@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 12126 2014-08-28 16:02:00Z msweet $"
+ * "$Id: http-private.h 12243 2014-11-12 12:12:59Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
@@ -160,6 +160,9 @@ extern "C" {
 #define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
 #define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
+
+#define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
+#define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
 
 
 /*
@@ -420,6 +423,7 @@ extern void		_httpTLSInitialize(void);
 extern size_t		_httpTLSPending(http_t *http);
 extern int		_httpTLSRead(http_t *http, char *buf, int len);
 extern int		_httpTLSSetCredentials(http_t *http);
+extern void		_httpTLSSetOptions(int options);
 extern int		_httpTLSStart(http_t *http);
 extern void		_httpTLSStop(http_t *http);
 extern int		_httpTLSWrite(http_t *http, const char *buf, int len);
@@ -438,5 +442,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 12126 2014-08-28 16:02:00Z msweet $".
+ * End of "$Id: http-private.h 12243 2014-11-12 12:12:59Z msweet $".
  */

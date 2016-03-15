@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 12125 2014-08-28 15:49:29Z msweet $"
+ * "$Id: http.c 12230 2014-10-21 13:55:24Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -2702,6 +2702,19 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
         http->server = _cupsStrAlloc(value);
         break;
 
+    case HTTP_FIELD_WWW_AUTHENTICATE :
+       /* CUPS STR #4503 - don't override WWW-Authenticate for unknown auth schemes */
+        if (http->fields[HTTP_FIELD_WWW_AUTHENTICATE][0] &&
+	    _cups_strncasecmp(value, "Basic ", 6) &&
+	    _cups_strncasecmp(value, "Digest ", 7) &&
+	    _cups_strncasecmp(value, "Negotiate ", 10))
+	{
+	  DEBUG_printf(("1httpSetField: Ignoring unknown auth scheme in \"%s\".", value));
+          return;
+	}
+
+	/* Fall through to copy */
+
     default :
 	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
 	break;
@@ -3610,6 +3623,17 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 	http->status = HTTP_STATUS_ERROR;
 	return (-1);
       }
+    }
+
+   /*
+    * "Click-jacking" defense (STR #4492)...
+    */
+
+    if (httpPrintf(http, "X-Frame-Options: DENY\r\n"
+                         "Content-Security-Policy: frame-ancestors 'none'\r\n") < 1)
+    {
+      http->status = HTTP_STATUS_ERROR;
+      return (-1);
     }
   }
 
@@ -4826,5 +4850,5 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 12125 2014-08-28 15:49:29Z msweet $".
+ * End of "$Id: http.c 12230 2014-10-21 13:55:24Z msweet $".
  */

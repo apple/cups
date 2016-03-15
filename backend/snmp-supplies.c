@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp-supplies.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: snmp-supplies.c 12228 2014-10-21 13:42:05Z msweet $"
  *
  * SNMP supplies functions for CUPS.
  *
@@ -297,6 +297,7 @@ backendSNMPSupplies(
               else
                 new_supply_state |= CUPS_OPC_NEAR_EOL;
               break;
+#if 0 /* Because no two vendors report waste containers the same, disable SNMP reporting of same */
           case CUPS_TC_wasteInk :
           case CUPS_TC_wastePaper :
           case CUPS_TC_wasteToner :
@@ -307,6 +308,7 @@ backendSNMPSupplies(
               else
                 new_supply_state |= CUPS_WASTE_ALMOST_FULL;
               break;
+#endif /* 0 */
           case CUPS_TC_cleanerUnit :
           case CUPS_TC_fuserCleaningPad :
               if (percent <= 1)
@@ -1096,5 +1098,5 @@ utf16_to_utf8(
 
 
 /*
- * End of "$Id: snmp-supplies.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: snmp-supplies.c 12228 2014-10-21 13:42:05Z msweet $".
  */

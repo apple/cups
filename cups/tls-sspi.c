@@ -1,7 +1,8 @@
 /*
- * "$Id: tls-sspi.c 12159 2014-09-23 14:56:14Z msweet $"
+ * "$Id: tls-sspi.c 12215 2014-10-20 18:24:56Z msweet $"
  *
- * TLS support for CUPS on Windows using SSPI.
+ * TLS support for CUPS on Windows using the Security Support Provider
+ * Interface (SSPI).
  *
  * Copyright 2010-2014 by Apple Inc.
  *
@@ -47,6 +48,14 @@
 #ifndef SECURITY_FLAG_IGNORE_CERT_DATE_INVALID
 #  define SECURITY_FLAG_IGNORE_CERT_DATE_INVALID  0x00002000 /* Expired X509 Cert. */
 #endif /* !SECURITY_FLAG_IGNORE_CERT_DATE_INVALID */
+
+
+/*
+ * Local globals...
+ */
+
+static int		tls_options = 0;/* Options for TLS connections */
+
 
 /*
  * Local functions...
@@ -897,6 +906,17 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 
 
 /*
+ * '_httpTLSSetOptions()' - Set TLS protocol and cipher suite options.
+ */
+
+void
+_httpTLSSetOptions(int options)		/* I - Options */
+{
+  tls_options = options;
+}
+
+
+/*
  * '_httpTLSStart()' - Set up SSL/TLS support on a connection.
  */
 
@@ -1727,11 +1747,43 @@ http_sspi_find_credentials(
   SchannelCred.paCred    = &storedContext;
 
  /*
-  * SSPI doesn't seem to like it if grbitEnabledProtocols is set for a client.
+  * Set supported protocols (can also be overriden in the registry...)
   */
 
+#ifdef SP_PROT_TLS1_2_SERVER
   if (http->mode == _HTTP_MODE_SERVER)
-    SchannelCred.grbitEnabledProtocols = SP_PROT_SSL3TLS1;
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER | SP_PROT_SSL3_SERVER;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER;
+  }
+  else
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT | SP_PROT_SSL3_CLIENT;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT;
+  }
+
+#else
+  if (http->mode == _HTTP_MODE_SERVER)
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER | SP_PROT_SSL3_SERVER;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER;
+  }
+  else
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_SSL3_CLIENT;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT;
+  }
+#endif /* SP_PROT_TLS1_2_SERVER */
+
+  /* TODO: Support _HTTP_TLS_ALLOW_RC4 option; right now we'll rely on Windows registry to enable/disable RC4... */
 
  /*
   * Create an SSPI credential.
@@ -2361,5 +2413,5 @@ http_sspi_verify(
 
 
 /*
- * End of "$Id: tls-sspi.c 12159 2014-09-23 14:56:14Z msweet $".
+ * End of "$Id: tls-sspi.c 12215 2014-10-20 18:24:56Z msweet $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 12074 2014-07-31 01:10:14Z msweet $"
+# "$Id: cups.spec.in 12222 2014-10-21 11:55:01Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -44,12 +44,12 @@
 
 Summary: CUPS
 Name: cups
-Version: 2.0.0
+Version: 2.0.1
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/2.0.0/cups-2.0.0-source.tar.bz2
+Source: http://www.cups.org/software/2.0.1/cups-2.0.1-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -180,7 +180,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 # SystemD
-/usr/lib/systemd/system/*
+/usr/lib/systemd/system/org.cups.cupsd.*
 
 %else
 # Legacy init support on Linux
@@ -268,8 +268,8 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/ca/*
 #%dir /usr/share/doc/cups/cs
 #/usr/share/doc/cups/cs/*
-#%dir /usr/share/doc/cups/es
-#/usr/share/doc/cups/es/*
+%dir /usr/share/doc/cups/es
+/usr/share/doc/cups/es/*
 #%dir /usr/share/doc/cups/fr
 #/usr/share/doc/cups/fr/*
 #%dir /usr/share/doc/cups/ja
@@ -379,7 +379,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files lpd
 %defattr(-,root,root)
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+# SystemD
+/usr/lib/systemd/system/org.cups.cups-lpd*
+%else
+# Legacy xinetd
 /etc/xinetd.d/cups-lpd
+%endif
+
 %dir /usr/lib/cups
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-lpd
@@ -388,5 +395,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 12074 2014-07-31 01:10:14Z msweet $".
+# End of "$Id: cups.spec.in 12222 2014-10-21 11:55:01Z msweet $".
 #

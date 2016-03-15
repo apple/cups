@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 12095 2014-08-19 16:16:06Z msweet $"
+ * "$Id: ipp-support.c 12194 2014-10-02 18:44:36Z msweet $"
  *
  * Internet Printing Protocol support functions for CUPS.
  *
@@ -2223,6 +2223,14 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
   ipp_attribute_t	*attr;		/* Current member attribute */
 
 
+  if (!col)
+  {
+    if (buffer)
+      *buffer = '\0';
+
+    return (0);
+  }
+
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
@@ -2263,5 +2271,5 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 
 
 /*
- * End of "$Id: ipp-support.c 12095 2014-08-19 16:16:06Z msweet $".
+ * End of "$Id: ipp-support.c 12194 2014-10-02 18:44:36Z msweet $".
  */

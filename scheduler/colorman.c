@@ -1,5 +1,5 @@
 /*
- * "$Id: colorman.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: colorman.c 12226 2014-10-21 13:36:05Z msweet $"
  *
  * Color management routines for the CUPS scheduler.
  *
@@ -186,7 +186,8 @@ void
 cupsdStopColor(void)
 {
 #if !defined(__APPLE__) && defined(HAVE_DBUS)
-  dbus_connection_unref(colord_con);
+  if (colord_con)
+    dbus_connection_unref(colord_con);
   colord_con = NULL;
 #endif /* !__APPLE__ && HAVE_DBUS */
 }
@@ -1514,5 +1515,5 @@ colord_unregister_printer(
 
 
 /*
- * End of "$Id: colorman.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: colorman.c 12226 2014-10-21 13:36:05Z msweet $".
  */

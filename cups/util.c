@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 12073 2014-07-31 00:58:00Z msweet $"
+ * "$Id: util.c 12220 2014-10-20 22:03:01Z msweet $"
  *
  * Printing utilities for CUPS.
  *
@@ -846,10 +846,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
     snprintf(ppdname, sizeof(ppdname), "%s/ppd/%s.ppd", cg->cups_serverroot,
              name);
-    if (!stat(ppdname, &ppdinfo))
+    if (!stat(ppdname, &ppdinfo) && !access(ppdname, R_OK))
     {
      /*
-      * OK, the file exists, use it!
+      * OK, the file exists and is readable, use it!
       */
 
       if (buffer[0])
@@ -1655,5 +1655,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 12073 2014-07-31 00:58:00Z msweet $".
+ * End of "$Id: util.c 12220 2014-10-20 22:03:01Z msweet $".
  */

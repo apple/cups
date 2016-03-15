@@ -1,5 +1,5 @@
 /*
- * "$Id: ippserver.c 12136 2014-08-29 15:19:40Z msweet $"
+ * "$Id: ippserver.c 12215 2014-10-20 18:24:56Z msweet $"
  *
  * Sample IPP Everywhere server for CUPS.
  *
@@ -57,6 +57,11 @@ extern char **environ;
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
+#elif defined(HAVE_AVAHI)
+#  include <avahi-client/client.h>
+#  include <avahi-client/publish.h>
+#  include <avahi-common/error.h>
+#  include <avahi-common/thread-watch.h>
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
@@ -231,6 +236,19 @@ static const char * const printer_supplies[] =
  * Structures...
  */
 
+#ifdef HAVE_DNSSD
+typedef DNSServiceRef _ipp_srv_t;	/* Service reference */
+typedef TXTRecordRef _ipp_txt_t;	/* TXT record */
+
+#elif defined(HAVE_AVAHI)
+typedef AvahiEntryGroup *_ipp_srv_t;	/* Service reference */
+typedef AvahiStringList *_ipp_txt_t;	/* TXT record */
+
+#else
+typedef void *_ipp_srv_t;		/* Service reference */
+typedef void *_ipp_txt_t;		/* TXT record */
+#endif /* HAVE_DNSSD */
+
 typedef struct _ipp_filter_s		/**** Attribute filter ****/
 {
   cups_array_t		*ra;		/* Requested attributes */
@@ -243,18 +261,12 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 {
   int			ipv4,		/* IPv4 listener */
 			ipv6;		/* IPv6 listener */
-#ifdef HAVE_DNSSD
-  DNSServiceRef		common_ref,	/* Shared service connection */
-			ipp_ref,	/* Bonjour IPP service */
-#  ifdef HAVE_SSL
+  _ipp_srv_t		ipp_ref,	/* Bonjour IPP service */
 			ipps_ref,	/* Bonjour IPPS service */
-#  endif /* HAVE_SSL */
 			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
-  TXTRecordRef		ipp_txt;	/* Bonjour IPP TXT record */
-  char			*dnssd_name;	/* printer-dnssd-name */
-#endif /* HAVE_DNSSD */
-  char			*name,		/* printer-name */
+  char			*dnssd_name,	/* printer-dnssd-name */
+			*name,		/* printer-name */
 			*icon,		/* Icon filename */
 			*directory,	/* Spool directory */
 			*hostname,	/* Hostname */
@@ -340,10 +352,7 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					const char *icon,
 					const char *docformats, int ppm,
 					int ppm_color, int duplex, int port,
-					int pin,
-#ifdef HAVE_DNSSD
-					const char *subtype,
-#endif /* HAVE_DNSSD */
+					int pin, const char *subtype,
 					const char *directory,
 					const char *command);
 static void		debug_attributes(const char *title, ipp_t *ipp,
@@ -359,7 +368,11 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *regtype,
 				       const char *domain,
 				       _ipp_printer_t *printer);
+#elif defined(HAVE_AVAHI)
+static void		dnssd_callback(AvahiEntryGroup *p, AvahiEntryGroupState state, void *context);
+static void		dnssd_client_cb(AvahiClient *c, AvahiClientState state, void *userdata);
 #endif /* HAVE_DNSSD */
+static void		dnssd_init(void);
 static int		filter_cb(_ipp_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
 static _ipp_job_t	*find_job(_ipp_client_t *client);
 static void		html_escape(_ipp_client_t *client, const char *s,
@@ -386,9 +399,7 @@ static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
 static void		*process_job(_ipp_job_t *job);
-#ifdef HAVE_DNSSD
 static int		register_printer(_ipp_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
-#endif /* HAVE_DNSSD */
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
 				     const char *type, size_t length);
@@ -407,6 +418,13 @@ static int		valid_job_attributes(_ipp_client_t *client);
 /*
  * Globals...
  */
+
+#  ifdef HAVE_DNSSD
+static DNSServiceRef	DNSSDMaster = NULL;
+#  else /* HAVE_AVAHI */
+static AvahiThreadedPoll *DNSSDMaster = NULL;
+static AvahiClient	*DNSSDClient = NULL;
+#  endif /* HAVE_DNSSD */
 
 static int		KeepFiles = 0,
 			Verbosity = 0;
@@ -434,9 +452,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_SSL
   const char	*keypath = NULL;	/* Keychain path */
 #endif /* HAVE_SSL */
-#ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
-#endif /* HAVE_DNSSD */
   int		port = 0,		/* Port number (0 = auto) */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
@@ -546,14 +562,12 @@ main(int  argc,				/* I - Number of command-line args */
 	      port = atoi(argv[i]);
 	      break;
 
-#ifdef HAVE_DNSSD
 	  case 'r' : /* -r subtype */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
 	      subtype = argv[i];
 	      break;
-#endif /* HAVE_DNSSD */
 
 	  case 's' : /* -s speed[,color-speed] */
 	      i ++;
@@ -597,8 +611,8 @@ main(int  argc,				/* I - Number of command-line args */
   {
 #ifdef WIN32
    /*
-    * Windows is almost always used as a single user system, so use a default port
-    * number of 8631.
+    * Windows is almost always used as a single user system, so use a default
+    * port number of 8631.
     */
 
     port = 8631;
@@ -634,15 +648,18 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_SSL */
 
  /*
+  * Initialize Bonjour...
+  */
+
+  dnssd_init();
+
+ /*
   * Create the printer...
   */
 
   if ((printer = create_printer(servername, name, location, make, model, icon,
                                 formats, ppm, ppm_color, duplex, port, pin,
-#ifdef HAVE_DNSSD
-				subtype,
-#endif /* HAVE_DNSSD */
-				directory, command)) == NULL)
+				subtype, directory, command)) == NULL)
     return (1);
 
  /*
@@ -1197,9 +1214,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       int        duplex,	/* I - 1 = duplex, 0 = simplex */
 	       int        port,		/* I - Port for listeners or 0 for auto */
 	       int        pin,		/* I - Require PIN printing */
-#ifdef HAVE_DNSSD
 	       const char *subtype,	/* I - Bonjour service subtype */
-#endif /* HAVE_DNSSD */
 	       const char *directory,	/* I - Spool directory */
 	       const char *command)	/* I - Command to run on job files */
 {
@@ -1435,9 +1450,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->ipv4          = -1;
   printer->ipv6          = -1;
   printer->name          = strdup(name);
-#ifdef HAVE_DNSSD
   printer->dnssd_name    = strdup(printer->name);
-#endif /* HAVE_DNSSD */
   printer->command       = command ? strdup(command) : NULL;
   printer->directory     = strdup(directory);
   printer->hostname      = strdup(servername);
@@ -2078,14 +2091,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   debug_attributes("Printer", printer->attrs, 0);
 
-#ifdef HAVE_DNSSD
  /*
   * Register the printer with Bonjour...
   */
 
   if (!register_printer(printer, location, make, model, docformats, adminurl, uuid + 9, ppm_color > 0, duplex, subtype))
     goto bad_printer;
-#endif /* HAVE_DNSSD */
 
  /*
   * Return it!
@@ -2227,26 +2238,29 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
 #if HAVE_DNSSD
   if (printer->printer_ref)
     DNSServiceRefDeallocate(printer->printer_ref);
-
   if (printer->ipp_ref)
     DNSServiceRefDeallocate(printer->ipp_ref);
-
-#  ifdef HAVE_SSL
   if (printer->ipps_ref)
     DNSServiceRefDeallocate(printer->ipps_ref);
-#  endif /* HAVE_SSL */
   if (printer->http_ref)
     DNSServiceRefDeallocate(printer->http_ref);
+#elif defined(HAVE_AVAHI)
+  avahi_threaded_poll_lock(DNSSDMaster);
 
-  if (printer->common_ref)
-    DNSServiceRefDeallocate(printer->common_ref);
+  if (printer->printer_ref)
+    avahi_entry_group_free(printer->printer_ref);
+  if (printer->ipp_ref)
+    avahi_entry_group_free(printer->ipp_ref);
+  if (printer->ipps_ref)
+    avahi_entry_group_free(printer->ipps_ref);
+  if (printer->http_ref)
+    avahi_entry_group_free(printer->http_ref);
 
-  TXTRecordDeallocate(&(printer->ipp_txt));
+  avahi_threaded_poll_unlock(DNSSDMaster);
+#endif /* HAVE_DNSSD */
 
   if (printer->dnssd_name)
     free(printer->dnssd_name);
-#endif /* HAVE_DNSSD */
-
   if (printer->name)
     free(printer->name);
   if (printer->icon)
@@ -2302,7 +2316,92 @@ dnssd_callback(
     printer->dnssd_name = strdup(name);
   }
 }
+
+
+#elif defined(HAVE_AVAHI)
+/*
+ * 'dnssd_callback()' - Handle Bonjour registration events.
+ */
+
+static void
+dnssd_callback(
+    AvahiEntryGroup      *srv,		/* I - Service */
+    AvahiEntryGroupState state,		/* I - Registration state */
+    void                 *context)	/* I - Printer */
+{
+  (void)srv;
+  (void)state;
+  (void)context;
+}
+
+
+/*
+ * 'dnssd_client_cb()' - Client callback for Avahi.
+ *
+ * Called whenever the client or server state changes...
+ */
+
+static void
+dnssd_client_cb(
+    AvahiClient      *c,		/* I - Client */
+    AvahiClientState state,		/* I - Current state */
+    void             *userdata)		/* I - User data (unused) */
+{
+  (void)userdata;
+
+  if (!c)
+    return;
+
+  switch (state)
+  {
+    default :
+        fprintf(stderr, "Ignore Avahi state %d.\n", state);
+	break;
+
+    case AVAHI_CLIENT_FAILURE:
+	if (avahi_client_errno(c) == AVAHI_ERR_DISCONNECTED)
+	{
+	  fputs("Avahi server crashed, exiting.\n", stderr);
+	  exit(1);
+	}
+	break;
+  }
+}
 #endif /* HAVE_DNSSD */
+
+
+/*
+ * 'dnssd_init()' - Initialize the DNS-SD service connections...
+ */
+
+static void
+dnssd_init(void)
+{
+#ifdef HAVE_DNSSD
+  if (DNSServiceCreateConnection(&DNSSDMaster) != kDNSServiceErr_NoError)
+  {
+    fputs("Error: Unable to initialize Bonjour.\n", stderr);
+    exit(1);
+  }
+
+#elif defined(HAVE_AVAHI)
+  int error;			/* Error code, if any */
+
+  if ((DNSSDMaster = avahi_threaded_poll_new()) == NULL)
+  {
+    fputs("Error: Unable to initialize Bonjour.\n", stderr);
+    exit(1);
+  }
+
+  if ((DNSSDClient = avahi_client_new(avahi_threaded_poll_get(DNSSDMaster), AVAHI_CLIENT_NO_FAIL, dnssd_client_cb, NULL, &error)) == NULL)
+  {
+    fputs("Error: Unable to initialize Bonjour.\n", stderr);
+    exit(1);
+  }
+
+  avahi_threaded_poll_start(DNSSDMaster);
+#endif /* HAVE_DNSSD */
+}
 
 
 /*
@@ -2318,7 +2417,9 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
   * Filter attributes as needed...
   */
 
-//  (void)dst;
+#ifndef WIN32 /* Avoid MS compiler bug */
+  (void)dst;
+#endif /* !WIN32 */
 
   ipp_tag_t group = ippGetGroupTag(attr);
   const char *name = ippGetName(attr);
@@ -5426,7 +5527,6 @@ process_job(_ipp_job_t *job)		/* I - Job */
 }
 
 
-#ifdef HAVE_DNSSD
 /*
  * 'register_printer()' - Register a printer object via Bonjour.
  */
@@ -5444,6 +5544,8 @@ register_printer(
     int            duplex,		/* I - 1 = duplex, 0 = simplex */
     const char     *subtype)		/* I - Service subtype */
 {
+  _ipp_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
+#ifdef HAVE_DNSSD
   DNSServiceErrorType	error;		/* Error from Bonjour */
   char			make_model[256],/* Make and model together */
 			product[256],	/* Product string */
@@ -5457,47 +5559,36 @@ register_printer(
   snprintf(make_model, sizeof(make_model), "%s %s", make, model);
   snprintf(product, sizeof(product), "(%s)", model);
 
-  TXTRecordCreate(&(printer->ipp_txt), 1024, NULL);
-  TXTRecordSetValue(&(printer->ipp_txt), "rp", 9, "ipp/print");
-  TXTRecordSetValue(&(printer->ipp_txt), "ty", (uint8_t)strlen(make_model),
+  TXTRecordCreate(&ipp_txt, 1024, NULL);
+  TXTRecordSetValue(&ipp_txt, "rp", 9, "ipp/print");
+  TXTRecordSetValue(&ipp_txt, "ty", (uint8_t)strlen(make_model),
                     make_model);
-  TXTRecordSetValue(&(printer->ipp_txt), "adminurl", (uint8_t)strlen(adminurl),
+  TXTRecordSetValue(&ipp_txt, "adminurl", (uint8_t)strlen(adminurl),
                     adminurl);
   if (*location)
-    TXTRecordSetValue(&(printer->ipp_txt), "note", (uint8_t)strlen(location),
+    TXTRecordSetValue(&ipp_txt, "note", (uint8_t)strlen(location),
 		      location);
-  TXTRecordSetValue(&(printer->ipp_txt), "product", (uint8_t)strlen(product),
+  TXTRecordSetValue(&ipp_txt, "product", (uint8_t)strlen(product),
                     product);
-  TXTRecordSetValue(&(printer->ipp_txt), "pdl", (uint8_t)strlen(formats),
+  TXTRecordSetValue(&ipp_txt, "pdl", (uint8_t)strlen(formats),
                     formats);
-  TXTRecordSetValue(&(printer->ipp_txt), "Color", 1, color ? "T" : "F");
-  TXTRecordSetValue(&(printer->ipp_txt), "Duplex", 1, duplex ? "T" : "F");
-  TXTRecordSetValue(&(printer->ipp_txt), "usb_MFG", (uint8_t)strlen(make),
+  TXTRecordSetValue(&ipp_txt, "Color", 1, color ? "T" : "F");
+  TXTRecordSetValue(&ipp_txt, "Duplex", 1, duplex ? "T" : "F");
+  TXTRecordSetValue(&ipp_txt, "usb_MFG", (uint8_t)strlen(make),
                     make);
-  TXTRecordSetValue(&(printer->ipp_txt), "usb_MDL", (uint8_t)strlen(model),
+  TXTRecordSetValue(&ipp_txt, "usb_MDL", (uint8_t)strlen(model),
                     model);
-  TXTRecordSetValue(&(printer->ipp_txt), "UUID", (uint8_t)strlen(uuid), uuid);
+  TXTRecordSetValue(&ipp_txt, "UUID", (uint8_t)strlen(uuid), uuid);
 #  ifdef HAVE_SSL
-  TXTRecordSetValue(&(printer->ipp_txt), "TLS", 3, "1.2");
+  TXTRecordSetValue(&ipp_txt, "TLS", 3, "1.2");
 #  endif /* HAVE_SSL */
-
- /*
-  * Create a shared service reference for Bonjour...
-  */
-
-  if ((error = DNSServiceCreateConnection(&(printer->common_ref)))
-          != kDNSServiceErr_NoError)
-  {
-    fprintf(stderr, "Unable to create mDNSResponder connection: %d\n", error);
-    return (0);
-  }
 
  /*
   * Register the _printer._tcp (LPD) service type with a port number of 0 to
   * defend our service name but not actually support LPD...
   */
 
-  printer->printer_ref = printer->common_ref;
+  printer->printer_ref = DNSSDMaster;
 
   if ((error = DNSServiceRegister(&(printer->printer_ref),
                                   kDNSServiceFlagsShareConnection,
@@ -5518,7 +5609,7 @@ register_printer(
   * advertise our IPP printer...
   */
 
-  printer->ipp_ref = printer->common_ref;
+  printer->ipp_ref = DNSSDMaster;
 
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipp._tcp,%s", subtype);
@@ -5530,8 +5621,8 @@ register_printer(
                                   0 /* interfaceIndex */, printer->dnssd_name,
 				  regtype, NULL /* domain */,
 				  NULL /* host */, htons(printer->port),
-				  TXTRecordGetLength(&(printer->ipp_txt)),
-				  TXTRecordGetBytesPtr(&(printer->ipp_txt)),
+				  TXTRecordGetLength(&ipp_txt),
+				  TXTRecordGetBytesPtr(&ipp_txt),
 			          (DNSServiceRegisterReply)dnssd_callback,
 			          printer)) != kDNSServiceErr_NoError)
   {
@@ -5543,10 +5634,10 @@ register_printer(
 #  ifdef HAVE_SSL
  /*
   * Then register the _ipps._tcp (IPP) service type with the real port number to
-  * advertise our IPP printer...
+  * advertise our IPPS printer...
   */
 
-  printer->ipps_ref = printer->common_ref;
+  printer->ipps_ref = DNSSDMaster;
 
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipps._tcp,%s", subtype);
@@ -5558,8 +5649,8 @@ register_printer(
                                   0 /* interfaceIndex */, printer->dnssd_name,
 				  regtype, NULL /* domain */,
 				  NULL /* host */, htons(printer->port),
-				  TXTRecordGetLength(&(printer->ipp_txt)),
-				  TXTRecordGetBytesPtr(&(printer->ipp_txt)),
+				  TXTRecordGetLength(&ipp_txt),
+				  TXTRecordGetBytesPtr(&ipp_txt),
 			          (DNSServiceRegisterReply)dnssd_callback,
 			          printer)) != kDNSServiceErr_NoError)
   {
@@ -5574,7 +5665,7 @@ register_printer(
   * real port number to advertise our IPP printer...
   */
 
-  printer->http_ref = printer->common_ref;
+  printer->http_ref = DNSSDMaster;
 
   if ((error = DNSServiceRegister(&(printer->http_ref),
                                   kDNSServiceFlagsShareConnection,
@@ -5590,9 +5681,85 @@ register_printer(
     return (0);
   }
 
+  TXTRecordDeallocate(&ipp_txt);
+
+#elif defined(HAVE_AVAHI)
+  char		temp[256];		/* Subtype service string */
+
+ /*
+  * Create the TXT record...
+  */
+
+  ipp_txt = NULL;
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "rp=ipp/print");
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "ty=%s %s", make, model);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "adminurl=%s", adminurl);
+  if (*location)
+    ipp_txt = avahi_string_list_add_printf(ipp_txt, "note=%s", location);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "product=(%s)", model);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "pdl=%s", formats);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "Color=%s", color ? "T" : "F");
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "Duplex=%s", duplex ? "T" : "F");
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "usb_MFG=%s", make);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "usb_MDL=%s", model);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "UUID=%s", uuid);
+#  ifdef HAVE_SSL
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "TLS=1.2");
+#  endif /* HAVE_SSL */
+
+ /*
+  * Register _printer._tcp (LPD) with port 0 to reserve the service name...
+  */
+
+  avahi_threaded_poll_lock(DNSSDMaster);
+
+  printer->ipp_ref = avahi_entry_group_new(DNSSDClient, dnssd_callback, NULL);
+
+  avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_printer._tcp", NULL, NULL, 0, NULL);
+
+ /*
+  * Then register the _ipp._tcp (IPP)...
+  */
+
+  avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, NULL, printer->port, ipp_txt);
+  if (subtype && *subtype)
+  {
+    snprintf(temp, sizeof(temp), "%s._sub._ipp._tcp", subtype);
+    avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, temp);
+  }
+
+#ifdef HAVE_SSL
+ /*
+  * _ipps._tcp (IPPS) for secure printing...
+  */
+
+  avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, NULL, printer->port, ipp_txt);
+  if (subtype && *subtype)
+  {
+    snprintf(temp, sizeof(temp), "%s._sub._ipps._tcp", subtype);
+    avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, temp);
+  }
+#endif /* HAVE_SSL */
+
+ /*
+  * Finally _http.tcp (HTTP) for the web interface...
+  */
+
+  avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_http._tcp", NULL, NULL, printer->port, NULL);
+  avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_http._tcp", NULL, "_printer._sub._http._tcp");
+
+ /*
+  * Commit it...
+  */
+
+  avahi_entry_group_commit(printer->ipp_ref);
+  avahi_threaded_poll_unlock(DNSSDMaster);
+
+  avahi_string_list_free(ipp_txt);
+#endif /* HAVE_DNSSD */
+
   return (1);
 }
-#endif /* HAVE_DNSSD */
 
 
 /*
@@ -5786,7 +5953,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
   num_fds = 2;
 
 #ifdef HAVE_DNSSD
-  polldata[num_fds   ].fd     = DNSServiceRefSockFD(printer->common_ref);
+  polldata[num_fds   ].fd     = DNSServiceRefSockFD(DNSSDMaster);
   polldata[num_fds ++].events = POLLIN;
 #endif /* HAVE_DNSSD */
 
@@ -5833,7 +6000,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
 
 #ifdef HAVE_DNSSD
     if (polldata[2].revents & POLLIN)
-      DNSServiceProcessResult(printer->common_ref);
+      DNSServiceProcessResult(DNSSDMaster);
 #endif /* HAVE_DNSSD */
 
    /*
@@ -5871,7 +6038,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2013 by Apple Inc. All rights "
+    puts(CUPS_SVERSION " - Copyright 2010-2014 by Apple Inc. All rights "
          "reserved.");
     puts("");
   }
@@ -5894,9 +6061,7 @@ usage(int status)			/* O - Exit status */
   puts("-m model                Model name (default=Printer)");
   puts("-n hostname             Hostname for printer");
   puts("-p port                 Port number (default=auto)");
-#ifdef HAVE_DNSSD
   puts("-r subtype              Bonjour service subtype (default=_print)");
-#endif /* HAVE_DNSSD */
   puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
   puts("-v[vvv]                 Be (very) verbose");
 
@@ -6303,5 +6468,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id: ippserver.c 12136 2014-08-29 15:19:40Z msweet $".
+ * End of "$Id: ippserver.c 12215 2014-10-20 18:24:56Z msweet $".
  */

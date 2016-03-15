@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 11776 2014-03-28 19:16:05Z msweet $"
+ * "$Id: auth.c 12230 2014-10-21 13:55:24Z msweet $"
  *
  * Authentication functions for CUPS.
  *
@@ -761,7 +761,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
   if (
 #    ifdef HAVE_GSSAPI
-      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
+      _cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
 #    endif /* HAVE_GSSAPI */
 #    ifdef HAVE_AUTHORIZATION_H
       !httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
@@ -808,7 +808,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
                   filename, strerror(errno)));
 
 #  ifdef HAVE_GSSAPI
-    if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
+    if (!_cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
       * Kerberos required, don't try the root certificate...
@@ -876,5 +876,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 11776 2014-03-28 19:16:05Z msweet $".
+ * End of "$Id: auth.c 12230 2014-10-21 13:55:24Z msweet $".
  */

@@ -303,6 +303,12 @@ The default is "Minimal".
 <dd style="margin-left: 5.0em"><dt><b>SSLListen [</b><i>ipv6-address</i><b>]:</b><i>port</i>
 <dd style="margin-left: 5.0em"><dt><b>SSLListen *:</b><i>port</i>
 <dd style="margin-left: 5.0em">Listens on the specified address and port for encrypted connections.
+<dt><b>SSLOptions </b>[<i>AllowRC4</i>] [<i>AllowSSL3</i>]
+<dd style="margin-left: 5.0em"><dt><b>SSLOptions None</b>
+<dd style="margin-left: 5.0em">Sets encryption options.
+By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
+The <i>AllowRC4</i> option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
+The <i>AllowSSL3</i> option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
 <dt><b>SSLPort </b><i>port</i>
 <dd style="margin-left: 5.0em">Listens on the specified port for encrypted connections.
 <dt><b>StrictConformance Yes</b>

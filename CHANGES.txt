@@ -1,5 +1,33 @@
-CHANGES.txt - 2.0.0 - 2014-10-01
+CHANGES.txt - 2.0.1 - 2014-11-14
 --------------------------------
+
+CHANGES IN CUPS V2.0.1
+
+	- Security: SSLv3 is now disabled by default to protect against the
+	  POODLE attack (STR #4476)
+	- Printer sharing did not work when systemd was being used (STR #4497)
+	- cupsGetPPD* would return a symlink to the PPD in /etc/cups/ppd even if
+	  it was not readable by the user (STR #4500)
+	- The web interface now protects against frame "click-jacking" attacks
+	  (STR #4492)
+	- Fixed a crash in ippAttributeString (<rdar://problem/17903871>)
+	- Fixed a crash in the scheduler on Linux/*BSD if colord was not running
+	  (STR #4496)
+	- Fixed a random crash in the scheduler when not using systemd
+	  (STR #4484)
+	- Added systemd support for cups-lpd (STR #4493)
+	- The scheduler did not honor the FatalErrors directive for mis-
+	  configured Group and SystemGroup values (STR #4495)
+	- The network backends no longer report waste-receptacle conditions when
+	  using SNMP (STR #4499)
+	- The IPP backend did not work with some configurations of Windows
+	  (STR #4503)
+	- RPMs did not build (STR #4490)
+	- Added a USB quirk rule for the Brother HL-1250 (STR #4519)
+	- Fixed compiles on unsupported platforms (STR #4510)
+	- "cancel -a" did not cancel all jobs on all destinations (STR #4513)
+	- The web interface did not work on OpenBSD (STR #4496)
+
 
 CHANGES IN CUPS V2.0.0
 

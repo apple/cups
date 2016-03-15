@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 12178 2014-09-30 18:56:48Z msweet $"
+ * "$Id: conf.c 12224 2014-10-21 13:16:30Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -596,6 +596,8 @@ cupsdReadConfiguration(void)
 #  else
   cupsdSetString(&ServerKeychain, "/Library/Keychains/System.keychain");
 #  endif /* HAVE_GNUTLS */
+
+  _httpTLSSetOptions(0);
 #endif /* HAVE_SSL */
 
   language = cupsLangDefault();
@@ -993,6 +995,9 @@ cupsdReadConfiguration(void)
 
       cupsdLogMessage(CUPSD_LOG_NOTICE,
                       "Group and SystemGroup cannot use the same groups.");
+      if (FatalErrors & (CUPSD_FATAL_CONFIG | CUPSD_FATAL_PERMISSIONS))
+        return (0);
+
       cupsdLogMessage(CUPSD_LOG_INFO, "Resetting Group to \"nobody\"...");
 
       group = getgrnam("nobody");
@@ -2929,6 +2934,49 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 		      "FaxRetryLimit is deprecated; use "
 		      "JobRetryLimit on line %d.", linenum);
     }
+    else if (!_cups_strcasecmp(line, "SSLOptions"))
+    {
+     /*
+      * SSLOptions [AllowRC4] [AllowSSL3] [None]
+      */
+
+      int	options = 0;		/* SSL/TLS options */
+
+      if (value)
+      {
+        char	*start,			/* Start of option */
+		*end;			/* End of option */
+
+	for (start = value; *start; start = end)
+	{
+	 /*
+	  * Find end of keyword...
+	  */
+
+	  end = start;
+	  while (*end && !_cups_isspace(*end))
+	    end ++;
+
+	  if (*end)
+	    *end++ = '\0';
+
+         /*
+	  * Compare...
+	  */
+
+          if (!_cups_strcasecmp(start, "AllowRC4"))
+	    options |= _HTTP_TLS_ALLOW_RC4;
+          else if (!_cups_strcasecmp(start, "AllowSSL3"))
+	    options |= _HTTP_TLS_ALLOW_SSL3;
+          else if (!_cups_strcasecmp(start, "None"))
+	    options = 0;
+	  else if (_cups_strcasecmp(start, "NoEmptyFragments"))
+	    cupsdLogMessage(CUPSD_LOG_WARN, "Unknown SSL option %s at line %d.", start, linenum);
+        }
+      }
+
+      _httpTLSSetOptions(options);
+    }
     else if ((!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
 #ifdef HAVE_SSL
              || !_cups_strcasecmp(line, "SSLPort") || !_cups_strcasecmp(line, "SSLListen")
@@ -4093,5 +4141,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 12178 2014-09-30 18:56:48Z msweet $".
+ * End of "$Id: conf.c 12224 2014-10-21 13:16:30Z msweet $".
  */
