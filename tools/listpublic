@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# List public API symbols...
+#
+
+for function in `nm -g *.so | grep "T " | awk '{print $3}' | grep -v '^_' | sort`; do
+	found=`grep $function\( *.h | grep -v DEPRECATED`
+
+	if test "x$found" != x; then
+		echo $function
+	fi
+done

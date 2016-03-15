@@ -1,5 +1,10 @@
-CHANGES.txt - 2.1.3 - 2016-02-05
+CHANGES.txt - 2.1.4 - 2016-02-12
 --------------------------------
+
+CHANGES IN CUPS V2.1.4
+
+	- Documentation update (STR #4772)
+
 
 CHANGES IN CUPS V2.1.3
 

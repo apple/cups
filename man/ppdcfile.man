@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: ppdcfile.man 12854 2015-08-28 14:08:00Z msweet $"
+.\" "$Id: ppdcfile.man 13117 2016-03-07 18:36:16Z msweet $"
 .\"
 .\" ppdcfile man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2016 by Apple Inc.
 .\" Copyright 1997-2007 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdcfile 5 "CUPS" "12 June 2014" "Apple Inc."
+.TH ppdcfile 5 "CUPS" "5 March 2016" "Apple Inc."
 .SH NAME
 ppdcfile \- cups ppd compiler source file format
 .SH DESCRIPTION
@@ -82,7 +82,7 @@ Directives may be placed anywhere on a line and are followed by one or more valu
 .TP 5
 \fBDuplex \fItype\fR
 .TP 5
-\fBFilter \Imime-type cost program\fR
+\fBFilter \fImime-type cost program\fR
 .TP 5
 \fBFinishing \fIname\fR
 .TP 5
@@ -161,5 +161,5 @@ CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: ppdcfile.man 12854 2015-08-28 14:08:00Z msweet $".
+.\" End of "$Id: ppdcfile.man 13117 2016-03-07 18:36:16Z msweet $".
 .\"
