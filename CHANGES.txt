@@ -1,5 +1,19 @@
-CHANGES.txt - 2.1b1 - 2015-06-03
---------------------------------
+CHANGES.txt - 2.1rc1 - 2015-07-31
+---------------------------------
+
+CHANGES IN CUPS V2.1rc1
+
+	- Added support for 3D printers (basic types only, no built-in filters)
+	  based on PWG white paper.
+	- Fixed bugs in the new journald support (STR #4655, STR #4658,
+	  STR #4661)
+	- Fixed domain socket support on Linux (STR #4679)
+	- Fixed signal handlers in the dnssd and usb backends (STR #4671)
+	- <Limit All> in <Policy> sections now applies to all operations when
+	  used by itself (STR #4659)
+	- Configure script changes for systemd support (STR #4669)
+	- Updated autoconf sources to use newer form of AC_INIT (STR #4664)
+
 
 CHANGES IN CUPS V2.1b1
 

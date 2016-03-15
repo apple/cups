@@ -1,9 +1,9 @@
 /*
- * "$Id: po2strings.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: po2strings.c 12794 2015-07-20 18:26:20Z msweet $"
  *
  * Convert a GNU gettext .po file to an Apple .strings file.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -49,6 +49,9 @@
  * characters like newline and the double quote character.
  */
 
+static char	*normalize_string(const char *idstr, char *buffer, size_t bufsize);
+
+
 /*
  *   main() - Convert .po file to .strings.
  */
@@ -66,7 +69,8 @@ main(int  argc,				/* I - Number of command-line args */
 			*ptr,		/* Pointer into buffer */
 			*temp,		/* New string */
 			*msgid,		/* msgid string */
-			*msgstr;	/* msgstr string */
+			*msgstr,	/* msgstr string */
+			normalized[8192];/* Normalized msgid string */
   size_t		length;		/* Length of combined strings */
   int			use_msgid;	/* Use msgid strings for msgstr? */
 
@@ -190,8 +194,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (msgid && msgstr)
 	{
 	  if (*msgid)
-            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
-	                   (use_msgid || !*msgstr) ? msgid : msgstr);
+            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid, normalize_string((use_msgid || !*msgstr) ? msgid : msgstr, normalized, sizeof(normalized)));
 	}
 
 	if (msgid)
@@ -270,8 +273,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (msgid && msgstr)
   {
     if (*msgid)
-      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
-		     (use_msgid || !*msgstr) ? msgid : msgstr);
+      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid, normalize_string((use_msgid || !*msgstr) ? msgid : msgstr, normalized, sizeof(normalized)));
   }
 
   if (msgid)
@@ -288,5 +290,79 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: po2strings.c 11558 2014-02-06 18:33:34Z msweet $".
+ * 'normalize_string()' - Normalize a msgid string.
+ *
+ * This function converts ASCII ellipsis and double quotes to their Unicode
+ * counterparts.
+ */
+
+static char *				/* O - Normalized string */
+normalize_string(const char *idstr,	/* I - msgid string */
+                 char       *buffer,	/* I - Normalized string buffer */
+                 size_t     bufsize)	/* I - Size of string buffer */
+{
+  char	*bufptr = buffer,		/* Pointer into buffer */
+	*bufend = buffer + bufsize - 3;	/* End of buffer */
+  int	quote = 0,			/* Quote direction */
+	html = 0;			/* HTML text */
+
+
+  while (*idstr && bufptr < bufend)
+  {
+    if (!strncmp(idstr, "<A ", 3))
+      html = 1;
+    else if (html && *idstr == '>')
+      html = 0;
+
+    if (*idstr == '.' && idstr[1] == '.' && idstr[2] == '.')
+    {
+     /*
+      * Convert ... to Unicode ellipsis...
+      */
+
+      *bufptr++ = (char)0xE2;
+      *bufptr++ = (char)0x80;
+      *bufptr++ = (char)0xA6;
+      idstr += 2;
+    }
+    else if (!html && *idstr == '\\' && idstr[1] == '\"' && (quote || strchr(idstr + 2, '\"') != NULL))
+    {
+      if (quote)
+      {
+       /*
+        * Convert \" to Unicode right (curley) double quote.
+        */
+
+	*bufptr++ = (char)0xE2;
+	*bufptr++ = (char)0x80;
+	*bufptr++ = (char)0x9D;
+      }
+      else
+      {
+       /*
+        * Convert \" to Unicode left (curley) double quote.
+        */
+
+	*bufptr++ = (char)0xE2;
+	*bufptr++ = (char)0x80;
+	*bufptr++ = (char)0x9C;
+      }
+
+      quote = !quote;
+      idstr ++;
+    }
+    else
+      *bufptr++ = *idstr;
+
+    idstr ++;
+  }
+
+  *bufptr = '\0';
+
+  return (buffer);
+}
+
+
+/*
+ * End of "$Id: po2strings.c 12794 2015-07-20 18:26:20Z msweet $".
  */

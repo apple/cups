@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 12722 2015-06-08 22:00:19Z msweet $"
+ * "$Id: printers.c 12733 2015-06-12 01:21:05Z msweet $"
  *
  * Printer routines for the CUPS scheduler.
  *
@@ -3990,10 +3990,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (ppd->num_sizes == 0 || !p->pc)
     {
-      if (!ppdFindAttr(ppd, "APScannerOnly", NULL))
+      if (!ppdFindAttr(ppd, "APScannerOnly", NULL) && !ppdFindAttr(ppd, "cups3D", NULL))
 	cupsdLogMessage(CUPSD_LOG_CRIT,
 			"The PPD file for printer %s contains no media "
-			"options and is therefore invalid!", p->name);
+			"options and is therefore invalid.", p->name);
 
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "media-default", NULL, "unknown");
@@ -4683,6 +4683,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
 
    /*
+    * 3D printer support...
+    */
+
+    if (ppdFindAttr(ppd, "cups3D", NULL))
+      p->type |= CUPS_PRINTER_3D;
+
+   /*
     * Show current and available port monitors for this printer...
     */
 
@@ -5071,5 +5078,5 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: printers.c 12722 2015-06-08 22:00:19Z msweet $".
+ * End of "$Id: printers.c 12733 2015-06-12 01:21:05Z msweet $".
  */

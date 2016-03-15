@@ -1,5 +1,5 @@
 /*
- * "$Id: dnssd.c 12659 2015-05-22 19:06:41Z msweet $"
+ * "$Id: dnssd.c 12818 2015-07-31 13:29:25Z msweet $"
  *
  * DNS-SD discovery backend for CUPS.
  *
@@ -1289,7 +1289,7 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
   (void)sig;
 
   if (job_canceled)
-    exit(CUPS_BACKEND_OK);
+    _exit(CUPS_BACKEND_OK);
   else
     job_canceled = 1;
 }
@@ -1330,5 +1330,5 @@ unquote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: dnssd.c 12659 2015-05-22 19:06:41Z msweet $".
+ * End of "$Id: dnssd.c 12818 2015-07-31 13:29:25Z msweet $".
  */

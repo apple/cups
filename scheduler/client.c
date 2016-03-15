@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 12700 2015-06-08 18:32:35Z msweet $"
+ * "$Id: client.c 12751 2015-06-24 18:22:32Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
@@ -2159,6 +2159,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                http_status_t  code,	/* I - Error code */
 	       int            auth_type)/* I - Authentication type */
 {
+  char	location[HTTP_MAX_VALUE];	/* Location field */
+
+
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendError code=%d, auth_type=%d",
 		 code, auth_type);
 
@@ -2191,7 +2194,11 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   * never disable it in that case.
   */
 
+  strlcpy(location, httpGetField(con->http, HTTP_FIELD_LOCATION), sizeof(location));
+
   httpClearFields(con->http);
+
+  httpSetField(con->http, HTTP_FIELD_LOCATION, location);
 
   if (code >= HTTP_STATUS_BAD_REQUEST && con->type != CUPSD_AUTH_NEGOTIATE)
     httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
@@ -4065,5 +4072,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 12700 2015-06-08 18:32:35Z msweet $".
+ * End of "$Id: client.c 12751 2015-06-24 18:22:32Z msweet $".
  */

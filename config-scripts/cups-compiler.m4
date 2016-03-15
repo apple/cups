@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 12122 2014-08-28 12:55:52Z msweet $"
+dnl "$Id: cups-compiler.m4 12742 2015-06-23 14:48:53Z msweet $"
 dnl
 dnl Compiler stuff for CUPS.
 dnl
@@ -156,6 +156,15 @@ if test -n "$GCC"; then
 		# Add useful warning options for tracking down problems...
 		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
 
+		AC_MSG_CHECKING(whether compiler supports -Wno-unused-result)
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -Werror -Wno-unused-result"
+		AC_TRY_COMPILE(,,
+			[OPTIM="$OPTIM -Wno-unused-result"
+			AC_MSG_RESULT(yes)],
+			AC_MSG_RESULT(no))
+		CFLAGS="$OLDCFLAGS"
+
 		AC_MSG_CHECKING(whether compiler supports -Wsign-conversion)
 		OLDCFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS -Werror -Wsign-conversion"
@@ -237,5 +246,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 12122 2014-08-28 12:55:52Z msweet $".
+dnl End of "$Id: cups-compiler.m4 12742 2015-06-23 14:48:53Z msweet $".
 dnl

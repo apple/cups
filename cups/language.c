@@ -1,9 +1,9 @@
 /*
- * "$Id: language.c 12262 2014-11-19 15:18:33Z msweet $"
+ * "$Id: language.c 12790 2015-07-20 17:05:06Z msweet $"
  *
  * I18N/language support for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1305,7 +1305,8 @@ static cups_array_t *			/* O - Message catalog */
 appleMessageLoad(const char *locale)	/* I - Locale ID */
 {
   char			filename[1024],	/* Path to cups.strings file */
-			applelang[256];	/* Apple language ID */
+			applelang[256],	/* Apple language ID */
+			baselang[3];	/* Base language */
   CFURLRef		url;		/* URL to cups.strings file */
   CFReadStreamRef	stream = NULL;	/* File stream */
   CFPropertyListRef	plist = NULL;	/* Localization file */
@@ -1345,6 +1346,15 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       locale = "Japanese";
     else if (!strncmp(locale, "es", 2))
       locale = "Spanish";
+    else if (strstr(locale, "_") != NULL || strstr(locale, "-") != NULL)
+    {
+     /*
+      * Drop country code, just try language...
+      */
+
+      strlcpy(baselang, locale, sizeof(baselang));
+      locale = baselang;
+    }
 
     snprintf(filename, sizeof(filename),
 	     CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
@@ -1588,5 +1598,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 12262 2014-11-19 15:18:33Z msweet $".
+ * End of "$Id: language.c 12790 2015-07-20 17:05:06Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd-private.h 12722 2015-06-08 22:00:19Z msweet $"
+ * "$Id: ppd-private.h 12733 2015-06-12 01:21:05Z msweet $"
  *
  * Private PPD definitions for CUPS.
  *
@@ -109,6 +109,14 @@ typedef struct _pwg_finishings_s	/**** PWG finishings mapping data ****/
   cups_option_t		*options;	/* Options to apply */
 } _pwg_finishings_t;
 
+typedef struct _pwg_material_s		/**** PWG material mapping data ****/
+{
+  char		*key,			/* material-key value */
+		*name;			/* material-name value */
+  int		num_props;		/* Number of properties */
+  cups_option_t	*props;			/* Material properties */
+} _pwg_material_t;
+
 struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 {
   int		num_bins;		/* Number of output bins */
@@ -148,6 +156,11 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
   cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
+  char		*cups_3d,		/* cups3D value */
+		*cups_layer_order;	/* cupsLayerOrder value */
+  int		cups_accuracy[3];	/* cupsAccuracy value - x, y, and z in nanometers */
+  int		cups_volume[3];		/* cupsVolume value - x, y, and z in millimeters */
+  cups_array_t	*materials;		/* cupsMaterial values */
 };
 
 
@@ -223,5 +236,5 @@ extern const char	*_pwgPageSizeForMedia(pwg_media_t *media,
 #endif /* !_CUPS_PPD_PRIVATE_H_ */
 
 /*
- * End of "$Id: ppd-private.h 12722 2015-06-08 22:00:19Z msweet $".
+ * End of "$Id: ppd-private.h 12733 2015-06-12 01:21:05Z msweet $".
  */

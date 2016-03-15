@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 12700 2015-06-08 18:32:35Z msweet $"
+ * "$Id: ipp.c 12777 2015-07-07 17:24:06Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
@@ -3312,6 +3312,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
   }
 
   con->response->request.status.status_code = IPP_OK;
+
+  cupsdCheckJobs();
 }
 
 
@@ -11148,5 +11150,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 12700 2015-06-08 18:32:35Z msweet $".
+ * End of "$Id: ipp.c 12777 2015-07-07 17:24:06Z msweet $".
  */

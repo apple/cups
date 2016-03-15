@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c 12647 2015-05-20 18:37:52Z msweet $"
+ * "$Id: usersys.c 12817 2015-07-30 15:45:46Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
@@ -68,6 +68,7 @@ typedef struct _cups_client_conf_s	/**** client.conf config data ****/
 static void	cups_finalize_client_conf(_cups_client_conf_t *cc);
 static void	cups_init_client_conf(_cups_client_conf_t *cc);
 static void	cups_read_client_conf(cups_file_t *fp, _cups_client_conf_t *cc);
+static void	cups_set_default_ipp_port(_cups_globals_t *cg);
 static void	cups_set_encryption(_cups_client_conf_t *cc, const char *value);
 #ifdef HAVE_GSSAPI
 static void	cups_set_gss_service_name(_cups_client_conf_t *cc, const char *value);
@@ -382,6 +383,9 @@ cupsSetServer(const char *server)	/* I - Server name */
       cg->ipp_port = atoi(port);
     }
 
+    if (!cg->ipp_port)
+      cups_set_default_ipp_port(cg);
+
     if (cg->server[0] == '/')
       strlcpy(cg->servername, "localhost", sizeof(cg->servername));
     else
@@ -392,6 +396,7 @@ cupsSetServer(const char *server)	/* I - Server name */
     cg->server[0]      = '\0';
     cg->servername[0]  = '\0';
     cg->server_version = 20;
+    cg->ipp_port       = 0;
   }
 
   if (cg->http)
@@ -908,17 +913,7 @@ _cupsSetDefaults(void)
     cupsSetServer(cc.server_name);
 
   if (!cg->ipp_port)
-  {
-    const char	*ipp_port;		/* IPP_PORT environment variable */
-
-    if ((ipp_port = getenv("IPP_PORT")) != NULL)
-    {
-      if ((cg->ipp_port = atoi(ipp_port)) <= 0)
-        cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
-    }
-    else
-      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
-  }
+    cups_set_default_ipp_port(cg);
 
   if (!cg->user[0])
     strlcpy(cg->user, cc.user, sizeof(cg->user));
@@ -1017,7 +1012,7 @@ cups_finalize_client_conf(
     struct stat	sockinfo;		/* Domain socket information */
 
     if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
-	(sockinfo.st_mode & S_IRWXO) == S_IRWXO)
+	(sockinfo.st_mode & (S_IROTH | S_IWOTH)) == (S_IROTH | S_IWOTH))
       cups_set_server_name(cc, CUPS_DEFAULT_DOMAINSOCKET);
     else
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
@@ -1151,6 +1146,26 @@ cups_read_client_conf(
 
 
 /*
+ * 'cups_set_default_ipp_port()' - Set the default IPP port value.
+ */
+
+static void
+cups_set_default_ipp_port(
+    _cups_globals_t *cg)		/* I - Global data */
+{
+  const char	*ipp_port;		/* IPP_PORT environment variable */
+
+
+  if ((ipp_port = getenv("IPP_PORT")) != NULL)
+  {
+    if ((cg->ipp_port = atoi(ipp_port)) <= 0)
+      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
+  }
+  else
+    cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
+}
+
+/*
  * 'cups_set_encryption()' - Set the Encryption value.
  */
 
@@ -1270,5 +1285,5 @@ cups_set_user(
 
 
 /*
- * End of "$Id: usersys.c 12647 2015-05-20 18:37:52Z msweet $".
+ * End of "$Id: usersys.c 12817 2015-07-30 15:45:46Z msweet $".
  */

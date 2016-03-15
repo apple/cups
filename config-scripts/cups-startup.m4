@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-startup.m4 12691 2015-06-04 18:00:31Z msweet $"
+dnl "$Id: cups-startup.m4 12784 2015-07-14 17:39:26Z msweet $"
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -56,24 +56,16 @@ if test x$enable_systemd != xno; then
 	        	AC_MSG_ERROR(Need pkg-config to enable systemd support.)
                 fi
         else
-        	AC_MSG_CHECKING(for libsystemd-daemon)
-                if $PKGCONFIG --exists libsystemd-daemon; then
+        	AC_MSG_CHECKING(for libsystemd)
+                if $PKGCONFIG --exists libsystemd; then
                         AC_MSG_RESULT(yes)
-                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
-                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
+                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd`
+                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd`
                         AC_DEFINE(HAVE_SYSTEMD)
+			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
                         fi
-                else
-                        AC_MSG_RESULT(no)
-                fi
-        	AC_MSG_CHECKING(for libsystemd-journal)
-                if $PKGCONFIG --exists libsystemd-journal; then
-                        AC_MSG_RESULT(yes)
-                        ONDEMANDFLAGS="$ONDEMANDFLAGS `$PKGCONFIG --cflags libsystemd-journal`"
-                        ONDEMANDLIBS="$ONDEMANDLIBS `$PKGCONFIG --libs libsystemd-journal`"
-			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
                 else
                         AC_MSG_RESULT(no)
                 fi
@@ -181,5 +173,5 @@ fi
 
 
 dnl
-dnl End of "$Id: cups-startup.m4 12691 2015-06-04 18:00:31Z msweet $".
+dnl End of "$Id: cups-startup.m4 12784 2015-07-14 17:39:26Z msweet $".
 dnl

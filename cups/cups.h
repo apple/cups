@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 12722 2015-06-08 22:00:19Z msweet $"
+ * "$Id: cups.h 12733 2015-06-12 01:21:05Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -250,6 +250,7 @@ enum cups_ptype_e			/* Printer type/capability bit
 					 * @since CUPS 1.4/OS X 10.6@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities
 					 * @since CUPS 1.4/OS X 10.6@ */
+  CUPS_PRINTER_3D = 0x8000000,		/* 3D Printing @since CUPS 2.1@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT |
 					 * DEFAULT | FAX | REJECTING | DELETE |
 					 * NOT_SHARED | AUTHENTICATED |
@@ -635,5 +636,5 @@ extern int		cupsSetServerCredentials(const char *path, const char *common_name, 
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 12722 2015-06-08 22:00:19Z msweet $".
+ * End of "$Id: cups.h 12733 2015-06-12 01:21:05Z msweet $".
  */

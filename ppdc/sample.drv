@@ -1,5 +1,5 @@
 //
-// "$Id: sample.drv 12201 2014-10-15 19:11:12Z msweet $"
+// "$Id: sample.drv 12789 2015-07-20 14:51:28Z msweet $"
 //
 // Driver info file for CUPS-supplied PPDs.
 //
@@ -130,7 +130,7 @@ Copyright "file is missing or damaged, see the license at \"http://www.cups.org/
 
 Font *
 
-Version "2.0"
+Version "2.1"
 
 // Dymo Label Printer
 {
@@ -1168,5 +1168,5 @@ Version "2.0"
 }
 
 //
-// End of "$Id: sample.drv 12201 2014-10-15 19:11:12Z msweet $".
+// End of "$Id: sample.drv 12789 2015-07-20 14:51:28Z msweet $".
 //

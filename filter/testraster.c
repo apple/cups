@@ -1,9 +1,9 @@
 /*
- * "$Id: testraster.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: testraster.c 12746 2015-06-24 13:28:36Z msweet $"
  *
  * Raster test program routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -495,6 +495,8 @@ do_ras_file(const char *filename)	/* I - Filename */
 
     free(data);
   }
+
+  printf("EOF at %ld\n", (long)lseek(fd, SEEK_CUR, 0));
 
   cupsRasterClose(ras);
   close(fd);
@@ -1064,5 +1066,5 @@ print_changes(
 
 
 /*
- * End of "$Id: testraster.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: testraster.c 12746 2015-06-24 13:28:36Z msweet $".
  */

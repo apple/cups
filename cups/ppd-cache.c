@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd-cache.c 12722 2015-06-08 22:00:19Z msweet $"
+ * "$Id: ppd-cache.c 12733 2015-06-12 01:21:05Z msweet $"
  *
  * PPD cache implementation for CUPS.
  *
@@ -36,6 +36,7 @@
 static int	pwg_compare_finishings(_pwg_finishings_t *a,
 		                       _pwg_finishings_t *b);
 static void	pwg_free_finishings(_pwg_finishings_t *f);
+static void	pwg_free_material(_pwg_material_t *m);
 static void	pwg_ppdize_name(const char *ipp, char *name, size_t namesize);
 static void	pwg_ppdize_resolution(ipp_attribute_t *attr, int element, int *xres, int *yres, char *name, size_t namesize);
 static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize,
@@ -479,6 +480,53 @@ _ppdCacheCreateWithFile(
                     linenum));
       _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
       goto create_error;
+    }
+    else if (!_cups_strcasecmp(line, "3D"))
+    {
+      pc->cups_3d = _cupsStrAlloc(value);
+    }
+    else if (!_cups_strcasecmp(line, "LayerOrder"))
+    {
+      pc->cups_layer_order = _cupsStrAlloc(value);
+    }
+    else if (!_cups_strcasecmp(line, "Accuracy"))
+    {
+      sscanf(value, "%d%d%d", pc->cups_accuracy + 0, pc->cups_accuracy + 1, pc->cups_accuracy + 2);
+    }
+    else if (!_cups_strcasecmp(line, "Volume"))
+    {
+      sscanf(value, "%d%d%d", pc->cups_volume + 0, pc->cups_volume + 1, pc->cups_volume + 2);
+    }
+    else if (!_cups_strcasecmp(line, "Material"))
+    {
+     /*
+      * Material key "name" name=value ... name=value
+      */
+
+      if ((valueptr = strchr(value, ' ')) != NULL)
+      {
+	_pwg_material_t	*material = (_pwg_material_t *)calloc(1, sizeof(_pwg_material_t));
+
+        *valueptr++ = '\0';
+
+        material->key = _cupsStrAlloc(value);
+
+        if (*valueptr == '\"')
+	{
+	  value = valueptr + 1;
+	  if ((valueptr = strchr(value, '\"')) != NULL)
+	  {
+	    *valueptr++ = '\0';
+	    material->name = _cupsStrAlloc(value);
+	    material->num_props = cupsParseOptions(valueptr, 0, &material->props);
+	  }
+	}
+
+	if (!pc->materials)
+	  pc->materials = cupsArrayNew3(NULL, NULL, NULL, 0, NULL, (cups_afree_func_t)pwg_free_material);
+
+        cupsArrayAdd(pc->materials, material);
+      }
     }
     else if (!_cups_strcasecmp(line, "Filter"))
     {
@@ -1712,6 +1760,42 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     cupsArrayAdd(pc->support_files, ppd_attr->value);
 
  /*
+  * 3D stuff...
+  */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cups3D", NULL)) != NULL)
+    pc->cups_3d = _cupsStrAlloc(ppd_attr->value);
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsLayerOrder", NULL)) != NULL)
+    pc->cups_layer_order = _cupsStrAlloc(ppd_attr->value);
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsAccuracy", NULL)) != NULL)
+    sscanf(ppd_attr->value, "%d%d%d", pc->cups_accuracy + 0, pc->cups_accuracy + 1, pc->cups_accuracy + 2);
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsVolume", NULL)) != NULL)
+    sscanf(ppd_attr->value, "%d%d%d", pc->cups_volume + 0, pc->cups_volume + 1, pc->cups_volume + 2);
+
+  for (ppd_attr = ppdFindAttr(ppd, "cupsMaterial", NULL);
+       ppd_attr;
+       ppd_attr = ppdFindNextAttr(ppd, "cupsMaterial", NULL))
+  {
+   /*
+    * *cupsMaterial key/name: "name=value ... name=value"
+    */
+
+    _pwg_material_t	*material = (_pwg_material_t *)calloc(1, sizeof(_pwg_material_t));
+
+    material->key = _cupsStrAlloc(ppd_attr->name);
+    material->name = _cupsStrAlloc(ppd_attr->text);
+    material->num_props = cupsParseOptions(ppd_attr->value, 0, &material->props);
+
+    if (!pc->materials)
+      pc->materials = cupsArrayNew3(NULL, NULL, NULL, 0, NULL, (cups_afree_func_t)pwg_free_material);
+
+    cupsArrayAdd(pc->materials, material);
+  }
+
+ /*
   * Return the cache data...
   */
 
@@ -1817,6 +1901,11 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   cupsArrayDelete(pc->mandatory);
 
   cupsArrayDelete(pc->support_files);
+
+  _cupsStrFree(pc->cups_3d);
+  _cupsStrFree(pc->cups_layer_order);
+
+  cupsArrayDelete(pc->materials);
 
   free(pc);
 }
@@ -2575,6 +2664,7 @@ _ppdCacheWriteFile(
   cups_option_t		*option;	/* Current option */
   const char		*value;		/* Filter/pre-filter value */
   char			newfile[1024];	/* New filename */
+  _pwg_material_t	*m;		/* Material */
 
 
  /*
@@ -2754,6 +2844,32 @@ _ppdCacheWriteFile(
        value;
        value = (char *)cupsArrayNext(pc->support_files))
     cupsFilePutConf(fp, "SupportFile", value);
+
+ /*
+  * 3D stuff...
+  */
+
+  if (pc->cups_3d)
+    cupsFilePutConf(fp, "3D", pc->cups_3d);
+
+  if (pc->cups_layer_order)
+    cupsFilePutConf(fp, "LayerOrder", pc->cups_layer_order);
+
+  if (pc->cups_accuracy[0] || pc->cups_accuracy[0] || pc->cups_accuracy[2])
+    cupsFilePrintf(fp, "Accuracy %d %d %d\n", pc->cups_accuracy[0], pc->cups_accuracy[1], pc->cups_accuracy[2]);
+
+  if (pc->cups_volume[0] || pc->cups_volume[0] || pc->cups_volume[2])
+    cupsFilePrintf(fp, "Volume %d %d %d\n", pc->cups_volume[0], pc->cups_volume[1], pc->cups_volume[2]);
+
+  for (m = (_pwg_material_t *)cupsArrayFirst(pc->materials);
+       m;
+       m = (_pwg_material_t *)cupsArrayNext(pc->materials))
+  {
+    cupsFilePrintf(fp, "Material %s \"%s\"", m->key, m->name);
+    for (i = 0; i < m->num_props; i ++)
+      cupsFilePrintf(fp, " %s=%s", m->props[i].name, m->props[i].value);
+    cupsFilePuts(fp, "\n");
+  }
 
  /*
   * IPP attributes, if any...
@@ -3562,6 +3678,22 @@ pwg_free_finishings(
 
 
 /*
+ * 'pwg_free_material()' - Free a material value.
+ */
+
+static void
+pwg_free_material(_pwg_material_t *m)	/* I - Material value */
+{
+  _cupsStrFree(m->key);
+  _cupsStrFree(m->name);
+
+  cupsFreeOptions(m->num_props, m->props);
+
+  free(m);
+}
+
+
+/*
  * 'pwg_ppdize_name()' - Convert an IPP keyword to a PPD keyword.
  */
 
@@ -3589,7 +3721,6 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 
   *ptr = '\0';
 }
-
 
 
 /*
@@ -3680,5 +3811,5 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
 
 /*
- * End of "$Id: ppd-cache.c 12722 2015-06-08 22:00:19Z msweet $".
+ * End of "$Id: ppd-cache.c 12733 2015-06-12 01:21:05Z msweet $".
  */

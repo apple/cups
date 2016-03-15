@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 12269 2014-11-20 15:37:29Z msweet $"
+ * "$Id: config.h 12763 2015-06-24 20:12:22Z msweet $"
  *
  * Configuration file for CUPS on Windows.
  *
@@ -96,8 +96,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.1svn"
-#define CUPS_MINIMAL "CUPS/2.1svn"
+#define CUPS_SVERSION "CUPS v2.1b2"
+#define CUPS_MINIMAL "CUPS/2.1b2"
 
 
 /*
@@ -799,5 +799,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 12269 2014-11-20 15:37:29Z msweet $".
+ * End of "$Id: config.h 12763 2015-06-24 20:12:22Z msweet $".
  */

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 11919 2014-06-11 15:38:28Z msweet $"
+# "$Id: Makefile 12814 2015-07-30 15:03:33Z msweet $"
 #
 # Man page makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1993-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -43,6 +43,7 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		cups-files.conf.$(MAN5EXT) \
 		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
+		cupsd-logs.$(MAN5EXT) \
 		ipptoolfile.$(MAN5EXT) \
 		mailto.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
@@ -61,7 +62,6 @@ MAN8	=	cupsaccept.$(MAN8EXT) \
 		cups-snmp.$(MAN8EXT) \
 		cupsd.$(MAN8EXT) \
 		cupsd-helper.$(MAN8EXT) \
-		cupsd-logs.$(MAN8EXT) \
 		cupsenable.$(MAN8EXT) \
 		lpadmin.$(MAN8EXT) \
 		lpinfo.$(MAN8EXT) \
@@ -228,5 +228,5 @@ mantohtml:	mantohtml.o ../cups/$(LIBCUPSSTATIC)
 
 
 #
-# End of "$Id: Makefile 11919 2014-06-11 15:38:28Z msweet $".
+# End of "$Id: Makefile 12814 2015-07-30 15:03:33Z msweet $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 12722 2015-06-08 22:00:19Z msweet $"
+ * "$Id: dest.c 12733 2015-06-12 01:21:05Z msweet $"
  *
  * User-defined destination (and option) support for CUPS.
  *
@@ -871,7 +871,7 @@ cupsEnumDests(
   */
 
   num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
-                            &dests, type, mask);
+                            &dests, type, mask | CUPS_PRINTER_3D);
 
   if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
     defprinter = name;
@@ -1743,7 +1743,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   *dests    = (cups_dest_t *)0;
-  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, 0);
+  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, CUPS_PRINTER_3D);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -1960,7 +1960,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * Get the printer's attributes...
   */
 
-  if (!_cupsGetDests(http, op, name, &dest, 0, 0))
+  if (!_cupsGetDests(http, op, name, &dest, 0, CUPS_PRINTER_3D))
     return (NULL);
 
   if (instance)
@@ -2136,7 +2136,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Get the server destinations...
   */
 
-  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, 0);
+  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, CUPS_PRINTER_3D);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -3943,5 +3943,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 12722 2015-06-08 22:00:19Z msweet $".
+ * End of "$Id: dest.c 12733 2015-06-12 01:21:05Z msweet $".
  */
