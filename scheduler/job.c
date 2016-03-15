@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 12701 2015-06-08 18:33:44Z msweet $"
+ * "$Id: job.c 12778 2015-07-07 17:28:51Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -213,8 +213,6 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
 			 "Job canceled by user.");
     }
   }
-
-  cupsdCheckJobs();
 }
 
 
@@ -392,7 +390,9 @@ cupsdCheckJobs(void)
 	  * Start the job...
 	  */
 
+	  cupsArraySave(ActiveJobs);
 	  start_job(job, printer);
+	  cupsArrayRestore(ActiveJobs);
 	}
       }
     }
@@ -3491,13 +3491,6 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
   job->printer->job = NULL;
   job->printer      = NULL;
-
- /*
-  * Try printing another job...
-  */
-
-  if (printer_state != IPP_PRINTER_STOPPED)
-    cupsdCheckJobs();
 }
 
 
@@ -4804,6 +4797,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		*ptr;			/* Pointer update... */
   int		loglevel,		/* Log level for message */
 		event = 0;		/* Events? */
+  cupsd_printer_t *printer = job->printer;
+					/* Printer */
   static const char * const levels[] =	/* Log levels */
 		{
 		  "NONE",
@@ -5157,10 +5152,11 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     finalize_job(job, 1);
 
    /*
-    * Check for new jobs...
+    * Try printing another job...
     */
 
-    cupsdCheckJobs();
+    if (printer->state != IPP_PRINTER_STOPPED)
+      cupsdCheckJobs();
   }
 }
 
@@ -5280,5 +5276,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 12701 2015-06-08 18:33:44Z msweet $".
+ * End of "$Id: job.c 12778 2015-07-07 17:28:51Z msweet $".
  */

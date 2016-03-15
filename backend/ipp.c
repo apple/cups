@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 12624 2015-05-06 23:50:20Z msweet $"
+ * "$Id: ipp.c 12759 2015-06-24 20:06:30Z msweet $"
  *
  * IPP backend for CUPS.
  *
@@ -1562,6 +1562,7 @@ main(int  argc,				/* I - Number of command-line args */
           FD_ZERO(&input);
 	  FD_SET(fd, &input);
 	  FD_SET(snmp_fd, &input);
+	  FD_SET(CUPS_SC_FD, &input);
 
           while (select(fd > snmp_fd ? fd + 1 : snmp_fd + 1, &input, NULL, NULL,
 	                NULL) <= 0 && !job_canceled);
@@ -3769,5 +3770,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 12624 2015-05-06 23:50:20Z msweet $".
+ * End of "$Id: ipp.c 12759 2015-06-24 20:06:30Z msweet $".
  */
