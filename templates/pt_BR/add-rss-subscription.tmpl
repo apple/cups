@@ -1,0 +1,44 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription">
+
+<H2 CLASS="title">Adicionar inscrição RSS</H2>
+
+<TABLE SUMMARY="Formulário para adicionar inscrição RSS">
+<TR>
+<TH CLASS="label">Nome:</TH>
+<TD COLSPAN="5"><INPUT TYPE="TEXT" NAME="SUBSCRIPTION_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?SUBSCRIPTION_NAME}"><BR>
+<SMALL>(Pode conter qualquer caracter imprimível, exceto espaço em branco, "/", "?", e "#")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Fila:</TH>
+<TD COLSPAN="5"><SELECT NAME="PRINTER_URI" SIZE="10"><OPTION VALUE="#ALL#"{?PRINTER_URI=#ALL#? SELECTED:}>All Queues</OPTION>{[printer_name]<OPTION VALUE="{printer_uri_supported}"{?PRINTER_URI={printer_uri_supported}? SELECTED:}>{printer_name}</OPTION>}</SELECT></TD>
+</TR>
+<TR VALIGN="TOP">
+<TH CLASS="label">Eventos:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CREATED" {?EVENT_JOB_CREATED}>Trabalho criado<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_COMPLETED" {?EVENT_JOB_COMPLETED}>Trabalho concluído<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_STOPPED" {?EVENT_JOB_STOPPED}>Trabalho parado<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CONFIG_CHANGED" {?EVENT_JOB_CONFIG_CHANGED}>Opções do Trabalho alteradas</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_STOPPED" {?EVENT_PRINTER_STOPPED}>Fila parada<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_ADDED" {?EVENT_PRINTER_ADDED}>Fila adicionada<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_MODIFIED" {?EVENT_PRINTER_MODIFIED}>Fila modificada<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_DELETED" {?EVENT_PRINTER_DELETED}>Fila apagada</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STARTED" {?EVENT_SERVER_STARTED}>Servidor iniciado<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STOPPED" {?EVENT_SERVER_STOPPED}>Servidor parado<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_RESTARTED" {?EVENT_SERVER_RESTARTED}>Servidor reiniciado<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_AUDIT" {?EVENT_SERVER_AUDIT}>Auditoria de segurança do servidor</TD>
+</TR>
+<TR>
+<TH CLASS="label">Máximo de eventos no Feed:</TH>
+<TD COLSPAN="5"><INPUT TYPE="NUMBER" NAME="MAX_EVENTS" SIZE="4" MAXLENGTH="4" VALUE="{MAX_EVENTS?{MAX_EVENTS}:20}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN="5"><INPUT TYPE="SUBMIT" VALUE="Adicionar inscrição RSS"></TD>
+</TR>
+</TABLE>
+
+</FORM>

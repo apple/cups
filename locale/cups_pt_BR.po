@@ -1,0 +1,6019 @@
+#
+# "$Id$"
+#
+#   Brazilian Portuguese message catalog for CUPS.
+#
+#   Copyright 2007-2014 by Apple Inc.
+#   Copyright 2005-2007 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CUPS 1.7.4\n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
+"PO-Revision-Date: 2014-07-22 00:19-0300\n"
+"Last-Translator: Rafael Ferreira <rafael.f.f1@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.5\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "\t\t(all)"
+msgstr "\t\t(todos)"
+
+msgid "\t\t(none)"
+msgstr "\t\t(nenhum)"
+
+#, c-format
+msgid "\t%d entries"
+msgstr "\t%d registros"
+
+#, c-format
+msgid "\t%s"
+msgstr "\t%s"
+
+msgid "\tAfter fault: continue"
+msgstr "\tApós a falha: continuar"
+
+#, c-format
+msgid "\tAlerts: %s"
+msgstr "\tAlertas: %s"
+
+msgid "\tBanner required"
+msgstr "\tBanner é necessário"
+
+msgid "\tCharset sets:"
+msgstr "\tDefinições de conjunto de caracteres:"
+
+msgid "\tConnection: direct"
+msgstr "\tConexão: direta"
+
+msgid "\tConnection: remote"
+msgstr "\tConexão: remota"
+
+msgid "\tContent types: any"
+msgstr "\tTipos de conteúdos: qualquer"
+
+msgid "\tDefault page size:"
+msgstr "\tTamanho de página padrão:"
+
+msgid "\tDefault pitch:"
+msgstr "\tPitch padrão:"
+
+msgid "\tDefault port settings:"
+msgstr "\tConfiguração de porta padrão:"
+
+#, c-format
+msgid "\tDescription: %s"
+msgstr "\tDescrição: %s"
+
+msgid "\tForm mounted:"
+msgstr "\tFormulário montado:"
+
+msgid "\tForms allowed:"
+msgstr "\tFormulários permitidos:"
+
+#, c-format
+msgid "\tInterface: %s.ppd"
+msgstr "\tInterface: %s.ppd"
+
+#, c-format
+msgid "\tInterface: %s/interfaces/%s"
+msgstr "\tInterface: %s/interfaces/%s"
+
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd"
+msgstr "\tInterface: %s/ppd/%s.ppd"
+
+#, c-format
+msgid "\tLocation: %s"
+msgstr "\tLocalização: %s"
+
+msgid "\tOn fault: no alert"
+msgstr "\tCaso de falha: nenhum alerta"
+
+msgid "\tPrinter types: unknown"
+msgstr "\tTipos de impressoras: desconhecido"
+
+#, c-format
+msgid "\tStatus: %s"
+msgstr "\tEstado: %s"
+
+msgid "\tUsers allowed:"
+msgstr "\tUsuários permitidos:"
+
+msgid "\tUsers denied:"
+msgstr "\tUsuários proibidos:"
+
+msgid "\tdaemon present"
+msgstr "\tdaemon presente"
+
+msgid "\tno entries"
+msgstr "\tnenhum registro"
+
+#, c-format
+msgid "\tprinter is on device '%s' speed -1"
+msgstr "\timpressora está na velocidade -1 do dispositivo \"%s\""
+
+msgid "\tprinting is disabled"
+msgstr "\timpressão está desabilitada"
+
+msgid "\tprinting is enabled"
+msgstr "\timpressão está habilitada"
+
+#, c-format
+msgid "\tqueued for %s"
+msgstr "\tna fila de %s"
+
+msgid "\tqueuing is disabled"
+msgstr "\tenfileiramento está desabilitado"
+
+msgid "\tqueuing is enabled"
+msgstr "\tenfileiramento está habilitado"
+
+msgid "\treason unknown"
+msgstr "\tmotivo desconhecido"
+
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS"
+msgstr ""
+"\n"
+"    RESULTADOS DETALHADOS DE TESTE DE CONFORMIDADE"
+
+msgid "                          Ignore specific warnings."
+msgstr "                          Ignora aviso específicos."
+
+msgid "                          Issue warnings instead of errors."
+msgstr "                          Emite avisos ao invés de erros."
+
+msgid "                REF: Page 15, section 3.1."
+msgstr "                REF: Página 15, seção 3.1."
+
+msgid "                REF: Page 15, section 3.2."
+msgstr "                REF: Página 15, seção 3.2."
+
+msgid "                REF: Page 19, section 3.3."
+msgstr "                REF: Página 19, seção 3.3."
+
+msgid "                REF: Page 20, section 3.4."
+msgstr "                REF: Página 20, seção 3.4."
+
+msgid "                REF: Page 27, section 3.5."
+msgstr "                REF: Página 27, seção 3.5."
+
+msgid "                REF: Page 42, section 5.2."
+msgstr "                REF: Página 42, seção 5.2."
+
+msgid "                REF: Pages 16-17, section 3.2."
+msgstr "                REF: Página 16-17, seção 3.2."
+
+msgid "                REF: Pages 42-45, section 5.2."
+msgstr "                REF: Página 42-45, seção 5.2."
+
+msgid "                REF: Pages 45-46, section 5.2."
+msgstr "                REF: Página 45-46, seção 5.2."
+
+msgid "                REF: Pages 48-49, section 5.2."
+msgstr "                REF: Página 48-49, seção 5.2."
+
+msgid "                REF: Pages 52-54, section 5.2."
+msgstr "                REF: Página 52-54, seção 5.2."
+
+#, c-format
+msgid "        %-39.39s %.0f bytes"
+msgstr "        %-39.39s %.0f bytes"
+
+#, c-format
+msgid "        PASS    Default%s"
+msgstr "        PASSOU  Default%s"
+
+msgid "        PASS    DefaultImageableArea"
+msgstr "        PASSOU  DefaultImageableArea"
+
+msgid "        PASS    DefaultPaperDimension"
+msgstr "        PASSOU  DefaultPaperDimension"
+
+msgid "        PASS    FileVersion"
+msgstr "        PASSOU  FileVersion"
+
+msgid "        PASS    FormatVersion"
+msgstr "        PASSOU  FormatVersion"
+
+msgid "        PASS    LanguageEncoding"
+msgstr "        PASSOU  LanguageEncoding"
+
+msgid "        PASS    LanguageVersion"
+msgstr "        PASSOU  LanguageVersion"
+
+msgid "        PASS    Manufacturer"
+msgstr "        PASSOU  Manufacturer"
+
+msgid "        PASS    ModelName"
+msgstr "        PASSOU  ModelName"
+
+msgid "        PASS    NickName"
+msgstr "        PASSOU  NickName"
+
+msgid "        PASS    PCFileName"
+msgstr "        PASSOU  PCFileName"
+
+msgid "        PASS    PSVersion"
+msgstr "        PASSOU  PSVersion"
+
+msgid "        PASS    PageRegion"
+msgstr "        PASSOU  PageRegion"
+
+msgid "        PASS    PageSize"
+msgstr "        PASSOU  PageSize"
+
+msgid "        PASS    Product"
+msgstr "        PASSOU  Product"
+
+msgid "        PASS    ShortNickName"
+msgstr "        PASSOU  ShortNickName"
+
+#, c-format
+msgid "        WARN    %s has no corresponding options."
+msgstr "        AVISO   %s não possui opções correspondentes."
+
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2."
+msgstr ""
+"        AVISO   %s compartilha um prefixo comum com %s\n"
+"                REF: Página 15, seção 3.2."
+
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s may not work as expected and should "
+"be named Duplex.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"        AVISO   A opção Duplex de palavra-chave %s pode não funcionar como "
+"esperado e deve ser renomeada para Duplex.\n"
+"                REF: Página 122, seção 5.17"
+
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
+msgstr ""
+"        AVISO   Arquivo contém fim das linhas com uma mistura de CR, LF e CR "
+"LF."
+
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"        AVISO   LanguageEncoding é necessário pela especificação PPD 4.3.\n"
+"                REF: Páginas 56-57, seção 5.3."
+
+#, c-format
+msgid "        WARN    Line %d only contains whitespace."
+msgstr "        AVISO   Linha %d contém somente espaço em branco."
+
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"        AVISO   Fabricante é necessário pela especificação PPD 4.3.\n"
+"                REF: Páginas 58-59, seção 5.3."
+
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF."
+msgstr ""
+"        AVISO   Arquivos PPD de sistemas não-Windows deveriam usar fim de "
+"linhas somente com LR, e não CR LF."
+
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f.\n"
+"                REF: Page 42, section 5.2."
+msgstr ""
+"        AVISO   PPD versão %.1f está obsoleto.\n"
+"                REF: Página 42, seção 5.2."
+
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        AVISO   PCFileName maior que 8.3 em violação com especificação PPD.\n"
+"                REF: Páginas 61-62, seção 5.3."
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        AVISO   PCFileName deveria conter um nome de arquivo único.\n"
+"                REF: Páginas 61-62, seção 5.3."
+
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        AVISO   Protocolos contêm PJL, mas atributos de JCL não estão "
+"definidos.\n"
+"                REF: Páginas 78-79, seção 5.7."
+
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        AVISO   Protocolos contêm ambos PJL e BCP; esperava-se TBCP.\n"
+"                REF: Páginas 78-79, seção 5.7."
+
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"        AVISO   ShortNickName é necessário pela especificação PPD 4.3.\n"
+"                REF: Páginas 64-65, seção 5.3."
+
+msgid "       cupsaddsmb [options] -a"
+msgstr "     cupsaddsmb [opções] -a"
+
+msgid "       cupstestdsc [options] -"
+msgstr "     cupstestdsc [opções] -"
+
+msgid "       program | cupstestppd [options] -"
+msgstr "     programa | cupstestppd [opções] -"
+
+#, c-format
+msgid ""
+"      %s  \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")."
+msgstr ""
+"      %s  \"%s %s\" conflita com \"%s %s\"\n"
+"                (restrição=\"%s %s %s %s\")."
+
+#, c-format
+msgid "      %s  %s %s does not exist."
+msgstr "      %s  %s %s não existe."
+
+#, c-format
+msgid "      %s  %s file \"%s\" has the wrong capitalization."
+msgstr "      %s  Arquivo de %s \"%s\" possui letra maiúscula incorreta."
+
+#, c-format
+msgid ""
+"      %s  Bad %s choice %s.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"      %s  Escolha %s inválida para %s.\n"
+"                REF: Página 122, seção 5.17"
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s."
+msgstr ""
+"      %s  Má string de tradução de \"%s\" em UTF-8 para a opção %s, escolha "
+"%s."
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s."
+msgstr "      %s  Má string de tradução de \"%s\" em UTF-8 para a opção %s."
+
+#, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"."
+msgstr "      %s  Valor \"%s\" inválido para cupsFilter."
+
+#, c-format
+msgid "      %s  Bad cupsFilter2 value \"%s\"."
+msgstr "      %s  Valor \"%s\" inválido para cupsFilter2."
+
+#, c-format
+msgid "      %s  Bad cupsICCProfile %s."
+msgstr "      %s  cupsICCProfile %s inválido."
+
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"."
+msgstr "      %s  Valor \"%s\" inválido para cupsPreFilter."
+
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\""
+msgstr "      %s  cupsUIConstraints %s inválido: \"%s\""
+
+#, c-format
+msgid "      %s  Bad language \"%s\"."
+msgstr "      %s  Idioma \"%s\" inválido."
+
+#, c-format
+msgid "      %s  Bad permissions on %s file \"%s\"."
+msgstr "      %s  Permissões inválidas no arquivo %s \"%s\"."
+
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s."
+msgstr "      %s  Pronúncia incorreta de %s - deveria ser %s."
+
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID."
+msgstr ""
+"      %s  Não é possível fornecer ambos APScanAppPath e APScanAppBundleID."
+
+#, c-format
+msgid "      %s  Default choices conflicting."
+msgstr "      %s  Escolhas padrão conflitando."
+
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s"
+msgstr "      %s  cupsUIConstraints %s vazia"
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s."
+msgstr ""
+"      %s  Faltando string de tradução de \"%s\" para a opção %s, escolha %s."
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s."
+msgstr "      %s  Faltando string de tradução de \"%s\" para a opção %s."
+
+#, c-format
+msgid "      %s  Missing %s file \"%s\"."
+msgstr "      %s  Faltando %s arquivo \"%s\"."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageRegion option.\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"      %s  Faltando opção NECESSÁRIA PageRegion.\n"
+"                REF: Página 100, seção 5.14."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageSize option.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"      %s  Faltando opção NECESSÁRIA PageSize.\n"
+"                REF: Página 99, seção 5.14."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr ""
+"      %s  Faltando escolha de *%s %s em UIConstraints \"*%s %s *%s %s\"."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\""
+msgstr "      %s  Faltando escolha *%s %s em cupsUIConstraints %s: \"%s\""
+
+#, c-format
+msgid "      %s  Missing cupsUIResolver %s"
+msgstr "      %s  Faltando cupsUIResolver %s"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr "      %s  Faltando a opção %s em UIConstraints \"*%s %s *%s %s\"."
+
+#, c-format
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\""
+msgstr "      %s  Faltando a opção %s em cupsUIConstraints %s: \"%s\""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file."
+msgstr "      %s  Nenhuma tradução base de \"%s\" está inclusa no arquivo."
+
+#, c-format
+msgid ""
+"      %s  REQUIRED %s does not define choice None.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"      %s  %s NECESSÁRIO não define a escolha None.\n"
+"                REF: Página 122, seção 5.17"
+
+#, c-format
+msgid "      %s  Size \"%s\" defined for %s but not for %s."
+msgstr "      %s  Tamanho \"%s\" definido para %s, mas não para %s."
+
+#, c-format
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)."
+msgstr "      %s  Tamanho \"%s\" tem dimensões inesperadas (%gx%g)."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be \"%s\"."
+msgstr "      %s  Tamanho \"%s\" deveria ser \"%s\"."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be the Adobe standard name \"%s\"."
+msgstr ""
+"      %s  Tamanho \"%s\" deveria ser no padrão do Adobo chamado \"%s\"."
+
+#, c-format
+msgid "      %s  cupsICCProfile %s hash value collides with %s."
+msgstr "      %s  Valor de hash de cupsICCProfile %s colide com %s."
+
+#, c-format
+msgid "      %s  cupsUIResolver %s causes a loop."
+msgstr "      %s  cupsUIResolver %s causa um loop."
+
+#, c-format
+msgid ""
+"      %s  cupsUIResolver %s does not list at least two different options."
+msgstr ""
+"      %s  cupsUIResolver %s não lista pelo menos duas opções diferentes."
+
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID\n"
+"                REF: Page 72, section 5.5"
+msgstr ""
+"      **FALHA** %s deve ser 1284DeviceID\n"
+"                REF: Página 72, seção 5.5"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad Default%s %s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"      **FALHA** Default%s inválido %s\n"
+"                REF: Página 40, seção 4.5."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad DefaultImageableArea %s\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **FALHA** DefaultImageableArea inválido %s\n"
+"                REF: Página 102, seção 5.15."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad DefaultPaperDimension %s\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **FALHA** DefaultPaperDimension inválido %s\n"
+"                REF: Página 103, seção 5.15."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FileVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **FALHA** FileVersion inválido \"%s\"\n"
+"                REF: Página 56, seção 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FormatVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **FALHA** FormatVersion inválido \"%s\"\n"
+"                REF: Página 56, seção 5.3."
+
+msgid ""
+"      **FAIL**  Bad JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4."
+msgstr ""
+"      **FALHA** Atributo inválido de JobPatchFile no arquivo\n"
+"                REF: Página 24, seção 3.4."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1."
+msgstr "      **FALHA** LanguageEncoding inválido %s - tem que ser ISOLatin1."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English."
+msgstr "      **FALHA** LanguageVersion inválido %s - deve ser Inglês."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad Manufacturer (should be \"%s\")\n"
+"                REF: Page 211, table D.1."
+msgstr ""
+"      **FALHA** Manufacturer inválido (deveria ser \"%s\")\n"
+"                REF: Página 211, tabela D.1."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"      **FALHA** ModelName inválido - \"%c\" não permitido na string.\n"
+"                REF: Páginas 59-60, seção 5.3."
+
+msgid ""
+"      **FAIL**  Bad PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"      **FALHA** PSVersion inválida - não \"(string) int\".\n"
+"                REF: Páginas 62-64, seção 5.3."
+
+msgid ""
+"      **FAIL**  Bad Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"      **FALHA** Product inválido - não \"(string)\".\n"
+"                REF: Página 62, seção 5.3."
+
+msgid ""
+"      **FAIL**  Bad ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"      **FALHA** ShortNickName inválido - maior do que 31 caracteres.\n"
+"                REF: Páginas 64-65, seção 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad option %s choice %s\n"
+"                REF: Page 84, section 5.9"
+msgstr ""
+"      **FALHA** Opção inválido %s escolha %s\n"
+"                REF: Página 84, seção 5.9"
+
+#, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s"
+msgstr "      **FALHA** Código de opção padrão não pode ser interpretado: %s"
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters."
+msgstr ""
+"      **FALHA** String de tradução padrão para opção %s escolha %s contém "
+"caracteres de 8-bit."
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters."
+msgstr ""
+"      **FALHA** String de tradução padrão para opção %s contém caracteres de "
+"8-bit."
+
+#, c-format
+msgid "      **FAIL**  Group names %s and %s differ only by case."
+msgstr ""
+"      **FALHA** Nomes dos grupos %s e %s se diferem somente por maiúsculo/"
+"minúsculo."
+
+#, c-format
+msgid "      **FAIL**  Multiple occurrences of option %s choice name %s."
+msgstr "      **FALHA** Múltiplas ocorrências da opção %s escolha de nome %s."
+
+#, c-format
+msgid "      **FAIL**  Option %s choice names %s and %s differ only by case."
+msgstr ""
+"      **FALHA** Opção %s escolha de nomes %s e %s se diferem somente por "
+"maiúsculo/minúsculo."
+
+#, c-format
+msgid "      **FAIL**  Option names %s and %s differ only by case."
+msgstr ""
+"      **FALHA** Os nomes de opção %s e %s se diferem somente por maiúsculo/"
+"minúsculo."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"      **FALHA** NECESSÁRIO Default%s\n"
+"                REF: Página 40, seção 4.5."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **FALHA** NECESSÁRIO DefaultImageableArea\n"
+"                REF: Página 102, seção 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **FALHA** NECESSÁRIO DefaultPaperDimension\n"
+"                REF: Página 103, seção 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO FileVersion\n"
+"                REF: Página 56, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO FormatVersion\n"
+"                REF: Página 56, seção 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **FALHA** NECESSÁRIO ImageableArea para PageSize %s\n"
+"                REF: Página 41, seção 5.\n"
+"                REF: Página 102, seção 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO LanguageEncoding\n"
+"                REF: Páginas 56-57, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO LanguageVersion\n"
+"                REF: Páginas 57-58, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO Manufacturer\n"
+"                REF: Páginas 58-59, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO ModelName\n"
+"                REF: Páginas 59-60, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO NickName\n"
+"                REF: Página 60, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO PCFileName\n"
+"                REF: Páginas 61-62, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO PSVersion\n"
+"                REF: Páginas 62-64, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"      **FALHA** NECESSÁRIO PageRegion\n"
+"                REF: Página 100, seção 5.14."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"      **FALHA** NECESSÁRIO PageSize\n"
+"                REF: Página 41, seção 5.\n"
+"                REF: Página 99, seção 5.14."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14."
+msgstr ""
+"      **FALHA** NECESSÁRIO PageSize\n"
+"                REF: Páginas 99-100, seção 5.14."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **FALHA** NECESSÁRIO PaperDimension para PageSize %s\n"
+"                REF: Página 41, seção 5.\n"
+"                REF: Página 103, seção 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO Product\n"
+"                REF: Página 62, seção 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3."
+msgstr ""
+"      **FALHA** NECESSÁRIO ShortNickName\n"
+"                REF: Página 64-65, seção 5.3."
+
+#, c-format
+msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
+msgstr "      **FALHA** Não foi possível abrir o arquivo PPD - %s na linha %d."
+
+#, c-format
+msgid "    %d ERRORS FOUND"
+msgstr "    %d ERROS ENCONTRADOS"
+
+msgid "    -h       Show program usage"
+msgstr "    -h       Mostra formas de uso do programa"
+
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d.\n"
+"        REF: Page 39, %%%%BoundingBox:"
+msgstr ""
+"    %%%%BoundingBox inválida: na linha %d.\n"
+"        REF: Página 39, %%%%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d.\n"
+"        REF: Page 53, %%%%Page:"
+msgstr ""
+"    %%%%Page inválida: na linha %d.\n"
+"        REF: Página 53, %%%%Page:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d.\n"
+"        REF: Page 43, %%%%Pages:"
+msgstr ""
+"    %%%%Pages inválida: na linha %d.\n"
+"        REF: Página 43, %%%%Pages:"
+
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d).\n"
+"        REF: Page 25, Line Length"
+msgstr ""
+"    Linha %d é maior do que 255 caracteres (%d).\n"
+"        REF: Página 25, Line Length"
+
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line.\n"
+"        REF: Page 17, 3.1 Conforming Documents"
+msgstr ""
+"    Faltando %!PS-Adobe-3.0 na primeira linha.\n"
+"        REF: Página 17, 3.1 Conforming Documents"
+
+#, c-format
+msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+msgstr ""
+"    Faltando comentário de %%EndComments.        REF: Página 41, "
+"%%EndComments"
+
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment.\n"
+"        REF: Page 39, %%BoundingBox:"
+msgstr ""
+"    Faltando %%BoundingBox ou é inválido: comentário.\n"
+"        REF: Página 39, %%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments.\n"
+"        REF: Page 53, %%Page:"
+msgstr ""
+"    Faltando %%Page ou inválido: comentários.\n"
+"        REF: Página 53, %%Page:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment.\n"
+"        REF: Page 43, %%Pages:"
+msgstr ""
+"    Faltando %%Pages ou inválido: comentário.\n"
+"        REF: Página 43, %%Pages:"
+
+msgid "    NO ERRORS FOUND"
+msgstr "    NENHUM ERRO ENCONTRADO"
+
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters."
+msgstr "    Cortadas %d linhas que excederam a 255 caracteres."
+
+#, c-format
+msgid "    Too many %%BeginDocument comments."
+msgstr "    Número excessivo de comentários de %%BeginDocument."
+
+#, c-format
+msgid "    Too many %%EndDocument comments."
+msgstr "    Número excessivo de comentários de %%EndDocument."
+
+msgid "    Warning: file contains binary data."
+msgstr "    Aviso: arquivo contém dados binários."
+
+#, c-format
+msgid "    Warning: no %%EndComments comment in file."
+msgstr "    Aviso: nenhum comentário de %%EndComments no arquivo."
+
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file."
+msgstr "    Aviso: versão %.1f obsoleta de DSC no arquivo."
+
+msgid "  ! expression            Unary NOT of expression."
+msgstr "  ! expressão             Unário NÃO de expressão."
+
+msgid "  ( expressions )         Group expressions."
+msgstr "  ( expressões )          Grupo de expressões."
+
+msgid "  --[no-]debug-logging    Turn debug logging on/off."
+msgstr "  --[no-]debug-logging    Habilita ou desabilita depuração dos logs."
+
+msgid "  --[no-]remote-admin     Turn remote administration on/off."
+msgstr "  --[no-]remote-admin     Habilita ou desabilita administração remota."
+
+msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
+msgstr "  --[no-]remote-any       Permite/proíbe acesso por meio da Internet."
+
+msgid "  --[no-]share-printers   Turn printer sharing on/off."
+msgstr ""
+"  --[no-]share-printers   Habilita ou desabilita compartilhamento de "
+"impressora."
+
+msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
+msgstr ""
+"  --[no-]user-cancel-any  Permite/proíbe os usuários cancelar qualquer "
+"trabalho."
+
+msgid "  --cr                    End lines with CR (Mac OS 9)."
+msgstr "  --cr                    Fim de linhas com CR (Mac OS 9)."
+
+msgid "  --crlf                  End lines with CR + LF (Windows)."
+msgstr "  --crlf                  Fim de linhas com CR + LF (Windows)."
+
+msgid "  --domain regex          Match domain to regular expression."
+msgstr "  --domain regex          Corresponde o domínio à expressão regular."
+
+msgid ""
+"  --exec utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+"  --exec utilitário [argumento ...] ;\n"
+"                          Executa o programa se verdadeiro."
+
+msgid "  --false                 Always false."
+msgstr "  --false                 Sempre falso."
+
+msgid "  --help                  Show this help."
+msgstr "  --help                  Mostra esta ajuda."
+
+msgid "  --host regex            Match hostname to regular expression."
+msgstr ""
+"  --host regex            Corresponde o nome da máquina à expressão regular."
+
+msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+msgstr "  --lf                    Fim de linhas com LF (UNIX/Linux/OS X)."
+
+msgid "  --local                 True if service is local."
+msgstr "  --local                 Verdadeiro se o serviço for local."
+
+msgid "  --ls                    List attributes."
+msgstr "  --ls                    Lista os atributos."
+
+msgid "  --name regex            Match service name to regular expression."
+msgstr ""
+"  --name regex            Corresponde o nome do serviço à expressão regular."
+
+msgid "  --not expression        Unary NOT of expression."
+msgstr "  --not expressão         Unário NÃO da expressão."
+
+msgid "  --path regex            Match resource path to regular expression."
+msgstr ""
+"  --path regex            Corresponde o caminho do recurso à expressão "
+"regular."
+
+msgid "  --port number[-number]  Match port to number or range."
+msgstr "  --port número[-número]  Corresponde a porta ao número ou faixa."
+
+msgid "  --print                 Print URI if true."
+msgstr "  --print                 Exibe a URI se verdadeiro."
+
+msgid "  --print-name            Print service name if true."
+msgstr "  --print-name            Exibe o nome do serviço se verdadeiro."
+
+msgid "  --quiet                 Quietly report match via exit code."
+msgstr ""
+"  --quiet                 Relata silenciosamente correspondências via "
+"código                              de saída."
+
+msgid "  --remote                True if service is remote."
+msgstr "  --remote                Verdeiro se o serviço for remoto."
+
+msgid "  --true                  Always true."
+msgstr "  --true                  Sempre verdadeiro."
+
+msgid "  --txt key               True if the TXT record contains the key."
+msgstr ""
+"  --txt chave             Verdadeiro se o registro TXT contiver a chave."
+
+msgid "  --txt-* regex           Match TXT record key to regular expression."
+msgstr ""
+"  --txt-* regex           Corresponde a chave de registro TXT à expressão "
+"regular."
+
+msgid "  --uri regex             Match URI to regular expression."
+msgstr "  --uri regex             Corresponde a URI à expressão regular."
+
+msgid "  --version               Show program version."
+msgstr "  --version               Mostra a versão do programa."
+
+msgid "  -4                      Connect using IPv4."
+msgstr "  -4                      Conecta usando IPv4."
+
+msgid "  -6                      Connect using IPv6."
+msgstr "  -6                      Conecta usando IPv6."
+
+msgid "  -C                      Send requests using chunking (default)."
+msgstr "  -C                      Envia requisições usando chunking (padrão)."
+
+msgid "  -D                      Remove the input file when finished."
+msgstr "  -D                      Remove o arquivo de entrada ao finalizar."
+
+msgid "  -D name=value           Set named variable to value."
+msgstr "  -D nome=valor           Define a variável \"nome\" com \"valor\"."
+
+msgid "  -E                      Encrypt the connection."
+msgstr "  -E                      Criptografa a conexão."
+
+msgid "  -E                      Test with HTTP Upgrade to TLS."
+msgstr "  -E                      Testa com HTTP Upgrade para TLS."
+
+msgid ""
+"  -F                      Run in the foreground but detach from console."
+msgstr ""
+"  -F                      Executa em primeiro plano, mas desanexa do console."
+
+msgid "  -H samba-server         Use the named SAMBA server."
+msgstr ""
+"  -H servidor-samba       Usa o servidor SAMBA chamado  \"servidor-samba\"."
+
+msgid "  -I                      Ignore errors."
+msgstr "  -I                      Ignora erros."
+
+msgid "  -I include-dir          Add include directory to search path."
+msgstr ""
+"  -I dir-include          Adiciona diretório de include ao caminho de "
+"pesquisa."
+
+msgid "  -I {filename,filters,none,profiles}"
+msgstr "  -I {filename,filters,none,profiles}"
+
+msgid "  -L                      Send requests using content-length."
+msgstr "  -L                      Envia requisições usando limite de conteúdo."
+
+msgid "  -P filename.ppd         Set PPD file."
+msgstr "  -P arquivo.ppd          Define arquivo PPD."
+
+msgid "  -P number[-number]      Match port to number or range."
+msgstr "  -P número[-número]      Corresponde a porta ao número ou faixa."
+
+msgid "  -R root-directory       Set alternate root."
+msgstr "  -R diretório-raiz       Define diretório-raiz alternativo."
+
+msgid "  -S                      Test with SSL encryption."
+msgstr "  -S                      Testa com criptografia SSL."
+
+msgid "  -T seconds              Set the browse timeout in seconds."
+msgstr ""
+"  -T segundos             Define o tempo limite de navegação em segundos."
+
+msgid "  -T seconds              Set the receive/send timeout in seconds."
+msgstr ""
+"  -T segundos             Define o limite de tempo de recebimento/envio "
+"em                                segundos."
+
+msgid "  -U username             Specify username."
+msgstr "  -U usuário              Especifica nome do usuário."
+
+msgid "  -V version              Set default IPP version."
+msgstr "  -V versão               Define versão padrão de IPP."
+
+msgid ""
+"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}"
+msgstr ""
+"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}"
+
+msgid "  -X                      Produce XML plist instead of plain text."
+msgstr "  -X                      Produz plist XML ao invés de texto normal."
+
+msgid "  -a                      Browse for all services."
+msgstr "  -a                      Navega por todos os serviços."
+
+msgid "  -a                      Export all printers."
+msgstr "  -a                      Exporta todas as impressoras."
+
+msgid "  -c catalog.po           Load the specified message catalog."
+msgstr ""
+"  -c catálogo.po          Carrega o catálogo de mensagens especificado."
+
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+"  -c cups-files.conf      Define o arquivo cups-files.conf para ser usado."
+
+msgid "  -c cupsd.conf           Set cupsd.conf file to use."
+msgstr "  -c cupsd.conf           Define o arquivo cupsd.conf a ser usado."
+
+msgid "  -d domain               Browse/resolve in specified domain."
+msgstr "  -d domínio              Navega/resolve no domínio especificado."
+
+msgid "  -d name=value           Set named variable to value."
+msgstr "  -d nome=valor           Define a variável \"nome\" com \"valor\"."
+
+msgid "  -d output-dir           Specify the output directory."
+msgstr "  -d dir-saída            Especifica o diretório de saída."
+
+msgid "  -d printer              Use the named printer."
+msgstr "  -d impressora           Usa a impressora informada."
+
+msgid "  -d regex                Match domain to regular expression."
+msgstr "  -d regex                Corresponde o domínio à expressão regular."
+
+msgid "  -e                      Use every filter from the PPD file."
+msgstr "  -e                      Usa todos os filtros do arquivo PPD."
+
+msgid "  -f                      Run in the foreground."
+msgstr "  -f                      Executa em primeiro plano."
+
+msgid "  -f filename             Set default request filename."
+msgstr ""
+"  -f arquivo              Define o nome de arquivo de requisição padrão."
+
+msgid "  -h                      Show this usage message."
+msgstr "  -h                      Exibe esta mensagem de uso."
+
+msgid "  -h regex                Match hostname to regular expression."
+msgstr ""
+"  -h regex                Corresponde o nome da máquina à expressão regular."
+
+msgid "  -h server[:port]        Specify server address."
+msgstr "  -h servidor[:porta]     Especifica o endereço do servidor."
+
+msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
+msgstr ""
+"  -i tipo-mime            Define o tipo MIME de entrada (caso "
+"contrário,                                  tipo automático)."
+
+msgid ""
+"  -i seconds              Repeat the last file with the given time interval."
+msgstr ""
+"  -i segundos             Repete o último arquivo com o tempo de intervalo "
+"dado."
+
+msgid ""
+"  -j job-id[,N]           Filter file N from the specified job (default is "
+"file 1)."
+msgstr ""
+"  -j job-id[,N]           Filtra o arquivo N do trabalho especificado "
+"(o                                  padrão é o arquivo 1)."
+
+msgid "  -l                      List attributes."
+msgstr "  -l                      Lista os atributos."
+
+msgid "  -l                      Run cupsd from launchd(8)."
+msgstr "  -l                      Executa cupsd a partir do launchd(8)."
+
+msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
+msgstr "  -l idioma[,idioma,...]  Especifica o(s) idioma(s) de saída (locale)."
+
+msgid "  -m                      Use the ModelName value as the filename."
+msgstr ""
+"  -m                      Usa o valor de ModelName como o nome de arquivo."
+
+msgid ""
+"  -m mime/type            Set output MIME type (otherwise application/pdf)."
+msgstr ""
+"  -m tipo-mime            Define o tipo MIME de saída (caso "
+"contrário,                                    aplicação/pdf)."
+
+msgid "  -n copies               Set number of copies."
+msgstr "  -n cópias               Define número de cópias."
+
+msgid ""
+"  -n count                Repeat the last file the given number of times."
+msgstr ""
+"  -n contagem             Repete o último arquivo o número de vezes dado."
+
+msgid "  -n regex                Match service name to regular expression."
+msgstr ""
+"  -n regex                Corresponde o nome do serviço à expressão regular."
+
+msgid ""
+"  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
+msgstr ""
+"  -o arquivo.drv          Define o arquivo de informações do "
+"driver                          (caso contrário, ppdi.drv)."
+
+msgid "  -o filename.ppd[.gz]    Set output file (otherwise stdout)."
+msgstr ""
+"  -o arquivo.ppd[.gz]     Define arquivo de saída (caso contrário, stdout)."
+
+msgid "  -o name=value           Set option(s)."
+msgstr "  -o nome=valor           Define opção/opções."
+
+msgid "  -p                      Print URI if true."
+msgstr "  -p                      Exibe a URI se verdadeiro."
+
+msgid "  -p filename.ppd         Set PPD file."
+msgstr "  -p arquivo.ppd          Define arquivo PPD."
+
+msgid "  -p program              Run specified program for each service."
+msgstr ""
+"  -p programa             Executa o programa especificado para cada serviço."
+
+msgid "  -q                      Quietly report match via exit code."
+msgstr ""
+"  -q                      Relata silenciosamente correspondências via "
+"código                              de saída."
+
+msgid "  -q                      Run silently."
+msgstr "  -q                      Executa silenciosamente."
+
+msgid "  -r                      True if service is remote."
+msgstr "  -r                      Verdadeiro se o serviço for remoto."
+
+msgid "  -r                      Use 'relaxed' open mode."
+msgstr "  -r                      Usa modo aberto \"relaxado\"."
+
+msgid "  -s                      Print service name if true."
+msgstr "  -s                      Exibe o nome do serviço se verdadeiro."
+
+msgid "  -t                      Produce a test report."
+msgstr "  -t                      Produz um relatório de teste."
+
+msgid "  -t                      Test PPDs instead of generating them."
+msgstr "  -t                      Testa PPDs ao invés de criá-los."
+
+msgid "  -t                      Test the configuration file."
+msgstr "  -t                      Testa o arquivo de configuração."
+
+msgid "  -t key                  True if the TXT record contains the key."
+msgstr ""
+"  -t chave                Verdadeiro se o registro TXT contiver a chave."
+
+msgid "  -t title                Set title."
+msgstr "  -t título               Define um título."
+
+msgid "  -t type                 Browse/resolve with specified type."
+msgstr "  -t tipo                 Navega/resolve com o tipo especificado."
+
+msgid "  -u                      Remove the PPD file when finished."
+msgstr "  -u                      Remove o arquivo PPD ao final."
+
+msgid "  -u regex                Match URI to regular expression."
+msgstr "  -u regex                Corresponde a URI à expressão regular."
+
+msgid "  -v                      Be verbose."
+msgstr "  -v                      Modo detalhado."
+
+msgid "  -vv                     Be very verbose."
+msgstr "  -vv                     Modo muito detalhado."
+
+msgid ""
+"  -x utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+"  -x utilitário [argumento ...] ;\n"
+"                          Executa o programa se verdadeiro."
+
+msgid "  -z                      Compress PPD files using GNU zip."
+msgstr "  -z                      Compacta arquivos PPD usando GNU zip."
+
+msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr "  IPPFIND_SERVICE_DOMAIN  Nome do domínio"
+
+msgid ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Fully-qualified domain name"
+msgstr ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Nome completo do domínio (FQDN)"
+
+msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+msgstr "  IPPFIND_SERVICE_NAME    Nome da instância do serviço"
+
+msgid "  IPPFIND_SERVICE_PORT    Port number"
+msgstr "  IPPFIND_SERVICE_PORT    Número da porta"
+
+msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr "  IPPFIND_SERVICE_REGTYPE Tipo de registro DNS-SD"
+
+msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr "  IPPFIND_SERVICE_SCHEME  Esquema URI"
+
+msgid "  IPPFIND_SERVICE_URI     URI"
+msgstr "  IPPFIND_SERVICE_URI     URI"
+
+msgid "  IPPFIND_TXT_*           Value of TXT record key"
+msgstr "  IPPFIND_TXT_*           Valor da chave de registro TXT"
+
+msgid ""
+"  expression --and expression\n"
+"                          Logical AND."
+msgstr ""
+"  expressão --and expressão\n"
+"                          AND lógico."
+
+msgid ""
+"  expression --or expression\n"
+"                          Logical OR."
+msgstr ""
+"  expressão --or expressão\n"
+"                          OR lógico."
+
+msgid "  expression expression   Logical AND."
+msgstr "  expressão expressão     AND lógico."
+
+msgid "  {service_domain}        Domain name"
+msgstr "  {service_domain}        Nome do domínio"
+
+msgid "  {service_hostname}      Fully-qualified domain name"
+msgstr "  {service_hostname}      Nome completo do domínio (FQDN)"
+
+msgid "  {service_name}          Service instance name"
+msgstr "  {service_name}          Nome da instância do serviço"
+
+msgid "  {service_port}          Port number"
+msgstr "  {service_port}          Número da porta"
+
+msgid "  {service_regtype}       DNS-SD registration type"
+msgstr "  {service_regtype}       Tipo de registro DNS-SD"
+
+msgid "  {service_scheme}        URI scheme"
+msgstr "  {service_scheme}        Esquema URI"
+
+msgid "  {service_uri}           URI"
+msgstr "  {service_uri}           URI"
+
+msgid "  {txt_*}                 Value of TXT record key"
+msgstr "  {txt_*}                 Valor da chave de registro TXT"
+
+msgid "  {}                      URI"
+msgstr "  {}                      URI"
+
+msgid " FAIL"
+msgstr " FALHA"
+
+msgid " PASS"
+msgstr " PASSOU"
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+msgstr "\"%s\": Valor inválido de URI \"%s\" - %s (RFC 2911 seção 4.1.5)."
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgstr ""
+"\"%s\": Valor inválido de URI \"%s\" - comprimento inválido %d (RFC 2911 "
+"seção 4.1.5)."
+
+#, c-format
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+"\"%s\": Nome de atributo inválido - comprimento inválido %d (RFC 2911 seção "
+"4.1.3)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+msgstr ""
+"\"%s\": Nome de atributo inválido - caractere inválido (RFC 2911 seção "
+"4.1.3)."
+
+#, c-format
+msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+msgstr "\"%s\": Valor booleano inválido %d (RFC 2911 seção 4.1.11)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+msgstr ""
+"\"%s\": Valor de conjunto de caracteres inválido \"%s\" - caracteres "
+"inválido (RFC 2911 seção 4.1.7)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+msgstr ""
+"\"%s\": Valor de conjunto de caracteres inválido \"%s\" - comprimento "
+"inválido %d (RFC 2911 seção 4.1.7)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Horas de UTC dateTime inválidas %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Minutos de UTC dateTime inválidos %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Sinal de UTC dateTime inválido \"%c\" (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Dia de dateTime inválido %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+"\"%s\": Décimos de segundos de dateTime inválidos %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Horas de dateTime inválidas %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Minutos de dateTime inválidos %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Mês de dateTime inválido %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+msgstr "\"%s\": Segundos de dateTime inválidos %u (RFC 2911 seção 4.1.14)."
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+msgstr ""
+"\"%s\": Valor de enum inválido %d - fora da faixa (RFC 2911 seção 4.1.4)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+"\"%s\": Valor de keyword inválido \"%s\" - comprimento inválido %d (RFC 2911 "
+"seção 4.1.3)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+"4.1.3)."
+msgstr ""
+"\"%s\": Valor de keyword inválido \"%s\" - caractere inválido (RFC 2911 "
+"seção 4.1.3)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+"\"%s\": Valor de mimeMediaType inválido \"%s\" - caracteres inválidos (RFC "
+"2911 seção 4.1.9)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+"\"%s\": Valor de mimeMediaType inválido \"%s\" - comprimento inválido %d "
+"(RFC 2911 seção 4.1.9)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+msgstr ""
+"\"%s\": Valor de name inválido \"%s\" - sequência UTF-8 inválida (RFC 2911 "
+"seção 4.1.2)."
+
+#, c-format
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgstr ""
+"\"%s\": Valor de name inválido \"%s\" - comprimento inválido %d (RFC 2911 "
+"seção 4.1.2)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+"\"%s\": Valor de naturalLanguage inválido \"%s\" - caracteres inválidos (RFC "
+"2911 seção 4.1.8)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+"\"%s\": Valor de naturalLanguage inválido \"%s\" - comprimento inválido %d "
+"(RFC 2911 seção 4.1.8)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+msgstr ""
+"\"%s\": Valor de octetString inválido - comprimento inválido %d (RFC 2911 "
+"seção 4.1.10)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
+"section 4.1.13)."
+msgstr ""
+"\"%s\": Valor de rangeOfInteger inválido %d-%d - inferior maior do que o "
+"superior (RFC 2911 seção 4.1.13)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+"4.1.15)."
+msgstr ""
+"\"%s\": Valor de resolução inválido %dx%d%s - valor de unidades inválido "
+"(RFC 2911 seção 4.1.15)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+"positive (RFC 2911 section 4.1.15)."
+msgstr ""
+"\"%s\": Valor de resolução inválido %dx%d%s - resolução de cross-feed deve "
+"ser positiva (RFC 2911 seção 4.1.15)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
+"2911 section 4.1.15)."
+msgstr ""
+"\"%s\": Valor de resolução inválido %dx%d%s - resolução de feed deve ser "
+"positiva (RFC 2911 seção 4.1.15)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+msgstr ""
+"\"%s\": Valor de texto inválido \"%s\" - sequência UTF-8 inválida (RFC 2911 "
+"seção 4.1.1)."
+
+#, c-format
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgstr ""
+"\"%s\": Valor de texto inválido \"%s\" - comprimento inválido %d (RFC 2911 "
+"seção 4.1.1)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+msgstr ""
+"\"%s\": Valor de uriScheme inválido \"%s\" - caracteres inválidos (RFC 2911 "
+"seção 4.1.6)."
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+msgstr ""
+"\"%s\": Valor de uriScheme inválido \"%s\" - comprimento inválido %d (RFC "
+"2911 seção 4.1.6)."
+
+#, c-format
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+
+#, c-format
+msgid "%s accepting requests since %s"
+msgstr "%s está aceitando requisições desde %s"
+
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s não pode ser alterada."
+
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc."
+msgstr "%s não está implementada pela versão CUPS do lpc."
+
+#, c-format
+msgid "%s is not ready"
+msgstr "%s não está pronta"
+
+#, c-format
+msgid "%s is ready"
+msgstr "%s está pronta"
+
+#, c-format
+msgid "%s is ready and printing"
+msgstr "%s está pronta e imprimindo"
+
+#, c-format
+msgid "%s job-id user title copies options [file]"
+msgstr "%s job-id usuário título cópia opções [arquivo]"
+
+#, c-format
+msgid "%s not accepting requests since %s -"
+msgstr "%s não está aceitando requisições desde %s -"
+
+#, c-format
+msgid "%s not supported."
+msgstr "%s não é suportada."
+
+#, c-format
+msgid "%s/%s accepting requests since %s"
+msgstr "%s/%s está aceitando requisições desde %s"
+
+#, c-format
+msgid "%s/%s not accepting requests since %s -"
+msgstr "%s/%s não está aceitando requisições desde %s -"
+
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]"
+msgstr "%s: %-33.33s [trabalho %d localhost]"
+
+#. TRANSLATORS: Message is "subject: error"
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#, c-format
+msgid "%s: %s failed: %s"
+msgstr "%s: %s falhou: %s"
+
+#, c-format
+msgid "%s: Bad version %s for \"-V\"."
+msgstr "%s: Versão inválida %s para \"-V\"."
+
+#, c-format
+msgid "%s: Don't know what to do."
+msgstr "%s: Não sei o que fazer."
+
+#, c-format
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"."
+msgstr ""
+"%s: Erro - A variável de ambiente %s contém destino inexistente \"%s\"."
+
+#, c-format
+msgid "%s: Error - add '/version=1.1' to server name."
+msgstr "%s: Erro - adicione '/version=1.1' ao nome do servidor."
+
+#, c-format
+msgid "%s: Error - bad job ID."
+msgstr "%s: Erro - ID de trabalho inválido."
+
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously."
+msgstr ""
+"%s: Erro - não é possível imprimir arquivos e alterar trabalhos "
+"simultaneamente."
+
+#, c-format
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
+msgstr ""
+"%s: Erro - não é possível imprimir de stdin se os arquivos ou um ID de "
+"trabalho forem fornecidos."
+
+#, c-format
+msgid "%s: Error - expected character set after \"-S\" option."
+msgstr "%s: Erro - esperava uma codificação de caracteres após a opção \"-S\"."
+
+#, c-format
+msgid "%s: Error - expected content type after \"-T\" option."
+msgstr "%s: Erro - esperava um tipo de conteúdo após a opção \"-T\"."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-#\" option."
+msgstr "%s: Erro - esperava cópias após a opção \"-#\"."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-n\" option."
+msgstr "%s: Erro - esperava cópias após a opção \"-n\"."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-P\" option."
+msgstr "%s: Erro - esperava um destino após a opção \"-P\"."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-d\" option."
+msgstr "%s: Erro - esperava um destino após a opção \"-d\"."
+
+#, c-format
+msgid "%s: Error - expected form after \"-f\" option."
+msgstr "%s: Erro - esperava um formulário após a opção \"-f\"."
+
+#, c-format
+msgid "%s: Error - expected hold name after \"-H\" option."
+msgstr "%s: Erro - esperava um nome para segurar após a opção \"-H\"."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-H\" option."
+msgstr "%s: Erro - esperava o nome da máquina após a opção \"-H\"."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-h\" option."
+msgstr "%s: Erro - esperava o nome da máquina após a opção \"-h\"."
+
+#, c-format
+msgid "%s: Error - expected mode list after \"-y\" option."
+msgstr "%s: Erro - esperava uma lista de modos após a opção \"-y\"."
+
+#, c-format
+msgid "%s: Error - expected name after \"-%c\" option."
+msgstr "%s: Erro - esperava um nome após a opção \"-%c\"."
+
+#, c-format
+msgid "%s: Error - expected option=value after \"-o\" option."
+msgstr "%s: Erro - esperava opção=valor após a opção \"-o\"."
+
+#, c-format
+msgid "%s: Error - expected page list after \"-P\" option."
+msgstr "%s: Erro - esperava uma lista de página após a opção \"-P\"."
+
+#, c-format
+msgid "%s: Error - expected priority after \"-%c\" option."
+msgstr "%s: Erro - esperava uma prioridade após a opção \"-%c\"."
+
+#, c-format
+msgid "%s: Error - expected reason text after \"-r\" option."
+msgstr "%s: Erro - esperava um texto com motivo após a opção \"-r\"."
+
+#, c-format
+msgid "%s: Error - expected title after \"-t\" option."
+msgstr "%s: Erro - esperava um título após a opção \"-t\"."
+
+#, c-format
+msgid "%s: Error - expected username after \"-U\" option."
+msgstr "%s: Erro - esperava um nome de usuário após a opção \"-U\"."
+
+#, c-format
+msgid "%s: Error - expected username after \"-u\" option."
+msgstr "%s: Erro - esperava um nome de usuário após a opção \"-u\"."
+
+#, c-format
+msgid "%s: Error - expected value after \"-%c\" option."
+msgstr "%s: Erro - esperava um valor após a opção \"-%c\"."
+
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" "
+"option."
+msgstr ""
+"%s: Erro - precisa de \"completed\", \"not-completed\" ou \"all\" após a "
+"opção \"-W\"."
+
+#, c-format
+msgid "%s: Error - no default destination available."
+msgstr "%s: Erro - nenhum destino padrão disponível."
+
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100."
+msgstr "%s: Erro - prioridade deve estar entre 1 e 100."
+
+#, c-format
+msgid "%s: Error - scheduler not responding."
+msgstr "%s: Erro - agendador não está respondendo."
+
+#, c-format
+msgid "%s: Error - too many files - \"%s\"."
+msgstr "%s: Erro - arquivos demais - \"%s\"."
+
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s"
+msgstr "%s: Erro - não foi possível acessar \"%s\" - %s"
+
+#, c-format
+msgid "%s: Error - unable to queue from stdin - %s."
+msgstr "%s: Erro - não foi possível enfilerar de stdin - %s."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"."
+msgstr "%s: Erro - destino desconhecido \"%s\"."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"."
+msgstr "%s: Erro - destino desconhecido \"%s/%s\"."
+
+#, c-format
+msgid "%s: Error - unknown option \"%c\"."
+msgstr "%s: Erro - opção desconhecida \"%c\"."
+
+#, c-format
+msgid "%s: Error - unknown option \"%s\"."
+msgstr "%s: Erro - opção desconhecida \"%s\"."
+
+#, c-format
+msgid "%s: Expected job ID after \"-i\" option."
+msgstr "%s: Esperava ID do trabalho após a \"-i\"."
+
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"."
+msgstr "%s: Nome de destino inválido na lista \"%s\"."
+
+#, c-format
+msgid "%s: Invalid filter string \"%s\"."
+msgstr "%s: String de filtro inválida \"%s\"."
+
+#, c-format
+msgid "%s: Missing timeout for \"-T\"."
+msgstr "%s: Faltando tempo de espera para \"-T\"."
+
+#, c-format
+msgid "%s: Missing version for \"-V\"."
+msgstr "%s: Faltando versão para \"-V\"."
+
+#, c-format
+msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
+msgstr "%s: Precisa de ID de trabalho (\"-i jobid\") antes de \"-H restart\"."
+
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s."
+msgstr "%s: Nenhum filtro para converter de %s/%s para %s/%s."
+
+#, c-format
+msgid "%s: Operation failed: %s"
+msgstr "%s: Operação falhou: %s"
+
+#, c-format
+msgid "%s: Sorry, no encryption support."
+msgstr "%s: Desculpa, não há suporte a criptografia."
+
+#, c-format
+msgid "%s: Unable to connect to server."
+msgstr "%s: Não foi possível conectar ao servidor."
+
+#, c-format
+msgid "%s: Unable to contact server."
+msgstr "%s: Não foi possível contactar o servidor."
+
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"."
+msgstr "%s: Não foi possível determinar o tipo MIME de \"%s\"."
+
+#, c-format
+msgid "%s: Unable to open %s: %s"
+msgstr "%s: Não foi possível abrir %s: %s"
+
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d."
+msgstr "%s: Não foi possível abrir o arquivo PPD: %s na linha %d."
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
+msgstr "%s: Não foi possível ler o banco de dados MIME de \"%s\" ou \"%s\"."
+
+#, c-format
+msgid "%s: Unknown destination \"%s\"."
+msgstr "%s: Destino desconhecido \"%s\"."
+
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s."
+msgstr "%s: Tipo de MIME de destino desconhecido %s/%s."
+
+#, c-format
+msgid "%s: Unknown option \"%c\"."
+msgstr "%s: Opção desconhecida \"%c\"."
+
+#, c-format
+msgid "%s: Unknown option \"%s\"."
+msgstr "%s: Opção desconhecida \"%s\"."
+
+#, c-format
+msgid "%s: Unknown option \"-%c\"."
+msgstr "%s: Opção desconhecida \"-%c\"."
+
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s."
+msgstr "%s: Tipo MIME de origem desconhecida %s/%s."
+
+#, c-format
+msgid ""
+"%s: Warning - \"%c\" format modifier not supported - output may not be "
+"correct."
+msgstr ""
+"%s: Aviso - modificador de formato \"%c\" não é suportado - a saída pode não "
+"ficar correta."
+
+#, c-format
+msgid "%s: Warning - character set option ignored."
+msgstr "%s: Aviso - opção de conjunto de caracteres ignorada."
+
+#, c-format
+msgid "%s: Warning - content type option ignored."
+msgstr "%s: Aviso - opção de tipo de conteúdo ignorada."
+
+#, c-format
+msgid "%s: Warning - form option ignored."
+msgstr "%s: Aviso - opção de formulário ignorada."
+
+#, c-format
+msgid "%s: Warning - mode option ignored."
+msgstr "%s: Aviso - opção modo ignorada."
+
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 pol/seg."
+
+msgid "1.25x0.25\""
+msgstr "1.25x0.25\""
+
+msgid "1.25x2.25\""
+msgstr "1.25x2.25\""
+
+msgid "1.5 inch/sec."
+msgstr "1.5 pol/seg."
+
+msgid "1.50x0.25\""
+msgstr "1.50x0.25\""
+
+msgid "1.50x0.50\""
+msgstr "1.50x0.50\""
+
+msgid "1.50x1.00\""
+msgstr "1.50x1.00\""
+
+msgid "1.50x2.00\""
+msgstr "1.50x2.00\""
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 pol/seg."
+
+msgid "10 x 11"
+msgstr "10 x 11"
+
+msgid "10 x 13"
+msgstr "10 x 13"
+
+msgid "10 x 14"
+msgstr "10 x 14"
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 mm/s"
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 pol/s"
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 pol/s"
+
+msgid "12 x 11"
+msgstr "12 x 11"
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 mm/s"
+
+msgid "120x60dpi"
+msgstr "120x60dpi"
+
+msgid "120x72dpi"
+msgstr "120x72dpi"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136dpi"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 mm/s"
+
+msgid "15 x 11"
+msgstr "15 x 11"
+
+msgid "150 mm/sec."
+msgstr "150 mm/s"
+
+msgid "150dpi"
+msgstr "150dpi"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180dpi"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 pol/s"
+
+msgid "2-Sided Printing"
+msgstr "Frente e Verso"
+
+msgid "2.00x0.37\""
+msgstr "2.00x0.37\""
+
+msgid "2.00x0.50\""
+msgstr "2.00x0.50\""
+
+msgid "2.00x1.00\""
+msgstr "2.00x1.00\""
+
+msgid "2.00x1.25\""
+msgstr "2.00x1.25\""
+
+msgid "2.00x2.00\""
+msgstr "2.00x2.00\""
+
+msgid "2.00x3.00\""
+msgstr "2.00x3.00\""
+
+msgid "2.00x4.00\""
+msgstr "2.00x4.00\""
+
+msgid "2.00x5.50\""
+msgstr "2.00x5.50\""
+
+msgid "2.25x0.50\""
+msgstr "2.25x0.50\""
+
+msgid "2.25x1.25\""
+msgstr "2.25x1.25\""
+
+msgid "2.25x4.00\""
+msgstr "2.25x4.00\""
+
+msgid "2.25x5.50\""
+msgstr "2.25x5.50\""
+
+msgid "2.38x5.50\""
+msgstr "2.38x5.50\""
+
+msgid "2.5 inches/sec."
+msgstr "2.5 pol/s"
+
+msgid "2.50x1.00\""
+msgstr "2.50x1.00\""
+
+msgid "2.50x2.00\""
+msgstr "2.50x2.00\""
+
+msgid "2.75x1.25\""
+msgstr "2.75x1.25\""
+
+msgid "2.9 x 1\""
+msgstr "2.9 x 1\""
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 mm/s"
+
+msgid "200 mm/sec."
+msgstr "200 mm/s"
+
+msgid "203dpi"
+msgstr "203dpi"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "Séries de 24 agulhas"
+
+msgid "240x72dpi"
+msgstr "240x72dpi"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 mm/s"
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 pol/s"
+
+msgid "3 x 5"
+msgstr "3 x 5"
+
+msgid "3.00x1.00\""
+msgstr "3.00x1.00\""
+
+msgid "3.00x1.25\""
+msgstr "3.00x1.25\""
+
+msgid "3.00x2.00\""
+msgstr "3.00x2.00\""
+
+msgid "3.00x3.00\""
+msgstr "3.00x3.00\""
+
+msgid "3.00x5.00\""
+msgstr "3.00x5.00\""
+
+msgid "3.25x2.00\""
+msgstr "3.25x2.00\""
+
+msgid "3.25x5.00\""
+msgstr "3.25x5.00\""
+
+msgid "3.25x5.50\""
+msgstr "3.25x5.50\""
+
+msgid "3.25x5.83\""
+msgstr "3.25x5.83\""
+
+msgid "3.25x7.83\""
+msgstr "3.25x7.83\""
+
+msgid "3.5 x 5"
+msgstr "3.5 x 5"
+
+msgid "3.5\" Disk"
+msgstr "Disco de 3.5\""
+
+msgid "3.50x1.00\""
+msgstr "3.50x1.00\""
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 mm/s"
+
+msgid "300 mm/sec."
+msgstr "300 mm/s"
+
+msgid "300dpi"
+msgstr "300dpi"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360dpi"
+
+msgid "360x180dpi"
+msgstr "360x180dpi"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 pol/s"
+
+msgid "4.00x1.00\""
+msgstr "4.00x1.00\""
+
+msgid "4.00x13.00\""
+msgstr "4.00x13.00\""
+
+msgid "4.00x2.00\""
+msgstr "4.00x2.00\""
+
+msgid "4.00x2.50\""
+msgstr "4.00x2.50\""
+
+msgid "4.00x3.00\""
+msgstr "4.00x3.00\""
+
+msgid "4.00x4.00\""
+msgstr "4.00x4.00\""
+
+msgid "4.00x5.00\""
+msgstr "4.00x5.00\""
+
+msgid "4.00x6.00\""
+msgstr "4.00x6.00\""
+
+msgid "4.00x6.50\""
+msgstr "4.00x6.50\""
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 mm/s"
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 pol/s"
+
+msgid "5 x 7"
+msgstr "5 x 7"
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 pol/s"
+
+msgid "6.00x1.00\""
+msgstr "6.00x1.00\""
+
+msgid "6.00x2.00\""
+msgstr "6.00x2.00\""
+
+msgid "6.00x3.00\""
+msgstr "6.00x3.00\""
+
+msgid "6.00x4.00\""
+msgstr "6.00x4.00\""
+
+msgid "6.00x5.00\""
+msgstr "6.00x5.00\""
+
+msgid "6.00x6.00\""
+msgstr "6.00x6.00\""
+
+msgid "6.00x6.50\""
+msgstr "6.00x6.50\""
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 mm/s"
+
+msgid "600dpi"
+msgstr "600dpi"
+
+msgid "60dpi"
+msgstr "60dpi"
+
+msgid "60x72dpi"
+msgstr "60x72dpi"
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 pol/s"
+
+msgid "7 x 9"
+msgstr "7 x 9"
+
+msgid "70"
+msgstr "70"
+
+msgid "720dpi"
+msgstr "720dpi"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 pol/s"
+
+msgid "8 x 10"
+msgstr "8 x 10"
+
+msgid "8.00x1.00\""
+msgstr "8.00x1.00\""
+
+msgid "8.00x2.00\""
+msgstr "8.00x2.00\""
+
+msgid "8.00x3.00\""
+msgstr "8.00x3.00\""
+
+msgid "8.00x4.00\""
+msgstr "8.00x4.00\""
+
+msgid "8.00x5.00\""
+msgstr "8.00x5.00\""
+
+msgid "8.00x6.00\""
+msgstr "8.00x6.00\""
+
+msgid "8.00x6.50\""
+msgstr "8.00x6.50\""
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 mm/s"
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 pol/s"
+
+msgid "9 x 11"
+msgstr "9 x 11"
+
+msgid "9 x 12"
+msgstr "9 x 12"
+
+msgid "9-Pin Series"
+msgstr "Série de 9 agulhas"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
+
+msgid "?Invalid help command unknown."
+msgstr "?Comando de ajuda inválido desconhecido."
+
+msgid "A Samba password is required to export printer drivers"
+msgstr "Uma senha do Samba é necessária para exportar drivers de impressora"
+
+msgid "A Samba username is required to export printer drivers"
+msgstr ""
+"Um nome de usuário do Samba é necessário para exportar drivers de impressora"
+
+#, c-format
+msgid "A class named \"%s\" already exists."
+msgstr "Uma classe chamada \"%s\" já existe."
+
+#, c-format
+msgid "A printer named \"%s\" already exists."
+msgstr "Uma impressora chamada \"%s\" já existe."
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr "A0 borda maior"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr "A1 borda maior"
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr "A2 borda maior"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr "A3 borda maior"
+
+msgid "A3 Oversize"
+msgstr "A3 grande"
+
+msgid "A3 Oversize Long Edge"
+msgstr "A3 borda muito maior"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr "A4 borda maior"
+
+msgid "A4 Oversize"
+msgstr "A4 grande"
+
+msgid "A4 Small"
+msgstr "A4 pequeno"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr "A5 borda maior"
+
+msgid "A5 Oversize"
+msgstr "A5 grande"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr "A6 borda maior"
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr "ARCH C borda maior"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr "ARCH D borda maior"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
+msgstr "ARCH E borda maior"
+
+msgid "Accept Jobs"
+msgstr "Aceitando trabalhos"
+
+msgid "Accepted"
+msgstr "Aceitou"
+
+msgid "Add Class"
+msgstr "Adicionar classe"
+
+msgid "Add Printer"
+msgstr "Adicionar impressora"
+
+msgid "Add RSS Subscription"
+msgstr "Adicionar inscrição RSS"
+
+msgid "Address"
+msgstr "Endereço"
+
+msgid "Administration"
+msgstr "Administração"
+
+msgid "Always"
+msgstr "Sempre"
+
+msgid "AppSocket/HP JetDirect"
+msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "Aplicador"
+
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d."
+msgstr ""
+"Tentativa de definir o estado da impressora %s para o valor inválido %d."
+
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)."
+msgstr "Grupos de atributos estão fora de ordem (%x < %x)."
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr "B5 grande"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
+
+#, c-format
+msgid "Bad 'document-format' value \"%s\"."
+msgstr "Valor de \"document-format\" inválido \"%s\"."
+
+msgid "Bad NULL dests pointer"
+msgstr "Ponteiro de destinatário NULO inválido"
+
+msgid "Bad OpenGroup"
+msgstr "OpenGroup inválido"
+
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "OpenUI/JCLOpenUI inválido"
+
+msgid "Bad OrderDependency"
+msgstr "OrderDependency inválido"
+
+msgid "Bad PPD cache file."
+msgstr "Arquivo de cache de PPD inválido."
+
+msgid "Bad Request"
+msgstr "Requisição inválida"
+
+msgid "Bad SNMP version number"
+msgstr "Número de versão SNMP inválido"
+
+msgid "Bad UIConstraints"
+msgstr "UIConstraints inválido"
+
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Valor de cópias inválido %d."
+
+msgid "Bad custom parameter"
+msgstr "Parâmetro personalizado inválido"
+
+#, c-format
+msgid "Bad device-uri \"%s\"."
+msgstr "device-uri inválido \"%s\"."
+
+#, c-format
+msgid "Bad device-uri scheme \"%s\"."
+msgstr "Esquema device-uri inválido \"%s\"."
+
+#, c-format
+msgid "Bad document-format \"%s\"."
+msgstr "document-format inválido \"%s\"."
+
+#, c-format
+msgid "Bad document-format-default \"%s\"."
+msgstr "document-format-default inválido \"%s\"."
+
+msgid "Bad filename buffer"
+msgstr "Buffer de nome de arquivo inválido"
+
+#, c-format
+msgid "Bad job-name value: %s"
+msgstr "Valor de job-name inválido: %s"
+
+msgid "Bad job-name value: Wrong type or count."
+msgstr "Valor de job-name inválido: Quantidade ou tipo inválido."
+
+msgid "Bad job-priority value."
+msgstr "Valor job-priority inválido."
+
+#, c-format
+msgid "Bad job-sheets value \"%s\"."
+msgstr "Valor de job-sheets inválido \"%s\"."
+
+msgid "Bad job-sheets value type."
+msgstr "Tipo de valor de job-sheets inválido."
+
+msgid "Bad job-state value."
+msgstr "Valor de job-state inválido."
+
+#, c-format
+msgid "Bad job-uri \"%s\"."
+msgstr "job-uri inválido \"%s\"."
+
+#, c-format
+msgid "Bad notify-pull-method \"%s\"."
+msgstr "notify-pull-method inválido \"%s\"."
+
+#, c-format
+msgid "Bad notify-recipient-uri \"%s\"."
+msgstr "notify-recipient-uri inválido \"%s\"."
+
+#, c-format
+msgid "Bad number-up value %d."
+msgstr "Valor de number-up inválido %d."
+
+#, c-format
+msgid "Bad option + choice on line %d."
+msgstr "Opção + escolha inválidas na linha %d."
+
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Valor de page-ranges inválido %d-%d."
+
+#, c-format
+msgid "Bad port-monitor \"%s\"."
+msgstr "port-monitor inválido \"%s\"."
+
+msgid "Bad printer URI."
+msgstr "URI de impressora inválido."
+
+#, c-format
+msgid "Bad printer-state value %d."
+msgstr "Valor de printer-state inválido %d."
+
+#, c-format
+msgid "Bad request ID %d."
+msgstr "ID da requisição inválido %d."
+
+#, c-format
+msgid "Bad request version number %d.%d."
+msgstr "Número da versão de requisição inválido %d.%d."
+
+msgid "Bad subscription ID"
+msgstr "ID de inscrição inválido"
+
+msgid "Bad value string"
+msgstr "String de valor inválido"
+
+msgid "Banners"
+msgstr "Banners"
+
+msgid "Bond Paper"
+msgstr "Papel autocolante"
+
+#, c-format
+msgid "Boolean expected for waiteof option \"%s\"."
+msgstr "Esperava booleano para opção waiteof \"%s\"."
+
+msgid "Buffer overflow detected, aborting."
+msgstr "Estouro de pilha do buffer detectado, abortando."
+
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "Impressora de etiqueta CPCL"
+
+msgid "Cancel RSS Subscription"
+msgstr "Cancelar inscrição RSS"
+
+msgid "Canceling print job."
+msgstr "Cancelando trabalho de impressão."
+
+msgid "Cannot share a remote Kerberized printer."
+msgstr "Não foi possível compartilhar uma impressora remota via Kerberos."
+
+msgid "Cassette"
+msgstr "Cassette"
+
+msgid "Change Settings"
+msgstr "Alterar configurações"
+
+#, c-format
+msgid "Character set \"%s\" not supported."
+msgstr "Conjunto de caracteres \"%s\" não é suportado."
+
+msgid "Classes"
+msgstr "Classes"
+
+msgid "Clean Print Heads"
+msgstr "Limpar cabeça de impressão"
+
+msgid "Close-Job doesn't support the job-uri attribute."
+msgstr "Close-Job não suporta o atributo job-uri."
+
+msgid "Color"
+msgstr "Cor"
+
+msgid "Color Mode"
+msgstr "Modo colorido"
+
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?"
+msgstr ""
+"Comandos podem ser abreviados. Os comandos são:\n"
+"\n"
+"exit    help    quit    status  ?"
+
+msgid "Community name uses indefinite length"
+msgstr "Nome da comunidade usa comprimento indefinido"
+
+msgid "Connected to printer."
+msgstr "Conectado à impressora."
+
+msgid "Connecting to printer."
+msgstr "Conectando à impressora."
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Continuous"
+msgstr "Contínuo"
+
+msgid "Control file sent successfully."
+msgstr "Arquivo de controle enviado com sucesso."
+
+msgid "Copying print data."
+msgstr "Copiando dados de impressão."
+
+msgid "Created"
+msgstr "Criada"
+
+msgid "Custom"
+msgstr "Personalizar"
+
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "Cortar"
+
+msgid "Cutter"
+msgstr "Cortador"
+
+msgid "Dark"
+msgstr "Escuro"
+
+msgid "Darkness"
+msgstr "Escuridão"
+
+msgid "Data file sent successfully."
+msgstr "Arquivo de dados enviado com sucesso."
+
+msgid "Delete Class"
+msgstr "Excluir classe"
+
+msgid "Delete Printer"
+msgstr "Excluir impressora"
+
+msgid "DeskJet Series"
+msgstr "DeskJet Séries"
+
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "Destino \"%s\" não está aceitando trabalhos."
+
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s"
+msgstr ""
+"Dispositivo: uri = %s\n"
+"             classe = %s\n"
+"             info = %s\n"
+"             marca-e-modelo = %s\n"
+"             dispo-id = %s\n"
+"             localização = %s"
+
+msgid "Direct Thermal Media"
+msgstr "Mídia Térmica Direta"
+
+#, c-format
+msgid "Directory \"%s\" contains a relative path."
+msgstr "Diretório \"%s\" contém um caminho relativo."
+
+#, c-format
+msgid "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr "Diretório \"%s\" contém permissões inseguras (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "Directory \"%s\" is a file."
+msgstr "Diretório \"%s\" é um arquivo."
+
+#, c-format
+msgid "Directory \"%s\" not available: %s"
+msgstr "Diretório \"%s\" não está disponível: %s"
+
+#, c-format
+msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "Permissões do diretório \"%s\" estão OK (0%o/uid=%d/gid=%d)."
+
+msgid "Disabled"
+msgstr "Desabilitado"
+
+#, c-format
+msgid "Document #%d does not exist in job #%d."
+msgstr "Documento #%d não existe no trabalho #%d."
+
+msgid "Duplexer"
+msgstr "Duplexador"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "Impressora de etiqueta EPL1"
+
+msgid "EPL2 Label Printer"
+msgstr "Impressora de etiqueta EPL2"
+
+msgid "Edit Configuration File"
+msgstr "Editar arquivo de configuração"
+
+msgid "Empty PPD file."
+msgstr "Arquivo PPD vazio."
+
+#. TRANSLATORS: Banner/cover sheet after the print job.
+msgid "Ending Banner"
+msgstr "Banner ao final"
+
+msgid "English"
+msgstr "Inglês"
+
+msgid "Enter old password:"
+msgstr "Digite a senha antiga:"
+
+msgid "Enter password again:"
+msgstr "Digite sua senha novamente:"
+
+msgid "Enter password:"
+msgstr "Digite a senha:"
+
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Digite seu nome de usuário e senha, ou do usuário root, para acessar esta "
+"página. Se você estiver usando autenticação Kerberos, certifique-se de que "
+"você tem um ticket Kerberos válido."
+
+msgid "Envelope #10 "
+msgstr "Envelope #10 "
+
+msgid "Envelope #11"
+msgstr "Envelope #11"
+
+msgid "Envelope #12"
+msgstr "Envelope #12"
+
+msgid "Envelope #14"
+msgstr "Envelope #14"
+
+msgid "Envelope #9"
+msgstr "Envelope #9"
+
+msgid "Envelope B4"
+msgstr "Envelope B4"
+
+msgid "Envelope B5"
+msgstr "Envelope B5"
+
+msgid "Envelope B6"
+msgstr "Envelope B6"
+
+msgid "Envelope C0"
+msgstr "Envelope C0"
+
+msgid "Envelope C1"
+msgstr "Envelope C1"
+
+msgid "Envelope C2"
+msgstr "Envelope C2"
+
+msgid "Envelope C3"
+msgstr "Envelope C3"
+
+msgid "Envelope C4"
+msgstr "Envelope C4"
+
+msgid "Envelope C5"
+msgstr "Envelope C5"
+
+msgid "Envelope C6"
+msgstr "Envelope C6"
+
+msgid "Envelope C65"
+msgstr "Envelope C65"
+
+msgid "Envelope C7"
+msgstr "Envelope C7"
+
+msgid "Envelope Choukei 3"
+msgstr "Envelope Choukei 3"
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr "Envelope Choukei 3 borda maior"
+
+msgid "Envelope Choukei 4"
+msgstr "Envelope Choukei 4"
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr "Envelope Choukei 4 borda maior"
+
+msgid "Envelope DL"
+msgstr "Envelope DL"
+
+msgid "Envelope Feed"
+msgstr "Alimentação de Envelope"
+
+msgid "Envelope Invite"
+msgstr "Envelope Convite"
+
+msgid "Envelope Italian"
+msgstr "Envelope Italiano"
+
+msgid "Envelope Kaku2"
+msgstr "Envelope Kaku2"
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr "Envelope Kaku2 borda maior"
+
+msgid "Envelope Kaku3"
+msgstr "Envelope Kaku3"
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr "Envelope Kaku3 borda maior"
+
+msgid "Envelope Monarch"
+msgstr "Envelope Monarch"
+
+msgid "Envelope PRC1 "
+msgstr "Envelope PRC1 "
+
+msgid "Envelope PRC1 Long Edge"
+msgstr "Envelope PRC1 borda maior"
+
+msgid "Envelope PRC10"
+msgstr "Envelope PRC10"
+
+msgid "Envelope PRC10 Long Edge"
+msgstr "Envelope PRC10 borda maior"
+
+msgid "Envelope PRC2"
+msgstr "Envelope PRC2"
+
+msgid "Envelope PRC2 Long Edge"
+msgstr "Envelope PRC2 borda maior"
+
+msgid "Envelope PRC3"
+msgstr "Envelope PRC3"
+
+msgid "Envelope PRC3 Long Edge"
+msgstr "Envelope PRC3 borda maior"
+
+msgid "Envelope PRC4"
+msgstr "Envelope PRC4"
+
+msgid "Envelope PRC4 Long Edge"
+msgstr "Envelope PRC4 borda maior"
+
+msgid "Envelope PRC5 Long Edge"
+msgstr "Envelope PRC5 borda maior"
+
+msgid "Envelope PRC5PRC5"
+msgstr "Envelope PRC5"
+
+msgid "Envelope PRC6"
+msgstr "Envelope PRC6"
+
+msgid "Envelope PRC6 Long Edge"
+msgstr "Envelope PRC6 borda maior"
+
+msgid "Envelope PRC7"
+msgstr "Envelope PRC7"
+
+msgid "Envelope PRC7 Long Edge"
+msgstr "Envelope PRC7 borda maior"
+
+msgid "Envelope PRC8"
+msgstr "Envelope PRC8"
+
+msgid "Envelope PRC8 Long Edge"
+msgstr "Envelope PRC8 borda maior"
+
+msgid "Envelope PRC9"
+msgstr "Envelope PRC9"
+
+msgid "Envelope PRC9 Long Edge"
+msgstr "Envelope PRC9 borda maior"
+
+msgid "Envelope Personal"
+msgstr "Envelope Pessoal"
+
+msgid "Envelope You4"
+msgstr "Envelope You4"
+
+msgid "Envelope You4 Long Edge"
+msgstr "Envelope You4 borda maior"
+
+msgid "Environment Variables:"
+msgstr "Variáveis de ambiente:"
+
+msgid "Epson"
+msgstr "Epson"
+
+msgid "Error Policy"
+msgstr "Política de erro"
+
+msgid "Error sending raster data."
+msgstr "Erro ao enviar dados de rasterização."
+
+msgid "Error: need hostname after \"-h\" option."
+msgstr "Erro: precisa de nome da máquina após a opção \"-h\"."
+
+msgid "Every 10 Labels"
+msgstr "A cada 10 etiquetas"
+
+msgid "Every 2 Labels"
+msgstr "A cada 2 etiquetas"
+
+msgid "Every 3 Labels"
+msgstr "A cada 3 etiquetas"
+
+msgid "Every 4 Labels"
+msgstr "A cada 4 etiquetas"
+
+msgid "Every 5 Labels"
+msgstr "A cada 5 etiquetas"
+
+msgid "Every 6 Labels"
+msgstr "A cada 6 etiquetas"
+
+msgid "Every 7 Labels"
+msgstr "A cada 7 etiquetas"
+
+msgid "Every 8 Labels"
+msgstr "A cada 8 etiquetas"
+
+msgid "Every 9 Labels"
+msgstr "A cada 9 etiquetas"
+
+msgid "Every Label"
+msgstr "A cada etiqueta"
+
+msgid "Executive"
+msgstr "Executivo"
+
+msgid "Expectation Failed"
+msgstr "Falhou a expectativa"
+
+msgid "Export Printers to Samba"
+msgstr "Exportar impressoras para o Samba"
+
+msgid "Expressions:"
+msgstr "Expressões:"
+
+msgid "FAIL"
+msgstr "FALHA"
+
+msgid "FanFold German"
+msgstr "FanFold German"
+
+msgid "FanFold Legal German"
+msgstr "FanFold Legal German"
+
+msgid "Fanfold US"
+msgstr "Fanfold US"
+
+#, c-format
+msgid "File \"%s\" contains a relative path."
+msgstr "Arquivo \"%s\" contém um caminho relativo."
+
+#, c-format
+msgid "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr "Arquivo \"%s\" tem permissões inseguras (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "File \"%s\" is a directory."
+msgstr "Arquivo \"%s\" é um diretório."
+
+#, c-format
+msgid "File \"%s\" not available: %s"
+msgstr "Arquivo \"%s\" não está disponível: %s"
+
+#, c-format
+msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "Permissões do arquivo \"%s\" estão OK (0%o/uid=%d/gid=%d)."
+
+msgid "File Folder "
+msgstr "Pasta do arquivo "
+
+#, c-format
+msgid ""
+"File device URIs have been disabled. To enable, see the FileDevice directive "
+"in \"%s/cups-files.conf\"."
+msgstr ""
+"URIs de arquivos de dispositivo foram desabilitadas. Para habilitar, veja a "
+"diretiva FileDevice em \"%s/cups-files.conf\"."
+
+#, c-format
+msgid "Finished page %d."
+msgstr "Terminou página %d."
+
+msgid "Folio"
+msgstr "Fólio"
+
+msgid "Forbidden"
+msgstr "Proibido"
+
+msgid "General"
+msgstr "Geral"
+
+msgid "Generic"
+msgstr "Genérico"
+
+msgid "Get-Response-PDU uses indefinite length"
+msgstr "Get-Response-PDU usa comprimento indefinido"
+
+msgid "Glossy Paper"
+msgstr "Papel brilhante"
+
+msgid "Got a printer-uri attribute but no job-id."
+msgstr "Atributo printer-ui obtido, mas nenhum job-id."
+
+msgid "Grayscale"
+msgstr "Escalas de cinza"
+
+msgid "HP"
+msgstr "HP"
+
+msgid "Hanging Folder"
+msgstr "Pasta suspensa"
+
+msgid "Help file not in index."
+msgstr "Arquivo de ajuda não está no índice."
+
+msgid "IPP 1setOf attribute with incompatible value tags."
+msgstr "Atributo 1setOf de IPP com tags de valor incompatível."
+
+msgid "IPP attribute has no name."
+msgstr "Atributo de IPP não tem nome."
+
+msgid "IPP attribute is not a member of the message."
+msgstr "Atributo de IPP não é um membro da mensagem."
+
+msgid "IPP begCollection value not 0 bytes."
+msgstr "Valor begCollection de IPP não contém 0 bytes."
+
+msgid "IPP boolean value not 1 byte."
+msgstr "Valor booleano de IPP não contém 1 byte."
+
+msgid "IPP date value not 11 bytes."
+msgstr "Valor de data de IPP não contém 11 bytes."
+
+msgid "IPP endCollection value not 0 bytes."
+msgstr "Valor endCollection IPP não contém 0 bytes."
+
+msgid "IPP enum value not 4 bytes."
+msgstr "Valor enum de IPP não contém 4 bytes."
+
+msgid "IPP extension tag larger than 0x7FFFFFFF."
+msgstr "Tag de extensão de IPP maior do que 0x7FFFFFFF."
+
+msgid "IPP integer value not 4 bytes."
+msgstr "Valor inteiro de IPP não contém 4 bytes."
+
+msgid "IPP language length overflows value."
+msgstr "Comprimento do idioma de IPP excede o valor."
+
+msgid "IPP language length too large."
+msgstr "Comprimento do idioma de IPP muito grande."
+
+msgid "IPP member name is not empty."
+msgstr "Nome de membro de IPP não está vazio."
+
+msgid "IPP memberName value is empty."
+msgstr "Valor de memberName de IPP está vazio."
+
+msgid "IPP memberName with no attribute."
+msgstr "memberName de IPP sem atributo algum."
+
+msgid "IPP name larger than 32767 bytes."
+msgstr "Nome de IPP maior do que 32767 bytes."
+
+msgid "IPP nameWithLanguage value less than minimum 4 bytes."
+msgstr "Valor de nameWithLanguage de IPP menor do que o mínimo de 4 bytes."
+
+msgid "IPP octetString length too large."
+msgstr "Comprimento de octetString de IPP muito grande."
+
+msgid "IPP rangeOfInteger value not 8 bytes."
+msgstr "Valor de rangeOfInteger de IPP não contém 8 bytes."
+
+msgid "IPP resolution value not 9 bytes."
+msgstr "Valor de resolução de IPP não contém 9 bytes."
+
+msgid "IPP string length overflows value."
+msgstr "Comprimento da string de IPP excede o valor."
+
+msgid "IPP textWithLanguage value less than minimum 4 bytes."
+msgstr "Valor de textWithLanguage de IPP menor do que o mínimo de 4 bytes."
+
+msgid "IPP value larger than 32767 bytes."
+msgstr "Valor de IPP maior do que 32767 bytes."
+
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
+msgid "Illegal control character"
+msgstr "Caractere de controle é ilegal"
+
+msgid "Illegal main keyword string"
+msgstr "String ilegal de palavra-chave principal"
+
+msgid "Illegal option keyword string"
+msgstr "String ilegal de palavra-chave de opção"
+
+msgid "Illegal translation string"
+msgstr "String ilegal de tradução"
+
+msgid "Illegal whitespace character"
+msgstr "Caractere ilegal de espaço em branco"
+
+msgid "Installable Options"
+msgstr "Opções instaláveis"
+
+msgid "Installed"
+msgstr "Instalada"
+
+msgid "IntelliBar Label Printer"
+msgstr "Impressora de etiqueta IntelliBar"
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
+msgid "Internal Server Error"
+msgstr "Erro interno de servidor"
+
+msgid "Internal error"
+msgstr "Erro interno"
+
+msgid "Internet Postage 2-Part"
+msgstr "Internet Postage Parte-2"
+
+msgid "Internet Postage 3-Part"
+msgstr "Internet Postage Parte-3"
+
+msgid "Internet Printing Protocol"
+msgstr "Protocolo de Impressão para Internet"
+
+msgid "Invalid media name arguments."
+msgstr "Argumentos de nome de mídia inválidos."
+
+msgid "Invalid media size."
+msgstr "Tamanho de mídia inválido."
+
+#, c-format
+msgid "Invalid printer command \"%s\"."
+msgstr "Comando de impressora \"%s\" inválido."
+
+msgid "JCL"
+msgstr "JCL"
+
+msgid "JIS B0"
+msgstr "JIS B0"
+
+msgid "JIS B1"
+msgstr "JIS B1"
+
+msgid "JIS B10"
+msgstr "JIS B10"
+
+msgid "JIS B2"
+msgstr "JIS B2"
+
+msgid "JIS B3"
+msgstr "JIS B3"
+
+msgid "JIS B4"
+msgstr "JIS B4"
+
+msgid "JIS B4 Long Edge"
+msgstr "JIS B4 borda maior"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "JIS B5 Long Edge"
+msgstr "JIS B5 borda maior"
+
+msgid "JIS B6"
+msgstr "JIS B6"
+
+msgid "JIS B6 Long Edge"
+msgstr "JIS B6 borda maior"
+
+msgid "JIS B7"
+msgstr "JIS B7"
+
+msgid "JIS B8"
+msgstr "JIS B8"
+
+msgid "JIS B9"
+msgstr "JIS B9"
+
+#, c-format
+msgid "Job #%d cannot be restarted - no files."
+msgstr "O trabalho #%d não pode ser reiniciado - nenhum arquivo."
+
+#, c-format
+msgid "Job #%d does not exist."
+msgstr "Trabalho #%d não existe."
+
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "Trabalho #%d já foi abortado - não é possível cancelar."
+
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "Trabalho #%d já foi cancelado - não é possível cancelar."
+
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "Trabalho #%d já concluiu - não é possível cancelar."
+
+#, c-format
+msgid "Job #%d is finished and cannot be altered."
+msgstr "Trabalho #%d já finalizou e não pode ser alterado."
+
+#, c-format
+msgid "Job #%d is not complete."
+msgstr "Trabalho #%d não concluiu."
+
+#, c-format
+msgid "Job #%d is not held for authentication."
+msgstr "Trabalho #%d não está agarrado para autenticação."
+
+#, c-format
+msgid "Job #%d is not held."
+msgstr "Trabalho #%d não está agarrado."
+
+msgid "Job Completed"
+msgstr "Trabalho concluiu"
+
+msgid "Job Created"
+msgstr "Trabalho criado"
+
+msgid "Job Options Changed"
+msgstr "Opções do trabalho alteradas"
+
+msgid "Job Stopped"
+msgstr "Trabalho parou"
+
+msgid "Job is completed and cannot be changed."
+msgstr "Trabalho está concluído e não pode ser alterado."
+
+msgid "Job operation failed"
+msgstr "Operação do trabalho falhou"
+
+msgid "Job state cannot be changed."
+msgstr "Estado do trabalho não pode ser alterado."
+
+msgid "Job subscriptions cannot be renewed."
+msgstr "Inscrições de trabalho não podem ser renovadas."
+
+msgid "Jobs"
+msgstr "Trabalhos"
+
+msgid "LPD/LPR Host or Printer"
+msgstr "Impressora ou máquina LPD/LPR"
+
+msgid "Label Printer"
+msgstr "Impressora de etiqueta"
+
+msgid "Label Top"
+msgstr "Parte superior da etiqueta"
+
+#, c-format
+msgid "Language \"%s\" not supported."
+msgstr "Idioma \"%s\" não suportado."
+
+msgid "Large Address"
+msgstr "Endereço grande"
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet Series PCL 4/5"
+
+msgid "Letter Oversize"
+msgstr "Carta grande"
+
+msgid "Letter Oversize Long Edge"
+msgstr "Carta borda muito maior"
+
+msgid "Light"
+msgstr "Leve"
+
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "Linha maior do que o máximo permitido (255 caracteres)"
+
+msgid "List Available Printers"
+msgstr "Lista de impressoras disponíveis"
+
+msgid "Long-Edge (Portrait)"
+msgstr "Borda maior (retrato)"
+
+msgid "Looking for printer."
+msgstr "Procurando impressoras."
+
+msgid "Manual Feed"
+msgstr "Alimentação manual"
+
+msgid "Media Size"
+msgstr "Tamanho de mídia"
+
+msgid "Media Source"
+msgstr "Fonte de mídia"
+
+msgid "Media Tracking"
+msgstr "Rastreamento de mídia"
+
+msgid "Media Type"
+msgstr "Tipo de mídia"
+
+msgid "Medium"
+msgstr "Médio"
+
+msgid "Memory allocation error"
+msgstr "Erro de alocação de memória"
+
+msgid "Missing CloseGroup"
+msgstr "Faltando CloseGroup"
+
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Faltando cabeçalho PPD-Adobe-4.x"
+
+msgid "Missing asterisk in column 1"
+msgstr "Faltando asterisco na coluna 1"
+
+msgid "Missing document-number attribute."
+msgstr "Faltando atributo document-number."
+
+#, c-format
+msgid "Missing double quote on line %d."
+msgstr "Faltando aspas duplas na linha %d."
+
+msgid "Missing form variable"
+msgstr "Faltando variável de formulário"
+
+msgid "Missing last-document attribute in request."
+msgstr "Faltando atributo last-document na requisição."
+
+msgid "Missing media or media-col."
+msgstr "Faltando media ou media-col."
+
+msgid "Missing media-size in media-col."
+msgstr "Faltando media-size em media-col."
+
+msgid "Missing notify-subscription-ids attribute."
+msgstr "Faltando atributo notify-subscription-ids."
+
+msgid "Missing option keyword"
+msgstr "Faltando palavra-chave de opção"
+
+msgid "Missing requesting-user-name attribute."
+msgstr "Faltando atributo requesting-user-name."
+
+msgid "Missing required attributes."
+msgstr "Faltando atributos necessários."
+
+#, c-format
+msgid "Missing value on line %d."
+msgstr "Faltando valor na linha %d."
+
+msgid "Missing value string"
+msgstr "Faltando string de valor"
+
+msgid "Missing x-dimension in media-size."
+msgstr "Faltando dimensão-x em media-size."
+
+msgid "Missing y-dimension in media-size."
+msgstr "Faltando dimensão-y em media-size."
+
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s"
+msgstr ""
+"Modelo:  nome = %s\n"
+"         idioma_natural = %s\n"
+"         marca-e-modelo = %s\n"
+"         id-dispositivo = %s"
+
+msgid "Modifiers:"
+msgstr "Modificadores:"
+
+msgid "Modify Class"
+msgstr "Modificar classe"
+
+msgid "Modify Printer"
+msgstr "Modificar impressora"
+
+msgid "Move All Jobs"
+msgstr "Mover todos trabalhos"
+
+msgid "Move Job"
+msgstr "Mover trabalho"
+
+msgid "Moved Permanently"
+msgstr "Mover permanentemente"
+
+msgid "NULL PPD file pointer"
+msgstr "Ponteiro NULO para arquivo PPD"
+
+msgid "Name OID uses indefinite length"
+msgstr "OID de nome usa comprimento indefinido"
+
+msgid "Nested classes are not allowed."
+msgstr "Classes aninhadas não são permitidas."
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "New Stylus Color Series"
+msgstr "Nova Stylus Color Séries"
+
+msgid "New Stylus Photo Series"
+msgstr "Nova Stylus Photos Séries"
+
+msgid "No"
+msgstr "Não"
+
+msgid "No Content"
+msgstr "Nenhum conteúdo"
+
+msgid "No PPD name"
+msgstr "Nenhum nome PPD"
+
+msgid "No VarBind SEQUENCE"
+msgstr "Nenhuma SEQUENCE de VarBind"
+
+msgid "No Windows printer drivers are installed."
+msgstr "Nenhum driver de impressora Windows está instalado."
+
+msgid "No active connection"
+msgstr "Nenhuma conexão ativa"
+
+msgid "No active connection."
+msgstr "Nenhuma conexão ativa."
+
+#, c-format
+msgid "No active jobs on %s."
+msgstr "Nenhum trabalho ativo em %s"
+
+msgid "No attributes in request."
+msgstr "Nenhum atributo na requisição."
+
+msgid "No authentication information provided."
+msgstr "Nenhuma informação de autenticação foi fornecida."
+
+msgid "No community name"
+msgstr "Nenhum nome de comunidade"
+
+msgid "No default printer."
+msgstr "Nenhuma impressora padrão."
+
+msgid "No destinations added."
+msgstr "Nenhuma destinação foi adicionada."
+
+msgid "No device URI found in argv[0] or in DEVICE_URI environment variable."
+msgstr ""
+"Nenhum URI de dispositivo encontrado em argv[0] ou na variável de ambiente "
+"DEVICE_URI."
+
+msgid "No error-index"
+msgstr "Nenhum error-index"
+
+msgid "No error-status"
+msgstr "Nenhum error-status"
+
+msgid "No file in print request."
+msgstr "Nenhum arquivo na requisição de impressão."
+
+msgid "No modification time"
+msgstr "Nenhum horário de modificação"
+
+msgid "No name OID"
+msgstr "Nenhum OID de nome"
+
+msgid "No pages were found."
+msgstr "Nenhuma página foi encontrada."
+
+msgid "No printer name"
+msgstr "Nenhum nome de impressora"
+
+msgid "No printer-uri found"
+msgstr "Nenhum printer-uri foi encontrado"
+
+msgid "No printer-uri found for class"
+msgstr "Nenhum printer-uri foi encontrado para classe"
+
+msgid "No printer-uri in request."
+msgstr "Nenhum printer-uri na requisição."
+
+msgid "No request sent."
+msgstr "Nenhuma requisição enviada."
+
+msgid "No request-id"
+msgstr "Nenhum request-id"
+
+msgid "No subscription attributes in request."
+msgstr "Nenhum atributo de inscrição na requisição."
+
+msgid "No subscriptions found."
+msgstr "Nenhuma inscrição encontrada."
+
+msgid "No variable-bindings SEQUENCE"
+msgstr "Nenhum SEQUENCE em variable-bindings"
+
+msgid "No version number"
+msgstr "Nenhum número de versão"
+
+msgid "Non-continuous (Mark sensing)"
+msgstr "Não-contíguo (Mark sensing)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "Não-contíguo (Web sensing)"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Not Found"
+msgstr "Não encontrado"
+
+msgid "Not Implemented"
+msgstr "Não implementado"
+
+msgid "Not Installed"
+msgstr "Não instalado"
+
+msgid "Not Modified"
+msgstr "Não modificado"
+
+msgid "Not Supported"
+msgstr "Não suportado"
+
+msgid "Not allowed to print."
+msgstr "Sem permissão para imprimir."
+
+msgid "Note"
+msgstr "Nota"
+
+msgid ""
+"Note: this program only validates the DSC comments, not the PostScript "
+"itself."
+msgstr ""
+"Nota: esse programa só valida os comentários DSC, e não o próprio PostScript."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Off (1-Sided)"
+msgstr "Off (1 lado)"
+
+msgid "Oki"
+msgstr "Oki"
+
+msgid "Online Help"
+msgstr "Ajuda online"
+
+#, c-format
+msgid "Open of %s failed: %s"
+msgstr "Abertura de %s falhou: %s"
+
+msgid "OpenGroup without a CloseGroup first"
+msgstr "OpenGroup sem um CloseGroup primeiro"
+
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "OpenUI/JCLOpenUI sem um CloseUI/JCLCloseUI primeiro"
+
+msgid "Operation Policy"
+msgstr "Política de operação"
+
+#, c-format
+msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
+msgstr "Opção \"%s\" não pode ser incluída via %%%%IncludeFeature."
+
+msgid "Options Installed"
+msgstr "Opções instaladas"
+
+msgid "Options:"
+msgstr "Opções:"
+
+msgid "Out of date PPD cache file."
+msgstr "Cache de arquivo PPD está desatualizado."
+
+msgid "Out of memory."
+msgstr "Memória insuficiente."
+
+msgid "Output Mode"
+msgstr "Mode de saída"
+
+#, c-format
+msgid "Output for printer %s is sent to %s"
+msgstr "Saída da impressora %s é enviada para %s"
+
+#, c-format
+msgid "Output for printer %s is sent to remote printer %s on %s"
+msgstr "Saída da impressora %s é enviada para a impressora remota %s em %s"
+
+#, c-format
+msgid "Output for printer %s/%s is sent to %s"
+msgstr "Saída da impressora %s/%s é enviada para %s"
+
+#, c-format
+msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgstr "Saída da impressora %s/%s é enviada para impressora remota %s em %s"
+
+msgid "PASS"
+msgstr "PASSOU"
+
+msgid "PCL Laser Printer"
+msgstr "Impressora Laser PCL"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr "PRC16K borda maior"
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr "PRC32K borda maior"
+
+msgid "PRC32K Oversize"
+msgstr "PRC32K grande"
+
+msgid "PRC32K Oversize Long Edge"
+msgstr "PRC32K borda muito maior"
+
+msgid "Packet does not contain a Get-Response-PDU"
+msgstr "Pacote não contém um Get-Response-PDU"
+
+msgid "Packet does not start with SEQUENCE"
+msgstr "Pacote não inicia com SEQUENCE"
+
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
+#, c-format
+msgid "Password for %s on %s? "
+msgstr "Senha para %s em %s? "
+
+#, c-format
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "Senha para %s é necessária para acessar %s via SAMBA: "
+
+msgid "Pause Class"
+msgstr "Pausar classe"
+
+msgid "Pause Printer"
+msgstr "Pausar impressora"
+
+# peel-off seria descolar etiqueta do papel?
+msgid "Peel-Off"
+msgstr "Descolar"
+
+msgid "Photo"
+msgstr "Foto"
+
+msgid "Photo Labels"
+msgstr "Foto pequena"
+
+msgid "Plain Paper"
+msgstr "Papel normal"
+
+msgid "Policies"
+msgstr "Políticas"
+
+msgid "Port Monitor"
+msgstr "Monitor de porta"
+
+msgid "PostScript Printer"
+msgstr "Impressora PostScript"
+
+msgid "Postcard"
+msgstr "Postal"
+
+msgid "Postcard Double "
+msgstr "Postal duplo"
+
+msgid "Postcard Double Long Edge"
+msgstr "Postal duplo borda maior"
+
+msgid "Postcard Long Edge"
+msgstr "Postal borda maior"
+
+msgid "Preparing to print."
+msgstr "Preparando para imprimir."
+
+msgid "Print Density"
+msgstr "Densidade de impressão"
+
+msgid "Print Job:"
+msgstr "Trabalho de impressão:"
+
+msgid "Print Mode"
+msgstr "Modo de impressão"
+
+msgid "Print Rate"
+msgstr "Taxa de impressão"
+
+msgid "Print Self-Test Page"
+msgstr "Imprimir página de auto-teste"
+
+msgid "Print Speed"
+msgstr "Velocidade de impressão"
+
+msgid "Print Test Page"
+msgstr "Imprimir página de teste"
+
+msgid "Print and Cut"
+msgstr "Imprimir e cortar"
+
+msgid "Print and Tear"
+msgstr "Imprimir e rasgar"
+
+msgid "Print file sent."
+msgstr "Arquivo de impressão enviado."
+
+msgid "Print job canceled at printer."
+msgstr "Trabalho de impressão cancelado na impressora."
+
+msgid "Print job too large."
+msgstr "Trabalho de impressão muito grande."
+
+msgid "Print job was not accepted."
+msgstr "Trabalho de impressão não foi aceito."
+
+msgid "Printer Added"
+msgstr "Impressora adicionada"
+
+msgid "Printer Default"
+msgstr "Impressora padrão"
+
+msgid "Printer Deleted"
+msgstr "Impressora excluída"
+
+msgid "Printer Modified"
+msgstr "Impressora modificada"
+
+msgid "Printer Paused"
+msgstr "Impressora pausada"
+
+msgid "Printer Settings"
+msgstr "Configurações de impressora"
+
+msgid "Printer cannot print supplied content."
+msgstr "Impressora não consegue imprimir o conteúdo fornecido."
+
+msgid "Printer cannot print with supplied options."
+msgstr "Impressora não consegue imprimir os opções fornecidas."
+
+msgid "Printer:"
+msgstr "Impressora:"
+
+msgid "Printers"
+msgstr "Impressoras"
+
+#, c-format
+msgid "Printing page %d, %d%% complete."
+msgstr "Imprimindo página %d, %d%% completo."
+
+msgid "Purge Jobs"
+msgstr "Apagar trabalhos"
+
+msgid "Quarto"
+msgstr "Quarto"
+
+msgid "Quota limit reached."
+msgstr "Limite de quota alcançado."
+
+msgid "Rank    Owner   Job     File(s)                         Total Size"
+msgstr "Ordem   Dono    Trab    Arquivo(s)                      Tamanho total"
+
+#. TRANSLATORS: Pri is job priority.
+msgid ""
+"Rank   Owner      Pri  Job        Files                       Total Size"
+msgstr ""
+"Ordem   Dono      Pri  Trab       Arquivos                    Tamanho total"
+
+msgid "Reject Jobs"
+msgstr "Rejeitar trabalhos"
+
+#, c-format
+msgid "Remote host did not accept control file (%d)."
+msgstr "Máquina remota não aceitou arquivo de controle (%d)."
+
+#, c-format
+msgid "Remote host did not accept data file (%d)."
+msgstr "Máquina remota não aceitou arquivo de dados (%d)."
+
+msgid "Reprint After Error"
+msgstr "Erro após reimpressão"
+
+msgid "Request Entity Too Large"
+msgstr "Entidade de requisição muito grande"
+
+msgid "Resolution"
+msgstr "Resolução"
+
+msgid "Resume Class"
+msgstr "Resumir classe"
+
+msgid "Resume Printer"
+msgstr "Resumir impressora"
+
+msgid "Return Address"
+msgstr "Retornar endereço"
+
+msgid "Rewind"
+msgstr "Rebobinar"
+
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'"
+msgstr "Executando comando: %s %s -N -A %s -c '%s'"
+
+msgid "SEQUENCE uses indefinite length"
+msgstr "SEQUENCE usa comprimento indefinido"
+
+msgid "SSL/TLS Negotiation Error"
+msgstr "Erro de negociação SSL/TLS"
+
+msgid "See Other"
+msgstr "Veja outro"
+
+msgid "Sending data to printer."
+msgstr "Enviando dados à impressora."
+
+msgid "Server Restarted"
+msgstr "Servidor reiniciado"
+
+msgid "Server Security Auditing"
+msgstr "Auditoria de segurança de servidor"
+
+msgid "Server Started"
+msgstr "Servidor iniciou"
+
+msgid "Server Stopped"
+msgstr "Servidor parou"
+
+msgid "Service Unavailable"
+msgstr "Serviço indisponível"
+
+msgid "Set Allowed Users"
+msgstr "Definir usuários permitidos"
+
+msgid "Set As Server Default"
+msgstr "Definir como servidor padrão"
+
+msgid "Set Class Options"
+msgstr "Definir opções de classe"
+
+msgid "Set Printer Options"
+msgstr "Definir opções de impressora"
+
+msgid "Set Publishing"
+msgstr "Definir publicação"
+
+msgid "Shipping Address"
+msgstr "Endereço de entrega"
+
+msgid "Short-Edge (Landscape)"
+msgstr "Borda menor (paisagem)"
+
+msgid "Special Paper"
+msgstr "Papel especial"
+
+#, c-format
+msgid "Spooling job, %.0f%% complete."
+msgstr "Trabalho de impressão, %.0f%% completo."
+
+msgid "Standard"
+msgstr "Padrão"
+
+#. TRANSLATORS: Banner/cover sheet before the print job.
+msgid "Starting Banner"
+msgstr "Iniciando banner"
+
+#, c-format
+msgid "Starting page %d."
+msgstr "Iniciando página %d."
+
+msgid "Statement"
+msgstr "Declaração"
+
+msgid "Stylus Color Series"
+msgstr "Stylus Color Séries"
+
+msgid "Stylus Photo Series"
+msgstr "Stylus Photo Séries"
+
+#, c-format
+msgid "Subscription #%d does not exist."
+msgstr "Inscrição #%d não existe."
+
+msgid "Substitutions:"
+msgstr "Substituições:"
+
+msgid "Super A"
+msgstr "Super A"
+
+msgid "Super B"
+msgstr "Super B"
+
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
+msgid "Switching Protocols"
+msgstr "Alternando protocolos"
+
+msgid "Tabloid"
+msgstr "Tabloide"
+
+msgid "Tabloid Oversize"
+msgstr "Tabloide grande"
+
+msgid "Tabloid Oversize Long Edge"
+msgstr "Tabloide borda muito maior"
+
+msgid "Tear"
+msgstr "Destacar"
+
+msgid "Tear-Off"
+msgstr "Destacar"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Ajuste da posição de destaque"
+
+#, c-format
+msgid "The \"%s\" attribute is required for print jobs."
+msgstr "O atributo \"%s\" é necessário para imprimir os trabalhos."
+
+#, c-format
+msgid "The %s attribute cannot be provided with job-ids."
+msgstr "O atributo %s não pode ser fornecido com job-ids."
+
+#, c-format
+msgid ""
+"The '%s' Job Description attribute cannot be supplied in a job creation "
+"request."
+msgstr ""
+"O atributo Job Description \"%s\" não pode ser fornecido em uma requisição "
+"de criação de trabalho."
+
+#, c-format
+msgid ""
+"The '%s' operation attribute cannot be supplied in a Create-Job request."
+msgstr ""
+"O atributo de operação '%s' não pode ser fornecido em uma requisição de "
+"criação de trabalho."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr "O arquivo PPD \"%s\" não pôde ser encontrado."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr "O arquivo PPD \"%s\" não pôde ser aberto: %s"
+
+msgid "The PPD file could not be opened."
+msgstr "O arquivo PPD não pôde ser aberto."
+
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"O nome da classe pode conter somente até 127 caracteres imprimíveis e não "
+"pode conter espaços, barras (/), ou sinal de tralha (#)."
+
+msgid "The developer unit needs to be replaced."
+msgstr "A unidade de desenvolvedor precisa ser substituído."
+
+msgid "The developer unit will need to be replaced soon."
+msgstr "A unidade de desenvolvedor precisará ser substituído em breve."
+
+msgid "The fuser's temperature is high."
+msgstr "A temperatura do fusor está alta."
+
+msgid "The fuser's temperature is low."
+msgstr "A temperatura do fusor está baixa."
+
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"O atributo notify-lease-duration não pode ser usado para inscrições de "
+"trabalhos."
+
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)."
+msgstr "O valor de notify-user-data está muito grande (%d > 63 octetos)."
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr "O fotocondutor óptico precisa ser substituído."
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr "O fotocondutor óptico precisará ser substituído em breve."
+
+msgid "The output bin is almost full."
+msgstr "O tabuleiro de saída está quase completo."
+
+msgid "The output bin is full."
+msgstr "O tabuleiro de saída está completo."
+
+msgid "The output bin is missing."
+msgstr "O tabuleiro de saída não foi encontrado."
+
+msgid "The paper tray is almost empty."
+msgstr "O bandeja de papel está quase vazia."
+
+msgid "The paper tray is empty."
+msgstr "O bandeja de papel está vazia."
+
+msgid "The paper tray is missing."
+msgstr "O bandeja de papel não foi encontrada."
+
+msgid "The paper tray needs to be filled."
+msgstr "O bandeja de papel precisa ser recarregada."
+
+msgid "The printer configuration is incorrect or the printer no longer exists."
+msgstr ""
+"A configuração da impressora está incorreta ou a impressora não existe mais."
+
+msgid "The printer did not respond."
+msgstr "A impressora não respondeu."
+
+msgid "The printer is in use."
+msgstr "A impressora está em uso."
+
+msgid "The printer is not connected."
+msgstr "A impressora não está conectada."
+
+msgid "The printer is not responding."
+msgstr "A impressora não está respondendo."
+
+msgid "The printer is now connected."
+msgstr "A impressora está agora conectada."
+
+msgid "The printer is now online."
+msgstr "A impressora está agora online."
+
+msgid "The printer is offline."
+msgstr "A impressora está offline."
+
+msgid "The printer is running low on ink."
+msgstr "A impressora está ficando sem tinta."
+
+msgid "The printer is running low on toner."
+msgstr "A impressora está ficando sem toner."
+
+msgid "The printer is unreachable at this time."
+msgstr "A impressora está inacessível neste momento."
+
+msgid "The printer may be out of ink."
+msgstr "A impressora pode estar sem tinta."
+
+msgid "The printer may be out of toner."
+msgstr "A impressora pode estar sem toner."
+
+msgid "The printer may not exist or is unavailable at this time."
+msgstr "A impressora pode não existir ou está indisponível neste momento."
+
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"O nome da impressora pode conter somente até 127 caracteres imprimíveis e "
+"não pode conter espaços, barras (/), ou sinal de tralha (#)."
+
+msgid "The printer or class does not exist."
+msgstr "A impressora ou classe não existe."
+
+msgid "The printer or class is not shared."
+msgstr "A impressora ou classe não está compartilhada."
+
+msgid "The printer's cover is open."
+msgstr "A tampa superior da impressora está aberta."
+
+msgid "The printer's door is open."
+msgstr "A tampa da impressora está aberta."
+
+msgid "The printer's interlock is open."
+msgstr "A interlock da impressora está aberta."
+
+msgid "The printer's waste bin is almost full."
+msgstr "A lixeira da impressora está quase completa."
+
+msgid "The printer's waste bin is full."
+msgstr "A lixeira da impressora está completa."
+
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "O printer-uri \"%s\" contém caracteres inválidos."
+
+msgid "The printer-uri attribute is required."
+msgstr "O atributo printer-uri é necessário."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"O printer-uri deve estar no formato \"ipp://MAQUINA/classes/NOMECLASSE\"."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"O printer-uri deve estar no formato \"ipp://MAQUINA/printers/NOMEIMPRESSORA"
+"\"."
+
+msgid ""
+"The subscription name may not contain spaces, slashes (/), question marks "
+"(?), or the pound sign (#)."
+msgstr ""
+"O nome da inscrição não pode conter espaços, barras (/), sinais de "
+"interrogação (?), ou sinal de tralha (#)."
+
+msgid ""
+"The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
+"enable it."
+msgstr ""
+"A interface web está desabilitada no momento. Execute \"cupsctl "
+"WebInterface=yes\" para habilitá-la."
+
+#, c-format
+msgid "The which-jobs value \"%s\" is not supported."
+msgstr "O valor de which-jobs \"%s\" não é suportado."
+
+msgid "There are too many subscriptions."
+msgstr "Há inscrições demais."
+
+msgid "There is a paper jam."
+msgstr "Ocorreu um atolamento de papel."
+
+msgid "There was an unrecoverable USB error."
+msgstr "Ocorreu um erro de USB irrecuperável."
+
+msgid "Thermal Transfer Media"
+msgstr "Mídia de transferência térmica"
+
+msgid "Too many active jobs."
+msgstr "Há trabalhos demais ativos."
+
+#, c-format
+msgid "Too many job-sheets values (%d > 2)."
+msgstr "Há valores de job-sheets demais (%d > 2)."
+
+#, c-format
+msgid "Too many printer-state-reasons values (%d > %d)."
+msgstr "Há valores de printer-state-reasons demais (%d >%d)."
+
+msgid "Transparency"
+msgstr "Transparência"
+
+msgid "Tray"
+msgstr "Bandeja"
+
+msgid "Tray 1"
+msgstr "Bandeja 1"
+
+msgid "Tray 2"
+msgstr "Bandeja 2"
+
+msgid "Tray 3"
+msgstr "Bandeja 3"
+
+msgid "Tray 4"
+msgstr "Bandeja 4"
+
+msgid "URI Too Long"
+msgstr "URI muito longa"
+
+msgid "US Ledger"
+msgstr "US Ledger"
+
+msgid "US Legal"
+msgstr "US Legal"
+
+msgid "US Legal Oversize"
+msgstr "US Legal grande"
+
+msgid "US Letter"
+msgstr "US Letter"
+
+msgid "US Letter Long Edge"
+msgstr "US Letter borda maior"
+
+msgid "US Letter Oversize"
+msgstr "US Letter grande"
+
+msgid "US Letter Oversize Long Edge"
+msgstr "US Letter borda muito maior"
+
+msgid "US Letter Small"
+msgstr "US Letter pequena"
+
+msgid "Unable to access cupsd.conf file"
+msgstr "Não foi possível acessar o arquivo cupsd.conf"
+
+msgid "Unable to access help file."
+msgstr "Não foi possível acessar o arquivo de ajuda."
+
+msgid "Unable to add RSS subscription"
+msgstr "Não foi possível adicionar inscrição RSS"
+
+msgid "Unable to add class"
+msgstr "Não foi possível adicionar classe"
+
+msgid "Unable to add document to print job."
+msgstr "Não foi possível adicionar o documento ao trabalho de impressão."
+
+#, c-format
+msgid "Unable to add job for destination \"%s\"."
+msgstr "Não foi possível adicionar trabalho para destino \"%s\"."
+
+msgid "Unable to add printer"
+msgstr "Não foi possível adicionar impressora"
+
+msgid "Unable to allocate memory for file types."
+msgstr "Não foi possível alocar memória para os tipos de arquivos."
+
+msgid "Unable to allocate memory for page info"
+msgstr "Não foi possível alocar memória para informação de página"
+
+msgid "Unable to allocate memory for pages array"
+msgstr "Não foi possível alocar memória para vetor de páginas"
+
+msgid "Unable to cancel RSS subscription"
+msgstr "Não foi possível cancelar inscrição RSS"
+
+msgid "Unable to cancel print job."
+msgstr "Não foi possível cancelar trabalho de impressão."
+
+msgid "Unable to change printer"
+msgstr "Não foi possível alterar a impressora"
+
+msgid "Unable to change printer-is-shared attribute"
+msgstr "Não foi possível alterar o atributo printer-is-shared"
+
+msgid "Unable to change server settings"
+msgstr "Não foi possível alterar as configurações do servidor"
+
+#, c-format
+msgid "Unable to compile mimeMediaType regular expression: %s."
+msgstr "Não foi possível compilar a expressão regular de mimeMediaType: %s."
+
+#, c-format
+msgid "Unable to compile naturalLanguage regular expression: %s."
+msgstr "Não foi possível compilar a expressão regular de naturalLanguage: %s."
+
+msgid "Unable to configure printer options."
+msgstr "Não foi possível configurar opções de impressora."
+
+msgid "Unable to connect to host."
+msgstr "Não foi possível conectar à máquina."
+
+msgid "Unable to contact printer, queuing on next printer in class."
+msgstr ""
+"Não foi possível contactar a impressora, enfileirando na próxima impressora "
+"na classe."
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+msgstr ""
+"Não foi possível copiar arquivos de driver de impressora CUPS 64-bit (%d)."
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+msgstr ""
+"Não foi possível copiar arquivos de driver de impressora (%d) de Windows 64-"
+"bit."
+
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)."
+msgstr "Não foi possível copiar arquivos de driver de impressora (%d) de CUPS."
+
+#, c-format
+msgid "Unable to copy PPD file - %s"
+msgstr "Não foi possível copiar arquivo PPD - %s"
+
+msgid "Unable to copy PPD file."
+msgstr "Não foi possível copiar arquivo PPD."
+
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)."
+msgstr ""
+"Não foi possível copiar arquivos de driver de impressora (%d) de Windows "
+"2000."
+
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)."
+msgstr ""
+"Não foi possível copiar arquivos de driver de impressora (%d) de Windows 9x."
+
+#, c-format
+msgid "Unable to copy interface script - %s"
+msgstr "Não foi possível copiar script de interface - %s"
+
+msgid "Unable to create printer-uri"
+msgstr "Não foi possível criar uri de impressora"
+
+msgid "Unable to create temporary file"
+msgstr "Não foi possível criar arquivo temporário"
+
+msgid "Unable to delete class"
+msgstr "Não foi possível excluir classe"
+
+msgid "Unable to delete printer"
+msgstr "Não foi possível excluir impressora"
+
+msgid "Unable to do maintenance command"
+msgstr "Não foi possível executar comando de manutenção"
+
+msgid "Unable to edit cupsd.conf files larger than 1MB"
+msgstr "Não foi possível editar arquivos de cupsd.conf maiores que 1MB"
+
+msgid ""
+"Unable to establish a secure connection to host (certificate chain invalid)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (cadeia de "
+"certificação inválida)."
+
+msgid ""
+"Unable to establish a secure connection to host (certificate not yet valid)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (certificado "
+"inválido no momento)."
+
+msgid "Unable to establish a secure connection to host (expired certificate)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (certificado "
+"expirou)."
+
+msgid "Unable to establish a secure connection to host (host name mismatch)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (nome da "
+"máquina incorreto)."
+
+msgid ""
+"Unable to establish a secure connection to host (peer dropped connection "
+"before responding)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (terminou a "
+"conexão sem a resposta)."
+
+msgid ""
+"Unable to establish a secure connection to host (self-signed certificate)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (certificado "
+"auto-assinado)."
+
+msgid ""
+"Unable to establish a secure connection to host (untrusted certificate)."
+msgstr ""
+"Não foi possível estabelecer uma conexão segura com a máquina (certificado "
+"não confiado)."
+
+msgid "Unable to establish a secure connection to host."
+msgstr "Não foi possível estabelecer uma conexão segura com a máquina."
+
+msgid "Unable to find destination for job"
+msgstr "Não foi possível encontrar o destino do trabalho"
+
+msgid "Unable to find printer."
+msgstr "Não foi possível encontrar a impressora."
+
+msgid "Unable to get backend exit status."
+msgstr "Não foi possível obter o estado de saída do backend."
+
+msgid "Unable to get class list"
+msgstr "Não foi possível obter lista de classes"
+
+msgid "Unable to get class status"
+msgstr "Não foi possível obter o estado da classe"
+
+msgid "Unable to get list of printer drivers"
+msgstr "Não foi possível obter lista de drivers de impressoras"
+
+msgid "Unable to get printer attributes"
+msgstr "Não foi possível obter atributos de impressora"
+
+msgid "Unable to get printer list"
+msgstr "Não foi possível obter lista de impressora"
+
+msgid "Unable to get printer status"
+msgstr "Não foi possível obter status de impressora"
+
+msgid "Unable to get printer status."
+msgstr "Não foi possível obter o estado de impressora."
+
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)."
+msgstr ""
+"Não foi possível instalar arquivos de driver de impressora Windows 2000 (%d)."
+
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)."
+msgstr ""
+"Não foi possível instalar arquivos de driver de impressora Windows 9x (%d)."
+
+msgid "Unable to load help index."
+msgstr "Não foi possível carregar índice de ajuda."
+
+#, c-format
+msgid "Unable to locate printer \"%s\"."
+msgstr "Não foi possível localizar a impressora \"%s\"."
+
+msgid "Unable to locate printer."
+msgstr "Não foi possível localizar a impressora."
+
+msgid "Unable to modify class"
+msgstr "Não foi possível modificar classe"
+
+msgid "Unable to modify printer"
+msgstr "Não foi possível modificar impressora"
+
+msgid "Unable to move job"
+msgstr "Não foi possível mover trabalho"
+
+msgid "Unable to move jobs"
+msgstr "Não foi possível mover trabalhos"
+
+msgid "Unable to open PPD file"
+msgstr "Não foi possível abrir arquivo PPD"
+
+msgid "Unable to open cupsd.conf file:"
+msgstr "Não foi possível abrir arquivo cupsd.conf:"
+
+msgid "Unable to open device file"
+msgstr "Não foi possível abrir arquivo dispositivo"
+
+#, c-format
+msgid "Unable to open document #%d in job #%d."
+msgstr "Não foi possível abrir documento #%d no trabalho #%d."
+
+msgid "Unable to open help file."
+msgstr "Não foi possível abrir arquivo de ajuda."
+
+msgid "Unable to open print file"
+msgstr "Não foi possível abrir arquivo de impressão"
+
+msgid "Unable to open raster file"
+msgstr "Não foi possível arquivo de rasterização"
+
+msgid "Unable to print test page"
+msgstr "Não foi possível imprimir página teste"
+
+msgid "Unable to read print data."
+msgstr "Não foi possível ler dados de impressão."
+
+msgid "Unable to resolve printer URI."
+msgstr "Não foi possível resolver URI da impressora."
+
+#, c-format
+msgid "Unable to run \"%s\": %s"
+msgstr "Não foi possível executar \"%s\": %s"
+
+msgid "Unable to see in file"
+msgstr "Não foi possível ler o arquivo"
+
+msgid "Unable to send command to printer driver"
+msgstr "Não foi possível enviar comando ao driver da impressora"
+
+msgid "Unable to send data to printer."
+msgstr "Não foi possível enviar dados à impressora."
+
+#, c-format
+msgid "Unable to set Windows printer driver (%d)."
+msgstr "Não foi possível definir driver de impressora Windows (%d)."
+
+msgid "Unable to set options"
+msgstr "Não foi possível definir opções"
+
+msgid "Unable to set server default"
+msgstr "Não foi possível definir servidor padrão"
+
+msgid "Unable to start backend process."
+msgstr "Não foi possível iniciar processo de backend."
+
+msgid "Unable to upload cupsd.conf file"
+msgstr "Não foi possível atualizar o arquivo cupsd.conf"
+
+msgid "Unable to use legacy USB class driver."
+msgstr "Não foi possível usar driver de classe USB legado."
+
+msgid "Unable to write print data"
+msgstr "Não foi possível escrever dados de impressão"
+
+#, c-format
+msgid "Unable to write uncompressed print data: %s"
+msgstr "Não foi possível escrever dados descompactados de impressão: %s"
+
+msgid "Unauthorized"
+msgstr "Não autorizado"
+
+msgid "Units"
+msgstr "Unidades"
+
+msgid "Unknown"
+msgstr "Desconhecido"
+
+#, c-format
+msgid "Unknown choice \"%s\" for option \"%s\"."
+msgstr "Escolha desconhecida \"%s\" para opção \"%s\"."
+
+#, c-format
+msgid "Unknown encryption option value: \"%s\"."
+msgstr "Valor da opção de criptografia desconhecido: \"%s\"."
+
+#, c-format
+msgid "Unknown file order: \"%s\"."
+msgstr "Ordem de arquivo desconhecida: \"%s\"."
+
+#, c-format
+msgid "Unknown format character: \"%c\"."
+msgstr "Caractere de formato desconhecido: \"%c\"."
+
+msgid "Unknown media size name."
+msgstr "Nome de tamanho de mídia desconhecido."
+
+#, c-format
+msgid "Unknown option \"%s\" with value \"%s\"."
+msgstr "Opção \"%s\" desconhecida com valor \"%s\"."
+
+#, c-format
+msgid "Unknown option \"%s\"."
+msgstr "Opção \"%s\" desconhecida."
+
+#, c-format
+msgid "Unknown print mode: \"%s\"."
+msgstr "Modo de impressão desconhecido: \"%s\"."
+
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "printer-error-policy \"%s\" desconhecido."
+
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "printer-op-policy \"%s\" desconhecido."
+
+msgid "Unknown service name."
+msgstr "Nome de serviço desconhecido."
+
+#, c-format
+msgid "Unknown version option value: \"%s\"."
+msgstr "Valor de opção de versão desconhecido: \"%s\"."
+
+#, c-format
+msgid "Unsupported 'compression' value \"%s\"."
+msgstr "Valor de \"compression\" sem suporte \"%s\"."
+
+#, c-format
+msgid "Unsupported 'document-format' value \"%s\"."
+msgstr "Valor de \"document-format\" sem suporte \"%s\"."
+
+msgid "Unsupported 'job-name' value."
+msgstr "Valor de \"job-name\" sem suporte."
+
+#, c-format
+msgid "Unsupported character set \"%s\"."
+msgstr "Conjunto de caracteres \"%s\" sem suporte."
+
+#, c-format
+msgid "Unsupported compression \"%s\"."
+msgstr "Compressão \"%s\" sem suporte."
+
+#, c-format
+msgid "Unsupported document-format \"%s\"."
+msgstr "document-format \"%s\" sem suporte."
+
+#, c-format
+msgid "Unsupported document-format \"%s/%s\"."
+msgstr "document-format \"%s/%s\" sem suporte."
+
+#, c-format
+msgid "Unsupported format \"%s\"."
+msgstr "Formato \"%s\" sem suporte."
+
+msgid "Unsupported margins."
+msgstr "Margens sem suporte."
+
+msgid "Unsupported media value."
+msgstr "Valor de mídia sem suporte."
+
+#, c-format
+msgid "Unsupported number-up value %d, using number-up=1."
+msgstr "Valor de number-up %d sem suporte; usando number-up=1."
+
+#, c-format
+msgid "Unsupported number-up-layout value %s, using number-up-layout=lrtb."
+msgstr ""
+"Valor de number-up-layout %s sem suporte; usando number-up-layout=lrtb."
+
+#, c-format
+msgid "Unsupported page-border value %s, using page-border=none."
+msgstr "Valor de page-border %s sem suporte; usando page-border=none."
+
+msgid "Unsupported raster data."
+msgstr "Dados de rasterização sem suporte."
+
+msgid "Unsupported value type"
+msgstr "Tipo de valor sem suporte"
+
+msgid "Upgrade Required"
+msgstr "Atualização necessária"
+
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]"
+msgstr ""
+"Uso:\n"
+"\n"
+"    lpadmin [-h servidor] -d destino\n"
+"    lpadmin [-h servidor] -x destino\n"
+"    lpadmin [-h servidor] -p impressora [-c add-classe] [-i interface]\n"
+"                       [-m modelo] [-r remove-classe] [-v dispositivo]\n"
+"                       [-D descrição] [-P arquivo-ppd] [-o nome=valor]\n"
+"                       [-u allow:usuário,usuário] [-u deny:usuário,usuário]"
+
+#, c-format
+msgid "Usage: %s job-id user title copies options [file]"
+msgstr "Uso: %s job-id usuário título cópias opções [arquivo]"
+
+msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+msgstr "Uso: cupsaddsmb [opções] impressora1 ... impressoraN"
+
+msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
+msgstr "Uso: cupsctl [opções] [param=valor ... paramN=valorN]"
+
+msgid "Usage: cupsd [options]"
+msgstr "Uso: cupsd [opções]"
+
+msgid "Usage: cupsfilter [ options ] filename"
+msgstr "Uso: cupsfilter [ opções ] arquivo"
+
+msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+msgstr "Uso: cupstestdsc [opções] arquivo.ps [... arquivo.ps]"
+
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+msgstr "Uso: cupstestppd [opções] arquivo1.ppd[.gz] [... arquivoN.ppd[.gz]]"
+
+msgid ""
+"Usage: ippdiscover [options] -a\n"
+"       ippdiscover [options] \"service name\"\n"
+"\n"
+"Options:"
+msgstr ""
+"Uso: ippdiscover [opções] -a\n"
+"     ippdiscover [opções] \"nome do serviço\"\n"
+"\n"
+"Opções:"
+
+msgid ""
+"Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
+"       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
+"       ippfind --help\n"
+"       ippfind --version"
+msgstr ""
+"Uso: ippfind [opções] tiporeg[,tiposub][.domínio.] ... [expressões]\n"
+"     ippfind [opções] nome[.tiporeg[.domínio.]] ... [expressões]\n"
+"     ippfind --help\n"
+"     ippfind --version"
+
+msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
+msgstr "Uso: ipptool [opções] URI arquivo [ ... arquivoN ]"
+
+msgid "Usage: lpmove job/src dest"
+msgstr "Uso: lpmove trabalho/fonte dest"
+
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer"
+msgstr ""
+"Uso: lpoptions [-h servidor] [-E] -d impressora\n"
+"     lpoptions [-h servidor] [-E] [-p impressora] -l\n"
+"     lpoptions [-h servidor] [-E] -p impressora -o opção[=valor] ...\n"
+"     lpoptions [-h servidor] [-E] -x impressora"
+
+msgid "Usage: lppasswd [-g groupname]"
+msgstr "Uso: lppasswd [-g grupo]"
+
+msgid ""
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]"
+msgstr ""
+"Uso: lppasswd [-g grupo] [usuário]\n"
+"     lppasswd [-g grupo] -a [usuário]\n"
+"     lppasswd [-g grupo] -x [usuário]"
+
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+msgstr "Uso: lpq [-P dest] [-U usuário] [-h máquina[:porta]] [-l] [+intervalo]"
+
+msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
+msgstr "Uso: ppdc [opções] arquivo.drv [ ... arquivoN.drv ]"
+
+msgid "Usage: ppdhtml [options] filename.drv >filename.html"
+msgstr "Uso: ppdhtml [opções] arquivo.drv >arquivo.html"
+
+msgid "Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Uso: ppdi [opções] arquivo.ppd [ ... arquivoN.ppd ]"
+
+msgid "Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Uso: ppdmerge [opções] arquivo.ppd [ ... arquivoN.ppd ]"
+
+msgid ""
+"Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
+msgstr "Uso: ppdpo [opções] -o arquivo.po arquivo.drv [ ... arquivoN.drv ]"
+
+msgid "Usage: snmp [host-or-ip-address]"
+msgstr "Uso: snmp [máquina-ou-endereço-ip]"
+
+msgid "Value uses indefinite length"
+msgstr "Valor usa comprimento indefinido"
+
+msgid "VarBind uses indefinite length"
+msgstr "VarBind usa comprimento indefinido"
+
+msgid "Version uses indefinite length"
+msgstr "Version usa comprimento indefinido"
+
+msgid "Waiting for job to complete."
+msgstr "Esperando o trabalho completar."
+
+msgid "Waiting for printer to become available."
+msgstr "Esperando a impressora ficar disponível."
+
+msgid "Waiting for printer to finish."
+msgstr "Esperando a impressora finalizar."
+
+msgid "Warning, no Windows 2000 printer drivers are installed."
+msgstr "Aviso, nenhum driver de impressora Windows 2000 está instalado."
+
+msgid "Web Interface is Disabled"
+msgstr "Interface web está desabilitada"
+
+msgid "Yes"
+msgstr "Sim"
+
+#, c-format
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://"
+"%s:%d%s</A>."
+msgstr ""
+"Você tem que acessar esta página usando a URL <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A>."
+
+msgid ""
+"Your password must be at least 6 characters long, cannot contain your "
+"username, and must contain at least one letter and number."
+msgstr ""
+"Sua senha deve ser pelo menos de 6 caracteres, não pode conter o seu nome de "
+"usuário, e deve conter pelo menos uma letra e um número."
+
+msgid "ZPL Label Printer"
+msgstr "Impressora de etiqueta ZPL"
+
+msgid "Zebra"
+msgstr "Zebra"
+
+msgid "aborted"
+msgstr "abortado"
+
+msgid "canceled"
+msgstr "cancelado"
+
+msgid "completed"
+msgstr "completou"
+
+msgid "cups-deviced failed to execute."
+msgstr "cups-deviced falhou na execução."
+
+msgid "cups-driverd failed to execute."
+msgstr "cups-driverd falhou na execução."
+
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+msgstr "cupsaddsmb: Nenhum arquivo PPD para a impressora \"%s\" - %s"
+
+msgid "cupsctl: Cannot set Listen or Port directly."
+msgstr "cupsctl: Não foi possível definir diretamente Porta ou Listen."
+
+#, c-format
+msgid "cupsctl: Unable to connect to server: %s"
+msgstr "cupsctl: Não foi possível conectar o servidor: %s"
+
+#, c-format
+msgid "cupsctl: Unknown option \"%s\""
+msgstr "cupsctl: Opção desconhecida \"%s\""
+
+#, c-format
+msgid "cupsctl: Unknown option \"-%c\""
+msgstr "cupsctl: Opção desconhecida \"-%c\""
+
+msgid "cupsd: Expected config filename after \"-c\" option."
+msgstr "cupsd: Esperava nome de arquivo de configuração após a opção \"-c\"."
+
+msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
+msgstr ""
+"cupsd: Esperava nome de arquivo de cups-files.conf após a opção \"-s\"."
+
+msgid "cupsd: Relative cups-files.conf filename not allowed."
+msgstr "cupsd: Nome de arquivo relativo para cups-files.conf não é permitido."
+
+msgid "cupsd: Unable to get current directory."
+msgstr "cupsd: Não é possível obter diretório atual."
+
+msgid "cupsd: Unable to get path to cups-files.conf file."
+msgstr ""
+"cupsd: Não foi possível obter o caminho para o arquivo cups-files.conf."
+
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting."
+msgstr "cupsd: Argumento desconhecido \"%s\" - abortando."
+
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting."
+msgstr "cupsd: Opção desconhecida \"%c\" - abortando."
+
+msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+msgstr ""
+"cupsd: Compilado sem suporte a launchd(8) e, portanto, executando no modo "
+"normal."
+
+#, c-format
+msgid "cupsfilter: Invalid document number %d."
+msgstr "cupsfilter: Número de documento inválido %d."
+
+#, c-format
+msgid "cupsfilter: Invalid job ID %d."
+msgstr "cupsfilter: ID de trabalho inválido %d."
+
+msgid "cupsfilter: Only one filename can be specified."
+msgstr "cupsfilter: Somente um nome de arquivo pode ser especificado."
+
+#, c-format
+msgid "cupsfilter: Unable to get job file - %s"
+msgstr "cupsfilter: Não é possível obter o arquivo do trabalho - %s"
+
+msgid "cupstestppd: The -q option is incompatible with the -v option."
+msgstr "cupstestppd: A opção -q é incompatível com a opção -v."
+
+msgid "cupstestppd: The -v option is incompatible with the -q option."
+msgstr "cupstestppd: A opção -v é incompatível com a opção -q."
+
+#, c-format
+msgid "device for %s/%s: %s"
+msgstr "dispositivo de %s/%s: %s"
+
+#, c-format
+msgid "device for %s: %s"
+msgstr "dispositivo de %s: %s"
+
+msgid "error-index uses indefinite length"
+msgstr "error-index usa comprimento indefinido"
+
+msgid "error-status uses indefinite length"
+msgstr "error-status usa comprimento indefinido"
+
+msgid "held"
+msgstr "retido"
+
+msgid "help\t\tGet help on commands."
+msgstr "help\t\tObtém ajuda sobre os comandos."
+
+msgid "idle"
+msgstr "inativo"
+
+#, c-format
+msgid "ippfind: Bad regular expression: %s"
+msgstr "ippfind: Expressão regular inválida: %s"
+
+msgid "ippfind: Cannot use --and after --or."
+msgstr "ippfind: Não é possível usar --and após --or."
+
+#, c-format
+msgid "ippfind: Expected key name after %s."
+msgstr "ippfind: Esperava nome da chave após %s."
+
+#, c-format
+msgid "ippfind: Expected port range after %s."
+msgstr "ippfind: Esperava faixa de portas após %s."
+
+#, c-format
+msgid "ippfind: Expected program after %s."
+msgstr "ippfind: Esperava o programa após %s."
+
+#, c-format
+msgid "ippfind: Expected semi-colon after %s."
+msgstr "ippfind: Esperava ponto-e-vírgula após %s."
+
+msgid "ippfind: Missing close brace in substitution."
+msgstr "ippfind: Faltando chave de fechamento na substituição."
+
+msgid "ippfind: Missing close parenthesis."
+msgstr "ippfind: Faltando parênteses de fechamento."
+
+msgid "ippfind: Missing expression before \"--and\"."
+msgstr "ippfind: Faltando expressão antes de \"--and\"."
+
+msgid "ippfind: Missing expression before \"--or\"."
+msgstr "ippfind: Faltando expressão antes de \"--or\"."
+
+#, c-format
+msgid "ippfind: Missing key name after %s."
+msgstr "ippfind: Faltando nome da chave após %s."
+
+msgid "ippfind: Missing open parenthesis."
+msgstr "ippfind: Faltando parênteses de abertura."
+
+#, c-format
+msgid "ippfind: Missing program after %s."
+msgstr "ippfind: Faltando programa após %s."
+
+#, c-format
+msgid "ippfind: Missing regular expression after %s."
+msgstr "ippfind: Faltando expressão regular após %s."
+
+#, c-format
+msgid "ippfind: Missing semi-colon after %s."
+msgstr "ippfind: Faltando dois-pontos após %s."
+
+msgid "ippfind: Out of memory."
+msgstr "ippfind: Memória insuficiente."
+
+msgid "ippfind: Too many parenthesis."
+msgstr "ippfind: Número excessivo de parênteses."
+
+#, c-format
+msgid "ippfind: Unable to browse or resolve: %s"
+msgstr "ippfind: Não foi possível navegar ou resolver: %s"
+
+#, c-format
+msgid "ippfind: Unable to execute \"%s\": %s"
+msgstr "ippfind: Não foi possível executar \"%s\": %s"
+
+#, c-format
+msgid "ippfind: Unable to use Bonjour: %s"
+msgstr "ippfind: Não foi possível usar Bonjour: %s"
+
+#, c-format
+msgid "ippfind: Unknown variable \"{%s}\"."
+msgstr "ippfind: Argumento desconhecido \"{%s}\"."
+
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+msgstr "ipptool: \"-i\" e \"-n\" são incompatíveis com \"-X\"."
+
+#, c-format
+msgid "ipptool: Bad URI - %s."
+msgstr "ipptool: URI inválida - %s."
+
+msgid "ipptool: Invalid seconds for \"-i\"."
+msgstr "ipptool: Segundos inválidos para \"-i\"."
+
+msgid "ipptool: May only specify a single URI."
+msgstr "ipptool: Só é possível especificar uma única URI."
+
+msgid "ipptool: Missing count for \"-n\"."
+msgstr "ipptool: Contagem faltando para \"-n\"."
+
+msgid "ipptool: Missing filename for \"-f\"."
+msgstr "ipptool: Faltando nome de arquivo para \"-f\"."
+
+msgid "ipptool: Missing name=value for \"-d\"."
+msgstr "ipptool: Faltando nome=valor para\"-d\"."
+
+msgid "ipptool: Missing seconds for \"-i\"."
+msgstr "ipptool: Faltando segundos para \"-i\"."
+
+msgid "ipptool: URI required before test file."
+msgstr "ipptool: URI necessária antes do arquivo de teste."
+
+#, c-format
+msgid "ipptool: Unknown option \"-%c\"."
+msgstr "ipptool: Opção desconhecida \"-%c\"."
+
+msgid "job-printer-uri attribute missing."
+msgstr "Faltando atributo de job-printer-uri."
+
+msgid "lpadmin: Class name can only contain printable characters."
+msgstr "lpadmin: Nome da classe só pode conter caracteres imprimíveis."
+
+msgid "lpadmin: Expected PPD after \"-P\" option."
+msgstr "lpadmin: Esperava PPD após a opção \"-P\"."
+
+msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
+msgstr ""
+"lpadmin: Esperava permitir/negar lista de usuários após a opção \"-u\"."
+
+msgid "lpadmin: Expected class after \"-r\" option."
+msgstr "lpadmin: Esperava a classe após a opção \"-r\"."
+
+msgid "lpadmin: Expected class name after \"-c\" option."
+msgstr "lpadmin: Esperava nome de classe após a opção \"-c\"."
+
+msgid "lpadmin: Expected description after \"-D\" option."
+msgstr "lpadmin: Esperava descrição após a opção \"-D\"."
+
+msgid "lpadmin: Expected device URI after \"-v\" option."
+msgstr "lpadmin: Esperava URI de dispositivo após a opção \"-v\"."
+
+msgid "lpadmin: Expected file type(s) after \"-I\" option."
+msgstr "lpadmin: Esperava tipo(s) de arquivo(s) após a opção \"-I\"."
+
+msgid "lpadmin: Expected hostname after \"-h\" option."
+msgstr "lpadmin: Esperava nome do máquina após a opção \"-h\"."
+
+msgid "lpadmin: Expected interface after \"-i\" option."
+msgstr "lpadmin: Esperava interface após a opção \"-i\"."
+
+msgid "lpadmin: Expected location after \"-L\" option."
+msgstr "lpadmin: Esperava localização após a opção \"-L\"."
+
+msgid "lpadmin: Expected model after \"-m\" option."
+msgstr "lpadmin: Esperava modelo após a opção \"-m\"."
+
+msgid "lpadmin: Expected name after \"-R\" option."
+msgstr "lpadmin: Esperava nome após a opção \"-R\"."
+
+msgid "lpadmin: Expected name=value after \"-o\" option."
+msgstr "lpadmin: Esperava nome=valor após a opção \"-o\"."
+
+msgid "lpadmin: Expected printer after \"-p\" option."
+msgstr "lpadmin: Esperava impressora após a opção \"-p\"."
+
+msgid "lpadmin: Expected printer name after \"-d\" option."
+msgstr "lpadmin: Esperava nome da impressora após a opção \"-d\"."
+
+msgid "lpadmin: Expected printer or class after \"-x\" option."
+msgstr "lpadmin: Esperava impressora ou classe após a opção \"-x\"."
+
+msgid "lpadmin: No member names were seen."
+msgstr "lpadmin: Nenhum nome de membros foi encontrado."
+
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s."
+msgstr "lpadmin: Impressora %s já é um membro da classe %s."
+
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s."
+msgstr "lpadmin: Impressora %s não é membro da classe %s."
+
+msgid "lpadmin: Printer name can only contain printable characters."
+msgstr "lpadmin: Nome da impressora só pode conter caracteres imprimíveis."
+
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Não é possível adicionar impressora à classe\n"
+"         Você deve primeiro especificar o nome da impressora."
+
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s"
+msgstr "lpadmin: Não foi possível conectar ao servidor: %s"
+
+msgid "lpadmin: Unable to create temporary file"
+msgstr "lpadmin: Não foi possível criar arquivo temporário"
+
+msgid ""
+"lpadmin: Unable to delete option:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Não foi possível excluir opção:\n"
+"         Você deve primeiro especificar o nome da impressora."
+
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+msgstr "lpadmin: Não foi possível abrir o arquivo PPD \"%s\" - %s"
+
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Não foi possível excluir impressora da classe:\n"
+"         Você deve primeiro especificar o nome da impressora."
+
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Não foi possível definir as opções da impressora:\n"
+"         Você deve primeiro especificar o nome da impressora."
+
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"."
+msgstr "lpadmin: Opção de permitir/negar desconhecida \"%s\"."
+
+#, c-format
+msgid "lpadmin: Unknown argument \"%s\"."
+msgstr "lpadmin: Argumento desconhecido \"%s\"."
+
+#, c-format
+msgid "lpadmin: Unknown option \"%c\"."
+msgstr "lpadmin: Opção desconhecida \"%c\"."
+
+msgid "lpadmin: Warning - content type list ignored."
+msgstr "lpadmin: Aviso - lista de tipos de conteúdos ignorada."
+
+msgid "lpc> "
+msgstr "lpc> "
+
+msgid "lpinfo: Expected 1284 device ID string after \"--device-id\"."
+msgstr ""
+"lpinfo: Esperava string de ID de dispositivo 1284 após \"--device-id\"."
+
+msgid "lpinfo: Expected language after \"--language\"."
+msgstr "lpinfo: Esperava idioma após \"--language\"."
+
+msgid "lpinfo: Expected make and model after \"--make-and-model\"."
+msgstr "lpinfo: Esperava marca e modelo após \"--make-and-model\"."
+
+msgid "lpinfo: Expected product string after \"--product\"."
+msgstr "lpinfo: Esperava string de produto após \"--product\"."
+
+msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
+msgstr "lpinfo: Esperava lista de esquemas após \"--exclude-schemes\"."
+
+msgid "lpinfo: Expected scheme list after \"--include-schemes\"."
+msgstr "lpinfo: Esperava lista de esquemas após \"--include-schemes\"."
+
+msgid "lpinfo: Expected timeout after \"--timeout\"."
+msgstr "lpinfo: Esperava tempo de espera após \"--timeout\"."
+
+#, c-format
+msgid "lpinfo: Unknown argument \"%s\"."
+msgstr "lpinfo: Argumento desconhecido \"%s\"."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%c\"."
+msgstr "lpinfo: Opção desconhecida \"%c\"."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%s\"."
+msgstr "lpinfo: Opção desconhecida \"%s\"."
+
+#, c-format
+msgid "lpmove: Unable to connect to server: %s"
+msgstr "lpmove: Não foi possível conectar ao servidor: %s"
+
+#, c-format
+msgid "lpmove: Unknown argument \"%s\"."
+msgstr "lpmove: Argumento desconhecido \"%s\"."
+
+#, c-format
+msgid "lpmove: Unknown option \"%c\"."
+msgstr "lpmove: Opção desconhecida \"%c\"."
+
+msgid "lpoptions: No printers."
+msgstr "lpoptions: Nenhuma impressora."
+
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s"
+msgstr "lpoptions: Não foi possível adicionar impressora ou instância: %s"
+
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s"
+msgstr "lpoptions: Não foi possível obter o arquivo PPD para %s: %s"
+
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s."
+msgstr "lpoptions: Não foi possível abrir o arquivo PPD para %s."
+
+msgid "lpoptions: Unknown printer or class."
+msgstr "lpoptions: Impressora ou classe desconhecida."
+
+msgid "lppasswd: Only root can add or delete passwords."
+msgstr "lppasswd: Somente o root pode adicionar ou excluir senhas."
+
+msgid "lppasswd: Password file busy."
+msgstr "lppasswd: Arquivo de senhas ocupado."
+
+msgid "lppasswd: Password file not updated."
+msgstr "lppasswd: Arquivo de senhas não atualizado."
+
+msgid "lppasswd: Sorry, password doesn't match."
+msgstr "lppasswd: Desculpe, senha não corresponde."
+
+msgid "lppasswd: Sorry, password rejected."
+msgstr "lppasswd: Desculpe, senha rejeitada."
+
+msgid "lppasswd: Sorry, passwords don't match."
+msgstr "lppasswd: Desculpe, senhas não correspondem."
+
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s"
+msgstr "lppasswd: Não foi possível copiar string de senha: %s"
+
+#, c-format
+msgid "lppasswd: Unable to open password file: %s"
+msgstr "lppasswd: Não foi possível abrir arquivo de senhas: %s"
+
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s"
+msgstr "lppasswd: Não foi possível gravar no arquivo de senha: %s"
+
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s"
+msgstr "lppasswd: Falha ao fazer backup do arquivo de senhas antigo: %s"
+
+#, c-format
+msgid "lppasswd: failed to rename password file: %s"
+msgstr "lppasswd: Falha ao renomear arquivo de senhas: %s"
+
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+msgstr "lppasswd: Usuário \"%s\" e grupo \"%s\" não existem."
+
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"."
+msgstr ""
+"lpstat: Erro - variável de ambiente %s contém destino inexistente \"%s\"."
+
+#, c-format
+msgid "members of class %s:"
+msgstr "membros da classe %s:"
+
+msgid "no entries"
+msgstr "nenhum registro"
+
+msgid "no system default destination"
+msgstr "nenhum destino padrão de sistema"
+
+msgid "notify-events not specified."
+msgstr "notify-events não especificado."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" is already used."
+msgstr "URI de notify-recipient-uri \"%s\" já está sendo usada."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
+msgstr "URI de notify-recipient-uri \"%s\" usa um esquema desconhecido."
+
+msgid "pending"
+msgstr "pendente"
+
+#, c-format
+msgid "ppdc: Adding include directory \"%s\"."
+msgstr "ppdc: Adicionando diretório de include \"%s\"."
+
+#, c-format
+msgid "ppdc: Adding/updating UI text from %s."
+msgstr "ppdc: Adicionando/atualizando texto de UI de %s."
+
+#, c-format
+msgid "ppdc: Bad boolean value (%s) on line %d of %s."
+msgstr "ppdc: Valor booleano inválido (%s) na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Bad font attribute: %s"
+msgstr "ppdc: Atributo de fonte inválido: %s"
+
+#, c-format
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s."
+msgstr "ppdc: Nome de resolução inválido \"%s\" na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Bad status keyword %s on line %d of %s."
+msgstr "ppdc: palavra-chave de estado inválida %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Bad variable substitution ($%c) on line %d of %s."
+msgstr "ppdc: Substituição de variável inválida ($%c) na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Choice found on line %d of %s with no Option."
+msgstr "ppdc: Escolha encontrada na linha %d de %s com nenhuma opção."
+
+#, c-format
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s."
+msgstr "ppdc: Duplicata de #po para o local %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected a filter definition on line %d of %s."
+msgstr "ppdc: Esperava a definição de um filtro na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected a program name on line %d of %s."
+msgstr "ppdc: Esperava o nome de um programa na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected boolean value on line %d of %s."
+msgstr "ppdc: Esperava um valor booleano na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected charset after Font on line %d of %s."
+msgstr "ppdc: Esperava conjunto de caracteres após Font na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected choice code on line %d of %s."
+msgstr "ppdc: Esperava código de escolha na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected choice name/text on line %d of %s."
+msgstr "ppdc: Esperava texto/nome de escolha na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected color order for ColorModel on line %d of %s."
+msgstr "ppdc: Esperava ordem de cores para ColorModel na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s."
+msgstr "ppdc: Esperava espaço de cores para ColorModel na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s."
+msgstr "ppdc: Esperava compressão para ColorModel na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s."
+msgstr ""
+"ppdc: Esperava string de restrições para UIConstraints na linha %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected driver type keyword following DriverType on line %d of %s."
+msgstr ""
+"ppdc: Esperava palavra-chave de tipo de driver seguindo DriverType na linha "
+"%d de %s."
+
+#, c-format
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s."
+msgstr "ppdc: Esperava tipo Duplex após Duplex na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected encoding after Font on line %d of %s."
+msgstr "ppdc: Esperava codificação após Font na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected filename after #po %s on line %d of %s."
+msgstr "ppdc: Esperava nome de arquivo após #po %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected group name/text on line %d of %s."
+msgstr "ppdc: Esperava text/nome de grupo na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected include filename on line %d of %s."
+msgstr "ppdc: Esperava inclusão de nome de arquivo na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected integer on line %d of %s."
+msgstr "ppdc: Esperava número inteiro na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s."
+msgstr "ppdc: Esperava local após #po na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s."
+msgstr "ppdc: Esperava nome após %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s."
+msgstr "ppdc: Esperava nome após FileName na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s."
+msgstr "ppdc: Esperava nome após Font na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s."
+msgstr "ppdc: Esperava nome após Manufacturer na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s."
+msgstr "ppdc: Esperava nome após MediaSize na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s."
+msgstr "ppdc: Esperava nome após ModelName na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s."
+msgstr "ppdc: Esperava nome após PCFileName na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s."
+msgstr "ppdc: Esperava nome/texto após %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s."
+msgstr "ppdc: Esperava nome/texto após Installable na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s."
+msgstr "ppdc: Esperava nome/texto após Resolution na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: Esperava combinação de nome/texto para ColorModel na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s."
+msgstr "ppdc: Esperava opção de nome/texto na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s."
+msgstr "ppdc: Esperava opção de seção na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s."
+msgstr "ppdc: Esperava tipo da opção na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s."
+msgstr ""
+"ppdc: Esperava um campo de substituição após Resolution na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected quoted string on line %d of %s."
+msgstr "ppdc: Esperava string em aspas na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s."
+msgstr "ppdc: Esperava número real na linha %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s."
+msgstr ""
+"ppdc: Esperava resolução/tipo de mídia seguindo ColorProfile na linha %d de "
+"%s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
+"of %s."
+msgstr ""
+"ppdc: Esperava resolução/tipo de mídia seguindo SimpleColorProfile na linha "
+"%d de %s."
+
+#, c-format
+msgid "ppdc: Expected selector after %s on line %d of %s."
+msgstr "ppdc: Esperava seletor após %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected status after Font on line %d of %s."
+msgstr "ppdc: Esperava estado após Font na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected string after Copyright on line %d of %s."
+msgstr "ppdc: Esperava string após Copyright na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s."
+msgstr "ppdc: Esperava string após Version na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s."
+msgstr "ppdc: Esperava nomes de duas opções na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s."
+msgstr "ppdc: Esperava valor após %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s."
+msgstr "ppdc: Esperava versão após Font na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"."
+msgstr "ppdc: Nome de arquivo \"%s\" de #include/#po inválido. "
+
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s."
+msgstr "ppdc: Custo inválido para filtro na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s."
+msgstr "ppdc: Tipo MIME vazio inválido para filtro na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s."
+msgstr "ppdc: Nome de programa vazio inválido na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s."
+msgstr "ppdc: Seção \"%s\" inválida de opção na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s."
+msgstr "ppdc: Tipo \"%s\" inválido de opção na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Loading driver information file \"%s\"."
+msgstr "ppdc: Carregando arquivo \"%s\" de informações de driver."
+
+#, c-format
+msgid "ppdc: Loading messages for locale \"%s\"."
+msgstr "ppdc: Carregando mensagens para locale \"%s\" ."
+
+#, c-format
+msgid "ppdc: Loading messages from \"%s\"."
+msgstr "ppdc: Carregando mensagens de \"%s\"."
+
+#, c-format
+msgid "ppdc: Missing #endif at end of \"%s\"."
+msgstr "ppdc: Faltando #endif ao final de \"%s\"."
+
+#, c-format
+msgid "ppdc: Missing #if on line %d of %s."
+msgstr "ppdc: Faltando #if na linha %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Need a msgid line before any translation strings on line %d of %s."
+msgstr ""
+"ppdc: Precisa de uma linha de msgid antes de qualquer string de tradução na "
+"linha %d de %s."
+
+#, c-format
+msgid "ppdc: No message catalog provided for locale %s."
+msgstr "ppdc: Nenhum catálogo de mensagens fornecido para o locale %s."
+
+#, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s."
+msgstr "ppdc: Opção %s definida em dois grupos diferentes na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s."
+msgstr "ppdc: Opção %s redefinida com um tipo diferente na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s."
+msgstr "ppdc: Restrição da opção deve *name na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s."
+msgstr "ppdc: Muitos #if aninhados demais na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to create PPD file \"%s\" - %s."
+msgstr "ppdc: Não foi possível criar o arquivo PPD \"%s\" - %s."
+
+#, c-format
+msgid "ppdc: Unable to create output directory %s: %s"
+msgstr "ppdc: Não foi possível criar diretório de saída %s: %s"
+
+#, c-format
+msgid "ppdc: Unable to create output pipes: %s"
+msgstr "ppdc: Não foi possível criar redirecionamento de saída: %s"
+
+#, c-format
+msgid "ppdc: Unable to execute cupstestppd: %s"
+msgstr "ppdc: Não foi possível executar cupstestppd: %s"
+
+#, c-format
+msgid "ppdc: Unable to find #po file %s on line %d of %s."
+msgstr "ppdc: Não foi possível encontrar arquivo #po %s na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s."
+msgstr ""
+"ppdc: Não foi possível encontrar o arquivo include \"%s\" na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to find localization for \"%s\" - %s"
+msgstr "ppdc: Não foi possível encontrar localização para \"%s\" - %s"
+
+#, c-format
+msgid "ppdc: Unable to load localization file \"%s\" - %s"
+msgstr "ppdc: Não foi possível carregar arquivo de localização \"%s\" - %s"
+
+#, c-format
+msgid "ppdc: Unable to open %s: %s"
+msgstr "ppdc: Não foi possível abrir %s: %s"
+
+#, c-format
+msgid "ppdc: Undefined variable (%s) on line %d of %s."
+msgstr "ppdc: Variável indefinida (%s) na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unexpected text on line %d of %s."
+msgstr "ppdc: Texto inesperado na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unknown driver type %s on line %d of %s."
+msgstr "ppdc: Tipo de driver %s desconhecido na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s."
+msgstr "ppdc: Tipo de duplex desconhecido \"%s\" na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
+msgstr "ppdc: Tamanho de mídia desconhecido \"%s\" na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unknown message catalog format for \"%s\"."
+msgstr "ppdc: Formato de catálogo de mensagens desconhecido para \"%s\"."
+
+#, c-format
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s."
+msgstr "ppdc: Token desconhecido \"%s\" visto na linha %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s."
+msgstr ""
+"ppdc: Caractere final desconhecido em número real \"%s\" na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Unterminated string starting with %c on line %d of %s."
+msgstr "ppdc: Início de string não terminada com %c na linha %d de %s."
+
+#, c-format
+msgid "ppdc: Warning - overlapping filename \"%s\"."
+msgstr "ppdc: Aviso - nome de arquivo em sobreposição \"%s\"."
+
+#, c-format
+msgid "ppdc: Writing %s."
+msgstr "ppdc: Gravando %s."
+
+#, c-format
+msgid "ppdc: Writing PPD files to directory \"%s\"."
+msgstr "ppdc: Gravando arquivos PPD para a pasta \"%s\"."
+
+#, c-format
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s."
+msgstr "ppdmerge: LanguageVersion incorreto \"%s\" em %s."
+
+#, c-format
+msgid "ppdmerge: Ignoring PPD file %s."
+msgstr "ppdmerge: Ignorando o arquivo PPD %s."
+
+#, c-format
+msgid "ppdmerge: Unable to backup %s to %s - %s"
+msgstr "ppdmerge: Não é possível fazer backup de %s para %s - %s"
+
+#, c-format
+msgid "printer %s disabled since %s -"
+msgstr "impressora %s desabilitada desde %s -"
+
+#, c-format
+msgid "printer %s is idle.  enabled since %s"
+msgstr "impressora %s está inativa; habilitada desde %s"
+
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s"
+msgstr "impressora %s está imprimindo %s-%d; habilitada desde %s"
+
+#, c-format
+msgid "printer %s/%s disabled since %s -"
+msgstr "impressora %s/%s desabilitada desde %s -"
+
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s"
+msgstr "impressora %s/%s está inativa; habilitada desde %s"
+
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s"
+msgstr "impressora %s/%s está imprimindo %s-%d; habilitada desde %s"
+
+msgid "processing"
+msgstr "processando"
+
+#, c-format
+msgid "request id is %s-%d (%d file(s))"
+msgstr "id de requisição é %s-%d (%d arquivo(s))"
+
+msgid "request-id uses indefinite length"
+msgstr "request-id usa comprimento indefinido"
+
+msgid "scheduler is not running"
+msgstr "Agendador não está em execução"
+
+msgid "scheduler is running"
+msgstr "Agendador está em execução"
+
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "falhou o estado de %s: %s"
+
+msgid "status\t\tShow status of daemon and queue."
+msgstr "status\t\tMostra estado do daemon e da fila."
+
+msgid "stopped"
+msgstr "parou"
+
+#, c-format
+msgid "system default destination: %s"
+msgstr "destino padrão do sistema: %s"
+
+#, c-format
+msgid "system default destination: %s/%s"
+msgstr "destino padrão do sistema: %s/%s"
+
+msgid "unknown"
+msgstr "desconhecido"
+
+msgid "untitled"
+msgstr "sem título"
+
+msgid "variable-bindings uses indefinite length"
+msgstr "variable-bindings usa comprimento indefinido"

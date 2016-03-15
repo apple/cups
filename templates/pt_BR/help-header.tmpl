@@ -1,0 +1,51 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Pesquisar em 
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:todos os documentos}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Pesquisar">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Limpar"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Conteúdo">
+<TR><TD>
+
+<H3 CLASS="title">Documentos de ajuda online</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Todos os Documentos</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Pesquisar resultados em {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Todos os documentos}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (em <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Nenhum resultado encontrado.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Ver versão imprimível"></FORM>:
+
+<H1>Ajuda online</H1>
+
+<P>Essa é a interface de ajuda online do CUPS. Forneça expressões de pesquisa
+acima ou clique em qualquer um dos links de documentação para mostrar
+a informação de ajuda online.</P>
+
+<P>Se você é novo no CUPS, leia a página "<a
+href="/help/overview.html">Visão geral do CUPS</a>". Usuários veteranos
+devem ler a página "<a href="/help/whatsnew.html">O que Há de Novo no CUPS
+1.6</a>".</P>
+
+<P>A <A HREF="http://www.cups.org/">Página inicial do CUPS</A> também
+fornece muitos recursos incluindo fórums de discussão de usuários, respostas
+a perguntas frequentes e um formulário para enviar registros de erros e
+pedidos de melhorias.</P>}

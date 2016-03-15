@@ -1,0 +1,11 @@
+{#printer_name=0?:
+<TABLE CLASS="list" SUMMARY="Class List">
+<THEAD>
+<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> Nome da fila <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> Nome da fila <SMALL>&#x25bc;</SMALL>}</A></TH><TH>Descrição</TH><TH>Localização</TH><TH>Membros</TH><TH>Estado</TH></TR>
+</THEAD>
+<TBODY>
+{[printer_name]
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{?member_uris=?Nenhum:{member_uris}}</TD><TD>{printer_state=3?Inativa:{printer_state=4?Processando:Pausada}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
+}
+</TBODY>
+</TABLE></DIV>}
