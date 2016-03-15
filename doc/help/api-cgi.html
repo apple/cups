@@ -1,0 +1,1138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>CGI API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id: api-array.header 8087 2008-10-27 21:37:05Z mike $"
+
+  CGI API header for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>CGI API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/cgi.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupscgi</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#cgiCheckVariables" title="Check for the presence of &quot;required&quot; variables.">cgiCheckVariables</a></li>
+	<li><a href="#cgiClearVariables" title="Clear all form variables.">cgiClearVariables</a></li>
+	<li><a href="#cgiCompileSearch" title="Compile a search string.">cgiCompileSearch</a></li>
+	<li><a href="#cgiCopyTemplateFile" title="Copy a template file and replace all the
+'{variable}' strings with the variable value.">cgiCopyTemplateFile</a></li>
+	<li><a href="#cgiCopyTemplateLang" title="Copy a template file using a language...">cgiCopyTemplateLang</a></li>
+	<li><a href="#cgiDoSearch" title="Do a search of some text.">cgiDoSearch</a></li>
+	<li><a href="#cgiEndHTML" title="End a HTML page.">cgiEndHTML</a></li>
+	<li><a href="#cgiEndMultipart" title="End the delivery of a multipart web page.">cgiEndMultipart</a></li>
+	<li><a href="#cgiFormEncode" title="Encode a string as a form variable.">cgiFormEncode</a></li>
+	<li><a href="#cgiFreeSearch" title="Free a compiled search context.">cgiFreeSearch</a></li>
+	<li><a href="#cgiGetArray" title="Get an element from a form array.">cgiGetArray</a></li>
+	<li><a href="#cgiGetAttributes" title="Get the list of attributes that are needed
+by the template file.">cgiGetAttributes</a></li>
+	<li><a href="#cgiGetCookie" title="Get a cookie value.">cgiGetCookie</a></li>
+	<li><a href="#cgiGetFile" title="Get the file (if any) that was submitted in the form.">cgiGetFile</a></li>
+	<li><a href="#cgiGetIPPObjects" title="Get the objects in an IPP response.">cgiGetIPPObjects</a></li>
+	<li><a href="#cgiGetSize" title="Get the size of a form array value.">cgiGetSize</a></li>
+	<li><a href="#cgiGetTemplateDir" title="Get the templates directory...">cgiGetTemplateDir</a></li>
+	<li><a href="#cgiGetVariable" title="Get a CGI variable from the database.">cgiGetVariable</a></li>
+	<li><a href="#cgiInitialize" title="Initialize the CGI variable &quot;database&quot;.">cgiInitialize</a></li>
+	<li><a href="#cgiIsPOST" title="Determine whether this page was POSTed.">cgiIsPOST</a></li>
+	<li><a href="#cgiMoveJobs" title="Move one or more jobs.">cgiMoveJobs</a></li>
+	<li><a href="#cgiPrintCommand" title="Print a CUPS command job.">cgiPrintCommand</a></li>
+	<li><a href="#cgiPrintTestPage" title="Print a test page.">cgiPrintTestPage</a></li>
+	<li><a href="#cgiRewriteURL" title="Rewrite a printer URI into a web browser URL...">cgiRewriteURL</a></li>
+	<li><a href="#cgiSetArray" title="Set array element N to the specified string.">cgiSetArray</a></li>
+	<li><a href="#cgiSetCookie" title="Set a cookie value.">cgiSetCookie</a></li>
+	<li><a href="#cgiSetIPPObjectVars" title="Set CGI variables from an IPP object.">cgiSetIPPObjectVars</a></li>
+	<li><a href="#cgiSetIPPVars" title="Set CGI variables from an IPP response.">cgiSetIPPVars</a></li>
+	<li><a href="#cgiSetServerVersion" title="Set the server name and CUPS version...">cgiSetServerVersion</a></li>
+	<li><a href="#cgiSetSize" title="Set the array size.">cgiSetSize</a></li>
+	<li><a href="#cgiSetVariable" title="Set a CGI variable in the database.">cgiSetVariable</a></li>
+	<li><a href="#cgiShowIPPError" title="Show the last IPP error message.">cgiShowIPPError</a></li>
+	<li><a href="#cgiShowJobs" title="Show print jobs.">cgiShowJobs</a></li>
+	<li><a href="#cgiStartHTML" title="Start a HTML page.">cgiStartHTML</a></li>
+	<li><a href="#cgiStartMultipart" title="Start a multipart delivery of a web page.">cgiStartMultipart</a></li>
+	<li><a href="#cgiSupportsMultipart" title="Does the browser support multi-part documents?">cgiSupportsMultipart</a></li>
+	<li><a href="#cgiText" title="Return localized text.">cgiText</a></li>
+	<li><a href="#helpDeleteIndex" title="Delete an index, freeing all memory used.">helpDeleteIndex</a></li>
+	<li><a href="#helpFindNode" title="Find a node in an index.">helpFindNode</a></li>
+	<li><a href="#helpLoadIndex" title="Load a help index from disk.">helpLoadIndex</a></li>
+	<li><a href="#helpSaveIndex" title="Save a help index to disk.">helpSaveIndex</a></li>
+	<li><a href="#helpSearchIndex" title="Search an index.">helpSearchIndex</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cgi_file_t" title="Uploaded file data">cgi_file_t</a></li>
+	<li><a href="#help_index_t" title="Help index structure">help_index_t</a></li>
+	<li><a href="#help_node_t" title="Help node structure...">help_node_t</a></li>
+	<li><a href="#help_word_t" title="Help word structure...">help_word_t</a></li>
+</ul></li>
+<li><a href="#STRUCTURES">Structures</a><ul class="code">
+	<li><a href="#cgi_file_s" title="Uploaded file data">cgi_file_s</a></li>
+	<li><a href="#help_index_s" title="Help index structure">help_index_s</a></li>
+	<li><a href="#help_node_s" title="Help node structure...">help_node_s</a></li>
+	<li><a href="#help_word_s" title="Help word structure...">help_word_s</a></li>
+</ul></li>
+</ul>
+<!--
+  "$Id: api-array.shtml 7616 2008-05-28 00:34:13Z mike $"
+
+  CGI API introduction for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The CGI API provides Common Gateway Interface functions for CUPS.</p>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="cgiCheckVariables">cgiCheckVariables</a></h3>
+<p class="description">Check for the presence of &quot;required&quot; variables.</p>
+<p class="code">
+int cgiCheckVariables (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *names<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>names</dt>
+<dd class="description">Variables to look for</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if all variables present, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Names may be separated by spaces and/or commas.</p>
+<h3 class="function"><a name="cgiClearVariables">cgiClearVariables</a></h3>
+<p class="description">Clear all form variables.</p>
+<p class="code">
+void cgiClearVariables (void);</p>
+<h3 class="function"><a name="cgiCompileSearch">cgiCompileSearch</a></h3>
+<p class="description">Compile a search string.</p>
+<p class="code">
+void *cgiCompileSearch (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *query<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>query</dt>
+<dd class="description">Query string</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Search context</p>
+<h3 class="function"><a name="cgiCopyTemplateFile">cgiCopyTemplateFile</a></h3>
+<p class="description">Copy a template file and replace all the
+'{variable}' strings with the variable value.</p>
+<p class="code">
+void cgiCopyTemplateFile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *out,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *tmpl<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>out</dt>
+<dd class="description">Output file</dd>
+<dt>tmpl</dt>
+<dd class="description">Template file to read</dd>
+</dl>
+<h3 class="function"><a name="cgiCopyTemplateLang">cgiCopyTemplateLang</a></h3>
+<p class="description">Copy a template file using a language...</p>
+<p class="code">
+void cgiCopyTemplateLang (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *tmpl<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>tmpl</dt>
+<dd class="description">Base filename</dd>
+</dl>
+<h3 class="function"><a name="cgiDoSearch">cgiDoSearch</a></h3>
+<p class="description">Do a search of some text.</p>
+<p class="code">
+int cgiDoSearch (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *search,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *text<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>search</dt>
+<dd class="description">Search context</dd>
+<dt>text</dt>
+<dd class="description">Text to search</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of matches</p>
+<h3 class="function"><a name="cgiEndHTML">cgiEndHTML</a></h3>
+<p class="description">End a HTML page.</p>
+<p class="code">
+void cgiEndHTML (void);</p>
+<h3 class="function"><a name="cgiEndMultipart">cgiEndMultipart</a></h3>
+<p class="description">End the delivery of a multipart web page.</p>
+<p class="code">
+void cgiEndMultipart (void);</p>
+<h3 class="function"><a name="cgiFormEncode">cgiFormEncode</a></h3>
+<p class="description">Encode a string as a form variable.</p>
+<p class="code">
+char *cgiFormEncode (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t dstsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dst</dt>
+<dd class="description">Destination string</dd>
+<dt>src</dt>
+<dd class="description">Source string</dd>
+<dt>dstsize</dt>
+<dd class="description">Size of destination string</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Destination string</p>
+<h3 class="function"><a name="cgiFreeSearch">cgiFreeSearch</a></h3>
+<p class="description">Free a compiled search context.</p>
+<p class="code">
+void cgiFreeSearch (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *search<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>search</dt>
+<dd class="description">Search context</dd>
+</dl>
+<h3 class="function"><a name="cgiGetArray">cgiGetArray</a></h3>
+<p class="description">Get an element from a form array.</p>
+<p class="code">
+const char *cgiGetArray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of array variable</dd>
+<dt>element</dt>
+<dd class="description">Element number (0 to N)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Element value or NULL</p>
+<h3 class="function"><a name="cgiGetAttributes">cgiGetAttributes</a></h3>
+<p class="description">Get the list of attributes that are needed
+by the template file.</p>
+<p class="code">
+void cgiGetAttributes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_t *request,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *tmpl<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>request</dt>
+<dd class="description">IPP request</dd>
+<dt>tmpl</dt>
+<dd class="description">Base filename</dd>
+</dl>
+<h3 class="function"><a name="cgiGetCookie">cgiGetCookie</a></h3>
+<p class="description">Get a cookie value.</p>
+<p class="code">
+const char *cgiGetCookie (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of cookie</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value or NULL</p>
+<h3 class="function"><a name="cgiGetFile">cgiGetFile</a></h3>
+<p class="description">Get the file (if any) that was submitted in the form.</p>
+<p class="code">
+const <a href="#cgi_file_t">cgi_file_t</a> *cgiGetFile (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Attached file or NULL</p>
+<h3 class="function"><a name="cgiGetIPPObjects">cgiGetIPPObjects</a></h3>
+<p class="description">Get the objects in an IPP response.</p>
+<p class="code">
+cups_array_t *cgiGetIPPObjects (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_t *response,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *search<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>response</dt>
+<dd class="description">IPP response</dd>
+<dt>search</dt>
+<dd class="description">Search filter</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Array of objects</p>
+<h3 class="function"><a name="cgiGetSize">cgiGetSize</a></h3>
+<p class="description">Get the size of a form array value.</p>
+<p class="code">
+int cgiGetSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of variable</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of elements</p>
+<h3 class="function"><a name="cgiGetTemplateDir">cgiGetTemplateDir</a></h3>
+<p class="description">Get the templates directory...</p>
+<p class="code">
+char *cgiGetTemplateDir (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Template directory</p>
+<h3 class="function"><a name="cgiGetVariable">cgiGetVariable</a></h3>
+<p class="description">Get a CGI variable from the database.</p>
+<p class="code">
+const char *cgiGetVariable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of variable</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value of variable</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns NULL if the variable doesn't exist.  If the variable is an
+array of values, returns the last element.</p>
+<h3 class="function"><a name="cgiInitialize">cgiInitialize</a></h3>
+<p class="description">Initialize the CGI variable &quot;database&quot;.</p>
+<p class="code">
+int cgiInitialize (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Non-zero if there was form data</p>
+<h3 class="function"><a name="cgiIsPOST">cgiIsPOST</a></h3>
+<p class="description">Determine whether this page was POSTed.</p>
+<p class="code">
+int cgiIsPOST (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if POST, 0 if GET</p>
+<h3 class="function"><a name="cgiMoveJobs">cgiMoveJobs</a></h3>
+<p class="description">Move one or more jobs.</p>
+<p class="code">
+void cgiMoveJobs (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int job_id<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>dest</dt>
+<dd class="description">Destination or NULL</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID or 0 for all</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">At least one of dest or job_id must be non-zero/NULL.</p>
+<h3 class="function"><a name="cgiPrintCommand">cgiPrintCommand</a></h3>
+<p class="description">Print a CUPS command job.</p>
+<p class="code">
+void cgiPrintCommand (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *command,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *title<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>dest</dt>
+<dd class="description">Destination printer</dd>
+<dt>command</dt>
+<dd class="description">Command to send</dd>
+<dt>title</dt>
+<dd class="description">Page/job title</dd>
+</dl>
+<h3 class="function"><a name="cgiPrintTestPage">cgiPrintTestPage</a></h3>
+<p class="description">Print a test page.</p>
+<p class="code">
+void cgiPrintTestPage (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>dest</dt>
+<dd class="description">Destination printer/class</dd>
+</dl>
+<h3 class="function"><a name="cgiRewriteURL">cgiRewriteURL</a></h3>
+<p class="description">Rewrite a printer URI into a web browser URL...</p>
+<p class="code">
+char *cgiRewriteURL (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *uri,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *url,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int urlsize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *newresource<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>uri</dt>
+<dd class="description">Current URI</dd>
+<dt>url</dt>
+<dd class="description">New URL</dd>
+<dt>urlsize</dt>
+<dd class="description">Size of URL buffer</dd>
+<dt>newresource</dt>
+<dd class="description">Replacement resource</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New URL</p>
+<h3 class="function"><a name="cgiSetArray">cgiSetArray</a></h3>
+<p class="description">Set array element N to the specified string.</p>
+<p class="code">
+void cgiSetArray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of variable</dd>
+<dt>element</dt>
+<dd class="description">Element number (0 to N)</dd>
+<dt>value</dt>
+<dd class="description">Value of variable</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">If the variable array is smaller than (element + 1), the intervening
+elements are set to NULL.</p>
+<h3 class="function"><a name="cgiSetCookie">cgiSetCookie</a></h3>
+<p class="description">Set a cookie value.</p>
+<p class="code">
+void cgiSetCookie (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *path,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *domain,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;time_t expires,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int secure<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+<dt>path</dt>
+<dd class="description">Path (typically &quot;/&quot;)</dd>
+<dt>domain</dt>
+<dd class="description">Domain name</dd>
+<dt>expires</dt>
+<dd class="description">Expiration date (0 for session)</dd>
+<dt>secure</dt>
+<dd class="description">Require SSL</dd>
+</dl>
+<h3 class="function"><a name="cgiSetIPPObjectVars">cgiSetIPPObjectVars</a></h3>
+<p class="description">Set CGI variables from an IPP object.</p>
+<p class="code">
+ipp_attribute_t *cgiSetIPPObjectVars (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_attribute_t *obj,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *prefix,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>obj</dt>
+<dd class="description">Response data to be copied...</dd>
+<dt>prefix</dt>
+<dd class="description">Prefix for name or NULL</dd>
+<dt>element</dt>
+<dd class="description">Parent element number</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Next object</p>
+<h3 class="function"><a name="cgiSetIPPVars">cgiSetIPPVars</a></h3>
+<p class="description">Set CGI variables from an IPP response.</p>
+<p class="code">
+int cgiSetIPPVars (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_t *response,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filter_name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filter_value,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *prefix,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int parent_el<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>response</dt>
+<dd class="description">Response data to be copied...</dd>
+<dt>filter_name</dt>
+<dd class="description">Filter name</dd>
+<dt>filter_value</dt>
+<dd class="description">Filter value</dd>
+<dt>prefix</dt>
+<dd class="description">Prefix for name or NULL</dd>
+<dt>parent_el</dt>
+<dd class="description">Parent element number</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Maximum number of elements</p>
+<h3 class="function"><a name="cgiSetServerVersion">cgiSetServerVersion</a></h3>
+<p class="description">Set the server name and CUPS version...</p>
+<p class="code">
+void cgiSetServerVersion (void);</p>
+<h3 class="function"><a name="cgiSetSize">cgiSetSize</a></h3>
+<p class="description">Set the array size.</p>
+<p class="code">
+void cgiSetSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of variable</dd>
+<dt>size</dt>
+<dd class="description">Number of elements (0 to N)</dd>
+</dl>
+<h3 class="function"><a name="cgiSetVariable">cgiSetVariable</a></h3>
+<p class="description">Set a CGI variable in the database.</p>
+<p class="code">
+void cgiSetVariable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of variable</dd>
+<dt>value</dt>
+<dd class="description">Value of variable</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">If the variable is an array, this truncates the array to a single element.</p>
+<h3 class="function"><a name="cgiShowIPPError">cgiShowIPPError</a></h3>
+<p class="description">Show the last IPP error message.</p>
+<p class="code">
+void cgiShowIPPError (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *message<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>message</dt>
+<dd class="description">Contextual message</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The caller must still call cgiStartHTML() and cgiEndHTML().</p>
+<h3 class="function"><a name="cgiShowJobs">cgiShowJobs</a></h3>
+<p class="description">Show print jobs.</p>
+<p class="code">
+void cgiShowJobs (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>dest</dt>
+<dd class="description">Destination name or NULL</dd>
+</dl>
+<h3 class="function"><a name="cgiStartHTML">cgiStartHTML</a></h3>
+<p class="description">Start a HTML page.</p>
+<p class="code">
+void cgiStartHTML (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *title<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>title</dt>
+<dd class="description">Title of page</dd>
+</dl>
+<h3 class="function"><a name="cgiStartMultipart">cgiStartMultipart</a></h3>
+<p class="description">Start a multipart delivery of a web page.</p>
+<p class="code">
+void cgiStartMultipart (void);</p>
+<h3 class="function"><a name="cgiSupportsMultipart">cgiSupportsMultipart</a></h3>
+<p class="description">Does the browser support multi-part documents?</p>
+<p class="code">
+int cgiSupportsMultipart (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if multi-part supported, 0 otherwise</p>
+<h3 class="function"><a name="cgiText">cgiText</a></h3>
+<p class="description">Return localized text.</p>
+<p class="code">
+const char *cgiText (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *message<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>message</dt>
+<dd class="description">Message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized message</p>
+<h3 class="function"><a name="helpDeleteIndex">helpDeleteIndex</a></h3>
+<p class="description">Delete an index, freeing all memory used.</p>
+<p class="code">
+void helpDeleteIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#help_index_t">help_index_t</a> *hi<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>hi</dt>
+<dd class="description">Help index</dd>
+</dl>
+<h3 class="function"><a name="helpFindNode">helpFindNode</a></h3>
+<p class="description">Find a node in an index.</p>
+<p class="code">
+<a href="#help_node_t">help_node_t</a> *helpFindNode (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#help_index_t">help_index_t</a> *hi,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *anchor<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>hi</dt>
+<dd class="description">Index</dd>
+<dt>filename</dt>
+<dd class="description">Filename</dd>
+<dt>anchor</dt>
+<dd class="description">Anchor</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Node pointer or NULL</p>
+<h3 class="function"><a name="helpLoadIndex">helpLoadIndex</a></h3>
+<p class="description">Load a help index from disk.</p>
+<p class="code">
+<a href="#help_index_t">help_index_t</a> *helpLoadIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *hifile,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *directory<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>hifile</dt>
+<dd class="description">Index filename</dd>
+<dt>directory</dt>
+<dd class="description">Directory that is indexed</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Index pointer or NULL</p>
+<h3 class="function"><a name="helpSaveIndex">helpSaveIndex</a></h3>
+<p class="description">Save a help index to disk.</p>
+<p class="code">
+int helpSaveIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#help_index_t">help_index_t</a> *hi,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *hifile<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>hi</dt>
+<dd class="description">Index</dd>
+<dt>hifile</dt>
+<dd class="description">Index filename</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on error</p>
+<h3 class="function"><a name="helpSearchIndex">helpSearchIndex</a></h3>
+<p class="description">Search an index.</p>
+<p class="code">
+<a href="#help_index_t">help_index_t</a> *helpSearchIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#help_index_t">help_index_t</a> *hi,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *query,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *section,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>hi</dt>
+<dd class="description">Index</dd>
+<dt>query</dt>
+<dd class="description">Query string</dd>
+<dt>section</dt>
+<dd class="description">Limit search to this section</dd>
+<dt>filename</dt>
+<dd class="description">Limit search to this file</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Search index</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="cgi_file_t">cgi_file_t</a></h3>
+<p class="description">Uploaded file data</p>
+<p class="code">
+typedef struct <a href="#cgi_file_s">cgi_file_s</a> cgi_file_t;
+</p>
+<h3 class="typedef"><a name="help_index_t">help_index_t</a></h3>
+<p class="description">Help index structure</p>
+<p class="code">
+typedef struct <a href="#help_index_s">help_index_s</a> help_index_t;
+</p>
+<h3 class="typedef"><a name="help_node_t">help_node_t</a></h3>
+<p class="description">Help node structure...</p>
+<p class="code">
+typedef struct <a href="#help_node_s">help_node_s</a> help_node_t;
+</p>
+<h3 class="typedef"><a name="help_word_t">help_word_t</a></h3>
+<p class="description">Help word structure...</p>
+<p class="code">
+typedef struct <a href="#help_word_s">help_word_s</a> help_word_t;
+</p>
+<h2 class="title"><a name="STRUCTURES">Structures</a></h2>
+<h3 class="struct"><a name="cgi_file_s">cgi_file_s</a></h3>
+<p class="description">Uploaded file data</p>
+<p class="code">struct cgi_file_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t filesize;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char tempfile[1024], *name, *filename, *mimetype;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>filesize </dt>
+<dd class="description">Size of uploaded file</dd>
+<dt>mimetype </dt>
+<dd class="description">MIME media type</dd>
+</dl>
+<h3 class="struct"><a name="help_index_s">help_index_s</a></h3>
+<p class="description">Help index structure</p>
+<p class="code">struct help_index_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *nodes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int search;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *sorted;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>nodes </dt>
+<dd class="description">Nodes sorted by filename</dd>
+<dt>search </dt>
+<dd class="description">1 = search index, 0 = normal</dd>
+<dt>sorted </dt>
+<dd class="description">Nodes sorted by score + text</dd>
+</dl>
+<h3 class="struct"><a name="help_node_s">help_node_s</a></h3>
+<p class="description">Help node structure...</p>
+<p class="code">struct help_node_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *anchor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *filename;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t length;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;time_t mtime;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;off_t offset;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int score;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *section;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *text;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *words;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>anchor </dt>
+<dd class="description">Anchor name (NULL if none)</dd>
+<dt>filename </dt>
+<dd class="description">Filename, relative to help dir</dd>
+<dt>length </dt>
+<dd class="description">Length in bytes</dd>
+<dt>mtime </dt>
+<dd class="description">Last modification time</dd>
+<dt>offset </dt>
+<dd class="description">Offset in file</dd>
+<dt>score </dt>
+<dd class="description">Search score</dd>
+<dt>section </dt>
+<dd class="description">Section name (NULL if none)</dd>
+<dt>text </dt>
+<dd class="description">Text in anchor</dd>
+<dt>words </dt>
+<dd class="description">Words after this node</dd>
+</dl>
+<h3 class="struct"><a name="help_word_s">help_word_s</a></h3>
+<p class="description">Help word structure...</p>
+<p class="code">struct help_word_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int count;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *text;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>count </dt>
+<dd class="description">Number of occurrences</dd>
+<dt>text </dt>
+<dd class="description">Word text</dd>
+</dl>
+</div>
+</body>
+</html>

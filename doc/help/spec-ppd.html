@@ -1,0 +1,2487 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS PPD Extensions	</title>
+	<meta name="keywords" content="Specifications">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id$"
+
+  PPD extension documentation for CUPS.
+
+  Copyright 2007-2011 by Apple Inc.
+  Copyright 1997-2007 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<H1 CLASS="title">CUPS PPD Extensions</H1>
+
+<p>This specification describes the attributes and extensions that CUPS adds to <a href="http://partners.adobe.com/public/developer/en/ps/5003.PPD_Spec_v4.3.pdf" target="_blank">Adobe TechNote #5003: PostScript Printer Description File Format Specification Version 4.3</a>. PostScript Printer Description ("PPD") files describe the capabilities of each printer and are used by CUPS to support printer-specific features and intelligent filtering.</p>
+
+<div class='summary'><table summary='General Information'>
+<tbody>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='postscript-driver.html'>Developing PostScript Printer Drivers</a><br>
+	Programming: <a href='raster-driver.html'>Developing Raster Printer Drivers</a><br>
+	Programming: <a href='api-filter.html'>Filter and Backend Programming</a><br>
+	Programming: <a href='ppd-compiler.html'>Introduction to the PPD Compiler</a><br>
+	Programming: <a href='api-raster.html'>Raster API</a><br>
+	References: <a href='ref-ppdcfile.html'>PPD Compiler Driver Information File Reference</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#SYNTAX">PPD File Syntax</a></li>
+<li><a href="#AUTOCONFIG">Auto-Configuration</a><ul class="subcontents">
+	<li><a href="#APAutoSetupTool">APAutoSetupTool</a></li>
+	<li><a href="#QUERYKEYWORD">?MainKeyword</a></li>
+	<li><a href="#OID">OIDMainKeyword</a></li>
+</ul></li>
+<li><a href="#PROFILES">Color Profiles</a><ul class="subcontents">
+	<li><a href="#cupsColorProfile">cupsColorProfile</a></li>
+	<li><a href="#cupsICCProfile">cupsICCProfile</a></li>
+	<li><a href="#APCustom">Custom Color Matching Support</a></li>
+</ul></li>
+<li><a href="#CONSTRAINTS">Constraints</a><ul class="subcontents">
+	<li><a href="#cupsUIConstraints">cupsUIConstraints</a></li>
+	<li><a href="#cupsUIResolver">cupsUIResolver</a></li>
+</ul></li>
+<li><a href="#I18N">Globalized PPD Support</a></li>
+<li><a href="#OPTIONS">CUPS 1.3/OS X 10.6Custom Options</a></li>
+<li><a href="#RASTERPS">Writing PostScript Option Commands for Raster Drivers</a></li>
+<li><a href="#MEDIA">Media Keywords</a><ul class="subcontents">
+	<li><a href="#cupsMediaQualifier2">cupsMediaQualifier2</a></li>
+	<li><a href="#cupsMediaQualifier3">cupsMediaQualifier3</a></li>
+	<li><a href="#cupsMinSize">cupsMinSize</a></li>
+	<li><a href="#cupsMaxSize">cupsMaxSize</a></li>
+	<li><a href="#cupsPageSizeCategory">cupsPageSizeCategory</a></li>
+</ul></li>
+<li><a href="#ATTRIBUTES">General Attributes</a><ul class="subcontents">
+	<li><a href="#cupsBackSide">cupsBackSide</a></li>
+	<li><a href="#cupsCommands">cupsCommands</a></li>
+	<li><a href="#cupsEvenDuplex">cupsEvenDuplex</a></li>
+	<li><a href="#cupsFax">cupsFax</a></li>
+	<li><a href="#cupsFilter">cupsFilter</a></li>
+	<li><a href="#cupsFilter2">cupsFilter2</a></li>
+	<li><a href="#cupsFlipDuplex">cupsFlipDuplex</a></li>
+	<li><a href="#cupsIPPFinishings">cupsIPPFinishings</a></li>
+	<li><a href="#cupsIPPReason">cupsIPPReason</a></li>
+	<li><a href="#cupsIPPSupplies">cupsIPPSupplies</a></li>
+	<li><a href="#cupsJobAccountId">cupsJobAccountId</a></li>
+	<li><a href="#cupsJobAccountingUserId">cupsJobAccountingUserId</a></li>
+	<li><a href="#cupsJobPassword">cupsJobPassword</a></li>
+	<li><a href="#cupsLanguages">cupsLanguages</a></li>
+	<li><a href="#cupsMandatory">cupsMandatory</a></li>
+	<li><a href="#cupsManualCopies">cupsManualCopies</a></li>
+	<li><a href="#cupsMarkerName">cupsMarkerName</a></li>
+	<li><a href="#cupsMarkerNotice">cupsMarkerNotice</a></li>
+	<li><a href="#cupsMaxCopies">cupsMaxCopies</a></li>
+	<li><a href="#cupsModelNumber">cupsModelNumber</a></li>
+	<li><a href="#cupsPJLCharset">cupsPJLCharset</a></li>
+	<li><a href="#cupsPJLDisplay">cupsPJLDisplay</a></li>
+	<li><a href="#cupsPortMonitor">cupsPortMonitor</a></li>
+	<li><a href="#cupsPreFilter">cupsPreFilter</a></li>
+	<li><a href="#cupsPrintQuality">cupsPrintQuality</a></li>
+	<li><a href="#cupsSingleFile">cupsSingleFile</a></li>
+	<li><a href="#cupsSNMPSupplies">cupsSNMPSupplies</a></li>
+	<li><a href="#cupsVersion">cupsVersion</a></li>
+	<li><a href="#JCLToPDFInterpreter">JCLToPDFInterpreter</a></li>
+</ul></li>
+<li><a href="#MACOSX">OS X Attributes</a><ul class="subcontents">
+	<li><a href="#APDialogExtension">APDialogExtension</a></li>
+	<li><a href="#APDuplexRequiresFlippedMargin">APDuplexRequiresFlippedMargin</a></li>
+	<li><a href="#APHelpBook">APHelpBook</a></li>
+	<li><a href="#APICADriver">APICADriver</a></li>
+	<li><a href="#APPrinterIconPath">APPrinterIconPath</a></li>
+	<li><a href="#APPrinterLowInkTool">APPrinterLowInkTool</a></li>
+	<li><a href="#APPrinterPreset">APPrinterPreset</a></li>
+	<li><a href="#APPrinterUtilityPath">APPrinterUtilityPath</a></li>
+	<li><a href="#APScannerOnly">APScannerOnly</a></li>
+	<li><a href="#APScanAppBundleID">APScanAppBundleID</a></li>
+</ul></li>
+<li><a href="#HISTORY">Change History</a></li>
+</ul>
+<h2 class='title'><a name='SYNTAX'>PPD File Syntax</a></h2>
+
+<p>The PPD format is text-based and uses lines of up to 255 characters terminated by a carriage return, linefeed, or combination of carriage return and line feed. The following ABNF definition [<a href="http://tools.ietf.org/html/rfc5234" target="_blank">RFC5234</a>] defines the general format of lines in a PPD file:</p>
+
+<pre class='command'>
+PPD-FILE = HEADER +(DATA / COMMENT / LINE-END)
+
+HEADER   = "*PPD-Adobe:" *WSP DQUOTE VERSION DQUOTE LINE-END
+
+VERSION  = "4.0" / "4.1" / "4.2" / "4.3"
+
+COMMENT  = "*%" *TCHAR LINE-END
+
+DATA     = "*" 1*KCHAR [ WSP 1*KCHAR [ "/" 1*TCHAR ] ] ":"
+           1*(*WSP VALUE) LINE-END
+
+VALUE    = 1*TCHAR / DQUOTE 1*SCHAR DQUOTE
+
+KCHAR    = ALPHA / DIGIT / "_" / "." / "-"
+
+SCHAR    = LINE-END / WSP / %x21.23-7E.A0-FF
+
+TCHAR    = %x20-7E.A0-FF
+
+LINE-END = CR / LF / CR LF
+</pre>
+
+
+<h2 class='title'><a name='AUTOCONFIG'>Auto-Configuration</a></h2>
+
+<p>CUPS supports several methods of auto-configuration via PPD keywords.</p>
+
+<h3><span class='info'>OS X 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
+
+<p class='summary'>*APAutoSetupTool: "/LibraryPrinters/vendor/filename"</p>
+
+<p>This OS X keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
+
+<p>The program is provided with two arguments: the printer's device URI and the PPD file to be used for the printer. The program must write an updated PPD file to stdout.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use our setup tool when adding a printer
+*APAutoSetupTool: "/Library/Printers/vendor/Tools/autosetuptool"
+</pre>
+
+<h3><span class='info'>OS X 10.2/CUPS 1.4</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
+
+<p class='summary'>*?<i>MainKeyword</i>: "<br>
+  PostScript query code that writes a message using the = operator...<br>
+"<br>
+*End</p>
+
+<p>The <tt>?<i>MainKeyword</i></tt> keyword defines PostScript code that determines the currently selected/enabled option keyword (choice) for the main keyword (option). It is typically used when communicating with USB, serial, Appletalk, and AppSocket (port 9100) printers.</p>
+
+<p>The PostScript code typically sends its response back using the <tt>=</tt> operator.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*OpenUI OptionDuplex/Duplexer Installed: Boolean
+*DuplexOptionDuplex: False
+*OptionDuplex False/Not Installed: ""
+*OptionDuplex True/Installed: ""
+
+<em>*% Query the printer for the presence of the duplexer option...</em>
+*?OptionDuplex: "
+  currentpagedevice /Duplex known
+  {(True)} {(False)} ifelse
+  = flush
+"
+*End
+*CloseUI: OptionDuplex
+</pre>
+
+<h3><span class='info'>OS X 10.4/CUPS 1.5</span><a name='OID'>OIDMainKeyword</a></h3>
+
+<p class='summary'>*?OID<i>MainKeyword</i>: ".n.n.n..."<br>
+*OID<i>MainKeyword</i> <i>OptionKeyword1</i>: "value"<br>
+...<br>
+*OID<i>MainKeyword</i> <i>OptionKeywordN</i>: "value"</p>
+
+<p>The <tt>OID<i>MainKeyword</i></tt> keyword is used to define SNMP OIDs that map to installable options. The first (query) line defines the OID to lookup on the network device. The second and subsequent keywords define a mapping from OID value to option keyword. Since SNMP is an IP-based network protocol, this method is typically only used to configure AppSocket, IPP, and LPD network printers.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Get the installed memory on the printer...
+*?OIDInstalledMemory: ".1.3.6.1.2.1.25.2.2.0"
+*OIDInstalledMemory 16MB: "16384 KBytes"
+*OIDInstalledMemory 32MB: "32768 KBytes"
+*OIDInstalledMemory 48MB: "49152 KBytes"
+*OIDInstalledMemory 72MB: "73728 KBytes"
+</pre>
+
+
+<h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
+
+<p>CUPS supports three types of color profiles. The first type is based on sRGB and is used by the standard CUPS raster filters and GPL Ghostscript. The second type is based on ICC profiles and is used by the Quartz-based filters on MacOS X. The final type is based on well-known colorspaces such as sRGB and Adobe RGB.</p>
+
+<blockquote><b>Note:</b>
+
+<p>At this time, none of the CUPS raster filters support ICC profiles. This will be addressed as time and resources permit.</p>
+
+</blockquote>
+
+<h3><span class='info'>Deprecated</span><a name='cupsColorProfile'>cupsColorProfile</a></h3>
+
+<p class='summary'>*cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
+
+<p>This string keyword specifies an sRGB-based color profile consisting of gamma and density controls and a 3x3 CMY color transform matrix. <em>This keyword is not supported on OS X.</em></p>
+
+<p>The <i>Resolution</i> and <i>MediaType</i> values may be "-" to act as a wildcard. Otherwise they must match one of the <tt>Resolution</tt> or <tt>MediaType</tt> option keywords defined in the PPD file.</p>
+
+<p>The <i>density</i> and <i>gamma</i> values define gamma and
+density adjustment function such that:</p>
+
+<pre class='command'>
+f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
+</pre>
+
+<p>The <i>m00</i> through <i>m22</i> values define a 3x3 transformation matrix for the CMY color values. The density function is applied <i>after</i> the CMY transformation:</p>
+
+<pre class='command'>
+| m00 m01 m02 |
+| m10 m11 m12 |
+| m20 m21 m22 |
+</pre>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for printing at 360dpi on all media types</em>
+*cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a profile for printing at 720dpi on Glossy media</em>
+*cupsColorProfile 720dpi/Glossy: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em>
+*cupsColorProfile -/-: "0.9 2.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
+</pre>
+
+
+<h3><span class='info'>OS X 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
+
+<p class='summary'>*cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"</p>
+
+<p>This keyword specifies an ICC color profile that is used to convert the document colors to the device colorspace. The <tt>ColorModel</tt>, <tt>MediaType</tt>, and <tt>Resolution</tt> option keywords specify a selector for color profiles. If omitted, the color profile will match any option keyword for the corresponding main keyword.</p>
+
+<p>The <tt>Description</tt> specifies human-readable text that is associated with the color profile. The <tt>filename</tt> portion specifies the ICC color profile to use; if the filename is not absolute, it is loaded relative to the <var>/usr/share/cups/profiles</var> directory.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em>
+*cupsICCProfile CMYK..360dpi/360dpi CMYK: "/Library/Printers/vendor/Profiles/foo-360-cmyk.icc"
+
+<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em>
+*cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "/Library/Printers/vendor/Profiles/foo-720-glossy-rgb.icc"
+
+<em>*% Specify a default profile for printing at all other resolutions and media types</em>
+*cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
+</pre>
+
+<h4>Customizing the Profile Selection Keywords</h4>
+
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and <tt>Resolution</tt> main keywords can be reassigned to different main keywords, allowing drivers to do color profile selection based on different parameters. The <tt>cupsICCQualifier1</tt>, <tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt> keywords define the mapping from selector to main keyword:</p>
+
+<pre class='command'>
+*cupsICCQualifier1: MainKeyword1
+*cupsICCQualifier2: MainKeyword2
+*cupsICCQualifier3: MainKeyword3
+</pre>
+
+<p>The default mapping is as follows:</p>
+
+<pre class='command'>
+*cupsICCQualifier1: ColorModel
+*cupsICCQualifier2: MediaType
+*cupsICCQualifier3: Resolution
+</pre>
+
+<h3><span class='info'>OS X 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
+
+<p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
+*<a href='#APCustomColorMatchingName'>APCustomColorMatchingName</a> name/text: ""<br>
+*<a href='#APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a>: profile<br>
+*<a href='#APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a>: profile</p>
+
+<p>These keywords tell the OS X raster filters that the printer driver provides its own custom color matching and that generic color profiles should be used when generating 1-, 3-, and 4-component raster data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt> and <tt>APDefaultColorMatchingProfile</tt> keywords specify alternate color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Prior to OS X 10.6, the default RGB color space was Apple's "GenericRGB". The new default in OS X 10.6 and later is "sRGB". For more information, see <a href="http://support.apple.com/kb/HT3712">"OS X v10.6: About gamma 2.2"</a> on Apple's support site.</p>
+
+</blockquote>
+
+<h4><span class='info'>OS X 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
+
+<p class='summary'>*APCustomColorMatchingName name/text: ""</p>
+
+<p>This keyword defines an alternate name for the color matching provided by a driver in the <var>Color Matching</var> print panel. The default is to use the name "Vendor Matching" or its localized equivalent.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Define the names for our color matching...
+*APCustomColorMatchingName name/AcmeColor(tm): ""
+*fr.APCustomColorMatchingName name/La AcmeColor(tm): ""
+</pre>
+
+<h4><span class='info'>OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
+
+<p class='summary'>*APCustomColorMatchingProfile: name</p>
+
+<p>This keyword defines a supported RGB color profile that can be used when doing custom color matching. Currently only <tt>sRGB</tt>, <tt>AdobeRGB</tt>, and <tt>GenericRGB</tt> are supported. If not specified, RGB data will use the GenericRGB colorspace.</p>
+
+<blockquote><b>Note:</b>
+
+<p>If you provide multiple <tt>APCustomColorMatchingProfile</tt> keywords, you are responsible for providing the necessary user interface controls to select the profile in a <a href='#APDialogExtension'>print dialog pane</a>. Add the named profile to the print settings using the key <tt>kPMCustomColorMatchingProfileKey</tt>.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default, but support both sRGB and AdobeRGB
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: sRGB
+*APCustomColorMatchingProfile: AdobeRGB
+</pre>
+
+<h4><span class='info'>OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
+
+<p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
+
+<p>This keyword defines the default RGB color profile that will be used when doing custom color matching. Currently only <tt>sRGB</tt>, <tt>AdobeRGB</tt>, and <tt>GenericRGB</tt> are supported.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use sRGB for RGB color by default
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
+
+<h4><span class='info'>OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
+
+<p class='summary'>*APSupportsCustomColorMatching: boolean</p>
+
+<p>This keyword specifies that the driver provides its own custom color matching. When <tt>true</tt>, the default hand-off colorspace will be GenericGray, GenericRGB, or GenericCMYK depending on the number of components the driver requests. The <a href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a> keyword can be used to override the default 3-component (RGB) colorspace.</p>
+
+<p>The default for <tt>APSupportsCustomColorMatching</tt> is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APSupportsCustomColorMatching: true
+*APDefaultCustomColorMatchingProfile: sRGB
+</pre>
+
+
+<h2 class='title'><a name='CONSTRAINTS'>Constraints</a></h2>
+
+<p>Constraints are option choices that are not allowed by the driver or device, for example printing 2-sided transparencies. All versions of CUPS support constraints defined by the legacy Adobe <tt>UIConstraints</tt> and <tt>NonUIConstraints</tt> keywords which support conflicts between any two option choices, for example:</p>
+
+<pre class='command'>
+*% Do not allow 2-sided printing on transparency media
+*UIConstraints: "*Duplex *MediaType Transparency"
+*UIConstraints: "*MediaType Transparency *Duplex"
+</pre>
+
+<p>While nearly all constraints can be expressed using these keywords, there are valid scenarios requiring constraints between more than two option choices. In addition, resolution of constraints is problematic since users and software have to guess how a particular constraint is best resolved.</p>
+
+<p>CUPS 1.4 and higher define two new keywords for constraints, <tt>cupsUIConstraints</tt> and <tt>cupsUIResolver</tt>. Each <tt>cupsUIConstraints</tt> keyword points to a <tt>cupsUIResolver</tt> keyword which specifies alternate options that resolve the conflict condition. The same <tt>cupsUIResolver</tt> can be used by multiple <tt>cupsUIConstraints</tt>.</p>
+
+<blockquote><b>Note:</b>
+
+<p>When developing PPD files that contain constraints, it is very important to use the <a href="man-cupstestppd.html">cupstestppd(1)</a> program to verify that your constraints are accurate and cannot result in unresolvable option selections.</p>
+
+</blockquote>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
+
+<p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 *Keyword2 OptionKeyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."<br>
+*cupsUIConstraints: "*InstallableKeyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
+
+<p>Lists two or more options which conflict. The "resolver" string is a (possibly unique) keyword which specifies which options to change when the constraint exists. When no resolver is provided, CUPS first tries the default choice followed by testing each option choice to resolve the conflict.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify that 2-sided printing cannot happen on transparencies</em>
+*cupsUIConstraints transparency: "*Duplex *MediaType Transparency"
+
+<em>*% Specify that envelope printing cannot happen from the paper trays</em>
+*cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
+*cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
+*cupsUIConstraints envelope: "*PageSize EnvDL *InputSlot Tray2"
+*cupsUIConstraints envelope: "*PageSize EnvDL *InputSlot Tray2"
+
+<em>*% Specify an installable option constraint for the envelope feeder</em>
+*cupsUIConstraints: "*InputSlot EnvFeeder *InstalledEnvFeeder"
+
+<em>*% Specify that photo printing cannot happen on plain paper or transparencies at 1200dpi</em>
+*cupsUIConstraints photo: "*OutputMode Photo *MediaType Plain *Resolution 1200dpi"
+*cupsUIConstraints photo: "*OutputMode Photo *MediaType Transparency *Resolution 1200dpi"
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
+
+<p class='summary'>*cupsUIResolver resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
+
+<p>Specifies two or more options to mark/select to resolve a constraint. The "resolver" string identifies a particular action to take for one or more <a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>. The same action can be used for multiple constraints. The option keyword pairs are treated as an ordered list of option selections to try - only the first N selections will be used, where N is the minimum number of selections required. Because <a href="api-ppd.html#cupsResolveConflicts"><code>cupsResolveConflicts()</code></a> will not change the most recent option selection passed to it, at least two options from the constraints must be listed to avoid situations where conflicts cannot be resolved.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify the options to change for the 2-sided transparency constraint</em>
+*cupsUIResolver transparency: "*Duplex None *MediaType Plain"
+
+<em>*% Specify the options to change for the envelope printing constraints.  Notice
+*% that we try to change the InputSlot to either the envelope feeder or the
+*% manual feed first, then we change the page size...</em>
+*cupsUIResolver envelope: "*InputSlot EnvFeeder *InputSlot ManualFeed *PageSize Letter"
+
+<em>*% Specify the options to change for the photo printing constraints</em>
+*cupsUIResolver photo: "*OutputMode Best *Resolution 600dpi"
+</pre>
+
+
+<h2 class='title'><a name='I18N'>Globalized PPD Support</a></h2>
+
+<p>CUPS 1.2 and higher adds support for PPD files containing multiple languages by following the following additional rules:</p>
+
+<ol>
+
+	<li>The <tt>LanguageVersion</tt> MUST be <tt>English</tt></li>
+
+	<li>The <tt>LanguageEncoding</tt> MUST be <tt>ISOLatin1</tt></li>
+
+	<li>The <tt>cupsLanguages</tt> keyword MUST be provided and list each of the supported locales in the PPD file</li>
+
+	<li>Main and option keywords MUST NOT exceed 34 (instead of 40) characters to allow room for the locale prefixes in translation keywords</li>
+
+	<li>The main keyword "Translation" MUST NOT be used</li>
+
+	<li>Translation strings included with the main and option keywords MUST NOT contain characters outside the ASCII subset of ISOLatin1 and UTF-8; developers wishing to use characters outside ASCII MUST provide a separate set of English localization keywords for the affected keywords.</li>
+
+	<li>Localizations are specified using a locale prefix of the form "ll" or "ll_CC." where "ll" is the 2-letter ISO language code and "CC" is the 2-letter ISO country code<ul>
+		<li>A generic language translation ("ll") SHOULD be provided with country-specific differences ("ll_CC") provided only as needed</li>
+		<li>For historical reasons, the "zh" and "zh_CN" locales map to Simplified Chinese while the "zh_TW" locale maps to Traditional Chinese</li>
+	</ul></li>
+
+	<li>Locale-specific translation strings MUST be encoded using UTF-8.</li>
+
+	<li>Main keywords MUST be localized using one of the following forms:
+	<p><tt>*ll.Translation MainKeyword/translation text: ""</tt><br />
+	<tt>*ll_CC.Translation MainKeyword/translation text: ""</tt></p></li>
+
+	<li>Option keywords MUST be localized using one of the following forms:
+	<p><tt>*ll.MainKeyword OptionKeyword/translation text: ""</tt><br>
+	<tt>*ll_CC.MainKeyword OptionKeyword/translation text: ""</tt></p></li>
+
+	<li>Localization keywords MAY appear anywhere after the first line of the PPD file</li>
+
+</ol>
+
+<blockquote><b>Note:</b>
+
+<p>We use a <tt>LanguageEncoding</tt> value of <tt>ISOLatin1</tt> and limit the allowed base translation strings to ASCII to avoid character coding issues that would otherwise occur. In addition, requiring the base translation strings to be in English allows for easier fallback translation when no localization is provided in the PPD file for a given locale.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*cupsLanguages: "de fr_CA"
+*ModelName: "Foobar Laser 9999"
+
+<em>*% Localize ModelName for French and German</em>
+*fr_CA.Translation ModelName/La Foobar Laser 9999: ""
+*de.Translation ModelName/Foobar LaserDrucken 9999: ""
+
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
+<em>*% Localize printer-state-reason for French and German</em>
+*fr_CA.cupsIPPReason com.vendor-error/Une erreur s&egrave;rieuse s'est produite: "/help/com.vendor/error.html"
+*de.cupsIPPReason com.vendor-error/Eine ernste St&ouml;rung trat: "/help/com.vendor/error.html"
+
+...
+
+*OpenUI *InputSlot/Paper Source: PickOne
+*OrderDependency: 10 AnySetup *InputSlot
+*DefaultInputSlot: Auto
+<em>*% Localize InputSlot for French and German</em>
+*fr_CA.Translation InputSlot/Papier source: ""
+*de.Translation InputSlot/Papiereinzug: ""
+*InputSlot Auto/Default: "&lt;&lt;/ManualFeed false&gt;&gt;setpagedevice"
+<em>*% Localize InputSlot=Auto for French and German</em>
+*fr_CA.InputSlot Auto/Par Defaut: ""
+*de.InputSlot Auto/Standard: ""
+*InputSlot Manual/Manual Feed: "&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice"
+<em>*% Localize InputSlot=Manual for French and German</em>
+*fr_CA.InputSlot Manual/Manuel mecanisme de alimentation: ""
+*de.InputSlot Manual/Manueller Einzug: ""
+*CloseUI: *InputSlot
+</pre>
+
+
+<h2 class='title'><a name='OPTIONS'><span class="info">CUPS 1.3/OS X 10.6</span>Custom Options</a></h2>
+
+<p>CUPS supports custom options using an extension of the <tt>CustomPageSize</tt> and <tt>ParamCustomPageSize</tt> syntax:</p>
+
+<pre class='command'>
+*CustomFoo True: "command"
+*ParamCustomFoo Name1/Text 1: order type minimum maximum
+*ParamCustomFoo Name2/Text 2: order type minimum maximum
+...
+*ParamCustomFoo NameN/Text N: order type minimum maximum
+</pre>
+
+<p>When the base option is part of the <tt>JCLSetup</tt> section, the "command" string contains JCL commands with "\order" placeholders for each numbered parameter. The CUPS API handles any necessary value quoting for HP-PJL commands. For example, if the JCL command string is "@PJL SET PASSCODE=\1" and the first
+option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234".</p>
+
+<p>For non-<tt>JCLSetup</tt> options, the "order" value is a number from 1 to N and specifies the order of values as they are placed on the stack before the command. For example, if the PostScript command string is "&lt;&lt;/cupsReal1 2 1 roll&gt;&gt;setpagedevice" and the option value is "2.0" then CUPS will output the string "2.0 &lt;&lt;/cupsReal1 2 1 roll&gt;&gt;setpagedevice".</p>
+
+<p>The "type" is one of the following keywords:</p>
+
+<ul>
+
+	<li><tt>curve</tt> - a real value from "minimum" to "maximum" representing a gamma correction curve using the function: f(x) = x <sup>value</sup></li>
+
+	<li><tt>int</tt> - an integer value from "minimum" to "maximum"</li>
+
+	<li><tt>invcurve</tt> - a real value from "minimum" to "maximum" representing a gamma correction curve using the function: f(x) = x <sup>1 / value</sup></li>
+
+	<li><tt>passcode</tt> - a string of numbers value with a minimum of "minimum" numbers and a maximum of "maximum" numbers ("minimum" and "maximum" are numbers and passcode strings are not displayed in the user interface)</li>
+
+	<li><tt>password</tt> - a string value with a minimum of "minimum" characters and a maximum of "maximum" characters ("minimum" and "maximum" are numbers and password strings are not displayed in the user interface)</li>
+
+	<li><tt>points</tt> - a measurement value in points from "minimum" to "maximum"</li>
+
+	<li><tt>real</tt> - a real value from "minimum" to "maximum"</li>
+
+	<li><tt>string</tt> - a string value with a minimum of "minimum" characters and a maximum of "maximum" characters ("minimum" and "maximum" are numbers)</li>
+
+</ul>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Base JCL key code option</em>
+*JCLOpenUI JCLPasscode/Key Code: PickOne
+*OrderDependency: 10 JCLSetup *JCLPasscode
+*DefaultJCLPasscode: None
+*JCLPasscode None/No Code: ""
+*JCLPasscode 1111: "@PJL SET PASSCODE = 1111&lt;0A&gt;"
+*JCLPasscode 2222: "@PJL SET PASSCODE = 2222&lt;0A&gt;"
+*JCLPasscode 3333: "@PJL SET PASSCODE = 3333&lt;0A&gt;"
+*JCLCloseUI: *JCLPasscode
+
+<em>*% Custom JCL key code option</em>
+*CustomJCLPasscode True: "@PJL SET PASSCODE = \1&lt;0A&gt;"
+*ParamCustomJCLPasscode Code/Key Code: 1 passcode 4 4
+
+
+<em>*% Base PostScript watermark option</em>
+*OpenUI WatermarkText/Watermark Text: PickOne
+*OrderDependency: 10 AnySetup *WatermarkText
+*DefaultWatermarkText: None
+*WatermarkText None: ""
+*WatermarkText Draft: "&lt;&lt;/cupsString1(Draft)&gt;&gt;setpagedevice"
+*CloseUI: *WatermarkText
+
+<em>*% Custom PostScript watermark option</em>
+*CustomWatermarkText True: "&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice"
+*ParamCustomWatermarkText Text: 1 string 0 32
+
+
+<em>*% Base PostScript gamma/density option</em>
+*OpenUI GammaDensity/Gamma and Density: PickOne
+*OrderDependency: 10 AnySetup *GammaDensity
+*DefaultGammaDensity: Normal
+*GammaDensity Normal/Normal: "&lt;&lt;/cupsReal1 1.0/cupsReal2 1.0&gt;&gt;setpagedevice"
+*GammaDensity Light/Lighter: "&lt;&lt;/cupsReal1 0.9/cupsReal2 0.67&gt;&gt;setpagedevice"
+*GammaDensity Dark/Darker: "&lt;&lt;/cupsReal1 1.1/cupsReal2 1.5&gt;&gt;setpagedevice"
+*CloseUI: *GammaDensity
+
+<em>*% Custom PostScript gamma/density option</em>
+*CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 -1 roll/cupsReal2 5 -1&gt;&gt;setpagedevice"
+*ParamCustomGammaDensity Gamma: 1 curve 0.1 10
+*ParamCustomGammaDensity Density: 2 real 0 2
+</pre>
+
+
+<h2 class='title'><a name='RASTERPS'>Writing PostScript Option Commands for Raster Drivers</a></h2>
+
+<p>PPD files are used for both PostScript and non-PostScript printers. For CUPS raster drivers, you use a subset of the PostScript language to set page device keywords such as page size, resolution, and so forth. For example, the following code sets the page size to A4 size:</p>
+
+<pre class='command'>
+*PageSize A4: "&lt;&lt;/PageSize[595 842]&gt;&gt;setpagedevice"
+</pre>
+
+<p>Custom options typically use other operators to organize the values into a key/value dictionary for <tt>setpagedevice</tt>. For example, our previous <tt>CustomWatermarkText</tt> option code uses the <tt>roll</tt> operator to move the custom string value into the dictionary for <tt>setpagedevice</tt>:</p>
+
+<pre class='command'>
+*CustomWatermarkText True: "&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice"
+</pre>
+
+<p>For a custom string value of "My Watermark", CUPS will produce the following PostScript code for the option:</p>
+
+<pre class='command'>
+(My Watermark)
+&lt;&lt;/cupsString1 3 -1 roll&gt;&gt;setpagedevice
+</pre>
+
+<p>The code moves the string value ("My Watermark") from the bottom of the stack to the top, creating a dictionary that looks like:</p>
+
+<pre class='command'>
+&lt;&lt;/cupsString1(My Watermark)&gt;&gt;setpagedevice
+</pre>
+
+<p>The resulting dictionary sets the page device attributes that are sent to your raster driver in the page header.</p>
+
+<h3>Custom Page Size Code</h3>
+
+<p>There are many possible implementations of the <tt>CustomPageSize</tt> code. For CUPS raster drivers, the following code is recommended:</p>
+
+<pre class='command'>
+*ParamCustomPageSize Width:        1 points <i>min-width max-width</i>
+*ParamCustomPageSize Height:       2 points <i>min-height max-height</i>
+*ParamCustomPageSize WidthOffset:  3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation:  5 int 0 0
+*CustomPageSize True: "pop pop pop &lt;&lt;/PageSize[5 -2 roll]/ImagingBBox null&gt;&gt;setpagedevice"
+</pre>
+
+<h3>Supported PostScript Operators</h3>
+
+<p>CUPS supports the following PostScript operators in addition to the usual PostScript number, string (literal and hex-encoded), boolean, null, and name values:</p>
+
+<ul>
+
+	<li><tt>&lt;&lt;</tt> - Start a dictionary.</li>
+
+	<li><tt>&gt;&gt;</tt> - End a dictionary.</li>
+
+	<li><tt>[</tt> - Start an array.</li>
+
+	<li><tt>]</tt> - End an array.</li>
+
+	<li><tt>copy</tt> - Copy the top N objects on the stack.</li>
+
+	<li><tt>dup</tt> - Copy the top object on the stack.</li>
+
+	<li><tt>index</tt> - Copy the Nth from the top object on the stack.</li>
+
+	<li><tt>pop</tt> - Pop the top object on the stack.</li>
+
+	<li><tt>roll</tt> - Shift the top N objects on the stack.</li>
+
+	<li><tt>setpagedevice</tt> - Set the page header values according to the key/value dictionary on the stack.</li>
+
+</ul>
+
+<blockquote><b>Note:</b>
+
+<p><em>Never</em> use the unsupported <tt>dict</tt> or <tt>put</tt>
+operators in your option code. These operators are typically used in
+option code dating back to Level 1 PostScript printers, which did not
+support the simpler <tt>&lt;&lt;</tt> or <tt>&gt;&gt;</tt> operators.
+If you have old option code using <tt>dict</tt> or <tt>put</tt>, you can
+rewrite it very easily to use the newer <tt>&lt;&lt;</tt> and
+<tt>&gt;&gt;</tt> operators instead. For example, the following code
+to set the page size:</p>
+
+<style type='text/css'><!--
+PRE B {
+  background: #000000;
+  color: #ffffff;
+  padding: 2px 5px;
+}
+--></style>
+
+<pre class='command'>
+<b>1 dict dup</b> /PageSize [612 792] <b>put</b> setpagedevice
+</pre>
+
+<p>can be rewritten as:</p>
+
+<pre class='command'>
+<b>&lt;&lt;</b> /PageSize [612 792] <b>&gt;&gt;</b> setpagedevice
+</pre>
+
+</blockquote>
+
+<h3>Supported Page Device Attributes</h3>
+
+<p>Table 2 shows the supported page device attributes along with PostScript code examples.</p>
+
+<div class='table'>
+<table summary='Supported Page Device Attributes'>
+<caption>Table 2: <a name='TABLE_2'>Supported Page Device Attributes</a></caption>
+<thead>
+<tr>
+	<th>Name(s)</th>
+	<th>Type</th>
+	<th>Description</th>
+	<th>Example(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr valign='top'>
+	<td><tt>AdvanceDistance</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of points to advance roll media after printing.</td>
+	<td><tt>&lt;&lt;/AdvanceDistance 18&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>AdvanceMedia</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to advance the media: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/AdvanceMedia 4&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Collate</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether collated copies are required.</td>
+	<td><tt>&lt;&lt;/Collate true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>CutMedia</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to cut the media: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/CutMedia 1&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Duplex</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether 2-sided printing is required.</td>
+	<td><tt>&lt;&lt;/Duplex true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>HWResolution</tt></td>
+	<td>Integer Array</td>
+	<td>Specifies the resolution of the page image in pixels per inch.</td>
+	<td><tt>&lt;&lt;/HWResolution[1200 1200]&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>InsertSheet</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to insert a blank sheet before the job.</td>
+	<td><tt>&lt;&lt;/InsertSheet true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Jog</tt></td>
+	<td>Integer</td>
+	<td>Specifies when to shift the media in the output bin: 0 = never, 1 = after the file, 2 = after the job, 3 = after the set, and 4 = after the page.</td>
+	<td><tt>&lt;&lt;/Jog 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>LeadingEdge</tt></td>
+	<td>Integer</td>
+	<td>Specifies the leading edge of the media: 0 = top, 1 = right, 2 = bottom, 3 = left.</td>
+	<td><tt>&lt;&lt;/LeadingEdge 0&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>ManualFeed</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether media should be drawn from the manual feed tray. Note: The <tt>MediaPosition</tt> attribute is preferred over the <tt>ManualFeed</tt> attribute.</td>
+	<td><tt>&lt;&lt;/ManualFeed true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaClass</tt></td>
+	<td>String</td>
+	<td>Specifies a named media.</td>
+	<td><tt>&lt;&lt;/MediaClass (Invoices)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaColor</tt></td>
+	<td>String</td>
+	<td>Specifies the color of the media.</td>
+	<td><tt>&lt;&lt;/MediaColor &gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaPosition</tt></td>
+	<td>Integer</td>
+	<td>Specifies the tray or source of the media.</td>
+	<td><tt>&lt;&lt;/MediaPosition 12&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaType</tt></td>
+	<td>String</td>
+	<td>Specifies the general media type.</td>
+	<td><tt>&lt;&lt;/MediaType (Glossy)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MediaWeight</tt></td>
+	<td>Integer</td>
+	<td>Specifies the media weight in grams per meter<sup>2</sup>.</td>
+	<td><tt>&lt;&lt;/MediaWeight 100&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>MirrorPrint</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to flip the output image horizontally.</td>
+	<td><tt>&lt;&lt;/MirrorPrint true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>NegativePrint</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to invert the output image.</td>
+	<td><tt>&lt;&lt;/NegativePrint true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>NumCopies</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of copies to produce of each page.</td>
+	<td><tt>&lt;&lt;/NumCopies 100&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Orientation</tt></td>
+	<td>Integer</td>
+	<td>Specifies the orientation of the output: 0 = portrait, 1 = landscape rotated counter-clockwise, 2 = upside-down, 3 = landscape rotated clockwise.</td>
+	<td><tt>&lt;&lt;/Orientation 3&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>OutputFaceUp</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to place the media face-up in the output bin/tray.</td>
+	<td><tt>&lt;&lt;/OutputFaceUp true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>OutputType</tt></td>
+	<td>String</td>
+	<td>Specifies the output type name.</td>
+	<td><tt>&lt;&lt;/OutputType (Photo)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>PageSize</tt></td>
+	<td>Integer/Real Array</td>
+	<td>Specifies the width and length/height of the page in points.</td>
+	<td><tt>&lt;&lt;/PageSize[595 842]&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Separations</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to produce color separations.</td>
+	<td><tt>&lt;&lt;/Separations true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>TraySwitch</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether to switch trays automatically.</td>
+	<td><tt>&lt;&lt;/TraySwitch true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>Tumble</tt></td>
+	<td>Boolean</td>
+	<td>Specifies whether the back sides of pages are rotated 180 degrees.</td>
+	<td><tt>&lt;&lt;/Tumble true&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsBorderlessScalingFactor</tt></td>
+	<td>Real</td>
+	<td>Specifies the amount to scale the page image dimensions.</td>
+	<td><tt>&lt;&lt;/cupsBorderlessScalingFactor 1.01&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsColorOrder</tt></td>
+	<td>Integer</td>
+	<td>Specifies the order of colors: 0 = chunked, 1 = banded, 2 = planar.</td>
+	<td><tt>&lt;&lt;/cupsColorOrder 0&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsColorSpace</tt></td>
+	<td>Integer</td>
+	<td>Specifies the page image colorspace: 0 = W, 1 = RGB, 2 = RGBA, 3 = K, 4 = CMY, 5 = YMC, 6 = CMYK, 7 = YMCK, 8 = KCMY, 9 = KCMYcm, 10 = GMCK, 11 = GMCS, 12 = White, 13 = Gold, 14 = Silver, 15 = CIE XYZ, 16 = CIE Lab, 17 = RGBW, 32 to 46 = CIE Lab (1 to 15 inks)</td>
+	<td><tt>&lt;&lt;/cupsColorSpace 1 &gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsCompression</tt></td>
+	<td>Integer</td>
+	<td>Specifies a driver compression type/mode.</td>
+	<td><tt>&lt;&lt;/cupsCompression 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsInteger0<br>
+	...<br>
+	cupsInteger15</tt></td>
+	<td>Integer</td>
+	<td>Specifies driver integer values.</td>
+	<td><tt>&lt;&lt;/cupsInteger11 1234&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsMarkerType</tt></td>
+	<td>String</td>
+	<td>Specifies the type of ink/toner to use.</td>
+	<td><tt>&lt;&lt;/cupsMarkerType (Black+Color)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsMediaType</tt></td>
+	<td>Integer</td>
+	<td>Specifies a numeric media type.</td>
+	<td><tt>&lt;&lt;/cupsMediaType 999&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsPageSizeName</tt></td>
+	<td>String</td>
+	<td>Specifies the name of the page size.</td>
+	<td><tt>&lt;&lt;/cupsPageSizeName (A4.Full)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsPreferredBitsPerColor</tt></td>
+	<td>Integer</td>
+	<td>Specifies the preferred number of bits per color, typically 8 or 16.</td>
+	<td><tt>&lt;&lt;/cupsPreferredBitsPerColor 16&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsReal0<br>
+	...<br>
+	cupsReal15</tt></td>
+	<td>Real</td>
+	<td>Specifies driver real number values.</td>
+	<td><tt>&lt;&lt;/cupsReal15 1.234&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRenderingIntent</tt></td>
+	<td>String</td>
+	<td>Specifies the color rendering intent.</td>
+	<td><tt>&lt;&lt;/cupsRenderingIntent (AbsoluteColorimetric)&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowCount</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of rows of raster data to print on each line for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowCount 24&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowFeed</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of rows to feed between passes for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowFeed 17&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsRowStep</tt></td>
+	<td>Integer</td>
+	<td>Specifies the number of lines between columns/rows on the print head for some drivers.</td>
+	<td><tt>&lt;&lt;/cupsRowStep 2&gt;&gt;setpagedevice</tt></td>
+</tr>
+<tr valign='top'>
+	<td><tt>cupsString0<br>
+	...<br>
+	cupsString15</tt></td>
+	<td>String</td>
+	<td>Specifies driver string values.</td>
+	<td><tt>&lt;&lt;/cupsString0(String Value)&gt;&gt;setpagedevice</tt></td>
+</tr>
+</tbody>
+</table></div>
+
+
+<h2 class='title'><a name='MEDIA'>Media Keywords</a></h2>
+
+<p>The CUPS media keywords allow drivers to specify alternate custom page
+size limits based on up to two options.</p>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
+
+<p class='summary'>*cupsMediaQualifier2: MainKeyword</p>
+
+<p>This keyword specifies the second option to use for overriding the
+custom page size limits.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
+
+<p class='summary'>*cupsMediaQualifier3: MainKeyword</p>
+
+<p>This keyword specifies the third option to use for overriding the
+custom page size limits.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
+
+<p class='summary'>*cupsMinSize .Qualifier2.Qualifier3: "width length"<br>
+*cupsMinSize .Qualifier2.: "width length"<br>
+*cupsMinSize ..Qualifier3: "width length"</p>
+
+<p>This keyword specifies alternate minimum custom page sizes in points.
+The <a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a> and
+<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a> keywords
+are used to identify options to use for matching.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
+
+<p class='summary'>*cupsMaxSize .Qualifier2.Qualifier3: "width length"<br>
+*cupsMaxSize .Qualifier2.: "width length"<br>
+*cupsMaxSize ..Qualifier3: "width length"</p>
+
+<p>This keyword specifies alternate maximum custom page sizes in points.
+The <a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a> and
+<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a> keywords
+are used to identify options to use for matching.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsPageSizeCategory'>cupsPageSizeCategory</a></h3>
+
+<p class="summary">*cupsPageSizeCategory name/text: "name name2 ... nameN"</p>
+
+<p>This keyword lists related paper size names that should be grouped together in the Print or Page Setup dialogs. The "name" portion of the keyword specifies the root/default size for the grouping. On OS X the grouped paper sizes are shown in a submenu of the main paper size. When omitted, sizes with the same dimensions are automatically grouped together, for example "Letter" and "Letter.Borderless".</p>
+
+<p>Example:</p>
+
+<pre class="command">
+<em>*% Specify grouping of borderless/non-borderless sizes</em>
+*cupsPageSizeCategory Letter/US Letter: "Letter Letter.Borderless"
+*cupsPageSizeCategory A4/A4: "A4 A4.Borderless"
+</pre>
+
+
+<h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
+
+<p class='summary'>*cupsBackSide: keyword</p>
+
+<p>This keyword requests special handling of the back side of pages
+when doing duplexed (2-sided) output. <a href='#TABLE_1'>Table 1</a>
+shows the supported keyword values for this keyword and their effect
+on the raster data sent to your driver. For example, when <tt>cupsBackSide</tt>
+is <code>Rotated</code> and <tt>Tumble</tt> is <tt>false</tt>, your driver
+will receive print data starting at the bottom right corner of the page, with
+each line going right-to-left instead of left-to-right. The default value is
+<code>Normal</code>.</p>
+
+<blockquote><b>Note:</b>
+
+<p><tt>cupsBackSide</tt> replaces the older <tt>cupsFlipDuplex</tt>
+keyword - if <tt>cupsBackSide</tt> is specified, <tt>cupsFlipDuplex</tt>
+will be ignored.</p>
+
+</blockquote>
+
+<div class='table'>
+<table width='80%' summary='Back Side Raster Coordinate System'>
+<caption>Table 1: <a name='TABLE_1'>Back Side Raster Coordinate System</a></caption>
+<thead>
+<tr>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Image Presentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Normal</code></td>
+	<td><code>true</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>false</code></td>
+	<td>Left-to-right, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>ManualTumble</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>false</code></td>
+	<td>Right-to-left, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Rotated</code></td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>false</code></td>
+	<td>Left-to-right, bottom-to-top</td>
+</tr>
+<tr>
+	<td><code>Flipped</code> *</td>
+	<td><code>true</code></td>
+	<td>Right-to-left, top-to-bottom</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><em>* - Not supported in OS X 10.5.x and earlier</em></p>
+
+<div class='figure'><table summary='Back side images'>
+<caption>Figure 1: Back side images</caption>
+<tr><td><img src='../images/raster.png' width='624' height='448' alt='Back side images'></td></tr>
+</table></div>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Flip the page image for the back side of duplexed output</em>
+*cupsBackSide: Flipped
+
+<em>*% Rotate the page image for the back side of duplexed output</em>
+*cupsBackSide: Rotated
+</pre>
+
+<p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
+keyword.</p>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
+
+<p class='summary'>*cupsCommands: "name name2 ... nameN"</p>
+
+<p>This string keyword specifies the commands that are supported by the
+CUPS command file filter for this device. The command names are separated
+by whitespace.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the list of commands we support</em>
+*cupsCommands: "AutoConfigure Clean PrintSelfTestPage ReportLevels com.vendor.foo"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
+
+<p class='summary'>*cupsEvenDuplex: boolean</p>
+
+<p>This boolean keyword notifies the RIP filters that the
+destination printer requires an even number of pages when 2-sided
+printing is selected. The default value is <code>false</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Always send an even number of pages when duplexing</em>
+*cupsEvenDuplex: true
+</pre>
+
+<h3><a name='cupsFax'>cupsFax</a></h3>
+
+<p class='summary'>*cupsFax: boolean</p>
+
+<p>This boolean keyword specifies whether the PPD defines a facsimile device. The default is <tt>false</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsFax: true
+</pre>
+
+<h3><a name='cupsFilter'>cupsFilter</a></h3>
+
+<p class='summary'>*cupsFilter: "source/type cost program"</p>
+
+<p>This string keyword provides a conversion rule from the
+given source type to the printer's native format using the
+filter "program". If a printer supports the source type directly,
+the special filter program "-" may be specified.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Standard raster printer driver filter</em>
+*cupsFilter: "application/vnd.cups-raster 100 rastertofoo"
+
+<em>*% Plain text filter</em>
+*cupsFilter: "text/plain 10 texttofoo"
+
+<em>*% Pass-through filter for PostScript printers</em>
+*cupsFilter: "application/vnd.cups-postscript 0 -"
+</pre>
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsFilter2'>cupsFilter2</a></h3>
+
+<p class='summary'>*cupsFilter2: "source/type destination/type cost program"</p>
+
+<p>This string keyword provides a conversion rule from the given source type to the printer's native format using the filter "program". If a printer supports the source type directly, the special filter program "-" may be specified. The destination type is automatically created as needed and is passed to the filters and backend as the FINAL_CONTENT_TYPE value.</p>
+
+<blockquote><b>Note:</b>
+
+<p>The presence of a single <code>cupsFilter2</code> keyword in the PPD file will hide any <code>cupsFilter</code> keywords from the CUPS scheduler. When using <code>cupsFilter2</code> to provide filters specific for CUPS 1.5 and later, provide a <code>cupsFilter2</code> line for every filter and a <code>cupsFilter</code> line for each filter that is compatible with older versions of CUPS.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Standard raster printer driver filter</em>
+*cupsFilter2: "application/vnd.cups-raster application/vnd.foo 100 rastertofoo"
+
+<em>*% Plain text filter</em>
+*cupsFilter2: "text/plain application/vnd.foo 10 texttofoo"
+
+<em>*% Pass-through filter for PostScript printers</em>
+*cupsFilter2: "application/vnd.cups-postscript application/postscript 0 -"
+</pre>
+
+<h3><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
+
+<p class='summary'>*cupsFlipDuplex: boolean</p>
+
+<p>Due to implementation differences between OS X and Ghostscript,
+the <tt>cupsFlipDuplex</tt> keyword is deprecated. Instead, use
+the <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> keyword to specify
+the coordinate system (pixel layout) of the page data on the back side of
+duplex pages.</p>
+
+<p>The value <code>true</code> maps to a <tt>cupsBackSide</tt> value
+of <code>Rotated</code> on OS X and <code>Flipped</code> with
+Ghostscript.</p>
+
+<p>The default value is <code>false</code>.</p>
+
+<blockquote><b>Note:</b>
+
+<p>OS X drivers that previously used
+<tt>cupsFlipDuplex</tt> may wish to provide both the old and
+new keywords for maximum compatibility, for example:</p>
+
+<pre class='command'>
+*cupsBackSide: Rotated
+*cupsFlipDuplex: true
+</pre>
+
+<p>Similarly, drivers written for other operating systems using
+Ghostscript can use:</p>
+
+<pre class='command'>
+*cupsBackSide: Flipped
+*cupsFlipDuplex: true
+</pre></blockquote>
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
+
+<p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
+
+<p>This keyword defines a mapping from IPP <code>finishings</code>
+values to PPD options and choices.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsIPPFinishings 4/staple: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 5/punch: "*PunchMedia Yes *PunchLocation LeftSide"
+*cupsIPPFinishings 20/staple-top-left: "*StapleLocation SinglePortrait"
+*cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
+</pre>
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
+
+<p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
+
+<p>This optional keyword maps custom
+<code>printer-state-reasons</code> keywords that are generated by
+the driver to human readable text. The optional URIs string
+contains zero or more URIs separated by a newline. Each URI can
+be a CUPS server absolute path to a help file under the
+scheduler's <code>DocumentRoot</code> directory, a full HTTP URL
+("http://www.domain.com/path/to/help/page.html"), or any other
+valid URI which directs the user at additional information
+concerning the condition that is being reported.</p>
+
+<p>Since the reason text is limited to 80 characters by the PPD specification, longer text strings can be included by URI-encoding the text with the "text" scheme, for example "text:some%20text". Multiple <code>text</code> URIs are combined by the <tt>ppdLocalizeIPPReason</tt> into a single string that can be displayed to the user.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Map com.vendor-error to text but no page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: ""
+
+<em>*% Map com.vendor-error to more than 80 characters of text but no page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "text:Now%20is%20the%20time
+text:for%20all%20good%20men%20to%20come%20to%20the%20aid%20of%20their%20country."
+
+<em>*% Map com.vendor-error to text and a local page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html"
+
+<em>*% Map com.vendor-error to text and a remote page</em>
+*cupsIPPReason com.vendor-error/A serious error occurred: "http://www.vendor.com/help"
+
+<em>*% Map com.vendor-error to text and a local, Apple help book, and remote page</em>
+*APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
+*cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html
+help:anchor='com.vendor-error'%20bookID=Vendor%20Help
+http://www.vendor.com/help"
+*End
+</pre>
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsIPPSupplies'>cupsIPPSupplies</a></h3>
+
+<p class='summary'>*cupsIPPSupplies: boolean</p>
+
+<p>This keyword tells the IPP backend whether it should report the current marker-xxx supply attribute values. The default value is <code>True</code>.
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Do not use IPP marker-xxx attributes to report supply levels</em>
+*cupsIPPSupplies: False
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
+
+<p class='summary'>*cupsJobAccountId: boolean</p>
+
+<p>This keyword defines whether the printer accepts the job-account-id IPP attribute.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer accepts the job-account-id IPP attribute.</em>
+*cupsJobAccountId: True
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
+
+<p class='summary'>*cupsJobAccountingUserId: boolean</p>
+
+<p>This keyword defines whether the printer accepts the job-accounting-user-id IPP attribute.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer accepts the job-accounting-user-id IPP attribute.</em>
+*cupsJobAccountingUserId: True
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
+
+<p class='summary'>*cupsJobPassword: "format"</p>
+
+<p>This keyword defines the format of the job-password IPP attribute, if supported by the printer. Currently the only supported format is "1111" indicating a 4-digit PIN code.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer supports 4-digit PIN codes.</em>
+*cupsJobPassword: "1111"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.2/OS X 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
+
+<p class='summary'>*cupsLanguages: "locale list"</p>
+
+<p>This keyword describes which language localizations are
+included in the PPD. The "locale list" string is a space-delimited
+list of locale names ("en", "en_US", "fr_CA", etc.)</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify Canadian, UK, and US English, and Canadian and French French</em>
+*cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsMandatory'>cupsMandatory</a></h3>
+
+<p class='summary'>*cupsMandatory: "attribute1 attribute2 ... attributeN"</p>
+
+<p>This keyword defines a list of IPP attributes that must be provided when submitting a print job creation request.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify that the user must supply a job-password</em>
+*cupsMandatory: "job-password job-password-encryption"
+</pre>
+
+
+<h3><a name='cupsManualCopies'>cupsManualCopies</a></h3>
+
+<p class='summary'>*cupsManualCopies: boolean</p>
+
+<p>This boolean keyword notifies the RIP filters that the
+destination printer does not support copy generation in
+hardware. The default value is <code>false</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Tell the RIP filters to generate the copies for us</em>
+*cupsManualCopies: true
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
+
+<p class='summary'>*cupsMarkerName/Name Text: ""</p>
+
+<p>This optional keyword maps <code>marker-names</code> strings that are
+generated by the driver to human readable text.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Map cyanToner to "Cyan Toner"</em>
+*cupsMarkerName cyanToner/Cyan Toner: ""
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
+
+<p class='summary'>*cupsMarkerNotice: "disclaimer text"</p>
+
+<p>This optional keyword provides disclaimer text for the supply level
+information provided by the driver, typically something like "supply levels
+are approximate".</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*cupsMarkerNotice: "Supply levels are approximate."
+</pre>
+
+<h3><span class='info'>CUPS 1.6/OS X 10.8</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
+
+<p class='summary'>*cupsMaxCopies: integer</p>
+
+<p>This integer keyword notifies the filters that the destination printer supports up to N copies in hardware. The default value is <code>9999</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Tell the RIP filters we can do up to 99 copies</em>
+*cupsMaxCopies: 99
+</pre>
+
+<h3><a name='cupsModelNumber'>cupsModelNumber</a></h3>
+
+<p class='summary'>*cupsModelNumber: number</p>
+
+<p>This integer keyword specifies a printer-specific model
+number. This number can be used by a filter program to adjust
+the output for a specific model of printer.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify an integer for a driver-specific model number</em>
+*cupsModelNumber: 1234
+</pre>
+
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
+
+<p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
+
+<p>This string keyword specifies the character set that is used
+for strings in PJL commands. If not specified, US-ASCII is
+assumed.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify UTF-8 is used in PJL strings</em>
+*cupsPJLCharset: "UTF-8"
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
+
+<p class='summary'>*cupsPJLDisplay: "what"</p>
+
+<p>This optional keyword specifies which command is used to display the
+job ID, name, and user on the printer's control panel. "What" is either "none"
+to disable this functionality, "job" to use "@PJL JOB DISPLAY", or "rdymsg"
+to use "@PJL RDYMSG DISPLAY". The default is "job".</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Display job information using @PJL SET RDYMSG DISPLAY="foo"</em>
+*cupsPJLDisplay: "rdymsg"
+
+<em>*% Display job information display</em>
+*cupsPJLDisplay: "none"
+</pre>
+
+<h3><span class='info'>CUPS 1.2/OS X 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
+
+<p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
+
+<p>This string keyword specifies printer-specific "port
+monitor" filters that may be used with the printer. The CUPS
+scheduler also looks for the <tt>Protocols</tt> keyword to see
+if the <tt>BCP</tt> or <tt>TBCP</tt> protocols are supported. If
+so, the corresponding port monitor ("bcp" and "tbcp",
+respectively) is listed in the printer's
+<tt>port-monitor-supported</tt> keyword.</p>
+
+<p>The "urischeme" portion of the keyword specifies the URI scheme
+that this port monitor should be used for. Typically this is used to
+pre-select a particular port monitor for each type of connection that
+is supported by the printer. The "port monitor" string can be "none"
+to disable the port monitor for the given URI scheme.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify a PostScript printer that supports the TBCP protocol</em>
+*Protocols: TBCP PJL
+
+<em>*% Specify that TBCP should be used for socket connections but not USB</em>
+*cupsPortMonitor socket/AppSocket Printing: "tbcp"
+*cupsPortMonitor usb/USB Printing: "none"
+
+<em>*% Specify a printer-specific port monitor for an Epson USB printer</em>
+*cupsPortMonitor usb/USB Status Monitor: "epson-usb"
+</pre>
+
+<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
+
+<p class='summary'>*cupsPreFilter: "source/type cost program"</p>
+
+<p>This string keyword provides a pre-filter rule. The pre-filter
+program will be inserted in the conversion chain immediately
+before the filter that accepts the given MIME type.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% PDF pre-filter</em>
+*cupsPreFilter: "application/pdf 100 mypdfprefilter"
+
+<em>*% PNG pre-filter</em>
+*cupsPreFilter: "image/png 0 mypngprefilter"
+</pre>
+
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsPrintQuality'>cupsPrintQuality</a></h3>
+
+<p class='summary'>*cupsPrintQuality keyword/text: "code"</p>
+
+<p>This UI keyword defines standard print qualities that directly map from the IPP "print-quality" job template keyword. Standard keyword values are "Draft", "Normal", and "High" which are mapped from the IPP "print-quality" values 3, 4, and 5 respectively. Each <code>cupsPrintQuality</code> option typically sets output mode and resolution parameters in the page device dictionary, eliminating the need for separate (and sometimes confusing) output mode and resolution options.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Unlike all of the other keywords defined in this document, <code>cupsPrintQuality</code> is a UI keyword that MUST be enclosed inside the PPD <code>OpenUI</code> and <code>CloseUI</code> keywords.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*OpenUI *cupsPrintQuality/Print Quality: PickOne
+*OrderDependency: 10 AnySetup *cupsPrintQuality
+*DefaultcupsPrintQuality: Normal
+*cupsPrintQuality Draft/Draft: "code"
+*cupsPrintQuality Normal/Normal: "code"
+*cupsPrintQuality High/Photo: "code"
+*CloseUI: *cupsPrintQuality
+</pre>
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsSingleFile'>cupsSingleFile</a></h3>
+
+<p class='summary'>*cupsSingleFile: Boolean</p>
+
+<p>This boolean keyword tells the scheduler whether to print multiple files in a job together or singly. The default is "False" which uses a single instance of the backend for all files in the print job. Setting this keyword to "True" will result in separate instances of the backend for each file in the print job.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Send all print data to a single backend</em>
+*cupsSingleFile: False
+
+<em>*% Send each file using a separate backend</em>
+*cupsSingleFile: True
+</pre>
+
+<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
+
+<p class='summary'>*cupsSNMPSupplies: boolean</p>
+
+<p>This keyword tells the standard network backends whether they should query
+the standard SNMP Printer MIB OIDs for supply levels. The default value is
+<code>True</code>.
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Do not use SNMP queries to report supply levels</em>
+*cupsSNMPSupplies: False
+</pre>
+
+<h3><a name='cupsVersion'>cupsVersion</a></h3>
+
+<p class='summary'>*cupsVersion: major.minor</p>
+
+<p>This required keyword describes which version of the CUPS
+PPD file extensions was used. Currently it must be the string
+"1.0", "1.1", "1.2", "1.3", "1.4", "1.5", or "1.6".</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify a CUPS 1.2 driver</em>
+*cupsVersion: "1.2"
+</pre>
+
+
+<h3><span class="info">CUPS 1.6/OS X 10.8</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
+
+<p class="summary">*JCLToPDFInterpreter: "JCL"</p>
+
+<p>This keyword provides the JCL command to insert a PDF job file into a printer-ready data stream. The JCL command is added after the <tt>JCLBegin</tt> value and any commands for JCL options in the PPD file.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% PJL command to start the PDF interpreter</em>
+*JCLToPDFInterpreter: "@PJL ENTER LANGUAGE = PDF&lt;0A&gt;"
+</pre>
+
+
+<h2 class='title'><a name='MACOSX'>OS X Attributes</a></h2>
+
+<h3><span class='info'>OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+
+<p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
+
+<p>This keyword defines additional option panes that are displayed in the
+print dialog. Each keyword adds one or more option panes. See the "OutputBinsPDE"
+example and <a href='http://developer.apple.com/qa/qa2004/qa1352.html'>Apple
+Technical Q&amp;A QA1352</a> for information on writing your own print dialog
+plug-ins.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Starting with OS X 10.5, each plug-in must be compiled "4-way fat"
+(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
+in order to be usable with all applications.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Add two panes for finishing and driver options
+*APDialogExtension: "/Library/Printers/vendor/finishing.plugin"
+*APDialogExtension: "/Library/Printers/vendor/options.plugin"
+</pre>
+
+<h3><span class='info'>OS X 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
+
+<p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
+
+<p>This boolean keyword notifies the RIP filters that the
+destination printer requires the top and bottom margins of the
+<tt>ImageableArea</tt> to be swapped for the back page. The
+default is <tt>true</tt> when <tt>cupsBackSide</tt> is <tt>Flipped</tt>
+and <tt>false</tt> otherwise. <a href='#TABLE_2'>Table 2</a> shows how
+<tt>APDuplexRequiresFlippedMargin</tt> interacts with <tt>cupsBackSide</tt>
+and the <tt>Tumble</tt> page attribute.</p>
+
+<div class='table'>
+<table width='80%' summary='Margin Flipping Modes'>
+<caption>Table 2: <a name='TABLE_2'>Margin Flipping Modes</a></caption>
+<thead>
+<tr>
+	<th>APDuplexRequiresFlippedMargin</th>
+	<th>cupsBackSide</th>
+	<th>Tumble Value</th>
+	<th>Margins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>false</td>
+	<td>any</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>any</td>
+	<td>Normal</td>
+	<td>any</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>false</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>ManualDuplex</td>
+	<td>true</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>false</td>
+	<td>Flipped</td>
+</tr>
+<tr>
+	<td>true</td>
+	<td>Rotated</td>
+	<td>true</td>
+	<td>Normal</td>
+</tr>
+<tr>
+	<td>true or unspecified</td>
+	<td>Flipped</td>
+	<td>any</td>
+	<td>Flipped</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Rotate the back side images</em>
+*cupsBackSide: Rotated
+
+<em>*% Don't swap the top and bottom margins for the back side</em>
+*APDuplexRequiresFlippedMargin: false
+</pre>
+
+<p>Also see the related <a href='#cupsBackSide'><tt>cupsBackSide</tt></a>
+keyword.</p>
+
+<h3><a name='APHelpBook'>APHelpBook</a></h3>
+
+<p class='summary'>*APHelpBook: "bundle URL"</p>
+
+<p>This string keyword specifies the Apple help book bundle to use when
+looking up IPP reason codes for this printer driver. The
+<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> keyword maps
+"help" URIs to this file.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
+</pre>
+
+<h3><span class='info'>OS X 10.6</span><a name='APICADriver'>APICADriver</a></h3>
+
+<p class='summary'>*APICADriver: boolean</p>
+
+<p>This keyword specifies whether the device has a matching Image Capture
+Architecture (ICA) driver for scanning. The default is <tt>False</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APICADriver: True
+*APScanAppBundleID: "com.apple.ImageCaptureApp"
+</pre>
+
+<h3><span class='info'>OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
+
+<p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename.icns"</p>
+
+<p>This keyword defines the location of a printer icon file to use when
+displaying the printer. The file must be in the Apple icon format.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Apple icon file
+*APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.icns"
+</pre>
+
+<h3><span class='info'>OS X 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
+
+<p class='summary'>*APPrinterLowInkTool: "/Library/Printers/vendor/program"</p>
+
+<p>This keyword defines an program that checks the ink/toner/marker levels
+on a printer, returning an XML document with those levels. See the "InkTool"
+example and
+<a href='http://developer.apple.com/technotes/tn2005/tn2144.html'>Apple
+Technical Note TN2144</a> for more information.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Use a vendor monitoring program
+*APPrinterLowInkTool: "/Library/Printers/vendor/Tools/lowinktool"
+</pre>
+
+<h3><span class='info'>OS X 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
+
+<p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
+
+<p>This keyword defines presets for multiple options that show up
+in the print dialog of applications (such as iPhoto) that set the job
+style hint to <tt>NSPrintPhotoJobStyleHint</tt>. Each preset maps to one or
+more pairs of PPD options and choices as well as providing key/value data for
+the application. The following standard preset names are currently defined:</p>
+
+<ul>
+
+	<li><code>General_with_Paper_Auto-Detect</code>; Normal quality general printing with auto-detected media.</li>
+
+	<li><code>General_with_Paper_Auto-Detect_-_Draft</code>; Draft quality general printing with auto-detected media.</li>
+
+	<li><code>General_on_Plain_Paper</code>; Normal quality general printing on plain paper.</li>
+
+	<li><code>General_on_Plain_Paper_-_Draft</code>; Draft quality general printing on plain paper.</li>
+
+	<li><code>Photo_with_Paper_Auto-Detect</code>; Normal quality photo printing with auto-detected media.</li>
+
+	<li><code>Photo_with_Paper_Auto-Detect_-_Fine</code>; High quality photo printing with auto-detected media.</li>
+
+	<li><code>Photo_on_Plain_Paper</code>; Normal quality photo printing on plain paper.</li>
+
+	<li><code>Photo_on_Plain_Paper_-_Fine</code>; High quality photo printing on plain paper.</li>
+
+	<li><code>Photo_on_Photo_Paper</code>; Normal quality photo printing on glossy photo paper.</li>
+
+	<li><code>Photo_on_Photo_Paper_-_Fine</code>; High quality photo printing on glossy photo paper.</li>
+
+	<li><code>Photo_on_Matte_Paper</code>; Normal quality photo printing on matte paper.</li>
+
+	<li><code>Photo_on_Matte_Paper_-_Fine</code>; High quality photo printing on matte paper.</li>
+
+</ul>
+
+<p>The value string consists of pairs of keywords, either an option name and
+choice (*MainKeyword OptionKeyword) or a preset identifier and value
+(com.apple.print.preset.foo value). The following preset identifiers are currently used:</p>
+
+<ul>
+
+	<li><code>com.apple.print.preset.graphicsType</code>; specifies the type of printing used for this printing - "General" for general purpose printing and "Photo" for photo printing.</li>
+
+	<li><code>com.apple.print.preset.media-front-coating</code>; specifies the media type selected by this preset - "none" (plain paper), "glossy", "high-gloss", "semi-gloss", "satin", "matte", and "autodetect".</li>
+
+	<li><code>com.apple.print.preset.output-mode</code>; specifies the output mode for this preset - "color" (default for color printers) or "monochrome" (grayscale, default for B&amp;W printers).</li>
+
+	<li><code>com.apple.print.preset.quality</code>; specifies the overall print quality selected by this preset - "low" (draft), "mid" (normal), or "high".</li>
+
+</ul>
+
+<p>Presets, like options, can also be localized in multiple languages.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APPrinterPreset Photo_on_Photo_Paper/Photo on Photo Paper: "
+  *MediaType Glossy
+  *ColorModel RGB
+  *Resolution 300dpi
+  com.apple.print.preset.graphicsType Photo
+  com.apple.print.preset.quality mid
+  com.apple.print.preset.media-front-coating glossy"
+*End
+*fr.APPrinterPreset Photo_on_Photo_Paper/Photo sur papier photographique: ""
+</pre>
+
+<h3><span class='info'>OS X 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
+
+<p class='summary'>*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/filename.app"</p>
+
+<p>This keyword defines a GUI application that can be used to do printer
+maintenance functions such as cleaning the print head(s). See ... for more
+information.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*% Define the printer utility application
+*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
+</pre>
+
+<h3><span class='info'>OS X 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
+
+<p class='summary'>*APScannerOnly: boolean</p>
+
+<p>This keyword specifies whether the device has scanning but no printing
+capabilities. The default is <tt>False</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APICADriver: True
+*APScannerOnly: True
+</pre>
+
+<h3><span class='info'>OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
+
+<p class='summary'>*APScanAppBundleID: "bundle ID"</p>
+
+<p>This keyword defines the application to use when scanning pages from
+the device.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APICADriver: True
+*APScanAppBundleID: "com.apple.ImageCaptureApp"
+</pre>
+
+
+<h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.7</h3>
+
+<ul>
+
+	<li>Added <a href="#cupsJobAccountId"><tt>cupsJobAccountId</tt></a>,
+	<a href="#cupsJobAccountingUserId"><tt>cupsJobAccountingUserId</tt></a>,
+	<a href="#cupsJobPassword"><tt>cupsJobPassword</tt></a>,
+	<a href="#cupsMandatory"><tt>cupsMandatory</tt></a> keywords.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.6</h3>
+
+<ul>
+
+	<li>Added <a href="#cupsPageSizeCategory"><tt>cupsPageSizeCategory</tt></a> keyword (originally defined in CUPS 1.4).</li>
+
+	<li>Added <a href="#cupsMaxCopies"><tt>cupsMaxCopies</tt></a> keyword.</li>
+
+	<li>Documented <a href="#JCLToPDFInterpreter"><tt>JCLToPDFInterpreter</tt></a> keyword.</li>
+
+	<li>Updated <a href="#cupsVersion"><tt>cupsVersion</tt></a> keyword documentation to list all current releases of CUPS.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.5</h3>
+
+<ul>
+
+	<li>Changes all instances of PPD attributes to PPD keywords, to be consistent with the parent specification from Adobe.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.4.5</h3>
+
+<ul>
+
+	<li>Added <a href='#cupsPrintQuality'><tt>cupsPrintQuality</tt></a> UI keyword.</li>
+
+	<li>Added new properties and values for the <a href='#APPrinterPreset'><tt>APPrinterPreset</tt></a> keyword.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.4</h3>
+
+<ul>
+
+	<li>Added <a href='#APICADriver'><tt>APICADriver</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsCommands'><tt>cupsCommands</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsMarkerName'><tt>cupsMarkerName</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsMarkerNotice'><tt>cupsMarkerNotice</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsPJLDisplay'><tt>cupsPJLDisplay</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsSNMPSupplies'><tt>cupsSNMPSupplies</tt></a>
+	keyword.</li>
+
+	<li>Added <a href='#cupsUIResolver'><tt>cupsUIResolver</tt></a> and
+	<a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>
+	keywords.</li>
+
+	<li>Added
+	<a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a>,
+	<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a>,
+	<a href='#cupsMinSize'><tt>cupsMinSize</tt></a>, and
+	<a href='#cupsMaxSize'><tt>cupsMaxSize</tt></a> keywords.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.3.1</h3>
+
+<ul>
+
+	<li>Added missing OS X <tt>AP</tt> keywords.</li>
+
+	<li>Added section on auto-configuration including the
+	<tt>OID<i>MainKeyword</i></tt> and <tt>?<i>MainKeyword</i></tt>
+	keywords.</li>
+
+	<li>Minor reorganization.</li>
+
+</ul>
+
+
+<h3>Changes in CUPS 1.3</h3>
+
+<ul>
+
+	<li>Added <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> and
+	deprecated <a href='#cupsFlipDuplex'><tt>cupsFlipDuplex</tt></a>.</li>
+
+	<li>Added text URI information to
+	<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> documentation.</li>
+
+	<li>Added <a href='#APPrinterPreset'><tt>APPrinterPreset</tt></a>,
+	<a href='#cupsIPPFinishings'><tt>cupsIPPFinishings</tt></a>, and
+	<a href='#cupsPreFilter'><tt>cupsPreFilter</tt></a> keywords.</li>
+
+	<li>Added discussion of custom option code, sample
+	<tt>CustomPageSize</tt> code, and "do not use dict and put" note.</li>
+
+</ul>
+
+<h3>Changes in CUPS 1.2.8</h3>
+
+<ul>
+
+	<li>Added section on supported PostScript commands for raster
+	drivers</li>
+
+</ul>
+
+<h3>Changes in CUPS 1.2</h3>
+
+<ul>
+
+	<li>Added globalization support keywords</li>
+
+	<li>Added custom option values support</li>
+
+	<li>Added <a href='#APHelpBook'><tt>APHelpBook</tt></a> keyword</li>
+
+	<li>Added <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
+	keyword</li>
+
+	<li>Added <a href='#cupsICCProfile'><tt>cupsICCProfile</tt></a> keyword</li>
+
+	<li>Added <a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> keyword</li>
+
+	<li>Added <a href='#cupsLanguages'><tt>cupsLanguages</tt></a> keyword</li>
+
+	<li>Added <a href='#cupsPortMonitor'><tt>cupsPortMonitor</tt></a> keyword</li>
+
+	<li>Removed <tt>cupsProtocol</tt> keyword</li>
+
+</ul>
+
+<h3>Changes in CUPS 1.1</h3>
+
+<ul>
+
+	<li>Added <a href='#cupsFlipDuplex'><tt>cupsFlipDuplex</tt></a> keyword</li>
+
+	<li>Added <tt>cupsProtocol</tt> keyword</li>
+
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+#
+# File/directory/user/group configuration file for the CUPS scheduler.
+# See "man cups-files.conf" for a complete description of this file.
+#
+
+# List of events that are considered fatal errors for the scheduler...
+#FatalErrors @CUPS_FATAL_ERRORS@
+
+# Do we call fsync() after writing configuration or status files?
+#SyncOnClose No
+
+# Default user and group for filters/backends/helper programs; this cannot be
+# any user or group that resolves to ID 0 for security reasons...
+#User @CUPS_USER@
+#Group @CUPS_GROUP@
+
+# Administrator user group, used to match @SYSTEM in cupsd.conf policy rules...
+# This cannot contain the Group value for security reasons...
+SystemGroup @CUPS_SYSTEM_GROUPS@
+@CUPS_SYSTEM_AUTHKEY@
+
+# User that is substituted for unauthenticated (remote) root accesses...
+#RemoteRoot remroot
+
+# Do we allow file: device URIs other than to /dev/null?
+#FileDevice No
+
+# Permissions for configuration and log files...
+#ConfigFilePerm 0@CUPS_CONFIG_FILE_PERM@
+#LogFilePerm 0@CUPS_LOG_FILE_PERM@
+
+# Location of the file logging all access to the scheduler; may be the name
+# "syslog". If not an absolute path, the value of ServerRoot is used as the
+# root directory.  Also see the "AccessLogLevel" directive in cupsd.conf.
+AccessLog @CUPS_LOGDIR@/access_log
+
+# Location of cache files used by the scheduler...
+#CacheDir @CUPS_CACHEDIR@
+
+# Location of data files used by the scheduler...
+#DataDir @CUPS_DATADIR@
+
+# Location of the static web content served by the scheduler...
+#DocumentRoot @CUPS_DOCROOT@
+
+# Location of the file logging all messages produced by the scheduler and any
+# helper programs; may be the name "syslog". If not an absolute path, the value
+# of ServerRoot is used as the root directory.  Also see the "LogLevel"
+# directive in cupsd.conf.
+ErrorLog @CUPS_LOGDIR@/error_log
+
+# Location of fonts used by older print filters...
+#FontPath @CUPS_FONTPATH@
+
+# Location of LPD configuration
+#LPDConfigFile @CUPS_DEFAULT_LPD_CONFIG_FILE@
+
+# Location of the file logging all pages printed by the scheduler and any
+# helper programs; may be the name "syslog". If not an absolute path, the value
+# of ServerRoot is used as the root directory.  Also see the "PageLogFormat"
+# directive in cupsd.conf.
+PageLog @CUPS_LOGDIR@/page_log
+
+# Location of the file listing all of the local printers...
+#Printcap @CUPS_DEFAULT_PRINTCAP@
+
+# Format of the Printcap file...
+#PrintcapFormat bsd
+#PrintcapFormat plist
+#PrintcapFormat solaris
+
+# Location of all spool files...
+#RequestRoot @CUPS_REQUESTS@
+
+# Location of helper programs...
+#ServerBin @CUPS_SERVERBIN@
+
+# SSL/TLS keychain for the scheduler...
+#ServerKeychain @CUPS_SERVERKEYCHAIN@
+
+# Location of other configuration files...
+#ServerRoot @CUPS_SERVERROOT@
+
+# Location of Samba configuration file...
+#SMBConfigFile @CUPS_DEFAULT_SMB_CONFIG_FILE@
+
+# Location of scheduler state files...
+#StateDir @CUPS_STATEDIR@
+
+# Location of scheduler/helper temporary files. This directory is emptied on
+# scheduler startup and cannot be one of the standard (public) temporary
+# directory locations for security reasons...
+#TempDir @CUPS_REQUESTS@/tmp

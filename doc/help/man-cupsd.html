@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd(8)</title>
+</head>
+<body>
+<h1 class="title">cupsd(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsd - cups scheduler
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsd</b>
+[
+<b>-c</b>
+<i>config-file</i>
+] [
+<b>-f</b>
+] [
+<b>-F</b>
+] [
+<b>-h</b>
+] [
+<b>-l</b>
+] [
+<b>-t</b>
+]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>cupsd</b>
+is the scheduler for CUPS. It implements a printing system based upon the Internet Printing Protocol, version 2.1. If no options are specified on the command-line then the default configuration file
+<i>/etc/cups/cupsd.conf</i>
+will be used.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<dl class="man">
+<dt><b>-c</b><i> config-file</i>
+<dd style="margin-left: 5.0em">Uses the named configuration file.
+<dt><b>-f</b>
+<dd style="margin-left: 5.0em">Run
+<b>cupsd</b>
+in the foreground; the default is to run in the background as a "daemon".
+<dt><b>-F</b>
+<dd style="margin-left: 5.0em">Run
+<b>cupsd</b>
+in the foreground but detach the process from the controlling terminal and current directory. This is useful for running
+<b>cupsd</b>
+from
+<b>init</b>(8).
+<dt><b>-h</b>
+<dd style="margin-left: 5.0em">Shows the program usage.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em">This option is passed to
+<b>cupsd</b>
+when it is run from
+<b>launchd</b>(8)
+or
+<b>systemd</b>(8).
+<dt><b>-t</b>
+<dd style="margin-left: 5.0em">Test the configuration file for syntax errors.
+</dl>
+<h2 class="title"><a name="FILES">Files</a></h2>
+<pre class="man">
+<i>/etc/cups/classes.conf</i>
+<i>/etc/cups/cups-files.conf</i>
+<i>/etc/cups/cupsd.conf</i>
+<i>/usr/share/cups/mime/mime.convs</i>
+<i>/usr/share/cups/mime/mime.types</i>
+<i>/etc/cups/printers.conf</i>
+<i>/etc/cups/subscriptions.conf</i>
+</pre>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+<b>cupsd</b>
+implements all of the required IPP/2.1 attributes and operations. It also implements several CUPS-specific administrative operations.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Run
+<b>cupsd</b>
+in the background with the default configuration file:
+<pre class="man">
+
+    cupsd
+
+</pre>
+Test a configuration file called
+<i>test.conf</i>:
+<pre class="man">
+
+    cupsd -t -c test.conf
+
+</pre>
+Run
+<b>cupsd</b>
+in the foreground with a test configuration file called
+<i>test.conf</i>:
+<pre class="man">
+
+    cupsd -f -c test.conf
+
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cups-lpd.html?TOPIC=Man+Pages"><b>cups-lpd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-cupsd-helper.html?TOPIC=Man+Pages"><b>cupsd-helper</b>(8),</a>
+<a href="man-cupsd-logs.html?TOPIC=Man+Pages"><b>cupsd-logs</b>(8),</a>
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
+<b>launchd</b>(8),
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
+<b>systemd</b>(8),
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

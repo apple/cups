@@ -1,0 +1,232 @@
+IPPTOOL.txt - 2013-07-15
+------------------------
+
+See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
+
+
+INTRODUCTION
+
+    CUPS includes two user programs for IPP printers.  The first is called
+    ipptool and can be used to send arbitrary IPP requests to a CUPS server or
+    IPP printer.  This tool started life as part of the CUPS automated test
+    suite and has grown to support complex conformance tests and a simple way
+    to query printer, job, and subscription attributes.
+
+    The second program called ippfind that can be used to find IPP printers
+    that have registered themselves using Bonjour (DNS-SD, mDNS, and Zeroconf)
+    and run commands such as ipptool.
+
+
+READING THE DOCUMENTATION
+
+    Full documentation on the ipptool command can be found in the
+    "man-ipptool.html" and "man-ipptoolfile.html" files; the latter describes
+    the test file format supported by ipptool.
+
+    Full documentation on the ippfind command can be found in the
+    "man-ippfind.html" file.
+
+
+IPPFIND BASIC USAGE
+
+    The ippfind command can be used to discover IPP printers on your network.
+    For example, the following command prints the printer URI of registered IPP
+    printers:
+
+        ippfind
+
+    To find all color IPP printers, run:
+
+        ippfind --txt-color T
+
+    And to run the IPP Everywhere conformance test file on every registered IPP
+    printer, run the following command:
+
+        ippfind _ipp._tcp,_print --exec ipptool -t '{}' ipp-everywhere.test \;
+
+
+IPPTOOL BASIC USAGE
+
+    The ipptool command requires a printer URI and one or more "test" files that
+    describe the operations, attributes to display, and expected status and
+    attribute values. Several standard files are included with CUPS, for example
+    to show a list of pending print jobs on a CUPS printer called "myprinter"
+    you'd run:
+
+        ipptool ipp://localhost/printers/myprinter get-jobs.test
+
+    which would produce something like this:
+
+	job-id job-state    job-name     job-originating-user-name
+	------ ------------ ------------ -------------------------
+	72     pending      testfile.pdf msweet
+	73     pending      testfile.ps  msweet
+	74     pending-held testfile.jpg msweet
+	75     pending-held testfile.txt msweet
+
+    To get output suitable for import into a spreadsheet, use the "-c" (CSV)
+    option:
+
+        ipptool -c ipp://localhost/printers/myprinter get-jobs.test
+
+    which will produce something like this:
+
+	job-id,job-state,job-name,job-originating-user-name
+	72,pending,testfile.pdf,msweet
+	73,pending,testfile.ps,msweet
+	74,pending-held,testfile.jpg,msweet
+	75,pending-held,testfile.txt,msweet
+
+
+STANDARD TEST FILES
+
+    The following standard test files are included with ipptool:
+
+        create-printer-subscription.test    Creates a printer subscription for
+                                            state change notifications
+        get-completed-jobs.test             Shows a list of completed jobs
+        get-jobs.test                       Shows a list of pending jobs
+        get-notifications.test              Shows events for an ippget
+	                                    subscription.
+        get-printer-attributes.test         Shows printer attributes
+        get-subscriptions.test              Shows a list of subscriptions
+        ipp-1.1.test                        IPP/1.1 conformance test suite
+        ipp-2.0.test                        IPP/2.0 conformance test suite
+        ipp-2.1.test                        IPP/2.1 conformance test suite
+        ipp-2.2.test                        IPP/2.2 conformance test suite
+        ipp-everywhere.test                 IPP Everywhere conformance test
+                                            suite
+        print-job.test                      Prints a file
+        print-job-deflate.test              Prints a file, compressing with
+                                            deflate.
+        print-job-gzip.test                 Prints a file, compressing with gzip
+        validate-job.test                   Validates attributes for a job
+                                            submission.
+
+
+CONFORMANCE TESTS
+
+    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, IPP/2.1,
+    IPP/2.2, and IPP Everywhere.  For a given printer URI, the following
+    commands perform tests at each level:
+
+        ipptool -tf filename [options] -I printer-uri ipp-1.1.test
+        ipptool -tf filename [options] -I -V 2.0 printer-uri ipp-2.0.test
+        ipptool -tf filename [options] -I -V 2.1 printer-uri ipp-2.1.test
+        ipptool -tf filename [options] -I -V 2.2 printer-uri ipp-2.2.test
+
+    The filename must use a format supported by the printer; ipptool will guess
+    the MIME media type using the extension, otherwise application/octet stream
+    will be used.  The following standard test files are included:
+
+	color.jpg
+	document-a4.pdf
+	document-a4.ps
+	document-letter.pdf
+	document-letter.ps
+	gray.jpg
+	onepage-a4.pdf
+	onepage-a4.ps
+	onepage-letter.pdf
+	onepage-letter.ps
+	testfile.jpg
+	testfile.pcl
+	testfile.pdf
+	testfile.ps
+	testfile.txt
+
+    Useful options include the following:
+
+        -4           Connect using IPv4
+        -6           Connect using IPv6
+        -C           Send chunked requests (default)
+        -d name=val  Define a variable
+        -E           Test IPP with HTTP Upgrade to TLS
+        -L           Send requests using the Content-Length header (HTTP/1.0)
+        -S           Test IPP over HTTPS (default for ipps: URIs)
+        -T seconds   Set a timeout for responses in seconds
+        -v           Be verbose, showing all attributes sent and received
+        -X           Produce XML (Apple plist) output
+
+    The printer-uri must be a URI supported by the printer using the "ipp" or
+    "ipps" scheme, for example:
+
+        ipp://192.168.0.1/ipp
+        ipps://192.168.0.1/ipp/print
+
+    Print-by-reference (URL) printing can be tested by defining the document-uri
+    variable as a URL, for example:
+
+        ipptool -tf filename -d document-uri=url -I printer-uri ipp-1.1.test
+
+    The standard test files are available on cups.org under the "test"
+    directory, for example:
+
+        ipptool -tf document-a4.pdf \
+            -d document-uri=http://www.cups.org/test/document-a4.pdf \
+            ipp://192.168.0.1/ipp -I -V 2.0 ipp-2.0.test
+
+    The "document" test files contain 4 pages each.  Doing the IPP conformance
+    tests will will produce up to 90 pages on various media, depending on the
+    printer.
+
+
+IPP EVERYWHERE TESTING
+
+    The IPP Everywhere tests use sample PWG raster files available from:
+
+        ftp://ftp.pwg.org/pub/pwg/ipp/examples
+
+    Extract the corresponding ZIP archives into the current directory before
+    running the ipp-everywhere.test file.  The test file will attempt to print
+    each PWG Raster file that is supported by the printer being tested - up to
+    372 pages including the 90 pages produced by the regular IPP test suite.
+
+
+GETTING SUPPORT AND OTHER RESOURCES
+
+    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide
+    discussion forums which are available at:
+
+	http://www.cups.org/
+
+
+REPORTING BUGS
+
+    If you believe you have discovered a bug in ippfind or ipptool, please fill
+    out the bug form at:
+
+	http://www.cups.org/str.php
+
+    Be sure to identify the version of CUPS and ippfind/ipptool (if you
+    downloaded the standalone version) you are using, the printer (if any) and
+    firmware version, and include any files that apply.
+
+    If you downloaded the standalone version of ippfind/ipptool, please also
+    re-run the command with debug logging enabled.  Run the following commands
+    on Windows to enable debug logging:
+
+        setdebug.bat
+
+    For Linux and Mac OS X use:
+
+	CUPS_DEBUG_LOG=ipptool.log; export CUPS_DEBUG_LOG
+	CUPS_DEBUG_LEVEL=6; export CUPS_DEBUG_LEVEL
+
+    Then when you run the ippfind or ipptool command a new "ipptool.log" file
+    will be created with detailed information - attach this file to the bug you
+    file as well.
+
+
+LEGAL STUFF
+
+    CUPS is Copyright 2007-2013 by Apple Inc.  CUPS and the CUPS logo are
+    trademarks of Apple Inc.
+
+    The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
+
+    CUPS is provided under the terms of version 2 of the GNU General Public
+    License and GNU Library General Public License. This program is distributed
+    in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the "doc/help/license.html" or "LICENSE.txt" files for more information.

@@ -1,0 +1,28 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 36 36 576 756
+%%Pages: 1
+%%LanguageLevel: 2
+%%EndComments
+%%Page: (1) 1
+% Draw a black box around the page
+0 setgray
+1 setlinewidth
+36 36 540 720 rectstroke
+
+% Draw a two inch blue circle in the middle of the page
+0 0 1 setrgbcolor
+306 396 144 0 360 arc closepath fill
+
+% Draw two half inch yellow circles for eyes
+1 1 0 setrgbcolor
+252 432 36 0 360 arc closepath fill
+360 432 36 0 360 arc closepath fill
+
+% Draw the smile
+1 setlinecap
+18 setlinewidth
+306 396 99 200 340 arc stroke
+
+% Print it!
+showpage
+%%EOF

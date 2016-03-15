@@ -1,0 +1,595 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd.conf(5)</title>
+</head>
+<body>
+<h1 class="title">cupsd.conf(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsd.conf - server configuration file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The
+<i>cupsd.conf</i>
+file configures the CUPS scheduler,
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
+It is normally located in the
+<i>/etc/cups</i>
+directory.
+<b>Note:</b> File, directory, and user configuration directives that used to be allowed in the <b>cupsd.conf</b> file are now stored in the
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
+file instead in order to prevent certain types of privilege escalation attacks.
+<p>Each line in the file can be a configuration directive, a blank line, or a comment.
+Configuration directives typically consist of a name and zero or more values separated by whitespace.
+The configuration directive name and values are case-insensitive.
+Comment lines start with the # character.
+<h3><a name="TOP_LEVEL_DIRECTIVES">Top-level Directives</a></h3>
+The following top-level directives are understood by
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
+<dl class="man">
+<dt><a name="AccessLogLevel"></a><b>AccessLogLevel config</b>
+<dd style="margin-left: 5.0em"><dt><b>AccessLogLevel actions</b>
+<dd style="margin-left: 5.0em"><dt><b>AccessLogLevel all</b>
+<dd style="margin-left: 5.0em">Specifies the logging level for the AccessLog file.
+The "config" level logs when printers and classes are added, deleted, or modified and when configuration files are accessed or updated.
+The "actions" level logs when print jobs are submitted, held, released, modified, or canceled, and any of the conditions for "config".
+The "all" level logs all requests.
+The default access log level is "actions".
+<dt><a name="AutoPurgeJobs"></a><b>AutoPurgeJobs Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>AutoPurgeJobs No</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies whether to purge job history data automatically when it is no longer required for quotas.
+The default is "No".
+<dt><a name="BrowseLocalProtocols"></a><b>BrowseLocalProtocols all</b>
+<dd style="margin-left: 5.0em"><dt><b>BrowseLocalProtocols dnssd</b>
+<dd style="margin-left: 5.0em"><dt><b>BrowseLocalProtocols none</b>
+<dd style="margin-left: 5.0em">Specifies which protocols to use for local printer sharing.
+The default is "dnssd" on systems that support Bonjour and "none" otherwise.
+<dt><a name="BrowseWebIF"></a><b>BrowseWebIF Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>BrowseWebIF No</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies whether the CUPS web interface is advertised.
+The default is "No".
+<dt><a name="Browsing"></a><b>Browsing Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>Browsing No</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies whether shared printers are advertised.
+The default is "No".
+<dt><a name="Classification"></a><b>Classification </b><i>banner</i>
+<dd style="margin-left: 5.0em"><br>
+Specifies the security classification of the server.
+Any valid banner name can be used, including "classified", "confidential", "secret", "topsecret", and "unclassified", or the banner can be omitted to disable secure printing functions.
+The default is no classification banner.
+<dt><a name="ClassifyOverride"></a><b>ClassifyOverride Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>ClassifyOverride No</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
+The default is "No".
+<dt><a name="DefaultAuthType"></a><b>DefaultAuthType Basic</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultAuthType Negotiate</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies the default type of authentication to use.
+The default is "Basic".
+<dt><a name="DefaultEncryption"></a><b>DefaultEncryption Never</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultEncryption IfRequested</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultEncryption Required</b>
+<dd style="margin-left: 5.0em">Specifies whether encryption will be used for authenticated requests.
+The default is "Required".
+<dt><a name="DefaultLanguage"></a><b>DefaultLanguage </b><i>locale</i>
+<dd style="margin-left: 5.0em">Specifies the default language to use for text and web content.
+The default is "en".
+<dt><a name="DefaultPaperSize"></a><b>DefaultPaperSize Auto</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultPaperSize None</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultPaperSize </b><i>sizename</i>
+<dd style="margin-left: 5.0em">Specifies the default paper size for new print queues. "Auto" uses a locale-specific default, while "None" specifies there is no default paper size.
+Specific size names are typically "Letter" or "A4".
+The default is "Auto".
+<dt><a name="DefaultPolicy"></a><b>DefaultPolicy </b><i>policy-name</i>
+<dd style="margin-left: 5.0em">Specifies the default access policy to use.
+The default access policy is "default".
+<dt><a name="DefaultShared"></a><b>DefaultShared Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>DefaultShared No</b>
+<dd style="margin-left: 5.0em">Specifies whether local printers are shared by default.
+The default is "Yes".
+<dt><a name="DirtyCleanInterval"></a><b>DirtyCleanInterval </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the delay for updating of configuration and state files.
+A value of 0 causes the update to happen as soon as possible, typically within a few milliseconds.
+The default value is "30".
+<dt><a name="ErrorPolicy"></a><b>ErrorPolicy abort-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
+<dt><b>ErrorPolicy retry-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
+<dt><b>ErrorPolicy retry-this-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+<dt><b>ErrorPolicy stop-printer</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
+<dt><a name="FilterLimit"></a><b>FilterLimit </b><i>limit</i>
+<dd style="margin-left: 5.0em">Specifies the maximum cost of filters that are run concurrently, which can be used to minimize disk, memory, and CPU resource problems.
+A limit of 0 disables filter limiting.
+An average print to a non-PostScript printer needs a filter limit of about 200.
+A PostScript printer needs about half that (100).
+Setting the limit below these thresholds will effectively limit the scheduler to printing a single job at any time.
+The default limit is "0".
+<dt><a name="FilterNice"></a><b>FilterNice </b><i>nice-value</i>
+<dd style="margin-left: 5.0em">Specifies the scheduling priority (
+<b>nice</b>(8)
+value) of filters that are run to print a job.
+The nice value ranges from 0, the highest priority, to 19, the lowest priority.
+The default is 0.
+<dt><a name="GSSServiceName"></a><b>GSSServiceName </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the service name when using Kerberos authentication.
+The default service name is "http."
+<dt><b>HostNameLookups On</b>
+<dd style="margin-left: 5.0em"><dt><a name="HostNameLookups"></a><b>HostNameLookups Off</b>
+<dd style="margin-left: 5.0em"><dt><b>HostNameLookups Double</b>
+<dd style="margin-left: 5.0em">Specifies whether to do reverse lookups on connecting clients.
+The "Double" setting causes
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+to verify that the hostname resolved from the address matches one of the addresses returned for that hostname.
+Double lookups also prevent clients with unregistered addresses from connecting to your server.
+The default is "Off" to avoid the potential server performance problems with hostname lookups.
+Only set this option to "On" or "Double" if absolutely required.
+<dt><a name="JobKillDelay"></a><b>JobKillDelay </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the number of seconds to wait before killing the filters and backend associated with a canceled or held job.
+The default is "30".
+<dt><a name="JobRetryInterval"></a><b>JobRetryInterval </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the interval between retries of jobs in seconds.
+This is typically used for fax queues but can also be used with normal print queues whose error policy is "retry-job" or "retry-current-job".
+The default is "30".
+<dt><a name="JobRetryLimit"></a><b>JobRetryLimit </b><i>count</i>
+<dd style="margin-left: 5.0em">Specifies the number of retries that are done for jobs.
+This is typically used for fax queues but can also be used with normal print queues whose error policy is "retry-job" or "retry-current-job".
+The default is "5".
+<dt><a name="KeepAlive"></a><b>KeepAlive Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>KeepAlive No</b>
+<dd style="margin-left: 5.0em">Specifies whether to support HTTP keep-alive connections.
+The default is "Yes".
+<dt><a name="KeepAliveTimeout"></a><b>KeepAliveTimeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies how long an idle client connection remains open.
+The default is "30".
+<dt><a name="LimitIPP"></a><b>&lt;Limit </b><i>operation </i>...<b>> </b>... <b>&lt;/Limit></b>
+<dd style="margin-left: 5.0em">Specifies the IPP operations that are being limited inside a Policy section. IPP operation names are listed below in the section "IPP OPERATIONS".
+<dt><a name="Limit"></a><b>&lt;Limit </b><i>method </i>...<b>> </b>... <b>&lt;/Limit></b>
+<dd style="margin-left: 5.0em"><dt><a name="LimitExcept"></a><b>&lt;LimitExcept </b><i>method </i>...<b>> </b>... <b>&lt;/LimitExcept></b>
+<dd style="margin-left: 5.0em">Specifies the HTTP methods that are being limited inside a Location section. HTTP method names are listed below in the section "HTTP METHODS".
+<dt><a name="LimitRequestBody"></a><b>LimitRequestBody </b><i>size</i>
+<dd style="margin-left: 5.0em">Specifies the maximum size of print files, IPP requests, and HTML form data.
+The default is "0" which disables the limit check.
+<dt><a name="Listen"></a><b>Listen </b><i>ipv4-address</i><b>:</b><i>port</i>
+<dd style="margin-left: 5.0em"><dt><b>Listen [</b><i>ipv6-address</i><b>]:</b><i>port</i>
+<dd style="margin-left: 5.0em"><dt><b>Listen *:</b><i>port</i>
+<dd style="margin-left: 5.0em"><dt><b>Listen </b><i>/path/to/domain/socket</i>
+<dd style="margin-left: 5.0em">Listens to the specified address and port or domain socket path for connections.
+Multiple Listen directives can be provided to listen on multiple addresses.
+The Listen directive is similar to the Port directive but allows you to restrict access to specific interfaces or networks.
+<dt><a name="ListenBackLog"></a><b>ListenBackLog </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the number of pending connections that will be allowed.
+This normally only affects very busy servers that have reached the MaxClients limit, but can also be triggered by large numbers of simultaneous connections.
+When the limit is reached, the operating system will refuse additional connections until the scheduler can accept the pending ones.
+The default is the OS-defined default limit, typically either "5" for older operating systems or "128" for newer operating systems.
+<dt><a name="Location"></a><b>&lt;Location </b><i>/path</i><b>> </b>... <b>&lt;/Location></b>
+<dd style="margin-left: 5.0em">Specifies access control for the named location.
+Paths are documented below in the section "LOCATION PATHS".
+<dt><a name="LogDebugHistory"></a><b>LogDebugHistory </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the number of debugging messages that are retained for logging if an error occurs in a print job. Debug messages are logged regardless of the LogLevel setting.
+<dt><a name="LogLevel"></a><b>LogLevel </b>none
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>emerg
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>alert
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>crit
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>error
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>warn
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>notice
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>info
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>debug
+<dd style="margin-left: 5.0em"><dt><b>LogLevel </b>debug2
+<dd style="margin-left: 5.0em">Specifies the level of logging for the ErrorLog file.
+The value "none" stops all logging while "debug2" logs everything.
+The default is "warn".
+<dt><a name="LogTimeFormat"></a><b>LogTimeFormat </b>standard
+<dd style="margin-left: 5.0em"><dt><b>LogTimeFormat </b>usecs
+<dd style="margin-left: 5.0em">Specifies the format of the date and time in the log files.
+The value "standard" is the default and logs whole seconds while "usecs" logs microseconds.
+<dt><a name="MaxClients"></a><b>MaxClients </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous clients that are allowed by the scheduler.
+The default is "100".
+<dt><a name="MaxClientPerHost"></a><b>MaxClientsPerHost </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous clients that are allowed from a
+single address.
+The default is the MaxClients value.
+<dt><a name="MaxCopies"></a><b>MaxCopies </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of copies that a user can print of each job.
+The default is "9999".
+<dt><a name="MaxHoldTime"></a><b>MaxHoldTime </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the maximum time a job may remain in the "indefinite" hold state before it is canceled.
+The default is "0" which disables cancellation of held jobs.
+<dt><a name="MaxJobs"></a><b>MaxJobs </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs that are allowed.
+Set to "0" to allow an unlimited number of jobs.
+The default is "500".
+<dt><a name="MaxJobsPerPrinter"></a><b>MaxJobsPerPrinter </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs that are allowed per printer.
+The default is "0" which allows up to MaxJobs jobs per printer.
+<dt><a name="MaxJobsPerUser"></a><b>MaxJobsPerUser </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs that are allowed per user.
+The default is "0" which allows up to MaxJobs jobs per user.
+<dt><a name="MaxJobTime"></a><b>MaxJobTime </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the maximum time a job may take to print before it is canceled.
+Set to "0" to disable cancellation of "stuck" jobs.
+The default is "10800" (3 hours).
+<dt><a name="MaxLogSize"></a><b>MaxLogSize </b><i>size</i>
+<dd style="margin-left: 5.0em">Specifies the maximum size of the log files before they are rotated.
+The value "0" disables log rotation.
+The default is "1048576" (1MB).
+<dt><a name="MultipleOperationTimeout"></a><b>MultipleOperationTimeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the maximum amount of time to allow between files in a multiple file print job.
+The default is "300" (5 minutes).
+<dt><a name="PageLogFormat"></a><b>PageLogFormat </b><i>format-string</i>
+<dd style="margin-left: 5.0em">Specifies the format of PageLog lines.
+Sequences beginning with percent (%) characters are replaced with the corresponding information, while all other characters are copied literally.
+The following percent sequences are recognized:
+<pre class="man">
+
+    "%%" inserts a single percent character.
+    "%{name}" inserts the value of the specified IPP attribute.
+    "%C" inserts the number of copies for the current page.
+    "%P" inserts the current page number.
+    "%T" inserts the current date and time in common log format.
+    "%j" inserts the job ID.
+    "%p" inserts the printer name.
+    "%u" inserts the username.
+
+</pre>
+The default is the empty string, which disables page logging.
+The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
+<dt><a name="PassEnv"></a><b>PassEnv </b><i>variable </i>[ ... <i>variable </i>]
+<dd style="margin-left: 5.0em">Passes the specified environment variable(s) to child processes.
+<dt><a name="Policy"></a><b>&lt;Policy </b><i>name</i><b>> </b>... <b>&lt;/Policy></b>
+<dd style="margin-left: 5.0em">Specifies access control for the named policy.
+<dt><a name="Port"></a><b>Port </b><i>number</i>
+<dd style="margin-left: 5.0em">Listens to the specified port number for connections.
+<dt><a name="PreserveJobFiles"></a><b>PreserveJobFiles Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>PreserveJobFiles No</b>
+<dd style="margin-left: 5.0em"><dt><b>PreserveJobFiles </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies whether job files (documents) are preserved after a job is printed.
+If a numeric value is specified, job files are preserved for the indicated number of seconds after printing.
+The default is "86400" (preserve 1 day).
+<dt><a name="PreserveJobHistory"></a><b>PreserveJobHistory Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>PreserveJobHistory No</b>
+<dd style="margin-left: 5.0em"><dt><b>PreserveJobHistory </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies whether the job history is preserved after a job is printed.
+If a numeric value is specified, the job history is preserved for the indicated number of seconds after printing.
+If "Yes", the job history is preserved until the MaxJobs limit is reached.
+The default is "Yes".
+<dt><a name="ReloadTimeout"></a><b>ReloadTimeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the amount of time to wait for job completion before restarting the scheduler.
+The default is "30".
+<dt><a name="RIPCache"></a><b>RIPCache </b><i>size</i>
+<dd style="margin-left: 5.0em">Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
+The default is "128m".
+<dt><a name="ServerAdmin"></a><b>ServerAdmin </b><i>email-address</i>
+<dd style="margin-left: 5.0em">Specifies the email address of the server administrator.
+The default value is "root@ServerName".
+<dt><a name="ServerAlias"></a><b>ServerAlias </b><i>hostname </i>[ ... <i>hostname </i>]
+<dd style="margin-left: 5.0em"><dt><b>ServerAlias *</b>
+<dd style="margin-left: 5.0em">The ServerAlias directive is used for HTTP Host header validation when clients connect to the scheduler from external interfaces.
+Using the special name "*" can expose your system to known browser-based DNS rebinding attacks, even when accessing sites through a firewall.
+If the auto-discovery of alternate names does not work, we recommend listing each alternate name with a ServerAlias directive instead of using "*".
+<dt><a name="ServerName"></a><b>ServerName </b><i>hostname</i>
+<dd style="margin-left: 5.0em">Specifies the fully-qualified hostname of the server.
+The default is the value reported by the
+<b>hostname</b>(1)
+command.
+<dt><a name="ServerTokens"></a><b>ServerTokens None</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens ProductOnly</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens Major</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens Minor</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens Minimal</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens OS</b>
+<dd style="margin-left: 5.0em"><dt><b>ServerTokens Full</b>
+<dd style="margin-left: 5.0em">Specifies what information is included in the Server header of HTTP responses.
+"None" disables the Server header.
+"ProductOnly" reports "CUPS".
+"Major" reports "CUPS 2".
+"Minor" reports "CUPS 2.0".
+"Minimal" reports "CUPS 2.0.0".
+"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the
+<b>uname</b>(1)
+command.
+"Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".
+The default is "Minimal".
+<dt><a name="SetEnv"></a><b>SetEnv </b><i>variable value</i>
+<dd style="margin-left: 5.0em">Set the specified environment variable to be passed to child processes.
+<dt><a name="SSLListen"></a><b>SSLListen </b><i>ipv4-address</i><b>:</b><i>port</i>
+<dd style="margin-left: 5.0em"><dt><b>SSLListen [</b><i>ipv6-address</i><b>]:</b><i>port</i>
+<dd style="margin-left: 5.0em"><dt><b>SSLListen *:</b><i>port</i>
+<dd style="margin-left: 5.0em">Listens on the specified address and port for encrypted connections.
+<dt><a name="SSLOptions"></a><b>SSLOptions </b>[<i>AllowRC4</i>] [<i>AllowSSL3</i>]
+<dd style="margin-left: 5.0em"><dt><b>SSLOptions None</b>
+<dd style="margin-left: 5.0em">Sets encryption options.
+By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
+The <i>AllowRC4</i> option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
+The <i>AllowSSL3</i> option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
+<dt><a name="SSLPort"></a><b>SSLPort </b><i>port</i>
+<dd style="margin-left: 5.0em">Listens on the specified port for encrypted connections.
+<dt><a name="StrictConformance"></a><b>StrictConformance Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>StrictConformance No</b>
+<dd style="margin-left: 5.0em">Specifies whether the scheduler requires clients to strictly adhere to the IPP specifications.
+The default is "No".
+<dt><a name="Timeout"></a><b>Timeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the HTTP request timeout.
+The default is "300" (5 minutes).
+<dt><a name="WebInterface"></a><b>WebInterface yes</b>
+<dd style="margin-left: 5.0em"><dt><b>WebInterface no</b>
+<dd style="margin-left: 5.0em">Specifies whether the web interface is enabled.
+The default is "No".
+</dl>
+<h3><a name="HTTP_METHOD_NAMES">Http Method Names</a></h3>
+The following HTTP methods are supported by
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
+<dl class="man">
+<dt>GET
+<dd style="margin-left: 5.0em">Used by a client to download icons and other printer resources and to access the CUPS web interface.
+<dt>HEAD
+<dd style="margin-left: 5.0em">Used by a client to get the type, size, and modification date of resources.
+<dt>OPTIONS
+<dd style="margin-left: 5.0em">Used by a client to establish a secure (SSL/TLS) connection.
+<dt>POST
+<dd style="margin-left: 5.0em">Used by a client to submit IPP requests and HTML forms from the CUPS web interface.
+<dt>PUT
+<dd style="margin-left: 5.0em">Used by a client to upload configuration files.
+</dl>
+<h3><a name="IPP_OPERATION_NAMES">Ipp Operation Names</a></h3>
+The following IPP operations are supported by
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
+<dl class="man">
+<dt>CUPS-Accept-Jobs
+<dd style="margin-left: 5.0em">Allows a printer to accept new jobs.
+<dt>CUPS-Add-Modify-Class
+<dd style="margin-left: 5.0em">Adds or modifies a printer class.
+<dt>CUPS-Add-Modify-Printer
+<dd style="margin-left: 5.0em">Adds or modifies a printer.
+<dt>CUPS-Authenticate-Job
+<dd style="margin-left: 5.0em">Releases a job that is held for authentication.
+<dt>CUPS-Delete-Class
+<dd style="margin-left: 5.0em">Deletes a printer class.
+<dt>CUPS-Delete-Printer
+<dd style="margin-left: 5.0em">Deletes a printer.
+<dt>CUPS-Get-Classes
+<dd style="margin-left: 5.0em">Gets a list of printer classes.
+<dt>CUPS-Get-Default
+<dd style="margin-left: 5.0em">Gets the server default printer or printer class.
+<dt>CUPS-Get-Devices
+<dd style="margin-left: 5.0em">Gets a list of devices that are currently available.
+<dt>CUPS-Get-Document
+<dd style="margin-left: 5.0em">Gets a document file for a job.
+<dt>CUPS-Get-PPD
+<dd style="margin-left: 5.0em">Gets a PPD file.
+<dt>CUPS-Get-PPDs
+<dd style="margin-left: 5.0em">Gets a list of installed PPD files.
+<dt>CUPS-Get-Printers
+<dd style="margin-left: 5.0em">Gets a list of printers.
+<dt>CUPS-Move-Job
+<dd style="margin-left: 5.0em">Moves a job.
+<dt>CUPS-Reject-Jobs
+<dd style="margin-left: 5.0em">Prevents a printer from accepting new jobs.
+<dt>CUPS-Set-Default
+<dd style="margin-left: 5.0em">Sets the server default printer or printer class.
+<dt>Cancel-Job
+<dd style="margin-left: 5.0em">Cancels a job.
+<dt>Cancel-Jobs
+<dd style="margin-left: 5.0em">Cancels one or more jobs.
+<dt>Cancel-My-Jobs
+<dd style="margin-left: 5.0em">Cancels one or more jobs creates by a user.
+<dt>Cancel-Subscription
+<dd style="margin-left: 5.0em">Cancels a subscription.
+<dt>Close-Job
+<dd style="margin-left: 5.0em">Closes a job that is waiting for more documents.
+<dt>Create-Job
+<dd style="margin-left: 5.0em">Creates a new job with no documents.
+<dt>Create-Job-Subscriptions
+<dd style="margin-left: 5.0em">Creates a subscription for job events.
+<dt>Create-Printer-Subscriptions
+<dd style="margin-left: 5.0em">Creates a subscription for printer events.
+<dt>Get-Job-Attributes
+<dd style="margin-left: 5.0em">Gets information about a job.
+<dt>Get-Jobs
+<dd style="margin-left: 5.0em">Gets a list of jobs.
+<dt>Get-Notifications
+<dd style="margin-left: 5.0em">Gets a list of event notifications for a subscription.
+<dt>Get-Printer-Attributes
+<dd style="margin-left: 5.0em">Gets information about a printer or printer class.
+<dt>Get-Subscription-Attributes
+<dd style="margin-left: 5.0em">Gets information about a subscription.
+<dt>Get-Subscriptions
+<dd style="margin-left: 5.0em">Gets a list of subscriptions.
+<dt>Hold-Job
+<dd style="margin-left: 5.0em">Holds a job from printing.
+<dt>Hold-New-Jobs
+<dd style="margin-left: 5.0em">Holds all new jobs from printing.
+<dt>Pause-Printer
+<dd style="margin-left: 5.0em">Stops processing of jobs by a printer or printer class.
+<dt>Pause-Printer-After-Current-Job
+<dd style="margin-left: 5.0em">Stops processing of jobs by a printer or printer class after the current job is finished.
+<dt>Print-Job
+<dd style="margin-left: 5.0em">Creates a new job with a single document.
+<dt>Purge-Jobs
+<dd style="margin-left: 5.0em">Cancels one or more jobs and deletes the job history.
+<dt>Release-Held-New-Jobs
+<dd style="margin-left: 5.0em">Allows previously held jobs to print.
+<dt>Release-Job
+<dd style="margin-left: 5.0em">Allows a job to print.
+<dt>Renew-Subscription
+<dd style="margin-left: 5.0em">Renews a subscription.
+<dt>Restart-Job
+<dd style="margin-left: 5.0em">Reprints a job, if possible.
+<dt>Send-Document
+<dd style="margin-left: 5.0em">Adds a document to a job.
+<dt>Set-Job-Attributes
+<dd style="margin-left: 5.0em">Changes job information.
+<dt>Set-Printer-Attributes
+<dd style="margin-left: 5.0em">Changes printer or printer class information.
+<dt>Validate-Job
+<dd style="margin-left: 5.0em">Validates options for a new job.
+</dl>
+<h3><a name="LOCATION_PATHS">Location Paths</a></h3>
+The following paths are commonly used when configuring
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
+<dl class="man">
+<dt>/
+<dd style="margin-left: 5.0em">The path for all get operations (get-printers, get-jobs, etc.)
+<dt>/admin
+<dd style="margin-left: 5.0em">The path for all administration operations (add-printer, delete-printer, start-printer, etc.)
+<dt>/admin/conf
+<dd style="margin-left: 5.0em">The path for access to the CUPS configuration files (cupsd.conf, client.conf, etc.)
+<dt>/admin/log
+<dd style="margin-left: 5.0em">The path for access to the CUPS log files (access_log, error_log, page_log)
+<dt>/classes
+<dd style="margin-left: 5.0em">The path for all printer classes
+<dt>/classes/name
+<dd style="margin-left: 5.0em">The resource for the named printer class
+<dt>/jobs
+<dd style="margin-left: 5.0em">The path for all jobs (hold-job, release-job, etc.)
+<dt>/jobs/id
+<dd style="margin-left: 5.0em">The path for the specified job.
+<dt>/printers
+<dd style="margin-left: 5.0em">The path for all printers
+<dt>/printers/name
+<dd style="margin-left: 5.0em">The path for the named printer
+<dt>/printers/name.png
+<dd style="margin-left: 5.0em">The icon file path for the named printer
+<dt>/printers/name.ppd
+<dd style="margin-left: 5.0em">The PPD file path for the named printer
+</dl>
+<h3><a name="DIRECTIVES_VALID_WITHIN_LOCATION_AND_LIMIT_SECTIONS">Directives Valid Within Location And Limit Sections</a></h3>
+The following directives may be placed inside Location and Limit sections in the <b>cupsd.conf</b> file:
+<dl class="man">
+<dt><b>Allow all</b>
+<dd style="margin-left: 5.0em"><dt><b>Allow none</b>
+<dd style="margin-left: 5.0em"><dt><b>Allow </b><i>host.domain.com</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow *.</b><i>domain.com</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow </b><i>ipv4-address</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow </b><i>ipv4-address</i><b>/</b><i>netmask</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow </b><i>ipv4-address</i><b>/</b><i>mm</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow [</b><i>ipv6-address</i><b>]</b>
+<dd style="margin-left: 5.0em"><dt><b>Allow [</b><i>ipv6-address</i><b>]/</b><i>mm</i>
+<dd style="margin-left: 5.0em"><dt><b>Allow @IF(</b><i>name</i><b>)</b>
+<dd style="margin-left: 5.0em"><dt><b>Allow @LOCAL</b>
+<dd style="margin-left: 5.0em">Allows access from the named hosts, domains, addresses, or interfaces.
+The Order directive controls whether Allow lines are evaluated before or after Deny lines.
+<dt><b>AuthType None</b>
+<dd style="margin-left: 5.0em"><dt><b>AuthType Basic</b>
+<dd style="margin-left: 5.0em"><dt><b>AuthType Default</b>
+<dd style="margin-left: 5.0em"><dt><b>AuthType Negotiate</b>
+<dd style="margin-left: 5.0em">Specifies the type of authentication required.
+The value "Default" corresponds to the DefaultAuthType value.
+<dt><b>Deny all</b>
+<dd style="margin-left: 5.0em"><dt><b>Deny none</b>
+<dd style="margin-left: 5.0em"><dt><b>Deny </b><i>host.domain.com</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny *.</b><i>domain.com</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny </b><i>ipv4-address</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny </b><i>ipv4-address</i><b>/</b><i>netmask</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny </b><i>ipv4-address</i><b>/</b><i>mm</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny [</b><i>ipv6-address</i><b>]</b>
+<dd style="margin-left: 5.0em"><dt><b>Deny [</b><i>ipv6-address</i><b>]/</b><i>mm</i>
+<dd style="margin-left: 5.0em"><dt><b>Deny @IF(</b><i>name</i><b>)</b>
+<dd style="margin-left: 5.0em"><dt><b>Deny @LOCAL</b>
+<dd style="margin-left: 5.0em">Denies access from the named hosts, domains, addresses, or interfaces.
+The Order directive controls whether Deny lines are evaluated before or after Allow lines.
+<dt><b>Encryption IfRequested</b>
+<dd style="margin-left: 5.0em"><dt><b>Encryption Never</b>
+<dd style="margin-left: 5.0em"><dt><b>Encryption Required</b>
+<dd style="margin-left: 5.0em">Specifies the level of encryption that is required for a particular location.
+The default value is "IfRequested".
+<dt><b>Order allow,deny</b>
+<dd style="margin-left: 5.0em">Specifies that access is denied by default. Allow lines are then processed followed by Deny lines to determine whether a client may access a particular resource.
+<dt><b>Order deny,allow</b>
+<dd style="margin-left: 5.0em">Specifies that access is allowed by default. Deny lines are then processed followed by Allow lines to determine whether a client may access a particular resource.
+<dt><b>Require group </b><i>group-name </i>[ <i>group-name </i>... ]
+<dd style="margin-left: 5.0em">Specifies that an authenticated user must be a member of one of the named groups.
+<dt><b>Require user {</b><i>user-name</i>|<b>@</b><i>group-name</i>} ...
+<dd style="margin-left: 5.0em">Specifies that an authenticated user must match one of the named users or be a member of one of the named groups.
+The group name "@SYSTEM" corresponds to the list of groups defined by the SystemGroup directive in the
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
+file.
+The group name "@OWNER" corresponds to the owner of the resource, for example the person that submitted a print job.
+<dt><b>Require valid-user</b>
+<dd style="margin-left: 5.0em">Specifies that any authenticated user is acceptable.
+<dt><b>Satisfy all</b>
+<dd style="margin-left: 5.0em">Specifies that all Allow, AuthType, Deny, Order, and Require conditions must be satisfied to allow access.
+<dt><b>Satisfy any</b>
+<dd style="margin-left: 5.0em">Specifies that any a client may access a resource if either the authentication (AuthType/Require) or address (Allow/Deny/Order) conditions are satisfied.
+For example, this can be used to require authentication only for remote accesses.
+</dl>
+<h3><a name="DIRECTIVES_VALID_WITHIN_POLICY_SECTIONS">Directives Valid Within Policy Sections</a></h3>
+The following directives may be placed inside Policy sections in the <b>cupsd.conf</b> file:
+<dl class="man">
+<dt><b>JobPrivateAccess all</b>
+<dd style="margin-left: 5.0em"><dt><b>JobPrivateAccess default</b>
+<dd style="margin-left: 5.0em"><dt><b>JobPrivateAccess </b>{<i>user</i>|<b>@</b><i>group</i>|<b>@ACL</b>|<b>@OWNER</b>|<b>@SYSTEM</b>} ...
+<dd style="margin-left: 5.0em">Specifies an access list for a job's private values.
+The "default" access list is "@OWNER @SYSTEM".
+"@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
+"@OWNER" maps to the job's owner.
+"@SYSTEM" maps to the groups listed for the SystemGroup directive in the
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
+file.
+<dt><b>JobPrivateValues all</b>
+<dd style="margin-left: 5.0em"><dt><b>JobPrivateValues default</b>
+<dd style="margin-left: 5.0em"><dt><b>JobPrivateValues none</b>
+<dd style="margin-left: 5.0em"><dt><b>JobPrivateValues </b><i>attribute-name </i>[ ... <i>attribute-name </i>]
+<dd style="margin-left: 5.0em">Specifies the list of job values to make private.
+The "default" values are "job-name", "job-originating-host-name", "job-originating-user-name", and "phone".
+<dt><b>SubscriptionPrivateAccess all</b>
+<dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateAccess default</b>
+<dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateAccess </b>{<i>user</i>|<b>@</b><i>group</i>|<b>@ACL</b>|<b>@OWNER</b>|<b>@SYSTEM</b>} ...
+<dd style="margin-left: 5.0em">Specifies an access list for a subscription's private values.
+The "default" access list is "@OWNER @SYSTEM".
+"@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
+"@OWNER" maps to the job's owner.
+"@SYSTEM" maps to the groups listed for the SystemGroup directive in the
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
+file.
+<dt><b>SubscriptionPrivateValues all</b>
+<dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateValues default</b>
+<dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateValues none</b>
+<dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateValues </b><i>attribute-name </i>[ ... <i>attribute-name </i>]
+<dd style="margin-left: 5.0em">Specifies the list of subscription values to make private.
+The "default" values are "notify-events", "notify-pull-method", "notify-recipient-uri", "notify-subscriber-user-name", and "notify-user-data".
+</dl>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The <b>cupsd.conf</b> file format is based on the Apache HTTP Server configuration file format.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Log everything with a maximum log file size of 32 megabytes:
+<pre class="man">
+
+    AccessLogLevel all
+    LogLevel debug2
+    MaxLogSize 32m
+
+</pre>
+Require authentication for accesses from outside the 10. network:
+<pre class="man">
+
+    &lt;Location />
+    Order allow,deny
+    Allow from 10./8
+    AuthType Basic
+    Require valid-user
+    Satisfy any
+    &lt;/Location>
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
+<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

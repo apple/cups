@@ -1,0 +1,1172 @@
+//
+// "$Id: sample.drv 12789 2015-07-20 14:51:28Z msweet $"
+//
+// Driver info file for CUPS-supplied PPDs.
+//
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 1993-2006 by Easy Software Products.
+//
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
+//
+
+// Include necessary files...
+#include <font.defs>
+#include <media.defs>
+#include <hp.h>
+#include <epson.h>
+#include <label.h>
+
+// Localizations are provided for all of the base languages supported by
+// CUPS...
+#po ar ""
+#po ca ""
+#po cs ""
+#po da ""
+#po de ""
+#po el ""
+#po es ""
+#po fi ""
+#po fr ""
+#po he ""
+#po hr ""
+#po hu ""
+#po id ""
+#po it ""
+#po ja ""
+#po ko ""
+#po ms ""
+#po no ""
+#po pl ""
+#po pt ""
+#po pt_PT ""
+#po ro ""
+#po ru ""
+#po sk ""
+#po sv ""
+#po th ""
+#po tr ""
+#po uk ""
+#po vi ""
+#po zh_CN ""
+#po zh_TW ""
+
+// MediaSize sizes used by label drivers...
+#media "w90h18/1.25x0.25\"" 90 18
+#media "w90h162/1.25x2.25\"" 90 162
+#media "w108h18/1.50x0.25\"" 108 18
+#media "w108h36/1.50x0.50\"" 108 36
+#media "w108h72/1.50x1.00\"" 108 72
+#media "w108h144/1.50x2.00\"" 108 144
+#media "w144h26/2.00x0.37\"" 144 26
+#media "w144h36/2.00x0.50\"" 144 36
+#media "w144h72/2.00x1.00\"" 144 72
+#media "w144h90/2.00x1.25\"" 144 90
+#media "w144h144/2.00x2.00\"" 144 144
+#media "w144h216/2.00x3.00\"" 144 216
+#media "w144h288/2.00x4.00\"" 144 288
+#media "w144h396/2.00x5.50\"" 144 396
+#media "w162h36/2.25x0.50\"" 162 36
+#media "w162h90/2.25x1.25\"" 162 90
+#media "w162h288/2.25x4.00\"" 162 288
+#media "w162h396/2.25x5.50\"" 162 396
+#media "w171h396/2.38x5.50\"" 171 396
+#media "w180h72/2.50x1.00\"" 180 72
+#media "w180h144/2.50x2.00\"" 180 144
+#media "w198h90/2.75x1.25\"" 198 90
+#media "w209h72/2.9 x 1\"" 209 72
+#media "w216h72/3.00x1.00\"" 216 72
+#media "w216h90/3.00x1.25\"" 216 90
+#media "w216h144/3.00x2.00\"" 216 144
+#media "w216h216/3.00x3.00\"" 216 216
+#media "w216h360/3.00x5.00\"" 216 360
+#media "w234h144/3.25x2.00\"" 234 144
+#media "w234h360/3.25x5.00\"" 234 360
+#media "w234h396/3.25x5.50\"" 234 396
+#media "w234h419/3.25x5.83\"" 234 419
+#media "w234h563/3.25x7.83\"" 234 563
+#media "w252h72/3.50x1.00\"" 252 72
+#media "w288h72/4.00x1.00\"" 288 72
+#media "w288h144/4.00x2.00\"" 288 144
+#media "w288h180/4.00x2.50\"" 288 180
+#media "w288h216/4.00x3.00\"" 288 216
+#media "w288h288/4.00x4.00\"" 288 288
+#media "w288h360/4.00x5.00\"" 288 360
+#media "w288h432/4.00x6.00\"" 288 432
+#media "w288h468/4.00x6.50\"" 288 468
+#media "w288h936/4.00x13.00\"" 288 936
+#media "w432h72/6.00x1.00\"" 432 72
+#media "w432h144/6.00x2.00\"" 432 144
+#media "w432h216/6.00x3.00\"" 432 216
+#media "w432h288/6.00x4.00\"" 432 288
+#media "w432h360/6.00x5.00\"" 432 360
+#media "w432h432/6.00x6.00\"" 432 432
+#media "w432h468/6.00x6.50\"" 432 468
+#media "w576h72/8.00x1.00\"" 576 72
+#media "w576h144/8.00x2.00\"" 576 144
+#media "w576h216/8.00x3.00\"" 576 216
+#media "w576h288/8.00x4.00\"" 576 288
+#media "w576h360/8.00x5.00\"" 576 360
+#media "w576h432/8.00x6.00\"" 576 432
+#media "w576h468/8.00x6.50\"" 576 468
+
+// Common stuff for all drivers...
+Attribute "cupsVersion" "" "2.1"
+Attribute "FileSystem" "" "False"
+Attribute "LandscapeOrientation" "" "Plus90"
+Attribute "TTRasterizer" "" "Type42"
+
+Copyright "Copyright 2007-2014 by Apple Inc."
+Copyright "Copyright 1997-2007 by Easy Software Products."
+Copyright ""
+Copyright "These coded instructions, statements, and computer programs are the"
+Copyright "property of Apple Inc. and are protected by Federal copyright"
+Copyright "law.  Distribution and use rights are outlined in the file \"LICENSE.txt\""
+Copyright "which should have been included with this file.  If this file is"
+Copyright "file is missing or damaged, see the license at \"http://www.cups.org/\"."
+
+Font *
+
+Version "2.1"
+
+// Dymo Label Printer
+{
+  Manufacturer "Dymo"
+  ModelName "Label Printer"
+  Attribute NickName "" "Dymo Label Printer"
+  PCFileName "dymo.ppd"
+  DriverType label
+  ModelNumber $DYMO_3x0
+  Throughput 8
+  ManualCopies Yes
+  ColorDevice No
+
+  HWMargins 2 14.9 2 14.9
+
+  *MediaSize w81h252
+  MediaSize w101h252
+  MediaSize w54h144
+  MediaSize w167h288
+  MediaSize w162h540
+  MediaSize w162h504
+  MediaSize w41h248
+  MediaSize w41h144
+  MediaSize w153h198
+
+  Resolution k 1 0 0 0 136dpi
+  Resolution k 1 0 0 0 203dpi
+  *Resolution k 1 0 0 0 300dpi
+
+  Darkness 0 Light
+  Darkness 1 Medium
+  *Darkness 2 Normal
+  Darkness 3 Dark
+}
+
+// Epson
+{
+  Manufacturer "Epson"
+  DriverType epson
+  ManualCopies Yes
+  ColorDevice No
+  Throughput 1
+
+  HWMargins 0 0 0 0
+  VariablePaperSize Yes
+  MinSize 36 36
+  MaxSize 1080 86400
+
+  // Epson 24-Pin Series
+  {
+    ModelName "24-Pin Series"
+    Attribute NickName "" "Epson 24-Pin Series"
+    PCFileName "epson24.ppd"
+    ModelNumber $EPSON_24PIN
+
+    HWMargins 18 18 18 18
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize A4
+    MediaSize FanFoldUS
+
+    Resolution k 1 8 0 0 60dpi
+    *Resolution k 1 8 0 0 120x60dpi
+    Resolution k 1 24 0 0 180dpi
+    Resolution k 1 24 0 0 360x180dpi
+    Resolution k 1 48 0 0 360dpi
+  }
+
+  // Epson 9-Pin Series
+  {
+    ModelName "9-Pin Series"
+    Attribute NickName "" "Epson 9-Pin Series"
+    PCFileName "epson9.ppd"
+    ModelNumber $EPSON_9PIN
+    ColorDevice No
+
+    HWMargins 18 18 18 18
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize A4
+    MediaSize FanFoldUS
+
+    Resolution k 1 8 0 0 60x72dpi
+    *Resolution k 1 8 0 0 120x72dpi
+    Resolution k 1 8 0 0 240x72dpi
+  }
+}
+
+// Generic drivers
+{
+  Manufacturer "Generic"
+
+  // Generic PCL Laser Printer
+  {
+    DriverType hp
+
+    ModelName "PCL Laser Printer"
+    Attribute NickName "" "Generic PCL Laser Printer"
+    PCFileName "generpcl.ppd"
+    Throughput 8
+    ModelNumber $HP_LASERJET
+    ColorDevice No
+    Attribute 1284DeviceID "" "CMD:PCL;"
+
+    UIConstraints "*Duplex  *Option1 False"
+    UIConstraints "*PageSize A3 *InputSlot Envelope"
+    UIConstraints "*PageSize A4 *InputSlot Envelope"
+    UIConstraints "*PageSize A5 *InputSlot Envelope"
+    UIConstraints "*PageSize B5 *InputSlot Envelope"
+    UIConstraints "*PageSize Executive *InputSlot Envelope"
+    UIConstraints "*PageSize Legal *InputSlot Envelope"
+    UIConstraints "*PageSize Letter *InputSlot Envelope"
+    UIConstraints "*PageSize Tabloid *InputSlot Envelope"
+
+    HWMargins 18 12 18 12
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    *Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    *InputSlot 0 "Default/Printer Default"
+    InputSlot 8 "Tray1/Tray 1"
+    InputSlot 1 "Tray2/Tray 2"
+    InputSlot 4 "Tray3/Tray 3"
+    InputSlot 5 "Tray4/Tray 4"
+    InputSlot 2 "Manual/Manual Feed"
+    InputSlot 3 "Envelope/Envelope Feed"
+
+    Duplex Yes
+    Installable "Option1/Duplexer"
+  }
+
+  // Generic PostScript Printer
+  {
+    DriverType ps
+
+    ModelName "PostScript Printer"
+    Attribute NickName "" "Generic PostScript Printer"
+    PCFileName "generic.ppd"
+    Throughput 8
+    ColorDevice Yes
+    Attribute PSVersion "" "(2016.0) 0"
+    Attribute LanguageLevel "" 2
+    Attribute 1284DeviceID "" "CMD:PS;"
+
+    UIConstraints "*Duplex  *Option1 False"
+
+    HWMargins 12 12 12 12
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    Option "InputSlot/Media Source" PickOne AnySetup 10
+      *Choice "Default/Printer Default" ""
+      Choice "Upper/Cassette" "<</ManualFeed false>>setpagedevice"
+      Choice "Manual/Manual Feed" "<</ManualFeed true>>setpagedevice"
+
+    Duplex Yes
+    Installable "Option1/Duplexer"
+    Attribute "?Option1" "" "save currentpagedevice/Duplex known{(True)}{(False)}ifelse = flush restore"
+  }
+}
+
+// HP
+{
+  Manufacturer "HP"
+  DriverType hp
+
+  // HP DeskJet Series
+  {
+    ModelName "DeskJet Series"
+    Attribute NickName "" "HP DeskJet Series"
+    PCFileName "deskjet.ppd"
+    ModelNumber $HP_DESKJET
+    ManualCopies Yes
+    ColorDevice Yes
+    Throughput 1
+    Attribute 1284DeviceID "" "MFG:HP;MDL:HP DeskJet;CMD:PCL;"
+
+    UIConstraints "*PageSize A3 *InputSlot Envelope"
+    UIConstraints "*PageSize A4 *InputSlot Envelope"
+    UIConstraints "*PageSize A5 *InputSlot Envelope"
+    UIConstraints "*PageSize B5 *InputSlot Envelope"
+    UIConstraints "*PageSize Executive *InputSlot Envelope"
+    UIConstraints "*PageSize Legal *InputSlot Envelope"
+    UIConstraints "*PageSize Letter *InputSlot Envelope"
+    UIConstraints "*PageSize Tabloid *InputSlot Envelope"
+
+    HWMargins 18 36 18 36
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    ColorModel Gray/Grayscale k chunky 2
+    ColorModel RGB/Color cmy banded 2
+    *ColorModel CMYK kcmy banded 2
+
+    Resolution - 1 0 0 0 150dpi
+    *Resolution - 1 0 0 0 300dpi
+    Resolution - 1 0 0 0 600dpi
+
+    *InputSlot 1 Tray
+    InputSlot 2 "Manual/Manual Feed"
+    InputSlot 3 "Envelope/Envelope Feed"
+
+    *MediaType 0 "Plain/Plain Paper"
+    MediaType 1 "Bond/Bond Paper"
+    MediaType 2 "Special/Special Paper"
+    MediaType 3 Transparency
+    MediaType 4 "Glossy/Glossy Paper"
+  }
+
+  // HP LaserJet Series PCL 4/5
+  {
+    ModelName "LaserJet Series PCL 4/5"
+    Attribute NickName "" "HP LaserJet Series PCL 4/5"
+    PCFileName "laserjet.ppd"
+    Throughput 8
+    ModelNumber $HP_LASERJET
+    ColorDevice No
+    Attribute 1284DeviceID "" "MFG:HP;MDL:HP LaserJet;CMD:PCL;"
+
+    UIConstraints "*Duplex  *Option1 False"
+    UIConstraints "*PageSize A3 *InputSlot Envelope"
+    UIConstraints "*PageSize A4 *InputSlot Envelope"
+    UIConstraints "*PageSize A5 *InputSlot Envelope"
+    UIConstraints "*PageSize B5 *InputSlot Envelope"
+    UIConstraints "*PageSize Executive *InputSlot Envelope"
+    UIConstraints "*PageSize Legal *InputSlot Envelope"
+    UIConstraints "*PageSize Letter *InputSlot Envelope"
+    UIConstraints "*PageSize Tabloid *InputSlot Envelope"
+
+    HWMargins 18 36 18 36
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    Resolution k 1 0 0 0 150dpi
+    *Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    *InputSlot 0 "Default/Printer Default"
+    InputSlot 8 "Tray1/Tray 1"
+    InputSlot 1 "Tray2/Tray 2"
+    InputSlot 4 "Tray3/Tray 3"
+    InputSlot 5 "Tray4/Tray 4"
+    InputSlot 2 "Manual/Manual Feed"
+    InputSlot 3 "Envelope/Envelope Feed"
+
+    Duplex Yes
+    Installable "Option1/Duplexer"
+  }
+}
+
+// Intellitech IntelliBar Series Label Printer
+{
+  Manufacturer "Intellitech"
+  ModelName "IntelliBar Label Printer"
+  Attribute ShortNickName "" "IntelliBar Label Printer"
+  PCFileName "intelbar.ppd"
+  DriverType label
+  ModelNumber $INTELLITECH_PCL
+  Throughput 8
+  ColorDevice No
+
+  HWMargins 0 5.76 0 5.76
+  VariablePaperSize Yes
+  MinSize 36 36
+  MaxSize 630 7128
+
+  UIConstraints "*inPrintMode Standard *inCutInterval"
+  UIConstraints "*inPrintMode Tear *inCutInterval"
+  UIConstraints "*inPrintMode Standard *inTearInterval"
+  UIConstraints "*inPrintMode Cut *inTearInterval"
+
+  *MediaSize w288h432
+
+  *Resolution k 1 0 0 0 300dpi
+
+  Group "PrinterSettings/Printer Settings"
+    Option "inPrintDensity/Print Density" PickOne DocumentSetup 20.0
+      *Choice "Default/Printer Default" "<</cupsCompression -1>>setpagedevice"
+      Choice "-15/-15" "<</cupsCompression 0>>setpagedevice"
+      Choice "-14/-14" "<</cupsCompression 3>>setpagedevice"
+      Choice "-13/-13" "<</cupsCompression 6>>setpagedevice"
+      Choice "-12/-12" "<</cupsCompression 10>>setpagedevice"
+      Choice "-11/-11" "<</cupsCompression 13>>setpagedevice"
+      Choice "-10/-10" "<</cupsCompression 16>>setpagedevice"
+      Choice "-9/-9" "<</cupsCompression 20>>setpagedevice"
+      Choice "-8/-8" "<</cupsCompression 23>>setpagedevice"
+      Choice "-7/-7" "<</cupsCompression 26>>setpagedevice"
+      Choice "-6/-6" "<</cupsCompression 30>>setpagedevice"
+      Choice "-5/-5" "<</cupsCompression 33>>setpagedevice"
+      Choice "-4/-4" "<</cupsCompression 36>>setpagedevice"
+      Choice "-3/-3" "<</cupsCompression 40>>setpagedevice"
+      Choice "-2/-2" "<</cupsCompression 43>>setpagedevice"
+      Choice "-1/-1" "<</cupsCompression 46>>setpagedevice"
+      Choice "0/0" "<</cupsCompression 50>>setpagedevice"
+      Choice "1/1" "<</cupsCompression 53>>setpagedevice"
+      Choice "2/2" "<</cupsCompression 56>>setpagedevice"
+      Choice "3/3" "<</cupsCompression 60>>setpagedevice"
+      Choice "4/4" "<</cupsCompression 63>>setpagedevice"
+      Choice "5/5" "<</cupsCompression 66>>setpagedevice"
+      Choice "6/6" "<</cupsCompression 70>>setpagedevice"
+      Choice "7/7" "<</cupsCompression 73>>setpagedevice"
+      Choice "8/8" "<</cupsCompression 76>>setpagedevice"
+      Choice "9/9" "<</cupsCompression 80>>setpagedevice"
+      Choice "10/10" "<</cupsCompression 83>>setpagedevice"
+      Choice "11/11" "<</cupsCompression 86>>setpagedevice"
+      Choice "12/12" "<</cupsCompression 90>>setpagedevice"
+      Choice "13/13" "<</cupsCompression 93>>setpagedevice"
+      Choice "14/14" "<</cupsCompression 96>>setpagedevice"
+      Choice "15/15" "<</cupsCompression 100>>setpagedevice"
+    Option "inPrintRate/Print Speed" PickOne DocumentSetup 20.0
+      *Choice "Default/Printer Default" "<</cupsRowFeed 0>>setpagedevice"
+      Choice "15/15 mm/sec." "<</cupsRowFeed 15>>setpagedevice"
+      Choice "20/20 mm/sec." "<</cupsRowFeed 20>>setpagedevice"
+      Choice "30/30 mm/sec." "<</cupsRowFeed 30>>setpagedevice"
+      Choice "40/40 mm/sec." "<</cupsRowFeed 40>>setpagedevice"
+      Choice "60/60 mm/sec." "<</cupsRowFeed 60>>setpagedevice"
+      Choice "80/80 mm/sec." "<</cupsRowFeed 80>>setpagedevice"
+      Choice "100/100 mm/sec." "<</cupsRowFeed 100>>setpagedevice"
+      Choice "120/120 mm/sec." "<</cupsRowFeed 120>>setpagedevice"
+      Choice "150/150 mm/sec." "<</cupsRowFeed 150>>setpagedevice"
+      Choice "200/200 mm/sec." "<</cupsRowFeed 200>>setpagedevice"
+      Choice "250/250 mm/sec." "<</cupsRowFeed 250>>setpagedevice"
+      Choice "300/300 mm/sec." "<</cupsRowFeed 300>>setpagedevice"
+    Option "inPrintMode/Print Mode" PickOne DocumentSetup 20.0
+      *Choice "Standard/Standard" ""
+      Choice "Tear/Tear" ""
+      Choice "Cut/Cut" ""
+    Option "inTearInterval/Print and Tear" PickOne DocumentSetup 20.0
+      *Choice "None/Disabled" "<</cupsRowCount 0>>setpagedevice"
+      Choice "1/Every Label" "<</cupsRowCount 1>>setpagedevice"
+      Choice "2/Every 2 Labels" "<</cupsRowCount 2>>setpagedevice"
+      Choice "3/Every 3 Labels" "<</cupsRowCount 3>>setpagedevice"
+      Choice "4/Every 4 Labels" "<</cupsRowCount 4>>setpagedevice"
+      Choice "5/Every 5 Labels" "<</cupsRowCount 5>>setpagedevice"
+      Choice "6/Every 6 Labels" "<</cupsRowCount 6>>setpagedevice"
+      Choice "7/Every 7 Labels" "<</cupsRowCount 7>>setpagedevice"
+      Choice "8/Every 8 Labels" "<</cupsRowCount 8>>setpagedevice"
+      Choice "9/Every 9 Labels" "<</cupsRowCount 9>>setpagedevice"
+      Choice "10/Every 10 Labels" "<</cupsRowCount 10>>setpagedevice"
+      Attribute CustominTearInterval True "<</cupsRowCount 2 1 roll>>setpagedevice"
+      Attribute ParamCustominTearInterval Interval "1 int 1 99"
+    Option "inCutInterval/Print and Cut" PickOne DocumentSetup 20.0
+      *Choice "None/Disabled" "<</cupsRowStep 0>>setpagedevice"
+      Choice "1/Every Label" "<</cupsRowStep 1>>setpagedevice"
+      Choice "2/Every 2 Labels" "<</cupsRowStep 2>>setpagedevice"
+      Choice "3/Every 3 Labels" "<</cupsRowStep 3>>setpagedevice"
+      Choice "4/Every 4 Labels" "<</cupsRowStep 4>>setpagedevice"
+      Choice "5/Every 5 Labels" "<</cupsRowStep 5>>setpagedevice"
+      Choice "6/Every 6 Labels" "<</cupsRowStep 6>>setpagedevice"
+      Choice "7/Every 7 Labels" "<</cupsRowStep 7>>setpagedevice"
+      Choice "8/Every 8 Labels" "<</cupsRowStep 8>>setpagedevice"
+      Choice "9/Every 9 Labels" "<</cupsRowStep 9>>setpagedevice"
+      Choice "10/Every 10 Labels" "<</cupsRowStep 10>>setpagedevice"
+      Attribute CustominCutInterval True "<</cupsRowStep 2 1 roll>>setpagedevice"
+      Attribute ParamCustominCutInterval Interval "1 int 1 99"
+}
+
+// Oki
+{
+  Manufacturer "Oki"
+  DriverType epson
+  ManualCopies Yes
+  ColorDevice No
+  Throughput 1
+
+  HWMargins 18 18 18 18
+  *MediaSize Letter
+  MediaSize Legal
+  MediaSize A4
+  MediaSize FanFoldUS
+
+  HWMargins 0 0 0 0
+  VariablePaperSize Yes
+  MinSize 36 36
+  MaxSize 1080 86400
+
+  // Oki 24-Pin Series
+  {
+    ModelName "24-Pin Series"
+    Attribute NickName "" "Oki 24-Pin Series"
+    PCFileName "okidat24.ppd"
+    ModelNumber $EPSON_24PIN
+
+    Resolution k 1 8 0 0 60dpi
+    *Resolution k 1 8 0 0 120x60dpi
+    Resolution k 1 24 0 0 180dpi
+    Resolution k 1 24 0 0 360x180dpi
+    Resolution k 1 48 0 0 360dpi
+  }
+
+  // Oki 9-Pin Series
+  {
+    ModelName "9-Pin Series"
+    Attribute NickName "" "Oki 9-Pin Series"
+    PCFileName "okidata9.ppd"
+    ModelNumber $EPSON_9PIN
+    ColorDevice No
+
+    Resolution k 1 8 0 0 60x72dpi
+    *Resolution k 1 8 0 0 120x72dpi
+    Resolution k 1 8 0 0 240x72dpi
+  }
+}
+
+
+// Zebra
+{
+  Manufacturer "Zebra"
+  DriverType label
+  Throughput 8
+  ColorDevice False
+
+  // Zebra CPCL Label Printer
+  {
+    ModelName "CPCL Label Printer"
+    Attribute NickName "" "Zebra CPCL Label Printer"
+    PCFileName "zebracpl.ppd"
+    ModelNumber $ZEBRA_CPCL
+
+    HWMargins 0 0 0 0
+    MediaSize w144h72
+    MediaSize w144h90
+    MediaSize w144h144
+    MediaSize w144h216
+    MediaSize w209h72
+
+    HWMargins 0 0 1 0
+    MediaSize w288h144
+    MediaSize w288h216
+    MediaSize w288h288
+    *MediaSize w288h360
+    MediaSize w288h432
+
+    VariablePaperSize Yes
+    HWMargins 0 0 1 0
+    MinSize 36 36
+    MaxSize 288 3600
+
+    *Resolution k 1 0 0 0 203dpi
+
+    Group "General/General"
+      Option "zeMediaTracking/Media Tracking" PickOne AnySetup 20.0
+	Choice "Continuous/Continuous" ""
+	*Choice "Web/Non-continuous (Web sensing)" ""
+	Choice "Mark/Non-continuous (Mark sensing)" ""
+
+    Group "PrinterSettings/Printer Settings"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
+	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
+	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
+	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
+	Choice "4/4" "<</cupsCompression 14>>setpagedevice"
+	Choice "5/5" "<</cupsCompression 17>>setpagedevice"
+	Choice "6/6" "<</cupsCompression 20>>setpagedevice"
+	Choice "7/7" "<</cupsCompression 24>>setpagedevice"
+	Choice "8/8" "<</cupsCompression 27>>setpagedevice"
+	Choice "9/9" "<</cupsCompression 30>>setpagedevice"
+	Choice "10/10" "<</cupsCompression 34>>setpagedevice"
+	Choice "11/11" "<</cupsCompression 37>>setpagedevice"
+	Choice "12/12" "<</cupsCompression 40>>setpagedevice"
+	Choice "13/13" "<</cupsCompression 44>>setpagedevice"
+	Choice "14/14" "<</cupsCompression 47>>setpagedevice"
+	Choice "15/15" "<</cupsCompression 50>>setpagedevice"
+	Choice "16/16" "<</cupsCompression 54>>setpagedevice"
+	Choice "17/17" "<</cupsCompression 57>>setpagedevice"
+	Choice "18/18" "<</cupsCompression 60>>setpagedevice"
+	Choice "19/19" "<</cupsCompression 64>>setpagedevice"
+	Choice "20/20" "<</cupsCompression 67>>setpagedevice"
+	Choice "21/21" "<</cupsCompression 70>>setpagedevice"
+	Choice "22/22" "<</cupsCompression 74>>setpagedevice"
+	Choice "23/23" "<</cupsCompression 77>>setpagedevice"
+	Choice "24/24" "<</cupsCompression 80>>setpagedevice"
+	Choice "25/25" "<</cupsCompression 84>>setpagedevice"
+	Choice "26/26" "<</cupsCompression 87>>setpagedevice"
+	Choice "27/27" "<</cupsCompression 90>>setpagedevice"
+	Choice "28/28" "<</cupsCompression 94>>setpagedevice"
+	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
+	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
+      Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
+	*Choice "Default/Printer Default" ""
+	Choice "1/1 inch/sec." ""
+	Choice "2/2 inches/sec." ""
+	Choice "3/3 inches/sec." ""
+	Choice "4/4 inches/sec." ""
+      Option "zeTearOffPosition/Tear-Off Adjust Position" PickOne AnySetup 20.0
+	*Choice "1000/Printer Default" "<</AdvanceDistance 1000>>setpagedevice"
+	Choice "-120/-120" "<</AdvanceDistance -120>>setpagedevice"
+	Choice "-115/-115" "<</AdvanceDistance -115>>setpagedevice"
+	Choice "-110/-110" "<</AdvanceDistance -110>>setpagedevice"
+	Choice "-105/-105" "<</AdvanceDistance -105>>setpagedevice"
+	Choice "-100/-100" "<</AdvanceDistance -100>>setpagedevice"
+	Choice "-95/-95" "<</AdvanceDistance -95>>setpagedevice"
+	Choice "-90/-90" "<</AdvanceDistance -90>>setpagedevice"
+	Choice "-85/-85" "<</AdvanceDistance -85>>setpagedevice"
+	Choice "-80/-80" "<</AdvanceDistance -80>>setpagedevice"
+	Choice "-75/-75" "<</AdvanceDistance -75>>setpagedevice"
+	Choice "-70/-70" "<</AdvanceDistance -70>>setpagedevice"
+	Choice "-65/-65" "<</AdvanceDistance -65>>setpagedevice"
+	Choice "-60/-60" "<</AdvanceDistance -60>>setpagedevice"
+	Choice "-55/-55" "<</AdvanceDistance -55>>setpagedevice"
+	Choice "-50/-50" "<</AdvanceDistance -50>>setpagedevice"
+	Choice "-45/-45" "<</AdvanceDistance -45>>setpagedevice"
+	Choice "-40/-40" "<</AdvanceDistance -40>>setpagedevice"
+	Choice "-35/-35" "<</AdvanceDistance -35>>setpagedevice"
+	Choice "-30/-30" "<</AdvanceDistance -30>>setpagedevice"
+	Choice "-25/-25" "<</AdvanceDistance -25>>setpagedevice"
+	Choice "-20/-20" "<</AdvanceDistance -20>>setpagedevice"
+	Choice "-15/-15" "<</AdvanceDistance -15>>setpagedevice"
+	Choice "-10/-10" "<</AdvanceDistance -10>>setpagedevice"
+	Choice "-5/-5" "<</AdvanceDistance -5>>setpagedevice"
+	Choice "0/0" "<</AdvanceDistance 0>>setpagedevice"
+	Choice "5/5" "<</AdvanceDistance 5>>setpagedevice"
+	Choice "10/10" "<</AdvanceDistance 10>>setpagedevice"
+	Choice "15/15" "<</AdvanceDistance 15>>setpagedevice"
+	Choice "20/20" "<</AdvanceDistance 20>>setpagedevice"
+	Choice "25/25" "<</AdvanceDistance 25>>setpagedevice"
+	Choice "30/30" "<</AdvanceDistance 30>>setpagedevice"
+	Choice "35/35" "<</AdvanceDistance 35>>setpagedevice"
+	Choice "40/40" "<</AdvanceDistance 40>>setpagedevice"
+	Choice "45/45" "<</AdvanceDistance 45>>setpagedevice"
+	Choice "50/50" "<</AdvanceDistance 50>>setpagedevice"
+	Choice "55/55" "<</AdvanceDistance 55>>setpagedevice"
+	Choice "60/60" "<</AdvanceDistance 60>>setpagedevice"
+	Choice "65/65" "<</AdvanceDistance 65>>setpagedevice"
+	Choice "70/70" "<</AdvanceDistance 70>>setpagedevice"
+	Choice "75/75" "<</AdvanceDistance 75>>setpagedevice"
+	Choice "80/80" "<</AdvanceDistance 80>>setpagedevice"
+	Choice "85/85" "<</AdvanceDistance 85>>setpagedevice"
+	Choice "90/90" "<</AdvanceDistance 90>>setpagedevice"
+	Choice "95/95" "<</AdvanceDistance 95>>setpagedevice"
+	Choice "100/100" "<</AdvanceDistance 100>>setpagedevice"
+	Choice "105/105" "<</AdvanceDistance 105>>setpagedevice"
+	Choice "110/110" "<</AdvanceDistance 110>>setpagedevice"
+	Choice "115/115" "<</AdvanceDistance 115>>setpagedevice"
+	Choice "120/120" "<</AdvanceDistance 120>>setpagedevice"
+      Option "zeErrorReprint/Reprint After Error" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
+	Choice "Always/Always" ""
+	Choice "Never/Never" ""
+  }
+
+  // Zebra EPL1 Label Printer
+  {
+    ModelName "EPL1 Label Printer"
+    Attribute NickName "" "Zebra EPL1 Label Printer"
+    PCFileName "zebraep1.ppd"
+    ModelNumber $ZEBRA_EPL_LINE
+
+    HWMargins 0 0 0 0
+    VariablePaperSize Yes
+    MinSize 36 36
+    MaxSize 288 3600
+
+    MediaSize w90h18
+    MediaSize w90h162
+    MediaSize w108h18
+    MediaSize w108h36
+    MediaSize w108h72
+    MediaSize w108h144
+    MediaSize w144h26
+    MediaSize w144h36
+    MediaSize w144h72
+    MediaSize w144h90
+    MediaSize w144h288
+    MediaSize w144h396
+    MediaSize w162h36
+    MediaSize w162h90
+    MediaSize w162h288
+    MediaSize w162h396
+    MediaSize w171h396
+    MediaSize w180h72
+    MediaSize w180h144
+    MediaSize w198h90
+    MediaSize w216h72
+    MediaSize w216h90
+    MediaSize w216h144
+    MediaSize w216h216
+    MediaSize w216h360
+    MediaSize w234h144
+    MediaSize w234h360
+    MediaSize w234h396
+    MediaSize w234h419
+    MediaSize w234h563
+    MediaSize w252h72
+    MediaSize w288h72
+    MediaSize w288h144
+    MediaSize w288h180
+    MediaSize w288h216
+    MediaSize w288h288
+    *MediaSize w288h360
+    MediaSize w288h432
+    MediaSize w288h468
+    MediaSize w288h936
+
+    *Resolution k 1 0 0 0 203dpi
+    Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    Group "PrinterSettings/Printer Settings"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
+	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
+	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
+	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
+	Choice "4/4" "<</cupsCompression 14>>setpagedevice"
+	Choice "5/5" "<</cupsCompression 17>>setpagedevice"
+	Choice "6/6" "<</cupsCompression 20>>setpagedevice"
+	Choice "7/7" "<</cupsCompression 24>>setpagedevice"
+	Choice "8/8" "<</cupsCompression 27>>setpagedevice"
+	Choice "9/9" "<</cupsCompression 30>>setpagedevice"
+	Choice "10/10" "<</cupsCompression 34>>setpagedevice"
+	Choice "11/11" "<</cupsCompression 37>>setpagedevice"
+	Choice "12/12" "<</cupsCompression 40>>setpagedevice"
+	Choice "13/13" "<</cupsCompression 44>>setpagedevice"
+	Choice "14/14" "<</cupsCompression 47>>setpagedevice"
+	Choice "15/15" "<</cupsCompression 50>>setpagedevice"
+	Choice "16/16" "<</cupsCompression 54>>setpagedevice"
+	Choice "17/17" "<</cupsCompression 57>>setpagedevice"
+	Choice "18/18" "<</cupsCompression 60>>setpagedevice"
+	Choice "19/19" "<</cupsCompression 64>>setpagedevice"
+	Choice "20/20" "<</cupsCompression 67>>setpagedevice"
+	Choice "21/21" "<</cupsCompression 70>>setpagedevice"
+	Choice "22/22" "<</cupsCompression 74>>setpagedevice"
+	Choice "23/23" "<</cupsCompression 77>>setpagedevice"
+	Choice "24/24" "<</cupsCompression 80>>setpagedevice"
+	Choice "25/25" "<</cupsCompression 84>>setpagedevice"
+	Choice "26/26" "<</cupsCompression 87>>setpagedevice"
+	Choice "27/27" "<</cupsCompression 90>>setpagedevice"
+	Choice "28/28" "<</cupsCompression 94>>setpagedevice"
+	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
+	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
+      Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
+	*Choice "Default/Printer Default" ""
+	Choice "1/1 inch/sec." ""
+	Choice "1.5/1.5 inch/sec." ""
+	Choice "2/2 inches/sec." ""
+	Choice "2.5/2.5 inches/sec." ""
+  }
+
+  // Zebra EPL2 Label Printer
+  {
+    ModelName "EPL2 Label Printer"
+    Attribute NickName "" "Zebra EPL2 Label Printer"
+    PCFileName "zebraep2.ppd"
+    ModelNumber $ZEBRA_EPL_PAGE
+
+    HWMargins 0 0 0 0
+    VariablePaperSize Yes
+    MinSize 36 36
+    MaxSize 288 3600
+
+    MediaSize w90h18
+    MediaSize w90h162
+    MediaSize w108h18
+    MediaSize w108h36
+    MediaSize w108h72
+    MediaSize w108h144
+    MediaSize w144h26
+    MediaSize w144h36
+    MediaSize w144h72
+    MediaSize w144h90
+    MediaSize w144h288
+    MediaSize w144h396
+    MediaSize w162h36
+    MediaSize w162h90
+    MediaSize w162h288
+    MediaSize w162h396
+    MediaSize w171h396
+    MediaSize w180h72
+    MediaSize w180h144
+    MediaSize w198h90
+    MediaSize w216h72
+    MediaSize w216h90
+    MediaSize w216h144
+    MediaSize w216h216
+    MediaSize w216h360
+    MediaSize w234h144
+    MediaSize w234h360
+    MediaSize w234h396
+    MediaSize w234h419
+    MediaSize w234h563
+    MediaSize w252h72
+    MediaSize w288h72
+    MediaSize w288h144
+    MediaSize w288h180
+    MediaSize w288h216
+    MediaSize w288h288
+    *MediaSize w288h360
+    MediaSize w288h432
+    MediaSize w288h468
+    MediaSize w288h936
+
+    *Resolution k 1 0 0 0 203dpi
+    Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    Group "General/General"
+      Option "MediaType/Media Type" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
+	Choice "Thermal/Thermal Transfer Media" "<</MediaType(Thermal)>>setpagedevice"
+	Choice "Direct/Direct Thermal Media" "<</MediaType(Direct)>>setpagedevice"
+    Group "PrinterSettings/Printer Settings"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
+	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
+	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
+	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
+	Choice "4/4" "<</cupsCompression 14>>setpagedevice"
+	Choice "5/5" "<</cupsCompression 17>>setpagedevice"
+	Choice "6/6" "<</cupsCompression 20>>setpagedevice"
+	Choice "7/7" "<</cupsCompression 24>>setpagedevice"
+	Choice "8/8" "<</cupsCompression 27>>setpagedevice"
+	Choice "9/9" "<</cupsCompression 30>>setpagedevice"
+	Choice "10/10" "<</cupsCompression 34>>setpagedevice"
+	Choice "11/11" "<</cupsCompression 37>>setpagedevice"
+	Choice "12/12" "<</cupsCompression 40>>setpagedevice"
+	Choice "13/13" "<</cupsCompression 44>>setpagedevice"
+	Choice "14/14" "<</cupsCompression 47>>setpagedevice"
+	Choice "15/15" "<</cupsCompression 50>>setpagedevice"
+	Choice "16/16" "<</cupsCompression 54>>setpagedevice"
+	Choice "17/17" "<</cupsCompression 57>>setpagedevice"
+	Choice "18/18" "<</cupsCompression 60>>setpagedevice"
+	Choice "19/19" "<</cupsCompression 64>>setpagedevice"
+	Choice "20/20" "<</cupsCompression 67>>setpagedevice"
+	Choice "21/21" "<</cupsCompression 70>>setpagedevice"
+	Choice "22/22" "<</cupsCompression 74>>setpagedevice"
+	Choice "23/23" "<</cupsCompression 77>>setpagedevice"
+	Choice "24/24" "<</cupsCompression 80>>setpagedevice"
+	Choice "25/25" "<</cupsCompression 84>>setpagedevice"
+	Choice "26/26" "<</cupsCompression 87>>setpagedevice"
+	Choice "27/27" "<</cupsCompression 90>>setpagedevice"
+	Choice "28/28" "<</cupsCompression 94>>setpagedevice"
+	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
+	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
+      Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
+	*Choice "Default/Printer Default" ""
+	Choice "1/1 inch/sec." ""
+	Choice "1.5/1.5 inch/sec." ""
+	Choice "2/2 inches/sec." ""
+	Choice "2.5/2.5 inches/sec." ""
+	Choice "3/3 inches/sec." ""
+	Choice "4/4 inches/sec." ""
+	Choice "5/5 inches/sec." ""
+	Choice "6/6 inches/sec." ""
+  }
+
+  // Zebra ZPL Label Printer
+  {
+    ModelName "ZPL Label Printer"
+    Attribute NickName "" "Zebra ZPL Label Printer"
+    PCFileName "zebra.ppd"
+    ModelNumber $ZEBRA_ZPL
+
+    HWMargins 0 0 0 0
+    VariablePaperSize Yes
+    MinSize 36 36
+    MaxSize 576 3600
+
+    MediaSize w90h18
+    MediaSize w90h162
+    MediaSize w108h18
+    MediaSize w108h36
+    MediaSize w108h72
+    MediaSize w108h144
+    MediaSize w144h26
+    MediaSize w144h36
+    MediaSize w144h72
+    MediaSize w144h90
+    MediaSize w144h288
+    MediaSize w144h396
+    MediaSize w162h36
+    MediaSize w162h90
+    MediaSize w162h288
+    MediaSize w162h396
+    MediaSize w171h396
+    MediaSize w180h72
+    MediaSize w180h144
+    MediaSize w198h90
+    MediaSize w216h72
+    MediaSize w216h90
+    MediaSize w216h144
+    MediaSize w216h216
+    MediaSize w216h360
+    MediaSize w234h144
+    MediaSize w234h360
+    MediaSize w234h396
+    MediaSize w234h419
+    MediaSize w234h563
+    MediaSize w252h72
+    MediaSize w288h72
+    MediaSize w288h144
+    MediaSize w288h180
+    MediaSize w288h216
+    MediaSize w288h288
+    *MediaSize w288h360
+    MediaSize w288h432
+    MediaSize w288h468
+    MediaSize w288h936
+    MediaSize w432h72
+    MediaSize w432h144
+    MediaSize w432h216
+    MediaSize w432h288
+    MediaSize w432h360
+    MediaSize w432h432
+    MediaSize w432h468
+    MediaSize w576h72
+    MediaSize w576h144
+    MediaSize w576h216
+    MediaSize w576h288
+    MediaSize w576h360
+    MediaSize w576h432
+    MediaSize w576h468
+
+    *Resolution k 1 0 0 0 203dpi
+    Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    Group "General/General"
+      Option "zeMediaTracking/Media Tracking" PickOne AnySetup 20.0
+	Choice "Continuous/Continuous" ""
+	*Choice "Web/Non-continuous (Web sensing)" ""
+	Choice "Mark/Non-continuous (Mark sensing)" ""
+      Option "MediaType/Media Type" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
+	Choice "Thermal/Thermal Transfer Media" "<</MediaType(Thermal)>>setpagedevice"
+	Choice "Direct/Direct Thermal Media" "<</MediaType(Direct)>>setpagedevice"
+    Group "PrinterSettings/Printer Settings"
+      Option "Darkness" PickOne AnySetup 20.0
+	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
+	Choice "1/1" "<</cupsCompression 4>>setpagedevice"
+	Choice "2/2" "<</cupsCompression 7>>setpagedevice"
+	Choice "3/3" "<</cupsCompression 10>>setpagedevice"
+	Choice "4/4" "<</cupsCompression 14>>setpagedevice"
+	Choice "5/5" "<</cupsCompression 17>>setpagedevice"
+	Choice "6/6" "<</cupsCompression 20>>setpagedevice"
+	Choice "7/7" "<</cupsCompression 24>>setpagedevice"
+	Choice "8/8" "<</cupsCompression 27>>setpagedevice"
+	Choice "9/9" "<</cupsCompression 30>>setpagedevice"
+	Choice "10/10" "<</cupsCompression 34>>setpagedevice"
+	Choice "11/11" "<</cupsCompression 37>>setpagedevice"
+	Choice "12/12" "<</cupsCompression 40>>setpagedevice"
+	Choice "13/13" "<</cupsCompression 44>>setpagedevice"
+	Choice "14/14" "<</cupsCompression 47>>setpagedevice"
+	Choice "15/15" "<</cupsCompression 50>>setpagedevice"
+	Choice "16/16" "<</cupsCompression 54>>setpagedevice"
+	Choice "17/17" "<</cupsCompression 57>>setpagedevice"
+	Choice "18/18" "<</cupsCompression 60>>setpagedevice"
+	Choice "19/19" "<</cupsCompression 64>>setpagedevice"
+	Choice "20/20" "<</cupsCompression 67>>setpagedevice"
+	Choice "21/21" "<</cupsCompression 70>>setpagedevice"
+	Choice "22/22" "<</cupsCompression 74>>setpagedevice"
+	Choice "23/23" "<</cupsCompression 77>>setpagedevice"
+	Choice "24/24" "<</cupsCompression 80>>setpagedevice"
+	Choice "25/25" "<</cupsCompression 84>>setpagedevice"
+	Choice "26/26" "<</cupsCompression 87>>setpagedevice"
+	Choice "27/27" "<</cupsCompression 90>>setpagedevice"
+	Choice "28/28" "<</cupsCompression 94>>setpagedevice"
+	Choice "29/29" "<</cupsCompression 97>>setpagedevice"
+	Choice "30/30" "<</cupsCompression 100>>setpagedevice"
+      Option "zePrintRate/Print Rate" PickOne AnySetup 20.0
+	*Choice "Default/Printer Default" ""
+	Choice "1/1 inch/sec." ""
+	Choice "2/2 inches/sec." ""
+	Choice "3/3 inches/sec." ""
+	Choice "4/4 inches/sec." ""
+	Choice "5/5 inches/sec." ""
+	Choice "6/6 inches/sec." ""
+	Choice "7/7 inches/sec." ""
+	Choice "8/8 inches/sec." ""
+	Choice "9/9 inches/sec." ""
+	Choice "10/10 inches/sec." ""
+	Choice "11/11 inches/sec." ""
+	Choice "12/12 inches/sec." ""
+      Option "zeLabelTop/Label Top" PickOne AnySetup 20.0
+	*Choice "200/Printer Default" "<</cupsRowStep 200>>setpagedevice"
+	Choice "-120/-120" "<</cupsRowStep -120>>setpagedevice"
+	Choice "-115/-115" "<</cupsRowStep -115>>setpagedevice"
+	Choice "-110/-110" "<</cupsRowStep -110>>setpagedevice"
+	Choice "-105/-105" "<</cupsRowStep -105>>setpagedevice"
+	Choice "-100/-100" "<</cupsRowStep -100>>setpagedevice"
+	Choice "-95/-95" "<</cupsRowStep -95>>setpagedevice"
+	Choice "-90/-90" "<</cupsRowStep -90>>setpagedevice"
+	Choice "-85/-85" "<</cupsRowStep -85>>setpagedevice"
+	Choice "-80/-80" "<</cupsRowStep -80>>setpagedevice"
+	Choice "-75/-75" "<</cupsRowStep -75>>setpagedevice"
+	Choice "-70/-70" "<</cupsRowStep -70>>setpagedevice"
+	Choice "-65/-65" "<</cupsRowStep -65>>setpagedevice"
+	Choice "-60/-60" "<</cupsRowStep -60>>setpagedevice"
+	Choice "-55/-55" "<</cupsRowStep -55>>setpagedevice"
+	Choice "-50/-50" "<</cupsRowStep -50>>setpagedevice"
+	Choice "-45/-45" "<</cupsRowStep -45>>setpagedevice"
+	Choice "-40/-40" "<</cupsRowStep -40>>setpagedevice"
+	Choice "-35/-35" "<</cupsRowStep -35>>setpagedevice"
+	Choice "-30/-30" "<</cupsRowStep -30>>setpagedevice"
+	Choice "-25/-25" "<</cupsRowStep -25>>setpagedevice"
+	Choice "-20/-20" "<</cupsRowStep -20>>setpagedevice"
+	Choice "-15/-15" "<</cupsRowStep -15>>setpagedevice"
+	Choice "-10/-10" "<</cupsRowStep -10>>setpagedevice"
+	Choice "-5/-5" "<</cupsRowStep -5>>setpagedevice"
+	Choice "0/0" "<</cupsRowStep 0>>setpagedevice"
+	Choice "5/5" "<</cupsRowStep 5>>setpagedevice"
+	Choice "10/10" "<</cupsRowStep 10>>setpagedevice"
+	Choice "15/15" "<</cupsRowStep 15>>setpagedevice"
+	Choice "20/20" "<</cupsRowStep 20>>setpagedevice"
+	Choice "25/25" "<</cupsRowStep 25>>setpagedevice"
+	Choice "30/30" "<</cupsRowStep 30>>setpagedevice"
+	Choice "35/35" "<</cupsRowStep 35>>setpagedevice"
+	Choice "40/40" "<</cupsRowStep 40>>setpagedevice"
+	Choice "45/45" "<</cupsRowStep 45>>setpagedevice"
+	Choice "50/50" "<</cupsRowStep 50>>setpagedevice"
+	Choice "55/55" "<</cupsRowStep 55>>setpagedevice"
+	Choice "60/60" "<</cupsRowStep 60>>setpagedevice"
+	Choice "65/65" "<</cupsRowStep 65>>setpagedevice"
+	Choice "70/70" "<</cupsRowStep 70>>setpagedevice"
+	Choice "75/75" "<</cupsRowStep 75>>setpagedevice"
+	Choice "80/80" "<</cupsRowStep 80>>setpagedevice"
+	Choice "85/85" "<</cupsRowStep 85>>setpagedevice"
+	Choice "90/90" "<</cupsRowStep 90>>setpagedevice"
+	Choice "95/95" "<</cupsRowStep 95>>setpagedevice"
+	Choice "100/100" "<</cupsRowStep 100>>setpagedevice"
+	Choice "105/105" "<</cupsRowStep 105>>setpagedevice"
+	Choice "110/110" "<</cupsRowStep 110>>setpagedevice"
+	Choice "115/115" "<</cupsRowStep 115>>setpagedevice"
+	Choice "120/120" "<</cupsRowStep 120>>setpagedevice"
+      Option "zePrintMode/Print Mode" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
+	Choice "Tear/Tear-Off" ""
+	Choice "Peel/Peel-Off" ""
+	Choice "Rewind/Rewind" ""
+	Choice "Applicator/Applicator" ""
+	Choice "Cutter/Cutter" ""
+      Option "zeTearOffPosition/Tear-Off Adjust Position" PickOne AnySetup 20.0
+	*Choice "1000/Printer Default" "<</AdvanceDistance 1000>>setpagedevice"
+	Choice "-120/-120" "<</AdvanceDistance -120>>setpagedevice"
+	Choice "-115/-115" "<</AdvanceDistance -115>>setpagedevice"
+	Choice "-110/-110" "<</AdvanceDistance -110>>setpagedevice"
+	Choice "-105/-105" "<</AdvanceDistance -105>>setpagedevice"
+	Choice "-100/-100" "<</AdvanceDistance -100>>setpagedevice"
+	Choice "-95/-95" "<</AdvanceDistance -95>>setpagedevice"
+	Choice "-90/-90" "<</AdvanceDistance -90>>setpagedevice"
+	Choice "-85/-85" "<</AdvanceDistance -85>>setpagedevice"
+	Choice "-80/-80" "<</AdvanceDistance -80>>setpagedevice"
+	Choice "-75/-75" "<</AdvanceDistance -75>>setpagedevice"
+	Choice "-70/-70" "<</AdvanceDistance -70>>setpagedevice"
+	Choice "-65/-65" "<</AdvanceDistance -65>>setpagedevice"
+	Choice "-60/-60" "<</AdvanceDistance -60>>setpagedevice"
+	Choice "-55/-55" "<</AdvanceDistance -55>>setpagedevice"
+	Choice "-50/-50" "<</AdvanceDistance -50>>setpagedevice"
+	Choice "-45/-45" "<</AdvanceDistance -45>>setpagedevice"
+	Choice "-40/-40" "<</AdvanceDistance -40>>setpagedevice"
+	Choice "-35/-35" "<</AdvanceDistance -35>>setpagedevice"
+	Choice "-30/-30" "<</AdvanceDistance -30>>setpagedevice"
+	Choice "-25/-25" "<</AdvanceDistance -25>>setpagedevice"
+	Choice "-20/-20" "<</AdvanceDistance -20>>setpagedevice"
+	Choice "-15/-15" "<</AdvanceDistance -15>>setpagedevice"
+	Choice "-10/-10" "<</AdvanceDistance -10>>setpagedevice"
+	Choice "-5/-5" "<</AdvanceDistance -5>>setpagedevice"
+	Choice "0/0" "<</AdvanceDistance 0>>setpagedevice"
+	Choice "5/5" "<</AdvanceDistance 5>>setpagedevice"
+	Choice "10/10" "<</AdvanceDistance 10>>setpagedevice"
+	Choice "15/15" "<</AdvanceDistance 15>>setpagedevice"
+	Choice "20/20" "<</AdvanceDistance 20>>setpagedevice"
+	Choice "25/25" "<</AdvanceDistance 25>>setpagedevice"
+	Choice "30/30" "<</AdvanceDistance 30>>setpagedevice"
+	Choice "35/35" "<</AdvanceDistance 35>>setpagedevice"
+	Choice "40/40" "<</AdvanceDistance 40>>setpagedevice"
+	Choice "45/45" "<</AdvanceDistance 45>>setpagedevice"
+	Choice "50/50" "<</AdvanceDistance 50>>setpagedevice"
+	Choice "55/55" "<</AdvanceDistance 55>>setpagedevice"
+	Choice "60/60" "<</AdvanceDistance 60>>setpagedevice"
+	Choice "65/65" "<</AdvanceDistance 65>>setpagedevice"
+	Choice "70/70" "<</AdvanceDistance 70>>setpagedevice"
+	Choice "75/75" "<</AdvanceDistance 75>>setpagedevice"
+	Choice "80/80" "<</AdvanceDistance 80>>setpagedevice"
+	Choice "85/85" "<</AdvanceDistance 85>>setpagedevice"
+	Choice "90/90" "<</AdvanceDistance 90>>setpagedevice"
+	Choice "95/95" "<</AdvanceDistance 95>>setpagedevice"
+	Choice "100/100" "<</AdvanceDistance 100>>setpagedevice"
+	Choice "105/105" "<</AdvanceDistance 105>>setpagedevice"
+	Choice "110/110" "<</AdvanceDistance 110>>setpagedevice"
+	Choice "115/115" "<</AdvanceDistance 115>>setpagedevice"
+	Choice "120/120" "<</AdvanceDistance 120>>setpagedevice"
+      Option "zeErrorReprint/Reprint After Error" PickOne AnySetup 20.0
+	*Choice "Saved/Printer Default" ""
+	Choice "Always/Always" ""
+	Choice "Never/Never" ""
+  }
+}
+
+//
+// End of "$Id: sample.drv 12789 2015-07-20 14:51:28Z msweet $".
+//

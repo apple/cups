@@ -1,0 +1,250 @@
+CHANGES-1.7.txt
+---------------
+
+CHANGES IN CUPS V1.7.5
+
+	- Security: Addressed some more situations where symlinked files would
+	  be served by the web interface (STR #4455)
+	- The LPD backend did not work with some versions of glibc (STR #4452)
+	- CGI scripts did not work (STR #4454)
+	- The cupsd.conf man page did not list the ErrorPolicy directive
+	  (STR #4457)
+	- Updated the Brazilian Portuguese translation (STR #4456)
+
+
+CHANGES IN CUPS V1.7.4
+
+	- Security: The web interface incorrectly served symlinked files and
+	  files that were not world-readable, potentially leading to a
+	  disclosure of information (STR #4450)
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402, STR #4424)
+	- The "snmp" option did not work with the network backends (STR #4422)
+	- The User directive in client.conf did not override the USER
+	  environment variable (STR #4426)
+	- The web interface now properly shows a "Go" button for all text-based
+	  browsers (STR #4425)
+	- The MaxJobTime directive now properly supports time values (STR #4434)
+	- The RPM spec file did not work due to the new Brazilian Portuguese
+	  localization (STR #4436)
+	- Fixed an "IPP read error" issue (STR #4440)
+	- Fixed the --disable-libusb configure option (STR #4439)
+	- Fixed the debug output from the DNS-SD backend when using Avahi
+	  (STR #4444)
+	- Fixed a bug in the CUPS_SC_GET_DEVICE_ID handling by the network
+	  backends (STR #4447)
+	- Added USB quirk rule for Lexmark E230 (STR #4448)
+
+
+CHANGES IN CUPS V1.7.3
+
+	- Added Brazilian Portuguese translation (STR #4409)
+	- Fixed mapping of OutputBin values such as "Tray1"
+	  (<rdar://problem/16685606>)
+	- Several ippGet* functions incorrectly returned -1 instead of 0 on
+	  error.
+	- The cupsGetResponse function did not work properly with
+	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
+	- The IPP backend did not abort a job when the printer did not validate
+	  the supplied options (<rdar://problem/16836752>)
+	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
+	- The scheduler did not add the "job-hold-until-specified" reason when
+	  holding a job using the lp command (STR #4405)
+	- The configure script incorrectly added libgcrypt as a GNU TLS
+	  dependency (STR #4399)
+	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
+	  (STR #4414)
+	- Auto-typing of PWG Raster files did not work (STR #4417)
+	- IPP queues using hardcoded credentials would ask for credentials
+	  (STR #4371)
+	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
+	- The RPM spec file now looks for libusb-devel 1.0 or later.
+	- Fixed the "create-printer-subscription.test" file for IPPTOOL
+	  (STR #4420)
+
+
+CHANGES IN CUPS V1.7.2
+
+	- Security: The scheduler now blocks URLs containing embedded HTML
+	  (STR #4356)
+	- Documentation fixes (STR #3259, STR #4346, STR #4355)
+	- Fixed the Japanese localization (STR #4385)
+	- Added a German localization (STR #4363)
+	- The cupsfilter command incorrectly read the cupsd.conf file; it now
+	  reads the cups-files.conf file instead.
+	- Fixed OS X builds with Xcode 5.x (<rdar://problem/15914959>)
+	- Fixed SSL support on Windows (STR #4358)
+	- Fixed documentation and naming of Create-Job/Printer-Subscriptions
+	  operations (STR #4389)
+	- Phone numbers in fax jobs were not properly filtered for IPP FaxOut
+	  (<rdar://problem/16351701>)
+	- Updated Linux "relro" support (STR #4349)
+	- Fixed a memory leak in the label printer driver (STR #4393)
+	- cupsEnumDests did not set the "is_default" field (STR #4332)
+	- cupsDoIORequest could miss the server status, causing failed lpadmin
+	  and other administrative commands (STR #4386)
+	- cupsEnumDests didn't always call the callback function (STR #4380)
+	- "lp -i job-id -H hold" did not work (STR #nnn)
+	- CUPS didn't compile on older platforms (STR #4338)
+	- Several libcups files did not have the Apple license exception
+	  notice (STR #4361)
+	- Fixed a D-BUS threading issue that caused the scheduler to crash
+	  (STR #4347)
+	- The scheduler now automatically reconnects to Avahi as needed
+	  (STR #4370, STR #4373)
+	- The scheduler did not handle GET requests for the log files properly
+	  (STR #3265)
+	- The dnssd backend did not always report all discovered printers using
+	  Avahi (STR #4365)
+	- The Zebra printer driver did not properly handle negative "label top"
+	  values (STR #4354)
+	- The scheduler did not always update the MakeModel value in
+	  printers.conf after updating the driver (STR #4264)
+	- The LPD mini daemon did not support print jobs larger than 2GB
+	  (STR #4351)
+	- Fixed a bug in the status reading code when sending a compressed data
+	  stream to an IPP printer/server (<rdar://problem/16019623>)
+	- The IPP backend might not include all job attributes in Validate-Job
+	  operations (<rdar://problem/16025435>)
+	- Fixed some clang-reported issues (<rdar://problem/15936066>)
+
+
+CHANGES IN CUPS V1.7.1
+
+	- Security: the lppasswd program incorrectly used settings from
+	  ~/.cups/client.conf (STR #4319)
+	- Auto debug logging was broken in 1.7.0 (<rdar://problem/15331639>)
+	- Some gzip'd PPD files could not be used (<rdar://problem/15386424>)
+	- Cleaned up some job logging in the scheduler
+	  (<rdar://problem/15332672>)
+	- ATTR messages could cause string pool memory corruption in the
+	  scheduler (<rdar://problem/15382819>)
+	- The RPM spec file did not list the build requirements; this was on
+	  purpose, but now we are listing the Red Hat package names
+	  (<rdar://problem/15375760>, STR #4322)
+	- Printing to a raw queue could result in corrupt output due to
+	  opportunistic compression (<rdar://problem/15008524>)
+	- The GNU TLS support code triggered many compiler warnings due to the
+	  use of old GNU TLS compatibility type names
+	  (<rdar://problem/15392966>)
+	- The "make check" test suite did not work on Linux without the
+	  cups-filters package installed (<rdar://problem/14292998>)
+	- Japanese PPDs using with the Shift-JIS encoding did not work
+	  (<rdar://problem/15427759>)
+	- "tel:" URIs incorrectly had slashes (<rdar://problem/15418463>)
+	- The libusb-based USB backend incorrectly used write timeouts
+	  (<rdar://problem/15564888>)
+	- Shared printers could become inaccessible after a few days on OS X
+	  (<rdar://problem/15426838>)
+	- The IPP backend did not wait for a busy printer to become available
+	  before attempting to print (<rdar://problem/15465667>)
+	- CUPS did not support "auto-monochrome" or "process-monochrome" for the
+	  "print-color-mode" option (<rdar://problem/15482520>)
+	- Using "@IF(name)" in an Allow or Deny rule did not work (STR #4328)
+	- lpq and lpstat did not list jobs in the correct order when priorities
+	  were specified (STR #4326)
+	- The D-BUS notifier did not remove its lockfile (STR #4314)
+	- CUPS incorrectly used the USER environment variable when the name did
+	  not match the user ID (STR #4327)
+
+
+CHANGES IN CUPS V1.7.0
+
+	- Updated the Japanese localization.
+	- The lpadmin command did not send the PPD name from the "-m" option
+	  (<rdar://problem/15264697>)
+	- Network backends now use the prtMarkerSuppliesClass property to
+	  determine the direction of supply level values
+	  (<rdar://problem/14302628>)
+	- The scheduler did not remove backup PPD files when a printer was
+	  deleted (<rdar://problem/15065555>)
+	- The scheduler incorrectly responded to HEAD requests when the web
+	  interface was disabled (<rdar://problem/15090332>)
+	- The scheduler did not respond using the hostname specified by the
+	  client (<rdar://problem/14583574>)
+	- Fax queues did not work when shared via Bonjour
+	  (<rdar://problem/14498310>)
+	- Error messages from the scheduler were not localized using the
+	  language specified in the client's IPP request
+	  (<rdar://problem/14128011>)
+	- Added an Italian localization (<rdar://problem/14481578>)
+	- Fixed a couple memory leaks in ippfind that were reported by Clang.
+	- Fixed a compile issue on 64-bit Linux with Clang - need to use the
+	  -pie option instead of -Wl,-pie now (<rdar://problem/14480938>)
+	- The ippfind utility reported the wrong port numbers when compiled
+	  against Avahi (<rdar://problem/14508324>)
+	- httpGetFd, httpGetFile, httpPutFd, and httpPutFile did not
+	  automatically reconnect if the server closed the connecion after the
+	  previous response.
+	- Fixed a compile error in libcups (<rdar://problem/14467141>)
+	- The scheduler incorrectly did not pass a FINAL_CONTENT_TYPE
+	  environment variable to the filters or backend
+	  (<rdar://problem/14355011>)
+	- The cups-exec helper program could fail randomly on OS X due to
+	  sandbox violations when closing excess file descriptors
+	  (<rdar://problem/14421943>)
+	- The scheduler incorrectly did not use the kqueue interface on OS X.
+
+
+CHANGES IN CUPS V1.7rc1
+
+	- Printer xxx-default values were not reported by Get-Printer-Attributes
+	  or lpoptions (<rdar://problem/14401795>)
+	- Fixed deprecation warnings for many functions on OS X so they are tied
+	  to the deployment version when building (<rdar://problem/14210079>)
+	- Fixed a build issue on ARM-based Linux systems - unable to validate
+	  va_list arguments.
+	- Added a new ippfind tool for finding IPP printers and other Bonjour
+	  services (<rdar://problem/13876199>)
+	- Fixed some issues with conversion of PWG media size names to
+	  hundredths of millimeters (<rdar://problem/14065748>)
+	- The IPP backend could crash on OS X when printing to a Kerberized
+	  printer (<rdar://problem/14040186>)
+	- The ipptool program now automatically extends timeouts when the
+	  output buffer is filled (<rdar://problem/14016099>)
+	- The ipptool program now supports the --help and --version options.
+	- The ipptool program did not continue past include file errors by
+	  default (<rdar://problem/13875803>)
+	- The ipptool program now supports FILE-ID and TEST-ID directives and
+	  includes their values in its XML output (<rdar://problem/13876038>)
+	- The ipptool program now supports WITH-HOSTNAME, WITH-RESOURCE, and
+	  WITH-SCHEME expect predicates to compare the corresponding URI
+	  components (<rdar://problem/13876091>)
+
+
+CHANGES IN CUPS V1.7b1
+
+	- The configure script now supports a --with-rundir option to change
+	  the transient run-time state directory from the default to other
+	  locations like /run/cups (STR #4306)
+	- The scheduler now supports PPD lookups for classes (STR #4296)
+	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
+	  environment variable for filters.
+	- Added a new "-x" option to the cancel command (STR #4103)
+	- Made the PWG media handling APIs public (STR #4267)
+	- Implemented ready media support for the cupsGetDestMediaXxx APIs
+	  (STR #4289)
+	- Added new cupsFindDestDefault, cupsFindDestReady, and
+	  cupsFindDestSupported APIs (STR #4289)
+	- Added new cupsGetDestMediaByIndex, cupsGetDestMediaCount, and
+	  cupsGetDestMediaDefault APIs (STR #4289)
+	- Added new ippGet/SetOctetString APIs for getting and setting an
+	  octetString value (STR #4289)
+	- Added new ippCreateRequestedArray API for generating a array of
+	  attributes from the requested-attributes attribute.
+	- The ipptool utility now supports compression, conditional tests based
+	  on the presence of files, and new DEFINE predicates for STATUS.
+	- Added new IPP APIs for checking values (STR #4167)
+	- Added new IPP APis for adding and setting formatted strings.
+	- Added new HTTP APIs to support basic server functionality via libcups.
+	- The dnssd backend now generates a 1284 device ID as needed (STR #3702)
+	- CUPS now supports compressing and decompressing streamed data
+	  (STR #4168)
+	- CUPS now supports higher-level PIN printing, external accounting
+	  systems, and "print here" printing environments (STR #4169)
+	- IRIX is no longer a supported operating system (STR #4092)
+	- The PPD compiler now supports JCL options properly (STR #4115)
+	- The web interface now checks whether the web browser has cookies
+	  enabled and displays a suitable error message (STR #4141)

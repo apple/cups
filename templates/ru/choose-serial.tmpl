@@ -1,0 +1,49 @@
+<H2 CLASS="title">{op=modify-printer?Изменение {printer_name}:Добавление принтера}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Подключение:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Скорость передачи:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Четность:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>None
+<OPTION VALUE="even" {?parity=even?SELECTED:}>Even
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Odd
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Биты данных:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Управление:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>Нет
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Программное)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Аппаратное)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Аппаратное)
+</SELECT></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Продолжить"></TD>
+</TR>
+</TABLE>
+
+</FORM>

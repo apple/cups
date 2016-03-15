@@ -1,0 +1,738 @@
+#
+# "$Id: cups.list.in 11776 2014-03-28 19:16:05Z msweet $"
+#
+# ESP Package Manager (EPM) file list for CUPS.
+#
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+# Product information
+%product CUPS
+%copyright 2007-2014 by Apple Inc.
+%vendor Apple Inc.
+#%license LICENSE.txt
+%readme LICENSE.txt
+%format rpm
+# Red Hat and their epochs...
+%version 1:@CUPS_VERSION@
+%format !rpm
+%version @CUPS_VERSION@
+%format all
+%description CUPS is the standards-based, open source printing system developed by
+%description Apple Inc. for OS X and other UNIX®-like operating systems.
+
+%format rpm
+%provides lpd
+%provides lpr
+%provides LPRng
+%replaces lpd
+%replaces lpr
+%replaces LPRng
+%requires cups-libs 1:@CUPS_VERSION@
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
+
+
+%format deb
+%provides cupsys
+%provides cupsys-client
+%provides cupsys-bsd
+%requires cups-libs
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
+
+
+%format pkg
+%replaces SUNWlpmsg LP Alerts
+%replaces SUNWlpr LP Print Service, (Root)
+%replaces SUNWlps LP Print Service - Server, (Usr)
+%replaces SUNWlpu LP Print Service - Client, (Usr)
+%replaces SUNWpsu LP Print Server, (Usr)
+%replaces SUNWpsr LP Print Server, (Root)
+%replaces SUNWpcu LP Print Client, (Usr)
+%replaces SUNWpcr LP Print Client, (Root)
+%replaces SUNWppm
+%replaces SUNWmp
+%replaces SUNWscplp SunOS Print Compatibility
+
+%format inst
+%replaces patch*.print_*.* 0 0 1289999999 1289999999
+%replaces maint*.print_*.* 0 0 1289999999 1289999999
+%replaces print 0 0 1289999999 1289999999
+%replaces fw_cups 0 0 1289999999 1289999999
+%incompat patch*.print_*.* 0 0 1289999999 1289999999
+%incompat maint*.print_*.* 0 0 1289999999 1289999999
+%incompat print 0 0 1289999999 1289999999
+%incompat fw_cups 0 0 1289999999 1289999999
+%requires cups.sw.libs
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups.sw.da
+%replaces cups.sw.de
+%replaces cups.sw.es
+%replaces cups.sw.et
+%replaces cups.sw.fi
+%replaces cups.sw.fr
+%replaces cups.sw.he
+%replaces cups.sw.id
+%replaces cups.sw.it
+%replaces cups.sw.ja
+%replaces cups.sw.ko
+%replaces cups.sw.nl
+%replaces cups.sw.no
+%replaces cups.sw.pl
+%replaces cups.sw.pt
+%replaces cups.sw.ru
+%replaces cups.sw.sv
+%replaces cups.sw.zh
+
+%format portable
+%requires cups-libs
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
+
+%format all
+
+%subpackage libs
+%description Shared libraries
+%format deb
+%provides libcups1
+%provides libcupsys2
+%provides libcupsys2-gnutls10
+%provides libcupsimage2
+%format all
+
+%subpackage devel
+%description Development environment
+%format deb
+%provides libcupsys2-dev
+%provides libcupsimage2-dev
+%format all
+
+%subpackage lpd
+%description LPD support
+
+%subpackage
+
+
+#
+# GNU variables...
+#
+
+$prefix=@prefix@
+$exec_prefix=@exec_prefix@
+$bindir=@bindir@
+$datarootdir=@datarootdir@
+$datadir=@datadir@
+$includedir=@includedir@
+$infodir=@infodir@
+$libdir=@libdir@
+$libexecdir=@libexecdir@
+$localstatedir=@localstatedir@
+$mandir=@mandir@
+$oldincludedir=@oldincludedir@
+$sbindir=@sbindir@
+$sharedstatedir=@sharedstatedir@
+$srcdir=@srcdir@
+$sysconfdir=@sysconfdir@
+$top_srcdir=@top_srcdir@
+
+#
+# ESP variables...
+#
+
+$AMANDIR=@AMANDIR@
+$BINDIR=@bindir@
+$CACHEDIR=@CUPS_CACHEDIR@
+$DATADIR=@CUPS_DATADIR@
+$DOCDIR=@CUPS_DOCROOT@
+$INCLUDEDIR=${includedir}
+$INITDIR=@INITDIR@
+$INITDDIR=@INITDDIR@
+$LIBDIR=${libdir}
+$LOCALEDIR=@CUPS_LOCALEDIR@
+$LOGDIR=@CUPS_LOGDIR@
+$MANDIR=@mandir@
+$PAMDIR=@PAMDIR@
+$PMANDIR=@PMANDIR@
+$REQUESTS=@CUPS_REQUESTS@
+$SBINDIR=@sbindir@
+$SERVERBIN=@CUPS_SERVERBIN@
+$SERVERROOT=@CUPS_SERVERROOT@
+$STATEDIR=@CUPS_STATEDIR@
+$XINETD=@XINETD@
+$LIB32DIR=@LIB32DIR@
+$LIB64DIR=@LIB64DIR@
+
+$MDNS=@MDNS@
+
+$CUPS_USER=@CUPS_USER@
+$CUPS_GROUP=@CUPS_GROUP@
+$CUPS_PRIMARY_SYSTEM_GROUP=@CUPS_PRIMARY_SYSTEM_GROUP@
+$CUPS_PERM=0@CUPS_CONFIG_FILE_PERM@
+
+$INSTALLSTATIC=@INSTALLSTATIC@
+
+$MAN1EXT=@MAN1EXT@
+$MAN3EXT=@MAN3EXT@
+$MAN5EXT=@MAN5EXT@
+$MAN7EXT=@MAN7EXT@
+$MAN8EXT=@MAN8EXT@
+$MAN8DIR=@MAN8DIR@
+
+$LIBZ=@LIBZ@
+$DSOLIBS=@DSOLIBS@
+
+# Make sure the MD5 password file is now owned by CUPS_USER...
+%postinstall if test -f $SERVERROOT/passwd.md5; then
+%postinstall chown $CUPS_USER $SERVERROOT/passwd.md5
+%postinstall fi
+
+# Make sure the shared libraries are refreshed...
+%subpackage libs
+%system linux
+%postinstall ldconfig
+%system all
+%subpackage
+
+# Server programs
+%system all
+# Server files
+f 0555 root sys $SBINDIR/cupsd scheduler/cupsd
+
+d 0755 root sys $SERVERBIN -
+%system darwin
+d 0755 root sys $SERVERBIN/apple -
+f 0555 root sys $SERVERBIN/apple/ipp backend/ipp
+l 0755 root sys $SERVERBIN/apple/http ipp
+l 0755 root sys $SERVERBIN/apple/https ipp
+l 0755 root sys $SERVERBIN/apple/ipps ipp
+%system all
+d 0755 root sys $SERVERBIN/backend -
+f 0500 root sys $SERVERBIN/backend/ipp backend/ipp
+l 0700 root sys $SERVERBIN/backend/http ipp
+l 0700 root sys $SERVERBIN/backend/https ipp
+l 0700 root sys $SERVERBIN/backend/ipps ipp
+f 0500 root sys $SERVERBIN/backend/lpd backend/lpd
+%if DNSSD_BACKEND
+f 0500 root sys $SERVERBIN/backend/dnssd backend/dnssd
+%system darwin
+l 0700 root sys $SERVERBIN/backend/mdns dnssd
+%system all
+%endif
+f 0555 root sys $SERVERBIN/backend/snmp backend/snmp
+f 0555 root sys $SERVERBIN/backend/socket backend/socket
+f 0555 root sys $SERVERBIN/backend/usb backend/usb
+d 0755 root sys $SERVERBIN/cgi-bin -
+f 0555 root sys $SERVERBIN/cgi-bin/admin.cgi cgi-bin/admin.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/classes.cgi cgi-bin/classes.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/help.cgi cgi-bin/help.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
+f 0555 root sys $SERVERBIN/cgi-bin/printers.cgi cgi-bin/printers.cgi
+d 0755 root sys $SERVERBIN/daemon -
+f 0555 root sys $SERVERBIN/daemon/cups-deviced scheduler/cups-deviced
+f 0555 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
+d 0755 root sys $SERVERBIN/driver -
+d 0755 root sys $SERVERBIN/filter -
+f 0555 root sys $SERVERBIN/filter/commandtops filter/commandtops
+f 0555 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
+f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
+f 0555 root sys $SERVERBIN/filter/rastertolabel filter/rastertolabel
+l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
+f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
+f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
+f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
+d 0755 root sys $SERVERBIN/notifier -
+f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto
+
+%subpackage lpd
+d 0755 root sys $SERVERBIN/daemon -
+f 0555 root sys $SERVERBIN/daemon/cups-lpd scheduler/cups-lpd
+%subpackage
+
+# Admin commands
+d 0755 root sys $BINDIR -
+l 0755 root sys $BINDIR/enable $SBINDIR/cupsaccept
+l 0755 root sys $BINDIR/disable $SBINDIR/cupsaccept
+d 0755 root sys $LIBDIR -
+l 0755 root sys $LIBDIR/accept $SBINDIR/cupsaccept
+l 0755 root sys $LIBDIR/lpadmin $SBINDIR/lpadmin
+l 0755 root sys $LIBDIR/reject $SBINDIR/cupsaccept
+d 0755 root sys $SBINDIR -
+l 0755 root sys $SBINDIR/accept cupsaccept
+f 0555 root sys $SBINDIR/cupsaccept systemv/cupsaccept
+f 0555 root sys $SBINDIR/cupsaddsmb systemv/cupsaddsmb
+f 0555 root sys $SBINDIR/cupsctl systemv/cupsctl
+l 0755 root sys $SBINDIR/cupsdisable accept
+l 0755 root sys $SBINDIR/cupsenable accept
+l 0755 root sys $SBINDIR/cupsreject accept
+f 0555 root sys $SBINDIR/lpadmin systemv/lpadmin
+f 0555 root sys $SBINDIR/lpc berkeley/lpc
+f 0555 root sys $SBINDIR/lpinfo systemv/lpinfo
+f 0555 root sys $SBINDIR/lpmove systemv/lpmove
+l 0755 root sys $SBINDIR/reject cupsaccept
+
+%system irix
+l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
+%system all
+
+# User commands
+d 0755 root sys $BINDIR -
+f 0555 root sys $BINDIR/cancel systemv/cancel
+f 0555 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
+f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
+f 0555 root sys $BINDIR/ipptool test/ipptool
+f 0555 root sys $BINDIR/lp systemv/lp
+f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
+f 0555 root sys $BINDIR/lpq berkeley/lpq
+f 0555 root sys $BINDIR/lpr berkeley/lpr
+f 0555 root sys $BINDIR/lprm berkeley/lprm
+f 0555 root sys $BINDIR/lpstat systemv/lpstat
+
+%system irix
+l 0755 root sys /usr/bsd/lpq $BINDIR/lpq
+l 0755 root sys /usr/bsd/lpr $BINDIR/lpr
+l 0755 root sys /usr/bsd/lprm $BINDIR/lprm
+%system all
+
+# DSOs
+%if DSOLIBS
+%subpackage libs
+%system hpux
+f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2 nostrip()
+l 0755 root sys $LIBDIR/libcups.sl libcups.sl.2
+f 0555 root sys $LIBDIR/libcupscgi.sl.1 cgi-bin/libcupscgi.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.sl libcupscgi.sl.1
+f 0555 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2 nostrip()
+l 0755 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
+f 0555 root sys $LIBDIR/libcupsmime.sl.1 scheduler/libcupsmime.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.sl libcupsmime.sl.1
+f 0555 root sys $LIBDIR/libcupsppdc.sl.1 ppdc/libcupsppdc.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.sl libcupsppdc.sl.1
+%system aix
+f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a nostrip()
+f 0555 root sys $LIBDIR/libcupscgi_s.a cgi-bin/libcupscgi_s.a nostrip()
+f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a nostrip()
+f 0555 root sys $LIBDIR/libcupsmime_s.a scheduler/libcupsmime_s.a nostrip()
+f 0555 root sys $LIBDIR/libcupsppdc_s.a ppdc/libcupsppdc_s.a nostrip()
+%system darwin
+f 0555 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib nostrip()
+l 0755 root sys $LIBDIR/libcups.dylib libcups.2.dylib
+f 0555 root sys $LIBDIR/libcupscgi.1.dylib cgi-bin/libcupscgi.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.dylib libcupscgi.1.dylib
+f 0555 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
+f 0555 root sys $LIBDIR/libcupsmime.1.dylib scheduler/libcupsmime.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.dylib libcupsmime.1.dylib
+f 0555 root sys $LIBDIR/libcupsppdc.1.dylib ppdc/libcupsppdc.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.dylib libcupsppdc.1.dylib
+%system !hpux !aix !darwin
+f 0555 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2 nostrip()
+l 0755 root sys $LIBDIR/libcups.so libcups.so.2
+f 0555 root sys $LIBDIR/libcupscgi.so.1 cgi-bin/libcupscgi.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.so libcupscgi.so.1
+f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2 nostrip()
+l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
+f 0555 root sys $LIBDIR/libcupsmime.so.1 scheduler/libcupsmime.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.so libcupsmime.so.1
+f 0555 root sys $LIBDIR/libcupsppdc.so.1 ppdc/libcupsppdc.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.so libcupsppdc.so.1
+%system all
+%subpackage
+%endif
+
+# Directories
+d 0755 root sys $LOGDIR -
+d 0710 root $CUPS_GROUP $REQUESTS -
+d 1770 root $CUPS_GROUP $REQUESTS/tmp -
+d 0775 root $CUPS_GROUP $CACHEDIR -
+d 0775 root $CUPS_GROUP $CACHEDIR/rss -
+#d 0755 root $CUPS_GROUP $CACHEDIR/ppd -
+%system !darwin
+d 0755 root $CUPS_GROUP $STATEDIR -
+%system all
+d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
+
+# Data files
+#f 0444 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
+#f 0444 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
+#f 0444 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
+#f 0444 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
+#f 0444 root sys $LOCALEDIR/eu/cups_eu.po locale/cups_eu.po
+#f 0444 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
+#f 0444 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+#f 0444 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
+#f 0444 root sys $LOCALEDIR/id/cups_id.po locale/cups_id.po
+#f 0444 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
+#f 0444 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+#f 0444 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
+#f 0444 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
+#f 0444 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
+#f 0444 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
+#f 0444 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
+#f 0444 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
+#f 0444 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
+#f 0444 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+#f 0444 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
+#f 0444 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
+
+d 0755 root sys $DATADIR -
+
+d 0755 root sys $DATADIR/banners -
+f 0444 root sys $DATADIR/banners/classified data/classified
+f 0444 root sys $DATADIR/banners/confidential data/confidential
+f 0444 root sys $DATADIR/banners/secret data/secret
+f 0444 root sys $DATADIR/banners/standard data/standard
+f 0444 root sys $DATADIR/banners/topsecret data/topsecret
+f 0444 root sys $DATADIR/banners/unclassified data/unclassified
+
+d 0755 root sys $DATADIR/data -
+f 0444 root sys $DATADIR/data/testprint data/testprint
+
+d 0755 root sys $DATADIR/drv -
+f 0444 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
+
+d 0755 root sys $DATADIR/examples -
+f 0444 root sys $DATADIR/examples examples/*.drv
+
+d 0755 root sys $DATADIR/ipptool -
+f 0444 root sys $DATADIR/ipptool/create-printer-subscription.test test/create-printer-subscription.test
+f 0444 root sys $DATADIR/ipptool/get-completed-jobs.test test/get-completed-jobs.test
+f 0444 root sys $DATADIR/ipptool/get-jobs.test test/get-jobs.test
+f 0444 root sys $DATADIR/ipptool/get-printer-attributes.test test/get-printer-attributes.test
+f 0444 root sys $DATADIR/ipptool/print-job.test test/print-job.test
+f 0444 root sys $DATADIR/ipptool test/document-*.p*
+f 0444 root sys $DATADIR/ipptool test/ipp-*.test
+f 0444 root sys $DATADIR/ipptool test/onepage-*.p*
+f 0444 root sys $DATADIR/ipptool test/testfile.*
+f 0444 root sys $DATADIR/ipptool/color.jpg test/color.jpg
+f 0444 root sys $DATADIR/ipptool/gray.jpg test/gray.jpg
+
+d 0755 root sys $DATADIR/mime -
+f 0444 root sys $DATADIR/mime/mime.convs conf/mime.convs
+f 0444 root sys $DATADIR/mime/mime.types conf/mime.types
+
+d 0755 root sys $DATADIR/model -
+
+d 0755 root sys $DATADIR/ppdc -
+f 0444 root sys $DATADIR/ppdc data/*.defs
+f 0444 root sys $DATADIR/ppdc data/*.h
+
+d 0755 root sys $DATADIR/templates -
+f 0444 root sys $DATADIR/templates templates/*.tmpl
+
+## Template files
+#d 0755 root sys $DATADIR/templates/de
+#f 0444 root sys $DATADIR/templates/de templates/de/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/es
+#f 0444 root sys $DATADIR/templates/es templates/es/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/et
+#f 0444 root sys $DATADIR/templates/et templates/et/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/eu
+#f 0444 root sys $DATADIR/templates/eu templates/eu/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/fr
+#f 0444 root sys $DATADIR/templates/fr templates/fr/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/he
+#f 0444 root sys $DATADIR/templates/he templates/he/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/id
+#f 0444 root sys $DATADIR/templates/id templates/id/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/it
+#f 0444 root sys $DATADIR/templates/it templates/it/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/ja
+#f 0444 root sys $DATADIR/templates/ja templates/ja/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/pl
+#f 0444 root sys $DATADIR/templates/pl templates/pl/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/ru
+#f 0444 root sys $DATADIR/templates/ru templates/ru/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/sv
+#f 0444 root sys $DATADIR/templates/sv templates/sv/*.tmpl
+
+#d 0755 root sys $DATADIR/templates/zh_TW
+#f 0444 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
+
+# Config files
+d 0755 root $CUPS_GROUP $SERVERROOT -
+d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
+d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
+d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cups-files.conf conf/cups-files.conf
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cups-files.conf.default conf/cups-files.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf conf/cupsd.conf
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/snmp.conf conf/snmp.conf
+
+%if PAMDIR
+d 0755 root sys $PAMDIR -
+c 0644 root sys $PAMDIR/cups conf/@PAMFILE@
+%endif
+
+%subpackage devel
+# Developer files
+f 0555 root sys $BINDIR/cups-config cups-config
+d 0755 root sys $INCLUDEDIR/cups -
+f 0444 root sys $INCLUDEDIR/cups/adminutil.h cups/adminutil.h
+f 0444 root sys $INCLUDEDIR/cups/array.h cups/array.h
+f 0444 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
+f 0444 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
+f 0444 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
+f 0444 root sys $INCLUDEDIR/cups/file.h cups/file.h
+f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
+f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
+f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h
+f 0444 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
+f 0444 root sys $INCLUDEDIR/cups/raster.h cups/raster.h
+f 0444 root sys $INCLUDEDIR/cups/sidechannel.h cups/sidechannel.h
+f 0444 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
+f 0444 root sys $INCLUDEDIR/cups/versioning.h cups/versioning.h
+
+%if INSTALLSTATIC
+f 0444 root sys $LIBDIR/libcups.a cups/libcups.a
+f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
+%endif
+
+d 0755 root sys $DOCDIR/help -
+f 0444 root sys $DOCDIR/help doc/help/api*.html
+f 0444 root sys $DOCDIR/help/postscript-driver.html doc/help/postscript-driver.html
+f 0444 root sys $DOCDIR/help/ppd-compiler.html doc/help/ppd-compiler.html
+f 0444 root sys $DOCDIR/help/raster-driver.html doc/help/raster-driver.html
+f 0444 root sys $DOCDIR/help doc/help/spec*.html
+%subpackage
+
+# Documentation files
+d 0755 root sys $DOCDIR -
+f 0444 root sys $DOCDIR doc/*.css
+f 0444 root sys $DOCDIR doc/*.html
+d 0755 root sys $DOCDIR/help -
+f 0444 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
+f 0444 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
+f 0444 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
+f 0444 root sys $DOCDIR/help/kerberos.html doc/help/kerberos.html
+f 0444 root sys $DOCDIR/help/license.html doc/help/license.html
+f 0444 root sys $DOCDIR/help/network.html doc/help/network.html
+f 0444 root sys $DOCDIR/help/options.html doc/help/options.html
+f 0444 root sys $DOCDIR/help/overview.html doc/help/overview.html
+f 0444 root sys $DOCDIR/help/policies.html doc/help/policies.html
+f 0444 root sys $DOCDIR/help/security.html doc/help/security.html
+f 0444 root sys $DOCDIR/help/sharing.html doc/help/sharing.html
+f 0444 root sys $DOCDIR/help/standard.html doc/help/standard.html
+f 0444 root sys $DOCDIR/help/translation.html doc/help/translation.html
+f 0444 root sys $DOCDIR/help/whatsnew.html doc/help/whatsnew.html
+f 0444 root sys $DOCDIR/help doc/help/man-*.html
+f 0444 root sys $DOCDIR/help doc/help/ref-*.html
+d 0755 root sys $DOCDIR/images -
+f 0444 root sys $DOCDIR/images doc/images/*.gif
+f 0444 root sys $DOCDIR/images doc/images/*.jpg
+f 0444 root sys $DOCDIR/images doc/images/*.png
+f 0444 root sys $DOCDIR/robots.txt doc/robots.txt
+
+# Localized documentation files
+#d 0755 root sys $DOCDIR/de
+#f 0444 root sys $DOCDIR/de doc/de/*.html
+
+#d 0755 root sys $DOCDIR/es
+#f 0444 root sys $DOCDIR/es doc/es/*.html
+
+#d 0755 root sys $DOCDIR/et
+#f 0444 root sys $DOCDIR/et doc/et/*.html
+
+#d 0755 root sys $DOCDIR/eu
+#f 0444 root sys $DOCDIR/eu doc/eu/*.html
+
+#d 0755 root sys $DOCDIR/fr
+#f 0444 root sys $DOCDIR/fr doc/fr/*.html
+
+#d 0755 root sys $DOCDIR/he
+#f 0444 root sys $DOCDIR/he doc/he/*.html
+#f 0444 root sys $DOCDIR/he/cups.css doc/he/cups.css
+
+#d 0755 root sys $DOCDIR/id
+#f 0444 root sys $DOCDIR/id doc/id/*.html
+
+#d 0755 root sys $DOCDIR/it
+#f 0444 root sys $DOCDIR/it doc/it/*.html
+
+#d 0755 root sys $DOCDIR/ja
+#f 0444 root sys $DOCDIR/ja doc/ja/*.html
+
+#d 0755 root sys $DOCDIR/pl
+#f 0444 root sys $DOCDIR/pl doc/pl/*.html
+
+#d 0755 root sys $DOCDIR/ru
+#f 0444 root sys $DOCDIR/ru doc/ru/*.html
+
+#d 0755 root sys $DOCDIR/sv
+#f 0444 root sys $DOCDIR/sv doc/sv/*.html
+
+#d 0755 root sys $DOCDIR/zh_TW
+#f 0444 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
+
+# Man pages
+d 0755 root sys $AMANDIR -
+d 0755 root sys $AMANDIR/man$MAN8DIR -
+d 0755 root sys $MANDIR -
+d 0755 root sys $MANDIR/man1 -
+d 0755 root sys $MANDIR/man5 -
+d 0755 root sys $MANDIR/man7 -
+
+f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
+f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
+f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
+
+f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/cups-snmp.conf.$MAN5EXT man/cups-snmp.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/ipptoolfile.$MAN5EXT man/ipptoolfile.$MAN5EXT
+f 0444 root sys $MANDIR/man5/mailto.conf.$MAN5EXT man/mailto.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
+f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT
+f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
+
+l 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT cupsaccept.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/cupsreject.$MAN8EXT cupsaccept.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsctl.$MAN8EXT man/cupsctl.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsfilter.$MAN8EXT man/cupsfilter.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cups-snmp.$MAN8EXT man/cups-snmp.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/cupsdisable.$MAN8EXT cupsenable.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT cupsenable.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/enable.$MAN8EXT cupsenable.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpadmin.$MAN8EXT man/lpadmin.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpc.$MAN8EXT man/lpc.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpinfo.$MAN8EXT man/lpinfo.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT cupsaccept.$MAN8EXT
+
+%subpackage devel
+f 0444 root sys $MANDIR/man1/cups-config.$MAN1EXT man/cups-config.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ man/ppd*.$MAN1EXT
+f 0444 root sys $MANDIR/man5/ppdcfile.$MAN5EXT man/ppdcfile.$MAN5EXT
+f 0444 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
+f 0444 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
+f 0444 root sys $MANDIR/man7/notifier.$MAN7EXT man/notifier.$MAN7EXT
+
+%subpackage lpd
+d 0755 root sys $AMANDIR/man$MAN8DIR -
+f 0444 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
+%subpackage
+
+# Startup scripts
+%system darwin
+f 0444 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist scheduler/org.cups.cupsd.plist
+%preremove <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+killall cupsd || exit 0
+EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
+killall cupsd || exit 0
+EOF
+%postinstall <<EOF
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd.plist
+EOF
+%subpackage lpd
+f 0444 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpd.plist
+%preremove <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
+%preinstall <<EOF
+launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
+EOF
+%postinstall <<EOF
+rm -f /etc/xinetd.d/cups-lpd
+launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd-lpd.plist
+EOF
+%subpackage
+
+%system !darwin
+i 0755 root sys cups scheduler/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(@RCLEVELS@)
+%subpackage lpd
+%if XINETD
+f 0444 root sys $XINETD/cups-lpd scheduler/cups-lpd.xinetd
+%endif
+%subpackage
+
+#
+# End of "$Id: cups.list.in 11776 2014-03-28 19:16:05Z msweet $".
+#

@@ -1,0 +1,11 @@
+[Unit]
+Description=CUPS Scheduler
+Documentation=man:cupsd(8)
+
+[Service]
+ExecStart=@sbindir@/cupsd -l
+Type=simple
+
+[Install]
+Also=org.cups.cupsd.socket org.cups.cupsd.path
+WantedBy=printer.target

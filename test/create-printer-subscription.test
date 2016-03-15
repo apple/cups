@@ -1,0 +1,75 @@
+#
+# "$Id: create-printer-subscription.test 11896 2014-05-27 15:00:06Z msweet $"
+#
+# Create a printer subscription.
+#
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool [-d recipient=uri] printer-uri create-printer-subscription.test
+#
+
+{
+	# The name of the test...
+	NAME "Create a push printer subscription"
+	SKIP-IF-NOT-DEFINED recipient
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+
+	# The attributes to send
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	GROUP subscription-attributes-tag
+	ATTR uri notify-recipient-uri $recipient
+	ATTR keyword notify-events printer-config-changed,printer-state-changed
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT notify-subscription-id OF-TYPE integer WITH-VALUE >0
+	DISPLAY notify-subscription-id
+}
+
+{
+	# The name of the test...
+	NAME "Create a pull printer subscription"
+	SKIP-IF-DEFINED recipient
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+
+	# The attributes to send
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+        GROUP subscription-attributes-tag
+	ATTR keyword notify-pull-method ippget
+	ATTR keyword notify-events printer-config-changed,printer-state-changed
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT notify-subscription-id OF-TYPE integer WITH-VALUE >0
+	DISPLAY notify-subscription-id
+}
+
+
+#
+# End of "$Id: create-printer-subscription.test 11896 2014-05-27 15:00:06Z msweet $"
+#

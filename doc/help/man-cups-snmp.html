@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups-snmp(8)</title>
+</head>
+<body>
+<h1 class="title">cups-snmp(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+snmp - cups snmp backend
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>/usr/lib/cups/backend/snmp</b>
+<i>ip-address-or-hostname</i>
+<br>
+<b>/usr/libexec/cups/backend/snmp</b>
+<i>ip-address-or-hostname</i>
+<br>
+<b>lpinfo</b>
+<b>-v</b>
+<b>--include-schemes</b>
+snmp
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The CUPS SNMP backend provides legacy discovery and identification of network printers using SNMPv1.
+When used for discovery through the scheduler, the backend will list all printers that respond to a broadcast SNMPv1 query with the "public" community name.
+Additional queries are then sent to printers that respond in order to determine the correct device URI, make and model, and other information needed for printing.
+<p>In the first form, the SNMP backend is run directly by the user to look up the device URI and other information when you have an IP address or hostname.
+This can be used for programs that need to configure print queues where the user has supplied an address but nothing else.
+<p>In the second form, the SNMP backend is run indirectly using the
+<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
+command.
+The output provides all printers detected via SNMP on the configured
+broadcast addresses.
+<i>Note: no broadcast addresses are configured by default.</i>
+<h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
+The DebugLevel value can be overridden using the CUPS_DEBUG_LEVEL environment variable.
+The MaxRunTime value can be overridden using the CUPS_MAX_RUN_TIME environment variable.
+<h2 class="title"><a name="FILES">Files</a></h2>
+The SNMP backend reads the <i>/etc/cups/snmp.conf</i> configuration file, if
+present, to set the default broadcast address, community name, and logging
+level.
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The CUPS SNMP backend uses the information from the Host, Printer, and Port Monitor MIBs along with some vendor private MIBs and intelligent port probes to determine the correct device URI and make and model for each printer.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
+<a href="man-cups-snmp.conf.html?TOPIC=Man+Pages"><b>cups-snmp.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

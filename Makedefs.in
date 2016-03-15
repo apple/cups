@@ -1,0 +1,268 @@
+#
+# "$Id: Makedefs.in 12519 2015-02-17 13:10:19Z msweet $"
+#
+# Common makefile definitions for CUPS.
+#
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+#
+# Programs...
+#
+
+AR		=	@AR@
+AWK		=	@AWK@
+CC		=	@LIBTOOL@ @CC@
+CHMOD		=	@CHMOD@
+CXX		=	@LIBTOOL@ @CXX@
+DSO		=	@DSO@
+DSOXX		=	@DSOXX@
+GZIP		=	@GZIP@
+INSTALL		=	@INSTALL@
+LD		=	@LD@
+LIBTOOL		=	@LIBTOOL@
+LN		=	@LN@ -sf
+MV		=	@MV@
+RANLIB		=	@RANLIB@
+RM		=	@RM@ -f
+RMDIR		=	@RMDIR@
+SED		=	@SED@
+SHELL		=	/bin/sh
+
+#
+# Installation programs...
+#
+
+INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -c -m 555 @INSTALL_STRIP@
+INSTALL_COMPDATA =	$(INSTALL) -c -m 444 @INSTALL_GZIP@
+INSTALL_CONFIG	=	$(INSTALL) -c -m @CUPS_CONFIG_FILE_PERM@
+INSTALL_DATA	=	$(INSTALL) -c -m 444
+INSTALL_DIR	=	$(INSTALL) -d
+INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -c -m 555 @INSTALL_STRIP@
+INSTALL_MAN	=	$(INSTALL) -c -m 444
+INSTALL_SCRIPT	=	$(INSTALL) -c -m 555
+
+#
+# Default user, group, and system groups for the scheduler...
+#
+
+CUPS_USER	=	@CUPS_USER@
+CUPS_GROUP	=	@CUPS_GROUP@
+CUPS_SYSTEM_GROUPS =	@CUPS_SYSTEM_GROUPS@
+CUPS_PRIMARY_SYSTEM_GROUP =	@CUPS_PRIMARY_SYSTEM_GROUP@
+
+#
+# Default permissions...
+#
+
+CUPS_CONFIG_FILE_PERM = @CUPS_CONFIG_FILE_PERM@
+CUPS_CUPSD_FILE_PERM = @CUPS_CUPSD_FILE_PERM@
+CUPS_LOG_FILE_PERM = @CUPS_LOG_FILE_PERM@
+
+#
+# Languages to install...
+#
+
+LANGUAGES	=	@LANGUAGES@
+INSTALL_LANGUAGES =	@INSTALL_LANGUAGES@
+UNINSTALL_LANGUAGES =	@UNINSTALL_LANGUAGES@
+
+#
+# Libraries...
+#
+
+LIBCUPS		=	@LIBCUPS@
+LIBCUPSCGI	=	@LIBCUPSCGI@
+LIBCUPSIMAGE	=	@LIBCUPSIMAGE@
+LIBCUPSMIME	=	@LIBCUPSMIME@
+LIBCUPSPPDC	=	@LIBCUPSPPDC@
+LIBCUPSSTATIC	=	@LIBCUPSSTATIC@
+LIBGSSAPI	=	@LIBGSSAPI@
+LIBMALLOC	=	@LIBMALLOC@
+LIBMXML		=	@LIBMXML@
+LIBPAPER	=	@LIBPAPER@
+LIBUSB		=	@LIBUSB@
+LIBWRAP		=	@LIBWRAP@
+LIBZ		=	@LIBZ@
+
+#
+# Install static libraries?
+#
+
+INSTALLSTATIC	=	@INSTALLSTATIC@
+
+#
+# IPP backend aliases...
+#
+
+IPPALIASES	=	@IPPALIASES@
+
+#
+# Install XPC backends?
+#
+
+INSTALLXPC	=	@INSTALLXPC@
+
+#
+# Program options...
+#
+# ARCHFLAGS     Defines the default architecture build options.
+# OPTIM         Defines the common compiler optimization/debugging options
+#               for all architectures.
+# OPTIONS       Defines other compile-time options (currently only -DDEBUG
+#               for extra debug info)
+#
+
+ALL_CFLAGS	=	-I.. -D_CUPS_SOURCE $(CFLAGS) $(SSLFLAGS) \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(ONDEMANDFLAGS) $(OPTIONS)
+ALL_CXXFLAGS	=	-I.. -D_CUPS_SOURCE $(CXXFLAGS) $(SSLFLAGS) \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(ONDEMANDFLAGS) $(OPTIONS)
+ARCHFLAGS	=	@ARCHFLAGS@
+ARFLAGS		=	@ARFLAGS@
+BACKLIBS	=	@BACKLIBS@
+BUILDDIRS	=	@BUILDDIRS@
+CFLAGS		=	@CPPFLAGS@ @CFLAGS@
+COMMONLIBS	=	@LIBS@
+CXXFLAGS	=	@CPPFLAGS@ @CXXFLAGS@
+CXXLIBS		=	@CXXLIBS@
+DBUS_NOTIFIER	=	@DBUS_NOTIFIER@
+DBUS_NOTIFIERLIBS =	@DBUS_NOTIFIERLIBS@
+DNSSD_BACKEND	=	@DNSSD_BACKEND@
+DSOFLAGS	=	-L../cups @DSOFLAGS@
+DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
+DNSSDLIBS	=	@DNSSDLIBS@
+IPPFIND_BIN	=	@IPPFIND_BIN@
+IPPFIND_MAN	=	@IPPFIND_MAN@
+LDFLAGS		=	-L../cgi-bin -L../cups -L../filter -L../ppdc \
+			-L../scheduler @LDARCHFLAGS@ \
+			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
+LINKCUPS	=	@LINKCUPS@ $(LIBGSSAPI) $(DNSSDLIBS) $(LIBZ)
+LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
+LIBS		=	$(LINKCUPS) $(COMMONLIBS)
+ONDEMANDFLAGS	=	@ONDEMANDFLAGS@
+ONDEMANDLIBS	=	@ONDEMANDLIBS@
+OPTIM		=	@OPTIM@
+OPTIONS		=
+PAMLIBS		=	@PAMLIBS@
+SERVERLIBS	=	@SERVERLIBS@
+SSLFLAGS	=	@SSLFLAGS@
+SSLLIBS		=	@SSLLIBS@
+UNITTESTS	=	@UNITTESTS@
+
+
+#
+# Directories...
+#
+# The first section uses the GNU names (which are *extremely*
+# difficult to find in a makefile because they are lowercase...)
+# We have to define these first because autoconf uses ${prefix}
+# and ${exec_prefix} for most of the other directories...
+#
+# The "datarootdir" variable may not get defined if you are using
+# a version of autoconf prior to 2.60.
+#
+# This is immediately followed by definition in ALL CAPS for the
+# needed directories...
+#
+
+bindir		=	@bindir@
+datadir		=	@datadir@
+datarootdir	=	@datarootdir@
+exec_prefix	=	@exec_prefix@
+includedir	=	@includedir@
+infodir		=	@infodir@
+libdir		=	@libdir@
+libexecdir	=	@libexecdir@
+localstatedir	=	@localstatedir@
+mandir		=	@mandir@
+oldincludedir	=	@oldincludedir@
+prefix		=	@prefix@
+privateinclude	=	@privateinclude@
+sbindir		=	@sbindir@
+sharedstatedir	=	@sharedstatedir@
+srcdir		=	@srcdir@
+sysconfdir	=	@sysconfdir@
+top_srcdir	=	@top_srcdir@
+
+BUILDROOT	=	$(DSTROOT)
+
+AMANDIR		=	$(BUILDROOT)@AMANDIR@
+BINDIR		=	$(BUILDROOT)@bindir@
+BUNDLEDIR	=	@CUPS_BUNDLEDIR@
+CACHEDIR	=	$(BUILDROOT)@CUPS_CACHEDIR@
+DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
+DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
+ICONDIR		=	@ICONDIR@
+INCLUDEDIR	=	$(BUILDROOT)$(includedir)
+LIBDIR		=	$(BUILDROOT)$(libdir)
+LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
+LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
+MANDIR		=	$(BUILDROOT)@mandir@
+MENUDIR		=	@MENUDIR@
+PMANDIR		=	$(BUILDROOT)@PMANDIR@
+PRIVATEINCLUDE	=	$(BUILDROOT)@PRIVATEINCLUDE@
+RCLEVELS	=	@RCLEVELS@
+RCSTART		=	@RCSTART@
+RCSTOP		=	@RCSTOP@
+REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
+SBINDIR		=	$(BUILDROOT)@sbindir@
+SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
+SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
+STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
+
+MAN1EXT		=	@MAN1EXT@
+MAN5EXT		=	@MAN5EXT@
+MAN7EXT		=	@MAN7EXT@
+MAN8EXT		=	@MAN8EXT@
+MAN8DIR		=	@MAN8DIR@
+
+PAMDIR		=	@PAMDIR@
+PAMFILE		=	@PAMFILE@
+
+DBUSDIR		=	@DBUSDIR@
+INITDIR		=	@INITDIR@
+INITDDIR	=	@INITDDIR@
+LAUNCHD_DIR	=	@LAUNCHD_DIR@
+SMFMANIFESTDIR	= 	@SMFMANIFESTDIR@
+SYSTEMD_DIR	=	@SYSTEMD_DIR@
+XINETD		=	@XINETD@
+
+USBQUIRKS	=	@USBQUIRKS@
+
+
+#
+# Rules...
+#
+
+.SILENT:
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .3 .3.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+
+.c.o:
+	echo Compiling $<...
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
+
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(ALL_CXXFLAGS) -c -o $@ $<
+
+.man.1 .man.1m .man.3 .man.5 .man.7 .man.8:
+	echo Linking $<...
+	$(RM) $@
+	$(LN) $< $@
+
+.man.1.gz .man.1m.gz .man.3.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
+	echo -n Compressing $<...
+	$(RM) $@
+	gzip -v9 <$< >$@
+
+
+#
+# End of "$Id: Makedefs.in 12519 2015-02-17 13:10:19Z msweet $"
+#

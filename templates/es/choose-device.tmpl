@@ -1,0 +1,52 @@
+<H2 CLASS="title">{op=modify-printer?Modificar {printer_name}:A&ntilde;adir impresora}</H2>
+
+{CUPS_GET_DEVICES_DONE?:<P><IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
+ALT="Busy Indicator"> Buscando impresoras...</P>}
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+
+<TABLE>
+{op=add-printer?:<TR>
+<TH CLASS="label">Conexi&oacute;n actual:</TH>
+<TD><INPUT TYPE="RADIO" NAME="DEVICE_URI" VALUE="{current_device_uri}" CHECKED>
+{current_device_uri}</TD>
+</TR>}
+<TR>
+<TH CLASS="label">Impresoras locales:</TH>
+<TD>
+{[device_uri]{device_class!network?<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+:}}
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Impresoras en red descubiertas:</TH>
+<TD>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+:}:}}
+</TD>
+</TR>
+<TR>
+<TR>
+<TH CLASS="label">Otras impresoras en red:</TH>
+<TD>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+}:}}
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Siguiente"></TD>
+</TR>
+</TABLE>
+
+</FORM>:<P><IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
+ALT="Indicador de ocupado"> Buscando impresoras...</P>}

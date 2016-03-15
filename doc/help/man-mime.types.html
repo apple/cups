@@ -1,0 +1,97 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>mime.types(5)</title>
+</head>
+<body>
+<h1 class="title">mime.types(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+mime.types - mime type description file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <b>mime.types</b> file defines the recognized file types.
+<p>Additional file types are specified in files with the extension <i>.types</i> in the CUPS configuration directory.
+<p>Each line in the <b>mime.types</b> file is a comment, blank, or rule line.
+Comment lines start with the # character.
+Rule lines start with the MIME media type and are optionally followed by a series of file recognition rules:
+<pre class="man">
+
+    <i>mime/type </i>[ <i>rule </i>... <i>rule </i>]
+
+</pre>
+Rules can be extended over multiple lines using the backslash character (\):
+<pre class="man">
+
+    <i>mime/type </i>[ <i>really-really-really-long-rule </i>... <b>\
+      </b><i>rule </i>]
+
+</pre>
+MIME media types specified by the <i>mime/type</i> field are case-insensitive and are sorted in ascending alphanumeric order for the purposes of matching.
+See the "TYPE MATCHING AND PRIORITY" section for more information.
+<p>The rules may be grouped using parenthesis, joined using "+" for a logical AND, joined using "," or whitespace for a logical OR, and negated using "!".
+<h3><a name="RULES">Rules</a></h3>
+Rules take two forms - a filename extension by itself and functions with test
+values inside parenthesis.
+The following functions are available:
+<dl class="man">
+<dt><b>match("</b><i>pattern</i><b>")</b>
+<dd style="margin-left: 5.0em">True if the filename matches the given shell wildcard <i>pattern</i>.
+<dt><b>ascii(</b><i>offset</i><b>,</b><i>length</i><b>)</b>
+<dd style="margin-left: 5.0em">True if the <i>length</i> bytes starting at <i>offset</i> are valid printable ASCII (CR, NL, TAB, BS, 32-126).
+<dt><b>printable(</b><i>offset</i><b>,</b><i>length</i><b>)</b>
+<dd style="margin-left: 5.0em">True if the <i>length</i> bytes starting at <i>offset</i> are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254).
+<dt><b>priority(</b><i>number</i><b>)</b>
+<dd style="margin-left: 5.0em">Specifies the relative priority of this MIME media type.
+The default priority is 100.
+Larger values have higher priority while smaller values have lower priority.
+<dt><b>string(</b><i>offset</i><b>,"</b><i>string</i><b>")</b>
+<dd style="margin-left: 5.0em">True if the bytes starting at <i>offset</i> are identical to <i>string</i>.
+<dt><b>istring(</b><i>offset</i><b>,"</b><i>string</i><b>")</b>
+<dd style="margin-left: 5.0em">True if the bytes starting at <i>offset</i> match <i>string</i> without respect to case.
+<dt><b>char(</b><i>offset</i><b>,</b><i>value</i><b>)</b>
+<dd style="margin-left: 5.0em">True if the byte at <i>offset</i> is identical to <i>value</i>.
+<dt><b>short(</b><i>offset</i><b>,</b><i>value</i><b>)</b>
+<dd style="margin-left: 5.0em">True if the 16-bit big-endian integer at <i>offset</i> is identical to <i>value</i>.
+<dt><b>int(</b><i>offset</i><b>,</b><i>value</i><b>)</b>
+<dd style="margin-left: 5.0em">True if the 32-bit big-endian integer at <i>offset</i> is identical to <i>value</i>.
+<dt><b>locale("</b><i>string</i><b>")</b>
+<dd style="margin-left: 5.0em">True if current locale matches <i>string</i>.
+<dt><b>contains(</b><i>offset</i><b>,</b><i>range</i><b>,"</b><i>string</i><b>")</b>
+<dd style="margin-left: 5.0em">True if the bytes starting at <i>offset</i> for <i>range</i> bytes contains <i>string</i>.
+</dl>
+<h3><a name="STRING_CONSTANTS">String Constants</a></h3>
+String constants can be specified inside quotes ("") for strings containing whitespace and angle brackets (&lt;>) for hexadecimal strings.
+<h3><a name="TYPE_MATCHING_AND_PRIORITY">Type Matching And Priority</a></h3>
+When CUPS needs to determine the MIME media type of a given file, it checks every MIME media type defined in the <i>.types</i> files.
+When two or more types match a given file, the type chosen will depend on the type name and priority, with higher-priority types being used over lower-priority ones.
+If the types have the same priority, the type names are sorted alphanumerically in ascending order and the first type is chosen.
+<p>For example, if two types "text/bar" and "text/foo" are defined as matching the
+extension "doc", normally the type "text/bar" will be chosen since its name is
+alphanumerically smaller than "text/foo".
+However, if "text/foo" also defines a higher priority than "text/bar", "text/foo" will be chosen instead.
+<h2 class="title"><a name="FILES">Files</a></h2>
+<i>/etc/cups</i> - Typical CUPS configuration directory.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Define two MIME media types for raster data, with one being a subset with higher priority:
+<pre class="man">
+
+    application/vnd.cups-raster  string(0,"RaSt") string(0,"tSaR") \
+                                  string(0,"RaS2") string(0,"2SaR") \
+                                  string(0,"RaS3") string(0,"3SaR")
+
+    image/pwg-raster              string(0,"RaS2") + \
+                                  string(4,PwgRaster&lt;00>) priority(150)
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsfilter.html?TOPIC=Man+Pages"><b>cupsfilter</b>(8),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

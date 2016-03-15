@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsaccept(8)</title>
+</head>
+<body>
+<h1 class="title">cupsaccept(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsaccept/cupsreject - accept/reject jobs sent to a destination
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsaccept</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h</b>
+<i>hostname[:port]</i>
+]
+<i>destination(s)</i>
+<br>
+<b>cupsreject</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h</b>
+<i>hostname[:port]</i>
+] [
+<b>-r</b>
+<i>reason</i>
+]
+<i>destination(s)</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The
+<b>cupsaccept</b>
+command instructs the printing system to accept print jobs to the specified destinations.
+<p>The
+<b>cupsreject</b>
+command instructs the printing system to reject print jobs to the
+specified destinations.
+The <i>-r</i> option sets the reason for rejecting print jobs. If not specified, the reason defaults to "Reason Unknown".
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are supported by both
+<b>cupsaccept</b>
+and
+<b>cupsreject</b>:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Sets the username that is sent when connecting to the server.
+<dt><b>-h </b><i>hostname[:port]</i>
+<dd style="margin-left: 5.0em">Chooses an alternate server.
+<dt><b>-r </b>"<i>reason</i>"
+<dd style="margin-left: 5.0em">Sets the reason string that is shown for a printer that is rejecting jobs.
+</dl>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The
+<b>cupsaccept</b>
+and
+<b>cupsreject</b>
+commands correspond to the System V printing system commands "accept" and "reject", respectively.
+Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+<p>Finally, the CUPS versions may ask the user for an access password depending on the printing system configuration.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-cupsenable.html?TOPIC=Man+Pages"><b>cupsenable</b>(8),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+<br>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

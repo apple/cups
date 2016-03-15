@@ -1,0 +1,131 @@
+.\"
+.\" "$Id: cupsaddsmb.man.in 12854 2015-08-28 14:08:00Z msweet $"
+.\"
+.\" cupsaddsmb man page for CUPS.
+.\"
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cupsaddsmb 8 "CUPS" "11 June 2014" "Apple Inc."
+.SH NAME
+cupsaddsmb \- export printers to samba for windows clients
+
+.SH SYNOPSIS
+.B cupsaddsmb
+[
+.B \-H
+.I samba-server
+] [
+.B \-U
+.I samba-user[%samba-password]
+] [
+.B \-h
+.I cups-server[:port]
+] [
+.B \-v
+]
+.B \-a
+.br
+.B cupsaddsmb
+[
+.B \-H
+.I samba-server
+] [
+.B \-U
+.I samba-user[%samba-password]
+] [
+.B \-h
+.I cups-server[:port]
+] [
+.B \-v
+]
+.I printer
+[ ...
+.I printer
+]
+.SH DESCRIPTION
+The \fBcupsaddsmb\fR program exports printers to the SAMBA software (version 2.2.0 or higher) for use with Windows clients.
+Depending on the SAMBA configuration, you may need to provide a password to export the printers.
+This program requires the Windows printer driver files described below.
+.SS SAMBA CONFIGURATION
+\fBcupsaddsmb\fR uses the RPC-based printing support in SAMBA to provide printer drivers and PPD files to Windows client machines.
+In order to use this functionality, you must first configure the SAMBA
+.BR smb.conf (5)
+file to support printing through CUPS and provide a printer driver download
+share, as follows:
+.nf
+
+    [global]
+	load printers = yes
+	printing = cups
+	printcap name = cups
+
+    [printers]
+	comment = All Printers
+	path = /var/spool/samba
+	browseable = no
+	public = yes
+	guest ok = yes
+	writable = no
+	printable = yes
+
+    [print$]
+	comment = Printer Drivers
+	path = /etc/samba/drivers
+	browseable = yes
+	guest ok = no
+	read only = yes
+	write list = root
+
+.fi
+This configuration assumes a FHS-compliant installation of SAMBA; adjust the [printers] and [print$] share paths accordingly on your system as needed.
+.SS MICROSOFT POSTSCRIPT DRIVERS FOR WINDOWS
+The base driver for Windows 2000 and higher is the Microsoft PostScript driver, which is available on any system running Windows 2000 or higher in the %WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\W32X86\\3 folder for 32-bit drivers and %WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\X64\\3 folder for 64-bit drivers.
+.LP
+Copy the 32-bit drivers to the \fI/usr/share/cups/drivers\fR directory and the 64-bit drivers to the \fI/usr/share/cups/drivers/x64\fR directory exactly as named below:
+.nf
+
+    ps5ui.dll
+    pscript.hlp
+    pscript.ntf
+    pscript5.dll
+
+.fi
+\fBNote:\fR Unlike Windows, case is significant - make sure that you use the lowercase filenames shown above, otherwise \fBcupsaddsmb\fR will fail to export the drivers.
+.SH OPTIONS
+\fBcupsaddsmb\fR supports the following options:
+.TP 5
+\fB\-H \fIsamba-server\fR
+Specifies the SAMBA server which defaults to the CUPS server.
+.TP 5
+\fB\-U \fIsamba-user\fR[\fB%\fIsamba-password\fR]
+Specifies the SAMBA print admin username which defaults to your current username.
+If the username contains a percent (%) character, then the text following the percent is treated as the SAMBA password to use.
+.TP 5
+.B \-a
+Exports all known printers.
+Otherwise only the named printers are exported.
+.TP 5
+\fB\-h \fIcups-server\fR[\fB:\fIport\fR]
+Specifies a different CUPS server to use.
+.TP 5
+.B \-v
+Specifies that verbose information should be shown.
+This is useful for debugging SAMBA configuration problems.
+.SH SEE ALSO
+.BR rpcclient (1),
+.BR smbclient (1),
+.BR smbd (8),
+.BR smb.conf (5),
+CUPS Online Help (http://localhost:631/help)
+.SH COPYRIGHT
+Copyright \[co] 2007-2015 by Apple Inc.
+.\"
+.\" End of "$Id: cupsaddsmb.man.in 12854 2015-08-28 14:08:00Z msweet $".
+.\"

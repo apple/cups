@@ -1,0 +1,328 @@
+#
+# "$Id: 4.2-cups-printer-ops.test 11798 2014-04-07 15:18:44Z msweet $"
+#
+#   Verify that the CUPS printer operations work.
+#
+{
+	# The name of the test...
+	NAME "Add Printer Test1"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	FILE testhp.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Delete Printer Test1"
+
+	# The operation to use
+	OPERATION cups-delete-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Deleted"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Subscribe to Printer Events"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/
+	ATTR name requesting-user-name $user
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-added,printer-modified,printer-deleted
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+}
+{
+	# The name of the test...
+	NAME "Add Printer Test2"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	FILE testhp.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test2 Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Modify Printer Test2"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test2
+
+	GROUP printer
+	ATTR uri device-uri file:/tmp/Test2
+	ATTR enum printer-state 3
+	ATTR boolean printer-is-accepting-jobs true
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Re-Add Printer Test1"
+
+	# The operation to use
+	OPERATION cups-add-printer
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	GROUP printer
+	ATTR uri device-uri file:/tmp/Test1
+	ATTR enum printer-state 3
+	ATTR boolean printer-is-accepting-jobs true
+	ATTR text printer-info "Test Printer 1"
+
+	FILE testps.ppd
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Verify Printer Test1 Re-Added"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Get Default Printer with no default set"
+
+	# The operation to use
+	OPERATION cups-get-default
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Set Default Printer to Test1"
+
+	# The operation to use
+	OPERATION cups-set-default
+	RESOURCE /admin/
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Get Default Printer"
+
+	# The operation to use
+	OPERATION cups-get-default
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-name
+	EXPECT printer-uri-supported
+}
+{
+	# The name of the test...
+	NAME "Get IPP/2.x Attributes for Printer Test1"
+
+	# The operation to use
+	OPERATION get-printer-attributes
+	RESOURCE /
+
+	# The IPP version to use
+	VERSION 2.0
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT media-col-default
+}
+
+#
+# End of "$Id: 4.2-cups-printer-ops.test 11798 2014-04-07 15:18:44Z msweet $"
+#

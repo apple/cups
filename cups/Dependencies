@@ -1,0 +1,318 @@
+adminutil.o: adminutil.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h adminutil.h
+array.o: array.c ../cups/cups.h file.h versioning.h ipp.h http.h array.h \
+  language.h pwg.h string-private.h ../config.h debug-private.h \
+  array-private.h
+attr.o: attr.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+auth.o: auth.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+backchannel.o: backchannel.c cups.h file.h versioning.h ipp.h http.h \
+  array.h language.h pwg.h
+backend.o: backend.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h backend.h
+conflicts.o: conflicts.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+custom.o: custom.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+debug.o: debug.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+dest.o: dest.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+dest-job.o: dest-job.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+dest-localization.o: dest-localization.c cups-private.h string-private.h \
+  ../config.h debug-private.h ../cups/versioning.h array-private.h \
+  ../cups/array.h ipp-private.h ../cups/ipp.h http.h http-private.h \
+  ../cups/language.h md5-private.h language-private.h \
+  ../cups/transcode.h pwg-private.h ../cups/cups.h file.h pwg.h \
+  ppd-private.h ../cups/ppd.h thread-private.h
+dest-options.o: dest-options.c cups-private.h string-private.h \
+  ../config.h debug-private.h ../cups/versioning.h array-private.h \
+  ../cups/array.h ipp-private.h ../cups/ipp.h http.h http-private.h \
+  ../cups/language.h md5-private.h language-private.h \
+  ../cups/transcode.h pwg-private.h ../cups/cups.h file.h pwg.h \
+  ppd-private.h ../cups/ppd.h thread-private.h
+dir.o: dir.c string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h dir.h
+emit.o: emit.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+encode.o: encode.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+file.o: file.c file-private.h cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+getdevices.o: getdevices.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+getifaddrs.o: getifaddrs.c http-private.h ../config.h ../cups/language.h \
+  array.h versioning.h ../cups/http.h md5-private.h ipp-private.h \
+  ../cups/ipp.h
+getputfile.o: getputfile.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+globals.o: globals.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+http.o: http.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+http-addr.o: http-addr.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+http-addrlist.o: http-addrlist.c cups-private.h string-private.h \
+  ../config.h debug-private.h ../cups/versioning.h array-private.h \
+  ../cups/array.h ipp-private.h ../cups/ipp.h http.h http-private.h \
+  ../cups/language.h md5-private.h language-private.h \
+  ../cups/transcode.h pwg-private.h ../cups/cups.h file.h pwg.h \
+  ppd-private.h ../cups/ppd.h thread-private.h
+http-support.o: http-support.c cups-private.h string-private.h \
+  ../config.h debug-private.h ../cups/versioning.h array-private.h \
+  ../cups/array.h ipp-private.h ../cups/ipp.h http.h http-private.h \
+  ../cups/language.h md5-private.h language-private.h \
+  ../cups/transcode.h pwg-private.h ../cups/cups.h file.h pwg.h \
+  ppd-private.h ../cups/ppd.h thread-private.h
+ipp.o: ipp.c cups-private.h string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h array-private.h ../cups/array.h ipp-private.h \
+  ../cups/ipp.h http.h http-private.h ../cups/language.h md5-private.h \
+  language-private.h ../cups/transcode.h pwg-private.h ../cups/cups.h \
+  file.h pwg.h ppd-private.h ../cups/ppd.h thread-private.h
+ipp-support.o: ipp-support.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+langprintf.o: langprintf.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+language.o: language.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+localize.o: localize.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+mark.o: mark.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+md5.o: md5.c md5-private.h string-private.h ../config.h
+md5passwd.o: md5passwd.c http-private.h ../config.h ../cups/language.h \
+  array.h versioning.h ../cups/http.h md5-private.h ipp-private.h \
+  ../cups/ipp.h string-private.h
+notify.o: notify.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+options.o: options.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+page.o: page.c string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h ppd.h cups.h file.h ipp.h http.h array.h \
+  language.h pwg.h
+ppd.o: ppd.c cups-private.h string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h array-private.h ../cups/array.h ipp-private.h \
+  ../cups/ipp.h http.h http-private.h ../cups/language.h md5-private.h \
+  language-private.h ../cups/transcode.h pwg-private.h ../cups/cups.h \
+  file.h pwg.h ppd-private.h ../cups/ppd.h thread-private.h
+ppd-cache.o: ppd-cache.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+pwg-media.o: pwg-media.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+request.o: request.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+sidechannel.o: sidechannel.c sidechannel.h versioning.h cups-private.h \
+  string-private.h ../config.h debug-private.h array-private.h \
+  ../cups/array.h ipp-private.h ../cups/ipp.h http.h http-private.h \
+  ../cups/language.h md5-private.h language-private.h \
+  ../cups/transcode.h pwg-private.h ../cups/cups.h file.h pwg.h \
+  ppd-private.h ../cups/ppd.h thread-private.h
+snmp.o: snmp.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h snmp-private.h
+snprintf.o: snprintf.c string-private.h ../config.h
+string.o: string.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+tempfile.o: tempfile.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+thread.o: thread.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+tls.o: tls.c cups-private.h string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h array-private.h ../cups/array.h ipp-private.h \
+  ../cups/ipp.h http.h http-private.h ../cups/language.h md5-private.h \
+  language-private.h ../cups/transcode.h pwg-private.h ../cups/cups.h \
+  file.h pwg.h ppd-private.h ../cups/ppd.h thread-private.h tls-darwin.c
+transcode.o: transcode.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+usersys.o: usersys.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+util.o: util.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+testadmin.o: testadmin.c adminutil.h cups.h file.h versioning.h ipp.h \
+  http.h array.h language.h pwg.h string-private.h ../config.h
+testarray.o: testarray.c string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h array-private.h ../cups/array.h dir.h
+testconflicts.o: testconflicts.c cups.h file.h versioning.h ipp.h http.h \
+  array.h language.h pwg.h ppd.h string-private.h ../config.h
+testcups.o: testcups.c string-private.h ../config.h cups.h file.h \
+  versioning.h ipp.h http.h array.h language.h pwg.h ppd.h
+testdest.o: testdest.c cups.h file.h versioning.h ipp.h http.h array.h \
+  language.h pwg.h
+testfile.o: testfile.c string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h file.h
+testhttp.o: testhttp.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+testi18n.o: testi18n.c string-private.h ../config.h language-private.h \
+  ../cups/transcode.h language.h array.h versioning.h
+testipp.o: testipp.c file.h versioning.h string-private.h ../config.h \
+  ipp-private.h ../cups/ipp.h http.h array.h
+testoptions.o: testoptions.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+testlang.o: testlang.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+testppd.o: testppd.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
+testpwg.o: testpwg.c ppd-private.h ../cups/cups.h file.h versioning.h \
+  ipp.h http.h array.h language.h pwg.h ../cups/ppd.h pwg-private.h \
+  file-private.h cups-private.h string-private.h ../config.h \
+  debug-private.h array-private.h ipp-private.h http-private.h \
+  md5-private.h language-private.h ../cups/transcode.h thread-private.h
+testsnmp.o: testsnmp.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h snmp-private.h

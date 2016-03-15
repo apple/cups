@@ -1,0 +1,547 @@
+//
+// "$Id: foo.drv 3247 2011-05-12 06:22:31Z msweet $"
+//
+//   PPD file compiler test data file for CUPS.
+//
+//   Copyright 2007-2011 by Apple Inc.
+//   Copyright 1997-2003 by Easy Software Products.
+//
+//   These coded instructions, statements, and computer programs are the
+//   property of Apple Inc. and are protected by Federal copyright
+//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+//   which should have been included with this file.  If this file is
+//   file is missing or damaged, see the license at "http://www.cups.org/".
+//
+
+/*
+ * C-style comments are supported.
+ */
+
+//
+// C++-style comments are supported.
+//
+
+//
+// Include the common media size definitions...
+//
+// #include directives support both <name> to include a standard file
+// and "name" or just name without the quotes for a local file.  Local
+// files resolve relative to the current file's path.  Unlike C/C++,
+// #include <name> does not look in multiple directories, and
+// #include "name" does not look in the standard directory.
+//
+
+#include <media.defs>
+
+
+//
+// Include the CUPS raster definitions...
+//
+
+#include <raster.defs>
+
+
+//
+// Include the standard CUPS fonts...
+//
+
+#include <font.defs>
+
+
+//
+// Define variables using the #define directive.  In this case we
+// are defining constants for the model number, which is used by
+// our imaginary rastertofoo filter to determine which model-specific
+// features to use/support.
+//
+
+#define MODEL_BW	0
+#define MODEL_COLOR	1
+
+#define MODEL_LASER	0
+#define MODEL_PHOTO	2
+
+
+//
+// Media sizes are defined using the #media directive.  The order of
+// values is: size name/text, width, length.
+//
+// "Size name" is an alphanumeric string of up to 40 characters as
+// defined by the Adobe PPD specification.
+//
+// "Size text" is a text string of up to 80 characters as defined by
+// the Adobe PPD specification.
+//
+// "Width" and "length" are the width and length of the media size.
+// Numbers by themselves represent points (72 points = 1 inch).  The
+// suffixes "cm", "ft", "in", "m", "mm", and "pt" are recognized to
+// specify centimeters, feet, inches, meters, millimeters, and points,
+// respectively.
+//
+
+#media "FooLetter/Foo Letter" 8in 10in
+#media "FooPhoto/Foo Photo" 200mm 300mm
+
+
+//
+// Message catalogs can be included using #po...
+//
+
+#po fr foo-fr.po
+
+
+//
+// Specify that the drivers use all of the standard base fonts...
+//
+
+Font *
+
+
+//
+// All copyright lines are put at the top of the PPD file in order
+// of their appearance.  Copyright text can span multiple lines and
+// will be properly included in the PPD file with comment prefixes
+// on each line.
+//
+// First an MIT-style copyright/license notice...
+//
+
+Copyright "Copyright 2007 by Foo Industries."
+Copyright "
+Permission is granted for redistribution of this file as long as
+this copyright notice is intact and the contents of the file are
+not altered in any way from their original form.
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the \"Software\"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+"
+
+//
+// Then a GPL notice...
+//
+
+Copyright "Copyright 2007 by Foo Industries."
+Copyright "
+This software is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public
+License along with this software; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA 02111 USA
+"
+
+
+//
+// All printer drivers must define the manufacturer, model, PC
+// filename, and version strings; since this test file contains
+// drivers for an imaginary manufacturer "Foo", all of the drivers
+// listed in this file share common manufacturer and version
+// strings.
+//
+
+Manufacturer "Foo"
+Version 1.0
+
+
+//
+// Printer drivers can access driver-specific attributes in a PPD
+// file; these attributes are specified using lines of the form:
+//
+//     Attribute name selector value
+//
+// "Name" is the name of the attribute and should start with either
+// the "cups" prefix or the name of the vendor, e.g. "hpFoo",
+// "epsonBar", etc.  The name can be any alphanumeric character (a-z,
+// A-Z, and 0-9) and cannot be a common prefix of another attribute,
+// e.g. "fooLines" and "fooLinesPerInch" cannot be in the same file.
+//
+// "Selector" is a selector string containing any characters except
+// colon (:).  Typically this will be one or more keywords separated
+// by the forward slash (/), however the empty string ("") can be used
+// to omit the selector.
+//
+// "Value" is a quoted value string that can contain any printable
+// characters except the double quote (").  Hexadecimal numbers
+// inside angle brackets (<xx>) can be used to substitute escape
+// codes and other special characters.
+//
+
+Attribute fooOutputFormat "" "PCL"
+Attribute fooPJL Begin "<1B>%-12345X@PJL<0D0A>"
+Attribute fooPJL Enter/PCL "@PJL ENTER LANGUAGE=PCL<0D0A>"
+Attribute fooPJL End "<1B>%-12345X@PJL END JOB<0D0A>"
+
+//
+// Most printer drivers use filters; exceptions include PostScript
+// printers and PPD files for software RIPs.
+//
+// The format is:
+//
+//     Filter mime-type cost program
+//
+// The "mime-type" field defines the MIME type that the filter program
+// accepts; for CUPS raster printer drivers, this will be
+// "application/vnd.cups-raster".
+//
+// The "cost" field defines the relative cost of the filter in terms of
+// both CPU and memory usage, and is used to limit the number of
+// simultaneous jobs in some configurations.  Most raster filters should
+// have a cost of 100, unless the filter does no dithering - then a cost
+// of 33 is more appropriate.
+//
+// The "program" field defined the filter program to run; use the null
+// filter "-" to define a MIME type that the printer accepts directly.
+// If no path information is provided, then the program will be run
+// from the standard CUPS filter directory, usually
+// /usr/lib/cups/filter.
+//
+// When compiling PPD files for PostScript capable devices that use
+// additional filters, add a null filter for the MIME type
+// "application/vnd.cups-postscript" so that printer commands, user
+// job filters, and page markings can be added to the PostScript
+// output that is sent to the printer.
+//
+
+Filter application/vnd.cups-raster 100 rastertofoo
+
+
+//
+// Attributes are included thusly...
+//
+
+Attribute cupsIPPReason "com.foo-serious-error/A Serious Error" "http://foo.com/serious.html"
+
+
+//
+// Curley braces are used for grouping common data and for isolating
+// individual printer models.  All data values are inherited *except*
+// for the PCFilename and ModelName strings.
+//
+
+{
+  //
+  // Define two printer drivers that support only the FooLetter and
+  // FooPhoto media size.  One is color, the other is black-and-white.
+  //
+  // Both printers share two MediaSize definitions; the name listed
+  // after the MediaSize keyword must be one of the Adobe standard
+  // names listed in the PPD specification or any named size defined
+  // using the #media directive.
+  //
+  // Default options are indicated by placing an asterisk (*) before
+  // the keyword.
+  //
+  // For custom size and margin specification, see the next group of
+  // printer drivers.
+  //
+
+  MediaSize FooLetter
+  *MediaSize FooPhoto
+
+
+  //
+  // These imaginary printers support printing at 300, 600x300,
+  // and 600 DPI.  We'll use the old-style Resolution convenience
+  // keyword which accepts the following parameters: colorspace/
+  // order, bits-per-color, row count, row feed, row step, and
+  // name/text.
+  //
+  // The name must be of the form NNNsuffix or NNNxMMMsuffix,
+  // where NNN and MMM represent the X and Y resolution in dots
+  // per inch.
+  //
+
+  Resolution - 8 0 0 0 "300dpi/300 DPI"
+  Resolution - 8 0 0 0 "600x300dpi/600 x 300 DPI"
+  *Resolution - 8 0 0 0 "600dpi/600 DPI"
+
+
+  //
+  // One printer is grayscale only, and the other does grayscale
+  // and color.  Define the grayscale color model for both printers
+  // using the old-style ColorModel convenience keyword which
+  // accepts the name/text, colorspace, color order, and compression
+  // parameters.
+  //
+
+  ColorModel	Gray/Grayscale w chunked 0
+
+
+  {
+    //
+    // The first sub-group contains the grayscale printer, which
+    // only needs the model name, PC filename, and model number
+    // values set...
+    //
+    // The ModelName keyword defines the string that is shown to
+    // the user.
+    //
+
+    ModelName "Mono Photo Printer"
+
+
+    //
+    // The ModelNumber keyword defines the cupsModelNumber
+    // attribute value.  We use the "(name name)" notation
+    // to perform a bitwise OR of the #define'd constants.
+    //
+
+    ModelNumber ($MODEL_BW $MODEL_PHOTO)
+
+
+    //
+    // The PCFileName keyword defines the filename of the PPD
+    // file and should be 8 characters or less + the .ppd
+    // extension.
+    //
+
+    PCFileName "foogphot.ppd"
+  }
+
+
+  {
+    //
+    // The second sub-group contains the color printer, which
+    // needs another ColorModel definition along with the model
+    // name, PC filename, and model number values.  For fun, we'll
+    // add some input slots (paper trays) as well.
+    //
+    // The ModelName keyword defines the string that is shown to
+    // the user.
+    //
+
+    ModelName "Color Photo Printer"
+
+
+    //
+    // The ModelNumber keyword defines the cupsModelNumber
+    // attribute value.  We use the "(name name)" notation
+    // to perform a bitwise OR of the #define'd constants.
+    //
+
+    ModelNumber ($MODEL_COLOR $MODEL_PHOTO)
+
+
+    //
+    // The PCFileName keyword defines the filename of the PPD
+    // file and should be 8 characters or less + the .ppd
+    // extension.
+    //
+
+    PCFileName "foocphot.ppd"
+
+
+    //
+    // This printer does color printing, too, so add it and make
+    // RGB the default...
+    //
+
+    ColorDevice Yes
+
+    *ColorModel	RGB/Color rgb chunked 0
+
+
+    //
+    // The old-style InputSlot keyword accepts tray definitions
+    // of the form:
+    //
+    //    InputSlot position name/text
+    //
+
+    InputSlot 0 "Upper/Main Paper Tray"
+    InputSlot 1 "LargeCapacity/Large Paper Tray"
+  }
+}
+
+
+{
+  //
+  // Define two printer drivers that support two typical laser
+  // printers with custom page sizes.  One is color, the other is
+  // black-and-white.
+  //
+  // Both printers share several MediaSize definitions and support
+  // custom page sizes from 3x5 to 13x19 inches.
+  //
+  // All US media sizes use hardware margins of 0.25 inches on the sides
+  // and 12 points (1/6th inch) at the top and bottom.  European sizes
+  // and custom sizes use margins of 12 points all around.
+  //
+  // The order of the HWMargins numbers are left, bottom, right, and top.
+  // The current HWMargins values are used when defining each media size.
+  // The last HWMargins values are used for custom page size margins.
+  //
+
+  HWMargins 0.25in 12pt 0.25in 12pt
+
+  *MediaSize Letter
+  MediaSize Legal
+  MediaSize Tabloid
+  MediaSize TabloidExtra
+
+  HWMargins 12pt 12pt 12pt 12pt
+  MediaSize A4
+  MediaSize A3
+
+  //
+  // Specify that custom/variable paper sizes are supported, and the
+  // range of sizes that are supported...
+  //
+
+  VariablePaperSize Yes
+  MinSize 3in 5in
+  MaxSize 13in 19in
+
+
+  //
+  // These imaginary printers support printing at 600 and 1200 DPI.
+  // We'll use the new Option and Choice keywords to define the
+  // Resolution options...
+  //
+  // Option option-name option-text option-type
+  // Choice choice-name choice-text code
+  //
+  // "Option-type" is the type of option: boolean, pickone, or pickmany.
+  //
+
+  Option Resolution PickOne AnySetup 10
+  Choice "600dpi/600 DPI" "<</HWResolution[600 600]/cupsBitsPerColor 8>>setpagedevice"
+  Choice "1200dpi/1200 DPI" "<</HWResolution[1200 1200]/cupsBitsPerColor 8>>setpagedevice"
+
+
+  //
+  // One printer is grayscale only, and the other does grayscale
+  // and color.  Define the grayscale color model for both printers
+  // using the new Option and Choice keywords.
+  //
+
+  Option "ColorModel/Color Mode" PickOne AnySetup 10
+  Choice Gray/Grayscale "<</cupsColorSpace $CUPS_CSPACE_W>>setpagedevice"
+
+
+  //
+  // Both printers provide two paper trays, which we'll define using
+  // the new Option and Choice keywords...
+  //
+
+  Option "InputSlot/Input Slot" PickOne AnySetup 10
+  Choice "Upper/Main Paper Tray" "<</MediaPosition 0>>setpagedevice"
+  Choice "LargeCapacity/Large Paper Tray" "<</MediaPosition 1>>setpagedevice"
+
+
+  //
+  // Both printers support duplexing...
+  //
+  // The Duplex keyword accepts values of "none" (no duplexing capability),
+  // "normal" (standard duplexing capability), and "flip" (auto-duplex that
+  // requires the back side to be flipped by the RIP...)
+  //
+
+  Duplex normal
+
+
+  {
+    //
+    // The first sub-group contains the grayscale printer, which
+    // only needs the model name, PC filename, and model number
+    // values set...
+    //
+    // The ModelName keyword defines the string that is shown to
+    // the user.
+    //
+
+    ModelName "Mono Laser Printer"
+
+
+    //
+    // The ModelNumber keyword defines the cupsModelNumber
+    // attribute value.  We use the "(name name)" notation
+    // to perform a bitwise OR of the #define'd constants.
+    //
+
+    ModelNumber ($MODEL_BW $MODEL_LASER)
+
+
+    //
+    // The PCFileName keyword defines the filename of the PPD
+    // file and should be 8 characters or less + the .ppd
+    // extension.
+    //
+
+    PCFileName "fooglasr.ppd"
+  }
+
+
+  {
+    //
+    // The second sub-group contains the color printer, which
+    // needs another ColorModel definition along with the model
+    // name, PC filename, and model number values.
+    //
+    // The ModelName keyword defines the string that is shown to
+    // the user.
+    //
+
+    ModelName "Color Laser Printer"
+
+
+    //
+    // The ModelNumber keyword defines the cupsModelNumber
+    // attribute value.  We use the "(name name)" notation
+    // to perform a bitwise OR of the #define'd constants.
+    //
+
+    ModelNumber ($MODEL_COLOR $MODEL_LASER)
+
+
+    //
+    // The PCFileName keyword defines the filename of the PPD
+    // file and should be 8 characters or less + the .ppd
+    // extension.
+    //
+
+    PCFileName "fooclasr.ppd"
+
+
+    //
+    // This printer does color printing, too, so add it and make
+    // RGB the default...
+    //
+
+    ColorDevice Yes
+
+    Option "ColorModel/Color Mode" PickOne AnySetup 10
+    *Choice RGB/Color "<</cupsColorSpace $CUPS_CSPACE_RGB>>setpagedevice"
+  }
+}
+
+
+//
+// End of "$Id: foo.drv 3247 2011-05-12 06:22:31Z msweet $".
+//

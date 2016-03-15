@@ -1,0 +1,153 @@
+#
+# "$Id: 4.4-subscription-ops.test 11398 2013-11-06 20:11:11Z msweet $"
+#
+#   Verify that the CUPS subscription operations work.
+#
+{
+	# The name of the test...
+	NAME "Add Printer Subscription w/Lease"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-duration 5
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+}
+{
+	# The name of the test...
+	NAME "Verify Subscription Expiration"
+
+	# Delay test for 7 seconds to allow lease to expire...
+	DELAY 7
+
+	# The operation to use
+	OPERATION Get-Subscription-Attributes
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR integer notify-subscription-id $notify-subscription-id
+	ATTR name requesting-user-name $user
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Add 2 Printer Subscriptions w/Lease"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-duration 5
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-config-changed
+	ATTR integer notify-lease-duration 5
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+}
+{
+	# The name of the test...
+	NAME "List Printer Subscriptions"
+
+	# The operation to use
+	OPERATION Get-Subscriptions
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+	EXPECT notify-printer-uri
+	DISPLAY notify-printer-uri
+	EXPECT notify-events
+	DISPLAY notify-events
+}
+{
+	# The name of the test...
+	NAME "Check MaxSubscriptions limits"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-duration 5
+
+	# What statuses are OK?
+	STATUS client-error-too-many-subscriptions
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+
+#
+# End of "$Id: 4.4-subscription-ops.test 11398 2013-11-06 20:11:11Z msweet $"
+#

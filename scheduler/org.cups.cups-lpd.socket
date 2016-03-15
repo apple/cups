@@ -1,0 +1,9 @@
+[Unit]
+Description=CUPS LPD Server Socket
+
+[Socket]
+ListenStream=515
+Accept=yes
+
+[Install]
+WantedBy=sockets.target

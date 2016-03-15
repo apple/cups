@@ -1,0 +1,51 @@
+.\"
+.\" "$Id: cupstestdsc.man 12854 2015-08-28 14:08:00Z msweet $"
+.\"
+.\" cupstestdsc man page for CUPS.
+.\"
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2006 by Easy Software Products.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cupstestdsc 1 "CUPS" "11 June 2014" "Apple Inc."
+.SH NAME
+cupstestdsc \- test conformance of postscript files (deprecated)
+.SH SYNOPSIS
+.B cupstestdsc
+[
+.B \-h
+]
+.I filename.ps
+[ ...
+.I filenameN.ps
+]
+.br
+.B cupstestdsc
+[
+.B \-h
+]
+.B \-
+.SH DESCRIPTION
+\fBcupstestdsc\fR tests the conformance of PostScript files to the Adobe PostScript Language Document Structuring Conventions Specification version 3.0.
+The results of testing and any other output are sent to the standard output.
+The second form of the command reads PostScript from the standard input.
+.SH NOTES
+\fIThis program is deprecated and will be removed in a future release of CUPS.\fR
+.LP
+\fBcupstestdsc\fR only validates the DSC comments in a PostScript file and does not attempt to validate the PostScript code itself.
+Developers must ensure that the PostScript they generate follows the rules defined by Adobe.
+Specifically, all pages must be independent of each other, code outside page descriptions may not affect the graphics state (current font, color, transform matrix, etc.), and device-specific commands such as setpagedevice should not be used.
+.SH SEE ALSO
+CUPS Online Help (http://localhost:631/help),
+Adobe PostScript Language Document Structuring Conventions
+Specification, Version 3.0.
+.SH COPYRIGHT
+Copyright \[co] 2007-2015 by Apple Inc.
+.\"
+.\" End of "$Id: cupstestdsc.man 12854 2015-08-28 14:08:00Z msweet $".
+.\"

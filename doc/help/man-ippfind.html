@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ippfind(1)</title>
+</head>
+<body>
+<h1 class="title">ippfind(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ippfind - find internet printing protocol printers
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ippfind</b>
+[
+<i>options</i>
+] <i>regtype</i>[<b>,</b><i>subtype</i>][<b>.</b><i>domain</i><b>.</b>] ... [
+<i>expression</i>
+ ... ]
+<br>
+<b>ippfind</b>
+[
+<i>options</i>
+] <i>name</i>[<b>.</b><i>regtype</i>[<b>.</b><i>domain</i><b>.</b>]] ... [
+<i>expression</i>
+ ... ]
+<br>
+<b>ippfind</b>
+<b>--help</b>
+<br>
+<b>ippfind</b>
+<b>--version</b>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ippfind</b> finds services registered with a DNS server or available through local devices.
+Its primary purpose is to find IPP printers and show their URIs, show their current status, or run commands.
+<h3><a name="REGISTRATION_TYPES">Registration Types</a></h3>
+<b>ippfind</b> supports the following registration types:
+<dl class="man">
+<dt>_http._tcp
+<dd style="margin-left: 5.0em">HyperText Transport Protocol (HTTP, RFC 2616)
+<dt>_https._tcp
+<dd style="margin-left: 5.0em">Secure HyperText Transport Protocol (HTTPS, RFC 2818)
+<dt>_ipp._tcp
+<dd style="margin-left: 5.0em">Internet Printing Protocol (IPP, RFC 2911)
+<dt>_ipps._tcp
+<dd style="margin-left: 5.0em">Secure Internet Printing Protocol (IPPS, draft)
+<dt>_printer._tcp
+<dd style="margin-left: 5.0em">Line Printer Daemon (LPD, RFC 1179)
+</dl>
+<h3><a name="EXPRESSIONS">Expressions</a></h3>
+<b>ippfind</b> supports expressions much like the
+<b>find</b>(1)
+utility.
+However, unlike
+<b>find</b>(1),
+<b>ippfind</b> uses POSIX regular expressions instead of shell filename matching patterns.
+If <i>--exec</i>, <i>-l</i>, <i>--ls</i>, <i>-p</i>, <i>--print</i>, <i>--print-name</i>, <i>-q</i>, <i>--quiet</i>, <i>-s</i>, or <i>-x</i> is not specified, <b>ippfind</b> adds <i>--print</i> to print the service URI of anything it finds.
+The following expressions are supported:
+<dl class="man">
+<dt><b>-d </b><i>regex</i>
+<dd style="margin-left: 5.0em"><dt><b>--domain </b><i>regex</i>
+<dd style="margin-left: 5.0em">True if the domain matches the given regular expression.
+<dt><b>--false</b>
+<dd style="margin-left: 5.0em">Always false.
+<dt><b>-h </b><i>regex</i>
+<dd style="margin-left: 5.0em"><dt><b>--host </b><i>regex</i>
+<dd style="margin-left: 5.0em">True is the hostname matches the given regular expression.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em"><dt><b>--ls</b>
+<dd style="margin-left: 5.0em">Lists attributes returned by Get-Printer-Attributes for IPP printers and traditional <i>find</i> "-ls" output for HTTP URLs.
+The result is true if the URI is accessible, false otherwise.
+<dt><b>--local</b>
+<dd style="margin-left: 5.0em">True if the service is local to this computer.
+<dt><b>-n </b><i>regex</i>
+<dd style="margin-left: 5.0em"><dt><b>--name </b><i>regex</i>
+<dd style="margin-left: 5.0em">True if the service instance name matches the given regular expression.
+<dt><b>--path </b><i>regex</i>
+<dd style="margin-left: 5.0em">True if the URI resource path matches the given regular expression.
+<dt><b>-P </b><i>number</i>[<b>-</b><i>number</i>]
+<dd style="margin-left: 5.0em"><dt><b>--port </b><i>number</i>[<b>-</b><i>number</i>]
+<dd style="margin-left: 5.0em">True if the port matches the given number or range.
+<dt><b>-p</b>
+<dd style="margin-left: 5.0em"><dt><b>--print</b>
+<dd style="margin-left: 5.0em">Prints the URI if the result of previous expressions is true.
+The result is always true.
+<dt><b>-q</b>
+<dd style="margin-left: 5.0em"><dt><b>--quiet</b>
+<dd style="margin-left: 5.0em">Quiet mode - just returns the exit codes below.
+<dt><b>-r</b>
+<dd style="margin-left: 5.0em"><dt><b>--remote</b>
+<dd style="margin-left: 5.0em">True if the service is not local to this computer.
+<dt><b>-s</b>
+<dd style="margin-left: 5.0em"><dt><b>--print-name</b>
+<dd style="margin-left: 5.0em">Prints the service instance name if the result of previous expressions is true.
+The result is always true.
+<dt><b>--true</b>
+<dd style="margin-left: 5.0em">Always true.
+<dt><b>-t </b><i>key</i>
+<dd style="margin-left: 5.0em"><dt><b>--txt </b><i>key</i>
+<dd style="margin-left: 5.0em">True if the TXT record contains the named key.
+<dt><b>--txt-</b><i>key regex</i>
+<dd style="margin-left: 5.0em">True if the TXT record contains the named key and matches the given regular expression.
+<dt><b>-u </b><i>regex</i>
+<dd style="margin-left: 5.0em"><dt><b>--uri </b><i>regex</i>
+<dd style="margin-left: 5.0em">True if the URI matches the given regular expression.
+<dt><b>-x </b><i>utility </i>[ <i>argument </i>... ] <b>;</b>
+<dd style="margin-left: 5.0em"><dt><b>--exec </b><i>utility </i>[ <i>argument </i>... ] <b>;</b>
+<dd style="margin-left: 5.0em">Executes the specified program if the current result is true.
+"{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
+</dl>
+<p>Expressions may also contain modifiers:
+<dl class="man">
+<dt><b>( </b><i>expression </i><b>)</b>
+<dd style="margin-left: 5.0em">Group the result of expressions.
+<dt><b>! </b><i>expression</i>
+<dd style="margin-left: 5.0em"><dt><b>--not </b><i>expression</i>
+<dd style="margin-left: 5.0em">Unary NOT of the expression.
+<dt><i>expression expression</i>
+<dd style="margin-left: 5.0em"><dt><i>expression </i><b>--and </b><i>expression</i>
+<dd style="margin-left: 5.0em">Logical AND of expressions.
+<dt><i>expression </i><b>--or </b><i>expression</i>
+<dd style="margin-left: 5.0em">Logical OR of expressions.
+</dl>
+<h3><a name="SUBSTITUTIONS">Substitutions</a></h3>
+The substitutions for "{foo}" in <i>-e</i> and <i>--exec</i> are:
+<dl class="man">
+<dt><b>{service_domain}</b>
+<dd style="margin-left: 5.0em">Domain name, e.g., "example.com.", "local.", etc.
+<dt><b>{service_hostname}</b>
+<dd style="margin-left: 5.0em">Fully-qualified domain name, e.g., "printer.example.com.", "printer.local.", etc.
+<dt><b>{service_name}</b>
+<dd style="margin-left: 5.0em">Service instance name, e.g., "My Fine Printer".
+<dt><b>{service_port}</b>
+<dd style="margin-left: 5.0em">Port number for server, typically 631 for IPP and 80 for HTTP.
+<dt><b>{service_regtype}</b>
+<dd style="margin-left: 5.0em">DNS-SD registration type, e.g., "_ipp._tcp", "_http._tcp", etc.
+<dt><b>{service_scheme}</b>
+<dd style="margin-left: 5.0em">URI scheme for DNS-SD registration type, e.g., "ipp", "http", etc.
+<dt><b>{}</b>
+<dd style="margin-left: 5.0em"><dt><b>{service_uri}</b>
+<dd style="margin-left: 5.0em">URI for service, e.g., "ipp://printer.local./ipp/print", "<a href="http://printer.local./"">http://printer.local./"</a>, etc.
+<dt><b>{txt_</b><i>key</i><b>}</b>
+<dd style="margin-left: 5.0em">Value of TXT record <i>key</i> (lowercase).
+</dl>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ippfind</b> supports the following options:
+<dl class="man">
+<dt><b>--help</b>
+<dd style="margin-left: 5.0em">Show program help.
+<dt><b>--version</b>
+<dd style="margin-left: 5.0em">Show program version.
+<dt><b>-4</b>
+<dd style="margin-left: 5.0em">Use IPv4 when listing.
+<dt><b>-6</b>
+<dd style="margin-left: 5.0em">Use IPv6 when listing.
+<dt><b>-T </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specify find timeout in seconds.
+If 1 or less, <b>ippfind</b> stops as soon as it thinks it has found everything.
+The default timeout is 1 second.
+<dt><b>-V </b><i>version</i>
+<dd style="margin-left: 5.0em">Specifies the IPP version when listing.
+Supported values are "1.1", "2.0", "2.1", and "2.2".
+</dl>
+<h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
+<b>ippfind</b> returns 0 if the result for all processed expressions is true, 1 if the result of any processed expression is false, 2 if browsing or any query or resolution failed, 3 if an undefined option or invalid expression was specified, and 4 if it ran out of memory.
+<h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
+When executing a program, <b>ippfind</b> sets the following environment variables for the matching service registration:
+<dl class="man">
+<dt><b>IPPFIND_SERVICE_DOMAIN</b>
+<dd style="margin-left: 5.0em">Domain name, e.g., "example.com.", "local.", etc.
+<dt><b>IPPFIND_SERVICE_HOSTNAME</b>
+<dd style="margin-left: 5.0em">Fully-qualified domain name, e.g., "printer.example.com.", "printer.local.", etc.
+<dt><b>IPPFIND_SERVICE_NAME</b>
+<dd style="margin-left: 5.0em">Service instance name, e.g., "My Fine Printer".
+<dt><b>IPPFIND_SERVICE_PORT</b>
+<dd style="margin-left: 5.0em">Port number for server, typically 631 for IPP and 80 for HTTP.
+<dt><b>IPPFIND_SERVICE_REGTYPE</b>
+<dd style="margin-left: 5.0em">DNS-SD registration type, e.g., "_ipp._tcp", "_http._tcp", etc.
+<dt><b>IPPFIND_SERVICE_SCHEME</b>
+<dd style="margin-left: 5.0em">URI scheme for DNS-SD registration type, e.g., "ipp", "http", etc.
+<dt><b>IPPFIND_SERVICE_URI</b>
+<dd style="margin-left: 5.0em">URI for service, e.g., "ipp://printer.local./ipp/print", "<a href="http://printer.local./"">http://printer.local./"</a>, etc.
+<dt><b>IPPFIND_TXT_fIKEYfR</b>
+<dd style="margin-left: 5.0em">Values of TXT record <i>KEY</i> (uppercase).
+</dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+To show the status of all registered IPP printers on your network, run:
+<pre class="man">
+
+    ippfind --ls
+
+</pre>
+Similarly, to send a PostScript test page to every PostScript printer, run:
+<pre class="man">
+
+    ippfind --txt-pdl application/postscript --exec ipptool
+      -f onepage-letter.ps '{}' print-job.test \;
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(1)</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2013-2015 by Apple Inc.
+
+</body>
+</html>

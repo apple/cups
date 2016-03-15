@@ -1,0 +1,121 @@
+*PPD-Adobe: "4.3"
+*%
+*% "$Id: testppdx.ppd 3833 2012-05-23 22:51:18Z msweet $"
+*%
+*% Test PPD file for data encoding example.
+*%
+*% This file cannot be used with any known printers.
+*%
+*% Copyright 2007-2012 by Apple Inc.
+*% Copyright 2002-2006 by Easy Software Products.
+*%
+*% These coded instructions, statements, and computer programs are the
+*% property of Apple Inc. and are protected by Federal copyright
+*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+*% which should have been included with this file.  If this file is
+*% file is missing or damaged, see the license at "http://www.cups.org/".
+*FormatVersion:	"4.3"
+*FileVersion:	"1.3"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"TESTPPDX.PPD"
+*Manufacturer:	"Apple"
+*Product:	"(Test PPDX)"
+*cupsVersion:	1.6
+*ModelName:     "Test PPDX"
+*ShortNickName: "Test PPDX"
+*NickName:      "Test PPDX for CUPS"
+*PSVersion:	"(3010.000) 0"
+*LanguageLevel:	"3"
+*ColorDevice:	True
+*DefaultColorSpace: RGB
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*TTRasterizer:	Type42
+*cupsFilter: "application/vnd.cups-raster 0 -"
+*RequiresPageRegion All: True
+
+*% For PageSize, we have put all of the translations in-line...
+*OpenUI *PageSize/Page Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter:	"PageSize=Letter"
+*PageSize Letter.Banner/US Letter Banner: "PageSize=Letter.Banner"
+*PageSize Letter.Fullbleed/US Letter Borderless: "PageSize=Letter.Fullbleed"
+*PageSize A4/A4:		"PageSize=A4"
+*PageSize Env10/#10 Envelope:	"PageSize=Env10"
+*CloseUI: *PageSize
+
+*% For PageRegion, we have separated the translations...
+*OpenUI *PageRegion/Page Region: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter:	"PageRegion=Letter"
+*PageRegion Letter.Banner/US Letter Banner: "PageRegion=Letter.Fullbleed"
+*PageRegion Letter.Fullbleed/US Letter Borderless: "PageRegion=Letter.Fullbleed"
+*PageRegion A4/A4:		"PageRegion=A4"
+*PageRegion Env10/#10 Envelope:	"PageRegion=Env10"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter
+*ImageableArea Letter:	"18 36 594 756"
+*ImageableArea Letter.Banner:	"18 0 594 792"
+*ImageableArea Letter.Fullbleed:	"0 0 612 792"
+*ImageableArea A4:	"18 36 577 806"
+*ImageableArea Env10:	"18 36 279 648"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter:	"612 792"
+*PaperDimension Letter.Banner:	"612 792"
+*PaperDimension Letter.Fullbleed:	"612 792"
+*PaperDimension A4:	"595 842"
+*PaperDimension Env10:	"297 684"
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+*%
+*% End of "$Id: testppdx.ppd 3833 2012-05-23 22:51:18Z msweet $".
+*%
+*EXData0000: "eNqlVm1v2zYQ/hz/ipvWznLgl6T7siXrgCJ2AANBEyQpNmAtAlqiLG4SKZBU7LTIf9/dUW9Og32ZAFsieffcc88dKS2OR3AM0Zt1+ibCJxoA3EvnobJma0UJmbFwc7OEVHgBUicmVXoLci/KqpCAQznvHC9MWSmc3Smfn3WzdG2TBGYGPCJXVbqH2fIBQR+Wq5vb1cWH+9XyfRTBbNs"
+*EXData0001: "GcwTaG6zIqkrh7evgzDVk1Xb3MO7k9N3sHmCDxWRWeuk53KfSxf4paC087ZOvDLaTcF54WUptcdnoVO0KavaS9um7EBYCT6XAQhnK2n9E5hsEIc9yQ6XvUw8RkEelzKVVhQI2TAMEIXYzQGWClmoTU002L1GgmwVIpraF0ozXYoOGUkZXa0vVh/vVnO/91FA2+UqycHlpi5SyMWjhI0"
+*EXData0002: "lBq9kqKmbEl9BFCOETDwOuuHoFxAaQZQKueooljmVJRiK1NUSHL+UKhEaiQpPES599XZYrHb7eZUkLmx20U0lLsPAK7e/I2agDcME1S7vpst5aMsUM0U7kzmd5S03CeyIkVaqAujPdWm759SKB1PYAa3UqShDzNrShDcLdycHJgk3VnlWUnQcgdJXut/HCEvRqMFw62DSricSOeEfYI"
+*EXData0003: "HFGldfN5Y/djIyT85nyqzDz//WDKolgHcxE3ah6N2hDjQHj8vxkr7Y/oWhzDNYKt9spz89aOljnKo1HpZPRtBMDGzep7ODlntxcuAJfrq9XR0XFWnQfcS6KBZbJElC2SXNijo6Spwl+/nP7685cp27aVoY3A9NEesSi9Bm3ZZUopMpxTX+WDZzx6nPZRaRggCIFG5z1Iuwh0DDxQNAQ"
+*EXData0004: "OcbnJtJ9qyPpNAISHpW/rmTYOrRC4m6l53FfAuW50OzH4IBq4Y1ciVYcdUcQ/kWTc7Rib7baU0GJYIyDKUSrP2kQTeGnNgd0eEmHNoSpbSL7orPch1SyCkNkuDn0gEKC0JENLFQGcVZN8InKjYVqJCU3wovbmk3hdMoCmqybo+2Ds+h/zs5ZUhgn427c1btF/YKw488nY1p+xp8snDw"
+*EXData0005: "CM3WJ0OzASUA7kH27eSgtwNteZJqmDklRnN9ajTTYf3wHjpxeTXYkGK4F30W4zaV1lI1bm+vb8+4+Llw8LagMxm1nIZt155O3fz8s46mDVh7xYXR20kbcNqMWzKNWgDdRjsNM8/8TyIxeTwmkrIaVITze0m/9i4ekqbO6JmSVNqE/nWilMwWQrL/waMTMCwdxqT5+NVOQ4LUa7tNNJk"
+*EXData0006: "kOQfP11dTRqvb51GGZ9WXC3usl6nrpNe667v072jN8wgNn9mpMPj49V0n5t7043hwrezNTaOPmmxCacZ5QbjIf44mhwIhDsmpDFpmxSabopW7TdO1yftNxA2LZP6rifCSbL/g8Th06E/GPoWOLS30tdWQ3yKw+fu1bHCDsDTNXyPhbfAvwxF0gE="
+*EXData0007: ""

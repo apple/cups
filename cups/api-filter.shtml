@@ -1,0 +1,876 @@
+<!--
+  "$Id: api-filter.shtml 7677 2008-06-19 23:22:19Z mike $"
+
+  Filter and backend programming introduction for CUPS.
+
+  Copyright 2007-2014 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
+
+<p>Filters (which include printer drivers and port monitors) and backends
+are used to convert job files to a printable format and send that data to the
+printer itself. All of these programs use a common interface for processing
+print jobs and communicating status information to the scheduler. Each is run
+with a standard set of command-line arguments:<p>
+
+<dl class="code">
+
+	<dt>argv[1]</dt>
+	<dd>The job ID</dd>
+
+	<dt>argv[2]</dt>
+	<dd>The user printing the job</dd>
+
+	<dt>argv[3]</dt>
+	<dd>The job name/title</dd>
+
+	<dt>argv[4]</dt>
+	<dd>The number of copies to print</dd>
+
+	<dt>argv[5]</dt>
+	<dd>The options that were provided when the job was submitted</dd>
+
+	<dt>argv[6]</dt>
+	<dd>The file to print (first program only)</dd>
+</dl>
+
+<p>The scheduler runs one or more of these programs to print any given job. The
+first filter reads from the print file and writes to the standard output, while
+the remaining filters read from the standard input and write to the standard
+output. The backend is the last filter in the chain and writes to the
+device.</p>
+
+<p>Filters are always run as a non-privileged user, typically "lp", with no
+connection to the user's desktop. Backends are run either as a non-privileged
+user or as root if the file permissions do not allow user or group execution.
+The <a href="#PERMISSIONS">file permissions</a> section talks about this in
+more detail.</p>
+
+<h3><a name="SECURITY">Security Considerations</a></h3>
+
+<p>It is always important to use security programming practices. Filters and
+most backends are run as a non-privileged user, so the major security
+consideration is resource utilization - filters should not depend on unlimited
+amounts of CPU, memory, or disk space, and should protect against conditions
+that could lead to excess usage of any resource like infinite loops and
+unbounded recursion. In addition, filters must <em>never</em> allow the user to
+specify an arbitrary file path to a separator page, template, or other file
+used by the filter since that can lead to an unauthorized disclosure of
+information. <em>Always</em> treat input as suspect and validate it!</p>
+
+<p>If you are developing a backend that runs as root, make sure to check for
+potential buffer overflows, integer under/overflow conditions, and file
+accesses since these can lead to privilege escalations. When writing files,
+always validate the file path and <em>never</em> allow a user to determine
+where to store a file.</p>
+
+<blockquote><b>Note:</b>
+
+<p><em>Never</em> write files to a user's home directory. Aside from the
+security implications, CUPS is a network print service and as such the network
+user may not be the same as the local user and/or there may not be a local home
+directory to write to.</p>
+
+<p>In addition, some operating systems provide additional security mechanisms
+that further limit file system access, even for backends running as root. On
+OS X, for example, no backend may write to a user's home directory. See the <a href="#SANDBOXING">Sandboxing on OS X</a> section for more information.</p>
+</blockquote>
+
+<h3><a name="SIGNALS">Canceled Jobs and Signal Handling</a></h3>
+
+<p>The scheduler sends <code>SIGTERM</code> when a printing job is canceled or
+held. Filters, backends, and port monitors <em>must</em> catch
+<code>SIGTERM</code> and perform any cleanup necessary to produce a valid output
+file or return the printer to a known good state. The recommended behavior is to
+end the output on the current page, preferably on the current line or object
+being printed.</p>
+
+<p>Filters and backends may also receive <code>SIGPIPE</code> when an upstream or downstream filter/backend exits with a non-zero status. Developers should generally ignore <code>SIGPIPE</code> at the beginning of <code>main()</code> with the following function call:</p>
+
+<pre class="example">
+#include &lt;signal.h&gt;>
+
+...
+
+int
+main(int argc, char *argv[])
+{
+  signal(SIGPIPE, SIG_IGN);
+
+  ...
+}
+</pre>
+
+<h3><a name="PERMISSIONS">File Permissions</a></h3>
+
+<p>For security reasons, CUPS will only run filters and backends that are owned
+by root and do not have world or group write permissions. The recommended
+permissions for filters and backends are 0555 - read and execute but no write.
+Backends that must run as root should use permissions of 0500 - read and execute
+by root, no access for other users. Write permissions can be enabled for the
+root user only.</p>
+
+<p>To avoid a warning message, the directory containing your filter(s) must also
+be owned by root and have world and group write disabled - permissions of 0755
+or 0555 are strongly encouraged.</p>
+
+<h3><a name="TEMPFILES">Temporary Files</a></h3>
+
+<p>Temporary files should be created in the directory specified by the
+"TMPDIR" environment variable. The
+<a href="#cupsTempFile2"><code>cupsTempFile2</code></a> function can be
+used to safely create temporary files in this directory.</p>
+
+<h3><a name="COPIES">Copy Generation</a></h3>
+
+<p>The <code>argv[4]</code> argument specifies the number of copies to produce
+of the input file. In general, you should only generate copies if the
+<em>filename</em> argument is supplied. The only exception to this are
+filters that produce device-independent PostScript output, since the PostScript
+filter <var>pstops</var> is responsible for generating copies of PostScript
+files.</p>
+
+<h3><a name="EXITCODES">Exit Codes</a></h3>
+
+<p>Filters must exit with status 0 when they successfully generate print data
+or 1 when they encounter an error. Backends can return any of the
+<a href="#cups_backend_t"><code>cups_backend_t</code></a> constants.</p>
+
+<h3><a name="ENVIRONMENT">Environment Variables</a></h3>
+
+<p>The following environment variables are defined by the printing system
+when running print filters and backends:</p>
+
+<dl class="code">
+
+	<dt>APPLE_LANGUAGE</dt>
+	<dd>The Apple language identifier associated with the job
+	(OS X only).</dd>
+
+	<dt>CHARSET</dt>
+	<dd>The job character set, typically "utf-8".</dd>
+
+	<dt>CLASS</dt>
+	<dd>When a job is submitted to a printer class, contains the name of
+	the destination printer class. Otherwise this environment
+	variable will not be set.</dd>
+
+	<dt>CONTENT_TYPE</dt>
+	<dd>The MIME type associated with the file (e.g.
+	application/postscript).</dd>
+
+	<dt>CUPS_CACHEDIR</dt>
+	<dd>The directory where cache files can be stored. Cache files can be
+	used to retain information between jobs or files in a job.</dd>
+
+	<dt>CUPS_DATADIR</dt>
+	<dd>The directory where (read-only) CUPS data files can be found.</dd>
+
+	<dt>CUPS_FILETYPE</dt>
+	<dd>The type of file being printed: "job-sheet" for a banner page and
+	"document" for a regular print file.</dd>
+
+	<dt>CUPS_SERVERROOT</dt>
+	<dd>The root directory of the server.</dd>
+
+	<dt>DEVICE_URI</dt>
+	<dd>The device-uri associated with the printer.</dd>
+
+	<dt>FINAL_CONTENT_TYPE</dt>
+	<dd>The MIME type associated with the printer (e.g.
+	application/vnd.cups-postscript).</dd>
+
+	<dt>LANG</dt>
+	<dd>The language locale associated with the job.</dd>
+
+	<dt>PPD</dt>
+	<dd>The full pathname of the PostScript Printer Description (PPD)
+	file for this printer.</dd>
+
+	<dt>PRINTER</dt>
+	<dd>The queue name of the class or printer.</dd>
+
+	<dt>RIP_CACHE</dt>
+	<dd>The recommended amount of memory to use for Raster Image
+	Processors (RIPs).</dd>
+
+	<dt>TMPDIR</dt>
+	<dd>The directory where temporary files should be created.</dd>
+
+</dl>
+
+<h3><a name="MESSAGES">Communicating with the Scheduler</a></h3>
+
+<p>Filters and backends communicate with the scheduler by writing messages
+to the standard error file. The scheduler reads messages from all filters in
+a job and processes the message based on its prefix. For example, the following
+code sets the current printer state message to "Printing page 5":</p>
+
+<pre class="example">
+int page = 5;
+
+fprintf(stderr, "INFO: Printing page %d\n", page);
+</pre>
+
+<p>Each message is a single line of text starting with one of the following
+prefix strings:</p>
+
+<dl class="code">
+
+	<dt>ALERT: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "alert" log level.</dd>
+
+	<dt>ATTR: attribute=value [attribute=value]</dt>
+	<dd>Sets the named printer or job attribute(s). Typically this is used
+	to set the <code>marker-colors</code>, <code>marker-high-levels</code>,
+	<code>marker-levels</code>, <code>marker-low-levels</code>,
+	<code>marker-message</code>, <code>marker-names</code>,
+	<code>marker-types</code>, <code>printer-alert</code>, and
+	<code>printer-alert-description</code> printer attributes. Standard
+	<code>marker-types</code> values are listed in <a href='#TABLE1'>Table
+	1</a>. String values need special handling - see <a href="#ATTR_STRINGS">Reporting Attribute String Values</a> below.</dd>
+
+	<dt>CRIT: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "critical" log
+	level.</dd>
+
+	<dt>DEBUG: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "debug" log level.</dd>
+
+	<dt>DEBUG2: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "debug2" log level.</dd>
+
+	<dt>EMERG: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "emergency" log
+	level.</dd>
+
+	<dt>ERROR: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "error" log level.
+	Use "ERROR:" messages for non-persistent processing errors.</dd>
+
+	<dt>INFO: message</dt>
+	<dd>Sets the printer-state-message attribute. If the current log level
+	is set to "debug2", also adds the specified message to the current error
+	log file using the "info" log level.</dd>
+
+	<dt>NOTICE: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "notice" log level.</dd>
+
+	<dt>PAGE: page-number #-copies</dt>
+	<dt>PAGE: total #-pages</dt>
+	<dd>Adds an entry to the current page log file. The first form adds
+	#-copies to the job-media-sheets-completed attribute. The second
+	form sets the job-media-sheets-completed attribute to #-pages.</dd>
+
+	<dt>PPD: keyword=value [keyword=value ...]</dt>
+	<dd>Changes or adds keywords to the printer's PPD file. Typically
+	this is used to update installable options or default media settings
+	based on the printer configuration.</dd>
+
+	<dt>STATE: + printer-state-reason [printer-state-reason ...]</dt>
+	<dt>STATE: - printer-state-reason [printer-state-reason ...]</dt>
+	<dd>Sets or clears printer-state-reason keywords for the current queue.
+	Typically this is used to indicate persistent media, ink, toner, and
+	configuration conditions or errors on a printer.
+	<a href='#TABLE2'>Table 2</a> lists the standard state keywords -
+	use vendor-prefixed ("com.example.foo") keywords for custom states. See
+	<a href="#MANAGING_STATE">Managing Printer State in a Filter</a> for more
+	information.
+
+	<dt>WARNING: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "warning" log
+	level.</dd>
+
+</dl>
+
+<p>Messages without one of these prefixes are treated as if they began with
+the "DEBUG:" prefix string.</p>
+
+<div class='table'><table width='80%' summary='Table 1: Standard marker-types Values'>
+<caption>Table 1: <a name='TABLE1'>Standard marker-types Values</a></caption>
+<thead>
+<tr>
+	<th>marker-type</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>developer</td>
+	<td>Developer unit</td>
+</tr>
+<tr>
+	<td>fuser</td>
+	<td>Fuser unit</td>
+</tr>
+<tr>
+	<td>fuser-cleaning-pad</td>
+	<td>Fuser cleaning pad</td>
+</tr>
+<tr>
+	<td>fuser-oil</td>
+	<td>Fuser oil</td>
+</tr>
+<tr>
+	<td>ink</td>
+	<td>Ink supply</td>
+</tr>
+<tr>
+	<td>opc</td>
+	<td>Photo conductor</td>
+</tr>
+<tr>
+	<td>solid-wax</td>
+	<td>Wax supply</td>
+</tr>
+<tr>
+	<td>staples</td>
+	<td>Staple supply</td>
+</tr>
+<tr>
+	<td>toner</td>
+	<td>Toner supply</td>
+</tr>
+<tr>
+	<td>transfer-unit</td>
+	<td>Transfer unit</td>
+</tr>
+<tr>
+	<td>waste-ink</td>
+	<td>Waste ink tank</td>
+</tr>
+<tr>
+	<td>waste-toner</td>
+	<td>Waste toner tank</td>
+</tr>
+<tr>
+	<td>waste-wax</td>
+	<td>Waste wax tank</td>
+</tr>
+</tbody>
+</table></div>
+
+<br>
+
+<div class='table'><table width='80%' summary='Table 2: Standard State Keywords'>
+<caption>Table 2: <a name='TABLE2'>Standard State Keywords</a></caption>
+<thead>
+<tr>
+	<th>Keyword</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>connecting-to-device</td>
+	<td>Connecting to printer but not printing yet.</td>
+</tr>
+<tr>
+	<td>cover-open</td>
+	<td>The printer's cover is open.</td>
+</tr>
+<tr>
+	<td>input-tray-missing</td>
+	<td>The paper tray is missing.</td>
+</tr>
+<tr>
+	<td>marker-supply-empty</td>
+	<td>The printer is out of ink.</td>
+</tr>
+<tr>
+	<td>marker-supply-low</td>
+	<td>The printer is almost out of ink.</td>
+</tr>
+<tr>
+	<td>marker-waste-almost-full</td>
+	<td>The printer's waste bin is almost full.</td>
+</tr>
+<tr>
+	<td>marker-waste-full</td>
+	<td>The printer's waste bin is full.</td>
+</tr>
+<tr>
+	<td>media-empty</td>
+	<td>The paper tray (any paper tray) is empty.</td>
+</tr>
+<tr>
+	<td>media-jam</td>
+	<td>There is a paper jam.</td>
+</tr>
+<tr>
+	<td>media-low</td>
+	<td>The paper tray (any paper tray) is almost empty.</td>
+</tr>
+<tr>
+	<td>media-needed</td>
+	<td>The paper tray needs to be filled (for a job that is printing).</td>
+</tr>
+<tr>
+	<td>paused</td>
+	<td>Stop the printer.</td>
+</tr>
+<tr>
+	<td>timed-out</td>
+	<td>Unable to connect to printer.</td>
+</tr>
+<tr>
+	<td>toner-empty</td>
+	<td>The printer is out of toner.</td>
+</tr>
+<tr>
+	<td>toner-low</td>
+	<td>The printer is low on toner.</td>
+</tr>
+</tbody>
+</table></div>
+
+
+<h4><a name="ATTR_STRINGS">Reporting Attribute String Values</a></h4>
+
+<p>When reporting string values using "ATTR:" messages, a filter or backend must take special care to appropriately quote those values. The scheduler uses the CUPS option parsing code for attributes, so the general syntax is:</p>
+
+<pre class="example">
+name=simple
+name=simple,simple,...
+name='complex value'
+name="complex value"
+name='"complex value"','"complex value"',...
+</pre>
+
+<p>Simple values are strings that do not contain spaces, quotes, backslashes, or the comma and can be placed verbatim in the "ATTR:" message, for example:</p>
+
+<pre class="example">
+int levels[4] = { 40, 50, 60, 70 }; /* CMYK */
+
+fputs("ATTR: marker-colors=#00FFFF,#FF00FF,#FFFF00,#000000\n", stderr);
+fputs("ATTR: marker-high-levels=100,100,100,100\n", stderr);
+fprintf(stderr, "ATTR: marker-levels=%d,%d,%d,%d\n", levels[0], levels[1],
+        levels[2], levels[3], levels[4]);
+fputs("ATTR: marker-low-levels=5,5,5,5\n", stderr);
+fputs("ATTR: marker-types=toner,toner,toner,toner\n", stderr);
+</pre>
+
+<p>Complex values that contains spaces, quotes, backslashes, or the comma must be quoted. For a single value a single set of quotes is sufficient:</p>
+
+<pre class="example">
+fputs("ATTR: marker-message='Levels shown are approximate.'\n", stderr);
+</pre>
+
+<p>When multiple values are reported, each value must be enclosed by a set of single and double quotes:</p>
+
+<pre class="example">
+fputs("ATTR: marker-names='\"Cyan Toner\"','\"Magenta Toner\"',"
+      "'\"Yellow Toner\"','\"Black Toner\"'\n", stderr);
+</pre>
+
+<p>The IPP backend includes a <var>quote_string</var> function that may be used to properly quote a complex value in an "ATTR:" message:</p>
+
+<pre class="example">
+static const char *                     /* O - Quoted string */
+quote_string(const char *s,             /* I - String */
+             char       *q,             /* I - Quoted string buffer */
+             size_t     qsize)          /* I - Size of quoted string buffer */
+{
+  char  *qptr,                          /* Pointer into string buffer */
+        *qend;                          /* End of string buffer */
+
+
+  qptr = q;
+  qend = q + qsize - 5;
+
+  if (qend &lt; q)
+  {
+    *q = '\0';
+    return (q);
+  }
+
+  *qptr++ = '\'';
+  *qptr++ = '\"';
+
+  while (*s && qptr &lt; qend)
+  {
+    if (*s == '\\' || *s == '\"' || *s == '\'')
+    {
+      if (qptr &lt; (qend - 4))
+      {
+        *qptr++ = '\\';
+        *qptr++ = '\\';
+        *qptr++ = '\\';
+      }
+      else
+        break;
+    }
+
+    *qptr++ = *s++;
+  }
+
+  *qptr++ = '\"';
+  *qptr++ = '\'';
+  *qptr   = '\0';
+
+  return (q);
+}
+</pre>
+
+
+<h4><a name="MANAGING_STATE">Managing Printer State in a Filter</a></h4>
+
+<p>Filters are responsible for managing the state keywords they set using
+"STATE:" messages. Typically you will update <em>all</em> of the keywords that
+are used by the filter at startup, for example:</p>
+
+<pre class="example">
+if (foo_condition != 0)
+  fputs("STATE: +com.example.foo\n", stderr);
+else
+  fputs("STATE: -com.example.foo\n", stderr);
+
+if (bar_condition != 0)
+  fputs("STATE: +com.example.bar\n", stderr);
+else
+  fputs("STATE: -com.example.bar\n", stderr);
+</pre>
+
+<p>Then as conditions change, your filter sends "STATE: +keyword" or "STATE:
+-keyword" messages as necessary to set or clear the corresponding keyword,
+respectively.</p>
+
+<p>State keywords are often used to notify the user of issues that span across
+jobs, for example "media-empty-warning" that indicates one or more paper trays
+are empty. These keywords should not be cleared unless the corresponding issue
+no longer exists.</p>
+
+<p>Filters should clear job-related keywords on startup and exit so that they
+do not remain set between jobs.  For example, "connecting-to-device" is a job
+sub-state and not an issue that applies when a job is not printing.</p>
+
+<blockquote><b>Note:</b>
+
+<p>"STATE:" messages often provide visible alerts to the user. For example,
+on OS X setting a printer-state-reason value with an "-error" or
+"-warning" suffix will cause the printer's dock item to bounce if the
+corresponding reason is localized with a cupsIPPReason keyword in the
+printer's PPD file.</p>
+
+<p>When providing a vendor-prefixed keyword, <em>always</em> provide the
+corresponding standard keyword (if any) to allow clients to respond to the
+condition correctly. For example, if you provide a vendor-prefixed keyword
+for a low cyan ink condition ("com.example.cyan-ink-low") you must also set the
+"marker-supply-low-warning" keyword. In such cases you should also refrain
+from localizing the vendor-prefixed keyword in the PPD file - otherwise both
+the generic and vendor-specific keyword will be shown in the user
+interface.</p>
+
+</blockquote>
+
+<h4><a name="REPORTING_SUPPLIES">Reporting Supply Levels</a></h4>
+
+<p>CUPS tracks several "marker-*" attributes for ink/toner supply level
+reporting. These attributes allow applications to display the current supply
+levels for a printer without printer-specific software. <a href="#TABLE3">Table 3</a> lists the marker attributes and what they represent.</p>
+
+<p>Filters set marker attributes by sending "ATTR:" messages to stderr. For
+example, a filter supporting an inkjet printer with black and tri-color ink
+cartridges would use the following to initialize the supply attributes:</p>
+
+<pre class="example">
+fputs("ATTR: marker-colors=#000000,#00FFFF#FF00FF#FFFF00\n", stderr);
+fputs("ATTR: marker-low-levels=5,10\n", stderr);
+fputs("ATTR: marker-names=Black,Tri-Color\n", stderr);
+fputs("ATTR: marker-types=ink,ink\n", stderr);
+</pre>
+
+<p>Then periodically the filter queries the printer for its current supply
+levels and updates them with a separate "ATTR:" message:</p>
+
+<pre class="example">
+int black_level, tri_level;
+...
+fprintf(stderr, "ATTR: marker-levels=%d,%d\n", black_level, tri_level);
+</pre>
+
+<div class='table'><table width='80%' summary='Table 3: Supply Level Attributes'>
+<caption>Table 3: <a name='TABLE3'>Supply Level Attributes</a></caption>
+<thead>
+<tr>
+	<th>Attribute</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>marker-colors</td>
+	<td>A list of comma-separated colors; each color is either "none" or one or
+	more hex-encoded sRGB colors of the form "#RRGGBB".</td>
+</tr>
+<tr>
+	<td>marker-high-levels</td>
+	<td>A list of comma-separated "almost full" level values from 0 to 100; a
+	value of 100 should be used for supplies that are consumed/emptied like ink
+	cartridges.</td>
+</tr>
+<tr>
+	<td>marker-levels</td>
+	<td>A list of comma-separated level values for each supply. A value of -1
+	indicates the level is unavailable, -2 indicates unknown, and -3 indicates
+	the level is unknown but has not yet reached capacity. Values from 0 to 100
+	indicate the corresponding percentage.</td>
+</tr>
+<tr>
+	<td>marker-low-levels</td>
+	<td>A list of comma-separated "almost empty" level values from 0 to 100; a
+	value of 0 should be used for supplies that are filled like waste ink
+	tanks.</td>
+</tr>
+<tr>
+	<td>marker-message</td>
+	<td>A human-readable supply status message for the user like "12 pages of
+	ink remaining."</td>
+</tr>
+<tr>
+	<td>marker-names</td>
+	<td>A list of comma-separated supply names like "Cyan Ink", "Fuser",
+	etc.</td>
+</tr>
+<tr>
+	<td>marker-types</td>
+	<td>A list of comma-separated supply types; the types are listed in
+	<a href="#TABLE1">Table 1</a>.</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3><a name="COMMUNICATING_BACKEND">Communicating with the Backend</a></h3>
+
+<p>Filters can communicate with the backend via the
+<a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> and
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+functions. The
+<a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> function
+reads data that has been sent back from the device and is typically used to
+obtain status and configuration information. For example, the following code
+polls the backend for back-channel data:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+
+char buffer[8192];
+ssize_t bytes;
+
+/* Use a timeout of 0.0 seconds to poll for back-channel data */
+bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0.0);
+</pre>
+
+<p>Filters can also use <code>select()</code> or <code>poll()</code> on the
+back-channel file descriptor (3 or <code>CUPS_BC_FD</code>) to read data only
+when it is available.</p>
+
+<p>The
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+function allows you to get out-of-band status information and do synchronization
+with the device. For example, the following code gets the current IEEE-1284
+device ID string from the backend:</p>
+
+<pre class="example">
+#include &lt;cups/sidechannel.h&gt;
+
+char data[2049];
+int datalen;
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+
+/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for
+   nul-termination... */
+datalen = sizeof(data) - 1;
+
+/* Get the IEEE-1284 device ID, waiting for up to 1 second */
+status = <a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a>(CUPS_SC_CMD_GET_DEVICE_ID, data, &amp;datalen, 1.0);
+
+/* Use the returned value if OK was returned and the length is non-zero */
+if (status == CUPS_SC_STATUS_OK &amp;&amp; datalen > 0)
+  data[datalen] = '\0';
+else
+  data[0] = '\0';
+</pre>
+
+<h4><a name="DRAIN_OUTPUT">Forcing All Output to a Printer</a></h4>
+
+<p>The
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+function allows you to tell the backend to send all pending data to the printer.
+This is most often needed when sending query commands to the printer. For example:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/sidechannel.h&gt;
+
+char data[1024];
+int datalen = sizeof(data);
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+
+/* Flush pending output to stdout */
+fflush(stdout);
+
+/* Drain output to backend, waiting for up to 30 seconds */
+status = <a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a>(CUPS_SC_CMD_DRAIN_OUTPUT, data, &amp;datalen, 30.0);
+
+/* Read the response if the output was sent */
+if (status == CUPS_SC_STATUS_OK)
+{
+  ssize_t bytes;
+
+  /* Wait up to 10.0 seconds for back-channel data */
+  bytes = cupsBackChannelRead(data, sizeof(data), 10.0);
+  /* do something with the data from the printer */
+}
+</pre>
+
+<h3><a name="COMMUNICATING_FILTER">Communicating with Filters</a></h3>
+
+<p>Backends communicate with filters using the reciprocal functions
+<a href="#cupsBackChannelWrite"><code>cupsBackChannelWrite</code></a>,
+<a href="#cupsSideChannelRead"><code>cupsSideChannelRead</code></a>, and
+<a href="#cupsSideChannelWrite"><code>cupsSideChannelWrite</code></a>. We
+recommend writing back-channel data using a timeout of 1.0 seconds:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+
+char buffer[8192];
+ssize_t bytes;
+
+/* Obtain data from printer/device */
+...
+
+/* Use a timeout of 1.0 seconds to give filters a chance to read */
+cupsBackChannelWrite(buffer, bytes, 1.0);
+</pre>
+
+<p>The <a href="#cupsSideChannelRead"><code>cupsSideChannelRead</code></a>
+function reads a side-channel command from a filter, driver, or port monitor.
+Backends can either poll for commands using a <code>timeout</code> of 0.0, wait
+indefinitely for commands using a <code>timeout</code> of -1.0 (probably in a
+separate thread for that purpose), or use <code>select</code> or
+<code>poll</code> on the <code>CUPS_SC_FD</code> file descriptor (4) to handle
+input and output on several file descriptors at the same time.</p>
+
+<p>Once a command is processed, the backend uses the
+<a href="#cupsSideChannelWrite"><code>cupsSideChannelWrite</code></a> function
+to send its response. For example, the following code shows how to poll for a
+side-channel command and respond to it:</p>
+
+<pre class="example">
+#include &lt;cups/sidechannel.h&gt;
+
+<a href="#cups_sc_command_t">cups_sc_command_t</a> command;
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+char data[2048];
+int datalen = sizeof(data);
+
+/* Poll for a command... */
+if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;status, data, &amp;datalen, 0.0))
+{
+  switch (command)
+  {
+    /* handle supported commands, fill data/datalen/status with values as needed */
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  /* Send a response... */
+  <a href="#cupsSideChannelWrite">cupsSideChannelWrite</a>(command, status, data, datalen, 1.0);
+}
+</pre>
+
+<h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
+
+<p>The Simple Network Management Protocol (SNMP) allows you to get the current
+status, page counter, and supply levels from most network printers. Every
+piece of information is associated with an Object Identifier (OID), and
+every printer has a <em>community</em> name associated with it. OIDs can be
+queried directly or by "walking" over a range of OIDs with a common prefix.</p>
+
+<p>The two CUPS SNMP functions provide a simple API for querying network
+printers through the side-channel interface. Each accepts a string containing
+an OID like ".1.3.6.1.2.1.43.10.2.1.4.1.1" (the standard page counter OID)
+along with a timeout for the query.</p>
+
+<p>The <a href="#cupsSideChannelSNMPGet"><code>cupsSideChannelSNMPGet</code></a>
+function queries a single OID and returns the value as a string in a buffer
+you supply:</p>
+
+<pre class="example">
+#include &lt;cups/sidechannel.h&gt;
+
+char data[512];
+int datalen = sizeof(data);
+
+if (<a href="#cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a>(".1.3.6.1.2.1.43.10.2.1.4.1.1", data, &amp;datalen, 5.0)
+        == CUPS_SC_STATUS_OK)
+{
+  /* Do something with the value */
+  printf("Page counter is: %s\n", data);
+}
+</pre>
+
+<p>The
+<a href="#cupsSideChannelSNMPWalk"><code>cupsSideChannelSNMPWalk</code></a>
+function allows you to query a whole group of OIDs, calling a function of your
+choice for each OID that is found:</p>
+
+<pre class="example">
+#include &lt;cups/sidechannel.h&gt;
+
+void
+my_callback(const char *oid, const char *data, int datalen, void *context)
+{
+  /* Do something with the value */
+  printf("%s=%s\n", oid, data);
+}
+
+...
+
+void *my_data;
+
+<a href="#cupsSideChannelSNMPWalk">cupsSNMPSideChannelWalk</a>(".1.3.6.1.2.1.43", 5.0, my_callback, my_data);
+</pre>
+
+<h2><a name="SANDBOXING">Sandboxing on OS X</a></h2>
+
+<p>Starting with OS X 10.6, filters and backends are run inside a security "sandbox" which further limits (beyond the normal UNIX user/group permissions) what a filter or backend can do. This helps to both secure the printing system from malicious software and enforce the functional separation of components in the CUPS filter chain. What follows is a list of actions that are explicitly allowed for all filters and backends:</p>
+
+<ol>
+
+	<li>Reading of files: pursuant to normal UNIX file permissions, filters and backends can read files for the current job from the <var>/private/var/spool/cups</var> directory and other files on mounted filesystems <em>except</em> for user home directories under <var>/Users</var>.</li>
+
+	<li>Writing of files: pursuant to normal UNIX file permissions, filters and backends can read/write files to the cache directory specified by the <code>CUPS_CACHEDIR</code> environment variable, to the state directory specified by the <code>CUPS_STATEDIR</code> environment variable, to the temporary directory specified by the <code>TMPDIR</code> environment variable, and under the <var>/private/var/db</var>, <var>/private/var/folders</var>, <var>/private/var/lib</var>, <var>/private/var/mysql</var>, <var>/private/var/run</var>, <var>/private/var/spool</var> (except <var>/private/var/spool/cups</var>), <var>/Library/Application&nbsp;Support</var>, <var>/Library/Caches</var>, <var>/Library/Logs</var>, <var>/Library/Preferences</var>, <var>/Library/WebServer</var>, and <var>/Users/Shared</var> directories.</li>
+
+	<li>Execution of programs: pursuant to normal UNIX file permissions, filters and backends can execute any program not located under the <var>/Users</var> directory. Child processes inherit the sandbox and are subject to the same restrictions as the parent.</li>
+
+	<li>Bluetooth and USB: backends can access Bluetooth and USB printers through IOKit. <em>Filters cannot access Bluetooth and USB printers directly.</em></li>
+
+	<li>Network: filters and backends can access UNIX domain sockets under the <var>/private/tmp</var>, <var>/private/var/run</var>, and <var>/private/var/tmp</var> directories. Backends can also create IPv4 and IPv6 TCP (outgoing) and UDP (incoming and outgoing) socket, and bind to local source ports. <em>Filters cannot directly create IPv4 and IPv6 TCP or UDP sockets.</em></li>
+
+	<li>Notifications: filters and backends can send notifications via the Darwin <code>notify_post()</code> API.</li>
+
+</ol>
+
+<blockquote><b>Note:</b> The sandbox profile used in CUPS 2.0 still allows some actions that are not listed above - these privileges will be removed over time until the profile matches the list above.</blockquote>

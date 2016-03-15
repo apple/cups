@@ -1,0 +1,2212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>PPD Compiler API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id: api-array.header 8087 2008-10-27 21:37:05Z mike $"
+
+  PPD Compiler API header for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>PPD Compiler API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/ppdc.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupsppdc</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#CLASSES">Classes</a><ul class="code">
+	<li><a href="#ppdcArray" title="// Shared Array">ppdcArray</a></li>
+	<li><a href="#ppdcAttr" title="// Attribute">ppdcAttr</a></li>
+	<li><a href="#ppdcCatalog" title="// Translation catalog">ppdcCatalog</a></li>
+	<li><a href="#ppdcChoice" title="// Option Choice">ppdcChoice</a></li>
+	<li><a href="#ppdcConstraint" title="// Constraint">ppdcConstraint</a></li>
+	<li><a href="#ppdcDriver" title="// Printer Driver Data">ppdcDriver</a></li>
+	<li><a href="#ppdcFile" title="// File">ppdcFile</a></li>
+	<li><a href="#ppdcFilter" title="// Filter Program">ppdcFilter</a></li>
+	<li><a href="#ppdcFont" title="// Shared Font">ppdcFont</a></li>
+	<li><a href="#ppdcGroup" title="// Group of Options">ppdcGroup</a></li>
+	<li><a href="#ppdcInteger" title="// Shared integer">ppdcInteger</a></li>
+	<li><a href="#ppdcMediaSize" title="// Media Size">ppdcMediaSize</a></li>
+	<li><a href="#ppdcMessage" title="// Translation message">ppdcMessage</a></li>
+	<li><a href="#ppdcOption" title="// Option">ppdcOption</a></li>
+	<li><a href="#ppdcProfile" title="// Color Profile">ppdcProfile</a></li>
+	<li><a href="#ppdcShared" title="// Shared Data Value">ppdcShared</a></li>
+	<li><a href="#ppdcSource" title="// Source File">ppdcSource</a></li>
+	<li><a href="#ppdcString" title="// Shared String">ppdcString</a></li>
+	<li><a href="#ppdcVariable" title="// Variable Definition">ppdcVariable</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#ppdc_cs_t" title="">ppdc_cs_t</a></li>
+</ul></li>
+<li><a href="#VARIABLES">Variables</a><ul class="code">
+	<li><a href="#ppdcSource" title="// Printer Driver Data">ppdcSource</a></li>
+</ul></li>
+<li><a href="#ENUMERATIONS">Constants</a><ul class="code">
+	<li><a href="#ppdcCondFlags" title="// Condition flags">ppdcCondFlags</a></li>
+	<li><a href="#ppdcDrvType" title="// Driver type">ppdcDrvType</a></li>
+	<li><a href="#ppdcFontStatus" title="// Load status of font">ppdcFontStatus</a></li>
+	<li><a href="#ppdcLineEnding" title="// Line endings">ppdcLineEnding</a></li>
+	<li><a href="#ppdcOptSection" title="// Option section">ppdcOptSection</a></li>
+	<li><a href="#ppdcOptType" title="// Option type">ppdcOptType</a></li>
+</ul></li>
+</ul>
+<!--
+  "$Id: api-array.shtml 7616 2008-05-28 00:34:13Z mike $"
+
+  PPD Compiler API introduction for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The PPD Compiler API provides access to CUPS driver information files and
+methods for generating and importing PPD files.</p>
+<h2 class="title"><a name="CLASSES">Classes</a></h2>
+<h3 class="class"><a name="ppdcArray">ppdcArray</a></h3>
+<p class="description">// Shared Array</p>
+<p class="code">class ppdcArray : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int count, alloc, current;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcShared">ppdcShared</a> **data;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>current </dt>
+<dd class="description">Current element</dd>
+<dt>data </dt>
+<dd class="description">Elements</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void add(<a href="#ppdcShared">ppdcShared</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+</dl>
+<h4 class="method"><a name="add">add</a></h4>
+<p class="description"></p>
+<p class="code">
+void add (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcShared">ppdcShared</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+</dl>
+<h4 class="method"><a name="first">first</a></h4>
+<p class="description">Return the first element in the array.</p>
+<p class="code">
+<a href="#ppdcShared">ppdcShared</a> *first (void);</p>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description"></p>
+<h4 class="method"><a name="next">next</a></h4>
+<p class="description">Return the next element in the array.</p>
+<p class="code">
+<a href="#ppdcShared">ppdcShared</a> *next (void);</p>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description"></p>
+<h4 class="method"><a name="ppdcArray">ppdcArray</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcArray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *a<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>a</dt>
+</dl>
+<h4 class="method"><a name="remove">remove</a></h4>
+<p class="description"></p>
+<p class="code">
+void remove (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcShared">ppdcShared</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+<dd class="description">Data element</dd>
+</dl>
+<h4 class="method"><a name="~ppdcArray">~ppdcArray</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcArray (void);</p>
+<h3 class="class"><a name="ppdcAttr">ppdcAttr</a></h3>
+<p class="description">// Attribute</p>
+<p class="code">class ppdcAttr : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool localizable;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *selector, *text, *value;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>localizable </dt>
+<dd class="description">Should this attribute be localized?</dd>
+<dt>value </dt>
+<dd class="description">Value string</dd>
+</dl>
+<h4 class="method"><a name="ppdcAttr">ppdcAttr</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcAttr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *s,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *t,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool loc<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name</dd>
+<dt>s</dt>
+<dd class="description">Spec string</dd>
+<dt>t</dt>
+<dd class="description">Human-readable text</dd>
+<dt>v</dt>
+<dd class="description">Value</dd>
+<dt>loc</dt>
+<dd class="description">Localize this attribute?</dd>
+</dl>
+<h4 class="method"><a name="~ppdcAttr">~ppdcAttr</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcAttr (void);</p>
+<h3 class="class"><a name="ppdcCatalog">ppdcCatalog</a></h3>
+<p class="description">// Translation catalog</p>
+<p class="code">class ppdcCatalog : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *filename;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *locale;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *messages;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>filename </dt>
+<dd class="description">Name of translation file</dd>
+<dt>locale </dt>
+<dd class="description">Name of locale</dd>
+<dt>messages </dt>
+<dd class="description">Array of translation messages</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void add_message(const char *id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *string = NULL<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>id</dt>
+<dt>string</dt>
+</dl>
+<h4 class="method"><a name="add_message">add_message</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_message (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *string<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>id</dt>
+<dd class="description">Message ID to add</dd>
+<dt>string</dt>
+<dd class="description">Translation string</dd>
+</dl>
+<h4 class="method"><a name="find_message">find_message</a></h4>
+<p class="description"></p>
+<p class="code">
+const char *find_message (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *id<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>id</dt>
+<dd class="description">Message ID</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Message text</p>
+<h4 class="method"><a name="load_messages">load_messages</a></h4>
+<p class="description"></p>
+<p class="code">
+int load_messages (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Message catalog file</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">0 on success, -1 on failure</p>
+<h4 class="method"><a name="ppdcCatalog">ppdcCatalog</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcCatalog (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *l,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>l</dt>
+<dd class="description">Locale</dd>
+<dt>f</dt>
+<dd class="description">Message catalog file</dd>
+</dl>
+<h4 class="method"><a name="save_messages">save_messages</a></h4>
+<p class="description"></p>
+<p class="code">
+int save_messages (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">File to save to</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">0 on success, -1 on error</p>
+<h4 class="method"><a name="~ppdcCatalog">~ppdcCatalog</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcCatalog (void);</p>
+<h3 class="class"><a name="ppdcChoice">ppdcChoice</a></h3>
+<p class="description">// Option Choice</p>
+<p class="code">class ppdcChoice : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *text, *code;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>code </dt>
+<dd class="description">PS code of choice</dd>
+</dl>
+<h4 class="method"><a name="ppdcChoice">ppdcChoice</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcChoice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *t,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of choice</dd>
+<dt>t</dt>
+<dd class="description">Text of choice</dd>
+<dt>c</dt>
+<dd class="description">Code of choice</dd>
+</dl>
+<h4 class="method"><a name="~ppdcChoice">~ppdcChoice</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcChoice (void);</p>
+<h3 class="class"><a name="ppdcConstraint">ppdcConstraint</a></h3>
+<p class="description">// Constraint</p>
+<p class="code">class ppdcConstraint : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *option1, *choice1, *option2, *choice2;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>choice2 </dt>
+<dd class="description">Second choice</dd>
+</dl>
+<h4 class="method"><a name="ppdcConstraint">ppdcConstraint</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcConstraint (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *o1,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c1,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *o2,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c2<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>o1</dt>
+<dd class="description">First option</dd>
+<dt>c1</dt>
+<dd class="description">First choice</dd>
+<dt>o2</dt>
+<dd class="description">Second option</dd>
+<dt>c2</dt>
+<dd class="description">Second choice</dd>
+</dl>
+<h4 class="method"><a name="~ppdcConstraint">~ppdcConstraint</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcConstraint (void);</p>
+<h3 class="class"><a name="ppdcDriver">ppdcDriver</a></h3>
+<p class="description">// Printer Driver Data</p>
+<p class="code">class ppdcDriver : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *copyright;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *custom_size_code;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *default_font, *default_size;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float left_margin, bottom_margin, right_margin, top_margin, max_width, max_length, min_width, min_length;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *attrs, *constraints, *filters, *fonts, *groups, *profiles, *sizes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int model_number, manual_copies, color_device, throughput;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDrvType">ppdcDrvType</a> type;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int variable_paper_size;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *manufacturer, *model_name, *file_name, *pc_file_name, *version;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>copyright </dt>
+<dd class="description">Copyright strings</dd>
+<dt>custom_size_code </dt>
+<dd class="description">Custom page size code, if any</dd>
+<dt>default_size </dt>
+<dd class="description">Default size option</dd>
+<dt>min_length </dt>
+<dd class="description">Minimum length (points)</dd>
+<dt>sizes </dt>
+<dd class="description">Fixed sizes</dd>
+<dt>throughput </dt>
+<dd class="description">Throughput in pages per minute</dd>
+<dt>type </dt>
+<dd class="description">Driver type</dd>
+<dt>variable_paper_size </dt>
+<dd class="description">Support variable sizes?</dd>
+<dt>version </dt>
+<dd class="description">Version number</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void add_attr(<a href="#ppdcAttr">ppdcAttr</a> *a<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>a</dt>
+</dl>
+<h4 class="method"><a name="add_constraint">add_constraint</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_constraint (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcConstraint">ppdcConstraint</a> *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>c</dt>
+</dl>
+<h4 class="method"><a name="add_copyright">add_copyright</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_copyright (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>c</dt>
+</dl>
+<h4 class="method"><a name="add_filter">add_filter</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_filter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFilter">ppdcFilter</a> *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+</dl>
+<h4 class="method"><a name="add_font">add_font</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_font (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFont">ppdcFont</a> *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+</dl>
+<h4 class="method"><a name="add_group">add_group</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_group (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcGroup">ppdcGroup</a> *g<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>g</dt>
+</dl>
+<h4 class="method"><a name="add_profile">add_profile</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_profile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcProfile">ppdcProfile</a> *p<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>p</dt>
+</dl>
+<h4 class="method"><a name="add_size">add_size</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_size (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcMediaSize">ppdcMediaSize</a> *m<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>m</dt>
+</dl>
+<h4 class="method"><a name="find_attr">find_attr</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcAttr">ppdcAttr</a> *find_attr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *k,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *s<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>k</dt>
+<dd class="description">Keyword string</dd>
+<dt>s</dt>
+<dd class="description">Spec string</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Attribute or NULL</p>
+<h4 class="method"><a name="find_group">find_group</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcGroup">ppdcGroup</a> *find_group (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Group name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Matching group or NULL</p>
+<h4 class="method"><a name="find_option">find_option</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcOption">ppdcOption</a> *find_option (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Option name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Matching option or NULL</p>
+<h4 class="method"><a name="find_option_group">find_option_group</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcOption">ppdcOption</a> *find_option_group (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcGroup">ppdcGroup</a> **mg<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Option name</dd>
+<dt>mg</dt>
+<dd class="description">Matching group or NULL</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Matching option or NULL</p>
+<h4 class="method"><a name="ppdcDriver">ppdcDriver</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcDriver (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDriver">ppdcDriver</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+<dd class="description">Printer driver template</dd>
+</dl>
+<h4 class="method"><a name="set_custom_size_code">set_custom_size_code</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_custom_size_code (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>c</dt>
+<dd class="description">CustomPageSize code</dd>
+</dl>
+<h4 class="method"><a name="set_default_font">set_default_font</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_default_font (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFont">ppdcFont</a> *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Font</dd>
+</dl>
+<h4 class="method"><a name="set_default_size">set_default_size</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_default_size (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcMediaSize">ppdcMediaSize</a> *m<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>m</dt>
+<dd class="description">Media size</dd>
+</dl>
+<h4 class="method"><a name="set_file_name">set_file_name</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_file_name (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Filename</dd>
+</dl>
+<h4 class="method"><a name="set_manufacturer">set_manufacturer</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_manufacturer (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *m<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>m</dt>
+<dd class="description">Model name</dd>
+</dl>
+<h4 class="method"><a name="set_model_name">set_model_name</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_model_name (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *m<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>m</dt>
+<dd class="description">Model name</dd>
+</dl>
+<h4 class="method"><a name="set_pc_file_name">set_pc_file_name</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_pc_file_name (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Filename</dd>
+</dl>
+<h4 class="method"><a name="set_version">set_version</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_version (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>v</dt>
+<dd class="description">Version</dd>
+</dl>
+<h4 class="method"><a name="write_ppd_file">write_ppd_file</a></h4>
+<p class="description"></p>
+<p class="code">
+int write_ppd_file (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcCatalog">ppdcCatalog</a> *catalog,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *locales,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcSource">ppdcSource</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcLineEnding">ppdcLineEnding</a> le<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">PPD file</dd>
+<dt>catalog</dt>
+<dd class="description">Message catalog</dd>
+<dt>locales</dt>
+<dd class="description">Additional languages to add</dd>
+<dt>src</dt>
+<dd class="description">Driver source</dd>
+<dt>le</dt>
+<dd class="description">Line endings to use</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">0 on success, -1 on failure</p>
+<h4 class="method"><a name="~ppdcDriver">~ppdcDriver</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcDriver (void);</p>
+<h3 class="class"><a name="ppdcFile">ppdcFile</a></h3>
+<p class="description">// File</p>
+<p class="code">class ppdcFile {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool close_on_delete;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int line;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>close_on_delete </dt>
+<dd class="description">Close file on delete?</dd>
+<dt>filename </dt>
+<dd class="description">Filename</dd>
+<dt>fp </dt>
+<dd class="description">File pointer</dd>
+<dt>line </dt>
+<dd class="description">Line in file</dd>
+</dl>
+<h4 class="method"><a name="get">get</a></h4>
+<p class="description">Get a character from a file.</p>
+<p class="code">
+int get (void);</p>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description"></p>
+<h4 class="method"><a name="peek">peek</a></h4>
+<p class="description"></p>
+<p class="code">
+int peek (void);</p>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Next character in file</p>
+<h4 class="method"><a name="ppdcFile">ppdcFile</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcFile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *ffp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">File to open</dd>
+<dt>ffp</dt>
+<dd class="description">File pointer to use</dd>
+</dl>
+<h4 class="method"><a name="~ppdcFile">~ppdcFile</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcFile (void);</p>
+<h3 class="class"><a name="ppdcFilter">ppdcFilter</a></h3>
+<p class="description">// Filter Program</p>
+<p class="code">class ppdcFilter : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cost;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *mime_type, *program;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>cost </dt>
+<dd class="description">Relative cost of filter</dd>
+<dt>program </dt>
+<dd class="description">Filter program</dd>
+</dl>
+<h4 class="method"><a name="ppdcFilter">ppdcFilter</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *t,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *p,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>t</dt>
+<dd class="description">MIME type</dd>
+<dt>p</dt>
+<dd class="description">Filter program</dd>
+<dt>c</dt>
+<dd class="description">Relative cost</dd>
+</dl>
+<h4 class="method"><a name="~ppdcFilter">~ppdcFilter</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcFilter (void);</p>
+<h3 class="class"><a name="ppdcFont">ppdcFont</a></h3>
+<p class="description">// Shared Font</p>
+<p class="code">class ppdcFont : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *encoding, *version, *charset;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFontStatus">ppdcFontStatus</a> status;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>charset </dt>
+<dd class="description">Font charset</dd>
+<dt>status </dt>
+<dd class="description">Font status (ROM or Disk)</dd>
+</dl>
+<h4 class="method"><a name="ppdcFont">ppdcFont</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcFont (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *e,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *c,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFontStatus">ppdcFontStatus</a> s<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of font</dd>
+<dt>e</dt>
+<dd class="description">Font encoding</dd>
+<dt>v</dt>
+<dd class="description">Font version</dd>
+<dt>c</dt>
+<dd class="description">Font charset</dd>
+<dt>s</dt>
+<dd class="description">Font status</dd>
+</dl>
+<h4 class="method"><a name="~ppdcFont">~ppdcFont</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcFont (void);</p>
+<h3 class="class"><a name="ppdcGroup">ppdcGroup</a></h3>
+<p class="description">// Group of Options</p>
+<p class="code">class ppdcGroup : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *options;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *text;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>options </dt>
+<dd class="description">Options</dd>
+<dt>text </dt>
+<dd class="description">Human-readable text of option</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void add_option(<a href="#ppdcOption">ppdcOption</a> *o<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>o</dt>
+</dl>
+<h4 class="method"><a name="find_option">find_option</a></h4>
+<p class="description">Find an option in a group.</p>
+<p class="code">
+<a href="#ppdcOption">ppdcOption</a> *find_option (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of option</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description"></p>
+<h4 class="method"><a name="ppdcGroup">ppdcGroup</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcGroup (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcGroup">ppdcGroup</a> *g<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>g</dt>
+<dd class="description">Group template</dd>
+</dl>
+<h4 class="method"><a name="~ppdcGroup">~ppdcGroup</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcGroup (void);</p>
+<h3 class="class"><a name="ppdcInteger">ppdcInteger</a></h3>
+<p class="description">// Shared integer</p>
+<p class="code">class ppdcInteger : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *value;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>value </dt>
+<dd class="description">Integer value</dd>
+</dl>
+<h4 class="method"><a name="ppdcInteger">ppdcInteger</a></h4>
+<p class="description">Integer value</p>
+<p class="code">
+void ppdcInteger (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>v</dt>
+</dl>
+<h3 class="class"><a name="ppdcMediaSize">ppdcMediaSize</a></h3>
+<p class="description">// Media Size</p>
+<p class="code">class ppdcMediaSize : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *size_code, *region_code;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *text;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float width, length, left, bottom, right, top;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>region_code </dt>
+<dd class="description">PageRegion code, if any</dd>
+<dt>text </dt>
+<dd class="description">Human-readable text</dd>
+<dt>top </dt>
+<dd class="description">Top limit in points</dd>
+</dl>
+<h4 class="method"><a name="ppdcMediaSize">ppdcMediaSize</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcMediaSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *t,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float w,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float l,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float lm,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float bm,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float rm,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float tm,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *sc,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *rc<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of media size</dd>
+<dt>t</dt>
+<dd class="description">Text of media size</dd>
+<dt>w</dt>
+<dd class="description">Width in points</dd>
+<dt>l</dt>
+<dd class="description">Length in points</dd>
+<dt>lm</dt>
+<dd class="description">Left margin in points</dd>
+<dt>bm</dt>
+<dd class="description">Bottom margin in points</dd>
+<dt>rm</dt>
+<dd class="description">Right margin in points</dd>
+<dt>tm</dt>
+<dd class="description">Top margin in points</dd>
+<dt>sc</dt>
+<dd class="description">PageSize code, if any</dd>
+<dt>rc</dt>
+<dd class="description">PageRegion code, if any</dd>
+</dl>
+<h4 class="method"><a name="~ppdcMediaSize">~ppdcMediaSize</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcMediaSize (void);</p>
+<h3 class="class"><a name="ppdcMessage">ppdcMessage</a></h3>
+<p class="description">// Translation message</p>
+<p class="code">class ppdcMessage : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *id, *string;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>string </dt>
+<dd class="description">Translation string</dd>
+</dl>
+<h4 class="method"><a name="ppdcMessage">ppdcMessage</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcMessage (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *i,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *s<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>i</dt>
+<dd class="description">ID</dd>
+<dt>s</dt>
+<dd class="description">Text</dd>
+</dl>
+<h4 class="method"><a name="~ppdcMessage">~ppdcMessage</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcMessage (void);</p>
+<h3 class="class"><a name="ppdcOption">ppdcOption</a></h3>
+<p class="description">// Option</p>
+<p class="code">class ppdcOption : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *choices;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *defchoice;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float order;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcOptSection">ppdcOptSection</a> section;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *text;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcOptType">ppdcOptType</a> type;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>choices </dt>
+<dd class="description">Choices</dd>
+<dt>defchoice </dt>
+<dd class="description">Default choice</dd>
+<dt>order </dt>
+<dd class="description">Order number</dd>
+<dt>section </dt>
+<dd class="description">Section for option code</dd>
+<dt>text </dt>
+<dd class="description">Human-readable text of option</dd>
+<dt>type </dt>
+<dd class="description">Type of option</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void add_choice(<a href="#ppdcChoice">ppdcChoice</a> *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>c</dt>
+</dl>
+<h4 class="method"><a name="find_choice">find_choice</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcChoice">ppdcChoice</a> *find_choice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of choice</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Choice or NULL</p>
+<h4 class="method"><a name="ppdcOption">ppdcOption</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcOption">ppdcOption</a> *o<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>o</dt>
+<dd class="description">Template option</dd>
+</dl>
+<h4 class="method"><a name="set_defchoice">set_defchoice</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_defchoice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcChoice">ppdcChoice</a> *c<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>c</dt>
+<dd class="description">Choice</dd>
+</dl>
+<h4 class="method"><a name="~ppdcOption">~ppdcOption</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcOption (void);</p>
+<h3 class="class"><a name="ppdcProfile">ppdcProfile</a></h3>
+<p class="description">// Color Profile</p>
+<p class="code">class ppdcProfile : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *resolution, *media_type;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float density, gamma, profile[9];<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>media_type </dt>
+<dd class="description">Media type name</dd>
+<dt>profile[9] </dt>
+<dd class="description">Color profile matrix</dd>
+</dl>
+<h4 class="method"><a name="ppdcProfile">ppdcProfile</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcProfile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *m,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float d,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float g,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const float *p<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>r</dt>
+<dd class="description">Resolution name</dd>
+<dt>m</dt>
+<dd class="description">Media type name</dd>
+<dt>d</dt>
+<dd class="description">Density</dd>
+<dt>g</dt>
+<dd class="description">Gamma</dd>
+<dt>p</dt>
+<dd class="description">3x3 transform matrix</dd>
+</dl>
+<h4 class="method"><a name="~ppdcProfile">~ppdcProfile</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcProfile (void);</p>
+<h3 class="class"><a name="ppdcShared">ppdcShared</a></h3>
+<p class="description">// Shared Data Value</p>
+<p class="code">class ppdcShared {<br>
+&nbsp;&nbsp;private:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int use;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>use </dt>
+<dd class="description">Use count (delete when 0)</dd>
+</dl>
+<h4 class="method"><a name="class_name">class_name</a></h4>
+<p class="description"></p>
+<p class="code">
+virtual const char *class_name (void);</p>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description"></p>
+<h4 class="method"><a name="ppdcShared">ppdcShared</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcShared (void);</p>
+<h4 class="method"><a name="release">release</a></h4>
+<p class="description"></p>
+<p class="code">
+void release (void);</p>
+<h4 class="method"><a name="retain">retain</a></h4>
+<p class="description"></p>
+<p class="code">
+void retain (void);</p>
+<h4 class="method"><a name="~ppdcShared">~ppdcShared</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcShared (void);</p>
+<h3 class="class"><a name="ppdcSource">ppdcSource</a></h3>
+<p class="description">// Source File</p>
+<p class="code">class ppdcSource : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cond_state, *cond_current, cond_stack[101];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;static const char *driver_types[];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *filename;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;static <a href="#ppdcArray">ppdcArray</a> *includes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcArray">ppdcArray</a> *base_fonts, *drivers, *po_files, *sizes, *vars;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>cond_stack[101] </dt>
+<dd class="description">#if state stack</dd>
+<dt>driver_types[] </dt>
+<dd class="description">Driver types</dd>
+<dt>filename </dt>
+<dd class="description">Filename</dd>
+<dt>includes </dt>
+<dd class="description">Include directories</dd>
+<dt>vars </dt>
+<dd class="description">Defined variables</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;static void add_include(const char *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+</dl>
+<h4 class="method"><a name="add_include">add_include</a></h4>
+<p class="description"></p>
+<p class="code">
+void add_include (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>d</dt>
+<dd class="description">Include directory</dd>
+</dl>
+<h4 class="method"><a name="find_driver">find_driver</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcDriver">ppdcDriver</a> *find_driver (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Driver file name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Driver</p>
+<h4 class="method"><a name="find_include">find_include</a></h4>
+<p class="description"></p>
+<p class="code">
+char *find_include (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *base,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int nlen<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Include filename</dd>
+<dt>base</dt>
+<dd class="description">Current directory</dd>
+<dt>n</dt>
+<dd class="description">Path buffer</dd>
+<dt>nlen</dt>
+<dd class="description">Path buffer length</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Found path or NULL</p>
+<h4 class="method"><a name="find_po">find_po</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcCatalog">ppdcCatalog</a> *find_po (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *l<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>l</dt>
+<dd class="description">Locale name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Message catalog or NULL</p>
+<h4 class="method"><a name="find_size">find_size</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcMediaSize">ppdcMediaSize</a> *find_size (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *s<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>s</dt>
+<dd class="description">Size name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Size</p>
+<h4 class="method"><a name="find_variable">find_variable</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcVariable">ppdcVariable</a> *find_variable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Variable name</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Variable</p>
+<h4 class="method"><a name="get_attr">get_attr</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcAttr">ppdcAttr</a> *get_attr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool loc<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>loc</dt>
+<dd class="description">Localize this attribute?</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Attribute</p>
+<h4 class="method"><a name="get_boolean">get_boolean</a></h4>
+<p class="description"></p>
+<p class="code">
+int get_boolean (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Boolean value</p>
+<h4 class="method"><a name="get_choice">get_choice</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcChoice">ppdcChoice</a> *get_choice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Choice data</p>
+<h4 class="method"><a name="get_color_model">get_color_model</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcChoice">ppdcChoice</a> *get_color_model (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Choice data</p>
+<h4 class="method"><a name="get_color_order">get_color_order</a></h4>
+<p class="description"></p>
+<p class="code">
+int get_color_order (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *co<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>co</dt>
+<dd class="description">Color order string</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Color order value</p>
+<h4 class="method"><a name="get_color_profile">get_color_profile</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcProfile">ppdcProfile</a> *get_color_profile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Color profile</p>
+<h4 class="method"><a name="get_color_space">get_color_space</a></h4>
+<p class="description"></p>
+<p class="code">
+int get_color_space (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *cs<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>cs</dt>
+<dd class="description">Colorspace string</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Colorspace value</p>
+<h4 class="method"><a name="get_constraint">get_constraint</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcConstraint">ppdcConstraint</a> *get_constraint (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Constraint</p>
+<h4 class="method"><a name="get_custom_size">get_custom_size</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcMediaSize">ppdcMediaSize</a> *get_custom_size (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Media size</p>
+<h4 class="method"><a name="get_duplex">get_duplex</a></h4>
+<p class="description"></p>
+<p class="code">
+void get_duplex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDriver">ppdcDriver</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read from</dd>
+<dt>d</dt>
+<dd class="description">Current driver</dd>
+</dl>
+<h4 class="method"><a name="get_filter">get_filter</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcFilter">ppdcFilter</a> *get_filter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Filter</p>
+<h4 class="method"><a name="get_float">get_float</a></h4>
+<p class="description"></p>
+<p class="code">
+float get_float (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Number</p>
+<h4 class="method"><a name="get_font">get_font</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcFont">ppdcFont</a> *get_font (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Font data</p>
+<h4 class="method"><a name="get_generic">get_generic</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcChoice">ppdcChoice</a> *get_generic (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *keyword,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *tattr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *nattr<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>keyword</dt>
+<dd class="description">Keyword name</dd>
+<dt>tattr</dt>
+<dd class="description">Text attribute</dd>
+<dt>nattr</dt>
+<dd class="description">Numeric attribute</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Choice data</p>
+<h4 class="method"><a name="get_group">get_group</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcGroup">ppdcGroup</a> *get_group (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDriver">ppdcDriver</a> *d<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>d</dt>
+<dd class="description">Printer driver</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Group</p>
+<h4 class="method"><a name="get_installable">get_installable</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcOption">ppdcOption</a> *get_installable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Option</p>
+<h4 class="method"><a name="get_integer">get_integer</a></h4>
+<p class="description"></p>
+<p class="code">
+int get_integer (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Integer value</p>
+<h4 class="method"><a name="get_measurement">get_measurement</a></h4>
+<p class="description"></p>
+<p class="code">
+float get_measurement (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Measurement value in points</p>
+<h4 class="method"><a name="get_option">get_option</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcOption">ppdcOption</a> *get_option (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDriver">ppdcDriver</a> *d,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcGroup">ppdcGroup</a> *g<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>d</dt>
+<dd class="description">Printer driver</dd>
+<dt>g</dt>
+<dd class="description">Current group</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Option</p>
+<h4 class="method"><a name="get_po">get_po</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcCatalog">ppdcCatalog</a> *get_po (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Message catalog</p>
+<h4 class="method"><a name="get_resolution">get_resolution</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcChoice">ppdcChoice</a> *get_resolution (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Choice data</p>
+<h4 class="method"><a name="get_simple_profile">get_simple_profile</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcProfile">ppdcProfile</a> *get_simple_profile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Color profile</p>
+<h4 class="method"><a name="get_size">get_size</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcMediaSize">ppdcMediaSize</a> *get_size (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Media size</p>
+<h4 class="method"><a name="get_token">get_token</a></h4>
+<p class="description"></p>
+<p class="code">
+char *get_token (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int buflen<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>buffer</dt>
+<dd class="description">Buffer</dd>
+<dt>buflen</dt>
+<dd class="description">Length of buffer</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Token string or NULL</p>
+<h4 class="method"><a name="get_variable">get_variable</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcVariable">ppdcVariable</a> *get_variable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Variable</p>
+<h4 class="method"><a name="import_ppd">import_ppd</a></h4>
+<p class="description"></p>
+<p class="code">
+int import_ppd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">Filename</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="method"><a name="ppdcSource">ppdcSource</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcSource (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *ffp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">File to read</dd>
+<dt>ffp</dt>
+<dd class="description">File pointer to use</dd>
+</dl>
+<h4 class="method"><a name="quotef">quotef</a></h4>
+<p class="description"></p>
+<p class="code">
+int quotef (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *format,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to write to</dd>
+<dt>format</dt>
+<dd class="description">Printf-style format string</dd>
+<dt>...</dt>
+<dd class="description">Additional args as needed</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Number bytes on success, -1 on failure</p>
+<h4 class="method"><a name="read_file">read_file</a></h4>
+<p class="description"></p>
+<p class="code">
+void read_file (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *ffp<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">File to read</dd>
+<dt>ffp</dt>
+<dd class="description">File pointer to use</dd>
+</dl>
+<h4 class="method"><a name="scan_file">scan_file</a></h4>
+<p class="description"></p>
+<p class="code">
+void scan_file (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcFile">ppdcFile</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcDriver">ppdcDriver</a> *td,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool inc<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read</dd>
+<dt>td</dt>
+<dd class="description">Driver template</dd>
+<dt>inc</dt>
+<dd class="description">Including?</dd>
+</dl>
+<h4 class="method"><a name="set_variable">set_variable</a></h4>
+<p class="description"></p>
+<p class="code">
+<a href="#ppdcVariable">ppdcVariable</a> *set_variable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>name</dt>
+<dd class="description">Name</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">Variable</p>
+<h4 class="method"><a name="write_file">write_file</a></h4>
+<p class="description"></p>
+<p class="code">
+int write_file (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *f<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>f</dt>
+<dd class="description">File to write</dd>
+</dl>
+<h5 class="returnvalue">Return Value</h5>
+<p class="description">0 on success, -1 on error</p>
+<h4 class="method"><a name="~ppdcSource">~ppdcSource</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcSource (void);</p>
+<h3 class="class"><a name="ppdcString">ppdcString</a></h3>
+<p class="description">// Shared String</p>
+<p class="code">class ppdcString : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *value;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>value </dt>
+<dd class="description">String value</dd>
+</dl>
+<h4 class="method"><a name="ppdcString">ppdcString</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>v</dt>
+<dd class="description">String</dd>
+</dl>
+<h4 class="method"><a name="~ppdcString">~ppdcString</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcString (void);</p>
+<h3 class="class"><a name="ppdcVariable">ppdcVariable</a></h3>
+<p class="description">// Variable Definition</p>
+<p class="code">class ppdcVariable : public ppdcShared {<br>
+&nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppdcString">ppdcString</a> *name, *value;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>value </dt>
+<dd class="description">Value of variable</dd>
+</dl>
+<h4 class="method"><a name="PPDC_NAME">PPDC_NAME</a></h4>
+<p class="description"></p>
+<p class="code">
+void PPDC_NAME (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void set_value(const char *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>v</dt>
+</dl>
+<h4 class="method"><a name="ppdcVariable">ppdcVariable</a></h4>
+<p class="description"></p>
+<p class="code">
+void ppdcVariable (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>n</dt>
+<dd class="description">Name of variable</dd>
+<dt>v</dt>
+<dd class="description">Value of variable</dd>
+</dl>
+<h4 class="method"><a name="set_value">set_value</a></h4>
+<p class="description"></p>
+<p class="code">
+void set_value (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *v<br>
+);</p>
+<h5 class="parameters">Parameters</h5>
+<dl>
+<dt>v</dt>
+</dl>
+<h4 class="method"><a name="~ppdcVariable">~ppdcVariable</a></h4>
+<p class="description"></p>
+<p class="code">
+void ~ppdcVariable (void);</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="ppdc_cs_t">ppdc_cs_t</a></h3>
+<p class="description"></p>
+<p class="code">
+typedef enum ppdc_cs_t;
+</p>
+<h2 class="title"><a name="VARIABLES">Variables</a></h2>
+<h3 class="variable"><a name="ppdcSource">ppdcSource</a></h3>
+<p class="description">// Printer Driver Data</p>
+<p class="code">class ppdcSource;</p>
+<h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
+<h3 class="enumeration"><a name="ppdcCondFlags">ppdcCondFlags</a></h3>
+<p class="description">// Condition flags</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_COND_NORMAL </dt>
+<dd class="description">Normal state</dd>
+<dt>PPDC_COND_SATISFIED </dt>
+<dd class="description">At least one condition satisfied</dd>
+<dt>PPDC_COND_SKIP </dt>
+<dd class="description">Skip state</dd>
+</dl>
+<h3 class="enumeration"><a name="ppdcDrvType">ppdcDrvType</a></h3>
+<p class="description">// Driver type</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_DRIVER_CUSTOM </dt>
+<dd class="description">Custom driver</dd>
+<dt>PPDC_DRIVER_EPSON </dt>
+<dd class="description">rastertoepson driver</dd>
+<dt>PPDC_DRIVER_ESCP </dt>
+<dd class="description">rastertoescpx driver</dd>
+<dt>PPDC_DRIVER_HP </dt>
+<dd class="description">rastertohp driver</dd>
+<dt>PPDC_DRIVER_LABEL </dt>
+<dd class="description">rastertolabel/rastertodymo driver</dd>
+<dt>PPDC_DRIVER_MAX </dt>
+<dd class="description">Number of driver types defined</dd>
+<dt>PPDC_DRIVER_PCL </dt>
+<dd class="description">rastertopclx driver</dd>
+<dt>PPDC_DRIVER_PS </dt>
+<dd class="description">PostScript driver</dd>
+</dl>
+<h3 class="enumeration"><a name="ppdcFontStatus">ppdcFontStatus</a></h3>
+<p class="description">// Load status of font</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_FONT_DISK </dt>
+<dd class="description">Font is on disk</dd>
+<dt>PPDC_FONT_ROM </dt>
+<dd class="description">Font is in ROM</dd>
+</dl>
+<h3 class="enumeration"><a name="ppdcLineEnding">ppdcLineEnding</a></h3>
+<p class="description">// Line endings</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_CRLF </dt>
+<dd class="description">CR + LF</dd>
+<dt>PPDC_CRONLY </dt>
+<dd class="description">CR only</dd>
+<dt>PPDC_LFONLY </dt>
+<dd class="description">LF only</dd>
+</dl>
+<h3 class="enumeration"><a name="ppdcOptSection">ppdcOptSection</a></h3>
+<p class="description">// Option section</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_SECTION_ANY </dt>
+<dd class="description">AnySetup</dd>
+<dt>PPDC_SECTION_DOCUMENT </dt>
+<dd class="description">DocumentSetup</dd>
+<dt>PPDC_SECTION_EXIT </dt>
+<dd class="description">ExitServer</dd>
+<dt>PPDC_SECTION_JCL </dt>
+<dd class="description">JCLSetup</dd>
+<dt>PPDC_SECTION_PAGE </dt>
+<dd class="description">PageSetup</dd>
+<dt>PPDC_SECTION_PROLOG </dt>
+<dd class="description">Prolog</dd>
+</dl>
+<h3 class="enumeration"><a name="ppdcOptType">ppdcOptType</a></h3>
+<p class="description">// Option type</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPDC_BOOLEAN </dt>
+<dd class="description">True/false option</dd>
+<dt>PPDC_PICKMANY </dt>
+<dd class="description">Multiple choices from list</dd>
+<dt>PPDC_PICKONE </dt>
+<dd class="description">Single choice from list</dd>
+</dl>
+</div>
+</body>
+</html>

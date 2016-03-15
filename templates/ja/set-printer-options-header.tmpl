@@ -1,0 +1,24 @@
+<H2 CLASS="title">{printer_name} のデフォルトオプションの変更</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="プリンターにデフォルトオプションを問い合わせる">:}
+
+<SCRIPT TYPE="text/javascript"><!--
+function update_paramtable(option)
+{
+  var cb = document.getElementById("select-" + option)
+  var paramstable = document.getElementById(option + "-params");
+  if (cb.value == "Custom")
+    paramstable.style.display = "table";
+  else
+    paramstable.style.display = "none";
+}
+--></SCRIPT>
+
+<H3 CLASS="title">{[group_id]
+<A HREF="#{group_id}">{group}</A>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</H3>
+
+<DIV CLASS="tabs">

@@ -1,0 +1,8 @@
+<H2 CLASS="title">{title} для {printer_name}</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Ожидание"> }Обработка задания
+{job_state=3?в очереди:{job_state=4?удерживается:
+{job_state=5?обрабатывается:{job_state=6?остановлено:
+{job_state=7?отменено:{job_state=8?прервано:завершено}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}</P>

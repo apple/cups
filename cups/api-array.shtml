@@ -1,0 +1,196 @@
+<!--
+  "$Id: api-array.shtml 7616 2008-05-28 00:34:13Z mike $"
+
+  Array API introduction for CUPS.
+
+  Copyright 2007-2011 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The CUPS array API provides a high-performance generic array container.
+The contents of the array container can be sorted and the container itself is
+designed for optimal speed and memory usage under a wide variety of conditions.
+Sorted arrays use a binary search algorithm from the last found or inserted
+element to quickly find matching elements in the array. Arrays created with the
+optional hash function can often find elements with a single lookup. The
+<a href='#cups_array_t'><code>cups_array_t</code></a> type is used when
+referring to a CUPS array.</p>
+
+<p>The CUPS scheduler (<tt>cupsd</tt>) and many of the CUPS API
+functions use the array API to efficiently manage large lists of
+data.</p>
+
+<h3><a name='MANAGING_ARRAYS'>Managing Arrays</a></h3>
+
+<p>Arrays are created using either the
+<a href='#cupsArrayNew'><code>cupsArrayNew</code></a>,
+<a href='#cupsArrayNew2'><code>cupsArrayNew2</code></a>, or
+<a href='#cupsArrayNew2'><code>cupsArrayNew3</code></a> functions. The
+first function creates a new array with the specified callback function
+and user data pointer:</p>
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+static int compare_func(void *first, void *second, void *user_data);
+
+void *user_data;
+<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>(compare_func, user_data);
+</pre>
+
+<p>The comparison function (type
+<a href="#cups_arrayfunc_t"><code>cups_arrayfunc_t</code></a>) is called
+whenever an element is added to the array and can be <code>NULL</code> to
+create an unsorted array. The function returns -1 if the first element should
+come before the second, 0 if the first and second elements should have the same
+ordering, and 1 if the first element should come after the second.</p>
+
+<p>The "user_data" pointer is passed to your comparison function. Pass
+<code>NULL</code> if you do not need to associate the elements in your array
+with additional information.</p>
+
+<p>The <a href='#cupsArrayNew2'><code>cupsArrayNew2</code></a> function adds
+two more arguments to support hashed lookups, which can potentially provide
+instantaneous ("O(1)") lookups in your array:</p>
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+#define HASH_SIZE 512 /* Size of hash table */
+
+static int compare_func(void *first, void *second, void *user_data);
+static int hash_func(void *element, void *user_data);
+
+void *user_data;
+<a href='#cups_array_t'>cups_array_t</a> *hash_array = <a href='#cupsArrayNew2'>cupsArrayNew2</a>(compare_func, user_data, hash_func, HASH_SIZE);
+</pre>
+
+<p>The hash function (type
+<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) should return a
+number from 0 to (hash_size-1) that (hopefully) uniquely identifies the
+element and is called whenever you look up an element in the array with
+<a href='#cupsArrayFind'><code>cupsArrayFind</code></a>. The hash size is
+only limited by available memory, but generally should not be larger than
+16384 to realize any performance improvement.</p>
+
+<p>The <a href='#cupsArrayNew3'><code>cupsArrayNew3</code></a> function adds
+copy and free callbacks to support basic memory management of elements:</p>
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+#define HASH_SIZE 512 /* Size of hash table */
+
+static int compare_func(void *first, void *second, void *user_data);
+static void *copy_func(void *element, void *user_data);
+static void free_func(void *element, void *user_data);
+static int hash_func(void *element, void *user_data);
+
+void *user_data;
+<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew3'>cupsArrayNew3</a>(compare_func, user_data, NULL, 0, copy_func, free_func);
+
+<a href='#cups_array_t'>cups_array_t</a> *hash_array = <a href='#cupsArrayNew3'>cupsArrayNew3</a>(compare_func, user_data, hash_func, HASH_SIZE, copy_func, free_func);
+</pre>
+
+<p>Once you have created the array, you add elements using the
+<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a>
+<a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> functions.
+The first function adds an element to the array, adding the new element
+after any elements that have the same order, while the second inserts the
+element before others with the same order. For unsorted arrays,
+<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the element to
+the end of the array while
+<a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> inserts the
+element at the beginning of the array. For example, the following code
+creates a sorted array of character strings:</p>
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+/* Use strcmp() to compare strings - it will ignore the user_data pointer */
+<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
+
+/* Add four strings to the array */
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
+</pre>
+
+<p>Elements are removed using the
+<a href='#cupsArrayRemove'><code>cupsArrayRemove</code></a> function, for
+example:</p>
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+/* Use strcmp() to compare strings - it will ignore the user_data pointer */
+<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
+
+/* Add four strings to the array */
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
+
+/* Remove "Red Fish" */
+<a href='#cupsArrayRemove'>cupsArrayRemove</a>(array, "Red Fish");
+</pre>
+
+<p>Finally, you free the memory used by the array using the
+<a href='#cupsArrayDelete'><code>cupsArrayDelete</code></a> function. All
+of the memory for the array and hash table (if any) is freed, however <em>CUPS
+does not free the elements unless you provide copy and free functions</em>.</p>
+
+<h3><a name='FINDING_AND_ENUMERATING'>Finding and Enumerating Elements</a></h3>
+
+<p>CUPS provides several functions to find and enumerate elements in an
+array. Each one sets or updates a "current index" into the array, such that
+future lookups will start where the last one left off:</p>
+
+<dl>
+	<dt><a href='#cupsArrayFind'><code>cupsArrayFind</code></a></dt>
+	<dd>Returns the first matching element.</dd>
+	<dt><a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a></dt>
+	<dd>Returns the first element in the array.</dd>
+	<dt><a href='#cupsArrayIndex'><code>cupsArrayIndex</code></a></dt>
+	<dd>Returns the Nth element in the array, starting at 0.</dd>
+	<dt><a href='#cupsArrayLast'><code>cupsArrayLast</code></a></dt>
+	<dd>Returns the last element in the array.</dd>
+	<dt><a href='#cupsArrayNext'><code>cupsArrayNext</code></a></dt>
+	<dd>Returns the next element in the array.</dd>
+	<dt><a href='#cupsArrayPrev'><code>cupsArrayPrev</code></a></dt>
+	<dd>Returns the previous element in the array.</dd>
+</dl>
+
+<p>Each of these functions returns <code>NULL</code> when there is no
+corresponding element.  For example, a simple <code>for</code> loop using the
+<a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a> and
+<a href='#cupsArrayNext'><code>cupsArrayNext</code></a> functions will
+enumerate all of the strings in our previous example:</p> 
+
+<pre class='example'>
+#include &lt;cups/array.h&gt;
+
+/* Use strcmp() to compare strings - it will ignore the user_data pointer */
+<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
+
+/* Add four strings to the array */
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
+<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
+
+/* Show all of the strings in the array */
+char *s;
+for (s = (char *)<a href='#cupsArrayFirst'>cupsArrayFirst</a>(array); s != NULL; s = (char *)<a href='#cupsArrayNext'>cupsArrayNext</a>(array))
+  puts(s);
+</pre>

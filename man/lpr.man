@@ -1,0 +1,149 @@
+.\"
+.\" "$Id: lpr.man 12854 2015-08-28 14:08:00Z msweet $"
+.\"
+.\" lpr man page for CUPS.
+.\"
+.\" Copyright 2007-2013 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpr 1 "CUPS" "11 June 2014" "Apple Inc."
+.SH NAME
+lpr \- print files
+.SH SYNOPSIS
+.B lpr
+[
+.B \-E
+] [
+\fB\-H \fIserver\fR[\fB:\fIport\fR]
+] [
+.B \-U
+.I username
+] [
+\fB\-P \fIdestination\fR[\fB/\fIinstance\fR]
+] [
+.B \-#
+.I num-copies
+[
+.B \-h
+] [
+.B \-l
+] [
+.B \-m
+] [
+\fB\-o \fIoption\fR[\fB=\fIvalue\fR]
+] [
+.B \-p
+] [
+.B \-q
+] [
+.B \-r
+] [
+.B \-C
+.I title
+] [
+.B \-J
+.I title
+] [
+.B \-T
+.I title
+] [
+.I file(s)
+]
+.SH DESCRIPTION
+\fBlpr\fR submits files for printing.
+Files named on the command line are sent to the named printer or the default destination if no destination is specified.
+If no files are listed on the command-line, \fBlpr\fR reads the print file from the standard input.
+.SS THE DEFAULT DESTINATION
+CUPS provides many ways to set the default destination. The \fBLPDEST\fR and \fBPRINTER\fR environment variables are consulted first.
+If neither are set, the current default set using the
+.BR lpoptions (1)
+command is used, followed by the default set using the
+.BR lpadmin (8)
+command.
+.SH OPTIONS
+The following options are recognized by \fIlpr\fR:
+.TP 5
+.B \-E
+Forces encryption when connecting to the server.
+.TP 5
+\fB\-H \fIserver\fR[\fB:\fIport\fR]
+Specifies an alternate server.
+.TP 5
+\fB\-C "\fIname\fB"\fR
+.TP 5
+\fB\-J "\fIname\fB"\fR
+.TP 5
+\fB\-T "\fIname\fB"\fR
+Sets the job name/title.
+.TP 5
+\fB\-P \fIdestination\fR[\fB/\fIinstance\fR]
+Prints files to the named printer.
+.TP 5
+\fB\-U \fIusername\fR
+Specifies an alternate username.
+.TP 5
+\fB\-# \fIcopies\fR
+Sets the number of copies to print.
+.TP 5
+.B \-h
+Disables banner printing. This option is equivalent to \fI-o job\-sheets=none\fR.
+.TP 5
+.B \-l
+Specifies that the print file is already formatted for the destination and should be sent without filtering.
+This option is equivalent to \fI-o raw\fR.
+.TP 5
+.B \-m
+Send an email on job completion.
+.TP 5
+\fB\-o \fIoption\fR[\fB=\fIvalue\fR]
+Sets a job option.
+.TP 5
+.B \-p
+Specifies that the print file should be formatted with a shaded header with the date, time, job name, and page number.
+This option is equivalent to \fI\-o prettyprint\fR and is only useful when printing text files.
+.TP 5
+.B \-q
+Hold job for printing.
+.TP 5
+.B \-r
+Specifies that the named print files should be deleted after submitting them.
+.SH NOTES
+The \fI\-c\fR, \fI\-d\fR, \fI\-f\fR, \fI\-g\fR, \fI\-i\fR, \fI\-n\fR, \fI\-t\fR, \fI\-v\fR, and \fI\-w\fR options are not supported by CUPS and produce a warning message if used.
+.SH EXAMPLES
+Print two copies of a document to the default printer:
+.nf
+
+    lpr -# 2 filename
+
+.fi
+Print a double-sided legal document to a printer called "foo":
+.nf
+
+    lpr -P foo -o media=legal -o sides=two-sided-long-edge filename
+
+.fi
+Print a presentation document 2-up to a printer called "foo":
+.nf
+
+    lpr -P foo -o number-up=2 filename
+.fi
+.SH SEE ALSO
+.BR cancel (1),
+.BR lp (1),
+.BR lpadmin (8),
+.BR lpoptions (1),
+.BR lpq (1),
+.BR lprm (1),
+.BR lpstat (1),
+CUPS Online Help (http://localhost:631/help)
+.SH COPYRIGHT
+Copyright \[co] 2007-2015 by Apple Inc.
+.\"
+.\" End of "$Id: lpr.man 12854 2015-08-28 14:08:00Z msweet $".
+.\"

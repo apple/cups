@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>IFPkgDescriptionDeleteWarning</key>
+        <string></string>
+        <key>IFPkgDescriptionDescription</key>
+        <string>CUPS provides a portable printing layer for UNIX(r) operating systems.</string>
+        <key>IFPkgDescriptionTitle</key>
+        <string>CUPS</string>
+        <key>IFPkgDescriptionVersion</key>
+        <string>@CUPS_RELEASE@</string>
+</dict>
+</plist>

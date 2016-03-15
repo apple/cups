@@ -1,0 +1,59 @@
+.\"
+.\" "$Id$"
+.\"
+.\" ippproxy man page for CUPS.
+.\"
+.\" Copyright 2014 by Apple Inc.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ippproxy 1 "CUPS" "16 September 2014" "Apple Inc."
+.SH NAME
+ippproxy \- a simple ipp proxy client
+.SH SYNOPSIS
+.B ippproxy
+[
+.B \-v[vvv]
+]
+.I infrastructure-printer-uri
+.I local-printer-uri
+.SH DESCRIPTION
+.B ippproxy
+is a simple IPP proxy client conforming to the IPP Shared Infrastructure Extensions (INFRA) specification. It can be used to proxy access to a local IPP printer through an Infrastructure Printer such as
+.BR ippinfra (1).
+.SH OPTIONS
+The following options are recognized by
+.B ippproxy:
+.TP 5
+.B \-v[vvv]
+Be (very) verbose when logging activity to the standard output.
+.SH EXIT STATUS
+The
+.B ippproxy
+program returns 1 if it is unable to process the command-line arguments or connect to either the infrastructure or local printers.
+Otherwise
+.B ippproxy
+will run continuously until terminated.
+.SH CONFORMING TO
+The
+.B ippproxy
+program is unique to CUPS and conforms to the IPP Shared Infrastructure Extensions (INFRA) specification.
+.SH EXAMPLE
+Run
+.B ippproxy
+with an infrastructure URI of "ipps://host.example.com/ipp/print" and a local URI of "ipp://10.0.1.2/ipp/print":
+.nf
+
+    ippproxy ipps://host.example.com/ipp/print ipp://10.0.1.2/ipp/print
+.fi
+.SH SEE ALSO
+PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
+.SH COPYRIGHT
+Copyright \[co] 2007-2014 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

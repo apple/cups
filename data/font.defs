@@ -1,0 +1,55 @@
+/*
+ * "$Id: font.defs 343 2007-07-13 19:52:48Z mike $"
+ *
+ *   Standard ESP Ghostscript font definitions for the CUPS PPD file
+ *   compiler.
+ *
+ *   Copyright 2007 by Apple Inc.
+ *   Copyright 1997-2005 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
+ */
+
+#font AvantGarde-Book Standard "(1.05)" Standard ROM
+#font AvantGarde-BookOblique Standard "(1.05)" Standard ROM
+#font AvantGarde-Demi Standard "(1.05)" Standard ROM
+#font AvantGarde-DemiOblique Standard "(1.05)" Standard ROM
+#font Bookman-Demi Standard "(1.05)" Standard ROM
+#font Bookman-DemiItalic Standard "(1.05)" Standard ROM
+#font Bookman-Light Standard "(1.05)" Standard ROM
+#font Bookman-LightItalic Standard "(1.05)" Standard ROM
+#font Courier Standard "(1.05)" Standard ROM
+#font Courier-Bold Standard "(1.05)" Standard ROM
+#font Courier-BoldOblique Standard "(1.05)" Standard ROM
+#font Courier-Oblique Standard "(1.05)" Standard ROM
+#font Helvetica Standard "(1.05)" Standard ROM
+#font Helvetica-Bold Standard "(1.05)" Standard ROM
+#font Helvetica-BoldOblique Standard "(1.05)" Standard ROM
+#font Helvetica-Narrow Standard "(1.05)" Standard ROM
+#font Helvetica-Narrow-Bold Standard "(1.05)" Standard ROM
+#font Helvetica-Narrow-BoldOblique Standard "(1.05)" Standard ROM
+#font Helvetica-Narrow-Oblique Standard "(1.05)" Standard ROM
+#font Helvetica-Oblique Standard "(1.05)" Standard ROM
+#font NewCenturySchlbk-Bold Standard "(1.05)" Standard ROM
+#font NewCenturySchlbk-BoldItalic Standard "(1.05)" Standard ROM
+#font NewCenturySchlbk-Italic Standard "(1.05)" Standard ROM
+#font NewCenturySchlbk-Roman Standard "(1.05)" Standard ROM
+#font Palatino-Bold Standard "(1.05)" Standard ROM
+#font Palatino-BoldItalic Standard "(1.05)" Standard ROM
+#font Palatino-Italic Standard "(1.05)" Standard ROM
+#font Palatino-Roman Standard "(1.05)" Standard ROM
+#font Symbol Special "(001.005)" Special ROM
+#font Times-Bold Standard "(1.05)" Standard ROM
+#font Times-BoldItalic Standard "(1.05)" Standard ROM
+#font Times-Italic Standard "(1.05)" Standard ROM
+#font Times-Roman Standard "(1.05)" Standard ROM
+#font ZapfChancery-MediumItalic Standard "(1.05)" Standard ROM
+#font ZapfDingbats Special "(001.005)" Special ROM
+
+/*
+ * End of "$Id: font.defs 343 2007-07-13 19:52:48Z mike $".
+ */

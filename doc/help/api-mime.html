@@ -1,0 +1,845 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>MIME API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id: api-array.header 8087 2008-10-27 21:37:05Z mike $"
+
+  MIME API header for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>MIME API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/mime.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupsmime</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#mimeAddFilter" title="Add a filter to the current MIME database.">mimeAddFilter</a></li>
+	<li><a href="#mimeAddType" title="Add a MIME type to a database.">mimeAddType</a></li>
+	<li><a href="#mimeAddTypeRule" title="Add a detection rule for a file type.">mimeAddTypeRule</a></li>
+	<li><a href="#mimeDelete" title="Delete (free) a MIME database.">mimeDelete</a></li>
+	<li><a href="#mimeDeleteFilter" title="Delete a filter from the MIME database.">mimeDeleteFilter</a></li>
+	<li><a href="#mimeDeleteType" title="Delete a type from the MIME database.">mimeDeleteType</a></li>
+	<li><a href="#mimeFileType" title="Determine the type of a file.">mimeFileType</a></li>
+	<li><a href="#mimeFilter" title="Find the fastest way to convert from one type to another.">mimeFilter</a></li>
+	<li><a href="#mimeFilter2" title="Find the fastest way to convert from one type to another,
+including file size.">mimeFilter2</a></li>
+	<li><a href="#mimeFilterLookup" title="Lookup a filter.">mimeFilterLookup</a></li>
+	<li><a href="#mimeFirstFilter" title="Get the first filter in the MIME database.">mimeFirstFilter</a></li>
+	<li><a href="#mimeFirstType" title="Get the first type in the MIME database.">mimeFirstType</a></li>
+	<li><a href="#mimeLoad" title="Create a new MIME database from disk.">mimeLoad</a></li>
+	<li><a href="#mimeLoadFilters" title="Load filter definitions from disk.">mimeLoadFilters</a></li>
+	<li><a href="#mimeLoadTypes" title="Load type definitions from disk.">mimeLoadTypes</a></li>
+	<li><a href="#mimeNew" title="Create a new, empty MIME database.">mimeNew</a></li>
+	<li><a href="#mimeNextFilter" title="Get the next filter in the MIME database.">mimeNextFilter</a></li>
+	<li><a href="#mimeNextType" title="Get the next type in the MIME database.">mimeNextType</a></li>
+	<li><a href="#mimeNumFilters" title="Next type">mimeNumFilters</a></li>
+	<li><a href="#mimeNumTypes" title="MIME database">mimeNumTypes</a></li>
+	<li><a href="#mimeSetErrorCallback" title="Set the callback for error messages.">mimeSetErrorCallback</a></li>
+	<li><a href="#mimeType" title="Lookup a file type.">mimeType</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#const" title="MIME Database">const</a></li>
+	<li><a href="#mime_filter_t" title="MIME Conversion Filter Data">mime_filter_t</a></li>
+	<li><a href="#mime_magic_t" title="MIME Magic Data">mime_magic_t</a></li>
+	<li><a href="#mime_op_t" title="Types/structures...">mime_op_t</a></li>
+	<li><a href="#mime_t" title="MIME Database">mime_t</a></li>
+	<li><a href="#mime_type_t" title="MIME Type Data">mime_type_t</a></li>
+</ul></li>
+</ul>
+<!--
+  "$Id: api-array.shtml 7616 2008-05-28 00:34:13Z mike $"
+
+  MIME API introduction for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The MIME API provides file typing and conversion services for CUPS.</p>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="mimeAddFilter">mimeAddFilter</a></h3>
+<p class="description">Add a filter to the current MIME database.</p>
+<p class="code">
+<a href="#mime_filter_t">mime_filter_t</a> *mimeAddFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cost,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filter<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>src</dt>
+<dd class="description">Source type</dd>
+<dt>dst</dt>
+<dd class="description">Destination type</dd>
+<dt>cost</dt>
+<dd class="description">Relative time/resource cost</dd>
+<dt>filter</dt>
+<dd class="description">Filter program to run</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New filter</p>
+<h3 class="function"><a name="mimeAddType">mimeAddType</a></h3>
+<p class="description">Add a MIME type to a database.</p>
+<p class="code">
+<a href="#mime_type_t">mime_type_t</a> *mimeAddType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *super,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *type<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>super</dt>
+<dd class="description">Super-type name</dd>
+<dt>type</dt>
+<dd class="description">Type name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New (or existing) MIME type</p>
+<h3 class="function"><a name="mimeAddTypeRule">mimeAddTypeRule</a></h3>
+<p class="description">Add a detection rule for a file type.</p>
+<p class="code">
+int mimeAddTypeRule (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *mt,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *rule<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mt</dt>
+<dd class="description">Type to add to</dd>
+<dt>rule</dt>
+<dd class="description">Rule to add</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h3 class="function"><a name="mimeDelete">mimeDelete</a></h3>
+<p class="description">Delete (free) a MIME database.</p>
+<p class="code">
+void mimeDelete (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h3 class="function"><a name="mimeDeleteFilter">mimeDeleteFilter</a></h3>
+<p class="description">Delete a filter from the MIME database.</p>
+<p class="code">
+void mimeDeleteFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_filter_t">mime_filter_t</a> *filter<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>filter</dt>
+<dd class="description">Filter</dd>
+</dl>
+<h3 class="function"><a name="mimeDeleteType">mimeDeleteType</a></h3>
+<p class="description">Delete a type from the MIME database.</p>
+<p class="code">
+void mimeDeleteType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *mt<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>mt</dt>
+<dd class="description">Type</dd>
+</dl>
+<h3 class="function"><a name="mimeFileType">mimeFileType</a></h3>
+<p class="description">Determine the type of a file.</p>
+<p class="code">
+<a href="#mime_type_t">mime_type_t</a> *mimeFileType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filename,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *compression<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>pathname</dt>
+<dd class="description">Name of file to check on disk</dd>
+<dt>filename</dt>
+<dd class="description">Original filename or NULL</dd>
+<dt>compression</dt>
+<dd class="description">Is the file compressed?</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Type of file</p>
+<h3 class="function"><a name="mimeFilter">mimeFilter</a></h3>
+<p class="description">Find the fastest way to convert from one type to another.</p>
+<p class="code">
+cups_array_t *mimeFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cost<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>src</dt>
+<dd class="description">Source file type</dd>
+<dt>dst</dt>
+<dd class="description">Destination file type</dd>
+<dt>cost</dt>
+<dd class="description">Cost of filters</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Array of filters to run</p>
+<h3 class="function"><a name="mimeFilter2">mimeFilter2</a></h3>
+<p class="description">Find the fastest way to convert from one type to another,
+including file size.</p>
+<p class="code">
+cups_array_t *mimeFilter2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t srcsize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cost<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>src</dt>
+<dd class="description">Source file type</dd>
+<dt>srcsize</dt>
+<dd class="description">Size of source file</dd>
+<dt>dst</dt>
+<dd class="description">Destination file type</dd>
+<dt>cost</dt>
+<dd class="description">Cost of filters</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Array of filters to run</p>
+<h3 class="function"><a name="mimeFilterLookup">mimeFilterLookup</a></h3>
+<p class="description">Lookup a filter.</p>
+<p class="code">
+<a href="#mime_filter_t">mime_filter_t</a> *mimeFilterLookup (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>src</dt>
+<dd class="description">Source type</dd>
+<dt>dst</dt>
+<dd class="description">Destination type</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Filter for src-&gt;dst</p>
+<h3 class="function"><a name="mimeFirstFilter">mimeFirstFilter</a></h3>
+<p class="description">Get the first filter in the MIME database.</p>
+<p class="code">
+<a href="#mime_filter_t">mime_filter_t</a> *mimeFirstFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Filter or NULL</p>
+<h3 class="function"><a name="mimeFirstType">mimeFirstType</a></h3>
+<p class="description">Get the first type in the MIME database.</p>
+<p class="code">
+<a href="#mime_type_t">mime_type_t</a> *mimeFirstType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Type or NULL</p>
+<h3 class="function"><a name="mimeLoad">mimeLoad</a></h3>
+<p class="description">Create a new MIME database from disk.</p>
+<p class="code">
+<a href="#mime_t">mime_t</a> *mimeLoad (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filterpath<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>pathname</dt>
+<dd class="description">Directory to load</dd>
+<dt>filterpath</dt>
+<dd class="description">Directory to load</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New MIME database</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function uses <a href="#mimeLoadFilters"><code>mimeLoadFilters</code></a> and <a href="#mimeLoadTypes"><code>mimeLoadTypes</code></a> to
+create a MIME database from a single directory.</p>
+<h3 class="function"><a name="mimeLoadFilters">mimeLoadFilters</a></h3>
+<p class="description">Load filter definitions from disk.</p>
+<p class="code">
+<a href="#mime_t">mime_t</a> *mimeLoadFilters (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filterpath<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>pathname</dt>
+<dd class="description">Directory to load from</dd>
+<dt>filterpath</dt>
+<dd class="description">Default filter program directory</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">MIME database</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function loads all of the .convs files from the specified directory.
+Use <a href="#mimeLoadTypes"><code>mimeLoadTypes</code></a> to load all types before you load the filters.</p>
+<h3 class="function"><a name="mimeLoadTypes">mimeLoadTypes</a></h3>
+<p class="description">Load type definitions from disk.</p>
+<p class="code">
+<a href="#mime_t">mime_t</a> *mimeLoadTypes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database or <code>NULL</code> to create a new one</dd>
+<dt>pathname</dt>
+<dd class="description">Directory to load from</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">MIME database</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function loads all of the .types files from the specified directory.
+Use <a href="#mimeLoadFilters"><code>mimeLoadFilters</code></a> to load all filters after you load the types.</p>
+<h3 class="function"><a name="mimeNew">mimeNew</a></h3>
+<p class="description">Create a new, empty MIME database.</p>
+<p class="code">
+<a href="#mime_t">mime_t</a> *mimeNew (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">MIME database</p>
+<h3 class="function"><a name="mimeNextFilter">mimeNextFilter</a></h3>
+<p class="description">Get the next filter in the MIME database.</p>
+<p class="code">
+<a href="#mime_filter_t">mime_filter_t</a> *mimeNextFilter (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Filter or NULL</p>
+<h3 class="function"><a name="mimeNextType">mimeNextType</a></h3>
+<p class="description">Get the next type in the MIME database.</p>
+<p class="code">
+<a href="#mime_type_t">mime_type_t</a> *mimeNextType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Type or NULL</p>
+<h3 class="function"><a name="mimeNumFilters">mimeNumFilters</a></h3>
+<p class="description">Next type</p>
+<p class="code">
+int mimeNumFilters (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Get the number of filters in a MIME database.</p>
+<h3 class="function"><a name="mimeNumTypes">mimeNumTypes</a></h3>
+<p class="description">MIME database</p>
+<p class="code">
+int mimeNumTypes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Get the number of types in a MIME database.</p>
+<h3 class="function"><a name="mimeSetErrorCallback">mimeSetErrorCallback</a></h3>
+<p class="description">Set the callback for error messages.</p>
+<p class="code">
+void mimeSetErrorCallback (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mime_error_cb_t cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *ctx<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>cb</dt>
+<dd class="description">Callback function</dd>
+<dt>ctx</dt>
+<dd class="description">Context pointer for callback</dd>
+</dl>
+<h3 class="function"><a name="mimeType">mimeType</a></h3>
+<p class="description">Lookup a file type.</p>
+<p class="code">
+<a href="#mime_type_t">mime_type_t</a> *mimeType (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *super,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *type<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>super</dt>
+<dd class="description">Super-type name</dd>
+<dt>type</dt>
+<dd class="description">Type name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Matching file type definition</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="const">const</a></h3>
+<p class="description">MIME Database</p>
+<p class="code">
+typedef void (*constmime_error_cb_t)(void *;
+</p>
+<h3 class="typedef"><a name="mime_filter_t">mime_filter_t</a></h3>
+<p class="description">MIME Conversion Filter Data</p>
+<p class="code">
+typedef struct _mime_filter_s mime_filter_t;
+</p>
+<h3 class="typedef"><a name="mime_magic_t">mime_magic_t</a></h3>
+<p class="description">MIME Magic Data</p>
+<p class="code">
+typedef struct _mime_magic_s mime_magic_t;
+</p>
+<h3 class="typedef"><a name="mime_op_t">mime_op_t</a></h3>
+<p class="description">Types/structures...</p>
+<p class="code">
+typedef enum mime_op_t;
+</p>
+<h3 class="typedef"><a name="mime_t">mime_t</a></h3>
+<p class="description">MIME Database</p>
+<p class="code">
+typedef struct _mime_s mime_t;
+</p>
+<h3 class="typedef"><a name="mime_type_t">mime_type_t</a></h3>
+<p class="description">MIME Type Data</p>
+<p class="code">
+typedef struct _mime_type_s mime_type_t;
+</p>
+</div>
+</body>
+</html>

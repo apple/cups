@@ -1,0 +1,7 @@
+# cups: auth account password session
+auth       sufficient     pam_securityserver.so
+auth       sufficient     pam_unix.so
+auth       required       pam_deny.so
+account    required       pam_permit.so
+password   required       pam_deny.so
+session    required       pam_permit.so

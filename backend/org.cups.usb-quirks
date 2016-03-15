@@ -1,0 +1,243 @@
+# USB backend 'quirks' file.
+#
+# This file lists known issues with various vendors or printers.  Each
+# line contains either a comment (starting with #) or the USB vendor ID,
+# product ID (omit for all vendor products), and a list of known issues:
+#
+#   blacklist     The printer is not functional with the USB backend.
+#   delay-close   Delay close/reset of selected interface
+#   no-reattach   Do no re-attach usblp kernel module after printing.
+#   soft-reset    Do a soft reset after printing for cleanup.
+#   unidir        Only supported unidirectional I/O
+#   usb-init      Needs vendor USB initialization string.
+#   vendor-class  Uses vendor-specific class or subclass.
+#   whitelist     The printer is functional with the USB backend.
+
+# HP DeskJet 895C
+0x03f0 0x0004 unidir
+
+# HP DeskJet 880C
+0x03f0 0x0104 unidir
+
+# HP DeskJet 815C
+0x03f0 0x0204 unidir
+
+# HP DeskJet 810C/812C
+0x03f0 0x0304 unidir
+
+# HP DeskJet 830C
+0x03f0 0x0404 unidir
+
+# HP DeskJet 885C
+0x03f0 0x0504 unidir
+
+# HP DeskJet 840C
+0x03f0 0x0604 unidir
+
+# HP DeskJet 816C
+0x03f0 0x0804 unidir
+
+# HP Deskjet 959C
+0x03f0 0x1104 unidir
+
+# NEC Picty900 (HP OEM)
+0x0409 0xefbe unidir
+
+# NEC Picty760 (HP OEM)
+0x0409 0xbef4 unidir
+
+# NEC Picty920 (HP OEM)
+0x0409 0xf0be unidir
+
+# NEC Picty800 (HP OEM)
+0x0409 0xf1be unidir
+
+# Lexmark International, Inc. (e250d), https://bugs.launchpad.net/bugs/1084164
+0x043d 0x00f3 no-reattach
+
+# Kyocera Mita FS 820, by zut <kernel@zut.de>
+0x0482 0x0010 unidir
+
+# Canon, Inc. PIXMA iP6000D Printer, https://bugs.launchpad.net/bugs/1160638
+0x04a9 0x1095 unidir
+
+# Canon, Inc. PIXMA iP4200 Printer, http://www.cups.org/str.php?L4155
+0x04a9 0x10a2 unidir
+
+# Canon, Inc. PIXMA iP4300 Printer, https://bugs.launchpad.net/bugs/1032385
+0x04a9 0x10b6 unidir
+
+# Canon, Inc. MP210 https://bugzilla.redhat.com/show_bug.cgi?id=847923#c53
+0x04a9 0x1721 unidir
+
+# Canon, Inc. MP500 Printer, https://bugs.launchpad.net/bugs/1032456
+0x04a9 0x170c unidir
+
+# Canon, Inc. MP510 Printer, https://bugs.launchpad.net/bugs/1050009
+0x04a9 0x1717 unidir
+
+# Canon, Inc. MP550 Printer, http://www.cups.org/str.php?L4155
+0x04a9 0x173d unidir
+
+# Canon, Inc. MP560 Printer, http://www.cups.org/str.php?L4155
+0x04a9 0x173e unidir
+
+# Canon, Inc. MF4150 Printer, https://bugs.launchpad.net/bugs/1160638
+0x04a9 0x26a3 no-reattach
+
+# Brother Industries, Ltd HL-1250 Laser Printer, https://bugs.debian.org/712512
+0x04f9 0x0007 no-reattach
+
+# Brother Industries, Ltd HL-1430 Laser Printer, https://bugs.launchpad.net/bugs/1038695
+0x04f9 0x001a no-reattach
+
+# Brother Industries, Ltd HL-1440 Laser Printer, https://bugs.launchpad.net/bugs/1000253
+0x04f9 0x000d no-reattach unidir
+
+# Brother Industries, Ltd HL-1450 Laser Printer, https://bugs.launchpad.net/bugs/1000253
+0x04f9 0x000e no-reattach unidir
+
+# Oki Data Corp. Okipage 14ex Printer, https://bugs.launchpad.net/bugs/872483
+0x06bc 0x000b no-reattach
+
+# Oki Data Corp. B410d, https://bugs.launchpad.net/bugs/872483
+0x06bc 0x01c7 no-reattach
+
+# Seiko Epson Corp. Stylus Color 740 / Photo 750, http://bugs.debian.org/697970
+0x04b8 0x0001 no-reattach unidir
+
+# Seiko Epson Corp. Stylus Color 670, https://bugs.launchpad.net/bugs/872483
+0x04b8 0x0005 no-reattach
+
+# Seiko Epson Receipt Printer M129C
+0x04b8 0x0202 vendor-class
+
+# Prolific Technology, Inc. PL2305 Parallel Port (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485
+0x067b 0x2305 no-reattach soft-reset unidir
+
+# Xerox Phaser 3124 https://bugzilla.redhat.com/show_bug.cgi?id=867392
+0x0924 0x3ce9 no-reattach
+
+# Xerox WorkCentre 3210 https://bugs.launchpad.net/bugs/1102470
+0x0924 0x4293 no-reattach
+
+# QinHeng Electronics CH340S (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/1000253
+0x1a86 0x7584 no-reattach
+
+# All Samsung devices, https://bugs.launchpad.net/bugs/1032456
+0x04e8 soft-reset
+
+# All Zebra devices, https://bugs.launchpad.net/bugs/1001028
+0x0a5f unidir
+
+# Canon CP-10
+0x04a9 0x304a blacklist
+
+# Canon CP-100
+0x04a9 0x3063 blacklist
+
+# Canon CP-200
+0x04a9 0x307c blacklist
+
+# Canon CP-300
+0x04a9 0x307d blacklist
+
+# Canon CP-220
+0x04a9 0x30bd blacklist
+
+# Canon CP-330
+0x04a9 0x30be blacklist
+
+# Canon SELPHY CP400
+0x04a9 0x30f6 blacklist
+
+# Canon SELPHY CP600
+0x04a9 0x310b blacklist
+
+# Canon SELPHY CP710
+0x04a9 0x3127 blacklist
+
+# Canon SELPHY CP510
+0x04a9 0x3128 blacklist
+
+# Canon SELPHY ES1
+0x04a9 0x3141 blacklist
+
+# Canon SELPHY CP730
+0x04a9 0x3142 blacklist
+
+# Canon SELPHY CP720
+0x04a9 0x3143 blacklist
+
+# Canon SELPHY CP750
+0x04a9 0x3170 blacklist
+
+# Canon SELPHY CP740
+0x04a9 0x3171 blacklist
+
+# Canon SELPHY ES2
+0x04a9 0x3185 blacklist
+
+# Canon SELPHY ES20
+0x04a9 0x3186 blacklist
+
+# Canon SELPHY CP770
+0x04a9 0x31aa blacklist
+
+# Canon SELPHY CP760
+0x04a9 0x31ab blacklist
+
+# Canon SELPHY ES30
+0x04a9 0x31b0 blacklist
+
+# Canon SELPHY CP780
+0x04a9 0x31dd blacklist
+
+# Canon SELPHY ES40
+0x04a9 0x31ee blacklist
+
+# Canon SELPHY CP800
+0x04a9 0x3214 blacklist
+
+# Canon SELPHY CP900
+0x04a9 0x3255 blacklist
+
+# Canon SELPHY CP810
+0x04a9 0x3256 blacklist
+
+# Canon SELPHY CP500
+0x04a9 0x30f5 blacklist
+
+# Canon SELPHY ES3
+0x04a9 0x31af blacklist
+
+# Canon SELPHY CP780
+0x04a9 0x31dd blacklist
+
+# Lexmark E238 (<rdar://problem/14493054>)
+0x043d 0x00d7 no-reattach
+
+# Lexmark E238 (STR #4448)
+0x043d 0x009a no-reattach
+
+# Canon MX310 (STR #4482)
+0x04a9 0x1728 unidir
+
+# Canon MX320 (STR #4482)
+0x04A9 0x1736 unidir
+
+# All Intermec devices (STR #4553)
+0x067e no-reattach
+
+# HP LaserJet 1150 (STR #4549)
+0x03f0 0x0f17 delay-close
+
+# HP LaserJet 1300 (STR #4549)
+0x03f0 0x1017 delay-close
+0x03f0 0x1117 delay-close
+
+# HP LaserJet 1320 (STR #4549)
+0x03f0 0x1d17 delay-close
+
+# Canon, Inc. MP530 Printer
+0x04a9 0x1712 unidir

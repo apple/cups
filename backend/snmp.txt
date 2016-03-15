@@ -1,0 +1,172 @@
+snmp.txt - 2006-04-19
+---------------------
+
+This file lists the "interesting" bits from the command:
+
+    snmpwalk -v 1 -c public HOST .1
+
+for many network print servers and internal cards.  It is mainly here
+for SNMP documentation and development purposes.
+
+
+AXIS 5600
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM J.sp.00,JETDIRECT EX,JD28,EEPROM 6.16.5
+SNMPv2-MIB::sysName.0 = STRING:
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.3 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: Hewlett-Packard hp LaserJet 3380
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: Axis AXIS 5600
+HOST-RESOURCES-MIB::hrDeviceDescr.3 = STRING: Axis AXIS 5600
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.2 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.3 = OID: SNMPv2-SMI::zeroDotZero
+SNMPv2-SMI::enterprises.11.2.4.3.10.8.0 = STRING: "AXIS433AE8"
+SNMPv2-SMI::enterprises.368.2.3.2.601.0 = INTEGER: 9100
+SNMPv2-SMI::enterprises.368.2.3.2.602.0 = INTEGER: 9101
+SNMPv2-SMI::enterprises.368.2.3.2.603.0 = INTEGER: 9102
+SNMPv2-SMI::enterprises.368.2.3.10.901.0 = STRING: "AXIS433AE8"
+
+
+AXIS OfficeBasic
+
+SNMPv2-MIB::sysDescr.0 = STRING: AXIS OfficeBasic Parallel Network Print Server V6.43 Sep  4 2003
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: EPSON Stylus Photo 870
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+
+
+DLink DP-301P+
+
+SNMPv2-MIB::sysDescr.0 = STRING: D-Link DP-301P+ Print Server
+
+
+Genicom ML280
+
+SNMPv2-MIB::sysDescr.0 = STRING: GENICOM microLaser 280
+SNMPv2-MIB::sysName.0 = STRING: PRQ_004F75
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: MANUFACTURER:GENICOM;MODEL:microLaser 280;
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.3369.1.1.2.4
+
+
+EPSON Type-B Network Card
+
+SNMPv2-MIB::sysDescr.0 = STRING: EPSON Type-B 10Base-T/100Base-TX Print Server
+SNMPv2-MIB::sysName.0 = STRING: StylusPro7600-BB87A8
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: EPSON Stylus Pro 7600
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.1248.1.2.1.22.69.109.117.108.97.116.101.83.116.121.108.117.115.32.80.114.111.32.55.54.48.48
+SNMPv2-SMI::enterprises.11.2.3.9.1.1.7.0 = STRING: "MFG:EPSON;CMD:ESCPL2,BDC;MDL:Stylus Pro 7600;CLS:PRINTER;DES:EPSON Stylus Pro 7600;"
+SNMPv2-SMI::enterprises.1248.1.2.2.1.1.1.1.1 = STRING: "MFG:EPSON;CMD:ESCPL2,BDC;MDL:Stylus Pro 7600;CLS:PRINTER;DES:EPSON Stylus Pro 7600;"
+
+
+EPSON Wireless 802.11b Print Server
+
+SNMPv2-MIB::sysDescr.0 = STRING: EPSON Wireless LAN Print Interface compatible with an HP JETDIRECT EX
+SNMPv2-MIB::sysName.0 = STRING: EAI_0F550B
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING:
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+
+
+HP JetDirect EX3plus
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM D.04.03,JETDIRECT EX,JD26,EEPROM D.05.22
+SNMPv2-MIB::sysName.0 = STRING: NPID1EC0F
+
+
+HP LJ4000
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM G.05.34,JETDIRECT,JD30,EEPROM G.08.32
+SNMPv2-MIB::sysName.0 = STRING:
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP LaserJet 4000 Series
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.11.2.3.9.1.2.5
+
+
+HP CLJ4550
+
+SNMPv2-MIB::sysDescr.0 = STRING: HP ETHERNET MULTI-ENVIRONMENT,ROM L.20.07,JETDIRECT,JD84,EEPROM L.21.22,CIDATE 07/06/2001
+SNMPv2-MIB::sysName.0 = STRING: NPI02FDE7
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP Color LaserJet 4550
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: Hewlett-Packard Dynamic RAM Disk
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.11.2.3.9.1.2.14
+
+
+Lexmark C522
+
+SNMPv2-MIB::sysDescr.0 = STRING: Lexmark C522 version NS.NP.N212 kernel 2.6.6 All-N-1
+SNMPv2-MIB::sysName.0 = STRING: ET0004000D0CCA
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDeviceNonVolatileMemory
+HOST-RESOURCES-MIB::hrDeviceType.3 = OID: HOST-RESOURCES-TYPES::hrDeviceProcessor
+HOST-RESOURCES-MIB::hrDeviceType.4 = OID: HOST-RESOURCES-TYPES::hrDeviceSerialPort
+HOST-RESOURCES-MIB::hrDeviceType.5 = OID: HOST-RESOURCES-TYPES::hrDeviceNetwork
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: Lexmark C522 9421TTV LS.FA.P129
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: Nonvolatile RAM
+HOST-RESOURCES-MIB::hrDeviceDescr.3 = STRING: IBM 750 Rev CXr
+HOST-RESOURCES-MIB::hrDeviceDescr.4 = STRING: USB Interface
+HOST-RESOURCES-MIB::hrDeviceDescr.5 = STRING: Network Interface
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.2 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.3 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.4 = OID: SNMPv2-SMI::zeroDotZero
+HOST-RESOURCES-MIB::hrDeviceID.5 = OID: SNMPv2-SMI::enterprises.641.1
+SNMPv2-SMI::enterprises.641.2.1.2.1.2.1 = STRING: "Lexmark C522"
+SNMPv2-SMI::enterprises.641.2.1.2.1.3.1 = STRING: "MANUFACTURER:Lexmark International;COMMAND SET:;MODEL:Lexmark C522"
+
+
+Linksys EPSX3
+
+SNMPv2-MIB::sysDescr.0 = STRING: ETHERNET MULTI-ENVIRONMENT.ROM, JETDIRECT EX, EEPROM 6016
+
+
+NetGear PS113
+
+SNMPv2-MIB::sysDescr.0 = STRING: A SNMP proxy agent.
+
+
+Okidata C7200
+
+SNMPv2-MIB::sysDescr.0 = STRING: OkiLAN 6200e
+SNMPv2-MIB::sysName.0 = STRING: OKI7009715
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDeviceNonVolat
+ileMemory
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: C7200
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: FLASH0
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.2001.1.1.1.1
+HOST-RESOURCES-MIB::hrDeviceID.2 = OID: SNMPv2-SMI::zeroDotZero
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.1 = STRING: "IEEE 1284"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.2 = STRING: "EtherTalk Phase 2"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.3 = STRING: "LPD"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.4 = STRING: "Netware Rprinter"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.5 = STRING: "Netware Bindery or NDS Pserver"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.6 = STRING: "Raw TCP Port 9100"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.7 = STRING: "FTP"
+SNMPv2-SMI::mib-2.43.14.1.1.3.1.8 = STRING: "DLC/LLC"
+SNMPv2-SMI::enterprises.2001.1.1.1.1.1.3530.0 = STRING: "C7200"
+
+
+Xerox N2025
+
+SNMPv2-MIB::sysDescr.0 = STRING: Xerox DocuPrint N2025 Network Laser Printer - 2.12-02 
+SNMPv2-MIB::sysName.0 = STRING:
+HOST-RESOURCES-MIB::hrDeviceType.1 = OID: HOST-RESOURCES-TYPES::hrDevicePrinter
+HOST-RESOURCES-MIB::hrDeviceType.2 = OID: HOST-RESOURCES-TYPES::hrDeviceParallelPort
+HOST-RESOURCES-MIB::hrDeviceType.3 = OID: HOST-RESOURCES-TYPES::hrDeviceNetwork
+HOST-RESOURCES-MIB::hrDeviceType.6 = OID: HOST-RESOURCES-TYPES::hrDeviceProcessor
+HOST-RESOURCES-MIB::hrDeviceType.7 = OID: HOST-RESOURCES-TYPES::hrDeviceOther
+HOST-RESOURCES-MIB::hrDeviceType.9 = OID: HOST-RESOURCES-TYPES::hrDeviceVolatileMemory
+HOST-RESOURCES-MIB::hrDeviceType.10 = OID: HOST-RESOURCES-TYPES::hrDeviceNonVolatileMemory
+HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: Xerox DocuPrint N2025 Network Laser Printer - 2.12-02 
+HOST-RESOURCES-MIB::hrDeviceDescr.2 = STRING: IEEE 1284 port
+HOST-RESOURCES-MIB::hrDeviceDescr.3 = STRING: Ethernet port
+HOST-RESOURCES-MIB::hrDeviceDescr.6 = STRING: Motorola Power PC
+HOST-RESOURCES-MIB::hrDeviceDescr.7 = STRING: USB Port
+HOST-RESOURCES-MIB::hrDeviceDescr.9 = STRING: RAM Memory
+HOST-RESOURCES-MIB::hrDeviceDescr.10 = STRING: ROM Memory
+HOST-RESOURCES-MIB::hrDeviceID.1 = OID: SNMPv2-SMI::enterprises.253.8.62.1.3.2.17.1
+

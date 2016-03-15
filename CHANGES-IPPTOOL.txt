@@ -1,0 +1,168 @@
+CHANGES-IPPTOOL.txt - 2015-05-15
+--------------------------------
+
+This file provides a list of changes to the ipptool binary distribution posted
+on CUPS.org.
+
+2014-05-15
+
+	- Added support for simultaneous XML and test output from ipptool.
+	- Added support for PAUSE directive in ipptool test files.
+
+
+2013-07-15
+
+	- New ippfind tool now included with ipptool.
+	- Added support for automatically extending the timeout when all of the
+	  request data has not yet been written (all platforms but Windows
+	  which does not support it...)
+	- Fixed several ipptool test files that used old STATUS names.
+
+
+2013-04-18
+
+	- Fixed some HTTP issues with authentication and compression.
+	- The IPP/1.1 test file did not allow for sufficient retries when
+	  printing.
+	- The IPP/1.1 test file did not allow for empty printer-name values.
+	- The IPP Everywhere test file contained numerous errors.
+	- The color.jpg test file used a progressive mode instead of the
+	  baseline JPEG mode.
+	- The IPP/1.1 test file referenced "color.jpeg" instead of "color.jpg".
+
+
+2013-01-31
+
+	- Added support for DEFINE-MATCH and DEFINE-NO-MATCH as STATUS
+	  predicates.
+	- Added support for WITH-VALUE and resolution values.
+	- Added support for SKIP-IF-MISSING (skip test if file is missing)
+	- Added support for octetString values.
+	- Added support for document compression in Print-Job and Send-Document
+	  requests.
+	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
+	  out.
+	- Fixed a bug where bad IPP responses would cause ipptool to crash.
+
+
+2012-02-28
+
+	- Changed behavior of WITH-VALUES "/regex/" to not require all values to
+	  match.
+	- Added WITH-ALL-VALUES directive for EXPECT predicates that require all
+	  values to match.
+	- Updated test files to use WITH-ALL-VALUES where necessary.
+	- Updated test files to use new ABNF for media names from PWG Media
+	  Names 2.0.
+
+
+2012-02-06
+
+	- Fixed the packaging of ipptool on Windows (removed unnecessary DLLs)
+	- Fixed an crash in ipptool when mixing DISPLAY with -I and a failed
+	  request.
+	- Added a Print-Job test file.
+	- Added a "setdebug" batch file for Windows
+	- Added support for a CUPS_DISABLE_ASYNC_CONNECT environment variable.
+
+
+2012-01-10
+
+	- Fixed an issue with the IPP/1.1 test file where the "waiting for job
+	  completion" test did not work.
+	- The attribute groups out of order error was not shown for the
+	  operation-attributes-tag group.
+
+
+2011-12-02
+
+	- Fixed a truncated XML output bug that would happen for certain errors.
+	- Fixed the order-of-groups tests.
+	- Fixed "WITH-VALUE >N" for rangeOfInteger attributes.
+	- The Windows installer was missing the get-printer-attributes.test
+	  file.
+	- The Linux binaries are now compiled for all LSB 4.x-compliant Linux
+	  distributions.
+	- The Linux binaries no longer support SSL or TLS.
+
+
+2011-10-05
+
+	- Fixed a crasher bug that showed up on Windows.
+	- The IPP/1.1 test would hang if the initial Print-Job test failed.
+	- Fixed a typo in the IPP/2.0 test.
+
+
+2011-10-03
+
+	- Using OF-TYPE with the "no-value" or "unknown" out-of-band value tags
+	  now works without special WITH-VALUE strings.
+	- ipptool now shows an error when an attribute appears more than once
+	  within the same attribute group.
+	- ipptool did not display attributes as specified by the DISPLAY
+	  directive when a test error failed.
+	- Fixed one spot where DEFINE-VALUE was still treated as an error when
+	  the EXPECT test failed.
+	- uriScheme values were not displayed properly.
+	- Updated the IPP/1.1 tests to properly validate support for
+	  job-hold-until-default and job-hold-until-supported when the Hold-Job
+	  operation is supported.
+	- Updated the IPP/1.1 tests to properly check for the various standard
+	  media sizes for the printing tests.
+	- Updated the IPP/1.1 tests to accept "no-value" for media-default an
+	  orientation-requested-default.
+	- Updated the IPP/1.1 tests to accept "unknown" for job-state.
+	- Updated the IPP/1.1 tests to not perform the bogus URI printing tests
+	  unless the "document-uri" variable is defined.
+	- Updated the IPP/2.0 tests to properly validate media-col
+	  "media-xxx-supported" attributes.
+	- Updated the IPP/2.2 tests to properly validate media-ready and
+	  media-col-ready.
+
+
+2011-09-28
+
+	- Test output now includes a summary and overall score at the end.
+	- The MATCH-VALUE predicate now correctly deals with a failed EXPECT
+	  condition.
+	- The IPP/1.1 test suite now looks for legacy media names and uses them
+	  if the corresponding PWG standard names are not present.
+	- The IPP/1.1 test suite now tests the Print-Job+Release-Job when the
+	  printer supports the job-hold-until attribute, Hold-Job operation, and
+	  Release-Job operation.
+
+
+2011-09-21
+
+	- Fixes for HTTP chunking, timeout, and encryption issues reported by
+	  various users.
+	- Greatly improved IPP tests with added IPP/2.2 tests.
+	- New test documents - 1-page and 4-page mixed A4/Letter PDF/PS and a
+	  couple JPEGs.
+	- New REPEAT directives to programmatically repeat tests as needed.
+
+
+2011-08-16
+
+	- The Windows version no longer requires Visual Studio to be installed.
+	- The Windows version now supports SSL.
+	- Added "ipps" URI support.
+	- Added a new "-T" option.
+	- Added support for fractional seconds for the -i option and DELAY
+	  directive.
+	- Added support for authentication.
+	- Added DEFINE-MATCH, DEFINE-NO-MATCH, DEFINE-VALUE, IF-NOT-DEFINED,
+	  IGNORE-ERRORS, SKIP-IF-DEFINED, SKIP-IF-NOT-DEFINED,
+	  SKIP-PREVIOUS-ERROR directives.
+	- WITH-VALUE now supports variable expansion.
+	- Updated the IPP/1.1 conformance test to skip the "my-jobs different
+	  user" test if the printer URI contains a username.
+	- Updated the IPP conformance tests to validate media, media-default,
+	  and media-supported values.
+	- No longer error out if a Printer returns a different version number in
+	  the response when the request contains the version 0.0.
+
+
+2010-10-16
+
+	- Initial release of standalone binary.

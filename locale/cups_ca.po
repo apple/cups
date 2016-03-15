@@ -1,0 +1,6394 @@
+#
+# "$Id$"
+#
+#   Message catalog template for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 2007-2015 by Apple Inc.
+#   Copyright 2005-2007 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+#
+# Notes for Translators:
+#
+# The following prefixes MUST NOT be translated: "ALERT:", "CRIT:", "INFO:",
+# "NOTICE:", and "WARNING:".
+#
+# The "checkpo" program located in the "locale" source directory can be used
+# to verify that your translations do not introduce formatting errors or other
+# problems.  Run with:
+#
+#    cd locale
+#    ./checkpo cups_LL.po
+#
+# where "LL" is your locale.
+# Àngel Mompó <mecatxis@gmail.com>, 2011, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CUPS 1.4.6\n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2015-07-20 14:24-0400\n"
+"PO-Revision-Date: 2012-09-29 11:21+0200\n"
+"Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
+"Language-Team: Catalan <ca@dodds.net>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+msgid "\t\t(all)"
+msgstr "\t\t(tots)"
+
+msgid "\t\t(none)"
+msgstr "\t\t(cap)"
+
+#, c-format
+msgid "\t%d entries"
+msgstr "\t%d entrades"
+
+#, c-format
+msgid "\t%s"
+msgstr "\t%s"
+
+msgid "\tAfter fault: continue"
+msgstr "\tDesprés d'una fallada: continua"
+
+#, c-format
+msgid "\tAlerts: %s"
+msgstr "\tAlertes: %s"
+
+msgid "\tBanner required"
+msgstr "\tNecessita un bàner"
+
+msgid "\tCharset sets:"
+msgstr "\tConjunt de caràcters:"
+
+msgid "\tConnection: direct"
+msgstr "\tConnexió: directa"
+
+msgid "\tConnection: remote"
+msgstr "\tConnexió: remota"
+
+msgid "\tContent types: any"
+msgstr "\tTipus de contingut: qualsevol"
+
+msgid "\tDefault page size:"
+msgstr "\tMida de la pàgina per defecte:"
+
+msgid "\tDefault pitch:"
+msgstr "\tDensitat per defecte:"
+
+msgid "\tDefault port settings:"
+msgstr "\tConfiguració del port per defecte:"
+
+#, c-format
+msgid "\tDescription: %s"
+msgstr "\tDescripció: %s"
+
+msgid "\tForm mounted:"
+msgstr "\tFormularis muntats:"
+
+msgid "\tForms allowed:"
+msgstr "\tFormularis admesos:"
+
+#, c-format
+msgid "\tInterface: %s.ppd"
+msgstr "\tInterfície: %s.ppd"
+
+#, c-format
+msgid "\tInterface: %s/interfaces/%s"
+msgstr "\tInterfície: %s/interfícies/%s"
+
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd"
+msgstr "\tInterfície: %s/ppd/%s.ppd"
+
+#, c-format
+msgid "\tLocation: %s"
+msgstr "\tUbicació: %s"
+
+msgid "\tOn fault: no alert"
+msgstr "\tEn cas de fallada: no avisis"
+
+msgid "\tPrinter types: unknown"
+msgstr "\tTipus d'impresores: desconeguts"
+
+#, c-format
+msgid "\tStatus: %s"
+msgstr "\tEstat: %s"
+
+msgid "\tUsers allowed:"
+msgstr "\tUsuaris permesos:"
+
+msgid "\tUsers denied:"
+msgstr "\tUsuaris sense permís:"
+
+msgid "\tdaemon present"
+msgstr "\tpresència del dimoni"
+
+msgid "\tno entries"
+msgstr "\tcap entrada"
+
+#, c-format
+msgid "\tprinter is on device '%s' speed -1"
+msgstr "\tLa impressora és al dispositiu «%s» velocitat -1"
+
+msgid "\tprinting is disabled"
+msgstr "\tLa impressora està deshabilitada"
+
+msgid "\tprinting is enabled"
+msgstr "\tLa impressora està habilitada"
+
+#, c-format
+msgid "\tqueued for %s"
+msgstr "\ten cua per %s"
+
+msgid "\tqueuing is disabled"
+msgstr "\tla cua està deshabilitada"
+
+msgid "\tqueuing is enabled"
+msgstr "\tla cua està habilitada"
+
+msgid "\treason unknown"
+msgstr "\traó desconeguda"
+
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS"
+msgstr ""
+"\n"
+"     RESULTAT DETALLAT DEL TEST DE CONFORMITAT"
+
+msgid "                          Ignore specific warnings."
+msgstr "                          Ignora els avisos específics."
+
+msgid "                          Issue warnings instead of errors."
+msgstr "                          Mostra avisos enlloc d'errors."
+
+msgid "                REF: Page 15, section 3.1."
+msgstr "                REF: pàgina 15, secció 3.1."
+
+msgid "                REF: Page 15, section 3.2."
+msgstr "                REF: pàgina 15, secció 3.2."
+
+msgid "                REF: Page 19, section 3.3."
+msgstr "                REF: pàgina 19, secció 3.3."
+
+msgid "                REF: Page 20, section 3.4."
+msgstr "                REF: pàgina 20, secció 3.4."
+
+msgid "                REF: Page 27, section 3.5."
+msgstr "                REF: pàgina 27, secció 3.5."
+
+msgid "                REF: Page 42, section 5.2."
+msgstr "                REF: pàgina 42, secció 5.2."
+
+msgid "                REF: Pages 16-17, section 3.2."
+msgstr "                REF: pàgines 16-17, secció 3.2."
+
+msgid "                REF: Pages 42-45, section 5.2."
+msgstr "                REF: pàgines 42-45, secció 5.2."
+
+msgid "                REF: Pages 45-46, section 5.2."
+msgstr "                REF: pàgines 45-46, secció 5.2."
+
+msgid "                REF: Pages 48-49, section 5.2."
+msgstr "                REF: pàgines 48-49, secció 5.2."
+
+msgid "                REF: Pages 52-54, section 5.2."
+msgstr "                REF: pàgines 52-54, secció 5.2."
+
+#, c-format
+msgid "        %-39.39s %.0f bytes"
+msgstr "        %-39.39s %.0f bytes"
+
+#, c-format
+msgid "        PASS    Default%s"
+msgstr "        VALIDA    Default%s"
+
+msgid "        PASS    DefaultImageableArea"
+msgstr "        VALIDA    DefaultImageableArea"
+
+msgid "        PASS    DefaultPaperDimension"
+msgstr "        VALIDA    DefaultPaperDimension"
+
+msgid "        PASS    FileVersion"
+msgstr "        VALIDA    FileVersion"
+
+msgid "        PASS    FormatVersion"
+msgstr "        VALIDA    FileVersion"
+
+msgid "        PASS    LanguageEncoding"
+msgstr "       VALIDA    LanguageEncoding"
+
+msgid "        PASS    LanguageVersion"
+msgstr "        VALIDA    LanguageVersion"
+
+msgid "        PASS    Manufacturer"
+msgstr "        VALIDA    Manufacturer"
+
+msgid "        PASS    ModelName"
+msgstr "        VALIDA    ModelName"
+
+msgid "        PASS    NickName"
+msgstr "        VALIDA    NickName"
+
+msgid "        PASS    PCFileName"
+msgstr "        VALIDA    PCFileName"
+
+msgid "        PASS    PSVersion"
+msgstr "        VALIDA    PSVersion"
+
+msgid "        PASS    PageRegion"
+msgstr "        VALIDA    PageRegion"
+
+msgid "        PASS    PageSize"
+msgstr "        VALIDA    PageSize"
+
+msgid "        PASS    Product"
+msgstr "        VALIDA    Product"
+
+msgid "        PASS    ShortNickName"
+msgstr "        VALIDA    ShortNickName"
+
+#, c-format
+msgid "        WARN    %s has no corresponding options."
+msgstr "        AVÍS    %s no té les opcions corresponents."
+
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2."
+msgstr ""
+"        AVÍS    %s té un prefixe comú amb %s\n"
+"                REF: pàgina 15, secció 3.2."
+
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s may not work as expected and should "
+"be named Duplex.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"        AVÍS    La paraula clau %s de l'opció dúplex pot no funcionar com "
+"s'espera i s'hauria de dir Duplex.\n"
+"                REF: pàgina 122, secció 5.17"
+
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
+msgstr ""
+"        AVÍS    El fitxer conté una barreja de CR, LF, i CR LF com a finals "
+"de línia."
+
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"        AVÍS    Es requereix un LanguageEncoding segons les espec. del PPD "
+"4.3\n"
+"                REF: pàgines 56-57, secció 5.3."
+
+#, c-format
+msgid "        WARN    Line %d only contains whitespace."
+msgstr "        AVÍS    La línia %d només conté espais en blanc."
+
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"        AVÍS    El fabricant requereix les espec. del PPD 4.3.\n"
+"                REF: pàgines 58-59, secció 5.3."
+
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF."
+msgstr ""
+"        AVÍS    Els fitxers PPD que no són del Windows han de fer servir "
+"només LF com a final de línia, no CR LF."
+
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f.\n"
+"                REF: Page 42, section 5.2."
+msgstr ""
+"        AVÍS     La versió del PPD %.1f és obsoleta!\n"
+"                REF: pàgina 42, secció 5.2."
+
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        AVÍS    El PCFileName és més llarg de 8.3 i viola les espec. del "
+"PPD.\n"
+"                REF: pàgines 61-62, secció 5.3."
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        AVÍS    El PCFileName és més llarg de 8.3 i viola les espec. del "
+"PPD.\n"
+"                REF: pàgines 61-62, secció 5.3."
+
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        AVÍS    Els protocols contenen el PJL però els atributs del JCL no "
+"s'han definit.\n"
+"                REF: pàgines 78-79, secció 5.7."
+
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        AVÍS    Es protocols contenen tant el PJL com el BCP; s'esperava el "
+"TBCP.\n"
+"                REF: pàgines 78-79, secció 5.7."
+
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"        AVÍS    Es requereix un ShortNickName segons les espec.del PPD 4.3.\n"
+"                REF: pàgines 64-65, secció 5.3."
+
+msgid "       cupsaddsmb [options] -a"
+msgstr "       cupsaddsmb [opcions] -a"
+
+msgid "       cupstestdsc [options] -"
+msgstr "       cupstestdsc [opcions] -"
+
+msgid "       program | cupstestppd [options] -"
+msgstr "       programa | cupstestppd [opcions] -"
+
+#, c-format
+msgid ""
+"      %s  \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")."
+msgstr ""
+"      %s  «%s %s» entra en conflicte amb «%s %s»\n"
+"                (restricció=«%s %s %s %s»)."
+
+#, c-format
+msgid "      %s  %s %s does not exist."
+msgstr "      %s  %s %s no existeix."
+
+#, c-format
+msgid "      %s  %s file \"%s\" has the wrong capitalization."
+msgstr "      %s  %s el fitxer «%s» fa un ús incorrecte de les majúscules."
+
+#, c-format
+msgid ""
+"      %s  Bad %s choice %s.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"      %s  Mala %s elecció %s!\n"
+"                REF: pàgina 122, secció 5.17"
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s."
+msgstr ""
+"      %s  UTF-8 incorrecte «%s» a la traducció de l'opció %s, elecció %s."
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s."
+msgstr "      %s  UTF-8 Incorrecte «%s» a la traducció de l'opció %s."
+
+#, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"."
+msgstr "      %s  Valor incorrecte del cupsFilter «%s»."
+
+#, c-format
+msgid "      %s  Bad cupsFilter2 value \"%s\"."
+msgstr "      %s  Valor incorrecte del cupsFilter2 «%s»"
+
+#, c-format
+msgid "      %s  Bad cupsICCProfile %s."
+msgstr "      %s  cupsICCProfile incorrecte %s."
+
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"."
+msgstr "      %s  Valor de la cupsPreFilter incorrecte «%s»."
+
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\""
+msgstr "      %s  cupsUIConstraints incorrecte %s: «%s»"
+
+#, c-format
+msgid "      %s  Bad language \"%s\"."
+msgstr "      %s  language incorrecte «%s»."
+
+#, c-format
+msgid "      %s  Bad permissions on %s file \"%s\"."
+msgstr "      %s  Permisos del fitxer %s incorrectes «%s»."
+
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s."
+msgstr "      %s  %s Està mal escrit: hauria de ser %s."
+
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID."
+msgstr "      %s  No hi pot haver APScanAppPath i APScanAppBundleID alhora."
+
+#, c-format
+msgid "      %s  Default choices conflicting."
+msgstr "      %s  Conflictes amb les opcions per defecte."
+
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s"
+msgstr "      %s  cupsUIConstraints buit %s"
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s."
+msgstr "      %s  Falta la traducció de «%s» per l'opció %s, elecció %s."
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s."
+msgstr "      %s  Falta la traducció de «%s» per l'opció %s."
+
+#, c-format
+msgid "      %s  Missing %s file \"%s\"."
+msgstr "      %s  Falta el fitxer %s «%s»."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageRegion option.\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"      %s  Falta l'opció PageRegion NECESSÀRIA .\n"
+"                REF: pàgina 100, secció 5.14."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageSize option.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"      %s  Falta l'opció PageSize NECESSÀRIA.\n"
+"                REF: pàgina 99, secció 5.14."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr "      %s  Falta l'elecció *%s %s a UIConstraints «*%s %s *%s %s»."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\""
+msgstr "      %s  Falta l'elecció *%s %s a cupsUIConstraints %s: «%s»"
+
+#, c-format
+msgid "      %s  Missing cupsUIResolver %s"
+msgstr "      %s  Falta el cupsUIResolver %s"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr "      %s  Falta l'opció %s a UIConstraints «*%s %s *%s %s»."
+
+#, c-format
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\""
+msgstr "      %s  Falta l'opció %s a cupsUIConstraints %s: «%s»"
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file."
+msgstr "      %s  No s'ha inclòs cap traducció de base «%s» al fitxer."
+
+#, c-format
+msgid ""
+"      %s  REQUIRED %s does not define choice None.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"      %s  NECESSARI %s no defineix l'eleció «Cap»!\n"
+"                REF: pàgina 122, secció 5.17"
+
+#, c-format
+msgid "      %s  Size \"%s\" defined for %s but not for %s."
+msgstr "      %s  Mida \"%s\" definida per %s però no per %s."
+
+#, c-format
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)."
+msgstr "      %s  Mida \"%s\" té unes dimensions inesperades (%gx%g)."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be \"%s\"."
+msgstr "      %s  Mida «%s» hauria de ser «%s»."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be the Adobe standard name \"%s\"."
+msgstr "      %s  Mida \"%s\" hauria de ser el nom estàndard d'Adobe «%s»."
+
+#, c-format
+msgid "      %s  cupsICCProfile %s hash value collides with %s."
+msgstr "      %s  cupsICCProfile %s el valor resum (hash) col·lideix amb %s."
+
+#, c-format
+msgid "      %s  cupsUIResolver %s causes a loop."
+msgstr "      %s  cupsUIResolver %s entra en bucle."
+
+#, c-format
+msgid ""
+"      %s  cupsUIResolver %s does not list at least two different options."
+msgstr ""
+"      %s  cupsUIResolver %s no llista com a mínim dues opcions diferents."
+
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID\n"
+"                REF: Page 72, section 5.5"
+msgstr ""
+"      **ERROR**  %s ha de ser 1284DeviceID!\n"
+"                REF: pàgina 72, secció 5.5"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad Default%s %s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"      **ERROR**  Default%s incorrecte %s\n"
+"                REF: pàgina 40, secció 4.5."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad DefaultImageableArea %s\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **ERROR**  DefaultImageableArea incorrecte %s\n"
+"                REF: pàgina 102, secció 5.15."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad DefaultPaperDimension %s\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **ERROR**  DefaultPaperDimension incorrecte %s\n"
+"                REF: pàgina 103, secció 5.15."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FileVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **ERROR**  FileVersion incorrecte «%s»\n"
+"                REF: pàgina 56, secció 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FormatVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **ERROR**  FormatVersion incorrecte «%s»\n"
+"                REF: pàgina 56, secció 5.3."
+
+msgid ""
+"      **FAIL**  Bad JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4."
+msgstr ""
+"      **ERROR**  atribut de JobPatchFile incorrecte al fitxer\n"
+"                REF: pàgina 24, secció 3.4."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1."
+msgstr "      **ERROR**  LanguageEncoding incorrecte %s: ha de ser ISOLatin1."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English."
+msgstr "      **ERROR**  LanguageVersion incorrecta %s: ha de ser anglès."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad Manufacturer (should be \"%s\")\n"
+"                REF: Page 211, table D.1."
+msgstr ""
+"      **ERROR**  Manufacturer incorrecte (hauria de ser «%s»)\n"
+"                REF: pàgina 211, taula D.1."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"      **ERROR**  ModelName incorrecte - no es permet «%c» a la cadena.\n"
+"                REF: pàgines 59-60, secció 5.3."
+
+msgid ""
+"      **FAIL**  Bad PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"      **ERROR**  PSVersion incorrecte - no és «(cadena) enter».\n"
+"                REF: pàgines 62-64, secció 5.3."
+
+msgid ""
+"      **FAIL**  Bad Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"      **ERROR**  Product incorrecte - no és «(cadena)».\n"
+"                REF: pàgina 62, secció 5.3."
+
+msgid ""
+"      **FAIL**  Bad ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"      **ERROR**  ShortNickName incorrecte - més llarg de 31 caràcters.\n"
+"                REF: pàgines 64-65, secció 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad option %s choice %s\n"
+"                REF: Page 84, section 5.9"
+msgstr ""
+"      **ERROR**  Elecció %s incorrecta %s\n"
+"                REF: pàgina 84, secció 5.9"
+
+#, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s"
+msgstr ""
+"      **ERROR**  El codi de l'opció per defecte no es pot interpretar: %s"
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters."
+msgstr ""
+"      **ERROR**  La traducció per defecte de l'opció %s elecció %s conté "
+"caràcters de 8 bits."
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters."
+msgstr ""
+"      **ERROR**  La traducció per defecte de l'opció %s conté caràcters de 8 "
+"bits."
+
+#, c-format
+msgid "      **FAIL**  Group names %s and %s differ only by case."
+msgstr ""
+"      **ERROR**  Els noms dels grups %s i %s només es diferencien en les "
+"majúscules."
+
+#, c-format
+msgid "      **FAIL**  Multiple occurrences of option %s choice name %s."
+msgstr ""
+"      **ERROR**  Coincidències múltiples de l'opció %s nom de l'elecció %s."
+
+#, c-format
+msgid "      **FAIL**  Option %s choice names %s and %s differ only by case."
+msgstr ""
+"      **ERROR**  L'opció %s noms de les opcions %s i %s només es diferencien "
+"per les majúscules."
+
+#, c-format
+msgid "      **FAIL**  Option names %s and %s differ only by case."
+msgstr ""
+"      **ERROR**  Els noms de les opcions %s i %s només es diferencien per "
+"les majúscules."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"      **ERROR**  ES NECESSITA Default%s\n"
+"                REF: pàgina 40, secció 4.5."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **ERROR**  ES NECESSITA DefaultImageableArea\n"
+"                REF: pàgina 102, secció 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **ERROR**  ES NECESSITA DefaultPaperDimension\n"
+"                REF: pàgina 103, secció 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA FileVersion\n"
+"                REF: pàgina 56, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA FormatVersion\n"
+"                REF: pàgina 56, secció 5.3."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"      **ERROR**  ES NECESSITA ImageableArea per PageSize %s\n"
+"                REF: pàgina 41, secció 5.\n"
+"                REF: pàgina 102, secció 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA LanguageEncoding\n"
+"                REF: pàgines 56-57, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA LanguageVersion\n"
+"                REF: pàgines 57-58, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA Manufacturer\n"
+"                REF: pàgines 58-59, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA ModelName\n"
+"                REF: pàgines 59-60, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA NickName\n"
+"                REF: pàgina 60, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA PCFileName\n"
+"                REF: pàgines 61-62, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA PSVersion\n"
+"                REF: pàgines 62-64, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"      **ERROR**  ES NECESSITA PageRegion\n"
+"                REF: pàgina 100, secció 5.14."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"      **ERROR**  ES NECESSITA PageSize\n"
+"                REF: pàgina 41, secció 5.\n"
+"                REF: pàgina 99, secció 5.14."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14."
+msgstr ""
+"      **ERROR**  ES NECESSITA PageSize\n"
+"                REF: pàgines 99-100, secció 5.14."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"      **ERROR**  ES NECESSITA PaperDimension per PageSize %s\n"
+"                REF: pàgina 41, secció 5.\n"
+"                REF: pàgina 103, secció 5.15."
+
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"      **ERROR**  ES NECESSITA Product\n"
+"                REF: pàgina 62, secció 5.3."
+
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3."
+msgstr ""
+"      **FAIL**  ES NECESSITA ShortNickName\n"
+"                REF: pàgina 64-65, secció 5.3."
+
+#, c-format
+msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
+msgstr "      **ERROR** No es pot obrir el fitxer PPD - %s a la línia %d."
+
+#, c-format
+msgid "    %d ERRORS FOUND"
+msgstr "    %d S'HAN TROBAT ERRORS"
+
+msgid "    -h       Show program usage"
+msgstr "    -h       Mostra la sintaxi del programa"
+
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d.\n"
+"        REF: Page 39, %%%%BoundingBox:"
+msgstr ""
+"    %%%%BoundingBox incorrecte: a la línia %d.\n"
+"        REF: pàgina 39, %%%%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d.\n"
+"        REF: Page 53, %%%%Page:"
+msgstr ""
+"    %%%%Page incorrecte: a la línia %d.\n"
+"        REF: pàgina 53, %%%%Page:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d.\n"
+"        REF: Page 43, %%%%Pages:"
+msgstr ""
+"    %%%%Pages incorrecte: a la línia %d!\n"
+"        REF: pàgina 43, %%%%Pages:"
+
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d).\n"
+"        REF: Page 25, Line Length"
+msgstr ""
+"    La línia %d és més llarga de 255 caràcters (%d)\n"
+"        REF: pàgina 25, Longitud de línia"
+
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line.\n"
+"        REF: Page 17, 3.1 Conforming Documents"
+msgstr ""
+"    Falta %!PS-Adobe-3.0 a la primera línia.\n"
+"        REF: pàgina 17, 3.1 Adaptació de documents"
+
+#, c-format
+msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+msgstr ""
+"    Falta el comentari %%EndComments.        REF: pàgina 41, %%EndComments"
+
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment.\n"
+"        REF: Page 39, %%BoundingBox:"
+msgstr ""
+"     %%BoundingBox incorrecte o inexistent: comentari.\n"
+"        REF: pàgina 39, %%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments.\n"
+"        REF: Page 53, %%Page:"
+msgstr ""
+"    %%Page incorrecte o inexistent: comentaris.\n"
+"        REF: pàgina 53, %%Page:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment.\n"
+"        REF: Page 43, %%Pages:"
+msgstr ""
+"    %%Pages incorrecte o inexistent: comentari.\n"
+"        REF: pàgina 43, %%Pages:"
+
+msgid "    NO ERRORS FOUND"
+msgstr "    NO S'HA TROBAT CAP ERROR"
+
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters."
+msgstr "     S'han trobat %d línies que superen els 255 caràcters."
+
+#, c-format
+msgid "    Too many %%BeginDocument comments."
+msgstr "     Massa comentaris %%BeginDocument."
+
+#, c-format
+msgid "    Too many %%EndDocument comments."
+msgstr "     Massa comentaris %%EndDocument."
+
+msgid "    Warning: file contains binary data."
+msgstr "     Avís: el fitxer conté dades binàries."
+
+#, c-format
+msgid "    Warning: no %%EndComments comment in file."
+msgstr "     Avís: no hi ha cap %%EndComments al fitxer."
+
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file."
+msgstr "     Avís: versió del DSC %.1f obsoleta al fitxer."
+
+msgid "  ! expression            Unary NOT of expression."
+msgstr ""
+
+msgid "  ( expressions )         Group expressions."
+msgstr ""
+
+msgid "  --[no-]debug-logging    Turn debug logging on/off."
+msgstr "  --[no-]debug-logging    Activa o desactiva el registre de depuració."
+
+msgid "  --[no-]remote-admin     Turn remote administration on/off."
+msgstr "  --[no-]remote-admin     Activa o desactiva l'administració remota."
+
+msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
+msgstr "  --[no-]remote-any       Permet o impedeix l'accés des d'Internet."
+
+msgid "  --[no-]share-printers   Turn printer sharing on/off."
+msgstr ""
+"  --[no-]share-printers   Activa o desactiva la compartició d'impressores."
+
+msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
+msgstr ""
+"  --[no-]user-cancel-any  Permet o impedeix que els usuaris cancel·lin "
+"tasques."
+
+msgid "  --cr                    End lines with CR (Mac OS 9)."
+msgstr "  --cr                    Final de línia amb CR (Mac OS 9)."
+
+msgid "  --crlf                  End lines with CR + LF (Windows)."
+msgstr "  --crlf                  Final de línia amb CR + LF (Windows)."
+
+msgid "  --domain regex          Match domain to regular expression."
+msgstr ""
+
+msgid ""
+"  --exec utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
+msgid "  --false                 Always false."
+msgstr ""
+
+msgid "  --help                  Show help."
+msgstr ""
+
+msgid "  --help                  Show this help."
+msgstr ""
+
+msgid "  --host regex            Match hostname to regular expression."
+msgstr ""
+
+msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
+
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
+msgid "  --local                 True if service is local."
+msgstr ""
+
+msgid "  --ls                    List attributes."
+msgstr ""
+
+msgid "  --name regex            Match service name to regular expression."
+msgstr ""
+
+msgid "  --not expression        Unary NOT of expression."
+msgstr ""
+
+msgid "  --path regex            Match resource path to regular expression."
+msgstr ""
+
+msgid "  --port number[-number]  Match port to number or range."
+msgstr ""
+
+msgid "  --print                 Print URI if true."
+msgstr ""
+
+msgid "  --print-name            Print service name if true."
+msgstr ""
+
+msgid "  --quiet                 Quietly report match via exit code."
+msgstr ""
+
+msgid "  --remote                True if service is remote."
+msgstr ""
+
+msgid ""
+"  --stop-after-include-error\n"
+"                          Stop tests after a failed INCLUDE."
+msgstr ""
+
+msgid "  --true                  Always true."
+msgstr ""
+
+msgid "  --txt key               True if the TXT record contains the key."
+msgstr ""
+
+msgid "  --txt-* regex           Match TXT record key to regular expression."
+msgstr ""
+
+msgid "  --uri regex             Match URI to regular expression."
+msgstr ""
+
+msgid "  --version               Show program version."
+msgstr ""
+
+msgid "  --version               Show version."
+msgstr ""
+
+msgid "  -4                      Connect using IPv4."
+msgstr "  -4                      Connecta fent servir IPv4."
+
+msgid "  -6                      Connect using IPv6."
+msgstr "  -6                      Connecta fent servir IPv6."
+
+msgid "  -C                      Send requests using chunking (default)."
+msgstr ""
+"  -C                      Envia les sol·licituds fent servir la fragmentació "
+"(per defecte)."
+
+msgid "  -D                      Remove the input file when finished."
+msgstr "  -D                      Elimina el fitxer d'entrada quan ha acabat."
+
+msgid "  -D name=value           Set named variable to value."
+msgstr "  -D nom=valor            Estableix la variable indicada al valor."
+
+msgid "  -E                      Encrypt the connection."
+msgstr "  -E                      Xifra la connexió."
+
+msgid "  -E                      Test with HTTP Upgrade to TLS."
+msgstr ""
+"  -E                      Fa una prova amb l'actualització d'HTTP a TLS."
+
+msgid ""
+"  -F                      Run in the foreground but detach from console."
+msgstr ""
+"  -F                      Executa en primer pla però separat de la consola."
+
+msgid "  -H samba-server         Use the named SAMBA server."
+msgstr "  -H servidor-samba         Fa servir el servidor SAMBA indicat."
+
+msgid "  -I                      Ignore errors."
+msgstr "  -I                      Ignora els errors."
+
+msgid "  -I include-dir          Add include directory to search path."
+msgstr "  -I dir-inclòs          Afegeix el directori inclòs al camí de cerca."
+
+msgid "  -I {filename,filters,none,profiles}"
+msgstr "  -I {nomfitxer,filtres,cap,perfils}"
+
+msgid "  -L                      Send requests using content-length."
+msgstr ""
+"  -L                      Envia les peticions fent servir content-length."
+
+msgid ""
+"  -P filename.plist       Produce XML plist to a file and test report to "
+"standard output."
+msgstr ""
+
+msgid "  -P filename.ppd         Set PPD file."
+msgstr "  -P nomfitxer.ppd         Estableix el fitxer PPD."
+
+msgid "  -P number[-number]      Match port to number or range."
+msgstr ""
+
+msgid "  -R root-directory       Set alternate root."
+msgstr "  -R directori-arrel       Estableix una arrel alternativa."
+
+msgid "  -S                      Test with SSL encryption."
+msgstr "  -S                      Fa una prova amb xifrat SSL."
+
+msgid "  -T seconds              Set the browse timeout in seconds."
+msgstr ""
+
+msgid "  -T seconds              Set the receive/send timeout in seconds."
+msgstr ""
+"  -T segons              Estableix el temps d'espera màxim per enviar i "
+"rebre en segons."
+
+msgid "  -U username             Specify username."
+msgstr "  -U nomusuari             Especifica un nom d'usuari."
+
+msgid "  -V version              Set default IPP version."
+msgstr "  -V versió              Estableix la versió per defecte del IPP."
+
+msgid ""
+"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}"
+msgstr ""
+"  -W {tots,cap,restringits,per defecte,dúplex,filtres,perfils,mides,"
+"traduccions}"
+
+msgid "  -X                      Produce XML plist instead of plain text."
+msgstr ""
+"  -X                      Retorna els plist en XML en comptes de text pla."
+
+msgid "  -a                      Browse for all services."
+msgstr ""
+
+msgid "  -a                      Export all printers."
+msgstr "  -a                      Exporta totes les impressores."
+
+msgid "  -c                      Produce CSV output."
+msgstr ""
+
+msgid "  -c catalog.po           Load the specified message catalog."
+msgstr "  -c catàleg.po           Carrega el catàleg de missatges indicat."
+
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
+msgid "  -c cupsd.conf           Set cupsd.conf file to use."
+msgstr ""
+"  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer servir."
+
+msgid "  -d domain               Browse/resolve in specified domain."
+msgstr ""
+
+msgid "  -d name=value           Set named variable to value."
+msgstr "  -d nom=valor           Estableix la variable indicada al valor."
+
+msgid "  -d output-dir           Specify the output directory."
+msgstr "  -d dir-sortida           Especifica el directori de sortida."
+
+msgid "  -d printer              Use the named printer."
+msgstr "  -d impressora              Fa servir la impressora indicada."
+
+msgid "  -d regex                Match domain to regular expression."
+msgstr ""
+
+msgid "  -e                      Use every filter from the PPD file."
+msgstr "  -e                      Fa servir tots els filtres del fitxer PPD."
+
+msgid "  -f                      Run in the foreground."
+msgstr "  -f                      Executa en primer pla."
+
+msgid "  -f filename             Set default request filename."
+msgstr ""
+"  -f nomfitxer             Estableix el nom del fitxer per defecte de la "
+"sol·licitud."
+
+msgid "  -h                      Show this usage message."
+msgstr "  -h                      Mostra aquest missatge de sintaxi."
+
+msgid "  -h regex                Match hostname to regular expression."
+msgstr ""
+
+msgid "  -h server[:port]        Specify server address."
+msgstr "  -h servidor[:port]        Especifica l'adreça del servidor."
+
+msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
+msgstr ""
+"  -i tipus/mime            Estableix el tipus MIME d'entrada (auto-typed si "
+"no s'especifica)."
+
+msgid ""
+"  -i seconds              Repeat the last file with the given time interval."
+msgstr ""
+"  -i segons              Repeteix l'últim fitxer amb l'interval especificat."
+
+msgid ""
+"  -j job-id[,N]           Filter file N from the specified job (default is "
+"file 1)."
+msgstr ""
+"  -j id-feina[,N]           Filtra el fitxer N a la feina especificada (el "
+"fitxer per defecte és 1)."
+
+msgid "  -l                      List attributes."
+msgstr ""
+
+msgid "  -l                      Produce plain text output."
+msgstr ""
+
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
+
+msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
+msgstr ""
+"  -l idioma[,idioma,...]      Especifica els idiomes de sortida (locale)."
+
+msgid "  -m                      Use the ModelName value as the filename."
+msgstr ""
+"  -m                      Fa servir el valor de ModelName com a nom de "
+"fitxer."
+
+msgid ""
+"  -m mime/type            Set output MIME type (otherwise application/pdf)."
+msgstr ""
+"  -m tipus/mime            Estableix el tipus MIME de sortida (application/"
+"pdf si no s'especifica)."
+
+msgid "  -n copies               Set number of copies."
+msgstr "  -n còpies               Estableix el nombre de còpies."
+
+msgid ""
+"  -n count                Repeat the last file the given number of times."
+msgstr ""
+"  -n comptador                Repeteix l'últim fitxer el nombre indicat de "
+"vegades."
+
+msgid "  -n regex                Match service name to regular expression."
+msgstr ""
+
+msgid ""
+"  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
+msgstr ""
+"  -o nomfitxer.drv         Estableix el fitxer d'informació del controlador "
+"(ppdi.drv si no s'especifica)."
+
+msgid "  -o filename.ppd[.gz]    Set output file (otherwise stdout)."
+msgstr ""
+"  -o nomfitxer.ppd[.gz]    Estableix el fitxer de sortida (stdout si no "
+"s'especifica)."
+
+msgid "  -o name=value           Set option(s)."
+msgstr "  -o nom=valor           Estableix les opcions."
+
+msgid "  -p                      Print URI if true."
+msgstr ""
+
+msgid "  -p filename.ppd         Set PPD file."
+msgstr "  -p nomfitxer.ppd         Estableix el fitxer PPD."
+
+msgid "  -p program              Run specified program for each service."
+msgstr ""
+
+msgid "  -q                      Quietly report match via exit code."
+msgstr ""
+
+msgid "  -q                      Run silently."
+msgstr "  -q                      S'executa en mode silenciós."
+
+msgid "  -r                      True if service is remote."
+msgstr ""
+
+msgid "  -r                      Use 'relaxed' open mode."
+msgstr "  -r                      Fa servir el mode obert «relaxat»."
+
+msgid "  -s                      Print service name if true."
+msgstr ""
+
+msgid "  -t                      Produce a test report."
+msgstr "  -t                      Genera un informe de prova."
+
+msgid "  -t                      Test PPDs instead of generating them."
+msgstr "  -t                      Prova els  PPDs en comptes de generar-los."
+
+msgid "  -t                      Test the configuration file."
+msgstr "  -t                      Prova el fitxer de configuració."
+
+msgid "  -t key                  True if the TXT record contains the key."
+msgstr ""
+
+msgid "  -t title                Set title."
+msgstr "  -t títol                Estableix el títol."
+
+msgid "  -t type                 Browse/resolve with specified type."
+msgstr ""
+
+msgid "  -u                      Remove the PPD file when finished."
+msgstr "  -u                      Elimina el fitxer PPD quan ha acabat."
+
+msgid "  -u regex                Match URI to regular expression."
+msgstr ""
+
+msgid "  -v                      Be verbose."
+msgstr "  -v                      Mode detallat."
+
+msgid "  -vv                     Be very verbose."
+msgstr "  -vv                     Mode molt detallat."
+
+msgid ""
+"  -x utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
+msgid "  -z                      Compress PPD files using GNU zip."
+msgstr ""
+"  -z                      Comprimeix els fitxers PPD fent servir el zip de "
+"GNU."
+
+msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Fully-qualified domain name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "  IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
+
+msgid ""
+"  expression --and expression\n"
+"                          Logical AND."
+msgstr ""
+
+msgid ""
+"  expression --or expression\n"
+"                          Logical OR."
+msgstr ""
+
+msgid "  expression expression   Logical AND."
+msgstr ""
+
+msgid "  {service_domain}        Domain name"
+msgstr ""
+
+msgid "  {service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "  {service_name}          Service instance name"
+msgstr ""
+
+msgid "  {service_port}          Port number"
+msgstr ""
+
+msgid "  {service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "  {service_scheme}        URI scheme"
+msgstr ""
+
+msgid "  {service_uri}           URI"
+msgstr ""
+
+msgid "  {txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "  {}                      URI"
+msgstr ""
+
+msgid " FAIL"
+msgstr " ERROR"
+
+msgid " PASS"
+msgstr " VÀLID"
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+"4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
+"section 4.1.13)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+"4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+"positive (RFC 2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
+"2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+msgstr ""
+
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+
+#, c-format
+msgid "%d x %d mm"
+msgstr ""
+
+#, c-format
+msgid "%g x %g"
+msgstr ""
+
+#, c-format
+msgid "%s (%s)"
+msgstr ""
+
+#, c-format
+msgid "%s (%s, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s accepting requests since %s"
+msgstr "%s accepta peticions des de %s"
+
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s no es pot canviar."
+
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc."
+msgstr "%s no està implementat en la versió del CUPS del lpc."
+
+#, c-format
+msgid "%s is not ready"
+msgstr "%s no està preparada"
+
+#, c-format
+msgid "%s is ready"
+msgstr "%s està preparada"
+
+#, c-format
+msgid "%s is ready and printing"
+msgstr "%s està preparada i imprimeix"
+
+#, c-format
+msgid "%s job-id user title copies options [file]"
+msgstr "%s identificador-feina usuari títol còpies opcions [fitxer]"
+
+#, c-format
+msgid "%s not accepting requests since %s -"
+msgstr "%s no accepta peticions des de %s -"
+
+#, c-format
+msgid "%s not supported."
+msgstr "no és compatible amb l'ús de %s."
+
+#, c-format
+msgid "%s/%s accepting requests since %s"
+msgstr "%s/%s accepta peticions des de %s"
+
+#, c-format
+msgid "%s/%s not accepting requests since %s -"
+msgstr "%s/%s no accepta peticions des de %s -"
+
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]"
+msgstr "%s: %-33.33s [feina %d localhost]"
+
+#. TRANSLATORS: Message is "subject: error"
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#, c-format
+msgid "%s: %s failed: %s"
+msgstr "%s: %s ha fallat: %s"
+
+#, c-format
+msgid "%s: Bad printer URI \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Bad version %s for \"-V\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Don't know what to do."
+msgstr "%s: no sé que fer."
+
+#, c-format
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"."
+msgstr ""
+"%s: error - els noms de les variables d'entorn %s tenen un destí inexistent "
+"«%s»."
+
+#, c-format
+msgid "%s: Error - add '/version=1.1' to server name."
+msgstr ""
+
+#, c-format
+msgid "%s: Error - bad job ID."
+msgstr "%s: error - ID de la feina incorrecte."
+
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously."
+msgstr ""
+"%s: error - no es poden imprimir fitxers i modificar tasques al mateix temps."
+
+#, c-format
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
+msgstr ""
+"%s: error - no es pot imprimir des d'stdin si s'indiquen els fitxers o "
+"l'identificador de la feina."
+
+#, c-format
+msgid "%s: Error - expected character set after \"-S\" option."
+msgstr ""
+"%s: error - s'esperava un conjunt de caràcters després de l'opció «-S»."
+
+#, c-format
+msgid "%s: Error - expected content type after \"-T\" option."
+msgstr "%s: error - s'esperava un tipus de contingut després de l'opció «-T»."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-#\" option."
+msgstr "%s: error - s'esperaven còpies després de l'opció «-#»."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-n\" option."
+msgstr "%s: error - s'esperaven còpies després de l'opció «-n»."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-P\" option."
+msgstr "%s: error - s'esperava un destí després de l'opció «-P»."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-d\" option."
+msgstr "%s: error - s'esperava un destí després de l'opció «-d»."
+
+#, c-format
+msgid "%s: Error - expected form after \"-f\" option."
+msgstr "%s: error - s'esperava un formulari després de l'opció «-f»."
+
+#, c-format
+msgid "%s: Error - expected hold name after \"-H\" option."
+msgstr "%s: error - s'esperava un nom per pausa després de l'opció «-H»."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-H\" option."
+msgstr "%s: error - s'esperava el nom de l'amfitrió després de l'opció «-H»."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-h\" option."
+msgstr "%s: error - s'esperava el nom de l'amfitrió després de l'opció «-h»."
+
+#, c-format
+msgid "%s: Error - expected mode list after \"-y\" option."
+msgstr "%s: error - s'esperava una llista de modes després de l'opció «-y»."
+
+#, c-format
+msgid "%s: Error - expected name after \"-%c\" option."
+msgstr "%s: error - s'esperava un nom després de l'opció «-%c»."
+
+#, c-format
+msgid "%s: Error - expected option=value after \"-o\" option."
+msgstr "%s: error - s'esperava opció=valor després de l'opció «-o»."
+
+#, c-format
+msgid "%s: Error - expected page list after \"-P\" option."
+msgstr "%s: error - s'esperava una llista de pàgines després de l'opció «-P»."
+
+#, c-format
+msgid "%s: Error - expected priority after \"-%c\" option."
+msgstr "%s: error - s'esperava una prioritat després de l'opció «-%c»."
+
+#, c-format
+msgid "%s: Error - expected reason text after \"-r\" option."
+msgstr "%s: error - s'esperava una explicació després de l'opció «-r»."
+
+#, c-format
+msgid "%s: Error - expected title after \"-t\" option."
+msgstr "%s: error - s'esperava un títol després de l'opció «-t»."
+
+#, c-format
+msgid "%s: Error - expected username after \"-U\" option."
+msgstr "%s: error - s'esperava un nom d'usuari després de l'opció «-U»."
+
+#, c-format
+msgid "%s: Error - expected username after \"-u\" option."
+msgstr "%s: error - s'esperava un nom d'usuari després de l'opció «-u»."
+
+#, c-format
+msgid "%s: Error - expected value after \"-%c\" option."
+msgstr "%s: error - s'esperava un valor després de l'opció «-%c»."
+
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" "
+"option."
+msgstr ""
+"%s: error - es requereix «completed», «not-completed», o «all» després de "
+"l'opció «-W»."
+
+#, c-format
+msgid "%s: Error - no default destination available."
+msgstr "%s: error - no hi ha un destí per defecte."
+
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100."
+msgstr "%s: error - la prioritat ha de ser entre 1 i 100."
+
+#, c-format
+msgid "%s: Error - scheduler not responding."
+msgstr "%s: error - el planificador no està responent."
+
+#, c-format
+msgid "%s: Error - too many files - \"%s\"."
+msgstr "%s: error - massa fitxers - «%s»."
+
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s"
+msgstr "%s: error - no es pot accedir a «%s» - %s"
+
+#, c-format
+msgid "%s: Error - unable to queue from stdin - %s."
+msgstr "%s: error - no es pot posar en cua des d'stdin - %s."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"."
+msgstr "%s: error - el destí «%s» és desconegut."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"."
+msgstr "%s: error - el destí «%s/%s» és desconegut."
+
+#, c-format
+msgid "%s: Error - unknown option \"%c\"."
+msgstr "%s: error - l'opció «%c» és desconeguda."
+
+#, c-format
+msgid "%s: Error - unknown option \"%s\"."
+msgstr "%s: error - l'opció «%s» és desconeguda."
+
+#, c-format
+msgid "%s: Expected job ID after \"-i\" option."
+msgstr "%s: s'esperava l'ID d'una feina després de l'opció «-i»."
+
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"."
+msgstr "%s: el nom del destí no és vàlid a la llista «%s»."
+
+#, c-format
+msgid "%s: Invalid filter string \"%s\"."
+msgstr "%s: la cadena del filtre «%s» no és vàlida."
+
+#, c-format
+msgid "%s: Missing filename for \"-P\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Missing timeout for \"-T\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Missing version for \"-V\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
+msgstr "%s: es necessita l'ID de la feina («-i jobid») abans de «-H restart»."
+
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s."
+msgstr "%s: no hi ha cap filtre per convertir de %s/%s a %s/%s."
+
+#, c-format
+msgid "%s: Operation failed: %s"
+msgstr "%s: ha fallat l'operació: %s"
+
+#, c-format
+msgid "%s: Sorry, no encryption support."
+msgstr "%s: ho sento, no està compilada la compatibilitat pel xifrat."
+
+#, c-format
+msgid "%s: Unable to connect to \"%s:%d\": %s"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to connect to server."
+msgstr "%s: no es pot connectar al servidor."
+
+#, c-format
+msgid "%s: Unable to contact server."
+msgstr "%s: no es pot contactar amb el servidor."
+
+#, c-format
+msgid "%s: Unable to create PPD file: %s"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"."
+msgstr "%s: no es pot determinar el tips de MIME de «%s»."
+
+#, c-format
+msgid "%s: Unable to open \"%s\": %s"
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to open %s: %s"
+msgstr "%s: no es pot obrir %s: %s"
+
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d."
+msgstr "%s: no es pot obrir el fitxer PPD: %s a la línia %d."
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
+msgstr "%s: no es pot llegir la base de dades MIME de «%s» o «%s»."
+
+#, c-format
+msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown destination \"%s\"."
+msgstr "%s: el destí «%s» és desconegut."
+
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s."
+msgstr "%s: es destí de tipus MIME %s/%s és desconegut."
+
+#, c-format
+msgid "%s: Unknown option \"%c\"."
+msgstr "%s: l'opció «%c» és desconeguda."
+
+#, c-format
+msgid "%s: Unknown option \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown option \"-%c\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s."
+msgstr "%s: la font del tipus de MIME %s/%s és desconeguda."
+
+#, c-format
+msgid ""
+"%s: Warning - \"%c\" format modifier not supported - output may not be "
+"correct."
+msgstr ""
+"%s: avís - no és compatible amb l'ús del modificador de format «%c» - el "
+"resultat pot no ser correcte."
+
+#, c-format
+msgid "%s: Warning - character set option ignored."
+msgstr "%s: avís - s'ignora l'opció del grup de caràcters."
+
+#, c-format
+msgid "%s: Warning - content type option ignored."
+msgstr "%s: avís - s'ignora l'opció de tipus de contingut."
+
+#, c-format
+msgid "%s: Warning - form option ignored."
+msgstr "%s: avís - s'ignora l'opció de formulari."
+
+#, c-format
+msgid "%s: Warning - mode option ignored."
+msgstr "%s: avís - s'ignora l'opció de mode."
+
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 polzada/seg."
+
+msgid "1.25x0.25\""
+msgstr "1.25x0.25\""
+
+msgid "1.25x2.25\""
+msgstr "1.25x2.25\""
+
+msgid "1.5 inch/sec."
+msgstr "1.5 polzades/seg."
+
+msgid "1.50x0.25\""
+msgstr "1.50x0.25\""
+
+msgid "1.50x0.50\""
+msgstr "1.50x0.50\""
+
+msgid "1.50x1.00\""
+msgstr "1.50x1.00\""
+
+msgid "1.50x2.00\""
+msgstr "1.50x2.00\""
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 polzades/seg."
+
+msgid "10 x 11"
+msgstr "10 x 11"
+
+msgid "10 x 13"
+msgstr "10 x 13"
+
+msgid "10 x 14"
+msgstr "10 x 14"
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 mm/seg."
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 polzades/seg."
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 polzades/seg."
+
+msgid "12 x 11"
+msgstr "12 x 11"
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 mm/seg."
+
+msgid "120x60dpi"
+msgstr "120x60ppp"
+
+msgid "120x72dpi"
+msgstr "120x72ppp"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136ppp"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 mm/seg."
+
+msgid "15 x 11"
+msgstr "15 x 11"
+
+msgid "150 mm/sec."
+msgstr "150 mm/seg."
+
+msgid "150dpi"
+msgstr "150ppp"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180ppp"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 polzades/seg."
+
+msgid "2-Sided Printing"
+msgstr "Impressió a doble cara"
+
+msgid "2.00x0.37\""
+msgstr "2.00x0.37\""
+
+msgid "2.00x0.50\""
+msgstr "2.00x0.50\""
+
+msgid "2.00x1.00\""
+msgstr "2.00x1.00\""
+
+msgid "2.00x1.25\""
+msgstr "2.00x1.25\""
+
+msgid "2.00x2.00\""
+msgstr "2.00x2.00\""
+
+msgid "2.00x3.00\""
+msgstr "2.00x3.00\""
+
+msgid "2.00x4.00\""
+msgstr "2.00x4.00\""
+
+msgid "2.00x5.50\""
+msgstr "2.00x5.50\""
+
+msgid "2.25x0.50\""
+msgstr "2.25x0.50\""
+
+msgid "2.25x1.25\""
+msgstr "2.25x1.25\""
+
+msgid "2.25x4.00\""
+msgstr "2.25x4.00\""
+
+msgid "2.25x5.50\""
+msgstr "2.25x5.50\""
+
+msgid "2.38x5.50\""
+msgstr "2.38x5.50\""
+
+msgid "2.5 inches/sec."
+msgstr "2.5 polzades/seg."
+
+msgid "2.50x1.00\""
+msgstr "2.50x1.00\""
+
+msgid "2.50x2.00\""
+msgstr "2.50x2.00\""
+
+msgid "2.75x1.25\""
+msgstr "2.75x1.25\""
+
+msgid "2.9 x 1\""
+msgstr "2.9 x 1\""
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 mm/seg."
+
+msgid "200 mm/sec."
+msgstr "200 mm/seg."
+
+msgid "203dpi"
+msgstr "203ppp"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "Sèrie de 24 pins"
+
+msgid "240x72dpi"
+msgstr "240x72ppp"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 mm/seg."
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 polzades/seg."
+
+msgid "3 x 5"
+msgstr "3 x 5"
+
+msgid "3.00x1.00\""
+msgstr "3.00x1.00\""
+
+msgid "3.00x1.25\""
+msgstr "3.00x1.25\""
+
+msgid "3.00x2.00\""
+msgstr "3.00x2.00\""
+
+msgid "3.00x3.00\""
+msgstr "3.00x3.00\""
+
+msgid "3.00x5.00\""
+msgstr "3.00x5.00\""
+
+msgid "3.25x2.00\""
+msgstr "3.25x2.00\""
+
+msgid "3.25x5.00\""
+msgstr "3.25x5.00\""
+
+msgid "3.25x5.50\""
+msgstr "3.25x5.50\""
+
+msgid "3.25x5.83\""
+msgstr "3.25x5.83\""
+
+msgid "3.25x7.83\""
+msgstr "3.25x7.83\""
+
+msgid "3.5 x 5"
+msgstr "3.5 x 5"
+
+msgid "3.5\" Disk"
+msgstr "Disc de 3.5\""
+
+msgid "3.50x1.00\""
+msgstr "3.5x1.00\""
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 mm/seg."
+
+msgid "300 mm/sec."
+msgstr "300 mm/seg."
+
+msgid "300dpi"
+msgstr "300ppp"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360ppp"
+
+msgid "360x180dpi"
+msgstr "360x180ppp"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 polzades/seg."
+
+msgid "4.00x1.00\""
+msgstr "4.00x1.00\""
+
+msgid "4.00x13.00\""
+msgstr "4.00x13.00\""
+
+msgid "4.00x2.00\""
+msgstr "4.00x2.00\""
+
+msgid "4.00x2.50\""
+msgstr "4.00x2.50\""
+
+msgid "4.00x3.00\""
+msgstr "4.00x3.00\""
+
+msgid "4.00x4.00\""
+msgstr "4.00x4.00\""
+
+msgid "4.00x5.00\""
+msgstr "4.00x5.00\""
+
+msgid "4.00x6.00\""
+msgstr "4.00x6.00\""
+
+msgid "4.00x6.50\""
+msgstr "4.00x6.50\""
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 mm/seg."
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 polzades/seg."
+
+msgid "5 x 7"
+msgstr "15 x 11"
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 polzades/seg."
+
+msgid "6.00x1.00\""
+msgstr "6.00x1.00\""
+
+msgid "6.00x2.00\""
+msgstr "6.00x2.00\""
+
+msgid "6.00x3.00\""
+msgstr "6.00x3.00\""
+
+msgid "6.00x4.00\""
+msgstr "6.00x4.00\""
+
+msgid "6.00x5.00\""
+msgstr "6.00x5.00\""
+
+msgid "6.00x6.00\""
+msgstr "6.00x6.00\""
+
+msgid "6.00x6.50\""
+msgstr "6.00x6.50\""
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 mm/seg."
+
+msgid "600dpi"
+msgstr "600ppp"
+
+msgid "60dpi"
+msgstr "60ppp"
+
+msgid "60x72dpi"
+msgstr "60x72ppp"
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 polzades/seg."
+
+msgid "7 x 9"
+msgstr "7 x 9"
+
+msgid "70"
+msgstr "70"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 polzades/seg."
+
+msgid "8 x 10"
+msgstr "8 x 10"
+
+msgid "8.00x1.00\""
+msgstr "8.00x1.00\""
+
+msgid "8.00x2.00\""
+msgstr "8.00x2.00\""
+
+msgid "8.00x3.00\""
+msgstr "8.00x3.00\""
+
+msgid "8.00x4.00\""
+msgstr "8.00x4.00\""
+
+msgid "8.00x5.00\""
+msgstr "8.00x5.00\""
+
+msgid "8.00x6.00\""
+msgstr "8.00x6.00\""
+
+msgid "8.00x6.50\""
+msgstr "8.00x6.50\""
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 mm/seg."
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 polzades/seg."
+
+msgid "9 x 11"
+msgstr "9 x 11"
+
+msgid "9 x 12"
+msgstr "9 x 12"
+
+msgid "9-Pin Series"
+msgstr "Sèrie de 9 pins"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
+
+msgid "?Invalid help command unknown."
+msgstr "?Comanda d'ajuda no vàlida desconeguda."
+
+msgid "A Samba password is required to export printer drivers"
+msgstr ""
+"Necessiteu una contrasenya de Samba per exportar els controladors "
+"d'impressora"
+
+msgid "A Samba username is required to export printer drivers"
+msgstr ""
+"Necessiteu una nom d'usuari de Samba per exportar els controladors "
+"d'impressora"
+
+#, c-format
+msgid "A class named \"%s\" already exists."
+msgstr "Ja existeix una classe anomenada «%s»."
+
+#, c-format
+msgid "A printer named \"%s\" already exists."
+msgstr "Ja existeix una impressora anomenada «%s»."
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr "A0 costat llarg"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr "A1 costat llarg"
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr "A2 costat llarg"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr "A3 costat llarg"
+
+msgid "A3 Oversize"
+msgstr "A3 estès"
+
+msgid "A3 Oversize Long Edge"
+msgstr "A3 estès pel costat llarg"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr "A4 costat llarg"
+
+msgid "A4 Oversize"
+msgstr "A4 estès"
+
+msgid "A4 Small"
+msgstr "A4 reduït"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr "A5 costat llarg"
+
+msgid "A5 Oversize"
+msgstr "A5 estès"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr "A6 costat llarg"
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr "ARCH C costat llarg"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr "ARCH D costat llarg"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
+msgstr "ARCH E costat llarg"
+
+msgid "Accept Jobs"
+msgstr "Accepta feines"
+
+msgid "Accepted"
+msgstr "Acceptada"
+
+msgid "Add Class"
+msgstr "Afegeix una classe"
+
+msgid "Add Printer"
+msgstr "Afegeix una impressora"
+
+msgid "Add RSS Subscription"
+msgstr "Afegeix una subscripció RSS"
+
+msgid "Address"
+msgstr "Adreça"
+
+msgid "Administration"
+msgstr "Administració"
+
+msgid "Always"
+msgstr "Sempre"
+
+msgid "AppSocket/HP JetDirect"
+msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "Aplicador"
+
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d."
+msgstr ""
+"S'ha intentat posar l'estat de la impressora %s a un valor incorrecte %d."
+
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)."
+msgstr "Grups d'atribut desordenats (%x < %x)."
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr "A5 estès"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
+
+#, c-format
+msgid "Bad 'document-format' value \"%s\"."
+msgstr ""
+
+msgid "Bad NULL dests pointer"
+msgstr "El punter de dests NULL és incorrecte"
+
+msgid "Bad OpenGroup"
+msgstr "La OpenGroup és incorrecta"
+
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "La OpenUI/JCLOpenUI és incorrecta"
+
+msgid "Bad OrderDependency"
+msgstr "La OrderDependency és incorrecta"
+
+msgid "Bad PPD cache file."
+msgstr "El fitxer PPD de memòria cau és incorrecte."
+
+msgid "Bad Request"
+msgstr "La petició és incorrecta"
+
+msgid "Bad SNMP version number"
+msgstr "El número de versió del SNMP és incorrecte"
+
+msgid "Bad UIConstraints"
+msgstr "La UIConstraints és incorrecta"
+
+msgid "Bad arguments to function"
+msgstr ""
+
+#, c-format
+msgid "Bad copies value %d."
+msgstr "El valor de copies %d és incorrecte"
+
+msgid "Bad custom parameter"
+msgstr "El paràmetre personalitzat és incorrecte"
+
+#, c-format
+msgid "Bad device-uri \"%s\"."
+msgstr "La device-uri «%s» és incorrecta."
+
+#, c-format
+msgid "Bad device-uri scheme \"%s\"."
+msgstr "L'esquema «%s» de la device-uri és incorrecte."
+
+#, c-format
+msgid "Bad document-format \"%s\"."
+msgstr "La document-format «%s» és incorrecta."
+
+#, c-format
+msgid "Bad document-format-default \"%s\"."
+msgstr "La document-format-default «%s» és incorrecta."
+
+msgid "Bad filename buffer"
+msgstr "El nom del fitxer de la memòria cau és incorrecte"
+
+msgid "Bad hostname/address in URI"
+msgstr ""
+
+#, c-format
+msgid "Bad job-name value: %s"
+msgstr ""
+
+msgid "Bad job-name value: Wrong type or count."
+msgstr ""
+
+msgid "Bad job-priority value."
+msgstr "El valor de la job-priority és incorrecte."
+
+#, c-format
+msgid "Bad job-sheets value \"%s\"."
+msgstr "El valor «%s» de la job-sheets és incorrecte."
+
+msgid "Bad job-sheets value type."
+msgstr "El tipus de valor de la job-sheets és incorrecte."
+
+msgid "Bad job-state value."
+msgstr "El valor de la job-state és incorrecte."
+
+#, c-format
+msgid "Bad job-uri \"%s\"."
+msgstr "La job-uri «%s» és incorrecta."
+
+#, c-format
+msgid "Bad notify-pull-method \"%s\"."
+msgstr "La notify-pull-method «%s» és incorrecta."
+
+#, c-format
+msgid "Bad notify-recipient-uri \"%s\"."
+msgstr "La notify-recipient-uri «%s» és incorrecta."
+
+#, c-format
+msgid "Bad number-up value %d."
+msgstr "El valor de number-up %d és incorrecte."
+
+#, c-format
+msgid "Bad option + choice on line %d."
+msgstr "L'opció + elecció de la línia %d és incorrecta."
+
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Els valors de page-ranges %d-%d són incorrectes."
+
+msgid "Bad port number in URI"
+msgstr ""
+
+#, c-format
+msgid "Bad port-monitor \"%s\"."
+msgstr "La port-monitor «%s» és incorrecta."
+
+#, c-format
+msgid "Bad printer-state value %d."
+msgstr "El valor %d de printer-state és incorrecte."
+
+msgid "Bad printer-uri."
+msgstr ""
+
+#, c-format
+msgid "Bad request ID %d."
+msgstr "L'identificador %d de la sol·licitud és incorrecte."
+
+#, c-format
+msgid "Bad request version number %d.%d."
+msgstr "El número de versió %d.%d de la sol·licitud és incorrecte."
+
+msgid "Bad resource in URI"
+msgstr ""
+
+msgid "Bad scheme in URI"
+msgstr ""
+
+msgid "Bad subscription ID"
+msgstr "L'identificador de la subscripció és incorrecte."
+
+msgid "Bad username in URI"
+msgstr ""
+
+msgid "Bad value string"
+msgstr "El valor de la cadena és incorrecte"
+
+msgid "Bad/empty URI"
+msgstr ""
+
+msgid "Banners"
+msgstr "Bàners"
+
+msgid "Bond Paper"
+msgstr "Paper de valors"
+
+#, c-format
+msgid "Boolean expected for waiteof option \"%s\"."
+msgstr "S'esperava un booleà per l'opció waiteof «%s»."
+
+msgid "Buffer overflow detected, aborting."
+msgstr "S'ha detectat un desbordament la memòria cau. S'interromp."
+
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "Impressora d'etiquetes CPCL"
+
+msgid "Cancel Jobs"
+msgstr ""
+
+msgid "Cancel RSS Subscription"
+msgstr "Cancel·la la subscripció RSS"
+
+msgid "Canceling print job."
+msgstr "Es cancel·la feina."
+
+msgid "Cannot share a remote Kerberized printer."
+msgstr "No es pot compartir una impressora remota sobre Kerberos."
+
+msgid "Cassette"
+msgstr "Classet"
+
+msgid "Change Settings"
+msgstr "Canvia la configuració"
+
+#, c-format
+msgid "Character set \"%s\" not supported."
+msgstr "No es permet l'ús del grup de caràcters «%s»."
+
+msgid "Classes"
+msgstr "Classes"
+
+msgid "Clean Print Heads"
+msgstr "Neteja els capçals de la impressora"
+
+msgid "Close-Job doesn't support the job-uri attribute."
+msgstr "Close-Job no permet l'ús de l'atribut job-uri."
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Color Mode"
+msgstr "Mode de color"
+
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?"
+msgstr ""
+"Les ordres han de ser abreujades.  Poden ser:\n"
+"\n"
+"exit    help    quit    status  ?"
+
+msgid "Community name uses indefinite length"
+msgstr "Els noms de comunitat tenen longitud indefinida"
+
+msgid "Connected to printer."
+msgstr "S'ha connectat a la impressora."
+
+msgid "Connecting to printer."
+msgstr "Es connecta a la impressora."
+
+msgid "Continue"
+msgstr "Continua"
+
+msgid "Continuous"
+msgstr "Contínua"
+
+msgid "Control file sent successfully."
+msgstr "El fitxer de control s'ha enviat correctament."
+
+msgid "Copying print data."
+msgstr "Es copien les dades d'impressió."
+
+msgid "Created"
+msgstr "Creat"
+
+msgid "Custom"
+msgstr "Personalitzat"
+
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "Tall"
+
+msgid "Cutter"
+msgstr "Ganiveta"
+
+msgid "Dark"
+msgstr "Fosc"
+
+msgid "Darkness"
+msgstr "Foscor"
+
+msgid "Data file sent successfully."
+msgstr "El fitxer de dades s'ha enviat correctament."
+
+msgid "Delete Class"
+msgstr "Elimina la classe"
+
+msgid "Delete Printer"
+msgstr "Elimina la impressora"
+
+msgid "DeskJet Series"
+msgstr "Sèrie Deskjet"
+
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "El Destí «%s» no accepta tasques."
+
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s"
+msgstr ""
+"Dispositiu: uri = %s\n"
+"            classe = %s\n"
+"            informació = %s\n"
+"            fabricant i model = %s\n"
+"            identificador = %s\n"
+"            ubicació = %s"
+
+msgid "Direct Thermal Media"
+msgstr "Paper per impressió tèrmica directa"
+
+#, c-format
+msgid "Directory \"%s\" contains a relative path."
+msgstr "El directori «%s» conté un camí relatiu."
+
+#, c-format
+msgid "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr "El directori «%s» té permisos que no són segurs (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "Directory \"%s\" is a file."
+msgstr "El directori «%s» és un fitxer."
+
+#, c-format
+msgid "Directory \"%s\" not available: %s"
+msgstr "El directori «%s» no està disponible: %s"
+
+#, c-format
+msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "El directori «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
+
+msgid "Disabled"
+msgstr "Desabilitat"
+
+#, c-format
+msgid "Document #%d does not exist in job #%d."
+msgstr "No s'ha trobat el document #%d a la feina #%d."
+
+msgid "Duplexer"
+msgstr "Unitat d'impressió a dues cares"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "Impressora d'etiquetes EPL1"
+
+msgid "EPL2 Label Printer"
+msgstr "Impressora d'etiquetes EPL2"
+
+msgid "Edit Configuration File"
+msgstr "Edita el fitxer de configuració"
+
+msgid "Empty PPD file."
+msgstr "El fitxer PPD és buit."
+
+msgid "Encryption is not supported."
+msgstr ""
+
+#. TRANSLATORS: Banner/cover sheet after the print job.
+msgid "Ending Banner"
+msgstr "S'està acabant el bàner"
+
+msgid "English"
+msgstr "Anglès"
+
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Introduïu el vostre nom d'usuari i contrasenya o el nom d'usuari i la "
+"contrasenya de root per accedir a aquesta pàgina. Si feu servir "
+"l'autenticació Kerberos, assegureu-vos de tenir un tiquet Kerberos que sigui "
+"vàlid."
+
+msgid "Envelope #10 "
+msgstr "Sobre #10"
+
+msgid "Envelope #11"
+msgstr "Sobre #11"
+
+msgid "Envelope #12"
+msgstr "Sobre #12"
+
+msgid "Envelope #14"
+msgstr "Sobre #14"
+
+msgid "Envelope #9"
+msgstr "Sobre #9"
+
+msgid "Envelope B4"
+msgstr "Sobre B4"
+
+msgid "Envelope B5"
+msgstr "Sobre B5"
+
+msgid "Envelope B6"
+msgstr "Sobre B6"
+
+msgid "Envelope C0"
+msgstr "Sobre C0"
+
+msgid "Envelope C1"
+msgstr "Sobre C1"
+
+msgid "Envelope C2"
+msgstr "Sobre C2"
+
+msgid "Envelope C3"
+msgstr "Sobre C3"
+
+msgid "Envelope C4"
+msgstr "Sobre C4"
+
+msgid "Envelope C5"
+msgstr "Sobre C5"
+
+msgid "Envelope C6"
+msgstr "Sobre C6"
+
+msgid "Envelope C65"
+msgstr "Sobre C65"
+
+msgid "Envelope C7"
+msgstr "Sobre C7"
+
+msgid "Envelope Choukei 3"
+msgstr "Sobre Choukei 3"
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr "Sobre Choukei 3 costat llarg"
+
+msgid "Envelope Choukei 4"
+msgstr "Sobre Choukei 4"
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr "Sobre Choukei 4 costat llarg"
+
+msgid "Envelope DL"
+msgstr "Sobre DL"
+
+msgid "Envelope Feed"
+msgstr "Alimentació de sobres"
+
+msgid "Envelope Invite"
+msgstr "Sobre d'invitació"
+
+msgid "Envelope Italian"
+msgstr "Sobre italià"
+
+msgid "Envelope Kaku2"
+msgstr "Sobre Kaku2"
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr "Sobre Kaku2 costat llarg"
+
+msgid "Envelope Kaku3"
+msgstr "Sobre Kaku3"
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr "Sobre Kaku3 costat llarg"
+
+msgid "Envelope Monarch"
+msgstr "Sobre monarch"
+
+msgid "Envelope PRC1 "
+msgstr "Sobre PRC1"
+
+msgid "Envelope PRC1 Long Edge"
+msgstr "Sobre PRC1 costat llarg"
+
+msgid "Envelope PRC10"
+msgstr "Sobre PRC10"
+
+msgid "Envelope PRC10 Long Edge"
+msgstr "Sobre PRC10 costat llarg"
+
+msgid "Envelope PRC2"
+msgstr "Sobre PRC2"
+
+msgid "Envelope PRC2 Long Edge"
+msgstr "Sobre PRC2 costat llarg"
+
+msgid "Envelope PRC3"
+msgstr "Sobre PRC3"
+
+msgid "Envelope PRC3 Long Edge"
+msgstr "Sobre PRC3 costat llarg"
+
+msgid "Envelope PRC4"
+msgstr "Sobre PRC4"
+
+msgid "Envelope PRC4 Long Edge"
+msgstr "Sobre PRC4 costat llarg"
+
+msgid "Envelope PRC5 Long Edge"
+msgstr "Sobre PRC5 costat llarg"
+
+msgid "Envelope PRC5PRC5"
+msgstr "Sobre PRC5"
+
+msgid "Envelope PRC6"
+msgstr "Sobre PRC6"
+
+msgid "Envelope PRC6 Long Edge"
+msgstr "Sobre PRC6 costat llarg"
+
+msgid "Envelope PRC7"
+msgstr "Sobre PRC7"
+
+msgid "Envelope PRC7 Long Edge"
+msgstr "Sobre PRC7 costat llarg"
+
+msgid "Envelope PRC8"
+msgstr "Sobre PRC8"
+
+msgid "Envelope PRC8 Long Edge"
+msgstr "Sobre PRC8 costat llarg"
+
+msgid "Envelope PRC9"
+msgstr "Sobre PRC9"
+
+msgid "Envelope PRC9 Long Edge"
+msgstr "Sobre PRC9 costat llarg"
+
+msgid "Envelope Personal"
+msgstr "Sobre personalitzat"
+
+msgid "Envelope You4"
+msgstr "Sobre You4"
+
+msgid "Envelope You4 Long Edge"
+msgstr "Sobre You4 costat llarg"
+
+msgid "Environment Variables:"
+msgstr ""
+
+msgid "Epson"
+msgstr "Epson"
+
+msgid "Error Policy"
+msgstr "Normes d'error"
+
+msgid "Error reading raster data."
+msgstr ""
+
+msgid "Error sending raster data."
+msgstr "S'ha produït un error quan s'enviaven les dades de la trama."
+
+msgid "Error: need hostname after \"-h\" option."
+msgstr "ERROR: es necessita un nom d'amfitrió després de l'opció «-h»."
+
+msgid "Every 10 Labels"
+msgstr "Cada 10 etiquetes"
+
+msgid "Every 2 Labels"
+msgstr "Cada 2 etiquetes"
+
+msgid "Every 3 Labels"
+msgstr "Cada 3 etiquetes"
+
+msgid "Every 4 Labels"
+msgstr "Cada 4 etiquetes"
+
+msgid "Every 5 Labels"
+msgstr "Cada 5 etiquetes"
+
+msgid "Every 6 Labels"
+msgstr "Cada 6 etiquetes"
+
+msgid "Every 7 Labels"
+msgstr "Cada 7 etiquetes"
+
+msgid "Every 8 Labels"
+msgstr "Cada 8 etiquetes"
+
+msgid "Every 9 Labels"
+msgstr "Cada 9 etiquetes"
+
+msgid "Every Label"
+msgstr "Cada etiqueta"
+
+msgid "Executive"
+msgstr "Executiu"
+
+msgid "Expectation Failed"
+msgstr "Ha fallat la condició del valor que s'esperava"
+
+msgid "Export Printers to Samba"
+msgstr "Exportar les impressores al Samba"
+
+msgid "Expressions:"
+msgstr ""
+
+msgid "FAIL"
+msgstr "ERROR"
+
+msgid "FanFold German"
+msgstr "Paper continu alemany"
+
+msgid "FanFold Legal German"
+msgstr "Paper continu legal alemany"
+
+msgid "Fanfold US"
+msgstr "Paper continu americà"
+
+#, c-format
+msgid "File \"%s\" contains a relative path."
+msgstr "El fitxer «%s» conté un camí relatiu."
+
+#, c-format
+msgid "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr "El fitxer «%s» té permisos que no són segurs (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "File \"%s\" is a directory."
+msgstr "El fitxer «%s» és un directori."
+
+#, c-format
+msgid "File \"%s\" not available: %s"
+msgstr "El fitxer «%s» no està disponible: %s"
+
+#, c-format
+msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "El fitxer «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
+
+msgid "File Folder "
+msgstr "Carpeta d'arxivador "
+
+#, c-format
+msgid ""
+"File device URIs have been disabled. To enable, see the FileDevice directive "
+"in \"%s/cups-files.conf\"."
+msgstr ""
+
+#, c-format
+msgid "Finished page %d."
+msgstr "S'ha acabat la pàgina %d."
+
+msgid "Folio"
+msgstr "Foli"
+
+msgid "Forbidden"
+msgstr "Prohibit"
+
+msgid "General"
+msgstr "General"
+
+msgid "Generic"
+msgstr "Genèric"
+
+msgid "Get-Response-PDU uses indefinite length"
+msgstr "La Get-Response-PDU fa servir una longitud indefinida"
+
+msgid "Glossy Paper"
+msgstr "Paper fotogràfic"
+
+msgid "Got a printer-uri attribute but no job-id."
+msgstr "S'ha obtingut l'atribut printer-uri però no el job-id."
+
+msgid "Grayscale"
+msgstr "Escala de grisos"
+
+msgid "HP"
+msgstr "HP"
+
+msgid "Hanging Folder"
+msgstr "Carpeta per penjar"
+
+msgid "Help file not in index."
+msgstr "El fitxer d'ajuda no és a l'índex."
+
+msgid "IPP 1setOf attribute with incompatible value tags."
+msgstr ""
+"L'atribut 1setOf del IPP té etiquetes amb valors que no són compatibles."
+
+msgid "IPP attribute has no name."
+msgstr "L'atribut del IPP no té nom."
+
+msgid "IPP attribute is not a member of the message."
+msgstr "L'atribut del IPP no és membre del missatge."
+
+msgid "IPP begCollection value not 0 bytes."
+msgstr "El valor de begColletion del IPP no té 0 bytes."
+
+msgid "IPP boolean value not 1 byte."
+msgstr "El valor booleà del IPP no té 1 byte."
+
+msgid "IPP date value not 11 bytes."
+msgstr "El valor de date del IPP no té 11 bytes."
+
+msgid "IPP endCollection value not 0 bytes."
+msgstr "El valor de endColletion del IPP no té 0 bytes."
+
+msgid "IPP enum value not 4 bytes."
+msgstr "El valor de enum del IPP no té 4 bytes."
+
+msgid "IPP extension tag larger than 0x7FFFFFFF."
+msgstr "La etiqueta d'extension del IPP és més llarga de 0x7FFFFFFF."
+
+msgid "IPP integer value not 4 bytes."
+msgstr "El valor enter de IPP no té 4 bytes."
+
+msgid "IPP language length overflows value."
+msgstr "El valor de la longitud del llenguatge del IPP desborda."
+
+msgid "IPP language length too large."
+msgstr ""
+
+msgid "IPP member name is not empty."
+msgstr "El nom del membre del IPP no està buit."
+
+msgid "IPP memberName value is empty."
+msgstr "El valor de memberName de l'IPP està buit."
+
+msgid "IPP memberName with no attribute."
+msgstr ""
+
+msgid "IPP name larger than 32767 bytes."
+msgstr "EL nom del IPP és més llarg de 32767 bytes."
+
+msgid "IPP nameWithLanguage value less than minimum 4 bytes."
+msgstr ""
+"El valor de nameWithLanguage del IPP és més petit que el mínim, 4 bytes."
+
+msgid "IPP octetString length too large."
+msgstr ""
+
+msgid "IPP rangeOfInteger value not 8 bytes."
+msgstr "El valor de rangeOfInteger del IPP no té 8 bytes."
+
+msgid "IPP resolution value not 9 bytes."
+msgstr "El valor de resolution del IPP no té 9 bytes."
+
+msgid "IPP string length overflows value."
+msgstr "El valor de la longitud de la cadena del IPP desborda."
+
+msgid "IPP textWithLanguage value less than minimum 4 bytes."
+msgstr ""
+"EL valor de textWithLanguage del IPP és més petit que el mínim, 4 bytes."
+
+msgid "IPP value larger than 32767 bytes."
+msgstr "El valor del IPP és més llarg de 32767 bytes."
+
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
+msgid "Illegal control character"
+msgstr "Caràcter de control no permès"
+
+msgid "Illegal main keyword string"
+msgstr "Cadena de paraula clau principal no permesa"
+
+msgid "Illegal option keyword string"
+msgstr "Cadena de paraula clau d'opció no permesa"
+
+msgid "Illegal translation string"
+msgstr "Cadena de traducció no permesa"
+
+msgid "Illegal whitespace character"
+msgstr "Caràcter d'espai en blanc no permés"
+
+msgid "Installable Options"
+msgstr "Opcions instal·lables"
+
+msgid "Installed"
+msgstr "Instal·lat"
+
+msgid "IntelliBar Label Printer"
+msgstr "Impressora d'etiquetes IntelliBar"
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
+msgid "Internal Server Error"
+msgstr "Error intern del servidor"
+
+msgid "Internal error"
+msgstr "Error intern"
+
+msgid "Internet Postage 2-Part"
+msgstr "Franqueig per Internet en 2 parts"
+
+msgid "Internet Postage 3-Part"
+msgstr "Franqueig per Internet en 3 parts"
+
+msgid "Internet Printing Protocol"
+msgstr "Protocol d'impressió per Internet"
+
+msgid "Invalid media name arguments."
+msgstr ""
+
+msgid "Invalid media size."
+msgstr "Mida del suport no vàlida."
+
+#, c-format
+msgid "Invalid printer command \"%s\"."
+msgstr "La comanda de la impressora «%s» no és vàlida."
+
+msgid "JCL"
+msgstr "Llenguatge de control de tasques (JCL)"
+
+msgid "JIS B0"
+msgstr "JIS B0"
+
+msgid "JIS B1"
+msgstr "JIS B1"
+
+msgid "JIS B10"
+msgstr "JIS B10"
+
+msgid "JIS B2"
+msgstr "JIS B2"
+
+msgid "JIS B3"
+msgstr "JIS B3"
+
+msgid "JIS B4"
+msgstr "JIS B4"
+
+msgid "JIS B4 Long Edge"
+msgstr "JIS B4 costat llarg"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "JIS B5 Long Edge"
+msgstr "JIS B5 costat llarg"
+
+msgid "JIS B6"
+msgstr "JIS B6"
+
+msgid "JIS B6 Long Edge"
+msgstr "JIS B6 costat llarg"
+
+msgid "JIS B7"
+msgstr "JIS B7"
+
+msgid "JIS B8"
+msgstr "JIS B8"
+
+msgid "JIS B9"
+msgstr "JIS B9"
+
+#, c-format
+msgid "Job #%d cannot be restarted - no files."
+msgstr "La feina #%d no es pot tornar a iniciar - no hi ha fitxers."
+
+#, c-format
+msgid "Job #%d does not exist."
+msgstr "La feina #%d no existeix."
+
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "La feina #%d ja s'ha interromput: no es pot cancel·lar."
+
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "La feina #%d ja està cancel·lada: no es pot cancel·lar."
+
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "La feina #%d ja s'ha acabat: no es pot cancel·lar."
+
+#, c-format
+msgid "Job #%d is finished and cannot be altered."
+msgstr "La feina #%d s'ha acabat i no es pot canviar."
+
+#, c-format
+msgid "Job #%d is not complete."
+msgstr "La feina #%d no s'ha acabat."
+
+#, c-format
+msgid "Job #%d is not held for authentication."
+msgstr "La feina #%d no està aturada per ser autenticada."
+
+#, c-format
+msgid "Job #%d is not held."
+msgstr "La feina #%d no està aturada."
+
+msgid "Job Completed"
+msgstr "S'ha acabat la feina"
+
+msgid "Job Created"
+msgstr "S'ha creat la feina"
+
+msgid "Job Options Changed"
+msgstr "S'han canviat les opcions de la feina"
+
+msgid "Job Stopped"
+msgstr "S'ha aturat la feina"
+
+msgid "Job is completed and cannot be changed."
+msgstr "La feina s'ha finalitzat i no es pot canviar."
+
+msgid "Job operation failed"
+msgstr "Ha fallat l'operació de la feina"
+
+msgid "Job state cannot be changed."
+msgstr "L'estat de la feina no es pot canviar."
+
+msgid "Job subscriptions cannot be renewed."
+msgstr "Les subscripcions a les feines no es poden renovar."
+
+msgid "Jobs"
+msgstr "Feines"
+
+msgid "LPD/LPR Host or Printer"
+msgstr "Amfitrió o impressora LPD/LPR"
+
+msgid "Label Printer"
+msgstr "Impressora d'etiquetes"
+
+msgid "Label Top"
+msgstr "Capçalera de l'etiqueta"
+
+#, c-format
+msgid "Language \"%s\" not supported."
+msgstr "L'idioma «%s» no està disponible."
+
+msgid "Large Address"
+msgstr "Adreça gran"
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "Sèrie Laser Jet PCL 4/5"
+
+msgid "Letter Oversize"
+msgstr "Carta gran"
+
+msgid "Letter Oversize Long Edge"
+msgstr "Carta americà gran costat llarg"
+
+msgid "Light"
+msgstr "Lluminós"
+
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "La línia la longitud màxima permesa (255 caràcters)"
+
+msgid "List Available Printers"
+msgstr "Llista les impressores disponibles"
+
+msgid "Load paper."
+msgstr ""
+
+msgid "Long-Edge (Portrait)"
+msgstr "Costat-llarg (vertical)"
+
+msgid "Looking for printer..."
+msgstr ""
+
+msgid "Manual Feed"
+msgstr "Alimentació manual"
+
+msgid "Media Size"
+msgstr "Mida del paper"
+
+msgid "Media Source"
+msgstr "Font del paper"
+
+msgid "Media Tracking"
+msgstr "Seguiment del paper"
+
+msgid "Media Type"
+msgstr "Tipus de paper"
+
+msgid "Medium"
+msgstr "Mitjà"
+
+msgid "Memory allocation error"
+msgstr "S'ha produït un error d'ubicació de memòria"
+
+msgid "Missing CloseGroup"
+msgstr "Falta el CloseGroup"
+
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Falta la capçalera PPD-ADOBE-4.x"
+
+msgid "Missing asterisk in column 1"
+msgstr "Falta un asterisc a la columna 1"
+
+msgid "Missing document-number attribute."
+msgstr "Falta l'atribut document-number."
+
+#, c-format
+msgid "Missing double quote on line %d."
+msgstr "Falta una cometa doble a la línia %d."
+
+msgid "Missing form variable"
+msgstr "Falta una variable del formulari"
+
+msgid "Missing last-document attribute in request."
+msgstr "Falta l'atribut last-document-number a la petició."
+
+msgid "Missing media or media-col."
+msgstr "Falta el media o el media-col."
+
+msgid "Missing media-size in media-col."
+msgstr "Falta el media-size al media-col."
+
+msgid "Missing notify-subscription-ids attribute."
+msgstr "Falta l'atribut notify-subscription-ids."
+
+msgid "Missing option keyword"
+msgstr "Falta l'opció keyword"
+
+msgid "Missing requesting-user-name attribute."
+msgstr "Falta l'atribut requesting-user-name."
+
+msgid "Missing required attributes."
+msgstr "Falten alguns atributs necessaris."
+
+msgid "Missing resource in URI"
+msgstr ""
+
+msgid "Missing scheme in URI"
+msgstr ""
+
+#, c-format
+msgid "Missing value on line %d."
+msgstr "Falta un valor a la línia %d."
+
+msgid "Missing value string"
+msgstr "Falta la cadena de valor"
+
+msgid "Missing x-dimension in media-size."
+msgstr "Falta la mida x a la mida del suport."
+
+msgid "Missing y-dimension in media-size."
+msgstr "Falta la mida y a la mida del suport."
+
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s"
+msgstr ""
+"Model:  nom = %s\n"
+"        idioma_natural = %s\n"
+"        fabricant i model = %s\n"
+"        id del dispositiu = %s"
+
+msgid "Modifiers:"
+msgstr ""
+
+msgid "Modify Class"
+msgstr "Modifica la classe"
+
+msgid "Modify Printer"
+msgstr "Modifica la impressora"
+
+msgid "Move All Jobs"
+msgstr "Mou totes les feines"
+
+msgid "Move Job"
+msgstr "Mou la feina"
+
+msgid "Moved Permanently"
+msgstr "S'ha mogut de manera permanent"
+
+msgid "NULL PPD file pointer"
+msgstr "Punter del fitxer PPD NUL"
+
+msgid "Name OID uses indefinite length"
+msgstr "El nom de l'OID fa servir una longitud indefinida"
+
+msgid "Nested classes are not allowed."
+msgstr "No es permeten les classes imbricades."
+
+msgid "Never"
+msgstr "Mai"
+
+msgid "No"
+msgstr "No"
+
+msgid "No Content"
+msgstr "No hi ha contingut"
+
+msgid "No PPD name"
+msgstr "El PPD no té nom"
+
+msgid "No VarBind SEQUENCE"
+msgstr "No hi ha cap SEQUENCE VarBind"
+
+msgid "No Windows printer drivers are installed."
+msgstr "No hi ha cap controlador d'impressores de Windows instal·lat."
+
+msgid "No active connection"
+msgstr "No hi ha cap connexió activa"
+
+msgid "No active connection."
+msgstr ""
+
+#, c-format
+msgid "No active jobs on %s."
+msgstr "No hi ha cap feina activa a %s."
+
+msgid "No attributes in request."
+msgstr "No hi ha atributs en demanda."
+
+msgid "No authentication information provided."
+msgstr "No s'ha donat cap informació d'autenticació."
+
+msgid "No community name"
+msgstr "Ho hi na cap nom de comunitat"
+
+msgid "No default printer."
+msgstr "No hi ha cap impressora per defecte."
+
+msgid "No destinations added."
+msgstr "No s'ha afegit cap destí."
+
+msgid "No device URI found in argv[0] or in DEVICE_URI environment variable."
+msgstr ""
+"No s'ha trobat cap URI de dispositiu a argv[0] o a la variable d'entorn "
+"DEVICE_URI."
+
+msgid "No error-index"
+msgstr "No hi ca cap error-index"
+
+msgid "No error-status"
+msgstr "No hi ha cap status-error"
+
+msgid "No file in print request."
+msgstr "No hi ha cap printer-uri a la sol·licitud."
+
+msgid "No modification time"
+msgstr "No hi ha hora de modificació"
+
+msgid "No name OID"
+msgstr "No hi ha cap nom d'OID"
+
+msgid "No pages were found."
+msgstr "No s'ha trobat cap pàgina."
+
+msgid "No printer name"
+msgstr "No hi ha cap nom d'impressora"
+
+msgid "No printer-uri found"
+msgstr "No s'ha trobat cap printer-uri"
+
+msgid "No printer-uri found for class"
+msgstr "No s'ha trobat cap printer-uri per la classe"
+
+msgid "No printer-uri in request."
+msgstr "No hi ha cap printer-uri a la sol·licitud."
+
+msgid "No request URI."
+msgstr ""
+
+msgid "No request protocol version."
+msgstr ""
+
+msgid "No request sent."
+msgstr ""
+
+msgid "No request-id"
+msgstr "No hi ha cap request-id"
+
+msgid "No subscription attributes in request."
+msgstr "No hi ha cap atribut de la subscripció a la sol·licitud."
+
+msgid "No subscriptions found."
+msgstr "No s'ha trobat cap sol·licitud."
+
+msgid "No variable-bindings SEQUENCE"
+msgstr "No hi ha cap SEQUENCE variable-bindings"
+
+msgid "No version number"
+msgstr "No hi ha cap número de versió"
+
+msgid "Non-continuous (Mark sensing)"
+msgstr "Discontinu (sensible a les marques)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "Discontinu (Sensible al web)"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "Not Found"
+msgstr "No s'ha trobat"
+
+msgid "Not Implemented"
+msgstr "No implementat"
+
+msgid "Not Installed"
+msgstr "No està instal·lat"
+
+msgid "Not Modified"
+msgstr "No està modificat"
+
+msgid "Not Supported"
+msgstr "No és compatible"
+
+msgid "Not allowed to print."
+msgstr "No teniu permís per imprimir."
+
+msgid "Note"
+msgstr "Nota"
+
+msgid ""
+"Note: this program only validates the DSC comments, not the PostScript "
+"itself."
+msgstr ""
+"Nota: aquest programa només valida els comentaris DSC, no el PostScript."
+
+msgid "OK"
+msgstr "D'acord"
+
+msgid "Off (1-Sided)"
+msgstr "Inactiu (Una cara)"
+
+msgid "Oki"
+msgstr "Oki"
+
+msgid "Online Help"
+msgstr "Ajuda en línia"
+
+#, c-format
+msgid "Open of %s failed: %s"
+msgstr "No s'ha pogut obrir %s: %s"
+
+msgid "OpenGroup without a CloseGroup first"
+msgstr "OpenGroup sense un CloseGroup abans"
+
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "OpenUI/JCLOpenUI sense un CloseUI/JCLCloseUI abans"
+
+msgid "Operation Policy"
+msgstr "Política d'operacions"
+
+#, c-format
+msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
+msgstr "L'opció «%s» no es pot incloure a través de %%%%IncludeFeature."
+
+msgid "Options Installed"
+msgstr "Opcions instal·lades"
+
+msgid "Options:"
+msgstr "Opcions:"
+
+msgid "Out of date PPD cache file."
+msgstr "El fitxer de memòria cau del PPD no està actualitzat."
+
+msgid "Out of memory."
+msgstr "Sense memòria."
+
+msgid "Output Mode"
+msgstr "Mode de sortida"
+
+msgid "Output bin is almost full."
+msgstr ""
+
+msgid "Output bin is full."
+msgstr ""
+
+msgid "Output bin is missing."
+msgstr ""
+
+msgid "PASS"
+msgstr "VÀLID"
+
+msgid "PCL Laser Printer"
+msgstr "Impressora làser PCL"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr "PRC16K costat llarg"
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr "PRC32K costat llarg"
+
+msgid "PRC32K Oversize"
+msgstr "PRC32K gran"
+
+msgid "PRC32K Oversize Long Edge"
+msgstr "PRC32K gran costat llarg"
+
+msgid "Packet does not contain a Get-Response-PDU"
+msgstr "El paquet no conté cap Get-Response-PDU"
+
+msgid "Packet does not start with SEQUENCE"
+msgstr "El paquet no comença amb SEQUENCE"
+
+msgid "Paper jam."
+msgstr ""
+
+msgid "Paper tray is almost empty."
+msgstr ""
+
+msgid "Paper tray is empty."
+msgstr ""
+
+msgid "Paper tray is missing."
+msgstr ""
+
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
+#, c-format
+msgid "Password for %s on %s? "
+msgstr "Contrasenya per %s a %s? "
+
+#, c-format
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "Es necessita la contrasenya de %s per accedir a %s a través de SAMBA: "
+
+msgid "Pause Class"
+msgstr "Posa la classe en pausa"
+
+msgid "Pause Printer"
+msgstr "Posa la impressora en pausa"
+
+msgid "Peel-Off"
+msgstr "Desenganxar"
+
+msgid "Photo"
+msgstr "Fotografia"
+
+msgid "Photo Labels"
+msgstr "Etiquetes de fotografia"
+
+msgid "Plain Paper"
+msgstr "Paper normal"
+
+msgid "Policies"
+msgstr "Polítiques"
+
+msgid "Port Monitor"
+msgstr "Seguiment del port"
+
+msgid "PostScript Printer"
+msgstr "Impressora PostScript"
+
+msgid "Postcard"
+msgstr "Postal"
+
+msgid "Postcard Double "
+msgstr "Postal doble"
+
+msgid "Postcard Double Long Edge"
+msgstr "Postal doble costat llarg"
+
+msgid "Postcard Long Edge"
+msgstr "Postal costat llarg"
+
+msgid "Preparing to print."
+msgstr ""
+
+msgid "Print Density"
+msgstr "Densitat de la impressió"
+
+msgid "Print Job:"
+msgstr "Feina d'impressió:"
+
+msgid "Print Mode"
+msgstr "Mode d'impressió"
+
+msgid "Print Rate"
+msgstr "Ritme d'impressió"
+
+msgid "Print Self-Test Page"
+msgstr "Imprimeix la pàgina de prova pròpia"
+
+msgid "Print Speed"
+msgstr "Velocitat d'impressió"
+
+msgid "Print Test Page"
+msgstr "Imprimeix una pàgina de prova"
+
+msgid "Print and Cut"
+msgstr "Imprimeix i talla"
+
+msgid "Print and Tear"
+msgstr "Imprimeix i estripa"
+
+msgid "Print file sent."
+msgstr "S'ha enviat el fitxer d'impressió."
+
+msgid "Print job canceled at printer."
+msgstr "S'ha cancel·lat la feina a la impressora."
+
+msgid "Print job too large."
+msgstr "La feina d'impressió és massa llarga."
+
+msgid "Print job was not accepted."
+msgstr ""
+
+msgid "Printer Added"
+msgstr "S'ha afegit una impressora"
+
+msgid "Printer Default"
+msgstr "Impressora per defecte"
+
+msgid "Printer Deleted"
+msgstr "S'ha eliminat la impressora"
+
+msgid "Printer Modified"
+msgstr "S'ha modificat la impressora"
+
+msgid "Printer Paused"
+msgstr "S'ha posat la impressora en pausa"
+
+msgid "Printer Settings"
+msgstr "Configuració de la impressora"
+
+msgid "Printer cannot print supplied content."
+msgstr "La impressora no pot imprimir el contingut subministrat."
+
+msgid "Printer cannot print with supplied options."
+msgstr ""
+
+msgid "Printer:"
+msgstr "Impressora:"
+
+msgid "Printers"
+msgstr "Impressores"
+
+#, c-format
+msgid "Printing page %d, %u%% complete."
+msgstr ""
+
+msgid "Quarto"
+msgstr "Quart"
+
+msgid "Quota limit reached."
+msgstr "S'ha assolit el límit de la quota."
+
+msgid "Rank    Owner   Job     File(s)                         Total Size"
+msgstr ""
+"Rang    Propietari   Feina     Fitxer(s)                         Mida total"
+
+msgid "Reject Jobs"
+msgstr "Rebutja feines"
+
+#, c-format
+msgid "Remote host did not accept control file (%d)."
+msgstr "L'amfitrió remot no accepta el fitxer de control (%d)."
+
+#, c-format
+msgid "Remote host did not accept data file (%d)."
+msgstr "L'amfitrió remot no accepta el fitxer de dades (%d)."
+
+msgid "Reprint After Error"
+msgstr "Torna a imprimir després d'un error"
+
+msgid "Request Entity Too Large"
+msgstr "Entitat de petició massa gran"
+
+msgid "Resolution"
+msgstr "Resolució"
+
+msgid "Resume Class"
+msgstr "Reprèn la classe"
+
+msgid "Resume Printer"
+msgstr "Reprèn la impressora"
+
+msgid "Return Address"
+msgstr "Remitent"
+
+msgid "Rewind"
+msgstr "Rebobina"
+
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'"
+msgstr "S'està executant l'ordre: %s %s -N -A %s -c «%s»"
+
+msgid "SEQUENCE uses indefinite length"
+msgstr "SEQUENCE té una longitud indefinida"
+
+msgid "SSL/TLS Negotiation Error"
+msgstr "S'ha produït un error mentre es negociava el SSL/TLS"
+
+msgid "See Other"
+msgstr "Vegeu altres"
+
+msgid "Sending data to printer."
+msgstr "S'envien les dades a la impressora."
+
+msgid "Server Restarted"
+msgstr "S'ha reiniciat el servidor"
+
+msgid "Server Security Auditing"
+msgstr "S'està auditant la seguretat del servidor"
+
+msgid "Server Started"
+msgstr "S'ha iniciat el servidor"
+
+msgid "Server Stopped"
+msgstr "S'ha aturat el servidor"
+
+msgid "Server credentials not set."
+msgstr ""
+
+msgid "Service Unavailable"
+msgstr "El servei no està disponible"
+
+msgid "Set Allowed Users"
+msgstr "Definir els permisos dels usuaris"
+
+msgid "Set As Server Default"
+msgstr "Establir com a servidor per defecte"
+
+msgid "Set Class Options"
+msgstr "Definir les opcions de la classe"
+
+msgid "Set Printer Options"
+msgstr "Definir les opcions de la impressora"
+
+msgid "Set Publishing"
+msgstr "Establir com a pública"
+
+msgid "Shipping Address"
+msgstr "Adreça de lliurament"
+
+msgid "Short-Edge (Landscape)"
+msgstr "Costat curt (horitzontal)"
+
+msgid "Special Paper"
+msgstr "Paper especial"
+
+#, c-format
+msgid "Spooling job, %.0f%% complete."
+msgstr "S'està posant a la cua la feina. S'ha completat el %.0f%%."
+
+msgid "Standard"
+msgstr "Estàndard"
+
+#. TRANSLATORS: Banner/cover sheet before the print job.
+msgid "Starting Banner"
+msgstr "Bàner inicial"
+
+#, c-format
+msgid "Starting page %d."
+msgstr "S'està començant la pàgina %d."
+
+msgid "Statement"
+msgstr "Declaració"
+
+#, c-format
+msgid "Subscription #%d does not exist."
+msgstr "La subscripció #%d no existeix."
+
+msgid "Substitutions:"
+msgstr ""
+
+msgid "Super A"
+msgstr "Super A"
+
+msgid "Super B"
+msgstr "Super B"
+
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
+msgid "Switching Protocols"
+msgstr "Intercanviar els protocols"
+
+msgid "Tabloid"
+msgstr "Tabloide"
+
+msgid "Tabloid Oversize"
+msgstr "Tabloide gran"
+
+msgid "Tabloid Oversize Long Edge"
+msgstr "Tabloide gran costat llarg"
+
+msgid "Tear"
+msgstr "Estripar"
+
+msgid "Tear-Off"
+msgstr "Estripar"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Posició d'ajust d'estripat"
+
+#, c-format
+msgid "The \"%s\" attribute is required for print jobs."
+msgstr ""
+
+#, c-format
+msgid "The %s attribute cannot be provided with job-ids."
+msgstr "No es pot fer servir l'atribut %s amb les job-ids."
+
+#, c-format
+msgid ""
+"The '%s' Job Status attribute cannot be supplied in a job creation request."
+msgstr ""
+
+#, c-format
+msgid ""
+"The '%s' operation attribute cannot be supplied in a Create-Job request."
+msgstr ""
+"L'atribut d'operació «%s» no es pot subministrar en una petició de Create-"
+"Job."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr "No s'ha pogut trobar el fitxer PPD «%s»."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr "No s'ha pogut obrir el fitxer PPD «%s»: %s"
+
+msgid "The PPD file could not be opened."
+msgstr "No s'ha pogut obrir el fitxer PPD."
+
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"El nom de la classe només pot tenir fins a 127 caràcters imprimibles i no "
+"pot contenir espais, barres (/) o el símbol coixinet (#)."
+
+msgid "The developer unit needs to be replaced."
+msgstr "S'ha de canviar la unitat de desenvolupament."
+
+msgid "The developer unit will need to be replaced soon."
+msgstr "La unitat de desenvolupament s'haurà de canviar aviat."
+
+msgid "The fuser's temperature is high."
+msgstr "La temperatura del fusor és alta."
+
+msgid "The fuser's temperature is low."
+msgstr "La temperatura del fusor és baixa."
+
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"No es pot fer servir l'atribut notify-lease-duration amb les subscripcions a "
+"tasques."
+
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)."
+msgstr "El valor de notify-user-data és massa llarg (%d > 63 octets)."
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr "S'ha de canviar el fotoconductor òptic."
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr "El fotoconductor òptic s'haurà de canviar aviat."
+
+msgid "The printer configuration is incorrect or the printer no longer exists."
+msgstr ""
+
+msgid "The printer did not respond."
+msgstr "La impressora no ha respost."
+
+msgid "The printer is in use."
+msgstr "La impressora està ocupada."
+
+msgid "The printer is low on ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr "S'està acabant el tòner de la impressora."
+
+msgid "The printer is not connected."
+msgstr "La impressora no està connectada."
+
+msgid "The printer is not responding."
+msgstr "La impressora no respon."
+
+msgid "The printer is now connected."
+msgstr "Ara la impressora està connectada."
+
+msgid "The printer is now online."
+msgstr "Ara la impressora està en línia."
+
+msgid "The printer is offline."
+msgstr "La impressora està fora de línia."
+
+msgid "The printer is unreachable at this time."
+msgstr "Ara mateix no es pot accedir a la impressora."
+
+msgid "The printer may be out of ink."
+msgstr "Es deu haver acabat la tinta de la impressora."
+
+msgid "The printer may be out of toner."
+msgstr "Es deu haver acabat el tòner de la impressora."
+
+msgid "The printer may not exist or is unavailable at this time."
+msgstr ""
+"Pot ser que la impressora no existeixi o que ara mateix no estigui "
+"accessible."
+
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"El nom de la impressora només pot tenir fins a 127 caràcters imprimibles i "
+"no pot contenir espais, barres (/) o el símbol coixinet (#)."
+
+msgid "The printer or class does not exist."
+msgstr "La impressora o la classe no existeix."
+
+msgid "The printer or class is not shared."
+msgstr "La impressora o la classe no estan compartides."
+
+msgid "The printer's cover is open."
+msgstr "La tapa de la impressora està oberta."
+
+msgid "The printer's door is open."
+msgstr "La porta de la impressora està oberta."
+
+msgid "The printer's interlock is open."
+msgstr "L'enclavament de seguretat de la impressora està obert."
+
+msgid "The printer's waste bin is almost full."
+msgstr "El dipòsit de residus és gairebé ple."
+
+msgid "The printer's waste bin is full."
+msgstr "El dipòsit de residus és ple."
+
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "El printer-uri «%s» conté caràcters no vàlids."
+
+msgid "The printer-uri attribute is required."
+msgstr "L'atribut printer-uri és obligatori."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"El printer-uri ha de tenir la forma «ipp://NOMAMFITRIÓ/classes/NOMCLASSE»."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"El printer-uri ha de tenir la forma «ipp://NOMAMFITRIÓ/printers/"
+"NOMIMPRESSORA»."
+
+msgid ""
+"The subscription name may not contain spaces, slashes (/), question marks "
+"(?), or the pound sign (#)."
+msgstr ""
+"La subscripció no pot contenir espais, barres (/), interrogacions (?), o el "
+"símbol coixinet (#)."
+
+msgid ""
+"The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
+"enable it."
+msgstr ""
+"La interfície web està deshabilitada. Executeu «cupsctl WebInterface=yes» "
+"per habilitar-la."
+
+#, c-format
+msgid "The which-jobs value \"%s\" is not supported."
+msgstr "El valor «%s» de which-jobs no està implementat."
+
+msgid "There are too many subscriptions."
+msgstr "Hi ha massa subscripcions."
+
+msgid "There was an unrecoverable USB error."
+msgstr "Hi ha un error de l'USB irrecuperable."
+
+msgid "Thermal Transfer Media"
+msgstr "Mitjà de transferència tèrmica"
+
+msgid "Too many active jobs."
+msgstr "Hi ha massa tasques actives."
+
+#, c-format
+msgid "Too many job-sheets values (%d > 2)."
+msgstr "Hi ha massa valors de job-sheets (%d > 2)."
+
+#, c-format
+msgid "Too many printer-state-reasons values (%d > %d)."
+msgstr "Hi ha massa valors de printer-state-reasons (%d > %d)."
+
+msgid "Transparency"
+msgstr "Transparència"
+
+msgid "Tray"
+msgstr "Safata"
+
+msgid "Tray 1"
+msgstr "Safata 1"
+
+msgid "Tray 2"
+msgstr "Safata 2"
+
+msgid "Tray 3"
+msgstr "Safata 3"
+
+msgid "Tray 4"
+msgstr "Safata 4"
+
+msgid "URI Too Long"
+msgstr "L'URI és massa llarg"
+
+msgid "URI too large"
+msgstr ""
+
+msgid "US Ledger"
+msgstr "Llibre major americà"
+
+msgid "US Legal"
+msgstr "Legal americà"
+
+msgid "US Legal Oversize"
+msgstr "Legal americà gran"
+
+msgid "US Letter"
+msgstr "Carta americà"
+
+msgid "US Letter Long Edge"
+msgstr "Carta americà costat llarg"
+
+msgid "US Letter Oversize"
+msgstr "Carta americà gran"
+
+msgid "US Letter Oversize Long Edge"
+msgstr "Carta americà gran costat llarg"
+
+msgid "US Letter Small"
+msgstr "Carta americà petit"
+
+msgid "Unable to access cupsd.conf file"
+msgstr "No es pot accedir al fitxer cups.conf"
+
+msgid "Unable to access help file."
+msgstr "No es pot accedir al fitxer d'ajuda."
+
+msgid "Unable to add RSS subscription"
+msgstr "No es pot afegir la subscripció RSS"
+
+msgid "Unable to add class"
+msgstr "No es pot afegir la classe"
+
+msgid "Unable to add document to print job."
+msgstr "No es pot obrir el documenta la feina."
+
+#, c-format
+msgid "Unable to add job for destination \"%s\"."
+msgstr "No es pot afegir la feina al destí «%s»."
+
+msgid "Unable to add printer"
+msgstr "No es pot afegir la impressora"
+
+msgid "Unable to allocate memory for file types."
+msgstr "No es pot assignar la memòria pels tipus de fitxers."
+
+msgid "Unable to allocate memory for page info"
+msgstr "No s'ha pogut assignar memòria per la pàgina d'informació"
+
+msgid "Unable to allocate memory for pages array"
+msgstr "No s'ha pogut assignar memòria per la matriu de pàgines"
+
+msgid "Unable to cancel RSS subscription"
+msgstr "No es pot cancel·lar la subscripció RSS"
+
+msgid "Unable to cancel print job."
+msgstr "No es pot cancel·lar la feina d'impressió."
+
+msgid "Unable to change printer"
+msgstr "No es pot canviar la impressora"
+
+msgid "Unable to change printer-is-shared attribute"
+msgstr "No es pot canviar l'atribut printer-is-shared"
+
+msgid "Unable to change server settings"
+msgstr "No es pot canviar la configuració del servidor"
+
+#, c-format
+msgid "Unable to compile mimeMediaType regular expression: %s."
+msgstr ""
+
+#, c-format
+msgid "Unable to compile naturalLanguage regular expression: %s."
+msgstr ""
+
+msgid "Unable to configure printer options."
+msgstr "No es poden configurar les opcions de la impressora."
+
+msgid "Unable to connect to host."
+msgstr "No es pot connectar a l'amfitrió."
+
+msgid "Unable to contact printer, queuing on next printer in class."
+msgstr ""
+"No es pot contactar amb la impressora. Es posa a la cua de la següent "
+"impressora de la classe."
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+msgstr ""
+"No es poden copiar els fitxers del controlador d'impressora CUPS de 64 bits "
+"(%d)."
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+msgstr ""
+"No es poden copiar els fitxers del controlador d'impressora Windows de 64 "
+"bits (%d)."
+
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)."
+msgstr "No es poden copiar els fitxers del controlador d'impressora CUPS (%d)."
+
+#, c-format
+msgid "Unable to copy PPD file - %s"
+msgstr "No es pot copiar el fitxer PPD - %s"
+
+msgid "Unable to copy PPD file."
+msgstr "No es pot copiar el fitxer PPD."
+
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)."
+msgstr ""
+"No es poden copiar els fitxers del controlador d'impressora Windows 2000 "
+"(%d)."
+
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)."
+msgstr ""
+"No es poden copiar els fitxers del controlador d'impressora Windows 9x (%d)."
+
+#, c-format
+msgid "Unable to copy interface script - %s"
+msgstr "No es pot copiar l'script de la interfície - %s"
+
+msgid "Unable to create printer-uri"
+msgstr "No es pot crear el printer-uri"
+
+msgid "Unable to create server credentials."
+msgstr ""
+
+msgid "Unable to create temporary file"
+msgstr "No es pot crear el fitxer temporal"
+
+msgid "Unable to delete class"
+msgstr "No es pot esborrar la classe"
+
+msgid "Unable to delete printer"
+msgstr "No es pot esborrar la impressora"
+
+msgid "Unable to do maintenance command"
+msgstr "No es pot executar la comanda de manteniment"
+
+msgid "Unable to edit cupsd.conf files larger than 1MB"
+msgstr "No es poden editar fitxers cupsd.conf més grans d'1MB"
+
+msgid ""
+"Unable to establish a secure connection to host (certificate chain invalid)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (la cadena del "
+"certificat no és vàlida)."
+
+msgid ""
+"Unable to establish a secure connection to host (certificate not yet valid)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (el certificat "
+"encara no és vàlid)."
+
+msgid "Unable to establish a secure connection to host (expired certificate)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (ha expirat el "
+"certificat)."
+
+msgid "Unable to establish a secure connection to host (host name mismatch)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (hi ha un error en "
+"el nom de l'amfitrió)."
+
+msgid ""
+"Unable to establish a secure connection to host (peer dropped connection "
+"before responding)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (s'ha tallat la "
+"connexió abans de respondre)."
+
+msgid ""
+"Unable to establish a secure connection to host (self-signed certificate)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (el certificat és "
+"autosignat)."
+
+msgid ""
+"Unable to establish a secure connection to host (untrusted certificate)."
+msgstr ""
+"No s'ha pogut establir una connexió segura amb l'amfitrió (el certificat no "
+"és de confiança)."
+
+msgid "Unable to establish a secure connection to host."
+msgstr "No es pot establir una connexió segura amb l'amfitrió."
+
+msgid "Unable to find destination for job"
+msgstr "No es pot trobar el destí de la feina"
+
+msgid "Unable to find printer."
+msgstr "No es pot trobar la impressora."
+
+msgid "Unable to find server credentials."
+msgstr ""
+
+msgid "Unable to get backend exit status."
+msgstr "No es pot obtenir el motiu de la sortida de l'execució en segon pla"
+
+msgid "Unable to get class list"
+msgstr "No es pot obtenir la llista de classes"
+
+msgid "Unable to get class status"
+msgstr "No es pot obtenir l'estat de la classe"
+
+msgid "Unable to get list of printer drivers"
+msgstr "No es pot obtenir la llista dels controladors d'impressora"
+
+msgid "Unable to get printer attributes"
+msgstr "No es poden obtenir els atributs de la impressora"
+
+msgid "Unable to get printer list"
+msgstr "No es pot obtenir la llista d'impressores"
+
+msgid "Unable to get printer status"
+msgstr "No es pot obtenir l'estat de la impressora"
+
+msgid "Unable to get printer status."
+msgstr "No es pot obtenir l'estat de la impressora."
+
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)."
+msgstr ""
+"No es poden instal·lar els fitxers del controlador d'impressores per Windows "
+"2000 (%d)."
+
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)."
+msgstr ""
+"No es poden instal·lar els fitxers del controlador d'impressores per Windows "
+"9x (%d)."
+
+msgid "Unable to load help index."
+msgstr "No es pot carregar l'índex de l'ajuda."
+
+#, c-format
+msgid "Unable to locate printer \"%s\"."
+msgstr "No es pot ubicar la impressora «%s»."
+
+msgid "Unable to locate printer."
+msgstr "No es pot ubicar la impressora."
+
+msgid "Unable to modify class"
+msgstr "No es pot modificar la classe"
+
+msgid "Unable to modify printer"
+msgstr "No es pot modificar la impressora"
+
+msgid "Unable to move job"
+msgstr "No es pot moure la feina"
+
+msgid "Unable to move jobs"
+msgstr "No es poden moure les tasques"
+
+msgid "Unable to open PPD file"
+msgstr "No es pot obrir el fitxer PPD"
+
+msgid "Unable to open cupsd.conf file:"
+msgstr "No es pot obrir el fitxer cups.conf"
+
+msgid "Unable to open device file"
+msgstr "No es pot obrir el fitxer de dispositiu"
+
+#, c-format
+msgid "Unable to open document #%d in job #%d."
+msgstr "No es pot obrir el document #%d a la feina #%d."
+
+msgid "Unable to open help file."
+msgstr "No es pot obrir el fitxer d'impressió."
+
+msgid "Unable to open print file"
+msgstr "No es pot obrir el fitxer d'impressió"
+
+msgid "Unable to open raster file"
+msgstr "No es pot obrir el fitxer de trama"
+
+msgid "Unable to print test page"
+msgstr "No es pot imprimir la pàgina de prova"
+
+msgid "Unable to read print data."
+msgstr "No es poden llegir les dades d'impressió."
+
+msgid "Unable to rename job document file."
+msgstr ""
+
+msgid "Unable to resolve printer-uri."
+msgstr ""
+
+#, c-format
+msgid "Unable to run \"%s\": %s"
+msgstr "No es pot executar «%s»: %s"
+
+msgid "Unable to see in file"
+msgstr "No es pot veure al fitxer"
+
+msgid "Unable to send command to printer driver"
+msgstr "No es pot enviar la comanda al controlador de la impressora"
+
+msgid "Unable to send data to printer."
+msgstr "No es poden enviar dades a la impressora."
+
+#, c-format
+msgid "Unable to set Windows printer driver (%d)."
+msgstr "No es pot configurar el controlador d'impressores per Windows (%d)"
+
+msgid "Unable to set options"
+msgstr "No es poden configurar les opcions"
+
+msgid "Unable to set server default"
+msgstr "No es pot posar la configuració per defecte al servidor"
+
+msgid "Unable to start backend process."
+msgstr "No es pot iniciar el procés en segon pla."
+
+msgid "Unable to upload cupsd.conf file"
+msgstr "No es pot penjar el fitxer cups.conf"
+
+msgid "Unable to use legacy USB class driver."
+msgstr "No es pot fer servir el controlador de la classe USB antic."
+
+msgid "Unable to write print data"
+msgstr "No es poden escriure les dades d'impressió"
+
+#, c-format
+msgid "Unable to write uncompressed print data: %s"
+msgstr "No es poden escriure les dades sense comprimir: %s"
+
+msgid "Unauthorized"
+msgstr "No autoritzat"
+
+msgid "Units"
+msgstr "Unitats"
+
+msgid "Unknown"
+msgstr "Desconegut"
+
+#, c-format
+msgid "Unknown choice \"%s\" for option \"%s\"."
+msgstr "La tria de «%s» per l'opció «%s» és desconeguda."
+
+#, c-format
+msgid "Unknown encryption option value: \"%s\"."
+msgstr "El valor de l'opció de xifrat «%s» és desconegut."
+
+#, c-format
+msgid "Unknown file order: \"%s\"."
+msgstr "Ordre desconegut del fitxer: «%s»."
+
+#, c-format
+msgid "Unknown format character: \"%c\"."
+msgstr "Format del caràcter desconegut: «%c»."
+
+msgid "Unknown media size name."
+msgstr "El nom de la mida del suport no és conegut."
+
+#, c-format
+msgid "Unknown option \"%s\" with value \"%s\"."
+msgstr "L'opció «%s» amb valor «%s» és desconeguda."
+
+#, c-format
+msgid "Unknown option \"%s\"."
+msgstr "L'opció «%s» és desconeguda."
+
+#, c-format
+msgid "Unknown print mode: \"%s\"."
+msgstr "El mode d'impressió «%s» és desconegut."
+
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "El paràmetre printer-error-policy «%s» és desconegut."
+
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "El paràmetre printer-op-policy «%s» és desconegut."
+
+msgid "Unknown request method."
+msgstr ""
+
+msgid "Unknown request version."
+msgstr ""
+
+msgid "Unknown scheme in URI"
+msgstr ""
+
+msgid "Unknown service name."
+msgstr "El nom del servei és desconegut."
+
+#, c-format
+msgid "Unknown version option value: \"%s\"."
+msgstr "El valor de l'opció de la versió és desconegut: «%s»."
+
+#, c-format
+msgid "Unsupported 'compression' value \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "Unsupported 'document-format' value \"%s\"."
+msgstr ""
+
+msgid "Unsupported 'job-name' value."
+msgstr ""
+
+#, c-format
+msgid "Unsupported character set \"%s\"."
+msgstr "No s'admet el grup de caràcters «%s»."
+
+#, c-format
+msgid "Unsupported compression \"%s\"."
+msgstr "No s'admet la compressió «%s»."
+
+#, c-format
+msgid "Unsupported document-format \"%s\"."
+msgstr "No s'admet el document-format «%s»."
+
+#, c-format
+msgid "Unsupported document-format \"%s/%s\"."
+msgstr "No s'admet el document-format «%s/%s»."
+
+#, c-format
+msgid "Unsupported format \"%s\"."
+msgstr "No s'admet el format «%s»."
+
+msgid "Unsupported margins."
+msgstr "No s'admeten els marges."
+
+msgid "Unsupported media value."
+msgstr "No s'admet el valor del suport."
+
+#, c-format
+msgid "Unsupported number-up value %d, using number-up=1."
+msgstr "No s'admet el valor %d a number-up. Es fa servir number-up=1."
+
+#, c-format
+msgid "Unsupported number-up-layout value %s, using number-up-layout=lrtb."
+msgstr ""
+"No s'admet el valor %s a number-up-layout. Es fa servir number-up-"
+"layout=lrtb."
+
+#, c-format
+msgid "Unsupported page-border value %s, using page-border=none."
+msgstr "No s'admet el valor %s a page-border. Es fa servir page-border=none."
+
+msgid "Unsupported raster data."
+msgstr "No s'admet les dades en trama."
+
+msgid "Unsupported value type"
+msgstr "El tipus de valor no és compatible"
+
+msgid "Upgrade Required"
+msgstr "S'ha d'actualitzar"
+
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]"
+msgstr ""
+"Sintaxi:\n"
+"\n"
+"    lpadmin [-h servidor] -d destí\n"
+"    lpadmin [-h servidor] -x destí\n"
+"    lpadmin [-h servidor] -p impressora [-c afegir-classe] [-i interfície] [-"
+"m model]\n"
+"                       [-r eliminar-classe] [-v dispositiu] [-D descripció]\n"
+"                       [-P fitxer-ppd] [-o nom=valor]\n"
+"                       [-u allow:usuari,usuari] [-u deny:usuari,usuari]"
+
+#, c-format
+msgid "Usage: %s job-id user title copies options [file]"
+msgstr "Sintaxi: %s id-feina usuari títol còpies opcions [fitxer]"
+
+msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+msgstr "Sintaxi: cupsaddsmb [opcions] impressora1 ... impressoraN"
+
+msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
+msgstr "Sintaxi: cupsctl [opcions] [param=valor ... paramN=valorN]"
+
+msgid "Usage: cupsd [options]"
+msgstr "Sintaxi: cupsd [opcions]"
+
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
+
+msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+msgstr "Sintaxi: cupstestdsc [opcions] nomfitxer.ps [...nomfitxer.ps]"
+
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+msgstr ""
+"Sintaxi: cupstestppd [opcions] nomfitxer1.ppd[.gz] [... nomfitxerN.ppd[.gz]]"
+
+msgid ""
+"Usage: ippdiscover [options] -a\n"
+"       ippdiscover [options] \"service name\"\n"
+"\n"
+"Options:"
+msgstr ""
+
+msgid ""
+"Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
+"       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
+"       ippfind --help\n"
+"       ippfind --version"
+msgstr ""
+
+msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
+msgstr "Sintaxi: ipptool [opcions] URI nomfitxer[ ... nomfitxerN]"
+
+msgid "Usage: lpmove job/src dest"
+msgstr "Sintaxi: lpmove feina/font destí"
+
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer"
+msgstr ""
+"Sintaxi: lpoptions [-h servidor] [-E] -d impressora\n"
+"         lpoptions [-h servidor] [-E] [-p impressora] -l\n"
+"         lpoptions [-h servidor] [-E] -p impressora -o opció[=valor] ...\n"
+"         lpoptions [-h servidor] [-E] -x impressora"
+
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+msgstr ""
+"Sintaxi: lpq [-P destí] [-U nomusuari] [-h nomamfitrió[:port]] [-l] "
+"[+interval]"
+
+msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
+msgstr "Sintaxi: ppdc [opcions] nomfitxer.rv [ ... nomfitxerN.drv ]"
+
+msgid "Usage: ppdhtml [options] filename.drv >filename.html"
+msgstr "Sintaxi: ppdhtml [opcions] nomfitxer.drv >nomfitxer.html"
+
+msgid "Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Sintaxi: ppdi [opcions] nomfitxer.ppd [ ... nomfitxerN.ppd ]"
+
+msgid "Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Sintaxi: ppdmerge [opcions] nomfitxer.ppd [ ... nomfitxerN.ppd ]"
+
+msgid ""
+"Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
+msgstr ""
+"Sintaxi: ppdpo [opcions] -o nomfitxer.po nomfitxer.drv [ ... nomfitxerN.drv]"
+
+msgid "Usage: snmp [host-or-ip-address]"
+msgstr "Sintaxi: snmp [adreça-amfitrió-o-ip]"
+
+msgid "Value uses indefinite length"
+msgstr "El valor té una longitud indefinida"
+
+msgid "VarBind uses indefinite length"
+msgstr "VarBind té una longitud indefinida"
+
+msgid "Version uses indefinite length"
+msgstr "Version té una longitud indefinida"
+
+msgid "Waiting for job to complete."
+msgstr "S'està esperant que acabi la feina."
+
+msgid "Waiting for printer to become available."
+msgstr "S'està esperant que la impressora estigui disponible."
+
+msgid "Waiting for printer to finish."
+msgstr "S'està esperant que la impressora acabi."
+
+msgid "Warning, no Windows 2000 printer drivers are installed."
+msgstr "AVÍS. No hi ha cap controlador per Windows 2000 instal·lat."
+
+msgid "Web Interface is Disabled"
+msgstr "La interfície web està deshabilitada"
+
+msgid "Yes"
+msgstr "Sí"
+
+#, c-format
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://"
+"%s:%d%s</A>."
+msgstr ""
+"Heu d'accedir a aquesta pagina a través de la URL <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A>."
+
+msgid "ZPL Label Printer"
+msgstr "Impressora d'etiquetes ZPL"
+
+msgid "Zebra"
+msgstr "Zebra"
+
+msgid "aborted"
+msgstr "interromput"
+
+msgid "canceled"
+msgstr "cancel·lat"
+
+msgid "completed"
+msgstr "completat"
+
+msgid "cups-deviced failed to execute."
+msgstr "no s'ha pogut executar correctament la cups-deviced."
+
+msgid "cups-driverd failed to execute."
+msgstr "no s'ha pogut executar correctament la cups-driverd"
+
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+msgstr "cupsaddsmb: falta el fitxer PPD per la impressora «%s» - %s"
+
+msgid "cupsctl: Cannot set Listen or Port directly."
+msgstr "cupsctl: no es pot establir Listen o Port directament."
+
+#, c-format
+msgid "cupsctl: Unable to connect to server: %s"
+msgstr "cupsctl: no es pot connectar al servidor: %s"
+
+#, c-format
+msgid "cupsctl: Unknown option \"%s\""
+msgstr "cupsctl: l'opció «%s» és desconeguda"
+
+#, c-format
+msgid "cupsctl: Unknown option \"-%c\""
+msgstr "cupsctl: l'opció «-%c» és desconeguda"
+
+msgid "cupsd: Expected config filename after \"-c\" option."
+msgstr ""
+"cupsd: s'esperava un nom de fitxer de configuració després de l'opció «-c»."
+
+msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
+msgstr ""
+
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
+msgid "cupsd: Relative cups-files.conf filename not allowed."
+msgstr ""
+
+msgid "cupsd: Unable to get current directory."
+msgstr "cupsd: No es pot obtenir el directori actual."
+
+msgid "cupsd: Unable to get path to cups-files.conf file."
+msgstr ""
+
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting."
+msgstr "cupsd: l'argument «%s» és desconegut - s'interromp."
+
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting."
+msgstr "cupsd: l'opció «%c» és desconeguda - s'interromp."
+
+#, c-format
+msgid "cupsfilter: Invalid document number %d."
+msgstr "cupsfilter: el document número %d no és vàlid."
+
+#, c-format
+msgid "cupsfilter: Invalid job ID %d."
+msgstr "cupsfilter: la feina %d no és vàlida."
+
+msgid "cupsfilter: Only one filename can be specified."
+msgstr "cupsfilter: només es pot especificar un nom de fitxer."
+
+#, c-format
+msgid "cupsfilter: Unable to get job file - %s"
+msgstr "cupsfilter: no es pot obtenir el fitxer de la feina - %s"
+
+msgid "cupstestppd: The -q option is incompatible with the -v option."
+msgstr "cupstestppd: l'opció -q no és compatible amb l'opció -v."
+
+msgid "cupstestppd: The -v option is incompatible with the -q option."
+msgstr "cupstestppd: l'opció -v no és compatible amb l'opció -q."
+
+#, c-format
+msgid "device for %s/%s: %s"
+msgstr "dispositiu per %s/%s: %s"
+
+#, c-format
+msgid "device for %s: %s"
+msgstr "dispositiu per %s: %s"
+
+msgid "error-index uses indefinite length"
+msgstr "error-index fa servir una longitud indefinida"
+
+msgid "error-status uses indefinite length"
+msgstr "error-status fa servir una longitud indefinida"
+
+msgid "held"
+msgstr "En pausa"
+
+msgid "help\t\tGet help on commands."
+msgstr "help\t\tproporciona ajuda sobre les comandes."
+
+msgid "idle"
+msgstr "inactiva"
+
+#, c-format
+msgid "ippfind: Bad regular expression: %s"
+msgstr ""
+
+msgid "ippfind: Cannot use --and after --or."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected key name after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected port range after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Missing close brace in substitution."
+msgstr ""
+
+msgid "ippfind: Missing close parenthesis."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--and\"."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--or\"."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing key name after %s."
+msgstr ""
+
+msgid "ippfind: Missing open parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing regular expression after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Out of memory."
+msgstr ""
+
+msgid "ippfind: Too many parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to browse or resolve: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to execute \"%s\": %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to use Bonjour: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unknown variable \"{%s}\"."
+msgstr ""
+
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
+msgstr ""
+
+#, c-format
+msgid "ipptool: Bad URI - %s."
+msgstr "ipptool: l'URI no es correcte - %s."
+
+msgid "ipptool: Invalid seconds for \"-i\"."
+msgstr "ipptool: els segons de «-i» no són correctes."
+
+msgid "ipptool: May only specify a single URI."
+msgstr "ipptool: heu d'especificar només un URI."
+
+msgid "ipptool: Missing count for \"-n\"."
+msgstr "ipptool: falta el comptador de «-n»."
+
+msgid "ipptool: Missing filename for \"-f\"."
+msgstr "ipptool: falta el nom del fitxer a «-f»."
+
+msgid "ipptool: Missing name=value for \"-d\"."
+msgstr "ipptool: falta nom=valor a «-d»."
+
+msgid "ipptool: Missing seconds for \"-i\"."
+msgstr "ipptool: falten els segons a «-i»."
+
+msgid "ipptool: URI required before test file."
+msgstr "ipptool: falta l'URI abans del fitxer de prova."
+
+#, c-format
+msgid "ipptool: Unknown option \"-%c\"."
+msgstr "ipptool: l'opció «-%c» és desconeguda."
+
+msgid "job-printer-uri attribute missing."
+msgstr "Falta l'atribut de job-printer-uri."
+
+msgid "lpadmin: Class name can only contain printable characters."
+msgstr "lpadmin: el nom de la classe només pot tenir caràcters imprimibles."
+
+msgid "lpadmin: Expected PPD after \"-P\" option."
+msgstr "lpadmin: s'esperava un PPD després de l'opció «-P»."
+
+msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
+msgstr "lpadmin: s'esperava allow/deny:llistausuaris després de l'opció «-u»."
+
+msgid "lpadmin: Expected class after \"-r\" option."
+msgstr "lpadmin: s'esperava una classe després de l'opció «-r»."
+
+msgid "lpadmin: Expected class name after \"-c\" option."
+msgstr "lpadmin: s'esperava un nom de classe després de l'opció «-c»."
+
+msgid "lpadmin: Expected description after \"-D\" option."
+msgstr "lpadmin: s'esperava una descripció després de l'opció «-D»."
+
+msgid "lpadmin: Expected device URI after \"-v\" option."
+msgstr "lpadmin: s'esperava un URI de dispositiu després de l'opció «-v»."
+
+msgid "lpadmin: Expected file type(s) after \"-I\" option."
+msgstr "lpadmin: s'esperava un(s) tipus de fitxer(s) després de l'opció «-I»."
+
+msgid "lpadmin: Expected hostname after \"-h\" option."
+msgstr "lpadmin: s'esperava un nom d'amfitrió després de l'opció «-h»."
+
+msgid "lpadmin: Expected interface after \"-i\" option."
+msgstr "lpadmin: s'esperava una interfície després de l'opció «-i»."
+
+msgid "lpadmin: Expected location after \"-L\" option."
+msgstr "lpadmin: s'esperava una ubicació després de l'opció «-L»."
+
+msgid "lpadmin: Expected model after \"-m\" option."
+msgstr "lpadmin: s'esperava un model després de l'opció «-m»."
+
+msgid "lpadmin: Expected name after \"-R\" option."
+msgstr "lpadmin: s'esperava un nom després de l'opció «-R»."
+
+msgid "lpadmin: Expected name=value after \"-o\" option."
+msgstr "lpadmin: s'esperava nom=valor després de l'opció «-o»."
+
+msgid "lpadmin: Expected printer after \"-p\" option."
+msgstr "lpadmin: s'esperava una impressora després de l'opció «-p»."
+
+msgid "lpadmin: Expected printer name after \"-d\" option."
+msgstr "lpadmin: s'esperava un nom d'impressora després de l'opció «-d»."
+
+msgid "lpadmin: Expected printer or class after \"-x\" option."
+msgstr "lpadmin: s'esperava un impressora o classe després de l'opció «-x»."
+
+msgid "lpadmin: No member names were seen."
+msgstr "lpadmin: no s'ha trobat cap nom de membre."
+
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s."
+msgstr "lpadmin: la impressora %s ja és membre de la classe %s."
+
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s."
+msgstr "lpadmin: la impressora %s no és membre de la classe %s."
+
+msgid "lpadmin: Printer name can only contain printable characters."
+msgstr ""
+"lpadmin: el nom de la impressora només pot contenir caràcters imprimibles."
+
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: no s'ha pogut afegir una impressora a la classe:\n"
+"         Heu d'especificar primer un nom d'impressora."
+
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s"
+msgstr "lpadmin: no s'ha pogut connectar al servidor: %s"
+
+msgid "lpadmin: Unable to create temporary file"
+msgstr "lpadmin: no s'ha pogut crear el fitxer temporal"
+
+msgid ""
+"lpadmin: Unable to delete option:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: no s'ha pogut esborrar l'opció:\n"
+"         Heu d'especificar primer un nom d'impressora."
+
+#, c-format
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgstr ""
+
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+msgstr "lpadmin: no s'ha pogut obrir el fitxer PPD «%s» - %s"
+
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: no es pot esborrar una impressora de la classe:\n"
+"         Heu d'especificar primer un nom d'impressora."
+
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: no es pot establir les opcions de la impressora:\n"
+"         Heu d'especificar primer un nom d'impressora."
+
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"."
+msgstr "lpadmin: l'opció allow/deny «%s» és desconeguda."
+
+#, c-format
+msgid "lpadmin: Unknown argument \"%s\"."
+msgstr "lpadmin: l'argument «%s» és desconegut."
+
+#, c-format
+msgid "lpadmin: Unknown option \"%c\"."
+msgstr "lpadmin: l'opció «%c» és desconeguda."
+
+msgid "lpadmin: Warning - content type list ignored."
+msgstr "lpadmin: avís - s'ignora el contingut de la llista de tipus."
+
+msgid "lpc> "
+msgstr "lpc> "
+
+msgid "lpinfo: Expected 1284 device ID string after \"--device-id\"."
+msgstr ""
+"lpinfo: s'esperava una cadena d'ID de dispositiu 1284 després de «--device-"
+"id»."
+
+msgid "lpinfo: Expected language after \"--language\"."
+msgstr "lpinfo: s'esperava un idioma després de «--language»."
+
+msgid "lpinfo: Expected make and model after \"--make-and-model\"."
+msgstr "lpinfo: s'esperava una marca i model després de «--make-and-model»."
+
+msgid "lpinfo: Expected product string after \"--product\"."
+msgstr "lpinfo: s'esperava una cadena de producte després de «--product!»."
+
+msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
+msgstr ""
+"lpinfo: s'esperava una llista d'esquemes després de l'opció «--exclude-"
+"schemes»."
+
+msgid "lpinfo: Expected scheme list after \"--include-schemes\"."
+msgstr ""
+"lpinfo: s'esperava una llista d'esquemes després de l'opció «--include-"
+"schemes»."
+
+msgid "lpinfo: Expected timeout after \"--timeout\"."
+msgstr "lpinfo: s'esperava un temps d'espera després de «--timeout»."
+
+#, c-format
+msgid "lpinfo: Unknown argument \"%s\"."
+msgstr "lpinfo: l'argument «%s» és desconegut."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%c\"."
+msgstr "lpinfo: l'opció «%c» és desconeguda."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%s\"."
+msgstr "lpinfo: l'opció «%s» és desconeguda."
+
+#, c-format
+msgid "lpmove: Unable to connect to server: %s"
+msgstr "lpmove: no s'ha pogut connectar al servidor: %s"
+
+#, c-format
+msgid "lpmove: Unknown argument \"%s\"."
+msgstr "lpmove: l'argument «%s» és desconegut."
+
+#, c-format
+msgid "lpmove: Unknown option \"%c\"."
+msgstr "lpmove: l'opció «%c» és desconeguda."
+
+msgid "lpoptions: No printers."
+msgstr "lpoptions: no hi ha cap impressora."
+
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s"
+msgstr "lpoptions: no s'ha pogut afegir la impressora o la instància: %s"
+
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s"
+msgstr "lpoptions: no s'ha pogut obtenir el fitxer PPD de %s: %s"
+
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s."
+msgstr "lpoptions: no s'ha pogut obrir el fitxer PPD per %s."
+
+msgid "lpoptions: Unknown printer or class."
+msgstr "lpoptions: la impressora o la classe són desconegudes."
+
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"."
+msgstr ""
+"lpstat: error - la variable d'entorn %s esmenta el destí «%s» que no "
+"existeix."
+
+#, c-format
+msgid "members of class %s:"
+msgstr "membres de la classe %s:"
+
+msgid "no entries"
+msgstr "no hi ha cap entrada"
+
+msgid "no system default destination"
+msgstr "no hi ha cap destí per defecte"
+
+msgid "notify-events not specified."
+msgstr "no s'ha especificat cap notify-events."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" is already used."
+msgstr "L'URI de notify-recipient-uri «%s» ja s'ha fet servir."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
+msgstr "L'URI de notify-recipient-uri «%s» fa servir un esquema desconegut."
+
+msgid "pending"
+msgstr "pendent"
+
+#, c-format
+msgid "ppdc: Adding include directory \"%s\"."
+msgstr "ppdc: s'afegeix el directori inclòs «%s»."
+
+#, c-format
+msgid "ppdc: Adding/updating UI text from %s."
+msgstr "ppdc: s'afegeix/actualitza el text de l'UI des de %s."
+
+#, c-format
+msgid "ppdc: Bad boolean value (%s) on line %d of %s."
+msgstr "ppdc: valor booleà incorrecte (%s) a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Bad font attribute: %s"
+msgstr "ppdc: l'atribut del tipus de lletra és incorrecte: %s"
+
+#, c-format
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s."
+msgstr "ppdc: el nom de resolució «%s» de la línia %d de %s és incorrecte."
+
+#, c-format
+msgid "ppdc: Bad status keyword %s on line %d of %s."
+msgstr "ppdc: la paraula clau d'estat %s de la línia %d de %s és incorrecta."
+
+#, c-format
+msgid "ppdc: Bad variable substitution ($%c) on line %d of %s."
+msgstr ""
+"ppdc: la variable de substitució ($%c) de la línia %d de %s és incorrecta."
+
+#, c-format
+msgid "ppdc: Choice found on line %d of %s with no Option."
+msgstr "ppdc: s'ha trobat una elecció a la línia %d de %s sense cap opció."
+
+#, c-format
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s."
+msgstr "ppdc: #po duplicat per l'idioma %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected a filter definition on line %d of %s."
+msgstr "ppdc: s'esperava una definició de filtre a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected a program name on line %d of %s."
+msgstr "ppdc: s'esperava un nom de programa a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected boolean value on line %d of %s."
+msgstr "ppdc: s'esperava un valor booleà a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected charset after Font on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un joc de caràcters després de Font a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected choice code on line %d of %s."
+msgstr "ppdc: s'esperava un codi d'elecció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected choice name/text on line %d of %s."
+msgstr "ppdc: s'esperava un nom/text d'elecció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected color order for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un ordre de colors per ColorModel a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un espai de colors per ColorModel a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s."
+msgstr "ppdc: s'esperava una compressió per ColorModel a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s."
+msgstr ""
+"ppdc: s'esperava una cadena de restriccions per UIConstraints a la línia %d "
+"de %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected driver type keyword following DriverType on line %d of %s."
+msgstr ""
+"ppdc: s'esperava una paraula clau de tipus de controlador després de "
+"DriverType a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un tipus de dúplex després de Duplex a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected encoding after Font on line %d of %s."
+msgstr "ppdc: s'esperava una codificació després de Font a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected filename after #po %s on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un nom de fitxer després de #po %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected group name/text on line %d of %s."
+msgstr "ppdc: s'esperava un nom/text de grup a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected include filename on line %d of %s."
+msgstr "ppdc: s'esperava un nom de fitxer d'inclusió a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected integer on line %d of %s."
+msgstr "ppdc: s'esperava un enter a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s."
+msgstr "ppdc: s'esperava un idioma després de #po a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de FileName a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de Font a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de Manufacturer a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de MediaSize a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de ModelName a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s."
+msgstr "ppdc: s'esperava un nom després de PCFileName a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s."
+msgstr "ppdc: s'esperava un nom/text després de %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un nom/text després d'Installable a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un nom/text després de Resolution a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: s'esperava una combinació de nom/text per ColorModel a la línia %d de "
+"%s."
+
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s."
+msgstr "ppdc: s'esperava un nom/text d'opció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s."
+msgstr "ppdc: s'esperava una secció d'opció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s."
+msgstr "ppdc: s'esperava un tipus d'opció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s."
+msgstr ""
+"ppdc: s'esperava un camp de substitució després de Resolution a la línia %d "
+"de %s."
+
+#, c-format
+msgid "ppdc: Expected quoted string on line %d of %s."
+msgstr "ppdc: s'esperava una cadena entre cometes dobles a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s."
+msgstr "ppdc: s'esperava un número real a la línia %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s."
+msgstr ""
+"ppdc: s'esperava una resolució/tipus de mitjà després de ColorProfile a la "
+"línia %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
+"of %s."
+msgstr ""
+"ppdc: s'esperava una resolució/tipus de mitjà després de SimpleColorProfile "
+"a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected selector after %s on line %d of %s."
+msgstr "ppdc: s'esperava un selector després de %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected status after Font on line %d of %s."
+msgstr "ppdc: s'esperava un estat després de Font a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected string after Copyright on line %d of %s."
+msgstr "ppdc: s'esperava una cadena després de Copyright a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s."
+msgstr "ppdc: s'esperava una cadena després de Version a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s."
+msgstr "ppdc: s'esperava dos noms d'opció a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s."
+msgstr "ppdc: s'esperava un valor després de %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s."
+msgstr "ppdc: s'esperava una versió després de Font a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"."
+msgstr "ppdc: el nom de fitxer #include/#po «%s» no és vàlid."
+
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s."
+msgstr "ppdc: el cost del filtre no és vàlid a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s."
+msgstr "ppdc: el tipus MIME buit no és vàlid pel filtre a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s."
+msgstr ""
+"ppdc: el nom de programa buit no és vàlid pel filtre a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s."
+msgstr "ppdc: la secció d'opció «%s» no és vàlida a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s."
+msgstr "ppdc: el tipus d'opció «%s» no és vàlid a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Loading driver information file \"%s\"."
+msgstr "ppdc: s'està carregant el fitxer d'informació del controlador «%s»."
+
+#, c-format
+msgid "ppdc: Loading messages for locale \"%s\"."
+msgstr "ppdc: s'està carregant l'idioma «%s»."
+
+#, c-format
+msgid "ppdc: Loading messages from \"%s\"."
+msgstr "ppdc: s'està carregant els missatges des de «%s»."
+
+#, c-format
+msgid "ppdc: Missing #endif at end of \"%s\"."
+msgstr "ppdc: falta un #endif al final de «%s»."
+
+#, c-format
+msgid "ppdc: Missing #if on line %d of %s."
+msgstr "ppdc: falta un #if a la línia %d de %s."
+
+#, c-format
+msgid ""
+"ppdc: Need a msgid line before any translation strings on line %d of %s."
+msgstr ""
+"oodc: es necessita un msgid abans de la cadena per traduir a la línia %d de "
+"%s."
+
+#, c-format
+msgid "ppdc: No message catalog provided for locale %s."
+msgstr "ppdc: no s'ha donat el catàleg de missatges per l'idioma %s."
+
+#, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s."
+msgstr ""
+"ppdc: l'opció %s està definida a dos grups diferents a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s."
+msgstr ""
+"ppdc: l'opció %s està redefinida amb un tipus diferent a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s."
+msgstr "ppdc: l'opció de restricció ha d'incloure *nom a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s."
+msgstr "ppdc: hi ha massa #if imbricats a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to create PPD file \"%s\" - %s."
+msgstr "ppdc: no s'ha pogut crear el fitxer PPD «%s» - %s."
+
+#, c-format
+msgid "ppdc: Unable to create output directory %s: %s"
+msgstr "ppdc: no s'ha pogut crear el directori de sortida %s: %s"
+
+#, c-format
+msgid "ppdc: Unable to create output pipes: %s"
+msgstr "ppdc: no s'ha pogut crear els conductes de sortida: %s"
+
+#, c-format
+msgid "ppdc: Unable to execute cupstestppd: %s"
+msgstr "ppdc: no s'ha pogut executar cupstestppd: %s"
+
+#, c-format
+msgid "ppdc: Unable to find #po file %s on line %d of %s."
+msgstr "ppdc: no s'ha pogut trobar el fitxer #po %s a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s."
+msgstr ""
+"ppdc: no s'ha pogut trobar el fitxer d'inclusió «%s» a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Unable to find localization for \"%s\" - %s"
+msgstr "ppdc: no s'ha pogut trobar la localització de «%s» - %s"
+
+#, c-format
+msgid "ppdc: Unable to load localization file \"%s\" - %s"
+msgstr "ppdc: no s'ha pogut carregar el fitxer de localització «%s» - %s"
+
+#, c-format
+msgid "ppdc: Unable to open %s: %s"
+msgstr "ppdc: no s'ha pogut obrir %s: %s"
+
+#, c-format
+msgid "ppdc: Undefined variable (%s) on line %d of %s."
+msgstr "ppdc: la variable (%s) de la línia %d de %s no està definida."
+
+#, c-format
+msgid "ppdc: Unexpected text on line %d of %s."
+msgstr "ppdc: hi ha un text inesperat a la línia %d de %s."
+
+#, c-format
+msgid "ppdc: Unknown driver type %s on line %d of %s."
+msgstr "ppdc: el tipus de controlador %s de la línia %d de %s no és conegut."
+
+#, c-format
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s."
+msgstr "ppdc: el tipus de dúplex «%s» de la línia %d de %s no és conegut."
+
+#, c-format
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
+msgstr "ppdc: la mida del mitjà «%s» de la línia %d de %s no és coneguda."
+
+#, c-format
+msgid "ppdc: Unknown message catalog format for \"%s\"."
+msgstr "ppdc: el format del catàleg de missatges de «%s» no és conegut."
+
+#, c-format
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s."
+msgstr "ppdc: el testimoni «%s» de la línia %d de %s no és conegut."
+
+#, c-format
+msgid ""
+"ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s."
+msgstr ""
+"ppdc: els caràcters finals del número real «%s» de la línia %d de %s no són "
+"coneguts."
+
+#, c-format
+msgid "ppdc: Unterminated string starting with %c on line %d of %s."
+msgstr ""
+"ppdc: la cadena que comença per %c de la línia %d de %s no està acabada."
+
+#, c-format
+msgid "ppdc: Warning - overlapping filename \"%s\"."
+msgstr "ppdc: avís - se superposa el nom del fitxer «%s»."
+
+#, c-format
+msgid "ppdc: Writing %s."
+msgstr "ppdc: s'escriu %s."
+
+#, c-format
+msgid "ppdc: Writing PPD files to directory \"%s\"."
+msgstr "ppdc: s'escriuen els fitxers PPD a la carpeta «%s»."
+
+#, c-format
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s."
+msgstr "ppdmerge: LanguageVersion «%s» incorrecte a %s."
+
+#, c-format
+msgid "ppdmerge: Ignoring PPD file %s."
+msgstr "ppdmerge: s'ignora el fitxer PPD %s."
+
+#, c-format
+msgid "ppdmerge: Unable to backup %s to %s - %s"
+msgstr "ppdmerge: no s'ha pogut fer la còpia de seguretat %s a %s- %s"
+
+#, c-format
+msgid "printer %s disabled since %s -"
+msgstr "la impressora %s està deshabilitada des de %s -"
+
+#, c-format
+msgid "printer %s is idle.  enabled since %s"
+msgstr "la impressora %s està inactiva. Està activada des de %s"
+
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s"
+msgstr "la impressora %s està imprimint %s-%d. Està habilitada des de %s"
+
+#, c-format
+msgid "printer %s/%s disabled since %s -"
+msgstr "la impressora %s/%s està deshabilitada des de %s -"
+
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s"
+msgstr "la impressora %s/%s està inactiva. Està activada des de %s"
+
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s"
+msgstr "la impressora %s/%s està imprimint %s-%d. Està activada des de %s"
+
+msgid "processing"
+msgstr "s'està processant"
+
+#, c-format
+msgid "request id is %s-%d (%d file(s))"
+msgstr "l'identificador de la petició és %s-%d (%d fitxer(s))"
+
+msgid "request-id uses indefinite length"
+msgstr "la request-id fa servir una longitud indefinida"
+
+msgid "scheduler is not running"
+msgstr "el programador de tasques no s'està executant"
+
+msgid "scheduler is running"
+msgstr "el programador de tasques s'està executant"
+
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "stat de %s ha fallat: %s"
+
+msgid "status\t\tShow status of daemon and queue."
+msgstr "status\t\tmostra l'estat del dimoni i la cua."
+
+msgid "stopped"
+msgstr "aturat"
+
+#, c-format
+msgid "system default destination: %s"
+msgstr "destí per defecte del sistema: %s"
+
+#, c-format
+msgid "system default destination: %s/%s"
+msgstr "destí per defecte del sistema: %s/%s"
+
+msgid "unknown"
+msgstr "desconegut"
+
+msgid "untitled"
+msgstr "sense títol"
+
+msgid "variable-bindings uses indefinite length"
+msgstr "La variable-bindings fa servir una longitud indefinida"
+
+#~ msgid ""
+#~ "      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+#~ "                REF: Page 211, table D.1."
+#~ msgstr ""
+#~ "      **ERROR**  Manufacturer INCORRECTE (hauria de ser «Oki»)\n"
+#~ "                REF: pàgina 211, taula D.1."
+
+#~ msgid "      **FAIL**  Unable to open PPD file - %s"
+#~ msgstr "      **ERROR**  No es pot obrir el fitxer PPD - %s"
+
+#~ msgid "  -E                      Enable encryption."
+#~ msgstr "  -E                      Habilita el xifrat."
+
+#~ msgid "  -J title                Set title."
+#~ msgstr "  -J títol                Estableix el títol."
+
+#~ msgid "  -T                      Set the receive/send timeout in seconds."
+#~ msgstr ""
+#~ "  -T                      Estableix el temps d'espera màxim per enviar i "
+#~ "rebre en segons."
+
+#~ msgid "  -U samba-user           Authenticate using the named SAMBA user."
+#~ msgstr ""
+#~ "  -U usuari-samba           Autentica fent servir l'usuari SAMBA indicat."
+
+#~ msgid "  -U username             Set username for job."
+#~ msgstr "  -U nomusuari             Estableix el nom d'usuari per la tasca."
+
+#~ msgid "  -a 'name=value ...'     Set option(s)."
+#~ msgstr "  -a 'nom=valor ...'     Estableix les opcions."
+
+#~ msgid "  -c config-file          Load alternate configuration file."
+#~ msgstr ""
+#~ "  -c fitxer-config          Carrega un fitxer de configuració alternatiu."
+
+#~ msgid "  -c copies               Set number of copies."
+#~ msgstr "  -c còpies               Estableix el nombre de còpies."
+
+#~ msgid ""
+#~ "  -f filename             Set file to be converted (otherwise stdin)."
+#~ msgstr ""
+#~ "  -f nomfitxer             Estableix el fitxer que s'ha de convertir "
+#~ "(stdin si no s'especifica)."
+
+#~ msgid "  -h cups-server          Use the named CUPS server."
+#~ msgstr "  -h servidor-cups          Fa servir el servidor CUPS indicat."
+
+#~ msgid ""
+#~ "  -j mime/type            Set output MIME type (otherwise application/"
+#~ "pdf)."
+#~ msgstr ""
+#~ "  -j tipus/mime            Estableix el tipus MIME de sortida "
+#~ "(application/pdf si no s'especifica)."
+
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Executa cupsd des de launchd(8)."
+
+#~ msgid ""
+#~ "  -o filename             Set file to be generated (otherwise stdout)."
+#~ msgstr ""
+#~ "  -o nomfitxer             Estableix el nom del fitxer que s'ha de "
+#~ "generar (stdout si no s'especifica)."
+
+#~ msgid "  -q                      Be quiet - no output except errors."
+#~ msgstr "  -q                      Silenciós - Només dóna els errors."
+
+#~ msgid "  -v                      Be slightly verbose."
+#~ msgstr "  -v                      mode lleugerament detallat."
+
+#~ msgid "  -v                      Be verbose (more v's for more verbosity)."
+#~ msgstr "  -v                      mode detallat (com més v's més detallat)."
+
+#~ msgid "  -v                      Be verbose (show commands)."
+#~ msgstr "  -v                      mode detallat (mostra les ordres)."
+
+#~ msgid "  -v                      Show all attributes sent and received."
+#~ msgstr ""
+#~ "  -v                      Mostra tots els atributs enviats i rebuts."
+
+#~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+#~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+
+#~ msgid "%s: Error - expected destination after \"-b\" option."
+#~ msgstr "%s: error - s'esperava un destí després de l'opció «-b»."
+
+#~ msgid "3.5\" Disk - 2 1/8 x 2 3/4\""
+#~ msgstr "Disc de 3.5 - 2 1/8 x 2 3/4\""
+
+#~ msgid "720dpi"
+#~ msgstr "720ppp"
+
+#~ msgid "Address - 1 1/8 x 3 1/2\""
+#~ msgstr "Adreça - 1 1/8 x 3 1/2\""
+
+#~ msgid "Bad printer URI."
+#~ msgstr "L'URI de la impressora és incorrecte."
+
+#~ msgid "Enter old password:"
+#~ msgstr "Introduïu la contrasenya antiga:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Introduïu la contrasenya un altre cop:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Introduïu la contrasenya:"
+
+#~ msgid "File Folder - 9/16 x 3 7/16\""
+#~ msgstr "Carpeta d'arxivador: 9/16 x 3 7/16\""
+
+#~ msgid ""
+#~ "File device URIs have been disabled. To enable, see the FileDevice "
+#~ "directive in \"%s/cupsd.conf\"."
+#~ msgstr ""
+#~ "S'han deshabilitat els URIs dels dispositius de fitxers. Per habilitar-"
+#~ "los, vegeu la directriu FileDevice a «%s/cupsd.conf»."
+
+#~ msgid "Hanging Folder - 9/16 x 2\""
+#~ msgstr "Carpeta per penjar: 9/16 x 2\""
+
+#~ msgid "Internet Postage 2-Part - 2 1/4 x 7 1/2\""
+#~ msgstr "Franqueig per Internet en 2 parts - 2 1/4 x 7 1/2\""
+
+#~ msgid "Internet Postage 3-Part - 2 1/4 x 7\""
+#~ msgstr "Franqueig per Internet en 3 parts - 2 1/4 x 7\""
+
+#~ msgid "Large Address - 1 4/10 x 3 1/2\""
+#~ msgstr "Adreça gran - 1 4/10 x 3 1/2\""
+
+#~ msgid "Looking for printer."
+#~ msgstr "S'està buscant la impressora."
+
+#~ msgid "New Stylus Color Series"
+#~ msgstr "Sèrie New Stylus Color"
+
+#~ msgid "New Stylus Photo Series"
+#~ msgstr "Sèrie New Stylus Photo"
+
+#~ msgid "Output for printer %s is sent to %s"
+#~ msgstr "La sortida de la impressora %s s'envia a %s"
+
+#~ msgid "Output for printer %s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida de la impressora %s s'envia a la impressora remota %s a %s"
+
+#~ msgid "Output for printer %s/%s is sent to %s"
+#~ msgstr "La sortida per la impressora %s/%s s'envia a la impressora %s"
+
+#~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
+
+#~ msgid "Print file accepted - job ID %d."
+#~ msgstr "S'ha acceptat el fitxer d'impressió - ID de la feina %d."
+
+#~ msgid "Print file accepted - job ID unknown."
+#~ msgstr ""
+#~ "S'ha acceptat el fitxer d'impressió - l'ID de la feina és desconegut."
+
+#~ msgid "Print file was not accepted."
+#~ msgstr "No s'ha acceptat el fitxer d'impressió."
+
+#~ msgid "Printer busy, will retry in 10 seconds."
+#~ msgstr ""
+#~ "La impressora està ocupada. Es tornarà a intentar d'aquí a 10 segons."
+
+#~ msgid "Printer did not respond."
+#~ msgstr "La impressora no respon."
+
+#~ msgid "Printer is busy, will retry in 5 seconds."
+#~ msgstr ""
+#~ "La impressora està ocupada. Es tornarà a intentar d'aquí a 5 segons."
+
+#~ msgid "Printer is now connected."
+#~ msgstr "La impressora està connectada."
+
+#~ msgid "Printer not connected, will retry in 30 seconds."
+#~ msgstr ""
+#~ "La impressora està desconnectada. Es tornarà a intentar d'aquí a 30 "
+#~ "segons."
+
+#~ msgid "Printing page %d, %d%% complete."
+#~ msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
+
+#~ msgid "Purge Jobs"
+#~ msgstr "Purga les feines"
+
+#~ msgid ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+#~ msgstr ""
+#~ "Rang   Propietari      Pri  Feina        Fitxers                       "
+#~ "Mida total"
+
+#~ msgid "Ready to print."
+#~ msgstr "Preparada per imprimir."
+
+#~ msgid "Return Address - 3/4 x 2\""
+#~ msgstr "Remitent - 3/4 x 2\""
+
+#~ msgid "Shipping Address - 2 5/16 x 4\""
+#~ msgstr "Adreça de lliurament - 2 5/16 x 4\""
+
+#~ msgid "Stylus Color Series"
+#~ msgstr "Sèrie Stylus Color"
+
+#~ msgid "Stylus Photo Series"
+#~ msgstr "Sèrie Stylus Photo"
+
+#~ msgid "The output bin is almost full."
+#~ msgstr "La safata de sortida és gairebé plena."
+
+#~ msgid "The output bin is full."
+#~ msgstr "La safata de sortida és plena."
+
+#~ msgid "The output bin is missing."
+#~ msgstr "Falta la safata de sortida."
+
+#~ msgid "The paper tray is almost empty."
+#~ msgstr "La safata de paper és gairebé buida."
+
+#~ msgid "The paper tray is empty."
+#~ msgstr "La safata de paper és buida."
+
+#~ msgid "The paper tray is missing."
+#~ msgstr "Falta la safata de paper."
+
+#~ msgid "The paper tray needs to be filled."
+#~ msgstr "S'ha d'omplir la safata de paper."
+
+#~ msgid "The printer URI is incorrect or no longer exists."
+#~ msgstr "L'URI de la impressora no és correcte o ja no existeix."
+
+#~ msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
+#~ msgstr ""
+#~ "La impressora no és compatible amb el IPP/%d.%d, s'està intentant el IPP/"
+#~ "%s."
+
+#~ msgid "The printer is out of toner."
+#~ msgstr "S'ha acabat el tòner de la impressora"
+
+#~ msgid "The printer is running low on ink."
+#~ msgstr "S'està acabant la tinta de la impressora."
+
+#~ msgid "The printer is running low on toner."
+#~ msgstr "S'està acabant el tòner de la impressora."
+
+#~ msgid "There is a paper jam."
+#~ msgstr "S'ha encallat el paper."
+
+#~ msgid "Unable to create compressed print file"
+#~ msgstr "No es pot crear el fitxer d'impressió comprimit"
+
+#~ msgid "Unable to create temporary file:"
+#~ msgstr "No es pot crear el fitxer temporal:"
+
+#~ msgid "Unable to generate compressed print file"
+#~ msgstr "No es pot generar el fitxer d'impressió comprimit"
+
+#~ msgid "Unable to get printer status:"
+#~ msgstr "No es pot obtenir l'estat de la impressora:"
+
+#~ msgid "Unable to open PPD file:"
+#~ msgstr "No es pot obrir el fitxer PPD:"
+
+#~ msgid "Unable to open compressed print file"
+#~ msgstr "No es pot obrir el fitxer d'impressió comprimit"
+
+#~ msgid "Unable to read print data"
+#~ msgstr "No es poden llegir les dades d'impressió"
+
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "No es pot resoldre l'URI de la impressora."
+
+#~ msgid "Usage: %s job-id user title copies options file"
+#~ msgstr "Sintaxi: %s id-tasca usuari títol còpies opcions fitxer"
+
+#~ msgid "Usage: convert [ options ]"
+#~ msgstr "Sintaxi: convert [ opcions ]"
+
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
+
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "Sintaxi: lppasswd [-g nomgrup]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "Sintaxi: lppasswd [-g nomgrup] [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -a [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -x [nomusuari]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "La contrasenya ha de tenir com a mínim 6 caràcters, no pot contenir el "
+#~ "nom d'usuari, i ha de tenir com a mínim una lletra i un número."
+
+#~ msgid "convert: Use the -f option to specify a file to convert."
+#~ msgstr ""
+#~ "convert: feu servir l'opció -f per especificar el fitxer que voleu "
+#~ "convertir."
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: no s'ha compilat amb compatibilitat per launchd(8). S'executa en "
+#~ "mode normal."
+
+#~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+#~ msgstr "ipptool: «-i» i «-n» no són compatibles amb «-X»."
+
+#~ msgid "ipptool: \"-i\" is incompatible with \"-X\"."
+#~ msgstr "ipptool: «-i» no és compatible amb «-X»."
+
+#~ msgid "ipptool: \"-n\" is incompatible with \"-X\"."
+#~ msgstr "ipptool: «-n» no és compatible amb «-X»."
+
+#~ msgid "ipptool: Bad version %s for \"-V\"."
+#~ msgstr "ipptool: la versió %s de «-V» no és correcta."
+
+#~ msgid "ipptool: Missing timeout for \"-T\"."
+#~ msgstr "ipptool: falta el temps màxim d'espera a «-T»."
+
+#~ msgid "ipptool: Missing version for \"-V\"."
+#~ msgstr "ipptool: falta la versió a «-V»."
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr ""
+#~ "lppasswd: només l'usuari primari (root) pot afegir o esborrar "
+#~ "contrasenyes."
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppaswd: el fitxer de contrasenyes està ocupat."
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppaswd: el fitxer de contrasenyes no està actualitzat."
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppaswwd: la contrasenya no coincideix."
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppaswwd: s'ha refusat la contrasenya."
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppaswwd: les contrasenyes no coincideixen."
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: no s'ha pogut copiar la cadena de contrasenya: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut obrir el fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut escriure al fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut fer la còpia de seguretat del fitxer de "
+#~ "contrasenyes antic: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut canviar el nom del fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppaswd: l'usuari «%s» i el grup «%s» no existeixen."

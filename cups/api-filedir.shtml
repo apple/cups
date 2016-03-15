@@ -1,0 +1,31 @@
+<!--
+  "$Id: api-filedir.shtml 7279 2008-01-31 01:50:44Z mike $"
+
+  File and directory API introduction for CUPS.
+
+  Copyright 2007-2011 by Apple Inc.
+  Copyright 1997-2005 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
+
+<p>The CUPS file and directory APIs provide portable interfaces
+for manipulating files and listing files and directories. Unlike
+stdio <code>FILE</code> streams, the <code>cupsFile</code> functions
+allow you to open more than 256 files at any given time. They
+also manage the platform-specific details of locking, large file
+support, line endings (CR, LF, or CR LF), and reading and writing
+files using Flate ("gzip") compression. Finally, you can also
+connect, read from, and write to network connections using the
+<code>cupsFile</code> functions.</p>
+
+<p>The <code>cupsDir</code> functions manage the platform-specific
+details of directory access/listing and provide a convenient way
+to get both a list of files and the information (permissions,
+size, timestamp, etc.) for each of those files.</p>

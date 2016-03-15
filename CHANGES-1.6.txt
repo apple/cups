@@ -1,0 +1,244 @@
+CHANGES-1.6.txt
+---------------
+
+CHANGES IN CUPS V1.6.4
+
+	- Removed some duplicate size definitions for some ISO sizes that were
+	  causing problems (<rdar://problem/14722721>)
+	- The IPP backend did not add the "last-document" attribute
+	  (<rdar://problem/114660379>)
+	- Added a SyncOnClose directive to cups-files.conf to force cupsd to
+	  call fsync before closing any configuration/state files it writes
+	  (<rdar://problem/14523043>)
+	- Added USB quirk rule for Lexmark E238 (<rdar://problem/14493054>)
+	- Closed server connections were still not always detected
+	  (<rdar://problem/14484313>)
+	- The libusb-based USB backend now loads its list of quirks from files
+	  in /usr/share/cups/usb instead of using a hardcoded table
+	  (<rdar://problem/14442769>)
+	- The scheduler did not properly register ICC color profiles with
+	  colord (<rdar://problem/14455625>)
+
+
+CHANGES IN CUPS V1.6.3
+
+	- The configure script now prefers Clang over GCC.
+	- Fixed a compile problem on AIX (STR #4307)
+	- The default IPP version did not always get set before creating a new
+	  IPP request message (<rdar://problem/14401718>)
+	- The lp, lpq, lpr, and lpstat now display an error message advising the
+	  use of the /version=1.1 ServerName option (<rdar://problem/14290628>)
+	- Added documentation about the /version=1.1 option to ServerName in
+	  client.conf (<rdar://problem/14216262>)
+	- httpStatus(HTTP_ERROR) did not return a useful error message
+	  (<rdar://problem/14217326>)
+	- The lp, lpq, lpr, and lpstat commands incorrectly ignored the default
+	  printer set in the lpoptions file (<rdar://problem/14216472>)
+	- Fixed a URI encoding issue for hostnames containing the ` (backquote)
+	  character (<rdar://problem/14243133>)
+	- Added support for RFC 6874's IPv6 link local address format in URIs
+	  (<rdar://problem/13979453>)
+	- The USB backend could crash on libusb-based systems if USB was
+	  disabled in the BIOS (<rdar://problem/13875729>)
+	- Fixed a rounding error in the PWG media size mapping code
+	  (<rdar://problem/13493241>)
+	- Fixed several ipptool test files that used old STATUS names.
+	- Kerberos credentials could get truncated when printing to a shared
+	  printer.
+	- Printing using "ipps" URIs was not encrypted.
+	- Insecure ICC profiles prevented installation of user profiles for a
+	  printer on OS X.
+	- Added more USB quirks for the libusb-based backend (STR #4311,
+	  <rdar://problem/13736470>)
+	- The Russian web interface templates were broken (STR #4310)
+	- The scheduler no longer tries to do Kerberos authentication over the
+	  loopback interface.
+	- The IPP backend could fail to pause a job for authentication
+	  (STR #4298)
+	- Fixed a regression on the handling of auth keys on OS X if the
+	  cups-files.conf was not present or did not contain a SystemAuthKey
+	  value.
+	- The scheduler incorrectly did a reverse lookup of the server address
+	  when HostNameLookups was turned off (STR #4302)
+	- The scheduler incorrectly computed the final content type value when
+	  null filters were present.
+
+
+CHANGES IN CUPS V1.6.2
+
+	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248,
+	  STR #4259)
+	- Security: All file, directory, user, and group settings are now stored
+	  in a separate cups-files.conf configuration file that cannot be set
+	  through the CUPS web interface or APIs (STR #4223)
+	- Added a Czech localization (STR #4201)
+	- Added a French localization (STR #4247)
+	- Added a Russian localization (STR #4228, STR #4285)
+	- Updated the Catalan localization (STR #4202)
+	- Local certificate authentication did not guard against an empty
+	  certification file (STR #4293)
+	- The scheduler did not reject device URIs with spaces.
+	- Added USB quirk rule for Epson Stylus Photo 750 (STR #4286)
+	- The IPP backend could crash if the printer disconnects early
+	  (STR #4284)
+	- cupsGetPPD did not work with statically-configured CUPS shared
+	  queues (STR #4178)
+	- The scheduler did not support long MIME media types (STR #4270)
+	- The cupsfilter command did not set the CHARSET environment variable
+	  for the text filters (STR #4273)
+	- The lp command did not show errors for unknown "--foo" (STR #4261)
+	- Bad IPP responses could crash ipptool (STR #4262)
+	- Updated USB quirk rules for Canon and Xerox printers (STR #4217,
+	  STR #4263)
+	- Added USB blacklisting for printers that require a custom backend
+	  (STR #4218)
+	- The PPD compiler did not correctly JCL options (STR #4115, STR #4203)
+	- The ipptool program now supports DEFINE-MATCH and DEFINE-NO-MATCH
+	  predicates for STATUS directives.
+	- Fixed a problem with local Kerberos authentication (STR #4140)
+	- Coverity scan: fixed some minor issues (STR #4242)
+	- The scheduler did not remove color profiles after deleting a printer
+	  (STR #4232, STR #4276)
+	- The CUPS library did not always detect a timed out connection to the
+	  server which could cause temporary loss of printing from applications
+	  (STR #4187)
+	- The ipptool program now supports variable substitution in OPERATION
+	  and DELAY directives (STR #4175)
+	- The IPP backend now stops queues when the server configuration
+	  prevents successful job submission (STR #4125)
+	- The XML output of ipptool contained empty dictionaries (STR #4136)
+	- The scheduler did not delete job control backup files (STR #4244)
+	- cupsGetPPD3 could return a local PPD instead of the correct remote
+	  PPD.
+	- The scheduler incorrectly advertised auth-info-required for local
+	  queues needing local authentication (STR #4205)
+	- CUPS 1.6 clients using the ServerName directive in client.conf did not
+	  work with CUPS 1.3.x or older servers (STR #4231, STR #4291)
+	- The SNMP backend now tries to work around broken printers that use a
+	  newline to separate key/value pairs.
+	- The IPP backend did not send a cancel request to printers when a job
+	  was canceled and the printer did not support Create-Job.
+	- Fixed EPM packaging files (STR #4199)
+	- OpenBSD build fix (STR #4195, STR #4196, STR #4197)
+	- The scheduler could crash when using Avahi (STR #4183, STR #4192,
+	  STR #4200, STR #4213)
+	- The IPP backend could get stuck in an endless loop on certain network
+	  errors (STR #4194)
+	- 32-bit builds failed on Debian (STR #4133)
+	- The scheduler no longer accepts or sends job description attributes.
+	- The IPP backend now works around some conformance issues for broken
+	  printers (STR #4190)
+	- cupsBackendReport() now filters out all control characters from the
+	  reported 1284 device IDs (STR #4124)
+	- The scheduler no longer allows job-name values that are not valid
+	  network Unicode strings (STR #4072)
+	- The web interface did not preserve the order of classes, jobs, or
+	  printers (STR #4170)
+	- The network backends now support disabling of SNMP supply level
+	  queries via the "snmp" URI option (STR #4106)
+	- The IPP backend did not specify the compression used (STR #4181)
+	- ipptool did not support octetString values.
+	- The scheduler did not recognize dnssd: or ipps: URIs as Bonjour shared
+	  queues (STR #4158)
+	- Applications could not get the PPD file for statically-configured
+	  Bonjour-shared print queues (STR #4159)
+	- The cupsd.conf file included obsolete browsing directives (STR #4157)
+	- Fixed a USB backend compatibility issue on systems using libusb
+	  (STR #4155, STR #4191)
+	- Some Bonjour features were not available on systems with Avahi
+	  (STR #4156)
+	- CUPS now includes the port number in the Host: header for HTTP
+	  requests.
+	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
+	  out.
+
+
+CHANGES IN CUPS V1.6.1
+
+	- Documentation fix (STR #4149)
+	- RPM packaging fixes (STR #4129, #4145)
+	- The Japanese and English web interface headers were swapped
+	  (STR #4148)
+
+
+CHANGES IN CUPS V1.6.0
+
+	- Document changes (STR #4131)
+	- Added new Catalan (STR #4107) and Spanish (STR #4137) localizations.
+
+
+CHANGES IN CUPS V1.6rc1
+
+	- Added a new Japanese localization (STR #4122)
+	- The SNMP backend no longer exits if it is unable to obtain an IPv6
+	  socket (STR #4109)
+	- The LPD backend incorrectly used "localhost" in the control file
+	  instead of the current hostname.
+
+
+CHANGES IN CUPS V1.6b1
+
+	- Documentation updates (STR #3927, STR #3980, STR #4010, STR #4068)
+	- The scheduler now consolidates all PPD updates from filters at the
+	  end of the job (STR #4075)
+	- CUPS now supports color management using colord (STR #3808)
+	- CUPS now supports Bonjour using Avahi (STR #3066)
+	- The PreserveJobFiles and PreserveJobHistory directives now support
+	  specification of a time interval (STR #3143)
+	- PPD files can now be archived in (gzip'd) tar files to further reduce
+	  the disk space used by PPD files (STR #3772)
+	- The network backends now deal with printers that report their levels
+	  in percent but do not specify a maximum capacity of 100 (STR #3551)
+	- The network backends now report full/almost-full waste bins in
+	  printers along with end-of-life for cleaning pads (STR #4017)
+	- Added a configure option to set the permissions of the installed
+	  cupsd (STR #3459)
+	- Added a new WITH-ALL-VALUES directive to ipptool EXPECT predicates
+	  (STR #3949)
+	- CUPS now supports a User directive in client.conf and the CUPS_USER
+	  environment variable for overriding the default username (STR #3114)
+	- Now set the PJL USERNAME variable as needed (STR #3100)
+	- Added support for usernames and passwords longer than 32 characters
+	  (STR #2856)
+	- Added a new MaxHoldTime directive to automatically cancel jobs that
+	  have been held indefinitely after a specific number of seconds
+	  (STR #2291)
+	- The LPD backend now uses the originating host name when it is not the
+	  local system (STR #2053)
+	- CUPS now prefers the suffix "dpcm" when reporting resolution in dots-
+	  per-centimeter (STR #4006)
+	- The configure script and build system no longer support building of
+	  separate 32-bit and 64-bit libraries.
+	- The "brightness", "columns", "fitplot", "gamma", "hue",
+	  "natural-scaling", "penwidth", "position", "ppi", "saturation", and
+	  "scaling" options are not longer supported (STR #4010)
+	- The "page-bottom", "page-left", "page-right", "page-top",
+	  "prettyprint", and "wrap" options have been deprecated (STR #4010)
+	- The scheduler now reports the standard "number-of-documents" attribute
+	  instead of the CUPS-specific "document-count" attribute in
+	  job objects.
+	- Added new destination connection and enumeration functions (STR #3924)
+	- Added new option, localization, and job submission functions that do
+	  not depend on PPD files (STR #3925)
+	- Added a new MaxJobTime directive for cupsd that specifies the maximum
+	  amount of time allowed for a job to complete before it is canceled.
+	- The default password callback now supports passwords up to 127
+	  characters.
+	- The scheduler now supports a DefaultAuthType of "auto" to
+	  automatically choose between Basic (username/password) and Negotiate
+	  (Kerberos) authentication.
+	- cupsSideChannelSNMPGet/Walk now support OIDs and values up to 64k in
+	  length.
+	- CUPS no longer supports automatic remote printers or implicit classes
+	  via the CUPS, LDAP, or SLP protocols (STR #3922, STR #3923)
+	- The PPD APIs are now deprecated and will be removed in a future
+	  version of CUPS (STR #3927)
+	- The default IPP version for requests is now 2.0 (STR #3929)
+	- The IPP APIs no longer expose the ipp_t or ipp_attribute_t structures
+	  and instead provide accessor functions (STR #3928)
+	- The scheduler will no longer run programs with group write permission.
+	- The PHP module has been removed (STR #3932)
+	- The bannertops, commandtoescpx, commandtopclx, imagetops,
+	  imagetoraster, pdftops, rastertoescpx, rastertopclx, and texttops
+	  filters have been removed (STR #3930)
+	- The serial and parallel backends have been removed (STR 3935)

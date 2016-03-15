@@ -1,0 +1,9 @@
+[Unit]
+Description=CUPS LPD server
+Documentation=man:cups-lpd(8)
+
+[Service]
+ExecStart=-@CUPS_SERVERBIN@/daemon/cups-lpd
+StandardInput=socket
+User=@CUPS_USER@
+

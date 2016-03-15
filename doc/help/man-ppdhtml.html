@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ppdhtml(1)</title>
+</head>
+<body>
+<h1 class="title">ppdhtml(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ppdhtml - cups html summary generator (deprecated)
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ppdhtml</b>
+[
+<b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+] [
+<b>-I</b>
+<i>include-directory</i>
+]
+<i>source-file</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ppdhtml</b> reads a driver information file and produces a HTML summary page that lists all of the drivers in a file and the supported options.
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ppdhtml</b> supports the following options:
+<dl class="man">
+<dt><b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+<dd style="margin-left: 5.0em">Sets the named variable for use in the source file.
+It is equivalent to using the <i>#define</i> directive in the source file.
+<dt><b>-I </b><i>include-directory</i>
+<dd style="margin-left: 5.0em">Specifies an alternate include directory.
+Multiple <i>-I</i> options can be supplied to add additional directories.
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-ppdc.html?TOPIC=Man+Pages"><b>ppdc</b>(1),</a>
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+<a href="man-ppdi.html?TOPIC=Man+Pages"><b>ppdi</b>(1),</a>
+<a href="man-ppdmerge.html?TOPIC=Man+Pages"><b>ppdmerge</b>(1),</a>
+<a href="man-ppdpo.html?TOPIC=Man+Pages"><b>ppdpo</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+#
+# SNMP configuration file for CUPS.  See "man cups-snmp.conf" for a complete
+# description of this file.
+#
+
+@CUPS_SNMP_ADDRESS@
+@CUPS_SNMP_COMMUNITY@

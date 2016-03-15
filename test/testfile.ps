@@ -1,0 +1,598 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 0 0 612 792
+%%Pages: 1
+%%LanguageLevel: 1
+%%DocumentData: Clean7Bit
+%%DocumentSuppliedResources: procset testprint/1.3
+%%DocumentNeededResources: font Helvetica Helvetica-Bold Times-Roman
+%%Creator: Michael Sweet, Apple Inc.
+%%CreationDate: D:20070606214000+0500
+%%Title: Test Page
+%%EndComments
+%%BeginProlog
+%%BeginResource procset testprint 1.3 0
+%
+%   PostScript test page for CUPS.
+%
+%   Copyright 2007-2011 Apple Inc.
+%   Copyright 1993-2007 Easy Software Products
+%
+%   These coded instructions, statements, and computer programs are the
+%   property of Apple Inc. and are protected by Federal copyright law.
+%   Distribution and use rights are outlined in the file "LICENSE.txt"
+%   which is included with the CUPS source distribution.
+%
+/SEXTANT {			% Draw a color wheel sextant...
+				% (name) white radius r g b SEXTANT -
+  % Loop through 100 shades...
+  0 0.010101 0.98 {
+    % Set the color...
+    dup 0.75 le {		% Get "white" value
+      % Start from black
+      dup 0.75 div		% val2 = val / 0.75
+
+      0 index 5 index mul 	% R = R * val2
+      1 index 5 index mul 	% G = G * val2
+      2 index 5 index mul 	% B = B * val2
+
+      4 -1 roll pop		% Discard val2
+    } {
+      % Fade to white
+      dup neg 1 add 4 mul	% val2 = (1 - val) * 4
+
+      0 index 5 index mul 	% R = R * val2
+      1 index neg 1 add add	% + (1 - val2)
+      1 index 5 index mul 	% G = G * val2
+      2 index neg 1 add add	% + (1 - val2)
+      2 index 5 index mul 	% B = B * val2
+      3 index neg 1 add add	% + (1 - val2)
+
+      4 -1 roll pop		% Discard val2
+    } ifelse
+    setrgbcolor			% Set the color...
+
+    % Draw the polygon...
+    newpath			% Start a new path...
+    dup 5 index mul		% r1 = radius * val
+    0 0 3 -1 roll 0 60 arc	% Draw the inner arc
+
+    dup 0.010101 add 5 index mul% r2 = (radius + 0.010101) * val
+    0 0 3 -1 roll 60 0 arcn	% Draw the outer arc
+
+    closepath			% Close the path
+    fill			% Fill it...
+
+    pop				% Pop value...
+  } for
+
+  % Draw a line around the polygons...
+  pop pop pop dup		% Pop R, G, B, start
+  0 setgray			% Black
+  newpath
+  0 0 moveto			% Center
+  0 0 3 -1 roll 0 60 arc	% Arc around octant
+  closepath			% Back to center
+  stroke			% Stroke it...
+
+  % Draw the label...
+  dup				% Save radius
+  dup 30 cos mul		% X = radius * cos(30)
+  exch 30 sin mul		% Y = radius * sin(30)
+  moveto			% Position label
+
+  gsave
+    30 rotate			% Rotate label
+    dup 0.05 mul		% Offset to the right
+    exch -0.05 mul		% and down...
+    rmoveto			% Offset label
+    show			% Show label
+  grestore
+} bind def
+/CENTER {			% Draw centered text
+				% (name) CENTER -
+  dup stringwidth pop		% Get the width of the string
+  0.5 mul neg 0 rmoveto		% Shift left 1/2 of the distance
+  show				% Show the string
+} bind def
+/RIGHT {			% Draw right-justified text
+				% (name) RIGHT -
+  dup stringwidth pop		% Get the width of the string
+  neg 0 rmoveto			% Shift left the entire distance
+  show				% Show the string
+} bind def
+/NUMBER {			% Draw a number
+				% power n NUMBER -
+  1 index 1 eq {		% power == 1?
+    round cvi exch pop		% Convert "n" to integer
+  } {
+    1 index mul round exch div	% Truncate extra decimal places
+  } ifelse
+  100 string cvs show		% Convert to a string and show it...
+} bind def
+/CUPSLOGO {			% Draw the CUPS logo
+				% height CUPSLOGO
+  % Start with a big C...
+  /Helvetica findfont 1 index scalefont setfont
+  0 setgray
+  0 0 moveto
+  (C) show
+
+  % Then "UNIX Printing System" much smaller...
+  /Helvetica-Bold findfont 1 index 9 div scalefont setfont
+  0.25 mul
+  dup dup 2.0 mul moveto
+  (UNIX) show
+  dup dup 1.6 mul moveto
+  (Printing) show
+  dup 1.2 mul moveto
+  (System) show
+} bind def
+%%EndResource
+%%EndProlog
+%%Page: 1 1
+gsave
+
+  % Determine the imageable area and device resolution...
+  initclip newpath clippath pathbbox	% Get bounding rectangle
+  72 div /pageTop exch def		% Get top margin in inches
+  72 div /pageRight exch def		% Get right margin in inches
+  72 div /pageBottom exch def		% Get bottom margin in inches
+  72 div /pageLeft exch def		% Get left margin in inches
+
+  4 setlinewidth			% Draw wide lines
+  0 setgray closepath stroke		% Draw a clipping rectangle
+
+  /pageWidth pageRight pageLeft sub def	% pageWidth = pageRight - pageLeft
+  /pageHeight pageTop pageBottom sub def% pageHeight = pageTop - pageBottom
+
+  72 72 dtransform			% Get device resolution per inch
+  /yResolution exch abs def		% yResolution = abs(yres)
+  /xResolution exch abs def		% xResolution = abs(xres)
+
+  % Figure out the sizes of things...
+  /wheelSize				% size of wheels
+  pageWidth pageHeight lt
+  { pageWidth 9 mul }
+  { pageHeight 7 mul }
+  ifelse def
+
+  % Create fonts...
+  /bigFont /Helvetica-Bold findfont	% bigFont = Helvetica-Bold
+  pageHeight 3 mul scalefont def	% size = pageHeight * 3 (nominally 33)
+
+  /mediumFont /Helvetica findfont	% mediumFont = Helvetica
+  pageHeight 1.5 mul scalefont def	% size = pageHeight * 1.5 (nominally 16.5)
+
+  /smallFont /Times-Roman findfont	% smallFont = Times-Roman
+  pageHeight scalefont def		% size = pageHeight (nominally 11)
+
+  % Draw rulers along the edges...
+  /CENTIMETER 72 2.54 div def
+  /MILLIMETER 72 25.4 div def
+
+  /Times-Roman findfont			% Font for ruler numbers
+  11 scalefont setfont			% 11 points
+
+  gsave					% Left side inches
+    pageLeft 72 mul 0 translate		% Offset left edge
+
+    1 setlinewidth			% Draw normal lines
+    72 72 pageTop 72 mul {		% Height inches
+      dup dup
+      0 exch moveto 24 0 rlineto stroke	% Draw tic mark
+      24 exch pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs RIGHT
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    18 18 pageTop 72 mul {		% 1/4 inches
+      0 exch moveto 15 0 rlineto stroke	% Draw tic mark
+    } for
+
+    9 9 pageTop 72 mul {		% 1/8 inches
+      0 exch moveto 6 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Bottom inches
+    0 pageBottom 72 mul translate	% Offset bottom edge
+
+    1 setlinewidth			% Draw normal lines
+    72 72 pageRight 72 mul {		% Width inches
+      dup dup
+      0 moveto 0 24 rlineto stroke	% Draw tic mark
+      3 add 27 pageHeight sub moveto	% Draw number
+      72 div cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    18 18 pageRight 72 mul {		% 1/4 inches
+      0 moveto 0 15 rlineto stroke	% Draw tic mark
+    } for
+
+    9 9 pageRight 72 mul {		% 1/8 inches
+      0 moveto 0 6 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Right side centimeters
+    pageRight 72 mul 0 translate	% Offset right edge
+
+    1 setlinewidth			% Draw normal lines
+    CENTIMETER CENTIMETER
+        pageTop 72 mul {		% Height centimeters
+      0 exch moveto -24 0 rlineto stroke% Draw tic mark
+    } for
+    1 1 pageTop 2.54 mul {		% Height labels
+      dup
+      -24 exch CENTIMETER mul
+          pageHeight sub moveto		% Draw number
+      cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageTop 72 mul {		% 1/2 centimeters
+      0 exch moveto -15 0 rlineto stroke% Draw tic mark
+    } for
+    0 MILLIMETER pageTop 72 mul {	% Millimeters
+      0 exch moveto -6 0 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  gsave					% Top centimeters
+    0 pageTop 72 mul translate		% Offset top edge
+
+    1 setlinewidth			% Draw normal lines
+    CENTIMETER CENTIMETER
+        pageRight 72 mul {		% Width centimeters
+      0 moveto 0 -24 rlineto stroke	% Draw tic mark
+    } for
+    1 1 pageRight 2.54 mul {		% Width labels
+      dup
+      CENTIMETER mul 3 add -24 moveto	% Draw number
+      cvi 10 string cvs show
+    } for
+
+    0.5 setlinewidth			% Draw thin lines
+    0 0.5 CENTIMETER mul
+        pageRight 72 mul {		% 1/2 centimeters
+      0 moveto 0 -15 rlineto stroke	% Draw tic mark
+    } for
+    0 MILLIMETER pageRight 72 mul {	% Millimeters
+      0 moveto 0 -6 rlineto stroke	% Draw tic mark
+    } for
+  grestore
+
+  % Offset page to account for lower-left margin...
+  pageLeft 72 mul
+  pageBottom 72 mul
+  translate
+
+  % Set text font and color...
+  mediumFont setfont			% Font
+  0 setgray				% Color
+  1 setlinewidth			% Draw normal lines
+
+  % Draw the color wheel...
+  gsave
+    % Position the wheel on the left side...
+    pageWidth 18 mul			% x = pageWidth * 1/4 * 72
+    pageHeight 54 mul			% y = pageHeight * 3/4 * 72
+    translate
+
+    % Size the wheel...
+    wheelSize
+
+    % Draw the colors...
+    dup (C) 3 -1 roll 0 1 1 SEXTANT 60 rotate
+    dup (M) 3 -1 roll 1 0 1 SEXTANT 60 rotate
+    dup (Y) 3 -1 roll 1 1 0 SEXTANT 60 rotate
+    dup (R) 3 -1 roll 1 0 0 SEXTANT 60 rotate
+    dup (G) 3 -1 roll 0 1 0 SEXTANT 60 rotate
+    dup (B) 3 -1 roll 0 0 1 SEXTANT 60 rotate
+
+    pop
+  grestore
+
+  % Label the color wheel...
+  pageWidth 18 mul			% x = pageWidth * 1/4 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
+  moveto				% Position the text
+  (Color Wheel) CENTER			% Show the text centered
+
+  % Draw the gray ramp...
+  gsave
+    % Position the gray ramp in the center...
+    pageWidth 36 mul			% x = pageWidth * 1/2 * 72
+    pageHeight 54 mul			% y = pageHeight * 3/4 * 72
+    wheelSize sub			% - wheelSize
+    translate
+
+    % Loop through 100 shades...
+    0 0.010101 0.98 {
+      % Set the color...
+      dup setgray			% Set the grayscale...
+
+      % Draw the polygon...
+      newpath				% Start a new path...
+
+      wheelSize -0.2 mul		% X = -wheelSize / 5
+      1 index 2 mul wheelSize mul	% Y = val * 2 * wheelSize
+      moveto				% Move there...
+
+      wheelSize 0.4 mul 0 rlineto	% Right side...
+
+      wheelSize 0.2 mul			% X = wheelSize / 5
+      1 index 0.010101 add 2 mul wheelSize mul
+      					% Y = (val + 0.010101) * 2 * wheelSize
+      lineto				% Move there...
+
+      wheelSize -0.4 mul 0 rlineto	% Left side...
+
+      closepath				% Close the path
+      fill				% Fill it...
+
+      pop				% Pop value...
+    } for
+
+    0 setgray				% Black
+
+    newpath				% Start a new path
+    wheelSize -0.2 mul 0 moveto		% Bottom left
+    wheelSize 0.4 mul 0 rlineto		% Bottom right
+    0 wheelSize 2 mul rlineto		% Upper right
+    wheelSize -0.4 mul 0 rlineto	% Upper left
+    closepath				% Close the path
+    stroke				% Stroke it...
+
+    0 wheelSize -0.2 mul moveto		% Center bottom for label
+    (K) CENTER				% Center K at bottom
+
+    0 wheelSize 2.05 mul moveto		% Center top for label
+    (W) CENTER				% Center W at top
+  grestore
+
+  % Label the gray ramp...
+  pageWidth 36 mul			% x = pageWidth * 1/2 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
+  moveto				% Position the text
+  (Gray Ramp) CENTER			% Show the text centered
+
+
+  % Draw radial lines...
+  gsave
+    0 setlinewidth			% 1 pixel lines
+
+    % Position the lines on the left side...
+    pageWidth 54 mul			% x = pageWidth * 3/4 * 72
+    pageHeight 54 mul			% y = pageHeight * 3/4 * 72
+    translate
+
+    % Size the wheel...
+    wheelSize
+
+    % Loop at 1 degree increments
+    0 1 359 {
+      pop				% Discard angle - not used
+      0 0 moveto			% Start line at the center
+      dup 0 lineto			% Draw to the radius
+      1 rotate				% Rotate 1 degree
+    } for
+
+    pop					% Discard radius - not needed anymore
+    stroke      			% Draw lines...
+
+  grestore
+
+  % Label the lines...
+  pageWidth 54 mul			% x = pageWidth * 3/4 * 72
+  pageHeight 43 mul			% y = pageHeight * 19/32 * 72
+  moveto				% Position the text
+  (1 Degree Radial Lines) CENTER	% Show the text centered
+
+  % Imageable area...
+  pageHeight 15 mul			% Height of imageable area
+
+  pageWidth 4.5 mul			% x = pageWidth * 1/16 * 72
+  pageHeight 35.5 mul			% y = pageHeight * 1/2 * 72
+  2 index sub				% y -= height
+  pageWidth 28 mul			% width = pageWidth * 1/4 * 72
+  3 index				% height
+  0.5 setgray rectfill			% Draw a shadow
+
+  pageWidth 4 mul			% x = pageWidth * 1/16 * 72
+  pageHeight 36 mul			% y = pageHeight * 1/2 * 72
+  2 index sub				% y -= height
+  pageWidth 28 mul			% width = pageWidth * 3/8 * 72
+  3 index				% height
+  4 copy 1 setgray rectfill		% Clear the box to white
+  0 setgray rectstroke			% Draw a black box around it...
+
+  pop					% Discard height
+
+  % Label the imageable area...
+  pageWidth 4 mul			% x = pageWidth * 1/16 * 72
+  pageHeight 37 mul			% y = pageHeight * 1/2 * 72
+  moveto				% Position the text
+  mediumFont setfont			% Font
+  (Imageable Area) show			% Show the text
+
+  smallFont setfont			% Font
+  pageWidth 14 mul			% x = pageWidth * 3/16 * 72
+  pageHeight 36 mul			% y = pageWidth * 1/2 * 72
+  pageHeight -2 mul add			% y -= 2 * smallFont height
+
+  % Page Size inches
+  2 copy moveto				% Move to x & y
+  (Page Size: ) RIGHT			% Label
+  100 pageWidth NUMBER			% pageWidth
+  (x) show				% "x"
+  100 pageHeight NUMBER			% pageHeight
+  (in) show				% "in"
+
+  % Page Size millimeters
+  pageHeight sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  10 pageWidth 25.4 mul NUMBER		% pageWidth
+  (x) show				% "x"
+  10 pageHeight 25.4 mul NUMBER		% pageHeight
+  (mm) show				% "mm"
+
+  % Lower-left inches
+  pageHeight 2 mul sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  (Lower-Left: ) RIGHT			% Label
+  100 pageLeft NUMBER			% pageLeft
+  (x) show				% "x"
+  100 pageBottom NUMBER			% pageBottom
+  (in) show				% "in"
+
+  % Lower-left millimeters
+  pageHeight sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  10 pageLeft 25.4 mul NUMBER		% pageLeft
+  (x) show				% "x"
+  10 pageBottom 25.4 mul NUMBER		% pageBottom
+  (mm) show				% "mm"
+
+  % Upper-right inches
+  pageHeight 2 mul sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  (Upper-Right: ) RIGHT			% Label
+  100 pageRight NUMBER			% pageRight
+  (x) show				% "x"
+  100 pageTop NUMBER			% pageTop
+  (in) show				% "in"
+
+  % Upper-right millimeters
+  pageHeight sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  10 pageRight 25.4 mul NUMBER		% pageRight
+  (x) show				% "x"
+  10 pageTop 25.4 mul NUMBER		% pageTop
+  (mm) show				% "mm"
+
+  % Resolution dots-per-inch
+  pageHeight 2 mul sub			% Move down...
+
+  2 copy moveto				% Move to x & y
+  (Resolution: ) RIGHT			% Label
+  1 xResolution NUMBER			% xResolution
+  (x) show				% "x"
+  1 yResolution NUMBER			% yResolution
+  (dpi) show				% "dpi"
+
+  % Resolution dots-per-meter
+  pageHeight sub			% Move down...
+
+  moveto				% Move to x & y
+  1 xResolution 39.27 mul NUMBER	% xResolution
+  (x) show				% "x"
+  1 yResolution 39.27 mul NUMBER	% yResolution
+  (dpm) show				% "dpm"
+
+  % Interpreter Information...
+  pageHeight 15 mul			% Height of interpreter information
+
+  pageWidth 40.5 mul			% x = pageWidth * 9/16 * 72
+  pageHeight 35.5 mul			% y = pageHeight * 1/2 * 72
+  2 index sub				% y -= height
+  pageWidth 28 mul			% width = pageWidth * 1/4 * 72
+  3 index				% height
+  0.5 setgray rectfill			% Draw a shadow
+
+  pageWidth 40 mul			% x = pageWidth * 9/16 * 72
+  pageHeight 36 mul			% y = pageHeight * 1/2 * 72
+  2 index sub				% y -= height
+  pageWidth 28 mul			% width = pageWidth * 3/8 * 72
+  3 index				% height
+  4 copy 1 setgray rectfill		% Clear the box to white
+  0 setgray rectstroke			% Draw a black box around it...
+
+  pop					% Discard height
+
+  % Label the interpreter info...
+  pageWidth 40 mul			% x = pageWidth * 9/16 * 72
+  pageHeight 37 mul			% y = pageHeight * 1/2 * 72
+  moveto				% Position the text
+  mediumFont setfont			% Font
+  (Interpreter Information) show	% Show the text
+
+  smallFont setfont			% Font
+  pageWidth 49 mul			% x = pageWidth * 11/16 * 72
+  pageHeight 36 mul			% y = pageWidth * 1/2 * 72
+  pageHeight 2 mul sub			% y -= 2 * smallFont height
+
+  % Language level
+  2 copy moveto				% Move to x & y
+  (PostScript: ) RIGHT			% Label
+  (Level ) show				% "Level "
+  1 languagelevel NUMBER		% Language level
+
+  % Version
+  pageHeight 2 mul sub			% Move down...
+  2 copy moveto				% Move to x & y
+  (Version: ) RIGHT			% Label
+  version show				% Version
+  ( \() show				% " ("
+  1 revision NUMBER			% Revision
+  (\)) show				% ")"
+
+  % Product
+  pageHeight 2 mul sub			% Move down...
+  2 copy moveto				% Move to x & y
+  (Product: ) RIGHT			% Label
+  product show				% Product name
+
+  % Serial Number
+  pageHeight 2 mul sub			% Move down...
+  moveto				% Move to x & y
+  (Serial #: ) RIGHT			% Label
+  1 serialnumber NUMBER			% S/N
+
+  % Draw the label at the top...
+  pageWidth 36 mul			% Center of page
+  pageHeight 66 mul			% Top of page (11/12ths)
+  moveto				% Position text
+  bigFont setfont			% Font
+  (Printer Test Page) CENTER		% Show text centered
+
+  % Draw the copyright notice at the bottom...
+  pageWidth 17 mul			% Center of page
+  pageHeight 10 mul			% Bottom of page
+  moveto				% Position text
+  (Printed Using CUPS v1.3.x) show
+
+  pageWidth 17 mul			% Left side of page
+  pageHeight 8 mul			% Move down...
+  2 copy moveto				% Position text
+  smallFont setfont			% Font
+  (Copyright 2007 Apple Inc., All Rights Reserved. CUPS and the CUPS logo are the trademark) show
+  pageHeight 2 add sub			% Move down...
+  2 copy moveto				% Position text
+  (property of Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA.) show
+  pageHeight 2 mul 4 add sub		% Move down...
+  moveto				% Position text
+  (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) show
+
+  % Then the CUPS logo....
+  gsave
+    pageWidth 4 mul
+    pageHeight 4 mul
+    translate
+    pageWidth 15 mul CUPSLOGO
+  grestore
+
+% Show the page...
+grestore
+showpage
+%
+% End of "$Id: testfile.ps 6649 2007-07-11 21:46:42Z mike $".
+%
+%%EOF

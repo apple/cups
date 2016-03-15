@@ -1,0 +1,27 @@
+#
+# "$Id$"
+#
+# Message catalog template for CUPS.
+#
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 2005-2007 by Easy Software Products.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+#
+# Notes for Translators:
+#
+# The "checkpo" program located in the "locale" source directory can be used
+# to verify that your translations do not introduce formatting errors or other
+# problems.  Run with:
+#
+#    cd locale
+#    ./checkpo cups_LL.po
+#
+# where "LL" is your locale.
+#
