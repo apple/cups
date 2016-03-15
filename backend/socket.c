@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: socket.c 11909 2014-06-09 18:58:16Z msweet $"
  *
  *   AppSocket backend for CUPS.
  *
@@ -250,8 +250,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
          */
 
          snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
-                        _cups_strcasecmp(value, "yes") ||
-                        _cups_strcasecmp(value, "true");
+                        !_cups_strcasecmp(value, "yes") ||
+                        !_cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "contimeout"))
       {
@@ -520,5 +520,5 @@ wait_bc(int device_fd,			/* I - Socket */
 
 
 /*
- * End of "$Id: socket.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: socket.c 11909 2014-06-09 18:58:16Z msweet $".
  */

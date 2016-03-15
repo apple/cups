@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 11812 2014-04-10 15:47:53Z msweet $"
+ * "$Id: cups.h 11978 2014-07-02 10:35:09Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -30,10 +30,6 @@
 typedef off_t ssize_t;			/* @private@ */
 #  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
-#  ifdef __BLOCKS__
-#    include <dispatch/dispatch.h>
-#  endif /* __BLOCKS__ */
-
 #  include "file.h"
 #  include "ipp.h"
 #  include "language.h"
@@ -53,10 +49,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			1.0703
+#  define CUPS_VERSION			1.0704
 #  define CUPS_VERSION_MAJOR		1
 #  define CUPS_VERSION_MINOR		7
-#  define CUPS_VERSION_PATCH		3
+#  define CUPS_VERSION_PATCH		4
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
@@ -627,5 +623,5 @@ extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 11812 2014-04-10 15:47:53Z msweet $".
+ * End of "$Id: cups.h 11978 2014-07-02 10:35:09Z msweet $".
  */

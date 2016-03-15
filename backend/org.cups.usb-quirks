@@ -212,3 +212,6 @@
 
 # Lexmark E238 (<rdar://problem/14493054>)
 0x043d 0x00d7 no-reattach
+
+# Lexmark E238 (STR #4448)
+0x043d 0x009a no-reattach

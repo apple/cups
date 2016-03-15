@@ -2517,7 +2517,7 @@ esac
 ac_config_headers="$ac_config_headers config.h"
 
 
-CUPS_VERSION=1.7.3
+CUPS_VERSION=1.7.4
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -5238,7 +5238,7 @@ USBQUIRKS=""
 
 
 if test "x$PKGCONFIG" != x; then
-	if test x$enable_libusb = xyes -o $uname != Darwin; then
+	if test x$enable_libusb != xno -a $uname != Darwin; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libusb-1.0" >&5
 $as_echo_n "checking for libusb-1.0... " >&6; }
 		if $PKGCONFIG --exists libusb-1.0; then
@@ -5252,6 +5252,9 @@ $as_echo "yes" >&6; }
 		else
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+			if test x$enable_libusb = xyes; then
+				as_fn_error $? "libusb required for --enable-libusb." "$LINENO" 5
+			fi
 		fi
 	fi
 elif test x$enable_libusb = xyes; then

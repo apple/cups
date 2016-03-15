@@ -52,7 +52,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/whatsnew.html">Novetats del CUPS 1.4</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Fòrum d'usuaris</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups">Fòrum d'usuaris</A></P>
 
 </TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
@@ -72,8 +72,6 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-cupsd-conf.html">Referència del cupsd.conf</A></P>
 
-<P><A HREF="http://www.cups.org/ppd.php">Cerca de controladors d'impressora</A></P>
-
 </TD><TD VALIGN="top" STYLE="padding-left: 20px;">
 
 <H2>CUPS per desenvolupadors</H2>
@@ -92,7 +90,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-ppdcfile.html">Referència del fitxer d'inf. del compilador del controlador per PPD</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Fòrum de desenvolupadors</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups-devel">Fòrum de desenvolupadors</A></P>
 
 </TD></TR>
 </TABLE>

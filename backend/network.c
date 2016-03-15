@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c 3755 2012-03-30 05:59:14Z msweet $"
+ * "$Id: network.c 11971 2014-07-01 14:38:29Z msweet $"
  *
  *   Common backend network APIs for CUPS.
  *
@@ -268,6 +268,12 @@ backendNetworkSideCB(
 	datalen = 0;
 	break;
 
+    case CUPS_SC_CMD_GET_CONNECTED :
+	status  = CUPS_SC_STATUS_OK;
+        data[0] = device_fd != -1;
+        datalen = 1;
+        break;
+
     case CUPS_SC_CMD_GET_DEVICE_ID :
         if (snmp_fd >= 0)
 	{
@@ -305,12 +311,6 @@ backendNetworkSideCB(
 	  break;
 	}
 
-    case CUPS_SC_CMD_GET_CONNECTED :
-	status  = CUPS_SC_STATUS_OK;
-        data[0] = device_fd != -1;
-        datalen = 1;
-        break;
-
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
 	datalen = 0;
@@ -322,5 +322,5 @@ backendNetworkSideCB(
 
 
 /*
- * End of "$Id: network.c 3755 2012-03-30 05:59:14Z msweet $".
+ * End of "$Id: network.c 11971 2014-07-01 14:38:29Z msweet $".
  */

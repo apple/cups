@@ -1,33 +1,17 @@
 /*
- * "$Id: dnssd.c 11623 2014-02-19 20:18:10Z msweet $"
+ * "$Id: dnssd.c 11971 2014-07-01 14:38:29Z msweet $"
  *
- *   DNS-SD discovery backend for CUPS.
+ * DNS-SD discovery backend for CUPS.
  *
- *   Copyright 2008-2012 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()		     - Browse for printers.
- *   browse_callback()	     - Browse devices.
- *   browse_local_callback() - Browse local devices.
- *   client_callback()       - Avahi client callback function.
- *   compare_devices()	     - Compare two devices.
- *   exec_backend()	     - Execute the backend that corresponds to the
- *			       resolved service name.
- *   device_type()	     - Get DNS-SD type enumeration from string.
- *   get_device()	     - Create or update a device.
- *   query_callback()	     - Process query data.
- *   find_device()	     - Find a device from its name and domain.
- *   sigterm_handler()	     - Handle termination signals.
- *   unquote()		     - Unquote a name string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -924,8 +908,11 @@ get_device(cups_array_t *devices,	/* I - Device array */
   * Yes, add the device...
   */
 
-  fprintf(stderr, "DEBUG: Found \"%s.%s%s\"...\n", serviceName, regtype,
-	  replyDomain);
+#ifdef HAVE_DNSSD
+  fprintf(stderr, "DEBUG: Found \"%s.%s%s\"...\n", serviceName, regtype, replyDomain);
+#else /* HAVE_AVAHI */
+  fprintf(stderr, "DEBUG: Found \"%s.%s.%s\"...\n", serviceName, regtype, replyDomain);
+#endif /* HAVE_DNSSD */
 
   device           = calloc(sizeof(cups_device_t), 1);
   device->name     = strdup(serviceName);
@@ -1329,5 +1316,5 @@ unquote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: dnssd.c 11623 2014-02-19 20:18:10Z msweet $".
+ * End of "$Id: dnssd.c 11971 2014-07-01 14:38:29Z msweet $".
  */

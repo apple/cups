@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 11688 2014-03-05 21:11:32Z msweet $"
+ * "$Id: dirsvc.c 11906 2014-06-09 18:33:24Z msweet $"
  *
  * Directory services routines for the CUPS scheduler.
  *
@@ -237,11 +237,13 @@ cupsdStartBrowsing(void)
   if (BrowseLocalProtocols & BROWSE_SMB)
     update_smb(1);
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
  /*
   * Register the individual printers
   */
 
   dnssdRegisterAllPrinters(0);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 }
 
 
@@ -255,6 +257,7 @@ cupsdStopBrowsing(void)
   if (!Browsing || !BrowseLocalProtocols)
     return;
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
  /*
   * De-register the individual printers
   */
@@ -265,7 +268,6 @@ cupsdStopBrowsing(void)
   * Shut down browsing sockets...
   */
 
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if ((BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDMaster)
     dnssdStop();
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
@@ -1548,7 +1550,7 @@ get_auth_info_required(
       if (i)
 	*bufptr++ = ',';
 
-      strlcpy(bufptr, p->auth_info_required[i], bufsize - (bufptr - buffer));
+      strlcpy(bufptr, p->auth_info_required[i], bufsize - (size_t)(bufptr - buffer));
       bufptr += strlen(bufptr);
     }
 
@@ -1814,5 +1816,5 @@ update_smb(int onoff)			/* I - 1 = turn on, 0 = turn off */
 
 
 /*
- * End of "$Id: dirsvc.c 11688 2014-03-05 21:11:32Z msweet $".
+ * End of "$Id: dirsvc.c 11906 2014-06-09 18:33:24Z msweet $".
  */

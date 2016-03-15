@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 11642 2014-02-27 15:57:59Z msweet $"
+ * "$Id: client.c 12009 2014-07-09 17:02:38Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
@@ -2143,6 +2143,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    * Grab any request data from the connection...
 	    */
 
+	    if (!httpWait(HTTP(con), 0))
+	      return;
+
 	    if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	    {
               cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2210,7 +2213,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  {
 	    if (!httpWait(HTTP(con), 0))
 	      return;
-            else if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
+
+            if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	    {
 	      if (con->http.error && con->http.error != EPIPE)
 		cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -3323,7 +3327,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     if ((ptr = strchr(filename, '?')) != NULL)
       *ptr = '\0';
 
-    if ((status = stat(filename, filestats)) != 0)
+    if ((status = lstat(filename, filestats)) != 0)
     {
      /*
       * Drop the language prefix and try the root directory...
@@ -3335,12 +3339,33 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if ((ptr = strchr(filename, '?')) != NULL)
 	*ptr = '\0';
 
-      status = stat(filename, filestats);
+      status = lstat(filename, filestats);
     }
   }
 
  /*
-  * If we're found a directory, get the index.html file instead...
+  * If we've found a symlink, 404 the sucker to avoid disclosing information.
+  */
+
+  if (!status && S_ISLNK(filestats->st_mode))
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Symlinks such as \"%s\" are not allowed.", con->http.fd, filename);
+    return (NULL);
+  }
+
+ /*
+  * Similarly, if the file/directory does not have world read permissions, do
+  * not allow access...
+  */
+
+  if (!status && !(filestats->st_mode & S_IROTH))
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Files/directories such as \"%s\" must be world-readable.", con->http.fd, filename);
+    return (NULL);
+  }
+
+ /*
+  * If we've found a directory, get the index.html file instead...
   */
 
   if (!status && S_ISDIR(filestats->st_mode))
@@ -4370,5 +4395,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 11642 2014-02-27 15:57:59Z msweet $".
+ * End of "$Id: client.c 12009 2014-07-09 17:02:38Z msweet $".
  */

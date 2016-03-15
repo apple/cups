@@ -1,5 +1,32 @@
-CHANGES.txt - 1.7.3 - 2014-05-27
+CHANGES.txt - 1.7.4 - 2014-07-08
 --------------------------------
+
+CHANGES IN CUPS V1.7.4
+
+	- Security: The web interface incorrectly served symlinked files and
+	  files that were not world-readable, potentially leading to a
+	  disclosure of information (STR #4450)
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402, STR #4424)
+	- The "snmp" option did not work with the network backends (STR #4422)
+	- The User directive in client.conf did not override the USER
+	  environment variable (STR #4426)
+	- The web interface now properly shows a "Go" button for all text-based
+	  browsers (STR #4425)
+	- The MaxJobTime directive now properly supports time values (STR #4434)
+	- The RPM spec file did not work due to the new Brazilian Portuguese
+	  localization (STR #4436)
+	- Fixed an "IPP read error" issue (STR #4440)
+	- Fixed the --disable-libusb configure option (STR #4439)
+	- Fixed the debug output from the DNS-SD backend when using Avahi
+	  (STR #4444)
+	- Fixed a bug in the CUPS_SC_GET_DEVICE_ID handling by the network
+	  backends (STR #4447)
+	- Added USB quirk rule for Lexmark E230 (STR #4448)
+	- The LPD backend did not work with some versions of glibc (STR #4452)
+
 
 CHANGES IN CUPS V1.7.3
 
@@ -15,12 +42,8 @@ CHANGES IN CUPS V1.7.3
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
 	- The scheduler did not add the "job-hold-until-specified" reason when
 	  holding a job using the lp command (STR #4405)
-	- The CUPS headers incorrectly needed libdispatch for blocks support
-	  (STR #4397)
 	- The configure script incorrectly added libgcrypt as a GNU TLS
 	  dependency (STR #4399)
-	- CUPS did not compile when Avahi or mDNSResponder was not present
-	  (STR #4402)
 	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
 	  (STR #4414)
 	- Auto-typing of PWG Raster files did not work (STR #4417)

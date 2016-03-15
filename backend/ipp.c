@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11890 2014-05-22 13:59:21Z msweet $"
+ * "$Id: ipp.c 11909 2014-06-09 18:58:16Z msweet $"
  *
  * IPP backend for CUPS.
  *
@@ -528,8 +528,8 @@ main(int  argc,				/* I - Number of command-line args */
          */
 
          snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
-                        _cups_strcasecmp(value, "yes") ||
-                        _cups_strcasecmp(value, "true");
+                        !_cups_strcasecmp(value, "yes") ||
+                        !_cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "version"))
       {
@@ -3709,5 +3709,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 11890 2014-05-22 13:59:21Z msweet $".
+ * End of "$Id: ipp.c 11909 2014-06-09 18:58:16Z msweet $".
  */

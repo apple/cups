@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 11488 2013-12-22 05:04:41Z msweet $"
+ * "$Id: conf.c 11932 2014-06-16 16:13:06Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -104,7 +104,7 @@ static const cupsd_var_t	cupsd_vars[] =
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
-  { "MaxJobTime",		&MaxJobTime,		CUPSD_VARTYPE_INTEGER },
+  { "MaxJobTime",		&MaxJobTime,		CUPSD_VARTYPE_TIME },
   { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_TIME },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
@@ -4063,5 +4063,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 11488 2013-12-22 05:04:41Z msweet $".
+ * End of "$Id: conf.c 11932 2014-06-16 16:13:06Z msweet $".
  */

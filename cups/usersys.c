@@ -1,9 +1,9 @@
 /*
- * "$Id: usersys.c 11689 2014-03-05 21:22:12Z msweet $"
+ * "$Id: usersys.c 11909 2014-06-09 18:58:16Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -851,29 +851,7 @@ _cupsSetDefaults(void)
   cups_anyroot	      = getenv("CUPS_ANYROOT");
   cups_expiredroot    = getenv("CUPS_EXPIREDROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
-
-  if ((cups_user = getenv("CUPS_USER")) == NULL)
-  {
-#ifndef WIN32
-   /*
-    * Try the USER environment variable...
-    */
-
-    if ((cups_user = getenv("USER")) != NULL)
-    {
-     /*
-      * Validate USER matches the current UID, otherwise don't allow it to
-      * override things...  This makes sure that printing after doing su or
-      * sudo records the correct username.
-      */
-
-      struct passwd	*pw;		/* Account information */
-
-      if ((pw = getpwnam(cups_user)) == NULL || pw->pw_uid != getuid())
-        cups_user = NULL;
-    }
-#endif /* !WIN32 */
-  }
+  cups_user           = getenv("CUPS_USER");
 
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
@@ -1089,20 +1067,30 @@ cups_read_client_conf(
       if (!GetUserName(cg->user, &size))
 #else
      /*
-      * Get the user name corresponding to the current UID...
+      * Try the USER environment variable as the default username...
       */
 
-      struct passwd	*pwd;		/* User/password entry */
+      const char *envuser = getenv("USER");
+					/* Default username */
+      struct passwd	*pw = NULL;	/* Account information */
 
-      setpwent();
-      if ((pwd = getpwuid(getuid())) != NULL)
+      if (envuser)
       {
        /*
-	* Found a match!
+	* Validate USER matches the current UID, otherwise don't allow it to
+	* override things...  This makes sure that printing after doing su or
+	* sudo records the correct username.
 	*/
 
-	strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
+	if ((pw = getpwnam(envuser)) != NULL && pw->pw_uid != getuid())
+	  pw = NULL;
       }
+
+      if (!pw)
+        pw = getpwuid(getuid());
+
+      if (pw)
+	strlcpy(cg->user, pw->pw_name, sizeof(cg->user));
       else
 #endif /* WIN32 */
       {
@@ -1141,5 +1129,5 @@ cups_read_client_conf(
 
 
 /*
- * End of "$Id: usersys.c 11689 2014-03-05 21:22:12Z msweet $".
+ * End of "$Id: usersys.c 11909 2014-06-09 18:58:16Z msweet $".
  */
