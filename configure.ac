@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.ac 12787 2015-07-14 21:19:57Z msweet $"
+dnl "$Id: configure.ac 12831 2015-08-05 14:24:32Z msweet $"
 dnl
 dnl Configuration script for CUPS.
 dnl
@@ -17,7 +17,7 @@ dnl We need at least autoconf 2.60...
 AC_PREREQ(2.60)
 
 dnl Package name and version...
-AC_INIT([CUPS], [2.1rc1], [https://www.cups.org/str.php], [cups], [https://www.cups.org/])
+AC_INIT([CUPS], [2.1.0], [https://www.cups.org/str.php], [cups], [https://www.cups.org/])
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
@@ -95,5 +95,5 @@ AC_OUTPUT(Makedefs
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.ac 12787 2015-07-14 21:19:57Z msweet $".
+dnl End of "$Id: configure.ac 12831 2015-08-05 14:24:32Z msweet $".
 dnl

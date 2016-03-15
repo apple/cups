@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 12635 2015-05-19 02:12:22Z msweet $"
+# "$Id: Makefile 12850 2015-08-27 19:29:06Z msweet $"
 #
 # API library Makefile for CUPS.
 #
@@ -83,6 +83,7 @@ LIBOBJS	=	\
 TESTOBJS	= \
 		testadmin.o \
 		testarray.o \
+		testcache.o \
 		testconflicts.o \
 		testcups.o \
 		testdest.o \
@@ -677,5 +678,5 @@ tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #
-# End of "$Id: Makefile 12635 2015-05-19 02:12:22Z msweet $".
+# End of "$Id: Makefile 12850 2015-08-27 19:29:06Z msweet $".
 #

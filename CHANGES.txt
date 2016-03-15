@@ -1,5 +1,22 @@
-CHANGES.txt - 2.1rc1 - 2015-07-31
----------------------------------
+CHANGES.txt - 2.1.0 - 2015-08-31
+--------------------------------
+
+CHANGES IN CUPS V2.1.0
+
+	- Fixed more scheduler crash bugs in the new logging code (STR #4687,
+	  STR #4690)
+	- The scheduler did not use the ConfigFilePerm setting when copying PPD
+	  files or interface scripts attached to a request (STR #4703)
+	- Now support new Chinese locale IDs and their correct fallback locales
+	  (<rdar://problem/22086642>, <rdar://problem/22130168>)
+	- "make check" incorrectly reported an expectation of 18 warning
+	  messages when 8 were expected (STR #4684)
+	- The new PDF file type rule did not work (STR #4692)
+	- The scheduler did not update the jobs.cache file when job files were
+	  expired (STR #4706)
+	- Fixed some configure script issues (STR #4694, STR #4695, STR #4698)
+	- Documentation updates (STR #4691, STR #4693)
+
 
 CHANGES IN CUPS V2.1rc1
 

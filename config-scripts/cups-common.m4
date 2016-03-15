@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 12785 2015-07-14 18:07:49Z msweet $"
+dnl "$Id: cups-common.m4 12852 2015-08-28 13:29:21Z msweet $"
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
@@ -17,7 +17,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION=2.1rc1
+CUPS_VERSION=2.1.0
 
 case "$CUPS_VERSION" in
 	*svn)
@@ -327,7 +327,7 @@ DBUSDIR=""
 DBUS_NOTIFIER=""
 DBUS_NOTIFIERLIBS=""
 
-if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x; then
+if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x -a "x$uname" != xDarwin; then
 	AC_MSG_CHECKING(for DBUS)
 	if $PKGCONFIG --exists dbus-1; then
 		AC_MSG_RESULT(yes)
@@ -474,5 +474,5 @@ esac
 AC_SUBST(BUILDDIRS)
 
 dnl
-dnl End of "$Id: cups-common.m4 12785 2015-07-14 18:07:49Z msweet $".
+dnl End of "$Id: cups-common.m4 12852 2015-08-28 13:29:21Z msweet $".
 dnl

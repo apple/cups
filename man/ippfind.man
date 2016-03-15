@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: ippfind.man 11938 2014-06-22 12:44:05Z msweet $"
+.\" "$Id: ippfind.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" ippfind man page for CUPS.
 .\"
@@ -255,7 +255,7 @@ Similarly, to send a PostScript test page to every PostScript printer, run:
 .SH SEE ALSO
 .BR ipptool (1)
 .SH COPYRIGHT
-Copyright \[co] 2013-2014 by Apple Inc.
+Copyright \[co] 2013-2015 by Apple Inc.
 .\"
-.\" End of "$Id: ippfind.man 11938 2014-06-22 12:44:05Z msweet $".
+.\" End of "$Id: ippfind.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

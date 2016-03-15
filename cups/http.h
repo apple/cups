@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 12094 2014-08-19 12:15:11Z msweet $"
+ * "$Id: http.h 12848 2015-08-26 18:51:57Z msweet $"
  *
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
@@ -246,7 +246,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_STATUS_NOT_AUTHORITATIVE,	/* Information isn't authoritative */
   HTTP_STATUS_NO_CONTENT,		/* Successful command, no new data */
   HTTP_STATUS_RESET_CONTENT,		/* Content was reset/recreated */
-  HTTP_STATUS_PARTIAL_CONTENT,		/* Only a partial file was recieved/sent */
+  HTTP_STATUS_PARTIAL_CONTENT,		/* Only a partial file was received/sent */
 
   HTTP_STATUS_MULTIPLE_CHOICES = 300,	/* Multiple files match request */
   HTTP_STATUS_MOVED_PERMANENTLY,	/* Document has moved permanently */
@@ -656,5 +656,5 @@ extern const char	*httpURIStatusString(http_uri_status_t status) _CUPS_API_2_0;
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 12094 2014-08-19 12:15:11Z msweet $".
+ * End of "$Id: http.h 12848 2015-08-26 18:51:57Z msweet $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 12713 2015-06-08 21:10:09Z msweet $"
+# "$Id: cups.spec.in 12857 2015-08-31 15:00:45Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -21,6 +21,7 @@
 #   dnssd    - Enable/disable DNS-SD support (default = enable)
 #   libusb1  - Enable/disable LIBUSB 1.0 support (default = enable)
 #   static   - Enable/disable static libraries (default = enable)
+#   systemd  - Enable/disable systemd support (default = enable)
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
@@ -44,12 +45,12 @@
 
 Summary: CUPS
 Name: cups
-Version: 2.1rc1
+Version: 2.1.0
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/2.1rc1/cups-2.1rc1-source.tar.bz2
+Source: http://www.cups.org/software/2.1.0/cups-2.1.0-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -313,6 +314,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/*.conf.5.gz
+/usr/share/man/man5/cupsd-logs.5.gz
 /usr/share/man/man5/ipptoolfile.5.gz
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man8
@@ -327,7 +329,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsd-helper.8.gz
-/usr/share/man/man8/cupsd-logs.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
 /usr/share/man/man8/cupsreject.8.gz
@@ -401,5 +402,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 12713 2015-06-08 21:10:09Z msweet $".
+# End of "$Id: cups.spec.in 12857 2015-08-31 15:00:45Z msweet $".
 #

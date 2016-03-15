@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man 11922 2014-06-11 23:35:37Z msweet $"
+.\" "$Id: lp.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" lp man page for CUPS.
 .\"
@@ -216,7 +216,7 @@ Print a presentation document 2-up to a printer called "foo":
 .BR lpstat (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: lp.man 11922 2014-06-11 23:35:37Z msweet $".
+.\" End of "$Id: lp.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

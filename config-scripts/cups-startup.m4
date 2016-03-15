@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-startup.m4 12784 2015-07-14 17:39:26Z msweet $"
+dnl "$Id: cups-startup.m4 12857 2015-08-31 15:00:45Z msweet $"
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
@@ -56,18 +56,33 @@ if test x$enable_systemd != xno; then
 	        	AC_MSG_ERROR(Need pkg-config to enable systemd support.)
                 fi
         else
+        	have_systemd=no
         	AC_MSG_CHECKING(for libsystemd)
                 if $PKGCONFIG --exists libsystemd; then
                         AC_MSG_RESULT(yes)
+                        have_systemd=yes
                         ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd`
                         ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd`
+		elif $PKGCONFIG --exists libsystemd-daemon; then
+			AC_MSG_RESULT(yes - legacy)
+                        have_systemd=yes
+			ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
+			ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
+
+			if $PKGCONFIG --exists libsystemd-journal; then
+				ONDEMANDFLAGS="$ONDEMANDFLAGS `$PKGCONFIG --cflags libsystemd-journal`"
+				ONDEMANDLIBS="$ONDEMANDLIBS `$PKGCONFIG --libs libsystemd-journal`"
+			fi
+                else
+                        AC_MSG_RESULT(no)
+                fi
+
+		if test $have_systemd = yes; then
                         AC_DEFINE(HAVE_SYSTEMD)
 			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
                         fi
-                else
-                        AC_MSG_RESULT(no)
                 fi
         fi
 fi
@@ -173,5 +188,5 @@ fi
 
 
 dnl
-dnl End of "$Id: cups-startup.m4 12784 2015-07-14 17:39:26Z msweet $".
+dnl End of "$Id: cups-startup.m4 12857 2015-08-31 15:00:45Z msweet $".
 dnl

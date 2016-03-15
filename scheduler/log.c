@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 12816 2015-07-30 15:38:57Z msweet $"
+ * "$Id: log.c 12857 2015-08-31 15:00:45Z msweet $"
  *
  * Log file routines for the CUPS scheduler.
  *
@@ -617,7 +617,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 
       asl_set(m, PWG_Event, "JobStateChanged");
       asl_set(m, PWG_JobID, job_id);
-      asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
+      asl_set(m, PWG_JobState, job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING]);
 
       if (job->impressions)
       {
@@ -637,7 +637,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
-    cupsd_printer_t *printer = job->printer ? job->printer : job->dest ? cupsdFindDest(job->dest) : NULL;
+    cupsd_printer_t *printer = job ? (job->printer ? job->printer : (job->dest ? cupsdFindDest(job->dest) : NULL)) : NULL;
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -667,7 +667,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 		      PWG_Event"=JobStateChanged",
 		      PWG_ServiceURI"=%s", printer ? printer->uri : "",
 		      PWG_JobID"=%d", job->id,
-		      PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
+		      PWG_JobState"=%s", job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING],
 		      PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
 		      NULL);
     else
@@ -1510,5 +1510,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 12816 2015-07-30 15:38:57Z msweet $".
+ * End of "$Id: log.c 12857 2015-08-31 15:00:45Z msweet $".
  */

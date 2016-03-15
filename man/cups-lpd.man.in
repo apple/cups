@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-lpd.man.in 11905 2014-06-03 18:46:30Z msweet $"
+.\" "$Id: cups-lpd.man.in 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" cups-lpd man page for CUPS.
 .\"
@@ -120,7 +120,7 @@ service using the corresponding control program.
 CUPS Online Help (http://localhost:631/help),
 RFC 2569
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cups-lpd.man.in 11905 2014-06-03 18:46:30Z msweet $".
+.\" End of "$Id: cups-lpd.man.in 12854 2015-08-28 14:08:00Z msweet $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 12790 2015-07-20 17:05:06Z msweet $"
+ * "$Id: language.c 12841 2015-08-10 17:07:30Z msweet $"
  *
  * I18N/language support for CUPS.
  *
@@ -1180,7 +1180,7 @@ appleLangDefault(void)
 	  * See if we have an Info.plist file in the bundle...
 	  */
 
-	  CFStringGetCString(cfpath, path,sizeof(path), kCFStringEncodingUTF8);
+	  CFStringGetCString(cfpath, path, sizeof(path), kCFStringEncodingUTF8);
 	  DEBUG_printf(("3appleLangDefault: Got a resource URL (\"%s\")", path));
 	  strlcat(path, "Contents/Info.plist", sizeof(path));
 
@@ -1211,7 +1211,6 @@ appleLangDefault(void)
 
     if (localizationList)
     {
-
 #ifdef DEBUG
       if (CFGetTypeID(localizationList) == CFArrayGetTypeID())
         DEBUG_printf(("3appleLangDefault: Got localizationList, %d entries.",
@@ -1287,6 +1286,8 @@ appleLangDefault(void)
       strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
     }
   }
+  else
+    DEBUG_printf(("3appleLangDefault: Using previous locale \"%s\".", cg->language));
 
  /*
   * Return the cached locale...
@@ -1324,6 +1325,18 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
   snprintf(filename, sizeof(filename),
            CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings",
 	   _cupsAppleLanguage(locale, applelang, sizeof(applelang)));
+
+  if (access(filename, 0))
+  {
+   /*
+    * <rdar://problem/22086642>
+    *
+    * Try with original locale string...
+    */
+
+    snprintf(filename, sizeof(filename), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
+  }
+
   DEBUG_printf(("1appleMessageLoad: filename=\"%s\"", filename));
 
   if (access(filename, 0))
@@ -1346,6 +1359,19 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       locale = "Japanese";
     else if (!strncmp(locale, "es", 2))
       locale = "Spanish";
+    else if (!strcmp(locale, "zh_HK"))
+    {
+     /*
+      * <rdar://problem/22130168>
+      *
+      * Try zh_TW first, then zh...  Sigh...
+      */
+
+      if (!access(CUPS_BUNDLEDIR "/Resources/zh_TW.lproj/cups.strings", 0))
+        locale = "zh_TW";
+      else
+        locale = "zh";
+    }
     else if (strstr(locale, "_") != NULL || strstr(locale, "-") != NULL)
     {
      /*
@@ -1598,5 +1624,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 12790 2015-07-20 17:05:06Z msweet $".
+ * End of "$Id: language.c 12841 2015-08-10 17:07:30Z msweet $".
  */

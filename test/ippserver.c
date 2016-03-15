@@ -1,5 +1,5 @@
 /*
- * "$Id: ippserver.c 12598 2015-05-05 18:57:57Z msweet $"
+ * "$Id: ippserver.c 12840 2015-08-09 02:10:23Z msweet $"
  *
  * Sample IPP Everywhere server for CUPS.
  *
@@ -108,6 +108,26 @@ enum _ipp_preason_e			/* printer-state-reasons bit values */
   _IPP_PREASON_TONER_LOW = 0x8000	/* toner-low */
 };
 typedef unsigned int _ipp_preason_t;	/* Bitfield for printer-state-reasons */
+static const char * const _ipp_preason_strings[] =
+{					/* Strings for each bit */
+  /* "none" is implied for no bits set */
+  "other",
+  "cover-open",
+  "input-tray-missing",
+  "marker-supply-empty",
+  "marker-supply-low",
+  "marker-waste-almost-full",
+  "marker-waste-full",
+  "media-empty",
+  "media-jam",
+  "media-low",
+  "media-needed",
+  "moving-to-paused",
+  "paused",
+  "spool-area-full",
+  "toner-empty",
+  "toner-low"
+};
 
 typedef enum _ipp_media_class_e
 {
@@ -230,6 +250,16 @@ static const char * const printer_supplies[] =
   "Black Toner",
   "Toner Waste"
 };
+
+/*
+ * URL scheme for web resources...
+ */
+
+#ifdef HAVE_SSL
+#  define WEB_SCHEME "https"
+#else
+#  define WEB_SCHEME "http"
+#endif /* HAVE_SSL */
 
 
 /*
@@ -354,7 +384,8 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					int ppm_color, int duplex, int port,
 					int pin, const char *subtype,
 					const char *directory,
-					const char *command);
+					const char *command,
+					const char *attrfile);
 static void		debug_attributes(const char *title, ipp_t *ipp,
 			                 int response);
 static void		delete_client(_ipp_client_t *client);
@@ -375,6 +406,8 @@ static void		dnssd_client_cb(AvahiClient *c, AvahiClientState state, void *userd
 static void		dnssd_init(void);
 static int		filter_cb(_ipp_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
 static _ipp_job_t	*find_job(_ipp_client_t *client);
+static ipp_t		*get_collection(FILE *fp, const char *filename, int *linenum);
+static char		*get_token(FILE *fp, char *buf, int buflen, int *linenum);
 static void		html_escape(_ipp_client_t *client, const char *s,
 			            size_t slen);
 static void		html_footer(_ipp_client_t *client);
@@ -394,11 +427,14 @@ static void		ipp_print_uri(_ipp_client_t *client);
 static void		ipp_send_document(_ipp_client_t *client);
 static void		ipp_send_uri(_ipp_client_t *client);
 static void		ipp_validate_job(_ipp_client_t *client);
+static void		load_attributes(const char *filename, ipp_t *attrs);
 static int		parse_options(_ipp_client_t *client, cups_option_t **options);
+static void		process_attr_message(_ipp_job_t *job, char *message);
 static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
 static void		*process_job(_ipp_job_t *job);
+static void		process_state_message(_ipp_job_t *job, char *message);
 static int		register_printer(_ipp_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
@@ -440,6 +476,7 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option character */
+		*attrfile = NULL,	/* Attributes file */
 		*command = NULL,	/* Command to run with job files */
 		*servername = NULL,	/* Server host name */
 		*name = NULL,		/* Printer name */
@@ -497,6 +534,14 @@ main(int  argc,				/* I - Number of command-line args */
           case 'P' : /* -P (PIN printing mode) */
               pin = 1;
               break;
+
+	  case 'a' : /* -a attributes-file */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+	      attrfile = argv[i];
+	      break;
 
           case 'c' : /* -c command */
               i ++;
@@ -672,7 +717,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((printer = create_printer(servername, name, location, make, model, icon,
                                 formats, ppm, ppm_color, duplex, port, pin,
-				subtype, directory, command)) == NULL)
+				subtype, directory, command, attrfile)) == NULL)
     return (1);
 
  /*
@@ -1229,7 +1274,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       int        pin,		/* I - Require PIN printing */
 	       const char *subtype,	/* I - Bonjour service subtype */
 	       const char *directory,	/* I - Spool directory */
-	       const char *command)	/* I - Command to run on job files */
+	       const char *command,	/* I - Command to run on job files */
+	       const char *attrfile)	/* I - Attributes file */
 {
   int			i, j;		/* Looping vars */
   _ipp_printer_t	*printer;	/* Printer */
@@ -1237,6 +1283,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   char			path[1024];	/* Full path to command */
 #endif /* !WIN32 */
   char			uri[1024],	/* Printer URI */
+#ifdef HAVE_SSL
+			securi[1024],	/* Secure printer URI */
+			*uris[2],	/* All URIs */
+#endif /* HAVE_SSL */
 			icons[1024],	/* printer-icons URI */
 			adminurl[1024],	/* printer-more-info URI */
 			supplyurl[1024],/* printer-supply-info-uri URI */
@@ -1407,6 +1457,18 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     "W8",
     "DM1"
   };
+#ifdef HAVE_SSL
+  static const char * const uri_authentication_supported[] =
+  {					/* uri-authentication-supported values */
+    "none",
+    "none"
+  };
+  static const char * const uri_security_supported[] =
+  {					/* uri-security-supported values */
+    "none",
+    "tls"
+  };
+#endif /* HAVE_SSL */
   static const char * const which_jobs[] =
   {					/* which-jobs-supported values */
     "completed",
@@ -1475,10 +1537,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->jobs          = cupsArrayNew((cups_array_func_t)compare_jobs, NULL);
   printer->next_job_id   = 1;
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-		  printer->hostname, printer->port, "/ipp/print");
+  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL, printer->hostname, printer->port, "/ipp/print");
   printer->uri    = strdup(uri);
   printer->urilen = strlen(uri);
+
+#ifdef HAVE_SSL
+  httpAssembleURI(HTTP_URI_CODING_ALL, securi, sizeof(securi), "ipps", NULL, printer->hostname, printer->port, "/ipp/print");
+#endif /* HAVE_SSL */
 
   if (icon)
     printer->icon = strdup(icon);
@@ -1522,10 +1587,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   * Prepare values for the printer attributes...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, icons, sizeof(icons), "http", NULL,
-                  printer->hostname, printer->port, "/icon.png");
-  httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), "http", NULL, printer->hostname, printer->port, "/");
-  httpAssembleURI(HTTP_URI_CODING_ALL, supplyurl, sizeof(supplyurl), "http", NULL, printer->hostname, printer->port, "/supplies");
+  httpAssembleURI(HTTP_URI_CODING_ALL, icons, sizeof(icons), WEB_SCHEME, NULL, printer->hostname, printer->port, "/icon.png");
+  httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/");
+  httpAssembleURI(HTTP_URI_CODING_ALL, supplyurl, sizeof(supplyurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/supplies");
 
   if (Verbosity)
   {
@@ -1610,34 +1674,30 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   printer->attrs = ippNew();
 
+  if (attrfile)
+    load_attributes(attrfile, printer->attrs);
+
   /* charset-configured */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_CHARSET),
-               "charset-configured", NULL, "utf-8");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_CHARSET), "charset-configured", NULL, "utf-8");
 
   /* charset-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_CHARSET),
-                "charset-supported", sizeof(charsets) / sizeof(charsets[0]),
-		NULL, charsets);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_CHARSET), "charset-supported", sizeof(charsets) / sizeof(charsets[0]), NULL, charsets);
 
   /* color-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "color-supported",
-                ppm_color > 0);
+  if (!ippFindAttribute(printer->attrs, "color-supported", IPP_TAG_ZERO))
+    ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "color-supported", ppm_color > 0);
 
   /* compression-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_KEYWORD),
-	        "compression-supported",
-	        (int)(sizeof(compressions) / sizeof(compressions[0])), NULL,
-	        compressions);
+  if (!ippFindAttribute(printer->attrs, "compression-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "compression-supported", (int)(sizeof(compressions) / sizeof(compressions[0])), NULL, compressions);
 
   /* copies-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "copies-default", 1);
+  if (!ippFindAttribute(printer->attrs, "copies-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "copies-default", 1);
 
   /* copies-supported */
-  ippAddRange(printer->attrs, IPP_TAG_PRINTER, "copies-supported", 1, 999);
+  if (!ippFindAttribute(printer->attrs, "copies-supported", IPP_TAG_ZERO))
+    ippAddRange(printer->attrs, IPP_TAG_PRINTER, "copies-supported", 1, 999);
 
   /* document-format-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
@@ -1649,47 +1709,55 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 		(const char * const *)formats);
 
   /* document-password-supported */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "document-password-supported", 127);
+  if (!ippFindAttribute(printer->attrs, "document-password-supported", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "document-password-supported", 127);
 
   /* finishings-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                "finishings-default", IPP_FINISHINGS_NONE);
+  if (!ippFindAttribute(printer->attrs, "finishings-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-default", IPP_FINISHINGS_NONE);
 
   /* finishings-supported */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                "finishings-supported", IPP_FINISHINGS_NONE);
+  if (!ippFindAttribute(printer->attrs, "finishings-supported", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-supported", IPP_FINISHINGS_NONE);
 
   /* generated-natural-language-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_LANGUAGE),
-               "generated-natural-language-supported", NULL, "en");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_LANGUAGE), "generated-natural-language-supported", NULL, "en");
 
   /* identify-actions-default */
-  ippAddString (printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "identify-actions-default", NULL, "sound");
+  if (!ippFindAttribute(printer->attrs, "identify-actions-default", IPP_TAG_ZERO))
+    ippAddString (printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "identify-actions-default", NULL, "sound");
 
   /* identify-actions-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "identify-actions-supported", sizeof(identify_actions) / sizeof(identify_actions[0]), NULL, identify_actions);
+  if (!ippFindAttribute(printer->attrs, "identify-actions-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "identify-actions-supported", sizeof(identify_actions) / sizeof(identify_actions[0]), NULL, identify_actions);
 
   /* ipp-features-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-features-supported", sizeof(features) / sizeof(features[0]), NULL, features);
+  if (!ippFindAttribute(printer->attrs, "ipp-features-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-features-supported", sizeof(features) / sizeof(features[0]), NULL, features);
 
   /* ipp-versions-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]), NULL, versions);
+  if (!ippFindAttribute(printer->attrs, "ipp-versions-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]), NULL, versions);
 
   /* job-account-id-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-account-id-default", NULL, "");
+  if (!ippFindAttribute(printer->attrs, "job-account-id-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-account-id-default", NULL, "");
 
   /* job-account-id-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-account-id-supported", 1);
+  if (!ippFindAttribute(printer->attrs, "job-account-id-supported", IPP_TAG_ZERO))
+    ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-account-id-supported", 1);
 
   /* job-accounting-user-id-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-accounting-user-id-default", NULL, "");
+  if (!ippFindAttribute(printer->attrs, "job-accounting-user-id-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-accounting-user-id-default", NULL, "");
 
   /* job-accounting-user-id-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-accounting-user-id-supported", 1);
+  if (!ippFindAttribute(printer->attrs, "job-accounting-user-id-supported", IPP_TAG_ZERO))
+    ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-accounting-user-id-supported", 1);
 
   /* job-creation-attributes-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", sizeof(job_creation) / sizeof(job_creation[0]), NULL, job_creation);
+  if (!ippFindAttribute(printer->attrs, "job-creation-attributes-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", sizeof(job_creation) / sizeof(job_creation[0]), NULL, job_creation);
 
   /* job-ids-supported */
   ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-ids-supported", 1);
@@ -1699,171 +1767,153 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	      k_supported);
 
   /* job-password-supported */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-password-supported", 4);
+  if (!ippFindAttribute(printer->attrs, "job-password-supported", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "job-password-supported", 4);
 
   /* job-preferred-attributes-supported */
   ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-preferred-attributes-supported", 0);
 
   /* job-priority-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-priority-default", 50);
+  if (!ippFindAttribute(printer->attrs, "job-priority-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "job-priority-default", 50);
 
   /* job-priority-supported */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-priority-supported", 100);
+  if (!ippFindAttribute(printer->attrs, "job-priority-supported", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "job-priority-supported", 100);
 
   /* job-sheets-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_NAME),
-               "job-sheets-default", NULL, "none");
+  if (!ippFindAttribute(printer->attrs, "job-sheets-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-sheets-default", NULL, "none");
 
   /* job-sheets-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_NAME),
-               "job-sheets-supported", NULL, "none");
+  if (!ippFindAttribute(printer->attrs, "job-sheets-supported", IPP_TAG_ZERO))
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "job-sheets-supported", NULL, "none");
 
   /* media-bottom-margin-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "media-bottom-margin-supported",
-		 (int)(sizeof(media_xxx_margin_supported) /
-		       sizeof(media_xxx_margin_supported[0])),
-		 media_xxx_margin_supported);
+  if (!ippFindAttribute(printer->attrs, "media-bottom-margin-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-bottom-margin-supported", (int)(sizeof(media_xxx_margin_supported) / sizeof(media_xxx_margin_supported[0])), media_xxx_margin_supported);
 
   /* media-col-database */
-  for (num_database = 0, i = 0;
-       i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
-       i ++)
+  if (!ippFindAttribute(printer->attrs, "media-col-database", IPP_TAG_ZERO))
   {
-    if (media_col_sizes[i][2] == _IPP_ENV_ONLY)
-      num_database += 3;		/* auto + manual + envelope */
-    else if (media_col_sizes[i][2] == _IPP_PHOTO_ONLY)
-      num_database += 6 * 3;		/* auto + photographic-* from auto, manual, and photo */
-    else
-      num_database += 2;		/* Regular + borderless */
-  }
-
-  media_col_database = ippAddCollections(printer->attrs, IPP_TAG_PRINTER,
-                                         "media-col-database", num_database,
-					 NULL);
-  for (media_col_index = 0, i = 0;
-       i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
-       i ++)
-  {
-    switch (media_col_sizes[i][2])
+    for (num_database = 0, i = 0;
+	 i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
+	 i ++)
     {
-      case _IPP_GENERAL :
-         /*
-	  * Regular + borderless for the general class; no source/type
-	  * selectors...
-	  */
+      if (media_col_sizes[i][2] == _IPP_ENV_ONLY)
+	num_database += 3;		/* auto + manual + envelope */
+      else if (media_col_sizes[i][2] == _IPP_PHOTO_ONLY)
+	num_database += 6 * 3;		/* auto + photographic-* from auto, manual, and photo */
+      else
+	num_database += 2;		/* Regular + borderless */
+    }
 
-	  ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], NULL, NULL, media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
-	  ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], NULL, NULL, media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
-          break;
+    media_col_database = ippAddCollections(printer->attrs, IPP_TAG_PRINTER, "media-col-database", num_database, NULL);
+    for (media_col_index = 0, i = 0;
+	 i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
+	 i ++)
+    {
+      switch (media_col_sizes[i][2])
+      {
+	case _IPP_GENERAL :
+	   /*
+	    * Regular + borderless for the general class; no source/type
+	    * selectors...
+	    */
 
-      case _IPP_ENV_ONLY :
-	 /*
-	  * Regular margins for "auto", "manual", and "envelope" sources.
-	  */
+	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], NULL, NULL, media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
+	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], NULL, NULL, media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
+	    break;
 
-	  ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "auto", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
-	  ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "manual", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
-	  ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "envelope", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
-	  break;
-      case _IPP_PHOTO_ONLY :
-         /*
-	  * Photos have specific media types and can only be printed via
-	  * the auto, manual, and photo sources...
-	  */
+	case _IPP_ENV_ONLY :
+	   /*
+	    * Regular margins for "auto", "manual", and "envelope" sources.
+	    */
 
-	  for (j = 0;
-	       j < (int)(sizeof(media_type_supported) /
-			 sizeof(media_type_supported[0]));
-	       j ++)
-	  {
-	    if (strcmp(media_type_supported[j], "auto") && strncmp(media_type_supported[j], "photographic-", 13))
-	      continue;
+	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "auto", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
+	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "manual", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
+	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "envelope", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
+	    break;
+	case _IPP_PHOTO_ONLY :
+	   /*
+	    * Photos have specific media types and can only be printed via
+	    * the auto, manual, and photo sources...
+	    */
 
-	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "auto", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
-	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "manual", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
-	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "photo", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
-	  }
-	  break;
+	    for (j = 0;
+		 j < (int)(sizeof(media_type_supported) /
+			   sizeof(media_type_supported[0]));
+		 j ++)
+	    {
+	      if (strcmp(media_type_supported[j], "auto") && strncmp(media_type_supported[j], "photographic-", 13))
+		continue;
+
+	      ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "auto", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
+	      ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "manual", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
+	      ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "photo", media_type_supported[j], media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
+	    }
+	    break;
+      }
     }
   }
 
   /* media-col-default */
-  media_col_default = create_media_col(media_supported[0],
-                                       media_source_supported[0],
-                                       media_type_supported[0],
-				       media_col_sizes[0][0],
-				       media_col_sizes[0][1],
-				       media_xxx_margin_supported[1]);
+  if (!ippFindAttribute(printer->attrs, "media-col-default", IPP_TAG_ZERO))
+  {
+    media_col_default = create_media_col(media_supported[0], media_source_supported[0], media_type_supported[0], media_col_sizes[0][0], media_col_sizes[0][1],media_xxx_margin_supported[1]);
 
-  ippAddCollection(printer->attrs, IPP_TAG_PRINTER, "media-col-default",
-                   media_col_default);
-  ippDelete(media_col_default);
+    ippAddCollection(printer->attrs, IPP_TAG_PRINTER, "media-col-default",
+		     media_col_default);
+    ippDelete(media_col_default);
+  }
 
   /* media-col-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                "media-col-supported",
-		(int)(sizeof(media_col_supported) /
-		      sizeof(media_col_supported[0])), NULL,
-		media_col_supported);
+  if (!ippFindAttribute(printer->attrs, "media-col-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-col-supported", (int)(sizeof(media_col_supported) / sizeof(media_col_supported[0])), NULL, media_col_supported);
 
   /* media-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "media-default", NULL, media_supported[0]);
+  if (!ippFindAttribute(printer->attrs, "media-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-default", NULL, media_supported[0]);
 
   /* media-left-margin-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "media-left-margin-supported",
-		 (int)(sizeof(media_xxx_margin_supported) /
-		       sizeof(media_xxx_margin_supported[0])),
-		 media_xxx_margin_supported);
+  if (!ippFindAttribute(printer->attrs, "media-left-margin-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-left-margin-supported", (int)(sizeof(media_xxx_margin_supported) / sizeof(media_xxx_margin_supported[0])), media_xxx_margin_supported);
 
   /* media-right-margin-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "media-right-margin-supported",
-		 (int)(sizeof(media_xxx_margin_supported) /
-		       sizeof(media_xxx_margin_supported[0])),
-		 media_xxx_margin_supported);
+  if (!ippFindAttribute(printer->attrs, "media-right-margin-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-right-margin-supported", (int)(sizeof(media_xxx_margin_supported) / sizeof(media_xxx_margin_supported[0])), media_xxx_margin_supported);
 
   /* media-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                "media-supported",
-		(int)(sizeof(media_supported) / sizeof(media_supported[0])),
-		NULL, media_supported);
+  if (!ippFindAttribute(printer->attrs, "media-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-supported", (int)(sizeof(media_supported) / sizeof(media_supported[0])), NULL, media_supported);
 
   /* media-size-supported */
-  media_size_supported = ippAddCollections(printer->attrs, IPP_TAG_PRINTER,
-                                           "media-size-supported",
-                                           (int)(sizeof(media_col_sizes) /
-                                                 sizeof(media_col_sizes[0])),
-                                           NULL);
-  for (i = 0;
-       i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
-       i ++)
-    ippSetCollection(printer->attrs, &media_size_supported, i,
-		     create_media_size(media_col_sizes[i][0],
-		                       media_col_sizes[i][1]));
+  if (!ippFindAttribute(printer->attrs, "media-size-supported", IPP_TAG_ZERO))
+  {
+    media_size_supported = ippAddCollections(printer->attrs, IPP_TAG_PRINTER, "media-size-supported", (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0])), NULL);
+
+    for (i = 0;
+	 i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
+	 i ++)
+    {
+      ipp_t *size = create_media_size(media_col_sizes[i][0], media_col_sizes[i][1]);
+
+      ippSetCollection(printer->attrs, &media_size_supported, i, size);
+      ippDelete(size);
+    }
+  }
 
   /* media-source-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-source-supported", (int)(sizeof(media_source_supported) / sizeof(media_source_supported[0])), NULL, media_source_supported);
+  if (!ippFindAttribute(printer->attrs, "media-source-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-source-supported", (int)(sizeof(media_source_supported) / sizeof(media_source_supported[0])), NULL, media_source_supported);
 
   /* media-top-margin-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                 "media-top-margin-supported",
-		 (int)(sizeof(media_xxx_margin_supported) /
-		       sizeof(media_xxx_margin_supported[0])),
-		 media_xxx_margin_supported);
+  if (!ippFindAttribute(printer->attrs, "media-top-margin-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-top-margin-supported", (int)(sizeof(media_xxx_margin_supported) / sizeof(media_xxx_margin_supported[0])), media_xxx_margin_supported);
 
   /* media-type-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-type-supported", (int)(sizeof(media_type_supported) / sizeof(media_type_supported[0])), NULL, media_type_supported);
+  if (!ippFindAttribute(printer->attrs, "media-type-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-type-supported", (int)(sizeof(media_type_supported) / sizeof(media_type_supported[0])), NULL, media_type_supported);
 
   /* multiple-document-handling-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "multiple-document-handling-supported", sizeof(multiple_document_handling) / sizeof(multiple_document_handling[0]), NULL, multiple_document_handling);
@@ -1883,40 +1933,39 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                "natural-language-configured", NULL, "en");
 
   /* number-up-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "number-up-default", 1);
+  if (!ippFindAttribute(printer->attrs, "number-up-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "number-up-default", 1);
 
   /* number-up-supported */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "number-up-supported", 1);
+  if (!ippFindAttribute(printer->attrs, "number-up-supported", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "number-up-supported", 1);
 
   /* operations-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-		 "operations-supported", sizeof(ops) / sizeof(ops[0]), ops);
+  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "operations-supported", sizeof(ops) / sizeof(ops[0]), ops);
 
   /* orientation-requested-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
-                "orientation-requested-default", 0);
+  if (!ippFindAttribute(printer->attrs, "orientation-requested-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE, "orientation-requested-default", 0);
 
   /* orientation-requested-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "orientation-requested-supported", 4, orients);
+  if (!ippFindAttribute(printer->attrs, "orientation-requested-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "orientation-requested-supported", 4, orients);
 
   /* output-bin-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "output-bin-default", NULL, "face-down");
+  if (!ippFindAttribute(printer->attrs, "output-bin-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "output-bin-default", NULL, "face-down");
 
   /* output-bin-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "output-bin-supported", NULL, "face-down");
+  if (!ippFindAttribute(printer->attrs, "output-bin-supported", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "output-bin-supported", NULL, "face-down");
 
   /* overrides-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "overrides-supported", (int)(sizeof(overrides) / sizeof(overrides[0])), NULL, overrides);
+  if (!ippFindAttribute(printer->attrs, "overrides-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "overrides-supported", (int)(sizeof(overrides) / sizeof(overrides[0])), NULL, overrides);
 
   /* page-ranges-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 1);
+  if (!ippFindAttribute(printer->attrs, "page-ranges-supported", IPP_TAG_ZERO))
+    ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 1);
 
   /* pages-per-minute */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1928,33 +1977,40 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                   "pages-per-minute-color", ppm_color);
 
   /* pdl-override-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "pdl-override-supported", NULL, "attempted");
+  if (!ippFindAttribute(printer->attrs, "pdl-override-supported", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "pdl-override-supported", NULL, "attempted");
 
   /* print-color-mode-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-default", NULL, "auto");
+  if (!ippFindAttribute(printer->attrs, "print-color-mode-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-default", NULL, "auto");
 
   /* print-color-mode-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-supported", (int)(sizeof(print_color_mode_supported) / sizeof(print_color_mode_supported[0])), NULL, print_color_mode_supported);
+  if (!ippFindAttribute(printer->attrs, "print-color-mode-supported", IPP_TAG_ZERO))
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-supported", (int)(sizeof(print_color_mode_supported) / sizeof(print_color_mode_supported[0])), NULL, print_color_mode_supported);
 
   /* print-content-optimize-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-content-optimize-default", NULL, "auto");
+  if (!ippFindAttribute(printer->attrs, "print-content-optimize-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-content-optimize-default", NULL, "auto");
 
   /* print-content-optimize-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-content-optimize-supported", NULL, "auto");
+  if (!ippFindAttribute(printer->attrs, "print-content-optimize-supported", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-content-optimize-supported", NULL, "auto");
 
   /* print-rendering-intent-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-rendering-intent-default", NULL, "auto");
+  if (!ippFindAttribute(printer->attrs, "print-rendering-intent-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-rendering-intent-default", NULL, "auto");
 
   /* print-rendering-intent-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-rendering-intent-supported", NULL, "auto");
+  if (!ippFindAttribute(printer->attrs, "print-rendering-intent-supported", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-rendering-intent-supported", NULL, "auto");
 
   /* print-quality-default */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "print-quality-default", IPP_QUALITY_NORMAL);
+  if (!ippFindAttribute(printer->attrs, "print-quality-default", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "print-quality-default", IPP_QUALITY_NORMAL);
 
   /* print-quality-supported */
-  ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "print-quality-supported", (int)(sizeof(print_quality_supported) / sizeof(print_quality_supported[0])), print_quality_supported);
+  if (!ippFindAttribute(printer->attrs, "print-quality-supported", IPP_TAG_ZERO))
+    ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "print-quality-supported", (int)(sizeof(print_quality_supported) / sizeof(print_quality_supported[0])), print_quality_supported);
 
   /* printer-device-id */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -1964,19 +2020,18 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "printer-get-attributes-supported", NULL, "document-format");
 
   /* printer-geo-location */
-  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_UNKNOWN, "printer-geo-location", 0);
+  if (!ippFindAttribute(printer->attrs, "printer-geo-location", IPP_TAG_ZERO))
+    ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_UNKNOWN, "printer-geo-location", 0);
 
   /* printer-icons */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
                "printer-icons", NULL, icons);
 
   /* printer-is-accepting-jobs */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                1);
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
 
   /* printer-info */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
-               NULL, name);
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info", NULL, name);
 
   /* printer-location */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -1987,7 +2042,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                "printer-make-and-model", NULL, make_model);
 
   /* printer-mandatory-job-attributes */
-  if (pin)
+  if (pin && !ippFindAttribute(printer->attrs, "", IPP_TAG_ZERO))
   {
     static const char * const names[] =
     {
@@ -2005,22 +2060,23 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info", NULL, adminurl);
 
   /* printer-name */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name",
-               NULL, name);
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name", NULL, name);
 
   /* printer-organization */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organization", NULL, "Apple Inc.");
+  if (!ippFindAttribute(printer->attrs, "printer-organization", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organization", NULL, "Apple Inc.");
 
   /* printer-organizational-unit */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organizational-unit", NULL, "Printing Engineering");
+  if (!ippFindAttribute(printer->attrs, "printer-organizational-unit", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organizational-unit", NULL, "Printing Engineering");
 
   /* printer-resolution-default */
-  ippAddResolution(printer->attrs, IPP_TAG_PRINTER,
-                   "printer-resolution-default", IPP_RES_PER_INCH, 600, 600);
+  if (!ippFindAttribute(printer->attrs, "printer-resolution-default", IPP_TAG_ZERO))
+    ippAddResolution(printer->attrs, IPP_TAG_PRINTER, "printer-resolution-default", IPP_RES_PER_INCH, 600, 600);
 
   /* printer-resolution-supported */
-  ippAddResolution(printer->attrs, IPP_TAG_PRINTER,
-                   "printer-resolution-supported", IPP_RES_PER_INCH, 600, 600);
+  if (!ippFindAttribute(printer->attrs, "printer-resolutions-supported", IPP_TAG_ZERO))
+    ippAddResolution(printer->attrs, IPP_TAG_PRINTER, "printer-resolution-supported", IPP_RES_PER_INCH, 600, 600);
 
   /* printer-supply-description */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supplies) / sizeof(printer_supplies[0])), NULL, printer_supplies);
@@ -2029,7 +2085,15 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-supply-info-uri", NULL, supplyurl);
 
   /* printer-uri-supported */
+#ifdef HAVE_SSL
+  uris[0] = uri;
+  uris[1] = securi;
+
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported", 2, NULL, (const char **)uris);
+
+#else
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported", NULL, uri);
+#endif /* HAVE_SSL */
 
   /* printer-uuid */
   httpAssembleUUID(printer->hostname, port, name, 0, uuid, sizeof(uuid));
@@ -2042,63 +2106,49 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   if (i < num_formats)
   {
-    ippAddResolutions(printer->attrs, IPP_TAG_PRINTER,
-                      "pwg-raster-document-resolution-supported",
-                      (int)(sizeof(pwg_raster_document_resolution_supported) /
-                            sizeof(pwg_raster_document_resolution_supported[0])),
-                      IPP_RES_PER_INCH,
-                      pwg_raster_document_resolution_supported,
-                      pwg_raster_document_resolution_supported);
-    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "pwg-raster-document-sheet-back", NULL, "normal");
-    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                  "pwg-raster-document-type-supported",
-                  (int)(sizeof(pwg_raster_document_type_supported) /
-                        sizeof(pwg_raster_document_type_supported[0])), NULL,
-                  pwg_raster_document_type_supported);
+    if (!ippFindAttribute(printer->attrs, "pwg-raster-document-resolution-supported", IPP_TAG_ZERO))
+      ippAddResolutions(printer->attrs, IPP_TAG_PRINTER, "pwg-raster-document-resolution-supported", (int)(sizeof(pwg_raster_document_resolution_supported) / sizeof(pwg_raster_document_resolution_supported[0])), IPP_RES_PER_INCH, pwg_raster_document_resolution_supported, pwg_raster_document_resolution_supported);
+    if (!ippFindAttribute(printer->attrs, "pwg-raster-document-sheet-back", IPP_TAG_ZERO))
+      ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "pwg-raster-document-sheet-back", NULL, "normal");
+    if (!ippFindAttribute(printer->attrs, "pwg-raster-document-type-supported", IPP_TAG_ZERO))
+      ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "pwg-raster-document-type-supported", (int)(sizeof(pwg_raster_document_type_supported) / sizeof(pwg_raster_document_type_supported[0])), NULL, pwg_raster_document_type_supported);
   }
 
   /* reference-uri-scheme-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_URISCHEME),
-                "reference-uri-schemes-supported",
-                (int)(sizeof(reference_uri_schemes_supported) /
-                      sizeof(reference_uri_schemes_supported[0])),
-                NULL, reference_uri_schemes_supported);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_URISCHEME), "reference-uri-schemes-supported", (int)(sizeof(reference_uri_schemes_supported) / sizeof(reference_uri_schemes_supported[0])), NULL, reference_uri_schemes_supported);
 
   /* sides-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "sides-default", NULL, "one-sided");
+  if (!ippFindAttribute(printer->attrs, "sides-default", IPP_TAG_ZERO))
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "sides-default", NULL, "one-sided");
 
   /* sides-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
+  if (!ippFindAttribute(printer->attrs, "sides-supported", IPP_TAG_ZERO))
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
 
   /* urf-supported */
   for (i = 0; i < num_formats; i ++)
     if (!strcasecmp(formats[i], "image/urf"))
       break;
 
-  if (i < num_formats)
+  if (i < num_formats && !ippFindAttribute(printer->attrs, "urf-supported", IPP_TAG_ZERO))
     ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "urf-supported", (int)(sizeof(urf_supported) / sizeof(urf_supported[0])) - !duplex, NULL, urf_supported);
 
   /* uri-authentication-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "uri-authentication-supported", NULL, "none");
+#ifdef HAVE_SSL
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", 2, NULL, uri_authentication_supported);
+#else
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", NULL, "none");
+#endif /* HAVE_SSL */
 
   /* uri-security-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_CONST_TAG(IPP_TAG_KEYWORD),
-               "uri-security-supported", NULL, "none");
+#ifdef HAVE_SSL
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-security-supported", 2, NULL, uri_security_supported);
+#else
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-security-supported", NULL, "none");
+#endif /* HAVE_SSL */
 
   /* which-jobs-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                "which-jobs-supported",
-                sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "which-jobs-supported", sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 
   free(formats[0]);
 
@@ -2474,6 +2524,325 @@ find_job(_ipp_client_t *client)		/* I - Client */
   _cupsRWUnlock(&(client->printer->rwlock));
 
   return (job);
+}
+
+
+/*
+ * 'get_collection()' - Get a collection value from a file.
+ */
+
+static ipp_t *				/* O  - Collection value */
+get_collection(FILE       *fp,		/* I  - File to read from */
+               const char *filename,	/* I  - Attributes filename */
+	       int        *linenum)	/* IO - Line number */
+{
+  char		token[1024],		/* Token from file */
+		attr[128];		/* Attribute name */
+  ipp_tag_t	value;			/* Current value type */
+  ipp_t		*col = ippNew();	/* Collection value */
+  ipp_attribute_t *lastcol = NULL;	/* Last collection attribute */
+
+
+  while (get_token(fp, token, sizeof(token), linenum) != NULL)
+  {
+    if (!strcmp(token, "}"))
+      break;
+    else if (!strcmp(token, "{") && lastcol)
+    {
+     /*
+      * Another collection value
+      */
+
+      ipp_t	*subcol = get_collection(fp, filename, linenum);
+					/* Collection value */
+
+      if (subcol)
+        ippSetCollection(col, &lastcol, ippGetCount(lastcol), subcol);
+      else
+	goto col_error;
+    }
+    else if (!_cups_strcasecmp(token, "MEMBER"))
+    {
+     /*
+      * Attribute...
+      */
+
+      lastcol = NULL;
+
+      if (!get_token(fp, token, sizeof(token), linenum))
+      {
+	fprintf(stderr, "ippserver: Missing MEMBER value tag on line %d of \"%s\".\n", *linenum, filename);
+	goto col_error;
+      }
+
+      if ((value = ippTagValue(token)) == IPP_TAG_ZERO)
+      {
+	fprintf(stderr, "ippserver: Bad MEMBER value tag \"%s\" on line %d of \"%s\".\n", token, *linenum, filename);
+	goto col_error;
+      }
+
+      if (!get_token(fp, attr, sizeof(attr), linenum))
+      {
+	fprintf(stderr, "ippserver: Missing MEMBER name on line %d of \"%s\".\n", *linenum, filename);
+	goto col_error;
+      }
+
+      if (!get_token(fp, token, sizeof(token), linenum))
+      {
+	fprintf(stderr, "ippserver: Missing MEMBER value on line %d of \"%s\".\n", *linenum, filename);
+	goto col_error;
+      }
+
+      switch (value)
+      {
+	case IPP_TAG_BOOLEAN :
+	    if (!_cups_strcasecmp(token, "true"))
+	      ippAddBoolean(col, IPP_TAG_ZERO, attr, 1);
+	    else
+	      ippAddBoolean(col, IPP_TAG_ZERO, attr, (char)atoi(token));
+	    break;
+
+	case IPP_TAG_INTEGER :
+	case IPP_TAG_ENUM :
+	    ippAddInteger(col, IPP_TAG_ZERO, value, attr, atoi(token));
+	    break;
+
+	case IPP_TAG_RESOLUTION :
+	    {
+	      int	xres,		/* X resolution */
+			yres;		/* Y resolution */
+	      char	units[6];	/* Units */
+
+	      if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
+		  (_cups_strcasecmp(units, "dpi") &&
+		   _cups_strcasecmp(units, "dpc") &&
+		   _cups_strcasecmp(units, "dpcm") &&
+		   _cups_strcasecmp(units, "other")))
+	      {
+		fprintf(stderr, "ippserver: Bad resolution value \"%s\" on line %d of \"%s\".\n", token, *linenum, filename);
+		goto col_error;
+	      }
+
+	      if (!_cups_strcasecmp(units, "dpi"))
+		ippAddResolution(col, IPP_TAG_ZERO, attr, IPP_RES_PER_INCH, xres, yres);
+	      else if (!_cups_strcasecmp(units, "dpc") ||
+	               !_cups_strcasecmp(units, "dpcm"))
+		ippAddResolution(col, IPP_TAG_ZERO, attr, IPP_RES_PER_CM, xres, yres);
+	      else
+		ippAddResolution(col, IPP_TAG_ZERO, attr, (ipp_res_t)0, xres, yres);
+	    }
+	    break;
+
+	case IPP_TAG_RANGE :
+	    {
+	      int	lowers[4],	/* Lower value */
+			uppers[4],	/* Upper values */
+			num_vals;	/* Number of values */
+
+
+	      num_vals = sscanf(token, "%d-%d,%d-%d,%d-%d,%d-%d",
+				lowers + 0, uppers + 0,
+				lowers + 1, uppers + 1,
+				lowers + 2, uppers + 2,
+				lowers + 3, uppers + 3);
+
+	      if ((num_vals & 1) || num_vals == 0)
+	      {
+		fprintf(stderr, "ippserver: Bad rangeOfInteger value \"%s\" on line %d of \"%s\".\n", token, *linenum, filename);
+		goto col_error;
+	      }
+
+	      ippAddRanges(col, IPP_TAG_ZERO, attr, num_vals / 2, lowers,
+			   uppers);
+	    }
+	    break;
+
+	case IPP_TAG_BEGIN_COLLECTION :
+	    if (!strcmp(token, "{"))
+	    {
+	      ipp_t	*subcol = get_collection(fp, filename, linenum);
+				      /* Collection value */
+
+	      if (subcol)
+	      {
+		lastcol = ippAddCollection(col, IPP_TAG_ZERO, attr, subcol);
+		ippDelete(subcol);
+	      }
+	      else
+		goto col_error;
+	    }
+	    else
+	    {
+	      fprintf(stderr, "ippserver: Bad collection value on line %d of \"%s\".\n", *linenum, filename);
+	      goto col_error;
+	    }
+	    break;
+	case IPP_TAG_STRING :
+	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, (int)strlen(token));
+	    break;
+
+	default :
+	    if (!strchr(token, ','))
+	      ippAddString(col, IPP_TAG_ZERO, value, attr, NULL, token);
+	    else
+	    {
+	     /*
+	      * Multiple string values...
+	      */
+
+	      int	num_values;	/* Number of values */
+	      char	*values[100],	/* Values */
+			*ptr;		/* Pointer to next value */
+
+
+	      values[0]  = token;
+	      num_values = 1;
+
+	      for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
+	      {
+		*ptr++ = '\0';
+		values[num_values] = ptr;
+		num_values ++;
+		if (num_values >= (int)(sizeof(values) / sizeof(values[0])))
+		  break;
+	      }
+
+	      ippAddStrings(col, IPP_TAG_ZERO, value, attr, num_values,
+			    NULL, (const char **)values);
+	    }
+	    break;
+      }
+    }
+  }
+
+  return (col);
+
+ /*
+  * If we get here there was a parse error; free memory and return.
+  */
+
+  col_error:
+
+  ippDelete(col);
+
+  return (NULL);
+}
+
+
+/*
+ * 'get_token()' - Get a token from a file.
+ */
+
+static char *				/* O  - Token from file or NULL on EOF */
+get_token(FILE *fp,			/* I  - File to read from */
+          char *buf,			/* I  - Buffer to read into */
+	  int  buflen,			/* I  - Length of buffer */
+	  int  *linenum)		/* IO - Current line number */
+{
+  int	ch,				/* Character from file */
+	quote;				/* Quoting character */
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* End of buffer */
+
+
+  for (;;)
+  {
+   /*
+    * Skip whitespace...
+    */
+
+    while (isspace(ch = getc(fp)))
+    {
+      if (ch == '\n')
+        (*linenum) ++;
+    }
+
+   /*
+    * Read a token...
+    */
+
+    if (ch == EOF)
+      return (NULL);
+    else if (ch == '\'' || ch == '\"')
+    {
+     /*
+      * Quoted text or regular expression...
+      */
+
+      quote  = ch;
+      bufptr = buf;
+      bufend = buf + buflen - 1;
+
+      while ((ch = getc(fp)) != EOF)
+      {
+        if (ch == '\\')
+	{
+	 /*
+	  * Escape next character...
+	  */
+
+	  if (bufptr < bufend)
+	    *bufptr++ = (char)ch;
+
+	  if ((ch = getc(fp)) != EOF && bufptr < bufend)
+	    *bufptr++ = (char)ch;
+	}
+	else if (ch == quote)
+          break;
+	else if (bufptr < bufend)
+          *bufptr++ = (char)ch;
+      }
+
+      *bufptr = '\0';
+
+      return (buf);
+    }
+    else if (ch == '#')
+    {
+     /*
+      * Comment...
+      */
+
+      while ((ch = getc(fp)) != EOF)
+	if (ch == '\n')
+          break;
+
+      (*linenum) ++;
+    }
+    else if (ch == '{' || ch == '}' || ch == ',')
+    {
+      buf[0] = (char)ch;
+      buf[1] = '\0';
+
+      return (buf);
+    }
+    else
+    {
+     /*
+      * Whitespace delimited text...
+      */
+
+      ungetc(ch, fp);
+
+      bufptr = buf;
+      bufend = buf + buflen - 1;
+
+      while ((ch = getc(fp)) != EOF)
+	if (isspace(ch) || ch == '#')
+          break;
+	else if (bufptr < bufend)
+          *bufptr++ = (char)ch;
+
+      if (ch == '#')
+        ungetc(ch, fp);
+      else if (ch == '\n')
+        (*linenum) ++;
+
+      *bufptr = '\0';
+
+      return (buf);
+    }
+  }
 }
 
 
@@ -3303,45 +3672,22 @@ ipp_get_printer_attributes(
                    "printer-state-reasons", NULL, "none");
     else
     {
-      int			num_reasons = 0;/* Number of reasons */
-      const char		*reasons[32];	/* Reason strings */
+      ipp_attribute_t	*attr = NULL;		/* printer-state-reasons */
+      _ipp_preason_t	bit;			/* Reason bit */
+      int		i;			/* Looping var */
+      char		reason[32];		/* Reason string */
 
-      if (printer->state_reasons & _IPP_PREASON_OTHER)
-	reasons[num_reasons ++] = "other";
-      if (printer->state_reasons & _IPP_PREASON_COVER_OPEN)
-	reasons[num_reasons ++] = "cover-open";
-      if (printer->state_reasons & _IPP_PREASON_INPUT_TRAY_MISSING)
-	reasons[num_reasons ++] = "input-tray-missing";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_SUPPLY_EMPTY)
-	reasons[num_reasons ++] = "marker-supply-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_SUPPLY_LOW)
-	reasons[num_reasons ++] = "marker-supply-low-report";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_WASTE_ALMOST_FULL)
-	reasons[num_reasons ++] = "marker-waste-almost-full-report";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_WASTE_FULL)
-	reasons[num_reasons ++] = "marker-waste-full-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_EMPTY)
-	reasons[num_reasons ++] = "media-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_JAM)
-	reasons[num_reasons ++] = "media-jam-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_LOW)
-	reasons[num_reasons ++] = "media-low-report";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_NEEDED)
-	reasons[num_reasons ++] = "media-needed-report";
-      if (printer->state_reasons & _IPP_PREASON_MOVING_TO_PAUSED)
-	reasons[num_reasons ++] = "moving-to-paused";
-      if (printer->state_reasons & _IPP_PREASON_PAUSED)
-	reasons[num_reasons ++] = "paused";
-      if (printer->state_reasons & _IPP_PREASON_SPOOL_AREA_FULL)
-	reasons[num_reasons ++] = "spool-area-full";
-      if (printer->state_reasons & _IPP_PREASON_TONER_EMPTY)
-	reasons[num_reasons ++] = "toner-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_TONER_LOW)
-	reasons[num_reasons ++] = "toner-low-report";
-
-      ippAddStrings(client->response, IPP_TAG_PRINTER,
-                    IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                    "printer-state-reasons", num_reasons, NULL, reasons);
+      for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+      {
+        if (printer->state_reasons & bit)
+	{
+	  snprintf(reason, sizeof(reason), "%s-%s", _ipp_preason_strings[0], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
+	  if (attr)
+	    ippSetString(client->response, &attr, ippGetCount(attr), reason);
+	  else
+	    attr = ippAddString(client->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "printer-state-reasons", NULL, reason);
+	}
+      }
     }
   }
 
@@ -3384,7 +3730,21 @@ static void
 ipp_identify_printer(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  ipp_attribute_t	*actions,	/* identify-actions */
+			*message;	/* message */
+
+
+  actions = ippFindAttribute(client->request, "identify-actions", IPP_TAG_KEYWORD);
+  message = ippFindAttribute(client->request, "message", IPP_TAG_TEXT);
+
+  if (!actions || ippContainsString(actions, "sound"))
+  {
+    putchar(0x07);
+    fflush(stdout);
+  }
+
+  if (ippContainsString(actions, "display"))
+    printf("IDENTIFY from %s: %s\n", client->hostname, message ? ippGetString(message, 0, NULL) : "No message supplied");
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
 }
@@ -4432,6 +4792,296 @@ ipp_validate_job(_ipp_client_t *client)	/* I - Client */
 
 
 /*
+ * 'load_attributes()' - Load printer attributes from a file.
+ *
+ * Syntax is based on ipptool format:
+ *
+ *    ATTR value-tag name value
+ */
+
+static void
+load_attributes(const char *filename,	/* I - File to load */
+                ipp_t      *attrs)	/* I - Printer attributes */
+{
+  int		linenum = 0;		/* Current line number */
+  FILE		*fp = NULL;		/* Test file */
+  char		attr[128],		/* Attribute name */
+		token[1024],		/* Token from file */
+		*tokenptr;		/* Pointer into token */
+  ipp_tag_t	value;			/* Current value type */
+  ipp_attribute_t *attrptr,		/* Attribute pointer */
+		*lastcol = NULL;	/* Last collection attribute */
+
+
+  if ((fp = fopen(filename, "r")) == NULL)
+  {
+    fprintf(stderr, "ippserver: Unable to open \"%s\": %s\n", filename, strerror(errno));
+    exit(1);
+  }
+
+  while (get_token(fp, token, sizeof(token), &linenum) != NULL)
+  {
+    if (!_cups_strcasecmp(token, "ATTR"))
+    {
+     /*
+      * Attribute...
+      */
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	fprintf(stderr, "ippserver: Missing ATTR value tag on line %d of \"%s\".\n", linenum, filename);
+        exit(1);
+      }
+
+      if ((value = ippTagValue(token)) == IPP_TAG_ZERO)
+      {
+	fprintf(stderr, "ippserver: Bad ATTR value tag \"%s\" on line %d of \"%s\".\n", token, linenum, filename);
+	exit(1);
+      }
+
+      if (!get_token(fp, attr, sizeof(attr), &linenum))
+      {
+	fprintf(stderr, "ippserver: Missing ATTR name on line %d of \"%s\".\n", linenum, filename);
+	exit(1);
+      }
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	fprintf(stderr, "ippserver: Missing ATTR value on line %d of \"%s\".\n", linenum, filename);
+	exit(1);
+      }
+
+      attrptr = NULL;
+
+      switch (value)
+      {
+	case IPP_TAG_BOOLEAN :
+	    if (!_cups_strcasecmp(token, "true"))
+	      attrptr = ippAddBoolean(attrs, IPP_TAG_PRINTER, attr, 1);
+	    else
+	      attrptr = ippAddBoolean(attrs, IPP_TAG_PRINTER, attr, (char)atoi(token));
+	    break;
+
+	case IPP_TAG_INTEGER :
+	case IPP_TAG_ENUM :
+	    if (!strchr(token, ','))
+	      attrptr = ippAddInteger(attrs, IPP_TAG_PRINTER, value, attr, (int)strtol(token, &tokenptr, 0));
+	    else
+	    {
+	      int	values[100],	/* Values */
+			num_values = 1;	/* Number of values */
+
+	      values[0] = (int)strtol(token, &tokenptr, 10);
+	      while (tokenptr && *tokenptr &&
+		     num_values < (int)(sizeof(values) / sizeof(values[0])))
+	      {
+		if (*tokenptr == ',')
+		  tokenptr ++;
+		else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
+		  break;
+
+		values[num_values] = (int)strtol(tokenptr, &tokenptr, 0);
+		num_values ++;
+	      }
+
+	      attrptr = ippAddIntegers(attrs, IPP_TAG_PRINTER, value, attr, num_values, values);
+	    }
+
+	    if (!tokenptr || *tokenptr)
+	    {
+	      fprintf(stderr, "ippserver: Bad %s value \"%s\" on line %d of \"%s\".\n", ippTagString(value), token, linenum, filename);
+	      exit(1);
+	    }
+	    break;
+
+	case IPP_TAG_RESOLUTION :
+	    {
+	      int	xres,		/* X resolution */
+			yres;		/* Y resolution */
+	      ipp_res_t	units;		/* Units */
+	      char	*start,		/* Start of value */
+			*ptr,		/* Pointer into value */
+			*next = NULL;	/* Next value */
+
+	      for (start = token; start; start = next)
+	      {
+		xres = yres = (int)strtol(start, (char **)&ptr, 10);
+		if (ptr > start && xres > 0)
+		{
+		  if (*ptr == 'x')
+		    yres = (int)strtol(ptr + 1, (char **)&ptr, 10);
+		}
+
+		if (ptr && (next = strchr(ptr, ',')) != NULL)
+		  *next++ = '\0';
+
+		if (ptr <= start || xres <= 0 || yres <= 0 || !ptr ||
+		    (_cups_strcasecmp(ptr, "dpi") &&
+		     _cups_strcasecmp(ptr, "dpc") &&
+		     _cups_strcasecmp(ptr, "dpcm") &&
+		     _cups_strcasecmp(ptr, "other")))
+		{
+		  fprintf(stderr, "ippserver: Bad resolution value \"%s\" on line %d of \"%s\".\n", token, linenum, filename);
+		  exit(1);
+		}
+
+		if (!_cups_strcasecmp(ptr, "dpc") || !_cups_strcasecmp(ptr, "dpcm"))
+		  units = IPP_RES_PER_CM;
+		else
+		  units = IPP_RES_PER_INCH;
+
+                if (attrptr)
+		  ippSetResolution(attrs, &attrptr, ippGetCount(attrptr), units, xres, yres);
+		else
+		  attrptr = ippAddResolution(attrs, IPP_TAG_PRINTER, attr, units, xres, yres);
+	      }
+	    }
+	    break;
+
+	case IPP_TAG_RANGE :
+	    {
+	      int	lowers[4],	/* Lower value */
+			uppers[4],	/* Upper values */
+			num_vals;	/* Number of values */
+
+
+	      num_vals = sscanf(token, "%d-%d,%d-%d,%d-%d,%d-%d",
+				lowers + 0, uppers + 0,
+				lowers + 1, uppers + 1,
+				lowers + 2, uppers + 2,
+				lowers + 3, uppers + 3);
+
+	      if ((num_vals & 1) || num_vals == 0)
+	      {
+		fprintf(stderr, "ippserver: Bad rangeOfInteger value \"%s\" on line %d of \"%s\".", token, linenum, filename);
+		exit(1);
+	      }
+
+	      attrptr = ippAddRanges(attrs, IPP_TAG_PRINTER, attr, num_vals / 2, lowers,
+				     uppers);
+	    }
+	    break;
+
+	case IPP_TAG_BEGIN_COLLECTION :
+	    if (!strcmp(token, "{"))
+	    {
+	      ipp_t	*col = get_collection(fp, filename, &linenum);
+				    /* Collection value */
+
+	      if (col)
+	      {
+		attrptr = lastcol = ippAddCollection(attrs, IPP_TAG_PRINTER, attr, col);
+		ippDelete(col);
+	      }
+	      else
+		exit(1);
+	    }
+	    else
+	    {
+	      fprintf(stderr, "ippserver: Bad ATTR collection value on line %d of \"%s\".\n", linenum, filename);
+	      exit(1);
+	    }
+
+	    do
+	    {
+	      ipp_t	*col;			/* Collection value */
+	      long	pos = ftell(fp);	/* Save position of file */
+
+	      if (!get_token(fp, token, sizeof(token), &linenum))
+		break;
+
+	      if (strcmp(token, ","))
+	      {
+		fseek(fp, pos, SEEK_SET);
+		break;
+	      }
+
+	      if (!get_token(fp, token, sizeof(token), &linenum) || strcmp(token, "{"))
+	      {
+		fprintf(stderr, "ippserver: Unexpected \"%s\" on line %d of \"%s\".\n", token, linenum, filename);
+		exit(1);
+	      }
+
+	      if ((col = get_collection(fp, filename, &linenum)) == NULL)
+		break;
+
+	      ippSetCollection(attrs, &attrptr, ippGetCount(attrptr), col);
+	      lastcol = attrptr;
+	    }
+	    while (!strcmp(token, "{"));
+	    break;
+
+	case IPP_TAG_STRING :
+	    attrptr = ippAddOctetString(attrs, IPP_TAG_PRINTER, attr, token, (int)strlen(token));
+	    break;
+
+	default :
+	    fprintf(stderr, "ippserver: Unsupported ATTR value tag %s on line %d of \"%s\".\n", ippTagString(value), linenum, filename);
+	    exit(1);
+
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	    if (!strchr(token, ','))
+	      attrptr = ippAddString(attrs, IPP_TAG_PRINTER, value, attr, NULL, token);
+	    else
+	    {
+	     /*
+	      * Multiple string values...
+	      */
+
+	      int	num_values;	/* Number of values */
+	      char	*values[100],	/* Values */
+			*ptr;		/* Pointer to next value */
+
+
+	      values[0]  = token;
+	      num_values = 1;
+
+	      for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
+	      {
+		if (ptr > token && ptr[-1] == '\\')
+		  _cups_strcpy(ptr - 1, ptr);
+		else
+		{
+		  *ptr++ = '\0';
+		  values[num_values] = ptr;
+		  num_values ++;
+		  if (num_values >= (int)(sizeof(values) / sizeof(values[0])))
+		    break;
+		}
+	      }
+
+	      attrptr = ippAddStrings(attrs, IPP_TAG_PRINTER, value, attr, num_values, NULL, (const char **)values);
+	    }
+	    break;
+      }
+
+      if (!attrptr)
+      {
+        fprintf(stderr, "ippserver: Unable to add attribute on line %d of \"%s\": %s\n", linenum, filename, cupsLastErrorString());
+        exit(1);
+      }
+    }
+    else
+    {
+      fprintf(stderr, "ippserver: Unknown directive \"%s\" on line %d of \"%s\".\n", token, linenum, filename);
+      exit(1);
+    }
+  }
+
+  fclose(fp);
+}
+
+
+/*
  * 'parse_options()' - Parse URL options into CUPS options.
  *
  * The client->options string is destroyed by this function.
@@ -4462,6 +5112,20 @@ parse_options(_ipp_client_t *client,	/* I - Client */
   }
 
   return (num_options);
+}
+
+
+/*
+ * 'process_attr_message()' - Process an ATTR: message from a command.
+ */
+
+static void
+process_attr_message(
+    _ipp_job_t *job,			/* I - Job */
+    char       *message)		/* I - Message */
+{
+  (void)job;
+  (void)message;
 }
 
 
@@ -5391,6 +6055,13 @@ process_job(_ipp_job_t *job)		/* I - Job */
     ipp_attribute_t *attr;		/* Job attribute */
     char	val[1280],		/* IPP_NAME=value */
 		*valptr;		/* Pointer into string */
+#ifndef WIN32
+    int		mypipe[2];		/* Pipe for stderr */
+    char	line[2048],		/* Line from stderr */
+		*ptr,			/* Pointer into line */
+		*endptr;		/* End of line */
+    ssize_t	bytes;			/* Bytes read */
+#endif /* !WIN32 */
 
     fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
             job->filename);
@@ -5450,12 +6121,24 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
 #ifdef WIN32
     status = _spawnvpe(_P_WAIT, job->printer->command, myargv, myenvp);
+
 #else
+    if (pipe(mypipe))
+    {
+      perror("Unable to create pipe for stderr");
+      mypipe[0] = mypipe[1] = -1;
+    }
+
     if ((pid = fork()) == 0)
     {
      /*
       * Child comes here...
       */
+
+      close(2);
+      dup2(mypipe[1], 2);
+      close(mypipe[0]);
+      close(mypipe[1]);
 
       execve(job->printer->command, myargv, myenvp);
       exit(errno);
@@ -5468,6 +6151,9 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       perror("Unable to start job processing command");
       status = -1;
+
+      close(mypipe[0]);
+      close(mypipe[1]);
 
      /*
       * Free memory used for environment...
@@ -5484,6 +6170,55 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       while (myenvc > 0)
 	free(myenvp[-- myenvc]);
+
+     /*
+      * If the pipe exists, read from it until EOF...
+      */
+
+      if (mypipe[0] >= 0)
+      {
+	close(mypipe[1]);
+
+	endptr = line;
+	while ((bytes = read(mypipe[0], endptr, sizeof(line) - (size_t)(endptr - line) - 1)) > 0)
+	{
+	  endptr += bytes;
+	  *endptr = '\0';
+
+          while ((ptr = strchr(line, '\n')) != NULL)
+	  {
+	    *ptr++ = '\0';
+
+	    if (!strncmp(line, "STATE:", 6))
+	    {
+	     /*
+	      * Process printer-state-reasons keywords.
+	      */
+
+	      process_state_message(job, line);
+	    }
+	    else if (!strncmp(line, "ATTR:", 5))
+	    {
+	     /*
+	      * Process printer attribute update.
+	      */
+
+	      process_attr_message(job, line);
+	    }
+	    else if (Verbosity > 1)
+	      fprintf(stderr, "%s: %s\n", job->printer->command, line);
+
+	    bytes = ptr - line;
+            if (ptr < endptr)
+	      memmove(line, ptr, (size_t)(endptr - ptr));
+	    endptr -= bytes;
+	    *endptr = '\0';
+	  }
+	}
+
+	close(mypipe[0]);
+      }
+
      /*
       * Wait for child to complete...
       */
@@ -5543,6 +6278,95 @@ process_job(_ipp_job_t *job)		/* I - Job */
   job->printer->active_job = NULL;
 
   return (NULL);
+}
+
+
+/*
+ * 'process_state_message()' - Process a STATE: message from a command.
+ */
+
+static void
+process_state_message(
+    _ipp_job_t *job,			/* I - Job */
+    char       *message)		/* I - Message */
+{
+  int		i;			/* Looping var */
+  _ipp_preason_t state_reasons,		/* printer-state-reasons values */
+		bit;			/* Current reason bit */
+  char		*ptr,			/* Pointer into message */
+		*next;			/* Next keyword in message */
+  int		remove;			/* Non-zero if we are removing keywords */
+
+
+ /*
+  * Skip leading "STATE:" and any whitespace...
+  */
+
+  for (message += 6; *message; message ++)
+    if (*message != ' ' && *message != '\t')
+      break;
+
+ /*
+  * Support the following forms of message:
+  *
+  * "keyword[,keyword,...]" to set the printer-state-reasons value(s).
+  *
+  * "-keyword[,keyword,...]" to remove keywords.
+  *
+  * "+keyword[,keyword,...]" to add keywords.
+  *
+  * Keywords may or may not have a suffix (-report, -warning, -error) per
+  * RFC 2911.
+  */
+
+  if (*message == '-')
+  {
+    remove        = 1;
+    state_reasons = job->printer->state_reasons;
+    message ++;
+  }
+  else if (*message == '+')
+  {
+    remove        = 0;
+    state_reasons = job->printer->state_reasons;
+    message ++;
+  }
+  else
+  {
+    remove        = 0;
+    state_reasons = _IPP_PREASON_NONE;
+  }
+
+  while (*message)
+  {
+    if ((next = strchr(message, ',')) != NULL)
+      *next++ = '\0';
+
+    if ((ptr = strstr(message, "-error")) != NULL)
+      *ptr = '\0';
+    else if ((ptr = strstr(message, "-report")) != NULL)
+      *ptr = '\0';
+    else if ((ptr = strstr(message, "-warning")) != NULL)
+      *ptr = '\0';
+
+    for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+    {
+      if (!strcmp(message, _ipp_preason_strings[i]))
+      {
+        if (remove)
+	  state_reasons &= ~bit;
+	else
+	  state_reasons |= bit;
+      }
+    }
+
+    if (next)
+      message = next;
+    else
+      break;
+  }
+
+  job->printer->state_reasons = state_reasons;
 }
 
 
@@ -6064,7 +6888,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2014 by Apple Inc. All rights "
+    puts(CUPS_SVERSION " - Copyright 2010-2015 by Apple Inc. All rights "
          "reserved.");
     puts("");
   }
@@ -6075,6 +6899,7 @@ usage(int status)			/* O - Exit status */
   puts("-2                      Supports 2-sided printing (default=1-sided)");
   puts("-M manufacturer         Manufacturer name (default=Test)");
   puts("-P                      PIN printing mode");
+  puts("-a attributes-file      Load printer attributes from file");
   puts("-c command              Run command for every print job");
   printf("-d spool-directory      Spool directory "
          "(default=/tmp/ippserver.%d)\n", (int)getpid());
@@ -6253,6 +7078,7 @@ valid_job_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
   int			i,		/* Looping var */
+			count,		/* Number of values */
 			valid = 1;	/* Valid attributes? */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*supported;	/* xxx-supported attribute */
@@ -6359,13 +7185,9 @@ valid_job_attributes(
     }
     else
     {
-      for (i = 0;
-           i < (int)(sizeof(media_supported) / sizeof(media_supported[0]));
-	   i ++)
-        if (!strcmp(ippGetString(attr, 0, NULL), media_supported[i]))
-	  break;
+      supported = ippFindAttribute(client->printer->attrs, "media-supported", IPP_TAG_KEYWORD);
 
-      if (i >= (int)(sizeof(media_supported) / sizeof(media_supported[0])))
+      if (!ippContainsString(supported, ippGetString(attr, 0, NULL)))
       {
 	respond_unsupported(client, attr);
 	valid = 0;
@@ -6375,13 +7197,86 @@ valid_job_attributes(
 
   if ((attr = ippFindAttribute(client->request, "media-col", IPP_TAG_ZERO)) != NULL)
   {
+    ipp_t		*col,		/* media-col collection */
+			*size;		/* media-size collection */
+    ipp_attribute_t	*member,	/* Member attribute */
+			*x_dim,		/* x-dimension */
+			*y_dim;		/* y-dimension */
+    int			x_value,	/* y-dimension value */
+			y_value;	/* x-dimension value */
+
     if (ippGetCount(attr) != 1 ||
         ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
     {
       respond_unsupported(client, attr);
       valid = 0;
     }
-    /* TODO: check for valid media-col */
+
+    col = ippGetCollection(attr, 0);
+
+    if ((member = ippFindAttribute(col, "media-size-name", IPP_TAG_ZERO)) != NULL)
+    {
+      if (ippGetCount(member) != 1 ||
+	  (ippGetValueTag(member) != IPP_TAG_NAME &&
+	   ippGetValueTag(member) != IPP_TAG_NAMELANG &&
+	   ippGetValueTag(member) != IPP_TAG_KEYWORD))
+      {
+	respond_unsupported(client, attr);
+	valid = 0;
+      }
+      else
+      {
+	supported = ippFindAttribute(client->printer->attrs, "media-supported", IPP_TAG_KEYWORD);
+
+	if (!ippContainsString(supported, ippGetString(member, 0, NULL)))
+	{
+	  respond_unsupported(client, attr);
+	  valid = 0;
+	}
+      }
+    }
+    else if ((member = ippFindAttribute(col, "media-size", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+    {
+      if (ippGetCount(member) != 1)
+      {
+	respond_unsupported(client, attr);
+	valid = 0;
+      }
+      else
+      {
+	size = ippGetCollection(member, 0);
+
+	if ((x_dim = ippFindAttribute(size, "x-dimension", IPP_TAG_INTEGER)) == NULL || ippGetCount(x_dim) != 1 ||
+	    (y_dim = ippFindAttribute(size, "y-dimension", IPP_TAG_INTEGER)) == NULL || ippGetCount(y_dim) != 1)
+	{
+	  respond_unsupported(client, attr);
+	  valid = 0;
+	}
+	else
+	{
+	  x_value   = ippGetInteger(x_dim, 0);
+	  y_value   = ippGetInteger(y_dim, 0);
+	  supported = ippFindAttribute(client->printer->attrs, "media-size-supported", IPP_TAG_BEGIN_COLLECTION);
+	  count     = ippGetCount(supported);
+
+	  for (i = 0; i < count ; i ++)
+	  {
+	    size  = ippGetCollection(supported, i);
+	    x_dim = ippFindAttribute(size, "x-dimension", IPP_TAG_ZERO);
+	    y_dim = ippFindAttribute(size, "y-dimension", IPP_TAG_ZERO);
+
+	    if (ippContainsInteger(x_dim, x_value) && ippContainsInteger(y_dim, y_value))
+	      break;
+	  }
+
+	  if (i >= count)
+	  {
+	    respond_unsupported(client, attr);
+	    valid = 0;
+	  }
+	}
+      }
+    }
   }
 
   if ((attr = ippFindAttribute(client->request, "multiple-document-handling", IPP_TAG_ZERO)) != NULL)
@@ -6440,8 +7335,7 @@ valid_job_attributes(
     }
     else
     {
-      int	count,			/* Number of supported values */
-		xdpi,			/* Horizontal resolution for job template attribute */
+      int	xdpi,			/* Horizontal resolution for job template attribute */
 		ydpi,			/* Vertical resolution for job template attribute */
 		sydpi;			/* Vertical resolution for supported value */
       ipp_res_t	units,			/* Units for job template attribute */
@@ -6494,5 +7388,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id: ippserver.c 12598 2015-05-05 18:57:57Z msweet $".
+ * End of "$Id: ippserver.c 12840 2015-08-09 02:10:23Z msweet $".
  */

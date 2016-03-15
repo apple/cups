@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 12820 2015-07-31 14:12:25Z msweet $"
+# "$Id: run-stp-tests.sh 12853 2015-08-28 13:38:46Z msweet $"
 #
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
@@ -133,6 +133,7 @@ case "$testtype" in
 		pjobs=10
 		pprinters=0
 		loglevel="debug2"
+		testtype="1"
 		;;
 esac
 
@@ -997,9 +998,9 @@ fi
 # Warning log messages
 count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
 if test $count != 8; then
-	echo "FAIL: $count warning messages, expected 18."
+	echo "FAIL: $count warning messages, expected 8."
 	$GREP '^W ' $BASE/log/error_log
-	echo "<P>FAIL: $count warning messages, expected 18.</P>" >>$strfile
+	echo "<P>FAIL: $count warning messages, expected 8.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	$GREP '^W ' $BASE/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
@@ -1113,5 +1114,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 12820 2015-07-31 14:12:25Z msweet $"
+# End of "$Id: run-stp-tests.sh 12853 2015-08-28 13:38:46Z msweet $"
 #

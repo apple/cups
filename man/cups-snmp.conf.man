@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-snmp.conf.man 11913 2014-06-10 19:00:24Z msweet $"
+.\" "$Id: cups-snmp.conf.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" snmp.conf man page for CUPS.
 .\"
@@ -63,7 +63,7 @@ The default is 120 seconds (2 minutes).
 .BR cups-snmp (8),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cups-snmp.conf.man 11913 2014-06-10 19:00:24Z msweet $".
+.\" End of "$Id: cups-snmp.conf.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

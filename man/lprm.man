@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lprm.man 11893 2014-05-23 02:45:48Z msweet $"
+.\" "$Id: lprm.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" lprm man page for CUPS.
 .\"
@@ -84,7 +84,7 @@ Cancel all jobs:
 .BR lpstat (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: lprm.man 11893 2014-05-23 02:45:48Z msweet $".
+.\" End of "$Id: lprm.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

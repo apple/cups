@@ -1,9 +1,9 @@
 /*
- * "$Id: ppd.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: ppd.c 12848 2015-08-26 18:51:57Z msweet $"
  *
  * PPD file routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -283,7 +283,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
 
 /*
- * 'ppdErrorString()' - Returns the text assocated with a status.
+ * 'ppdErrorString()' - Returns the text associated with a status.
  *
  * @since CUPS 1.1.19/OS X 10.3@
  */
@@ -418,10 +418,10 @@ _ppdOpen(
   char			custom_name[PPD_MAX_NAME];
 					/* CustomFoo attribute name */
   ppd_attr_t		*custom_attr;	/* CustomFoo attribute */
-  char			ll[4],		/* Language + '.' */
-			ll_CC[7];	/* Language + country + '.' */
-  size_t		ll_len = 0,	/* Language length */
-			ll_CC_len = 0;	/* Language + country length */
+  char			ll[7],		/* Base language + '.' */
+			ll_CC[7];	/* Language w/country + '.' */
+  size_t		ll_len = 0,	/* Base language length */
+			ll_CC_len = 0;	/* Language w/country length */
   static const char * const ui_keywords[] =
 			{
 #ifdef CUPS_USE_FULL_UI_KEYWORDS_LIST
@@ -519,7 +519,17 @@ _ppdOpen(
       return (NULL);
 
     snprintf(ll_CC, sizeof(ll_CC), "%s.", lang->language);
-    snprintf(ll, sizeof(ll), "%2.2s.", lang->language);
+
+   /*
+    * <rdar://problem/22130168>
+    *
+    * Need to use a different base language for some locales...
+    */
+
+    if (!strcmp(lang->language, "zh_HK"))
+      strlcpy(ll, "zh_TW.", sizeof(ll));
+    else
+      snprintf(ll, sizeof(ll), "%2.2s.", lang->language);
 
     ll_CC_len = strlen(ll_CC);
     ll_len    = strlen(ll);
@@ -3346,5 +3356,5 @@ ppd_update_filters(ppd_file_t      *ppd,/* I - PPD file */
 
 
 /*
- * End of "$Id: ppd.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: ppd.c 12848 2015-08-26 18:51:57Z msweet $".
  */

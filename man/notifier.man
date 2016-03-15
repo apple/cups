@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: notifier.man 11924 2014-06-12 19:10:33Z msweet $"
+.\" "$Id: notifier.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" notifier man page for CUPS.
 .\"
@@ -38,7 +38,7 @@ Notifiers inherit the environment and can use the logging mechanism documented i
 .BR filter (7),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: notifier.man 11924 2014-06-12 19:10:33Z msweet $".
+.\" End of "$Id: notifier.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-snmp.man.in 11913 2014-06-10 19:00:24Z msweet $"
+.\" "$Id: cups-snmp.man.in 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" SNMP backend man page for CUPS.
 .\"
@@ -55,7 +55,7 @@ The CUPS SNMP backend uses the information from the Host, Printer, and Port Moni
 .BR lpinfo (8),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cups-snmp.man.in 11913 2014-06-10 19:00:24Z msweet $".
+.\" End of "$Id: cups-snmp.man.in 12854 2015-08-28 14:08:00Z msweet $".
 .\"
