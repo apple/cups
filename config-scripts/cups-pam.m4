@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-pam.m4 11342 2013-10-18 20:36:01Z msweet $"
 dnl
 dnl   PAM stuff for CUPS.
 dnl
@@ -93,5 +93,5 @@ AC_SUBST(PAMMOD)
 AC_SUBST(PAMMODAUTH)
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-pam.m4 11342 2013-10-18 20:36:01Z msweet $".
 dnl

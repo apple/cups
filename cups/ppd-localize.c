@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd-localize.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * PPD localization routines for CUPS.
  *
@@ -775,5 +775,5 @@ ppd_ll_CC(char   *ll_CC,		/* O - Country-specific locale name */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd-localize.c 13138 2016-03-15 14:59:54Z msweet $".
  */

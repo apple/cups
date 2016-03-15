@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testipp.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * IPP test program for CUPS.
  *
@@ -1051,5 +1051,5 @@ write_cb(_ippdata_t   *data,		/* I - Data */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testipp.c 11984 2014-07-02 13:16:59Z msweet $".
  */

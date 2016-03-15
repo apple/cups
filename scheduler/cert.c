@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cert.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Authentication certificate routines for the CUPS scheduler.
  *
@@ -451,5 +451,5 @@ ctcompare(const char *a,		/* I - First string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: cert.c 13138 2016-03-15 14:59:54Z msweet $".
  */

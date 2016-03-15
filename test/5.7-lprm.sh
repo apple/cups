@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: 5.7-lprm.sh 11398 2013-11-06 20:11:11Z msweet $"
 #
 #   Test the lprm command.
 #
@@ -43,5 +43,5 @@ fi
 echo ""
 
 #
-# End of "$Id$".
+# End of "$Id: 5.7-lprm.sh 11398 2013-11-06 20:11:11Z msweet $".
 #

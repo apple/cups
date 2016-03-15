@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: sample.drv 13138 2016-03-15 14:59:54Z msweet $"
 //
 // Driver info file for CUPS-supplied PPDs.
 //
@@ -1168,5 +1168,5 @@ Version "2.1"
 }
 
 //
-// End of "$Id$".
+// End of "$Id: sample.drv 13138 2016-03-15 14:59:54Z msweet $".
 //

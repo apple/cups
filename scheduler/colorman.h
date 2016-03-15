@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: colorman.h 3833 2012-05-23 22:51:18Z msweet $"
  *
  *   Color management definitions for the CUPS scheduler.
  *
@@ -24,5 +24,5 @@ extern void	cupsdUnregisterColor(cupsd_printer_t *p);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: colorman.h 3833 2012-05-23 22:51:18Z msweet $".
  */

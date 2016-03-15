@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: select.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Select abstraction functions for the CUPS scheduler.
  *
@@ -930,5 +930,5 @@ find_fd(int fd)				/* I - File descriptor */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: select.c 11984 2014-07-02 13:16:59Z msweet $".
  */

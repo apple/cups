@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cupsd.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Main header file for the CUPS scheduler.
  *
@@ -229,5 +229,5 @@ extern void		cupsdStopServer(void);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: cupsd.h 13138 2016-03-15 14:59:54Z msweet $".
  */

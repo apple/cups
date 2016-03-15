@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: tempfile.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Temp file utilities for CUPS.
  *
@@ -195,5 +195,5 @@ cupsTempFile2(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: tempfile.c 13138 2016-03-15 14:59:54Z msweet $".
  */

@@ -2267,5 +2267,5 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: dest-options.c 13138 2016-03-15 14:59:54Z msweet $".
  */

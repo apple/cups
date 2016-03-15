@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: cupstestppd.man 13138 2016-03-15 14:59:54Z msweet $"
 .\"
 .\" cupstestppd man page for CUPS.
 .\"
@@ -147,5 +147,5 @@ Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: cupstestppd.man 13138 2016-03-15 14:59:54Z msweet $".
 .\"

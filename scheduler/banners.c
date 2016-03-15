@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: banners.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Banner routines for the CUPS scheduler.
  *
@@ -220,5 +220,5 @@ free_banners(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: banners.c 10996 2013-05-29 11:51:34Z msweet $".
  */

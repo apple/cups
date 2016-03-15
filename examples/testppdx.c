@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testppdx.c 3833 2012-05-23 22:51:18Z msweet $"
  *
  *   Test program for PPD data encoding example code.
  *
@@ -113,5 +113,5 @@ main(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testppdx.c 3833 2012-05-23 22:51:18Z msweet $".
  */

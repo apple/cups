@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: string-private.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Private string definitions for CUPS.
  *
@@ -219,5 +219,5 @@ extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: string-private.h 13138 2016-03-15 14:59:54Z msweet $".
  */

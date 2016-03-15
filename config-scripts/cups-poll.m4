@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-poll.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   Select/poll stuff for CUPS.
 dnl
@@ -18,5 +18,5 @@ AC_CHECK_FUNC(epoll_create, AC_DEFINE(HAVE_EPOLL))
 AC_CHECK_FUNC(kqueue, AC_DEFINE(HAVE_KQUEUE))
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-poll.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

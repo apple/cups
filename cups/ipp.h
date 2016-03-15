@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Internet Printing Protocol definitions for CUPS.
  *
@@ -1036,5 +1036,5 @@ extern const char	*ippStateString(ipp_state_t state) _CUPS_API_2_0;
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.h 13138 2016-03-15 14:59:54Z msweet $".
  */

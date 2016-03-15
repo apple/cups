@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: lpinfo.man 13138 2016-03-15 14:59:54Z msweet $"
 .\"
 .\" lpinfo man page for CUPS.
 .\"
@@ -134,5 +134,5 @@ CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: lpinfo.man 13138 2016-03-15 14:59:54Z msweet $".
 .\"

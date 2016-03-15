@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: type.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * MIME typing routines for CUPS.
  *
@@ -1279,5 +1279,5 @@ mime_patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: type.c 13138 2016-03-15 14:59:54Z msweet $".
  */

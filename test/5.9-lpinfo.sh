@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: 5.9-lpinfo.sh 11398 2013-11-06 20:11:11Z msweet $"
 #
 #   Test the lpinfo command.
 #
@@ -51,5 +51,5 @@ fi
 echo ""
 
 #
-# End of "$Id$".
+# End of "$Id: 5.9-lpinfo.sh 11398 2013-11-06 20:11:11Z msweet $".
 #

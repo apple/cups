@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppdx.h 3833 2012-05-23 22:51:18Z msweet $"
  *
  *   Header for PPD data encoding example code.
  *
@@ -78,5 +78,5 @@ extern void	ppdxWriteData(const char *name, const void *data,
 #endif /* !_PPDX_H */
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppdx.h 3833 2012-05-23 22:51:18Z msweet $".
  */

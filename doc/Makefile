@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $"
 #
 # Documentation makefile for CUPS.
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testsub.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Scheduler notification tester for CUPS.
  *
@@ -505,5 +505,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testsub.c 11984 2014-07-02 13:16:59Z msweet $".
  */

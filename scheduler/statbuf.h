@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: statbuf.h 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Status buffer definitions for the CUPS scheduler.
  *
@@ -45,5 +45,5 @@ extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: statbuf.h 10996 2013-05-29 11:51:34Z msweet $".
  */

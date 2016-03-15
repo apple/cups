@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: adminutil.h 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Administration utility API definitions for CUPS.
  *
@@ -77,5 +77,5 @@ extern int	cupsAdminSetServerSettings(http_t *http,
 #endif /* !_CUPS_ADMINUTIL_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: adminutil.h 10996 2013-05-29 11:51:34Z msweet $".
  */

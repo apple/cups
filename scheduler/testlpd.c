@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testlpd.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * cups-lpd test program for CUPS.
  *
@@ -535,5 +535,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testlpd.c 13138 2016-03-15 14:59:54Z msweet $".
  */

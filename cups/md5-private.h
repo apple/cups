@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: md5-private.h 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Private MD5 definitions for CUPS.
  *
@@ -75,5 +75,5 @@ void _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16]);
 #endif /* !_CUPS_MD5_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: md5-private.h 10996 2013-05-29 11:51:34Z msweet $".
  */

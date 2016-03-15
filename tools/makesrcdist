@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: makesrcdist 13138 2016-03-15 14:59:54Z msweet $"
 #
 # makesrcdist - make a source distribution of CUPS.
 #
@@ -148,5 +148,5 @@ rm -rf cups-$version
 echo "Done - files in $TMPDIR."
 
 #
-# End of "$Id$".
+# End of "$Id: makesrcdist 13138 2016-03-15 14:59:54Z msweet $".
 #

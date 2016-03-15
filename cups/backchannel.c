@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: backchannel.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Backchannel functions for CUPS.
  *
@@ -189,5 +189,5 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: backchannel.c 11984 2014-07-02 13:16:59Z msweet $".
  */

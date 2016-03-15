@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: ipp-tests.test 13138 2016-03-15 14:59:54Z msweet $"
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
@@ -1154,5 +1154,5 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 
 
 #
-# End of "$Id$".
+# End of "$Id: ipp-tests.test 13138 2016-03-15 14:59:54Z msweet $".
 #

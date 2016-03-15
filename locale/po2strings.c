@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: po2strings.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Convert a GNU gettext .po file to an Apple .strings file.
  *
@@ -364,5 +364,5 @@ normalize_string(const char *idstr,	/* I - msgid string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: po2strings.c 13138 2016-03-15 14:59:54Z msweet $".
  */

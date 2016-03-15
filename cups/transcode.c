@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: transcode.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Transcoding support for CUPS.
  *
@@ -716,5 +716,5 @@ cupsUTF32ToUTF8(
 
 
 /*
- * End of "$Id$"
+ * End of "$Id: transcode.c 13138 2016-03-15 14:59:54Z msweet $"
  */

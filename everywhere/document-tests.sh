@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  "$Id$"
+#  "$Id: document-tests.sh 13138 2016-03-15 14:59:54Z msweet $"
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
 #
@@ -55,5 +55,5 @@ fi
 $IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 Document Results.plist" -I '{}' document-tests.test \;
 
 #
-# End of "$Id$".
+# End of "$Id: document-tests.sh 13138 2016-03-15 14:59:54Z msweet $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd-attr.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * PPD model-specific attribute routines for CUPS.
  *
@@ -317,5 +317,5 @@ _ppdNormalizeMakeAndModel(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd-attr.c 13138 2016-03-15 14:59:54Z msweet $".
  */

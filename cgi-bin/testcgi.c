@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testcgi.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * CGI test program for CUPS.
  *
@@ -65,5 +65,5 @@ main(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testcgi.c 11984 2014-07-02 13:16:59Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: tlscheck.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * TLS check program for CUPS.
  *
@@ -746,5 +746,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: tlscheck.c 13138 2016-03-15 14:59:54Z msweet $".
  */

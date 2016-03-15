@@ -1,6 +1,6 @@
 @echo off
 ::
-::  "$Id$"
+::  "$Id: bonjour-tests.bat 13138 2016-03-15 14:59:54Z msweet $"
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 ::
@@ -387,5 +387,5 @@ echo Summary: %total% tests, %pass% passed, %fail% failed, %skip% skipped
 echo Score: %score%%%
 
 ::
-:: End of "$Id$".
+:: End of "$Id: bonjour-tests.bat 13138 2016-03-15 14:59:54Z msweet $".
 ::

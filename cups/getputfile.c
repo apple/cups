@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: getputfile.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Get/put file functions for CUPS.
  *
@@ -511,5 +511,5 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: getputfile.c 11984 2014-07-02 13:16:59Z msweet $".
  */

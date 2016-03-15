@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: util.h 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Mini-daemon utility definitions for CUPS.
  *
@@ -67,5 +67,5 @@ extern void		cupsdSendIPPTrailer(void);
 #endif /* !_CUPSD_UTIL_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: util.h 11984 2014-07-02 13:16:59Z msweet $".
  */

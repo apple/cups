@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: thread-private.h 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Private threading definitions for CUPS.
  *
@@ -96,5 +96,5 @@ extern int	_cupsThreadCreate(_cups_thread_func_t func, void *arg);
 #endif /* !_CUPS_THREAD_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: thread-private.h 11984 2014-07-02 13:16:59Z msweet $".
  */

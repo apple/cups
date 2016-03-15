@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: debug.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Debugging functions for CUPS.
  *
@@ -645,5 +645,5 @@ _cups_safe_vsnprintf(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: debug.c 13138 2016-03-15 14:59:54Z msweet $".
  */

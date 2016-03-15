@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: make-ippeveselfcert.sh 13138 2016-03-15 14:59:54Z msweet $"
 #
 #   Make an IPP Everywhere Printer self-certification package.
 #
@@ -68,5 +68,5 @@ rm -r $pkgdir
 echo Done.
 
 #
-# End of "$Id$".
+# End of "$Id: make-ippeveselfcert.sh 13138 2016-03-15 14:59:54Z msweet $".
 #

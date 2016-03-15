@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: usersys.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
@@ -1284,5 +1284,5 @@ cups_set_user(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: usersys.c 13138 2016-03-15 14:59:54Z msweet $".
  */

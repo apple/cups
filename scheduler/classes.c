@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: classes.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Printer class routines for the CUPS scheduler.
  *
@@ -806,5 +806,5 @@ cupsdSaveAllClasses(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: classes.c 11984 2014-07-02 13:16:59Z msweet $".
  */

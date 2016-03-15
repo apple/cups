@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testlang.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  *   Localization test program for CUPS.
  *
@@ -153,5 +153,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testlang.c 13138 2016-03-15 14:59:54Z msweet $".
  */

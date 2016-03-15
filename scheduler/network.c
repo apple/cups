@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: network.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Network interface functions for the CUPS scheduler.
  *
@@ -298,5 +298,5 @@ compare_netif(cupsd_netif_t *a,		/* I - First network interface */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: network.c 11984 2014-07-02 13:16:59Z msweet $".
  */

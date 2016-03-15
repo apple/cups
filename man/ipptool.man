@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: ipptool.man 13138 2016-03-15 14:59:54Z msweet $"
 .\"
 .\" ipptool man page for CUPS.
 .\"
@@ -244,5 +244,5 @@ RFC 2911 (http://tools.ietf.org/html/rfc2911),
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: ipptool.man 13138 2016-03-15 14:59:54Z msweet $".
 .\"

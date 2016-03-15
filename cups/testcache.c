@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testcache.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * PPD cache testing program for CUPS.
  *
@@ -94,5 +94,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testcache.c 11984 2014-07-02 13:16:59Z msweet $".
  */

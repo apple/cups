@@ -1,0 +1,44 @@
+HTTP/2.0 Implementation Notes - 2013-11-07
+------------------------------------------
+
+OVERVIEW
+
+    HTTP/2.0 allows clients to send multiple, simultaneous requests over a
+    single connection, as well as supporting server-side push delivery of
+    content.  In the context of IPP, this would allow a single connection to
+    support simultaneous job submission and monitoring.
+
+    This will require changes to the HTTP API used in CUPS, and to cupsd and
+    other CUPS-based servers.  This branch tracks that development.
+
+
+DESIGN
+
+    http_t will be updated to be accessible from multiple threads and track the
+    HTTP state in a thread ID to stream ID/state table.  Applications can
+    discover whether a Printer supports HTTP/2.0 with a new httpSupportsVersion
+    API and upgrade to HTTP/2.0 with httpUpgradeToVersion.
+
+    Calling httpPost in HTTP/1.1 mode will serialize requests between threads.
+    Calling httpPost in HTTP/2.0 mode will create a new stream ID and issue
+    requests in parallel.
+
+    Q: How to handle incoming 2.0 requests? New httpServerRunLoop with
+    callback that creates a new thread for all incoming requests and associates
+    the thread with the stream ID.  httpWriteResponse is then tied to the stream
+    ID.  For 1.1 mode the callback gets called on the current thread (no new
+    threads created).
+
+    Q: How to handle PUSH_PROMISE? New httpPushPromise API that creates a new
+    thread and stream ID?
+
+
+REFERENCES
+
+    HTTPbis WG web site: http://tools.ietf.org/wg/httpbis
+
+    Main spec: http://tools.ietf.org/html/draft-ietf-httpbis-http2
+
+    Header compression spec:
+        http://tools.ietf.org/html/draft-ietf-httpbis-header-compression
+

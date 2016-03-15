@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-driver.cxx 11984 2014-07-02 13:16:59Z msweet $"
 //
 // PPD file compiler definitions for the CUPS PPD Compiler.
 //
@@ -1326,5 +1326,5 @@ ppdcDriver::write_ppd_file(
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-driver.cxx 11984 2014-07-02 13:16:59Z msweet $".
 //

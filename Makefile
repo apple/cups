@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $"
 #
 # Top-level Makefile for CUPS.
 #
@@ -351,5 +351,5 @@ dist:	all
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $".
 #

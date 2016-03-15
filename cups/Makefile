@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $"
 #
 # API library Makefile for CUPS.
 #
@@ -52,6 +52,7 @@ LIBOBJS	=	\
 		http-addr.o \
 		http-addrlist.o \
 		http-support.o \
+		huffman.o \
 		ipp.o \
 		ipp-support.o \
 		langprintf.o \
@@ -91,6 +92,7 @@ TESTOBJS	= \
 		testdest.o \
 		testfile.o \
 		testhttp.o \
+		testhuffman.o \
 		testi18n.o \
 		testipp.o \
 		testoptions.o \
@@ -131,6 +133,7 @@ HEADERSPRIV =	\
 		debug-private.h \
 		file-private.h \
 		http-private.h \
+		huffman-private.h \
 		ipp-private.h \
 		language-private.h \
 		md5-private.h \
@@ -159,6 +162,7 @@ UNITTARGETS =	\
 		testdest \
 		testfile \
 		testhttp \
+		testhuffman \
 		testi18n \
 		testipp \
 		testlang \
@@ -464,6 +468,18 @@ testhttp:	testhttp.o $(LIBCUPSSTATIC)
 
 
 #
+# testhuffman (dependency on static CUPS library is intentional)
+#
+
+testhuffman:	testhuffman.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhuffman.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running HTTP/2 Huffman tests...
+	./testhuffman
+
+
+#
 # testipp (dependency on static CUPS library is intentional)
 #
 
@@ -679,5 +695,5 @@ tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $".
 #

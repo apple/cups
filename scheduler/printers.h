@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: printers.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Printer definitions for the CUPS scheduler.
  *
@@ -196,5 +196,5 @@ extern void		cupsdWritePrintcap(void);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: printers.h 13138 2016-03-15 14:59:54Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: tls.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * TLS routines for CUPS.
  *
@@ -108,5 +108,5 @@ httpSaveCredentials(const char *path, cups_array_t *credentials, const char *com
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: tls.c 13138 2016-03-15 14:59:54Z msweet $".
  */

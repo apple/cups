@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: array.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Sorted array routines for CUPS.
  *
@@ -1330,5 +1330,5 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: array.c 13138 2016-03-15 14:59:54Z msweet $".
  */

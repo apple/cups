@@ -1,6 +1,6 @@
 @echo off
 ::
-::  "$Id$"
+::  "$Id: ipp-tests.bat 13138 2016-03-15 14:59:54Z msweet $"
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 ::
@@ -24,5 +24,5 @@
 ippfind "%1._ipp._tcp.local." -x ipptool -P "\"%1 IPP Results.plist\"" -I "{}" ipp-tests.test ";"
 
 ::
-:: End of "$Id$".
+:: End of "$Id: ipp-tests.bat 13138 2016-03-15 14:59:54Z msweet $".
 ::

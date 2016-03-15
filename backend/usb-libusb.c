@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: usb-libusb.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * LIBUSB interface code for CUPS.
  *
@@ -2022,6 +2022,6 @@ soft_reset_printer(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: usb-libusb.c 13138 2016-03-15 14:59:54Z msweet $".
  */
 

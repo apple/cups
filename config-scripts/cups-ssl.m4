@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-ssl.m4 13138 2016-03-15 14:59:54Z msweet $"
 dnl
 dnl TLS stuff for CUPS.
 dnl
@@ -108,5 +108,5 @@ EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-ssl.m4 13138 2016-03-15 14:59:54Z msweet $".
 dnl

@@ -713,5 +713,5 @@ usage(const char *arg)			/* I - Argument for usage message */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testdest.c 13138 2016-03-15 14:59:54Z msweet $".
  */

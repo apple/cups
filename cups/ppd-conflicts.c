@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd-conflicts.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Option conflict management routines for CUPS.
  *
@@ -1196,5 +1196,5 @@ ppd_test_constraints(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd-conflicts.c 13138 2016-03-15 14:59:54Z msweet $".
  */

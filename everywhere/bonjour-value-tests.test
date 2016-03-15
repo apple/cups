@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: bonjour-value-tests.test 13138 2016-03-15 14:59:54Z msweet $"
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 #
@@ -43,5 +43,5 @@ FILE-ID "org.pwg.ipp-everywhere.20151009.bonjour"
 }
 
 #
-# End of "$Id$".
+# End of "$Id: bonjour-value-tests.test 13138 2016-03-15 14:59:54Z msweet $".
 #

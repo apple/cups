@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: admin.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Administration CGI for CUPS.
  *
@@ -4277,5 +4277,5 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: admin.c 13138 2016-03-15 14:59:54Z msweet $".
  */

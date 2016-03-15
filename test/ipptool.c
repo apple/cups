@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipptool.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * ipptool command for CUPS.
  *
@@ -6201,5 +6201,5 @@ with_value_from(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipptool.c 13138 2016-03-15 14:59:54Z msweet $".
  */

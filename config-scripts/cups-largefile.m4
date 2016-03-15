@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-largefile.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   Large file support stuff for CUPS.
 dnl
@@ -48,5 +48,5 @@ fi
 AC_CHECK_FUNC(strtoll, AC_DEFINE(HAVE_STRTOLL))
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-largefile.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

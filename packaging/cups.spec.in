@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: cups.spec.in 13138 2016-03-15 14:59:54Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -401,5 +401,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id$".
+# End of "$Id: cups.spec.in 13138 2016-03-15 14:59:54Z msweet $".
 #

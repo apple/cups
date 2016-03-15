@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  *   PostScript Printer Description definitions for CUPS.
  *
@@ -484,5 +484,5 @@ extern int		ppdPageSizeLimits(ppd_file_t *ppd,
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd.h 13138 2016-03-15 14:59:54Z msweet $".
  */

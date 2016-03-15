@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: tls-gnutls.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * TLS support code for CUPS using GNU TLS.
  *
@@ -1341,5 +1341,5 @@ _httpTLSWrite(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: tls-gnutls.c 13138 2016-03-15 14:59:54Z msweet $".
  */

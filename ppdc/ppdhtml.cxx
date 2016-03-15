@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdhtml.cxx 13138 2016-03-15 14:59:54Z msweet $"
 //
 // PPD to HTML utility for the CUPS PPD Compiler.
 //
@@ -187,5 +187,5 @@ usage(void)
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdhtml.cxx 13138 2016-03-15 14:59:54Z msweet $".
 //

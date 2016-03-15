@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdmerge.cxx 11984 2014-07-02 13:16:59Z msweet $"
 //
 // PPD file merge utility for the CUPS PPD Compiler.
 //
@@ -369,5 +369,5 @@ usage(void)
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdmerge.cxx 11984 2014-07-02 13:16:59Z msweet $".
 //

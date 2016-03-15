@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: file.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * File functions for the CUPS scheduler.
  *
@@ -447,5 +447,5 @@ overwrite_data(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: file.c 11984 2014-07-02 13:16:59Z msweet $".
  */

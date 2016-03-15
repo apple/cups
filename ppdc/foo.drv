@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: foo.drv 3247 2011-05-12 06:22:31Z msweet $"
 //
 //   PPD file compiler test data file for CUPS.
 //
@@ -543,5 +543,5 @@ Attribute cupsIPPReason "com.foo-serious-error/A Serious Error" "http://foo.com/
 
 
 //
-// End of "$Id$".
+// End of "$Id: foo.drv 3247 2011-05-12 06:22:31Z msweet $".
 //

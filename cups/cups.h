@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cups.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -623,5 +623,5 @@ extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t dat
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: cups.h 13138 2016-03-15 14:59:54Z msweet $".
  */

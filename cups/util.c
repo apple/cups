@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: util.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Printing utilities for CUPS.
  *
@@ -966,5 +966,5 @@ cupsStartDocument(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: util.c 13138 2016-03-15 14:59:54Z msweet $".
  */

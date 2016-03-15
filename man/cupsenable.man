@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: cupsenable.man 13138 2016-03-15 14:59:54Z msweet $"
 .\"
 .\" cupsenable/cupsdisable man page for CUPS.
 .\"
@@ -102,5 +102,5 @@ CUPS Online Help (http://localhost:631/help)
 Copyright \[co] 2007-2015 by Apple Inc.
 
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: cupsenable.man 13138 2016-03-15 14:59:54Z msweet $".
 .\"

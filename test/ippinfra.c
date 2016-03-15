@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ippinfra.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Sample IPP INFRA server for CUPS.
  *
@@ -7121,5 +7121,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ippinfra.c 13138 2016-03-15 14:59:54Z msweet $".
  */

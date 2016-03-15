@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: thread.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Threading primitives for CUPS.
  *
@@ -323,5 +323,5 @@ _cupsThreadCreate(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: thread.c 11984 2014-07-02 13:16:59Z msweet $".
  */

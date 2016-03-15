@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: usb-darwin.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Copyright 2005-2015 Apple Inc. All rights reserved.
  *
@@ -2538,5 +2538,5 @@ log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: usb-darwin.c 13138 2016-03-15 14:59:54Z msweet $".
  */

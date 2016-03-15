@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: sidechannel.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Side-channel API code for CUPS.
  *
@@ -625,5 +625,5 @@ cupsSideChannelWrite(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: sidechannel.c 13138 2016-03-15 14:59:54Z msweet $".
  */

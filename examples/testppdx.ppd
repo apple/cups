@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
+*% "$Id: testppdx.ppd 3833 2012-05-23 22:51:18Z msweet $"
 *%
 *% Test PPD file for data encoding example.
 *%
@@ -109,7 +109,7 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id$".
+*% End of "$Id: testppdx.ppd 3833 2012-05-23 22:51:18Z msweet $".
 *%
 *EXData0000: "eNqlVm1v2zYQ/hz/ipvWznLgl6T7siXrgCJ2AANBEyQpNmAtAlqiLG4SKZBU7LTIf9/dUW9Og32ZAFsieffcc88dKS2OR3AM0Zt1+ibCJxoA3EvnobJma0UJmbFwc7OEVHgBUicmVXoLci/KqpCAQznvHC9MWSmc3Smfn3WzdG2TBGYGPCJXVbqH2fIBQR+Wq5vb1cWH+9XyfRTBbNs"
 *EXData0001: "GcwTaG6zIqkrh7evgzDVk1Xb3MO7k9N3sHmCDxWRWeuk53KfSxf4paC087ZOvDLaTcF54WUptcdnoVO0KavaS9um7EBYCT6XAQhnK2n9E5hsEIc9yQ6XvUw8RkEelzKVVhQI2TAMEIXYzQGWClmoTU002L1GgmwVIpraF0ozXYoOGUkZXa0vVh/vVnO/91FA2+UqycHlpi5SyMWjhI0"

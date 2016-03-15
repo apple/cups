@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ippdiscover.c 10983 2013-05-13 23:57:32Z msweet $"
  *
  *   ippdiscover command for CUPS.
  *
@@ -825,5 +825,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ippdiscover.c 10983 2013-05-13 23:57:32Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: strings2po.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Convert Apple .strings file (UTF-16 BE text file) to GNU gettext .po files.
  *
@@ -173,5 +173,5 @@ write_po(FILE       *po,		/* I - .po file */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: strings2po.c 11984 2014-07-02 13:16:59Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd-util.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * PPD utilities for CUPS.
  *
@@ -719,5 +719,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd-util.c 13138 2016-03-15 14:59:54Z msweet $".
  */

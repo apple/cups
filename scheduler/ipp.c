@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
@@ -11403,5 +11403,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.c 13138 2016-03-15 14:59:54Z msweet $".
  */

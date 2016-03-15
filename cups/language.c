@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: language.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * I18N/language support for CUPS.
  *
@@ -1624,5 +1624,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: language.c 13138 2016-03-15 14:59:54Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testspeed.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Scheduler speed test for CUPS.
  *
@@ -376,5 +376,5 @@ usage(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testspeed.c 11984 2014-07-02 13:16:59Z msweet $".
  */

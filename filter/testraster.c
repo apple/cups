@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testraster.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Raster test program routines for CUPS.
  *
@@ -1067,5 +1067,5 @@ print_changes(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testraster.c 13138 2016-03-15 14:59:54Z msweet $".
  */

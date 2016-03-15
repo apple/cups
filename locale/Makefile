@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $"
 #
 # Locale file makefile for CUPS.
 #
@@ -204,5 +204,5 @@ include Dependencies
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 13138 2016-03-15 14:59:54Z msweet $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: mime.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * MIME database file routines for CUPS.
  *
@@ -935,5 +935,5 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: mime.c 11984 2014-07-02 13:16:59Z msweet $".
  */

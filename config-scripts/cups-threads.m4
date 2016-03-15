@@ -1,5 +1,5 @@
 dnl
-dnl "$Id$"
+dnl "$Id: cups-threads.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   Threading stuff for CUPS.
 dnl
@@ -50,5 +50,5 @@ fi
 AC_SUBST(PTHREAD_FLAGS)
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-threads.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

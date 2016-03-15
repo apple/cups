@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http.h 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
@@ -656,5 +656,5 @@ extern const char	*httpURIStatusString(http_uri_status_t status) _CUPS_API_2_0;
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: http.h 13138 2016-03-15 14:59:54Z msweet $".
  */

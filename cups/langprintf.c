@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: langprintf.c 11984 2014-07-02 13:16:59Z msweet $"
  *
  * Localized printf/puts functions for CUPS.
  *
@@ -337,5 +337,5 @@ _cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: langprintf.c 11984 2014-07-02 13:16:59Z msweet $".
  */

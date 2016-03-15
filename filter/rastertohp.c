@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: rastertohp.c 13138 2016-03-15 14:59:54Z msweet $"
  *
  * Hewlett-Packard Page Control Language filter for CUPS.
  *
@@ -847,5 +847,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: rastertohp.c 13138 2016-03-15 14:59:54Z msweet $".
  */
