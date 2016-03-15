@@ -1,5 +1,5 @@
 /*
- * "$Id: sidechannel.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: sidechannel.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * Side-channel API code for CUPS.
  *
@@ -490,7 +490,7 @@ cupsSideChannelSNMPWalk(
         real_data[real_datalen] = '\0';
 
       real_oidlen  = strlen(real_data) + 1;
-      real_datalen -= real_oidlen;
+      real_datalen -= (int)real_oidlen;
 
      /*
       * Call the callback with the OID and data...
@@ -625,5 +625,5 @@ cupsSideChannelWrite(
 
 
 /*
- * End of "$Id: sidechannel.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: sidechannel.c 12124 2014-08-28 15:37:22Z msweet $".
  */

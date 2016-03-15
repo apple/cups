@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 12073 2014-07-31 00:58:00Z msweet $"
+dnl "$Id: cups-common.m4 12140 2014-08-30 01:51:22Z msweet $"
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION=2.0b1
+CUPS_VERSION=2.0rc1
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -369,9 +369,6 @@ case $uname in
 		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
-                dnl Check for the vproc_transaction_begin/end stuff...
-		AC_CHECK_FUNCS(vproc_transaction_begin)
-
 		dnl Need <dlfcn.h> header...
 		AC_CHECK_HEADER(dlfcn.h,AC_DEFINE(HAVE_DLFCN_H))
 
@@ -465,5 +462,5 @@ esac
 AC_SUBST(BUILDDIRS)
 
 dnl
-dnl End of "$Id: cups-common.m4 12073 2014-07-31 00:58:00Z msweet $".
+dnl End of "$Id: cups-common.m4 12140 2014-08-30 01:51:22Z msweet $".
 dnl

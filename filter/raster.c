@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: raster.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * Raster file routines for CUPS.
  *
@@ -378,7 +378,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       if (!cups_raster_read(r, &byte, 1))
 	return (0);
 
-      r->count = byte + 1;
+      r->count = (unsigned)byte + 1;
 
       if (r->count > 1)
 	ptr = r->pixels;
@@ -418,7 +418,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	  * Repeat the next N bytes...
 	  */
 
-          count = (byte + 1) * r->bpp;
+          count = ((unsigned)byte + 1) * r->bpp;
           if (count > (unsigned)bytes)
 	    count = (unsigned)bytes;
 
@@ -1448,5 +1448,5 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
 
 
 /*
- * End of "$Id: raster.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: raster.c 12124 2014-08-28 15:37:22Z msweet $".
  */

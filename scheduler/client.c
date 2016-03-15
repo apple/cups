@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 12056 2014-07-22 14:02:56Z msweet $"
+ * "$Id: client.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
@@ -934,7 +934,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_STATUS_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -993,7 +993,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_STATUS_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1891,7 +1891,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			      con->request->request.op.version[1],
 			      ippOpString(con->request->request.op.operation_id),
 			      con->request->request.op.request_id);
-	      con->bytes += ippLength(con->request);
+	      con->bytes += (off_t)ippLength(con->request);
 	    }
 	  }
 
@@ -2912,6 +2912,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   char		*ptr;			/* Pointer info filename */
   size_t	plen;			/* Remaining length after pointer */
   char		language[7];		/* Language subdirectory, if any */
+  int		perm_check = 1;		/* Do permissions check? */
 
 
  /*
@@ -2921,17 +2922,27 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   language[0] = '\0';
 
   if (!strncmp(con->uri, "/ppd/", 5) && !strchr(con->uri + 5, '/'))
+  {
     snprintf(filename, len, "%s%s", ServerRoot, con->uri);
+
+    perm_check = 0;
+  }
   else if (!strncmp(con->uri, "/icons/", 7) && !strchr(con->uri + 7, '/'))
   {
     snprintf(filename, len, "%s/%s", CacheDir, con->uri + 7);
     if (access(filename, F_OK) < 0)
       snprintf(filename, len, "%s/images/generic.png", DocumentRoot);
+
+    perm_check = 0;
   }
   else if (!strncmp(con->uri, "/rss/", 5) && !strchr(con->uri + 5, '/'))
     snprintf(filename, len, "%s/rss/%s", CacheDir, con->uri + 5);
-  else if (!strncmp(con->uri, "/admin/conf/", 12))
-    snprintf(filename, len, "%s%s", ServerRoot, con->uri + 11);
+  else if (!strcmp(con->uri, "/admin/conf/cupsd.conf"))
+  {
+    strlcpy(filename, ConfigurationFile, len);
+
+    perm_check = 0;
+  }
   else if (!strncmp(con->uri, "/admin/log/", 11))
   {
     if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
@@ -2942,6 +2953,8 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       strlcpy(filename, PageLog, len);
     else
       return (NULL);
+
+    perm_check = 0;
   }
   else if (con->language)
   {
@@ -3007,7 +3020,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * not allow access...
   */
 
-  if (!status && !(filestats->st_mode & S_IROTH))
+  if (!status && perm_check && !(filestats->st_mode & S_IROTH))
   {
     cupsdLogClient(con, CUPSD_LOG_INFO, "Files/directories such as \"%s\" must be world-readable.", filename);
     return (NULL);
@@ -3115,7 +3128,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     * not allow access...
     */
 
-    if (!status && !(filestats->st_mode & S_IROTH))
+    if (!status && perm_check && !(filestats->st_mode & S_IROTH))
     {
       cupsdLogClient(con, CUPSD_LOG_INFO, "Files/directories such as \"%s\" must be world-readable.", filename);
       return (NULL);
@@ -4042,5 +4055,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 12056 2014-07-22 14:02:56Z msweet $".
+ * End of "$Id: client.c 12124 2014-08-28 15:37:22Z msweet $".
  */

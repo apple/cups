@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 11851 2014-05-07 23:55:35Z msweet $"
+ * "$Id: globals.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  *   Global variable access routines for CUPS.
  *
@@ -361,7 +361,9 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 
   httpClose(cg->http);
 
+#ifdef HAVE_SSL
   _httpFreeCredentials(cg->tls_credentials);
+#endif /* HAVE_SSL */
 
   cupsFileClose(cg->stdio_files[0]);
   cupsFileClose(cg->stdio_files[1]);
@@ -392,5 +394,5 @@ cups_globals_init(void)
 
 
 /*
- * End of "$Id: globals.c 11851 2014-05-07 23:55:35Z msweet $".
+ * End of "$Id: globals.c 12124 2014-08-28 15:37:22Z msweet $".
  */

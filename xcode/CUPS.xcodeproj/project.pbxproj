@@ -30,6 +30,7 @@
 			);
 			dependencies = (
 				274FF5E313332D4300317ECB /* PBXTargetDependency */,
+				72BEA8D819AFA8BB0085F0F3 /* PBXTargetDependency */,
 				72F75A711336FACD004BB496 /* PBXTargetDependency */,
 				274FF5E513332D4300317ECB /* PBXTargetDependency */,
 				274FF622133331D300317ECB /* PBXTargetDependency */,
@@ -44,6 +45,8 @@
 				274FF65E13333A3400317ECB /* PBXTargetDependency */,
 				724379531333FECE009631B9 /* PBXTargetDependency */,
 				724379111333E4EA009631B9 /* PBXTargetDependency */,
+				72BEA8D619AFA8A00085F0F3 /* PBXTargetDependency */,
+				72BEA8D419AFA89C0085F0F3 /* PBXTargetDependency */,
 				276683FF1337F7C5000D33D0 /* PBXTargetDependency */,
 				7243792B1333E962009631B9 /* PBXTargetDependency */,
 				276683D71337B24A000D33D0 /* PBXTargetDependency */,
@@ -887,6 +890,27 @@
 			remoteInfo = ippserver;
 		};
 		726AD705135E8AC5002C930D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274FF6891333B1C400317ECB;
+			remoteInfo = libcups_static;
+		};
+		72BEA8D319AFA89C0085F0F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 726AD6F6135E88F0002C930D;
+			remoteInfo = ippserver;
+		};
+		72BEA8D519AFA8A00085F0F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72CF95E618A19134000FCAE4;
+			remoteInfo = ippfind;
+		};
+		72BEA8D719AFA8BB0085F0F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
 			proxyType = 1;
@@ -3924,6 +3948,21 @@
 			isa = PBXTargetDependency;
 			target = 274FF6891333B1C400317ECB /* libcups_static */;
 			targetProxy = 726AD705135E8AC5002C930D /* PBXContainerItemProxy */;
+		};
+		72BEA8D419AFA89C0085F0F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 726AD6F6135E88F0002C930D /* ippserver */;
+			targetProxy = 72BEA8D319AFA89C0085F0F3 /* PBXContainerItemProxy */;
+		};
+		72BEA8D619AFA8A00085F0F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72CF95E618A19134000FCAE4 /* ippfind */;
+			targetProxy = 72BEA8D519AFA8A00085F0F3 /* PBXContainerItemProxy */;
+		};
+		72BEA8D819AFA8BB0085F0F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274FF6891333B1C400317ECB /* libcups_static */;
+			targetProxy = 72BEA8D719AFA8BB0085F0F3 /* PBXContainerItemProxy */;
 		};
 		72CF95E718A19134000FCAE4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

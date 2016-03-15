@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 12067 2014-07-31 00:02:30Z msweet $"
+ * "$Id: job.c 12140 2014-08-30 01:51:22Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -235,10 +235,7 @@ cupsdCheckJobs(void)
 
   curtime = time(NULL);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d, "
-                  "curtime=%ld", cupsArrayCount(ActiveJobs), Sleeping,
-                  NeedReload, (long)curtime);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckJobs: %d active jobs, sleeping=%d, ac-power=%d, reload=%d, curtime=%ld", cupsArrayCount(ActiveJobs), Sleeping, ACPower, NeedReload, (long)curtime);
 
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
@@ -332,7 +329,7 @@ cupsdCheckJobs(void)
     */
 
     if (job->state_value == IPP_JOB_PENDING && !NeedReload &&
-        !Sleeping && !DoingShutdown && !job->printer)
+        (!Sleeping || ACPower) && !DoingShutdown && !job->printer)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;
@@ -5289,5 +5286,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 12067 2014-07-31 00:02:30Z msweet $".
+ * End of "$Id: job.c 12140 2014-08-30 01:51:22Z msweet $".
  */

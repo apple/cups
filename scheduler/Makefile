@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 11718 2014-03-21 18:04:48Z msweet $"
+# "$Id: Makefile 12132 2014-08-29 11:27:18Z msweet $"
 #
 # Scheduler Makefile for CUPS.
 #
@@ -171,7 +171,7 @@ install-data:
 	echo Creating $(REQUESTS)/tmp...
 	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
-	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
+	$(INSTALL_DIR) -m 770 -g $(CUPS_GROUP) $(CACHEDIR)
 	if test "x$(INITDIR)" != x; then \
 		echo Installing init scripts...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
@@ -547,5 +547,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 11718 2014-03-21 18:04:48Z msweet $".
+# End of "$Id: Makefile 12132 2014-08-29 11:27:18Z msweet $".
 #

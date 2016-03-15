@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptool.c 12031 2014-07-15 19:57:59Z msweet $"
+ * "$Id: ipptool.c 12143 2014-09-02 13:37:30Z msweet $"
  *
  * ipptool command for CUPS.
  *
@@ -647,6 +647,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (!vars.uri)
       {
         _cupsLangPuts(stderr, _("ipptool: URI required before test file."));
+        _cupsLangPuts(stderr, argv[i]);
 	usage();
       }
 
@@ -1371,7 +1372,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
         * Name of test...
 	*/
 
-	get_token(fp, name, sizeof(name), &linenum);
+	get_token(fp, temp, sizeof(temp), &linenum);
+	expand_variables(vars, name, temp, sizeof(name));
       }
       else if (!_cups_strcasecmp(token, "PAUSE"))
       {
@@ -2470,6 +2472,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
       {
 	fputs("<key>Successful</key>\n", outfile);
 	fputs("<true />\n", outfile);
+	fputs("<key>Skipped</key>\n", outfile);
+	fputs("<true />\n", outfile);
 	fputs("<key>StatusCode</key>\n", outfile);
 	print_xml_string(outfile, "string", "skip");
 	fputs("<key>ResponseAttributes</key>\n", outfile);
@@ -3060,7 +3064,62 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	    set_variable(outfile, vars, expect->define_match, "1");
 
 	  if (found && expect->define_value)
+	  {
+	    if (!expect->with_value)
+	    {
+	      int last = ippGetCount(found) - 1;
+					/* Last element in attribute */
+
+	      switch (ippGetValueTag(found))
+	      {
+	        case IPP_TAG_ENUM :
+		case IPP_TAG_INTEGER :
+		    snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
+		    break;
+
+		case IPP_TAG_BOOLEAN :
+		    if (ippGetBoolean(found, last))
+		      strlcpy(buffer, "true", sizeof(buffer));
+		    else
+		      strlcpy(buffer, "false", sizeof(buffer));
+		    break;
+
+		case IPP_TAG_RESOLUTION :
+		    {
+		      int	xres,	/* Horizontal resolution */
+				yres;	/* Vertical resolution */
+		      ipp_res_t	units;	/* Resolution units */
+
+		      xres = ippGetResolution(found, last, &yres, &units);
+
+		      if (xres == yres)
+		        snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		      else
+		        snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		    }
+		    break;
+
+		case IPP_TAG_CHARSET :
+		case IPP_TAG_KEYWORD :
+		case IPP_TAG_LANGUAGE :
+		case IPP_TAG_MIMETYPE :
+		case IPP_TAG_NAME :
+		case IPP_TAG_NAMELANG :
+		case IPP_TAG_TEXT :
+		case IPP_TAG_TEXTLANG :
+		case IPP_TAG_URI :
+		case IPP_TAG_URISCHEME :
+		    strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
+		    break;
+
+		default :
+		    ippAttributeString(found, buffer, sizeof(buffer));
+		    break;
+	      }
+	    }
+
 	    set_variable(outfile, vars, expect->define_value, buffer);
+	  }
 
 	  if (found && expect->repeat_match &&
 	      repeat_count < expect->repeat_limit)
@@ -3079,6 +3138,25 @@ do_tests(FILE         *outfile,		/* I - Output file */
         {
           printf("%04d]\n", repeat_count);
           fflush(stdout);
+
+	  if (num_displayed > 0)
+	  {
+	    for (attrptr = ippFirstAttribute(response); attrptr; attrptr = ippNextAttribute(response))
+	    {
+	      const char *attrname = ippGetName(attrptr);
+	      if (attrname)
+	      {
+		for (i = 0; i < num_displayed; i ++)
+		{
+		  if (!strcmp(displayed[i], attrname))
+		  {
+		    print_attr(stdout, _CUPS_OUTPUT_TEST, attrptr, NULL);
+		    break;
+		  }
+		}
+	      }
+	    }
+	  }
         }
 
         sleep((unsigned)repeat_interval);
@@ -3134,7 +3212,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	printf("        status-code = %s (%s)\n", ippErrorString(cupsLastError()),
 	       cupsLastErrorString());
 
-        if (response)
+        if (Verbosity && response)
         {
 	  for (attrptr = response->attrs;
 	       attrptr != NULL;
@@ -3143,7 +3221,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	}
       }
     }
-    else if (!prev_pass)
+    else if (!prev_pass && Output != _CUPS_OUTPUT_QUIET)
       fprintf(stderr, "%s\n", cupsLastErrorString());
 
     if (prev_pass && Output >= _CUPS_OUTPUT_LIST && !Verbosity &&
@@ -3214,7 +3292,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
       }
     }
 
-    if (num_displayed > 0 && !Verbosity && response && Output == _CUPS_OUTPUT_TEST)
+    if (num_displayed > 0 && !Verbosity && response && (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != stdout)))
     {
       for (attrptr = response->attrs;
 	   attrptr != NULL;
@@ -3387,14 +3465,26 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
       }
       else if (vars)
       {
-	strlcpy(temp, src + 1, sizeof(temp));
+        if (src[1] == '{')
+	{
+	  src += 2;
+	  strlcpy(temp, src, sizeof(temp));
+	  if ((tempptr = strchr(temp, '}')) != NULL)
+	    *tempptr = '\0';
+	  else
+	    tempptr = temp + strlen(temp);
+	}
+	else
+	{
+	  strlcpy(temp, src + 1, sizeof(temp));
 
-	for (tempptr = temp; *tempptr; tempptr ++)
-	  if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
-	    break;
+	  for (tempptr = temp; *tempptr; tempptr ++)
+	    if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
+	      break;
 
-        if (*tempptr)
-	  *tempptr = '\0';
+	  if (*tempptr)
+	    *tempptr = '\0';
+        }
 
 	if (!strcmp(temp, "uri"))
 	  value = vars->uri;
@@ -4713,6 +4803,10 @@ usage(void)
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... "
 		          "filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
+  _cupsLangPuts(stderr, _("  --help                  Show help."));
+  _cupsLangPuts(stderr, _("  --stop-after-include-error\n"
+                          "                          Stop tests after a failed INCLUDE."));
+  _cupsLangPuts(stderr, _("  --version               Show version."));
   _cupsLangPuts(stderr, _("  -4                      Connect using IPv4."));
   _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
   _cupsLangPuts(stderr, _("  -C                      Send requests using "
@@ -4722,6 +4816,7 @@ usage(void)
   _cupsLangPuts(stderr, _("  -I                      Ignore errors."));
   _cupsLangPuts(stderr, _("  -L                      Send requests using "
                           "content-length."));
+  _cupsLangPuts(stderr, _("  -P filename.plist       Produce XML plist to a file and test report to standard output."));
   _cupsLangPuts(stderr, _("  -S                      Test with SSL "
 			  "encryption."));
   _cupsLangPuts(stderr, _("  -T seconds              Set the receive/send "
@@ -4730,12 +4825,14 @@ usage(void)
                           "version."));
   _cupsLangPuts(stderr, _("  -X                      Produce XML plist instead "
                           "of plain text."));
+  _cupsLangPuts(stderr, _("  -c                      Produce CSV output."));
   _cupsLangPuts(stderr, _("  -d name=value           Set named variable to "
                           "value."));
   _cupsLangPuts(stderr, _("  -f filename             Set default request "
                           "filename."));
   _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with "
                           "the given time interval."));
+  _cupsLangPuts(stderr, _("  -l                      Produce plain text output."));
   _cupsLangPuts(stderr, _("  -n count                Repeat the last file the "
                           "given number of times."));
   _cupsLangPuts(stderr, _("  -q                      Run silently."));
@@ -5769,5 +5866,5 @@ with_value(FILE            *outfile,	/* I - Output file */
 
 
 /*
- * End of "$Id: ipptool.c 12031 2014-07-15 19:57:59Z msweet $".
+ * End of "$Id: ipptool.c 12143 2014-09-02 13:37:30Z msweet $".
  */

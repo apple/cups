@@ -1,5 +1,5 @@
 /*
- * "$Id: network.c 11970 2014-07-01 14:35:25Z msweet $"
+ * "$Id: network.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * Common backend network APIs for CUPS.
  *
@@ -175,13 +175,13 @@ backendNetworkSideCB(
 	      {
 	        case CUPS_ASN1_BOOLEAN :
 		    snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%d", packet.object_value.boolean);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
 	        case CUPS_ASN1_INTEGER :
 		    snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%d",
 		             packet.object_value.integer);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
 	        case CUPS_ASN1_BIT_STRING :
@@ -193,13 +193,13 @@ backendNetworkSideCB(
 
 		    memcpy(dataptr, packet.object_value.string.bytes, i);
 
-                    datalen += i;
+                    datalen += (int)i;
 		    break;
 
 	        case CUPS_ASN1_OID :
 		    _cupsSNMPOIDToString(packet.object_value.oid, dataptr,
 		                         sizeof(data) - (size_t)(dataptr - data));
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_HEX_STRING :
@@ -208,22 +208,22 @@ backendNetworkSideCB(
 			     dataptr < (data + sizeof(data) - 3);
 			 i ++, dataptr += 2)
 		      sprintf(dataptr, "%02X", packet.object_value.string.bytes[i]);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_COUNTER :
 		    snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%u", packet.object_value.counter);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_GAUGE :
 		    snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%u", packet.object_value.gauge);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_TIMETICKS :
 		    snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%u", packet.object_value.timeticks);
-	            datalen += strlen(dataptr);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 default :
@@ -304,5 +304,5 @@ backendNetworkSideCB(
 
 
 /*
- * End of "$Id: network.c 11970 2014-07-01 14:35:25Z msweet $".
+ * End of "$Id: network.c 12124 2014-08-28 15:37:22Z msweet $".
  */

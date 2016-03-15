@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h 12031 2014-07-15 19:57:59Z msweet $"
+ * "$Id: config.h 12136 2014-08-29 15:19:40Z msweet $"
  *
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -54,6 +54,15 @@
 
 
 /*
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
+ * and strnicmp() functions...
+ */
+
+#define strcasecmp	stricmp
+#define strncasecmp	strnicmp
+
+
+/*
  * Map the POSIX sleep() and usleep() functions to the Win32 Sleep() function...
  */
 
@@ -71,7 +80,7 @@ typedef unsigned long useconds_t;
 #  define R_OK		04
 #  define O_RDONLY	_O_RDONLY
 #  define O_WRONLY	_O_WRONLY
-#  define O_CREATE	_O_CREAT
+#  define O_CREAT	_O_CREAT
 #  define O_TRUNC	_O_TRUNC
 
 
@@ -163,7 +172,7 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have domain socket support?
+ * Do we have domain socket support, and if so what is the default one?
  */
 
 #undef CUPS_DEFAULT_DOMAINSOCKET
@@ -198,6 +207,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have posix_spawn?
+ */
+
+/* #undef HAVE_POSIX_SPAWN */
+
+
+/*
  * Do we have ZLIB?
  */
 
@@ -209,10 +225,7 @@ typedef unsigned long useconds_t;
  * Do we have PAM stuff?
  */
 
-#ifndef HAVE_LIBPAM
 #define HAVE_LIBPAM 0
-#endif /* !HAVE_LIBPAM */
-
 /* #undef HAVE_PAM_PAM_APPL_H */
 /* #undef HAVE_PAM_SET_ITEM */
 /* #undef HAVE_PAM_SETCRED */
@@ -361,6 +374,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have the gnutls_transport_set_pull_timeout_function function?
+ */
+
+/* #undef HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
+
+
+/*
  * What Security framework headers do we have?
  */
 
@@ -380,6 +400,20 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_CSSMERRORSTRING */
+
+
+/*
+ * Do we have the SecGenerateSelfSignedCertificate function?
+ */
+
+/* #undef HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+
+
+/*
+ * Do we have the SecKeychainOpen function?
+ */
+
+/* #undef HAVE_SECKEYCHAINOPEN */
 
 
 /*
@@ -503,6 +537,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have systemd support?
+ */
+
+/* #undef HAVE_SYSTEMD */
+
+
+/*
  * Various scripting languages...
  */
 
@@ -579,6 +620,7 @@ typedef unsigned long useconds_t;
 
 /* #undef HAVE_DBUS */
 /* #undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
+/* #undef HAVE_DBUS_THREADS_INIT */
 
 
 /*
@@ -750,5 +792,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 12031 2014-07-15 19:57:59Z msweet $".
+ * End of "$Id: config.h 12136 2014-08-29 15:19:40Z msweet $".
  */

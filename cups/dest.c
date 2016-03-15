@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 11959 2014-06-26 18:30:19Z msweet $"
+ * "$Id: dest.c 12094 2014-08-19 12:15:11Z msweet $"
  *
  * User-defined destination (and option) support for CUPS.
  *
@@ -1310,7 +1310,7 @@ _cupsGetDestResource(
  *
  * "uri" is the "ipp" or "ipps" URI for the printer.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */
@@ -3942,5 +3942,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 11959 2014-06-26 18:30:19Z msweet $".
+ * End of "$Id: dest.c 12094 2014-08-19 12:15:11Z msweet $".
  */

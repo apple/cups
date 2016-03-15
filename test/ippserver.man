@@ -1,0 +1,172 @@
+.\"
+.\" "$Id$"
+.\"
+.\" ippserver man page for CUPS.
+.\"
+.\" Copyright 2014 by Apple Inc.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ippserver 1 "CUPS" "28 August 2014" "Apple Inc."
+.SH NAME
+ippserver \- a simple internet printing protocol server
+.SH SYNOPSIS
+.B ippserver
+[
+.B \-2
+] [
+.B \-M
+.I manufacturer
+] [
+.B \-P
+] [
+.B \-c
+.I command
+] [
+.B \-d
+.I spool-directory
+] [
+.B \-f
+.I type/subtype[,...]
+] [
+.B \-h
+] [
+.B \-i
+.I iconfile.png
+] [
+.B \-k
+] [
+.B \-l
+.I location
+] [
+.B \-m
+.I model
+] [
+.B \-n
+.I hostname
+] [
+.B \-p
+.I port
+] [
+.B \-r
+.I subtype
+] [
+.B \-s
+.I speed[,color-speed]
+] [
+.B \-v[vvv]
+]
+.I service-name
+.SH DESCRIPTION
+.B ippserver
+is a simple Internet Printing Protocol (IPP) server conforming to the IPP Everywhere (PWG 5100.14) specification. It can be used to test client software or act as a very basic print server that runs a command for every job that is printed.
+.SH OPTIONS
+The following options are recognized by
+.B ippserver:
+.TP 5
+.B \-2
+Report support for two-sided (duplex) printing.
+.TP 5
+\fB\-M \fImanufacturer\fR
+Set the manufacturer of the printer.
+The default is "Test".
+.TP 5
+.B \-P
+Report support for PIN printing.
+.TP 5
+\fB\-c \fIcommand\fR
+Run the specified command for each document that is printed.
+.TP 5
+\fB\-d \fIspool-directory\fR
+Specifies the directory that will hold the print files.
+The default is a directory under the user's current temporary directory.
+.TP 5
+\fB\-f \fItype/subtype[,...]\fR
+Specifies a list of MIME media types that the server will accept.
+The default is "application/pdf,image/jpeg,image/pwg-raster".
+.TP 5
+.B \-h
+Shows program help.
+.TP 5
+\fB\-i \fIiconfile.png\fR
+Specifies the printer icon file for the server.
+The default is "printer.png".
+.TP 5
+.B \-k
+Keeps the print documents in the spool directory rather than deleting them.
+.TP 5
+\fB\-l \fIlocation\fR
+Specifies the human-readable location string that is reported by the server.
+The default is the empty string.
+.TP 5
+\fB\-m \fImodel\fR
+Specifies the model name of the printer.
+The default is "Printer".
+.TP 5
+\fB\-n \fIhostname\fR
+Specifies the hostname that is reported by the server.
+The default is the name returned by the
+.BR hostname (1)
+command.
+.TP 5
+\fB\-p \fIport\fR
+Specifies the port number to listen on.
+The default is a user-specific number from 8000 to 8999.
+.TP 5
+\fB\-r \fIsubtype\fR
+Specifies the Bonjour subtype(s) to advertise.
+Separate multiple subtypes with a comma.
+The default is "_print".
+.TP 5
+\fB\-s \fIspeed[,color-speed]\fR
+Specifies the printer speed in pages per minute.
+If two numbers are specified and the second number is greater than zero, the server will report support for color printing.
+The default is "10,0".
+.TP 5
+.B \-v[vvv]
+Be (very) verbose when logging activity to the standard output.
+.SH EXIT STATUS
+The
+.B ippserver
+program returns 1 if it is unable to process the command-line arguments or register the IPP service.
+Otherwise
+.B ippserver
+will run continuously until terminated.
+.SH CONFORMING TO
+The
+.B ippserver
+program is unique to CUPS and conforms to the IPP Everywhere (PWG 5100.14) specification.
+.SH ENVIRONMENT
+.B ippserver
+adds environment variables starting with "IPP_" for all IPP Job attributes in the print request.
+For example, when executing a command for an IPP Job containing the "media" Job Template attribute, the "IPP_MEDIA" environment variable will be set to the value of that attribute.
+.LP
+Enumerated values are converted to their keyword equivalents.
+For example, a "print-quality" Job Template attribute with a enum value of 3 will become the "IPP_PRINT_QUALITY" environment variable with a value of "draft".
+.SH EXAMPLES
+Run
+.B ippserver
+with a service name of My Cool Printer:
+.nf
+
+    ippserver "My Cool Printer"
+.fi
+.LP
+Run the
+.BR file (1)
+command whenever a job is sent to the server:
+.nf
+
+    ippserver \-c file "My Cool Printer"
+.fi
+.SH SEE ALSO
+PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
+.SH COPYRIGHT
+Copyright \[co] 2007-2014 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c 11908 2014-06-09 18:57:44Z msweet $"
+ * "$Id: usersys.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
@@ -211,8 +211,10 @@ cupsSetCredentials(
   if (cupsArrayCount(credentials) < 1)
     return (-1);
 
+#ifdef HAVE_SSL
   _httpFreeCredentials(cg->tls_credentials);
   cg->tls_credentials = _httpCreateCredentials(credentials);
+#endif /* HAVE_SSL */
 
   return (cg->tls_credentials ? 0 : -1);
 }
@@ -1127,5 +1129,5 @@ cups_read_client_conf(
 
 
 /*
- * End of "$Id: usersys.c 11908 2014-06-09 18:57:44Z msweet $".
+ * End of "$Id: usersys.c 12124 2014-08-28 15:37:22Z msweet $".
  */

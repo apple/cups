@@ -1,5 +1,5 @@
 /*
- * "$Id: tls.c 11841 2014-04-29 16:39:25Z msweet $"
+ * "$Id: tls.c 12136 2014-08-29 15:19:40Z msweet $"
  *
  * TLS routines for CUPS.
  *
@@ -46,12 +46,67 @@
 #    include "tls-gnutls.c"
 #  elif defined(HAVE_CDSASSL)
 #    include "tls-darwin.c"
-#  else
+#  elif defined(HAVE_SSPISSL)
 #    include "tls-sspi.c"
 #  endif /* HAVE_GNUTLS */
+#else
+/* Stubs for when TLS is not supported/available */
+int
+httpCopyCredentials(http_t *http, cups_array_t **credentials)
+{
+  (void)http;
+  if (credentials)
+    *credentials = NULL;
+  return (-1);
+}
+int
+httpCredentialsAreValidForName(cups_array_t *credentials, const char *common_name)
+{
+  (void)credentials;
+  (void)common_name;
+  return (1);
+}
+time_t
+httpCredentialsGetExpiration(cups_array_t *credentials)
+{
+  (void)credentials;
+  return (INT_MAX);
+}
+http_trust_t
+httpCredentialsGetTrust(cups_array_t *credentials, const char *common_name)
+{
+  (void)credentials;
+  (void)common_name;
+  return (HTTP_TRUST_OK);
+}
+size_t
+httpCredentialsString(cups_array_t *credentials, char *buffer, size_t bufsize)
+{
+  (void)credentials;
+  (void)bufsize;
+  if (buffer)
+    *buffer = '\0';
+  return (0);
+}
+int
+httpLoadCredentials(const char *path, cups_array_t **credentials, const char *common_name)
+{
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+  return (-1);
+}
+int
+httpSaveCredentials(const char *path, cups_array_t *credentials, const char *common_name)
+{
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+  return (-1);
+}
 #endif /* HAVE_SSL */
 
 
 /*
- * End of "$Id: tls.c 11841 2014-04-29 16:39:25Z msweet $".
+ * End of "$Id: tls.c 12136 2014-08-29 15:19:40Z msweet $".
  */

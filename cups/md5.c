@@ -1,5 +1,5 @@
 /*
- * "$Id: md5.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: md5.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * Private MD5 implementation for CUPS.
  *
@@ -333,7 +333,7 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
     for (i = 0; i < 8; ++i)
 	data[i] = (unsigned char)(pms->count[i >> 2] >> ((i & 3) << 3));
     /* Pad to 56 bytes mod 64. */
-    _cupsMD5Append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    _cupsMD5Append(pms, pad, (int)((55 - (pms->count[0] >> 3)) & 63) + 1);
     /* Append the length. */
     _cupsMD5Append(pms, data, 8);
     for (i = 0; i < 16; ++i)
@@ -342,5 +342,5 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
 
 
 /*
- * End of "$Id: md5.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: md5.c 12124 2014-08-28 15:37:22Z msweet $".
  */

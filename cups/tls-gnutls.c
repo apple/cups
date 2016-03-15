@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-gnutls.c 12050 2014-07-18 16:51:12Z msweet $"
+ * "$Id: tls-gnutls.c 12125 2014-08-28 15:49:29Z msweet $"
  *
  * TLS support code for CUPS using GNU TLS.
  *
@@ -51,7 +51,7 @@ static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, 
 /*
  * 'cupsMakeServerCredentials()' - Make a self-signed certificate and private key pair.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -228,7 +228,7 @@ cupsMakeServerCredentials(
  * Note: The server credentials are used by all threads in the running process.
  * This function is threadsafe.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -357,7 +357,7 @@ _httpFreeCredentials(
 /*
  * 'httpCredentialsAreValidForName()' - Return whether the credentials are valid for the given name.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -383,7 +383,7 @@ httpCredentialsAreValidForName(
 /*
  * 'httpCredentialsGetTrust()' - Return the trust of credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_trust_t				/* O - Level of trust */
@@ -475,7 +475,7 @@ httpCredentialsGetTrust(
 /*
  * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 time_t					/* O - Expiration date of credentials */
@@ -500,7 +500,7 @@ httpCredentialsGetExpiration(
 /*
  * 'httpCredentialsString()' - Return a string representing the credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Total size of credentials string */
@@ -556,7 +556,7 @@ httpCredentialsString(
 /*
  * 'httpLoadCredentials()' - Load X.509 credentials from a keychain file.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -682,7 +682,7 @@ httpLoadCredentials(
 /*
  * 'httpSaveCredentials()' - Save X.509 credentials to a keychain file.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - -1 on error, 0 on success */
@@ -1186,7 +1186,9 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
   gnutls_transport_set_pull_function(http->tls, http_gnutls_read);
+#ifdef HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION
   gnutls_transport_set_pull_timeout_function(http->tls, (gnutls_pull_timeout_func)httpWait);
+#endif /* HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
   gnutls_transport_set_push_function(http->tls, http_gnutls_write);
 
   while ((status = gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
@@ -1289,5 +1291,5 @@ _httpTLSWrite(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: tls-gnutls.c 12050 2014-07-18 16:51:12Z msweet $".
+ * End of "$Id: tls-gnutls.c 12125 2014-08-28 15:49:29Z msweet $".
  */

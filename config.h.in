@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 11717 2014-03-21 16:42:53Z msweet $"
+ * "$Id: config.h.in 12140 2014-08-30 01:51:22Z msweet $"
  *
  * Configuration file for CUPS.
  *
@@ -93,7 +93,7 @@
  * Default MaxCopies value...
  */
 
-#define CUPS_DEFAULT_MAX_COPIES	100
+#define CUPS_DEFAULT_MAX_COPIES	9999
 
 
 /*
@@ -150,10 +150,7 @@
  * Do we have PAM stuff?
  */
 
-#ifndef HAVE_LIBPAM
 #define HAVE_LIBPAM 0
-#endif /* !HAVE_LIBPAM */
-
 #undef HAVE_PAM_PAM_APPL_H
 #undef HAVE_PAM_SET_ITEM
 #undef HAVE_PAM_SETCRED
@@ -297,7 +294,15 @@
 
 #undef HAVE_CDSASSL
 #undef HAVE_GNUTLS
+#undef HAVE_SSPISSL
 #undef HAVE_SSL
+
+
+/*
+ * Do we have the gnutls_transport_set_pull_timeout_function function?
+ */
+
+#undef HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION
 
 
 /*
@@ -633,13 +638,6 @@
 
 
 /*
- * Do we have vproc_transaction_begin/end?
- */
-
-#undef HAVE_VPROC_TRANSACTION_BEGIN
-
-
-/*
  * Do we have libusb?
  */
 
@@ -714,5 +712,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 11717 2014-03-21 16:42:53Z msweet $".
+ * End of "$Id: config.h.in 12140 2014-08-30 01:51:22Z msweet $".
  */

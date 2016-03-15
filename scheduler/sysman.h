@@ -1,16 +1,16 @@
 /*
- * "$Id: sysman.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: sysman.h 12140 2014-08-30 01:51:22Z msweet $"
  *
- *   System management definitions for the CUPS scheduler.
+ * System management definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -35,7 +35,9 @@ VAR int			DirtyFiles	VALUE(CUPSD_DIRTY_NONE),
 					/* How often do we write dirty files? */
 VAR time_t		DirtyCleanTime	VALUE(0);
 					/* When to clean dirty files next */
-VAR int			Sleeping	VALUE(0);
+VAR int			ACPower		VALUE(-1),
+					/* Is the system on AC power? */
+			Sleeping	VALUE(0);
 					/* Non-zero if machine is entering or *
 					 * in a sleep state...                */
 VAR time_t		SleepJobs	VALUE(0);
@@ -60,5 +62,5 @@ extern void	cupsdStopSystemMonitor(void);
 
 
 /*
- * End of "$Id: sysman.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: sysman.h 12140 2014-08-30 01:51:22Z msweet $".
  */

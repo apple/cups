@@ -1,5 +1,28 @@
-CHANGES.txt - 2.0b1 - 2014-07-30
---------------------------------
+CHANGES.txt - 2.0rc1 - 2014-09-02
+---------------------------------
+
+CHANGES IN CUPS V2.0rc1
+
+	- Documentation updates (STR #4464)
+	- The scheduler now monitors the AC power status on OS X, allowing for
+	  "sleep printing" when sharing printers (<rdar://problem/17325852>)
+	- The scheduler incorrectly called launch_activate_socket multiple times
+	  on OS X (<rdar://problem/17523218>)
+	- The ippserver test program now passes the IPP Everywhere self-
+	  certification tests (STR #4101)
+	- Relaxed the new OS X filter sandbox slightly (STR #4471,
+	  <rdar://problem/17483959>)
+	- Dropped the old Epson Stylus Color/Photo sample drivers since they
+	  don't work with any current printers and there are free alternatives
+	  that produce much better output (<rdar://problem/18036889>)
+	- Log and configuration files that are not world-readable are again
+	  accessible via the web interface (STR #4461)
+	- PPD files are now created using the permissions specified by the
+	  ConfigFilePerm directive.
+	- Fixed RPM build issues (STR #4459)
+	- Fixed the spinner image and restart page when reconfiguring the
+	  scheduler through the web interface (STR #4475)
+
 
 CHANGES IN CUPS V2.0b1
 

@@ -1531,6 +1531,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\cups\cups-private.h"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\cups.h"
 				>
 			</File>

@@ -1,5 +1,5 @@
 /*
- * "$Id: dest-localization.c 11894 2014-05-23 03:18:00Z msweet $"
+ * "$Id: dest-localization.c 12094 2014-08-19 12:15:11Z msweet $"
  *
  * Destination localization support for CUPS.
  *
@@ -38,7 +38,7 @@ static char	*cups_scan_strings(char *buffer);
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 const char *				/* O - Localized string */
@@ -535,5 +535,5 @@ cups_scan_strings(char *buffer)		/* I - Start of string */
 
 
 /*
- * End of "$Id: dest-localization.c 11894 2014-05-23 03:18:00Z msweet $".
+ * End of "$Id: dest-localization.c 12094 2014-08-19 12:15:11Z msweet $".
  */

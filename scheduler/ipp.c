@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 12067 2014-07-31 00:02:30Z msweet $"
+ * "$Id: ipp.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
@@ -2715,7 +2715,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "Copied PPD file successfully");
-      chmod(dstfile, 0644);
     }
   }
 
@@ -4623,7 +4622,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   * Open the destination file for a copy...
   */
 
-  if ((dst = cupsFileOpen(to, "wb")) == NULL)
+  if ((dst = cupsdCreateConfFile(to, ConfigFilePerm)) == NULL)
   {
     cupsFreeOptions(num_defaults, defaults);
     cupsFileClose(src);
@@ -4678,7 +4677,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
   unlink(tempfile);
 
-  return (cupsFileClose(dst));
+  return (cupsdCloseCreatedConfFile(dst, to));
 }
 
 
@@ -10824,8 +10823,10 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
 	     ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  ipp_attribute_t	*attr,		/* Current attribute */
-			*auth_info;	/* auth-info attribute */
+  ipp_attribute_t	*attr;		/* Current attribute */
+#ifdef HAVE_SSL
+  ipp_attribute_t	*auth_info;	/* auth-info attribute */
+#endif /* HAVE_SSL */
   ipp_attribute_t	*format,	/* Document-format attribute */
 			*name;		/* Job-name attribute */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
@@ -10991,7 +10992,9 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
+#ifdef HAVE_SSL
   auth_info = ippFindAttribute(con->request, "auth-info", IPP_TAG_TEXT);
+#endif /* HAVE_SSL */
 
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
@@ -11093,5 +11096,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 12067 2014-07-31 00:02:30Z msweet $".
+ * End of "$Id: ipp.c 12124 2014-08-28 15:37:22Z msweet $".
  */

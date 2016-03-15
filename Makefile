@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 12074 2014-07-31 01:10:14Z msweet $"
+# "$Id: Makefile 12145 2014-09-02 15:00:50Z msweet $"
 #
 # Top-level Makefile for CUPS.
 #
@@ -319,7 +319,7 @@ sloc:
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-bsd deb pkg slackware tardist:
+bsd deb pkg slackware:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:
@@ -348,5 +348,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 12074 2014-07-31 01:10:14Z msweet $".
+# End of "$Id: Makefile 12145 2014-09-02 15:00:50Z msweet $".
 #

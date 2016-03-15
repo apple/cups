@@ -1,5 +1,5 @@
-README - CUPS v2.0b1 - 2014-07-30
----------------------------------
+README - CUPS v2.0rc1 - 2014-09-02
+----------------------------------
 
 ********************************************************************************
 ********************************************************************************
@@ -54,10 +54,10 @@ READING THE DOCUMENTATION
 
 GETTING SUPPORT AND OTHER RESOURCES
 
-    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide many
-    discussion forums which are available at:
+    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide two
+    mailing lists which are available at:
 
-	http://www.cups.org/newsgroups.php
+	http://www.cups.org/lists.php
 
     See the CUPS web site at "http://www.cups.org/" for other resources.
 
@@ -91,10 +91,6 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	-----------------------------  ------------------------------
 	Dymo Label Printers            drv:///sample.drv/dymo.ppd
 	Intellitech Intellibar         drv:///sample.drv/intelbar.ppd
-	EPSON Stylus Color Series      drv:///sample.drv/stcolor.ppd
-	EPSON Stylus Photo Series      drv:///sample.drv/stphoto.ppd
-	EPSON Stylus New Color Series  drv:///sample.drv/stcolor2.ppd
-	EPSON Stylus New Photo Series  drv:///sample.drv/stphoto2.ppd
 	EPSON 9-pin Series             drv:///sample.drv/epson9.ppd
 	EPSON 24-pin Series            drv:///sample.drv/epson24.ppd
 	Generic PCL Laser Printer      drv:///sample.drv/generpcl.ppd
@@ -126,11 +122,7 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
         lpadmin -p printername -E -v lpd://11.22.33.44/ -m ppd-name
 
     The sample drivers provide basic printing capabilities, but generally do not
-    exercise the full potential of the printers or CUPS.  The CUPS web site
-    provides links and drivers:
-
-        http://www.cups.org/ppd.php      PPD files
-	http://www.cups.org/links.php    Links to other drivers
+    exercise the full potential of the printers or CUPS.
 
 
 PRINTING FILES
@@ -147,8 +139,8 @@ PRINTING FILES
 	lpr -o media=A4 -o resolution=600dpi filename
 
     CUPS recognizes many types of images files as well as PDF, PostScript,
-    HP-GL/2, and text files, so you can print those files directly rather than
-    through an application.
+    and text files, so you can print those files directly rather than through
+    an application.
 
     If you have an application that generates output specifically for your
     printer then you need to use the "-oraw" or "-l" options:
@@ -156,8 +148,7 @@ PRINTING FILES
 	lp -o raw filename
 	lpr -l filename
 
-    This will prevent the filters from misinterpreting your print
-    file.
+    This will prevent the filters from misinterpreting your print file.
 
 
 LEGAL STUFF
@@ -166,8 +157,6 @@ LEGAL STUFF
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
-
-    This software is based in part on the work of the Independent JPEG Group.
 
     CUPS is provided under the terms of version 2 of the GNU General Public
     License and GNU Library General Public License. This program is distributed

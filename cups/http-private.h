@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 12044 2014-07-17 21:21:21Z msweet $"
+ * "$Id: http-private.h 12126 2014-08-28 16:02:00Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
@@ -76,7 +76,6 @@ typedef int socklen_t;
 #  ifdef HAVE_GNUTLS
 #    include <gnutls/gnutls.h>
 #    include <gnutls/x509.h>
-#    include <gcrypt.h>
 #  elif defined(HAVE_CDSASSL)
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
@@ -439,5 +438,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 12044 2014-07-17 21:21:21Z msweet $".
+ * End of "$Id: http-private.h 12126 2014-08-28 16:02:00Z msweet $".
  */

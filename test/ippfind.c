@@ -1,5 +1,5 @@
 /*
- * "$Id: ippfind.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: ippfind.c 12139 2014-08-29 17:50:38Z msweet $"
  *
  * Utility to find IPP printers via Bonjour/DNS-SD and optionally run
  * commands such as IPP and Bonjour conformance tests.  This tool is
@@ -242,7 +242,7 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int			i,		/* Looping var */
 			have_output = 0,/* Have output expression */
-			status = IPPFIND_EXIT_TRUE;
+			status = IPPFIND_EXIT_FALSE;
 					/* Exit status */
   const char		*opt,		/* Option character */
 			*search;	/* Current browse/resolve string */
@@ -306,6 +306,10 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Parse command-line...
   */
+
+  if (getenv("IPPFIND_DEBUG"))
+    for (i = 1; i < argc; i ++)
+      fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
 
   for (i = 1; i < argc; i ++)
   {
@@ -603,9 +607,9 @@ main(int  argc,				/* I - Number of command-line args */
                                NULL)) == NULL)
             return (IPPFIND_EXIT_MEMORY);
         }
-        else if (!strncmp(argv[i], "--txt-", 5))
+        else if (!strncmp(argv[i], "--txt-", 6))
         {
-          const char *key = argv[i] + 5;/* TXT key */
+          const char *key = argv[i] + 6;/* TXT key */
 
           i ++;
           if (i >= argc)
@@ -1420,8 +1424,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    service->ref = NULL;
 	  }
 
-          if (!eval_expr(service, expressions))
-            status = IPPFIND_EXIT_FALSE;
+          if (eval_expr(service, expressions))
+            status = IPPFIND_EXIT_TRUE;
 
           service->is_processed = 1;
         }
@@ -1803,6 +1807,9 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
 	    result = !regexec(&(expression->re), val, 0, NULL, 0);
 	  else
 	    result = 0;
+
+	  if (getenv("IPPFIND_DEBUG"))
+	    printf("TXT_REGEX of \"%s\": %d\n", val, result);
           break;
       case IPPFIND_OP_URI_REGEX :
           result = !regexec(&(expression->re), service->uri, 0, NULL, 0);
@@ -1976,9 +1983,9 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 	    strlcpy(tptr, scheme + 22, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strncmp(keyword, "txt_", 4))
 	  {
-	    if ((ptr = (char *)cupsGetOption(keyword + 4, service->num_txt,
-					     service->txt)) != NULL)
-	      strlcpy(tptr, strdup(ptr), sizeof(temp) - (size_t)(tptr - temp));
+	    const char *txt = cupsGetOption(keyword + 4, service->num_txt, service->txt);
+	    if (txt)
+	      strlcpy(tptr, txt, sizeof(temp) - (size_t)(tptr - temp));
 	    else
 	      *tptr = '\0';
 	  }
@@ -2003,6 +2010,17 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
   }
 
 #ifdef WIN32
+  if (getenv("IPPFIND_DEBUG"))
+  {
+    printf("\nProgram:\n    %s\n", args[0]);
+    puts("\nArguments:");
+    for (i = 0; i < num_args; i ++)
+      printf("    %s\n", myargv[i]);
+    puts("\nEnvironment:");
+    for (i = 0; i < myenvc; i ++)
+      printf("    %s\n", myenvp[i]);
+  }
+
   status = _spawnvpe(_P_WAIT, args[0], myargv, myenvp);
 
 #else
@@ -2069,6 +2087,18 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
  /*
   * Return whether the program succeeded or crashed...
   */
+
+  if (getenv("IPPFIND_DEBUG"))
+  {
+#ifdef WIN32
+    printf("Exit Status: %d\n", status);
+#else
+    if (WIFEXITED(status))
+      printf("Exit Status: %d\n", WEXITSTATUS(status));
+    else
+      printf("Terminating Signal: %d\n", WTERMSIG(status));
+#endif /* WIN32 */
+  }
 
   return (status == 0);
 }
@@ -2805,5 +2835,5 @@ show_version(void)
 
 
 /*
- * End of "$Id: ippfind.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: ippfind.c 12139 2014-08-29 17:50:38Z msweet $".
  */

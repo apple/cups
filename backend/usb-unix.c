@@ -1,5 +1,5 @@
 /*
- * "$Id: usb-unix.c 11342 2013-10-18 20:36:01Z msweet $"
+ * "$Id: usb-unix.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * USB port backend for CUPS.
  *
@@ -146,7 +146,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   tcgetattr(device_fd, &opts);
 
-  opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+  opts.c_lflag &= ~(unsigned)(ICANON | ECHO | ISIG);	/* Raw mode */
 
   /**** No options supported yet ****/
 
@@ -603,5 +603,5 @@ side_cb(int         print_fd,		/* I - Print file */
 
 
 /*
- * End of "$Id: usb-unix.c 11342 2013-10-18 20:36:01Z msweet $".
+ * End of "$Id: usb-unix.c 12124 2014-08-28 15:37:22Z msweet $".
  */

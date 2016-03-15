@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 12034 2014-07-16 19:37:34Z msweet $"
+ * "$Id: process.c 12102 2014-08-20 15:19:09Z msweet $"
  *
  * Process management routines for the CUPS scheduler.
  *
@@ -215,6 +215,8 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/private/var/mysql$\""
                  " #\"^/private/var/run$\""
                  " #\"^/private/var/spool$\""
+                 " #\"^/private/var/tmp$\""
+                 " #\"^/private/var/tmp/\""
                  " #\"^/usr/bin$\""	/* /usr/bin */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
                  " #\"^/usr/libexec/cups$\""	/* /usr/libexec/cups */
@@ -223,27 +225,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/usr/libexec/fax/\""	/* /usr/libexec/fax/... */
                  " #\"^/usr/sbin$\""	/* /usr/sbin */
                  " #\"^/usr/sbin/\""	/* /usr/sbin/... */
-		 " #\"^/Library/Application Support$\""
-		 " #\"^/Library/Application Support/\""
-		 " #\"^/Library/Caches$\""
-		 " #\"^/Library/ColorSync$\""
-		 " #\"^/Library/ColorSync/Profiles$\""
-		 " #\"^/Library/ColorSync/Profiles/\""
-		 " #\"^/Library/Fonts$\""
-		 " #\"^/Library/Fonts/\""
-		 " #\"^/Library/Frameworks$\""
-		 " #\"^/Library/Frameworks/\""
-		 " #\"^/Library/Keychains$\""
-		 " #\"^/Library/Keychains/\""
-		 " #\"^/Library/Logs$\""
-		 " #\"^/Library/Printers$\""
-		 " #\"^/Library/Printers/\""
-		 " #\"^/Library/Security$\""
-		 " #\"^/Library/Security/\""
-		 " #\"^/Library/WebServer$\""
-		 " #\"^/System/Library/ColorSync$\""
-		 " #\"^/System/Library/ColorSync/Profiles$\""
-		 " #\"^/System/Library/ColorSync/Profiles/\""
+		 " #\"^/Library$\""	/* /Library */
+		 " #\"^/Library/\""	/* /Library/... */
+		 " #\"^/System$\""	/* /System */
+		 " #\"^/System/\""	/* /System/... */
 		 " #\"^%s/Library$\""	/* RequestRoot/Library */
 		 " #\"^%s/Library/\""	/* RequestRoot/Library/... */
 		 " #\"^%s$\""		/* ServerBin */
@@ -292,6 +277,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		   " #\"^%s/\""		/* CUPS_TESTROOT/... */
 		   "))\n",
 		   testroot);
+    cupsFilePrintf(fp, "(allow sysctl*)\n");
   }
   if (job_id)
   {
@@ -314,7 +300,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   cupsFilePuts(fp, "(allow distributed-notification-post)\n");
   /* Allow outbound networking to local services */
   cupsFilePuts(fp, "(allow network-outbound"
-		   "\n       (regex #\"^/private/var/run/\" #\"^/private/tmp/\")");
+		   "\n       (regex #\"^/private/var/run/\" #\"^/private/tmp/\" #\"^/private/var/tmp/\")");
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
@@ -884,5 +870,5 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: process.c 12034 2014-07-16 19:37:34Z msweet $".
+ * End of "$Id: process.c 12102 2014-08-20 15:19:09Z msweet $".
  */

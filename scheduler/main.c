@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 11722 2014-03-21 18:28:30Z msweet $"
+ * "$Id: main.c 12140 2014-08-30 01:51:22Z msweet $"
  *
  * Main loop for the CUPS scheduler.
  *
@@ -119,8 +119,7 @@ main(int  argc,				/* I - Number of command-line args */
   int			run_as_child = 0;
 					/* Needed for background fork/exec */
 #ifdef __APPLE__
-  int			use_sysman = !getuid();
-					/* Use system management functions? */
+  int			use_sysman = 1;	/* Use system management functions? */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
@@ -137,7 +136,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (getuid() != geteuid())
   {
-    fputs("cupsd: Cannot run as a setuid program\n", stderr);
+    fputs("cupsd: Cannot run as a setuid program.\n", stderr);
     return (1);
   }
 #endif /* HAVE_GETEUID */
@@ -725,19 +724,6 @@ main(int  argc,				/* I - Number of command-line args */
 		 ConfigurationFile);
           break;
 	}
-
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
-	if (OnDemand)
-	{
-	 /*
-	  * If we were started by launchd or systemd, get the listen socket file
-	  * descriptors...
-	  */
-
-	  service_checkin();
-	  service_checkout();
-	}
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
        /*
         * Startup the server...
@@ -1885,6 +1871,8 @@ service_checkin(void)
 #    endif /* HAVE_SSL */
   }
 
+  free(ld_sockets);
+
 #  elif defined(HAVE_LAUNCHD)
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
@@ -2170,5 +2158,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 11722 2014-03-21 18:28:30Z msweet $".
+ * End of "$Id: main.c 12140 2014-08-30 01:51:22Z msweet $".
  */

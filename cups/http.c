@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 12034 2014-07-16 19:37:34Z msweet $"
+ * "$Id: http.c 12125 2014-08-28 15:49:29Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -393,7 +393,7 @@ httpClose(http_t *http)			/* I - HTTP connection */
 /*
  * 'httpCompareCredentials()' - Compare two sets of X.509 credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if they match, 0 if they do not */
@@ -759,7 +759,7 @@ httpGet(http_t     *http,		/* I - HTTP connection */
  *
  * The return value is the UNIX time of the last read or write.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 time_t					/* O - Time of last read or write */
@@ -911,7 +911,7 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
  * @link httpIsEncrypted@ function to determine whether a TLS session has
  * been established.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_encryption_t			/* O - Current encryption mode */
@@ -995,7 +995,7 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 /*
  * 'httpGetKeepAlive()' - Get the current Keep-Alive state of the connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_keepalive_t			/* O - Keep-Alive state */
@@ -1104,7 +1104,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetPending()' - Get the number of bytes that are buffered for writing.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Number of bytes buffered */
@@ -1117,7 +1117,7 @@ httpGetPending(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetReady()' - Get the number of bytes that can be read without blocking.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Number of bytes available */
@@ -1143,7 +1143,7 @@ httpGetReady(http_t *http)		/* I - HTTP connection */
  * The @link httpIsChunked@ function can be used to determine whether the
  * message body is chunked or fixed-length.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Remaining bytes */
@@ -1582,7 +1582,7 @@ httpInitialize(void)
  * This function returns non-zero if the message body is composed of
  * variable-length chunks.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if chunked, 0 if not */
@@ -1597,7 +1597,7 @@ httpIsChunked(http_t *http)		/* I - HTTP connection */
  *
  * This function returns non-zero if the connection is currently encrypted.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if encrypted, 0 if not */
@@ -1793,8 +1793,8 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
       memcpy(http->sbuffer + http->stream.avail_in, http->buffer, buflen);
       http->stream.avail_in += buflen;
-      http->used            -= buflen;
-      http->data_remaining  -= buflen;
+      http->used            -= (int)buflen;
+      http->data_remaining  -= (off_t)buflen;
 
       if (http->used > 0)
         memmove(http->buffer, http->buffer + buflen, (size_t)http->used);
@@ -2557,9 +2557,11 @@ httpSetCredentials(http_t	*http,		/* I - HTTP connection */
   if (!http || cupsArrayCount(credentials) < 1)
     return (-1);
 
+#ifdef HAVE_SSL
   _httpFreeCredentials(http->tls_credentials);
 
   http->tls_credentials = _httpCreateCredentials(credentials);
+#endif /* HAVE_SSL */
 
   return (http->tls_credentials ? 0 : -1);
 }
@@ -2769,7 +2771,7 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
 /*
  * 'httpSetKeepAlive()' - Set the current Keep-Alive state of a connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 void
@@ -2847,7 +2849,7 @@ httpSetTimeout(
 /*
  * 'httpShutdown()' - Shutdown one side of an HTTP connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 void
@@ -2856,8 +2858,10 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
   if (!http || http->fd < 0)
     return;
 
+#ifdef HAVE_SSL
   if (http->tls)
     _httpTLSStop(http);
+#endif /* HAVE_SSL */
 
 #ifdef WIN32
   shutdown(http->fd, SD_RECEIVE);	/* Microsoft-ism... */
@@ -4822,5 +4826,5 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 12034 2014-07-16 19:37:34Z msweet $".
+ * End of "$Id: http.c 12125 2014-08-28 15:49:29Z msweet $".
  */

@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:29-0400\n"
+"POT-Creation-Date: 2014-08-29 22:25-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -973,6 +973,9 @@ msgstr ""
 msgid "  --false                 Always false."
 msgstr ""
 
+msgid "  --help                  Show help."
+msgstr ""
+
 msgid "  --help                  Show this help."
 msgstr ""
 
@@ -1015,6 +1018,11 @@ msgstr ""
 msgid "  --remote                True if service is remote."
 msgstr ""
 
+msgid ""
+"  --stop-after-include-error\n"
+"                          Stop tests after a failed INCLUDE."
+msgstr ""
+
 msgid "  --true                  Always true."
 msgstr ""
 
@@ -1028,6 +1036,9 @@ msgid "  --uri regex             Match URI to regular expression."
 msgstr ""
 
 msgid "  --version               Show program version."
+msgstr ""
+
+msgid "  --version               Show version."
 msgstr ""
 
 msgid "  -4                      Connect using IPv4."
@@ -1075,6 +1086,11 @@ msgid "  -L                      Send requests using content-length."
 msgstr ""
 "  -L                      Envia les peticions fent servir content-length."
 
+msgid ""
+"  -P filename.plist       Produce XML plist to a file and test report to "
+"standard output."
+msgstr ""
+
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P nomfitxer.ppd         Estableix el fitxer PPD."
 
@@ -1117,6 +1133,9 @@ msgstr ""
 
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Exporta totes les impressores."
+
+msgid "  -c                      Produce CSV output."
+msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catàleg.po           Carrega el catàleg de missatges indicat."
@@ -1181,6 +1200,9 @@ msgstr ""
 "fitxer per defecte és 1)."
 
 msgid "  -l                      List attributes."
+msgstr ""
+
+msgid "  -l                      Produce plain text output."
 msgstr ""
 
 msgid "  -l                      Run cupsd on demand."
@@ -2421,9 +2443,6 @@ msgstr "7 x 9"
 
 msgid "70"
 msgstr "70"
-
-msgid "720dpi"
-msgstr "720ppp"
 
 msgid "75"
 msgstr "75"
@@ -3734,12 +3753,6 @@ msgstr "No es permeten les classes imbricades."
 msgid "Never"
 msgstr "Mai"
 
-msgid "New Stylus Color Series"
-msgstr "Sèrie New Stylus Color"
-
-msgid "New Stylus Photo Series"
-msgstr "Sèrie New Stylus Photo"
-
 msgid "No"
 msgstr "No"
 
@@ -4216,12 +4229,6 @@ msgstr "S'està començant la pàgina %d."
 
 msgid "Statement"
 msgstr "Declaració"
-
-msgid "Stylus Color Series"
-msgstr "Sèrie Stylus Color"
-
-msgid "Stylus Photo Series"
-msgstr "Sèrie Stylus Photo"
 
 #, c-format
 msgid "Subscription #%d does not exist."
@@ -6080,6 +6087,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "3.5\" Disk - 2 1/8 x 2 3/4\""
 #~ msgstr "Disc de 3.5 - 2 1/8 x 2 3/4\""
 
+#~ msgid "720dpi"
+#~ msgstr "720ppp"
+
 #~ msgid "Address - 1 1/8 x 3 1/2\""
 #~ msgstr "Adreça - 1 1/8 x 3 1/2\""
 
@@ -6116,6 +6126,12 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "Large Address - 1 4/10 x 3 1/2\""
 #~ msgstr "Adreça gran - 1 4/10 x 3 1/2\""
+
+#~ msgid "New Stylus Color Series"
+#~ msgstr "Sèrie New Stylus Color"
+
+#~ msgid "New Stylus Photo Series"
+#~ msgstr "Sèrie New Stylus Photo"
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "La sortida de la impressora %s s'envia a %s"
@@ -6180,6 +6196,12 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "Shipping Address - 2 5/16 x 4\""
 #~ msgstr "Adreça de lliurament - 2 5/16 x 4\""
+
+#~ msgid "Stylus Color Series"
+#~ msgstr "Sèrie Stylus Color"
+
+#~ msgid "Stylus Photo Series"
+#~ msgstr "Sèrie Stylus Photo"
 
 #~ msgid "The output bin is almost full."
 #~ msgstr "La safata de sortida és gairebé plena."

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 11931 2014-06-16 16:10:58Z msweet $"
+ * "$Id: conf.c 12132 2014-08-29 11:27:18Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -1076,7 +1076,7 @@ cupsdReadConfiguration(void)
 
   if ((cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
 			     Group, 1, 1) < 0 ||
-       cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
+       cupsdCheckPermissions(CacheDir, NULL, 0770, RunUser,
 			     Group, 1, 1) < 0 ||
        cupsdCheckPermissions(temp, NULL, 0775, RunUser,
 			     Group, 1, 1) < 0 ||
@@ -4087,5 +4087,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 11931 2014-06-16 16:10:58Z msweet $".
+ * End of "$Id: conf.c 12132 2014-08-29 11:27:18Z msweet $".
  */

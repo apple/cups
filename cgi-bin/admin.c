@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: admin.c 12123 2014-08-28 14:24:45Z msweet $"
  *
  * Administration CGI for CUPS.
  *
@@ -1897,7 +1897,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
+      cgiSetVariable("refresh_page", "5;URL=/admin/");
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiCopyTemplateLang("restart.tmpl");
@@ -4198,5 +4198,5 @@ get_points(double     number,		/* I - Original number */
 
 
 /*
- * End of "$Id: admin.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: admin.c 12123 2014-08-28 14:24:45Z msweet $".
  */

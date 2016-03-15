@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c 11627 2014-02-20 16:15:09Z msweet $"
+ * "$Id: http-addr.c 12129 2014-08-28 19:26:31Z msweet $"
  *
  * HTTP address routines for CUPS.
  *
@@ -64,7 +64,7 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
  * listen address for sockets created with @link httpAddrListen@. This will
  * ensure that domain sockets are removed when closed.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int						/* O - 0 on success, -1 on failure */
@@ -653,7 +653,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
  *
  * Returns @code NULL@ if the socket is currently unconnected.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_addr_t *				/* O - Connected address or @code NULL@ */
@@ -865,6 +865,13 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
       }
 #endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
     }
+
+   /*
+    * Make sure .local hostnames end with a period...
+    */
+
+    if (strlen(s) > 6 && !strcmp(s + strlen(s) - 6, ".local"))
+      strlcat(s, ".", (size_t)slen);
   }
 
  /*
@@ -879,7 +886,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
  * 'httpResolveHostname()' - Resolve the hostname of the HTTP connection
  *                           address.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - Resolved hostname or @code NULL@ */
@@ -917,5 +924,5 @@ httpResolveHostname(http_t *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http-addr.c 11627 2014-02-20 16:15:09Z msweet $".
+ * End of "$Id: http-addr.c 12129 2014-08-28 19:26:31Z msweet $".
  */

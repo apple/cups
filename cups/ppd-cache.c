@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd-cache.c 11832 2014-04-24 15:04:00Z msweet $"
+ * "$Id: ppd-cache.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * PPD cache implementation for CUPS.
  *
@@ -2630,7 +2630,7 @@ pwg_compare_finishings(
     _pwg_finishings_t *a,		/* I - First finishings value */
     _pwg_finishings_t *b)		/* I - Second finishings value */
 {
-  return (b->value - a->value);
+  return ((int)b->value - (int)a->value);
 }
 
 
@@ -2712,5 +2712,5 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
 
 /*
- * End of "$Id: ppd-cache.c 11832 2014-04-24 15:04:00Z msweet $".
+ * End of "$Id: ppd-cache.c 12124 2014-08-28 15:37:22Z msweet $".
  */

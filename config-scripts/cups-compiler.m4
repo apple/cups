@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 11683 2014-03-05 20:00:54Z msweet $"
+dnl "$Id: cups-compiler.m4 12122 2014-08-28 12:55:52Z msweet $"
 dnl
 dnl Compiler stuff for CUPS.
 dnl
@@ -110,7 +110,7 @@ if test -n "$GCC"; then
 	# The -fstack-protector option is available with some versions of
 	# GCC and adds "stack canaries" which detect when the return address
 	# has been overwritten, preventing many types of exploit attacks.
-	AC_MSG_CHECKING(if GCC supports -fstack-protector)
+	AC_MSG_CHECKING(whether compiler supports -fstack-protector)
 	OLDCFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fstack-protector"
 	AC_TRY_LINK(,,
@@ -130,7 +130,7 @@ if test -n "$GCC"; then
 		# exploits that depend on a fixed address for common functions.
 		#
 		# Not available to LSB binaries...
-		AC_MSG_CHECKING(if GCC supports -fPIE)
+		AC_MSG_CHECKING(whether compiler supports -fPIE)
 		OLDCFLAGS="$CFLAGS"
 		case "$uname" in
 			Darwin*)
@@ -154,9 +154,18 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wsign-conversion -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
 
-		AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
+		AC_MSG_CHECKING(whether compiler supports -Wsign-conversion)
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -Werror -Wsign-conversion"
+		AC_TRY_COMPILE(,,
+			[OPTIM="$OPTIM -Wsign-conversion"
+			AC_MSG_RESULT(yes)],
+			AC_MSG_RESULT(no))
+		CFLAGS="$OLDCFLAGS"
+
+		AC_MSG_CHECKING(whether compiler supports -Wno-tautological-compare)
 		OLDCFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
 		AC_TRY_COMPILE(,,
@@ -211,7 +220,7 @@ else
 			# should contribute the necessary options to
 			# cups-support@cups.org...
 			echo "Building CUPS with default compiler optimizations; contact"
-			echo "cups-bugs@cups.org with uname and compiler options needed"
+			echo "cups-devel@cups.org with uname and compiler options needed"
 			echo "for your platform, or set the CFLAGS and LDFLAGS environment"
 			echo "variables before running configure."
 			;;
@@ -228,5 +237,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 11683 2014-03-05 20:00:54Z msweet $".
+dnl End of "$Id: cups-compiler.m4 12122 2014-08-28 12:55:52Z msweet $".
 dnl

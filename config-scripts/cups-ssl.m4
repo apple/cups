@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ssl.m4 11911 2014-06-10 13:54:53Z msweet $"
+dnl "$Id: cups-ssl.m4 12122 2014-08-28 12:55:52Z msweet $"
 dnl
 dnl TLS stuff for CUPS.
 dnl
@@ -78,6 +78,11 @@ if test x$enable_ssl != xno; then
 	if test $have_ssl = 1; then
 	    CUPS_SERVERCERT="ssl/server.crt"
 	    CUPS_SERVERKEY="ssl/server.key"
+
+	    SAVELIBS="$LIBS"
+	    LIBS="$LIBS $SSLLIBS"
+	    AC_CHECK_FUNC(gnutls_transport_set_pull_timeout_function, AC_DEFINE(HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION))
+	    LIBS="$SAVELIBS"
 	fi
     fi
 fi
@@ -101,5 +106,5 @@ EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-ssl.m4 11911 2014-06-10 13:54:53Z msweet $".
+dnl End of "$Id: cups-ssl.m4 12122 2014-08-28 12:55:52Z msweet $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 11591 2014-02-14 16:07:13Z msweet $"
+ * "$Id: config.h 12140 2014-08-30 01:51:22Z msweet $"
  *
  * Configuration file for CUPS and Xcode.
  *
@@ -625,13 +625,6 @@
 
 
 /*
- * Do we have vproc_transaction_begin/end?
- */
-
-#define HAVE_VPROC_TRANSACTION_BEGIN 1
-
-
-/*
  * Do we have libusb?
  */
 
@@ -706,5 +699,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 11591 2014-02-14 16:07:13Z msweet $".
+ * End of "$Id: config.h 12140 2014-08-30 01:51:22Z msweet $".
  */

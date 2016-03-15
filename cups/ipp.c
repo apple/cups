@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11840 2014-04-29 15:57:26Z msweet $"
+ * "$Id: ipp.c 12093 2014-08-19 12:10:17Z msweet $"
  *
  * Internet Printing Protocol functions for CUPS.
  *
@@ -1728,7 +1728,7 @@ ippCopyAttribute(
 /*
  * 'ippCopyAttributes()' - Copy attributes from one IPP message to another.
  *
- * Zero or more attributes are copied from the source IPP message, @code@ src, to the
+ * Zero or more attributes are copied from the source IPP message, @code src@, to the
  * destination IPP message, @code dst@. When @code quickcopy@ is non-zero, a "shallow"
  * reference copy of the attribute is created - this should only be done as long as the
  * original source IPP message will not be freed for the life of the destination.
@@ -7046,5 +7046,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c 11840 2014-04-29 15:57:26Z msweet $".
+ * End of "$Id: ipp.c 12093 2014-08-19 12:10:17Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 11806 2014-04-09 16:12:27Z msweet $"
+ * "$Id: ipp-support.c 12095 2014-08-19 16:16:06Z msweet $"
  *
  * Internet Printing Protocol support functions for CUPS.
  *
@@ -669,7 +669,14 @@ ippAttributeString(
           break;
 
       case IPP_TAG_RESOLUTION :
-          if (buffer && bufptr < bufend)
+	  if (val->resolution.xres == val->resolution.yres)
+	  {
+	    if (buffer && bufptr < bufend)
+	      bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d%s", val->resolution.xres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    else
+	      bufptr += snprintf(temp, sizeof(temp), "%d%s", val->resolution.xres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	  }
+	  else if (buffer && bufptr < bufend)
             bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           else
             bufptr += snprintf(temp, sizeof(temp), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
@@ -2122,7 +2129,7 @@ ippSetPort(int p)			/* I - Port number to use */
 /*
  * 'ippStateString()' - Return the name corresponding to a state value.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - State name */
@@ -2256,5 +2263,5 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 
 
 /*
- * End of "$Id: ipp-support.c 11806 2014-04-09 16:12:27Z msweet $".
+ * End of "$Id: ipp-support.c 12095 2014-08-19 16:16:06Z msweet $".
  */

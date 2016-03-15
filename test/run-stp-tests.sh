@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 12065 2014-07-30 17:56:35Z msweet $"
+# "$Id: run-stp-tests.sh 12101 2014-08-20 15:10:51Z msweet $"
 #
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
@@ -623,8 +623,7 @@ echo "    $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_l
 echo ""
 
 if test `uname` = Darwin -a "x$VALGRIND" = x; then
-	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib
-	../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
+	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib MallocStackLogging=1 ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 else
 	$VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 fi
@@ -768,6 +767,13 @@ for file in 5*.sh; do
 done
 
 #
+# Log all allocations made by the scheduler...
+#
+if test `uname` = Darwin -a "x$VALGRIND" = x; then
+	malloc_history $cupsd -callTree -showContent >$BASE/log/malloc_log 2>&1
+fi
+
+#
 # Restart the server...
 #
 
@@ -778,12 +784,12 @@ echo "\"5.10-restart\":" >>$strfile
 kill -HUP $cupsd
 
 while true; do
+	sleep 10
+
 	running=`../systemv/lpstat -r 2>/dev/null`
 	if test "x$running" = "xscheduler is running"; then
 		break
 	fi
-
-	sleep 10
 done
 
 description="`lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
@@ -1060,5 +1066,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 12065 2014-07-30 17:56:35Z msweet $"
+# End of "$Id: run-stp-tests.sh 12101 2014-08-20 15:10:51Z msweet $"
 #

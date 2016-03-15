@@ -1,5 +1,5 @@
 /*
- * "$Id: http-support.c 11844 2014-05-02 11:58:54Z msweet $"
+ * "$Id: http-support.c 12124 2014-08-28 15:37:22Z msweet $"
  *
  * HTTP support routines for CUPS.
  *
@@ -649,7 +649,7 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 	  break;
       case 3 :
           if (outptr < outend)
-            *outptr++ |= base64;
+            *outptr++ |= (char)base64;
 	  pos = 0;
 	  break;
     }
@@ -1300,7 +1300,7 @@ httpSeparateURI(
 /*
  * 'httpStateString()' - Return the string describing a HTTP state value.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - State string */
@@ -1433,7 +1433,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 /*
  * 'httpURIStatusString()' - Return a string describing a URI status code.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - Localized status string */
@@ -2544,5 +2544,5 @@ http_resolve_cb(
 
 
 /*
- * End of "$Id: http-support.c 11844 2014-05-02 11:58:54Z msweet $".
+ * End of "$Id: http-support.c 12124 2014-08-28 15:37:22Z msweet $".
  */

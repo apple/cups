@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 11884 2014-05-16 21:54:22Z msweet $"
+ * "$Id: cups.h 12094 2014-08-19 12:15:11Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -615,7 +615,7 @@ extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
 extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
 extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 
-/* New in CUPS 2.0 */
+/* New in CUPS 2.0/OS X 10.10 */
 extern cups_dest_t	*cupsGetDestWithURI(const char *name, const char *uri) _CUPS_API_2_0;
 extern const char	*cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest, cups_dinfo_t *info, unsigned flags, cups_size_t *size) _CUPS_API_2_0;
 extern int		cupsMakeServerCredentials(const char *path, const char *common_name, int num_alt_names, const char **alt_names, time_t expiration_date) _CUPS_API_2_0;
@@ -628,5 +628,5 @@ extern int		cupsSetServerCredentials(const char *path, const char *common_name, 
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 11884 2014-05-16 21:54:22Z msweet $".
+ * End of "$Id: cups.h 12094 2014-08-19 12:15:11Z msweet $".
  */

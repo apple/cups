@@ -1,27 +1,16 @@
 /*
- * "$Id: rss.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: rss.c 12128 2014-08-28 19:23:23Z msweet $"
  *
- *   RSS notifier for CUPS.
+ * RSS notifier for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()           - Main entry for the test notifier.
- *   compare_rss()    - Compare two messages.
- *   delete_message() - Free all memory used by a message.
- *   load_rss()       - Load an existing RSS feed file.
- *   new_message()    - Create a new RSS message.
- *   password_cb()    - Return the cached password.
- *   save_rss()       - Save messages to a RSS file.
- *   xml_escape()     - Copy a string, escaping &, <, and > as needed.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -29,6 +18,7 @@
  */
 
 #include <cups/cups.h>
+#include <sys/stat.h>
 #include <cups/language.h>
 #include <cups/string-private.h>
 #include <cups/array.h>
@@ -629,6 +619,8 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
     return (0);
   }
 
+  fchmod(fileno(fp), 0644);
+
   fputs("<?xml version=\"1.0\"?>\n", fp);
   fputs("<rss version=\"2.0\">\n", fp);
   fputs("  <channel>\n", fp);
@@ -737,5 +729,5 @@ xml_escape(const char *s)		/* I - String to escape */
 
 
 /*
- * End of "$Id: rss.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: rss.c 12128 2014-08-28 19:23:23Z msweet $".
  */
