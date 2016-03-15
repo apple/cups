@@ -1,4 +1,4 @@
-README - CUPS v2.1.2 - 2015-12-02
+README - CUPS v2.1.3 - 2016-02-05
 ---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt" instead...

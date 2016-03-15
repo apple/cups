@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c 12817 2015-07-30 15:45:46Z msweet $"
+ * "$Id: usersys.c 13030 2016-01-04 14:35:45Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
@@ -710,6 +710,8 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
   noecho = original;
   noecho.c_lflag &= (tcflag_t)~(ICANON | ECHO | ECHOE | ISIG);
+  noecho.c_cc[VMIN]  = 1;
+  noecho.c_cc[VTIME] = 0;
 
   if (tcsetattr(tty, TCSAFLUSH, &noecho))
   {
@@ -1237,7 +1239,7 @@ cups_set_ssl_options(
 
   for (start = temp; *start; start = end)
   {
-   /* 
+   /*
     * Find end of keyword...
     */
 
@@ -1285,5 +1287,5 @@ cups_set_user(
 
 
 /*
- * End of "$Id: usersys.c 12817 2015-07-30 15:45:46Z msweet $".
+ * End of "$Id: usersys.c 13030 2016-01-04 14:35:45Z msweet $".
  */

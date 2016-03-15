@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 12856 2015-08-31 14:27:39Z msweet $"
+ * "$Id: job.c 13047 2016-01-13 19:16:12Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -2316,7 +2316,10 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
 
   }
 
-  ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
+  if (strcmp(when, "no-hold"))
+    ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
+  else
+    ippSetString(job->attrs, &job->reasons, 0, "none");
 
  /*
   * Update the hold time...
@@ -5341,5 +5344,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 12856 2015-08-31 14:27:39Z msweet $".
+ * End of "$Id: job.c 13047 2016-01-13 19:16:12Z msweet $".
  */

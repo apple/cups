@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 12978 2015-11-17 19:29:52Z msweet $"
+ * "$Id: subscriptions.c 13040 2016-01-11 20:29:13Z msweet $"
  *
  * Subscription routines for the CUPS scheduler.
  *
@@ -656,6 +656,8 @@ cupsdExpireSubscriptions(
 
   curtime = time(NULL);
   update  = 0;
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Expiring subscriptions...");
 
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
@@ -1615,5 +1617,5 @@ cupsd_update_notifier(void)
 
 
 /*
- * End of "$Id: subscriptions.c 12978 2015-11-17 19:29:52Z msweet $".
+ * End of "$Id: subscriptions.c 13040 2016-01-11 20:29:13Z msweet $".
  */

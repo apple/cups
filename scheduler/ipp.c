@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c 12978 2015-11-17 19:29:52Z msweet $"
+ * "$Id: ipp.c 13040 2016-01-11 20:29:13Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -7309,6 +7309,12 @@ get_subscription_attrs(
                   con, con->number, sub_id);
 
  /*
+  * Expire subscriptions as needed...
+  */
+
+  cupsdExpireSubscriptions(NULL, NULL);
+
+ /*
   * Is the subscription ID valid?
   */
 
@@ -7456,6 +7462,12 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
     send_http_error(con, status, printer);
     return;
   }
+
+ /*
+  * Expire subscriptions as needed...
+  */
+
+  cupsdExpireSubscriptions(NULL, NULL);
 
  /*
   * Copy the subscription attributes to the response using the
@@ -11169,5 +11181,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 12978 2015-11-17 19:29:52Z msweet $".
+ * End of "$Id: ipp.c 13040 2016-01-11 20:29:13Z msweet $".
  */

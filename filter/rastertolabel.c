@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 12945 2015-10-26 19:46:02Z msweet $"
+ * "$Id: rastertolabel.c 13022 2015-12-16 18:35:26Z msweet $"
  *
  * Label printer filter for CUPS.
  *
@@ -471,6 +471,13 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	*/
 
         puts("P1");
+
+       /*
+        * Cut the label as needed...
+        */
+
+      	if (header->CutMedia)
+	  puts("C");
 	break;
 
     case ZEBRA_ZPL :
@@ -602,6 +609,13 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 
         puts("^IDR:CUPS.GRF^FS");
 	puts("^XZ");
+
+       /*
+        * Cut the label as needed...
+        */
+
+      	if (header->CutMedia)
+	  puts("^CN1");
         break;
 
     case ZEBRA_CPCL :
@@ -1267,5 +1281,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 12945 2015-10-26 19:46:02Z msweet $".
+ * End of "$Id: rastertolabel.c 13022 2015-12-16 18:35:26Z msweet $".
  */

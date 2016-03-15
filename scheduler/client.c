@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 12978 2015-11-17 19:29:52Z msweet $"
+ * "$Id: client.c 13061 2016-01-26 21:31:40Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
@@ -1156,29 +1156,28 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 	    }
-	    else if (!WebInterface)
-	    {
-	     /*
-	      * Web interface is disabled. Show an appropriate message...
-	      */
 
-	      if (!cupsdSendError(con, HTTP_STATUS_CUPS_WEBIF_DISABLED, CUPSD_AUTH_NONE))
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      break;
-	    }
-
-	    if ((!strncmp(con->uri, "/admin", 6) &&
-		  strncmp(con->uri, "/admin/conf/", 12) &&
-		  strncmp(con->uri, "/admin/log/", 11)) ||
+	    if ((!strncmp(con->uri, "/admin", 6) && strcmp(con->uri, "/admin/conf/cupsd.conf") && strncmp(con->uri, "/admin/log/", 11)) ||
 		 !strncmp(con->uri, "/printers", 9) ||
 		 !strncmp(con->uri, "/classes", 8) ||
 		 !strncmp(con->uri, "/help", 5) ||
 		 !strncmp(con->uri, "/jobs", 5))
 	    {
+	      if (!WebInterface)
+	      {
+	       /*
+		* Web interface is disabled. Show an appropriate message...
+		*/
+
+		if (!cupsdSendError(con, HTTP_STATUS_CUPS_WEBIF_DISABLED, CUPSD_AUTH_NONE))
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
+
+		break;
+	      }
+
 	     /*
 	      * Send CGI output...
 	      */
@@ -1245,20 +1244,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (httpGetVersion(con->http) <= HTTP_VERSION_1_0)
 		httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
 	    }
-            else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
-	              (strchr(con->uri + 12, '/') ||
-		       strlen(con->uri) == 12)) ||
-		     (!strncmp(con->uri, "/admin/log/", 11) &&
-	              (strchr(con->uri + 11, '/') ||
-		       strlen(con->uri) == 11)))
+            else if (!strncmp(con->uri, "/admin/log/", 11) && (strchr(con->uri + 11, '/') || strlen(con->uri) == 11))
 	    {
 	     /*
 	      * GET can only be done to configuration files directly under
 	      * /admin/conf...
 	      */
 
-	      cupsdLogClient(con, CUPSD_LOG_ERROR,
-			      "Request for subdirectory \"%s\"!", con->uri);
+	      cupsdLogClient(con, CUPSD_LOG_ERROR, "Request for subdirectory \"%s\".", con->uri);
 
 	      if (!cupsdSendError(con, HTTP_STATUS_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
@@ -1396,9 +1389,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      break;
 	    }
-	    else if ((!strncmp(con->uri, "/admin", 6) &&
-	              strncmp(con->uri, "/admin/conf/", 12) &&
-	              strncmp(con->uri, "/admin/log/", 11)) ||
+	    else if ((!strncmp(con->uri, "/admin", 6) && strncmp(con->uri, "/admin/log/", 11)) ||
 	             !strncmp(con->uri, "/printers", 9) ||
 	             !strncmp(con->uri, "/classes", 8) ||
 	             !strncmp(con->uri, "/help", 5) ||
@@ -1648,9 +1639,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      break;
 	    }
 
-	    if ((!strncmp(con->uri, "/admin", 6) &&
-	         strncmp(con->uri, "/admin/conf/", 12) &&
-	         strncmp(con->uri, "/admin/log/", 11)) ||
+	    if ((!strncmp(con->uri, "/admin", 6) && strcmp(con->uri, "/admin/conf/cupsd.conf") && strncmp(con->uri, "/admin/log/", 11)) ||
 		!strncmp(con->uri, "/printers", 9) ||
 		!strncmp(con->uri, "/classes", 8) ||
 		!strncmp(con->uri, "/help", 5) ||
@@ -1670,12 +1659,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
               cupsdLogRequest(con, HTTP_STATUS_OK);
 	    }
-            else if ((!strncmp(con->uri, "/admin/conf/", 12) &&
-	              (strchr(con->uri + 12, '/') ||
-		       strlen(con->uri) == 12)) ||
-		     (!strncmp(con->uri, "/admin/log/", 11) &&
-	              (strchr(con->uri + 11, '/') ||
-		       strlen(con->uri) == 11)))
+            else if (!strncmp(con->uri, "/admin/log/", 11) && (strchr(con->uri + 11, '/') || strlen(con->uri) == 11))
 	    {
 	     /*
 	      * HEAD can only be done to configuration files under
@@ -4093,5 +4077,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 12978 2015-11-17 19:29:52Z msweet $".
+ * End of "$Id: client.c 13061 2016-01-26 21:31:40Z msweet $".
  */

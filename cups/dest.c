@@ -1,9 +1,9 @@
 /*
- * "$Id: dest.c 12733 2015-06-12 01:21:05Z msweet $"
+ * "$Id: dest.c 13075 2016-01-29 21:14:05Z msweet $"
  *
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -122,7 +122,7 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 #ifdef __APPLE__
 static CFArrayRef	appleCopyLocations(void);
 static CFStringRef	appleCopyNetwork(void);
-static char		*appleGetPaperSize(char *name, int namesize);
+static char		*appleGetPaperSize(char *name, size_t namesize);
 static CFStringRef	appleGetPrinter(CFArrayRef locations,
 			                CFStringRef network, CFIndex *locindex);
 #endif /* __APPLE__ */
@@ -2491,8 +2491,8 @@ appleCopyNetwork(void)
  */
 
 static char *				/* O - Default paper size */
-appleGetPaperSize(char *name,		/* I - Paper size name buffer */
-                  int  namesize)	/* I - Size of buffer */
+appleGetPaperSize(char   *name,		/* I - Paper size name buffer */
+                  size_t namesize)	/* I - Size of buffer */
 {
   CFStringRef	defaultPaperID;		/* Default paper ID */
   pwg_media_t	*pwgmedia;		/* PWG media size */
@@ -2501,8 +2501,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
   defaultPaperID = _cupsAppleCopyDefaultPaperID();
   if (!defaultPaperID ||
       CFGetTypeID(defaultPaperID) != CFStringGetTypeID() ||
-      !CFStringGetCString(defaultPaperID, name, namesize,
-			  kCFStringEncodingUTF8))
+      !CFStringGetCString(defaultPaperID, name, (CFIndex)namesize, kCFStringEncodingUTF8))
     name[0] = '\0';
   else if ((pwgmedia = pwgMediaForLegacy(name)) != NULL)
     strlcpy(name, pwgmedia->pwg, namesize);
@@ -3943,5 +3942,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 12733 2015-06-12 01:21:05Z msweet $".
+ * End of "$Id: dest.c 13075 2016-01-29 21:14:05Z msweet $".
  */

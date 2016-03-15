@@ -1,5 +1,24 @@
-CHANGES.txt - 2.1.2 - 2015-12-02
+CHANGES.txt - 2.1.3 - 2016-02-05
 --------------------------------
+
+CHANGES IN CUPS V2.1.3
+
+	- The default password function did not work on some platforms
+	  (STR #4750)
+	- The scheduler should not exit under memory pressure
+	  (<rdar://problem/23255001>)
+	- The EPL2 and ZPL sample drivers did not properly support the CutMedia
+	  option.
+	- Pending subscriptions would prevent the scheduler from idle exiting
+	  (STR #4754)
+	- Fixed some issues in ipptool for skipped tests
+	  (<rdar://problem/24137160>)
+	- The "lp -H resume" command did not reset the "job-state-reasons"
+	  attribute value (STR #4752)
+	- The scheduler did not allow access to resource files (icons, etc.)
+	  when the web interface was disabled (STR #4755)
+	- Localization fix (STR #4756)
+
 
 CHANGES IN CUPS V2.1.2
 

@@ -9,7 +9,7 @@
 	<key>EnableTransactions</key>
 	<true/>
 	<key>EnablePressuredExit</key>
-	<true/>
+	<false/>
 	<key>ExitTimeOut</key>
 	<integer>60</integer>
 	<key>KeepAlive</key>

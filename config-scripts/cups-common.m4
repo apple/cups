@@ -17,7 +17,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION=2.1.2
+CUPS_VERSION=2.1.3
 
 case "$CUPS_VERSION" in
 	*svn)
