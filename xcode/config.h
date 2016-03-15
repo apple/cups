@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 12762 2015-06-24 20:11:53Z msweet $"
+ * "$Id: config.h 12687 2015-06-03 17:19:04Z msweet $"
  *
  * Configuration file for CUPS and Xcode.
  *
@@ -16,12 +16,14 @@
 #ifndef _CUPS_CONFIG_H_
 #define _CUPS_CONFIG_H_
 
+#include <AvailabilityMacros.h>
+
 /*
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.0.4"
-#define CUPS_MINIMAL "CUPS/2.0.4"
+#define CUPS_SVERSION "CUPS v2.1svn"
+#define CUPS_MINIMAL "CUPS/2.1svn"
 
 
 /*
@@ -246,6 +248,20 @@
 
 
 /*
+ * Do we have the ASL functions?
+ */
+
+#define HAVE_ASL_H
+
+
+/*
+ * Do we have the systemd journal functions?
+ */
+
+/*#undef HAVE_SYSTEMD_SD_JOURNAL_H*/
+
+
+/*
  * Do we have the (v)snprintf() functions?
  */
 
@@ -348,6 +364,15 @@
  */
 
 #define HAVE_SECKEYCHAINOPEN 1
+
+
+/*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
+#  define HAVE_SSLSETENABLEDCIPHERS 1
+#endif /* AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER */
 
 
 /*
@@ -468,7 +493,7 @@
 
 #define HAVE_LAUNCH_H 1
 #define HAVE_LAUNCHD 1
-#undef HAVE_LAUNCH_ACTIVATE_SOCKET
+#define HAVE_LAUNCH_ACTIVATE_SOCKET 1
 
 
 /*
@@ -713,5 +738,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 12762 2015-06-24 20:11:53Z msweet $".
+ * End of "$Id: config.h 12687 2015-06-03 17:19:04Z msweet $".
  */

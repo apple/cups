@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: configure.ac 12222 2014-10-21 11:55:01Z msweet $"
+dnl "$Id: configure.ac 12278 2014-12-01 13:53:56Z msweet $"
 dnl
 dnl Configuration script for CUPS.
 dnl
@@ -66,7 +66,6 @@ AC_OUTPUT(Makedefs
 	  conf/pam.std
 	  conf/snmp.conf
 	  cups-config
-	  data/testprint
 	  desktop/cups.desktop
 	  doc/index.html
 	  man/client.conf.man
@@ -92,5 +91,5 @@ AC_OUTPUT(Makedefs
 chmod +x cups-config
 
 dnl
-dnl End of "$Id: configure.ac 12222 2014-10-21 11:55:01Z msweet $".
+dnl End of "$Id: configure.ac 12278 2014-12-01 13:53:56Z msweet $".
 dnl

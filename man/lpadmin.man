@@ -1,9 +1,9 @@
 .\"
-.\" "$Id: lpadmin.man 11922 2014-06-11 23:35:37Z msweet $"
+.\" "$Id: lpadmin.man 12513 2015-02-11 19:45:01Z msweet $"
 .\"
 .\" lpadmin man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2015 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "CUPS" "11 June 2014" "Apple Inc."
+.TH lpadmin 8 "CUPS" "11 February 2015" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -91,6 +91,7 @@ Sets a standard System V interface script or PPD file for the printer from the \
 Use the \fI-m\fR option with the
 .BR lpinfo (8)
 command to get a list of supported models.
+The model "raw" clears any existing interface script or PPD file and the model "everywhere" queries the printer referred to by the specified IPP \fIdevice-uri\fR.
 .TP 5
 \fB\-o cupsIPPSupplies=true\fR
 .TP 5
@@ -199,6 +200,13 @@ Finally, the CUPS version of \fBlpadmin\fR may ask the user for an access passwo
 This differs from the System V version which requires the root user to execute this command.
 .SH NOTES
 The CUPS version of \fBlpadmin\fR does not support all of the System V or Solaris printing system configuration options.
+.SH EXAMPLE
+Create an IPP Everywhere print queue:
+.nf
+
+    lpadmin -p myprinter -E -v ipp://myprinter.local/ipp/print -m everywhere
+
+.fi
 .SH SEE ALSO
 .BR cupsaccept (8),
 .BR cupsenable (8),
@@ -206,7 +214,7 @@ The CUPS version of \fBlpadmin\fR does not support all of the System V or Solari
 .BR lpoptions (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: lpadmin.man 11922 2014-06-11 23:35:37Z msweet $".
+.\" End of "$Id: lpadmin.man 12513 2015-02-11 19:45:01Z msweet $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-driverd.cxx 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: cups-driverd.cxx 12722 2015-06-08 22:00:19Z msweet $"
  *
  * PPD/driver support for CUPS.
  *
@@ -7,7 +7,7 @@
  * created from driver information files, and dynamically generated PPD files
  * using driver helper programs.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1172,11 +1172,11 @@ list_ppds(int        request_id,	/* I - Request ID */
   load_drivers(include, exclude);
 
  /*
-  * Add the raw driver...
+  * Add the raw and IPP Everywhere drivers...
   */
 
-  add_ppd("", "raw", "en", "Raw", "Raw Queue", "", "", "", 0, 0, 0,
-          PPD_TYPE_UNKNOWN, "raw");
+  add_ppd("", "everywhere", "en", "Generic", "IPP Everywhere", "", "", "", 0, 0, 0, PPD_TYPE_UNKNOWN, "everywhere");
+  add_ppd("", "raw", "en", "Raw", "Raw Queue", "", "", "", 0, 0, 0, PPD_TYPE_UNKNOWN, "raw");
 
  /*
   * Send IPP attributes...
@@ -2903,5 +2903,5 @@ regex_string(const char *s)		/* I - String to compare */
 
 
 /*
- * End of "$Id: cups-driverd.cxx 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: cups-driverd.cxx 12722 2015-06-08 22:00:19Z msweet $".
  */

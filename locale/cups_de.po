@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-05-09 22:25+0100\n"
+"POT-Creation-Date: 2015-06-08 17:14-0400\n"
 "PO-Revision-Date: 2015-05-09 22:25+0100\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,7 +57,7 @@ msgstr "\tNach einem Fehler: fortfahren"
 
 #, c-format
 msgid "\tAlerts: %s"
-msgstr "\Alarme: %s"
+msgstr "\tAlarme: %s"
 
 msgid "\tBanner required"
 msgstr "\tBanner erforderlich"
@@ -807,7 +807,9 @@ msgid "  --[no-]share-printers   Turn printer sharing on/off."
 msgstr "  --[no-]share-printers   Druckerfreigabe ein/aus."
 
 msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
-msgstr "  --[no-]user-cancel-any  Erlaube/sperre Benutzern das abbrechen eines Druckauftrags."
+msgstr ""
+"  --[no-]user-cancel-any  Erlaube/sperre Benutzern das abbrechen eines "
+"Druckauftrags."
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    Zeilenenden mit CR (OS 9)"
@@ -816,7 +818,8 @@ msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  Zeilenenden mit CR+LF (Windows)"
 
 msgid "  --domain regex          Match domain to regular expression."
-msgstr "  --domain regex          Prüfe auf Übereinstimmung mit Regulärem Ausdruck"
+msgstr ""
+"  --domain regex          Prüfe auf Übereinstimmung mit Regulärem Ausdruck"
 
 msgid ""
 "  --exec utility [argument ...] ;\n"
@@ -833,7 +836,9 @@ msgid "  --help                  Show this help."
 msgstr "  --help                  Zeige diese Hilfe."
 
 msgid "  --host regex            Match hostname to regular expression."
-msgstr "  --host regex            Prüfe den Hostnamen auf Übereinstimmung mit Regulärem Audruck"
+msgstr ""
+"  --host regex            Prüfe den Hostnamen auf Übereinstimmung mit "
+"Regulärem Audruck"
 
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Zeilenenden mit LF (UNIX/Linux/OS X)"
@@ -918,7 +923,8 @@ msgstr "  -E                      Teste mit HTTP Upgrade auf TLS."
 msgid ""
 "  -F                      Run in the foreground but detach from console."
 msgstr ""
-"  -F                      Laufe im Vordergrund aber abgetrennt von der Konsole."
+"  -F                      Laufe im Vordergrund aber abgetrennt von der "
+"Konsole."
 
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr "  -H samba-server         Benutze den SAMBA Server."
@@ -953,10 +959,14 @@ msgid "  -S                      Test with SSL encryption."
 msgstr "  -S                      Teste mit SSL Verschlüsselung."
 
 msgid "  -T seconds              Set the browse timeout in seconds."
-msgstr "  -T seconds              Setze die Zeitüberschreitung für das Browsen in Sekunden."
+msgstr ""
+"  -T seconds              Setze die Zeitüberschreitung für das Browsen in "
+"Sekunden."
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
-msgstr "  -T seconds              Setze die Zeitüberschreitung für das Senden/Empfangen in Sekunden."
+msgstr ""
+"  -T seconds              Setze die Zeitüberschreitung für das Senden/"
+"Empfangen in Sekunden."
 
 msgid "  -U username             Specify username."
 msgstr "  -U username             Gebe den Benutzernamen an."
@@ -985,7 +995,8 @@ msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
 
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
-msgstr "  -c cups-files.conf      Setze die zu benutzende Datei cups-files.conf"
+msgstr ""
+"  -c cups-files.conf      Setze die zu benutzende Datei cups-files.conf"
 
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cups.conf            Setze die zu benutzende Datei cups.conf"
@@ -1134,7 +1145,8 @@ msgid ""
 msgstr ""
 
 msgid "  -z                      Compress PPD files using GNU zip."
-msgstr "  -z                      Komprimiere PPD Datei unter Verwendung von GNU zip."
+msgstr ""
+"  -z                      Komprimiere PPD Datei unter Verwendung von GNU zip."
 
 msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
 msgstr ""
@@ -1461,6 +1473,10 @@ msgid "%s: %s failed: %s"
 msgstr ""
 
 #, c-format
+msgid "%s: Bad printer URI \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
 
@@ -1656,11 +1672,19 @@ msgid "%s: Sorry, no encryption support."
 msgstr ""
 
 #, c-format
+msgid "%s: Unable to connect to \"%s:%d\": %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to connect to server."
 msgstr ""
 
 #, c-format
 msgid "%s: Unable to contact server."
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to create PPD file: %s"
 msgstr ""
 
 #, c-format
@@ -1681,6 +1705,10 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to resolve \"%s\"."
 msgstr ""
 
 #, c-format
@@ -1845,6 +1873,7 @@ msgstr "1"
 
 msgid "1 inch/sec."
 msgstr "1 inch/s"
+
 # Die Verwendung des x ist nur ersatzweise erlaubt, typografisch korrekt und in UTF-8 auch möglich ist ×
 # Keine Leerzeichen zwischen Zahl und ×!
 # Die Verwendung von " für die Einheit Inch ist nicht zulässig (ISO 80000).
@@ -2109,7 +2138,7 @@ msgid "3.25x5.00\""
 msgstr "3,25×5,00 inch"
 
 msgid "3.25x5.50\""
-msgstr "3,25×5,50 inch
+msgstr "3,25×5,50 inch"
 
 msgid "3.25x5.83\""
 msgstr "3,25×5,83 inch"
@@ -3033,6 +3062,9 @@ msgstr "Epson"
 msgid "Error Policy"
 msgstr "Fehlerbehandlung"
 
+msgid "Error reading raster data."
+msgstr ""
+
 msgid "Error sending raster data."
 msgstr "Fehler beim Senden von Rasterdaten."
 
@@ -3594,7 +3626,8 @@ msgid "No destinations added."
 msgstr "Keine Druckziele hinzugefügt."
 
 msgid "No device URI found in argv[0] or in DEVICE_URI environment variable."
-msgstr "Keine Geräte-URI in argv[0] oder der Umgebungsvariablen DEVICE_URI gefunden."
+msgstr ""
+"Keine Geräte-URI in argv[0] oder der Umgebungsvariablen DEVICE_URI gefunden."
 
 msgid "No error-index"
 msgstr "Kein Fehlerindex"
@@ -3684,7 +3717,8 @@ msgid ""
 "Note: this program only validates the DSC comments, not the PostScript "
 "itself."
 msgstr ""
-"Hinweis: dieses Programme validiert nur die DSC Kommentare, nicht PostScript selber"
+"Hinweis: dieses Programme validiert nur die DSC Kommentare, nicht PostScript "
+"selber"
 
 msgid "OK"
 msgstr "OK"
@@ -4074,8 +4108,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"The '%s' Job Description attribute cannot be supplied in a job creation "
-"request."
+"The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
 
 #, c-format
@@ -4229,8 +4262,8 @@ msgid ""
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
 "enable it."
 msgstr ""
-"Die Web-Schnittstelle ist derzeit abgeschaltet. Das Einschalten kann mit"
-"dem Befehl \"cupsctl WebInterface=yes\" erfolgen."
+"Die Web-Schnittstelle ist derzeit abgeschaltet. Das Einschalten kann mitdem "
+"Befehl \"cupsctl WebInterface=yes\" erfolgen."
 
 #, c-format
 msgid "The which-jobs value \"%s\" is not supported."
@@ -4538,6 +4571,9 @@ msgid "Unable to print test page"
 msgstr "Die Testseite kann nicht gedruckt werden"
 
 msgid "Unable to read print data."
+msgstr ""
+
+msgid "Unable to rename job document file."
 msgstr ""
 
 msgid "Unable to resolve printer-uri."
@@ -5051,7 +5087,8 @@ msgid "lpadmin: Expected PPD after \"-P\" option."
 msgstr "lpadmin: Nach der \"-P\" Option PPD erwartet."
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
-msgstr "lpadmin: Nach der \"-u\" Option wird eine allow/deny:userlist erwartet."
+msgstr ""
+"lpadmin: Nach der \"-u\" Option wird eine allow/deny:userlist erwartet."
 
 msgid "lpadmin: Expected class after \"-r\" option."
 msgstr ""
@@ -5126,6 +5163,10 @@ msgstr ""
 msgid ""
 "lpadmin: Unable to delete option:\n"
 "         You must specify a printer name first."
+msgstr ""
+
+#, c-format
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
 msgstr ""
 
 #, c-format

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 12325 2014-12-09 20:28:51Z msweet $"
+dnl "$Id: cups-network.m4 12324 2014-12-09 20:28:39Z msweet $"
 dnl
 dnl Networking stuff for CUPS.
 dnl
@@ -72,5 +72,5 @@ AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl
-dnl End of "$Id: cups-network.m4 12325 2014-12-09 20:28:51Z msweet $".
+dnl End of "$Id: cups-network.m4 12324 2014-12-09 20:28:39Z msweet $".
 dnl

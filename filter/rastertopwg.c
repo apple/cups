@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertopwg.c 12610 2015-05-06 12:24:54Z msweet $"
+ * "$Id: rastertopwg.c 12609 2015-05-06 12:24:47Z msweet $"
  *
  * CUPS raster to PWG raster format filter for CUPS.
  *
@@ -459,5 +459,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: rastertopwg.c 12610 2015-05-06 12:24:54Z msweet $".
+ * End of "$Id: rastertopwg.c 12609 2015-05-06 12:24:47Z msweet $".
  */

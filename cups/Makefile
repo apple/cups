@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 12032 2014-07-15 20:37:32Z msweet $"
+# "$Id: Makefile 12635 2015-05-19 02:12:22Z msweet $"
 #
 # API library Makefile for CUPS.
 #
@@ -94,7 +94,8 @@ TESTOBJS	= \
 		testlang.o \
 		testppd.o \
 		testpwg.o \
-		testsnmp.o
+		testsnmp.o \
+		tlscheck.o
 OBJS	=	\
 		$(LIBOBJS) \
 		$(TESTOBJS)
@@ -161,7 +162,8 @@ UNITTARGETS =	\
 		testoptions \
 		testppd \
 		testpwg \
-		testsnmp
+		testsnmp \
+		tlscheck
 
 TARGETS	=	\
 		$(LIBTARGETS)
@@ -540,6 +542,16 @@ testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 
 
 #
+# tlscheck (dependency on static CUPS library is intentional)
+#
+
+tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ tlscheck.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
 # Automatic API help files...
 #
 
@@ -665,5 +677,5 @@ tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #
-# End of "$Id: Makefile 12032 2014-07-15 20:37:32Z msweet $".
+# End of "$Id: Makefile 12635 2015-05-19 02:12:22Z msweet $".
 #

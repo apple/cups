@@ -1,9 +1,9 @@
 /*
- * "$Id: log.c 11920 2014-06-11 19:03:59Z msweet $"
+ * "$Id: log.c 12691 2015-06-04 18:00:31Z msweet $"
  *
  * Log file routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -19,7 +19,41 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
+#ifdef HAVE_ASL_H
+#  include <asl.h>
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#  define SD_JOURNAL_SUPPRESS_LOCATION
+#  include <systemd/sd-journal.h>
+#endif /* HAVE_ASL_H */
 #include <syslog.h>
+
+
+/*
+ * Constants for log keys from PWG 5110.3 (PWG Common Log Format)...
+ */
+
+#define PWG_DeviceUUID			"DUU"
+#define PWG_Event			"E"
+#define PWG_LogNaturalLanguage		"NL"
+#define PWG_Status			"S"
+#define PWG_ServiceURI			"URI"
+#define PWG_UserHost			"UH"
+#define PWG_UserName			"UN"
+#define PWG_UserURI			"UU"
+#define PWG_ServiceIsAcceptingJobs	"IAJ"
+#define PWG_ServiceState		"ST"
+#define PWG_ServiceStateReasons		"SR"
+#define PWG_ServiceUUID			"SUU"
+#define PWG_JobID			"JID"
+#define PWG_JobUUID			"JUU"
+#define PWG_JobImagesCompleted		"JIM"
+#define PWG_JobImpressionsCompleted	"JIC"
+#define PWG_JobDestinationURI		"JD"
+#define PWG_JobState			"JS"
+#define PWG_JobStateReasons		"JR"
+#define PWG_JobAccountingID		"JA"
+#define PWG_JobAcountingUserName	"JAUN"
+#define PWG_JobAccountingUserURI	"JAUU"
 
 
 /*
@@ -31,8 +65,22 @@ static _cups_mutex_t log_mutex = _CUPS_MUTEX_INITIALIZER;
 static size_t	log_linesize = 0;	/* Size of line for output file */
 static char	*log_line = NULL;	/* Line for output file */
 
-#ifdef HAVE_VSYSLOG
-static const int syslevels[] =		/* SYSLOG levels... */
+#ifdef HAVE_ASL_H
+static const int log_levels[] =		/* ASL levels... */
+		{
+		  ASL_LEVEL_EMERG,
+		  ASL_LEVEL_EMERG,
+		  ASL_LEVEL_ALERT,
+		  ASL_LEVEL_CRIT,
+		  ASL_LEVEL_ERR,
+		  ASL_LEVEL_WARNING,
+		  ASL_LEVEL_NOTICE,
+		  ASL_LEVEL_INFO,
+		  ASL_LEVEL_DEBUG,
+		  ASL_LEVEL_DEBUG
+		};
+#elif defined(HAVE_VSYSLOG) || defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+static const int log_levels[] =		/* SYSLOG levels... */
 		{
 		  0,
 		  LOG_EMERG,
@@ -45,7 +93,7 @@ static const int syslevels[] =		/* SYSLOG levels... */
 		  LOG_DEBUG,
 		  LOG_DEBUG
 		};
-#endif /* HAVE_VSYSLOG */
+#endif /* HAVE_ASL_H */
 
 
 /*
@@ -75,6 +123,16 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 
   if (!lf || !logname || !logname[0])
     return (1);
+
+ /*
+  * Handle logging to stderr...
+  */
+
+  if (!strcmp(logname, "stderr"))
+  {
+    *lf = LogStderr;
+    return (1);
+  }
 
  /*
   * Format the filename as needed...
@@ -169,8 +227,20 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 
       if (*lf == NULL)
       {
-	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
-	       strerror(errno));
+#ifdef HAVE_ASL_H
+	asl_object_t	m;		/* Log message */
+
+	m = asl_new(ASL_TYPE_MSG);
+	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+	asl_release(m);
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+        sd_journal_print(LOG_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+
+#else
+	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+#endif /* HAVE_ASL_H */
 
         if (FatalErrors & CUPSD_FATAL_LOG)
 	  cupsdEndProcess(getpid(), 0);
@@ -211,8 +281,20 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 
     if ((*lf = cupsFileOpen(filename, "a")) == NULL)
     {
-      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
-             strerror(errno));
+#ifdef HAVE_ASL_H
+	asl_object_t	m;		/* Log message */
+
+	m = asl_new(ASL_TYPE_MSG);
+	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+	asl_release(m);
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+        sd_journal_print(LOG_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+
+#else
+	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename, strerror(errno));
+#endif /* HAVE_ASL_H */
 
       if (FatalErrors & CUPSD_FATAL_LOG)
 	cupsdEndProcess(getpid(), 0);
@@ -507,6 +589,85 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
       LogDebugHistory <= 0)
     return (1);
 
+#ifdef HAVE_ASL_H
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    asl_object_t	m;		/* Log message */
+    char		job_id[32],	/* job-id string */
+			completed[32];	/* job-impressions-completed string */
+    static const char * const job_states[] =
+    {					/* job-state strings */
+      "Pending",
+      "PendingHeld",
+      "Processing",
+      "ProcessingStopped",
+      "Canceled",
+      "Aborted",
+      "Completed"
+    };
+
+    snprintf(job_id, sizeof(job_id), "%d", job->id);
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_set(m, PWG_Event, "JobStateChanged");
+    asl_set(m, PWG_ServiceURI, job->printer->uri);
+    asl_set(m, PWG_JobID, job_id);
+    asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
+
+    if (job->impressions)
+    {
+      snprintf(completed, sizeof(completed), "%d", ippGetInteger(job->impressions, 0));
+      asl_set(m, PWG_JobImpressionsCompleted, completed);
+    }
+
+    va_start(ap, message);
+    asl_vlog(NULL, m, log_levels[level], message, ap);
+    va_end(ap);
+
+    asl_release(m);
+    return (1);
+  }
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    static const char * const job_states[] =
+    {					/* job-state strings */
+      "Pending",
+      "PendingHeld",
+      "Processing",
+      "ProcessingStopped",
+      "Canceled",
+      "Aborted",
+      "Completed"
+    };
+
+    va_start(ap, message);
+
+    do
+    {
+      va_copy(ap2, ap);
+      status = format_log_line(message, ap2);
+      va_end(ap2);
+    }
+    while (status == 0);
+
+    va_end(ap);
+
+    sd_journal_send("MESSAGE=%s", log_line,
+                    "PRIORITY=%i", log_levels[level],
+		    PWG_Event"=JobStateChanged",
+		    PWG_ServiceURI"=%s", job->printer->uri,
+		    PWG_JobID"=%d", job->id,
+		    PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
+		    PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
+		    NULL);
+    return (1);
+  }
+
+#endif /* HAVE_ASL_H */
+
  /*
   * Format and write the log message...
   */
@@ -604,12 +765,26 @@ cupsdLogMessage(int        level,	/* I - Log level */
   if ((TestConfigFile || !ErrorLog) && level <= CUPSD_LOG_WARN)
   {
     va_start(ap, message);
-#ifdef HAVE_VSYSLOG
-    vsyslog(LOG_LPR | syslevels[level], message, ap);
+
+#ifdef HAVE_ASL_H
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_vlog(NULL, m, log_levels[level], message, ap);
+    asl_release(m);
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+    sd_journal_printv(log_levels[level], message, ap);
+
+#elif defined(HAVE_VSYSLOG)
+    vsyslog(LOG_LPR | log_levels[level], message, ap);
+
 #else
     vfprintf(stderr, message, ap);
     putc('\n', stderr);
 #endif /* HAVE_VSYSLOG */
+
     va_end(ap);
 
     return (1);
@@ -617,6 +792,30 @@ cupsdLogMessage(int        level,	/* I - Log level */
 
   if (level > LogLevel || !ErrorLog)
     return (1);
+
+#ifdef HAVE_ASL_H
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+
+    va_start(ap, message);
+    asl_vlog(NULL, m, log_levels[level], message, ap);
+    va_end(ap);
+
+    asl_release(m);
+    return (1);
+  }
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_printv(log_levels[level], message, ap);
+    return (1);
+  }
+#endif /* HAVE_ASL_H */
 
  /*
   * Format and write the log message...
@@ -831,7 +1030,70 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 
   *bufptr = '\0';
 
-#ifdef HAVE_VSYSLOG
+#ifdef HAVE_ASL_H
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    asl_object_t	m;		/* Log message */
+    char		job_id[32],	/* job-id string */
+			completed[32];	/* job-impressions-completed string */
+    static const char * const job_states[] =
+    {					/* job-state strings */
+      "Pending",
+      "PendingHeld",
+      "Processing",
+      "ProcessingStopped",
+      "Canceled",
+      "Aborted",
+      "Completed"
+    };
+
+    snprintf(job_id, sizeof(job_id), "%d", job->id);
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_set(m, PWG_Event, "JobStateChanged");
+    asl_set(m, PWG_ServiceURI, job->printer->uri);
+    asl_set(m, PWG_JobID, job_id);
+    asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
+
+    if (job->impressions)
+    {
+      snprintf(completed, sizeof(completed), "%d", ippGetInteger(job->impressions, 0));
+      asl_set(m, PWG_JobImpressionsCompleted, completed);
+    }
+
+    asl_log(NULL, m, ASL_LEVEL_INFO, "%s", buffer);
+
+    asl_release(m);
+    return (1);
+  }
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    static const char * const job_states[] =
+    {					/* job-state strings */
+      "Pending",
+      "PendingHeld",
+      "Processing",
+      "ProcessingStopped",
+      "Canceled",
+      "Aborted",
+      "Completed"
+    };
+
+    sd_journal_send("MESSAGE=%s", buffer,
+                    "PRIORITY=%i", LOG_INFO,
+		    PWG_Event"=JobStateChanged",
+		    PWG_ServiceURI"=%s", job->printer->uri,
+		    PWG_JobID"=%d", job->id,
+		    PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
+		    PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
+		    NULL);
+    return (1);
+  }
+
+#elif defined(HAVE_VSYSLOG)
  /*
   * See if we are logging pages via syslog...
   */
@@ -842,7 +1104,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 
     return (1);
   }
-#endif /* HAVE_VSYSLOG */
+#endif /* HAVE_ASL_H */
 
  /*
   * Not using syslog; check the log file...
@@ -1003,7 +1265,36 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
     }
   }
 
-#ifdef HAVE_VSYSLOG
+#ifdef HAVE_ASL_H
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+
+    asl_log(NULL, m, ASL_LEVEL_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
+           con->http->hostname, con->username[0] != '\0' ? con->username : "-",
+	   states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)),
+	   con->http->version / 100, con->http->version % 100,
+	   code, CUPS_LLCAST con->bytes,
+	   con->request ?
+	       ippOpString(con->request->request.op.operation_id) : "-",
+	   con->response ?
+	       ippErrorString(con->response->request.status.status_code) : "-");
+
+    asl_release(m);
+    return (1);
+  }
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_print(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s", con->http->hostname, con->username[0] != '\0' ? con->username : "-", states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)), con->http->version / 100, con->http->version % 100, code, CUPS_LLCAST con->bytes, con->request ? ippOpString(con->request->request.op.operation_id) : "-", con->response ? ippErrorString(con->response->request.status.status_code) : "-");
+    return (1);
+  }
+
+#elif defined(HAVE_VSYSLOG)
  /*
   * See if we are logging accesses via syslog...
   */
@@ -1023,7 +1314,7 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
     return (1);
   }
-#endif /* HAVE_VSYSLOG */
+#endif /* HAVE_ASL_H */
 
  /*
   * Not using syslog; check the log file...
@@ -1081,17 +1372,37 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
 		};
 
 
-#ifdef HAVE_VSYSLOG
+#ifdef HAVE_ASL_H
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_log(NULL, m, ASL_LEVEL_INFO, "%s", message);
+
+    asl_release(m);
+    return (1);
+  }
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_print(log_levels[level], "%s", message);
+    return (1);
+  }
+
+#elif defined(HAVE_VSYSLOG)
  /*
   * See if we are logging errors via syslog...
   */
 
   if (!strcmp(ErrorLog, "syslog"))
   {
-    syslog(syslevels[level], "%s", message);
+    syslog(log_levels[level], "%s", message);
     return (1);
   }
-#endif /* HAVE_VSYSLOG */
+#endif /* HAVE_ASL_H */
 
  /*
   * Not using syslog; check the log file...
@@ -1186,5 +1497,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 11920 2014-06-11 19:03:59Z msweet $".
+ * End of "$Id: log.c 12691 2015-06-04 18:00:31Z msweet $".
  */

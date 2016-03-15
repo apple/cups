@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 12770 2015-06-30 16:17:56Z msweet $"
+# "$Id: cups.spec.in 12713 2015-06-08 21:10:09Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -164,7 +164,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
+/etc/cups/cups-files.conf.default
 /etc/cups/cupsd.conf.default
+/etc/cups/snmp.conf.default
 %dir /etc/cups/interfaces
 %dir /etc/cups/ppd
 %attr(0700,root,root) %dir /etc/cups/ssl
@@ -399,5 +401,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 12770 2015-06-30 16:17:56Z msweet $".
+# End of "$Id: cups.spec.in 12713 2015-06-08 21:10:09Z msweet $".
 #

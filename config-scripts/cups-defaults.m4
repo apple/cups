@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-defaults.m4 11789 2014-04-02 16:52:53Z msweet $"
+dnl "$Id: cups-defaults.m4 12350 2014-12-09 22:18:21Z msweet $"
 dnl
 dnl   Default cupsd configuration settings for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
+dnl   Copyright 2007-2014 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -409,5 +409,5 @@ AC_SUBST(CUPS_WEBIF)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_WEBIF, $CUPS_DEFAULT_WEBIF)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 11789 2014-04-02 16:52:53Z msweet $".
+dnl End of "$Id: cups-defaults.m4 12350 2014-12-09 22:18:21Z msweet $".
 dnl

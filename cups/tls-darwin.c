@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-darwin.c 12481 2015-02-03 12:45:14Z msweet $"
+ * "$Id: tls-darwin.c 12675 2015-05-28 01:14:32Z msweet $"
  *
  * TLS support code for CUPS on OS X.
  *
@@ -27,14 +27,6 @@ extern char **environ;
 
 
 /*
- * Test define - set to 1 to use SSLSetEnabledCiphers.  Currently disabled (0)
- * because of <rdar://problem/18707430>.
- */
-
-#define USE_SET_ENABLED_CIPHERS 0
-
-
-/*
  * Local globals...
  */
 
@@ -49,8 +41,8 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = 0;/* Options for TLS connections */
 #endif /* HAVE_SECKEYCHAINOPEN */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -1017,7 +1009,14 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   http_credential_t	*credential;	/* Credential data */
 
 
-  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+
+  if (tls_options < 0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting defaults.");
+    _cupsSetDefaults();
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+  }
 
 #ifdef HAVE_SECKEYCHAINOPEN
   if (http->mode == _HTTP_MODE_SERVER && !tls_keychain)
@@ -1061,11 +1060,20 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   if (!error)
   {
-    error = SSLSetProtocolVersionMin(http->tls, (tls_options & _HTTP_TLS_ALLOW_SSL3) ? kSSLProtocol3 : kTLSProtocol1);
-    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin, error=%d", (int)error));
+    SSLProtocol minProtocol;
+
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      minProtocol = kTLSProtocol11;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      minProtocol = kSSLProtocol3;
+    else
+      minProtocol = kTLSProtocol1;
+
+    error = SSLSetProtocolVersionMin(http->tls, minProtocol);
+    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", minProtocol, (int)error));
   }
 
-#  if USE_SET_ENABLED_CIPHERS
+#  if HAVE_SSLSETENABLEDCIPHERS
   if (!error)
   {
     SSLCipherSuite	supported[100];	/* Supported cipher suites */
@@ -1130,6 +1138,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	  case TLS_RSA_PSK_WITH_NULL_SHA256 :
 	  case TLS_RSA_PSK_WITH_NULL_SHA384 :
 	  case SSL_RSA_WITH_DES_CBC_MD5 :
+	      DEBUG_printf(("4_httpTLSStart: Excluding insecure cipher suite %d", supported[i]));
 	      break;
 
           /* RC4 cipher suites that should only be used as a last resort */
@@ -1144,7 +1153,51 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	  case TLS_RSA_PSK_WITH_RC4_128_SHA :
 	      if (tls_options & _HTTP_TLS_ALLOW_RC4)
 	        enabled[num_enabled ++] = supported[i];
+	      else
+		DEBUG_printf(("4_httpTLSStart: Excluding RC4 cipher suite %d", supported[i]));
 	      break;
+
+          /* DH/DHE cipher suites that are problematic with parameters < 1024 bits */
+          case TLS_DH_DSS_WITH_AES_128_CBC_SHA :
+          case TLS_DH_RSA_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_DSS_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_RSA_WITH_AES_128_CBC_SHA :
+          case TLS_DH_DSS_WITH_AES_256_CBC_SHA :
+          case TLS_DH_RSA_WITH_AES_256_CBC_SHA :
+          case TLS_DHE_DSS_WITH_AES_256_CBC_SHA :
+          case TLS_DHE_RSA_WITH_AES_256_CBC_SHA :
+          case TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA :
+//          case TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DH_DSS_WITH_AES_128_CBC_SHA256 :
+          case TLS_DH_RSA_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_DSS_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 :
+          case TLS_DH_DSS_WITH_AES_256_CBC_SHA256 :
+          case TLS_DH_RSA_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_DSS_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DHE_PSK_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_PSK_WITH_AES_256_CBC_SHA :
+//          case TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 :
+//          case TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 :
+          case TLS_DH_RSA_WITH_AES_128_GCM_SHA256 :
+          case TLS_DH_RSA_WITH_AES_256_GCM_SHA384 :
+//          case TLS_DHE_DSS_WITH_AES_128_GCM_SHA256 :
+//          case TLS_DHE_DSS_WITH_AES_256_GCM_SHA384 :
+          case TLS_DH_DSS_WITH_AES_128_GCM_SHA256 :
+          case TLS_DH_DSS_WITH_AES_256_GCM_SHA384 :
+          case TLS_DHE_PSK_WITH_AES_128_GCM_SHA256 :
+          case TLS_DHE_PSK_WITH_AES_256_GCM_SHA384 :
+          case TLS_DHE_PSK_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_PSK_WITH_AES_256_CBC_SHA384 :
+              if (tls_options & _HTTP_TLS_ALLOW_DH)
+	        enabled[num_enabled ++] = supported[i];
+	      else
+		DEBUG_printf(("4_httpTLSStart: Excluding DH/DHE cipher suite %d", supported[i]));
+              break;
 
           /* Anything else we'll assume is secure */
           default :
@@ -1157,7 +1210,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
       error = SSLSetEnabledCiphers(http->tls, enabled, num_enabled);
     }
   }
-#endif /* USE_SET_ENABLED_CIPHERS */
+#endif /* HAVE_SSLSETENABLEDCIPHERS */
 
   if (!error && http->mode == _HTTP_MODE_CLIENT)
   {
@@ -1782,5 +1835,5 @@ http_cdsa_write(
 
 
 /*
- * End of "$Id: tls-darwin.c 12481 2015-02-03 12:45:14Z msweet $".
+ * End of "$Id: tls-darwin.c 12675 2015-05-28 01:14:32Z msweet $".
  */

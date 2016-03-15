@@ -4,6 +4,8 @@
 <dict>
 	<key>Label</key>
 	<string>org.cups.cupsd</string>
+	<key>ProcessType</key>
+	<string>Background</string>
 	<key>EnableTransactions</key>
 	<true/>
 	<key>EnablePressuredExit</key>
@@ -37,18 +39,6 @@
 	<dict>
 		<key>Listeners</key>
 		<array>
-			<dict>
-				<key>SockNodeName</key>
-				<string>::1</string>
-				<key>SockServiceName</key>
-				<string>ipp</string>
-			</dict>
-			<dict>
-				<key>SockNodeName</key>
-				<string>127.0.0.1</string>
-				<key>SockServiceName</key>
-				<string>ipp</string>
-			</dict>
 			<dict>
 				<key>SockPathMode</key>
 				<integer>49663</integer>

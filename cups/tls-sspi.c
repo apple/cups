@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-sspi.c 12481 2015-02-03 12:45:14Z msweet $"
+ * "$Id: tls-sspi.c 12647 2015-05-20 18:37:52Z msweet $"
  *
  * TLS support for CUPS on Windows using the Security Support Provider
  * Interface (SSPI).
@@ -54,7 +54,7 @@
  * Local globals...
  */
 
-static int		tls_options = 0;/* Options for TLS connections */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -930,7 +930,14 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	*hostptr;			/* Pointer into hostname */
 
 
-  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+
+  if (tls_options < 0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting defaults.");
+    _cupsSetDefaults();
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+  }
 
   if ((http->tls = http_sspi_alloc()) == NULL)
     return (-1);
@@ -1756,14 +1763,18 @@ http_sspi_find_credentials(
 #ifdef SP_PROT_TLS1_2_SERVER
   if (http->mode == _HTTP_MODE_SERVER)
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER | SP_PROT_SSL3_SERVER;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER;
   }
   else
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT | SP_PROT_SSL3_CLIENT;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT;
@@ -1786,7 +1797,7 @@ http_sspi_find_credentials(
   }
 #endif /* SP_PROT_TLS1_2_SERVER */
 
-  /* TODO: Support _HTTP_TLS_ALLOW_RC4 option; right now we'll rely on Windows registry to enable/disable RC4... */
+  /* TODO: Support _HTTP_TLS_ALLOW_RC4 and _HTTP_TLS_ALLOW_DH options; right now we'll rely on Windows registry to enable/disable RC4/DH... */
 
  /*
   * Create an SSPI credential.
@@ -2416,5 +2427,5 @@ http_sspi_verify(
 
 
 /*
- * End of "$Id: tls-sspi.c 12481 2015-02-03 12:45:14Z msweet $".
+ * End of "$Id: tls-sspi.c 12647 2015-05-20 18:37:52Z msweet $".
  */

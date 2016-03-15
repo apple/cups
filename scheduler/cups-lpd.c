@@ -1,9 +1,9 @@
 /*
- * "$Id: cups-lpd.c 12612 2015-05-06 15:30:50Z msweet $"
+ * "$Id: cups-lpd.c 12611 2015-05-06 15:30:36Z msweet $"
  *
  * Line Printer Daemon interface for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -29,6 +29,9 @@
 #ifdef HAVE_INTTYPES_H
 #  include <inttypes.h>
 #endif /* HAVE_INTTYPES_H */
+#ifdef __APPLE__
+#  include <vproc.h>
+#endif /* __APPLE__ */
 
 
 /*
@@ -96,6 +99,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		hostip[256],		/* IP address */
 		*hostfamily;		/* Address family */
   int		hostlookups;		/* Do hostname lookups? */
+#ifdef __APPLE__
+  vproc_transaction_t vtran = vproc_transaction_begin(NULL);
+#endif /* __APPLE__ */
 
 
  /*
@@ -211,6 +217,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     syslog(LOG_ERR, "Unable to get command line from client!");
     putchar(1);
+
+#ifdef __APPLE__
+    vproc_transaction_end(NULL, vtran);
+#endif /* __APPLE__ */
+
     return (1);
   }
 
@@ -302,6 +313,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   syslog(LOG_INFO, "Closing connection");
   closelog();
+
+#ifdef __APPLE__
+  vproc_transaction_end(NULL, vtran);
+#endif /* __APPLE__ */
 
   return (status);
 }
@@ -1614,5 +1629,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 12612 2015-05-06 15:30:50Z msweet $".
+ * End of "$Id: cups-lpd.c 12611 2015-05-06 15:30:36Z msweet $".
  */

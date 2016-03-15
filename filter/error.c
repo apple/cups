@@ -1,9 +1,9 @@
 /*
- * "$Id: error.c 12748 2015-06-24 15:58:40Z msweet $"
+ * "$Id: error.c 11558 2014-02-06 18:33:34Z msweet $"
  *
  * Raster error handling for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -56,16 +56,12 @@ _cupsRasterAddError(const char *f,	/* I - Printf-style error message */
   ssize_t	bytes;			/* Bytes in message string */
 
 
-  DEBUG_printf(("_cupsRasterAddError(f=\"%s\", ...)", f));
-
   va_start(ap, f);
   bytes = vsnprintf(s, sizeof(s), f, ap);
   va_end(ap);
 
   if (bytes <= 0)
     return;
-
-  DEBUG_printf(("1_cupsRasterAddError: %s", s));
 
   bytes ++;
 
@@ -189,7 +185,7 @@ get_error_buffer(void)
   * Initialize the global data exactly once...
   */
 
-  DEBUG_puts("3get_error_buffer()");
+  DEBUG_puts("get_error_buffer()");
 
   pthread_once(&raster_key_once, raster_init);
 
@@ -200,7 +196,7 @@ get_error_buffer(void)
   if ((buf = (_cups_raster_error_t *)pthread_getspecific(raster_key))
           == NULL)
   {
-    DEBUG_puts("4get_error_buffer: allocating memory for thread.");
+    DEBUG_puts("get_error_buffer: allocating memory for thread...");
 
    /*
     * No, allocate memory as set the pointer for the key...
@@ -209,7 +205,7 @@ get_error_buffer(void)
     buf = calloc(1, sizeof(_cups_raster_error_t));
     pthread_setspecific(raster_key, buf);
 
-    DEBUG_printf(("4get_error_buffer: buf=%p", buf));
+    DEBUG_printf(("    buf=%p\n", buf));
   }
 
  /*
@@ -229,7 +225,8 @@ raster_init(void)
 {
   pthread_key_create(&raster_key, raster_destructor);
 
-  DEBUG_printf(("3raster_init(): raster_key=%x(%u)", (unsigned)raster_key, (unsigned)raster_key));
+  DEBUG_printf(("raster_init(): raster_key=%x(%u)\n", (unsigned)raster_key,
+                (unsigned)raster_key));
 }
 
 
@@ -244,7 +241,7 @@ raster_destructor(void *value)		/* I - Data to free */
 					/* Error buffer */
 
 
-  DEBUG_printf(("3raster_destructor(value=%p)", value));
+  DEBUG_printf(("raster_destructor(value=%p)\n", value));
 
   if (buf->start)
     free(buf->start);
@@ -275,5 +272,5 @@ get_error_buffer(void)
 
 
 /*
- * End of "$Id: error.c 12748 2015-06-24 15:58:40Z msweet $".
+ * End of "$Id: error.c 11558 2014-02-06 18:33:34Z msweet $".
  */

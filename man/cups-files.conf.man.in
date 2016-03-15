@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-files.conf.man.in 12477 2015-02-02 18:38:25Z msweet $"
+.\" "$Id: cups-files.conf.man.in 12699 2015-06-08 18:16:30Z msweet $"
 .\"
 .\" cups-files.conf man page for CUPS.
 .\"
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "2 February 2015" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "3 June 2015" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -33,9 +33,12 @@ The following directives are understood by
 .TP 5
 \fBAccessLog \fIfilename\fR
 .TP 5
+\fBAccessLog stderr\fR
+.TP 5
 \fBAccessLog syslog\fR
 Defines the access log filename.
 Specifying a blank filename disables access log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 .nf
@@ -69,9 +72,12 @@ The default is usually "/usr/share/doc/cups".
 .TP 5
 \fBErrorLog \fIfilename\fR
 .TP 5
+\fBErrorLog stderr\fR
+.TP 5
 \fBErrorLog syslog\fR
 Defines the error log filename.
 Specifying a blank filename disables error log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 .nf
@@ -134,8 +140,11 @@ The default is "0644".
 .TP 5
 \fBPageLog \fR[ \fIfilename\fR ]
 .TP 5
+\fBPageLog stderr\fR
+.TP 5
 \fBPageLog syslog\fR
 Defines the page log filename.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables page log generation.
 The server name may be included in filenames using the string "%s", for example:
@@ -156,8 +165,6 @@ The default is "remroot".
 Specifies the directory that contains print jobs and other HTTP request data.
 The default is "/var/spool/cups".
 .\"#Sandboxing
-.TP 5
-\fBSandboxing off\fR
 .TP 5
 \fBSandboxing relaxed\fR
 .TP 5
@@ -218,5 +225,5 @@ CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cups-files.conf.man.in 12477 2015-02-02 18:38:25Z msweet $".
+.\" End of "$Id: cups-files.conf.man.in 12699 2015-06-08 18:16:30Z msweet $".
 .\"

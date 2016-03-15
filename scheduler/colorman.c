@@ -1,5 +1,5 @@
 /*
- * "$Id: colorman.c 12369 2014-12-15 14:51:28Z msweet $"
+ * "$Id: colorman.c 12619 2015-05-06 21:00:19Z msweet $"
  *
  * Color management routines for the CUPS scheduler.
  *
@@ -368,7 +368,7 @@ apple_register_profiles(
   * Make sure ColorSync is available...
   */
 
-  if (ColorSyncRegisterDevice == NULL)
+  if (&ColorSyncRegisterDevice == NULL)
     return;
 
  /*
@@ -868,7 +868,7 @@ apple_unregister_profiles(
   * Make sure ColorSync is available...
   */
 
-  if (ColorSyncUnregisterDevice != NULL)
+  if (&ColorSyncUnregisterDevice != NULL)
   {
     CFUUIDRef deviceUUID;		/* Device UUID */
 
@@ -1519,5 +1519,5 @@ colord_unregister_printer(
 
 
 /*
- * End of "$Id: colorman.c 12369 2014-12-15 14:51:28Z msweet $".
+ * End of "$Id: colorman.c 12619 2015-05-06 21:00:19Z msweet $".
  */

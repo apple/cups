@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: mark.c 12258 2014-11-19 12:38:44Z msweet $"
  *
  * Option marking routines for CUPS.
  *
@@ -514,6 +514,12 @@ ppdMarkDefaults(ppd_file_t *ppd)	/* I - PPD file record */
 
   for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
     ppd_defaults(ppd, g);
+
+ /*
+  * Finally, tag any conflicts (API compatibility) once at the end.
+  */
+
+  ppdConflicts(ppd);
 }
 
 
@@ -710,7 +716,7 @@ ppd_defaults(ppd_file_t  *ppd,		/* I - PPD file */
 
   for (i = g->num_options, o = g->options; i > 0; i --, o ++)
     if (_cups_strcasecmp(o->keyword, "PageRegion") != 0)
-      ppdMarkOption(ppd, o->keyword, o->defchoice);
+      ppd_mark_option(ppd, o->keyword, o->defchoice);
 
   for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
     ppd_defaults(ppd, sg);
@@ -1078,5 +1084,5 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: mark.c 12258 2014-11-19 12:38:44Z msweet $".
  */

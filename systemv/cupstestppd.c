@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 12412 2015-01-19 15:18:02Z msweet $"
+ * "$Id: cupstestppd.c 12583 2015-04-03 00:33:05Z msweet $"
  *
  *   PPD test program for CUPS.
  *
@@ -2371,8 +2371,40 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (!warn)
         errors ++;
+
+      continue;
     }
-    else if (strcmp(program, "-"))
+
+    if (!strncmp(program, "maxsize(", 8))
+    {
+      char	*mptr;			/* Pointer into maxsize(nnnn) program */
+
+      strtoll(program + 8, &mptr, 10);
+
+      if (*mptr != ')')
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Bad cupsFilter value \"%s\"."),
+			  prefix, attr->value);
+
+	if (!warn)
+	  errors ++;
+
+	continue;
+      }
+
+      mptr ++;
+      while (_cups_isspace(*mptr))
+	mptr ++;
+
+      _cups_strcpy(program, mptr);
+    }
+
+    if (strcmp(program, "-"))
     {
       if (program[0] == '/')
 	snprintf(pathprog, sizeof(pathprog), "%s%s", root, program);
@@ -2457,8 +2489,40 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (!warn)
         errors ++;
+
+      continue;
     }
-    else if (strcmp(program, "-"))
+
+    if (!strncmp(program, "maxsize(", 8))
+    {
+      char	*mptr;			/* Pointer into maxsize(nnnn) program */
+
+      strtoll(program + 8, &mptr, 10);
+
+      if (*mptr != ')')
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Bad cupsFilter2 value \"%s\"."),
+			  prefix, attr->value);
+
+	if (!warn)
+	  errors ++;
+
+	continue;
+      }
+
+      mptr ++;
+      while (_cups_isspace(*mptr))
+	mptr ++;
+
+      _cups_strcpy(program, mptr);
+    }
+
+    if (strcmp(program, "-"))
     {
       if (strncmp(program, "maxsize(", 8) &&
           (ptr = strchr(program + 8, ')')) != NULL)
@@ -3972,5 +4036,5 @@ valid_utf8(const char *s)		/* I - String to check */
 
 
 /*
- * End of "$Id: cupstestppd.c 12412 2015-01-19 15:18:02Z msweet $".
+ * End of "$Id: cupstestppd.c 12583 2015-04-03 00:33:05Z msweet $".
  */

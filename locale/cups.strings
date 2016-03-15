@@ -366,6 +366,7 @@
 // TRANSLATORS: Message is "subject: error"
 "%s: %s" = "%s: %s";
 "%s: %s failed: %s" = "%s: %s failed: %s";
+"%s: Bad printer URI \"%s\"." = "%s: Bad printer URI \"%s\".";
 "%s: Bad version %s for \"-V\"." = "%s: Bad version %s for \"-V\".";
 "%s: Don't know what to do." = "%s: Don't know what to do.";
 "%s: Error - %s environment variable names non-existent destination \"%s\"." = "%s: Error - %s environment variable names non-existent destination \"%s\".";
@@ -414,13 +415,16 @@
 "%s: No filter to convert from %s/%s to %s/%s." = "%s: No filter to convert from %s/%s to %s/%s.";
 "%s: Operation failed: %s" = "%s: Operation failed: %s";
 "%s: Sorry, no encryption support." = "%s: Sorry, no encryption support.";
+"%s: Unable to connect to \"%s:%d\": %s" = "%s: Unable to connect to \"%s:%d\": %s";
 "%s: Unable to connect to server." = "%s: Unable to connect to server.";
 "%s: Unable to contact server." = "%s: Unable to contact server.";
+"%s: Unable to create PPD file: %s" = "%s: Unable to create PPD file: %s";
 "%s: Unable to determine MIME type of \"%s\"." = "%s: Unable to determine MIME type of \"%s\".";
 "%s: Unable to open \"%s\": %s" = "%s: Unable to open \"%s\": %s";
 "%s: Unable to open %s: %s" = "%s: Unable to open %s: %s";
 "%s: Unable to open PPD file: %s on line %d." = "%s: Unable to open PPD file: %s on line %d.";
 "%s: Unable to read MIME database from \"%s\" or \"%s\"." = "%s: Unable to read MIME database from \"%s\" or \"%s\".";
+"%s: Unable to resolve \"%s\"." = "%s: Unable to resolve \"%s\".";
 "%s: Unknown destination \"%s\"." = "%s: Unknown destination \"%s\".";
 "%s: Unknown destination MIME type %s/%s." = "%s: Unknown destination MIME type %s/%s.";
 "%s: Unknown option \"%c\"." = "%s: Unknown option \"%c\".";
@@ -849,6 +853,7 @@
 "Environment Variables:" = "Environment Variables:";
 "Epson" = "Epson";
 "Error Policy" = "Error Policy";
+"Error reading raster data." = "Error reading raster data.";
 "Error sending raster data." = "Error sending raster data.";
 "Error: need hostname after \"-h\" option." = "Error: need hostname after \"-h\" option.";
 "Every 10 Labels" = "Every 10 Labels";
@@ -1181,7 +1186,7 @@
 "Tear-Off Adjust Position" = "Tear-Off Adjust Position";
 "The \"%s\" attribute is required for print jobs." = "The \"%s\" attribute is required for print jobs.";
 "The %s attribute cannot be provided with job-ids." = "The %s attribute cannot be provided with job-ids.";
-"The '%s' Job Description attribute cannot be supplied in a job creation request." = "The '%s' Job Description attribute cannot be supplied in a job creation request.";
+"The '%s' Job Status attribute cannot be supplied in a job creation request." = "The '%s' Job Status attribute cannot be supplied in a job creation request.";
 "The '%s' operation attribute cannot be supplied in a Create-Job request." = "The '%s' operation attribute cannot be supplied in a Create-Job request.";
 "The PPD file \"%s\" could not be found." = "The PPD file \"%s\" could not be found.";
 "The PPD file \"%s\" could not be opened: %s" = "The PPD file \"%s\" could not be opened: %s";
@@ -1318,6 +1323,7 @@
 "Unable to open raster file" = "Unable to open raster file";
 "Unable to print test page" = "Unable to print test page";
 "Unable to read print data." = "Unable to read print data.";
+"Unable to rename job document file." = "Unable to rename job document file.";
 "Unable to resolve printer-uri." = "Unable to resolve printer-uri.";
 "Unable to run \"%s\": %s" = "Unable to run \"%s\": %s";
 "Unable to see in file" = "Unable to see in file";
@@ -1485,6 +1491,7 @@
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";
 "lpadmin: Unable to create temporary file" = "lpadmin: Unable to create temporary file";
 "lpadmin: Unable to delete option:\n         You must specify a printer name first." = "lpadmin: Unable to delete option:\n         You must specify a printer name first.";
+"lpadmin: Unable to open PPD \"%s\": %s on line %d." = "lpadmin: Unable to open PPD \"%s\": %s on line %d.";
 "lpadmin: Unable to open PPD file \"%s\" - %s" = "lpadmin: Unable to open PPD file \"%s\" - %s";
 "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first." = "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to set the printer options:\n         You must specify a printer name first." = "lpadmin: Unable to set the printer options:\n         You must specify a printer name first.";

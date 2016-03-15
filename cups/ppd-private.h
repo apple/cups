@@ -1,9 +1,9 @@
 /*
- * "$Id: ppd-private.h 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: ppd-private.h 12722 2015-06-08 22:00:19Z msweet $"
  *
  * Private PPD definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	6	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	7	/* Version number in cache file */
 
 
 /*
@@ -155,6 +155,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
  * Prototypes...
  */
 
+extern int		_cupsConvertOptions(ipp_t *request, ppd_file_t *ppd, _ppd_cache_t *pc, ipp_attribute_t *media_col_sup, ipp_attribute_t *doc_handling_sup, ipp_attribute_t *print_color_mode_sup, const char *user, const char *format, int copies, int num_options, cups_option_t *options);
 extern _ppd_cache_t	*_ppdCacheCreateWithFile(const char *filename,
 			                         ipp_t **attrs);
 extern _ppd_cache_t	*_ppdCacheCreateWithPPD(ppd_file_t *ppd);
@@ -187,6 +188,7 @@ extern const char	*_ppdCacheGetType(_ppd_cache_t *pc,
 			                  const char *media_type);
 extern int		_ppdCacheWriteFile(_ppd_cache_t *pc,
 			                   const char *filename, ipp_t *attrs);
+extern char		*_ppdCreateFromIPP(char *buffer, size_t bufsize, ipp_t *response);
 extern void		_ppdFreeLanguages(cups_array_t *languages);
 extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);
@@ -221,5 +223,5 @@ extern const char	*_pwgPageSizeForMedia(pwg_media_t *media,
 #endif /* !_CUPS_PPD_PRIVATE_H_ */
 
 /*
- * End of "$Id: ppd-private.h 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: ppd-private.h 12722 2015-06-08 22:00:19Z msweet $".
  */

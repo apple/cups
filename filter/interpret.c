@@ -1,9 +1,9 @@
 /*
- * "$Id: interpret.c 12748 2015-06-24 15:58:40Z msweet $"
+ * "$Id: interpret.c 11848 2014-05-07 00:26:44Z msweet $"
  *
  * PPD command interpreter for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -91,8 +91,8 @@ static int		setpagedevice(_cups_ps_stack_t *st,
 			                cups_page_header2_t *h,
 			                int *preferred_bits);
 #ifdef DEBUG
-static void		DEBUG_object(const char *prefix, _cups_ps_obj_t *obj);
-static void		DEBUG_stack(const char *prefix, _cups_ps_stack_t *st);
+static void		DEBUG_object(_cups_ps_obj_t *obj);
+static void		DEBUG_stack(_cups_ps_stack_t *st);
 #endif /* DEBUG */
 
 
@@ -547,8 +547,8 @@ _cupsRasterExecPS(
   while ((obj = scan_ps(st, &codeptr)) != NULL)
   {
 #ifdef DEBUG
-    DEBUG_printf(("_cupsRasterExecPS: Stack (%d objects)", st->num_objs));
-    DEBUG_object("_cupsRasterExecPS", obj);
+    DEBUG_printf(("_cupsRasterExecPS: Stack (%d objects)\n", st->num_objs));
+    DEBUG_object(obj);
 #endif /* DEBUG */
 
     switch (obj->type)
@@ -561,11 +561,11 @@ _cupsRasterExecPS(
           pop_stack(st);
 
 	  if (cleartomark_stack(st))
-	    _cupsRasterAddError("cleartomark: Stack underflow.\n");
+	    _cupsRasterAddError("cleartomark: Stack underflow!\n");
 
 #ifdef DEBUG
-          DEBUG_puts("1_cupsRasterExecPS:    dup");
-	  DEBUG_stack("_cupsRasterExecPS", st);
+          DEBUG_puts("    dup: ");
+	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
 
@@ -577,7 +577,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
             DEBUG_puts("_cupsRasterExecPS: copy");
-	    DEBUG_stack("_cupsRasterExecPS", st);
+	    DEBUG_stack(st);
 #endif /* DEBUG */
           }
           break;
@@ -588,7 +588,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
           DEBUG_puts("_cupsRasterExecPS: dup");
-	  DEBUG_stack("_cupsRasterExecPS", st);
+	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
 
@@ -600,7 +600,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
             DEBUG_puts("_cupsRasterExecPS: index");
-	    DEBUG_stack("_cupsRasterExecPS", st);
+	    DEBUG_stack(st);
 #endif /* DEBUG */
           }
           break;
@@ -611,7 +611,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
           DEBUG_puts("_cupsRasterExecPS: pop");
-	  DEBUG_stack("_cupsRasterExecPS", st);
+	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
 
@@ -630,7 +630,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
               DEBUG_puts("_cupsRasterExecPS: roll");
-	      DEBUG_stack("_cupsRasterExecPS", st);
+	      DEBUG_stack(st);
 #endif /* DEBUG */
             }
 	  }
@@ -642,7 +642,7 @@ _cupsRasterExecPS(
 
 #ifdef DEBUG
           DEBUG_puts("_cupsRasterExecPS: setpagedevice");
-	  DEBUG_stack("_cupsRasterExecPS", st);
+	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
 
@@ -653,9 +653,10 @@ _cupsRasterExecPS(
 	  break;
 
       case CUPS_PS_OTHER :
-          _cupsRasterAddError("Unknown operator \"%s\".\n", obj->value.other);
+          _cupsRasterAddError("Unknown operator \"%s\"!\n", obj->value.other);
 	  error = 1;
-          DEBUG_printf(("_cupsRasterExecPS: Unknown operator \"%s\".", obj->value.other));
+          DEBUG_printf(("_cupsRasterExecPS: Unknown operator \"%s\"!\n",
+	                obj->value.other));
           break;
     }
 
@@ -674,8 +675,8 @@ _cupsRasterExecPS(
     error_stack(st, "Stack not empty:");
 
 #ifdef DEBUG
-    DEBUG_puts("_cupsRasterExecPS: Stack not empty");
-    DEBUG_stack("_cupsRasterExecPS", st);
+    DEBUG_puts("_cupsRasterExecPS: Stack not empty:");
+    DEBUG_stack(st);
 #endif /* DEBUG */
 
     delete_stack(st);
@@ -976,7 +977,7 @@ roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
   int			n;		/* Index into array */
 
 
-  DEBUG_printf(("3roll_stack(st=%p, s=%d, c=%d)", st, s, c));
+  DEBUG_printf(("    roll_stack(st=%p, s=%d, c=%d)\n", st, s, c));
 
  /*
   * Range check input...
@@ -1434,7 +1435,7 @@ setpagedevice(
   * Now pull /name and value pairs from the dictionary...
   */
 
-  DEBUG_puts("3setpagedevice: Dictionary:");
+  DEBUG_puts("setpagedevice: Dictionary:");
 
   for (obj ++; obj < end; obj ++)
   {
@@ -1449,8 +1450,8 @@ setpagedevice(
     obj ++;
 
 #ifdef DEBUG
-    DEBUG_printf(("4setpagedevice: /%s ", name));
-    DEBUG_object("setpagedevice", obj);
+    DEBUG_printf(("setpagedevice: /%s ", name));
+    DEBUG_object(obj);
 #endif /* DEBUG */
 
    /*
@@ -1600,7 +1601,7 @@ setpagedevice(
       * Ignore unknown name+value...
       */
 
-      DEBUG_printf(("4setpagedevice: Unknown name (\"%s\") or value...\n", name));
+      DEBUG_printf(("    Unknown name (\"%s\") or value...\n", name));
 
       while (obj[1].type != CUPS_PS_NAME && obj < end)
         obj ++;
@@ -1617,92 +1618,91 @@ setpagedevice(
  */
 
 static void
-DEBUG_object(const char *prefix,	/* I - Prefix string */
-             _cups_ps_obj_t *obj)	/* I - Object to print */
+DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
 {
   switch (obj->type)
   {
     case CUPS_PS_NAME :
-	DEBUG_printf(("4%s: /%s\n", prefix, obj->value.name));
+	DEBUG_printf(("/%s\n", obj->value.name));
 	break;
 
     case CUPS_PS_NUMBER :
-	DEBUG_printf(("4%s: %g\n", prefix, obj->value.number));
+	DEBUG_printf(("%g\n", obj->value.number));
 	break;
 
     case CUPS_PS_STRING :
-	DEBUG_printf(("4%s: (%s)\n", prefix, obj->value.string));
+	DEBUG_printf(("(%s)\n", obj->value.string));
 	break;
 
     case CUPS_PS_BOOLEAN :
 	if (obj->value.boolean)
-	  DEBUG_printf(("4%s: true", prefix));
+	  DEBUG_puts("true");
 	else
-	  DEBUG_printf(("4%s: false", prefix));
+	  DEBUG_puts("false");
 	break;
 
     case CUPS_PS_NULL :
-	DEBUG_printf(("4%s: null", prefix));
+	DEBUG_puts("null");
 	break;
 
     case CUPS_PS_START_ARRAY :
-	DEBUG_printf(("4%s: [", prefix));
+	DEBUG_puts("[");
 	break;
 
     case CUPS_PS_END_ARRAY :
-	DEBUG_printf(("4%s: ]", prefix));
+	DEBUG_puts("]");
 	break;
 
     case CUPS_PS_START_DICT :
-	DEBUG_printf(("4%s: <<", prefix));
+	DEBUG_puts("<<");
 	break;
 
     case CUPS_PS_END_DICT :
-	DEBUG_printf(("4%s: >>", prefix));
+	DEBUG_puts(">>");
 	break;
 
     case CUPS_PS_START_PROC :
-	DEBUG_printf(("4%s: {", prefix));
+	DEBUG_puts("{");
 	break;
 
     case CUPS_PS_END_PROC :
-	DEBUG_printf(("4%s: }", prefix));
+	DEBUG_puts("}");
 	break;
 
     case CUPS_PS_CLEARTOMARK :
-	DEBUG_printf(("4%s: --cleartomark--", prefix));
+	DEBUG_puts("--cleartomark--");
         break;
 
     case CUPS_PS_COPY :
-	DEBUG_printf(("4%s: --copy--", prefix));
+	DEBUG_puts("--copy--");
         break;
 
     case CUPS_PS_DUP :
-	DEBUG_printf(("4%s: --dup--", prefix));
+	DEBUG_puts("--dup--");
         break;
 
     case CUPS_PS_INDEX :
-	DEBUG_printf(("4%s: --index--", prefix));
+	DEBUG_puts("--index--");
         break;
 
     case CUPS_PS_POP :
-	DEBUG_printf(("4%s: --pop--", prefix));
+	DEBUG_puts("--pop--");
         break;
 
     case CUPS_PS_ROLL :
-	DEBUG_printf(("4%s: --roll--", prefix));
+	DEBUG_puts("--roll--");
         break;
 
     case CUPS_PS_SETPAGEDEVICE :
-	DEBUG_printf(("4%s: --setpagedevice--", prefix));
+	DEBUG_puts("--setpagedevice--");
         break;
 
     case CUPS_PS_STOPPED :
-	DEBUG_printf(("4%s: --stopped--", prefix));
+	DEBUG_puts("--stopped--");
         break;
 
     case CUPS_PS_OTHER :
-	DEBUG_printf(("4%s: --%s--", prefix, obj->value.other));
+	DEBUG_printf(("--%s--\n", obj->value.other));
 	break;
   }
 }
@@ -1713,19 +1713,18 @@ DEBUG_object(const char *prefix,	/* I - Prefix string */
  */
 
 static void
-DEBUG_stack(const char       *prefix,	/* I - Prefix string */
-            _cups_ps_stack_t *st)	/* I - Stack */
+DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 {
   int			c;		/* Looping var */
   _cups_ps_obj_t	*obj;		/* Current object on stack */
 
 
   for (obj = st->objs, c = st->num_objs; c > 0; c --, obj ++)
-    DEBUG_object(prefix, obj);
+    DEBUG_object(obj);
 }
 #endif /* DEBUG */
 
 
 /*
- * End of "$Id: interpret.c 12748 2015-06-24 15:58:40Z msweet $".
+ * End of "$Id: interpret.c 11848 2014-05-07 00:26:44Z msweet $".
  */

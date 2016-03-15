@@ -1,9 +1,9 @@
 /*
- * "$Id: printers.c 12463 2015-01-30 16:34:31Z msweet $"
+ * "$Id: printers.c 12722 2015-06-08 22:00:19Z msweet $"
  *
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -95,11 +95,12 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
                                             uuid, sizeof(uuid)));
   cupsdSetDeviceURI(p, "file:///dev/null");
 
-  p->state      = IPP_PRINTER_STOPPED;
-  p->state_time = time(NULL);
-  p->accepting  = 0;
-  p->shared     = DefaultShared;
-  p->filetype   = mimeAddType(MimeDatabase, "printer", name);
+  p->config_time = time(NULL);
+  p->state       = IPP_PRINTER_STOPPED;
+  p->state_time  = time(NULL);
+  p->accepting   = 0;
+  p->shared      = DefaultShared;
+  p->filetype    = mimeAddType(MimeDatabase, "printer", name);
 
   cupsdSetString(&p->job_sheets[0], "none");
   cupsdSetString(&p->job_sheets[1], "none");
@@ -170,6 +171,10 @@ cupsdCreateCommonData(void)
 		  "second-shift",
 		  "third-shift",
 		  "weekend"
+		};
+  static const char * const features[] =/* ipp-features-supported values */
+		{
+		  "subscription-object"
 		};
   static const char * const versions[] =/* ipp-versions-supported values */
 		{
@@ -339,8 +344,11 @@ cupsdCreateCommonData(void)
 		};
   static const char * const printer_settable[] =
 		{			/* printer-settable-attributes-supported */
+		  "printer-geo-location",
 		  "printer-info",
-		  "printer-location"
+		  "printer-location",
+		  "printer-organization",
+		  "printer-organizational-unit"
 	        };
   static const char * const which_jobs[] =
 		{			/* which-jobs-supported values */
@@ -419,6 +427,9 @@ cupsdCreateCommonData(void)
   /* generated-natural-language-supported (no IPP_TAG_COPY) */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "generated-natural-language-supported", NULL, DefaultLanguage);
+
+  /* ipp-features-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-features-supported", sizeof(features) / sizeof(features[0]), NULL, features);
 
   /* ipp-versions-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
@@ -533,6 +544,9 @@ cupsdCreateCommonData(void)
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "multiple-operation-time-out", MultipleOperationTimeout);
 
+  /* multiple-operation-time-out-action */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "multiple-operation-time-out-action", NULL, "process-job");
+
   /* natural-language-configured (no IPP_TAG_COPY) */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "natural-language-configured", NULL, DefaultLanguage);
@@ -617,6 +631,9 @@ cupsdCreateCommonData(void)
   /* pdl-override-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "pdl-override-supported", NULL, "attempted");
+
+  /* printer-get-attributes-supported */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "printer-get-attributes-supported", NULL, "document-format");
 
   /* printer-op-policy-supported */
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
@@ -751,6 +768,7 @@ cupsdDeletePrinter(
   cupsdClearString(&p->hostname);
   cupsdClearString(&p->name);
   cupsdClearString(&p->location);
+  cupsdClearString(&p->geo_location);
   cupsdClearString(&p->make_model);
   cupsdClearString(&p->info);
   cupsdClearString(&p->job_sheets[0]);
@@ -960,6 +978,21 @@ cupsdLoadAllPrinters(void)
       if (value)
 	cupsdSetString(&p->location, value);
     }
+    else if (!_cups_strcasecmp(line, "GeoLocation"))
+    {
+      if (value)
+        cupsdSetString(&p->geo_location, value);
+    }
+    else if (!_cups_strcasecmp(line, "Organization"))
+    {
+      if (value)
+	cupsdSetString(&p->organization, value);
+    }
+    else if (!_cups_strcasecmp(line, "OrganizationalUnit"))
+    {
+      if (value)
+	cupsdSetString(&p->organizational_unit, value);
+    }
     else if (!_cups_strcasecmp(line, "DeviceURI"))
     {
       if (value)
@@ -1063,6 +1096,15 @@ cupsdLoadAllPrinters(void)
 
       if (value)
         p->state_time = atoi(value);
+    }
+    else if (!_cups_strcasecmp(line, "ConfigTime"))
+    {
+     /*
+      * Set the config time...
+      */
+
+      if (value)
+        p->config_time = atoi(value);
     }
     else if (!_cups_strcasecmp(line, "Accepting"))
     {
@@ -1214,10 +1256,17 @@ cupsdLoadAllPrinters(void)
     else if (!_cups_strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
-        cupsdSetString(&p->error_policy, value);
+      {
+	if (strcmp(value, "retry-current-job") &&
+	    strcmp(value, "abort-job") &&
+	    strcmp(value, "retry-job") &&
+	    strcmp(value, "stop-printer"))
+	  cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid ErrorPolicy \"%s\" on line %d or printers.conf.", ErrorPolicy, linenum);
+	else
+	  cupsdSetString(&p->error_policy, value);
+      }
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Syntax error on line %d of printers.conf.", linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d of printers.conf.", linenum);
     }
     else if (!_cups_strcasecmp(line, "Attribute") && value)
     {
@@ -1413,8 +1462,17 @@ cupsdSaveAllPrinters(void)
     if (printer->location)
       cupsFilePutConf(fp, "Location", printer->location);
 
+    if (printer->geo_location)
+      cupsFilePutConf(fp, "GeoLocation", printer->geo_location);
+
     if (printer->make_model)
       cupsFilePutConf(fp, "MakeModel", printer->make_model);
+
+    if (printer->organization)
+      cupsFilePutConf(fp, "Organization", printer->organization);
+
+    if (printer->organizational_unit)
+      cupsFilePutConf(fp, "OrganizationalUnit", printer->organizational_unit);
 
     cupsFilePutConf(fp, "DeviceURI", printer->device_uri);
 
@@ -1425,13 +1483,14 @@ cupsdSaveAllPrinters(void)
     {
       cupsFilePuts(fp, "State Stopped\n");
 
-      if (printer->state_message)
+      if (printer->state_message[0])
         cupsFilePutConf(fp, "StateMessage", printer->state_message);
     }
     else
       cupsFilePuts(fp, "State Idle\n");
 
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
+    cupsFilePrintf(fp, "ConfigTime %d\n", (int)printer->config_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
       if (strcmp(printer->reasons[i], "connecting-to-device") &&
@@ -1997,6 +2056,77 @@ cupsdSetPrinterAttr(
   }
 
   free(temp);
+
+ /*
+  * Update the printer-supply and printer-supply-description, as needed...
+  */
+
+  if (!strcmp(name, "marker-names"))
+  {
+    ipp_attribute_t *supply_desc = ippFindAttribute(p->attrs, "printer-supply-description", IPP_TAG_TEXT);
+					/* printer-supply-description attribute */
+
+    if (supply_desc != NULL)
+      ippDeleteAttribute(p->attrs, supply_desc);
+
+    supply_desc = ippCopyAttribute(p->attrs, attr, 0);
+    ippSetName(p->attrs, &supply_desc, "printer-supply-description");
+    ippSetValueTag(p->attrs, &supply_desc, IPP_TAG_TEXT);
+  }
+  else if (!strcmp(name, "marker-colors") || !strcmp(name, "marker-levels") || !strcmp(name, "marker-types"))
+  {
+    char	buffer[256],		/* printer-supply values */
+		pstype[64],		/* printer-supply type value */
+		*psptr;			/* Pointer into type */
+    const char	*color,			/* marker-colors value */
+		*type;			/* marker-types value */
+    int		level;			/* marker-levels value */
+    ipp_attribute_t *colors = ippFindAttribute(p->attrs, "marker-colors", IPP_TAG_NAME);
+					/* marker-colors attribute */
+    ipp_attribute_t *levels = ippFindAttribute(p->attrs, "marker-levels", IPP_TAG_INTEGER);
+					/* marker-levels attribute */
+    ipp_attribute_t *types = ippFindAttribute(p->attrs, "marker-types", IPP_TAG_KEYWORD);
+					/* marker-types attribute */
+    ipp_attribute_t *supply = ippFindAttribute(p->attrs, "printer-supply", IPP_TAG_STRING);
+					/* printer-supply attribute */
+
+    if (supply != NULL)
+    {
+      ippDeleteAttribute(p->attrs, supply);
+      supply = NULL;
+    }
+
+    if (!colors || !levels || !types)
+      return;
+
+    count = ippGetCount(colors);
+    if (count != ippGetCount(levels) || count != ippGetCount(types))
+      return;
+
+    for (i = 0; i < count; i ++)
+    {
+      color = ippGetString(colors, i, NULL);
+      level = ippGetInteger(levels, i);
+      type  = ippGetString(types, i, NULL);
+
+      for (psptr = pstype; *type && psptr < (pstype + sizeof(pstype) - 1); type ++)
+        if (*type == '-')
+	{
+	  type ++;
+	  *psptr++ = (char)toupper(*type & 255);
+	}
+	else
+	  *psptr++ = *type;
+      *psptr = '\0';
+
+      snprintf(buffer, sizeof(buffer), "index=%d;class=%s;type=%s;unit=percent;maxcapacity=100;level=%d;colorantname=%s;", i + 1, strncmp(pstype, "waste", 5) ? "supplyThatIsConsumed" : "receptacleThatIsFilled", pstype, level, color);
+
+      if (!i)
+        supply = ippAddOctetString(p->attrs, IPP_TAG_PRINTER, "printer-supply", buffer, (int)strlen(buffer));
+      else
+        ippSetOctetString(p->attrs, &supply, i, buffer, (int)strlen(buffer));
+    }
+  }
 }
 
 
@@ -2086,10 +2216,15 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                p->name);
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-location",
                NULL, p->location ? p->location : "");
+  if (p->geo_location)
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-geo-location", NULL, p->geo_location);
+  else
+    ippAddOutOfBand(p->attrs, IPP_TAG_PRINTER, IPP_TAG_UNKNOWN, "printer-geo-location");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info ? p->info : "");
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uuid", NULL,
-	       p->uuid);
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-organization", NULL, p->organization ? p->organization : "");
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-organizational-unit", NULL, p->organizational_unit ? p->organizational_unit : "");
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uuid", NULL, p->uuid);
 
   if (cupsArrayCount(p->users) > 0)
   {
@@ -3485,8 +3620,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	 filter;
 	 filter = (mime_filter_t *)cupsArrayNext(MimeDatabase->filters))
     {
-      if (filter->dst == p->filetype && filter->filter &&
-	  strstr(filter->filter, "PrintJobMgr"))
+      if (filter->dst == p->filetype && strstr(filter->filter, "PrintJobMgr"))
 	break;
     }
 
@@ -3784,6 +3918,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		      "pages-per-minute-color", 1);
     }
+
+    if ((ppd_attr = ppdFindAttr(ppd, "1284DeviceId", NULL)) != NULL)
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-device-id", NULL, ppd_attr->value);
 
     num_qualities = 0;
 
@@ -4934,5 +5071,5 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: printers.c 12463 2015-01-30 16:34:31Z msweet $".
+ * End of "$Id: printers.c 12722 2015-06-08 22:00:19Z msweet $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 12336 2014-12-09 21:19:52Z msweet $"
+dnl "$Id: cups-common.m4 12697 2015-06-08 17:42:16Z msweet $"
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION=2.0.4
+CUPS_VERSION=2.1b1
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -137,6 +137,7 @@ AC_CHECK_HEADER(bstring.h,AC_DEFINE(HAVE_BSTRING_H))
 AC_CHECK_HEADER(sys/ioctl.h,AC_DEFINE(HAVE_SYS_IOCTL_H))
 AC_CHECK_HEADER(sys/param.h,AC_DEFINE(HAVE_SYS_PARAM_H))
 AC_CHECK_HEADER(sys/ucred.h,AC_DEFINE(HAVE_SYS_UCRED_H))
+AC_CHECK_HEADER(asl.h,AC_DEFINE(HAVE_ASL_H))
 
 dnl Checks for iconv.h and iconv_open
 AC_CHECK_HEADER(iconv.h,
@@ -465,5 +466,5 @@ esac
 AC_SUBST(BUILDDIRS)
 
 dnl
-dnl End of "$Id: cups-common.m4 12336 2014-12-09 21:19:52Z msweet $".
+dnl End of "$Id: cups-common.m4 12697 2015-06-08 17:42:16Z msweet $".
 dnl

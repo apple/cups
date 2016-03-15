@@ -1,5 +1,5 @@
 //
-// "$Id: sample.drv 12105 2014-08-20 15:27:43Z msweet $"
+// "$Id: sample.drv 12201 2014-10-15 19:11:12Z msweet $"
 //
 // Driver info file for CUPS-supplied PPDs.
 //
@@ -114,7 +114,7 @@
 #media "w576h468/8.00x6.50\"" 576 468
 
 // Common stuff for all drivers...
-Attribute "cupsVersion" "" "2.0"
+Attribute "cupsVersion" "" "2.1"
 Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
@@ -1168,5 +1168,5 @@ Version "2.0"
 }
 
 //
-// End of "$Id: sample.drv 12105 2014-08-20 15:27:43Z msweet $".
+// End of "$Id: sample.drv 12201 2014-10-15 19:11:12Z msweet $".
 //

@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 12230 2014-10-21 13:55:24Z msweet $"
+ * "$Id: auth.c 12619 2015-05-06 21:00:19Z msweet $"
  *
  * Authentication functions for CUPS.
  *
@@ -311,7 +311,7 @@ _cupsSetNegotiateAuthString(
   * to use it...
   */
 
-  if (gss_init_sec_context == NULL)
+  if (&gss_init_sec_context == NULL)
   {
     DEBUG_puts("1_cupsSetNegotiateAuthString: Weak-linked GSSAPI/Kerberos "
                "framework is not present");
@@ -876,5 +876,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 12230 2014-10-21 13:55:24Z msweet $".
+ * End of "$Id: auth.c 12619 2015-05-06 21:00:19Z msweet $".
  */

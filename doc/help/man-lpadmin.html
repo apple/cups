@@ -79,6 +79,7 @@ This option cannot be specified with the <i>-P</i> option (PPD file) and is inte
 Use the <i>-m</i> option with the
 <a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
 command to get a list of supported models.
+The model "raw" clears any existing interface script or PPD file and the model "everywhere" queries the printer referred to by the specified IPP <i>device-uri</i>.
 <dt><b>-o cupsIPPSupplies=true</b>
 <dd style="margin-left: 5.0em"><dt><b>-o cupsIPPSupplies=false</b>
 <dd style="margin-left: 5.0em">Specifies whether IPP supply level values should be reported.
@@ -161,6 +162,13 @@ Finally, the CUPS version of <b>lpadmin</b> may ask the user for an access passw
 This differs from the System V version which requires the root user to execute this command.
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 The CUPS version of <b>lpadmin</b> does not support all of the System V or Solaris printing system configuration options.
+<h2 class="title"><a name="EXAMPLE">Example</a></h2>
+Create an IPP Everywhere print queue:
+<pre class="man">
+
+    lpadmin -p myprinter -E -v ipp://myprinter.local/ipp/print -m everywhere
+
+</pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-cupsaccept.html?TOPIC=Man+Pages"><b>cupsaccept</b>(8),</a>
 <a href="man-cupsenable.html?TOPIC=Man+Pages"><b>cupsenable</b>(8),</a>
@@ -168,7 +176,7 @@ The CUPS version of <b>lpadmin</b> does not support all of the System V or Solar
 <a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2014 by Apple Inc.
+Copyright &copy; 2007-2015 by Apple Inc.
 
 </body>
 </html>

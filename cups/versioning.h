@@ -1,5 +1,5 @@
 /*
- * "$Id: versioning.h 12419 2015-01-22 15:51:20Z msweet $"
+ * "$Id: versioning.h 12418 2015-01-22 15:49:23Z msweet $"
  *
  *   API versioning definitions for CUPS.
  *
@@ -162,5 +162,5 @@
 #endif /* !_CUPS_VERSIONING_H_ */
 
 /*
- * End of "$Id: versioning.h 12419 2015-01-22 15:51:20Z msweet $".
+ * End of "$Id: versioning.h 12418 2015-01-22 15:49:23Z msweet $".
  */

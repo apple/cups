@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-startup.m4 12351 2014-12-09 22:18:45Z msweet $"
+dnl "$Id: cups-startup.m4 12691 2015-06-04 18:00:31Z msweet $"
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
@@ -65,6 +65,15 @@ if test x$enable_systemd != xno; then
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
                         fi
+                else
+                        AC_MSG_RESULT(no)
+                fi
+        	AC_MSG_CHECKING(for libsystemd-journal)
+                if $PKGCONFIG --exists libsystemd-journal; then
+                        AC_MSG_RESULT(yes)
+                        ONDEMANDFLAGS="$ONDEMANDFLAGS `$PKGCONFIG --cflags libsystemd-journal`"
+                        ONDEMANDLIBS="$ONDEMANDLIBS `$PKGCONFIG --libs libsystemd-journal`"
+			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
                 else
                         AC_MSG_RESULT(no)
                 fi
@@ -172,5 +181,5 @@ fi
 
 
 dnl
-dnl End of "$Id: cups-startup.m4 12351 2014-12-09 22:18:45Z msweet $".
+dnl End of "$Id: cups-startup.m4 12691 2015-06-04 18:00:31Z msweet $".
 dnl

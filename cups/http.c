@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $"
+ * "$Id: http.c 12333 2014-12-09 21:01:46Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -4850,5 +4850,5 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $".
+ * End of "$Id: http.c 12333 2014-12-09 21:01:46Z msweet $".
  */

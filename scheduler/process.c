@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 12522 2015-02-17 20:01:33Z msweet $"
+ * "$Id: process.c 12521 2015-02-17 20:00:17Z msweet $"
  *
  * Process management routines for the CUPS scheduler.
  *
@@ -890,5 +890,5 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: process.c 12522 2015-02-17 20:01:33Z msweet $".
+ * End of "$Id: process.c 12521 2015-02-17 20:00:17Z msweet $".
  */

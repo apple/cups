@@ -1,9 +1,9 @@
 /*
- * "$Id: encode.c 11733 2014-03-25 18:01:41Z msweet $"
+ * "$Id: encode.c 12668 2015-05-27 19:30:32Z msweet $"
  *
  * Option encoding routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -117,6 +117,9 @@ static const _ipp_option_t ipp_options[] =
   { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
 							IPP_TAG_DOCUMENT },
   { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "date-time-at-completed",IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "date-time-at-creation",	IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "date-time-at-processing",IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
   { 0, "device-uri",		IPP_TAG_URI,		IPP_TAG_PRINTER },
   { 1, "document-copies",	IPP_TAG_RANGE,		IPP_TAG_JOB,
 							IPP_TAG_DOCUMENT,
@@ -274,6 +277,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { 1, "printer-commands",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "printer-geo-location",	IPP_TAG_URI,		IPP_TAG_PRINTER },
   { 0, "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -849,5 +853,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 11733 2014-03-25 18:01:41Z msweet $".
+ * End of "$Id: encode.c 12668 2015-05-27 19:30:32Z msweet $".
  */

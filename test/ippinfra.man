@@ -1,0 +1,103 @@
+.\"
+.\" "$Id$"
+.\"
+.\" ippinfra man page for CUPS.
+.\"
+.\" Copyright 2014 by Apple Inc.
+.\"
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ippinfra 1 "CUPS" "16 September 2014" "Apple Inc."
+.SH NAME
+ippinfra \- a simple ipp infrastructure server
+.SH SYNOPSIS
+.B ippinfra
+[
+.B \-d
+.I spool-directory
+] [
+.B \-h
+] [
+.B \-k
+] [
+.B \-n
+.I hostname
+] [
+.B \-p
+.I port
+] [
+.B \-u
+.I username:password
+] [
+.B \-v[vvv]
+]
+.I service-name
+.SH DESCRIPTION
+.B ippinfra
+is a simple Internet Printing Protocol (IPP) infrastructure server conforming to the IPP Shared Infrastructure Extensions (INFRA) specification. It can be used as a very basic infrastructure server between standard IPP clients and IPP proxies conforming to the INFRA specification.
+.SH OPTIONS
+The following options are recognized by
+.B ippinfra:
+.TP 5
+\fB\-d \fIspool-directory\fR
+Specifies the directory that will hold the print files.
+The default is a directory under the user's current temporary directory.
+.TP 5
+.B \-h
+Shows program help.
+.TP 5
+.B \-k
+Keeps the print documents in the spool directory rather than deleting them.
+.TP 5
+\fB\-n \fIhostname\fR
+Specifies the hostname that is reported by the server.
+The default is the name returned by the
+.BR hostname (1)
+command.
+.TP 5
+\fB\-p \fIport\fR
+Specifies the port number to listen on.
+The default is a user-specific number from 8000 to 8999.
+.TP 5
+\fB\-u \fIusername:password\fR
+Specifies the username and password for the IPP proxy.
+The default is "test:test123".
+.TP 5
+.B \-v[vvv]
+Be (very) verbose when logging activity to the standard output.
+.SH EXIT STATUS
+The
+.B ippinfra
+program returns 1 if it is unable to process the command-line arguments.
+Otherwise
+.B ippinfra
+will run continuously until terminated.
+.SH CONFORMING TO
+The
+.B ippinfra
+program is unique to CUPS and conforms to the IPP Shared Infrastructure Extensions (INFRA) specification as an Infrastructure Printer.
+.SH EXAMPLES
+Run
+.B ippinfra
+with a service name of My Cool Printer:
+.nf
+
+    ippinfra "My Cool Printer"
+.fi
+.LP
+Specify a proxy username of "foo" and password of "bar":
+.nf
+
+    ippinfra \-u foo:bar "My Cool Printer"
+.fi
+.SH SEE ALSO
+PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
+.SH COPYRIGHT
+Copyright \[co] 2007-2014 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

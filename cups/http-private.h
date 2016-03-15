@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 12419 2015-01-22 15:51:20Z msweet $"
+ * "$Id: http-private.h 12645 2015-05-20 01:20:52Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
@@ -126,6 +126,7 @@ extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate)
 
 #  ifndef WIN32
 #    include <net/if.h>
+#    include <resolv.h>
 #    ifdef HAVE_GETIFADDRS
 #      include <ifaddrs.h>
 #    else
@@ -161,8 +162,11 @@ extern "C" {
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
 #define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
 
+#define _HTTP_TLS_NONE		0	/* No TLS options */
 #define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
 #define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
+#define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
+#define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
 
 
 /*
@@ -438,5 +442,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 12419 2015-01-22 15:51:20Z msweet $".
+ * End of "$Id: http-private.h 12645 2015-05-20 01:20:52Z msweet $".
  */

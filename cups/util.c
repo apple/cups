@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 12449 2015-01-29 20:32:16Z msweet $"
+ * "$Id: util.c 12448 2015-01-29 20:32:07Z msweet $"
  *
  * Printing utilities for CUPS.
  *
@@ -1655,5 +1655,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 12449 2015-01-29 20:32:16Z msweet $".
+ * End of "$Id: util.c 12448 2015-01-29 20:32:07Z msweet $".
  */

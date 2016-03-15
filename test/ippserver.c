@@ -1,5 +1,5 @@
 /*
- * "$Id: ippserver.c 12486 2015-02-04 13:13:21Z msweet $"
+ * "$Id: ippserver.c 12598 2015-05-05 18:57:57Z msweet $"
  *
  * Sample IPP Everywhere server for CUPS.
  *
@@ -1371,16 +1371,15 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   static const int	pwg_raster_document_resolution_supported[] =
   {
     150,
-    300,
-    600
+    300
   };
   static const char * const pwg_raster_document_type_supported[] =
   {
-    "black-1",
-    "cmyk-8",
-    "sgray-8",
-    "srgb-8",
-    "srgb-16"
+    "black_1",
+    "cmyk_8",
+    "sgray_8",
+    "srgb_8",
+    "srgb_16"
   };
   static const char * const reference_uri_schemes_supported[] =
   {					/* reference-uri-schemes-supported */
@@ -1402,7 +1401,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     "CP1",
     "IS1-5-7",
     "MT1-2-3-4-5-6-8-9-10-11-12-13",
-    "RS600",
+    "RS300",
     "SRGB24",
     "V1.4",
     "W8",
@@ -1992,6 +1991,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   {
     static const char * const names[] =
     {
+      "job-account-id",
       "job-accounting-user-id",
       "job-password"
     };
@@ -4812,7 +4812,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	    if (client->printer->state_reasons & reason)
 	      html_printf(client, "\n<br>&nbsp;&nbsp;&nbsp;&nbsp;%s", reasons[i]);
 	  html_printf(client, "</p>\n");
-	  
+
           if (cupsArrayCount(client->printer->jobs) > 0)
 	  {
             _cupsRWLockRead(&(client->printer->rwlock));
@@ -5603,6 +5603,11 @@ register_printer(
 #  ifdef HAVE_SSL
   TXTRecordSetValue(&ipp_txt, "TLS", 3, "1.2");
 #  endif /* HAVE_SSL */
+  if (strstr(formats, "image/urf"))
+    TXTRecordSetValue(&ipp_txt, "URF", 66, "CP1,IS1-5-7,MT1-2-3-4-5-6-8-9-10-11-12-13,RS300,SRGB24,V1.4,W8,DM1");
+
+  TXTRecordSetValue(&ipp_txt, "txtvers", 1, "1");
+  TXTRecordSetValue(&ipp_txt, "qtotal", 1, "1");
 
  /*
   * Register the _printer._tcp (LPD) service type with a port number of 0 to
@@ -6489,5 +6494,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id: ippserver.c 12486 2015-02-04 13:13:21Z msweet $".
+ * End of "$Id: ippserver.c 12598 2015-05-05 18:57:57Z msweet $".
  */

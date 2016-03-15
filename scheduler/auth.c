@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 12604 2015-05-06 01:43:05Z msweet $"
+ * "$Id: auth.c 12602 2015-05-05 20:19:35Z msweet $"
  *
  * Authorization routines for the CUPS scheduler.
  *
@@ -2336,5 +2336,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 12604 2015-05-06 01:43:05Z msweet $".
+ * End of "$Id: auth.c 12602 2015-05-05 20:19:35Z msweet $".
  */
