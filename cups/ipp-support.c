@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 11085 2013-07-03 13:53:05Z msweet $"
+ * "$Id: ipp-support.c 11734 2014-03-25 18:01:47Z msweet $"
  *
  *   Internet Printing Protocol support functions for CUPS.
  *
@@ -175,8 +175,8 @@ static const char * const ipp_std_ops[] =
 		  "Set-Printer-Attributes",
 		  "Set-Job-Attributes",
 		  "Get-Printer-Supported-Values",
-		  "Create-Printer-Subscription",
-		  "Create-Job-Subscription",
+		  "Create-Printer-Subscriptions",
+		  "Create-Job-Subscriptions",
 		  "Get-Subscription-Attributes",
 		  "Get-Subscriptions",
 		  "Renew-Subscription",
@@ -2083,6 +2083,12 @@ ippOpValue(const char *name)		/* I - Textual name */
     if (!_cups_strcasecmp(name, ipp_cups_ops2[i]))
       return ((ipp_op_t)(i + 0x4027));
 
+  if (!_cups_strcasecmp(name, "Create-Job-Subscription"))
+    return (IPP_OP_CREATE_JOB_SUBSCRIPTIONS);
+
+  if (!_cups_strcasecmp(name, "Create-Printer-Subscription"))
+    return (IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS);
+
   if (!_cups_strcasecmp(name, "CUPS-Add-Class"))
     return (IPP_OP_CUPS_ADD_MODIFY_CLASS);
 
@@ -2248,5 +2254,5 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 
 
 /*
- * End of "$Id: ipp-support.c 11085 2013-07-03 13:53:05Z msweet $".
+ * End of "$Id: ipp-support.c 11734 2014-03-25 18:01:47Z msweet $".
  */

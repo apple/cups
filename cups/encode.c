@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 11115 2013-07-10 14:35:53Z msweet $"
+ * "$Id: encode.c 11734 2014-03-25 18:01:47Z msweet $"
  *
  *   Option encoding routines for CUPS.
  *
@@ -41,7 +41,10 @@ static const ipp_op_t ipp_job_creation[] =
 {
   IPP_OP_PRINT_JOB,
   IPP_OP_PRINT_URI,
+  IPP_OP_VALIDATE_JOB,
   IPP_OP_CREATE_JOB,
+  IPP_OP_HOLD_JOB,
+  IPP_OP_SET_JOB_ATTRIBUTES,
   IPP_OP_CUPS_NONE
 };
 
@@ -51,6 +54,8 @@ static const ipp_op_t ipp_doc_creation[] =
   IPP_OP_PRINT_URI,
   IPP_OP_SEND_DOCUMENT,
   IPP_OP_SEND_URI,
+  IPP_OP_SET_JOB_ATTRIBUTES,
+  IPP_OP_SET_DOCUMENT_ATTRIBUTES,
   IPP_OP_CUPS_NONE
 };
 
@@ -59,8 +64,8 @@ static const ipp_op_t ipp_sub_creation[] =
   IPP_OP_PRINT_JOB,
   IPP_OP_PRINT_URI,
   IPP_OP_CREATE_JOB,
-  IPP_OP_CREATE_PRINTER_SUBSCRIPTION,
-  IPP_OP_CREATE_JOB_SUBSCRIPTION,
+  IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS,
+  IPP_OP_CREATE_JOB_SUBSCRIPTIONS,
   IPP_OP_CUPS_NONE
 };
 
@@ -68,6 +73,7 @@ static const ipp_op_t ipp_all_print[] =
 {
   IPP_OP_PRINT_JOB,
   IPP_OP_PRINT_URI,
+  IPP_OP_VALIDATE_JOB,
   IPP_OP_CREATE_JOB,
   IPP_OP_SEND_DOCUMENT,
   IPP_OP_SEND_URI,
@@ -872,5 +878,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 11115 2013-07-10 14:35:53Z msweet $".
+ * End of "$Id: encode.c 11734 2014-03-25 18:01:47Z msweet $".
  */

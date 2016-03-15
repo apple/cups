@@ -1,0 +1,46 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{printer_name} ändern</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Beschreibung:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Für Menschen lesbare Beschreibung wie "HP LaserJet with Duplexer")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Ort:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Für Menschen lesbarer Ort wie "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Verbindung:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Freigabe:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
+Diesen Drucker im Netz freigeben</TD>
+</TR>
+<TR>
+<TH CLASS="label">Farbmanagement:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_COLORMANAGED" {PRINTER_IS_COLORMANAGED=1?CHECKED:}>
+Einschalten</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Weiter"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

@@ -1,5 +1,51 @@
-CHANGES.txt - 1.7.1 - 2014-01-08
+CHANGES.txt - 1.7.2 - 2014-04-10
 --------------------------------
+
+CHANGES IN CUPS V1.7.2
+
+	- Security: The scheduler now blocks URLs containing embedded HTML
+	  (STR #4356)
+	- Documentation fixes (STR #3259, STR #4346, STR #4355)
+	- Fixed the Japanese localization (STR #4385)
+	- Added a German localization (STR #4363)
+	- The cupsfilter command incorrectly read the cupsd.conf file; it now
+	  reads the cups-files.conf file instead.
+	- Fixed OS X builds with Xcode 5.x (<rdar://problem/15914959>)
+	- Fixed SSL support on Windows (STR #4358)
+	- Fixed documentation and naming of Create-Job/Printer-Subscriptions
+	  operations (STR #4389)
+	- Phone numbers in fax jobs were not properly filtered for IPP FaxOut
+	  (<rdar://problem/16351701>)
+	- Fixed a memory leak in the label printer driver (STR #4393)
+	- Updated Linux "relro" support (STR #4349)
+	- cupsEnumDests did not set the "is_default" field (STR #4332)
+	- cupsDoIORequest could miss the server status, causing failed lpadmin
+	  and other administrative commands (STR #4386)
+	- cupsEnumDests didn't always call the callback function (STR #4380)
+	- "lp -i job-id -H hold" did not work (STR #nnn)
+	- CUPS didn't compile on older platforms (STR #4338)
+	- Several libcups files did not have the Apple license exception
+	  notice (STR #4361)
+	- Fixed a D-BUS threading issue that caused the scheduler to crash
+	  (STR #4347)
+	- The scheduler now automatically reconnects to Avahi as needed
+	  (STR #4370, STR #4373)
+	- The scheduler did not handle GET requests for the log files properly
+	  (STR #3265)
+	- The dnssd backend did not always report all discovered printers using
+	  Avahi (STR #4365)
+	- The Zebra printer driver did not properly handle negative "label top"
+	  values (STR #4354)
+	- The scheduler did not always update the MakeModel value in
+	  printers.conf after updating the driver (STR #4264)
+	- The LPD mini daemon did not support print jobs larger than 2GB
+	  (STR #4351)
+	- Fixed a bug in the status reading code when sending a compressed data
+	  stream to an IPP printer/server (<rdar://problem/16019623>)
+	- The IPP backend might not include all job attributes in Validate-Job
+	  operations (<rdar://problem/16025435>)
+	- Fixed some clang-reported issues (<rdar://problem/15936066>)
+
 
 CHANGES IN CUPS V1.7.1
 

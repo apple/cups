@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 11141 2013-07-16 14:58:25Z msweet $"
+ * "$Id: dest.c 11688 2014-03-05 21:11:32Z msweet $"
  *
  *   User-defined destination (and option) support for CUPS.
  *
@@ -891,6 +891,10 @@ cupsEnumDests(
 			num_dests;	/* Number of destinations */
   cups_dest_t		*dests = NULL,	/* Destinations */
 			*dest;		/* Current destination */
+  const char		*defprinter;	/* Default printer */
+  char			name[1024],	/* Copy of printer name */
+			*instance,	/* Pointer to instance name */
+			*user_default;	/* User default printer */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   int			count,		/* Number of queries started */
 			remaining;	/* Remainder of timeout */
@@ -936,6 +940,31 @@ cupsEnumDests(
   num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
                             &dests, type, mask);
 
+  if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
+    defprinter = name;
+  else if ((defprinter = cupsGetDefault2(CUPS_HTTP_DEFAULT)) != NULL)
+  {
+    strlcpy(name, defprinter, sizeof(name));
+    defprinter = name;
+  }
+
+  if (defprinter)
+  {
+   /*
+    * Separate printer and instance name...
+    */
+
+    if ((instance = strchr(name, '/')) != NULL)
+      *instance++ = '\0';
+
+   /*
+    * Lookup the printer and instance and make it the default...
+    */
+
+    if ((dest = cupsGetDest(name, instance, num_dests, dests)) != NULL)
+      dest->is_default = 1;
+  }
+
   for (i = num_dests, dest = dests;
        i > 0 && (!cancel || !*cancel);
        i --, dest ++)
@@ -953,11 +982,11 @@ cupsEnumDests(
   * Get Bonjour-shared printers...
   */
 
-  data.type    = type;
-  data.mask    = mask;
-  data.devices = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices,
-                               NULL, NULL, 0, NULL,
-                               (cups_afree_func_t)cups_dnssd_free_device);
+  data.type      = type;
+  data.mask      = mask;
+  data.cb        = cb;
+  data.user_data = user_data;
+  data.devices   = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices, NULL, NULL, 0, NULL, (cups_afree_func_t)cups_dnssd_free_device);
 
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
@@ -3891,5 +3920,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 11141 2013-07-16 14:58:25Z msweet $".
+ * End of "$Id: dest.c 11688 2014-03-05 21:11:32Z msweet $".
  */

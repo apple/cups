@@ -1,7 +1,7 @@
 /*
-* "$Id: usb-darwin.c 10996 2013-05-29 11:51:34Z msweet $"
+* "$Id: usb-darwin.c 11670 2014-03-04 14:53:59Z msweet $"
 *
-* Copyright 2005-2013 Apple Inc. All rights reserved.
+* Copyright 2005-2014 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -40,35 +40,6 @@
 * AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
 * STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
 * POSSIBILITY OF SUCH DAMAGE.
-*
-* Contents:
-*
- *   list_devices()       - List all USB devices.
- *   print_device()       - Print a file to a USB device.
- *   read_thread()        - Thread to read the backchannel data on.
- *   sidechannel_thread() - Handle side-channel requests.
- *   iterate_printers()   - Iterate over all the printers.
- *   device_added()       - Device added notifier.
- *   list_device_cb()     - list_device iterator callback.
- *   find_device_cb()     - print_device iterator callback.
- *   status_timer_cb()    - Status timer callback.
- *   copy_deviceinfo()    - Copy strings from the 1284 device ID.
- *   release_deviceinfo() - Release deviceinfo strings.
- *   load_classdriver()   - Load a classdriver.
- *   unload_classdriver() - Unload a classdriver.
- *   load_printerdriver() - Load vendor's classdriver.
- *   registry_open()      - Open a connection to the printer.
- *   registry_close()     - Close the connection to the printer.
- *   copy_deviceid()      - Copy the 1284 device id string.
- *   copy_devicestring()  - Copy the 1284 device id string.
- *   copy_value_for_key() - Copy value string associated with a key.
- *   cfstr_create_trim()  - Create CFString and trim whitespace characters.
- *   parse_options()      - Parse URI options.
- *   sigterm_handler()    - SIGTERM handler.
- *   next_line()          - Find the next line in a buffer.
- *   parse_pserror()      - Scan the backchannel data for postscript errors.
- *   soft_reset()         - Send a soft reset to the device.
- *   get_device_id()      - Return IEEE-1284 device ID.
 */
 
 /*
@@ -97,7 +68,7 @@
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <libproc.h>
-
+#include <asl.h>
 #include <spawn.h>
 #include <pthread.h>
 
@@ -309,6 +280,9 @@ static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRe
 static void setup_cfLanguage(void);
 static void soft_reset(void);
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
+static void log_usb_class_driver(int is_64bit);
+#define IS_64BIT 1
+#define IS_NOT_64BIT 0
 
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
@@ -476,6 +450,11 @@ print_device(const char *uri,		/* I - Device URI */
 
       return (CUPS_BACKEND_STOP);
     }
+
+#ifdef __x86_64__
+    if (status == noErr && driverBundlePath != NULL && CFStringCompare(driverBundlePath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo)
+      log_usb_class_driver(IS_64BIT);
+#endif /* __x86_64__ */
 
     if (driverBundlePath)
       CFRelease(driverBundlePath);
@@ -1607,7 +1586,7 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
   CFStringRef deviceMake = NULL;
   CFStringRef deviceModel = NULL;
   CFStringRef deviceSerial = NULL;
-  
+
   *deviceID = NULL;
 
   OSStatus err = (*classdriver)->GetDeviceID(classdriver, &devID, DEFAULT_TIMEOUT);
@@ -1682,13 +1661,13 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
   CFRange range = (deviceSerial != NULL ? CFStringFind(deviceSerial, CFSTR("+"), 0) : CFRangeMake(0, 0));
   if (range.length == 1) {
       range = CFStringFind(*deviceID, deviceSerial, 0);
-      
+
       CFMutableStringRef deviceIDString = CFStringCreateMutableCopy(NULL, 0, *deviceID);
       CFStringFindAndReplace(deviceIDString, CFSTR("+"), CFSTR(""), range, 0);
       CFRelease(*deviceID);
       *deviceID = deviceIDString;
   }
-  
+
   release_deviceinfo(&deviceMake, &deviceModel, &deviceSerial);
 
   return err;
@@ -1976,6 +1955,8 @@ static void run_legacy_backend(int argc,
 
   if (!usb_legacy_status)
   {
+    log_usb_class_driver(IS_NOT_64BIT);
+
    /*
     * Setup a SIGTERM handler then block it before forking...
     */
@@ -2338,6 +2319,32 @@ static void get_device_id(cups_sc_status_t *status,
 }
 
 
+static void
+log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
+{
+ /*
+  * Report the usage of legacy USB class drivers to Apple if the user opts into providing
+  * feedback to Apple...
+  */
+
+  aslmsg aslm = asl_new(ASL_TYPE_MSG);
+  if (aslm)
+  {
+    ppd_file_t *ppd = ppdOpenFile(getenv("PPD"));
+    const char *make_model = ppd ? ppd->nickname : NULL;
+    ppd_attr_t *version = ppdFindAttr(ppd, "FileVersion", "");
+
+    asl_set(aslm, "com.apple.message.domain", "com.apple.printing.usb.64bit");
+    asl_set(aslm, "com.apple.message.result", is_64bit ? "yes" : "no");
+    asl_set(aslm, "com.apple.message.signature", make_model ? make_model : "Unknown");
+    asl_set(aslm, "com.apple.message.signature2", version ? version->value : "?.?");
+    asl_set(aslm, "com.apple.message.summarize", "YES");
+    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "");
+    asl_free(aslm);
+  }
+}
+
+
 /*
- * End of "$Id: usb-darwin.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: usb-darwin.c 11670 2014-03-04 14:53:59Z msweet $".
  */

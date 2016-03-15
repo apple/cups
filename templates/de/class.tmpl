@@ -1,0 +1,44 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Im Leerlauf:{printer_state=4?Beschäftigt:Angehalten}},
+{printer_is_accepting_jobs=0?Aufträge werden ablehnt:Aufträge werden akzeptiert},
+{server_is_sharing_printers=0?Keine (Server):{printer_is_shared=0?Keine:}} Netzfreigabe{default_name={printer_name}?, Standarddrucker:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Wartung</OPTION>
+<OPTION VALUE="print-test-page">Drucke Testseite</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Klasse starten</OPTION>:<OPTION VALUE="stop-class">Klasse stoppen</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Aufträge akzeptieren</OPTION>:<OPTION VALUE="reject-jobs">Aufträge ablehnen</OPTION>}
+<OPTION VALUE="move-jobs">Alle Aufträge verschieben</OPTION>
+<OPTION VALUE="purge-jobs">Alle Aufträge abbrechen</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administration</OPTION>
+<OPTION VALUE="modify-class">Klasse ändern</OPTION>
+<OPTION VALUE="delete-class">Klasse löschen</OPTION>
+<OPTION VALUE="set-class-options">Standardeinstellungen festlegen</OPTION>
+<OPTION VALUE="set-as-default">Als Standard festlegen</OPTION>
+<OPTION VALUE="set-allowed-users">Erlaubte Benutzer festlegen</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Beschreibung:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Ort:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Mitglieder:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Standardeinstellungen:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unbekannt}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

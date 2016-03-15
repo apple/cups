@@ -1,9 +1,9 @@
 /*
- * "$Id: ipptool.c 11370 2013-10-30 15:08:29Z msweet $"
+ * "$Id: ipptool.c 11707 2014-03-19 18:38:23Z msweet $"
  *
  * ipptool command for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -138,7 +138,9 @@ int		Cancel = 0,		/* Cancel test? */
 		PassCount = 0,		/* Number of passing tests */
 		FailCount = 0,		/* Number of failing tests */
 		SkipCount = 0;		/* Number of skipped tests */
-char		*Password = NULL;	/* Password from URI */
+static char	*Username = NULL,	/* Username from URI */
+		*Password = NULL;	/* Password from URI */
+static int	PasswordTries = 0;	/* Number of tries with password */
 const char * const URIStatusStrings[] =	/* URI status strings */
 {
   "URI too large",
@@ -608,7 +610,7 @@ main(int  argc,				/* I - Number of command-line args */
         if ((Password = strchr(vars.userpass, ':')) != NULL)
 	  *Password++ = '\0';
 
-        cupsSetUser(vars.userpass);
+        Username = vars.userpass;
 	cupsSetPasswordCB(password_cb);
 	set_variable(&vars, "uriuser", vars.userpass);
       }
@@ -2427,6 +2429,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       goto skip_error;
     }
 
+    PasswordTries   = 0;
     repeat_count    = 0;
     repeat_interval = 1;
     repeat_prev     = 1;
@@ -2435,7 +2438,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     {
       repeat_count ++;
 
-      status = HTTP_OK;
+      status = HTTP_STATUS_OK;
 
       if (transfer == _CUPS_TRANSFER_CHUNKED ||
 	  (transfer == _CUPS_TRANSFER_AUTO && filename[0]))
@@ -2475,7 +2478,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       repeat_test = 0;
       prev_pass   = 1;
 
-      if (status != HTTP_ERROR)
+      if (status != HTTP_STATUS_ERROR)
       {
 	while (!response && !Cancel && prev_pass)
 	{
@@ -2486,7 +2489,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    httpSetField(http, HTTP_FIELD_CONTENT_ENCODING, compression);
 #endif /* HAVE_LIBZ */
 
-	  if (!Cancel && status == HTTP_CONTINUE &&
+	  if (!Cancel && status == HTTP_STATUS_CONTINUE &&
 	      request->state == IPP_DATA && filename[0])
 	  {
 	    if ((reqfile = cupsFileOpen(filename, "r")) != NULL)
@@ -2495,7 +2498,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	             (bytes = cupsFileRead(reqfile, buffer,
 	                                   sizeof(buffer))) > 0)
 		if ((status = cupsWriteRequestData(http, buffer,
-						   bytes)) != HTTP_CONTINUE)
+						   bytes)) != HTTP_STATUS_CONTINUE)
 		  break;
 
 	      cupsFileClose(reqfile);
@@ -2506,7 +2509,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		       strerror(errno));
 	      _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
 
-	      status = HTTP_ERROR;
+	      status = HTTP_STATUS_ERROR;
 	    }
 	  }
 
@@ -2514,13 +2517,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  * Get the server's response...
 	  */
 
-	  if (!Cancel && status != HTTP_ERROR)
+	  if (!Cancel && status != HTTP_STATUS_ERROR)
 	  {
 	    response = cupsGetResponse(http, resource);
 	    status   = httpGetStatus(http);
 	  }
 
-	  if (!Cancel && status == HTTP_ERROR && http->error != EINVAL &&
+	  if (!Cancel && status == HTTP_STATUS_ERROR && http->error != EINVAL &&
 #ifdef WIN32
 	      http->error != WSAETIMEDOUT)
 #else
@@ -2530,12 +2533,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    if (httpReconnect(http))
 	      prev_pass = 0;
 	  }
-	  else if (status == HTTP_ERROR)
+	  else if (status == HTTP_STATUS_ERROR || status == HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED)
 	  {
 	    prev_pass = 0;
 	    break;
 	  }
-	  else if (status != HTTP_OK)
+	  else if (status != HTTP_STATUS_OK)
 	  {
 	    httpFlush(http);
 
@@ -2547,7 +2550,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
       }
 
-      if (!Cancel && status == HTTP_ERROR && http->error != EINVAL &&
+      if (!Cancel && status == HTTP_STATUS_ERROR && http->error != EINVAL &&
 #ifdef WIN32
 	  http->error != WSAETIMEDOUT)
 #else
@@ -2557,14 +2560,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (httpReconnect(http))
 	  prev_pass = 0;
       }
-      else if (status == HTTP_ERROR)
+      else if (status == HTTP_STATUS_ERROR)
       {
         if (!Cancel)
           httpReconnect(http);
 
 	prev_pass = 0;
       }
-      else if (status != HTTP_OK)
+      else if (status != HTTP_STATUS_OK)
       {
         httpFlush(http);
         prev_pass = 0;
@@ -3929,7 +3932,16 @@ password_cb(const char *prompt)		/* I - Prompt (unused) */
 {
   (void)prompt;
 
-  return (Password);
+  if (PasswordTries < 3)
+  {
+    PasswordTries ++;
+
+    cupsSetUser(Username);
+
+    return (Password);
+  }
+  else
+    return (NULL);
 }
 
 
@@ -5750,5 +5762,5 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
 
 /*
- * End of "$Id: ipptool.c 11370 2013-10-30 15:08:29Z msweet $".
+ * End of "$Id: ipptool.c 11707 2014-03-19 18:38:23Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 11374 2013-11-04 23:49:10Z msweet $"
+ * "$Id: file.c 11642 2014-02-27 15:57:59Z msweet $"
  *
  * File functions for CUPS.
  *
@@ -16,6 +16,8 @@
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * which should have been included with this file.  If this file is
  * file is missing or damaged, see the license at "http://www.cups.org/".
+ *
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -2670,5 +2672,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 11374 2013-11-04 23:49:10Z msweet $".
+ * End of "$Id: file.c 11642 2014-02-27 15:57:59Z msweet $".
  */

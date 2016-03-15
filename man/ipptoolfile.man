@@ -1,17 +1,17 @@
 .\"
-.\" "$Id: ipptoolfile.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: ipptoolfile.man 11734 2014-03-25 18:01:47Z msweet $"
 .\"
-.\"   ipptoolfile man page for CUPS.
+.\" ipptoolfile man page for CUPS.
 .\"
-.\"   Copyright 2010-2013 by Apple Inc.
+.\" Copyright 2010-2014 by Apple Inc.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "13 May 2013" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "25 March 2014" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -152,7 +152,7 @@ The following directives are understood in a test:
 .TP 5
 ATTR tag attribute-name value(s)
 Adds an attribute to the test request. Values are separated by the comma (",")
-character - escape commas using the "\" character.
+character - escape commas using the "\" character. Common attributes and values are listed in the IANA IPP registry - see references below.
 .TP 5
 ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
 Adds a collection attribute to the test request. Member attributes follow the
@@ -423,8 +423,8 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Cancel-Subscription
     Close-Job
     Create-Job
-    Create-Job-Subscription
-    Create-Printer-Subscription
+    Create-Job-Subscriptions
+    Create-Printer-Subscriptions
     Deactivate-Printer
     Disable-Printer
     Enable-Printer
@@ -614,12 +614,15 @@ $username
 Inserts the username from the URI provided to \fIipptool\fR, if any.
 
 .SH SEE ALSO
-\fIipptool(1)\fR,
+\fIipptool(1)\fR, RFC 2911,
 .br
 http://localhost:631/help
-
+.br
+http://www.iana.org/assignments/ipp-registrations
+.br
+http://www.pwg.org/ipp
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ipptoolfile.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: ipptoolfile.man 11734 2014-03-25 18:01:47Z msweet $".
 .\"

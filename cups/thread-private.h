@@ -1,5 +1,5 @@
 /*
- * "$Id: thread-private.h 3794 2012-04-23 22:44:16Z msweet $"
+ * "$Id: thread-private.h 11642 2014-02-27 15:57:59Z msweet $"
  *
  *   Private threading definitions for CUPS.
  *
@@ -10,6 +10,8 @@
  *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  *   which should have been included with this file.  If this file is
  *   file is missing or damaged, see the license at "http://www.cups.org/".
+ *
+ *   This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_THREAD_PRIVATE_H_
@@ -94,5 +96,5 @@ extern int	_cupsThreadCreate(_cups_thread_func_t func, void *arg);
 #endif /* !_CUPS_THREAD_PRIVATE_H_ */
 
 /*
- * End of "$Id: thread-private.h 3794 2012-04-23 22:44:16Z msweet $".
+ * End of "$Id: thread-private.h 11642 2014-02-27 15:57:59Z msweet $".
  */

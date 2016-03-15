@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 11418 2013-11-08 15:18:01Z msweet $"
+ * "$Id: printers.c 11623 2014-02-19 20:18:10Z msweet $"
  *
  * Printer routines for the CUPS scheduler.
  *
@@ -50,7 +50,6 @@ static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
 static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
-static void	log_ipp_conformance(cupsd_printer_t *p, const char *reason);
 static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
 		               const char *type);
 static void	write_xml_string(cups_file_t *fp, const char *s);
@@ -2486,10 +2485,6 @@ cupsdSetPrinterReasons(
 
       if (i >= p->num_reasons)
       {
-        if (!strncmp(reason, "cups-ipp-missing-", 17) ||
-	    !strncmp(reason, "cups-ipp-wrong-", 15))
-	  log_ipp_conformance(p, reason);
-
         if (i >= (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
 	{
 	  cupsdLogMessage(CUPSD_LOG_ALERT,
@@ -3678,6 +3673,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
 
+  cupsdClearString(&(p->make_model));
+
   if (cache_info.st_mtime >= ppd_info.st_mtime)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", cache_name);
@@ -4851,83 +4848,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
 
 /*
- * 'log_ipp_conformance()' - Log an IPP conformance issue with a printer.
- */
-
-static void
-log_ipp_conformance(
-    cupsd_printer_t *p,			/* I - Printer */
-    const char      *reason)		/* I - Printer state reason */
-{
-  const char	*message;		/* Message to log */
-#ifdef __APPLE__
-  aslmsg	aslm;			/* Apple System Log message */
-#endif /* __APPLE__ */
-
-
- /*
-  * Strip the leading "cups-ipp-" from the reason and create a log message for
-  * it...
-  */
-
-  reason += 9;
-  if (!strcmp(reason, "missing-cancel-job"))
-    message = "Printer does not support REQUIRED Cancel-Job operation.";
-  else if (!strcmp(reason, "missing-get-job-attributes"))
-    message = "Printer does not support REQUIRED Get-Job-Attributes operation.";
-  else if (!strcmp(reason, "missing-print-job"))
-    message = "Printer does not support REQUIRED Print-Job operation.";
-  else if (!strcmp(reason, "missing-validate-job"))
-    message = "Printer does not support REQUIRED Validate-Job operation.";
-  else if (!strcmp(reason, "missing-get-printer-attributes"))
-    message = "Printer does not support REQUIRED Get-Printer-Attributes operation.";
-  else if (!strcmp(reason, "missing-send-document"))
-    message = "Printer supports Create-Job but not Send-Document operation.";
-  else if (!strcmp(reason, "missing-job-history"))
-    message = "Printer does not provide REQUIRED job history.";
-  else if (!strcmp(reason, "missing-job-id"))
-    message = "Printer does not provide REQUIRED job-id attribute.";
-  else if (!strcmp(reason, "missing-job-state"))
-    message = "Printer does not provide REQUIRED job-state attribute.";
-  else if (!strcmp(reason, "missing-operations-supported"))
-    message = "Printer does not provide REQUIRED operations-supported "
-              "attribute.";
-  else if (!strcmp(reason, "missing-printer-is-accepting-jobs"))
-    message = "Printer does not provide REQUIRED printer-is-accepting-jobs "
-              "attribute.";
-  else if (!strcmp(reason, "missing-printer-state-reasons"))
-    message = "Printer does not provide REQUIRED printer-state-reasons "
-              "attribute.";
-  else if (!strcmp(reason, "wrong-http-version"))
-    message = "Printer does not use REQUIRED HTTP/1.1 transport.";
-  else
-    message = "Unknown IPP conformance failure.";
-
-  cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, message);
-
-#ifdef __APPLE__
- /*
-  * Report the failure information to Apple if the user opts into providing
-  * feedback to Apple...
-  */
-
-  aslm = asl_new(ASL_TYPE_MSG);
-  if (aslm)
-  {
-    asl_set(aslm, "com.apple.message.domain", "com.apple.printing.ipp.conformance");
-    asl_set(aslm, "com.apple.message.domain_scope", "com.apple.printing.ipp.conformance");
-    asl_set(aslm, "com.apple.message.signature", reason);
-    asl_set(aslm, "com.apple.message.signature2",
-	    p->make_model ? p->make_model : "Unknown");
-    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "%s: %s",
-            p->make_model ? p->make_model : "Unknown", message);
-    asl_free(aslm);
-  }
-#endif /* __APPLE__ */
-}
-
-
-/*
  * 'new_media_col()' - Create a media-col collection value.
  */
 
@@ -5011,5 +4931,5 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: printers.c 11418 2013-11-08 15:18:01Z msweet $".
+ * End of "$Id: printers.c 11623 2014-02-19 20:18:10Z msweet $".
  */

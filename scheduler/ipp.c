@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11500 2014-01-06 22:21:15Z msweet $"
+ * "$Id: ipp.c 11734 2014-03-25 18:01:47Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
@@ -85,7 +85,7 @@ static void	copy_subscription_attrs(cupsd_client_t *con,
 					cups_array_t *exclude);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static cups_array_t *create_requested_array(ipp_t *request);
-static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	create_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_default(cupsd_client_t *con);
 static void	get_devices(cupsd_client_t *con);
@@ -437,176 +437,176 @@ cupsdProcessIPPRequest(
 
 	switch (con->request->request.op.operation_id)
 	{
-	  case IPP_PRINT_JOB :
+	  case IPP_OP_PRINT_JOB :
               print_job(con, uri);
               break;
 
-	  case IPP_VALIDATE_JOB :
+	  case IPP_OP_VALIDATE_JOB :
               validate_job(con, uri);
               break;
 
-	  case IPP_CREATE_JOB :
+	  case IPP_OP_CREATE_JOB :
               create_job(con, uri);
               break;
 
-	  case IPP_SEND_DOCUMENT :
+	  case IPP_OP_SEND_DOCUMENT :
               send_document(con, uri);
               break;
 
-	  case IPP_CANCEL_JOB :
+	  case IPP_OP_CANCEL_JOB :
               cancel_job(con, uri);
               break;
 
-	  case IPP_GET_JOB_ATTRIBUTES :
+	  case IPP_OP_GET_JOB_ATTRIBUTES :
               get_job_attrs(con, uri);
               break;
 
-	  case IPP_GET_JOBS :
+	  case IPP_OP_GET_JOBS :
               get_jobs(con, uri);
               break;
 
-	  case IPP_GET_PRINTER_ATTRIBUTES :
+	  case IPP_OP_GET_PRINTER_ATTRIBUTES :
               get_printer_attrs(con, uri);
               break;
 
-	  case IPP_GET_PRINTER_SUPPORTED_VALUES :
+	  case IPP_OP_GET_PRINTER_SUPPORTED_VALUES :
               get_printer_supported(con, uri);
               break;
 
-	  case IPP_HOLD_JOB :
+	  case IPP_OP_HOLD_JOB :
               hold_job(con, uri);
               break;
 
-	  case IPP_RELEASE_JOB :
+	  case IPP_OP_RELEASE_JOB :
               release_job(con, uri);
               break;
 
-	  case IPP_RESTART_JOB :
+	  case IPP_OP_RESTART_JOB :
               restart_job(con, uri);
               break;
 
-	  case IPP_PAUSE_PRINTER :
+	  case IPP_OP_PAUSE_PRINTER :
               stop_printer(con, uri);
 	      break;
 
-	  case IPP_RESUME_PRINTER :
+	  case IPP_OP_RESUME_PRINTER :
               start_printer(con, uri);
 	      break;
 
-	  case IPP_PURGE_JOBS :
-	  case IPP_CANCEL_JOBS :
-	  case IPP_CANCEL_MY_JOBS :
+	  case IPP_OP_PURGE_JOBS :
+	  case IPP_OP_CANCEL_JOBS :
+	  case IPP_OP_CANCEL_MY_JOBS :
               cancel_all_jobs(con, uri);
               break;
 
-	  case IPP_SET_JOB_ATTRIBUTES :
+	  case IPP_OP_SET_JOB_ATTRIBUTES :
               set_job_attrs(con, uri);
               break;
 
-	  case IPP_SET_PRINTER_ATTRIBUTES :
+	  case IPP_OP_SET_PRINTER_ATTRIBUTES :
               set_printer_attrs(con, uri);
               break;
 
-	  case IPP_HOLD_NEW_JOBS :
+	  case IPP_OP_HOLD_NEW_JOBS :
               hold_new_jobs(con, uri);
               break;
 
-	  case IPP_RELEASE_HELD_NEW_JOBS :
+	  case IPP_OP_RELEASE_HELD_NEW_JOBS :
               release_held_new_jobs(con, uri);
               break;
 
-	  case IPP_CLOSE_JOB :
+	  case IPP_OP_CLOSE_JOB :
               close_job(con, uri);
               break;
 
-	  case CUPS_GET_DEFAULT :
+	  case IPP_OP_CUPS_GET_DEFAULT :
               get_default(con);
               break;
 
-	  case CUPS_GET_PRINTERS :
+	  case IPP_OP_CUPS_GET_PRINTERS :
               get_printers(con, 0);
               break;
 
-	  case CUPS_GET_CLASSES :
+	  case IPP_OP_CUPS_GET_CLASSES :
               get_printers(con, CUPS_PRINTER_CLASS);
               break;
 
-	  case CUPS_ADD_PRINTER :
+	  case IPP_OP_CUPS_ADD_MODIFY_PRINTER :
               add_printer(con, uri);
               break;
 
-	  case CUPS_DELETE_PRINTER :
+	  case IPP_OP_CUPS_DELETE_PRINTER :
               delete_printer(con, uri);
               break;
 
-	  case CUPS_ADD_CLASS :
+	  case IPP_OP_CUPS_ADD_MODIFY_CLASS :
               add_class(con, uri);
               break;
 
-	  case CUPS_DELETE_CLASS :
+	  case IPP_OP_CUPS_DELETE_CLASS :
               delete_printer(con, uri);
               break;
 
-	  case CUPS_ACCEPT_JOBS :
-	  case IPP_ENABLE_PRINTER :
+	  case IPP_OP_CUPS_ACCEPT_JOBS :
+	  case IPP_OP_ENABLE_PRINTER :
               accept_jobs(con, uri);
               break;
 
-	  case CUPS_REJECT_JOBS :
-	  case IPP_DISABLE_PRINTER :
+	  case IPP_OP_CUPS_REJECT_JOBS :
+	  case IPP_OP_DISABLE_PRINTER :
               reject_jobs(con, uri);
               break;
 
-	  case CUPS_SET_DEFAULT :
+	  case IPP_OP_CUPS_SET_DEFAULT :
               set_default(con, uri);
               break;
 
-	  case CUPS_GET_DEVICES :
+	  case IPP_OP_CUPS_GET_DEVICES :
               get_devices(con);
               break;
 
-          case CUPS_GET_DOCUMENT :
+          case IPP_OP_CUPS_GET_DOCUMENT :
 	      get_document(con, uri);
 	      break;
 
-	  case CUPS_GET_PPD :
+	  case IPP_OP_CUPS_GET_PPD :
               get_ppd(con, uri);
               break;
 
-	  case CUPS_GET_PPDS :
+	  case IPP_OP_CUPS_GET_PPDS :
               get_ppds(con);
               break;
 
-	  case CUPS_MOVE_JOB :
+	  case IPP_OP_CUPS_MOVE_JOB :
               move_job(con, uri);
               break;
 
-	  case CUPS_AUTHENTICATE_JOB :
+	  case IPP_OP_CUPS_AUTHENTICATE_JOB :
               authenticate_job(con, uri);
               break;
 
-          case IPP_CREATE_PRINTER_SUBSCRIPTION :
-	  case IPP_CREATE_JOB_SUBSCRIPTION :
-	      create_subscription(con, uri);
+          case IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS :
+	  case IPP_OP_CREATE_JOB_SUBSCRIPTIONS :
+	      create_subscriptions(con, uri);
 	      break;
 
-          case IPP_GET_SUBSCRIPTION_ATTRIBUTES :
+          case IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES :
 	      get_subscription_attrs(con, sub_id);
 	      break;
 
-	  case IPP_GET_SUBSCRIPTIONS :
+	  case IPP_OP_GET_SUBSCRIPTIONS :
 	      get_subscriptions(con, uri);
 	      break;
 
-	  case IPP_RENEW_SUBSCRIPTION :
+	  case IPP_OP_RENEW_SUBSCRIPTION :
 	      renew_subscription(con, sub_id);
 	      break;
 
-	  case IPP_CANCEL_SUBSCRIPTION :
+	  case IPP_OP_CANCEL_SUBSCRIPTION :
 	      cancel_subscription(con, sub_id);
 	      break;
 
-          case IPP_GET_NOTIFICATIONS :
+          case IPP_OP_GET_NOTIFICATIONS :
 	      get_notifications(con);
 	      break;
 
@@ -5224,11 +5224,11 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
 
 
 /*
- * 'create_subscription()' - Create a notification subscription.
+ * 'create_subscriptions()' - Create one or more notification subscriptions.
  */
 
 static void
-create_subscription(
+create_subscriptions(
     cupsd_client_t  *con,		/* I - Client connection */
     ipp_attribute_t *uri)		/* I - Printer URI */
 {
@@ -5276,9 +5276,7 @@ create_subscription(
   * Is the destination valid?
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "cupsdCreateSubscription(con=%p(%d), uri=\"%s\")",
-                  con, con->http.fd, uri->values[0].string.text);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "create_subscriptions(con=%p(%d), uri=\"%s\")", con, con->http.fd, uri->values[0].string.text);
 
   httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
                   sizeof(scheme), userpass, sizeof(userpass), host,
@@ -5529,7 +5527,7 @@ create_subscription(
     if (MaxLeaseDuration && (lease == 0 || lease > MaxLeaseDuration))
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "create_subscription: Limiting notify-lease-duration to "
+                      "create_subscriptions: Limiting notify-lease-duration to "
 		      "%d seconds.",
 		      MaxLeaseDuration);
       lease = MaxLeaseDuration;
@@ -11016,5 +11014,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 11500 2014-01-06 22:21:15Z msweet $".
+ * End of "$Id: ipp.c 11734 2014-03-25 18:01:47Z msweet $".
  */

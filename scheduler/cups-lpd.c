@@ -1,27 +1,16 @@
 /*
- * "$Id: cups-lpd.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: cups-lpd.c 11623 2014-02-19 20:18:10Z msweet $"
  *
- *   Line Printer Daemon interface for CUPS.
+ * Line Printer Daemon interface for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()           - Process an incoming LPD request...
- *   create_job()     - Create a new print job.
- *   get_printer()    - Get the named printer and its options.
- *   print_file()     - Add a file to the current job.
- *   recv_print_job() - Receive a print job from the client.
- *   remove_jobs()    - Cancel one or more jobs.
- *   send_state()     - Send the queue state.
- *   smart_gets()     - Get a line of text, removing the trailing CR and/or LF.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -781,7 +770,8 @@ recv_print_job(
   int		fd;			/* Temporary file */
   FILE		*fp;			/* File pointer */
   char		filename[1024];		/* Temporary filename */
-  int		bytes;			/* Bytes received */
+  ssize_t	bytes;			/* Bytes received */
+  size_t	total;			/* Total bytes */
   char		line[256],		/* Line from file/stdin */
 		command,		/* Command from line */
 		*count,			/* Number of bytes */
@@ -965,15 +955,15 @@ recv_print_job(
     * Copy the data or control file from the client...
     */
 
-    for (i = atoi(count); i > 0; i -= bytes)
+    for (total = (size_t)strtoll(count, NULL, 10); total > 0; total -= (size_t)bytes)
     {
-      if (i > sizeof(line))
-        bytes = sizeof(line);
+      if (total > sizeof(line))
+        bytes = (ssize_t)sizeof(line);
       else
-        bytes = i;
+        bytes = (ssize_t)total;
 
-      if ((bytes = fread(line, 1, bytes, stdin)) > 0)
-        bytes = write(fd, line, bytes);
+      if ((bytes = (ssize_t)fread(line, 1, (size_t)bytes, stdin)) > 0)
+        bytes = write(fd, line, (size_t)bytes);
 
       if (bytes < 1)
       {
@@ -1622,5 +1612,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: cups-lpd.c 11623 2014-02-19 20:18:10Z msweet $".
  */

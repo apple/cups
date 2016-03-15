@@ -1,17 +1,17 @@
 .\"
-.\" "$Id: ipptool.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: ipptool.man 11642 2014-02-27 15:57:59Z msweet $"
 .\"
-.\"   ipptool man page for CUPS.
+.\" ipptool man page for CUPS.
 .\"
-.\"   Copyright 2010-2013 by Apple Inc.
+.\" Copyright 2010-2014 by Apple Inc.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "13 May 2013" "Apple Inc."
+.TH ipptool 1 "CUPS" "20 February 2014" "Apple Inc."
 .SH NAME
 ipptool - perform internet printing protocol requests
 .SH SYNOPSIS
@@ -42,8 +42,10 @@ The following options are recognized by \fIipptool\fR:
 .TP 5
 --help
 Shows program help.
+.TP 5
 --stop-after-include-error
 Tells \fIipptool\fR to stop if an error occurs in an included file. Normally \fIipptool\fR will continue with subsequent tests after the INCLUDE directive.
+.TP 5
 --version
 Shows the version of \fIipptool\fR being used.
 .TP 5
@@ -150,11 +152,15 @@ The following standard files are available:
     validate-job.test
 .fi
 .SH SEE ALSO
-\fIipptoolfile(5)\fR,
+\fIipptoolfile(5)\fR, RFC 2911,
 .br
 http://localhost:631/help
+.br
+http://www.iana.org/assignments/ipp-registrations
+.br
+http://www.pwg.org/ipp
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ipptool.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: ipptool.man 11642 2014-02-27 15:57:59Z msweet $".
 .\"

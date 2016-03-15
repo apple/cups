@@ -1,17 +1,17 @@
 .\"
-.\" "$Id: cupsfilter.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: cupsfilter.man 11772 2014-03-28 15:08:30Z msweet $"
 .\"
-.\"   cupsfilter man page for CUPS.
+.\" cupsfilter man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
+.\" Copyright 2007-2014 by Apple Inc.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "CUPS" "20 June 2012" "Apple Inc."
+.TH cupsfilter 8 "CUPS" "28 March 2014" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
@@ -41,7 +41,8 @@ cupsfilter \- convert a file to another format using cups filters
 .SH DESCRIPTION
 \fIcupsfilter\fR is a front-end to the CUPS filter subsystem which allows you
 to convert a file to a specific format, just as if you had printed the file
-through CUPS. By default, \fIcupsfilter\fR generates a PDF file.
+through CUPS. By default, \fIcupsfilter\fR generates a PDF file. The converted
+file is sent to the standard output.
 .SH OPTIONS
 .TP 5
 -D
@@ -54,7 +55,7 @@ Specifies the username passed to the filters. The default is the name of the cur
 .TP 5
 -c config-file
 .br
-Uses the named cupsd.conf configuration file.
+Uses the named cups-files.conf configuration file.
 .TP 5
 -d printer
 Uses information from the named printer.
@@ -99,11 +100,11 @@ Specifies the document title.
 .br
 Delete the PPD file after conversion.
 .SH SEE ALSO
-\fIcupsd.conf(5)\fR
+\fIcups-files.conf(5)\fR
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: cupsfilter.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: cupsfilter.man 11772 2014-03-28 15:08:30Z msweet $".
 .\"

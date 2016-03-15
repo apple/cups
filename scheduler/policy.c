@@ -1,32 +1,16 @@
 /*
- * "$Id: policy.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: policy.c 11684 2014-03-05 20:01:48Z msweet $"
  *
- *   Policy routines for the CUPS scheduler.
+ * Policy routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2011, 2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   AddPolicy()              - Add a policy to the system.
- *   cupsdAddPolicyOp()       - Add an operation to a policy.
- *   cupsdCheckPolicy()       - Check the IPP operation and username against a
- *                              policy.
- *   cupsdDeleteAllPolicies() - Delete all policies in memory.
- *   cupsdFindPolicy()        - Find a named policy.
- *   cupsdFindPolicyOp()      - Find a policy operation.
- *   cupsdGetPrivateAttrs()   - Get the private attributes for the current
- *                              request.
- *   compare_ops()            - Compare two operations.
- *   compare_policies()       - Compare two policies.
- *   free_policy()            - Free the memory used by a policy.
- *   hash_op()                - Generate a lookup hash for the operation.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -48,7 +32,7 @@ static int	hash_op(cupsd_location_t *op);
 
 
 /*
- * 'AddPolicy()' - Add a policy to the system.
+ * 'cupsdAddPolicy()' - Add a policy to the system.
  */
 
 cupsd_policy_t *			/* O - Policy */
@@ -136,7 +120,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if (!p || !con)
   {
-    cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdCheckPolicy: p=%p, con=%p!", p, con);
+    cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdCheckPolicy: p=%p, con=%p.", p, con);
 
     return ((http_status_t)0);
   }
@@ -147,7 +131,7 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 
   if ((po = cupsdFindPolicyOp(p, con->request->request.op.operation_id)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0!");
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCheckPolicy: No matching operation, returning 0.");
     return ((http_status_t)0);
   }
 
@@ -263,7 +247,7 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
     return (po);
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp: No match found!");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp: No match found.");
 
   return (NULL);
 }
@@ -295,6 +279,12 @@ cupsdGetPrivateAttrs(
 		  "printer=%p(%s), owner=\"%s\")", policy, policy->name, con,
 		  con->http.fd, printer, printer ? printer->name : "", owner);
 #endif /* DEBUG */
+
+  if (!policy)
+  {
+    cupsdLogMessage(CUPSD_LOG_CRIT, "cupsdGetPrivateAttrs: policy=%p, con=%p, printer=%p, owner=\"%s\", DefaultPolicyPtr=%p: This should never happen, please report a bug.", policy, con, printer, owner, DefaultPolicyPtr);
+    policy = DefaultPolicyPtr;
+  }
 
  /*
   * Get the access and attributes lists that correspond to the request...
@@ -513,5 +503,5 @@ hash_op(cupsd_location_t *op)		/* I - Operation */
 
 
 /*
- * End of "$Id: policy.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: policy.c 11684 2014-03-05 20:01:48Z msweet $".
  */

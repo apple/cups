@@ -174,7 +174,7 @@ The following directives are understood in a test:
 <dt>ATTR tag attribute-name value(s)
 </dt>
 <dd>Adds an attribute to the test request. Values are separated by the comma (",")
-character - escape commas using the "" character.
+character - escape commas using the "" character. Common attributes and values are listed in the IANA IPP registry - see references below.
 </dd>
 <dt>ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
 </dt>
@@ -530,8 +530,8 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Cancel-Subscription
     Close-Job
     Create-Job
-    Create-Job-Subscription
-    Create-Printer-Subscription
+    Create-Job-Subscriptions
+    Create-Printer-Subscriptions
     Deactivate-Printer
     Disable-Printer
     Enable-Printer
@@ -735,12 +735,15 @@ no notify-subscription-id has been seen.
 </dd>
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-ipptool.html?TOPIC=Man+Pages'>ipptool(1)</a>,
+<a href='man-ipptool.html?TOPIC=Man+Pages'>ipptool(1)</a>, RFC 2911,
 <br>
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
-
+<br>
+<a href='http://www.iana.org/assignments/ipp-registrations'>http://www.iana.org/assignments/ipp-registrations</a>
+<br>
+<a href='http://www.pwg.org/ipp'>http://www.pwg.org/ipp</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 
 </body>
 </html>

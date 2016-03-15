@@ -1,18 +1,18 @@
 /*
- * "$Id: ipp.h 11085 2013-07-03 13:53:05Z msweet $"
+ * "$Id: ipp.h 11734 2014-03-25 18:01:47Z msweet $"
  *
- *   Internet Printing Protocol definitions for CUPS.
+ * Internet Printing Protocol definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_IPP_H_
@@ -251,8 +251,8 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_SET_PRINTER_ATTRIBUTES,	/* Set printer attributes @private@ */
   IPP_OP_SET_JOB_ATTRIBUTES,		/* Set job attributes */
   IPP_OP_GET_PRINTER_SUPPORTED_VALUES,	/* Get supported attribute values */
-  IPP_OP_CREATE_PRINTER_SUBSCRIPTION,	/* Create a printer subscription @since CUPS 1.2/OS X 10.5@ */
-  IPP_OP_CREATE_JOB_SUBSCRIPTION,	/* Create a job subscription @since CUPS 1.2/OS X 10.5@ */
+  IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS,	/* Create one or more printer subscriptions @since CUPS 1.2/OS X 10.5@ */
+  IPP_OP_CREATE_JOB_SUBSCRIPTIONS,	/* Create one of more job subscriptions @since CUPS 1.2/OS X 10.5@ */
   IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2/OS X 10.5@ */
   IPP_OP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2/OS X 10.5@ */
   IPP_OP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2/OS X 10.5@ */
@@ -331,8 +331,10 @@ typedef enum ipp_op_e			/**** IPP operations ****/
 #    define IPP_SET_PRINTER_ATTRIBUTES		IPP_OP_SET_PRINTER_ATTRIBUTES
 #    define IPP_SET_JOB_ATTRIBUTES		IPP_OP_SET_JOB_ATTRIBUTES
 #    define IPP_GET_PRINTER_SUPPORTED_VALUES	IPP_OP_GET_PRINTER_SUPPORTED_VALUES
-#    define IPP_CREATE_PRINTER_SUBSCRIPTION	IPP_OP_CREATE_PRINTER_SUBSCRIPTION
-#    define IPP_CREATE_JOB_SUBSCRIPTION		IPP_OP_CREATE_JOB_SUBSCRIPTION
+#    define IPP_CREATE_PRINTER_SUBSCRIPTION	IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS
+#    define IPP_CREATE_JOB_SUBSCRIPTION		IPP_OP_CREATE_JOB_SUBSCRIPTIONS
+#    define IPP_OP_CREATE_PRINTER_SUBSCRIPTION	IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS
+#    define IPP_OP_CREATE_JOB_SUBSCRIPTION		IPP_OP_CREATE_JOB_SUBSCRIPTIONS
 #    define IPP_GET_SUBSCRIPTION_ATTRIBUTES	IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES
 #    define IPP_GET_SUBSCRIPTIONS		IPP_OP_GET_SUBSCRIPTIONS
 #    define IPP_RENEW_SUBSCRIPTION		IPP_OP_RENEW_SUBSCRIPTION
@@ -992,5 +994,5 @@ extern int		ippValidateAttributes(ipp_t *ipp) _CUPS_API_1_7;
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h 11085 2013-07-03 13:53:05Z msweet $".
+ * End of "$Id: ipp.h 11734 2014-03-25 18:01:47Z msweet $".
  */

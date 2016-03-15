@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11495 2013-12-22 05:29:16Z msweet $"
+ * "$Id: ipp.c 11779 2014-03-28 20:48:44Z msweet $"
  *
  * IPP backend for CUPS.
  *
@@ -2877,19 +2877,39 @@ new_request(
       if ((keyword = cupsGetOption("phone", num_options, options)) != NULL)
       {
 	ipp_t	*destination;		/* destination collection */
-	char	tel_uri[1024];		/* tel: URI */
+	char	phone[1024],		/* Phone number string */
+		*ptr,			/* Pointer into string */
+		tel_uri[1024];		/* tel: URI */
+        static const char * const allowed = "0123456789#*-+.()";
+					/* Allowed characters */
 
         destination = ippNew();
 
-        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel",
-                        NULL, NULL, 0, keyword);
-        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri",
-                     NULL, tel_uri);
+       /*
+        * Unescape and filter out spaces and other characters that are not
+        * allowed in a tel: URI.
+        */
+
+        _httpDecodeURI(phone, keyword, sizeof(phone));
+        for (ptr = phone; *ptr;)
+	{
+	  if (!strchr(allowed, *ptr))
+	    _cups_strcpy(ptr, ptr + 1);
+	  else
+	    ptr ++;
+        }
+
+        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
+        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
 
 	if ((keyword = cupsGetOption("faxPrefix", num_options,
 	                             options)) != NULL && *keyword)
-	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT,
-	               "pre-dial-string", NULL, keyword);
+        {
+	  char	predial[1024];		/* Pre-dial string */
+
+	  _httpDecodeURI(predial, keyword, sizeof(predial));
+	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT, "pre-dial-string", NULL, predial);
+	}
 
         ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
         ippDelete(destination);
@@ -2984,6 +3004,8 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
   if (password && *password && *password_tries < 3)
   {
     (*password_tries) ++;
+
+    cupsSetUser(username);
 
     return (password);
   }
@@ -3680,5 +3702,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 11495 2013-12-22 05:29:16Z msweet $".
+ * End of "$Id: ipp.c 11779 2014-03-28 20:48:44Z msweet $".
  */

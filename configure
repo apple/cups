@@ -2517,7 +2517,7 @@ esac
 ac_config_headers="$ac_config_headers config.h"
 
 
-CUPS_VERSION=1.7.1
+CUPS_VERSION=1.7.2
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -5500,12 +5500,6 @@ fi
 fi
 LIBS="$SAVELIBS"
 
-if test -d /etc/dbus-1; then
-	DBUSDIR="/etc/dbus-1"
-else
-	DBUSDIR=""
-fi
-
 # Check whether --enable-dbus was given.
 if test "${enable_dbus+set}" = set; then :
   enableval=$enable_dbus;
@@ -5518,6 +5512,7 @@ if test "${with_dbusdir+set}" = set; then :
 fi
 
 
+DBUSDIR=""
 DBUS_NOTIFIER=""
 DBUS_NOTIFIERLIBS=""
 
@@ -5541,7 +5536,16 @@ if test "x$ac_cv_func_dbus_message_iter_init_append" = xyes; then :
 
 fi
 
+		ac_fn_c_check_func "$LINENO" "dbus_threads_init" "ac_cv_func_dbus_threads_init"
+if test "x$ac_cv_func_dbus_threads_init" = xyes; then :
+  $as_echo "#define HAVE_DBUS_THREADS_INIT 1" >>confdefs.h
+
+fi
+
 		LIBS="$SAVELIBS"
+		if test -d /etc/dbus-1; then
+			DBUSDIR="/etc/dbus-1"
+		fi
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -6949,7 +6953,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 			# The -z relro option is provided by the Linux linker command to
 			# make relocatable data read-only.
 			if test x$enable_relro = xyes; then
-				RELROFLAGS="-Wl,-z,relro"
+				RELROFLAGS="-Wl,-z,relro,-z,now"
 			fi
 			;;
 	esac
@@ -7966,53 +7970,27 @@ fi
 
 
 		if test -d /System/Library/Frameworks/GSS.framework; then
-			gssdir="/System/Library/Frameworks/GSS.framework"
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GSS/gssapi.h presence" >&5
-$as_echo_n "checking for GSS/gssapi.h presence... " >&6; }
-			if test -f $gssdir/Headers/gssapi.h; then
-				$as_echo "#define HAVE_GSS_GSSAPI_H 1" >>confdefs.h
+			ac_fn_c_check_header_mongrel "$LINENO" "GSS/gssapi.h" "ac_cv_header_GSS_gssapi_h" "$ac_includes_default"
+if test "x$ac_cv_header_GSS_gssapi_h" = xyes; then :
+  $as_echo "#define HAVE_GSS_GSSAPI_H 1" >>confdefs.h
 
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-			else
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-			fi
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GSS/gssapi_generic.h presence" >&5
-$as_echo_n "checking for GSS/gssapi_generic.h presence... " >&6; }
-			if test -f $gssdir/Headers/gssapi_generic.h; then
-				$as_echo "#define HAVE_GSSAPI_GENERIC_H 1" >>confdefs.h
+fi
 
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-			else
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-			fi
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GSS/gssapi_spi.h presence" >&5
-$as_echo_n "checking for GSS/gssapi_spi.h presence... " >&6; }
-			if test -f $gssdir/PrivateHeaders/gssapi_spi.h; then
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GSS/gssapi_spi.h usability" >&5
-$as_echo_n "checking for GSS/gssapi_spi.h usability... " >&6; }
-				if test -s $gssdir/PrivateHeaders/gssapi_spi.h; then
-					{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-					$as_echo "#define HAVE_GSS_GSSAPI_SPI_H 1" >>confdefs.h
 
-				else
-					{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-				fi
-			else
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-				if test $uversion -ge 110 -a $uversion -lt 120; then
-					# Broken public headers in 10.7.x...
-					as_fn_error $? "Run 'sudo mkdir -p $gssdir/PrivateHeaders' and 'sudo touch $gssdir/PrivateHeaders/gssapi_spi.h' to build CUPS." "$LINENO" 5
-				fi
-			fi
+			ac_fn_c_check_header_mongrel "$LINENO" "GSS/gssapi_generic.h" "ac_cv_header_GSS_gssapi_generic_h" "$ac_includes_default"
+if test "x$ac_cv_header_GSS_gssapi_generic_h" = xyes; then :
+  $as_echo "#define HAVE_GSS_GSSAPI_GENERIC_H 1" >>confdefs.h
+
+fi
+
+
+			ac_fn_c_check_header_mongrel "$LINENO" "GSS/gssapi_spi.h" "ac_cv_header_GSS_gssapi_spi_h" "$ac_includes_default"
+if test "x$ac_cv_header_GSS_gssapi_spi_h" = xyes; then :
+  $as_echo "#define HAVE_GSS_GSSAPI_SPI_H 1" >>confdefs.h
+
+fi
+
+
 		else
 			ac_fn_c_check_header_mongrel "$LINENO" "gssapi.h" "ac_cv_header_gssapi_h" "$ac_includes_default"
 if test "x$ac_cv_header_gssapi_h" = xyes; then :

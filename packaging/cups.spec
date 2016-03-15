@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 11516 2014-01-08 16:24:32Z msweet $"
+# "$Id: cups.spec.in 11808 2014-04-10 15:11:43Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -40,12 +40,12 @@
 
 Summary: CUPS
 Name: cups
-Version: 1.7.1
+Version: 1.7.2
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/1.7.1/cups-1.7.1-source.tar.bz2
+Source: http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -273,6 +273,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/ca/*
 %dir /usr/share/doc/cups/cs
 /usr/share/doc/cups/cs/*
+%dir /usr/share/doc/cups/de
+/usr/share/doc/cups/de/*
 %dir /usr/share/doc/cups/es
 /usr/share/doc/cups/es/*
 %dir /usr/share/doc/cups/fr
@@ -288,6 +290,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/ca/cups_ca.po
 %dir /usr/share/locale/cs
 /usr/share/locale/cs/cups_cs.po
+%dir /usr/share/locale/de
+/usr/share/locale/de/cups_de.po
 %dir /usr/share/locale/es
 /usr/share/locale/es/cups_es.po
 %dir /usr/share/locale/fr
@@ -392,5 +396,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 11516 2014-01-08 16:24:32Z msweet $".
+# End of "$Id: cups.spec.in 11808 2014-04-10 15:11:43Z msweet $".
 #

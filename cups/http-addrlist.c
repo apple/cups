@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addrlist.c 11374 2013-11-04 23:49:10Z msweet $"
+ * "$Id: http-addrlist.c 11642 2014-02-27 15:57:59Z msweet $"
  *
  * HTTP address list routines for CUPS.
  *
@@ -11,6 +11,8 @@
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * which should have been included with this file.  If this file is
  * file is missing or damaged, see the license at "http://www.cups.org/".
+ *
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -455,6 +457,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
     if ((first = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t))) != NULL)
     {
+      addr = first;
       first->addr.un.sun_family = AF_LOCAL;
       strlcpy(first->addr.un.sun_path, hostname, sizeof(first->addr.un.sun_path));
     }
@@ -874,5 +877,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 11374 2013-11-04 23:49:10Z msweet $".
+ * End of "$Id: http-addrlist.c 11642 2014-02-27 15:57:59Z msweet $".
  */

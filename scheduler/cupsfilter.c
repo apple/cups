@@ -1,34 +1,16 @@
 /*
- * "$Id: cupsfilter.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: cupsfilter.c 11772 2014-03-28 15:08:30Z msweet $"
  *
- *   Filtering program for CUPS.
+ * Filtering program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                - Main entry for the test program.
- *   add_printer_filter()  - Add a single filters from a PPD file.
- *   add_printer_filters() - Add filters from a PPD file.
- *   check_cb()            - Callback function for _cupsFileCheck.
- *   compare_pids()        - Compare two filter PIDs...
- *   escape_options()      - Convert an options array to a string.
- *   exec_filter()         - Execute a single filter.
- *   exec_filters()        - Execute filters for the given file and options.
- *   get_job_file()        - Get the specified job file.
- *   open_pipe()           - Create a pipe which is closed on exec.
- *   read_cupsd_conf()     - Read the cupsd.conf file to get the filter
- *                           settings.
- *   set_string()          - Copy and set a string.
- *   sighandler()          - Signal catcher for when we print from stdin...
- *   usage()               - Show program usage...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -99,7 +81,7 @@ static int		exec_filters(mime_type_t *srctype,
 			             cups_option_t *options);
 static void		get_job_file(const char *job);
 static int		open_pipe(int *fds);
-static int		read_cupsd_conf(const char *filename);
+static int		read_cups_files_conf(const char *filename);
 static void		set_string(char **s, const char *val);
 static void		sighandler(int sig);
 static void		usage(const char *opt) __attribute__((noreturn));
@@ -129,7 +111,7 @@ main(int  argc,				/* I - Number of command-line args */
   char		mimedir[1024];		/* MIME directory */
   char		*infile,		/* File to filter */
 		*outfile;		/* File to create */
-  char		cupsdconf[1024];	/* cupsd.conf file */
+  char		cupsfilesconf[1024];	/* cups-files.conf file */
   const char	*server_root;		/* CUPS_SERVERROOT environment variable */
   mime_type_t	*src,			/* Source type */
 		*dst;			/* Destination type */
@@ -173,7 +155,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((server_root = getenv("CUPS_SERVERROOT")) == NULL)
     server_root = CUPS_SERVERROOT;
 
-  snprintf(cupsdconf, sizeof(cupsdconf), "%s/cupsd.conf", server_root);
+  snprintf(cupsfilesconf, sizeof(cupsfilesconf), "%s/cups-files.conf", server_root);
 
  /*
   * Process command-line arguments...
@@ -203,7 +185,7 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(opt);
 	      break;
 
-          case 'c' : /* Specify cupsd.conf file location... */
+          case 'c' : /* Specify cups-files.conf file location... */
 	      i ++;
 	      if (i < argc)
 	      {
@@ -211,7 +193,7 @@ main(int  argc,				/* I - Number of command-line args */
 		  num_options = cupsAddOption("copies", argv[i], num_options,
 					      &options);
 		else
-		  strlcpy(cupsdconf, argv[i], sizeof(cupsdconf));
+		  strlcpy(cupsfilesconf, argv[i], sizeof(cupsfilesconf));
 	      }
 	      else
 	        usage(opt);
@@ -373,10 +355,10 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
-  * Load the cupsd.conf file and create the MIME database...
+  * Load the cups-files.conf file and create the MIME database...
   */
 
-  if (read_cupsd_conf(cupsdconf))
+  if (read_cups_files_conf(cupsfilesconf))
     return (1);
 
   snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
@@ -1354,13 +1336,14 @@ open_pipe(int *fds)			/* O - Pipe file descriptors (2) */
 
 
 /*
- * 'read_cupsd_conf()' - Read the cupsd.conf file to get the filter settings.
+ * 'read_cups_files_conf()' - Read the cups-files.conf file to get the filter settings.
  */
 
 static int				/* O - 0 on success, 1 on error */
-read_cupsd_conf(const char *filename)	/* I - File to read */
+read_cups_files_conf(
+    const char *filename)		/* I - File to read */
 {
-  cups_file_t	*fp;			/* cupsd.conf file */
+  cups_file_t	*fp;			/* cups-files.conf file */
   const char	*temp;			/* Temporary string */
   char		line[1024],		/* Line from file */
 		*ptr;			/* Pointer into line */
@@ -1476,7 +1459,7 @@ usage(const char *opt)			/* I - Incorrect option, if any */
 			  "when finished."));
   _cupsLangPuts(stdout, _("  -P filename.ppd         Set PPD file."));
   _cupsLangPuts(stdout, _("  -U username             Specify username."));
-  _cupsLangPuts(stdout, _("  -c cupsd.conf           Set cupsd.conf file to "
+  _cupsLangPuts(stdout, _("  -c cups-files.conf      Set cups-files.conf file to "
 			  "use."));
   _cupsLangPuts(stdout, _("  -d printer              Use the named "
 			  "printer."));
@@ -1500,5 +1483,5 @@ usage(const char *opt)			/* I - Incorrect option, if any */
 
 
 /*
- * End of "$Id: cupsfilter.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: cupsfilter.c 11772 2014-03-28 15:08:30Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: config.h.in 11642 2014-02-27 15:57:59Z msweet $"
  *
  *   Configuration file for CUPS.
  *
@@ -535,6 +535,7 @@
 
 #undef HAVE_DBUS
 #undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND
+#undef HAVE_DBUS_THREADS_INIT
 
 
 /*
@@ -706,5 +707,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: config.h.in 11642 2014-02-27 15:57:59Z msweet $".
  */

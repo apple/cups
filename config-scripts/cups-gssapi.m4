@@ -1,9 +1,9 @@
 dnl
-dnl   "$Id$"
+dnl   "$Id: cups-gssapi.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   GSSAPI/Kerberos library detection for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
+dnl   Copyright 2007-2013 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl   This file contains Kerberos support code, copyright 2006 by
@@ -71,38 +71,9 @@ if test x$enable_gssapi != xno; then
 	if test "x$LIBGSSAPI" != x; then
 		AC_CHECK_HEADER(krb5.h, AC_DEFINE(HAVE_KRB5_H))
 		if test -d /System/Library/Frameworks/GSS.framework; then
-			gssdir="/System/Library/Frameworks/GSS.framework"
-			AC_MSG_CHECKING(for GSS/gssapi.h presence)
-			if test -f $gssdir/Headers/gssapi.h; then
-				AC_DEFINE(HAVE_GSS_GSSAPI_H)
-				AC_MSG_RESULT(yes)
-			else
-				AC_MSG_RESULT(no)
-			fi
-			AC_MSG_CHECKING(for GSS/gssapi_generic.h presence)
-			if test -f $gssdir/Headers/gssapi_generic.h; then
-				AC_DEFINE(HAVE_GSSAPI_GENERIC_H)
-				AC_MSG_RESULT(yes)
-			else
-				AC_MSG_RESULT(no)
-			fi
-			AC_MSG_CHECKING(for GSS/gssapi_spi.h presence)
-			if test -f $gssdir/PrivateHeaders/gssapi_spi.h; then
-				AC_MSG_RESULT(yes)
-				AC_MSG_CHECKING(for GSS/gssapi_spi.h usability)
-				if test -s $gssdir/PrivateHeaders/gssapi_spi.h; then
-					AC_MSG_RESULT(yes)
-					AC_DEFINE(HAVE_GSS_GSSAPI_SPI_H)
-				else
-					AC_MSG_RESULT(no)
-				fi
-			else
-				AC_MSG_RESULT(no)
-				if test $uversion -ge 110 -a $uversion -lt 120; then
-					# Broken public headers in 10.7.x...
-					AC_MSG_ERROR(Run 'sudo mkdir -p $gssdir/PrivateHeaders' and 'sudo touch $gssdir/PrivateHeaders/gssapi_spi.h' to build CUPS.)
-				fi
-			fi
+			AC_CHECK_HEADER(GSS/gssapi.h, AC_DEFINE(HAVE_GSS_GSSAPI_H))
+			AC_CHECK_HEADER(GSS/gssapi_generic.h, AC_DEFINE(HAVE_GSS_GSSAPI_GENERIC_H))
+			AC_CHECK_HEADER(GSS/gssapi_spi.h, AC_DEFINE(HAVE_GSS_GSSAPI_SPI_H))
 		else
 			AC_CHECK_HEADER(gssapi.h, AC_DEFINE(HAVE_GSSAPI_H))
 			AC_CHECK_HEADER(gssapi/gssapi.h, AC_DEFINE(HAVE_GSSAPI_GSSAPI_H))
@@ -158,5 +129,5 @@ AC_SUBST(CUPS_DEFAULT_GSSSERVICENAME)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GSSSERVICENAME, "$CUPS_DEFAULT_GSSSERVICENAME")
 
 dnl
-dnl End of "$Id$".
+dnl End of "$Id: cups-gssapi.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

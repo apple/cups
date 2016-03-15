@@ -233,6 +233,7 @@
 "  -a                      Browse for all services." = "  -a                      Browse for all services.";
 "  -a                      Export all printers." = "  -a                      Export all printers.";
 "  -c catalog.po           Load the specified message catalog." = "  -c catalog.po           Load the specified message catalog.";
+"  -c cups-files.conf      Set cups-files.conf file to use." = "  -c cups-files.conf      Set cups-files.conf file to use.";
 "  -c cupsd.conf           Set cupsd.conf file to use." = "  -c cupsd.conf           Set cupsd.conf file to use.";
 "  -d domain               Browse/resolve in specified domain." = "  -d domain               Browse/resolve in specified domain.";
 "  -d name=value           Set named variable to value." = "  -d name=value           Set named variable to value.";

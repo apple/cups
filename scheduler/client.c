@@ -1,46 +1,19 @@
 /*
- * "$Id: client.c 11308 2013-09-27 14:09:25Z msweet $"
+ * "$Id: client.c 11642 2014-02-27 15:57:59Z msweet $"
  *
- *   Client routines for the CUPS scheduler.
+ * Client routines for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   This file contains Kerberos support code, copyright 2006 by
- *   Jelmer Vernooij.
+ * This file contains Kerberos support code, copyright 2006 by
+ * Jelmer Vernooij.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAcceptClient()    - Accept a new client.
- *   cupsdCloseAllClients() - Close all remote clients immediately.
- *   cupsdCloseClient()     - Close a remote client.
- *   cupsdFlushHeader()     - Flush the header fields to the client.
- *   cupsdReadClient()	    - Read data from a client.
- *   cupsdSendCommand()     - Send output from a command via HTTP.
- *   cupsdSendError()	    - Send an error message via HTTP.
- *   cupsdSendHeader()	    - Send an HTTP request.
- *   cupsdUpdateCGI()	    - Read status messages from CGI scripts and
- *			      programs.
- *   cupsdWriteClient()     - Write data to a client as needed.
- *   check_if_modified()    - Decode an "If-Modified-Since" line.
- *   compare_clients()	    - Compare two client connections.
- *   data_ready()	    - Check whether data is available from a client.
- *   get_file() 	    - Get a filename and state info.
- *   install_cupsd_conf()    - Install a configuration file.
- *   is_cgi()		    - Is the resource a CGI script/program?
- *   is_path_absolute()     - Is a path absolute and free of relative elements
- *			      (i.e. "..").
- *   pipe_command()	    - Pipe the output of a command to the remote
- *			      client.
- *   valid_host()	    - Is the Host: field valid?
- *   write_file()	    - Send a file via HTTP.
- *   write_pipe()	    - Flag that data is available on the CGI pipe.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -2884,6 +2857,17 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     con->file_ready = 0;
   }
 
+  bytes = (ssize_t)(sizeof(con->header) - (size_t)con->header_used);
+
+  if (!con->pipe_pid && bytes > con->http.data_remaining)
+  {
+   /*
+    * Limit GET bytes to original size of file (STR #3265)...
+    */
+
+    bytes = (ssize_t)con->http.data_remaining;
+  }
+
   if (con->response && con->response->state != IPP_DATA)
   {
     int wused = con->http.wused;	/* Previous write buffer use */
@@ -2926,8 +2910,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
                     con->http.fd, (int)bytes, con->http.state,
                     CUPS_LLCAST con->http.data_remaining);
   }
-  else if ((bytes = read(con->file, con->header + con->header_used,
-			 sizeof(con->header) - con->header_used)) > 0)
+  else if ((bytes = read(con->file, con->header + con->header_used, (size_t)bytes)) > 0)
   {
     con->header_used += bytes;
 
@@ -3708,6 +3691,14 @@ is_path_absolute(const char *path)	/* I - Input path */
     return (0);
 
  /*
+  * Check for "<" or quotes in the path and reject since this is probably
+  * someone trying to inject HTML...
+  */
+
+  if (strchr(path, '<') != NULL || strchr(path, '\"') != NULL || strchr(path, '\'') != NULL)
+    return (0);
+
+ /*
   * Check for "/.." in the path...
   */
 
@@ -4379,5 +4370,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 11308 2013-09-27 14:09:25Z msweet $".
+ * End of "$Id: client.c 11642 2014-02-27 15:57:59Z msweet $".
  */

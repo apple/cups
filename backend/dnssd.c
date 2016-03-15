@@ -1,5 +1,5 @@
 /*
- * "$Id: dnssd.c 4074 2012-12-12 20:54:21Z msweet $"
+ * "$Id: dnssd.c 11623 2014-02-19 20:18:10Z msweet $"
  *
  *   DNS-SD discovery backend for CUPS.
  *
@@ -95,6 +95,7 @@ static int		job_canceled = 0;
 static AvahiSimplePoll	*simple_poll = NULL;
 					/* Poll information */
 static int		got_data = 0;	/* Got data from poll? */
+static int		browsers = 0;	/* Number of running browsers */
 #endif /* HAVE_AVAHI */
 
 
@@ -345,6 +346,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
+  browsers = 6;
   avahi_service_browser_new(client, AVAHI_IF_UNSPEC,
 			    AVAHI_PROTO_UNSPEC,
 			    "_fax-ipp._tcp", NULL, 0,
@@ -558,7 +560,11 @@ main(int  argc,				/* I - Number of command-line args */
 
       fprintf(stderr, "DEBUG: sent=%d, count=%d\n", sent, count);
 
+#ifdef HAVE_AVAHI
+      if (sent == cupsArrayCount(devices) && browsers == 0)
+#else
       if (sent == cupsArrayCount(devices))
+#endif /* HAVE_AVAHI */
 	break;
     }
   }
@@ -710,9 +716,12 @@ browse_callback(
 	break;
 
     case AVAHI_BROWSER_REMOVE:
-    case AVAHI_BROWSER_ALL_FOR_NOW:
     case AVAHI_BROWSER_CACHE_EXHAUSTED:
         break;
+
+    case AVAHI_BROWSER_ALL_FOR_NOW:
+	browsers--;
+	break;
   }
 }
 
@@ -1320,5 +1329,5 @@ unquote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: dnssd.c 4074 2012-12-12 20:54:21Z msweet $".
+ * End of "$Id: dnssd.c 11623 2014-02-19 20:18:10Z msweet $".
  */

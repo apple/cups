@@ -1,39 +1,16 @@
 /*
- * "$Id: main.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: main.c 11721 2014-03-21 18:18:56Z msweet $"
  *
- *   Main loop for the CUPS scheduler.
+ * Main loop for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                - Main entry for the CUPS scheduler.
- *   cupsdAddString()      - Copy and add a string to an array.
- *   cupsdCheckProcess()   - Tell the main loop to check for dead children.
- *   cupsdClearString()    - Clear a string.
- *   cupsdFreeStrings()    - Free an array of strings.
- *   cupsdHoldSignals()    - Hold child and termination signals.
- *   cupsdReleaseSignals() - Release signals for delivery.
- *   cupsdSetString()      - Set a string value.
- *   cupsdSetStringf()     - Set a formatted string value.
- *   launchd_checkin()     - Check-in with launchd and collect the listening
- *                           fds.
- *   launchd_checkout()    - Update the launchd KeepAlive file as needed.
- *   parent_handler()      - Catch USR1/CHLD signals...
- *   process_children()    - Process all dead children...
- *   select_timeout()      - Calculate the select timeout value.
- *   sigchld_handler()     - Handle 'child' signals from old processes.
- *   sighup_handler()      - Handle 'hangup' signals to reconfigure the
- *                           scheduler.
- *   sigterm_handler()     - Handle 'terminate' signals that stop the scheduler.
- *   usage()               - Show scheduler usage.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -69,6 +46,10 @@
 #ifdef HAVE_NOTIFY_H
 #  include <notify.h>
 #endif /* HAVE_NOTIFY_H */
+
+#ifdef HAVE_DBUS
+#  include <dbus/dbus.h>
+#endif /* HAVE_DBUS */
 
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
@@ -505,6 +486,14 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef LC_TIME
   setlocale(LC_TIME, "");
 #endif /* LC_TIME */
+
+#ifdef HAVE_DBUS_THREADS_INIT
+ /*
+  * Enable threading support for D-BUS...
+  */
+
+  dbus_threads_init_default();
+#endif /* HAVE_DBUS_THREADS_INIT */
 
  /*
   * Set the maximum number of files...
@@ -2025,5 +2014,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: main.c 11721 2014-03-21 18:18:56Z msweet $".
  */

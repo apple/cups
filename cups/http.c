@@ -1,9 +1,9 @@
 /*
- * "$Id: http.c 11392 2013-11-06 01:29:56Z msweet $"
+ * "$Id: http.c 11761 2014-03-28 13:04:33Z msweet $"
  *
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by Jelmer Vernooij.
@@ -1748,7 +1748,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
     */
 
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding >= _HTTP_CODING_GUNZIP)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
@@ -1776,7 +1776,8 @@ httpPeek(http_t *http,			/* I - Connection to server */
 
 #ifdef HAVE_LIBZ
   if (http->used == 0 &&
-      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0))
+      (http->coding == _HTTP_CODING_IDENTITY ||
+       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)))
 #else
   if (http->used == 0)
 #endif /* HAVE_LIBZ */
@@ -1819,7 +1820,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
   }
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding >= _HTTP_CODING_GUNZIP)
   {
 #  ifdef HAVE_INFLATECOPY
     int		zerr;			/* Decompressor error */
@@ -2056,7 +2057,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     return (0);
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding >= _HTTP_CODING_GUNZIP)
   {
     do
     {
@@ -2210,14 +2211,15 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
   if (
 #ifdef HAVE_LIBZ
-      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0) &&
+      (http->coding == _HTTP_CODING_IDENTITY ||
+       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)) &&
 #endif /* HAVE_LIBZ */
       ((http->data_remaining <= 0 &&
         http->data_encoding == HTTP_ENCODING_LENGTH) ||
        (http->data_encoding == HTTP_ENCODING_CHUNKED && bytes == 0)))
   {
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding >= _HTTP_CODING_GUNZIP)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
@@ -3478,7 +3480,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   */
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding == _HTTP_CODING_GZIP || http->coding == _HTTP_CODING_DEFLATE)
   {
     DEBUG_printf(("1httpWrite2: http->coding=%d", http->coding));
 
@@ -3578,7 +3580,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     */
 
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding == _HTTP_CODING_GZIP || http->coding == _HTTP_CODING_DEFLATE)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
@@ -5394,6 +5396,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!http->tls)
   {
+    DEBUG_puts("8http_setup_ssl: Unable to allocate SSPI data.");
     _cupsSetHTTPError(HTTP_STATUS_ERROR);
     return (-1);
   }
@@ -5404,11 +5407,14 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
                sizeof(commonName) / sizeof(TCHAR), TEXT("CN=%s"), username);
 
-  if (!_sspiGetCredentials(http->tls_credentials, L"ClientContainer",
-                           commonName, FALSE))
+  DEBUG_printf(("8http_setup_ssl: commonName=\"%s\"", commonName));
+
+  if (!_sspiGetCredentials(http->tls, L"ClientContainer", commonName, FALSE))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    DEBUG_puts("8http_setup_ssl: _sspiGetCredentials failed.");
+
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
@@ -5419,13 +5425,15 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
-  _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
+  _sspiSetAllowsAnyRoot(http->tls, TRUE);
+  _sspiSetAllowsExpiredCerts(http->tls, TRUE);
 
-  if (!_sspiConnect(http->tls_credentials, hostname))
+  if (!_sspiConnect(http->tls, hostname))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    DEBUG_printf(("8http_setup_ssl: _sspiConnect failed for \"%s\".", hostname));
+
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
@@ -5478,7 +5486,7 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
     CFRelease(http->tls_credentials);
 
 #  elif defined(HAVE_SSPISSL)
-  _sspiFree(http->tls_credentials);
+  _sspiFree(http->tls);
 #  endif /* HAVE_LIBSSL */
 
   http->tls             = NULL;
@@ -5898,5 +5906,5 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 
 
 /*
- * End of "$Id: http.c 11392 2013-11-06 01:29:56Z msweet $".
+ * End of "$Id: http.c 11761 2014-03-28 13:04:33Z msweet $".
  */

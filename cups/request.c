@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 11174 2013-07-23 12:33:52Z msweet $"
+ * "$Id: request.c 11739 2014-03-26 21:06:04Z msweet $"
  *
  *   IPP utilities for CUPS.
  *
@@ -261,7 +261,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Get the server's response...
     */
 
-    if (status != HTTP_STATUS_ERROR)
+    if (status <= HTTP_STATUS_CONTINUE || status == HTTP_STATUS_OK)
     {
       response = cupsGetResponse(http, resource);
       status   = httpGetStatus(http);
@@ -1177,5 +1177,5 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * End of "$Id: request.c 11174 2013-07-23 12:33:52Z msweet $".
+ * End of "$Id: request.c 11739 2014-03-26 21:06:04Z msweet $".
  */
