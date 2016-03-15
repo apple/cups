@@ -1,18 +1,16 @@
 #!/bin/sh
 #
-# "$Id: build.sh 12738 2015-06-15 18:28:48Z msweet $"
+# Common script for building the current stable and development (master)
+# branches of CUPS.
 #
-#   Common script for building the current stable and development (trunk)
-#   branches of CUPS.
+# Copyright 2007-2016 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   Copyright 2007-2015 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 # Usage:
 #

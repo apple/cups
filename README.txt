@@ -1,4 +1,4 @@
-README.txt - 2014-11-20
+README.txt - 2016-03-15
 -----------------------
 
 This directory contains an automated build and test environment for CUPS.
@@ -20,13 +20,13 @@ currently supported:
 SCRIPTS
 
 The build.sh script builds the current stable branch of CUPS along with
-trunk, running "make check" in each.  Normally you will run the script via
-a cron job:
+master ("latest"), running "make check" in each.  Normally you will run the
+script via a cron job:
 
     0   0   *   *   0   /path/to/build.sh --update --quiet clean all
     0   0   *   *   1-6 /path/to/build.sh --update --quiet
 
-The "--update" option tells build.sh to do an "svn up" prior to building.
+The "--update" option tells build.sh to do an "git pull" prior to building.
 
 The "--quiet" option tells build.sh to work quietly and optionally send the
 build log via email or HTTP POST for recording, automated processing, etc.

@@ -1,24 +1,22 @@
 #
-# "$Id: build.mak 10105 2011-11-04 16:32:00Z mike $"
+# Makefile for CUPS build and test repository.
 #
-#   Makefile for CUPS build and test repository.
+# This makefile MUST be used from the build.sh script, otherwise the
+# environment will not be configured properly...
 #
-#   This makefile MUST be used from the build.sh script, otherwise the
-#   environment will not be configured properly...
+# Copyright 2007-2016 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   Copyright 2007-2014 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 
 # Subdirectories to be built...
 DIRS	=	\
 		stable/.all \
-		trunk/.all \
+		development/.all \
 
 
 # Make everything...
@@ -34,33 +32,10 @@ clean:	tools/.clean $(DIRS:.all=.clean)
 	find . -name 'error_log-*' -mtime +7 -print -exec rm -f '{}' \;
 
 
-# Make EPM
-epm/.all:	epm/Makefile
-	@echo Making all in EPM...
-	cd epm && $(MAKE) test && $(MAKE) install
-
-epm/.clean:
-	@cd epm; if test -f Makefile; then \
-		echo Cleaning EPM...; \
-		$(MAKE) distclean || exit 1; \
-	fi
-
-epm/Makefile:	epm/Makefile.in epm/configure
-	@cd epm; if test -f Makefile; then \
-		echo Cleaning EPM...; \
-		$(MAKE) distclean || exit 1; \
-	fi
-	@echo Configuring EPM...
-	cd epm && ./configure $(BUILDOPTIONS) --prefix=$(BASEDIR)/temp
-
-
 # Make CUPS stable
 stable/.all:	stable/Makedefs
 	@echo Making all in CUPS stable...
 	cd stable && $(MAKE) all check
-#	@if test -x /usr/bin/rpm; then \
-#		cd stable && tools/testrpm; \
-#	fi
 
 stable/.clean:
 	@cd stable; if test -f Makedefs; then \
@@ -103,53 +78,50 @@ stable/configure: stable/configure.ac \
 	cd stable; rm -rf autom4te.cache configure; autoconf
 
 
-# Make CUPS trunk
-trunk/.all:	trunk/Makedefs
-	@echo Making all in CUPS trunk...
-	cd trunk && $(MAKE) all check
-#	@if test -x /usr/bin/rpm; then \
-#		cd trunk && tools/testrpm; \
-#	fi
+# Make CUPS master (bleeding edge development)
+development/.all:	development/Makedefs
+	@echo Making all in CUPS development...
+	cd development && $(MAKE) all check
 
-trunk/.clean:
-	@cd trunk; if test -f Makedefs; then \
-		echo Cleaning CUPS trunk...; \
+development/.clean:
+	@cd development; if test -f Makedefs; then \
+		echo Cleaning CUPS development...; \
 		$(MAKE) distclean || exit 1; \
 	fi
 
-trunk/Makedefs:	trunk/Makedefs.in trunk/configure \
-			trunk/packaging/cups.list.in \
-			trunk/config.h.in
-	@cd trunk; if test -f Makedefs; then \
-		echo Cleaning CUPS trunk...; \
+development/Makedefs:	development/Makedefs.in development/configure \
+			development/packaging/cups.list.in \
+			development/config.h.in
+	@cd development; if test -f Makedefs; then \
+		echo Cleaning CUPS development...; \
 		$(MAKE) distclean || exit 1; \
 	fi
-	@echo Configuring CUPS trunk...
-	cd trunk && ./configure $(BUILDOPTIONS) \
+	@echo Configuring CUPS development...
+	cd development && ./configure $(BUILDOPTIONS) \
 		--enable-static \
 		--enable-unit-tests --enable-debug-printfs
 
-trunk/configure: trunk/configure.ac \
-	trunk/config-scripts/cups-common.m4 \
-	trunk/config-scripts/cups-compiler.m4 \
-	trunk/config-scripts/cups-defaults.m4 \
-	trunk/config-scripts/cups-directories.m4 \
-	trunk/config-scripts/cups-dnssd.m4 \
-	trunk/config-scripts/cups-gssapi.m4 \
-	trunk/config-scripts/cups-largefile.m4 \
-	trunk/config-scripts/cups-libtool.m4 \
-	trunk/config-scripts/cups-manpages.m4 \
-	trunk/config-scripts/cups-network.m4 \
-	trunk/config-scripts/cups-opsys.m4 \
-	trunk/config-scripts/cups-pam.m4 \
-	trunk/config-scripts/cups-poll.m4 \
-	trunk/config-scripts/cups-scripting.m4 \
-	trunk/config-scripts/cups-sharedlibs.m4 \
-	trunk/config-scripts/cups-ssl.m4 \
-	trunk/config-scripts/cups-startup.m4 \
-	trunk/config-scripts/cups-threads.m4
-	@echo Updating CUPS trunk configure script...
-	cd trunk; rm -rf autom4te.cache configure; autoconf
+development/configure: development/configure.ac \
+	development/config-scripts/cups-common.m4 \
+	development/config-scripts/cups-compiler.m4 \
+	development/config-scripts/cups-defaults.m4 \
+	development/config-scripts/cups-directories.m4 \
+	development/config-scripts/cups-dnssd.m4 \
+	development/config-scripts/cups-gssapi.m4 \
+	development/config-scripts/cups-largefile.m4 \
+	development/config-scripts/cups-libtool.m4 \
+	development/config-scripts/cups-manpages.m4 \
+	development/config-scripts/cups-network.m4 \
+	development/config-scripts/cups-opsys.m4 \
+	development/config-scripts/cups-pam.m4 \
+	development/config-scripts/cups-poll.m4 \
+	development/config-scripts/cups-scripting.m4 \
+	development/config-scripts/cups-sharedlibs.m4 \
+	development/config-scripts/cups-ssl.m4 \
+	development/config-scripts/cups-startup.m4 \
+	development/config-scripts/cups-threads.m4
+	@echo Updating CUPS development configure script...
+	cd development; rm -rf autom4te.cache configure; autoconf
 
 # Make the build tools
 tools/.all:	tools/Makefile
@@ -169,8 +141,3 @@ tools/Makefile:	tools/Makefile.in tools/configure
 	fi
 	@echo Configuring Tools...
 	cd tools && ./configure $(BUILDOPTIONS) --prefix=$(BASEDIR)/temp
-
-
-#
-# End of "$Id: build.mak 10105 2011-11-04 16:32:00Z mike $".
-#
