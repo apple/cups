@@ -103,25 +103,25 @@ fi
 
 echo "Starting build of '$targets' on `date`"
 
-if test -f svn.log; then
+if test -f git.log; then
 	# Show Subversion updates...
-	echo svn up
-	cat svn.log
-	svn st | $grep -e '^[ACDGM]' -e '^ M' >svn.log
-	if test -s svn.log; then
+	echo git pull; git submodule update stable; git submodule update development
+	cat git.log
+	git status | $grep modified: >git.log
+	if test -s git.log; then
 		echo ""
 		echo ERROR: Local files have modifications:
 		echo ""
-		cat svn.log
+		cat git.log
 		echo ""
 	fi
-	rm -f svn.log
+	rm -f git.log
 fi
 
 # Update and then build safely...
 if test $update = yes; then
 	cd $BASEDIR
-	svn up 2>&1 >svn.log
+	(git pull; git submodule update stable; git submodule update development) 2>&1 >git.log
 
 	# Need to exec since this script might change...
 	options=""
@@ -138,15 +138,15 @@ fi
 # Look for changes to the dependent projects
 changed=0
 
-for dir in . stable tools trunk; do
-	rev=`svnversion $dir | sed -e '1,$s/[a-zA-Z]//g'`
+for dir in . tools stable development; do
+	rev=`git rev-parse HEAD $dir`
 	if test -f $dir/.buildrev; then
 		oldrev=`cat $dir/.buildrev`
 	else
-		oldrev=0
+		oldrev=""
 	fi
 
-	if test $rev -gt $oldrev; then
+	if test "x$rev" != "x$oldrev"; then
 		changed=1
 	fi
 
@@ -211,14 +211,13 @@ fi
 # If configured, send the build log to a central server for processing...
 if test "x$BUILDNOTIFY" != x -a -x temp/bin/sendbuildlog -a $quiet = yes; then
 	attachments=""
-        rev=`svn info . | grep Revision: | awk '{print $2}'`
 
-	if test -f stable/test/cups-str-2.0-r$rev-$USER.html; then
-		attachments="$attachments -a stable/test/cups-str-2.0-r$rev-$USER.html"
+	if test -f stable/test/cups-str-2.1-$USER.html; then
+		attachments="$attachments -a stable/test/cups-str-2.1-$USER.html"
 	fi
 
-	if test -f trunk/test/cups-str-2.1-r$rev-$USER.html; then
-		attachments="$attachments -a trunk/test/cups-str-2.1-r$rev-$USER.html"
+	if test -f developent/test/cups-str-2.2-$USER.html; then
+		attachments="$attachments -a developent/test/cups-str-2.2-$USER.html"
 	fi
 
 	temp/bin/sendbuildlog -b $status -s "$BUILDSUBJECT r$rev" $attachments "$BUILDNOTIFY" build.log
