@@ -1,2 +1,0 @@
-auth	required	@PAMMODAUTH@
-account	required	@PAMMOD@

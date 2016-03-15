@@ -1,2 +1,0 @@
-auth	required	pam_unix2.so nullok shadow
-account	required	pam_unix2.so
