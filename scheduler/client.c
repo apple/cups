@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 12009 2014-07-09 17:02:38Z msweet $"
+ * "$Id: client.c 12057 2014-07-22 14:03:19Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
@@ -3310,7 +3310,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * then fallback to the default one...
   */
 
-  if ((status = stat(filename, filestats)) != 0 && language[0] &&
+  if ((status = lstat(filename, filestats)) != 0 && language[0] &&
       strncmp(con->uri, "/icons/", 7) &&
       strncmp(con->uri, "/ppd/", 5) &&
       strncmp(con->uri, "/rss/", 5) &&
@@ -3408,13 +3408,13 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       plen = len - (ptr - filename);
 
       strlcpy(ptr, "index.html", plen);
-      status = stat(filename, filestats);
+      status = lstat(filename, filestats);
 
 #ifdef HAVE_JAVA
       if (status)
       {
 	strlcpy(ptr, "index.class", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_JAVA */
 
@@ -3422,7 +3422,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.pl", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PERL */
 
@@ -3430,7 +3430,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.php", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PHP */
 
@@ -3438,18 +3438,39 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.pyc", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 
       if (status)
       {
 	strlcpy(ptr, "index.py", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PYTHON */
 
     }
     while (status && language[0]);
+
+   /*
+    * If we've found a symlink, 404 the sucker to avoid disclosing information.
+    */
+
+    if (!status && S_ISLNK(filestats->st_mode))
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Symlinks such as \"%s\" are not allowed.", con->http.fd, filename);
+      return (NULL);
+    }
+
+   /*
+    * Similarly, if the file/directory does not have world read permissions, do
+    * not allow access...
+    */
+
+    if (!status && !(filestats->st_mode & S_IROTH))
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Files/directories such as \"%s\" must be world-readable.", con->http.fd, filename);
+      return (NULL);
+    }
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -3812,12 +3833,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   argv[0] = command;
 
   if (options)
-  {
-    commptr = options;
-    if (*commptr == ' ')
-      commptr ++;
-    strlcpy(argbuf, commptr, sizeof(argbuf));
-  }
+    strlcpy(argbuf, options, sizeof(argbuf));
   else
     argbuf[0] = '\0';
 
@@ -4395,5 +4411,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 12009 2014-07-09 17:02:38Z msweet $".
+ * End of "$Id: client.c 12057 2014-07-22 14:03:19Z msweet $".
  */

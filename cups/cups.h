@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 11978 2014-07-02 10:35:09Z msweet $"
+ * "$Id: cups.h 12025 2014-07-15 13:00:17Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -49,10 +49,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			1.0704
+#  define CUPS_VERSION			1.0705
 #  define CUPS_VERSION_MAJOR		1
 #  define CUPS_VERSION_MINOR		7
-#  define CUPS_VERSION_PATCH		4
+#  define CUPS_VERSION_PATCH		5
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
@@ -623,5 +623,5 @@ extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 11978 2014-07-02 10:35:09Z msweet $".
+ * End of "$Id: cups.h 12025 2014-07-15 13:00:17Z msweet $".
  */

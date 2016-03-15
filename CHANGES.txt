@@ -1,5 +1,16 @@
-CHANGES.txt - 1.7.4 - 2014-07-08
+CHANGES.txt - 1.7.5 - 2014-07-30
 --------------------------------
+
+CHANGES IN CUPS V1.7.5
+
+	- Security: Addressed some more situations where symlinked files would
+	  be served by the web interface (STR #4455)
+	- The LPD backend did not work with some versions of glibc (STR #4452)
+	- CGI scripts did not work (STR #4454)
+	- The cupsd.conf man page did not list the ErrorPolicy directive
+	  (STR #4457)
+	- Updated the Brazilian Portuguese translation (STR #4456)
+
 
 CHANGES IN CUPS V1.7.4
 
@@ -25,7 +36,6 @@ CHANGES IN CUPS V1.7.4
 	- Fixed a bug in the CUPS_SC_GET_DEVICE_ID handling by the network
 	  backends (STR #4447)
 	- Added USB quirk rule for Lexmark E230 (STR #4448)
-	- The LPD backend did not work with some versions of glibc (STR #4452)
 
 
 CHANGES IN CUPS V1.7.3

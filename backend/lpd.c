@@ -1,5 +1,5 @@
 /*
- * "$Id: lpd.c 12005 2014-07-08 15:46:59Z msweet $"
+ * "$Id: lpd.c 12025 2014-07-15 13:00:17Z msweet $"
  *
  *   Line Printer Daemon backend for CUPS.
  *
@@ -1276,7 +1276,7 @@ rresvport_af(int *port,			/* IO - Port number to bind to */
     * Try binding the port to the socket; return if all is OK...
     */
 
-    if (!bind(fd, (struct sockaddr *)&addr, httpAddrSize(&addr)))
+    if (!bind(fd, (struct sockaddr *)&addr, httpAddrLength(&addr)))
       return (fd);
 
    /*
@@ -1331,5 +1331,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: lpd.c 12005 2014-07-08 15:46:59Z msweet $".
+ * End of "$Id: lpd.c 12025 2014-07-15 13:00:17Z msweet $".
  */

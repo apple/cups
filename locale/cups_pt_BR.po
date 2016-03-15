@@ -14,17 +14,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 1.7.2\n"
+"Project-Id-Version: CUPS 1.7.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2014-05-09 13:32-0700\n"
-"PO-Revision-Date: 2014-04-30 23:57-0300\n"
+"PO-Revision-Date: 2014-07-22 00:19-0300\n"
 "Last-Translator: Rafael Ferreira <rafael.f.f1@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.4\n"
+"X-Generator: Poedit 1.6.5\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "\t\t(all)"
@@ -3742,7 +3742,7 @@ msgid "No active connection"
 msgstr "Nenhuma conexão ativa"
 
 msgid "No active connection."
-msgstr ""
+msgstr "Nenhuma conexão ativa."
 
 #, c-format
 msgid "No active jobs on %s."
@@ -3799,7 +3799,7 @@ msgid "No printer-uri in request."
 msgstr "Nenhum printer-uri na requisição."
 
 msgid "No request sent."
-msgstr ""
+msgstr "Nenhuma requisição enviada."
 
 msgid "No request-id"
 msgstr "Nenhum request-id"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man.in 11109 2013-07-08 21:15:13Z msweet $"
+.\" "$Id: cupsd.conf.man.in 12060 2014-07-28 14:04:41Z msweet $"
 .\"
 .\"   cupsd.conf man page for CUPS.
 .\"
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "8 July 2013" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "28 July 2014" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -179,6 +179,18 @@ Encryption Required
 .br
 Specifies the level of encryption that is required for a particular
 location.
+.TP 5
+ErrorPolicy abort-job
+Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
+.TP 5
+ErrorPolicy retry-job
+Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
+.TP 5
+ErrorPolicy retry-this-job
+Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+.TP 5
+ErrorPolicy stop-printer
+Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
 .TP 5
 FilterLimit limit
 .br
@@ -521,5 +533,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: cupsd.conf.man.in 11109 2013-07-08 21:15:13Z msweet $".
+.\" End of "$Id: cupsd.conf.man.in 12060 2014-07-28 14:04:41Z msweet $".
 .\"
