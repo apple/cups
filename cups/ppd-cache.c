@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd-cache.c 4274 2013-04-09 20:10:23Z msweet $"
+ * "$Id: ppd-cache.c 11833 2014-04-24 15:04:15Z msweet $"
  *
  *   PPD cache implementation for CUPS.
  *
@@ -2719,6 +2719,8 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
     if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
 	_cups_isupper(ppd[1]) && ptr < end)
       *ptr++ = '-';
+    else if (!isdigit(*ppd & 255) && isdigit(ppd[1] & 255))
+      *ptr++ = '-';
   }
 
   *ptr = '\0';
@@ -2726,5 +2728,5 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
 
 /*
- * End of "$Id: ppd-cache.c 4274 2013-04-09 20:10:23Z msweet $".
+ * End of "$Id: ppd-cache.c 11833 2014-04-24 15:04:15Z msweet $".
  */

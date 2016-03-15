@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3483,6 +3483,9 @@ msgstr ""
 msgid "No active connection"
 msgstr "Aucune connexion active"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr ""
@@ -3533,6 +3536,9 @@ msgid "No printer-uri found for class"
 msgstr ""
 
 msgid "No printer-uri in request."
+msgstr ""
+
+msgid "No request sent."
 msgstr ""
 
 msgid "No request-id"

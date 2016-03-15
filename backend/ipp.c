@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11779 2014-03-28 20:48:44Z msweet $"
+ * "$Id: ipp.c 11890 2014-05-22 13:59:21Z msweet $"
  *
  * IPP backend for CUPS.
  *
@@ -91,8 +91,10 @@ static const char * const jattrs[] =	/* Job attributes we want */
   "job-state",
   "job-state-reasons"
 };
-static int		job_canceled = 0;
+static int		job_canceled = 0,
 					/* Job cancelled? */
+			uri_credentials = 0;
+					/* Credentials supplied in URI? */
 static char		username[256] = "",
 					/* Username for device URI */
 			*password = NULL;
@@ -630,6 +632,7 @@ main(int  argc,				/* I - Number of command-line args */
       *password++ = '\0';
 
     cupsSetUser(username);
+    uri_credentials = 1;
   }
   else
   {
@@ -1410,6 +1413,7 @@ main(int  argc,				/* I - Number of command-line args */
       sleep(10);
     }
     else if (ipp_status == IPP_STATUS_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED ||
+             ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
@@ -2985,20 +2989,23 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
   (void)method;
   (void)resource;
 
- /*
-  * Remember that we need to authenticate...
-  */
-
-  auth_info_required = "username,password";
-
-  if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
-                      def_username))
+  if (!uri_credentials)
   {
-    char	quoted[HTTP_MAX_VALUE * 2 + 4];
-					/* Quoted string */
+   /*
+    * Remember that we need to authenticate...
+    */
 
-    fprintf(stderr, "ATTR: auth-info-default=%s,\n",
-            quote_string(def_username, quoted, sizeof(quoted)));
+    auth_info_required = "username,password";
+
+    if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+			def_username))
+    {
+      char	quoted[HTTP_MAX_VALUE * 2 + 4];
+					  /* Quoted string */
+
+      fprintf(stderr, "ATTR: auth-info-default=%s,\n",
+	      quote_string(def_username, quoted, sizeof(quoted)));
+    }
   }
 
   if (password && *password && *password_tries < 3)
@@ -3702,5 +3709,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 11779 2014-03-28 20:48:44Z msweet $".
+ * End of "$Id: ipp.c 11890 2014-05-22 13:59:21Z msweet $".
  */

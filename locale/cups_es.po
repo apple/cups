@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3683,6 +3683,9 @@ msgstr "No está instalado ningún controlador de impresora de Windows."
 msgid "No active connection"
 msgstr "No hay conexión activa"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr "No hay trabajos activos en %s."
@@ -3736,6 +3739,9 @@ msgstr "No se encontró printer-uri para la clase"
 
 msgid "No printer-uri in request."
 msgstr "No hay printer-uri en la petición."
+
+msgid "No request sent."
+msgstr ""
 
 msgid "No request-id"
 msgstr "No hay request-id"

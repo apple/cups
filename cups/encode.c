@@ -1,26 +1,18 @@
 /*
- * "$Id: encode.c 11734 2014-03-25 18:01:47Z msweet $"
+ * "$Id: encode.c 11867 2014-05-09 20:33:08Z msweet $"
  *
- *   Option encoding routines for CUPS.
+ * Option encoding routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsEncodeOptions()   - Encode printer options into IPP attributes.
- *   cupsEncodeOptions2()  - Encode printer options into IPP attributes for
- *                           a group.
- *   _ippFindOption()      - Find the attribute information for an option.
- *   compare_ipp_options() - Compare two IPP options.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -80,34 +72,11 @@ static const ipp_op_t ipp_all_print[] =
   IPP_OP_CUPS_NONE
 };
 
-static const ipp_op_t ipp_all_limit[] =
-{
-  IPP_OP_GET_JOBS,
-  IPP_OP_GET_PRINTER_ATTRIBUTES,
-  IPP_OP_CUPS_GET_PRINTERS,
-  IPP_OP_CUPS_GET_CLASSES,
-  IPP_OP_CUPS_GET_DEVICES,
-  IPP_OP_CUPS_GET_PPDS,
-  IPP_OP_CUPS_NONE
-};
-
 static const ipp_op_t ipp_set_printer[] =
 {
   IPP_OP_SET_PRINTER_ATTRIBUTES,
   IPP_OP_CUPS_ADD_MODIFY_PRINTER,
   IPP_OP_CUPS_ADD_MODIFY_CLASS,
-  IPP_OP_CUPS_NONE
-};
-
-static const ipp_op_t cups_am_class[] =
-{
-  IPP_OP_CUPS_ADD_MODIFY_CLASS,
-  IPP_OP_CUPS_NONE
-};
-
-static const ipp_op_t cups_am_printer[] =
-{
-  IPP_OP_CUPS_ADD_MODIFY_PRINTER,
   IPP_OP_CUPS_NONE
 };
 
@@ -878,5 +847,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 11734 2014-03-25 18:01:47Z msweet $".
+ * End of "$Id: encode.c 11867 2014-05-09 20:33:08Z msweet $".
  */

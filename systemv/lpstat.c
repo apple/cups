@@ -1,9 +1,9 @@
 /*
- * "$Id: lpstat.c 11395 2013-11-06 20:06:50Z msweet $"
+ * "$Id: lpstat.c 11890 2014-05-22 13:59:21Z msweet $"
  *
  * "lpstat" command for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -649,7 +649,6 @@ show_accepting(const char  *printers,	/* I - Destinations */
 		*message;		/* Printer device URI */
   int		accepting;		/* Accepting requests? */
   time_t	ptime;			/* Printer state time */
-  struct tm	*pdate;			/* Printer state date & time */
   char		printer_state_time[255];/* Printer state time */
   static const char *pattrs[] =		/* Attributes we need for printers... */
 		{
@@ -772,8 +771,7 @@ show_accepting(const char  *printers,	/* I - Destinations */
 
       if (match_list(printers, printer))
       {
-        pdate = localtime(&ptime);
-        strftime(printer_state_time, sizeof(printer_state_time), "%c", pdate);
+        _cupsStrDate(printer_state_time, sizeof(printer_state_time), ptime);
 
         if (accepting)
 	  _cupsLangPrintf(stdout, _("%s accepting requests since %s"),
@@ -1323,7 +1321,6 @@ show_jobs(const char *dests,		/* I - Destinations */
 		jobid,			/* job-id */
 		size;			/* job-k-octets */
   time_t	jobtime;		/* time-at-creation */
-  struct tm	*jobdate;		/* Date & time */
   char		temp[255],		/* Temporary buffer */
 		date[255];		/* Date buffer */
   static const char *jattrs[] =		/* Attributes we need for jobs... */
@@ -1481,62 +1478,44 @@ show_jobs(const char *dests,		/* I - Destinations */
 
       if (match_list(dests, dest) && match_list(users, username))
       {
-        jobdate = localtime(&jobtime);
         snprintf(temp, sizeof(temp), "%s-%d", dest, jobid);
 
-        if (long_status == 3)
-	{
-	 /*
-	  * Show the consolidated output format for the SGI tools...
-	  */
+	_cupsStrDate(date, sizeof(date), jobtime);
 
-	  if (!strftime(date, sizeof(date), "%b %d %H:%M", jobdate))
-	    strlcpy(date, "Unknown", sizeof(date));
-
-	  _cupsLangPrintf(stdout, "%s;%s;%d;%s;%s",
-	                  temp, username ? username : "unknown",
-	        	  size, title ? title : "unknown", date);
-	}
+	if (ranking)
+	  _cupsLangPrintf(stdout, "%3d %-21s %-13s %8.0f %s",
+			  rank, temp, username ? username : "unknown",
+			  1024.0 * size, date);
 	else
+	  _cupsLangPrintf(stdout, "%-23s %-13s %8.0f   %s",
+			  temp, username ? username : "unknown",
+			  1024.0 * size, date);
+	if (long_status)
 	{
-	  if (!strftime(date, sizeof(date), "%c", jobdate))
-	    strlcpy(date, "Unknown", sizeof(date));
+	  if (message)
+	    _cupsLangPrintf(stdout, _("\tStatus: %s"), message);
 
-          if (ranking)
-	    _cupsLangPrintf(stdout, "%3d %-21s %-13s %8.0f %s",
-	                    rank, temp, username ? username : "unknown",
-			    1024.0 * size, date);
-          else
-	    _cupsLangPrintf(stdout, "%-23s %-13s %8.0f   %s",
-	                    temp, username ? username : "unknown",
-			    1024.0 * size, date);
-          if (long_status)
-          {
-	    if (message)
-	      _cupsLangPrintf(stdout, _("\tStatus: %s"), message);
+	  if (reasons)
+	  {
+	    char	alerts[1024],	/* Alerts string */
+		      *aptr;		/* Pointer into alerts string */
 
-	    if (reasons)
+	    for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 	    {
-	      char	alerts[1024],	/* Alerts string */
-			*aptr;		/* Pointer into alerts string */
+	      if (i)
+		snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
+			 reasons->values[i].string.text);
+	      else
+		strlcpy(alerts, reasons->values[i].string.text,
+			sizeof(alerts));
 
-	      for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
-	      {
-	        if (i)
-		  snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			   reasons->values[i].string.text);
-                else
-		  strlcpy(alerts, reasons->values[i].string.text,
-		          sizeof(alerts));
-
-		aptr += strlen(aptr);
-	      }
-
-	      _cupsLangPrintf(stdout, _("\tAlerts: %s"), alerts);
+	      aptr += strlen(aptr);
 	    }
 
-	    _cupsLangPrintf(stdout, _("\tqueued for %s"), dest);
+	    _cupsLangPrintf(stdout, _("\tAlerts: %s"), alerts);
 	  }
+
+	  _cupsLangPrintf(stdout, _("\tqueued for %s"), dest);
 	}
       }
 
@@ -1579,7 +1558,6 @@ show_printers(const char  *printers,	/* I - Destinations */
   ipp_pstate_t	pstate;			/* Printer state */
   cups_ptype_t	ptype;			/* Printer type */
   time_t	ptime;			/* Printer state time */
-  struct tm	*pdate;			/* Printer state date & time */
   int		jobid;			/* Job ID of current job */
   char		printer_uri[HTTP_MAX_URI],
 					/* Printer URI */
@@ -1823,8 +1801,7 @@ show_printers(const char  *printers,	/* I - Destinations */
         * Display it...
 	*/
 
-        pdate = localtime(&ptime);
-        strftime(printer_state_time, sizeof(printer_state_time), "%c", pdate);
+        _cupsStrDate(printer_state_time, sizeof(printer_state_time), ptime);
 
         switch (pstate)
 	{
@@ -2105,5 +2082,5 @@ show_scheduler(void)
 
 
 /*
- * End of "$Id: lpstat.c 11395 2013-11-06 20:06:50Z msweet $".
+ * End of "$Id: lpstat.c 11890 2014-05-22 13:59:21Z msweet $".
  */

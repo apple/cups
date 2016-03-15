@@ -1,5 +1,5 @@
 /*
- * "$Id: testipp.c 11215 2013-08-02 15:24:51Z msweet $"
+ * "$Id: testipp.c 11890 2014-05-22 13:59:21Z msweet $"
  *
  *   IPP test program for CUPS.
  *
@@ -901,17 +901,10 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
       case IPP_TAG_DATE :
           {
-	    time_t	vtime;		/* Date/Time value */
-	    struct tm	*vdate;		/* Date info */
 	    char	vstring[256];	/* Formatted time */
 
 	    for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    {
-	      vtime = ippDateToTime(val->date);
-	      vdate = localtime(&vtime);
-	      strftime(vstring, sizeof(vstring), "%c", vdate);
-	      printf(" (%s)", vstring);
-	    }
+	      printf(" (%s)", _cupsStrDate(vstring, sizeof(vstring), ippDateToTime(val->date)));
           }
           putchar('\n');
           break;
@@ -1019,5 +1012,5 @@ write_cb(_ippdata_t   *data,		/* I - Data */
 
 
 /*
- * End of "$Id: testipp.c 11215 2013-08-02 15:24:51Z msweet $".
+ * End of "$Id: testipp.c 11890 2014-05-22 13:59:21Z msweet $".
  */

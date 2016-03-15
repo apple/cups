@@ -1,31 +1,16 @@
 /*
- * "$Id: ipp-var.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: ipp-var.c 11890 2014-05-22 13:59:21Z msweet $"
  *
- *   CGI <-> IPP variable routines for CUPS.
+ * CGI <-> IPP variable routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cgiGetAttributes()    - Get the list of attributes that are needed by the
- *                           template file.
- *   cgiGetIPPObjects()    - Get the objects in an IPP response.
- *   cgiMoveJobs()         - Move one or more jobs.
- *   cgiPrintCommand()     - Print a CUPS command job.
- *   cgiPrintTestPage()    - Print a test page.
- *   cgiRewriteURL()       - Rewrite a printer URI into a web browser URL...
- *   cgiSetIPPObjectVars() - Set CGI variables from an IPP object.
- *   cgiSetIPPVars()       - Set CGI variables from an IPP response.
- *   cgiShowIPPError()     - Show the last IPP error message.
- *   cgiShowJobs()         - Show print jobs.
- *   cgiText()             - Return localized text.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -958,7 +943,6 @@ cgiSetIPPObjectVars(
 			*nameptr,	/* Pointer into name */
 			value[16384],	/* Value(s) */
 			*valptr;	/* Pointer into value */
-  struct tm		*date;		/* Date information */
 
 
   fprintf(stderr, "DEBUG2: cgiSetIPPObjectVars(obj=%p, prefix=\"%s\", "
@@ -1186,17 +1170,9 @@ cgiSetIPPObjectVars(
 	case IPP_TAG_INTEGER :
 	case IPP_TAG_ENUM :
 	    if (strncmp(name, "time_at_", 8) == 0)
-	    {
-	      time_t	t;		/* Temporary time value */
-
-              t    = (time_t)attr->values[i].integer;
-	      date = localtime(&t);
-
-	      strftime(valptr, sizeof(value) - (valptr - value), "%c", date);
-	    }
+	      _cupsStrDate(valptr, sizeof(value) - (size_t)(valptr - value), (time_t)ippGetInteger(attr, i));
 	    else
-	      snprintf(valptr, sizeof(value) - (valptr - value),
-		       "%d", attr->values[i].integer);
+	      snprintf(valptr, sizeof(value) - (size_t)(valptr - value), "%d", ippGetInteger(attr, i));
 	    break;
 
 	case IPP_TAG_BOOLEAN :
@@ -1589,5 +1565,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: ipp-var.c 11890 2014-05-22 13:59:21Z msweet $".
  */

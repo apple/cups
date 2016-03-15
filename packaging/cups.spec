@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 11808 2014-04-10 15:11:43Z msweet $"
+# "$Id: cups.spec.in 11897 2014-05-27 15:02:42Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -40,12 +40,12 @@
 
 Summary: CUPS
 Name: cups
-Version: 1.7.2
+Version: 1.7.3
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2
+Source: http://www.cups.org/software/1.7.3/cups-1.7.3-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -62,7 +62,7 @@ BuildRequires: avahi-devel
 %endif
 
 %if %{?_with_libusb1:1}%{!?_with_libusb1:0}
-BuildRequires: libusbx-devel
+BuildRequires: libusb-devel >= 1.0
 %endif
 
 # Use buildroot so as not to disturb the version already installed
@@ -396,5 +396,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 11808 2014-04-10 15:11:43Z msweet $".
+# End of "$Id: cups.spec.in 11897 2014-05-27 15:02:42Z msweet $".
 #

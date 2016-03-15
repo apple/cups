@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 11739 2014-03-26 21:06:04Z msweet $"
+ * "$Id: request.c 11867 2014-05-09 20:33:08Z msweet $"
  *
  *   IPP utilities for CUPS.
  *
@@ -350,17 +350,31 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
 
   DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", http, resource));
+  DEBUG_printf(("1cupsGetResponse: http->state=%d", http ? http->state : HTTP_STATE_ERROR));
 
  /*
   * Connect to the default server as needed...
   */
 
   if (!http)
-    http = _cupsConnect();
+  {
+    _cups_globals_t *cg = _cupsGlobals();
+					/* Pointer to library globals */
 
-  if (!http || (http->state != HTTP_STATE_POST_RECV &&
-                http->state != HTTP_STATE_POST_SEND))
+    if ((http = cg->http) == NULL)
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No active connection."), 1);
+      DEBUG_puts("1cupsGetResponse: No active connection - returning NULL.");
+      return (NULL);
+    }
+  }
+
+  if (http->state != HTTP_STATE_POST_RECV && http->state != HTTP_STATE_POST_SEND)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No request sent."), 1);
+    DEBUG_puts("1cupsGetResponse: Not in POST state - returning NULL.");
     return (NULL);
+  }
 
  /*
   * Check for an unfinished chunked request...
@@ -749,9 +763,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     got_status     = 0;
 
     while ((state = ippWrite(http, request)) != IPP_STATE_DATA)
-      if (state == IPP_STATE_ERROR)
-	break;
-      else if (httpCheck(http))
+    {
+      if (httpCheck(http))
       {
         got_status = 1;
 
@@ -759,15 +772,30 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	if (status >= HTTP_STATUS_MULTIPLE_CHOICES)
 	  break;
       }
+      else if (state == IPP_STATE_ERROR)
+	break;
+    }
 
     if (state == IPP_STATE_ERROR)
     {
-      DEBUG_puts("1cupsSendRequest: Unable to send IPP request.");
+     /*
+      * We weren't able to send the IPP request. But did we already get a HTTP
+      * error status?
+      */
 
-      http->status = HTTP_STATUS_ERROR;
-      http->state  = HTTP_STATE_WAITING;
+      if (!got_status || status < HTTP_STATUS_MULTIPLE_CHOICES)
+      {
+       /*
+        * No, something else went wrong.
+	*/
 
-      return (HTTP_STATUS_ERROR);
+	DEBUG_puts("1cupsSendRequest: Unable to send IPP request.");
+
+	http->status = HTTP_STATUS_ERROR;
+	http->state  = HTTP_STATE_WAITING;
+
+	return (HTTP_STATUS_ERROR);
+      }
     }
 
    /*
@@ -1177,5 +1205,5 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * End of "$Id: request.c 11739 2014-03-26 21:06:04Z msweet $".
+ * End of "$Id: request.c 11867 2014-05-09 20:33:08Z msweet $".
  */

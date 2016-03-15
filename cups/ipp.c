@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 11113 2013-07-10 14:08:39Z msweet $"
+ * "$Id: ipp.c 11864 2014-05-08 23:10:47Z msweet $"
  *
  *   Internet Printing Protocol functions for CUPS.
  *
@@ -2204,7 +2204,7 @@ ippFirstAttribute(ipp_t *ipp)		/* I - IPP message */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Boolean value or -1 on error */
+int					/* O - Boolean value or 0 on error */
 ippGetBoolean(ipp_attribute_t *attr,	/* I - IPP attribute */
               int             element)	/* I - Value number (0-based) */
 {
@@ -2214,7 +2214,7 @@ ippGetBoolean(ipp_attribute_t *attr,	/* I - IPP attribute */
 
   if (!attr || attr->value_tag != IPP_TAG_BOOLEAN ||
       element < 0 || element >= attr->num_values)
-    return (-1);
+    return (0);
 
  /*
   * Return the value...
@@ -2260,7 +2260,7 @@ ippGetCollection(
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Number of values or -1 on error */
+int					/* O - Number of values or 0 on error */
 ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
 {
  /*
@@ -2268,7 +2268,7 @@ ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
   */
 
   if (!attr)
-    return (-1);
+    return (0);
 
  /*
   * Return the number of values...
@@ -2340,7 +2340,7 @@ ippGetGroupTag(ipp_attribute_t *attr)	/* I - IPP attribute */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Value or -1 on error */
+int					/* O - Value or 0 on error */
 ippGetInteger(ipp_attribute_t *attr,	/* I - IPP attribute */
               int             element)	/* I - Value number (0-based) */
 {
@@ -2350,7 +2350,7 @@ ippGetInteger(ipp_attribute_t *attr,	/* I - IPP attribute */
 
   if (!attr || (attr->value_tag != IPP_TAG_INTEGER && attr->value_tag != IPP_TAG_ENUM) ||
       element < 0 || element >= attr->num_values)
-    return (-1);
+    return (0);
 
  /*
   * Return the value...
@@ -2429,7 +2429,7 @@ ippGetOctetString(
  * @since CUPS 1.6/OS X 10.8@
  */
 
-ipp_op_t				/* O - Operation ID or -1 on error */
+ipp_op_t				/* O - Operation ID or 0 on error */
 ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
 {
  /*
@@ -2437,7 +2437,7 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
   */
 
   if (!ipp)
-    return ((ipp_op_t)-1);
+    return ((ipp_op_t)0);
 
  /*
   * Return the value...
@@ -2456,7 +2456,7 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Lower value of range or -1 */
+int					/* O - Lower value of range or 0 */
 ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
 	    int             element,	/* I - Value number (0-based) */
 	    int             *uppervalue)/* O - Upper value of range */
@@ -2469,9 +2469,9 @@ ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
       element < 0 || element >= attr->num_values)
   {
     if (uppervalue)
-      *uppervalue = -1;
+      *uppervalue = 0;
 
-    return (-1);
+    return (0);
   }
 
  /*
@@ -2491,7 +2491,7 @@ ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Request ID or -1 on error */
+int					/* O - Request ID or 0 on error */
 ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
 {
  /*
@@ -2499,7 +2499,7 @@ ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
   */
 
   if (!ipp)
-    return (-1);
+    return (0);
 
  /*
   * Return the request ID...
@@ -2518,7 +2518,7 @@ ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Horizontal/cross feed resolution or -1 */
+int					/* O - Horizontal/cross feed resolution or 0 */
 ippGetResolution(
     ipp_attribute_t *attr,		/* I - IPP attribute */
     int             element,		/* I - Value number (0-based) */
@@ -2531,7 +2531,15 @@ ippGetResolution(
 
   if (!attr || attr->value_tag != IPP_TAG_RESOLUTION ||
       element < 0 || element >= attr->num_values)
-    return (-1);
+  {
+    if (yres)
+      *yres = 0;
+
+    if (units)
+      *units = (ipp_res_t)0;
+
+    return (0);
+  }
 
  /*
   * Return the value...
@@ -2659,7 +2667,7 @@ ippGetValueTag(ipp_attribute_t *attr)	/* I - IPP attribute */
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - Major version number or -1 on error */
+int					/* O - Major version number or 0 on error */
 ippGetVersion(ipp_t *ipp,		/* I - IPP message */
               int   *minor)		/* O - Minor version number or @code NULL@ */
 {
@@ -2670,9 +2678,9 @@ ippGetVersion(ipp_t *ipp,		/* I - IPP message */
   if (!ipp)
   {
     if (minor)
-      *minor = -1;
+      *minor = 0;
 
-    return (-1);
+    return (0);
   }
 
  /*
@@ -7064,5 +7072,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c 11113 2013-07-10 14:08:39Z msweet $".
+ * End of "$Id: ipp.c 11864 2014-05-08 23:10:47Z msweet $".
  */

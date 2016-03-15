@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-gnutls.c 3755 2012-03-30 05:59:14Z msweet $"
+ * "$Id: tls-gnutls.c 11899 2014-05-27 15:10:09Z msweet $"
  *
  *   TLS support code for the CUPS scheduler using GNU TLS.
  *
@@ -117,7 +117,7 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   gnutls_set_default_priority(con->http.tls);
 
   gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
+  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr_t)HTTP(con));
   gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
   gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
 
@@ -152,8 +152,8 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
 static int				/* O - 1 on success, 0 on failure */
 make_certificate(cupsd_client_t *con)	/* I - Client connection */
 {
-  gnutls_x509_crt	crt;		/* Self-signed certificate */
-  gnutls_x509_privkey	key;		/* Encryption key */
+  gnutls_x509_crt_t	crt;		/* Self-signed certificate */
+  gnutls_x509_privkey_t	key;		/* Encryption key */
   cups_lang_t		*language;	/* Default language info */
   cups_file_t		*fp;		/* Key/cert file */
   unsigned char		buffer[8192];	/* Buffer for x509 data */
@@ -288,5 +288,5 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
- * End of "$Id: tls-gnutls.c 3755 2012-03-30 05:59:14Z msweet $".
+ * End of "$Id: tls-gnutls.c 11899 2014-05-27 15:10:09Z msweet $".
  */

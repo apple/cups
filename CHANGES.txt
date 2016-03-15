@@ -1,5 +1,36 @@
-CHANGES.txt - 1.7.2 - 2014-04-10
+CHANGES.txt - 1.7.3 - 2014-05-27
 --------------------------------
+
+CHANGES IN CUPS V1.7.3
+
+	- Added Brazilian Portuguese translation (STR #4409)
+	- Fixed mapping of OutputBin values such as "Tray1"
+	  (<rdar://problem/16685606>)
+	- Several ippGet* functions incorrectly returned -1 instead of 0 on
+	  error.
+	- The cupsGetResponse function did not work properly with
+	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
+	- The IPP backend did not abort a job when the printer did not validate
+	  the supplied options (<rdar://problem/16836752>)
+	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
+	- The scheduler did not add the "job-hold-until-specified" reason when
+	  holding a job using the lp command (STR #4405)
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
+	- The configure script incorrectly added libgcrypt as a GNU TLS
+	  dependency (STR #4399)
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402)
+	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
+	  (STR #4414)
+	- Auto-typing of PWG Raster files did not work (STR #4417)
+	- IPP queues using hardcoded credentials would ask for credentials
+	  (STR #4371)
+	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
+	- The RPM spec file now looks for libusb-devel 1.0 or later.
+	- Fixed the "create-printer-subscription.test" file for IPPTOOL
+	  (STR #4420)
+
 
 CHANGES IN CUPS V1.7.2
 
@@ -22,7 +53,7 @@ CHANGES IN CUPS V1.7.2
 	- cupsDoIORequest could miss the server status, causing failed lpadmin
 	  and other administrative commands (STR #4386)
 	- cupsEnumDests didn't always call the callback function (STR #4380)
-	- "lp -i job-id -H hold" did not work (STR #nnn)
+	- "lp -i job-id -H hold" did not work (STR #4401)
 	- CUPS didn't compile on older platforms (STR #4338)
 	- Several libcups files did not have the Apple license exception
 	  notice (STR #4361)

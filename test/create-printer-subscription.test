@@ -1,16 +1,16 @@
 #
-# "$Id: create-printer-subscription.test 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: create-printer-subscription.test 11897 2014-05-27 15:02:42Z msweet $"
 #
-#   Create a printer subscription.
+# Create a printer subscription.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 # Usage:
 #
@@ -31,8 +31,8 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 
-        GROUP subscription-attributes-tag
-	ATTR uri notify-recipient $recipient
+	GROUP subscription-attributes-tag
+	ATTR uri notify-recipient-uri $recipient
 	ATTR keyword notify-events printer-config-changed,printer-state-changed
 
 	# What statuses are OK?
@@ -71,5 +71,5 @@
 
 
 #
-# End of "$Id: create-printer-subscription.test 11396 2013-11-06 20:09:03Z msweet $"
+# End of "$Id: create-printer-subscription.test 11897 2014-05-27 15:02:42Z msweet $"
 #

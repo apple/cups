@@ -1,5 +1,5 @@
 /*
- * "$Id: dest-options.c 11085 2013-07-03 13:53:05Z msweet $"
+ * "$Id: dest-options.c 11883 2014-05-16 21:04:07Z msweet $"
  *
  *   Destination option/media support for CUPS.
  *
@@ -886,7 +886,8 @@ cupsGetDestMediaByIndex(
     unsigned     flags,			/* I - Media flags */
     cups_size_t  *size)			/* O - Media size information */
 {
-  cups_size_t	*nsize;			/* Size for N */
+  _cups_media_db_t	*nsize;		/* Size for N */
+  pwg_media_t		*pwg;		/* PWG media name for size */
 
 
  /*
@@ -916,13 +917,30 @@ cupsGetDestMediaByIndex(
   * Copy the size over and return...
   */
 
-  if ((nsize = (cups_size_t *)cupsArrayIndex(dinfo->cached_db, n)) == NULL)
+  if ((nsize = (_cups_media_db_t *)cupsArrayIndex(dinfo->cached_db, n)) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (0);
+  }
+  
+  if (nsize->size_name)
+    strlcpy(size->media, nsize->size_name, sizeof(size->media));
+  else if (nsize->key)
+    strlcpy(size->media, nsize->key, sizeof(size->media));
+  else if ((pwg = pwgMediaForSize(nsize->width, nsize->length)) != NULL)
+    strlcpy(size->media, pwg->pwg, sizeof(size->media));
+  else
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
 
-  memcpy(size, nsize, sizeof(cups_size_t));
+  size->width  = nsize->width;
+  size->length = nsize->length;
+  size->bottom = nsize->bottom;
+  size->left   = nsize->left;
+  size->right  = nsize->right;
+  size->top    = nsize->top;
 
   return (1);
 }
@@ -1281,6 +1299,8 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
 			*first;		/* First entry this size */
 
 
+  DEBUG_printf(("3cups_create_cached(http=%p, dinfo=%p, flags=%u)", http, dinfo, flags));
+
   if (dinfo->cached_db)
     cupsArrayDelete(dinfo->cached_db);
 
@@ -1289,11 +1309,15 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
 
   if (flags & CUPS_MEDIA_FLAGS_READY)
   {
+    DEBUG_puts("4cups_create_cached: ready media");
+
     cups_update_ready(http, dinfo);
     db = dinfo->ready_db;
   }
   else
   {
+    DEBUG_puts("4cups_create_cached: supported media");
+
     if (!dinfo->media_db)
       cups_create_media_db(dinfo, CUPS_MEDIA_FLAGS_DEFAULT);
 
@@ -1304,26 +1328,40 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
        mdb;
        mdb = (_cups_media_db_t *)cupsArrayNext(db))
   {
+    DEBUG_printf(("4cups_create_cached: %p key=\"%s\", type=\"%s\", %dx%d, B%d L%d R%d T%d", mdb, mdb->key, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
+
     if (flags & CUPS_MEDIA_FLAGS_BORDERLESS)
     {
       if (!mdb->left && !mdb->right && !mdb->top && !mdb->bottom)
+      {
+        DEBUG_printf(("4cups_create_cached: add %p", mdb));
         cupsArrayAdd(dinfo->cached_db, mdb);
+      }
     }
     else if (flags & CUPS_MEDIA_FLAGS_DUPLEX)
     {
       if (first->width != mdb->width || first->length != mdb->length)
       {
+	DEBUG_printf(("4cups_create_cached: add %p", first));
         cupsArrayAdd(dinfo->cached_db, first);
         first = mdb;
       }
-      else if (mdb->left >= first->left && mdb->right >= first->right &&
-               mdb->top >= first->top && mdb->bottom >= first->bottom)
+      else if (mdb->left >= first->left && mdb->right >= first->right && mdb->top >= first->top && mdb->bottom >= first->bottom &&
+	       (mdb->left != first->left || mdb->right != first->right || mdb->top != first->top || mdb->bottom != first->bottom))
         first = mdb;
+    }
+    else
+    {
+      DEBUG_printf(("4cups_create_cached: add %p", mdb));
+      cupsArrayAdd(dinfo->cached_db, mdb);
     }
   }
 
   if (flags & CUPS_MEDIA_FLAGS_DUPLEX)
+  {
+    DEBUG_printf(("4cups_create_cached: add %p", first));
     cupsArrayAdd(dinfo->cached_db, first);
+  }
 }
 
 
@@ -1757,8 +1795,7 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
       * Look for the smallest margins...
       */
 
-      if (best->left != 0 || best->right != 0 || best->top != 0 ||
-          best->bottom != 0)
+      if (best->left != 0 || best->right != 0 || best->top != 0 || best->bottom != 0)
       {
 	for (mdb = (_cups_media_db_t *)cupsArrayNext(db);
 	     mdb && !cups_compare_media_db(mdb, &key);
@@ -1795,7 +1832,8 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
 	   mdb = (_cups_media_db_t *)cupsArrayNext(db))
       {
 	if (mdb->left >= best->left && mdb->right >= best->right &&
-	    mdb->top >= best->top && mdb->bottom >= best->bottom)
+	    mdb->top >= best->top && mdb->bottom >= best->bottom &&
+	    (mdb->bottom != best->bottom || mdb->left != best->left || mdb->right != best->right || mdb->top != best->top))
 	  best = mdb;
       }
     }
@@ -1810,11 +1848,10 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
 	   mdb = (_cups_media_db_t *)cupsArrayNext(db))
       {
 	if (((mdb->left > 0 && mdb->left <= best->left) || best->left == 0) &&
-	    ((mdb->right > 0 && mdb->right <= best->right) ||
-	     best->right == 0) &&
+	    ((mdb->right > 0 && mdb->right <= best->right) || best->right == 0) &&
 	    ((mdb->top > 0 && mdb->top <= best->top) || best->top == 0) &&
-	    ((mdb->bottom > 0 && mdb->bottom <= best->bottom) ||
-	     best->bottom == 0))
+	    ((mdb->bottom > 0 && mdb->bottom <= best->bottom) || best->bottom == 0) &&
+	    (mdb->bottom != best->bottom || mdb->left != best->left || mdb->right != best->right || mdb->top != best->top))
 	  best = mdb;
       }
     }
@@ -1892,7 +1929,8 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
 	     mdb = (_cups_media_db_t *)cupsArrayNext(db))
 	{
 	  if (mdb->left <= best->left && mdb->right <= best->right &&
-	      mdb->top <= best->top && mdb->bottom <= best->bottom)
+	      mdb->top <= best->top && mdb->bottom <= best->bottom &&
+	      (mdb->bottom != best->bottom || mdb->left != best->left || mdb->right != best->right || mdb->top != best->top))
 	  {
 	    best = mdb;
 	    if (mdb->left == 0 && mdb->right == 0 && mdb->bottom == 0 &&
@@ -1913,7 +1951,8 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
 	   mdb = (_cups_media_db_t *)cupsArrayNext(db))
       {
 	if (mdb->left >= best->left && mdb->right >= best->right &&
-	    mdb->top >= best->top && mdb->bottom >= best->bottom)
+	    mdb->top >= best->top && mdb->bottom >= best->bottom &&
+	    (mdb->bottom != best->bottom || mdb->left != best->left || mdb->right != best->right || mdb->top != best->top))
 	  best = mdb;
       }
     }
@@ -1932,7 +1971,8 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
 	     best->right == 0) &&
 	    ((mdb->top > 0 && mdb->top <= best->top) || best->top == 0) &&
 	    ((mdb->bottom > 0 && mdb->bottom <= best->bottom) ||
-	     best->bottom == 0))
+	     best->bottom == 0) &&
+	    (mdb->bottom != best->bottom || mdb->left != best->left || mdb->right != best->right || mdb->top != best->top))
 	  best = mdb;
       }
     }
@@ -2267,5 +2307,5 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
 
 
 /*
- * End of "$Id: dest-options.c 11085 2013-07-03 13:53:05Z msweet $".
+ * End of "$Id: dest-options.c 11883 2014-05-16 21:04:07Z msweet $".
  */

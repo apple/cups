@@ -1,0 +1,54 @@
+<SCRIPT TYPE="text/javascript"><!--
+function select_printers() {
+  var list = document.export_samba.EXPORT_NAME;
+  var sel = document.export_samba.EXPORT_ALL.checked;
+
+  for (i = 0; i < list.length; i ++) {
+    list.options[i].selected = sel;
+  }
+}
+--></SCRIPT>
+
+<FORM METHOD="POST" ACTION="/admin/" NAME="export_samba">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba">
+
+<H2 CLASS="title">Exportar impressoras para o Samba</H2>
+
+{error?<P>Não foi possível exportar impressoras para o Samba\:</P>
+<BLOCKQUOTE>{error}</BLOCKQUOTE>
+<P>Consulte o arquivo <A HREF="/admin/log/error_log"
+TARGET="_blank">error_log</A> para mais informações.</P>:
+<P>Essa página permite que você exporte impressoras para o Samba
+para que clientes Windows possam acessá-las através do ícone de
+<VAR>Meus locais de rede</VAR> nas suas áreas de trabalho.
+Você deve primeiro instalar os drivers de impressora PostScript
+do Windows como descrito na página de manual do
+<A HREF="/help/man-cupsaddsmb.html" TARGET="_blank">cupsaddsmb(8)</A>.</P>}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Impressoras:</TH>
+<TD>
+<SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
+{[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
+</SELECT><BR>
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"> Exportar todas as impressoras
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Nome do usuário do Samba:</TH>
+<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (obrigatório)</TD>
+</TR>
+<TR>
+<TH CLASS="label">Senha do Samba:</TH>
+<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (obrigatório)</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Exportar impressoras para o Samba"></TD>
+</TR>
+</TABLE>
+
+</FORM>
