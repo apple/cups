@@ -1,5 +1,0 @@
-<DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Aktive Aufträge anzeigen"></FORM>}
-{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Fertige Aufträge anzeigen"></FORM>}
-{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Alle Aufträge anzeigen"></FORM>}</DIV>
-
-<P ALIGN="CENTER">{total=0?Keine Aufträge:Zeige {#job_id} von {total} {?which_jobs=?aktiven:{which_jobs=all?:beendeten}} {total=1?Auftrag:Aufträgen}}.</P>

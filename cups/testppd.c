@@ -1,22 +1,18 @@
 /*
- * "$Id: testppd.c 11060 2013-06-25 15:02:18Z msweet $"
+ * "$Id: testppd.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   PPD test program for CUPS.
+ * PPD test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main() - Main entry.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -32,6 +28,7 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #endif /* WIN32 */
+#include <math.h>
 
 
 /*
@@ -394,10 +391,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("ppdPageSizeLimits: ", stdout);
     if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
     {
-      if (minsize.width != 36 || minsize.length != 36 ||
-          maxsize.width != 1080 || maxsize.length != 86400)
+      if (fabs(minsize.width - 36.0) > 0.001 || fabs(minsize.length - 36.0) > 0.001 ||
+          fabs(maxsize.width - 1080.0) > 0.001 || fabs(maxsize.length - 86400.0) > 0.001)
       {
-        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+        printf("FAIL (got min=%.3fx%.3f, max=%.3fx%.3f, "
 	       "expected min=36x36, max=1080x86400)\n", minsize.width,
 	       minsize.length, maxsize.width, maxsize.length);
         status ++;
@@ -483,7 +480,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     size = ppdPageSize(ppd, NULL);
     if (!size || strcmp(size->name, "Custom") ||
-        size->width != 576 || size->length != 720)
+        fabs(size->width - 576.0) > 0.001 ||
+        fabs(size->length - 720.0) > 0.001)
     {
       printf("FAIL (%s - %gx%g)\n", size ? size->name : "unknown",
              size ? size->width : 0.0, size ? size->length : 0.0);
@@ -772,8 +770,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("ppdPageSizeLimits(default): ", stdout);
     if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
     {
-      if (minsize.width != 36 || minsize.length != 36 ||
-          maxsize.width != 1080 || maxsize.length != 86400)
+      if (fabs(minsize.width - 36.0) > 0.001 || fabs(minsize.length - 36.0) > 0.001 ||
+          fabs(maxsize.width - 1080.0) > 0.001 || fabs(maxsize.length - 86400.0) > 0.001)
       {
         printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
 	       "expected min=36x36, max=1080x86400)\n", minsize.width,
@@ -794,8 +792,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("ppdPageSizeLimits(InputSlot=Manual): ", stdout);
     if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
     {
-      if (minsize.width != 100 || minsize.length != 100 ||
-          maxsize.width != 1000 || maxsize.length != 1000)
+      if (fabs(minsize.width - 100.0) > 0.001 || fabs(minsize.length - 100.0) > 0.001 ||
+          fabs(maxsize.width - 1000.0) > 0.001 || fabs(maxsize.length - 1000.0) > 0.001)
       {
         printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
 	       "expected min=100x100, max=1000x1000)\n", minsize.width,
@@ -816,8 +814,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("ppdPageSizeLimits(Quality=Photo): ", stdout);
     if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
     {
-      if (minsize.width != 200 || minsize.length != 200 ||
-          maxsize.width != 1000 || maxsize.length != 1000)
+      if (fabs(minsize.width - 200.0) > 0.001 || fabs(minsize.length - 200.0) > 0.001 ||
+          fabs(maxsize.width - 1000.0) > 0.001 || fabs(maxsize.length - 1000.0) > 0.001)
       {
         printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
 	       "expected min=200x200, max=1000x1000)\n", minsize.width,
@@ -838,8 +836,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("ppdPageSizeLimits(Quality=Photo): ", stdout);
     if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
     {
-      if (minsize.width != 300 || minsize.length != 300 ||
-          maxsize.width != 1080 || maxsize.length != 86400)
+      if (fabs(minsize.width - 300.0) > 0.001 || fabs(minsize.length - 300.0) > 0.001 ||
+          fabs(maxsize.width - 1080.0) > 0.001 || fabs(maxsize.length - 86400.0) > 0.001)
       {
         printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
 	       "expected min=300x300, max=1080x86400)\n", minsize.width,
@@ -1109,5 +1107,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 11060 2013-06-25 15:02:18Z msweet $".
+ * End of "$Id: testppd.c 11594 2014-02-14 20:09:01Z msweet $".
  */

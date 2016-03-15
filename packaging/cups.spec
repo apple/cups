@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 11946 2014-06-24 18:01:58Z msweet $"
+# "$Id: cups.spec.in 12074 2014-07-31 01:10:14Z msweet $"
 #
 # RPM "spec" file for CUPS.
 #
@@ -21,11 +21,6 @@
 #   dnssd    - Enable/disable DNS-SD support (default = enable)
 #   libusb1  - Enable/disable LIBUSB 1.0 support (default = enable)
 #   static   - Enable/disable static libraries (default = enable)
-#
-# Note: Older Linux distributions use the name "libusbx-devel" or just
-#       "libusb-devel" for LIBUSB 1.0.  There is absolutely nothing we can
-#       do to make this spec file build as-is on those distributions, you'll
-#       need to change the "BuildRequires" line accordingly...
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
@@ -43,14 +38,18 @@
 %{?_with_static: %define _static --enable-static}
 %{!?_with_static: %define _static --disable-static}
 
+%{!?_with_systemd: %{!?_without_systemd: %define _with_systemd --with-systemd}}
+%{?_with_systemd: %define _systemd --enable-systemd}
+%{!?_with_systemd: %define _systemd --disable-systemd}
+
 Summary: CUPS
 Name: cups
-Version: 1.7.5
+Version: 2.0b1
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/1.7.5/cups-1.7.5-source.tar.bz2
+Source: http://www.cups.org/software/2.0b1/cups-2.0b1-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -68,6 +67,10 @@ BuildRequires: avahi-devel
 
 %if %{?_with_libusb1:1}%{!?_with_libusb1:0}
 BuildRequires: libusb-devel >= 1.0
+%endif
+
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+BuildRequires: systemd-devel
 %endif
 
 # Use buildroot so as not to disturb the version already installed
@@ -123,6 +126,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 make BUILDROOT=$RPM_BUILD_ROOT install
+rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners $RPM_BUILD_ROOT/usr/share/cups/data
 
 %post
 /sbin/chkconfig --add cups
@@ -174,27 +178,18 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/pam.d
 /etc/pam.d/*
 
-# RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
-# don't use Red Hat or Mandrake...
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+# SystemD
+/usr/lib/systemd/system/*
 
+%else
+# Legacy init support on Linux
 /etc/init.d/*
 /etc/rc0.d/*
 /etc/rc2.d/*
 /etc/rc3.d/*
 /etc/rc5.d/*
-
-# OLD RedHat/Mandrake
-#/etc/rc.d/init.d/*
-#/etc/rc.d/rc0.d/*
-#/etc/rc.d/rc2.d/*
-#/etc/rc.d/rc3.d/*
-#/etc/rc.d/rc5.d/*
-
-#/sbin/rc.d/*
-#/sbin/rc.d/rc0.d/*
-#/sbin/rc.d/rc2.d/*
-#/sbin/rc.d/rc3.d/*
-#/sbin/rc.d/rc5.d/*
+%endif
 
 /usr/bin/cancel
 /usr/bin/cupstestdsc
@@ -232,10 +227,6 @@ rm -rf $RPM_BUILD_ROOT
 
 /usr/sbin/*
 %dir /usr/share/cups
-%dir /usr/share/cups/banners
-/usr/share/cups/banners/*
-%dir /usr/share/cups/data
-/usr/share/cups/data/*
 %dir /usr/share/cups/drv
 /usr/share/cups/drv/*
 %dir /usr/share/cups/ipptool
@@ -270,35 +261,26 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/security.html
 /usr/share/doc/cups/help/sharing.html
 /usr/share/doc/cups/help/translation.html
-/usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
 
-%dir /usr/share/doc/cups/ca
-/usr/share/doc/cups/ca/*
-%dir /usr/share/doc/cups/cs
-/usr/share/doc/cups/cs/*
-%dir /usr/share/doc/cups/de
-/usr/share/doc/cups/de/*
-%dir /usr/share/doc/cups/es
-/usr/share/doc/cups/es/*
-%dir /usr/share/doc/cups/fr
-/usr/share/doc/cups/fr/*
-%dir /usr/share/doc/cups/it
-/usr/share/doc/cups/it/*
-%dir /usr/share/doc/cups/ja
-/usr/share/doc/cups/ja/*
-%dir /usr/share/doc/cups/pt_BR
-/usr/share/doc/cups/pt_BR/*
-%dir /usr/share/doc/cups/ru
-/usr/share/doc/cups/ru/*
+#%dir /usr/share/doc/cups/ca
+#/usr/share/doc/cups/ca/*
+#%dir /usr/share/doc/cups/cs
+#/usr/share/doc/cups/cs/*
+#%dir /usr/share/doc/cups/es
+#/usr/share/doc/cups/es/*
+#%dir /usr/share/doc/cups/fr
+#/usr/share/doc/cups/fr/*
+#%dir /usr/share/doc/cups/ja
+#/usr/share/doc/cups/ja/*
+#%dir /usr/share/doc/cups/ru
+#/usr/share/doc/cups/ru/*
 
 %dir /usr/share/locale/ca
 /usr/share/locale/ca/cups_ca.po
 %dir /usr/share/locale/cs
 /usr/share/locale/cs/cups_cs.po
-%dir /usr/share/locale/de
-/usr/share/locale/de/cups_de.po
 %dir /usr/share/locale/es
 /usr/share/locale/es/cups_es.po
 %dir /usr/share/locale/fr
@@ -307,20 +289,18 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/it/cups_it.po
 %dir /usr/share/locale/ja
 /usr/share/locale/ja/cups_ja.po
-%dir /usr/share/locale/pt_BR
-/usr/share/locale/pt_BR/cups_pt_BR.po
 %dir /usr/share/locale/ru
 /usr/share/locale/ru/cups_ru.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
+/usr/share/man/man1/cups.1.gz
 /usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
 /usr/share/man/man1/ippfind.1.gz
 /usr/share/man/man1/ipptool.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
-/usr/share/man/man1/lppasswd.1.gz
 /usr/share/man/man1/lpq.1.gz
 /usr/share/man/man1/lpr.1.gz
 /usr/share/man/man1/lprm.1.gz
@@ -331,17 +311,20 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
+/usr/share/man/man8/cups-deviced.8.gz
+/usr/share/man/man8/cups-driverd.8.gz
+/usr/share/man/man8/cups-exec.8.gz
+/usr/share/man/man8/cups-snmp.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
 /usr/share/man/man8/cupsaccept.8.gz
 /usr/share/man/man8/cupsctl.8.gz
 /usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
+/usr/share/man/man8/cupsd-helper.8.gz
+/usr/share/man/man8/cupsd-logs.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
 /usr/share/man/man8/cupsreject.8.gz
-/usr/share/man/man8/cups-deviced.8.gz
-/usr/share/man/man8/cups-driverd.8.gz
-/usr/share/man/man8/cups-snmp.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
 /usr/share/man/man8/lpinfo.8.gz
@@ -405,5 +388,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 11946 2014-06-24 18:01:58Z msweet $".
+# End of "$Id: cups.spec.in 12074 2014-07-31 01:10:14Z msweet $".
 #

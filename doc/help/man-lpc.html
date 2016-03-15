@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,62 +10,45 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 lpc - line printer control program
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>lpc
-</b>[
-<i>command
-</i>[
-<i>parameter(s)
-</i>] ]
+<b>lpc</b>
+[
+<i>command</i>
+[
+<i>parameter(s)</i>
+] ]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>lpc</i> provides limited control over printer and class queues
-provided by CUPS. It can also be used to query the state of
-queues.
-<p>If no command is specified on the command-line, lpc will
-display a prompt and accept commands from the standard input.
-<h2 class="title"><a name="COMMANDS">Commands</a></h2>
-The <i>lpc</i> program accepts a subset of commands accepted by
-the Berkeley <i>lpc</i> program of the same name:
-<dl>
-<dt>exit
-</dt>
-<dd></dd>
-<dd>Exits the command interpreter.
-</dd>
-<dt>help [command]
-</dt>
-<dd></dd>
-<dt>? [command]
-</dt>
-<dd></dd>
-<dd>Displays a short help message.
-</dd>
-<dt>quit
-</dt>
-<dd></dd>
-<dd>Exits the command interpreter.
-</dd>
-<dt>status [queue]
-</dt>
-<dd></dd>
-<dd>Displays the status of one or more printer or class queues.
-</dd>
+<b>lpc</b> provides limited control over printer and class queues provided by CUPS. It can also be used to query the state of queues.
+<p>If no command is specified on the command-line, <b>lpc</b> displays a prompt and accepts commands from the standard input.
+<h3><a name="COMMANDS">Commands</a></h3>
+The <b>lpc</b> program accepts a subset of commands accepted by the Berkeley <b>lpc</b> program of the same name:
+<dl class="man">
+<dt><b>exit</b>
+<dd style="margin-left: 5.0em">Exits the command interpreter.
+<dt><b>help </b>[<i>command</i>]
+<dd style="margin-left: 5.0em"><dt><b>? </b>[<i>command</i>]
+<dd style="margin-left: 5.0em">Displays a short help message.
+<dt><b>quit</b>
+<dd style="margin-left: 5.0em">Exits the command interpreter.
+<dt><b>status </b>[<i>queue</i>]
+<dd style="margin-left: 5.0em">Displays the status of one or more printer or class queues.
 </dl>
-<h2 class="title"><a name="LIMITATIONS">Limitations</a></h2>
-Since <i>lpc</i> is geared towards the Berkeley printing system,
-it is impossible to use <i>lpc</i> to configure printer or class
-queues provided by CUPS.  To configure printer or class queues
-you must use the <a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a> command or another
-CUPS-compatible client with that functionality.
-<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
-The CUPS version of <i>lpc</i> does not implement all of the
-standard Berkeley or LPRng commands.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+Since <b>lpc</b> is geared towards the Berkeley printing system, it is impossible to use <b>lpc</b> to configure printer or class queues provided by CUPS.
+To configure printer or class queues you must use the
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+command or another CUPS-compatible client with that functionality.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-cupsaccept.html?TOPIC=Man+Pages'>cupsaccept(8)</a>, <a href='man-cupsenable.html?TOPIC=Man+Pages'>cupsenable(8)</a>,
-<a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a>, <a href='man-lprm.html?TOPIC=Man+Pages'>lprm(1)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-cupsaccept.html?TOPIC=Man+Pages"><b>cupsaccept</b>(8),</a>
+<a href="man-cupsenable.html?TOPIC=Man+Pages"><b>cupsenable</b>(8),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

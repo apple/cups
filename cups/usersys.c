@@ -1,5 +1,5 @@
 /*
- * "$Id: usersys.c 11909 2014-06-09 18:58:16Z msweet $"
+ * "$Id: usersys.c 11908 2014-06-09 18:57:44Z msweet $"
  *
  * User, system, and password routines for CUPS.
  *
@@ -51,8 +51,8 @@ static void	cups_read_client_conf(cups_file_t *fp,
                                       const char *cups_gssservicename,
 #endif /* HAVE_GSSAPI */
 				      const char *cups_anyroot,
-				      const char *cups_expiredroot,
-				      const char *cups_expiredcerts);
+				      const char *cups_expiredcerts,
+				      const char *cups_validatecerts);
 
 
 /*
@@ -678,7 +678,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   }
 
   noecho = original;
-  noecho.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+  noecho.c_lflag &= (tcflag_t)~(ICANON | ECHO | ECHOE | ISIG);
 
   if (tcsetattr(tty, TCSAFLUSH, &noecho))
   {
@@ -831,8 +831,8 @@ _cupsSetDefaults(void)
 		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
 		*cups_anyroot,		/* CUPS_ANYROOT env var */
-		*cups_expiredroot,	/* CUPS_EXPIREDROOT env var */
-		*cups_expiredcerts;	/* CUPS_EXPIREDCERTS env var */
+		*cups_expiredcerts,	/* CUPS_EXPIREDCERTS env var */
+		*cups_validatecerts;	/* CUPS_VALIDATECERTS env var */
   char		filename[1024];		/* Filename */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -849,9 +849,9 @@ _cupsSetDefaults(void)
   cups_gssservicename = getenv("CUPS_GSSSERVICENAME");
 #endif /* HAVE_GSSAPI */
   cups_anyroot	      = getenv("CUPS_ANYROOT");
-  cups_expiredroot    = getenv("CUPS_EXPIREDROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
   cups_user           = getenv("CUPS_USER");
+  cups_validatecerts  = getenv("CUPS_VALIDATECERTS");
 
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
@@ -899,8 +899,7 @@ _cupsSetDefaults(void)
 #ifdef HAVE_GSSAPI
 			  cups_gssservicename,
 #endif /* HAVE_GSSAPI */
-			  cups_anyroot, cups_expiredroot,
-			  cups_expiredcerts);
+			  cups_anyroot, cups_expiredcerts, cups_validatecerts);
     cupsFileClose(fp);
   }
 }
@@ -922,8 +921,8 @@ cups_read_client_conf(
 					/* I - CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
     const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
-    const char	    *cups_expiredroot,	/* I - CUPS_EXPIREDROOT env var */
-    const char	    *cups_expiredcerts)	/* I - CUPS_EXPIREDCERTS env var */
+    const char	    *cups_expiredcerts,	/* I - CUPS_EXPIREDCERTS env var */
+    const char      *cups_validatecerts)/* I - CUPS_VALIDATECERTS env var */
 {
   int	linenum;			/* Current line number */
   char	line[1024],			/* Line from file */
@@ -934,8 +933,8 @@ cups_read_client_conf(
 #endif /* !__APPLE__ */
 	user[256],			/* User value */
 	any_root[1024],			/* AllowAnyRoot value */
-	expired_root[1024],		/* AllowExpiredRoot value */
-	expired_certs[1024];		/* AllowExpiredCerts value */
+	expired_certs[1024],		/* AllowExpiredCerts value */
+	validate_certs[1024];		/* ValidateCerts value */
 #ifdef HAVE_GSSAPI
   char	gss_service_name[32];		/* GSSServiceName value */
 #endif /* HAVE_GSSAPI */
@@ -976,17 +975,16 @@ cups_read_client_conf(
       strlcpy(any_root, value, sizeof(any_root));
       cups_anyroot = any_root;
     }
-    else if (!cups_expiredroot && !_cups_strcasecmp(line, "AllowExpiredRoot") &&
-             value)
-    {
-      strlcpy(expired_root, value, sizeof(expired_root));
-      cups_expiredroot = expired_root;
-    }
     else if (!cups_expiredcerts && !_cups_strcasecmp(line, "AllowExpiredCerts") &&
              value)
     {
       strlcpy(expired_certs, value, sizeof(expired_certs));
       cups_expiredcerts = expired_certs;
+    }
+    else if (!cups_validatecerts && !_cups_strcasecmp(line, "ValidateCerts") && value)
+    {
+      strlcpy(validate_certs, value, sizeof(validate_certs));
+      cups_validatecerts = validate_certs;
     }
 #ifdef HAVE_GSSAPI
     else if (!cups_gssservicename && !_cups_strcasecmp(line, "GSSServiceName") &&
@@ -1116,18 +1114,18 @@ cups_read_client_conf(
 		   !_cups_strcasecmp(cups_anyroot, "on")  ||
 		   !_cups_strcasecmp(cups_anyroot, "true");
 
-  if (cups_expiredroot)
-    cg->expired_root  = !_cups_strcasecmp(cups_expiredroot, "yes") ||
-			!_cups_strcasecmp(cups_expiredroot, "on")  ||
-			!_cups_strcasecmp(cups_expiredroot, "true");
-
   if (cups_expiredcerts)
     cg->expired_certs = !_cups_strcasecmp(cups_expiredcerts, "yes") ||
 			!_cups_strcasecmp(cups_expiredcerts, "on")  ||
 			!_cups_strcasecmp(cups_expiredcerts, "true");
+
+  if (cups_validatecerts)
+    cg->validate_certs = !_cups_strcasecmp(cups_validatecerts, "yes") ||
+			 !_cups_strcasecmp(cups_validatecerts, "on")  ||
+			 !_cups_strcasecmp(cups_validatecerts, "true");
 }
 
 
 /*
- * End of "$Id: usersys.c 11909 2014-06-09 18:58:16Z msweet $".
+ * End of "$Id: usersys.c 11908 2014-06-09 18:57:44Z msweet $".
  */

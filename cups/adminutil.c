@@ -1,29 +1,18 @@
 /*
- * "$Id: adminutil.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: adminutil.c 11598 2014-02-18 18:58:19Z msweet $"
  *
- *   Administration utility API definitions for CUPS.
+ * Administration utility API definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2001-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2001-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsAdminCreateWindowsPPD()  - Create the Windows PPD file for a printer.
- *   cupsAdminExportSamba()       - Export a printer to Samba.
- *   cupsAdminGetServerSettings() - Get settings from the server.
- *   cupsAdminSetServerSettings() - Set settings on the server.
- *   do_samba_command()           - Do a SAMBA command.
- *   get_cupsd_conf()             - Get the current cupsd.conf file.
- *   invalidate_cupsd_cache()     - Invalidate the cached cupsd.conf settings.
- *   write_option()               - Write a CUPS option to a PPD file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -52,7 +41,7 @@ static int		do_samba_command(const char *command,
 					 FILE *logfile);
 static http_status_t	get_cupsd_conf(http_t *http, _cups_globals_t *cg,
 			               time_t last_update, char *name,
-				       int namelen, int *remote);
+				       size_t namelen, int *remote);
 static void		invalidate_cupsd_cache(_cups_globals_t *cg);
 static void		write_option(cups_file_t *dstfp, int order,
 			             const char *name, const char *text,
@@ -319,7 +308,7 @@ cupsAdminCreateWindowsPPD(
 	}
       }
 
-      snprintf(ptr + 1, sizeof(line) - (ptr - line + 1),
+      snprintf(ptr + 1, sizeof(line) - (size_t)(ptr - line + 1),
                "%%cupsJobTicket: %s=%s\n\"\n*End", option, choice);
 
       cupsFilePrintf(dstfp, "*%% Changed for CUPS Windows Driver...\n%s\n",
@@ -2120,7 +2109,7 @@ get_cupsd_conf(
     _cups_globals_t *cg,		/* I - Global data */
     time_t          last_update,	/* I - Last update time for file */
     char            *name,		/* I - Filename buffer */
-    int             namesize,		/* I - Size of filename buffer */
+    size_t          namesize,		/* I - Size of filename buffer */
     int             *remote)		/* O - Remote file? */
 {
   int		fd;			/* Temporary file descriptor */
@@ -2176,7 +2165,7 @@ get_cupsd_conf(
     * Read cupsd.conf via a HTTP GET request...
     */
 
-    if ((fd = cupsTempFd(name, namesize)) < 0)
+    if ((fd = cupsTempFd(name, (int)namesize)) < 0)
     {
       *name = '\0';
 
@@ -2337,5 +2326,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: adminutil.c 11598 2014-02-18 18:58:19Z msweet $".
  */

@@ -1,59 +1,16 @@
 //
-// "$Id: ppdc-source.cxx 4167 2013-02-04 19:27:13Z msweet $"
+// "$Id: ppdc-source.cxx 11558 2014-02-06 18:33:34Z msweet $"
 //
-//   Source class for the CUPS PPD Compiler.
+// Source class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2013 by Apple Inc.
-//   Copyright 2002-2007 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 2002-2007 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcSource::ppdcSource()         - Load a driver source file.
-//   ppdcSource::~ppdcSource()        - Free a driver source file.
-//   ppdcSource::add_include()        - Add an include directory.
-//   ppdcSource::find_driver()        - Find a driver.
-//   ppdcSource::find_include()       - Find an include file.
-//   ppdcSource::find_po()            - Find a message catalog for the given
-//                                      locale.
-//   ppdcSource::find_size()          - Find a media size.
-//   ppdcSource::find_variable()      - Find a variable.
-//   ppdcSource::get_attr()           - Get an attribute.
-//   ppdcSource::get_boolean()        - Get a boolean value.
-//   ppdcSource::get_choice()         - Get a choice.
-//   ppdcSource::get_color_model()    - Get an old-style color model option.
-//   ppdcSource::get_color_order()    - Get an old-style color order value.
-//   ppdcSource::get_color_profile()  - Get a color profile definition.
-//   ppdcSource::get_color_space()    - Get an old-style colorspace value.
-//   ppdcSource::get_constraint()     - Get a constraint.
-//   ppdcSource::get_custom_size()    - Get a custom media size definition from
-//                                      a file.
-//   ppdcSource::get_duplex()         - Get a duplex option.
-//   ppdcSource::get_filter()         - Get a filter.
-//   ppdcSource::get_float()          - Get a single floating-point number.
-//   ppdcSource::get_font()           - Get a font definition.
-//   ppdcSource::get_generic()        - Get a generic old-style option.
-//   ppdcSource::get_group()          - Get an option group.
-//   ppdcSource::get_installable()    - Get an installable option.
-//   ppdcSource::get_integer()        - Get an integer value from a file.
-//   ppdcSource::get_measurement()    - Get a measurement value.
-//   ppdcSource::get_option()         - Get an option definition.
-//   ppdcSource::get_po()             - Get a message catalog.
-//   ppdcSource::get_resolution()     - Get an old-style resolution option.
-//   ppdcSource::get_simple_profile() - Get a simple color profile definition.
-//   ppdcSource::get_size()           - Get a media size definition from a file.
-//   ppdcSource::get_token()          - Get a token from a file.
-//   ppdcSource::get_variable()       - Get a variable definition.
-//   ppdcSource::quotef()             - Write a formatted, quoted string...
-//   ppdcSource::read_file()          - Read a driver source file.
-//   ppdcSource::scan_file()          - Scan a driver source file.
-//   ppdcSource::set_variable()       - Set a variable.
-//   ppdcSource::write_file()         - Write the current source data to a file.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -235,9 +192,9 @@ ppdcSource::find_include(
   {
     // Check for the local file relative to the current directory...
     if (base && *base && f[0] != '/')
-      snprintf(n, nlen, "%s/%s", base, f);
+      snprintf(n, (size_t)nlen, "%s/%s", base, f);
     else
-      strlcpy(n, f, nlen);
+      strlcpy(n, f, (size_t)nlen);
 
     if (!access(n, 0))
       return (n);
@@ -253,7 +210,7 @@ ppdcSource::find_include(
   {
     for (dir = (ppdcString *)includes->first(); dir; dir = (ppdcString *)includes->next())
     {
-      snprintf(n, nlen, "%s/%s", dir->value, f);
+      snprintf(n, (size_t)nlen, "%s/%s", dir->value, f);
       if (!access(n, 0))
         return (n);
     }
@@ -262,11 +219,11 @@ ppdcSource::find_include(
   // Search the standard include directories...
   _cups_globals_t *cg = _cupsGlobals();	// Global data
 
-  snprintf(n, nlen, "%s/ppdc/%s", cg->cups_datadir, f);
+  snprintf(n, (size_t)nlen, "%s/ppdc/%s", cg->cups_datadir, f);
   if (!access(n, 0))
     return (n);
 
-  snprintf(n, nlen, "%s/po/%s", cg->cups_datadir, f);
+  snprintf(n, (size_t)nlen, "%s/po/%s", cg->cups_datadir, f);
   if (!access(n, 0))
     return (n);
   else
@@ -1810,26 +1767,26 @@ ppdcSource::get_resolution(ppdcFile *fp)// I - File to read
 
   if (color_order >= 0)
   {
-    snprintf(commptr, sizeof(command) - (commptr - command),
+    snprintf(commptr, sizeof(command) - (size_t)(commptr - command),
              "/cupsColorOrder %d", color_order);
     commptr += strlen(commptr);
   }
 
   if (color_space >= 0)
   {
-    snprintf(commptr, sizeof(command) - (commptr - command),
+    snprintf(commptr, sizeof(command) - (size_t)(commptr - command),
              "/cupsColorSpace %d", color_space);
     commptr += strlen(commptr);
   }
 
   if (compression >= 0)
   {
-    snprintf(commptr, sizeof(command) - (commptr - command),
+    snprintf(commptr, sizeof(command) - (size_t)(commptr - command),
              "/cupsCompression %d", compression);
     commptr += strlen(commptr);
   }
 
-  snprintf(commptr, sizeof(command) - (commptr - command), ">>setpagedevice");
+  snprintf(commptr, sizeof(command) - (size_t)(commptr - command), ">>setpagedevice");
 
   // Return the new choice...
   return (new ppdcChoice(name, text, command));
@@ -2014,7 +1971,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
         if (!isalnum(ch) && ch != '_')
 	  break;
 	else if (nameptr < (name + sizeof(name) - 1))
-	  *nameptr++ = fp->get();
+	  *nameptr++ = (char)fp->get();
       }
 
       if (nameptr == name)
@@ -2024,7 +1981,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 	{
 	  // $$ = $
 	  if (bufptr < bufend)
-	    *bufptr++ = fp->get();
+	    *bufptr++ = (char)fp->get();
 	}
 	else
 	{
@@ -2044,7 +2001,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 	var = find_variable(name);
 	if (var)
 	{
-	  strlcpy(bufptr, var->value->value, bufend - bufptr + 1);
+	  strlcpy(bufptr, var->value->value, (size_t)(bufend - bufptr + 1));
 	  bufptr += strlen(bufptr);
 	}
 	else
@@ -2054,7 +2011,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 			    _("ppdc: Undefined variable (%s) on line %d of "
 			      "%s."), name, fp->line, fp->filename);
 
-	  snprintf(bufptr, bufend - bufptr + 1, "$%s", name);
+	  snprintf(bufptr, (size_t)(bufend - bufptr + 1), "$%s", name);
 	  bufptr += strlen(bufptr);
 	}
       }
@@ -2096,7 +2053,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
         empty = 0;
 
 	if (bufptr < bufend)
-	  *bufptr++ = ch;
+	  *bufptr++ = (char)ch;
       }
     }
     else if (ch == '\'' || ch == '\"')
@@ -2112,7 +2069,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
       {
         // Insert the opposing quote char...
 	if (bufptr < bufend)
-          *bufptr++ = ch;
+          *bufptr++ = (char)ch;
       }
       else
       {
@@ -2128,14 +2085,14 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
       startline = fp->line;
 
       if (bufptr < bufend)
-	*bufptr++ = ch;
+	*bufptr++ = (char)ch;
     }
     else if ((ch == ')' && quote == '(') || (ch == '>' && quote == '<'))
     {
       quote = 0;
 
       if (bufptr < bufend)
-	*bufptr++ = ch;
+	*bufptr++ = (char)ch;
     }
     else if (ch == '\\')
     {
@@ -2145,13 +2102,13 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
         break;
 
       if (bufptr < bufend)
-        *bufptr++ = ch;
+        *bufptr++ = (char)ch;
     }
     else if (bufptr < bufend)
     {
       empty = 0;
 
-      *bufptr++ = ch;
+      *bufptr++ = (char)ch;
 
       if ((ch == '{' || ch == '}') && !quote)
         break;
@@ -2171,7 +2128,6 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
   else
   {
     *bufptr = '\0';
-//    puts(buffer);
     return (buffer);
   }
 }
@@ -2292,7 +2248,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    memcpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, (size_t)(format - bufformat));
 	    tformat[format - bufformat] = '\0';
 
 	    bytes += cupsFilePrintf(fp, tformat, va_arg(ap, double));
@@ -2309,7 +2265,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    memcpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, (size_t)(format - bufformat));
 	    tformat[format - bufformat] = '\0';
 
 #  ifdef HAVE_LONG_LONG
@@ -2327,7 +2283,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    memcpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, (size_t)(format - bufformat));
 	    tformat[format - bufformat] = '\0';
 
 	    bytes += cupsFilePrintf(fp, tformat, va_arg(ap, void *));
@@ -2341,7 +2297,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    }
 	    else
 	    {
-	      cupsFileWrite(fp, va_arg(ap, char *), width);
+	      cupsFileWrite(fp, va_arg(ap, char *), (size_t)width);
 	      bytes += width;
 	    }
 	    break;
@@ -2350,7 +2306,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((s = va_arg(ap, char *)) == NULL)
 	      s = (char *)"(nil)";
 
-	    slen = strlen(s);
+	    slen = (int)strlen(s);
 	    if (slen > width && prec != width)
 	      width = slen;
 
@@ -3847,5 +3803,5 @@ ppdcSource::write_file(const char *f)	// I - File to write
 
 
 //
-// End of "$Id: ppdc-source.cxx 4167 2013-02-04 19:27:13Z msweet $".
+// End of "$Id: ppdc-source.cxx 11558 2014-02-06 18:33:34Z msweet $".
 //

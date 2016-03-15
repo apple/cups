@@ -1,46 +1,51 @@
 .\"
-.\" "$Id: ppdhtml.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: ppdhtml.man 11927 2014-06-13 00:01:23Z msweet $"
 .\"
-.\"   ppdhtml man page for CUPS.
+.\" ppdhtml man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2007 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2007 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdhtml 1 "CUPS" "10 October 2008" "Apple Inc."
+.TH ppdhtml 1 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
-ppdhtml \- cups html summary generator
+ppdhtml \- cups html summary generator (deprecated)
 .SH SYNOPSIS
 .B ppdhtml
-[ -D
-.I name[=value]
-] [ -I
+[
+\fB\-D \fIname\fR[\fB=\fIvalue\fR]
+] [
+.B \-I
 .I include-directory
 ]
 .I source-file
 .SH DESCRIPTION
-\fIppdhtml\fR reads a driver information file and produces a
-HTML summary page that lists all of the drivers in a file and
-the supported options.
-.PP
-The \fI-D\fR option sets the named variable for use in the
-source file. It is equivalent to using the #define directive
-in the source file.
-.PP
-The \fI-I\fR option specifies an alternate include directory;
-multiple \fI-I\fR options can be supplied to add additional
-directories.
+\fBppdhtml\fR reads a driver information file and produces a HTML summary page that lists all of the drivers in a file and the supported options.
+\fBThis program is deprecated and will be removed in a future release of CUPS.\fR
+.SH OPTIONS
+\fBppdhtml\fR supports the following options:
+.TP 5
+\fB\-D \fIname\fR[\fB=\fIvalue\fR]
+Sets the named variable for use in the source file.
+It is equivalent to using the \fI#define\fR directive in the source file.
+.TP 5
+\fB\-I \fIinclude-directory\fR
+Specifies an alternate include directory.
+Multiple \fI-I\fR options can be supplied to add additional directories.
 .SH SEE ALSO
-ppdc(1), ppdcfile(5), ppdi(1), ppdmerge(1), ppdpo(1)
-.br
-http://localhost:631/help
+.BR ppdc (1),
+.BR ppdcfile (5),
+.BR ppdi (1),
+.BR ppdmerge (1),
+.BR ppdpo (1),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ppdhtml.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: ppdhtml.man 11927 2014-06-13 00:01:23Z msweet $".
 .\"

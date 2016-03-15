@@ -1,27 +1,16 @@
 /*
- * "$Id: lpq.c 11101 2013-07-08 11:20:33Z msweet $"
+ * "$Id: lpq.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   "lpq" command for CUPS.
+ * "lpq" command for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()         - Parse options and commands.
- *   show_jobs()    - Show jobs.
- *   show_printer() - Show printer status.
- *   usage()        - Show program usage.
- */
-
-/*
- * Include necessary headers...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -194,7 +183,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    httpClose(http);
 
 	    usage();
-	    break;
       }
     }
     else if (isdigit(argv[i][0] & 255))
@@ -262,7 +250,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (i && interval)
     {
       fflush(stdout);
-      sleep(interval);
+      sleep((unsigned)interval);
     }
     else
       break;
@@ -323,9 +311,6 @@ show_jobs(const char *command,		/* I - Command name */
   ipp_jstate_t	jobstate;		/* job-state */
   int		jobid,			/* job-id */
 		jobsize,		/* job-k-octets */
-#ifdef __osf__
-		jobpriority,		/* job-priority */
-#endif /* __osf__ */
 		jobcount,		/* Number of jobs */
 		jobcopies,		/* Number of copies */
 		rank;			/* Rank of job */
@@ -448,9 +433,6 @@ show_jobs(const char *command,		/* I - Command name */
 
       jobid       = 0;
       jobsize     = 0;
-#ifdef __osf__
-      jobpriority = 50;
-#endif /* __osf__ */
       jobstate    = IPP_JOB_PENDING;
       jobname     = "unknown";
       jobuser     = "unknown";
@@ -466,12 +448,6 @@ show_jobs(const char *command,		/* I - Command name */
         if (!strcmp(attr->name, "job-k-octets") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobsize = attr->values[0].integer;
-
-#ifdef __osf__
-        if (!strcmp(attr->name, "job-priority") &&
-	    attr->value_tag == IPP_TAG_INTEGER)
-	  jobpriority = attr->values[0].integer;
-#endif /* __osf__ */
 
         if (!strcmp(attr->name, "job-state") &&
 	    attr->value_tag == IPP_TAG_ENUM)
@@ -510,16 +486,9 @@ show_jobs(const char *command,		/* I - Command name */
       }
 
       if (!longstatus && jobcount == 0)
-#ifdef __osf__
-	_cupsLangPuts(stdout,
-	              /* TRANSLATORS: Pri is job priority. */
-	              _("Rank   Owner      Pri  Job        Files"
-		        "                       Total Size"));
-#else
 	_cupsLangPuts(stdout,
 	              _("Rank    Owner   Job     File(s)"
 		        "                         Total Size"));
-#endif /* __osf__ */
 
       jobcount ++;
 
@@ -560,16 +529,9 @@ show_jobs(const char *command,		/* I - Command name */
 	                namestr, 1024.0 * jobsize);
       }
       else
-#ifdef __osf__
-        _cupsLangPrintf(stdout,
-	                _("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"),
-			rankstr, jobuser, jobpriority, jobid, jobname,
-			1024.0 * jobsize);
-#else
         _cupsLangPrintf(stdout,
 	                _("%-7s %-7.7s %-7d %-31.31s %.0f bytes"),
 			rankstr, jobuser, jobid, jobname, 1024.0 * jobsize);
-#endif /* __osf */
 
       if (attr == NULL)
         break;
@@ -679,5 +641,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpq.c 11101 2013-07-08 11:20:33Z msweet $".
+ * End of "$Id: lpq.c 11558 2014-02-06 18:33:34Z msweet $".
  */

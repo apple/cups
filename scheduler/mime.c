@@ -1,40 +1,16 @@
 /*
- * "$Id: mime.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: mime.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   MIME database file routines for CUPS.
+ * MIME database file routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   mimeDelete()           - Delete (free) a MIME database.
- *   mimeDeleteFilter()     - Delete a filter from the MIME database.
- *   mimeDeleteType()       - Delete a type from the MIME database.
- *   _mimeError()           - Show an error message.
- *   mimeFirstFilter()      - Get the first filter in the MIME database.
- *   mimeFirstType()        - Get the first type in the MIME database.
- *   mimeLoad()             - Create a new MIME database from disk.
- *   mimeLoadFilters()      - Load filter definitions from disk.
- *   mimeLoadTypes()        - Load type definitions from disk.
- *   mimeNew()              - Create a new, empty MIME database.
- *   mimeNextFilter()       - Get the next filter in the MIME database.
- *   mimeNextType()         - Get the next type in the MIME database.
- *   mimeNumFilters()       - Get the number of filters in a MIME database.
- *   mimeNumTypes()         - Get the number of types in a MIME database.
- *   mimeSetErrorCallback() - Set the callback for error messages.
- *   mime_add_fcache()      - Add a filter to the filter cache.
- *   mime_compare_fcache()  - Compare two filter cache entries.
- *   mime_delete_fcache()   - Free all memory used by the filter cache.
- *   mime_delete_rules()    - Free all memory for the given rule tree.
- *   mime_load_convs()      - Load a xyz.convs file.
- *   mime_load_types()      - Load a xyz.types file.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -659,6 +635,9 @@ mime_delete_rules(mime_magic_t *rules)	/* I - Rules to free */
     if (rules->child != NULL)
       mime_delete_rules(rules->child);
 
+    if (rules->op == MIME_MAGIC_REGEX)
+      regfree(&(rules->value.rev));
+
     free(rules);
     rules = next;
   }
@@ -741,7 +720,7 @@ mime_load_convs(
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -753,7 +732,7 @@ mime_load_convs(
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -814,7 +793,7 @@ mime_load_convs(
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -826,7 +805,7 @@ mime_load_convs(
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -865,7 +844,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
                 const char *filename)	/* I - Types file to load */
 {
   cups_file_t	*fp;			/* Types file */
-  int		linelen;		/* Length of line */
+  size_t	linelen;		/* Length of line */
   char		line[32768],		/* Input line from file */
 		*lineptr,		/* Current position in line */
 		super[MIME_MAX_SUPER],	/* Super-type name */
@@ -927,7 +906,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
     while (*lineptr != '/' && *lineptr != '\n' && *lineptr != '\0' &&
            (temp - super + 1) < MIME_MAX_SUPER)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -939,7 +918,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
     while (*lineptr != ' ' && *lineptr != '\t' && *lineptr != '\n' &&
            *lineptr != '\0' && (temp - type + 1) < MIME_MAX_TYPE)
-      *temp++ = tolower(*lineptr++ & 255);
+      *temp++ = (char)tolower(*lineptr++ & 255);
 
     *temp = '\0';
 
@@ -956,5 +935,5 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: mime.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: mime.c 11558 2014-02-06 18:33:34Z msweet $".
  */

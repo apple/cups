@@ -1,102 +1,97 @@
-<TABLE CLASS="indent" SUMMARY="Administration Tasks">
-<TR><TD VALIGN="TOP">
+<div class="row">
+  <div class="halves">
+    <H2 CLASS="title">Printers</H2>
 
-<H2 CLASS="title">Printers</H2>
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Add Printer"></FORM>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Find New Printers"></FORM>
+    <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Printers"></FORM>
+    {have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Export Printers to Samba"></FORM>:}
+    </P>
 
-<P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Add Printer"></FORM>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Find New Printers"></FORM>
-<FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Printers"></FORM>
-{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Export Printers to Samba"></FORM>:}
-</P>
+    <H2 CLASS="title">Classes</H2>
 
-<H2 CLASS="title">Classes</H2>
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Add Class"></FORM>
+    <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Classes"></FORM>
+    </P>
 
-<P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Add Class"></FORM>
-<FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Classes"></FORM>
-</P>
+    <H2 CLASS="title">Jobs</H2>
 
-<H2 CLASS="title">Jobs</H2>
+    <P>
+    <FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Jobs"></FORM>
+    </P>
+  </div>
+  <div class="halves">
+    <H2 CLASS="title">Server</H2>
 
-<P>
-<FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Jobs"></FORM>
-</P>
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Edit Configuration File"></FORM>
+    <FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Access Log"></FORM>
+    <FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Error Log"></FORM>
+    <FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Page Log"></FORM>
+    </P>
 
-</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+    {SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+    <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
 
-<H2 CLASS="title">Server</H2>
+    <FORM METHOD="POST" ACTION="/admin">
+    <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 
-<P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Edit Configuration File"></FORM>
-<FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Access Log"></FORM>
-<FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Error Log"></FORM>
-<FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="View Page Log"></FORM>
-</P>
+    {ADVANCEDSETTINGS?<P><B>Server Settings\:</B></P>
 
-{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
-<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+    <P><A HREF="/admin/">Advanced <SMALL>&#x25bc;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max clients\:
+    <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Advertise web interface<BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
+    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Preserve job history<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum jobs (0 for no limit)\:
+    <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Metadata\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Documents\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max log file size\:
+    <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
 
-<FORM METHOD="POST" ACTION="/admin">
-<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+    :<P><B>Server Settings:</B></P>
 
-{ADVANCEDSETTINGS?<P><B>Server Settings\:</B></P>
+    <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Advanced <SMALL>&#x25b6;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
 
-<P><A HREF="/admin/">Advanced <SMALL>&#x25bc;</SMALL></A><BR>
-<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-<INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
-<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max clients\:
-<INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Advertise web interface<BR>
-<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
-{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
-<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Preserve job history<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum jobs (0 for no limit)\:
-<INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Metadata\:
-<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Documents\:
-<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
-<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max log file size\:
-<INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
+    }
+    <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Change Settings"></P>
 
-:<P><B>Server Settings:</B></P>
+    </FORM>}
+  </div>
+</div>
 
-<P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Advanced <SMALL>&#x25b6;</SMALL></A><BR>
-<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
-<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
-{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
-<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
+<div class="row">
+  <H2 CLASS="title">RSS Subscriptions</H2>
 
-}
-<P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Change Settings"></P>
+  <P>
+  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Add RSS Subscription"></FORM>
+  </P>
 
-</FORM>}
-
-</TD></TR>
-</TABLE>
-
-<DIV CLASS="indent">
-
-<H2 CLASS="title">RSS Subscriptions</H2>
-
-<P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Add RSS Subscription"></FORM>
-</P>
-
-</DIV>
-
-{notify_subscription_id?<TABLE CLASS="list" SUMMARY="RSS Subscriptions">
-<THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Queue Name</TH></TR></THEAD>
-<TBODY>{[notify_subscription_id]
-<TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
-</TBODY>
-</TABLE>:}
+  {notify_subscription_id?<TABLE CLASS="list" SUMMARY="RSS Subscriptions">
+  <THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Queue Name</TH></TR></THEAD>
+  <TBODY>{[notify_subscription_id]
+  <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
+  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
+  </TBODY>
+  </TABLE>:}
+</div>

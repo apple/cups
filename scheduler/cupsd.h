@@ -1,16 +1,16 @@
 /*
- * "$Id: cupsd.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: cupsd.h 11717 2014-03-21 16:42:53Z msweet $"
  *
- *   Main header file for the CUPS scheduler.
+ * Main header file for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -144,10 +144,8 @@ typedef void (*cupsd_selfunc_t)(void *data);
  * Globals...
  */
 
-VAR int			TestConfigFile	VALUE(0),
+VAR int			TestConfigFile	VALUE(0);
 					/* Test the cupsd.conf file? */
-			UseProfiles	VALUE(1);
-					/* Use security profiles for child procs? */
 VAR int			MaxFDs		VALUE(0);
 					/* Maximum number of files */
 
@@ -160,10 +158,10 @@ VAR int			NeedReload	VALUE(RELOAD_ALL),
 VAR void		*DefaultProfile	VALUE(0);
 					/* Default security profile */
 
-#ifdef HAVE_LAUNCH_H
-VAR int			Launchd		VALUE(0);
-					/* Running from launchd */
-#endif /* HAVE_LAUNCH_H */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+VAR int			OnDemand	VALUE(0);
+					/* Launched on demand */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
 
 /*
@@ -203,11 +201,10 @@ extern void		cupsdSetStringf(char **s, const char *f, ...)
 			__attribute__ ((__format__ (__printf__, 2, 3)));
 
 /* process.c */
-extern void		*cupsdCreateProfile(int job_id);
+extern void		*cupsdCreateProfile(int job_id, int allow_networking);
 extern void		cupsdDestroyProfile(void *profile);
 extern int		cupsdEndProcess(int pid, int force);
-extern const char	*cupsdFinishProcess(int pid, char *name, int namelen,
-					    int *job_id);
+extern const char	*cupsdFinishProcess(int pid, char *name, size_t namelen, int *job_id);
 extern int		cupsdStartProcess(const char *command, char *argv[],
 					  char *envp[], int infd, int outfd,
 					  int errfd, int backfd, int sidefd,
@@ -231,5 +228,5 @@ extern void		cupsdStopServer(void);
 
 
 /*
- * End of "$Id: cupsd.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: cupsd.h 11717 2014-03-21 16:42:53Z msweet $".
  */

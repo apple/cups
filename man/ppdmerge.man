@@ -1,47 +1,54 @@
 .\"
-.\" "$Id: ppdmerge.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: ppdmerge.man 11927 2014-06-13 00:01:23Z msweet $"
 .\"
-.\"   ppdmerge man page for CUPS.
+.\" ppdmerge man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2007 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2007 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdmerge 1 "CUPS" "20 May 2008" "Apple Inc."
+.TH ppdmerge 1 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
-ppdmerge \- merge ppd files
+ppdmerge \- merge ppd files (deprecated)
 .SH SYNOPSIS
 .B ppdmerge
-[ \-o
+[
+.B \-o
 .I output-ppd-file
 ]
 .I ppd-file
-.I ppd-file2
-[
-.I ... ppd-fileN
+.I ppd-file
+[ ...
+.I ppd-file
 ]
 .SH DESCRIPTION
-\fIppdmerge\fR merges two or more PPD files into a single, multi-language
+\fBppdmerge\fR merges two or more PPD files into a single, multi-language
 PPD file.
-.PP
-The \fI-o\fR option specifies the PPD file to create. If not specified,
-the merged PPD file is written to the standard output. If the output file
-already exists, the new
+\fBThis program is deprecated and will be removed in a future release of CUPS.\fR
+.SH OPTIONS
+\fBppdmerge\fR supports the following options:
+.TP
+\fB\-o \fIoutput-ppd-file\fR
+Specifies the PPD file to create.
+If not specified, the merged PPD file is written to the standard output.
+If the output file already exists, it is silently overwritten.
 .SH NOTES
-\fIppdmerge\fR does not check whether the merged PPD files are for the
-same device. Merging of different device PPDs will yield unpredictable
-results.
+\fBppdmerge\fR does not check whether the merged PPD files are for the same device.
+Merging of different device PPDs will yield unpredictable results.
 .SH SEE ALSO
-cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdpo(1), ppdcfile(5)
-.br
-http://localhost:631/help
+.BR ppdc (1),
+.BR ppdhtml (1),
+.BR ppdi (1),
+.BR ppdpo (1),
+.BR ppdcfile (5),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ppdmerge.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: ppdmerge.man 11927 2014-06-13 00:01:23Z msweet $".
 .\"

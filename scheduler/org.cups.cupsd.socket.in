@@ -1,0 +1,12 @@
+[Unit]
+Description=CUPS Scheduler
+
+[Socket]
+ListenStream=@CUPS_DEFAULT_DOMAINSOCKET@
+ListenStream=[::1]:631
+ListenStream=127.0.0.1:631
+BindIPv6Only=ipv6-only
+ReusePort=true
+
+[Install]
+WantedBy=sockets.target

@@ -1,5 +1,5 @@
 #
-# "$Id: ipp-2.0.test 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: ipp-2.0.test 11398 2013-11-06 20:11:11Z msweet $"
 #
 #   IPP/2.0 test suite.
 #
@@ -111,5 +111,5 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 
 
 #
-# End of "$Id: ipp-2.0.test 11396 2013-11-06 20:09:03Z msweet $".
+# End of "$Id: ipp-2.0.test 11398 2013-11-06 20:11:11Z msweet $".
 #

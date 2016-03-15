@@ -1,27 +1,18 @@
 /*
- * "$Id: error.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: error.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Raster error handling for CUPS.
+ * Raster error handling for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsRasterAddError()   - Add an error message to the error buffer.
- *   _cupsRasterClearError() - Clear the error buffer.
- *   cupsRasterErrorString() - Return the last error from a raster function.
- *   get_error_buffer()      - Return a pointer to thread local storage.
- *   raster_init()           - Initialize error buffer once.
- *   raster_destructor()     - Free memory allocated by get_error_buffer().
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -62,7 +53,7 @@ _cupsRasterAddError(const char *f,	/* I - Printf-style error message */
 					/* Error buffer */
   va_list	ap;			/* Pointer to additional arguments */
   char		s[2048];		/* Message string */
-  size_t	bytes;			/* Bytes in message string */
+  ssize_t	bytes;			/* Bytes in message string */
 
 
   va_start(ap, f);
@@ -74,10 +65,10 @@ _cupsRasterAddError(const char *f,	/* I - Printf-style error message */
 
   bytes ++;
 
-  if (bytes >= sizeof(s))
+  if ((size_t)bytes >= sizeof(s))
     return;
 
-  if (bytes > (size_t)(buf->end - buf->current))
+  if (bytes > (ssize_t)(buf->end - buf->current))
   {
    /*
     * Allocate more memory...
@@ -87,7 +78,7 @@ _cupsRasterAddError(const char *f,	/* I - Printf-style error message */
     size_t	size;			/* Size of buffer */
 
 
-    size = buf->end - buf->start + 2 * bytes + 1024;
+    size = (size_t)(buf->end - buf->start + 2 * bytes + 1024);
 
     if (buf->start)
       temp = realloc(buf->start, size);
@@ -110,7 +101,7 @@ _cupsRasterAddError(const char *f,	/* I - Printf-style error message */
   * Append the message to the end of the current string...
   */
 
-  memcpy(buf->current, s, bytes);
+  memcpy(buf->current, s, (size_t)bytes);
   buf->current += bytes - 1;
 }
 
@@ -167,8 +158,7 @@ cupsRasterErrorString(void)
  * Local globals...
  */
 
-static pthread_key_t	raster_key = -1;
-					/* Thread local storage key */
+static pthread_key_t	raster_key = 0;	/* Thread local storage key */
 static pthread_once_t	raster_key_once = PTHREAD_ONCE_INIT;
 					/* One-time initialization object */
 
@@ -282,5 +272,5 @@ get_error_buffer(void)
 
 
 /*
- * End of "$Id: error.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: error.c 11558 2014-02-06 18:33:34Z msweet $".
  */

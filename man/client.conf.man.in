@@ -1,65 +1,76 @@
 .\"
-.\" "$Id: client.conf.man.in 11109 2013-07-08 21:15:13Z msweet $"
+.\" "$Id: client.conf.man.in 11851 2014-05-07 23:55:35Z msweet $"
 .\"
-.\"   client.conf man page for CUPS.
+.\" client.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 2006 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2006 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "8 July 2013" "Apple Inc."
+.TH client.conf 5 "CUPS" "7 May 2014" "Apple Inc."
 .SH NAME
-client.conf \- client configuration file for cups
+client.conf \- client configuration file for cups (deprecated)
 .SH DESCRIPTION
-The \fIclient.conf\fR file configures the CUPS client and is
-normally located in the \fI/etc/cups\fR or \fI~/.cups\fR
-directory. Each line in the file can be a configuration
-directive, a blank line, or a comment. Comment lines start with
-the # character.
-.SH DIRECTIVES
-The following directives are understood by the client. Consult the
-on-line help for detailed descriptions:
+The \fBclient.conf\fR file configures the CUPS client and is normally located in the \fI/etc/cups\fR and/or \fI~/.cups\fR directories.
+Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character.
+.LP
+\fBNote:\fR Starting with OS X 10.7, this file is only used by command-line and X11 applications.
+The \fBServerName\fR directive is not supported on OS X at all.
+.SS DIRECTIVES
+The following directives are understood by the client. Consult the online help for detailed descriptions:
 .TP 5
-Encryption IfRequested
+\fBAllowAnyRoot Yes\fR
 .TP 5
-Encryption Never
+\fBAllowAnyRoot No\fR
+Specifies whether to allow TLS with certificates that have not been signed by a trusted Certificate Authority.
+The default is "Yes".
 .TP 5
-Encryption Required
-.br
-Specifies the level of encryption that is required for a particular
-location.
+\fBAllowExpiredCerts Yes\fR
 .TP 5
-GSSServiceName name
-Specifies the Kerberos service name that is used for authentication, typically
-"host", "http", or "ipp". CUPS adds the remote hostname
-("name@server.example.com") for you. The default name is
-"http".
+\fBAllowExpiredCerts No\fR
+Specifies whether to allow TLS with expired certificates.
+The default is "Yes".
 .TP 5
-ServerName hostname-or-ip-address[:port]
+\fBEncryption IfRequested\fR
 .TP 5
-ServerName /domain/socket
-.br
-Specifies the address and optionally the port to use when connecting to the
-server. \fBNote: Not supported on OS X 10.7 or later.\fR
+\fBEncryption Never\fR
 .TP 5
-ServerName hostname-or-ip-address[:port]/version=1.1
-.br
-Specifies the address and optionally the port to use when connecting to a
-server running CUPS 1.3.12 and earlier. \fBNote: Not supported on OS X 10.7 or
-later.\fR
+\fBEncryption Required\fR
+Specifies the level of encryption that should be used.
 .TP 5
-User name
-.br
+\fBGSSServiceName \fIname\fR
+Specifies the Kerberos service name that is used for authentication, typically "host", "http", or "ipp".
+CUPS adds the remote hostname ("name@server.example.com") for you. The default name is "http".
+.TP 5
+\fBServerName \fIhostname-or-ip-address\fR[\fI:port\fR]
+.TP 5
+\fBServerName \fI/domain/socket\fR
+Specifies the address and optionally the port to use when connecting to the server.
+\fBNote: This directive it not supported on OS X 10.7 or later.\fR
+.TP 5
+\fBServerName \fIhostname-or-ip-address\fR[\fI:port\fR]\fB/version=1.1\fR
+Specifies the address and optionally the port to use when connecting to a server running CUPS 1.3.12 and earlier.
+.TP 5
+\fBUser \fIname\fR
 Specifies the default user name to use for requests.
+.TP 5
+\fBValidateCerts Yes\fR
+.TP 5
+\fBValidateCerts No\fR
+Specifies whether to only allow TLS with certificates whose common name matches the hostname.
+The default is "No".
+.SH NOTES
+The \fBclient.conf\fR file is deprecated and will no longer be supported in a future version of CUPS.
 .SH SEE ALSO
-http://localhost:631/help
+.BR cups (1),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: client.conf.man.in 11109 2013-07-08 21:15:13Z msweet $".
+.\" End of "$Id: client.conf.man.in 11851 2014-05-07 23:55:35Z msweet $".
 .\"

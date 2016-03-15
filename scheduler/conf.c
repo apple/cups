@@ -1,9 +1,9 @@
 /*
- * "$Id: conf.c 11932 2014-06-16 16:13:06Z msweet $"
+ * "$Id: conf.c 11931 2014-06-16 16:10:58Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -47,7 +47,8 @@ typedef enum
   CUPSD_VARTYPE_TIME,			/* Time interval option */
   CUPSD_VARTYPE_STRING,			/* String option */
   CUPSD_VARTYPE_BOOLEAN,		/* Boolean option */
-  CUPSD_VARTYPE_PATHNAME		/* File/directory name option */
+  CUPSD_VARTYPE_PATHNAME,		/* File/directory name option */
+  CUPSD_VARTYPE_PERM			/* File/directory permissions */
 } cupsd_vartype_t;
 
 typedef struct
@@ -84,13 +85,16 @@ static const cupsd_var_t	cupsd_vars[] =
 #ifdef HAVE_GSSAPI
   { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_GSSAPI */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  { "IdleExitTimeout",		&IdleExitTimeout,	CUPSD_VARTYPE_TIME },
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
   { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_TIME },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_TIME },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_TIME },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
-  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_TIME },
+  { "LaunchdTimeout",		&IdleExitTimeout,	CUPSD_VARTYPE_TIME },
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
@@ -129,13 +133,13 @@ static const cupsd_var_t	cupsfiles_vars[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "CacheDir",			&CacheDir,		CUPSD_VARTYPE_STRING },
-  { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_INTEGER },
+  { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_PERM },
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
   { "FileDevice",		&FileDevice,		CUPSD_VARTYPE_BOOLEAN },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-  { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
+  { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_PERM },
   { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
@@ -143,10 +147,7 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
-  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
-  { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_PATHNAME },
-#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+  { "ServerKeychain",		&ServerKeychain,	CUPSD_VARTYPE_PATHNAME },
 #endif /* HAVE_SSL */
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
@@ -227,9 +228,9 @@ int					/* O - 0 on success, -1 on error, 1 on warning */
 cupsdCheckPermissions(
     const char *filename,		/* I - File/directory name */
     const char *suffix,			/* I - Additional file/directory name */
-    int        mode,			/* I - Permissions */
-    int        user,			/* I - Owner */
-    int        group,			/* I - Group */
+    mode_t     mode,			/* I - Permissions */
+    uid_t      user,			/* I - Owner */
+    gid_t      group,			/* I - Group */
     int        is_dir,			/* I - 1 = directory, 0 = file */
     int        create_dir)		/* I - 1 = create directory, -1 = create w/o logging, 0 = not */
 {
@@ -590,12 +591,11 @@ cupsdReadConfiguration(void)
   ClassifyOverride  = 0;
 
 #ifdef HAVE_SSL
-#  ifdef HAVE_CDSASSL
-  cupsdSetString(&ServerCertificate, "/Library/Keychains/System.keychain");
+#  ifdef HAVE_GNUTLS
+  cupsdSetString(&ServerKeychain, "ssl");
 #  else
-  cupsdSetString(&ServerCertificate, "ssl/server.crt");
-  cupsdSetString(&ServerKey, "ssl/server.key");
-#  endif /* HAVE_CDSASSL */
+  cupsdSetString(&ServerKeychain, "/Library/Keychains/System.keychain");
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
   language = cupsLangDefault();
@@ -685,7 +685,6 @@ cupsdReadConfiguration(void)
   default_auth_type        = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption        = HTTP_ENCRYPT_REQUIRED;
-  SSLOptions               = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
   DirtyCleanInterval       = DEFAULT_KEEPALIVE;
   JobKillDelay             = DEFAULT_TIMEOUT;
@@ -711,6 +710,7 @@ cupsdReadConfiguration(void)
   NumSystemGroups          = 0;
   ReloadTimeout	           = DEFAULT_KEEPALIVE;
   RootCertDuration         = 300;
+  Sandboxing               = CUPSD_SANDBOXING_STRICT;
   StrictConformance        = FALSE;
   SyncOnClose              = FALSE;
   Timeout                  = DEFAULT_TIMEOUT;
@@ -755,9 +755,9 @@ cupsdReadConfiguration(void)
   DefaultLeaseDuration       = 86400;
   MaxLeaseDuration           = 0;
 
-#ifdef HAVE_LAUNCHD
-  LaunchdTimeout = 10;
-#endif /* HAVE_LAUNCHD */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  IdleExitTimeout = 60;
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
  /*
   * Setup environment variables...
@@ -1060,24 +1060,11 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&CacheDir, "%s/%s", ServerRoot, CacheDir);
 
 #ifdef HAVE_SSL
-  if (ServerCertificate[0] != '/')
-    cupsdSetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
+  if (ServerKeychain[0] != '/')
+    cupsdSetStringf(&ServerKeychain, "%s/%s", ServerRoot, ServerKeychain);
 
-  if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)) &&
-      cupsdCheckPermissions(ServerCertificate, NULL, 0600, RunUser, Group,
-                            0, 0) < 0 &&
-      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
-    return (0);
-
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
-  if (ServerKey[0] != '/')
-    cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
-
-  if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)) &&
-      cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0 &&
-      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
-    return (0);
-#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Using keychain \"%s\" for server name \"%s\".", ServerKeychain, ServerName);
+  cupsSetServerCredentials(ServerKeychain, ServerName, 1);
 #endif /* HAVE_SSL */
 
  /*
@@ -1312,6 +1299,7 @@ cupsdReadConfiguration(void)
       cupsdAddString(&(p->job_attrs), "job-name");
       cupsdAddString(&(p->job_attrs), "job-originating-host-name");
       cupsdAddString(&(p->job_attrs), "job-originating-user-name");
+      cupsdAddString(&(p->job_attrs), "phone");
 
       cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateAccess default");
       cupsdAddString(&(p->sub_access), "@OWNER");
@@ -1520,7 +1508,7 @@ cupsdReadConfiguration(void)
     if (!mimeType(MimeDatabase, "application", "octet-stream"))
       NumMimeTypes ++;
 
-    if ((MimeTypes = calloc(NumMimeTypes, sizeof(const char *))) == NULL)
+    if ((MimeTypes = calloc((size_t)NumMimeTypes, sizeof(const char *))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate memory for %d MIME types.",
@@ -2182,20 +2170,6 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-    else if (!_cups_strcasecmp(value, "digest"))
-    {
-      loc->type = CUPSD_AUTH_DIGEST;
-
-      if (loc->level == CUPSD_AUTH_ANON)
-	loc->level = CUPSD_AUTH_USER;
-    }
-    else if (!_cups_strcasecmp(value, "basicdigest"))
-    {
-      loc->type = CUPSD_AUTH_BASICDIGEST;
-
-      if (loc->level == CUPSD_AUTH_ANON)
-	loc->level = CUPSD_AUTH_USER;
-    }
     else if (!_cups_strcasecmp(value, "default"))
     {
       loc->type = CUPSD_AUTH_DEFAULT;
@@ -2695,6 +2669,41 @@ parse_variable(
 	}
 	break;
 
+    case CUPSD_VARTYPE_PERM :
+	if (!value)
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Missing permissions value for %s on line %d of %s.",
+			  line, linenum, filename);
+          return (0);
+	}
+	else if (!isdigit(*value & 255))
+	{
+	 /* TODO: Add chmod UGO syntax support */
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Bad permissions value for %s on line %d of %s.",
+			  line, linenum, filename);
+          return (0);
+	}
+	else
+	{
+	  int n = strtol(value, NULL, 8);
+					/* Permissions value */
+
+	  if (n < 0)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+			    "Bad negative permissions value for %s on line %d of "
+			    "%s.", line, linenum, filename);
+	    return (0);
+	  }
+	  else
+	  {
+	    *((mode_t *)var->ptr) = (mode_t)n;
+	  }
+	}
+	break;
+
     case CUPSD_VARTYPE_TIME :
 	if (!value)
 	{
@@ -3017,7 +3026,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 #endif /* AF_LOCAL */
 	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv%d)", temp,
                         httpAddrPort(&(lis->address)),
-			_httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
+			httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
 
         if (!httpAddrLocalhost(&(lis->address)))
 	  RemotePort = httpAddrPort(&(lis->address));
@@ -3059,10 +3068,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	default_auth_type = CUPSD_AUTH_NONE;
       else if (!_cups_strcasecmp(value, "basic"))
 	default_auth_type = CUPSD_AUTH_BASIC;
-      else if (!_cups_strcasecmp(value, "digest"))
-	default_auth_type = CUPSD_AUTH_DIGEST;
-      else if (!_cups_strcasecmp(value, "basicdigest"))
-	default_auth_type = CUPSD_AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
       else if (!_cups_strcasecmp(value, "negotiate"))
         default_auth_type = CUPSD_AUTH_NEGOTIATE;
@@ -3131,6 +3136,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
         AccessLogLevel = CUPSD_ACCESSLOG_ACTIONS;
       else if (!_cups_strcasecmp(value, "config"))
         AccessLogLevel = CUPSD_ACCESSLOG_CONFIG;
+      else if (!_cups_strcasecmp(value, "none"))
+        AccessLogLevel = CUPSD_ACCESSLOG_NONE;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d.",
 	                value, linenum);
@@ -3288,23 +3295,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	                "Missing value for SetEnv directive on line %d.",
 	                linenum);
     }
-#ifdef HAVE_SSL
-    else if (!_cups_strcasecmp(line, "SSLOptions"))
-    {
-     /*
-      * SSLOptions options
-      */
-
-      if (!value || !_cups_strcasecmp(value, "none"))
-        SSLOptions = CUPSD_SSL_NONE;
-      else if (!_cups_strcasecmp(value, "noemptyfragments"))
-        SSLOptions = CUPSD_SSL_NOEMPTY;
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown value \"%s\" for SSLOptions directive on "
-			"line %d.", value, linenum);
-    }
-#endif /* HAVE_SSL */
     else if (!_cups_strcasecmp(line, "AccessLog") ||
              !_cups_strcasecmp(line, "CacheDir") ||
              !_cups_strcasecmp(line, "ConfigFilePerm") ||
@@ -3325,6 +3315,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
              !_cups_strcasecmp(line, "ServerBin") ||
              !_cups_strcasecmp(line, "ServerCertificate") ||
              !_cups_strcasecmp(line, "ServerKey") ||
+             !_cups_strcasecmp(line, "ServerKeychain") ||
              !_cups_strcasecmp(line, "ServerRoot") ||
              !_cups_strcasecmp(line, "SMBConfigFile") ||
              !_cups_strcasecmp(line, "StateDir") ||
@@ -3378,7 +3369,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       */
 
       if (isdigit(value[0]))
-        Group = atoi(value);
+        Group = (gid_t)atoi(value);
       else
       {
         endgrent();
@@ -3412,6 +3403,30 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unknown PrintcapFormat \"%s\" on line %d of %s.",
+	                value, linenum, CupsFilesFile);
+        if (FatalErrors & CUPSD_FATAL_CONFIG)
+          return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(line, "Sandboxing") && value)
+    {
+     /*
+      * Level of sandboxing?
+      */
+
+      if (!_cups_strcasecmp(value, "off"))
+      {
+        Sandboxing = CUPSD_SANDBOXING_OFF;
+        cupsdLogMessage(CUPSD_LOG_WARN, "Disabling sandboxing is not recommended (line %d of %s)", linenum, CupsFilesFile);
+      }
+      else if (!_cups_strcasecmp(value, "relaxed"))
+        Sandboxing = CUPSD_SANDBOXING_RELAXED;
+      else if (!_cups_strcasecmp(value, "strict"))
+        Sandboxing = CUPSD_SANDBOXING_STRICT;
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown Sandboxing \"%s\" on line %d of %s.",
 	                value, linenum, CupsFilesFile);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
           return (0);
@@ -3453,7 +3468,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
             return (0);
         }
         else
-	  User = atoi(value);
+	  User = (uid_t)atoi(value);
       }
       else
       {
@@ -3486,6 +3501,15 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
             return (0);
         }
       }
+    }
+    else if (!_cups_strcasecmp(line, "ServerCertificate") ||
+             !_cups_strcasecmp(line, "ServerKey"))
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+		      "The \"%s\" directive on line %d of %s is no longer "
+		      "supported; this will become an error in a future "
+		      "release.",
+		      line, linenum, CupsFilesFile);
     }
     else if (!parse_variable(CupsFilesFile, linenum, line, value,
 			     sizeof(cupsfiles_vars) / sizeof(cupsfiles_vars[0]),
@@ -4063,5 +4087,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 11932 2014-06-16 16:13:06Z msweet $".
+ * End of "$Id: conf.c 11931 2014-06-16 16:10:58Z msweet $".
  */

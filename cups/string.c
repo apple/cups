@@ -1,35 +1,18 @@
 /*
- * "$Id: string.c 11890 2014-05-22 13:59:21Z msweet $"
+ * "$Id: string.c 11889 2014-05-22 13:54:15Z msweet $"
  *
- *   String functions for CUPS.
+ * String functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsStrAlloc()      - Allocate/reference a string.
- *   _cupsStrFlush()      - Flush the string pool.
- *   _cupsStrFormatd()    - Format a floating-point number.
- *   _cupsStrFree()       - Free/dereference a string.
- *   _cupsStrRetain()     - Increment the reference count of a string.
- *   _cupsStrScand()      - Scan a string for a floating-point number.
- *   _cupsStrStatistics() - Return allocation statistics for string pool.
- *   _cups_strcpy()       - Copy a string allowing for overlapping strings.
- *   _cups_strdup()       - Duplicate a string.
- *   _cups_strcasecmp()   - Do a case-insensitive comparison.
- *   _cups_strncasecmp()  - Do a case-insensitive comparison on up to N chars.
- *   _cups_strlcat()      - Safely concatenate two strings.
- *   _cups_strlcpy()      - Safely copy two strings.
- *   compare_sp_items()   - Compare two string pool items...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -290,7 +273,7 @@ _cupsStrFormatd(char         *buf,	/* I - String */
   }
   else
   {
-    strlcpy(buf, temp, bufend - buf + 1);
+    strlcpy(buf, temp, (size_t)(bufend - buf + 1));
     bufptr = buf + strlen(buf);
   }
 
@@ -466,7 +449,7 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
 
     if (loc && loc->decimal_point)
     {
-      strlcpy(tempptr, loc->decimal_point, sizeof(temp) - (tempptr - temp));
+      strlcpy(tempptr, loc->decimal_point, sizeof(temp) - (size_t)(tempptr - temp));
       tempptr += strlen(tempptr);
     }
     else if (tempptr < (temp + sizeof(temp) - 1))
@@ -576,7 +559,7 @@ _cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
     */
 
     count  += item->ref_count;
-    len    = (strlen(item->str) + 8) & ~7;
+    len    = (strlen(item->str) + 8) & (size_t)~7;
     abytes += sizeof(_cups_sp_item_t) + len;
     tbytes += item->ref_count * len;
   }
@@ -732,7 +715,7 @@ _cups_strlcat(char       *dst,		/* O - Destination string */
   if (srclen > size)
     srclen = size;
 
-  memcpy(dst + dstlen, src, srclen);
+  memmove(dst + dstlen, src, srclen);
   dst[dstlen + srclen] = '\0';
 
   return (dstlen + srclen);
@@ -768,7 +751,7 @@ _cups_strlcpy(char       *dst,		/* O - Destination string */
   if (srclen > size)
     srclen = size;
 
-  memcpy(dst, src, srclen);
+  memmove(dst, src, srclen);
   dst[srclen] = '\0';
 
   return (srclen);
@@ -789,5 +772,5 @@ compare_sp_items(_cups_sp_item_t *a,	/* I - First item */
 
 
 /*
- * End of "$Id: string.c 11890 2014-05-22 13:59:21Z msweet $".
+ * End of "$Id: string.c 11889 2014-05-22 13:54:15Z msweet $".
  */

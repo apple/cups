@@ -1,23 +1,16 @@
 /*
- * "$Id: classes.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: classes.c 11928 2014-06-13 00:08:32Z msweet $"
  *
- *   Class status CGI for CUPS.
+ * Class status CGI for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()             - Main entry for CGI.
- *   do_class_op()      - Do a class operation.
- *   show_all_classes() - Show all classes...
- *   show_class()       - Show a single class.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -42,8 +35,7 @@ static void	show_class(http_t *http, const char *printer);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
-     char *argv[])			/* I - Command-line arguments */
+main(void)
 {
   const char	*pclass;		/* Class name */
   const char	*user;			/* Username */
@@ -169,8 +161,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_class_op(http, pclass, CUPS_ACCEPT_JOBS, cgiText(_("Accept Jobs")));
     else if (!strcmp(op, "reject-jobs"))
       do_class_op(http, pclass, CUPS_REJECT_JOBS, cgiText(_("Reject Jobs")));
-    else if (!strcmp(op, "purge-jobs"))
-      do_class_op(http, pclass, IPP_PURGE_JOBS, cgiText(_("Purge Jobs")));
+    else if (!strcmp(op, "cancel-jobs"))
+      do_class_op(http, pclass, IPP_OP_CANCEL_JOBS, cgiText(_("Cancel Jobs")));
     else if (!_cups_strcasecmp(op, "print-test-page"))
       cgiPrintTestPage(http, pclass);
     else if (!_cups_strcasecmp(op, "move-jobs"))
@@ -286,8 +278,8 @@ do_class_op(http_t      *http,		/* I - HTTP connection */
       cgiCopyTemplateLang("printer-accept.tmpl");
     else if (op == CUPS_REJECT_JOBS)
       cgiCopyTemplateLang("printer-reject.tmpl");
-    else if (op == IPP_PURGE_JOBS)
-      cgiCopyTemplateLang("printer-purge.tmpl");
+    else if (op == IPP_OP_CANCEL_JOBS)
+      cgiCopyTemplateLang("printer-cancel-jobs.tmpl");
   }
 
   cgiEndHTML();
@@ -554,5 +546,5 @@ show_class(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: classes.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: classes.c 11928 2014-06-13 00:08:32Z msweet $".
  */

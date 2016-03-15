@@ -1,16 +1,16 @@
 /*
- * "$Id: job.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: job.h 12067 2014-07-31 00:02:30Z msweet $"
  *
- *   Print job definitions for the CUPS scheduler.
+ * Print job definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -39,6 +39,8 @@ struct cupsd_job_s			/**** Job request ****/
 					 * waiting on files */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
+  char			*name;		/* Job name/title */
+  int			koctets;	/* job-k-octets */
   cups_ptype_t		dtype;		/* Destination type */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			num_files;	/* Number of files in job */
@@ -47,6 +49,8 @@ struct cupsd_job_s			/**** Job request ****/
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
 			cancel_time,	/* When to cancel/send SIGTERM */
+			creation_time,	/* When job was created */
+			completed_time,	/* When job was completed (0 if not) */
 			file_time,	/* Job file retain time */
 			history_time,	/* Job history retain time */
 			hold_until,	/* Hold expiration date/time */
@@ -74,10 +78,13 @@ struct cupsd_job_s			/**** Job request ****/
   int			backend;	/* Backend process ID */
   int			status;		/* Status code from filters */
   int			tries;		/* Number of tries for this job */
+  int			completed;	/* cups-waiting-for-job-completed seen */
+  int			retry_as_raster;/* Need to retry the job as raster */
   char			*auth_env[3],	/* AUTH_xxx environment variables,
                                          * if any */
 			*auth_uid;	/* AUTH_UID environment variable */
-  void			*profile;	/* Security profile */
+  void			*profile,	/* Security profile for filters */
+			*bprofile;	/* Security profile for backend */
   cups_array_t		*history;	/* Debug log history */
   int			progress;	/* Printing progress */
   int			num_keywords;	/* Number of PPD keywords */
@@ -145,6 +152,7 @@ extern void		cupsdDeleteJob(cupsd_job_t *job,
 			               cupsd_jobaction_t action);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFreeAllJobs(void);
+extern cups_array_t	*cupsdGetCompletedJobs(cupsd_printer_t *p);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
 extern void		cupsdLoadAllJobs(void);
@@ -171,5 +179,5 @@ extern void		cupsdUpdateJobs(void);
 
 
 /*
- * End of "$Id: job.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: job.h 12067 2014-07-31 00:02:30Z msweet $".
  */

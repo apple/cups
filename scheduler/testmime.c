@@ -1,24 +1,16 @@
 /*
- * "$Id: testmime.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testmime.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   MIME test program for CUPS.
+ * MIME test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()            - Main entry for the test program.
- *   add_ppd_filter()  - Add a printer filter from a PPD.
- *   add_ppd_filters() - Add all filters from a PPD.
- *   print_rules()     - Print the rules for a file type...
- *   type_dir()        - Show the MIME types for a given directory.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -135,7 +127,7 @@ main(int  argc,				/* I - Number of command-line args */
       sscanf(argv[i], "%15[^/]/%255s", super, type);
       dst = mimeType(mime, super, type);
 
-      filters = mimeFilter2(mime, src, srcinfo.st_size, dst, &cost);
+      filters = mimeFilter2(mime, src, (size_t)srcinfo.st_size, dst, &cost);
 
       if (!filters)
       {
@@ -264,7 +256,7 @@ add_ppd_filter(mime_t      *mime,	/* I - MIME database */
   {
     char	*ptr;			/* Pointer into maxsize(nnnn) program */
 
-    maxsize = strtoll(program + 8, &ptr, 10);
+    maxsize = (size_t)strtoll(program + 8, &ptr, 10);
 
     if (*ptr != ')')
     {
@@ -527,5 +519,5 @@ type_dir(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: testmime.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testmime.c 11558 2014-02-06 18:33:34Z msweet $".
  */

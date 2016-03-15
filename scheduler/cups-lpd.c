@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-lpd.c 11623 2014-02-19 20:18:10Z msweet $"
+ * "$Id: cups-lpd.c 11594 2014-02-14 20:09:01Z msweet $"
  *
  * Line Printer Daemon interface for CUPS.
  *
@@ -59,7 +59,7 @@ static int	create_job(http_t *http, const char *dest, const char *title,
                            const char *docname, const char *user,
 			   int num_options, cups_option_t *options);
 static int	get_printer(http_t *http, const char *name, char *dest,
-		            int destsize, cups_option_t **options,
+		            size_t destsize, cups_option_t **options,
 			    int *accepting, int *shared, ipp_pstate_t *state);
 static int	print_file(http_t *http, int id, const char *filename,
 		           const char *docname, const char *user,
@@ -257,21 +257,21 @@ main(int  argc,				/* I - Number of command-line arguments */
         syslog(LOG_INFO, "Receive print job for %s", dest);
         /* recv_print_job() sends initial status byte */
 
-        status = recv_print_job(dest, num_defaults, defaults);
+        status = (char)recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
         syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
 	/* no status byte for this command */
 
-        status = send_state(dest, list, 0);
+        status = (char)send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
         syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
 	/* no status byte for this command */
 
-        status = send_state(dest, list, 1);
+        status = (char)send_state(dest, list, 1);
 	break;
 
     case 0x05 : /* Remove jobs */
@@ -289,7 +289,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
 
-	  status = remove_jobs(dest, agent, list);
+	  status = (char)remove_jobs(dest, agent, list);
         }
 	else
 	  status = 1;
@@ -398,7 +398,7 @@ static int				/* O - Number of options or -1 on error */
 get_printer(http_t        *http,	/* I - HTTP connection */
             const char    *name,	/* I - Printer name from request */
 	    char          *dest,	/* I - Destination buffer */
-            int           destsize,	/* I - Size of destination buffer */
+            size_t        destsize,	/* I - Size of destination buffer */
 	    cups_option_t **options,	/* O - Printer options */
 	    int           *accepting,	/* O - printer-is-accepting-jobs value */
 	    int           *shared,	/* O - printer-is-shared value */
@@ -733,7 +733,7 @@ print_file(http_t     *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
 
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", (char)last);
 
  /*
   * Do the request...
@@ -1599,7 +1599,7 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
       break;
     }
     else if (ptr < end)
-      *ptr++ = ch;
+      *ptr++ = (char)ch;
   }
 
   *ptr = '\0';
@@ -1612,5 +1612,5 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
 
 
 /*
- * End of "$Id: cups-lpd.c 11623 2014-02-19 20:18:10Z msweet $".
+ * End of "$Id: cups-lpd.c 11594 2014-02-14 20:09:01Z msweet $".
  */

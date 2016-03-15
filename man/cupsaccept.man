@@ -1,79 +1,94 @@
 .\"
-.\" "$Id: cupsaccept.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: cupsaccept.man 11913 2014-06-10 19:00:24Z msweet $"
 .\"
-.\"   accept/reject man page for CUPS.
+.\" accept/reject man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2006 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsaccept 8 "CUPS" "12 February 2006" "Apple Inc."
+.TH cupsaccept 8 "CUPS" "10 June 2014" "Apple Inc."
 .SH NAME
 cupsaccept/cupsreject \- accept/reject jobs sent to a destination
 .SH SYNOPSIS
 .B cupsaccept
-[ -E ] [ -U
+[
+.B \-E
+] [
+.B \-U
 .I username
-] [ -h
+] [
+.B \-h
 .I hostname[:port]
-] destination(s)
+]
+.I destination(s)
 .br
 .B cupsreject
-[ -E ] [ -U
+[
+.B \-E
+] [
+.B \-U
 .I username
-] [ -h
+] [
+.B \-h
 .I hostname[:port]
-] [ -r
+] [
+.B \-r
 .I reason
-] destination(s)
+]
+.I destination(s)
 .SH DESCRIPTION
-\fIcupsaccept\fR instructs the printing system to accept print jobs to the
-specified destinations.
+The
+.B cupsaccept
+command instructs the printing system to accept print jobs to the specified destinations.
 .LP
-\fIcupsreject\fR instructs the printing system to reject print jobs to the
-specified destinations. The \fI-r\fR option sets the reason for rejecting
-print jobs. If not specified the reason defaults to "Reason Unknown".
+The
+.B cupsreject
+command instructs the printing system to reject print jobs to the
+specified destinations.
+The \fI-r\fR option sets the reason for rejecting print jobs. If not specified, the reason defaults to "Reason Unknown".
 .SH OPTIONS
-The following options are supported by both \fIcupsaccept\fR and
-\fIcupsreject\fR:
+The following options are supported by both
+.B cupsaccept
+and
+.BR cupsreject :
 .TP 5
--E
-.br
+.B \-E
 Forces encryption when connecting to the server.
 .TP 5
--U username
-.br
+\fB-U \fIusername\fR
 Sets the username that is sent when connecting to the server.
 .TP 5
--h hostname[:port]
-.br
+\fB-h \fIhostname[:port]\fR
 Chooses an alternate server.
 .TP 5
--r "reason"
-.br
-Sets the reason string that is shown for a printer that is
-rejecting jobs.
-.SH COMPATIBILITY
-Unlike the System V printing system, CUPS allows printer names to
-contain any printable character except SPACE, TAB, "/", or "#".
+\fB-r \fR"\fIreason\fR"
+Sets the reason string that is shown for a printer that is rejecting jobs.
+.SH CONFORMING TO
+The
+.B cupsaccept
+and
+.B cupsreject
+commands correspond to the System V printing system commands "accept" and "reject", respectively.
+Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are \fInot\fR case-sensitive.
 .LP
-The CUPS versions of \fIaccept\fR and \fIreject\fR may ask the
-user for an access password depending on the printing system
-configuration. This differs from the System V versions which
-require the root user to execute these commands.
+Finally, the CUPS versions may ask the user for an access password depending on the printing system configuration.
 .SH SEE ALSO
-\fIcancel(1)\fR, \fIcupsenable(8)\fR, \fIlp(1)\fR,
-\fIlpadmin(8)\fR, \fIlpstat(1)\fR,
+.BR cancel (1),
+.BR cupsenable (8),
+.BR lp (1),
+.BR lpadmin (8),
+.BR lpstat (1),
 .br
-http://localhost:631/help
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: cupsaccept.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: cupsaccept.man 11913 2014-06-10 19:00:24Z msweet $".
 .\"

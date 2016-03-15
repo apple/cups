@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 7871 2008-08-27 21:12:43Z mike $"
+dnl "$Id: cups-compiler.m4 11683 2014-03-05 20:00:54Z msweet $"
 dnl
 dnl Compiler stuff for CUPS.
 dnl
@@ -103,7 +103,7 @@ if test -n "$GCC"; then
 	fi
 
 	# Generate position-independent code as needed...
-	if test $PICFLAG = 1 -a $uname != AIX; then
+	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
 	fi
 
@@ -154,20 +154,20 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wsign-conversion -Wunused $OPTIM"
+
+		AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
+		AC_TRY_COMPILE(,,
+			[OPTIM="$OPTIM -Wno-tautological-compare"
+			AC_MSG_RESULT(yes)],
+			AC_MSG_RESULT(no))
+		CFLAGS="$OLDCFLAGS"
 
 		# Additional warning options for development testing...
 		if test -d .svn; then
-			OPTIM="-Wshadow -Werror $OPTIM"
-		else
-			AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
-			OLDCFLAGS="$CFLAGS"
-			CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-			AC_TRY_COMPILE(,,
-				[OPTIM="$OPTIM -Wno-tautological-compare"
-				AC_MSG_RESULT(yes)],
-				AC_MSG_RESULT(no))
-			CFLAGS="$OLDCFLAGS"
+			OPTIM="-Werror $OPTIM"
 		fi
 	fi
 
@@ -192,59 +192,11 @@ if test -n "$GCC"; then
 else
 	# Add vendor-specific compiler options...
 	case $uname in
-		AIX*)
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O2 -qmaxmem=6000"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-			;;
-		HP-UX*)
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="+O2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-
-			CFLAGS="-Ae $CFLAGS"
-
-			if test $PICFLAG = 1; then
-				OPTIM="+z $OPTIM"
-			fi
-			;;
-		OSF*)
-			# Tru64 UNIX aka Digital UNIX aka OSF/1
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O"
-				else
-					OPTIM="$with_optim"
-				fi
-			fi
-			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
 					OPTIM="-xO2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-
-			if test $PICFLAG = 1; then
-				OPTIM="-KPIC $OPTIM"
-			fi
-			;;
-		UNIX_SVR*)
-			# UnixWare
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O"
 				else
 					OPTIM="$with_optim $OPTIM"
 				fi
@@ -268,33 +220,13 @@ fi
 
 # Add general compiler options per platform...
 case $uname in
-	HP-UX*)
-		# HP-UX 10.20 (at least) needs this definition to get the
-		# h_errno global...
-		OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
-
-		# HP-UX 11.00 (at least) needs this definition to get the
-		# u_short type used by the IP headers...
-		OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
-
-		# HP-UX 11.23 (at least) needs this definition to get the
-		# IPv6 header to work...
-		OPTIM="$OPTIM -D_HPUX_SOURCE"
-		;;
-
 	Linux*)
 		# glibc 2.8 and higher breaks peer credentials unless you
 		# define _GNU_SOURCE...
 		OPTIM="$OPTIM -D_GNU_SOURCE"
 		;;
-
-	OSF*)
-		# Tru64 UNIX aka Digital UNIX aka OSF/1 need to be told
-		# to be POSIX-compliant...
-		OPTIM="$OPTIM -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -D_OSF_SOURCE"
-		;;
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 7871 2008-08-27 21:12:43Z mike $".
+dnl End of "$Id: cups-compiler.m4 11683 2014-03-05 20:00:54Z msweet $".
 dnl

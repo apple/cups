@@ -1,5 +1,0 @@
-<DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Aktivní úlohy"></FORM>}
-{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Dokončené úlohy"></FORM>}
-{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Všechny úlohy"></FORM>}</DIV>
-
-<P ALIGN="CENTER">{total=0?Žádné úlohy:Zobrazení {#job_id} z {total} {?which_jobs=?aktivních:{which_jobs=all?:dokončených}} {total=1?úloha:úloh}}.</P>

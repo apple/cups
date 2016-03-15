@@ -1,26 +1,18 @@
 /*
- * "$Id: transcode.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: transcode.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Transcoding support for CUPS.
+ * Transcoding support for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsCharmapFlush() - Flush all character set maps out of cache.
- *   cupsCharsetToUTF8() - Convert legacy character set to UTF-8.
- *   cupsUTF8ToCharset() - Convert UTF-8 to legacy character set.
- *   cupsUTF8ToUTF32()   - Convert UTF-8 to UTF-32.
- *   cupsUTF32ToUTF8()   - Convert UTF-32 to UTF-8.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -117,7 +109,7 @@ cupsCharsetToUTF8(
   if (encoding == CUPS_UTF8 || encoding <= CUPS_US_ASCII ||
       encoding >= CUPS_ENCODING_VBCS_END)
   {
-    strlcpy((char *)dest, src, maxout);
+    strlcpy((char *)dest, src, (size_t)maxout);
     return ((int)strlen((char *)dest));
   }
 
@@ -141,11 +133,11 @@ cupsCharsetToUTF8(
 
       if (ch & 128)
       {
-	*destptr++ = 0xc0 | (ch >> 6);
-	*destptr++ = 0x80 | (ch & 0x3f);
+	*destptr++ = (cups_utf8_t)(0xc0 | (ch >> 6));
+	*destptr++ = (cups_utf8_t)(0x80 | (ch & 0x3f));
       }
       else
-	*destptr++ = ch;
+	*destptr++ = (cups_utf8_t)ch;
     }
 
     *destptr = '\0';
@@ -174,7 +166,7 @@ cupsCharsetToUTF8(
     char *altdestptr = (char *)dest;	/* Silence bogus GCC type-punned */
 
     srclen       = strlen(src);
-    outBytesLeft = maxout - 1;
+    outBytesLeft = (size_t)maxout - 1;
 
     iconv(map_to_utf8, (char **)&src, &srclen, &altdestptr, &outBytesLeft);
     *altdestptr = '\0';
@@ -234,7 +226,7 @@ cupsUTF8ToCharset(
   if (encoding == CUPS_UTF8 ||
       encoding >= CUPS_ENCODING_VBCS_END)
   {
-    strlcpy(dest, (char *)src, maxout);
+    strlcpy(dest, (char *)src, (size_t)maxout);
     return ((int)strlen(dest));
   }
 
@@ -262,7 +254,7 @@ cupsUTF8ToCharset(
 	ch = ((ch & 0x1f) << 6) | (*src++ & 0x3f);
 
 	if (ch < maxch)
-          *destptr++ = ch;
+          *destptr++ = (char)ch;
 	else
           *destptr++ = '?';
       }
@@ -270,7 +262,7 @@ cupsUTF8ToCharset(
                (ch & 0xf8) == 0xf0)
         *destptr++ = '?';
       else if (!(ch & 0x80))
-	*destptr++ = ch;
+	*destptr++ = (char)ch;
     }
 
     *destptr = '\0';
@@ -299,7 +291,7 @@ cupsUTF8ToCharset(
     char *altsrc = (char *)src;		/* Silence bogus GCC type-punned */
 
     srclen       = strlen((char *)src);
-    outBytesLeft = maxout - 1;
+    outBytesLeft = (size_t)maxout - 1;
 
     iconv(map_from_utf8, &altsrc, &srclen, &destptr, &outBytesLeft);
     *destptr = '\0';
@@ -404,7 +396,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = ((ch & 0x1f) << 6) | (next & 0x3f);
+      ch32 = (cups_utf32_t)((ch & 0x1f) << 6) | (cups_utf32_t)(next & 0x3f);
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
@@ -436,7 +428,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = ((ch & 0x0f) << 6) | (next & 0x3f);
+      ch32 = (cups_utf32_t)((ch & 0x0f) << 6) | (cups_utf32_t)(next & 0x3f);
 
       next = *src++;
       if ((next & 0xc0) != 0x80)
@@ -446,7 +438,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = (ch32 << 6) | (next & 0x3f);
+      ch32 = (ch32 << 6) | (cups_utf32_t)(next & 0x3f);
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
@@ -478,7 +470,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = ((ch & 0x07) << 6) | (next & 0x3f);
+      ch32 = (cups_utf32_t)((ch & 0x07) << 6) | (cups_utf32_t)(next & 0x3f);
 
       next = *src++;
       if ((next & 0xc0) != 0x80)
@@ -488,7 +480,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = (ch32 << 6) | (next & 0x3f);
+      ch32 = (ch32 << 6) | (cups_utf32_t)(next & 0x3f);
 
       next = *src++;
       if ((next & 0xc0) != 0x80)
@@ -498,7 +490,7 @@ cupsUTF8ToUTF32(
 	return (-1);
       }
 
-      ch32 = (ch32 << 6) | (next & 0x3f);
+      ch32 = (ch32 << 6) | (cups_utf32_t)(next & 0x3f);
 
      /*
       * Check for non-shortest form (invalid UTF-8)...
@@ -716,5 +708,5 @@ cupsUTF32ToUTF8(
 
 
 /*
- * End of "$Id: transcode.c 10996 2013-05-29 11:51:34Z msweet $"
+ * End of "$Id: transcode.c 11594 2014-02-14 20:09:01Z msweet $"
  */

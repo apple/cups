@@ -1,18 +1,18 @@
 /*
- * "$Id: snmp-private.h 3794 2012-04-23 22:44:16Z msweet $"
+ * "$Id: snmp-private.h 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Private SNMP definitions for CUPS.
+ * Private SNMP definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_SNMP_PRIVATE_H_
@@ -66,14 +66,14 @@ typedef struct cups_snmp_string_s	/**** String value ****/
 {
   unsigned char	bytes[CUPS_SNMP_MAX_STRING];
 					/* Bytes in string */
-  int		num_bytes;		/* Number of bytes */
+  unsigned	num_bytes;		/* Number of bytes */
 } cups_snmp_string_t;
 
 union cups_snmp_value_u			/**** Object value ****/
 {
   int		boolean;		/* Boolean value */
   int		integer;		/* Integer value */
-  unsigned	counter;		/* Counter value */
+  int		counter;		/* Counter value */
   unsigned	gauge;			/* Gauge value */
   unsigned	timeticks;		/* Timeticks  value */
   int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
@@ -88,7 +88,7 @@ typedef struct cups_snmp_s		/**** SNMP data packet ****/
   char		community[CUPS_SNMP_MAX_COMMUNITY];
 					/* Community name */
   cups_asn1_t	request_type;		/* Request type */
-  int		request_id;		/* request-id value */
+  unsigned	request_id;		/* request-id value */
   int		error_status;		/* error-status value */
   int		error_index;		/* error-index value */
   int		object_name[CUPS_SNMP_MAX_OID];
@@ -142,5 +142,5 @@ extern int		_cupsSNMPWrite(int fd, http_addr_t *address, int version,
 
 
 /*
- * End of "$Id: snmp-private.h 3794 2012-04-23 22:44:16Z msweet $".
+ * End of "$Id: snmp-private.h 11558 2014-02-06 18:33:34Z msweet $".
  */

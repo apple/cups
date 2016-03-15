@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 11867 2014-05-09 20:33:08Z msweet $"
+ * "$Id: encode.c 11733 2014-03-25 18:01:41Z msweet $"
  *
  * Option encoding routines for CUPS.
  *
@@ -151,6 +151,8 @@ static const _ipp_option_t ipp_options[] =
   { 0, "job-accounting-user-id", IPP_TAG_NAME,          IPP_TAG_JOB },
   { 0, "job-accounting-user-id-default", IPP_TAG_NAME,  IPP_TAG_PRINTER },
   { 0, "job-authorization-uri",	IPP_TAG_URI,		IPP_TAG_OPERATION },
+  { 0, "job-cancel-after",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-cancel-after-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "job-hold-until",	IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "job-id",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
@@ -647,7 +649,7 @@ cupsEncodeOptions2(
 	    * Integer/enumeration value...
 	    */
 
-            attr->values[j].integer = strtol(val, &s, 10);
+            attr->values[j].integer = (int)strtol(val, &s, 10);
 
             DEBUG_printf(("2cupsEncodeOptions2: Added integer option value "
 	                  "%d...", attr->values[j].integer));
@@ -689,12 +691,12 @@ cupsEncodeOptions2(
 	      s = val;
 	    }
 	    else
-	      attr->values[j].range.lower = strtol(val, &s, 10);
+	      attr->values[j].range.lower = (int)strtol(val, &s, 10);
 
 	    if (*s == '-')
 	    {
 	      if (s[1])
-		attr->values[j].range.upper = strtol(s + 1, NULL, 10);
+		attr->values[j].range.upper = (int)strtol(s + 1, NULL, 10);
 	      else
 		attr->values[j].range.upper = 2147483647;
             }
@@ -711,10 +713,10 @@ cupsEncodeOptions2(
 	    * Resolution...
 	    */
 
-	    attr->values[j].resolution.xres = strtol(val, &s, 10);
+	    attr->values[j].resolution.xres = (int)strtol(val, &s, 10);
 
 	    if (*s == 'x')
-	      attr->values[j].resolution.yres = strtol(s + 1, &s, 10);
+	      attr->values[j].resolution.yres = (int)strtol(s + 1, &s, 10);
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 
@@ -847,5 +849,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 11867 2014-05-09 20:33:08Z msweet $".
+ * End of "$Id: encode.c 11733 2014-03-25 18:01:41Z msweet $".
  */

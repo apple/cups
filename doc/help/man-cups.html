@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups(1)</title>
+</head>
+<body>
+<h1 class="title">cups(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cups - a standards-based, open source printing system
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>CUPS</b>
+is the software you use to print from applications like word processors, email readers, photo editors, and web browsers. It converts the page descriptions produced by your application (put a paragraph here, draw a line there, and so forth) into something your printer can understand and then sends the information to the printer for printing.
+<p>Now, since every printer manufacturer does things differently, printing can be very complicated.
+<b>CUPS</b>
+does its best to hide this from you and your application so that you can concentrate on printing and less on how to print. Generally, the only time you need to know anything about your printer is when you use it for the first time, and even then
+<b>CUPS</b>
+can often figure things out on its own.
+<h3><a name="HOW_DOES_IT_WORK_">How Does It Work?</a></h3>
+The first time you print to a printer,
+<b>CUPS</b>
+creates a queue to keep track of the current status of the printer (everything OK, out of paper, etc.) and any pages you have printed. Most of the time the queue points to a printer connected directly to your computer via a USB port, however it can also point to a printer on your network, a printer on the Internet, or multiple printers depending on the configuration. Regardless of where the queue points, it will look like any other printer to you and your applications.
+<p>Every time you print something,
+<b>CUPS</b>
+creates a job which contains the queue you are sending the print to, the name of the document you are printing, and the page descriptions. Job are numbered (queue-1, queue-2, and so forth) so you can monitor the job as it is printed or cancel it if you see a mistake. When
+<b>CUPS</b>
+gets a job for printing, it determines the best programs (filters, printer drivers, port monitors, and backends) to convert the pages into a printable format and then runs them to actually print the job.
+<p>When the print job is completely printed,
+<b>CUPS</b>
+removes the job from the queue and moves on to any other jobs you have submitted. You can also be notified when the job is finished, or if there are any errors during printing, in several different ways.
+<h3><a name="WHERE_DO_I_BEGIN_">Where Do I Begin?</a></h3>
+The easiest way to start is by using the web interface to configure your printer. Go to "<a href="http://localhost:631"">http://localhost:631"</a> and choose the Administration tab at the top of the page. Click/press on the Add Printer button and follow the prompts.
+<p>When you are asked for a username and password, enter your login username and password or the "root" username and password.
+<p>After the printer is added you will be asked to set the default printer options (paper size, output mode, etc.) for the printer. Make any changes as needed and then click/press on the Set Default Options button to save them. Some printers also support auto-configuration - click/press on the Query Printer for Default Options button to update the options automatically.
+<p>Once you have added the printer, you can print to it from any application. You can also choose Print Test Page from the maintenance menu to print a simple test page and verify that everything is working properly.
+<p>You can also use the
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+and
+<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
+commands to add printers to
+<b>CUPS</b>.
+Additionally, your operating system may include graphical user interfaces or automatically create printer queues when you connect a printer to your computer.
+<h3><a name="HOW_DO_I_GET_HELP_">How Do I Get Help?</a></h3>
+The
+<b>CUPS</b>
+web site (<a href="http://www.CUPS.org">http://www.CUPS.org</a>) provides access to the
+<i>cups</i>
+and
+<i>cups-devel</i>
+mailing lists, additional documentation and resources, and a bug report database. Most vendors also provide online discussion forums to ask printing questions for your operating system of choice.
+<h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
+<b>CUPS</b>
+commands use the following environment variables to override the default locations of files and so forth. For security reasons, these environment variables are ignored for setuid programs:
+<dl class="man">
+<dt><b>CUPS_ANYROOT</b>
+<dd style="margin-left: 5.0em">Whether to allow any X.509 certificate root (Y or N).
+<dt><b>CUPS_CACHEDIR</b>
+<dd style="margin-left: 5.0em">The directory where semi-persistent cache files can be found.
+<dt><b>CUPS_DATADIR</b>
+<dd style="margin-left: 5.0em">The directory where data files can be found.
+<dt><b>CUPS_ENCRYPTION</b>
+<dd style="margin-left: 5.0em">The default level of encryption (Always, IfRequested, Never, Required).
+<dt><b>CUPS_EXPIREDCERTS</b>
+<dd style="margin-left: 5.0em">Whether to allow expired X.509 certificates (Y or N).
+<dt><b>CUPS_GSSSERVICENAME</b>
+<dd style="margin-left: 5.0em">The Kerberos service name used for authentication.
+<dt><b>CUPS_SERVER</b>
+<dd style="margin-left: 5.0em">The hostname/IP address and port number of the CUPS scheduler (hostname:port or ipaddress:port).
+<dt><b>CUPS_SERVERBIN</b>
+<dd style="margin-left: 5.0em">The directory where server helper programs, filters, backend, etc. can be found.
+<dt><b>CUPS_SERVERROOT</b>
+<dd style="margin-left: 5.0em">The root directory of the server.
+<dt><b>CUPS_STATEDIR</b>
+<dd style="margin-left: 5.0em">The directory where state files can be found.
+<dt><b>CUPS_USER</b>
+<dd style="margin-left: 5.0em">Specifies the name of the user for print requests.
+<dt><b>HOME</b>
+<dd style="margin-left: 5.0em">Specifies the home directory of the current user.
+<dt><b>IPP_PORT</b>
+<dd style="margin-left: 5.0em">Specifies the default port number for IPP requests.
+<dt><b>LOCALEDIR</b>
+<dd style="margin-left: 5.0em">Specifies the location of localization files.
+<dt><b>LPDEST</b>
+<dd style="margin-left: 5.0em">Specifies the default print queue (System V standard).
+<dt><b>PRINTER</b>
+<dd style="margin-left: 5.0em">Specifies the default print queue (Berkeley standard).
+<dt><b>TMPDIR</b>
+<dd style="margin-left: 5.0em">Specifies the location of temporary files.
+</dl>
+<h2 class="title"><a name="FILES">Files</a></h2>
+<pre class="man">
+<i>~/.cups/client.conf</i>
+<i>~/.cups/lpoptions</i>
+</pre>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+<b>CUPS</b>
+conforms to the Internet Printing Protocol version 2.1 and implements the Berkeley and System V UNIX print commands.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-client.conf.html?TOPIC=Man+Pages"><b>client.conf</b>(7),</a>
+<a href="man-cupsctl.html?TOPIC=Man+Pages"><b>cupsctl</b>(8),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8),</a>
+<a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
+<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help)">http://localhost:631/help)</a>,
+CUPS Web Site (<a href="http://www.CUPS.org)">http://www.CUPS.org)</a>,
+PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp">http://www.pwg.org/ipp</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2014 by Apple Inc.
+
+</body>
+</html>

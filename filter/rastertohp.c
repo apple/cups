@@ -1,29 +1,18 @@
 /*
- * "$Id: rastertohp.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: rastertohp.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Hewlett-Packard Page Control Language filter for CUPS.
+ * Hewlett-Packard Page Control Language filter for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1993-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1993-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   Setup()        - Prepare the printer for printing.
- *   StartPage()    - Start a page of graphics.
- *   EndPage()      - Finish a page of graphics.
- *   Shutdown()     - Shutdown the printer.
- *   CancelJob()    - Cancel the current job...
- *   CompressData() - Compress a line of graphics.
- *   OutputLine()   - Output a line of graphics.
- *   main()         - Main entry and processing of driver.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -47,10 +36,10 @@
 unsigned char	*Planes[4],		/* Output buffers */
 		*CompBuffer,		/* Compression buffer */
 		*BitBuffer;		/* Buffer for output bits */
-int		NumPlanes,		/* Number of color planes */
+unsigned 	NumPlanes,		/* Number of color planes */
 		ColorBits,		/* Number of bits per color */
-		Feed,			/* Number of lines to skip */
-		Duplex,			/* Current duplex mode */
+		Feed;			/* Number of lines to skip */
+int		Duplex,			/* Current duplex mode */
 		Page,			/* Current page number */
 		Canceled;		/* Has the current job been canceled? */
 
@@ -65,7 +54,7 @@ void	EndPage(void);
 void	Shutdown(void);
 
 void	CancelJob(int sig);
-void	CompressData(unsigned char *line, int length, int plane, int type);
+void	CompressData(unsigned char *line, unsigned length, unsigned plane, unsigned type);
 void	OutputLine(cups_page_header2_t *header);
 
 
@@ -93,7 +82,7 @@ void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
           cups_page_header2_t *header)	/* I - Page header */
 {
-  int	plane;				/* Looping var */
+  unsigned	plane;			/* Looping var */
 
 
  /*
@@ -287,33 +276,33 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
     printf("\033*g26W");
     putchar(2);					/* Format 2 */
-    putchar(NumPlanes);				/* Output planes */
+    putchar((int)NumPlanes);			/* Output planes */
 
-    putchar(header->HWResolution[0] >> 8);	/* Black resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
+    putchar((int)(header->HWResolution[0] >> 8));/* Black resolution */
+    putchar((int)header->HWResolution[0]);
+    putchar((int)(header->HWResolution[1] >> 8));
+    putchar((int)header->HWResolution[1]);
     putchar(0);
     putchar(1 << ColorBits);			/* # of black levels */
 
-    putchar(header->HWResolution[0] >> 8);	/* Cyan resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
+    putchar((int)(header->HWResolution[0] >> 8));/* Cyan resolution */
+    putchar((int)header->HWResolution[0]);
+    putchar((int)(header->HWResolution[1] >> 8));
+    putchar((int)header->HWResolution[1]);
     putchar(0);
     putchar(1 << ColorBits);			/* # of cyan levels */
 
-    putchar(header->HWResolution[0] >> 8);	/* Magenta resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
+    putchar((int)(header->HWResolution[0] >> 8));/* Magenta resolution */
+    putchar((int)header->HWResolution[0]);
+    putchar((int)(header->HWResolution[1] >> 8));
+    putchar((int)header->HWResolution[1]);
     putchar(0);
     putchar(1 << ColorBits);			/* # of magenta levels */
 
-    putchar(header->HWResolution[0] >> 8);	/* Yellow resolution */
-    putchar(header->HWResolution[0]);
-    putchar(header->HWResolution[1] >> 8);
-    putchar(header->HWResolution[1]);
+    putchar((int)(header->HWResolution[0] >> 8));/* Yellow resolution */
+    putchar((int)header->HWResolution[0]);
+    putchar((int)(header->HWResolution[1] >> 8));
+    putchar((int)header->HWResolution[1]);
     putchar(0);
     putchar(1 << ColorBits);			/* # of yellow levels */
 
@@ -321,7 +310,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   }
   else
   {
-    printf("\033*t%dR", header->HWResolution[0]);
+    printf("\033*t%uR", header->HWResolution[0]);
 						/* Set resolution */
 
     if (header->cupsColorSpace == CUPS_CSPACE_KCMY)
@@ -341,8 +330,8 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     * Set size and position of graphics...
     */
 
-    printf("\033*r%dS", header->cupsWidth);	/* Set width */
-    printf("\033*r%dT", header->cupsHeight);	/* Set height */
+    printf("\033*r%uS", header->cupsWidth);	/* Set width */
+    printf("\033*r%uT", header->cupsHeight);	/* Set height */
 
     printf("\033&a0H");				/* Set horizontal position */
 
@@ -356,7 +345,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   printf("\033*r1A");				/* Start graphics */
 
   if (header->cupsCompression)
-    printf("\033*b%dM",				/* Set compression */
+    printf("\033*b%uM",				/* Set compression */
            header->cupsCompression);
 
   Feed = 0;					/* No blank lines yet */
@@ -463,15 +452,15 @@ CancelJob(int sig)			/* I - Signal */
 
 void
 CompressData(unsigned char *line,	/* I - Data to compress */
-             int           length,	/* I - Number of bytes */
-	     int           plane,	/* I - Color plane */
-	     int           type)	/* I - Type of compression */
+             unsigned      length,	/* I - Number of bytes */
+	     unsigned      plane,	/* I - Color plane */
+	     unsigned      type)	/* I - Type of compression */
 {
   unsigned char	*line_ptr,		/* Current byte pointer */
         	*line_end,		/* End-of-line byte pointer */
         	*comp_ptr,		/* Pointer into compression buffer */
         	*start;			/* Start of compression sequence */
-  int           count;			/* Count of bytes for output */
+  unsigned	count;			/* Count of bytes for output */
 
 
   switch (type)
@@ -501,7 +490,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
         	   count < 256;
                count ++);
 
-	  comp_ptr[0] = count - 1;
+	  comp_ptr[0] = (unsigned char)(count - 1);
 	  comp_ptr[1] = line_ptr[0];
 	}
 
@@ -546,7 +535,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
               count ++;
 	    }
 
-	    *comp_ptr++ = 257 - count;
+	    *comp_ptr++ = (unsigned char)(257 - count);
 	    *comp_ptr++ = *line_ptr++;
 	  }
 	  else
@@ -567,7 +556,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
               count ++;
 	    }
 
-	    *comp_ptr++ = count - 1;
+	    *comp_ptr++ = (unsigned char)(count - 1);
 
 	    memcpy(comp_ptr, start, count);
 	    comp_ptr += count;
@@ -584,7 +573,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   */
 
   printf("\033*b%d%c", (int)(line_end - line_ptr), plane);
-  fwrite(line_ptr, line_end - line_ptr, 1, stdout);
+  fwrite(line_ptr, (size_t)(line_end - line_ptr), 1, stdout);
 }
 
 
@@ -595,7 +584,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 void
 OutputLine(cups_page_header2_t *header)	/* I - Page header */
 {
-  int		plane,			/* Current plane */
+  unsigned	plane,			/* Current plane */
 		bytes,			/* Bytes to write */
 		count;			/* Bytes to convert */
   unsigned char	bit,			/* Current plane data */
@@ -644,15 +633,15 @@ OutputLine(cups_page_header2_t *header)	/* I - Page header */
       {
         bit = plane_ptr[0];
 
-        bit0 = ((bit & 64) << 1) | ((bit & 16) << 2) | ((bit & 4) << 3) | ((bit & 1) << 4);
-        bit1 = (bit & 128) | ((bit & 32) << 1) | ((bit & 8) << 2) | ((bit & 2) << 3);
+        bit0 = (unsigned char)(((bit & 64) << 1) | ((bit & 16) << 2) | ((bit & 4) << 3) | ((bit & 1) << 4));
+        bit1 = (unsigned char)((bit & 128) | ((bit & 32) << 1) | ((bit & 8) << 2) | ((bit & 2) << 3));
 
         if (count > 1)
 	{
 	  bit = plane_ptr[1];
 
-          bit0 |= (bit & 1) | ((bit & 4) >> 1) | ((bit & 16) >> 2) | ((bit & 64) >> 3);
-          bit1 |= ((bit & 2) >> 1) | ((bit & 8) >> 2) | ((bit & 32) >> 3) | ((bit & 128) >> 4);
+          bit0 |= (unsigned char)((bit & 1) | ((bit & 4) >> 1) | ((bit & 16) >> 2) | ((bit & 64) >> 3));
+          bit1 |= (unsigned char)(((bit & 2) >> 1) | ((bit & 8) >> 2) | ((bit & 32) >> 3) | ((bit & 128) >> 4));
 	}
 
         bit_ptr[0]     = bit0;
@@ -683,7 +672,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
   cups_page_header2_t	header;		/* Page header from file */
-  int			y;		/* Current line */
+  unsigned		y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -814,9 +803,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((y & 127) == 0)
       {
         _cupsLangPrintFilter(stderr, "INFO",
-	                     _("Printing page %d, %d%% complete."),
+	                     _("Printing page %d, %u%% complete."),
 			     Page, 100 * y / header.cupsHeight);
-        fprintf(stderr, "ATTR: job-media-progress=%d\n",
+        fprintf(stderr, "ATTR: job-media-progress=%u\n",
 		100 * y / header.cupsHeight);
       }
 
@@ -882,5 +871,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertohp.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: rastertohp.c 11558 2014-02-06 18:33:34Z msweet $".
  */

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,116 +10,91 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cups-config - get cups api, compiler, directory, and link information.
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cups-config
-</b>--api-version
+<b>cups-config</b>
+<i>--api-version</i>
 <br>
-<b>cups-config
-</b>--build
+<b>cups-config</b>
+<i>--build</i>
 <br>
-<b>cups-config
-</b>--cflags
+<b>cups-config</b>
+<i>--cflags</i>
 <br>
-<b>cups-config
-</b>--datadir
+<b>cups-config</b>
+<i>--datadir</i>
 <br>
-<b>cups-config
-</b>--help
+<b>cups-config</b>
+<i>--help</i>
 <br>
-<b>cups-config
-</b>--ldflags
+<b>cups-config</b>
+<i>--ldflags</i>
 <br>
-<b>cups-config
-</b>[
-<i>--image
-</i>] [
-<i>--static
-</i>] --libs
+<b>cups-config</b>
+[
+<i>--image</i>
+] [
+<i>--static</i>
+]
+<i>--libs</i>
 <br>
-<b>cups-config
-</b>--serverbin
+<b>cups-config</b>
+<i>--serverbin</i>
 <br>
-<b>cups-config
-</b>--serverroot
+<b>cups-config</b>
+<i>--serverroot</i>
 <br>
-<b>cups-config
-</b>--version
+<b>cups-config</b>
+<i>--version</i>
 <br>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<b>cups-config</b> is the CUPS program configuration utility. It should be
-used by application developers to determine the necessary command-line
-options for the compiler and linker, as well as determining installation
-directories for filters, configuration files, and drivers.
+The <b>cups-config</b> command allows application developers to determine the necessary command-line options for the compiler and linker, as well as the installation directories for filters, configuration files, and drivers.
+All values are reported to the standard output.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-<dl>
-<dt>--api-version
-</dt>
-<dd></dd>
-<dd>Displays the current API version (major.minor).
-</dd>
-<dt>--build
-</dt>
-<dd></dd>
-<dd>Displays a system-specific build number.
-</dd>
-<dt>--cflags
-</dt>
-<dd></dd>
-<dd>Displays the necessary compiler options.
-</dd>
-<dt>--datadir
-</dt>
-<dd></dd>
-<dd>Displays the default CUPS data directory.
-</dd>
-<dt>--help
-</dt>
-<dd></dd>
-<dd>Displays the program usage message.
-</dd>
-<dt>--image
-</dt>
-<dd></dd>
-<dd>When used with <i>--libs</i>, adds the CUPS imaging library to the
-list of displayed libraries.
-</dd>
-<dt>--ldflags
-</dt>
-<dd></dd>
-<dd>Displays the necessary linker options.
-</dd>
-<dt>--libs
-</dt>
-<dd></dd>
-<dd>Displays the necessary librarys to link to.
-</dd>
-<dt>--serverbin
-</dt>
-<dd></dd>
-<dd>Displays the default CUPS binary directory,
-where filters and backends are stored.
-</dd>
-<dt>--serverroot
-</dt>
-<dd></dd>
-<dd>Displays the default CUPS configuration file directory.
-</dd>
-<dt>--static
-</dt>
-<dd></dd>
-<dd>When used with <i>--libs</i>, shows the static libraries instead
-of the default (shared) libraries.
-</dd>
-<dt>--version
-</dt>
-<dd></dd>
-<dd>Displays the full version number of the CUPS installation
-(major.minor.patch).
-</dd>
+The <b>cups-config</b> command accepts the following command-line options:
+<dl class="man">
+<dt><b>--api-version</b>
+<dd style="margin-left: 5.0em">Reports the current API version (major.minor).
+<dt><b>--build</b>
+<dd style="margin-left: 5.0em">Reports a system-specific build number.
+<dt><b>--cflags</b>
+<dd style="margin-left: 5.0em">Reports the necessary compiler options.
+<dt><b>--datadir</b>
+<dd style="margin-left: 5.0em">Reports the default CUPS data directory.
+<dt><b>--help</b>
+<dd style="margin-left: 5.0em">Reports the program usage message.
+<dt><b>--image</b>
+<dd style="margin-left: 5.0em">When used with <i>--libs</i>, adds the CUPS imaging library to the
+list of libraries.
+<dt><b>--ldflags</b>
+<dd style="margin-left: 5.0em">Reports the necessary linker options.
+<dt><b>--libs</b>
+<dd style="margin-left: 5.0em">Reports the necessary libraries to link to.
+<dt><b>--serverbin</b>
+<dd style="margin-left: 5.0em">Reports the default CUPS binary directory, where filters and backends are stored.
+<dt><b>--serverroot</b>
+<dd style="margin-left: 5.0em">Reports the default CUPS configuration file directory.
+<dt><b>--static</b>
+<dd style="margin-left: 5.0em">When used with <i>--libs</i>, reports the static libraries instead of the default (shared) libraries.
+<dt><b>--version</b>
+<dd style="margin-left: 5.0em">Reports the full version number of the CUPS installation (major.minor.patch).
 </dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Show the currently installed version of CUPS:
+<pre class="man">
+
+    cups-config --version
+
+</pre>
+Compile a simple one-file CUPS filter:
+<pre class="man">
+
+    cc `cups-config --cflags --ldflags` -o filter filter.c \
+        `cups-config --libs`
+</pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

@@ -1,29 +1,16 @@
 //
-// "$Id: ppdc-catalog.cxx 3794 2012-04-23 22:44:16Z msweet $"
+// "$Id: ppdc-catalog.cxx 11800 2014-04-08 19:53:57Z msweet $"
 //
-//   Shared message catalog class for the CUPS PPD Compiler.
+// Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2012 by Apple Inc.
-//   Copyright 2002-2006 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 2002-2006 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcCatalog::ppdcCatalog()   - Create a shared message catalog.
-//   ppdcCatalog::~ppdcCatalog()  - Destroy a shared message catalog.
-//   ppdcCatalog::add_message()   - Add a new message.
-//   ppdcCatalog::find_message()  - Find a message in a catalog...
-//   ppdcCatalog::load_messages() - Load messages from a .po file.
-//   ppdcCatalog::save_messages() - Save the messages to a .po file.
-//   get_utf8()                   - Get a UTF-8 character.
-//   get_utf16()                  - Get a UTF-16 character...
-//   put_utf8()                   - Add a UTF-8 character to a string.
-//   put_utf16()                  - Write a UTF-16 character to a file.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -50,6 +37,9 @@ typedef enum
 // Local functions...
 //
 
+#if defined(__APPLE__) && defined(CUPS_BUNDLEDIR)
+static void	apple_add_message(CFStringRef key, CFStringRef val, ppdcCatalog *c);
+#endif /* __APPLE__ && CUPS_BUNDLEDIR */
 static int	get_utf8(char *&ptr);
 static int	get_utf16(cups_file_t *fp, ppdc_cs_t &cs);
 static int	put_utf8(int ch, char *&ptr, char *end);
@@ -64,10 +54,6 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
                          const char *f)	// I - Message catalog file
   : ppdcShared()
 {
-  _cups_globals_t	*cg = _cupsGlobals();
-					// Global information
-
-
   PPDC_NEW;
 
   locale   = new ppdcString(l);
@@ -79,6 +65,67 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
     // Try loading the base messages for this locale...
     char	pofile[1024];		// Message catalog file
 
+
+#if defined(__APPLE__) && defined(CUPS_BUNDLEDIR)
+    char		applelang[256];	// Apple language ID
+    CFURLRef		url;		// URL to cups.strings file
+    CFReadStreamRef	stream = NULL;	// File stream
+    CFPropertyListRef	plist = NULL;	// Localization file
+
+    snprintf(pofile, sizeof(pofile), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", _cupsAppleLanguage(l, applelang, sizeof(applelang)));
+    if (access(pofile, 0))
+    {
+      // Try alternate lproj directory names...
+      const char *tl = l;		// Temporary locale string
+
+      if (!strncmp(l, "en", 2))
+	tl = "English";
+      else if (!strncmp(l, "nb", 2) || !strncmp(l, "nl", 2))
+	tl = "Dutch";
+      else if (!strncmp(l, "fr", 2))
+	tl = "French";
+      else if (!strncmp(l, "de", 2))
+	tl = "German";
+      else if (!strncmp(l, "it", 2))
+	tl = "Italian";
+      else if (!strncmp(l, "ja", 2))
+	tl = "Japanese";
+      else if (!strncmp(l, "es", 2))
+	tl = "Spanish";
+
+      snprintf(pofile, sizeof(pofile), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", tl);
+    }
+
+    url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (UInt8 *)pofile, (CFIndex)strlen(pofile), false);
+    if (url)
+    {
+      stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
+
+      if (stream)
+      {
+       /*
+	* Read the property list containing the localization data.
+	*/
+
+	CFReadStreamOpen(stream);
+
+	plist = CFPropertyListCreateWithStream(kCFAllocatorDefault, stream, 0, kCFPropertyListImmutable, NULL, NULL);
+
+	if (plist && CFGetTypeID(plist) == CFDictionaryGetTypeID())
+	  CFDictionaryApplyFunction((CFDictionaryRef)plist, (CFDictionaryApplierFunction)apple_add_message, this);
+
+	if (plist)
+	  CFRelease(plist);
+
+	CFRelease(stream);
+      }
+
+      CFRelease(url);
+    }
+
+#else
+    _cups_globals_t	*cg = _cupsGlobals();
+					// Global information
 
     snprintf(pofile, sizeof(pofile), "%s/%s/cups_%s.po", cg->localedir, l, l);
 
@@ -94,9 +141,10 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
       load_messages(pofile);
     }
+#endif /* __APPLE__ && CUPS_BUNDLEDIR */
   }
 
-  if (f)
+  if (f && *f)
     load_messages(f);
 }
 
@@ -206,8 +254,8 @@ ppdcCatalog::load_messages(
   else if (!strcmp(ptr, ".strings"))
   {
    /*
-    * Read messages in OS X ".strings" format, which are UTF-16 text files of
-    * the format:
+    * Read messages in OS X ".strings" format, which are either UTF-8/UTF-16
+    * text files of the format:
     *
     *     "id" = "str";
     *
@@ -610,6 +658,27 @@ ppdcCatalog::save_messages(
 }
 
 
+#if defined(__APPLE__) && defined(CUPS_BUNDLEDIR)
+//
+// 'apple_add_message()' - Add a message from a localization dictionary.
+//
+
+static void
+apple_add_message(CFStringRef key,	// I - Localization key
+                  CFStringRef val,	// I - Localized value
+                  ppdcCatalog *c)	// I - Message catalog
+{
+  char	id[1024],			// Message id
+	str[1024];			// Localized message
+
+
+  if (CFStringGetCString(key, id, sizeof(id), kCFStringEncodingUTF8) &&
+      CFStringGetCString(val, str, sizeof(str), kCFStringEncodingUTF8))
+    c->add_message(id, str);
+}
+#endif /* __APPLE__ && CUPS_BUNDLEDIR */
+
+
 //
 // 'get_utf8()' - Get a UTF-8 character.
 //
@@ -817,7 +886,7 @@ put_utf8(int  ch,			// I  - Unicode character
     if (ptr >= end)
       return (-1);
 
-    *ptr++ = ch;
+    *ptr++ = (char)ch;
   }
   else if (ch < 0x800)
   {
@@ -825,8 +894,8 @@ put_utf8(int  ch,			// I  - Unicode character
     if ((ptr + 1) >= end)
       return (-1);
 
-    *ptr++ = 0xc0 | (ch >> 6);
-    *ptr++ = 0x80 | (ch & 0x3f);
+    *ptr++ = (char)(0xc0 | (ch >> 6));
+    *ptr++ = (char)(0x80 | (ch & 0x3f));
   }
   else if (ch < 0x10000)
   {
@@ -834,9 +903,9 @@ put_utf8(int  ch,			// I  - Unicode character
     if ((ptr + 2) >= end)
       return (-1);
 
-    *ptr++ = 0xe0 | (ch >> 12);
-    *ptr++ = 0x80 | ((ch >> 6) & 0x3f);
-    *ptr++ = 0x80 | (ch & 0x3f);
+    *ptr++ = (char)(0xe0 | (ch >> 12));
+    *ptr++ = (char)(0x80 | ((ch >> 6) & 0x3f));
+    *ptr++ = (char)(0x80 | (ch & 0x3f));
   }
   else
   {
@@ -844,10 +913,10 @@ put_utf8(int  ch,			// I  - Unicode character
     if ((ptr + 3) >= end)
       return (-1);
 
-    *ptr++ = 0xf0 | (ch >> 18);
-    *ptr++ = 0x80 | ((ch >> 12) & 0x3f);
-    *ptr++ = 0x80 | ((ch >> 6) & 0x3f);
-    *ptr++ = 0x80 | (ch & 0x3f);
+    *ptr++ = (char)(0xf0 | (ch >> 18));
+    *ptr++ = (char)(0x80 | ((ch >> 12) & 0x3f));
+    *ptr++ = (char)(0x80 | ((ch >> 6) & 0x3f));
+    *ptr++ = (char)(0x80 | (ch & 0x3f));
   }
 
   return (0);
@@ -868,8 +937,8 @@ put_utf16(cups_file_t *fp,		// I - File to write to
   if (ch < 0x10000)
   {
     // One-word UTF-16 big-endian...
-    buffer[0] = ch >> 8;
-    buffer[1] = ch;
+    buffer[0] = (unsigned char)(ch >> 8);
+    buffer[1] = (unsigned char)ch;
 
     if (cupsFileWrite(fp, (char *)buffer, 2) == 2)
       return (0);
@@ -879,10 +948,10 @@ put_utf16(cups_file_t *fp,		// I - File to write to
     // Two-word UTF-16 big-endian...
     ch -= 0x10000;
 
-    buffer[0] = 0xd8 | (ch >> 18);
-    buffer[1] = ch >> 10;
-    buffer[2] = 0xdc | ((ch >> 8) & 0x03);
-    buffer[3] = ch;
+    buffer[0] = (unsigned char)(0xd8 | (ch >> 18));
+    buffer[1] = (unsigned char)(ch >> 10);
+    buffer[2] = (unsigned char)(0xdc | ((ch >> 8) & 0x03));
+    buffer[3] = (unsigned char)ch;
 
     if (cupsFileWrite(fp, (char *)buffer, 4) == 4)
       return (0);
@@ -893,5 +962,5 @@ put_utf16(cups_file_t *fp,		// I - File to write to
 
 
 //
-// End of "$Id: ppdc-catalog.cxx 3794 2012-04-23 22:44:16Z msweet $".
+// End of "$Id: ppdc-catalog.cxx 11800 2014-04-08 19:53:57Z msweet $".
 //

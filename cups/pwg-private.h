@@ -1,5 +1,5 @@
 /*
- * "$Id: pwg-private.h 11240 2013-08-14 20:33:55Z msweet $"
+ * "$Id: pwg-private.h 11826 2014-04-23 00:38:21Z msweet $"
  *
  *   Private PWG media API definitions for CUPS.
  *
@@ -66,6 +66,7 @@ extern pwg_media_t	*_pwgMediaForPWG(const char *pwg)
 extern pwg_media_t	*_pwgMediaForSize(int width, int length)
 			    _CUPS_INTERNAL_MSG("Use pwgMediaForSize instead.");
 extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
+extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon);
 
 #  ifdef __cplusplus
 }
@@ -74,5 +75,5 @@ extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
 #endif /* !_CUPS_PWG_PRIVATE_H_ */
 
 /*
- * End of "$Id: pwg-private.h 11240 2013-08-14 20:33:55Z msweet $".
+ * End of "$Id: pwg-private.h 11826 2014-04-23 00:38:21Z msweet $".
  */

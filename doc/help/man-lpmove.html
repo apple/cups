@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,56 +10,66 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 lpmove - move a job or all jobs to a new destination
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>lpmove
-</b>[ -E ] [ -h
-<i>server[:port]
-</i>] [ -U
-<i>username
-</i>]
-<i>job destination
-</i><br>
-<b>lpmove
-</b>[ -E ] [ -h
-<i>server[:port]
-</i>] [ -U
-<i>username
-</i>]
-<i>source destination
-</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<b>lpmove</b> moves the specified <i>job</i> or all jobs from
-<i>source</i> to <i>destination</i>. <i>job</i> can be the job ID
-number or the old destination and job ID:
+<b>lpmove</b>
+[
+<b>-E</b>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-U</b>
+<i>username</i>
+]
+<i>job</i>
+<i>destination</i>
 <br>
-<pre>
-
-     lpmove 123 newprinter
-     lpmove oldprinter-123 newprinter
-</pre>
+<b>lpmove</b>
+[
+<b>-E</b>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-U</b>
+<i>username</i>
+]
+<i>source</i>
+<i>destination</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>lpmove</b> moves the specified <i>job</i> or all jobs from <i>source</i> to <i>destination</i>. <i>job</i> can be the job ID number or the old destination and job ID.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-The <i>lpmove</i> command supports the following options:
-<dl>
-<dt>-E
-</dt>
-<dd></dd>
-<dd>Forces encryption when connecting to the server.
-</dd>
-<dt>-U username
-</dt>
-<dd></dd>
-<dd>Specifies an alternate username.
-</dd>
-<dt>-h server[:port]
-</dt>
-<dd></dd>
-<dd>Specifies an alternate server.
-</dd>
+The <b>lpmove</b> command supports the following options:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies an alternate username.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Specifies an alternate server.
 </dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Move job 123 from "oldprinter" to "newprinter":
+<pre class="man">
+
+    lpmove 123 newprinter
+
+            <i>or</i>
+
+    lpmove oldprinter-123 newprinter
+
+</pre>
+Move all jobs from "oldprinter" to "newprinter":
+<pre class="man">
+
+    lpmove oldprinter newprinter
+</pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>,
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

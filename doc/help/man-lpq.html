@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,64 +10,52 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 lpq - show printer queue status
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>lpq
-</b>[ -E ] [ -U
-<i>username
-</i>] [ -h
-<i>server[:port]
-</i>] [ -P
-<i>destination[/instance]
-</i>] [ -a ] [ -l ] [
-<i>+interval
-</i>]
+<b>lpq</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-P </b><i>destination</i>[<b>/</b><i>instance</i>]
+] [
+<b>-a</b>
+] [
+<b>-l</b>
+] [
+<b>+</b><i>interval</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>lpq</i> shows the current print queue status on the named
-printer. Jobs queued on the default destination will be shown if
-no printer or class is specified on the command-line.
-<p>The <i>+interval</i> option allows you to continuously report the
-jobs in the queue until the queue is empty; the list of jobs is
-shown once every <i>interval</i> seconds.
+<b>lpq</b> shows the current print queue status on the named printer.
+Jobs queued on the default destination will be shown if no printer or class is specified on the command-line.
+<p>The <i>+interval</i> option allows you to continuously report the jobs in the queue until the queue is empty; the list of jobs is shown once every <i>interval</i> seconds.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-<i>lpq</i> supports the following options:
-<dl>
-<dt>-E
-</dt>
-<dd></dd>
-<dd>Forces encryption when connecting to the server.
-</dd>
-<dt>-P destination[/instance]
-</dt>
-<dd></dd>
-<dd>Specifies an alternate printer or class name.
-</dd>
-<dt>-U username
-</dt>
-<dd></dd>
-<dd>Specifies an alternate username.
-</dd>
-<dt>-a
-</dt>
-<dd></dd>
-<dd>Reports jobs on all printers.
-</dd>
-<dt>-h server[:port]
-</dt>
-<dd></dd>
-<dd>Specifies an alternate server.
-</dd>
-<dt>-l
-</dt>
-<dd></dd>
-<dd>Requests a more verbose (long) reporting format.
-</dd>
+<b>lpq</b> supports the following options:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-P </b><i>destination</i>[<b>/</b><i>instance</i>]
+<dd style="margin-left: 5.0em">Specifies an alternate printer or class name.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies an alternate username.
+<dt><b>-a</b>
+<dd style="margin-left: 5.0em">Reports jobs on all printers.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Specifies an alternate server.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em">Requests a more verbose (long) reporting format.
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a>, <a href='man-lprm.html?TOPIC=Man+Pages'>lprm(1)</a>,
-<a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

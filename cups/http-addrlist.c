@@ -1,9 +1,9 @@
 /*
- * "$Id: http-addrlist.c 11642 2014-02-27 15:57:59Z msweet $"
+ * "$Id: http-addrlist.c 11627 2014-02-20 16:15:09Z msweet $"
  *
  * HTTP address list routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -115,7 +115,7 @@ httpAddrConnect2(
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		  httpAddrPort(&(addrlist->addr))));
 
-    if ((*sock = (int)socket(_httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
+    if ((*sock = (int)socket(httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
                              0)) < 0)
     {
      /*
@@ -180,8 +180,7 @@ httpAddrConnect2(
     * Then connect...
     */
 
-    if (!connect(*sock, &(addrlist->addr.addr),
-                 httpAddrLength(&(addrlist->addr))))
+    if (!connect(*sock, &(addrlist->addr.addr), (socklen_t)httpAddrLength(&(addrlist->addr))))
     {
       DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...",
 		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
@@ -218,11 +217,7 @@ httpAddrConnect2(
 
             DEBUG_puts("1httpAddrConnect2: Canceled connect()");
 
-#    ifdef WIN32
-	    closesocket(*sock);
-#    else
-	    close(*sock);
-#    endif /* WIN32 */
+            httpAddrClose(NULL, *sock);
 
 	    *sock = -1;
 
@@ -290,11 +285,7 @@ httpAddrConnect2(
     * Close this socket and move to the next address...
     */
 
-#ifdef WIN32
-    closesocket(*sock);
-#else
-    close(*sock);
-#endif /* WIN32 */
+    httpAddrClose(NULL, *sock);
 
     *sock    = -1;
     addrlist = addrlist->next;
@@ -877,5 +868,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 11642 2014-02-27 15:57:59Z msweet $".
+ * End of "$Id: http-addrlist.c 11627 2014-02-20 16:15:09Z msweet $".
  */

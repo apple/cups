@@ -1,16 +1,16 @@
 #
-# "$Id: Makefile 11024 2013-06-06 23:11:13Z msweet $"
+# "$Id: Makefile 11919 2014-06-11 15:38:28Z msweet $"
 #
-#   Man page makefile for CUPS.
+# Man page makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 1993-2006 by Easy Software Products.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1993-2006 by Easy Software Products.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -21,6 +21,7 @@ include ../Makedefs
 #
 
 MAN1	=	cancel.$(MAN1EXT) \
+		cups.$(MAN1EXT) \
 		cups-config.$(MAN1EXT) \
 		cupstestdsc.$(MAN1EXT) \
 		cupstestppd.$(MAN1EXT) \
@@ -28,7 +29,6 @@ MAN1	=	cancel.$(MAN1EXT) \
 		ipptool.$(MAN1EXT) \
 		lp.$(MAN1EXT) \
 		lpoptions.$(MAN1EXT) \
-		lppasswd.$(MAN1EXT) \
 		lpq.$(MAN1EXT) \
 		lprm.$(MAN1EXT) \
 		lpr.$(MAN1EXT) \
@@ -57,11 +57,11 @@ MAN8	=	cupsaccept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \
 		cupsfilter.$(MAN8EXT) \
-		cups-deviced.$(MAN8EXT) \
-		cups-driverd.$(MAN8EXT) \
 		cups-lpd.$(MAN8EXT) \
 		cups-snmp.$(MAN8EXT) \
 		cupsd.$(MAN8EXT) \
+		cupsd-helper.$(MAN8EXT) \
+		cupsd-logs.$(MAN8EXT) \
 		cupsenable.$(MAN8EXT) \
 		lpadmin.$(MAN8EXT) \
 		lpinfo.$(MAN8EXT) \
@@ -144,6 +144,10 @@ install-data: all
 	done
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
+	for file in cups-deviced cups-driverd cups-exec; do \
+		$(RM) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+		$(LN) cupsd-helper.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+	done
 
 
 #
@@ -217,10 +221,12 @@ html:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) mantohtml
 		./mantohtml `basename $$file .$(MAN8EXT)`.man >../doc/help/man-`basename $$file .$(MAN8EXT)`.html; \
 	done
 
-mantohtml:	mantohtml.o
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o
+mantohtml:	mantohtml.o ../cups/$(LIBCUPSSTATIC)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
-# End of "$Id: Makefile 11024 2013-06-06 23:11:13Z msweet $".
+# End of "$Id: Makefile 11919 2014-06-11 15:38:28Z msweet $".
 #

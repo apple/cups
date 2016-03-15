@@ -1,25 +1,18 @@
 /*
- * "$Id: testbackend.c 4297 2013-05-10 16:04:59Z msweet $"
+ * "$Id: testbackend.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Backend test program for CUPS.
+ * Backend test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()            - Run the named backend.
- *   sigterm_handler() - Flag when we get SIGTERM.
- *   usage()           - Show usage information.
- *   walk_cb()         - Show results of cupsSideChannelSNMPWalk...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -97,7 +90,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (getcwd(libpath, sizeof(libpath)) &&
       (ptr = strrchr(libpath, '/')) != NULL && !strcmp(ptr, "/backend"))
   {
-    strlcpy(ptr, "/cups", sizeof(libpath) - (ptr - libpath));
+    strlcpy(ptr, "/cups", sizeof(libpath) - (size_t)(ptr - libpath));
     if (!access(libpath, 0))
     {
 #ifdef __APPLE__
@@ -311,7 +304,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  */
 
 	  if ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0)) > 0)
-	    write(2, buffer, bytes);
+	    write(2, buffer, (size_t)bytes);
 
 	 /*
 	  * Throttle output to ~100hz...
@@ -339,7 +332,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
         while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 5.0)) > 0)
-	  write(2, buffer, bytes);
+	  write(2, buffer, (size_t)bytes);
 
 	exit(0);
       }
@@ -414,7 +407,7 @@ main(int  argc,				/* I - Number of command-line args */
         while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer),
 	                                    timeout)) > 0)
 	{
-	  write(2, buffer, bytes);
+	  write(2, buffer, (size_t)bytes);
 	  timeout = 5.0;
 	}
 	write(2, "\nDEBUG: END\n", 12);
@@ -668,14 +661,17 @@ walk_cb(const char *oid,		/* I - OID */
 	void       *context)		/* I - Context (unused) */
 {
   char temp[80];
-  if (datalen > (sizeof(temp) - 1))
+
+  (void)context;
+
+  if ((size_t)datalen > (sizeof(temp) - 1))
   {
     memcpy(temp, data, sizeof(temp) - 1);
     temp[sizeof(temp) - 1] = '\0';
   }
   else
   {
-    memcpy(temp, data, datalen);
+    memcpy(temp, data, (size_t)datalen);
     temp[datalen] = '\0';
   }
 
@@ -684,5 +680,5 @@ walk_cb(const char *oid,		/* I - OID */
 
 
 /*
- * End of "$Id: testbackend.c 4297 2013-05-10 16:04:59Z msweet $".
+ * End of "$Id: testbackend.c 11594 2014-02-14 20:09:01Z msweet $".
  */

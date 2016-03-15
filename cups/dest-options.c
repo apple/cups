@@ -1,55 +1,17 @@
 /*
- * "$Id: dest-options.c 11883 2014-05-16 21:04:07Z msweet $"
+ * "$Id: dest-options.c 11882 2014-05-16 21:02:15Z msweet $"
  *
- *   Destination option/media support for CUPS.
+ * Destination option/media support for CUPS.
  *
- *   Copyright 2012-2013 by Apple Inc.
+ * Copyright 2012-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsCheckDestSupported()  - Check that the option and value are supported
- *				 by the destination.
- *   cupsCopyDestConflicts()   - Get conflicts and resolutions for a new
- *				 option/value pair.
- *   cupsCopyDestInfo()        - Get the supported values/capabilities for the
- *				 destination.
- *   cupsFindDestDefault()     - Find the default value(s) for the given
- *				 option.
- *   cupsFindDestReady()       - Find the default value(s) for the given
- *				 option.
- *   cupsFindDestSupported()   - Find the default value(s) for the given
- *				 option.
- *   cupsFreeDestInfo()        - Free destination information obtained using
- *				 @link cupsCopyDestInfo@.
- *   cupsGetDestMediaByIndex() - Get a media name, dimension, and margins for a
- *				 specific size.
- *   cupsGetDestMediaByName()  - Get media names, dimensions, and margins.
- *   cupsGetDestMediaBySize()  - Get media names, dimensions, and margins.
- *   cupsGetDestMediaCount()   - Get the number of sizes supported by a
- *				 destination.
- *   cupsGetDestMediaDefault() - Get the default size for a destination.
- *   cups_add_dconstres()      - Add a constraint or resolver to an array.
- *   cups_compare_dconstres()  - Compare to resolver entries.
- *   cups_compare_media_db()   - Compare two media entries.
- *   cups_copy_media_db()      - Copy a media entry.
- *   cups_create_cached()      - Create the media selection cache.
- *   cups_create_constraints() - Create the constraints and resolvers arrays.
- *   cups_create_defaults()    - Create the -default option array.
- *   cups_create_media_db()    - Create the media database.
- *   cups_free_media_cb()      - Free a media entry.
- *   cups_get_media_db()       - Lookup the media entry for a given size.
- *   cups_is_close_media_db()  - Compare two media entries to see if they are
- *				 close to the same size.
- *   cups_test_constraints()   - Test constraints.
- *   cups_update_ready()       - Update xxx-ready attributes for the printer.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -328,7 +290,7 @@ cupsCopyDestConflicts(
 		*myres = NULL,		/* My resolved options */
 		*myoption,		/* My current option */
 		*option;		/* Current option */
-  cups_array_t	*active,		/* Active conflicts */
+  cups_array_t	*active = NULL,		/* Active conflicts */
 		*pass = NULL,		/* Resolvers for this pass */
 		*resolvers = NULL,	/* Resolvers we have used */
 		*test;			/* Test array for conflicts */
@@ -669,7 +631,7 @@ cupsCopyDestInfo(
         version = 11;
       else if (status == IPP_STATUS_ERROR_BUSY)
       {
-        sleep(delay);
+        sleep((unsigned)delay);
 
         delay = _cupsNextDelay(delay, &prev_delay);
       }
@@ -1184,7 +1146,7 @@ cupsGetDestMediaDefault(
   * Fall back to the first matching media size...
   */
 
-  return (cupsGetDestMediaByIndex(http, dest, dinfo, flags, 0, size));
+  return (cupsGetDestMediaByIndex(http, dest, dinfo, 0, flags, size));
 }
 
 
@@ -2286,9 +2248,7 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
                dinfo->uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
-  ippAddStrings(request, IPP_TAG_OPERATION,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "requested-attributes",
-                (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_CONST_TAG(IPP_TAG_KEYWORD), "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
 
   dinfo->ready_attrs = cupsDoRequest(http, request, dinfo->resource);
 
@@ -2307,5 +2267,5 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
 
 
 /*
- * End of "$Id: dest-options.c 11883 2014-05-16 21:04:07Z msweet $".
+ * End of "$Id: dest-options.c 11882 2014-05-16 21:02:15Z msweet $".
  */

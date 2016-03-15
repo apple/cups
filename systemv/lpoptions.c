@@ -1,23 +1,16 @@
 /*
- * "$Id: lpoptions.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: lpoptions.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Printer option program for CUPS.
+ * Printer option program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()         - Main entry.
- *   list_group()   - List printer-specific options from the PPD group.
- *   list_options() - List printer-specific options from the PPD file.
- *   usage()        - Show program usage and exit.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -274,8 +267,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        num_options --;
 
 		if (j < num_options)
-		  memcpy(options + j, options + j + 1,
-		         sizeof(cups_option_t) * (num_options - j));
+		  memmove(options + j, options + j + 1, sizeof(cups_option_t) * (size_t)(num_options - j));
 		break;
               }
 
@@ -322,7 +314,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 		j = dest - dests;
 		if (j < num_dests)
-		  memcpy(dest, dest + 1, (num_dests - j) * sizeof(cups_dest_t));
+		  memmove(dest, dest + 1, (size_t)(num_dests - j) * sizeof(cups_dest_t));
 	      }
 	    }
 
@@ -385,14 +377,12 @@ main(int  argc,				/* I - Number of command-line arguments */
         *ptr++ = ' ';
 
       if (!options[i].value[0])
-        strlcpy(ptr, options[i].name, sizeof(buffer) - (ptr - buffer));
+        strlcpy(ptr, options[i].name, sizeof(buffer) - (size_t)(ptr - buffer));
       else if (strchr(options[i].value, ' ') != NULL ||
                strchr(options[i].value, '\t') != NULL)
-	snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s=\'%s\'",
-	         options[i].name, options[i].value);
+	snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), "%s=\'%s\'", options[i].name, options[i].value);
       else
-	snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s=%s",
-	         options[i].name, options[i].value);
+	snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), "%s=%s", options[i].name, options[i].value);
 
       ptr += strlen(ptr);
     }
@@ -450,19 +440,16 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
         if ((coption = ppdFindCustomOption(ppd, option->keyword)) == NULL ||
 	    cupsArrayCount(coption->params) == 0)
-	  snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %sCustom",
-	           choice->marked ? "*" : "");
+	  snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), " %sCustom", choice->marked ? "*" : "");
         else if (!_cups_strcasecmp(option->keyword, "PageSize") ||
 	         !_cups_strcasecmp(option->keyword, "PageRegion"))
-	  snprintf(ptr, sizeof(buffer) - (ptr - buffer),
-	           " %sCustom.WIDTHxHEIGHT", choice->marked ? "*" : "");
+	  snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), " %sCustom.WIDTHxHEIGHT", choice->marked ? "*" : "");
         else
 	{
 	  cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 
 	  if (cupsArrayCount(coption->params) == 1)
-	    snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %sCustom.%s",
-	             choice->marked ? "*" : "", types[cparam->type]);
+	    snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), " %sCustom.%s", choice->marked ? "*" : "", types[cparam->type]);
 	  else
 	  {
 	    const char	*prefix;	/* Prefix string */
@@ -475,22 +462,21 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
 	    while (cparam)
 	    {
-	      snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s%s=%s", prefix,
-	               cparam->name, types[cparam->type]);
+	      snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), "%s%s=%s", prefix, cparam->name, types[cparam->type]);
 	      cparam = (ppd_cparam_t *)cupsArrayNext(coption->params);
 	      prefix = " ";
 	      ptr += strlen(ptr);
 	    }
 
             if (ptr < (buffer + sizeof(buffer) - 1))
-	      strlcpy(ptr, "}", sizeof(buffer) - (ptr - buffer));
+	      strlcpy(ptr, "}", sizeof(buffer) - (size_t)(ptr - buffer));
 	  }
 	}
       }
       else if (choice->marked)
-        snprintf(ptr, sizeof(buffer) - (ptr - buffer), " *%s", choice->choice);
+        snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), " *%s", choice->choice);
       else
-        snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %s", choice->choice);
+        snprintf(ptr, sizeof(buffer) - (size_t)(ptr - buffer), " %s", choice->choice);
 
       ptr += strlen(ptr);
     }
@@ -561,5 +547,5 @@ usage(void)
 
 
 /*
- * End of "$Id: lpoptions.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: lpoptions.c 11558 2014-02-06 18:33:34Z msweet $".
  */

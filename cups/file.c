@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 11642 2014-02-27 15:57:59Z msweet $"
+ * "$Id: file.c 11627 2014-02-20 16:15:09Z msweet $"
  *
  * File functions for CUPS.
  *
@@ -8,7 +8,7 @@
  * our own file functions allows us to provide transparent support of
  * gzip'd print files, PPD files, etc.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -288,7 +288,6 @@ _cupsFileCheckFilter(
 
   switch (result)
   {
-    default :
     case _CUPS_FILE_CHECK_OK :
         prefix = "DEBUG2";
 	break;
@@ -372,7 +371,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
         if (fp->stream.next_out > fp->cbuf)
 	{
 	  if (cups_write(fp, (char *)fp->cbuf,
-	                 fp->stream.next_out - fp->cbuf) < 0)
+	                 (size_t)(fp->stream.next_out - fp->cbuf)) < 0)
 	    status = -1;
 
 	  fp->stream.next_out  = fp->cbuf;
@@ -390,14 +389,14 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
       * Write the CRC and length...
       */
 
-      trailer[0] = fp->crc;
-      trailer[1] = fp->crc >> 8;
-      trailer[2] = fp->crc >> 16;
-      trailer[3] = fp->crc >> 24;
-      trailer[4] = fp->pos;
-      trailer[5] = fp->pos >> 8;
-      trailer[6] = fp->pos >> 16;
-      trailer[7] = fp->pos >> 24;
+      trailer[0] = (unsigned char)fp->crc;
+      trailer[1] = (unsigned char)(fp->crc >> 8);
+      trailer[2] = (unsigned char)(fp->crc >> 16);
+      trailer[3] = (unsigned char)(fp->crc >> 24);
+      trailer[4] = (unsigned char)fp->pos;
+      trailer[5] = (unsigned char)(fp->pos >> 8);
+      trailer[6] = (unsigned char)(fp->pos >> 16);
+      trailer[7] = (unsigned char)(fp->pos >> 24);
 
       if (cups_write(fp, (char *)trailer, 8) < 0)
         status = -1;
@@ -430,7 +429,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 
   if (mode == 's')
   {
-    if (closesocket(fd) < 0)
+    if (httpAddrClose(NULL, fd) < 0)
       status = -1;
   }
   else if (!is_stdio)
@@ -511,7 +510,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
 
     if (!access(filename, 0))
     {
-      strlcpy(buffer, filename, bufsize);
+      strlcpy(buffer, filename, (size_t)bufsize);
       return (buffer);
     }
     else
@@ -536,7 +535,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
       if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
         *bufptr++ = '/';
 
-      strlcpy(bufptr, filename, bufend - bufptr);
+      strlcpy(bufptr, filename, (size_t)(bufend - bufptr));
 
 #ifdef WIN32
       if (!access(buffer, 0))
@@ -563,7 +562,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
   if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
     *bufptr++ = '/';
 
-  strlcpy(bufptr, filename, bufend - bufptr);
+  strlcpy(bufptr, filename, (size_t)(bufend - bufptr));
 
   if (!access(buffer, 0))
   {
@@ -611,10 +610,10 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
   {
 #ifdef HAVE_LIBZ
     if (fp->compressed)
-      bytes = cups_compress(fp, fp->buf, bytes);
+      bytes = cups_compress(fp, fp->buf, (size_t)bytes);
     else
 #endif /* HAVE_LIBZ */
-      bytes = cups_write(fp, fp->buf, bytes);
+      bytes = cups_write(fp, fp->buf, (size_t)bytes);
 
     if (bytes < 0)
       return (-1);
@@ -885,7 +884,7 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
 
   DEBUG_printf(("4cupsFileGetLine: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-  return (ptr - buf);
+  return ((size_t)(ptr - buf));
 }
 
 
@@ -960,7 +959,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
       break;
     }
     else
-      *ptr++ = ch;
+      *ptr++ = (char)ch;
   }
 
   *ptr = '\0';
@@ -1132,7 +1131,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   if ((fp = cupsFileOpenFd(fd, mode)) == NULL)
   {
     if (*mode == 's')
-      closesocket(fd);
+      httpAddrClose(NULL, fd);
     else
       close(fd);
   }
@@ -1215,10 +1214,10 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 	  header[1] = 0x8b;
 	  header[2] = Z_DEFLATED;
 	  header[3] = 0;
-	  header[4] = curtime;
-	  header[5] = curtime >> 8;
-	  header[6] = curtime >> 16;
-	  header[7] = curtime >> 24;
+	  header[4] = (unsigned char)curtime;
+	  header[5] = (unsigned char)(curtime >> 8);
+	  header[6] = (unsigned char)(curtime >> 16);
+	  header[7] = (unsigned char)(curtime >> 24);
 	  header[8] = 0;
 	  header[9] = 0x03;
 
@@ -1343,11 +1342,11 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
     if (bytes > 65535)
       return (-1);
 
-    if ((temp = realloc(fp->printf_buffer, bytes + 1)) == NULL)
+    if ((temp = realloc(fp->printf_buffer, (size_t)(bytes + 1))) == NULL)
       return (-1);
 
     fp->printf_buffer = temp;
-    fp->printf_size   = bytes + 1;
+    fp->printf_size   = (size_t)(bytes + 1);
 
     va_start(ap, format);
     bytes = vsnprintf(fp->printf_buffer, fp->printf_size, format, ap);
@@ -1356,14 +1355,14 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 
   if (fp->mode == 's')
   {
-    if (cups_write(fp, fp->printf_buffer, bytes) < 0)
+    if (cups_write(fp, fp->printf_buffer, (size_t)bytes) < 0)
       return (-1);
 
     fp->pos += bytes;
 
     DEBUG_printf(("4cupsFilePrintf: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-    return (bytes);
+    return ((int)bytes);
   }
 
   if ((fp->ptr + bytes) > fp->end)
@@ -1374,20 +1373,20 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 
   DEBUG_printf(("4cupsFilePrintf: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-  if (bytes > sizeof(fp->buf))
+  if ((size_t)bytes > sizeof(fp->buf))
   {
 #ifdef HAVE_LIBZ
     if (fp->compressed)
-      return (cups_compress(fp, fp->printf_buffer, bytes));
+      return ((int)cups_compress(fp, fp->printf_buffer, (size_t)bytes));
     else
 #endif /* HAVE_LIBZ */
-      return (cups_write(fp, fp->printf_buffer, bytes));
+      return ((int)cups_write(fp, fp->printf_buffer, (size_t)bytes));
   }
   else
   {
-    memcpy(fp->ptr, fp->printf_buffer, bytes);
+    memcpy(fp->ptr, fp->printf_buffer, (size_t)bytes);
     fp->ptr += bytes;
-    return (bytes);
+    return ((int)bytes);
   }
 }
 
@@ -1418,7 +1417,7 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
     char ch;				/* Output character */
 
 
-    ch = c;
+    ch = (char)c;
 
     if (send(fp->fd, &ch, 1, 0) < 1)
       return (-1);
@@ -1433,7 +1432,7 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
       if (cupsFileFlush(fp))
 	return (-1);
 
-    *(fp->ptr) ++ = c;
+    *(fp->ptr) ++ = (char)c;
   }
 
   fp->pos ++;
@@ -1480,7 +1479,7 @@ cupsFilePutConf(cups_file_t *fp,	/* I - CUPS file */
       * Need to quote the first # in the info string...
       */
 
-      if ((temp = cupsFileWrite(fp, value, ptr - value)) < 0)
+      if ((temp = cupsFileWrite(fp, value, (size_t)(ptr - value))) < 0)
         return (-1);
       bytes += temp;
 
@@ -1531,18 +1530,18 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   * Write the string...
   */
 
-  bytes = (int)strlen(s);
+  bytes = (ssize_t)strlen(s);
 
   if (fp->mode == 's')
   {
-    if (cups_write(fp, s, bytes) < 0)
+    if (cups_write(fp, s, (size_t)bytes) < 0)
       return (-1);
 
     fp->pos += bytes;
 
     DEBUG_printf(("4cupsFilePuts: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-    return (bytes);
+    return ((int)bytes);
   }
 
   if ((fp->ptr + bytes) > fp->end)
@@ -1553,20 +1552,20 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
 
   DEBUG_printf(("4cupsFilePuts: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
-  if (bytes > sizeof(fp->buf))
+  if ((size_t)bytes > sizeof(fp->buf))
   {
 #ifdef HAVE_LIBZ
     if (fp->compressed)
-      return (cups_compress(fp, s, bytes));
+      return ((int)cups_compress(fp, s, (size_t)bytes));
     else
 #endif /* HAVE_LIBZ */
-      return (cups_write(fp, s, bytes));
+      return ((int)cups_write(fp, s, (size_t)bytes));
   }
   else
   {
-    memcpy(fp->ptr, s, bytes);
+    memcpy(fp->ptr, s, (size_t)bytes);
     fp->ptr += bytes;
-    return (bytes);
+    return ((int)bytes);
   }
 }
 
@@ -1622,7 +1621,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
     if (count > (ssize_t)bytes)
       count = (ssize_t)bytes;
 
-    memcpy(buf, fp->ptr, count);
+    memcpy(buf, fp->ptr,(size_t) count);
     fp->ptr += count;
     fp->pos += count;
 
@@ -1632,8 +1631,8 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
     * Update the counts for the last read...
     */
 
-    bytes -= count;
-    total += count;
+    bytes -= (size_t)count;
+    total += (size_t)count;
     buf   += count;
   }
 
@@ -2105,14 +2104,14 @@ cups_compress(cups_file_t *fp,		/* I - CUPS file */
   * Update the CRC...
   */
 
-  fp->crc = crc32(fp->crc, (const Bytef *)buf, bytes);
+  fp->crc = crc32(fp->crc, (const Bytef *)buf, (uInt)bytes);
 
  /*
   * Deflate the bytes...
   */
 
   fp->stream.next_in  = (Bytef *)buf;
-  fp->stream.avail_in = bytes;
+  fp->stream.avail_in = (uInt)bytes;
 
   while (fp->stream.avail_in > 0)
   {
@@ -2123,9 +2122,9 @@ cups_compress(cups_file_t *fp,		/* I - CUPS file */
     DEBUG_printf(("9cups_compress: avail_in=%d, avail_out=%d",
                   fp->stream.avail_in, fp->stream.avail_out));
 
-    if (fp->stream.avail_out < (int)(sizeof(fp->cbuf) / 8))
+    if (fp->stream.avail_out < (uInt)(sizeof(fp->cbuf) / 8))
     {
-      if (cups_write(fp, (char *)fp->cbuf, fp->stream.next_out - fp->cbuf) < 0)
+      if (cups_write(fp, (char *)fp->cbuf, (size_t)(fp->stream.next_out - fp->cbuf)) < 0)
         return (-1);
 
       fp->stream.next_out  = fp->cbuf;
@@ -2135,7 +2134,7 @@ cups_compress(cups_file_t *fp,		/* I - CUPS file */
     deflate(&(fp->stream), Z_NO_FLUSH);
   }
 
-  return (bytes);
+  return ((ssize_t)bytes);
 }
 #endif /* HAVE_LIBZ */
 
@@ -2315,7 +2314,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       */
 
       if ((bytes = end - ptr) > 0)
-        memcpy(fp->cbuf, ptr, bytes);
+        memcpy(fp->cbuf, ptr, (size_t)bytes);
 
      /*
       * Setup the decompressor data...
@@ -2326,7 +2325,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->stream.opaque    = (voidpf)0;
       fp->stream.next_in   = (Bytef *)fp->cbuf;
       fp->stream.next_out  = NULL;
-      fp->stream.avail_in  = bytes;
+      fp->stream.avail_in  = (uInt)bytes;
       fp->stream.avail_out = 0;
       fp->crc              = crc32(0L, Z_NULL, 0);
 
@@ -2355,7 +2354,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
           return (-1);
 
 	fp->stream.next_in  = fp->cbuf;
-	fp->stream.avail_in = bytes;
+	fp->stream.avail_in = (uInt)bytes;
       }
 
      /*
@@ -2369,7 +2368,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 
       if (fp->stream.next_out > (Bytef *)fp->buf)
         fp->crc = crc32(fp->crc, (Bytef *)fp->buf,
-	                fp->stream.next_out - (Bytef *)fp->buf);
+	                (uInt)(fp->stream.next_out - (Bytef *)fp->buf));
 
       if (status == Z_STREAM_END)
       {
@@ -2381,7 +2380,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	uLong		tcrc;		/* Trailer CRC */
 
 
-	if (read(fp->fd, trailer, sizeof(trailer)) < sizeof(trailer))
+	if (read(fp->fd, trailer, sizeof(trailer)) < (ssize_t)sizeof(trailer))
 	{
 	 /*
           * Can't get it, so mark end-of-file...
@@ -2417,7 +2416,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
       }
 
-      bytes = sizeof(fp->buf) - fp->stream.avail_out;
+      bytes = (ssize_t)sizeof(fp->buf) - (ssize_t)fp->stream.avail_out;
 
      /*
       * Return the decompressed data...
@@ -2658,8 +2657,8 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
     * Update the counts for the last write call...
     */
 
-    bytes -= count;
-    total += count;
+    bytes -= (size_t)count;
+    total += (size_t)count;
     buf   += count;
   }
 
@@ -2672,5 +2671,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 11642 2014-02-27 15:57:59Z msweet $".
+ * End of "$Id: file.c 11627 2014-02-20 16:15:09Z msweet $".
  */

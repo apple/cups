@@ -1,16 +1,16 @@
 dnl
-dnl "$Id: cups-manpages.m4 6649 2007-07-11 21:46:42Z mike $"
+dnl "$Id: cups-manpages.m4 11342 2013-10-18 20:36:01Z msweet $"
 dnl
-dnl   Manpage stuff for CUPS.
+dnl Manpage stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Fix "mandir" variable...
@@ -22,8 +22,8 @@ fi
 
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
-        	Darwin* | Linux | GNU | *BSD* | AIX*)
-        		# Darwin, MacOS X, Linux, GNU HURD, *BSD, and AIX
+        	Darwin* | Linux | GNU | *BSD*)
+        		# Darwin, MacOS X, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"
@@ -45,8 +45,8 @@ AC_SUBST(PMANDIR)
 
 dnl Setup manpage extensions...
 case "$uname" in
-	SunOS* | HP-UX*)
-		# Solaris and HP-UX
+	SunOS*)
+		# Solaris
 		MAN1EXT=1
 		MAN5EXT=5
 		MAN7EXT=7
@@ -78,5 +78,5 @@ AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
 
 dnl
-dnl End of "$Id: cups-manpages.m4 6649 2007-07-11 21:46:42Z mike $".
+dnl End of "$Id: cups-manpages.m4 11342 2013-10-18 20:36:01Z msweet $".
 dnl

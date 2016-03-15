@@ -1,21 +1,17 @@
 /*
- * "$Id: rastertopwg.c 3427 2011-09-20 18:40:57Z msweet $"
+ * "$Id: rastertopwg.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   CUPS raster to PWG raster format filter for CUPS.
+ * CUPS raster to PWG raster format filter for CUPS.
  *
- *   Copyright 2011 Apple Inc.
+ * Copyright 2011, 2014 Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright law.
- *   Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright law.
+ * Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main() - Main entry for filter.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -41,9 +37,9 @@ main(int  argc,				/* I - Number of command-line args */
 			*outras;	/* Output raster stream */
   cups_page_header2_t	inheader,	/* Input raster page header */
 			outheader;	/* Output raster page header */
-  int			y;		/* Current line */
+  unsigned		y;		/* Current line */
   unsigned char		*line;		/* Line buffer */
-  int			page = 0,	/* Current page */
+  unsigned		page = 0,	/* Current page */
 			page_width,	/* Actual page width */
 			page_height,	/* Actual page height */
 			page_top,	/* Top margin */
@@ -101,14 +97,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     fprintf(stderr, "PAGE: %d %d\n", page, inheader.NumCopies);
 
-    page_width  = (int)(inheader.cupsPageSize[0] * inheader.HWResolution[0] /
-                        72.0);
-    page_height = (int)(inheader.cupsPageSize[1] * inheader.HWResolution[1] /
-                        72.0);
-    page_left   = (int)(inheader.cupsImagingBBox[0] *
-                        inheader.HWResolution[0] / 72.0);
-    page_bottom = (int)(inheader.cupsImagingBBox[1] *
-                        inheader.HWResolution[1] / 72.0);
+    page_width  = (unsigned)(inheader.cupsPageSize[0] * inheader.HWResolution[0] / 72.0);
+    page_height = (unsigned)(inheader.cupsPageSize[1] * inheader.HWResolution[1] / 72.0);
+    page_left   = (unsigned)(inheader.cupsImagingBBox[0] * inheader.HWResolution[0] / 72.0);
+    page_bottom = (unsigned)(inheader.cupsImagingBBox[1] * inheader.HWResolution[1] / 72.0);
     page_top    = page_height - page_bottom - inheader.cupsHeight;
     linesize    = (page_width * inheader.cupsBitsPerPixel + 7) / 8;
     lineoffset  = page_left * inheader.cupsBitsPerPixel / 8; /* Round down */
@@ -199,7 +191,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((val = cupsGetOption("print-quality", num_options, options)) != NULL)
     {
-      int quality = atoi(val);		/* print-quality value */
+      unsigned quality = (unsigned)atoi(val);		/* print-quality value */
 
       if (quality >= IPP_QUALITY_DRAFT && quality <= IPP_QUALITY_HIGH)
 	outheader.cupsInteger[8] = quality;
@@ -270,7 +262,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (inheader.Tumble)
         {
-	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
+	  outheader.cupsInteger[1] = ~0U;/* CrossFeedTransform */
 	  outheader.cupsInteger[2] = 1;	/* FeedTransform */
 
 	  outheader.cupsInteger[3] = page_width - page_left -
@@ -286,7 +278,7 @@ main(int  argc,				/* I - Number of command-line args */
         else
         {
 	  outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
-	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+	  outheader.cupsInteger[2] = ~0U;/* FeedTransform */
 
 	  outheader.cupsInteger[3] = page_left;
 					/* ImageBoxLeft */
@@ -302,8 +294,8 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (inheader.Tumble)
         {
-	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
-	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+	  outheader.cupsInteger[1] = ~0U;/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = ~0U;/* FeedTransform */
 
 	  outheader.cupsInteger[3] = page_width - page_left -
 	                             inheader.cupsWidth;
@@ -334,8 +326,8 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (inheader.Tumble)
         {
-	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
-	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+	  outheader.cupsInteger[1] = ~0U;/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = ~0U;/* FeedTransform */
 
 	  outheader.cupsInteger[3] = page_width - page_left -
 	                             inheader.cupsWidth;
@@ -457,5 +449,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: rastertopwg.c 3427 2011-09-20 18:40:57Z msweet $".
+ * End of "$Id: rastertopwg.c 11558 2014-02-06 18:33:34Z msweet $".
  */

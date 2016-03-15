@@ -1,27 +1,18 @@
 /*
- * "$Id: testraster.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testraster.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Raster test program routines for CUPS.
+ * Raster test program routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()            - Test the raster functions.
- *   do_ppd_tests()    - Test the default option commands in a PPD file.
- *   do_ps_tests()     - Test standard PostScript commands.
- *   do_ras_file()     - Test reading of a raster file.
- *   do_raster_tests() - Test reading and writing of raster data.
- *   print_changes()   - Print differences in the page header.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -29,6 +20,7 @@
  */
 
 #include <cups/raster-private.h>
+#include <math.h>
 
 
 /*
@@ -172,13 +164,12 @@ static cups_page_header2_t setpagedevice_header =
   1,					/* cupsRowFeed */
   1,					/* cupsRowStep */
   0,					/* cupsNumColors */
-  1.001,				/* cupsBorderlessScalingFactor */
-  { 612.0, 792.1 },			/* cupsPageSize */
-  { 0.0, 0.0, 0.0, 0.0 },		/* cupsImagingBBox */
+  1.001f,				/* cupsBorderlessScalingFactor */
+  { 612.0f, 792.1f },			/* cupsPageSize */
+  { 0.0f, 0.0f, 0.0f, 0.0f },		/* cupsImagingBBox */
   { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
 					/* cupsInteger[16] */
-  { 1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1, 9.1, 10.1, 11.1, 12.1, 13.1,
-    14.1, 15.1, 16.1 },			/* cupsReal[16] */
+  { 1.1f, 2.1f, 3.1f, 4.1f, 5.1f, 6.1f, 7.1f, 8.1f, 9.1f, 10.1f, 11.1f, 12.1f, 13.1f, 14.1f, 15.1f, 16.1f },			/* cupsReal[16] */
   { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13",
     "14", "15", "16" },			/* cupsString[16] */
   "Marker Type",			/* cupsMarkerType */
@@ -519,7 +510,7 @@ do_ras_file(const char *filename)	/* I - Filename */
 static int				/* O - Number of errors */
 do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 {
-  int			page, x, y;	/* Looping vars */
+  unsigned		page, x, y;	/* Looping vars */
   FILE			*fp;		/* Raster file */
   cups_raster_t		*r;		/* Raster stream */
   cups_page_header2_t	header,		/* Page header */
@@ -610,7 +601,7 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     else
     {
       for (x = 0; x < header.cupsBytesPerLine; x ++)
-	data[x] = x;
+	data[x] = (unsigned char)x;
 
       for (y = 0; y < 64; y ++)
 	if (!cupsRasterWritePixels(r, data, header.cupsBytesPerLine))
@@ -636,7 +627,7 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 	else
 	{
 	  for (x = 0; x < header.cupsBytesPerLine; x ++)
-	    data[x] = x / 4;
+	    data[x] = (unsigned char)(x / 4);
 
 	  for (y = 0; y < 64; y ++)
 	    if (!cupsRasterWritePixels(r, data, header.cupsBytesPerLine))
@@ -1020,22 +1011,21 @@ print_changes(
     printf("    cupsNumColors %d, expected %d\n", header->cupsNumColors,
            expected->cupsNumColors);
 
-  if (header->cupsBorderlessScalingFactor !=
-          expected->cupsBorderlessScalingFactor)
+  if (fabs(header->cupsBorderlessScalingFactor - expected->cupsBorderlessScalingFactor) > 0.001)
     printf("    cupsBorderlessScalingFactor %g, expected %g\n",
            header->cupsBorderlessScalingFactor,
            expected->cupsBorderlessScalingFactor);
 
-  if (header->cupsPageSize[0] != expected->cupsPageSize[0] ||
-      header->cupsPageSize[1] != expected->cupsPageSize[1])
+  if (fabs(header->cupsPageSize[0] - expected->cupsPageSize[0]) > 0.001 ||
+      fabs(header->cupsPageSize[1] - expected->cupsPageSize[1]) > 0.001)
     printf("    cupsPageSize [%g %g], expected [%g %g]\n",
            header->cupsPageSize[0], header->cupsPageSize[1],
            expected->cupsPageSize[0], expected->cupsPageSize[1]);
 
-  if (header->cupsImagingBBox[0] != expected->cupsImagingBBox[0] ||
-      header->cupsImagingBBox[1] != expected->cupsImagingBBox[1] ||
-      header->cupsImagingBBox[2] != expected->cupsImagingBBox[2] ||
-      header->cupsImagingBBox[3] != expected->cupsImagingBBox[3])
+  if (fabs(header->cupsImagingBBox[0] - expected->cupsImagingBBox[0]) > 0.001 ||
+      fabs(header->cupsImagingBBox[1] - expected->cupsImagingBBox[1]) > 0.001 ||
+      fabs(header->cupsImagingBBox[2] - expected->cupsImagingBBox[2]) > 0.001 ||
+      fabs(header->cupsImagingBBox[3] - expected->cupsImagingBBox[3]) > 0.001)
     printf("    cupsImagingBBox [%g %g %g %g], expected [%g %g %g %g]\n",
            header->cupsImagingBBox[0], header->cupsImagingBBox[1],
            header->cupsImagingBBox[2], header->cupsImagingBBox[3],
@@ -1048,7 +1038,7 @@ print_changes(
              expected->cupsInteger[i]);
 
   for (i = 0; i < 16; i ++)
-    if (header->cupsReal[i] != expected->cupsReal[i])
+    if (fabs(header->cupsReal[i] - expected->cupsReal[i]) > 0.001)
       printf("    cupsReal%d %g, expected %g\n", i, header->cupsReal[i],
              expected->cupsReal[i]);
 
@@ -1074,5 +1064,5 @@ print_changes(
 
 
 /*
- * End of "$Id: testraster.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testraster.c 11558 2014-02-06 18:33:34Z msweet $".
  */

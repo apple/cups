@@ -1,49 +1,20 @@
 /*
- * "$Id: var.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: var.c 12034 2014-07-16 19:37:34Z msweet $"
  *
- *   CGI form variable and array functions for CUPS.
+ * CGI form variable and array functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cgiCheckVariables()        - Check for the presence of "required"
- *                                variables.
- *   cgiClearVariables()        - Clear all form variables.
- *   cgiGetArray()              - Get an element from a form array.
- *   cgiGetCookie()             - Get a cookie value.
- *   cgiGetFile()               - Get the file (if any) that was submitted in
- *                                the form.
- *   cgiGetSize()               - Get the size of a form array value.
- *   cgiGetVariable()           - Get a CGI variable from the database.
- *   cgiInitialize()            - Initialize the CGI variable "database".
- *   cgiIsPOST()                - Determine whether this page was POSTed.
- *   cgiSetArray()              - Set array element N to the specified string.
- *   cgiSetCookie()             - Set a cookie value.
- *   cgiSetSize()               - Set the array size.
- *   cgiSetVariable()           - Set a CGI variable in the database.
- *   cgi_add_variable()         - Add a form variable.
- *   cgi_compare_variables()    - Compare two variables.
- *   cgi_find_variable()        - Find a variable.
- *   cgi_initialize_cookies()   - Initialize cookies.
- *   cgi_initialize_get()       - Initialize form variables using the GET
- *                                method.
- *   cgi_initialize_multipart() - Initialize variables and file using the POST
- *                                method.
- *   cgi_initialize_post()      - Initialize variables using the POST method.
- *   cgi_initialize_string()    - Initialize form variables from a string.
- *   cgi_passwd()               - Catch authentication requests and notify the
- *                                server.
- *   cgi_set_sid()              - Set the CUPS session ID.
- *   cgi_sort_variables()       - Sort all form variables for faster lookup.
- *   cgi_unlink_file()          - Remove the uploaded form.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
+ */
+
+/*
+ * Include necessary headers...
  */
 
 /*#define DEBUG*/
@@ -417,7 +388,7 @@ cgiSetArray(const char *name,		/* I - Name of variable */
       const char **temp;		/* Temporary pointer */
 
       temp = (const char **)realloc((void *)(var->values),
-                                    sizeof(char *) * (element + 16));
+                                    sizeof(char *) * (size_t)(element + 16));
       if (!temp)
         return;
 
@@ -466,9 +437,9 @@ cgiSetCookie(const char *name,		/* I - Name */
     printf(" expires=%s;", httpGetDateString2(expires, date, sizeof(date)));
   }
   if (secure)
-    puts(" secure;");
+    puts(" httponly; secure;");
   else
-    putchar('\n');
+    puts(" httponly;");
 }
 
 
@@ -495,7 +466,7 @@ cgiSetSize(const char *name,		/* I - Name of variable */
     const char **temp;			/* Temporary pointer */
 
     temp = (const char **)realloc((void *)(var->values),
-				  sizeof(char *) * (size + 16));
+				  sizeof(char *) * (size_t)(size + 16));
     if (!temp)
       return;
 
@@ -581,7 +552,7 @@ cgi_add_variable(const char *name,	/* I - Variable name */
     if (form_alloc == 0)
       temp_vars = malloc(sizeof(_cgi_var_t) * 16);
     else
-      temp_vars = realloc(form_vars, (form_alloc + 16) * sizeof(_cgi_var_t));
+      temp_vars = realloc(form_vars, (size_t)(form_alloc + 16) * sizeof(_cgi_var_t));
 
     if (!temp_vars)
       return;
@@ -592,7 +563,7 @@ cgi_add_variable(const char *name,	/* I - Variable name */
 
   var = form_vars + form_count;
 
-  if ((var->values = calloc(element + 1, sizeof(char *))) == NULL)
+  if ((var->values = calloc((size_t)element + 1, sizeof(char *))) == NULL)
     return;
 
   var->name            = _cupsStrAlloc(name);
@@ -632,7 +603,7 @@ cgi_find_variable(const char *name)	/* I - Name of variable */
 
   key.name = name;
 
-  return ((_cgi_var_t *)bsearch(&key, form_vars, form_count, sizeof(_cgi_var_t),
+  return ((_cgi_var_t *)bsearch(&key, form_vars, (size_t)form_count, sizeof(_cgi_var_t),
                            (int (*)(const void *, const void *))cgi_compare_variables));
 }
 
@@ -769,8 +740,8 @@ cgi_initialize_multipart(
 		*ptr,			/* Pointer into name/filename */
 		*end;			/* End of buffer */
   int		ch,			/* Character from file */
-		fd,			/* Temporary file descriptor */
-		blen;			/* Length of boundary string */
+		fd;			/* Temporary file descriptor */
+  size_t	blen;			/* Length of boundary string */
 
 
   DEBUG_printf(("cgi_initialize_multipart(boundary=\"%s\")\n", boundary));
@@ -835,22 +806,22 @@ cgi_initialize_multipart(
 
 	while ((ch = getchar()) != EOF)
 	{
-	  *ptr++ = ch;
+	  *ptr++ = (char)ch;
 
-          if ((ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
+          if ((size_t)(ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
 	  {
 	    ptr -= blen;
 	    break;
 	  }
 
-          if ((ptr - line - blen) >= 8192)
+          if ((ptr - line - (int)blen) >= 8192)
 	  {
 	   /*
 	    * Write out the first 8k of the buffer...
 	    */
 
 	    write(fd, line, 8192);
-	    memmove(line, line + 8192, ptr - line - 8192);
+	    memmove(line, line + 8192, (size_t)(ptr - line - 8192));
 	    ptr -= 8192;
 	  }
 	}
@@ -860,7 +831,7 @@ cgi_initialize_multipart(
 	*/
 
 	if (ptr > line)
-          write(fd, line, ptr - line);
+          write(fd, line, (size_t)(ptr - line));
 
 	close(fd);
       }
@@ -877,9 +848,9 @@ cgi_initialize_multipart(
 	while ((ch = getchar()) != EOF)
 	{
 	  if (ptr < end)
-	    *ptr++ = ch;
+	    *ptr++ = (char)ch;
 
-          if ((ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
+          if ((size_t)(ptr - line) >= blen && !memcmp(ptr - blen, bstring, blen))
 	  {
 	    ptr -= blen;
 	    break;
@@ -979,12 +950,12 @@ cgi_initialize_multipart(
 static int				/* O - 1 if form data was read */
 cgi_initialize_post(void)
 {
-  char	*content_length,		/* Length of input data (string) */
-	*data;				/* Pointer to form data string */
-  int	length,				/* Length of input data */
-	nbytes,				/* Number of bytes read this read() */
-	tbytes,				/* Total number of bytes read */
-	status;				/* Return status */
+  char		*content_length,	/* Length of input data (string) */
+		*data;			/* Pointer to form data string */
+  size_t	length,			/* Length of input data */
+		tbytes;			/* Total number of bytes read */
+  ssize_t	nbytes;			/* Number of bytes read this read() */
+  int		status;			/* Return status */
 
 
   DEBUG_puts("cgi_initialize_post: Initializing variables using POST method...");
@@ -1001,7 +972,7 @@ cgi_initialize_post(void)
   * Get the length of the input stream and allocate a buffer for it...
   */
 
-  length = atoi(content_length);
+  length = (size_t)strtol(content_length, NULL, 10);
   data   = malloc(length + 1);
 
   if (data == NULL)
@@ -1011,8 +982,8 @@ cgi_initialize_post(void)
   * Read the data into the buffer...
   */
 
-  for (tbytes = 0; tbytes < length; tbytes += nbytes)
-    if ((nbytes = read(0, data + tbytes, length - tbytes)) < 0)
+  for (tbytes = 0; tbytes < length; tbytes += (size_t)nbytes)
+    if ((nbytes = read(0, data + tbytes, (size_t)(length - tbytes))) < 0)
     {
       if (errno != EAGAIN)
       {
@@ -1126,7 +1097,7 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
               ch = *data - '0';
               if (ch > 9)
         	ch -= 7;
-              *s = ch << 4;
+              *s = (char)(ch << 4);
 
               data ++;
               ch = *data - '0';
@@ -1264,7 +1235,7 @@ cgi_sort_variables(void)
   if (form_count < 2)
     return;
 
-  qsort(form_vars, form_count, sizeof(_cgi_var_t),
+  qsort(form_vars, (size_t)form_count, sizeof(_cgi_var_t),
         (int (*)(const void *, const void *))cgi_compare_variables);
 
 #ifdef DEBUG
@@ -1307,5 +1278,5 @@ cgi_unlink_file(void)
 
 
 /*
- * End of "$Id: var.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: var.c 12034 2014-07-16 19:37:34Z msweet $".
  */

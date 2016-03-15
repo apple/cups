@@ -1,53 +1,18 @@
 /*
- * "$Id: http-support.c 11445 2013-12-05 19:57:43Z msweet $"
+ * "$Id: http-support.c 11844 2014-05-02 11:58:54Z msweet $"
  *
- *   HTTP support routines for CUPS.
+ * HTTP support routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   httpAssembleURI()	  - Assemble a uniform resource identifier from its
- *			    components.
- *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
- *			    components with a formatted resource.
- *   httpAssembleUUID()   - Assemble a name-based UUID URN conforming to RFC
- *                          4122.
- *   httpDecode64()	  - Base64-decode a string.
- *   httpDecode64_2()	  - Base64-decode a string.
- *   httpEncode64()	  - Base64-encode a string.
- *   httpEncode64_2()	  - Base64-encode a string.
- *   httpGetDateString()  - Get a formatted date/time string from a time value.
- *   httpGetDateString2() - Get a formatted date/time string from a time value.
- *   httpGetDateTime()	  - Get a time value from a formatted date/time string.
- *   httpSeparate()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   httpSeparate2()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   httpSeparateURI()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   httpStatus()	  - Return a short string describing a HTTP status
- *			    code.
- *   _cups_hstrerror()	  - hstrerror() emulation function for Solaris and
- *			    others.
- *   _httpDecodeURI()	  - Percent-decode a HTTP request URI.
- *   _httpEncodeURI()	  - Percent-encode a HTTP request URI.
- *   _httpResolveURI()	  - Resolve a DNS-SD URI.
- *   http_client_cb()	  - Client callback for resolving URI.
- *   http_copy_decode()   - Copy and decode a URI.
- *   http_copy_encode()   - Copy and encode a URI.
- *   http_poll_cb()       - Wait for input on the specified file descriptors.
- *   http_resolve_cb()	  - Build a device URI for the given service name.
- *   http_resolve_cb()	  - Build a device URI for the given service name.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -84,6 +49,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
   size_t		bufsize;	/* Size of buffer */
   int			options;	/* Options passed to _httpResolveURI */
   const char		*resource;	/* Resource from URI */
+  const char		*uuid;		/* UUID from URI */
 } _http_uribuf_t;
 
 
@@ -91,7 +57,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
  * Local globals...
  */
 
-static const char * const http_days[7] =
+static const char * const http_days[7] =/* Days of the week */
 			{
 			  "Sun",
 			  "Mon",
@@ -102,7 +68,7 @@ static const char * const http_days[7] =
 			  "Sat"
 			};
 static const char * const http_months[12] =
-			{
+			{		/* Months of the year */
 			  "Jan",
 			  "Feb",
 			  "Mar",
@@ -115,6 +81,26 @@ static const char * const http_months[12] =
 			  "Oct",
 			  "Nov",
 			  "Dec"
+			};
+static const char * const http_states[] =
+			{		/* HTTP state strings */
+			  "HTTP_STATE_ERROR",
+			  "HTTP_STATE_WAITING",
+			  "HTTP_STATE_OPTIONS",
+			  "HTTP_STATE_GET",
+			  "HTTP_STATE_GET_SEND",
+			  "HTTP_STATE_HEAD",
+			  "HTTP_STATE_POST",
+			  "HTTP_STATE_POST_RECV",
+			  "HTTP_STATE_POST_SEND",
+			  "HTTP_STATE_PUT",
+			  "HTTP_STATE_PUT_RECV",
+			  "HTTP_STATE_DELETE",
+			  "HTTP_STATE_TRACE",
+			  "HTTP_STATE_CONNECT",
+			  "HTTP_STATE_STATUS",
+			  "HTTP_STATE_UNKNOWN_METHOD",
+			  "HTTP_STATE_UNKNOWN_VERSION"
 			};
 
 
@@ -206,10 +192,10 @@ httpAssembleURI(
   if (!ptr)
     goto assemble_overflow;
 
-  if (!strcmp(scheme, "mailto") || !strcmp(scheme, "tel"))
+  if (!strcmp(scheme, "geo") || !strcmp(scheme, "mailto") || !strcmp(scheme, "tel"))
   {
    /*
-    * mailto: and tel: only have :, no //...
+    * geo:, mailto:, and tel: only have :, no //...
     */
 
     if (ptr < end)
@@ -220,7 +206,7 @@ httpAssembleURI(
   else
   {
    /*
-    * Schemes other than mailto: and tel: all have //...
+    * Schemes other than geo:, mailto:, and tel: typically have //...
     */
 
     if ((ptr + 2) < end)
@@ -372,7 +358,7 @@ httpAssembleURI(
 
     if (port > 0)
     {
-      snprintf(ptr, end - ptr + 1, ":%d", port);
+      snprintf(ptr, (size_t)(end - ptr + 1), ":%d", port);
       ptr += strlen(ptr);
 
       if (ptr >= end)
@@ -486,7 +472,7 @@ httpAssembleURIf(
   bytes = vsnprintf(resource, sizeof(resource), resourcef, ap);
   va_end(ap);
 
-  if (bytes >= sizeof(resource))
+  if ((size_t)bytes >= sizeof(resource))
   {
     *uri = '\0';
     return (HTTP_URI_STATUS_OVERFLOW);
@@ -534,7 +520,7 @@ httpAssembleUUID(const char *server,	/* I - Server name */
 	   (unsigned)CUPS_RAND() & 0xffff, (unsigned)CUPS_RAND() & 0xffff);
 
   _cupsMD5Init(&md5state);
-  _cupsMD5Append(&md5state, (unsigned char *)data, strlen(data));
+  _cupsMD5Append(&md5state, (unsigned char *)data, (int)strlen(data));
   _cupsMD5Finish(&md5state, md5sum);
 
  /*
@@ -550,13 +536,6 @@ httpAssembleUUID(const char *server,	/* I - Server name */
 	   md5sum[14], md5sum[15]);
 
   return (buffer);
-}
-
-/* For OS X 10.8 and earlier */
-char *_httpAssembleUUID(const char *server, int port, const char *name,
-			int number, char *buffer, size_t bufsize)
-{
-  return (httpAssembleUUID(server, port, name, number, buffer, bufsize));
 }
 
 
@@ -597,10 +576,10 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 	       int        *outlen,	/* IO - Size of output string */
                const char *in)		/* I  - String to read from */
 {
-  int	pos,				/* Bit position */
-	base64;				/* Value of this character */
-  char	*outptr,			/* Output pointer */
-	*outend;			/* End of output buffer */
+  int		pos;			/* Bit position */
+  unsigned	base64;			/* Value of this character */
+  char		*outptr,		/* Output pointer */
+		*outend;		/* End of output buffer */
 
 
  /*
@@ -629,11 +608,11 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
     */
 
     if (*in >= 'A' && *in <= 'Z')
-      base64 = *in - 'A';
+      base64 = (unsigned)(*in - 'A');
     else if (*in >= 'a' && *in <= 'z')
-      base64 = *in - 'a' + 26;
+      base64 = (unsigned)(*in - 'a' + 26);
     else if (*in >= '0' && *in <= '9')
-      base64 = *in - '0' + 52;
+      base64 = (unsigned)(*in - '0' + 52);
     else if (*in == '+')
       base64 = 62;
     else if (*in == '/')
@@ -651,21 +630,21 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
     {
       case 0 :
           if (outptr < outend)
-            *outptr = base64 << 2;
+            *outptr = (char)(base64 << 2);
 	  pos ++;
 	  break;
       case 1 :
           if (outptr < outend)
-            *outptr++ |= (base64 >> 4) & 3;
+            *outptr++ |= (char)((base64 >> 4) & 3);
           if (outptr < outend)
-	    *outptr = (base64 << 4) & 255;
+	    *outptr = (char)((base64 << 4) & 255);
 	  pos ++;
 	  break;
       case 2 :
           if (outptr < outend)
-            *outptr++ |= (base64 >> 2) & 15;
+            *outptr++ |= (char)((base64 >> 2) & 15);
           if (outptr < outend)
-	    *outptr = (base64 << 6) & 255;
+	    *outptr = (char)((base64 << 6) & 255);
 	  pos ++;
 	  break;
       case 3 :
@@ -830,10 +809,7 @@ httpGetDateString2(time_t t,		/* I - UNIX time */
 
   tdate = gmtime(&t);
   if (tdate)
-    snprintf(s, slen, "%s, %02d %s %d %02d:%02d:%02d GMT",
-	     http_days[tdate->tm_wday], tdate->tm_mday,
-	     http_months[tdate->tm_mon], tdate->tm_year + 1900,
-	     tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+    snprintf(s, (size_t)slen, "%s, %02d %s %d %02d:%02d:%02d GMT", http_days[tdate->tm_wday], tdate->tm_mday, http_months[tdate->tm_mon], tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
   else
     s[0] = '\0';
 
@@ -1028,7 +1004,7 @@ httpSeparateURI(
     * Workaround for HP IPP client bug...
     */
 
-    strlcpy(scheme, "ipp", schemelen);
+    strlcpy(scheme, "ipp", (size_t)schemelen);
     status = HTTP_URI_STATUS_MISSING_SCHEME;
   }
   else if (*uri == '/')
@@ -1037,7 +1013,7 @@ httpSeparateURI(
     * Filename...
     */
 
-    strlcpy(scheme, "file", schemelen);
+    strlcpy(scheme, "file", (size_t)schemelen);
     status = HTTP_URI_STATUS_MISSING_SCHEME;
   }
   else
@@ -1255,7 +1231,7 @@ httpSeparateURI(
         return (HTTP_URI_STATUS_BAD_PORT);
       }
 
-      *port = strtol(uri + 1, (char **)&uri, 10);
+      *port = (int)strtol(uri + 1, (char **)&uri, 10);
 
       if (*uri != '/' && *uri)
       {
@@ -1322,21 +1298,33 @@ httpSeparateURI(
 
 
 /*
- * 'httpStatus()' - Return a short string describing a HTTP status code.
+ * 'httpStateString()' - Return the string describing a HTTP state value.
  *
- * The returned string is localized to the current POSIX locale and is based
- * on the status strings defined in RFC 2616.
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - State string */
+httpStateString(http_state_t state)	/* I - HTTP state value */
+{
+  if (state < HTTP_STATE_ERROR || state > HTTP_STATE_UNKNOWN_VERSION)
+    return ("HTTP_STATE_???");
+  else
+    return (http_states[state - HTTP_STATE_ERROR]);
+}
+
+
+/*
+ * '_httpStatus()' - Return the localized string describing a HTTP status code.
+ *
+ * The returned string is localized using the passed message catalog.
  */
 
 const char *				/* O - Localized status string */
-httpStatus(http_status_t status)	/* I - HTTP status code */
+_httpStatus(cups_lang_t   *lang,	/* I - Language */
+            http_status_t status)	/* I - HTTP status code */
 {
   const char	*s;			/* Status string */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
-
-  if (!cg->lang_default)
-    cg->lang_default = cupsLangDefault();
 
   switch (status)
   {
@@ -1415,6 +1403,90 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 	break;
 
     default :
+        s = _("Unknown");
+	break;
+  }
+
+  return (_cupsLangString(lang, s));
+}
+
+
+/*
+ * 'httpStatus()' - Return a short string describing a HTTP status code.
+ *
+ * The returned string is localized to the current POSIX locale and is based
+ * on the status strings defined in RFC 2616.
+ */
+
+const char *				/* O - Localized status string */
+httpStatus(http_status_t status)	/* I - HTTP status code */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+  return (_httpStatus(cg->lang_default, status));
+}
+
+/*
+ * 'httpURIStatusString()' - Return a string describing a URI status code.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - Localized status string */
+httpURIStatusString(
+    http_uri_status_t status)		/* I - URI status code */
+{
+  const char	*s;			/* Status string */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+  switch (status)
+  {
+    case HTTP_URI_STATUS_OVERFLOW :
+	s = _("URI too large");
+	break;
+    case HTTP_URI_STATUS_BAD_ARGUMENTS :
+	s = _("Bad arguments to function");
+	break;
+    case HTTP_URI_STATUS_BAD_RESOURCE :
+	s = _("Bad resource in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_PORT :
+	s = _("Bad port number in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_HOSTNAME :
+	s = _("Bad hostname/address in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_USERNAME :
+	s = _("Bad username in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_SCHEME :
+	s = _("Bad scheme in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_URI :
+	s = _("Bad/empty URI");
+	break;
+    case HTTP_URI_STATUS_OK :
+	s = _("OK");
+	break;
+    case HTTP_URI_STATUS_MISSING_SCHEME :
+	s = _("Missing scheme in URI");
+	break;
+    case HTTP_URI_STATUS_UNKNOWN_SCHEME :
+	s = _("Unknown scheme in URI");
+	break;
+    case HTTP_URI_STATUS_MISSING_RESOURCE :
+	s = _("Missing resource in URI");
+	break;
+
+    default:
         s = _("Unknown");
 	break;
   }
@@ -1538,7 +1610,9 @@ _httpResolveURI(
   {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     char		*regtype,	/* Pointer to type in hostname */
-			*domain;	/* Pointer to domain in hostname */
+			*domain,	/* Pointer to domain in hostname */
+			*uuid,		/* Pointer to UUID in URI */
+			*uuidend;	/* Pointer to end of UUID in URI */
     _http_uribuf_t	uribuf;		/* URI buffer */
     int			offline = 0;	/* offline-report state set? */
 #  ifdef HAVE_DNSSD
@@ -1546,9 +1620,11 @@ _httpResolveURI(
 #      pragma comment(lib, "dnssd.lib")
 #    endif /* WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
-			domainref,	/* DNS-SD service reference for domain */
+			domainref = NULL,/* DNS-SD service reference for domain */
+			ippref = NULL,	/* DNS-SD service reference for network IPP */
+			ippsref = NULL,	/* DNS-SD service reference for network IPPS */
 			localref;	/* DNS-SD service reference for .local */
-    int			domainsent = 0;	/* Send the domain resolve? */
+    int			extrasent = 0;	/* Send the domain/IPP/IPPS resolves? */
 #    ifdef HAVE_POLL
     struct pollfd	polldata;	/* Polling data */
 #    else /* select() */
@@ -1595,12 +1671,21 @@ _httpResolveURI(
     if (domain)
       *domain++ = '\0';
 
+    if ((uuid = strstr(resource, "?uuid=")) != NULL)
+    {
+      *uuid = '\0';
+      uuid  += 6;
+      if ((uuidend = strchr(uuid, '&')) != NULL)
+        *uuidend = '\0';
+    }
+
+    resolved_uri[0] = '\0';
+
     uribuf.buffer   = resolved_uri;
     uribuf.bufsize  = resolved_size;
     uribuf.options  = options;
     uribuf.resource = resource;
-
-    resolved_uri[0] = '\0';
+    uribuf.uuid     = uuid;
 
     DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
@@ -1616,7 +1701,7 @@ _httpResolveURI(
 #  ifdef HAVE_DNSSD
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
-      int myinterface = kDNSServiceInterfaceIndexAny;
+      uint32_t myinterface = kDNSServiceInterfaceIndexAny;
 					/* Lookup on any interface */
 
       if (!strcmp(scheme, "ippusb"))
@@ -1656,7 +1741,7 @@ _httpResolveURI(
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
-	  fds = poll(&polldata, 1, 1000 * timeout);
+	  fds = poll(&polldata, 1, (int)(1000 * timeout));
 
 #    else /* select() */
 	  FD_ZERO(&input_set);
@@ -1688,7 +1773,7 @@ _httpResolveURI(
 	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (domainsent == 0 && domain && _cups_strcasecmp(domain, "local."))
+	    if (extrasent == 0 && domain && _cups_strcasecmp(domain, "local."))
 	    {
 	      if (options & _HTTP_RESOLVE_STDERR)
 		fprintf(stderr,
@@ -1702,7 +1787,33 @@ _httpResolveURI(
 	                            myinterface, hostname, regtype, domain,
 				    http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)
-		domainsent = 1;
+		extrasent = 1;
+	    }
+	    else if (extrasent == 0 && !strcmp(scheme, "ippusb"))
+	    {
+	      if (options & _HTTP_RESOLVE_STDERR)
+		fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"_ipps._tcp\", domain=\"local.\"...\n", hostname);
+
+	      ippsref = ref;
+	      if (DNSServiceResolve(&ippsref,
+	                            kDNSServiceFlagsShareConnection,
+	                            kDNSServiceInterfaceIndexAny, hostname,
+	                            "_ipps._tcp", domain, http_resolve_cb,
+				    &uribuf) == kDNSServiceErr_NoError)
+		extrasent = 1;
+	    }
+	    else if (extrasent == 1 && !strcmp(scheme, "ippusb"))
+	    {
+	      if (options & _HTTP_RESOLVE_STDERR)
+		fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"_ipp._tcp\", domain=\"local.\"...\n", hostname);
+
+	      ippref = ref;
+	      if (DNSServiceResolve(&ippref,
+	                            kDNSServiceFlagsShareConnection,
+	                            kDNSServiceInterfaceIndexAny, hostname,
+	                            "_ipp._tcp", domain, http_resolve_cb,
+				    &uribuf) == kDNSServiceErr_NoError)
+		extrasent = 2;
 	    }
 
 	   /*
@@ -1719,7 +1830,8 @@ _httpResolveURI(
 	  }
 	  else
 	  {
-	    if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError)
+	    if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError &&
+	        resolved_uri[0])
 	    {
 	      uri = resolved_uri;
 	      break;
@@ -1727,8 +1839,15 @@ _httpResolveURI(
 	  }
 	}
 
-	if (domainsent)
-	  DNSServiceRefDeallocate(domainref);
+	if (extrasent)
+	{
+	  if (domainref)
+	    DNSServiceRefDeallocate(domainref);
+	  if (ippref)
+	    DNSServiceRefDeallocate(ippref);
+	  if (ippsref)
+	    DNSServiceRefDeallocate(ippsref);
+	}
 
 	DNSServiceRefDeallocate(localref);
       }
@@ -1920,7 +2039,7 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 	  else
 	    quoted |= *src - '0';
 
-          *ptr++ = quoted;
+          *ptr++ = (char)quoted;
 	}
 	else
 	{
@@ -2033,6 +2152,31 @@ http_resolve_cb(
 	        txtRecord, context));
 
  /*
+  * If we have a UUID, compare it...
+  */
+
+  if (uribuf->uuid &&
+      (value = TXTRecordGetValuePtr(txtLen, txtRecord, "UUID",
+                                    &valueLen)) != NULL)
+  {
+    char	uuid[256];		/* UUID value */
+
+    memcpy(uuid, value, valueLen);
+    uuid[valueLen] = '\0';
+
+    if (_cups_strcasecmp(uuid, uribuf->uuid))
+    {
+      if (uribuf->options & _HTTP_RESOLVE_STDERR)
+	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
+		uribuf->uuid);
+
+      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+                    uribuf->uuid));
+      return;
+    }
+  }
+
+ /*
   * Figure out the scheme from the full name...
   */
 
@@ -2123,9 +2267,7 @@ http_resolve_cb(
     {
       for (addr = addrlist; addr; addr = addr->next)
       {
-        int error = getnameinfo(&(addr->addr.addr),
-	                        httpAddrLength(&(addr->addr)),
-			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+        int error = getnameinfo(&(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr)), fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
 
         if (!error)
 	{
@@ -2156,12 +2298,9 @@ http_resolve_cb(
 
   if ((!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
       !strcmp(uribuf->resource, "/cups"))
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
-                     scheme, NULL, hostTarget, ntohs(port), "%s?snmp=false",
-                     resource);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, ntohs(port), "%s?snmp=false", resource);
   else
-    httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
-                    scheme, NULL, hostTarget, ntohs(port), resource);
+    httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, ntohs(port), resource);
 
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }
@@ -2234,6 +2373,31 @@ http_resolve_cb(
     avahi_service_resolver_free(resolver);
     avahi_simple_poll_quit(uribuf->poll);
     return;
+  }
+
+ /*
+  * If we have a UUID, compare it...
+  */
+
+  if (uribuf->uuid && (pair = avahi_string_list_find(txt, "UUID")) != NULL)
+  {
+    char	uuid[256];		/* UUID value */
+
+    avahi_string_list_get_pair(pair, NULL, &value, &valueLen);
+
+    memcpy(uuid, value, valueLen);
+    uuid[valueLen] = '\0';
+
+    if (_cups_strcasecmp(uuid, uribuf->uuid))
+    {
+      if (uribuf->options & _HTTP_RESOLVE_STDERR)
+	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
+		uribuf->uuid);
+
+      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+                    uribuf->uuid));
+      return;
+    }
   }
 
  /*
@@ -2341,9 +2505,7 @@ http_resolve_cb(
     {
       for (addr = addrlist; addr; addr = addr->next)
       {
-        int error = getnameinfo(&(addr->addr.addr),
-	                        httpAddrLength(&(addr->addr)),
-			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+        int error = getnameinfo(&(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr)), fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
 
         if (!error)
 	{
@@ -2382,5 +2544,5 @@ http_resolve_cb(
 
 
 /*
- * End of "$Id: http-support.c 11445 2013-12-05 19:57:43Z msweet $".
+ * End of "$Id: http-support.c 11844 2014-05-02 11:58:54Z msweet $".
  */

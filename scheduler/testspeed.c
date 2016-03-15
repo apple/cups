@@ -1,23 +1,16 @@
 /*
- * "$Id: testspeed.c 10995 2013-05-29 11:51:03Z msweet $"
+ * "$Id: testspeed.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Scheduler speed test for CUPS.
+ * Scheduler speed test for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()    - Send multiple IPP requests and report on the average response
- *               time.
- *   do_test() - Run a test on a specific host...
- *   usage()   - Show program usage...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -303,7 +296,7 @@ do_test(const char        *server,	/* I - Server to use */
     if (opstring)
       op = ippOpValue(opstring);
     else
-      op = ops[i % (sizeof(ops) / sizeof(ops[0]))];
+      op = ops[i % (int)(sizeof(ops) / sizeof(ops[0]))];
 
     request = ippNewRequest(op);
 
@@ -383,5 +376,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c 10995 2013-05-29 11:51:03Z msweet $".
+ * End of "$Id: testspeed.c 11558 2014-02-06 18:33:34Z msweet $".
  */

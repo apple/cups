@@ -1,23 +1,18 @@
 /*
- * "$Id: socket.c 11909 2014-06-09 18:58:16Z msweet $"
+ * "$Id: socket.c 11907 2014-06-09 18:35:32Z msweet $"
  *
- *   AppSocket backend for CUPS.
+ * AppSocket backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()    - Send a file to the printer or server.
- *   wait_bc() - Wait for back-channel data...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -46,7 +41,7 @@
  * Local functions...
  */
 
-static int	wait_bc(int device_fd, int secs);
+static ssize_t	wait_bc(int device_fd, int secs);
 
 
 /*
@@ -385,7 +380,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
         }
 
-	sleep(delay);
+	sleep((unsigned)delay);
 
 	if (delay < 30)
 	  delay += 5;
@@ -415,7 +410,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   tbytes = 0;
 
   if (bytes > 0)
-    tbytes += write(device_fd, buffer, bytes);
+    tbytes += write(device_fd, buffer, (size_t)bytes);
 
   while (copies > 0 && tbytes >= 0)
   {
@@ -433,6 +428,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
+
+  fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
   if (waiteof)
   {
@@ -479,7 +476,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
  * 'wait_bc()' - Wait for back-channel data...
  */
 
-static int				/* O - # bytes read or -1 on error */
+static ssize_t				/* O - # bytes read or -1 on error */
 wait_bc(int device_fd,			/* I - Socket */
         int secs)			/* I - Seconds to wait */
 {
@@ -509,7 +506,7 @@ wait_bc(int device_fd,			/* I - Socket */
     {
       fprintf(stderr, "DEBUG: Received %d bytes of back-channel data\n",
 	      (int)bytes);
-      cupsBackChannelWrite(buffer, bytes, 1.0);
+      cupsBackChannelWrite(buffer, (size_t)bytes, 1.0);
     }
 
     return (bytes);
@@ -520,5 +517,5 @@ wait_bc(int device_fd,			/* I - Socket */
 
 
 /*
- * End of "$Id: socket.c 11909 2014-06-09 18:58:16Z msweet $".
+ * End of "$Id: socket.c 11907 2014-06-09 18:35:32Z msweet $".
  */

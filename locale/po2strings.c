@@ -1,15 +1,15 @@
 /*
- * "$Id: po2strings.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: po2strings.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Convert a GNU gettext .po file to an Apple .strings file.
+ * Convert a GNU gettext .po file to an Apple .strings file.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Usage:
  *
@@ -18,10 +18,6 @@
  * Compile with:
  *
  *   gcc -o po2strings po2strings.c `cups-config --libs`
- *
- * Contents:
- *
- *   main() - Convert .po file to .strings.
  */
 
 #include <cups/cups-private.h>
@@ -71,7 +67,7 @@ main(int  argc,				/* I - Number of command-line args */
 			*temp,		/* New string */
 			*msgid,		/* msgid string */
 			*msgstr;	/* msgstr string */
-  int			length;		/* Length of combined strings */
+  size_t		length;		/* Length of combined strings */
   int			use_msgid;	/* Use msgid strings for msgstr? */
 
 
@@ -215,7 +211,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         size_t ptrlen = strlen(ptr);	/* Length of string */
 
-	length = (int)strlen(msgstr ? msgstr : msgid);
+	length = strlen(msgstr ? msgstr : msgid);
 
 	if ((temp = realloc(msgstr ? msgstr : msgid,
 			    length + ptrlen + 1)) == NULL)
@@ -292,5 +288,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: po2strings.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: po2strings.c 11558 2014-02-06 18:33:34Z msweet $".
  */

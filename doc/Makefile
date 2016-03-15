@@ -1,16 +1,16 @@
 #
-# "$Id: Makefile 11109 2013-07-08 21:15:13Z msweet $"
+# "$Id: Makefile 11930 2014-06-16 15:33:00Z msweet $"
 #
-#   Documentation makefile for CUPS.
+# Documentation makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -20,6 +20,7 @@ include ../Makedefs
 #
 
 WEBPAGES	=	\
+			apple-touch-icon.png \
 			cups.css \
 			cups-printable.css \
 			index.html \
@@ -61,14 +62,21 @@ HELPFILES	=	\
 			help/glossary.html \
 			help/kerberos.html \
 			help/license.html \
-			help/man-cupsaccept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
+			help/man-classes.conf.html \
+			help/man-client.conf.html \
+			help/man-cups.html \
 			help/man-cups-config.html \
+			help/man-cups-files.conf.html \
 			help/man-cups-lpd.html \
 			help/man-cups-snmp.html \
+			help/man-cupsaccept.html \
 			help/man-cupsaddsmb.html \
+			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
+			help/man-cupsd-helper.html \
+			help/man-cupsd-logs.html \
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
@@ -81,7 +89,6 @@ HELPFILES	=	\
 			help/man-lpinfo.html \
 			help/man-lpmove.html \
 			help/man-lpoptions.html \
-			help/man-lppasswd.html \
 			help/man-lpq.html \
 			help/man-lpr.html \
 			help/man-lprm.html \
@@ -94,6 +101,8 @@ HELPFILES	=	\
 			help/man-ppdi.html \
 			help/man-ppdmerge.html \
 			help/man-ppdpo.html \
+			help/man-printers.conf.html \
+			help/man-subscriptions.conf.html \
 			help/network.html \
 			help/options.html \
 			help/overview.html \
@@ -101,18 +110,7 @@ HELPFILES	=	\
 			help/postscript-driver.html \
 			help/ppd-compiler.html \
 			help/raster-driver.html \
-			help/ref-access_log.html \
-			help/ref-classes-conf.html \
-			help/ref-client-conf.html \
-			help/ref-cupsd-conf.html \
-			help/ref-cups-files-conf.html \
-			help/ref-error_log.html \
-			help/ref-mailto-conf.html \
-			help/ref-page_log.html \
 			help/ref-ppdcfile.html \
-			help/ref-printers-conf.html \
-			help/ref-snmp-conf.html \
-			help/ref-subscriptions-conf.html \
 			help/security.html \
 			help/sharing.html \
 			help/spec-banner.html \
@@ -125,8 +123,7 @@ HELPFILES	=	\
 			help/spec-ppd.html \
 			help/spec-raster.html \
 			help/spec-stp.html \
-			help/translation.html \
-			help/whatsnew.html
+			help/translation.html
 
 
 #

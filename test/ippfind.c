@@ -1,42 +1,19 @@
 /*
- * "$Id: ippfind.c 11177 2013-07-24 12:16:37Z msweet $"
+ * "$Id: ippfind.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Utility to find IPP printers via Bonjour/DNS-SD and optionally run
- *   commands such as IPP and Bonjour conformance tests.  This tool is
- *   inspired by the UNIX "find" command, thus its name.
+ * Utility to find IPP printers via Bonjour/DNS-SD and optionally run
+ * commands such as IPP and Bonjour conformance tests.  This tool is
+ * inspired by the UNIX "find" command, thus its name.
  *
- *   Copyright 2008-2013 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()		     - Browse for printers.
- *   browse_callback()	     - Browse devices.
- *   browse_local_callback() - Browse local devices.
- *   browse_callback()	     - Browse devices.
- *   client_callback()	     - Avahi client callback function.
- *   compare_services()      - Compare two devices.
- *   dnssd_error_string()    - Return an error string for an error code.
- *   eval_expr()	     - Evaluate the expressions against the specified
- *			       service.
- *   exec_program()	     - Execute a program for a service.
- *   get_service()	     - Create or update a device.
- *   get_time() 	     - Get the current time-of-day in seconds.
- *   list_service()	     - List the contents of a service.
- *   new_expr() 	     - Create a new expression.
- *   poll_callback()	     - Wait for input on the specified file
- *			       descriptors.
- *   resolve_callback()      - Process resolve data.
- *   set_service_uri()	     - Set the URI of the service.
- *   show_usage()	     - Show program usage.
- *   show_version()	     - Show program version.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -782,7 +759,6 @@ main(int  argc,				/* I - Number of command-line args */
 				  "ippfind");
 		  show_usage();
 		}
-                  show_usage();
 
                 if (!strcmp(argv[i], "1.1"))
                   ipp_version = 11;
@@ -948,7 +924,6 @@ main(int  argc,				/* I - Number of command-line args */
                 _cupsLangPrintf(stderr, _("%s: Unknown option \"-%c\"."),
                                 "ippfind", *opt);
                 show_usage();
-                break;
           }
 
 	  if (temp)
@@ -1490,6 +1465,9 @@ browse_callback(
   * Only process "add" data...
   */
 
+  (void)sdRef;
+  (void)interfaceIndex;
+
   if (errorCode != kDNSServiceErr_NoError || !(flags & kDNSServiceFlagsAdd))
     return;
 
@@ -1522,6 +1500,9 @@ browse_local_callback(
  /*
   * Only process "add" data...
   */
+
+  (void)sdRef;
+  (void)interfaceIndex;
 
   if (errorCode != kDNSServiceErr_NoError || !(flags & kDNSServiceFlagsAdd))
     return;
@@ -1912,14 +1893,14 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
     snprintf(txt[i], sizeof(txt[i]), "IPPFIND_TXT_%s=%s", service->txt[i].name,
              service->txt[i].value);
     for (ptr = txt[i] + 12; *ptr && *ptr != '='; ptr ++)
-      *ptr = _cups_toupper(*ptr);
+      *ptr = (char)_cups_toupper(*ptr);
   }
 
   for (i = 0, myenvc = 7 + service->num_txt; environ[i]; i ++)
     if (strncmp(environ[i], "IPPFIND_", 8))
       myenvc ++;
 
-  if ((myenvp = calloc(sizeof(char *), myenvc + 1)) == NULL)
+  if ((myenvp = calloc(sizeof(char *), (size_t)(myenvc + 1))) == NULL)
   {
     _cupsLangPuts(stderr, _("ippfind: Out of memory."));
     exit(IPPFIND_EXIT_MEMORY);
@@ -1944,7 +1925,7 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
   * Allocate and copy command-line arguments...
   */
 
-  if ((myargv = calloc(sizeof(char *), num_args + 1)) == NULL)
+  if ((myargv = calloc(sizeof(char *), (size_t)(num_args + 1))) == NULL)
   {
     _cupsLangPuts(stderr, _("ippfind: Out of memory."));
     exit(IPPFIND_EXIT_MEMORY);
@@ -1980,24 +1961,24 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 
           *kptr = '\0';
           if (!keyword[0] || !strcmp(keyword, "service_uri"))
-	    strlcpy(tptr, service->uri, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, service->uri, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_domain"))
-	    strlcpy(tptr, service->domain, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, service->domain, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_hostname"))
-	    strlcpy(tptr, service->host, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, service->host, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_name"))
-	    strlcpy(tptr, service->name, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, service->name, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_path"))
-	    strlcpy(tptr, service->resource, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, service->resource, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_port"))
-	    strlcpy(tptr, port + 20, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, port + 20, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_scheme"))
-	    strlcpy(tptr, scheme + 22, sizeof(temp) - (tptr - temp));
+	    strlcpy(tptr, scheme + 22, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strncmp(keyword, "txt_", 4))
 	  {
 	    if ((ptr = (char *)cupsGetOption(keyword + 4, service->num_txt,
 					     service->txt)) != NULL)
-	      strlcpy(tptr, strdup(ptr), sizeof(temp) - (tptr - temp));
+	      strlcpy(tptr, strdup(ptr), sizeof(temp) - (size_t)(tptr - temp));
 	    else
 	      *tptr = '\0';
 	  }
@@ -2279,7 +2260,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
 
     if ((attr = ippFindAttribute(response, "printer-state",
                                  IPP_TAG_ENUM)) != NULL)
-      pstate = ippGetInteger(attr, 0);
+      pstate = (ipp_pstate_t)ippGetInteger(attr, 0);
     else
       pstate = IPP_PSTATE_STOPPED;
 
@@ -2300,7 +2281,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
            i ++, ptr += strlen(ptr))
       {
         *ptr++ = ',';
-        strlcpy(ptr, ippGetString(attr, i, NULL), end - ptr + 1);
+        strlcpy(ptr, ippGetString(attr, i, NULL), (size_t)(end - ptr + 1));
       }
     }
     else
@@ -2385,11 +2366,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
     _cupsLangPrintf(stdout, "%s available", service->uri);
     httpAddrFreeList(addrlist);
 
-#ifdef WIN32
-    closesocket(sock);
-#else
-    close(sock);
-#endif /* WIN32 */
+    httpAddrClose(NULL, sock);
   }
   else
   {
@@ -2470,8 +2447,8 @@ new_expr(ippfind_op_t op,		/* I - Operation */
         break;
 
      temp->num_args = num_args;
-     temp->args     = malloc(num_args * sizeof(char *));
-     memcpy(temp->args, args, num_args * sizeof(char *));
+     temp->args     = malloc((size_t)num_args * sizeof(char *));
+     memcpy(temp->args, args, (size_t)num_args * sizeof(char *));
   }
 
   return (temp);
@@ -2540,7 +2517,12 @@ resolve_callback(
   * Only process "add" data...
   */
 
-  if (errorCode != kDNSServiceErr_NoError)
+  (void)sdRef;
+  (void)flags;
+  (void)interfaceIndex;
+  (void)fullName;
+
+   if (errorCode != kDNSServiceErr_NoError)
   {
     _cupsLangPrintf(stderr, _("ippfind: Unable to browse or resolve: %s"),
 		    dnssd_error_string(errorCode));
@@ -2823,5 +2805,5 @@ show_version(void)
 
 
 /*
- * End of "$Id: ippfind.c 11177 2013-07-24 12:16:37Z msweet $".
+ * End of "$Id: ippfind.c 11594 2014-02-14 20:09:01Z msweet $".
  */

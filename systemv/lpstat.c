@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 11890 2014-05-22 13:59:21Z msweet $"
+ * "$Id: lpstat.c 12066 2014-07-30 18:30:44Z msweet $"
  *
  * "lpstat" command for CUPS.
  *
@@ -1214,52 +1214,6 @@ show_devices(const char  *printers,	/* I - Destinations */
 
       if (match_list(printers, printer))
       {
-#ifdef __osf__ /* Compaq/Digital like to do it their own way... */
-        char	scheme[HTTP_MAX_URI],	/* Components of printer URI */
-		username[HTTP_MAX_URI],
-		hostname[HTTP_MAX_URI],
-		resource[HTTP_MAX_URI];
-	int	port;
-
-
-        if (device == NULL)
-	{
-	  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-	                  username, sizeof(username), hostname,
-			  sizeof(hostname), &port, resource, sizeof(resource));
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to remote "
-			    "printer %s on %s"),
-	        	  printer, strrchr(resource, '/') + 1, hostname);
-        }
-        else if (!strncmp(device, "file:", 5))
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to %s"),
-			  printer, device + 5);
-        else
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to %s"),
-			  printer, device);
-
-        for (i = 0; i < num_dests; i ++)
-	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
-	  {
-            if (device == NULL)
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to "
-			        "remote printer %s on %s"),
-	        	      printer, dests[i].instance,
-			      strrchr(resource, '/') + 1, hostname);
-            else if (!strncmp(device, "file:", 5))
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to %s"),
-			      printer, dests[i].instance, device + 5);
-            else
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to %s"),
-			      printer, dests[i].instance, device);
-	  }
-#else
         if (device == NULL)
           _cupsLangPrintf(stdout, _("device for %s: %s"),
 	                  printer, uri);
@@ -1271,6 +1225,7 @@ show_devices(const char  *printers,	/* I - Destinations */
 	                  printer, device);
 
         for (i = 0; i < num_dests; i ++)
+        {
 	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
@@ -1283,7 +1238,7 @@ show_devices(const char  *printers,	/* I - Destinations */
               _cupsLangPrintf(stdout, _("device for %s/%s: %s"),
 	                      printer, dests[i].instance, device);
 	  }
-#endif /* __osf__ */
+	}
       }
 
       if (attr == NULL)
@@ -1316,7 +1271,8 @@ show_jobs(const char *dests,		/* I - Destinations */
   const char	*dest,			/* Pointer into job-printer-uri */
 		*username,		/* Pointer to job-originating-user-name */
 		*title,			/* Pointer to job-name */
-		*message;		/* Pointer to job-printer-state-message */
+		*message,		/* Pointer to job-printer-state-message */
+		*time_at;		/* time-at-xxx attribute name to use */
   int		rank,			/* Rank in queue */
 		jobid,			/* job-id */
 		size;			/* job-k-octets */
@@ -1332,7 +1288,8 @@ show_jobs(const char *dests,		/* I - Destinations */
 		  "job-printer-state-message",
 		  "job-printer-uri",
 		  "job-state-reasons",
-		  "time-at-creation"
+		  "time-at-creation",
+		  "time-at-completed"
 		};
 
 
@@ -1398,6 +1355,13 @@ show_jobs(const char *dests,		/* I - Destinations */
     * Loop through the job list and display them...
     */
 
+    if (!strcmp(which, "aborted") ||
+        !strcmp(which, "canceled") ||
+        !strcmp(which, "completed"))
+      time_at = "time-at-completed";
+    else
+      time_at = "time-at-creation";
+
     rank = -1;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
@@ -1433,8 +1397,7 @@ show_jobs(const char *dests,		/* I - Destinations */
         else if (!strcmp(attr->name, "job-k-octets") &&
 		 attr->value_tag == IPP_TAG_INTEGER)
 	  size = attr->values[0].integer;
-        else if (!strcmp(attr->name, "time-at-creation") &&
-		 attr->value_tag == IPP_TAG_INTEGER)
+        else if (!strcmp(attr->name, time_at) && attr->value_tag == IPP_TAG_INTEGER)
 	  jobtime = attr->values[0].integer;
         else if (!strcmp(attr->name, "job-printer-state-message") &&
 	         attr->value_tag == IPP_TAG_TEXT)
@@ -1503,11 +1466,9 @@ show_jobs(const char *dests,		/* I - Destinations */
 	    for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 	    {
 	      if (i)
-		snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			 reasons->values[i].string.text);
+		snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
 	      else
-		strlcpy(alerts, reasons->values[i].string.text,
-			sizeof(alerts));
+		strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 	      aptr += strlen(aptr);
 	    }
@@ -1787,7 +1748,7 @@ show_printers(const char  *printers,	/* I - Destinations */
 		jobid = jobattr->values[0].integer;
               else if (!strcmp(jobattr->name, "job-state") &&
 	               jobattr->value_tag == IPP_TAG_ENUM)
-		jobstate = jobattr->values[0].integer;
+		jobstate = (ipp_jstate_t)jobattr->values[0].integer;
 	    }
 
             if (jobstate != IPP_JOB_PROCESSING)
@@ -1851,11 +1812,9 @@ show_printers(const char  *printers,	/* I - Destinations */
 	    for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 	    {
 	      if (i)
-		snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			 reasons->values[i].string.text);
+		snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
 	      else
-		strlcpy(alerts, reasons->values[i].string.text,
-			sizeof(alerts));
+		strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 	      aptr += strlen(aptr);
 	    }
@@ -1977,11 +1936,9 @@ show_printers(const char  *printers,	/* I - Destinations */
 		for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 		{
 		  if (i)
-		    snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			     reasons->values[i].string.text);
+		    snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
 		  else
-		    strlcpy(alerts, reasons->values[i].string.text,
-			    sizeof(alerts));
+		    strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 		  aptr += strlen(aptr);
 		}
@@ -2082,5 +2039,5 @@ show_scheduler(void)
 
 
 /*
- * End of "$Id: lpstat.c 11890 2014-05-22 13:59:21Z msweet $".
+ * End of "$Id: lpstat.c 12066 2014-07-30 18:30:44Z msweet $".
  */

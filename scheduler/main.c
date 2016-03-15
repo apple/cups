@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 11721 2014-03-21 18:18:56Z msweet $"
+ * "$Id: main.c 11722 2014-03-21 18:28:30Z msweet $"
  *
  * Main loop for the CUPS scheduler.
  *
@@ -28,16 +28,17 @@
 #  include <libgen.h>
 #  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the launchd KeepAlive file */
-#  ifndef LAUNCH_JOBKEY_KEEPALIVE
-#    define LAUNCH_JOBKEY_KEEPALIVE "KeepAlive"
-#  endif /* !LAUNCH_JOBKEY_KEEPALIVE */
-#  ifndef LAUNCH_JOBKEY_PATHSTATE
-#    define LAUNCH_JOBKEY_PATHSTATE "PathState"
-#  endif /* !LAUNCH_JOBKEY_PATHSTATE */
-#  ifndef LAUNCH_JOBKEY_SERVICEIPC
-#    define LAUNCH_JOBKEY_SERVICEIPC "ServiceIPC"
-#  endif /* !LAUNCH_JOBKEY_SERVICEIPC */
+#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
+/* Update when we have a public header we can include */
+extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
+#  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 #endif /* HAVE_LAUNCH_H */
+
+#ifdef HAVE_SYSTEMD
+#  include <systemd/sd-daemon.h>
+#  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
+					/* Name of the systemd path file */
+#endif /* HAVE_SYSTEMD */
 
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
@@ -60,16 +61,16 @@
  * Local functions...
  */
 
-#ifdef HAVE_LAUNCHD
-static void		launchd_checkin(void);
-static void		launchd_checkout(void);
-#endif /* HAVE_LAUNCHD */
 static void		parent_handler(int sig);
 static void		process_children(void);
 static void		sigchld_handler(int sig);
 static void		sighup_handler(int sig);
 static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+static void		service_checkin(void);
+static void		service_checkout(void);
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 static void		usage(int status) __attribute__((noreturn));
 
 
@@ -123,10 +124,10 @@ main(int  argc,				/* I - Number of command-line args */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
-#if HAVE_LAUNCHD
-  int			launchd_idle_exit;
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  int			service_idle_exit;
 					/* Idle exit on select timeout? */
-#endif	/* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
 
 #ifdef HAVE_GETEUID
@@ -150,8 +151,8 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_LAUNCHD
   if (getenv("CUPSD_LAUNCHD"))
   {
-    Launchd = 1;
-    fg      = 1;
+    OnDemand = 1;
+    fg       = 1;
   }
 #endif /* HAVE_LAUNCHD */
 
@@ -228,15 +229,15 @@ main(int  argc,				/* I - Number of command-line args */
 	      usage(0);
 	      break;
 
-          case 'l' : /* Started by launchd... */
-#ifdef HAVE_LAUNCHD
-	      Launchd = 1;
-	      fg      = 1;
+          case 'l' : /* Started by launchd/systemd... */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+	      OnDemand = 1;
+	      fg       = 1;
 #else
-	      _cupsLangPuts(stderr, _("cupsd: launchd(8) support not compiled "
+	      _cupsLangPuts(stderr, _("cupsd: On-demand support not compiled "
 	                              "in, running in normal mode."));
               fg = 0;
-#endif /* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 	      break;
 
           case 'p' : /* Stop immediately for profiling */
@@ -247,9 +248,8 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'P' : /* Disable security profiles */
-              fputs("cupsd: -P (disable security profiles) is for internal "
-                    "testing use only!\n", stderr);
-	      UseProfiles = 0;
+              fputs("cupsd: -P (disable sandboxing) is for internal testing use only.\n", stderr);
+	      UseSandboxing = 0;
 	      break;
 
           case 's' : /* Set cups-files.conf location */
@@ -328,7 +328,7 @@ main(int  argc,				/* I - Number of command-line args */
       return (1);
     }
 
-    strlcpy(slash, "/cups-files.conf", len - (slash - filename));
+    strlcpy(slash, "/cups-files.conf", len - (size_t)(slash - filename));
     cupsdSetString(&CupsFilesFile, filename);
     free(filename);
   }
@@ -513,7 +513,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* RLIM_INFINITY */
     MaxFDs = limit.rlim_max;
 
-  limit.rlim_cur = MaxFDs;
+  limit.rlim_cur = (rlim_t)MaxFDs;
 
   setrlimit(RLIMIT_NOFILE, &limit);
 
@@ -541,17 +541,18 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdCleanFiles(CacheDir, "*.ipp");
 
-#if HAVE_LAUNCHD
-  if (Launchd)
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  if (OnDemand)
   {
    /*
-    * If we were started by launchd get the listen sockets file descriptors...
+    * If we were started on demand by launchd or systemd get the listen sockets
+    * file descriptors...
     */
 
-    launchd_checkin();
-    launchd_checkout();
+    service_checkin();
+    service_checkout();
   }
-#endif /* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
  /*
   * Startup the server...
@@ -638,18 +639,15 @@ main(int  argc,				/* I - Number of command-line args */
   * Send server-started event...
   */
 
-#ifdef HAVE_LAUNCHD
-  if (Launchd)
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
-                  "Scheduler started via launchd.");
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  if (OnDemand)
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started on demand.");
   else
-#endif /* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
   if (fg)
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
-                  "Scheduler started in foreground.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in foreground.");
   else
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
-                  "Scheduler started in background.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in background.");
 
  /*
   * Start any pending print jobs...
@@ -692,10 +690,10 @@ main(int  argc,				/* I - Number of command-line args */
 	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	     con;
 	     con = (cupsd_client_t *)cupsArrayNext(Clients))
-	  if (con->http.state == HTTP_WAITING)
+	  if (httpGetState(con->http) == HTTP_WAITING)
 	    cupsdCloseClient(con);
 	  else
-	    con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	    con->http->keep_alive = HTTP_KEEPALIVE_OFF;
 
         cupsdPauseListening();
       }
@@ -728,18 +726,18 @@ main(int  argc,				/* I - Number of command-line args */
           break;
 	}
 
-#if HAVE_LAUNCHD
-	if (Launchd)
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+	if (OnDemand)
 	{
 	 /*
-	  * If we were started by launchd, get the listen socket file
+	  * If we were started by launchd or systemd, get the listen socket file
 	  * descriptors...
 	  */
 
-	  launchd_checkin();
-	  launchd_checkout();
+	  service_checkin();
+	  service_checkout();
 	}
-#endif /* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
        /*
         * Startup the server...
@@ -770,23 +768,23 @@ main(int  argc,				/* I - Number of command-line args */
     if ((timeout = select_timeout(fds)) > 1 && LastEvent)
       timeout = 1;
 
-#if HAVE_LAUNCHD
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
    /*
     * If no other work is scheduled and we're being controlled by
     * launchd then timeout after 'LaunchdTimeout' seconds of
     * inactivity...
     */
 
-    if (timeout == 86400 && Launchd && LaunchdTimeout &&
+    if (timeout == 86400 && OnDemand && IdleExitTimeout &&
         !cupsArrayCount(ActiveJobs) &&
 	(!Browsing || !BrowseLocalProtocols || !cupsArrayCount(Printers)))
     {
-      timeout		= LaunchdTimeout;
-      launchd_idle_exit = 1;
+      timeout		= IdleExitTimeout;
+      service_idle_exit = 1;
     }
     else
-      launchd_idle_exit = 0;
-#endif	/* HAVE_LAUNCHD */
+      service_idle_exit = 0;
+#endif	/* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
     if ((fds = cupsdDoSelect(timeout)) < 0)
     {
@@ -814,7 +812,7 @@ main(int  argc,				/* I - Number of command-line args */
 	   i ++, con = (cupsd_client_t *)cupsArrayNext(Clients))
         cupsdLogMessage(CUPSD_LOG_EMERG,
 	                "Clients[%d] = %d, file = %d, state = %d",
-	                i, con->http.fd, con->file, con->http.state);
+	                i, con->number, con->file, httpGetState(con->http));
 
       for (i = 0, lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
            lis;
@@ -883,13 +881,13 @@ main(int  argc,				/* I - Number of command-line args */
     }
 #endif /* !__APPLE__ */
 
-#if HAVE_LAUNCHD
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
    /*
     * If no other work was scheduled and we're being controlled by launchd
     * then timeout after 'LaunchdTimeout' seconds of inactivity...
     */
 
-    if (!fds && launchd_idle_exit)
+    if (!fds && service_idle_exit)
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Printer sharing is off and there are no jobs pending, "
@@ -897,7 +895,7 @@ main(int  argc,				/* I - Number of command-line args */
       stop_scheduler = 1;
       break;
     }
-#endif /* HAVE_LAUNCHD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
    /*
     * Resume listening for new connections as needed...
@@ -951,7 +949,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Process pending data in the input buffer...
       */
 
-      if (con->http.used)
+      if (httpGetReady(con->http))
       {
         cupsdReadClient(con);
 	continue;
@@ -962,11 +960,9 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       activity = current_time - Timeout;
-      if (con->http.activity < activity && !con->pipe_pid)
+      if (httpGetActivity(con->http) < activity && !con->pipe_pid)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Closing client %d after %d seconds of inactivity...",
-	                con->http.fd, Timeout);
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Closing client %d after %d seconds of inactivity.", con->number, Timeout);
 
         cupsdCloseClient(con);
         continue;
@@ -1103,14 +1099,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdStopServer();
 
-#ifdef HAVE_LAUNCHD
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
  /*
-  * Update the launchd KeepAlive file as needed...
+  * Update the keep-alive file as needed...
   */
 
-  if (Launchd)
-    launchd_checkout();
-#endif /* HAVE_LAUNCHD */
+  if (OnDemand)
+    service_checkout();
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
  /*
   * Stop all jobs...
@@ -1298,197 +1294,6 @@ cupsdSetStringf(char       **s,		/* O - New string */
   if (olds)
     _cupsStrFree(olds);
 }
-
-
-#ifdef HAVE_LAUNCHD
-/*
- * 'launchd_checkin()' - Check-in with launchd and collect the listening fds.
- */
-
-static void
-launchd_checkin(void)
-{
-  size_t		i,		/* Looping var */
-			count;		/* Number of listeners */
-  launch_data_t		ld_msg,		/* Launch data message */
-			ld_resp,	/* Launch data response */
-			ld_array,	/* Launch data array */
-			ld_sockets,	/* Launch data sockets dictionary */
-			tmp;		/* Launch data */
-  cupsd_listener_t	*lis;		/* Listeners array */
-  http_addr_t		addr;		/* Address variable */
-  socklen_t		addrlen;	/* Length of address */
-  int			fd;		/* File descriptor */
-  char			s[256];		/* String addresss */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: pid=%d", (int)getpid());
-
- /*
-  * Check-in with launchd...
-  */
-
-  ld_msg = launch_data_new_string(LAUNCH_KEY_CHECKIN);
-  if ((ld_resp = launch_msg(ld_msg)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "launchd_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
-		    "\") IPC failure");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
-  if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
-  {
-    errno = launch_data_get_errno(ld_resp);
-    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Check-in failed: %s",
-                    strerror(errno));
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Get the sockets dictionary...
-  */
-
-  if ((ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS))
-          == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "launchd_checkin: No sockets found to answer requests on!");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Get the array of listener sockets...
-  */
-
-  if ((ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "launchd_checkin: No sockets found to answer requests on!");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Add listening fd(s) to the Listener array...
-  */
-
-  if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
-  {
-    count = launch_data_array_get_count(ld_array);
-
-    for (i = 0; i < count; i ++)
-    {
-     /*
-      * Get the launchd file descriptor and address...
-      */
-
-      if ((tmp = launch_data_array_get_index(ld_array, i)) != NULL)
-      {
-	fd      = launch_data_get_fd(tmp);
-	addrlen = sizeof(addr);
-
-	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "launchd_checkin: Unable to get local address - %s",
-			  strerror(errno));
-	  continue;
-	}
-
-       /*
-	* Try to match the launchd socket address to one of the listeners...
-	*/
-
-	for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	     lis;
-	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-	  if (httpAddrEqual(&lis->address, &addr))
-	    break;
-
-       /*
-	* Add a new listener If there's no match...
-	*/
-
-	if (lis)
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-		  "launchd_checkin: Matched existing listener %s with fd %d...",
-		  httpAddrString(&(lis->address), s, sizeof(s)), fd);
-	}
-	else
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-		  "launchd_checkin: Adding new listener %s with fd %d...",
-		  httpAddrString(&addr, s, sizeof(s)), fd);
-
-	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-			    "launchd_checkin: Unable to allocate listener - "
-			    "%s.", strerror(errno));
-	    exit(EXIT_FAILURE);
-	  }
-
-	  cupsArrayAdd(Listeners, lis);
-
-	  memcpy(&lis->address, &addr, sizeof(lis->address));
-	}
-
-	lis->fd = fd;
-
-#  ifdef HAVE_SSL
-	if (httpAddrPort(&(lis->address)) == 443)
-	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
-#  endif /* HAVE_SSL */
-      }
-    }
-  }
-
-  launch_data_free(ld_msg);
-  launch_data_free(ld_resp);
-}
-
-
-/*
- * 'launchd_checkout()' - Update the launchd KeepAlive file as needed.
- */
-
-static void
-launchd_checkout(void)
-{
-  int	fd;				/* File descriptor */
-
-
- /*
-  * Create or remove the launchd KeepAlive file based on whether
-  * there are active jobs, polling, browsing for remote printers or
-  * shared printers to advertise...
-  */
-
-  if (cupsArrayCount(ActiveJobs) ||
-      (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "Creating launchd keepalive file \"" CUPS_KEEPALIVE
-                    "\"...");
-
-    if ((fd = open(CUPS_KEEPALIVE, O_RDONLY | O_CREAT | O_EXCL, S_IRUSR)) >= 0)
-      close(fd);
-  }
-  else
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "Removing launchd keepalive file \"" CUPS_KEEPALIVE
-                    "\"...");
-
-    unlink(CUPS_KEEPALIVE);
-  }
-}
-#endif /* HAVE_LAUNCHD */
 
 
 /*
@@ -1768,7 +1573,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
        con = (cupsd_client_t *)cupsArrayNext(Clients))
-    if (con->http.used > 0)
+    if (httpGetReady(con->http))
       return (0);
 
  /*
@@ -1822,9 +1627,9 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
        con = (cupsd_client_t *)cupsArrayNext(Clients))
-    if ((con->http.activity + Timeout) < timeout)
+    if ((httpGetActivity(con->http) + Timeout) < timeout)
     {
-      timeout = con->http.activity + Timeout;
+      timeout = httpGetActivity(con->http) + Timeout;
       why     = "timeout a client connection";
     }
 
@@ -1988,6 +1793,357 @@ sigterm_handler(int sig)		/* I - Signal number */
 }
 
 
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+/*
+ * 'service_checkin()' - Check-in with launchd and collect the listening fds.
+ */
+
+static void
+service_checkin(void)
+{
+#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
+  int			error;		/* Check-in error, if any */
+  size_t		i,		/* Looping var */
+			count;		/* Number of listeners */
+  int			*ld_sockets;	/* Listener sockets */
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  char			s[256];		/* String addresss */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
+
+ /*
+  * Check-in with launchd...
+  */
+
+  if ((error = launch_activate_socket("Listeners", &ld_sockets, &count)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get listener sockets: %s", strerror(error));
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Try to match the launchd sockets to the cupsd listeners...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", (int)count);
+
+  for (i = 0; i < count; i ++)
+  {
+   /*
+    * Get the launchd socket address...
+    */
+
+    addrlen = sizeof(addr);
+
+    if (getsockname(ld_sockets[i], (struct sockaddr *)&addr, &addrlen))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
+      continue;
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, ld_sockets[i], httpAddrString(&addr, s, sizeof(s)));
+
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	 lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+      if (httpAddrEqual(&lis->address, &addr))
+	break;
+
+   /*
+    * Add a new listener if there's no match...
+    */
+
+    if (lis)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
+
+      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s", strerror(errno));
+	exit(EXIT_FAILURE);
+      }
+
+      cupsArrayAdd(Listeners, lis);
+
+      memcpy(&lis->address, &addr, sizeof(lis->address));
+    }
+
+    lis->fd        = ld_sockets[i];
+    lis->on_demand = 1;
+
+#    ifdef HAVE_SSL
+    if (httpAddrPort(&(lis->address)) == 443)
+      lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#    endif /* HAVE_SSL */
+  }
+
+#  elif defined(HAVE_LAUNCHD)
+  size_t		i,		/* Looping var */
+			count;		/* Number of listeners */
+  launch_data_t		ld_msg,		/* Launch data message */
+			ld_resp,	/* Launch data response */
+			ld_array,	/* Launch data array */
+			ld_sockets,	/* Launch data sockets dictionary */
+			tmp;		/* Launch data */
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  int			fd;		/* File descriptor */
+  char			s[256];		/* String addresss */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
+
+ /*
+  * Check-in with launchd...
+  */
+
+  ld_msg = launch_data_new_string(LAUNCH_KEY_CHECKIN);
+  if ((ld_resp = launch_msg(ld_msg)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "service_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
+		    "\") IPC failure");
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+  if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
+  {
+    errno = launch_data_get_errno(ld_resp);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Check-in failed: %s",
+                    strerror(errno));
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Get the sockets dictionary...
+  */
+
+  if ((ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS))
+          == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "service_checkin: No sockets found to answer requests on.");
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Get the array of listener sockets...
+  */
+
+  if ((ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "service_checkin: No sockets found to answer requests on.");
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Add listening fd(s) to the Listener array...
+  */
+
+  if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
+  {
+    count = launch_data_array_get_count(ld_array);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", (int)count);
+
+    for (i = 0; i < count; i ++)
+    {
+     /*
+      * Get the launchd file descriptor and address...
+      */
+
+      if ((tmp = launch_data_array_get_index(ld_array, i)) != NULL)
+      {
+	fd      = launch_data_get_fd(tmp);
+	addrlen = sizeof(addr);
+
+	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
+	  continue;
+	}
+
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, fd, httpAddrString(&addr, s, sizeof(s)));
+
+       /*
+	* Try to match the launchd socket address to one of the listeners...
+	*/
+
+	for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	     lis;
+	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+	  if (httpAddrEqual(&lis->address, &addr))
+	    break;
+
+       /*
+	* Add a new listener If there's no match...
+	*/
+
+	if (lis)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+	}
+	else
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
+
+	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s.", strerror(errno));
+	    exit(EXIT_FAILURE);
+	  }
+
+	  cupsArrayAdd(Listeners, lis);
+
+	  memcpy(&lis->address, &addr, sizeof(lis->address));
+	}
+
+	lis->fd        = fd;
+        lis->on_demand = 1;
+
+#    ifdef HAVE_SSL
+	if (httpAddrPort(&(lis->address)) == 443)
+	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#    endif /* HAVE_SSL */
+      }
+    }
+  }
+
+  launch_data_free(ld_msg);
+  launch_data_free(ld_resp);
+
+#  else /* HAVE_SYSTEMD */
+  int			i,		/* Looping var */
+			count;		/* Number of listeners */
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  char			s[256];		/* String addresss */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
+
+ /*
+  * Check-in with systemd...
+  */
+
+  if ((count = sd_listen_fds(0)) < 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get listener sockets: %s", strerror(-count));
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Try to match the systemd sockets to the cupsd listeners...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", count);
+
+  for (i = 0; i < count; i ++)
+  {
+   /*
+    * Get the launchd socket address...
+    */
+
+    addrlen = sizeof(addr);
+
+    if (getsockname(SD_LISTEN_FDS_START + i, (struct sockaddr *)&addr, &addrlen))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
+      continue;
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, SD_LISTEN_FDS_START + i, httpAddrString(&addr, s, sizeof(s)));
+
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	 lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+      if (httpAddrEqual(&lis->address, &addr))
+	break;
+
+   /*
+    * Add a new listener if there's no match...
+    */
+
+    if (lis)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
+
+      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s", strerror(errno));
+	exit(EXIT_FAILURE);
+      }
+
+      cupsArrayAdd(Listeners, lis);
+
+      memcpy(&lis->address, &addr, sizeof(lis->address));
+    }
+
+    lis->fd        = SD_LISTEN_FDS_START + i;
+    lis->on_demand = 1;
+
+#    ifdef HAVE_SSL
+    if (httpAddrPort(&(lis->address)) == 443)
+      lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#    endif /* HAVE_SSL */
+  }
+#  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
+}
+
+
+/*
+ * 'service_checkout()' - Update the CUPS_KEEPALIVE file as needed.
+ */
+
+static void
+service_checkout(void)
+{
+  int	fd;				/* File descriptor */
+
+
+ /*
+  * Create or remove the systemd path file based on whether there are active
+  * jobs or shared printers to advertise...
+  */
+
+  if (cupsArrayCount(ActiveJobs) ||
+      (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating keep-alive file \"" CUPS_KEEPALIVE "\".");
+
+    if ((fd = open(CUPS_KEEPALIVE, O_RDONLY | O_CREAT | O_EXCL, S_IRUSR)) >= 0)
+      close(fd);
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Removing keep-alive file \"" CUPS_KEEPALIVE "\".");
+
+    unlink(CUPS_KEEPALIVE);
+  }
+}
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+
+
 /*
  * 'usage()' - Show scheduler usage.
  */
@@ -2005,7 +2161,7 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(fp, _("  -F                      Run in the foreground but "
                       "detach from console."));
   _cupsLangPuts(fp, _("  -h                      Show this usage message."));
-  _cupsLangPuts(fp, _("  -l                      Run cupsd from launchd(8)."));
+  _cupsLangPuts(fp, _("  -l                      Run cupsd on demand."));
   _cupsLangPuts(fp, _("  -t                      Test the configuration "
                       "file."));
 
@@ -2014,5 +2170,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 11721 2014-03-21 18:18:56Z msweet $".
+ * End of "$Id: main.c 11722 2014-03-21 18:28:30Z msweet $".
  */

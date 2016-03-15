@@ -1,22 +1,22 @@
 /*
- * "$Id: colorman.c 11150 2013-07-17 13:03:56Z msweet $"
+ * "$Id: colorman.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Color management routines for the CUPS scheduler.
+ * Color management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   Original DBUS/colord code is Copyright 2011 Red Hat, Inc.
+ * Original DBUS/colord code is Copyright 2011 Red Hat, Inc.
  *
- *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
- *   are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
  *
  *   Redistributions of source code must retain the above copyright
  *   notice, this list of conditions and the following disclaimer.
@@ -25,40 +25,18 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the distribution.
  *
- *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *   COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- *   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- *   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- *   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- *   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- *   OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Contents:
- *
- *   cupsdRegisterColor()	   - Register vendor color profiles in a PPD
- *				     file.
- *   cupsdStartColor()		   - Initialize color management.
- *   cupsdStopColor()		   - Shutdown color management.
- *   cupsdUnregisterColor()	   - Unregister vendor color profiles in a PPD
- *				     file.
- *   apple_init_profile()	   - Initialize a color profile.
- *   apple_register_profiles()	   - Register color profiles for a printer.
- *   apple_unregister_profiles()   - Remove color profiles for the specified
- *				     printer.
- *   colord_create_device()	   - Create a device and register profiles.
- *   colord_create_profile()	   - Create a color profile for a printer.
- *   colord_delete_device()	   - Delete a device
- *   colord_device_add_profile()   - Assign a profile to a device.
- *   colord_dict_add_strings()	   - Add two strings to a dictionary.
- *   colord_find_device()	   - Finds a device
- *   colord_get_qualifier_format() - Get the qualifier format.
- *   colord_register_printer()	   - Register profiles for a printer.
- *   colord_unregister_printer()   - Unregister profiles for a printer.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
@@ -327,9 +305,7 @@ apple_init_profile(
 
  if (iccfile && *iccfile)
  {
-    url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
-						  (const UInt8 *)iccfile,
-                                                  strlen(iccfile), false);
+    url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)iccfile, (CFIndex)strlen(iccfile), false);
 
     if (url)
     {
@@ -1538,5 +1514,5 @@ colord_unregister_printer(
 
 
 /*
- * End of "$Id: colorman.c 11150 2013-07-17 13:03:56Z msweet $".
+ * End of "$Id: colorman.c 11558 2014-02-06 18:33:34Z msweet $".
  */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.8-cancel.sh 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: 5.8-cancel.sh 11398 2013-11-06 20:11:11Z msweet $"
 #
 #   Test the cancel command.
 #
@@ -53,5 +53,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.8-cancel.sh 11396 2013-11-06 20:09:03Z msweet $".
+# End of "$Id: 5.8-cancel.sh 11398 2013-11-06 20:11:11Z msweet $".
 #

@@ -1,23 +1,16 @@
 /*
- * "$Id: printers.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: printers.c 11928 2014-06-13 00:08:32Z msweet $"
  *
- *   Printer status CGI for CUPS.
+ * Printer status CGI for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()              - Main entry for CGI.
- *   do_printer_op()     - Do a printer operation.
- *   show_all_printers() - Show all printers...
- *   show_printer()      - Show a single printer.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -43,8 +36,7 @@ static void	show_printer(http_t *http, const char *printer);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
-     char *argv[])			/* I - Command-line arguments */
+main(void)
 {
   const char	*printer;		/* Printer name */
   const char	*user;			/* Username */
@@ -172,8 +164,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       do_printer_op(http, printer, CUPS_ACCEPT_JOBS, cgiText(_("Accept Jobs")));
     else if (!strcmp(op, "reject-jobs"))
       do_printer_op(http, printer, CUPS_REJECT_JOBS, cgiText(_("Reject Jobs")));
-    else if (!strcmp(op, "purge-jobs"))
-      do_printer_op(http, printer, IPP_PURGE_JOBS, cgiText(_("Purge Jobs")));
+    else if (!strcmp(op, "cancel-jobs"))
+      do_printer_op(http, printer, IPP_OP_CANCEL_JOBS, cgiText(_("Cancel Jobs")));
     else if (!_cups_strcasecmp(op, "print-self-test-page"))
       cgiPrintCommand(http, printer, "PrintSelfTestPage",
                       cgiText(_("Print Self-Test Page")));
@@ -293,8 +285,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
       cgiCopyTemplateLang("printer-accept.tmpl");
     else if (op == CUPS_REJECT_JOBS)
       cgiCopyTemplateLang("printer-reject.tmpl");
-    else if (op == IPP_PURGE_JOBS)
-      cgiCopyTemplateLang("printer-purge.tmpl");
+    else if (op == IPP_OP_CANCEL_JOBS)
+      cgiCopyTemplateLang("printer-cancel-jobs.tmpl");
   }
 
   cgiEndHTML();
@@ -574,5 +566,5 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: printers.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: printers.c 11928 2014-06-13 00:08:32Z msweet $".
  */

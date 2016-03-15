@@ -38,7 +38,19 @@ P.example {
   font-style: italic;
   margin-left: 36pt;
 }
-  
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
 PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
@@ -77,7 +89,7 @@ A:link:hover IMG {
 }
 
 A:link, A:visited {
-  font-weight: normal;
+  font-weight: inherit;
   text-decoration: none;
 }
 
@@ -408,7 +420,10 @@ current thread.">cupsLastErrorString</a></li>
 specified listening socket.">httpAcceptConnection</a></li>
 	<li><a href="#httpAddCredential" title="Allocates and adds a single credential to an array.">httpAddCredential</a></li>
 	<li><a href="#httpAddrAny" title="Check for the &quot;any&quot; address.">httpAddrAny</a></li>
+	<li><a href="#httpAddrClose" title="Close a socket created by httpAddrConnect or
+httpAddrListen.">httpAddrClose</a></li>
 	<li><a href="#httpAddrEqual" title="Compare two addresses.">httpAddrEqual</a></li>
+	<li><a href="#httpAddrFamily" title="Get the address family of an address.">httpAddrFamily</a></li>
 	<li><a href="#httpAddrLength" title="Return the length of the address in bytes.">httpAddrLength</a></li>
 	<li><a href="#httpAddrListen" title="Create a listening socket bound to the specified
 address and port.">httpAddrListen</a></li>
@@ -426,11 +441,10 @@ components with a formatted resource.">httpAssembleURIf</a></li>
 	<li><a href="#httpClearCookie" title="Clear the cookie value(s).">httpClearCookie</a></li>
 	<li><a href="#httpClearFields" title="Clear HTTP request fields.">httpClearFields</a></li>
 	<li><a href="#httpClose" title="Close an HTTP connection.">httpClose</a></li>
+	<li><a href="#httpCompareCredentials" title="Compare two sets of X.509 credentials.">httpCompareCredentials</a></li>
 	<li><a href="#httpConnect" title="Connect to a HTTP server.">httpConnect</a></li>
 	<li><a href="#httpConnect2" title="Connect to a HTTP server.">httpConnect2</a></li>
 	<li><a href="#httpConnectEncrypt" title="Connect to a HTTP server using encryption.">httpConnectEncrypt</a></li>
-	<li><a href="#httpCopyCredentials" title="Copy the credentials associated with an encrypted
-connection.">httpCopyCredentials</a></li>
 	<li><a href="#httpDecode64" title="Base64-decode a string.">httpDecode64</a></li>
 	<li><a href="#httpDecode64_2" title="Base64-decode a string.">httpDecode64_2</a></li>
 	<li><a href="#httpDelete" title="Send a DELETE request to the server.">httpDelete</a></li>
@@ -438,10 +452,14 @@ connection.">httpCopyCredentials</a></li>
 	<li><a href="#httpEncode64_2" title="Base64-encode a string.">httpEncode64_2</a></li>
 	<li><a href="#httpEncryption" title="Set the required encryption on the link.">httpEncryption</a></li>
 	<li><a href="#httpError" title="Get the last error on a connection.">httpError</a></li>
+	<li><a href="#httpFieldValue" title="Return the HTTP field enumeration value for a field
+name.">httpFieldValue</a></li>
 	<li><a href="#httpFlush" title="Flush data from a HTTP connection.">httpFlush</a></li>
 	<li><a href="#httpFlushWrite" title="Flush data in write buffer.">httpFlushWrite</a></li>
 	<li><a href="#httpFreeCredentials" title="Free an array of credentials.">httpFreeCredentials</a></li>
 	<li><a href="#httpGet" title="Send a GET request to the server.">httpGet</a></li>
+	<li><a href="#httpGetActivity" title="Get the most recent activity for a connection.">httpGetActivity</a></li>
+	<li><a href="#httpGetAddress" title="Get the address of the connected peer of a connection.">httpGetAddress</a></li>
 	<li><a href="#httpGetAuthString" title="Get the current authorization string.">httpGetAuthString</a></li>
 	<li><a href="#httpGetBlocking" title="Get the blocking/non-block state of a connection.">httpGetBlocking</a></li>
 	<li><a href="#httpGetContentEncoding" title="Get a common content encoding, if any, between
@@ -450,16 +468,22 @@ the client and server.">httpGetContentEncoding</a></li>
 	<li><a href="#httpGetDateString" title="Get a formatted date/time string from a time value.">httpGetDateString</a></li>
 	<li><a href="#httpGetDateString2" title="Get a formatted date/time string from a time value.">httpGetDateString2</a></li>
 	<li><a href="#httpGetDateTime" title="Get a time value from a formatted date/time string.">httpGetDateTime</a></li>
+	<li><a href="#httpGetEncryption" title="Get the current encryption mode of a connection.">httpGetEncryption</a></li>
 	<li><a href="#httpGetExpect" title="Get the value of the Expect header, if any.">httpGetExpect</a></li>
 	<li><a href="#httpGetFd" title="Get the file descriptor associated with a connection.">httpGetFd</a></li>
 	<li><a href="#httpGetField" title="Get a field value from a request/response.">httpGetField</a></li>
 	<li><a href="#httpGetHostByName" title="Lookup a hostname or IPv4 address, and return
 address records for the specified name.">httpGetHostByName</a></li>
 	<li><a href="#httpGetHostname" title="Get the FQDN for the connection or local system.">httpGetHostname</a></li>
+	<li><a href="#httpGetKeepAlive" title="Get the current Keep-Alive state of the connection.">httpGetKeepAlive</a></li>
 	<li><a href="#httpGetLength" title="Get the amount of data remaining from the
 content-length or transfer-encoding fields.">httpGetLength</a></li>
 	<li><a href="#httpGetLength2" title="Get the amount of data remaining from the
 content-length or transfer-encoding fields.">httpGetLength2</a></li>
+	<li><a href="#httpGetPending" title="Get the number of bytes that are buffered for writing.">httpGetPending</a></li>
+	<li><a href="#httpGetReady" title="Get the number of bytes that can be read without blocking.">httpGetReady</a></li>
+	<li><a href="#httpGetRemaining" title="Get the number of remaining bytes in the message
+body or current chunk.">httpGetRemaining</a></li>
 	<li><a href="#httpGetState" title="Get the current state of the HTTP request.">httpGetState</a></li>
 	<li><a href="#httpGetStatus" title="Get the status of the last HTTP request.">httpGetStatus</a></li>
 	<li><a href="#httpGetSubField" title="Get a sub-field value.">httpGetSubField</a></li>
@@ -469,6 +493,8 @@ content-length or transfer-encoding fields.">httpGetLength2</a></li>
 	<li><a href="#httpHead" title="Send a HEAD request to the server.">httpHead</a></li>
 	<li><a href="#httpInitialize" title="Initialize the HTTP interface library and set the
 default HTTP proxy (if any).">httpInitialize</a></li>
+	<li><a href="#httpIsChunked" title="Report whether a message body is chunked.">httpIsChunked</a></li>
+	<li><a href="#httpIsEncrypted" title="Report whether a connection is encrypted.">httpIsEncrypted</a></li>
 	<li><a href="#httpMD5" title="Compute the MD5 sum of the username:group:password.">httpMD5</a></li>
 	<li><a href="#httpMD5Final" title="Combine the MD5 sum of the username, group, and password
 with the server-supplied nonce value, method, and
@@ -484,6 +510,8 @@ request-uri.">httpMD5Final</a></li>
 	<li><a href="#httpReconnect" title="Reconnect to a HTTP server.">httpReconnect</a></li>
 	<li><a href="#httpReconnect2" title="Reconnect to a HTTP server with timeout and optional
 cancel.">httpReconnect2</a></li>
+	<li><a href="#httpResolveHostname" title="Resolve the hostname of the HTTP connection
+address.">httpResolveHostname</a></li>
 	<li><a href="#httpSeparate" title="Separate a Universal Resource Identifier into its
 components.">httpSeparate</a></li>
 	<li><a href="#httpSeparate2" title="Separate a Universal Resource Identifier into its
@@ -497,10 +525,14 @@ connection.">httpSetCredentials</a></li>
 	<li><a href="#httpSetDefaultField" title="Set the default value of an HTTP header.">httpSetDefaultField</a></li>
 	<li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
 	<li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
+	<li><a href="#httpSetKeepAlive" title="Set the current Keep-Alive state of a connection.">httpSetKeepAlive</a></li>
 	<li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
 	<li><a href="#httpSetTimeout" title="Set read/write timeouts and an optional callback.">httpSetTimeout</a></li>
+	<li><a href="#httpShutdown" title="Shutdown one side of an HTTP connection.">httpShutdown</a></li>
+	<li><a href="#httpStateString" title="Return the string describing a HTTP state value.">httpStateString</a></li>
 	<li><a href="#httpStatus" title="Return a short string describing a HTTP status code.">httpStatus</a></li>
 	<li><a href="#httpTrace" title="Send an TRACE request to the server.">httpTrace</a></li>
+	<li><a href="#httpURIStatusString" title="Return a string describing a URI status code.">httpURIStatusString</a></li>
 	<li><a href="#httpUpdate" title="Update the current HTTP state for incoming data.">httpUpdate</a></li>
 	<li><a href="#httpWait" title="Wait for data available on a connection.">httpWait</a></li>
 	<li><a href="#httpWrite" title="Write data to a HTTP connection.">httpWrite</a></li>
@@ -592,6 +624,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippSetStringfv" title="Set a formatted string value of an attribute.">ippSetStringfv</a></li>
 	<li><a href="#ippSetValueTag" title="Set the value tag of an attribute.">ippSetValueTag</a></li>
 	<li><a href="#ippSetVersion" title="Set the version number in an IPP message.">ippSetVersion</a></li>
+	<li><a href="#ippStateString" title="Return the name corresponding to a state value.">ippStateString</a></li>
 	<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
 	<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
 	<li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
@@ -621,6 +654,7 @@ with a hostname. ">http_addrlist_t</a></li>
 are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_t" title="HTTP connection type">http_t</a></li>
 	<li><a href="#http_timeout_cb_t" title="HTTP timeout callback ">http_timeout_cb_t</a></li>
+	<li><a href="#http_trust_t" title="Level of trust for credentials ">http_trust_t</a></li>
 	<li><a href="#http_uri_coding_t" title="URI en/decode flags">http_uri_coding_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
@@ -658,6 +692,7 @@ with a hostname. ">http_addrlist_s</a></li>
 	<li><a href="#http_state_e" title="HTTP state values; states
 are server-oriented...">http_state_e</a></li>
 	<li><a href="#http_status_e" title="HTTP status codes">http_status_e</a></li>
+	<li><a href="#http_trust_e" title="Level of trust for credentials ">http_trust_e</a></li>
 	<li><a href="#http_uri_coding_e" title="URI en/decode flags">http_uri_coding_e</a></li>
 	<li><a href="#http_uri_status_e" title="URI separation status ">http_uri_status_e</a></li>
 	<li><a href="#http_version_e" title="HTTP version numbers">http_version_e</a></li>
@@ -1455,6 +1490,29 @@ int httpAddrAny (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if &quot;any&quot;, 0 otherwise</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpAddrClose">httpAddrClose</a></h3>
+<p class="description">Close a socket created by <a href="#httpAddrConnect"><code>httpAddrConnect</code></a> or
+<a href="#httpAddrListen"><code>httpAddrListen</code></a>.</p>
+<p class="code">
+int httpAddrClose (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_addr_t">http_addr_t</a> *addr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>addr</dt>
+<dd class="description">Listen address or <code>NULL</code></dd>
+<dt>fd</dt>
+<dd class="description">Socket file descriptor</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Pass <code>NULL</code> for sockets created with <a href="#httpAddrConnect"><code>httpAddrConnect</code></a> and the
+listen address for sockets created with <a href="#httpAddrListen"><code>httpAddrListen</code></a>. This will
+ensure that domain sockets are removed when closed.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrEqual">httpAddrEqual</a></h3>
 <p class="description">Compare two addresses.</p>
 <p class="code">
@@ -1471,6 +1529,19 @@ int httpAddrEqual (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if equal, 0 if not</p>
+<h3 class="function"><a name="httpAddrFamily">httpAddrFamily</a></h3>
+<p class="description">Get the address family of an address.</p>
+<p class="code">
+int httpAddrFamily (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_addr_t">http_addr_t</a> *addr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>addr</dt>
+<dd class="description">Address</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Address family</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrLength">httpAddrLength</a></h3>
 <p class="description">Return the length of the address in bytes.</p>
 <p class="code">
@@ -1699,7 +1770,7 @@ void httpBlocking (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>b</dt>
 <dd class="description">1 = blocking, 0 = non-blocking</dd>
 </dl>
@@ -1712,7 +1783,7 @@ int httpCheck (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 = no data, 1 = data available</p>
@@ -1725,7 +1796,7 @@ void httpClearCookie (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h3 class="function"><a name="httpClearFields">httpClearFields</a></h3>
 <p class="description">Clear HTTP request fields.</p>
@@ -1736,7 +1807,7 @@ void httpClearFields (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h3 class="function"><a name="httpClose">httpClose</a></h3>
 <p class="description">Close an HTTP connection.</p>
@@ -1747,8 +1818,24 @@ void httpClose (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpCompareCredentials">httpCompareCredentials</a></h3>
+<p class="description">Compare two sets of X.509 credentials.</p>
+<p class="code">
+int httpCompareCredentials (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *cred1,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *cred2<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cred1</dt>
+<dd class="description">First set of X.509 credentials</dd>
+<dt>cred2</dt>
+<dd class="description">Second set of X.509 credentials</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if they match, 0 if they do not</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpConnect">httpConnect</a></h3>
 <p class="description">Connect to a HTTP server.</p>
 <p class="code">
@@ -1827,23 +1914,6 @@ void httpClose (<br>
 instead.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
-<p class="description">Copy the credentials associated with an encrypted
-connection.</p>
-<p class="code">
-int httpCopyCredentials (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t **credentials<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server</dd>
-<dt>credentials</dt>
-<dd class="description">Array of credentials</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Status of call (0 = success)</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpDecode64">httpDecode64</a></h3>
 <p class="description">Base64-decode a string.</p>
 <p class="code">
@@ -1894,7 +1964,7 @@ int httpDelete (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI to delete</dd>
 </dl>
@@ -1953,7 +2023,7 @@ int httpEncryption (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>e</dt>
 <dd class="description">New encryption preference</dd>
 </dl>
@@ -1968,10 +2038,24 @@ int httpError (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Error code (errno) value</p>
+<h3 class="function"><a name="httpFieldValue">httpFieldValue</a></h3>
+<p class="description">Return the HTTP field enumeration value for a field
+name.</p>
+<p class="code">
+<a href="#http_field_t">http_field_t</a> httpFieldValue (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">String name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Field index</p>
 <h3 class="function"><a name="httpFlush">httpFlush</a></h3>
 <p class="description">Flush data from a HTTP connection.</p>
 <p class="code">
@@ -1981,7 +2065,7 @@ void httpFlush (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpFlushWrite">httpFlushWrite</a></h3>
 <p class="description">Flush data in write buffer.</p>
@@ -1992,7 +2076,7 @@ int httpFlushWrite (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Bytes written or -1 on error</p>
@@ -2017,12 +2101,46 @@ int httpGet (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI to get</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetActivity">httpGetActivity</a></h3>
+<p class="description">Get the most recent activity for a connection.</p>
+<p class="code">
+time_t httpGetActivity (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Time of last read or write</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The return value is the UNIX time of the last read or write.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetAddress">httpGetAddress</a></h3>
+<p class="description">Get the address of the connected peer of a connection.</p>
+<p class="code">
+<a href="#http_addr_t">http_addr_t</a> *httpGetAddress (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Connected address or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns <code>NULL</code> if the socket is currently unconnected.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="httpGetAuthString">httpGetAuthString</a></h3>
 <p class="description">Get the current authorization string.</p>
 <p class="code">
@@ -2032,7 +2150,7 @@ char *httpGetAuthString (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Authorization string</p>
@@ -2052,7 +2170,7 @@ int httpGetBlocking (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if blocking, 0 if non-blocking</p>
@@ -2066,7 +2184,7 @@ const char *httpGetContentEncoding (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to client/server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Content-Coding value or
@@ -2137,6 +2255,25 @@ time_t httpGetDateTime (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">UNIX time</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetEncryption">httpGetEncryption</a></h3>
+<p class="description">Get the current encryption mode of a connection.</p>
+<p class="code">
+<a href="#http_encryption_t">http_encryption_t</a> httpGetEncryption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Current encryption mode</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns the encryption mode for the connection. Use the
+<a href="#httpIsEncrypted"><code>httpIsEncrypted</code></a> function to determine whether a TLS session has
+been established.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="httpGetExpect">httpGetExpect</a></h3>
 <p class="description">Get the value of the Expect header, if any.</p>
 <p class="code">
@@ -2146,7 +2283,7 @@ http_status_t httpGetExpect (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to client</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Expect: status, if any</p>
@@ -2164,7 +2301,7 @@ int httpGetFd (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">File descriptor or -1 if none</p>
@@ -2178,7 +2315,7 @@ const char *httpGetField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>field</dt>
 <dd class="description">Field to get</dd>
 </dl>
@@ -2219,11 +2356,25 @@ const char *httpGetHostname (<br>
 <p class="description">FQDN for connection or system</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">When &quot;http&quot; points to a connected socket, return the hostname or
-address that was used in the call to httpConnect() or httpConnectEncrypt().
+address that was used in the call to httpConnect() or httpConnectEncrypt(),
+or the address of the client for the connection from httpAcceptConnection().
 Otherwise, return the FQDN for the local system using both gethostname()
 and gethostbyname() to get the local hostname with domain.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetKeepAlive">httpGetKeepAlive</a></h3>
+<p class="description">Get the current Keep-Alive state of the connection.</p>
+<p class="code">
+<a href="#http_keepalive_t">http_keepalive_t</a> httpGetKeepAlive (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Keep-Alive state</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpGetLength">httpGetLength</a></h3>
 <p class="description">Get the amount of data remaining from the
 content-length or transfer-encoding fields.</p>
@@ -2234,7 +2385,7 @@ int httpGetLength (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Content length</p>
@@ -2253,13 +2404,58 @@ off_t httpGetLength2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Content length</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function returns the complete content length, even for
 content larger than 2^31 - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetPending">httpGetPending</a></h3>
+<p class="description">Get the number of bytes that are buffered for writing.</p>
+<p class="code">
+size_t httpGetPending (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes buffered</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetReady">httpGetReady</a></h3>
+<p class="description">Get the number of bytes that can be read without blocking.</p>
+<p class="code">
+size_t httpGetReady (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes available</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetRemaining">httpGetRemaining</a></h3>
+<p class="description">Get the number of remaining bytes in the message
+body or current chunk.</p>
+<p class="code">
+size_t httpGetRemaining (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Remaining bytes</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <a href="#httpIsChunked"><code>httpIsChunked</code></a> function can be used to determine whether the
+message body is chunked or fixed-length.
 
 </p>
 <h3 class="function"><a name="httpGetState">httpGetState</a></h3>
@@ -2271,7 +2467,7 @@ content larger than 2^31 - 1.
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP state</p>
@@ -2284,7 +2480,7 @@ http_status_t httpGetStatus (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
@@ -2300,7 +2496,7 @@ char *httpGetSubField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>name</dt>
@@ -2323,7 +2519,7 @@ char *httpGetSubField2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>name</dt>
@@ -2344,7 +2540,7 @@ char *httpGetSubField2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Version number</p>
@@ -2363,7 +2559,7 @@ char *httpGets (<br>
 <dt>length</dt>
 <dd class="description">Max length of buffer</dd>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Line or NULL</p>
@@ -2377,7 +2573,7 @@ int httpHead (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI for head</dd>
 </dl>
@@ -2388,6 +2584,41 @@ int httpHead (<br>
 default HTTP proxy (if any).</p>
 <p class="code">
 void httpInitialize (void);</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpIsChunked">httpIsChunked</a></h3>
+<p class="description">Report whether a message body is chunked.</p>
+<p class="code">
+int httpIsChunked (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if chunked, 0 if not</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns non-zero if the message body is composed of
+variable-length chunks.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpIsEncrypted">httpIsEncrypted</a></h3>
+<p class="description">Report whether a connection is encrypted.</p>
+<p class="code">
+int httpIsEncrypted (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if encrypted, 0 if not</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns non-zero if the connection is currently encrypted.
+
+</p>
 <h3 class="function"><a name="httpMD5">httpMD5</a></h3>
 <p class="description">Compute the MD5 sum of the username:group:password.</p>
 <p class="code">
@@ -2460,7 +2691,7 @@ int httpOptions (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI for options</dd>
 </dl>
@@ -2477,7 +2708,7 @@ ssize_t httpPeek (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -2503,7 +2734,7 @@ int httpPost (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI for post</dd>
 </dl>
@@ -2519,7 +2750,7 @@ int httpPut (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI to put</dd>
 </dl>
@@ -2536,7 +2767,7 @@ int httpRead (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -2560,7 +2791,7 @@ ssize_t httpRead2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -2596,7 +2827,7 @@ int httpReconnect (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, non-zero on failure</p>
@@ -2617,7 +2848,7 @@ int httpReconnect2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>msec</dt>
 <dd class="description">Timeout in milliseconds</dd>
 <dt>cancel</dt>
@@ -2625,6 +2856,26 @@ int httpReconnect2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, non-zero on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpResolveHostname">httpResolveHostname</a></h3>
+<p class="description">Resolve the hostname of the HTTP connection
+address.</p>
+<p class="code">
+const char *httpResolveHostname (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+<dt>buffer</dt>
+<dd class="description">Hostname buffer</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Resolved hostname or <code>NULL</code></p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpSeparate">httpSeparate</a></h3>
 <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
@@ -2755,7 +3006,7 @@ void httpSetAuthString (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>scheme</dt>
 <dd class="description">Auth scheme (NULL to clear it)</dd>
 <dt>data</dt>
@@ -2793,7 +3044,7 @@ int httpSetCredentials (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>credentials</dt>
 <dd class="description">Array of credentials</dd>
 </dl>
@@ -2810,7 +3061,7 @@ void httpSetDefaultField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>value</dt>
@@ -2831,7 +3082,7 @@ void httpSetExpect (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>expect</dt>
 <dd class="description">HTTP status to expect
 (<code>HTTP_STATUS_CONTINUE</code>)</dd>
@@ -2852,11 +3103,25 @@ void httpSetField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>value</dt>
 <dd class="description">Value</dd>
+</dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpSetKeepAlive">httpSetKeepAlive</a></h3>
+<p class="description">Set the current Keep-Alive state of a connection.</p>
+<p class="code">
+void httpSetKeepAlive (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_keepalive_t">http_keepalive_t</a> keep_alive<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+<dt>keep_alive</dt>
+<dd class="description">New Keep-Alive value</dd>
 </dl>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetLength">httpSetLength</a></h3>
 <p class="description">Set the content-length and content-encoding.</p>
@@ -2868,7 +3133,7 @@ void httpSetLength (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>length</dt>
 <dd class="description">Length (0 for chunked)</dd>
 </dl>
@@ -2884,7 +3149,7 @@ void httpSetTimeout (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>timeout</dt>
 <dd class="description">Number of seconds for timeout,
 must be greater than 0</dd>
@@ -2898,6 +3163,30 @@ must be greater than 0</dd>
 data pointer and must return 1 to continue or 0 to error (time) out.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpShutdown">httpShutdown</a></h3>
+<p class="description">Shutdown one side of an HTTP connection.</p>
+<p class="code">
+void httpShutdown (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection</dd>
+</dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpStateString">httpStateString</a></h3>
+<p class="description">Return the string describing a HTTP state value.</p>
+<p class="code">
+const char *httpStateString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_state_t">http_state_t</a> state<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>state</dt>
+<dd class="description">HTTP state value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">State string</p>
 <h3 class="function"><a name="httpStatus">httpStatus</a></h3>
 <p class="description">Return a short string describing a HTTP status code.</p>
 <p class="code">
@@ -2924,12 +3213,25 @@ int httpTrace (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>uri</dt>
 <dd class="description">URI for trace</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpURIStatusString">httpURIStatusString</a></h3>
+<p class="description">Return a string describing a URI status code.</p>
+<p class="code">
+const char *httpURIStatusString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_uri_status_t">http_uri_status_t</a> status<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>status</dt>
+<dd class="description">URI status code</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized status string</p>
 <h3 class="function"><a name="httpUpdate">httpUpdate</a></h3>
 <p class="description">Update the current HTTP state for incoming data.</p>
 <p class="code">
@@ -2939,7 +3241,7 @@ http_status_t httpUpdate (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
@@ -2953,7 +3255,7 @@ int httpWait (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>msec</dt>
 <dd class="description">Milliseconds to wait</dd>
 </dl>
@@ -2970,7 +3272,7 @@ int httpWrite (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -2994,7 +3296,7 @@ ssize_t httpWrite2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server</dd>
+<dd class="description">HTTP connection</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -4025,6 +4327,10 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+of attribute and member names separated by slashes, for example
+&quot;media-col/media-size&quot;.</p>
 <h3 class="function"><a name="ippFindNextAttribute">ippFindNextAttribute</a></h3>
 <p class="description">Find the next named attribute in a request.</p>
 <p class="code">
@@ -4044,6 +4350,10 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+of attribute and member names separated by slashes, for example
+&quot;media-col/media-size&quot;.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippFirstAttribute">ippFirstAttribute</a></h3>
 <p class="description">Return the first attribute in the message.</p>
 <p class="code">
@@ -4072,7 +4382,7 @@ int ippGetBoolean (<br>
 <dd class="description">Value number (0-based)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Boolean value or -1 on error</p>
+<p class="description">Boolean value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4111,7 +4421,7 @@ int ippGetCount (<br>
 <dd class="description">IPP attribute</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Number of values or -1 on error</p>
+<p class="description">Number of values or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetDate">ippGetDate</a></h3>
 <p class="description">Get a date value for an attribute.</p>
 <p class="code">
@@ -4161,7 +4471,7 @@ int ippGetInteger (<br>
 <dd class="description">Value number (0-based)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Value or -1 on error</p>
+<p class="description">Value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4216,7 +4526,7 @@ ipp_op_t ippGetOperation (<br>
 <dd class="description">IPP request message</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Operation ID or -1 on error</p>
+<p class="description">Operation ID or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetRange">ippGetRange</a></h3>
 <p class="description">Get a rangeOfInteger value from an attribute.</p>
 <p class="code">
@@ -4235,7 +4545,7 @@ int ippGetRange (<br>
 <dd class="description">Upper value of range</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Lower value of range or -1</p>
+<p class="description">Lower value of range or 0</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4253,7 +4563,7 @@ int ippGetRequestId (<br>
 <dd class="description">IPP message</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Request ID or -1 on error</p>
+<p class="description">Request ID or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetResolution">ippGetResolution</a></h3>
 <p class="description">Get a resolution value for an attribute.</p>
 <p class="code">
@@ -4275,7 +4585,7 @@ int ippGetResolution (<br>
 <dd class="description">Units for resolution</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Horizontal/cross feed resolution or -1</p>
+<p class="description">Horizontal/cross feed resolution or 0</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4358,7 +4668,7 @@ int ippGetVersion (<br>
 <dd class="description">Minor version number or <code>NULL</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Major version number or -1 on error</p>
+<p class="description">Major version number or 0 on error</p>
 <h3 class="function"><a name="ippLength">ippLength</a></h3>
 <p class="description">Compute the length of an IPP message.</p>
 <p class="code">
@@ -5083,6 +5393,19 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="ippStateString">ippStateString</a></h3>
+<p class="description">Return the name corresponding to a state value.</p>
+<p class="code">
+const char *ippStateString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_state_t">ipp_state_t</a> state<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>state</dt>
+<dd class="description">State value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">State name</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
 <p class="description">Return the tag name corresponding to a tag value.</p>
 <p class="code">
@@ -5292,6 +5615,11 @@ typedef struct _http_s http_t;
 <p class="description">HTTP timeout callback </p>
 <p class="code">
 typedef int (*http_timeout_cb_t)(<a href="#http_t">http_t</a> *http, void *user_data);
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_t">http_trust_t</a></h3>
+<p class="description">Level of trust for credentials </p>
+<p class="code">
+typedef enum <a href="#http_trust_e">http_trust_e</a> http_trust_t;
 </p>
 <h3 class="typedef"><a name="http_uri_coding_t">http_uri_coding_t</a></h3>
 <p class="description">URI en/decode flags</p>
@@ -5690,6 +6018,23 @@ are server-oriented...</p>
 <dt>HTTP_STATUS_USE_PROXY </dt>
 <dd class="description">Must use a proxy to access this URI</dd>
 </dl>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_e">http_trust_e</a></h3>
+<p class="description">Level of trust for credentials </p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>HTTP_TRUST_CHANGED </dt>
+<dd class="description">Credentials have changed</dd>
+<dt>HTTP_TRUST_EXPIRED </dt>
+<dd class="description">Credentials are expired</dd>
+<dt>HTTP_TRUST_INVALID </dt>
+<dd class="description">Credentials are invalid</dd>
+<dt>HTTP_TRUST_OK </dt>
+<dd class="description">Credentials are OK/trusted</dd>
+<dt>HTTP_TRUST_RENEWED </dt>
+<dd class="description">Credentials have been renewed</dd>
+<dt>HTTP_TRUST_UNKNOWN </dt>
+<dd class="description">Credentials are unknown/new</dd>
+</dl>
 <h3 class="enumeration"><a name="http_uri_coding_e">http_uri_coding_e</a></h3>
 <p class="description">URI en/decode flags</p>
 <h4 class="constants">Constants</h4>
@@ -5784,6 +6129,8 @@ are server-oriented...</p>
 <dd class="description">Bind on top</dd>
 <dt>IPP_FINISHINGS_BOOKLET_MAKER </dt>
 <dd class="description">Fold to make booklet</dd>
+<dt>IPP_FINISHINGS_COAT </dt>
+<dd class="description">Apply protective liquid or powder coating</dd>
 <dt>IPP_FINISHINGS_COVER </dt>
 <dd class="description">Add cover</dd>
 <dt>IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN </dt>
@@ -5876,6 +6223,8 @@ are server-oriented...</p>
 <dd class="description">Fold the paper vertically into three sections, forming a Z</dd>
 <dt>IPP_FINISHINGS_JOG_OFFSET </dt>
 <dd class="description">Offset for binding (any type)</dd>
+<dt>IPP_FINISHINGS_LAMINATE </dt>
+<dd class="description">Apply protective (solid) material</dd>
 <dt>IPP_FINISHINGS_NONE </dt>
 <dd class="description">No finishing</dd>
 <dt>IPP_FINISHINGS_PUNCH </dt>
@@ -5932,6 +6281,14 @@ are server-oriented...</p>
 <dd class="description">Staple top left corner</dd>
 <dt>IPP_FINISHINGS_STAPLE_TOP_RIGHT </dt>
 <dd class="description">Staple top right corner</dd>
+<dt>IPP_FINISHINGS_STAPLE_TRIPLE_BOTTOM </dt>
+<dd class="description">Three staples on bottom</dd>
+<dt>IPP_FINISHINGS_STAPLE_TRIPLE_LEFT </dt>
+<dd class="description">Three staples on left</dd>
+<dt>IPP_FINISHINGS_STAPLE_TRIPLE_RIGHT </dt>
+<dd class="description">Three staples on right</dd>
+<dt>IPP_FINISHINGS_STAPLE_TRIPLE_TOP </dt>
+<dd class="description">Three staples on top</dd>
 <dt>IPP_FINISHINGS_TRIM </dt>
 <dd class="description">Trim (any type)</dd>
 <dt>IPP_FINISHINGS_TRIM_AFTER_COPIES </dt>
@@ -6073,6 +6430,8 @@ are server-oriented...</p>
 <dl>
 <dt>IPP_ORIENT_LANDSCAPE </dt>
 <dd class="description">90 degrees counter-clockwise</dd>
+<dt>IPP_ORIENT_NONE </dt>
+<dd class="description">No rotation</dd>
 <dt>IPP_ORIENT_PORTRAIT </dt>
 <dd class="description">No rotation</dd>
 <dt>IPP_ORIENT_REVERSE_LANDSCAPE </dt>
@@ -6134,6 +6493,14 @@ are server-oriented...</p>
 <dd class="description">Invalid status name for <a href="#ippErrorValue"><code>ippErrorValue</code></a></dd>
 <dt>IPP_STATUS_CUPS_SEE_OTHER </dt>
 <dd class="description">cups-see-other</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED </dt>
+<dd class="description">client-error-account-authorization-failed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_CLOSED </dt>
+<dd class="description">client-error-account-closed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_INFO_NEEDED </dt>
+<dd class="description">client-error-account-info-needed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_LIMIT_REACHED </dt>
+<dd class="description">client-error-account-limit-reached</dd>
 <dt>IPP_STATUS_ERROR_ATTRIBUTES_NOT_SETTABLE </dt>
 <dd class="description">client-error-attributes-not-settable</dd>
 <dt>IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES </dt>
@@ -6150,13 +6517,13 @@ are server-oriented...</p>
 <dd class="description">client-error-compression-not-supported</dd>
 <dt>IPP_STATUS_ERROR_CONFLICTING </dt>
 <dd class="description">client-error-conflicting-attributes</dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-authorization-failed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
-<dd class="description">cups-error-account-closed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED </dt>
+<dd class="description">cups-error-account-closed @deprecate@</dd>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-info-needed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-limit-reached </dd>
 <dt>IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">cups-authentication-canceled - Authentication canceled by user </dd>

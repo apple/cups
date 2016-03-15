@@ -1,25 +1,16 @@
 /*
- * "$Id: cert.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: cert.c 12034 2014-07-16 19:37:34Z msweet $"
  *
- *   Authentication certificate routines for the CUPS scheduler.
+ * Authentication certificate routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddCert()        - Add a certificate.
- *   cupsdDeleteCert()     - Delete a single certificate.
- *   cupsdDeleteAllCerts() - Delete all certificates...
- *   cupsdFindCert()       - Find a certificate.
- *   cupsdInitCerts()      - Initialize the certificate "system" and root
- *                           certificate.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -52,8 +43,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 					/* Hex constants... */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAddCert: Adding certificate for PID %d", pid);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAddCert: Adding certificate for PID %d", pid);
 
  /*
   * Allocate memory for the certificate...
@@ -417,10 +407,10 @@ cupsdInitCerts(void)
     * them as the seed...
     */
 
-    seed = cupsFileGetChar(fp);
-    seed = (seed << 8) | cupsFileGetChar(fp);
-    seed = (seed << 8) | cupsFileGetChar(fp);
-    CUPS_SRAND((seed << 8) | cupsFileGetChar(fp));
+    seed = (unsigned)cupsFileGetChar(fp);
+    seed = (seed << 8) | (unsigned)cupsFileGetChar(fp);
+    seed = (seed << 8) | (unsigned)cupsFileGetChar(fp);
+    CUPS_SRAND((seed << 8) | (unsigned)cupsFileGetChar(fp));
 
     cupsFileClose(fp);
   }
@@ -436,5 +426,5 @@ cupsdInitCerts(void)
 
 
 /*
- * End of "$Id: cert.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: cert.c 12034 2014-07-16 19:37:34Z msweet $".
  */

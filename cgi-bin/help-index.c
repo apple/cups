@@ -1,34 +1,16 @@
 /*
- * "$Id: help-index.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: help-index.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Online help index routines for CUPS.
+ * Online help index routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   helpDeleteIndex()          - Delete an index, freeing all memory used.
- *   helpFindNode()             - Find a node in an index.
- *   helpLoadIndex()            - Load a help index from disk.
- *   helpSaveIndex()            - Save a help index to disk.
- *   helpSearchIndex()          - Search an index.
- *   help_add_word()            - Add a word to a node.
- *   help_compile_search()      - Convert a search string into a regular expression.
- *   help_delete_node()         - Free all memory used by a node.
- *   help_delete_word()         - Free all memory used by a word.
- *   help_load_directory()      - Load a directory of files into an index.
- *   help_load_file()           - Load a HTML files into an index.
- *   help_new_node()            - Create a new node and add it to an index.
- *   help_sort_nodes_by_name()  - Sort nodes by section, filename, and anchor.
- *   help_sort_nodes_by_score() - Sort nodes by score and text.
- *   help_sort_words()          - Sort words alphabetically.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -346,7 +328,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 	    mtime = strtol(ptr, &ptr, 10);
 
 	  offset = strtoll(ptr, &ptr, 10);
-	  length = strtoll(ptr, &ptr, 10);
+	  length = (size_t)strtoll(ptr, &ptr, 10);
 
 	  while (isspace(*ptr & 255))
             ptr ++;
@@ -1019,14 +1001,14 @@ help_load_file(
 
         *ptr++ = ' ';
 
-        if (!cupsFileGets(fp, ptr, sizeof(line) - (ptr - line) - 1))
+        if (!cupsFileGets(fp, ptr, sizeof(line) - (size_t)(ptr - line) - 1))
 	  break;
       }
 
       *ptr = '\0';
 
       if (node)
-	node->length = offset - node->offset;
+	node->length = (size_t)(offset - node->offset);
 
       if (!*text)
       {
@@ -1179,9 +1161,9 @@ help_load_file(
 
 	for (text = ptr, ptr ++; *ptr && isalnum(*ptr & 255); ptr ++);
 
-	wordlen = ptr - text;
+	wordlen = (int)(ptr - text);
 
-        memcpy(temp, text, wordlen);
+        memcpy(temp, text, (size_t)wordlen);
 	temp[wordlen] = '\0';
 
         ptr --;
@@ -1206,7 +1188,7 @@ help_load_file(
   cupsFileClose(fp);
 
   if (node)
-    node->length = offset - node->offset;
+    node->length = (size_t)(offset - node->offset);
 
   return (0);
 }
@@ -1324,5 +1306,5 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
 
 
 /*
- * End of "$Id: help-index.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: help-index.c 11594 2014-02-14 20:09:01Z msweet $".
  */

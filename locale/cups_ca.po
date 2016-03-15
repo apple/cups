@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-09 13:32-0700\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -982,6 +982,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr ""
 
@@ -1180,8 +1183,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr ""
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      Executa cupsd des de launchd(8)."
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
@@ -1524,12 +1527,36 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-
-#, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+
+#, c-format
+msgid "%d x %d mm"
+msgstr ""
+
+#, c-format
+msgid "%g x %g"
+msgstr ""
+
+#, c-format
+msgid "%s (%s)"
+msgstr ""
+
+#, c-format
+msgid "%s (%s, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s, %s)"
+msgstr ""
 
 #, c-format
 msgid "%s accepting requests since %s"
@@ -1764,6 +1791,10 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr "%s: la cadena del filtre «%s» no és vàlida."
 
 #, c-format
+msgid "%s: Missing filename for \"-P\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr ""
 
@@ -1798,6 +1829,10 @@ msgstr "%s: no es pot contactar amb el servidor."
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
 msgstr "%s: no es pot determinar el tips de MIME de «%s»."
+
+#, c-format
+msgid "%s: Unable to open \"%s\": %s"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to open %s: %s"
@@ -2679,6 +2714,9 @@ msgstr "El número de versió del SNMP és incorrecte"
 msgid "Bad UIConstraints"
 msgstr "La UIConstraints és incorrecta"
 
+msgid "Bad arguments to function"
+msgstr ""
+
 #, c-format
 msgid "Bad copies value %d."
 msgstr "El valor de copies %d és incorrecte"
@@ -2704,6 +2742,9 @@ msgstr "La document-format-default «%s» és incorrecta."
 
 msgid "Bad filename buffer"
 msgstr "El nom del fitxer de la memòria cau és incorrecte"
+
+msgid "Bad hostname/address in URI"
+msgstr ""
 
 #, c-format
 msgid "Bad job-name value: %s"
@@ -2749,16 +2790,19 @@ msgstr "L'opció + elecció de la línia %d és incorrecta."
 msgid "Bad page-ranges values %d-%d."
 msgstr "Els valors de page-ranges %d-%d són incorrectes."
 
+msgid "Bad port number in URI"
+msgstr ""
+
 #, c-format
 msgid "Bad port-monitor \"%s\"."
 msgstr "La port-monitor «%s» és incorrecta."
 
-msgid "Bad printer URI."
-msgstr "L'URI de la impressora és incorrecte."
-
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr "El valor %d de printer-state és incorrecte."
+
+msgid "Bad printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Bad request ID %d."
@@ -2768,11 +2812,23 @@ msgstr "L'identificador %d de la sol·licitud és incorrecte."
 msgid "Bad request version number %d.%d."
 msgstr "El número de versió %d.%d de la sol·licitud és incorrecte."
 
+msgid "Bad resource in URI"
+msgstr ""
+
+msgid "Bad scheme in URI"
+msgstr ""
+
 msgid "Bad subscription ID"
 msgstr "L'identificador de la subscripció és incorrecte."
 
+msgid "Bad username in URI"
+msgstr ""
+
 msgid "Bad value string"
 msgstr "El valor de la cadena és incorrecte"
+
+msgid "Bad/empty URI"
+msgstr ""
 
 msgid "Banners"
 msgstr "Bàners"
@@ -2792,6 +2848,9 @@ msgstr "CMYK"
 
 msgid "CPCL Label Printer"
 msgstr "Impressora d'etiquetes CPCL"
+
+msgid "Cancel Jobs"
+msgstr ""
 
 msgid "Cancel RSS Subscription"
 msgstr "Cancel·la la subscripció RSS"
@@ -2961,21 +3020,15 @@ msgstr "Edita el fitxer de configuració"
 msgid "Empty PPD file."
 msgstr "El fitxer PPD és buit."
 
+msgid "Encryption is not supported."
+msgstr ""
+
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "S'està acabant el bàner"
 
 msgid "English"
 msgstr "Anglès"
-
-msgid "Enter old password:"
-msgstr "Introduïu la contrasenya antiga:"
-
-msgid "Enter password again:"
-msgstr "Introduïu la contrasenya un altre cop:"
-
-msgid "Enter password:"
-msgstr "Introduïu la contrasenya:"
 
 msgid ""
 "Enter your username and password or the root username and password to access "
@@ -3550,6 +3603,9 @@ msgstr "La línia la longitud màxima permesa (255 caràcters)"
 msgid "List Available Printers"
 msgstr "Llista les impressores disponibles"
 
+msgid "Load paper."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Costat-llarg (vertical)"
 
@@ -3616,6 +3672,12 @@ msgstr "Falta l'atribut requesting-user-name."
 
 msgid "Missing required attributes."
 msgstr "Falten alguns atributs necessaris."
+
+msgid "Missing resource in URI"
+msgstr ""
+
+msgid "Missing scheme in URI"
+msgstr ""
 
 #, c-format
 msgid "Missing value on line %d."
@@ -3753,6 +3815,12 @@ msgstr "No s'ha trobat cap printer-uri per la classe"
 msgid "No printer-uri in request."
 msgstr "No hi ha cap printer-uri a la sol·licitud."
 
+msgid "No request URI."
+msgstr ""
+
+msgid "No request protocol version."
+msgstr ""
+
 msgid "No request sent."
 msgstr ""
 
@@ -3851,22 +3919,14 @@ msgstr "Sense memòria."
 msgid "Output Mode"
 msgstr "Mode de sortida"
 
-#, c-format
-msgid "Output for printer %s is sent to %s"
-msgstr "La sortida de la impressora %s s'envia a %s"
-
-#, c-format
-msgid "Output for printer %s is sent to remote printer %s on %s"
-msgstr "La sortida de la impressora %s s'envia a la impressora remota %s a %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to %s"
-msgstr "La sortida per la impressora %s/%s s'envia a la impressora %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgid "Output bin is almost full."
 msgstr ""
-"La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
+
+msgid "Output bin is full."
+msgstr ""
+
+msgid "Output bin is missing."
+msgstr ""
 
 msgid "PASS"
 msgstr "VÀLID"
@@ -3897,6 +3957,18 @@ msgstr "El paquet no conté cap Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "El paquet no comença amb SEQUENCE"
+
+msgid "Paper jam."
+msgstr ""
+
+msgid "Paper tray is almost empty."
+msgstr ""
+
+msgid "Paper tray is empty."
+msgstr ""
+
+msgid "Paper tray is missing."
+msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4024,11 +4096,8 @@ msgid "Printers"
 msgstr "Impressores"
 
 #, c-format
-msgid "Printing page %d, %d%% complete."
-msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
-
-msgid "Purge Jobs"
-msgstr "Purga les feines"
+msgid "Printing page %d, %u%% complete."
+msgstr ""
 
 msgid "Quarto"
 msgstr "Quart"
@@ -4039,13 +4108,6 @@ msgstr "S'ha assolit el límit de la quota."
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr ""
 "Rang    Propietari   Feina     Fitxer(s)                         Mida total"
-
-#. TRANSLATORS: Pri is job priority.
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size"
-msgstr ""
-"Rang   Propietari      Pri  Feina        Fitxers                       Mida "
-"total"
 
 msgid "Reject Jobs"
 msgstr "Rebutja feines"
@@ -4106,6 +4168,9 @@ msgstr "S'ha iniciat el servidor"
 
 msgid "Server Stopped"
 msgstr "S'ha aturat el servidor"
+
+msgid "Server credentials not set."
+msgstr ""
 
 msgid "Service Unavailable"
 msgstr "El servei no està disponible"
@@ -4262,27 +4327,6 @@ msgstr "S'ha de canviar el fotoconductor òptic."
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr "El fotoconductor òptic s'haurà de canviar aviat."
 
-msgid "The output bin is almost full."
-msgstr "La safata de sortida és gairebé plena."
-
-msgid "The output bin is full."
-msgstr "La safata de sortida és plena."
-
-msgid "The output bin is missing."
-msgstr "Falta la safata de sortida."
-
-msgid "The paper tray is almost empty."
-msgstr "La safata de paper és gairebé buida."
-
-msgid "The paper tray is empty."
-msgstr "La safata de paper és buida."
-
-msgid "The paper tray is missing."
-msgstr "Falta la safata de paper."
-
-msgid "The paper tray needs to be filled."
-msgstr "S'ha d'omplir la safata de paper."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -4291,6 +4335,12 @@ msgstr "La impressora no ha respost."
 
 msgid "The printer is in use."
 msgstr "La impressora està ocupada."
+
+msgid "The printer is low on ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr "S'està acabant el tòner de la impressora."
 
 msgid "The printer is not connected."
 msgstr "La impressora no està connectada."
@@ -4306,12 +4356,6 @@ msgstr "Ara la impressora està en línia."
 
 msgid "The printer is offline."
 msgstr "La impressora està fora de línia."
-
-msgid "The printer is running low on ink."
-msgstr "S'està acabant la tinta de la impressora."
-
-msgid "The printer is running low on toner."
-msgstr "S'està acabant el tòner de la impressora."
 
 msgid "The printer is unreachable at this time."
 msgstr "Ara mateix no es pot accedir a la impressora."
@@ -4394,9 +4438,6 @@ msgstr "El valor «%s» de which-jobs no està implementat."
 msgid "There are too many subscriptions."
 msgstr "Hi ha massa subscripcions."
 
-msgid "There is a paper jam."
-msgstr "S'ha encallat el paper."
-
 msgid "There was an unrecoverable USB error."
 msgstr "Hi ha un error de l'USB irrecuperable."
 
@@ -4434,6 +4475,9 @@ msgstr "Safata 4"
 
 msgid "URI Too Long"
 msgstr "L'URI és massa llarg"
+
+msgid "URI too large"
+msgstr ""
 
 msgid "US Ledger"
 msgstr "Llibre major americà"
@@ -4565,6 +4609,9 @@ msgstr "No es pot copiar l'script de la interfície - %s"
 msgid "Unable to create printer-uri"
 msgstr "No es pot crear el printer-uri"
 
+msgid "Unable to create server credentials."
+msgstr ""
+
 msgid "Unable to create temporary file"
 msgstr "No es pot crear el fitxer temporal"
 
@@ -4629,6 +4676,9 @@ msgstr "No es pot trobar el destí de la feina"
 
 msgid "Unable to find printer."
 msgstr "No es pot trobar la impressora."
+
+msgid "Unable to find server credentials."
+msgstr ""
 
 msgid "Unable to get backend exit status."
 msgstr "No es pot obtenir el motiu de la sortida de l'execució en segon pla"
@@ -4716,8 +4766,8 @@ msgstr "No es pot imprimir la pàgina de prova"
 msgid "Unable to read print data."
 msgstr "No es poden llegir les dades d'impressió."
 
-msgid "Unable to resolve printer URI."
-msgstr "No es pot resoldre l'URI de la impressora."
+msgid "Unable to resolve printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Unable to run \"%s\": %s"
@@ -4805,6 +4855,15 @@ msgstr "El paràmetre printer-error-policy «%s» és desconegut."
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr "El paràmetre printer-op-policy «%s» és desconegut."
+
+msgid "Unknown request method."
+msgstr ""
+
+msgid "Unknown request version."
+msgstr ""
+
+msgid "Unknown scheme in URI"
+msgstr ""
 
 msgid "Unknown service name."
 msgstr "El nom del servei és desconegut."
@@ -4906,8 +4965,8 @@ msgstr "Sintaxi: cupsctl [opcions] [param=valor ... paramN=valorN]"
 msgid "Usage: cupsd [options]"
 msgstr "Sintaxi: cupsd [opcions]"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Sintaxi: cupstestdsc [opcions] nomfitxer.ps [...nomfitxer.ps]"
@@ -4947,18 +5006,6 @@ msgstr ""
 "         lpoptions [-h servidor] [-E] [-p impressora] -l\n"
 "         lpoptions [-h servidor] [-E] -p impressora -o opció[=valor] ...\n"
 "         lpoptions [-h servidor] [-E] -x impressora"
-
-msgid "Usage: lppasswd [-g groupname]"
-msgstr "Sintaxi: lppasswd [-g nomgrup]"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-"Sintaxi: lppasswd [-g nomgrup] [nomusuari]\n"
-"         lppasswd [-g nomgrup] -a [nomusuari]\n"
-"         lppasswd [-g nomgrup] -x [nomusuari]"
 
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
@@ -5021,13 +5068,6 @@ msgstr ""
 "Heu d'accedir a aquesta pagina a través de la URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
 
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
-"La contrasenya ha de tenir com a mínim 6 caràcters, no pot contenir el nom "
-"d'usuari, i ha de tenir com a mínim una lletra i un número."
-
 msgid "ZPL Label Printer"
 msgstr "Impressora d'etiquetes ZPL"
 
@@ -5075,6 +5115,9 @@ msgstr ""
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr ""
 
@@ -5091,11 +5134,6 @@ msgstr "cupsd: l'argument «%s» és desconegut - s'interromp."
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: l'opció «%c» és desconeguda - s'interromp."
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: no s'ha compilat amb compatibilitat per launchd(8). S'executa en mode "
-"normal."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -5217,8 +5255,8 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
-msgstr "ipptool: «-i» i «-n» no són compatibles amb «-X»."
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
+msgstr ""
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
@@ -5443,51 +5481,6 @@ msgstr "lpoptions: no s'ha pogut obrir el fitxer PPD per %s."
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: la impressora o la classe són desconegudes."
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr ""
-"lppasswd: només l'usuari primari (root) pot afegir o esborrar contrasenyes."
-
-msgid "lppasswd: Password file busy."
-msgstr "lppaswd: el fitxer de contrasenyes està ocupat."
-
-msgid "lppasswd: Password file not updated."
-msgstr "lppaswd: el fitxer de contrasenyes no està actualitzat."
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr "lppaswwd: la contrasenya no coincideix."
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr "lppaswwd: s'ha refusat la contrasenya."
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr "lppaswwd: les contrasenyes no coincideixen."
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr "lppasswd: no s'ha pogut copiar la cadena de contrasenya: %s"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr "lppasswd: no s'ha pogut obrir el fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr "lppasswd: no s'ha pogut escriure al fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-"lppasswd: no s'ha pogut fer la còpia de seguretat del fitxer de contrasenyes "
-"antic: %s"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr "lppasswd: no s'ha pogut canviar el nom del fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr "lppaswd: l'usuari «%s» i el grup «%s» no existeixen."
 
 #, c-format
 msgid ""
@@ -6053,6 +6046,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "  -j tipus/mime            Estableix el tipus MIME de sortida "
 #~ "(application/pdf si no s'especifica)."
 
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Executa cupsd des de launchd(8)."
+
 #~ msgid ""
 #~ "  -o filename             Set file to be generated (otherwise stdout)."
 #~ msgstr ""
@@ -6075,6 +6071,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgstr ""
 #~ "  -v                      Mostra tots els atributs enviats i rebuts."
 
+#~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+#~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: error - s'esperava un destí després de l'opció «-b»."
 
@@ -6083,6 +6082,18 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "Address - 1 1/8 x 3 1/2\""
 #~ msgstr "Adreça - 1 1/8 x 3 1/2\""
+
+#~ msgid "Bad printer URI."
+#~ msgstr "L'URI de la impressora és incorrecte."
+
+#~ msgid "Enter old password:"
+#~ msgstr "Introduïu la contrasenya antiga:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Introduïu la contrasenya un altre cop:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Introduïu la contrasenya:"
 
 #~ msgid "File Folder - 9/16 x 3 7/16\""
 #~ msgstr "Carpeta d'arxivador: 9/16 x 3 7/16\""
@@ -6105,6 +6116,20 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "Large Address - 1 4/10 x 3 1/2\""
 #~ msgstr "Adreça gran - 1 4/10 x 3 1/2\""
+
+#~ msgid "Output for printer %s is sent to %s"
+#~ msgstr "La sortida de la impressora %s s'envia a %s"
+
+#~ msgid "Output for printer %s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida de la impressora %s s'envia a la impressora remota %s a %s"
+
+#~ msgid "Output for printer %s/%s is sent to %s"
+#~ msgstr "La sortida per la impressora %s/%s s'envia a la impressora %s"
+
+#~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
 
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "S'ha acceptat el fitxer d'impressió - ID de la feina %d."
@@ -6135,6 +6160,18 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "La impressora està desconnectada. Es tornarà a intentar d'aquí a 30 "
 #~ "segons."
 
+#~ msgid "Printing page %d, %d%% complete."
+#~ msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
+
+#~ msgid "Purge Jobs"
+#~ msgstr "Purga les feines"
+
+#~ msgid ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+#~ msgstr ""
+#~ "Rang   Propietari      Pri  Feina        Fitxers                       "
+#~ "Mida total"
+
 #~ msgid "Ready to print."
 #~ msgstr "Preparada per imprimir."
 
@@ -6144,6 +6181,27 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Shipping Address - 2 5/16 x 4\""
 #~ msgstr "Adreça de lliurament - 2 5/16 x 4\""
 
+#~ msgid "The output bin is almost full."
+#~ msgstr "La safata de sortida és gairebé plena."
+
+#~ msgid "The output bin is full."
+#~ msgstr "La safata de sortida és plena."
+
+#~ msgid "The output bin is missing."
+#~ msgstr "Falta la safata de sortida."
+
+#~ msgid "The paper tray is almost empty."
+#~ msgstr "La safata de paper és gairebé buida."
+
+#~ msgid "The paper tray is empty."
+#~ msgstr "La safata de paper és buida."
+
+#~ msgid "The paper tray is missing."
+#~ msgstr "Falta la safata de paper."
+
+#~ msgid "The paper tray needs to be filled."
+#~ msgstr "S'ha d'omplir la safata de paper."
+
 #~ msgid "The printer URI is incorrect or no longer exists."
 #~ msgstr "L'URI de la impressora no és correcte o ja no existeix."
 
@@ -6152,11 +6210,17 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "La impressora no és compatible amb el IPP/%d.%d, s'està intentant el IPP/"
 #~ "%s."
 
-#~ msgid "The printer is low on toner."
-#~ msgstr "S'està acabant el tòner de la impressora."
-
 #~ msgid "The printer is out of toner."
 #~ msgstr "S'ha acabat el tòner de la impressora"
+
+#~ msgid "The printer is running low on ink."
+#~ msgstr "S'està acabant la tinta de la impressora."
+
+#~ msgid "The printer is running low on toner."
+#~ msgstr "S'està acabant el tòner de la impressora."
+
+#~ msgid "There is a paper jam."
+#~ msgstr "S'ha encallat el paper."
 
 #~ msgid "Unable to create compressed print file"
 #~ msgstr "No es pot crear el fitxer d'impressió comprimit"
@@ -6179,16 +6243,49 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Unable to read print data"
 #~ msgstr "No es poden llegir les dades d'impressió"
 
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "No es pot resoldre l'URI de la impressora."
+
 #~ msgid "Usage: %s job-id user title copies options file"
 #~ msgstr "Sintaxi: %s id-tasca usuari títol còpies opcions fitxer"
 
 #~ msgid "Usage: convert [ options ]"
 #~ msgstr "Sintaxi: convert [ opcions ]"
 
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
+
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "Sintaxi: lppasswd [-g nomgrup]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "Sintaxi: lppasswd [-g nomgrup] [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -a [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -x [nomusuari]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "La contrasenya ha de tenir com a mínim 6 caràcters, no pot contenir el "
+#~ "nom d'usuari, i ha de tenir com a mínim una lletra i un número."
+
 #~ msgid "convert: Use the -f option to specify a file to convert."
 #~ msgstr ""
 #~ "convert: feu servir l'opció -f per especificar el fitxer que voleu "
 #~ "convertir."
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: no s'ha compilat amb compatibilitat per launchd(8). S'executa en "
+#~ "mode normal."
+
+#~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+#~ msgstr "ipptool: «-i» i «-n» no són compatibles amb «-X»."
 
 #~ msgid "ipptool: \"-i\" is incompatible with \"-X\"."
 #~ msgstr "ipptool: «-i» no és compatible amb «-X»."
@@ -6204,3 +6301,44 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: falta la versió a «-V»."
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr ""
+#~ "lppasswd: només l'usuari primari (root) pot afegir o esborrar "
+#~ "contrasenyes."
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppaswd: el fitxer de contrasenyes està ocupat."
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppaswd: el fitxer de contrasenyes no està actualitzat."
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppaswwd: la contrasenya no coincideix."
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppaswwd: s'ha refusat la contrasenya."
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppaswwd: les contrasenyes no coincideixen."
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: no s'ha pogut copiar la cadena de contrasenya: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut obrir el fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut escriure al fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut fer la còpia de seguretat del fitxer de "
+#~ "contrasenyes antic: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut canviar el nom del fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppaswd: l'usuari «%s» i el grup «%s» no existeixen."

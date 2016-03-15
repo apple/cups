@@ -1,9 +1,9 @@
 /*
- * "$Id: testhttp.c 11445 2013-12-05 19:57:43Z msweet $"
+ * "$Id: testhttp.c 12028 2014-07-15 14:01:27Z msweet $"
  *
  * HTTP test program for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -35,8 +35,8 @@ typedef struct uri_test_s		/**** URI test cases ****/
 			*hostname,	/* Hostname string */
 			*resource;	/* Resource string */
   int			port,		/* Port number */
-			assemble_port,	/* Port number for httpAssembleURI() */
-			assemble_coding;/* Coding for httpAssembleURI() */
+			assemble_port;	/* Port number for httpAssembleURI() */
+  http_uri_coding_t	assemble_coding;/* Coding for httpAssembleURI() */
 } uri_test_t;
 
 
@@ -109,7 +109,7 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://username:password@[fe80::200:1234:5678:9abc%25eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999,
-			    HTTP_URI_CODING_MOST | HTTP_URI_CODING_RFC6874 },
+			    (http_uri_coding_t)(HTTP_URI_CODING_MOST | HTTP_URI_CODING_RFC6874) },
 			  { HTTP_URI_STATUS_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
 			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0,
 			    HTTP_URI_CODING_MOST  },
@@ -613,13 +613,67 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000,
-                        NULL);
+    http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL);
     if (http == NULL)
     {
       perror(hostname);
       continue;
     }
+
+    if (httpIsEncrypted(http))
+    {
+      cups_array_t *creds;
+      char info[1024];
+      static const char *trusts[] = { "OK", "Invalid", "Changed", "Expired", "Renewed", "Unknown" };
+      if (!httpCopyCredentials(http, &creds))
+      {
+	cups_array_t *lcreds;
+        http_trust_t trust = httpCredentialsGetTrust(creds, hostname);
+
+        httpCredentialsString(creds, info, sizeof(info));
+
+	printf("Count: %d\n", cupsArrayCount(creds));
+        printf("Trust: %s\n", trusts[trust]);
+        printf("Expiration: %s\n", httpGetDateString(httpCredentialsGetExpiration(creds)));
+        printf("IsValidName: %d\n", httpCredentialsAreValidForName(creds, hostname));
+        printf("String: \"%s\"\n", info);
+
+	printf("LoadCredentials: %d\n", httpLoadCredentials(NULL, &lcreds, hostname));
+	httpCredentialsString(lcreds, info, sizeof(info));
+	printf("    Count: %d\n", cupsArrayCount(lcreds));
+	printf("    String: \"%s\"\n", info);
+
+        if (lcreds && cupsArrayCount(creds) == cupsArrayCount(lcreds))
+        {
+          int			i;
+          http_credential_t	*cred, *lcred;
+
+          for (i = 1, cred = (http_credential_t *)cupsArrayFirst(creds), lcred = (http_credential_t *)cupsArrayFirst(lcreds);
+               cred && lcred;
+               i ++, cred = (http_credential_t *)cupsArrayNext(creds), lcred = (http_credential_t *)cupsArrayNext(lcreds))
+          {
+            if (cred->datalen != lcred->datalen)
+              printf("    Credential #%d: Different lengths (saved=%d, current=%d)\n", i, (int)cred->datalen, (int)lcred->datalen);
+            else if (memcmp(cred->data, lcred->data, cred->datalen))
+              printf("    Credential #%d: Different data\n", i);
+            else
+              printf("    Credential #%d: Matches\n", i);
+          }
+        }
+
+        if (trust != HTTP_TRUST_OK)
+	{
+	  printf("SaveCredentials: %d\n", httpSaveCredentials(NULL, creds, hostname));
+	  trust = httpCredentialsGetTrust(creds, hostname);
+	  printf("New Trust: %s\n", trusts[trust]);
+	}
+
+        httpFreeCredentials(creds);
+      }
+      else
+        puts("No credentials!");
+    }
+
     printf("Checking file \"%s\"...\n", resource);
 
     do
@@ -807,11 +861,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
     {
       total += bytes;
-      fwrite(buffer, bytes, 1, out);
+      fwrite(buffer, (size_t)bytes, 1, out);
       if (out != stdout)
       {
         current = time(NULL);
-        if (current == start) current ++;
+        if (current == start)
+          current ++;
+
         printf("\r" CUPS_LLFMT "/" CUPS_LLFMT " bytes ("
 	       CUPS_LLFMT " bytes/sec)      ", CUPS_LLCAST total,
 	       CUPS_LLCAST length, CUPS_LLCAST (total / (current - start)));
@@ -819,6 +875,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
     }
   }
+
+  if (out != stdout)
+    putchar('\n');
 
   puts("Closing connection to server...");
   httpClose(http);
@@ -831,5 +890,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 11445 2013-12-05 19:57:43Z msweet $".
+ * End of "$Id: testhttp.c 12028 2014-07-15 14:01:27Z msweet $".
  */

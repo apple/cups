@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.6-lpr.sh 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: 5.6-lpr.sh 12065 2014-07-30 17:56:35Z msweet $"
 #
 #   Test the lpr command.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2014 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -55,6 +55,7 @@ echo ""
 echo "    lpr -P Test1 testfile.jpg"
 echo "    lpr -P Test2 testfile.jpg"
 i=0
+pids=""
 while test $i -lt $1; do
 	j=1
 	while test $j -le $2; do
@@ -63,12 +64,13 @@ while test $i -lt $1; do
 	done
 
 	$VALGRIND ../berkeley/lpr -P Test1 testfile.jpg 2>&1 &
+	pids="$pids $!"
 	$VALGRIND ../berkeley/lpr -P Test2 testfile.jpg 2>&1 &
-	lprpid=$!
+	pids="$pids $!"
 
 	i=`expr $i + 1`
 done
-wait $lppid
+wait $pids
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -80,5 +82,5 @@ echo ""
 ./waitjobs.sh
 
 #
-# End of "$Id: 5.6-lpr.sh 11396 2013-11-06 20:09:03Z msweet $".
+# End of "$Id: 5.6-lpr.sh 12065 2014-07-30 17:56:35Z msweet $".
 #

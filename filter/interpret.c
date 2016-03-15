@@ -1,39 +1,18 @@
 /*
- * "$Id: interpret.c 11551 2014-01-29 16:31:35Z msweet $"
+ * "$Id: interpret.c 11848 2014-05-07 00:26:44Z msweet $"
  *
- *   PPD command interpreter for CUPS.
+ * PPD command interpreter for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1993-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1993-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsRasterInterpretPPD() - Interpret PPD commands to create a page header.
- *   _cupsRasterExecPS()      - Execute PostScript code to initialize a page
- *                              header.
- *   cleartomark_stack()      - Clear to the last mark ([) on the stack.
- *   copy_stack()             - Copy the top N stack objects.
- *   delete_stack()           - Free memory used by a stack.
- *   error_object()           - Add an object's value to the current error
- *                              message.
- *   error_stack()            - Add a stack to the current error message.
- *   index_stack()            - Copy the Nth value on the stack.
- *   new_stack()              - Create a new stack.
- *   pop_stock()              - Pop the top object off the stack.
- *   push_stack()             - Push an object on the stack.
- *   roll_stack()             - Rotate stack objects.
- *   scan_ps()                - Scan a string for the next PS object.
- *   setpagedevice()          - Simulate the PostScript setpagedevice operator.
- *   DEBUG_object()           - Print an object value.
- *   DEBUG_stack()            - Print a stack.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -162,7 +141,8 @@ cupsRasterInterpretPPD(
   float		left,			/* Left position */
 		bottom,			/* Bottom position */
 		right,			/* Right position */
-		top;			/* Top position */
+		top,			/* Top position */
+		temp1, temp2;		/* Temporary variables for swapping */
   int		preferred_bits;		/* Preferred bits per color */
 
 
@@ -189,7 +169,7 @@ cupsRasterInterpretPPD(
   h->PageSize[1]                 = 792;
   h->HWResolution[0]             = 100;
   h->HWResolution[1]             = 100;
-  h->cupsBitsPerColor            =  1;
+  h->cupsBitsPerColor            = 1;
   h->cupsColorOrder              = CUPS_ORDER_CHUNKED;
   h->cupsColorSpace              = CUPS_CSPACE_K;
   h->cupsBorderlessScalingFactor = 1.0f;
@@ -301,6 +281,67 @@ cupsRasterInterpretPPD(
     top    = 792.0f;
   }
 
+ /*
+  * Handle orientation...
+  */
+
+  switch (h->Orientation)
+  {
+    case CUPS_ORIENT_0 :
+    default :
+        /* Do nothing */
+        break;
+
+    case CUPS_ORIENT_90 :
+        temp1              = h->cupsPageSize[0];
+        h->cupsPageSize[0] = h->cupsPageSize[1];
+        h->cupsPageSize[1] = temp1;
+
+        temp1  = left;
+        temp2  = right;
+        left   = h->cupsPageSize[0] - top;
+        right  = h->cupsPageSize[0] - bottom;
+        bottom = h->cupsPageSize[1] - temp1;
+        top    = h->cupsPageSize[1] - temp2;
+        break;
+
+    case CUPS_ORIENT_180 :
+        temp1  = left;
+        temp2  = bottom;
+        left   = h->cupsPageSize[0] - right;
+        right  = h->cupsPageSize[0] - temp1;
+        bottom = h->cupsPageSize[1] - top;
+        top    = h->cupsPageSize[1] - temp2;
+        break;
+
+    case CUPS_ORIENT_270 :
+        temp1              = h->cupsPageSize[0];
+        h->cupsPageSize[0] = h->cupsPageSize[1];
+        h->cupsPageSize[1] = temp1;
+
+        temp1  = left;
+        temp2  = right;
+        left   = bottom;
+        right  = top;
+        bottom = h->cupsPageSize[1] - temp2;
+        top    = h->cupsPageSize[1] - temp1;
+        break;
+  }
+
+  if (left > right)
+  {
+    temp1 = left;
+    left  = right;
+    right = temp1;
+  }
+
+  if (bottom > top)
+  {
+    temp1  = bottom;
+    bottom = top;
+    top    = temp1;
+  }
+
   h->PageSize[0]           = (unsigned)(h->cupsPageSize[0] *
                                         h->cupsBorderlessScalingFactor);
   h->PageSize[1]           = (unsigned)(h->cupsPageSize[1] *
@@ -352,9 +393,9 @@ cupsRasterInterpretPPD(
   * Compute the bitmap parameters...
   */
 
-  h->cupsWidth  = (int)((right - left) * h->cupsBorderlessScalingFactor *
+  h->cupsWidth  = (unsigned)((right - left) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[0] / 72.0f + 0.5f);
-  h->cupsHeight = (int)((top - bottom) * h->cupsBorderlessScalingFactor *
+  h->cupsHeight = (unsigned)((top - bottom) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[1] / 72.0f + 0.5f);
 
   switch (h->cupsColorSpace)
@@ -906,7 +947,7 @@ push_stack(_cups_ps_stack_t *st,	/* I - Stack */
 
     st->alloc_objs += 32;
 
-    if ((temp = realloc(st->objs, st->alloc_objs *
+    if ((temp = realloc(st->objs, (size_t)st->alloc_objs *
                                   sizeof(_cups_ps_obj_t))) == NULL)
       return (NULL);
 
@@ -967,12 +1008,12 @@ roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
 
     s = -s;
 
-    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+    if ((temp = calloc((size_t)s, sizeof(_cups_ps_obj_t))) == NULL)
       return (-1);
 
-    memcpy(temp, st->objs + n, s * sizeof(_cups_ps_obj_t));
-    memmove(st->objs + n, st->objs + n + s, (c - s) * sizeof(_cups_ps_obj_t));
-    memcpy(st->objs + n + c - s, temp, s * sizeof(_cups_ps_obj_t));
+    memcpy(temp, st->objs + n, (size_t)s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n, st->objs + n + s, (size_t)(c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n + c - s, temp, (size_t)s * sizeof(_cups_ps_obj_t));
   }
   else
   {
@@ -980,13 +1021,12 @@ roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
     * Shift up...
     */
 
-    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+    if ((temp = calloc((size_t)s, sizeof(_cups_ps_obj_t))) == NULL)
       return (-1);
 
-    memcpy(temp, st->objs + n + c - s, s * sizeof(_cups_ps_obj_t));
-    memmove(st->objs + n + s, st->objs + n,
-            (c - s) * sizeof(_cups_ps_obj_t));
-    memcpy(st->objs + n, temp, s * sizeof(_cups_ps_obj_t));
+    memcpy(temp, st->objs + n + c - s, (size_t)s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n + s, st->objs + n, (size_t)(c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n, temp, (size_t)s * sizeof(_cups_ps_obj_t));
   }
 
   free(temp);
@@ -1105,7 +1145,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 		ch = (ch << 3) + *cur - '0';
 	      }
 
-	      *valptr++ = ch;
+	      *valptr++ = (char)ch;
 	    }
 	    else if (*cur == '\r')
 	    {
@@ -1182,7 +1222,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 		ch |= tolower(*cur) - 'a' + 10;
             }
 
-	    *valptr++ = ch;
+	    *valptr++ = (char)ch;
           }
 
           if (*cur != '>')
@@ -1686,5 +1726,5 @@ DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 
 
 /*
- * End of "$Id: interpret.c 11551 2014-01-29 16:31:35Z msweet $".
+ * End of "$Id: interpret.c 11848 2014-05-07 00:26:44Z msweet $".
  */

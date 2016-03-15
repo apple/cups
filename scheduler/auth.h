@@ -1,16 +1,16 @@
 /*
- * "$Id: auth.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: auth.h 11776 2014-03-28 19:16:05Z msweet $"
  *
- *   Authorization definitions for the CUPS scheduler.
+ * Authorization definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -27,10 +27,8 @@
 #define CUPSD_AUTH_DEFAULT	-1	/* Use DefaultAuthType */
 #define CUPSD_AUTH_NONE		0	/* No authentication */
 #define CUPSD_AUTH_BASIC	1	/* Basic authentication */
-#define CUPSD_AUTH_DIGEST	2	/* Digest authentication */
-#define CUPSD_AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
-#define CUPSD_AUTH_NEGOTIATE	4	/* Kerberos authentication */
-#define CUPSD_AUTH_AUTO		5	/* Kerberos or Basic, depending on configuration of server */
+#define CUPSD_AUTH_NEGOTIATE	2	/* Kerberos authentication */
+#define CUPSD_AUTH_AUTO		3	/* Kerberos or Basic, depending on configuration of server */
 
 #define CUPSD_AUTH_ANON		0	/* Anonymous access */
 #define CUPSD_AUTH_USER		1	/* Must have a valid username/password */
@@ -74,7 +72,7 @@ typedef struct
 
 typedef struct
 {
-  int		length;			/* Length of name */
+  size_t	length;			/* Length of name */
   char		*name;			/* Name string */
 } cupsd_namemask_t;
 
@@ -91,9 +89,9 @@ typedef struct
 typedef struct
 {
   char			*location;	/* Location of resource */
+  size_t		length;		/* Length of location string */
   ipp_op_t		op;		/* IPP operation */
   int			limit,		/* Limit for these types of requests */
-			length,		/* Length of location string */
 			order_type,	/* Allow or Deny */
 			type,		/* Type of authentication */
 			level,		/* Access level required */
@@ -130,10 +128,8 @@ extern void		cupsdAddLocation(cupsd_location_t *loc);
 extern void		cupsdAddName(cupsd_location_t *loc, char *name);
 extern int		cupsdAddNameMask(cups_array_t **masks, char *name);
 extern void		cupsdAuthorize(cupsd_client_t *con);
-extern int		cupsdCheckAccess(unsigned ip[4], char *name,
-			                 int namelen, cupsd_location_t *loc);
-extern int		cupsdCheckAuth(unsigned ip[4], char *name, int namelen,
-				       cups_array_t *masks);
+extern int		cupsdCheckAccess(unsigned ip[4], const char *name, size_t namelen, cupsd_location_t *loc);
+extern int		cupsdCheckAuth(unsigned ip[4], const char *name, size_t namelen, cups_array_t *masks);
 extern int		cupsdCheckGroup(const char *username,
 			                struct passwd *user,
 			                const char *groupname);
@@ -147,5 +143,5 @@ extern cupsd_location_t	*cupsdNewLocation(const char *location);
 
 
 /*
- * End of "$Id: auth.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: auth.h 11776 2014-03-28 19:16:05Z msweet $".
  */

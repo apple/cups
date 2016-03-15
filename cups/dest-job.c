@@ -1,25 +1,17 @@
 /*
- * "$Id: dest-job.c 4274 2013-04-09 20:10:23Z msweet $"
+ * "$Id: dest-job.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Destination job support for CUPS.
+ * Destination job support for CUPS.
  *
- *   Copyright 2012-2013 by Apple Inc.
+ * Copyright 2012-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsCancelDestJob()      - Cancel a job on a destination.
- *   cupsCloseDestJob()       - Close a job and start printing.
- *   cupsCreateDestJob()      - Create a job on a destination.
- *   cupsFinishDestDocument() - Finish the current document.
- *   cupsStartDestDocument()  - Start a new document.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -45,6 +37,12 @@ cupsCancelDestJob(http_t      *http,	/* I - Connection to destination */
                   cups_dest_t *dest,	/* I - Destination */
                   int         job_id)	/* I - Job ID */
 {
+  /* TODO: Needs to be implemented! */
+  /* Probably also needs to be revved to accept cups_dinfo_t... */
+  (void)http;
+  (void)dest;
+  (void)job_id;
+
   return (IPP_STATUS_ERROR_NOT_FOUND);
 }
 
@@ -344,7 +342,7 @@ cupsStartDestDocument(
   if (format)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last_document);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", (char)last_document);
 
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_DOCUMENT);
@@ -362,5 +360,5 @@ cupsStartDestDocument(
 
 
 /*
- * End of "$Id: dest-job.c 4274 2013-04-09 20:10:23Z msweet $".
+ * End of "$Id: dest-job.c 11558 2014-02-06 18:33:34Z msweet $".
  */

@@ -1,27 +1,16 @@
 /*
- * "$Id: template.c 11688 2014-03-05 21:11:32Z msweet $"
+ * "$Id: template.c 11685 2014-03-05 20:03:29Z msweet $"
  *
- *   CGI template function.
+ * CGI template function.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cgiCopyTemplateFile() - Copy a template file and replace all the
- *                           '{variable}' strings with the variable value.
- *   cgiCopyTemplateLang() - Copy a template file using a language...
- *   cgiGetTemplateDir()   - Get the templates directory...
- *   cgiSetServerVersion() - Set the server name and CUPS version...
- *   cgi_copy()            - Copy the template file, substituting as needed...
- *   cgi_puts()            - Put a string to the output file, quoting as
- *                           needed...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #include "cgi-private.h"
@@ -266,7 +255,7 @@ cgi_copy(FILE *out,			/* I - Output file */
         else if (s > name && ch == '?')
 	  break;
 	else if (s < (name + sizeof(name) - 1))
-          *s++ = ch;
+          *s++ = (char)ch;
 
       *s = '\0';
 
@@ -443,7 +432,7 @@ cgi_copy(FILE *out,			/* I - Output file */
       *   {name~refex?true:false}    Regex match
       */
 
-      op = ch;
+      op = (char)ch;
 
       if (ch == '?')
       {
@@ -486,7 +475,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	    innerptr = innername;
 	    while ((ch = getc(in)) != EOF && ch != '}')
 	      if (innerptr < (innername + sizeof(innername) - 1))
-	        *innerptr++ = ch;
+	        *innerptr++ = (char)ch;
 	    *innerptr = '\0';
 
             if (innername[0] == '#')
@@ -498,26 +487,26 @@ cgi_copy(FILE *out,			/* I - Output file */
 	      if ((innerval = cgiGetArray(innername, atoi(innerptr) - 1)) == NULL)
 	        *s = '\0';
 	      else
-	        strlcpy(s, innerval, sizeof(compare) - (s - compare));
+	        strlcpy(s, innerval, sizeof(compare) - (size_t)(s - compare));
 	    }
 	    else if (innername[0] == '?')
 	    {
 	      if ((innerval = cgiGetArray(innername + 1, element)) == NULL)
 		*s = '\0';
 	      else
-	        strlcpy(s, innerval, sizeof(compare) - (s - compare));
+	        strlcpy(s, innerval, sizeof(compare) - (size_t)(s - compare));
             }
 	    else if ((innerval = cgiGetArray(innername, element)) == NULL)
-	      snprintf(s, sizeof(compare) - (s - compare), "{%s}", innername);
+	      snprintf(s, sizeof(compare) - (size_t)(s - compare), "{%s}", innername);
 	    else
-	      strlcpy(s, innerval, sizeof(compare) - (s - compare));
+	      strlcpy(s, innerval, sizeof(compare) - (size_t)(s - compare));
 
             s += strlen(s);
 	  }
           else if (ch == '\\')
-	    *s++ = getc(in);
+	    *s++ = (char)getc(in);
 	  else
-            *s++ = ch;
+            *s++ = (char)ch;
 
         *s = '\0';
 
@@ -729,5 +718,5 @@ cgi_puturi(const char *s,		/* I - String to output */
 
 
 /*
- * End of "$Id: template.c 11688 2014-03-05 21:11:32Z msweet $".
+ * End of "$Id: template.c 11685 2014-03-05 20:03:29Z msweet $".
  */

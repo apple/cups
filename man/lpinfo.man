@@ -1,115 +1,138 @@
 .\"
-.\" "$Id: lpinfo.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: lpinfo.man 11923 2014-06-12 12:55:34Z msweet $"
 .\"
-.\"   lpinfo man page for CUPS.
+.\" lpinfo man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2006 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpinfo 8 "CUPS" "5 December 2008" "Apple Inc."
+.TH lpinfo 8 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
 lpinfo \- show available devices or drivers
 .SH SYNOPSIS
 .B lpinfo
-[ -E ] [ -U
+[
+.B \-E
+] [
+.B \-U
 .I username
-] [ -h
-.I server[:port]
-] [ -l ] [ --device-id
+] [
+\fB\-h \fIserver\fR[\fB:\fIport\fR]
+] [
+.B \-l
+] [
+.B \-\-device\-id
 .I device-id-string
-] [ --exclude-schemes
+] [
+.B \-\-exclude\-schemes
 .I scheme-list
-] [ --include-schemes
+] [
+.B \-\-include\-schemes
 .I scheme-list
-] [ --language
+] [
+.B \-\-language
 .I locale
-] [ --make-and-model
+] [
+.B \-\-make\-and\-model
 .I name
-] [ --product
+] [
+.B \-\-product
 .I name
-] -m
+]
+.B \-m
 .br
 .B lpinfo
-[ -E ] [ -U
+[
+.B \-E
+] [
+.B \-U
 .I username
-] [ -h
-.I server[:port]
-] [ -l ] [ --exclude-schemes
+] [
+\fB\-h \fIserver\fR[\fB:\fIport\fR]
+] [
+.B \-l
+] [
+.B \-\-exclude\-schemes
 .I scheme-list
-] [ --include-schemes
+] [
+.B \-\-include\-schemes
 .I scheme-list
-] [ --timeout
+] [
+.B \-\-timeout
 .I seconds
-] -v
+]
+.B \-v
 .SH DESCRIPTION
-\fIlpinfo\fR lists the available devices or drivers known to the
-CUPS server. The first form (\fI-m\fR) lists the available
-drivers, while the second form (\fI-v\fR) lists the available
-devices.
+\fBlpinfo\fR lists the available devices or drivers known to the CUPS server.
+The first form (\fI-m\fR) lists the available drivers, while the second form (\fI-v\fR) lists the available devices.
 .SH OPTIONS
-\fIlpinfo\fR accepts the following options:
+\fBlpinfo\fR accepts the following options:
 .TP 5
--E
-.br
+.B \-E
 Forces encryption when connecting to the server.
 .TP 5
--U username
-.br
+\fB\-U \fIusername\fR
 Sets the username to use when connecting to the server.
 .TP 5
--h server[:port]
-.br
+\fB\-h \fIserver\fR[\fB:\fIport\fR]
 Selects an alternate server.
 .TP 5
--l
-.br
+.B \-l
 Shows a "long" listing of devices or drivers.
 .TP 5
---device-id device-id-string
-.br
-Specifies the IEEE-1284 device ID to match when listing drivers with the
-\fI-m\fR option.
+\fB\-\-device\-id \fIdevice-id-string\fR
+Specifies the IEEE-1284 device ID to match when listing drivers with the \fI\-m\fR option.
 .TP 5
---exclude-schemes scheme-list
-.br
-Specifies a comma-separated list of device or PPD schemes that should be
-excluded from the results. Static PPD files use the "file" scheme.
+\fB\-\-exclude\-schemes \fIscheme-list\fR
+Specifies a comma-delimited list of device or PPD schemes that should be excluded from the results.
+Static PPD files use the "file" scheme.
 .TP 5
---include-schemes scheme-list
-.br
-Specifies a comma-separated list of device or PPD schemes that should be
-included in the results. Static PPD files use the "file" scheme.
+\fB\-\-include\-schemes \fIscheme-list\fR
+Specifies a comma-delimited list of device or PPD schemes that should be included in the results.
+Static PPD files use the "file" scheme.
 .TP 5
---language locale
-.br
-Specifies the language to match when listing drivers with the \fI-m\fR option.
+\fB\-\-language \fIlocale\fR
+Specifies the language to match when listing drivers with the \fI\-m\fR option.
 .TP 5
---make-and-model name
-.br
-Specifies the make and model to match when listing drivers with the \fI-m\fR
-option.
+\fB\-\-make\-and\-model \fIname\fR
+Specifies the make and model to match when listing drivers with the \fI\-m\fR option.
 .TP 5
---product name
-.br
-Specifies the product to match when listing drivers with the \fI-m\fR option.
+\fB\-\-product \fIname\fR
+Specifies the product to match when listing drivers with the \fI\-m\fR option.
 .TP 5
---timeout seconds
-.br
-Specifies the timeout when listing devices with the \fI-v\fR option.
-.SH COMPATIBILITY
+\fB\-\-timeout \fIseconds\fR
+Specifies the timeout when listing devices with the \fI\-v\fR option.
+.SH CONFORMING TO
 The \fIlpinfo\fR command is unique to CUPS.
+.SH EXAMPLES
+List all devices:
+.nf
+
+    lpinfo \-v
+
+.fi
+List all drivers:
+.nf
+
+    lpinfo \-m
+
+.fi
+List drivers matching "HP LaserJet":
+.nf
+
+    lpinfo \-\-make\-and\-model "HP LaserJet" \-m
+.fi
 .SH SEE ALSO
-\fIlpadmin(8)\fR,
-.br
-http://localhost:631/help
+.BR lpadmin (8),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: lpinfo.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: lpinfo.man 11923 2014-06-12 12:55:34Z msweet $".
 .\"

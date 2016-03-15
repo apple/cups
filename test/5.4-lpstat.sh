@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.4-lpstat.sh 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: 5.4-lpstat.sh 11398 2013-11-06 20:11:11Z msweet $"
 #
 #   Test the lpstat command.
 #
@@ -39,5 +39,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.4-lpstat.sh 11396 2013-11-06 20:09:03Z msweet $".
+# End of "$Id: 5.4-lpstat.sh 11398 2013-11-06 20:11:11Z msweet $".
 #

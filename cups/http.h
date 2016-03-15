@@ -1,18 +1,18 @@
 /*
- * "$Id: http.h 11085 2013-07-03 13:53:05Z msweet $"
+ * "$Id: http.h 11850 2014-05-07 23:12:48Z msweet $"
  *
- *   Hyper-Text Transport Protocol definitions for CUPS.
+ * Hyper-Text Transport Protocol definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_HTTP_H_
@@ -87,8 +87,6 @@ extern "C" {
 #    define s6_addr32	_S6_un._S6_u32
 #  elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)|| defined(__DragonFly__)
 #    define s6_addr32	__u6_addr.__u6_addr32
-#  elif defined(__osf__)
-#    define s6_addr32	s6_un.sa6_laddr
 #  elif defined(WIN32)
 /*
  * Windows only defines byte and 16-bit word members of the union and
@@ -344,6 +342,16 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } http_status_t;
 
+typedef enum http_trust_e		/**** Level of trust for credentials @since CUPS 2.0@ */
+{
+  HTTP_TRUST_OK = 0,			/* Credentials are OK/trusted */
+  HTTP_TRUST_INVALID,			/* Credentials are invalid */
+  HTTP_TRUST_CHANGED,			/* Credentials have changed */
+  HTTP_TRUST_EXPIRED,			/* Credentials are expired */
+  HTTP_TRUST_RENEWED,			/* Credentials have been renewed */
+  HTTP_TRUST_UNKNOWN,			/* Credentials are unknown/new */
+} http_trust_t;
+
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ****/
 {
   HTTP_URI_STATUS_OVERFLOW = -8,	/* URI buffer for httpAssembleURI is too small */
@@ -585,7 +593,7 @@ extern int		httpReconnect2(http_t *http, int msec, int *cancel)
 			               _CUPS_API_1_6;
 
 
-/**** New in CUPS 1.7 ****/
+/**** New in CUPS 1.7/OS X 10.9 ****/
 extern http_t		*httpAcceptConnection(int fd, int blocking)
 			                      _CUPS_API_1_7;
 extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
@@ -612,6 +620,31 @@ extern void		httpSetDefaultField(http_t *http, http_field_t field,
 extern http_state_t	httpWriteResponse(http_t *http,
 			                  http_status_t status) _CUPS_API_1_7;
 
+/* New in CUPS 2.0 */
+extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
+extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
+extern int		httpCompareCredentials(cups_array_t *cred1, cups_array_t *cred2) _CUPS_API_2_0;
+extern int		httpCredentialsAreValidForName(cups_array_t *credentials, const char *common_name);
+extern time_t		httpCredentialsGetExpiration(cups_array_t *credentials) _CUPS_API_2_0;
+extern http_trust_t	httpCredentialsGetTrust(cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
+extern size_t		httpCredentialsString(cups_array_t *credentials, char *buffer, size_t bufsize) _CUPS_API_2_0;
+extern http_field_t	httpFieldValue(const char *name) _CUPS_API_2_0;
+extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;
+extern http_addr_t	*httpGetAddress(http_t *http) _CUPS_API_2_0;
+extern http_encryption_t httpGetEncryption(http_t *http) _CUPS_API_2_0;
+extern http_keepalive_t	httpGetKeepAlive(http_t *http) _CUPS_API_2_0;
+extern size_t		httpGetPending(http_t *http) _CUPS_API_2_0;
+extern size_t		httpGetReady(http_t *http) _CUPS_API_2_0;
+extern size_t		httpGetRemaining(http_t *http) _CUPS_API_2_0;
+extern int		httpIsChunked(http_t *http) _CUPS_API_2_0;
+extern int		httpIsEncrypted(http_t *http) _CUPS_API_2_0;
+extern int		httpLoadCredentials(const char *path, cups_array_t **credentials, const char *common_name) _CUPS_API_2_0;
+extern const char	*httpResolveHostname(http_t *http, char *buffer, size_t bufsize) _CUPS_API_2_0;
+extern int		httpSaveCredentials(const char *path, cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
+extern void		httpSetKeepAlive(http_t *http, http_keepalive_t keep_alive) _CUPS_API_2_0;
+extern void		httpShutdown(http_t *http) _CUPS_API_2_0;
+extern const char	*httpStateString(http_state_t state) _CUPS_API_2_0;
+extern const char	*httpURIStatusString(http_uri_status_t status) _CUPS_API_2_0;
 
 /*
  * C++ magic...
@@ -623,5 +656,5 @@ extern http_state_t	httpWriteResponse(http_t *http,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 11085 2013-07-03 13:53:05Z msweet $".
+ * End of "$Id: http.h 11850 2014-05-07 23:12:48Z msweet $".
  */

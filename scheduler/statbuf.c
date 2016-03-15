@@ -1,22 +1,16 @@
 /*
- * "$Id: statbuf.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: statbuf.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Status buffer routines for the CUPS scheduler.
+ * Status buffer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdStatBufDelete() - Destroy a status buffer.
- *   cupsdStatBufNew()    - Create a new status buffer.
- *   cupsdStatBufUpdate() - Update the status buffer.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -138,8 +132,7 @@ cupsdStatBufUpdate(
     * No, read more data...
     */
 
-    if ((bytes = read(sb->fd, sb->buffer + sb->bufused,
-                      CUPSD_SB_BUFFER_SIZE - sb->bufused - 1)) > 0)
+    if ((bytes = read(sb->fd, sb->buffer + sb->bufused, (size_t)(CUPSD_SB_BUFFER_SIZE - sb->bufused - 1))) > 0)
     {
       sb->bufused += bytes;
       sb->buffer[sb->bufused] = '\0';
@@ -312,7 +305,7 @@ cupsdStatBufUpdate(
   * Copy the message to the line buffer...
   */
 
-  strlcpy(line, message, linelen);
+  strlcpy(line, message, (size_t)linelen);
 
  /*
   * Copy over the buffer data we've used up...
@@ -331,5 +324,5 @@ cupsdStatBufUpdate(
 
 
 /*
- * End of "$Id: statbuf.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: statbuf.c 11594 2014-02-14 20:09:01Z msweet $".
  */

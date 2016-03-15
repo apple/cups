@@ -1,24 +1,17 @@
 /*
- * "$Id: debug.c 4027 2012-11-16 01:00:05Z msweet $"
+ * "$Id: debug.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Debugging functions for CUPS.
+ * Debugging functions for CUPS.
  *
- *   Copyright 2008-2012 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   debug_vsnprintf()    - Format a string into a fixed size buffer.
- *   _cups_debug_printf() - Write a formatted line to the log.
- *   _cups_debug_puts()   - Write a single line to the log.
- *   _cups_debug_set()    - Enable or disable debug logging.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -92,7 +85,7 @@ debug_thread_id(void)
  * 'debug_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
-static int				/* O - Number of bytes formatted */
+static ssize_t				/* O - Number of bytes formatted */
 debug_vsnprintf(char       *buffer,	/* O - Output buffer */
                 size_t     bufsize,	/* O - Size of output buffer */
 	        const char *format,	/* I - printf-style format string */
@@ -108,7 +101,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 		*tptr,			/* Pointer into temporary format */
 		temp[1024];		/* Buffer for formatted numbers */
   char		*s;			/* Pointer to string */
-  int		bytes;			/* Total number of bytes needed */
+  ssize_t	bytes;			/* Total number of bytes needed */
 
 
   if (!buffer || bufsize < 2 || !format)
@@ -149,7 +142,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	format ++;
 	width = va_arg(ap, int);
 
-	snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", width);
+	snprintf(tptr, sizeof(tformat) - (size_t)(tptr - tformat), "%d", width);
 	tptr += strlen(tptr);
       }
       else
@@ -181,7 +174,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	  format ++;
 	  prec = va_arg(ap, int);
 
-	  snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", prec);
+	  snprintf(tptr, sizeof(tformat) - (size_t)(tptr - tformat), "%d", prec);
 	  tptr += strlen(tptr);
 	}
 	else
@@ -236,7 +229,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	case 'e' :
 	case 'f' :
 	case 'g' :
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, double));
@@ -258,7 +251,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	case 'o' :
 	case 'u' :
 	case 'x' :
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 #  ifdef HAVE_LONG_LONG
@@ -281,7 +274,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    break;
 
 	case 'p' : /* Pointer value */
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
@@ -301,7 +294,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    if (bufptr)
 	    {
 	      if (width <= 1)
-	        *bufptr++ = va_arg(ap, int);
+	        *bufptr++ = (char)va_arg(ap, int);
 	      else
 	      {
 		if ((bufptr + width) > bufend)
@@ -382,7 +375,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    break;
 
 	case 'n' : /* Output number of chars so far */
-	    *(va_arg(ap, int *)) = bytes;
+	    *(va_arg(ap, int *)) = (int)bytes;
 	    break;
       }
     }
@@ -418,7 +411,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   va_list		ap;		/* Pointer to arguments */
   struct timeval	curtime;	/* Current time */
   char			buffer[2048];	/* Output buffer */
-  size_t		bytes;		/* Number of bytes in buffer */
+  ssize_t		bytes;		/* Number of bytes in buffer */
   int			level;		/* Log level in message */
 
 
@@ -471,7 +464,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   bytes = debug_vsnprintf(buffer + 19, sizeof(buffer) - 20, format, ap) + 19;
   va_end(ap);
 
-  if (bytes >= (sizeof(buffer) - 1))
+  if ((size_t)bytes >= (sizeof(buffer) - 1))
   {
     buffer[sizeof(buffer) - 2] = '\n';
     bytes = sizeof(buffer) - 1;
@@ -487,7 +480,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   */
 
   _cupsMutexLock(&debug_log_mutex);
-  write(_cups_debug_fd, buffer, bytes);
+  write(_cups_debug_fd, buffer, (size_t)bytes);
   _cupsMutexUnlock(&debug_log_mutex);
 }
 
@@ -501,7 +494,7 @@ _cups_debug_puts(const char *s)		/* I - String to output */
 {
   struct timeval	curtime;	/* Current time */
   char			buffer[2048];	/* Output buffer */
-  size_t		bytes;		/* Number of bytes in buffer */
+  ssize_t		bytes;		/* Number of bytes in buffer */
   int			level;		/* Log level in message */
 
 
@@ -551,7 +544,7 @@ _cups_debug_puts(const char *s)		/* I - String to output */
 		   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000),
 		   s);
 
-  if (bytes >= (sizeof(buffer) - 1))
+  if ((size_t)bytes >= (sizeof(buffer) - 1))
   {
     buffer[sizeof(buffer) - 2] = '\n';
     bytes = sizeof(buffer) - 1;
@@ -567,7 +560,7 @@ _cups_debug_puts(const char *s)		/* I - String to output */
   */
 
   _cupsMutexLock(&debug_log_mutex);
-  write(_cups_debug_fd, buffer, bytes);
+  write(_cups_debug_fd, buffer, (size_t)bytes);
   _cupsMutexUnlock(&debug_log_mutex);
 }
 
@@ -650,5 +643,5 @@ _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
 
 
 /*
- * End of "$Id: debug.c 4027 2012-11-16 01:00:05Z msweet $".
+ * End of "$Id: debug.c 11558 2014-02-06 18:33:34Z msweet $".
  */

@@ -625,6 +625,7 @@ CUPS_USER
 CUPS_DEFAULT_SHARED
 CUPS_BROWSE_LOCAL_PROTOCOLS
 CUPS_BROWSING
+CUPS_PAGE_LOG_FORMAT
 CUPS_ACCESS_LOG_LEVEL
 CUPS_LOG_LEVEL
 CUPS_FATAL_ERRORS
@@ -633,8 +634,17 @@ CUPS_CUPSD_FILE_PERM
 CUPS_CONFIG_FILE_PERM
 CUPS_BUNDLEDIR
 LANGUAGES
-LAUNCHDLIBS
-DEFAULT_LAUNCHD_CONF
+XINETD
+RCSTOP
+RCSTART
+RCLEVELS
+INITDDIR
+INITDIR
+SMFMANIFESTDIR
+SYSTEMD_DIR
+LAUNCHD_DIR
+ONDEMANDLIBS
+ONDEMANDFLAGS
 IPPFIND_MAN
 IPPFIND_BIN
 DNSSD_BACKEND
@@ -705,13 +715,6 @@ MENUDIR
 ICONDIR
 CUPS_DATADIR
 CUPS_CACHEDIR
-XINETD
-SMFMANIFESTDIR
-RCSTOP
-RCSTART
-RCLEVELS
-INITDDIR
-INITDIR
 PRIVATEINCLUDE
 privateinclude
 BUILDDIRS
@@ -818,12 +821,6 @@ with_adminkey
 with_operkey
 with_components
 with_privateinclude
-with_rcdir
-with_rclevels
-with_rcstart
-with_rcstop
-with_smfmanifestdir
-with_xinetd
 with_lpdconfig
 with_smbconfig
 with_cachedir
@@ -850,9 +847,6 @@ enable_threads
 enable_ssl
 enable_cdsassl
 enable_gnutls
-enable_openssl
-with_openssl_libs
-with_openssl_includes
 enable_pam
 with_pam_module
 enable_largefile
@@ -861,6 +855,14 @@ enable_dnssd
 with_dnssd_libs
 with_dnssd_includes
 enable_launchd
+enable_systemd
+with_systemd
+with_smfmanifestdir
+with_rcdir
+with_rclevels
+with_rcstart
+with_rcstop
+with_xinetd
 with_languages
 with_bundledir
 with_config_file_perm
@@ -869,6 +871,7 @@ with_log_file_perm
 with_fatal_errors
 with_log_level
 with_access_log_level
+with_page_logging
 enable_browsing
 with_local_protocols
 enable_default_shared
@@ -1530,12 +1533,12 @@ Optional Features:
   --disable-ssl           disable SSL/TLS support
   --enable-cdsassl        use CDSA for SSL/TLS support, default=first
   --enable-gnutls         use GNU TLS for SSL/TLS support, default=second
-  --enable-openssl        use OpenSSL for SSL/TLS support, default=third
   --disable-pam           disable PAM support
   --disable-largefile     omit support for large files
   --disable-avahi         disable DNS Service Discovery support using Avahi
   --disable-dnssd         disable DNS Service Discovery support using mDNSResponder
   --disable-launchd       disable launchd support
+  --disable-systemd       disable systemd support
   --disable-browsing      disable Browsing by default
   --disable-default-shared
 			  disable DefaultShared by default
@@ -1553,12 +1556,6 @@ Optional Packages:
 			    - "all" (default) builds everything
 			    - "core" builds libcups and ipptool
   --with-privateinclude   set path for private include files, default=none
-  --with-rcdir            set path for rc scripts
-  --with-rclevels         set run levels for rc scripts
-  --with-rcstart          set start number for rc scripts
-  --with-rcstop           set stop number for rc scripts
-  --with-smfmanifestdir   set path for Solaris SMF manifest
-  --with-xinetd           set path for xinetd config files
   --with-lpdconfig        set URI for LPD config file
   --with-smbconfig        set URI for Samba config file
   --with-cachedir         set path for cache files
@@ -1573,11 +1570,16 @@ Optional Packages:
   --with-ldarchflags      set program architecture flags
   --with-domainsocket     set unix domain socket name
   --with-gssservicename   set default gss service name
-  --with-openssl-libs     set directory for OpenSSL library
-  --with-openssl-includes set directory for OpenSSL includes
   --with-pam-module       specify the PAM module to use
   --with-dnssd-libs       set directory for DNS Service Discovery library
   --with-dnssd-includes   set directory for DNS Service Discovery includes
+  --with-systemd          set directory for systemd service files
+  --with-smfmanifestdir   set path for Solaris SMF manifest
+  --with-rcdir            set path for rc scripts
+  --with-rclevels         set run levels for rc scripts
+  --with-rcstart          set start number for rc scripts
+  --with-rcstop           set stop number for rc scripts
+  --with-xinetd           set path for xinetd config files
   --with-languages        set installed languages, default=all
   --with-bundledir        set OS X localization bundle directory
   --with-config-file-perm set default ConfigFilePerm value, default=0640
@@ -1585,7 +1587,8 @@ Optional Packages:
   --with-log-file-perm    set default LogFilePerm value, default=0644
   --with-fatal-errors     set default FatalErrors value, default=config
   --with-log-level        set default LogLevel value, default=warn
-  --with-access-log-level set default AccessLogLevel value, default=actions
+  --with-access-log-level set default AccessLogLevel value, default=none
+  --enable-page-logging   enable page_log by default
   --with-local-protocols  set default BrowseLocalProtocols, default=""
   --with-cups-user        set default user for CUPS
   --with-cups-group       set default group for CUPS
@@ -2517,7 +2520,7 @@ esac
 ac_config_headers="$ac_config_headers config.h"
 
 
-CUPS_VERSION=1.7.5
+CUPS_VERSION=2.0b1
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -4109,8 +4112,9 @@ fi
 
 
 
-# Extract the first word of "pkg-config", so it can be a program name with args.
-set dummy pkg-config; ac_word=$2
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_PKGCONFIG+:} false; then :
@@ -4148,6 +4152,63 @@ else
 $as_echo "no" >&6; }
 fi
 
+
+fi
+if test -z "$ac_cv_path_PKGCONFIG"; then
+  ac_pt_PKGCONFIG=$PKGCONFIG
+  # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_PKGCONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_PKGCONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_PKGCONFIG="$ac_pt_PKGCONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_PKGCONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_PKGCONFIG=$ac_cv_path_ac_pt_PKGCONFIG
+if test -n "$ac_pt_PKGCONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKGCONFIG" >&5
+$as_echo "$ac_pt_PKGCONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_PKGCONFIG" = x; then
+    PKGCONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKGCONFIG=$ac_pt_PKGCONFIG
+  fi
+else
+  PKGCONFIG="$ac_cv_path_PKGCONFIG"
+fi
 
 
 
@@ -4829,13 +4890,6 @@ if test "x$ac_cv_header_bstring_h" = xyes; then :
 fi
 
 
-ac_fn_c_check_header_mongrel "$LINENO" "usersec.h" "ac_cv_header_usersec_h" "$ac_includes_default"
-if test "x$ac_cv_header_usersec_h" = xyes; then :
-  $as_echo "#define HAVE_USERSEC_H 1" >>confdefs.h
-
-fi
-
-
 ac_fn_c_check_header_mongrel "$LINENO" "sys/ioctl.h" "ac_cv_header_sys_ioctl_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ioctl_h" = xyes; then :
   $as_echo "#define HAVE_SYS_IOCTL_H 1" >>confdefs.h
@@ -4853,13 +4907,6 @@ fi
 ac_fn_c_check_header_mongrel "$LINENO" "sys/ucred.h" "ac_cv_header_sys_ucred_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_ucred_h" = xyes; then :
   $as_echo "#define HAVE_SYS_UCRED_H 1" >>confdefs.h
-
-fi
-
-
-ac_fn_c_check_header_mongrel "$LINENO" "scsi/sg.h" "ac_cv_header_scsi_sg_h" "$ac_includes_default"
-if test "x$ac_cv_header_scsi_sg_h" = xyes; then :
-  $as_echo "#define HAVE_SCSI_SG_H 1" >>confdefs.h
 
 fi
 
@@ -5158,6 +5205,18 @@ ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
 if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+
+for ac_func in posix_spawn
+do :
+  ac_fn_c_check_func "$LINENO" "posix_spawn" "ac_cv_func_posix_spawn"
+if test "x$ac_cv_func_posix_spawn" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_POSIX_SPAWN 1
 _ACEOF
 
 fi
@@ -5598,13 +5657,6 @@ if test "x$ac_cv_header_CoreFoundation_CFBundlePriv_h" = xyes; then :
 fi
 
 
-		ac_fn_c_check_header_mongrel "$LINENO" "IOKit/pwr_mgt/IOPMLibPrivate.h" "ac_cv_header_IOKit_pwr_mgt_IOPMLibPrivate_h" "$ac_includes_default"
-if test "x$ac_cv_header_IOKit_pwr_mgt_IOPMLibPrivate_h" = xyes; then :
-  $as_echo "#define HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H 1" >>confdefs.h
-
-fi
-
-
 
 				for ac_func in SCDynamicStoreCopyComputerName
 do :
@@ -5904,11 +5956,6 @@ if test "$libdir" = "\${exec_prefix}/lib"; then
 				libdir="$exec_prefix/lib64"
 			fi
 			;;
-		HP-UX*)
-			if test -d /usr/lib/hpux32; then
-				libdir="$exec_prefix/lib/hpux32"
-			fi
-			;;
 	esac
 fi
 
@@ -5925,159 +5972,6 @@ if test "x$privateinclude" != x -a "x$privateinclude" != xnone; then
 else
 	privateinclude=""
 	PRIVATEINCLUDE=""
-fi
-
-
-
-
-# Check whether --with-rcdir was given.
-if test "${with_rcdir+set}" = set; then :
-  withval=$with_rcdir; rcdir="$withval"
-else
-  rcdir=""
-fi
-
-
-# Check whether --with-rclevels was given.
-if test "${with_rclevels+set}" = set; then :
-  withval=$with_rclevels; rclevels="$withval"
-else
-  rclevels="2 3 5"
-fi
-
-
-# Check whether --with-rcstart was given.
-if test "${with_rcstart+set}" = set; then :
-  withval=$with_rcstart; rcstart="$withval"
-else
-  rcstart="99"
-fi
-
-
-# Check whether --with-rcstop was given.
-if test "${with_rcstop+set}" = set; then :
-  withval=$with_rcstop; rcstop="$withval"
-else
-  rcstop="00"
-fi
-
-
-# Check whether --with-smfmanifestdir was given.
-if test "${with_smfmanifestdir+set}" = set; then :
-  withval=$with_smfmanifestdir; smfmanifestdir="$withval"
-else
-  smfmanifestdir=""
-fi
-
-
-INITDIR=""
-INITDDIR=""
-RCLEVELS="$rclevels"
-RCSTART="$rcstart"
-RCSTOP="$rcstop"
-SMFMANIFESTDIR=""
-
-if test x$rcdir = x; then
-	case "$uname" in
-		AIX*)
-			INITDIR="/etc/rc.d"
-			;;
-
-		Darwin*)
-			# Darwin and MacOS X...
-			if test -x /sbin/launchd; then
-				INITDDIR="/System/Library/LaunchDaemons"
-			else
-				INITDDIR="/System/Library/StartupItems/PrintingServices"
-			fi
-			;;
-
-		FreeBSD* | OpenBSD* | MirBSD* | ekkoBSD*)
-			# FreeBSD and OpenBSD
-			;;
-
-		HP-UX*)
-			INITDIR="/sbin"
-			RCLEVELS="2"
-			RCSTART="380"
-			RCSTOP="620"
-			;;
-
-		Linux | GNU | GNU/k*BSD*)
-			# Linux/HURD seems to choose an init.d directory at random...
-			if test -d /sbin/init.d; then
-				# SuSE
-				INITDIR="/sbin/init.d"
-			else
-				if test -d /etc/init.d; then
-					# Others
-					INITDIR="/etc"
-				else
-					# RedHat
-					INITDIR="/etc/rc.d"
-				fi
-			fi
-			RCSTART="81"
-			RCSTOP="36"
-			;;
-
-		NetBSD*)
-			# NetBSD
-			INITDDIR="/etc/rc.d"
-			;;
-
-		OSF1*)
-			INITDIR="/sbin"
-			;;
-
-		SunOS*)
-			# Solaris
-			if test "x$smfmanifestdir" != x; then
-				SMFMANIFESTDIR=$smfmanifestdir
-			else
-				INITDIR="/etc"
-				RCSTART="81"
-			fi
-			;;
-
-		*)
-			INITDIR="/etc"
-			;;
-
-	esac
-elif test "x$rcdir" != xno; then
-	if test "x$rclevels" = x; then
-		INITDDIR="$rcdir"
-	else
-		INITDIR="$rcdir"
-	fi
-fi
-
-
-
-
-
-
-
-
-
-# Check whether --with-xinetd was given.
-if test "${with_xinetd+set}" = set; then :
-  withval=$with_xinetd; XINETD="$withval"
-else
-  XINETD=""
-fi
-
-
-if test "x$XINETD" = x -a ! -x /sbin/launchd; then
-	for dir in /private/etc/xinetd.d /etc/xinetd.d /usr/local/etc/xinetd.d; do
-		if test -d $dir; then
-			XINETD="$dir"
-			break
-		fi
-	done
-elif test "x$XINETD" = xno; then
-	XINETD=""
 fi
 
 
@@ -6266,10 +6160,6 @@ if test "$localedir" = "\${datarootdir}/locale"; then
 			CUPS_LOCALEDIR="$datarootdir/locale"
 			;;
 
-		OSF1* | AIX*)
-			CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
-			;;
-
 		*)
 			# This is the standard System V location...
 			CUPS_LOCALEDIR="$exec_prefix/lib/locale"
@@ -6382,8 +6272,8 @@ fi
 
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
-        	Darwin* | Linux | GNU | *BSD* | AIX*)
-        		# Darwin, MacOS X, Linux, GNU HURD, *BSD, and AIX
+        	Darwin* | Linux | GNU | *BSD*)
+        		# Darwin, MacOS X, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"
@@ -6404,8 +6294,8 @@ fi
 
 
 case "$uname" in
-	SunOS* | HP-UX*)
-		# Solaris and HP-UX
+	SunOS*)
+		# Solaris
 		MAN1EXT=1
 		MAN5EXT=5
 		MAN7EXT=7
@@ -6464,51 +6354,7 @@ if test x$enable_shared != xno; then
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
-		UNIX_S*)
-			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-h,\`basename \$@\` -G \$(OPTIM)"
-			;;
-		HP-UX*)
-			case "$uarch" in
-				ia64)
-					LIBCUPS="lib$cupsbase.so.2"
-					LIBCUPSCGI="libcupscgi.so.1"
-					LIBCUPSIMAGE="libcupsimage.so.2"
-					LIBCUPSMIME="libcupsmime.so.1"
-					LIBCUPSPPDC="libcupsppdc.so.1"
-					DSO="\$(CC)"
-					DSOXX="\$(CXX)"
-					DSOFLAGS="$DSOFLAGS -Wl,-b,-z,+h,\`basename \$@\`"
-					;;
-				*)
-					LIBCUPS="lib$cupsbase.sl.2"
-					LIBCUPSCGI="libcupscgi.sl.1"
-					LIBCUPSIMAGE="libcupsimage.sl.2"
-					LIBCUPSMIME="libcupsmime.sl.1"
-					LIBCUPSPPDC="libcupsppdc.sl.1"
-					DSO="\$(LD)"
-					DSOXX="\$(LD)"
-					DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
-					;;
-			esac
-			;;
-		IRIX)
-			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
-			;;
-		OSF1* | Linux | GNU | *BSD*)
+		Linux | GNU | *BSD*)
 			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -6527,17 +6373,6 @@ if test x$enable_shared != xno; then
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
-			;;
-		AIX*)
-			LIBCUPS="lib${cupsbase}_s.a"
-			LIBCUPSBASE="${cupsbase}_s"
-			LIBCUPSCGI="libcupscgi_s.a"
-			LIBCUPSIMAGE="libcupsimage_s.a"
-			LIBCUPSMIME="libcupsmime_s.a"
-			LIBCUPSPPDC="libcupsppdc_s.a"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-bexpall,-bM:SRE,-bnoentry,-blibpath:\$(libdir)"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
@@ -6581,19 +6416,11 @@ if test x$enable_shared = xno; then
 	EXTLINKCUPS="-lcups"
 	EXTLINKCUPSIMAGE="-lcupsimage"
 else
-	if test $uname = AIX; then
-		LINKCUPS="-l${cupsbase}_s"
-		LINKCUPSIMAGE="-lcupsimage_s"
+	LINKCUPS="-l${cupsbase}"
+	LINKCUPSIMAGE="-lcupsimage"
 
-		EXTLINKCUPS="-lcups_s"
-		EXTLINKCUPSIMAGE="-lcupsimage_s"
-	else
-		LINKCUPS="-l${cupsbase}"
-		LINKCUPSIMAGE="-lcupsimage"
-
-		EXTLINKCUPS="-lcups"
-		EXTLINKCUPSIMAGE="-lcupsimage"
-	fi
+	EXTLINKCUPS="-lcups"
+	EXTLINKCUPSIMAGE="-lcupsimage"
 fi
 
 
@@ -6615,19 +6442,6 @@ if test "$DSO" != ":"; then
 	# need this option, even when the library is installed in a
 	# standard location...
 	case $uname in
-                HP-UX*)
-			# HP-UX needs the path, even for /usr/lib...
-			case "$uarch" in
-				ia64)
-					DSOFLAGS="-Wl,+s,+b,$libdir $DSOFLAGS"
-					;;
-				*)
-                			DSOFLAGS="+s +b $libdir $DSOFLAGS"
-					;;
-			esac
-                	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
-                	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
-			;;
                 SunOS*)
                 	# Solaris...
 			if test $exec_prefix != /usr; then
@@ -6804,7 +6618,7 @@ if test -n "$GCC"; then
 	fi
 
 	# Generate position-independent code as needed...
-	if test $PICFLAG = 1 -a $uname != AIX; then
+	if test $PICFLAG = 1; then
     		OPTIM="-fPIC $OPTIM"
 	fi
 
@@ -6908,17 +6722,13 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wsign-conversion -Wunused $OPTIM"
 
-		# Additional warning options for development testing...
-		if test -d .svn; then
-			OPTIM="-Wshadow -Werror $OPTIM"
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if GCC supports -Wno-tautological-compare" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if GCC supports -Wno-tautological-compare" >&5
 $as_echo_n "checking if GCC supports -Wno-tautological-compare... " >&6; }
-			OLDCFLAGS="$CFLAGS"
-			CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-			cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 int
@@ -6931,14 +6741,18 @@ main ()
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
   OPTIM="$OPTIM -Wno-tautological-compare"
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-			CFLAGS="$OLDCFLAGS"
+		CFLAGS="$OLDCFLAGS"
+
+		# Additional warning options for development testing...
+		if test -d .svn; then
+			OPTIM="-Werror $OPTIM"
 		fi
 	fi
 
@@ -6963,59 +6777,11 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 else
 	# Add vendor-specific compiler options...
 	case $uname in
-		AIX*)
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O2 -qmaxmem=6000"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-			;;
-		HP-UX*)
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="+O2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-
-			CFLAGS="-Ae $CFLAGS"
-
-			if test $PICFLAG = 1; then
-				OPTIM="+z $OPTIM"
-			fi
-			;;
-		OSF*)
-			# Tru64 UNIX aka Digital UNIX aka OSF/1
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O"
-				else
-					OPTIM="$with_optim"
-				fi
-			fi
-			;;
 		SunOS*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
 					OPTIM="-xO2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-
-			if test $PICFLAG = 1; then
-				OPTIM="-KPIC $OPTIM"
-			fi
-			;;
-		UNIX_SVR*)
-			# UnixWare
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O"
 				else
 					OPTIM="$with_optim $OPTIM"
 				fi
@@ -7039,30 +6805,10 @@ fi
 
 # Add general compiler options per platform...
 case $uname in
-	HP-UX*)
-		# HP-UX 10.20 (at least) needs this definition to get the
-		# h_errno global...
-		OPTIM="$OPTIM -D_XOPEN_SOURCE_EXTENDED"
-
-		# HP-UX 11.00 (at least) needs this definition to get the
-		# u_short type used by the IP headers...
-		OPTIM="$OPTIM -D_INCLUDE_HPUX_SOURCE"
-
-		# HP-UX 11.23 (at least) needs this definition to get the
-		# IPv6 header to work...
-		OPTIM="$OPTIM -D_HPUX_SOURCE"
-		;;
-
 	Linux*)
 		# glibc 2.8 and higher breaks peer credentials unless you
 		# define _GNU_SOURCE...
 		OPTIM="$OPTIM -D_GNU_SOURCE"
-		;;
-
-	OSF*)
-		# Tru64 UNIX aka Digital UNIX aka OSF/1 need to be told
-		# to be POSIX-compliant...
-		OPTIM="$OPTIM -D_XOPEN_SOURCE=500 -D_XOPEN_SOURCE_EXTENDED -D_OSF_SOURCE"
 		;;
 esac
 
@@ -7706,21 +7452,6 @@ fi
 
 
 
-for ac_header in AppleTalk/at_proto.h
-do :
-  ac_fn_c_check_header_compile "$LINENO" "AppleTalk/at_proto.h" "ac_cv_header_AppleTalk_at_proto_h" "#include <netat/appletalk.h>
-"
-if test "x$ac_cv_header_AppleTalk_at_proto_h" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_APPLETALK_AT_PROTO_H 1
-_ACEOF
- $as_echo "#define HAVE_APPLETALK_AT_PROTO_H 1" >>confdefs.h
-
-fi
-
-done
-
-
 
 
 ac_fn_c_check_func "$LINENO" "poll" "ac_cv_func_poll"
@@ -7754,8 +7485,9 @@ LIBGSSAPI=""
 
 
 if test x$enable_gssapi != xno; then
-	# Extract the first word of "krb5-config", so it can be a program name with args.
-set dummy krb5-config; ac_word=$2
+	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}krb5-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}krb5-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_KRB5CONFIG+:} false; then :
@@ -7793,6 +7525,63 @@ else
 $as_echo "no" >&6; }
 fi
 
+
+fi
+if test -z "$ac_cv_path_KRB5CONFIG"; then
+  ac_pt_KRB5CONFIG=$KRB5CONFIG
+  # Extract the first word of "krb5-config", so it can be a program name with args.
+set dummy krb5-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_KRB5CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_KRB5CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_KRB5CONFIG="$ac_pt_KRB5CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_KRB5CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_KRB5CONFIG=$ac_cv_path_ac_pt_KRB5CONFIG
+if test -n "$ac_pt_KRB5CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_KRB5CONFIG" >&5
+$as_echo "$ac_pt_KRB5CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_KRB5CONFIG" = x; then
+    KRB5CONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    KRB5CONFIG=$ac_pt_KRB5CONFIG
+  fi
+else
+  KRB5CONFIG="$ac_cv_path_KRB5CONFIG"
+fi
 
 	if test "x$KRB5CONFIG" != x; then
 		case "$uname" in
@@ -8200,25 +7989,6 @@ if test "${enable_gnutls+set}" = set; then :
   enableval=$enable_gnutls;
 fi
 
-# Check whether --enable-openssl was given.
-if test "${enable_openssl+set}" = set; then :
-  enableval=$enable_openssl;
-fi
-
-
-# Check whether --with-openssl-libs was given.
-if test "${with_openssl_libs+set}" = set; then :
-  withval=$with_openssl_libs; LDFLAGS="-L$withval $LDFLAGS"
-    DSOFLAGS="-L$withval $DSOFLAGS"
-fi
-
-
-# Check whether --with-openssl-includes was given.
-if test "${with_openssl_includes+set}" = set; then :
-  withval=$with_openssl_includes; CFLAGS="-I$withval $CFLAGS"
-    CPPFLAGS="-I$withval $CPPFLAGS"
-fi
-
 
 SSLFLAGS=""
 SSLLIBS=""
@@ -8299,6 +8069,8 @@ fi
 
 		$as_echo "#define HAVE_CSSMERRORSTRING 1" >>confdefs.h
 
+		$as_echo "#define HAVE_SECKEYCHAINOPEN 1" >>confdefs.h
+
 fi
 
 
@@ -8306,8 +8078,9 @@ fi
     fi
 
         if test $have_ssl = 0 -a "x$enable_gnutls" != "xno" -a "x$PKGCONFIG" != x; then
-    	# Extract the first word of "libgnutls-config", so it can be a program name with args.
-set dummy libgnutls-config; ac_word=$2
+    	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}libgnutls-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}libgnutls-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_LIBGNUTLSCONFIG+:} false; then :
@@ -8346,8 +8119,66 @@ $as_echo "no" >&6; }
 fi
 
 
-    	# Extract the first word of "libgcrypt-config", so it can be a program name with args.
-set dummy libgcrypt-config; ac_word=$2
+fi
+if test -z "$ac_cv_path_LIBGNUTLSCONFIG"; then
+  ac_pt_LIBGNUTLSCONFIG=$LIBGNUTLSCONFIG
+  # Extract the first word of "libgnutls-config", so it can be a program name with args.
+set dummy libgnutls-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_LIBGNUTLSCONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_LIBGNUTLSCONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_LIBGNUTLSCONFIG="$ac_pt_LIBGNUTLSCONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_LIBGNUTLSCONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_LIBGNUTLSCONFIG=$ac_cv_path_ac_pt_LIBGNUTLSCONFIG
+if test -n "$ac_pt_LIBGNUTLSCONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_LIBGNUTLSCONFIG" >&5
+$as_echo "$ac_pt_LIBGNUTLSCONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_LIBGNUTLSCONFIG" = x; then
+    LIBGNUTLSCONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    LIBGNUTLSCONFIG=$ac_pt_LIBGNUTLSCONFIG
+  fi
+else
+  LIBGNUTLSCONFIG="$ac_cv_path_LIBGNUTLSCONFIG"
+fi
+
+    	if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}libgcrypt-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}libgcrypt-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_LIBGCRYPTCONFIG+:} false; then :
@@ -8386,6 +8217,63 @@ $as_echo "no" >&6; }
 fi
 
 
+fi
+if test -z "$ac_cv_path_LIBGCRYPTCONFIG"; then
+  ac_pt_LIBGCRYPTCONFIG=$LIBGCRYPTCONFIG
+  # Extract the first word of "libgcrypt-config", so it can be a program name with args.
+set dummy libgcrypt-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_LIBGCRYPTCONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_LIBGCRYPTCONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_LIBGCRYPTCONFIG="$ac_pt_LIBGCRYPTCONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_LIBGCRYPTCONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_LIBGCRYPTCONFIG=$ac_cv_path_ac_pt_LIBGCRYPTCONFIG
+if test -n "$ac_pt_LIBGCRYPTCONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_LIBGCRYPTCONFIG" >&5
+$as_echo "$ac_pt_LIBGCRYPTCONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_LIBGCRYPTCONFIG" = x; then
+    LIBGCRYPTCONFIG=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    LIBGCRYPTCONFIG=$ac_pt_LIBGCRYPTCONFIG
+  fi
+else
+  LIBGCRYPTCONFIG="$ac_cv_path_LIBGCRYPTCONFIG"
+fi
+
 	if $PKGCONFIG --exists gnutls; then
 	    have_ssl=1
 	    SSLLIBS=`$PKGCONFIG --libs gnutls`
@@ -8407,103 +8295,7 @@ fi
 	if test $have_ssl = 1; then
 	    CUPS_SERVERCERT="ssl/server.crt"
 	    CUPS_SERVERKEY="ssl/server.key"
-
-            if $PKGCONFIG --exists gcrypt; then
-	        SSLLIBS="$SSLLIBS `$PKGCONFIG --libs gcrypt`"
-	        SSLFLAGS="$SSLFLAGS `$PKGCONFIG --cflags gcrypt`"
-	    elif test "x$LIBGCRYPTCONFIG" != x; then
-	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
-	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
-	    fi
 	fi
-    fi
-
-        if test $have_ssl = 0 -a "x$enable_openssl" != "xno"; then
-	ac_fn_c_check_header_mongrel "$LINENO" "openssl/ssl.h" "ac_cv_header_openssl_ssl_h" "$ac_includes_default"
-if test "x$ac_cv_header_openssl_ssl_h" = xyes; then :
-
-	    	    	    SAVELIBS="$LIBS"
-
-
-	    for libcrypto in \
-		"-lcrypto" \
-		"-lcrypto -lrsaref" \
-		"-lcrypto -lRSAglue -lrsaref"
-	    do
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SSL_new in -lssl" >&5
-$as_echo_n "checking for SSL_new in -lssl... " >&6; }
-if ${ac_cv_lib_ssl_SSL_new+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lssl $libcrypto $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char SSL_new ();
-int
-main ()
-{
-return SSL_new ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_ssl_SSL_new=yes
-else
-  ac_cv_lib_ssl_SSL_new=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ssl_SSL_new" >&5
-$as_echo "$ac_cv_lib_ssl_SSL_new" >&6; }
-if test "x$ac_cv_lib_ssl_SSL_new" = xyes; then :
-  have_ssl=1
-		     SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
-		     SSLLIBS="-lssl $libcrypto"
-		     $as_echo "#define HAVE_SSL 1" >>confdefs.h
-
-		     $as_echo "#define HAVE_LIBSSL 1" >>confdefs.h
-
-fi
-
-
-		if test "x${SSLLIBS}" != "x"; then
-		    break
-		fi
-	    done
-
-	    if test "x${SSLLIBS}" != "x"; then
-		CUPS_SERVERCERT="ssl/server.crt"
-		CUPS_SERVERKEY="ssl/server.key"
-
-		LIBS="$SAVELIBS $SSLLIBS"
-		for ac_func in SSL_set_tlsext_host_name
-do :
-  ac_fn_c_check_func "$LINENO" "SSL_set_tlsext_host_name" "ac_cv_func_SSL_set_tlsext_host_name"
-if test "x$ac_cv_func_SSL_set_tlsext_host_name" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_SSL_SET_TLSEXT_HOST_NAME 1
-_ACEOF
-
-fi
-done
-
-	    fi
-
-	    LIBS="$SAVELIBS"
-fi
-
-
     fi
 fi
 
@@ -8514,7 +8306,7 @@ $as_echo "    Using SSLLIBS=\"$SSLLIBS\"" >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result:     Using SSLFLAGS=\"$SSLFLAGS\"" >&5
 $as_echo "    Using SSLFLAGS=\"$SSLFLAGS\"" >&6; }
     IPPALIASES="http https ipps"
-elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes -o x$enable_openssl = xyes; then
+elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes; then
     as_fn_error $? "Unable to enable SSL support." "$LINENO" 5
 fi
 
@@ -8540,10 +8332,6 @@ if test "${with_pam_module+set}" = set; then :
   withval=$with_pam_module;
 fi
 
-
-if test $uname = AIX; then
-	enable_pam=no
-fi
 
 PAMDIR=""
 PAMFILE="pam.std"
@@ -9172,15 +8960,18 @@ fi
 
 
 
+ONDEMANDFLAGS=""
+ONDEMANDLIBS=""
+
+
 
 # Check whether --enable-launchd was given.
 if test "${enable_launchd+set}" = set; then :
   enableval=$enable_launchd;
 fi
 
+LAUNCHD_DIR=""
 
-DEFAULT_LAUNCHD_CONF=""
-LAUNCHDLIBS=""
 
 if test x$enable_launchd != xno; then
 	ac_fn_c_check_func "$LINENO" "launch_msg" "ac_cv_func_launch_msg"
@@ -9189,6 +8980,17 @@ if test "x$ac_cv_func_launch_msg" = xyes; then :
 
 fi
 
+	if test $uversion -ge 140; then
+		ac_fn_c_check_func "$LINENO" "launch_activate_socket" "ac_cv_func_launch_activate_socket"
+if test "x$ac_cv_func_launch_activate_socket" = xyes; then :
+
+			$as_echo "#define HAVE_LAUNCHD 1" >>confdefs.h
+
+			$as_echo "#define HAVE_LAUNCH_ACTIVATE_SOCKET 1" >>confdefs.h
+
+fi
+
+	fi
 	ac_fn_c_check_header_mongrel "$LINENO" "launch.h" "ac_cv_header_launch_h" "$ac_includes_default"
 if test "x$ac_cv_header_launch_h" = xyes; then :
   $as_echo "#define HAVE_LAUNCH_H 1" >>confdefs.h
@@ -9200,7 +9002,7 @@ fi
 	case "$uname" in
 		Darwin*)
 			# Darwin, MacOS X
-			DEFAULT_LAUNCHD_CONF="/System/Library/LaunchDaemons/org.cups.cupsd.plist"
+			LAUNCHD_DIR="/System/Library/LaunchDaemons"
 			# liblaunch is already part of libSystem
 			;;
 		*)
@@ -9209,7 +9011,181 @@ fi
 	esac
 fi
 
+# Check whether --enable-systemd was given.
+if test "${enable_systemd+set}" = set; then :
+  enableval=$enable_systemd;
+fi
 
+
+# Check whether --with-systemd was given.
+if test "${with_systemd+set}" = set; then :
+  withval=$with_systemd; SYSTEMD_DIR="$withval"
+else
+  SYSTEMD_DIR=""
+fi
+
+
+
+if test x$enable_systemd != xno; then
+	if test "x$PKGCONFIG" = x; then
+        	if test x$enable_systemd = xyes; then
+	        	as_fn_error $? "Need pkg-config to enable systemd support." "$LINENO" 5
+                fi
+        else
+        	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libsystemd-daemon" >&5
+$as_echo_n "checking for libsystemd-daemon... " >&6; }
+                if $PKGCONFIG --exists libsystemd-daemon; then
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
+                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
+                        $as_echo "#define HAVE_SYSTEMD 1" >>confdefs.h
+
+			if test "x$SYSTEMD_DIR" = x; then
+			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
+                        fi
+                else
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                fi
+        fi
+fi
+
+SMFMANIFESTDIR=""
+
+
+# Check whether --with-smfmanifestdir was given.
+if test "${with_smfmanifestdir+set}" = set; then :
+  withval=$with_smfmanifestdir; SMFMANIFESTDIR="$withval"
+fi
+
+
+
+# Check whether --with-rcdir was given.
+if test "${with_rcdir+set}" = set; then :
+  withval=$with_rcdir; rcdir="$withval"
+else
+  rcdir=""
+fi
+
+
+# Check whether --with-rclevels was given.
+if test "${with_rclevels+set}" = set; then :
+  withval=$with_rclevels; rclevels="$withval"
+else
+  rclevels="2 3 5"
+fi
+
+
+# Check whether --with-rcstart was given.
+if test "${with_rcstart+set}" = set; then :
+  withval=$with_rcstart; rcstart="$withval"
+else
+  rcstart=""
+fi
+
+
+# Check whether --with-rcstop was given.
+if test "${with_rcstop+set}" = set; then :
+  withval=$with_rcstop; rcstop="$withval"
+else
+  rcstop=""
+fi
+
+
+if test x$rcdir = x; then
+	if test x$LAUNCHD_DIR = x -a x$SYSTEMD_DIR = x -a x$SMFMANIFESTDIR = x; then
+                # Fall back on "init", the original service startup interface...
+                if test -d /sbin/init.d; then
+                        # SuSE
+                        rcdir="/sbin/init.d"
+                elif test -d /etc/init.d; then
+                        # Others
+                        rcdir="/etc"
+                else
+                        # RedHat, NetBSD
+                        rcdir="/etc/rc.d"
+                fi
+        else
+        	rcdir="no"
+	fi
+fi
+
+if test "x$rcstart" = x; then
+	case "$uname" in
+        	Linux | GNU | GNU/k*BSD*)
+                	# Linux
+                        rcstart="81"
+                      	;;
+
+		SunOS*)
+			# Solaris
+                        rcstart="81"
+			;;
+
+                *)
+                        # Others
+                        rcstart="99"
+                        ;;
+	esac
+fi
+
+if test "x$rcstop" = x; then
+	case "$uname" in
+        	Linux | GNU | GNU/k*BSD*)
+                	# Linux
+                        rcstop="36"
+                      	;;
+
+                *)
+                        # Others
+                        rcstop="00"
+                        ;;
+	esac
+fi
+
+INITDIR=""
+INITDDIR=""
+RCLEVELS="$rclevels"
+RCSTART="$rcstart"
+RCSTOP="$rcstop"
+
+
+
+
+
+
+if test "x$rcdir" != xno; then
+	if test "x$rclevels" = x; then
+		INITDDIR="$rcdir"
+	else
+		INITDIR="$rcdir"
+	fi
+fi
+
+
+# Check whether --with-xinetd was given.
+if test "${with_xinetd+set}" = set; then :
+  withval=$with_xinetd; xinetd="$withval"
+else
+  xinetd=""
+fi
+
+XINETD=""
+
+
+if test "x$xinetd" = x; then
+	if test ! -x /sbin/launchd; then
+                for dir in /etc/xinetd.d /usr/local/etc/xinetd.d; do
+                        if test -d $dir; then
+                                XINETD="$dir"
+                                break
+                        fi
+                done
+        fi
+elif test "x$xinet" != xno; then
+	XINETD="$xinetd"
+fi
 
 
 
@@ -9326,13 +9302,26 @@ _ACEOF
 if test "${with_access_log_level+set}" = set; then :
   withval=$with_access_log_level; CUPS_ACCESS_LOG_LEVEL="$withval"
 else
-  CUPS_ACCESS_LOG_LEVEL="actions"
+  CUPS_ACCESS_LOG_LEVEL="none"
 fi
 
 
 cat >>confdefs.h <<_ACEOF
 #define CUPS_DEFAULT_ACCESS_LOG_LEVEL "$CUPS_ACCESS_LOG_LEVEL"
 _ACEOF
+
+
+
+# Check whether --with-page_logging was given.
+if test "${with_page_logging+set}" = set; then :
+  withval=$with_page_logging;
+fi
+
+if test "x$enable_page_logging" = xyes; then
+	CUPS_PAGE_LOG_FORMAT=""
+else
+	CUPS_PAGE_LOG_FORMAT="PageLogFormat"
+fi
 
 
 # Check whether --enable-browsing was given.
@@ -10088,7 +10077,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config data/testprint desktop/cups.desktop doc/help/ref-cups-files-conf.html doc/help/ref-cupsd-conf.html doc/index.html man/client.conf.man man/cups-deviced.man man/cups-driverd.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist templates/header.tmpl packaging/cups.list $LANGFILES"
+ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config data/testprint desktop/cups.desktop doc/index.html man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket templates/header.tmpl packaging/cups.list $LANGFILES"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -10802,12 +10791,8 @@ do
     "cups-config") CONFIG_FILES="$CONFIG_FILES cups-config" ;;
     "data/testprint") CONFIG_FILES="$CONFIG_FILES data/testprint" ;;
     "desktop/cups.desktop") CONFIG_FILES="$CONFIG_FILES desktop/cups.desktop" ;;
-    "doc/help/ref-cups-files-conf.html") CONFIG_FILES="$CONFIG_FILES doc/help/ref-cups-files-conf.html" ;;
-    "doc/help/ref-cupsd-conf.html") CONFIG_FILES="$CONFIG_FILES doc/help/ref-cupsd-conf.html" ;;
     "doc/index.html") CONFIG_FILES="$CONFIG_FILES doc/index.html" ;;
     "man/client.conf.man") CONFIG_FILES="$CONFIG_FILES man/client.conf.man" ;;
-    "man/cups-deviced.man") CONFIG_FILES="$CONFIG_FILES man/cups-deviced.man" ;;
-    "man/cups-driverd.man") CONFIG_FILES="$CONFIG_FILES man/cups-driverd.man" ;;
     "man/cups-files.conf.man") CONFIG_FILES="$CONFIG_FILES man/cups-files.conf.man" ;;
     "man/cups-lpd.man") CONFIG_FILES="$CONFIG_FILES man/cups-lpd.man" ;;
     "man/cups-snmp.man") CONFIG_FILES="$CONFIG_FILES man/cups-snmp.man" ;;
@@ -10819,6 +10804,9 @@ do
     "scheduler/cups.sh") CONFIG_FILES="$CONFIG_FILES scheduler/cups.sh" ;;
     "scheduler/cups.xml") CONFIG_FILES="$CONFIG_FILES scheduler/cups.xml" ;;
     "scheduler/org.cups.cups-lpd.plist") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cups-lpd.plist" ;;
+    "scheduler/org.cups.cupsd.path") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.path" ;;
+    "scheduler/org.cups.cupsd.service") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.service" ;;
+    "scheduler/org.cups.cupsd.socket") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.socket" ;;
     "templates/header.tmpl") CONFIG_FILES="$CONFIG_FILES templates/header.tmpl" ;;
     "packaging/cups.list") CONFIG_FILES="$CONFIG_FILES packaging/cups.list" ;;
     "$LANGFILES") CONFIG_FILES="$CONFIG_FILES $LANGFILES" ;;

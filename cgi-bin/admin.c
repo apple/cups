@@ -1,37 +1,16 @@
 /*
- * "$Id: admin.c 11345 2013-10-18 21:14:52Z msweet $"
+ * "$Id: admin.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Administration CGI for CUPS.
+ * Administration CGI for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                    - Main entry for CGI.
- *   choose_device_cb()        - Add a device to the device selection page.
- *   do_add_rss_subscription() - Add a RSS subscription.
- *   do_am_class()             - Add or modify a class.
- *   do_am_printer()           - Add or modify a printer.
- *   do_cancel_subscription()  - Cancel a subscription.
- *   do_config_server()        - Configure server settings.
- *   do_delete_class()         - Delete a class.
- *   do_delete_printer()       - Delete a printer.
- *   do_export()               - Export printers to Samba.
- *   do_list_printers()        - List available printers.
- *   do_menu()                 - Show the main menu.
- *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
- *   do_set_default()          - Set the server default printer/class.
- *   do_set_options()          - Configure the default options for a queue.
- *   do_set_sharing()          - Set printer-is-shared value.
- *   get_option_value()        - Return the value of an option.
- *   get_points()              - Get a value in points.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -89,8 +68,7 @@ static double	get_points(double number, const char *uval);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
-     char *argv[])			/* I - Command-line arguments */
+main(void)
 {
   http_t	*http;			/* Connection to the server */
   const char	*op;			/* Operation name */
@@ -1172,7 +1150,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       char		filename[1024];	/* PPD filename */
       ppd_file_t	*ppd;		/* PPD information */
       char		buffer[1024];	/* Buffer */
-      int		bytes;		/* Number of bytes */
+      ssize_t		bytes;		/* Number of bytes */
       http_status_t	get_status;	/* Status of GET */
 
 
@@ -1194,7 +1172,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       else if ((fd = cupsTempFd(filename, sizeof(filename))) >= 0)
       {
 	while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
-          write(fd, buffer, bytes);
+          write(fd, buffer, (size_t)bytes);
 
 	close(fd);
 
@@ -1211,8 +1189,10 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	}
 	else
 	{
+	  int linenum;			/* Line number */
+
 	  fprintf(stderr, "ERROR: Unable to open PPD file %s: %s\n",
-	          filename, ppdErrorString(ppdLastError(&bytes)));
+	          filename, ppdErrorString(ppdLastError(&linenum)));
 	}
       }
       else
@@ -1380,7 +1360,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       if ((uriptr = strchr(uri, '?')) == NULL)
         uriptr = uri + strlen(uri);
 
-      snprintf(uriptr, sizeof(uri) - (uriptr - uri),
+      snprintf(uriptr, sizeof(uri) - (size_t)(uriptr - uri),
                "?baud=%s+bits=%s+parity=%s+flow=%s",
                cgiGetVariable("BAUDRATE"), cgiGetVariable("BITS"),
 	       cgiGetVariable("PARITY"), cgiGetVariable("FLOW"));
@@ -1881,7 +1861,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
         if ((end = strstr(start, "\n")) == NULL)
 	  end = start + strlen(start);
 
-      cupsFileWrite(temp, start, end - start);
+      cupsFileWrite(temp, start, (size_t)(end - start));
       cupsFilePutChar(temp, '\n');
 
       if (*end == '\r')
@@ -2006,9 +1986,9 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Allocate memory and load the file into a string buffer...
     */
 
-    if ((buffer = calloc(1, info.st_size + 1)) != NULL)
+    if ((buffer = calloc(1, (size_t)info.st_size + 1)) != NULL)
     {
-      cupsFileRead(cupsd, buffer, info.st_size);
+      cupsFileRead(cupsd, buffer, (size_t)info.st_size);
       cgiSetVariable("CUPSDCONF", buffer);
       free(buffer);
     }
@@ -2025,7 +2005,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if (!stat(filename, &info) && info.st_size < (1024 * 1024) &&
         (cupsd = cupsFileOpen(filename, "r")) != NULL)
     {
-      if ((buffer = calloc(1, 2 * info.st_size + 1)) != NULL)
+      if ((buffer = calloc(1, 2 * (size_t)info.st_size + 1)) != NULL)
       {
 	bufend = buffer + 2 * info.st_size - 1;
 
@@ -2035,7 +2015,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 	  if (ch == '\\' || ch == '\"')
 	  {
 	    *bufptr++ = '\\';
-	    *bufptr++ = ch;
+	    *bufptr++ = (char)ch;
 	  }
 	  else if (ch == '\n')
 	  {
@@ -2048,7 +2028,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 	    *bufptr++ = 't';
 	  }
 	  else if (ch >= ' ')
-	    *bufptr++ = ch;
+	    *bufptr++ = (char)ch;
 	}
 
 	*bufptr = '\0';
@@ -3882,7 +3862,7 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
-  ippAddBoolean(request, IPP_TAG_OPERATION, "printer-is-shared", atoi(shared));
+  ippAddBoolean(request, IPP_TAG_OPERATION, "printer-is-shared", (char)atoi(shared));
 
  /*
   * Do the request and get back a response...
@@ -4096,7 +4076,7 @@ get_option_value(
       if ((val = cgiGetVariable(keyword)) == NULL)
 	return (NULL);
 
-      snprintf(bufptr, bufend - bufptr, "%s%s=", prefix, cparam->name);
+      snprintf(bufptr, (size_t)(bufend - bufptr), "%s%s=", prefix, cparam->name);
       bufptr += strlen(bufptr);
       prefix = " ";
 
@@ -4110,7 +4090,7 @@ get_option_value(
 		number > cparam->maximum.custom_real)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%g", number);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%g", number);
 	    break;
 
 	case PPD_CUSTOM_INT :
@@ -4120,7 +4100,7 @@ get_option_value(
 		integer > cparam->maximum.custom_int)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%ld", integer);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%ld", integer);
 	    break;
 
 	case PPD_CUSTOM_POINTS :
@@ -4138,7 +4118,7 @@ get_option_value(
 		number_points > cparam->maximum.custom_points)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%g%s", number, uval);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%g%s", number, uval);
 	    break;
 
 	case PPD_CUSTOM_PASSCODE :
@@ -4218,5 +4198,5 @@ get_points(double     number,		/* I - Original number */
 
 
 /*
- * End of "$Id: admin.c 11345 2013-10-18 21:14:52Z msweet $".
+ * End of "$Id: admin.c 11594 2014-02-14 20:09:01Z msweet $".
  */

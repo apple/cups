@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -8,36 +8,44 @@
 <body>
 <h1 class="title">ppdpo(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-ppdpo - ppd message catalog generator
+ppdpo - ppd message catalog generator (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>ppdpo
-</b>[ -D
-<i>name[=value]
-</i>] [ -I
-<i>include-directory
-</i>] [ -o
-<i>output-file
-</i>]
-<i>source-file
-</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>ppdpo</i> extracts UI strings from PPDC source files and updates either
-a GNU gettext or OS X strings format message catalog source file for
-translation.
-<p>The <i>-D</i> option sets the named variable for use in the
-source file. It is equivalent to using the #define directive
-in the source file.
-<p>The <i>-I</i> option specifies an alternate include directory;
-multiple <i>-I</i> options can be supplied to add additional
-directories.
-<p>The <i>-o</i> option specifies the output file. The supported extensions are
-".po" or ".po.gz" for GNU gettext format message catalogs and ".strings" for
-OS X strings files.
+<b>ppdpo</b>
+[
+<b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+] [
+<b>-I</b>
+<i>include-directory</i>
+] [
+<b>-o</b>
+<i>output-file</i>
+]
+<i>source-file</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ppdpo</b> extracts UI strings from PPDC source files and updates either a GNU gettext or OS X strings format message catalog source file for translation.
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ppdpo</b> supports the following options:
+<dl class="man">
+<dt><b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+<dd style="margin-left: 5.0em">Sets the named variable for use in the source file.
+It is equivalent to using the <i>#define</i> directive in the source file.
+<dt><b>-I </b><i>include-directory</i>
+<dd style="margin-left: 5.0em">Specifies an alternate include directory.
+Multiple <i>-I</i> options can be supplied to add additional directories.
+<dt><b>-o </b><i>output-file</i>
+<dd style="margin-left: 5.0em">Specifies the output file.
+The supported extensions are <i>.po</i> or <i>.po.gz</i> for GNU gettext format message catalogs and <i>.strings</i> for OS X strings files.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5)
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-ppdc.html?TOPIC=Man+Pages"><b>ppdc</b>(1),</a>
+<a href="man-ppdhtml.html?TOPIC=Man+Pages"><b>ppdhtml</b>(1),</a>
+<a href="man-ppdi.html?TOPIC=Man+Pages"><b>ppdi</b>(1),</a>
+<a href="man-ppdmerge.html?TOPIC=Man+Pages"><b>ppdmerge</b>(1),</a>
+<b>ppdcfile(5),</b>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

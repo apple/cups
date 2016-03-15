@@ -38,18 +38,6 @@ authentication:</P>
 	username and password information - this is the default on
 	MacOS X and systems with GNU TLS or OpenSSL installed.</P></LI>
 
-	<LI>Digest authentication uses an MD5 checksum of the
-	username, password, and domain ("CUPS"), so the original
-	username and password is not sent over the network.
-
-	<P>The current implementation does not authenticate the
-	entire message and uses the client's IP address for the
-	nonce value, making it possible to launch "man in the
-	middle" and replay attacks from the same client.</P>
-
-	<P><B>Recommendation:</B> Enable encryption to hide the
-	username and password information.</P></LI>
-
 	<LI>Local certificate authentication passes 128-bit
 	"certificates" that identify an authenticated user.
 	Certificates are created on-the-fly from random data and
@@ -101,20 +89,6 @@ variety of denial of service attacks:</P>
 
 	<P><B>Recommendation:</B> None.</P></LI>
 
-	<LI>Flooding the network with broadcast packets on port
-	631.
-
-	<P>It might be possible to disable browsing if this
-	condition is detected by the CUPS software, however if
-	there are large numbers of printers available on the
-	network such an algorithm might think that an attack was
-	occurring when instead a valid update was being
-	received.</P>
-
-	<P><B>Recommendation:</B> Block browse packets from
-	foreign or untrusted networks using a router or
-	firewall.</P></LI>
-
 	<LI>Sending partial IPP requests; specifically, sending
 	part of an attribute value and then stopping
 	transmission.
@@ -146,27 +120,7 @@ variety of denial of service attacks:</P>
 
 <H2 CLASS="title"><A NAME="ENCRYPTION">Encryption Issues</A></H2>
 
-<P>CUPS supports 128-bit SSL 3.0 and TLS 1.0 encryption of
-network connections via the OpenSSL, GNU TLS, and CDSA encryption
-libraries. In additional to the potential security issues posed
-by the SSL and TLS protocols, CUPS currently has the following
-additional issue:</P>
-
-<OL>
-
-	<LI>Certification validation/revocation; currently CUPS
-	does not validate or revoke server or client certificates
-	when establishing a secure connection. This can
-	potentially lead to "man in the middle" and
-	impersonation/spoofing attacks over unsecured networks.
-	Future versions of CUPS will support both validation and
-	revocation of server certificates.
-
-	<P><B>Recommendation:</B> Do not depend on encryption for
-	security when connecting to servers over the Internet or
-	untrusted WAN links.</P></LI>
-
-</OL>
+<P>CUPS supports 128-bit TLS encryption of network connections via the GNU TLS library, OS X Security framework, and Windows SSPI APIs. Secure deployment of TLS depends on proper certificate management and software maintenance.</P>
 
 </BODY>
 </HTML>

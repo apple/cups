@@ -37,6 +37,7 @@
 #                                       100=default, 200=highest)
 #   printable(offset,length)		True if bytes are printable 8-bit chars
 #					(CR, NL, TAB, BS, 32-126, 128-254)
+#   regex(offset,"regex")		True if bytes match regular expression
 #   string(offset,"string")		True if bytes are identical to string
 #   istring(offset,"string")		True if bytes are identical to
 #                                       case-insensitive string
@@ -70,7 +71,7 @@
 #
 
 #application/msword		doc string(0,<D0CF11E0A1B11AE1>)
-application/pdf			pdf string(0,%PDF)
+application/pdf			pdf regex(0,^[\\n\\r]*%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
 				(contains(0,4096,"LANGUAGE=POSTSCRIPT") \
@@ -123,7 +124,7 @@ application/x-shell		sh printable(0,1024) + string(0,#!) +\
 				(contains(2,80,/bash) contains(2,80,/ksh)\
 				 contains(2,80,/sh) contains(2,80,/zsh))
 application/x-csource		c cxx cpp cc C h hpp \
-				printable(0,1024) + \
+				printable(0,1024) + ! css + \
 				(string(0,/*) string(0,//)
 				 string(0,#include) contains(0,1024,<0a>#include) \
 				 string(0,#define) contains(0,1024,<0a>#define))

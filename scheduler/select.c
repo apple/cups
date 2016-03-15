@@ -1,28 +1,16 @@
 /*
- * "$Id: select.c 11142 2013-07-17 01:07:00Z msweet $"
+ * "$Id: select.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   Select abstraction functions for the CUPS scheduler.
+ * Select abstraction functions for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddSelect()    - Add a file descriptor to the list.
- *   cupsdDoSelect()     - Do a select-like operation.
- *   cupsdIsSelecting()  - Determine whether we are monitoring a file
- *                         descriptor.
- *   cupsdRemoveSelect() - Remove a file descriptor from the list.
- *   cupsdStartSelect()  - Initialize the file polling engine.
- *   cupsdStopSelect()   - Shutdown the file polling engine.
- *   compare_fds()       - Compare file descriptors.
- *   find_fd()           - Find an existing file descriptor record.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -39,8 +27,6 @@
 #  include <sys/time.h>
 #elif defined(HAVE_POLL)
 #  include <poll.h>
-#elif defined(__hpux)
-#  include <sys/time.h>
 #else
 #  include <sys/select.h>
 #endif /* HAVE_EPOLL */
@@ -532,15 +518,13 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 
 
       if (cupsd_pollfds)
-	pfd = realloc(cupsd_pollfds, allocfds * sizeof(struct pollfd));
+	pfd = realloc(cupsd_pollfds, (size_t)allocfds * sizeof(struct pollfd));
       else
-	pfd = malloc(allocfds * sizeof(struct pollfd));
+	pfd = malloc((size_t)allocfds * sizeof(struct pollfd));
 
       if (!pfd)
       {
-	cupsdLogMessage(CUPSD_LOG_EMERG,
-                	"Unable to allocate %d bytes for polling!",
-                	(int)(allocfds * sizeof(struct pollfd)));
+	cupsdLogMessage(CUPSD_LOG_EMERG, "Unable to allocate %d bytes for polling.", (int)((size_t)allocfds * sizeof(struct pollfd)));
 
 	return (-1);
       }
@@ -569,9 +553,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   }
 
   if (timeout >= 0 && timeout < 86400)
-    nfds = poll(cupsd_pollfds, count, timeout * 1000);
+    nfds = poll(cupsd_pollfds, (nfds_t)count, timeout * 1000);
   else
-    nfds = poll(cupsd_pollfds, count, -1);
+    nfds = poll(cupsd_pollfds, (nfds_t)count, -1);
 
   if (nfds > 0)
   {
@@ -822,13 +806,13 @@ cupsdStartSelect(void)
 
 #ifdef HAVE_EPOLL
   cupsd_epoll_fd       = epoll_create(MaxFDs);
-  cupsd_epoll_events   = calloc(MaxFDs, sizeof(struct epoll_event));
+  cupsd_epoll_events   = calloc((size_t)MaxFDs, sizeof(struct epoll_event));
   cupsd_update_pollfds = 0;
 
 #elif defined(HAVE_KQUEUE)
   cupsd_kqueue_fd      = kqueue();
   cupsd_kqueue_changes = 0;
-  cupsd_kqueue_events  = calloc(MaxFDs, sizeof(struct kevent));
+  cupsd_kqueue_events  = calloc((size_t)MaxFDs, sizeof(struct kevent));
 
 #elif defined(HAVE_POLL)
   cupsd_update_pollfds = 0;
@@ -946,5 +930,5 @@ find_fd(int fd)				/* I - File descriptor */
 
 
 /*
- * End of "$Id: select.c 11142 2013-07-17 01:07:00Z msweet $".
+ * End of "$Id: select.c 11594 2014-02-14 20:09:01Z msweet $".
  */

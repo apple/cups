@@ -1,21 +1,21 @@
 #
-# "$Id: cups.list.in 11025 2013-06-07 01:00:33Z msweet $"
+# "$Id: cups.list.in 11776 2014-03-28 19:16:05Z msweet $"
 #
-#   ESP Package Manager (EPM) file list for CUPS.
+# ESP Package Manager (EPM) file list for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 # Product information
 %product CUPS
-%copyright 2007-2012 by Apple Inc.
+%copyright 2007-2014 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -345,7 +345,6 @@ f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
 f 0555 root sys $BINDIR/ipptool test/ipptool
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
-f 0555 root sys $BINDIR/lppasswd systemv/lppasswd
 f 0555 root sys $BINDIR/lpq berkeley/lpq
 f 0555 root sys $BINDIR/lpr berkeley/lpr
 f 0555 root sys $BINDIR/lprm berkeley/lprm
@@ -652,7 +651,6 @@ f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
-f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.$MAN1EXT
@@ -736,5 +734,5 @@ f 0444 root sys $XINETD/cups-lpd scheduler/cups-lpd.xinetd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 11025 2013-06-07 01:00:33Z msweet $".
+# End of "$Id: cups.list.in 11776 2014-03-28 19:16:05Z msweet $".
 #

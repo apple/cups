@@ -1,22 +1,16 @@
 //
-// "$Id: ppdmerge.cxx 3275 2011-05-20 07:26:13Z msweet $"
+// "$Id: ppdmerge.cxx 11558 2014-02-06 18:33:34Z msweet $"
 //
-//   PPD file merge utility for the CUPS PPD Compiler.
+// PPD file merge utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2011 by Apple Inc.
-//   Copyright 2002-2007 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 2002-2007 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   main()       - Main entry for the PPD merge utility.
-//   ppd_locale() - Return the locale associated with a PPD file.
-//   usage()      - Show usage and exit.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -302,8 +296,8 @@ main(int  argc,				// I - Number of command-line arguments
 static const char *			// O - Locale string
 ppd_locale(ppd_file_t *ppd)		// I - PPD file
 {
-  int		i,			// Looping var
-		vlen;			// Length of LanguageVersion string
+  int		i;			// Looping var
+  size_t	vlen;			// Length of LanguageVersion string
   static char	locale[255];		// Locale string
   static struct				// LanguageVersion translation table
   {
@@ -375,5 +369,5 @@ usage(void)
 
 
 //
-// End of "$Id: ppdmerge.cxx 3275 2011-05-20 07:26:13Z msweet $".
+// End of "$Id: ppdmerge.cxx 11558 2014-02-06 18:33:34Z msweet $".
 //

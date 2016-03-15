@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: ipptoolfile.man 11734 2014-03-25 18:01:47Z msweet $"
+.\" "$Id: ipptoolfile.man 11880 2014-05-16 06:14:11Z msweet $"
 .\"
 .\" ipptoolfile man page for CUPS.
 .\"
@@ -11,539 +11,522 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "25 March 2014" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "15 May 2014" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
-
 .SH DESCRIPTION
-The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
+The
+.BR ipptool (1)
+program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
 .nf
 
     # This is a comment
     {
       # The name of the test
-      NAME "Print PostScript Job"
+      NAME "Print PostScript File"
 
       # The request to send
-      OPERATION Print-Job
-      GROUP operation-attributes-tag
-      ATTR charset attributes-charset utf-8
-      ATTR language attributes-natural-language en
-      ATTR uri printer-uri $uri
-      ATTR name requesting-user-name $user
+      OPERATION Print\-Job
+      GROUP operation\-attributes\-tag
+      ATTR charset attributes\-charset utf\-8
+      ATTR language attributes\-natural\-language en
+      ATTR uri printer\-uri $uri
+      ATTR name requesting\-user\-name $user
       FILE testfile.ps
 
       # The response to expect
-      STATUS successful-ok
-      EXPECT attributes-charset OF-TYPE charset
-      EXPECT attributes-natural-language OF-TYPE naturalLanguage
-      EXPECT job-id OF-TYPE integer
-      EXPECT job-uri OF-TYPE uri
+      STATUS successful\-ok
+      EXPECT job\-id OF\-TYPE integer WITH\-VALUE >0
+      EXPECT job\-uri OF\-TYPE uri
     }
     {
       # The name of the test
       NAME "Get Attributes of PostScript Job"
 
       # The request to send
-      OPERATION Get-Job-Attributes
-      GROUP operation-attributes-tag
-      ATTR charset attributes-charset utf-8
-      ATTR language attributes-natural-language en
-      ATTR uri printer-uri $uri
-      ATTR integer job-id $job-id
-      ATTR name requesting-user-name $user
+      OPERATION Get\-Job\-Attributes
+      GROUP operation\-attributes\-tag
+      ATTR charset attributes\-charset utf\-8
+      ATTR language attributes\-natural\-language en
+      ATTR uri printer\-uri $uri
+      ATTR integer job\-id $job\-id
+      ATTR name requesting\-user\-name $user
 
       # The response to expect
-      STATUS successful-ok
-      EXPECT attributes-charset OF-TYPE charset
-      EXPECT attributes-natural-language OF-TYPE naturalLanguage
-      EXPECT job-id OF-TYPE integer
-      EXPECT job-uri OF-TYPE uri
-      EXPECT job-state OF-TYPE enum
-      EXPECT job-originating-user-name OF-TYPE name WITH-VALUE "$user"
+      STATUS successful\-ok
+      EXPECT job\-id OF\-TYPE integer WITH\-VALUE $job\-id
+      EXPECT job\-uri OF\-TYPE uri
+      EXPECT job\-state OF\-TYPE enum WITH\-VALUE 3,4,5,6,7,8,9
+      EXPECT job\-originating\-user\-name OF\-TYPE name WITH\-VALUE "$user"
     }
 .fi
-
-.SH TOP-LEVEL DIRECTIVES
-The following directives can be used outside of a test:
+.SS TOP-LEVEL DIRECTIVES
+The following directives can be used outside of a \fItest\fR:
 .TP 5
-{ test }
+\fB{ \fItest \fB}\fR
 Defines a test.
 .TP 5
-DEFINE variable-name value
-Defines the named variable to the given value. This is equivalent to specifying
-"-d variable-name=value" on the \fIipptool\fR command-line.
+\fBDEFINE \fIvariable-name value\fR
+Defines the named variable to the given value. This is equivalent to specifying \fI\-d variable-name=value\fR on the
+.BR ipptool (8)
+command-line.
 .TP 5
-DEFINE-DEFAULT variable-name value
-Defines the named variable to the given value if it does not already have a
-value.
+\fBDEFINE\-DEFAULT \fIvariable-name value\fR
+Defines the named variable to the given value if it does not already have a value.
 .TP 5
-FILE-ID "identifier"
+\fBFILE\-ID "\fIidentifier\fB"\fR
 Specifies an identifier string for the current file.
 .TP 5
-IGNORE-ERRORS yes
+\fBIGNORE\-ERRORS yes\fR
 .TP 5
-IGNORE-ERRORS no
-Specifies whether, by default, \fIipptool\fR will ignore errors and continue with
-subsequent tests.
+\fBIGNORE\-ERRORS no\fR
+Specifies whether, by default,
+.BR ipptool (8)
+will ignore errors and continue with subsequent tests.
 .TP 5
-INCLUDE "filename"
+\fBINCLUDE "\fIfilename\fB"\fR
 .TP 5
-INCLUDE <filename>
-Includes another test file. The first form includes a file relative to the
-current test file, while the second form includes a file from the \fIipptool\fR
+\fBINCLUDE <\fIfilename\fB>\fR
+Includes another test file. The first form includes a file relative to the current test file, while the second form includes a file from the
+.BR ipptool (8)
 include directory.
 .TP 5
-INCLUDE-IF-DEFINED name "filename"
+\fBINCLUDE\-IF\-DEFINED \fIname \fB"\fIfilename\fB"\fR
 .TP 5
-INCLUDE-IF-DEFINED name <filename>
-Includes another test file if the named variable is defined. The first form
-includes a file relative to the current test file, while the second form
-includes a file from the \fIipptool\fR include directory.
+\fBINCLUDE\-IF\-DEFINED \fIname \fB<\fIfilename\fB>\fR
+Includes another test file if the named variable is defined. The first form includes a file relative to the current test file, while the second form includes a file from the
+.BR ipptool (8)
+include directory.
 .TP 5
-INCLUDE-IF-NOT-DEFINED name "filename"
+\fBINCLUDE\-IF\-NOT\-DEFINED \fIname \fB"\fIfilename\fB"\fR
 .TP 5
-INCLUDE-IF-NOT-DEFINED name <filename>
-Includes another test file if the named variable is not defined. The first form
-includes a file relative to the current test file, while the second form
-includes a file from the \fIipptool\fR include directory.
+\fBINCLUDE\-IF\-NOT\-DEFINED \fIname \fB<\fIfilename\fB>\fR
+Includes another test file if the named variable is not defined. The first form includes a file relative to the current test file, while the second form includes a file from the
+.BR ipptool (8)
+include directory.
 .TP 5
-SKIP-IF-DEFINED variable-name
+\fBSKIP\-IF\-DEFINED \fIvariable-name\fR
 .TP 5
-SKIP-IF-NOT-DEFINED variable-name
-Specifies that the remainder of the test file should be skipped when the
-variable is or is not defined.
+\fBSKIP\-IF\-NOT\-DEFINED \fIvariable-name\fR
+Specifies that the remainder of the test file should be skipped when the variable is or is not defined.
 .TP 5
-STOP-AFTER-INCLUDE-ERROR no
+\fBSTOP\-AFTER\-INCLUDE\-ERROR no\fR
 .TP 5
-STOP-AFTER-INCLUDE-ERROR yes
+\fBSTOP\-AFTER\-INCLUDE\-ERROR yes\fR
 Specifies whether tests will be stopped after an error in an included file.
 .TP 5
-TRANSFER auto
-Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
-requests with attached files and "Content-Length:" for requests without attached
-files.
+\fBTRANSFER auto\fR
+Specifies that tests will, by default, use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
 .TP 5
-TRANSFER chunked
-Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding:
-chunked" header. This is the default and is equivalent to specifying "-c" on the
-\fIipptool\fR command-line. Support for chunked requests is required for
-conformance with all versions of IPP.
+\fBTRANSFER chunked\fR
+Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding: chunked" header. This is the default and is equivalent to specifying \fI\-c\fR on the
+.BR ipptool (8)
+command-line. Support for chunked requests is required for conformance with all versions of IPP.
 .TP 5
-TRANSFER length
-Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:"
-header. This is equivalent to specifying "-l" on the \fIipptool\fR command-line.
-Support for content length requests is required for conformance with all
-versions of IPP.
+\fBTRANSFER length\fR
+Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:" header. This is equivalent to specifying \fI\-l\fR on the
+.BR ipptool (8)
+command-line. Support for content length requests is required for conformance with all versions of IPP.
 .TP 5
-VERSION 1.0
+\fBVERSION 1.0\fR
 .TP 5
-VERSION 1.1
+\fBVERSION 1.1\fR
 .TP 5
-VERSION 2.0
+\fBVERSION 2.0\fR
 .TP 5
-VERSION 2.1
+\fBVERSION 2.1\fR
 .TP 5
-VERSION 2.2
+\fBVERSION 2.2\fR
 Specifies the default IPP version number to use for the tests that follow.
-
-.SH TEST DIRECTIVES
-The following directives are understood in a test:
+.SS TEST DIRECTIVES
+The following directives are understood within a \fItest\fR:
 .TP 5
-ATTR tag attribute-name value(s)
-Adds an attribute to the test request. Values are separated by the comma (",")
-character - escape commas using the "\" character. Common attributes and values are listed in the IANA IPP registry - see references below.
+\fBATTR \fItag attribute-name value(s)\fR
+Adds an attribute to the test request. Values are separated by the comma (",") character - escape commas using the "\" character. Common attributes and values are listed in the IANA IPP registry - see references below.
 .TP 5
-ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
-Adds a collection attribute to the test request. Member attributes follow the
-same syntax as regular attributes and can themselves be nested collections.
-Multiple collection values can be supplied as needed.
+\fBATTR collection \fIattribute-name \fB{ MEMBER \fItag member-name value(s) ... \fB}\fR [ \fI... \fB,{ \fI... \fB} \fR]
+Adds a collection attribute to the test request. Member attributes follow the same syntax as regular attributes and can themselves be nested collections. Multiple collection values can be supplied as needed, separated by commas.
 .TP 5
-COMPRESSION deflate
+\fBCOMPRESSION deflate\fR
 .TP 5
-COMPRESSION gzip
+\fBCOMPRESSION gzip\fR
 .TP 5
-COMPRESSION none
-.br
-Uses the specified compression on the document data following the attributes in
-a Print-Job or Send-Document request.
+\fBCOMPRESSION none\fR
+Uses the specified compression on the document data following the attributes in a Print-Job or Send-Document request.
 .TP 5
-DELAY seconds
+\fBDELAY \fIseconds\fR
 Specifies a delay before this test will be run.
 .TP 5
-DISPLAY attribute-name
+\fBDISPLAY \fIattribute-name\fR
 Specifies that value of the named attribute should be output as part of the
 test report.
 .TP 5
-EXPECT attribute-name [ predicate(s) ]
+\fBEXPECT \fIattribute-name \fR[ \fIpredicate(s) \fR]
 .TP 5
-EXPECT ?attribute-name predicate(s)
+\fBEXPECT ?\fIattribute-name predicate(s)\fR
 .TP 5
-EXPECT !attribute-name
-Specifies that the response must/may/must not include the named attribute.
-Additional requirements can be added as predicates - see the "EXPECT PREDICATES"
-section for more information on predicates.
+\fBEXPECT !\fIattribute-name\fR
+Specifies that the response must/may/must not include the named attribute. Additional requirements can be added as predicates - see the "EXPECT PREDICATES" section for more information on predicates. Attribute names can specify member attributes by separating the attribute and member names with the forward slash, for example "media\-col/media\-size/x\-dimension".
 .TP 5
-FILE filename
-Specifies a file to include at the end of the request. This is typically used
-when sending a test print file.
+\fBFILE filename\fR
+Specifies a file to include at the end of the request. This is typically used when sending a test print file.
 .TP 5
-GROUP tag
+\fBGROUP tag\fR
 Specifies the group tag for subsequent attributes in the request.
 .TP 5
-IGNORE-ERRORS yes
+\fBIGNORE\-ERRORS yes\fR
 .TP 5
-IGNORE-ERRORS no
-Specifies whether \fIipptool\fR will ignore errors and continue with subsequent
-tests.
+\fBIGNORE\-ERRORS no\fR
+Specifies whether
+.BR ipptool (8)
+will ignore errors and continue with subsequent tests.
 .TP 5
-NAME "literal string"
+\fBNAME "\fIliteral string\fB"\fR
 Specifies the human-readable name of the test.
 .TP 5
-OPERATION operation-code
+\fBOPERATION \fIoperation-code\fR
 Specifies the operation to be performed.
 .TP 5
-REQUEST-ID number
+\fBPAUSE "\fImessage\fB"\fR
+Displays the provided message and waits for the user to press a key to continue.
 .TP 5
-REQUEST-ID random
-Specifies the request-id value to use in the request, either an integer or the
-word "random" to use a randomly generated value (the default).
+\fBREQUEST\-ID \fInumber\fR\fR
 .TP 5
-RESOURCE path
-Specifies an alternate resource path that is used for the HTTP POST request.
-The default is the resource from the URI provided to the \fIipptool\fR program.
+\fBREQUEST\-ID random\fR
+Specifies the request-id value to use in the request, either an integer or the word "random" to use a randomly generated value (the default).
 .TP 5
-SKIP-IF-DEFINED variable-name
+\fBRESOURCE \fIpath\fR
+Specifies an alternate resource path that is used for the HTTP POST request. The default is the resource from the URI provided to the
+.BR ipptool (8)
+program.
 .TP 5
-SKIP-IF-NOT-DEFINED variable-name
-Specifies that the current test should be skipped when the variable is or is not
-defined.
+\fBSKIP\-IF\-DEFINED \fIvariable-name\fR
 .TP 5
-SKIP-PREVIOUS-ERROR yes
+\fBSKIP\-IF\-NOT\-DEFINED \fIvariable-name\fR
+Specifies that the current test should be skipped when the variable is or is not defined.
 .TP 5
-SKIP-PREVIOUS-ERROR no
-Specifies whether \fIipptool\fR will skip the current test if the previous test
-resulted in an error/failure.
+\fBSKIP\-PREVIOUS\-ERROR yes\fR
 .TP 5
-STATUS status-code [ predicate ]
-Specifies an expected response status-code value. Additional requirements can be
-added as predicates - see the "STATUS PREDICATES" section for more information
-on predicates.
+\fBSKIP\-PREVIOUS\-ERROR no\fR
+Specifies whether
+.BR ipptool (8)
+will skip the current test if the previous test resulted in an error/failure.
 .TP 5
-TEST-ID "identifier"
+\fBSTATUS \fIstatus-code \fR[ \fIpredicate\fR ]
+Specifies an expected response status-code value. Additional requirements can be added as predicates - see the "STATUS PREDICATES" section for more information on predicates.
+.TP 5
+\fBTEST\-ID "\fIidentifier\fR"
 Specifies an identifier string for the current test.
 .TP 5
-TRANSFER auto
-Specifies that this test will use "Transfer-Encoding: chunked" if it has an
-attached file or "Content-Length:" otherwise.
+\fBTRANSFER auto\fR
+Specifies that this test will use "Transfer-Encoding: chunked" if it has an attached file or "Content-Length:" otherwise.
 .TP 5
-TRANSFER chunked
-Specifies that this test will use the HTTP/1.1 "Transfer-Encoding: chunked"
-header.
+\fBTRANSFER chunked\fR
+Specifies that this test will use the HTTP/1.1 "Transfer-Encoding: chunked" header.
 .TP 5
-TRANSFER length
+\fBTRANSFER length\fR
 Specifies that this test will use the HTTP/1.0 "Content-Length:" header.
 .TP 5
-VERSION 1.0
+\fBVERSION 1.0\fR
 .TP 5
-VERSION 1.1
+\fBVERSION 1.1\fR
 .TP 5
-VERSION 2.0
+\fBVERSION 2.0\fR
 .TP 5
-VERSION 2.1
+\fBVERSION 2.1\fR
 .TP 5
-VERSION 2.2
+\fBVERSION 2.2\fR
 Specifies the IPP version number to use for this test.
-
-.SH EXPECT PREDICATES
-The following predicates are understood following the EXPECT test directive:
+.SS EXPECT PREDICATES
+The following predicates are understood following the \fBEXPECT\fR test directive:
 .TP 5
-COUNT number
-Requires the EXPECT attribute to have the specified number of values.
+\fBCOUNT \fInumber\fR
+Requires the \fBEXPECT\fR attribute to have the specified number of values.
 .TP 5
-DEFINE-MATCH variable-name
-Defines the variable to "1" when the EXPECT condition matches. A side-effect of
-this predicate is that this EXPECT will never fail a test.
+\fBDEFINE\-MATCH \fIvariable-name\fR
+Defines the variable to "1" when the \fBEXPECT\fR condition matches. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
 .TP 5
-DEFINE-NO-MATCH variable-name
-Defines the variable to "1" when the EXPECT condition does not match. A side-
-effect of this predicate is that this EXPECT will never fail a test.
+\fBDEFINE\-NO\-MATCH \fIvariable-name\fR
+Defines the variable to "1" when the \fBEXPECT\fR condition does not match. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
 .TP 5
-DEFINE-VALUE variable-name
-Defines the variable to the value of the attribute when the EXPECT condition
-matches. A side-effect of this predicate is that this EXPECT will never fail a test.
+\fBDEFINE\-VALUE \fIvariable-name\fR
+Defines the variable to the value of the attribute when the \fBEXPECT\fR condition matches. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
 .TP 5
-IF-DEFINED variable-name
-Makes the EXPECT conditions apply only if the specified variable is defined.
+\fBIF\-DEFINED \fIvariable-name\fR
+Makes the \fBEXPECT\fR conditions apply only if the specified variable is defined.
 .TP 5
-IF-NOT-DEFINED variable-name
-Makes the EXPECT conditions apply only if the specified variable is not
-defined.
+\fBIF\-NOT\-DEFINED \fIvariable-name\fR
+Makes the \fBEXPECT\fR conditions apply only if the specified variable is not defined.
 .TP 5
-IN-GROUP tag
-Requires the EXPECT attribute to be in the specified group tag.
+\fBIN\-GROUP \fItag\fR
+Requires the \fBEXPECT\fR attribute to be in the specified group tag.
 .TP 5
-OF-TYPE tag[,tag,...]
-Requires the EXPECT attribute to use the specified value tag(s).
+\fBOF\-TYPE \fItag[,tag,...]\fR
+Requires the \fBEXPECT\fR attribute to use one of the specified value tag(s).
 .TP 5
-REPEAT-LIMIT number
+\fBREPEAT\-LIMIT \fInumber\fR
 .br
-Specifies the maximum number of times to repeat. The default value is 1000.
+Specifies the maximum number of times to repeat if the \fBREPEAT-MATCH\fR or \fBREPEAT-NO-MATCH\fR predicate is specified. The default value is 1000.
 .TP 5
-REPEAT-MATCH
+\fBREPEAT\-MATCH\fR
 .TP 5
-REPEAT-NO-MATCH
-Specifies that the current test should be repeated when the EXPECT condition
-matches or does not match.
+\fBREPEAT\-NO\-MATCH\fR
+Specifies that the current test should be repeated when the \fBEXPECT\fR condition matches or does not match.
 .TP 5
-SAME-COUNT-AS attribute-name
-Requires the EXPECT attribute to have the same number of values as the specified
-parallel attribute.
+\fBSAME\-COUNT\-AS \fIattribute-name\fR
+Requires the \fBEXPECT\fR attribute to have the same number of values as the specified parallel attribute.
 .TP 5
-WITH-ALL-HOSTNAMES "literal string"
+\fBWITH\-ALL\-HOSTNAMES "\fIliteral string\fB"\fR
 .TP 5
-WITH-ALL-HOSTNAMES "/regular expression/"
+\fBWITH\-ALL\-HOSTNAMES "/\fIregular expression\fB/"\fR
 Requires that all URI values contain a matching hostname.
 .TP 5
-WITH-ALL-RESOURCES "literal string"
+\fBWITH\-ALL\-RESOURCES "\fIliteral string\fB"\fR
 .TP 5
-WITH-ALL-RESOURCES "/regular expression/"
+\fBWITH\-ALL\-RESOURCES "/\fIregular expression\fB/"\fR
 Requires that all URI values contain a matching resource (including leading /).
 .TP 5
-WITH-ALL-SCHEMES "literal string"
+\fBWITH\-ALL\-SCHEMES "\fIliteral string\fB"\fR
 .TP 5
-WITH-ALL-SCHEMES "/regular expression/"
+\fBWITH\-ALL-SCHEMES "/\fIregular expression\fB/"\fR
 Requires that all URI values contain a matching scheme.
 .TP 5
-WITH-ALL-VALUES "literal string"
-Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
+\fBWITH\-ALL\-VALUES "\fIliteral string\fB"\fR
+Requires that all values of the \fBEXPECT\fR attribute match the literal string. Comparisons are case-sensitive.
 .TP 5
-WITH-ALL-VALUES <number
+\fBWITH\-ALL\-VALUES <\fInumber\fR
 .TP 5
-WITH-ALL-VALUES =number
+\fBWITH\-ALL\-VALUES =\fInumber\fR
 .TP 5
-WITH-ALL-VALUES >number
+\fBWITH\-ALL\-VALUES >\fInumber\fR
 .TP 5
-WITH-ALL-VALUES number[,number,...]
-Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
+\fBWITH\-ALL\-VALUES \fInumber\fR[\fI,...,number\fR]
+Requires that all values of the \fBEXPECT\fR attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
 .TP 5
-WITH-ALL-VALUES "false"
+\fBWITH\-ALL\-VALUES "false"\fR
 .TP 5
-WITH-ALL-VALUES "true"
-Requires that all values of the EXPECT attribute match the boolean value given.
+\fBWITH\-ALL\-VALUES "true"\fR
+Requires that all values of the \fBEXPECT\fR attribute match the boolean value given.
 .TP 5
-WITH-ALL-VALUES "/regular expression/"
-Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+\fBWITH\-ALL\-VALUES "/\fIregular expression\fB/"\fR
+Requires that all values of the \fBEXPECT\fR attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
 .TP 5
-WITH-HOSTNAME "literal string"
+\fBWITH\-HOSTNAME "\fIliteral string\fB"\fR
 .TP 5
-WITH-HOSTNAME "/regular expression/"
+\fBWITH\-HOSTNAME "/\fIregular expression\fB/"\fR
 Requires that at least one URI value contains a matching hostname.
 .TP 5
-WITH-RESOURCE "literal string"
+\fBWITH\-RESOURCE "\fIliteral string\fB"\fR
 .TP 5
-WITH-RESOURCE "/regular expression/"
+\fBWITH\-RESOURCE "/\fIregular expression\fB/"\fR
 Requires that at least one URI value contains a matching resource (including leading /).
 .TP 5
-WITH-SCHEME "literal string"
+\fBWITH\-SCHEME "\fIliteral string\fB"\fR
 .TP 5
-WITH-SCHEME "/regular expression/"
+\fBWITH\-SCHEME "/\fIregular expression\fB/"\fR
 Requires that at least one URI value contains a matching scheme.
 .TP 5
-WITH-VALUE "literal string"
-Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
+\fBWITH\-VALUE "\fIliteral string\fB"\fR
+Requires that at least one value of the \fBEXPECT\fR attribute matches the literal string. Comparisons are case-sensitive.
 .TP 5
-WITH-VALUE <number
+\fBWITH\-VALUE <\fInumber\fR
 .TP 5
-WITH-VALUE =number
+\fBWITH\-VALUE =\fInumber\fR
 .TP 5
-WITH-VALUE >number
+\fBWITH\-VALUE >\fInumber\fR
 .TP 5
-WITH-VALUE number[,number,...]
-Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
+\fBWITH\-VALUE \fInumber\fR[\fI,...,number\fR]
+Requires that at least one value of the \fBEXPECT\fR attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
 .TP 5
-WITH-VALUE "false"
+\fBWITH\-VALUE "false"\fR
 .TP 5
-WITH-VALUE "true"
-Requires that at least one value of the EXPECT attribute matches the boolean value given.
+\fBWITH\-VALUE "true"\fR
+Requires that at least one value of the \fBEXPECT\fR attribute matches the boolean value given.
 .TP 5
-WITH-VALUE "/regular expression/"
-Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
-
-.SH STATUS PREDICATES
-The following predicates are understood following the STATUS test directive:
+\fBWITH\-VALUE "/\fIregular expression\fB/"\fR
+Requires that at least one value of the \fBEXPECT\fR attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+.SS STATUS PREDICATES
+The following predicates are understood following the \fBSTATUS\fR test directive:
 .TP 5
-DEFINE-MATCH variable-name
-Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+\fBDEFINE\-MATCH \fIvariable-name\fR
+Defines the variable to "1" when the \fBSTATUS\fR matches. A side-effect of this predicate is that this \fBSTATUS\fR will never fail a test.
 .TP 5
-DEFINE-NO-MATCH variable-name
-Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+\fBDEFINE\-NO\-MATCH \fIvariable-name\fR
+Defines the variable to "1" when the \fBSTATUS\fR does not match. A side-effect of this predicate is that this \fBSTATUS\fR will never fail a test.
 .TP 5
-IF-DEFINED variable-name
-Makes the STATUS apply only if the specified variable is defined.
+\fBIF\-DEFINED \fIvariable-name\fR
+Makes the \fBSTATUS\fR apply only if the specified variable is defined.
 .TP 5
-IF-NOT-DEFINED variable-name
-Makes the STATUS apply only if the specified variable is not defined.
+\fBIF\-NOT\-DEFINED \fIvariable-name\fR
+Makes the \fBSTATUS\fR apply only if the specified variable is not defined.
 .TP 5
-REPEAT-LIMIT number
+\fBREPEAT\-LIMIT \fInumber\fR
 .br
 Specifies the maximum number of times to repeat. The default value is 1000.
 .TP 5
-REPEAT-MATCH
+\fBREPEAT\-MATCH\fR
 .TP 5
-REPEAT-NO-MATCH
-Specifies that the current test should be repeated when the response status-code
-matches or does not match the value specified by the STATUS directive.
-
-.SH OPERATION CODES
-Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from
-RFC 2911 and other IPP extension specifications. Here is a complete list:
+\fBREPEAT\-NO\-MATCH\fR
+Specifies that the current test should be repeated when the response status-code matches or does not match the value specified by the STATUS directive.
+.SS OPERATION CODES
+Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of names supported by
+.BR ipptool (8):
 .nf
-    Activate-Printer
-    CUPS-Accept-Jobs
-    CUPS-Add-Modify-Class
-    CUPS-Add-Modify-Printer
-    CUPS-Authenticate-Job
-    CUPS-Delete-Class
-    CUPS-Delete-Printer
-    CUPS-Get-Classes
-    CUPS-Get-Default
-    CUPS-Get-Devices
-    CUPS-Get-Document
-    CUPS-Get-PPD
-    CUPS-Get-PPDs
-    CUPS-Get-Printers
-    CUPS-Move-Job
-    CUPS-Reject-Jobs
-    CUPS-Set-Default
-    Cancel-Current-Job
-    Cancel-Job
-    Cancel-Jobs
-    Cancel-My-Jobs
-    Cancel-Subscription
-    Close-Job
-    Create-Job
-    Create-Job-Subscriptions
-    Create-Printer-Subscriptions
-    Deactivate-Printer
-    Disable-Printer
-    Enable-Printer
-    Get-Job-Attributes
-    Get-Jobs
-    Get-Notifications
-    Get-Printer-Attributes
-    Get-Printer-Support-Files
-    Get-Printer-Supported-Values
-    Get-Subscription-Attributes
-    Get-Subscriptions
-    Hold-Job
-    Hold-New-Jobs
-    Identify-Printer
-    Pause-Printer
-    Pause-Printer-After-Current-Job
-    Print-Job
-    Print-URI
-    Promote-Job
-    Purge-Jobs
-    Release-Held-New-Jobs
-    Release-Job
-    Renew-Subscription
-    Reprocess-Job
-    Restart-Job
-    Restart-Printer
-    Resubmit-Job
-    Resume-Job
-    Resume-Printer
-    Schedule-Job-After
-    Send-Document
-    Send-Hardcopy-Document
-    Send-Notifications
-    Send-URI
-    Set-Job-Attributes
-    Set-Printer-Attributes
-    Shutdown-Printer
-    Startup-Printer
-    Suspend-Current-Job
-    Validate-Document
-    Validate-Job
+
+    Activate\-Printer
+    CUPS\-Accept\-Jobs
+    CUPS\-Add\-Modify\-Class
+    CUPS\-Add\-Modify\-Printer
+    CUPS\-Authenticate\-Job
+    CUPS\-Delete\-Class
+    CUPS\-Delete\-Printer
+    CUPS\-Get\-Classes
+    CUPS\-Get\-Default
+    CUPS\-Get\-Devices
+    CUPS\-Get\-Document
+    CUPS\-Get\-PPD
+    CUPS\-Get\-PPDs
+    CUPS\-Get\-Printers
+    CUPS\-Move\-Job
+    CUPS\-Reject\-Jobs
+    CUPS\-Set\-Default
+    Cancel\-Current\-Job
+    Cancel\-Job
+    Cancel\-Jobs
+    Cancel\-My\-Jobs
+    Cancel\-Subscription
+    Close\-Job
+    Create\-Job
+    Create\-Job\-Subscriptions
+    Create\-Printer\-Subscriptions
+    Deactivate\-Printer
+    Disable\-Printer
+    Enable\-Printer
+    Get\-Job\-Attributes
+    Get\-Jobs
+    Get\-Notifications
+    Get\-Printer\-Attributes
+    Get\-Printer\-Support\-Files
+    Get\-Printer\-Supported\-Values
+    Get\-Subscription\-Attributes
+    Get\-Subscriptions
+    Hold\-Job
+    Hold\-New\-Jobs
+    Identify\-Printer
+    Pause\-Printer
+    Pause\-Printer\-After\-Current\-Job
+    Print\-Job
+    Print\-URI
+    Promote\-Job
+    Purge\-Jobs
+    Release\-Held\-New\-Jobs
+    Release\-Job
+    Renew\-Subscription
+    Reprocess\-Job
+    Restart\-Job
+    Restart\-Printer
+    Resubmit\-Job
+    Resume\-Job
+    Resume\-Printer
+    Schedule\-Job\-After
+    Send\-Document
+    Send\-Hardcopy\-Document
+    Send\-Notifications
+    Send\-URI
+    Set\-Job\-Attributes
+    Set\-Printer\-Attributes
+    Shutdown\-Printer
+    Startup\-Printer
+    Suspend\-Current\-Job
+    Validate\-Document
+    Validate\-Job
 .fi
-
-.SH STATUS CODES
-Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
-2911 and other IPP extension specifications. Here is a complete list:
+.SS STATUS CODES
+Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of the names supported by
+.BR ipptool (8):
 .nf
-    client-error-attributes-not-settable
-    client-error-attributes-or-values-not-supported
-    client-error-bad-request
-    client-error-charset-not-supported
-    client-error-compression-error
-    client-error-compression-not-supported
-    client-error-conflicting-attributes
-    client-error-document-access-error
-    client-error-document-format-error
-    client-error-document-format-not-supported
-    client-error-document-password-error
-    client-error-document-permission-error
-    client-error-document-security-error
-    client-error-document-unprintable-error
-    client-error-forbidden
-    client-error-gone
-    client-error-ignored-all-notifications
-    client-error-ignored-all-subscriptions
-    client-error-not-authenticated
-    client-error-not-authorized
-    client-error-not-found
-    client-error-not-possible
-    client-error-print-support-file-not-found
-    client-error-request-entity-too-large
-    client-error-request-value-too-long
-    client-error-timeout
-    client-error-too-many-subscriptions
-    client-error-uri-scheme-not-supported
-    cups-see-other
-    redirection-other-site
-    server-error-busy
-    server-error-device-error
-    server-error-internal-error
-    server-error-job-canceled
-    server-error-multiple-document-jobs-not-supported
-    server-error-not-accepting-jobs
-    server-error-operation-not-supported
-    server-error-printer-is-deactivated
-    server-error-service-unavailable
-    server-error-temporary-error
-    server-error-version-not-supported
-    successful-ok
-    successful-ok-but-cancel-subscription
-    successful-ok-conflicting-attributes
-    successful-ok-events-complete
-    successful-ok-ignored-notifications
-    successful-ok-ignored-or-substituted-attributes
-    successful-ok-ignored-subscriptions
-    successful-ok-too-many-events
+
+    client\-error\-account\-authorization\-failed
+    client\-error\-account\-closed
+    client\-error\-account\-info\-needed
+    client\-error\-account\-limit\-reached
+    client\-error\-attributes\-not\-settable
+    client\-error\-attributes\-or\-values\-not\-supported
+    client\-error\-bad\-request
+    client\-error\-charset\-not\-supported
+    client\-error\-compression\-error
+    client\-error\-compression\-not\-supported
+    client\-error\-conflicting\-attributes
+    client\-error\-document\-access\-error
+    client\-error\-document\-format\-error
+    client\-error\-document\-format\-not\-supported
+    client\-error\-document\-password\-error
+    client\-error\-document\-permission\-error
+    client\-error\-document\-security\-error
+    client\-error\-document\-unprintable\-error
+    client\-error\-forbidden
+    client\-error\-gone
+    client\-error\-ignored\-all\-notifications
+    client\-error\-ignored\-all\-subscriptions
+    client\-error\-not\-authenticated
+    client\-error\-not\-authorized
+    client\-error\-not\-found
+    client\-error\-not\-possible
+    client\-error\-print\-support\-file\-not\-found
+    client\-error\-request\-entity\-too\-large
+    client\-error\-request\-value\-too\-long
+    client\-error\-timeout
+    client\-error\-too\-many\-subscriptions
+    client\-error\-uri\-scheme\-not\-supported
+    cups\-error\-account\-authorization\-failed
+    cups\-error\-account\-closed
+    cups\-error\-account\-info\-needed
+    cups\-error\-account\-limit\-reached
+    cups\-see\-other
+    redirection\-other\-site
+    server\-error\-busy
+    server\-error\-device\-error
+    server\-error\-internal\-error
+    server\-error\-job\-canceled
+    server\-error\-multiple\-document\-jobs\-not\-supported
+    server\-error\-not\-accepting\-jobs
+    server\-error\-operation\-not\-supported
+    server\-error\-printer\-is\-deactivated
+    server\-error\-service\-unavailable
+    server\-error\-temporary\-error
+    server\-error\-version\-not\-supported
+    successful\-ok
+    successful\-ok\-but\-cancel\-subscription
+    successful\-ok\-conflicting\-attributes
+    successful\-ok\-events\-complete
+    successful\-ok\-ignored\-notifications
+    successful\-ok\-ignored\-or\-substituted\-attributes
+    successful\-ok\-ignored\-subscriptions
+    successful\-ok\-too\-many\-events
 .fi
-
-.SH TAGS
-Value and group tags correspond to the names from RFC 2911 and other IPP
-extension specifications. Here are the group tags:
+.SS TAGS
+Value and group tags correspond to the names from RFC 2911 and other IPP extension specifications. Here are the group tags:
 .nf
-    event-notification-attributes-tag
-    job-attributes-tag
-    operation-attributes-tag
-    printer-attributes-tag
-    subscription-attributes-tag
-    unsupported-attributes-tag
+
+    document\-attributes\-tag
+    event\-notification\-attributes\-tag
+    job\-attributes\-tag
+    operation\-attributes\-tag
+    printer\-attributes\-tag
+    subscription\-attributes\-tag
+    unsupported\-attributes\-tag
 .fi
 .LP
 Here are the value tags:
 .nf
-    admin-define
+
+    admin\-define
     boolean
     charset
     collection
     dateTime
     default
-    delete-attribute
+    delete\-attribute
     enum
     integer
     keyword
@@ -551,8 +534,8 @@ Here are the value tags:
     nameWithLanguage
     nameWithoutLanguage
     naturalLanguage
-    no-value
-    not-settable
+    no\-value
+    not\-settable
     octetString
     rangeOfInteger
     resolution
@@ -563,66 +546,71 @@ Here are the value tags:
     uri
     uriScheme
 .fi
-
-.SH VARIABLES
-The \fIipptool\fR program maintains a list of variables that can be used in any
-literal string or attribute value by specifying "$variable-name". Aside from
-variables defined using the "-d" option or "DEFINE" directive, the following
-pre-defined variables are available:
+.SS VARIABLES
+The
+.BR ipptool (8)
+program maintains a list of variables that can be used in any literal string or attribute value by specifying "\fI$variable-name\fR". Aside from variables defined using the \fI-d\fR option or \fBDEFINE\fR directive, the following pre-defined variables are available:
 .TP 5
-$$
+\fB$$\fR
 Inserts a single "$" character.
 .TP 5
-$ENV[name]
-Inserts the value of the named environment variable, or an empty string if the
-environment variable is not defined.
+\fB$ENV[\fIname\fB]\fR
+Inserts the value of the named environment variable, or an empty string if the environment variable is not defined.
 .TP 5
-$filename
-Inserts the filename provided to \fIipptool\fR with the "-f" option.
+\fB$filename\fR
+Inserts the filename provided to
+.BR ipptool (8)
+with the \fI-f\fR option.
 .TP 5
-$hostname
-Inserts the hostname from the URI provided to \fIipptool\fR.
+\fB$filetype\fR
+Inserts the MIME media type for the filename provided to
+.BR ipptool (8)
+with the \fI-f\fR option.
 .TP 5
-$job-id
-Inserts the last job-id value returned in a test response or 0 if no job-id has
-been seen.
+\fB$hostname\fR
+Inserts the hostname from the URI provided to
+.BR ipptool (8).
 .TP 5
-$job-uri
-Inserts the last job-uri value returned in a test response or an empty string if
-no job-uri has been seen.
+\fB$job\-id\fR
+Inserts the last "job\-id" attribute value returned in a test response or 0 if no "job\-id" attribute has been seen.
 .TP 5
-$scheme
-Inserts the scheme from the URI provided to \fIipptool\fR.
+\fB$job\-uri\fR
+Inserts the last "job\-uri" attribute value returned in a test response or an empty string if no "job\-uri" attribute has been seen.
 .TP 5
-$notify-subscription-id
-Inserts the last notify-subscription-id value returned in a test response or 0 if
-no notify-subscription-id has been seen.
+\fB$notify\-subscription\-id\fR
+Inserts the last "notify\-subscription\-id" attribute value returned in a test response or 0 if no "notify\-subscription\-id" attribute has been seen.
 .TP 5
-$port
-Inserts the port number from the URI provided to \fIipptool\fR.
+\fB$port\fR
+Inserts the port number from the URI provided to
+.BR ipptool (8).
 .TP 5
-$resource
-Inserts the resource path from the URI provided to \fIipptool\fR.
+\fB$resource\fR
+Inserts the resource path from the URI provided to
+.BR ipptool (8).
 .TP 5
-$uri
-Inserts the URI provided to \fIipptool\fR.
+\fB$scheme\fR
+Inserts the scheme from the URI provided to
+.BR ipptool (8).
 .TP 5
-$user
+\fB$uri\fR
+Inserts the URI provided to
+.BR ipptool (8).
+.TP 5
+\fB$uriuser\fR
+Inserts the username from the URI provided to
+.BR ipptool (8),
+if any.
+.TP 5
+\fB$user\fR
 Inserts the current user's login name.
-.TP 5
-$username
-Inserts the username from the URI provided to \fIipptool\fR, if any.
-
 .SH SEE ALSO
-\fIipptool(1)\fR, RFC 2911,
-.br
-http://localhost:631/help
-.br
-http://www.iana.org/assignments/ipp-registrations
-.br
-http://www.pwg.org/ipp
+.BR ipptool (1),
+CUPS Online Help (http://localhost:631/help),
+IANA IPP Registry (http://www.iana.org/assignments/ipp-registrations),
+PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp),
+RFC 2911 (http://tools.ietf.org/html/rfc3911)
 .SH COPYRIGHT
-Copyright 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ipptoolfile.man 11734 2014-03-25 18:01:47Z msweet $".
+.\" End of "$Id: ipptoolfile.man 11880 2014-05-16 06:14:11Z msweet $".
 .\"

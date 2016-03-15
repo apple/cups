@@ -1,9 +1,9 @@
 /*
- * "$Id: http-private.h 11392 2013-11-06 01:29:56Z msweet $"
+ * "$Id: http-private.h 12044 2014-07-17 21:21:21Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -23,6 +23,7 @@
  */
 
 #  include "config.h"
+#  include <cups/language.h>
 #  include <stddef.h>
 #  include <stdlib.h>
 
@@ -39,7 +40,6 @@
 #    include <unistd.h>
 #    include <fcntl.h>
 #    include <sys/socket.h>
-#    define closesocket(f) close(f)
 #    define CUPS_SOCAST
 #  endif /* WIN32 */
 
@@ -73,11 +73,7 @@ typedef int socklen_t;
 #  include "md5-private.h"
 #  include "ipp-private.h"
 
-#  if defined HAVE_LIBSSL
-#    include <openssl/err.h>
-#    include <openssl/rand.h>
-#    include <openssl/ssl.h>
-#  elif defined HAVE_GNUTLS
+#  ifdef HAVE_GNUTLS
 #    include <gnutls/gnutls.h>
 #    include <gnutls/x509.h>
 #    include <gcrypt.h>
@@ -98,6 +94,19 @@ typedef int socklen_t;
 #      include <Security/SecCertificate.h>
 #      include <Security/SecIdentity.h>
 #    endif /* HAVE_SECCERTIFICATE_H */
+#    ifdef HAVE_SECCERTIFICATEPRIV_H
+#      include <Security/SecCertificatePriv.h>
+#    else
+#      ifdef __cplusplus
+extern "C" {
+#      endif /* __cplusplus */
+extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
+extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
+extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
+#      ifdef __cplusplus
+}
+#      endif /* __cplusplus */
+#    endif /* HAVE_SECCERTIFICATEPRIV_H */
 #    ifdef HAVE_SECITEMPRIV_H
 #      include <Security/SecItemPriv.h>
 #    endif /* HAVE_SECITEMPRIV_H */
@@ -108,8 +117,13 @@ typedef int socklen_t;
 #      include <Security/SecPolicyPriv.h>
 #    endif /* HAVE_SECPOLICYPRIV_H */
 #  elif defined(HAVE_SSPISSL)
-#    include "sspi-private.h"
-#  endif /* HAVE_LIBSSL */
+#    include <wincrypt.h>
+#    include <wintrust.h>
+#    include <schannel.h>
+#    define SECURITY_WIN32
+#    include <security.h>
+#    include <sspi.h>
+#  endif /* HAVE_GNUTLS */
 
 #  ifndef WIN32
 #    include <net/if.h>
@@ -142,6 +156,7 @@ extern "C" {
  */
 
 
+#define _HTTP_MAX_SBUFFER	65536	/* Size of (de)compression buffer */
 #define _HTTP_RESOLVE_DEFAULT	0	/* Just resolve with default options */
 #define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
@@ -152,30 +167,13 @@ extern "C" {
  * Types and functions for SSL support...
  */
 
-#  if defined HAVE_LIBSSL
-/*
- * The OpenSSL library provides its own SSL/TLS context structure for its
- * IO and protocol management.  However, we need to provide our own BIO
- * (basic IO) implementation to do timeouts...
- */
-
-typedef SSL  *http_tls_t;
-typedef void *http_tls_credentials_t;
-
-extern BIO_METHOD *_httpBIOMethods(void);
-
-#  elif defined HAVE_GNUTLS
+#  ifdef HAVE_GNUTLS
 /*
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
 
 typedef gnutls_session_t http_tls_t;
-typedef void *http_tls_credentials_t;
-
-extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr_t ptr, void *data,
-		                size_t length);
-extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr_t ptr, const void *data,
-		                 size_t length);
+typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
 
 #  elif defined(HAVE_CDSASSL)
 /*
@@ -205,18 +203,31 @@ extern OSStatus SecPolicySetValue(SecPolicyRef policyRef,
 typedef SSLContextRef	http_tls_t;
 typedef CFArrayRef	http_tls_credentials_t;
 
-extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
-		              size_t *dataLength);
-extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
-		               size_t *dataLength);
-
 #  elif defined(HAVE_SSPISSL)
 /*
  * Windows' SSPI library gets a CUPS wrapper...
  */
 
-typedef _sspi_struct_t * http_tls_t;
-typedef void *http_tls_credentials_t;
+typedef struct _http_sspi_s		/**** SSPI/SSL data structure ****/
+{
+  CredHandle	creds;			/* Credentials */
+  CtxtHandle	context;		/* SSL context */
+  BOOL		contextInitialized;	/* Is context init'd? */
+  SecPkgContext_StreamSizes streamSizes;/* SSL data stream sizes */
+  BYTE		*decryptBuffer;		/* Data pre-decryption*/
+  size_t	decryptBufferLength;	/* Length of decrypt buffer */
+  size_t	decryptBufferUsed;	/* Bytes used in buffer */
+  BYTE		*readBuffer;		/* Data post-decryption */
+  int		readBufferLength;	/* Length of read buffer */
+  int		readBufferUsed;		/* Bytes used in buffer */
+  BYTE		*writeBuffer;		/* Data pre-encryption */
+  int		writeBufferLength;	/* Length of write buffer */
+  PCCERT_CONTEXT localCert,		/* Local certificate */
+		remoteCert;		/* Remote (peer's) certificate */
+  char		error[256];		/* Most recent error message */
+} _http_sspi_t;
+typedef _http_sspi_t *http_tls_t;
+typedef PCCERT_CONTEXT http_tls_credentials_t;
 
 #  else
 /*
@@ -225,7 +236,7 @@ typedef void *http_tls_credentials_t;
 
 typedef void *http_tls_t;
 typedef void *http_tls_credentials_t;
-#  endif /* HAVE_LIBSSL */
+#  endif /* HAVE_GNUTLS */
 
 typedef enum _http_coding_e		/**** HTTP content coding enumeration ****/
 {
@@ -242,6 +253,7 @@ typedef enum _http_mode_e		/**** HTTP mode enumeration ****/
   _HTTP_MODE_SERVER			/* Server connected (accepted) from client */
 } _http_mode_t;
 
+#  ifndef _HTTP_NO_PRIVATE
 struct _http_s				/**** HTTP connection structure ****/
 {
   int			fd;		/* File descriptor for this socket */
@@ -263,7 +275,7 @@ struct _http_s				/**** HTTP connection structure ****/
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
-  int			auth_type;	/* Authentication in use */
+  int			_auth_type;	/* Authentication in use (deprecated) */
   _cups_md5_state_t	md5_state;	/* MD5 state */
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
@@ -329,9 +341,10 @@ struct _http_s				/**** HTTP connection structure ****/
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
   z_stream		stream;		/* (De)compression stream */
-  Bytef			*dbuffer;	/* Decompression buffer */
+  Bytef			*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
 };
+#  endif /* !_HTTP_NO_PRIVATE */
 
 
 /*
@@ -341,11 +354,6 @@ struct _http_s				/**** HTTP connection structure ****/
 #  ifndef HAVE_HSTRERROR
 extern const char *_cups_hstrerror(int error);
 #    define hstrerror _cups_hstrerror
-#  elif defined(_AIX) || defined(__osf__)
-/*
- * AIX and Tru64 UNIX don't provide a prototype but do provide the function...
- */
-extern const char *hstrerror(int error);
 #  endif /* !HAVE_HSTRERROR */
 
 
@@ -395,19 +403,7 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
-#define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
-extern int		_httpAddrPort(http_addr_t *addr)
-			              _CUPS_INTERNAL_MSG("Use httpAddrPort instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
-extern char		*_httpAssembleUUID(const char *server, int port,
-					   const char *name, int number,
-					   char *buffer, size_t bufsize)
-					   _CUPS_INTERNAL_MSG("Use httpAssembleUUID instead.");
-extern http_t		*_httpCreate(const char *host, int port,
-			             http_addrlist_t *addrlist,
-				     http_encryption_t encryption,
-				     int family)
-				     _CUPS_INTERNAL_MSG("Use httpConnect2 or httpAccept instead.");
 extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
@@ -416,12 +412,18 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
-extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
-			          _CUPS_INTERNAL_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
+extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
+extern void		_httpTLSInitialize(void);
+extern size_t		_httpTLSPending(http_t *http);
+extern int		_httpTLSRead(http_t *http, char *buf, int len);
+extern int		_httpTLSSetCredentials(http_t *http);
+extern int		_httpTLSStart(http_t *http);
+extern void		_httpTLSStop(http_t *http);
+extern int		_httpTLSWrite(http_t *http, const char *buf, int len);
 extern int		_httpUpdate(http_t *http, http_status_t *status);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 
@@ -437,5 +439,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 11392 2013-11-06 01:29:56Z msweet $".
+ * End of "$Id: http-private.h 12044 2014-07-17 21:21:21Z msweet $".
  */

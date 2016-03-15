@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -8,89 +8,23 @@
 <body>
 <h1 class="title">subscriptions.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-subscriptions.conf - subscriptions file for cups
+subscriptions.conf - subscription configuration file for cups
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-The <i>subscriptions.conf</i> file defines the local subscriptions
-that are active. It is normally located in the <i>/etc/cups</i>
-directory and is generated automatically by the <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>
-program when subscriptions are created, renewed, or cancelled.
-<p>Each line in the file can be a configuration directive, a blank line,
-or a comment. Comment lines start with the # character.
-<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-<dl>
-<dt>&lt;Subscription NNN> ... &lt;/Subscription>
-</dt>
-<dd></dd>
-<dd>Defines a subscription.
-</dd>
-<dt>Events name [ ... name ]
-</dt>
-<dd></dd>
-<dd>Specifies the events that are subscribed.
-</dd>
-<dt>ExpirationTime unix-time
-</dt>
-<dd></dd>
-<dd>Specifies the expiration time of a subscription as a UNIX time
-value in seconds since January 1st, 1970.
-</dd>
-<dt>Interval seconds
-</dt>
-<dd></dd>
-<dd>Specifies the preferred time interval for event notifications in
-seconds.
-</dd>
-<dt>JobId job-id
-</dt>
-<dd></dd>
-<dd>Specifies the job ID associated with the subscription.
-</dd>
-<dt>LeaseDuration seconds
-</dt>
-<dd></dd>
-<dd>Specifies the number of seconds that the subscription is valid
-for. If 0, the subscription does not expire.
-</dd>
-<dt>NextEventId number
-</dt>
-<dd></dd>
-<dd>Specifies the next notify-sequence-number to use for the
-subscription.
-</dd>
-<dt>NextSubscriptionId number
-</dt>
-<dd></dd>
-<dd>Specifies the next subscription-id to use.
-</dd>
-<dt>Owner username
-</dt>
-<dd></dd>
-<dd>Specifies the user that owns the subscription.
-</dd>
-<dt>PrinterName printername
-</dt>
-<dd></dd>
-<dd>Specifies the printer or class associated with the subscription.
-</dd>
-<dt>Recipient uri
-</dt>
-<dd></dd>
-<dd>Specifies the notify-recipient-uri value for push-type notifications.
-</dd>
-<dt>UserData hex-escaped-data
-</dt>
-<dd></dd>
-<dd>Specifies user data to be included in event notifications. This
-is typically the "from" address in mailto: notifications.
-</dd>
-</dl>
+The <b>subscriptions.conf</b> file defines the local event notification subscriptions that are active. It is normally located in the <i>/etc/cups</i> directory and is maintained by the
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+program. This file is not intended to be edited or managed manually.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+The name, location, and format of this file are an implementation detail that will change in future releases of CUPS.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-classes.conf.html?TOPIC=Man+Pages'>classes.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>,
-<a href='man-mime.convs.html?TOPIC=Man+Pages'>mime.convs(5)</a>, <a href='man-mime.types.html?TOPIC=Man+Pages'>mime.types(5)</a>, printers.conf(5)
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

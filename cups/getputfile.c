@@ -1,25 +1,18 @@
 /*
- * "$Id: getputfile.c 11153 2013-07-17 14:10:21Z msweet $"
+ * "$Id: getputfile.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Get/put file functions for CUPS.
+ * Get/put file functions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsGetFd()   - Get a file from the server.
- *   cupsGetFile() - Get a file from the server.
- *   cupsPutFd()   - Put a file on the server.
- *   cupsPutFile() - Put a file on the server.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -49,7 +42,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
 	  const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
-  int		bytes;			/* Number of bytes read */
+  ssize_t	bytes;			/* Number of bytes read */
   char		buffer[8192];		/* Buffer for file */
   http_status_t	status;			/* HTTP status from server */
   char		if_modified_since[HTTP_MAX_VALUE];
@@ -174,7 +167,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
     */
 
     while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
-      write(fd, buffer, bytes);
+      write(fd, buffer, (size_t)bytes);
   }
   else
   {
@@ -273,8 +266,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
           const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
-  int		bytes,			/* Number of bytes read */
-		retries;		/* Number of retries */
+  ssize_t	bytes;			/* Number of bytes read */
+  int		retries;		/* Number of retries */
   char		buffer[8192];		/* Buffer for file */
   http_status_t	status;			/* HTTP status from server */
 
@@ -362,7 +355,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
             break;
 	}
 	else
-          httpWrite2(http, buffer, bytes);
+          httpWrite2(http, buffer, (size_t)bytes);
     }
 
     if (status == HTTP_STATUS_CONTINUE)
@@ -518,5 +511,5 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
 
 
 /*
- * End of "$Id: getputfile.c 11153 2013-07-17 14:10:21Z msweet $".
+ * End of "$Id: getputfile.c 11558 2014-02-06 18:33:34Z msweet $".
  */

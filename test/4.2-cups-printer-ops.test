@@ -1,5 +1,5 @@
 #
-# "$Id: 4.2-cups-printer-ops.test 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: 4.2-cups-printer-ops.test 11798 2014-04-07 15:18:44Z msweet $"
 #
 #   Verify that the CUPS printer operations work.
 #
@@ -204,6 +204,7 @@
 	ATTR uri device-uri file:/tmp/Test1
 	ATTR enum printer-state 3
 	ATTR boolean printer-is-accepting-jobs true
+	ATTR text printer-info "Test Printer 1"
 
 	FILE testps.ppd
 
@@ -323,5 +324,5 @@
 }
 
 #
-# End of "$Id: 4.2-cups-printer-ops.test 11396 2013-11-06 20:09:03Z msweet $"
+# End of "$Id: 4.2-cups-printer-ops.test 11798 2014-04-07 15:18:44Z msweet $"
 #

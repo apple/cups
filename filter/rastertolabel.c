@@ -1,29 +1,18 @@
 /*
- * "$Id: rastertolabel.c 11756 2014-03-27 17:06:25Z msweet $"
+ * "$Id: rastertolabel.c 11755 2014-03-27 17:06:12Z msweet $"
  *
- *   Label printer filter for CUPS.
+ * Label printer filter for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2001-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2001-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   Setup()        - Prepare the printer for printing.
- *   StartPage()    - Start a page of graphics.
- *   EndPage()      - Finish a page of graphics.
- *   CancelJob()    - Cancel the current job...
- *   OutputLine()   - Output a line of graphics.
- *   PCLCompress()  - Output a PCL (mode 3) compressed line.
- *   ZPLCompress()  - Output a run-length compression sequence.
- *   main()         - Main entry and processing of driver.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -78,10 +67,10 @@
 unsigned char	*Buffer;		/* Output buffer */
 unsigned char	*CompBuffer;		/* Compression buffer */
 unsigned char	*LastBuffer;		/* Last buffer */
+unsigned	Feed;			/* Number of lines to skip */
 int		LastSet;		/* Number of repeat characters */
 int		ModelNumber,		/* cupsModelNumber attribute */
 		Page,			/* Current page */
-		Feed,			/* Number of lines to skip */
 		Canceled;		/* Non-zero if job is canceled */
 
 
@@ -93,9 +82,9 @@ void	Setup(ppd_file_t *ppd);
 void	StartPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	EndPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	CancelJob(int sig);
-void	OutputLine(ppd_file_t *ppd, cups_page_header2_t *header, int y);
-void	PCLCompress(unsigned char *line, int length);
-void	ZPLCompress(char repeat_char, int repeat_count);
+void	OutputLine(ppd_file_t *ppd, cups_page_header2_t *header, unsigned y);
+void	PCLCompress(unsigned char *line, unsigned length);
+void	ZPLCompress(unsigned char repeat_char, unsigned repeat_count);
 
 
 /*
@@ -169,7 +158,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
           cups_page_header2_t *header)	/* I - Page header */
 {
   ppd_choice_t	*choice;		/* Marked choice */
-  int		length;			/* Actual label length */
+  unsigned	length;			/* Actual label length */
 
 
  /*
@@ -289,7 +278,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	if ((choice = ppdFindMarkedChoice(ppd, "zePrintRate")) != NULL &&
 	    strcmp(choice->choice, "Default"))
 	{
-	  float val = atof(choice->choice);
+	  double val = atof(choice->choice);
 
 	  if (val >= 3.0)
 	    printf("S%.0f\n", val);
@@ -302,13 +291,13 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	*/
 
         if (header->cupsCompression > 0 && header->cupsCompression <= 100)
-	  printf("D%d\n", 15 * header->cupsCompression / 100);
+	  printf("D%u\n", 15 * header->cupsCompression / 100);
 
        /*
         * Set label size...
 	*/
 
-        printf("q%d\n", (header->cupsWidth + 7) & ~7);
+        printf("q%u\n", (header->cupsWidth + 7) & ~7U);
         break;
 
     case ZEBRA_ZPL :
@@ -317,13 +306,13 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	*/
 
         if (header->cupsCompression > 0 && header->cupsCompression <= 100)
-	  printf("~SD%02d\n", 30 * header->cupsCompression / 100);
+	  printf("~SD%02u\n", 30 * header->cupsCompression / 100);
 
        /*
         * Start bitmap graphics...
 	*/
 
-        printf("~DGR:CUPS.GRF,%d,%d,\n",
+        printf("~DGR:CUPS.GRF,%u,%u,\n",
 	       header->cupsHeight * header->cupsBytesPerLine,
 	       header->cupsBytesPerLine);
 
@@ -344,8 +333,8 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
         printf("! 0 %u %u %u %u\r\n", header->HWResolution[0],
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
-	printf("PAGE-WIDTH %d\r\n", header->cupsWidth);
-	printf("PAGE-HEIGHT %d\r\n", header->cupsWidth);
+	printf("PAGE-WIDTH %u\r\n", header->cupsWidth);
+	printf("PAGE-HEIGHT %u\r\n", header->cupsWidth);
         break;
 
     case INTELLITECH_PCL :
@@ -391,14 +380,15 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	      break;
 
           default : /* Custom size */
-	      printf("\033!f%dZ", header->PageSize[1] * 300 / 72);
+	      printf("\033!f%uZ", header->PageSize[1] * 300 / 72);
 	      break;
 	}
 
-	printf("\033&l%dP",		/* Set page length */
+	printf("\033&l%uP",		/* Set page length */
                header->PageSize[1] / 12);
 	printf("\033&l0E");		/* Set top margin to 0 */
-        printf("\033&l%dX", header->NumCopies);
+        if (header->NumCopies)
+	  printf("\033&l%uX", header->NumCopies);
 					/* Set number copies */
         printf("\033&l0L");		/* Turn off perforation skip */
 
@@ -409,11 +399,11 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	if (Page == 1)
 	{
           if (header->cupsRowFeed)	/* inPrintRate */
-	    printf("\033!p%dS", header->cupsRowFeed);
+	    printf("\033!p%uS", header->cupsRowFeed);
 
-          if (header->cupsCompression != ~0)
+          if (header->cupsCompression != ~0U)
 	  				/* inPrintDensity */
-	    printf("\033&d%dA", 30 * header->cupsCompression / 100 - 15);
+	    printf("\033&d%uA", 30 * header->cupsCompression / 100 - 15);
 
 	  if ((choice = ppdFindMarkedChoice(ppd, "inPrintMode")) != NULL)
 	  {
@@ -424,14 +414,14 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	      fputs("\033!p1M", stdout);
 
               if (header->cupsRowCount)	/* inTearInterval */
-		printf("\033!n%dT", header->cupsRowCount);
+		printf("\033!n%uT", header->cupsRowCount);
             }
 	    else
 	    {
 	      fputs("\033!p2M", stdout);
 
               if (header->cupsRowStep)	/* inCutInterval */
-		printf("\033!n%dC", header->cupsRowStep);
+		printf("\033!n%uC", header->cupsRowStep);
             }
 	  }
         }
@@ -440,12 +430,12 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	* Setup graphics...
 	*/
 
-	printf("\033*t%dR", header->HWResolution[0]);
+	printf("\033*t%uR", header->HWResolution[0]);
 					/* Set resolution */
 
-	printf("\033*r%dS", header->cupsWidth);
+	printf("\033*r%uS", header->cupsWidth);
 					/* Set width */
-	printf("\033*r%dT", header->cupsHeight);
+	printf("\033*r%uT", header->cupsHeight);
 					/* Set height */
 
 	printf("\033&a0H");		/* Set horizontal position */
@@ -746,16 +736,18 @@ CancelJob(int sig)			/* I - Signal */
 void
 OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
            cups_page_header2_t *header,	/* I - Page header */
-           int                y)	/* I - Line number */
+           unsigned           y)	/* I - Line number */
 {
-  int		i;			/* Looping var */
+  unsigned	i;			/* Looping var */
   unsigned char	*ptr;			/* Pointer into buffer */
   unsigned char	*compptr;		/* Pointer into compression buffer */
-  char		repeat_char;		/* Repeated character */
-  int		repeat_count;		/* Number of repeated characters */
-  static const char *hex = "0123456789ABCDEF";
+  unsigned char	repeat_char;		/* Repeated character */
+  unsigned	repeat_count;		/* Number of repeated characters */
+  static const unsigned char *hex = (const unsigned char *)"0123456789ABCDEF";
 					/* Hex digits */
 
+
+  (void)ppd;
 
   switch (ModelNumber)
   {
@@ -913,14 +905,14 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 
 void
 PCLCompress(unsigned char *line,	/* I - Line to compress */
-            int           length)	/* I - Length of line */
+            unsigned      length)	/* I - Length of line */
 {
   unsigned char	*line_ptr,		/* Current byte pointer */
         	*line_end,		/* End-of-line byte pointer */
         	*comp_ptr,		/* Pointer into compression buffer */
         	*start,			/* Start of compression sequence */
 		*seed;			/* Seed buffer pointer */
-  int           count,			/* Count of bytes for output */
+  unsigned	count,			/* Count of bytes for output */
 		offset;			/* Offset of bytes for output */
 
 
@@ -950,7 +942,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
 
       offset = 0;
 
-      if ((count = line_end - line_ptr) > 8)
+      if ((count = (unsigned)(line_end - line_ptr)) > 8)
 	count = 8;
 
       line_ptr += count;
@@ -971,7 +963,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
       if (line_ptr == line_end)
         break;
 
-      offset = line_ptr - start;
+      offset = (unsigned)(line_ptr - start);
 
      /*
       * Find up to 8 non-matching bytes...
@@ -1000,7 +992,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
       * Output multi-byte offset...
       */
 
-      *comp_ptr++ = ((count - 1) << 5) | 31;
+      *comp_ptr++ = (unsigned char)(((count - 1) << 5) | 31);
 
       offset -= 31;
       while (offset >= 255)
@@ -1009,7 +1001,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
         offset    -= 255;
       }
 
-      *comp_ptr++ = offset;
+      *comp_ptr++ = (unsigned char)offset;
     }
     else
     {
@@ -1017,7 +1009,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
       * Output single-byte offset...
       */
 
-      *comp_ptr++ = ((count - 1) << 5) | offset;
+      *comp_ptr++ = (unsigned char)(((count - 1) << 5) | offset);
     }
 
     memcpy(comp_ptr, start, count);
@@ -1029,7 +1021,7 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
   */
 
   printf("\033*b%dW", (int)(comp_ptr - CompBuffer));
-  fwrite(CompBuffer, comp_ptr - CompBuffer, 1, stdout);
+  fwrite(CompBuffer, (size_t)(comp_ptr - CompBuffer), 1, stdout);
 
  /*
   * Save this line as a "seed" buffer for the next...
@@ -1045,8 +1037,8 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
  */
 
 void
-ZPLCompress(char repeat_char,		/* I - Character to repeat */
-	    int  repeat_count)		/* I - Number of repeated characters */
+ZPLCompress(unsigned char repeat_char,	/* I - Character to repeat */
+	    unsigned      repeat_count)	/* I - Number of repeated characters */
 {
   if (repeat_count > 1)
   {
@@ -1067,7 +1059,7 @@ ZPLCompress(char repeat_char,		/* I - Character to repeat */
 
     if (repeat_count >= 20)
     {
-      putchar('f' + repeat_count / 20);
+      putchar((int)('f' + repeat_count / 20));
       repeat_count %= 20;
     }
 
@@ -1076,14 +1068,14 @@ ZPLCompress(char repeat_char,		/* I - Character to repeat */
     */
 
     if (repeat_count > 0)
-      putchar('F' + repeat_count);
+      putchar((int)('F' + repeat_count));
   }
 
  /*
   * Then the character to be repeated...
   */
 
-  putchar(repeat_char);
+  putchar((int)repeat_char);
 }
 
 
@@ -1098,7 +1090,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
   cups_page_header2_t	header;		/* Page header from file */
-  int			y;		/* Current line */
+  unsigned		y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
   int			num_options;	/* Number of options */
   cups_option_t		*options;	/* Options */
@@ -1240,9 +1232,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((y & 15) == 0)
       {
         _cupsLangPrintFilter(stderr, "INFO",
-	                     _("Printing page %d, %d%% complete."),
+	                     _("Printing page %d, %u%% complete."),
 			     Page, 100 * y / header.cupsHeight);
-        fprintf(stderr, "ATTR: job-media-progress=%d\n",
+        fprintf(stderr, "ATTR: job-media-progress=%u\n",
 		100 * y / header.cupsHeight);
       }
 
@@ -1302,5 +1294,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 11756 2014-03-27 17:06:25Z msweet $".
+ * End of "$Id: rastertolabel.c 11755 2014-03-27 17:06:12Z msweet $".
  */

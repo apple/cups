@@ -1,39 +1,18 @@
 /*
- * "$Id: ipp-support.c 11734 2014-03-25 18:01:47Z msweet $"
+ * "$Id: ipp-support.c 11806 2014-04-09 16:12:27Z msweet $"
  *
- *   Internet Printing Protocol support functions for CUPS.
+ * Internet Printing Protocol support functions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ippAttributeString()      - Convert the attribute's value to a string.
- *   ippCreateRequestedArray() - Create a CUPS array of attribute names from
- *				 the given requested-attributes attribute.
- *   ippEnumString()	       - Return a string corresponding to the enum
- *				 value.
- *   ippEnumValue()	       - Return the value associated with a given enum
- *				 string.
- *   ippErrorString()	       - Return a name for the given status code.
- *   ippErrorValue()	       - Return a status code for the given name.
- *   ippOpString()	       - Return a name for the given operation id.
- *   ippOpValue()	       - Return an operation id for the given name.
- *   ippPort()		       - Return the default IPP port number.
- *   ippSetPort()	       - Set the default port number.
- *   ippTagString()	       - Return the tag name corresponding to a tag
- *				 value.
- *   ippTagValue()	       - Return the tag value corresponding to a tag
- *				 name.
- *   ipp_col_string()	       - Convert a collection to a string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -47,6 +26,14 @@
  * Local globals...
  */
 
+static const char * const ipp_states[] =
+		{
+		  "IPP_STATE_ERROR",
+		  "IPP_STATE_IDLE",
+		  "IPP_STATE_HEADER",
+		  "IPP_STATE_ATTRIBUTE",
+		  "IPP_STATE_DATA"
+		};
 static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		{				/* (name) = abandoned standard value */
 		  "successful-ok",
@@ -87,7 +74,11 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "client-error-document-password-error",
 		  "client-error-document-permission-error",
 		  "client-error-document-security-error",
-		  "client-error-document-unprintable-error"
+		  "client-error-document-unprintable-error",
+		  "client-error-account-info-needed",
+		  "client-error-account-closed",
+		  "client-error-account-limit-reached",
+		  "client-error-account-authorization-failed"
 		},
 		* const ipp_status_480s[] =	/* Vendor client errors */
 		{
@@ -334,7 +325,7 @@ static const char * const ipp_document_states[] =
 		  "pending",
 		  "4",
 		  "processing",
-		  "6",
+		  "processing-stopped",	/* IPPSIX */
 		  "canceled",
 		  "aborted",
 		  "completed"
@@ -353,8 +344,8 @@ static const char * const ipp_document_states[] =
 		  "bale",
 		  "booklet-maker",
 		  "jog-offset",
-		  "15",
-		  "16",
+		  "coat",		/* Finishings 2.0 */
+		  "laminate",		/* Finishings 2.0 */
 		  "17",
 		  "18",
 		  "19",
@@ -370,10 +361,10 @@ static const char * const ipp_document_states[] =
 		  "staple-dual-top",
 		  "staple-dual-right",
 		  "staple-dual-bottom",
-		  "32",
-		  "33",
-		  "34",
-		  "35",
+		  "staple-triple-left",	/* Finishings 2.0 */
+		  "staple-triple-top",	/* Finishings 2.0 */
+		  "staple-triple-right",/* Finishings 2.0 */
+		  "staple-triple-bottom",/* Finishings 2.0 */
 		  "36",
 		  "37",
 		  "38",
@@ -408,37 +399,37 @@ static const char * const ipp_document_states[] =
 		  "67",
 		  "68",
 		  "69",
-		  "punch-top-left",
-		  "punch-bottom-left",
-		  "punch-top-right",
-		  "punch-bottom-right",
-		  "punch-dual-left",
-		  "punch-dual-top",
-		  "punch-dual-right",
-		  "punch-dual-bottom",
-		  "punch-triple-left",
-		  "punch-triple-top",
-		  "punch-triple-right",
-		  "punch-triple-bottom",
-		  "punch-quad-left",
-		  "punch-quad-top",
-		  "punch-quad-right",
-		  "punch-quad-bottom",
+		  "punch-top-left",	/* Finishings 2.0 */
+		  "punch-bottom-left",	/* Finishings 2.0 */
+		  "punch-top-right",	/* Finishings 2.0 */
+		  "punch-bottom-right",	/* Finishings 2.0 */
+		  "punch-dual-left",	/* Finishings 2.0 */
+		  "punch-dual-top",	/* Finishings 2.0 */
+		  "punch-dual-right",	/* Finishings 2.0 */
+		  "punch-dual-bottom",	/* Finishings 2.0 */
+		  "punch-triple-left",	/* Finishings 2.0 */
+		  "punch-triple-top",	/* Finishings 2.0 */
+		  "punch-triple-right",	/* Finishings 2.0 */
+		  "punch-triple-bottom",/* Finishings 2.0 */
+		  "punch-quad-left",	/* Finishings 2.0 */
+		  "punch-quad-top",	/* Finishings 2.0 */
+		  "punch-quad-right",	/* Finishings 2.0 */
+		  "punch-quad-bottom",	/* Finishings 2.0 */
 		  "86",
 		  "87",
 		  "88",
 		  "89",
-		  "fold-accordian",
-		  "fold-double-gate",
-		  "fold-gate",
-		  "fold-half",
-		  "fold-half-z",
-		  "fold-left-gate",
-		  "fold-letter",
-		  "fold-parallel",
-		  "fold-poster",
-		  "fold-right-gate",
-		  "fold-z"
+		  "fold-accordian",	/* Finishings 2.0 */
+		  "fold-double-gate",	/* Finishings 2.0 */
+		  "fold-gate",		/* Finishings 2.0 */
+		  "fold-half",		/* Finishings 2.0 */
+		  "fold-half-z",	/* Finishings 2.0 */
+		  "fold-left-gate",	/* Finishings 2.0 */
+		  "fold-letter",	/* Finishings 2.0 */
+		  "fold-parallel",	/* Finishings 2.0 */
+		  "fold-poster",	/* Finishings 2.0 */
+		  "fold-right-gate",	/* Finishings 2.0 */
+		  "fold-z"		/* Finishings 2.0 */
 		},
 		* const ipp_finishings_vendor[] =
 		{
@@ -572,7 +563,8 @@ static const char * const ipp_document_states[] =
 		  "portrait",
 		  "landscape",
 		  "reverse-landscape",
-		  "reverse-portrait"
+		  "reverse-portrait",
+		  "none"
 		},
 		* const ipp_print_qualities[] =
 		{			/* print-quality enums */
@@ -650,53 +642,44 @@ ippAttributeString(
           ptr = ippEnumString(attr->name, val->integer);
 
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, ptr, bufend - bufptr + 1);
+            strlcpy(bufptr, ptr, (size_t)(bufend - bufptr + 1));
 
           bufptr += strlen(ptr);
           break;
 
       case IPP_TAG_INTEGER :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d", val->integer);
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d", val->integer);
           else
             bufptr += snprintf(temp, sizeof(temp), "%d", val->integer);
           break;
 
       case IPP_TAG_BOOLEAN :
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, val->boolean ? "true" : "false",
-                    bufend - bufptr + 1);
+            strlcpy(bufptr, val->boolean ? "true" : "false", (size_t)(bufend - bufptr + 1));
 
           bufptr += val->boolean ? 4 : 5;
           break;
 
       case IPP_TAG_RANGE :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d-%d",
-                               val->range.lower, val->range.upper);
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d-%d", val->range.lower, val->range.upper);
           else
-            bufptr += snprintf(temp, sizeof(temp), "%d-%d", val->range.lower,
-                               val->range.upper);
+            bufptr += snprintf(temp, sizeof(temp), "%d-%d", val->range.lower, val->range.upper);
           break;
 
       case IPP_TAG_RESOLUTION :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%dx%d%s",
-                               val->resolution.xres, val->resolution.yres,
-                               val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpcm");
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           else
-            bufptr += snprintf(temp, sizeof(temp), "%dx%d%s",
-                               val->resolution.xres, val->resolution.yres,
-                               val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpcm");
+            bufptr += snprintf(temp, sizeof(temp), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           break;
 
       case IPP_TAG_DATE :
           {
             unsigned year;		/* Year */
 
-            year = (val->date[0] << 8) + val->date[1];
+            year = ((unsigned)val->date[0] << 8) + (unsigned)val->date[1];
 
 	    if (val->date[9] == 0 && val->date[10] == 0)
 	      snprintf(temp, sizeof(temp), "%04u-%02u-%02uT%02u:%02u:%02uZ",
@@ -710,7 +693,7 @@ ippAttributeString(
 		       val->date[10]);
 
             if (buffer && bufptr < bufend)
-              strlcpy(bufptr, temp, bufend - bufptr + 1);
+              strlcpy(bufptr, temp, (size_t)(bufend - bufptr + 1));
 
             bufptr += strlen(temp);
           }
@@ -754,7 +737,7 @@ ippAttributeString(
             bufptr ++;
 
             if (buffer && bufptr < bufend)
-              strlcpy(bufptr, val->string.language, bufend - bufptr);
+              strlcpy(bufptr, val->string.language, (size_t)(bufend - bufptr));
             bufptr += strlen(val->string.language);
 
             if (buffer && bufptr < bufend)
@@ -765,8 +748,7 @@ ippAttributeString(
 
       case IPP_TAG_BEGIN_COLLECTION :
           if (buffer && bufptr < bufend)
-            bufptr += ipp_col_string(val->collection, bufptr,
-                                     bufend - bufptr + 1);
+            bufptr += ipp_col_string(val->collection, bufptr, (size_t)(bufend - bufptr + 1));
           else
             bufptr += ipp_col_string(val->collection, NULL, 0);
           break;
@@ -788,11 +770,9 @@ ippAttributeString(
             else if (!isprint(*ptr & 255))
             {
               if (buffer && bufptr < bufend)
-                bufptr += snprintf(bufptr, bufend - bufptr + 1, "\\%03o",
-                                   *ptr & 255);
+                bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "\\%03o", *ptr & 255);
               else
-                bufptr += snprintf(temp, sizeof(temp), "\\%03o",
-                                   *ptr & 255);
+                bufptr += snprintf(temp, sizeof(temp), "\\%03o", *ptr & 255);
             }
             else
             {
@@ -806,7 +786,7 @@ ippAttributeString(
       default :
           ptr = ippTagString(attr->value_tag);
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, ptr, bufend - bufptr + 1);
+            strlcpy(bufptr, ptr, (size_t)(bufend - bufptr + 1));
           bufptr += strlen(ptr);
           break;
     }
@@ -817,7 +797,7 @@ ippAttributeString(
   else if (bufend)
     *bufend = '\0';
 
-  return (bufptr - buffer);
+  return ((size_t)(bufptr - buffer));
 }
 
 
@@ -1550,11 +1530,16 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-fax-modem-info",		/* IPP FaxOut */
     "printer-fax-modem-name",		/* IPP FaxOut */
     "printer-fax-modem-number",		/* IPP FaxOut */
+    "printer-firmware-name",		/* PWG 5110.1 */
+    "printer-firmware-patches",		/* PWG 5110.1 */
+    "printer-firmware-string-version",	/* PWG 5110.1 */
+    "printer-firmware-version",		/* PWG 5110.1 */
     "printer-geo-location",
     "printer-get-attributes-supported",
     "printer-icc-profiles",
     "printer-icons",
     "printer-info",
+    "printer-input-tray",		/* IPP JPS3 */
     "printer-is-accepting-jobs",
     "printer-is-shared",		/* CUPS extension */
     "printer-kind",			/* IPP Paid Printing */
@@ -1570,6 +1555,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-native-formats",
     "printer-organization",
     "printer-organizational-unit",
+    "printer-output-tray",		/* IPP JPS3 */
     "printer-settable-attributes-supported",
     "printer-state",
     "printer-state-change-date-time",
@@ -1858,7 +1844,7 @@ ippEnumValue(const char *attrname,	/* I - Attribute name */
   */
 
   if (isdigit(*enumstring & 255))
-    return (strtol(enumstring, NULL, 0));
+    return ((int)strtol(enumstring, NULL, 0));
 
  /*
   * Otherwise look up the string...
@@ -1953,7 +1939,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   else if (error == IPP_STATUS_CUPS_SEE_OTHER)
     return ("cups-see-other");
   else if (error >= IPP_STATUS_ERROR_BAD_REQUEST &&
-           error <= IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE)
+           error <= IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED)
     return (ipp_status_400s[error - IPP_STATUS_ERROR_BAD_REQUEST]);
   else if (error >= 0x480 &&
            error <= IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
@@ -1985,7 +1971,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 ipp_status_t				/* O - IPP status code */
 ippErrorValue(const char *name)		/* I - Name */
 {
-  int		i;
+  size_t	i;			/* Looping var */
 
 
   for (i = 0; i < (sizeof(ipp_status_oks) / sizeof(ipp_status_oks[0])); i ++)
@@ -2062,7 +2048,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
 ipp_op_t				/* O - Operation ID */
 ippOpValue(const char *name)		/* I - Textual name */
 {
-  int		i;
+  size_t	i;			/* Looping var */
 
 
   if (!strncmp(name, "0x", 2))
@@ -2134,6 +2120,22 @@ ippSetPort(int p)			/* I - Port number to use */
 
 
 /*
+ * 'ippStateString()' - Return the name corresponding to a state value.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - State name */
+ippStateString(ipp_state_t state)	/* I - State value */
+{
+  if (state >= IPP_STATE_ERROR && state <= IPP_STATE_DATA)
+    return (ipp_states[state - IPP_STATE_ERROR]);
+  else
+    return ("UNKNOWN");
+}
+
+
+/*
  * 'ippTagString()' - Return the tag name corresponding to a tag value.
  *
  * The returned names are defined in RFC 2911 and 3382.
@@ -2164,7 +2166,7 @@ ippTagString(ipp_tag_t tag)		/* I - Tag value */
 ipp_tag_t				/* O - Tag value */
 ippTagValue(const char *name)		/* I - Tag name */
 {
-  int	i;				/* Looping var */
+  size_t	i;			/* Looping var */
 
 
   for (i = 0; i < (sizeof(ipp_tag_names) / sizeof(ipp_tag_names[0])); i ++)
@@ -2228,12 +2230,12 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
     prefix = ' ';
 
     if (buffer && bufptr < bufend)
-      bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
+      bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%s=", attr->name);
     else
       bufptr += strlen(attr->name) + 1;
 
     if (buffer && bufptr < bufend)
-      bufptr += ippAttributeString(attr, bufptr, bufend - bufptr + 1);
+      bufptr += ippAttributeString(attr, bufptr, (size_t)(bufend - bufptr + 1));
     else
       bufptr += ippAttributeString(attr, temp, sizeof(temp));
   }
@@ -2249,10 +2251,10 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
     *bufptr = '}';
   bufptr ++;
 
-  return (bufptr - buffer);
+  return ((size_t)(bufptr - buffer));
 }
 
 
 /*
- * End of "$Id: ipp-support.c 11734 2014-03-25 18:01:47Z msweet $".
+ * End of "$Id: ipp-support.c 11806 2014-04-09 16:12:27Z msweet $".
  */

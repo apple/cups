@@ -1,24 +1,17 @@
 /*
- * "$Id: snmp-supplies.c 11319 2013-09-27 16:18:26Z msweet $"
+ * "$Id: snmp-supplies.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   SNMP supplies functions for CUPS.
+ * SNMP supplies functions for CUPS.
  *
- *   Copyright 2008-2013 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendSNMPSupplies()   - Get the current supplies for a device.
- *   backend_init_supplies() - Initialize the supplies list.
- *   backend_walk_cb()       - Interpret the supply value responses.
- *   utf16_to_utf8()         - Convert UTF-16 text to UTF-8.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -329,9 +322,9 @@ backendSNMPSupplies(
 
       if ((supplies[i].max_capacity > 0 || (quirks & CUPS_SNMP_CAPACITY)) &&
           supplies[i].level >= 0)
-        snprintf(ptr, sizeof(value) - (ptr - value), "%d", percent);
+        snprintf(ptr, sizeof(value) - (size_t)(ptr - value), "%d", percent);
       else
-        strlcpy(ptr, "-1", sizeof(value) - (ptr - value));
+        strlcpy(ptr, "-1", sizeof(value) - (size_t)(ptr - value));
     }
 
     fprintf(stderr, "ATTR: marker-levels=%s\n", value);
@@ -585,7 +578,7 @@ backend_init_supplies(
       {
         if (!strcmp(description, value))
 	  cupsFileRead(cachefile, (char *)supplies,
-	               num_supplies * sizeof(backend_supplies_t));
+	               (size_t)num_supplies * sizeof(backend_supplies_t));
         else
 	{
 	  num_supplies = -1;
@@ -680,7 +673,7 @@ backend_init_supplies(
 
     if (num_supplies > 0)
       cupsFileWrite(cachefile, (char *)supplies,
-                    num_supplies * sizeof(backend_supplies_t));
+                    (size_t)num_supplies * sizeof(backend_supplies_t));
 
     cupsFileClose(cachefile);
   }
@@ -708,7 +701,7 @@ backend_init_supplies(
     if (i)
       *ptr++ = ',';
 
-    strlcpy(ptr, supplies[i].color, sizeof(value) - (ptr - value));
+    strlcpy(ptr, supplies[i].color, sizeof(value) - (size_t)(ptr - value));
   }
 
   fprintf(stderr, "ATTR: marker-colors=%s\n", value);
@@ -756,9 +749,9 @@ backend_init_supplies(
     type = supplies[i].type;
 
     if (type < CUPS_TC_other || type > CUPS_TC_covers)
-      strlcpy(ptr, "unknown", sizeof(value) - (ptr - value));
+      strlcpy(ptr, "unknown", sizeof(value) - (size_t)(ptr - value));
     else
-      strlcpy(ptr, types[type - CUPS_TC_other], sizeof(value) - (ptr - value));
+      strlcpy(ptr, types[type - CUPS_TC_other], sizeof(value) - (size_t)(ptr - value));
   }
 
   fprintf(stderr, "ATTR: marker-types=%s\n", value);
@@ -1062,9 +1055,9 @@ utf16_to_utf8(
   for (ptr = temp; srcsize >= 2;)
   {
     if (le)
-      ch = src[0] | (src[1] << 8);
+      ch = (cups_utf32_t)(src[0] | (src[1] << 8));
     else
-      ch = (src[0] << 8) | src[1];
+      ch = (cups_utf32_t)((src[0] << 8) | src[1]);
 
     src += 2;
     srcsize -= 2;
@@ -1075,13 +1068,13 @@ utf16_to_utf8(
       * Multi-word UTF-16 char...
       */
 
-      int lch;			/* Lower word */
+      cups_utf32_t lch;			/* Lower word */
 
 
       if (le)
-	lch = src[0] | (src[1] << 8);
+	lch = (cups_utf32_t)(src[0] | (src[1] << 8));
       else
-	lch = (src[0] << 8) | src[1];
+	lch = (cups_utf32_t)((src[0] << 8) | src[1]);
 
       if (lch >= 0xdc00 && lch <= 0xdfff)
       {
@@ -1098,10 +1091,10 @@ utf16_to_utf8(
 
   *ptr = '\0';
 
-  cupsUTF32ToUTF8(dst, temp, dstsize);
+  cupsUTF32ToUTF8(dst, temp, (int)dstsize);
 }
 
 
 /*
- * End of "$Id: snmp-supplies.c 11319 2013-09-27 16:18:26Z msweet $".
+ * End of "$Id: snmp-supplies.c 11558 2014-02-06 18:33:34Z msweet $".
  */

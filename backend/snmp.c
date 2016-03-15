@@ -1,44 +1,18 @@
 /*
- * "$Id: snmp.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: snmp.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   SNMP discovery backend for CUPS.
+ * SNMP discovery backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()                    - Discover printers via SNMP.
- *   add_array()               - Add a string to an array.
- *   add_cache()               - Add a cached device...
- *   add_device_uri()          - Add a device URI to the cache.
- *   alarm_handler()           - Handle alarm signals...
- *   compare_cache()           - Compare two cache entries.
- *   debug_printf()            - Display some debugging information.
- *   fix_make_model()          - Fix common problems in the make-and-model
- *                               string.
- *   free_array()              - Free an array of strings.
- *   free_cache()              - Free the array of cached devices.
- *   get_interface_addresses() - Get the broadcast address(es) associated with
- *                               an interface.
- *   list_device()             - List a device we found...
- *   password_cb()             - Handle authentication requests.
- *   probe_device()            - Probe a device to discover whether it is a
- *                               printer.
- *   read_snmp_conf()          - Read the snmp.conf file.
- *   read_snmp_response()      - Read and parse a SNMP response...
- *   run_time()                - Return the total running time...
- *   scan_devices()            - Scan for devices using SNMP.
- *   try_connect()             - Try connecting on a port...
- *   update_cache()            - Update a cached device...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -532,17 +506,16 @@ fix_make_model(
     make_model[0] = 'H';
     make_model[1] = 'P';
     make_model[2] = ' ';
-    strlcpy(make_model + 3, mmptr, make_model_size - 3);
+    strlcpy(make_model + 3, mmptr, (size_t)make_model_size - 3);
   }
   else if (!_cups_strncasecmp(old_make_model, "deskjet", 7))
-    snprintf(make_model, make_model_size, "HP DeskJet%s", old_make_model + 7);
+    snprintf(make_model, (size_t)make_model_size, "HP DeskJet%s", old_make_model + 7);
   else if (!_cups_strncasecmp(old_make_model, "officejet", 9))
-    snprintf(make_model, make_model_size, "HP OfficeJet%s", old_make_model + 9);
+    snprintf(make_model, (size_t)make_model_size, "HP OfficeJet%s", old_make_model + 9);
   else if (!_cups_strncasecmp(old_make_model, "stylus_pro_", 11))
-    snprintf(make_model, make_model_size, "EPSON Stylus Pro %s",
-             old_make_model + 11);
+    snprintf(make_model, (size_t)make_model_size, "EPSON Stylus Pro %s", old_make_model + 11);
   else
-    strlcpy(make_model, old_make_model, make_model_size);
+    strlcpy(make_model, old_make_model, (size_t)make_model_size);
 
   if ((mmptr = strstr(make_model, ", Inc.,")) != NULL)
   {
@@ -753,7 +726,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 	    * Insert hostname/address...
 	    */
 
-	    strlcpy(uriptr, device->addrname, sizeof(uri) - (uriptr - uri));
+	    strlcpy(uriptr, device->addrname, sizeof(uri) - (size_t)(uriptr - uri));
 	    uriptr += strlen(uriptr);
 	    format += 2;
 	  }
@@ -1233,7 +1206,7 @@ scan_devices(int ipv4,			/* I - SNMP IPv4 socket */
       for (addr = addrs; addr; addr = addr->next)
       {
 #ifdef AF_INET6
-        if (_httpAddrFamily(&(addr->addr)) == AF_INET6)
+        if (httpAddrFamily(&(addr->addr)) == AF_INET6)
 	  fd = ipv6;
 	else
 #endif /* AF_INET6 */
@@ -1335,7 +1308,7 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
   debug_printf("DEBUG: %.3f Trying %s://%s:%d...\n", run_time(),
                port == 515 ? "lpd" : "socket", addrname, port);
 
-  if ((fd = socket(_httpAddrFamily(addr), SOCK_STREAM, 0)) < 0)
+  if ((fd = socket(httpAddrFamily(addr), SOCK_STREAM, 0)) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create socket: %s\n",
             strerror(errno));
@@ -1346,7 +1319,7 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
 
   alarm(1);
 
-  status = connect(fd, (void *)addr, httpAddrLength(addr));
+  status = connect(fd, (void *)addr, (socklen_t)httpAddrLength(addr));
 
   close(fd);
   alarm(0);
@@ -1391,5 +1364,5 @@ update_cache(snmp_cache_t *device,	/* I - Device */
 
 
 /*
- * End of "$Id: snmp.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: snmp.c 11594 2014-02-14 20:09:01Z msweet $".
  */

@@ -1,26 +1,16 @@
 /*
- * "$Id: type.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: type.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   MIME typing routines for CUPS.
+ * MIME typing routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   mimeAddType()        - Add a MIME type to a database.
- *   mimeAddTypeRule()    - Add a detection rule for a file type.
- *   mimeFileType()       - Determine the type of a file.
- *   mimeType()           - Lookup a file type.
- *   mime_compare_types() - Compare two MIME super/type names.
- *   mime_check_rules()   - Check each rule in a list.
- *   mime_patmatch()      - Pattern matching.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -319,7 +309,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       */
 
       ptr = name;
-      while (isalnum(*rule & 255) && (ptr - name) < (sizeof(name) - 1))
+      while (isalnum(*rule & 255) && (size_t)(ptr - name) < (sizeof(name) - 1))
         *ptr++ = *rule++;
 
       *ptr = '\0';
@@ -332,12 +322,12 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 	rule ++;
 	for (num_values = 0;
-	     num_values < (sizeof(value) / sizeof(value[0]));
+	     num_values < (int)(sizeof(value) / sizeof(value[0]));
 	     num_values ++)
 	{
 	  ptr = value[num_values];
 
-	  while ((ptr - value[num_values]) < (sizeof(value[0]) - 1) &&
+	  while ((size_t)(ptr - value[num_values]) < (sizeof(value[0]) - 1) &&
 	         *rule != '\0' && *rule != ',' && *rule != ')')
 	  {
 	    if (isspace(*rule & 255))
@@ -358,7 +348,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      quote = *rule++;
 
 	      while (*rule != '\0' && *rule != quote &&
-	             (ptr - value[num_values]) < (sizeof(value[0]) - 1))
+	             (size_t)(ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	        *ptr++ = *rule++;
 
               if (*rule == quote)
@@ -371,14 +361,14 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	      rule ++;
 
 	      while (*rule != '>' && *rule != '\0' &&
-	             (ptr - value[num_values]) < (sizeof(value[0]) - 1))
+	             (size_t)(ptr - value[num_values]) < (sizeof(value[0]) - 1))
 	      {
 	        if (isxdigit(rule[0] & 255) && isxdigit(rule[1] & 255))
 		{
 		  if (isdigit(*rule))
-		    *ptr = (*rule++ - '0') << 4;
+		    *ptr = (char)((*rule++ - '0') << 4);
 		  else
-		    *ptr = (tolower(*rule++) - 'a' + 10) << 4;
+		    *ptr = (char)((tolower(*rule++) - 'a' + 10) << 4);
 
 		  if (isdigit(*rule))
 		    *ptr++ |= *rule++ - '0';
@@ -425,6 +415,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  op = MIME_MAGIC_ASCII;
 	else if (!strcmp(name, "printable"))
 	  op = MIME_MAGIC_PRINTABLE;
+	else if (!strcmp(name, "regex"))
+	  op = MIME_MAGIC_REGEX;
 	else if (!strcmp(name, "string"))
 	  op = MIME_MAGIC_STRING;
 	else if (!strcmp(name, "istring"))
@@ -454,7 +446,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	*/
 
 	snprintf(value[0], sizeof(value[0]), "*.%s", name);
-	length[0]  = strlen(value[0]);
+	length[0]  = (int)strlen(value[0]);
 	op         = MIME_MAGIC_MATCH;
       }
 
@@ -465,7 +457,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       if ((temp = calloc(1, sizeof(mime_magic_t))) == NULL)
 	return (-1);
 
-      temp->invert = invert;
+      temp->invert = (short)invert;
       if (current != NULL)
       {
 	temp->parent  = current->parent;
@@ -507,13 +499,13 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       */
 
       current  = temp;
-      temp->op = op;
+      temp->op = (short)op;
       invert   = 0;
 
       switch (op)
       {
         case MIME_MAGIC_MATCH :
-	    if (length[0] > (sizeof(temp->value.matchv) - 1))
+	    if ((size_t)length[0] > (sizeof(temp->value.matchv) - 1))
 	      return (-1);
 	    strlcpy(temp->value.matchv, value[0], sizeof(temp->value.matchv));
 	    break;
@@ -524,18 +516,24 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    if (temp->length > MIME_MAX_BUFFER)
 	      temp->length = MIME_MAX_BUFFER;
 	    break;
+	case MIME_MAGIC_REGEX :
+	    temp->offset = strtol(value[0], NULL, 0);
+	    temp->length = MIME_MAX_BUFFER;
+	    if (regcomp(&(temp->value.rev), value[1], REG_NOSUB | REG_EXTENDED))
+	      return (-1);
+	    break;
 	case MIME_MAGIC_STRING :
 	case MIME_MAGIC_ISTRING :
 	    temp->offset = strtol(value[0], NULL, 0);
-	    if (length[1] > sizeof(temp->value.stringv))
+	    if ((size_t)length[1] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[1];
-	    memcpy(temp->value.stringv, value[1], length[1]);
+	    memcpy(temp->value.stringv, value[1], (size_t)length[1]);
 	    break;
 	case MIME_MAGIC_CHAR :
 	    temp->offset = strtol(value[0], NULL, 0);
 	    if (length[1] == 1)
-	      temp->value.charv = value[1][0];
+	      temp->value.charv = (unsigned char)value[1][0];
 	    else
 	      temp->value.charv = (unsigned char)strtol(value[1], NULL, 0);
 
@@ -551,7 +549,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    temp->value.intv = (unsigned)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_LOCALE :
-	    if (length[0] > (sizeof(temp->value.localev) - 1))
+	    if ((size_t)length[0] > (sizeof(temp->value.localev) - 1))
 	      return (-1);
 
 	    strlcpy(temp->value.localev, value[0], sizeof(temp->value.localev));
@@ -559,10 +557,10 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	case MIME_MAGIC_CONTAINS :
 	    temp->offset = strtol(value[0], NULL, 0);
 	    temp->region = strtol(value[1], NULL, 0);
-	    if (length[2] > sizeof(temp->value.stringv))
+	    if ((size_t)length[2] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[2];
-	    memcpy(temp->value.stringv, value[2], length[2]);
+	    memcpy(temp->value.stringv, value[2], (size_t)length[2]);
 	    break;
       }
     }
@@ -735,8 +733,8 @@ mime_check_rules(
   int		n;			/* Looping var */
   int		region;			/* Region to look at */
   int		logic,			/* Logic to apply */
-		result,			/* Result of test */
-		intv;			/* Integer value */
+		result;			/* Result of test */
+  unsigned	intv;			/* Integer value */
   short		shortv;			/* Short value */
   unsigned char	*bufptr;		/* Pointer into buffer */
 
@@ -852,6 +850,50 @@ mime_check_rules(
 	  result = (n == 0);
 	  break;
 
+      case MIME_MAGIC_REGEX :
+          DEBUG_printf(("5mime_check_rules: regex(%d, \"%s\")", rules->offset,
+	                rules->value.stringv));
+
+         /*
+	  * Load the buffer if necessary...
+	  */
+
+          if (fb->offset < 0 || rules->offset < fb->offset ||
+	      (rules->offset + rules->length) > (fb->offset + fb->length))
+	  {
+	   /*
+	    * Reload file buffer...
+	    */
+
+            cupsFileSeek(fb->fp, rules->offset);
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
+	    fb->offset = rules->offset;
+
+            DEBUG_printf(("5mime_check_rules: loaded %d byte fb->buffer at %d, starts "
+	                  "with \"%c%c%c%c\".",
+	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
+			  fb->buffer[2], fb->buffer[3]));
+	  }
+
+         /*
+	  * Compare the buffer against the string.  If the file is too
+	  * short then don't compare - it can't match...
+	  */
+
+          if (fb->length > 0)
+          {
+            char temp[MIME_MAX_BUFFER + 1];
+					/* Temporary buffer */
+
+            memcpy(temp, fb->buffer, (size_t)fb->length);
+            temp[fb->length] = '\0';
+            result = !regexec(&(rules->value.rev), temp, 0, NULL, 0);
+          }
+
+          DEBUG_printf(("5mime_check_rules: result=%d", result));
+	  break;
+
       case MIME_MAGIC_STRING :
           DEBUG_printf(("5mime_check_rules: string(%d, \"%s\")", rules->offset,
 	                rules->value.stringv));
@@ -886,8 +928,7 @@ mime_check_rules(
 	  if ((rules->offset + rules->length) > (fb->offset + fb->length))
 	    result = 0;
 	  else
-            result = (memcmp(fb->buffer + rules->offset - fb->offset,
-	                     rules->value.stringv, rules->length) == 0);
+            result = !memcmp(fb->buffer + rules->offset - fb->offset, rules->value.stringv, (size_t)rules->length);
           DEBUG_printf(("5mime_check_rules: result=%d", result));
 	  break;
 
@@ -917,9 +958,7 @@ mime_check_rules(
 	  if ((rules->offset + rules->length) > (fb->offset + fb->length))
 	    result = 0;
 	  else
-            result = (_cups_strncasecmp((char *)fb->buffer + rules->offset -
-	                              fb->offset,
-	                          rules->value.stringv, rules->length) == 0);
+            result = !_cups_strncasecmp((char *)fb->buffer + rules->offset - fb->offset, rules->value.stringv, (size_t)rules->length);
 	  break;
 
       case MIME_MAGIC_CHAR :
@@ -979,7 +1018,7 @@ mime_check_rules(
 	  else
 	  {
 	    bufptr = fb->buffer + rules->offset - fb->offset;
-	    shortv = (bufptr[0] << 8) | bufptr[1];
+	    shortv = (short)((bufptr[0] << 8) | bufptr[1]);
 	    result = (shortv == rules->value.shortv);
 	  }
 	  break;
@@ -1012,19 +1051,16 @@ mime_check_rules(
 	  else
 	  {
 	    bufptr = fb->buffer + rules->offset - fb->offset;
-	    intv   = (((((bufptr[0] << 8) | bufptr[1]) << 8) |
-	               bufptr[2]) << 8) | bufptr[3];
+	    intv   = (unsigned)((((((bufptr[0] << 8) | bufptr[1]) << 8) | bufptr[2]) << 8) | bufptr[3]);
 	    result = (intv == rules->value.intv);
 	  }
 	  break;
 
       case MIME_MAGIC_LOCALE :
 #if defined(WIN32) || defined(__EMX__) || defined(__APPLE__)
-          result = (strcmp(rules->value.localev,
-	                   setlocale(LC_ALL, "")) == 0);
+          result = !strcmp(rules->value.localev, setlocale(LC_ALL, ""));
 #else
-          result = (strcmp(rules->value.localev,
-	                   setlocale(LC_MESSAGES, "")) == 0);
+          result = !strcmp(rules->value.localev, setlocale(LC_MESSAGES, ""));
 #endif /* __APPLE__ */
 	  break;
 
@@ -1061,9 +1097,7 @@ mime_check_rules(
 	      region = fb->length - rules->length;
 
 	    for (n = 0; n < region; n ++)
-	      if ((result = (memcmp(fb->buffer + rules->offset - fb->offset + n,
-	                            rules->value.stringv,
-				    rules->length) == 0)) != 0)
+	      if ((result = (memcmp(fb->buffer + rules->offset - fb->offset + n, rules->value.stringv, (size_t)rules->length) == 0)) != 0)
 		break;
           }
 	  break;
@@ -1212,5 +1246,5 @@ mime_patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: type.c 11594 2014-02-14 20:09:01Z msweet $".
  */

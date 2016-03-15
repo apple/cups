@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,135 +10,21 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 printers.conf - printer configuration file for cups
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-The <i>printers.conf</i> file defines the local printers that are
-available. It is normally located in the <i>/etc/cups</i> directory and
-is generated automatically by the <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a> program when printers
-are added or deleted.
-<p>Each line in the file can be a configuration directive, a blank line,
-or a comment. Comment lines start with the # character.
-<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-<dl>
-<dt>&lt;Printer name> ... &lt;/Printer>
-</dt>
-<dd></dd>
-<dd>Defines a specific printer.
-</dd>
-<dt>&lt;DefaultPrinter name> ... &lt;/Printer>
-</dt>
-<dd></dd>
-<dd>Defines a default printer.
-</dd>
-<dt>Accepting Yes
-</dt>
-<dd></dd>
-<dt>Accepting No
-</dt>
-<dd></dd>
-<dd>Specifies whether the printer is accepting new jobs.
-</dd>
-<dt>AllowUser [ user @group ... ]
-</dt>
-<dd></dd>
-<dd>Allows specific users and groups to print to the printer.
-</dd>
-<dt>DenyUser [ user @group ... ]
-</dt>
-<dd></dd>
-<dd>Prevents specific users and groups from printing to the printer.
-</dd>
-<dt>DeviceURI uri
-</dt>
-<dd></dd>
-<dd>Specifies the device URI for a printer.
-</dd>
-<dt>ErrorPolicy abort-job
-</dt>
-<dd></dd>
-<dt>ErrorPolicy retry-current-job
-</dt>
-<dd></dd>
-<dt>ErrorPolicy retry-job
-</dt>
-<dd></dd>
-<dt>ErrorPolicy stop-printer
-</dt>
-<dd></dd>
-<dd>Specifies the error policy for the printer.
-</dd>
-<dt>Info text
-</dt>
-<dd></dd>
-<dd>Specifies human-readable text describing the printer.
-</dd>
-<dt>JobSheets banner banner
-</dt>
-<dd></dd>
-<dd>Specifies the banner pages to use for the printer.
-</dd>
-<dt>KLimit number
-</dt>
-<dd></dd>
-<dd>Specifies the job-k-limit value for the printer.
-</dd>
-<dt>Location text
-</dt>
-<dd></dd>
-<dd>Specifies human-readable text describing the location of the printer.
-</dd>
-<dt>OpPolicy name
-</dt>
-<dd></dd>
-<dd>Specifies the operation policy for the printer.
-</dd>
-<dt>PageLimit number
-</dt>
-<dd></dd>
-<dd>Specifies the job-page-limit value for the printer.
-</dd>
-<dt>PortMonitor monitor
-</dt>
-<dd></dd>
-<dd>Specifies the port monitor for a printer.
-</dd>
-<dt>QuotaPeriod seconds
-</dt>
-<dd></dd>
-<dd>Specifies the job-quota-period value for the printer.
-</dd>
-<dt>Shared Yes
-</dt>
-<dd></dd>
-<dt>Shared No
-</dt>
-<dd></dd>
-<dd>Specifies whether the printer is shared.
-</dd>
-<dt>State idle
-</dt>
-<dd></dd>
-<dt>State stopped
-</dt>
-<dd></dd>
-<dd>Specifies the initial state of the printer (Idle or Stopped)
-</dd>
-<dt>StateMessage text
-</dt>
-<dd></dd>
-<dd>Specifies the message associated with the state.
-</dd>
-<dt>StateTime seconds
-</dt>
-<dd></dd>
-<dd>Specifies the date/time associated with the state.
-</dd>
-</dl>
+The <b>printers.conf</b> file defines the local printers that are available. It is normally located in the <i>/etc/cups</i> directory and is maintained by the
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+program. This file is not intended to be edited or managed manually.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+The name, location, and format of this file are an implementation detail that will change in future releases of CUPS.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-classes.conf.html?TOPIC=Man+Pages'>classes.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>,
-<a href='man-mime.convs.html?TOPIC=Man+Pages'>mime.convs(5)</a>, <a href='man-mime.types.html?TOPIC=Man+Pages'>mime.types(5)</a>,
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

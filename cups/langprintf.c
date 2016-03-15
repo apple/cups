@@ -1,27 +1,18 @@
 /*
- * "$Id: langprintf.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: langprintf.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Localized printf/puts functions for CUPS.
+ * Localized printf/puts functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2002-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2002-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsLangPrintError()  - Print a message followed by a standard error.
- *   _cupsLangPrintFilter() - Print a formatted filter message string to a file.
- *   _cupsLangPrintf()      - Print a formatted message string to a file.
- *   _cupsLangPuts()        - Print a static message string to a file.
- *   _cupsSetLocale()       - Set the current locale and transcode the
- *                            command-line.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -39,7 +30,7 @@ void
 _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
                     const char *message)/* I - Message */
 {
-  int		bytes;			/* Number of bytes formatted */
+  ssize_t	bytes;			/* Number of bytes formatted */
   int		last_errno;		/* Last error */
   char		buffer[2048],		/* Message buffer */
 		*bufptr,		/* Pointer into buffer */
@@ -81,7 +72,7 @@ _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
   else
     bufptr = buffer;
 
-  snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
+  snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer),
 	   /* TRANSLATORS: Message is "subject: error" */
 	   _cupsLangString(cg->lang_default, _("%s: %s")),
 	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
@@ -95,7 +86,7 @@ _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
                             cg->lang_default->encoding);
 
   if (bytes > 0)
-    fwrite(output, 1, bytes, stderr);
+    fwrite(output, 1, (size_t)bytes, stderr);
 }
 
 
@@ -110,7 +101,7 @@ _cupsLangPrintFilter(
     const char *message,		/* I - Message string to use */
     ...)				/* I - Additional arguments as needed */
 {
-  int		bytes;			/* Number of bytes formatted */
+  ssize_t	bytes;			/* Number of bytes formatted */
   char		temp[2048],		/* Temporary format buffer */
 		buffer[2048],		/* Message buffer */
 		output[8192];		/* Output buffer */
@@ -152,9 +143,9 @@ _cupsLangPrintFilter(
   */
 
   if (bytes > 0)
-    return ((int)fwrite(output, 1, bytes, fp));
+    return ((int)fwrite(output, 1, (size_t)bytes, fp));
   else
-    return (bytes);
+    return ((int)bytes);
 }
 
 
@@ -167,7 +158,7 @@ _cupsLangPrintf(FILE       *fp,		/* I - File to write to */
 		const char *message,	/* I - Message string to use */
 	        ...)			/* I - Additional arguments as needed */
 {
-  int		bytes;			/* Number of bytes formatted */
+  ssize_t	bytes;			/* Number of bytes formatted */
   char		buffer[2048],		/* Message buffer */
 		output[8192];		/* Output buffer */
   va_list 	ap;			/* Pointer to additional arguments */
@@ -209,9 +200,9 @@ _cupsLangPrintf(FILE       *fp,		/* I - File to write to */
   */
 
   if (bytes > 0)
-    return ((int)fwrite(output, 1, bytes, fp));
+    return ((int)fwrite(output, 1, (size_t)bytes, fp));
   else
-    return (bytes);
+    return ((int)bytes);
 }
 
 
@@ -223,7 +214,7 @@ int					/* O - Number of bytes written */
 _cupsLangPuts(FILE       *fp,		/* I - File to write to */
               const char *message)	/* I - Message string to use */
 {
-  int		bytes;			/* Number of bytes formatted */
+  ssize_t	bytes;			/* Number of bytes formatted */
   char		output[8192];		/* Message buffer */
   _cups_globals_t *cg;			/* Global data */
 
@@ -248,18 +239,16 @@ _cupsLangPuts(FILE       *fp,		/* I - File to write to */
 			    (cups_utf8_t *)_cupsLangString(cg->lang_default,
 							   message),
 			    sizeof(output) - 4, cg->lang_default->encoding);
-  bytes += cupsUTF8ToCharset(output + bytes, (cups_utf8_t *)"\n",
-                             sizeof(output) - bytes,
-			     cg->lang_default->encoding);
+  bytes += cupsUTF8ToCharset(output + bytes, (cups_utf8_t *)"\n", (int)(sizeof(output) - (size_t)bytes), cg->lang_default->encoding);
 
  /*
   * Write the string and return the number of bytes written...
   */
 
   if (bytes > 0)
-    return ((int)fwrite(output, 1, bytes, fp));
+    return ((int)fwrite(output, 1, (size_t)bytes, fp));
   else
-    return (bytes);
+    return ((int)bytes);
 }
 
 
@@ -301,7 +290,7 @@ _cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
     if ((charset = strchr(new_lc_time, '.')) == NULL)
       charset = new_lc_time + strlen(new_lc_time);
 
-    strlcpy(charset, ".UTF-8", sizeof(new_lc_time) - (charset - new_lc_time));
+    strlcpy(charset, ".UTF-8", sizeof(new_lc_time) - (size_t)(charset - new_lc_time));
   }
   else
     strlcpy(new_lc_time, "C", sizeof(new_lc_time));
@@ -348,5 +337,5 @@ _cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
 
 
 /*
- * End of "$Id: langprintf.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: langprintf.c 11558 2014-02-06 18:33:34Z msweet $".
  */

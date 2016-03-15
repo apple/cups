@@ -6,6 +6,8 @@
 	<string>org.cups.cupsd</string>
 	<key>EnableTransactions</key>
 	<true/>
+	<key>EnablePressuredExit</key>
+	<true/>
 	<key>ExitTimeOut</key>
 	<integer>60</integer>
 	<key>KeepAlive</key>
@@ -21,8 +23,7 @@
 		<string>/usr/sbin/cupsd</string>
 		<string>-l</string>
 	</array>
-	<!-- These environment variables are only used when CUPS is compiled
-	     with --enable-debug-printfs -->
+	<!-- These environment variables are only used when CUPS is compiled with debug-printfs support -->
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>CUPS_DEBUG_LOG</key>
@@ -30,10 +31,8 @@
 		<key>CUPS_DEBUG_LEVEL</key>
 		<string>3</string>
 		<key>CUPS_DEBUG_FILTER</key>
-		<string>^(http|_http|ipp|_ipp|mime).*</string>
+		<string>^(cupsDo|cupsGet|cupsMake|cupsSet|http|_http|ipp|_ipp|mime).*</string>
 	</dict>
-	<key>ServiceIPC</key>
-	<true/>
 	<key>Sockets</key>
 	<dict>
 		<key>Listeners</key>

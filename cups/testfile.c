@@ -1,25 +1,18 @@
 /*
- * "$Id: testfile.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testfile.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   File test program for CUPS.
+ * File test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()             - Main entry.
- *   count_lines()      - Count the number of lines in a file.
- *   random_tests()     - Do random access tests.
- *   read_write_tests() - Perform read/write tests.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -266,8 +259,8 @@ random_tests(void)
 		count,			/* Number of records read */
 		record,			/* Current record */
 		num_records;		/* Number of records */
-  ssize_t	pos,			/* Position in file */
-		expected;		/* Expected position in file */
+  off_t		pos;			/* Position in file */
+  ssize_t	expected;		/* Expected position in file */
   cups_file_t	*fp;			/* File */
   char		buffer[512];		/* Data buffer */
 
@@ -298,10 +291,10 @@ random_tests(void)
     * cupsFileTell()
     */
 
-    expected = 256 * sizeof(buffer) * pass;
+    expected = 256 * (ssize_t)sizeof(buffer) * pass;
 
     fputs("cupsFileTell(): ", stdout);
-    if ((pos = cupsFileTell(fp)) != expected)
+    if ((pos = cupsFileTell(fp)) != (off_t)expected)
     {
       printf("FAIL (" CUPS_LLFMT " instead of " CUPS_LLFMT ")\n",
 	     CUPS_LLCAST pos, CUPS_LLCAST expected);
@@ -319,7 +312,7 @@ random_tests(void)
     for (record = 0; record < 256; record ++)
     {
       memset(buffer, record, sizeof(buffer));
-      if (cupsFileWrite(fp, buffer, sizeof(buffer)) < sizeof(buffer))
+      if (cupsFileWrite(fp, buffer, sizeof(buffer)) < (ssize_t)sizeof(buffer))
         break;
     }
 
@@ -336,10 +329,10 @@ random_tests(void)
     * cupsFileTell()
     */
 
-    expected += 256 * sizeof(buffer);
+    expected += 256 * (ssize_t)sizeof(buffer);
 
     fputs("cupsFileTell(): ", stdout);
-    if ((pos = cupsFileTell(fp)) != expected)
+    if ((pos = cupsFileTell(fp)) != (off_t)expected)
     {
       printf("FAIL (" CUPS_LLFMT " instead of " CUPS_LLFMT ")\n",
              CUPS_LLCAST pos, CUPS_LLCAST expected);
@@ -372,11 +365,9 @@ random_tests(void)
 
     fputs("cupsFileSeek(), cupsFileRead(): ", stdout);
 
-    for (num_records = (pass + 1) * 256, count = (pass + 1) * 256,
-             record = CUPS_RAND() % num_records;
+    for (num_records = (pass + 1) * 256, count = (pass + 1) * 256, record = ((int)CUPS_RAND() & 65535) % num_records;
          count > 0;
-	 count --, record = (record + (CUPS_RAND() & 31) - 16 + num_records) %
-	                    num_records)
+	 count --, record = (record + ((int)CUPS_RAND() & 31) - 16 + num_records) % num_records)
     {
      /*
       * The last record is always the first...
@@ -390,7 +381,7 @@ random_tests(void)
       * contents...
       */
 
-      expected = sizeof(buffer) * record;
+      expected = (ssize_t)sizeof(buffer) * record;
 
       if ((pos = cupsFileSeek(fp, expected)) != expected)
       {
@@ -454,6 +445,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   unsigned char	readbuf[8192],		/* Read buffer */
 		writebuf[8192];		/* Write buffer */
   int		byte;			/* Byte from file */
+  ssize_t	bytes;			/* Number of bytes read/written */
   off_t		length;			/* Length of file */
   static const char *partial_line = "partial line";
 					/* Partial line */
@@ -472,7 +464,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   CUPS_SRAND((unsigned)time(NULL));
 
   for (i = 0; i < (int)sizeof(writebuf); i ++)
-    writebuf[i] = CUPS_RAND();
+    writebuf[i] = (unsigned char)CUPS_RAND();
 
  /*
   * cupsFileOpen(write)
@@ -673,7 +665,7 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileGetConf(): ", stdout);
 
-    for (i = 0; i < 1000; i ++)
+    for (i = 0, value = NULL; i < 1000; i ++)
       if (!cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
         break;
       else if (_cups_strcasecmp(line, "TestLine") || !value || atoi(value) != i ||
@@ -700,7 +692,7 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileGetChar(): ", stdout);
 
-    for (i = 0; i < 256; i ++)
+    for (i = 0, byte = 0; i < 256; i ++)
       if ((byte = cupsFileGetChar(fp)) != i)
         break;
 
@@ -723,15 +715,15 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileRead(): ", stdout);
 
-    for (i = 0; i < 10000; i ++)
-      if ((byte = cupsFileRead(fp, (char *)readbuf, sizeof(readbuf))) < 0)
+    for (i = 0, bytes = 0; i < 10000; i ++)
+      if ((bytes = cupsFileRead(fp, (char *)readbuf, sizeof(readbuf))) < 0)
         break;
       else if (memcmp(readbuf, writebuf, sizeof(readbuf)))
         break;
 
     if (i >= 10000)
       puts("PASS");
-    else if (byte > 0)
+    else if (bytes > 0)
     {
       printf("FAIL (Pass %d, ", i);
 
@@ -817,5 +809,5 @@ read_write_tests(int compression)	/* I - Use compression? */
 
 
 /*
- * End of "$Id: testfile.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testfile.c 11558 2014-02-06 18:33:34Z msweet $".
  */

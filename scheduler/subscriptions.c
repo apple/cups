@@ -1,37 +1,16 @@
 /*
- * "$Id: subscriptions.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: subscriptions.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Subscription routines for the CUPS scheduler.
+ * Subscription routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddEvent()               - Add an event to the global event cache.
- *   cupsdAddSubscription()        - Add a new subscription object.
- *   cupsdDeleteAllSubscriptions() - Delete all subscriptions.
- *   cupsdDeleteSubscription()     - Delete a subscription object.
- *   cupsdEventName()              - Return a single event name.
- *   cupsdEventValue()             - Return the event mask value for a name.
- *   cupsdExpireSubscriptions()    - Expire old subscription objects.
- *   cupsdFindSubscription()       - Find a subscription by ID.
- *   cupsdLoadAllSubscriptions()   - Load all subscriptions from the .conf file.
- *   cupsdSaveAllSubscriptions()   - Save all subscriptions to the .conf file.
- *   cupsdStopAllNotifiers()       - Stop all notifier processes.
- *   cupsd_compare_subscriptions() - Compare two subscriptions.
- *   cupsd_delete_event()          - Delete a single event...
- *   cupsd_send_dbus()             - Send a DBUS notification...
- *   cupsd_send_notification()     - Send a notification for the specified
- *                                   event.
- *   cupsd_start_notifier()        - Start a notifier subprocess...
- *   cupsd_update_notifier()       - Read messages from notifiers.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -212,7 +191,7 @@ cupsdAddEvent(
 			(const char * const *)dest->reasons);
 
 	ippAddBoolean(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	              "printer-is-accepting-jobs", dest->accepting);
+	              "printer-is-accepting-jobs", (char)dest->accepting);
       }
 
       if (job)
@@ -945,9 +924,9 @@ cupsdLoadAllSubscriptions(void)
 	    if (isxdigit(valueptr[0]) && isxdigit(valueptr[1]))
 	    {
 	      if (isdigit(valueptr[0]))
-	        sub->user_data[i] = (valueptr[0] - '0') << 4;
+	        sub->user_data[i] = (unsigned char)((valueptr[0] - '0') << 4);
 	      else
-	        sub->user_data[i] = (tolower(valueptr[0]) - 'a' + 10) << 4;
+	        sub->user_data[i] = (unsigned char)((tolower(valueptr[0]) - 'a' + 10) << 4);
 
 	      if (isdigit(valueptr[1]))
 	        sub->user_data[i] |= valueptr[1] - '0';
@@ -966,7 +945,7 @@ cupsdLoadAllSubscriptions(void)
 	      break;
 	  }
 	  else
-	    sub->user_data[i] = *valueptr++;
+	    sub->user_data[i] = (unsigned char)*valueptr++;
 	}
 
 	if (*valueptr)
@@ -1638,5 +1617,5 @@ cupsd_update_notifier(void)
 
 
 /*
- * End of "$Id: subscriptions.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: subscriptions.c 11558 2014-02-06 18:33:34Z msweet $".
  */

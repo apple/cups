@@ -1,27 +1,16 @@
 /*
- * "$Id: testlpd.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testlpd.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   cups-lpd test program for CUPS.
+ * cups-lpd test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()          - Simulate an LPD client.
- *   do_command()    - Send the LPD command and wait for a response.
- *   print_job()     - Submit a file for printing.
- *   print_waiting() - Print waiting jobs.
- *   remove_job()    - Cancel a print job.
- *   status_long()   - Show the long printer status.
- *   status_short()  - Show the short printer status.
- *   usage()         - Show program usage...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -210,15 +199,15 @@ do_command(int        outfd,		/* I - Command file descriptor */
            int        infd,		/* I - Response file descriptor */
 	   const char *command)		/* I - Command line to send */
 {
-  int	len;				/* Length of command line */
-  char	status;				/* Status byte */
+  size_t	len;			/* Length of command line */
+  char		status;			/* Status byte */
 
 
   printf("COMMAND: %02X %s", command[0], command + 1);
 
   len = strlen(command);
 
-  if (write(outfd, command, len) < len)
+  if ((size_t)write(outfd, command, len) < len)
   {
     puts("    Write failed!");
     return (-1);
@@ -251,7 +240,7 @@ print_job(int  outfd,			/* I - Command file descriptor */
   struct stat	fileinfo;		/* File information */
   char		*jobname;		/* Job name */
   int		sequence;		/* Sequence number */
-  int		bytes;			/* Bytes read/written */
+  ssize_t	bytes;			/* Bytes read/written */
 
 
  /*
@@ -305,10 +294,10 @@ print_job(int  outfd,			/* I - Command file descriptor */
   * Send the control file...
   */
 
-  bytes = strlen(control);
+  bytes = (ssize_t)strlen(control);
 
   snprintf(command, sizeof(command), "\002%d cfA%03dlocalhost\n",
-           bytes, sequence);
+           (int)bytes, sequence);
 
   if ((status = do_command(outfd, infd, command)) != 0)
   {
@@ -318,14 +307,14 @@ print_job(int  outfd,			/* I - Command file descriptor */
 
   bytes ++;
 
-  if (write(outfd, control, bytes) < bytes)
+  if (write(outfd, control, (size_t)bytes) < bytes)
   {
-    printf("CONTROL: Unable to write %d bytes!\n", bytes);
+    printf("CONTROL: Unable to write %d bytes!\n", (int)bytes);
     close(fd);
     return (-1);
   }
 
-  printf("CONTROL: Wrote %d bytes.\n", bytes);
+  printf("CONTROL: Wrote %d bytes.\n", (int)bytes);
 
   if (read(infd, command, 1) < 1)
   {
@@ -355,9 +344,9 @@ print_job(int  outfd,			/* I - Command file descriptor */
 
   while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
   {
-    if (write(outfd, buffer, bytes) < bytes)
+    if (write(outfd, buffer, (size_t)bytes) < bytes)
     {
-      printf("DATA: Unable to write %d bytes!\n", bytes);
+      printf("DATA: Unable to write %d bytes!\n", (int)bytes);
       close(fd);
       return (-1);
     }
@@ -451,7 +440,7 @@ status_long(int  outfd,			/* I - Command file descriptor */
 {
   char		command[1024],		/* Command buffer */
 		buffer[8192];		/* Status buffer */
-  int		bytes;			/* Bytes read/written */
+  ssize_t	bytes;			/* Bytes read/written */
 
 
  /*
@@ -463,9 +452,9 @@ status_long(int  outfd,			/* I - Command file descriptor */
   else
     snprintf(command, sizeof(command), "\004%s\n", dest);
 
-  bytes = strlen(command);
+  bytes = (ssize_t)strlen(command);
 
-  if (write(outfd, command, bytes) < bytes)
+  if (write(outfd, command, (size_t)bytes) < bytes)
     return (-1);
 
  /*
@@ -474,7 +463,7 @@ status_long(int  outfd,			/* I - Command file descriptor */
 
   while ((bytes = read(infd, buffer, sizeof(buffer))) > 0)
   {
-    fwrite(buffer, 1, bytes, stdout);
+    fwrite(buffer, 1, (size_t)bytes, stdout);
     fflush(stdout);
   }
 
@@ -494,7 +483,7 @@ status_short(int  outfd,		/* I - Command file descriptor */
 {
   char		command[1024],		/* Command buffer */
 		buffer[8192];		/* Status buffer */
-  int		bytes;			/* Bytes read/written */
+  ssize_t	bytes;			/* Bytes read/written */
 
 
  /*
@@ -506,9 +495,9 @@ status_short(int  outfd,		/* I - Command file descriptor */
   else
     snprintf(command, sizeof(command), "\003%s\n", dest);
 
-  bytes = strlen(command);
+  bytes = (ssize_t)strlen(command);
 
-  if (write(outfd, command, bytes) < bytes)
+  if (write(outfd, command, (size_t)bytes) < bytes)
     return (-1);
 
  /*
@@ -517,7 +506,7 @@ status_short(int  outfd,		/* I - Command file descriptor */
 
   while ((bytes = read(infd, buffer, sizeof(buffer))) > 0)
   {
-    fwrite(buffer, 1, bytes, stdout);
+    fwrite(buffer, 1, (size_t)bytes, stdout);
     fflush(stdout);
   }
 
@@ -546,5 +535,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testlpd.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testlpd.c 11558 2014-02-06 18:33:34Z msweet $".
  */

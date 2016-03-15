@@ -1,7 +1,109 @@
+/* Layout CSS */
+.header {
+  background: rgba(46,46,46,.9);
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.25);
+  color: white;
+  left: 0;
+  margin-bottom: 20px;
+  padding: 0px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+}
+.header ul {
+  list-style: none;
+  margin: 0px;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 5px;
+  -webkit-padding-start: 0;
+}
+.header ul li {
+  float: left;
+}
+.header a {
+  display: block;
+  padding: 5px 10px !important;
+}
+.header a:link, .header a:visited {
+  color: white !important;
+  text-decoration: none !important;
+}
+.header a:hover {
+  background: #cccccc !important;
+  color: #333333 !important;
+  text-decoration: none !important;
+}
+.header a.active {
+  background: white !important;
+  box-shadow: rgba(0,0,0,0.1) 0px 0px 10px 0px inset;
+  color: black !important;
+  text-decoration: none !important;
+}
+
+.body {
+  padding: 40px 20px;
+}
+
+.footer {
+  background: rgba(46,46,46,.9);
+  bottom: 0;
+  box-shadow: 0px -2px 5px rgba(0,0,0,0.25);
+  color: #cccccc;
+  font-size: 10px;
+  height: 20px;
+  left: 0;
+  padding: 10px 10px 3px;
+  position: fixed;
+  width: 100%;
+}
+.footer a:link, footer a:hover, .footer a:visited {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.row {
+  width: 100%;
+  *zoom: 1;
+}
+.row:after {
+  clear: both;
+}
+
+.row .thirds {
+  float: left;
+  margin-left: 0.5%;
+  margin-right: 0;
+  width: 33%;
+}
+.row .thirds:first-child {
+  margin-left: 0;
+}
+
+.row .halves {
+  float: left;
+  margin-left: 0.5%;
+  margin-right: 0;
+  width: 49.75%;
+}
+.row .halves:first-child {
+  margin-left: 0;
+}
+.mobile {
+  display: none;
+}
+.no-mobile {
+  display: inherit;
+}
+
+/* Appearance CSS */
 BODY {
   background: white;
   color: black;
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+  margin: 0;
 }
 
 H1, H2, H3, H4, H5, H6, P, TD, TH {
@@ -29,6 +131,18 @@ PRE.command {
 P.example {
   font-style: italic;
   margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
 }
 
 PRE.example {
@@ -255,7 +369,7 @@ H2.title, H3.title {
   border-bottom: solid 1pt #999999;
 }
 
-DIV.indent, TABLE.indent {
+TABLE.indent {
   margin-top: 2em;
   margin-left: auto;
   margin-right: auto;
@@ -459,4 +573,70 @@ div.body dt {
 }
 div.body dd {
   margin-bottom: 0.5em;
+}
+/* iPhone/iPod touch overrides */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px),
+       only screen and (min-device-width: 320px) and (max-device-width: 568px) {
+  .mobile {
+    display: inherit;
+  }
+  .no-mobile {
+    display: none;
+  }
+
+  .header {
+    margin: 0;
+    position: relative;
+  }
+  .header ul li {
+    float: none;
+  }
+
+  .body {
+    paddng: 0px;
+  }
+
+  .footer {
+    font-size: 10px;
+    height: auto;
+    position: relative;
+  }
+
+  .row .thirds, .row .halves {
+    float: none;
+    margin: 0;
+    width: 100%;
+  }
+
+  DIV.sidebar {
+    float: none;
+    margin-left: 0;
+    max-width: 100%;
+    min-width: 100%;
+    width: 100%;
+  }
+
+  BLOCKQUOTE {
+    margin: 0;
+  }
+
+  P.example {
+    margin-left: 0;
+  }
+
+  PRE.command, PRE.example, PRE.man {
+    margin-left: 0;
+    white-space: pre-wrap;
+  }
+}
+
+/* iPad overrides */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+
+  .mobile {
+    display: inherit;
+  }
+  .no-mobile {
+    display: none;
+  }
 }

@@ -1,17 +1,17 @@
 /*
- * "$Id: thread-private.h 11642 2014-02-27 15:57:59Z msweet $"
+ * "$Id: thread-private.h 11627 2014-02-20 16:15:09Z msweet $"
  *
- *   Private threading definitions for CUPS.
+ * Private threading definitions for CUPS.
  *
- *   Copyright 2009-2012 by Apple Inc.
+ * Copyright 2009-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_THREAD_PRIVATE_H_
@@ -41,7 +41,7 @@ typedef pthread_rwlock_t _cups_rwlock_t;
 typedef pthread_key_t	_cups_threadkey_t;
 #    define _CUPS_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
 #    define _CUPS_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
-#    define _CUPS_THREADKEY_INITIALIZER -1
+#    define _CUPS_THREADKEY_INITIALIZER 0
 #    define _cupsThreadGetData(k) pthread_getspecific(k)
 #    define _cupsThreadSetData(k,p) pthread_setspecific(k,p)
 
@@ -96,5 +96,5 @@ extern int	_cupsThreadCreate(_cups_thread_func_t func, void *arg);
 #endif /* !_CUPS_THREAD_PRIVATE_H_ */
 
 /*
- * End of "$Id: thread-private.h 11642 2014-02-27 15:57:59Z msweet $".
+ * End of "$Id: thread-private.h 11627 2014-02-20 16:15:09Z msweet $".
  */

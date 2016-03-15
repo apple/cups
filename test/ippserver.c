@@ -1,75 +1,17 @@
 /*
- * "$Id: ippserver.c 11097 2013-07-04 15:54:36Z msweet $"
+ * "$Id: ippserver.c 11986 2014-07-02 15:52:01Z msweet $"
  *
- *   Sample IPP/2.0 server for CUPS.
+ * Sample IPP/2.0 server for CUPS.
  *
- *   Copyright 2010-2013 by Apple Inc.
+ * Copyright 2010-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()			  - Main entry to the sample server.
- *   clean_jobs()		  - Clean out old (completed) jobs.
- *   compare_jobs()		  - Compare two jobs.
- *   copy_attributes()		  - Copy attributes from one request to
- *				    another.
- *   copy_job_attrs()		  - Copy job attributes to the response.
- *   create_client()		  - Accept a new network connection and create
- *				    a client object.
- *   create_job()		  - Create a new job object from a Print-Job or
- *				    Create-Job request.
- *   create_listener()		  - Create a listener socket.
- *   create_media_col() 	  - Create a media-col value.
- *   create_printer()		  - Create, register, and listen for
- *				    connections to a printer object.
- *   create_requested_array()	  - Create an array for requested-attributes.
- *   debug_attributes() 	  - Print attributes in a request or response.
- *   delete_client()		  - Close the socket and free all memory used
- *				    by a client object.
- *   delete_job()		  - Remove from the printer and free all memory
- *				    used by a job object.
- *   delete_printer()		  - Unregister, close listen sockets, and free
- *				    all memory used by a printer object.
- *   dnssd_callback()		  - Handle Bonjour registration events.
- *   find_job() 		  - Find a job specified in a request.
- *   html_escape()		  - Write a HTML-safe string.
- *   html_printf()		  - Send formatted text to the client, quoting
- *				    as needed.
- *   ipp_cancel_job()		  - Cancel a job.
- *   ipp_create_job()		  - Create a job object.
- *   ipp_get_job_attributes()	  - Get the attributes for a job object.
- *   ipp_get_jobs()		  - Get a list of job objects.
- *   ipp_get_printer_attributes() - Get the attributes for a printer object.
- *   ipp_print_job()		  - Create a job object with an attached
- *				    document.
- *   ipp_print_uri()		  - Create a job object with a referenced
- *				    document.
- *   ipp_send_document()	  - Add an attached document to a job object
- *				    created with Create-Job.
- *   ipp_send_uri()		  - Add a referenced document to a job object
- *				    created with Create-Job.
- *   ipp_validate_job() 	  - Validate job creation attributes.
- *   process_client()		  - Process client requests on a thread.
- *   process_http()		  - Process a HTTP request.
- *   process_ipp()		  - Process an IPP request.
- *   process_job()		  - Process a print job.
- *   register_printer() 	  - Register a printer object via Bonjour.
- *   respond_http()		  - Send a HTTP response.
- *   respond_ipp()		  - Send an IPP response.
- *   respond_unsupported()	  - Respond with an unsupported attribute.
- *   run_printer()		  - Run the printer service.
- *   usage()			  - Show program usage.
- *   valid_doc_attributes()	  - Determine whether the document attributes
- *				    are valid.
- *   valid_job_attributes()	  - Determine whether the job attributes are
- *				    valid.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -379,6 +321,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*icon = "printer.png",	/* Icon file */
 		*formats = "application/pdf,image/jpeg,image/pwg-raster";
 	      				/* Supported formats */
+#ifdef HAVE_SSL
+  const char	*keypath = NULL;	/* Keychain path */
+#endif /* HAVE_SSL */
 #ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
 #endif /* HAVE_DNSSD */
@@ -399,11 +344,21 @@ main(int  argc,				/* I - Number of command-line args */
     if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
+      {
         switch (*opt)
 	{
 	  case '2' : /* -2 (enable 2-sided printing) */
 	      duplex = 1;
 	      break;
+
+#ifdef HAVE_SSL
+	  case 'K' : /* -K keypath */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+	      keypath = argv[i];
+	      break;
+#endif /* HAVE_SSL */
 
 	  case 'M' : /* -M manufacturer */
 	      i ++;
@@ -440,7 +395,6 @@ main(int  argc,				/* I - Number of command-line args */
 
           case 'h' : /* -h (show help) */
 	      usage(0);
-	      break;
 
 	  case 'i' : /* -i icon.png */
 	      i ++;
@@ -505,8 +459,8 @@ main(int  argc,				/* I - Number of command-line args */
           default : /* Unknown */
 	      fprintf(stderr, "Unknown option \"-%c\".\n", *opt);
 	      usage(1);
-	      break;
 	}
+      }
     }
     else if (!name)
     {
@@ -539,6 +493,10 @@ main(int  argc,				/* I - Number of command-line args */
     if (Verbosity)
       fprintf(stderr, "Using spool directory \"%s\".\n", directory);
   }
+
+#ifdef HAVE_SSL
+  cupsSetServerCredentials(keypath, servername, 1);
+#endif /* HAVE_SSL */
 
  /*
   * Create the printer...
@@ -675,57 +633,57 @@ copy_job_attributes(
     {
       case IPP_JSTATE_PENDING :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
+	               IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-state-reasons",
 		       NULL, "none");
 	  break;
 
       case IPP_JSTATE_HELD :
           if (job->fd >= 0)
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	                 "job-state-reasons", NULL, "job-incoming");
 	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	                 "job-state-reasons", NULL, "job-hold-until-specified");
           else
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	                 "job-state-reasons", NULL, "job-data-insufficient");
 	  break;
 
       case IPP_JSTATE_PROCESSING :
 	  if (job->cancel)
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	                 "job-state-reasons", NULL, "processing-to-stop-point");
 	  else
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	                 "job-state-reasons", NULL, "job-printing");
 	  break;
 
       case IPP_JSTATE_STOPPED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
+	               IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-state-reasons",
 		       NULL, "job-stopped");
 	  break;
 
       case IPP_JSTATE_CANCELED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
+	               IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-state-reasons",
 		       NULL, "job-canceled-by-user");
 	  break;
 
       case IPP_JSTATE_ABORTED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
+	               IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-state-reasons",
 		       NULL, "aborted-by-system");
 	  break;
 
       case IPP_JSTATE_COMPLETED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
+	               IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-state-reasons",
 		       NULL, "job-completed-successfully");
 	  break;
     }
@@ -734,12 +692,12 @@ copy_job_attributes(
   if (!ra || cupsArrayFind(ra, "time-at-completed"))
     ippAddInteger(client->response, IPP_TAG_JOB,
                   job->completed ? IPP_TAG_INTEGER : IPP_TAG_NOVALUE,
-                  "time-at-completed", job->completed);
+                  "time-at-completed", (int)job->completed);
 
   if (!ra || cupsArrayFind(ra, "time-at-processing"))
     ippAddInteger(client->response, IPP_TAG_JOB,
                   job->processing ? IPP_TAG_INTEGER : IPP_TAG_NOVALUE,
-                  "time-at-processing", job->processing);
+                  "time-at-processing", (int)job->processing);
 }
 
 
@@ -846,7 +804,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
     ippSetName(job->attrs, &attr, "job-originating-user-name");
   else
     attr = ippAddString(job->attrs, IPP_TAG_JOB,
-                        IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
+                        IPP_CONST_TAG(IPP_TAG_NAME),
                         "job-originating-user-name", NULL, "anonymous");
 
   if (attr)
@@ -1239,18 +1197,17 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   for (i = 0; i < num_formats; i ++)
   {
     if (!_cups_strcasecmp(formats[i], "application/pdf"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPDF", prefix);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%sPDF", prefix);
     else if (!_cups_strcasecmp(formats[i], "application/postscript"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPS", prefix);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%sPS", prefix);
     else if (!_cups_strcasecmp(formats[i], "application/vnd.hp-PCL"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPCL", prefix);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%sPCL", prefix);
     else if (!_cups_strcasecmp(formats[i], "image/jpeg"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sJPEG", prefix);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%sJPEG", prefix);
     else if (!_cups_strcasecmp(formats[i], "image/png"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPNG", prefix);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%sPNG", prefix);
     else if (_cups_strcasecmp(formats[i], "application/octet-stream"))
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s%s", prefix,
-               formats[i]);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%s%s", prefix, formats[i]);
 
     ptr += strlen(ptr);
     prefix = ",";
@@ -1294,12 +1251,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* charset-configured */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_CHARSET | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_CHARSET),
                "charset-configured", NULL, "utf-8");
 
   /* charset-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_CHARSET | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_CHARSET),
                 "charset-supported", sizeof(charsets) / sizeof(charsets[0]),
 		NULL, charsets);
 
@@ -1309,7 +1266,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* compression-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
 	        "compression-supported",
 	        (int)(sizeof(compressions) / sizeof(compressions[0])), NULL,
 	        compressions);
@@ -1340,12 +1297,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* generated-natural-language-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_LANGUAGE | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_LANGUAGE),
                "generated-natural-language-supported", NULL, "en");
 
   /* ipp-versions-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "ipp-versions-supported",
 		sizeof(versions) / sizeof(versions[0]), NULL, versions);
 
@@ -1358,7 +1315,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* job-creation-attributes-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "job-creation-attributes-supported",
 		sizeof(job_creation) / sizeof(job_creation[0]),
 		NULL, job_creation);
@@ -1381,12 +1338,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* job-sheets-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_NAME),
                "job-sheets-default", NULL, "none");
 
   /* job-sheets-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_NAME),
                "job-sheets-supported", NULL, "none");
 
   /* media-bottom-margin-supported */
@@ -1472,7 +1429,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* media-col-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "media-col-supported",
 		(int)(sizeof(media_col_supported) /
 		      sizeof(media_col_supported[0])), NULL,
@@ -1480,7 +1437,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* media-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "media-default", NULL, media_supported[0]);
 
   /* media-left-margin-supported */
@@ -1499,7 +1456,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* media-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "media-supported",
 		(int)(sizeof(media_supported) / sizeof(media_supported[0])),
 		NULL, media_supported);
@@ -1526,7 +1483,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* media-type-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "media-type-supported",
 		(int)(sizeof(media_type_supported) /
 		      sizeof(media_type_supported[0])),
@@ -1534,7 +1491,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* multiple-document-handling-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "multiple-document-handling-supported",
                 sizeof(multiple_document_handling) /
 		    sizeof(multiple_document_handling[0]), NULL,
@@ -1546,7 +1503,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* natural-language-configured */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_LANGUAGE | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_LANGUAGE),
                "natural-language-configured", NULL, "en");
 
   /* number-up-default */
@@ -1571,12 +1528,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* output-bin-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "output-bin-default", NULL, "face-down");
 
   /* output-bin-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "output-bin-supported", NULL, "face-down");
 
   /* pages-per-minute */
@@ -1590,7 +1547,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* pdl-override-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "pdl-override-supported", NULL, "attempted");
 
   /* print-quality-default */
@@ -1687,7 +1644,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* reference-uri-scheme-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_URISCHEME | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_URISCHEME),
                 "reference-uri-schemes-supported",
                 (int)(sizeof(reference_uri_schemes_supported) /
                       sizeof(reference_uri_schemes_supported[0])),
@@ -1695,27 +1652,27 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* sides-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "sides-default", NULL, "one-sided");
 
   /* sides-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
 
   /* uri-authentication-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "uri-authentication-supported", NULL, "none");
 
   /* uri-security-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+               IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "uri-security-supported", NULL, "none");
 
   /* which-jobs-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "which-jobs-supported",
                 sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 
@@ -1928,6 +1885,10 @@ dnssd_callback(
     const char          *domain,	/* I - Domain for service */
     _ipp_printer_t      *printer)	/* I - Printer */
 {
+  (void)sdRef;
+  (void)flags;
+  (void)domain;
+
   if (errorCode)
   {
     fprintf(stderr, "DNSServiceRegister for %s failed with error %d.\n",
@@ -2003,7 +1964,7 @@ html_escape(_ipp_client_t *client,	/* I - Client */
     if (*s == '&' || *s == '<')
     {
       if (s > start)
-        httpWrite2(client->http, start, s - start);
+        httpWrite2(client->http, start, (size_t)(s - start));
 
       if (*s == '&')
         httpWrite2(client->http, "&amp;", 5);
@@ -2017,7 +1978,7 @@ html_escape(_ipp_client_t *client,	/* I - Client */
   }
 
   if (s > start)
-    httpWrite2(client->http, start, s - start);
+    httpWrite2(client->http, start, (size_t)(s - start));
 }
 
 
@@ -2054,7 +2015,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
     if (*format == '%')
     {
       if (format > start)
-        httpWrite2(client->http, start, format - start);
+        httpWrite2(client->http, start, (size_t)(format - start));
 
       tptr    = tformat;
       *tptr++ = *format++;
@@ -2077,7 +2038,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	format ++;
 	width = va_arg(ap, int);
 
-	snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", width);
+	snprintf(tptr, sizeof(tformat) - (size_t)(tptr - tformat), "%d", width);
 	tptr += strlen(tptr);
       }
       else
@@ -2109,7 +2070,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	  format ++;
 	  prec = va_arg(ap, int);
 
-	  snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", prec);
+	  snprintf(tptr, sizeof(tformat) - (size_t)(tptr - tformat), "%d", prec);
 	  tptr += strlen(tptr);
 	}
 	else
@@ -2169,7 +2130,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	case 'e' :
 	case 'f' :
 	case 'g' :
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, double));
@@ -2185,7 +2146,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	case 'o' :
 	case 'u' :
 	case 'x' :
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 #  ifdef HAVE_LONG_LONG
@@ -2202,7 +2163,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	    break;
 
 	case 'p' : /* Pointer value */
-	    if ((width + 2) > sizeof(temp))
+	    if ((size_t)(width + 2) > sizeof(temp))
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
@@ -2213,7 +2174,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
         case 'c' : /* Character or character array */
             if (width <= 1)
             {
-              temp[0] = va_arg(ap, int);
+              temp[0] = (char)va_arg(ap, int);
               temp[1] = '\0';
               html_escape(client, temp, 1);
             }
@@ -2234,7 +2195,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
   }
 
   if (format > start)
-    httpWrite2(client->http, start, format - start);
+    httpWrite2(client->http, start, (size_t)(format - start));
 
   va_end(ap);
 }
@@ -2606,7 +2567,7 @@ ipp_get_printer_attributes(
   {
     if (printer->state_reasons == _IPP_PSTATE_NONE)
       ippAddString(client->response, IPP_TAG_PRINTER,
-                   IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                   IPP_CONST_TAG(IPP_TAG_KEYWORD),
                    "printer-state-reasons", NULL, "none");
     else
     {
@@ -2647,7 +2608,7 @@ ipp_get_printer_attributes(
 	reasons[num_reasons ++] = "toner-low-report";
 
       ippAddStrings(client->response, IPP_TAG_PRINTER,
-                    IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                    IPP_CONST_TAG(IPP_TAG_KEYWORD),
                     "printer-state-reasons", num_reasons, NULL, reasons);
     }
   }
@@ -2736,6 +2697,9 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
     snprintf(filename, sizeof(filename), "%s/%d.prn",
              client->printer->directory, job->id);
 
+  if (Verbosity)
+    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
+
   if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
@@ -2747,7 +2711,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
   while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
-    if (write(job->fd, buffer, bytes) < bytes)
+    if (write(job->fd, buffer, (size_t)bytes) < bytes)
     {
       int error = errno;		/* Write error */
 
@@ -2991,7 +2955,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
       if ((bytes = read(infile, buffer, sizeof(buffer))) < 0 &&
           (errno == EAGAIN || errno == EINTR))
         bytes = 1;
-      else if (bytes > 0 && write(job->fd, buffer, bytes) < bytes)
+      else if (bytes > 0 && write(job->fd, buffer, (size_t)bytes) < bytes)
       {
 	int error = errno;		/* Write error */
 
@@ -3072,7 +3036,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
     while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
     {
-      if (write(job->fd, buffer, bytes) < bytes)
+      if (write(job->fd, buffer, (size_t)bytes) < bytes)
       {
 	int error = errno;		/* Write error */
 
@@ -3223,8 +3187,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   _cupsRWLockWrite(&(client->printer->rwlock));
 
-  if ((attr = ippFindAttribute(job->attrs, "document-format",
-                               IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
     job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
@@ -3249,6 +3212,9 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
     snprintf(filename, sizeof(filename), "%s/%d.prn",
              client->printer->directory, job->id);
 
+  if (Verbosity)
+    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
+
   job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 
   _cupsRWUnlock(&(client->printer->rwlock));
@@ -3264,7 +3230,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
-    if (write(job->fd, buffer, bytes) < bytes)
+    if (write(job->fd, buffer, (size_t)bytes) < bytes)
     {
       int error = errno;		/* Write error */
 
@@ -3566,7 +3532,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
       if ((bytes = read(infile, buffer, sizeof(buffer))) < 0 &&
           (errno == EAGAIN || errno == EINTR))
         bytes = 1;
-      else if (bytes > 0 && write(job->fd, buffer, bytes) < bytes)
+      else if (bytes > 0 && write(job->fd, buffer, (size_t)bytes) < bytes)
       {
 	int error = errno;		/* Write error */
 
@@ -3647,7 +3613,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
     while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
     {
-      if (write(job->fd, buffer, bytes) < bytes)
+      if (write(job->fd, buffer, (size_t)bytes) < bytes)
       {
 	int error = errno;		/* Write error */
 
@@ -3746,9 +3712,39 @@ process_client(_ipp_client_t *client)	/* I - Client */
   * Loop until we are out of requests or timeout (30 seconds)...
   */
 
+#ifdef HAVE_SSL
+  int first_time = 1;			/* First time request? */
+#endif /* HAVE_SSL */
+
   while (httpWait(client->http, 30000))
+  {
+#ifdef HAVE_SSL
+    if (first_time)
+    {
+     /*
+      * See if we need to negotiate a TLS connection...
+      */
+
+      char buf[1];			/* First byte from client */
+
+      if (recv(httpGetFd(client->http), buf, 1, MSG_PEEK) == 1 && (!buf[0] || !strchr("DGHOPT", buf[0])))
+      {
+        fprintf(stderr, "%s Negotiating TLS session.\n", client->hostname);
+
+	if (httpEncryption(client->http, HTTP_ENCRYPTION_ALWAYS))
+	{
+	  fprintf(stderr, "%s Unable to encrypt connection: %s\n", client->hostname, cupsLastErrorString());
+	  break;
+        }
+      }
+
+      first_time = 0;
+    }
+#endif /* HAVE_SSL */
+
     if (!process_http(client))
       break;
+  }
 
  /*
   * Close the conection to the client and return...
@@ -3952,7 +3948,6 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  return (respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0));
 	else
 	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
-	break;
 
     case HTTP_STATE_GET :
         if (!strcmp(client->uri, "/icon.png"))
@@ -3972,14 +3967,14 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
 	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png",
-	                      fileinfo.st_size))
+	                      (size_t)fileinfo.st_size))
 	    {
 	      close(fd);
 	      return (0);
 	    }
 
 	    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-	      httpWrite2(client->http, buffer, bytes);
+	      httpWrite2(client->http, buffer, (size_t)bytes);
 
 	    httpFlushWrite(client->http);
 
@@ -4501,7 +4496,7 @@ register_printer(
     return (0);
   }
 
-#  if 0 /* ifdef HAVE_SSL */
+#  ifdef HAVE_SSL
  /*
   * Then register the _ipps._tcp (IPP) service type with the real port number to
   * advertise our IPP printer...
@@ -4762,7 +4757,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
     else
       timeout = -1;
 
-    if (poll(polldata, num_fds, timeout) < 0 && errno != EINTR)
+    if (poll(polldata, (nfds_t)num_fds, timeout) < 0 && errno != EINTR)
     {
       perror("poll() failed");
       break;
@@ -5212,5 +5207,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id: ippserver.c 11097 2013-07-04 15:54:36Z msweet $".
+ * End of "$Id: ippserver.c 11986 2014-07-02 15:52:01Z msweet $".
  */

@@ -1,30 +1,16 @@
 /*
- * "$Id: file.c 11201 2013-07-26 21:27:27Z msweet $"
+ * "$Id: file.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   File functions for the CUPS scheduler.
+ * File functions for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCleanFiles()		 - Clean out old files.
- *   cupsdCloseCreatedConfFile() - Close a created configuration file and move
- *				   into place.
- *   cupsdClosePipe()		 - Close a pipe as necessary.
- *   cupsdCreateConfFile()	 - Create a configuration file safely.
- *   cupsdOpenConfFile()	 - Open a configuration file.
- *   cupsdOpenPipe()		 - Create a pipe which is closed on exec.
- *   cupsdRemoveFile()		 - Remove a file securely.
- *   cupsdUnlinkOrRemoveFile()	 - Unlink or securely remove a file depending
- *				   on the configuration.
- *   overwrite_data()		 - Overwrite the data in a file.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -445,7 +431,7 @@ overwrite_data(int        fd,		/* I - File descriptor */
     else
       bytes = filesize;
 
-    if ((bytes = write(fd, buffer, bytes)) < 0)
+    if ((bytes = write(fd, buffer, (size_t)bytes)) < 0)
       return (-1);
 
     filesize -= bytes;
@@ -461,5 +447,5 @@ overwrite_data(int        fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: file.c 11201 2013-07-26 21:27:27Z msweet $".
+ * End of "$Id: file.c 11594 2014-02-14 20:09:01Z msweet $".
  */

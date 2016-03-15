@@ -1,18 +1,18 @@
 #
-# "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $"
+# "$Id: Makefile 12032 2014-07-15 20:37:32Z msweet $"
 #
-#   API library Makefile for CUPS.
+# API library Makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
-#   This file is subject to the Apple OS-Developed Software exception.
+# This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -76,6 +76,7 @@ LIBOBJS	=	\
 		string.o \
 		tempfile.o \
 		thread.o \
+		tls.o \
 		transcode.o \
 		usersys.o \
 		util.o
@@ -84,6 +85,7 @@ TESTOBJS	= \
 		testarray.o \
 		testconflicts.o \
 		testcups.o \
+		testdest.o \
 		testfile.o \
 		testhttp.o \
 		testi18n.o \
@@ -147,8 +149,10 @@ LIBTARGETS =	\
 UNITTARGETS =	\
 		testadmin \
 		testarray \
+		testcache \
 		testconflicts \
 		testcups \
+		testdest \
 		testfile \
 		testhttp \
 		testi18n \
@@ -190,7 +194,7 @@ unittests:	$(UNITTARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
-	$(RM) libcups.so libcups.sl libcups.dylib
+	$(RM) libcups.so libcups.dylib
 
 
 #
@@ -257,7 +261,7 @@ install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
+	if test $(LIBCUPS) = "libcups.so.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 	fi
@@ -286,9 +290,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcups.2.dylib
 	$(RM) $(LIBDIR)/$(LIBCUPSSTATIC)
 	$(RM) $(LIBDIR)/libcups.dylib
-	$(RM) $(LIBDIR)/libcups_s.a
-	$(RM) $(LIBDIR)/libcups.sl
-	$(RM) $(LIBDIR)/libcups.sl.2
 	$(RM) $(LIBDIR)/libcups.so
 	$(RM) $(LIBDIR)/libcups.so.2
 	-$(RMDIR) $(LIBDIR)
@@ -299,10 +300,10 @@ uninstall:
 
 
 #
-# libcups.so.2, libcups.sl.2
+# libcups.so.2
 #
 
-libcups.so.2 libcups.sl.2:	$(LIBOBJS)
+libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
@@ -322,7 +323,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.10.0 \
+		-current_version 2.11.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -332,26 +333,13 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 
 
 #
-# libcups_s.a
-#
-
-libcups_s.a:	$(LIBOBJS) libcups_s.exp
-	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o \
-		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ libcups_s.o
-
-
-#
 # libcups.la
 #
 
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:10 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:11 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -364,6 +352,23 @@ libcups.a:	$(LIBOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
+
+
+#
+# libcups2.def (Windows DLL exports file...)
+#
+
+libcups2.def: $(LIBOBJS) Makefile
+	echo Generating $@...
+	echo "LIBRARY libcups2" >libcups2.def
+	echo "VERSION 2.11" >>libcups2.def
+	echo "EXPORTS" >>libcups2.def
+	(nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}'; \
+	 echo __cups_strcpy; echo __cups_strlcat; echo __cups_strlcpy) | \
+		grep -v -E \
+		    -e 'cups_debug|Apple|BackChannel|Backend|FileCheck|Filter|GSSService|SetNegotiate|SideChannel' \
+		    -e 'Block$$' | \
+		sed -e '1,$$s/^_//' | sort >>libcups2.def
 
 
 #
@@ -389,6 +394,16 @@ testarray:	testarray.o $(LIBCUPSSTATIC)
 
 
 #
+# testcache (dependency on static CUPS library is intentional)
+#
+
+testcache:	testcache.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testcache.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
 # testconflicts (dependency on static CUPS library is intentional)
 #
 
@@ -405,6 +420,16 @@ testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 testcups:	testcups.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testcups.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testdest (dependency on static CUPS library is intentional)
+#
+
+testdest:	testdest.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testdest.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -636,8 +661,9 @@ sloc:
 #
 
 include Dependencies
+tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #
-# End of "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $".
+# End of "$Id: Makefile 12032 2014-07-15 20:37:32Z msweet $".
 #

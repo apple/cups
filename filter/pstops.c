@@ -1,51 +1,18 @@
 /*
- * "$Id: pstops.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: pstops.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   PostScript filter for CUPS.
+ * PostScript filter for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1993-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1993-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()               - Main entry.
- *   add_page()           - Add a page to the pages array.
- *   cancel_job()         - Flag the job as canceled.
- *   check_range()        - Check to see if the current page is selected for
- *                          printing.
- *   copy_bytes()         - Copy bytes from the input file to stdout.
- *   copy_comments()      - Copy all of the comments section.
- *   copy_dsc()           - Copy a DSC-conforming document.
- *   copy_non_dsc()       - Copy a document that does not conform to the DSC.
- *   copy_page()          - Copy a page description.
- *   copy_prolog()        - Copy the document prolog section.
- *   copy_setup()         - Copy the document setup section.
- *   copy_trailer()       - Copy the document trailer.
- *   do_prolog()          - Send the necessary document prolog commands.
- *   do_setup()           - Send the necessary document setup commands.
- *   doc_printf()         - Send a formatted string to stdout and/or the temp
- *                          file.
- *   doc_puts()           - Send a nul-terminated string to stdout and/or the
- *                          temp file.
- *   doc_write()          - Send data to stdout and/or the temp file.
- *   end_nup()            - End processing for N-up printing.
- *   include_feature()    - Include a printer option/feature command.
- *   parse_text()         - Parse a text value in a comment.
- *   set_pstops_options() - Set pstops options.
- *   skip_page()          - Skip past a page that won't be printed.
- *   start_nup()          - Start processing for N-up printing.
- *   write_label_prolog() - Write the prolog with the classification and page
- *                          label.
- *   write_labels()       - Write the actual page labels.
- *   write_options()      - Write options provided via %%IncludeFeature.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -236,7 +203,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_options;		/* Number of print options */
   cups_option_t	*options;		/* Print options */
   char		line[8192];		/* Line buffer */
-  size_t	len;			/* Length of line buffer */
+  ssize_t	len;			/* Length of line buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -306,7 +273,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Read the first line to see if we have DSC comments...
   */
 
-  if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
+  if ((len = (ssize_t)cupsFileGetLine(fp, line, sizeof(line))) == 0)
   {
     fputs("DEBUG: The print file is empty.\n", stderr);
     return (1);
@@ -355,13 +322,13 @@ main(int  argc,				/* I - Number of command-line args */
     fputs("DEBUG: Skipping PJL header...\n", stderr);
 
     while (strstr(line, "ENTER LANGUAGE") == NULL && strncmp(line, "%!", 2))
-      if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
+      if ((len = (ssize_t)cupsFileGetLine(fp, line, sizeof(line))) == 0)
         break;
 
     if (!strncmp(line, "%!", 2))
       break;
 
-    if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
+    if ((len = (ssize_t)cupsFileGetLine(fp, line, sizeof(line))) == 0)
       break;
   }
 
@@ -511,11 +478,11 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
     {
       lower = 1;
       range ++;
-      upper = strtol(range, (char **)&range, 10);
+      upper = (int)strtol(range, (char **)&range, 10);
     }
     else
     {
-      lower = strtol(range, (char **)&range, 10);
+      lower = (int)strtol(range, (char **)&range, 10);
 
       if (*range == '-')
       {
@@ -523,7 +490,7 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
 	if (!isdigit(*range & 255))
 	  upper = 65535;
 	else
-	  upper = strtol(range, (char **)&range, 10);
+	  upper = (int)strtol(range, (char **)&range, 10);
       }
       else
         upper = lower;
@@ -569,14 +536,14 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
     if (nleft > sizeof(buffer) || length == 0)
       nbytes = sizeof(buffer);
     else
-      nbytes = nleft;
+      nbytes = (ssize_t)nleft;
 
-    if ((nbytes = cupsFileRead(fp, buffer, nbytes)) < 1)
+    if ((nbytes = cupsFileRead(fp, buffer, (size_t)nbytes)) < 1)
       return;
 
-    nleft -= nbytes;
+    nleft -= (size_t)nbytes;
 
-    fwrite(buffer, 1, nbytes, stdout);
+    fwrite(buffer, 1, (size_t)nbytes, stdout);
   }
 }
 
@@ -741,13 +708,13 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     }
     else if (!strcmp(line, "%%EndComments"))
     {
-      linelen = cupsFileGetLine(fp, line, linesize);
+      linelen = (ssize_t)cupsFileGetLine(fp, line, linesize);
       break;
     }
     else if (strncmp(line, "%!", 2) && strncmp(line, "%cups", 5))
       doc_printf(doc, "%s\n", line);
 
-    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+    if ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
@@ -860,9 +827,9 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
   while (strncmp(line, "%%Page:", 7) && strncmp(line, "%%Trailer", 9))
   {
-    doc_write(doc, line, linelen);
+    doc_write(doc, line, (size_t)linelen);
 
-    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+    if ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
@@ -905,7 +872,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
     doc_puts(doc, "showpage\n");
     end_nup(doc, doc->number_up);
 
-    pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
+    pageinfo->length = (ssize_t)(cupsFileTell(doc->temp) - pageinfo->offset);
   }
 
   if (doc->slow_duplex && (doc->page & 1))
@@ -929,7 +896,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
     doc_puts(doc, "showpage\n");
     end_nup(doc, doc->number_up);
 
-    pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
+    pageinfo->length = (ssize_t)(cupsFileTell(doc->temp) - pageinfo->offset);
   }
 
  /*
@@ -1006,7 +973,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
       if (!number)
       {
         pageinfo = (pstops_page_t *)cupsArrayFirst(doc->pages);
-	copy_bytes(doc->temp, 0, pageinfo->offset);
+	copy_bytes(doc->temp, 0, (size_t)pageinfo->offset);
       }
 
      /*
@@ -1041,7 +1008,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 		 pageinfo->bounding_box[2], pageinfo->bounding_box[3]);
 	}
 
-	copy_bytes(doc->temp, pageinfo->offset, pageinfo->length);
+	copy_bytes(doc->temp, pageinfo->offset, (size_t)pageinfo->length);
 
 	pageinfo = doc->slow_order ? (pstops_page_t *)cupsArrayPrev(doc->pages) :
                                      (pstops_page_t *)cupsArrayNext(doc->pages);
@@ -1079,10 +1046,12 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
 	     ssize_t      linelen,	/* I - Length of initial line */
 	     size_t       linesize)	/* I - Size of line buffer */
 {
-  int	copy;				/* Current copy */
-  char	buffer[8192];			/* Copy buffer */
-  int	bytes;				/* Number of bytes copied */
+  int		copy;			/* Current copy */
+  char		buffer[8192];		/* Copy buffer */
+  ssize_t	bytes;			/* Number of bytes copied */
 
+
+  (void)linesize;
 
  /*
   * First let the user know that they are attempting to print a file
@@ -1175,17 +1144,17 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   puts("%%EndPageSetup");
   puts("%%BeginDocument: nondsc");
 
-  fwrite(line, linelen, 1, stdout);
+  fwrite(line, (size_t)linelen, 1, stdout);
 
   if (doc->temp)
-    cupsFileWrite(doc->temp, line, linelen);
+    cupsFileWrite(doc->temp, line, (size_t)linelen);
 
   while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
   {
-    fwrite(buffer, 1, bytes, stdout);
+    fwrite(buffer, 1, (size_t)bytes, stdout);
 
     if (doc->temp)
-      cupsFileWrite(doc->temp, buffer, bytes);
+      cupsFileWrite(doc->temp, buffer, (size_t)bytes);
   }
 
   puts("%%EndDocument");
@@ -1367,7 +1336,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   memcpy(bounding_box, doc->bounding_box, sizeof(bounding_box));
 
-  while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
+  while ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) > 0)
   {
     if (!strncmp(line, "%%PageBoundingBox:", 18))
     {
@@ -1400,24 +1369,24 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
         switch (Orientation)
 	{
 	  case 1 : /* Landscape */
-	      bounding_box[0] = PageLength - temp_bbox[3];
+	      bounding_box[0] = (int)(PageLength - temp_bbox[3]);
 	      bounding_box[1] = temp_bbox[0];
-	      bounding_box[2] = PageLength - temp_bbox[1];
+	      bounding_box[2] = (int)(PageLength - temp_bbox[1]);
 	      bounding_box[3] = temp_bbox[2];
               break;
 
 	  case 2 : /* Reverse Portrait */
-	      bounding_box[0] = PageWidth - temp_bbox[2];
-	      bounding_box[1] = PageLength - temp_bbox[3];
-	      bounding_box[2] = PageWidth - temp_bbox[0];
-	      bounding_box[3] = PageLength - temp_bbox[1];
+	      bounding_box[0] = (int)(PageWidth - temp_bbox[2]);
+	      bounding_box[1] = (int)(PageLength - temp_bbox[3]);
+	      bounding_box[2] = (int)(PageWidth - temp_bbox[0]);
+	      bounding_box[3] = (int)(PageLength - temp_bbox[1]);
               break;
 
 	  case 3 : /* Reverse Landscape */
 	      bounding_box[0] = temp_bbox[1];
-	      bounding_box[1] = PageWidth - temp_bbox[2];
+	      bounding_box[1] = (int)(PageWidth - temp_bbox[2]);
 	      bounding_box[2] = temp_bbox[3];
-	      bounding_box[3] = PageWidth - temp_bbox[0];
+	      bounding_box[3] = (int)(PageWidth - temp_bbox[0]);
               break;
 	}
 
@@ -1550,7 +1519,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   {
     int	feature = 0;			/* In a Begin/EndFeature block? */
 
-    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
+    while ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) > 0)
     {
       if (!strncmp(line, "%%EndPageSetup", 14))
 	break;
@@ -1582,7 +1551,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
         break;
 
       if (!feature || (doc->number_up == 1 && !doc->fit_to_page))
-	doc_write(doc, line, linelen);
+	doc_write(doc, line, (size_t)linelen);
     }
 
    /*
@@ -1590,7 +1559,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
     */
 
     if (linelen > 0 && !strncmp(line, "%%EndPageSetup", 14))
-      linelen = cupsFileGetLine(fp, line, linesize);
+      linelen = (ssize_t)cupsFileGetLine(fp, line, linesize);
   }
 
   if (first_page)
@@ -1639,14 +1608,14 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
     else if (!strncmp(line, "%%BeginDocument", 15) ||
 	     !strncmp(line, "%ADO_BeginApplication", 21))
     {
-      doc_write(doc, line, linelen);
+      doc_write(doc, line, (size_t)linelen);
 
       level ++;
     }
     else if ((!strncmp(line, "%%EndDocument", 13) ||
 	      !strncmp(line, "%ADO_EndApplication", 19)) && level > 0)
     {
-      doc_write(doc, line, linelen);
+      doc_write(doc, line, (size_t)linelen);
 
       level --;
     }
@@ -1661,16 +1630,16 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       int	bytes;			/* Bytes of data */
 
 
-      doc_write(doc, line, linelen);
+      doc_write(doc, line, (size_t)linelen);
 
       bytes = atoi(strchr(line, ':') + 1);
 
       while (bytes > 0)
       {
-	if (bytes > linesize)
+	if ((size_t)bytes > linesize)
 	  linelen = cupsFileRead(fp, line, linesize);
 	else
-	  linelen = cupsFileRead(fp, line, bytes);
+	  linelen = cupsFileRead(fp, line, (size_t)bytes);
 
 	if (linelen < 1)
 	{
@@ -1679,15 +1648,15 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 	  return (0);
 	}
 
-        doc_write(doc, line, linelen);
+        doc_write(doc, line, (size_t)linelen);
 
 	bytes -= linelen;
       }
     }
     else
-      doc_write(doc, line, linelen);
+      doc_write(doc, line, (size_t)linelen);
   }
-  while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0);
+  while ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) > 0);
 
  /*
   * Finish up this page and return...
@@ -1695,7 +1664,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   end_nup(doc, number);
 
-  pageinfo->length = cupsFileTell(doc->temp) - pageinfo->offset;
+  pageinfo->length = (ssize_t)(cupsFileTell(doc->temp) - pageinfo->offset);
 
   return (linelen);
 }
@@ -1721,9 +1690,9 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%BeginSetup", 12) || !strncmp(line, "%%Page:", 7))
       break;
 
-    doc_write(doc, line, linelen);
+    doc_write(doc, line, (size_t)linelen);
 
-    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+    if ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
@@ -1733,18 +1702,18 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
 
   if (!strncmp(line, "%%BeginProlog", 13))
   {
-    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
+    while ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) > 0)
     {
       if (!strncmp(line, "%%EndProlog", 11) ||
           !strncmp(line, "%%BeginSetup", 12) ||
           !strncmp(line, "%%Page:", 7))
         break;
 
-      doc_write(doc, line, linelen);
+      doc_write(doc, line, (size_t)linelen);
     }
 
     if (!strncmp(line, "%%EndProlog", 11))
-      linelen = cupsFileGetLine(fp, line, linesize);
+      linelen = (ssize_t)cupsFileGetLine(fp, line, linesize);
     else
       fputs("DEBUG: The %%EndProlog comment is missing.\n", stderr);
   }
@@ -1779,9 +1748,9 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%Page:", 7))
       break;
 
-    doc_write(doc, line, linelen);
+    doc_write(doc, line, (size_t)linelen);
 
-    if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+    if ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) == 0)
       break;
   }
 
@@ -1808,14 +1777,14 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	  num_options = include_feature(ppd, line, num_options, &options);
       }
       else if (strncmp(line, "%%BeginSetup", 12))
-        doc_write(doc, line, linelen);
+        doc_write(doc, line, (size_t)linelen);
 
-      if ((linelen = cupsFileGetLine(fp, line, linesize)) == 0)
+      if ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) == 0)
 	break;
     }
 
     if (!strncmp(line, "%%EndSetup", 10))
-      linelen = cupsFileGetLine(fp, line, linesize);
+      linelen = (ssize_t)cupsFileGetLine(fp, line, linesize);
     else
       fputs("DEBUG: The %%EndSetup comment is missing.\n", stderr);
   }
@@ -1852,6 +1821,8 @@ copy_trailer(cups_file_t  *fp,		/* I - File to read from */
   * Write the trailer comments...
   */
 
+  (void)ppd;
+
   puts("%%Trailer");
 
   while (linelen > 0)
@@ -1861,9 +1832,9 @@ copy_trailer(cups_file_t  *fp,		/* I - File to read from */
     else if (strncmp(line, "%%Trailer", 9) &&
              strncmp(line, "%%Pages:", 8) &&
              strncmp(line, "%%BoundingBox:", 14))
-      fwrite(line, 1, linelen, stdout);
+      fwrite(line, 1, (size_t)linelen, stdout);
 
-    linelen = cupsFileGetLine(fp, line, linesize);
+    linelen = (ssize_t)cupsFileGetLine(fp, line, linesize);
   }
 
   fprintf(stderr, "DEBUG: Wrote %d pages...\n", number);
@@ -2045,21 +2016,21 @@ doc_printf(pstops_doc_t *doc,		/* I - Document information */
 {
   va_list	ap;			/* Pointer to arguments */
   char		buffer[1024];		/* Output buffer */
-  size_t	bytes;			/* Number of bytes to write */
+  ssize_t	bytes;			/* Number of bytes to write */
 
 
   va_start(ap, format);
   bytes = vsnprintf(buffer, sizeof(buffer), format, ap);
   va_end(ap);
 
-  if (bytes > sizeof(buffer))
+  if ((size_t)bytes > sizeof(buffer))
   {
     _cupsLangPrintFilter(stderr, "ERROR",
                          _("Buffer overflow detected, aborting."));
     exit(1);
   }
 
-  doc_write(doc, buffer, bytes);
+  doc_write(doc, buffer, (size_t)bytes);
 }
 
 
@@ -2705,7 +2676,7 @@ skip_page(cups_file_t *fp,		/* I - File to read from */
 
   level = 0;
 
-  while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
+  while ((linelen = (ssize_t)cupsFileGetLine(fp, line, linesize)) > 0)
   {
     if (level == 0 &&
         (!strncmp(line, "%%Page:", 7) || !strncmp(line, "%%Trailer", 9)))
@@ -2724,17 +2695,16 @@ skip_page(cups_file_t *fp,		/* I - File to read from */
       * Skip binary data...
       */
 
-      int	bytes;			/* Bytes of data */
-
+      ssize_t	bytes;			/* Bytes of data */
 
       bytes = atoi(strchr(line, ':') + 1);
 
       while (bytes > 0)
       {
-	if (bytes > linesize)
-	  linelen = cupsFileRead(fp, line, linesize);
+	if ((size_t)bytes > linesize)
+	  linelen = (ssize_t)cupsFileRead(fp, line, linesize);
 	else
-	  linelen = cupsFileRead(fp, line, bytes);
+	  linelen = (ssize_t)cupsFileRead(fp, line, (size_t)bytes);
 
 	if (linelen < 1)
 	{
@@ -2764,15 +2734,15 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 {
   int		pos;			/* Position on page */
   int		x, y;			/* Relative position of subpage */
-  float		w, l,			/* Width and length of subpage */
+  double	w, l,			/* Width and length of subpage */
 		tx, ty;			/* Translation values for subpage */
-  float		pagew,			/* Printable width of page */
+  double	pagew,			/* Printable width of page */
 		pagel;			/* Printable height of page */
   int		bboxx,			/* BoundingBox X origin */
 		bboxy,			/* BoundingBox Y origin */
 		bboxw,			/* BoundingBox width */
 		bboxl;			/* BoundingBox height */
-  float		margin = 0;		/* Current margin for border */
+  double	margin = 0;		/* Current margin for border */
 
 
   if (doc->number_up > 1)
@@ -2793,8 +2763,8 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
   {
     bboxx = 0;
     bboxy = 0;
-    bboxw = PageWidth;
-    bboxl = PageLength;
+    bboxw = (int)PageWidth;
+    bboxl = (int)PageLength;
   }
 
   fprintf(stderr, "DEBUG: pagew = %.1f, pagel = %.1f\n", pagew, pagel);
@@ -3125,7 +3095,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
   if (doc->page_border && show_border)
   {
     int		rects;			/* Number of border rectangles */
-    float	fscale;			/* Scaling value for points */
+    double	fscale;			/* Scaling value for points */
 
 
     rects  = (doc->page_border & PSTOPS_BORDERDOUBLE) ? 2 : 1;
@@ -3365,7 +3335,7 @@ write_options(
 {
   int		i;		/* Looping var */
   ppd_option_t	*option;	/* PPD option */
-  int		min_order;	/* Minimum OrderDependency value */
+  float		min_order;	/* Minimum OrderDependency value */
   char		*doc_setup,	/* DocumentSetup commands to send */
 		*any_setup;	/* AnySetup commands to send */
 
@@ -3430,5 +3400,5 @@ write_options(
 
 
 /*
- * End of "$Id: pstops.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: pstops.c 11558 2014-02-06 18:33:34Z msweet $".
  */

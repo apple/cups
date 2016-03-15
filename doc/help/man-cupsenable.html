@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,83 +10,83 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupsdisable, cupsenable - stop/start printers and classes
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupsdisable
-</b>[ -E ] [-U
-<i>username
-</i>] [ -c ] [ -h
-<i>server[:port]
-</i>] [ -r
-<i>reason
-</i>] [ --hold ] destination(s)
+<b>cupsdisable</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-c</b>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-r</b>
+<i>reason</i>
+] [
+<b>--hold</b>
+]
+<i>destination(s)</i>
 <br>
-<b>cupsenable
-</b>[ -E ] [-U
-<i>username
-</i>] [ -c ] [ -h
-<i>server[:port]
-</i>] [ --release ] destination(s)
+<b>cupsenable</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-c</b>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>--release</b>
+]
+<i>destination(s)</i>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>cupsenable</i> starts the named printers or classes.
-<p><i>cupsdisable</i> stops the named printers or classes.  The
-following options may be used:
-<dl>
-<dt>-E
-</dt>
-<dd></dd>
-<dd>Forces encryption of the connection to the server.
-</dd>
-<dt>-U username
-</dt>
-<dd></dd>
-<dd>Uses the specified username when connecting to the server.
-</dd>
-<dt>-c
-</dt>
-<dd></dd>
-<dd>Cancels all jobs on the named destination.
-</dd>
-<dt>-h server[:port]
-</dt>
-<dd></dd>
-<dd>Uses the specified server and port.
-</dd>
-<dt>--hold
-</dt>
-<dd></dd>
-<dd>Holds remaining jobs on the named printer.  Useful for allowing the current
-job to complete before performing maintenance.
-</dd>
-<dt>-r "reason"
-</dt>
-<dd></dd>
-<dd>Sets the message associated with the stopped state. If no reason is specified
-then the message is set to "Reason Unknown".
-</dd>
-<dt>--release
-</dt>
-<dd></dd>
-<dd>Releases pending jobs for printing. Use after running <i>cupsdisable</i> with
-the <i>--hold</i> option to resume printing.
-</dd>
+<b>cupsenable</b>
+starts the named printers or classes while
+<b>cupsdisable</b>
+stops the named printers or classes.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options may be used:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption of the connection to the server.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Uses the specified username when connecting to the server.
+<dt><b>-c</b>
+<dd style="margin-left: 5.0em">Cancels all jobs on the named destination.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Uses the specified server and port.
+<dt><b>--hold</b>
+<dd style="margin-left: 5.0em">Holds remaining jobs on the named printer.
+Useful for allowing the current job to complete before performing maintenance.
+<dt><b>-r "</b><i>reason</i><b>"</b>
+<dd style="margin-left: 5.0em">Sets the message associated with the stopped state.
+If no reason is specified then the message is set to "Reason Unknown".
+<dt><b>--release</b>
+<dd style="margin-left: 5.0em">Releases pending jobs for printing.
+Use after running <b>cupsdisable</b> with the <i>--hold</i> option to resume printing.
 </dl>
-<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
-Unlike the System V printing system, CUPS allows printer names to
-contain any printable character except SPACE, TAB, "/", or "#".
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are <i>not</i> case-sensitive.
-<p>The System V versions of these commands are <i>disable</i> and
-<i>enable</i>. They have been renamed to avoid conflicts with the
-<i>bash(1)</i> build-in commands of the same name.
-<p>The CUPS versions of <i>disable</i> and <i>enable</i> may ask the
-user for an access password depending on the printing system
-configuration.  This differs from the System V versions which
-require the root user to execute these commands.
+<p>The System V versions of these commands are <b>disable</b> and <b>enable</b>, respectively.
+They have been renamed to avoid conflicts with the
+<b>bash</b>(1)
+build-in commands of the same names.
+<p>The CUPS versions of <b>disable</b> and <b>enable</b> may ask the user for an access password depending on the printing system configuration.
+This differs from the System V versions which require the root user to execute these commands.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cupsaccept.html?TOPIC=Man+Pages'>cupsaccept(8)</a>, <i>cupsreject(8)</i>, <a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>,
-<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-cupsaccept.html?TOPIC=Man+Pages"><b>cupsaccept</b>(8),</a>
+<b>cupsreject</b>(8),
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 
 </body>

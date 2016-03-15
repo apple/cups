@@ -1,30 +1,16 @@
 /*
- * "$Id: lpadmin.c 11345 2013-10-18 21:14:52Z msweet $"
+ * "$Id: lpadmin.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   "lpadmin" command for CUPS.
+ * "lpadmin" command for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                      - Parse options and configure the scheduler.
- *   add_printer_to_class()      - Add a printer to a class.
- *   default_printer()           - Set the default printing destination.
- *   delete_printer()            - Delete a printer from the system.
- *   delete_printer_from_class() - Delete a printer from a class.
- *   delete_printer_option()     - Delete a printer option.
- *   enable_printer()            - Enable a printer.
- *   get_printer_type()          - Determine the printer type and URI.
- *   set_printer_options()       - Set the printer options and/or file.
- *   validate_name()             - Make sure the printer name only contains
- *                                 valid chars.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -1201,8 +1187,7 @@ get_printer_type(http_t *http,		/* I - Server connection */
   *    requesting-user-name
   */
 
-  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, urisize, "ipp", NULL, "localhost",
-                   ippPort(), "/printers/%s", printer);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, (int)urisize, "ipp", NULL, "localhost", ippPort(), "/printers/%s", printer);
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
@@ -1223,8 +1208,7 @@ get_printer_type(http_t *http,		/* I - Server connection */
     type = (cups_ptype_t)attr->values[0].integer;
 
     if (type & CUPS_PRINTER_CLASS)
-      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, urisize, "ipp", NULL,
-		       "localhost", ippPort(), "/classes/%s", printer);
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, (int)urisize, "ipp", NULL, "localhost", ippPort(), "/classes/%s", printer);
   }
   else
     type = CUPS_PRINTER_LOCAL;
@@ -1515,5 +1499,5 @@ validate_name(const char *name)		/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c 11345 2013-10-18 21:14:52Z msweet $".
+ * End of "$Id: lpadmin.c 11558 2014-02-06 18:33:34Z msweet $".
  */

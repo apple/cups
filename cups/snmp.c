@@ -1,57 +1,18 @@
 /*
- * "$Id: snmp.c 4167 2013-02-04 19:27:13Z msweet $"
+ * "$Id: snmp.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   SNMP functions for CUPS.
+ * SNMP functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsSNMPClose()            - Close a SNMP socket.
- *   _cupsSNMPCopyOID()          - Copy an OID.
- *   _cupsSNMPDefaultCommunity() - Get the default SNMP community name.
- *   _cupsSNMPIsOID()            - Test whether a SNMP response contains the
- *                                 specified OID.
- *   _cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
- *                                 specified OID prefix.
- *   _cupsSNMPOIDToString()      - Convert an OID to a string.
- *   _cupsSNMPOpen()             - Open a SNMP socket.
- *   _cupsSNMPRead()             - Read and parse a SNMP response.
- *   _cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
- *   _cupsSNMPStringToOID()      - Convert a numeric OID string to an OID array.
- *   _cupsSNMPWalk()             - Enumerate a group of OIDs.
- *   _cupsSNMPWrite()            - Send an SNMP query packet.
- *   asn1_debug()                - Decode an ASN1-encoded message.
- *   asn1_decode_snmp()          - Decode a SNMP packet.
- *   asn1_encode_snmp()          - Encode a SNMP packet.
- *   asn1_get_integer()          - Get an integer value.
- *   asn1_get_length()           - Get a value length.
- *   asn1_get_oid()              - Get an OID value.
- *   asn1_get_packed()           - Get a packed integer value.
- *   asn1_get_string()           - Get a string value.
- *   asn1_get_type()             - Get a value type.
- *   asn1_set_integer()          - Set an integer value.
- *   asn1_set_length()           - Set a value length.
- *   asn1_set_oid()              - Set an OID value.
- *   asn1_set_packed()           - Set a packed integer value.
- *   asn1_size_integer()         - Figure out the number of bytes needed for an
- *                                 integer value.
- *   asn1_size_length()          - Figure out the number of bytes needed for a
- *                                 length value.
- *   asn1_size_oid()             - Figure out the numebr of bytes needed for an
- *                                 OID value.
- *   asn1_size_packed()          - Figure out the number of bytes needed for a
- *                                 packed integer value.
- *   snmp_set_error()            - Set the localized error for a packet.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -77,16 +38,16 @@ static int		asn1_encode_snmp(unsigned char *buffer, size_t len,
 			                 cups_snmp_t *packet);
 static int		asn1_get_integer(unsigned char **buffer,
 			                 unsigned char *bufend,
-			                 int length);
+			                 unsigned length);
 static int		asn1_get_oid(unsigned char **buffer,
 			             unsigned char *bufend,
-				     int length, int *oid, int oidsize);
+				     unsigned length, int *oid, int oidsize);
 static int		asn1_get_packed(unsigned char **buffer,
 			                unsigned char *bufend);
 static char		*asn1_get_string(unsigned char **buffer,
 			                 unsigned char *bufend,
-			                 int length, char *string,
-			                 int strsize);
+			                 unsigned length, char *string,
+			                 size_t strsize);
 static unsigned		asn1_get_length(unsigned char **buffer,
 			                unsigned char *bufend);
 static int		asn1_get_type(unsigned char **buffer,
@@ -99,10 +60,10 @@ static void		asn1_set_oid(unsigned char **buffer,
 			             const int *oid);
 static void		asn1_set_packed(unsigned char **buffer,
 			                int integer);
-static int		asn1_size_integer(int integer);
-static int		asn1_size_length(int length);
-static int		asn1_size_oid(const int *oid);
-static int		asn1_size_packed(int integer);
+static unsigned		asn1_size_integer(int integer);
+static unsigned		asn1_size_length(unsigned length);
+static unsigned		asn1_size_oid(const int *oid);
+static unsigned		asn1_size_packed(int integer);
 static void		snmp_set_error(cups_snmp_t *packet,
 			               const char *message);
 
@@ -116,11 +77,7 @@ _cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 {
   DEBUG_printf(("4_cupsSNMPClose(fd=%d)", fd));
 
-#ifdef WIN32
-  closesocket(fd);
-#else
-  close(fd);
-#endif /* WIN32 */
+  httpAddrClose(NULL, fd);
 }
 
 
@@ -323,7 +280,7 @@ _cupsSNMPOIDToString(const int *src,	/* I - OID */
   for (dstptr = dst, dstend = dstptr + dstsize - 1;
        *src >= 0 && dstptr < dstend;
        src ++, dstptr += strlen(dstptr))
-    snprintf(dstptr, dstend - dstptr + 1, ".%d", *src);
+    snprintf(dstptr, (size_t)(dstend - dstptr + 1), ".%d", *src);
 
   if (*src >= 0)
     return (NULL);
@@ -391,7 +348,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 {
   unsigned char	buffer[CUPS_SNMP_MAX_PACKET];
 					/* Data packet */
-  int		bytes;			/* Number of bytes received */
+  ssize_t	bytes;			/* Number of bytes received */
   socklen_t	addrlen;		/* Source address length */
   http_addr_t	address;		/* Source address */
 
@@ -477,9 +434,9 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Look for the response status code in the SNMP message header...
   */
 
-  asn1_debug("DEBUG: IN ", buffer, bytes, 0);
+  asn1_debug("DEBUG: IN ", buffer, (size_t)bytes, 0);
 
-  asn1_decode_snmp(buffer, bytes, packet);
+  asn1_decode_snmp(buffer, (size_t)bytes, packet);
 
   memcpy(&(packet->address), &address, sizeof(packet->address));
 
@@ -600,7 +557,7 @@ _cupsSNMPWalk(int            fd,	/* I - SNMP socket */
 	      void           *data)	/* I - User data pointer that is passed to the callback function */
 {
   int		count = 0;		/* Number of OIDs found */
-  int		request_id = 0;		/* Current request ID */
+  unsigned	request_id = 0;		/* Current request ID */
   cups_snmp_t	packet;			/* Current response packet */
   int		lastoid[CUPS_SNMP_MAX_OID];
 					/* Last OID we got */
@@ -693,7 +650,7 @@ _cupsSNMPWrite(
   cups_snmp_t	packet;			/* SNMP message packet */
   unsigned char	buffer[CUPS_SNMP_MAX_PACKET];
 					/* SNMP message buffer */
-  int		bytes;			/* Size of message */
+  ssize_t	bytes;			/* Size of message */
   http_addr_t	temp;			/* Copy of address */
 
 
@@ -749,7 +706,7 @@ _cupsSNMPWrite(
     return (0);
   }
 
-  asn1_debug("DEBUG: OUT ", buffer, bytes, 0);
+  asn1_debug("DEBUG: OUT ", buffer, (size_t)bytes, 0);
 
  /*
   * Send the message...
@@ -759,8 +716,7 @@ _cupsSNMPWrite(
 
   _httpAddrSetPort(&temp, CUPS_SNMP_PORT);
 
-  return (sendto(fd, buffer, bytes, 0, (void *)&temp,
-                 httpAddrLength(&temp)) == bytes);
+  return (sendto(fd, buffer, (size_t)bytes, 0, (void *)&temp, (socklen_t)httpAddrLength(&temp)) == bytes);
 }
 
 
@@ -774,14 +730,14 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
            size_t        len,		/* I - Length of buffer */
            int           indent)	/* I - Indentation */
 {
-  int		i;			/* Looping var */
+  size_t	i;			/* Looping var */
   unsigned char	*bufend;		/* End of buffer */
   int		integer;		/* Number value */
   int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
   char		string[CUPS_SNMP_MAX_STRING];
 					/* String value */
   unsigned char	value_type;		/* Type of value */
-  int		value_length;		/* Length of value */
+  unsigned	value_length;		/* Length of value */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
@@ -794,15 +750,15 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
     * Do a hex dump of the packet...
     */
 
-    int j;
+    size_t j;
 
     fprintf(stderr, "%sHex Dump (%d bytes):\n", prefix, (int)len);
 
-    for (i = 0; i < (int)len; i += 16)
+    for (i = 0; i < len; i += 16)
     {
-      fprintf(stderr, "%s%04x:", prefix, i);
+      fprintf(stderr, "%s%04x:", prefix, (unsigned)i);
 
-      for (j = 0; j < 16 && (i + j) < (int)len; j ++)
+      for (j = 0; j < 16 && (i + j) < len; j ++)
       {
         if (j && !(j & 3))
 	  fprintf(stderr, "  %02x", buffer[i + j]);
@@ -822,7 +778,7 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
 
       fputs("    ", stderr);
 
-      for (j = 0; j < 16 && (i + j) < (int)len; j ++)
+      for (j = 0; j < 16 && (i + j) < len; j ++)
         if (buffer[i + j] < ' ' || buffer[i + j] >= 0x7f)
 	  putc('.', stderr);
 	else
@@ -843,7 +799,7 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
     * Get value type...
     */
 
-    value_type   = asn1_get_type(&buffer, bufend);
+    value_type   = (unsigned char)asn1_get_type(&buffer, bufend);
     value_length = asn1_get_length(&buffer, bufend);
 
     switch (value_type)
@@ -913,7 +869,7 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
 
           fprintf(stderr, "%s%*sOID %d bytes ", prefix, indent, "",
 	          value_length);
-	  for (i = 0; i < integer; i ++)
+	  for (i = 0; i < (unsigned)integer; i ++)
 	    fprintf(stderr, ".%d", oid[i]);
 	  putc('\n', stderr);
           break;
@@ -972,7 +928,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 {
   unsigned char	*bufptr,		/* Pointer into the data */
 		*bufend;		/* End of data */
-  int		length;			/* Length of value */
+  unsigned	length;			/* Length of value */
 
 
  /*
@@ -1005,7 +961,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
     asn1_get_string(&bufptr, bufend, length, packet->community,
                     sizeof(packet->community));
 
-    if ((packet->request_type = asn1_get_type(&bufptr, bufend))
+    if ((packet->request_type = (cups_asn1_t)asn1_get_type(&bufptr, bufend))
             != CUPS_ASN1_GET_RESPONSE)
       snmp_set_error(packet, _("Packet does not contain a Get-Response-PDU"));
     else if (asn1_get_length(&bufptr, bufend) == 0)
@@ -1016,7 +972,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
       snmp_set_error(packet, _("request-id uses indefinite length"));
     else
     {
-      packet->request_id = asn1_get_integer(&bufptr, bufend, length);
+      packet->request_id = (unsigned)asn1_get_integer(&bufptr, bufend, length);
 
       if (asn1_get_type(&bufptr, bufend) != CUPS_ASN1_INTEGER)
 	snmp_set_error(packet, _("No error-status"));
@@ -1052,7 +1008,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 	    asn1_get_oid(&bufptr, bufend, length, packet->object_name,
 	                 CUPS_SNMP_MAX_OID);
 
-            packet->object_type = asn1_get_type(&bufptr, bufend);
+            packet->object_type = (cups_asn1_t)asn1_get_type(&bufptr, bufend);
 
 	    if ((length = asn1_get_length(&bufptr, bufend)) == 0 &&
 	        packet->object_type != CUPS_ASN1_NULL_VALUE &&
@@ -1096,12 +1052,12 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 
 	        case CUPS_ASN1_GAUGE :
 		    packet->object_value.gauge =
-		        asn1_get_integer(&bufptr, bufend, length);
+		        (unsigned)asn1_get_integer(&bufptr, bufend, length);
 	            break;
 
 	        case CUPS_ASN1_TIMETICKS :
 		    packet->object_value.timeticks =
-		        asn1_get_integer(&bufptr, bufend, length);
+		        (unsigned)asn1_get_integer(&bufptr, bufend, length);
 	            break;
 
                 default :
@@ -1129,7 +1085,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
                  cups_snmp_t   *packet)	/* I - SNMP packet */
 {
   unsigned char	*bufptr;		/* Pointer into buffer */
-  int		total,			/* Total length */
+  unsigned	total,			/* Total length */
 		msglen,			/* Length of entire message */
 		commlen,		/* Length of community string */
 		reqlen,			/* Length of request */
@@ -1176,17 +1132,17 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
   varlen  = 1 + asn1_size_length(namelen) + namelen +
             1 + asn1_size_length(valuelen) + valuelen;
   listlen = 1 + asn1_size_length(varlen) + varlen;
-  reqlen  = 2 + asn1_size_integer(packet->request_id) +
+  reqlen  = 2 + asn1_size_integer((int)packet->request_id) +
             2 + asn1_size_integer(packet->error_status) +
             2 + asn1_size_integer(packet->error_index) +
             1 + asn1_size_length(listlen) + listlen;
-  commlen = strlen(packet->community);
+  commlen = (unsigned)strlen(packet->community);
   msglen  = 2 + asn1_size_integer(packet->version) +
             1 + asn1_size_length(commlen) + commlen +
 	    1 + asn1_size_length(reqlen) + reqlen;
   total   = 1 + asn1_size_length(msglen) + msglen;
 
-  if (total > (int)bufsize)
+  if (total > bufsize)
   {
     packet->error = "Message too large for buffer";
     return (-1);
@@ -1212,7 +1168,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
   *bufptr++ = packet->request_type;	/* Get-Request-PDU/Get-Next-Request-PDU */
   asn1_set_length(&bufptr, reqlen);
 
-  asn1_set_integer(&bufptr, packet->request_id);
+  asn1_set_integer(&bufptr, (int)packet->request_id);
 
   asn1_set_integer(&bufptr, packet->error_status);
 
@@ -1258,7 +1214,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
         break;
   }
 
-  return (bufptr - buffer);
+  return ((int)(bufptr - buffer));
 }
 
 
@@ -1270,7 +1226,7 @@ static int				/* O  - Integer value */
 asn1_get_integer(
     unsigned char **buffer,		/* IO - Pointer in buffer */
     unsigned char *bufend,		/* I  - End of buffer */
-    int           length)		/* I  - Length of value */
+    unsigned      length)		/* I  - Length of value */
 {
   int	value;				/* Integer value */
 
@@ -1333,7 +1289,7 @@ static int				/* O  - Number of OIDs */
 asn1_get_oid(
     unsigned char **buffer,		/* IO - Pointer in buffer */
     unsigned char *bufend,		/* I  - End of buffer */
-    int           length,		/* I  - Length of value */
+    unsigned      length,		/* I  - Length of value */
     int           *oid,			/* I  - OID buffer */
     int           oidsize)		/* I  - Size of OID buffer */
 {
@@ -1375,7 +1331,7 @@ asn1_get_oid(
 
   *oidptr = -1;
 
-  return (oidptr - oid);
+  return ((int)(oidptr - oid));
 }
 
 
@@ -1417,22 +1373,14 @@ static char *				/* O  - String */
 asn1_get_string(
     unsigned char **buffer,		/* IO - Pointer in buffer */
     unsigned char *bufend,		/* I  - End of buffer */
-    int           length,		/* I  - Value length */
+    unsigned      length,		/* I  - Value length */
     char          *string,		/* I  - String buffer */
-    int           strsize)		/* I  - String buffer size */
+    size_t        strsize)		/* I  - String buffer size */
 {
-  if (length > (bufend - *buffer))
-    length = bufend - *buffer;
+  if (length > (unsigned)(bufend - *buffer))
+    length = (unsigned)(bufend - *buffer);
 
-  if (length < 0)
-  {
-   /*
-    * Disallow negative lengths!
-    */
-
-    *string = '\0';
-  }
-  else if (length < strsize)
+  if (length < strsize)
   {
    /*
     * String is smaller than the buffer...
@@ -1456,7 +1404,7 @@ asn1_get_string(
   if (length > 0)
     (*buffer) += length;
 
-  return (length < 0 ? NULL : string);
+  return (string);
 }
 
 
@@ -1496,40 +1444,40 @@ asn1_set_integer(unsigned char **buffer,/* IO - Pointer in buffer */
   {
     **buffer = 4;
     (*buffer) ++;
-    **buffer = integer >> 24;
+    **buffer = (unsigned char)(integer >> 24);
     (*buffer) ++;
-    **buffer = integer >> 16;
+    **buffer = (unsigned char)(integer >> 16);
     (*buffer) ++;
-    **buffer = integer >> 8;
+    **buffer = (unsigned char)(integer >> 8);
     (*buffer) ++;
-    **buffer = integer;
+    **buffer = (unsigned char)integer;
     (*buffer) ++;
   }
   else if (integer > 0x7fff || integer < -0x8000)
   {
     **buffer = 3;
     (*buffer) ++;
-    **buffer = integer >> 16;
+    **buffer = (unsigned char)(integer >> 16);
     (*buffer) ++;
-    **buffer = integer >> 8;
+    **buffer = (unsigned char)(integer >> 8);
     (*buffer) ++;
-    **buffer = integer;
+    **buffer = (unsigned char)integer;
     (*buffer) ++;
   }
   else if (integer > 0x7f || integer < -0x80)
   {
     **buffer = 2;
     (*buffer) ++;
-    **buffer = integer >> 8;
+    **buffer = (unsigned char)(integer >> 8);
     (*buffer) ++;
-    **buffer = integer;
+    **buffer = (unsigned char)integer;
     (*buffer) ++;
   }
   else
   {
     **buffer = 1;
     (*buffer) ++;
-    **buffer = integer;
+    **buffer = (unsigned char)integer;
     (*buffer) ++;
   }
 }
@@ -1547,21 +1495,21 @@ asn1_set_length(unsigned char **buffer,	/* IO - Pointer in buffer */
   {
     **buffer = 0x82;			/* 2-byte length */
     (*buffer) ++;
-    **buffer = length >> 8;
+    **buffer = (unsigned char)(length >> 8);
     (*buffer) ++;
-    **buffer = length;
+    **buffer = (unsigned char)length;
     (*buffer) ++;
   }
   else if (length > 127)
   {
     **buffer = 0x81;			/* 1-byte length */
     (*buffer) ++;
-    **buffer = length;
+    **buffer = (unsigned char)length;
     (*buffer) ++;
   }
   else
   {
-    **buffer = length;			/* Length */
+    **buffer = (unsigned char)length;	/* Length */
     (*buffer) ++;
   }
 }
@@ -1635,7 +1583,7 @@ asn1_set_packed(unsigned char **buffer,	/* IO - Pointer in buffer */
  *                         integer value.
  */
 
-static int				/* O - Size in bytes */
+static unsigned				/* O - Size in bytes */
 asn1_size_integer(int integer)		/* I - Integer value */
 {
   if (integer > 0x7fffff || integer < -0x800000)
@@ -1654,8 +1602,8 @@ asn1_size_integer(int integer)		/* I - Integer value */
  *                        length value.
  */
 
-static int				/* O - Size in bytes */
-asn1_size_length(int length)		/* I - Length value */
+static unsigned				/* O - Size in bytes */
+asn1_size_length(unsigned length)	/* I - Length value */
 {
   if (length > 0xff)
     return (3);
@@ -1671,10 +1619,10 @@ asn1_size_length(int length)		/* I - Length value */
  *                     OID value.
  */
 
-static int				/* O - Size in bytes */
+static unsigned				/* O - Size in bytes */
 asn1_size_oid(const int *oid)		/* I - OID value */
 {
-  int	length;				/* Length of value */
+  unsigned	length;			/* Length of value */
 
 
   if (oid[1] < 0)
@@ -1694,7 +1642,7 @@ asn1_size_oid(const int *oid)		/* I - OID value */
  *                        packed integer value.
  */
 
-static int				/* O - Size in bytes */
+static unsigned				/* O - Size in bytes */
 asn1_size_packed(int integer)		/* I - Integer value */
 {
   if (integer > 0xfffffff)
@@ -1729,5 +1677,5 @@ snmp_set_error(cups_snmp_t *packet,	/* I - Packet */
 
 
 /*
- * End of "$Id: snmp.c 4167 2013-02-04 19:27:13Z msweet $".
+ * End of "$Id: snmp.c 11594 2014-02-14 20:09:01Z msweet $".
  */

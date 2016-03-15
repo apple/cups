@@ -12,7 +12,7 @@
 
   CUPS IPP specification for CUPS.
 
-  Copyright 2007-2012 by Apple Inc.
+  Copyright 2007-2013 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -369,7 +369,8 @@ Print-Job request:
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
-	<dt>"job-billing" (text(MAX)):<span class='info'>CUPS 1.1</span>
+	<dt>"job-billing" (text(MAX))<span class='info'>CUPS 1.1</span> or
+	"job-account-id (text(MAX))"<span class='info'>CUPS 1.7</span>:
 
 	<dd>The client OPTIONALLY supplies a billing string that is logged
 	with the page accounting information.
@@ -476,7 +477,8 @@ Create-Job request:
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
-	<dt>"job-billing" (text(MAX)):<span class='info'>CUPS 1.1</span>
+	<dt>"job-billing" (text(MAX))<span class='info'>CUPS 1.1</span> or
+	"job-account-id (text(MAX))<span class='info'>CUPS 1.7</span>:
 
 	<dd>The client OPTIONALLY supplies a billing string that is logged
 	with the page accounting information.
@@ -2168,6 +2170,12 @@ document (fit-to-page=false). The default value is false.
 
 <p>The job-billing attribute provides a text value to associate with a job
 for billing purposes.
+
+<blockquote><b>Note:</b> This attribute has been superceded by the "job-account-id" attribute defined in PWG 5100.11: Job and Printer Extensions - Set 2.</blockquote>
+
+<h4><a name="job-cancel-after">job-cancel-after (integer(1:MAX))</a><span class='info'>CUPS 2.0</span></h4>
+
+<p>The job-cancel-after attribute provides the maximum number of seconds that are allowed for processing a job.</p>
 
 <h4><a name="job-hold-until">job-hold-until (keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 

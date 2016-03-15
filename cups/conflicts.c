@@ -1,34 +1,20 @@
 /*
- * "$Id: conflicts.c 3933 2012-10-01 03:01:10Z msweet $"
+ * "$Id: conflicts.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Option marking routines for CUPS.
+ * Option marking routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsGetConflicts()       - Get a list of conflicting options in a marked
- *                              PPD.
- *   cupsResolveConflicts()   - Resolve conflicts in a marked PPD.
- *   ppdConflicts()           - Check to see if there are any conflicts among
- *                              the marked option choices.
- *   ppdInstallableConflict() - Test whether an option choice conflicts with an
- *                              installable option.
- *   ppd_is_installable()     - Determine whether an option is in the
- *                              InstallableOptions group.
- *   ppd_load_constraints()   - Load constraints from a PPD file.
- *   ppd_test_constraints()   - See if any constraints are active.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -193,7 +179,7 @@ cupsResolveConflicts(
 			tries,		/* Number of tries */
 			num_newopts;	/* Number of new options */
   cups_option_t		*newopts;	/* New options */
-  cups_array_t		*active,	/* Active constraints */
+  cups_array_t		*active = NULL,	/* Active constraints */
 			*pass,		/* Resolvers for this pass */
 			*resolvers,	/* Resolvers we have used */
 			*test;		/* Test array for conflicts */
@@ -886,7 +872,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
       return;
     }
 
-    if ((constptr = calloc(i, sizeof(_ppd_cups_uiconst_t))) == NULL)
+    if ((constptr = calloc((size_t)i, sizeof(_ppd_cups_uiconst_t))) == NULL)
     {
       free(consts);
       DEBUG_puts("8ppd_load_constraints: Unable to allocate memory for "
@@ -1210,5 +1196,5 @@ ppd_test_constraints(
 
 
 /*
- * End of "$Id: conflicts.c 3933 2012-10-01 03:01:10Z msweet $".
+ * End of "$Id: conflicts.c 11558 2014-02-06 18:33:34Z msweet $".
  */

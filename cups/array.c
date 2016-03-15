@@ -1,56 +1,25 @@
 /*
- * "$Id: array.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: array.c 12031 2014-07-15 19:57:59Z msweet $"
  *
- *   Sorted array routines for CUPS.
+ * Sorted array routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsArrayAdd()         - Add an element to the array.
- *   _cupsArrayAddStrings() - Add zero or more comma-delimited strings to an
- *                            array.
- *   cupsArrayClear()       - Clear the array.
- *   cupsArrayCount()       - Get the number of elements in the array.
- *   cupsArrayCurrent()     - Return the current element in the array.
- *   cupsArrayDelete()      - Free all memory used by the array.
- *   cupsArrayDup()         - Duplicate the array.
- *   cupsArrayFind()        - Find an element in the array.
- *   cupsArrayFirst()       - Get the first element in the array.
- *   cupsArrayGetIndex()    - Get the index of the current element.
- *   cupsArrayGetInsert()   - Get the index of the last inserted element.
- *   cupsArrayIndex()       - Get the N-th element in the array.
- *   cupsArrayInsert()      - Insert an element in the array.
- *   cupsArrayLast()        - Get the last element in the array.
- *   cupsArrayNew()         - Create a new array.
- *   cupsArrayNew2()        - Create a new array with hash.
- *   cupsArrayNew3()        - Create a new array with hash and/or free function.
- *   _cupsArrayNewStrings() - Create a new array of comma-delimited strings.
- *   cupsArrayNext()        - Get the next element in the array.
- *   cupsArrayPrev()        - Get the previous element in the array.
- *   cupsArrayRemove()      - Remove an element from the array.
- *   cupsArrayRestore()     - Reset the current element to the last @link
- *                            cupsArraySave@.
- *   cupsArraySave()        - Mark the current element for a later @link
- *                            cupsArrayRestore@.
- *   cupsArrayUserData()    - Return the user data for an array.
- *   cups_array_add()       - Insert or append an element to the array.
- *   cups_array_find()      - Find an element in the array.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
  * Include necessary headers...
  */
 
+#include <cups/cups.h>
 #include "string-private.h"
 #include "debug-private.h"
 #include "array-private.h"
@@ -423,7 +392,7 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
     * Allocate memory for the elements...
     */
 
-    da->elements = malloc(a->num_elements * sizeof(void *));
+    da->elements = malloc((size_t)a->num_elements * sizeof(void *));
     if (!da->elements)
     {
       free(da);
@@ -451,7 +420,7 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
       * Just copy raw pointers...
       */
 
-      memcpy(da->elements, a->elements, a->num_elements * sizeof(void *));
+      memcpy(da->elements, a->elements, (size_t)a->num_elements * sizeof(void *));
     }
 
     da->num_elements   = a->num_elements;
@@ -794,7 +763,7 @@ cupsArrayNew3(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
   {
     a->hashfunc  = h;
     a->hashsize  = hsize;
-    a->hash      = malloc(hsize * sizeof(int));
+    a->hash      = malloc((size_t)hsize * sizeof(int));
 
     if (!a->hash)
     {
@@ -802,7 +771,7 @@ cupsArrayNew3(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
       return (NULL);
     }
 
-    memset(a->hash, -1, hsize * sizeof(int));
+    memset(a->hash, -1, (size_t)hsize * sizeof(int));
   }
 
   a->copyfunc = cf;
@@ -918,9 +887,9 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayRemove(cups_array_t *a,	/* I - Array */
                 void         *e)	/* I - Element */
 {
-  int	i,				/* Looping var */
-	current,			/* Current element */
-	diff;				/* Difference */
+  ssize_t	i,			/* Looping var */
+		current;		/* Current element */
+  int		diff;			/* Difference */
 
 
  /*
@@ -952,7 +921,7 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 
   if (current < a->num_elements)
     memmove(a->elements + current, a->elements + current + 1,
-            (a->num_elements - current) * sizeof(void *));
+            (size_t)(a->num_elements - current) * sizeof(void *));
 
   if (current <= a->current)
     a->current --;
@@ -1053,9 +1022,9 @@ cups_array_add(cups_array_t *a,		/* I - Array */
                void         *e,		/* I - Element to add */
 	       int          insert)	/* I - 1 = insert, 0 = append */
 {
-  int	i,				/* Looping var */
-	current,			/* Current element */
-	diff;				/* Comparison with current element */
+  int		i,			/* Looping var */
+		current;		/* Current element */
+  int		diff;			/* Comparison with current element */
 
 
   DEBUG_printf(("7cups_array_add(a=%p, e=%p, insert=%d)", a, e, insert));
@@ -1079,7 +1048,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
     if (a->alloc_elements == 0)
     {
       count = 16;
-      temp  = malloc(count * sizeof(void *));
+      temp  = malloc((size_t)count * sizeof(void *));
     }
     else
     {
@@ -1088,10 +1057,10 @@ cups_array_add(cups_array_t *a,		/* I - Array */
       else
         count = a->alloc_elements + 1024;
 
-      temp = realloc(a->elements, count * sizeof(void *));
+      temp = realloc(a->elements, (size_t)count * sizeof(void *));
     }
 
-    DEBUG_printf(("9cups_array_add: count=%d", count));
+    DEBUG_printf(("9cups_array_add: count=" CUPS_LLFMT, CUPS_LLCAST count));
 
     if (!temp)
     {
@@ -1181,7 +1150,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
     */
 
     memmove(a->elements + current + 1, a->elements + current,
-            (a->num_elements - current) * sizeof(void *));
+            (size_t)(a->num_elements - current) * sizeof(void *));
 
     if (a->current >= current)
       a->current ++;
@@ -1190,11 +1159,11 @@ cups_array_add(cups_array_t *a,		/* I - Array */
       if (a->saved[i] >= current)
 	a->saved[i] ++;
 
-    DEBUG_printf(("9cups_array_add: insert element at index %d...", current));
+    DEBUG_printf(("9cups_array_add: insert element at index " CUPS_LLFMT, CUPS_LLCAST current));
   }
 #ifdef DEBUG
   else
-    DEBUG_printf(("9cups_array_add: append element at %d...", current));
+    DEBUG_printf(("9cups_array_add: append element at " CUPS_LLFMT, CUPS_LLCAST current));
 #endif /* DEBUG */
 
   if (a->copyfunc)
@@ -1213,8 +1182,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 
 #ifdef DEBUG
   for (current = 0; current < a->num_elements; current ++)
-    DEBUG_printf(("9cups_array_add: a->elements[%d]=%p", current,
-                  a->elements[current]));
+    DEBUG_printf(("9cups_array_add: a->elements[" CUPS_LLFMT "]=%p", CUPS_LLCAST current, a->elements[current]));
 #endif /* DEBUG */
 
   DEBUG_puts("9cups_array_add: returning 1");
@@ -1362,5 +1330,5 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
 
 /*
- * End of "$Id: array.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: array.c 12031 2014-07-15 19:57:59Z msweet $".
  */

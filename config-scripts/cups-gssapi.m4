@@ -1,5 +1,5 @@
 dnl
-dnl   "$Id: cups-gssapi.m4 11324 2013-10-04 03:11:42Z msweet $"
+dnl   "$Id: cups-gssapi.m4 11911 2014-06-10 13:54:53Z msweet $"
 dnl
 dnl   GSSAPI/Kerberos library detection for CUPS.
 dnl
@@ -22,7 +22,7 @@ LIBGSSAPI=""
 AC_SUBST(LIBGSSAPI)
 
 if test x$enable_gssapi != xno; then
-	AC_PATH_PROG(KRB5CONFIG, krb5-config)
+	AC_PATH_TOOL(KRB5CONFIG, krb5-config)
 	if test "x$KRB5CONFIG" != x; then
 		case "$uname" in
 			Darwin)
@@ -129,5 +129,5 @@ AC_SUBST(CUPS_DEFAULT_GSSSERVICENAME)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GSSSERVICENAME, "$CUPS_DEFAULT_GSSSERVICENAME")
 
 dnl
-dnl End of "$Id: cups-gssapi.m4 11324 2013-10-04 03:11:42Z msweet $".
+dnl End of "$Id: cups-gssapi.m4 11911 2014-06-10 13:54:53Z msweet $".
 dnl

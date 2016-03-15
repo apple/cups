@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-scripting.m4 7915 2008-09-07 22:18:29Z mike $"
+dnl "$Id: cups-scripting.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   Scripting configuration stuff for CUPS.
 dnl
@@ -85,5 +85,5 @@ if test "x$CUPS_PYTHON" != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-scripting.m4 7915 2008-09-07 22:18:29Z mike $".
+dnl End of "$Id: cups-scripting.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

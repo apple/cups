@@ -1,36 +1,17 @@
 /*
- * "$Id: pwg-media.c 11240 2013-08-14 20:33:55Z msweet $"
+ * "$Id: pwg-media.c 11881 2014-05-16 20:59:22Z msweet $"
  *
- *   PWG media name API implementation for CUPS.
+ * PWG media name API implementation for CUPS.
  *
- *   Copyright 2009-2013 by Apple Inc.
+ * Copyright 2009-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   pwgFormatSizeName()      - Generate a PWG self-describing media size name.
- *   pwgInitSize()	      - Initialize a pwg_size_t structure using IPP Job
- *				Template attributes.
- *   pwgMediaForLegacy()      - Find a PWG media size by ISO/IPP legacy name.
- *   pwgMediaForPPD()	      - Find a PWG media size by Adobe PPD name.
- *   pwgMediaForPWG()	      - Find a PWG media size by 5101.1 self-describing
- *				name.
- *   pwgMediaForSize()	      - Get the PWG media size for the given
- *				dimensions.
- *   _pwgMediaTable()         - Return the internal media size table.
- *   pwg_compare_legacy()     - Compare two sizes using the legacy names.
- *   pwg_compare_ppd()	      - Compare two sizes using the PPD names.
- *   pwg_compare_pwg()	      - Compare two sizes using the PWG names.
- *   pwg_format_inches()      - Convert and format PWG units as inches.
- *   pwg_format_millimeters() - Convert and format PWG units as millimeters.
- *   pwg_scan_measurement()   - Scan a measurement in inches or millimeters.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -376,10 +357,10 @@ pwgFormatSizeName(char       *keyword,	/* I - Keyword buffer */
   */
 
   uptr = usize;
-  (*format)(uptr, sizeof(usize) - (uptr - usize), width);
+  (*format)(uptr, sizeof(usize) - (size_t)(uptr - usize), width);
   uptr += strlen(uptr);
   *uptr++ = 'x';
-  (*format)(uptr, sizeof(usize) - (uptr - usize), length);
+  (*format)(uptr, sizeof(usize) - (size_t)(uptr - usize), length);
   uptr += strlen(uptr);
 
  /*
@@ -931,6 +912,24 @@ pwg_media_t *				/* O - PWG media name */
 pwgMediaForSize(int width,		/* I - Width in hundredths of millimeters */
 		int length)		/* I - Length in hundredths of millimeters */
 {
+ /*
+  * Adobe uses a size matching algorithm with an epsilon of 5 points, which
+  * is just about 176/2540ths...
+  */
+
+  return (_pwgMediaNearSize(width, length, 176));
+}
+
+
+/*
+ * '_pwgMediaNearSize()' - Get the PWG media size within the given tolerance.
+ */
+
+pwg_media_t *				/* O - PWG media name */
+_pwgMediaNearSize(int width,	        /* I - Width in hundredths of millimeters */
+		  int length,		/* I - Length in hundredths of millimeters */
+		  int epsilon)		/* I - Match within this tolernace. PWG units */
+{
   int		i;			/* Looping var */
   pwg_media_t	*media,			/* Current media */
 		*best_media = NULL;	/* Best match */
@@ -956,17 +955,13 @@ pwgMediaForSize(int width,		/* I - Width in hundredths of millimeters */
        i > 0;
        i --, media ++)
   {
-   /*
-    * Adobe uses a size matching algorithm with an epsilon of 5 points, which
-    * is just about 176/2540ths...
-    */
 
     dw = abs(media->width - width);
     dl = abs(media->length - length);
 
     if (!dw && !dl)
       return (media);
-    else if (dw < 176 && dl < 176)
+    else if (dw <= epsilon && dl <= epsilon)
     {
       if (dw <= best_dw && dl <= best_dl)
       {
@@ -1185,5 +1180,5 @@ pwg_scan_measurement(
 
 
 /*
- * End of "$Id: pwg-media.c 11240 2013-08-14 20:33:55Z msweet $".
+ * End of "$Id: pwg-media.c 11881 2014-05-16 20:59:22Z msweet $".
  */

@@ -1,32 +1,21 @@
 /*
- * "$Id: auth.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: auth.c 11776 2014-03-28 19:16:05Z msweet $"
  *
- *   Authentication functions for CUPS.
+ * Authentication functions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   This file contains Kerberos support code, copyright 2006 by
- *   Jelmer Vernooij.
+ * This file contains Kerberos support code, copyright 2006 by
+ * Jelmer Vernooij.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsDoAuthentication()        - Authenticate a request.
- *   _cupsSetNegotiateAuthString() - Set the Kerberos authentication string.
- *   cups_gss_acquire()            - Kerberos credentials callback.
- *   cups_gss_getname()            - Get CUPS service credentials for
- *                                   authentication.
- *   cups_gss_printf()             - Show debug error messages from GSSAPI.
- *   cups_local_auth()             - Get the local authorization certificate if
- *                                   available/applicable.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -272,7 +261,6 @@ cupsDoAuthentication(
     char	encode[33],		/* MD5 buffer */
 		digest[1024];		/* Digest auth data */
 
-
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
 
@@ -453,21 +441,21 @@ _cupsSetNegotiateAuthString(
     * arbitrarily large credentials...
     */
 
-    int authsize = 10 +				/* "Negotiate " */
-		   output_token.length * 4 / 3 + 1 +	/* Base64 */
-		   1;					/* nul */
+    int authsize = 10 +			/* "Negotiate " */
+		   (int)output_token.length * 4 / 3 + 1 + 1;
+		   			/* Base64 + nul */
 
     httpSetAuthString(http, NULL, NULL);
 
-    if ((http->authstring = malloc(authsize)) == NULL)
+    if ((http->authstring = malloc((size_t)authsize)) == NULL)
     {
       http->authstring = http->_authstring;
       authsize         = sizeof(http->_authstring);
     }
 
-    strlcpy(http->authstring, "Negotiate ", authsize);
+    strlcpy(http->authstring, "Negotiate ", (size_t)authsize);
     httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
-		   output_token.length);
+		   (int)output_token.length);
 
     gss_release_buffer(&minor_status, &output_token);
   }
@@ -888,5 +876,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: auth.c 11776 2014-03-28 19:16:05Z msweet $".
  */

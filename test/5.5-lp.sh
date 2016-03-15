@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.5-lp.sh 11396 2013-11-06 20:09:03Z msweet $"
+# "$Id: 5.5-lp.sh 12066 2014-07-30 18:30:44Z msweet $"
 #
 #   Test the lp command.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2014 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -55,6 +55,7 @@ echo ""
 echo "    lp -d Test1 testfile.jpg"
 echo "    lp -d Test2 testfile.jpg"
 i=0
+pids=""
 while test $i -lt $1; do
 	j=1
 	while test $j -le $2; do
@@ -63,12 +64,13 @@ while test $i -lt $1; do
 	done
 
 	$VALGRIND ../systemv/lp -d Test1 testfile.jpg 2>&1 &
+	pids="$pids $!"
 	$VALGRIND ../systemv/lp -d Test2 testfile.jpg 2>&1 &
-	lppid=$!
+	pids="$pids $!"
 
 	i=`expr $i + 1`
 done
-wait $lppid
+wait $pids
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -79,6 +81,19 @@ echo ""
 
 ./waitjobs.sh
 
+echo "LPSTAT Completed Jobs Order Test"
+echo ""
+echo "    lpstat -W completed -o"
+$VALGRIND ../systemv/lpstat -W completed -o | tee $BASE/lpstat-completed.txt
+if test "`uniq -d $BASE/lpstat-completed.txt`" != ""; then
+	echo "    FAILED"
+	exit 1
+else
+	echo "    PASSED"
+fi
+echo ""
+
+
 #
-# End of "$Id: 5.5-lp.sh 11396 2013-11-06 20:09:03Z msweet $".
+# End of "$Id: 5.5-lp.sh 12066 2014-07-30 18:30:44Z msweet $".
 #

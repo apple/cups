@@ -1,24 +1,18 @@
 /*
- * "$Id: testarray.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testarray.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Array test program for CUPS.
+ * Array test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()        - Main entry.
- *   get_seconds() - Get the current time in seconds...
- *   load_words()  - Load words from a file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -44,8 +38,7 @@ static int	load_words(const char *filename, cups_array_t *array);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
-     char *argv[])			/* I - Command-line arguments */
+main(void)
 {
   int		i;			/* Looping var */
   cups_array_t	*array,			/* Test array */
@@ -296,7 +289,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     while ((dent = cupsDirRead(dir)) != NULL)
     {
-      i = strlen(dent->filename) - 2;
+      i = (int)strlen(dent->filename) - 2;
 
       if (i > 0 && dent->filename[i] == '.' &&
           (dent->filename[i + 1] == 'c' ||
@@ -558,5 +551,5 @@ load_words(const char   *filename,	/* I - File to load */
 
 
 /*
- * End of "$Id: testarray.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testarray.c 11558 2014-02-06 18:33:34Z msweet $".
  */

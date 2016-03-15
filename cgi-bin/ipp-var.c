@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 11890 2014-05-22 13:59:21Z msweet $"
+ * "$Id: ipp-var.c 11889 2014-05-22 13:54:15Z msweet $"
  *
  * CGI <-> IPP variable routines for CUPS.
  *
@@ -50,7 +50,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
   {
     for (i = 0; lang[i] && i < 15; i ++)
       if (isalnum(lang[i] & 255))
-        locale[i] = tolower(lang[i]);
+        locale[i] = (char)tolower(lang[i]);
       else
         locale[i] = '_';
 
@@ -92,7 +92,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
   while ((ch = getc(in)) != EOF)
     if (ch == '\\')
       getc(in);
-    else if (ch == '{' && num_attrs < (sizeof(attrs) / sizeof(attrs[0])))
+    else if (ch == '{' && num_attrs < (int)(sizeof(attrs) / sizeof(attrs[0])))
     {
      /*
       * Grab the name...
@@ -108,7 +108,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
 	  if (ch == '_')
 	    *nameptr++ = '-';
 	  else
-            *nameptr++ = ch;
+            *nameptr++ = (char)ch;
 	}
 
       *nameptr = '\0';
@@ -902,7 +902,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
       * Make URI relative to the current server...
       */
 
-      strlcpy(url, resource, urlsize);
+      strlcpy(url, resource, (size_t)urlsize);
     }
     else
     {
@@ -911,17 +911,13 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
       */
 
       if (userpass[0])
-	snprintf(url, urlsize, "%s://%s@%s:%d%s",
-		 ishttps ? "https" : "http",
-		 userpass, hostname, port, resource);
+	snprintf(url, (size_t)urlsize, "%s://%s@%s:%d%s", ishttps ? "https" : "http", userpass, hostname, port, resource);
       else
-	snprintf(url, urlsize, "%s://%s:%d%s",
-		 ishttps ? "https" : "http",
-		 hostname, port, resource);
+	snprintf(url, (size_t)urlsize, "%s://%s:%d%s", ishttps ? "https" : "http", hostname, port, resource);
     }
   }
   else
-    strlcpy(url, uri, urlsize);
+    strlcpy(url, uri, (size_t)urlsize);
 
   return (url);
 }
@@ -1023,7 +1019,7 @@ cgiSetIPPObjectVars(
 	  *valptr++ = ' ';
         }
 
-        remaining = sizeof(value) - (valptr - value);
+        remaining = sizeof(value) - (size_t)(valptr - value);
 
         if (!strcmp(attr->values[i].string.text, "printer-stopped"))
 	  strlcpy(valptr, _("Printer Paused"), remaining);
@@ -1161,7 +1157,7 @@ cgiSetIPPObjectVars(
     for (i = 0; i < attr->num_values; i ++)
     {
       if (i)
-	strlcat(valptr, ", ", sizeof(value) - (valptr - value));
+	strlcat(valptr, ", ", sizeof(value) - (size_t)(valptr - value));
 
       valptr += strlen(valptr);
 
@@ -1176,22 +1172,22 @@ cgiSetIPPObjectVars(
 	    break;
 
 	case IPP_TAG_BOOLEAN :
-	    snprintf(valptr, sizeof(value) - (valptr - value),
+	    snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
 	             "%d", attr->values[i].boolean);
 	    break;
 
 	case IPP_TAG_NOVALUE :
-	    strlcat(valptr, "novalue", sizeof(value) - (valptr - value));
+	    strlcat(valptr, "novalue", sizeof(value) - (size_t)(valptr - value));
 	    break;
 
 	case IPP_TAG_RANGE :
-	    snprintf(valptr, sizeof(value) - (valptr - value),
+	    snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
 	             "%d-%d", attr->values[i].range.lower,
 		     attr->values[i].range.upper);
 	    break;
 
 	case IPP_TAG_RESOLUTION :
-	    snprintf(valptr, sizeof(value) - (valptr - value),
+	    snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
 	             "%dx%d%s", attr->values[i].resolution.xres,
 		     attr->values[i].resolution.yres,
 		     attr->values[i].resolution.units == IPP_RES_PER_INCH ?
@@ -1214,13 +1210,13 @@ cgiSetIPPObjectVars(
 		cgiRewriteURL(attr->values[i].string.text, url,
 		              sizeof(url), NULL);
 
-                snprintf(valptr, sizeof(value) - (valptr - value),
+                snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
 		         "<A HREF=\"%s\">%s</A>", url,
 			 strrchr(attr->values[i].string.text, '/') + 1);
 	      }
 	      else
 		cgiRewriteURL(attr->values[i].string.text, valptr,
-		              sizeof(value) - (valptr - value), NULL);
+		              (int)(sizeof(value) - (size_t)(valptr - value)), NULL);
               break;
             }
 
@@ -1232,7 +1228,7 @@ cgiSetIPPObjectVars(
 	case IPP_TAG_LANGUAGE :
 	case IPP_TAG_MIMETYPE :
 	    strlcat(valptr, attr->values[i].string.text,
-	            sizeof(value) - (valptr - value));
+	            sizeof(value) - (size_t)(valptr - value));
 	    break;
 
         case IPP_TAG_BEGIN_COLLECTION :
@@ -1565,5 +1561,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 11890 2014-05-22 13:59:21Z msweet $".
+ * End of "$Id: ipp-var.c 11889 2014-05-22 13:54:15Z msweet $".
  */

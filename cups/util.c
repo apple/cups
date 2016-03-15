@@ -1,54 +1,18 @@
 /*
- * "$Id: util.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: util.c 12073 2014-07-31 00:58:00Z msweet $"
  *
- *   Printing utilities for CUPS.
+ * Printing utilities for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsCancelJob()        - Cancel a print job on the default server.
- *   cupsCancelJob2()       - Cancel or purge a print job.
- *   cupsCreateJob()        - Create an empty job for streaming.
- *   cupsFinishDocument()   - Finish sending a document.
- *   cupsFreeJobs()         - Free memory used by job data.
- *   cupsGetClasses()       - Get a list of printer classes from the default
- *                            server.
- *   cupsGetDefault()       - Get the default printer or class for the default
- *                            server.
- *   cupsGetDefault2()      - Get the default printer or class for the specified
- *                            server.
- *   cupsGetJobs()          - Get the jobs from the default server.
- *   cupsGetJobs2()         - Get the jobs from the specified server.
- *   cupsGetPPD()           - Get the PPD file for a printer on the default
- *                            server.
- *   cupsGetPPD2()          - Get the PPD file for a printer from the specified
- *                            server.
- *   cupsGetPPD3()          - Get the PPD file for a printer on the specified
- *                            server if it has changed.
- *   cupsGetPrinters()      - Get a list of printers from the default server.
- *   cupsGetServerPPD()     - Get an available PPD file from the server.
- *   cupsPrintFile()        - Print a file to a printer or class on the default
- *                            server.
- *   cupsPrintFile2()       - Print a file to a printer or class on the
- *                            specified server.
- *   cupsPrintFiles()       - Print one or more files to a printer or class on
- *                            the default server.
- *   cupsPrintFiles2()      - Print one or more files to a printer or class on
- *                            the specified server.
- *   cupsStartDocument()    - Add a document to a job created with
- *                            cupsCreateJob().
- *   cups_get_printer_uri() - Get the printer-uri-supported attribute for the
- *                            first printer in a class.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -324,7 +288,8 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 /*
  * 'cupsGetClasses()' - Get a list of printer classes from the default server.
  *
- * This function is deprecated - use @link cupsGetDests@ instead.
+ * This function is deprecated and no longer returns a list of printer
+ * classes - use @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -332,84 +297,10 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 int					/* O - Number of classes */
 cupsGetClasses(char ***classes)		/* O - Classes */
 {
-  int		n;			/* Number of classes */
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  char		**temp;			/* Temporary pointer */
-  http_t	*http;			/* Connection to server */
+  if (classes)
+    *classes = NULL;
 
-
-  if (!classes)
-  {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
-
-    return (0);
-  }
-
-  *classes = NULL;
-
-  if ((http = _cupsConnect()) == NULL)
-    return (0);
-
- /*
-  * Build a CUPS_GET_CLASSES request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    requested-attributes
-  */
-
-  request = ippNewRequest(IPP_OP_CUPS_GET_CLASSES);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-name");
-
- /*
-  * Do the request and get back a response...
-  */
-
-  n = 0;
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (attr->name != NULL &&
-          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
-          attr->value_tag == IPP_TAG_NAME)
-      {
-        if (n == 0)
-	  temp = malloc(sizeof(char *));
-	else
-	  temp = realloc(*classes, sizeof(char *) * (n + 1));
-
-	if (temp == NULL)
-	{
-	 /*
-	  * Ran out of memory!
-	  */
-
-          while (n > 0)
-	  {
-	    n --;
-	    free((*classes)[n]);
-	  }
-
-	  free(*classes);
-	  ippDelete(response);
-	  return (0);
-	}
-
-        *classes = temp;
-        temp[n]  = strdup(attr->values[0].string.text);
-	n ++;
-      }
-
-    ippDelete(response);
-  }
-
-  return (n);
+  return (0);
 }
 
 
@@ -748,7 +639,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
       if (n == 0)
         temp = malloc(sizeof(cups_job_t));
       else
-	temp = realloc(*jobs, sizeof(cups_job_t) * (n + 1));
+	temp = realloc(*jobs, sizeof(cups_job_t) * (size_t)(n + 1));
 
       if (!temp)
       {
@@ -1059,6 +950,18 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   DEBUG_printf(("2cupsGetPPD3: Printer hostname=\"%s\", port=%d", hostname,
                 port));
 
+  if (cupsServer()[0] == '/' && !_cups_strcasecmp(hostname, "localhost") && port == ippPort())
+  {
+   /*
+    * Redirect localhost to domain socket...
+    */
+
+    strlcpy(hostname, cupsServer(), sizeof(hostname));
+    port = 0;
+
+    DEBUG_printf(("2cupsGetPPD3: Redirecting to \"%s\".", hostname));
+  }
+
  /*
   * Remap local hostname to localhost...
   */
@@ -1170,7 +1073,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 /*
  * 'cupsGetPrinters()' - Get a list of printers from the default server.
  *
- * This function is deprecated - use @link cupsGetDests@ instead.
+ * This function is deprecated and no longer returns a list of printers - use
+ * @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -1178,98 +1082,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 int					/* O - Number of printers */
 cupsGetPrinters(char ***printers)	/* O - Printers */
 {
-  int		n;			/* Number of printers */
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  char		**temp;			/* Temporary pointer */
-  http_t	*http;			/* Connection to server */
+  if (printers)
+    *printers = NULL;
 
-
- /*
-  * Range check input...
-  */
-
-  if (!printers)
-  {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
-
-    return (0);
-  }
-
-  *printers = NULL;
-
- /*
-  * Try to connect to the server...
-  */
-
-  if ((http = _cupsConnect()) == NULL)
-    return (0);
-
- /*
-  * Build a CUPS_GET_PRINTERS request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    requested-attributes
-  */
-
-  request = ippNewRequest(IPP_OP_CUPS_GET_PRINTERS);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-name");
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type", 0);
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type-mask", CUPS_PRINTER_CLASS);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  n = 0;
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (attr->name != NULL &&
-          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
-          attr->value_tag == IPP_TAG_NAME)
-      {
-        if (n == 0)
-	  temp = malloc(sizeof(char *));
-	else
-	  temp = realloc(*printers, sizeof(char *) * (n + 1));
-
-	if (temp == NULL)
-	{
-	 /*
-	  * Ran out of memory!
-	  */
-
-	  while (n > 0)
-	  {
-	    n --;
-	    free((*printers)[n]);
-	  }
-
-	  free(*printers);
-	  ippDelete(response);
-	  return (0);
-	}
-
-        *printers = temp;
-        temp[n]   = strdup(attr->values[0].string.text);
-	n ++;
-      }
-
-    ippDelete(response);
-  }
-
-  return (n);
+  return (0);
 }
 
 
@@ -1510,7 +1326,7 @@ cupsPrintFiles2(
 
     while (status == HTTP_STATUS_CONTINUE &&
 	   (bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
-      status = cupsWriteRequestData(http, buffer, bytes);
+      status = cupsWriteRequestData(http, buffer, (size_t)bytes);
 
     cupsFileClose(fp);
 
@@ -1601,7 +1417,7 @@ cupsStartDocument(
   if (format)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last_document);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", (char)last_document);
 
  /*
   * Send and delete the request, then return the status...
@@ -1652,20 +1468,15 @@ cups_get_printer_uri(
 		};
 
 
-  DEBUG_printf(("7cups_get_printer_uri(http=%p, name=\"%s\", host=%p, "
-                "hostsize=%d, resource=%p, resourcesize=%d, depth=%d)",
-		http, name, host, hostsize, resource, resourcesize, depth));
+  DEBUG_printf(("4cups_get_printer_uri(http=%p, name=\"%s\", host=%p, hostsize=%d, resource=%p, resourcesize=%d, depth=%d)", http, name, host, hostsize, resource, resourcesize, depth));
 
  /*
   * Setup the printer URI...
   */
 
-  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                       "localhost", 0, "/printers/%s",
-                       name) < HTTP_URI_STATUS_OK)
+  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL, "localhost", 0, "/printers/%s", name) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create printer-uri"),
-                  1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create printer-uri"), 1);
 
     *host     = '\0';
     *resource = '\0';
@@ -1673,7 +1484,7 @@ cups_get_printer_uri(
     return (0);
   }
 
-  DEBUG_printf(("9cups_get_printer_uri: printer-uri=\"%s\"", uri));
+  DEBUG_printf(("5cups_get_printer_uri: printer-uri=\"%s\"", uri));
 
  /*
   * Get the hostname and port number we are connected to...
@@ -1681,6 +1492,8 @@ cups_get_printer_uri(
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
   http_port = httpAddrPort(http->hostaddr);
+
+  DEBUG_printf(("5cups_get_printer_uri: http_hostname=\"%s\"", http_hostname));
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1694,27 +1507,25 @@ cups_get_printer_uri(
 
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                "requested-attributes",
-		sizeof(requested_attrs) / sizeof(requested_attrs[0]),
-		NULL, requested_attrs);
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requested-attributes", sizeof(requested_attrs) / sizeof(requested_attrs[0]), NULL, requested_attrs);
 
  /*
   * Do the request and get back a response...
   */
 
-  snprintf(resource, resourcesize, "/printers/%s", name);
+  snprintf(resource, (size_t)resourcesize, "/printers/%s", name);
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
     const char *device_uri = NULL;	/* device-uri value */
 
-    if ((attr = ippFindAttribute(response, "device-uri",
-                                 IPP_TAG_URI)) != NULL)
+    if ((attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI)) != NULL)
+    {
       device_uri = attr->values[0].string.text;
+      DEBUG_printf(("5cups_get_printer_uri: device-uri=\"%s\"", device_uri));
+    }
 
     if (device_uri &&
         (!strncmp(device_uri, "ipp://", 6) ||
@@ -1727,27 +1538,25 @@ cups_get_printer_uri(
       * Statically-configured shared printer.
       */
 
-      httpSeparateURI(HTTP_URI_CODING_ALL,
-                      _httpResolveURI(device_uri, uri, sizeof(uri),
-                                      _HTTP_RESOLVE_DEFAULT, NULL, NULL),
-                      scheme, sizeof(scheme), username, sizeof(username),
-		      host, hostsize, port, resource, resourcesize);
+      httpSeparateURI(HTTP_URI_CODING_ALL, _httpResolveURI(device_uri, uri, sizeof(uri), _HTTP_RESOLVE_DEFAULT, NULL, NULL), scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
       ippDelete(response);
 
+      DEBUG_printf(("5cups_get_printer_uri: Resolved to host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
       return (1);
     }
-    else if ((attr = ippFindAttribute(response, "member-uris",
-                                      IPP_TAG_URI)) != NULL)
+    else if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
     {
      /*
       * Get the first actual printer name in the class...
       */
 
+      DEBUG_printf(("5cups_get_printer_uri: Got member-uris with %d values.", ippGetCount(attr)));
+
       for (i = 0; i < attr->num_values; i ++)
       {
-	httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text,
-	                scheme, sizeof(scheme), username, sizeof(username),
-			host, hostsize, port, resource, resourcesize);
+        DEBUG_printf(("5cups_get_printer_uri: member-uris[%d]=\"%s\"", i, ippGetString(attr, i, NULL)));
+
+	httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text, scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
 	if (!strncmp(resource, "/printers/", 10))
 	{
 	 /*
@@ -1756,6 +1565,7 @@ cups_get_printer_uri(
 
           ippDelete(response);
 
+	  DEBUG_printf(("5cups_get_printer_uri: Found printer member with host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
 	  return (1);
 	}
       }
@@ -1780,9 +1590,7 @@ cups_get_printer_uri(
 
 	    if (!_cups_strcasecmp(http_hostname, host) && *port == http_port)
 	      http2 = http;
-	    else if ((http2 = httpConnect2(host, *port, NULL, AF_UNSPEC,
-					   cupsEncryption(), 1, 30000,
-					   NULL)) == NULL)
+	    else if ((http2 = httpConnect2(host, *port, NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL)) == NULL)
 	    {
 	      DEBUG_puts("8cups_get_printer_uri: Unable to connect to server");
 
@@ -1811,25 +1619,21 @@ cups_get_printer_uri(
 	}
       }
     }
-    else if ((attr = ippFindAttribute(response, "printer-uri-supported",
-                                      IPP_TAG_URI)) != NULL)
+    else if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
     {
-      httpSeparateURI(HTTP_URI_CODING_ALL,
-                      _httpResolveURI(attr->values[0].string.text, uri,
-		                      sizeof(uri), _HTTP_RESOLVE_DEFAULT,
-				      NULL, NULL),
-                      scheme, sizeof(scheme), username, sizeof(username),
-		      host, hostsize, port, resource, resourcesize);
+      httpSeparateURI(HTTP_URI_CODING_ALL, _httpResolveURI(attr->values[0].string.text, uri, sizeof(uri), _HTTP_RESOLVE_DEFAULT, NULL, NULL), scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
       ippDelete(response);
+
+      DEBUG_printf(("5cups_get_printer_uri: Resolved to host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
 
       if (!strncmp(resource, "/classes/", 9))
       {
-        _cupsSetError(IPP_STATUS_ERROR_INTERNAL,
-	              _("No printer-uri found for class"), 1);
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No printer-uri found for class"), 1);
 
 	*host     = '\0';
 	*resource = '\0';
 
+        DEBUG_puts("5cups_get_printer_uri: Not returning class.");
 	return (0);
       }
 
@@ -1845,10 +1649,11 @@ cups_get_printer_uri(
   *host     = '\0';
   *resource = '\0';
 
+  DEBUG_puts("5cups_get_printer_uri: Printer URI not found.");
   return (0);
 }
 
 
 /*
- * End of "$Id: util.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: util.c 12073 2014-07-31 00:58:00Z msweet $".
  */

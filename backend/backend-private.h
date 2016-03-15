@@ -1,18 +1,18 @@
 /*
- * "$Id: backend-private.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: backend-private.h 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Backend support definitions for CUPS.
+ * Backend support definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_BACKEND_PRIVATE_H_
@@ -313,7 +313,7 @@ extern int		backendGetDeviceID(int fd, char *device_id,
 					   int uri_size);
 extern int		backendGetMakeModel(const char *device_id,
 			                    char *make_model,
-				            int make_model_size);
+				            size_t make_model_size);
 extern int		backendNetworkSideCB(int print_fd, int device_fd,
 			                     int snmp_fd, http_addr_t *addr,
 					     int use_bc);
@@ -334,5 +334,5 @@ extern int		backendWaitLoop(int snmp_fd, http_addr_t *addr,
 
 
 /*
- * End of "$Id: backend-private.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: backend-private.h 11558 2014-02-06 18:33:34Z msweet $".
  */

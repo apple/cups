@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,56 +10,73 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 lprm - cancel print jobs
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>lprm
-</b>[ -E ] [ -U
-<i>username
-</i>] [ -h
-<i>server[:port]
-</i>] [ -P
-<i>destination[/instance]
-</i>] [ - ] [
-<i>job ID(s)
-</i>]
+<b>lprm</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h</b>
+<i>server</i>[<i>:port</i>]
+] [
+<b>-P</b>
+<i>destination</i>[<i>/instance</i>]
+] [
+<b>-</b>
+] [
+<i>job-id(s)</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>lprm</i> cancels print jobs that have been queued for printing.
-If no arguments are supplied, the current job on the default
-destination is cancelled. You can specify one or more job ID
-numbers to cancel those jobs or use the <i>-</i> option to cancel
-all jobs.
+<b>lprm</b>
+cancels print jobs that have been queued for printing.
+If no arguments are supplied, the current job on the default destination is canceled.
+You can specify one or more job ID numbers to cancel those jobs or use the <i>-</i> option to cancel all jobs.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-The <i>lprm</i> command supports the following options:
-<dl>
-<dt>-E
-</dt>
-<dd></dd>
-<dd>Forces encryption when connecting to the server.
-</dd>
-<dt>-P destination[/instance]
-</dt>
-<dd></dd>
-<dd>Specifies the destination printer or class.
-</dd>
-<dt>-U username
-</dt>
-<dd></dd>
-<dd>Specifies an alternate username.
-</dd>
-<dt>-h server[:port]
-</dt>
-<dd></dd>
-<dd>Specifies an alternate server.
-</dd>
+The
+<b>lprm</b>
+command supports the following options:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-P </b><i>destination</i>[<i>/instance</i>]
+<dd style="margin-left: 5.0em">Specifies the destination printer or class.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies an alternate username.
+<dt><b>-h </b><i>server</i>[<i>:port</i>]
+<dd style="margin-left: 5.0em">Specifies an alternate server.
 </dl>
-<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
-The CUPS version of <i>lprm</i> is compatible with the standard
-Berkeley <i>lprm</i> command.
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The CUPS version of
+<b>lprm</b>
+is compatible with the standard Berkeley command of the same name.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Cancel the current job on the default printer:
+<pre class="man">
+
+    lprm
+
+</pre>
+Cancel job 1234:
+<pre class="man">
+
+    lprm 1234
+
+</pre>
+Cancel all jobs:
+<pre class="man">
+
+    lprm -
+</pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpq.html?TOPIC=Man+Pages'>lpq(1)</a>, <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a>,
-<a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

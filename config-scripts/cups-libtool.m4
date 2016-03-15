@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-libtool.m4 6649 2007-07-11 21:46:42Z mike $"
+dnl "$Id: cups-libtool.m4 11324 2013-10-04 03:11:42Z msweet $"
 dnl
 dnl   Libtool stuff for CUPS.
 dnl
@@ -35,5 +35,5 @@ if test x$LIBTOOL != x; then
 fi
 
 dnl
-dnl End of "$Id: cups-libtool.m4 6649 2007-07-11 21:46:42Z mike $".
+dnl End of "$Id: cups-libtool.m4 11324 2013-10-04 03:11:42Z msweet $".
 dnl

@@ -1,28 +1,16 @@
 /*
- * "$Id: log.c 11367 2013-10-28 15:35:57Z msweet $"
+ * "$Id: log.c 11920 2014-06-11 19:03:59Z msweet $"
  *
- *   Log file routines for the CUPS scheduler.
+ * Log file routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCheckLogFile()     - Open/rotate a log file if it needs it.
- *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
- *   cupsdLogGSSMessage() - Log a GSSAPI error...
- *   cupsdLogJob()        - Log a job message.
- *   cupsdLogMessage()    - Log a message to the error log file.
- *   cupsdLogPage()       - Log a page to the page log file.
- *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
- *   cupsdWriteErrorLog() - Write a line to the ErrorLog.
- *   format_log_line()    - Format a line for a log file.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -38,7 +26,9 @@
  * Local globals...
  */
 
-static int	log_linesize = 0;	/* Size of line for output file */
+static _cups_mutex_t log_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for logging */
+static size_t	log_linesize = 0;	/* Size of line for output file */
 static char	*log_line = NULL;	/* Line for output file */
 
 #ifdef HAVE_VSYSLOG
@@ -124,7 +114,7 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 	  * Insert the server name...
 	  */
 
-	  strlcpy(ptr, ServerName, sizeof(filename) - (ptr - filename));
+	  strlcpy(ptr, ServerName, sizeof(filename) - (size_t)(ptr - filename));
 	  ptr += strlen(ptr);
 	}
         else
@@ -165,15 +155,14 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 	* the log file permissions as a basis...
 	*/
 
-        int log_dir_perm = 0300 | LogFilePerm;
+        mode_t log_dir_perm = (mode_t)(0300 | LogFilePerm);
 					/* LogFilePerm + owner write/search */
 	if (log_dir_perm & 0040)
 	  log_dir_perm |= 0010;		/* Add group search */
 	if (log_dir_perm & 0004)
 	  log_dir_perm |= 0001;		/* Add other search */
 
-        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group,
-	                      1, -1);
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group, 1, -1);
 
         *lf = cupsFileOpen(filename, "a");
       }
@@ -382,8 +371,8 @@ cupsdLogFCMessage(
 int					/* O - 1 on success, 0 on error */
 cupsdLogGSSMessage(
     int        level,			/* I - Log level */
-    int	       major_status,		/* I - Major GSSAPI status */
-    int	       minor_status, 		/* I - Minor GSSAPI status */
+    OM_uint32  major_status,		/* I - Major GSSAPI status */
+    OM_uint32  minor_status, 		/* I - Minor GSSAPI status */
     const char *message,		/* I - printf-style message string */
     ...)				/* I - Additional args as needed */
 {
@@ -434,6 +423,61 @@ cupsdLogGSSMessage(
   return (ret);
 }
 #endif /* HAVE_GSSAPI */
+
+
+/*
+ * 'cupsdLogClient()' - Log a client message.
+ */
+
+int					/* O - 1 on success, 0 on error */
+cupsdLogClient(cupsd_client_t *con,	/* I - Client connection */
+               int            level,	/* I - Log level */
+               const char     *message,	/* I - Printf-style message string */
+               ...)			/* I - Additional arguments as needed */
+{
+  va_list		ap, ap2;	/* Argument pointers */
+  char			clientmsg[1024];/* Format string for client message */
+  int			status;		/* Formatting status */
+
+
+ /*
+  * See if we want to log this message...
+  */
+
+  if (TestConfigFile || !ErrorLog)
+    return (1);
+
+  if (level > LogLevel)
+    return (1);
+
+ /*
+  * Format and write the log message...
+  */
+
+  if (con)
+    snprintf(clientmsg, sizeof(clientmsg), "[Client %d] %s", con->number,
+             message);
+  else
+    strlcpy(clientmsg, message, sizeof(clientmsg));
+
+  va_start(ap, message);
+
+  do
+  {
+    va_copy(ap2, ap);
+    status = format_log_line(clientmsg, ap2);
+    va_end(ap2);
+  }
+  while (status == 0);
+
+  va_end(ap);
+
+  if (status > 0)
+    return (cupsdWriteErrorLog(level, log_line));
+  else
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line."));
+}
 
 
 /*
@@ -536,7 +580,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   }
   else
     return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
-                               "Unable to allocate memory for log line!"));
+                               "Unable to allocate memory for log line."));
 }
 
 
@@ -642,53 +686,68 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	    break;
 
         case 'p' :			/* Printer name */
-	    strlcpy(bufptr, job->printer->name,
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, job->printer->name, sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'j' :			/* Job ID */
-	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", job->id);
+	    snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", job->id);
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'u' :			/* Username */
-	    strlcpy(bufptr, job->username ? job->username : "-",
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, job->username ? job->username : "-", sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'T' :			/* Date and time */
-	    strlcpy(bufptr, cupsdGetDateTime(NULL, LogTimeFormat),
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, cupsdGetDateTime(NULL, LogTimeFormat), sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'P' :			/* Page number */
-	    strlcpy(bufptr, number, sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, number, sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'C' :			/* Number of copies */
-	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", copies);
+	    snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", copies);
 	    bufptr += strlen(bufptr);
 	    break;
 
         case '{' :			/* {attribute} */
-	    if ((nameend = strchr(format, '}')) != NULL &&
-	        (nameend - format - 2) < (sizeof(name) - 1))
+	    if ((nameend = strchr(format, '}')) != NULL && (size_t)(nameend - format - 2) < (sizeof(name) - 1))
 	    {
 	     /*
 	      * Pull the name from inside the brackets...
 	      */
 
-	      memcpy(name, format + 1, nameend - format - 1);
+	      memcpy(name, format + 1, (size_t)(nameend - format - 1));
 	      name[nameend - format - 1] = '\0';
 
 	      format = nameend;
 
-	      if ((attr = ippFindAttribute(job->attrs, name,
-	                                   IPP_TAG_ZERO)) != NULL)
+	      attr = ippFindAttribute(job->attrs, name, IPP_TAG_ZERO);
+	      if (!attr && !strcmp(name, "job-billing"))
+	      {
+	       /*
+	        * Handle alias "job-account-id" (which was standardized after
+		* "job-billing" was defined for CUPS...
+		*/
+
+	        attr = ippFindAttribute(job->attrs, "job-account-id", IPP_TAG_ZERO);
+	      }
+	      else if (!attr && !strcmp(name, "media"))
+	      {
+	       /*
+	        * Handle alias "media-col" which uses dimensions instead of
+		* names...
+		*/
+
+		attr = ippFindAttribute(job->attrs, "media-col/media-size", IPP_TAG_BEGIN_COLLECTION);
+	      }
+
+	      if (attr)
 	      {
 	       /*
 	        * Add the attribute value...
@@ -706,14 +765,12 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 		  {
 		    case IPP_TAG_INTEGER :
 		    case IPP_TAG_ENUM :
-			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
-			         "%d", attr->values[i].integer);
+			snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", attr->values[i].integer);
 			bufptr += strlen(bufptr);
 			break;
 
                     case IPP_TAG_BOOLEAN :
-			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
-			         "%d", attr->values[i].boolean);
+			snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", attr->values[i].boolean);
 			bufptr += strlen(bufptr);
 		        break;
 
@@ -727,14 +784,28 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 		    case IPP_TAG_CHARSET :
 		    case IPP_TAG_LANGUAGE :
 		    case IPP_TAG_MIMETYPE :
-		        strlcpy(bufptr, attr->values[i].string.text,
-			        sizeof(buffer) - (bufptr - buffer));
+		        strlcpy(bufptr, attr->values[i].string.text, sizeof(buffer) - (size_t)(bufptr - buffer));
 			bufptr += strlen(bufptr);
 		        break;
 
+                    case IPP_TAG_BEGIN_COLLECTION :
+		        if (!strcmp(attr->name, "media-size"))
+			{
+			  ipp_attribute_t *x_dimension = ippFindAttribute(ippGetCollection(attr, 0), "x-dimension", IPP_TAG_INTEGER);
+			  ipp_attribute_t *y_dimension = ippFindAttribute(ippGetCollection(attr, 0), "y-dimension", IPP_TAG_INTEGER);
+					/* Media dimensions */
+
+			  if (x_dimension && y_dimension)
+			  {
+			    pwg_media_t *pwg = pwgMediaForSize(ippGetInteger(x_dimension, 0), ippGetInteger(y_dimension, 0));
+			    		/* PWG media name */
+			    strlcpy(bufptr, pwg->pwg, sizeof(buffer) - (size_t)(bufptr - buffer));
+			    break;
+			  }
+			}
+
 		    default :
-			strlcpy(bufptr, "???",
-			        sizeof(buffer) - (bufptr - buffer));
+			strlcpy(bufptr, "???", sizeof(buffer) - (size_t)(bufptr - buffer));
 			bufptr += strlen(bufptr);
 		        break;
 		  }
@@ -826,7 +897,9 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   * Filter requests as needed...
   */
 
-  if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
+  if (AccessLogLevel == CUPSD_ACCESSLOG_NONE)
+    return (1);
+  else if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
   {
    /*
     * Eliminate simple GET, POST, and PUT requests...
@@ -939,9 +1012,9 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   {
     syslog(LOG_INFO,
            "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
-           con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+           con->http->hostname, con->username[0] != '\0' ? con->username : "-",
 	   states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)),
-	   con->http.version / 100, con->http.version % 100,
+	   con->http->version / 100, con->http->version % 100,
 	   code, CUPS_LLCAST con->bytes,
 	   con->request ?
 	       ippOpString(con->request->request.op.operation_id) : "-",
@@ -965,12 +1038,12 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   cupsFilePrintf(AccessFile,
                  "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
-        	 con->http.hostname,
+        	 con->http->hostname,
 		 con->username[0] != '\0' ? con->username : "-",
 		 cupsdGetDateTime(&(con->start), LogTimeFormat),
 		 states[con->operation],
 		 _httpEncodeURI(temp, con->uri, sizeof(temp)),
-		 con->http.version / 100, con->http.version % 100,
+		 con->http->version / 100, con->http->version % 100,
 		 code, CUPS_LLCAST con->bytes,
 		 con->request ?
 		     ippOpString(con->request->request.op.operation_id) : "-",
@@ -992,6 +1065,7 @@ int					/* O - 1 on success, 0 on failure */
 cupsdWriteErrorLog(int        level,	/* I - Log level */
                    const char *message)	/* I - Message string */
 {
+  int		ret = 1;		/* Return value */
   static const char	levels[] =	/* Log levels... */
 		{
 		  ' ',
@@ -1023,18 +1097,26 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   * Not using syslog; check the log file...
   */
 
+  _cupsMutexLock(&log_mutex);
+
   if (!cupsdCheckLogFile(&ErrorFile, ErrorLog))
-    return (0);
+  {
+    ret = 0;
+  }
+  else
+  {
+   /*
+    * Write the log message...
+    */
 
- /*
-  * Write the log message...
-  */
+    cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
+                   cupsdGetDateTime(NULL, LogTimeFormat), message);
+    cupsFileFlush(ErrorFile);
+  }
 
-  cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
-                 cupsdGetDateTime(NULL, LogTimeFormat), message);
-  cupsFileFlush(ErrorFile);
+  _cupsMutexUnlock(&log_mutex);
 
-  return (1);
+  return (ret);
 }
 
 
@@ -1050,7 +1132,7 @@ static int				/* O - -1 for fatal, 0 for retry, 1 for success */
 format_log_line(const char *message,	/* I - Printf-style format string */
                 va_list    ap)		/* I - Argument list */
 {
-  int		len;			/* Length of formatted line */
+  ssize_t	len;			/* Length of formatted line */
 
 
  /*
@@ -1076,7 +1158,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   * Resize the buffer as needed...
   */
 
-  if (len >= log_linesize && log_linesize < 65536)
+  if ((size_t)len >= log_linesize && log_linesize < 65536)
   {
     char	*temp;			/* Temporary string pointer */
 
@@ -1088,12 +1170,12 @@ format_log_line(const char *message,	/* I - Printf-style format string */
     else if (len > 65536)
       len = 65536;
 
-    temp = realloc(log_line, len);
+    temp = realloc(log_line, (size_t)len);
 
     if (temp)
     {
       log_line     = temp;
-      log_linesize = len;
+      log_linesize = (size_t)len;
 
       return (0);
     }
@@ -1104,5 +1186,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 11367 2013-10-28 15:35:57Z msweet $".
+ * End of "$Id: log.c 11920 2014-06-11 19:03:59Z msweet $".
  */

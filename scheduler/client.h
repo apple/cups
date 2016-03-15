@@ -1,16 +1,16 @@
 /*
- * "$Id: client.h 11213 2013-08-01 22:23:18Z msweet $"
+ * "$Id: client.h 11717 2014-03-21 16:42:53Z msweet $"
  *
- *   Client definitions for the CUPS scheduler.
+ * Client definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -24,7 +24,8 @@
 
 struct cupsd_client_s
 {
-  http_t		http;		/* HTTP client connection */
+  int			number;		/* Connection number */
+  http_t		*http;		/* HTTP client connection */
   ipp_t			*request,	/* IPP request information */
 			*response;	/* IPP response information */
   cupsd_location_t	*best;		/* Best match for AAA */
@@ -45,6 +46,7 @@ struct cupsd_client_s
   int			file;		/* Input/output file */
   int			file_ready;	/* Input ready on file/pipe? */
   int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
+  http_status_t		pipe_status;	/* HTTP status from pipe process */
   int			sent_header,	/* Non-zero if sent HTTP header */
 			got_fields,	/* Non-zero if all fields seen */
 			header_used;	/* Number of header bytes used */
@@ -53,7 +55,7 @@ struct cupsd_client_s
 #ifdef HAVE_SSL
   int			auto_ssl;	/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
-  http_addr_t		clientaddr;	/* Client address */
+  http_addr_t		clientaddr;	/* Client's server address */
   char			clientname[256];/* Client's server name for connection */
   int			clientport;	/* Client's server port for connection */
   char			servername[256];/* Server name for connection */
@@ -67,7 +69,7 @@ struct cupsd_client_s
 #endif /* HAVE_AUTHORIZATION_H */
 };
 
-#define HTTP(con) &((con)->http)
+#define HTTP(con) ((con)->http)
 
 
 /*
@@ -79,6 +81,9 @@ typedef struct
   int			fd;		/* File descriptor for this server */
   http_addr_t		address;	/* Bind address of socket */
   http_encryption_t	encryption;	/* To encrypt or not to encrypt... */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  int			on_demand;	/* Is this a socket from launchd/systemd? */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 } cupsd_listener_t;
 
 
@@ -86,7 +91,9 @@ typedef struct
  * Globals...
  */
 
-VAR int			ListenBackLog	VALUE(SOMAXCONN),
+VAR int			LastClientNumber VALUE(0),
+					/* Last client connection number */
+			ListenBackLog	VALUE(SOMAXCONN),
 					/* Max backlog of pending connections */
 			LocalPort	VALUE(631),
 					/* Local port to use */
@@ -118,7 +125,6 @@ extern void	cupsdAcceptClient(cupsd_listener_t *lis);
 extern void	cupsdCloseAllClients(void);
 extern int	cupsdCloseClient(cupsd_client_t *con);
 extern void	cupsdDeleteAllListeners(void);
-extern int	cupsdFlushHeader(cupsd_client_t *con);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
 extern void	cupsdReadClient(cupsd_client_t *con);
@@ -142,5 +148,5 @@ extern int	cupsdStartTLS(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 11213 2013-08-01 22:23:18Z msweet $".
+ * End of "$Id: client.h 11717 2014-03-21 16:42:53Z msweet $".
  */

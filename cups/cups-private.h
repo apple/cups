@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-private.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: cups-private.h 11851 2014-05-07 23:55:35Z msweet $"
  *
  *   Private definitions for CUPS.
  *
@@ -166,9 +166,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   void			*server_cert_data;
 					/* Server certificate user data */
   int			server_version,	/* Server IPP version */
-			any_root,	/* Allow any root */
+			any_root,	/* Allow any (e.g., self-signed) root */
 			expired_certs,	/* Allow expired certs */
-			expired_root;	/* Allow expired root */
+			validate_certs;	/* Validate certificates */
 
   /* util.c */
   char			def_printer[256];
@@ -281,5 +281,5 @@ extern char		*_cupsUserDefault(char *name, size_t namesize);
 #endif /* !_CUPS_CUPS_PRIVATE_H_ */
 
 /*
- * End of "$Id: cups-private.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: cups-private.h 11851 2014-05-07 23:55:35Z msweet $".
  */

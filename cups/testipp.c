@@ -1,26 +1,18 @@
 /*
- * "$Id: testipp.c 11890 2014-05-22 13:59:21Z msweet $"
+ * "$Id: testipp.c 11889 2014-05-22 13:54:15Z msweet $"
  *
- *   IPP test program for CUPS.
+ * IPP test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()             - Main entry.
- *   hex_dump()         - Produce a hex dump of a buffer.
- *   print_attributes() - Print the attributes in a request...
- *   read_cb()          - Read data from a buffer.
- *   write_cb()         - Write data into a buffer.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -55,7 +47,7 @@ typedef struct _ippdata_t
  * Local globals...
  */
 
-ipp_uchar_t	collection[] =		/* Collection buffer */
+static ipp_uchar_t collection[] =	/* Collection buffer */
 		{
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
@@ -205,7 +197,7 @@ ipp_uchar_t	collection[] =		/* Collection buffer */
 		  IPP_TAG_END		/* end tag */
 		};
 
-ipp_uchar_t	mixed[] =		/* Mixed value buffer */
+static ipp_uchar_t mixed[] =		/* Mixed value buffer */
 		{
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
@@ -236,7 +228,7 @@ ipp_uchar_t	mixed[] =		/* Mixed value buffer */
  * Local functions...
  */
 
-void	hex_dump(const char *title, ipp_uchar_t *buffer, int bytes);
+void	hex_dump(const char *title, ipp_uchar_t *buffer, size_t bytes);
 void	print_attributes(ipp_t *ipp, int indent);
 ssize_t	read_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
 ssize_t	write_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
@@ -259,9 +251,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*media_size,	/* media-size attribute */
 		*attr;		/* Other attribute */
   ipp_state_t	state;		/* State */
-  int		length;		/* Length of data */
+  size_t	length;		/* Length of data */
   cups_file_t	*fp;		/* File pointer */
-  int		i;		/* Looping var */
+  size_t	i;		/* Looping var */
   int		status;		/* Status of tests (0 = success, 1 = fail) */
 #ifdef DEBUG
   const char	*name;		/* Option name */
@@ -322,7 +314,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (length != sizeof(collection))
     {
       printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             length, (int)sizeof(collection));
+             (int)length, (int)sizeof(collection));
       status = 1;
     }
     else
@@ -362,7 +354,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         if (data.wbuffer[i] != collection[i])
 	  break;
 
-      printf("FAIL - output does not match baseline at 0x%04x!\n", i);
+      printf("FAIL - output does not match baseline at 0x%04x!\n", (unsigned)i);
       hex_dump("Bytes Written", data.wbuffer, data.wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
@@ -403,7 +395,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     else if (length != sizeof(collection))
     {
       printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             length, (int)sizeof(collection));
+             (int)length, (int)sizeof(collection));
       print_attributes(request, 8);
       status = 1;
     }
@@ -550,6 +542,53 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
 
+   /*
+    * Test hierarchical find...
+    */
+
+    fputs("ippFindAttribute(media-col/media-size/x-dimension): ", stdout);
+    if ((attr = ippFindAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      if (ippGetInteger(attr, 0) != 21590)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n", ippGetInteger(attr, 0));
+        status = 1;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (not found)");
+      status = 1;
+    }
+
+    fputs("ippFindNextAttribute(media-col/media-size/x-dimension): ", stdout);
+    if ((attr = ippFindNextAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      if (ippGetInteger(attr, 0) != 21000)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n", ippGetInteger(attr, 0));
+        status = 1;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (not found)");
+      status = 1;
+    }
+
+    fputs("ippFindNextAttribute(media-col/media-size/x-dimension) again: ", stdout);
+    if ((attr = ippFindNextAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      printf("FAIL (got %d, expected nothing)\n", ippGetInteger(attr, 0));
+      status = 1;
+    }
+    else
+      puts("PASS");
+
     ippDelete(request);
 
    /*
@@ -587,7 +626,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     else if (length != (sizeof(mixed) + 4))
     {
       printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
-             length, (int)sizeof(mixed) + 4);
+             (int)length, (int)sizeof(mixed) + 4);
       print_attributes(request, 8);
       status = 1;
     }
@@ -673,7 +712,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Read IPP files...
     */
 
-    for (i = 1; i < argc; i ++)
+    for (i = 1; i < (size_t)argc; i ++)
     {
       if ((fp = cupsFileOpen(argv[i], "r")) == NULL)
       {
@@ -713,10 +752,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 void
 hex_dump(const char  *title,		/* I - Title */
          ipp_uchar_t *buffer,		/* I - Buffer to dump */
-         int         bytes)		/* I - Number of bytes */
+         size_t      bytes)		/* I - Number of bytes */
 {
-  int	i, j;				/* Looping vars */
-  int	ch;				/* Current ASCII char */
+  size_t	i, j;			/* Looping vars */
+  int		ch;			/* Current ASCII char */
 
 
  /*
@@ -731,7 +770,7 @@ hex_dump(const char  *title,		/* I - Title */
     * Show the offset...
     */
 
-    printf("    %04x ", i);
+    printf("    %04x ", (unsigned)i);
 
    /*
     * Then up to 16 bytes in hex...
@@ -977,7 +1016,7 @@ read_cb(_ippdata_t   *data,		/* I - Data */
   * Return the number of bytes read...
   */
 
-  return (count);
+  return ((ssize_t)count);
 }
 
 
@@ -1007,10 +1046,10 @@ write_cb(_ippdata_t   *data,		/* I - Data */
   * Return the number of bytes written...
   */
 
-  return (count);
+  return ((ssize_t)count);
 }
 
 
 /*
- * End of "$Id: testipp.c 11890 2014-05-22 13:59:21Z msweet $".
+ * End of "$Id: testipp.c 11889 2014-05-22 13:54:15Z msweet $".
  */

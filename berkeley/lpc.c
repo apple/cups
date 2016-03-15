@@ -1,24 +1,16 @@
 /*
- * "$Id: lpc.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: lpc.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   "lpc" command for CUPS.
+ * "lpc" command for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()            - Parse options and commands.
- *   compare_strings() - Compare two command-line strings.
- *   do_command()      - Do an lpc command...
- *   show_help()       - Show help messages.
- *   show_status()     - Show printers.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -32,7 +24,7 @@
  * Local functions...
  */
 
-static int	compare_strings(const char *, const char *, int);
+static int	compare_strings(const char *, const char *, size_t);
 static void	do_command(http_t *, const char *, const char *);
 static void	show_help(const char *);
 static void	show_status(http_t *, const char *);
@@ -158,9 +150,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 static int				/* O - -1 or 1 = no match, 0 = match */
 compare_strings(const char *s,		/* I - Command-line string */
                 const char *t,		/* I - Option string */
-                int        tmin)	/* I - Minimum number of unique chars in option */
+                size_t     tmin)	/* I - Minimum number of unique chars in option */
 {
-  int	slen;				/* Length of command-line string */
+  size_t	slen;			/* Length of command-line string */
 
 
   slen = strlen(s);
@@ -446,5 +438,5 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpc.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: lpc.c 11558 2014-02-06 18:33:34Z msweet $".
  */

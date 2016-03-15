@@ -1,7 +1,15 @@
 /*
- * "$Id: strings2po.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: strings2po.c 11558 2014-02-06 18:33:34Z msweet $"
  *
  * Convert Apple .strings file (UTF-16 BE text file) to GNU gettext .po files.
+ *
+ * Copyright 2007-2014 by Apple Inc.
+ *
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Usage:
  *
@@ -10,12 +18,6 @@
  * Compile with:
  *
  *   gcc -o strings2po strings2po.c
- *
- * Contents:
- *
- *   main()         - Convert .strings file to .po.
- *   read_strings() - Read a line from a .strings file.
- *   write_po()     - Write a line to the .po file.
  */
 
 #include <stdio.h>
@@ -116,7 +118,7 @@ read_strings(FILE   *strings,		/* I - .strings file */
   char	*bufptr;			/* Pointer into buffer */
 
 
-  while (fgets(buffer, bufsize, strings))
+  while (fgets(buffer, (int)bufsize, strings))
   {
     if (buffer[0] != '\"')
       continue;
@@ -171,5 +173,5 @@ write_po(FILE       *po,		/* I - .po file */
 
 
 /*
- * End of "$Id: strings2po.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: strings2po.c 11558 2014-02-06 18:33:34Z msweet $".
  */

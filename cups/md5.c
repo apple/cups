@@ -1,9 +1,9 @@
 /*
- * "$Id: md5.c 11374 2013-11-04 23:49:10Z msweet $"
+ * "$Id: md5.c 11594 2014-02-14 20:09:01Z msweet $"
  *
  * Private MD5 implementation for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2005 by Easy Software Products
  * Copyright (C) 1999 Aladdin Enterprises.  All rights reserved.
  *
@@ -291,7 +291,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 	return;
 
     /* Update the message length. */
-    pms->count[1] += nbytes >> 29;
+    pms->count[1] += (unsigned)nbytes >> 29;
     pms->count[0] += nbits;
     if (pms->count[0] < nbits)
 	pms->count[1]++;
@@ -300,7 +300,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
     if (offset) {
 	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
-	memcpy(pms->buf + offset, p, copy);
+	memcpy(pms->buf + offset, p, (size_t)copy);
 	if (offset + copy < 64)
 	    return;
 	p += copy;
@@ -314,7 +314,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 
     /* Process a final partial block. */
     if (left)
-	memcpy(pms->buf, p, left);
+	memcpy(pms->buf, p, (size_t)left);
 }
 
 void
@@ -342,5 +342,5 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
 
 
 /*
- * End of "$Id: md5.c 11374 2013-11-04 23:49:10Z msweet $".
+ * End of "$Id: md5.c 11594 2014-02-14 20:09:01Z msweet $".
  */

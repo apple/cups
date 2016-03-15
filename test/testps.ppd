@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: testps.ppd 11397 2013-11-06 20:09:46Z msweet $"
+*% "$Id: testps.ppd 11398 2013-11-06 20:11:11Z msweet $"
 *%
 *%   Test PS PPD file for CUPS.
 *%
@@ -179,5 +179,5 @@
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: testps.ppd 11397 2013-11-06 20:09:46Z msweet $".
+*% End of "$Id: testps.ppd 11398 2013-11-06 20:11:11Z msweet $".
 *%

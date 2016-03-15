@@ -1,16 +1,16 @@
 /*
- * "$Id: config.h 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: config.h 12031 2014-07-15 19:57:59Z msweet $"
  *
- *   Configuration file for CUPS on Windows.
+ * Configuration file for CUPS on Windows.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -57,6 +57,7 @@
  * Map the POSIX sleep() and usleep() functions to the Win32 Sleep() function...
  */
 
+typedef unsigned long useconds_t;
 #define sleep(X)	Sleep(1000 * (X))
 #define usleep(X)	Sleep((X)/1000)
 
@@ -86,8 +87,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.7.0"
-#define CUPS_MINIMAL "CUPS/1.7.0"
+#define CUPS_SVERSION "CUPS v2.0.0"
+#define CUPS_MINIMAL "CUPS/2.0.0"
 
 
 /*
@@ -355,16 +356,8 @@
 
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
-/* #undef HAVE_LIBSSL */
 #define HAVE_SSPISSL
 #define HAVE_SSL
-
-
-/*
- * Do we have the SSL_set_tlsext_host_name function?
- */
-
-/* #undef HAVE_SSL_SET_TLSEXT_HOST_NAME */
 
 
 /*
@@ -495,13 +488,6 @@
 
 
 /*
- * Do we have the AIX usersec.h header file?
- */
-
-/* #undef HAVE_USERSEC_H */
-
-
-/*
  * Do we have pthread support?
  */
 
@@ -585,13 +571,6 @@
 
 /* #undef HAVE_NOTIFY_H */
 /* #undef HAVE_NOTIFY_POST */
-
-
-/*
- * Do we have Darwin's IOKit private headers?
- */
-
-/* #undef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
 
 
 /*
@@ -771,5 +750,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: config.h 12031 2014-07-15 19:57:59Z msweet $".
  */

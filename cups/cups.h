@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 12025 2014-07-15 13:00:17Z msweet $"
+ * "$Id: cups.h 11884 2014-05-16 21:54:22Z msweet $"
  *
  * API definitions for CUPS.
  *
@@ -49,10 +49,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			1.0705
-#  define CUPS_VERSION_MAJOR		1
-#  define CUPS_VERSION_MINOR		7
-#  define CUPS_VERSION_PATCH		5
+#  define CUPS_VERSION			2.0000
+#  define CUPS_VERSION_MAJOR		2
+#  define CUPS_VERSION_MINOR		0
+#  define CUPS_VERSION_PATCH		0
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
@@ -615,6 +615,11 @@ extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
 extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
 extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 
+/* New in CUPS 2.0 */
+extern cups_dest_t	*cupsGetDestWithURI(const char *name, const char *uri) _CUPS_API_2_0;
+extern const char	*cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest, cups_dinfo_t *info, unsigned flags, cups_size_t *size) _CUPS_API_2_0;
+extern int		cupsMakeServerCredentials(const char *path, const char *common_name, int num_alt_names, const char **alt_names, time_t expiration_date) _CUPS_API_2_0;
+extern int		cupsSetServerCredentials(const char *path, const char *common_name, int auto_create) _CUPS_API_2_0;
 
 #  ifdef __cplusplus
 }
@@ -623,5 +628,5 @@ extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 12025 2014-07-15 13:00:17Z msweet $".
+ * End of "$Id: cups.h 11884 2014-05-16 21:54:22Z msweet $".
  */

@@ -1,22 +1,16 @@
 /*
- * "$Id: search.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: search.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Search routines for CUPS.
+ * Search routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cgiCompileSearch() - Compile a search string.
- *   cgiDoSearch()      - Do a search of some text.
- *   cgiFreeSearch()    - Free a compiled search context.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -38,12 +32,12 @@ cgiCompileSearch(const char *query)	/* I - Query string */
   char		*s,			/* Regular expression string */
 		*sptr,			/* Pointer into RE string */
 		*sword;			/* Pointer to start of word */
-  int		slen;			/* Allocated size of RE string */
+  size_t	slen;			/* Allocated size of RE string */
   const char	*qptr,			/* Pointer into query string */
 		*qend;			/* End of current word */
   const char	*prefix;		/* Prefix to add to next word */
   int		quoted;			/* Word is quoted */
-  int		wlen;			/* Word length */
+  size_t	wlen;			/* Word length */
   char		*lword;			/* Last word in query */
 
 
@@ -139,7 +133,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       for (qend = qptr + 1; *qend && !isspace(*qend); qend ++);
     }
 
-    wlen = qend - qptr;
+    wlen = (size_t)(qend - qptr);
 
    /*
     * Look for logic words: AND, OR
@@ -174,7 +168,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       * string + RE overhead...
       */
 
-      wlen = (sptr - s) + 2 * 4 * wlen + 2 * strlen(prefix) + 11;
+      wlen = (size_t)(sptr - s) + 2 * 4 * wlen + 2 * strlen(prefix) + 11;
       if (lword)
         wlen += strlen(lword);
 
@@ -377,5 +371,5 @@ cgiFreeSearch(void *search)		/* I - Search context */
 
 
 /*
- * End of "$Id: search.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: search.c 11558 2014-02-06 18:33:34Z msweet $".
  */

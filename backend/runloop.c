@@ -1,25 +1,18 @@
 /*
- * "$Id: runloop.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: runloop.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Common run loop APIs for CUPS backends.
+ * Common run loop APIs for CUPS backends.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendDrainOutput() - Drain pending print data to the device.
- *   backendRunLoop()     - Read and write print and back-channel data.
- *   backendWaitLoop()    - Wait for input from stdin while handling
- *                          side-channel queries.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -28,11 +21,7 @@
 
 #include "backend-private.h"
 #include <limits.h>
-#ifdef __hpux
-#  include <sys/time.h>
-#else
-#  include <sys/select.h>
-#endif /* __hpux */
+#include <sys/select.h>
 
 
 /*
@@ -113,7 +102,7 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
     for (print_ptr = print_buffer; print_bytes > 0;)
     {
-      if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+      if ((bytes = write(device_fd, print_ptr, (size_t)print_bytes)) < 0)
       {
        /*
         * Write error - bail if we don't see an error we can retry...
@@ -293,7 +282,7 @@ backendRunLoop(
 	fprintf(stderr,
 	        "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data\n",
 	        CUPS_LLCAST bc_bytes);
-        cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
+        cupsBackChannelWrite(bc_buffer, (size_t)bc_bytes, 1.0);
       }
       else if (bc_bytes < 0 && errno != EAGAIN && errno != EINTR)
       {
@@ -350,7 +339,7 @@ backendRunLoop(
 
     if (print_bytes && FD_ISSET(device_fd, &output))
     {
-      if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+      if ((bytes = write(device_fd, print_ptr, (size_t)print_bytes)) < 0)
       {
        /*
         * Write error - bail if we don't see an error we can retry...
@@ -539,5 +528,5 @@ backendWaitLoop(
 
 
 /*
- * End of "$Id: runloop.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: runloop.c 11558 2014-02-06 18:33:34Z msweet $".
  */

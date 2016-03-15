@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -11,74 +11,49 @@
 cupsaddsmb - export printers to samba for windows clients
 
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupsaddsmb
-</b>[ -H
-<i>samba-server
-</i>] [ -U
-<i>samba-user[%samba-password]
-</i>] [ -h
-<i>cups-server[:port]
-</i>] [ -v ] -a
+<b>cupsaddsmb</b>
+[
+<b>-H</b>
+<i>samba-server</i>
+] [
+<b>-U</b>
+<i>samba-user[%samba-password]</i>
+] [
+<b>-h</b>
+<i>cups-server[:port]</i>
+] [
+<b>-v</b>
+]
+<b>-a</b>
 <br>
-<b>cupsaddsmb
-</b>[ -H
-<i>samba-server
-</i>] [ -U
-<i>samba-user[%samba-password]
-</i>] [ -h
-<i>cups-server[:port]
-</i>] [ -v ] printer [ ... printer ]
-
+<b>cupsaddsmb</b>
+[
+<b>-H</b>
+<i>samba-server</i>
+] [
+<b>-U</b>
+<i>samba-user[%samba-password]</i>
+] [
+<b>-h</b>
+<i>cups-server[:port]</i>
+] [
+<b>-v</b>
+]
+<i>printer</i>
+[ ...
+<i>printer</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>cupsaddsmb</i> exports printers to the SAMBA software (version
-2.2.0 or higher) for use with Windows clients. Depending on the
-SAMBA configuration, you may need to provide a password to
-export the printers. This program requires the Windows printer
-driver files described below.
-
-<h2 class="title"><a name="OPTIONS">Options</a></h2>
-<i>cupsaddsmb</i> supports the following options:
-<dl>
-<dt>-H samba-server
-</dt>
-<dd></dd>
-<dd>Specifies the SAMBA server which defaults to the CUPS server.
-</dd>
-<dt>-U samba-user[%samba-password]
-</dt>
-<dd></dd>
-<dd>Specifies the SAMBA print admin username which defaults to your
-current username. If the username contains a percent (%)
-character, then the text following the percent is treated as the
-SAMBA password to use.
-</dd>
-<dt>-a
-</dt>
-<dd></dd>
-<dd>Exports all known printers. Otherwise only the named printers are
-exported.
-</dd>
-<dt>-h cups-server[:port]
-</dt>
-<dd></dd>
-<dd>Specifies a different CUPS server to use.
-</dd>
-<dt>-v
-</dt>
-<dd></dd>
-<dd>Specifies that verbose information should be shown. This is
-useful for debugging SAMBA configuration problems.
-
-</dd>
-</dl>
-<h2 class="title"><a name="SAMBA_CONFIGURATION">Samba Configuration</a></h2>
-<i>cupsaddsmb</i> uses the new RPC-based printing support in
-SAMBA 2.2.x to provide printer drivers and PPD files to Windows
-client machines. In order to use this functionality, you must
-first configure the SAMBA <i>smb.conf(5)</i> file to support
-printing through CUPS and provide a printer driver download
+The <b>cupsaddsmb</b> program exports printers to the SAMBA software (version 2.2.0 or higher) for use with Windows clients.
+Depending on the SAMBA configuration, you may need to provide a password to export the printers.
+This program requires the Windows printer driver files described below.
+<h3><a name="SAMBA_CONFIGURATION">Samba Configuration</a></h3>
+<b>cupsaddsmb</b> uses the RPC-based printing support in SAMBA to provide printer drivers and PPD files to Windows client machines.
+In order to use this functionality, you must first configure the SAMBA
+<b>smb.conf</b>(5)
+file to support printing through CUPS and provide a printer driver download
 share, as follows:
-<pre>
+<pre class="man">
 
     [global]
 	load printers = yes
@@ -101,70 +76,46 @@ share, as follows:
 	guest ok = no
 	read only = yes
 	write list = root
+
 </pre>
-<p>This configuration assumes a FHS-compliant installation of
-SAMBA; adjust the [printers] and [print$] share paths
-accordingly on your system as needed.
+This configuration assumes a FHS-compliant installation of SAMBA; adjust the [printers] and [print$] share paths accordingly on your system as needed.
+<h3><a name="MICROSOFT_POSTSCRIPT_DRIVERS_FOR_WINDOWS">Microsoft Postscript Drivers For Windows</a></h3>
+The base driver for Windows 2000 and higher is the Microsoft PostScript driver, which is available on any system running Windows 2000 or higher in the %WINDIR%\SYSTEM32\SPOOL\DRIVERS\W32X86\3 folder for 32-bit drivers and %WINDIR%\SYSTEM32\SPOOL\DRIVERS\X64\3 folder for 64-bit drivers.
+<p>Copy the 32-bit drivers to the <i>/usr/share/cups/drivers</i> directory and the 64-bit drivers to the <i>/usr/share/cups/drivers/x64</i> directory exactly as named below:
+<pre class="man">
 
-<h2 class="title"><a name="MICROSOFT_POSTSCRIPT_DRIVERS_FOR_WINDOWS">Microsoft Postscript Drivers For Windows</a></h2>
-The base driver for Windows 2000 and higher is the Microsoft
-PostScript driver, which is available on any system running
-Windows 2000 or higher in the
-%WINDIR%\SYSTEM32\SPOOL\DRIVERS\W32X86\3 folder for 32-bit
-drivers and
-%WINDIR%\SYSTEM32\SPOOL\DRIVERS\X64\3 folder for 64-bit
-drivers.
-<p>However, currently only Windows 2000 and higher is supported by the Microsoft
-driver, so you will also need to get the Adobe driver to support
-Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
-for Windows 2000 are identical.
-<p>Once you have extracted the driver files, copy the 32-bit drivers
-to the <i>/usr/share/cups/drivers</i> directory and the 64-bit
-drivers to the <i>/usr/share/cups/drivers/x64</i> directory exactly
-as named below:
-<pre>
-
-    [Windows 2000 and higher]
     ps5ui.dll
     pscript.hlp
     pscript.ntf
     pscript5.dll
+
 </pre>
-<p><b>Note:</b> Unlike Windows, case is significant - make sure that
-you use the lowercase filenames shown above, otherwise
-<i>cupsaddsmb</i> will fail to export the drivers.
-
-<h2 class="title"><a name="ADOBE_POSTSCRIPT_DRIVERS_FOR_WINDOWS_95,_98,_AND_ME">Adobe Postscript Drivers For Windows 95, 98, And Me</a></h2>
-<i>cupsaddsmb</i> can use the Adobe PostScript printer driver for
-Windows 95, 98, and ME, which are available for download from the
-Adobe web site (<a href='http://www.adobe.com).'>http://www.adobe.com).</a>
-<p>The Adobe driver does not support the page-label, job-billing, or
-job-hold-until options.
-<p>Once you have installed the driver on a Windows system, copy the
-following files to the <i>/usr/share/cups/drivers</i> directory
-exactly as named below:
-<pre>
-
-    [Windows 95, 98, and Me]
-    ADFONTS.MFM
-    ADOBEPS4.DRV
-    ADOBEPS4.HLP
-    ICONLIB.DLL
-    PSMON.DLL
-</pre>
-<p><b>Note:</b> Unlike Windows, case is significant - make sure that
-you use the UPPERCASE filenames shown above, otherwise
-<i>cupsaddsmb</i> will fail to export the drivers.
-
-<h2 class="title"><a name="KNOWN_ISSUES">Known Issues</a></h2>
-Getting the full set of Windows driver files should be easier.
-
+<b>Note:</b> Unlike Windows, case is significant - make sure that you use the lowercase filenames shown above, otherwise <b>cupsaddsmb</b> will fail to export the drivers.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>cupsaddsmb</b> supports the following options:
+<dl class="man">
+<dt><b>-H </b><i>samba-server</i>
+<dd style="margin-left: 5.0em">Specifies the SAMBA server which defaults to the CUPS server.
+<dt><b>-U </b><i>samba-user</i>[<b>%</b><i>samba-password</i>]
+<dd style="margin-left: 5.0em">Specifies the SAMBA print admin username which defaults to your current username.
+If the username contains a percent (%) character, then the text following the percent is treated as the SAMBA password to use.
+<dt><b>-a</b>
+<dd style="margin-left: 5.0em">Exports all known printers.
+Otherwise only the named printers are exported.
+<dt><b>-h </b><i>cups-server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Specifies a different CUPS server to use.
+<dt><b>-v</b>
+<dd style="margin-left: 5.0em">Specifies that verbose information should be shown.
+This is useful for debugging SAMBA configuration problems.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>smbd(8)</i>, <i>smb.conf(5)</i>,
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
-
+<b>rpcclient</b>(1),
+<b>smbclient</b>(1),
+<b>smbd</b>(8),
+<b>smb.conf</b>(5),
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -8,32 +8,45 @@
 <body>
 <h1 class="title">ppdi(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-ppdi - import ppd files
+ppdi - import ppd files (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>ppdi
-</b>[ -I
-<i>include-directory
-</i>] [ -o
-<i>source-file
-</i>]
-<i>ppd-file
-</i>[
-<i>ppd-file2 ... ppd-fileN
-</i>]
+<b>ppdi</b>
+[
+<b>-I</b>
+<i>include-directory</i>
+] [
+<b>-o</b>
+<i>source-file</i>
+]
+<i>ppd-file</i>
+[ ...
+<i>ppd-file</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>ppdi</i> imports one or more PPD files into a PPD compiler source file.
-Multiple languages of the same PPD file are merged into a single printer
-definition to facilitate accurate changes for all localizations.
-<p>The <i>-o</i> option specifies the PPD source file to update. If the source
-file does not exist, a new source file is created. Otherwise the existing
-file is merged with the new PPD file(s) on the command-line. If no source
-file is specified, the filename "ppdi.drv" is used.
+<b>ppdi</b> imports one or more PPD files into a PPD compiler source file.
+Multiple languages of the same PPD file are merged into a single printer definition to facilitate accurate changes for all localizations.
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ppdi</b> supports the following options:
+<dl class="man">
+<dt><b>-I </b><i>include-directory</i>
+<dd style="margin-left: 5.0em">Specifies an alternate include directory.
+Multiple <i>-I</i> options can be supplied to add additional directories.
+<dt><b>-o </b><i>source-file</i>
+<dd style="margin-left: 5.0em">Specifies the PPD source file to update.
+If the source file does not exist, a new source file is created.
+Otherwise the existing file is merged with the new PPD file(s) on the command-line.
+If no source file is specified, the filename <i>ppdi.drv</i> is used.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-ppdc(1), ppdhtml(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-ppdc.html?TOPIC=Man+Pages"><b>ppdc</b>(1),</a>
+<a href="man-ppdhtml.html?TOPIC=Man+Pages"><b>ppdhtml</b>(1),</a>
+<a href="man-ppdmerge.html?TOPIC=Man+Pages"><b>ppdmerge</b>(1),</a>
+<a href="man-ppdpo.html?TOPIC=Man+Pages"><b>ppdpo</b>(1),</a>
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

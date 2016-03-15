@@ -1,35 +1,15 @@
 /*
- * "$Id: usb-libusb.c 11456 2013-12-09 19:26:47Z msweet $"
+ * "$Id: usb-libusb.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   LIBUSB interface code for CUPS.
+ * LIBUSB interface code for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   list_devices()	  - List the available printers.
- *   print_device()	  - Print a file to a USB device.
- *   close_device()	  - Close the connection to the USB printer.
- *   compare_quirks()	  - Compare two quirks entries.
- *   find_device()	  - Find or enumerate USB printers.
- *   find_quirks()	  - Find the quirks for the given printer, if any.
- *   get_device_id()	  - Get the IEEE-1284 device ID for the printer.
- *   list_cb()		  - List USB printers for discovery.
- *   load_quirks()	  - Load all quirks files in the /usr/share/cups/usb
- *			    directory.
- *   make_device_uri()	  - Create a device URI for a USB printer.
- *   open_device()	  - Open a connection to the USB printer.
- *   print_cb() 	  - Find a USB printer for printing.
- *   read_thread()	  - Thread to read the backchannel data on.
- *   sidechannel_thread() - Handle side-channel requests.
- *   soft_reset()	  - Send a soft reset to the device.
- *   soft_reset_printer() - Do the soft reset request specific to printers
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -920,8 +900,8 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	      fprintf(stderr, "DEBUG: Printer does not report class 7 and/or "
 		      "subclass 1 but works as a printer anyway\n");
 
-	    read_endp  = -1;
-	    write_endp = -1;
+	    read_endp  = 0xff;
+	    write_endp = 0xff;
 
 	    for (endp = 0, endpptr = altptr->endpoint;
 	         endp < altptr->bNumEndpoints;
@@ -1085,8 +1065,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * bytes.  The 1284 spec says the length is stored MSB first...
   */
 
-  length = (((unsigned)buffer[0] & 255) << 8) |
-	   ((unsigned)buffer[1] & 255);
+  length = (int)((((unsigned)buffer[0] & 255) << 8) | ((unsigned)buffer[1] & 255));
 
  /*
   * Check to see if the length is larger than our buffer or less than 14 bytes
@@ -1097,8 +1076,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   */
 
   if (length > bufsize || length < 14)
-    length = (((unsigned)buffer[1] & 255) << 8) |
-	     ((unsigned)buffer[0] & 255);
+    length = (int)((((unsigned)buffer[1] & 255) << 8) | ((unsigned)buffer[0] & 255));
 
   if (length > bufsize)
     length = bufsize;
@@ -1120,7 +1098,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * nul-terminate.
   */
 
-  memmove(buffer, buffer + 2, length);
+  memmove(buffer, buffer + 2, (size_t)length);
   buffer[length] = '\0';
 
   return (0);
@@ -1734,7 +1712,7 @@ static void *read_thread(void *reference)
     {
       fprintf(stderr, "DEBUG: Read %d bytes of back-channel data...\n",
               (int)rbytes);
-      cupsBackChannelWrite((const char *)readbuffer, rbytes, 1.0);
+      cupsBackChannelWrite((const char *)readbuffer, (size_t)rbytes, 1.0);
     }
     else if (readstatus == LIBUSB_ERROR_TIMEOUT)
       fputs("DEBUG: Got USB transaction timeout during read.\n", stderr);
@@ -2021,6 +1999,6 @@ soft_reset_printer(
 
 
 /*
- * End of "$Id: usb-libusb.c 11456 2013-12-09 19:26:47Z msweet $".
+ * End of "$Id: usb-libusb.c 11594 2014-02-14 20:09:01Z msweet $".
  */
 

@@ -1,61 +1,27 @@
 /*
- * "$Id: ppd.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: ppd.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   PPD file routines for CUPS.
+ * PPD file routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   This code and any derivative of it may be used and distributed
- *   freely under the terms of the GNU General Public License when
- *   used with GNU Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU
- *   GhostScript (or its derivatives) is governed by the CUPS license
- *   agreement.
+ * This code and any derivative of it may be used and distributed
+ * freely under the terms of the GNU General Public License when
+ * used with GNU Ghostscript or its derivatives.  Use of the code
+ * (or any derivative of it) with software other than GNU
+ * GhostScript (or its derivatives) is governed by the CUPS license
+ * agreement.
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ppdClose()             - Free all memory used by the PPD file.
- *   ppdErrorString()       - Returns the text assocated with a status.
- *   _ppdGetEncoding()      - Get the CUPS encoding value for the given
- *                            LanguageEncoding.
- *   ppdLastError()         - Return the status from the last ppdOpen*().
- *   ppdOpen()              - Read a PPD file into memory.
- *   _ppdOpen()             - Read a PPD file into memory.
- *   ppdOpen2()             - Read a PPD file into memory.
- *   ppdOpenFd()            - Read a PPD file into memory.
- *   _ppdOpenFile()         - Read a PPD file into memory.
- *   ppdOpenFile()          - Read a PPD file into memory.
- *   ppdSetConformance()    - Set the conformance level for PPD files.
- *   ppd_add_attr()         - Add an attribute to the PPD data.
- *   ppd_add_choice()       - Add a choice to an option.
- *   ppd_add_size()         - Add a page size.
- *   ppd_compare_attrs()    - Compare two attributes.
- *   ppd_compare_choices()  - Compare two choices...
- *   ppd_compare_coptions() - Compare two custom options.
- *   ppd_compare_options()  - Compare two options.
- *   ppd_decode()           - Decode a string value...
- *   ppd_free_filters()     - Free the filters array.
- *   ppd_free_group()       - Free a single UI group.
- *   ppd_free_option()      - Free a single option.
- *   ppd_get_coption()      - Get a custom option record.
- *   ppd_get_cparam()       - Get a custom parameter record.
- *   ppd_get_group()        - Find or create the named group as needed.
- *   ppd_get_option()       - Find or create the named option as needed.
- *   ppd_hash_option()      - Generate a hash of the option name...
- *   ppd_read()             - Read a line from a PPD file, skipping comment
- *                            lines as necessary.
- *   ppd_update_filters()   - Update the filters array as needed.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -69,14 +35,6 @@
 /*
  * Definitions...
  */
-
-#if defined(WIN32) || defined(__EMX__)
-#  define READ_BINARY	"rb"		/* Open a binary file for reading */
-#  define WRITE_BINARY	"wb"		/* Open a binary file for writing */
-#else
-#  define READ_BINARY	"r"		/* Open a binary file for reading */
-#  define WRITE_BINARY	"w"		/* Open a binary file for writing */
-#endif /* WIN32 || __EMX__ */
 
 #define ppd_free(p)	if (p) free(p)	/* Safe free macro */
 
@@ -872,8 +830,7 @@ _ppdOpen(
       if (ppd->num_profiles == 0)
         profile = malloc(sizeof(ppd_profile_t));
       else
-        profile = realloc(ppd->profiles, sizeof(ppd_profile_t) *
-	                                 (ppd->num_profiles + 1));
+        profile = realloc(ppd->profiles, sizeof(ppd_profile_t) * (size_t)(ppd->num_profiles + 1));
 
       if (!profile)
       {
@@ -907,7 +864,7 @@ _ppdOpen(
       if (ppd->num_filters == 0)
         filter = malloc(sizeof(char *));
       else
-        filter = realloc(ppd->filters, sizeof(char *) * (ppd->num_filters + 1));
+        filter = realloc(ppd->filters, sizeof(char *) * (size_t)(ppd->num_filters + 1));
 
       if (filter == NULL)
       {
@@ -937,8 +894,7 @@ _ppdOpen(
       if (ppd->num_fonts == 0)
         tempfonts = (char **)malloc(sizeof(char *));
       else
-        tempfonts = (char **)realloc(ppd->fonts,
-	                             sizeof(char *) * (ppd->num_fonts + 1));
+        tempfonts = (char **)realloc(ppd->fonts, sizeof(char *) * (size_t)(ppd->num_fonts + 1));
 
       if (tempfonts == NULL)
       {
@@ -1173,7 +1129,7 @@ _ppdOpen(
 	}
 
       ppd->num_emulations = count;
-      if ((ppd->emulations = calloc(count, sizeof(ppd_emul_t))) == NULL)
+      if ((ppd->emulations = calloc((size_t)count, sizeof(ppd_emul_t))) == NULL)
       {
         cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1697,8 +1653,7 @@ _ppdOpen(
       if (ppd->num_consts == 0)
 	constraint = calloc(2, sizeof(ppd_const_t));
       else
-	constraint = realloc(ppd->consts,
-	                     (ppd->num_consts + 2) * sizeof(ppd_const_t));
+	constraint = realloc(ppd->consts, (size_t)(ppd->num_consts + 2) * sizeof(ppd_const_t));
 
       if (constraint == NULL)
       {
@@ -2282,7 +2237,7 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
   if (ppd->num_attrs == 0)
     ptr = malloc(sizeof(ppd_attr_t *));
   else
-    ptr = realloc(ppd->attrs, (ppd->num_attrs + 1) * sizeof(ppd_attr_t *));
+    ptr = realloc(ppd->attrs, (size_t)(ppd->num_attrs + 1) * sizeof(ppd_attr_t *));
 
   if (ptr == NULL)
     return (NULL);
@@ -2334,8 +2289,7 @@ ppd_add_choice(ppd_option_t *option,	/* I - Option */
   if (option->num_choices == 0)
     choice = malloc(sizeof(ppd_choice_t));
   else
-    choice = realloc(option->choices,
-	             sizeof(ppd_choice_t) * (option->num_choices + 1));
+    choice = realloc(option->choices, sizeof(ppd_choice_t) * (size_t)(option->num_choices + 1));
 
   if (choice == NULL)
     return (NULL);
@@ -2365,7 +2319,7 @@ ppd_add_size(ppd_file_t *ppd,		/* I - PPD file */
   if (ppd->num_sizes == 0)
     size = malloc(sizeof(ppd_size_t));
   else
-    size = realloc(ppd->sizes, sizeof(ppd_size_t) * (ppd->num_sizes + 1));
+    size = realloc(ppd->sizes, sizeof(ppd_size_t) * (size_t)(ppd->num_sizes + 1));
 
   if (size == NULL)
     return (NULL);
@@ -2454,9 +2408,9 @@ ppd_decode(char *string)		/* I - String to decode */
       while (isxdigit(*inptr & 255))
       {
 	if (_cups_isalpha(*inptr))
-	  *outptr = (tolower(*inptr) - 'a' + 10) << 4;
+	  *outptr = (char)((tolower(*inptr) - 'a' + 10) << 4);
 	else
-	  *outptr = (*inptr - '0') << 4;
+	  *outptr = (char)((*inptr - '0') << 4);
 
 	inptr ++;
 
@@ -2464,9 +2418,9 @@ ppd_decode(char *string)		/* I - String to decode */
 	  break;
 
 	if (_cups_isalpha(*inptr))
-	  *outptr |= tolower(*inptr) - 'a' + 10;
+	  *outptr |= (char)(tolower(*inptr) - 'a' + 10);
 	else
-	  *outptr |= *inptr - '0';
+	  *outptr |= (char)(*inptr - '0');
 
 	inptr ++;
 	outptr ++;
@@ -2687,8 +2641,7 @@ ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
     if (ppd->num_groups == 0)
       group = malloc(sizeof(ppd_group_t));
     else
-      group = realloc(ppd->groups,
-	              (ppd->num_groups + 1) * sizeof(ppd_group_t));
+      group = realloc(ppd->groups, (size_t)(ppd->num_groups + 1) * sizeof(ppd_group_t));
 
     if (group == NULL)
     {
@@ -2736,8 +2689,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
     if (group->num_options == 0)
       option = malloc(sizeof(ppd_option_t));
     else
-      option = realloc(group->options,
-	               (group->num_options + 1) * sizeof(ppd_option_t));
+      option = realloc(group->options, (size_t)(group->num_options + 1) * sizeof(ppd_option_t));
 
     if (option == NULL)
       return (NULL);
@@ -2917,7 +2869,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	* Any other character...
 	*/
 
-	*lineptr++ = ch;
+	*lineptr++ = (char)ch;
 	col ++;
 
 	if (col > (PPD_MAX_LINE - 1))
@@ -3370,7 +3322,7 @@ ppd_update_filters(ppd_file_t      *ppd,/* I - PPD file */
     if (ppd->num_filters == 0)
       filter = malloc(sizeof(char *));
     else
-      filter = realloc(ppd->filters, sizeof(char *) * (ppd->num_filters + 1));
+      filter = realloc(ppd->filters, sizeof(char *) * (size_t)(ppd->num_filters + 1));
 
     if (filter == NULL)
     {
@@ -3394,5 +3346,5 @@ ppd_update_filters(ppd_file_t      *ppd,/* I - PPD file */
 
 
 /*
- * End of "$Id: ppd.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: ppd.c 11558 2014-02-06 18:33:34Z msweet $".
  */

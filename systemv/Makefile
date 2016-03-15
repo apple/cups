@@ -1,25 +1,25 @@
 #
-# "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $"
+# "$Id: Makefile 11776 2014-03-28 19:16:05Z msweet $"
 #
-#   System V commands makefile for CUPS.
+# System V commands makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
 
 TARGETS	=	cancel cupsaccept cupsaddsmb cupsctl cupstestdsc cupstestppd \
-		lp lpadmin lpinfo lpmove lpoptions lppasswd lpstat
+		lp lpadmin lpinfo lpmove lpoptions lpstat
 OBJS	=	cancel.o cupsaccept.o cupsaddsmb.o cupsctl.o cupstestdsc.o \
 		cupstestppd.o lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o \
-		lppasswd.o lpstat.o
+		lpstat.o
 
 
 #
@@ -105,7 +105,6 @@ install-exec:
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
-	$(INSTALL_BIN) lppasswd $(BINDIR)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(TARGETS); do \
@@ -139,7 +138,6 @@ uninstall:
 	$(RM) $(BINDIR)/cupstestppd
 	$(RM) $(BINDIR)/lp
 	$(RM) $(BINDIR)/lpoptions
-	$(RM) $(BINDIR)/lppasswd
 	$(RM) $(BINDIR)/lpstat
 	-$(RMDIR) $(BINDIR)
 	$(RM) $(SBINDIR)/accept
@@ -265,15 +263,6 @@ lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 
 
 #
-# lppasswd
-#
-
-lppasswd:	lppasswd.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lppasswd lppasswd.o $(LIBZ) $(LIBS)
-
-
-#
 # lpstat
 #
 
@@ -290,5 +279,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $".
+# End of "$Id: Makefile 11776 2014-03-28 19:16:05Z msweet $".
 #

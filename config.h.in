@@ -1,16 +1,16 @@
 /*
- * "$Id: config.h.in 11642 2014-02-27 15:57:59Z msweet $"
+ * "$Id: config.h.in 11717 2014-03-21 16:42:53Z msweet $"
  *
- *   Configuration file for CUPS.
+ * Configuration file for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -129,6 +129,13 @@
 #define CUPS_SERVERBIN	"/usr/lib/cups"
 #define CUPS_SERVERROOT	"/etc/cups"
 #define CUPS_STATEDIR	"/var/run/cups"
+
+
+/*
+ * Do we have posix_spawn?
+ */
+
+#undef HAVE_POSIX_SPAWN
 
 
 /*
@@ -290,15 +297,7 @@
 
 #undef HAVE_CDSASSL
 #undef HAVE_GNUTLS
-#undef HAVE_LIBSSL
 #undef HAVE_SSL
-
-
-/*
- * Do we have the SSL_set_tlsext_host_name function?
- */
-
-#undef HAVE_SSL_SET_TLSEXT_HOST_NAME
 
 
 /*
@@ -321,6 +320,20 @@
  */
 
 #undef HAVE_CSSMERRORSTRING
+
+
+/*
+ * Do we have the SecGenerateSelfSignedCertificate function?
+ */
+
+#undef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
+
+
+/*
+ * Do we have the SecKeychainOpen function?
+ */
+
+#undef HAVE_SECKEYCHAINOPEN
 
 
 /*
@@ -429,13 +442,6 @@
 
 
 /*
- * Do we have the AIX usersec.h header file?
- */
-
-#undef HAVE_USERSEC_H
-
-
-/*
  * Do we have pthread support?
  */
 
@@ -448,6 +454,14 @@
 
 #undef HAVE_LAUNCH_H
 #undef HAVE_LAUNCHD
+#undef HAVE_LAUNCH_ACTIVATE_SOCKET
+
+
+/*
+ * Do we have systemd support?
+ */
+
+#undef HAVE_SYSTEMD
 
 
 /*
@@ -520,13 +534,6 @@
 
 #undef HAVE_NOTIFY_H
 #undef HAVE_NOTIFY_POST
-
-
-/*
- * Do we have Darwin's IOKit private headers?
- */
-
-#undef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H
 
 
 /*
@@ -707,5 +714,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 11642 2014-02-27 15:57:59Z msweet $".
+ * End of "$Id: config.h.in 11717 2014-03-21 16:42:53Z msweet $".
  */

@@ -1,24 +1,18 @@
 /*
- * "$Id: tempfile.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: tempfile.c 12073 2014-07-31 00:58:00Z msweet $"
  *
- *   Temp file utilities for CUPS.
+ * Temp file utilities for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsTempFd()    - Creates a temporary file.
- *   cupsTempFile()  - Generates a temporary filename.
- *   cupsTempFile2() - Creates a temporary CUPS file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -103,8 +97,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%05lx%08lx", tmpdir,
-             GetCurrentProcessId(), curtime);
+    snprintf(filename, (size_t)len - 1, "%s/%05lx%08lx", tmpdir, GetCurrentProcessId(), curtime);
 #else
    /*
     * Get the current time of day...
@@ -116,8 +109,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%05x%08x", tmpdir, (unsigned)getpid(),
-             (unsigned)(curtime.tv_sec + curtime.tv_usec + tries));
+    snprintf(filename, (size_t)len - 1, "%s/%05x%08x", tmpdir, (unsigned)getpid(), (unsigned)(curtime.tv_sec + curtime.tv_usec + tries));
 #endif /* WIN32 */
 
    /*
@@ -153,8 +145,8 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
  * 'cupsTempFile()' - Generates a temporary filename.
  *
  * The temporary filename is returned in the filename buffer.
- * This function is deprecated - use @link cupsTempFd@ or
- * @link cupsTempFile2@ instead.
+ * This function is deprecated and will no longer generate a temporary
+ * filename - use @link cupsTempFd@ or @link cupsTempFile2@ instead.
  *
  * @deprecated@
  */
@@ -163,38 +155,12 @@ char *					/* O - Filename or @code NULL@ on error */
 cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
-  int		fd;			/* File descriptor for temp file */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  (void)len;
 
+  if (filename)
+    *filename = '\0';
 
- /*
-  * See if a filename was specified...
-  */
-
-  if (filename == NULL)
-  {
-    filename = cg->tempfile;
-    len      = sizeof(cg->tempfile);
-  }
-
- /*
-  * Create the temporary file...
-  */
-
-  if ((fd = cupsTempFd(filename, len)) < 0)
-    return (NULL);
-
- /*
-  * Close the temp file - it'll be reopened later as needed...
-  */
-
-  close(fd);
-
- /*
-  * Return the temp filename...
-  */
-
-  return (filename);
+  return (NULL);
 }
 
 
@@ -229,5 +195,5 @@ cupsTempFile2(char *filename,		/* I - Pointer to buffer */
 
 
 /*
- * End of "$Id: tempfile.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: tempfile.c 12073 2014-07-31 00:58:00Z msweet $".
  */

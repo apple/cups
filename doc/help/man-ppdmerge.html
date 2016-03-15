@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -8,33 +8,42 @@
 <body>
 <h1 class="title">ppdmerge(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-ppdmerge - merge ppd files
+ppdmerge - merge ppd files (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>ppdmerge
-</b>[ -o
-<i>output-ppd-file
-</i>]
-<i>ppd-file
-</i><i>ppd-file2
-</i>[
-<i>... ppd-fileN
-</i>]
+<b>ppdmerge</b>
+[
+<b>-o</b>
+<i>output-ppd-file</i>
+]
+<i>ppd-file</i>
+<i>ppd-file</i>
+[ ...
+<i>ppd-file</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>ppdmerge</i> merges two or more PPD files into a single, multi-language
+<b>ppdmerge</b> merges two or more PPD files into a single, multi-language
 PPD file.
-<p>The <i>-o</i> option specifies the PPD file to create. If not specified,
-the merged PPD file is written to the standard output. If the output file
-already exists, the new
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ppdmerge</b> supports the following options:
+<dl class="man">
+<dt><b>-o </b><i>output-ppd-file</i>
+<dd style="margin-left: 3.0em">Specifies the PPD file to create.
+If not specified, the merged PPD file is written to the standard output.
+If the output file already exists, it is silently overwritten.
+</dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-<i>ppdmerge</i> does not check whether the merged PPD files are for the
-same device. Merging of different device PPDs will yield unpredictable
-results.
+<b>ppdmerge</b> does not check whether the merged PPD files are for the same device.
+Merging of different device PPDs will yield unpredictable results.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdpo(1), ppdcfile(5)
-<br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="man-ppdc.html?TOPIC=Man+Pages"><b>ppdc</b>(1),</a>
+<a href="man-ppdhtml.html?TOPIC=Man+Pages"><b>ppdhtml</b>(1),</a>
+<a href="man-ppdi.html?TOPIC=Man+Pages"><b>ppdi</b>(1),</a>
+<a href="man-ppdpo.html?TOPIC=Man+Pages"><b>ppdpo</b>(1),</a>
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

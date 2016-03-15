@@ -1,43 +1,18 @@
 /*
- * "$Id: language.c 11424 2013-11-08 19:51:01Z msweet $"
+ * "$Id: language.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   I18N/language support for CUPS.
+ * I18N/language support for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsAppleLanguage()   - Get the Apple language identifier associated with
- *			      a locale ID.
- *   _cupsEncodingName()    - Return the character encoding name string for the
- *			      given encoding enumeration.
- *   cupsLangDefault()	    - Return the default language.
- *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
- *			      for the given language.
- *   cupsLangFlush()	    - Flush all language data out of the cache.
- *   cupsLangFree()	    - Free language data.
- *   cupsLangGet()	    - Get a language.
- *   _cupsLangString()	    - Get a message string.
- *   _cupsMessageFree()     - Free a messages array.
- *   _cupsMessageLoad()     - Load a .po file into a messages array.
- *   _cupsMessageLookup()   - Lookup a message string.
- *   _cupsMessageNew()	    - Make a new message catalog array.
- *   appleLangDefault()     - Get the default locale string.
- *   appleMessageLoad()     - Load a message catalog from a localizable bundle.
- *   cups_cache_lookup()    - Lookup a language in the cache...
- *   cups_message_compare() - Compare two messages.
- *   cups_message_free()    - Free a message.
- *   cups_message_load()    - Load the message catalog for a language.
- *   cups_unquote()	    - Unquote characters in strings...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -227,8 +202,8 @@ _cupsAppleLanguage(const char *locale,	/* I - Locale ID */
 	  */
 
 	  language[2] = '_';
-	  language[3] = toupper(language[3] & 255);
-	  language[4] = toupper(language[4] & 255);
+	  language[3] = (char)toupper(language[3] & 255);
+	  language[4] = (char)toupper(language[4] & 255);
 	}
 	break;
   }
@@ -253,7 +228,7 @@ _cupsAppleLanguage(const char *locale,	/* I - Locale ID */
     if ((langid = CFLocaleCreateCanonicalLanguageIdentifierFromString(
                       kCFAllocatorDefault, localeid)) != NULL)
     {
-      CFStringGetCString(langid, language, langsize, kCFStringEncodingASCII);
+      CFStringGetCString(langid, language, (CFIndex)langsize, kCFStringEncodingASCII);
       CFRelease(langid);
     }
 
@@ -278,8 +253,8 @@ const char *				/* O - Character encoding */
 _cupsEncodingName(
     cups_encoding_t encoding)		/* I - Encoding value */
 {
-  if (encoding < 0 ||
-      encoding >= (sizeof(lang_encodings) / sizeof(const char *)))
+  if (encoding < CUPS_US_ASCII ||
+      encoding >= (cups_encoding_t)(sizeof(lang_encodings) / sizeof(lang_encodings[0])))
   {
     DEBUG_printf(("1_cupsEncodingName(encoding=%d) = out of range (\"%s\")",
                   encoding, lang_encodings[0]));
@@ -608,7 +583,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       if (*language == '_' || *language == '-' || *language == '.')
 	break;
       else if (ptr < (langname + sizeof(langname) - 1))
-        *ptr++ = tolower(*language & 255);
+        *ptr++ = (char)tolower(*language & 255);
 
     *ptr = '\0';
 
@@ -622,7 +597,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 	if (*language == '.')
 	  break;
 	else if (ptr < (country + sizeof(country) - 1))
-          *ptr++ = toupper(*language & 255);
+          *ptr++ = (char)toupper(*language & 255);
 
       *ptr = '\0';
     }
@@ -635,7 +610,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
       for (language ++, ptr = charset; *language; language ++)
         if (_cups_isalnum(*language) && ptr < (charset + sizeof(charset) - 1))
-          *ptr++ = toupper(*language & 255);
+          *ptr++ = (char)toupper(*language & 255);
 
       *ptr = '\0';
     }
@@ -846,8 +821,8 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
   char			s[4096],	/* String buffer */
 			*ptr,		/* Pointer into buffer */
 			*temp;		/* New string */
-  int			length;		/* Length of combined strings */
-  size_t		ptrlen;		/* Length of string */
+  size_t		length,		/* Length of combined strings */
+			ptrlen;		/* Length of string */
 
 
   DEBUG_printf(("4_cupsMessageLoad(filename=\"%s\")", filename));
@@ -978,11 +953,10 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
       * Append to current string...
       */
 
-      length = (int)strlen(m->str ? m->str : m->id);
+      length = strlen(m->str ? m->str : m->id);
       ptrlen = strlen(ptr);
 
-      if ((temp = realloc(m->str ? m->str : m->id,
-                          length + ptrlen + 1)) == NULL)
+      if ((temp = realloc(m->str ? m->str : m->id, length + ptrlen + 1)) == NULL)
       {
         if (m->str)
 	  free(m->str);
@@ -1351,7 +1325,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
 
   url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
                                                 (UInt8 *)filename,
-						strlen(filename), false);
+						(CFIndex)strlen(filename), false);
   if (url)
   {
     stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
@@ -1586,5 +1560,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 11424 2013-11-08 19:51:01Z msweet $".
+ * End of "$Id: language.c 11558 2014-02-06 18:33:34Z msweet $".
  */

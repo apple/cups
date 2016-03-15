@@ -29,7 +29,19 @@ P.example {
   font-style: italic;
   margin-left: 36pt;
 }
-  
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
 PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
@@ -68,7 +80,7 @@ A:link:hover IMG {
 }
 
 A:link, A:visited {
-  font-weight: normal;
+  font-weight: inherit;
   text-decoration: none;
 }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -8,37 +8,37 @@
 <body>
 <h1 class="title">cupstestdsc(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-cupstestdsc - test conformance of postscript files
+cupstestdsc - test conformance of postscript files (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupstestdsc
-</b>[ -h ] filename.ps [ ...
-<i>filenameN.ps
-</i>]
+<b>cupstestdsc</b>
+[
+<b>-h</b>
+]
+<i>filename.ps</i>
+[ ...
+<i>filenameN.ps</i>
+]
 <br>
-<b>cupstestdsc
-</b>[ -h ] -
+<b>cupstestdsc</b>
+[
+<b>-h</b>
+]
+<b>-</b>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>cupstestdsc</i> tests the conformance of PostScript files to
-the Adobe PostScript Language Document Structuring Conventions
-Specification version 3.0. The results of testing and any other
-output are sent to the standard output. The second form of the
-command reads PostScript from the standard input.
-<h2 class="title"><a name="LIMITATIONS">Limitations</a></h2>
-<i>cupstestdsc</i> only validates the DSC comments in a PostScript
-file and does not attempt to validate the PostScript code itself.
-Developers must ensure that the PostScript they generate follows
-the rules defined by Adobe. Specifically, all pages must be
-independent of each other, code outside page descriptions may not
-affect the graphics state (current font, color, transform matrix,
-etc.), and device-specific commands such as setpagedevice should
-not be used.
+<b>cupstestdsc</b> tests the conformance of PostScript files to the Adobe PostScript Language Document Structuring Conventions Specification version 3.0.
+The results of testing and any other output are sent to the standard output.
+The second form of the command reads PostScript from the standard input.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+<i>This program is deprecated and will be removed in a future release of CUPS.</i>
+<p><b>cupstestdsc</b> only validates the DSC comments in a PostScript file and does not attempt to validate the PostScript code itself.
+Developers must ensure that the PostScript they generate follows the rules defined by Adobe.
+Specifically, all pages must be independent of each other, code outside page descriptions may not affect the graphics state (current font, color, transform matrix, etc.), and device-specific commands such as setpagedevice should not be used.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
-<br>
+CUPS Online Help (<a href="http://localhost:631/help)">http://localhost:631/help)</a>,
 Adobe PostScript Language Document Structuring Conventions
 Specification, Version 3.0.
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>

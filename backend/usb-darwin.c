@@ -1,46 +1,46 @@
 /*
-* "$Id: usb-darwin.c 11670 2014-03-04 14:53:59Z msweet $"
-*
-* Copyright 2005-2014 Apple Inc. All rights reserved.
-*
-* IMPORTANT:  This Apple software is supplied to you by Apple Computer,
-* Inc. ("Apple") in consideration of your agreement to the following
-* terms, and your use, installation, modification or redistribution of
-* this Apple software constitutes acceptance of these terms.  If you do
-* not agree with these terms, please do not use, install, modify or
-* redistribute this Apple software.
-*
-* In consideration of your agreement to abide by the following terms, and
-* subject to these terms, Apple grants you a personal, non-exclusive
-* license, under Apple's copyrights in this original Apple software (the
-* "Apple Software"), to use, reproduce, modify and redistribute the Apple
-* Software, with or without modifications, in source and/or binary forms;
-* provided that if you redistribute the Apple Software in its entirety and
-* without modifications, you must retain this notice and the following
-* text and disclaimers in all such redistributions of the Apple Software.
-* Neither the name, trademarks, service marks or logos of Apple Computer,
-* Inc. may be used to endorse or promote products derived from the Apple
-* Software without specific prior written permission from Apple.  Except
-* as expressly stated in this notice, no other rights or licenses, express
-* or implied, are granted by Apple herein, including but not limited to
-* any patent rights that may be infringed by your derivative works or by
-* other works in which the Apple Software may be incorporated.
-*
-* The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
-* MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
-* THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
-* OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
-*
-* IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
-* OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-* INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
-* MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
-* AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
-* STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
-* POSSIBILITY OF SUCH DAMAGE.
-*/
+ * "$Id: usb-darwin.c 11669 2014-03-04 14:53:34Z msweet $"
+ *
+ * Copyright 2005-2014 Apple Inc. All rights reserved.
+ *
+ * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
+ * Inc. ("Apple") in consideration of your agreement to the following
+ * terms, and your use, installation, modification or redistribution of
+ * this Apple software constitutes acceptance of these terms.  If you do
+ * not agree with these terms, please do not use, install, modify or
+ * redistribute this Apple software.
+ *
+ * In consideration of your agreement to abide by the following terms, and
+ * subject to these terms, Apple grants you a personal, non-exclusive
+ * license, under Apple's copyrights in this original Apple software (the
+ * "Apple Software"), to use, reproduce, modify and redistribute the Apple
+ * Software, with or without modifications, in source and/or binary forms;
+ * provided that if you redistribute the Apple Software in its entirety and
+ * without modifications, you must retain this notice and the following
+ * text and disclaimers in all such redistributions of the Apple Software.
+ * Neither the name, trademarks, service marks or logos of Apple Computer,
+ * Inc. may be used to endorse or promote products derived from the Apple
+ * Software without specific prior written permission from Apple.  Except
+ * as expressly stated in this notice, no other rights or licenses, express
+ * or implied, are granted by Apple herein, including but not limited to
+ * any patent rights that may be infringed by your derivative works or by
+ * other works in which the Apple Software may be incorporated.
+ *
+ * The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
+ * MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
+ * THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
+ * OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
+ *
+ * IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
+ * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
+ * MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
+ * AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
+ * STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 /*
  * Include necessary headers.
@@ -286,10 +286,10 @@ static void log_usb_class_driver(int is_64bit);
 
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
-static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
+static void run_legacy_backend(int argc, char *argv[], int fd) __attribute__((noreturn));	/* Starts child backend process running as a ppc executable */
 #endif /* __i386__ || __x86_64__ */
 static void sigterm_handler(int sig);	/* SIGTERM handler */
-static void sigquit_handler(int sig, siginfo_t *si, void *unused);
+static void sigquit_handler(int sig, siginfo_t *si, void *unused) __attribute__((noreturn));
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -688,7 +688,7 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (g.print_bytes)
       {
-	bytes    = g.print_bytes;
+	bytes    = (UInt32)g.print_bytes;
 	iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 
        /*
@@ -710,7 +710,7 @@ print_device(const char *uri,		/* I - Device URI */
 	{
 	  fputs("DEBUG: Got USB pipe stalled during write\n", stderr);
 
-	  bytes    = g.print_bytes;
+	  bytes    = (UInt32)g.print_bytes;
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 	}
 
@@ -730,7 +730,7 @@ print_device(const char *uri,		/* I - Device URI */
           sleep(5);
 #endif /* DEBUG_WRITES */
 
-	  bytes    = g.print_bytes;
+	  bytes    = (UInt32)g.print_bytes;
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
         }
 
@@ -769,6 +769,7 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
   fprintf(stderr, "DEBUG: Sent %lld bytes...\n", (off_t)total_bytes);
+  fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
  /*
   * Signal the side channel thread to exit...
@@ -1017,7 +1018,7 @@ sidechannel_thread(void *reference)
 	  fputs("DEBUG: CUPS_SC_CMD_GET_BIDI received from driver...\n",
 		stderr);
 
-	  data[0] = g.bidi_flag;
+	  data[0] = (char)g.bidi_flag;
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
 
 	  fprintf(stderr,
@@ -1033,7 +1034,7 @@ sidechannel_thread(void *reference)
 	  get_device_id(&status, data, &datalen);
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, datalen, 1.0);
 
-          if (datalen < sizeof(data))
+          if ((size_t)datalen < sizeof(data))
 	    data[datalen] = '\0';
 	  else
 	    data[sizeof(data) - 1] = '\0';
@@ -1236,7 +1237,7 @@ static Boolean find_device_cb(void *refcon,
   if (obj != 0x0)
   {
     CFStringRef idString = NULL;
-    UInt32 location = -1;
+    UInt32 location = ~0U;
     UInt8	interfaceNum = 0;
 
     copy_devicestring(obj, &idString, &location, &interfaceNum);
@@ -1876,7 +1877,7 @@ static void parse_options(char *options,
     else if (!_cups_strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
     else if (!_cups_strcasecmp(name, "location") && location)
-      *location = strtol(value, NULL, 16);
+      *location = (UInt32)strtoul(value, NULL, 16);
   }
 }
 
@@ -1938,6 +1939,7 @@ static void run_legacy_backend(int argc,
   pid_t	waitpid_status;
   char	*my_argv[32];
   char	*usb_legacy_status;
+
 
  /*
   * If we're running as x86_64 or i386 and couldn't load the class driver
@@ -2024,7 +2026,7 @@ static void run_legacy_backend(int argc,
       cups_serverbin = CUPS_SERVERBIN;
     snprintf(usbpath, sizeof(usbpath), "%s/backend/usb", cups_serverbin);
 
-    for (i = 0; i < argc && i < (sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
+    for (i = 0; i < argc && i < (int)(sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
       my_argv[i] = argv[i];
 
     my_argv[i] = NULL;
@@ -2312,7 +2314,7 @@ static void get_device_id(cups_sc_status_t *status,
   if (deviceIDString)
   {
     CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
-    *datalen = strlen(data);
+    *datalen = (int)strlen(data);
     CFRelease(deviceIDString);
   }
   *status  = CUPS_SC_STATUS_OK;
@@ -2346,5 +2348,5 @@ log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
 
 
 /*
- * End of "$Id: usb-darwin.c 11670 2014-03-04 14:53:59Z msweet $".
+ * End of "$Id: usb-darwin.c 11669 2014-03-04 14:53:34Z msweet $".
  */

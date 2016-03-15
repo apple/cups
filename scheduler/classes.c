@@ -1,27 +1,16 @@
 /*
- * "$Id: classes.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: classes.c 11781 2014-03-28 20:57:22Z msweet $"
  *
- *   Printer class routines for the CUPS scheduler.
+ * Printer class routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddClass()                 - Add a class to the system.
- *   cupsdAddPrinterToClass()        - Add a printer to a class...
- *   cupsdDeletePrinterFromClass()   - Delete a printer from a class.
- *   cupsdDeletePrinterFromClasses() - Delete a printer from all classes.
- *   cupsdFindAvailablePrinter()     - Find an available printer in a class.
- *   cupsdFindClass()                - Find the named class.
- *   cupsdLoadAllClasses()           - Load classes from the classes.conf file.
- *   cupsdSaveAllClasses()           - Save classes to the classes.conf file.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -93,7 +82,7 @@ cupsdAddPrinterToClass(
   if (c->num_printers == 0)
     temp = malloc(sizeof(cupsd_printer_t *));
   else
-    temp = realloc(c->printers, sizeof(cupsd_printer_t *) * (c->num_printers + 1));
+    temp = realloc(c->printers, sizeof(cupsd_printer_t *) * (size_t)(c->num_printers + 1));
 
   if (temp == NULL)
   {
@@ -147,7 +136,7 @@ cupsdDeletePrinterFromClass(
     c->num_printers --;
     if (i < c->num_printers)
       memmove(c->printers + i, c->printers + i + 1,
-              (c->num_printers - i) * sizeof(cupsd_printer_t *));
+              (size_t)(c->num_printers - i) * sizeof(cupsd_printer_t *));
   }
   else
     return (0);
@@ -343,7 +332,7 @@ cupsdLoadAllClasses(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!_cups_strcasecmp(line, "</Class>"))
+    else if (!_cups_strcasecmp(line, "</Class>") || !_cups_strcasecmp(line, "</DefaultClass>"))
     {
       if (p != NULL)
       {
@@ -806,7 +795,10 @@ cupsdSaveAllClasses(void)
       cupsFilePutConf(fp, "Option", value);
     }
 
-    cupsFilePuts(fp, "</Class>\n");
+    if (pclass == DefaultPrinter)
+      cupsFilePuts(fp, "</DefaultClass>\n");
+    else
+      cupsFilePuts(fp, "</Class>\n");
   }
 
   cupsdCloseCreatedConfFile(fp, filename);
@@ -814,5 +806,5 @@ cupsdSaveAllClasses(void)
 
 
 /*
- * End of "$Id: classes.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: classes.c 11781 2014-03-28 20:57:22Z msweet $".
  */

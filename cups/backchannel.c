@@ -1,24 +1,18 @@
 /*
- * "$Id: backchannel.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: backchannel.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Backchannel functions for CUPS.
+ * Backchannel functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsBackChannelRead()  - Read data from the backchannel.
- *   cupsBackChannelWrite() - Write data to the backchannel.
- *   cups_setup()           - Setup select()
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -169,7 +163,7 @@ cupsBackChannelWrite(
       */
 
       buffer += count;
-      total  += count;
+      total  += (size_t)count;
     }
   }
 
@@ -195,5 +189,5 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
 
 
 /*
- * End of "$Id: backchannel.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: backchannel.c 11558 2014-02-06 18:33:34Z msweet $".
  */

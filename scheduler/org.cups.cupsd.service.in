@@ -1,0 +1,10 @@
+[Unit]
+Description=CUPS Scheduler
+
+[Service]
+ExecStart=@sbindir@/cupsd -l
+Type=simple
+
+[Install]
+Also=org.cups.cupsd.socket org.cups.cupsd.path
+WantedBy=printer.target

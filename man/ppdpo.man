@@ -1,52 +1,58 @@
 .\"
-.\" "$Id: ppdpo.man 11022 2013-06-06 22:14:09Z msweet $"
+.\" "$Id: ppdpo.man 11927 2014-06-13 00:01:23Z msweet $"
 .\"
-.\"   ppdpo man page for CUPS.
+.\" ppdpo man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2007 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2007 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdpo 1 "CUPS" "23 April 2012" "Apple Inc."
+.TH ppdpo 1 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
-ppdpo \- ppd message catalog generator
+ppdpo \- ppd message catalog generator (deprecated)
 .SH SYNOPSIS
 .B ppdpo
-[ -D
-.I name[=value]
-] [ -I
+[
+\fB\-D \fIname\fR[\fB=\fIvalue\fR]
+] [
+.B \-I
 .I include-directory
-] [ -o
+] [
+.B \-o
 .I output-file
 ]
 .I source-file
 .SH DESCRIPTION
-\fIppdpo\fR extracts UI strings from PPDC source files and updates either
-a GNU gettext or OS X strings format message catalog source file for
-translation.
-.PP
-The \fI-D\fR option sets the named variable for use in the
-source file. It is equivalent to using the #define directive
-in the source file.
-.PP
-The \fI-I\fR option specifies an alternate include directory;
-multiple \fI-I\fR options can be supplied to add additional
-directories.
-.PP
-The \fI-o\fR option specifies the output file. The supported extensions are
-".po" or ".po.gz" for GNU gettext format message catalogs and ".strings" for
-OS X strings files.
+\fBppdpo\fR extracts UI strings from PPDC source files and updates either a GNU gettext or OS X strings format message catalog source file for translation.
+\fBThis program is deprecated and will be removed in a future release of CUPS.\fR
+.SH OPTIONS
+\fBppdpo\fR supports the following options:
+.TP 5
+\fB\-D \fIname\fR[\fB=\fIvalue\fR]
+Sets the named variable for use in the source file.
+It is equivalent to using the \fI#define\fR directive in the source file.
+.TP 5
+\fB\-I \fIinclude-directory\fR
+Specifies an alternate include directory.
+Multiple \fI-I\fR options can be supplied to add additional directories.
+.TP 5
+\fB\-o \fIoutput-file\fR
+Specifies the output file.
+The supported extensions are \fI.po\fR or \fI.po.gz\fR for GNU gettext format message catalogs and \fI.strings\fR for OS X strings files.
 .SH SEE ALSO
-ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5)
-.br
-http://localhost:631/help
+.BR ppdc (1),
+.BR ppdhtml (1),
+.BR ppdi (1),
+.BR ppdmerge (1),
+.BR ppdcfile(5),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: ppdpo.man 11022 2013-06-06 22:14:09Z msweet $".
+.\" End of "$Id: ppdpo.man 11927 2014-06-13 00:01:23Z msweet $".
 .\"

@@ -1,21 +1,16 @@
 //
-// "$Id: ppdc.cxx 3794 2012-04-23 22:44:16Z msweet $"
+// "$Id: ppdc.cxx 11800 2014-04-08 19:53:57Z msweet $"
 //
-//   PPD file compiler main entry for the CUPS PPD Compiler.
+// PPD file compiler main entry for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2012 by Apple Inc.
-//   Copyright 2002-2007 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 2002-2007 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   main()  - Main entry for the PPD compiler.
-//   usage() - Show usage and exit.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -192,7 +187,7 @@ main(int  argc,				// I - Number of command-line arguments
 
         	catalog = new ppdcCatalog(argv[i]);
 
-		if (catalog->messages->count == 0)
+		if (catalog->messages->count == 0 && strcmp(argv[i], "en"))
 		{
         	  _cupsLangPrintf(stderr,
 				  _("ppdc: Unable to find localization for "
@@ -344,7 +339,7 @@ main(int  argc,				// I - Number of command-line arguments
 	  for (j = 0;
 	       outname[j] && j < (int)(sizeof(pcfilename) - 1);
 	       j ++)
-	    pcfilename[j] = tolower(outname[j] & 255);
+	    pcfilename[j] = (char)tolower(outname[j] & 255);
 
 	  pcfilename[j] = '\0';
 	}
@@ -464,5 +459,5 @@ usage(void)
 
 
 //
-// End of "$Id: ppdc.cxx 3794 2012-04-23 22:44:16Z msweet $".
+// End of "$Id: ppdc.cxx 11800 2014-04-08 19:53:57Z msweet $".
 //

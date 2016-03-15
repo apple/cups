@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 11154 2013-07-17 15:21:18Z msweet $"
+# "$Id: Makefile 11859 2014-05-08 22:42:44Z msweet $"
 #
 #   Backend makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
+#   Copyright 2007-2014 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -23,8 +23,8 @@ include ../Makedefs
 
 # RBACKENDS are installed mode 0700 so cupsd will run them as root...
 #
-# UBACKENDS are installed mode 0755 so cupsd will run them as an unprivileged
-# user...
+# UBACKENDS and ULBACKENDS are installed mode 0755 so cupsd will run them as
+# an unprivileged user...
 #
 # See http://www.cups.org/documentation.php/api-filter.html for more info...
 RBACKENDS =	\
@@ -33,7 +33,8 @@ RBACKENDS =	\
 		$(DNSSD_BACKEND)
 UBACKENDS =	\
 		snmp \
-		socket \
+		socket
+ULBACKENDS =	\
 		usb
 UNITTESTS =	\
 		test1284 \
@@ -42,7 +43,8 @@ UNITTESTS =	\
 TARGETS =	\
 		libbackend.a \
 		$(RBACKENDS) \
-		$(UBACKENDS)
+		$(UBACKENDS) \
+		$(ULBACKENDS)
 LIBOBJS	=	\
 		ieee1284.o \
 		network.o \
@@ -71,7 +73,7 @@ all:	$(TARGETS)
 # Make library targets...
 #
 
-libs:
+libs:	$(ULBACKENDS)
 
 
 #
@@ -167,6 +169,18 @@ install-headers:
 #
 
 install-libs:
+	echo Installing backends in $(SERVERBIN)/backend
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/backend
+	for file in $(ULBACKENDS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/backend; \
+	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(ULBACKENDS); do \
+			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
+		done \
+	fi
 
 
 #
@@ -179,7 +193,7 @@ uninstall:
 		$(RM) $(SERVERBIN)/apple/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/apple
-	for file in $(RBACKENDS) $(UBACKENDS); do \
+	for file in $(RBACKENDS) $(UBACKENDS) $(ULBACKENDS); do \
 		$(RM) $(SERVERBIN)/backend/$$file; \
 	done
 	for file in $(IPPALIASES); do \
@@ -301,5 +315,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 11154 2013-07-17 15:21:18Z msweet $".
+# End of "$Id: Makefile 11859 2014-05-08 22:42:44Z msweet $".
 #

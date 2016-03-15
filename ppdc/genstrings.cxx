@@ -1,30 +1,23 @@
 //
-// "$Id: genstrings.cxx 3275 2011-05-20 07:26:13Z msweet $"
+// "$Id: genstrings.cxx 11800 2014-04-08 19:53:57Z msweet $"
 //
-//   GNU gettext message generator for the CUPS PPD Compiler.
+// GNU gettext message generator for the CUPS PPD Compiler.
 //
-//   This program is used to generate a dummy source file containing all of
-//   the standard media and sample driver strings.  The results are picked up
-//   by GNU gettext and placed in the CUPS message catalog.
+// This program is used to generate a dummy source file containing all of
+// the standard media and sample driver strings.  The results are picked up
+// by GNU gettext and placed in the CUPS message catalog.
 //
-//   Copyright 2008-2011 by Apple Inc.
+// Copyright 2008-2014 by Apple Inc.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 // Usage:
 //
 //   ./genstrings >sample.c
-//
-// Contents:
-//
-//   main()           - Main entry for the PPD compiler.
-//   add_ui_strings() - Add all UI strings from the driver.
-//   write_cstring()  - Write a translation string as a valid C string to
-//                      stdout.
 //
 
 //
@@ -211,5 +204,5 @@ write_cstring(const char *s)		/* I - String to write */
 
 
 //
-// End of "$Id: genstrings.cxx 3275 2011-05-20 07:26:13Z msweet $".
+// End of "$Id: genstrings.cxx 11800 2014-04-08 19:53:57Z msweet $".
 //

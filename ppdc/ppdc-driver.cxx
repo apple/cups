@@ -1,34 +1,16 @@
 //
-// "$Id: ppdc-driver.cxx 3940 2012-10-15 21:02:10Z msweet $"
+// "$Id: ppdc-driver.cxx 11558 2014-02-06 18:33:34Z msweet $"
 //
-//   PPD file compiler definitions for the CUPS PPD Compiler.
+// PPD file compiler definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2011 by Apple Inc.
-//   Copyright 2002-2006 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 2002-2006 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcDriver::ppdcDriver()           - Create a new printer driver.
-//   ppdcDriver::~ppdcDriver()          - Destroy a printer driver.
-//   ppdcDriver::find_attr()            - Find an attribute.
-//   ppdcDriver::find_group()           - Find a group.
-//   ppdcDriver::find_option()          - Find an option.
-//   ppdcDriver::find_option_group()    - Find an option and its group.
-//   ppdcDriver::set_custom_size_code() - Set the custom page size code.
-//   ppdcDriver::set_default_font()     - Set the default font name.
-//   ppdcDriver::set_default_size()     - Set the default size name.
-//   ppdcDriver::set_file_name()        - Set the full filename.
-//   ppdcDriver::set_manufacturer()     - Set the manufacturer name.
-//   ppdcDriver::set_model_name()       - Set the model name.
-//   ppdcDriver::set_pc_file_name()     - Set the PC filename.
-//   ppdcDriver::set_version()          - Set the version string.
-//   ppdcDriver::write_ppd_file()       - Write a PPD file...
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -1333,7 +1315,7 @@ ppdcDriver::write_ppd_file(
 		     fn->status == PPDC_FONT_ROM ? "ROM" : "Disk", lf);
 
   cupsFilePrintf(fp, "*%% End of %s, %05d bytes.%s", pc_file_name->value,
-        	 (int)(cupsFileTell(fp) + 25 + strlen(pc_file_name->value)),
+        	 (int)((size_t)cupsFileTell(fp) + 25 + strlen(pc_file_name->value)),
 		 lf);
 
   if (delete_cat)
@@ -1344,5 +1326,5 @@ ppdcDriver::write_ppd_file(
 
 
 //
-// End of "$Id: ppdc-driver.cxx 3940 2012-10-15 21:02:10Z msweet $".
+// End of "$Id: ppdc-driver.cxx 11558 2014-02-06 18:33:34Z msweet $".
 //

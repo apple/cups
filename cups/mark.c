@@ -1,39 +1,20 @@
 /*
- * "$Id: mark.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: mark.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Option marking routines for CUPS.
+ * Option marking routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsMarkOptions()     - Mark command-line options in a PPD file.
- *   ppdFindChoice()       - Return a pointer to an option choice.
- *   ppdFindMarkedChoice() - Return the marked choice for the specified option.
- *   ppdFindOption()       - Return a pointer to the specified option.
- *   ppdIsMarked()         - Check to see if an option is marked.
- *   ppdMarkDefaults()     - Mark all default options in the PPD file.
- *   ppdMarkOption()       - Mark an option in a PPD file and return the number
- *                           of conflicts.
- *   ppdFirstOption()      - Return the first option in the PPD file.
- *   ppdNextOption()       - Return the next option in the PPD file.
- *   _ppdParseOptions()    - Parse options from a PPD file.
- *   ppd_debug_marked()    - Output the marked array to stdout...
- *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
- *   ppd_mark_choices()    - Mark one or more option choices from a string.
- *   ppd_mark_option()     - Quickly mark an option without checking for
- *                           conflicts.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -143,7 +124,7 @@ cupsMarkOptions(
       * Extract the sub-option from the string...
       */
 
-      for (ptr = s; *val && *val != ',' && (ptr - s) < (sizeof(s) - 1);)
+      for (ptr = s; *val && *val != ',' && (size_t)(ptr - s) < (sizeof(s) - 1);)
 	*ptr++ = *val++;
       *ptr++ = '\0';
 
@@ -195,7 +176,7 @@ cupsMarkOptions(
 
       if (print_quality)
       {
-	pwg_pq = atoi(print_quality) - IPP_QUALITY_DRAFT;
+	pwg_pq = (_pwg_print_quality_t)(atoi(print_quality) - IPP_QUALITY_DRAFT);
 	if (pwg_pq < _PWG_PRINT_QUALITY_DRAFT)
 	  pwg_pq = _PWG_PRINT_QUALITY_DRAFT;
 	else if (pwg_pq > _PWG_PRINT_QUALITY_HIGH)
@@ -316,7 +297,7 @@ cupsMarkOptions(
         if (!isdigit(*ptr & 255))
 	  break;
 
-        if ((j = strtol(ptr, &ptr, 10)) < 3)
+        if ((j = (int)strtol(ptr, &ptr, 10)) < 3)
 	  break;
 
        /*
@@ -1097,5 +1078,5 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: mark.c 11558 2014-02-06 18:33:34Z msweet $".
  */

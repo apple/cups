@@ -1,21 +1,16 @@
 /*
- * "$Id: jobs.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: jobs.c 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   Job status CGI for CUPS.
+ * Job status CGI for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()      - Main entry for CGI.
- *   do_job_op() - Do a job operation.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -37,8 +32,7 @@ static void	do_job_op(http_t *http, int job_id, ipp_op_t op);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
-     char *argv[])			/* I - Command-line arguments */
+main(void)
 {
   http_t	*http;			/* Connection to the server */
   const char	*op;			/* Operation name */
@@ -210,5 +204,5 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
 
 /*
- * End of "$Id: jobs.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: jobs.c 11558 2014-02-06 18:33:34Z msweet $".
  */

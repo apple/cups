@@ -1,34 +1,18 @@
 /*
- * "$Id: request.c 11867 2014-05-09 20:33:08Z msweet $"
+ * "$Id: request.c 11866 2014-05-09 20:20:16Z msweet $"
  *
- *   IPP utilities for CUPS.
+ * IPP utilities for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsDoFileRequest()    - Do an IPP request with a file.
- *   cupsDoIORequest()      - Do an IPP request with file descriptors.
- *   cupsDoRequest()        - Do an IPP request.
- *   cupsGetResponse()      - Get a response to an IPP request.
- *   cupsLastError()        - Return the last IPP status code.
- *   cupsLastErrorString()  - Return the last IPP status-message.
- *   _cupsNextDelay()       - Return the next retry delay value.
- *   cupsReadResponseData() - Read additional data after the IPP response.
- *   cupsSendRequest()      - Send an IPP request.
- *   cupsWriteRequestData() - Write additional data after an IPP request.
- *   _cupsConnect()         - Get the default server connection...
- *   _cupsSetError()        - Set the last IPP status code and status-message.
- *   _cupsSetHTTPError()    - Set the last error using the HTTP status.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -129,7 +113,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   size_t	length = 0;		/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
   struct stat	fileinfo;		/* File information */
-  int		bytes;			/* Number of bytes read/written */
+  ssize_t	bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
 
 
@@ -205,7 +189,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       length = 0;			/* Chunk when piping */
     else
 #endif /* !WIN32 */
-    length = ippLength(request) + fileinfo.st_size;
+    length = ippLength(request) + (size_t)fileinfo.st_size;
   }
   else
     length = ippLength(request);
@@ -249,9 +233,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 #endif /* WIN32 */
       lseek(infile, 0, SEEK_SET);
 
-      while ((bytes = (int)read(infile, buffer, sizeof(buffer))) > 0)
+      while ((bytes = read(infile, buffer, sizeof(buffer))) > 0)
       {
-        if ((status = cupsWriteRequestData(http, buffer, bytes))
+        if ((status = cupsWriteRequestData(http, buffer, (size_t)bytes))
                 != HTTP_STATUS_CONTINUE)
 	  break;
       }
@@ -283,8 +267,8 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * Write trailing data to file...
       */
 
-      while ((bytes = (int)httpRead2(http, buffer, sizeof(buffer))) > 0)
-	if (write(outfile, buffer, bytes) < bytes)
+      while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
+	if (write(outfile, buffer, (size_t)bytes) < bytes)
 	  break;
     }
 
@@ -971,7 +955,7 @@ cupsWriteRequestData(
 
   if (length >= HTTP_MAX_BUFFER ||
       http->wused < wused ||
-      (wused > 0 && http->wused == length))
+      (wused > 0 && (size_t)http->wused == length))
   {
    /*
     * We've written something to the server, so check for response data...
@@ -1205,5 +1189,5 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * End of "$Id: request.c 11867 2014-05-09 20:33:08Z msweet $".
+ * End of "$Id: request.c 11866 2014-05-09 20:20:16Z msweet $".
  */

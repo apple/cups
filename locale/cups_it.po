@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-09 13:32-0700\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -985,6 +985,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Termina le righe con LF (UNIX/Linux/OS X)."
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr "  --local                 Vero se il servizio è locale."
 
@@ -1199,8 +1202,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr "  -l                      Elenca gli attributi."
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      Avvia cupsd da launchd(8)."
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr "  -l lang[,lang,...]      Specifica la lingua(e) (locale) di output."
@@ -1598,12 +1601,36 @@ msgstr ""
 "valida %d (RFC 2911 sezione 4.1.6)."
 
 #, c-format
-msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
-
-#, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f byte"
+
+#, c-format
+msgid "%d x %d mm"
+msgstr ""
+
+#, c-format
+msgid "%g x %g"
+msgstr ""
+
+#, c-format
+msgid "%s (%s)"
+msgstr ""
+
+#, c-format
+msgid "%s (%s, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s, %s)"
+msgstr ""
 
 #, c-format
 msgid "%s accepting requests since %s"
@@ -1840,6 +1867,10 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr "%s: la stringa del filtro non è valida \"%s\"."
 
 #, c-format
+msgid "%s: Missing filename for \"-P\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr "%s: manca il timeout di \"-T\"."
 
@@ -1875,6 +1906,10 @@ msgstr "%s: non è possibile contattare il server."
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
 msgstr "%s: non è possibile determinare il tipo di MIME di \"%s\"."
+
+#, c-format
+msgid "%s: Unable to open \"%s\": %s"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to open %s: %s"
@@ -2754,6 +2789,9 @@ msgstr "Il numero di versione di SNMP non è valido"
 msgid "Bad UIConstraints"
 msgstr "UIConstraints non è valido"
 
+msgid "Bad arguments to function"
+msgstr ""
+
 #, c-format
 msgid "Bad copies value %d."
 msgstr "Il valore %d delle copie non è valido."
@@ -2779,6 +2817,9 @@ msgstr "Il document-format-default \"%s\" non è valido."
 
 msgid "Bad filename buffer"
 msgstr "Il buffer del file non è valido"
+
+msgid "Bad hostname/address in URI"
+msgstr ""
 
 #, c-format
 msgid "Bad job-name value: %s"
@@ -2824,16 +2865,19 @@ msgstr "L'opzione + scelta alla riga %d non è valida."
 msgid "Bad page-ranges values %d-%d."
 msgstr "Il valore di page-ranges %d-%d non è valido."
 
+msgid "Bad port number in URI"
+msgstr ""
+
 #, c-format
 msgid "Bad port-monitor \"%s\"."
 msgstr "Il valore di port-monitor \"%s\" non è valido."
 
-msgid "Bad printer URI."
-msgstr "L'URI della stampante non è valido."
-
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr "Il valore di printer-state %d non è valido."
+
+msgid "Bad printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Bad request ID %d."
@@ -2843,11 +2887,23 @@ msgstr "L'ID della richiesta %d non è valido."
 msgid "Bad request version number %d.%d."
 msgstr "Il numero della versione richiesta %d.%d non è valido."
 
+msgid "Bad resource in URI"
+msgstr ""
+
+msgid "Bad scheme in URI"
+msgstr ""
+
 msgid "Bad subscription ID"
 msgstr "L'ID della sottoscrizione non è valido"
 
+msgid "Bad username in URI"
+msgstr ""
+
 msgid "Bad value string"
 msgstr "La stringa ha un valore che non è valido"
+
+msgid "Bad/empty URI"
+msgstr ""
 
 msgid "Banners"
 msgstr "Banner"
@@ -2867,6 +2923,9 @@ msgstr "CMYK"
 
 msgid "CPCL Label Printer"
 msgstr "CPCL Label Printer"
+
+msgid "Cancel Jobs"
+msgstr ""
 
 msgid "Cancel RSS Subscription"
 msgstr "Eliminare l'abbonamento RSS"
@@ -3037,21 +3096,15 @@ msgstr "Edita il file di configurazione"
 msgid "Empty PPD file."
 msgstr "Il file PPD è vuoto."
 
+msgid "Encryption is not supported."
+msgstr ""
+
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "Termine del banner"
 
 msgid "English"
 msgstr "Inglese"
-
-msgid "Enter old password:"
-msgstr "Digitare la vecchia password:"
-
-msgid "Enter password again:"
-msgstr "Digitare di nuovo la password:"
-
-msgid "Enter password:"
-msgstr "Digitare la password:"
 
 msgid ""
 "Enter your username and password or the root username and password to access "
@@ -3624,6 +3677,9 @@ msgstr "Linea più lunga di quella massima consentita (255 caratteri)"
 msgid "List Available Printers"
 msgstr "Elenco delle stampanti disponibili"
 
+msgid "Load paper."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Long-Edge (Portrait)"
 
@@ -3690,6 +3746,12 @@ msgstr "Manca l'attributo di requesting-user-name."
 
 msgid "Missing required attributes."
 msgstr "Mancano gli attributi richiesti."
+
+msgid "Missing resource in URI"
+msgstr ""
+
+msgid "Missing scheme in URI"
+msgstr ""
 
 #, c-format
 msgid "Missing value on line %d."
@@ -3827,6 +3889,12 @@ msgstr "Non è stato trovato printer-uri per la classe"
 msgid "No printer-uri in request."
 msgstr "Nessun printer-uri nella richiesta."
 
+msgid "No request URI."
+msgstr ""
+
+msgid "No request protocol version."
+msgstr ""
+
 msgid "No request sent."
 msgstr ""
 
@@ -3926,23 +3994,14 @@ msgstr "Memoria insufficiente."
 msgid "Output Mode"
 msgstr "Modalità di output"
 
-#, c-format
-msgid "Output for printer %s is sent to %s"
-msgstr "L'output della stampante %s è stato inviato a %s"
-
-#, c-format
-msgid "Output for printer %s is sent to remote printer %s on %s"
+msgid "Output bin is almost full."
 msgstr ""
-"L'output della stampante %s è stato inviato alla stampante remota %s su %s"
 
-#, c-format
-msgid "Output for printer %s/%s is sent to %s"
-msgstr "L'output della stampante %s/%s è stato inviato a %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgid "Output bin is full."
 msgstr ""
-"L'output della stampante %s/%s è stato inviato alla stampante remota %s su %s"
+
+msgid "Output bin is missing."
+msgstr ""
 
 msgid "PASS"
 msgstr "OPERAZIONE RIUSCITA CON SUCCESSO"
@@ -3973,6 +4032,18 @@ msgstr "Il pacchetto non contiene un Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Il pacchetto non inizia con SEQUENZA"
+
+msgid "Paper jam."
+msgstr ""
+
+msgid "Paper tray is almost empty."
+msgstr ""
+
+msgid "Paper tray is empty."
+msgstr ""
+
+msgid "Paper tray is missing."
+msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4100,11 +4171,8 @@ msgid "Printers"
 msgstr "Stampanti"
 
 #, c-format
-msgid "Printing page %d, %d%% complete."
-msgstr "Stampa della pagina %d, %d%% completato."
-
-msgid "Purge Jobs"
-msgstr "Elimina le stampe"
+msgid "Printing page %d, %u%% complete."
+msgstr ""
 
 msgid "Quarto"
 msgstr "Quarto"
@@ -4114,12 +4182,6 @@ msgstr "Il limite della quota è stato raggiunto."
 
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr "Rank    Owner   Job     File(s)                         Total Size"
-
-#. TRANSLATORS: Pri is job priority.
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size"
-msgstr ""
-"Rank   Owner      Pri  Job        Files                       Total Size"
 
 msgid "Reject Jobs"
 msgstr "Stampe rifiutate"
@@ -4180,6 +4242,9 @@ msgstr "Il server è stato avviato"
 
 msgid "Server Stopped"
 msgstr "Il server è stato fermato"
+
+msgid "Server credentials not set."
+msgstr ""
 
 msgid "Service Unavailable"
 msgstr "Servizio non disponibile"
@@ -4338,27 +4403,6 @@ msgstr "Il fotoconduttore ottico deve essere sostituito."
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr "Il fotoconduttore ottico dovrà essere sostituito a breve."
 
-msgid "The output bin is almost full."
-msgstr "Il raccoglitore di uscita è quasi pieno."
-
-msgid "The output bin is full."
-msgstr "Il raccoglitore di uscita è pieno."
-
-msgid "The output bin is missing."
-msgstr "Manca il raccoglitore di uscita."
-
-msgid "The paper tray is almost empty."
-msgstr "Il vassoio della carta è quasi vuoto."
-
-msgid "The paper tray is empty."
-msgstr "Il vassoio della carta è vuoto."
-
-msgid "The paper tray is missing."
-msgstr "Manca il vassoio della carta."
-
-msgid "The paper tray needs to be filled."
-msgstr "Il vassoio della carta deve essere riempito."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 "La configurazione della stampante è errata oppure la stampante non esiste "
@@ -4369,6 +4413,12 @@ msgstr "La stampante non ha risposto."
 
 msgid "The printer is in use."
 msgstr "La stampante è in uso."
+
+msgid "The printer is low on ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
 
 msgid "The printer is not connected."
 msgstr "La stampante non è connessa."
@@ -4384,12 +4434,6 @@ msgstr "Adesso la stampante è online."
 
 msgid "The printer is offline."
 msgstr "La stampante è offline."
-
-msgid "The printer is running low on ink."
-msgstr "L'inchiostro della stampante sta per esaurirsi."
-
-msgid "The printer is running low on toner."
-msgstr "Il toner della stampante sta per esaurirsi."
 
 msgid "The printer is unreachable at this time."
 msgstr "In questo momento la stampante non è raggiungibile."
@@ -4473,9 +4517,6 @@ msgstr "Il valore which-jobs \"%s\" non è supportato."
 msgid "There are too many subscriptions."
 msgstr "Ci sono troppe sottoscrizioni."
 
-msgid "There is a paper jam."
-msgstr "Vi è un inceppamento della carta."
-
 msgid "There was an unrecoverable USB error."
 msgstr "Si è verificato un errore irreversibile sulla porta USB."
 
@@ -4513,6 +4554,9 @@ msgstr "Vassoio 4"
 
 msgid "URI Too Long"
 msgstr "L'URI è troppo lungo"
+
+msgid "URI too large"
+msgstr ""
 
 msgid "US Ledger"
 msgstr "US Ledger"
@@ -4639,6 +4683,9 @@ msgstr "Non è possibile copiare lo script dell'interfaccia - %s"
 msgid "Unable to create printer-uri"
 msgstr "Non è possibile creare il printer-uri"
 
+msgid "Unable to create server credentials."
+msgstr ""
+
 msgid "Unable to create temporary file"
 msgstr "Non è possibile creare un file temporaneo"
 
@@ -4703,6 +4750,9 @@ msgstr "Non è possibile trovare la destinazione del processo"
 
 msgid "Unable to find printer."
 msgstr "Non è possibile trovare la stampante."
+
+msgid "Unable to find server credentials."
+msgstr ""
 
 msgid "Unable to get backend exit status."
 msgstr "Non è possibile ottenere lo stato del backend."
@@ -4788,8 +4838,8 @@ msgstr "Non è possibile stampare la pagina di prova"
 msgid "Unable to read print data."
 msgstr "Non è possibile leggere i dati della stampa."
 
-msgid "Unable to resolve printer URI."
-msgstr "Non è possibile risolvere l'URI della stampante."
+msgid "Unable to resolve printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Unable to run \"%s\": %s"
@@ -4877,6 +4927,15 @@ msgstr "printer-error-policy sconosciuta \"%s\"."
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr "printer-op-policy sconosciuta \"%s\"."
+
+msgid "Unknown request method."
+msgstr ""
+
+msgid "Unknown request version."
+msgstr ""
+
+msgid "Unknown scheme in URI"
+msgstr ""
 
 msgid "Unknown service name."
 msgstr "Nome del servizio sconosciuto."
@@ -4978,8 +5037,8 @@ msgstr "Uso: cupsctl [opzioni] [param=valore ... paramN=valoreN]"
 msgid "Usage: cupsd [options]"
 msgstr "Uso: cupsd [opzioni]"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "Uso: cupsfilter [ opzioni ] file"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Uso: cupstestdsc [opzioni] file.ps [... file.ps]"
@@ -5026,18 +5085,6 @@ msgstr ""
 "     lpoptions [-h server] [-E] [-p stampante] -l\n"
 "     lpoptions [-h server] [-E] -p stampante -o opzione[=valore] ...\n"
 "     lpoptions [-h server] [-E] -x stampante"
-
-msgid "Usage: lppasswd [-g groupname]"
-msgstr "Uso: lppasswd [-g groupname]"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-"Uso: lppasswd [-g groupname] [username]\n"
-"     lppasswd [-g groupname] -a [username]\n"
-"     lppasswd [-g groupname] -x [username]"
 
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
@@ -5099,13 +5146,6 @@ msgstr ""
 "Bisogna accedere a questa pagina, usando l'URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
 
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
-"La password deve contenere almeno 6 caratteri, non può contenere l'username "
-"e deve contenere almeno una lettera ed un numero."
-
 msgid "ZPL Label Printer"
 msgstr "ZPL Label Printer"
 
@@ -5152,6 +5192,9 @@ msgstr "cupsd: dopo l'opzione \"-c\" è previsto il file di configurazione."
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr "cupsd: dopo l'opzione \"-s\" è previsto il file cups-files.conf."
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr "cupsd: non è consentito il file relativo cups-files.conf."
 
@@ -5168,10 +5211,6 @@ msgstr "cupsd: argomento sconosciuto \"%s\" - operazione interrotta."
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: opzione sconosciuta \"%c\" - operazione interrotta."
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: launchd(8) non supporta i compilati, quando è in modalità normale."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -5293,8 +5332,8 @@ msgstr "ippfind: non è possibile utilizzare Bonjour: %s"
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr "ippfind: variabile sconosciuta \"{%s}\"."
 
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
-msgstr "ipptool: \"-i\" e \"-n\" sono incompatibili con -X\"."
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
+msgstr ""
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
@@ -5514,51 +5553,6 @@ msgstr "lpoptions: non è possibile aprire il file PPD per %s."
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: stampante o classe sconosciuta."
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr "lppasswd: solo root può aggiungere o eliminare le password."
-
-msgid "lppasswd: Password file busy."
-msgstr "lppasswd: il file delle password è già in uso."
-
-msgid "lppasswd: Password file not updated."
-msgstr "lppasswd: il file delle password non è aggiornato."
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr "lppasswd: spiacenti, la password non è esatta."
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr "lppasswd: spiacenti, la password è stata rifiutata."
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr "lppasswd: spiacenti, le password non sono esatte."
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr "lppasswd: non è possibile copiare la stringa della password: %s"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr "lppasswd: non è possibile aprire il file delle password: %s"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr ""
-"lppasswd: non è possibile scrivere all'interno del file delle password: %s"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-"lppasswd: non è possibile eseguire il backup del vecchio file delle "
-"password: %s"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr "lppasswd: non è possibile rinominare il file delle password: %s"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr "lppasswd: l'utente \"%s\" ed il gruppo \"%s\" non esistono."
 
 #, c-format
 msgid ""
@@ -6065,3 +6059,148 @@ msgstr "senza titolo"
 
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings utilizza una lunghezza indefinita"
+
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Avvia cupsd da launchd(8)."
+
+#~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+#~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
+
+#~ msgid "Bad printer URI."
+#~ msgstr "L'URI della stampante non è valido."
+
+#~ msgid "Enter old password:"
+#~ msgstr "Digitare la vecchia password:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Digitare di nuovo la password:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Digitare la password:"
+
+#~ msgid "Output for printer %s is sent to %s"
+#~ msgstr "L'output della stampante %s è stato inviato a %s"
+
+#~ msgid "Output for printer %s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "L'output della stampante %s è stato inviato alla stampante remota %s su %s"
+
+#~ msgid "Output for printer %s/%s is sent to %s"
+#~ msgstr "L'output della stampante %s/%s è stato inviato a %s"
+
+#~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "L'output della stampante %s/%s è stato inviato alla stampante remota %s "
+#~ "su %s"
+
+#~ msgid "Printing page %d, %d%% complete."
+#~ msgstr "Stampa della pagina %d, %d%% completato."
+
+#~ msgid "Purge Jobs"
+#~ msgstr "Elimina le stampe"
+
+#~ msgid ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+#~ msgstr ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+
+#~ msgid "The output bin is almost full."
+#~ msgstr "Il raccoglitore di uscita è quasi pieno."
+
+#~ msgid "The output bin is full."
+#~ msgstr "Il raccoglitore di uscita è pieno."
+
+#~ msgid "The output bin is missing."
+#~ msgstr "Manca il raccoglitore di uscita."
+
+#~ msgid "The paper tray is almost empty."
+#~ msgstr "Il vassoio della carta è quasi vuoto."
+
+#~ msgid "The paper tray is empty."
+#~ msgstr "Il vassoio della carta è vuoto."
+
+#~ msgid "The paper tray is missing."
+#~ msgstr "Manca il vassoio della carta."
+
+#~ msgid "The paper tray needs to be filled."
+#~ msgstr "Il vassoio della carta deve essere riempito."
+
+#~ msgid "The printer is running low on ink."
+#~ msgstr "L'inchiostro della stampante sta per esaurirsi."
+
+#~ msgid "The printer is running low on toner."
+#~ msgstr "Il toner della stampante sta per esaurirsi."
+
+#~ msgid "There is a paper jam."
+#~ msgstr "Vi è un inceppamento della carta."
+
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "Non è possibile risolvere l'URI della stampante."
+
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Uso: cupsfilter [ opzioni ] file"
+
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "Uso: lppasswd [-g groupname]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "Uso: lppasswd [-g groupname] [username]\n"
+#~ "     lppasswd [-g groupname] -a [username]\n"
+#~ "     lppasswd [-g groupname] -x [username]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "La password deve contenere almeno 6 caratteri, non può contenere "
+#~ "l'username e deve contenere almeno una lettera ed un numero."
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: launchd(8) non supporta i compilati, quando è in modalità normale."
+
+#~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+#~ msgstr "ipptool: \"-i\" e \"-n\" sono incompatibili con -X\"."
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr "lppasswd: solo root può aggiungere o eliminare le password."
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppasswd: il file delle password è già in uso."
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppasswd: il file delle password non è aggiornato."
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppasswd: spiacenti, la password non è esatta."
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppasswd: spiacenti, la password è stata rifiutata."
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppasswd: spiacenti, le password non sono esatte."
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: non è possibile copiare la stringa della password: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: non è possibile aprire il file delle password: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr ""
+#~ "lppasswd: non è possibile scrivere all'interno del file delle password: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr ""
+#~ "lppasswd: non è possibile eseguire il backup del vecchio file delle "
+#~ "password: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr "lppasswd: non è possibile rinominare il file delle password: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppasswd: l'utente \"%s\" ed il gruppo \"%s\" non esistono."

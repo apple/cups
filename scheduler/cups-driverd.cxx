@@ -1,48 +1,20 @@
 /*
- * "$Id: cups-driverd.cxx 3933 2012-10-01 03:01:10Z msweet $"
+ * "$Id: cups-driverd.cxx 11558 2014-02-06 18:33:34Z msweet $"
  *
- *   PPD/driver support for CUPS.
+ * PPD/driver support for CUPS.
  *
- *   This program handles listing and installing static PPD files, PPD files
- *   created from driver information files, and dynamically generated PPD files
- *   using driver helper programs.
+ * This program handles listing and installing static PPD files, PPD files
+ * created from driver information files, and dynamically generated PPD files
+ * using driver helper programs.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
-﻿ *   main()	       - Scan for drivers and return an IPP response.
- *   add_ppd()	       - Add a PPD file.
- *   cat_drv()	       - Generate a PPD from a driver info file.
- *   cat_ppd()	       - Copy a PPD file to stdout.
- *   copy_static()     - Copy a static PPD file to stdout.
- *   cat_tar()	       - Copy an archived PPD file to stdout.
- *   compare_inodes()  - Compare two inodes.
- *   compare_matches() - Compare PPD match scores for sorting.
- *   compare_names()   - Compare PPD filenames for sorting.
- *   compare_ppds()    - Compare PPD file make and model names for sorting.
- *   dump_ppds_dat()   - Dump the contents of the ppds.dat file.
- *   free_array()      - Free an array of strings.
- *   get_file()        - Get the filename associated with a request.
- *   list_ppds()       - List PPD files.
- *   load_drv()        - Load the PPDs from a driver information file.
- *   load_drivers()    - Load driver-generated PPD files.
- *   load_ppd()        - Load a PPD file.
- *   load_ppds()       - Load PPD files recursively.
- *   load_ppds_dat()   - Load the ppds.dat file.
- *   load_tar()        - Load archived PPD files.
- *   read_tar()        - Read a file header from an archive.
- *   regex_device_id() - Compile a regular expression based on the 1284 device
- *			 ID.
- *   regex_string()    - Construct a regular expression to compare a simple
- *			 string.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -291,7 +263,7 @@ add_ppd(const char *filename,		/* I - PPD filename */
 
   ppd->found               = 1;
   ppd->record.mtime        = mtime;
-  ppd->record.size         = size;
+  ppd->record.size         = (off_t)size;
   ppd->record.model_number = model_number;
   ppd->record.type         = type;
 
@@ -645,7 +617,7 @@ cat_tar(const char *name,		/* I - PPD name */
   */
 
   if ((fp = get_file(name, request_id, "model", filename, sizeof(filename),
-                     &ppdname)) == NULL)
+                     &ppdname)) == NULL || !ppdname)
     return (1);
 
  /*
@@ -674,7 +646,7 @@ cat_tar(const char *name,		/* I - PPD name */
         if ((size_t)(bytes = (curinfo.st_size - total)) > sizeof(buffer))
           bytes = sizeof(buffer);
 
-        if ((bytes = cupsFileRead(fp, buffer, bytes)) < 0)
+        if ((bytes = cupsFileRead(fp, buffer, (size_t)bytes)) < 0)
         {
           if (errno == EINTR || errno == EAGAIN)
           {
@@ -686,7 +658,7 @@ cat_tar(const char *name,		/* I - PPD name */
             break;
           }
         }
-        else if (bytes > 0 && fwrite(buffer, bytes, 1, stdout) != 1)
+        else if (bytes > 0 && fwrite(buffer, (size_t)bytes, 1, stdout) != 1)
           break;
       }
 
@@ -1053,8 +1025,6 @@ list_ppds(int        request_id,	/* I - Request ID */
 		*type_str;		/* ppd-type option */
   int		model_number,		/* ppd-model-number value */
 		type,			/* ppd-type value */
-		make_and_model_len,	/* Length of ppd-make-and-model */
-		product_len,		/* Length of ppd-product */
 		send_device_id,		/* Send ppd-device-id? */
 		send_make,		/* Send ppd-make? */
 		send_make_and_model,	/* Send ppd-make-and-model? */
@@ -1065,6 +1035,8 @@ list_ppds(int        request_id,	/* I - Request ID */
 		send_psversion,		/* Send ppd-psversion? */
 		send_type,		/* Send ppd-type? */
 		sent_header;		/* Sent the IPP header? */
+  size_t	make_and_model_len,	/* Length of ppd-make-and-model */
+		product_len;		/* Length of ppd-product */
   regex_t	*device_id_re,		/* Regular expression for matching device ID */
 		*make_and_model_re;	/* Regular expression for matching make and model */
   regmatch_t	re_matches[6];		/* Regular expression matches */
@@ -1385,7 +1357,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 	// See how much of the make-and-model string we matched...
 	if (re_matches[0].rm_so == 0)
 	{
-	  if (re_matches[0].rm_eo == make_and_model_len)
+	  if ((size_t)re_matches[0].rm_eo == make_and_model_len)
 	    ppd->matches += 3;		// Exact match
 	  else
 	    ppd->matches += 2;		// Prefix match
@@ -1637,8 +1609,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
   * Add a dummy entry for the file...
   */
 
-  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
-          PPD_TYPE_DRV, "drv");
+  add_ppd(name, name, "", "", "", "", "", "", mtime, (size_t)size, 0, PPD_TYPE_DRV, "drv");
   ChangedPPD = 1;
 
  /*
@@ -1696,14 +1667,10 @@ load_drv(const char  *filename,		/* I - Actual filename */
       if (!strcmp(product->name->value, "Product"))
       {
         if (!products_found)
-	  ppd = add_ppd(name, uri, "en", d->manufacturer->value, make_model,
-		        device_id ? device_id->value->value : "",
-		        product->value->value,
-		        ps_version ? ps_version->value->value : "(3010) 0",
-		        mtime, size, d->model_number, type, "drv");
+	  ppd = add_ppd(name, uri, "en", d->manufacturer->value, make_model, device_id ? device_id->value->value : "", product->value->value,
+		        ps_version ? ps_version->value->value : "(3010) 0", mtime, (size_t)size, d->model_number, type, "drv");
 	else if (products_found < PPD_MAX_PROD)
-	  strlcpy(ppd->record.products[products_found], product->value->value,
-	          sizeof(ppd->record.products[0]));
+	  strlcpy(ppd->record.products[products_found], product->value->value, sizeof(ppd->record.products[0]));
 	else
 	  break;
 
@@ -1711,11 +1678,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
       }
 
     if (!products_found)
-      add_ppd(name, uri, "en", d->manufacturer->value, make_model,
-	      device_id ? device_id->value->value : "",
-	      d->model_name->value,
-	      ps_version ? ps_version->value->value : "(3010) 0",
-	      mtime, size, d->model_number, type, "drv");
+      add_ppd(name, uri, "en", d->manufacturer->value, make_model, device_id ? device_id->value->value : "", d->model_name->value, ps_version ? ps_version->value->value : "(3010) 0", mtime, (size_t)size, d->model_number, type, "drv");
   }
 
   src->release();
@@ -1810,7 +1773,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	scheme_end = scheme + strlen(scheme) - 1;
 
 	if ((scheme_end > scheme && *scheme_end == '*' &&
-	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	     !strncmp(scheme, dent->filename, (size_t)(scheme_end - scheme))) ||
 	    !strcmp(scheme, dent->filename))
 	{
 	  fputs("DEBUG: [cups-driverd] Yes, exclude!\n", stderr);
@@ -1837,7 +1800,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	scheme_end = scheme + strlen(scheme) - 1;
 
 	if ((scheme_end > scheme && *scheme_end == '*' &&
-	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	     !strncmp(scheme, dent->filename, (size_t)(scheme_end - scheme))) ||
 	    !strcmp(scheme, dent->filename))
 	{
 	  fputs("DEBUG: [cups-driverd] Yes, include!\n", stderr);
@@ -2307,11 +2270,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
 
     fprintf(stderr, "DEBUG2: [cups-driverd] Adding ppd \"%s\"...\n", name);
 
-    ppd = add_ppd(name, name, lang_version, manufacturer, make_model,
-		  device_id, (char *)cupsArrayFirst(products),
-		  (char *)cupsArrayFirst(psversions),
-		  fileinfo->st_mtime, fileinfo->st_size,
-		  model_number, type, scheme);
+    ppd = add_ppd(name, name, lang_version, manufacturer, make_model, device_id, (char *)cupsArrayFirst(products), (char *)cupsArrayFirst(psversions), fileinfo->st_mtime, (size_t)fileinfo->st_size, model_number, type, scheme);
 
     if (!ppd)
       return;
@@ -2634,13 +2593,11 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
     unsigned ppdsync;			/* Sync word */
     int      num_ppds;			/* Number of PPDs */
 
-    if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync))
-            == sizeof(ppdsync) &&
+    if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync)) == sizeof(ppdsync) &&
         ppdsync == PPD_SYNC &&
         !stat(filename, &fileinfo) &&
-	((fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
-	(num_ppds = (fileinfo.st_size - sizeof(ppdsync)) /
-	            sizeof(ppd_rec_t)) > 0)
+	(((size_t)fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
+	(num_ppds = ((size_t)fileinfo.st_size - sizeof(ppdsync)) / sizeof(ppd_rec_t)) > 0)
     {
      /*
       * We have a ppds.dat file, so read it!
@@ -2702,8 +2659,7 @@ load_tar(const char  *filename,		/* I - Actual filename */
 
   (void)filename;
 
-  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
-          PPD_TYPE_ARCHIVE, "file");
+  add_ppd(name, name, "", "", "", "", "", "", mtime, (size_t)size, 0, PPD_TYPE_ARCHIVE, "file");
   ChangedPPD = 1;
 
  /*
@@ -2947,5 +2903,5 @@ regex_string(const char *s)		/* I - String to compare */
 
 
 /*
- * End of "$Id: cups-driverd.cxx 3933 2012-10-01 03:01:10Z msweet $".
+ * End of "$Id: cups-driverd.cxx 11558 2014-02-06 18:33:34Z msweet $".
  */

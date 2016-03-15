@@ -1,24 +1,18 @@
 /*
- * "$Id: ieee1284.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: ieee1284.c 11594 2014-02-14 20:09:01Z msweet $"
  *
- *   IEEE-1284 support functions for CUPS.
+ * IEEE-1284 support functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendGetDeviceID()  - Get the IEEE-1284 device ID string and
- *                           corresponding URI.
- *   backendGetMakeModel() - Get the make and model string from the device ID.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -26,7 +20,6 @@
  */
 
 #include "backend-private.h"
-#include <cups/cups-private.h>
 
 
 /*
@@ -148,8 +141,7 @@ backendGetDeviceID(
 		* Read the 1284 device ID...
 		*/
 
-		if ((length = read(devparportfd, device_id,
-				   device_id_size - 1)) >= 2)
+		if ((length = read(devparportfd, device_id, (size_t)device_id_size - 1)) >= 2)
 		{
 		  device_id[length] = '\0';
 		  got_id = 1;
@@ -178,8 +170,7 @@ backendGetDeviceID(
       * bytes.  The 1284 spec says the length is stored MSB first...
       */
 
-      length = (((unsigned)device_id[0] & 255) << 8) +
-	       ((unsigned)device_id[1] & 255);
+      length = (int)((((unsigned)device_id[0] & 255) << 8) + ((unsigned)device_id[1] & 255));
 
      /*
       * Check to see if the length is larger than our buffer; first
@@ -188,8 +179,7 @@ backendGetDeviceID(
       */
 
       if (length > device_id_size || length < 14)
-	length = (((unsigned)device_id[1] & 255) << 8) +
-		 ((unsigned)device_id[0] & 255);
+	length = (int)((((unsigned)device_id[1] & 255) << 8) + ((unsigned)device_id[0] & 255));
 
       if (length > device_id_size)
 	length = device_id_size;
@@ -221,7 +211,7 @@ backendGetDeviceID(
 
 	length -= 2;
 
-	memmove(device_id, device_id + 2, length);
+	memmove(device_id, device_id + 2, (size_t)length);
 	device_id[length] = '\0';
       }
     }
@@ -287,7 +277,7 @@ backendGetDeviceID(
   */
 
   if (make_model)
-    backendGetMakeModel(device_id, make_model, make_model_size);
+    backendGetMakeModel(device_id, make_model, (size_t)make_model_size);
 
  /*
   * Then generate a device URI...
@@ -372,7 +362,7 @@ int					/* O - 0 on success, -1 on failure */
 backendGetMakeModel(
     const char *device_id,		/* O - 1284 device ID */
     char       *make_model,		/* O - Make/model */
-    int        make_model_size)		/* I - Size of buffer */
+    size_t     make_model_size)		/* I - Size of buffer */
 {
   int		num_values;		/* Number of keys and values */
   cups_option_t	*values;		/* Keys and values */
@@ -381,9 +371,7 @@ backendGetMakeModel(
 		*des;			/* Description string */
 
 
-  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", "
-                "make_model=%p, make_model_size=%d)\n", device_id,
-		make_model, make_model_size));
+  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", make_model=%p, make_model_size=" CUPS_LLFMT ")\n", device_id, make_model, CUPS_LLCAST make_model_size));
 
  /*
   * Range check input...
@@ -487,5 +475,5 @@ backendGetMakeModel(
 
 
 /*
- * End of "$Id: ieee1284.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: ieee1284.c 11594 2014-02-14 20:09:01Z msweet $".
  */

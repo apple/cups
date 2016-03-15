@@ -1,152 +1,201 @@
 .\"
-.\" "$Id: cups-files.conf.man.in 11201 2013-07-26 21:27:27Z msweet $"
+.\" "$Id: cups-files.conf.man.in 11927 2014-06-13 00:01:23Z msweet $"
 .\"
-.\"   cupsd.conf man page for CUPS.
+.\" cups-files.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2006 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "26 July 2013" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "11 June 2014" "Apple Inc."
 .SH NAME
-cups-files.conf \- file and directory configuration file for cups
+cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
-The \fIcups-files.conf\fR file configures the files and directories used by the
-CUPS scheduler, \fIcupsd(8)\fR.  It is normally located in the
-\fI/etc/cups\fR directory.
+The \fBcups\-files.conf\fR file configures the files and directories used by the CUPS scheduler,
+.BR cupsd (8).
+It is normally located in the \fI/etc/cups\fR directory.
 .LP
-Each line in the file can be a configuration directive, a blank line,
-or a comment. Comment lines start with the # character.
-.SH DIRECTIVES
-The following directives are understood by \fIcupsd(8)\fR. Consult the
-on-line help for detailed descriptions:
+Each line in the file can be a configuration directive, a blank line, or a comment.
+Configuration directives typically consist of a name and zero or more values separated by whitespace.
+The configuration directive name and values are case-insensitive.
+Comment lines start with the # character.
+.SS DIRECTIVES
+The following directives are understood by
+.BR cupsd (8):
 .TP 5
-AccessLog filename
+\fBAccessLog\fR
 .TP 5
-AccessLog syslog
-.br
+\fBAccessLog \fIfilename\fR
+.TP 5
+\fBAccessLog syslog\fR
 Defines the access log filename.
+Specifying a blank filename disables access log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
+The server name may be included in filenames using the string "%s", for example:
+.nf
+
+    AccessLog /var/log/cups/%s-access_log
+
+.fi
+The default is "/var/log/cups/access_log".
 .TP 5
-ConfigFilePerm mode
-.br
-Specifies the permissions for all configuration files that the scheduler
-writes.
+\fBConfigFilePerm \fImode\fR
+Specifies the permissions for all configuration files that the scheduler writes.
+The default is "0644" on OS X and "0640" on all other operating systems.
+.LP
+\fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
+This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
+There is no way to disable this security feature.
 .TP 5
-DataDir path
-.br
-Specified the directory where data files can be found.
+\fBDataDir \fIpath\fR
+Specifies the directory where data files can be found.
+The default is usually "/usr/share/cups".
 .TP 5
-DocumentRoot directory
-.br
-Specifies the root directory for the internal web server documents.
+\fBDocumentRoot \fIdirectory\fR
+Specifies the root directory for the CUPS web interface content.
+The default is usually "/usr/share/doc/cups".
 .TP 5
-ErrorLog filename
+\fBErrorLog\fR
 .TP 5
-ErrorLog syslog
-.br
-Specifies the error log filename.
+\fBErrorLog \fIfilename\fR
 .TP 5
-FatalErrors none
+\fBErrorLog syslog\fR
+Defines the error log filename.
+Specifying a blank filename disables error log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
+The server name may be included in filenames using the string "%s", for example:
+.nf
+
+    ErrorLog /var/log/cups/%s-error_log
+
+.fi
+The default is "/var/log/cups/error_log".
 .TP 5
-FatalErrors all -kind [... -kind]
+\fBFatalErrors none\fR
 .TP 5
-FatalErrors kind [... kind]
-.br
-Specifies which errors are fatal, causing the scheduler to exit. "Kind" is
-"browse", "config", "listen", "log", or "permissions".
+\fBFatalErrors all \fI\-kind \fR[ ... \fI\-kind \fR]
 .TP 5
-FileDevice Yes
+\fBFatalErrors \fIkind \fR[ ... \fIkind \fR]
+Specifies which errors are fatal, causing the scheduler to exit.
+The default is "config".
+The \fIkind\fR strings are:
+.RS 5
 .TP 5
-FileDevice No
-.br
-Specifies whether the file pseudo-device can be used for new
-printer queues.
+.B none
+No errors are fatal.
 .TP 5
-FontPath directory[:directory:...]
-.br
-Specifies the search path for fonts.
+.B all
+All of the errors below are fatal.
 .TP 5
-Group group-name-or-number
-.br
-Specifies the group name or ID that will be used when executing
-external programs.
+.B browse
+Browsing initialization errors are fatal, for example failed connections to the DNS-SD daemon.
 .TP 5
-LogFilePerm mode
-.br
-Specifies the permissions for all log files that the scheduler writes.
+.B config
+Configuration file syntax errors are fatal.
 .TP 5
-PageLog filename
+.B listen
+Listen or Port errors are fatal, except for IPv6 failures on the loopback or "any" addresses.
 .TP 5
-PageLog syslog
-.br
-Specifies the page log filename.
+.B log
+Log file creation or write errors are fatal.
 .TP 5
-Printcap
+.B permissions
+Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
+.RE
 .TP 5
-Printcap filename
-.br
-Specifies the filename for a printcap file that is updated
-automatically with a list of available printers (needed for
-legacy applications); specifying Printcap with no filename
-disables printcap generation.
+\fBFileDevice Yes\fR
 .TP 5
-RemoteRoot user-name
-.br
-Specifies the username that is associated with unauthenticated root
-accesses.
+\fBFileDevice No\fR
+Specifies whether the file pseudo-device can be used for new printer queues.
+The URI "file:///dev/null" is always allowed.
 .TP 5
-RequestRoot directory
-.br
-Specifies the directory to store print jobs and other HTTP request
-data.
+\fBGroup \fIgroup-name-or-number\fR
+Specifies the group name or ID that will be used when executing external programs.
+The default group is operating system specific but is usually "lp" or "nobody".
 .TP 5
-ServerBin directory
-.br
-Specifies the directory where backends, CGIs, daemons, and filters may
-be found.
+\fBLogFilePerm \fImode\fR
+Specifies the permissions of all log files that the scheduler writes.
+The default is "0644".
 .TP 5
-ServerCertificate filename
-.br
-Specifies the encryption certificate to use.
+\fBPageLog \fR[ \fIfilename\fR ]
 .TP 5
-ServerKey filename
-.br
-Specifies the encryption key to use.
+\fBPageLog syslog\fR
+Defines the page log filename.
+The value "syslog" causes log entries to be sent to the system log daemon.
+Specifying a blank filename disables page log generation.
+The server name may be included in filenames using the string "%s", for example:
+.nf
+
+    PageLog /var/log/cups/%s-page_log
+
+.fi
+The default is "/var/log/cups/page_log".
 .TP 5
-ServerRoot directory
-.br
-Specifies the directory where the server configuration files can be found.
+\fBRemoteRoot \fIusername\fR
+Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
+The default is "remroot".
 .TP 5
-SyncOnClose Yes
+\fBRequestRoot \fIdirectory\fR
+Specifies the directory that contains print jobs and other HTTP request data.
+The default is "/var/spool/cups".
 .TP 5
-SyncOnClose No
-Specifies whether the scheduler calls \fIfsync(2)\fR after writing configuration
-or state files. The default is No.
+\fBSandboxing off\fR
 .TP 5
-SystemGroup group-name [group-name ...]
-.br
-Specifies the group(s) to use for System class authentication.
+\fBSandboxing relaxed\fR
 .TP 5
-TempDir directory
-.br
+\fBSandboxing strict\fR
+Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
+The default is "strict".
+This directive is currently only used/supported on OS X.
+.TP 5
+\fBServerBin \fIdirectory\fR
+Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
+The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
+.TP 5
+\fBServerKeychain \fIpath\fR
+Specifies the location of TLS certificates and private keys.
+The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
+.TP 5
+\fBServerRoot \fIdirectory\fR
+Specifies the directory containing the server configuration files.
+The default is "/etc/cups".
+.TP 5
+\fBSyncOnClose Yes\fR
+.TP 5
+\fBSyncOnClose No\fR
+Specifies whether the scheduler calls
+.BR fsync (2)
+after writing configuration or state files.
+The default is "No".
+.TP 5
+\fBSystemGroup \fIgroup-name \fR[ ... \fIgroup-name\fR ]
+Specifies the group(s) to use for \fI@SYSTEM\fR group authentication.
+The default contains "admin", "lpadmin", "root", "sys", and/or "system".
+.TP 5
+\fBTempDir \fIdirectory\fR
 Specifies the directory where temporary files are stored.
+The default is "/var/spool/cups/tmp".
 .TP 5
-User user-name
-.br
+\fBUser \fIusername\fR
 Specifies the user name or ID that is used when running external programs.
+The default is "lp".
 .SH SEE ALSO
-\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fImime.convs(5)\fR,
-\fImime.types(5)\fR, \fIprinters.conf(5)\fR,
-\fIsubscriptions.conf(5)\fR,
-.br
-http://localhost:631/help
+.BR classes.conf (5),
+.BR cups (1),
+.BR cupsd (8),
+.BR cupsd.conf (5),
+.BR mime.convs (5),
+.BR mime.types (5),
+.BR printers.conf (5),
+.BR subscriptions.conf (5),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright \[co] 2007-2014 by Apple Inc.
 .\"
-.\" End of "$Id: cups-files.conf.man.in 11201 2013-07-26 21:27:27Z msweet $".
+.\" End of "$Id: cups-files.conf.man.in 11927 2014-06-13 00:01:23Z msweet $".
 .\"
