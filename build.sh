@@ -212,12 +212,14 @@ fi
 if test "x$BUILDNOTIFY" != x -a -x temp/bin/sendbuildlog -a $quiet = yes; then
 	attachments=""
 
-	if test -f stable/test/cups-str-2.1-$USER.html; then
-		attachments="$attachments -a stable/test/cups-str-2.1-$USER.html"
+	date=`date "+%Y-%m-%d"`
+
+	if test -f stable/test/cups-str-2.1-$date-$USER.html; then
+		attachments="$attachments -a stable/test/cups-str-2.1-$date-$USER.html"
 	fi
 
-	if test -f developent/test/cups-str-2.2-$USER.html; then
-		attachments="$attachments -a developent/test/cups-str-2.2-$USER.html"
+	if test -f developent/test/cups-str-2.2-$date-$USER.html; then
+		attachments="$attachments -a developent/test/cups-str-2.2-$date-$USER.html"
 	fi
 
 	temp/bin/sendbuildlog -b $status -s "$BUILDSUBJECT r$rev" $attachments "$BUILDNOTIFY" build.log
