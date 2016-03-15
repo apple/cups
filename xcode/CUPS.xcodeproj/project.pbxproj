@@ -1560,6 +1560,7 @@
 		72F75A691336FA8A004BB496 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = ../filter/error.c; sourceTree = "<group>"; };
 		72F75A6A1336FA8A004BB496 /* interpret.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = interpret.c; path = ../filter/interpret.c; sourceTree = "<group>"; };
 		72F75A6B1336FA8A004BB496 /* raster.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = raster.c; path = ../filter/raster.c; sourceTree = "<group>"; };
+		72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */ = {isa = PBXFileReference; lastKnownFileType = text; name = "org.cups.usb-quirks"; path = "../backend/org.cups.usb-quirks"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2247,6 +2248,7 @@
 		724378F71333E3CE009631B9 /* backends */ = {
 			isa = PBXGroup;
 			children = (
+				72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */,
 				724379091333E4E3009631B9 /* backend-private.h */,
 				724379501333FEBB009631B9 /* dnssd.c */,
 				724379CA1334000E009631B9 /* ieee1284.c */,

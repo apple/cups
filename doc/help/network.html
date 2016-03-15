@@ -14,7 +14,7 @@
 
 <P>Every network printer or print server has a unique Internet Protocol (IP) address associated with it. This address is either configured manually or set using an automatic network protocol such as the <A HREF="#BOOTP">Boot Protocol (BOOTP)</A>, <A HREF="#DHCP">Dynamic Host Control Protocol (DHCP)</A>, Reverse Address Resolution Protocol (RARP), or ZeroConf.</P>
 
-<P>You can normally find the IP address of a printer on the printer's control panel or by printing the configuration or status page. The <A HREF="#SNMP">Simple Network Management Protocol (SNMP)</A> can also be used to get the IP address remotely, which happens automatically when you visit the CUPS administration web page or choose an available CUPS device when adding a printer.</P>
+<P>You can normally find the IP address of a printer on the printer's control panel or by printing the configuration or status page. The <A HREF="#SNMP">Simple Network Management Protocol (SNMP)</A> can also be used to get the IP address remotely.</P>
 
 
 <H2 CLASS="title"><A NAME="CONFIG">Configuring the IP Address</A></H2>
@@ -102,7 +102,7 @@ socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value&amp;opti
 
 <H3><A NAME="IPP">Internet Printing Protocol (IPP)</A></H3>
 
-<P>IPP is the only protocol that CUPS supports natively and is supported by some network printers and print servers. However, since many printers do not implement IPP properly, only use IPP when the vendor actually documents official support for it. IPP printing normally happens over port 631 and uses the <tt>http</tt>, <tt>ipp</tt>, and <tt>ipps</tt> URI schemes:</P>
+<P>IPP is the only protocol that CUPS supports natively and is supported by most network printers and print servers. IPP printing normally happens over port 631 and uses the <tt>http</tt> (Windows), <tt>ipp</tt>, and <tt>ipps</tt> URI schemes:</P>
 
 <PRE>
 http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
@@ -133,10 +133,6 @@ ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>optio
 </TR>
 </THEAD>
 <TBODY>
-<TR>
-	<TD><TT>compression=gzip</TT></TD>
-	<TD>Specifies that print data should be compressed before sending.</TD>
-</TR>
 <TR>
 	<TD><TT>encryption=always</TT></TD>
 	<TD>Specifies that the connection to the IPP server should be encrypted using SSL.</TD>

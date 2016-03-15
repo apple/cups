@@ -215,3 +215,9 @@
 
 # Lexmark E238 (STR #4448)
 0x043d 0x009a no-reattach
+
+# Canon MX310 (STR #4482)
+0x04a9 0x1728 unidir
+
+# Canon MX320 (STR #4482)
+0x04A9 0x1736 unidir

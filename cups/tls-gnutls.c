@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-gnutls.c 12125 2014-08-28 15:49:29Z msweet $"
+ * "$Id: tls-gnutls.c 12159 2014-09-23 14:56:14Z msweet $"
  *
  * TLS support code for CUPS using GNU TLS.
  *
@@ -15,6 +15,7 @@
  * This file is subject to the Apple OS-Developed Software exception.
  */
 
+/**** This file is included from tls.c ****/
 
 /*
  * Include necessary headers...
@@ -1291,5 +1292,5 @@ _httpTLSWrite(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: tls-gnutls.c 12125 2014-08-28 15:49:29Z msweet $".
+ * End of "$Id: tls-gnutls.c 12159 2014-09-23 14:56:14Z msweet $".
  */

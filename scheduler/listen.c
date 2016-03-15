@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 12080 2014-08-04 13:23:50Z msweet $"
+ * "$Id: listen.c 12178 2014-09-30 18:56:48Z msweet $"
  *
  * Server listening routines for the CUPS scheduler.
  *
@@ -43,10 +43,19 @@ cupsdDeleteAllListeners(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-    free(lis);
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+    if (!lis->on_demand)
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+    {
+      cupsArrayRemove(Listeners, lis);
+      free(lis);
+    }
 
-  cupsArrayDelete(Listeners);
-  Listeners = NULL;
+  if (cupsArrayCount(Listeners) == 0)
+  {
+    cupsArrayDelete(Listeners);
+    Listeners = NULL;
+  }
 }
 
 
@@ -275,19 +284,23 @@ cupsdStopListening(void)
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
 #if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
-    if (lis->fd != -1 && !lis->on_demand)
+    if (!lis->on_demand && lis->fd != -1)
+    {
       httpAddrClose(&(lis->address), lis->fd);
+      lis->fd = -1;
+    }
 
 #else
     if (lis->fd != -1)
+    {
       httpAddrClose(&(lis->address), lis->fd);
+      lis->fd = -1;
+    }
 #endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
-
-    lis->fd = -1;
   }
 }
 
 
 /*
- * End of "$Id: listen.c 12080 2014-08-04 13:23:50Z msweet $".
+ * End of "$Id: listen.c 12178 2014-09-30 18:56:48Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 12132 2014-08-29 11:27:18Z msweet $"
+ * "$Id: conf.c 12178 2014-09-30 18:56:48Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -2974,9 +2974,15 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 
         if (lis)
 	{
-	  httpAddrString(&lis->address, temp, sizeof(temp));
-	  cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "Duplicate listen address \"%s\" ignored.", temp);
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+	  if (!lis->on_demand)
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+	  {
+	    httpAddrString(&lis->address, temp, sizeof(temp));
+	    cupsdLogMessage(CUPSD_LOG_WARN,
+			    "Duplicate listen address \"%s\" ignored.", temp);
+	  }
+
           continue;
 	}
 
@@ -4087,5 +4093,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 12132 2014-08-29 11:27:18Z msweet $".
+ * End of "$Id: conf.c 12178 2014-09-30 18:56:48Z msweet $".
  */

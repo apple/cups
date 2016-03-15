@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 12140 2014-08-30 01:51:22Z msweet $"
+dnl "$Id: cups-common.m4 12180 2014-10-01 12:08:02Z msweet $"
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION=2.0rc1
+CUPS_VERSION=2.0.0
 CUPS_REVISION=
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -462,5 +462,5 @@ esac
 AC_SUBST(BUILDDIRS)
 
 dnl
-dnl End of "$Id: cups-common.m4 12140 2014-08-30 01:51:22Z msweet $".
+dnl End of "$Id: cups-common.m4 12180 2014-10-01 12:08:02Z msweet $".
 dnl

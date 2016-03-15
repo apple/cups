@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-sspi.c 12094 2014-08-19 12:15:11Z msweet $"
+ * "$Id: tls-sspi.c 12159 2014-09-23 14:56:14Z msweet $"
  *
  * TLS support for CUPS on Windows using SSPI.
  *
@@ -13,6 +13,8 @@
  *
  * This file is subject to the Apple OS-Developed Software exception.
  */
+
+/**** This file is included from tls.c ****/
 
 /*
  * Include necessary headers...
@@ -2359,5 +2361,5 @@ http_sspi_verify(
 
 
 /*
- * End of "$Id: tls-sspi.c 12094 2014-08-19 12:15:11Z msweet $".
+ * End of "$Id: tls-sspi.c 12159 2014-09-23 14:56:14Z msweet $".
  */

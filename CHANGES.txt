@@ -1,5 +1,15 @@
-CHANGES.txt - 2.0rc1 - 2014-09-02
----------------------------------
+CHANGES.txt - 2.0.0 - 2014-10-01
+--------------------------------
+
+CHANGES IN CUPS V2.0.0
+
+	- The scheduler did not preserve listener sockets from launchd or
+	  systemd after a restart (<rdar://problem/18112848>)
+	- Added some USB quirk rules for the libusb-based USB backend
+	  (STR #4482)
+	- Spanish localization update (STR #4487)
+	- Updated documentation for 2.0.0 release.
+
 
 CHANGES IN CUPS V2.0rc1
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-darwin.c 12094 2014-08-19 12:15:11Z msweet $"
+ * "$Id: tls-darwin.c 12159 2014-09-23 14:56:14Z msweet $"
  *
  * TLS support code for CUPS on OS X.
  *
@@ -15,7 +15,7 @@
  * This file is subject to the Apple OS-Developed Software exception.
  */
 
-/**** This file is included from http.c ****/
+/**** This file is included from tls.c ****/
 
 /*
  * Include necessary headers...
@@ -1660,5 +1660,5 @@ http_cdsa_write(
 
 
 /*
- * End of "$Id: tls-darwin.c 12094 2014-08-19 12:15:11Z msweet $".
+ * End of "$Id: tls-darwin.c 12159 2014-09-23 14:56:14Z msweet $".
  */
