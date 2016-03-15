@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: testppd.c 12604 2015-05-06 01:43:05Z msweet $"
  *
  * PPD test program for CUPS.
  *
@@ -859,7 +859,19 @@ main(int  argc,				/* I - Number of command-line arguments */
     struct stat	fileinfo;		/* File information */
 
 
-    if (!strncmp(argv[1], "-d", 2))
+    if (strchr(argv[1], ':'))
+    {
+     /*
+      * Server PPD...
+      */
+
+      if ((filename = cupsGetServerPPD(CUPS_HTTP_DEFAULT, argv[1])) == NULL)
+      {
+        printf("%s: %s\n", argv[1], cupsLastErrorString());
+        return (1);
+      }
+    }
+    else if (!strncmp(argv[1], "-d", 2))
     {
       const char *printer;		/* Printer name */
 
@@ -1107,5 +1119,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: testppd.c 12604 2015-05-06 01:43:05Z msweet $".
  */

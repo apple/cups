@@ -1,5 +1,41 @@
-CHANGES.txt - 2.0.2 - 2015-02-03
+CHANGES.txt - 2.0.3 - 2015-06-08
 --------------------------------
+
+CHANGES IN CUPS V2.0.3
+
+	- Security: Fixed CERT VU #810572 exploiting the dynamic linker
+	  (STR #4609)
+	- Security: The scheduler could hang with malformed gzip data
+	  (STR #4602)
+	- Restored missing generic printer icon file (STR #4587)
+	- Fixed logging of configuration errors to show up as errors (STR #4582)
+	- Fixed potential buffer overflows in raster code and filters
+	  (STR #4598, STR #4599, STR #4600, STR #4601)
+	- Fixed a gzip processing bug (#4602)
+	- Fixed <Limit> inside <Location> (STR #4575)
+	- Fixed lpadmin when both -m and -o are used (STR #4578)
+	- The web interface always showed support for 2-sided printing
+	  (STR #4595)
+	- cupsRasterReadHeader did not fully validate the raster header
+	  (STR #4596)
+	- The rastertopwg filter did not check for truncated input (STR #4597)
+	- The cups-lpd mini-daemon did not check for request parameters
+	  (STR #4603)
+	- The scheduler could get caught in a busy loop (STR #4605)
+	- The sample Epson driver could crash (STR #4616)
+	- The IPP backend now correctly monitors jobs
+	  (<rdar://problem/20495955>)
+	- The ppdhtml and ppdpo utilities crashed when the -D option was used
+	  before a driver information file (STR #4627)
+	- ippfind incorrectly substituted "=port" for service_port.
+	- The IPP/1.1 test file did not handle the initial print job
+	  completing early (STR #4576)
+	- Fixed a memory leak in cupsConnectDest (STR #4634)
+	- PWG Raster Format output contained invalid ImageBox values
+	  (<rdar://problem/21144309>)
+	- Added Russian translation (STR #4577)
+	- Added German translation (STR #4635)
+
 
 CHANGES IN CUPS V2.0.2
 

@@ -1,27 +1,16 @@
 /*
- * "$Id: env.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: env.c 12701 2015-06-08 18:33:44Z msweet $"
  *
- *   Environment management routines for the CUPS scheduler.
+ * Environment management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdInitEnv()   - Initialize the current environment with standard
- *                      variables.
- *   cupsdLoadEnv()   - Copy common environment variables into an array.
- *   cupsdSetEnv()    - Set a common environment variable.
- *   cupsdSetEnvf()   - Set a formatted common environment variable.
- *   cupsdUpdateEnv() - Update the environment for the configured directories.
- *   clear_env()      - Clear common environment variables.
- *   find_env()       - Find a common environment variable.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -128,6 +117,13 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
     value = getenv(name);
 
   if (!value)
+    return;
+
+ /*
+  * Do not allow dynamic linker variables when running as root...
+  */
+
+  if (!RunUser && (!strncmp(name, "DYLD_", 5) || !strncmp(name, "LD_", 3)))
     return;
 
  /*
@@ -269,5 +265,5 @@ find_env(const char *name)		/* I - Variable name */
 
 
 /*
- * End of "$Id: env.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: env.c 12701 2015-06-08 18:33:44Z msweet $".
  */

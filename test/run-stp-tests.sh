@@ -1,11 +1,11 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 12398 2014-12-19 16:56:15Z msweet $"
+# "$Id: run-stp-tests.sh 12658 2015-05-22 17:53:45Z msweet $"
 #
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -401,7 +401,7 @@ instfilter() {
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.pdf"
@@ -418,7 +418,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.ps"
@@ -435,7 +435,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4-300-black-1.pwg.gz"
@@ -906,7 +906,7 @@ fi
 
 # Requests logged
 count=`wc -l $BASE/log/access_log | awk '{print $1}'`
-expected=`expr 37 + 18 + 29 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+expected=`expr 37 + 18 + 30 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
 if test $count != $expected; then
 	echo "FAIL: $count requests logged, expected $expected."
 	echo "<P>FAIL: $count requests logged, expected $expected.</P>" >>$strfile
@@ -1103,5 +1103,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 12398 2014-12-19 16:56:15Z msweet $"
+# End of "$Id: run-stp-tests.sh 12658 2015-05-22 17:53:45Z msweet $"
 #

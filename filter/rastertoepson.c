@@ -1,9 +1,9 @@
 /*
- * "$Id: rastertoepson.c 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: rastertoepson.c 12618 2015-05-06 20:28:48Z msweet $"
  *
  * EPSON ESC/P and ESC/P2 filter for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -274,7 +274,7 @@ StartPage(
 
   if (header->cupsCompression || DotBytes)
   {
-    if ((CompBuffer = calloc(2, header->cupsWidth)) == NULL)
+    if ((CompBuffer = calloc(2, header->cupsWidth + 1)) == NULL)
     {
       fputs("ERROR: Unable to allocate memory\n", stderr);
       exit(1);
@@ -655,9 +655,15 @@ OutputLine(
         }
 
         for (width = header->cupsWidth, tempptr = CompBuffer;
-             width > 0;
+             width > 1;
              width -= 2, tempptr += 2, oddptr += DotBytes * 2,
 	         evenptr += DotBytes * 2)
+        {
+          evenptr[0] = tempptr[0];
+          oddptr[0]  = tempptr[1];
+        }
+
+        if (width == 1)
         {
           evenptr[0] = tempptr[0];
           oddptr[0]  = tempptr[1];
@@ -873,6 +879,9 @@ OutputRows(
 	putchar(0);
       }
 
+      if (dot_count & 1)
+        putchar(*ptr);
+
      /*
       * Move the head back and print the odd bytes...
       */
@@ -901,6 +910,9 @@ OutputRows(
 	putchar(0);
         putchar(*ptr);
       }
+
+      if (dot_count & 1)
+        putchar(0);
     }
     else
       pwrite(dot_ptr, dot_count);
@@ -1138,5 +1150,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: rastertoepson.c 12618 2015-05-06 20:28:48Z msweet $".
  */

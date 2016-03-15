@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: ipp.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * IPP routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -409,8 +409,7 @@ cupsdProcessIPPRequest(
 	    * Remote unauthenticated user masquerading as local root...
 	    */
 
-	    _cupsStrFree(username->values[0].string.text);
-	    username->values[0].string.text = _cupsStrAlloc(RemoteRoot);
+            ippSetString(con->request, &username, 0, RemoteRoot);
 	  }
 	}
 
@@ -1556,7 +1555,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     cupsdSetString(&job->username, con->username);
 
     if (attr)
-      cupsdSetString(&attr->values[0].string.text, con->username);
+      ippSetString(job->attrs, &attr, 0, con->username);
   }
   else if (attr)
   {
@@ -1574,9 +1573,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                  "job-originating-user-name", NULL, job->username);
   else
   {
-    attr->group_tag = IPP_TAG_JOB;
-    _cupsStrFree(attr->name);
-    attr->name = _cupsStrAlloc("job-originating-user-name");
+    ippSetGroupTag(job->attrs, &attr, IPP_TAG_JOB);
+    ippSetName(job->attrs, &attr, "job-originating-user-name");
   }
 
   if (con->username[0] || auth_info)
@@ -1610,48 +1608,11 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
       * Also, we can only have 1 value and it must be a name value.
       */
 
-      switch (attr->value_tag)
-      {
-        case IPP_TAG_STRING :
-	case IPP_TAG_TEXTLANG :
-	case IPP_TAG_NAMELANG :
-	case IPP_TAG_TEXT :
-	case IPP_TAG_NAME :
-	case IPP_TAG_KEYWORD :
-	case IPP_TAG_URI :
-	case IPP_TAG_URISCHEME :
-	case IPP_TAG_CHARSET :
-	case IPP_TAG_LANGUAGE :
-	case IPP_TAG_MIMETYPE :
-	   /*
-	    * Free old strings...
-	    */
-
-	    for (i = 0; i < attr->num_values; i ++)
-	    {
-	      _cupsStrFree(attr->values[i].string.text);
-	      attr->values[i].string.text = NULL;
-	      if (attr->values[i].string.language)
-	      {
-		_cupsStrFree(attr->values[i].string.language);
-		attr->values[i].string.language = NULL;
-	      }
-            }
-
-	default :
-            break;
-      }
-
-     /*
-      * Use the default connection hostname instead...
-      */
-
-      attr->value_tag             = IPP_TAG_NAME;
-      attr->num_values            = 1;
-      attr->values[0].string.text = _cupsStrAlloc(con->http->hostname);
+      ippDeleteAttribute(job->attrs, attr);
+      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-host-name", NULL, con->http->hostname);
     }
-
-    attr->group_tag = IPP_TAG_JOB;
+    else
+      ippSetGroupTag(job->attrs, &attr, IPP_TAG_JOB);
   }
   else
   {
@@ -1747,8 +1708,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
-      attr->values[0].string.text = _cupsStrRetain(printer->job_sheets[0]);
-      attr->values[1].string.text = _cupsStrRetain(printer->job_sheets[1]);
+      ippSetString(job->attrs, &attr, 0, printer->job_sheets[0]);
+      ippSetString(job->attrs, &attr, 1, printer->job_sheets[1]);
     }
 
     job->job_sheets = attr;
@@ -1774,7 +1735,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
           * Force the leading banner to have the classification on it...
 	  */
 
-          cupsdSetString(&attr->values[0].string.text, Classification);
+          ippSetString(job->attrs, &attr, 0, Classification);
 
 	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "CLASSIFICATION FORCED "
 	                		     "job-sheets=\"%s,none\", "
@@ -1791,7 +1752,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 	  * Can't put two different security markings on the same document!
 	  */
 
-          cupsdSetString(&attr->values[1].string.text, attr->values[0].string.text);
+          ippSetString(job->attrs, &attr, 1, attr->values[0].string.text);
 
 	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "CLASSIFICATION FORCED "
 	                		     "job-sheets=\"%s,%s\", "
@@ -1831,18 +1792,18 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
         if (attr->num_values > 1 &&
 	    !strcmp(attr->values[0].string.text, attr->values[1].string.text))
 	{
-          cupsdSetString(&(attr->values[0].string.text), Classification);
-          cupsdSetString(&(attr->values[1].string.text), Classification);
+          ippSetString(job->attrs, &attr, 0, Classification);
+          ippSetString(job->attrs, &attr, 1, Classification);
 	}
         else
 	{
           if (attr->num_values == 1 ||
 	      strcmp(attr->values[0].string.text, "none"))
-            cupsdSetString(&(attr->values[0].string.text), Classification);
+            ippSetString(job->attrs, &attr, 0, Classification);
 
           if (attr->num_values > 1 &&
 	      strcmp(attr->values[1].string.text, "none"))
-            cupsdSetString(&(attr->values[1].string.text), Classification);
+	    ippSetString(job->attrs, &attr, 1, Classification);
         }
 
         if (attr->num_values > 1)
@@ -3069,8 +3030,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (attr)
   {
-    attr->value_tag = IPP_TAG_KEYWORD;
-    cupsdSetString(&(attr->values[0].string.text), "no-hold");
+    ippSetValueTag(job->attrs, &attr, IPP_TAG_KEYWORD);
+    ippSetString(job->attrs, &attr, 0, "no-hold");
   }
 
  /*
@@ -8191,11 +8152,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
              filetype->type);
 
     if (format)
-    {
-      _cupsStrFree(format->values[0].string.text);
-
-      format->values[0].string.text = _cupsStrAlloc(mimetype);
-    }
+      ippSetString(con->request, &format, 0, mimetype);
     else
       ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
@@ -8732,10 +8689,8 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (attr)
   {
-    _cupsStrFree(attr->values[0].string.text);
-
-    attr->value_tag = IPP_TAG_KEYWORD;
-    attr->values[0].string.text = _cupsStrAlloc("no-hold");
+    ippSetValueTag(job->attrs, &attr, IPP_TAG_KEYWORD);
+    ippSetString(job->attrs, &attr, 0, "no-hold");
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job job-hold-until value changed by user.");
@@ -9425,11 +9380,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     if ((jformat = ippFindAttribute(job->attrs, "document-format",
                                     IPP_TAG_MIMETYPE)) != NULL)
-    {
-      _cupsStrFree(jformat->values[0].string.text);
-
-      jformat->values[0].string.text = _cupsStrAlloc(mimetype);
-    }
+      ippSetString(job->attrs, &jformat, 0, mimetype);
     else
       ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
@@ -11096,5 +11047,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: ipp.c 12701 2015-06-08 18:33:44Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.c 12453 2015-01-30 15:42:19Z msweet $"
+ * "$Id: raster.c 12679 2015-05-28 19:09:57Z msweet $"
  *
  * Raster file routines for CUPS.
  *
@@ -706,14 +706,10 @@ cupsRasterWriteHeader2(
     fh.cupsInteger[0]        = htonl(r->header.cupsInteger[0]);
     fh.cupsInteger[1]        = htonl(r->header.cupsInteger[1]);
     fh.cupsInteger[2]        = htonl(r->header.cupsInteger[2]);
-    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] *
-                                                r->header.HWResolution[0]));
-    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] *
-                                                r->header.HWResolution[1]));
-    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] *
-                                                r->header.HWResolution[0]));
-    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] *
-                                                r->header.HWResolution[1]));
+    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] * r->header.HWResolution[1] / 72.0));
+    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] * r->header.HWResolution[1] / 72.0));
     fh.cupsInteger[7]        = htonl(0xffffff);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
@@ -970,7 +966,7 @@ cups_raster_read_header(
 
   cups_raster_update(r);
 
-  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
+  return (r->header.cupsBitsPerPixel != 0 && r->header.cupsBitsPerColor != 0 && r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }
 
 
@@ -1240,6 +1236,9 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
   else
     r->bpp = (r->header.cupsBitsPerColor + 7) / 8;
 
+  if (r->bpp == 0)
+    r->bpp = 1;
+
  /*
   * Set the number of remaining rows...
   */
@@ -1291,6 +1290,9 @@ cups_raster_write(
   */
 
   count = r->header.cupsBytesPerLine * 2;
+  if (count < 3)
+    count = 3;
+
   if ((size_t)count > r->bufsize)
   {
     if (r->buffer)
@@ -1455,5 +1457,5 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
 
 
 /*
- * End of "$Id: raster.c 12453 2015-01-30 15:42:19Z msweet $".
+ * End of "$Id: raster.c 12679 2015-05-28 19:09:57Z msweet $".
  */

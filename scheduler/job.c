@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 12463 2015-01-30 16:34:31Z msweet $"
+ * "$Id: job.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -377,7 +377,7 @@ cupsdCheckJobs(void)
 
           if ((attr = ippFindAttribute(job->attrs, "job-actual-printer-uri",
 	                               IPP_TAG_URI)) != NULL)
-            cupsdSetString(&attr->values[0].string.text, printer->uri);
+            ippSetString(job->attrs, &attr, 0, printer->uri);
 	  else
 	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI,
 	                 "job-actual-printer-uri", NULL, printer->uri);
@@ -2066,7 +2066,7 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
 
   if ((attr = ippFindAttribute(job->attrs, "job-printer-uri",
                                IPP_TAG_URI)) != NULL)
-    cupsdSetString(&(attr->values[0].string.text), p->uri);
+    ippSetString(job->attrs, &attr, 0, p->uri);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
                 "Job #%d moved from %s to %s.", job->id, olddest,
@@ -2263,7 +2263,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
 
     if (attr)
-      cupsdSetString(&(attr->values[0].string.text), when);
+      ippSetString(job->attrs, &attr, 0, when);
     else
       attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                           "job-hold-until", NULL, when);
@@ -2518,8 +2518,8 @@ cupsdSetJobState(
 
 	if (attr)
 	{
-	  attr->value_tag = IPP_TAG_KEYWORD;
-	  cupsdSetString(&(attr->values[0].string.text), "no-hold");
+	  ippSetValueTag(job->attrs, &attr, IPP_TAG_KEYWORD);
+	  ippSetString(job->attrs, &attr, 0, "no-hold");
 	}
 
     default :
@@ -4565,7 +4565,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
                                             "job-printer-state-message",
                                             IPP_TAG_TEXT);
   if (job->printer_message)
-    cupsdSetString(&(job->printer_message->values[0].string.text), "");
+    ippSetString(job->attrs, &job->printer_message, 0, "");
 
   ippSetString(job->attrs, &job->reasons, 0, "job-printing");
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
@@ -5205,15 +5205,14 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
   if (job->state_value != IPP_JOB_PROCESSING &&
       job->status_level == CUPSD_LOG_INFO)
   {
-    cupsdSetString(&(job->printer_message->values[0].string.text), "");
+    ippSetString(job->attrs, &job->printer_message, 0, "");
 
     job->dirty = 1;
     cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else if (job->printer->state_message[0] && do_message)
   {
-    cupsdSetString(&(job->printer_message->values[0].string.text),
-		   job->printer->state_message);
+    ippSetString(job->attrs, &job->printer_message, 0, job->printer->state_message);
 
     job->dirty = 1;
     cupsdMarkDirty(CUPSD_DIRTY_JOBS);
@@ -5281,5 +5280,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 12463 2015-01-30 16:34:31Z msweet $".
+ * End of "$Id: job.c 12701 2015-06-08 18:33:44Z msweet $".
  */

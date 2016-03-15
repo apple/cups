@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp-var.c 11889 2014-05-22 13:54:15Z msweet $"
+ * "$Id: ipp-var.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * CGI <-> IPP variable routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1202,21 +1202,7 @@ cgiSetIPPObjectVars(
 	      * Rewrite URIs...
 	      */
 
-              if (!strcmp(name, "member_uris"))
-	      {
-		char	url[1024];	/* URL for class member... */
-
-
-		cgiRewriteURL(attr->values[i].string.text, url,
-		              sizeof(url), NULL);
-
-                snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
-		         "<A HREF=\"%s\">%s</A>", url,
-			 strrchr(attr->values[i].string.text, '/') + 1);
-	      }
-	      else
-		cgiRewriteURL(attr->values[i].string.text, valptr,
-		              (int)(sizeof(value) - (size_t)(valptr - value)), NULL);
+	      cgiRewriteURL(attr->values[i].string.text, valptr, (int)(sizeof(value) - (size_t)(valptr - value)), NULL);
               break;
             }
 
@@ -1561,5 +1547,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 11889 2014-05-22 13:54:15Z msweet $".
+ * End of "$Id: ipp-var.c 12701 2015-06-08 18:33:44Z msweet $".
  */

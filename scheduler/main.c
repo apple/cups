@@ -1,9 +1,9 @@
 /*
- * "$Id: main.c 12248 2014-11-12 16:32:57Z msweet $"
+ * "$Id: main.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1137,8 +1137,8 @@ cupsdAddString(cups_array_t **a,	/* IO - String array */
   if (!*a)
     *a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
 		       (cups_ahash_func_t)NULL, 0,
-		       (cups_acopy_func_t)_cupsStrAlloc,
-		       (cups_afree_func_t)_cupsStrFree);
+		       (cups_acopy_func_t)strdup,
+		       (cups_afree_func_t)free);
 
   return (cupsArrayAdd(*a, (char *)s));
 }
@@ -1168,7 +1168,7 @@ cupsdClearString(char **s)		/* O - String value */
 {
   if (s && *s)
   {
-    _cupsStrFree(*s);
+    free(*s);
     *s = NULL;
   }
 }
@@ -1249,10 +1249,10 @@ cupsdSetString(char       **s,		/* O - New string */
     return;
 
   if (*s)
-    _cupsStrFree(*s);
+    free(*s);
 
   if (v)
-    *s = _cupsStrAlloc(v);
+    *s = strdup(v);
   else
     *s = NULL;
 }
@@ -1283,13 +1283,13 @@ cupsdSetStringf(char       **s,		/* O - New string */
     vsnprintf(v, sizeof(v), f, ap);
     va_end(ap);
 
-    *s = _cupsStrAlloc(v);
+    *s = strdup(v);
   }
   else
     *s = NULL;
 
   if (olds)
-    _cupsStrFree(olds);
+    free(olds);
 }
 
 
@@ -1449,8 +1449,7 @@ process_children(void)
 	    }
 
 	    if (job->printer_message)
-	      cupsdSetString(&(job->printer_message->values[0].string.text),
-			     message);
+	      ippSetString(job->attrs, &job->printer_message, 0, message);
 	  }
 	}
 
@@ -2173,5 +2172,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 12248 2014-11-12 16:32:57Z msweet $".
+ * End of "$Id: main.c 12701 2015-06-08 18:33:44Z msweet $".
  */

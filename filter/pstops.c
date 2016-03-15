@@ -1,9 +1,9 @@
 /*
- * "$Id: pstops.c 12358 2014-12-11 17:42:22Z msweet $"
+ * "$Id: pstops.c 12656 2015-05-22 17:27:37Z msweet $"
  *
  * PostScript filter for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -265,7 +265,11 @@ main(int  argc,				/* I - Number of command-line args */
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
       if (!JobCanceled)
+      {
+        fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", argv[6]);
         _cupsLangPrintError("ERROR", _("Unable to open print file"));
+      }
+
       return (1);
     }
   }
@@ -3401,5 +3405,5 @@ write_options(
 
 
 /*
- * End of "$Id: pstops.c 12358 2014-12-11 17:42:22Z msweet $".
+ * End of "$Id: pstops.c 12656 2015-05-22 17:27:37Z msweet $".
  */

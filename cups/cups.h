@@ -1,9 +1,9 @@
 /*
- * "$Id: cups.h 12266 2014-11-19 16:05:28Z msweet $"
+ * "$Id: cups.h 12704 2015-06-08 19:08:01Z msweet $"
  *
  * API definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -49,10 +49,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			2.0002
+#  define CUPS_VERSION			2.0003
 #  define CUPS_VERSION_MAJOR		2
 #  define CUPS_VERSION_MINOR		0
-#  define CUPS_VERSION_PATCH		2
+#  define CUPS_VERSION_PATCH		3
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
@@ -628,5 +628,5 @@ extern int		cupsSetServerCredentials(const char *path, const char *common_name, 
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 12266 2014-11-19 16:05:28Z msweet $".
+ * End of "$Id: cups.h 12704 2015-06-08 19:08:01Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 12471 2015-02-01 05:07:10Z msweet $"
+ * "$Id: process.c 12522 2015-02-17 20:01:33Z msweet $"
  *
  * Process management routines for the CUPS scheduler.
  *
@@ -606,7 +606,7 @@ cupsdStartProcess(
   if (infd != 0)
   {
     if (infd < 0)
-      posix_spawn_file_actions_addopen(&actions, 0, "/dev/null", O_WRONLY, 0);
+      posix_spawn_file_actions_addopen(&actions, 0, "/dev/null", O_RDONLY, 0);
     else
       posix_spawn_file_actions_adddup2(&actions, infd, 0);
   }
@@ -890,5 +890,5 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: process.c 12471 2015-02-01 05:07:10Z msweet $".
+ * End of "$Id: process.c 12522 2015-02-17 20:01:33Z msweet $".
  */

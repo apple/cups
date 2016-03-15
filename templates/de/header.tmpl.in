@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/cups.css" type="text/css">
+    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    {refresh_page?<meta http-equiv="refresh" content="{refresh_page}">:}
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="width=device-width">
+    <style>html{display:none;}</style>
+    <script type="text/javascript"><!--
+      /* Only display document if we are not in a frame... */
+      if (self == top) {
+        document.documentElement.style.display = 'block';
+      } else {
+        top.location = self.location;
+      }
+
+      /* Show an error if cookies are disabled */
+      function check_cookies() {
+	if (!navigator.cookieEnabled) {
+	      document.getElementById('body').innerHTML = 'This page uses cookies to prevent common cross-site attacks. Please enable cookies in your browser.';
+	}
+      }
+    --></SCRIPT>
+    <title>{title} - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
+  </head>
+  <body onload="check_cookies();">
+    <div class="header">
+      <ul>
+	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
+	<li><a href="/">Home</a></li>
+	<li><a {SECTION=admin?class="active" :}href="/admin">Verwaltung</a></li>
+	<li><a {SECTION=classes?class="active" :}href="/classes/">Klassen</a></li>
+	<li><a {SECTION=help?class="active" :}href="/help/">Hilfe</a></li>
+	<li><a {SECTION=jobs?class="active" :}href="/jobs/">Aufträge</a></li>
+	<li><a {SECTION=printers?class="active" :}href="/printers/">Drucker</a></li>
+      </ul>
+    </div>
+    <div class="body">
+      <div class="row">
+	<h1>{title}</h1>

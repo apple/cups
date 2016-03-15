@@ -1,0 +1,8 @@
+<H2 CLASS="title">{title} auf {printer_name}</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Busy Indicator"> }Drucker Befehlsauftrag
+{job_state=3?unerledigt:{job_state=4?gehalten:
+{job_state=5?verarbeite:{job_state=6?gestoppt:
+{job_state=7?gelöscht:{job_state=8?abgebrochen:beendet}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}</P>

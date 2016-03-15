@@ -1,9 +1,9 @@
 /*
- * "$Id: rastertopwg.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: rastertopwg.c 12610 2015-05-06 12:24:54Z msweet $"
  *
  * CUPS raster to PWG raster format filter for CUPS.
  *
- * Copyright 2011, 2014 Apple Inc.
+ * Copyright 2011, 2014-2015 Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright law.
@@ -401,6 +401,9 @@ main(int  argc,				/* I - Number of command-line args */
     * Copy raster data...
     */
 
+    if (linesize < inheader.cupsBytesPerLine)
+      linesize = inheader.cupsBytesPerLine;
+
     line = malloc(linesize);
 
     memset(line, white, linesize);
@@ -415,7 +418,14 @@ main(int  argc,				/* I - Number of command-line args */
 
     for (y = inheader.cupsHeight; y > 0; y --)
     {
-      cupsRasterReadPixels(inras, line + lineoffset, inheader.cupsBytesPerLine);
+      if (cupsRasterReadPixels(inras, line + lineoffset, inheader.cupsBytesPerLine) != inheader.cupsBytesPerLine)
+      {
+	_cupsLangPrintFilter(stderr, "ERROR", _("Error reading raster data."));
+	fprintf(stderr, "DEBUG: Unable to read line %d for page %d.\n",
+	        inheader.cupsHeight - y + page_top + 1, page);
+	return (1);
+      }
+
       if (!cupsRasterWritePixels(outras, line, outheader.cupsBytesPerLine))
       {
 	_cupsLangPrintFilter(stderr, "ERROR", _("Error sending raster data."));
@@ -449,5 +459,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: rastertopwg.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: rastertopwg.c 12610 2015-05-06 12:24:54Z msweet $".
  */

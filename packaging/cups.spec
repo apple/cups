@@ -44,12 +44,12 @@
 
 Summary: CUPS
 Name: cups
-Version: 2.0.2
+Version: 2.0.3
 Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://www.cups.org/software/2.0.2/cups-2.0.2-source.tar.bz2
+Source: http://www.cups.org/software/2.0.3/cups-2.0.3-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.

@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 12463 2015-01-30 16:34:31Z msweet $"
+ * "$Id: conf.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -407,7 +407,7 @@ cupsdDefaultAuthType(void)
   * to use it...
   */
 
-  if (gss_init_sec_context == NULL)
+  if (&gss_init_sec_context == NULL)
     return (default_auth_type = CUPSD_AUTH_BASIC);
 #  endif /* __APPLE__ */
 
@@ -993,7 +993,7 @@ cupsdReadConfiguration(void)
       * Log the error and reset the group to a safe value...
       */
 
-      cupsdLogMessage(CUPSD_LOG_NOTICE,
+      cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Group and SystemGroup cannot use the same groups.");
       if (FatalErrors & (CUPSD_FATAL_CONFIG | CUPSD_FATAL_PERMISSIONS))
         return (0);
@@ -4143,5 +4143,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 12463 2015-01-30 16:34:31Z msweet $".
+ * End of "$Id: conf.c 12701 2015-06-08 18:33:44Z msweet $".
  */

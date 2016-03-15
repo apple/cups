@@ -1,9 +1,9 @@
 /*
- * "$Id: client.c 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: client.c 12701 2015-06-08 18:33:44Z msweet $"
  *
  * Client routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -484,7 +484,12 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
     httpClose(con->http);
 
-    cupsdClearString(&con->filename);
+    if (con->filename)
+    {
+      unlink(con->filename);
+      cupsdClearString(&con->filename);
+    }
+
     cupsdClearString(&con->command);
     cupsdClearString(&con->options);
     cupsdClearString(&con->query_string);
@@ -584,6 +589,17 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     * If we get called in the wrong state, then something went wrong with the
     * connection and we need to shut it down...
     */
+
+    if (!httpGetReady(con->http) && recv(httpGetFd(con->http), buf, 1, MSG_PEEK) < 1)
+    {
+     /*
+      * Connection closed...
+      */
+
+      cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on EOF.");
+      cupsdCloseClient(con);
+      return;
+    }
 
     cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.",
 		   httpStateString(httpGetState(con->http)));
@@ -1979,12 +1995,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	if (httpGetState(con->http) == HTTP_STATE_POST_SEND)
 	{
-	 /*
-	  * Don't listen for activity until we decide to do something with this...
-	  */
-
-          cupsdAddSelect(httpGetFd(con->http), NULL, NULL, con);
-
 	  if (con->file >= 0)
 	  {
 	    fstat(con->file, &filestats);
@@ -3656,7 +3666,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   snprintf(script_filename, sizeof(script_filename), "SCRIPT_FILENAME=%s%s",
            DocumentRoot, script_name + 12);
 
-  sprintf(server_port, "SERVER_PORT=%d", con->serverport);
+  snprintf(server_port, sizeof(server_port), "SERVER_PORT=%d", con->serverport);
 
   if (httpGetField(con->http, HTTP_FIELD_HOST)[0])
   {
@@ -4055,5 +4065,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: client.c 12701 2015-06-08 18:33:44Z msweet $".
  */
