@@ -1,0 +1,10 @@
+*.o
+.buildrev
+buildtest.env
+build.log
+temp
+tools/.buildrev
+tools/Makefile
+tools/config.log
+tools/config.status
+tools/sendbuildlog
