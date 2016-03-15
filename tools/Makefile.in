@@ -1,0 +1,60 @@
+#
+# "$Id: Makefile.in 12273 2014-11-20 17:58:48Z msweet $"
+#
+#   Makefile for build and test tools.
+#
+#   Copyright 2007 by Apple Inc.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+# Programs and options...
+CC		=	@CC@
+CFLAGS		=	@CFLAGS@
+LIBS		=	@LIBS@
+SHELL		=	/bin/sh
+
+
+# Directories...
+prefix		=	@prefix@
+exec_prefix	=	@exec_prefix@
+bindir		=	@bindir@
+
+
+# Targets...
+OBJS		=	sendbuildlog.o
+TARGETS		=	sendbuildlog
+
+
+# Make everything...
+all:	$(TARGETS)
+
+
+# Clean everything...
+clean:
+	rm -f $(TARGETS) $(OBJS)
+
+
+# Really clean everything...
+distclean:	clean
+	rm -f Makefile config.log config.status
+
+
+# Install everything...
+install: all
+	-mkdir -p $(bindir)
+	cp sendbuildlog $(bindir)
+
+
+# sendbuildlog mail tool
+sendbuildlog:	sendbuildlog.o
+	$(CC) $(CFLAGS) -o $@ sendbuildlog.o $(LIBS)
+
+#
+# End of "$Id: Makefile.in 12273 2014-11-20 17:58:48Z msweet $".
+#
