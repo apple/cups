@@ -1,10 +1,10 @@
 /*
- * "$Id: tls-sspi.c 12215 2014-10-20 18:24:56Z msweet $"
+ * "$Id: tls-sspi.c 12481 2015-02-03 12:45:14Z msweet $"
  *
  * TLS support for CUPS on Windows using the Security Support Provider
  * Interface (SSPI).
  *
- * Copyright 2010-2014 by Apple Inc.
+ * Copyright 2010-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -261,6 +261,9 @@ httpCredentialsGetTrust(
   cert = http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials));
   if (!cert)
     return (HTTP_TRUST_UNKNOWN);
+
+  if (cg->any_root < 0)
+    _cupsSetDefaults();
 
   if (cg->any_root)
     certFlags |= SECURITY_FLAG_IGNORE_UNKNOWN_CA;
@@ -2413,5 +2416,5 @@ http_sspi_verify(
 
 
 /*
- * End of "$Id: tls-sspi.c 12215 2014-10-20 18:24:56Z msweet $".
+ * End of "$Id: tls-sspi.c 12481 2015-02-03 12:45:14Z msweet $".
  */

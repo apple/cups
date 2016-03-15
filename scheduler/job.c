@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 12140 2014-08-30 01:51:22Z msweet $"
+ * "$Id: job.c 12463 2015-01-30 16:34:31Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -489,7 +489,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
   struct stat		fileinfo;	/* Job file information */
-  int			argc;		/* Number of arguments */
+  int			argc = 0;	/* Number of arguments */
   char			**argv = NULL,	/* Filter command-line arguments */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
@@ -4059,14 +4059,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       if (job)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d.",
-	                linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d of %s.", linenum, filename);
         continue;
       }
 
       if (!value)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d of %s.", linenum, filename);
 	continue;
       }
 
@@ -4074,8 +4073,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (jobid < 1)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d.", jobid,
-	                linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d of %s.", jobid, linenum, filename);
         continue;
       }
 
@@ -4114,7 +4112,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else if (!job)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "Missing <Job #> directive on line %d.", linenum);
+	              "Missing <Job #> directive on line %d of %s.", linenum, filename);
       continue;
     }
     else if (!_cups_strcasecmp(line, "</Job>"))
@@ -4136,7 +4134,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     }
     else if (!value)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d of %s.", linenum, filename);
       continue;
     }
     else if (!_cups_strcasecmp(line, "State"))
@@ -4190,8 +4188,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (job->num_files < 0)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d.",
-	                job->num_files, linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d of %s.", job->num_files, linenum, filename);
         job->num_files = 0;
 	continue;
       }
@@ -4230,14 +4227,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       if (sscanf(value, "%d%*[ \t]%15[^/]/%255s%d", &number, super, type,
                  &compression) != 4)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d of %s.", linenum, filename);
 	continue;
       }
 
       if (number < 1 || number > job->num_files)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d.",
-	                number, linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d of %s.", number, linenum, filename);
         continue;
       }
 
@@ -4271,14 +4267,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       }
     }
     else
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d.",
-                      line, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d of %s.", line, linenum, filename);
   }
 
   if (job)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Missing </Job> directive on line %d.", linenum);
+		    "Missing </Job> directive on line %d of %s.", linenum, filename);
     cupsdDeleteJob(job, CUPSD_JOB_PURGE);
   }
 
@@ -4738,7 +4733,7 @@ stop_job(cupsd_job_t       *job,	/* I - Job */
   FilterLevel -= job->cost;
   job->cost   = 0;
 
-  if (action == CUPSD_JOB_DEFAULT && !job->kill_time)
+  if (action == CUPSD_JOB_DEFAULT && !job->kill_time && job->backend > 0)
     job->kill_time = time(NULL) + JobKillDelay;
   else if (action >= CUPSD_JOB_FORCE)
     job->kill_time = 0;
@@ -5286,5 +5281,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 12140 2014-08-30 01:51:22Z msweet $".
+ * End of "$Id: job.c 12463 2015-01-30 16:34:31Z msweet $".
  */

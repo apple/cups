@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 12248 2014-11-12 16:32:57Z msweet $"
+# "$Id: run-stp-tests.sh 12398 2014-12-19 16:56:15Z msweet $"
 #
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
@@ -189,15 +189,18 @@ if test -z "$user"; then
 	fi
 fi
 
-port=8631
+port="${CUPS_TESTPORT:=8631}"
 cwd=`pwd`
 root=`dirname $cwd`
 CUPS_TESTROOT="$root"; export CUPS_TESTROOT
 
-if test -d /private/tmp; then
-	BASE=/private/tmp/cups-$user
-else
-	BASE=/tmp/cups-$user
+BASE="${CUPS_TESTBASE:=}"
+if test -z "$BASE"; then
+	if test -d /private/tmp; then
+		BASE=/private/tmp/cups-$user
+	else
+		BASE=/tmp/cups-$user
+	fi
 fi
 export BASE
 
@@ -335,13 +338,30 @@ ln -s $root/filter/rastertoepson $BASE/bin/filter
 ln -s $root/filter/rastertohp $BASE/bin/filter
 ln -s $root/filter/rastertolabel $BASE/bin/filter
 ln -s $root/filter/rastertopwg $BASE/bin/filter
+cat >$BASE/share/banners/standard <<EOF
+           ==== Cover Page ====
 
-ln -s $root/data/classified $BASE/share/banners
-ln -s $root/data/confidential $BASE/share/banners
-ln -s $root/data/secret $BASE/share/banners
-ln -s $root/data/standard $BASE/share/banners
-ln -s $root/data/topsecret $BASE/share/banners
-ln -s $root/data/unclassified $BASE/share/banners
+
+      Job: {?printer-name}-{?job-id}
+    Owner: {?job-originating-user-name}
+     Name: {?job-name}
+    Pages: {?job-impressions}
+
+
+           ==== Cover Page ====
+EOF
+cat >$BASE/share/banners/classified <<EOF
+           ==== Classified - Do Not Disclose ====
+
+
+      Job: {?printer-name}-{?job-id}
+    Owner: {?job-originating-user-name}
+     Name: {?job-name}
+    Pages: {?job-impressions}
+
+
+           ==== Classified - Do Not Disclose ====
+EOF
 ln -s $root/data $BASE/share
 ln -s $root/ppdc/sample.drv $BASE/share/drv
 ln -s $root/conf/mime.types $BASE/share/mime
@@ -364,7 +384,7 @@ instfilter() {
 	dst="$2"
 	format="$3"
 
-	for dir in /usr/libexec/cups/filter /usr/lib/cups/filter; do
+	for dir in /usr/local/libexec/cups/filter /usr/libexec/cups/filter /usr/lib/cups/filter; do
 		if test -x "$dir/$src"; then
 			ln -s "$dir/$src" "$BASE/bin/filter/$dst"
 			return
@@ -379,12 +399,15 @@ instfilter() {
 		pdf)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		cat "$root/test/onepage-a4.pdf"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.pdf"
 		;;
 	*)
-		cat "$root/test/onepage-letter.pdf"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter.pdf"
 		;;
 esac
 EOF
@@ -393,12 +416,15 @@ EOF
 		ps)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		cat "$root/test/onepage-a4.ps"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.ps"
 		;;
 	*)
-		cat "$root/test/onepage-letter.ps"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter.ps"
 		;;
 esac
 EOF
@@ -407,12 +433,15 @@ EOF
 		raster)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		gunzip -c "$root/test/onepage-a4-300-black-1.pwg.gz"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4-300-black-1.pwg.gz"
 		;;
 	*)
-		gunzip -c "$root/test/onepage-letter-300-black-1.pwg.gz"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter-300-black-1.pwg.gz"
 		;;
 esac
 EOF
@@ -424,17 +453,13 @@ EOF
 ln -s $root/test/test.convs $BASE/share/mime
 
 if test `uname` = Darwin; then
-	instfilter cgbannertopdf bannertopdf pdf
 	instfilter cgimagetopdf imagetopdf pdf
 	instfilter cgpdftopdf pdftopdf passthru
 	instfilter cgpdftops pdftops ps
 	instfilter cgpdftoraster pdftoraster raster
 	instfilter cgtexttopdf texttopdf pdf
 	instfilter pstocupsraster pstoraster raster
-	instfilter pstopdffilter pstopdf pdf
 else
-	instfilter bannertopdf bannertopdf pdf
-	instfilter bannertops bannertops ps
 	instfilter imagetopdf imagetopdf pdf
 	instfilter pdftopdf pdftopdf passthru
 	instfilter pdftops pdftops ps
@@ -472,7 +497,7 @@ AccessLogLevel actions
 LogLevel $loglevel
 LogTimeFormat usecs
 PreserveJobHistory Yes
-PreserveJobFiles No
+PreserveJobFiles 5m
 <Policy default>
 <Limit All>
 Order Allow,Deny
@@ -591,7 +616,7 @@ fi
 export SHLIB_PATH
 
 CUPS_DISABLE_APPLE_DEFAULT=yes; export CUPS_DISABLE_APPLE_DEFAULT
-CUPS_SERVER=localhost:8631; export CUPS_SERVER
+CUPS_SERVER=localhost:$port; export CUPS_SERVER
 CUPS_SERVERROOT=$BASE; export CUPS_SERVERROOT
 CUPS_STATEDIR=$BASE; export CUPS_STATEDIR
 CUPS_DATADIR=$BASE/share; export CUPS_DATADIR
@@ -632,7 +657,7 @@ cupsd=$!
 
 if test "x$testtype" = x0; then
 	# Not running tests...
-	echo "Scheduler is PID $cupsd and is listening on port 8631."
+	echo "Scheduler is PID $cupsd and is listening on port $port."
 	echo ""
 
 	# Create a helper script to run programs with...
@@ -694,7 +719,13 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=$BASE/cups-str-2.0-$date-$user.html
+
+if test -d $root/.svn; then
+	rev=`svn info . | grep Revision: | awk '{print $2}'`
+	strfile=$BASE/cups-str-2.0-r$rev-$user.html
+else
+	strfile=$BASE/cups-str-2.0-$date-$user.html
+fi
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -792,7 +823,7 @@ while true; do
 	fi
 done
 
-description="`lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
+description="`../systemv/lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
 if test "x$description" != "xTest Printer 1"; then
 	echo "Failed, printer-info for Test1 is '$description', expected 'Test Printer 1'." >>$strfile
 	echo "FAIL (got '$description', expected 'Test Printer 1')"
@@ -1047,7 +1078,13 @@ echo ""
 
 if test $fail != 0; then
 	echo "$fail tests failed."
-	cp $BASE/log/error_log error_log-$date-$user
+
+	if test -d $root/.svn; then
+		cp $BASE/log/error_log error_log-r$rev-$user
+	else
+		cp $BASE/log/error_log error_log-$date-$user
+	fi
+
 	cp $strfile .
 else
 	echo "All tests were successful."
@@ -1066,5 +1103,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 12248 2014-11-12 16:32:57Z msweet $"
+# End of "$Id: run-stp-tests.sh 12398 2014-12-19 16:56:15Z msweet $"
 #

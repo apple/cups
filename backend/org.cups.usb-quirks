@@ -224,3 +224,6 @@
 
 # Canon MX320 (STR #4482)
 0x04A9 0x1736 unidir
+
+# All Intermec devices (STR #4553)
+0x067e no-reattach

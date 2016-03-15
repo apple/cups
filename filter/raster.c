@@ -1,9 +1,9 @@
 /*
- * "$Id: raster.c 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: raster.c 12453 2015-01-30 15:42:19Z msweet $"
  *
  * Raster file routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * This file is part of the CUPS Imaging library.
@@ -256,7 +256,10 @@ cupsRasterReadHeader(
   */
 
   if (!cups_raster_read_header(r))
+  {
+    memset(h, 0, sizeof(cups_page_header_t));
     return (0);
+  }
 
  /*
   * Copy the header to the user-supplied buffer...
@@ -285,7 +288,10 @@ cupsRasterReadHeader2(
   */
 
   if (!cups_raster_read_header(r))
+  {
+    memset(h, 0, sizeof(cups_page_header2_t));
     return (0);
+  }
 
  /*
   * Copy the header to the user-supplied buffer...
@@ -603,8 +609,9 @@ cupsRasterWriteHeader(
     fh.cupsInteger[15]       = htonl(r->header.cupsInteger[15]);
 					/* VendorLength */
 
-    memcpy(fh.cupsReal, r->header.cupsReal,
-           sizeof(fh.cupsReal) + sizeof(fh.cupsString));
+    void *dst = fh.cupsReal; /* Bypass bogus compiler warning */
+    void *src = r->header.cupsReal;
+    memcpy(dst, src, sizeof(fh.cupsReal) + sizeof(fh.cupsString));
 					/* VendorData */
 
     strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
@@ -963,7 +970,7 @@ cups_raster_read_header(
 
   cups_raster_update(r);
 
-  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0);
+  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }
 
 
@@ -1448,5 +1455,5 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
 
 
 /*
- * End of "$Id: raster.c 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: raster.c 12453 2015-01-30 15:42:19Z msweet $".
  */

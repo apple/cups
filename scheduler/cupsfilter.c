@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsfilter.c 11770 2014-03-28 14:49:58Z msweet $"
+ * "$Id: cupsfilter.c 12303 2014-12-09 16:16:07Z msweet $"
  *
  * Filtering program for CUPS.
  *
@@ -178,7 +178,7 @@ main(int  argc,				/* I - Number of command-line args */
 	if (i < argc && !infile)
 	  infile = argv[i];
 	else
-	  usage(opt);
+	  usage(NULL);
       }
       else
       {
@@ -1501,5 +1501,5 @@ usage(const char *opt)			/* I - Incorrect option, if any */
 
 
 /*
- * End of "$Id: cupsfilter.c 11770 2014-03-28 14:49:58Z msweet $".
+ * End of "$Id: cupsfilter.c 12303 2014-12-09 16:16:07Z msweet $".
  */

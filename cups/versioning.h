@@ -1,5 +1,5 @@
 /*
- * "$Id: versioning.h 11232 2013-08-12 19:33:47Z msweet $"
+ * "$Id: versioning.h 12419 2015-01-22 15:51:20Z msweet $"
  *
  *   API versioning definitions for CUPS.
  *
@@ -53,6 +53,9 @@
 #    ifndef AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #      define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER __attribute__((unavailable))
 #    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER */
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER */
 #    define _CUPS_API_1_1_19 AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #    define _CUPS_API_1_1_20 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #    define _CUPS_API_1_1_21 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
@@ -62,7 +65,7 @@
 #    define _CUPS_API_1_5 AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #    define _CUPS_API_1_6 AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #    define _CUPS_API_1_7 AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
-#    define _CUPS_API_2_0
+#    define _CUPS_API_2_0 AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #  else
 #    define _CUPS_API_1_1_19
 #    define _CUPS_API_1_1_20
@@ -159,5 +162,5 @@
 #endif /* !_CUPS_VERSIONING_H_ */
 
 /*
- * End of "$Id: versioning.h 11232 2013-08-12 19:33:47Z msweet $".
+ * End of "$Id: versioning.h 12419 2015-01-22 15:51:20Z msweet $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 11129 2013-07-11 20:39:46Z msweet $"
+# "$Id: Makefile 12415 2015-01-21 00:03:08Z msweet $"
 #
 #   IPP test makefile for CUPS.
 #
@@ -90,7 +90,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(TARGETS) $(OBJS)
+	$(RM) $(TARGETS) $(OBJS) ippfind-static
 
 
 #
@@ -241,5 +241,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 11129 2013-07-11 20:39:46Z msweet $".
+# End of "$Id: Makefile 12415 2015-01-21 00:03:08Z msweet $".
 #

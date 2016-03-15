@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 11627 2014-02-20 16:15:09Z msweet $"
+ * "$Id: file.c 12297 2014-12-08 19:26:32Z msweet $"
  *
  * File functions for CUPS.
  *
@@ -288,6 +288,7 @@ _cupsFileCheckFilter(
 
   switch (result)
   {
+    default :
     case _CUPS_FILE_CHECK_OK :
         prefix = "DEBUG2";
 	break;
@@ -2671,5 +2672,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 11627 2014-02-20 16:15:09Z msweet $".
+ * End of "$Id: file.c 12297 2014-12-08 19:26:32Z msweet $".
  */

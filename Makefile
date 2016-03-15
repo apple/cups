@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 12145 2014-09-02 15:00:50Z msweet $"
+# "$Id: Makefile 12415 2015-01-21 00:03:08Z msweet $"
 #
 # Top-level Makefile for CUPS.
 #
@@ -105,7 +105,7 @@ distclean:	clean
 	$(RM) doc/index.html
 	$(RM) man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man
 	$(RM) packaging/cups.list
-	$(RM) scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket
+	$(RM) scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpdAT.service scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket
 	$(RM) templates/header.tmpl
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
@@ -348,5 +348,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 12145 2014-09-02 15:00:50Z msweet $".
+# End of "$Id: Makefile 12415 2015-01-21 00:03:08Z msweet $".
 #

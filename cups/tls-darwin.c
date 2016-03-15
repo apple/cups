@@ -1,9 +1,9 @@
 /*
- * "$Id: tls-darwin.c 12215 2014-10-20 18:24:56Z msweet $"
+ * "$Id: tls-darwin.c 12481 2015-02-03 12:45:14Z msweet $"
  *
  * TLS support code for CUPS on OS X.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -545,6 +545,9 @@ httpCredentialsGetTrust(
 
   if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (HTTP_TRUST_UNKNOWN);
+
+  if (cg->any_root < 0)
+    _cupsSetDefaults();
 
  /*
   * Look this common name up in the default keychains...
@@ -1779,5 +1782,5 @@ http_cdsa_write(
 
 
 /*
- * End of "$Id: tls-darwin.c 12215 2014-10-20 18:24:56Z msweet $".
+ * End of "$Id: tls-darwin.c 12481 2015-02-03 12:45:14Z msweet $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-startup.m4 11747 2014-03-27 01:15:48Z msweet $"
+dnl "$Id: cups-startup.m4 12351 2014-12-09 22:18:45Z msweet $"
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
@@ -166,11 +166,11 @@ if test "x$xinetd" = x; then
                         fi
                 done
         fi
-elif test "x$xinet" != xno; then
+elif test "x$xinetd" != xno; then
 	XINETD="$xinetd"
 fi
 
 
 dnl
-dnl End of "$Id: cups-startup.m4 11747 2014-03-27 01:15:48Z msweet $".
+dnl End of "$Id: cups-startup.m4 12351 2014-12-09 22:18:45Z msweet $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 12170 2014-09-30 16:12:03Z msweet $"
+ * "$Id: printers.c 12463 2015-01-30 16:34:31Z msweet $"
  *
  * Printer routines for the CUPS scheduler.
  *
@@ -3685,8 +3685,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
 
-  cupsdClearString(&(p->make_model));
-
   if (cache_info.st_mtime >= ppd_info.st_mtime)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", cache_name);
@@ -3709,6 +3707,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
+
+  cupsdClearString(&(p->make_model));
 
   p->type &= (cups_ptype_t)~CUPS_PRINTER_OPTIONS;
   p->type |= CUPS_PRINTER_BW;
@@ -4724,14 +4724,12 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     pstatus = ppdLastError(&pline);
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "PPD file for %s cannot be loaded!",
-		    p->name);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "PPD file for %s cannot be loaded.", p->name);
 
     if (pstatus <= PPD_ALLOC_ERROR)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", ppd_name, strerror(errno));
     else
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s on line %d.",
-		      ppdErrorString(pstatus), pline);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s on line %d of %s.", ppdErrorString(pstatus), pline, ppd_name);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
 		    "Hint: Run \"cupstestppd %s\" and fix any errors.",
@@ -4936,5 +4934,5 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
 
 
 /*
- * End of "$Id: printers.c 12170 2014-09-30 16:12:03Z msweet $".
+ * End of "$Id: printers.c 12463 2015-01-30 16:34:31Z msweet $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: http-private.h 12243 2014-11-12 12:12:59Z msweet $"
+ * "$Id: http-private.h 12419 2015-01-22 15:51:20Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -186,10 +186,6 @@ typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
 #    if !defined(HAVE_SECBASEPRIV_H) && defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */
 extern const char *cssmErrorString(int error);
 #    endif /* !HAVE_SECBASEPRIV_H && HAVE_CSSMERRORSTRING */
-#    ifndef HAVE_SECITEMPRIV_H /* Declare constants from that header... */
-extern const CFTypeRef kSecClassCertificate;
-extern const CFTypeRef kSecClassIdentity;
-#    endif /* !HAVE_SECITEMPRIV_H */
 #    if !defined(HAVE_SECIDENTITYSEARCHPRIV_H) && defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
 extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
 				CFStringRef idString, CSSM_KEYUSE keyUsage,
@@ -442,5 +438,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 12243 2014-11-12 12:12:59Z msweet $".
+ * End of "$Id: http-private.h 12419 2015-01-22 15:51:20Z msweet $".
  */

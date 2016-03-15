@@ -1,9 +1,9 @@
 /*
- * "$Id: process.c 12252 2014-11-14 17:14:45Z msweet $"
+ * "$Id: process.c 12471 2015-02-01 05:07:10Z msweet $"
  *
  * Process management routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -25,6 +25,15 @@
 #ifdef HAVE_POSIX_SPAWN
 #  include <spawn.h>
 extern char **environ;
+#endif /* HAVE_POSIX_SPAWN */
+#ifdef HAVE_POSIX_SPAWN
+#  if !defined(__OpenBSD__) || OpenBSD >= 201505
+#    define USE_POSIX_SPAWN 1
+#  else
+#    define USE_POSIX_SPAWN 0
+#  endif /* !__OpenBSD__ || */
+#else
+#  define USE_POSIX_SPAWN 0
 #endif /* HAVE_POSIX_SPAWN */
 
 
@@ -323,6 +332,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
     /* Also allow access to device files... */
     cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
                      "       (regex #\"^/dev/\"))\n");
+
+    /* And allow kernel extensions to be loaded, e.g., SMB */
+    cupsFilePuts(fp, "(allow system-kext-load)\n");
   }
   else
   {
@@ -465,13 +477,13 @@ cupsdStartProcess(
 		nice_str[16];		/* FilterNice string */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
-#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__)
+#if USE_POSIX_SPAWN
   posix_spawn_file_actions_t actions;	/* Spawn file actions */
   posix_spawnattr_t attrs;		/* Spawn attributes */
   sigset_t	defsignals;		/* Default signals */
 #elif defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
+#endif /* USE_POSIX_SPAWN */
 #if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */
@@ -535,9 +547,9 @@ cupsdStartProcess(
   * Use helper program when we have a sandbox profile...
   */
 
-#if !defined(HAVE_POSIX_SPAWN) || defined(__OpenBSD__)
+#if !USE_POSIX_SPAWN
   if (profile)
-#endif /* !HAVE_POSIX_SPAWN || __OpenBSD__ */
+#endif /* !USE_POSIX_SPAWN */
   {
     snprintf(cups_exec, sizeof(cups_exec), "%s/daemon/cups-exec", ServerBin);
     snprintf(user_str, sizeof(user_str), "%d", user);
@@ -573,7 +585,7 @@ cupsdStartProcess(
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: argv[%d] = \"%s\"", i, argv[i]);
   }
 
-#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__) /* OpenBSD posix_spawn is busted with SETSIGDEF */
+#if USE_POSIX_SPAWN
  /*
   * Setup attributes and file actions for the spawn...
   */
@@ -796,7 +808,7 @@ cupsdStartProcess(
   }
 
   cupsdReleaseSignals();
-#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
+#endif /* USE_POSIX_SPAWN */
 
   if (*pid)
   {
@@ -878,5 +890,5 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: process.c 12252 2014-11-14 17:14:45Z msweet $".
+ * End of "$Id: process.c 12471 2015-02-01 05:07:10Z msweet $".
  */

@@ -1561,6 +1561,8 @@
 		72F75A6A1336FA8A004BB496 /* interpret.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = interpret.c; path = ../filter/interpret.c; sourceTree = "<group>"; };
 		72F75A6B1336FA8A004BB496 /* raster.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = raster.c; path = ../filter/raster.c; sourceTree = "<group>"; };
 		72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */ = {isa = PBXFileReference; lastKnownFileType = text; name = "org.cups.usb-quirks"; path = "../backend/org.cups.usb-quirks"; sourceTree = "<group>"; };
+		72FC29CF1A37A1CA00BDF935 /* usb-libusb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "usb-libusb.c"; path = "../backend/usb-libusb.c"; sourceTree = "<group>"; };
+		72FC29D01A37A1CA00BDF935 /* usb-unix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "usb-unix.c"; path = "../backend/usb-unix.c"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2248,7 +2250,6 @@
 		724378F71333E3CE009631B9 /* backends */ = {
 			isa = PBXGroup;
 			children = (
-				72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */,
 				724379091333E4E3009631B9 /* backend-private.h */,
 				724379501333FEBB009631B9 /* dnssd.c */,
 				724379CA1334000E009631B9 /* ieee1284.c */,
@@ -2256,11 +2257,14 @@
 				724379281333E952009631B9 /* lpd.c */,
 				7243790B1333E4E3009631B9 /* network.c */,
 				724379121333E516009631B9 /* runloop.c */,
-				720DD6D21358FDDE0064AA82 /* snmp.c */,
 				7243790C1333E4E3009631B9 /* snmp-supplies.c */,
+				720DD6D21358FDDE0064AA82 /* snmp.c */,
 				7243793C1333FD19009631B9 /* socket.c */,
 				724379C51333FFC7009631B9 /* usb.c */,
 				724379C41333FFC7009631B9 /* usb-darwin.c */,
+				72FC29CF1A37A1CA00BDF935 /* usb-libusb.c */,
+				72FC29D01A37A1CA00BDF935 /* usb-unix.c */,
+				72F7F1D719D1C0CC00870B09 /* org.cups.usb-quirks */,
 			);
 			name = backends;
 			sourceTree = "<group>";

@@ -1,9 +1,9 @@
 /*
- * "$Id: ippserver.c 12215 2014-10-20 18:24:56Z msweet $"
+ * "$Id: ippserver.c 12486 2015-02-04 13:13:21Z msweet $"
  *
  * Sample IPP Everywhere server for CUPS.
  *
- * Copyright 2010-2014 by Apple Inc.
+ * Copyright 2010-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -361,7 +361,7 @@ static void		delete_client(_ipp_client_t *client);
 static void		delete_job(_ipp_job_t *job);
 static void		delete_printer(_ipp_printer_t *printer);
 #ifdef HAVE_DNSSD
-static void		dnssd_callback(DNSServiceRef sdRef,
+static void DNSSD_API	dnssd_callback(DNSServiceRef sdRef,
 				       DNSServiceFlags flags,
 				       DNSServiceErrorType errorCode,
 				       const char *name,
@@ -419,12 +419,12 @@ static int		valid_job_attributes(_ipp_client_t *client);
  * Globals...
  */
 
-#  ifdef HAVE_DNSSD
+#ifdef HAVE_DNSSD
 static DNSServiceRef	DNSSDMaster = NULL;
-#  else /* HAVE_AVAHI */
+#elif defined(HAVE_AVAHI)
 static AvahiThreadedPoll *DNSSDMaster = NULL;
 static AvahiClient	*DNSSDClient = NULL;
-#  endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD */
 
 static int		KeepFiles = 0,
 			Verbosity = 0;
@@ -630,9 +630,22 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!directory[0])
   {
-    snprintf(directory, sizeof(directory), "/tmp/ippserver.%d", (int)getpid());
+    const char *tmpdir;			/* Temporary directory */
 
-    if (mkdir(directory, 0777) && errno != EEXIST)
+#ifdef WIN32
+    if ((tmpdir = getenv("TEMP")) == NULL)
+      tmpdir = "C:/TEMP";
+#elif defined(__APPLE__)
+    if ((tmpdir = getenv("TMPDIR")) == NULL)
+      tmpdir = "/private/tmp";
+#else
+    if ((tmpdir = getenv("TMPDIR")) == NULL)
+      tmpdir = "/tmp";
+#endif /* WIN32 */
+
+    snprintf(directory, sizeof(directory), "%s/ippserver.%d", tmpdir, (int)getpid());
+
+    if (mkdir(directory, 0755) && errno != EEXIST)
     {
       fprintf(stderr, "Unable to create spool directory \"%s\": %s\n",
 	      directory, strerror(errno));
@@ -2286,7 +2299,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
  * 'dnssd_callback()' - Handle Bonjour registration events.
  */
 
-static void
+static void DNSSD_API
 dnssd_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Status flags */
@@ -5455,6 +5468,13 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       perror("Unable to start job processing command");
       status = -1;
+
+     /*
+      * Free memory used for environment...
+      */
+
+      while (myenvc > 0)
+	free(myenvp[-- myenvc]);
     }
     else
     {
@@ -5464,7 +5484,6 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       while (myenvc > 0)
 	free(myenvp[-- myenvc]);
-
      /*
       * Wait for child to complete...
       */
@@ -5544,7 +5563,9 @@ register_printer(
     int            duplex,		/* I - 1 = duplex, 0 = simplex */
     const char     *subtype)		/* I - Service subtype */
 {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   _ipp_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 #ifdef HAVE_DNSSD
   DNSServiceErrorType	error;		/* Error from Bonjour */
   char			make_model[256],/* Make and model together */
@@ -6468,5 +6489,5 @@ valid_job_attributes(
 
 
 /*
- * End of "$Id: ippserver.c 12215 2014-10-20 18:24:56Z msweet $".
+ * End of "$Id: ippserver.c 12486 2015-02-04 13:13:21Z msweet $".
  */

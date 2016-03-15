@@ -1,5 +1,5 @@
 /*
- * "$Id: help-index.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: help-index.c 12344 2014-12-09 21:36:11Z msweet $"
  *
  * Online help index routines for CUPS.
  *
@@ -884,7 +884,7 @@ help_load_file(
 
 
   DEBUG_printf(("2help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", "
-                "mtime=%ld)", hi, filename, relative, mtime));
+                "mtime=%ld)", hi, filename, relative, (long)mtime));
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (-1);
@@ -1306,5 +1306,5 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
 
 
 /*
- * End of "$Id: help-index.c 11594 2014-02-14 20:09:01Z msweet $".
+ * End of "$Id: help-index.c 12344 2014-12-09 21:36:11Z msweet $".
  */

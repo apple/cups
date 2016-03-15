@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.4-lpstat.sh 11398 2013-11-06 20:11:11Z msweet $"
+# "$Id: 5.4-lpstat.sh 12491 2015-02-06 18:46:09Z msweet $"
 #
 #   Test the lpstat command.
 #
@@ -30,7 +30,7 @@ echo "LPSTAT Test"
 echo ""
 echo "    lpstat -H"
 server="`$VALGRIND ../systemv/lpstat -H 2>&1`"
-if test $? != 0 -o "x$server" != xlocalhost:8631; then
+if test $? != 0 -o "x$server" != x$CUPS_SERVER; then
 	echo "    FAILED ($server)"
 	exit 1
 else
@@ -39,5 +39,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.4-lpstat.sh 11398 2013-11-06 20:11:11Z msweet $".
+# End of "$Id: 5.4-lpstat.sh 12491 2015-02-06 18:46:09Z msweet $".
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c 12093 2014-08-19 12:10:17Z msweet $"
+ * "$Id: ipp.c 12469 2015-02-01 04:51:08Z msweet $"
  *
  * Internet Printing Protocol functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2032,7 +2032,7 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
 			*childattr;	/* Child attribute */
   ipp_tag_t		value_tag;	/* Value tag */
   char			parent[1024],	/* Parent attribute name */
-			*child;		/* Child attribute name */
+			*child = NULL;	/* Child attribute name */
 
 
   DEBUG_printf(("2ippFindNextAttribute(ipp=%p, name=\"%s\", type=%02x(%s))",
@@ -6675,7 +6675,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
     DEBUG_printf(("5ipp_length: attr->name=\"%s\", attr->num_values=%d, "
                   "bytes=" CUPS_LLFMT, attr->name, attr->num_values, CUPS_LLCAST bytes));
 
-    if (attr->value_tag < IPP_TAG_EXTENSION)
+    if ((attr->value_tag & ~IPP_TAG_CUPS_CONST) < IPP_TAG_EXTENSION)
       bytes += (size_t)attr->num_values;/* Value tag for each value */
     else
       bytes += (size_t)(5 * attr->num_values);
@@ -6821,6 +6821,22 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       */
 
       if (!httpWait(http, 10000))
+      {
+       /*
+	* Signal no data...
+	*/
+
+	bytes = -1;
+	break;
+      }
+    }
+    else if (http->used == 0 && http->timeout_value > 0)
+    {
+     /*
+      * Wait up to timeout seconds for more data on blocking sockets...
+      */
+
+      if (!httpWait(http, (int)(1000 * http->timeout_value)))
       {
        /*
 	* Signal no data...
@@ -7046,5 +7062,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id: ipp.c 12093 2014-08-19 12:10:17Z msweet $".
+ * End of "$Id: ipp.c 12469 2015-02-01 04:51:08Z msweet $".
  */

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 11719 2014-03-21 18:07:23Z msweet $"
+dnl "$Id: cups-network.m4 12325 2014-12-09 20:28:51Z msweet $"
 dnl
 dnl Networking stuff for CUPS.
 dnl
@@ -13,7 +13,12 @@ dnl which should have been included with this file.  If this file is
 dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H))
+AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H),,[
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>])
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(gethostbyaddr, nsl)
 AC_SEARCH_LIBS(getifaddrs, nsl, AC_DEFINE(HAVE_GETIFADDRS))
@@ -67,5 +72,5 @@ AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
 
 dnl
-dnl End of "$Id: cups-network.m4 11719 2014-03-21 18:07:23Z msweet $".
+dnl End of "$Id: cups-network.m4 12325 2014-12-09 20:28:51Z msweet $".
 dnl

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/cups.css" type="text/css">
+    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="width=device-width">
+    <title>ホーム - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
+  </head>
+  <body>
+    <div class="header">
+      <ul>
+	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
+	<li><a class="active" href="/">ホーム</a></li>
+	<li><a href="/admin">管理</a></li>
+	<li><a href="/classes/">クラス</a></li>
+	<li><a href="/help/">ヘルプ</a></li>
+	<li><a href="/jobs/">ジョブ</a></li>
+	<li><a href="/printers/">プリンター</a></li>
+      </ul>
+    </div>
+    <div class="body">
+      <div class="row">
+	<h1>CUPS @CUPS_VERSION@</h1>
+	<p>CUPS は、OS X<sup>&reg;</sup> およびその他の UNIX <SUP>&reg;</sup> 系 OS のために、<a href="http://www.apple.com/">Apple Inc.</a> によって開発された標準ベースのオープンソース印刷システムです。</p>
+      </div>
+      <div class="row">
+	<div class="thirds">
+	  <h2>CUPS ユーザー向け</h2>
+	  <p><a href="help/overview.html">CUPS の概要</a></p>
+	  <p><a href="help/options.html">コマンドラインからの印刷とオプション</a></p>
+	  <p><a href="http://www.cups.org/lists.php?LIST=cups">ユーザーフォーラム</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS 管理者向け</h2>
+	  <p><a href="admin">プリンターとクラスの追加</a></p>
+	  <p><a href="help/policies.html">操作ポリシーの管理</a></p>
+	  <p><a href="help/network.html">ネットワークプリンターの使い方</a></p>
+	  <p><a href="help/man-cupsd.conf.html">ネットワークプリンターの使い方</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS 開発者向け</h2>
+	  <p><a href="help/api-overview.html">CUPS プログラミングの導入</a></p>
+	  <p><a href="help/api-cups.html">CUPS API</a></p>
+	  <p><a href="help/api-filter.html">フィルタとバックエンドのプログラミング</a></p>
+	  <p><a href="help/api-httpipp.html">HTTP と IPP の API</a></p>
+	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">開発者フォーラム</a></p>
+	</div>
+      </div>
+    </div>
+    <div class="footer">CUPS and the CUPS logo are trademarks of <a href="http://www.apple.com">Apple Inc.</a> Copyright &copy; 2007-2015 Apple Inc. All rights reserved.</div>
+  </body>
+</html>

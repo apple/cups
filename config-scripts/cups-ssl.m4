@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ssl.m4 12122 2014-08-28 12:55:52Z msweet $"
+dnl "$Id: cups-ssl.m4 12290 2014-12-05 17:25:55Z msweet $"
 dnl
 dnl TLS stuff for CUPS.
 dnl
@@ -20,8 +20,7 @@ AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support
 SSLFLAGS=""
 SSLLIBS=""
 have_ssl=0
-CUPS_SERVERCERT=""
-CUPS_SERVERKEY=""
+CUPS_SERVERKEYCHAIN=""
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
@@ -31,7 +30,7 @@ if test x$enable_ssl != xno; then
 	    	have_ssl=1
 		AC_DEFINE(HAVE_SSL)
 		AC_DEFINE(HAVE_CDSASSL)
-		CUPS_SERVERCERT="/Library/Keychains/System.keychain"
+		CUPS_SERVERKEYCHAIN="/Library/Keychains/System.keychain"
 
 		dnl Check for the various security headers...
 		AC_CHECK_HEADER(Security/SecureTransportPriv.h,
@@ -76,12 +75,12 @@ if test x$enable_ssl != xno; then
 	fi
 
 	if test $have_ssl = 1; then
-	    CUPS_SERVERCERT="ssl/server.crt"
-	    CUPS_SERVERKEY="ssl/server.key"
+	    CUPS_SERVERKEYCHAIN="ssl"
 
 	    SAVELIBS="$LIBS"
 	    LIBS="$LIBS $SSLLIBS"
 	    AC_CHECK_FUNC(gnutls_transport_set_pull_timeout_function, AC_DEFINE(HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION))
+	    AC_CHECK_FUNC(gnutls_priority_set_direct, AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT))
 	    LIBS="$SAVELIBS"
 	fi
     fi
@@ -96,8 +95,7 @@ elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes; then
     AC_MSG_ERROR([Unable to enable SSL support.])
 fi
 
-AC_SUBST(CUPS_SERVERCERT)
-AC_SUBST(CUPS_SERVERKEY)
+AC_SUBST(CUPS_SERVERKEYCHAIN)
 AC_SUBST(IPPALIASES)
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
@@ -106,5 +104,5 @@ EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-ssl.m4 12122 2014-08-28 12:55:52Z msweet $".
+dnl End of "$Id: cups-ssl.m4 12290 2014-12-05 17:25:55Z msweet $".
 dnl

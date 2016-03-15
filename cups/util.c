@@ -1,9 +1,9 @@
 /*
- * "$Id: util.c 12220 2014-10-20 22:03:01Z msweet $"
+ * "$Id: util.c 12449 2015-01-29 20:32:16Z msweet $"
  *
  * Printing utilities for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1509,7 +1509,7 @@ cups_get_printer_uri(
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requested-attributes", sizeof(requested_attrs) / sizeof(requested_attrs[0]), NULL, requested_attrs);
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", sizeof(requested_attrs) / sizeof(requested_attrs[0]), NULL, requested_attrs);
 
  /*
   * Do the request and get back a response...
@@ -1655,5 +1655,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 12220 2014-10-20 22:03:01Z msweet $".
+ * End of "$Id: util.c 12449 2015-01-29 20:32:16Z msweet $".
  */

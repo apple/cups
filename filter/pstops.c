@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: pstops.c 12358 2014-12-11 17:42:22Z msweet $"
  *
  * PostScript filter for CUPS.
  *
@@ -264,7 +264,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
-      _cupsLangPrintError("ERROR", _("Unable to open print file"));
+      if (!JobCanceled)
+        _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (1);
     }
   }
@@ -3400,5 +3401,5 @@ write_options(
 
 
 /*
- * End of "$Id: pstops.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: pstops.c 12358 2014-12-11 17:42:22Z msweet $".
  */

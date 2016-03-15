@@ -1,5 +1,5 @@
 /*
- * "$Id: colorman.c 12226 2014-10-21 13:36:05Z msweet $"
+ * "$Id: colorman.c 12369 2014-12-15 14:51:28Z msweet $"
  *
  * Color management routines for the CUPS scheduler.
  *
@@ -151,8 +151,11 @@ cupsdRegisterColor(cupsd_printer_t *p)	/* I - Printer */
   }
 
 #elif defined(HAVE_DBUS)
-  colord_unregister_printer(p);
-  colord_register_printer(p);
+  if (!RunUser)
+  {
+    colord_unregister_printer(p);
+    colord_register_printer(p);
+  }
 #endif /* __APPLE__ */
 }
 
@@ -205,7 +208,8 @@ cupsdUnregisterColor(cupsd_printer_t *p)/* I - Printer */
     apple_unregister_profiles(p);
 
 #elif defined(HAVE_DBUS)
-  colord_unregister_printer(p);
+  if (!RunUser)
+    colord_unregister_printer(p);
 #endif /* __APPLE__ */
 }
 
@@ -1515,5 +1519,5 @@ colord_unregister_printer(
 
 
 /*
- * End of "$Id: colorman.c 12226 2014-10-21 13:36:05Z msweet $".
+ * End of "$Id: colorman.c 12369 2014-12-15 14:51:28Z msweet $".
  */

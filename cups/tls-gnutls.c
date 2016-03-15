@@ -1,9 +1,9 @@
 /*
- * "$Id: tls-gnutls.c 12215 2014-10-20 18:24:56Z msweet $"
+ * "$Id: tls-gnutls.c 12481 2015-02-03 12:45:14Z msweet $"
  *
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -406,6 +406,9 @@ httpCredentialsGetTrust(
 
   if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (HTTP_TRUST_UNKNOWN);
+
+  if (cg->any_root < 0)
+    _cupsSetDefaults();
 
  /*
   * Look this common name up in the default keychains...
@@ -1107,7 +1110,6 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 		keyfile[1024];		/* Private key file */
     int		have_creds = 0;		/* Have credentials? */
 
-
     if (http->fields[HTTP_FIELD_HOST][0])
     {
      /*
@@ -1197,14 +1199,31 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
+#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   if (!tls_options)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
   else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
     gnutls_priority_set_direct(http->tls, "NORMAL", NULL);
   else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
   else
-    gnutls_priority_set_direct(http->tls, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+
+#else
+  gnutls_priority_t priority;		/* Priority */
+
+  if (!tls_options)
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+  else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
+    gnutls_priority_init(&priority, "NORMAL", NULL);
+  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
+  else
+    gnutls_priority_init(&priority, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+
+  gnutls_priority_set(http->tls, priority);
+  gnutls_priority_deinit(priority);
+#endif /* HAVE_GNUTLS_PRIORITY_SET_DIRECT */
 
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
   gnutls_transport_set_pull_function(http->tls, http_gnutls_read);
@@ -1313,5 +1332,5 @@ _httpTLSWrite(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: tls-gnutls.c 12215 2014-10-20 18:24:56Z msweet $".
+ * End of "$Id: tls-gnutls.c 12481 2015-02-03 12:45:14Z msweet $".
  */

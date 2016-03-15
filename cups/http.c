@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 12230 2014-10-21 13:55:24Z msweet $"
+ * "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -4032,7 +4032,7 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
   for (i = 0; i < bytes; i += 16)
   {
     for (j = 0, ptr = start; j < 16 && (i + j) < bytes; j ++, ptr += 2)
-      sprintf(ptr, "%02X", buffer[i + j] & 255);
+      snprintf(ptr, 3, "%02X", buffer[i + j] & 255);
 
     while (j < 16)
     {
@@ -4850,5 +4850,5 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 12230 2014-10-21 13:55:24Z msweet $".
+ * End of "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 12254 2014-11-14 17:24:18Z msweet $"
+ * "$Id: config.h 12280 2014-12-02 01:49:48Z msweet $"
  *
  * Configuration file for CUPS and Xcode.
  *
@@ -298,6 +298,20 @@
 #define HAVE_CDSASSL 1
 /* #undef HAVE_GNUTLS */
 #define HAVE_SSL 1
+
+
+/*
+ * Do we have the gnutls_transport_set_pull_timeout_function function?
+ */
+
+/* #undef HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
+
+
+/*
+ * Do we have the gnutls_priority_set_direct function?
+ */
+
+/* #undef HAVE_GNUTLS_PRIORITY_SET_DIRECT */
 
 
 /*
@@ -699,5 +713,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 12254 2014-11-14 17:24:18Z msweet $".
+ * End of "$Id: config.h 12280 2014-12-02 01:49:48Z msweet $".
  */

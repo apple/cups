@@ -1,4 +1,4 @@
-INSTALL - CUPS v2.0.1 - 2014-11-14
+INSTALL - CUPS v2.0.2 - 2015-02-03
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
@@ -140,6 +140,10 @@ INSTALLING THE SOFTWARE
     or for FreeBSD, NetBSD, or OpenBSD:
 
 	gmake install ENTER
+
+    Use the BUILDROOT variable to install to an alternate root directory:
+
+        make BUILDROOT=/some/other/root/directory install ENTER
 
     You can also build binary packages that can be installed on other machines
     using the RPM spec file ("packaging/cups.spec") or EPM list file

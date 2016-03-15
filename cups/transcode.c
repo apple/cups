@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.c 11594 2014-02-14 20:09:01Z msweet $"
+ * "$Id: transcode.c 12332 2014-12-09 20:58:45Z msweet $"
  *
  * Transcoding support for CUPS.
  *
@@ -154,11 +154,15 @@ cupsCharsetToUTF8(
 
   if (map_encoding != encoding)
   {
+    char	toset[1024];		/* Destination character set */
+
     _cupsCharmapFlush();
 
+    snprintf(toset, sizeof(toset), "%s//IGNORE", _cupsEncodingName(encoding));
+
+    map_encoding  = encoding;
     map_from_utf8 = iconv_open(_cupsEncodingName(encoding), "UTF-8");
-    map_to_utf8   = iconv_open("UTF-8", _cupsEncodingName(encoding));
-    map_encoding     = encoding;
+    map_to_utf8   = iconv_open("UTF-8", toset);
   }
 
   if (map_to_utf8 != (iconv_t)-1)
@@ -279,11 +283,15 @@ cupsUTF8ToCharset(
 
   if (map_encoding != encoding)
   {
+    char	toset[1024];		/* Destination character set */
+
     _cupsCharmapFlush();
 
-    map_from_utf8 = iconv_open(_cupsEncodingName(encoding), "UTF-8");
-    map_to_utf8   = iconv_open("UTF-8", _cupsEncodingName(encoding));
+    snprintf(toset, sizeof(toset), "%s//IGNORE", _cupsEncodingName(encoding));
+
     map_encoding  = encoding;
+    map_from_utf8 = iconv_open(_cupsEncodingName(encoding), "UTF-8");
+    map_to_utf8   = iconv_open("UTF-8", toset);
   }
 
   if (map_from_utf8 != (iconv_t)-1)
@@ -708,5 +716,5 @@ cupsUTF32ToUTF8(
 
 
 /*
- * End of "$Id: transcode.c 11594 2014-02-14 20:09:01Z msweet $"
+ * End of "$Id: transcode.c 12332 2014-12-09 20:58:45Z msweet $"
  */
