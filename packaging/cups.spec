@@ -40,12 +40,12 @@
 
 Summary: CUPS
 Name: cups
-Version: @CUPS_VERSION@
-Release: 0
+Version: 1.7.1
+Release: 1
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://ftp.cups.org/pub/cups/%{version}/cups-%{version}-source.tar.bz2
+Source: http://www.cups.org/software/1.7.1/cups-1.7.1-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.

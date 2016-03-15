@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testnotify.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Test notifier for CUPS.
  *
@@ -123,5 +123,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testnotify.c 10996 2013-05-29 11:51:34Z msweet $".
  */

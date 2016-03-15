@@ -1,23 +1,18 @@
 /*
- * "$Id$"
+ * "$Id: dbus.c 11500 2014-01-06 22:21:15Z msweet $"
  *
- *   D-Bus notifier for CUPS.
+ * D-Bus notifier for CUPS.
  *
- *   Copyright 2008-2012 by Apple Inc.
- *   Copyright (C) 2011 Red Hat, Inc.
- *   Copyright (C) 2007 Tim Waugh <twaugh@redhat.com>
- *   Copyright 1997-2005 by Easy Software Products.
+ * Copyright 2008-2014 by Apple Inc.
+ * Copyright (C) 2011, 2013 Red Hat, Inc.
+ * Copyright (C) 2007 Tim Waugh <twaugh@redhat.com>
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()         - Read events and send DBUS notifications.
- *   acquire_lock() - Acquire a lock so we only have a single notifier running.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -154,10 +149,18 @@ enum
 
 
 /*
+ * Global variables...
+ */
+
+static char		lock_filename[1024];	/* Lock filename */
+
+
+/*
  * Local functions...
  */
 
 static int	acquire_lock(int *fd, char *lockfile, size_t locksize);
+static void	release_lock(void);
 
 
 /*
@@ -176,8 +179,6 @@ main(int  argc,				/* I - Number of command-line args */
   DBusMessage		*message;	/* Message to send */
   DBusMessageIter	iter;		/* Iterator for message data */
   int			lock_fd = -1;	/* Lock file descriptor */
-  char			lock_filename[1024];
-					/* Lock filename */
 
 
  /*
@@ -578,12 +579,33 @@ main(int  argc,				/* I - Number of command-line args */
   if (lock_fd >= 0)
   {
     close(lock_fd);
-    unlink(lock_filename);
+    release_lock();
   }
 
   return (0);
 }
 
+
+/*
+ * 'release_lock()' - Release the singleton lock.
+ */
+
+static void
+release_lock(void)
+{
+  unlink(lock_filename);
+}
+
+
+/*
+ * 'handle_sigterm()' - Handle SIGTERM signal.
+ */
+static void
+handle_sigterm(int signum)
+{
+  release_lock();
+  _exit(0);
+}
 
 /*
  * 'acquire_lock()' - Acquire a lock so we only have a single notifier running.
@@ -594,7 +616,8 @@ acquire_lock(int    *fd,		/* O - Lock file descriptor */
              char   *lockfile,		/* I - Lock filename buffer */
 	     size_t locksize)		/* I - Size of filename buffer */
 {
-  const char	*tmpdir;		/* Temporary directory */
+  const char		*tmpdir;	/* Temporary directory */
+  struct sigaction	action;		/* POSIX sigaction data */
 
 
  /*
@@ -612,8 +635,16 @@ acquire_lock(int    *fd,		/* O - Lock file descriptor */
 
   if ((*fd = open(lockfile, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR)) < 0)
     return (-1);
-  else
-    return (0);
+
+ /*
+  * Set a SIGTERM handler to make sure we release the lock if the
+  * scheduler decides to stop us.
+  */
+  memset(&action, 0, sizeof(action));
+  action.sa_handler = handle_sigterm;
+  sigaction(SIGTERM, &action, NULL);
+
+  return (0);
 }
 #else /* !HAVE_DBUS */
 int
@@ -625,5 +656,5 @@ main(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: dbus.c 11500 2014-01-06 22:21:15Z msweet $".
  */

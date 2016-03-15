@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.h 11085 2013-07-03 13:53:05Z msweet $"
  *
  *   Internet Printing Protocol definitions for CUPS.
  *
@@ -992,5 +992,5 @@ extern int		ippValidateAttributes(ipp_t *ipp) _CUPS_API_1_7;
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.h 11085 2013-07-03 13:53:05Z msweet $".
  */

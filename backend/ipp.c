@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.c 11495 2013-12-22 05:29:16Z msweet $"
  *
  * IPP backend for CUPS.
  *
@@ -163,7 +163,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     ppd_file_t *ppd,
 				     ipp_attribute_t *media_col_sup,
 				     ipp_attribute_t *doc_handling_sup,
-				     int print_color_mode);
+				     ipp_attribute_t *print_color_mode_sup);
 static const char	*password_cb(const char *prompt, http_t *http,
 			             const char *method, const char *resource,
 			             int *user_data);
@@ -250,12 +250,12 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *doc_handling_sup;	/* multiple-document-handling-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
+  ipp_attribute_t *print_color_mode_sup;/* Does printer support print-color-mode? */
   int		create_job = 0,		/* Does printer support Create-Job? */
 		get_job_attrs = 0,	/* Does printer support Get-Job-Attributes? */
 		send_document = 0,	/* Does printer support Send-Document? */
 		validate_job = 0,	/* Does printer support Validate-Job? */
-		print_color_mode = 0;	/* Does printer support print-color-mode? */
-  int		copies,			/* Number of copies for job */
+		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
   const char	*content_type,		/* CONTENT_TYPE environment variable */
 		*final_content_type,	/* FINAL_CONTENT_TYPE environment var */
@@ -1024,7 +1024,8 @@ main(int  argc,				/* I - Number of command-line args */
 	delay = _cupsNextDelay(delay, &prev_delay);
 
 	ippDelete(supported);
-	supported = NULL;
+	supported  = NULL;
+	ipp_status = IPP_STATUS_ERROR_BUSY;
 	continue;
       }
     }
@@ -1100,9 +1101,7 @@ main(int  argc,				/* I - Number of command-line args */
 	        media_col_sup->values[i].string.text);
     }
 
-    print_color_mode = ippFindAttribute(supported,
-					"print-color-mode-supported",
-					IPP_TAG_KEYWORD) != NULL;
+    print_color_mode_sup = ippFindAttribute(supported, "print-color-mode-supported", IPP_TAG_KEYWORD);
 
     if ((operations_sup = ippFindAttribute(supported, "operations-supported",
 					   IPP_TAG_ENUM)) != NULL)
@@ -1384,7 +1383,7 @@ main(int  argc,				/* I - Number of command-line args */
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2],
                           monitor.job_name, num_options, options, compression,
 			  copies_sup ? copies : 1, document_format, pc, ppd,
-			  media_col_sup, doc_handling_sup, print_color_mode);
+			  media_col_sup, doc_handling_sup, print_color_mode_sup);
 
     response = cupsDoRequest(http, request, resource);
 
@@ -1470,7 +1469,7 @@ main(int  argc,				/* I - Number of command-line args */
 			  version, uri, argv[2], monitor.job_name, num_options,
 			  options, compression, copies_sup ? copies : 1,
 			  document_format, pc, ppd, media_col_sup,
-			  doc_handling_sup, print_color_mode);
+			  doc_handling_sup, print_color_mode_sup);
 
    /*
     * Do the request...
@@ -2483,7 +2482,8 @@ new_request(
     ppd_file_t      *ppd,		/* I - PPD file data */
     ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
     ipp_attribute_t *doc_handling_sup,  /* I - multiple-document-handling-supported values */
-    int             print_color_mode)	/* I - Printer supports print-color-mode */
+    ipp_attribute_t *print_color_mode_sup)
+					/* I - Printer supports print-color-mode */
 {
   int		i;			/* Looping var */
   ipp_t		*request;		/* Request data */
@@ -2658,6 +2658,14 @@ new_request(
                                   strlen(keyword));
                 break;
             default :
+                if (!strcmp(mandatory, "print-color-mode") && !strcmp(keyword, "monochrome"))
+                {
+                  if (ippContainsString(print_color_mode_sup, "auto-monochrome"))
+                    keyword = "auto-monochrome";
+                  else if (ippContainsString(print_color_mode_sup, "process-monochrome") && !ippContainsString(print_color_mode_sup, "monochrome"))
+                    keyword = "process-monochrome";
+                }
+
                 ippAddString(request, IPP_TAG_JOB, value_tag, mandatory,
                              NULL, keyword);
                 break;
@@ -2732,21 +2740,31 @@ new_request(
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
 		     NULL, keyword);
 
-      color_attr_name = print_color_mode ? "print-color-mode" : "output-mode";
+      color_attr_name = print_color_mode_sup ? "print-color-mode" : "output-mode";
 
       if ((keyword = cupsGetOption("print-color-mode", num_options,
-				   options)) != NULL)
+				   options)) == NULL)
+      {
+	if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
+	{
+	  if (!_cups_strcasecmp(choice->choice, "Gray"))
+	    keyword = "monochrome";
+	  else
+	    keyword = "color";
+	}
+      }
+
+      if (keyword && !strcmp(keyword, "monochrome"))
+      {
+	if (ippContainsString(print_color_mode_sup, "auto-monochrome"))
+	  keyword = "auto-monochrome";
+	else if (ippContainsString(print_color_mode_sup, "process-monochrome") && !ippContainsString(print_color_mode_sup, "monochrome"))
+	  keyword = "process-monochrome";
+      }
+
+      if (keyword)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, color_attr_name,
 		     NULL, keyword);
-      else if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
-      {
-	if (!_cups_strcasecmp(choice->choice, "Gray"))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               color_attr_name, NULL, "monochrome");
-	else
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               color_attr_name, NULL, "color");
-      }
 
       if ((keyword = cupsGetOption("print-quality", num_options,
 				   options)) != NULL)
@@ -3662,5 +3680,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.c 11495 2013-12-22 05:29:16Z msweet $".
  */

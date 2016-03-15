@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: snmp.c 4167 2013-02-04 19:27:13Z msweet $"
  *
  *   SNMP functions for CUPS.
  *
@@ -1729,5 +1729,5 @@ snmp_set_error(cups_snmp_t *packet,	/* I - Packet */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: snmp.c 4167 2013-02-04 19:27:13Z msweet $".
  */

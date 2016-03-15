@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http-addr.c 11374 2013-11-04 23:49:10Z msweet $"
  *
  * HTTP address routines for CUPS.
  *
@@ -754,5 +754,5 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: http-addr.c 11374 2013-11-04 23:49:10Z msweet $".
  */

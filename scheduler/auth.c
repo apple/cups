@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: auth.c 11500 2014-01-06 22:21:15Z msweet $"
  *
  *   Authorization routines for the CUPS scheduler.
  *
@@ -1302,6 +1302,8 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
           netip6[3] = htonl(ip[3]);
 #endif /* AF_INET6 */
 
+	  cupsdNetIFUpdate();
+
           if (!strcmp(mask->mask.name.name, "*"))
 	  {
 #ifdef __APPLE__
@@ -1316,8 +1318,6 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
 	   /*
 	    * Check against all local interfaces...
 	    */
-
-            cupsdNetIFUpdate();
 
 	    for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
 		 iface;
@@ -2607,5 +2607,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: auth.c 11500 2014-01-06 22:21:15Z msweet $".
  */

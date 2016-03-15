@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: pwg-media.c 11240 2013-08-14 20:33:55Z msweet $"
  *
  *   PWG media name API implementation for CUPS.
  *
@@ -1185,5 +1185,5 @@ pwg_scan_measurement(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: pwg-media.c 11240 2013-08-14 20:33:55Z msweet $".
  */

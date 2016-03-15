@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ipp.c 11113 2013-07-10 14:08:39Z msweet $"
  *
  *   Internet Printing Protocol functions for CUPS.
  *
@@ -7064,5 +7064,5 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ipp.c 11113 2013-07-10 14:08:39Z msweet $".
  */

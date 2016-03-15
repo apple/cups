@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: lppasswd.man 11022 2013-06-06 22:14:09Z msweet $"
 .\"
 .\"   lpadmin man page for CUPS.
 .\"
@@ -64,5 +64,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: lppasswd.man 11022 2013-06-06 22:14:09Z msweet $".
 .\"

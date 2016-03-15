@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: md5.c 11374 2013-11-04 23:49:10Z msweet $"
  *
  * Private MD5 implementation for CUPS.
  *
@@ -342,5 +342,5 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: md5.c 11374 2013-11-04 23:49:10Z msweet $".
  */

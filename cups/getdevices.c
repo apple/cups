@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: getdevices.c 4216 2013-03-11 13:57:36Z msweet $"
  *
  *   cupsGetDevices implementation for CUPS.
  *
@@ -280,5 +280,5 @@ cupsGetDevices(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: getdevices.c 4216 2013-03-11 13:57:36Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: colorman.c 11150 2013-07-17 13:03:56Z msweet $"
  *
  *   Color management routines for the CUPS scheduler.
  *
@@ -1538,5 +1538,5 @@ colord_unregister_printer(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: colorman.c 11150 2013-07-17 13:03:56Z msweet $".
  */

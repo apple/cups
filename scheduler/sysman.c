@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: sysman.c 11106 2013-07-08 12:29:10Z msweet $"
  *
  *   System management functions for the CUPS scheduler.
  *
@@ -1015,5 +1015,5 @@ sysUpdate(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: sysman.c 11106 2013-07-08 12:29:10Z msweet $".
  */

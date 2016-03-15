@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7.1 - 2013-11-06
+CHANGES.txt - 1.7.1 - 2014-01-08
 --------------------------------
 
 CHANGES IN CUPS V1.7.1
 
+	- Security: the lppasswd program incorrectly used settings from
+	  ~/.cups/client.conf (STR #4319)
 	- Auto debug logging was broken in 1.7.0 (<rdar://problem/15331639>)
 	- Some gzip'd PPD files could not be used (<rdar://problem/15386424>)
 	- Cleaned up some job logging in the scheduler
@@ -11,7 +13,7 @@ CHANGES IN CUPS V1.7.1
 	  scheduler (<rdar://problem/15382819>)
 	- The RPM spec file did not list the build requirements; this was on
 	  purpose, but now we are listing the Red Hat package names
-	  (<rdar://problem/15375760>)
+	  (<rdar://problem/15375760>, STR #4322)
 	- Printing to a raw queue could result in corrupt output due to
 	  opportunistic compression (<rdar://problem/15008524>)
 	- The GNU TLS support code triggered many compiler warnings due to the
@@ -21,6 +23,21 @@ CHANGES IN CUPS V1.7.1
 	  cups-filters package installed (<rdar://problem/14292998>)
 	- Japanese PPDs using with the Shift-JIS encoding did not work
 	  (<rdar://problem/15427759>)
+	- "tel:" URIs incorrectly had slashes (<rdar://problem/15418463>)
+	- The libusb-based USB backend incorrectly used write timeouts
+	  (<rdar://problem/15564888>)
+	- Shared printers could become inaccessible after a few days on OS X
+	  (<rdar://problem/15426838>)
+	- The IPP backend did not wait for a busy printer to become available
+	  before attempting to print (<rdar://problem/15465667>)
+	- CUPS did not support "auto-monochrome" or "process-monochrome" for the
+	  "print-color-mode" option (<rdar://problem/15482520>)
+	- Using "@IF(name)" in an Allow or Deny rule did not work (STR #4328)
+	- lpq and lpstat did not list jobs in the correct order when priorities
+	  were specified (STR #4326)
+	- The D-BUS notifier did not remove its lockfile (STR #4314)
+	- CUPS incorrectly used the USER environment variable when the name did
+	  not match the user ID (STR #4327)
 
 
 CHANGES IN CUPS V1.7.0

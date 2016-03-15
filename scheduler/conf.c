@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: conf.c 11488 2013-12-22 05:04:41Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
@@ -1164,6 +1164,8 @@ cupsdReadConfiguration(void)
 		    RequestRoot);
     cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
   }
+
+  setenv("TMPDIR", TempDir, 1);
 
  /*
   * Make sure the temporary directory has the right permissions...
@@ -4061,5 +4063,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: conf.c 11488 2013-12-22 05:04:41Z msweet $".
  */

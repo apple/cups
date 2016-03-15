@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: snprintf.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   snprintf functions for CUPS.
  *
@@ -361,6 +361,6 @@ _cups_snprintf(char       *buffer,	/* O - Output buffer */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: snprintf.c 10996 2013-05-29 11:51:34Z msweet $".
  */
 

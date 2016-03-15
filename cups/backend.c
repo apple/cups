@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: backend.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Backend functions for CUPS.
  *
@@ -150,5 +150,5 @@ quote_string(const char *s)		/* I - String to write */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: backend.c 10996 2013-05-29 11:51:34Z msweet $".
  */

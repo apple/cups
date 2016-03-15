@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: tls-openssl.c 3755 2012-03-30 05:59:14Z msweet $"
  *
  *   TLS support code for the CUPS scheduler using OpenSSL.
  *
@@ -349,5 +349,5 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: tls-openssl.c 3755 2012-03-30 05:59:14Z msweet $".
  */

@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-source.cxx 4167 2013-02-04 19:27:13Z msweet $"
 //
 //   Source class for the CUPS PPD Compiler.
 //
@@ -3847,5 +3847,5 @@ ppdcSource::write_file(const char *f)	// I - File to write
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-source.cxx 4167 2013-02-04 19:27:13Z msweet $".
 //

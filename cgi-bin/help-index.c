@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: help-index.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Online help index routines for CUPS.
  *
@@ -1324,5 +1324,5 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: help-index.c 10996 2013-05-29 11:51:34Z msweet $".
  */

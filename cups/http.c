@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http.c 11392 2013-11-06 01:29:56Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -5898,5 +5898,5 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: http.c 11392 2013-11-06 01:29:56Z msweet $".
  */

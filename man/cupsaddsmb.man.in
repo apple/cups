@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: cupsaddsmb.man.in 11206 2013-07-31 18:16:09Z msweet $"
 .\"
 .\"   cupsaddsmb man page for CUPS.
 .\"
@@ -172,5 +172,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: cupsaddsmb.man.in 11206 2013-07-31 18:16:09Z msweet $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http.h 11085 2013-07-03 13:53:05Z msweet $"
  *
  *   Hyper-Text Transport Protocol definitions for CUPS.
  *
@@ -623,5 +623,5 @@ extern http_state_t	httpWriteResponse(http_t *http,
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: http.h 11085 2013-07-03 13:53:05Z msweet $".
  */

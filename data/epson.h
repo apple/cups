@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: epson.h 624 2008-02-16 00:27:39Z msweet $"
  *
  *   This file contains model number definitions for the CUPS sample
  *   ESC/P driver.
@@ -23,5 +23,5 @@
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: epson.h 624 2008-02-16 00:27:39Z msweet $".
  */

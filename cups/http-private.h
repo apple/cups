@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: http-private.h 11392 2013-11-06 01:29:56Z msweet $"
  *
  * Private HTTP definitions for CUPS.
  *
@@ -437,5 +437,5 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: http-private.h 11392 2013-11-06 01:29:56Z msweet $".
  */

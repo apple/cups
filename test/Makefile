@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 11129 2013-07-11 20:39:46Z msweet $"
 #
 #   IPP test makefile for CUPS.
 #
@@ -241,5 +241,5 @@ include Dependencies
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 11129 2013-07-11 20:39:46Z msweet $".
 #

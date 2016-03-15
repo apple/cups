@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: statbuf.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Status buffer routines for the CUPS scheduler.
  *
@@ -331,5 +331,5 @@ cupsdStatBufUpdate(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: statbuf.c 10996 2013-05-29 11:51:34Z msweet $".
  */

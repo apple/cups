@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-filter.cxx 1378 2009-04-08 03:17:45Z msweet $"
 //
 //   Filter class for the CUPS PPD Compiler.
 //
@@ -56,5 +56,5 @@ ppdcFilter::~ppdcFilter()
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-filter.cxx 1378 2009-04-08 03:17:45Z msweet $".
 //

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cgi.h 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   CGI support library definitions for CUPS.
  *
@@ -115,5 +115,5 @@ extern const char	*cgiText(const char *message);
 #endif /* !_CUPS_CGI_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: cgi.h 10996 2013-05-29 11:51:34Z msweet $".
  */

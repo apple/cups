@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $"
 #
 #   Port monitor makefile for CUPS.
 #
@@ -143,5 +143,5 @@ include Dependencies
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $".
 #

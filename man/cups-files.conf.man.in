@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: cups-files.conf.man.in 11201 2013-07-26 21:27:27Z msweet $"
 .\"
 .\"   cupsd.conf man page for CUPS.
 .\"
@@ -148,5 +148,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: cups-files.conf.man.in 11201 2013-07-26 21:27:27Z msweet $".
 .\"

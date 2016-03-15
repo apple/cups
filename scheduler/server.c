@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: server.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Server start/stop routines for the CUPS scheduler.
  *
@@ -180,5 +180,5 @@ cupsdStopServer(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: server.c 10996 2013-05-29 11:51:34Z msweet $".
  */

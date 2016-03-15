@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cups.h 11367 2013-10-28 15:35:57Z msweet $"
  *
  *   API definitions for CUPS.
  *
@@ -627,5 +627,5 @@ extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: cups.h 11367 2013-10-28 15:35:57Z msweet $".
  */

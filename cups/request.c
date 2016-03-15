@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: request.c 11174 2013-07-23 12:33:52Z msweet $"
  *
  *   IPP utilities for CUPS.
  *
@@ -1177,5 +1177,5 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: request.c 11174 2013-07-23 12:33:52Z msweet $".
  */

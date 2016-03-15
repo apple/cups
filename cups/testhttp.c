@@ -1,22 +1,18 @@
 /*
- * "$Id$"
+ * "$Id: testhttp.c 11445 2013-12-05 19:57:43Z msweet $"
  *
- *   HTTP test program for CUPS.
+ * HTTP test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main() - Main entry.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -104,6 +100,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "socket://192.168.1.1:9101/",
 			    "socket", "", "192.168.1.1", "/", 9101, 9101,
+			    HTTP_URI_CODING_MOST  },
+			  { HTTP_URI_STATUS_OK, "tel:8005551212",
+			    "tel", "", "", "8005551212", 0, 0,
 			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999,
@@ -832,5 +831,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testhttp.c 11445 2013-12-05 19:57:43Z msweet $".
  */

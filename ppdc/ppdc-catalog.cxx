@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-catalog.cxx 3794 2012-04-23 22:44:16Z msweet $"
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
@@ -893,5 +893,5 @@ put_utf16(cups_file_t *fp,		// I - File to write to
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-catalog.cxx 3794 2012-04-23 22:44:16Z msweet $".
 //

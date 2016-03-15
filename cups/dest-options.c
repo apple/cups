@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: dest-options.c 11085 2013-07-03 13:53:05Z msweet $"
  *
  *   Destination option/media support for CUPS.
  *
@@ -2267,5 +2267,5 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: dest-options.c 11085 2013-07-03 13:53:05Z msweet $".
  */

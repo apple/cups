@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 4216 2013-03-11 13:57:36Z msweet $"
 #
 #   Makefile for the CUPS PPD Compiler.
 #
@@ -402,5 +402,5 @@ include Dependencies
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 4216 2013-03-11 13:57:36Z msweet $".
 #

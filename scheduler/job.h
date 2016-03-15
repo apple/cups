@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: job.h 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Print job definitions for the CUPS scheduler.
  *
@@ -171,5 +171,5 @@ extern void		cupsdUpdateJobs(void);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: job.h 10996 2013-05-29 11:51:34Z msweet $".
  */

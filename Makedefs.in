@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makedefs.in 11154 2013-07-17 15:21:18Z msweet $"
 #
 #   Common makefile definitions for CUPS.
 #
@@ -261,5 +261,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id$"
+# End of "$Id: Makedefs.in 11154 2013-07-17 15:21:18Z msweet $"
 #

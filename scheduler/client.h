@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: client.h 11213 2013-08-01 22:23:18Z msweet $"
  *
  *   Client definitions for the CUPS scheduler.
  *
@@ -142,5 +142,5 @@ extern int	cupsdStartTLS(cupsd_client_t *con);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: client.h 11213 2013-08-01 22:23:18Z msweet $".
  */

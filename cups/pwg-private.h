@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: pwg-private.h 11240 2013-08-14 20:33:55Z msweet $"
  *
  *   Private PWG media API definitions for CUPS.
  *
@@ -74,5 +74,5 @@ extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
 #endif /* !_CUPS_PWG_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: pwg-private.h 11240 2013-08-14 20:33:55Z msweet $".
  */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: waitjobs.sh 1253 2009-02-25 23:37:25Z msweet $"
 #
 # Script to wait for jobs to complete.
 #
@@ -56,5 +56,5 @@ done
 echo ""
 
 #
-# End of "$Id$".
+# End of "$Id: waitjobs.sh 1253 2009-02-25 23:37:25Z msweet $".
 #

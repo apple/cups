@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id$"
+# "$Id: cups.sh.in 3940 2012-10-15 21:02:10Z msweet $"
 #
 #   Startup/shutdown script for CUPS.
 #
@@ -221,5 +221,5 @@ exit 0
 
 
 #
-# End of "$Id$".
+# End of "$Id: cups.sh.in 3940 2012-10-15 21:02:10Z msweet $".
 #

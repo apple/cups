@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: ippfind.man 11027 2013-06-07 01:45:14Z msweet $"
 .\"
 .\"   ippfind man page for CUPS.
 .\"
@@ -243,5 +243,5 @@ Values of TXT record \fIKEY\fR (uppercase).
 .SH COPYRIGHT
 Copyright 2013 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: ippfind.man 11027 2013-06-07 01:45:14Z msweet $".
 .\"

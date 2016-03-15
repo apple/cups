@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cups-exec.c 11144 2013-07-17 02:45:55Z msweet $"
  *
  *   Sandbox helper for CUPS.
  *
@@ -90,5 +90,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: cups-exec.c 11144 2013-07-17 02:45:55Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: job.c 11418 2013-11-08 15:18:01Z msweet $"
  *
  * Job management routines for the CUPS scheduler.
  *
@@ -5136,5 +5136,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: job.c 11418 2013-11-08 15:18:01Z msweet $".
  */

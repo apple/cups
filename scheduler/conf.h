@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: conf.h 11202 2013-07-26 21:31:54Z msweet $"
  *
  *   Configuration file definitions for the CUPS scheduler.
  *
@@ -297,5 +297,5 @@ extern int	cupsdWriteErrorLog(int level, const char *message);
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: conf.h 11202 2013-07-26 21:31:54Z msweet $".
  */

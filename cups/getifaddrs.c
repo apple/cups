@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: getifaddrs.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Network interface functions for CUPS.
  *
@@ -262,5 +262,5 @@ _cups_freeifaddrs(struct ifaddrs *addrs)/* I - Interface list to free */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: getifaddrs.c 10996 2013-05-29 11:51:34Z msweet $".
  */

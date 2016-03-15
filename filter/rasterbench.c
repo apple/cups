@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: rasterbench.c 10996 2013-05-29 11:51:34Z msweet $"
  *
  *   Raster benchmark program for CUPS.
  *
@@ -351,5 +351,5 @@ write_test(int         fd,		/* I - File descriptor to write to */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: rasterbench.c 10996 2013-05-29 11:51:34Z msweet $".
  */

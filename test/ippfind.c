@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ippfind.c 11177 2013-07-24 12:16:37Z msweet $"
  *
  *   Utility to find IPP printers via Bonjour/DNS-SD and optionally run
  *   commands such as IPP and Bonjour conformance tests.  This tool is
@@ -2823,5 +2823,5 @@ show_version(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ippfind.c 11177 2013-07-24 12:16:37Z msweet $".
  */

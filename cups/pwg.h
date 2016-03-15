@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: pwg.h 4274 2013-04-09 20:10:23Z msweet $"
  *
  *   PWG media API definitions for CUPS.
  *
@@ -90,5 +90,5 @@ extern pwg_media_t	*pwgMediaForSize(int width, int length) _CUPS_API_1_7;
 #endif /* !_CUPS_PWG_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: pwg.h 4274 2013-04-09 20:10:23Z msweet $".
  */

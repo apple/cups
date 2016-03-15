@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $"
 #
 #   Template makefile for CUPS.
 #
@@ -200,5 +200,5 @@ uninstall-langbundle:
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $".
 #

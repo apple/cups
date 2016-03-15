@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testppd.c 11060 2013-06-25 15:02:18Z msweet $"
  *
  *   PPD test program for CUPS.
  *
@@ -1109,5 +1109,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testppd.c 11060 2013-06-25 15:02:18Z msweet $".
  */
