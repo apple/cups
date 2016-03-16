@@ -45,6 +45,7 @@ extern "C" {
  * Types/structures...
  */
 
+/* NOTE: update debug_ops[] in type.c whenever editing this enum */
 typedef enum
 {
   MIME_MAGIC_NOP,			/* No operation */

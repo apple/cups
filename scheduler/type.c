@@ -65,7 +65,8 @@ static const char * const debug_ops[] =
 		  "INT",		/* Integer/32-bit word matches */
 		  "LOCALE",		/* Current locale matches string */
 		  "CONTAINS",		/* File contains a string */
-		  "ISTRING"		/* Case-insensitive string matches */
+		  "ISTRING",		/* Case-insensitive string matches */
+		  "REGEX"		/* Regular expression matches */
 		};
 #endif /* DEBUG */
 
