@@ -28,12 +28,6 @@ layout: default
 rpmbuild -ta cups-<i>version</i>-source.tar.gz
 </pre>
 
-<p>or:</p>
-
-<pre class="command">
-rpmbuild -ta cups-<i>version</i>-source.tar.bz2
-</pre>
-
 <p>At a minimum, you'll need the <tt>gcc</tt>, <tt>pam-devel</tt>, and <tt>zlib-devel</tt> packages installed to compile CUPS with all of the standard functionality. Additional developer packages are needed for Bonjour (Avahi), DBUS, systemd, and USB printing support.</p>
 
 <p>The spec file supports five options:</p>
@@ -60,12 +54,12 @@ rpmbuild -ta cups-<i>version</i>-source.tar.gz --without systemd
 <p>The CUPS repository is hosted on Github. Run the following command to checkout the current 2.2 (development) version of the CUPS code:</p>
 
 <pre class="command">
-git clone {{site.github.repository_url}} cups-2.2
+git clone {{site.github.clone_url}} cups-2.2
 </pre>
 
 <p>Choose the "branch-2.1" branch to checkout the current 2.1.x (stable) version of the CUPS code:</p>
 
 <pre class="command">
-git clone -b branch-2.1 {{site.github.repository_url}} cups-2.1
+git clone -b branch-2.1 {{site.github.clone_url}} cups-2.1
 </pre>
 
