@@ -409,27 +409,22 @@ is a list of assumptions we follow when constructing makefiles:
   the target, e.g.:
 
       target:
-
-      _TAB_ target commands
+      TAB target commands
 
 - Dependencies; we assume that the make program supports recursive dependencies
   on targets, e.g.:
 
       target: foo bar
-
-      _TAB_ target commands
+      TAB target commands
 
       foo: bla
-
-      _TAB_ foo commands
+      TAB foo commands
 
       bar:
-
-      _TAB_ bar commands
+      TAB bar commands
 
       bla:
-
-      _TAB_ bla commands
+      TAB bla commands
 
 - Variable Definition; we assume that the make program supports variable
   definition on the command-line or in the makefile using the following form:
@@ -452,16 +447,13 @@ is a list of assumptions we follow when constructing makefiles:
   assumed dependencies, e.g.:
 
       .SUFFIXES: .c .o
-
       .c.o:
-
-      _TAB_ $(CC) $(CFLAGS) -o $@ -c $<
+      TAB $(CC) $(CFLAGS) -o $@ -c $<
 
 - Include Files; we assume that the make program supports the include
   directive, e.g.:
 
       include ../Makedefs
-
       include Dependencies
 
 - Comments; we assume that comments begin with a # character and proceed to the
