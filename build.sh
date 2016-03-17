@@ -135,6 +135,13 @@ if test $update = yes; then
 	exec ./build.sh $options $targets
 fi
 
+# Make sure submodules are initialized...
+if test ! -f stable/Makedefs.in; then
+	echo Initializing submodules...
+	git submodule init
+	git submodule update
+fi
+
 # Look for changes to the dependent projects
 changed=0
 
