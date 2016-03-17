@@ -1,0 +1,11 @@
+# Prevent git from showing duplicate names with commands like "git shortlog"
+# See the manpage of git-shortlog for details.
+# The syntax is:
+# Name that should be used <email that should be used> Bad name <bad email>
+#
+# You can skip Bad name if it is the same as the one that should be used, and is unique.
+#
+# This file is up-to-date if the command git log --format="%aN <%aE>" | sort -u
+# gives no duplicates.
+Michael R Sweet <michaelrsweet@gmail.com> msweet <msweet@a1ca3aef-8c08-0410-bb20-df032aa958be>
+Michael R Sweet <michaelrsweet@gmail.com> Michael Sweet <msweet@msweet-imac.local>
