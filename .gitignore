@@ -141,3 +141,6 @@ test/ippfind-static
 test/ippserver
 test/ipptool
 test/ipptool-static
+xcode/CUPS.xcodeproj/project.xcworkspace/
+xcode/CUPS.xcodeproj/xcuserdata/
+
