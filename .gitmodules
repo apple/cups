@@ -1,7 +1,7 @@
 [submodule "stable"]
 	path = stable
-	url = https://github.com/michaelrsweet/cups.git
+	url = https://github.com/apple/cups.git
 	branch = branch-2.1
 [submodule "development"]
 	path = development
-	url = https://github.com/michaelrsweet/cups.git
+	url = https://github.com/apple/cups.git
