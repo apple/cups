@@ -105,7 +105,7 @@ echo "Starting build of '$targets' on `date`"
 
 if test -f git.log; then
 	# Show Subversion updates...
-	echo git pull; git submodule update stable; git submodule update development
+	echo git pull --recurse-submodules; git submodule update --recursive
 	cat git.log
 	git status | $grep modified: >git.log
 	if test -s git.log; then
@@ -121,7 +121,7 @@ fi
 # Update and then build safely...
 if test $update = yes; then
 	cd $BASEDIR
-	(git pull; git submodule update stable; git submodule update development) 2>&1 >git.log
+	(git pull --recurse-submodules; git submodule update --recursive) 2>&1 >git.log
 
 	# Need to exec since this script might change...
 	options=""
