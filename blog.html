@@ -9,5 +9,5 @@ layout: default
 <hr>
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
 <p>{{ post.excerpt | remove: '<p>' | remove: '</p>' }}</p>
-<p><a class="btn btn-default btn-xs" href="{{ site.prefix }}{{ post.url }}">Read</a></p>
+<p><a class="btn btn-default btn-xs" href=".{{ post.url }}">Read</a></p>
 {% endfor %}
