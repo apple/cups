@@ -1,5 +1,4 @@
-CONTRIBUTING.txt - 2016/01/28
------------------------------
+# Contributing to CUPS
 
 CUPS is developed by Apple Inc. and distributed as open source software under a
 combination of GNU GPL2 and GNU LGPL2 licenses with exceptions to allow
@@ -12,10 +11,11 @@ Apple using the Apple Contributor Agreement:
 Contributions should be submitted as attachments to bug reports on the CUPS web
 site.  Changes to existing source files should be submitted as unified diffs
 (both Subversion and Git produce this format by default) while new source files
-should be provided as-is or in an archive.
+should be provided as-is or in an archive.  Github pull requests can also be
+used to submit changes.
 
 
-HOW TO CONTACT THE DEVELOPERS
+## HOW TO CONTACT THE DEVELOPERS
 
 The CUPS mailing lists are the primary means of asking questions and informally
 discussing issues and feature requests with the CUPS developers and other
@@ -24,7 +24,7 @@ CUPS usage questions and new software announcements while the "cups-devel"
 mailing list provides a forum for CUPS developers and monitoring new bugs.
 
 
-INTERFACES
+## INTERFACES
 
 CUPS interfaces, including the C APIs and command-line arguments, environment
 variables, configuration files, and output format, are stable across patch
@@ -47,7 +47,7 @@ published C API to access data stored in a file to avoid compatibility problems
 in the future.
 
 
-BUILD SYSTEM
+## BUILD SYSTEM
 
 The CUPS build system uses GNU autoconf to tailor the library to the local
 operating system.  Project files for the current release of Microsoft Visual
@@ -62,7 +62,7 @@ specific extensions, and GNU libtool is not portable or reliable enough for
 CUPS.
 
 
-VERSION NUMBERING
+## VERSION NUMBERING
 
 CUPS uses a three-part version number separated by periods to represent the
 major, minor, and patch release numbers.  Major release numbers indicate large
@@ -71,13 +71,13 @@ Imaging API.  Minor release numbers indicate new features and other smaller
 changes which are backwards-compatible with previous CUPS releases.  Patch
 numbers indicate bug fixes to the previous feature or patch release.
 
-    Note:
-
-    When we talk about compatibility, we are talking about binary compatibility
-    for public APIs and output format compatibility for program interfaces.
-    Changes to configuration file formats or the default behavior of programs
-    are not generally considered incompatible as the upgrade process can
-    normally address such changes gracefully.
+> Note:
+>
+> When we talk about compatibility, we are talking about binary compatibility
+> for public APIs and output format compatibility for program interfaces.
+> Changes to configuration file formats or the default behavior of programs
+> are not generally considered incompatible as the upgrade process can
+> normally address such changes gracefully.
 
 Production releases use the plain version numbers:
 
@@ -113,14 +113,14 @@ minor version numbers followed by the release candidate number:
     2.2rc1
 
 
-CODING GUIDELINES
+## CODING GUIDELINES
 
 Contributed source code must follow the guidelines below.  While the examples
 are for C and C++ source files, source code for other languages should conform
 to the same guidelines as allowed by the language.
 
 
-SOURCE FILES
+### SOURCE FILES
 
 All source files names must be 16 characters or less in length to ensure
 compatibility with older UNIX filesystems.  Source files containing functions
@@ -128,10 +128,10 @@ have an extension of ".c" for C and ".cxx" for C++ source files.  All other
 "include" files have an extension of ".h".  Tabs are set to 8 characters or
 columns.
 
-    Note:
-
-    The ".cxx" extension is used because it is the only common C++ extension
-    between Linux, OS X, UNIX, and Windows.
+> Note:
+>
+> The ".cxx" extension is used because it is the only common C++ extension
+> between Linux, OS X, UNIX, and Windows.
 
 The top of each source file contains a header giving the purpose or nature of
 the source file and the copyright and licensing notice:
@@ -154,7 +154,7 @@ the following additional comment appears after the contact information:
      * This file is subject to the Apple OS-Developed Software exception.
 
 
-HEADER FILES
+### HEADER FILES
 
 All public header files must include the "versioning.h" header file, or a header
 that does so.  Function declarations are then "decorated" with the correct
@@ -170,7 +170,7 @@ Typically a private API header file will include the corresponding public API
 header file.
 
 
-COMMENTS
+### COMMENTS
 
 All source code utilizes block comments within functions to describe the
 operations being performed by a group of statements; avoid putting a comment
@@ -201,27 +201,26 @@ comments ("// comment"):
      } while (i == (sizeof(array) / sizeof(array[0])));
 
 
-INDENTATION
+### INDENTATION
 
 All code blocks enclosed by brackets begin with the opening brace on a new
 line.  The code then follows starting on a new line after the brace and is
 indented 2 spaces.  The closing brace is then placed on a new line following
 the code at the original indentation:
 
-  {
-    int i; /* Looping var */
-
-
-   /*
-    * Process foobar values from 0 to 999...
-    */
-
-    for (i = 0; i < 1000; i ++)
     {
-      do_this(i);
-      do_that(i);
+      int i; /* Looping var */
+
+     /*
+      * Process foobar values from 0 to 999...
+      */
+
+      for (i = 0; i < 1000; i ++)
+      {
+        do_this(i);
+        do_that(i);
+      }
     }
-  }
 
 Single-line statements following "do", "else", "for", "if", and "while" are
 indented 2 spaces as well.  Blocks of code in a "switch" block are indented 4
@@ -240,28 +239,28 @@ spaces after each "case" and "default" case:
     }
 
 
-SPACING
+### SPACING
 
 A space follows each reserved word such as "if", "while", etc.  Spaces are not
 inserted between a function name and the arguments in parenthesis.
 
 
-RETURN VALUES
+### RETURN VALUES
 
 Parenthesis surround values returned from a function:
 
     return (CUPS_STATE_IDLE);
 
 
-FUNCTIONS
+### FUNCTIONS
 
 Functions with a global scope have a lowercase prefix followed by capitalized
 words, e.g., "cupsDoThis", "cupsDoThat", "cupsDoSomethingElse", etc.  Private
-global functions begin with a leading underscore, e.g., "_cupsDoThis",
-"_cupsDoThat", etc.
+global functions begin with a leading underscore, e.g., "\_cupsDoThis",
+"\_cupsDoThat", etc.
 
 Functions with a local scope are declared "static" with lowercase names and
-underscores between words, e.g., "do_this", "do_that", "do_something_else", etc.
+underscores between words, e.g., "do\_this", "do\_that", "do\_something\_else", etc.
 
 Each function begins with a comment header describing what the function does,
 the possible input limits (if any), the possible output values (if any), and
@@ -295,16 +294,16 @@ text in the function description comment:
                            function name with an underscore)
 
 
-VARIABLES
+### VARIABLES
 
 Variables with a global scope are capitalized, e.g., "ThisVariable",
 "ThatVariable", "ThisStateVariable", etc.  Globals in CUPS libraries are either
-part of the per-thread global values managed by the "_cupsGlobals()" function
+part of the per-thread global values managed by the "\_cupsGlobals()" function
 or are suitably protected for concurrent access.  Global variables should be
 replaced by function arguments whenever possible.
 
 Variables with a local scope are lowercase with underscores between words,
-e.g., "this_variable", "that_variable", etc.  Any "local global" variables
+e.g., "this\_variable", "that\_variable", etc.  Any "local global" variables
 shared by functions within a source file are declared "static".  As for global
 variables, local static variables are suitably protected for concurrent access.
 
@@ -315,26 +314,26 @@ comment block describing the variable:
     static int  that_variable;   /* The current state of that */
 
 
-TYPES
+### TYPES
 
-All type names are lowercase with underscores between words and "_t" appended
-to the end of the name, e.g., "cups_this_type_t", "cups_that_type_t", etc.
+All type names are lowercase with underscores between words and "\_t" appended
+to the end of the name, e.g., "cups\_this\_type\_t", "cups\_that\_type\_t", etc.
 Type names start with a prefix, typically "cups" or the name of the program,
 to avoid conflicts with system types.  Private type names start with an
-underscore, e.g., "_cups_this_t", "_cups_that_t", etc.
+underscore, e.g., "\_cups\_this\_t", "\_cups\_that\_t", etc.
 
 Each type has a comment block immediately after the typedef:
 
     typedef int cups_this_type_t;  /* This type is for CUPS foobar options. */
 
 
-STRUCTURES
+### STRUCTURES
 
-All structure names are lowercase with underscores between words and "_s"
-appended to the end of the name, e.g., "cups_this_s", "cups_that_s", etc.
+All structure names are lowercase with underscores between words and "\_s"
+appended to the end of the name, e.g., "cups\_this\_s", "cups\_that\_s", etc.
 Structure names start with a prefix, typically "cups" or the name of the
 program, to avoid conflicts with system types.  Private structure names start
-with an underscore, e.g., "_cups_this_s", "_cups_that_s", etc.
+with an underscore, e.g., "\_cups\_this\_s", "\_cups\_that\_s", etc.
 
 Each structure has a comment block immediately after the struct and each member
 is documented similar to the variable naming policy above:
@@ -346,12 +345,12 @@ is documented similar to the variable naming policy above:
     };
 
 
-CONSTANTS
+### CONSTANTS
 
 All constant names are uppercase with underscores between words, e.g.,
-"CUPS_THIS_CONSTANT", "CUPS_THAT_CONSTANT", etc.  Constants begin with an
+"CUPS\_THIS\_CONSTANT", "CUPS\_THAT\_CONSTANT", etc.  Constants begin with an
 uppercase prefix, typically "CUPS" or the program name.  Private constants
-start with an underscore, e.g., "_CUPS_THIS_CONSTANT", "_CUPS_THAT_CONSTANT",
+start with an underscore, e.g., "\_CUPS\_THIS\_CONSTANT", "\_CUPS\_THAT\_CONSTANT",
 etc.
 
 Typed enumerations should be used whenever possible to allow for type checking
@@ -366,14 +365,14 @@ Comment blocks immediately follow each constant:
     } cups_tray_t;
 
 
-MAKEFILE GUIDELINES
+## MAKEFILE GUIDELINES
 
 The following is a guide to the makefile-based build system used by CUPS.
 These standards have been developed over the years to allow CUPS to be built on
 as many systems and environments as possible.
 
 
-GENERAL ORGANIZATION
+### GENERAL ORGANIZATION
 
 The CUPS source code is organized functionally into a top-level makefile,
 include file, and subdirectories each with their own makefile and dependencies
@@ -381,7 +380,7 @@ files.  The ".in" files are template files for the autoconf software and are
 used to generate a static version of the corresponding file.
 
 
-MAKEFILE DOCUMENTATION
+### MAKEFILE DOCUMENTATION
 
 Each makefile starts with the standard CUPS header containing the description
 of the file, and CUPS copyright and license notice:
@@ -399,7 +398,7 @@ of the file, and CUPS copyright and license notice:
     #
 
 
-PORTABLE MAKEFILE CONSTRUCTION
+### PORTABLE MAKEFILE CONSTRUCTION
 
 CUPS uses a common subset of make program syntax to ensure that the software
 can be compiled "out of the box" on as many systems as possible.  The following
@@ -410,22 +409,27 @@ is a list of assumptions we follow when constructing makefiles:
   the target, e.g.:
 
       target:
-      <tab> target commands
+
+      _TAB_ target commands
 
 - Dependencies; we assume that the make program supports recursive dependencies
   on targets, e.g.:
 
       target: foo bar
-      <tab> target commands
+
+      _TAB_ target commands
 
       foo: bla
-      <tab> foo commands
+
+      _TAB_ foo commands
 
       bar:
-      <tab> bar commands
+
+      _TAB_ bar commands
 
       bla:
-      <tab> bla commands
+
+      _TAB_ bla commands
 
 - Variable Definition; we assume that the make program supports variable
   definition on the command-line or in the makefile using the following form:
@@ -448,13 +452,16 @@ is a list of assumptions we follow when constructing makefiles:
   assumed dependencies, e.g.:
 
       .SUFFIXES: .c .o
+
       .c.o:
-      <tab> $(CC) $(CFLAGS) -o $@ -c $<
+
+      _TAB_ $(CC) $(CFLAGS) -o $@ -c $<
 
 - Include Files; we assume that the make program supports the include
   directive, e.g.:
 
       include ../Makedefs
+
       include Dependencies
 
 - Comments; we assume that comments begin with a # character and proceed to the
@@ -470,7 +477,7 @@ is a list of assumptions we follow when constructing makefiles:
 - Shell; we assume a POSIX-compatible shell is present on the build system.
 
 
-STANDARD VARIABLES
+### STANDARD VARIABLES
 
 The following variables are defined in the "Makedefs" file generated by the
 autoconf software:
@@ -523,7 +530,7 @@ autoconf software:
 - srcdir; the source directory.
 
 
-STANDARD TARGETS
+### STANDARD TARGETS
 
 The following standard targets are defined in each makefile:
 
@@ -548,58 +555,58 @@ The following standard targets are defined in each makefile:
   (also see "INSTALL/UNINSTALL SUPPORT").
 
 
-OBJECT FILES
+### OBJECT FILES
 
 Object files (the result of compiling a C or C++ source file) have the
 extension ".o".
 
 
-PROGRAMS
+### PROGRAMS
 
 Program files are the result of linking object files and libraries together to
 form an executable file.  A typical program target looks like:
 
     program: $(OBJS)
-    <tab> echo Linking $@...
-    <tab> $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+    TAB echo Linking $@...
+    TAB $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
-STATIC LIBRARIES
+### STATIC LIBRARIES
 
 Static libraries have a prefix of "lib" and the extension ".a". A typical
 static library target looks like:
 
     libname.a: $(OBJECTS)
-    <tab> echo Creating $@...
-    <tab> $(RM) $@
-    <tab> $(AR) $(ARFLAGS) $@ $(OBJECTS)
-    <tab> $(RANLIB) $@
+    TAB echo Creating $@...
+    TAB $(RM) $@
+    TAB $(AR) $(ARFLAGS) $@ $(OBJECTS)
+    TAB $(RANLIB) $@
 
-SHARED LIBRARIES
+### SHARED LIBRARIES
 
 Shared libraries have a prefix of "lib" and the extension ".dylib" or ".so"
 depending on the operating system.  A typical shared library is composed of
 several targets that look like:
 
     libname.so: $(OBJECTS)
-    <tab> echo $(DSOCOMMAND) libname.so.$(DSOVERSION) ...
-    <tab> $(DSOCOMMAND) libname.so.$(DSOVERSION) $(OBJECTS)
-    <tab> $(RM) libname.so libname.so.$(DSOMAJOR)
-    <tab> $(LN) libname.so.$(DSOVERSION) libname.so.$(DSOMAJOR)
-    <tab> $(LN) libname.so.$(DSOVERSION) libname.so
+    TAB echo $(DSOCOMMAND) libname.so.$(DSOVERSION) ...
+    TAB $(DSOCOMMAND) libname.so.$(DSOVERSION) $(OBJECTS)
+    TAB $(RM) libname.so libname.so.$(DSOMAJOR)
+    TAB $(LN) libname.so.$(DSOVERSION) libname.so.$(DSOMAJOR)
+    TAB $(LN) libname.so.$(DSOVERSION) libname.so
 
     libname.dylib: $(OBJECTS)
-    <tab> echo $(DSOCOMMAND) libname.$(DSOVERSION).dylib ...
-    <tab> $(DSOCOMMAND) libname.$(DSOVERSION).dylib \
-    <tab> <tab> -install_name $(libdir)/libname.$(DSOMAJOR).dylib \
-    <tab> <tab> -current_version libname.$(DSOVERSION).dylib \
-    <tab> <tab> -compatibility_version $(DSOMAJOR).0 \
-    <tab> <tab> $(OBJECTS) $(LIBS)
-    <tab> $(RM) libname.dylib
-    <tab> $(RM) libname.$(DSOMAJOR).dylib
-    <tab> $(LN) libname.$(DSOVERSION).dylib libname.$(DSOMAJOR).dylib
-    <tab> $(LN) libname.$(DSOVERSION).dylib libname.dylib
+    TAB echo $(DSOCOMMAND) libname.$(DSOVERSION).dylib ...
+    TAB $(DSOCOMMAND) libname.$(DSOVERSION).dylib \
+    TAB TAB -install_name $(libdir)/libname.$(DSOMAJOR).dylib \
+    TAB TAB -current_version libname.$(DSOVERSION).dylib \
+    TAB TAB -compatibility_version $(DSOMAJOR).0 \
+    TAB TAB $(OBJECTS) $(LIBS)
+    TAB $(RM) libname.dylib
+    TAB $(RM) libname.$(DSOMAJOR).dylib
+    TAB $(LN) libname.$(DSOVERSION).dylib libname.$(DSOMAJOR).dylib
+    TAB $(LN) libname.$(DSOVERSION).dylib libname.dylib
 
-DEPENDENCIES
+### DEPENDENCIES
 
 Static dependencies are expressed in each makefile following the target, for
 example:
@@ -612,21 +619,21 @@ generate them.  Automatic dependencies are stored in a file named
 target rule is used to create the automatic dependencies:
 
     depend:
-    <tab> $(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
+    TAB $(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
 
 We regenerate the automatic dependencies on an OS X system and express any
 non-OS X dependencies statically in the makefile.
 
 
-INSTALL/UNINSTALL SUPPORT
+### INSTALL/UNINSTALL SUPPORT
 
 All makefiles contains install and uninstall rules which install or remove the
 corresponding software.  These rules must use the $(BUILDROOT) variable as a
 prefix to any installation directory so that CUPS can be installed in a
 temporary location for packaging by programs like rpmbuild.
 
-The $(INSTALL_BIN), $(INSTALL_COMPDATA), $(INSTALL_CONFIG), $(INSTALL_DATA),
-$(INSTALL_DIR), $(INSTALL_LIB), $(INSTALL_MAN), and $(INSTALL_SCRIPT) variables
+The $(INSTALL\_BIN), $(INSTALL\_COMPDATA), $(INSTALL\_CONFIG), $(INSTALL\_DATA),
+$(INSTALL\_DIR), $(INSTALL\_LIB), $(INSTALL\_MAN), and $(INSTALL\_SCRIPT) variables
 must be used when installing files so that the proper ownership and permissions
 are set on the installed files.
 
