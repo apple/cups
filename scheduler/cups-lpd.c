@@ -361,10 +361,6 @@ create_job(http_t        *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
                  NULL, title);
 
-  if (docname[0])
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name",
-                 NULL, docname);
-
   cupsEncodeOptions(request, num_options, options);
 
  /*
