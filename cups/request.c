@@ -53,10 +53,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
   int		infile;			/* Input file */
 
 
-  DEBUG_printf(("cupsDoFileRequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "filename=\"%s\")", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, filename));
+  DEBUG_printf(("cupsDoFileRequest(http=%p, request=%p(%s), resource=\"%s\", filename=\"%s\")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, filename));
 
   if (filename)
   {
@@ -117,10 +114,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   char		buffer[32768];		/* Output buffer */
 
 
-  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "infile=%d, outfile=%d)", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, infile, outfile));
+  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p(%s), resource=\"%s\", infile=%d, outfile=%d)", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, infile, outfile));
 
  /*
   * Range check input...
@@ -304,10 +298,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
               ipp_t      *request,	/* I - IPP request */
               const char *resource)	/* I - HTTP resource for POST */
 {
-  DEBUG_printf(("cupsDoRequest(http=%p, request=%p(%s), resource=\"%s\")",
-                http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource));
+  DEBUG_printf(("cupsDoRequest(http=%p, request=%p(%s), resource=\"%s\")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource));
 
   return (cupsDoIORequest(http, request, resource, -1, -1));
 }
@@ -333,7 +324,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   ipp_t		*response = NULL;	/* IPP response */
 
 
-  DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", http, resource));
+  DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", (void *)http, resource));
   DEBUG_printf(("1cupsGetResponse: http->state=%d", http ? http->state : HTTP_STATE_ERROR));
 
  /*
@@ -557,8 +548,7 @@ cupsReadResponseData(
   * Get the default connection as needed...
   */
 
-  DEBUG_printf(("cupsReadResponseData(http=%p, buffer=%p, "
-                "length=" CUPS_LLFMT ")", http, buffer, CUPS_LLCAST length));
+  DEBUG_printf(("cupsReadResponseData(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
   if (!http)
   {
@@ -610,10 +600,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   http_status_t		expect;		/* Expect: header to use */
 
 
-  DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "length=" CUPS_LLFMT ")", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, CUPS_LLCAST length));
+  DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", length=" CUPS_LLFMT ")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, CUPS_LLCAST length));
 
  /*
   * Range check input...
@@ -920,8 +907,7 @@ cupsWriteRequestData(
   * Get the default connection as needed...
   */
 
-  DEBUG_printf(("cupsWriteRequestData(http=%p, buffer=%p, "
-                "length=" CUPS_LLFMT ")", http, buffer, CUPS_LLCAST length));
+  DEBUG_printf(("cupsWriteRequestData(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
   if (!http)
   {

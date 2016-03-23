@@ -566,7 +566,7 @@ cupsConnectDest(
   http_t	*http;			/* Connection to server */
 
 
-  DEBUG_printf(("cupsConnectDest(dest=%p, flags=0x%x, msec=%d, cancel=%p(%d), resource=\"%s\", resourcesize=" CUPS_LLFMT ", cb=%p, user_data=%p)", dest, flags, msec, cancel, cancel ? *cancel : -1, resource, CUPS_LLCAST resourcesize, cb, user_data));
+  DEBUG_printf(("cupsConnectDest(dest=%p, flags=0x%x, msec=%d, cancel=%p(%d), resource=\"%s\", resourcesize=" CUPS_LLFMT ", cb=%p, user_data=%p)", (void *)dest, flags, msec, (void *)cancel, cancel ? *cancel : -1, resource, CUPS_LLCAST resourcesize, (void *)cb, user_data));
 
  /*
   * Range check input...
@@ -2772,11 +2772,7 @@ cups_dnssd_browse_cb(
 					/* Enumeration data */
 
 
-  DEBUG_printf(("5cups_dnssd_browse_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
-		"regtype=\"%s\", replyDomain=\"%s\", context=%p)",
-		sdRef, flags, interfaceIndex, errorCode, serviceName, regtype,
-		replyDomain, context));
+  DEBUG_printf(("5cups_dnssd_browse_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
 
  /*
   * Don't do anything on error...
@@ -2913,8 +2909,7 @@ cups_dnssd_free_device(
     _cups_dnssd_device_t *device,	/* I - Device */
     _cups_dnssd_data_t   *data)		/* I - Enumeration data */
 {
-  DEBUG_printf(("5cups_dnssd_free_device(device=%p(%s), data=%p)", device,
-                device->dest.name, data));
+  DEBUG_printf(("5cups_dnssd_free_device(device=%p(%s), data=%p)", (void *)device, device->dest.name, (void *)data));
 
 #  ifdef HAVE_DNSSD
   if (device->ref)
@@ -2952,9 +2947,7 @@ cups_dnssd_get_device(
 					/* Full name for query */
 
 
-  DEBUG_printf(("5cups_dnssd_get_device(data=%p, serviceName=\"%s\", "
-                "regtype=\"%s\", replyDomain=\"%s\")", data, serviceName,
-                regtype, replyDomain));
+  DEBUG_printf(("5cups_dnssd_get_device(data=%p, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\")", (void *)data, serviceName, regtype, replyDomain));
 
  /*
   * See if this is an existing device...
@@ -3085,11 +3078,7 @@ cups_dnssd_local_cb(
   _cups_dnssd_device_t	*device;	/* Device */
 
 
-  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
-		"regtype=\"%s\", replyDomain=\"%s\", context=%p)",
-		sdRef, flags, interfaceIndex, errorCode, serviceName,
-		regtype, replyDomain, context));
+  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
 
  /*
   * Only process "add" data...
@@ -3211,11 +3200,7 @@ cups_dnssd_query_cb(
 
 
 #  ifdef HAVE_DNSSD
-  DEBUG_printf(("5cups_dnssd_query_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, fullName=\"%s\", "
-		"rrtype=%u, rrclass=%u, rdlen=%u, rdata=%p, ttl=%u, "
-		"context=%p)", sdRef, flags, interfaceIndex, errorCode,
-		fullName, rrtype, rrclass, rdlen, rdata, ttl, context));
+  DEBUG_printf(("5cups_dnssd_query_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, fullName=\"%s\", rrtype=%u, rrclass=%u, rdlen=%u, rdata=%p, ttl=%u, context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, fullName, rrtype, rrclass, rdlen, rdata, ttl, context));
 
  /*
   * Only process "add" data...
@@ -3789,10 +3774,7 @@ cups_get_dests(
   int		linenum;		/* Current line number */
 
 
-  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", "
-                "match_inst=\"%s\", user_default_set=%d, num_dests=%d, "
-		"dests=%p)", filename, match_name, match_inst,
-		user_default_set, num_dests, dests));
+  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", match_inst=\"%s\", user_default_set=%d, num_dests=%d, dests=%p)", filename, match_name, match_inst, user_default_set, num_dests, (void *)dests));
 
  /*
   * Try to open the file...

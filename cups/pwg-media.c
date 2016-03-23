@@ -280,10 +280,7 @@ pwgFormatSizeName(char       *keyword,	/* I - Keyword buffer */
   * Range check input...
   */
 
-  DEBUG_printf(("pwgFormatSize(keyword=%p, keysize=" CUPS_LLFMT
-                ", prefix=\"%s\", name=\"%s\", width=%d, length=%d, "
-                "units=\"%s\")", keyword, CUPS_LLCAST keysize, prefix, name,
-                width, length, units));
+  DEBUG_printf(("pwgFormatSize(keyword=%p, keysize=" CUPS_LLFMT ", prefix=\"%s\", name=\"%s\", width=%d, length=%d, units=\"%s\")", (void *)keyword, CUPS_LLCAST keysize, prefix, name, width, length, units));
 
   if (keyword)
     *keyword = '\0';

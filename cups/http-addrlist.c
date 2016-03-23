@@ -42,7 +42,7 @@ httpAddrConnect(
     http_addrlist_t *addrlist,		/* I - List of potential addresses */
     int             *sock)		/* O - Socket */
 {
-  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)", addrlist, sock));
+  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)", (void *)addrlist, (void *)sock));
 
   return (httpAddrConnect2(addrlist, sock, 30000, NULL));
 }
@@ -87,8 +87,7 @@ httpAddrConnect2(
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpAddrConnect2(addrlist=%p, sock=%p, msec=%d, cancel=%p)",
-                addrlist, sock, msec, cancel));
+  DEBUG_printf(("httpAddrConnect2(addrlist=%p, sock=%p, msec=%d, cancel=%p)", (void *)addrlist, (void *)sock, msec, (void *)cancel));
 
   if (!sock)
   {

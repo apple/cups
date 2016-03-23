@@ -269,7 +269,7 @@ struct _cups_dir_s			/**** Directory data structure ****/
 void
 cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 {
-  DEBUG_printf(("cupsDirClose(dp=%p)", dp));
+  DEBUG_printf(("cupsDirClose(dp=%p)", (void *)dp));
 
  /*
   * Range check input...
@@ -358,7 +358,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 #  endif /* HAVE_PTHREAD_H */
 
 
-  DEBUG_printf(("2cupsDirRead(dp=%p)", dp));
+  DEBUG_printf(("2cupsDirRead(dp=%p)", (void *)dp));
 
  /*
   * Range check input...
@@ -448,7 +448,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 void
 cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 {
-  DEBUG_printf(("cupsDirRewind(dp=%p)", dp));
+  DEBUG_printf(("cupsDirRewind(dp=%p)", (void *)dp));
 
  /*
   * Range check input...

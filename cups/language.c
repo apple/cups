@@ -1476,7 +1476,7 @@ cups_cache_lookup(
   for (lang = lang_cache; lang != NULL; lang = lang->next)
   {
     DEBUG_printf(("9cups_cache_lookup: lang=%p, language=\"%s\", "
-		  "encoding=%d(%s)", lang, lang->language, lang->encoding,
+		  "encoding=%d(%s)", (void *)lang, lang->language, lang->encoding,
 		  lang_encodings[lang->encoding]));
 
     if (!strcmp(lang->language, name) &&

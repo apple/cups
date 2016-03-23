@@ -572,8 +572,7 @@ cupsCopyDestInfo(
   };
 
 
-  DEBUG_printf(("cupsCopyDestSupported(http=%p, dest=%p(%s))", http, dest,
-                dest ? dest->name : ""));
+  DEBUG_printf(("cupsCopyDestSupported(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
 
  /*
   * Range check input...
@@ -1261,7 +1260,7 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
 			*first;		/* First entry this size */
 
 
-  DEBUG_printf(("3cups_create_cached(http=%p, dinfo=%p, flags=%u)", http, dinfo, flags));
+  DEBUG_printf(("3cups_create_cached(http=%p, dinfo=%p, flags=%u)", (void *)http, (void *)dinfo, flags));
 
   if (dinfo->cached_db)
     cupsArrayDelete(dinfo->cached_db);
@@ -1290,13 +1289,13 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
        mdb;
        mdb = (_cups_media_db_t *)cupsArrayNext(db))
   {
-    DEBUG_printf(("4cups_create_cached: %p key=\"%s\", type=\"%s\", %dx%d, B%d L%d R%d T%d", mdb, mdb->key, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
+    DEBUG_printf(("4cups_create_cached: %p key=\"%s\", type=\"%s\", %dx%d, B%d L%d R%d T%d", (void *)mdb, mdb->key, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
 
     if (flags & CUPS_MEDIA_FLAGS_BORDERLESS)
     {
       if (!mdb->left && !mdb->right && !mdb->top && !mdb->bottom)
       {
-        DEBUG_printf(("4cups_create_cached: add %p", mdb));
+        DEBUG_printf(("4cups_create_cached: add %p", (void *)mdb));
         cupsArrayAdd(dinfo->cached_db, mdb);
       }
     }
@@ -1304,7 +1303,7 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
     {
       if (first->width != mdb->width || first->length != mdb->length)
       {
-	DEBUG_printf(("4cups_create_cached: add %p", first));
+	DEBUG_printf(("4cups_create_cached: add %p", (void *)first));
         cupsArrayAdd(dinfo->cached_db, first);
         first = mdb;
       }
@@ -1314,14 +1313,14 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
     }
     else
     {
-      DEBUG_printf(("4cups_create_cached: add %p", mdb));
+      DEBUG_printf(("4cups_create_cached: add %p", (void *)mdb));
       cupsArrayAdd(dinfo->cached_db, mdb);
     }
   }
 
   if (flags & CUPS_MEDIA_FLAGS_DUPLEX)
   {
-    DEBUG_printf(("4cups_create_cached: add %p", first));
+    DEBUG_printf(("4cups_create_cached: add %p", (void *)first));
     cupsArrayAdd(dinfo->cached_db, first);
   }
 }

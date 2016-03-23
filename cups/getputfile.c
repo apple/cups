@@ -53,8 +53,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {
@@ -276,8 +275,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {

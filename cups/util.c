@@ -167,9 +167,7 @@ cupsCreateJob(
   int		job_id = 0;		/* job-id value */
 
 
-  DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", "
-                "num_options=%d, options=%p)",
-                http, name, title, num_options, options));
+  DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", num_options=%d, options=%p)", (void *)http, name, title, num_options, (void *)options));
 
  /*
   * Range check input...
@@ -711,9 +709,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFile(name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)",
-                name, filename, title, num_options, options));
+  DEBUG_printf(("cupsPrintFile(name=\"%s\", filename=\"%s\", title=\"%s\", num_options=%d, options=%p)", name, filename, title, num_options, (void *)options));
 
   return (cupsPrintFiles2(CUPS_HTTP_DEFAULT, name, 1, &filename, title,
                           num_options, options));
@@ -736,9 +732,7 @@ cupsPrintFile2(
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFile2(http=%p, name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)",
-                http, name, filename, title, num_options, options));
+  DEBUG_printf(("cupsPrintFile2(http=%p, name=\"%s\", filename=\"%s\",  title=\"%s\", num_options=%d, options=%p)", (void *)http, name, filename, title, num_options, (void *)options));
 
   return (cupsPrintFiles2(http, name, 1, &filename, title, num_options,
                           options));
@@ -759,9 +753,7 @@ cupsPrintFiles(
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)",
-                name, num_files, files, title, num_options, options));
+  DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, files=%p, title=\"%s\", num_options=%d, options=%p)", name, num_files, (void *)files, title, num_options, (void *)options));
 
  /*
   * Print the file(s)...
@@ -802,9 +794,7 @@ cupsPrintFiles2(
   char		*cancel_message;	/* Error message to preserve */
 
 
-  DEBUG_printf(("cupsPrintFiles2(http=%p, name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)",
-                http, name, num_files, files, title, num_options, options));
+  DEBUG_printf(("cupsPrintFiles2(http=%p, name=\"%s\", num_files=%d, files=%p, title=\"%s\", num_options=%d, options=%p)", (void *)http, name, num_files, (void *)files, title, num_options, (void *)options));
 
  /*
   * Range check input...

@@ -530,7 +530,7 @@ cupsRasterReadHeader2(
   * Get the raster header...
   */
 
-  DEBUG_printf(("cupsRasterReadHeader2(r=%p, h=%p)", r, h));
+  DEBUG_printf(("cupsRasterReadHeader2(r=%p, h=%p)", (void *)r, (void *)h));
 
   if (!cups_raster_read_header(r))
   {
@@ -570,7 +570,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	count;			/* Repetition count */
 
 
-  DEBUG_printf(("cupsRasterReadPixels(r=%p, p=%p, len=%u)", r, p, len));
+  DEBUG_printf(("cupsRasterReadPixels(r=%p, p=%p, len=%u)", (void *)r, (void *)p, len));
 
   if (r == NULL || r->mode != CUPS_RASTER_READ || r->remaining == 0 ||
       r->header.cupsBytesPerLine == 0)
@@ -1010,8 +1010,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	remaining;		/* Bytes remaining */
 
 
-  DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
-		r, p, len, r->remaining));
+  DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u", (void *)r, (void *)p, len, r->remaining));
 
   if (r == NULL || r->mode == CUPS_RASTER_READ || r->remaining == 0)
     return (0);
@@ -1197,7 +1196,7 @@ cups_raster_read_header(
   size_t	len;			/* Length for read/swap */
 
 
-  DEBUG_printf(("3cups_raster_read_header(r=%p), r->mode=%d", r, r ? r->mode : 0));
+  DEBUG_printf(("3cups_raster_read_header(r=%p), r->mode=%d", (void *)r, r ? r->mode : 0));
 
   if (r == NULL || r->mode != CUPS_RASTER_READ)
     return (0);
@@ -1279,7 +1278,7 @@ cups_raster_io(cups_raster_t *r,	/* I - Raster stream */
 		total;			/* Total bytes read/written */
 
 
-  DEBUG_printf(("5cups_raster_io(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", r, buf, CUPS_LLCAST bytes));
+  DEBUG_printf(("5cups_raster_io(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", (void *)r, (void *)buf, CUPS_LLCAST bytes));
 
   for (total = 0; total < (ssize_t)bytes; total += count, buf += count)
   {
@@ -1322,7 +1321,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 		total;			/* Total bytes read */
 
 
-  DEBUG_printf(("5cups_raster_read(r=%p, buf=%p, bytes=" CUPS_LLFMT ")\n", r, buf, CUPS_LLCAST bytes));
+  DEBUG_printf(("5cups_raster_read(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", (void *)r, (void *)buf, CUPS_LLCAST bytes));
 
   if (!r->compressed)
     return (cups_raster_io(r, buf, bytes));
@@ -1366,7 +1365,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   {
     count = (ssize_t)bytes - total;
 
-    DEBUG_printf(("6cups_raster_read: count=" CUPS_LLFMT ", remaining=" CUPS_LLFMT ", buf=%p, bufptr=%p, bufend=%p", CUPS_LLCAST count, CUPS_LLCAST remaining, buf, r->bufptr, r->bufend));
+    DEBUG_printf(("6cups_raster_read: count=" CUPS_LLFMT ", remaining=" CUPS_LLFMT ", buf=%p, bufptr=%p, bufend=%p", CUPS_LLCAST count, CUPS_LLCAST remaining, (void *)buf, (void *)r->bufptr, (void *)r->bufend));
 
     if (remaining == 0)
     {
@@ -1616,7 +1615,7 @@ cups_raster_write(
 			count;		/* Count */
 
 
-  DEBUG_printf(("3cups_raster_write(r=%p, pixels=%p)\n", r, pixels));
+  DEBUG_printf(("3cups_raster_write(r=%p, pixels=%p)", (void *)r, (void *)pixels));
 
  /*
   * Allocate a write buffer as needed...

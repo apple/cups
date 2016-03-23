@@ -1578,7 +1578,7 @@ _httpResolveURI(
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, resolved_size=" CUPS_LLFMT ", options=0x%x, cb=%p, context=%p)", uri, resolved_uri, CUPS_LLCAST resolved_size, options, cb, context));
+  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, resolved_size=" CUPS_LLFMT ", options=0x%x, cb=%p, context=%p)", uri, (void *)resolved_uri, CUPS_LLCAST resolved_size, options, (void *)cb, context));
 
  /*
   * Get the device URI...
@@ -2147,11 +2147,7 @@ http_resolve_cb(
   uint8_t		valueLen;	/* Length of value */
 
 
-  DEBUG_printf(("4http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, "
-	        "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
-	        "txtLen=%u, txtRecord=%p, context=%p)", sdRef, flags,
-	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
-	        txtRecord, context));
+  DEBUG_printf(("4http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, txtLen=%u, txtRecord=%p, context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, fullName, hostTarget, port, txtLen, (void *)txtRecord, context));
 
  /*
   * If we have a UUID, compare it...

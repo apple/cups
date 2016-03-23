@@ -325,8 +325,7 @@ httpAddrLookup(
 					/* Global data */
 
 
-  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)", addr, name,
-		namelen));
+  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)", (void *)addr, (void *)name, namelen));
 
  /*
   * Range check input...
@@ -503,7 +502,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
                char              *s,	/* I - String buffer */
 	       int               slen)	/* I - Length of string */
 {
-  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)", addr, s, slen));
+  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)", (void *)addr, (void *)s, slen));
 
  /*
   * Range check input...

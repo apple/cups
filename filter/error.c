@@ -209,7 +209,7 @@ get_error_buffer(void)
     buf = calloc(1, sizeof(_cups_raster_error_t));
     pthread_setspecific(raster_key, buf);
 
-    DEBUG_printf(("4get_error_buffer: buf=%p", buf));
+    DEBUG_printf(("4get_error_buffer: buf=%p", (void *)buf));
   }
 
  /*

@@ -122,8 +122,7 @@ cupsDoAuthentication(
   _cups_globals_t *cg;			/* Global data */
 
 
-  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")",
-                http, method, resource));
+  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")", (void *)http, method, resource));
 
   if (!http)
     http = _cupsConnect();
@@ -668,8 +667,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 #  endif /* HAVE_AUTHORIZATION_H */
 
 
-  DEBUG_printf(("7cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"",
-                http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
+  DEBUG_printf(("7cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"", (void *)http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
   * See if we are accessing localhost...

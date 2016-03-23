@@ -187,7 +187,7 @@ cleanup:
   cups_file_t	*fp;			/* Seed/info file */
 
 
-  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, alt_names, (int)expiration_date));
+  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, (void *)alt_names, (int)expiration_date));
 
   (void)num_alt_names;
   (void)alt_names;
@@ -364,7 +364,7 @@ httpCopyCredentials(
   int			i;		/* Looping var */
 
 
-  DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", http, credentials));
+  DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", (void *)http, (void *)credentials));
 
   if (credentials)
     *credentials = NULL;
@@ -639,7 +639,7 @@ httpCredentialsString(
   SecCertificateRef	secCert;	/* Certificate reference */
 
 
-  DEBUG_printf(("httpCredentialsString(credentials=%p, buffer=%p, bufsize=" CUPS_LLFMT ")", credentials, buffer, CUPS_LLCAST bufsize));
+  DEBUG_printf(("httpCredentialsString(credentials=%p, buffer=%p, bufsize=" CUPS_LLFMT ")", (void *)credentials, (void *)buffer, CUPS_LLCAST bufsize));
 
   if (!buffer)
     return (0);
@@ -722,7 +722,7 @@ httpLoadCredentials(
   CFArrayRef		list = NULL;	/* Keychain list */
 
 
-  DEBUG_printf(("httpLoadCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, credentials, common_name));
+  DEBUG_printf(("httpLoadCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, (void *)credentials, common_name));
 
   if (!credentials)
     return (-1);
@@ -825,7 +825,7 @@ httpSaveCredentials(
   CFArrayRef		list = NULL;	/* Keychain list */
 
 
-  DEBUG_printf(("httpSaveCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, credentials, common_name));
+  DEBUG_printf(("httpSaveCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, (void *)credentials, common_name));
   if (!credentials)
     goto cleanup;
 
@@ -1007,7 +1007,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   http_credential_t	*credential;	/* Credential data */
 
 
-  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", (void *)http));
 
   if (tls_options < 0)
   {
@@ -1310,7 +1310,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
     DEBUG_printf(("4_httpTLSStart: SSLSetCertificate, error=%d", (int)error));
   }
 
-  DEBUG_printf(("4_httpTLSStart: tls_credentials=%p", http->tls_credentials));
+  DEBUG_printf(("4_httpTLSStart: tls_credentials=%p", (void *)http->tls_credentials));
 
  /*
   * Let the server know which hostname/domain we are trying to connect to
@@ -1532,7 +1532,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
   size_t	processed;		/* Number of bytes processed */
 
 
-  DEBUG_printf(("2_httpTLSWrite(http=%p, buf=%p, len=%d)", http, buf, len));
+  DEBUG_printf(("2_httpTLSWrite(http=%p, buf=%p, len=%d)", (void *)http, (void *)buf, len));
 
   error = SSLWrite(http->tls, buf, (size_t)len, &processed);
 
@@ -1764,7 +1764,7 @@ http_cdsa_set_credentials(http_t *http)	/* I - HTTP connection */
 					/* TLS credentials */
 
 
-  DEBUG_printf(("7http_tls_set_credentials(%p)", http));
+  DEBUG_printf(("7http_tls_set_credentials(%p)", (void *)http));
 
  /*
   * Prefer connection specific credentials...

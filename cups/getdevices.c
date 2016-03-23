@@ -65,10 +65,7 @@ cupsGetDevices(
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetDevices(http=%p, timeout=%d, include_schemes=\"%s\", "
-                "exclude_schemes=\"%s\", callback=%p, user_data=%p)", http,
-		timeout, include_schemes, exclude_schemes, callback,
-		user_data));
+  DEBUG_printf(("cupsGetDevices(http=%p, timeout=%d, include_schemes=\"%s\", exclude_schemes=\"%s\", callback=%p, user_data=%p)", (void *)http, timeout, include_schemes, exclude_schemes, (void *)callback, user_data));
 
   if (!callback)
     return (IPP_STATUS_ERROR_INTERNAL);
@@ -190,8 +187,7 @@ cupsGetDevices(
     if ((state = ippRead(http, response)) == IPP_STATE_ERROR)
       break;
 
-    DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state,
-                  response->last));
+    DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state, (void *)response->last));
 
     if (!response->attrs)
       continue;
@@ -243,8 +239,7 @@ cupsGetDevices(
   }
   while (state != IPP_STATE_DATA);
 
-  DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state,
-		response->last));
+  DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state, (void *)response->last));
 
   if (device_class && device_id && device_info && device_make_and_model &&
       device_uri)
