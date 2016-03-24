@@ -1,6 +1,4 @@
 /*
- * "$Id: ipptool.c 13075 2016-01-29 21:14:05Z msweet $"
- *
  * ipptool command for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -786,7 +784,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
 		temp[1024],		/* Temporary string */
-		buffer[8192],		/* Copy buffer */
+		buffer[131072],		/* Copy buffer */
 		compression[16];	/* COMPRESSION value */
   ipp_t		*request = NULL,	/* IPP request */
 		*response = NULL;	/* IPP response */
@@ -4442,7 +4440,7 @@ print_attr(FILE            *outfile,	/* I  - Output file */
   }
   else
   {
-    char	buffer[8192];		/* Value buffer */
+    char	buffer[131072];		/* Value buffer */
 
     if (format == _CUPS_OUTPUT_TEST)
     {
@@ -6198,8 +6196,3 @@ with_value_from(
 
   return (0);
 }
-
-
-/*
- * End of "$Id: ipptool.c 13075 2016-01-29 21:14:05Z msweet $".
- */

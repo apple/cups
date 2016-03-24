@@ -3,6 +3,7 @@ CHANGES.txt - 2.1.4 - 2016-03-24
 
 CHANGES IN CUPS V2.1.4
 
+	- The ipptool program truncated values at 8k (Issue #4786)
 	- The cups-lpd mini-daemon incorrectly included the document-name
 	  attribute when creating a job.  It should only be included when
 	  sending a job (Issue #4790)
