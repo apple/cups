@@ -84,6 +84,7 @@ notifier/mailto
 notifier/rss
 notifier/testnotify
 packaging/cups.list
+patches
 ppdc/genstrings
 ppdc/ppd/
 ppdc/ppd2/
