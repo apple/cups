@@ -4398,10 +4398,11 @@ print_attr(FILE            *outfile,	/* I  - Output file */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-      case IPP_TAG_CHARSET :
       case IPP_TAG_URI :
-      case IPP_TAG_MIMETYPE :
+      case IPP_TAG_URISCHEME :
+      case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
+      case IPP_TAG_MIMETYPE :
 	  for (i = 0; i < attr->num_values; i ++)
 	    print_xml_string(outfile, "string", attr->values[i].string.text);
 	  break;
