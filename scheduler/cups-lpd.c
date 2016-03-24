@@ -73,6 +73,7 @@ static int	remove_jobs(const char *name, const char *agent,
 static int	send_state(const char *name, const char *list,
 		           int longstatus);
 static char	*smart_gets(char *s, int len, FILE *fp);
+static void	smart_strlcpy(char *dst, const char *src, size_t dstsize);
 
 
 /*
@@ -1055,15 +1056,15 @@ recv_print_job(
 	switch (line[0])
 	{
 	  case 'J' : /* Job name */
-	      strlcpy(title, line + 1, sizeof(title));
+	      smart_strlcpy(title, line + 1, sizeof(title));
 	      break;
 
           case 'N' : /* Document name */
-              strlcpy(docname, line + 1, sizeof(docname));
+              smart_strlcpy(docname, line + 1, sizeof(docname));
               break;
 
 	  case 'P' : /* User identification */
-	      strlcpy(user, line + 1, sizeof(user));
+	      smart_strlcpy(user, line + 1, sizeof(user));
 	      break;
 
 	  case 'L' : /* Print banner page */
@@ -1148,7 +1149,7 @@ recv_print_job(
 	  switch (line[0])
 	  {
 	    case 'N' : /* Document name */
-		strlcpy(docname, line + 1, sizeof(docname));
+		smart_strlcpy(docname, line + 1, sizeof(docname));
 		break;
 
 	    case 'c' : /* Plot CIF file */
@@ -1618,4 +1619,83 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
     return (NULL);
   else
     return (s);
+}
+
+
+/*
+ * 'smart_strlcpy()' - Copy a string and convert from ISO-8859-1 to UTF-8 as needed.
+ */
+
+static void
+smart_strlcpy(char       *dst,		/* I - Output buffer */
+              const char *src,		/* I - Input string */
+              size_t     dstsize)	/* I - Size of output buffer */
+{
+  const unsigned char	*srcptr;	/* Pointer into input string */
+  unsigned char		*dstptr,	/* Pointer into output buffer */
+			*dstend;	/* End of output buffer */
+  int			saw_8859 = 0;	/* Saw an extended character that was not UTF-8? */
+
+
+  for (srcptr = (unsigned char *)src, dstptr = (unsigned char *)dst, dstend = dstptr + dstsize - 1; *srcptr;)
+  {
+    if (*srcptr < 0x80)
+      *dstptr++ = *srcptr++;		/* ASCII */
+    else if (saw_8859)
+    {
+     /*
+      * Map ISO-8859-1 (most likely character set for legacy LPD clients) to
+      * UTF-8...
+      */
+
+      if (dstptr > (dstend - 2))
+        break;
+
+      *dstptr++ = 0xc0 | (*srcptr >> 6);
+      *dstptr++ = 0x80 | (*srcptr++ & 0x3f);
+    }
+    else if ((*srcptr & 0xe0) == 0xc0)
+    {
+      if (dstptr > (dstend - 2))
+        break;
+
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+    }
+    else if ((*srcptr & 0xf0) == 0xe0)
+    {
+      if (dstptr > (dstend - 3))
+        break;
+
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+    }
+    else if ((*srcptr & 0xf8) == 0xf0)
+    {
+      if (dstptr > (dstend - 4))
+        break;
+
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+      *dstptr++ = *srcptr++;
+    }
+    else
+    {
+     /*
+      * Orphan UTF-8 sequence, this must be an ISO-8859-1 string...
+      */
+
+      saw_8859 = 1;
+
+      if (dstptr > (dstend - 2))
+        break;
+
+      *dstptr++ = 0xc0 | (*srcptr >> 6);
+      *dstptr++ = 0x80 | (*srcptr++ & 0x3f);
+    }
+  }
+
+  *dstptr = '\0';
 }

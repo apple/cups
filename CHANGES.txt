@@ -1,8 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-03-10
+CHANGES.txt - 2.2b1 - 2016-03-24
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
+	- The LPD mini-daemon now detects invalid UTF-8 sequences in job,
+	  document, and user names (Issue #4748)
 	- The IPP backend now continues on to the next job when the remote
 	  server/printer puts the job on hold (<rdar://problem/24858548>)
 	- The scheduler did not cancel multi-document jobs immediately
