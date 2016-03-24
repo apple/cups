@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -565,23 +563,6 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Location of the poppler/Xpdf pdftops program...
- */
-
-/* #undef HAVE_PDFTOPS */
-/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
-#define CUPS_PDFTOPS ""
-
-
-/*
- * Location of the Ghostscript gs program...
- */
-
-/* #undef HAVE_GHOSTSCRIPT */
-#define CUPS_GHOSTSCRIPT ""
-
-
-/*
  * Do we have CoreFoundation public and private headers?
  */
 
@@ -797,7 +778,3 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
-
-/*
- * End of "$Id$".
- */
