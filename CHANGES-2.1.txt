@@ -6,7 +6,7 @@ CHANGES IN CUPS V2.1.4
 	- The cups-lpd mini-daemon incorrectly included the document-name
 	  attribute when creating a job.  It should only be included when
 	  sending a job (Issue #4790)
-	- USB quirk updates (Issue #4789)
+	- USB quirk updates (Issue #4778, Issue #4789)
 	- Documentation update (Issue #4772)
 
 
