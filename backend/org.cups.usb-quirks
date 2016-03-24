@@ -244,3 +244,6 @@
 
 # Xerox WorkCentre 3220 (https://bugs.launchpad.net/bugs/1406203, Issue #4789)
 0x0924 0x4294 no-reattach
+
+# Lexmark C540n (Issue #4778)
+0x043d 0x0139 no-reattach
