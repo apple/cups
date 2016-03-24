@@ -1,9 +1,7 @@
 /*
- * "$Id: type.c 12577 2015-03-30 19:07:17Z msweet $"
- *
  * MIME typing routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -65,7 +63,8 @@ static const char * const debug_ops[] =
 		  "INT",		/* Integer/32-bit word matches */
 		  "LOCALE",		/* Current locale matches string */
 		  "CONTAINS",		/* File contains a string */
-		  "ISTRING"		/* Case-insensitive string matches */
+		  "ISTRING",		/* Case-insensitive string matches */
+		  "REGEX"		/* Regular expression matches */
 		};
 #endif /* DEBUG */
 
@@ -1276,8 +1275,3 @@ mime_patmatch(const char *s,		/* I - String to match against */
 
   return (*s == *pat);
 }
-
-
-/*
- * End of "$Id: type.c 12577 2015-03-30 19:07:17Z msweet $".
- */
