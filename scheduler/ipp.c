@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * IPP routines for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -11400,8 +11398,3 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   return (cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
                            con, owner) == HTTP_OK);
 }
-
-
-/*
- * End of "$Id$".
- */
