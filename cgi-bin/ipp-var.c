@@ -1325,7 +1325,7 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
     attr = cgiSetIPPObjectVars(attr, prefix, element);
   }
 
-  fprintf(stderr, "DEBUG2: Returing %d from cgiSetIPPVars()...\n", element);
+  fprintf(stderr, "DEBUG2: Returning %d from cgiSetIPPVars()...\n", element);
 
   return (element);
 }
