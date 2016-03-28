@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/cups.css">
+    <link rel="shortcut icon" href="../apple-touch-icon.png" type="image/png">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{page.title}}</title>
+    <meta name="keywords" content="printing,printer driver,internet printing protocol,ipp,ipp everywhere,ppd,linux,unix,mac,os x,postscript,pdf,text,image">
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+	<div class="navbar-header">
+	  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cups-collapsible">
+	  <span class="sr-only">Toggle Navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+	  <a class="navbar-brand" href="../index.html">CUPS.org</a>
+	</div>
+	<div class="collapse navbar-collapse" id="cups-collapsible">
+	  <ul class="nav navbar-nav">
+	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b class="caret"></b></a><ul class="dropdown-menu">
+{% for post in site.posts offset: 0 limit: 10 %}
+	    <li><a href="..{{ post.url }}">{{post.title}}</a></li>
+{% endfor %}
+	      <li class="divider"></li>
+	      <li><a href="../blog.html">All Articles</a></li>
+	    </ul>
+	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Bugs <b class="caret"></b></a><ul class="dropdown-menu">
+	      <li><a href="{{site.github.issues_url}}">All Issues</a></li>
+	      <li class="divider"></li>
+	      <li><a href="{{site.github.repository_url}}/milestones/Stable">CUPS 2.1.x Issues</a></li>
+	      <li><a href="{{site.github.repository_url}}/milestones/2.2">CUPS 2.2.x Issues</a></li>
+	      <li><a href="{{site.github.repository_url}}/milestones/Future">CUPS Future Issues</a></li>
+	    </ul></li>
+	    <li><a href="../documentation.html">Help</a></li>
+	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a><ul class="dropdown-menu">
+	      <li><a href="https://lists.cups.org/mailman/listinfo/cups">User</a></li>
+	      <li><a href="https://lists.cups.org/mailman/listinfo/cups-devel">Developer</a></li>
+	    </ul></li>
+	    <li><a href="../software.html">Software</a></li>
+	  </ul>
+	</div>
+      </div>
+    </nav>
+    <div class="container-fluid container-top">
+      {{ content }}
+    </div>
+    <div class="footer">
+      <p>Copyright &copy; 2007-2016 Apple Inc. All rights reserved. CUPS, the CUPS logo, and OS X are trademarks of <a href="http://www.apple.com/legal/intellectual-property/trademark/appletmlist.html">Apple Inc.</a> All other trademarks are the property of their respective owners.</p>
+    </div>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap.js"></script>
+  </body>
+</html>
