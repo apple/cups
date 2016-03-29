@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Job management routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2808,7 +2806,8 @@ cupsdUnloadCompletedJobs(void)
       if (job->dirty)
         cupsdSaveJob(job);
 
-      unload_job(job);
+      if (!job->dirty)
+        unload_job(job);
     }
 }
 
@@ -5368,8 +5367,3 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
   job->dirty = 1;
   cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
-
-
-/*
- * End of "$Id$".
- */
