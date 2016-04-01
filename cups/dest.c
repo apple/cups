@@ -48,7 +48,10 @@
  */
 
 #ifdef __APPLE__
-#  include <SystemConfiguration/SystemConfiguration.h>
+#  if !TARGET_OS_IOS
+#    include <SystemConfiguration/SystemConfiguration.h>
+#    define _CUPS_LOCATION_DEFAULTS 1
+#  endif /* !TARGET_OS_IOS */
 #  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
 #  define kDefaultPaperIDKey	CFSTR("DefaultPaperID")
 #  define kLastUsedPrintersKey	CFSTR("LastUsedPrinters")
@@ -117,13 +120,17 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
  * Local functions...
  */
 
-#ifdef __APPLE__
+#if _CUPS_LOCATION_DEFAULTS
 static CFArrayRef	appleCopyLocations(void);
 static CFStringRef	appleCopyNetwork(void);
+#endif /* _CUPS_LOCATION_DEFAULTS */
+#ifdef __APPLE__
 static char		*appleGetPaperSize(char *name, size_t namesize);
+#endif /* __APPLE__ */
+#if _CUPS_LOCATION_DEFAULTS
 static CFStringRef	appleGetPrinter(CFArrayRef locations,
 			                CFStringRef network, CFIndex *locindex);
-#endif /* __APPLE__ */
+#endif /* _CUPS_LOCATION_DEFAULTS */
 static cups_dest_t	*cups_add_dest(const char *name, const char *instance,
 				       int *num_dests, cups_dest_t **dests);
 #ifdef __BLOCKS__
@@ -307,6 +314,7 @@ _cupsAppleCopyDefaultPaperID(void)
 CFStringRef				/* O - Default printer name */
 _cupsAppleCopyDefaultPrinter(void)
 {
+#  if _CUPS_LOCATION_DEFAULTS
   CFStringRef	network;		/* Network location */
   CFArrayRef	locations;		/* Location array */
   CFStringRef	locprinter;		/* Current printer */
@@ -363,6 +371,10 @@ _cupsAppleCopyDefaultPrinter(void)
   CFRelease(locations);
 
   return (locprinter);
+
+#  else
+  return (NULL);
+#  endif /* _CUPS_LOCATION_DEFAULTS */
 }
 
 
@@ -415,6 +427,7 @@ void
 _cupsAppleSetDefaultPrinter(
     CFStringRef name)			/* I - Default printer/class name */
 {
+#  if _CUPS_LOCATION_DEFAULTS
   CFStringRef		network;	/* Current network */
   CFArrayRef		locations;	/* Old locations array */
   CFIndex		locindex;	/* Index in locations array */
@@ -508,6 +521,10 @@ _cupsAppleSetDefaultPrinter(
     CFRelease(locations);
 
   CFRelease(network);
+
+#  else
+  (void)name;
+#  endif /* _CUPS_LOCATION_DEFAULTS */
 }
 
 
@@ -2483,7 +2500,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 }
 
 
-#ifdef __APPLE__
+#if _CUPS_LOCATION_DEFAULTS
 /*
  * 'appleCopyLocations()' - Copy the location history array.
  */
@@ -2576,8 +2593,10 @@ appleCopyNetwork(void)
 
   return (network);
 }
+#endif /* _CUPS_LOCATION_DEFAULTS */
 
 
+#ifdef __APPLE__
 /*
  * 'appleGetPaperSize()' - Get the default paper size.
  */
@@ -2603,8 +2622,10 @@ appleGetPaperSize(char   *name,		/* I - Paper size name buffer */
 
   return (name);
 }
+#endif /* __APPLE__ */
 
 
+#if _CUPS_LOCATION_DEFAULTS
 /*
  * 'appleGetPrinter()' - Get a printer from the history array.
  */
@@ -2642,7 +2663,7 @@ appleGetPrinter(CFArrayRef  locations,	/* I - Location array */
 
   return (NULL);
 }
-#endif /* __APPLE__ */
+#endif /* _CUPS_LOCATION_DEFAULTS */
 
 
 /*
