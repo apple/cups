@@ -136,6 +136,7 @@ If the resulting class becomes empty it is removed.
 <dd style="margin-left: 5.0em">Sets user-level access control on a destination.
 Names starting with "@" are interpreted as UNIX groups.
 The latter two forms turn user-level access control off.
+Note: The user 'root' is not granted special access - using "-u allow:foo,bar" will allow users 'foo' and 'bar' to access the printer but NOT 'root'.
 <dt><b>-v "</b><i>device-uri</i><b>"</b>
 <dd style="margin-left: 5.0em">Sets the <i>device-uri</i> attribute of the printer queue.
 Use the <i>-v</i> option with the
@@ -173,7 +174,7 @@ Create an IPP Everywhere print queue:
 <a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>
