@@ -1096,7 +1096,7 @@ main(int  argc,				/* I - Number of command-line args */
                         "compression value \"%s\".\n", compression);
         compression = NULL;
       }
-      else if (!compression)
+      else if (!compression && (!strcmp(final_content_type, "image/pwg-raster") || !strcmp(final_content_type, "image/urf")))
       {
         if (ippContainsString(compression_sup, "gzip"))
           compression = "gzip";
@@ -1357,24 +1357,10 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (format_sup != NULL)
   {
-    for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type,
-                            format_sup->values[i].string.text))
-      {
-        document_format = final_content_type;
-	break;
-      }
-
-    if (!document_format)
-    {
-      for (i = 0; i < format_sup->num_values; i ++)
-	if (!_cups_strcasecmp("application/octet-stream",
-	                      format_sup->values[i].string.text))
-	{
-	  document_format = "application/octet-stream";
-	  break;
-	}
-    }
+    if (ippContainsString(format_sup, final_content_type))
+      document_format = final_content_type;
+    else if (ippContainsString(format_sup, "application/octet-stream"))
+      document_format = "application/octet-stream";
   }
 
   fprintf(stderr, "DEBUG: final_content_type=\"%s\", document_format=\"%s\"\n",
