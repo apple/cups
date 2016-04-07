@@ -296,15 +296,16 @@ cupsSetServerCredentials(
 #ifdef HAVE_SECKEYCHAINOPEN
   char			filename[1024];	/* Filename for keychain */
   SecKeychainRef	keychain = NULL;/* Temporary keychain */
+  OSStatus		status;		/* Status code */
 
 
   if (!path)
     path = http_cdsa_default_path(filename, sizeof(filename));
 
-  if (SecKeychainOpen(path, &keychain) != noErr)
+  if ((status = SecKeychainOpen(path, &keychain)) != noErr)
   {
     /* TODO: Set cups last error string */
-    DEBUG_puts("1cupsSetServerCredentials: Unable to open keychain, returning 0.");
+    DEBUG_printf(("1cupsSetServerCredentials: Unable to open keychain (%d), returning 0.", (int)status));
     return (0);
   }
 
