@@ -57,9 +57,7 @@
  * Prototypes...
  */
 
-static int	create_job(http_t *http, const char *dest, const char *title,
-                           const char *docname, const char *user,
-			   int num_options, cups_option_t *options);
+static int	create_job(http_t *http, const char *dest, const char *title, const char *user, int num_options, cups_option_t *options);
 static int	get_printer(http_t *http, const char *name, char *dest,
 		            size_t destsize, cups_option_t **options,
 			    int *accepting, int *shared, ipp_pstate_t *state);
@@ -330,8 +328,7 @@ static int				/* O - Job ID or -1 on error */
 create_job(http_t        *http,		/* I - HTTP connection */
            const char    *dest,		/* I - Destination name */
 	   const char    *title,	/* I - job-name */
-	   const char    *docname,	/* I - Name of job file */
-           const char    *user,		/* I - requesting-user-name */
+	   const char    *user,		/* I - requesting-user-name */
 	   int           num_options,	/* I - Number of options for job */
 	   cups_option_t *options)	/* I - Options for job */
 {
@@ -1126,8 +1123,7 @@ recv_print_job(
       * Create the job...
       */
 
-      if ((id = create_job(http, dest, title, docname, user, num_options,
-                           options)) < 0)
+      if ((id = create_job(http, dest, title, user, num_options, options)) < 0)
         status = 1;
       else
       {
