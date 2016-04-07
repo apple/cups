@@ -680,7 +680,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef WIN32
     if ((tmpdir = getenv("TEMP")) == NULL)
       tmpdir = "C:/TEMP";
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && !TARGET_OS_IOS
     if ((tmpdir = getenv("TMPDIR")) == NULL)
       tmpdir = "/private/tmp";
 #else

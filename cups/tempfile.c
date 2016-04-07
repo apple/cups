@@ -71,11 +71,11 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
-#  ifdef __APPLE__
+#  if defined(__APPLE__) && !TARGET_OS_IOS
     tmpdir = "/private/tmp";		/* /tmp is a symlink to /private/tmp */
 #  else
     tmpdir = "/tmp";
-#  endif /* __APPLE__ */
+#  endif /* __APPLE__  && !TARGET_OS_IOS */
 #endif /* WIN32 */
 
  /*
