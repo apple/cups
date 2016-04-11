@@ -161,7 +161,7 @@ cupsMakeServerCredentials(
     CFDictionaryRef itemAttrs = CFDictionaryCreate(kCFAllocatorDefault, itemKeys, itemValues, sizeof(itemKeys) / sizeof(itemKeys[0]), &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
     err = SecItemAdd(itemAttrs, NULL);
-    CFRelease(itemAttrs);
+    /* SecItemAdd consumes itemAttrs... */
 
     if (err != noErr)
       goto cleanup;
