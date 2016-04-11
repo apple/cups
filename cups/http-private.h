@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -99,9 +97,26 @@ typedef int socklen_t;
 #      ifdef __cplusplus
 extern "C" {
 #      endif /* __cplusplus */
+typedef CF_OPTIONS(uint32_t, SecKeyUsage) {
+    kSecKeyUsageAll              = 0x7FFFFFFF
+};
+extern const void * kSecCSRChallengePassword;
+extern const void * kSecSubjectAltName;
+extern const void * kSecCertificateKeyUsage;
+extern const void * kSecCSRBasicContraintsPathLen;
+extern const void * kSecCertificateExtensions;
+extern const void * kSecCertificateExtensionsEncoded;
+extern const void * kSecOidCommonName;
+extern const void * kSecOidCountryName;
+extern const void * kSecOidStateProvinceName;
+extern const void * kSecOidLocalityName;
+extern const void * kSecOidOrganization;
+extern const void * kSecOidOrganizationalUnit;
 extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
 extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
 extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
+extern SecCertificateRef SecGenerateSelfSignedCertificate(CFArrayRef subject, CFDictionaryRef parameters, SecKeyRef publicKey, SecKeyRef privateKey);
+extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificateRef certificate, SecKeyRef privateKey);
 #      ifdef __cplusplus
 }
 #      endif /* __cplusplus */
@@ -440,7 +455,3 @@ extern int		_httpWait(http_t *http, int msec, int usessl);
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

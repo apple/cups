@@ -82,6 +82,7 @@ cupsMakeServerCredentials(
 					/* Public key */
 			privateKey = NULL;
 					/* Private key */
+  SecCertificateRef	cert = NULL;	/* Self-signed certificate */
   CFMutableDictionaryRef keyParams = NULL;
 					/* Key generation parameters */
 
@@ -120,10 +121,15 @@ cupsMakeServerCredentials(
   */
 
   CFIndex	usageInt = kSecKeyUsageAll;
-  CFNumberRef	usage = CFNumberCreate(alloc, kCFNumberCFIndexType, &usageInt);
-  CFDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault,
-kSecCSRBasicContraintsPathLen, CFINT(0), kSecSubjectAltName, cfcommon_name, kSecCertificateKeyUsage, usage, NULL, NULL);
+  CFNumberRef	usage = CFNumberCreate(kCFAllocatorDefault, kCFNumberCFIndexType, &usageInt);
+  CFIndex	lenInt = 0;
+  CFNumberRef	len = CFNumberCreate(kCFAllocatorDefault, kCFNumberCFIndexType, &lenInt);
+  CFMutableDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 3, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+  CFDictionaryAddValue(certParams, kSecCSRBasicContraintsPathLen, len);
+  CFDictionaryAddValue(certParams, kSecSubjectAltName, cfcommon_name);
+  CFDictionaryAddValue(certParams, kSecCertificateKeyUsage, usage);
   CFRelease(usage);
+  CFRelease(len);
 
   const void	*ca_o[] = { kSecOidOrganization, CFSTR("") };
   const void	*ca_cn[] = { kSecOidCommonName, cfcommon_name };
@@ -135,7 +141,7 @@ kSecCSRBasicContraintsPathLen, CFINT(0), kSecSubjectAltName, cfcommon_name, kSec
   ca_dn_array[1] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_cn_dn, 1, NULL);
 
   CFArrayRef	subject = CFArrayCreate(kCFAllocatorDefault, ca_dn_array, 2, NULL);
-  SecCertificateRef cert = SecGenerateSelfSignedCertificate(subject, certParams, publicKey, privateKey);
+  cert = SecGenerateSelfSignedCertificate(subject, certParams, publicKey, privateKey);
   CFRelease(subject);
   CFRelease(certParams);
 
