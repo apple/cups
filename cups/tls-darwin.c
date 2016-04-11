@@ -107,7 +107,7 @@ cupsMakeServerCredentials(
   if (!keyParams)
     goto cleanup;
 
-  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeECDSA);
+  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
   CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
   CFDictionaryAddValue(keyParams, kSecAttrLabel, CFSTR("CUPS Self-Signed Certificate"));
 
