@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-03-08 16:15-0500\n"
+"POT-Creation-Date: 2016-04-11 20:30-0400\n"
 "PO-Revision-Date: 2015-05-09 22:25+0100\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2907,8 +2907,8 @@ msgstr ""
 "Authentifizierung verwenden, stellen Sie sicher, dass Sie ein gültiges "
 "Kerberos-Ticket haben."
 
-msgid "Envelope #10 "
-msgstr "US Umschlag 10"
+msgid "Envelope #10"
+msgstr ""
 
 msgid "Envelope #11"
 msgstr "US Umschlag 11"
@@ -2997,7 +2997,7 @@ msgstr ""
 msgid "Envelope Monarch"
 msgstr ""
 
-msgid "Envelope PRC1 "
+msgid "Envelope PRC1"
 msgstr ""
 
 msgid "Envelope PRC1 Long Edge"
@@ -3158,8 +3158,8 @@ msgstr "Datei \"%s\" nicht verfügbar: %s"
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr ""
 
-msgid "File Folder "
-msgstr "Datei-Verzeichnis "
+msgid "File Folder"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -3888,7 +3888,7 @@ msgstr "PostScript-Drucker"
 msgid "Postcard"
 msgstr "Postkarte"
 
-msgid "Postcard Double "
+msgid "Postcard Double"
 msgstr ""
 
 msgid "Postcard Double Long Edge"
@@ -5793,6 +5793,12 @@ msgstr "variable-bindings hat unbestimmte Länge"
 
 #~ msgid "Enter password:"
 #~ msgstr "Neues Passwort eingeben :"
+
+#~ msgid "Envelope #10 "
+#~ msgstr "US Umschlag 10"
+
+#~ msgid "File Folder "
+#~ msgstr "Datei-Verzeichnis "
 
 #~ msgid "Looking for printer."
 #~ msgstr "Suche nach Drucker."

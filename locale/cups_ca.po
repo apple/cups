@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-03-08 16:15-0500\n"
+"POT-Creation-Date: 2016-04-11 20:30-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -3088,8 +3088,8 @@ msgstr ""
 "l'autenticació Kerberos, assegureu-vos de tenir un tiquet Kerberos que sigui "
 "vàlid."
 
-msgid "Envelope #10 "
-msgstr "Sobre #10"
+msgid "Envelope #10"
+msgstr ""
 
 msgid "Envelope #11"
 msgstr "Sobre #11"
@@ -3178,8 +3178,8 @@ msgstr "Sobre Kaku3 costat llarg"
 msgid "Envelope Monarch"
 msgstr "Sobre monarch"
 
-msgid "Envelope PRC1 "
-msgstr "Sobre PRC1"
+msgid "Envelope PRC1"
+msgstr ""
 
 msgid "Envelope PRC1 Long Edge"
 msgstr "Sobre PRC1 costat llarg"
@@ -3339,8 +3339,8 @@ msgstr "El fitxer «%s» no està disponible: %s"
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "El fitxer «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
 
-msgid "File Folder "
-msgstr "Carpeta d'arxivador "
+msgid "File Folder"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -4075,8 +4075,8 @@ msgstr "Impressora PostScript"
 msgid "Postcard"
 msgstr "Postal"
 
-msgid "Postcard Double "
-msgstr "Postal doble"
+msgid "Postcard Double"
+msgstr ""
 
 msgid "Postcard Double Long Edge"
 msgstr "Postal doble costat llarg"
@@ -6169,6 +6169,15 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Enter password:"
 #~ msgstr "Introduïu la contrasenya:"
 
+#~ msgid "Envelope #10 "
+#~ msgstr "Sobre #10"
+
+#~ msgid "Envelope PRC1 "
+#~ msgstr "Sobre PRC1"
+
+#~ msgid "File Folder "
+#~ msgstr "Carpeta d'arxivador "
+
 #~ msgid "File Folder - 9/16 x 3 7/16\""
 #~ msgstr "Carpeta d'arxivador: 9/16 x 3 7/16\""
 
@@ -6213,6 +6222,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
 #~ msgstr ""
 #~ "La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
+
+#~ msgid "Postcard Double "
+#~ msgstr "Postal doble"
 
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "S'ha acceptat el fitxer d'impressió - ID de la feina %d."

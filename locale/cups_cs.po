@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-03-08 16:15-0500\n"
+"POT-Creation-Date: 2016-04-11 20:30-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -2885,7 +2885,7 @@ msgstr ""
 "administrátora pro přístup na tuto stránku. Pokud používáte ověřování "
 "Kerberos, ujistěte se, že máte platný ticket Kerberosu."
 
-msgid "Envelope #10 "
+msgid "Envelope #10"
 msgstr ""
 
 msgid "Envelope #11"
@@ -2975,7 +2975,7 @@ msgstr ""
 msgid "Envelope Monarch"
 msgstr ""
 
-msgid "Envelope PRC1 "
+msgid "Envelope PRC1"
 msgstr ""
 
 msgid "Envelope PRC1 Long Edge"
@@ -3136,8 +3136,8 @@ msgstr ""
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr ""
 
-msgid "File Folder "
-msgstr "Složka souborů "
+msgid "File Folder"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -3862,7 +3862,7 @@ msgstr "PostScriptová tiskárna"
 msgid "Postcard"
 msgstr "Pohlednice"
 
-msgid "Postcard Double "
+msgid "Postcard Double"
 msgstr ""
 
 msgid "Postcard Double Long Edge"
@@ -5754,6 +5754,9 @@ msgstr "\"variable-bindings\" má neomezenou délku"
 
 #~ msgid "Enter password:"
 #~ msgstr "Zadejte heslo:"
+
+#~ msgid "File Folder "
+#~ msgstr "Složka souborů "
 
 #~ msgid "New Stylus Color Series"
 #~ msgstr "New Stylus Color Series"

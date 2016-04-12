@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-03-08 16:15-0500\n"
+"POT-Creation-Date: 2016-04-11 20:30-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3125,8 +3125,8 @@ msgstr ""
 "root のユーザー名とパスワードを入力してください。Kerberos 認証を使用している"
 "場合、有効な Kerberos チケットがあることを確認してください。"
 
-msgid "Envelope #10 "
-msgstr "封筒 #10"
+msgid "Envelope #10"
+msgstr ""
 
 msgid "Envelope #11"
 msgstr "封筒 #11"
@@ -3215,8 +3215,8 @@ msgstr "封筒 角3 長辺送り"
 msgid "Envelope Monarch"
 msgstr "封筒 Monarch"
 
-msgid "Envelope PRC1 "
-msgstr "封筒 PRC1"
+msgid "Envelope PRC1"
+msgstr ""
 
 msgid "Envelope PRC1 Long Edge"
 msgstr "封筒 PRC1 長辺送り"
@@ -3378,8 +3378,8 @@ msgstr "ファイル \"%s\" は利用できません: %s"
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "ファイル \"%s\" のパーミッションは問題ありません (0%o/uid=%d/gid=%d)。"
 
-msgid "File Folder "
-msgstr "ファイルフォルダー"
+msgid "File Folder"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -4112,8 +4112,8 @@ msgstr "PostScript プリンター"
 msgid "Postcard"
 msgstr "ハガキ"
 
-msgid "Postcard Double "
-msgstr "往復ハガキ"
+msgid "Postcard Double"
+msgstr ""
 
 msgid "Postcard Double Long Edge"
 msgstr "往復ハガキ 長辺送り"
@@ -6144,6 +6144,15 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Enter password:"
 #~ msgstr "パスワードを入力:"
 
+#~ msgid "Envelope #10 "
+#~ msgstr "封筒 #10"
+
+#~ msgid "Envelope PRC1 "
+#~ msgstr "封筒 PRC1"
+
+#~ msgid "File Folder "
+#~ msgstr "ファイルフォルダー"
+
 #~ msgid "Looking for printer."
 #~ msgstr "プリンターを探しています。"
 
@@ -6165,6 +6174,9 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
 #~ msgstr ""
 #~ "プリンター %s/%s の出力は、リモートプリンター %s (%s 上) に送られます"
+
+#~ msgid "Postcard Double "
+#~ msgstr "往復ハガキ"
 
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "プリントファイルを受け付けました - ジョブ ID %d。"

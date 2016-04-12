@@ -801,7 +801,7 @@
 "Ending Banner" = "Ending Banner";
 "English" = "English";
 "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket." = "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket.";
-"Envelope #10 " = "Envelope #10 ";
+"Envelope #10" = "Envelope #10";
 "Envelope #11" = "Envelope #11";
 "Envelope #12" = "Envelope #12";
 "Envelope #14" = "Envelope #14";
@@ -831,7 +831,7 @@
 "Envelope Kaku3" = "Envelope Kaku3";
 "Envelope Kaku3 Long Edge" = "Envelope Kaku3 Long Edge";
 "Envelope Monarch" = "Envelope Monarch";
-"Envelope PRC1 " = "Envelope PRC1 ";
+"Envelope PRC1" = "Envelope PRC1";
 "Envelope PRC1 Long Edge" = "Envelope PRC1 Long Edge";
 "Envelope PRC10" = "Envelope PRC10";
 "Envelope PRC10 Long Edge" = "Envelope PRC10 Long Edge";
@@ -883,7 +883,7 @@
 "File \"%s\" is a directory." = "File “%s” is a directory.";
 "File \"%s\" not available: %s" = "File “%s” not available: %s";
 "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)." = "File “%s” permissions OK (0%o/uid=%d/gid=%d).";
-"File Folder " = "File Folder ";
+"File Folder" = "File Folder";
 "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cups-files.conf\"." = "File device URIs have been disabled. To enable, see the FileDevice directive in “%s/cups-files.conf”.";
 "Finished page %d." = "Finished page %d.";
 "Folio" = "Folio";
@@ -1115,7 +1115,7 @@
 "Port Monitor" = "Port Monitor";
 "PostScript Printer" = "PostScript Printer";
 "Postcard" = "Postcard";
-"Postcard Double " = "Postcard Double ";
+"Postcard Double" = "Postcard Double";
 "Postcard Double Long Edge" = "Postcard Double Long Edge";
 "Postcard Long Edge" = "Postcard Long Edge";
 "Preparing to print." = "Preparing to print.";
