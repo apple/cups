@@ -1,15 +1,13 @@
 //
-// "$Id$"
+// Private definitions for the CUPS PPD Compiler.
 //
-//   Private definitions for the CUPS PPD Compiler.
+// Copyright 2009-2010 by Apple Inc.
 //
-//   Copyright 2009-2010 by Apple Inc.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 #ifndef _PPDC_PRIVATE_H_
@@ -34,7 +32,3 @@
 
 
 #endif // !_PPDC_PRIVATE_H_
-
-//
-// End of "$Id$".
-//

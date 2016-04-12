@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # Top-level Makefile for CUPS.
 #
 # Copyright 2007-2014 by Apple Inc.
@@ -348,8 +346,3 @@ dist:	all
 #
 
 .NOTPARALLEL:
-
-
-#
-# End of "$Id$".
-#

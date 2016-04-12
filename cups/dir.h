@@ -1,18 +1,16 @@
 /*
- * "$Id$"
+ * Public directory definitions for CUPS.
  *
- *   Public directory definitions for CUPS.
+ * This set of APIs abstracts enumeration of directory entries.
  *
- *   This set of APIs abstracts enumeration of directory entries.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_DIR_H_
@@ -63,7 +61,3 @@ extern void		cupsDirRewind(cups_dir_t *dp) _CUPS_API_1_2;
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_DIR_H_ */
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Internet Printing Protocol support functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -2286,8 +2284,3 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 
   return ((size_t)(bufptr - buffer));
 }
-
-
-/*
- * End of "$Id$".
- */

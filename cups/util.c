@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Printing utilities for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -953,8 +951,3 @@ cupsStartDocument(
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

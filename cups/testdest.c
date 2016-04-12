@@ -358,7 +358,7 @@ localize(http_t       *http,		/* I - Connection to destination */
 	    break;
       }
     }
-    
+
   }
   else
     puts(cupsLocalizeDestValue(http, dest, dinfo, option, value));
@@ -674,7 +674,7 @@ show_supported(http_t       *http,	/* I - Connection to destination */
 	    break;
       }
     }
-    
+
   }
   else if (cupsCheckDestSupported(http, dest, dinfo, option, value))
     puts("YES");
@@ -710,8 +710,3 @@ usage(const char *arg)			/* I - Argument for usage message */
 
   exit(arg != NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
 dnl Copyright 2007-2015 by Apple Inc.
@@ -185,8 +183,3 @@ if test "x$xinetd" = x; then
 elif test "x$xinetd" != xno; then
 	XINETD="$xinetd"
 fi
-
-
-dnl
-dnl End of "$Id$".
-dnl

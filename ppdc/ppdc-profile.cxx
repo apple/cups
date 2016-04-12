@@ -1,21 +1,14 @@
 //
-// "$Id$"
+// Color profile class for the CUPS PPD Compiler.
 //
-//   Color profile class for the CUPS PPD Compiler.
+// Copyright 2007-2009 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2009 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcProfile::ppdcProfile()  - Create a color profile.
-//   ppdcProfile::~ppdcProfile() - Destroy a color profile.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -58,8 +51,3 @@ ppdcProfile::~ppdcProfile()
   resolution->release();
   media_type->release();
 }
-
-
-//
-// End of "$Id$".
-//

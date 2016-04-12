@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" filter man page for CUPS.
 .\"
 .\" Copyright 2007-2015 by Apple Inc.
@@ -220,6 +218,3 @@ program to use the appropriate filters to do the conversions you need.
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

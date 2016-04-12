@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * IPP utilities for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1172,8 +1170,3 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
   }
 }
-
-
-/*
- * End of "$Id$".
- */

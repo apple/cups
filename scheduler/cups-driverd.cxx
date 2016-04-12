@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD/driver support for CUPS.
  *
  * This program handles listing and installing static PPD files, PPD files
@@ -2928,8 +2926,3 @@ regex_string(const char *s)		/* I - String to compare */
 
   return (NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

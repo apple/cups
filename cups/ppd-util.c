@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD utilities for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -716,8 +714,3 @@ cups_get_printer_uri(
   DEBUG_puts("5cups_get_printer_uri: Printer URI not found.");
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Configuration routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -4244,8 +4242,3 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
     cupsdAddString(&(pol->sub_attrs), "notify-user-data");
   }
 }
-
-
-/*
- * End of "$Id$".
- */

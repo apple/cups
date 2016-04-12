@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Copyright 2005-2015 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
@@ -2535,8 +2533,3 @@ log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
     asl_free(aslm);
   }
 }
-
-
-/*
- * End of "$Id$".
- */

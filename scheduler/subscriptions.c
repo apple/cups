@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Subscription routines for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1614,8 +1612,3 @@ cupsd_update_notifier(void)
       break;
   }
 }
-
-
-/*
- * End of "$Id$".
- */

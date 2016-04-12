@@ -1,7 +1,5 @@
 dnl
-dnl "$Id$"
-dnl
-dnl   PAM stuff for CUPS.
+dnl PAM stuff for CUPS.
 dnl
 dnl Copyright 2007-2013 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
@@ -91,7 +89,3 @@ AC_SUBST(PAMFILE)
 AC_SUBST(PAMLIBS)
 AC_SUBST(PAMMOD)
 AC_SUBST(PAMMODAUTH)
-
-dnl
-dnl End of "$Id$".
-dnl

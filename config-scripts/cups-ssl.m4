@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl TLS stuff for CUPS.
 dnl
 dnl Copyright 2007-2015 by Apple Inc.
@@ -106,7 +104,3 @@ AC_SUBST(SSLLIBS)
 
 EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
-
-dnl
-dnl End of "$Id$".
-dnl

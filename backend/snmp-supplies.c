@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * SNMP supplies functions for CUPS.
  *
  * Copyright 2008-2015 by Apple Inc.
@@ -1096,8 +1094,3 @@ utf16_to_utf8(
 
   cupsUTF32ToUTF8(dst, temp, (int)dstsize);
 }
-
-
-/*
- * End of "$Id$".
- */

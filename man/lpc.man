@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" lpc man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -59,6 +57,3 @@ command or another CUPS-compatible client with that functionality.
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

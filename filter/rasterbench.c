@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Raster benchmark program for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -342,8 +340,3 @@ write_test(int         fd,		/* I - File descriptor to write to */
 
   cupsRasterClose(r);
 }
-
-
-/*
- * End of "$Id$".
- */

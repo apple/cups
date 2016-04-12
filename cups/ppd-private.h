@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Private PPD definitions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -247,7 +245,3 @@ extern const char	*_pwgPageSizeForMedia(pwg_media_t *media,
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_PPD_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

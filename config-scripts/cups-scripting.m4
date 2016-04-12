@@ -1,16 +1,14 @@
 dnl
-dnl "$Id$"
+dnl Scripting configuration stuff for CUPS.
 dnl
-dnl   Scripting configuration stuff for CUPS.
+dnl Copyright 2007-2010 by Apple Inc.
+dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
-dnl   Copyright 2007-2010 by Apple Inc.
-dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
-dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Do we have Java?
@@ -83,7 +81,3 @@ AC_DEFINE_UNQUOTED(CUPS_PYTHON, "$CUPS_PYTHON")
 if test "x$CUPS_PYTHON" != x; then
 	AC_DEFINE(HAVE_PYTHON)
 fi
-
-dnl
-dnl End of "$Id$".
-dnl

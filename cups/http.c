@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * HTTP routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -4813,8 +4811,3 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
   return (bytes);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Authentication certificate routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -448,8 +446,3 @@ ctcompare(const char *a,		/* I - First string */
 
   return (result);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * TLS support for CUPS on Windows using the Security Support Provider
  * Interface (SSPI).
  *
@@ -2424,8 +2422,3 @@ http_sspi_verify(
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

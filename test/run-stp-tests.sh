@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# "$Id$"
-#
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
@@ -1114,7 +1112,3 @@ if test $fail != 0; then
 
 	exit 1
 fi
-
-#
-# End of "$Id$"
-#

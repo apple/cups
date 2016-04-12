@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" ppdi man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -53,6 +51,3 @@ If no source file is specified, the filename \fIppdi.drv\fR is used.
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

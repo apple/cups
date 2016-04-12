@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Backend functions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -142,8 +140,3 @@ quote_string(const char *s)		/* I - String to write */
 
   putchar('\"');
 }
-
-
-/*
- * End of "$Id$".
- */

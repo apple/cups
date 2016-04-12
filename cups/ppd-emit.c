@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD code emission routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1200,8 +1198,3 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
     }
   }
 }
-
-
-/*
- * End of "$Id$".
- */

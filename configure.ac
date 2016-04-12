@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Configuration script for CUPS.
 dnl
 dnl Copyright 2007-2015 by Apple Inc.
@@ -93,7 +91,3 @@ AC_OUTPUT(Makedefs
 	  $LANGFILES)
 
 chmod +x cups-config
-
-dnl
-dnl End of "$Id$".
-dnl

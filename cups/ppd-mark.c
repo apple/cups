@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Option marking routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1082,8 +1080,3 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
   cupsArrayAdd(ppd->marked, c);
 }
-
-
-/*
- * End of "$Id$".
- */

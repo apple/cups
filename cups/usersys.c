@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * User, system, and password routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1281,8 +1279,3 @@ cups_set_user(
 {
   strlcpy(cc->user, value, sizeof(cc->user));
 }
-
-
-/*
- * End of "$Id$".
- */

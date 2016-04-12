@@ -1,21 +1,14 @@
 //
-// "$Id$"
+// Shared media size class for the CUPS PPD Compiler.
 //
-//   Shared media size class for the CUPS PPD Compiler.
+// Copyright 2007-2009 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2009 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcMediaSize::ppdcMediaSize()  - Create a new media size.
-//   ppdcMediaSize::~ppdcMediaSize() - Destroy a media size.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -78,8 +71,3 @@ ppdcMediaSize::~ppdcMediaSize()
   size_code->release();
   region_code->release();
 }
-
-
-//
-// End of "$Id$".
-//

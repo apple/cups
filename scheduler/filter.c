@@ -1,29 +1,14 @@
 /*
- * "$Id$"
+ * File type conversion routines for CUPS.
  *
- *   File type conversion routines for CUPS.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   mimeAddFilter()        - Add a filter to the current MIME database.
- *   mimeFilter()           - Find the fastest way to convert from one type to
- *                            another.
- *   mimeFilter2()          - Find the fastest way to convert from one type to
- *                            another, including the file size.
- *   mimeFilterLookup()     - Lookup a filter.
- *   mime_compare_filters() - Compare two filters.
- *   mime_compare_srcs()    - Compare two filter source types.
- *   mime_find_filters()    - Find the filters to convert from one type to
- *                            another.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -497,8 +482,3 @@ mime_find_filters(
 
   return (NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

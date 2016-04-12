@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD cache testing program for CUPS.
  *
  * Copyright 2009-2014 by Apple Inc.
@@ -91,8 +89,3 @@ main(int  argc,				/* I - Number of command-line args */
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

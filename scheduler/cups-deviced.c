@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Device scanning mini-daemon for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -790,8 +788,3 @@ start_backend(const char *name,		/* I - Backend to run */
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

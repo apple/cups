@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Threading primitives for CUPS.
  *
  * Copyright 2009-2014 by Apple Inc.
@@ -320,8 +318,3 @@ _cupsThreadCreate(
   return (0);
 }
 #endif /* HAVE_PTHREAD_H */
-
-
-/*
- * End of "$Id$".
- */

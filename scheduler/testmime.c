@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * MIME test program for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -516,8 +514,3 @@ type_dir(mime_t     *mime,		/* I - MIME database */
 
   cupsDirClose(dir);
 }
-
-
-/*
- * End of "$Id$".
- */

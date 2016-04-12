@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Temp file utilities for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -192,8 +190,3 @@ cupsTempFile2(char *filename,		/* I - Pointer to buffer */
   else
     return (file);
 }
-
-
-/*
- * End of "$Id$".
- */

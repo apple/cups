@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * IEEE-1284 support functions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -473,8 +471,3 @@ backendGetMakeModel(
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

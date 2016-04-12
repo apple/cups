@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Option unit test program for CUPS.
  *
  * Copyright 2008-2016 by Apple Inc.
@@ -174,8 +172,3 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   exit (status);
 }
-
-
-/*
- * End of "$Id$".
- */

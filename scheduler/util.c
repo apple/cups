@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Mini-daemon utility functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -452,8 +450,3 @@ cupsdSendIPPTrailer(void)
   putchar(IPP_TAG_END);
   fflush(stdout);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Administration CGI for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -4274,8 +4272,3 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
   else
     return (NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

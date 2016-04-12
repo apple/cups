@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Manpage stuff for CUPS.
 dnl
 dnl Copyright 2007-2013 by Apple Inc.
@@ -76,7 +74,3 @@ AC_SUBST(MAN5EXT)
 AC_SUBST(MAN7EXT)
 AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
-
-dnl
-dnl End of "$Id$".
-dnl

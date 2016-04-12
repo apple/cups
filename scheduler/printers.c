@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Printer routines for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -5080,8 +5078,3 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
   if (s > start)
     cupsFilePuts(fp, start);
 }
-
-
-/*
- * End of "$Id$".
- */

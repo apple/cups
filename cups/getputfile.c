@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Get/put file functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -506,8 +504,3 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

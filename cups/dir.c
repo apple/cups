@@ -1,30 +1,16 @@
 /*
- * "$Id$"
+ * Directory routines for CUPS.
  *
- *   Directory routines for CUPS.
+ * This set of APIs abstracts enumeration of directory entries.
  *
- *   This set of APIs abstracts enumeration of directory entries.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   _cups_dir_time() - Convert a FILETIME value to a UNIX time value.
- *   cupsDirClose()   - Close a directory.
- *   cupsDirOpen()    - Open a directory.
- *   cupsDirRead()    - Read the next directory entry.
- *   cupsDirRewind()  - Rewind to the start of the directory.
- *   cupsDirClose()   - Close a directory.
- *   cupsDirOpen()    - Open a directory.
- *   cupsDirRead()    - Read the next directory entry.
- *   cupsDirRewind()  - Rewind to the start of the directory.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -463,10 +449,4 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 
   rewinddir(dp->dir);
 }
-
-
 #endif /* WIN32 */
-
-/*
- * End of "$Id$".
- */

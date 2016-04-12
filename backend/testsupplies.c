@@ -1,21 +1,15 @@
 /*
- * "$Id$"
+ * SNMP supplies test program for CUPS.
  *
- *   SNMP supplies test program for CUPS.
+ * Copyright 2008-2011 by Apple Inc.
  *
- *   Copyright 2008-2011 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main() - Show the supplies state of a printer.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -76,8 +70,3 @@ main(int  argc,				/* I - Number of command-line args */
     sleep(5);
   }
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD model-specific attribute routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -314,8 +312,3 @@ _ppdNormalizeMakeAndModel(
 
   return (buffer[0] ? buffer : NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * CGI <-> IPP variable routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1547,8 +1545,3 @@ cgiText(const char *message)		/* I - Message */
 
   return (_cupsLangString(language, message));
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" cupsfilter man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -138,6 +136,3 @@ The following command will generate a PDF preview of job 42 for a printer named 
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

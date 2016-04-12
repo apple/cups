@@ -1,21 +1,14 @@
 /*
- * "$Id$"
+ * Network interface functions for CUPS.
  *
- *   Network interface functions for CUPS.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   _cups_getifaddrs()  - Get a list of network interfaces on the system.
- *   _cups_freeifaddrs() - Free an interface list...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -259,8 +252,3 @@ _cups_freeifaddrs(struct ifaddrs *addrs)/* I - Interface list to free */
   }
 }
 #endif /* !HAVE_GETIFADDRS */
-
-
-/*
- * End of "$Id$".
- */

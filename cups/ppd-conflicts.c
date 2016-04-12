@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Option conflict management routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1193,8 +1191,3 @@ ppd_test_constraints(
 
   return (active);
 }
-
-
-/*
- * End of "$Id$".
- */

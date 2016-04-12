@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Client routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -4079,8 +4077,3 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG, "CGI data ready to be sent.");
 }
-
-
-/*
- * End of "$Id$".
- */

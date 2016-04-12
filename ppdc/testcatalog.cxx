@@ -1,19 +1,13 @@
 //
-// "$Id$"
+// Test program for message catalog class.
 //
-//   Test program for message catalog class.
+// Copyright 2008 by Apple Inc.
 //
-//   Copyright 2008 by Apple Inc.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   main() - Open a message catalog 
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -24,7 +18,7 @@
 
 
 //
-// 'main()' - Open a message catalog 
+// 'main()' - Open a message catalog
 //
 
 int					// O - Exit status
@@ -56,8 +50,3 @@ main(int  argc,				// I - Number of command-line arguments
   // Return with no errors.
   return (0);
 }
-
-
-//
-// End of "$Id$".
-//

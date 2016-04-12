@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Main header file for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -226,8 +224,3 @@ extern void		cupsdStopSelect(void);
 /* server.c */
 extern void		cupsdStartServer(void);
 extern void		cupsdStopServer(void);
-
-
-/*
- * End of "$Id$".
- */

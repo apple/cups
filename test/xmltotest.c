@@ -1,37 +1,25 @@
 /*
- * "$Id$"
+ * IANA XML registration to test file generator for CUPS.
  *
- *   IANA XML registration to test file generator for CUPS.
+ * Copyright 2011-2012 by Apple Inc.
  *
- *   Copyright 2011-2012 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  *
  * Usage:
  *
  *   ./xmltotest [--ref standard] {--job|--printer} [XML file/URL] >file.test
  *
- *   If not specified, loads the XML registrations from:
+ * If not specified, loads the XML registrations from:
  *
- *     http://www.iana.org/assignments/ipp-registrations/ipp-registrations.xml
+ *   http://www.iana.org/assignments/ipp-registrations/ipp-registrations.xml
  *
- *   "Standard" is of the form "rfcNNNN" or "pwgNNNN.N".
- *
- * Contents:
- *
- *   main()	    - Process command-line arguments.
- *   compare_reg()  - Compare two registrations.
- *   load_xml()     - Load the XML registration file or URL.
- *   match_xref()   - Compare the xref against the named standard.
- *   new_reg()	    - Create a new registration record.
- *   usage()	    - Show usage message.
- *   write_expect() - Write an EXPECT test for an attribute.
+ * "Standard" is of the form "rfcNNNN" or "pwgNNNN.N".
  */
 
 
@@ -522,8 +510,3 @@ main(void)
   return (1);
 }
 #endif /* HAVE_MXML */
-
-
-/*
- * End of "$Id$".
- */

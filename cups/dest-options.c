@@ -883,7 +883,7 @@ cupsGetDestMediaByIndex(
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
-  
+
   if (nsize->size_name)
     strlcpy(size->media, nsize->size_name, sizeof(size->media));
   else if (nsize->key)
@@ -2263,8 +2263,3 @@ cups_update_ready(http_t       *http,	/* I - Connection to destination */
 
   dinfo->ready_time = time(NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

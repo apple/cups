@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * "lpadmin" command for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1596,8 +1594,3 @@ validate_name(const char *name)		/* I - Name to check */
 
   return ((ptr - name) < 128);
 }
-
-
-/*
- * End of "$Id$".
- */

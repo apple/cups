@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" ippproxy man page for CUPS.
 .\"
 .\" Copyright 2014 by Apple Inc.
@@ -54,6 +52,3 @@ with an infrastructure URI of "ipps://host.example.com/ipp/print" and a local UR
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 .SH COPYRIGHT
 Copyright \[co] 2007-2014 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

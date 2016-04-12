@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * SNMP test program for CUPS.
  *
  * Copyright 2008-2014 by Apple Inc.
@@ -290,8 +288,3 @@ usage(void)
 
   exit (1);
 }
-
-
-/*
- * End of "$Id$".
- */

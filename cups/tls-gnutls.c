@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * TLS support code for CUPS using GNU TLS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1338,8 +1336,3 @@ _httpTLSWrite(http_t     *http,		/* I - Connection to server */
 
   return ((int)result);
 }
-
-
-/*
- * End of "$Id$".
- */

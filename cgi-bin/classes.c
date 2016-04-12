@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Class status CGI for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -543,8 +541,3 @@ show_class(http_t     *http,		/* I - Connection to server */
 
    cgiEndHTML();
 }
-
-
-/*
- * End of "$Id$".
- */

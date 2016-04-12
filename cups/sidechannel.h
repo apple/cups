@@ -1,18 +1,16 @@
 /*
- * "$Id$"
+ * Side-channel API definitions for CUPS.
  *
- *   Side-channel API definitions for CUPS.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_SIDECHANNEL_H_
@@ -141,7 +139,3 @@ extern cups_sc_status_t	cupsSideChannelSNMPWalk(const char *oid, double timeout,
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_SIDECHANNEL_H_ */
-
-/*
- * End of "$Id$".
- */

@@ -1,17 +1,15 @@
 /*
- * "$Id$"
+ * API versioning definitions for CUPS.
  *
- *   API versioning definitions for CUPS.
+ * Copyright 2007-2016 by Apple Inc.
  *
- *   Copyright 2007-2015 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_VERSIONING_H_
@@ -30,7 +28,7 @@
  * provided by the compiler.
  */
 
-#  if defined(__APPLE__) && !defined(_CUPS_SOURCE)
+#  if defined(__APPLE__) && !defined(_CUPS_SOURCE) && !TARGET_OS_IOS
 #    include <AvailabilityMacros.h>
 #    ifndef AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #      define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER __attribute__((unavailable))
@@ -162,7 +160,3 @@
 #  endif /* !__GNUC__ */
 
 #endif /* !_CUPS_VERSIONING_H_ */
-
-/*
- * End of "$Id$".
- */

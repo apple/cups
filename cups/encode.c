@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Option encoding routines for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -848,8 +846,3 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 {
   return (strcmp(a->name, b->name));
 }
-
-
-/*
- * End of "$Id$".
- */

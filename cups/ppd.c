@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD file routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -3453,8 +3451,3 @@ ppd_update_filters(ppd_file_t     *ppd,	/* I - PPD file */
   DEBUG_puts("5ppd_update_filters: Completed OK.");
   return (1);
 }
-
-
-/*
- * End of "$Id$".
- */

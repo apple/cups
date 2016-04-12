@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // PPD file compiler definitions for the CUPS PPD Compiler.
 //
 // Copyright 2007-2014 by Apple Inc.
@@ -1323,8 +1321,3 @@ ppdcDriver::write_ppd_file(
 
   return (0);
 }
-
-
-//
-// End of "$Id$".
-//

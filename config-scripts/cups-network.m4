@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Networking stuff for CUPS.
 dnl
 dnl Copyright 2007-2014 by Apple Inc.
@@ -70,7 +68,3 @@ fi
 
 AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
-
-dnl
-dnl End of "$Id$".
-dnl

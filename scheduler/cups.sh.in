@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# "$Id$"
-#
 # Startup/shutdown script for CUPS.
 #
 # Copyright 2007-2013 by Apple Inc.
@@ -197,8 +195,3 @@ esac
 #
 
 exit 0
-
-
-#
-# End of "$Id$".
-#

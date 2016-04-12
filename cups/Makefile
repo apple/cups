@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # API library Makefile for CUPS.
 #
 # Copyright 2007-2015 by Apple Inc.
@@ -676,8 +674,3 @@ sloc:
 
 include Dependencies
 tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
-
-
-#
-# End of "$Id$".
-#

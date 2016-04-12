@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * AppSocket backend for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -514,8 +512,3 @@ wait_bc(int device_fd,			/* I - Socket */
   else
     return (-1);
 }
-
-
-/*
- * End of "$Id$".
- */

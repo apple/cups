@@ -1,17 +1,15 @@
 /*
- * "$Id$"
+ * PWG media API definitions for CUPS.
  *
- *   PWG media API definitions for CUPS.
+ * Copyright 2009-2013 by Apple Inc.
  *
- *   Copyright 2009-2013 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_PWG_H_
@@ -88,7 +86,3 @@ extern pwg_media_t	*pwgMediaForSize(int width, int length) _CUPS_API_1_7;
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_PWG_H_ */
-
-/*
- * End of "$Id$".
- */

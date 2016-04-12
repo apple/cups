@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * LIBUSB interface code for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -2019,9 +2017,3 @@ soft_reset_printer(
 
   return (errcode);
 }
-
-
-/*
- * End of "$Id$".
- */
-

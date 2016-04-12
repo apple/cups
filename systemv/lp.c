@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * "lp" command for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -755,8 +753,3 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

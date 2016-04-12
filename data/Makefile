@@ -1,16 +1,14 @@
 #
-# "$Id$"
+# Datafile makefile for CUPS.
 #
-#   Datafile makefile for CUPS.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1993-2006 by Easy Software Products.
 #
-#   Copyright 2007-2014 by Apple Inc.
-#   Copyright 1993-2006 by Easy Software Products.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -120,8 +118,3 @@ uninstall:
 	-$(RMDIR) $(DATADIR)/data
 	-$(RMDIR) $(DATADIR)/banners
 	-$(RMDIR) $(DATADIR)
-
-
-#
-# End of "$Id$".
-#

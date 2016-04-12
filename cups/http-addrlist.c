@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * HTTP address list routines for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -888,8 +886,3 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
   return (first);
 }
-
-
-/*
- * End of "$Id$".
- */

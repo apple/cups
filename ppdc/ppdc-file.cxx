@@ -1,23 +1,14 @@
 //
-// "$Id$"
+// File class for the CUPS PPD Compiler.
 //
-//   File class for the CUPS PPD Compiler.
+// Copyright 2007-2010 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2010 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcFile::ppdcFile()  - Create (open) a file.
-//   ppdcFile::~ppdcFile() - Delete (close) a file.
-//   ppdcFile::get()       - Get a character from a file.
-//   ppdcFile::peek()      - Look at the next character from a file.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -103,8 +94,3 @@ ppdcFile::peek()
   // Otherwise return the next character without advancing...
   return (cupsFilePeekChar(fp));
 }
-
-
-//
-// End of "$Id$".
-//

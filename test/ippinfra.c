@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Sample IPP INFRA server for CUPS.
  *
  * Copyright 2010-2014 by Apple Inc.
@@ -7118,8 +7116,3 @@ valid_job_attributes(
 
   return (valid);
 }
-
-
-/*
- * End of "$Id$".
- */

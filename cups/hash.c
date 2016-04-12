@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Hashing function for CUPS.
  *
  * Copyright 2015 by Apple Inc.
@@ -245,8 +243,3 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Hash buffer too small."), 1);
   return (-1);
 }
-
-
-/*
- * End of "$Id$".
- */

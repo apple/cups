@@ -1663,7 +1663,6 @@
 		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
 		729D4B561A2CB48700692B21 /* CHANGES-2.0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-2.0.txt"; path = "../CHANGES-2.0.txt"; sourceTree = "<group>"; };
-		729D4B571A2CB48700692B21 /* CHANGES-IPPTOOL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-IPPTOOL.txt"; path = "../CHANGES-IPPTOOL.txt"; sourceTree = "<group>"; };
 		72A4332F155844CF002E172D /* libcups_static.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		72A8B3D61C188BDE00A1A547 /* ppd-util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-util.c"; path = "../cups/ppd-util.c"; sourceTree = "<group>"; };
 		72C16CB8137B195D007E4BF4 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = ../scheduler/file.c; sourceTree = SOURCE_ROOT; };
@@ -1739,7 +1738,6 @@
 		72E65BDE18DCA35700097E89 /* CHANGES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CHANGES.txt; path = ../CHANGES.txt; sourceTree = "<group>"; };
 		72E65BDF18DCA35700097E89 /* CREDITS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CREDITS.txt; path = ../CREDITS.txt; sourceTree = "<group>"; };
 		72E65BE018DCA35700097E89 /* INSTALL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = INSTALL.txt; path = ../INSTALL.txt; sourceTree = "<group>"; };
-		72E65BE118DCA35700097E89 /* IPPTOOL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IPPTOOL.txt; path = ../IPPTOOL.txt; sourceTree = "<group>"; };
 		72E65BE218DCA35700097E89 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE.txt; path = ../LICENSE.txt; sourceTree = "<group>"; };
 		72E65BE318DCA35700097E89 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.txt; path = ../README.txt; sourceTree = "<group>"; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2640,12 +2638,10 @@
 				72E65BCC18DC7A9800097E89 /* api-raster.shtml */,
 				72E65BDD18DCA35700097E89 /* CHANGES-1.7.txt */,
 				729D4B561A2CB48700692B21 /* CHANGES-2.0.txt */,
-				729D4B571A2CB48700692B21 /* CHANGES-IPPTOOL.txt */,
 				72E65BDE18DCA35700097E89 /* CHANGES.txt */,
 				72E65BDF18DCA35700097E89 /* CREDITS.txt */,
 				72E65BB918DC7A3600097E89 /* doc */,
 				72E65BE018DCA35700097E89 /* INSTALL.txt */,
-				72E65BE118DCA35700097E89 /* IPPTOOL.txt */,
 				72E65BE218DCA35700097E89 /* LICENSE.txt */,
 				72E65BBA18DC7A3600097E89 /* man */,
 				72E65BCD18DC7A9800097E89 /* postscript-driver.header */,

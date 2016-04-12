@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Configuration file definitions for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -297,8 +295,3 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);
 extern int	cupsdWriteErrorLog(int level, const char *message);
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Transcoding support for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -710,8 +708,3 @@ cupsUTF32ToUTF8(
 
   return ((int)(dest - start));
 }
-
-
-/*
- * End of "$Id$"
- */

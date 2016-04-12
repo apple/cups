@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * HTTP address routines for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -920,8 +918,3 @@ httpResolveHostname(http_t *http,	/* I - HTTP connection */
   else
     return (http->hostname);
 }
-
-
-/*
- * End of "$Id$".
- */

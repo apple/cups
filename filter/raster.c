@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Raster file routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1799,8 +1797,3 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
 
   return (count);
 }
-
-
-/*
- * End of "$Id$".
- */

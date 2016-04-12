@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Authorization routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -2208,8 +2206,3 @@ to64(char          *s,			/* O - Output string */
     *s++ = itoa64[v & 0x3f];
 }
 #endif /* HAVE_LIBPAM */
-
-
-/*
- * End of "$Id$".
- */

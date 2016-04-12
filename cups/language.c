@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * I18N/language support for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1621,8 +1619,3 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
   *d = '\0';
 }
-
-
-/*
- * End of "$Id$".
- */

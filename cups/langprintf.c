@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Localized printf/puts functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -334,8 +332,3 @@ _cupsSetLocale(char *argv[])		/* IO - Command-line arguments */
     }
   }
 }
-
-
-/*
- * End of "$Id$".
- */

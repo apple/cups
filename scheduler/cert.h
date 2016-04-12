@@ -1,16 +1,14 @@
 /*
- * "$Id$"
+ * Authentication certificate definitions for the CUPS scheduler.
  *
- *   Authentication certificate definitions for the CUPS scheduler.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -46,8 +44,3 @@ extern void		cupsdDeleteCert(int pid);
 extern void		cupsdDeleteAllCerts(void);
 extern cupsd_cert_t	*cupsdFindCert(const char *certificate);
 extern void		cupsdInitCerts(void);
-
-
-/*
- * End of "$Id$".
- */

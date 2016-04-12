@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Directory stuff for CUPS.
 dnl
 dnl Copyright 2007-2014 by Apple Inc.
@@ -303,7 +301,3 @@ AC_ARG_WITH(rundir, [  --with-rundir           set transient run-time state dire
 	esac])
 AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$CUPS_STATEDIR")
 AC_SUBST(CUPS_STATEDIR)
-
-dnl
-dnl End of "$Id$".
-dnl

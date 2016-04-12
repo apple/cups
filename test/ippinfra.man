@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" ippinfra man page for CUPS.
 .\"
 .\" Copyright 2014 by Apple Inc.
@@ -98,6 +96,3 @@ Specify a proxy username of "foo" and password of "bar":
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 .SH COPYRIGHT
 Copyright \[co] 2007-2014 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

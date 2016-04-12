@@ -1,22 +1,14 @@
 //
-// "$Id$"
+// Group class for the CUPS PPD Compiler.
 //
-//   Group class for the CUPS PPD Compiler.
+// Copyright 2007-2011 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2011 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcGroup::ppdcGroup()   - Copy a new group.
-//   ppdcGroup::~ppdcGroup()  - Destroy a group.
-//   ppdcGroup::find_option() - Find an option in a group.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -96,8 +88,3 @@ ppdcGroup::find_option(const char *n)	// I - Name of option
 
   return (0);
 }
-
-
-//
-// End of "$Id$".
-//

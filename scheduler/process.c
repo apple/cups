@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Process management routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -887,8 +885,3 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
   return (dst);
 }
 #endif /* HAVE_SANDBOX_H */
-
-
-/*
- * End of "$Id$".
- */

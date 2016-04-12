@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" cupstestdsc man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -46,6 +44,3 @@ Adobe PostScript Language Document Structuring Conventions
 Specification, Version 3.0.
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

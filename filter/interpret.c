@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD command interpreter for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1725,8 +1723,3 @@ DEBUG_stack(const char       *prefix,	/* I - Prefix string */
     DEBUG_object(prefix, obj);
 }
 #endif /* DEBUG */
-
-
-/*
- * End of "$Id$".
- */

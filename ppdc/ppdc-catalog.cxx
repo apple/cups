@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // Shared message catalog class for the CUPS PPD Compiler.
 //
 // Copyright 2007-2014 by Apple Inc.
@@ -959,8 +957,3 @@ put_utf16(cups_file_t *fp,		// I - File to write to
 
   return (-1);
 }
-
-
-//
-// End of "$Id$".
-//

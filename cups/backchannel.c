@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Backchannel functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -186,8 +184,3 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
   FD_ZERO(set);
   FD_SET(3, set);
 }
-
-
-/*
- * End of "$Id$".
- */

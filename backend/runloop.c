@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Common run loop APIs for CUPS backends.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -525,8 +523,3 @@ backendWaitLoop(
 
   return (1);
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * API definitions for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -621,7 +619,3 @@ extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t dat
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_CUPS_H_ */
-
-/*
- * End of "$Id$".
- */

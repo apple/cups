@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * CGI form variable and array functions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1294,8 +1292,3 @@ cgi_unlink_file(void)
     form_file = NULL;
   }
 }
-
-
-/*
- * End of "$Id$".
- */

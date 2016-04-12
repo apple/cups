@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # Scheduler Makefile for CUPS.
 #
 # Copyright 2007-2015 by Apple Inc.
@@ -549,8 +547,3 @@ sloc:
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

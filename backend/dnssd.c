@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * DNS-SD discovery backend for CUPS.
  *
  * Copyright 2008-2015 by Apple Inc.
@@ -1315,8 +1313,3 @@ unquote(char       *dst,		/* I - Destination buffer */
 
   *dst = '\0';
 }
-
-
-/*
- * End of "$Id$".
- */

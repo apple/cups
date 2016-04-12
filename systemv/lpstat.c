@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * "lpstat" command for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -2023,8 +2021,3 @@ show_scheduler(void)
   else
     _cupsLangPuts(stdout, _("scheduler is not running"));
 }
-
-
-/*
- * End of "$Id$".
- */

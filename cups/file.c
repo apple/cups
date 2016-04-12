@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * File functions for CUPS.
  *
  * Since stdio files max out at 256 files on many systems, we have to
@@ -2735,8 +2733,3 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
   return ((ssize_t)total);
 }
-
-
-/*
- * End of "$Id$".
- */

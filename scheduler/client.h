@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Client definitions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -145,8 +143,3 @@ extern void	cupsdWriteClient(cupsd_client_t *con);
 extern int	cupsdEndTLS(cupsd_client_t *con);
 extern int	cupsdStartTLS(cupsd_client_t *con);
 #endif /* HAVE_SSL */
-
-
-/*
- * End of "$Id$".
- */

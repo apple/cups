@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Compiler stuff for CUPS.
 dnl
 dnl Copyright 2007-2014 by Apple Inc.
@@ -244,7 +242,3 @@ case $uname in
 		OPTIM="$OPTIM -D_GNU_SOURCE"
 		;;
 esac
-
-dnl
-dnl End of "$Id$".
-dnl

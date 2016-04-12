@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Convert a GNU gettext .po file to an Apple .strings file.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -361,8 +359,3 @@ normalize_string(const char *idstr,	/* I - msgid string */
 
   return (buffer);
 }
-
-
-/*
- * End of "$Id$".
- */

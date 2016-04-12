@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Filtering program for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1498,8 +1496,3 @@ usage(const char *opt)			/* I - Incorrect option, if any */
 
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

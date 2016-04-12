@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Log file routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1506,8 +1504,3 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
   return (1);
 }
-
-
-/*
- * End of "$Id$".
- */

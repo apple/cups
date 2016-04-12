@@ -1,26 +1,18 @@
 /*
- * "$Id$"
+ * DSC test program for CUPS.
  *
- *   DSC test program for CUPS.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 2006 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 2006 by Easy Software Products, all rights reserved.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()  - Main entry for test program.
- *   check() - Check a file for conformance.
- *   usage() - Show program usage.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -435,8 +427,3 @@ usage(void)
 
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

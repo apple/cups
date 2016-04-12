@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * System management functions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1069,8 +1067,3 @@ sysUpdateNames(void)
     cupsdRegisterPrinter(p);
 }
 #endif	/* __APPLE__ */
-
-
-/*
- * End of "$Id$".
- */

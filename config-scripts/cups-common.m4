@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Common configuration stuff for CUPS.
 dnl
 dnl Copyright 2007-2015 by Apple Inc.
@@ -472,7 +470,3 @@ case "$COMPONENTS" in
 esac
 
 AC_SUBST(BUILDDIRS)
-
-dnl
-dnl End of "$Id$".
-dnl

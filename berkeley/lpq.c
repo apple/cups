@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * "lpq" command for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -638,8 +636,3 @@ usage(void)
 		  "[-l] [+interval]"));
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

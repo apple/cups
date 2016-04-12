@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Administration utility API definitions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -2367,8 +2365,3 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
   cupsFilePrintf(dstfp, "*JCLCloseUI: *%s\n\n", name);
 }
-
-
-/*
- * End of "$Id$".
- */

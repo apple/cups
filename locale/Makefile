@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # Locale file makefile for CUPS.
 #
 # Copyright 2007-2014 by Apple Inc.
@@ -201,8 +199,3 @@ strings2po:	strings2po.o
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

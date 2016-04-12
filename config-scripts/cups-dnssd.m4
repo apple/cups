@@ -1,15 +1,13 @@
 dnl
-dnl "$Id$"
+dnl DNS Service Discovery (aka Bonjour) stuff for CUPS.
 dnl
-dnl   DNS Service Discovery (aka Bonjour) stuff for CUPS.
+dnl Copyright 2007-2015 by Apple Inc.
 dnl
-dnl   Copyright 2007-2015 by Apple Inc.
-dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(avahi, [  --disable-avahi         disable DNS Service Discovery support using Avahi])
@@ -80,7 +78,3 @@ AC_SUBST(DNSSDLIBS)
 AC_SUBST(DNSSD_BACKEND)
 AC_SUBST(IPPFIND_BIN)
 AC_SUBST(IPPFIND_MAN)
-
-dnl
-dnl End of "$Id$".
-dnl

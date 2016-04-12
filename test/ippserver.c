@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Sample IPP Everywhere server for CUPS.
  *
  * Copyright 2010-2015 by Apple Inc.
@@ -7388,8 +7386,3 @@ valid_job_attributes(
 
   return (valid);
 }
-
-
-/*
- * End of "$Id$".
- */

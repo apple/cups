@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Internet Printing Protocol definitions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1034,7 +1032,3 @@ extern const char	*ippStateString(ipp_state_t state) _CUPS_API_2_0;
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_IPP_H_ */
-
-/*
- * End of "$Id$".
- */

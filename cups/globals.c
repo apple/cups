@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Global variable access routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -379,8 +377,3 @@ cups_globals_init(void)
   pthread_key_create(&cups_globals_key, (void (*)(void *))cups_globals_free);
 }
 #endif /* HAVE_PTHREAD_H */
-
-
-/*
- * End of "$Id$".
- */

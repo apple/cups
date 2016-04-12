@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * File functions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -444,8 +442,3 @@ overwrite_data(int        fd,		/* I - File descriptor */
   return (fsync(fd));
 }
 #endif /* HAVE_REMOVEFILE */
-
-
-/*
- * End of "$Id$".
- */

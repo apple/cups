@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Page size functions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -382,8 +380,3 @@ ppdPageLength(ppd_file_t *ppd,	/* I - PPD file */
   else
     return (size->length);
 }
-
-
-/*
- * End of "$Id$".
- */

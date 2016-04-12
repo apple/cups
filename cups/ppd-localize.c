@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD localization routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -772,8 +770,3 @@ ppd_ll_CC(char   *ll_CC,		/* O - Country-specific locale name */
                 lang->language, ll_CC));
   return (lang);
 }
-
-
-/*
- * End of "$Id$".
- */

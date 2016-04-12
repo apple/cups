@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Private string definitions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -217,7 +215,3 @@ extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval);
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_STRING_H_ */
-
-/*
- * End of "$Id$".
- */

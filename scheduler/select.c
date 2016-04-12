@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Select abstraction functions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -927,8 +925,3 @@ find_fd(int fd)				/* I - File descriptor */
 
   return (fdptr);
 }
-
-
-/*
- * End of "$Id$".
- */

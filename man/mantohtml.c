@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Man page to HTML conversion program.
  *
  * Copyright 2007-2010, 2014 by Apple Inc.
@@ -1219,8 +1217,3 @@ strmove(char       *d,			/* I - Destination */
 
   *d = '\0';
 }
-
-
-/*
- * End of "$Id$".
- */

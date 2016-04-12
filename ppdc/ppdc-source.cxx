@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // Source class for the CUPS PPD Compiler.
 //
 // Copyright 2007-2014 by Apple Inc.
@@ -3800,8 +3798,3 @@ ppdcSource::write_file(const char *f)	// I - File to write
 
   return (0);
 }
-
-
-//
-// End of "$Id$".
-//

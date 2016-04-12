@@ -569,8 +569,3 @@ test_ppd_cache(_ppd_cache_t *pc,	/* I - PWG mapping data */
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

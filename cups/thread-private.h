@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Private threading definitions for CUPS.
  *
  * Copyright 2009-2014 by Apple Inc.
@@ -94,7 +92,3 @@ extern int	_cupsThreadCreate(_cups_thread_func_t func, void *arg);
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_THREAD_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

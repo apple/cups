@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Destination localization support for CUPS.
  *
  * Copyright 2012-2014 by Apple Inc.
@@ -531,9 +529,3 @@ cups_scan_strings(char *buffer)		/* I - Start of string */
 
   return (bufptr);
 }
-
-
-
-/*
- * End of "$Id$".
- */

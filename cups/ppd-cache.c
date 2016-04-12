@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD cache implementation for CUPS.
  *
  * Copyright 2010-2015 by Apple Inc.
@@ -3832,8 +3830,3 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
   *ptr = '\0';
 }
-
-
-/*
- * End of "$Id$".
- */

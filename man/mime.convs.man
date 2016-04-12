@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" mime.convs man page for CUPS.
 .\"
 .\" Copyright 2007-2015 by Apple Inc.
@@ -61,6 +59,3 @@ Define a filter that converts PostScript documents to CUPS Raster format:
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"

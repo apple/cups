@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // PPD file compiler main entry for the CUPS PPD Compiler.
 //
 // Copyright 2007-2014 by Apple Inc.
@@ -456,8 +454,3 @@ usage(void)
 
   exit(1);
 }
-
-
-//
-// End of "$Id$".
-//

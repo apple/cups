@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Private image library definitions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -60,7 +58,3 @@ extern void		_cupsRasterAddError(const char *f, ...)
 extern void		_cupsRasterClearError(void);
 
 #endif /* !_CUPS_RASTER_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

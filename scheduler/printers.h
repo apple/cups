@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Printer definitions for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -193,8 +191,3 @@ extern const char	*cupsdValidateDest(const char *uri,
 			        	   cups_ptype_t *dtype,
 					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);
-
-
-/*
- * End of "$Id$".
- */

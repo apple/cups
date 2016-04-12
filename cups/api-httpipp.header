@@ -1,6 +1,4 @@
 <!--
-  "$Id: api-httpipp.header 7258 2008-01-28 00:15:05Z mike $"
-
   HTTP and IPP API header for CUPS.
 
   Copyright 2007-2011 by Apple Inc.

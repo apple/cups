@@ -1,16 +1,14 @@
 /*
- * "$Id$"
+ * CGI support library definitions for CUPS.
  *
- *   CGI support library definitions for CUPS.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_CGI_H_
@@ -113,7 +111,3 @@ extern const char	*cgiText(const char *message);
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_CGI_H_ */
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # Template makefile for CUPS.
 #
 # Copyright 2007-2014 by Apple Inc.
@@ -197,8 +195,3 @@ uninstall-languages:
 	done
 
 uninstall-langbundle:
-
-
-#
-# End of "$Id$".
-#

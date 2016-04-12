@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Policy routines for the CUPS scheduler.
  *
  * Copyright 2007-2011, 2014 by Apple Inc.
@@ -500,8 +498,3 @@ hash_op(cupsd_location_t *op)		/* I - Operation */
 {
   return (((op->op >> 6) & 0x40) | (op->op & 0x3f));
 }
-
-
-/*
- * End of "$Id$".
- */

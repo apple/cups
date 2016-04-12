@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD custom option routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -109,8 +107,3 @@ ppdNextCustomParam(ppd_coption_t *opt)	/* I - Custom option */
 
   return ((ppd_cparam_t *)cupsArrayNext(opt->params));
 }
-
-
-/*
- * End of "$Id$".
- */

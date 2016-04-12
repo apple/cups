@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Server listening routines for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -299,8 +297,3 @@ cupsdStopListening(void)
 #endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
   }
 }
-
-
-/*
- * End of "$Id$".
- */
