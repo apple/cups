@@ -5,6 +5,7 @@
 *.o
 *.so
 *.so.*
+*.tokens
 .buildrev
 autom4te.cache
 config.h
