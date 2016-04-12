@@ -1,4 +1,5 @@
 *.a
+*.bck
 *.cgi
 *.dylib
 *.gz
