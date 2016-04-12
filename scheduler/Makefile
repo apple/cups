@@ -307,8 +307,10 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsmime.so
 	$(RM) $(LIBDIR)/libcupsmime.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/mime.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/mime.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 	if test "x$(INITDIR)" != x; then \
 		echo Uninstalling init scripts...; \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
@@ -346,28 +348,6 @@ uninstall:
 		echo Uninstalling xinetd configuration file for cups-lpd...; \
 		$(RM) $(BUILDROOT)$(XINETD)/cups-lpd; \
 	fi
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "MIME API" \
-		--css ../doc/cups-printable.css \
-		--header api-mime.header --intro api-mime.shtml \
-		mime.h $(LIBOBJS:.o=.c) >../doc/help/api-mime.html
-	mxmldoc --tokens help/api-mime.html api-mime.xml >../doc/help/api-mime.tokens
-	$(RM) api-mime.xml
-
-framedhelp:
-	mxmldoc --framed api-mime \
-		--section "Programming" \
-		--title "MIME API" \
-		--css ../doc/cups-printable.css \
-		--header api-mime.header --intro api-mime.shtml \
-		mime.h $(LIBOBJS:.o=.c)
 
 
 #

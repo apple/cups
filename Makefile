@@ -1,7 +1,7 @@
 #
 # Top-level Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -266,13 +266,13 @@ debugcheck:	all unittests
 #
 
 apihelp:
-	for dir in cgi-bin cups filter ppdc scheduler; do\
+	for dir in cups filter; do\
 		echo Generating API help in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) apihelp) || exit 1;\
 	done
 
 framedhelp:
-	for dir in cgi-bin cups filter ppdc scheduler; do\
+	for dir in cups filter; do\
 		echo Generating framed API help in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
 	done

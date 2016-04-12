@@ -179,31 +179,11 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupscgi.so
 	$(RM) $(LIBDIR)/libcupscgi.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/cgi.h
-	$(RM) $(INCLUDEDIR)/cups/help-index.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "CGI API" \
-		--css ../doc/cups-printable.css \
-		--header api-cgi.header --intro api-cgi.shtml \
-		cgi.h help-index.h $(LIBOBJS:.o=.c) >../doc/help/api-cgi.html
-	mxmldoc --tokens help/api-cgi.html api-cgi.xml >../doc/help/api-cgi.tokens
-	$(RM) api-cgi.xml
-
-framedhelp:
-	mxmldoc --framed api-cgi \
-		--section "Programming" \
-		--title "CGI API" \
-		--css ../doc/cups-printable.css \
-		--header api-cgi.header --intro api-cgi.shtml \
-		cgi.h help-index.h $(LIBOBJS:.o=.c)
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/cgi.h; \
+		$(RM) $(PRIVATEINCLUDE)/help-index.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 
 
 #

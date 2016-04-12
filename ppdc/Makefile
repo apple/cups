@@ -205,31 +205,10 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsppdc.so
 	$(RM) $(LIBDIR)/libcupsppdc.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/ppdc.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "PPD Compiler API" \
-		--css ../doc/cups-printable.css \
-		--header api-ppdc.header --intro api-ppdc.shtml \
-		api-ppdc.xml \
-		ppdc.h $(LIBOBJS:.o=.cxx) >../doc/help/api-ppdc.html
-	mxmldoc --tokens help/api-ppdc.html api-ppdc.xml >../doc/help/api-ppdc.tokens
-	$(RM) api-ppdc.xml
-
-framedhelp:
-	mxmldoc --framed api-ppdc \
-		--section "Programming" \
-		--title "PPD Compiler API" \
-		--css ../doc/cups-printable.css \
-		--header api-ppdc.header --intro api-ppdc.shtml \
-		ppdc.h $(LIBOBJS:.o=.cxx)
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/ppdc.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 
 
 #

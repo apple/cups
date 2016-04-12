@@ -1,7 +1,7 @@
 #
 # Documentation makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -45,15 +45,12 @@ HELPIMAGES	=	\
 HELPFILES	=	\
 			help/accounting.html \
 			help/api-array.html \
-			help/api-cgi.html \
 			help/api-cups.html \
 			help/api-filedir.html \
 			help/api-filter.html \
 			help/api-httpipp.html \
-			help/api-mime.html \
 			help/api-overview.html \
 			help/api-ppd.html \
-			help/api-ppdc.html \
 			help/api-raster.html \
 			help/cgi.html \
 			help/glossary.html \
