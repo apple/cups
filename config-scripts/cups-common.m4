@@ -1,7 +1,7 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -16,21 +16,7 @@ AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
 CUPS_VERSION="AC_PACKAGE_VERSION"
-
-case "$CUPS_VERSION" in
-	*svn)
-		if test -z "$CUPS_REVISION" -a -d .svn; then
-			CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-		else
-			CUPS_REVISION=""
-		fi
-		;;
-
-	*)
-		CUPS_REVISION=""
-		;;
-esac
-
+CUPS_REVISION=""
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],

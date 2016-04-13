@@ -22,8 +22,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2svn"
-#define CUPS_MINIMAL "CUPS/2.2svn"
+#define CUPS_SVERSION "CUPS v2.2"
+#define CUPS_MINIMAL "CUPS/2.2"
 
 
 /*
