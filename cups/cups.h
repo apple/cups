@@ -313,14 +313,6 @@ typedef int (^cups_dest_block_t)(unsigned flags, cups_dest_t *dest);
 					 * @since CUPS 1.6/OS X 10.8@ */
 #  endif /* __BLOCKS__ */
 
-typedef void (*cups_device_cb_t)(const char *device_class,
-                                 const char *device_id, const char *device_info,
-                                 const char *device_make_and_model,
-                                 const char *device_uri,
-				 const char *device_location, void *user_data);
-					/* Device callback
-					 * @since CUPS 1.4/OS X 10.6@ */
-
 typedef const char *(*cups_password_cb_t)(const char *prompt);
 					/* Password callback */
 
@@ -460,11 +452,6 @@ extern int		cupsCreateJob(http_t *http, const char *name,
 				      cups_option_t *options) _CUPS_API_1_4;
 extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
-extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
-			               const char *include_schemes,
-			               const char *exclude_schemes,
-				       cups_device_cb_t callback,
-				       void *user_data) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
 			                  const char *instance) _CUPS_API_1_4;
 extern const char	*cupsGetPassword2(const char *prompt, http_t *http,

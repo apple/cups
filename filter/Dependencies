@@ -64,4 +64,5 @@ rastertopwg.o: rastertopwg.c ../cups/cups-private.h \
 testraster.o: testraster.c ../cups/raster-private.h ../cups/raster.h \
   ../cups/cups.h ../cups/file.h ../cups/versioning.h ../cups/ipp.h \
   ../cups/http.h ../cups/array.h ../cups/language.h ../cups/pwg.h \
-  ../cups/debug-private.h ../cups/string-private.h ../config.h
+  ../cups/debug-private.h ../cups/string-private.h ../config.h \
+  ../cups/ppd.h

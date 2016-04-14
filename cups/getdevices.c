@@ -1,7 +1,7 @@
 /*
  * cupsGetDevices implementation for CUPS.
  *
- * Copyright 2008-2013 by Apple Inc.
+ * Copyright 2008-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -17,6 +17,7 @@
  */
 
 #include "cups-private.h"
+#include "adminutil.h"
 
 
 /*
