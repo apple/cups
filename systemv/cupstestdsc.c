@@ -187,7 +187,7 @@ check_file(const char *filename)	/* I - File to read from */
 	return (1);
       }
       else
-        version = atof(line + 11);
+        version = (float)atof(line + 11);
     }
     else if (level > 0)
     {
@@ -316,7 +316,7 @@ check_file(const char *filename)	/* I - File to read from */
         saw_trailer = 1;
     }
 
-    for (i = 0; !binary && i < bytes; i ++)
+    for (i = 0; !binary && i < (int)bytes; i ++)
     {
       ch = line[i];
 

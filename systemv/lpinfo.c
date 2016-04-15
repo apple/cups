@@ -16,6 +16,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/adminutil.h>
 
 
 /*

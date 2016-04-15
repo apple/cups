@@ -544,7 +544,7 @@ check_dest(const char  *command,	/* I  - Command name */
 
     for (pptr = printer; !isspace(*dptr & 255) && *dptr != ',' && *dptr;)
     {
-      if ((pptr - printer) < (sizeof(printer) - 1))
+      if ((size_t)(pptr - printer) < (sizeof(printer) - 1))
         *pptr++ = *dptr++;
       else
       {

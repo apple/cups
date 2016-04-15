@@ -282,7 +282,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                      "requesting-user-name", NULL, cupsUser());
 
       if (purge)
-	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
+	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
 
      /*
       * Do the request and get back a response...
@@ -348,7 +348,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                    "requesting-user-name", NULL, cupsUser());
 
-    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
+    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
 
    /*
     * Do the request and get back a response...
