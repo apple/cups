@@ -1,7 +1,7 @@
 /*
  * PPD localization routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -692,6 +692,17 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
 	*/
 
 	snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
+      else if (!strncmp(ll_CC, "nb", 2))
+      {
+       /*
+	* Norway has two languages, "Bokmal" (the primary one)
+	* and "Nynorsk" (new Norwegian); this code maps from the (currently)
+	* recommended "nb" to the previously recommended "no"...
+	*/
+
+	snprintf(lkeyword, sizeof(lkeyword), "no.%s", keyword);
 	attr = ppdFindAttr(ppd, lkeyword, spec);
       }
       else if (!strncmp(ll_CC, "no", 2))
