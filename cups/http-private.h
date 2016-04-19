@@ -97,9 +97,11 @@ typedef int socklen_t;
 #      ifdef __cplusplus
 extern "C" {
 #      endif /* __cplusplus */
+#      ifndef _SECURITY_VERSION_GREATER_THAN_57610_
 typedef CF_OPTIONS(uint32_t, SecKeyUsage) {
     kSecKeyUsageAll              = 0x7FFFFFFF
 };
+#       endif /* !_SECURITY_VERSION_GREATER_THAN_57610_ */
 extern const void * kSecCSRChallengePassword;
 extern const void * kSecSubjectAltName;
 extern const void * kSecCertificateKeyUsage;
