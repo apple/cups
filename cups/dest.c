@@ -617,9 +617,9 @@ cupsConnectDest(
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
         if (strstr(uri, "._tcp"))
           uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
-      }
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-    }
+      }
+   }
 
     if (uri)
       uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, uri, tempresource, sizeof(tempresource));
@@ -2202,7 +2202,6 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
   cupsSetDests2(CUPS_HTTP_DEFAULT, num_dests, dests);
 }
 
-
 /*
  * 'cupsSetDests2()' - Save the list of destinations for the specified server.
  *
@@ -2499,7 +2498,6 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 #endif /* __APPLE__ */
 }
 
-
 #if _CUPS_LOCATION_DEFAULTS
 /*
  * 'appleCopyLocations()' - Copy the location history array.
@@ -2664,6 +2662,7 @@ appleGetPrinter(CFArrayRef  locations,	/* I - Location array */
   return (NULL);
 }
 #endif /* _CUPS_LOCATION_DEFAULTS */
+
 
 
 /*
