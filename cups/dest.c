@@ -617,8 +617,8 @@ cupsConnectDest(
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
         if (strstr(uri, "._tcp"))
           uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
-      }
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+      }
     }
 
     if (uri)
