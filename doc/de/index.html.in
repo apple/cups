@@ -23,7 +23,7 @@
     </div>
     <div class="body">
       <div class="row">
-	<h1>CUPS 2.0.2</h1>
+	<h1>CUPS @CUPS_VERSION@</h1>
 	<p>CUPS basiert auf Standards, Open Source Drucksystem entwickelt durch <a href="http://www.apple.com/">Apple Inc.</a> für OS X<sup>&reg;</sup> und andere UNIX<sup>&reg;</sup>-artige Betriebssysteme.</p>
       </div>
       <div class="row">
