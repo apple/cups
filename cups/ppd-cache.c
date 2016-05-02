@@ -3499,8 +3499,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     ipp_attribute_t	*template;	/* "finishing-template" member */
     const char		*name;		/* String name */
     int			value;		/* Enum value, if any */
+    cups_array_t	*names;		/* Names we've added */
 
     count = ippGetCount(attr);
+    names = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
     cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickMany\n"
 		       "*OrderDependency: 10 AnySetup *cupsFinishingTemplate\n"
@@ -3516,6 +3518,11 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       if ((name = ippGetString(template, 0, NULL)) == NULL || !strcmp(name, "none"))
         continue;
 
+      if (cupsArrayFind(names, (char *)name))
+        continue;			/* Already did this finishing template */
+
+      cupsArrayAdd(names, (char *)name);
+
       for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
       {
         if (!strcmp(finishings[j][0], name))
@@ -3530,6 +3537,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	}
       }
     }
+
+    cupsArrayDelete(names);
 
     cupsFilePuts(fp, "*CloseUI: *cupsFinishingTemplate\n");
   }
