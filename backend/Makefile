@@ -1,7 +1,7 @@
 #
 # Backend makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -86,7 +86,7 @@ unittests:	$(UNITTESTS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns
+	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns socket-static
 
 
 #
@@ -292,6 +292,12 @@ snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
+
+socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o socket-static socket.o libbackend.a \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
 
 
 #
