@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-04-11 20:30-0400\n"
+"POT-Creation-Date: 2016-05-02 17:26-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -1124,9 +1124,6 @@ msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 "  -X                      Retorna els plist en XML en comptes de text pla."
 
-msgid "  -a                      Browse for all services."
-msgstr ""
-
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Exporta totes les impressores."
 
@@ -1142,9 +1139,6 @@ msgstr ""
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 "  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer servir."
-
-msgid "  -d domain               Browse/resolve in specified domain."
-msgstr ""
 
 msgid "  -d name=value           Set named variable to value."
 msgstr "  -d nom=valor           Estableix la variable indicada al valor."
@@ -1251,9 +1245,6 @@ msgstr ""
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p nomfitxer.ppd         Estableix el fitxer PPD."
 
-msgid "  -p program              Run specified program for each service."
-msgstr ""
-
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 
@@ -1286,9 +1277,6 @@ msgstr ""
 
 msgid "  -t title                Set title."
 msgstr "  -t títol                Estableix el títol."
-
-msgid "  -t type                 Browse/resolve with specified type."
-msgstr ""
 
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      Elimina el fitxer PPD quan ha acabat."
@@ -2171,6 +2159,18 @@ msgstr "2"
 msgid "2 inches/sec."
 msgstr "2 polzades/seg."
 
+msgid "2-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "2-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "2-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "2-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "2-Sided Printing"
 msgstr "Impressió a doble cara"
 
@@ -2285,6 +2285,18 @@ msgstr "3 polzades/seg."
 msgid "3 x 5"
 msgstr "3 x 5"
 
+msgid "3-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "3-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "3-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "3-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "3.00x1.00\""
 msgstr "3.00x1.00\""
 
@@ -2350,6 +2362,18 @@ msgstr "4"
 
 msgid "4 inches/sec."
 msgstr "4 polzades/seg."
+
+msgid "4-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "4-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "4-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "4-Hole Punch (Reverse Portrait)"
+msgstr ""
 
 msgid "4.00x1.00\""
 msgstr "4.00x1.00\""
@@ -2651,6 +2675,9 @@ msgstr "Accepta feines"
 msgid "Accepted"
 msgstr "Acceptada"
 
+msgid "Accordian Fold"
+msgstr ""
+
 msgid "Add Class"
 msgstr "Afegeix una classe"
 
@@ -2665,6 +2692,12 @@ msgstr "Adreça"
 
 msgid "Administration"
 msgstr "Administració"
+
+msgid "Alternate"
+msgstr ""
+
+msgid "Alternate Roll"
+msgstr ""
 
 msgid "Always"
 msgstr "Sempre"
@@ -2691,6 +2724,9 @@ msgstr ""
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "Grups d'atribut desordenats (%x < %x)."
+
+msgid "Automatic"
+msgstr ""
 
 msgid "B0"
 msgstr "B0"
@@ -2875,18 +2911,45 @@ msgstr "El valor de la cadena és incorrecte"
 msgid "Bad/empty URI"
 msgstr ""
 
+msgid "Bale"
+msgstr ""
+
 msgid "Banners"
 msgstr "Bàners"
 
+msgid "Bind"
+msgstr ""
+
+msgid "Bind (Landscape)"
+msgstr ""
+
+msgid "Bind (Portrait)"
+msgstr ""
+
+msgid "Bind (Reverse Landscape)"
+msgstr ""
+
+msgid "Bind (Reverse Portrait)"
+msgstr ""
+
 msgid "Bond Paper"
 msgstr "Paper de valors"
+
+msgid "Booklet Maker"
+msgstr ""
 
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr "S'esperava un booleà per l'opció waiteof «%s»."
 
+msgid "Bottom"
+msgstr ""
+
 msgid "Buffer overflow detected, aborting."
 msgstr "S'ha detectat un desbordament la memòria cau. S'interromp."
+
+msgid "CD/DVD/Bluray"
+msgstr ""
 
 msgid "CMYK"
 msgstr "CMYK"
@@ -2909,8 +2972,14 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr "No es pot compartir una impressora remota sobre Kerberos."
 
+msgid "Cardstock"
+msgstr ""
+
 msgid "Cassette"
 msgstr "Classet"
+
+msgid "Center"
+msgstr ""
 
 msgid "Change Settings"
 msgstr "Canvia la configuració"
@@ -2927,6 +2996,9 @@ msgstr "Neteja els capçals de la impressora"
 
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr "Close-Job no permet l'ús de l'atribut job-uri."
+
+msgid "Coat"
+msgstr ""
 
 msgid "Color"
 msgstr "Color"
@@ -2964,6 +3036,9 @@ msgstr "El fitxer de control s'ha enviat correctament."
 msgid "Copying print data."
 msgstr "Es copien les dades d'impressió."
 
+msgid "Cover"
+msgstr ""
+
 msgid "Created"
 msgstr "Creat"
 
@@ -2978,6 +3053,9 @@ msgstr "CustominTearInterval"
 
 msgid "Cut"
 msgstr "Tall"
+
+msgid "Cut Media"
+msgstr ""
 
 msgid "Cutter"
 msgstr "Ganiveta"
@@ -3046,9 +3124,30 @@ msgstr "El directori «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
 msgid "Disabled"
 msgstr "Desabilitat"
 
+msgid "Disc"
+msgstr ""
+
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr "No s'ha trobat el document #%d a la feina #%d."
+
+msgid "Double Gate Fold"
+msgstr ""
+
+msgid "Double Staple (Landscape)"
+msgstr ""
+
+msgid "Double Staple (Portrait)"
+msgstr ""
+
+msgid "Double Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Double Staple (Reverse Portrait)"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
 
 msgid "Duplexer"
 msgstr "Unitat d'impressió a dues cares"
@@ -3087,6 +3186,9 @@ msgstr ""
 "contrasenya de root per accedir a aquesta pàgina. Si feu servir "
 "l'autenticació Kerberos, assegureu-vos de tenir un tiquet Kerberos que sigui "
 "vàlid."
+
+msgid "Envelope"
+msgstr ""
 
 msgid "Envelope #10"
 msgstr ""
@@ -3319,6 +3421,9 @@ msgstr "Paper continu legal alemany"
 msgid "Fanfold US"
 msgstr "Paper continu americà"
 
+msgid "Fast Grayscale"
+msgstr ""
+
 #, c-format
 msgid "File \"%s\" contains a relative path."
 msgstr "El fitxer «%s» conté un camí relatiu."
@@ -3352,11 +3457,20 @@ msgstr ""
 msgid "Finished page %d."
 msgstr "S'ha acabat la pàgina %d."
 
+msgid "Finishing"
+msgstr ""
+
+msgid "Fold"
+msgstr ""
+
 msgid "Folio"
 msgstr "Foli"
 
 msgid "Forbidden"
 msgstr "Prohibit"
+
+msgid "Gate Fold"
+msgstr ""
 
 msgid "General"
 msgstr "General"
@@ -3370,6 +3484,9 @@ msgstr "La Get-Response-PDU fa servir una longitud indefinida"
 msgid "Glossy Paper"
 msgstr "Paper fotogràfic"
 
+msgid "Glossy Photo"
+msgstr ""
+
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "S'ha obtingut l'atribut printer-uri però no el job-id."
 
@@ -3379,6 +3496,15 @@ msgstr "Escala de grisos"
 msgid "HP"
 msgstr "HP"
 
+msgid "Hagaki"
+msgstr ""
+
+msgid "Half Fold"
+msgstr ""
+
+msgid "Half Z Fold"
+msgstr ""
+
 msgid "Hanging Folder"
 msgstr "Carpeta per penjar"
 
@@ -3387,6 +3513,12 @@ msgstr ""
 
 msgid "Help file not in index."
 msgstr "El fitxer d'ajuda no és a l'índex."
+
+msgid "High"
+msgstr ""
+
+msgid "High-Gloss Photo"
+msgstr ""
 
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr ""
@@ -3626,14 +3758,23 @@ msgstr "Les subscripcions a les feines no es poden renovar."
 msgid "Jobs"
 msgstr "Feines"
 
+msgid "Jog"
+msgstr ""
+
 msgid "LPD/LPR Host or Printer"
 msgstr "Amfitrió o impressora LPD/LPR"
+
+msgid "Label"
+msgstr ""
 
 msgid "Label Printer"
 msgstr "Impressora d'etiquetes"
 
 msgid "Label Top"
 msgstr "Capçalera de l'etiqueta"
+
+msgid "Laminate"
+msgstr ""
 
 #, c-format
 msgid "Language \"%s\" not supported."
@@ -3642,14 +3783,29 @@ msgstr "L'idioma «%s» no està disponible."
 msgid "Large Address"
 msgstr "Adreça gran"
 
+msgid "Large Capacity"
+msgstr ""
+
 msgid "LaserJet Series PCL 4/5"
 msgstr "Sèrie Laser Jet PCL 4/5"
+
+msgid "Left"
+msgstr ""
+
+msgid "Left Gate Fold"
+msgstr ""
+
+msgid "Letter Fold"
+msgstr ""
 
 msgid "Letter Oversize"
 msgstr "Carta gran"
 
 msgid "Letter Oversize Long Edge"
 msgstr "Carta americà gran costat llarg"
+
+msgid "Letterhead"
+msgstr ""
 
 msgid "Light"
 msgstr "Lluminós"
@@ -3672,8 +3828,20 @@ msgstr "Costat-llarg (vertical)"
 msgid "Looking for printer..."
 msgstr ""
 
+msgid "Main"
+msgstr ""
+
+msgid "Main Roll"
+msgstr ""
+
+msgid "Manual"
+msgstr ""
+
 msgid "Manual Feed"
 msgstr "Alimentació manual"
+
+msgid "Matte Photo"
+msgstr ""
 
 msgid "Media Size"
 msgstr "Mida del paper"
@@ -3692,6 +3860,9 @@ msgstr "Mitjà"
 
 msgid "Memory allocation error"
 msgstr "S'ha produït un error d'ubicació de memòria"
+
+msgid "Middle"
+msgstr ""
 
 msgid "Missing CloseGroup"
 msgstr "Falta el CloseGroup"
@@ -3786,6 +3957,9 @@ msgstr "Mou la feina"
 msgid "Moved Permanently"
 msgstr "S'ha mogut de manera permanent"
 
+msgid "Multipurpose"
+msgstr ""
+
 msgid "NULL PPD file pointer"
 msgstr "Punter del fitxer PPD NUL"
 
@@ -3803,6 +3977,9 @@ msgstr "No"
 
 msgid "No Content"
 msgstr "No hi ha contingut"
+
+msgid "No Finishing"
+msgstr ""
 
 msgid "No PPD name"
 msgstr "El PPD no té nom"
@@ -3971,6 +4148,9 @@ msgstr "Opcions instal·lades"
 msgid "Options:"
 msgstr "Opcions:"
 
+msgid "Other"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr "El fitxer de memòria cau del PPD no està actualitzat."
 
@@ -4031,6 +4211,9 @@ msgstr ""
 msgid "Paper tray is missing."
 msgstr ""
 
+msgid "Parallel Fold"
+msgstr ""
+
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
 
@@ -4084,6 +4267,9 @@ msgstr "Postal doble costat llarg"
 msgid "Postcard Long Edge"
 msgstr "Postal costat llarg"
 
+msgid "Poster Fold"
+msgstr ""
+
 msgid "Preparing to print."
 msgstr ""
 
@@ -4095,6 +4281,9 @@ msgstr "Feina d'impressió:"
 
 msgid "Print Mode"
 msgstr "Mode d'impressió"
+
+msgid "Print Quality"
+msgstr ""
 
 msgid "Print Rate"
 msgstr "Ritme d'impressió"
@@ -4164,6 +4353,9 @@ msgstr "Impressores"
 msgid "Printing page %d, %u%% complete."
 msgstr ""
 
+msgid "Punch"
+msgstr ""
+
 msgid "Quarto"
 msgstr "Quart"
 
@@ -4173,6 +4365,9 @@ msgstr "S'ha assolit el límit de la quota."
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr ""
 "Rang    Propietari   Feina     Fitxer(s)                         Mida total"
+
+msgid "Rear"
+msgstr ""
 
 msgid "Reject Jobs"
 msgstr "Rebutja feines"
@@ -4206,6 +4401,42 @@ msgstr "Remitent"
 msgid "Rewind"
 msgstr "Rebobina"
 
+msgid "Right"
+msgstr ""
+
+msgid "Right Gate Fold"
+msgstr ""
+
+msgid "Roll 1"
+msgstr ""
+
+msgid "Roll 10"
+msgstr ""
+
+msgid "Roll 2"
+msgstr ""
+
+msgid "Roll 3"
+msgstr ""
+
+msgid "Roll 4"
+msgstr ""
+
+msgid "Roll 5"
+msgstr ""
+
+msgid "Roll 6"
+msgstr ""
+
+msgid "Roll 7"
+msgstr ""
+
+msgid "Roll 8"
+msgstr ""
+
+msgid "Roll 9"
+msgstr ""
+
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr "S'està executant l'ordre: %s %s -N -A %s -c «%s»"
@@ -4216,10 +4447,19 @@ msgstr "SEQUENCE té una longitud indefinida"
 msgid "SSL/TLS Negotiation Error"
 msgstr "S'ha produït un error mentre es negociava el SSL/TLS"
 
+msgid "Saddle Stitch"
+msgstr ""
+
+msgid "Satin Photo"
+msgstr ""
+
 msgid "See Other"
 msgstr "Vegeu altres"
 
 msgid "See remote printer."
+msgstr ""
+
+msgid "Semi-Gloss Photo"
 msgstr ""
 
 msgid "Sending data to printer."
@@ -4264,6 +4504,33 @@ msgstr "Adreça de lliurament"
 msgid "Short-Edge (Landscape)"
 msgstr "Costat curt (horitzontal)"
 
+msgid "Side"
+msgstr ""
+
+msgid "Single Punch (Landscape)"
+msgstr ""
+
+msgid "Single Punch (Portrait)"
+msgstr ""
+
+msgid "Single Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "Single Punch (Reverse Portrait)"
+msgstr ""
+
+msgid "Single Staple (Landscape)"
+msgstr ""
+
+msgid "Single Staple (Portrait)"
+msgstr ""
+
+msgid "Single Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Single Staple (Reverse Portrait)"
+msgstr ""
+
 msgid "Special Paper"
 msgstr "Paper especial"
 
@@ -4273,6 +4540,24 @@ msgstr "S'està posant a la cua la feina. S'ha completat el %.0f%%."
 
 msgid "Standard"
 msgstr "Estàndard"
+
+msgid "Staple"
+msgstr ""
+
+msgid "Staple Edge"
+msgstr ""
+
+msgid "Staple Edge (Landscape)"
+msgstr ""
+
+msgid "Staple Edge (Portrait)"
+msgstr ""
+
+msgid "Staple Edge (Reverse Landscape)"
+msgstr ""
+
+msgid "Staple Edge (Reverse Portrait)"
+msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
 msgid "Starting Banner"
@@ -4516,6 +4801,9 @@ msgstr "Hi ha massa valors de job-sheets (%d > 2)."
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "Hi ha massa valors de printer-state-reasons (%d > %d)."
 
+msgid "Top"
+msgstr ""
+
 msgid "Transparency"
 msgstr "Transparència"
 
@@ -4525,14 +4813,74 @@ msgstr "Safata"
 msgid "Tray 1"
 msgstr "Safata 1"
 
+msgid "Tray 10"
+msgstr ""
+
+msgid "Tray 11"
+msgstr ""
+
+msgid "Tray 12"
+msgstr ""
+
+msgid "Tray 13"
+msgstr ""
+
+msgid "Tray 14"
+msgstr ""
+
+msgid "Tray 15"
+msgstr ""
+
+msgid "Tray 16"
+msgstr ""
+
+msgid "Tray 17"
+msgstr ""
+
+msgid "Tray 18"
+msgstr ""
+
+msgid "Tray 19"
+msgstr ""
+
 msgid "Tray 2"
 msgstr "Safata 2"
+
+msgid "Tray 20"
+msgstr ""
 
 msgid "Tray 3"
 msgstr "Safata 3"
 
 msgid "Tray 4"
 msgstr "Safata 4"
+
+msgid "Tray 5"
+msgstr ""
+
+msgid "Tray 6"
+msgstr ""
+
+msgid "Tray 7"
+msgstr ""
+
+msgid "Tray 8"
+msgstr ""
+
+msgid "Tray 9"
+msgstr ""
+
+msgid "Triple Staple (Landscape)"
+msgstr ""
+
+msgid "Triple Staple (Portrait)"
+msgstr ""
+
+msgid "Triple Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Triple Staple (Reverse Portrait)"
+msgstr ""
 
 msgid "URI Too Long"
 msgstr "L'URI és massa llarg"
@@ -5043,13 +5391,6 @@ msgstr ""
 "Sintaxi: cupstestppd [opcions] nomfitxer1.ppd[.gz] [... nomfitxerN.ppd[.gz]]"
 
 msgid ""
-"Usage: ippdiscover [options] -a\n"
-"       ippdiscover [options] \"service name\"\n"
-"\n"
-"Options:"
-msgstr ""
-
-msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
 "       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
 "       ippfind --help\n"
@@ -5133,6 +5474,9 @@ msgid ""
 msgstr ""
 "Heu d'accedir a aquesta pagina a través de la URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
+
+msgid "Z Fold"
+msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Impressora d'etiquetes ZPL"

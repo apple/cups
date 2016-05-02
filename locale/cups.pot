@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-04-11 20:30-0400\n"
+"POT-Creation-Date: 2016-05-02 17:26-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1204,10 +1204,6 @@ msgstr ""
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 
-#: test/ippdiscover.c:813
-msgid "  -a                      Browse for all services."
-msgstr ""
-
 #: systemv/cupsaddsmb.c:281
 msgid "  -a                      Export all printers."
 msgstr ""
@@ -1226,10 +1222,6 @@ msgstr ""
 
 #: scheduler/main.c:2192
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
-msgstr ""
-
-#: test/ippdiscover.c:814
-msgid "  -d domain               Browse/resolve in specified domain."
 msgstr ""
 
 #: test/ipptool.c:4954
@@ -1340,10 +1332,6 @@ msgstr ""
 msgid "  -p filename.ppd         Set PPD file."
 msgstr ""
 
-#: test/ippdiscover.c:815
-msgid "  -p program              Run specified program for each service."
-msgstr ""
-
 #: test/ippfind.c:2768
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
@@ -1386,10 +1374,6 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1494
 msgid "  -t title                Set title."
-msgstr ""
-
-#: test/ippdiscover.c:816
-msgid "  -t type                 Browse/resolve with specified type."
 msgstr ""
 
 #: scheduler/cupsfilter.c:1495
@@ -2104,7 +2088,7 @@ msgstr ""
 
 #: berkeley/lpq.c:81 berkeley/lpr.c:65 berkeley/lprm.c:61 systemv/cancel.c:76
 #: systemv/cupsaccept.c:82 systemv/cupsaddsmb.c:78 systemv/lp.c:94
-#: systemv/lpadmin.c:228 systemv/lpinfo.c:79 systemv/lpmove.c:66
+#: systemv/lpadmin.c:228 systemv/lpinfo.c:80 systemv/lpmove.c:66
 #: systemv/lpstat.c:86 test/ipptool.c:282 test/ipptool.c:326
 #, c-format
 msgid "%s: Sorry, no encryption support."
@@ -2536,7 +2520,23 @@ msgstr ""
 msgid "2 inches/sec."
 msgstr ""
 
-#: ppdc/sample.c:262
+#: cups/ppd-cache.c:2989
+msgid "2-Hole Punch (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2990
+msgid "2-Hole Punch (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2988
+msgid "2-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2987
+msgid "2-Hole Punch (Reverse Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3445 ppdc/sample.c:262
 msgid "2-Sided Printing"
 msgstr ""
 
@@ -2688,6 +2688,22 @@ msgstr ""
 msgid "3 x 5"
 msgstr ""
 
+#: cups/ppd-cache.c:3000
+msgid "3-Hole Punch (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2998
+msgid "3-Hole Punch (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2997
+msgid "3-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2999
+msgid "3-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 #: ppdc/sample.c:195
 msgid "3.00x1.00\""
 msgstr ""
@@ -2774,6 +2790,22 @@ msgstr ""
 
 #: ppdc/sample.c:382
 msgid "4 inches/sec."
+msgstr ""
+
+#: cups/ppd-cache.c:2994
+msgid "4-Hole Punch (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2992
+msgid "4-Hole Punch (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2991
+msgid "4-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2993
+msgid "4-Hole Punch (Reverse Portrait)"
 msgstr ""
 
 #: ppdc/sample.c:206
@@ -3170,6 +3202,10 @@ msgstr ""
 msgid "Accepted"
 msgstr ""
 
+#: cups/ppd-cache.c:2971
+msgid "Accordian Fold"
+msgstr ""
+
 #: cgi-bin/admin.c:544
 msgid "Add Class"
 msgstr ""
@@ -3189,6 +3225,14 @@ msgstr ""
 
 #: cgi-bin/admin.c:184 cgi-bin/admin.c:258 cgi-bin/admin.c:2729
 msgid "Administration"
+msgstr ""
+
+#: cups/ppd-cache.c:3258
+msgid "Alternate"
+msgstr ""
+
+#: cups/ppd-cache.c:3266
+msgid "Alternate Roll"
 msgstr ""
 
 #: ppdc/sample.c:424
@@ -3221,6 +3265,10 @@ msgstr ""
 #: scheduler/ipp.c:238
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
+msgstr ""
+
+#: cups/ppd-cache.c:3256 cups/ppd-cache.c:3338
+msgid "Automatic"
 msgstr ""
 
 #: ppdc/sample.c:126
@@ -3473,21 +3521,57 @@ msgstr ""
 msgid "Bad/empty URI"
 msgstr ""
 
+#: cups/ppd-cache.c:2956
+msgid "Bale"
+msgstr ""
+
 #: cgi-bin/admin.c:3274 cgi-bin/admin.c:3520
 msgid "Banners"
+msgstr ""
+
+#: cups/ppd-cache.c:2957
+msgid "Bind"
+msgstr ""
+
+#: cups/ppd-cache.c:2961
+msgid "Bind (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2959
+msgid "Bind (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2958
+msgid "Bind (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2960
+msgid "Bind (Reverse Portrait)"
 msgstr ""
 
 #: ppdc/sample.c:282
 msgid "Bond Paper"
 msgstr ""
 
-#: backend/usb-darwin.c:2046
+#: cups/ppd-cache.c:2962
+msgid "Booklet Maker"
+msgstr ""
+
+#: backend/usb-darwin.c:2014
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr ""
 
+#: cups/ppd-cache.c:3269
+msgid "Bottom"
+msgstr ""
+
 #: filter/pstops.c:2032
 msgid "Buffer overflow detected, aborting."
+msgstr ""
+
+#: cups/ppd-cache.c:3340
+msgid "CD/DVD/Bluray"
 msgstr ""
 
 #: ppdc/sample.c:277
@@ -3518,8 +3602,16 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
 
+#: cups/ppd-cache.c:3339
+msgid "Cardstock"
+msgstr ""
+
 #: ppdc/sample.c:271
 msgid "Cassette"
+msgstr ""
+
+#: cups/ppd-cache.c:3273
+msgid "Center"
 msgstr ""
 
 #: cgi-bin/admin.c:1639 cgi-bin/admin.c:1781 cgi-bin/admin.c:1794
@@ -3544,10 +3636,15 @@ msgstr ""
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr ""
 
-#: ppdc/sample.c:276
+#: cups/ppd-cache.c:2963
+msgid "Coat"
+msgstr ""
+
+#: cups/ppd-cache.c:3420 ppdc/sample.c:276
 msgid "Color"
 msgstr ""
 
+#: cups/ppd-cache.c:3396 cups/ppd-cache.c:3407 cups/ppd-cache.c:3418
 #: ppdc/sample.c:274
 msgid "Color Mode"
 msgstr ""
@@ -3587,6 +3684,10 @@ msgstr ""
 msgid "Copying print data."
 msgstr ""
 
+#: cups/ppd-cache.c:2964
+msgid "Cover"
+msgstr ""
+
 #: cups/http-support.c:1348
 msgid "Created"
 msgstr ""
@@ -3605,6 +3706,10 @@ msgstr ""
 
 #: ppdc/sample.c:338
 msgid "Cut"
+msgstr ""
+
+#: cups/ppd-cache.c:3015
+msgid "Cut Media"
 msgstr ""
 
 #: ppdc/sample.c:446
@@ -3640,7 +3745,7 @@ msgstr ""
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr ""
 
-#: systemv/lpinfo.c:291
+#: systemv/lpinfo.c:292
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -3684,9 +3789,37 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
+#: cups/ppd-cache.c:3262
+msgid "Disc"
+msgstr ""
+
 #: scheduler/ipp.c:6226
 #, c-format
 msgid "Document #%d does not exist in job #%d."
+msgstr ""
+
+#: cups/ppd-cache.c:2972
+msgid "Double Gate Fold"
+msgstr ""
+
+#: cups/ppd-cache.c:3008
+msgid "Double Staple (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3006
+msgid "Double Staple (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3005
+msgid "Double Staple (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3007
+msgid "Double Staple (Reverse Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3595 cups/ppd-cache.c:3647
+msgid "Draft"
 msgstr ""
 
 #: ppdc/sample.c:267
@@ -3730,6 +3863,10 @@ msgstr ""
 
 #: scheduler/client.c:2224
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr ""
+
+#: cups/ppd-cache.c:3261 cups/ppd-cache.c:3341
+msgid "Envelope"
 msgstr ""
 
 #: ppdc/sample.c:73
@@ -3965,7 +4102,7 @@ msgstr ""
 msgid "Error sending raster data."
 msgstr ""
 
-#: systemv/lpinfo.c:94 systemv/lpmove.c:81
+#: systemv/lpinfo.c:95 systemv/lpmove.c:81
 msgid "Error: need hostname after \"-h\" option."
 msgstr ""
 
@@ -4047,6 +4184,10 @@ msgstr ""
 msgid "Fanfold US"
 msgstr ""
 
+#: cups/ppd-cache.c:3398
+msgid "Fast Grayscale"
+msgstr ""
+
 #: cups/file.c:260
 #, c-format
 msgid "File \"%s\" contains a relative path."
@@ -4087,12 +4228,24 @@ msgstr ""
 msgid "Finished page %d."
 msgstr ""
 
+#: cups/ppd-cache.c:3511 cups/ppd-cache.c:3556
+msgid "Finishing"
+msgstr ""
+
+#: cups/ppd-cache.c:2970
+msgid "Fold"
+msgstr ""
+
 #: ppdc/sample.c:125
 msgid "Folio"
 msgstr ""
 
 #: cups/http-support.c:1373
 msgid "Forbidden"
+msgstr ""
+
+#: cups/ppd-cache.c:2973
+msgid "Gate Fold"
 msgstr ""
 
 #: cups/ppd.c:767 cups/ppd.c:1325
@@ -4111,6 +4264,10 @@ msgstr ""
 msgid "Glossy Paper"
 msgstr ""
 
+#: cups/ppd-cache.c:3345
+msgid "Glossy Photo"
+msgstr ""
+
 #: scheduler/ipp.c:2929 scheduler/ipp.c:3339 scheduler/ipp.c:3877
 #: scheduler/ipp.c:6155 scheduler/ipp.c:6302 scheduler/ipp.c:7800
 #: scheduler/ipp.c:8934 scheduler/ipp.c:9158 scheduler/ipp.c:9510
@@ -4118,12 +4275,24 @@ msgstr ""
 msgid "Got a printer-uri attribute but no job-id."
 msgstr ""
 
-#: ppdc/sample.c:275
+#: cups/ppd-cache.c:3409 ppdc/sample.c:275
 msgid "Grayscale"
 msgstr ""
 
 #: ppdc/sample.c:272
 msgid "HP"
+msgstr ""
+
+#: cups/ppd-cache.c:3264
+msgid "Hagaki"
+msgstr ""
+
+#: cups/ppd-cache.c:2974
+msgid "Half Fold"
+msgstr ""
+
+#: cups/ppd-cache.c:2975
+msgid "Half Z Fold"
 msgstr ""
 
 #: ppdc/sample.c:170
@@ -4136,6 +4305,14 @@ msgstr ""
 
 #: cgi-bin/help.c:137
 msgid "Help file not in index."
+msgstr ""
+
+#: cups/ppd-cache.c:3602 cups/ppd-cache.c:3650
+msgid "High"
+msgstr ""
+
+#: cups/ppd-cache.c:3346
+msgid "High-Gloss Photo"
 msgstr ""
 
 #: cups/ipp.c:3143 cups/ipp.c:3170 cups/ipp.c:3193
@@ -4453,8 +4630,16 @@ msgstr ""
 msgid "Jobs"
 msgstr ""
 
+#: cups/ppd-cache.c:2982
+msgid "Jog"
+msgstr ""
+
 #: backend/lpd.c:173
 msgid "LPD/LPR Host or Printer"
+msgstr ""
+
+#: cups/ppd-cache.c:3342
+msgid "Label"
 msgstr ""
 
 #: ppdc/sample.c:230
@@ -4463,6 +4648,10 @@ msgstr ""
 
 #: ppdc/sample.c:441
 msgid "Label Top"
+msgstr ""
+
+#: cups/ppd-cache.c:2983
+msgid "Laminate"
 msgstr ""
 
 #: scheduler/ipp.c:2051 scheduler/ipp.c:5737
@@ -4474,8 +4663,24 @@ msgstr ""
 msgid "Large Address"
 msgstr ""
 
+#: cups/ppd-cache.c:3259
+msgid "Large Capacity"
+msgstr ""
+
 #: ppdc/sample.c:286
 msgid "LaserJet Series PCL 4/5"
+msgstr ""
+
+#: cups/ppd-cache.c:3271
+msgid "Left"
+msgstr ""
+
+#: cups/ppd-cache.c:2976
+msgid "Left Gate Fold"
+msgstr ""
+
+#: cups/ppd-cache.c:2977
+msgid "Letter Fold"
 msgstr ""
 
 #: ppdc/sample.c:43
@@ -4484,6 +4689,10 @@ msgstr ""
 
 #: ppdc/sample.c:44
 msgid "Letter Oversize Long Edge"
+msgstr ""
+
+#: cups/ppd-cache.c:3351
+msgid "Letterhead"
 msgstr ""
 
 #: ppdc/sample.c:236
@@ -4506,7 +4715,7 @@ msgstr ""
 msgid "Local printer created."
 msgstr ""
 
-#: ppdc/sample.c:264
+#: cups/ppd-cache.c:3445 ppdc/sample.c:264
 msgid "Long-Edge (Portrait)"
 msgstr ""
 
@@ -4514,8 +4723,24 @@ msgstr ""
 msgid "Looking for printer..."
 msgstr ""
 
+#: cups/ppd-cache.c:3257
+msgid "Main"
+msgstr ""
+
+#: cups/ppd-cache.c:3265
+msgid "Main Roll"
+msgstr ""
+
+#: cups/ppd-cache.c:3260
+msgid "Manual"
+msgstr ""
+
 #: ppdc/sample.c:260
 msgid "Manual Feed"
+msgstr ""
+
+#: cups/ppd-cache.c:3347
+msgid "Matte Photo"
 msgstr ""
 
 #: cups/ppd.c:814 cups/ppd.c:1380
@@ -4540,6 +4765,10 @@ msgstr ""
 
 #: cups/ppd.c:316
 msgid "Memory allocation error"
+msgstr ""
+
+#: cups/ppd-cache.c:3268
+msgid "Middle"
 msgstr ""
 
 #: cups/ppd.c:336
@@ -4627,7 +4856,7 @@ msgstr ""
 msgid "Missing y-dimension in media-size."
 msgstr ""
 
-#: systemv/lpinfo.c:461
+#: systemv/lpinfo.c:462
 #, c-format
 msgid ""
 "Model:  name = %s\n"
@@ -4660,6 +4889,10 @@ msgstr ""
 msgid "Moved Permanently"
 msgstr ""
 
+#: cups/ppd-cache.c:3275
+msgid "Multipurpose"
+msgstr ""
+
 #: cups/ppd.c:315
 msgid "NULL PPD file pointer"
 msgstr ""
@@ -4682,6 +4915,10 @@ msgstr ""
 
 #: cups/http-support.c:1354
 msgid "No Content"
+msgstr ""
+
+#: cups/ppd-cache.c:3511 cups/ppd-cache.c:3556
+msgid "No Finishing"
 msgstr ""
 
 #: cups/ppd-util.c:451
@@ -4814,7 +5051,7 @@ msgstr ""
 msgid "Non-continuous (Web sensing)"
 msgstr ""
 
-#: ppdc/sample.c:238
+#: cups/ppd-cache.c:3598 cups/ppd-cache.c:3648 ppdc/sample.c:238
 msgid "Normal"
 msgstr ""
 
@@ -4854,7 +5091,7 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: ppdc/sample.c:263
+#: cups/ppd-cache.c:3445 ppdc/sample.c:263
 msgid "Off (1-Sided)"
 msgstr ""
 
@@ -4902,6 +5139,10 @@ msgstr ""
 #: ppdc/ppdhtml.cxx:177 ppdc/ppdi.cxx:123 ppdc/ppdmerge.cxx:361
 #: ppdc/ppdpo.cxx:247
 msgid "Options:"
+msgstr ""
+
+#: cups/ppd-cache.c:3343
+msgid "Other"
 msgstr ""
 
 #: cups/ppd-cache.c:464
@@ -4984,6 +5225,10 @@ msgstr ""
 msgid "Paper tray is missing."
 msgstr ""
 
+#: cups/ppd-cache.c:2978
+msgid "Parallel Fold"
+msgstr ""
+
 #: ppdc/sample.c:355
 msgid "ParamCustominCutInterval"
 msgstr ""
@@ -5014,7 +5259,7 @@ msgstr ""
 msgid "Peel-Off"
 msgstr ""
 
-#: ppdc/sample.c:160
+#: cups/ppd-cache.c:3263 cups/ppd-cache.c:3344 ppdc/sample.c:160
 msgid "Photo"
 msgstr ""
 
@@ -5022,7 +5267,7 @@ msgstr ""
 msgid "Photo Labels"
 msgstr ""
 
-#: ppdc/sample.c:281
+#: cups/ppd-cache.c:3350 ppdc/sample.c:281
 msgid "Plain Paper"
 msgstr ""
 
@@ -5054,6 +5299,10 @@ msgstr ""
 msgid "Postcard Long Edge"
 msgstr ""
 
+#: cups/ppd-cache.c:2979
+msgid "Poster Fold"
+msgstr ""
+
 #: backend/ipp.c:968 backend/ipp.c:976
 msgid "Preparing to print."
 msgstr ""
@@ -5068,6 +5317,10 @@ msgstr ""
 
 #: ppdc/sample.c:335
 msgid "Print Mode"
+msgstr ""
+
+#: cups/ppd-cache.c:3591 cups/ppd-cache.c:3645
+msgid "Print Quality"
 msgstr ""
 
 #: ppdc/sample.c:378
@@ -5161,6 +5414,10 @@ msgstr ""
 msgid "Printing page %d, %u%% complete."
 msgstr ""
 
+#: cups/ppd-cache.c:2984
+msgid "Punch"
+msgstr ""
+
 #: ppdc/sample.c:155
 msgid "Quarto"
 msgstr ""
@@ -5171,6 +5428,10 @@ msgstr ""
 
 #: berkeley/lpq.c:488
 msgid "Rank    Owner   Job     File(s)                         Total Size"
+msgstr ""
+
+#: cups/ppd-cache.c:3274
+msgid "Rear"
 msgstr ""
 
 #: cgi-bin/classes.c:161 cgi-bin/printers.c:164
@@ -5215,6 +5476,54 @@ msgstr ""
 msgid "Rewind"
 msgstr ""
 
+#: cups/ppd-cache.c:3272
+msgid "Right"
+msgstr ""
+
+#: cups/ppd-cache.c:2980
+msgid "Right Gate Fold"
+msgstr ""
+
+#: cups/ppd-cache.c:3296
+msgid "Roll 1"
+msgstr ""
+
+#: cups/ppd-cache.c:3305
+msgid "Roll 10"
+msgstr ""
+
+#: cups/ppd-cache.c:3297
+msgid "Roll 2"
+msgstr ""
+
+#: cups/ppd-cache.c:3298
+msgid "Roll 3"
+msgstr ""
+
+#: cups/ppd-cache.c:3299
+msgid "Roll 4"
+msgstr ""
+
+#: cups/ppd-cache.c:3300
+msgid "Roll 5"
+msgstr ""
+
+#: cups/ppd-cache.c:3301
+msgid "Roll 6"
+msgstr ""
+
+#: cups/ppd-cache.c:3302
+msgid "Roll 7"
+msgstr ""
+
+#: cups/ppd-cache.c:3303
+msgid "Roll 8"
+msgstr ""
+
+#: cups/ppd-cache.c:3304
+msgid "Roll 9"
+msgstr ""
+
 #: cups/adminutil.c:2083
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
@@ -5228,6 +5537,14 @@ msgstr ""
 msgid "SSL/TLS Negotiation Error"
 msgstr ""
 
+#: cups/ppd-cache.c:3001
+msgid "Saddle Stitch"
+msgstr ""
+
+#: cups/ppd-cache.c:3348
+msgid "Satin Photo"
+msgstr ""
+
 #: cups/http-support.c:1360
 msgid "See Other"
 msgstr ""
@@ -5236,7 +5553,11 @@ msgstr ""
 msgid "See remote printer."
 msgstr ""
 
-#: backend/usb-darwin.c:564 backend/usb-libusb.c:346
+#: cups/ppd-cache.c:3349
+msgid "Semi-Gloss Photo"
+msgstr ""
+
+#: backend/usb-darwin.c:572 backend/usb-libusb.c:346
 msgid "Sending data to printer."
 msgstr ""
 
@@ -5256,7 +5577,7 @@ msgstr ""
 msgid "Server Stopped"
 msgstr ""
 
-#: cups/tls-darwin.c:1057 cups/tls-gnutls.c:1047
+#: cups/tls-darwin.c:1092 cups/tls-gnutls.c:1047
 msgid "Server credentials not set."
 msgstr ""
 
@@ -5289,8 +5610,44 @@ msgstr ""
 msgid "Shipping Address"
 msgstr ""
 
-#: ppdc/sample.c:265
+#: cups/ppd-cache.c:3445 ppdc/sample.c:265
 msgid "Short-Edge (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3270
+msgid "Side"
+msgstr ""
+
+#: cups/ppd-cache.c:2996
+msgid "Single Punch (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2995
+msgid "Single Punch (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2985
+msgid "Single Punch (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2986
+msgid "Single Punch (Reverse Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3010
+msgid "Single Staple (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3009
+msgid "Single Staple (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3003
+msgid "Single Staple (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3004
+msgid "Single Staple (Reverse Portrait)"
 msgstr ""
 
 #: ppdc/sample.c:283
@@ -5304,6 +5661,30 @@ msgstr ""
 
 #: ppdc/sample.c:336
 msgid "Standard"
+msgstr ""
+
+#: cups/ppd-cache.c:3002
+msgid "Staple"
+msgstr ""
+
+#: cups/ppd-cache.c:2965
+msgid "Staple Edge"
+msgstr ""
+
+#: cups/ppd-cache.c:2969
+msgid "Staple Edge (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2967
+msgid "Staple Edge (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:2966
+msgid "Staple Edge (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:2968
+msgid "Staple Edge (Reverse Portrait)"
 msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
@@ -5479,11 +5860,11 @@ msgstr ""
 msgid "The printer is now connected."
 msgstr ""
 
-#: backend/usb-darwin.c:1363
+#: backend/usb-darwin.c:1348
 msgid "The printer is now online."
 msgstr ""
 
-#: backend/usb-darwin.c:1402
+#: backend/usb-darwin.c:1387
 msgid "The printer is offline."
 msgstr ""
 
@@ -5576,8 +5957,8 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr ""
 
-#: backend/usb-darwin.c:398 backend/usb-darwin.c:457 backend/usb-darwin.c:526
-#: backend/usb-darwin.c:547 backend/usb-libusb.c:271 backend/usb-libusb.c:325
+#: backend/usb-darwin.c:399 backend/usb-darwin.c:465 backend/usb-darwin.c:534
+#: backend/usb-darwin.c:555 backend/usb-libusb.c:271 backend/usb-libusb.c:325
 msgid "There was an unrecoverable USB error."
 msgstr ""
 
@@ -5599,7 +5980,11 @@ msgstr ""
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr ""
 
-#: ppdc/sample.c:284
+#: cups/ppd-cache.c:3267
+msgid "Top"
+msgstr ""
+
+#: cups/ppd-cache.c:3352 ppdc/sample.c:284
 msgid "Transparency"
 msgstr ""
 
@@ -5607,20 +5992,100 @@ msgstr ""
 msgid "Tray"
 msgstr ""
 
-#: ppdc/sample.c:256
+#: cups/ppd-cache.c:3276 ppdc/sample.c:256
 msgid "Tray 1"
 msgstr ""
 
-#: ppdc/sample.c:257
+#: cups/ppd-cache.c:3285
+msgid "Tray 10"
+msgstr ""
+
+#: cups/ppd-cache.c:3286
+msgid "Tray 11"
+msgstr ""
+
+#: cups/ppd-cache.c:3287
+msgid "Tray 12"
+msgstr ""
+
+#: cups/ppd-cache.c:3288
+msgid "Tray 13"
+msgstr ""
+
+#: cups/ppd-cache.c:3289
+msgid "Tray 14"
+msgstr ""
+
+#: cups/ppd-cache.c:3290
+msgid "Tray 15"
+msgstr ""
+
+#: cups/ppd-cache.c:3291
+msgid "Tray 16"
+msgstr ""
+
+#: cups/ppd-cache.c:3292
+msgid "Tray 17"
+msgstr ""
+
+#: cups/ppd-cache.c:3293
+msgid "Tray 18"
+msgstr ""
+
+#: cups/ppd-cache.c:3294
+msgid "Tray 19"
+msgstr ""
+
+#: cups/ppd-cache.c:3277 ppdc/sample.c:257
 msgid "Tray 2"
 msgstr ""
 
-#: ppdc/sample.c:258
+#: cups/ppd-cache.c:3295
+msgid "Tray 20"
+msgstr ""
+
+#: cups/ppd-cache.c:3278 ppdc/sample.c:258
 msgid "Tray 3"
 msgstr ""
 
-#: ppdc/sample.c:259
+#: cups/ppd-cache.c:3279 ppdc/sample.c:259
 msgid "Tray 4"
+msgstr ""
+
+#: cups/ppd-cache.c:3280
+msgid "Tray 5"
+msgstr ""
+
+#: cups/ppd-cache.c:3281
+msgid "Tray 6"
+msgstr ""
+
+#: cups/ppd-cache.c:3282
+msgid "Tray 7"
+msgstr ""
+
+#: cups/ppd-cache.c:3283
+msgid "Tray 8"
+msgstr ""
+
+#: cups/ppd-cache.c:3284
+msgid "Tray 9"
+msgstr ""
+
+#: cups/ppd-cache.c:3014
+msgid "Triple Staple (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3012
+msgid "Triple Staple (Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3011
+msgid "Triple Staple (Reverse Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3013
+msgid "Triple Staple (Reverse Portrait)"
 msgstr ""
 
 #: cups/http-support.c:1382
@@ -5789,7 +6254,7 @@ msgstr ""
 msgid "Unable to create printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1317 cups/tls-gnutls.c:1179
+#: cups/tls-darwin.c:1353 cups/tls-gnutls.c:1179
 msgid "Unable to create server credentials."
 msgstr ""
 
@@ -5813,35 +6278,35 @@ msgstr ""
 msgid "Unable to edit cupsd.conf files larger than 1MB"
 msgstr ""
 
-#: cups/tls-darwin.c:1484
+#: cups/tls-darwin.c:1520
 msgid "Unable to establish a secure connection to host (certificate chain invalid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1474
+#: cups/tls-darwin.c:1510
 msgid "Unable to establish a secure connection to host (certificate not yet valid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1469
+#: cups/tls-darwin.c:1505
 msgid "Unable to establish a secure connection to host (expired certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1479
+#: cups/tls-darwin.c:1515
 msgid "Unable to establish a secure connection to host (host name mismatch)."
 msgstr ""
 
-#: cups/tls-darwin.c:1489
+#: cups/tls-darwin.c:1525
 msgid "Unable to establish a secure connection to host (peer dropped connection before responding)."
 msgstr ""
 
-#: cups/tls-darwin.c:1464
+#: cups/tls-darwin.c:1500
 msgid "Unable to establish a secure connection to host (self-signed certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1459
+#: cups/tls-darwin.c:1495
 msgid "Unable to establish a secure connection to host (untrusted certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1516 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
+#: cups/tls-darwin.c:1552 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
@@ -5853,7 +6318,7 @@ msgstr ""
 msgid "Unable to find printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1330
+#: cups/tls-darwin.c:1366
 msgid "Unable to find server credentials."
 msgstr ""
 
@@ -5965,8 +6430,8 @@ msgstr ""
 msgid "Unable to print test page"
 msgstr ""
 
-#: backend/runloop.c:83 backend/runloop.c:312 backend/usb-darwin.c:634
-#: backend/usb-darwin.c:678 backend/usb-libusb.c:416 backend/usb-libusb.c:451
+#: backend/runloop.c:83 backend/runloop.c:312 backend/usb-darwin.c:642
+#: backend/usb-darwin.c:686 backend/usb-libusb.c:416 backend/usb-libusb.c:451
 msgid "Unable to read print data."
 msgstr ""
 
@@ -5991,7 +6456,7 @@ msgstr ""
 msgid "Unable to send command to printer driver"
 msgstr ""
 
-#: backend/usb-darwin.c:756 backend/usb-libusb.c:527
+#: backend/usb-darwin.c:764 backend/usb-libusb.c:527
 msgid "Unable to send data to printer."
 msgstr ""
 
@@ -6016,7 +6481,7 @@ msgstr ""
 msgid "Unable to upload cupsd.conf file"
 msgstr ""
 
-#: backend/usb-darwin.c:2188 backend/usb-darwin.c:2212
+#: backend/usb-darwin.c:2156 backend/usb-darwin.c:2180
 msgid "Unable to use legacy USB class driver."
 msgstr ""
 
@@ -6106,7 +6571,7 @@ msgstr ""
 msgid "Unknown scheme in URI"
 msgstr ""
 
-#: cups/http-addrlist.c:758
+#: cups/http-addrlist.c:771
 msgid "Unknown service name."
 msgstr ""
 
@@ -6234,14 +6699,6 @@ msgstr ""
 msgid "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 msgstr ""
 
-#: test/ippdiscover.c:809
-msgid ""
-"Usage: ippdiscover [options] -a\n"
-"       ippdiscover [options] \"service name\"\n"
-"\n"
-"Options:"
-msgstr ""
-
 #: test/ippfind.c:2744
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -6310,7 +6767,7 @@ msgstr ""
 msgid "Waiting for job to complete."
 msgstr ""
 
-#: backend/usb-darwin.c:481 backend/usb-libusb.c:223
+#: backend/usb-darwin.c:430 backend/usb-darwin.c:489 backend/usb-libusb.c:223
 msgid "Waiting for printer to become available."
 msgstr ""
 
@@ -6333,6 +6790,10 @@ msgstr ""
 #: scheduler/client.c:2234
 #, c-format
 msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
+msgstr ""
+
+#: cups/ppd-cache.c:2981
+msgid "Z Fold"
 msgstr ""
 
 #: ppdc/sample.c:434
@@ -6774,45 +7235,45 @@ msgstr ""
 msgid "lpc> "
 msgstr ""
 
-#: systemv/lpinfo.c:128
+#: systemv/lpinfo.c:129
 msgid "lpinfo: Expected 1284 device ID string after \"--device-id\"."
 msgstr ""
 
-#: systemv/lpinfo.c:181
+#: systemv/lpinfo.c:182
 msgid "lpinfo: Expected language after \"--language\"."
 msgstr ""
 
-#: systemv/lpinfo.c:198
+#: systemv/lpinfo.c:199
 msgid "lpinfo: Expected make and model after \"--make-and-model\"."
 msgstr ""
 
-#: systemv/lpinfo.c:215
+#: systemv/lpinfo.c:216
 msgid "lpinfo: Expected product string after \"--product\"."
 msgstr ""
 
-#: systemv/lpinfo.c:146
+#: systemv/lpinfo.c:147
 msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
 msgstr ""
 
-#: systemv/lpinfo.c:164
+#: systemv/lpinfo.c:165
 msgid "lpinfo: Expected scheme list after \"--include-schemes\"."
 msgstr ""
 
-#: systemv/lpinfo.c:232
+#: systemv/lpinfo.c:233
 msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr ""
 
-#: systemv/lpinfo.c:256
+#: systemv/lpinfo.c:257
 #, c-format
 msgid "lpinfo: Unknown argument \"%s\"."
 msgstr ""
 
-#: systemv/lpinfo.c:250
+#: systemv/lpinfo.c:251
 #, c-format
 msgid "lpinfo: Unknown option \"%c\"."
 msgstr ""
 
-#: systemv/lpinfo.c:243
+#: systemv/lpinfo.c:244
 #, c-format
 msgid "lpinfo: Unknown option \"%s\"."
 msgstr ""
@@ -7101,7 +7562,7 @@ msgstr ""
 msgid "ppdc: Expected override field after Resolution on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:387 ppdc/ppdc-catalog.cxx:399
+#: ppdc/ppdc-catalog.cxx:389 ppdc/ppdc-catalog.cxx:401
 #, c-format
 msgid "ppdc: Expected quoted string on line %d of %s."
 msgstr ""
@@ -7212,7 +7673,7 @@ msgstr ""
 msgid "ppdc: Missing #if on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:464
+#: ppdc/ppdc-catalog.cxx:466
 #, c-format
 msgid "ppdc: Need a msgid line before any translation strings on line %d of %s."
 msgstr ""
@@ -7294,7 +7755,7 @@ msgstr ""
 msgid "ppdc: Undefined variable (%s) on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:481
+#: ppdc/ppdc-catalog.cxx:483
 #, c-format
 msgid "ppdc: Unexpected text on line %d of %s."
 msgstr ""
@@ -7314,7 +7775,7 @@ msgstr ""
 msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:509
+#: ppdc/ppdc-catalog.cxx:511
 #, c-format
 msgid "ppdc: Unknown message catalog format for \"%s\"."
 msgstr ""

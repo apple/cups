@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-04-11 20:30-0400\n"
+"POT-Creation-Date: 2016-05-02 17:26-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -1087,9 +1087,6 @@ msgstr ""
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr "  -X                      Выводить XML plist вместо обычного текста."
 
-msgid "  -a                      Browse for all services."
-msgstr "  -a                      Обзор всех сервисов."
-
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Экспорт всех принтеров."
 
@@ -1104,9 +1101,6 @@ msgstr "  -c cups-files.conf      Использовать заданный cups
 
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           Использовать заданный cupsd.conf"
-
-msgid "  -d domain               Browse/resolve in specified domain."
-msgstr "  -d domain               Просмотр в заданном домене."
 
 msgid "  -d name=value           Set named variable to value."
 msgstr "  -d name=value           Указанной переменной присваивается значение."
@@ -1206,9 +1200,6 @@ msgstr "  -p                      Печать URI при соответстви
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p filename.ppd         Задать PPD-файл."
 
-msgid "  -p program              Run specified program for each service."
-msgstr "  -p program              Запустить указанную программу."
-
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 "  -q                      Кратко уведомлять о совпадении через код выхода."
@@ -1242,9 +1233,6 @@ msgstr "  -t key                  \"Истина\" если TXT запись с�
 
 msgid "  -t title                Set title."
 msgstr "  -t title                Задать заголовок."
-
-msgid "  -t type                 Browse/resolve with specified type."
-msgstr "  -t type                 Просмотр/определение по указанному типу."
 
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      Удалить PPD-файл после завершения."
@@ -2184,6 +2172,18 @@ msgstr "2"
 msgid "2 inches/sec."
 msgstr "2 дюйма/с"
 
+msgid "2-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "2-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "2-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "2-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "2-Sided Printing"
 msgstr "двусторонняя печать"
 
@@ -2298,6 +2298,18 @@ msgstr "3 дюйма/с"
 msgid "3 x 5"
 msgstr ""
 
+msgid "3-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "3-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "3-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "3-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "3.00x1.00\""
 msgstr "3,00x1,00\""
 
@@ -2363,6 +2375,18 @@ msgstr "4"
 
 msgid "4 inches/sec."
 msgstr "4 дюйма/с"
+
+msgid "4-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "4-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "4-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "4-Hole Punch (Reverse Portrait)"
+msgstr ""
 
 msgid "4.00x1.00\""
 msgstr "4,00x1,00\""
@@ -2660,6 +2684,9 @@ msgstr "Принять задания"
 msgid "Accepted"
 msgstr "Принято"
 
+msgid "Accordian Fold"
+msgstr ""
+
 msgid "Add Class"
 msgstr "Добавить группу"
 
@@ -2674,6 +2701,12 @@ msgstr "Адрес"
 
 msgid "Administration"
 msgstr "Администрирование"
+
+msgid "Alternate"
+msgstr ""
+
+msgid "Alternate Roll"
+msgstr ""
 
 msgid "Always"
 msgstr "Всегда"
@@ -2699,6 +2732,9 @@ msgstr ""
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "Атрибут группы не в диапазоне (%x < %x)"
+
+msgid "Automatic"
+msgstr ""
 
 msgid "B0"
 msgstr "B0"
@@ -2883,18 +2919,45 @@ msgstr "Неверная строка значений"
 msgid "Bad/empty URI"
 msgstr "Неверный или пустой URI"
 
+msgid "Bale"
+msgstr ""
+
 msgid "Banners"
 msgstr "Баннеры"
 
+msgid "Bind"
+msgstr ""
+
+msgid "Bind (Landscape)"
+msgstr ""
+
+msgid "Bind (Portrait)"
+msgstr ""
+
+msgid "Bind (Reverse Landscape)"
+msgstr ""
+
+msgid "Bind (Reverse Portrait)"
+msgstr ""
+
 msgid "Bond Paper"
 msgstr "Документная бумага"
+
+msgid "Booklet Maker"
+msgstr ""
 
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr "Параметр waiteof \"%s\" должен иметь двоичное значение"
 
+msgid "Bottom"
+msgstr ""
+
 msgid "Buffer overflow detected, aborting."
 msgstr "Обнаружено переполнение буфера, прерывание."
+
+msgid "CD/DVD/Bluray"
+msgstr ""
 
 msgid "CMYK"
 msgstr "CMYK"
@@ -2917,8 +2980,14 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
 
+msgid "Cardstock"
+msgstr ""
+
 msgid "Cassette"
 msgstr "Лоток"
+
+msgid "Center"
+msgstr ""
 
 msgid "Change Settings"
 msgstr "Изменить настройки"
@@ -2935,6 +3004,9 @@ msgstr "Очистить головки принтера"
 
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr "Close-Job не подерживает атрибут job-uri"
+
+msgid "Coat"
+msgstr ""
 
 msgid "Color"
 msgstr "Цвет"
@@ -2972,6 +3044,9 @@ msgstr "Контрольный файл успешно отправлен."
 msgid "Copying print data."
 msgstr "Копирование данных печати."
 
+msgid "Cover"
+msgstr ""
+
 msgid "Created"
 msgstr "Создано"
 
@@ -2986,6 +3061,9 @@ msgstr "CustominTearInterval"
 
 msgid "Cut"
 msgstr "Обрезать"
+
+msgid "Cut Media"
+msgstr ""
 
 msgid "Cutter"
 msgstr "Резак"
@@ -3048,9 +3126,30 @@ msgstr "Каталог \"%s\" доступ OK (0%o/uid=%d/gid=%d)."
 msgid "Disabled"
 msgstr "Отключено"
 
+msgid "Disc"
+msgstr ""
+
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr "Документ #%d не существует в задании #%d."
+
+msgid "Double Gate Fold"
+msgstr ""
+
+msgid "Double Staple (Landscape)"
+msgstr ""
+
+msgid "Double Staple (Portrait)"
+msgstr ""
+
+msgid "Double Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Double Staple (Reverse Portrait)"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
 
 msgid "Duplexer"
 msgstr "Дуплексер"
@@ -3088,6 +3187,9 @@ msgstr ""
 "Введите свое имя пользователя и пароль или данные учетной записи root, чтобы "
 "получить доступ к этой странице. Если используется проверка подлинности "
 "Kerberos, необходимо также иметь действительный билет Kerberos."
+
+msgid "Envelope"
+msgstr ""
 
 msgid "Envelope #10"
 msgstr ""
@@ -3320,6 +3422,9 @@ msgstr ""
 msgid "Fanfold US"
 msgstr ""
 
+msgid "Fast Grayscale"
+msgstr ""
+
 #, c-format
 msgid "File \"%s\" contains a relative path."
 msgstr "Файл \"%s\" содержит относительный путь."
@@ -3355,11 +3460,20 @@ msgstr ""
 msgid "Finished page %d."
 msgstr "Последняя страница %d."
 
+msgid "Finishing"
+msgstr ""
+
+msgid "Fold"
+msgstr ""
+
 msgid "Folio"
 msgstr "Фолио"
 
 msgid "Forbidden"
 msgstr "Запрещено"
+
+msgid "Gate Fold"
+msgstr ""
 
 msgid "General"
 msgstr "Основные"
@@ -3373,6 +3487,9 @@ msgstr "Для Get-Response-PDU длина не установлена"
 msgid "Glossy Paper"
 msgstr "Глянцевая бумага"
 
+msgid "Glossy Photo"
+msgstr ""
+
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "Получен атрибут printer-uri, но не job-id"
 
@@ -3382,6 +3499,15 @@ msgstr "Оттенки серого"
 msgid "HP"
 msgstr "HP"
 
+msgid "Hagaki"
+msgstr ""
+
+msgid "Half Fold"
+msgstr ""
+
+msgid "Half Z Fold"
+msgstr ""
+
 msgid "Hanging Folder"
 msgstr "Папка подвесного хранения"
 
@@ -3390,6 +3516,12 @@ msgstr ""
 
 msgid "Help file not in index."
 msgstr "Файл справки не проиндексирован."
+
+msgid "High"
+msgstr ""
+
+msgid "High-Gloss Photo"
+msgstr ""
 
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr "IPP атрибут 1setOf с недопустимым значением."
@@ -3626,14 +3758,23 @@ msgstr "Подписки на задание не могут быть обнов
 msgid "Jobs"
 msgstr "Задания"
 
+msgid "Jog"
+msgstr ""
+
 msgid "LPD/LPR Host or Printer"
 msgstr "Хост или принтер LPD/LPR"
+
+msgid "Label"
+msgstr ""
 
 msgid "Label Printer"
 msgstr "Принтер для печати этикеток"
 
 msgid "Label Top"
 msgstr "Верхний край этикетки"
+
+msgid "Laminate"
+msgstr ""
 
 #, c-format
 msgid "Language \"%s\" not supported."
@@ -3642,13 +3783,28 @@ msgstr "Язык \"%s\" не поддерживается."
 msgid "Large Address"
 msgstr "Полный адрес"
 
+msgid "Large Capacity"
+msgstr ""
+
 msgid "LaserJet Series PCL 4/5"
 msgstr "Серия LaserJet, PCL 4/5"
+
+msgid "Left"
+msgstr ""
+
+msgid "Left Gate Fold"
+msgstr ""
+
+msgid "Letter Fold"
+msgstr ""
 
 msgid "Letter Oversize"
 msgstr ""
 
 msgid "Letter Oversize Long Edge"
+msgstr ""
+
+msgid "Letterhead"
 msgstr ""
 
 msgid "Light"
@@ -3672,8 +3828,20 @@ msgstr "По длинной стороне (книжная)"
 msgid "Looking for printer..."
 msgstr ""
 
+msgid "Main"
+msgstr ""
+
+msgid "Main Roll"
+msgstr ""
+
+msgid "Manual"
+msgstr ""
+
 msgid "Manual Feed"
 msgstr "Ручная подача"
+
+msgid "Matte Photo"
+msgstr ""
 
 msgid "Media Size"
 msgstr "Размер бумаги"
@@ -3692,6 +3860,9 @@ msgstr "Средний"
 
 msgid "Memory allocation error"
 msgstr "Ошибка выделения памяти"
+
+msgid "Middle"
+msgstr ""
 
 msgid "Missing CloseGroup"
 msgstr "Пропущен CloseGroup"
@@ -3786,6 +3957,9 @@ msgstr "Переместить задание"
 msgid "Moved Permanently"
 msgstr "Перемещено окончательно"
 
+msgid "Multipurpose"
+msgstr ""
+
 msgid "NULL PPD file pointer"
 msgstr "Указатель PPD-файла установлен на NULL"
 
@@ -3803,6 +3977,9 @@ msgstr "Нет"
 
 msgid "No Content"
 msgstr "Нет содержимого"
+
+msgid "No Finishing"
+msgstr ""
 
 msgid "No PPD name"
 msgstr "Нет имени PPD"
@@ -3971,6 +4148,9 @@ msgstr "Доп.устройства"
 msgid "Options:"
 msgstr "Параметры:"
 
+msgid "Other"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr "Устаревший файл кеша PPD"
 
@@ -4031,6 +4211,9 @@ msgstr "Лоток с бумагой пуст."
 msgid "Paper tray is missing."
 msgstr "Лоток с бумагой отсутствует."
 
+msgid "Parallel Fold"
+msgstr ""
+
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
 
@@ -4084,6 +4267,9 @@ msgstr "Открытка двойная Long Edge"
 msgid "Postcard Long Edge"
 msgstr "Открытка Long Edge"
 
+msgid "Poster Fold"
+msgstr ""
+
 msgid "Preparing to print."
 msgstr "Подготовка к печати."
 
@@ -4095,6 +4281,9 @@ msgstr "Задание печати:"
 
 msgid "Print Mode"
 msgstr "Режим печати"
+
+msgid "Print Quality"
+msgstr ""
 
 msgid "Print Rate"
 msgstr "Скорость печати"
@@ -4164,6 +4353,9 @@ msgstr "Принтеры"
 msgid "Printing page %d, %u%% complete."
 msgstr "Печать страницы %d, %u%% завершена."
 
+msgid "Punch"
+msgstr ""
+
 msgid "Quarto"
 msgstr "Кватро"
 
@@ -4173,6 +4365,9 @@ msgstr "Предел квоты достигнут."
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr ""
 "Ранг    Владелец   Задание     Файл(ы)                     Общий размер"
+
+msgid "Rear"
+msgstr ""
 
 msgid "Reject Jobs"
 msgstr "Отклонить задания"
@@ -4206,6 +4401,42 @@ msgstr "Обратный адрес"
 msgid "Rewind"
 msgstr "Вернуться в начало"
 
+msgid "Right"
+msgstr ""
+
+msgid "Right Gate Fold"
+msgstr ""
+
+msgid "Roll 1"
+msgstr ""
+
+msgid "Roll 10"
+msgstr ""
+
+msgid "Roll 2"
+msgstr ""
+
+msgid "Roll 3"
+msgstr ""
+
+msgid "Roll 4"
+msgstr ""
+
+msgid "Roll 5"
+msgstr ""
+
+msgid "Roll 6"
+msgstr ""
+
+msgid "Roll 7"
+msgstr ""
+
+msgid "Roll 8"
+msgstr ""
+
+msgid "Roll 9"
+msgstr ""
+
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr "Запущенная команда: %s %s -N -A %s -c '%s'"
@@ -4216,10 +4447,19 @@ msgstr "Для SEQUENCE длина не установлена"
 msgid "SSL/TLS Negotiation Error"
 msgstr "SSL/TLS Negotiation Error"
 
+msgid "Saddle Stitch"
+msgstr ""
+
+msgid "Satin Photo"
+msgstr ""
+
 msgid "See Other"
 msgstr "Посмотреть другие"
 
 msgid "See remote printer."
+msgstr ""
+
+msgid "Semi-Gloss Photo"
 msgstr ""
 
 msgid "Sending data to printer."
@@ -4264,6 +4504,33 @@ msgstr "Адрес доставки"
 msgid "Short-Edge (Landscape)"
 msgstr "По короткой стороне (альбомная)"
 
+msgid "Side"
+msgstr ""
+
+msgid "Single Punch (Landscape)"
+msgstr ""
+
+msgid "Single Punch (Portrait)"
+msgstr ""
+
+msgid "Single Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "Single Punch (Reverse Portrait)"
+msgstr ""
+
+msgid "Single Staple (Landscape)"
+msgstr ""
+
+msgid "Single Staple (Portrait)"
+msgstr ""
+
+msgid "Single Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Single Staple (Reverse Portrait)"
+msgstr ""
+
 msgid "Special Paper"
 msgstr "Особая бумага"
 
@@ -4273,6 +4540,24 @@ msgstr "Постановка в очередь, %.0f%% завершено."
 
 msgid "Standard"
 msgstr "Стандартный"
+
+msgid "Staple"
+msgstr ""
+
+msgid "Staple Edge"
+msgstr ""
+
+msgid "Staple Edge (Landscape)"
+msgstr ""
+
+msgid "Staple Edge (Portrait)"
+msgstr ""
+
+msgid "Staple Edge (Reverse Landscape)"
+msgstr ""
+
+msgid "Staple Edge (Reverse Portrait)"
+msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
 msgid "Starting Banner"
@@ -4509,6 +4794,9 @@ msgstr "Слишком много значений job-sheets (%d>2)"
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "Слишком много значений printer-state-reasons (%d > %d)"
 
+msgid "Top"
+msgstr ""
+
 msgid "Transparency"
 msgstr "Прозрачность"
 
@@ -4518,14 +4806,74 @@ msgstr "Лоток"
 msgid "Tray 1"
 msgstr "Лоток 1"
 
+msgid "Tray 10"
+msgstr ""
+
+msgid "Tray 11"
+msgstr ""
+
+msgid "Tray 12"
+msgstr ""
+
+msgid "Tray 13"
+msgstr ""
+
+msgid "Tray 14"
+msgstr ""
+
+msgid "Tray 15"
+msgstr ""
+
+msgid "Tray 16"
+msgstr ""
+
+msgid "Tray 17"
+msgstr ""
+
+msgid "Tray 18"
+msgstr ""
+
+msgid "Tray 19"
+msgstr ""
+
 msgid "Tray 2"
 msgstr "Лоток 2"
+
+msgid "Tray 20"
+msgstr ""
 
 msgid "Tray 3"
 msgstr "Лоток 3"
 
 msgid "Tray 4"
 msgstr "Лоток 4"
+
+msgid "Tray 5"
+msgstr ""
+
+msgid "Tray 6"
+msgstr ""
+
+msgid "Tray 7"
+msgstr ""
+
+msgid "Tray 8"
+msgstr ""
+
+msgid "Tray 9"
+msgstr ""
+
+msgid "Triple Staple (Landscape)"
+msgstr ""
+
+msgid "Triple Staple (Portrait)"
+msgstr ""
+
+msgid "Triple Staple (Reverse Landscape)"
+msgstr ""
+
+msgid "Triple Staple (Reverse Portrait)"
+msgstr ""
 
 msgid "URI Too Long"
 msgstr "Слишком длинный адрес URI"
@@ -5021,18 +5369,6 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Usage: ippdiscover [options] -a\n"
-"       ippdiscover [options] \"service name\"\n"
-"\n"
-"Options:"
-msgstr ""
-"Использование:\n"
-"       ippdiscover [options] -a\n"
-"       ippdiscover [options] \"service name\"\n"
-"\n"
-"Параметры:"
-
-msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
 "       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
 "       ippfind --help\n"
@@ -5119,6 +5455,9 @@ msgid ""
 msgstr ""
 "Вы должны получить доступ к этой странице с помощью URL <A HREF=«https://%s:"
 "%d%s»>https://%s:%d%s</A>."
+
+msgid "Z Fold"
+msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Принтер для печати этикеток ZPL"
@@ -6041,6 +6380,18 @@ msgstr "Для variable-bindings длина не установлена"
 #~ "    Комментарий %%EndComments отсутствует.\n"
 #~ "        REF: Стр. 41, %%EndComments"
 
+#~ msgid "  -a                      Browse for all services."
+#~ msgstr "  -a                      Обзор всех сервисов."
+
+#~ msgid "  -d domain               Browse/resolve in specified domain."
+#~ msgstr "  -d domain               Просмотр в заданном домене."
+
+#~ msgid "  -p program              Run specified program for each service."
+#~ msgstr "  -p program              Запустить указанную программу."
+
+#~ msgid "  -t type                 Browse/resolve with specified type."
+#~ msgstr "  -t type                 Просмотр/определение по указанному типу."
+
 #~ msgid "File Folder "
 #~ msgstr "Каталог файла "
 
@@ -6058,6 +6409,18 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "Unable to copy interface script - %s"
 #~ msgstr "Не удается копировать скрипт интерфейса - %s"
+
+#~ msgid ""
+#~ "Usage: ippdiscover [options] -a\n"
+#~ "       ippdiscover [options] \"service name\"\n"
+#~ "\n"
+#~ "Options:"
+#~ msgstr ""
+#~ "Использование:\n"
+#~ "       ippdiscover [options] -a\n"
+#~ "       ippdiscover [options] \"service name\"\n"
+#~ "\n"
+#~ "Параметры:"
 
 #~ msgid "lpadmin: Expected PPD after \"-P\" option."
 #~ msgstr "lpadmin: После параметра '-P' должен быть указан PPD"
