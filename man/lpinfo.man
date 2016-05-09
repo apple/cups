@@ -18,9 +18,6 @@ lpinfo \- show available devices or drivers
 [
 .B \-E
 ] [
-.B \-U
-.I username
-] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
 .B \-l
@@ -49,9 +46,6 @@ lpinfo \- show available devices or drivers
 [
 .B \-E
 ] [
-.B \-U
-.I username
-] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
 .B \-l
@@ -74,9 +68,6 @@ The first form (\fI-m\fR) lists the available drivers, while the second form (\f
 .TP 5
 .B \-E
 Forces encryption when connecting to the server.
-.TP 5
-\fB\-U \fIusername\fR
-Sets the username to use when connecting to the server.
 .TP 5
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 Selects an alternate server.
