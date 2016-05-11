@@ -5,7 +5,7 @@
 	<title>CUPS API	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -518,8 +518,6 @@ attributes.">pwgInitSize</a></li>
 	<li><a href="#cups_dest_cb_t" title="Destination enumeration callback
 ">cups_dest_cb_t</a></li>
 	<li><a href="#cups_dest_t" title="Destination">cups_dest_t</a></li>
-	<li><a href="#cups_device_cb_t" title="Device callback
-">cups_device_cb_t</a></li>
 	<li><a href="#cups_dinfo_t" title="Destination capability and status
 information ">cups_dinfo_t</a></li>
 	<li><a href="#cups_job_t" title="Job">cups_job_t</a></li>
@@ -3335,12 +3333,6 @@ typedef int (*cups_dest_cb_t)(void *user_data, unsigned flags, <a href="#cups_de
 <p class="description">Destination</p>
 <p class="code">
 typedef struct <a href="#cups_dest_s">cups_dest_s</a> cups_dest_t;
-</p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
-<p class="description">Device callback
-</p>
-<p class="code">
-typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
 </p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_dinfo_t">cups_dinfo_t</a></h3>
 <p class="description">Destination capability and status
