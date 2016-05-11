@@ -387,16 +387,14 @@ cupsdCheckJobs(void)
         if (pclass)
 	{
 	 /*
-	  * Add/update a job-actual-printer-uri attribute for this job
+	  * Add/update a job-printer-uri-actual attribute for this job
 	  * so that we know which printer actually printed the job...
 	  */
 
-          if ((attr = ippFindAttribute(job->attrs, "job-actual-printer-uri",
-	                               IPP_TAG_URI)) != NULL)
+          if ((attr = ippFindAttribute(job->attrs, "job-printer-uri-actual", IPP_TAG_URI)) != NULL)
             ippSetString(job->attrs, &attr, 0, printer->uri);
 	  else
-	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI,
-	                 "job-actual-printer-uri", NULL, printer->uri);
+	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri-actual", NULL, printer->uri);
 
           job->dirty = 1;
           cupsdMarkDirty(CUPSD_DIRTY_JOBS);
