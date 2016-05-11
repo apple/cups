@@ -1692,7 +1692,24 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                         "job-hold-until", NULL, val);
   }
-  if (attr && strcmp(attr->values[0].string.text, "no-hold"))
+
+  if (printer->holding_new_jobs)
+  {
+   /*
+    * Hold all new jobs on this printer...
+    */
+
+    if (attr && strcmp(attr->values[0].string.text, "no-hold"))
+      cupsdSetJobHoldUntil(job, ippGetString(attr, 0, NULL), 0);
+    else
+      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+    job->state->values[0].integer = IPP_JOB_HELD;
+    job->state_value              = IPP_JOB_HELD;
+
+    ippSetString(job->attrs, &job->reasons, 0, "job-held-on-create");
+  }
+  else if (attr && strcmp(attr->values[0].string.text, "no-hold"))
   {
    /*
     * Hold job until specified time...
@@ -8667,6 +8684,8 @@ release_held_new_jobs(
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Printer \"%s\" now printing pending/new jobs (\"%s\").",
                     printer->name, get_username(con));
+
+  cupsdCheckJobs();
 
  /*
   * Everything was ok, so return OK status...
