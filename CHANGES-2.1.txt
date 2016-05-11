@@ -3,6 +3,8 @@ CHANGES-2.1.txt
 
 CHANGES IN CUPS V2.1.4
 
+	- The scheduler did not implement the Hold-New-Jobs opertion correctly
+	  (Issue #4767)
 	- The ipptool program truncated values at 8k (Issue #4786)
 	- The ipptool program did not correctly report uriScheme values in plist
 	  output (Issue #4785)
