@@ -28,5 +28,5 @@ CHANGES IN CUPS V2.2b1
 	- Added a new cupsHashData API and support for hashed job passwords
 	  (<rdar://problem/20221502>)
 	- Localization fixes (<rdar://problem/25292403>,
-	  <rdar://problem/25461517>, Issue #4796)
+	  <rdar://problem/25461517>, Issue #4041, Issue #4796)
 	- Documentation changes (Issue #4624, Issue #4781)
