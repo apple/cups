@@ -546,6 +546,13 @@
 
 
 /*
+ * Do we have the getgrouplist() function?
+ */
+
+#define HAVE_GETGROUPLIST 1
+ 
+
+/*
  * Do we have OS X 10.4's mbr_XXX functions?
  */
 

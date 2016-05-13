@@ -199,6 +199,9 @@ AC_CHECK_FUNCS(waitpid wait3)
 dnl Check for posix_spawn
 AC_CHECK_FUNCS(posix_spawn)
 
+dnl Check for getgrouplist
+AC_CHECK_FUNCS(getgrouplist)
+
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
 AC_TRY_COMPILE([#include <time.h>],[struct tm t;

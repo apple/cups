@@ -5307,6 +5307,18 @@ fi
 done
 
 
+for ac_func in getgrouplist
+do :
+  ac_fn_c_check_func "$LINENO" "getgrouplist" "ac_cv_func_getgrouplist"
+if test "x$ac_cv_func_getgrouplist" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GETGROUPLIST 1
+_ACEOF
+
+fi
+done
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tm_gmtoff member in tm structure" >&5
 $as_echo_n "checking for tm_gmtoff member in tm structure... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext

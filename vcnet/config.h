@@ -586,6 +586,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have the getgrouplist() function?
+ */
+
+#undef HAVE_GETGROUPLIST
+
+
+/*
  * Do we have OS X 10.4's mbr_XXX functions?
  */
 

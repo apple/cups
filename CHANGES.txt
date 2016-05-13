@@ -1,8 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-05-11
+CHANGES.txt - 2.2b1 - 2016-05-13
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
+	- The scheduler now uses the getgrouplist function when available
+	  (Issue #4611)
 	- The IPP backend no longer enables compression by default except for
 	  certain raster formats that generally benefit from it
 	  (<rdar://problem/25166952>)
