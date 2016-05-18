@@ -629,8 +629,15 @@ httpCredentialsGetTrust(
       * credentials and allow if the new ones have a later expiration...
       */
 
-      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
-          !httpCredentialsAreValidForName(credentials, common_name))
+      if (!cg->trust_first)
+      {
+       /*
+        * Do not trust certificates on first use...
+	*/
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) || !httpCredentialsAreValidForName(credentials, common_name))
       {
        /*
         * Either the new credentials are not newly issued, or the common name
@@ -659,6 +666,8 @@ httpCredentialsGetTrust(
   if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
     trust = HTTP_TRUST_EXPIRED;
   else if (!cg->any_root && cupsArrayCount(credentials) == 1)
+    trust = HTTP_TRUST_INVALID;
+  else if (!cg->trust_first)
     trust = HTTP_TRUST_INVALID;
 
   CFRelease(secCert);

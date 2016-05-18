@@ -1,7 +1,7 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -30,6 +30,7 @@ static int		tls_auto_create = 0;
 					/* Auto-create self-signed certs? */
 static char		*tls_common_name = NULL;
 					/* Default common name */
+static gnutls_x509_crl_t tls_crl = NULL;/* Certificate revocation list */
 static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
@@ -43,6 +44,7 @@ static int		tls_options = -1;/* Options for TLS connections */
 
 static gnutls_x509_crt_t http_gnutls_create_credential(http_credential_t *credential);
 static const char	*http_gnutls_default_path(char *buffer, size_t bufsize);
+static void		http_gnutls_load_crl(void);
 static const char	*http_gnutls_make_path(char *buffer, size_t bufsize, const char *dirname, const char *filename, const char *ext);
 static ssize_t		http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
 static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
@@ -373,6 +375,39 @@ httpCredentialsAreValidForName(
   if (cert)
   {
     result = gnutls_x509_crt_check_hostname(cert, common_name) != 0;
+
+    if (result)
+    {
+      int		i,		/* Looping var */
+			count;		/* Number of revoked certificates */
+      unsigned char	cserial[1024],	/* Certificate serial number */
+			rserial[1024];	/* Revoked serial number */
+      size_t		cserial_size,	/* Size of cert serial number */
+			rserial_size;	/* Size of revoked serial number */
+
+      _cupsMutexLock(&tls_mutex);
+
+      count = gnutls_x509_crl_get_crt_count(tls_crl);
+
+      if (count > 0)
+      {
+        cserial_size = sizeof(cserial);
+        gnutls_x509_crt_get_serial(cert, cserial, &cserial_size);
+
+        for (i = 0; i < count; i ++)
+	{
+	  rserial_size = sizeof(rserial);
+          if (!gnutls_x509_crl_get_crt_serial(tls_crl, i, rserial, sizeof(rserial)) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+	  {
+	    result = 0;
+	    break;
+	  }
+	}
+      }
+
+      _cupsMutexUnlock(&tls_mutex);
+    }
+
     gnutls_x509_crt_deinit(cert);
   }
 
@@ -406,7 +441,10 @@ httpCredentialsGetTrust(
     return (HTTP_TRUST_UNKNOWN);
 
   if (cg->any_root < 0)
+  {
     _cupsSetDefaults();
+    http_gnutls_load_crl();
+  }
 
  /*
   * Look this common name up in the default keychains...
@@ -429,8 +467,15 @@ httpCredentialsGetTrust(
       * credentials and allow if the new ones have a later expiration...
       */
 
-      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
-          !httpCredentialsAreValidForName(credentials, common_name))
+      if (!cg->trust_first)
+      {
+       /*
+        * Do not trust certificates on first use...
+	*/
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) || !httpCredentialsAreValidForName(credentials, common_name))
       {
        /*
         * Either the new credentials are not newly issued, or the common name
@@ -819,6 +864,105 @@ http_gnutls_default_path(char   *buffer,/* I - Path buffer */
   DEBUG_printf(("1http_gnutls_default_path: Using default path \"%s\".", buffer));
 
   return (buffer);
+}
+
+
+/*
+ * 'http_gnutls_load_crl()' - Load the certificate revocation list, if any.
+ */
+
+static void
+http_gnutls_load_crl(void)
+{
+  _cupsMutexLock(&tls_mutex);
+
+  if (!gnutls_x509_crl_init(&tls_crl))
+  {
+    cups_file_t		*fp;		/* CRL file */
+    char		filename[1024],	/* site.crl */
+			line[256];	/* Base64-encoded line */
+    unsigned char	*data = NULL;	/* Buffer for cert data */
+    size_t		alloc_data = 0,	/* Bytes allocated */
+			num_data = 0;	/* Bytes used */
+    int			decoded;	/* Bytes decoded */
+    gnutls_datum_t	datum;		/* Data record */
+
+
+    http_gnutls_make_path(filename, sizeof(filename), CUPS_SERVERROOT, "site", "crl");
+
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    {
+      while (cupsFileGets(fp, line, sizeof(line)))
+      {
+	if (!strcmp(line, "-----BEGIN X509 CRL-----"))
+	{
+	  if (num_data)
+	  {
+	   /*
+	    * Missing END X509 CRL...
+	    */
+
+	    break;
+	  }
+	}
+	else if (!strcmp(line, "-----END X509 CRL-----"))
+	{
+	  if (!num_data)
+	  {
+	   /*
+	    * Missing data...
+	    */
+
+	    break;
+	  }
+
+          datum.data = data;
+	  datum.size = num_data;
+
+	  gnutls_x509_crl_import(tls_crl, &datum, GNUTLS_X509_FORMAT_PEM);
+
+	  num_data = 0;
+	}
+	else
+	{
+	  if (alloc_data == 0)
+	  {
+	    data       = malloc(2048);
+	    alloc_data = 2048;
+
+	    if (!data)
+	      break;
+	  }
+	  else if ((num_data + strlen(line)) >= alloc_data)
+	  {
+	    unsigned char *tdata = realloc(data, alloc_data + 1024);
+					    /* Expanded buffer */
+
+	    if (!tdata)
+	    {
+	      httpFreeCredentials(*credentials);
+	      *credentials = NULL;
+	      break;
+	    }
+
+	    data       = tdata;
+	    alloc_data += 1024;
+	  }
+
+	  decoded = alloc_data - num_data;
+	  httpDecode64_2((char *)data + num_data, &decoded, line);
+	  num_data += (size_t)decoded;
+	}
+      }
+
+      cupsFileClose(fp);
+
+      if (data)
+	free(data);
+    }
+  }
+
+  _cupsMutexUnlock(&tls_mutex);
 }
 
 
