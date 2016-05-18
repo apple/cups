@@ -397,7 +397,7 @@ httpCredentialsAreValidForName(
         for (i = 0; i < count; i ++)
 	{
 	  rserial_size = sizeof(rserial);
-          if (!gnutls_x509_crl_get_crt_serial(tls_crl, i, rserial, sizeof(rserial)) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+          if (!gnutls_x509_crl_get_crt_serial(tls_crl, i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
 	  {
 	    result = 0;
 	    break;
@@ -919,7 +919,7 @@ http_gnutls_load_crl(void)
           datum.data = data;
 	  datum.size = num_data;
 
-	  gnutls_x509_crl_import(tls_crl, &datum, GNUTLS_X509_FORMAT_PEM);
+	  gnutls_x509_crl_import(tls_crl, &datum, GNUTLS_X509_FMT_PEM);
 
 	  num_data = 0;
 	}
@@ -939,11 +939,7 @@ http_gnutls_load_crl(void)
 					    /* Expanded buffer */
 
 	    if (!tdata)
-	    {
-	      httpFreeCredentials(*credentials);
-	      *credentials = NULL;
 	      break;
-	    }
 
 	    data       = tdata;
 	    alloc_data += 1024;
