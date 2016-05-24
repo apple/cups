@@ -132,9 +132,12 @@ httpAddrConnect2(
       {
        /*
 	* Don't abort yet, as this could just be an issue with the local
-	* system not being configured with IPv4/IPv6/domain socket enabled...
+	* system not being configured with IPv4/IPv6/domain socket enabled.
+	*
+	* Just skip this address...
 	*/
 
+        addrlist = addrlist->next;
 	continue;
       }
 
@@ -213,6 +216,7 @@ httpAddrConnect2(
       {
 	DEBUG_printf(("1httpAddrConnect2: Unable to connect to %s:%d: %s", httpAddrString(&(addrlist->addr), temp, sizeof(temp)), httpAddrPort(&(addrlist->addr)), strerror(errno)));
 	httpAddrClose(NULL, fds[nfds]);
+	addrlist = addrlist->next;
 	continue;
       }
 
