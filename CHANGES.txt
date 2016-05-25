@@ -1,8 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-05-18
+CHANGES.txt - 2.2b1 - 2016-05-25
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
+	- Improved performance of web interface with large numbers of jobs
+	  (Issue #3819)
 	- Encrypted printing can now be limited to only trusted printers and
 	  servers (<rdar://problem/25711658>)
 	- The scheduler now advertises PWG Raster attributes for IPP Everywhere

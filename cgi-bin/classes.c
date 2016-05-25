@@ -1,7 +1,7 @@
 /*
  * Class status CGI for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -297,8 +297,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 			*response;	/* IPP response */
   cups_array_t		*classes;	/* Array of class objects */
   ipp_attribute_t	*pclass;	/* Class object */
-  int			ascending,	/* Order of classes (0 = descending) */
-			first,		/* First class to show */
+  int			first,		/* First class to show */
 			count;		/* Number of classes */
   const char		*var;		/* Form variable */
   void			*search;	/* Search data */
@@ -370,25 +369,10 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     sprintf(val, "%d", count);
     cgiSetVariable("TOTAL", val);
 
-    if ((var = cgiGetVariable("ORDER")) != NULL && *var)
-      ascending = !_cups_strcasecmp(var, "asc");
-    else
-      ascending = 1;
-
-    if (ascending)
-    {
-      for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, first);
-	   i < CUPS_PAGE_MAX && pclass;
-	   i ++, pclass = (ipp_attribute_t *)cupsArrayNext(classes))
-        cgiSetIPPObjectVars(pclass, NULL, i);
-    }
-    else
-    {
-      for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, count - first - 1);
-	   i < CUPS_PAGE_MAX && pclass;
-	   i ++, pclass = (ipp_attribute_t *)cupsArrayPrev(classes))
-        cgiSetIPPObjectVars(pclass, NULL, i);
-    }
+    for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, first);
+	 i < CUPS_PAGE_MAX && pclass;
+	 i ++, pclass = (ipp_attribute_t *)cupsArrayNext(classes))
+      cgiSetIPPObjectVars(pclass, NULL, i);
 
    /*
     * Save navigation URLs...
@@ -406,6 +390,12 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     {
       sprintf(val, "%d", first + CUPS_PAGE_MAX);
       cgiSetVariable("NEXT", val);
+    }
+
+    if (count > CUPS_PAGE_MAX)
+    {
+      snprintf(val, sizeof(val), "%d", CUPS_PAGE_MAX * (count / CUPS_PAGE_MAX));
+      cgiSetVariable("LAST", val);
     }
 
    /*

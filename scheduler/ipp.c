@@ -6416,10 +6416,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   ipp_jstate_t	job_state;		/* job-state value */
   int		first_job_id = 1,	/* First job ID */
 		first_index = 1,	/* First index */
-		current_index = 0;	/* Current index */
-  int		limit = 0;		/* Maximum number of jobs to return */
-  int		count;			/* Number of jobs that match */
-  int		need_load_job = 0;	/* Do we need to load the job? */
+		limit = 0,		/* Maximum number of jobs to return */
+		count,			/* Number of jobs that match */
+		need_load_job = 0;	/* Do we need to load the job? */
   const char	*job_attr;		/* Job attribute requested */
   ipp_attribute_t *job_ids;		/* job-ids attribute */
   cupsd_job_t	*job;			/* Current job pointer */
@@ -6727,9 +6726,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   }
   else
   {
-    for (count = 0, job = (cupsd_job_t *)cupsArrayFirst(list);
-	 (limit <= 0 || count < limit) && job;
-	 job = (cupsd_job_t *)cupsArrayNext(list))
+    if (first_index > 1)
+      job = (cupsd_job_t *)cupsArrayIndex(list, first_index - 1);
+    else
+      job = (cupsd_job_t *)cupsArrayFirst(list);
+
+    for (count = 0; (limit <= 0 || count < limit) && job; job = (cupsd_job_t *)cupsArrayNext(list))
     {
      /*
       * Filter out jobs that don't match...
@@ -6760,10 +6762,6 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
       if (job->id < first_job_id)
 	continue;
-
-      current_index ++;
-      if (current_index < first_index)
-        continue;
 
       if (need_load_job && !job->attrs)
       {
