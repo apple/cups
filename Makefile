@@ -271,12 +271,6 @@ apihelp:
 		(cd $$dir; $(MAKE) $(MFLAGS) apihelp) || exit 1;\
 	done
 
-framedhelp:
-	for dir in cups filter; do\
-		echo Generating framed API help in $$dir... ;\
-		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
-	done
-
 
 #
 # Create an Xcode docset using Mini-XML's mxmldoc (http://www.msweet.org/)...

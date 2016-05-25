@@ -209,38 +209,6 @@ apihelp:
 		--intro spec-ppd.shtml \
 		>../doc/help/spec-ppd.html
 
-framedhelp:
-	echo Generating CUPS API help files...
-	mxmldoc --section "Programming" --title "Raster API" \
-		--framed ../cups/api-raster \
-		--css ../doc/cups-printable.css \
-		--header api-raster.header --intro api-raster.shtml \
-		../cups/raster.h interpret.c raster.c
-	mxmldoc --section "Programming" \
-		--title "Developing PostScript Printer Drivers" \
-		--framed ../cups/postscript-driver \
-		--css ../doc/cups-printable.css \
-		--header postscript-driver.header \
-		--intro postscript-driver.shtml
-	mxmldoc --section "Programming" \
-		--title "Introduction to the PPD Compiler" \
-		--framed ../cups/ppd-compiler \
-		--css ../doc/cups-printable.css \
-		--header ppd-compiler.header \
-		--intro ppd-compiler.shtml
-	mxmldoc --section "Programming" \
-		--title "Developing Raster Printer Drivers" \
-		--framed ../cups/raster-driver \
-		--css ../doc/cups-printable.css \
-		--header raster-driver.header \
-		--intro raster-driver.shtml
-	mxmldoc --section "Specifications" \
-		--title "CUPS PPD Extensions" \
-		--framed ../cups/spec-ppd \
-		--css ../doc/cups-printable.css \
-		--header spec-ppd.header \
-		--intro spec-ppd.shtml \
-
 
 #
 # commandtops

@@ -44,6 +44,7 @@ HELPIMAGES	=	\
 			images/smiley.jpg
 HELPFILES	=	\
 			help/accounting.html \
+			help/api-admin.html \
 			help/api-array.html \
 			help/api-cups.html \
 			help/api-filedir.html \
