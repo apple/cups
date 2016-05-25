@@ -1,7 +1,7 @@
 /*
  * "lpr" command for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -30,7 +30,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		job_id;			/* Job ID */
   char		ch;			/* Option character */
   char		*printer,		/* Destination printer or class */
-		*instance;		/* Instance */
+		*instance,		/* Instance */
+		*opt;			/* Option pointer */
   const char	*title,			/* Job title */
 		*val;			/* Environment variable name */
   int		num_copies;		/* Number of copies per file */
@@ -54,229 +55,235 @@ main(int  argc,				/* I - Number of command-line arguments */
   title       = NULL;
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '-')
     {
-      switch (ch = argv[i][1])
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
+	switch (ch = *opt)
+	{
+	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
-	                    argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
-	    break;
+	      break;
 
-        case 'U' : /* Username */
-	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'U' : /* Username */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected username after "
-				  "\"-U\" option."), argv[0]);
-	        return (1);
+		cupsSetUser(opt + 1);
+		opt += strlen(opt) - 1;
 	      }
-
-              cupsSetUser(argv[i]);
-	    }
-	    break;
-
-        case 'H' : /* Connect to host */
-	    if (argv[i][2] != '\0')
-              cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected hostname after "
-			          "\"-H\" option."), argv[0]);
-		return (1);
-              }
 	      else
-                cupsSetServer(argv[i]);
-	    }
-	    break;
-
-	case '1' : /* TROFF font set 1 */
-	case '2' : /* TROFF font set 2 */
-	case '3' : /* TROFF font set 3 */
-	case '4' : /* TROFF font set 4 */
-	case 'i' : /* indent */
-	case 'w' : /* width */
-	    if (argv[i][2] == '\0')
-	    {
-	      i ++;
-
-	      if (i >= argc)
 	      {
-		_cupsLangPrintf(stderr,
-		                _("%s: Error - expected value after \"-%c\" "
-				  "option."), argv[0], ch);
-		return (1);
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
+		  return (1);
+		}
+
+		cupsSetUser(argv[i]);
 	      }
-	    }
+	      break;
 
-        case 'c' : /* CIFPLOT */
-	case 'd' : /* DVI */
-	case 'f' : /* FORTRAN */
-	case 'g' : /* plot */
-	case 'n' : /* Ditroff */
-	case 't' : /* Troff */
-	case 'v' : /* Raster image */
-	    _cupsLangPrintf(stderr,
-	                    _("%s: Warning - \"%c\" format modifier not "
-			      "supported - output may not be correct."),
-			    argv[0], ch);
-	    break;
-
-	case 'o' : /* Option */
-	    if (argv[i][2] != '\0')
-	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'H' : /* Connect to host */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected option=value after "
-			          "\"-o\" option."), argv[0]);
-		return (1);
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
 	      }
-
-	      num_options = cupsParseOptions(argv[i], num_options, &options);
-	    }
-	    break;
-
-	case 'l' : /* Literal/raw */
-            num_options = cupsAddOption("raw", "true", num_options, &options);
-	    break;
-
-	case 'p' : /* Prettyprint */
-            num_options = cupsAddOption("prettyprint", "true", num_options,
-	                                &options);
-	    break;
-
-	case 'h' : /* Suppress burst page */
-            num_options = cupsAddOption("job-sheets", "none", num_options,
-	                                &options);
-	    break;
-
-	case 's' : /* Don't use symlinks */
-	    break;
-
-	case 'm' : /* Mail on completion */
-	    {
-	      char	email[1024];	/* EMail address */
-
-
-	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
-	               httpGetHostname(NULL, buffer, sizeof(buffer)));
-	      num_options = cupsAddOption("notify-recipient-uri", email,
-	                                  num_options, &options);
-	    }
-	    break;
-
-	case 'q' : /* Queue file but don't print */
-            num_options = cupsAddOption("job-hold-until", "indefinite",
-	                                num_options, &options);
-	    break;
-
-	case 'r' : /* Remove file after printing */
-	    deletefile = 1;
-	    break;
-
-        case 'P' : /* Destination printer or class */
-	    if (argv[i][2] != '\0')
-	      printer = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	      else
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected destination after "
-			          "\"-P\" option."), argv[0]);
-		return (1);
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-H\" option."), argv[0]);
+		  return (1);
+		}
+		else
+		  cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  case '1' : /* TROFF font set 1 */
+	  case '2' : /* TROFF font set 2 */
+	  case '3' : /* TROFF font set 3 */
+	  case '4' : /* TROFF font set 4 */
+	  case 'i' : /* indent */
+	  case 'w' : /* width */
+	      if (opt[1] != '\0')
+	      {
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr,
+				  _("%s: Error - expected value after \"-%c\" "
+				    "option."), argv[0], ch);
+		  return (1);
+		}
 	      }
 
-	      printer = argv[i];
-	    }
+	  case 'c' : /* CIFPLOT */
+	  case 'd' : /* DVI */
+	  case 'f' : /* FORTRAN */
+	  case 'g' : /* plot */
+	  case 'n' : /* Ditroff */
+	  case 't' : /* Troff */
+	  case 'v' : /* Raster image */
+	      _cupsLangPrintf(stderr, _("%s: Warning - \"%c\" format modifier not supported - output may not be correct."), argv[0], ch);
+	      break;
 
-            if ((instance = strrchr(printer, '/')) != NULL)
-	      *instance++ = '\0';
+	  case 'o' : /* Option */
+	      if (opt[1] != '\0')
+	      {
+		num_options = cupsParseOptions(opt + 1, num_options, &options);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected option=value after \"-o\" option."), argv[0]);
+		  return (1);
+		}
 
-            if ((dest = cupsGetNamedDest(NULL, printer, instance)) != NULL)
-	    {
-	      for (j = 0; j < dest->num_options; j ++)
-	        if (cupsGetOption(dest->options[j].name, num_options,
-		                  options) == NULL)
-	          num_options = cupsAddOption(dest->options[j].name,
-		                              dest->options[j].value,
-					      num_options, &options);
-	    }
-	    else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
-		     cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
-	    {
-	      _cupsLangPrintf(stderr,
-			      _("%s: Error - add '/version=1.1' to server "
-				"name."), argv[0]);
+		num_options = cupsParseOptions(argv[i], num_options, &options);
+	      }
+	      break;
+
+	  case 'l' : /* Literal/raw */
+	      num_options = cupsAddOption("raw", "true", num_options, &options);
+	      break;
+
+	  case 'p' : /* Prettyprint */
+	      num_options = cupsAddOption("prettyprint", "true", num_options, &options);
+	      break;
+
+	  case 'h' : /* Suppress burst page */
+	      num_options = cupsAddOption("job-sheets", "none", num_options, &options);
+	      break;
+
+	  case 's' : /* Don't use symlinks */
+	      break;
+
+	  case 'm' : /* Mail on completion */
+	      {
+		char	email[1024];	/* EMail address */
+
+		snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(), httpGetHostname(NULL, buffer, sizeof(buffer)));
+		num_options = cupsAddOption("notify-recipient-uri", email, num_options, &options);
+	      }
+	      break;
+
+	  case 'q' : /* Queue file but don't print */
+	      num_options = cupsAddOption("job-hold-until", "indefinite", num_options, &options);
+	      break;
+
+	  case 'r' : /* Remove file after printing */
+	      deletefile = 1;
+	      break;
+
+	  case 'P' : /* Destination printer or class */
+	      if (opt[1] != '\0')
+	      {
+		printer = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected destination after \"-P\" option."), argv[0]);
+		  return (1);
+		}
+
+		printer = argv[i];
+	      }
+
+	      if ((instance = strrchr(printer, '/')) != NULL)
+		*instance++ = '\0';
+
+	      if ((dest = cupsGetNamedDest(NULL, printer, instance)) != NULL)
+	      {
+		for (j = 0; j < dest->num_options; j ++)
+		  if (cupsGetOption(dest->options[j].name, num_options,
+				    options) == NULL)
+		    num_options = cupsAddOption(dest->options[j].name,
+						dest->options[j].value,
+						num_options, &options);
+	      }
+	      else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+		       cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - add '/version=1.1' to server name."), argv[0]);
+		return (1);
+	      }
+	      break;
+
+	  case '#' : /* Number of copies */
+	      if (opt[1] != '\0')
+	      {
+		num_copies = atoi(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected copies after \"-#\" option."), argv[0]);
+		  return (1);
+		}
+
+		num_copies = atoi(argv[i]);
+	      }
+
+	      if (num_copies < 1)
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - copies must be 1 or more."), argv[0]);
+		return (1);
+	      }
+
+	      sprintf(buffer, "%d", num_copies);
+	      num_options = cupsAddOption("copies", buffer, num_options, &options);
+	      break;
+
+	  case 'C' : /* Class */
+	  case 'J' : /* Job name */
+	  case 'T' : /* Title */
+	      if (opt[1] != '\0')
+	      {
+		title = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected name after \"-%c\" option."), argv[0], ch);
+		  return (1);
+		}
+
+		title = argv[i];
+	      }
+	      break;
+
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), argv[0], *opt);
 	      return (1);
-	    }
-	    break;
-
-	case '#' : /* Number of copies */
-	    if (argv[i][2] != '\0')
-	      num_copies = atoi(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected copies after "
-			          "\"-#\" option."), argv[0]);
-		return (1);
-	      }
-
-	      num_copies = atoi(argv[i]);
-	    }
-
-            sprintf(buffer, "%d", num_copies);
-            num_options = cupsAddOption("copies", buffer, num_options, &options);
-	    break;
-
-	case 'C' : /* Class */
-	case 'J' : /* Job name */
-	case 'T' : /* Title */
-	    if (argv[i][2] != '\0')
-	      title = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	      {
-		_cupsLangPrintf(stderr,
-		                _("%s: Error - expected name after \"-%c\" "
-				  "option."), argv[0], ch);
-		return (1);
-	      }
-
-	      title = argv[i];
-	    }
-	    break;
-
-	default :
-	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \"%c\"."), argv[0],
-			    argv[i][1]);
-	    return (1);
+	}
       }
     }
     else if (num_files < 1000)
@@ -305,9 +312,11 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
     }
     else
-      _cupsLangPrintf(stderr,
-                      _("%s: Error - too many files - \"%s\"."), argv[0],
-		      argv[i]);
+    {
+      _cupsLangPrintf(stderr, _("%s: Error - too many files - \"%s\"."), argv[0], argv[i]);
+    }
+  }
+
  /*
   * See if we have any files to print; if not, print from stdin...
   */

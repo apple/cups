@@ -2,7 +2,7 @@
  * "cupsaccept", "cupsdisable", "cupsenable", and "cupsreject" commands for
  * CUPS.
  *
- * Copyright 2007-2010 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -29,6 +29,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   char		*command,		/* Command to do */
+		*opt,			/* Option pointer */
 		uri[1024],		/* Printer URI */
 		*reason;		/* Reason for reject/disable */
   ipp_t		*request;		/* IPP request */
@@ -70,94 +71,90 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
+  {
+    if (!strcmp(argv[i], "--hold"))
+      op = IPP_HOLD_NEW_JOBS;
+    else if (!strcmp(argv[i], "--release"))
+      op = IPP_RELEASE_HELD_NEW_JOBS;
+    else if (argv[i][0] == '-')
     {
-      switch (argv[i][1])
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
-#ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-#else
-            _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support."), command);
-#endif /* HAVE_SSL */
-	    break;
+	switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
+  #ifdef HAVE_SSL
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+  #else
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), command);
+  #endif /* HAVE_SSL */
+	      break;
 
-        case 'U' : /* Username */
-	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'U' : /* Username */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected username after "
-				  "\"-U\" option."), command);
-	        return (1);
+		cupsSetUser(opt + 1);
+		opt += strlen(opt) - 1;
 	      }
-
-              cupsSetUser(argv[i]);
-	    }
-	    break;
-	    
-        case 'c' : /* Cancel jobs */
-	    cancel = 1;
-	    break;
-
-        case 'h' : /* Connect to host */
-	    if (argv[i][2] != '\0')
-	      cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	      else
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected hostname after "
-				  "\"-h\" option."), command);
-	        return (1);
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), command);
+		  return (1);
+		}
+
+		cupsSetUser(argv[i]);
 	      }
+	      break;
+	      
+	  case 'c' : /* Cancel jobs */
+	      cancel = 1;
+	      break;
 
-              cupsSetServer(argv[i]);
-	    }
-	    break;
-
-        case 'r' : /* Reason for cancellation */
-	    if (argv[i][2] != '\0')
-	      reason = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'h' : /* Connect to host */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected reason text after "
-				  "\"-r\" option."), command);
-		return (1);
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
 	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-h\" option."), command);
+		  return (1);
+		}
 
-	      reason = argv[i];
-	    }
-	    break;
+		cupsSetServer(argv[i]);
+	      }
+	      break;
 
-        case '-' :
-	    if (!strcmp(argv[i], "--hold"))
-	      op = IPP_HOLD_NEW_JOBS;
-	    else if (!strcmp(argv[i], "--release"))
-	      op = IPP_RELEASE_HELD_NEW_JOBS;
-	    else
-	    {
-	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%s\"."),
-			      command, argv[i]);
+	  case 'r' : /* Reason for cancellation */
+	      if (opt[1] != '\0')
+	      {
+		reason = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected reason text after \"-r\" option."), command);
+		  return (1);
+		}
+
+		reason = argv[i];
+	      }
+	      break;
+
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), command, *opt);
 	      return (1);
-	    }
-	    break;
-
-	default :
-	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."),
-	                    command, argv[i][1]);
-	    return (1);
+	}
       }
     }
     else
@@ -223,6 +220,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
       }
     }
+  }
 
   return (0);
 }
