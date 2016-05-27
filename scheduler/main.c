@@ -71,10 +71,10 @@ static void		sigchld_handler(int sig);
 static void		sighup_handler(int sig);
 static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
 static void		service_checkin(void);
 static void		service_checkout(void);
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 static void		usage(int status) __attribute__((noreturn));
 
 
@@ -131,10 +131,10 @@ main(int  argc,				/* I - Number of command-line args */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
   int			service_idle_exit;
 					/* Idle exit on select timeout? */
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
 
 #ifdef HAVE_GETEUID
@@ -243,7 +243,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'l' : /* Started by launchd/systemd... */
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
 	      OnDemand   = 1;
 	      fg         = 1;
 	      close_all  = 0;
@@ -254,7 +254,7 @@ main(int  argc,				/* I - Number of command-line args */
               fg         = 0;
 	      disconnect = 1;
 	      close_all  = 1;
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 	      break;
 
           case 'p' : /* Stop immediately for profiling */
@@ -584,7 +584,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdCleanFiles(CacheDir, "*.ipp");
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
   if (OnDemand)
   {
    /*
@@ -595,7 +595,7 @@ main(int  argc,				/* I - Number of command-line args */
     service_checkin();
     service_checkout();
   }
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
  /*
   * Startup the server...
@@ -682,11 +682,11 @@ main(int  argc,				/* I - Number of command-line args */
   * Send server-started event...
   */
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
   if (OnDemand)
     cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started on demand.");
   else
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
   if (fg)
     cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in foreground.");
   else
@@ -809,7 +809,7 @@ main(int  argc,				/* I - Number of command-line args */
     if ((timeout = select_timeout(fds)) > 1 && LastEvent)
       timeout = 1;
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
    /*
     * If no other work is scheduled and we're being controlled by
     * launchd then timeout after 'LaunchdTimeout' seconds of
@@ -828,7 +828,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
       service_idle_exit = 0;
-#endif	/* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif	/* HAVE_ONDEMAND */
 
     if ((fds = cupsdDoSelect(timeout)) < 0)
     {
@@ -925,7 +925,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
 #endif /* !__APPLE__ */
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
    /*
     * If no other work was scheduled and we're being controlled by launchd
     * then timeout after 'LaunchdTimeout' seconds of inactivity...
@@ -939,7 +939,7 @@ main(int  argc,				/* I - Number of command-line args */
       stop_scheduler = 1;
       break;
     }
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
    /*
     * Resume listening for new connections as needed...
@@ -1143,14 +1143,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdStopServer();
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
  /*
   * Update the keep-alive file as needed...
   */
 
   if (OnDemand)
     service_checkout();
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
  /*
   * Stop all jobs...
@@ -1822,7 +1822,7 @@ sigterm_handler(int sig)		/* I - Signal number */
 }
 
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
 /*
  * 'service_checkin()' - Check-in with launchd and collect the listening fds.
  */
@@ -2174,7 +2174,7 @@ service_checkout(void)
     unlink(CUPS_KEEPALIVE);
   }
 }
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
 
 /*

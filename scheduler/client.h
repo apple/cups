@@ -79,9 +79,9 @@ typedef struct
   int			fd;		/* File descriptor for this server */
   http_addr_t		address;	/* Bind address of socket */
   http_encryption_t	encryption;	/* To encrypt or not to encrypt... */
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
   int			on_demand;	/* Is this a socket from launchd/systemd? */
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 } cupsd_listener_t;
 
 

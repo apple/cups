@@ -41,9 +41,9 @@ cupsdDeleteAllListeners(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
     if (!lis->on_demand)
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
     {
       cupsArrayRemove(Listeners, lis);
       free(lis);
@@ -281,7 +281,7 @@ cupsdStopListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
     if (!lis->on_demand && lis->fd != -1)
     {
       httpAddrClose(&(lis->address), lis->fd);
@@ -294,6 +294,6 @@ cupsdStopListening(void)
       httpAddrClose(&(lis->address), lis->fd);
       lis->fd = -1;
     }
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
   }
 }
