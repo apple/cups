@@ -5,7 +5,7 @@
 	<title>PPD API (DEPRECATED)	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,8 +353,6 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-ppd.header 7616 2008-05-28 00:34:13Z mike $"
-
   PPD API header for CUPS.
 
   Copyright 2008-2012 by Apple Inc.
@@ -401,9 +399,13 @@ div.contents ul.subcontents li {
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 	<li><a href="#cupsGetConflicts" title="Get a list of conflicting options in a marked PPD.">cupsGetConflicts</a></li>
+	<li><a href="#cupsGetPPD" title="Get the PPD file for a printer on the default server.">cupsGetPPD</a></li>
+	<li><a href="#cupsGetPPD2" title="Get the PPD file for a printer from the specified server.">cupsGetPPD2</a></li>
+	<li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
+server if it has changed.">cupsGetPPD3</a></li>
+	<li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
 	<li><a href="#cupsMarkOptions" title="Mark command-line options in a PPD file.">cupsMarkOptions</a></li>
 	<li><a href="#cupsResolveConflicts" title="Resolve conflicts in a marked PPD.">cupsResolveConflicts</a></li>
-	<li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
 	<li><a href="#ppdCollect" title="Collect all marked options that reside in the specified
 section.">ppdCollect</a></li>
 	<li><a href="#ppdCollect2" title="Collect all marked options that reside in the
@@ -416,7 +418,6 @@ marked option choices.">ppdConflicts</a></li>
 	<li><a href="#ppdEmitJCL" title="Emit code for JCL options to a file.">ppdEmitJCL</a></li>
 	<li><a href="#ppdEmitJCLEnd" title="Emit JCLEnd code to a file.">ppdEmitJCLEnd</a></li>
 	<li><a href="#ppdEmitString" title="Get a string containing the code for marked options.">ppdEmitString</a></li>
-	<li><a href="#ppdErrorString" title="Returns the text associated with a status.">ppdErrorString</a></li>
 	<li><a href="#ppdFindAttr" title="Find the first matching attribute.">ppdFindAttr</a></li>
 	<li><a href="#ppdFindChoice" title="Return a pointer to an option choice.">ppdFindChoice</a></li>
 	<li><a href="#ppdFindCustomOption" title="Find a custom option.">ppdFindCustomOption</a></li>
@@ -429,7 +430,6 @@ marked option choices.">ppdConflicts</a></li>
 	<li><a href="#ppdInstallableConflict" title="Test whether an option choice conflicts with
 an installable option.">ppdInstallableConflict</a></li>
 	<li><a href="#ppdIsMarked" title="Check to see if an option is marked.">ppdIsMarked</a></li>
-	<li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
 	<li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
 	<li><a href="#ppdLocalizeAttr" title="Localize an attribute.">ppdLocalizeAttr</a></li>
 	<li><a href="#ppdLocalizeIPPReason" title="Get the localized version of a cupsIPPReason
@@ -441,15 +441,10 @@ attribute value.">ppdLocalizeMarkerName</a></li>
 conflicts.">ppdMarkOption</a></li>
 	<li><a href="#ppdNextCustomParam" title="Return the next parameter for a custom option.">ppdNextCustomParam</a></li>
 	<li><a href="#ppdNextOption" title="Return the next option in the PPD file.">ppdNextOption</a></li>
-	<li><a href="#ppdOpen" title="Read a PPD file into memory.">ppdOpen</a></li>
-	<li><a href="#ppdOpen2" title="Read a PPD file into memory.">ppdOpen2</a></li>
-	<li><a href="#ppdOpenFd" title="Read a PPD file into memory.">ppdOpenFd</a></li>
-	<li><a href="#ppdOpenFile" title="Read a PPD file into memory.">ppdOpenFile</a></li>
 	<li><a href="#ppdPageLength" title="Get the page length for the given size.">ppdPageLength</a></li>
 	<li><a href="#ppdPageSize" title="Get the page size record for the named size.">ppdPageSize</a></li>
 	<li><a href="#ppdPageSizeLimits" title="Return the custom page size limits.">ppdPageSizeLimits</a></li>
 	<li><a href="#ppdPageWidth" title="Get the page width for the given size.">ppdPageWidth</a></li>
-	<li><a href="#ppdSetConformance" title="Set the conformance level for PPD files.">ppdSetConformance</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#ppd_attr_t" title="PPD Attribute Structure ">ppd_attr_t</a></li>
@@ -498,8 +493,6 @@ conflicts.">ppdMarkOption</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id: api-ppd.shtml 7616 2008-05-28 00:34:13Z mike $"
-
   PPD API introduction for CUPS.
 
   Copyright 2007-2012 by Apple Inc.
@@ -750,6 +743,122 @@ the conflicting options.  The returned option array must be freed using
 <a href="#cupsFreeOptions"><code>cupsFreeOptions</code></a>.
 
 </p>
+<h3 class="function"><a name="cupsGetPPD">cupsGetPPD</a></h3>
+<p class="description">Get the PPD file for a printer on the default server.</p>
+<p class="code">
+const char *cupsGetPPD (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Destination name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Filename for PPD file</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For classes, <code>cupsGetPPD</code> returns the PPD file for the first printer
+in the class.<br>
+<br>
+The returned filename is stored in a static buffer and is overwritten with
+each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.  The caller &quot;owns&quot; the
+file that is created and must <code>unlink</code> the returned filename.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetPPD2">cupsGetPPD2</a></h3>
+<p class="description">Get the PPD file for a printer from the specified server.</p>
+<p class="code">
+const char *cupsGetPPD2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>name</dt>
+<dd class="description">Destination name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Filename for PPD file</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For classes, <code>cupsGetPPD2</code> returns the PPD file for the first printer
+in the class.<br>
+<br>
+The returned filename is stored in a static buffer and is overwritten with
+each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.  The caller &quot;owns&quot; the
+file that is created and must <code>unlink</code> the returned filename.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
+<p class="description">Get the PPD file for a printer on the specified
+server if it has changed.</p>
+<p class="code">
+http_status_t cupsGetPPD3 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;time_t *modtime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>name</dt>
+<dd class="description">Destination name</dd>
+<dt>modtime</dt>
+<dd class="description">Modification time</dd>
+<dt>buffer</dt>
+<dd class="description">Filename buffer</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of filename buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP status</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;modtime&quot; parameter contains the modification time of any
+locally-cached content and is updated with the time from the PPD file on
+the server.<br>
+<br>
+The &quot;buffer&quot; parameter contains the local PPD filename.  If it contains
+the empty string, a new temporary file is created, otherwise the existing
+file will be overwritten as needed.  The caller &quot;owns&quot; the file that is
+created and must <code>unlink</code> the returned filename.<br>
+<br>
+On success, <code>HTTP_STATUS_OK</code> is returned for a new PPD file and
+<code>HTTP_STATUS_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other
+status is an error.<br>
+<br>
+For classes, <code>cupsGetPPD3</code> returns the PPD file for the first printer
+in the class.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsGetServerPPD">cupsGetServerPPD</a></h3>
+<p class="description">Get an available PPD file from the server.</p>
+<p class="code">
+char *cupsGetServerPPD (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>name</dt>
+<dd class="description">Name of PPD file (&quot;ppd-name&quot;)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Name of PPD file or <code>NULL</code> on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns the named PPD file from the server.  The
+list of available PPDs is provided by the IPP <code>CUPS_GET_PPDS</code>
+operation.<br>
+<br>
+You must remove (unlink) the PPD file when you are finished with
+it. The PPD filename is stored in a static location that will be
+overwritten on the next call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a>, <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>,
+or <a href="#cupsGetServerPPD"><code>cupsGetServerPPD</code></a>.
+
+</p>
 <h3 class="function"><a name="cupsMarkOptions">cupsMarkOptions</a></h3>
 <p class="description">Mark command-line options in a PPD file.</p>
 <p class="code">
@@ -832,17 +941,6 @@ choice for the conflicting option, then iterating over all possible choices
 until a non-conflicting option choice is found.
 
 </p>
-<h3 class="function"><a name="ppdClose">ppdClose</a></h3>
-<p class="description">Free all memory used by the PPD file.</p>
-<p class="code">
-void ppdClose (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>ppd</dt>
-<dd class="description">PPD file record</dd>
-</dl>
 <h3 class="function"><a name="ppdCollect">ppdCollect</a></h3>
 <p class="description">Collect all marked options that reside in the specified
 section.</p>
@@ -1050,19 +1148,6 @@ The return string is allocated on the heap and should be freed using
 <code>free</code> when you are done with it.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ppdErrorString">ppdErrorString</a></h3>
-<p class="description">Returns the text associated with a status.</p>
-<p class="code">
-const char *ppdErrorString (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_status_t">ppd_status_t</a> status<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>status</dt>
-<dd class="description">PPD status</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Status string</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ppdFindAttr">ppdFindAttr</a></h3>
 <p class="description">Find the first matching attribute.</p>
 <p class="code">
@@ -1255,19 +1340,6 @@ int ppdIsMarked (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Non-zero if option is marked</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ppdLastError">ppdLastError</a></h3>
-<p class="description">Return the status from the last ppdOpen*().</p>
-<p class="code">
-<a href="#ppd_status_t">ppd_status_t</a> ppdLastError (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *line<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>line</dt>
-<dd class="description">Line number</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Status code</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ppdLocalize">ppdLocalize</a></h3>
 <p class="description">Localize the PPD file to the current locale.</p>
 <p class="code">
@@ -1429,58 +1501,6 @@ int ppdMarkOption (<br>
 <p class="discussion">Options are returned from all groups in ascending alphanumeric order.
 
 </p>
-<h3 class="function"><a name="ppdOpen">ppdOpen</a></h3>
-<p class="description">Read a PPD file into memory.</p>
-<p class="code">
-<a href="#ppd_file_t">ppd_file_t</a> *ppdOpen (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-<dd class="description">File to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file record</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ppdOpen2">ppdOpen2</a></h3>
-<p class="description">Read a PPD file into memory.</p>
-<p class="code">
-<a href="#ppd_file_t">ppd_file_t</a> *ppdOpen2 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-<dd class="description">File to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file record or <code>NULL</code> if the PPD file could not be opened.</p>
-<h3 class="function"><a name="ppdOpenFd">ppdOpenFd</a></h3>
-<p class="description">Read a PPD file into memory.</p>
-<p class="code">
-<a href="#ppd_file_t">ppd_file_t</a> *ppdOpenFd (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-<dd class="description">File to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file record or <code>NULL</code> if the PPD file could not be opened.</p>
-<h3 class="function"><a name="ppdOpenFile">ppdOpenFile</a></h3>
-<p class="description">Read a PPD file into memory.</p>
-<p class="code">
-<a href="#ppd_file_t">ppd_file_t</a> *ppdOpenFile (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-<dd class="description">File to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file record or <code>NULL</code> if the PPD file could not be opened.</p>
 <h3 class="function"><a name="ppdPageLength">ppdPageLength</a></h3>
 <p class="description">Get the page length for the given size.</p>
 <p class="code">
@@ -1556,17 +1576,6 @@ float ppdPageWidth (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Width of page in points or 0.0</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="ppdSetConformance">ppdSetConformance</a></h3>
-<p class="description">Set the conformance level for PPD files.</p>
-<p class="code">
-void ppdSetConformance (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_conform_t">ppd_conform_t</a> c<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>c</dt>
-<dd class="description">Conformance level</dd>
-</dl>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ppd_attr_t">ppd_attr_t</a></h3>
 <p class="description">PPD Attribute Structure </p>

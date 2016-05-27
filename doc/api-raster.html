@@ -5,7 +5,7 @@
 	<title>Raster API	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,8 +353,6 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id$"
-
   Raster API documentation for CUPS.
 
   Copyright 2008-2010 by Apple Inc.
@@ -399,6 +397,7 @@ div.contents ul.subcontents li {
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
+	<li><a href="#cupsRasterInitPWGHeader" title="Initialize a page header for PWG Raster output.">cupsRasterInitPWGHeader</a></li>
 	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
 	<li><a href="#cupsRasterOpen" title="Open a raster stream using a file descriptor.">cupsRasterOpen</a></li>
 	<li><a href="#cupsRasterOpenIO" title="Open a raster stream using a callback function.">cupsRasterOpenIO</a></li>
@@ -446,8 +445,6 @@ page header structure.">cupsRasterWriteHeader2</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id$"
-
   Raster API introduction for CUPS.
 
   Copyright 2007-2013 by Apple Inc.
@@ -620,6 +617,50 @@ void cupsRasterClose (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The file descriptor associated with the raster stream must be closed
 separately as needed.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.2&nbsp;</span><a name="cupsRasterInitPWGHeader">cupsRasterInitPWGHeader</a></h3>
+<p class="description">Initialize a page header for PWG Raster output.</p>
+<p class="code">
+int cupsRasterInitPWGHeader (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pwg_media_t *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int xdpi,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int ydpi,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *sides,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *sheet_back<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>h</dt>
+<dd class="description">Page header</dd>
+<dt>media</dt>
+<dd class="description">PWG media information</dd>
+<dt>type</dt>
+<dd class="description">PWG raster type string</dd>
+<dt>xdpi</dt>
+<dd class="description">Cross-feed direction (horizontal) resolution</dd>
+<dt>ydpi</dt>
+<dd class="description">Feed direction (vertical) resolution</dd>
+<dt>sides</dt>
+<dd class="description">IPP &quot;sides&quot; option value</dd>
+<dt>sheet_back</dt>
+<dd class="description">Transform for back side or <code>NULL</code> for none</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;media&quot; argument specifies the media to use.<br>
+<br>
+The &quot;type&quot; argument specifies a &quot;pwg-raster-document-type-supported&quot; value
+that controls the color space and bit depth of the raster data.<br>
+<br>
+The &quot;xres&quot; and &quot;yres&quot; arguments specify the raster resolution in dots per
+inch.<br>
+<br>
+The &quot;sheet_back&quot; argument specifies a &quot;pwg-raster-document-sheet-back&quot; value
+to apply for the back side of a page.  Pass <code>NULL</code> for the front side.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
 <p class="description">Interpret PPD commands to create a page header.</p>
 <p class="code">

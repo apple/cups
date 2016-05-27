@@ -5,7 +5,7 @@
 	<title>Filter and Backend Programming	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,11 +353,9 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-filter.header 7616 2008-05-28 00:34:13Z mike $"
-
   Filter and backend programming header for CUPS.
 
-  Copyright 2008-2014 by Apple Inc.
+  Copyright 2008-2016 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -373,6 +371,7 @@ div.contents ul.subcontents li {
 <tr>
 	<th>Headers</th>
 	<th>cups/backend.h<br>
+	cups/ppd.h<br>
 	cups/sidechannel.h</th>
 </tr>
 </thead>
@@ -439,11 +438,9 @@ div.contents ul.subcontents li {
 </ul></li>
 </ul>
 <!--
-  "$Id: api-filter.shtml 7677 2008-06-19 23:22:19Z mike $"
-
   Filter and backend programming introduction for CUPS.
 
-  Copyright 2007-2014 by Apple Inc.
+  Copyright 2007-2016 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -727,7 +724,7 @@ prefix strings:</p>
 	<dd>Sets or clears printer-state-reason keywords for the current queue.
 	Typically this is used to indicate persistent media, ink, toner, and
 	configuration conditions or errors on a printer.
-	<a href='#TABLE2'>Table 2</a> lists the standard state keywords -
+	<a href='#TABLE2'>Table 2</a> lists some of the standard "printer-state-reasons" keywords from the <a href="http://www.iana.org/assignments/ipp-registrations/ipp-registrations.xhtml#ipp-registrations-4">IANA IPP Registry</a> -
 	use vendor-prefixed ("com.example.foo") keywords for custom states. See
 	<a href="#MANAGING_STATE">Managing Printer State in a Filter</a> for more
 	information.
