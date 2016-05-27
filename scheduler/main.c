@@ -1823,6 +1823,81 @@ sigterm_handler(int sig)		/* I - Signal number */
 
 
 #if defined(HAVE_ONDEMAND)
+
+/*
+ * 'add_ondemand_listener()' - Bind an open fd as a Listener.
+ */
+
+static void
+add_ondemand_listener(int fd,           /* I - Socket file descriptor */
+                      int idx)          /* I - Listener number, for logging */
+{
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  char			s[256];		/* String addresss */
+
+  addrlen = sizeof(addr);
+
+  if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "service_checkin: Unable to get local address for listener #%d: %s",
+                    idx + 1, strerror(errno));
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "service_checkin: Listener #%d at fd %d, \"%s\".",
+                  idx + 1, fd, httpAddrString(&addr, s, sizeof(s)));
+
+  /*
+   * Try to match the on-demand socket address to one of the listeners...
+   */
+
+  for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+       lis;
+       lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+    if (httpAddrEqual(&lis->address, &addr))
+      break;
+
+  /*
+   * Add a new listener If there's no match...
+   */
+
+  if (lis)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "service_checkin: Matched existing listener #%d to %s.",
+                    idx + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+  }
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "service_checkin: Adding new listener #%d for %s.",
+                    idx + 1, httpAddrString(&addr, s, sizeof(s)));
+
+    if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s.", strerror(errno));
+      exit(EXIT_FAILURE);
+      return;
+    }
+
+    cupsArrayAdd(Listeners, lis);
+
+    memcpy(&lis->address, &addr, sizeof(lis->address));
+  }
+
+  lis->fd        = fd;
+  lis->on_demand = 1;
+
+#  ifdef HAVE_SSL
+  if (httpAddrPort(&(lis->address)) == 443)
+    lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#  endif /* HAVE_SSL */
+}
+
 /*
  * 'service_checkin()' - Check-in with launchd and collect the listening fds.
  */
@@ -1835,10 +1910,6 @@ service_checkin(void)
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
   int			*ld_sockets;	/* Listener sockets */
-  cupsd_listener_t	*lis;		/* Listeners array */
-  http_addr_t		addr;		/* Address variable */
-  socklen_t		addrlen;	/* Length of address */
-  char			s[256];		/* String addresss */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
@@ -1862,56 +1933,7 @@ service_checkin(void)
 
   for (i = 0; i < count; i ++)
   {
-   /*
-    * Get the launchd socket address...
-    */
-
-    addrlen = sizeof(addr);
-
-    if (getsockname(ld_sockets[i], (struct sockaddr *)&addr, &addrlen))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
-      continue;
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, ld_sockets[i], httpAddrString(&addr, s, sizeof(s)));
-
-    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	 lis;
-	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-      if (httpAddrEqual(&lis->address, &addr))
-	break;
-
-   /*
-    * Add a new listener if there's no match...
-    */
-
-    if (lis)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
-    }
-    else
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
-
-      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s", strerror(errno));
-	exit(EXIT_FAILURE);
-      }
-
-      cupsArrayAdd(Listeners, lis);
-
-      memcpy(&lis->address, &addr, sizeof(lis->address));
-    }
-
-    lis->fd        = ld_sockets[i];
-    lis->on_demand = 1;
-
-#    ifdef HAVE_SSL
-    if (httpAddrPort(&(lis->address)) == 443)
-      lis->encryption = HTTP_ENCRYPT_ALWAYS;
-#    endif /* HAVE_SSL */
+    add_ondemand_listener(ld_sockets[i], i);
   }
 
   free(ld_sockets);
@@ -1924,11 +1946,7 @@ service_checkin(void)
 			ld_array,	/* Launch data array */
 			ld_sockets,	/* Launch data sockets dictionary */
 			tmp;		/* Launch data */
-  cupsd_listener_t	*lis;		/* Listeners array */
-  http_addr_t		addr;		/* Address variable */
-  socklen_t		addrlen;	/* Length of address */
   int			fd;		/* File descriptor */
-  char			s[256];		/* String addresss */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
@@ -2000,56 +2018,7 @@ service_checkin(void)
       if ((tmp = launch_data_array_get_index(ld_array, i)) != NULL)
       {
 	fd      = launch_data_get_fd(tmp);
-	addrlen = sizeof(addr);
-
-	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
-	  continue;
-	}
-
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, fd, httpAddrString(&addr, s, sizeof(s)));
-
-       /*
-	* Try to match the launchd socket address to one of the listeners...
-	*/
-
-	for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	     lis;
-	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-	  if (httpAddrEqual(&lis->address, &addr))
-	    break;
-
-       /*
-	* Add a new listener If there's no match...
-	*/
-
-	if (lis)
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
-	}
-	else
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
-
-	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
-	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s.", strerror(errno));
-	    exit(EXIT_FAILURE);
-	  }
-
-	  cupsArrayAdd(Listeners, lis);
-
-	  memcpy(&lis->address, &addr, sizeof(lis->address));
-	}
-
-	lis->fd        = fd;
-        lis->on_demand = 1;
-
-#    ifdef HAVE_SSL
-	if (httpAddrPort(&(lis->address)) == 443)
-	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
-#    endif /* HAVE_SSL */
+        add_ondemand_listener(fd, i);
       }
     }
   }
@@ -2060,10 +2029,6 @@ service_checkin(void)
 #  else /* HAVE_SYSTEMD */
   int			i,		/* Looping var */
 			count;		/* Number of listeners */
-  cupsd_listener_t	*lis;		/* Listeners array */
-  http_addr_t		addr;		/* Address variable */
-  socklen_t		addrlen;	/* Length of address */
-  char			s[256];		/* String addresss */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
@@ -2087,56 +2052,7 @@ service_checkin(void)
 
   for (i = 0; i < count; i ++)
   {
-   /*
-    * Get the launchd socket address...
-    */
-
-    addrlen = sizeof(addr);
-
-    if (getsockname(SD_LISTEN_FDS_START + i, (struct sockaddr *)&addr, &addrlen))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
-      continue;
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, SD_LISTEN_FDS_START + i, httpAddrString(&addr, s, sizeof(s)));
-
-    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	 lis;
-	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-      if (httpAddrEqual(&lis->address, &addr))
-	break;
-
-   /*
-    * Add a new listener if there's no match...
-    */
-
-    if (lis)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
-    }
-    else
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
-
-      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s", strerror(errno));
-	exit(EXIT_FAILURE);
-      }
-
-      cupsArrayAdd(Listeners, lis);
-
-      memcpy(&lis->address, &addr, sizeof(lis->address));
-    }
-
-    lis->fd        = SD_LISTEN_FDS_START + i;
-    lis->on_demand = 1;
-
-#    ifdef HAVE_SSL
-    if (httpAddrPort(&(lis->address)) == 443)
-      lis->encryption = HTTP_ENCRYPT_ALWAYS;
-#    endif /* HAVE_SSL */
+    add_ondemand_listener(SD_LISTEN_FDS_START + i, i);
   }
 #  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 }
