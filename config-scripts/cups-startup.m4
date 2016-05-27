@@ -85,6 +85,15 @@ if test x$enable_systemd != xno; then
         fi
 fi
 
+dnl Upstart is also used on Linux (e.g., Chrome OS)
+AC_ARG_ENABLE(upstart, [ --enable-upstart         enable upstart support])
+if test "x$enable_upstart" = "xyes"; then
+	if test "x$have_systemd" = "xyes"; then
+		AC_MSG_ERROR(Cannot support both systemd and upstart.)
+	fi
+	AC_DEFINE(HAVE_UPSTART)
+fi
+
 dnl Solaris uses smf
 SMFMANIFESTDIR=""
 AC_SUBST(SMFMANIFESTDIR)

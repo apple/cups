@@ -30,8 +30,6 @@
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
 #  include <libgen.h>
-#  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
-					/* Name of the launchd KeepAlive file */
 #  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
 /* Update when we have a public header we can include */
 extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
@@ -40,9 +38,12 @@ extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
 
 #ifdef HAVE_SYSTEMD
 #  include <systemd/sd-daemon.h>
-#  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
-					/* Name of the systemd path file */
 #endif /* HAVE_SYSTEMD */
+
+#ifdef HAVE_ONDEMAND
+#  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
+					/* Name of the KeepAlive file */
+#endif
 
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
@@ -242,7 +243,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      usage(0);
 	      break;
 
-          case 'l' : /* Started by launchd/systemd... */
+          case 'l' : /* Started by launchd/systemd/upstart... */
 #if defined(HAVE_ONDEMAND)
 	      OnDemand   = 1;
 	      fg         = 1;
@@ -2026,7 +2027,7 @@ service_checkin(void)
   launch_data_free(ld_msg);
   launch_data_free(ld_resp);
 
-#  else /* HAVE_SYSTEMD */
+#  elif defined(HAVE_SYSTEMD)
   int			i,		/* Looping var */
 			count;		/* Number of listeners */
 
@@ -2054,6 +2055,49 @@ service_checkin(void)
   {
     add_ondemand_listener(SD_LISTEN_FDS_START + i, i);
   }
+#  elif defined(HAVE_UPSTART)
+  const char		*e;		/* Environment var */
+  int			fd;		/* File descriptor */
+
+  if (!(e = getenv("UPSTART_EVENTS")))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "service_checkin: We did not get started via Upstart.");
+    exit(EXIT_FAILURE);
+    return;
+  }
+
+  if (strcasecmp(e, "socket"))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "service_checkin: We did not get triggered via an Upstart socket event.");
+    exit(EXIT_FAILURE);
+    return;
+  }
+
+  if (!(e = getenv("UPSTART_FDS")))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "service_checkin: Unable to get listener sockets from UPSTART_FDS.");
+    exit(EXIT_FAILURE);
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: UPSTART_FDS=%s", e);
+
+  fd = strtol(e, NULL, 10);
+  if (fd < 0) {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "service_checkin: Could not parse UPSTART_FDS: %s", strerror(errno));
+    exit(EXIT_FAILURE);
+    return;
+  }
+
+  /* Upstart only supportst a single on-demand socket fd */
+  add_ondemand_listener(fd, 0);
+
+#  else
+#  error "Error: defined HAVE_ONDEMAND but no launchd/systemd/upstart selection"
 #  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 }
 

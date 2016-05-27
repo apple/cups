@@ -80,7 +80,7 @@ typedef struct
   http_addr_t		address;	/* Bind address of socket */
   http_encryption_t	encryption;	/* To encrypt or not to encrypt... */
 #if defined(HAVE_ONDEMAND)
-  int			on_demand;	/* Is this a socket from launchd/systemd? */
+  int			on_demand;	/* Is this a socket from launchd/systemd/upstart? */
 #endif /* HAVE_ONDEMAND */
 } cupsd_listener_t;
 

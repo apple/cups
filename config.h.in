@@ -494,6 +494,12 @@
 
 #undef HAVE_SYSTEMD
 
+/*
+ * Do we have upstart support?
+ */
+
+#undef HAVE_UPSTART
+
 
 /*
  * Various scripting languages...
@@ -717,7 +723,7 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #  endif /* __GNUC__ || __STDC_VERSION__ */
 #endif /* !HAVE_ABS && !abs */
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD) || defined(HAVE_UPSTART)
 #  define HAVE_ONDEMAND
 #else
 #  undef HAVE_ONDEMAND
