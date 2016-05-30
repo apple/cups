@@ -2532,7 +2532,7 @@ http_resolve_cb(
   * Assemble the final device URI using the resolved hostname...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
+  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme,
                   NULL, hostTarget, port, resource);
   DEBUG_printf(("5http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
