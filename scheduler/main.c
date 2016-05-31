@@ -754,6 +754,11 @@ main(int  argc,				/* I - Number of command-line args */
 	* Shutdown the server...
 	*/
 
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+	if (OnDemand)
+	  break;
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+
         DoingShutdown = 1;
 
 	cupsdStopServer();
@@ -2159,6 +2164,7 @@ service_checkout(void)
 
   if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
       WebInterface ||			/* Web interface enabled */
+      NeedReload ||			/* Doing a reload */
       (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
 					/* Printers being shared */
   {

@@ -1,9 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-05-25
+CHANGES.txt - 2.2b1 - 2016-05-31
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
 	- All CUPS commands now support POSIX options (Issue #4813)
+	- The scheduler now restarts faster (Issue #4760)
 	- Improved performance of web interface with large numbers of jobs
 	  (Issue #3819)
 	- Encrypted printing can now be limited to only trusted printers and
