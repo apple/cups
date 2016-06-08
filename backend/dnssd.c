@@ -1194,9 +1194,9 @@ query_callback(
       snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
 	       make_and_model, model);
     else if (!_cups_strncasecmp(model, "designjet ", 10))
-      snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s", model + 10);
+      snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s;", model + 10);
     else if (!_cups_strncasecmp(model, "stylus ", 7))
-      snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s", model + 7);
+      snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s;", model + 7);
     else if ((ptr = strchr(model, ' ')) != NULL)
     {
      /*
@@ -1206,7 +1206,7 @@ query_callback(
       memcpy(make_and_model, model, (size_t)(ptr - model));
       make_and_model[ptr - model] = '\0';
 
-      snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",
+      snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
 	       make_and_model, ptr + 1);
     }
   }
