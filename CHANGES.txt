@@ -1,8 +1,9 @@
-CHANGES.txt - 2.1.4 - 2016-05-11
+CHANGES.txt - 2.1.4 - 2016-06-08
 --------------------------------
 
 CHANGES IN CUPS V2.1.4
 
+	- Fixed reporting of 1284 Device IDs (Issue #3835, PR #3836)
 	- Fixed printing of multiple files to raw queues (Issue #4782)
 	- The scheduler did not implement the Hold-New-Jobs opertion correctly
 	  (Issue #4767)
