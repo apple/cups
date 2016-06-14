@@ -100,6 +100,6 @@ echo Archiving...
 tar czf cups-$fileversion-source.tar.gz cups-$version
 
 echo Removing temporary files...
-#rm -rf cups-$version
+rm -rf cups-$version
 
 echo "Done - files in $TMPDIR."
