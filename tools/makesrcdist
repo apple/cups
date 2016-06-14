@@ -76,8 +76,8 @@ else
 	fi
 
 	echo Creating tag for release...
-	git tag -m "Tag $version" release-$version
-	git push origin release-$version
+	git tag -m "Tag $version" v$version
+	git push origin v$version
 fi
 
 fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
