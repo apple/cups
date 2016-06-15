@@ -74,11 +74,7 @@ Therefore, running
 on your server will allow any computer on your network (and perhaps the entire
 Internet) to print to your server.
 .LP
-While
-.BR xinetd (8)
-has built-in access control support, you should use the TCP wrappers package with
-.BR inetd (8)
-to limit access to only those computers that should be able to print through your server.
+You should use configure the firewall to limit TCP port 515 access to only those computers that should be able to print through your server.
 .LP
 .B cups-lpd
 is not enabled by the standard CUPS distribution.
