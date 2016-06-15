@@ -191,6 +191,14 @@ to verify that the hostname resolved from the address matches one of the address
 Double lookups also prevent clients with unregistered addresses from connecting to your server.
 The default is "Off" to avoid the potential server performance problems with hostname lookups.
 Only set this option to "On" or "Double" if absolutely required.
+.\"#IdleExitTimeout
+.TP 5
+\fBIdleExitTimeout \fIseconds\fR
+Only applicable when
+.BR cupsd (8)
+is run on-demand (e.g., with \fB-l\fR).
+Specifies the length of time to wait before shutting down due to inactivity.
+The default is "60".
 .\"#JobKillDelay
 .TP 5
 \fBJobKillDelay \fIseconds\fR
