@@ -404,7 +404,7 @@ extern const char	*cupsRasterErrorString(void) _CUPS_API_1_3;
 extern cups_raster_t	*cupsRasterOpenIO(cups_raster_iocb_t iocb, void *ctx,
 			                  cups_mode_t mode);
 
-/**** New in CUPS 2.2 ****/
+/**** New in CUPS 2.2/macOS 10.12 ****/
 extern int		cupsRasterInitPWGHeader(cups_page_header2_t *h, pwg_media_t *media, const char *type, int xdpi, int ydpi, const char *sides, const char *sheet_back) _CUPS_API_2_2;
 
 #  ifdef __cplusplus

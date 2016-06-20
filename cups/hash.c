@@ -36,7 +36,7 @@
  *
  * The returned hash is binary data.
  *
- * @since CUPS 2.2@
+ * @since CUPS 2.2/macOS 10.12@
  */
 
 ssize_t					/* O - Size of hash or -1 on error */

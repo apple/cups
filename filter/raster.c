@@ -107,7 +107,7 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
  * The "sheet_back" argument specifies a "pwg-raster-document-sheet-back" value
  * to apply for the back side of a page.  Pass @code NULL@ for the front side.
  *
- * @since CUPS 2.2@
+ * @since CUPS 2.2/macOS 10.12@
  */
 
 int					/* O - 1 on success, 0 on failure */
