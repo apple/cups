@@ -9,13 +9,15 @@ layout: default
 
 <p><a class="btn btn-primary btn-large" href="{{site.github.releases_url}}"><span class="glyphicon glyphicon-download-alt"></span> Download CUPS</a></p>
 
+<p>See the <a href="pgp.html">PGP Information</a> page for information on validating source releases.</p>
+
 <h2>Binary Releases</h2>
 
 <p>Free binaries are available elsewhere - search <a target="_blank" href="http://www.google.com/search?q=cups+binary+package&amp;btnG=Search">Google</a> to find them.</p>
 
 <blockquote><b>Note:</b>
 
-<p>We do not provide binaries for OS X since newer releases of CUPS are not generally compatible with prior releases of OS X.</p>
+<p>We do not provide binaries for macOS since newer releases of CUPS are not generally compatible with prior releases of macOS, and System Integrity Protection (enabled by default) will prevent replacement of the CUPS software.</p>
 
 </blockquote>
 
@@ -62,4 +64,3 @@ git clone {{site.github.clone_url}} cups-2.2
 <pre class="command">
 git clone -b branch-2.1 {{site.github.clone_url}} cups-2.1
 </pre>
-
