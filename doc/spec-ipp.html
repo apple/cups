@@ -396,7 +396,7 @@ summary='Supported Operations'>
 
 
 
-<h3 class='title'><span class='info'>CUPS 1.2/OS X 10.5</span><a
+<h3 class='title'><span class='info'>CUPS 1.2/macOS 10.5</span><a
 name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
 <p>The Create-Printer-Subscription operation (0x0016) creates a subscription for printer or server event notifications. CUPS provides several additional events in addition to the standard events in the IPP notifications specification. CUPS adds the following <tt>notify-events (1setOf type2 keyword)</tt> values:<p>
@@ -484,7 +484,7 @@ name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
 	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to select the first printer that is returned.
 
@@ -512,7 +512,7 @@ name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
 	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a user name that is used to filter the returned printers.
 
@@ -571,7 +571,7 @@ name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
@@ -702,7 +702,7 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to select the first printer that is returned.
 
@@ -726,7 +726,7 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a user name that is used to filter the returned printers.
 
@@ -784,7 +784,7 @@ CUPS-Add-Modify-Printer Response:
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
@@ -945,11 +945,11 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The client OPTIONALLY supplies a device class keyword to select which devices are returned.
 
-	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor does not want to discover. If the client omits this attribute, the server responds with devices of all schemes specified by the "include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor wants to discover. If the client omits this attribute, the server responds with devices of all schemes except those specified by the "exclude-schemes" attribute.
 
@@ -961,7 +961,7 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dt>"timeout" (integer (1:MAX)): <span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"timeout" (integer (1:MAX)): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to limit the duration of the lookup. The default timeout is 15 seconds.
 
@@ -1011,11 +1011,11 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor does not want to list. If the client omits this attribute, the server responds with PPDs of all schemes specified by the "include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor wants to list. If the client omits this attribute, the server responds with PPDs of all schemes except those specified by the "exclude-schemes" attribute.
 
@@ -1027,27 +1027,27 @@ CUPS-Add-Modify-Printer Response:
 
 	<dd>The client OPTIONALLY supplies a printer manufacturer to select which PPDs are returned.
 
-	<dt>"ppd-make-and-model" (text(127)): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-make-and-model" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a make and model to select which PPDs are returned.
 
-	<dt>"ppd-model-number" (integer): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-model-number" (integer): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a model number to select which PPDs are returned.
 
-	<dt>"ppd-natural-language" (naturalLanguage): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-natural-language" (naturalLanguage): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a language to select which PPDs are returned.
 
-	<dt>"ppd-product" (text(127)): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-product" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript product string to select which PPDs are returned.
 
-	<dt>"ppd-psversion" (text(127)): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-psversion" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript version string to select which PPDs are returned.
 
-	<dt>"ppd-type" (type1 keyword): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-type" (type1 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a driver type to select which PPDs are returned.
 
@@ -1139,7 +1139,7 @@ CUPS-Get-PPDs Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.2/OS X 10.5</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.2/macOS 10.5</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
 
 <p>The CUPS-Authenticate-Job operation (0x400E) authenticates a print job for printing, releasing the job if it is held. Typically this is used when printing to a remote server. The authentication information is passed in the HTTP request; the HTTP connection is normally encrypted for this type of request.</p>
 
@@ -1167,11 +1167,11 @@ CUPS-Get-PPDs Response:
 
 <dl>
 
-	<dt>"auth-info" (1setOf text(MAX)): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info" (1setOf text(MAX)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
-	<dt>"job-hold-until" (keyword | name(MAX)): <span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"job-hold-until" (keyword | name(MAX)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a new job-hold-until value for the job. If specified and not the "no-hold" value, the job is held instead of released for printing.
 
@@ -1261,7 +1261,7 @@ CUPS-Get-PPDs Response:
 <p>If the status code is <tt>successful-ok</tt>, the PPD file follows the end of the IPP response.</p>
 
 
-<h3 class='title'><span class='info'>CUPS 1.4/OS X 10.6</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.4/macOS 10.6</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
 
 <p>The CUPS-Get-Document operation (0x4027) gets a document file from a job on the server. The document file is specified using the <tt>document-number</tt> and either the <tt>job-uri</tt> or <tt>printer-uri</tt> and <tt>job-id</tt> identifying the job.</p>
 
@@ -1494,7 +1494,7 @@ CUPS-Get-PPDs Response:
 
 <h3 class='title'><a name='JOB_ATTRIBUTES'>Job Attributes</a></h3>
 
-<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "auth-info" attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
 
@@ -1506,15 +1506,15 @@ CUPS-Get-PPDs Response:
 
 <p>The "job-hold-until" attribute specifies a hold time. In addition to the standard IPP/1.1 keyword names, CUPS supports name values of the form "HH:MM" and "HH:MM:SS" that specify a hold time. The hold time is in Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the specified time is less than the current time, the job is held until the next day.
 
-<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
 <p>The "job-media-progress" status attribute specifies the percentage of completion of the current page. It is only valid when the "job-state" attribute has the 'processing(5)' value.</p>
 
-<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "job-printer-state-message" status attribute provides the last known value of the "printer-state-message" attribute for the printer that processed (or is processing) the job.</p>
 
-<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "job-printer-state-reasons" status attribute provides the last known value of the "printer-state-reasons" attribute for the printer that processed (or is processing) the job.</p>
 
@@ -1524,7 +1524,7 @@ CUPS-Get-PPDs Response:
 
 <p>If only one value is supplied, the banner file is printed before the job. If two values are supplied, the first value is used as the starting banner file and the second as the ending banner file.
 
-<h4><a name="job-originating-host-name">job-originating-host-name (name(MAX))</a><span class='info'>CUPS 1.1.5/OS X 10.2</span></h4>
+<h4><a name="job-originating-host-name">job-originating-host-name (name(MAX))</a><span class='info'>CUPS 1.1.5/macOS 10.2</span></h4>
 
 <p>The "job-originating-host-name" status attribute specifies the host from which the job was queued. The value will be the hostname or IP address of the client depending on whether hostname resolution is enabled.  The localhost address (127.0.0.1) is <b>always</b> resolved to the name "localhost".
 
@@ -1609,7 +1609,7 @@ CUPS-Get-PPDs Response:
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>
 
-<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "auth-info-required" attribute specifies the authentication information that is required for printing a job. The following keywords are recognized:</p>
 
@@ -1637,35 +1637,35 @@ CUPS-Get-PPDs Response:
 
 <p>The "job-quota-period" attribute specifies the time period used for quota calculations, in seconds. The default value of 0 specifies that the limits apply to all jobs that have been printed by a user that are still known to the system.
 
-<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "marker-change-time" status attribute specifies the "printer-up-time" value when the last change to the marker-colors, marker-levels, marker-message, marker-names, or marker-types attributes was made.</p>
 
-<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "marker-colors" status attribute specifies the color(s) for each supply in the printer. It is only available when the driver provides supply levels. The color is either 'none' or one or more hex-encoded sRGB colors of the form '#RRGGBB'.</p>
 
-<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
 <p>The "marker-high-levels" status attribute specifies the supply levels that indicate a near-full condition. A value of 100 should be used for supplies that are consumed/emptied, e.g. ink cartridges.</p>
 
-<h4><a name="marker-levels">marker-levels (1setof integer(-3:100))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-levels">marker-levels (1setof integer(-3:100))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "marker-levels" status attribute specifies the current supply levels for the printer. It is only available when the driver provides supply levels. A value of -1 indicates the level is unavailable, -2 indicates unknown, and -3 indicates the level is unknown but has not yet reached capacity. Values from 0 to 100 indicate the corresponding percentage.</p>
 
-<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
 <p>The "marker-low-levels" status attribute specifies the supply levels that indicate a near-empty condition. A value of 0 should be used for supplies that are filled, e.g. waste ink tanks.</p>
 
-<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
 <p>The "marker-message" status attribute provides a human-readable status message for the current supply levels, e.g. "12 pages of ink remaining." It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "marker-names" status attribute specifies the name(s) for each supply in the printer. It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
 <p>The "marker-types" status attribute specifies the type(s) of each supply in the printer. It is only available when the driver provides supply levels. The following (RFC 3805) types are currently supported:</p>
 
@@ -1745,7 +1745,7 @@ CUPS-Get-PPDs Response:
 
 <p>The "printer-commands" attribute specifies the commands that are supported by the CUPS command file filter. The keyword 'none' indicates that no commands are supported.</p>
 
-<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
 <p>The "printer-dns-sd-name" attribute specifies the registered DNS-SD service name for the printer. If the printer is not being shared using this protocol, "printer-dns-sd-name" will have the no-value value.</p>
 
