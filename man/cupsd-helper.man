@@ -55,7 +55,7 @@ with no arguments in order to discover the available printers.
 .LP
 The \fBcups-driverd\fR helper program lists all available printer drivers, a subset of "matching" printer drivers, or a copy of a specific driver PPD file.
 .LP
-The \fBcups-exec\fR helper program runs backends, filters, and other programs. On OS X these programs are run in a secure sandbox.
+The \fBcups-exec\fR helper program runs backends, filters, and other programs. On macOS these programs are run in a secure sandbox.
 .SH FILES
 The \fBcups-driverd\fR program looks for PPD and driver information files in the following directories:
 .nf

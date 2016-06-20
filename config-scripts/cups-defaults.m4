@@ -22,8 +22,8 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 	esac])
 AC_SUBST(LANGUAGES)
 
-dnl OS X bundle-based localization support
-AC_ARG_WITH(bundledir, [  --with-bundledir        set OS X localization bundle directory ],
+dnl macOS bundle-based localization support
+AC_ARG_WITH(bundledir, [  --with-bundledir        set macOS localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
 	if test "x$uname" = xDarwin -a $uversion -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
@@ -382,7 +382,7 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl Web interface...
-AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for OS X])
+AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for macOS])
 case "x$enable_webif" in
 	xno)
 		CUPS_WEBIF=No

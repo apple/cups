@@ -37,7 +37,7 @@ static void	quote_string(const char *s);
  * variable or the device URI passed in argv[0], whichever is found
  * first.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 const char *				/* O - Device URI or @code NULL@ */
@@ -85,7 +85,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
  * It handles quoting of special characters in the device-make-and-model,
  * device-info, device-id, and device-location strings.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 void

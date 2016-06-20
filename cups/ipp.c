@@ -215,7 +215,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
  * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
  * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -265,7 +265,7 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
  * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
  * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -507,7 +507,7 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
  * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
  * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ipp_attribute_t	*			/* O - New attribute */
@@ -571,7 +571,7 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
  * (@code IPP_TAG_NOTSETTABLE@), delete-attribute (@code IPP_TAG_DELETEATTR@), and
  * admin-define (@code IPP_TAG_ADMINDEFINE@).
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_attribute_t	*			/* O - New attribute */
@@ -999,7 +999,7 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -1052,7 +1052,7 @@ ippAddStringf(ipp_t      *ipp,		/* I - IPP message */
  * stdarg pointer @code ap@.  The formatted string is truncated as needed to the
  * maximum length of the corresponding value type.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -1331,7 +1331,7 @@ ippAddStrings(
  * enum value, or the value falls within one of the rangeOfInteger values for
  * the attribute.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 on a match, 0 on no match */
@@ -1382,7 +1382,7 @@ ippContainsInteger(
  * Returns non-zero when the attribute contains a matching charset, keyword,
  * language, mimeMediaType, name, text, URI, or URI scheme value.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 on a match, 0 on no match */
@@ -1458,7 +1458,7 @@ ippContainsString(
  * created - this should only be done as long as the original source IPP message will
  * not be freed for the life of the destination.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 
@@ -1708,7 +1708,7 @@ ippCopyAttribute(
  * 0 to skip it. The function may also choose to do a partial copy of the source attribute
  * itself.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on error */
@@ -1835,7 +1835,7 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
 /*
  * 'ippDeleteAttribute()' - Delete a single attribute in an IPP message.
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 void
@@ -1909,7 +1909,7 @@ ippDeleteAttribute(
  *
  * Deleting all values in an attribute deletes the attribute.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -2113,7 +2113,7 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippFirstAttribute()' - Return the first attribute in the message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_attribute_t	*			/* O - First attribute or @code NULL@ if none */
@@ -2140,7 +2140,7 @@ ippFirstAttribute(ipp_t *ipp)		/* I - IPP message */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Boolean value or 0 on error */
@@ -2169,7 +2169,7 @@ ippGetBoolean(ipp_attribute_t *attr,	/* I - IPP attribute */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_t *					/* O - Collection value or @code NULL@ on error */
@@ -2196,7 +2196,7 @@ ippGetCollection(
 /*
  * 'ippGetCount()' - Get the number of values in an attribute.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Number of values or 0 on error */
@@ -2223,7 +2223,7 @@ ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const ipp_uchar_t *			/* O - Date value or @code NULL@ */
@@ -2249,7 +2249,7 @@ ippGetDate(ipp_attribute_t *attr,	/* I - IPP attribute */
 /*
  * 'ippGetGroupTag()' - Get the group associated with an attribute.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_tag_t				/* O - Group tag or @code IPP_TAG_ZERO@ on error */
@@ -2276,7 +2276,7 @@ ippGetGroupTag(ipp_attribute_t *attr)	/* I - IPP attribute */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Value or 0 on error */
@@ -2302,7 +2302,7 @@ ippGetInteger(ipp_attribute_t *attr,	/* I - IPP attribute */
 /*
  * 'ippGetName()' - Get the attribute name.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *				/* O - Attribute name or @code NULL@ for separators */
@@ -2329,7 +2329,7 @@ ippGetName(ipp_attribute_t *attr)	/* I - IPP attribute */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 void *					/* O - Pointer to octetString data */
@@ -2365,7 +2365,7 @@ ippGetOctetString(
 /*
  * 'ippGetOperation()' - Get the operation ID in an IPP message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_op_t				/* O - Operation ID or 0 on error */
@@ -2392,7 +2392,7 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Lower value of range or 0 */
@@ -2427,7 +2427,7 @@ ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
 /*
  * 'ippGetRequestId()' - Get the request ID from an IPP message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Request ID or 0 on error */
@@ -2454,7 +2454,7 @@ ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Horizontal/cross feed resolution or 0 */
@@ -2497,7 +2497,7 @@ ippGetResolution(
 /*
  * 'ippGetState()' - Get the IPP message state.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_state_t				/* O - IPP message state value */
@@ -2521,7 +2521,7 @@ ippGetState(ipp_t *ipp)			/* I - IPP message */
 /*
  * 'ippGetStatusCode()' - Get the status code from an IPP response or event message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_status_t				/* O - Status code in IPP message */
@@ -2548,7 +2548,7 @@ ippGetStatusCode(ipp_t *ipp)		/* I - IPP response or event message */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *
@@ -2579,7 +2579,7 @@ ippGetString(ipp_attribute_t *attr,	/* I - IPP attribute */
 /*
  * 'ippGetValueTag()' - Get the value tag for an attribute.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_tag_t				/* O - Value tag or @code IPP_TAG_ZERO@ on error */
@@ -2603,7 +2603,7 @@ ippGetValueTag(ipp_attribute_t *attr)	/* I - IPP attribute */
 /*
  * 'ippGetVersion()' - Get the major and minor version number from an IPP message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - Major version number or 0 on error */
@@ -2647,7 +2647,7 @@ ippLength(ipp_t *ipp)			/* I - IPP message */
 /*
  * 'ippNextAttribute()' - Return the next attribute in the message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_attribute_t *			/* O - Next attribute or @code NULL@ if none */
@@ -2709,7 +2709,7 @@ ippNew(void)
  * attributes-natural-language attributes added. The
  * attributes-natural-language value is derived from the current locale.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ipp_t *					/* O - IPP request message */
@@ -2776,7 +2776,7 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
  * "utf-8" and a value derived from the current locale are substituted,
  * respectively.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 ipp_t *					/* O - IPP response message */
@@ -2897,7 +2897,7 @@ ippRead(http_t *http,			/* I - HTTP connection */
 /*
  * 'ippReadFile()' - Read data for an IPP message from a file.
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ipp_state_t				/* O - Current state */
@@ -2913,7 +2913,7 @@ ippReadFile(int   fd,			/* I - HTTP data */
 /*
  * 'ippReadIO()' - Read data for an IPP message.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ipp_state_t				/* O - Current state */
@@ -3691,7 +3691,7 @@ ippReadIO(void       *src,		/* I - Data source */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3733,7 +3733,7 @@ ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3782,7 +3782,7 @@ ippSetCollection(
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3827,7 +3827,7 @@ ippSetDate(ipp_t             *ipp,	/* I  - IPP message */
  * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
  * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3866,7 +3866,7 @@ ippSetGroupTag(
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3906,7 +3906,7 @@ ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -3951,7 +3951,7 @@ ippSetName(ipp_t           *ipp,	/* I  - IPP message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4034,7 +4034,7 @@ ippSetOctetString(
  * The @code ipp@ parameter refers to an IPP message previously created using
  * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -4069,7 +4069,7 @@ ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4112,7 +4112,7 @@ ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
  *
  * The @code request_id@ parameter must be greater than 0.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -4149,7 +4149,7 @@ ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4191,7 +4191,7 @@ ippSetResolution(
 /*
  * 'ippSetState()' - Set the current state of the IPP message.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -4222,7 +4222,7 @@ ippSetState(ipp_t       *ipp,		/* I - IPP message */
  * The @code ipp@ parameter refers to an IPP message previously created using
  * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -4257,7 +4257,7 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4324,7 +4324,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4362,7 +4362,7 @@ ippSetStringf(ipp_t           *ipp,	/* I  - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4514,7 +4514,7 @@ ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
  * code in the "attributes-natural-language" attribute or, if not present, the language
  * code for the current locale.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4671,7 +4671,7 @@ ippSetValueTag(
  *
  * The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -4752,7 +4752,7 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
  * value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
  * failure, cupsLastErrorString() is set to a human-readable message.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -5391,7 +5391,7 @@ ippValidateAttribute(
  * attribute.  Like @link ippValidateAttribute@, cupsLastErrorString() is set
  * to a human-readable message on failure.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -5431,7 +5431,7 @@ ippWrite(http_t *http,			/* I - HTTP connection */
 /*
  * 'ippWriteFile()' - Write data for an IPP message to a file.
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ipp_state_t				/* O - Current state */
@@ -5449,7 +5449,7 @@ ippWriteFile(int   fd,			/* I - HTTP data */
 /*
  * 'ippWriteIO()' - Write data for an IPP message.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ipp_state_t				/* O - Current state */

@@ -24,7 +24,7 @@
     <div class="body">
       <div class="row">
 	<h1>CUPS @CUPS_VERSION@</h1>
-	<p>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en est&aacute;ndares desarrollado por <a href="http://www.apple.com/">Apple Inc.</a> para OS X<sup>&reg;</sup> y otros sistemas operativos tipo UNIX<sup>&reg;</sup>.</p>
+	<p>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en est&aacute;ndares desarrollado por <a href="http://www.apple.com/">Apple Inc.</a> para macOS<sup>&reg;</sup> y otros sistemas operativos tipo UNIX<sup>&reg;</sup>.</p>
       </div>
       <div class="row">
 	<div class="thirds">

@@ -65,7 +65,7 @@ _cups_dir_time(FILETIME ft)		/* I - File time */
 /*
  * 'cupsDirClose()' - Close a directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -96,7 +96,7 @@ cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 /*
  * 'cupsDirOpen()' - Open a directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_dir_t *				/* O - Directory pointer or @code NULL@ if the directory could not be opened. */
@@ -139,7 +139,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 /*
  * 'cupsDirRead()' - Read the next directory entry.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_dentry_t *				/* O - Directory entry or @code NULL@ if there are no more */
@@ -199,7 +199,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 /*
  * 'cupsDirRewind()' - Rewind to the start of the directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -249,7 +249,7 @@ struct _cups_dir_s			/**** Directory data structure ****/
 /*
  * 'cupsDirClose()' - Close a directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -276,7 +276,7 @@ cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 /*
  * 'cupsDirOpen()' - Open a directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_dir_t *				/* O - Directory pointer or @code NULL@ if the directory could not be opened. */
@@ -330,7 +330,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 /*
  * 'cupsDirRead()' - Read the next directory entry.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_dentry_t *				/* O - Directory entry or @code NULL@ when there are no more */
@@ -428,7 +428,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 /*
  * 'cupsDirRewind()' - Rewind to the start of the directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void

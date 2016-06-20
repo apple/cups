@@ -36,7 +36,7 @@ static char	*cups_scan_strings(char *buffer);
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 const char *				/* O - Localized string */
@@ -200,7 +200,7 @@ cupsLocalizeDestMedia(
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *				/* O - Localized string */
@@ -239,7 +239,7 @@ cupsLocalizeDestOption(
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *				/* O - Localized string */

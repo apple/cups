@@ -267,7 +267,7 @@ AC_SUBST(CUPS_REQUESTS)
 # Server executables...
 case "$uname" in
 	*BSD* | Darwin*)
-		# *BSD and Darwin (MacOS X)
+		# *BSD and Darwin (MacmacOS)
 		INSTALL_SYSV=""
 		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
 		;;
@@ -291,7 +291,7 @@ AC_SUBST(CUPS_SERVERROOT)
 AC_ARG_WITH(rundir, [  --with-rundir           set transient run-time state directory],CUPS_STATEDIR="$withval",[
 	case "$uname" in
 		Darwin*)
-			# Darwin (OS X)
+			# Darwin (macOS)
 			CUPS_STATEDIR="$CUPS_SERVERROOT"
 			;;
 		*)

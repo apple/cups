@@ -42,7 +42,7 @@
  *     FreeBSD         YES     YES     NO      YES     NO
  *     HP-UX           YES     YES     NO      NO      NO
  *     Linux           YES     YES     YES     NO      NO
- *     MacOS X         YES     YES     NO      YES     NO
+ *     MacmacOS         YES     YES     NO      YES     NO
  *     NetBSD          YES     YES     NO      YES     NO
  *     OpenBSD         YES     YES     NO      YES     NO
  *     Solaris         YES     YES     NO      NO      YES

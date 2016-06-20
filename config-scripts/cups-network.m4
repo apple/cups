@@ -47,7 +47,7 @@ if test x$enable_domainsocket != xno -a x$default_domainsocket != xno; then
 	if test "x$default_domainsocket" = x; then
 		case "$uname" in
 			Darwin*)
-				# Darwin and MaxOS X do their own thing...
+				# Darwin and MaxmacOS do their own thing...
 				CUPS_DEFAULT_DOMAINSOCKET="$localstatedir/run/cupsd"
 				;;
 			*)

@@ -59,9 +59,9 @@ enum cups_sc_command_e			/**** Request command codes ****/
   CUPS_SC_CMD_GET_BIDI = 3,		/* Return bidirectional capabilities */
   CUPS_SC_CMD_GET_DEVICE_ID = 4,	/* Return the IEEE-1284 device ID */
   CUPS_SC_CMD_GET_STATE = 5,		/* Return the device state */
-  CUPS_SC_CMD_SNMP_GET = 6,		/* Query an SNMP OID @since CUPS 1.4/OS X 10.6@ */
-  CUPS_SC_CMD_SNMP_GET_NEXT = 7,	/* Query the next SNMP OID @since CUPS 1.4/OS X 10.6@ */
-  CUPS_SC_CMD_GET_CONNECTED = 8,	/* Return whether the backend is "connected" to the printer @since CUPS 1.5/OS X 10.7@ */
+  CUPS_SC_CMD_SNMP_GET = 6,		/* Query an SNMP OID @since CUPS 1.4/macOS 10.6@ */
+  CUPS_SC_CMD_SNMP_GET_NEXT = 7,	/* Query the next SNMP OID @since CUPS 1.4/macOS 10.6@ */
+  CUPS_SC_CMD_GET_CONNECTED = 8,	/* Return whether the backend is "connected" to the printer @since CUPS 1.5/macOS 10.7@ */
   CUPS_SC_CMD_MAX			/* End of valid values @private@ */
 };
 typedef enum cups_sc_command_e cups_sc_command_t;

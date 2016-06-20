@@ -16,7 +16,7 @@ ONDEMANDLIBS=""
 AC_SUBST(ONDEMANDFLAGS)
 AC_SUBST(ONDEMANDLIBS)
 
-dnl Launchd is used on OS X/Darwin...
+dnl Launchd is used on macOS/Darwin...
 AC_ARG_ENABLE(launchd, [  --disable-launchd       disable launchd support])
 LAUNCHD_DIR=""
 AC_SUBST(LAUNCHD_DIR)
@@ -32,7 +32,7 @@ if test x$enable_launchd != xno; then
 
 	case "$uname" in
 		Darwin*)
-			# Darwin, MacOS X
+			# Darwin, MacmacOS
 			LAUNCHD_DIR="/System/Library/LaunchDaemons"
 			# liblaunch is already part of libSystem
 			;;

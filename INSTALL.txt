@@ -38,7 +38,7 @@ BEFORE YOU BEGIN
     Also, please note that CUPS does not include print filters to support PDF
     or raster printing.  You *must* download GPL Ghostscript and/or the Open
     Printing CUPS filters package separately to print on operating systems
-    other than OS X.
+    other than macOS.
 
 
 COMPILING THE SUBVERSION REPOSITORY CODE
@@ -98,7 +98,7 @@ CONFIGURATION
     and diagnose a variety of common problems - use the "--enable-unit-tests"
     configure option to run them at build time.
 
-    On OS X, use the "--with-archflags" option to build with the correct set of
+    On macOS, use the "--with-archflags" option to build with the correct set of
     architectures:
 
         ./configure --with-archflags="-arch i386 -arch x86_64" ...

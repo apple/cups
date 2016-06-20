@@ -24,7 +24,7 @@
 %version @CUPS_VERSION@
 %format all
 %description CUPS is the standards-based, open source printing system developed by
-%description Apple Inc. for OS X and other UNIX®-like operating systems.
+%description Apple Inc. for macOS® and other UNIX®-like operating systems.
 
 %format rpm
 %provides lpd

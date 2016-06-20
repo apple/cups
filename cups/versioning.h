@@ -23,7 +23,7 @@
  * _CUPS_API_2_0 - which add compiler-specific attributes that flag functions
  * that are deprecated, added in particular releases, or internal to CUPS.
  *
- * On OS X, the _CUPS_API_* constants are defined based on the values of
+ * On macOS, the _CUPS_API_* constants are defined based on the values of
  * the MAC_OS_X_VERSION_MIN_ALLOWED and MAC_OS_X_VERSION_MAX_ALLOWED constants
  * provided by the compiler.
  */

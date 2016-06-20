@@ -419,7 +419,7 @@ cupsParseOptions(
 /*
  * 'cupsRemoveOption()' - Remove an option from an option array.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O  - New number of options */

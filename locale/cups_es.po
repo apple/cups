@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2014-09-23 23:45+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -976,8 +976,8 @@ msgstr ""
 "  --host regex            Hacer coincidir el nombre del equipo con la "
 "expresión regular."
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-msgstr "  --lf                    Finalizar líneas con LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
+msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          Listar los filtros a usar."
@@ -1741,6 +1741,10 @@ msgstr ""
 "una ID de trabajo."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr "%s: Error - se esperaba un juego de caracteres tras la opción \"-S\"."
 
@@ -1947,6 +1951,10 @@ msgstr "%s: No se pudo leer base de datos MIME desde \"%s\" o \"%s\"."
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
 msgstr ""
 
 #, c-format
@@ -5470,8 +5478,8 @@ msgstr "Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]"
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 msgstr ""
-"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN."
-"ppd[.gz]]"
+"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN.ppd"
+"[.gz]]"
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -5945,28 +5953,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr "lpinfo: Se esperaba un tiempo de espera tras \"--timeout\"."
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: Argumento \"%s\" desconocido."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: Opción \"%c\" desconocida."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: Opción \"%s\" desconocida."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: No se ha podido conectar al servidor: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: Argumento \"%s\" desconocido."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpmove: Opción \"%c\" desconocida."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: No hay impresoras."
@@ -6496,6 +6488,10 @@ msgstr "variable-bindings usa una longitud indefinida"
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tInterfaz: %s/interfaces/%s"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr ""
+#~ "  --lf                    Finalizar líneas con LF (UNIX/Linux/OS X)."
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Explorar todos los servicios."
 
@@ -6553,3 +6549,15 @@ msgstr "variable-bindings usa una longitud indefinida"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: Se esperaba una interfaz tras la opción \"-i\"."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: Argumento \"%s\" desconocido."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: Opción \"%c\" desconocida."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: Opción \"%s\" desconocida."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpmove: Opción \"%c\" desconocida."

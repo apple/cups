@@ -21,7 +21,7 @@ fi
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
         	Darwin* | Linux | GNU | *BSD*)
-        		# Darwin, MacOS X, Linux, GNU HURD, and *BSD
+        		# Darwin, MacmacOS, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"
@@ -52,7 +52,7 @@ case "$uname" in
 		MAN8DIR=1m
 		;;
 	Linux* | GNU* | Darwin*)
-		# Linux, GNU Hurd, and OS X
+		# Linux, GNU Hurd, and macOS
 		MAN1EXT=1.gz
 		MAN5EXT=5.gz
 		MAN7EXT=7.gz

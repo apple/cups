@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -991,8 +991,8 @@ msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 "  --host regex            Corresponde o nome da máquina à expressão regular."
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-msgstr "  --lf                    Fim de linhas com LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
+msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          Lista filtros que serão usados."
@@ -1742,6 +1742,10 @@ msgstr ""
 "trabalho forem fornecidos."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr "%s: Erro - esperava uma codificação de caracteres após a opção \"-S\"."
 
@@ -1948,6 +1952,10 @@ msgstr "%s: Não foi possível ler o banco de dados MIME de \"%s\" ou \"%s\"."
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
 msgstr "%s: Não foi possível resolver \"%s\"."
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
@@ -5920,28 +5928,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr "lpinfo: Esperava tempo de espera após \"--timeout\"."
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: Argumento desconhecido \"%s\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: Opção desconhecida \"%c\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: Opção desconhecida \"%s\"."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: Não foi possível conectar ao servidor: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: Argumento desconhecido \"%s\"."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpmove: Opção desconhecida \"%c\"."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: Nenhuma impressora."
@@ -6457,6 +6449,9 @@ msgstr "variable-bindings usa comprimento indefinido"
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tInterface: %s/interfaces/%s"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr "  --lf                    Fim de linhas com LF (UNIX/Linux/OS X)."
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Navega por todos os serviços."
 
@@ -6632,6 +6627,18 @@ msgstr "variable-bindings usa comprimento indefinido"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: Esperava interface após a opção \"-i\"."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: Argumento desconhecido \"%s\"."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: Opção desconhecida \"%c\"."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: Opção desconhecida \"%s\"."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpmove: Opção desconhecida \"%c\"."
 
 #~ msgid "lppasswd: Only root can add or delete passwords."
 #~ msgstr "lppasswd: Somente o root pode adicionar ou excluir senhas."

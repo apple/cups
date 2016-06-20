@@ -32,7 +32,7 @@
 /*
  * 'httpAddrConnect()' - Connect to any of the addresses in the list.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */
@@ -50,7 +50,7 @@ httpAddrConnect(
  * 'httpAddrConnect2()' - Connect to any of the addresses in the list with a
  *                        timeout and optional cancel.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */
@@ -344,7 +344,7 @@ httpAddrConnect2(
 /*
  * 'httpAddrCopyList()' - Copy an address list.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 http_addrlist_t	*			/* O - New address list or @code NULL@ on error */
@@ -393,7 +393,7 @@ httpAddrCopyList(
 /*
  * 'httpAddrFreeList()' - Free an address list.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -421,7 +421,7 @@ httpAddrFreeList(
 /*
  * 'httpAddrGetList()' - Get a list of addresses for a hostname.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 http_addrlist_t	*			/* O - List of addresses or NULL */

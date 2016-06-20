@@ -514,7 +514,7 @@ cupsdStartProcess(
   if (envp)
   {
    /*
-    * Add special voodoo magic for OS X - this allows OS X programs to access
+    * Add special voodoo magic for macOS - this allows macOS programs to access
     * their bundle resources properly...
     */
 

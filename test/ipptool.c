@@ -4900,7 +4900,7 @@ timeout_cb(http_t *http,		/* I - Connection to server */
   * buffer is empty...
   */
 
-#ifdef SO_NWRITE			/* OS X and some versions of Linux */
+#ifdef SO_NWRITE			/* macOS and some versions of Linux */
   socklen_t len = sizeof(buffered);	/* Size of return value */
 
   if (getsockopt(httpGetFd(http), SOL_SOCKET, SO_NWRITE, &buffered, &len))

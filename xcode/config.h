@@ -550,10 +550,10 @@
  */
 
 #define HAVE_GETGROUPLIST 1
- 
+
 
 /*
- * Do we have OS X 10.4's mbr_XXX functions?
+ * Do we have macOS 10.4's mbr_XXX functions?
  */
 
 #define HAVE_MEMBERSHIP_H 1
@@ -700,7 +700,7 @@
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
 #if !TARGET_OS_IOS

@@ -113,7 +113,7 @@ cupsMarkOptions(
     * InputSlot, etc.) is not also set.
     *
     * For PageSize, we also check for an empty option value since some versions
-    * of MacOS X use it to specify auto-selection of the media based solely on
+    * of MacmacOS use it to specify auto-selection of the media based solely on
     * the size.
     */
 
@@ -561,7 +561,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_option_t *				/* O - First option or @code NULL@ */
@@ -579,7 +579,7 @@ ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_option_t *				/* O - Next option or @code NULL@ */
@@ -770,7 +770,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
         	ppd, option, choice));
 
  /*
-  * AP_D_InputSlot is the "default input slot" on MacOS X, and setting
+  * AP_D_InputSlot is the "default input slot" on MacmacOS, and setting
   * it clears the regular InputSlot choices...
   */
 

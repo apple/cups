@@ -450,7 +450,7 @@ usage(void)
   _cupsLangPuts(stdout, _("  --crlf                  End lines with CR + LF "
                           "(Windows)."));
   _cupsLangPuts(stdout, _("  --lf                    End lines with LF "
-                          "(UNIX/Linux/OS X)."));
+                          "(UNIX/Linux/macOS)."));
 
   exit(1);
 }

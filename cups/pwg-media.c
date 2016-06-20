@@ -258,7 +258,7 @@ static pwg_media_t const cups_pwg_media[] =
  * units string is @code NULL@, otherwise inches ("in") or millimeters ("mm")
  * are used.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -378,7 +378,7 @@ pwgFormatSizeName(char       *keyword,	/* I - Keyword buffer */
   return (1);
 }
 
-/* For OS X 10.8 and earlier... */
+/* For macOS 10.8 and earlier... */
 void _pwgGenerateSize(char *keyword, size_t keysize, const char *prefix,
 		      const char *name, int width, int length)
 { pwgFormatSizeName(keyword, keysize, prefix, name, width, length, NULL); }
@@ -396,7 +396,7 @@ void _pwgGenerateSize(char *keyword, size_t keysize, const char *prefix,
  * member attribute was specified in the "media-col" Job Template attribute,
  * otherwise it is initialized to 0.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 int					/* O - 1 if size was initialized, 0 otherwise */
@@ -560,7 +560,7 @@ pwgInitSize(pwg_size_t *size,		/* I - Size to initialize */
   return (1);
 }
 
-/* For OS X 10.8 and earlier */
+/* For macOS 10.8 and earlier */
 int _pwgInitSize(pwg_size_t *size, ipp_t *job, int *margins_set)
 { return (pwgInitSize(size, job, margins_set)); }
 
@@ -571,7 +571,7 @@ int _pwgInitSize(pwg_size_t *size, ipp_t *job, int *margins_set)
  * The "name" argument specifies the legacy ISO media size name, for example
  * "iso-a4" or "na-letter".
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -629,7 +629,7 @@ pwgMediaForLegacy(const char *legacy)	/* I - Legacy size name */
  * thread.  Custom names can be of the form "Custom.WIDTHxLENGTH[units]" or
  * "WIDTHxLENGTH[units]".
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -797,7 +797,7 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
  * thread-local storage and is overwritten by each call to the function in the
  * thread.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -896,7 +896,7 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
  * thread-local storage and is overwritten by each call to the function in the
  * thread.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 pwg_media_t *				/* O - PWG media name */

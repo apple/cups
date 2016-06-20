@@ -516,7 +516,7 @@ cupsRasterReadHeader(
  * 'cupsRasterReadHeader2()' - Read a raster page header and store it in a
  *                             version 2 page header structure.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 unsigned				/* O - 1 on success, 0 on failure/end-of-file */
@@ -903,7 +903,7 @@ cupsRasterWriteHeader(
  *
  * The page header can be initialized using @link cupsRasterInterpretPPD@.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 unsigned				/* O - 1 on success, 0 on failure */

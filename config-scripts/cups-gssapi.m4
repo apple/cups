@@ -24,7 +24,7 @@ if test x$enable_gssapi != xno; then
 	if test "x$KRB5CONFIG" != x; then
 		case "$uname" in
 			Darwin)
-				# OS X weak-links to the Kerberos framework...
+				# macOS weak-links to the Kerberos framework...
 				LIBGSSAPI="-weak_framework Kerberos"
 				AC_MSG_CHECKING(for GSS framework)
 				if test -d /System/Library/Frameworks/GSS.framework; then

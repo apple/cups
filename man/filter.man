@@ -203,7 +203,7 @@ The user executing the filter, typically "lp" or "root"; consult the \fIcups-fil
 While the filter interface is compatible with System V interface scripts, CUPS does not support System V interface scripts.
 .SH NOTES
 CUPS filters are not meant to be run directly by the user.
-Aside from the legacy System V interface issues (\fIargv[0]\fR is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on OS X) has additional restrictions that affect how it runs.
+Aside from the legacy System V interface issues (\fIargv[0]\fR is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs.
 Unless you are a developer and know what you are doing, please do not run filters directly.
 Instead, use the
 .BR cupsfilter (8)

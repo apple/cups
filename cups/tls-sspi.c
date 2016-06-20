@@ -134,7 +134,7 @@ cupsSetServerCredentials(
  * 'httpCopyCredentials()' - Copy the credentials associated with the peer in
  *                           an encrypted connection.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 int					/* O - Status of call (0 = success) */

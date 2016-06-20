@@ -254,7 +254,7 @@ ppdcCatalog::load_messages(
   else if (!strcmp(ptr, ".strings"))
   {
    /*
-    * Read messages in OS X ".strings" format, which are either UTF-8/UTF-16
+    * Read messages in macOS ".strings" format, which are either UTF-8/UTF-16
     * text files of the format:
     *
     *     "id" = "str";

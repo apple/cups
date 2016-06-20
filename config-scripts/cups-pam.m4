@@ -54,7 +54,7 @@ if test x$enable_pam != xno; then
 
 	case "$uname" in
 		Darwin*)
-			# Darwin/OS X
+			# Darwin/macOS
 			if test "x$with_pam_module" != x; then
 				PAMFILE="pam.$with_pam_module"
 			elif test -f /usr/lib/pam/pam_opendirectory.so.2; then

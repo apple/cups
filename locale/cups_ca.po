@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -978,8 +978,8 @@ msgstr ""
 msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
+msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr ""
@@ -1663,6 +1663,10 @@ msgstr ""
 "l'identificador de la feina."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr ""
 "%s: error - s'esperava un conjunt de caràcters després de l'opció «-S»."
@@ -1869,6 +1873,10 @@ msgstr "%s: no es pot llegir la base de dades MIME de «%s» o «%s»."
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
 msgstr ""
 
 #, c-format
@@ -5853,28 +5861,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr "lpinfo: s'esperava un temps d'espera després de «--timeout»."
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: l'argument «%s» és desconegut."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: l'opció «%c» és desconeguda."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: l'opció «%s» és desconeguda."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: no s'ha pogut connectar al servidor: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: l'argument «%s» és desconegut."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpmove: l'opció «%c» és desconeguda."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: no hi ha cap impressora."
@@ -6417,6 +6409,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "      **FAIL**  Unable to open PPD file - %s"
 #~ msgstr "      **ERROR**  No es pot obrir el fitxer PPD - %s"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
+
 #~ msgid "  -E                      Enable encryption."
 #~ msgstr "  -E                      Habilita el xifrat."
 
@@ -6755,6 +6750,18 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: s'esperava una interfície després de l'opció «-i»."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: l'argument «%s» és desconegut."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: l'opció «%c» és desconeguda."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: l'opció «%s» és desconeguda."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpmove: l'opció «%c» és desconeguda."
 
 #~ msgid "lppasswd: Only root can add or delete passwords."
 #~ msgstr ""

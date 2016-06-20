@@ -80,7 +80,7 @@ cupsGetPPD(const char *name)		/* I - Destination name */
  * each call to @link cupsGetPPD@ or @code cupsGetPPD2@.  The caller "owns" the
  * file that is created and must @code unlink@ the returned filename.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 const char *				/* O - Filename for PPD file */
@@ -121,7 +121,7 @@ cupsGetPPD2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
  * For classes, @code cupsGetPPD3@ returns the PPD file for the first printer
  * in the class.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 http_status_t				/* O  - HTTP status */
@@ -429,7 +429,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
  * overwritten on the next call to @link cupsGetPPD@, @link cupsGetPPD2@,
  * or @link cupsGetServerPPD@.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 char *					/* O - Name of PPD file or @code NULL@ on error */

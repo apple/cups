@@ -191,7 +191,7 @@
 "  --help                  Show help." = "  --help                  Show help.";
 "  --help                  Show this help." = "  --help                  Show this help.";
 "  --host regex            Match hostname to regular expression." = "  --host regex            Match hostname to regular expression.";
-"  --lf                    End lines with LF (UNIX/Linux/OS X)." = "  --lf                    End lines with LF (UNIX/Linux/OS X).";
+"  --lf                    End lines with LF (UNIX/Linux/macOS)." = "  --lf                    End lines with LF (UNIX/Linux/macOS).";
 "  --list-filters          List filters that will be used." = "  --list-filters          List filters that will be used.";
 "  --local                 True if service is local." = "  --local                 True if service is local.";
 "  --ls                    List attributes." = "  --ls                    List attributes.";
@@ -370,6 +370,7 @@
 "%s: Error - bad job ID." = "%s: Error - bad job ID.";
 "%s: Error - cannot print files and alter jobs simultaneously." = "%s: Error - cannot print files and alter jobs simultaneously.";
 "%s: Error - cannot print from stdin if files or a job ID are provided." = "%s: Error - cannot print from stdin if files or a job ID are provided.";
+"%s: Error - copies must be 1 or more." = "%s: Error - copies must be 1 or more.";
 "%s: Error - expected character set after \"-S\" option." = "%s: Error - expected character set after “-S” option.";
 "%s: Error - expected content type after \"-T\" option." = "%s: Error - expected content type after “-T” option.";
 "%s: Error - expected copies after \"-#\" option." = "%s: Error - expected copies after “-#” option.";
@@ -421,6 +422,7 @@
 "%s: Unable to open PPD file: %s on line %d." = "%s: Unable to open PPD file: %s on line %d.";
 "%s: Unable to read MIME database from \"%s\" or \"%s\"." = "%s: Unable to read MIME database from “%s” or “%s”.";
 "%s: Unable to resolve \"%s\"." = "%s: Unable to resolve “%s”.";
+"%s: Unknown argument \"%s\"." = "%s: Unknown argument “%s”.";
 "%s: Unknown destination \"%s\"." = "%s: Unknown destination “%s”.";
 "%s: Unknown destination MIME type %s/%s." = "%s: Unknown destination MIME type %s/%s.";
 "%s: Unknown option \"%c\"." = "%s: Unknown option “%c”.";
@@ -1634,12 +1636,8 @@
 "lpinfo: Expected scheme list after \"--exclude-schemes\"." = "lpinfo: Expected scheme list after “--exclude-schemes”.";
 "lpinfo: Expected scheme list after \"--include-schemes\"." = "lpinfo: Expected scheme list after “--include-schemes”.";
 "lpinfo: Expected timeout after \"--timeout\"." = "lpinfo: Expected timeout after “--timeout”.";
-"lpinfo: Unknown argument \"%s\"." = "lpinfo: Unknown argument “%s”.";
-"lpinfo: Unknown option \"%c\"." = "lpinfo: Unknown option “%c”.";
-"lpinfo: Unknown option \"%s\"." = "lpinfo: Unknown option “%s”.";
 "lpmove: Unable to connect to server: %s" = "lpmove: Unable to connect to server: %s";
 "lpmove: Unknown argument \"%s\"." = "lpmove: Unknown argument “%s”.";
-"lpmove: Unknown option \"%c\"." = "lpmove: Unknown option “%c”.";
 "lpoptions: No printers." = "lpoptions: No printers.";
 "lpoptions: Unable to add printer or instance: %s" = "lpoptions: Unable to add printer or instance: %s";
 "lpoptions: Unable to get PPD file for %s: %s" = "lpoptions: Unable to get PPD file for %s: %s";

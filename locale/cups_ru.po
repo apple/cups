@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -933,9 +933,8 @@ msgstr "  --help                  Показать эту справку."
 msgid "  --host regex            Match hostname to regular expression."
 msgstr "  --host regex            Найти hostname по регулярному выражению."
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
-"  --lf                    Строки заканчиваются на LF (UNIX/Linux/Mac OS X)."
 
 msgid "  --list-filters          List filters that will be used."
 msgstr ""
@@ -1669,6 +1668,10 @@ msgstr ""
 "задания."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr "%s: Ошибка - после параметра \"-S\" должен идти набор символов."
 
@@ -1882,6 +1885,10 @@ msgstr "%s: Не удается прочитать базу данных MIME и
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
 msgstr ""
 
 #, c-format
@@ -5828,28 +5835,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr "lpinfo: После \"--timeout\" должно быть указано время ожидания"
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: Неизвестный аргумент \"%s\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: Неизвестный параметр \"%c\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: Неизвестный параметр \"%s\"."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: Не удается подключиться к серверу: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: Неизвестный аргумент \"%s\"."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpmove: Неизвестный параметр \"%c\"."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: Нет принтеров."
@@ -6380,6 +6371,11 @@ msgstr "Для variable-bindings длина не установлена"
 #~ "    Комментарий %%EndComments отсутствует.\n"
 #~ "        REF: Стр. 41, %%EndComments"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr ""
+#~ "  --lf                    Строки заканчиваются на LF (UNIX/Linux/Mac OS "
+#~ "X)."
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Обзор всех сервисов."
 
@@ -6427,3 +6423,15 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: После параметра \"-i\" должен быть указан интерфейс."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: Неизвестный аргумент \"%s\"."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: Неизвестный параметр \"%c\"."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: Неизвестный параметр \"%s\"."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpmove: Неизвестный параметр \"%c\"."

@@ -264,9 +264,9 @@ information file.</P>
 <p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
 
 
-<h2 class='title'><a name='MACOSX'>Adding OS X Features</a></h2>
+<h2 class='title'><a name='MACOSX'>Adding macOS Features</a></h2>
 
-<p>OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
+<p>macOS printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin

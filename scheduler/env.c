@@ -49,7 +49,7 @@ cupsdInitEnv(void)
 
 #if defined(__APPLE__)
  /*
-  * Add special voodoo magic for MacOS X - this allows MacOS X
+  * Add special voodoo magic for MacmacOS - this allows MacmacOS
   * programs to access their bundle resources properly...
   *
   * This string is replaced in cupsdStartProcess()...

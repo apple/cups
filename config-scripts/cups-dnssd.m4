@@ -43,7 +43,7 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 	AC_CHECK_HEADER(dns_sd.h, [
 		case "$uname" in
 			Darwin*)
-				# Darwin and MacOS X...
+				# Darwin and MacmacOS...
 				AC_DEFINE(HAVE_DNSSD)
 				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				DNSSD_BACKEND="dnssd"

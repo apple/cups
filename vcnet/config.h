@@ -593,7 +593,7 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have OS X 10.4's mbr_XXX functions?
+ * Do we have macOS 10.4's mbr_XXX functions?
  */
 
 /* #undef HAVE_MEMBERSHIP_H */
@@ -746,7 +746,7 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
 /* #undef CUPS_BUNDLEDIR */

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -981,8 +981,8 @@ msgstr ""
 "  --host regex            Corrispondenza dell'hostname con l'espressione "
 "regolare."
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-msgstr "  --lf                    Termina le righe con LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
+msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr ""
@@ -1737,6 +1737,10 @@ msgstr ""
 "un ID del processo."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr "%s: errore - è previsto un set di caratteri dopo l'opzione \"-S\"."
 
@@ -1946,6 +1950,10 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
 msgstr ""
 
 #, c-format
@@ -5918,28 +5926,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr "lpinfo: è previsto un timeout dopo \"--timeout\"."
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: argomento sconosciuto \"%s\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: opzione sconosciuta \"%c\"."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: opzione sconosciuta \"%s\"."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: non è possibile connettersi al server: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: argomento sconosciuto \"%s\"."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpmove: opzione sconosciuta \"%c\"."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: nessuna stampante."
@@ -6468,6 +6460,10 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tInterfaccia: %s/interfacce/%s"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr ""
+#~ "  --lf                    Termina le righe con LF (UNIX/Linux/OS X)."
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Mostra tutti i servizi."
 
@@ -6644,6 +6640,18 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: è prevista l'interfaccia dopo l'opzione \"-i\"."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: argomento sconosciuto \"%s\"."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: opzione sconosciuta \"%c\"."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: opzione sconosciuta \"%s\"."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpmove: opzione sconosciuta \"%c\"."
 
 #~ msgid "lppasswd: Only root can add or delete passwords."
 #~ msgstr "lppasswd: solo root può aggiungere o eliminare le password."

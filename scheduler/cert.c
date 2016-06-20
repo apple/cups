@@ -120,7 +120,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
 #  ifdef HAVE_MBR_UID_TO_UUID
      /*
-      * On MacOS X, ACLs use UUIDs instead of GIDs...
+      * On MacmacOS, ACLs use UUIDs instead of GIDs...
       */
 
       acl = acl_init(NumSystemGroups - 1);

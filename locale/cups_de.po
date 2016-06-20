@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2016-04-22 12:25+0100\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,8 +852,8 @@ msgstr ""
 "  --host regex            Prüfe den Hostnamen auf Übereinstimmung mit "
 "Regulärem Audruck"
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-msgstr "  --lf                    Zeilenenden mit LF (UNIX/Linux/OS X)"
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
+msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          Liste die Filter auf die benutzt werden."
@@ -1536,6 +1536,10 @@ msgstr ""
 "Auftrags-ID übergeben werden."
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr "%s: Fehler - Zeichensatz nach der \"-S\" Option erwartet."
 
@@ -1742,6 +1746,10 @@ msgstr "%s: Lesen der MIME Datenbank von \"%s\" oder \"%s\" nicht möglich."
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
 msgstr "%s: Auflösen von \"%s\" nicht möglich."
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
@@ -5692,28 +5700,12 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr ""
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr "lpinfo: Unbekanntes Argument »%s«."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr "lpinfo: Unbekannte Option »%c«."
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr "lpinfo: Unbekannte Option »%s«."
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr "lpmove: Verbindung zum Server »%s« nicht möglich"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
 msgstr "lpmove: Unbekanntes Argument »%s«."
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
-msgstr "lpinfo: Unbekannte Option »%c«."
 
 msgid "lpoptions: No printers."
 msgstr "lpoptions: Keine Drucker."
@@ -6215,6 +6207,9 @@ msgstr "variable-bindings hat unbestimmte Länge"
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tSchnittstelle: %s/interfaces/%s"
 
+#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+#~ msgstr "  --lf                    Zeilenenden mit LF (UNIX/Linux/OS X)"
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Browse für alle Dienste."
 
@@ -6269,3 +6264,15 @@ msgstr "variable-bindings hat unbestimmte Länge"
 
 #~ msgid "lpadmin: Expected interface after \"-i\" option."
 #~ msgstr "lpadmin: Schnittstelle nach der \"-i\" Option erwartet."
+
+#~ msgid "lpinfo: Unknown argument \"%s\"."
+#~ msgstr "lpinfo: Unbekanntes Argument »%s«."
+
+#~ msgid "lpinfo: Unknown option \"%c\"."
+#~ msgstr "lpinfo: Unbekannte Option »%c«."
+
+#~ msgid "lpinfo: Unknown option \"%s\"."
+#~ msgstr "lpinfo: Unbekannte Option »%s«."
+
+#~ msgid "lpmove: Unknown option \"%c\"."
+#~ msgstr "lpinfo: Unbekannte Option »%c«."

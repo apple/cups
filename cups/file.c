@@ -312,7 +312,7 @@ _cupsFileCheckFilter(
 /*
  * 'cupsFileClose()' - Close a CUPS file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -444,7 +444,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 /*
  * 'cupsFileCompression()' - Return whether a file is compressed.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - @code CUPS_FILE_NONE@ or @code CUPS_FILE_GZIP@ */
@@ -457,7 +457,7 @@ cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
 /*
  * 'cupsFileEOF()' - Return the end-of-file status.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 1 on end of file, 0 otherwise */
@@ -476,7 +476,7 @@ cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
  * the supplied paths, @code NULL@ is returned. A @code NULL@ path only
  * matches the current directory.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 const char *				/* O - Full path to file or @code NULL@ if not found */
@@ -577,7 +577,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
 /*
  * 'cupsFileFlush()' - Flush pending output.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -625,7 +625,7 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 /*
  * 'cupsFileGetChar()' - Get a single character from a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - Character or -1 on end of file */
@@ -673,7 +673,7 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 /*
  * 'cupsFileGetConf()' - Get a line from a configuration file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 char *					/* O  - Line read or @code NULL@ on end of file or error */
@@ -816,7 +816,7 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
  * nul-terminated, however you should use the returned length to determine
  * the number of bytes on the line.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 size_t					/* O - Number of bytes on line or 0 on end of file */
@@ -890,7 +890,7 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
 /*
  * 'cupsFileGets()' - Get a CR and/or LF-terminated line.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 char *					/* O - Line read or @code NULL@ on end of file or error */
@@ -971,7 +971,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
 /*
  * 'cupsFileLock()' - Temporarily lock access to a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -1000,7 +1000,7 @@ cupsFileLock(cups_file_t *fp,		/* I - CUPS file */
 /*
  * 'cupsFileNumber()' - Return the file descriptor associated with a CUPS file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - File descriptor */
@@ -1029,7 +1029,7 @@ cupsFileNumber(cups_file_t *fp)		/* I - CUPS file */
  * connection as needed, generally preferring IPv6 connections when there is
  * a choice.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file or @code NULL@ if the file or socket cannot be opened */
@@ -1151,7 +1151,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
  * supplied which enables Flate compression of the file.  Compression is
  * not supported for the "a" (append) mode.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file or @code NULL@ if the file could not be opened */
@@ -1263,7 +1263,7 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 /*
  * 'cupsFilePeekChar()' - Peek at the next character from a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - Character or -1 on end of file */
@@ -1295,7 +1295,7 @@ cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
 /*
  * 'cupsFilePrintf()' - Write a formatted string.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - Number of bytes written or -1 on error */
@@ -1392,7 +1392,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 /*
  * 'cupsFilePutChar()' - Write a character.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -1446,7 +1446,7 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
  *
  * This function handles any comment escaping of the value.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ssize_t					/* O - Number of bytes written or -1 on error */
@@ -1507,7 +1507,7 @@ cupsFilePutConf(cups_file_t *fp,	/* I - CUPS file */
  *
  * Like the @code fputs@ function, no newline is appended to the string.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - Number of bytes written or -1 on error */
@@ -1571,7 +1571,7 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
 /*
  * 'cupsFileRead()' - Read from a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ssize_t					/* O - Number of bytes read or -1 on error */
@@ -1647,7 +1647,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
  * 'cupsFileRewind()' - Set the current file position to the beginning of the
  *                      file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 off_t					/* O - New file position or -1 on error */
@@ -1719,7 +1719,7 @@ cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
 /*
  * 'cupsFileSeek()' - Seek in a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 off_t					/* O - New file position or -1 on error */
@@ -1871,7 +1871,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 /*
  * 'cupsFileStderr()' - Return a CUPS file associated with stderr.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file */
@@ -1907,7 +1907,7 @@ cupsFileStderr(void)
 /*
  * 'cupsFileStdin()' - Return a CUPS file associated with stdin.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file */
@@ -1937,7 +1937,7 @@ cupsFileStdin(void)
 /*
  * 'cupsFileStdout()' - Return a CUPS file associated with stdout.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file */
@@ -1973,7 +1973,7 @@ cupsFileStdout(void)
 /*
  * 'cupsFileTell()' - Return the current file position.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 off_t					/* O - File position */
@@ -1989,7 +1989,7 @@ cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
 /*
  * 'cupsFileUnlock()' - Unlock access to a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -2019,7 +2019,7 @@ cupsFileUnlock(cups_file_t *fp)		/* I - CUPS file */
 /*
  * 'cupsFileWrite()' - Write to a file.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ssize_t					/* O - Number of bytes written or -1 on error */

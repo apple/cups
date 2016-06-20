@@ -131,7 +131,7 @@ columns.
 > Note:
 >
 > The ".cxx" extension is used because it is the only common C++ extension
-> between Linux, OS X, UNIX, and Windows.
+> between Linux, macOS, UNIX, and Windows.
 
 The top of each source file contains a header giving the purpose or nature of
 the source file and the copyright and licensing notice:
@@ -613,8 +613,8 @@ target rule is used to create the automatic dependencies:
     depend:
     TAB $(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
 
-We regenerate the automatic dependencies on an OS X system and express any
-non-OS X dependencies statically in the makefile.
+We regenerate the automatic dependencies on an macOS system and express any
+non-macOS dependencies statically in the makefile.
 
 
 ### INSTALL/UNINSTALL SUPPORT

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-05-02 18:01-0400\n"
+"POT-Creation-Date: 2016-06-20 15:18-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -831,7 +831,7 @@ msgstr ""
 msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 
-msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
@@ -1480,6 +1480,10 @@ msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
 msgstr ""
 
 #, c-format
+msgid "%s: Error - copies must be 1 or more."
+msgstr ""
+
+#, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
 msgstr ""
 
@@ -1683,6 +1687,10 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown argument \"%s\"."
 msgstr ""
 
 #, c-format
@@ -5567,27 +5575,11 @@ msgid "lpinfo: Expected timeout after \"--timeout\"."
 msgstr ""
 
 #, c-format
-msgid "lpinfo: Unknown argument \"%s\"."
-msgstr ""
-
-#, c-format
-msgid "lpinfo: Unknown option \"%c\"."
-msgstr ""
-
-#, c-format
-msgid "lpinfo: Unknown option \"%s\"."
-msgstr ""
-
-#, c-format
 msgid "lpmove: Unable to connect to server: %s"
 msgstr ""
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
-msgstr ""
-
-#, c-format
-msgid "lpmove: Unknown option \"%c\"."
 msgstr ""
 
 msgid "lpoptions: No printers."

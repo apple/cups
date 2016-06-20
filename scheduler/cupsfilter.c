@@ -820,7 +820,7 @@ exec_filter(const char *filter,		/* I - Filter to execute */
 
 
  /*
-  * Add special voodoo magic for MacOS X - this allows MacOS X
+  * Add special voodoo magic for MacmacOS - this allows MacmacOS
   * programs to access their bundle resources properly...
   */
 

@@ -20,7 +20,7 @@ case "$uname" in
 	Darwin*)
 		uname="Darwin"
 		if test $uversion -lt 120; then
-			AC_MSG_ERROR([Sorry, this version of CUPS requires OS X 10.8 or higher.])
+			AC_MSG_ERROR([Sorry, this version of CUPS requires macOS 10.8 or higher.])
 		fi
 		;;
 

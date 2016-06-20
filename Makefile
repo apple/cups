@@ -314,14 +314,8 @@ sloc:
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-bsd deb pkg slackware:
+bsd deb epm pkg rpm slackware:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
-
-epm:
-	epm $(EPMFLAGS) -s packaging/installer.gif cups packaging/cups.list
-
-rpm:
-	epm $(EPMFLAGS) -f rpm -s packaging/installer.gif cups packaging/cups.list
 
 .PHONEY:	dist
 dist:	all
@@ -329,7 +323,6 @@ dist:	all
 	$(MAKE) $(MFLAGS) epm
 	case `uname` in \
 		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
-		Darwin*) $(MAKE) $(MFLAGS) osx;; \
 		Linux*) test ! -x /usr/bin/rpm || $(MAKE) $(MFLAGS) rpm;; \
 		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac

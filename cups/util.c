@@ -58,7 +58,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
  * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ipp_status_t				/* O - IPP status */
@@ -146,7 +146,7 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
  * print, use the @link cupsPrintFile2@ or @link cupsPrintFiles2@ function
  * instead.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -226,7 +226,7 @@ cupsCreateJob(
  *
  * The document must have been started using @link cupsStartDocument@.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ipp_status_t				/* O - Status of document submission */
@@ -322,7 +322,7 @@ cupsGetDefault(void)
  * functions to get the user-defined default printer, as this function does
  * not support the lpoptions-defined default printer.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 const char *				/* O - Default printer or @code NULL@ */
@@ -413,7 +413,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
  * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
  * jobs that are stopped, canceled, aborted, or completed.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Number of jobs */
@@ -718,7 +718,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
  * 'cupsPrintFile2()' - Print a file to a printer or class on the specified
  *                      server.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -766,7 +766,7 @@ cupsPrintFiles(
  * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the
  *                       specified server.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -896,7 +896,7 @@ cupsPrintFiles2(
  * @code CUPS_FORMAT_TEXT@ are provided for the "format" argument, although
  * any supported MIME type string can be supplied.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 http_status_t				/* O - HTTP status of request */

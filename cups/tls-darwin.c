@@ -1,5 +1,5 @@
 /*
- * TLS support code for CUPS on OS X.
+ * TLS support code for CUPS on macOS.
  *
  * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -342,7 +342,7 @@ cleanup:
  * Note: The server credentials are used by all threads in the running process.
  * This function is threadsafe.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -417,7 +417,7 @@ cupsSetServerCredentials(
  * 'httpCopyCredentials()' - Copy the credentials associated with the peer in
  *                           an encrypted connection.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -520,7 +520,7 @@ _httpCreateCredentials(
 /*
  * 'httpCredentialsAreValidForName()' - Return whether the credentials are valid for the given name.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -583,7 +583,7 @@ httpCredentialsAreValidForName(
 /*
  * 'httpCredentialsGetTrust()' - Return the trust of credentials.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 http_trust_t				/* O - Level of trust */
@@ -679,7 +679,7 @@ httpCredentialsGetTrust(
 /*
  * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 time_t					/* O - Expiration date of credentials */
@@ -704,7 +704,7 @@ httpCredentialsGetExpiration(
 /*
  * 'httpCredentialsString()' - Return a string representing the credentials.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 size_t					/* O - Total size of credentials string */
