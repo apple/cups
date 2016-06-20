@@ -1,5 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-06-02
+CHANGES.txt - 2.2b1 - 2016-06-20
 --------------------------------
+
+CHANGES IN CUPS V2.2b2
+
+	- CUPS now supports Let's Encrypt certificates on Linux.
+
 
 CHANGES IN CUPS V2.2b1
 

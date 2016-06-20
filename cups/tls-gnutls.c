@@ -1294,17 +1294,73 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     if (hostname[0])
     {
-      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
-      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
+     /*
+      * First look for CA certs...
+      */
 
-      have_creds = !access(crtfile, 0) && !access(keyfile, 0);
+      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostname);
+      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostname);
+
+      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(hostname, '.')) != NULL)
+      {
+       /*
+        * Try just domain name...
+	*/
+
+        hostptr ++;
+	if (strchr(hostptr, '.'))
+	{
+	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+	}
+      }
+
+      if (access(crtfile, R_OK) || access(keyfile, R_OK))
+      {
+       /*
+        * Then look in the CUPS keystore...
+	*/
+
+	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
+	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
+      }
+
+      have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);
     }
     else if (tls_common_name)
     {
-      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
-      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
+     /*
+      * First look for CA certs...
+      */
 
-      have_creds = !access(crtfile, 0) && !access(keyfile, 0);
+      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", tls_common_name);
+      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", tls_common_name);
+
+      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(tls_common_name, '.')) != NULL)
+      {
+       /*
+        * Try just domain name...
+	*/
+
+        hostptr ++;
+	if (strchr(hostptr, '.'))
+	{
+	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+	}
+      }
+
+      if (access(crtfile, R_OK) || access(keyfile, R_OK))
+      {
+       /*
+        * Then look in the CUPS keystore...
+	*/
+
+	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
+	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
+      }
+
+      have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);
     }
 
     if (!have_creds && tls_auto_create && (hostname[0] || tls_common_name))
@@ -1324,7 +1380,8 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     DEBUG_printf(("4_httpTLSStart: Using certificate \"%s\" and private key \"%s\".", crtfile, keyfile));
 
-    status = gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
+    if (!status)
+      status = gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
   }
 
   if (!status)
