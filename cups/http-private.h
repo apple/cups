@@ -60,7 +60,7 @@
 
 #  if defined(__APPLE__) && !defined(_SOCKLEN_T)
 /*
- * MacmacOS 10.2.x does not define socklen_t, and in fact uses an int instead of
+ * macOS 10.2.x does not define socklen_t, and in fact uses an int instead of
  * unsigned type for length values...
  */
 

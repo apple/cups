@@ -1206,7 +1206,7 @@ cupsdCheckGroup(
 
 #ifdef HAVE_MBR_UID_TO_UUID
  /*
-  * Check group membership through MacmacOS membership API...
+  * Check group membership through macOS membership API...
   */
 
   if (user && !mbr_uid_to_uuid(user->pw_uid, useruuid))

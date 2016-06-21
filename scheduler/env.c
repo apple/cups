@@ -1,7 +1,7 @@
 /*
  * Environment management routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -49,7 +49,7 @@ cupsdInitEnv(void)
 
 #if defined(__APPLE__)
  /*
-  * Add special voodoo magic for MacmacOS - this allows MacmacOS
+  * Add special voodoo magic for macOS - this allows macOS
   * programs to access their bundle resources properly...
   *
   * This string is replaced in cupsdStartProcess()...

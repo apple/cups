@@ -1,7 +1,7 @@
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -32,7 +32,7 @@ if test x$enable_launchd != xno; then
 
 	case "$uname" in
 		Darwin*)
-			# Darwin, MacmacOS
+			# Darwin, macOS
 			LAUNCHD_DIR="/System/Library/LaunchDaemons"
 			# liblaunch is already part of libSystem
 			;;

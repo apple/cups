@@ -1,7 +1,7 @@
 /*
  * Filtering program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -820,7 +820,7 @@ exec_filter(const char *filter,		/* I - Filter to execute */
 
 
  /*
-  * Add special voodoo magic for MacmacOS - this allows MacmacOS
+  * Add special voodoo magic for macOS - this allows macOS
   * programs to access their bundle resources properly...
   */
 

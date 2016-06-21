@@ -2435,7 +2435,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
 #ifdef HAVE_NOTIFY_POST
  /*
-  * Send a notification so that MacmacOS applications can know about the
+  * Send a notification so that macOS applications can know about the
   * change, too.
   */
 

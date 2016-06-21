@@ -1,7 +1,7 @@
 /*
  * Authentication certificate routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -120,7 +120,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
 #  ifdef HAVE_MBR_UID_TO_UUID
      /*
-      * On MacmacOS, ACLs use UUIDs instead of GIDs...
+      * On macOS, ACLs use UUIDs instead of GIDs...
       */
 
       acl = acl_init(NumSystemGroups - 1);

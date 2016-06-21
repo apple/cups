@@ -1,7 +1,7 @@
 dnl
 dnl Manpage stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -21,7 +21,7 @@ fi
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
         	Darwin* | Linux | GNU | *BSD*)
-        		# Darwin, MacmacOS, Linux, GNU HURD, and *BSD
+        		# Darwin, macOS, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"

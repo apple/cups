@@ -1,7 +1,7 @@
 dnl
 dnl Directory stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -267,7 +267,7 @@ AC_SUBST(CUPS_REQUESTS)
 # Server executables...
 case "$uname" in
 	*BSD* | Darwin*)
-		# *BSD and Darwin (MacmacOS)
+		# *BSD and Darwin (macOS)
 		INSTALL_SYSV=""
 		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
 		;;

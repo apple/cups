@@ -3206,7 +3206,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
    /*
     * Convert the status to an exit code.  Due to the way the W* macros are
-    * implemented on MacmacOS (bug?), we have to store the exit status in a
+    * implemented on macOS (bug?), we have to store the exit status in a
     * variable first and then convert...
     */
 

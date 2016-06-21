@@ -1,7 +1,7 @@
 dnl
 dnl DNS Service Discovery (aka Bonjour) stuff for CUPS.
 dnl
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl
 dnl These coded instructions, statements, and computer programs are the
 dnl property of Apple Inc. and are protected by Federal copyright
@@ -43,7 +43,7 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 	AC_CHECK_HEADER(dns_sd.h, [
 		case "$uname" in
 			Darwin*)
-				# Darwin and MacmacOS...
+				# Darwin and macOS...
 				AC_DEFINE(HAVE_DNSSD)
 				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				DNSSD_BACKEND="dnssd"

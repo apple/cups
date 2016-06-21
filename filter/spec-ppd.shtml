@@ -97,7 +97,7 @@ LINE-END = CR / LF / CR LF
 
 <h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
 
-<p>CUPS supports three types of color profiles. The first type is based on sRGB and is used by the standard CUPS raster filters and GPL Ghostscript. The second type is based on ICC profiles and is used by the Quartz-based filters on MacmacOS. The final type is based on well-known colorspaces such as sRGB and Adobe RGB.</p>
+<p>CUPS supports three types of color profiles. The first type is based on sRGB and is used by the standard CUPS raster filters and GPL Ghostscript. The second type is based on ICC profiles and is used by the Quartz-based filters on macOS. The final type is based on well-known colorspaces such as sRGB and Adobe RGB.</p>
 
 <blockquote><b>Note:</b>
 
