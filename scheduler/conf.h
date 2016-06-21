@@ -244,10 +244,10 @@ VAR char		*ServerKeychain		VALUE(NULL);
 					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#if defined(HAVE_ONDEMAND)
 VAR int			IdleExitTimeout		VALUE(60);
 					/* Time after which an idle cupsd will exit */
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
 #ifdef HAVE_AUTHORIZATION_H
 VAR char		*SystemGroupAuthKey	VALUE(NULL);
