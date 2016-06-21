@@ -130,6 +130,12 @@ to verify that the hostname resolved from the address matches one of the address
 Double lookups also prevent clients with unregistered addresses from connecting to your server.
 The default is "Off" to avoid the potential server performance problems with hostname lookups.
 Only set this option to "On" or "Double" if absolutely required.
+<dt><a name="IdleExitTimeout"></a><b>IdleExitTimeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Only applicable when
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+is run on-demand (e.g., with <b>-l</b>).
+Specifies the length of time to wait before shutting down due to inactivity.
+The default is "60".
 <dt><a name="JobKillDelay"></a><b>JobKillDelay </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the number of seconds to wait before killing the filters and backend associated with a canceled or held job.
 The default is "30".
