@@ -22,12 +22,9 @@ LAUNCHD_DIR=""
 AC_SUBST(LAUNCHD_DIR)
 
 if test x$enable_launchd != xno; then
-	AC_CHECK_FUNC(launch_msg, AC_DEFINE(HAVE_LAUNCHD))
-	if test $uversion -ge 140; then
-		AC_CHECK_FUNC(launch_activate_socket, [
-			AC_DEFINE(HAVE_LAUNCHD)
-			AC_DEFINE(HAVE_LAUNCH_ACTIVATE_SOCKET)])
-	fi
+	AC_CHECK_FUNC(launch_activate_socket, [
+		AC_DEFINE(HAVE_LAUNCHD)
+		AC_DEFINE(HAVE_ONDEMAND)])
 	AC_CHECK_HEADER(launch.h, AC_DEFINE(HAVE_LAUNCH_H))
 
 	case "$uname" in
@@ -77,6 +74,7 @@ if test x$enable_systemd != xno; then
 
 		if test $have_systemd = yes; then
                         AC_DEFINE(HAVE_SYSTEMD)
+                        AC_DEFINE(HAVE_ONDEMAND)
 			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
@@ -92,6 +90,7 @@ if test "x$enable_upstart" = "xyes"; then
 		AC_MSG_ERROR(Cannot support both systemd and upstart.)
 	fi
 	AC_DEFINE(HAVE_UPSTART)
+	AC_DEFINE(HAVE_ONDEMAND)
 fi
 
 dnl Solaris uses smf

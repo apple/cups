@@ -534,6 +534,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have on-demand support (launchd/systemd/upstart)?
+ */
+
+/* #undef HAVE_ONDEMAND */
+
+
+/*
  * Do we have launchd support?
  */
 
@@ -546,6 +553,13 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_SYSTEMD */
+
+
+/*
+ * Do we have upstart support?
+ */
+
+/* #undef HAVE_UPSTART */
 
 
 /*
@@ -783,11 +797,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #    define abs(x) ((x) < 0 ? -(x) : (x))
 #  endif /* __GNUC__ || __STDC_VERSION__ */
 #endif /* !HAVE_ABS && !abs */
-
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD) || defined(HAVE_UPSTART)
-#  define HAVE_ONDEMAND
-#else
-#  undef HAVE_ONDEMAND
-#endif
 
 #endif /* !_CUPS_CONFIG_H_ */

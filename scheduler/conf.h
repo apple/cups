@@ -1,7 +1,7 @@
 /*
  * Configuration file definitions for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -244,7 +244,7 @@ VAR char		*ServerKeychain		VALUE(NULL);
 					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */
 
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
 VAR int			IdleExitTimeout		VALUE(60);
 					/* Time after which an idle cupsd will exit */
 #endif /* HAVE_ONDEMAND */

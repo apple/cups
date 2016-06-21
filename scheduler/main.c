@@ -29,11 +29,6 @@
 
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
-#  include <libgen.h>
-#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
-/* Update when we have a public header we can include */
-extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
-#  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 #endif /* HAVE_LAUNCH_H */
 
 #ifdef HAVE_SYSTEMD
@@ -72,7 +67,7 @@ static void		sigchld_handler(int sig);
 static void		sighup_handler(int sig);
 static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
 static void		service_checkin(void);
 static void		service_checkout(void);
 #endif /* HAVE_ONDEMAND */
@@ -755,10 +750,10 @@ main(int  argc,				/* I - Number of command-line args */
 	* Shutdown the server...
 	*/
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#ifdef HAVE_ONDEMAND
 	if (OnDemand)
 	  break;
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
         DoingShutdown = 1;
 
@@ -815,7 +810,7 @@ main(int  argc,				/* I - Number of command-line args */
     if ((timeout = select_timeout(fds)) > 1 && LastEvent)
       timeout = 1;
 
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
    /*
     * If no other work is scheduled and we're being controlled by
     * launchd then timeout after 'LaunchdTimeout' seconds of
@@ -845,7 +840,6 @@ main(int  argc,				/* I - Number of command-line args */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
       cupsd_printer_t	*p;		/* Current printer */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-
 
       if (errno == EINTR)		/* Just interrupted by a signal */
         continue;
@@ -931,10 +925,11 @@ main(int  argc,				/* I - Number of command-line args */
     }
 #endif /* !__APPLE__ */
 
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
    /*
-    * If no other work was scheduled and we're being controlled by launchd
-    * then timeout after 'LaunchdTimeout' seconds of inactivity...
+    * If no other work was scheduled and we're being controlled by launchd,
+    * systemd, or upstart then timeout after 'LaunchdTimeout' seconds of
+    * inactivity...
     */
 
     if (!fds && service_idle_exit)
@@ -1149,7 +1144,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsdStopServer();
 
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
  /*
   * Update the keep-alive file as needed...
   */
@@ -1828,38 +1823,34 @@ sigterm_handler(int sig)		/* I - Signal number */
 }
 
 
-#if defined(HAVE_ONDEMAND)
-
+#ifdef HAVE_ONDEMAND
 /*
- * 'add_ondemand_listener()' - Bind an open fd as a Listener.
+ * 'service_add_listener()' - Bind an open fd as a Listener.
  */
 
 static void
-add_ondemand_listener(int fd,           /* I - Socket file descriptor */
-                      int idx)          /* I - Listener number, for logging */
+service_add_listener(int fd,		/* I - Socket file descriptor */
+                     int idx)		/* I - Listener number, for logging */
 {
   cupsd_listener_t	*lis;		/* Listeners array */
   http_addr_t		addr;		/* Address variable */
   socklen_t		addrlen;	/* Length of address */
   char			s[256];		/* String addresss */
 
+
   addrlen = sizeof(addr);
 
   if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "service_checkin: Unable to get local address for listener #%d: %s",
-                    idx + 1, strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_add_listener: Unable to get local address for listener #%d: %s", idx + 1, strerror(errno));
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "service_checkin: Listener #%d at fd %d, \"%s\".",
-                  idx + 1, fd, httpAddrString(&addr, s, sizeof(s)));
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_add_listener: Listener #%d at fd %d, \"%s\".", idx + 1, fd, httpAddrString(&addr, s, sizeof(s)));
 
-  /*
-   * Try to match the on-demand socket address to one of the listeners...
-   */
+ /*
+  * Try to match the on-demand socket address to one of the listeners...
+  */
 
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
@@ -1873,19 +1864,15 @@ add_ondemand_listener(int fd,           /* I - Socket file descriptor */
 
   if (lis)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "service_checkin: Matched existing listener #%d to %s.",
-                    idx + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_add_listener: Matched existing listener #%d to %s.", idx + 1, httpAddrString(&(lis->address), s, sizeof(s)));
   }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "service_checkin: Adding new listener #%d for %s.",
-                    idx + 1, httpAddrString(&addr, s, sizeof(s)));
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_add_listener: Adding new listener #%d for %s.", idx + 1, httpAddrString(&addr, s, sizeof(s)));
 
     if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to allocate listener: %s.", strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "service_add_listener: Unable to allocate listener: %s.", strerror(errno));
       exit(EXIT_FAILURE);
       return;
     }
@@ -1904,6 +1891,7 @@ add_ondemand_listener(int fd,           /* I - Socket file descriptor */
 #  endif /* HAVE_SSL */
 }
 
+
 /*
  * 'service_checkin()' - Check-in with launchd and collect the listening fds.
  */
@@ -1911,7 +1899,7 @@ add_ondemand_listener(int fd,           /* I - Socket file descriptor */
 static void
 service_checkin(void)
 {
-#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
+#  ifdef HAVE_LAUNCHD
   int			error;		/* Check-in error, if any */
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
@@ -1938,99 +1926,9 @@ service_checkin(void)
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", (int)count);
 
   for (i = 0; i < count; i ++)
-  {
-    add_ondemand_listener(ld_sockets[i], i);
-  }
+    service_add_listener(ld_sockets[i], (int)i);
 
   free(ld_sockets);
-
-#  elif defined(HAVE_LAUNCHD)
-  size_t		i,		/* Looping var */
-			count;		/* Number of listeners */
-  launch_data_t		ld_msg,		/* Launch data message */
-			ld_resp,	/* Launch data response */
-			ld_array,	/* Launch data array */
-			ld_sockets,	/* Launch data sockets dictionary */
-			tmp;		/* Launch data */
-  int			fd;		/* File descriptor */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: pid=%d", (int)getpid());
-
- /*
-  * Check-in with launchd...
-  */
-
-  ld_msg = launch_data_new_string(LAUNCH_KEY_CHECKIN);
-  if ((ld_resp = launch_msg(ld_msg)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "service_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
-		    "\") IPC failure");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
-  if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
-  {
-    errno = launch_data_get_errno(ld_resp);
-    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Check-in failed: %s",
-                    strerror(errno));
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Get the sockets dictionary...
-  */
-
-  if ((ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS))
-          == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "service_checkin: No sockets found to answer requests on.");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Get the array of listener sockets...
-  */
-
-  if ((ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "service_checkin: No sockets found to answer requests on.");
-    exit(EXIT_FAILURE);
-    return; /* anti-compiler-warning */
-  }
-
- /*
-  * Add listening fd(s) to the Listener array...
-  */
-
-  if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
-  {
-    count = launch_data_array_get_count(ld_array);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", (int)count);
-
-    for (i = 0; i < count; i ++)
-    {
-     /*
-      * Get the launchd file descriptor and address...
-      */
-
-      if ((tmp = launch_data_array_get_index(ld_array, i)) != NULL)
-      {
-	fd      = launch_data_get_fd(tmp);
-        add_ondemand_listener(fd, i);
-      }
-    }
-  }
-
-  launch_data_free(ld_msg);
-  launch_data_free(ld_resp);
 
 #  elif defined(HAVE_SYSTEMD)
   int			i,		/* Looping var */
@@ -2057,52 +1955,52 @@ service_checkin(void)
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: %d listeners.", count);
 
   for (i = 0; i < count; i ++)
-  {
-    add_ondemand_listener(SD_LISTEN_FDS_START + i, i);
-  }
+    service_add_listener(SD_LISTEN_FDS_START + i, i);
+
 #  elif defined(HAVE_UPSTART)
   const char		*e;		/* Environment var */
   int			fd;		/* File descriptor */
 
+
   if (!(e = getenv("UPSTART_EVENTS")))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "service_checkin: We did not get started via Upstart.");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: We did not get started via Upstart.");
     exit(EXIT_FAILURE);
     return;
   }
 
   if (strcasecmp(e, "socket"))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "service_checkin: We did not get triggered via an Upstart socket event.");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: We did not get triggered via an Upstart socket event.");
     exit(EXIT_FAILURE);
     return;
   }
 
-  if (!(e = getenv("UPSTART_FDS")))
+  if ((e = getenv("UPSTART_FDS")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "service_checkin: Unable to get listener sockets from UPSTART_FDS.");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get listener sockets from UPSTART_FDS.");
     exit(EXIT_FAILURE);
     return;
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "service_checkin: UPSTART_FDS=%s", e);
 
-  fd = strtol(e, NULL, 10);
-  if (fd < 0) {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "service_checkin: Could not parse UPSTART_FDS: %s", strerror(errno));
+  fd = (int)strtol(e, NULL, 10);
+  if (fd < 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Could not parse UPSTART_FDS: %s", strerror(errno));
     exit(EXIT_FAILURE);
     return;
   }
 
-  /* Upstart only supportst a single on-demand socket fd */
-  add_ondemand_listener(fd, 0);
+ /*
+  * Upstart only supportst a single on-demand socket file descriptor...
+  */
+
+  service_add_listener(fd, 0);
 
 #  else
-#  error "Error: defined HAVE_ONDEMAND but no launchd/systemd/upstart selection"
+#    error "Error: defined HAVE_ONDEMAND but no launchd/systemd/upstart selection"
 #  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 }
 
@@ -2159,7 +2057,9 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
   _cupsLangPuts(fp, _("  -F                      Run in the foreground but detach from console."));
   _cupsLangPuts(fp, _("  -h                      Show this usage message."));
+#ifdef HAVE_ONDEMAND
   _cupsLangPuts(fp, _("  -l                      Run cupsd on demand."));
+#endif /* HAVE_ONDEMAND */
   _cupsLangPuts(fp, _("  -s cups-files.conf      Set cups-files.conf file to use."));
   _cupsLangPuts(fp, _("  -t                      Test the configuration file."));
 

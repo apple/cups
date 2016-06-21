@@ -1,7 +1,7 @@
 /*
  * Client definitions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -79,7 +79,7 @@ typedef struct
   int			fd;		/* File descriptor for this server */
   http_addr_t		address;	/* Bind address of socket */
   http_encryption_t	encryption;	/* To encrypt or not to encrypt... */
-#if defined(HAVE_ONDEMAND)
+#ifdef HAVE_ONDEMAND
   int			on_demand;	/* Is this a socket from launchd/systemd/upstart? */
 #endif /* HAVE_ONDEMAND */
 } cupsd_listener_t;

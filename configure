@@ -8764,7 +8764,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
+#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -8810,7 +8810,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
+#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -8834,7 +8834,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
+#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -8879,7 +8879,7 @@ else
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
+#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -8903,7 +8903,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     We can't simply define LARGE_OFF_T to be 9223372036854775807,
     since some C++ compilers masquerading as C compilers
     incorrectly reject 9223372036854775807.  */
-#define LARGE_OFF_T ((((off_t) 1 << 31) << 31) - 1 + (((off_t) 1 << 31) << 31))
+#define LARGE_OFF_T (((off_t) 1 << 62) - 1 + ((off_t) 1 << 62))
   int off_t_is_large[(LARGE_OFF_T % 2147483629 == 721
 		       && LARGE_OFF_T % 2147483647 == 1)
 		      ? 1 : -1];
@@ -9124,23 +9124,15 @@ LAUNCHD_DIR=""
 
 
 if test x$enable_launchd != xno; then
-	ac_fn_c_check_func "$LINENO" "launch_msg" "ac_cv_func_launch_msg"
-if test "x$ac_cv_func_launch_msg" = xyes; then :
-  $as_echo "#define HAVE_LAUNCHD 1" >>confdefs.h
-
-fi
-
-	if test $uversion -ge 140; then
-		ac_fn_c_check_func "$LINENO" "launch_activate_socket" "ac_cv_func_launch_activate_socket"
+	ac_fn_c_check_func "$LINENO" "launch_activate_socket" "ac_cv_func_launch_activate_socket"
 if test "x$ac_cv_func_launch_activate_socket" = xyes; then :
 
-			$as_echo "#define HAVE_LAUNCHD 1" >>confdefs.h
+		$as_echo "#define HAVE_LAUNCHD 1" >>confdefs.h
 
-			$as_echo "#define HAVE_LAUNCH_ACTIVATE_SOCKET 1" >>confdefs.h
+		$as_echo "#define HAVE_ONDEMAND 1" >>confdefs.h
 
 fi
 
-	fi
 	ac_fn_c_check_header_mongrel "$LINENO" "launch.h" "ac_cv_header_launch_h" "$ac_includes_default"
 if test "x$ac_cv_header_launch_h" = xyes; then :
   $as_echo "#define HAVE_LAUNCH_H 1" >>confdefs.h
@@ -9210,6 +9202,8 @@ $as_echo "no" >&6; }
 		if test $have_systemd = yes; then
                         $as_echo "#define HAVE_SYSTEMD 1" >>confdefs.h
 
+                        $as_echo "#define HAVE_ONDEMAND 1" >>confdefs.h
+
 			ac_fn_c_check_header_mongrel "$LINENO" "systemd/sd-journal.h" "ac_cv_header_systemd_sd_journal_h" "$ac_includes_default"
 if test "x$ac_cv_header_systemd_sd_journal_h" = xyes; then :
   $as_echo "#define HAVE_SYSTEMD_SD_JOURNAL_H 1" >>confdefs.h
@@ -9234,6 +9228,8 @@ if test "x$enable_upstart" = "xyes"; then
 		as_fn_error $? "Cannot support both systemd and upstart." "$LINENO" 5
 	fi
 	$as_echo "#define HAVE_UPSTART 1" >>confdefs.h
+
+	$as_echo "#define HAVE_ONDEMAND 1" >>confdefs.h
 
 fi
 
