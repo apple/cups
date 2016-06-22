@@ -2,82 +2,113 @@
 <!-- SECTION: Getting Started -->
 <head>
 	<title>Release Notes</title>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
 </head>
 <body>
 
-<h2><a name="020102">CUPS 2.1.2</a> <em>(December 2, 2015)</em></h2>
+<h1 class="title">Release Notes</h1>
+
+<h2 class="title"><a name="020104">CUPS 2.1.4</a> <em>(June 14, 2016)</em></h2>
+
+<ul>
+	<li>Fixed reporting of 1284 Device IDs (Issue #3835, PR #3836)</li>
+	<li>Fixed printing of multiple files to raw queues (Issue #4782)</li>
+	<li>The scheduler did not implement the Hold-New-Jobs operation correctly (Issue #4767)</li>
+	<li>The ipptool program truncated values at 8k (Issue #4786)</li>
+	<li>The ipptool program did not correctly report uriScheme values in plist output (Issue #4785)</li>
+	<li>The cups-lpd mini-daemon incorrectly included the document-name attribute when creating a job.  It should only be included when sending a job (Issue #4790)</li>
+	<li>USB quirk updates (Issue #4778, Issue #4789)</li>
+	<li>Documentation update (Issue #4772)</li>
+</ul>
+
+
+<h2 class="title"><a name="020103">CUPS 2.1.3</a> <em>(February 5, 2016)</em></h2>
+
+<ul>
+	<li>The default password function did not work on some platforms (<a href="https://github.com/apple/cups/issues/4750">Issue #4750</a>)</li>
+	<li>The scheduler should not exit under memory pressure (&lt;rdar://problem/23255001&gt;)</li>
+	<li>The EPL2 and ZPL sample drivers did not properly support the CutMedia option.</li>
+	<li>Pending subscriptions would prevent the scheduler from idle exiting (<a href="https://github.com/apple/cups/issues/4754">Issue #4754</a>)</li>
+	<li>Fixed some issues in ipptool for skipped tests (&lt;rdar://problem/24137160&gt;)</li>
+	<li>The &quot;lp -H resume&quot; command did not reset the &quot;job-state-reasons&quot; attribute value (<a href="https://github.com/apple/cups/issues/4752">Issue #4752</a>)</li>
+	<li>The scheduler did not allow access to resource files (icons, etc.) when the web interface was disabled (<a href="https://github.com/apple/cups/issues/4755">Issue #4755</a>)</li>
+	<li>Localization fix (<a href="https://github.com/apple/cups/issues/4756">Issue #4756</a>)</li>
+</ul>
+
+
+<h2 class="title"><a name="020102">CUPS 2.1.2</a> <em>(December 2, 2015)</em></h2>
 
 <ul>
 	<li>Re-release of CUPS 2.1.1 as CUPS 2.1.2 due to error in tagging of the 2.1.1 release (pulled content from the 2.2.x tree instead)</li>
 </ul>
 
 
-<h2><a name="020101">CUPS 2.1.1 WITHDRAWN</a> <em>(November 30, 2015)</em></h2>
+<h2 class="title"><a name="020101">CUPS 2.1.1 WITHDRAWN</a> <em>(November 30, 2015)</em></h2>
 
 <ul>
 	<li>Security hardening fixes (&lt;rdar://problem/23131948&gt;, &lt;rdar://problem/23132108&gt;, &lt;rdar://problem/23132353&gt;, &lt;rdar://problem/23132803&gt;, &lt;rdar://problem/23133230&gt;, &lt;rdar://problem/23133393&gt;, &lt;rdar://problem/23133466&gt;, &lt;rdar://problem/23133833&gt;, &lt;rdar://problem/23133998&gt;, &lt;rdar://problem/23134228&gt;, &lt;rdar://problem/23134299&gt;, &lt;rdar://problem/23134356&gt;, &lt;rdar://problem/23134415&gt;, &lt;rdar://problem/23134506&gt;, &lt;rdar://problem/23135066&gt;, &lt;rdar://problem/23135122&gt;, &lt;rdar://problem/23135207&gt;, &lt;rdar://problem/23144290&gt;, &lt;rdar://problem/23144358&gt;, &lt;rdar://problem/23144461&gt;)</li>
-	<li>The cupsGetPPD* functions did not work with IPP printers (<a href="http://www.cups.org/str.php?L4725">STR #4725</a>)</li>
-	<li>Some older HP LaserJet printers need a delayed close when printing using the libusb-based USB backend (<a href="http://www.cups.org/str.php?L4549">STR #4549</a>)</li>
-	<li>The libusb-based USB backend did not unload the kernel usblp module if it was preventing the backend from accessing the printer (<a href="http://www.cups.org/str.php?L4707">STR #4707</a>)</li>
-	<li>Current Primera printers were incorrectly reported as Fargo printers (<a href="http://www.cups.org/str.php?L4708">STR #4708</a>)</li>
+	<li>The cupsGetPPD* functions did not work with IPP printers (<a href="https://github.com/apple/cups/issues/4725">Issue #4725</a>)</li>
+	<li>Some older HP LaserJet printers need a delayed close when printing using the libusb-based USB backend (<a href="https://github.com/apple/cups/issues/4549">Issue #4549</a>)</li>
+	<li>The libusb-based USB backend did not unload the kernel usblp module if it was preventing the backend from accessing the printer (<a href="https://github.com/apple/cups/issues/4707">Issue #4707</a>)</li>
+	<li>Current Primera printers were incorrectly reported as Fargo printers (<a href="https://github.com/apple/cups/issues/4708">Issue #4708</a>)</li>
 	<li>The IPP backend did not always handle jobs getting canceled at the printer (&lt;rdar://problem/22716820&gt;)</li>
-	<li>Scheduler logging change (<a href="http://www.cups.org/str.php?L4728">STR #4728</a>)</li>
-	<li>Added USB quirk for Canon MP530 (<a href="http://www.cups.org/str.php?L4730">STR #4730</a>)</li>
-	<li>The scheduler did not deliver job notifications for jobs submitted to classes (<a href="http://www.cups.org/str.php?L4733">STR #4733</a>)</li>
-	<li>Changing the printer-is-shared value for a remote queue did not produce an error (<a href="http://www.cups.org/str.php?L4738">STR #4738</a>)</li>
+	<li>Scheduler logging change (<a href="https://github.com/apple/cups/issues/4728">Issue #4728</a>)</li>
+	<li>Added USB quirk for Canon MP530 (<a href="https://github.com/apple/cups/issues/4730">Issue #4730</a>)</li>
+	<li>The scheduler did not deliver job notifications for jobs submitted to classes (<a href="https://github.com/apple/cups/issues/4733">Issue #4733</a>)</li>
+	<li>Changing the printer-is-shared value for a remote queue did not produce an error (<a href="https://github.com/apple/cups/issues/4738">Issue #4738</a>)</li>
 	<li>The IPP backend incorrectly included the job-password attribute in Validate-Job requests (&lt;rdar://problem/23531939&gt;)</li>
-	<li>Updated localizations (<a href="http://www.cups.org/str.php?L4709">STR #4709</a>)</li>
+	<li>Updated localizations (<a href="https://github.com/apple/cups/issues/4709">Issue #4709</a>)</li>
 </ul>
 
 
-<h2><a name="020100">CUPS 2.1.0</a> <em>(August 31, 2015)</em></h2>
+<h2 class="title"><a name="020100">CUPS 2.1.0</a> <em>(August 31, 2015)</em></h2>
 
 <ul>
-	<li>Fixed more scheduler crash bugs in the new logging code (<a href="http://www.cups.org/str.php?L4687">STR #4687</a>, <a href="http://www.cups.org/str.php?L4690">STR #4690</a>)</li>
-	<li>The scheduler did not use the ConfigFilePerm setting when copying PPD files or interface scripts attached to a request (<a href="http://www.cups.org/str.php?L4703">STR #4703</a>)</li>
+	<li>Fixed more scheduler crash bugs in the new logging code (<a href="https://github.com/apple/cups/issues/4687">Issue #4687</a>, <a href="https://github.com/apple/cups/issues/4690">Issue #4690</a>)</li>
+	<li>The scheduler did not use the ConfigFilePerm setting when copying PPD files or interface scripts attached to a request (<a href="https://github.com/apple/cups/issues/4703">Issue #4703</a>)</li>
 	<li>Now support new Chinese locale IDs and their correct fallback locales (&lt;rdar://problem/22086642&gt;, &lt;rdar://problem/22130168&gt;)</li>
-	<li>&quot;make check&quot; incorrectly reported an expectation of 18 warning messages when 8 were expected (<a href="http://www.cups.org/str.php?L4684">STR #4684</a>)</li>
-	<li>The new PDF file type rule did not work (<a href="http://www.cups.org/str.php?L4692">STR #4692</a>)</li>
-	<li>The scheduler did not update the jobs.cache file when job files were expired (<a href="http://www.cups.org/str.php?L4706">STR #4706</a>)</li>
-	<li>Fixed some configure script issues (<a href="http://www.cups.org/str.php?L4694">STR #4694</a>, <a href="http://www.cups.org/str.php?L4695">STR #4695</a>, <a href="http://www.cups.org/str.php?L4698">STR #4698</a>)</li>
-	<li>Documentation updates (<a href="http://www.cups.org/str.php?L4691">STR #4691</a>, <a href="http://www.cups.org/str.php?L4693">STR #4693</a>)</li>
+	<li>&quot;make check&quot; incorrectly reported an expectation of 18 warning messages when 8 were expected (<a href="https://github.com/apple/cups/issues/4684">Issue #4684</a>)</li>
+	<li>The new PDF file type rule did not work (<a href="https://github.com/apple/cups/issues/4692">Issue #4692</a>)</li>
+	<li>The scheduler did not update the jobs.cache file when job files were expired (<a href="https://github.com/apple/cups/issues/4706">Issue #4706</a>)</li>
+	<li>Fixed some configure script issues (<a href="https://github.com/apple/cups/issues/4694">Issue #4694</a>, <a href="https://github.com/apple/cups/issues/4695">Issue #4695</a>, <a href="https://github.com/apple/cups/issues/4698">Issue #4698</a>)</li>
+	<li>Documentation updates (<a href="https://github.com/apple/cups/issues/4691">Issue #4691</a>, <a href="https://github.com/apple/cups/issues/4693">Issue #4693</a>)</li>
 </ul>
 
 
-<h2><a name="0201rc1">CUPS 2.1rc1</a> <em>(July 31, 2015)</em></h2>
+<h2 class="title"><a name="0201rc1">CUPS 2.1rc1</a> <em>(July 31, 2015)</em></h2>
 
 <ul>
 	<li>Added support for 3D printers (basic types only, no built-in filters) based on PWG white paper.</li>
-	<li>Fixed bugs in the new journald support (<a href="http://www.cups.org/str.php?L4655">STR #4655</a>, <a href="http://www.cups.org/str.php?L4658">STR #4658</a>, <a href="http://www.cups.org/str.php?L4661">STR #4661</a>)</li>
-	<li>Fixed domain socket support on Linux (<a href="http://www.cups.org/str.php?L4679">STR #4679</a>)</li>
-	<li>Fixed signal handlers in the dnssd and usb backends (<a href="http://www.cups.org/str.php?L4671">STR #4671</a>)</li>
-	<li>&lt;Limit All&gt; in &lt;Policy&gt; sections now applies to all operations when used by itself (<a href="http://www.cups.org/str.php?L4659">STR #4659</a>)</li>
-	<li>Configure script changes for systemd support (<a href="http://www.cups.org/str.php?L4669">STR #4669</a>)</li>
-	<li>Updated autoconf sources to use newer form of AC_INIT (<a href="http://www.cups.org/str.php?L4664">STR #4664</a>)</li>
+	<li>Fixed bugs in the new journald support (<a href="https://github.com/apple/cups/issues/4655">Issue #4655</a>, <a href="https://github.com/apple/cups/issues/4658">Issue #4658</a>, <a href="https://github.com/apple/cups/issues/4661">Issue #4661</a>)</li>
+	<li>Fixed domain socket support on Linux (<a href="https://github.com/apple/cups/issues/4679">Issue #4679</a>)</li>
+	<li>Fixed signal handlers in the dnssd and usb backends (<a href="https://github.com/apple/cups/issues/4671">Issue #4671</a>)</li>
+	<li>&lt;Limit All&gt; in &lt;Policy&gt; sections now applies to all operations when used by itself (<a href="https://github.com/apple/cups/issues/4659">Issue #4659</a>)</li>
+	<li>Configure script changes for systemd support (<a href="https://github.com/apple/cups/issues/4669">Issue #4669</a>)</li>
+	<li>Updated autoconf sources to use newer form of AC_INIT (<a href="https://github.com/apple/cups/issues/4664">Issue #4664</a>)</li>
 </ul>
 
 
-<h2><a name="0201b1">CUPS 2.1b1</a> <em>(June 8, 2015)</em></h2>
+<h2 class="title"><a name="0201b1">CUPS 2.1b1</a> <em>(June 8, 2015)</em></h2>
 
 <ul>
 	<li>Improved speed of ppdMarkDefaults for complex/large PPDs (&lt;rdar://problem/15146999&gt;)</li>
 	<li>The IPP backend now stops sending print data if the printer indicates the job has been aborted or canceled (&lt;rdar://problem/17837631&gt;)</li>
 	<li>The IPP backend now sends the job-pages-per-set attribute when printing multiple copy jobs with finishings (&lt;rdar://problem/16792757&gt;)</li>
 	<li>The IPP backend now updates the cupsMandatory values when the printer configuration changes (&lt;rdar://problem/18126570&gt;)</li>
-	<li>No longer install banner files since third-party banner filters now supply their own (<a href="http://www.cups.org/str.php?L4518">STR #4518</a>)</li>
-	<li>Added support for EXPECT-ALL directive in ipptool test files (<a href="http://www.cups.org/str.php?L4469">STR #4469</a>)</li>
-	<li>Added support for WITH-VALUE-FROM predicate in ipptool test files (<a href="http://www.cups.org/str.php?L4470">STR #4470</a>)</li>
+	<li>No longer install banner files since third-party banner filters now supply their own (<a href="https://github.com/apple/cups/issues/4518">Issue #4518</a>)</li>
+	<li>Added support for EXPECT-ALL directive in ipptool test files (<a href="https://github.com/apple/cups/issues/4469">Issue #4469</a>)</li>
+	<li>Added support for WITH-VALUE-FROM predicate in ipptool test files (<a href="https://github.com/apple/cups/issues/4470">Issue #4470</a>)</li>
 	<li>The scheduler no longer listens on the loopback interface unless the web interface or printer sharing are enabled (&lt;rdar://problem/9136448&gt;)</li>
-	<li>Added a PPD generator for IPP Everywhere printers (<a href="http://www.cups.org/str.php?L4258">STR #4258</a>)</li>
+	<li>Added a PPD generator for IPP Everywhere printers (<a href="https://github.com/apple/cups/issues/4258">Issue #4258</a>)</li>
 	<li>Now install &quot;default&quot; versions of more configuration files (&lt;rdar://problem/19024491&gt;)</li>
 	<li>The cupstestppd program did not handle &quot;maxsize(nnn)&quot; entries in cupsFilter/cupsFilter2 values (&lt;rdar://problem/18974858&gt;)</li>
-	<li>The scheduler now checks the return value of rename() calls (<a href="http://www.cups.org/str.php?L4589">STR #4589</a>)</li>
-	<li>The scheduler now validates ErrorPolicy values in config files (<a href="http://www.cups.org/str.php?L4591">STR #4591</a>)</li>
-	<li>Long cookies caused the web interface to stop working (<a href="http://www.cups.org/str.php?L4619">STR #4619</a>)</li>
+	<li>The scheduler now checks the return value of rename() calls (<a href="https://github.com/apple/cups/issues/4589">Issue #4589</a>)</li>
+	<li>The scheduler now validates ErrorPolicy values in config files (<a href="https://github.com/apple/cups/issues/4591">Issue #4591</a>)</li>
+	<li>Long cookies caused the web interface to stop working (<a href="https://github.com/apple/cups/issues/4619">Issue #4619</a>)</li>
 	<li>Added SSLOptions values to allow Diffie-Hellman key exchange and disable TLS/1.0 support.</li>
-	<li>Updated the scheduler to support more IPP Everywhere attributes (<a href="http://www.cups.org/str.php?L4630">STR #4630</a>)</li>
-	<li>The scheduler now supports advanced ASL and journald logging when &quot;syslog&quot; output is configured (<a href="http://www.cups.org/str.php?L4474">STR #4474</a>)</li>
-	<li>The scheduler now supports logging to stderr when running in the foreground (<a href="http://www.cups.org/str.php?L4505">STR #4505</a>)</li>
+	<li>Updated the scheduler to support more IPP Everywhere attributes (<a href="https://github.com/apple/cups/issues/4630">Issue #4630</a>)</li>
+	<li>The scheduler now supports advanced ASL and journald logging when &quot;syslog&quot; output is configured (<a href="https://github.com/apple/cups/issues/4474">Issue #4474</a>)</li>
+	<li>The scheduler now supports logging to stderr when running in the foreground (<a href="https://github.com/apple/cups/issues/4505">Issue #4505</a>)</li>
 </ul>
 
 
