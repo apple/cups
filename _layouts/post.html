@@ -43,10 +43,41 @@
 	      <li><a href="https://lists.cups.org/mailman/listinfo/cups-devel">Developer</a></li>
 	    </ul></li>
 	    <li><a href="../software.html">Software</a></li>
+	    <li><a href="#modalSearch" data-toggle="modal" data-target="#modalSearch"><span id="searchGlyph" class="glyphicon glyphicon-search"></span> <span class="hidden-sm hidden-md hidden-lg">Search</span></a></li>
 	  </ul>
 	</div>
       </div>
     </nav>
+    <!-- Search Modal -->
+    <div id="modalSearch" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+	<!-- Modal content-->
+	<div class="modal-content">
+	   <div class="modal-header">
+	     <button type="button" class="close" data-dismiss="modal">&times;</button>
+	     <h4 class="modal-title">Search CUPS.org</h4>
+	   </div>
+	   <div class="modal-body">
+	     <script>
+	       (function() {
+		 var cx = '013583990091537888036:obh2r5tsaso';
+		 var gcse = document.createElement('script');
+		 gcse.type = 'text/javascript';
+		 gcse.async = true;
+		 gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+		 var s = document.getElementsByTagName('script')[0];
+		 s.parentNode.insertBefore(gcse, s);
+	       })();
+	     </script>
+	     <gcse:search></gcse:search>
+	   </div>
+	   <div class="modal-footer">
+	     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	   </div>
+	</div>
+      </div>
+    </div>
+    <!-- Page Content -->
     <div class="container-fluid container-top">
       <h1><small class="float-right muted">{{page.date | date_to_string}}</small>{{page.title}}</h1>
 

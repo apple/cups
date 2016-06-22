@@ -156,14 +156,29 @@ SPAN.message {
   font-size: smaller;
 }
 
-.strtext CODE {
-  background: none;
-  border: none;
-  color: black;
-  font-family: Consolas, "Courier New", monospace;
-  font-size: 14px;
-  line-height: 14px;
-  white-space: pre-wrap !important;
+.modal .modal-dialog
+{
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal-open .modal, a:focus
+{
+  outline: none !important;
+}
+
+<!-- These styles fix CSE and Bootstrap 3 conflict -->
+.reset-box-sizing, .reset-box-sizing *, .reset-box-sizing *:before, .reset-box-sizing *:after,  .gsc-inline-block
+{
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+input.gsc-input, .gsc-input-box, .gsc-input-box-hover, .gsc-input-box-focus, .gsc-search-button
+{
+  box-sizing: content-box;
+  line-height: normal;
 }
 
 DL.comment DT, DL.comment DT A {
