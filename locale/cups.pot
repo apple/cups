@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-06-20 15:18-0400\n"
+"POT-Creation-Date: 2016-06-24 11:07-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1136,7 +1136,7 @@ msgstr ""
 msgid "  -E                      Test with HTTP Upgrade to TLS."
 msgstr ""
 
-#: scheduler/main.c:2200
+#: scheduler/main.c:2058
 msgid "  -F                      Run in the foreground but detach from console."
 msgstr ""
 
@@ -1220,7 +1220,7 @@ msgstr ""
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
-#: scheduler/main.c:2198
+#: scheduler/main.c:2056
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
@@ -1244,7 +1244,7 @@ msgstr ""
 msgid "  -e                      Use every filter from the PPD file."
 msgstr ""
 
-#: scheduler/main.c:2199
+#: scheduler/main.c:2057
 msgid "  -f                      Run in the foreground."
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr ""
 msgid "  -f filename             Set default request filename."
 msgstr ""
 
-#: scheduler/main.c:2201
+#: scheduler/main.c:2059
 msgid "  -h                      Show this usage message."
 msgstr ""
 
@@ -1284,7 +1284,7 @@ msgstr ""
 msgid "  -l                      Produce plain text output."
 msgstr ""
 
-#: scheduler/main.c:2202
+#: scheduler/main.c:2061
 msgid "  -l                      Run cupsd on demand."
 msgstr ""
 
@@ -1352,7 +1352,7 @@ msgstr ""
 msgid "  -s                      Print service name if true."
 msgstr ""
 
-#: scheduler/main.c:2203
+#: scheduler/main.c:2063
 msgid "  -s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
@@ -1364,7 +1364,7 @@ msgstr ""
 msgid "  -t                      Test PPDs instead of generating them."
 msgstr ""
 
-#: scheduler/main.c:2204
+#: scheduler/main.c:2064
 msgid "  -t                      Test the configuration file."
 msgstr ""
 
@@ -5143,7 +5143,7 @@ msgstr ""
 msgid "Options Installed"
 msgstr ""
 
-#: scheduler/cupsfilter.c:1480 scheduler/main.c:2197 systemv/cupsaddsmb.c:276
+#: scheduler/cupsfilter.c:1480 scheduler/main.c:2055 systemv/cupsaddsmb.c:276
 #: systemv/cupsctl.c:196 systemv/cupstestdsc.c:421 systemv/cupstestppd.c:3859
 #: test/ippfind.c:2751 test/ipptool.c:4930 ppdc/ppdc.cxx:430
 #: ppdc/ppdhtml.cxx:177 ppdc/ppdi.cxx:123 ppdc/ppdmerge.cxx:361
@@ -6693,7 +6693,7 @@ msgstr ""
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
 
-#: scheduler/main.c:2196
+#: scheduler/main.c:2054
 msgid "Usage: cupsd [options]"
 msgstr ""
 
@@ -6858,36 +6858,36 @@ msgstr ""
 msgid "cupsctl: Unknown option \"-%c\""
 msgstr ""
 
-#: scheduler/main.c:182
+#: scheduler/main.c:178
 msgid "cupsd: Expected config filename after \"-c\" option."
 msgstr ""
 
-#: scheduler/main.c:278
+#: scheduler/main.c:274
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 
-#: scheduler/main.c:252
+#: scheduler/main.c:248
 msgid "cupsd: On-demand support not compiled in, running in normal mode."
 msgstr ""
 
-#: scheduler/main.c:289
+#: scheduler/main.c:285
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr ""
 
-#: scheduler/main.c:213 scheduler/main.c:220
+#: scheduler/main.c:209 scheduler/main.c:216
 msgid "cupsd: Unable to get current directory."
 msgstr ""
 
-#: scheduler/main.c:345 scheduler/main.c:354
+#: scheduler/main.c:341 scheduler/main.c:350
 msgid "cupsd: Unable to get path to cups-files.conf file."
 msgstr ""
 
-#: scheduler/main.c:327
+#: scheduler/main.c:323
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting."
 msgstr ""
 
-#: scheduler/main.c:320
+#: scheduler/main.c:316
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr ""
