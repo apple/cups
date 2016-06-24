@@ -1,4 +1,4 @@
-README - CUPS v2.2b1 - 2016-05-31
+README - CUPS v2.2b2 - 2016-06-24
 ---------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt" instead...
@@ -7,7 +7,7 @@ Looking for compile instructions?  Read the file "INSTALL.txt" instead...
 INTRODUCTION
 
     CUPS is a standards-based, open source printing system developed by Apple
-    Inc. for OS® X and other UNIX®-like operating systems.  CUPS uses the
+    Inc. for macOS® and other UNIX®-like operating systems.  CUPS uses the
     Internet Printing Protocol ("IPP") and provides System V and Berkeley
     command-line interfaces, a web interface, and a C API to manage printers and
     print jobs.  It supports printing to both local (parallel, serial, USB) and
