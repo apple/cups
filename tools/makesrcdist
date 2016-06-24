@@ -81,6 +81,7 @@ else
 fi
 
 fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
+file="cups-$fileversion-source.tar.gz"
 
 echo Exporting $fileversion...
 rm -rf $TMPDIR/cups-$version
@@ -97,7 +98,11 @@ rm -rf tools .gitignore
 cd ..
 
 echo Archiving...
-tar czf cups-$fileversion-source.tar.gz cups-$version
+tar czf $file cups-$version
+
+echo Signing...
+test -f $file.sig && rm -f $file.sig
+gpg --detach-sign $file
 
 echo Removing temporary files...
 rm -rf cups-$version
