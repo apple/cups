@@ -3317,7 +3317,7 @@ sigterm_handler(int sig)		/* I - Signal */
   if (tmpfilename[0])
     unlink(tmpfilename);
 
-  exit(1);
+  _exit(1);
 }
 
 
