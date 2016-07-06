@@ -1,12 +1,17 @@
 LIBRARY libcups2
-VERSION 2.11
+VERSION 2.12
 EXPORTS
 _cupsArrayAddStrings
 _cupsArrayNewStrings
 _cupsBufferGet
 _cupsBufferRelease
 _cupsCharmapFlush
+_cupsCondBroadcast
+_cupsCondInit
+_cupsCondWait
 _cupsConnect
+_cupsConvertOptions
+_cupsCreateDest
 _cupsEncodingName
 _cupsGet1284Values
 _cupsGetDestResource
@@ -58,8 +63,11 @@ _cupsStrFree
 _cupsStrRetain
 _cupsStrScand
 _cupsStrStatistics
+_cupsThreadCancel
 _cupsThreadCreate
+_cupsThreadWait
 _cupsUserDefault
+_cups_safe_vsnprintf
 _cups_strcasecmp
 _cups_strcpy
 _cups_strcpy
@@ -77,6 +85,7 @@ _httpStatus
 _httpTLSInitialize
 _httpTLSPending
 _httpTLSRead
+_httpTLSSetOptions
 _httpTLSStart
 _httpTLSStop
 _httpTLSWrite
@@ -98,9 +107,11 @@ _ppdCacheGetSize
 _ppdCacheGetSource
 _ppdCacheGetType
 _ppdCacheWriteFile
+_ppdCreateFromIPP
 _ppdFreeLanguages
 _ppdGetEncoding
 _ppdGetLanguages
+_ppdGlobals
 _ppdHashName
 _ppdLocalizedAttr
 _ppdNormalizeMakeAndModel
@@ -110,10 +121,6 @@ _ppdParseOptions
 _pwgGenerateSize
 _pwgInitSize
 _pwgInputSlotForSource
-_pwgMediaForLegacy
-_pwgMediaForPPD
-_pwgMediaForPWG
-_pwgMediaForSize
 _pwgMediaNearSize
 _pwgMediaTable
 _pwgMediaTypeForType
@@ -234,6 +241,7 @@ cupsGetPassword2
 cupsGetPrinters
 cupsGetResponse
 cupsGetServerPPD
+cupsHashData
 cupsLangDefault
 cupsLangEncoding
 cupsLangFlush
