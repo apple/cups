@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # API library Makefile for CUPS.
 #
-# Copyright 2007-2015 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -367,7 +365,7 @@ libcups.a:	$(LIBOBJS)
 libcups2.def: $(LIBOBJS) Makefile
 	echo Generating $@...
 	echo "LIBRARY libcups2" >libcups2.def
-	echo "VERSION 2.11" >>libcups2.def
+	echo "VERSION 2.12" >>libcups2.def
 	echo "EXPORTS" >>libcups2.def
 	(nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}'; \
 	 echo __cups_strcpy; echo __cups_strlcat; echo __cups_strlcpy) | \
@@ -566,6 +564,13 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-overview.header --intro api-overview.shtml \
 		>../doc/help/api-overview.html
+	mxmldoc --section "Programming" --title "Administration APIs" \
+		--css ../doc/cups-printable.css \
+		--header api-admin.header --intro api-admin.shtml \
+		api-admin.xml \
+		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
+	mxmldoc --tokens help/api-admin.html api-admin.xml >../doc/help/api-admin.tokens
+	$(RM) api-admin.xml
 	mxmldoc --section "Programming" --title "Array API" \
 		--css ../doc/cups-printable.css \
 		--header api-array.header --intro api-array.shtml \
@@ -614,50 +619,6 @@ apihelp:
 	mxmldoc --tokens help/api-filter.html api-filter.xml >../doc/help/api-filter.tokens
 	$(RM) api-filter.xml
 
-framedhelp:
-	echo Generating CUPS API help files...
-	mxmldoc --framed api-overview \
-		--section "Programming" \
-		--title "Introduction to CUPS Programming" \
-		--css ../doc/cups-printable.css \
-		--header api-overview.header --intro api-overview.shtml
-	mxmldoc --framed api-array \
-		--section "Programming" --title "Array API" \
-		--css ../doc/cups-printable.css \
-		--header api-array.header --intro api-array.shtml \
-		array.h array.c
-	mxmldoc --framed api-cups \
-		--section "Programming" --title "CUPS API" \
-		--css ../doc/cups-printable.css \
-		--header api-cups.header --intro api-cups.shtml \
-		cups.h adminutil.c dest*.c language.c notify.c \
-		options.c tempfile.c usersys.c \
-		util.c
-	mxmldoc --framed api-filedir \
-		--section "Programming" --title "File and Directory APIs" \
-		--css ../doc/cups-printable.css \
-		--header api-filedir.header --intro api-filedir.shtml \
-		file.h file.c dir.h dir.c
-	mxmldoc --framed api-ppd \
-		--section "Programming" --title "PPD API (DEPRECATED)" \
-		--css ../doc/cups-printable.css \
-		--header api-ppd.header --intro api-ppd.shtml \
-		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c \
-		page.c ppd.c
-	mxmldoc --framed api-httpipp \
-		--section "Programming" --title "HTTP and IPP APIs" \
-		--css ../doc/cups-printable.css \
-		--header api-httpipp.header --intro api-httpipp.shtml \
-		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
-		http.c http-addr.c http-support.c ipp.c ipp-support.c \
-		md5passwd.c request.c
-	mxmldoc --framed api-filter \
-		--section "Programming" \
-		--title "Filter and Backend Programming" \
-		--css ../doc/cups-printable.css \
-		--header api-filter.header --intro api-filter.shtml \
-		backchannel.c backend.h backend.c sidechannel.c sidechannel.h
-
 
 #
 # Lines of code computation...
@@ -676,8 +637,3 @@ sloc:
 
 include Dependencies
 tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
-
-
-#
-# End of "$Id$".
-#

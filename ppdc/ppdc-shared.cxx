@@ -1,23 +1,14 @@
 //
-// "$Id$"
+// Shared data class for the CUPS PPD Compiler.
 //
-//   Shared data class for the CUPS PPD Compiler.
+// Copyright 2007-2009 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2009 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcShared::ppdcShared()  - Create shared data.
-//   ppdcShared::~ppdcShared() - Destroy shared data.
-//   ppdcShared::release()     - Decrement the use count and delete as needed.
-//   ppdcShared::retain()      - Increment the use count for this data.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -81,8 +72,3 @@ ppdcShared::retain()
 
   DEBUG_printf(("%s: %p retain use=%d", class_name(), this, use));
 }
-
-
-//
-// End of "$Id$".
-//

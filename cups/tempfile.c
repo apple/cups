@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Temp file utilities for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -71,11 +69,11 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
-#  ifdef __APPLE__
+#  if defined(__APPLE__) && !TARGET_OS_IOS
     tmpdir = "/private/tmp";		/* /tmp is a symlink to /private/tmp */
 #  else
     tmpdir = "/tmp";
-#  endif /* __APPLE__ */
+#  endif /* __APPLE__  && !TARGET_OS_IOS */
 #endif /* WIN32 */
 
  /*
@@ -170,7 +168,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
  * The temporary filename is returned in the filename buffer.
  * The temporary file is opened for writing.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 cups_file_t *				/* O - CUPS file or @code NULL@ on error */
@@ -192,8 +190,3 @@ cupsTempFile2(char *filename,		/* I - Pointer to buffer */
   else
     return (file);
 }
-
-
-/*
- * End of "$Id$".
- */

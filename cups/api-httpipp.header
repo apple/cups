@@ -1,9 +1,7 @@
 <!--
-  "$Id: api-httpipp.header 7258 2008-01-28 00:15:05Z mike $"
-
   HTTP and IPP API header for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
+  Copyright 2007-2016 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -18,8 +16,10 @@
 <div class='summary'><table summary='General Information'>
 <thead>
 <tr>
-	<th>Header</th>
-	<th>cups/cups.h</th>
+	<th>Headers</th>
+	<th>cups/cups.h<br>
+	cups/http.h<br>
+	cups/ipp.h</th>
 </tr>
 </thead>
 <tbody>

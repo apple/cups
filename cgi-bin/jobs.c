@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Job status CGI for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -201,8 +199,3 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
 
   cgiEndHTML();
 }
-
-
-/*
- * End of "$Id$".
- */

@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * "lp" command for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -41,6 +39,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		job_id;			/* Job ID */
   char		*printer,		/* Printer name */
 		*instance,		/* Instance name */
+		*opt,			/* Option pointer */
 		*val,			/* Option value */
 		*title;			/* Job title */
   int		priority;		/* Job priority (1-100) */
@@ -86,427 +85,431 @@ main(int  argc,				/* I - Number of command-line arguments */
   end_options = 0;
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '-' && argv[i][1] && !end_options)
-      switch (argv[i][1])
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
+        switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
-	                    argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
-	    break;
+	      break;
 
-        case 'U' : /* Username */
-	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'U' : /* Username */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected username after \"-U\" "
-				  "option."), argv[0]);
-	        return (1);
+		cupsSetUser(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
+		  return (1);
+		}
+
+		cupsSetUser(argv[i]);
+	      }
+	      break;
+
+	  case 'c' : /* Copy to spool dir (always enabled) */
+	      break;
+
+	  case 'd' : /* Destination printer or class */
+	      if (opt[1] != '\0')
+	      {
+		printer = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected destination after \"-d\" option."), argv[0]);
+		  return (1);
+		}
+
+		printer = argv[i];
 	      }
 
-              cupsSetUser(argv[i]);
-	    }
-	    break;
+	      if ((instance = strrchr(printer, '/')) != NULL)
+		*instance++ = '\0';
 
-        case 'c' : /* Copy to spool dir (always enabled) */
-	    break;
-
-        case 'd' : /* Destination printer or class */
-	    if (argv[i][2] != '\0')
-	      printer = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+	      if ((dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer,
+					   instance)) != NULL)
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected destination after "
-			          "\"-d\" option."), argv[0]);
-		return (1);
-              }
-
-	      printer = argv[i];
-	    }
-
-            if ((instance = strrchr(printer, '/')) != NULL)
-	      *instance++ = '\0';
-
-            if ((dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer,
-                                         instance)) != NULL)
-	    {
-	      for (j = 0; j < dest->num_options; j ++)
-	        if (cupsGetOption(dest->options[j].name, num_options,
-		                  options) == NULL)
-	          num_options = cupsAddOption(dest->options[j].name,
-		                              dest->options[j].value,
-					      num_options, &options);
-	    }
-	    else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
-		     cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
-	    {
-	      _cupsLangPrintf(stderr,
-			      _("%s: Error - add '/version=1.1' to server "
-				"name."), argv[0]);
-	      return (1);
-	    }
-	    break;
-
-        case 'f' : /* Form */
-	    if (!argv[i][2])
-	    {
-	      i ++;
-
-	      if (i >= argc)
+		for (j = 0; j < dest->num_options; j ++)
+		  if (cupsGetOption(dest->options[j].name, num_options,
+				    options) == NULL)
+		    num_options = cupsAddOption(dest->options[j].name,
+						dest->options[j].value,
+						num_options, &options);
+	      }
+	      else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+		       cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected form after \"-f\" "
-				  "option."),
-				argv[0]);
+		_cupsLangPrintf(stderr,
+				_("%s: Error - add '/version=1.1' to server "
+				  "name."), argv[0]);
 		return (1);
-              }
-	    }
-
-	    _cupsLangPrintf(stderr, _("%s: Warning - form option ignored."),
-	                    argv[0]);
-	    break;
-
-        case 'h' : /* Destination host */
-	    if (argv[i][2] != '\0')
-	      cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected hostname after "
-				  "\"-h\" option."), argv[0]);
-		return (1);
-              }
-
-	      cupsSetServer(argv[i]);
-	    }
-	    break;
-
-        case 'i' : /* Change job */
-	    if (argv[i][2])
-	      val = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Expected job ID after \"-i\" option."),
-				argv[0]);
-		return (1);
-              }
-
-	      val = argv[i];
-	    }
-
-            if (num_files > 0)
-	    {
-	      _cupsLangPrintf(stderr,
-		              _("%s: Error - cannot print files and alter "
-			        "jobs simultaneously."), argv[0]);
-	      return (1);
-	    }
-
-            if (strrchr(val, '-') != NULL)
-	      job_id = atoi(strrchr(val, '-') + 1);
-	    else
-	      job_id = atoi(val);
-
-            if (job_id < 0)
-	    {
-	      _cupsLangPrintf(stderr, _("%s: Error - bad job ID."), argv[0]);
+	      }
 	      break;
-	    }
-	    break;
 
-	case 'm' : /* Send email when job is done */
+	  case 'f' : /* Form */
+	      if (opt[1] != '\0')
+	      {
+	        opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected form after \"-f\" option."), argv[0]);
+		  return (1);
+		}
+	      }
+
+	      _cupsLangPrintf(stderr, _("%s: Warning - form option ignored."), argv[0]);
+	      break;
+
+	  case 'h' : /* Destination host */
+	      if (opt[1] != '\0')
+	      {
+		cupsSetServer(opt + 1);
+	        opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-h\" option."), argv[0]);
+		  return (1);
+		}
+
+		cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  case 'i' : /* Change job */
+	      if (opt[1] != '\0')
+	      {
+		val = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Expected job ID after \"-i\" option."), argv[0]);
+		  return (1);
+		}
+
+		val = argv[i];
+	      }
+
+	      if (num_files > 0)
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - cannot print files and alter jobs simultaneously."), argv[0]);
+		return (1);
+	      }
+
+	      if (strrchr(val, '-') != NULL)
+		job_id = atoi(strrchr(val, '-') + 1);
+	      else
+		job_id = atoi(val);
+
+	      if (job_id < 0)
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - bad job ID."), argv[0]);
+		break;
+	      }
+	      break;
+
+	  case 'm' : /* Send email when job is done */
 #ifdef __sun
-	case 'p' : /* Notify on completion */
+	  case 'p' : /* Notify on completion */
 #endif /* __sun */
-	case 'w' : /* Write to console or email */
-	    {
-	      char	email[1024];	/* EMail address */
-
-
-	      snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(),
-	               httpGetHostname(NULL, buffer, sizeof(buffer)));
-	      num_options = cupsAddOption("notify-recipient-uri", email,
-	                                  num_options, &options);
-	    }
-
-	    silent = 1;
-	    break;
-
-	case 'n' : /* Number of copies */
-	    if (argv[i][2] != '\0')
-	      num_copies = atoi(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+	  case 'w' : /* Write to console or email */
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected copies after "
-				  "\"-n\" option."), argv[0]);
-		return (1);
-              }
+		char	email[1024];	/* EMail address */
 
-	      num_copies = atoi(argv[i]);
-	    }
 
-            sprintf(buffer, "%d", num_copies);
-            num_options = cupsAddOption("copies", buffer, num_options,
-	                                &options);
-	    break;
+		snprintf(email, sizeof(email), "mailto:%s@%s", cupsUser(), httpGetHostname(NULL, buffer, sizeof(buffer)));
+		num_options = cupsAddOption("notify-recipient-uri", email, num_options, &options);
+	      }
 
-	case 'o' : /* Option */
-	    if (argv[i][2] != '\0')
-	      num_options = cupsParseOptions(argv[i] + 2, num_options,
-	                                     &options);
-	    else
-	    {
-	      i ++;
+	      silent = 1;
+	      break;
 
-	      if (i >= argc)
+	  case 'n' : /* Number of copies */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected option=value after "
-				  "\"-o\" option."), argv[0]);
-		return (1);
-              }
+		num_copies = atoi(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
 
-	      num_options = cupsParseOptions(argv[i], num_options, &options);
-	    }
-	    break;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected copies after \"-n\" option."), argv[0]);
+		  return (1);
+		}
+
+		num_copies = atoi(argv[i]);
+	      }
+
+	      if (num_copies < 1)
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - copies must be 1 or more."), argv[0]);
+		return (1);
+	      }
+
+	      sprintf(buffer, "%d", num_copies);
+	      num_options = cupsAddOption("copies", buffer, num_options,
+					  &options);
+	      break;
+
+	  case 'o' : /* Option */
+	      if (opt[1] != '\0')
+	      {
+		num_options = cupsParseOptions(opt + 1, num_options, &options);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected option=value after \"-o\" option."), argv[0]);
+		  return (1);
+		}
+
+		num_options = cupsParseOptions(argv[i], num_options, &options);
+	      }
+	      break;
 
 #ifndef __sun
-	case 'p' : /* Queue priority */
+	  case 'p' : /* Queue priority */
 #endif /* !__sun */
-	case 'q' : /* Queue priority */
-	    if (argv[i][2] != '\0')
-	      priority = atoi(argv[i] + 2);
-	    else
-	    {
-	      if ((i + 1) >= argc)
+	  case 'q' : /* Queue priority */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected priority after "
-				  "\"-%c\" option."), argv[0], argv[i][1]);
-		return (1);
-              }
-
-	      i ++;
-
-	      priority = atoi(argv[i]);
-	    }
-
-           /*
-	    * For 100% Solaris compatibility, need to add:
-	    *
-	    *   priority = 99 * (39 - priority) / 39 + 1;
-	    *
-	    * However, to keep CUPS lp the same across all platforms
-	    * we will break compatibility this far...
-	    */
-
-	    if (priority < 1 || priority > 100)
-	    {
-	      _cupsLangPrintf(stderr,
-		              _("%s: Error - priority must be between 1 and "
-			        "100."), argv[0]);
-	      return (1);
-	    }
-
-            sprintf(buffer, "%d", priority);
-            num_options = cupsAddOption("job-priority", buffer, num_options,
-	                                &options);
-	    break;
-
-	case 's' : /* Silent */
-	    silent = 1;
-	    break;
-
-	case 't' : /* Title */
-	    if (argv[i][2] != '\0')
-	      title = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+		priority = atoi(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected title after "
-				  "\"-t\" option."), argv[0]);
-		return (1);
-              }
+		if ((i + 1) >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected priority after \"-%c\" option."), argv[0], *opt);
+		  return (1);
+		}
 
-	      title = argv[i];
-	    }
-	    break;
+		i ++;
 
-        case 'y' : /* mode-list */
-	    if (!argv[i][2])
-	    {
-	      i ++;
+		priority = atoi(argv[i]);
+	      }
 
-	      if (i >= argc)
+	     /*
+	      * For 100% Solaris compatibility, need to add:
+	      *
+	      *   priority = 99 * (39 - priority) / 39 + 1;
+	      *
+	      * However, to keep CUPS lp the same across all platforms
+	      * we will break compatibility this far...
+	      */
+
+	      if (priority < 1 || priority > 100)
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected mode list after "
-				  "\"-y\" option."), argv[0]);
-		return (1);
-              }
-	    }
-
-	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - mode option ignored."), argv[0]);
-	    break;
-
-        case 'H' : /* Hold job */
-	    if (argv[i][2])
-	      val = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected hold name after "
-				  "\"-H\" option."), argv[0]);
-		return (1);
-              }
-
-	      val = argv[i];
-	    }
-
-	    if (!strcmp(val, "hold"))
-              num_options = cupsAddOption("job-hold-until", "indefinite",
-	                                  num_options, &options);
-	    else if (!strcmp(val, "resume") ||
-	             !strcmp(val, "release"))
-              num_options = cupsAddOption("job-hold-until", "no-hold",
-	                                  num_options, &options);
-	    else if (!strcmp(val, "immediate"))
-	    {
-              num_options = cupsAddOption("job-hold-until", "no-hold",
-	                                  num_options, &options);
-              num_options = cupsAddOption("job-priority", "100",
-	                                  num_options, &options);
-	    }
-	    else if (!strcmp(val, "restart"))
-	    {
-	      if (job_id < 1)
-	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Need job ID (\"-i jobid\") before "
-			          "\"-H restart\"."), argv[0]);
+		_cupsLangPrintf(stderr, _("%s: Error - priority must be between 1 and 100."), argv[0]);
 		return (1);
 	      }
 
-	      if (restart_job(argv[0], job_id))
-	        return (1);
-	    }
-	    else
-              num_options = cupsAddOption("job-hold-until", val,
-	                                  num_options, &options);
-	    break;
+	      sprintf(buffer, "%d", priority);
+	      num_options = cupsAddOption("job-priority", buffer, num_options,
+					  &options);
+	      break;
 
-        case 'P' : /* Page list */
-	    if (argv[i][2])
-	      val = argv[i] + 2;
-	    else
-	    {
-	      i ++;
+	  case 's' : /* Silent */
+	      silent = 1;
+	      break;
 
-	      if (i >= argc)
+	  case 't' : /* Title */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected page list after "
-				  "\"-P\" option."), argv[0]);
-		return (1);
-              }
-
-	      val = argv[i];
-	    }
-
-            num_options = cupsAddOption("page-ranges", val, num_options,
-	                                &options);
-            break;
-
-        case 'S' : /* character set */
-	    if (!argv[i][2])
-	    {
-	      i ++;
-
-	      if (i >= argc)
+		title = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected character set after "
-				  "\"-S\" option."), argv[0]);
-		return (1);
-              }
-	    }
+		i ++;
 
-	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - character set option ignored."),
-			    argv[0]);
-	    break;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected title after \"-t\" option."), argv[0]);
+		  return (1);
+		}
 
-        case 'T' : /* Content-Type */
-	    if (!argv[i][2])
-	    {
-	      i ++;
+		title = argv[i];
+	      }
+	      break;
 
-	      if (i >= argc)
+	  case 'y' : /* mode-list */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected content type after "
-			          "\"-T\" option."), argv[0]);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected mode list after \"-y\" option."), argv[0]);
+		  return (1);
+		}
+	      }
+
+	      _cupsLangPrintf(stderr, _("%s: Warning - mode option ignored."), argv[0]);
+	      break;
+
+	  case 'H' : /* Hold job */
+	      if (opt[1] != '\0')
+	      {
+		val = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hold name after \"-H\" option."), argv[0]);
+		  return (1);
+		}
+
+		val = argv[i];
+	      }
+
+	      if (!strcmp(val, "hold"))
+		num_options = cupsAddOption("job-hold-until", "indefinite", num_options, &options);
+	      else if (!strcmp(val, "resume") || !strcmp(val, "release"))
+		num_options = cupsAddOption("job-hold-until", "no-hold", num_options, &options);
+	      else if (!strcmp(val, "immediate"))
+	      {
+		num_options = cupsAddOption("job-hold-until", "no-hold", num_options, &options);
+		num_options = cupsAddOption("job-priority", "100", num_options, &options);
+	      }
+	      else if (!strcmp(val, "restart"))
+	      {
+		if (job_id < 1)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Need job ID (\"-i jobid\") before \"-H restart\"."), argv[0]);
+		  return (1);
+		}
+
+		if (restart_job(argv[0], job_id))
+		  return (1);
+	      }
+	      else
+		num_options = cupsAddOption("job-hold-until", val, num_options, &options);
+	      break;
+
+	  case 'P' : /* Page list */
+	      if (opt[1] != '\0')
+	      {
+		val = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected page list after \"-P\" option."), argv[0]);
+		  return (1);
+		}
+
+		val = argv[i];
+	      }
+
+	      num_options = cupsAddOption("page-ranges", val, num_options, &options);
+	      break;
+
+	  case 'S' : /* character set */
+	      if (opt[1] != '\0')
+	      {
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected character set after \"-S\" option."), argv[0]);
+		  return (1);
+		}
+	      }
+
+	      _cupsLangPrintf(stderr, _("%s: Warning - character set option ignored."), argv[0]);
+	      break;
+
+	  case 'T' : /* Content-Type */
+	      if (opt[1] != '\0')
+	      {
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected content type after \"-T\" option."), argv[0]);
+		  return (1);
+		}
+	      }
+
+	      _cupsLangPrintf(stderr, _("%s: Warning - content type option ignored."), argv[0]);
+	      break;
+
+	  case '-' : /* Stop processing options */
+	      if (opt[1] != '\0')
+	      {
+		_cupsLangPrintf(stderr, _("%s: Error - unknown option \"%s\"."), argv[0], argv[i]);
 		return (1);
-              }
-	    }
+	      }
 
-	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - content type option ignored."),
-			    argv[0]);
-	    break;
+	      end_options = 1;
+	      break;
 
-        case '-' : /* Stop processing options */
-            if (argv[i][2])
-            {
-	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%s\"."),
-			      argv[0], argv[i]);
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), argv[0], *opt);
 	      return (1);
-	    }
-
-	    end_options = 1;
-	    break;
-
-	default :
-	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."),
-	                    argv[0], argv[i][1]);
-	    return (1);
+	}
       }
+    }
     else if (!strcmp(argv[i], "-"))
     {
       if (num_files || job_id)
@@ -527,8 +530,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (access(argv[i], R_OK) != 0)
       {
-        _cupsLangPrintf(stderr, _("%s: Error - unable to access \"%s\" - %s"),
-	                argv[0], argv[i], strerror(errno));
+        _cupsLangPrintf(stderr, _("%s: Error - unable to access \"%s\" - %s"), argv[0], argv[i], strerror(errno));
         return (1);
       }
 
@@ -544,8 +546,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
     }
     else
-      _cupsLangPrintf(stderr, _("%s: Error - too many files - \"%s\"."),
-                      argv[0], argv[i]);
+    {
+      _cupsLangPrintf(stderr, _("%s: Error - too many files - \"%s\"."), argv[0], argv[i]);
+    }
+  }
 
  /*
   * See if we are altering an existing job...
@@ -755,8 +759,3 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

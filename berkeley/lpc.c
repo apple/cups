@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * "lpc" command for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -435,8 +433,3 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
     ippDelete(response);
   }
 }
-
-
-/*
- * End of "$Id$".
- */

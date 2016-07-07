@@ -1,9 +1,7 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -18,21 +16,7 @@ AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
 CUPS_VERSION="AC_PACKAGE_VERSION"
-
-case "$CUPS_VERSION" in
-	*svn)
-		if test -z "$CUPS_REVISION" -a -d .svn; then
-			CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-		else
-			CUPS_REVISION=""
-		fi
-		;;
-
-	*)
-		CUPS_REVISION=""
-		;;
-esac
-
+CUPS_REVISION=""
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],
@@ -214,6 +198,9 @@ AC_CHECK_FUNCS(waitpid wait3)
 
 dnl Check for posix_spawn
 AC_CHECK_FUNCS(posix_spawn)
+
+dnl Check for getgrouplist
+AC_CHECK_FUNCS(getgrouplist)
 
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
@@ -472,7 +459,3 @@ case "$COMPONENTS" in
 esac
 
 AC_SUBST(BUILDDIRS)
-
-dnl
-dnl End of "$Id$".
-dnl

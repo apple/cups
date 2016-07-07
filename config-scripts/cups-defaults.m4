@@ -1,16 +1,14 @@
 dnl
-dnl "$Id$"
+dnl Default cupsd configuration settings for CUPS.
 dnl
-dnl   Default cupsd configuration settings for CUPS.
+dnl Copyright 2007-2015 by Apple Inc.
+dnl Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl   Copyright 2007-2015 by Apple Inc.
-dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
-dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Default languages...
@@ -24,8 +22,8 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 	esac])
 AC_SUBST(LANGUAGES)
 
-dnl OS X bundle-based localization support
-AC_ARG_WITH(bundledir, [  --with-bundledir        set OS X localization bundle directory ],
+dnl macOS bundle-based localization support
+AC_ARG_WITH(bundledir, [  --with-bundledir        set macOS localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
 	if test "x$uname" = xDarwin -a $uversion -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
@@ -384,7 +382,7 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl Web interface...
-AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for OS X])
+AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for macOS])
 case "x$enable_webif" in
 	xno)
 		CUPS_WEBIF=No
@@ -407,7 +405,3 @@ esac
 
 AC_SUBST(CUPS_WEBIF)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_WEBIF, $CUPS_DEFAULT_WEBIF)
-
-dnl
-dnl End of "$Id$".
-dnl

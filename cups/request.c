@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * IPP utilities for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -53,10 +51,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
   int		infile;			/* Input file */
 
 
-  DEBUG_printf(("cupsDoFileRequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "filename=\"%s\")", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, filename));
+  DEBUG_printf(("cupsDoFileRequest(http=%p, request=%p(%s), resource=\"%s\", filename=\"%s\")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, filename));
 
   if (filename)
   {
@@ -99,7 +94,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
  * If "outfile" is a valid file descriptor, @code cupsDoIORequest@ copies
  * all of the data after the IPP response message to the file.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 ipp_t *					/* O - Response data */
@@ -117,10 +112,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   char		buffer[32768];		/* Output buffer */
 
 
-  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "infile=%d, outfile=%d)", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, infile, outfile));
+  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p(%s), resource=\"%s\", infile=%d, outfile=%d)", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, infile, outfile));
 
  /*
   * Range check input...
@@ -304,10 +296,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
               ipp_t      *request,	/* I - IPP request */
               const char *resource)	/* I - HTTP resource for POST */
 {
-  DEBUG_printf(("cupsDoRequest(http=%p, request=%p(%s), resource=\"%s\")",
-                http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource));
+  DEBUG_printf(("cupsDoRequest(http=%p, request=%p(%s), resource=\"%s\")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource));
 
   return (cupsDoIORequest(http, request, resource, -1, -1));
 }
@@ -321,7 +310,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
  * @link cupsReadResponseData@ after getting a successful response,
  * otherwise call @link httpFlush@ to complete the response processing.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ipp_t *					/* O - Response or @code NULL@ on HTTP error */
@@ -333,7 +322,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   ipp_t		*response = NULL;	/* IPP response */
 
 
-  DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", http, resource));
+  DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", (void *)http, resource));
   DEBUG_printf(("1cupsGetResponse: http->state=%d", http ? http->state : HTTP_STATE_ERROR));
 
  /*
@@ -497,7 +486,7 @@ cupsLastError(void)
  * 'cupsLastErrorString()' - Return the last IPP status-message received on the
  *                           current thread.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 const char *				/* O - status-message text from last request */
@@ -544,7 +533,7 @@ _cupsNextDelay(int current,		/* I  - Current delay value or 0 */
  * files from @code CUPS_GET_PPD@ and @code CUPS_GET_DOCUMENT@ requests,
  * respectively.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ssize_t					/* O - Bytes read, 0 on EOF, -1 on error */
@@ -557,8 +546,7 @@ cupsReadResponseData(
   * Get the default connection as needed...
   */
 
-  DEBUG_printf(("cupsReadResponseData(http=%p, buffer=%p, "
-                "length=" CUPS_LLFMT ")", http, buffer, CUPS_LLCAST length));
+  DEBUG_printf(("cupsReadResponseData(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
   if (!http)
   {
@@ -595,7 +583,7 @@ cupsReadResponseData(
  * Note: Unlike @link cupsDoFileRequest@, @link cupsDoIORequest@, and
  * @link cupsDoRequest@, the request is NOT freed with @link ippDelete@.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 http_status_t				/* O - Initial HTTP status */
@@ -610,10 +598,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   http_status_t		expect;		/* Expect: header to use */
 
 
-  DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", "
-                "length=" CUPS_LLFMT ")", http, request,
-		request ? ippOpString(request->request.op.operation_id) : "?",
-		resource, CUPS_LLCAST length));
+  DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", length=" CUPS_LLFMT ")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, CUPS_LLCAST length));
 
  /*
   * Range check input...
@@ -904,7 +889,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  * This function is used after @link cupsSendRequest@ to provide a PPD and
  * after @link cupsStartDocument@ to provide a document file.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 http_status_t				/* O - @code HTTP_STATUS_CONTINUE@ if OK or HTTP status on error */
@@ -920,8 +905,7 @@ cupsWriteRequestData(
   * Get the default connection as needed...
   */
 
-  DEBUG_printf(("cupsWriteRequestData(http=%p, buffer=%p, "
-                "length=" CUPS_LLFMT ")", http, buffer, CUPS_LLCAST length));
+  DEBUG_printf(("cupsWriteRequestData(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
   if (!http)
   {
@@ -1186,8 +1170,3 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
   }
 }
-
-
-/*
- * End of "$Id$".
- */

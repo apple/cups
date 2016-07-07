@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * CGI <-> IPP variable routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1325,7 +1323,7 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
     attr = cgiSetIPPObjectVars(attr, prefix, element);
   }
 
-  fprintf(stderr, "DEBUG2: Returing %d from cgiSetIPPVars()...\n", element);
+  fprintf(stderr, "DEBUG2: Returning %d from cgiSetIPPVars()...\n", element);
 
   return (element);
 }
@@ -1360,8 +1358,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 			*response;	/* IPP response */
   cups_array_t		*jobs;		/* Array of job objects */
   ipp_attribute_t	*job;		/* Job object */
-  int			ascending,	/* Order of jobs (0 = descending) */
-			first,		/* First job to show */
+  int			first,		/* First job to show */
 			count;		/* Number of jobs */
   const char		*var,		/* Form variable */
 			*query,		/* Query string */
@@ -1397,6 +1394,17 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                  NULL, which_jobs);
 
+  if ((var = cgiGetVariable("FIRST")) != NULL)
+  {
+    if ((first = atoi(var)) < 0)
+      first = 0;
+  }
+  else
+    first = 0;
+
+  if (first > 0)
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "first-index", first + 1);
+
   cgiGetAttributes(request, "jobs.tmpl");
 
  /*
@@ -1419,7 +1427,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     }
 
     jobs  = cgiGetIPPObjects(response, search);
-    count = cupsArrayCount(jobs);
+    count = cupsArrayCount(jobs) + first;
 
     if (search)
       cgiFreeSearch(search);
@@ -1428,33 +1436,12 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Figure out which jobs to display...
     */
 
-    if ((var = cgiGetVariable("FIRST")) != NULL)
-      first = atoi(var);
-    else
-      first = 0;
-
-    if (first >= count)
-      first = count - CUPS_PAGE_MAX;
-
-    first = (first / CUPS_PAGE_MAX) * CUPS_PAGE_MAX;
-
-    if (first < 0)
-      first = 0;
-
-    if ((var = cgiGetVariable("ORDER")) != NULL && *var)
-      ascending = !_cups_strcasecmp(var, "asc");
-    else
-      ascending = !which_jobs || !*which_jobs ||
-                  !_cups_strcasecmp(which_jobs, "not-completed");
-
     section = cgiGetVariable("SECTION");
 
     cgiClearVariables();
 
     if (query)
       cgiSetVariable("QUERY", query);
-
-    cgiSetVariable("ORDER", ascending ? "asc" : "dec");
 
     cgiSetVariable("SECTION", section);
 
@@ -1464,20 +1451,10 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if (which_jobs)
       cgiSetVariable("WHICH_JOBS", which_jobs);
 
-    if (ascending)
-    {
-      for (i = 0, job = (ipp_attribute_t *)cupsArrayIndex(jobs, first);
-	   i < CUPS_PAGE_MAX && job;
-	   i ++, job = (ipp_attribute_t *)cupsArrayNext(jobs))
-        cgiSetIPPObjectVars(job, NULL, i);
-    }
-    else
-    {
-      for (i = 0, job = (ipp_attribute_t *)cupsArrayIndex(jobs, count - first - 1);
-	   i < CUPS_PAGE_MAX && job;
-	   i ++, job = (ipp_attribute_t *)cupsArrayPrev(jobs))
-        cgiSetIPPObjectVars(job, NULL, i);
-    }
+    for (i = 0, job = (ipp_attribute_t *)cupsArrayFirst(jobs);
+	 i < CUPS_PAGE_MAX && job;
+	 i ++, job = (ipp_attribute_t *)cupsArrayNext(jobs))
+      cgiSetIPPObjectVars(job, NULL, i);
 
    /*
     * Save navigation URLs...
@@ -1504,6 +1481,12 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     {
       sprintf(val, "%d", first + CUPS_PAGE_MAX);
       cgiSetVariable("NEXT", val);
+    }
+
+    if (count > CUPS_PAGE_MAX)
+    {
+      snprintf(val, sizeof(val), "%d", CUPS_PAGE_MAX * (count / CUPS_PAGE_MAX));
+      cgiSetVariable("LAST", val);
     }
 
    /*
@@ -1547,8 +1530,3 @@ cgiText(const char *message)		/* I - Message */
 
   return (_cupsLangString(language, message));
 }
-
-
-/*
- * End of "$Id$".
- */

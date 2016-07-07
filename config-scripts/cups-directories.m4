@@ -1,9 +1,7 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Directory stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -269,7 +267,7 @@ AC_SUBST(CUPS_REQUESTS)
 # Server executables...
 case "$uname" in
 	*BSD* | Darwin*)
-		# *BSD and Darwin (MacOS X)
+		# *BSD and Darwin (macOS)
 		INSTALL_SYSV=""
 		CUPS_SERVERBIN="$exec_prefix/libexec/cups"
 		;;
@@ -293,7 +291,7 @@ AC_SUBST(CUPS_SERVERROOT)
 AC_ARG_WITH(rundir, [  --with-rundir           set transient run-time state directory],CUPS_STATEDIR="$withval",[
 	case "$uname" in
 		Darwin*)
-			# Darwin (OS X)
+			# Darwin (macOS)
 			CUPS_STATEDIR="$CUPS_SERVERROOT"
 			;;
 		*)
@@ -303,7 +301,3 @@ AC_ARG_WITH(rundir, [  --with-rundir           set transient run-time state dire
 	esac])
 AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$CUPS_STATEDIR")
 AC_SUBST(CUPS_STATEDIR)
-
-dnl
-dnl End of "$Id$".
-dnl

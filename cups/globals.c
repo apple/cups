@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Global variable access routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -204,6 +202,7 @@ cups_globals_alloc(void)
   memset(cg, 0, sizeof(_cups_globals_t));
   cg->encryption     = (http_encryption_t)-1;
   cg->password_cb    = (cups_password_cb2_t)_cupsGetPassword;
+  cg->trust_first    = -1;
   cg->any_root       = -1;
   cg->expired_certs  = -1;
   cg->validate_certs = -1;
@@ -379,8 +378,3 @@ cups_globals_init(void)
   pthread_key_create(&cups_globals_key, (void (*)(void *))cups_globals_free);
 }
 #endif /* HAVE_PTHREAD_H */
-
-
-/*
- * End of "$Id$".
- */

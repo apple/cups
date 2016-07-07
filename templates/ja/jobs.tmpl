@@ -1,7 +1,7 @@
 {#job_id=0?:
 <TABLE CLASS="list" SUMMARY="ジョブの一覧">
 <THEAD>
-<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> ID <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> ID <SMALL>&#x25bc;</SMALL>}</A></TH><TH>名前</TH><TH>ユーザー</TH><TH>サイズ</TH><TH>ページ</TH><TH>状態</TH><TH>制御</TH></TR>
+<TR><TH>ID</TH><TH>名前</TH><TH>ユーザー</TH><TH>サイズ</TH><TH>ページ</TH><TH>状態</TH><TH>制御</TH></TR>
 </THEAD>
 <TBODY>
 {[job_id]
@@ -11,9 +11,9 @@
 <TD>{?job_originating_user_name=?隠匿:{job_originating_user_name}}&nbsp;</TD>
 <TD>{job_k_octets}k&nbsp;</TD>
 <TD>{job_media_sheets_completed=0?不明:{?job_media_sheets_completed}}&nbsp;</TD>
-<TD>{job_state=3?{time_at_creation}<BR>から保留中:{job_state=4?{time_at_creation}<BR>から保留中:
-{job_state=5?{time_at_processing}<BR>から処理中:{job_state=6?に停止:
-{job_state=7?{time_at_completed}<BR>にキャンセル:{job_state=8?に中断:{time_at_completed}<BR>に完了}}}}}}&nbsp;{job_printer_state_message?<BR>
+<TD>{job_state=3?{?time_at_creation=?Unknown:{time_at_creation}}<BR>から保留中:{job_state=4?{?time_at_creation=?Unknown:{time_at_creation}}<BR>から保留中:
+{job_state=5?{?time_at_processing=?Unknown:{time_at_processing}}<BR>から処理中:{job_state=6?に停止:
+{job_state=7?{?time_at_completed=?Unknown:{time_at_completed}}<BR>にキャンセル:{job_state=8?に中断:{?time_at_completed=?Unknown:{time_at_completed}}<BR>に完了}}}}}}&nbsp;{job_printer_state_message?<BR>
 <EM>"{job_printer_state_message}"</EM>:}</TD>
 <TD>
 {job_preserved>0?{job_state>5?

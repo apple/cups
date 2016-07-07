@@ -1,23 +1,14 @@
 /*
- * "$Id$"
+ * "lpinfo" command for CUPS.
  *
- *   "lpinfo" command for CUPS.
+ * Copyright 2007-2016 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()         - Parse options and show information.
- *   device_cb      - Device callback.
- *   show_devices() - Show available devices.
- *   show_models()  - Show available PPDs.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -25,6 +16,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/adminutil.h>
 
 
 /*
@@ -56,7 +48,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   int		long_status;		/* Long listing? */
-  const char	*device_id,		/* 1284 device ID */
+  const char	*opt,			/* Option pointer */
+		*device_id,		/* 1284 device ID */
 		*language,		/* Language */
 		*make_model,		/* Make and model */
 		*product,		/* Product */
@@ -77,195 +70,175 @@ main(int  argc,				/* I - Number of command-line arguments */
   timeout         = CUPS_TIMEOUT_DEFAULT;
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
-      switch (argv[i][1])
+  {
+    if (!strcmp(argv[i], "--device-id"))
+    {
+      i ++;
+
+      if (i < argc)
+	device_id = argv[i];
+      else
       {
-        case 'E' : /* Encrypt */
-#ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-#else
-            _cupsLangPrintf(stderr,
-		            _("%s: Sorry, no encryption support."),
-	                    argv[0]);
-#endif /* HAVE_SSL */
-	    break;
-
-        case 'h' : /* Connect to host */
-	    if (argv[i][2] != '\0')
-	      cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-	        _cupsLangPuts(stderr,
-		              _("Error: need hostname after \"-h\" option."));
-		return (1);
-              }
-
-	      cupsSetServer(argv[i]);
-	    }
-	    break;
-
-        case 'l' : /* Show long listing */
-	    long_status = 1;
-	    break;
-
-        case 'm' : /* Show models */
-            if (show_models(long_status, device_id, language, make_model,
-	                    product, include_schemes, exclude_schemes))
-	      return (1);
-	    break;
-	    
-        case 'v' : /* Show available devices */
-            if (show_devices(long_status, timeout, include_schemes,
-	                     exclude_schemes))
-	      return (1);
-	    break;
-
-        case '-' : /* --something */
-            if (!strcmp(argv[i], "--device-id"))
-	    {
-	      i ++;
-
-	      if (i < argc)
-		device_id = argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected 1284 device ID string "
-				"after \"--device-id\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--device-id=", 12) && argv[i][12])
-	    {
-	      device_id = argv[i] + 12;
-	    }
-            else if (!strcmp(argv[i], "--exclude-schemes"))
-	    {
-	      i ++;
-
-	      if (i < argc)
-		exclude_schemes = argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected scheme list after "
-				"\"--exclude-schemes\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--exclude-schemes=", 18) && argv[i][18])
-	    {
-	      exclude_schemes = argv[i] + 18;
-	    }
-            else if (!strcmp(argv[i], "--include-schemes"))
-	    {
-	      i ++;
-
-	      if (i < argc)
-		include_schemes = argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected scheme list after "
-				"\"--include-schemes\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--include-schemes=", 18) && argv[i][18])
-	    {
-	      include_schemes = argv[i] + 18;
-	    }
-            else if (!strcmp(argv[i], "--language"))
-	    {
-	      i ++;
-	      if (i < argc)
-		language = argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected language after "
-				"\"--language\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--language=", 11) && argv[i][11])
-	    {
-	      language = argv[i] + 11;
-	    }
-            else if (!strcmp(argv[i], "--make-and-model"))
-	    {
-	      i ++;
-	      if (i < argc)
-		make_model= argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected make and model after "
-				"\"--make-and-model\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--make-and-model=", 17) && argv[i][17])
-	    {
-	      make_model = argv[i] + 17;
-	    }
-            else if (!strcmp(argv[i], "--product"))
-	    {
-	      i ++;
-	      if (i < argc)
-		product = argv[i];
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected product string after "
-				"\"--product\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--product=", 10) && argv[i][10])
-	    {
-	      product = argv[i] + 10;
-	    }
-            else if (!strcmp(argv[i], "--timeout"))
-	    {
-	      i ++;
-	      if (i < argc)
-		timeout = atoi(argv[i]);
-	      else
-	      {
-		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected timeout after "
-			        "\"--timeout\"."));
-		return (1);
-	      }
-	    }
-	    else if (!strncmp(argv[i], "--timeout=", 10) && argv[i][10])
-	    {
-	      timeout = atoi(argv[i] + 10);
-	    }
-	    else
-	    {
-	      _cupsLangPrintf(stderr, _("lpinfo: Unknown option \"%s\"."),
-			      argv[i]);
-	      return (1);
-	    }
-	    break;
-
-	default :
-	    _cupsLangPrintf(stderr, _("lpinfo: Unknown option \"%c\"."),
-	                    argv[i][1]);
-	    return (1);
+	_cupsLangPuts(stderr, _("lpinfo: Expected 1284 device ID string after \"--device-id\"."));
+	return (1);
       }
+    }
+    else if (!strncmp(argv[i], "--device-id=", 12) && argv[i][12])
+    {
+      device_id = argv[i] + 12;
+    }
+    else if (!strcmp(argv[i], "--exclude-schemes"))
+    {
+      i ++;
+
+      if (i < argc)
+	exclude_schemes = argv[i];
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected scheme list after \"--exclude-schemes\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--exclude-schemes=", 18) && argv[i][18])
+    {
+      exclude_schemes = argv[i] + 18;
+    }
+    else if (!strcmp(argv[i], "--include-schemes"))
+    {
+      i ++;
+
+      if (i < argc)
+	include_schemes = argv[i];
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected scheme list after \"--include-schemes\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--include-schemes=", 18) && argv[i][18])
+    {
+      include_schemes = argv[i] + 18;
+    }
+    else if (!strcmp(argv[i], "--language"))
+    {
+      i ++;
+      if (i < argc)
+	language = argv[i];
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected language after \"--language\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--language=", 11) && argv[i][11])
+    {
+      language = argv[i] + 11;
+    }
+    else if (!strcmp(argv[i], "--make-and-model"))
+    {
+      i ++;
+      if (i < argc)
+	make_model= argv[i];
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected make and model after \"--make-and-model\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--make-and-model=", 17) && argv[i][17])
+    {
+      make_model = argv[i] + 17;
+    }
+    else if (!strcmp(argv[i], "--product"))
+    {
+      i ++;
+      if (i < argc)
+	product = argv[i];
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected product string after \"--product\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--product=", 10) && argv[i][10])
+    {
+      product = argv[i] + 10;
+    }
+    else if (!strcmp(argv[i], "--timeout"))
+    {
+      i ++;
+      if (i < argc)
+	timeout = atoi(argv[i]);
+      else
+      {
+	_cupsLangPuts(stderr, _("lpinfo: Expected timeout after \"--timeout\"."));
+	return (1);
+      }
+    }
+    else if (!strncmp(argv[i], "--timeout=", 10) && argv[i][10])
+    {
+      timeout = atoi(argv[i] + 10);
+    }
+    else if (argv[i][0] == '-')
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
+      {
+	switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
+#ifdef HAVE_SSL
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+#else
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
+#endif /* HAVE_SSL */
+	      break;
+
+	  case 'h' : /* Connect to host */
+	      if (opt[1] != '\0')
+	      {
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPuts(stderr, _("Error: need hostname after \"-h\" option."));
+		  return (1);
+		}
+
+		cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  case 'l' : /* Show long listing */
+	      long_status = 1;
+	      break;
+
+	  case 'm' : /* Show models */
+	      if (show_models(long_status, device_id, language, make_model, product, include_schemes, exclude_schemes))
+		return (1);
+	      break;
+	      
+	  case 'v' : /* Show available devices */
+	      if (show_devices(long_status, timeout, include_schemes, exclude_schemes))
+		return (1);
+	      break;
+
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Unknown option \"%c\"."), argv[0], *opt);
+	      return (1);
+	}
+      }
+    }
     else
     {
-      _cupsLangPrintf(stderr, _("lpinfo: Unknown argument \"%s\"."),
-                      argv[i]);
+      _cupsLangPrintf(stderr, _("%s: Unknown argument \"%s\"."), argv[0], argv[i]);
       return (1);
     }
+  }
 
   return (0);
 }
@@ -491,8 +464,3 @@ show_models(
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

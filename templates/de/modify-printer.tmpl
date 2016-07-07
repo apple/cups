@@ -1,4 +1,4 @@
-<H2 CLASS="title">Modify {printer_name}</H2>
+<H2 CLASS="title">{printer_name} ändern</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -11,28 +11,28 @@
 
 <TABLE>
 <TR>
-<TH CLASS="label">Description:</TH>
+<TH CLASS="label">Beschreibung:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
-<SMALL>(Human-readable description such as "HP LaserJet with Duplexer")</SMALL></TD>
+<SMALL>(Menschenlesbare Beschreibung wie zum Beispiel "HP LaserJet mit Duplexer")</SMALL></TD>
 </TR>
 <TR>
-<TH CLASS="label">Location:</TH>
+<TH CLASS="label">Ort:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
-<SMALL>(Human-readable location such as "Lab 1")</SMALL></TD>
+<SMALL>(Menschenlesbare Ort wie zum Beispiel "Büro 1")</SMALL></TD>
 </TR>
 <TR>
-<TH CLASS="label">Connection:</TH>
+<TH CLASS="label">Verbindung:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
 </TR>
 <TR>
-<TH CLASS="label">Sharing:</TH>
+<TH CLASS="label">Freigabe:</TH>
 <TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
 Share This Printer</TD>
 </TR>
 <TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="SUBMIT" VALUE="Continue"></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Weiter"></TD>
 </TR>
 </TABLE>
 

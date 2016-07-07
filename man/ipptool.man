@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" ipptool man page for CUPS.
 .\"
 .\" Copyright 2010-2015 by Apple Inc.
@@ -242,7 +240,4 @@ IANA IPP Registry (http://www.iana.org/assignments/ipp\-registrations),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 RFC 2911 (http://tools.ietf.org/html/rfc2911),
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

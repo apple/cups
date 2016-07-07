@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Line Printer Daemon backend for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -1313,8 +1311,3 @@ sigterm_handler(int sig)		/* I - Signal */
 
   abort_job = 1;
 }
-
-
-/*
- * End of "$Id$".
- */

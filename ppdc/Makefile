@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # Makefile for the CUPS PPD Compiler.
 #
-# Copyright 2007-2015 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 2002-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -155,9 +153,11 @@ install-exec:
 #
 
 install-headers:
-	echo Installing header files in $(INCLUDEDIR)/cups...
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) ppdc.h $(INCLUDEDIR)/cups
+	if test "x$(privateinclude)" != x; then \
+		echo Installing private header files into $(PRIVATEINCLUDE)...; \
+		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
+		$(INSTALL_DATA) ppdc.h $(PRIVATEINCLUDE); \
+	fi
 
 
 #
@@ -205,31 +205,10 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsppdc.so
 	$(RM) $(LIBDIR)/libcupsppdc.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/ppdc.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "PPD Compiler API" \
-		--css ../doc/cups-printable.css \
-		--header api-ppdc.header --intro api-ppdc.shtml \
-		api-ppdc.xml \
-		ppdc.h $(LIBOBJS:.o=.cxx) >../doc/help/api-ppdc.html
-	mxmldoc --tokens help/api-ppdc.html api-ppdc.xml >../doc/help/api-ppdc.tokens
-	$(RM) api-ppdc.xml
-
-framedhelp:
-	mxmldoc --framed api-ppdc \
-		--section "Programming" \
-		--title "PPD Compiler API" \
-		--css ../doc/cups-printable.css \
-		--header api-ppdc.header --intro api-ppdc.shtml \
-		ppdc.h $(LIBOBJS:.o=.cxx)
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/ppdc.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 
 
 #
@@ -385,8 +364,3 @@ libcupsppdc.a:	$(LIBOBJS)
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

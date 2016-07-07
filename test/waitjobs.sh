@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# "$Id$"
-#
 # Script to wait for jobs to complete.
 #
 #   Copyright 2008-2009 by Apple Inc.
@@ -54,7 +52,3 @@ while test $timeout -gt 0; do
 done
 
 echo ""
-
-#
-# End of "$Id$".
-#

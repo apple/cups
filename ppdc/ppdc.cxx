@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // PPD file compiler main entry for the CUPS PPD Compiler.
 //
 // Copyright 2007-2014 by Apple Inc.
@@ -452,12 +450,7 @@ usage(void)
   _cupsLangPuts(stdout, _("  --crlf                  End lines with CR + LF "
                           "(Windows)."));
   _cupsLangPuts(stdout, _("  --lf                    End lines with LF "
-                          "(UNIX/Linux/OS X)."));
+                          "(UNIX/Linux/macOS)."));
 
   exit(1);
 }
-
-
-//
-// End of "$Id$".
-//

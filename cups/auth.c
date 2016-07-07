@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Authentication functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -104,7 +102,7 @@ static int	cups_local_auth(http_t *http);
  * This function should be called in response to a @code HTTP_STATUS_UNAUTHORIZED@
  * status, prior to resubmitting your request.
  *
- * @since CUPS 1.1.20/OS X 10.4@
+ * @since CUPS 1.1.20/macOS 10.4@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -122,8 +120,7 @@ cupsDoAuthentication(
   _cups_globals_t *cg;			/* Global data */
 
 
-  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")",
-                http, method, resource));
+  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")", (void *)http, method, resource));
 
   if (!http)
     http = _cupsConnect();
@@ -668,8 +665,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 #  endif /* HAVE_AUTHORIZATION_H */
 
 
-  DEBUG_printf(("7cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"",
-                http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
+  DEBUG_printf(("7cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"", (void *)http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
   * See if we are accessing localhost...
@@ -873,8 +869,3 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   return (1);
 #endif /* WIN32 || __EMX__ */
 }
-
-
-/*
- * End of "$Id$".
- */

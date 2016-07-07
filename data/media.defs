@@ -1,16 +1,14 @@
 /*
- * "$Id: media.defs 343 2007-07-13 19:52:48Z mike $"
+ * Adobe standard media size definitions for the CUPS PPD file compiler.
  *
- *   Adobe standard media size definitions for the CUPS PPD file compiler.
+ * Copyright 2007-2016 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
- *
- *   These codedinstructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   copyright law.  Distribution and use rights are outlinedin the file
- *   "LICENSE.txt" which should have beenincluded with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These codedinstructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * copyright law.  Distribution and use rights are outlinedin the file
+ * "LICENSE.txt" which should have beenincluded with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #media "3x5/3 x 5" 216 360
@@ -87,9 +85,9 @@
 #media "C5/Envelope C5" 459 649
 #media "C6/Envelope C6" 323 459
 #media "DL/Envelope DL" 312 624
-#media "DoublePostcard/Postcard Double " 567 420
+#media "DoublePostcard/Postcard Double" 567 420
 #media "DoublePostcardRotated/Postcard Double Long Edge" 420 567
-#media "Env10/Envelope #10 " 297 684
+#media "Env10/Envelope #10" 297 684
 #media "Env11/Envelope #11" 324 747
 #media "Env12/Envelope #12" 342 792
 #media "Env14/Envelope #14" 360 828
@@ -119,7 +117,7 @@
 #media "EnvKaku3Rotated/Envelope Kaku3 Long Edge" 785 612
 #media "EnvMonarch/Envelope Monarch" 279 540
 #media "EnvPersonal/Envelope Personal" 261 468
-#media "EnvPRC1/Envelope PRC1 " 289 468
+#media "EnvPRC1/Envelope PRC1" 289 468
 #media "EnvPRC1Rotated/Envelope PRC1 Long Edge" 468 289
 #media "EnvPRC2/Envelope PRC2" 289 499
 #media "EnvPRC2Rotated/Envelope PRC2 Long Edge" 499 289
@@ -198,11 +196,6 @@
 #media "w167h288/Shipping Address" 167 288
 #media "w162h540/Internet Postage 2-Part" 162 540
 #media "w162h504/Internet Postage 3-Part" 162 504
-#media "w41h248/File Folder " 41 248
+#media "w41h248/File Folder" 41 248
 #media "w41h144/Hanging Folder" 41 144
 #media "w153h198/3.5\" Disk" 153 198
-
-
-/*
- * End of "$Id: media.defs 343 2007-07-13 19:52:48Z mike $".
- */

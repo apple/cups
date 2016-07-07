@@ -1,9 +1,7 @@
 .\"
-.\" "$Id$"
-.\"
 .\" cupsd.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2015 by Apple Inc.
+.\" Copyright 2007-2016 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "30 June 2015" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "21 June 2016" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -193,6 +191,14 @@ to verify that the hostname resolved from the address matches one of the address
 Double lookups also prevent clients with unregistered addresses from connecting to your server.
 The default is "Off" to avoid the potential server performance problems with hostname lookups.
 Only set this option to "On" or "Double" if absolutely required.
+.\"#IdleExitTimeout
+.TP 5
+\fBIdleExitTimeout \fIseconds\fR
+Specifies the length of time to wait before shutting down due to inactivity.
+The default is "60" seconds.
+Note: Only applicable when
+.BR cupsd (8)
+is run on-demand (e.g., with \fB-l\fR).
 .\"#JobKillDelay
 .TP 5
 \fBJobKillDelay \fIseconds\fR
@@ -780,6 +786,7 @@ The group name "@SYSTEM" corresponds to the list of groups defined by the System
 .BR cups-files.conf (5)
 file.
 The group name "@OWNER" corresponds to the owner of the resource, for example the person that submitted a print job.
+Note: The 'root' user is not special and must be granted privileges like any other user account.
 .TP 5
 \fBRequire valid-user\fR
 Specifies that any authenticated user is acceptable.
@@ -870,7 +877,4 @@ Require authentication for accesses from outside the 10. network:
 .BR subscriptions.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

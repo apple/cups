@@ -1,16 +1,14 @@
 /*
- * "$Id$"
+ * Online help index definitions for CUPS.
  *
- *   Online help index definitions for CUPS.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_HELP_INDEX_H_
@@ -81,7 +79,3 @@ extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_HELP_INDEX_H_ */
-
-/*
- * End of "$Id$".
- */

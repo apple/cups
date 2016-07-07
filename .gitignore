@@ -1,10 +1,12 @@
 *.a
+*.bck
 *.cgi
 *.dylib
 *.gz
 *.o
 *.so
 *.so.*
+*.tokens
 .buildrev
 autom4te.cache
 config.h
@@ -84,6 +86,7 @@ notifier/mailto
 notifier/rss
 notifier/testnotify
 packaging/cups.list
+patches
 ppdc/genstrings
 ppdc/ppd/
 ppdc/ppd2/

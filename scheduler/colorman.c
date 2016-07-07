@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Color management routines for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -1516,8 +1514,3 @@ colord_unregister_printer(
   colord_delete_device(device_id);
 }
 #endif /* __APPLE__ */
-
-
-/*
- * End of "$Id$".
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Raster test program routines for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -1064,8 +1062,3 @@ print_changes(
            header->cupsPageSizeName,
            expected->cupsPageSizeName);
 }
-
-
-/*
- * End of "$Id$".
- */

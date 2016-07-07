@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Administration utility API definitions for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -833,7 +831,7 @@ cupsAdminExportSamba(
  * The returned settings should be freed with cupsFreeOptions() when
  * you are done with them.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1149,7 +1147,7 @@ cupsAdminGetServerSettings(
 /*
  * 'cupsAdminSetServerSettings()' - Set settings on the server.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -2367,8 +2365,3 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
   cupsFilePrintf(dstfp, "*JCLCloseUI: *%s\n\n", name);
 }
-
-
-/*
- * End of "$Id$".
- */

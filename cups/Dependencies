@@ -62,7 +62,7 @@ getdevices.o: getdevices.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
-  ../cups/cups.h file.h pwg.h thread-private.h
+  ../cups/cups.h file.h pwg.h thread-private.h adminutil.h
 getifaddrs.o: getifaddrs.c http-private.h ../config.h ../cups/language.h \
   array.h versioning.h ../cups/http.h md5-private.h ipp-private.h \
   ../cups/ipp.h

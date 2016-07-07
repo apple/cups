@@ -1,7 +1,7 @@
 {#job_id=0?:
 <TABLE CLASS="list" SUMMARY="Auftragsliste">
 <THEAD>
-<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> ID <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> ID <SMALL>&#x25bc;</SMALL>}</A></TH><TH>Name</TH><TH>Benutzer</TH><TH>Grösse</TH><TH>Seiten</TH><TH>Status</TH><TH>Steuerung</TH></TR>
+<TR><TH>ID</TH><TH>Name</TH><TH>Benutzer</TH><TH>Grösse</TH><TH>Seiten</TH><TH>Status</TH><TH>Steuerung</TH></TR>
 </THEAD>
 <TBODY>
 {[job_id]
@@ -11,9 +11,9 @@
 <TD>{?job_originating_user_name=?Einbehalten:{job_originating_user_name}}&nbsp;</TD>
 <TD>{job_k_octets}k&nbsp;</TD>
 <TD>{job_media_sheets_completed=0?Unbekannt:{?job_media_sheets_completed}}&nbsp;</TD>
-<TD>{job_state=3?unerledigt seit<BR>{time_at_creation}:{job_state=4?angehalten seit<BR>{time_at_creation}:
-{job_state=5?verarbeitet seit<BR>{time_at_processing}:{job_state=6?gestoppt:
-{job_state=7?gelöscht am<BR>{time_at_completed}:{job_state=8?abgebrochen:beendet am<BR>{time_at_completed}}}}}}}&nbsp;{job_printer_state_message?<BR>
+<TD>{job_state=3?unerledigt seit<BR>{?time_at_creation=?Unknown:{time_at_creation}}:{job_state=4?angehalten seit<BR>{?time_at_creation=?Unknown:{time_at_creation}}:
+{job_state=5?verarbeitet seit<BR>{?time_at_processing=?Unknown:{time_at_processing}}:{job_state=6?gestoppt:
+{job_state=7?gelöscht am<BR>{?time_at_completed=?Unknown:{time_at_completed}}:{job_state=8?abgebrochen:beendet am<BR>{?time_at_completed=?Unknown:{time_at_completed}}}}}}}}&nbsp;{job_printer_state_message?<BR>
 <EM>"{job_printer_state_message}"</EM>:}</TD>
 <TD>
 {job_preserved>0?{job_state>5?

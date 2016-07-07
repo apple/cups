@@ -1,18 +1,16 @@
 /*
- * "$Id$"
+ * Side-channel API definitions for CUPS.
  *
- *   Side-channel API definitions for CUPS.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_SIDECHANNEL_H_
@@ -61,9 +59,9 @@ enum cups_sc_command_e			/**** Request command codes ****/
   CUPS_SC_CMD_GET_BIDI = 3,		/* Return bidirectional capabilities */
   CUPS_SC_CMD_GET_DEVICE_ID = 4,	/* Return the IEEE-1284 device ID */
   CUPS_SC_CMD_GET_STATE = 5,		/* Return the device state */
-  CUPS_SC_CMD_SNMP_GET = 6,		/* Query an SNMP OID @since CUPS 1.4/OS X 10.6@ */
-  CUPS_SC_CMD_SNMP_GET_NEXT = 7,	/* Query the next SNMP OID @since CUPS 1.4/OS X 10.6@ */
-  CUPS_SC_CMD_GET_CONNECTED = 8,	/* Return whether the backend is "connected" to the printer @since CUPS 1.5/OS X 10.7@ */
+  CUPS_SC_CMD_SNMP_GET = 6,		/* Query an SNMP OID @since CUPS 1.4/macOS 10.6@ */
+  CUPS_SC_CMD_SNMP_GET_NEXT = 7,	/* Query the next SNMP OID @since CUPS 1.4/macOS 10.6@ */
+  CUPS_SC_CMD_GET_CONNECTED = 8,	/* Return whether the backend is "connected" to the printer @since CUPS 1.5/macOS 10.7@ */
   CUPS_SC_CMD_MAX			/* End of valid values @private@ */
 };
 typedef enum cups_sc_command_e cups_sc_command_t;
@@ -141,7 +139,3 @@ extern cups_sc_status_t	cupsSideChannelSNMPWalk(const char *oid, double timeout,
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_SIDECHANNEL_H_ */
-
-/*
- * End of "$Id$".
- */

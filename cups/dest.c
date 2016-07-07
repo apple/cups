@@ -48,7 +48,10 @@
  */
 
 #ifdef __APPLE__
-#  include <SystemConfiguration/SystemConfiguration.h>
+#  if !TARGET_OS_IOS
+#    include <SystemConfiguration/SystemConfiguration.h>
+#    define _CUPS_LOCATION_DEFAULTS 1
+#  endif /* !TARGET_OS_IOS */
 #  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
 #  define kDefaultPaperIDKey	CFSTR("DefaultPaperID")
 #  define kLastUsedPrintersKey	CFSTR("LastUsedPrinters")
@@ -117,13 +120,17 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
  * Local functions...
  */
 
-#ifdef __APPLE__
+#if _CUPS_LOCATION_DEFAULTS
 static CFArrayRef	appleCopyLocations(void);
 static CFStringRef	appleCopyNetwork(void);
+#endif /* _CUPS_LOCATION_DEFAULTS */
+#ifdef __APPLE__
 static char		*appleGetPaperSize(char *name, size_t namesize);
+#endif /* __APPLE__ */
+#if _CUPS_LOCATION_DEFAULTS
 static CFStringRef	appleGetPrinter(CFArrayRef locations,
 			                CFStringRef network, CFIndex *locindex);
-#endif /* __APPLE__ */
+#endif /* _CUPS_LOCATION_DEFAULTS */
 static cups_dest_t	*cups_add_dest(const char *name, const char *instance,
 				       int *num_dests, cups_dest_t **dests);
 #ifdef __BLOCKS__
@@ -307,6 +314,7 @@ _cupsAppleCopyDefaultPaperID(void)
 CFStringRef				/* O - Default printer name */
 _cupsAppleCopyDefaultPrinter(void)
 {
+#  if _CUPS_LOCATION_DEFAULTS
   CFStringRef	network;		/* Network location */
   CFArrayRef	locations;		/* Location array */
   CFStringRef	locprinter;		/* Current printer */
@@ -363,6 +371,10 @@ _cupsAppleCopyDefaultPrinter(void)
   CFRelease(locations);
 
   return (locprinter);
+
+#  else
+  return (NULL);
+#  endif /* _CUPS_LOCATION_DEFAULTS */
 }
 
 
@@ -415,6 +427,7 @@ void
 _cupsAppleSetDefaultPrinter(
     CFStringRef name)			/* I - Default printer/class name */
 {
+#  if _CUPS_LOCATION_DEFAULTS
   CFStringRef		network;	/* Current network */
   CFArrayRef		locations;	/* Old locations array */
   CFIndex		locindex;	/* Index in locations array */
@@ -508,6 +521,10 @@ _cupsAppleSetDefaultPrinter(
     CFRelease(locations);
 
   CFRelease(network);
+
+#  else
+  (void)name;
+#  endif /* _CUPS_LOCATION_DEFAULTS */
 }
 
 
@@ -540,7 +557,7 @@ _cupsAppleSetUseLastPrinter(
  * to by "cancel" is non-zero, or the callback function (or block) returns 0,
  * The caller is responsible for calling httpClose() on the returned object.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 http_t *				/* O - Connection to server or @code NULL@ */
@@ -566,7 +583,7 @@ cupsConnectDest(
   http_t	*http;			/* Connection to server */
 
 
-  DEBUG_printf(("cupsConnectDest(dest=%p, flags=0x%x, msec=%d, cancel=%p(%d), resource=\"%s\", resourcesize=" CUPS_LLFMT ", cb=%p, user_data=%p)", dest, flags, msec, cancel, cancel ? *cancel : -1, resource, CUPS_LLCAST resourcesize, cb, user_data));
+  DEBUG_printf(("cupsConnectDest(dest=%p, flags=0x%x, msec=%d, cancel=%p(%d), resource=\"%s\", resourcesize=" CUPS_LLFMT ", cb=%p, user_data=%p)", (void *)dest, flags, msec, (void *)cancel, cancel ? *cancel : -1, resource, CUPS_LLCAST resourcesize, (void *)cb, user_data));
 
  /*
   * Range check input...
@@ -600,8 +617,8 @@ cupsConnectDest(
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
         if (strstr(uri, "._tcp"))
           uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
-      }
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+      }
     }
 
     if (uri)
@@ -716,7 +733,7 @@ cupsConnectDest(
  * to by "cancel" is non-zero, or the callback function (or block) returns 0,
  * The caller is responsible for calling httpClose() on the returned object.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 http_t *				/* O - Connection to server or @code NULL@ */
@@ -742,7 +759,7 @@ cupsConnectDestBlock(
  * copy) - for use with the cupsEnumDests* functions. The caller is responsible
  * for calling cupsFreeDests() on the returned object(s).
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int
@@ -898,7 +915,7 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the callback function returns 0.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1233,7 +1250,7 @@ cupsEnumDests(
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the block returns 0.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1403,7 +1420,7 @@ _cupsGetDestResource(
  *
  * "uri" is the "ipp" or "ipps" URI for the printer.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */
@@ -1507,7 +1524,7 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
  * Free the memory used by the destination array using the @link cupsFreeDests@
  * function.
  *
- * Note: On OS X this function also gets the default paper from the system
+ * Note: On macOS this function also gets the default paper from the system
  * preferences (~/L/P/org.cups.PrintingPrefs.plist) and includes it in the
  * options array for each destination that supports it.
  */
@@ -1800,7 +1817,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Number of destinations */
@@ -1977,7 +1994,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
  * The returned destination must be freed using @link cupsFreeDests@ with a
  * "num_dests" value of 1.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */
@@ -2091,7 +2108,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
  * @link cupsSetDests@ or @link cupsSetDests2@ functions to save the new
  * options for the user.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 int					/* O  - New number of destinations */
@@ -2137,7 +2154,7 @@ cupsRemoveDest(const char  *name,	/* I  - Destination name */
 /*
  * 'cupsSetDefaultDest()' - Set the default destination.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 void
@@ -2192,7 +2209,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  * This function saves the destinations to /etc/cups/lpoptions when run
  * as root and ~/.cups/lpoptions when run as a normal user.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -2418,7 +2435,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
 #ifdef HAVE_NOTIFY_POST
  /*
-  * Send a notification so that MacOS X applications can know about the
+  * Send a notification so that macOS applications can know about the
   * change, too.
   */
 
@@ -2483,7 +2500,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 }
 
 
-#ifdef __APPLE__
+#if _CUPS_LOCATION_DEFAULTS
 /*
  * 'appleCopyLocations()' - Copy the location history array.
  */
@@ -2576,8 +2593,10 @@ appleCopyNetwork(void)
 
   return (network);
 }
+#endif /* _CUPS_LOCATION_DEFAULTS */
 
 
+#ifdef __APPLE__
 /*
  * 'appleGetPaperSize()' - Get the default paper size.
  */
@@ -2603,8 +2622,10 @@ appleGetPaperSize(char   *name,		/* I - Paper size name buffer */
 
   return (name);
 }
+#endif /* __APPLE__ */
 
 
+#if _CUPS_LOCATION_DEFAULTS
 /*
  * 'appleGetPrinter()' - Get a printer from the history array.
  */
@@ -2642,7 +2663,7 @@ appleGetPrinter(CFArrayRef  locations,	/* I - Location array */
 
   return (NULL);
 }
-#endif /* __APPLE__ */
+#endif /* _CUPS_LOCATION_DEFAULTS */
 
 
 /*
@@ -2772,11 +2793,7 @@ cups_dnssd_browse_cb(
 					/* Enumeration data */
 
 
-  DEBUG_printf(("5cups_dnssd_browse_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
-		"regtype=\"%s\", replyDomain=\"%s\", context=%p)",
-		sdRef, flags, interfaceIndex, errorCode, serviceName, regtype,
-		replyDomain, context));
+  DEBUG_printf(("5cups_dnssd_browse_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
 
  /*
   * Don't do anything on error...
@@ -2913,8 +2930,7 @@ cups_dnssd_free_device(
     _cups_dnssd_device_t *device,	/* I - Device */
     _cups_dnssd_data_t   *data)		/* I - Enumeration data */
 {
-  DEBUG_printf(("5cups_dnssd_free_device(device=%p(%s), data=%p)", device,
-                device->dest.name, data));
+  DEBUG_printf(("5cups_dnssd_free_device(device=%p(%s), data=%p)", (void *)device, device->dest.name, (void *)data));
 
 #  ifdef HAVE_DNSSD
   if (device->ref)
@@ -2952,9 +2968,7 @@ cups_dnssd_get_device(
 					/* Full name for query */
 
 
-  DEBUG_printf(("5cups_dnssd_get_device(data=%p, serviceName=\"%s\", "
-                "regtype=\"%s\", replyDomain=\"%s\")", data, serviceName,
-                regtype, replyDomain));
+  DEBUG_printf(("5cups_dnssd_get_device(data=%p, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\")", (void *)data, serviceName, regtype, replyDomain));
 
  /*
   * See if this is an existing device...
@@ -3085,11 +3099,7 @@ cups_dnssd_local_cb(
   _cups_dnssd_device_t	*device;	/* Device */
 
 
-  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
-		"regtype=\"%s\", replyDomain=\"%s\", context=%p)",
-		sdRef, flags, interfaceIndex, errorCode, serviceName,
-		regtype, replyDomain, context));
+  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
 
  /*
   * Only process "add" data...
@@ -3211,11 +3221,7 @@ cups_dnssd_query_cb(
 
 
 #  ifdef HAVE_DNSSD
-  DEBUG_printf(("5cups_dnssd_query_cb(sdRef=%p, flags=%x, "
-		"interfaceIndex=%d, errorCode=%d, fullName=\"%s\", "
-		"rrtype=%u, rrclass=%u, rdlen=%u, rdata=%p, ttl=%u, "
-		"context=%p)", sdRef, flags, interfaceIndex, errorCode,
-		fullName, rrtype, rrclass, rdlen, rdata, ttl, context));
+  DEBUG_printf(("5cups_dnssd_query_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, fullName=\"%s\", rrtype=%u, rrclass=%u, rdlen=%u, rdata=%p, ttl=%u, context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, fullName, rrtype, rrclass, rdlen, rdata, ttl, context));
 
  /*
   * Only process "add" data...
@@ -3789,10 +3795,7 @@ cups_get_dests(
   int		linenum;		/* Current line number */
 
 
-  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", "
-                "match_inst=\"%s\", user_default_set=%d, num_dests=%d, "
-		"dests=%p)", filename, match_name, match_inst,
-		user_default_set, num_dests, dests));
+  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", match_inst=\"%s\", user_default_set=%d, num_dests=%d, dests=%p)", filename, match_name, match_inst, user_default_set, num_dests, (void *)dests));
 
  /*
   * Try to open the file...

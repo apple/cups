@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -96,8 +94,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2svn"
-#define CUPS_MINIMAL "CUPS/2.2svn"
+#define CUPS_SVERSION "CUPS v2.2"
+#define CUPS_MINIMAL "CUPS/2.2"
 
 
 /*
@@ -536,6 +534,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have on-demand support (launchd/systemd/upstart)?
+ */
+
+/* #undef HAVE_ONDEMAND */
+
+
+/*
  * Do we have launchd support?
  */
 
@@ -551,6 +556,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have upstart support?
+ */
+
+/* #undef HAVE_UPSTART */
+
+
+/*
  * Various scripting languages...
  */
 
@@ -562,23 +574,6 @@ typedef unsigned long useconds_t;
 #define CUPS_PHP	""
 /* #undef HAVE_PYTHON */
 #define CUPS_PYTHON	""
-
-
-/*
- * Location of the poppler/Xpdf pdftops program...
- */
-
-/* #undef HAVE_PDFTOPS */
-/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
-#define CUPS_PDFTOPS ""
-
-
-/*
- * Location of the Ghostscript gs program...
- */
-
-/* #undef HAVE_GHOSTSCRIPT */
-#define CUPS_GHOSTSCRIPT ""
 
 
 /*
@@ -605,7 +600,14 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have OS X 10.4's mbr_XXX functions?
+ * Do we have the getgrouplist() function?
+ */
+
+#undef HAVE_GETGROUPLIST
+
+
+/*
+ * Do we have macOS 10.4's mbr_XXX functions?
  */
 
 /* #undef HAVE_MEMBERSHIP_H */
@@ -758,7 +760,7 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
 /* #undef CUPS_BUNDLEDIR */
@@ -797,7 +799,3 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
-
-/*
- * End of "$Id$".
- */

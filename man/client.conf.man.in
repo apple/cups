@@ -1,9 +1,7 @@
 .\"
-.\" "$Id$"
-.\"
 .\" client.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2015 by Apple Inc.
+.\" Copyright 2007-2016 by Apple Inc.
 .\" Copyright 2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,15 +10,17 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "19 May 2015" "Apple Inc."
+.TH client.conf 5 "CUPS" "20 June 2016" "Apple Inc."
 .SH NAME
-client.conf \- client configuration file for cups (deprecated)
+client.conf \- client configuration file for cups
 .SH DESCRIPTION
 The \fBclient.conf\fR file configures the CUPS client and is normally located in the \fI/etc/cups\fR and/or \fI~/.cups\fR directories.
 Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character.
 .LP
-\fBNote:\fR Starting with OS X 10.7, this file is only used by command-line and X11 applications plus the IPP backend.
-The \fBServerName\fR directive is not supported on OS X at all.
+\fBNote:\fR Starting with macOS 10.7, this file is only used by command-line and X11 applications plus the IPP backend.
+The \fBServerName\fR directive is not supported on macOS at all.
+Starting with macOS 10.12, all applications can access these settings in the \fI/Library/Preferences/org.cups.PrintingPrefs.plist\fR file instead.
+See the NOTES section below for more information.
 .SS DIRECTIVES
 The following directives are understood by the client. Consult the online help for detailed descriptions:
 .TP 5
@@ -34,7 +34,7 @@ The default is "Yes".
 .TP 5
 \fBAllowExpiredCerts No\fR
 Specifies whether to allow TLS with expired certificates.
-The default is "Yes".
+The default is "No".
 .TP 5
 \fBEncryption IfRequested\fR
 .TP 5
@@ -51,7 +51,7 @@ CUPS adds the remote hostname ("name@server.example.com") for you. The default n
 .TP 5
 \fBServerName \fI/domain/socket\fR
 Specifies the address and optionally the port to use when connecting to the server.
-\fBNote: This directive it not supported on OS X 10.7 or later.\fR
+\fBNote: This directive it not supported on macOS 10.7 or later.\fR
 .TP 5
 \fBServerName \fIhostname-or-ip-address\fR[\fI:port\fR]\fB/version=1.1\fR
 Specifies the address and optionally the port to use when connecting to a server running CUPS 1.3.12 and earlier.
@@ -66,6 +66,12 @@ The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are requi
 The \fIAllowSSL3\fR option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
 The \fIDenyTLS1.0\fR option disables TLS v1.0 support - this sets the minimum protocol version to TLS v1.1.
 .TP 5
+\fBTrustOnFirstUse Yes\fR
+.TP 5
+\fBTrustOnFirstUse No\fR
+Specifies whether to trust new TLS certificates by default.
+The default is "Yes".
+.TP 5
 \fBUser \fIname\fR
 Specifies the default user name to use for requests.
 .TP 5
@@ -75,12 +81,20 @@ Specifies the default user name to use for requests.
 Specifies whether to only allow TLS with certificates whose common name matches the hostname.
 The default is "No".
 .SH NOTES
-The \fBclient.conf\fR file is deprecated and will no longer be supported in a future version of CUPS.
+The \fBclient.conf\fR file is deprecated on macOS and will no longer be supported in a future version of CUPS.
+Configuration settings can instead be viewed or changed using the
+.BR defaults (1)
+command:
+.nf
+defaults write /Library/Preferences/org.cups.PrintingPrefs.plist Encryption Required
+defaults write /Library/Preferences/org.cups.PrintingPrefs.plist TrustOnFirstUse -bool NO
+
+defaults read /Library/Preferences/org.cups.PrintingPrefs.plist Encryption
+.fi
+On Linux and other systems using GNU TLS, the \fI/etc/cups/ssl/site.crl\fR file, if present, provides a list of revoked X.509 certificates and is used when validating certificates.
 .SH SEE ALSO
 .BR cups (1),
+.BR default (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

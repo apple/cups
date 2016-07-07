@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Threading primitives for CUPS.
  *
- * Copyright 2009-2014 by Apple Inc.
+ * Copyright 2009-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -23,6 +21,51 @@
 
 
 #if defined(HAVE_PTHREAD_H)
+/*
+ * '_cupsCondBroadcast()' - Wake up waiting threads.
+ */
+
+void
+_cupsCondBroadcast(_cups_cond_t *cond)	/* I - Condition */
+{
+  pthread_cond_broadcast(cond);
+}
+
+
+/*
+ * '_cupsCondInit()' - Initialize a condition variable.
+ */
+
+void
+_cupsCondInit(_cups_cond_t *cond)	/* I - Condition */
+{
+  pthread_cond_init(cond, NULL);
+}
+
+
+/*
+ * '_cupsCondWait()' - Wait for a condition with optional timeout.
+ */
+
+void
+_cupsCondWait(_cups_cond_t  *cond,	/* I - Condition */
+              _cups_mutex_t *mutex,	/* I - Mutex */
+	      double        timeout)	/* I - Timeout in seconds (0 or negative for none) */
+{
+  if (timeout > 0.0)
+  {
+    struct timespec abstime;		/* Timeout */
+
+    abstime.tv_sec  = (long)timeout;
+    abstime.tv_nsec = (long)(1000000000 * (timeout - (long)timeout));
+
+    pthread_cond_timedwait(cond, mutex, &abstime);
+  }
+  else
+    pthread_cond_wait(cond, mutex);
+}
+
+
 /*
  * '_cupsMutexInit()' - Initialize a mutex.
  */
@@ -101,17 +144,48 @@ _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
 
 
 /*
+ * '_cupsThreadCancel()' - Cancel (kill) a thread.
+ */
+
+void
+_cupsThreadCancel(_cups_thread_t thread)/* I - Thread ID */
+{
+  pthread_cancel(thread);
+}
+
+
+/*
  * '_cupsThreadCreate()' - Create a thread.
  */
 
-int					/* O - 0 on failure, 1 on success */
+_cups_thread_t				/* O - Thread ID */
 _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
 {
   pthread_t thread;
 
-  return (pthread_create(&thread, NULL, (void *(*)(void *))func, arg) == 0);
+  if (pthread_create(&thread, NULL, (void *(*)(void *))func, arg))
+    return (0);
+  else
+    return (thread);
+}
+
+
+/*
+ * '_cupsThreadWait()' - Wait for a thread to exit.
+ */
+
+void *					/* O - Return value */
+_cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
+{
+  void	*ret;				/* Return value */
+
+
+  if (pthread_join(thread, &ret))
+    return (NULL);
+  else
+    return (ret);
 }
 
 
@@ -211,16 +285,37 @@ _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
 
 
 /*
+ * '_cupsThreadCancel()' - Cancel (kill) a thread.
+ */
+
+void
+_cupsThreadCancel(_cups_thread_t thread)/* I - Thread ID */
+{
+  // TODO: Implement me
+}
+
+
+/*
  * '_cupsThreadCreate()' - Create a thread.
  */
 
-int					/* O - 0 on failure, 1 on success */
+_cups_thread_t				/* O - Thread ID */
 _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
 {
-  return (_beginthreadex(NULL, 0, (LPTHREAD_START_ROUTINE) func, arg, 0, NULL)
-	      != 0);
+  return (_beginthreadex(NULL, 0, (LPTHREAD_START_ROUTINE)func, arg, 0, NULL));
+}
+
+
+/*
+ * '_cupsThreadWait()' - Wait for a thread to exit.
+ */
+
+void *					/* O - Return value */
+_cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
+{
+  // TODO: Implement me
 }
 
 
@@ -303,10 +398,21 @@ _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
 
 
 /*
+ * '_cupsThreadCancel()' - Cancel (kill) a thread.
+ */
+
+void
+_cupsThreadCancel(_cups_thread_t thread)/* I - Thread ID */
+{
+  (void)thread;
+}
+
+
+/*
  * '_cupsThreadCreate()' - Create a thread.
  */
 
-int					/* O - 0 on failure, 1 on success */
+_cups_thread_t				/* O - Thread ID */
 _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
@@ -319,9 +425,18 @@ _cupsThreadCreate(
 
   return (0);
 }
-#endif /* HAVE_PTHREAD_H */
 
 
 /*
- * End of "$Id$".
+ * '_cupsThreadWait()' - Wait for a thread to exit.
  */
+
+void *					/* O - Return value */
+_cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
+{
+  (void)thread;
+
+  return (NULL);
+}
+
+#endif /* HAVE_PTHREAD_H */

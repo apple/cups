@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Option encoding routines for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -340,7 +338,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
-  DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)", ipp, num_options, options));
+  DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)", (void *)ipp, num_options, (void *)options));
 
  /*
   * Add the options in the proper groups & order...
@@ -359,7 +357,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
  * function multiple times for each group, or use cupsEncodeOptions()
  * to add the standard groups.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 void
@@ -386,10 +384,7 @@ cupsEncodeOptions2(
   const ipp_op_t	*ops;		/* List of allowed operations */
 
 
-  DEBUG_printf(("cupsEncodeOptions2(ipp=%p(%s), num_options=%d, options=%p, "
-                "group_tag=%x)", ipp,
-                ipp ? ippOpString(ippGetOperation(ipp)) : "", num_options,
-                options, group_tag));
+  DEBUG_printf(("cupsEncodeOptions2(ipp=%p(%s), num_options=%d, options=%p, group_tag=%x)", (void *)ipp, ipp ? ippOpString(ippGetOperation(ipp)) : "", num_options, (void *)options, group_tag));
 
  /*
   * Range check input...
@@ -851,8 +846,3 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 {
   return (strcmp(a->name, b->name));
 }
-
-
-/*
- * End of "$Id$".
- */

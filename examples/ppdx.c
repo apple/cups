@@ -1,24 +1,17 @@
 /*
- * "$Id$"
+ * Example code for encoding and decoding large amounts of data in a PPD file.
+ * This would typically be used in a driver to save configuration/state
+ * information that could be used by an application.
  *
- *   Example code for encoding and decoding large amounts of data in a PPD file.
- *   This would typically be used in a driver to save configuration/state
- *   information that could be used by an application.
+ * Copyright 2012 by Apple Inc.
  *
- *   Copyright 2012 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ppdxReadData()  - Read encoded data from a ppd_file_t *.
- *   ppdxWriteData() - Writes encoded data to stderr using PPD: messages.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -307,8 +300,3 @@ ppdxWriteData(const char *name,		/* I - Base name of keyword */
 
   fputs(line, stderr);
 }
-
-
-/*
- * End of "$Id$".
- */

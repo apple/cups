@@ -1,0 +1,97 @@
+<div class="row">
+  <div class="halves">
+    <H2 CLASS="title">Impressoras</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Adicionar impressora"></FORM>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Encontrar novas impressoras"></FORM>
+    <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gerenciar impressoras"></FORM>
+    {have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Exportar impressoras ao Samba"></FORM>:}
+    </P>
+
+    <H2 CLASS="title">Classes</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Adicionar classe"></FORM>
+    <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gerenciar classes"></FORM>
+    </P>
+
+    <H2 CLASS="title">Trabalhos</H2>
+
+    <P>
+    <FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gerenciar trabalhos"></FORM>
+    </P>
+  </div>
+  <div class="halves">
+    <H2 CLASS="title">Servidor</H2>
+
+    <P>
+    <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Editar arquivo de configura&ccedil;&atilde;o"></FORM>
+    <FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Ver log de acessos"></FORM>
+    <FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Ver log de erros"></FORM>
+    <FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Ver log de p&aacute;ginas"></FORM>
+    </P>
+
+    {SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+    <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
+    <FORM METHOD="POST" ACTION="/admin">
+    <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+
+    {ADVANCEDSETTINGS?<P><B>Configura&ccedil;&otilde;es do servidor\:</B></P>
+
+    <P><A HREF="/admin/">Avan&ccedil;ado <SMALL>&#x25bc;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartilhar impressoras conectadas a este sistema<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&aacute;ximo de clientes\:
+    <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Permitir impress&atilde;o a partir da Internet<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Anunciar interface web<BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administra&ccedil;&atilde;o remota<BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas os seus pr&oacute;prios)<BR>
+    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Preservar o hist&oacute;rico de trabalhos<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&aacute;ximo de trabalhos (0 para sem limite)\:
+    <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reter metadados\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reter documentos\:
+    <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salvar informa&ccedil;&atilde;o de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tamanho m&aacute;ximo do arquivo de log\:
+    <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
+
+    :<P><B>Configura&ccedil;&otilde;es do servidor:</B></P>
+
+    <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Avan&ccedil;ado <SMALL>&#x25b6;</SMALL></A><BR>
+    <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartilhar impressoras conectadas a este sistema<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Permitir impress&atilde;o a partir da Internet<BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administra&ccedil;&atilde;o remota<BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas seus pr&oacute;prios)<BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salvar informa&ccedil;&otilde;es de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas</P>
+
+    }
+    <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Alterar configura&ccedil;&otilde;es"></P>
+
+    </FORM>}
+  </div>
+</div>
+
+<div class="row">
+  <H2 CLASS="title">Inscri&ccedil;&otilde;es RSS</H2>
+
+  <P>
+  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Adicionar inscri&ccedil;&atilde;o RSS"></FORM>
+  </P>
+
+  {notify_subscription_id?<TABLE CLASS="list" SUMMARY="Inscri&ccedil;&otilde;es RSS">
+  <THEAD><TR><TH>Nome</TH><TH>Eventos</TH><TH>Nome da fila</TH></TR></THEAD>
+  <TBODY>{[notify_subscription_id]
+  <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
+  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancelar inscri&ccedil;&atilde;o RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Todas as filas}</TD></TR>}
+  </TBODY>
+  </TABLE>:}
+</div>

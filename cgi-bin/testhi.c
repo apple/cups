@@ -1,21 +1,14 @@
 /*
- * "$Id$"
+ * Help index test program for CUPS.
  *
- *   Help index test program for CUPS.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()       - Test the help index code.
- *   list_nodes() - List nodes in an array...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -106,8 +99,3 @@ list_nodes(const char   *title,		/* I - Title string */
     printf(" (%d words)\n", cupsArrayCount(node->words));
   }
 }
-
-
-/*
- * End of "$Id$".
- */

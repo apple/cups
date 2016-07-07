@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Internationalization test for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -607,8 +605,3 @@ print_utf8(const char	     *msg,	/* I - Message String */
 
   putchar('\n');
 }
-
-
-/*
- * End of "$Id$"
- */

@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Get/put file functions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -34,7 +32,7 @@
  *
  * This function returns @code HTTP_STATUS_OK@ when the file is successfully retrieved.
  *
- * @since CUPS 1.1.20/OS X 10.4@
+ * @since CUPS 1.1.20/macOS 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -53,8 +51,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {
@@ -190,7 +187,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
  *
  * This function returns @code HTTP_STATUS_OK@ when the file is successfully retrieved.
  *
- * @since CUPS 1.1.20/OS X 10.4@
+ * @since CUPS 1.1.20/macOS 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -258,7 +255,7 @@ cupsGetFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
  * This function returns @code HTTP_STATUS_CREATED@ when the file is stored
  * successfully.
  *
- * @since CUPS 1.1.20/OS X 10.4@
+ * @since CUPS 1.1.20/macOS 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -276,8 +273,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", http,
-                resource, fd));
+  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", (void *)http, resource, fd));
 
   if (!resource || fd < 0)
   {
@@ -459,7 +455,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
  * This function returns @code HTTP_CREATED@ when the file is stored
  * successfully.
  *
- * @since CUPS 1.1.20/OS X 10.4@
+ * @since CUPS 1.1.20/macOS 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -508,8 +504,3 @@ cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

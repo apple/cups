@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD model-specific attribute routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -24,7 +22,7 @@
 /*
  * 'ppdFindAttr()' - Find the first matching attribute.
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ppd_attr_t *				/* O - Attribute or @code NULL@ if not found */
@@ -81,7 +79,7 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 /*
  * 'ppdFindNextAttr()' - Find the next matching attribute.
  *
- * @since CUPS 1.1.19/OS X 10.3@
+ * @since CUPS 1.1.19/macOS 10.3@
  */
 
 ppd_attr_t *				/* O - Attribute or @code NULL@ if not found */
@@ -314,8 +312,3 @@ _ppdNormalizeMakeAndModel(
 
   return (buffer[0] ? buffer : NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

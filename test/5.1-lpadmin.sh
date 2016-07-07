@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# "$Id$"
-#
 # Test the lpadmin command.
 #
 # Copyright 2007-2013 by Apple Inc.
@@ -66,7 +64,3 @@ else
 	echo "    PASSED"
 fi
 echo ""
-
-#
-# End of "$Id$".
-#

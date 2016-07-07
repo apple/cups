@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * System management functions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -33,10 +31,10 @@
  * and state files to minimize the number of times the disk has to spin
  * up or flash to be written to.
  *
- * Power management support is currently only implemented on OS X, but
+ * Power management support is currently only implemented on macOS, but
  * essentially we use four functions to let the OS know when it is OK to
  * put the system to sleep, typically when we are not in the middle of
- * printing a job.  And on OS X we can also "sleep print" - basically the
+ * printing a job.  And on macOS we can also "sleep print" - basically the
  * system only wakes up long enough to service network requests and process
  * print jobs.
  */
@@ -1069,8 +1067,3 @@ sysUpdateNames(void)
     cupsdRegisterPrinter(p);
 }
 #endif	/* __APPLE__ */
-
-
-/*
- * End of "$Id$".
- */

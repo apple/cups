@@ -1,9 +1,7 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Manpage stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -23,7 +21,7 @@ fi
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$uname" in
         	Darwin* | Linux | GNU | *BSD*)
-        		# Darwin, MacOS X, Linux, GNU HURD, and *BSD
+        		# Darwin, macOS, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"
@@ -54,7 +52,7 @@ case "$uname" in
 		MAN8DIR=1m
 		;;
 	Linux* | GNU* | Darwin*)
-		# Linux, GNU Hurd, and OS X
+		# Linux, GNU Hurd, and macOS
 		MAN1EXT=1.gz
 		MAN5EXT=5.gz
 		MAN7EXT=7.gz
@@ -76,7 +74,3 @@ AC_SUBST(MAN5EXT)
 AC_SUBST(MAN7EXT)
 AC_SUBST(MAN8EXT)
 AC_SUBST(MAN8DIR)
-
-dnl
-dnl End of "$Id$".
-dnl

@@ -1,9 +1,7 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Networking stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2016 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -49,7 +47,7 @@ if test x$enable_domainsocket != xno -a x$default_domainsocket != xno; then
 	if test "x$default_domainsocket" = x; then
 		case "$uname" in
 			Darwin*)
-				# Darwin and MaxOS X do their own thing...
+				# Darwin and macOS do their own thing...
 				CUPS_DEFAULT_DOMAINSOCKET="$localstatedir/run/cupsd"
 				;;
 			*)
@@ -70,7 +68,3 @@ fi
 
 AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
-
-dnl
-dnl End of "$Id$".
-dnl

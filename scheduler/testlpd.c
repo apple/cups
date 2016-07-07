@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * cups-lpd test program for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -532,8 +530,3 @@ usage(void)
 
   exit(0);
 }
-
-
-/*
- * End of "$Id$".
- */

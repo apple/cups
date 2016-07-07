@@ -1,24 +1,16 @@
 /*
- * "$Id$"
+ * Notification routines for CUPS.
  *
- *   Notification routines for CUPS.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2005-2006 by Easy Software Products.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2005-2006 by Easy Software Products.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsNotifySubject() - Return the subject for the given notification
- *                         message.
- *   cupsNotifyText()    - Return the text for the given notification message.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -33,7 +25,7 @@
  *
  * The returned string must be freed by the caller using @code free@.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 char *					/* O - Subject string or @code NULL@ */
@@ -164,7 +156,7 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
  *
  * The returned string must be freed by the caller using @code free@.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 char *					/* O - Message text or @code NULL@ */
@@ -195,8 +187,3 @@ cupsNotifyText(cups_lang_t *lang,	/* I - Language data */
 
   return (strdup(notify_text->values[0].string.text));
 }
-
-
-/*
- * End of "$Id$".
- */

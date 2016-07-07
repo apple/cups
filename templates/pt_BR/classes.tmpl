@@ -1,0 +1,11 @@
+{#printer_name=0?:
+<TABLE CLASS="list" SUMMARY="Class List">
+<THEAD>
+<TR><TH>Nome da fila</TH><TH>Descri&ccedil;&atilde;o</TH><TH>Localiza&ccedil;&atilde;o</TH><TH>Membros</TH><TH>Estado</TH></TR>
+</THEAD>
+<TBODY>
+{[printer_name]
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{?member_uris=?Nenhum:{member_uris}}</TD><TD>{printer_state=3?ociosa:{printer_state=4?processando:pausada}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
+}
+</TBODY>
+</TABLE></DIV>}

@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # Top-level Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -268,15 +266,9 @@ debugcheck:	all unittests
 #
 
 apihelp:
-	for dir in cgi-bin cups filter ppdc scheduler; do\
+	for dir in cups filter; do\
 		echo Generating API help in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) apihelp) || exit 1;\
-	done
-
-framedhelp:
-	for dir in cgi-bin cups filter ppdc scheduler; do\
-		echo Generating framed API help in $$dir... ;\
-		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
 	done
 
 
@@ -322,14 +314,8 @@ sloc:
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-bsd deb pkg slackware:
+bsd deb epm pkg rpm slackware:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
-
-epm:
-	epm $(EPMFLAGS) -s packaging/installer.gif cups packaging/cups.list
-
-rpm:
-	epm $(EPMFLAGS) -f rpm -s packaging/installer.gif cups packaging/cups.list
 
 .PHONEY:	dist
 dist:	all
@@ -337,7 +323,6 @@ dist:	all
 	$(MAKE) $(MFLAGS) epm
 	case `uname` in \
 		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
-		Darwin*) $(MAKE) $(MFLAGS) osx;; \
 		Linux*) test ! -x /usr/bin/rpm || $(MAKE) $(MFLAGS) rpm;; \
 		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac
@@ -348,8 +333,3 @@ dist:	all
 #
 
 .NOTPARALLEL:
-
-
-#
-# End of "$Id$".
-#

@@ -1,7 +1,5 @@
 /*
- * "$Id$"
- *
- * Copyright 2005-2015 Apple Inc. All rights reserved.
+ * Copyright 2005-2016 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
  * Inc. ("Apple") in consideration of your agreement to the following
@@ -204,7 +202,7 @@ typedef struct classdriver_s		/**** g.classdriver context ****/
 
 } classdriver_t;
 
-typedef Boolean (*iterator_callback_t)(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting);
+typedef Boolean (*iterator_callback_t)(io_service_t obj, printer_interface_t printerIntf, void *refcon);
 
 typedef struct iterator_reference_s	/**** Iterator reference data */
 {
@@ -233,6 +231,7 @@ typedef struct globals_s
   UInt32		location;
   UInt8			interfaceNum;
   UInt8			alternateSetting;
+  UInt8                 interfaceProtocol;
 
   CFRunLoopTimerRef 	status_timer;
 
@@ -266,8 +265,8 @@ int Iterating = 0;			/* Are we iterating the bus? */
  * Local functions...
  */
 
-static Boolean find_device_cb(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting);
-static Boolean list_device_cb(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting);
+static Boolean list_device_cb(io_service_t obj, printer_interface_t printerIntf, void *refcon);
+static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf, void *refcon);
 
 static CFStringRef cfstr_create_trim(const char *cstr);
 static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys);
@@ -303,7 +302,7 @@ static void parse_pserror (char *sockBuffer, int len);
 #endif /* PARSE_PS_ERRORS */
 
 static printer_interface_t usb_printer_interface_interface(io_service_t usbClass);
-static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDevice);
+
 static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, UInt8 alternateSetting);
 static CFStringRef copy_printer_interface_indexed_description(printer_interface_t  printer, UInt8 index, UInt16 language);
 static CFStringRef deviceIDCopyManufacturer(CFStringRef deviceID);
@@ -420,10 +419,17 @@ print_device(const char *uri,		/* I - Device URI */
       g.printer_obj = 0x0;
       g.classdriver = 0x0;
     }
-
     fprintf(stderr, "DEBUG: Looking for '%s %s'\n", hostname, resource);
 
-    iterate_printers(find_device_cb, NULL);
+    do
+    {
+      iterate_printers(find_device_cb, NULL);
+      if (g.printer_obj != 0x0)
+        break;
+
+      _cupsLangPrintFilter(stderr, "INFO", _("Waiting for printer to become available."));
+      sleep(5);
+    } while (true);
 
     fputs("DEBUG: Opening connection\n", stderr);
 
@@ -1118,257 +1124,234 @@ sidechannel_thread(void *reference)
 /*
  * 'iterate_printers()' - Iterate over all the printers.
  */
-
 static void iterate_printers(iterator_callback_t callBack, void *userdata)
 {
-    Iterating = 1;
+  Iterating = 1;
 
-    mach_port_t	masterPort = 0x0;
-    kern_return_t kr = IOMasterPort (bootstrap_port, &masterPort);
+  iterator_reference_t reference = { callBack, userdata, true };
 
-    if (kr == kIOReturnSuccess && masterPort != 0x0)
+  IONotificationPortRef addNotification = IONotificationPortCreate(kIOMasterPortDefault);
+
+  int printingClass = kUSBPrintingClass;
+  int printingSubclass = kUSBPrintingSubclass;
+
+  CFNumberRef interfaceClass = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &printingClass);
+  CFNumberRef interfaceSubClass = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &printingSubclass);
+
+  CFMutableDictionaryRef usbPrinterMatchDictionary = IOServiceMatching(kIOUSBInterfaceClassName);
+  CFDictionaryAddValue(usbPrinterMatchDictionary, CFSTR("bInterfaceClass"), interfaceClass);
+  CFDictionaryAddValue(usbPrinterMatchDictionary, CFSTR("bInterfaceSubClass"), interfaceSubClass);
+
+  CFRelease(interfaceClass);
+  CFRelease(interfaceSubClass);
+
+  io_iterator_t add_iterator = IO_OBJECT_NULL;
+  IOServiceAddMatchingNotification(addNotification, kIOMatchedNotification,
+                usbPrinterMatchDictionary, &device_added, &reference, &add_iterator);
+  if (add_iterator != IO_OBJECT_NULL)
+  {
+    device_added (&reference, add_iterator);
+    if (reference.keepRunning)
     {
-        iterator_reference_t reference = { callBack, userdata, true };
-
-        IONotificationPortRef addNotification = IONotificationPortCreate(masterPort);
-        io_iterator_t addIterator = IO_OBJECT_NULL;
-
-        kr = IOServiceAddMatchingNotification(addNotification, kIOFirstMatchNotification, IOServiceMatching(kIOUSBDeviceClassName),
-                                              &device_added, &reference, &addIterator);
-        if (kr == kIOReturnSuccess && addIterator != IO_OBJECT_NULL)
-        {
-            device_added(&reference, addIterator);
-            if (reference.keepRunning)
-            {
-                CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(addNotification), kCFRunLoopDefaultMode);
-                CFRunLoopRun();
-            }
-            IOObjectRelease(addIterator);
-        }
-        mach_port_deallocate(mach_task_self(), masterPort);
+      CFRunLoopAddSource(CFRunLoopGetCurrent(), IONotificationPortGetRunLoopSource(addNotification), kCFRunLoopDefaultMode);
+      CFRunLoopRun();
     }
-
-    Iterating = 0;
+    IOObjectRelease(add_iterator);
+  }
+  Iterating = 0;
 }
 
 
 /*
  * 'device_added()' - Device added notifier.
  */
-#define IsPrintingInterface(c,s,p) ((c) == kUSBPrintingInterfaceClass && (s) == kUSBPrintingSubclass && (p) != kUSBPrintingProtocolIPP)
-
 static void device_added(void *userdata, io_iterator_t iterator)
 {
-    iterator_reference_t *reference = userdata;
-    io_service_t device;
+  iterator_reference_t *reference = userdata;
+  io_service_t intf;
 
-    while (reference->keepRunning && (device = IOIteratorNext(iterator)) != 0x0)
+  while (reference->keepRunning && (intf = IOIteratorNext(iterator)) != 0x0)
+  {
+    printer_interface_t printerIntf = usb_printer_interface_interface(intf);
+    if (printerIntf != NULL)
     {
-        UInt32 locationID = 0;
-        IOUSBDeviceInterface **devIntf = NULL;
-        io_iterator_t intfIterator = IO_OBJECT_NULL;
-        io_object_t intf = IO_OBJECT_NULL;
+      UInt8 intfClass = 0, intfSubClass = 0;
 
-        devIntf = usb_device_interface_for_device(device);
-        if (devIntf == NULL)
-            goto device_added_done;
-
-        UInt16 vendorUniqueID;
-        if ((*devIntf)->GetDeviceVendor(devIntf, &vendorUniqueID) != kIOReturnSuccess || vendorUniqueID == kAppleVendorID || vendorUniqueID == 0x0A5C)
-            goto device_added_done;
-
-        if ((*devIntf)->GetLocationID(devIntf, &locationID) != kIOReturnSuccess)
-            goto device_added_done;
-
-        IOUSBFindInterfaceRequest req = { kIOUSBFindInterfaceDontCare, kIOUSBFindInterfaceDontCare, kIOUSBFindInterfaceDontCare, kIOUSBFindInterfaceDontCare };
-        if ((*devIntf)->CreateInterfaceIterator(devIntf, &req, &intfIterator) != kIOReturnSuccess)
-            goto device_added_done;
-
-        while (reference->keepRunning && (intf = IOIteratorNext(intfIterator)))
-        {
-            printer_interface_t printerIntf = usb_printer_interface_interface(intf);
-            if (printerIntf != NULL)
-            {
-                UInt8 intfClass = 0, intfSubclass = 0, intfProtocol = 0, intfNumber = 0;
-
-                (*printerIntf)->GetInterfaceClass(printerIntf, &intfClass);
-                (*printerIntf)->GetInterfaceSubClass(printerIntf, &intfSubclass);
-                (*printerIntf)->GetInterfaceProtocol(printerIntf, &intfProtocol);
-                (*printerIntf)->GetInterfaceNumber(printerIntf, &intfNumber);
-
-                if (IsPrintingInterface(intfClass, intfSubclass, intfProtocol))
-                {
-                    CFStringRef deviceIDString = copy_printer_interface_deviceid(printerIntf, 0);
-                    if (deviceIDString != NULL)
-                    {
-                        reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, 0);
-                        CFRelease(deviceIDString);
-                    }
-                }
-
-                IOUSBInterfaceDescriptor *intfDesc = NULL;
-                while (reference->keepRunning && (intfDesc = (IOUSBInterfaceDescriptor *)(*printerIntf)->FindNextAssociatedDescriptor(printerIntf, intfDesc, kUSBInterfaceDesc)))
-                {
-                    intfClass = intfDesc->bInterfaceClass;
-                    intfSubclass = intfDesc->bInterfaceSubClass;
-                    intfProtocol = intfDesc->bInterfaceProtocol;
-
-                    if ((IsPrintingInterface(intfClass, intfSubclass, intfProtocol)))
-                    {
-                        CFStringRef deviceIDString = copy_printer_interface_deviceid(printerIntf, intfDesc->bAlternateSetting);
-                        if (deviceIDString != NULL)
-                        {
-                            reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, intfDesc->bAlternateSetting);
-                            CFRelease(deviceIDString);
-                        }
-                    }
-                }
-                (*printerIntf)->Release(printerIntf);
-            }
-            IOObjectRelease(intf);
-        }
-
-        device_added_done:
-            if (devIntf != NULL) (*devIntf)->Release(devIntf);
-            if (intfIterator != IO_OBJECT_NULL) IOObjectRelease(intfIterator);
-
-        IOObjectRelease(device);
+      (*printerIntf)->GetInterfaceClass(printerIntf, &intfClass);
+      (*printerIntf)->GetInterfaceSubClass(printerIntf, &intfSubClass);
+      if (intfClass == kUSBPrintingInterfaceClass && intfSubClass == kUSBPrintingSubclass)
+        reference->keepRunning = reference->callback(intf, printerIntf, userdata);
+        (*printerIntf)->Release(printerIntf);
+      }
+      IOObjectRelease(intf);
     }
 
-    /* One last call to the call back now that we are not longer have printers left to iterate...
-     */
     if (reference->keepRunning && reference->callback)
-        reference->keepRunning = reference->callback(reference->userdata, IO_OBJECT_NULL, NULL, 0, 0, 0);
+      reference->keepRunning = reference->callback(IO_OBJECT_NULL, NULL, reference->userdata);
 
     if (!reference->keepRunning)
-        CFRunLoopStop(CFRunLoopGetCurrent());
+      CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
 /*
  * 'list_device_cb()' - list_device iterator callback.
  */
-
-static Boolean list_device_cb(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting)
+static Boolean list_device_cb(io_service_t obj, printer_interface_t printerIntf, void *refcon)
 {
-    (void)refcon;
-    (void)interfaceNum;
-    (void)alternateSetting;
+  (void)refcon;
 
-    if (obj != IO_OBJECT_NULL)
-    {
-        CFStringRef make = deviceIDCopyManufacturer(deviceIDString);
-        CFStringRef model = deviceIDCopyModel(deviceIDString);
-        CFStringRef serial = deviceIDCopySerialNumber(deviceIDString);
+  if (obj != IO_OBJECT_NULL)
+  {
+    CFStringRef deviceIDString = NULL;
+    CFStringRef make = NULL;
+    CFStringRef model = NULL;
+    CFStringRef serial = NULL;
+    UInt32 intfLocation;
 
-        char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024];
-        char optionsstr[1024], idstr[1024], make_modelstr[1024];
+    deviceIDString = copy_printer_interface_deviceid(printerIntf, 0);
+    if (deviceIDString == NULL)
+      goto list_device_done;
 
-        CFStringGetCString(deviceIDString, idstr, sizeof(idstr), kCFStringEncodingUTF8);
-        backendGetMakeModel(idstr, make_modelstr, sizeof(make_modelstr));
+    make = deviceIDCopyManufacturer(deviceIDString);
+    model = deviceIDCopyModel(deviceIDString);
+    serial = deviceIDCopySerialNumber(deviceIDString);
 
-        modelstr[0] = '/';
+    char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024];
+    char optionsstr[1024], idstr[1024], make_modelstr[1024];
 
-        if (make  == NULL || !CFStringGetCString(make, makestr, sizeof(makestr), kCFStringEncodingUTF8))
-            strlcpy(makestr, "Unknown", sizeof(makestr));
+    CFStringGetCString(deviceIDString, idstr, sizeof(idstr), kCFStringEncodingUTF8);
+    backendGetMakeModel(idstr, make_modelstr, sizeof(make_modelstr));
 
-        if (model == NULL || !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1, kCFStringEncodingUTF8))
-            strlcpy(modelstr + 1, "Printer", sizeof(modelstr) - 1);
+    modelstr[0] = '/';
 
-        optionsstr[0] = '\0';
-        if (serial != NULL && CFStringGetCString(serial, serialstr, sizeof(serialstr), kCFStringEncodingUTF8))
-            snprintf(optionsstr, sizeof(optionsstr), "?serial=%s", serialstr);
-        else if (deviceLocation != 0)
-            snprintf(optionsstr, sizeof(optionsstr), "?location=%x", (unsigned)deviceLocation);
+    if (make  == NULL || !CFStringGetCString(make, makestr, sizeof(makestr), kCFStringEncodingUTF8))
+      strlcpy(makestr, "Unknown", sizeof(makestr));
 
-        httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
-        strlcat(uristr, optionsstr, sizeof(uristr));
+    if (model == NULL || !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1, kCFStringEncodingUTF8))
+      strlcpy(modelstr + 1, "Printer", sizeof(modelstr) - 1);
 
-        cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
+    optionsstr[0] = '\0';
+    if (serial != NULL && CFStringGetCString(serial, serialstr, sizeof(serialstr), kCFStringEncodingUTF8))
+      snprintf(optionsstr, sizeof(optionsstr), "?serial=%s", serialstr);
+    else if ((*printerIntf)->GetLocationID(printerIntf, &intfLocation) == kIOReturnSuccess)
+      snprintf(optionsstr, sizeof(optionsstr), "?location=%x", (unsigned)intfLocation);
+
+    httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
+    strlcat(uristr, optionsstr, sizeof(uristr));
+
+    cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
                           NULL);
+  list_device_done:
 
-        if (make != NULL) CFRelease(make);
-        if (model != NULL) CFRelease(model);
-        if (serial != NULL) CFRelease(serial);
-    }
-
-    return obj != IO_OBJECT_NULL;
+    if (make != NULL) CFRelease(make);
+    if (model != NULL) CFRelease(model);
+    if (serial != NULL) CFRelease(serial);
+  }
+  return obj != IO_OBJECT_NULL;
 }
 
 /*
  * 'find_device_cb()' - print_device iterator callback.
  */
-static Boolean find_device_cb(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting)
+static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf, void *refcon)
 {
-    Boolean keepLooking = true;
+  (void)refcon;
 
-    if (obj != IO_OBJECT_NULL)
+  Boolean keepLooking = true;
+
+  if (obj != IO_OBJECT_NULL)
+  {
+    CFStringRef deviceIDString = NULL;
+    CFStringRef make = NULL;
+    CFStringRef model = NULL;
+    CFStringRef serial = NULL;
+
+    deviceIDString = copy_printer_interface_deviceid(printerIntf, 0);
+    if (deviceIDString == NULL)
+      goto find_device_done;
+
+    make = deviceIDCopyManufacturer(deviceIDString);
+    model = deviceIDCopyModel(deviceIDString);
+    serial = deviceIDCopySerialNumber(deviceIDString);
+
+    if (make && CFStringCompare(make, g.make, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
     {
-        CFStringRef make = deviceIDCopyManufacturer(deviceIDString);
-        CFStringRef model = deviceIDCopyModel(deviceIDString);
-        CFStringRef serial = deviceIDCopySerialNumber(deviceIDString);
+      if (model && CFStringCompare(model, g.model, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+      {
+        UInt8 intfAltSetting = 0, intfNumber = 0, intfProtocol = 0;
+        UInt32 intfLocation = 0;
 
-        if (make && CFStringCompare(make, g.make, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+        (*printerIntf)->GetInterfaceProtocol(printerIntf, &intfProtocol);
+        (*printerIntf)->GetAlternateSetting(printerIntf, &intfAltSetting);
+        (*printerIntf)->GetInterfaceNumber(printerIntf, &intfNumber);
+        (*printerIntf)->GetLocationID(printerIntf, &intfLocation);
+
+        if (g.serial != NULL && CFStringGetLength(g.serial) > 0)
         {
-            if (model && CFStringCompare(model, g.model, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+          if (serial != NULL && CFStringCompare(serial, g.serial, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+          {
+            g.interfaceProtocol = intfProtocol;
+            g.location = intfLocation;
+            g.alternateSetting = intfAltSetting;
+            if (intfProtocol != kUSBPrintingProtocolIPP)
             {
-                if (g.serial != NULL && CFStringGetLength(g.serial) > 0)
-                {
-                    if (serial != NULL && CFStringCompare(serial, g.serial, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
-                    {
-                        IOObjectRetain(obj);
-                        g.printer_obj = obj;
-                        g.location = deviceLocation;
-                        g.alternateSetting = alternateSetting;
-                        keepLooking = false;
-                    }
-                }
-                else
-                {
-                    if (g.printer_obj != 0)
-                        IOObjectRelease(g.printer_obj);
-
-                    g.alternateSetting = alternateSetting;
-                    g.printer_obj = obj;
-                    IOObjectRetain(obj);
-
-                    if (g.location == 0 || g.location == deviceLocation)
-                        keepLooking = false;
-                }
-
-                if ( !keepLooking )
-                    g.interfaceNum = interfaceNum;
+              g.printer_obj = obj;
+              IOObjectRetain(obj);
             }
+            keepLooking = (intfProtocol == kUSBPrintingProtocolIPP);
+          }
+        }
+        else
+        {
+          if (g.printer_obj != 0)
+            IOObjectRelease(g.printer_obj);
+
+            g.location = intfLocation;
+            g.alternateSetting = intfAltSetting;
+            g.interfaceProtocol = intfProtocol;
+            g.printer_obj = obj;
+            IOObjectRetain(obj);
+
+            if (g.location == 0 || g.location == intfLocation)
+              keepLooking = false;
         }
 
-        if (make) CFRelease(make);
-        if (model) CFRelease(model);
-        if (serial) CFRelease(serial);
-    }
-    else
-    {
-        keepLooking = (g.printer_obj == 0);
-        if (obj == IO_OBJECT_NULL && keepLooking)
-        {
-            CFRunLoopTimerContext context = { 0, refcon, NULL, NULL, NULL };
-            CFRunLoopTimerRef timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() + 1.0, 10, 0x0, 0x0, status_timer_cb, &context);
-            if (timer != NULL)
-            {
-                CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
-                g.status_timer = timer;
-            }
-        }
+        if (!keepLooking)
+          g.interfaceNum = intfNumber;
+      }
     }
 
-    if (!keepLooking && g.status_timer != NULL)
+  find_device_done:
+    if (deviceIDString != NULL) CFRelease(deviceIDString);
+    if (make != NULL) CFRelease(make);
+    if (model != NULL) CFRelease(model);
+    if (serial != NULL) CFRelease(serial);
+  }
+  else
+  {
+    keepLooking = (g.printer_obj == 0 && g.interfaceProtocol != kUSBPrintingProtocolIPP);
+    if (obj == IO_OBJECT_NULL && keepLooking)
     {
-        fputs("STATE: -offline-report\n", stderr);
-        _cupsLangPrintFilter(stderr, "INFO", _("The printer is now online."));
-        CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
-        CFRelease(g.status_timer);
-        g.status_timer = NULL;
+      CFRunLoopTimerContext context = { 0, refcon, NULL, NULL, NULL };
+      CFRunLoopTimerRef timer = CFRunLoopTimerCreate(NULL, CFAbsoluteTimeGetCurrent() + 1.0, 10, 0x0, 0x0, status_timer_cb, &context);
+      if (timer != NULL)
+      {
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopDefaultMode);
+        g.status_timer = timer;
+      }
     }
+  }
 
-    return keepLooking;
+  if (!keepLooking && g.status_timer != NULL)
+  {
+    fputs("STATE: -offline-report\n", stderr);
+    _cupsLangPrintFilter(stderr, "INFO", _("The printer is now online."));
+    CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
+    CFRelease(g.status_timer);
+    g.status_timer = NULL;
+  }
+
+  return keepLooking;
 }
 
 static CFStringRef deviceIDCopySerialNumber(CFStringRef deviceID)
@@ -1567,23 +1550,6 @@ static printer_interface_t usb_printer_interface_interface(io_service_t usbClass
 
 	return intf;
 }
-
-static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDevice)
-{
-	IOUSBDeviceInterface ** intf = NULL;
-	IOCFPlugInInterface **plugin = NULL;
-	SInt32	score;
-
-	int kr = IOCreatePlugInInterfaceForService(usbDevice, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
-	if (kr == kIOReturnSuccess)
-	{
-		(*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID), (LPVOID *)&intf);
-		IODestroyPlugInInterface(plugin);
-	}
-
-	return intf;
-}
-
 
 static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, UInt8 alternateSetting)
 {
@@ -2535,8 +2501,3 @@ log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
     asl_free(aslm);
   }
 }
-
-
-/*
- * End of "$Id$".
- */

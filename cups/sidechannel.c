@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Side-channel API code for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -56,7 +54,7 @@
  * pointed to by the "data" parameter.  cupsSideChannelDoRequest() will
  * update the value to contain the number of data bytes in the buffer.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 cups_sc_status_t			/* O  - Status of command */
@@ -95,7 +93,7 @@ cupsSideChannelDoRequest(
  * pointed to by the "data" parameter.  cupsSideChannelDoRequest() will
  * update the value to contain the number of data bytes in the buffer.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -295,7 +293,7 @@ cupsSideChannelRead(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the SNMP query.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 cups_sc_status_t			/* O  - Query status */
@@ -401,7 +399,7 @@ cupsSideChannelSNMPGet(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the first SNMP query.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 cups_sc_status_t			/* O - Status of first query of @code CUPS_SC_STATUS_OK@ on success */
@@ -520,7 +518,7 @@ cupsSideChannelSNMPWalk(
  * This function is normally only called by backend programs to send
  * responses to a filter, driver, or port monitor program.
  *
- * @since CUPS 1.3/OS X 10.5@
+ * @since CUPS 1.3/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -622,8 +620,3 @@ cupsSideChannelWrite(
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

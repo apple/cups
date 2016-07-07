@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# "$Id$"
-#
 # makesrcdist - make a source distribution of CUPS.
 #
 
@@ -146,7 +144,3 @@ echo Removing temporary files...
 rm -rf cups-$version
 
 echo "Done - files in $TMPDIR."
-
-#
-# End of "$Id$".
-#

@@ -1,0 +1,39 @@
+<H2 CLASS="title">Modificar {printer_name}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Descri&ccedil;&atilde;o:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Descri&ccedil;&atilde;o leg&iacute;vel para humanos, tal como "HP LaserJet com Duplexador")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Localiza&ccedil;&atilde;o:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Localiza&ccedil;&atilde;o leg&iacute;vel para humanos, tal como "Laborat&oacute;rio 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Conex&atilde;o:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Compartilhamento:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
+Compartilhar esta impressora</TD>
+</TR>
+<TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Continar"></TD>
+</TR>
+</TABLE>
+
+</FORM>

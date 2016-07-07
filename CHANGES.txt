@@ -1,8 +1,38 @@
-CHANGES.txt - 2.2b1 - 2016-03-10
---------------------------------
+CHANGES.txt - 2.2rc1 - 2016-07-07
+---------------------------------
+
+CHANGES IN CUPS V2.2rc1
+
+	- Updated the list of supported IPP Everywhere media types.
+
+
+CHANGES IN CUPS V2.2b2
+
+	- Added Upstart support (PR #4825)
+	- CUPS now supports Let's Encrypt certificates on Linux.
+
 
 CHANGES IN CUPS V2.2b1
 
+	- All CUPS commands now support POSIX options (Issue #4813)
+	- The scheduler now restarts faster (Issue #4760)
+	- Improved performance of web interface with large numbers of jobs
+	  (Issue #3819)
+	- Encrypted printing can now be limited to only trusted printers and
+	  servers (<rdar://problem/25711658>)
+	- The scheduler now advertises PWG Raster attributes for IPP Everywhere
+	  clients (Issue #4428)
+	- The scheduler now logs informational messages for jobs at LogLevel
+	  "info" (Issue #4815)
+	- The scheduler now uses the getgrouplist function when available
+	  (Issue #4611)
+	- The IPP backend no longer enables compression by default except for
+	  certain raster formats that generally benefit from it
+	  (<rdar://problem/25166952>)
+	- The scheduler did not handle out-of-disk situations gracefully
+	  (Issue #4742)
+	- The LPD mini-daemon now detects invalid UTF-8 sequences in job,
+	  document, and user names (Issue #4748)
 	- The IPP backend now continues on to the next job when the remote
 	  server/printer puts the job on hold (<rdar://problem/24858548>)
 	- The scheduler did not cancel multi-document jobs immediately
@@ -14,9 +44,13 @@ CHANGES IN CUPS V2.2b1
 	- Added support for disc media sizes (<rdar://problem/20219536>)
 	- The httpAddrConnect and httpConnect* APIs now try connecting to
 	  multiple addresses in parallel (<rdar://problem/20643153>)
-	- The cupsd domain socket is no longer world-accessible on OS X
+	- The cupsd domain socket is no longer world-accessible on macOS
 	  (<rdar://problem/7542560>)
 	- Interface scripts are no longer supported for security reasons
 	  (<rdar://problem/23135640>)
 	- Added a new cupsHashData API and support for hashed job passwords
 	  (<rdar://problem/20221502>)
+	- Localization fixes (<rdar://problem/25292403>,
+	  <rdar://problem/25461517>, Issue #4041, Issue #4796)
+	- Documentation changes (Issue #4624, Issue #4781)
+	- Packaging fixes (PR #4832)

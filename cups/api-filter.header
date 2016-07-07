@@ -1,9 +1,7 @@
 <!--
-  "$Id: api-filter.header 7616 2008-05-28 00:34:13Z mike $"
-
   Filter and backend programming header for CUPS.
 
-  Copyright 2008-2014 by Apple Inc.
+  Copyright 2008-2016 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -19,6 +17,7 @@
 <tr>
 	<th>Headers</th>
 	<th>cups/backend.h<br>
+	cups/ppd.h<br>
 	cups/sidechannel.h</th>
 </tr>
 </thead>

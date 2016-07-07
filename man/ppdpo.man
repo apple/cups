@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" ppdpo man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -28,7 +26,7 @@ ppdpo \- ppd message catalog generator (deprecated)
 ]
 .I source-file
 .SH DESCRIPTION
-\fBppdpo\fR extracts UI strings from PPDC source files and updates either a GNU gettext or OS X strings format message catalog source file for translation.
+\fBppdpo\fR extracts UI strings from PPDC source files and updates either a GNU gettext or macOS strings format message catalog source file for translation.
 \fBThis program is deprecated and will be removed in a future release of CUPS.\fR
 .SH OPTIONS
 \fBppdpo\fR supports the following options:
@@ -43,7 +41,7 @@ Multiple \fI-I\fR options can be supplied to add additional directories.
 .TP 5
 \fB\-o \fIoutput-file\fR
 Specifies the output file.
-The supported extensions are \fI.po\fR or \fI.po.gz\fR for GNU gettext format message catalogs and \fI.strings\fR for OS X strings files.
+The supported extensions are \fI.po\fR or \fI.po.gz\fR for GNU gettext format message catalogs and \fI.strings\fR for macOS strings files.
 .SH SEE ALSO
 .BR ppdc (1),
 .BR ppdhtml (1),
@@ -52,7 +50,4 @@ The supported extensions are \fI.po\fR or \fI.po.gz\fR for GNU gettext format me
 .BR ppdcfile(5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

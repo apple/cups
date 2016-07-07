@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Server listening routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -43,9 +41,9 @@ cupsdDeleteAllListeners(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#ifdef HAVE_ONDEMAND
     if (!lis->on_demand)
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
     {
       cupsArrayRemove(Listeners, lis);
       free(lis);
@@ -283,7 +281,7 @@ cupsdStopListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#ifdef HAVE_ONDEMAND
     if (!lis->on_demand && lis->fd != -1)
     {
       httpAddrClose(&(lis->address), lis->fd);
@@ -296,11 +294,6 @@ cupsdStopListening(void)
       httpAddrClose(&(lis->address), lis->fd);
       lis->fd = -1;
     }
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
   }
 }
-
-
-/*
- * End of "$Id$".
- */

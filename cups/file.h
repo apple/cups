@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Public file definitions for CUPS.
  *
  * Since stdio files max out at 256 files on many systems, we have to
@@ -112,7 +110,3 @@ extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf,
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_FILE_H_ */
-
-/*
- * End of "$Id$".
- */

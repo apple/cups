@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * RSS notifier for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -732,8 +730,3 @@ xml_escape(const char *s)		/* I - String to escape */
 
   return (e);
 }
-
-
-/*
- * End of "$Id$".
- */

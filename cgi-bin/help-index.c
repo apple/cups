@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Online help index routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1303,8 +1301,3 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
 
   return (_cups_strcasecmp(w1->text, w2->text));
 }
-
-
-/*
- * End of "$Id$".
- */

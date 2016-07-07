@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD command interpreter for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -124,7 +122,7 @@ static void		DEBUG_stack(const char *prefix, _cups_ps_stack_t *st);
  * @code pop@, @code roll@, @code setpagedevice@, and @code stopped@ operators
  * are supported.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 int					/* O - 0 on success, -1 on failure */
@@ -185,7 +183,7 @@ cupsRasterInterpretPPD(
 
 #ifdef __APPLE__
  /*
-  * cupsInteger0 is also used for the total page count on OS X; set an
+  * cupsInteger0 is also used for the total page count on macOS; set an
   * uncommon default value so we can tell if the driver is using cupsInteger0.
   */
 
@@ -1725,8 +1723,3 @@ DEBUG_stack(const char       *prefix,	/* I - Prefix string */
     DEBUG_object(prefix, obj);
 }
 #endif /* DEBUG */
-
-
-/*
- * End of "$Id$".
- */

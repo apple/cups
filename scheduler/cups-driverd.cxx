@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD/driver support for CUPS.
  *
  * This program handles listing and installing static PPD files, PPD files
@@ -912,7 +910,7 @@ get_file(const char *name,		/* I - Name */
        slash > printerDriver))
   {
    /*
-    * Map ppd-name to OS X standard locations...
+    * Map ppd-name to macOS standard locations...
     */
 
     snprintf(buffer, bufsize, "/%s", name);
@@ -1083,7 +1081,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
 #ifdef __APPLE__
  /*
-  * Load PPDs from standard OS X locations...
+  * Load PPDs from standard macOS locations...
   */
 
   load_ppds("/Library/Printers",
@@ -2928,8 +2926,3 @@ regex_string(const char *s)		/* I - String to compare */
 
   return (NULL);
 }
-
-
-/*
- * End of "$Id$".
- */

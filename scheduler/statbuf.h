@@ -1,16 +1,14 @@
 /*
- * "$Id$"
+ * Status buffer definitions for the CUPS scheduler.
  *
- *   Status buffer definitions for the CUPS scheduler.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -42,8 +40,3 @@ extern void		cupsdStatBufDelete(cupsd_statbuf_t *sb);
 extern cupsd_statbuf_t	*cupsdStatBufNew(int fd, const char *prefix, ...);
 extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 			                    char *line, int linelen);
-
-
-/*
- * End of "$Id$".
- */

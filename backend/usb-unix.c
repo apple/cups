@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * USB port backend for CUPS.
  *
  * This file is included from "usb.c" when compiled on UNIX/Linux.
@@ -600,8 +598,3 @@ side_cb(int         print_fd,		/* I - Print file */
 
   return (cupsSideChannelWrite(command, status, data, datalen, 1.0));
 }
-
-
-/*
- * End of "$Id$".
- */

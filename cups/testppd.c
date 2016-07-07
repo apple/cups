@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD test program for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1168,8 +1166,3 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

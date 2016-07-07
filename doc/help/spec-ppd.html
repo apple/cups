@@ -5,7 +5,7 @@
 	<title>CUPS PPD Extensions	</title>
 	<meta name="keywords" content="Specifications">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,8 +353,6 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id$"
-
   PPD extension documentation for CUPS.
 
   Copyright 2007-2011 by Apple Inc.
@@ -402,7 +400,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsUIResolver">cupsUIResolver</a></li>
 </ul></li>
 <li><a href="#I18N">Globalized PPD Support</a></li>
-<li><a href="#OPTIONS">CUPS 1.3/OS X 10.6Custom Options</a></li>
+<li><a href="#OPTIONS">CUPS 1.3/macOS 10.6Custom Options</a></li>
 <li><a href="#RASTERPS">Writing PostScript Option Commands for Raster Drivers</a></li>
 <li><a href="#MEDIA">Media Keywords</a><ul class="subcontents">
 	<li><a href="#cupsMediaQualifier2">cupsMediaQualifier2</a></li>
@@ -442,7 +440,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsVersion">cupsVersion</a></li>
 	<li><a href="#JCLToPDFInterpreter">JCLToPDFInterpreter</a></li>
 </ul></li>
-<li><a href="#MACOSX">OS X Attributes</a><ul class="subcontents">
+<li><a href="#MACOSX">macOS Attributes</a><ul class="subcontents">
 	<li><a href="#APDialogExtension">APDialogExtension</a></li>
 	<li><a href="#APDuplexRequiresFlippedMargin">APDuplexRequiresFlippedMargin</a></li>
 	<li><a href="#APHelpBook">APHelpBook</a></li>
@@ -488,11 +486,11 @@ LINE-END = CR / LF / CR LF
 
 <p>CUPS supports several methods of auto-configuration via PPD keywords.</p>
 
-<h3><span class='info'>OS X 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
+<h3><span class='info'>macOS 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
 
 <p class='summary'>*APAutoSetupTool: "/LibraryPrinters/vendor/filename"</p>
 
-<p>This OS X keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
+<p>This macOS keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
 
 <p>The program is provided with two arguments: the printer's device URI and the PPD file to be used for the printer. The program must write an updated PPD file to stdout.</p>
 
@@ -503,7 +501,7 @@ LINE-END = CR / LF / CR LF
 *APAutoSetupTool: "/Library/Printers/vendor/Tools/autosetuptool"
 </pre>
 
-<h3><span class='info'>OS X 10.2/CUPS 1.4</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
+<h3><span class='info'>macOS 10.2/CUPS 1.4</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
 
 <p class='summary'>*?<i>MainKeyword</i>: "<br>
   PostScript query code that writes a message using the = operator...<br>
@@ -532,7 +530,7 @@ LINE-END = CR / LF / CR LF
 *CloseUI: OptionDuplex
 </pre>
 
-<h3><span class='info'>OS X 10.4/CUPS 1.5</span><a name='OID'>OIDMainKeyword</a></h3>
+<h3><span class='info'>macOS 10.4/CUPS 1.5</span><a name='OID'>OIDMainKeyword</a></h3>
 
 <p class='summary'>*?OID<i>MainKeyword</i>: ".n.n.n..."<br>
 *OID<i>MainKeyword</i> <i>OptionKeyword1</i>: "value"<br>
@@ -555,7 +553,7 @@ LINE-END = CR / LF / CR LF
 
 <h2 class='title'><a name='PROFILES'>Color Profiles</a></h2>
 
-<p>CUPS supports three types of color profiles. The first type is based on sRGB and is used by the standard CUPS raster filters and GPL Ghostscript. The second type is based on ICC profiles and is used by the Quartz-based filters on MacOS X. The final type is based on well-known colorspaces such as sRGB and Adobe RGB.</p>
+<p>CUPS supports three types of color profiles. The first type is based on sRGB and is used by the standard CUPS raster filters and GPL Ghostscript. The second type is based on ICC profiles and is used by the Quartz-based filters on macOS. The final type is based on well-known colorspaces such as sRGB and Adobe RGB.</p>
 
 <blockquote><b>Note:</b>
 
@@ -567,7 +565,7 @@ LINE-END = CR / LF / CR LF
 
 <p class='summary'>*cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
 
-<p>This string keyword specifies an sRGB-based color profile consisting of gamma and density controls and a 3x3 CMY color transform matrix. <em>This keyword is not supported on OS X.</em></p>
+<p>This string keyword specifies an sRGB-based color profile consisting of gamma and density controls and a 3x3 CMY color transform matrix. <em>This keyword is not supported on macOS.</em></p>
 
 <p>The <i>Resolution</i> and <i>MediaType</i> values may be "-" to act as a wildcard. Otherwise they must match one of the <tt>Resolution</tt> or <tt>MediaType</tt> option keywords defined in the PPD file.</p>
 
@@ -600,7 +598,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </pre>
 
 
-<h3><span class='info'>OS X 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
+<h3><span class='info'>macOS 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
 
 <p class='summary'>*cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"</p>
 
@@ -639,22 +637,22 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *cupsICCQualifier3: Resolution
 </pre>
 
-<h3><span class='info'>OS X 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
+<h3><span class='info'>macOS 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
 
 <p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
 *<a href='#APCustomColorMatchingName'>APCustomColorMatchingName</a> name/text: ""<br>
 *<a href='#APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a>: profile<br>
 *<a href='#APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a>: profile</p>
 
-<p>These keywords tell the OS X raster filters that the printer driver provides its own custom color matching and that generic color profiles should be used when generating 1-, 3-, and 4-component raster data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt> and <tt>APDefaultColorMatchingProfile</tt> keywords specify alternate color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
+<p>These keywords tell the macOS raster filters that the printer driver provides its own custom color matching and that generic color profiles should be used when generating 1-, 3-, and 4-component raster data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt> and <tt>APDefaultColorMatchingProfile</tt> keywords specify alternate color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
 
 <blockquote><b>Note:</b>
 
-<p>Prior to OS X 10.6, the default RGB color space was Apple's "GenericRGB". The new default in OS X 10.6 and later is "sRGB". For more information, see <a href="http://support.apple.com/kb/HT3712">"OS X v10.6: About gamma 2.2"</a> on Apple's support site.</p>
+<p>Prior to macOS 10.6, the default RGB color space was Apple's "GenericRGB". The new default in macOS 10.6 and later is "sRGB". For more information, see <a href="http://support.apple.com/kb/HT3712">"macOS v10.6: About gamma 2.2"</a> on Apple's support site.</p>
 
 </blockquote>
 
-<h4><span class='info'>OS X 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
+<h4><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
 
 <p class='summary'>*APCustomColorMatchingName name/text: ""</p>
 
@@ -668,7 +666,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *fr.APCustomColorMatchingName name/La AcmeColor(tm): ""
 </pre>
 
-<h4><span class='info'>OS X 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
+<h4><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
 
 <p class='summary'>*APCustomColorMatchingProfile: name</p>
 
@@ -690,7 +688,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *APCustomColorMatchingProfile: AdobeRGB
 </pre>
 
-<h4><span class='info'>OS X 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
+<h4><span class='info'>macOS 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
 
 <p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
 
@@ -704,7 +702,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
-<h4><span class='info'>OS X 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
+<h4><span class='info'>macOS 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
 
 <p class='summary'>*APSupportsCustomColorMatching: boolean</p>
 
@@ -740,7 +738,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 
 </blockquote>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
 
 <p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
 *cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
@@ -770,7 +768,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *cupsUIConstraints photo: "*OutputMode Photo *MediaType Transparency *Resolution 1200dpi"
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
 
 <p class='summary'>*cupsUIResolver resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
@@ -872,7 +870,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </pre>
 
 
-<h2 class='title'><a name='OPTIONS'><span class="info">CUPS 1.3/OS X 10.6</span>Custom Options</a></h2>
+<h2 class='title'><a name='OPTIONS'><span class="info">CUPS 1.3/macOS 10.6</span>Custom Options</a></h2>
 
 <p>CUPS supports custom options using an extension of the <tt>CustomPageSize</tt> and <tt>ParamCustomPageSize</tt> syntax:</p>
 
@@ -1330,7 +1328,7 @@ PRE B {
 <p>The CUPS media keywords allow drivers to specify alternate custom page
 size limits based on up to two options.</p>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
 
 <p class='summary'>*cupsMediaQualifier2: MainKeyword</p>
 
@@ -1349,7 +1347,7 @@ custom page size limits.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
 
 <p class='summary'>*cupsMediaQualifier3: MainKeyword</p>
 
@@ -1368,7 +1366,7 @@ custom page size limits.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
 
 <p class='summary'>*cupsMinSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMinSize .Qualifier2.: "width length"<br>
@@ -1391,7 +1389,7 @@ are used to identify options to use for matching.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
 
 <p class='summary'>*cupsMaxSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMaxSize .Qualifier2.: "width length"<br>
@@ -1415,11 +1413,11 @@ are used to identify options to use for matching.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsPageSizeCategory'>cupsPageSizeCategory</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPageSizeCategory'>cupsPageSizeCategory</a></h3>
 
 <p class="summary">*cupsPageSizeCategory name/text: "name name2 ... nameN"</p>
 
-<p>This keyword lists related paper size names that should be grouped together in the Print or Page Setup dialogs. The "name" portion of the keyword specifies the root/default size for the grouping. On OS X the grouped paper sizes are shown in a submenu of the main paper size. When omitted, sizes with the same dimensions are automatically grouped together, for example "Letter" and "Letter.Borderless".</p>
+<p>This keyword lists related paper size names that should be grouped together in the Print or Page Setup dialogs. The "name" portion of the keyword specifies the root/default size for the grouping. On macOS the grouped paper sizes are shown in a submenu of the main paper size. When omitted, sizes with the same dimensions are automatically grouped together, for example "Letter" and "Letter.Borderless".</p>
 
 <p>Example:</p>
 
@@ -1432,7 +1430,7 @@ are used to identify options to use for matching.</p>
 
 <h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
 
 <p class='summary'>*cupsBackSide: keyword</p>
 
@@ -1508,7 +1506,7 @@ will be ignored.</p>
 </table>
 </div>
 
-<p><em>* - Not supported in OS X 10.5.x and earlier</em></p>
+<p><em>* - Not supported in macOS 10.5.x and earlier</em></p>
 
 <div class='figure'><table summary='Back side images'>
 <caption>Figure 1: Back side images</caption>
@@ -1528,7 +1526,7 @@ will be ignored.</p>
 <p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
 keyword.</p>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
 
 <p class='summary'>*cupsCommands: "name name2 ... nameN"</p>
 
@@ -1544,7 +1542,7 @@ by whitespace.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
 
 <p class='summary'>*cupsEvenDuplex: boolean</p>
 
@@ -1622,21 +1620,21 @@ the special filter program "-" may be specified.</p>
 
 <p class='summary'>*cupsFlipDuplex: boolean</p>
 
-<p>Due to implementation differences between OS X and Ghostscript,
+<p>Due to implementation differences between macOS and Ghostscript,
 the <tt>cupsFlipDuplex</tt> keyword is deprecated. Instead, use
 the <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> keyword to specify
 the coordinate system (pixel layout) of the page data on the back side of
 duplex pages.</p>
 
 <p>The value <code>true</code> maps to a <tt>cupsBackSide</tt> value
-of <code>Rotated</code> on OS X and <code>Flipped</code> with
+of <code>Rotated</code> on macOS and <code>Flipped</code> with
 Ghostscript.</p>
 
 <p>The default value is <code>false</code>.</p>
 
 <blockquote><b>Note:</b>
 
-<p>OS X drivers that previously used
+<p>macOS drivers that previously used
 <tt>cupsFlipDuplex</tt> may wish to provide both the old and
 new keywords for maximum compatibility, for example:</p>
 
@@ -1653,7 +1651,7 @@ Ghostscript can use:</p>
 *cupsFlipDuplex: true
 </pre></blockquote>
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
 
 <p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
 
@@ -1669,7 +1667,7 @@ values to PPD options and choices.</p>
 *cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
 </pre>
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
 
 <p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
 
@@ -1723,7 +1721,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
+<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
 
 <p class='summary'>*cupsJobAccountId: boolean</p>
 
@@ -1737,7 +1735,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
+<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
 
 <p class='summary'>*cupsJobAccountingUserId: boolean</p>
 
@@ -1751,7 +1749,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
+<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
 
 <p class='summary'>*cupsJobPassword: "format"</p>
 
@@ -1765,7 +1763,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.2/OS X 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
+<h3><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
 
 <p class='summary'>*cupsLanguages: "locale list"</p>
 
@@ -1781,7 +1779,7 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/OS X 10.9</span><a name='cupsMandatory'>cupsMandatory</a></h3>
+<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsMandatory'>cupsMandatory</a></h3>
 
 <p class='summary'>*cupsMandatory: "attribute1 attribute2 ... attributeN"</p>
 
@@ -1810,7 +1808,7 @@ hardware. The default value is <code>false</code>.</p>
 *cupsManualCopies: true
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
 
 <p class='summary'>*cupsMarkerName/Name Text: ""</p>
 
@@ -1824,7 +1822,7 @@ generated by the driver to human readable text.</p>
 *cupsMarkerName cyanToner/Cyan Toner: ""
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
 
 <p class='summary'>*cupsMarkerNotice: "disclaimer text"</p>
 
@@ -1838,7 +1836,7 @@ are approximate".</p>
 *cupsMarkerNotice: "Supply levels are approximate."
 </pre>
 
-<h3><span class='info'>CUPS 1.6/OS X 10.8</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
+<h3><span class='info'>CUPS 1.6/macOS 10.8</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
 
 <p class='summary'>*cupsMaxCopies: integer</p>
 
@@ -1867,7 +1865,7 @@ the output for a specific model of printer.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
 
 <p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
 
@@ -1882,7 +1880,7 @@ assumed.</p>
 *cupsPJLCharset: "UTF-8"
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
 
 <p class='summary'>*cupsPJLDisplay: "what"</p>
 
@@ -1901,7 +1899,7 @@ to use "@PJL RDYMSG DISPLAY". The default is "job".</p>
 *cupsPJLDisplay: "none"
 </pre>
 
-<h3><span class='info'>CUPS 1.2/OS X 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
+<h3><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
 
 <p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
 
@@ -1933,7 +1931,7 @@ to disable the port monitor for the given URI scheme.</p>
 *cupsPortMonitor usb/USB Status Monitor: "epson-usb"
 </pre>
 
-<h3><span class='info'>CUPS 1.3/OS X 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
+<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
 
 <p class='summary'>*cupsPreFilter: "source/type cost program"</p>
 
@@ -1992,7 +1990,7 @@ before the filter that accepts the given MIME type.</p>
 *cupsSingleFile: True
 </pre>
 
-<h3><span class='info'>CUPS 1.4/OS X 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
+<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
 
 <p class='summary'>*cupsSNMPSupplies: boolean</p>
 
@@ -2023,7 +2021,7 @@ PPD file extensions was used. Currently it must be the string
 </pre>
 
 
-<h3><span class="info">CUPS 1.6/OS X 10.8</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
+<h3><span class="info">CUPS 1.6/macOS 10.8</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
 
 <p class="summary">*JCLToPDFInterpreter: "JCL"</p>
 
@@ -2037,9 +2035,9 @@ PPD file extensions was used. Currently it must be the string
 </pre>
 
 
-<h2 class='title'><a name='MACOSX'>OS X Attributes</a></h2>
+<h2 class='title'><a name='MACOSX'>macOS Attributes</a></h2>
 
-<h3><span class='info'>OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+<h3><span class='info'>macOS 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
 
@@ -2051,7 +2049,7 @@ plug-ins.</p>
 
 <blockquote><b>Note:</b>
 
-<p>Starting with OS X 10.5, each plug-in must be compiled "4-way fat"
+<p>Starting with macOS 10.5, each plug-in must be compiled "4-way fat"
 (32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
 in order to be usable with all applications.</p>
 
@@ -2065,7 +2063,7 @@ in order to be usable with all applications.</p>
 *APDialogExtension: "/Library/Printers/vendor/options.plugin"
 </pre>
 
-<h3><span class='info'>OS X 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
+<h3><span class='info'>macOS 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
 
 <p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
 
@@ -2162,7 +2160,7 @@ looking up IPP reason codes for this printer driver. The
 *APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
 </pre>
 
-<h3><span class='info'>OS X 10.6</span><a name='APICADriver'>APICADriver</a></h3>
+<h3><span class='info'>macOS 10.6</span><a name='APICADriver'>APICADriver</a></h3>
 
 <p class='summary'>*APICADriver: boolean</p>
 
@@ -2176,7 +2174,7 @@ Architecture (ICA) driver for scanning. The default is <tt>False</tt>.</p>
 *APScanAppBundleID: "com.apple.ImageCaptureApp"
 </pre>
 
-<h3><span class='info'>OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
+<h3><span class='info'>macOS 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
 
 <p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename.icns"</p>
 
@@ -2190,7 +2188,7 @@ displaying the printer. The file must be in the Apple icon format.</p>
 *APPrinterIconPath: "/Library/Printers/vendor/Icons/filename.icns"
 </pre>
 
-<h3><span class='info'>OS X 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
+<h3><span class='info'>macOS 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
 
 <p class='summary'>*APPrinterLowInkTool: "/Library/Printers/vendor/program"</p>
 
@@ -2207,7 +2205,7 @@ Technical Note TN2144</a> for more information.</p>
 *APPrinterLowInkTool: "/Library/Printers/vendor/Tools/lowinktool"
 </pre>
 
-<h3><span class='info'>OS X 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
+<h3><span class='info'>macOS 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
 
 <p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
 
@@ -2277,7 +2275,7 @@ choice (*MainKeyword OptionKeyword) or a preset identifier and value
 *fr.APPrinterPreset Photo_on_Photo_Paper/Photo sur papier photographique: ""
 </pre>
 
-<h3><span class='info'>OS X 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
+<h3><span class='info'>macOS 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
 
 <p class='summary'>*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/filename.app"</p>
 
@@ -2292,7 +2290,7 @@ information.</p>
 *APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
 </pre>
 
-<h3><span class='info'>OS X 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
+<h3><span class='info'>macOS 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
 
 <p class='summary'>*APScannerOnly: boolean</p>
 
@@ -2306,7 +2304,7 @@ capabilities. The default is <tt>False</tt>.</p>
 *APScannerOnly: True
 </pre>
 
-<h3><span class='info'>OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
+<h3><span class='info'>macOS 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
 
 <p class='summary'>*APScanAppBundleID: "bundle ID"</p>
 
@@ -2409,7 +2407,7 @@ the device.</p>
 
 <ul>
 
-	<li>Added missing OS X <tt>AP</tt> keywords.</li>
+	<li>Added missing macOS <tt>AP</tt> keywords.</li>
 
 	<li>Added section on auto-configuration including the
 	<tt>OID<i>MainKeyword</i></tt> and <tt>?<i>MainKeyword</i></tt>

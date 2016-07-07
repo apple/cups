@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * EPSON ESC/P and ESC/P2 filter for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -1171,8 +1169,3 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
     return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

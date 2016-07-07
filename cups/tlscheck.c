@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * TLS check program for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -743,8 +741,3 @@ usage(void)
   exit(1);
 }
 #endif /* !HAVE_SSL */
-
-
-/*
- * End of "$Id$".
- */

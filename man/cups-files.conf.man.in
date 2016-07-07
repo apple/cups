@@ -1,9 +1,7 @@
 .\"
-.\" "$Id$"
-.\"
 .\" cups-files.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2015 by Apple Inc.
+.\" Copyright 2007-2016 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "3 June 2015" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "20 June 2016" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -51,7 +49,7 @@ The default is "/var/log/cups/access_log".
 .TP 5
 \fBConfigFilePerm \fImode\fR
 Specifies the permissions for all configuration files that the scheduler writes.
-The default is "0644" on OS X and "0640" on all other operating systems.
+The default is "0644" on macOS and "0640" on all other operating systems.
 .LP
 \fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
@@ -171,7 +169,7 @@ The default is "/var/spool/cups".
 \fBSandboxing strict\fR
 Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
 The default is "strict".
-This directive is currently only used/supported on OS X.
+This directive is currently only used/supported on macOS.
 .\"#ServerBin
 .TP 5
 \fBServerBin \fIdirectory\fR
@@ -181,8 +179,8 @@ The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
 .TP 5
 \fBServerKeychain \fIpath\fR
 Specifies the location of TLS certificates and private keys.
-The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
-OS X uses its keychain database to store certificates and keys while other platforms use separate files in the specified directory, *.crt for PEM-encoded certificates and *.key for PEM-encoded private keys.
+The default is "/Library/Keychains/System.keychain" on macOS and "/etc/cups/ssl" on all other operating systems.
+macOS uses its keychain database to store certificates and keys while other platforms use separate files in the specified directory, *.crt for PEM-encoded certificates and *.key for PEM-encoded private keys.
 .\"#ServerRoot
 .TP 5
 \fBServerRoot \fIdirectory\fR
@@ -223,7 +221,4 @@ The default is "lp".
 .BR subscriptions.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

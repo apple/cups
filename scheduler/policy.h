@@ -1,16 +1,14 @@
 /*
- * "$Id$"
+ * Policy definitions for the CUPS scheduler.
  *
- *   Policy definitions for the CUPS scheduler.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -56,8 +54,3 @@ extern cups_array_t	*cupsdGetPrivateAttrs(cupsd_policy_t *p,
 			                      cupsd_client_t *con,
 					      cupsd_printer_t *printer,
 			                      const char *owner);
-
-
-/*
- * End of "$Id$".
- */

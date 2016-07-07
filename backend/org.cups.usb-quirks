@@ -52,67 +52,67 @@
 # NEC Picty800 (HP OEM)
 0x0409 0xf1be unidir
 
-# Lexmark International, Inc. (e250d), https://bugs.launchpad.net/bugs/1084164
+# Lexmark International, Inc. (e250d) (https://bugs.launchpad.net/bugs/1084164)
 0x043d 0x00f3 no-reattach
 
 # Kyocera Mita FS 820, by zut <kernel@zut.de>
 0x0482 0x0010 unidir
 
-# Canon, Inc. PIXMA iP6000D Printer, https://bugs.launchpad.net/bugs/1160638
+# Canon, Inc. PIXMA iP6000D Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x1095 unidir
 
-# Canon, Inc. PIXMA iP4200 Printer, http://www.cups.org/str.php?L4155
+# Canon, Inc. PIXMA iP4200 Printer (Issue #4155)
 0x04a9 0x10a2 unidir
 
-# Canon, Inc. PIXMA iP4300 Printer, https://bugs.launchpad.net/bugs/1032385
+# Canon, Inc. PIXMA iP4300 Printer (https://bugs.launchpad.net/bugs/1032385)
 0x04a9 0x10b6 unidir
 
-# Canon, Inc. MP210 https://bugzilla.redhat.com/show_bug.cgi?id=847923#c53
+# Canon, Inc. MP210 (https://bugzilla.redhat.com/show_bug.cgi?id=847923#c53)
 0x04a9 0x1721 unidir
 
-# Canon, Inc. MP500 Printer, https://bugs.launchpad.net/bugs/1032456
+# Canon, Inc. MP500 Printer (https://bugs.launchpad.net/bugs/1032456)
 0x04a9 0x170c unidir
 
-# Canon, Inc. MP510 Printer, https://bugs.launchpad.net/bugs/1050009
+# Canon, Inc. MP510 Printer (https://bugs.launchpad.net/bugs/1050009)
 0x04a9 0x1717 unidir
 
-# Canon, Inc. MP550 Printer, http://www.cups.org/str.php?L4155
+# Canon, Inc. MP550 Printer (Issue #4155)
 0x04a9 0x173d unidir
 
-# Canon, Inc. MP560 Printer, http://www.cups.org/str.php?L4155
+# Canon, Inc. MP560 Printer (Issue #4155)
 0x04a9 0x173e unidir
 
-# Canon, Inc. MF4150 Printer, https://bugs.launchpad.net/bugs/1160638
+# Canon, Inc. MF4150 Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x26a3 no-reattach
 
-# Brother Industries, Ltd HL-1250 Laser Printer, https://bugs.debian.org/712512
+# Brother Industries, Ltd HL-1250 Laser Printer (https://bugs.debian.org/712512)
 0x04f9 0x0007 no-reattach
 
-# Brother Industries, Ltd HL-1430 Laser Printer, https://bugs.launchpad.net/bugs/1038695
+# Brother Industries, Ltd HL-1430 Laser Printer (https://bugs.launchpad.net/bugs/1038695)
 0x04f9 0x001a no-reattach
 
-# Brother Industries, Ltd HL-1440 Laser Printer, https://bugs.launchpad.net/bugs/1000253
+# Brother Industries, Ltd HL-1440 Laser Printer (https://bugs.launchpad.net/bugs/1000253)
 0x04f9 0x000d no-reattach unidir
 
-# Brother Industries, Ltd HL-1450 Laser Printer, https://bugs.launchpad.net/bugs/1000253
+# Brother Industries, Ltd HL-1450 Laser Printer (https://bugs.launchpad.net/bugs/1000253)
 0x04f9 0x000e no-reattach unidir
 
-# Oki Data Corp. Okipage 14ex Printer, https://bugs.launchpad.net/bugs/872483
+# Oki Data Corp. Okipage 14ex Printer (https://bugs.launchpad.net/bugs/872483)
 0x06bc 0x000b no-reattach
 
-# Oki Data Corp. B410d, https://bugs.launchpad.net/bugs/872483
+# Oki Data Corp. B410d (https://bugs.launchpad.net/bugs/872483)
 0x06bc 0x01c7 no-reattach
 
-# Seiko Epson Corp. Stylus Color 740 / Photo 750, http://bugs.debian.org/697970
+# Seiko Epson Corp. Stylus Color 740 / Photo 750 (http://bugs.debian.org/697970)
 0x04b8 0x0001 no-reattach unidir
 
-# Seiko Epson Corp. Stylus Color 670, https://bugs.launchpad.net/bugs/872483
+# Seiko Epson Corp. Stylus Color 670 (https://bugs.launchpad.net/bugs/872483)
 0x04b8 0x0005 no-reattach
 
 # Seiko Epson Receipt Printer M129C
 0x04b8 0x0202 vendor-class
 
-# Prolific Technology, Inc. PL2305 Parallel Port (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485
+# Prolific Technology, Inc. PL2305 Parallel Port (USB -> Parallel adapter) (https://bugs.launchpad.net/bugs/987485)
 0x067b 0x2305 no-reattach soft-reset unidir
 
 # Xerox Phaser 3124 https://bugzilla.redhat.com/show_bug.cgi?id=867392
@@ -121,13 +121,13 @@
 # Xerox WorkCentre 3210 https://bugs.launchpad.net/bugs/1102470
 0x0924 0x4293 no-reattach
 
-# QinHeng Electronics CH340S (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/1000253
+# QinHeng Electronics CH340S (USB -> Parallel adapter) (https://bugs.launchpad.net/bugs/1000253)
 0x1a86 0x7584 no-reattach
 
-# All Samsung devices, https://bugs.launchpad.net/bugs/1032456
+# All Samsung devices (https://bugs.launchpad.net/bugs/1032456)
 0x04e8 soft-reset
 
-# All Zebra devices, https://bugs.launchpad.net/bugs/1001028
+# All Zebra devices (https://bugs.launchpad.net/bugs/1001028)
 0x0a5f unidir
 
 # Canon CP-10
@@ -217,27 +217,33 @@
 # Lexmark E238 (<rdar://problem/14493054>)
 0x043d 0x00d7 no-reattach
 
-# Lexmark E238 (STR #4448)
+# Lexmark E238 (Issue #4448)
 0x043d 0x009a no-reattach
 
-# Canon MX310 (STR #4482)
+# Canon MX310 (Issue #4482)
 0x04a9 0x1728 unidir
 
-# Canon MX320 (STR #4482)
+# Canon MX320 (Issue #4482)
 0x04A9 0x1736 unidir
 
-# All Intermec devices (STR #4553)
+# All Intermec devices (Issue #4553)
 0x067e no-reattach
 
-# HP LaserJet 1150 (STR #4549)
+# HP LaserJet 1150 (Issue #4549)
 0x03f0 0x0f17 delay-close
 
-# HP LaserJet 1300 (STR #4549)
+# HP LaserJet 1300 (Issue #4549)
 0x03f0 0x1017 delay-close
 0x03f0 0x1117 delay-close
 
-# HP LaserJet 1320 (STR #4549)
+# HP LaserJet 1320 (Issue #4549)
 0x03f0 0x1d17 delay-close
 
 # Canon, Inc. MP530 Printer
 0x04a9 0x1712 unidir
+
+# Xerox WorkCentre 3220 (https://bugs.launchpad.net/bugs/1406203, Issue #4789)
+0x0924 0x4294 no-reattach
+
+# Lexmark C540n (Issue #4778)
+0x043d 0x0139 no-reattach

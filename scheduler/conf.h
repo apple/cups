@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Configuration file definitions for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -78,7 +76,7 @@ typedef enum
 
 #define PRINTCAP_BSD		0	/* Berkeley LPD format */
 #define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
-#define PRINTCAP_PLIST		2	/* OS X plist format */
+#define PRINTCAP_PLIST		2	/* macOS plist format */
 
 
 /*
@@ -246,10 +244,10 @@ VAR char		*ServerKeychain		VALUE(NULL);
 					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+#ifdef HAVE_ONDEMAND
 VAR int			IdleExitTimeout		VALUE(60);
 					/* Time after which an idle cupsd will exit */
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
+#endif /* HAVE_ONDEMAND */
 
 #ifdef HAVE_AUTHORIZATION_H
 VAR char		*SystemGroupAuthKey	VALUE(NULL);
@@ -297,8 +295,3 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);
 extern int	cupsdWriteErrorLog(int level, const char *message);
-
-
-/*
- * End of "$Id$".
- */

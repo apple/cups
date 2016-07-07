@@ -1,0 +1,96 @@
+<!--
+  Administrative API documentation for CUPS.
+
+  Copyright 2016 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class="title"><a name="OVERVIEW">Overview</a></h2>
+
+<p>The administrative APIs provide convenience functions to perform certain administrative functions with the CUPS scheduler.</p>
+
+<blockquote><b>Note:<b>
+  <p>Administrative functions normally require administrative privileges to execute and must not be used in ordinary user applications!</p>
+</blockquote>
+
+<h3><a name="SETTINGS">Scheduler Settings</a></h3>
+
+<p>The <a href="#cupsAdminGetServerSettings"><code>cupsAdminGetServerSettings</code></a> and <a href="#cupsAdminSetServerSettings"><code>cupsAdminSetServerSettings</code></a> functions allow you to get and set simple directives and their values, respectively, in the <var>cupsd.conf</var> file for the CUPS scheduler. Settings are stored in CUPS option arrays which provide a simple list of string name/value pairs. While any simple <var>cupsd.conf</var> directive name can be specified, the following convenience names are also defined to control common complex directives:</p>
+
+<ul>
+  <li><code>CUPS_SERVER_DEBUG_LOGGING</code></li>: For <code>cupsAdminGetServerSettings</code>, a value of "1" means that the <code>LogLevel</code> directive is set to <code>debug</code> or <code>debug2</code> while a value of "0" means it is set to any other value. For <code>cupsAdminSetServerSettings</code> a value of "1" sets the <code>LogLeveL</code> to <code>debug</code> while a value of "0" sets it to <code>warn</code>.</li>
+  <li><code>CUPS_SERVER_REMOTE_ADMIN</code></li>: A value of "1" specifies that administrative requests are accepted from remote addresses while "0" specifies that requests are only accepted from local addresses (loopback interface and domain sockets).</li>
+  <li><code>CUPS_SERVER_REMOTE_ANY</code></li>: A value of "1" specifies that requests are accepts from any address while "0" specifies that requests are only accepted from the local subnet (when sharing is enabled) or local addresses (loopback interface and domain sockets).</li>
+  <li><code>CUPS_SERVER_SHARE_PRINTERS</code></li>: A value of "1" specifies that printer sharing is enabled for selected printers and remote requests are accepted while a value of "0" specifies that printer sharing is disables and remote requests are not accepted.</li>
+  <li><code>CUPS_SERVER_USER_CANCEL_ANY</code></li>: A value of "1" specifies that the default security policy allows any user to cancel any print job, regardless of the owner. A value of "0" specifies that only administrative users can cancel other user's jobs.</li>
+</ul>
+
+<blockquote><b>Note:</b>
+  <p>Changing settings will restart the CUPS scheduler.</p>
+  <p>When printer sharing or the web interface are enabled, the scheduler's launch-on-demand functionality is effectively disabled. This can affect power usage, system performance, and the security profile of a system.</p>
+</blockquote>
+
+<p>The recommended way to make changes to the <var>cupsd.conf</var> is to first call <a href="#cupsAdminGetServerSettings"><code>cupsAdminGetServerSettings</code></a>, make any changes to the returned option array, and then call <a href="#cupsAdminSetServerSettings"><code>cupsAdminSetServerSettings</code></a> to save those settings. For example, to enable the web interface:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/adminutil.h&gt;
+
+void
+enable_web_interface(void)
+{
+  int num_settings = 0;           /* Number of settings */
+  cups_option_t *settings = NULL; /* Settings */
+
+
+  if (!<a href="#cupsAdminGetServerSettings">cupsAdminGetServerSettings</a>(CUPS_HTTP_DEFAULT, &amp;num_settings, &amp;settings))
+  {
+    fprintf(stderr, "ERROR: Unable to get server settings: %s\n", cupsLastErrorString());
+    return;
+  }
+
+  num_settings = <a href="api-cups.html#cupsAddOption">cupsAddOption</a>("WebInterface", "Yes", num_settings, &amp;settings);
+
+  if (!<a href="#cupsAdminSetServerSettings">cupsAdminSetServerSettings</a>(CUPS_HTTP_DEFAULT, num_settings, settings))
+  {
+    fprintf(stderr, "ERROR: Unable to set server settings: %s\n", cupsLastErrorString());
+  }
+
+  <a href="api-cups.html#cupsFreeOptions">cupsFreeOptions</a>(num_settings, settings);
+}
+</pre>
+
+<h3><a name="DEVICES">Devices</a></h3>
+
+<p>Printers can be discovered through the CUPS scheduler using the <a href="#cupsGetDevices"><code>cupsGetDevices</code></a> API. Typically this API is used to locate printers to add the the system. Each device that is found will cause a supplied callback function to be executed. For example, to list the available printer devices that can be found within 30 seconds:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/adminutil.h&gt;
+
+
+void
+get_devices_cb(
+    const char *device_class,           /* I - Class */
+    const char *device_id,              /* I - 1284 device ID */
+    const char *device_info,            /* I - Description */
+    const char *device_make_and_model,  /* I - Make and model */
+    const char *device_uri,             /* I - Device URI */
+    const char *device_location,        /* I - Location */
+    void       *user_data)              /* I - User data */
+{
+  puts(device_uri);
+}
+
+
+void
+show_devices(void)
+{
+  <a href="#cupsGetDevices">cupsGetDevices</a>(CUPS_HTTP_DEFAULT, 30, NULL, NULL, get_devices_cb, NULL);
+}
+</pre>

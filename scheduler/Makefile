@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # Scheduler Makefile for CUPS.
 #
-# Copyright 2007-2015 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -243,9 +241,11 @@ install-exec:
 #
 
 install-headers:
-	echo Installing header files in $(INCLUDEDIR)/cups...
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) mime.h $(INCLUDEDIR)/cups
+	if test "x$(privateinclude)" != x; then \
+		echo Installing private header files into $(PRIVATEINCLUDE)...; \
+		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
+		$(INSTALL_DATA) mime.h $(PRIVATEINCLUDE); \
+	fi
 
 
 #
@@ -307,8 +307,10 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsmime.so
 	$(RM) $(LIBDIR)/libcupsmime.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/mime.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/mime.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 	if test "x$(INITDIR)" != x; then \
 		echo Uninstalling init scripts...; \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
@@ -346,28 +348,6 @@ uninstall:
 		echo Uninstalling xinetd configuration file for cups-lpd...; \
 		$(RM) $(BUILDROOT)$(XINETD)/cups-lpd; \
 	fi
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "MIME API" \
-		--css ../doc/cups-printable.css \
-		--header api-mime.header --intro api-mime.shtml \
-		mime.h $(LIBOBJS:.o=.c) >../doc/help/api-mime.html
-	mxmldoc --tokens help/api-mime.html api-mime.xml >../doc/help/api-mime.tokens
-	$(RM) api-mime.xml
-
-framedhelp:
-	mxmldoc --framed api-mime \
-		--section "Programming" \
-		--title "MIME API" \
-		--css ../doc/cups-printable.css \
-		--header api-mime.header --intro api-mime.shtml \
-		mime.h $(LIBOBJS:.o=.c)
 
 
 #
@@ -549,8 +529,3 @@ sloc:
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

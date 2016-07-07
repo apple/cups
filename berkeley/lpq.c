@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * "lpq" command for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -41,7 +39,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   http_t	*http;			/* Connection to server */
-  const char	*dest,			/* Desired printer */
+  const char	*opt,			/* Option pointer */
+		*dest,			/* Desired printer */
 		*user,			/* Desired user */
 		*val;			/* Environment variable name */
   char		*instance;		/* Printer instance */
@@ -67,128 +66,138 @@ main(int  argc,				/* I - Number of command-line arguments */
   all        = 0;
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '+')
+    {
       interval = atoi(argv[i] + 1);
+    }
     else if (argv[i][0] == '-')
     {
-      switch (argv[i][1])
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
+	switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
-	    if (http)
-	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+	      if (http)
+		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
-	                    argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
-	    break;
+	      break;
 
-        case 'U' : /* Username */
-	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'U' : /* Username */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected username after "
-				  "\"-U\" option."), argv[0]);
-	        return (1);
+		cupsSetUser(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
+		  return (1);
+		}
+
+		cupsSetUser(argv[i]);
+	      }
+	      break;
+
+	  case 'P' : /* Printer */
+	      if (opt[1] != '\0')
+	      {
+		dest = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+
+		if (i >= argc)
+		{
+		  httpClose(http);
+
+		  usage();
+		}
+
+		dest = argv[i];
 	      }
 
-              cupsSetUser(argv[i]);
-	    }
-	    break;
+	      if ((instance = strchr(dest, '/')) != NULL)
+		*instance++ = '\0';
 
-        case 'P' : /* Printer */
-	    if (argv[i][2])
-	      dest = argv[i] + 2;
-	    else
-	    {
-	      i ++;
+	      http = connect_server(argv[0], http);
 
-	      if (i >= argc)
+	      if ((named_dest = cupsGetNamedDest(http, dest, instance)) == NULL)
+	      {
+		if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+		    cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+		  _cupsLangPrintf(stderr, _("%s: Error - add '/version=1.1' to server name."), argv[0]);
+		else if (instance)
+		  _cupsLangPrintf(stderr, _("%s: Error - unknown destination \"%s/%s\"."), argv[0], dest, instance);
+		else
+		  _cupsLangPrintf(stderr, _("%s: Unknown destination \"%s\"."), argv[0], dest);
+
+		return (1);
+	      }
+
+	      cupsFreeDests(1, named_dest);
+	      break;
+
+	  case 'a' : /* All printers */
+	      all = 1;
+	      break;
+
+	  case 'h' : /* Connect to host */
+	      if (http)
 	      {
 		httpClose(http);
-
-	        usage();
+		http = NULL;
 	      }
 
-	      dest = argv[i];
-	    }
-
-	    if ((instance = strchr(dest, '/')) != NULL)
-	      *instance++ = '\0';
-
-            http = connect_server(argv[0], http);
-
-            if ((named_dest = cupsGetNamedDest(http, dest, instance)) == NULL)
-	    {
-	      if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
-		  cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
-		_cupsLangPrintf(stderr,
-				_("%s: Error - add '/version=1.1' to server "
-				  "name."), argv[0]);
-	      else if (instance)
-		_cupsLangPrintf(stderr,
-		                _("%s: Error - unknown destination \"%s/%s\"."),
-		        	argv[0], dest, instance);
-              else
-		_cupsLangPrintf(stderr, _("%s: Unknown destination \"%s\"."),
-				argv[0], dest);
-
-	      return (1);
-	    }
-
-	    cupsFreeDests(1, named_dest);
-	    break;
-
-	case 'a' : /* All printers */
-	    all = 1;
-	    break;
-
-        case 'h' : /* Connect to host */
-	    if (http)
-	    {
-	      httpClose(http);
-	      http = NULL;
-	    }
-
-	    if (argv[i][2] != '\0')
-              cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected hostname after "
-			          "\"-h\" option."), argv[0]);
-		return (1);
-              }
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
 	      else
-                cupsSetServer(argv[i]);
-	    }
-	    break;
+	      {
+		i ++;
 
-	case 'l' : /* Long status */
-	    longstatus = 1;
-	    break;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-h\" option."), argv[0]);
+		  return (1);
+		}
+		else
+		  cupsSetServer(argv[i]);
+	      }
+	      break;
 
-	default :
-	    httpClose(http);
+	  case 'l' : /* Long status */
+	      longstatus = 1;
+	      break;
 
-	    usage();
+	  default :
+	      httpClose(http);
+
+	      usage();
+	}
       }
     }
     else if (isdigit(argv[i][0] & 255))
+    {
       id = atoi(argv[i]);
+    }
     else
+    {
       user = argv[i];
+    }
+  }
 
   http = connect_server(argv[0], http);
 
@@ -638,8 +647,3 @@ usage(void)
 		  "[-l] [+interval]"));
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

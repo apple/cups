@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Client routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -2371,7 +2369,7 @@ cupsdSendHeader(
       * requests when the request requires system group membership - then the
       * client knows the root certificate can/should be used.
       *
-      * Also, for OS X we also look for @AUTHKEY and add an "authkey"
+      * Also, for macOS we also look for @AUTHKEY and add an "authkey"
       * parameter as needed...
       */
 
@@ -4079,8 +4077,3 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG, "CGI data ready to be sent.");
 }
-
-
-/*
- * End of "$Id$".
- */

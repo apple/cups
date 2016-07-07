@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Select abstraction functions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 2006-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -44,7 +42,7 @@
  *     FreeBSD         YES     YES     NO      YES     NO
  *     HP-UX           YES     YES     NO      NO      NO
  *     Linux           YES     YES     YES     NO      NO
- *     MacOS X         YES     YES     NO      YES     NO
+ *     macOS           YES     YES     NO      YES     NO
  *     NetBSD          YES     YES     NO      YES     NO
  *     OpenBSD         YES     YES     NO      YES     NO
  *     Solaris         YES     YES     NO      NO      YES
@@ -927,8 +925,3 @@ find_fd(int fd)				/* I - File descriptor */
 
   return (fdptr);
 }
-
-
-/*
- * End of "$Id$".
- */

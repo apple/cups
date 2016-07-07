@@ -1,0 +1,43 @@
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?ociosa:{printer_state=4?processando:pausada}},
+{printer_is_accepting_jobs=0?rejeitando trabalhos:aceitando trabalhos},
+{server_is_sharing_printers=0?n&atilde;o compartilhada:{printer_is_shared=0?n&atilde;o compartilhada:compartilhada}} {default_name={printer_name}?, padr&atilde;o do servidor:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Manuten&ccedil;&atilde;o</OPTION>
+<OPTION VALUE="print-test-page">Imprimir p&aacute;gina de teste</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Limpar cabe&ccedil;as de impress&atilde;o</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Imprimir p&aacute;gina de auto-teste</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Pausar impressora</OPTION>:<OPTION VALUE="stop-printer">Pausar impressora</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Aceitar trabalhos</OPTION>:<OPTION VALUE="reject-jobs">Rejeitar trabalhos</OPTION>}
+<OPTION VALUE="move-jobs">Mover todos trabalhos</OPTION>
+<OPTION VALUE="purge-jobs">Cancelar todos trabalhos</OPTION>
+</SELECT>
+<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Ir"></NOSCRIPT>
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administra&ccedil;&atilde;o</OPTION>
+<OPTION VALUE="modify-printer">Modificar impressora</OPTION>
+<OPTION VALUE="delete-printer">Excluir impressora</OPTION>
+<OPTION VALUE="set-printer-options">Definir op&ccedil;&otilde;es padr&otilde;es</OPTION>
+<OPTION VALUE="set-as-default">Definir com padr&atilde;o do servidor</OPTION>
+<OPTION VALUE="set-allowed-users">Definir usu&aacute;rios permitidos</OPTION>
+</SELECT>
+<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Ir"></NOSCRIPT>
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Descri&ccedil;&atilde;o:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Localiza&ccedil;&atilde;o:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Driver:</TH><TD>{printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported?, 2-sided printing:})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Conex&atilde;o:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Padr&otilde;es:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:desconhecido}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>

@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Raster file routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * This file is part of the CUPS Imaging library.
@@ -109,7 +107,7 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
  * The "sheet_back" argument specifies a "pwg-raster-document-sheet-back" value
  * to apply for the back side of a page.  Pass @code NULL@ for the front side.
  *
- * @since CUPS 2.2@
+ * @since CUPS 2.2/macOS 10.12@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -518,7 +516,7 @@ cupsRasterReadHeader(
  * 'cupsRasterReadHeader2()' - Read a raster page header and store it in a
  *                             version 2 page header structure.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 unsigned				/* O - 1 on success, 0 on failure/end-of-file */
@@ -530,7 +528,7 @@ cupsRasterReadHeader2(
   * Get the raster header...
   */
 
-  DEBUG_printf(("cupsRasterReadHeader2(r=%p, h=%p)", r, h));
+  DEBUG_printf(("cupsRasterReadHeader2(r=%p, h=%p)", (void *)r, (void *)h));
 
   if (!cups_raster_read_header(r))
   {
@@ -570,7 +568,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	count;			/* Repetition count */
 
 
-  DEBUG_printf(("cupsRasterReadPixels(r=%p, p=%p, len=%u)", r, p, len));
+  DEBUG_printf(("cupsRasterReadPixels(r=%p, p=%p, len=%u)", (void *)r, (void *)p, len));
 
   if (r == NULL || r->mode != CUPS_RASTER_READ || r->remaining == 0 ||
       r->header.cupsBytesPerLine == 0)
@@ -682,7 +680,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	  }
 
 	  temp  += count;
-	  bytes -= count;
+	  bytes -= (ssize_t)count;
 	}
 	else
 	{
@@ -697,7 +695,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
           if (count < r->bpp)
 	    break;
 
-	  bytes -= count;
+	  bytes -= (ssize_t)count;
 
           if (!cups_raster_read(r, temp, r->bpp))
 	  {
@@ -905,7 +903,7 @@ cupsRasterWriteHeader(
  *
  * The page header can be initialized using @link cupsRasterInterpretPPD@.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 unsigned				/* O - 1 on success, 0 on failure */
@@ -1010,8 +1008,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   unsigned	remaining;		/* Bytes remaining */
 
 
-  DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
-		r, p, len, r->remaining));
+  DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u", (void *)r, (void *)p, len, r->remaining));
 
   if (r == NULL || r->mode == CUPS_RASTER_READ || r->remaining == 0)
     return (0);
@@ -1197,7 +1194,7 @@ cups_raster_read_header(
   size_t	len;			/* Length for read/swap */
 
 
-  DEBUG_printf(("3cups_raster_read_header(r=%p), r->mode=%d", r, r ? r->mode : 0));
+  DEBUG_printf(("3cups_raster_read_header(r=%p), r->mode=%d", (void *)r, r ? r->mode : 0));
 
   if (r == NULL || r->mode != CUPS_RASTER_READ)
     return (0);
@@ -1279,7 +1276,7 @@ cups_raster_io(cups_raster_t *r,	/* I - Raster stream */
 		total;			/* Total bytes read/written */
 
 
-  DEBUG_printf(("5cups_raster_io(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", r, buf, CUPS_LLCAST bytes));
+  DEBUG_printf(("5cups_raster_io(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", (void *)r, (void *)buf, CUPS_LLCAST bytes));
 
   for (total = 0; total < (ssize_t)bytes; total += count, buf += count)
   {
@@ -1322,7 +1319,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 		total;			/* Total bytes read */
 
 
-  DEBUG_printf(("5cups_raster_read(r=%p, buf=%p, bytes=" CUPS_LLFMT ")\n", r, buf, CUPS_LLCAST bytes));
+  DEBUG_printf(("5cups_raster_read(r=%p, buf=%p, bytes=" CUPS_LLFMT ")", (void *)r, (void *)buf, CUPS_LLCAST bytes));
 
   if (!r->compressed)
     return (cups_raster_io(r, buf, bytes));
@@ -1366,7 +1363,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   {
     count = (ssize_t)bytes - total;
 
-    DEBUG_printf(("6cups_raster_read: count=" CUPS_LLFMT ", remaining=" CUPS_LLFMT ", buf=%p, bufptr=%p, bufend=%p", CUPS_LLCAST count, CUPS_LLCAST remaining, buf, r->bufptr, r->bufend));
+    DEBUG_printf(("6cups_raster_read: count=" CUPS_LLFMT ", remaining=" CUPS_LLFMT ", buf=%p, bufptr=%p, bufend=%p", CUPS_LLCAST count, CUPS_LLCAST remaining, (void *)buf, (void *)r->bufptr, (void *)r->bufend));
 
     if (remaining == 0)
     {
@@ -1616,7 +1613,7 @@ cups_raster_write(
 			count;		/* Count */
 
 
-  DEBUG_printf(("3cups_raster_write(r=%p, pixels=%p)\n", r, pixels));
+  DEBUG_printf(("3cups_raster_write(r=%p, pixels=%p)", (void *)r, (void *)pixels));
 
  /*
   * Allocate a write buffer as needed...
@@ -1800,8 +1797,3 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
 
   return (count);
 }
-
-
-/*
- * End of "$Id$".
- */

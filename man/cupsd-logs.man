@@ -1,6 +1,4 @@
 .\"
-.\" "$Id$"
-.\"
 .\" cupsd-logs man page for CUPS.
 .\"
 .\" Copyright 2007-2014 by Apple Inc.
@@ -235,7 +233,4 @@ The \fIsides\fR field contains a copy of the sides attribute provided with the I
 .BR cups-files.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2015 by Apple Inc.
-.\"
-.\" End of "$Id$".
-.\"
+Copyright \[co] 2007-2016 by Apple Inc.

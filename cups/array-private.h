@@ -1,17 +1,15 @@
 /*
- * "$Id$"
+ * Private array definitions for CUPS.
  *
- *   Private array definitions for CUPS.
+ * Copyright 2011-2012 by Apple Inc.
  *
- *   Copyright 2011-2012 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_ARRAY_PRIVATE_H_
@@ -46,7 +44,3 @@ extern cups_array_t	*_cupsArrayNewStrings(const char *s, char delim)
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_ARRAY_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

@@ -1,22 +1,14 @@
 /*
- * "$Id$"
+ * "cupsaddsmb" command for CUPS.
  *
- *   "cupsaddsmb" command for CUPS.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2001-2006 by Easy Software Products.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2001-2006 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()        - Export printers on the command-line.
- *   export_dest() - Export a destination to SAMBA.
- *   usage()       - Show program usage and exit...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -292,8 +284,3 @@ usage(void)
 
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

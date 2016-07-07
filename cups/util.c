@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Printing utilities for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -60,7 +58,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
  * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ipp_status_t				/* O - IPP status */
@@ -148,7 +146,7 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
  * print, use the @link cupsPrintFile2@ or @link cupsPrintFiles2@ function
  * instead.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -167,9 +165,7 @@ cupsCreateJob(
   int		job_id = 0;		/* job-id value */
 
 
-  DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", "
-                "num_options=%d, options=%p)",
-                http, name, title, num_options, options));
+  DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", num_options=%d, options=%p)", (void *)http, name, title, num_options, (void *)options));
 
  /*
   * Range check input...
@@ -230,7 +226,7 @@ cupsCreateJob(
  *
  * The document must have been started using @link cupsStartDocument@.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 ipp_status_t				/* O - Status of document submission */
@@ -326,7 +322,7 @@ cupsGetDefault(void)
  * functions to get the user-defined default printer, as this function does
  * not support the lpoptions-defined default printer.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 const char *				/* O - Default printer or @code NULL@ */
@@ -417,7 +413,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
  * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
  * jobs that are stopped, canceled, aborted, or completed.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Number of jobs */
@@ -711,9 +707,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFile(name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)",
-                name, filename, title, num_options, options));
+  DEBUG_printf(("cupsPrintFile(name=\"%s\", filename=\"%s\", title=\"%s\", num_options=%d, options=%p)", name, filename, title, num_options, (void *)options));
 
   return (cupsPrintFiles2(CUPS_HTTP_DEFAULT, name, 1, &filename, title,
                           num_options, options));
@@ -724,7 +718,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
  * 'cupsPrintFile2()' - Print a file to a printer or class on the specified
  *                      server.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -736,9 +730,7 @@ cupsPrintFile2(
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFile2(http=%p, name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)",
-                http, name, filename, title, num_options, options));
+  DEBUG_printf(("cupsPrintFile2(http=%p, name=\"%s\", filename=\"%s\",  title=\"%s\", num_options=%d, options=%p)", (void *)http, name, filename, title, num_options, (void *)options));
 
   return (cupsPrintFiles2(http, name, 1, &filename, title, num_options,
                           options));
@@ -759,9 +751,7 @@ cupsPrintFiles(
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
-  DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)",
-                name, num_files, files, title, num_options, options));
+  DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, files=%p, title=\"%s\", num_options=%d, options=%p)", name, num_files, (void *)files, title, num_options, (void *)options));
 
  /*
   * Print the file(s)...
@@ -776,7 +766,7 @@ cupsPrintFiles(
  * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the
  *                       specified server.
  *
- * @since CUPS 1.1.21/OS X 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -802,9 +792,7 @@ cupsPrintFiles2(
   char		*cancel_message;	/* Error message to preserve */
 
 
-  DEBUG_printf(("cupsPrintFiles2(http=%p, name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)",
-                http, name, num_files, files, title, num_options, options));
+  DEBUG_printf(("cupsPrintFiles2(http=%p, name=\"%s\", num_files=%d, files=%p, title=\"%s\", num_options=%d, options=%p)", (void *)http, name, num_files, (void *)files, title, num_options, (void *)options));
 
  /*
   * Range check input...
@@ -908,7 +896,7 @@ cupsPrintFiles2(
  * @code CUPS_FORMAT_TEXT@ are provided for the "format" argument, although
  * any supported MIME type string can be supplied.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 http_status_t				/* O - HTTP status of request */
@@ -963,8 +951,3 @@ cupsStartDocument(
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

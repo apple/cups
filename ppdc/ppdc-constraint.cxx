@@ -1,21 +1,14 @@
 //
-// "$Id$"
+// Contraint class for the CUPS PPD Compiler.
 //
-//   Contraint class for the CUPS PPD Compiler.
+// Copyright 2007-2009 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   Copyright 2007-2009 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
-//
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   ppdcConstraint::ppdcConstraint()  - Create a constraint.
-//   ppdcConstraint::~ppdcConstraint() - Destroy a constraint.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -57,8 +50,3 @@ ppdcConstraint::~ppdcConstraint()
   option2->release();
   choice2->release();
 }
-
-
-//
-// End of "$Id$".
-//

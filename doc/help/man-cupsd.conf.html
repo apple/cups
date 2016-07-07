@@ -130,6 +130,12 @@ to verify that the hostname resolved from the address matches one of the address
 Double lookups also prevent clients with unregistered addresses from connecting to your server.
 The default is "Off" to avoid the potential server performance problems with hostname lookups.
 Only set this option to "On" or "Double" if absolutely required.
+<dt><a name="IdleExitTimeout"></a><b>IdleExitTimeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the length of time to wait before shutting down due to inactivity.
+The default is "60" seconds.
+Note: Only applicable when
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+is run on-demand (e.g., with <b>-l</b>).
 <dt><a name="JobKillDelay"></a><b>JobKillDelay </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the number of seconds to wait before killing the filters and backend associated with a canceled or held job.
 The default is "30".
@@ -513,6 +519,7 @@ The group name "@SYSTEM" corresponds to the list of groups defined by the System
 <a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 file.
 The group name "@OWNER" corresponds to the owner of the resource, for example the person that submitted a print job.
+Note: The 'root' user is not special and must be granted privileges like any other user account.
 <dt><b>Require valid-user</b>
 <dd style="margin-left: 5.0em">Specifies that any authenticated user is acceptable.
 <dt><b>Satisfy all</b>
@@ -589,7 +596,7 @@ Require authentication for accesses from outside the 10. network:
 <a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>

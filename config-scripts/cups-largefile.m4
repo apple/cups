@@ -1,16 +1,14 @@
 dnl
-dnl "$Id$"
+dnl Large file support stuff for CUPS.
 dnl
-dnl   Large file support stuff for CUPS.
+dnl Copyright 2007-2011 by Apple Inc.
+dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
-dnl   Copyright 2007-2011 by Apple Inc.
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
-dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Check for largefile support...
@@ -46,7 +44,3 @@ if test $ac_cv_c_long_long = yes; then
 fi
 
 AC_CHECK_FUNC(strtoll, AC_DEFINE(HAVE_STRTOLL))
-
-dnl
-dnl End of "$Id$".
-dnl

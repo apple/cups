@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * API definitions for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -227,20 +225,20 @@ enum cups_ptype_e			/* Printer type/capability bit
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
   CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer
-					 * @since CUPS 1.2/OS X 10.5@ */
+					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared
-					 * @since CUPS 1.2/OS X 10.5@ */
+					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication
-					 * @since CUPS 1.2/OS X 10.5@ */
+					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands
-					 * @since CUPS 1.2/OS X 10.5@ */
+					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered
 					 * and added @private@
 					 * @since Deprecated@ */
   CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device
-					 * @since CUPS 1.4/OS X 10.6@ */
+					 * @since CUPS 1.4/macOS 10.6@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities
-					 * @since CUPS 1.4/OS X 10.6@ */
+					 * @since CUPS 1.4/macOS 10.6@ */
   CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @since CUPS 2.1@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT |
 					 * DEFAULT | FAX | REJECTING | DELETE |
@@ -265,7 +263,7 @@ typedef struct cups_dest_s		/**** Destination ****/
 
 typedef struct _cups_dinfo_s cups_dinfo_t;
 					/* Destination capability and status
-					 * information @since CUPS 1.6/OS X 10.8@ */
+					 * information @since CUPS 1.6/macOS 10.8@ */
 
 typedef struct cups_job_s		/**** Job ****/
 {
@@ -282,7 +280,7 @@ typedef struct cups_job_s		/**** Job ****/
   time_t	processing_time;	/* Time the job was processed */
 } cups_job_t;
 
-typedef struct cups_size_s		/**** Media Size @since CUPS 1.6/OS X 10.8@ ****/
+typedef struct cups_size_s		/**** Media Size @since CUPS 1.6/macOS 10.8@ ****/
 {
   char		media[128];		/* Media name to use */
   int		width,			/* Width in hundredths of millimeters */
@@ -302,26 +300,18 @@ typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls,
 				     cups_array_t *distinguished_names,
 				     void *user_data);
 					/* Client credentials callback
-					 * @since CUPS 1.5/OS X 10.7@ */
+					 * @since CUPS 1.5/macOS 10.7@ */
 
 typedef int (*cups_dest_cb_t)(void *user_data, unsigned flags,
 			      cups_dest_t *dest);
 			      		/* Destination enumeration callback
-					 * @since CUPS 1.6/OS X 10.8@ */
+					 * @since CUPS 1.6/macOS 10.8@ */
 
 #  ifdef __BLOCKS__
 typedef int (^cups_dest_block_t)(unsigned flags, cups_dest_t *dest);
 			      		/* Destination enumeration block
-					 * @since CUPS 1.6/OS X 10.8@ */
+					 * @since CUPS 1.6/macOS 10.8@ */
 #  endif /* __BLOCKS__ */
-
-typedef void (*cups_device_cb_t)(const char *device_class,
-                                 const char *device_id, const char *device_info,
-                                 const char *device_make_and_model,
-                                 const char *device_uri,
-				 const char *device_location, void *user_data);
-					/* Device callback
-					 * @since CUPS 1.4/OS X 10.6@ */
 
 typedef const char *(*cups_password_cb_t)(const char *prompt);
 					/* Password callback */
@@ -331,12 +321,12 @@ typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
 					   const char *resource,
 					   void *user_data);
 					/* New password callback
-					 * @since CUPS 1.4/OS X 10.6@ */
+					 * @since CUPS 1.4/macOS 10.6@ */
 
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls,
 				     cups_array_t *certs, void *user_data);
 					/* Server credentials callback
-					 * @since CUPS 1.5/OS X 10.7@ */
+					 * @since CUPS 1.5/macOS 10.7@ */
 
 
 /*
@@ -424,7 +414,7 @@ extern int		cupsPrintFiles2(http_t *http, const char *name,
 extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests) _CUPS_API_1_1_21;
 
-/**** New in CUPS 1.2/OS X 10.5 ****/
+/**** New in CUPS 1.2/macOS 10.5 ****/
 extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
 			                    double timeout) _CUPS_API_1_2;
 extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
@@ -441,7 +431,7 @@ extern int		cupsRemoveOption(const char *name, int num_options,
 			                 cups_option_t **options) _CUPS_API_1_2;
 extern cups_file_t	*cupsTempFile2(char *filename, int len) _CUPS_API_1_2;
 
-/**** New in CUPS 1.3/OS X 10.5 ****/
+/**** New in CUPS 1.3/macOS 10.5 ****/
 extern ipp_t		*cupsDoIORequest(http_t *http, ipp_t *request,
 			                 const char *resource, int infile,
 					 int outfile) _CUPS_API_1_3;
@@ -454,7 +444,7 @@ extern void		cupsSetDefaultDest(const char *name,
 					   int num_dests,
 					   cups_dest_t *dests) _CUPS_API_1_3;
 
-/**** New in CUPS 1.4/OS X 10.6 ****/
+/**** New in CUPS 1.4/macOS 10.6 ****/
 extern ipp_status_t	cupsCancelJob2(http_t *http, const char *name,
 			               int job_id, int purge) _CUPS_API_1_4;
 extern int		cupsCreateJob(http_t *http, const char *name,
@@ -462,11 +452,6 @@ extern int		cupsCreateJob(http_t *http, const char *name,
 				      cups_option_t *options) _CUPS_API_1_4;
 extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
-extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
-			               const char *include_schemes,
-			               const char *exclude_schemes,
-				       cups_device_cb_t callback,
-				       void *user_data) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
 			                  const char *instance) _CUPS_API_1_4;
 extern const char	*cupsGetPassword2(const char *prompt, http_t *http,
@@ -488,14 +473,14 @@ extern http_status_t	cupsStartDocument(http_t *http, const char *name,
 extern http_status_t	cupsWriteRequestData(http_t *http, const char *buffer,
 			                     size_t length) _CUPS_API_1_4;
 
-/**** New in CUPS 1.5/OS X 10.7 ****/
+/**** New in CUPS 1.5/macOS 10.7 ****/
 extern void		cupsSetClientCertCB(cups_client_cert_cb_t cb,
 					    void *user_data) _CUPS_API_1_5;
 extern int		cupsSetCredentials(cups_array_t *certs) _CUPS_API_1_5;
 extern void		cupsSetServerCertCB(cups_server_cert_cb_t cb,
 					    void *user_data) _CUPS_API_1_5;
 
-/**** New in CUPS 1.6/OS X 10.8 ****/
+/**** New in CUPS 1.6/macOS 10.8 ****/
 extern ipp_status_t	cupsCancelDestJob(http_t *http, cups_dest_t *dest,
 			                  int job_id) _CUPS_API_1_6;
 extern int		cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
@@ -607,13 +592,13 @@ extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
 extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
 extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 
-/* New in CUPS 2.0/OS X 10.10 */
+/* New in CUPS 2.0/macOS 10.10 */
 extern cups_dest_t	*cupsGetDestWithURI(const char *name, const char *uri) _CUPS_API_2_0;
 extern const char	*cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest, cups_dinfo_t *info, unsigned flags, cups_size_t *size) _CUPS_API_2_0;
 extern int		cupsMakeServerCredentials(const char *path, const char *common_name, int num_alt_names, const char **alt_names, time_t expiration_date) _CUPS_API_2_0;
 extern int		cupsSetServerCredentials(const char *path, const char *common_name, int auto_create) _CUPS_API_2_0;
 
-/* New in CUPS 2.2 */
+/* New in CUPS 2.2/macOS 10.12 */
 extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t datalen, unsigned char *hash, size_t hashsize) _CUPS_API_2_2;
 
 #  ifdef __cplusplus
@@ -621,7 +606,3 @@ extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t dat
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_CUPS_H_ */
-
-/*
- * End of "$Id$".
- */

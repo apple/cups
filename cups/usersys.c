@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * User, system, and password routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -35,6 +33,17 @@
  * Local constants...
  */
 
+#ifdef __APPLE__
+#  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
+#  define kAllowAnyRootKey	CFSTR("AllowAnyRoot")
+#  define kAllowExpiredCertsKey	CFSTR("AllowExpiredCerts")
+#  define kEncryptionKey	CFSTR("Encryption")
+#  define kGSSServiceNameKey	CFSTR("GSSServiceName")
+#  define kSSLOptionsKey	CFSTR("SSLOptions")
+#  define kTrustOnFirstUseKey	CFSTR("TrustOnFirstUse")
+#  define kValidateCertsKey	CFSTR("ValidateCerts")
+#endif /* __APPLE__ */
+
 #define _CUPS_PASSCHAR	'*'		/* Character that is echoed for password */
 
 
@@ -47,7 +56,8 @@ typedef struct _cups_client_conf_s	/**** client.conf config data ****/
 #ifdef HAVE_SSL
   int			ssl_options;	/* SSLOptions values */
 #endif /* HAVE_SSL */
-  int			any_root,	/* Allow any (e.g., self-signed) root */
+  int			trust_first,	/* Trust on first use? */
+			any_root,	/* Allow any (e.g., self-signed) root */
 			expired_certs,	/* Allow expired certs */
 			validate_certs;	/* Validate certificates */
   http_encryption_t	encryption;	/* Encryption setting */
@@ -65,6 +75,11 @@ typedef struct _cups_client_conf_s	/**** client.conf config data ****/
  * Local functions...
  */
 
+#ifdef __APPLE__
+static int	cups_apple_get_boolean(CFStringRef key, int *value);
+static int	cups_apple_get_string(CFStringRef key, char *value, size_t valsize);
+#endif /* __APPLE__ */
+static int	cups_boolean_value(const char *value);
 static void	cups_finalize_client_conf(_cups_client_conf_t *cc);
 static void	cups_init_client_conf(_cups_client_conf_t *cc);
 static void	cups_read_client_conf(cups_file_t *fp, _cups_client_conf_t *cc);
@@ -141,7 +156,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
  * do so in each thread for the same function to be used.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 const char *				/* O - Password */
@@ -199,7 +214,7 @@ cupsServer(void)
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 void
@@ -223,7 +238,7 @@ cupsSetClientCertCB(
  * program. Multi-threaded programs that override the setting need to do so in
  * each thread for the same setting to be used.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -311,7 +326,7 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.4/OS X 10.6@
+ * @since CUPS 1.4/macOS 10.6@
  */
 
 void
@@ -416,7 +431,7 @@ cupsSetServer(const char *server)	/* I - Server name */
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5/OS X 10.7@
+ * @since CUPS 1.5/macOS 10.7@
  */
 
 void
@@ -461,7 +476,7 @@ cupsSetUser(const char *user)		/* I - User name */
  * Setting the string to NULL forces the default value containing the CUPS
  * version, IPP version, and operating system version and architecture.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 void
@@ -536,7 +551,7 @@ cupsUser(void)
 /*
  * 'cupsUserAgent()' - Return the default HTTP User-Agent string.
  *
- * @since CUPS 1.7/OS X 10.9@
+ * @since CUPS 1.7/macOS 10.9@
  */
 
 const char *				/* O - User-Agent string */
@@ -925,6 +940,9 @@ _cupsSetDefaults(void)
     strlcpy(cg->gss_service_name, cc.gss_service_name, sizeof(cg->gss_service_name));
 #endif /* HAVE_GSSAPI */
 
+  if (cg->trust_first < 0)
+    cg->trust_first = cc.trust_first;
+
   if (cg->any_root < 0)
     cg->any_root = cc.any_root;
 
@@ -938,6 +956,57 @@ _cupsSetDefaults(void)
   _httpTLSSetOptions(cc.ssl_options);
 #endif /* HAVE_SSL */
 }
+
+
+#ifdef __APPLE__
+/*
+ * 'cups_apple_get_boolean()' - Get a boolean setting from the CUPS preferences.
+ */
+
+static int				/* O - 1 if set, 0 otherwise */
+cups_apple_get_boolean(
+    CFStringRef key,			/* I - Key (name) */
+    int         *value)			/* O - Boolean value */
+{
+  Boolean	bval,			/* Preference value */
+		bval_set;		/* Value is set? */
+
+
+  bval = CFPreferencesGetAppBooleanValue(key, kCUPSPrintingPrefs, &bval_set);
+
+  if (bval_set)
+    *value = (int)bval;
+
+  return ((int)bval_set);
+}
+
+
+/*
+ * 'cups_apple_get_string()' - Get a string setting from the CUPS preferences.
+ */
+
+static int				/* O - 1 if set, 0 otherwise */
+cups_apple_get_string(
+    CFStringRef key,			/* I - Key (name) */
+    char        *value,			/* O - String value */
+    size_t      valsize)		/* I - Size of value buffer */
+{
+  CFStringRef	sval;			/* String value */
+
+
+  if ((sval = CFPreferencesCopyAppValue(key, kCUPSPrintingPrefs)) != NULL)
+  {
+    Boolean result = CFStringGetCString(sval, value, (CFIndex)valsize, kCFStringEncodingUTF8);
+
+    CFRelease(sval);
+
+    if (result)
+      return (1);
+  }
+
+  return (0);
+}
+#endif /* __APPLE__ */
 
 
 /*
@@ -961,6 +1030,9 @@ cups_finalize_client_conf(
 {
   const char	*value;			/* Environment variable */
 
+
+  if ((value = getenv("CUPS_TRUSTFIRST")) != NULL)
+    cc->trust_first = cups_boolean_value(value);
 
   if ((value = getenv("CUPS_ANYROOT")) != NULL)
     cc->any_root = cups_boolean_value(value);
@@ -989,6 +1061,9 @@ cups_finalize_client_conf(
   * Then apply defaults for those values that haven't been set...
   */
 
+  if (cc->trust_first < 0)
+    cc->trust_first = 1;
+
   if (cc->any_root < 0)
     cc->any_root = 1;
 
@@ -996,7 +1071,7 @@ cups_finalize_client_conf(
     cc->encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
   if (cc->expired_certs < 0)
-    cc->expired_certs = 1;
+    cc->expired_certs = 0;
 
 #ifdef HAVE_GSSAPI
   if (!cc->gss_service_name[0])
@@ -1086,9 +1161,38 @@ cups_init_client_conf(
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
   cc->encryption     = (http_encryption_t)-1;
+  cc->trust_first    = -1;
   cc->any_root       = -1;
   cc->expired_certs  = -1;
   cc->validate_certs = -1;
+
+ /*
+  * Load settings from the org.cups.PrintingPrefs plist (which trump
+  * everything...)
+  */
+
+#ifdef __APPLE__
+  char	sval[1024];			/* String value */
+  int	bval;				/* Boolean value */
+
+  if (cups_apple_get_boolean(kAllowAnyRootKey, &bval))
+    cc->any_root = bval;
+
+  if (cups_apple_get_boolean(kAllowExpiredCertsKey, &bval))
+    cc->expired_certs = bval;
+
+  if (cups_apple_get_string(kEncryptionKey, sval, sizeof(sval)))
+    cups_set_encryption(cc, sval);
+
+  if (cups_apple_get_string(kSSLOptionsKey, sval, sizeof(sval)))
+    cups_set_ssl_options(cc, sval);
+
+  if (cups_apple_get_boolean(kTrustOnFirstUseKey, &bval))
+    cc->trust_first = bval;
+
+  if (cups_apple_get_boolean(kValidateCertsKey, &bval))
+    cc->validate_certs = bval;
+#endif /* __APPLE__ */
 }
 
 
@@ -1117,7 +1221,7 @@ cups_read_client_conf(
       cups_set_encryption(cc, value);
 #ifndef __APPLE__
    /*
-    * The ServerName directive is not supported on OS X due to app
+    * The ServerName directive is not supported on macOS due to app
     * sandboxing restrictions, i.e. not all apps request network access.
     */
     else if (!_cups_strcasecmp(line, "ServerName") && value)
@@ -1125,6 +1229,8 @@ cups_read_client_conf(
 #endif /* !__APPLE__ */
     else if (!_cups_strcasecmp(line, "User") && value)
       cups_set_user(cc, value);
+    else if (!_cups_strcasecmp(line, "TrustOnFirstUse") && value)
+      cc->trust_first = cups_boolean_value(value);
     else if (!_cups_strcasecmp(line, "AllowAnyRoot") && value)
       cc->any_root = cups_boolean_value(value);
     else if (!_cups_strcasecmp(line, "AllowExpiredCerts") &&
@@ -1265,7 +1371,7 @@ cups_set_ssl_options(
 
   cc->ssl_options = options;
 
-  DEBUG_printf(("4cups_set_ssl_options(cc=%p, value=\"%s\") options=%x", cc, value, options));
+  DEBUG_printf(("4cups_set_ssl_options(cc=%p, value=\"%s\") options=%x", (void *)cc, value, options));
 }
 #endif /* HAVE_SSL */
 
@@ -1281,8 +1387,3 @@ cups_set_user(
 {
   strlcpy(cc->user, value, sizeof(cc->user));
 }
-
-
-/*
- * End of "$Id$".
- */

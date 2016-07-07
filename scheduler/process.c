@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Process management routines for the CUPS scheduler.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -516,7 +514,7 @@ cupsdStartProcess(
   if (envp)
   {
    /*
-    * Add special voodoo magic for OS X - this allows OS X programs to access
+    * Add special voodoo magic for macOS - this allows macOS programs to access
     * their bundle resources properly...
     */
 
@@ -887,8 +885,3 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
   return (dst);
 }
 #endif /* HAVE_SANDBOX_H */
-
-
-/*
- * End of "$Id$".
- */

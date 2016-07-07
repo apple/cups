@@ -1,9 +1,10 @@
-CREDITS.txt - 2013-07-23
+CREDITS.txt - 2016-06-21
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
 like to thank the following individuals for their contributions:
 
+    Niklas 'Nille' Åkerström       - Swedish localization.
     Nathaniel Barbour              - Lots of testing and feedback.
     N. Becker                      - setsid().
     Philippe Combes                - French localization and buttons script.
@@ -17,20 +18,20 @@ like to thank the following individuals for their contributions:
     Wang Jian                      - CUPS RPM corrections.
     Roderick Johnstone             - Beta tester of the millenium.
     Till Kamppeter                 - Bug fixes, beta testing, evangelism.
-    Iñaki Larrañaga                - Basque localization.
-    Kenshi Muto                    - Japanese localization, patches, and
-                                     testing.
     Tomohiro Kato                  - Japanese localization.
     Kiko                           - Bug fixes.
     Sergey V. Kovalyov             - ESP Print Pro and CUPS beta tester.
     Marek Laane                    - Estonian translation.
+    Iñaki Larrañaga                - Basque localization.
     Mark Lawrence                  - Microsoft interoperability testing.
     Jeff Licquia                   - Bug fixes, beta testing, evangelism.
     Jason McMullan                 - Original CUPS RPM distributions.
     Àngel Mompó                    - Catalan localization.
     Wes Morgan                     - *BSD fixes.
+    Kenshi Muto                    - Japanese localization, patches, and
+                                     testing.
+    Brian Norris                   - Upstart support.
     Daniel Nylander                - Swedish localization.
-    Niklas 'Nille' Åkerström       - Swedish localization.
     Naruiko Ogasawara              - Japanese localization.
     Giulio Orsero                  - Bug fixes and testing.
     Michal Osowiecki               - Polish localization.

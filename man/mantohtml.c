@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Man page to HTML conversion program.
  *
  * Copyright 2007-2010, 2014 by Apple Inc.
@@ -515,7 +513,7 @@ main(int  argc,				/* I - Number of command-line args */
 	float amount = 3.0;		/* Indentation */
 
         if (line[3])
-          amount = atof(line + 4);
+          amount = (float)atof(line + 4);
 
 	fputs(end_fonts[font], outfile);
 	font = 0;
@@ -561,7 +559,7 @@ main(int  argc,				/* I - Number of command-line args */
 	float amount = 3.0;		/* Indentation */
 
         if (line[3])
-          amount = atof(line + 4);
+          amount = (float)atof(line + 4);
 
 	fputs(end_fonts[font], outfile);
 	font = 0;
@@ -594,7 +592,7 @@ main(int  argc,				/* I - Number of command-line args */
 	float amount = 3.0;		/* Indentation */
 
         if (line[3])
-          amount = atof(line + 4);
+          amount = (float)atof(line + 4);
 
 	fputs(end_fonts[font], outfile);
 	font = 0;
@@ -682,7 +680,7 @@ main(int  argc,				/* I - Number of command-line args */
           lineptr ++;
 
         if (isdigit(*lineptr & 255))
-          amount = atof(lineptr);
+          amount = (float)atof(lineptr);
 
         if (newlist && list && strcmp(newlist, list))
         {
@@ -1219,8 +1217,3 @@ strmove(char       *d,			/* I - Destination */
 
   *d = '\0';
 }
-
-
-/*
- * End of "$Id$".
- */

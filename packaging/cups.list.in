@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # ESP Package Manager (EPM) file list for CUPS.
 #
-# Copyright 2007-2015 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -15,7 +13,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2014 by Apple Inc.
+%copyright 2007-2016 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -26,7 +24,7 @@
 %version @CUPS_VERSION@
 %format all
 %description CUPS is the standards-based, open source printing system developed by
-%description Apple Inc. for OS X and other UNIX®-like operating systems.
+%description Apple Inc. for macOS® and other UNIX®-like operating systems.
 
 %format rpm
 %provides lpd
@@ -440,15 +438,8 @@ d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 d 0755 root sys $DATADIR -
 
 d 0755 root sys $DATADIR/banners -
-f 0444 root sys $DATADIR/banners/classified data/classified
-f 0444 root sys $DATADIR/banners/confidential data/confidential
-f 0444 root sys $DATADIR/banners/secret data/secret
-f 0444 root sys $DATADIR/banners/standard data/standard
-f 0444 root sys $DATADIR/banners/topsecret data/topsecret
-f 0444 root sys $DATADIR/banners/unclassified data/unclassified
 
 d 0755 root sys $DATADIR/data -
-f 0444 root sys $DATADIR/data/testprint data/testprint
 
 d 0755 root sys $DATADIR/drv -
 f 0444 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
@@ -551,6 +542,7 @@ f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h
 f 0444 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
+f 0444 root sys $INCLUDEDIR/cups/pwg.h cups/pwg.h
 f 0444 root sys $INCLUDEDIR/cups/raster.h cups/raster.h
 f 0444 root sys $INCLUDEDIR/cups/sidechannel.h cups/sidechannel.h
 f 0444 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
@@ -573,6 +565,7 @@ f 0444 root sys $DOCDIR/help doc/help/spec*.html
 d 0755 root sys $DOCDIR -
 f 0444 root sys $DOCDIR doc/*.css
 f 0444 root sys $DOCDIR doc/*.html
+f 0444 root sys $DOCDIR/apple-touch-icon.png doc/apple-touch-icon.png
 d 0755 root sys $DOCDIR/help -
 f 0444 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
 f 0444 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
@@ -585,9 +578,7 @@ f 0444 root sys $DOCDIR/help/overview.html doc/help/overview.html
 f 0444 root sys $DOCDIR/help/policies.html doc/help/policies.html
 f 0444 root sys $DOCDIR/help/security.html doc/help/security.html
 f 0444 root sys $DOCDIR/help/sharing.html doc/help/sharing.html
-f 0444 root sys $DOCDIR/help/standard.html doc/help/standard.html
 f 0444 root sys $DOCDIR/help/translation.html doc/help/translation.html
-f 0444 root sys $DOCDIR/help/whatsnew.html doc/help/whatsnew.html
 f 0444 root sys $DOCDIR/help doc/help/man-*.html
 f 0444 root sys $DOCDIR/help doc/help/ref-*.html
 d 0755 root sys $DOCDIR/images -
@@ -597,11 +588,11 @@ f 0444 root sys $DOCDIR/images doc/images/*.png
 f 0444 root sys $DOCDIR/robots.txt doc/robots.txt
 
 # Localized documentation files
-#d 0755 root sys $DOCDIR/de
-#f 0444 root sys $DOCDIR/de doc/de/*.html
+d 0755 root sys $DOCDIR/de
+f 0444 root sys $DOCDIR/de doc/de/*.html
 
-#d 0755 root sys $DOCDIR/es
-#f 0444 root sys $DOCDIR/es doc/es/*.html
+d 0755 root sys $DOCDIR/es
+f 0444 root sys $DOCDIR/es doc/es/*.html
 
 #d 0755 root sys $DOCDIR/et
 #f 0444 root sys $DOCDIR/et doc/et/*.html
@@ -622,14 +613,17 @@ f 0444 root sys $DOCDIR/robots.txt doc/robots.txt
 #d 0755 root sys $DOCDIR/it
 #f 0444 root sys $DOCDIR/it doc/it/*.html
 
-#d 0755 root sys $DOCDIR/ja
-#f 0444 root sys $DOCDIR/ja doc/ja/*.html
+d 0755 root sys $DOCDIR/ja
+f 0444 root sys $DOCDIR/ja doc/ja/*.html
 
 #d 0755 root sys $DOCDIR/pl
 #f 0444 root sys $DOCDIR/pl doc/pl/*.html
 
-#d 0755 root sys $DOCDIR/ru
-#f 0444 root sys $DOCDIR/ru doc/ru/*.html
+d 0755 root sys $DOCDIR/pt_BR
+f 0444 root sys $DOCDIR/pt_BR doc/pt_BR/*.html
+
+d 0755 root sys $DOCDIR/ru
+f 0444 root sys $DOCDIR/ru doc/ru/*.html
 
 #d 0755 root sys $DOCDIR/sv
 #f 0444 root sys $DOCDIR/sv doc/sv/*.html
@@ -646,19 +640,24 @@ d 0755 root sys $MANDIR/man5 -
 d 0755 root sys $MANDIR/man7 -
 
 f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
+f 0444 root sys $MANDIR/man1/cups.$MAN1EXT man/cups.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ippfind.$MAN1EXT man/ippfind.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
-f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpr.$MAN1EXT man/lpr.$MAN1EXT
+f 0444 root sys $MANDIR/man1/lprm.$MAN1EXT man/lprm.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpstat.$MAN1EXT man/lpstat.$MAN1EXT
-f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
 
 f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/client.conf.$MAN5EXT man/client.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/cups-files.conf.$MAN5EXT man/cups-files.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/cups-snmp.conf.$MAN5EXT man/cups-snmp.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/cupsd-logs.$MAN5EXT man/cupsd-logs.$MAN5EXT
 f 0444 root sys $MANDIR/man5/ipptoolfile.$MAN5EXT man/ipptoolfile.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mailto.conf.$MAN5EXT man/mailto.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
@@ -667,14 +666,15 @@ f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
 
 l 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT cupsaccept.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
-l 0644 root sys $AMANDIR/man$MAN8DIR/cupsreject.$MAN8EXT cupsaccept.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/cupsreject.$MAN8EXT cupsaccept.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsctl.$MAN8EXT man/cupsctl.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsfilter.$MAN8EXT man/cupsfilter.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cups-snmp.$MAN8EXT man/cups-snmp.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.$MAN8EXT
-f 0444 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsd-helper.$MAN8EXT man/cupsd-helper.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/cupsdisable.$MAN8EXT cupsenable.$MAN8EXT
+f 0444 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT cupsenable.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/enable.$MAN8EXT cupsenable.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/lpadmin.$MAN8EXT man/lpadmin.$MAN8EXT
@@ -731,7 +731,3 @@ i 0755 root sys cups scheduler/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(
 f 0444 root sys $XINETD/cups-lpd scheduler/cups-lpd.xinetd
 %endif
 %subpackage
-
-#
-# End of "$Id$".
-#

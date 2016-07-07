@@ -1,18 +1,16 @@
 #
-# "$Id$"
+# Backend makefile for CUPS.
 #
-#   Backend makefile for CUPS.
+# Copyright 2007-2016 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   Copyright 2007-2014 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
-#
-#   This file is subject to the Apple OS-Developed Software exception.
+# This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -88,7 +86,7 @@ unittests:	$(UNITTESTS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns
+	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns socket-static
 
 
 #
@@ -295,6 +293,12 @@ socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
 
+socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o socket-static socket.o libbackend.a \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
+
 
 #
 # usb
@@ -312,8 +316,3 @@ usb.o:	usb.c usb-darwin.c usb-libusb.c usb-unix.c
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

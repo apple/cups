@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * System management definitions for the CUPS scheduler.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -59,8 +57,3 @@ extern void	cupsdMarkDirty(int what);
 extern void	cupsdSetBusyState(void);
 extern void	cupsdStartSystemMonitor(void);
 extern void	cupsdStopSystemMonitor(void);
-
-
-/*
- * End of "$Id$".
- */

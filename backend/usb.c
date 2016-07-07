@@ -1,24 +1,16 @@
 /*
- * "$Id$"
+ * USB printer backend for CUPS.
  *
- *   USB port backend for CUPS.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   list_devices() - List all available USB devices to stdout.
- *   print_device() - Print a file to a USB device.
- *   main()         - Send a file to the specified USB port.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -257,8 +249,3 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */

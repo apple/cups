@@ -1,6 +1,4 @@
 //
-// "$Id$"
-//
 // PPD file message catalog program for the CUPS PPD Compiler.
 //
 // Copyright 2007-2015 by Apple Inc.
@@ -255,8 +253,3 @@ usage(void)
 
   exit(1);
 }
-
-
-//
-// End of "$Id$".
-//

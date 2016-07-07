@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Debugging functions for CUPS.
  *
  * Copyright 2008-2015 by Apple Inc.
@@ -642,8 +640,3 @@ _cups_safe_vsnprintf(
 
   return (bytes);
 }
-
-
-/*
- * End of "$Id$".
- */

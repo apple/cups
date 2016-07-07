@@ -28,7 +28,7 @@
  * @code IPP_STATUS_ERRPR_NOT_AUTHORIZED@ or
  * @code IPP_STATUS_ERROR_FORBIDDEN@ on failure.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_status_t
@@ -66,7 +66,7 @@ cupsCancelDestJob(http_t      *http,	/* I - Connection to destination */
  * "job_id" is the job ID returned by cupsCreateDestJob. Returns @code IPP_STATUS_OK@
  * on success.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_status_t				/* O - IPP status code */
@@ -81,9 +81,7 @@ cupsCloseDestJob(
   ipp_attribute_t	*attr;		/* operations-supported attribute */
 
 
-  DEBUG_printf(("cupsCloseDestJob(http=%p, dest=%p(%s/%s), info=%p, job_id=%d)",
-                http, dest, dest ? dest->name : NULL,
-                dest ? dest->instance : NULL, info, job_id));
+  DEBUG_printf(("cupsCloseDestJob(http=%p, dest=%p(%s/%s), info=%p, job_id=%d)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, job_id));
 
  /*
   * Range check input...
@@ -152,7 +150,7 @@ cupsCloseDestJob(
  * Returns @code IPP_STATUS_OK@ or @code IPP_STATUS_OK_SUBST@ on success, saving the job ID
  * in the variable pointed to by "job_id".
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_status_t				/* O - IPP status code */
@@ -171,10 +169,7 @@ cupsCreateDestJob(
 
 
   DEBUG_printf(("cupsCreateDestJob(http=%p, dest=%p(%s/%s), info=%p, "
-                "job_id=%p, title=\"%s\", num_options=%d, options=%p)",
-                http, dest, dest ? dest->name : NULL,
-                dest ? dest->instance : NULL, info, job_id, title, num_options,
-                options));
+                "job_id=%p, title=\"%s\", num_options=%d, options=%p)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, (void *)job_id, title, num_options, (void *)options));
 
  /*
   * Range check input...
@@ -245,7 +240,7 @@ cupsCreateDestJob(
  *
  * Returns @code IPP_STATUS_OK@ or @code IPP_STATUS_OK_SUBST@ on success.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 ipp_status_t				/* O - Status of document submission */
@@ -254,9 +249,7 @@ cupsFinishDestDocument(
     cups_dest_t  *dest,			/* I - Destination */
     cups_dinfo_t *info) 		/* I - Destination information */
 {
-  DEBUG_printf(("cupsFinishDestDocument(http=%p, dest=%p(%s/%s), info=%p)",
-                http, dest, dest ? dest->name : NULL,
-                dest ? dest->instance : NULL, info));
+  DEBUG_printf(("cupsFinishDestDocument(http=%p, dest=%p(%s/%s), info=%p)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info));
 
  /*
   * Range check input...
@@ -292,7 +285,7 @@ cupsFinishDestDocument(
  * if this is the last document to be submitted in the job.  Returns
  * @code HTTP_CONTINUE@ on success.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 http_status_t				/* O - Status of document creation */
@@ -311,12 +304,7 @@ cupsStartDestDocument(
   http_status_t	status;			/* HTTP status */
 
 
-  DEBUG_printf(("cupsStartDestDocument(http=%p, dest=%p(%s/%s), info=%p, "
-                "job_id=%d, docname=\"%s\", format=\"%s\", num_options=%d, "
-                "options=%p, last_document=%d)",
-                http, dest, dest ? dest->name : NULL,
-                dest ? dest->instance : NULL, info, job_id, docname, format,
-                num_options, options, last_document));
+  DEBUG_printf(("cupsStartDestDocument(http=%p, dest=%p(%s/%s), info=%p, job_id=%d, docname=\"%s\", format=\"%s\", num_options=%d, options=%p, last_document=%d)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, job_id, docname, format, num_options, (void *)options, last_document));
 
  /*
   * Range check input...

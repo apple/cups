@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Private IPP definitions for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -75,7 +73,3 @@ extern _ipp_option_t	*_ippFindOption(const char *name);
 }
 #  endif /* __cplusplus */
 #endif /* !_CUPS_IPP_H_ */
-
-/*
- * End of "$Id$".
- */

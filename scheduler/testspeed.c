@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Scheduler speed test for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -372,9 +370,3 @@ usage(void)
        "[-E] hostname[:port]");
   exit(0);
 }
-
-
-
-/*
- * End of "$Id$".
- */

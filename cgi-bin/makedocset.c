@@ -1,30 +1,18 @@
 /*
- * "$Id$"
+ * Xcode documentation set generator.
  *
- *   Xcode documentation set generator.
+ * Copyright 2007-2012 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Usage:
  *
  *   makedocset directory *.tokens
- *
- * Contents:
- *
- *   main()                   - Test the help index code.
- *   compare_html()           - Compare the titles of two HTML files.
- *   compare_sections()       - Compare the names of two help sections.
- *   compare_sections_files() - Compare the number of files and section names.
- *   write_index()            - Write an index file for the CUPS help.
- *   write_info()             - Write the Info.plist file.
- *   write_nodes()            - Write the Nodes.xml file.
  */
 
 /*
@@ -479,8 +467,3 @@ write_nodes(const char   *path,		/* I - File to write */
 
   cupsFileClose(fp);
 }
-
-
-/*
- * End of "$Id$".
- */

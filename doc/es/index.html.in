@@ -24,7 +24,7 @@
     <div class="body">
       <div class="row">
 	<h1>CUPS @CUPS_VERSION@</h1>
-	<p>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en est&aacute;ndares desarrollado por <a href="http://www.apple.com/">Apple Inc.</a> para OS X<sup>&reg;</sup> y otros sistemas operativos tipo UNIX<sup>&reg;</sup>.</p>
+	<p>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en est&aacute;ndares desarrollado por <a href="http://www.apple.com/">Apple Inc.</a> para macOS<sup>&reg;</sup> y otros sistemas operativos tipo UNIX<sup>&reg;</sup>.</p>
       </div>
       <div class="row">
 	<div class="thirds">
@@ -35,9 +35,9 @@
 	</div>
 	<div class="thirds">
 	  <h2>CUPS para administradores</h2>
-	  <p><a href="admin">A&ntilde;adiendo impresoras y clases</a></p>
-	  <p><a href="help/policies.html">Gestionando pol&iacute;ticas de funcionamiento</a></p>
-	  <p><a href="help/network.html">Usando impresoras de red</a></p>
+	  <p><a href="admin">A&ntilde;adir impresoras y clases</a></p>
+	  <p><a href="help/policies.html">Gesti&oacute;n de pol&iacute;ticas de funcionamiento</a></p>
+	  <p><a href="help/network.html">Uso de impresoras de red</a></p>
 	  <p><a href="help/man-cupsd.conf.html">Referencia de cupsd.conf</a></p>
 	</div>
 	<div class="thirds">

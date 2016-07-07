@@ -1,0 +1,642 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>Administration APIs	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.8">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  Administrative API header for CUPS.
+
+  Copyright 2016 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>Administrative APIs</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/adminutil.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcups</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='api-httpipp.html' target='_top'>HTTP and IPP APIs</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+	<li><a href="#SETTINGS">Scheduler Settings</a></li>
+	<li><a href="#DEVICES">Devices</a></li>
+</ul></li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
+	<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
+	<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
+	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
+	<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cups_device_cb_t" title="Device callback
+">cups_device_cb_t</a></li>
+</ul></li>
+</ul>
+<!--
+  Administrative API documentation for CUPS.
+
+  Copyright 2016 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class="title"><a name="OVERVIEW">Overview</a></h2>
+
+<p>The administrative APIs provide convenience functions to perform certain administrative functions with the CUPS scheduler.</p>
+
+<blockquote><b>Note:<b>
+  <p>Administrative functions normally require administrative privileges to execute and must not be used in ordinary user applications!</p>
+</blockquote>
+
+<h3><a name="SETTINGS">Scheduler Settings</a></h3>
+
+<p>The <a href="#cupsAdminGetServerSettings"><code>cupsAdminGetServerSettings</code></a> and <a href="#cupsAdminSetServerSettings"><code>cupsAdminSetServerSettings</code></a> functions allow you to get and set simple directives and their values, respectively, in the <var>cupsd.conf</var> file for the CUPS scheduler. Settings are stored in CUPS option arrays which provide a simple list of string name/value pairs. While any simple <var>cupsd.conf</var> directive name can be specified, the following convenience names are also defined to control common complex directives:</p>
+
+<ul>
+  <li><code>CUPS_SERVER_DEBUG_LOGGING</code></li>: For <code>cupsAdminGetServerSettings</code>, a value of "1" means that the <code>LogLevel</code> directive is set to <code>debug</code> or <code>debug2</code> while a value of "0" means it is set to any other value. For <code>cupsAdminSetServerSettings</code> a value of "1" sets the <code>LogLeveL</code> to <code>debug</code> while a value of "0" sets it to <code>warn</code>.</li>
+  <li><code>CUPS_SERVER_REMOTE_ADMIN</code></li>: A value of "1" specifies that administrative requests are accepted from remote addresses while "0" specifies that requests are only accepted from local addresses (loopback interface and domain sockets).</li>
+  <li><code>CUPS_SERVER_REMOTE_ANY</code></li>: A value of "1" specifies that requests are accepts from any address while "0" specifies that requests are only accepted from the local subnet (when sharing is enabled) or local addresses (loopback interface and domain sockets).</li>
+  <li><code>CUPS_SERVER_SHARE_PRINTERS</code></li>: A value of "1" specifies that printer sharing is enabled for selected printers and remote requests are accepted while a value of "0" specifies that printer sharing is disables and remote requests are not accepted.</li>
+  <li><code>CUPS_SERVER_USER_CANCEL_ANY</code></li>: A value of "1" specifies that the default security policy allows any user to cancel any print job, regardless of the owner. A value of "0" specifies that only administrative users can cancel other user's jobs.</li>
+</ul>
+
+<blockquote><b>Note:</b>
+  <p>Changing settings will restart the CUPS scheduler.</p>
+  <p>When printer sharing or the web interface are enabled, the scheduler's launch-on-demand functionality is effectively disabled. This can affect power usage, system performance, and the security profile of a system.</p>
+</blockquote>
+
+<p>The recommended way to make changes to the <var>cupsd.conf</var> is to first call <a href="#cupsAdminGetServerSettings"><code>cupsAdminGetServerSettings</code></a>, make any changes to the returned option array, and then call <a href="#cupsAdminSetServerSettings"><code>cupsAdminSetServerSettings</code></a> to save those settings. For example, to enable the web interface:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/adminutil.h&gt;
+
+void
+enable_web_interface(void)
+{
+  int num_settings = 0;           /* Number of settings */
+  cups_option_t *settings = NULL; /* Settings */
+
+
+  if (!<a href="#cupsAdminGetServerSettings">cupsAdminGetServerSettings</a>(CUPS_HTTP_DEFAULT, &amp;num_settings, &amp;settings))
+  {
+    fprintf(stderr, "ERROR: Unable to get server settings: %s\n", cupsLastErrorString());
+    return;
+  }
+
+  num_settings = <a href="api-cups.html#cupsAddOption">cupsAddOption</a>("WebInterface", "Yes", num_settings, &amp;settings);
+
+  if (!<a href="#cupsAdminSetServerSettings">cupsAdminSetServerSettings</a>(CUPS_HTTP_DEFAULT, num_settings, settings))
+  {
+    fprintf(stderr, "ERROR: Unable to set server settings: %s\n", cupsLastErrorString());
+  }
+
+  <a href="api-cups.html#cupsFreeOptions">cupsFreeOptions</a>(num_settings, settings);
+}
+</pre>
+
+<h3><a name="DEVICES">Devices</a></h3>
+
+<p>Printers can be discovered through the CUPS scheduler using the <a href="#cupsGetDevices"><code>cupsGetDevices</code></a> API. Typically this API is used to locate printers to add the the system. Each device that is found will cause a supplied callback function to be executed. For example, to list the available printer devices that can be found within 30 seconds:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/adminutil.h&gt;
+
+
+void
+get_devices_cb(
+    const char *device_class,           /* I - Class */
+    const char *device_id,              /* I - 1284 device ID */
+    const char *device_info,            /* I - Description */
+    const char *device_make_and_model,  /* I - Make and model */
+    const char *device_uri,             /* I - Device URI */
+    const char *device_location,        /* I - Location */
+    void       *user_data)              /* I - User data */
+{
+  puts(device_uri);
+}
+
+
+void
+show_devices(void)
+{
+  <a href="#cupsGetDevices">cupsGetDevices</a>(CUPS_HTTP_DEFAULT, 30, NULL, NULL, get_devices_cb, NULL);
+}
+</pre>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></h3>
+<p class="description">Create the Windows PPD file for a printer.</p>
+<p class="code">
+char *cupsAdminCreateWindowsPPD (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>dest</dt>
+<dd class="description">Printer or class</dd>
+<dt>buffer</dt>
+<dd class="description">Filename buffer</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of filename buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PPD file or NULL</p>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminExportSamba">cupsAdminExportSamba</a></h3>
+<p class="description">Export a printer to Samba.</p>
+<p class="code">
+int cupsAdminExportSamba (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_server,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_user,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_password,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *logfile<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dest</dt>
+<dd class="description">Destination to export</dd>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>samba_server</dt>
+<dd class="description">Samba server</dd>
+<dt>samba_user</dt>
+<dd class="description">Samba username</dd>
+<dt>samba_password</dt>
+<dd class="description">Samba password</dd>
+<dt>logfile</dt>
+<dd class="description">Log file, if any</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
+<p class="description">Get settings from the server.</p>
+<p class="code">
+int cupsAdminGetServerSettings (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *num_settings,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t **settings<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>num_settings</dt>
+<dd class="description">Number of settings</dd>
+<dt>settings</dt>
+<dd class="description">Settings</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned settings should be freed with cupsFreeOptions() when
+you are done with them.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
+<p class="description">Set settings on the server.</p>
+<p class="code">
+int cupsAdminSetServerSettings (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_settings,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *settings<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>num_settings</dt>
+<dd class="description">Number of settings</dd>
+<dt>settings</dt>
+<dd class="description">Settings</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
+<p class="description">Get available printer devices.</p>
+<p class="code">
+ipp_status_t cupsGetDevices (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *include_schemes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *exclude_schemes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_device_cb_t">cups_device_cb_t</a> callback,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>timeout</dt>
+<dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
+<dt>include_schemes</dt>
+<dd class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></dd>
+<dt>exclude_schemes</dt>
+<dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
+<dt>callback</dt>
+<dd class="description">Callback function</dd>
+<dt>user_data</dt>
+<dd class="description">User data pointer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Request status - <code>IPP_OK</code> on success.</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
+devices to the specified callback function. The &quot;timeout&quot; parameter controls
+how long the request lasts, while the &quot;include_schemes&quot; and &quot;exclude_schemes&quot;
+parameters provide comma-delimited lists of backends to include or omit from
+the request respectively.
+
+</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
+<p class="description">Device callback
+</p>
+<p class="code">
+typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
+</p>
+</div>
+</body>
+</html>

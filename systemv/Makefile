@@ -1,6 +1,4 @@
 #
-# "$Id$"
-#
 # System V commands makefile for CUPS.
 #
 # Copyright 2007-2014 by Apple Inc.
@@ -276,8 +274,3 @@ lpstat:	lpstat.o ../cups/$(LIBCUPS)
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Printer option program for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -45,7 +43,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
   cups_dest_t	*dest;			/* Current destination */
-  char		*printer,		/* Printer name */
+  char		*opt,			/* Option pointer */
+		*printer,		/* Printer name */
 		*instance,		/* Instance name */
  		*option;		/* Current option */
 
@@ -64,272 +63,256 @@ main(int  argc,				/* I - Number of command-line arguments */
   changes     = 0;
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '-')
     {
-      switch (argv[i][1])
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'd' : /* -d printer */
-	    if (argv[i][2])
-	      printer = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
+	switch (*opt)
+	{
+	  case 'd' : /* -d printer */
+	      if (opt[1] != '\0')
+	      {
+		printer = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
 
-	      printer = argv[i];
-	    }
+		printer = argv[i];
+	      }
 
-            if ((instance = strrchr(printer, '/')) != NULL)
-	      *instance++ = '\0';
+	      if ((instance = strrchr(printer, '/')) != NULL)
+		*instance++ = '\0';
 
-	    if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
-            if (num_dests == 0 || !dests ||
-	        (dest = cupsGetDest(printer, instance, num_dests,
-		                    dests)) == NULL)
-	    {
-	      _cupsLangPuts(stderr, _("lpoptions: Unknown printer or class."));
-	      return (1);
-	    }
-
-	   /*
-	    * Set the default destination...
-	    */
-
-	    for (j = 0; j < num_dests; j ++)
-	      dests[j].is_default = 0;
-
-	    dest->is_default = 1;
-
-	    cupsSetDests(num_dests, dests);
-
-	    for (j = 0; j < dest->num_options; j ++)
-	      if (cupsGetOption(dest->options[j].name, num_options,
-	                        options) == NULL)
-		num_options = cupsAddOption(dest->options[j].name,
-	                                    dest->options[j].value,
-	                                    num_options, &options);
-	    break;
-
-	case 'h' : /* -h server */
-	    if (argv[i][2])
-	      cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      cupsSetServer(argv[i]);
-	    }
-	    break;
-
-        case 'E' : /* Encrypt connection */
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-	    break;
-
-	case 'l' : /* -l (list options) */
-            if (dest == NULL)
-	    {
 	      if (num_dests == 0)
 		num_dests = cupsGetDests(&dests);
 
-	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
-	        dest = dests;
-	    }
+	      if (num_dests == 0 || !dests || (dest = cupsGetDest(printer, instance, num_dests, dests)) == NULL)
+	      {
+		_cupsLangPuts(stderr, _("lpoptions: Unknown printer or class."));
+		return (1);
+	      }
 
-            if (dest == NULL)
-	      _cupsLangPuts(stderr, _("lpoptions: No printers."));
-	    else
-	      list_options(dest);
+	     /*
+	      * Set the default destination...
+	      */
 
-            changes = -1;
-	    break;
+	      for (j = 0; j < num_dests; j ++)
+		dests[j].is_default = 0;
 
-	case 'o' : /* -o option[=value] */
-            if (dest == NULL)
-	    {
-	      if (num_dests == 0)
-		num_dests = cupsGetDests(&dests);
+	      dest->is_default = 1;
 
-	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
-	        dest = dests;
+	      cupsSetDests(num_dests, dests);
+
+	      for (j = 0; j < dest->num_options; j ++)
+		if (cupsGetOption(dest->options[j].name, num_options,
+				  options) == NULL)
+		  num_options = cupsAddOption(dest->options[j].name,
+					      dest->options[j].value,
+					      num_options, &options);
+	      break;
+
+	  case 'h' : /* -h server */
+	      if (opt[1] != '\0')
+	      {
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
+
+		cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  case 'E' : /* Encrypt connection */
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      break;
+
+	  case 'l' : /* -l (list options) */
+	      if (dest == NULL)
+	      {
+		if (num_dests == 0)
+		  num_dests = cupsGetDests(&dests);
+
+		if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+		  dest = dests;
+	      }
 
 	      if (dest == NULL)
-              {
 		_cupsLangPuts(stderr, _("lpoptions: No printers."));
-                return (1);
-              }
+	      else
+		list_options(dest);
+
+	      changes = -1;
+	      break;
+
+	  case 'o' : /* -o option[=value] */
+	      if (dest == NULL)
+	      {
+		if (num_dests == 0)
+		  num_dests = cupsGetDests(&dests);
+
+		if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+		  dest = dests;
+
+		if (dest == NULL)
+		{
+		  _cupsLangPuts(stderr, _("lpoptions: No printers."));
+		  return (1);
+		}
+
+		for (j = 0; j < dest->num_options; j ++)
+		  if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		    num_options = cupsAddOption(dest->options[j].name,
+						dest->options[j].value,
+						num_options, &options);
+	      }
+
+	      if (opt[1] != '\0')
+	      {
+		num_options = cupsParseOptions(opt + 1, num_options, &options);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
+
+		num_options = cupsParseOptions(argv[i], num_options, &options);
+	      }
+
+	      changes = 1;
+	      break;
+
+	  case 'p' : /* -p printer */
+	      if (opt[1] != '\0')
+	      {
+		printer = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
+
+		printer = argv[i];
+	      }
+
+	      if ((instance = strrchr(printer, '/')) != NULL)
+		*instance++ = '\0';
+
+	      if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
+	      if ((dest = cupsGetDest(printer, instance, num_dests, dests)) == NULL)
+	      {
+		num_dests = cupsAddDest(printer, instance, num_dests, &dests);
+		dest      = cupsGetDest(printer, instance, num_dests, dests);
+
+		if (dest == NULL)
+		{
+		  _cupsLangPrintf(stderr, _("lpoptions: Unable to add printer or instance: %s"), strerror(errno));
+		  return (1);
+		}
+	      }
 
 	      for (j = 0; j < dest->num_options; j ++)
 		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
 		  num_options = cupsAddOption(dest->options[j].name,
-	                                      dest->options[j].value,
-	                                      num_options, &options);
-	    }
+					      dest->options[j].value,
+					      num_options, &options);
+	      break;
 
-	    if (argv[i][2])
-	      num_options = cupsParseOptions(argv[i] + 2, num_options, &options);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      num_options = cupsParseOptions(argv[i], num_options, &options);
-	    }
-
-	    changes = 1;
-	    break;
-
-	case 'p' : /* -p printer */
-	    if (argv[i][2])
-	      printer = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      printer = argv[i];
-	    }
-
-            if ((instance = strrchr(printer, '/')) != NULL)
-	      *instance++ = '\0';
-
-	    if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
-            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) == NULL)
-	    {
-	      num_dests = cupsAddDest(printer, instance, num_dests, &dests);
-	      dest      = cupsGetDest(printer, instance, num_dests, dests);
-
-              if (dest == NULL)
-	      {
-	        _cupsLangPrintf(stderr,
-		                _("lpoptions: Unable to add printer or "
-				  "instance: %s"),
-				strerror(errno));
-		return (1);
-	      }
-	    }
-
-	    for (j = 0; j < dest->num_options; j ++)
-	      if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
-		num_options = cupsAddOption(dest->options[j].name,
-	                                    dest->options[j].value,
-	                                    num_options, &options);
-	    break;
-
-	case 'r' : /* -r option (remove) */
-            if (dest == NULL)
-	    {
-	      if (num_dests == 0)
-		num_dests = cupsGetDests(&dests);
-
-	      if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
-	        dest = dests;
-
+	  case 'r' : /* -r option (remove) */
 	      if (dest == NULL)
-              {
-		_cupsLangPuts(stderr, _("lpoptions: No printers."));
-                return (1);
-              }
-
-	      for (j = 0; j < dest->num_options; j ++)
-		if (cupsGetOption(dest->options[j].name, num_options,
-		                  options) == NULL)
-		  num_options = cupsAddOption(dest->options[j].name,
-	                                      dest->options[j].value,
-	                                      num_options, &options);
-	    }
-
-	    if (argv[i][2])
-	      option = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      option = argv[i];
-	    }
-
-            for (j = 0; j < num_options; j ++)
-	      if (!_cups_strcasecmp(options[j].name, option))
 	      {
-	       /*
-	        * Remove this option...
-		*/
+		if (num_dests == 0)
+		  num_dests = cupsGetDests(&dests);
 
-	        num_options --;
+		if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+		  dest = dests;
 
-		if (j < num_options)
-		  memmove(options + j, options + j + 1, sizeof(cups_option_t) * (size_t)(num_options - j));
-		break;
-              }
+		if (dest == NULL)
+		{
+		  _cupsLangPuts(stderr, _("lpoptions: No printers."));
+		  return (1);
+		}
 
-	    changes = 1;
-	    break;
+		for (j = 0; j < dest->num_options; j ++)
+		  if (cupsGetOption(dest->options[j].name, num_options,
+				    options) == NULL)
+		    num_options = cupsAddOption(dest->options[j].name,
+						dest->options[j].value,
+						num_options, &options);
+	      }
 
-        case 'x' : /* -x printer */
-	    if (argv[i][2])
-	      printer = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
-	        usage();
-
-	      printer = argv[i];
-	    }
-
-            if ((instance = strrchr(printer, '/')) != NULL)
-	      *instance++ = '\0';
-
-	    if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
-            if ((dest = cupsGetDest(printer, instance, num_dests,
-	                            dests)) != NULL)
-	    {
-              cupsFreeOptions(dest->num_options, dest->options);
-
-             /*
-	      * If we are "deleting" the default printer, then just set the
-	      * number of options to 0; if it is also the system default
-	      * then cupsSetDests() will remove it for us...
-	      */
-
-	      if (dest->is_default)
+	      if (opt[1] != '\0')
 	      {
-		dest->num_options = 0;
-		dest->options     = NULL;
+		option = opt + 1;
+		opt += strlen(opt) - 1;
 	      }
 	      else
 	      {
-		num_dests --;
+		i ++;
+		if (i >= argc)
+		  usage();
 
-		j = dest - dests;
-		if (j < num_dests)
-		  memmove(dest, dest + 1, (size_t)(num_dests - j) * sizeof(cups_dest_t));
+		option = argv[i];
 	      }
-	    }
 
-	    cupsSetDests(num_dests, dests);
-	    dest    = NULL;
-	    changes = -1;
-	    break;
+              num_options = cupsRemoveOption(option, num_options, &options);
 
-	default :
-	    usage();
+	      changes = 1;
+	      break;
+
+	  case 'x' : /* -x printer */
+	      if (opt[1] != '\0')
+	      {
+		printer = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
+
+		printer = argv[i];
+	      }
+
+	      if ((instance = strrchr(printer, '/')) != NULL)
+		*instance++ = '\0';
+
+	      if (num_dests == 0)
+		num_dests = cupsGetDests(&dests);
+
+              num_dests = cupsRemoveDest(printer, instance, num_dests, &dests);
+
+	      cupsSetDests(num_dests, dests);
+	      dest    = NULL;
+	      changes = -1;
+	      break;
+
+	  default :
+	      usage();
+	}
       }
     }
     else
+    {
       usage();
+    }
+  }
 
   if (num_dests == 0)
     num_dests = cupsGetDests(&dests);
@@ -545,8 +528,3 @@ usage(void)
 
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

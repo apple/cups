@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Printer status CGI for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -306,8 +304,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 			*response;	/* IPP response */
   cups_array_t		*printers;	/* Array of printer objects */
   ipp_attribute_t	*printer;	/* Printer object */
-  int			ascending,	/* Order of printers (0 = descending) */
-			first,		/* First printer to show */
+  int			first,		/* First printer to show */
 			count;		/* Number of printers */
   const char		*var;		/* Form variable */
   void			*search;	/* Search data */
@@ -389,25 +386,10 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
     sprintf(val, "%d", count);
     cgiSetVariable("TOTAL", val);
 
-    if ((var = cgiGetVariable("ORDER")) != NULL && *var)
-      ascending = !_cups_strcasecmp(var, "asc");
-    else
-      ascending = 1;
-
-    if (ascending)
-    {
-      for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, first);
-	   i < CUPS_PAGE_MAX && printer;
-	   i ++, printer = (ipp_attribute_t *)cupsArrayNext(printers))
-        cgiSetIPPObjectVars(printer, NULL, i);
-    }
-    else
-    {
-      for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, count - first - 1);
-	   i < CUPS_PAGE_MAX && printer;
-	   i ++, printer = (ipp_attribute_t *)cupsArrayPrev(printers))
-        cgiSetIPPObjectVars(printer, NULL, i);
-    }
+    for (i = 0, printer = (ipp_attribute_t *)cupsArrayIndex(printers, first);
+	 i < CUPS_PAGE_MAX && printer;
+	 i ++, printer = (ipp_attribute_t *)cupsArrayNext(printers))
+      cgiSetIPPObjectVars(printer, NULL, i);
 
    /*
     * Save navigation URLs...
@@ -425,6 +407,12 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
     {
       sprintf(val, "%d", first + CUPS_PAGE_MAX);
       cgiSetVariable("NEXT", val);
+    }
+
+    if (count > CUPS_PAGE_MAX)
+    {
+      snprintf(val, sizeof(val), "%d", CUPS_PAGE_MAX * (count / CUPS_PAGE_MAX));
+      cgiSetVariable("LAST", val);
     }
 
    /*
@@ -563,8 +551,3 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
    cgiEndHTML();
 }
-
-
-/*
- * End of "$Id$".
- */

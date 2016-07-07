@@ -1,18 +1,16 @@
 #
-# "$Id$"
+# Filter makefile for CUPS.
 #
-#   Filter makefile for CUPS.
+# Copyright 2007-2012 by Apple Inc.
+# Copyright 1997-2006 by Easy Software Products.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2006 by Easy Software Products.
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
-#
-#   This file is subject to the Apple OS-Developed Software exception.
+# This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -211,38 +209,6 @@ apihelp:
 		--intro spec-ppd.shtml \
 		>../doc/help/spec-ppd.html
 
-framedhelp:
-	echo Generating CUPS API help files...
-	mxmldoc --section "Programming" --title "Raster API" \
-		--framed ../cups/api-raster \
-		--css ../doc/cups-printable.css \
-		--header api-raster.header --intro api-raster.shtml \
-		../cups/raster.h interpret.c raster.c
-	mxmldoc --section "Programming" \
-		--title "Developing PostScript Printer Drivers" \
-		--framed ../cups/postscript-driver \
-		--css ../doc/cups-printable.css \
-		--header postscript-driver.header \
-		--intro postscript-driver.shtml
-	mxmldoc --section "Programming" \
-		--title "Introduction to the PPD Compiler" \
-		--framed ../cups/ppd-compiler \
-		--css ../doc/cups-printable.css \
-		--header ppd-compiler.header \
-		--intro ppd-compiler.shtml
-	mxmldoc --section "Programming" \
-		--title "Developing Raster Printer Drivers" \
-		--framed ../cups/raster-driver \
-		--css ../doc/cups-printable.css \
-		--header raster-driver.header \
-		--intro raster-driver.shtml
-	mxmldoc --section "Specifications" \
-		--title "CUPS PPD Extensions" \
-		--framed ../cups/spec-ppd \
-		--css ../doc/cups-printable.css \
-		--header spec-ppd.header \
-		--intro spec-ppd.shtml \
-
 
 #
 # commandtops
@@ -401,8 +367,3 @@ rasterbench:	rasterbench.o libcupsimage.a
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

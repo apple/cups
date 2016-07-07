@@ -1,25 +1,16 @@
 /*
- * "$Id$"
+ * MD5 password support for CUPS.
  *
- *   MD5 password support for CUPS.
+ * Copyright 2007-2010 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   httpMD5()       - Compute the MD5 sum of the username:group:password.
- *   httpMD5Nonce()  - Combine the MD5 sum of the username, group, and password
- *                     with the server-supplied nonce value.
- *   httpMD5String() - Convert an MD5 sum to a character string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -135,8 +126,3 @@ httpMD5String(const unsigned char *sum,	/* I - MD5 sum data */
 
   return (md5);
 }
-
-
-/*
- * End of "$Id$".
- */

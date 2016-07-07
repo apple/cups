@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PPD custom option routines for CUPS.
  *
  * Copyright 2007-2015 by Apple Inc.
@@ -35,7 +33,7 @@
 /*
  * 'ppdFindCustomOption()' - Find a custom option.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_coption_t *				/* O - Custom option or NULL */
@@ -56,7 +54,7 @@ ppdFindCustomOption(ppd_file_t *ppd,	/* I - PPD file */
 /*
  * 'ppdFindCustomParam()' - Find a parameter for a custom option.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */
@@ -82,7 +80,7 @@ ppdFindCustomParam(ppd_coption_t *opt,	/* I - Custom option */
 /*
  * 'ppdFirstCustomParam()' - Return the first parameter for a custom option.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */
@@ -98,7 +96,7 @@ ppdFirstCustomParam(ppd_coption_t *opt)	/* I - Custom option */
 /*
  * 'ppdNextCustomParam()' - Return the next parameter for a custom option.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @since CUPS 1.2/macOS 10.5@
  */
 
 ppd_cparam_t *				/* O - Custom parameter or NULL */
@@ -109,8 +107,3 @@ ppdNextCustomParam(ppd_coption_t *opt)	/* I - Custom option */
 
   return ((ppd_cparam_t *)cupsArrayNext(opt->params));
 }
-
-
-/*
- * End of "$Id$".
- */

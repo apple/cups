@@ -1,21 +1,14 @@
 /*
- * "$Id$"
+ * "lpmove" command for CUPS.
  *
- *   "lpmove" command for CUPS.
+ * Copyright 2007-2016 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()     - Parse options and move jobs.
- *   move_job() - Move a job.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -43,7 +36,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   http_t	*http;			/* Connection to server */
-  const char	*job;			/* Job name */
+  const char	*opt,			/* Option pointer */
+		*job;			/* Job name */
   int		jobid;			/* Job ID */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
@@ -61,43 +55,48 @@ main(int  argc,				/* I - Number of command-line arguments */
   src       = NULL;
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '-')
-      switch (argv[i][1])
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
+	switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
 #else
-            _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support."),
-	                    argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
-	    break;
+	      break;
 
-        case 'h' : /* Connect to host */
-	    if (argv[i][2] != '\0')
-	      cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+	  case 'h' : /* Connect to host */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPuts(stderr,
-		              _("Error: need hostname after \"-h\" option."));
-		return (1);
-              }
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
 
-	      cupsSetServer(argv[i]);
-	    }
-	    break;
+		if (i >= argc)
+		{
+		  _cupsLangPuts(stderr, _("Error: need hostname after \"-h\" option."));
+		  return (1);
+		}
 
-	default :
-	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \"%c\"."),
-	                    argv[i][1]);
-	    return (1);
+		cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Unknown option \"%c\"."), argv[0], *opt);
+	      return (1);
+	}
       }
+    }
     else if (!jobid && !src)
     {
       if (num_dests == 0)
@@ -119,6 +118,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       _cupsLangPrintf(stderr, _("lpmove: Unknown argument \"%s\"."), argv[i]);
       return (1);
     }
+  }
 
   if ((!jobid && !src) || !dest)
   {
@@ -206,8 +206,3 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   else
     return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

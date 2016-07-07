@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * PostScript command filter for CUPS.
  *
  * Copyright 2008-2014 by Apple Inc.
@@ -518,8 +516,3 @@ report_levels(ppd_file_t *ppd,		/* I - PPD file */
 
   end_ps(ppd);
 }
-
-
-/*
- * End of "$Id$".
- */

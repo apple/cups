@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Convert Apple .strings file (UTF-16 BE text file) to GNU gettext .po files.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -170,8 +168,3 @@ write_po(FILE       *po,		/* I - .po file */
 {
   fprintf(po, "%s \"%s\"\n", what, s);
 }
-
-
-/*
- * End of "$Id$".
- */

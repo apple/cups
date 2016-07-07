@@ -1,24 +1,14 @@
 /*
- * "$Id$"
+ * Quota routines for the CUPS scheduler.
  *
- *   Quota routines for the CUPS scheduler.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdFindQuota()   - Find a quota record.
- *   cupsdFreeQuotas()  - Free quotas for a printer.
- *   cupsdUpdateQuota() - Update quota data for the specified printer and user.
- *   add_quota()        - Add a quota record for this printer and user.
- *   compare_quotas()   - Compare two quota records...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -237,8 +227,3 @@ compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
 {
   return (_cups_strcasecmp(q1->username, q2->username));
 }
-
-
-/*
- * End of "$Id$".
- */

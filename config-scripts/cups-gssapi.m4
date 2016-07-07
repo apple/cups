@@ -1,19 +1,17 @@
 dnl
-dnl   "$Id$"
+dnl GSSAPI/Kerberos library detection for CUPS.
 dnl
-dnl   GSSAPI/Kerberos library detection for CUPS.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2006-2007 by Easy Software Products.
 dnl
-dnl   Copyright 2007-2013 by Apple Inc.
-dnl   Copyright 2006-2007 by Easy Software Products.
+dnl This file contains Kerberos support code, copyright 2006 by
+dnl Jelmer Vernooij.
 dnl
-dnl   This file contains Kerberos support code, copyright 2006 by
-dnl   Jelmer Vernooij.
-dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(gssapi, [  --disable-gssapi        disable GSSAPI support])
@@ -26,7 +24,7 @@ if test x$enable_gssapi != xno; then
 	if test "x$KRB5CONFIG" != x; then
 		case "$uname" in
 			Darwin)
-				# OS X weak-links to the Kerberos framework...
+				# macOS weak-links to the Kerberos framework...
 				LIBGSSAPI="-weak_framework Kerberos"
 				AC_MSG_CHECKING(for GSS framework)
 				if test -d /System/Library/Frameworks/GSS.framework; then
@@ -127,7 +125,3 @@ fi
 
 AC_SUBST(CUPS_DEFAULT_GSSSERVICENAME)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GSSSERVICENAME, "$CUPS_DEFAULT_GSSSERVICENAME")
-
-dnl
-dnl End of "$Id$".
-dnl

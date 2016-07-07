@@ -1,9 +1,7 @@
 //
-// "$Id$"
-//
 // Shared message catalog class for the CUPS PPD Compiler.
 //
-// Copyright 2007-2014 by Apple Inc.
+// Copyright 2007-2016 by Apple Inc.
 // Copyright 2002-2006 by Easy Software Products.
 //
 // These coded instructions, statements, and computer programs are the
@@ -80,7 +78,9 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
       if (!strncmp(l, "en", 2))
 	tl = "English";
-      else if (!strncmp(l, "nb", 2) || !strncmp(l, "nl", 2))
+      else if (!strncmp(l, "nb", 2))
+        tl = "no";
+      else if (!strncmp(l, "nl", 2))
 	tl = "Dutch";
       else if (!strncmp(l, "fr", 2))
 	tl = "French";
@@ -254,7 +254,7 @@ ppdcCatalog::load_messages(
   else if (!strcmp(ptr, ".strings"))
   {
    /*
-    * Read messages in OS X ".strings" format, which are either UTF-8/UTF-16
+    * Read messages in macOS ".strings" format, which are either UTF-8/UTF-16
     * text files of the format:
     *
     *     "id" = "str";
@@ -959,8 +959,3 @@ put_utf16(cups_file_t *fp,		// I - File to write to
 
   return (-1);
 }
-
-
-//
-// End of "$Id$".
-//

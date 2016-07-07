@@ -1,6 +1,4 @@
 <!--
-  "$Id: api-ppd.header 7616 2008-05-28 00:34:13Z mike $"
-
   PPD API header for CUPS.
 
   Copyright 2008-2012 by Apple Inc.
@@ -14,7 +12,7 @@
 
 <h1 class='title'>PPD API (DEPRECATED)</h1>
 
-<blockquote>The PPD API is deprecated starting in CUPS 1.6/OS X 10.8. Please use the new Job Ticket APIs in the <a href="api-cups.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
+<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="api-cups.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
 
 <div class='summary'><table summary='General Information'>
 <thead>

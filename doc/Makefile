@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # Documentation makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -46,17 +44,14 @@ HELPIMAGES	=	\
 			images/smiley.jpg
 HELPFILES	=	\
 			help/accounting.html \
+			help/api-admin.html \
 			help/api-array.html \
-			help/api-cgi.html \
 			help/api-cups.html \
-			help/api-driver.html \
 			help/api-filedir.html \
 			help/api-filter.html \
 			help/api-httpipp.html \
-			help/api-mime.html \
 			help/api-overview.html \
 			help/api-ppd.html \
-			help/api-ppdc.html \
 			help/api-raster.html \
 			help/cgi.html \
 			help/glossary.html \
@@ -254,8 +249,3 @@ docset:
 	cp $(HELPFILES) ../org.cups.docset/Contents/Resources/Documentation/help
 	cp cups-printable.css ../org.cups.docset/Contents/Resources/Documentation
 	cp $(HELPIMAGES) ../org.cups.docset/Contents/Resources/Documentation/images
-
-
-#
-# End of Makefile.
-#

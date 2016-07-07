@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" href="/cups.css" type="text/css">
+    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="width=device-width">
+    <title>In&iacute;cio - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
+  </head>
+  <body>
+    <div class="header">
+      <ul>
+	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
+	<li><a class="active" href="/">In&iacute;cio</a></li>
+	<li><a href="/admin">Administra&ccedil;&atilde;o</a></li>
+	<li><a href="/classes/">Classes</a></li>
+	<li><a href="/help/">Ajuda</a></li>
+	<li><a href="/jobs/">Trabalhos</a></li>
+	<li><a href="/printers/">Impressoras</a></li>
+      </ul>
+    </div>
+    <div class="body">
+      <div class="row">
+	<h1>CUPS @CUPS_VERSION@</h1>
+
+	<p>CUPS &eacute; o sistema de impress&atilde;o baseado em padr&otilde;es e de c&oacute;digo aberto desenvolvido pela <a href="http://www.apple.com/">Apple Inc.</a> para macOS<sup>&reg;</sup> e outros sistemas operacionais similares ao UNIX<sup>&reg;</sup>.</p>
+      </div>
+      <div class="row">
+	<div class="thirds">
+	  <h2>CUPS para usu&aacute;rios</h2>
+	  <p><a href="help/overview.html">Vis&atilde;o geral do CUPS</a></p>
+	  <p><a href="help/options.html">Impress&atilde;o e op&ccedil;&otilde;es em linha de comando</a></p>
+	  <p><a href="http://www.cups.org/lists.php?LIST=cups">F&oacute;rum de usu&aacute;rios</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS para administradores</h2>
+	  <p><a href="admin">Adicionar impressoras e classes</a></p>
+	  <p><a href="help/policies.html">Gerenciar pol&iacute;ticas de opera&ccedil;&atilde;o</a></p>
+	  <p><a href="help/network.html">Usar impressoras de rede</a></p>
+	  <p><a href="help/man-cupsd.conf.html">Refer&ecirc;ncia para o cupsd.conf</a></p>
+	</div>
+	<div class="thirds">
+	  <h2>CUPS para desenvolvedores</h2>
+	  <p><a href="help/api-overview.html">Introdu&ccedil;&atilde;o &agrave; programa&ccedil;&atilde;o do CUPS</a></p>
+	  <p><a href="help/api-cups.html">API do CUPS</a></p>
+	  <p><a href="help/api-filter.html">Programa&ccedil;&atilde;o de filtros e backend</a></p>
+	  <p><a href="help/api-httpipp.html">APIs HTTP e IPP</a></p>
+	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">F&oacute;rum de desenvolvedores</a></p>
+	</div>
+      </div>
+    </div>
+    <div class="footer">CUPS e o logo do CUPS s&atilde;o marcas registradas da <a href="http://www.apple.com">Apple Inc.</a> Copyright &copy; 2007-2015 Apple Inc. Todos os direitos reservados.</div>
+  </body>
+</html>

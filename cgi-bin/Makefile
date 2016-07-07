@@ -1,9 +1,7 @@
 #
-# "$Id$"
-#
 # CGI makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2016 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -128,10 +126,13 @@ install-exec:
 #
 
 install-headers:
-	echo Installing header files in $(INCLUDEDIR)/cups...
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) cgi.h $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) help-index.h $(INCLUDEDIR)/cups
+	if test "x$(privateinclude)" != x; then \
+		echo Installing private header files into $(PRIVATEINCLUDE)...; \
+		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
+		for file in cgi.h help-index.h; do \
+			$(INSTALL_DATA) $$file $(PRIVATEINCLUDE); \
+		done; \
+	fi
 
 
 #
@@ -178,31 +179,11 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupscgi.so
 	$(RM) $(LIBDIR)/libcupscgi.so.1
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/cgi.h
-	$(RM) $(INCLUDEDIR)/cups/help-index.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
-
-
-#
-# Automatic API help files...
-#
-
-apihelp:
-	mxmldoc --section "Programming" \
-		--title "CGI API" \
-		--css ../doc/cups-printable.css \
-		--header api-cgi.header --intro api-cgi.shtml \
-		cgi.h help-index.h $(LIBOBJS:.o=.c) >../doc/help/api-cgi.html
-	mxmldoc --tokens help/api-cgi.html api-cgi.xml >../doc/help/api-cgi.tokens
-	$(RM) api-cgi.xml
-
-framedhelp:
-	mxmldoc --framed api-cgi \
-		--section "Programming" \
-		--title "CGI API" \
-		--css ../doc/cups-printable.css \
-		--header api-cgi.header --intro api-cgi.shtml \
-		cgi.h help-index.h $(LIBOBJS:.o=.c)
+	-if test "x$(privateinclude)" != x; then \
+		$(RM) $(PRIVATEINCLUDE)/cgi.h; \
+		$(RM) $(PRIVATEINCLUDE)/help-index.h; \
+		$(RMDIR) $(PRIVATEINCLUDE); \
+	fi
 
 
 #
@@ -350,8 +331,3 @@ testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 #
 
 include Dependencies
-
-
-#
-# End of "$Id$".
-#

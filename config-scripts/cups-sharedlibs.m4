@@ -1,6 +1,4 @@
 dnl
-dnl "$Id$"
-dnl
 dnl Shared library support for CUPS.
 dnl
 dnl Copyright 2007-2013 by Apple Inc.
@@ -156,7 +154,3 @@ fi
 AC_SUBST(DSOLIBS)
 AC_SUBST(IMGLIBS)
 AC_SUBST(EXPORT_LDFLAGS)
-
-dnl
-dnl End of "$Id$".
-dnl

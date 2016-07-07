@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Sandbox helper for CUPS.
  *
  * Copyright 2007-2014 by Apple Inc.
@@ -199,8 +197,3 @@ usage(void)
   fputs("Usage: cups-exec [-g gid] [-n nice-value] [-u uid] /path/to/profile /path/to/program argv0 argv1 ... argvN\n", stderr);
   exit(1);
 }
-
-
-/*
- * End of "$Id$".
- */

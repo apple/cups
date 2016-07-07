@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Configuration file for CUPS and Xcode.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -17,13 +15,15 @@
 #define _CUPS_CONFIG_H_
 
 #include <AvailabilityMacros.h>
+#include <TargetConditionals.h>
+
 
 /*
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2svn"
-#define CUPS_MINIMAL "CUPS/2.2svn"
+#define CUPS_SVERSION "CUPS v2.2"
+#define CUPS_MINIMAL "CUPS/2.2"
 
 
 /*
@@ -152,13 +152,12 @@
  * Do we have PAM stuff?
  */
 
-#ifndef HAVE_LIBPAM
-#define HAVE_LIBPAM 1
-#endif /* !HAVE_LIBPAM */
-
+#if TARGET_OS_OSX
+#  define HAVE_LIBPAM 1
 /* #undef HAVE_PAM_PAM_APPL_H */
-#define HAVE_PAM_SET_ITEM 1
-#define HAVE_PAM_SETCRED 1
+#  define HAVE_PAM_SET_ITEM 1
+#  define HAVE_PAM_SETCRED 1
+#endif /* TARGET_OS_OSX */
 
 
 /*
@@ -334,7 +333,10 @@
  * What Security framework headers do we have?
  */
 
-#define HAVE_AUTHORIZATION_H 1
+#if !TARGET_OS_IOS
+#  define HAVE_AUTHORIZATION_H 1
+#endif /* !TARGET_OS_IOS */
+
 /* #undef HAVE_SECBASEPRIV_H */
 #define HAVE_SECCERTIFICATE_H 1
 /* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
@@ -349,30 +351,34 @@
  * Do we have the cssmErrorString function?
  */
 
-#define HAVE_CSSMERRORSTRING 1
+#if !TARGET_OS_IOS
+#  define HAVE_CSSMERRORSTRING 1
+#endif /* !TARGET_OS_IOS */
 
 
 /*
  * Do we have the SecGenerateSelfSignedCertificate function?
  */
 
-/* #undef HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+#if TARGET_OS_IOS
+#  define HAVE_SECGENERATESELFSIGNEDCERTIFICATE 1
+#endif /* TARGET_OS_IOS */
 
 
 /*
  * Do we have the SecKeychainOpen function?
  */
 
-#define HAVE_SECKEYCHAINOPEN 1
+#if !TARGET_OS_IOS
+#  define HAVE_SECKEYCHAINOPEN 1
+#endif /* !TARGET_OS_IOS */
 
 
 /*
  * Do we have (a working) SSLSetEnabledCiphers function?
  */
 
-#ifdef AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
-#  define HAVE_SSLSETENABLEDCIPHERS 1
-#endif /* AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER */
+#define HAVE_SSLSETENABLEDCIPHERS 1
 
 
 /*
@@ -488,44 +494,48 @@
 
 
 /*
+ * Do we have on-demand support (launchd/systemd/upstart)?
+ */
+
+#define HAVE_ONDEMAND 1
+
+
+/*
  * Do we have launchd support?
  */
 
 #define HAVE_LAUNCH_H 1
 #define HAVE_LAUNCHD 1
-#define HAVE_LAUNCH_ACTIVATE_SOCKET 1
+
+
+/*
+ * Do we have systemd support?
+ */
+
+/* #undef HAVE_SYSTEMD */
+
+
+/*
+ * Do we have upstart support?
+ */
+
+/* #undef HAVE_UPSTART */
 
 
 /*
  * Various scripting languages...
  */
 
-#define HAVE_JAVA 1
-#define CUPS_JAVA "/usr/bin/java"
-#define HAVE_PERL 1
-#define CUPS_PERL "/usr/bin/perl"
-#define HAVE_PHP 1
-#define CUPS_PHP "/usr/bin/php"
-#define HAVE_PYTHON 1
-#define CUPS_PYTHON "/usr/bin/python"
-
-
-/*
- * Location of the poppler/Xpdf pdftops program...
- */
-
-/* #undef HAVE_PDFTOPS */
-/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
-#define CUPS_PDFTOPS	"/usr/bin/pdftops"
-
-
-/*
- * Location of the Ghostscript gs program...
- */
-
-/* #undef HAVE_GHOSTSCRIPT */
-/* #undef HAVE_GHOSTSCRIPT_PS2WRITE */
-#define CUPS_GHOSTSCRIPT "/usr/bin/gs"
+#if !TARGET_OS_IOS
+#  define HAVE_JAVA 1
+#  define CUPS_JAVA "/usr/bin/java"
+#  define HAVE_PERL 1
+#  define CUPS_PERL "/usr/bin/perl"
+#  define HAVE_PHP 1
+#  define CUPS_PHP "/usr/bin/php"
+#  define HAVE_PYTHON 1
+#  define CUPS_PYTHON "/usr/bin/python"
+#endif /* !TARGET_OS_IOS */
 
 
 /*
@@ -541,18 +551,29 @@
  * Do we have ApplicationServices public headers?
  */
 
-#define HAVE_APPLICATIONSERVICES_H 1
+#if !TARGET_OS_IOS
+#  define HAVE_APPLICATIONSERVICES_H 1
+#endif /* !TARGET_OS_IOS */
 
 
 /*
  * Do we have the SCDynamicStoreCopyComputerName function?
  */
 
-#define HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME 1
+#if !TARGET_OS_IOS
+#  define HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME 1
+#endif /* !TARGET_OS_IOS */
 
 
 /*
- * Do we have OS X 10.4's mbr_XXX functions?
+ * Do we have the getgrouplist() function?
+ */
+
+#define HAVE_GETGROUPLIST 1
+
+
+/*
+ * Do we have macOS 10.4's mbr_XXX functions?
  */
 
 #define HAVE_MEMBERSHIP_H 1
@@ -580,13 +601,15 @@
  * Do we have the GSSAPI support library (for Kerberos support)?
  */
 
-#define HAVE_GSS_ACQUIRE_CRED_EX_F 1
-#define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
-#define HAVE_GSS_GSSAPI_H 1
+#if !TARGET_OS_IOS
+#  define HAVE_GSS_ACQUIRE_CRED_EX_F 1
+#  define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
+#  define HAVE_GSS_GSSAPI_H 1
 /* #undef HAVE_GSS_GSSAPI_SPI_H */
-#define HAVE_GSSAPI 1
+#  define HAVE_GSSAPI 1
 /* #undef HAVE_GSSAPI_GSSAPI_H */
 /* #undef HAVE_GSSAPI_H */
+#endif /* !TARGET_OS_IOS */
 
 
 /*
@@ -697,10 +720,12 @@
 
 
 /*
- * Location of OS X localization bundle, if any.
+ * Location of macOS localization bundle, if any.
  */
 
-#define CUPS_BUNDLEDIR "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
+#if !TARGET_OS_IOS
+#  define CUPS_BUNDLEDIR "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
+#endif /* !TARGET_OS_IOS */
 
 
 /*
@@ -736,7 +761,3 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
-
-/*
- * End of "$Id$".
- */

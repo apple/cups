@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * IPP routines for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -1696,7 +1694,24 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                         "job-hold-until", NULL, val);
   }
-  if (attr && strcmp(attr->values[0].string.text, "no-hold"))
+
+  if (printer->holding_new_jobs)
+  {
+   /*
+    * Hold all new jobs on this printer...
+    */
+
+    if (attr && strcmp(attr->values[0].string.text, "no-hold"))
+      cupsdSetJobHoldUntil(job, ippGetString(attr, 0, NULL), 0);
+    else
+      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+    job->state->values[0].integer = IPP_JOB_HELD;
+    job->state_value              = IPP_JOB_HELD;
+
+    ippSetString(job->attrs, &job->reasons, 0, "job-held-on-create");
+  }
+  else if (attr && strcmp(attr->values[0].string.text, "no-hold"))
   {
    /*
     * Hold job until specified time...
@@ -6401,10 +6416,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   ipp_jstate_t	job_state;		/* job-state value */
   int		first_job_id = 1,	/* First job ID */
 		first_index = 1,	/* First index */
-		current_index = 0;	/* Current index */
-  int		limit = 0;		/* Maximum number of jobs to return */
-  int		count;			/* Number of jobs that match */
-  int		need_load_job = 0;	/* Do we need to load the job? */
+		limit = 0,		/* Maximum number of jobs to return */
+		count,			/* Number of jobs that match */
+		need_load_job = 0;	/* Do we need to load the job? */
   const char	*job_attr;		/* Job attribute requested */
   ipp_attribute_t *job_ids;		/* job-ids attribute */
   cupsd_job_t	*job;			/* Current job pointer */
@@ -6712,9 +6726,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   }
   else
   {
-    for (count = 0, job = (cupsd_job_t *)cupsArrayFirst(list);
-	 (limit <= 0 || count < limit) && job;
-	 job = (cupsd_job_t *)cupsArrayNext(list))
+    if (first_index > 1)
+      job = (cupsd_job_t *)cupsArrayIndex(list, first_index - 1);
+    else
+      job = (cupsd_job_t *)cupsArrayFirst(list);
+
+    for (count = 0; (limit <= 0 || count < limit) && job; job = (cupsd_job_t *)cupsArrayNext(list))
     {
      /*
       * Filter out jobs that don't match...
@@ -6745,10 +6762,6 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
       if (job->id < first_job_id)
 	continue;
-
-      current_index ++;
-      if (current_index < first_index)
-        continue;
 
       if (need_load_job && !job->attrs)
       {
@@ -8889,6 +8902,8 @@ release_held_new_jobs(
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Printer \"%s\" now printing pending/new jobs (\"%s\").",
                     printer->name, get_username(con));
+
+  cupsdCheckJobs();
 
  /*
   * Everything was ok, so return OK status...
@@ -11400,8 +11415,3 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   return (cupsdCheckPolicy(printer ? printer->op_policy_ptr : DefaultPolicyPtr,
                            con, owner) == HTTP_OK);
 }
-
-
-/*
- * End of "$Id$".
- */

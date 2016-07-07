@@ -1,0 +1,3 @@
+.git* export-ignore
+.mailmap export-ignore
+tools export-ignore

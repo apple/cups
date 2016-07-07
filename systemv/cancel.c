@@ -1,20 +1,14 @@
 /*
- * "$Id$"
+ * "cancel" command for CUPS.
  *
- *   "cancel" command for CUPS.
+ * Copyright 2007-2016 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main() - Parse options and cancel jobs.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -37,7 +31,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		job_id;			/* Job ID */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dests;			/* Destinations */
-  char		*dest,			/* Destination printer */
+  char		*opt,			/* Option pointer */
+		*dest,			/* Destination printer */
 		*job,			/* Job ID pointer */
 		*user;			/* Cancel jobs for a user */
   int		purge;			/* Purge or cancel jobs? */
@@ -67,102 +62,106 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   for (i = 1; i < argc; i ++)
+  {
     if (argv[i][0] == '-' && argv[i][1])
     {
-      switch (argv[i][1])
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        case 'E' : /* Encrypt */
+	switch (*opt)
+	{
+	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
-	    if (http)
-	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+	      if (http)
+		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support."), argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
-	    break;
+	      break;
 
-        case 'U' : /* Username */
-	    if (argv[i][2] != '\0')
-	      cupsSetUser(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-	      if (i >= argc)
+	  case 'U' : /* Username */
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected username after "
-				  "\"-U\" option."), argv[0]);
-	        return (1);
+		cupsSetUser(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
+		  return (1);
+		}
+
+		cupsSetUser(argv[i]);
+	      }
+	      break;
+
+	  case 'a' : /* Cancel all jobs */
+	      op = purge ? IPP_PURGE_JOBS : IPP_CANCEL_JOBS;
+	      break;
+
+	  case 'h' : /* Connect to host */
+	      if (http != NULL)
+	      {
+		httpClose(http);
+		http = NULL;
 	      }
 
-              cupsSetUser(argv[i]);
-	    }
-	    break;
-
-        case 'a' : /* Cancel all jobs */
-	    op = purge ? IPP_PURGE_JOBS : IPP_CANCEL_JOBS;
-	    break;
-
-        case 'h' : /* Connect to host */
-	    if (http != NULL)
-	    {
-	      httpClose(http);
-	      http = NULL;
-	    }
-
-	    if (argv[i][2] != '\0')
-              cupsSetServer(argv[i] + 2);
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
+	      if (opt[1] != '\0')
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected hostname after "
-			          "\"-h\" option."), argv[0]);
-		return (1);
-              }
+		cupsSetServer(opt + 1);
+		opt += strlen(opt) - 1;
+	      }
 	      else
-                cupsSetServer(argv[i]);
-	    }
-	    break;
-
-        case 'u' : /* Username */
-	    op = IPP_CANCEL_MY_JOBS;
-
-	    if (argv[i][2] != '\0')
-	      user = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
 	      {
-	        _cupsLangPrintf(stderr,
-		        	_("%s: Error - expected username after "
-			          "\"-u\" option."), argv[0]);
-		return (1);
-              }
+		i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-h\" option."), argv[0]);
+		  return (1);
+		}
+		else
+		  cupsSetServer(argv[i]);
+	      }
+	      break;
+
+	  case 'u' : /* Username */
+	      op = IPP_CANCEL_MY_JOBS;
+
+	      if (opt[1] != '\0')
+	      {
+		user = opt + 1;
+		opt += strlen(opt) - 1;
+	      }
 	      else
-		user = argv[i];
-	    }
-	    break;
+	      {
+		i ++;
 
-        case 'x' : /* Purge job(s) */
-	    purge = 1;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-u\" option."), argv[0]);
+		  return (1);
+		}
+		else
+		  user = argv[i];
+	      }
+	      break;
 
-	    if (op == IPP_CANCEL_JOBS)
-	      op = IPP_PURGE_JOBS;
-	    break;
+	  case 'x' : /* Purge job(s) */
+	      purge = 1;
 
-	default :
-	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \"%c\"."),
-			    argv[0], argv[i][1]);
-	    return (1);
+	      if (op == IPP_CANCEL_JOBS)
+		op = IPP_PURGE_JOBS;
+	      break;
+
+	  default :
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), argv[0], *opt);
+	      return (1);
+	}
       }
     }
     else
@@ -288,7 +287,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                      "requesting-user-name", NULL, cupsUser());
 
       if (purge)
-	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
+	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
 
      /*
       * Do the request and get back a response...
@@ -314,6 +313,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       ippDelete(response);
     }
+  }
 
   if (num_dests == 0 && op != IPP_CANCEL_JOB)
   {
@@ -354,7 +354,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                    "requesting-user-name", NULL, cupsUser());
 
-    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
+    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
 
    /*
     * Do the request and get back a response...
@@ -380,8 +380,3 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   return (0);
 }
-
-
-/*
- * End of "$Id$".
- */

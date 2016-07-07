@@ -1,0 +1,5 @@
+{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Mostrar trabalhos ativos"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="conclu&iacute;dos"><INPUT TYPE="SUBMIT" VALUE="Mostrar trabalhos conclu&iacute;dos"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Mostrar todos trabalhos"></FORM>}
+
+<P ALIGN="CENTER">{total=0?Nenhum trabalho:Mostrando {#job_id} de {total} trabalho{total=1?:s}} {?which_jobs=?ativo{total<2?:s}}:{which_jobs=all?:conclu&iacute;dos}.</P>

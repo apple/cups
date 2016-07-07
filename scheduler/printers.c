@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Printer routines for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -3811,6 +3809,12 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		margins[16];		/* media-*-margin-supported values */
   const char	*filter,		/* Current filter */
 		*mandatory;		/* Current mandatory attribute */
+  static const char * const pwg_raster_document_types[] =
+		{
+		  "black_1",
+		  "sgray_8",
+		  "srgb_8"
+		};
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one-sided",
@@ -4415,6 +4419,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                     "print-color-mode-supported", 2, NULL, color_modes);
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "print-color-mode-default", NULL, "color");
+      ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "pwg-raster-document-type-supported", 3, NULL, pwg_raster_document_types);
     }
     else
     {
@@ -4422,6 +4427,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                    "print-color-mode-supported", NULL, "monochrome");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "print-color-mode-default", NULL, "monochrome");
+      ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "pwg-raster-document-type-supported", 2, NULL, pwg_raster_document_types);
     }
 
    /*
@@ -4459,10 +4465,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * Report all supported resolutions...
       */
 
-      attr = ippAddResolutions(p->ppd_attrs, IPP_TAG_PRINTER,
-                               "printer-resolution-supported",
-                               resolution->num_choices, IPP_RES_PER_INCH,
-			       NULL, NULL);
+      attr = ippAddResolutions(p->ppd_attrs, IPP_TAG_PRINTER, "printer-resolution-supported", resolution->num_choices, IPP_RES_PER_INCH, NULL, NULL);
 
       for (i = 0, choice = resolution->choices;
            i < resolution->num_choices;
@@ -4485,9 +4488,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         attr->values[i].resolution.units = IPP_RES_PER_INCH;
 
         if (choice->marked)
-	  ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
-	                   "printer-resolution-default", IPP_RES_PER_INCH,
-			   xdpi, ydpi);
+	  ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER, "printer-resolution-default", IPP_RES_PER_INCH, xdpi, ydpi);
+
+        if (i == 0)
+	  ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER, "pwg-raster-document-resolution-supported", IPP_RES_PER_INCH, xdpi, ydpi);
       }
     }
     else if ((ppd_attr = ppdFindAttr(ppd, "DefaultResolution", NULL)) != NULL &&
@@ -4520,6 +4524,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
 		       "printer-resolution-supported", IPP_RES_PER_INCH,
 		       xdpi, ydpi);
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER, "pwg-raster-document-resolution-supported", IPP_RES_PER_INCH, xdpi, ydpi);
     }
     else
     {
@@ -4533,6 +4538,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
 		       "printer-resolution-supported", IPP_RES_PER_INCH,
 		       300, 300);
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER, "pwg-raster-document-resolution-supported", IPP_RES_PER_INCH, 300, 300);
     }
 
    /*
@@ -4551,6 +4557,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	!ppdInstallableConflict(ppd, duplex->keyword, "DuplexTumble"))
     {
       p->type |= CUPS_PRINTER_DUPLEX;
+
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "pwg-raster-document-sheet-back", NULL, "normal");
 
       ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		    "sides-supported", 3, NULL, sides);
@@ -5080,8 +5088,3 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
   if (s > start)
     cupsFilePuts(fp, start);
 }
-
-
-/*
- * End of "$Id$".
- */

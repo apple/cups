@@ -24,7 +24,7 @@
     <div class="body">
       <div class="row">
 	<h1>CUPS @CUPS_VERSION@</h1>
-	<p>CUPS is the standards-based, open source printing system developed by <a href="http://www.apple.com/">Apple Inc.</a> for OS X<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems.</p>
+	<p>CUPS is the standards-based, open source printing system developed by <a href="http://www.apple.com/">Apple Inc.</a> for macOS<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems.</p>
       </div>
       <div class="row">
 	<div class="thirds">

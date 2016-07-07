@@ -1,25 +1,19 @@
 /*
- * "$Id$"
+ * Test program for PPD data encoding example code.
  *
- *   Test program for PPD data encoding example code.
+ * Compile with:
  *
- *   Compile with:
+ *     gcc -o testppdx -D_PPD_DEPRECATED="" -g testppdx.c ppdx.c -lcups -lz
  *
- *       gcc -o testppdx -D_PPD_DEPRECATED="" -g testppdx.c ppdx.c -lcups -lz
+ * Copyright 2012 by Apple Inc.
  *
- *   Copyright 2012 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main() - Read data from a test PPD file and write out new chunks.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -110,8 +104,3 @@ main(void)
 
   return (1);
 }
-
-
-/*
- * End of "$Id$".
- */

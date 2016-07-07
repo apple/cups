@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Destination localization support for CUPS.
  *
  * Copyright 2012-2014 by Apple Inc.
@@ -38,7 +36,7 @@ static char	*cups_scan_strings(char *buffer);
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 2.0/OS X 10.10@
+ * @since CUPS 2.0/macOS 10.10@
  */
 
 const char *				/* O - Localized string */
@@ -143,7 +141,7 @@ cupsLocalizeDestMedia(
 
   if (mdb)
   {
-    DEBUG_printf(("1cupsLocalizeDestMedia: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
+    DEBUG_printf(("1cupsLocalizeDestMedia: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", (void *)mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
 
     lsource = cupsLocalizeDestValue(http, dest, dinfo, "media-source", mdb->source);
     ltype   = cupsLocalizeDestValue(http, dest, dinfo, "media-type", mdb->type);
@@ -202,7 +200,7 @@ cupsLocalizeDestMedia(
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *				/* O - Localized string */
@@ -241,7 +239,7 @@ cupsLocalizeDestOption(
  * The returned string is stored in the destination information and will become
  * invalid if the destination information is deleted.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 const char *				/* O - Localized string */
@@ -531,9 +529,3 @@ cups_scan_strings(char *buffer)		/* I - Start of string */
 
   return (bufptr);
 }
-
-
-
-/*
- * End of "$Id$".
- */

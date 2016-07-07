@@ -151,7 +151,7 @@ CUPS backends are not generally design to be run directly by the user. Aside fro
 <i>argv[0]</i>
 and
 <b>DEVICE_URI</b>
-environment variable contain the device URI), CUPS backends also expect specific environment variables and file descriptors, and typically run in a user session that (on OS X) has additional restrictions that affect how it runs. Backends can also be installed with restricted permissions (0500 or 0700) that tell the scheduler to run them as the "root" user instead of an unprivileged user (typically "lp") on the system.
+environment variable contain the device URI), CUPS backends also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs. Backends can also be installed with restricted permissions (0500 or 0700) that tell the scheduler to run them as the "root" user instead of an unprivileged user (typically "lp") on the system.
 <p>Unless you are a developer and know what you are doing, please do not run backends directly. Instead, use the
 <a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1)</a>
 or
@@ -173,7 +173,7 @@ for more information.
 <br>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>
