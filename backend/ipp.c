@@ -688,44 +688,6 @@ main(int  argc,				/* I - Number of command-line args */
                       0, NULL);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
 
-  if (httpIsEncrypted(http))
-  {
-   /*
-    * Validate TLS credentials...
-    */
-
-    cups_array_t	*creds;		/* TLS credentials */
-    cups_array_t	*lcreds = NULL;	/* Loaded credentials */
-    http_trust_t	trust;		/* Trust level */
-    static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
-					/* Trust keywords */
-
-    if (!httpCopyCredentials(http, &creds))
-    {
-      trust = httpCredentialsGetTrust(creds, hostname);
-
-      update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
-      if (trusts[trust])
-      {
-        update_reasons(NULL, trusts[trust]);
-        return (CUPS_BACKEND_STOP);
-      }
-
-      if (httpLoadCredentials(NULL, &lcreds, hostname))
-      {
-       /*
-        * Could not load the credentials, let's save the ones we have so we
-        * can detect changes...
-        */
-
-        httpSaveCredentials(NULL, creds, hostname);
-      }
-
-      httpFreeCredentials(lcreds);
-      httpFreeCredentials(creds);
-    }
-  }
-
  /*
   * See if the printer supports SNMP...
   */
@@ -855,6 +817,53 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_OK);
   else if (!http)
     return (CUPS_BACKEND_FAILED);
+
+  if (httpIsEncrypted(http))
+  {
+   /*
+    * Validate TLS credentials...
+    */
+
+    cups_array_t	*creds;		/* TLS credentials */
+    cups_array_t	*lcreds = NULL;	/* Loaded credentials */
+    http_trust_t	trust;		/* Trust level */
+    static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
+					/* Trust keywords */
+
+    fputs("DEBUG: Connection is encrypted.\n", stderr);
+
+    if (!httpCopyCredentials(http, &creds))
+    {
+      trust = httpCredentialsGetTrust(creds, hostname);
+
+      fprintf(stderr, "DEBUG: trust=%d\n", (int)trust);
+
+      update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
+      if (trusts[trust])
+      {
+        update_reasons(NULL, trusts[trust]);
+        return (CUPS_BACKEND_STOP);
+      }
+
+      if (httpLoadCredentials(NULL, &lcreds, hostname))
+      {
+       /*
+        * Could not load the credentials, let's save the ones we have so we
+        * can detect changes...
+        */
+
+        httpSaveCredentials(NULL, creds, hostname);
+      }
+
+      httpFreeCredentials(lcreds);
+      httpFreeCredentials(creds);
+    }
+    else
+    {
+      update_reasons(NULL, "cups-pki-unknown");
+      return (CUPS_BACKEND_STOP);
+    }
+  }
 
   update_reasons(NULL, "-connecting-to-device");
   _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
