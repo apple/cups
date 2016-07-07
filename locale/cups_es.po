@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-06-24 11:07-0400\n"
+"POT-Creation-Date: 2016-07-07 15:43-0400\n"
 "PO-Revision-Date: 2014-09-23 23:45+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -2784,6 +2784,9 @@ msgstr ""
 msgid "Alternate Roll"
 msgstr ""
 
+msgid "Aluminum"
+msgstr ""
+
 msgid "Always"
 msgstr "Siempre"
 
@@ -2792,6 +2795,12 @@ msgstr "AppSocket/HP JetDirect"
 
 msgid "Applicator"
 msgstr "Aplicador"
+
+msgid "Archival Envelope"
+msgstr ""
+
+msgid "Archival Fabric"
+msgstr ""
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
@@ -2849,6 +2858,9 @@ msgstr "B8"
 
 msgid "B9"
 msgstr "B9"
+
+msgid "Back Print Film"
+msgstr ""
 
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
@@ -3018,6 +3030,9 @@ msgstr ""
 msgid "Bind (Reverse Portrait)"
 msgstr ""
 
+msgid "Bond Envelope"
+msgstr ""
+
 msgid "Bond Paper"
 msgstr "Papel de cartas"
 
@@ -3034,7 +3049,7 @@ msgstr ""
 msgid "Buffer overflow detected, aborting."
 msgstr "Se ha detectado un desbordamiento de buffer, cancelando."
 
-msgid "CD/DVD/Bluray"
+msgid "CD"
 msgstr ""
 
 msgid "CMYK"
@@ -3057,6 +3072,9 @@ msgstr ""
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr "No se puede compartir una impresora remota Kerberizada."
+
+msgid "Cardboard"
+msgstr ""
 
 msgid "Cardstock"
 msgstr ""
@@ -3086,11 +3104,20 @@ msgstr "Close-Job no admite el atributo job-uri."
 msgid "Coat"
 msgstr ""
 
+msgid "Coated Envelope"
+msgstr ""
+
+msgid "Coated Paper"
+msgstr ""
+
 msgid "Color"
 msgstr "Color"
 
 msgid "Color Mode"
 msgstr "Modo de color"
+
+msgid "Colored Labels"
+msgstr ""
 
 msgid ""
 "Commands may be abbreviated.  Commands are:\n"
@@ -3116,11 +3143,20 @@ msgstr "Continuar"
 msgid "Continuous"
 msgstr "Continuo"
 
+msgid "Continuous Long"
+msgstr ""
+
+msgid "Continuous Short"
+msgstr ""
+
 msgid "Control file sent successfully."
 msgstr "Archivo de control enviado correctamente."
 
 msgid "Copying print data."
 msgstr "Copiando datos de impresión."
+
+msgid "Cotton Envelope"
+msgstr ""
 
 msgid "Cover"
 msgstr ""
@@ -3145,6 +3181,9 @@ msgstr ""
 
 msgid "Cutter"
 msgstr "Cortadora"
+
+msgid "DVD"
+msgstr ""
 
 msgid "Dark"
 msgstr "Oscuro"
@@ -3232,7 +3271,13 @@ msgstr ""
 msgid "Double Staple (Reverse Portrait)"
 msgstr ""
 
+msgid "Double Wall Cardboard"
+msgstr ""
+
 msgid "Draft"
+msgstr ""
+
+msgid "Dry Film"
 msgstr ""
 
 msgid "Duplexer"
@@ -3250,11 +3295,17 @@ msgstr "Impresora de etiquetas EPL2"
 msgid "Edit Configuration File"
 msgstr "Editar archivo de configuración"
 
+msgid "Embossing Foil"
+msgstr ""
+
 msgid "Empty PPD file."
 msgstr "Archivo PPD vacío."
 
 msgid "Encryption is not supported."
 msgstr "El cifrado no está implementado."
+
+msgid "End Board"
+msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
@@ -3497,6 +3548,9 @@ msgstr "Expresiones:"
 msgid "FAIL"
 msgstr "FALLO"
 
+msgid "Fabric"
+msgstr ""
+
 msgid "FanFold German"
 msgstr "FanFold alemán"
 
@@ -3540,11 +3594,29 @@ msgstr ""
 "Los URIs del dispositivo de archivo han sido deshabilitados. Para "
 "habilitarlos, vea la directiva FileDevice en \"%s/cups-files.conf\"."
 
+msgid "Film"
+msgstr ""
+
+msgid "Fine Envelope"
+msgstr ""
+
 #, c-format
 msgid "Finished page %d."
 msgstr "Acabada la página %d."
 
 msgid "Finishing"
+msgstr ""
+
+msgid "Flexo Base"
+msgstr ""
+
+msgid "Flexo Photo Polymer"
+msgstr ""
+
+msgid "Flute"
+msgstr ""
+
+msgid "Foil"
 msgstr ""
 
 msgid "Fold"
@@ -3555,6 +3627,9 @@ msgstr "Folio"
 
 msgid "Forbidden"
 msgstr "Prohibido"
+
+msgid "Full Cut Tabs"
+msgstr ""
 
 msgid "Gate Fold"
 msgstr ""
@@ -3568,14 +3643,41 @@ msgstr "Genérico"
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "Get-Response-PDU usa una longitud indefinida"
 
+msgid "Glass"
+msgstr ""
+
+msgid "Glass Colored"
+msgstr ""
+
+msgid "Glass Opaque"
+msgstr ""
+
+msgid "Glass Surfaced"
+msgstr ""
+
+msgid "Glass Textured"
+msgstr ""
+
+msgid "Glossy Fabric"
+msgstr ""
+
+msgid "Glossy Labels"
+msgstr ""
+
+msgid "Glossy Optical Disc"
+msgstr ""
+
 msgid "Glossy Paper"
 msgstr "Papel satinado"
 
-msgid "Glossy Photo"
+msgid "Glossy Photo Paper"
 msgstr ""
 
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "Se ha obtenido el atributo printer-uri pero no el job-id."
+
+msgid "Gravure Cylinder"
+msgstr ""
 
 msgid "Grayscale"
 msgstr "Escale de grises"
@@ -3598,13 +3700,28 @@ msgstr "Carpeta colgante"
 msgid "Hash buffer too small."
 msgstr ""
 
+msgid "Heavyweight Envelope"
+msgstr ""
+
+msgid "Heavyweight Paper"
+msgstr ""
+
 msgid "Help file not in index."
 msgstr "El archivo de ayuda no está en el índice."
 
 msgid "High"
 msgstr ""
 
-msgid "High-Gloss Photo"
+msgid "High Gloss Fabric"
+msgstr ""
+
+msgid "High Gloss Labels"
+msgstr ""
+
+msgid "High Gloss Optical Disc"
+msgstr ""
+
+msgid "High Gloss Photo Paper"
 msgstr ""
 
 msgid "IPP 1setOf attribute with incompatible value tags."
@@ -3693,6 +3810,18 @@ msgstr "Cadena de traducción ilegal"
 
 msgid "Illegal whitespace character"
 msgstr "Carácter de espacio en blanco ilegal"
+
+msgid "Image Setter Paper"
+msgstr ""
+
+msgid "Imaging Cylinder"
+msgstr ""
+
+msgid "Inkjet Envelope"
+msgstr ""
+
+msgid "Inkjet Labels"
+msgstr ""
 
 msgid "Installable Options"
 msgstr "Opciones instalables"
@@ -3848,16 +3977,19 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "Equipo o impresora LPD/LPR"
 
-msgid "Label"
-msgstr ""
-
 msgid "Label Printer"
 msgstr "Impresora de etiquetas"
 
 msgid "Label Top"
 msgstr "Parte superior de la etiqueta"
 
+msgid "Labels"
+msgstr ""
+
 msgid "Laminate"
+msgstr ""
+
+msgid "Laminating Foil"
 msgstr ""
 
 #, c-format
@@ -3894,6 +4026,12 @@ msgstr ""
 msgid "Light"
 msgstr "Ligero"
 
+msgid "Lightweight Envelope"
+msgstr ""
+
+msgid "Lightweight Paper"
+msgstr ""
+
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "Línea más larga que el máximo permitido (255 caracteres)"
 
@@ -3924,7 +4062,16 @@ msgstr ""
 msgid "Manual Feed"
 msgstr "Alimentación manual"
 
-msgid "Matte Photo"
+msgid "Matte Fabric"
+msgstr ""
+
+msgid "Matte Labels"
+msgstr ""
+
+msgid "Matte Optical Disc"
+msgstr ""
+
+msgid "Matte Photo Paper"
 msgstr ""
 
 msgid "Media Size"
@@ -3944,6 +4091,24 @@ msgstr "Media"
 
 msgid "Memory allocation error"
 msgstr "Error de reserva de memoria"
+
+msgid "Metal"
+msgstr ""
+
+msgid "Metal Glossy"
+msgstr ""
+
+msgid "Metal High Gloss"
+msgstr ""
+
+msgid "Metal Matte"
+msgstr ""
+
+msgid "Metal Satin"
+msgstr ""
+
+msgid "Metal Semi Gloss"
+msgstr ""
 
 msgid "Middle"
 msgstr ""
@@ -4032,6 +4197,9 @@ msgstr "Modificar clase"
 msgid "Modify Printer"
 msgstr "Modificar impresora"
 
+msgid "Mounting Tape"
+msgstr ""
+
 msgid "Move All Jobs"
 msgstr "Mover todos los trabajos"
 
@@ -4040,6 +4208,12 @@ msgstr "Mover trabajo"
 
 msgid "Moved Permanently"
 msgstr "Movido permanentemente"
+
+msgid "Multi Layer"
+msgstr ""
+
+msgid "Multi Part Form"
+msgstr ""
 
 msgid "Multipurpose"
 msgstr ""
@@ -4222,6 +4396,9 @@ msgstr "OpenUI/JCLOpenUI sin un CloseUI/JCLCloseUI previo"
 msgid "Operation Policy"
 msgstr "Directiva de operación"
 
+msgid "Optical Disc"
+msgstr ""
+
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
 msgstr "La opción \"%s\" no puede incluirse via %%%%IncludeFeature."
@@ -4283,6 +4460,9 @@ msgstr "El paquete no contiene un Get-Response-PDU"
 msgid "Packet does not start with SEQUENCE"
 msgstr "El paquete no empieza por SEQUENCE"
 
+msgid "Paper"
+msgstr ""
+
 msgid "Paper jam."
 msgstr "Atasco de papel."
 
@@ -4321,17 +4501,62 @@ msgstr "Pausar impresora"
 msgid "Peel-Off"
 msgstr "Despegar"
 
+msgid "Permanent Labels"
+msgstr ""
+
 msgid "Photo"
 msgstr "Foto"
+
+msgid "Photo Film"
+msgstr ""
 
 msgid "Photo Labels"
 msgstr "Foto pequeña"
 
+msgid "Photo Paper"
+msgstr ""
+
+msgid "Photographic Archival"
+msgstr ""
+
+msgid "Plain Envelope"
+msgstr ""
+
 msgid "Plain Paper"
 msgstr "Papel normal"
 
+msgid "Plastic"
+msgstr ""
+
+msgid "Plastic Archival"
+msgstr ""
+
+msgid "Plastic Colored"
+msgstr ""
+
+msgid "Plastic Glossy"
+msgstr ""
+
+msgid "Plastic High Gloss"
+msgstr ""
+
+msgid "Plastic Matte"
+msgstr ""
+
+msgid "Plastic Satin"
+msgstr ""
+
+msgid "Plastic Semi Gloss"
+msgstr ""
+
+msgid "Plate"
+msgstr ""
+
 msgid "Policies"
 msgstr "Reglas"
+
+msgid "Polyester"
+msgstr ""
 
 msgid "Port Monitor"
 msgstr "Monitor de puerto"
@@ -4354,8 +4579,17 @@ msgstr "Postal lado largo"
 msgid "Poster Fold"
 msgstr ""
 
+msgid "Pre Cut Tabs"
+msgstr ""
+
 msgid "Preparing to print."
 msgstr "Preparando la impresión."
+
+msgid "Preprinted Envelope"
+msgstr ""
+
+msgid "Preprinted Paper"
+msgstr ""
 
 msgid "Print Density"
 msgstr "Densidad de impresión"
@@ -4440,6 +4674,9 @@ msgstr "Imprimiendo página %d, %u%% completado."
 msgid "Punch"
 msgstr ""
 
+msgid "Punched Paper"
+msgstr ""
+
 msgid "Quarto"
 msgstr "Quarto"
 
@@ -4490,6 +4727,9 @@ msgstr ""
 msgid "Right Gate Fold"
 msgstr ""
 
+msgid "Roll"
+msgstr ""
+
 msgid "Roll 1"
 msgstr ""
 
@@ -4533,7 +4773,22 @@ msgstr "Error en negociación SSL/TLS"
 msgid "Saddle Stitch"
 msgstr ""
 
-msgid "Satin Photo"
+msgid "Satin Labels"
+msgstr ""
+
+msgid "Satin Optical Disc"
+msgstr ""
+
+msgid "Satin Photo Paper"
+msgstr ""
+
+msgid "Screen"
+msgstr ""
+
+msgid "Screen Paged"
+msgstr ""
+
+msgid "Security Labels"
 msgstr ""
 
 msgid "See Other"
@@ -4542,7 +4797,22 @@ msgstr "Ver otros"
 msgid "See remote printer."
 msgstr ""
 
-msgid "Semi-Gloss Photo"
+msgid "Self Adhesive"
+msgstr ""
+
+msgid "Self Adhesive Film"
+msgstr ""
+
+msgid "Semi-Gloss Fabric"
+msgstr ""
+
+msgid "Semi-Gloss Labels"
+msgstr ""
+
+msgid "Semi-Gloss Optical Disc"
+msgstr ""
+
+msgid "Semi-Gloss Photo Paper"
 msgstr ""
 
 msgid "Sending data to printer."
@@ -4587,7 +4857,13 @@ msgstr "Dirección de envío"
 msgid "Short-Edge (Landscape)"
 msgstr "Lado corto (apaisado)"
 
+msgid "Shrink Foil"
+msgstr ""
+
 msgid "Side"
+msgstr ""
+
+msgid "Single Face"
 msgstr ""
 
 msgid "Single Punch (Landscape)"
@@ -4612,6 +4888,12 @@ msgid "Single Staple (Reverse Landscape)"
 msgstr ""
 
 msgid "Single Staple (Reverse Portrait)"
+msgstr ""
+
+msgid "Single Wall Cardboard"
+msgstr ""
+
+msgid "Sleeve"
 msgstr ""
 
 msgid "Special Paper"
@@ -4653,6 +4935,21 @@ msgstr "Iniciando página %d."
 msgid "Statement"
 msgstr "Declaración"
 
+msgid "Stationery"
+msgstr ""
+
+msgid "Stationery Archival"
+msgstr ""
+
+msgid "Stationery Cotton"
+msgstr ""
+
+msgid "Stationery Heavyweight Coated"
+msgstr ""
+
+msgid "Stationery Inkjet Paper"
+msgstr ""
+
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr "Subscripción #%d no existe."
@@ -4671,6 +4968,9 @@ msgstr "Super B/A3"
 
 msgid "Switching Protocols"
 msgstr "Protocolos de conexión"
+
+msgid "Tab Stock"
+msgstr ""
 
 msgid "Tabloid"
 msgstr "Tabloide"
@@ -4887,6 +5187,12 @@ msgstr "Demasiados valores printer-state-reasons (%d > %d)."
 msgid "Top"
 msgstr ""
 
+msgid "Tractor"
+msgstr ""
+
+msgid "Transfer"
+msgstr ""
+
 msgid "Transparency"
 msgstr "Transparencia"
 
@@ -4963,6 +5269,9 @@ msgid "Triple Staple (Reverse Landscape)"
 msgstr ""
 
 msgid "Triple Staple (Reverse Portrait)"
+msgstr ""
+
+msgid "Triple Wall Cardboard"
 msgstr ""
 
 msgid "URI Too Long"
@@ -5543,6 +5852,9 @@ msgstr "Valor usa una longitud indefinida"
 msgid "VarBind uses indefinite length"
 msgstr "VarBind usa una longitud indefinida"
 
+msgid "Vellum Paper"
+msgstr ""
+
 msgid "Version uses indefinite length"
 msgstr "Versión usa una longitud indefinida"
 
@@ -5560,8 +5872,17 @@ msgstr ""
 "Advertencia, no está instalado ningún controlador de impresora de Windows "
 "2000."
 
+msgid "Waterproof Fabric"
+msgstr ""
+
 msgid "Web Interface is Disabled"
 msgstr "La interfaz web está desactivada."
+
+msgid "Wet Film"
+msgstr ""
+
+msgid "Windowed Envelope"
+msgstr ""
 
 msgid "Yes"
 msgstr "Si"

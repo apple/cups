@@ -1,7 +1,7 @@
 /*
  * PPD cache implementation for CUPS.
  *
- * Copyright 2010-2015 by Apple Inc.
+ * Copyright 2010-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -3252,7 +3252,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   if ((attr = ippFindAttribute(response, "media-source-supported", IPP_TAG_KEYWORD)) != NULL && (count = ippGetCount(attr)) > 1)
   {
     static const char * const sources[][2] =
-    {
+    {					/* "media-source" strings */
       { "Auto", _("Automatic") },
       { "Main", _("Main") },
       { "Alternate", _("Alternate") },
@@ -3333,42 +3333,143 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "media-type-supported", IPP_TAG_KEYWORD)) != NULL && (count = ippGetCount(attr)) > 1)
   {
-    static const char * const types[][2] =
-    {					/* Media type strings (far from complete) */
-      { "Auto", _("Automatic") },
-      { "Cardstock", _("Cardstock") },
-      { "Disc", _("CD/DVD/Bluray") },
-      { "Envelope", _("Envelope") },
-      { "Labels", _("Label") },
-      { "Other", _("Other") },
-      { "Photographic", _("Photo") },
-      { "PhotographicGlossy", _("Glossy Photo") },
-      { "PhotographicHighGloss", _("High-Gloss Photo") },
-      { "PhotographicMatte", _("Matte Photo") },
-      { "PhotographicSatin", _("Satin Photo") },
-      { "PhotographicSemiGloss", _("Semi-Gloss Photo") },
-      { "Stationery", _("Plain Paper") },
-      { "StationeryLetterhead", _("Letterhead") },
-      { "Transparency", _("Transparency") }
+    static const char * const media_types[][2] =
+    {					/* "media-type" strings */
+      { "aluminum", _("Aluminum") },
+      { "auto", _("Automatic") },
+      { "back-print-film", _("Back Print Film") },
+      { "cardboard", _("Cardboard") },
+      { "cardstock", _("Cardstock") },
+      { "cd", _("CD") },
+      { "continuous", _("Continuous") },
+      { "continuous-long", _("Continuous Long") },
+      { "continuous-short", _("Continuous Short") },
+      { "disc", _("Optical Disc") },
+      { "disc-glossy", _("Glossy Optical Disc") },
+      { "disc-high-gloss", _("High Gloss Optical Disc") },
+      { "disc-matte", _("Matte Optical Disc") },
+      { "disc-satin", _("Satin Optical Disc") },
+      { "disc-semi-gloss", _("Semi-Gloss Optical Disc") },
+      { "double-wall", _("Double Wall Cardboard") },
+      { "dry-film", _("Dry Film") },
+      { "dvd", _("DVD") },
+      { "embossing-foil", _("Embossing Foil") },
+      { "end-board", _("End Board") },
+      { "envelope", _("Envelope") },
+      { "envelope-archival", _("Archival Envelope") },
+      { "envelope-bond", _("Bond Envelope") },
+      { "envelope-coated", _("Coated Envelope") },
+      { "envelope-cotton", _("Cotton Envelope") },
+      { "envelope-fine", _("Fine Envelope") },
+      { "envelope-heavyweight", _("Heavyweight Envelope") },
+      { "envelope-inkjet", _("Inkjet Envelope") },
+      { "envelope-lightweight", _("Lightweight Envelope") },
+      { "envelope-plain", _("Plain Envelope") },
+      { "envelope-preprinted", _("Preprinted Envelope") },
+      { "envelope-window", _("Windowed Envelope") },
+      { "fabric", _("Fabric") },
+      { "fabric-archival", _("Archival Fabric") },
+      { "fabric-glossy", _("Glossy Fabric") },
+      { "fabric-high-gloss", _("High Gloss Fabric") },
+      { "fabric-matte", _("Matte Fabric") },
+      { "fabric-semi-gloss", _("Semi-Gloss Fabric") },
+      { "fabric-waterproof", _("Waterproof Fabric") },
+      { "film", _("Film") },
+      { "flexo-base", _("Flexo Base") },
+      { "flexo-photo-polymer", _("Flexo Photo Polymer") },
+      { "flute", _("Flute") },
+      { "foil", _("Foil") },
+      { "full-cut-tabs", _("Full Cut Tabs") },
+      { "glass", _("Glass") },
+      { "glass-colored", _("Glass Colored") },
+      { "glass-opaque", _("Glass Opaque") },
+      { "glass-surfaced", _("Glass Surfaced") },
+      { "glass-textured", _("Glass Textured") },
+      { "gravure-cylinder", _("Gravure Cylinder") },
+      { "image-setter-paper", _("Image Setter Paper") },
+      { "imaging-cylinder", _("Imaging Cylinder") },
+      { "labels", _("Labels") },
+      { "labels-colored", _("Colored Labels") },
+      { "labels-glossy", _("Glossy Labels") },
+      { "labels-high-gloss", _("High Gloss Labels") },
+      { "labels-inkjet", _("Inkjet Labels") },
+      { "labels-matte", _("Matte Labels") },
+      { "labels-permanent", _("Permanent Labels") },
+      { "labels-satin", _("Satin Labels") },
+      { "labels-security", _("Security Labels") },
+      { "labels-semi-gloss", _("Semi-Gloss Labels") },
+      { "laminating-foil", _("Laminating Foil") },
+      { "letterhead", _("Letterhead") },
+      { "metal", _("Metal") },
+      { "metal-glossy", _("Metal Glossy") },
+      { "metal-high-gloss", _("Metal High Gloss") },
+      { "metal-matte", _("Metal Matte") },
+      { "metal-satin", _("Metal Satin") },
+      { "metal-semi-gloss", _("Metal Semi Gloss") },
+      { "mounting-tape", _("Mounting Tape") },
+      { "multi-layer", _("Multi Layer") },
+      { "multi-part-form", _("Multi Part Form") },
+      { "other", _("Other") },
+      { "paper", _("Paper") },
+      { "photographic", _("Photo Paper") },
+      { "photographic-archival", _("Photographic Archival") },
+      { "photographic-film", _("Photo Film") },
+      { "photographic-glossy", _("Glossy Photo Paper") },
+      { "photographic-high-gloss", _("High Gloss Photo Paper") },
+      { "photographic-matte", _("Matte Photo Paper") },
+      { "photographic-satin", _("Satin Photo Paper") },
+      { "photographic-semi-gloss", _("Semi-Gloss Photo Paper") },
+      { "plastic", _("Plastic") },
+      { "plastic-archival", _("Plastic Archival") },
+      { "plastic-colored", _("Plastic Colored") },
+      { "plastic-glossy", _("Plastic Glossy") },
+      { "plastic-high-gloss", _("Plastic High Gloss") },
+      { "plastic-matte", _("Plastic Matte") },
+      { "plastic-satin", _("Plastic Satin") },
+      { "plastic-semi-gloss", _("Plastic Semi Gloss") },
+      { "plate", _("Plate") },
+      { "polyester", _("Polyester") },
+      { "pre-cut-tabs", _("Pre Cut Tabs") },
+      { "roll", _("Roll") },
+      { "screen", _("Screen") },
+      { "screen-paged", _("Screen Paged") },
+      { "self-adhesive", _("Self Adhesive") },
+      { "self-adhesive-film", _("Self Adhesive Film") },
+      { "shrink-foil", _("Shrink Foil") },
+      { "single-face", _("Single Face") },
+      { "single-wall", _("Single Wall Cardboard") },
+      { "sleeve", _("Sleeve") },
+      { "stationery", _("Stationery") },
+      { "stationery-archival", _("Stationery Archival") },
+      { "stationery-coated", _("Coated Paper") },
+      { "stationery-cotton", _("Stationery Cotton") },
+      { "stationery-fine", _("Vellum Paper") },
+      { "stationery-heavyweight", _("Heavyweight Paper") },
+      { "stationery-heavyweight-coated", _("Stationery Heavyweight Coated") },
+      { "stationery-inkjet", _("Stationery Inkjet Paper") },
+      { "stationery-letterhead", _("Letterhead") },
+      { "stationery-lightweight", _("Lightweight Paper") },
+      { "stationery-preprinted", _("Preprinted Paper") },
+      { "stationery-prepunched", _("Punched Paper") },
+      { "tab-stock", _("Tab Stock") },
+      { "tractor", _("Tractor") },
+      { "transfer", _("Transfer") },
+      { "transparency", _("Transparency") },
+      { "triple-wall", _("Triple Wall Cardboard") },
+      { "wet-film", _("Wet Film") }
     };
 
     cupsFilePrintf(fp, "*OpenUI *MediaType: PickOne\n"
                        "*OrderDependency: 10 AnySetup *MediaType\n"
                        "*DefaultMediaType: %s\n", ppdname);
-    for (i = 0, count = ippGetCount(attr); i < count; i ++)
+    for (i = 0; i < (int)(sizeof(media_types) / sizeof(media_types[0])); i ++)
     {
-      pwg_ppdize_name(ippGetString(attr, i, NULL), ppdname, sizeof(ppdname));
+      if (!ippContainsString(attr, media_types[i][0]))
+        continue;
 
-      for (j = 0; j < (int)(sizeof(types) / sizeof(types[0])); j ++)
-        if (!strcmp(types[j][0], ppdname))
-	{
-	  cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, types[j][1]), ppdname);
-	  break;
-	}
+      pwg_ppdize_name(media_types[i][0], ppdname, sizeof(ppdname));
 
-      if (j >= (int)(sizeof(types) / sizeof(types[0])))
-	cupsFilePrintf(fp, "*MediaType %s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, ppdname);
-
+      cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, media_types[i][1]), ppdname);
     }
     cupsFilePuts(fp, "*CloseUI: *MediaType\n");
   }

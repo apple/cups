@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-06-24 11:07-0400\n"
+"POT-Creation-Date: 2016-07-07 15:43-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2546,7 +2546,7 @@ msgstr ""
 msgid "2-Hole Punch (Reverse Portrait)"
 msgstr ""
 
-#: cups/ppd-cache.c:3445 ppdc/sample.c:262
+#: cups/ppd-cache.c:3546 ppdc/sample.c:262
 msgid "2-Sided Printing"
 msgstr ""
 
@@ -3245,6 +3245,10 @@ msgstr ""
 msgid "Alternate Roll"
 msgstr ""
 
+#: cups/ppd-cache.c:3338
+msgid "Aluminum"
+msgstr ""
+
 #: ppdc/sample.c:424
 msgid "Always"
 msgstr ""
@@ -3255,6 +3259,14 @@ msgstr ""
 
 #: ppdc/sample.c:445
 msgid "Applicator"
+msgstr ""
+
+#: cups/ppd-cache.c:3359
+msgid "Archival Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3371
+msgid "Archival Fabric"
 msgstr ""
 
 #: scheduler/ipp.c:1010
@@ -3277,7 +3289,7 @@ msgstr ""
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr ""
 
-#: cups/ppd-cache.c:3256 cups/ppd-cache.c:3338
+#: cups/ppd-cache.c:3256 cups/ppd-cache.c:3339
 msgid "Automatic"
 msgstr ""
 
@@ -3327,6 +3339,10 @@ msgstr ""
 
 #: ppdc/sample.c:136
 msgid "B9"
+msgstr ""
+
+#: cups/ppd-cache.c:3340
+msgid "Back Print Film"
 msgstr ""
 
 #: scheduler/ipp.c:11199
@@ -3559,6 +3575,10 @@ msgstr ""
 msgid "Bind (Reverse Portrait)"
 msgstr ""
 
+#: cups/ppd-cache.c:3360
+msgid "Bond Envelope"
+msgstr ""
+
 #: ppdc/sample.c:282
 msgid "Bond Paper"
 msgstr ""
@@ -3580,8 +3600,8 @@ msgstr ""
 msgid "Buffer overflow detected, aborting."
 msgstr ""
 
-#: cups/ppd-cache.c:3340
-msgid "CD/DVD/Bluray"
+#: cups/ppd-cache.c:3343
+msgid "CD"
 msgstr ""
 
 #: ppdc/sample.c:277
@@ -3612,7 +3632,11 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
 
-#: cups/ppd-cache.c:3339
+#: cups/ppd-cache.c:3341
+msgid "Cardboard"
+msgstr ""
+
+#: cups/ppd-cache.c:3342
 msgid "Cardstock"
 msgstr ""
 
@@ -3650,13 +3674,25 @@ msgstr ""
 msgid "Coat"
 msgstr ""
 
-#: cups/ppd-cache.c:3420 ppdc/sample.c:276
+#: cups/ppd-cache.c:3361
+msgid "Coated Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3444
+msgid "Coated Paper"
+msgstr ""
+
+#: cups/ppd-cache.c:3521 ppdc/sample.c:276
 msgid "Color"
 msgstr ""
 
-#: cups/ppd-cache.c:3396 cups/ppd-cache.c:3407 cups/ppd-cache.c:3418
+#: cups/ppd-cache.c:3497 cups/ppd-cache.c:3508 cups/ppd-cache.c:3519
 #: ppdc/sample.c:274
 msgid "Color Mode"
+msgstr ""
+
+#: cups/ppd-cache.c:3392
+msgid "Colored Labels"
 msgstr ""
 
 #: berkeley/lpc.c:194
@@ -3682,8 +3718,16 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: ppdc/sample.c:360
+#: cups/ppd-cache.c:3344 ppdc/sample.c:360
 msgid "Continuous"
+msgstr ""
+
+#: cups/ppd-cache.c:3345
+msgid "Continuous Long"
+msgstr ""
+
+#: cups/ppd-cache.c:3346
+msgid "Continuous Short"
 msgstr ""
 
 #: backend/lpd.c:1102 backend/lpd.c:1234
@@ -3692,6 +3736,10 @@ msgstr ""
 
 #: backend/ipp.c:1384 backend/lpd.c:468
 msgid "Copying print data."
+msgstr ""
+
+#: cups/ppd-cache.c:3362
+msgid "Cotton Envelope"
 msgstr ""
 
 #: cups/ppd-cache.c:2964
@@ -3724,6 +3772,10 @@ msgstr ""
 
 #: ppdc/sample.c:446
 msgid "Cutter"
+msgstr ""
+
+#: cups/ppd-cache.c:3355
+msgid "DVD"
 msgstr ""
 
 #: ppdc/sample.c:239
@@ -3828,8 +3880,16 @@ msgstr ""
 msgid "Double Staple (Reverse Portrait)"
 msgstr ""
 
-#: cups/ppd-cache.c:3595 cups/ppd-cache.c:3647
+#: cups/ppd-cache.c:3353
+msgid "Double Wall Cardboard"
+msgstr ""
+
+#: cups/ppd-cache.c:3696 cups/ppd-cache.c:3748
 msgid "Draft"
+msgstr ""
+
+#: cups/ppd-cache.c:3354
+msgid "Dry Film"
 msgstr ""
 
 #: ppdc/sample.c:267
@@ -3854,12 +3914,20 @@ msgstr ""
 msgid "Edit Configuration File"
 msgstr ""
 
+#: cups/ppd-cache.c:3356
+msgid "Embossing Foil"
+msgstr ""
+
 #: cups/adminutil.c:325
 msgid "Empty PPD file."
 msgstr ""
 
 #: cups/http.c:4614
 msgid "Encryption is not supported."
+msgstr ""
+
+#: cups/ppd-cache.c:3357
+msgid "End Board"
 msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
@@ -3875,7 +3943,7 @@ msgstr ""
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
 
-#: cups/ppd-cache.c:3261 cups/ppd-cache.c:3341
+#: cups/ppd-cache.c:3261 cups/ppd-cache.c:3358
 msgid "Envelope"
 msgstr ""
 
@@ -4182,6 +4250,10 @@ msgstr ""
 msgid "FAIL"
 msgstr ""
 
+#: cups/ppd-cache.c:3370
+msgid "Fabric"
+msgstr ""
+
 #: ppdc/sample.c:122
 msgid "FanFold German"
 msgstr ""
@@ -4194,7 +4266,7 @@ msgstr ""
 msgid "Fanfold US"
 msgstr ""
 
-#: cups/ppd-cache.c:3398
+#: cups/ppd-cache.c:3499
 msgid "Fast Grayscale"
 msgstr ""
 
@@ -4232,14 +4304,38 @@ msgstr ""
 msgid "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cups-files.conf\"."
 msgstr ""
 
+#: cups/ppd-cache.c:3377
+msgid "Film"
+msgstr ""
+
+#: cups/ppd-cache.c:3363
+msgid "Fine Envelope"
+msgstr ""
+
 #: filter/rastertoepson.c:1136 filter/rastertohp.c:808
 #: filter/rastertolabel.c:1244
 #, c-format
 msgid "Finished page %d."
 msgstr ""
 
-#: cups/ppd-cache.c:3511 cups/ppd-cache.c:3556
+#: cups/ppd-cache.c:3612 cups/ppd-cache.c:3657
 msgid "Finishing"
+msgstr ""
+
+#: cups/ppd-cache.c:3378
+msgid "Flexo Base"
+msgstr ""
+
+#: cups/ppd-cache.c:3379
+msgid "Flexo Photo Polymer"
+msgstr ""
+
+#: cups/ppd-cache.c:3380
+msgid "Flute"
+msgstr ""
+
+#: cups/ppd-cache.c:3381
+msgid "Foil"
 msgstr ""
 
 #: cups/ppd-cache.c:2970
@@ -4252,6 +4348,10 @@ msgstr ""
 
 #: cups/http-support.c:1373
 msgid "Forbidden"
+msgstr ""
+
+#: cups/ppd-cache.c:3382
+msgid "Full Cut Tabs"
 msgstr ""
 
 #: cups/ppd-cache.c:2973
@@ -4270,12 +4370,44 @@ msgstr ""
 msgid "Get-Response-PDU uses indefinite length"
 msgstr ""
 
+#: cups/ppd-cache.c:3383
+msgid "Glass"
+msgstr ""
+
+#: cups/ppd-cache.c:3384
+msgid "Glass Colored"
+msgstr ""
+
+#: cups/ppd-cache.c:3385
+msgid "Glass Opaque"
+msgstr ""
+
+#: cups/ppd-cache.c:3386
+msgid "Glass Surfaced"
+msgstr ""
+
+#: cups/ppd-cache.c:3387
+msgid "Glass Textured"
+msgstr ""
+
+#: cups/ppd-cache.c:3372
+msgid "Glossy Fabric"
+msgstr ""
+
+#: cups/ppd-cache.c:3393
+msgid "Glossy Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3348
+msgid "Glossy Optical Disc"
+msgstr ""
+
 #: ppdc/sample.c:285
 msgid "Glossy Paper"
 msgstr ""
 
-#: cups/ppd-cache.c:3345
-msgid "Glossy Photo"
+#: cups/ppd-cache.c:3417
+msgid "Glossy Photo Paper"
 msgstr ""
 
 #: scheduler/ipp.c:2946 scheduler/ipp.c:3356 scheduler/ipp.c:3894
@@ -4285,7 +4417,11 @@ msgstr ""
 msgid "Got a printer-uri attribute but no job-id."
 msgstr ""
 
-#: cups/ppd-cache.c:3409 ppdc/sample.c:275
+#: cups/ppd-cache.c:3388
+msgid "Gravure Cylinder"
+msgstr ""
+
+#: cups/ppd-cache.c:3510 ppdc/sample.c:275
 msgid "Grayscale"
 msgstr ""
 
@@ -4313,16 +4449,36 @@ msgstr ""
 msgid "Hash buffer too small."
 msgstr ""
 
+#: cups/ppd-cache.c:3364
+msgid "Heavyweight Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3447
+msgid "Heavyweight Paper"
+msgstr ""
+
 #: cgi-bin/help.c:137
 msgid "Help file not in index."
 msgstr ""
 
-#: cups/ppd-cache.c:3602 cups/ppd-cache.c:3650
+#: cups/ppd-cache.c:3703 cups/ppd-cache.c:3751
 msgid "High"
 msgstr ""
 
-#: cups/ppd-cache.c:3346
-msgid "High-Gloss Photo"
+#: cups/ppd-cache.c:3373
+msgid "High Gloss Fabric"
+msgstr ""
+
+#: cups/ppd-cache.c:3394
+msgid "High Gloss Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3349
+msgid "High Gloss Optical Disc"
+msgstr ""
+
+#: cups/ppd-cache.c:3418
+msgid "High Gloss Photo Paper"
 msgstr ""
 
 #: cups/ipp.c:3143 cups/ipp.c:3170 cups/ipp.c:3193
@@ -4439,6 +4595,22 @@ msgstr ""
 
 #: cups/ppd.c:332
 msgid "Illegal whitespace character"
+msgstr ""
+
+#: cups/ppd-cache.c:3389
+msgid "Image Setter Paper"
+msgstr ""
+
+#: cups/ppd-cache.c:3390
+msgid "Imaging Cylinder"
+msgstr ""
+
+#: cups/ppd-cache.c:3365
+msgid "Inkjet Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3395
+msgid "Inkjet Labels"
 msgstr ""
 
 #: ppdc/sample.c:266
@@ -4648,10 +4820,6 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr ""
 
-#: cups/ppd-cache.c:3342
-msgid "Label"
-msgstr ""
-
 #: ppdc/sample.c:230
 msgid "Label Printer"
 msgstr ""
@@ -4660,8 +4828,16 @@ msgstr ""
 msgid "Label Top"
 msgstr ""
 
+#: cups/ppd-cache.c:3391
+msgid "Labels"
+msgstr ""
+
 #: cups/ppd-cache.c:2983
 msgid "Laminate"
+msgstr ""
+
+#: cups/ppd-cache.c:3401
+msgid "Laminating Foil"
 msgstr ""
 
 #: scheduler/ipp.c:2068 scheduler/ipp.c:5754
@@ -4701,12 +4877,20 @@ msgstr ""
 msgid "Letter Oversize Long Edge"
 msgstr ""
 
-#: cups/ppd-cache.c:3351
+#: cups/ppd-cache.c:3402 cups/ppd-cache.c:3450
 msgid "Letterhead"
 msgstr ""
 
 #: ppdc/sample.c:236
 msgid "Light"
+msgstr ""
+
+#: cups/ppd-cache.c:3366
+msgid "Lightweight Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3451
+msgid "Lightweight Paper"
 msgstr ""
 
 #: cups/ppd.c:327
@@ -4725,7 +4909,7 @@ msgstr ""
 msgid "Local printer created."
 msgstr ""
 
-#: cups/ppd-cache.c:3445 ppdc/sample.c:264
+#: cups/ppd-cache.c:3546 ppdc/sample.c:264
 msgid "Long-Edge (Portrait)"
 msgstr ""
 
@@ -4749,8 +4933,20 @@ msgstr ""
 msgid "Manual Feed"
 msgstr ""
 
-#: cups/ppd-cache.c:3347
-msgid "Matte Photo"
+#: cups/ppd-cache.c:3374
+msgid "Matte Fabric"
+msgstr ""
+
+#: cups/ppd-cache.c:3396
+msgid "Matte Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3350
+msgid "Matte Optical Disc"
+msgstr ""
+
+#: cups/ppd-cache.c:3419
+msgid "Matte Photo Paper"
 msgstr ""
 
 #: cups/ppd.c:814 cups/ppd.c:1380
@@ -4775,6 +4971,30 @@ msgstr ""
 
 #: cups/ppd.c:316
 msgid "Memory allocation error"
+msgstr ""
+
+#: cups/ppd-cache.c:3403
+msgid "Metal"
+msgstr ""
+
+#: cups/ppd-cache.c:3404
+msgid "Metal Glossy"
+msgstr ""
+
+#: cups/ppd-cache.c:3405
+msgid "Metal High Gloss"
+msgstr ""
+
+#: cups/ppd-cache.c:3406
+msgid "Metal Matte"
+msgstr ""
+
+#: cups/ppd-cache.c:3407
+msgid "Metal Satin"
+msgstr ""
+
+#: cups/ppd-cache.c:3408
+msgid "Metal Semi Gloss"
 msgstr ""
 
 #: cups/ppd-cache.c:3268
@@ -4887,6 +5107,10 @@ msgstr ""
 msgid "Modify Printer"
 msgstr ""
 
+#: cups/ppd-cache.c:3409
+msgid "Mounting Tape"
+msgstr ""
+
 #: cgi-bin/ipp-var.c:411 cgi-bin/ipp-var.c:502
 msgid "Move All Jobs"
 msgstr ""
@@ -4897,6 +5121,14 @@ msgstr ""
 
 #: cups/http-support.c:1357
 msgid "Moved Permanently"
+msgstr ""
+
+#: cups/ppd-cache.c:3410
+msgid "Multi Layer"
+msgstr ""
+
+#: cups/ppd-cache.c:3411
+msgid "Multi Part Form"
 msgstr ""
 
 #: cups/ppd-cache.c:3275
@@ -4927,7 +5159,7 @@ msgstr ""
 msgid "No Content"
 msgstr ""
 
-#: cups/ppd-cache.c:3511 cups/ppd-cache.c:3556
+#: cups/ppd-cache.c:3612 cups/ppd-cache.c:3657
 msgid "No Finishing"
 msgstr ""
 
@@ -5061,7 +5293,7 @@ msgstr ""
 msgid "Non-continuous (Web sensing)"
 msgstr ""
 
-#: cups/ppd-cache.c:3598 cups/ppd-cache.c:3648 ppdc/sample.c:238
+#: cups/ppd-cache.c:3699 cups/ppd-cache.c:3749 ppdc/sample.c:238
 msgid "Normal"
 msgstr ""
 
@@ -5101,7 +5333,7 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: cups/ppd-cache.c:3445 ppdc/sample.c:263
+#: cups/ppd-cache.c:3546 ppdc/sample.c:263
 msgid "Off (1-Sided)"
 msgstr ""
 
@@ -5134,6 +5366,10 @@ msgstr ""
 msgid "Operation Policy"
 msgstr ""
 
+#: cups/ppd-cache.c:3347
+msgid "Optical Disc"
+msgstr ""
+
 #: filter/pstops.c:2180
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
@@ -5151,7 +5387,7 @@ msgstr ""
 msgid "Options:"
 msgstr ""
 
-#: cups/ppd-cache.c:3343
+#: cups/ppd-cache.c:3412
 msgid "Other"
 msgstr ""
 
@@ -5219,6 +5455,10 @@ msgstr ""
 msgid "Packet does not start with SEQUENCE"
 msgstr ""
 
+#: cups/ppd-cache.c:3413
+msgid "Paper"
+msgstr ""
+
 #: cups/ppd-localize.c:291
 msgid "Paper jam."
 msgstr ""
@@ -5269,20 +5509,80 @@ msgstr ""
 msgid "Peel-Off"
 msgstr ""
 
-#: cups/ppd-cache.c:3263 cups/ppd-cache.c:3344 ppdc/sample.c:160
+#: cups/ppd-cache.c:3397
+msgid "Permanent Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3263 ppdc/sample.c:160
 msgid "Photo"
+msgstr ""
+
+#: cups/ppd-cache.c:3416
+msgid "Photo Film"
 msgstr ""
 
 #: ppdc/sample.c:161
 msgid "Photo Labels"
 msgstr ""
 
-#: cups/ppd-cache.c:3350 ppdc/sample.c:281
+#: cups/ppd-cache.c:3414
+msgid "Photo Paper"
+msgstr ""
+
+#: cups/ppd-cache.c:3415
+msgid "Photographic Archival"
+msgstr ""
+
+#: cups/ppd-cache.c:3367
+msgid "Plain Envelope"
+msgstr ""
+
+#: ppdc/sample.c:281
 msgid "Plain Paper"
+msgstr ""
+
+#: cups/ppd-cache.c:3422
+msgid "Plastic"
+msgstr ""
+
+#: cups/ppd-cache.c:3423
+msgid "Plastic Archival"
+msgstr ""
+
+#: cups/ppd-cache.c:3424
+msgid "Plastic Colored"
+msgstr ""
+
+#: cups/ppd-cache.c:3425
+msgid "Plastic Glossy"
+msgstr ""
+
+#: cups/ppd-cache.c:3426
+msgid "Plastic High Gloss"
+msgstr ""
+
+#: cups/ppd-cache.c:3427
+msgid "Plastic Matte"
+msgstr ""
+
+#: cups/ppd-cache.c:3428
+msgid "Plastic Satin"
+msgstr ""
+
+#: cups/ppd-cache.c:3429
+msgid "Plastic Semi Gloss"
+msgstr ""
+
+#: cups/ppd-cache.c:3430
+msgid "Plate"
 msgstr ""
 
 #: cgi-bin/admin.c:3283 cgi-bin/admin.c:3564
 msgid "Policies"
+msgstr ""
+
+#: cups/ppd-cache.c:3431
+msgid "Polyester"
 msgstr ""
 
 #: cgi-bin/admin.c:3290 cgi-bin/admin.c:3633 cgi-bin/admin.c:3646
@@ -5313,8 +5613,20 @@ msgstr ""
 msgid "Poster Fold"
 msgstr ""
 
+#: cups/ppd-cache.c:3432
+msgid "Pre Cut Tabs"
+msgstr ""
+
 #: backend/ipp.c:968 backend/ipp.c:976
 msgid "Preparing to print."
+msgstr ""
+
+#: cups/ppd-cache.c:3368
+msgid "Preprinted Envelope"
+msgstr ""
+
+#: cups/ppd-cache.c:3452
+msgid "Preprinted Paper"
 msgstr ""
 
 #: ppdc/sample.c:290
@@ -5329,7 +5641,7 @@ msgstr ""
 msgid "Print Mode"
 msgstr ""
 
-#: cups/ppd-cache.c:3591 cups/ppd-cache.c:3645
+#: cups/ppd-cache.c:3692 cups/ppd-cache.c:3746
 msgid "Print Quality"
 msgstr ""
 
@@ -5428,6 +5740,10 @@ msgstr ""
 msgid "Punch"
 msgstr ""
 
+#: cups/ppd-cache.c:3453
+msgid "Punched Paper"
+msgstr ""
+
 #: ppdc/sample.c:155
 msgid "Quarto"
 msgstr ""
@@ -5494,6 +5810,10 @@ msgstr ""
 msgid "Right Gate Fold"
 msgstr ""
 
+#: cups/ppd-cache.c:3433
+msgid "Roll"
+msgstr ""
+
 #: cups/ppd-cache.c:3296
 msgid "Roll 1"
 msgstr ""
@@ -5551,8 +5871,28 @@ msgstr ""
 msgid "Saddle Stitch"
 msgstr ""
 
-#: cups/ppd-cache.c:3348
-msgid "Satin Photo"
+#: cups/ppd-cache.c:3398
+msgid "Satin Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3351
+msgid "Satin Optical Disc"
+msgstr ""
+
+#: cups/ppd-cache.c:3420
+msgid "Satin Photo Paper"
+msgstr ""
+
+#: cups/ppd-cache.c:3434
+msgid "Screen"
+msgstr ""
+
+#: cups/ppd-cache.c:3435
+msgid "Screen Paged"
+msgstr ""
+
+#: cups/ppd-cache.c:3399
+msgid "Security Labels"
 msgstr ""
 
 #: cups/http-support.c:1360
@@ -5563,8 +5903,28 @@ msgstr ""
 msgid "See remote printer."
 msgstr ""
 
-#: cups/ppd-cache.c:3349
-msgid "Semi-Gloss Photo"
+#: cups/ppd-cache.c:3436
+msgid "Self Adhesive"
+msgstr ""
+
+#: cups/ppd-cache.c:3437
+msgid "Self Adhesive Film"
+msgstr ""
+
+#: cups/ppd-cache.c:3375
+msgid "Semi-Gloss Fabric"
+msgstr ""
+
+#: cups/ppd-cache.c:3400
+msgid "Semi-Gloss Labels"
+msgstr ""
+
+#: cups/ppd-cache.c:3352
+msgid "Semi-Gloss Optical Disc"
+msgstr ""
+
+#: cups/ppd-cache.c:3421
+msgid "Semi-Gloss Photo Paper"
 msgstr ""
 
 #: backend/usb-darwin.c:572 backend/usb-libusb.c:346
@@ -5620,12 +5980,20 @@ msgstr ""
 msgid "Shipping Address"
 msgstr ""
 
-#: cups/ppd-cache.c:3445 ppdc/sample.c:265
+#: cups/ppd-cache.c:3546 ppdc/sample.c:265
 msgid "Short-Edge (Landscape)"
+msgstr ""
+
+#: cups/ppd-cache.c:3438
+msgid "Shrink Foil"
 msgstr ""
 
 #: cups/ppd-cache.c:3270
 msgid "Side"
+msgstr ""
+
+#: cups/ppd-cache.c:3439
+msgid "Single Face"
 msgstr ""
 
 #: cups/ppd-cache.c:2996
@@ -5658,6 +6026,14 @@ msgstr ""
 
 #: cups/ppd-cache.c:3004
 msgid "Single Staple (Reverse Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3440
+msgid "Single Wall Cardboard"
+msgstr ""
+
+#: cups/ppd-cache.c:3441
+msgid "Sleeve"
 msgstr ""
 
 #: ppdc/sample.c:283
@@ -5712,6 +6088,26 @@ msgstr ""
 msgid "Statement"
 msgstr ""
 
+#: cups/ppd-cache.c:3442
+msgid "Stationery"
+msgstr ""
+
+#: cups/ppd-cache.c:3443
+msgid "Stationery Archival"
+msgstr ""
+
+#: cups/ppd-cache.c:3445
+msgid "Stationery Cotton"
+msgstr ""
+
+#: cups/ppd-cache.c:3448
+msgid "Stationery Heavyweight Coated"
+msgstr ""
+
+#: cups/ppd-cache.c:3449
+msgid "Stationery Inkjet Paper"
+msgstr ""
+
 #: scheduler/ipp.c:3553 scheduler/ipp.c:6852 scheduler/ipp.c:7562
 #: scheduler/ipp.c:9083
 #, c-format
@@ -5736,6 +6132,10 @@ msgstr ""
 
 #: cups/http-support.c:1342
 msgid "Switching Protocols"
+msgstr ""
+
+#: cups/ppd-cache.c:3454
+msgid "Tab Stock"
 msgstr ""
 
 #: ppdc/sample.c:159
@@ -5994,7 +6394,15 @@ msgstr ""
 msgid "Top"
 msgstr ""
 
-#: cups/ppd-cache.c:3352 ppdc/sample.c:284
+#: cups/ppd-cache.c:3455
+msgid "Tractor"
+msgstr ""
+
+#: cups/ppd-cache.c:3456
+msgid "Transfer"
+msgstr ""
+
+#: cups/ppd-cache.c:3457 ppdc/sample.c:284
 msgid "Transparency"
 msgstr ""
 
@@ -6096,6 +6504,10 @@ msgstr ""
 
 #: cups/ppd-cache.c:3013
 msgid "Triple Staple (Reverse Portrait)"
+msgstr ""
+
+#: cups/ppd-cache.c:3458
+msgid "Triple Wall Cardboard"
 msgstr ""
 
 #: cups/http-support.c:1382
@@ -6769,6 +7181,10 @@ msgstr ""
 msgid "VarBind uses indefinite length"
 msgstr ""
 
+#: cups/ppd-cache.c:3446
+msgid "Vellum Paper"
+msgstr ""
+
 #: cups/snmp.c:949
 msgid "Version uses indefinite length"
 msgstr ""
@@ -6789,8 +7205,20 @@ msgstr ""
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr ""
 
+#: cups/ppd-cache.c:3376
+msgid "Waterproof Fabric"
+msgstr ""
+
 #: cups/http-support.c:1406
 msgid "Web Interface is Disabled"
+msgstr ""
+
+#: cups/ppd-cache.c:3459
+msgid "Wet Film"
+msgstr ""
+
+#: cups/ppd-cache.c:3369
+msgid "Windowed Envelope"
 msgstr ""
 
 #: cups/ppd.c:1969
