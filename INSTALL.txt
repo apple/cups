@@ -1,5 +1,5 @@
-INSTALL - CUPS v2.2b2 - 2016-06-24
-----------------------------------
+INSTALL - CUPS v2.2rc1 - 2016-07-18
+-----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
@@ -30,24 +30,15 @@ BEFORE YOU BEGIN
     make does not support "include".
 
     Besides these tools you'll want ZLIB library for compression support, the
-    CDSA, GNU TLS, or OpenSSL libraries for encryption support, and either MIT
-    (1.6.3 or higher) or Heimdal Kerberos for Kerberos support.  CUPS will
-    compile and run without these, however you'll miss out on many of the
-    features provided by CUPS.
+    GNU TLS library for encryption support on platforms other then iOS, macOS,
+    or Windows, and either MIT (1.6.3 or higher) or Heimdal Kerberos for
+    Kerberos support.  CUPS will compile and run without these, however you'll
+    miss out on many of the features provided by CUPS.
 
     Also, please note that CUPS does not include print filters to support PDF
     or raster printing.  You *must* download GPL Ghostscript and/or the Open
     Printing CUPS filters package separately to print on operating systems
     other than macOS.
-
-
-COMPILING THE SUBVERSION REPOSITORY CODE
-
-    The CUPS Subversion repository doesn't hold a copy of the pre-built
-    configure script.  You'll need to run the GNU autoconf software (2.60 or
-    higher) to create it:
-
-	autoconf
 
 
 CONFIGURATION
@@ -102,6 +93,14 @@ CONFIGURATION
     architectures:
 
         ./configure --with-archflags="-arch i386 -arch x86_64" ...
+
+        Note: Current versions of macOS DO NOT allow installation to
+        /usr with the default system integrity settings.  In addition,
+        we do not recommend replacing the CUPS supplied with macOS
+        because not all versions of CUPS are compatible with every
+        macOS release, and because software updates will replace parts
+        of your local installation potentially rendering your system
+        unusable.
 
     Once you have configured things, just type:
 
