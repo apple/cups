@@ -1,10 +1,14 @@
-CHANGES.txt - 2.2rc1 - 2016-07-07
+CHANGES.txt - 2.2rc1 - 2016-07-19
 ---------------------------------
 
 CHANGES IN CUPS V2.2rc1
 
 	- Updated the list of supported IPP Everywhere media types.
 	- The IPP backend did not validate TLS credentials properly.
+	- The printer-state-message attribute was not cleared after a
+	  print job with no errors (Issue #4851)
+	- The CUPS-Add-Modify-Class and CUPS-Add-Modify-Printer operations did
+	  not always return an error for failed adds (Issue #4854)
 
 
 CHANGES IN CUPS V2.2b2

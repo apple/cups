@@ -124,8 +124,7 @@ static void	send_ipp_status(cupsd_client_t *con, ipp_status_t status,
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	set_printer_defaults(cupsd_client_t *con,
-		                     cupsd_printer_t *printer);
+static int	set_printer_defaults(cupsd_client_t *con, cupsd_printer_t *printer);
 static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	url_encode_attr(ipp_attribute_t *attr, char *buffer, size_t bufsize);
@@ -987,6 +986,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST, _("Cannot change printer-is-shared for remote queues."));
+      if (!modify)
+	cupsdDeletePrinter(pclass, 0);
+
       return;
     }
 
@@ -1009,6 +1011,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Attempt to set %s printer-state to bad value %d."),
                       pclass->name, attr->values[0].integer);
+      if (!modify)
+	cupsdDeletePrinter(pclass, 0);
+
       return;
     }
 
@@ -1065,12 +1070,18 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
 	send_ipp_status(con, IPP_NOT_FOUND,
                 	_("The printer or class does not exist."));
+	if (!modify)
+	  cupsdDeletePrinter(pclass, 0);
+
 	return;
       }
       else if (dtype & CUPS_PRINTER_CLASS)
       {
         send_ipp_status(con, IPP_BAD_REQUEST,
 			_("Nested classes are not allowed."));
+	if (!modify)
+	  cupsdDeletePrinter(pclass, 0);
+
         return;
       }
 
@@ -1082,7 +1093,13 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     }
   }
 
-  set_printer_defaults(con, pclass);
+  if (!set_printer_defaults(con, pclass))
+  {
+    if (!modify)
+      cupsdDeletePrinter(pclass, 0);
+
+    return;
+  }
 
   if ((attr = ippFindAttribute(con->request, "auth-info-required",
                                IPP_TAG_KEYWORD)) != NULL)
@@ -2344,22 +2361,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     http_uri_status_t	uri_status;	/* URI separation status */
     char		old_device_uri[1024];
 					/* Old device URI */
-    static const char * const uri_status_strings[] =
-    {
-      "URI too large.",
-      "Bad arguments to function.",
-      "Bad resource path.",
-      "Bad port number.",
-      "Bad hostname/address.",
-      "Bad username/password.",
-      "Bad URI scheme.",
-      "Bad URI.",
-      "OK",
-      "Missing URI scheme.",
-      "Unknown URI scheme",
-      "Missing resource path."
-    };
-
 
     need_restart_job = 1;
 
@@ -2370,14 +2371,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 				 host, sizeof(host), &port,
 				 resource, sizeof(resource));
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "%s device-uri: %s", printer->name,
-		    uri_status_strings[uri_status - HTTP_URI_STATUS_OVERFLOW]);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s device-uri: %s", printer->name, httpURIStatusString(uri_status));
 
     if (uri_status < HTTP_URI_OK)
     {
       send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"."),
 		      attr->values[0].string.text);
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2398,6 +2400,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	                  "To enable, see the FileDevice directive in "
 			  "\"%s/cups-files.conf\"."),
 			ServerRoot);
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
 	return;
       }
     }
@@ -2416,6 +2421,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
                         _("Bad device-uri scheme \"%s\"."), scheme);
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
 	return;
       }
     }
@@ -2460,6 +2468,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     {
       send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad port-monitor \"%s\"."),
         	      attr->values[0].string.text);
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2499,6 +2510,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Cannot share a remote Kerberized printer."));
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2509,6 +2523,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST, _("Cannot change printer-is-shared for remote queues."));
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2532,6 +2549,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     {
       send_ipp_status(con, IPP_BAD_REQUEST, _("Bad printer-state value %d."),
                       attr->values[0].integer);
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2568,6 +2588,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 		      attr->num_values,
 		      (int)(sizeof(printer->reasons) /
 		            sizeof(printer->reasons[0])));
+      if (!modify)
+        cupsdDeletePrinter(printer, 0);
+
       return;
     }
 
@@ -2601,7 +2624,13 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                   "Printer \"%s\" state changed.", printer->name);
   }
 
-  set_printer_defaults(con, printer);
+  if (!set_printer_defaults(con, printer))
+  {
+    if (!modify)
+      cupsdDeletePrinter(printer, 0);
+
+    return;
+  }
 
   if ((attr = ippFindAttribute(con->request, "auth-info-required",
                                IPP_TAG_KEYWORD)) != NULL)
@@ -2642,6 +2671,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       if (strncmp(line, "*PPD-Adobe", 10))
       {
 	send_ipp_status(con, IPP_STATUS_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED, _("Bad PPD file."));
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
 	return;
       }
 
@@ -2656,6 +2688,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       if (copy_file(srcfile, dstfile, ConfigFilePerm))
       {
 	send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file - %s"), strerror(errno));
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
 	return;
       }
 
@@ -2682,6 +2717,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     else if (strstr(ppd_name, "../"))
     {
       send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Invalid ppd-name value."));
+      if (!modify)
+	cupsdDeletePrinter(printer, 0);
+
       return;
     }
     else
@@ -2695,6 +2733,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       if (copy_model(con, ppd_name, dstfile))
       {
         send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file."));
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
 	return;
       }
 
@@ -2711,8 +2752,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.data", CacheDir,
-             printer->name);
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.data", CacheDir, printer->name);
     unlink(cache_name);
 
     cupsdSetPrinterReasons(printer, "none");
@@ -10576,7 +10616,7 @@ set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
  * 'set_printer_defaults()' - Set printer default options from a request.
  */
 
-static void
+static int				/* O - 1 on success, 0 on failure */
 set_printer_defaults(
     cupsd_client_t  *con,		/* I - Client connection */
     cupsd_printer_t *printer)		/* I - Printer */
@@ -10705,7 +10745,7 @@ set_printer_defaults(
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
                 	_("Unknown printer-op-policy \"%s\"."),
                 	attr->values[0].string.text);
-	return;
+	return (0);
       }
     }
     else if (!strcmp(attr->name, "printer-error-policy"))
@@ -10722,7 +10762,7 @@ set_printer_defaults(
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
                 	_("Unknown printer-error-policy \"%s\"."),
                 	attr->values[0].string.text);
-	return;
+	return (0);
       }
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -10818,6 +10858,8 @@ set_printer_defaults(
 	  break;
     }
   }
+
+  return (1);
 }
 
 
