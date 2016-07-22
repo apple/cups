@@ -1,9 +1,9 @@
 <H2 CLASS="title">{is_class?Klasse:Drucker} {printer_name} als Standard festlegen</H2>
 
-<P>{is_class?Klasse:Drucker} <A
+<P>{is_class?Die Klasse:Der Drucker} <A
 HREF="/{is_class?classes:printers}/{printer_name}">{printer_name}</A>
-wurde zum Standarddrucker für diesen Server gemacht.</P>
+wurde {is_class?zur Standardklasse:zum Standarddrucker} gemacht.</P>
 
-<BLOCKQUOTE><B>Notiz:</B> Die Einstellungen des Standarddruckers
+<BLOCKQUOTE><B>Hinweis:</B> Die Einstellungen {is_class?der Standardklasse:des Standarddruckers}
 welche von Benutzern mittels dem <TT>lpoptions</TT> Befehl gesetzt wurden,
 überschreiben diese Einstellung.</BLOCKQUOTE>

@@ -1,11 +1,11 @@
 {#printer_name=0?:
 <TABLE CLASS="list" SUMMARY="Druckerliste">
 <THEAD>
-<TR><TH>Queue Name</TH><TH>Beschreibung</TH><TH>Ort</TH><TH>Marke und Modell</TH><TH>Status</TH></TR>
+<TR><TH>Warteschlange</TH><TH>Beschreibung</TH><TH>Ort</TH><TH>Hersteller und Modell</TH><TH>Status</TH></TR>
 </THEAD>
 <TBODY>
 {[printer_name]
-<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{printer_make_and_model}</TD><TD>{printer_state=3?Im Leerlauf:{printer_state=4?Beschäftigt:Angehalten}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{printer_make_and_model}</TD><TD>{printer_state=3?Leerlauf:{printer_state=4?Beschäftigt:Angehalten}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
 }
 </TBODY>
 </TABLE></DIV>}

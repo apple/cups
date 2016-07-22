@@ -20,7 +20,7 @@
       /* Show an error if cookies are disabled */
       function check_cookies() {
 	if (!navigator.cookieEnabled) {
-	      document.getElementById('body').innerHTML = 'This page uses cookies to prevent common cross-site attacks. Please enable cookies in your browser.';
+	      document.getElementById('body').innerHTML = 'Diese Seite verwendet Cookies um gängigen Cross-Site-Scripting-Angriffen vorzubeugen. Bitte aktivieren Sie Cookies in Ihrem Browser.';
 	}
       }
     --></SCRIPT>
@@ -30,7 +30,7 @@
     <div class="header">
       <ul>
 	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
-	<li><a href="/">Home</a></li>
+	<li><a href="/">Startseite</a></li>
 	<li><a {SECTION=admin?class="active" :}href="/admin">Verwaltung</a></li>
 	<li><a {SECTION=classes?class="active" :}href="/classes/">Klassen</a></li>
 	<li><a {SECTION=help?class="active" :}href="/help/">Hilfe</a></li>
