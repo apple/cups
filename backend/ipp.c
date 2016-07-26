@@ -827,16 +827,37 @@ main(int  argc,				/* I - Number of command-line args */
     cups_array_t	*creds;		/* TLS credentials */
     cups_array_t	*lcreds = NULL;	/* Loaded credentials */
     http_trust_t	trust;		/* Trust level */
-    static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
+    char		credinfo[1024],	/* Information on credentials */
+			lcredinfo[1024];/* Information on saved credentials */
+    static const char	* const trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
 					/* Trust keywords */
+    static const char	* const trust_msgs[] =
+    {
+      "Credentials are OK/trusted",
+      "Credentials are invalid",
+      "Credentials have changed",
+      "Credentials are expired",
+      "Credentials have been renewed",
+      "Credentials are unknown/new"
+    };
 
     fputs("DEBUG: Connection is encrypted.\n", stderr);
 
     if (!httpCopyCredentials(http, &creds))
     {
       trust = httpCredentialsGetTrust(creds, hostname);
+      httpCredentialsString(creds, credinfo, sizeof(credinfo));
 
-      fprintf(stderr, "DEBUG: trust=%d\n", (int)trust);
+      fprintf(stderr, "DEBUG: %s\n", trust_msgs[trust]);
+      fprintf(stderr, "DEBUG: Printer credentials: %s\n", credinfo);
+
+      if (!httpLoadCredentials(NULL, &lcreds, hostname))
+      {
+        httpCredentialsString(lcreds, lcredinfo, sizeof(lcredinfo));
+	fprintf(stderr, "DEBUG: Stored credentials: %s\n", lcredinfo);
+      }
+      else
+        fputs("DEBUG: No stored credentials.\n", stderr);
 
       update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
       if (trusts[trust])
@@ -845,7 +866,7 @@ main(int  argc,				/* I - Number of command-line args */
         return (CUPS_BACKEND_STOP);
       }
 
-      if (httpLoadCredentials(NULL, &lcreds, hostname))
+      if (!lcreds)
       {
        /*
         * Could not load the credentials, let's save the ones we have so we
@@ -860,6 +881,8 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
+      fputs("DEBUG: No printer credentials.\n", stderr);
+
       update_reasons(NULL, "cups-pki-unknown");
       return (CUPS_BACKEND_STOP);
     }
