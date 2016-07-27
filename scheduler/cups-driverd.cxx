@@ -2383,7 +2383,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   char		filename[1024],		/* Name of PPD or directory */
 		line[256],		/* Line from file */
 		*ptr,			/* Pointer into name */
-		name[128];		/* Name of PPD file */
+		name[256];		/* Name of PPD file */
   ppd_info_t	*ppd,			/* New PPD file */
 		key;			/* Search key */
 
