@@ -621,6 +621,8 @@ httpLoadCredentials(
   size_t		alloc_data = 0,	/* Bytes allocated */
 			num_data = 0;	/* Bytes used */
   int			decoded;	/* Bytes decoded */
+  int			in_certificate = 0;
+					/* In a certificate? */
 
 
   if (!credentials || !common_name)
@@ -640,7 +642,7 @@ httpLoadCredentials(
   {
     if (!strcmp(line, "-----BEGIN CERTIFICATE-----"))
     {
-      if (num_data)
+      if (in_certificate)
       {
        /*
 	* Missing END CERTIFICATE...
@@ -650,10 +652,12 @@ httpLoadCredentials(
 	*credentials = NULL;
         break;
       }
+
+      in_certificate = 1;
     }
     else if (!strcmp(line, "-----END CERTIFICATE-----"))
     {
-      if (!num_data)
+      if (!in_certificate || !num_data)
       {
        /*
 	* Missing data...
@@ -674,9 +678,10 @@ httpLoadCredentials(
         break;
       }
 
-      num_data = 0;
+      num_data       = 0;
+      in_certificate = 0;
     }
-    else
+    else if (in_certificate)
     {
       if (alloc_data == 0)
       {
@@ -710,7 +715,7 @@ httpLoadCredentials(
 
   cupsFileClose(fp);
 
-  if (num_data)
+  if (in_certificate)
   {
    /*
     * Missing END CERTIFICATE...
