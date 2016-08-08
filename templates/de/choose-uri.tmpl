@@ -1,4 +1,4 @@
-<H2 CLASS="title">{op=modify-printer?{printer_name} ändern:Drucker hinzufügen (Schritt2/5)}</H2>
+<H2 CLASS="title">{op=modify-printer?{printer_name} ändern:Drucker hinzufügen (Schritt 2/5)}</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -8,7 +8,7 @@
 
 <TABLE>
 <TR>
-<TH CLASS="label">Verbindung-URI:</TH>
+<TH CLASS="label">Verbindung:</TH>
 <TD><INPUT TYPE="URL" SIZE="60" MAXLENGTH="1023" NAME="DEVICE_URI" VALUE="{current_device_uri?{current_device_uri}:{device_uri}}"></TD>
 </TR>
 <TR>
@@ -27,7 +27,8 @@
     socket://hostname:9100
 </PRE>
 
-<P>See <A HREF="/help/network.html" TARGET="_blank">"Netzwerkdrucker"</A> für die korrekte URI ihres Druckers.</P>
+<P>Beispiele und gängige URIs finden sich in der Hilfe unter
+<A HREF="/help/network.html" TARGET="_blank">"Netzwerkdrucker"</A>.</P>
 
 </TD>
 </TR>
