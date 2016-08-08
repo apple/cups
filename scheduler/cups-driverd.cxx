@@ -31,7 +31,7 @@
  * Constants...
  */
 
-#define PPD_SYNC	0x50504438	/* Sync word for ppds.dat (PPD8) */
+#define PPD_SYNC	0x50504439	/* Sync word for ppds.dat (PPD9) */
 #define PPD_MAX_LANG	32		/* Maximum languages */
 #define PPD_MAX_PROD	32		/* Maximum products */
 #define PPD_MAX_VERS	32		/* Maximum versions */
@@ -75,7 +75,7 @@ typedef struct				/**** PPD record ****/
   int		model_number;		/* cupsModelNumber */
   int		type;			/* ppd-type */
   char		filename[512],		/* Filename */
-		name[512],		/* PPD name */
+		name[256],		/* PPD name */
 		languages[PPD_MAX_LANG][6],
 					/* LanguageVersion/cupsLanguages */
 		products[PPD_MAX_PROD][128],
@@ -1719,7 +1719,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
   char		*argv[3],		/* Arguments for command */
 		filename[1024],		/* Name of driver */
 		line[2048],		/* Line from driver */
-		name[512],		/* ppd-name */
+		name[256],		/* ppd-name */
 		make[128],		/* ppd-make */
 		make_and_model[128],	/* ppd-make-and-model */
 		device_id[256],		/* ppd-device-id */
@@ -1852,7 +1852,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	psversion[0] = '\0';
 	strlcpy(type_str, "postscript", sizeof(type_str));
 
-        if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
+        if (sscanf(line, "\"%255[^\"]\"%127s%*[ \t]\"%127[^\"]\""
 	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%255[^\"]\""
 			 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
 			 "%*[ \t]\"%127[^\"]\"",
@@ -2383,7 +2383,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   char		filename[1024],		/* Name of PPD or directory */
 		line[256],		/* Line from file */
 		*ptr,			/* Pointer into name */
-		name[128];		/* Name of PPD file */
+		name[256];		/* Name of PPD file */
   ppd_info_t	*ppd,			/* New PPD file */
 		key;			/* Search key */
 
