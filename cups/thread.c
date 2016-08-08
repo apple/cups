@@ -351,6 +351,9 @@ void *					/* O - Return value */
 _cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
 {
   // TODO: Implement me
+  (void)thread;
+
+  return (NULL);
 }
 
 
