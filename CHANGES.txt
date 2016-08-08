@@ -9,8 +9,8 @@ CHANGES IN CUPS V2.2rc1
 	  print job with no errors (Issue #4851)
 	- The CUPS-Add-Modify-Class and CUPS-Add-Modify-Printer operations did
 	  not always return an error for failed adds (Issue #4854)
-	- PPD files with names longer than 127 bytes did not work (PR #4860)
-	- Updated localizations (PR #4858)
+	- PPD files with names longer than 127 bytes did not work (Issue #4860)
+	- Updated localizations (Issue #4846, PR #4858)
 
 
 CHANGES IN CUPS V2.2b2
