@@ -61,18 +61,22 @@ httpAddrConnect2(
     int             *cancel)		/* I - Pointer to "cancel" variable */
 {
   int			val;		/* Socket option value */
-#ifdef O_NONBLOCK
-  int			flags,		/* Socket flags */
-			remaining;	/* Remaining timeout */
+#ifndef WIN32
+  int			flags;		/* Socket flags */
+#endif /* !WIN32 */
+  int			remaining;	/* Remaining timeout */
   int			i,		/* Looping var */
 			nfds,		/* Number of file descriptors */
 			fds[100],	/* Socket file descriptors */
 			result;		/* Result from select() or poll() */
   http_addrlist_t	*addrs[100];	/* Addresses */
+#ifndef HAVE_POLL
+  int			max_fd = -1;	/* Highest file descriptor */
+#endif /* !HAVE_POLL */
+#ifdef O_NONBLOCK
 #  ifdef HAVE_POLL
   struct pollfd		pfds[100];	/* Polled file descriptors */
 #  else
-  int			max_fd = -1;	/* Highest file descriptor */
   fd_set		input_set,	/* select() input set */
 			output_set;	/* select() output set */
   struct timeval	timeout;	/* Timeout */
@@ -220,7 +224,9 @@ httpAddrConnect2(
 	continue;
       }
 
+#ifndef WIN32
       fcntl(fds[nfds], F_SETFL, flags);
+#endif /* !WIN32 */
 
 #ifndef HAVE_POLL
       if (fds[nfds] > max_fd)
