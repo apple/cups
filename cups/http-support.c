@@ -1724,7 +1724,7 @@ _httpResolveURI(
 	while (time(NULL) < end_time)
 	{
 	  if (options & _HTTP_RESOLVE_STDERR)
-	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer..."));
+	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
 
 	  if (cb && !(*cb)(context))
 	  {
