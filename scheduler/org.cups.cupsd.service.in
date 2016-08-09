@@ -9,5 +9,5 @@ Type=simple
 Restart=on-failure
 
 [Install]
-Also=org.cups.cupsd.socket org.cups.cupsd.path
+Also=cups.socket cups.path
 WantedBy=printer.target
