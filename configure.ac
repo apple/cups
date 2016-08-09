@@ -22,6 +22,15 @@ sinclude(config-scripts/cups-common.m4)
 sinclude(config-scripts/cups-directories.m4)
 sinclude(config-scripts/cups-manpages.m4)
 
+AC_MSG_CHECKING([for build system compiler])
+if test "$cross_compiling" = yes; then
+	CC_FOR_BUILD=${CC_FOR_BUILD-cc}
+else
+	CC_FOR_BUILD=${CC}
+fi
+AC_MSG_RESULT(${CC_FOR_BUILD})
+AC_SUBST(CC_FOR_BUILD)
+
 sinclude(config-scripts/cups-sharedlibs.m4)
 sinclude(config-scripts/cups-libtool.m4)
 sinclude(config-scripts/cups-compiler.m4)
