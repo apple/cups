@@ -209,7 +209,7 @@ static const char * const ipp_std_ops[] =
 		  "Close-Job",
 		  "Identify-Printer",
 		  "Validate-Document",
-		  "Send-Hardcopy-Document",
+		  "Add-Document-Images",
 		  "Acknowledge-Document",
 
 		  /* 0x0040 - 0x004a */

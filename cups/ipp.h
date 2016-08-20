@@ -302,7 +302,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_CLOSE_JOB,			/* Close-Job */
   IPP_OP_IDENTIFY_PRINTER,		/* Identify-Printer */
   IPP_OP_VALIDATE_DOCUMENT,		/* Validate-Document */
-  IPP_OP_SEND_HARDCOPY_DOCUMENT,	/* Send-Hardcopy-Document */
+  IPP_OP_ADD_DOCUMENT_IMAGES,		/* Add-Document-Images */
   IPP_OP_ACKNOWLEDGE_DOCUMENT,		/* Acknowledge-Document */
   IPP_OP_ACKNOWLEDGE_IDENTIFY_PRINTER,	/* Acknowledge-Identify-Printer */
   IPP_OP_ACKNOWLEDGE_JOB,		/* Acknowledge-Job */
@@ -397,6 +397,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
 #    define IPP_CLOSE_JOB			IPP_OP_CLOSE_JOB
 #    define IPP_IDENTIFY_PRINTER		IPP_OP_IDENTIFY_PRINTER
 #    define IPP_VALIDATE_DOCUMENT		IPP_OP_VALIDATE_DOCUMENT
+#    define IPP_OP_SEND_HARDCOPY_DOCUMENT	IPP_OP_ADD_DOCUMENT_IMAGES
 #    define IPP_PRIVATE				IPP_OP_PRIVATE
 #    define CUPS_GET_DEFAULT			IPP_OP_CUPS_GET_DEFAULT
 #    define CUPS_GET_PRINTERS			IPP_OP_CUPS_GET_PRINTERS
