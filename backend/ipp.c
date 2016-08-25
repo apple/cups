@@ -848,7 +848,7 @@ main(int  argc,				/* I - Number of command-line args */
       trust = httpCredentialsGetTrust(creds, hostname);
       httpCredentialsString(creds, credinfo, sizeof(credinfo));
 
-      fprintf(stderr, "DEBUG: %s\n", trust_msgs[trust]);
+      fprintf(stderr, "DEBUG: %s (%s)\n", trust_msgs[trust], cupsLastErrorString());
       fprintf(stderr, "DEBUG: Printer credentials: %s\n", credinfo);
 
       if (!httpLoadCredentials(NULL, &lcreds, hostname))

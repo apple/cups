@@ -435,10 +435,16 @@ httpCredentialsGetTrust(
 
 
   if (!common_name)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No common name specified."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create credentials from array."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if (cg->any_root < 0)
   {
@@ -473,14 +479,27 @@ httpCredentialsGetTrust(
         * Do not trust certificates on first use...
 	*/
 
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+
         trust = HTTP_TRUST_INVALID;
       }
-      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) || !httpCredentialsAreValidForName(credentials, common_name))
+      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds))
       {
        /*
-        * Either the new credentials are not newly issued, or the common name
-	* does not match the issued certificate...
+        * The new credentials are not newly issued...
 	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are older than stored credentials."), 1);
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (!httpCredentialsAreValidForName(credentials, common_name))
+      {
+       /*
+        * The common name does not match the issued certificate...
+	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are not valid for name."), 1);
 
         trust = HTTP_TRUST_INVALID;
       }
@@ -499,7 +518,10 @@ httpCredentialsGetTrust(
     httpFreeCredentials(tcreds);
   }
   else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No stored credentials, not valid for name."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
 
   if (trust == HTTP_TRUST_OK && !cg->expired_certs)
   {
@@ -508,11 +530,17 @@ httpCredentialsGetTrust(
     time(&curtime);
     if (curtime < gnutls_x509_crt_get_activation_time(cert) ||
         curtime > gnutls_x509_crt_get_expiration_time(cert))
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Credentials have expired."), 1);
       trust = HTTP_TRUST_EXPIRED;
+    }
   }
 
   if (trust == HTTP_TRUST_OK && !cg->any_root && cupsArrayCount(credentials) == 1)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Self-signed credentials are blocked."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
 
   gnutls_x509_crt_deinit(cert);
 
