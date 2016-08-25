@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-08 12:26-0400\n"
+"POT-Creation-Date: 2016-08-25 09:50-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -3093,6 +3093,9 @@ msgstr ""
 msgid "Created"
 msgstr "Создано"
 
+msgid "Credentials have expired."
+msgstr ""
+
 msgid "Custom"
 msgstr "Индивидуальный"
 
@@ -4153,6 +4156,12 @@ msgstr "Вложенные группы не допускаются."
 msgid "Never"
 msgstr "Никогда"
 
+msgid "New credentials are not valid for name."
+msgstr ""
+
+msgid "New credentials are older than stored credentials."
+msgstr ""
+
 msgid "No"
 msgstr "Нет"
 
@@ -4186,6 +4195,9 @@ msgstr "Нет атрибутов в запросе."
 
 msgid "No authentication information provided."
 msgstr "Нет информации для проверки подлинности."
+
+msgid "No common name specified."
+msgstr ""
 
 msgid "No community name"
 msgstr "Нет имени сообщества"
@@ -4241,6 +4253,9 @@ msgstr "Не отправлен запрос."
 
 msgid "No request-id"
 msgstr "Нет идентификатора request-id"
+
+msgid "No stored credentials, not valid for name."
+msgstr ""
 
 msgid "No subscription attributes in request."
 msgstr "Нет атрибутов подписки в запросе."
@@ -4727,6 +4742,9 @@ msgstr ""
 msgid "Self Adhesive Film"
 msgstr ""
 
+msgid "Self-signed credentials are blocked."
+msgstr ""
+
 msgid "Semi-Gloss Fabric"
 msgstr ""
 
@@ -5191,6 +5209,9 @@ msgstr ""
 msgid "Triple Wall Cardboard"
 msgstr ""
 
+msgid "Trust on first use is disabled."
+msgstr ""
+
 msgid "URI Too Long"
 msgstr "Слишком длинный адрес URI"
 
@@ -5313,6 +5334,9 @@ msgstr "Не удается копировать файлы драйвера п�
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr "Не удается копировать файлы драйвера принтера Windows 9x (%d)"
+
+msgid "Unable to create credentials from array."
+msgstr ""
 
 msgid "Unable to create printer-uri"
 msgstr "Не удается создать printer-uri"

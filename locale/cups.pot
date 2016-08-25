@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-08 12:26-0400\n"
+"POT-Creation-Date: 2016-08-25 09:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3750,6 +3750,10 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: cups/tls-darwin.c:695 cups/tls-gnutls.c:539
+msgid "Credentials have expired."
+msgstr ""
+
 #: cups/ppd.c:1136 cups/ppd.c:1176 cups/ppd.c:1421 cups/ppd.c:1524
 msgid "Custom"
 msgstr ""
@@ -5151,6 +5155,14 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
+#: cups/tls-darwin.c:664 cups/tls-gnutls.c:502
+msgid "New credentials are not valid for name."
+msgstr ""
+
+#: cups/tls-darwin.c:654 cups/tls-gnutls.c:492
+msgid "New credentials are older than stored credentials."
+msgstr ""
+
 #: cups/ppd.c:1971
 msgid "No"
 msgstr ""
@@ -5194,6 +5206,10 @@ msgstr ""
 
 #: scheduler/ipp.c:3068
 msgid "No authentication information provided."
+msgstr ""
+
+#: cups/tls-darwin.c:604 cups/tls-gnutls.c:439
+msgid "No common name specified."
 msgstr ""
 
 #: cups/snmp.c:954
@@ -5267,6 +5283,10 @@ msgstr ""
 
 #: cups/snmp.c:968
 msgid "No request-id"
+msgstr ""
+
+#: cups/tls-darwin.c:684 cups/tls-gnutls.c:522
+msgid "No stored credentials, not valid for name."
 msgstr ""
 
 #: scheduler/ipp.c:5679
@@ -5911,6 +5931,10 @@ msgstr ""
 msgid "Self Adhesive Film"
 msgstr ""
 
+#: cups/tls-darwin.c:701 cups/tls-gnutls.c:546
+msgid "Self-signed credentials are blocked."
+msgstr ""
+
 #: cups/ppd-cache.c:3375
 msgid "Semi-Gloss Fabric"
 msgstr ""
@@ -5947,7 +5971,7 @@ msgstr ""
 msgid "Server Stopped"
 msgstr ""
 
-#: cups/tls-darwin.c:1101 cups/tls-gnutls.c:1192
+#: cups/tls-darwin.c:1133 cups/tls-gnutls.c:1225
 msgid "Server credentials not set."
 msgstr ""
 
@@ -6510,6 +6534,11 @@ msgstr ""
 msgid "Triple Wall Cardboard"
 msgstr ""
 
+#: cups/tls-darwin.c:644 cups/tls-darwin.c:689 cups/tls-gnutls.c:482
+#: cups/tls-gnutls.c:527
+msgid "Trust on first use is disabled."
+msgstr ""
+
 #: cups/http-support.c:1382
 msgid "URI Too Long"
 msgstr ""
@@ -6668,6 +6697,10 @@ msgstr ""
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 
+#: cups/tls-darwin.c:610 cups/tls-gnutls.c:445
+msgid "Unable to create credentials from array."
+msgstr ""
+
 #: cups/ppd-util.c:542 cups/util.c:482
 msgid "Unable to create printer-uri"
 msgstr ""
@@ -6676,7 +6709,7 @@ msgstr ""
 msgid "Unable to create printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1362 cups/tls-gnutls.c:1380
+#: cups/tls-darwin.c:1394 cups/tls-gnutls.c:1413
 msgid "Unable to create server credentials."
 msgstr ""
 
@@ -6700,35 +6733,35 @@ msgstr ""
 msgid "Unable to edit cupsd.conf files larger than 1MB"
 msgstr ""
 
-#: cups/tls-darwin.c:1529
+#: cups/tls-darwin.c:1561
 msgid "Unable to establish a secure connection to host (certificate chain invalid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1519
+#: cups/tls-darwin.c:1551
 msgid "Unable to establish a secure connection to host (certificate not yet valid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1514
+#: cups/tls-darwin.c:1546
 msgid "Unable to establish a secure connection to host (expired certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1524
+#: cups/tls-darwin.c:1556
 msgid "Unable to establish a secure connection to host (host name mismatch)."
 msgstr ""
 
-#: cups/tls-darwin.c:1534
+#: cups/tls-darwin.c:1566
 msgid "Unable to establish a secure connection to host (peer dropped connection before responding)."
 msgstr ""
 
-#: cups/tls-darwin.c:1509
+#: cups/tls-darwin.c:1541
 msgid "Unable to establish a secure connection to host (self-signed certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1504
+#: cups/tls-darwin.c:1536
 msgid "Unable to establish a secure connection to host (untrusted certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1561 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
+#: cups/tls-darwin.c:1593 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
@@ -6740,7 +6773,7 @@ msgstr ""
 msgid "Unable to find printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1375
+#: cups/tls-darwin.c:1407
 msgid "Unable to find server credentials."
 msgstr ""
 
@@ -6993,7 +7026,7 @@ msgstr ""
 msgid "Unknown scheme in URI"
 msgstr ""
 
-#: cups/http-addrlist.c:775
+#: cups/http-addrlist.c:781
 msgid "Unknown service name."
 msgstr ""
 

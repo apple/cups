@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-08 12:26-0400\n"
+"POT-Creation-Date: 2016-08-25 09:50-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3160,6 +3160,9 @@ msgstr ""
 msgid "Created"
 msgstr "Creato"
 
+msgid "Credentials have expired."
+msgstr ""
+
 msgid "Custom"
 msgstr "Personalizzato"
 
@@ -4227,6 +4230,12 @@ msgstr "Le classi nidificate non sono consentite."
 msgid "Never"
 msgstr "Mai"
 
+msgid "New credentials are not valid for name."
+msgstr ""
+
+msgid "New credentials are older than stored credentials."
+msgstr ""
+
 msgid "No"
 msgstr "No"
 
@@ -4260,6 +4269,9 @@ msgstr "Nessun attributo nella richiesta."
 
 msgid "No authentication information provided."
 msgstr "Nessuna informazione di autenticazione fornita."
+
+msgid "No common name specified."
+msgstr ""
 
 msgid "No community name"
 msgstr "Nessun nome della comunità"
@@ -4316,6 +4328,9 @@ msgstr ""
 
 msgid "No request-id"
 msgstr "Nessun request-id"
+
+msgid "No stored credentials, not valid for name."
+msgstr ""
 
 msgid "No subscription attributes in request."
 msgstr "Nessun attributo della sottoscrizione nella richiesta."
@@ -4801,6 +4816,9 @@ msgstr ""
 msgid "Self Adhesive Film"
 msgstr ""
 
+msgid "Self-signed credentials are blocked."
+msgstr ""
+
 msgid "Semi-Gloss Fabric"
 msgstr ""
 
@@ -5275,6 +5293,9 @@ msgstr ""
 msgid "Triple Wall Cardboard"
 msgstr ""
 
+msgid "Trust on first use is disabled."
+msgstr ""
+
 msgid "URI Too Long"
 msgstr "L'URI è troppo lungo"
 
@@ -5398,6 +5419,9 @@ msgstr "Non è possibile copiare i driver di Windows 2000 della stampante (%d)."
 #, c-format
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr "Non è possibile copiare i driver di Windows 9x della stampante (%d)."
+
+msgid "Unable to create credentials from array."
+msgstr ""
 
 msgid "Unable to create printer-uri"
 msgstr "Non è possibile creare il printer-uri"

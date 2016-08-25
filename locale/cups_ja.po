@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-08 12:26-0400\n"
+"POT-Creation-Date: 2016-08-25 09:50-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3119,6 +3119,9 @@ msgstr ""
 msgid "Created"
 msgstr "ジョブ作成"
 
+msgid "Credentials have expired."
+msgstr ""
+
 msgid "Custom"
 msgstr "カスタム"
 
@@ -4190,6 +4193,12 @@ msgstr "入れ子になったクラスは許可されていません。"
 msgid "Never"
 msgstr "Never"
 
+msgid "New credentials are not valid for name."
+msgstr ""
+
+msgid "New credentials are older than stored credentials."
+msgstr ""
+
 msgid "No"
 msgstr "いいえ"
 
@@ -4223,6 +4232,9 @@ msgstr "リクエストに属性がありません。"
 
 msgid "No authentication information provided."
 msgstr "認証情報が提供されていません。"
+
+msgid "No common name specified."
+msgstr ""
 
 msgid "No community name"
 msgstr "コミュニティ名がありません"
@@ -4277,6 +4289,9 @@ msgstr "リクエストが送られませんでした。"
 
 msgid "No request-id"
 msgstr "リクエストID がありません"
+
+msgid "No stored credentials, not valid for name."
+msgstr ""
 
 msgid "No subscription attributes in request."
 msgstr "リクエストにサブスクリプション属性がありません。"
@@ -4762,6 +4777,9 @@ msgstr ""
 msgid "Self Adhesive Film"
 msgstr ""
 
+msgid "Self-signed credentials are blocked."
+msgstr ""
+
 msgid "Semi-Gloss Fabric"
 msgstr ""
 
@@ -5230,6 +5248,9 @@ msgstr ""
 msgid "Triple Wall Cardboard"
 msgstr ""
 
+msgid "Trust on first use is disabled."
+msgstr ""
+
 msgid "URI Too Long"
 msgstr "URI が長すぎます"
 
@@ -5351,6 +5372,9 @@ msgstr ""
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 "複数の Windows 9x プリンタードライバーファイルをコピーできません (%d)。"
+
+msgid "Unable to create credentials from array."
+msgstr ""
 
 msgid "Unable to create printer-uri"
 msgstr "printer-uri を作成できません"

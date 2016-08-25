@@ -1,5 +1,11 @@
-CHANGES.txt - 2.2rc1 - 2016-08-08
----------------------------------
+CHANGES.txt - 2.2.0 - 2016-08-25
+--------------------------------
+
+CHANGES IN CUPS V2.2.0
+
+	- Normalized the TLS certificate validation code and added additional
+	  error messages to aid troubleshooting.
+
 
 CHANGES IN CUPS V2.2rc1
 

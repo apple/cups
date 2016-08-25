@@ -808,6 +808,7 @@
 "Cotton Envelope" = "Cotton Envelope";
 "Cover" = "Cover";
 "Created" = "Created";
+"Credentials have expired." = "Credentials have expired.";
 "Custom" = "Custom";
 "CustominCutInterval" = "CustominCutInterval";
 "CustominTearInterval" = "CustominTearInterval";
@@ -1144,6 +1145,8 @@
 "Name OID uses indefinite length" = "Name OID uses indefinite length";
 "Nested classes are not allowed." = "Nested classes are not allowed.";
 "Never" = "Never";
+"New credentials are not valid for name." = "New credentials are not valid for name.";
+"New credentials are older than stored credentials." = "New credentials are older than stored credentials.";
 "No" = "No";
 "No Content" = "No Content";
 "No Finishing" = "No Finishing";
@@ -1155,6 +1158,7 @@
 "No active jobs on %s." = "No active jobs on %s.";
 "No attributes in request." = "No attributes in request.";
 "No authentication information provided." = "No authentication information provided.";
+"No common name specified." = "No common name specified.";
 "No community name" = "No community name";
 "No default printer." = "No default printer.";
 "No destinations added." = "No destinations added.";
@@ -1173,6 +1177,7 @@
 "No request protocol version." = "No request protocol version.";
 "No request sent." = "No request sent.";
 "No request-id" = "No request-id";
+"No stored credentials, not valid for name." = "No stored credentials, not valid for name.";
 "No subscription attributes in request." = "No subscription attributes in request.";
 "No subscriptions found." = "No subscriptions found.";
 "No variable-bindings SEQUENCE" = "No variable-bindings SEQUENCE";
@@ -1330,6 +1335,7 @@
 "See remote printer." = "See remote printer.";
 "Self Adhesive" = "Self Adhesive";
 "Self Adhesive Film" = "Self Adhesive Film";
+"Self-signed credentials are blocked." = "Self-signed credentials are blocked.";
 "Semi-Gloss Fabric" = "Semi-Gloss Fabric";
 "Semi-Gloss Labels" = "Semi-Gloss Labels";
 "Semi-Gloss Optical Disc" = "Semi-Gloss Optical Disc";
@@ -1473,6 +1479,7 @@
 "Triple Staple (Reverse Landscape)" = "Triple Staple (Reverse Landscape)";
 "Triple Staple (Reverse Portrait)" = "Triple Staple (Reverse Portrait)";
 "Triple Wall Cardboard" = "Triple Wall Cardboard";
+"Trust on first use is disabled." = "Trust on first use is disabled.";
 "URI Too Long" = "URI Too Long";
 "URI too large" = "URI too large";
 "US Ledger" = "US Ledger";
@@ -1510,6 +1517,7 @@
 "Unable to copy PPD file." = "Unable to copy PPD file.";
 "Unable to copy Windows 2000 printer driver files (%d)." = "Unable to copy Windows 2000 printer driver files (%d).";
 "Unable to copy Windows 9x printer driver files (%d)." = "Unable to copy Windows 9x printer driver files (%d).";
+"Unable to create credentials from array." = "Unable to create credentials from array.";
 "Unable to create printer-uri" = "Unable to create printer-uri";
 "Unable to create printer." = "Unable to create printer.";
 "Unable to create server credentials." = "Unable to create server credentials.";

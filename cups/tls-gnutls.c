@@ -522,6 +522,11 @@ httpCredentialsGetTrust(
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No stored credentials, not valid for name."), 1);
     trust = HTTP_TRUST_INVALID;
   }
+  else if (!cg->trust_first)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+    trust = HTTP_TRUST_INVALID;
+  }
 
   if (trust == HTTP_TRUST_OK && !cg->expired_certs)
   {
