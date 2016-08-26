@@ -44,6 +44,7 @@ cups/testadmin
 cups/testarray
 cups/testcache
 cups/testconflicts
+cups/testcreds
 cups/testcups
 cups/testdest
 cups/testfile

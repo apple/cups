@@ -85,6 +85,7 @@ TESTOBJS	= \
 		testarray.o \
 		testcache.o \
 		testconflicts.o \
+		testcreds.o \
 		testcups.o \
 		testdest.o \
 		testfile.o \
@@ -153,6 +154,7 @@ UNITTARGETS =	\
 		testarray \
 		testcache \
 		testconflicts \
+		testcreds \
 		testcups \
 		testdest \
 		testfile \
@@ -414,6 +416,16 @@ testcache:	testcache.o $(LIBCUPSSTATIC)
 testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testconflicts.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testcreds (dependency on static CUPS library is intentional)
+#
+
+testcreds:	testcreds.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcreds.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
