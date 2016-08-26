@@ -5,7 +5,7 @@
 	<title>Developing Raster Printer Drivers	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,8 +353,6 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id$"
-
   Raster printer driver documentation for CUPS.
 
   Copyright 2007-2012 by Apple Inc.
@@ -369,7 +367,7 @@ div.contents ul.subcontents li {
 
 <h1 class='title'>Developing Raster Printer Drivers</h1>
 
-<p>This document describes how to develop printer drivers for raster printers. Topics include: <a href='#BASICS'>printer driver basics</a>, <a href='#CREATE'>creating new PPD files</a>, <a href='#FILTERS'>using filters</a>, <a href='#COLOR'>implementing color management</a>, and <a href='#MACOSX'>adding OS X features</a>.</p>
+<p>This document describes how to develop printer drivers for raster printers. Topics include: <a href='#BASICS'>printer driver basics</a>, <a href='#CREATE'>creating new PPD files</a>, <a href='#FILTERS'>using filters</a>, <a href='#COLOR'>implementing color management</a>, and <a href='#MACOSX'>adding macOS features</a>.</p>
 
 <div class='summary'><table summary='General Information'>
 <tbody>
@@ -390,7 +388,7 @@ div.contents ul.subcontents li {
 <li><a href="#CREATING">Creating New PPD Files</a></li>
 <li><a href="#FILTERS">Using Filters</a></li>
 <li><a href="#COLOR">Implementing Color Management</a></li>
-<li><a href="#MACOSX">Adding OS X Features</a></li>
+<li><a href="#MACOSX">Adding macOS Features</a></li>
 </ul>
 <h2 class='title'><a name='BASICS'>Printer Driver Basics</a></h2>
 
@@ -566,9 +564,9 @@ div.contents ul.subcontents li {
 
 <p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
 
-<h3><span class='info'>Since OS X 10.5</span>Custom Color Matching Support</h3>
+<h3><span class='info'>Since macOS 10.5</span>Custom Color Matching Support</h3>
 
-<p>OS X printer drivers that are based on an existing standard RGB colorspace can tell the system to use the corresponding colorspace instead of an arbitrary ICC color profile when doing color management. The <a href='#APCustom'><tt>APSupportsCustomColorMatching</tt></a> and <tt>APDefaultCustomColorMatchingProfile</tt> attributes can be used to enable this mode:</p>
+<p>macOS printer drivers that are based on an existing standard RGB colorspace can tell the system to use the corresponding colorspace instead of an arbitrary ICC color profile when doing color management. The <a href='#APCustom'><tt>APSupportsCustomColorMatching</tt></a> and <tt>APDefaultCustomColorMatchingProfile</tt> attributes can be used to enable this mode:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APSupportsCustomColorMatching "" true
@@ -576,9 +574,9 @@ div.contents ul.subcontents li {
 </pre>
 
 
-<h2 class='title'><a name='MACOSX'>Adding OS X Features</a></h2>
+<h2 class='title'><a name='MACOSX'>Adding macOS Features</a></h2>
 
-<p>OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
+<p>macOS printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin

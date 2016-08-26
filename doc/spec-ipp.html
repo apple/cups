@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Specifications -->
 <head>
@@ -8,11 +8,9 @@
 </head>
 <body>
 <!--
-  "$Id$"
+  IPP specification for CUPS.
 
-  CUPS IPP specification for CUPS.
-
-  Copyright 2007-2013 by Apple Inc.
+  Copyright 2007-2016 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -26,27 +24,37 @@
 
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
 
-<p>CUPS implements IPP/2.1 and the operations and attributes
-defined in the "IPP: Job and Printer Set Operations", "IPP/1.1:
-Output-bin Attribute Extension", and "IPP/1.1: finishings
-'fold',' trim', and 'bale' attribute values extension"
-specifications.</p>
+<p>CUPS implements <a href="http://ftp.pwg.org/pub/pwg/standards/std-ipp20-20151030-5100.12.pdf">IPP/2.1</a> and the operations and attributes defined in the following specifications:</p>
 
-<p>CUPS also provides 16 new operations and many new attributes
-to support multiple IPP printers and printer classes on a single
-host.</p>
+<ul>
+
+	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ippjobprinterext10-20101030-5100.11.pdf">PWG 5100.11: IPP Job and Printer Extensions - Set 2 (JPS2)</a> (all operations plus the "job-creation-attributes-supported", "job-ids", "job-password", "job-password-encryption", "media-col-database", and "which-jobs" attributes)</li>
+
+	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ippjobprinterext3v10-20120727-5100.13.pdf">PWG 5100.13: IPP Job and Printer Extensions - Set 3 (JPS3)</a> (all operations/attributes required for IPP Everywhere except "printer-geo-location" and "printer-icc-profiles")</li>
+
+	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ippeve10-20130128-5100.14.pdf">PWG 5100.14: IPP Everywhere</a> (conforming to the Client and most of the Printer requirements)</li>
+
+	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ippfaxout10-20140618-5100.15.pdf">PWG 5100.15: IPP FaxOut Service</a> (for facsimile queues)</li>
+
+	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ipptrans10-20131108-5100.16.pdf">PWG 5100.16: IPP Transaction-Based Printing Extensions</a></li>
+
+	<li><a href="http://tools.ietf.org/html/rfc3998">RFC 3998: IPP Job and Printer Administrative Operations</a> (Disable-Printer, Enable-Printer, Hold-New-Jobs, and Release-Held-New-Jobs operations)</li>
+
+	<li><a href="http://tools.ietf.org/html/rfc7472">RFC 7472: IPP over HTTPS Transport Binding and 'ipps' URI Scheme</a></li>
+
+</ul>
+
+<p>CUPS also provides 17 new operations and many new attributes to support multiple IPP printers and printer classes on a single host.</p>
 
 <h3 class='title'><a name='IPP_URIS'>IPP URIs</a></h3>
 
-<p>CUPS supports the "http", "https", and "ipp" schemes. The
-following resource names are used:</p>
+<p>CUPS supports the "http", "https", "ipp", and "ipps" schemes. The following resource names are used:</p>
 
 <dl>
 
 	<dt><tt>scheme://hostname:port/</tt></dt>
 
-	<dd>Can be used for all "get" operations and for server
-	subscriptions.</dd>
+	<dd>Can be used for all "get" operations and for server subscriptions.</dd>
 
 	<dt><tt>scheme://hostname:port/admin/</tt></dt>
 
@@ -66,15 +74,11 @@ following resource names are used:</p>
 
 </dl>
 
-<p>So a typical printer URI would be
-"ipp://foo.bar.com/printers/LaserJet". In addition, the CUPS
-server also supports normal browser access via
-"http://hostname:port/" and "https://hostname:port/".</p>
+<p>So a typical printer URI would be "ipp://foo.example.com/printers/LaserJet". In addition, the CUPS scheduler also supports (when enabled) normal browser access via "http://foo.example.com:port/" and "https://foo.example.com:port/".</p>
 
 <h3 class='title'><a name='IPP_OPERATIONS'>CUPS IPP Operations</a></h3>
 
-<p>CUPS provides 16 extension operations in addition to most of the
-standard IPP and registered extension operations:
+<p>CUPS provides 17 vendor extension operations in addition to most of the standard IPP and registered extension operations:</p>
 
 <div class='table'><table align='center' border='1' width='80%'
 summary='Supported Operations'>
@@ -88,7 +92,7 @@ summary='Supported Operations'>
 </thead>
 <tbody>
 <tr>
-	<td><a href='#PRINT_JOB'>Print-Job</a></td>
+	<td>Print-Job</td>
 	<td>1.0</td>
 	<td>0x0002</td>
 	<td>Print a file.</td>
@@ -100,7 +104,7 @@ summary='Supported Operations'>
 	<td>Validate job attributes.</td>
 </tr>
 <tr>
-	<td><a href='#CREATE_JOB'>Create-Job</a></td>
+	<td>Create-Job</td>
 	<td>1.1</td>
 	<td>0x0005</td>
 	<td>Create a print job.</td>
@@ -172,7 +176,13 @@ summary='Supported Operations'>
 	<td>Purge all jobs.</td>
 </tr>
 <tr>
-	<td><a href='#SET_JOB_ATTRIBUTES'>Set-Job-Attributes</a></td>
+	<td>Set-Printer-Attributes</td>
+	<td>1.4</td>
+	<td>0x0013</td>
+	<td>Set attributes for a printer.</td>
+</tr>
+<tr>
+	<td>Set-Job-Attributes</td>
 	<td>1.1</td>
 	<td>0x0014</td>
 	<td>Set attributes for a pending or held job.</td>
@@ -232,6 +242,36 @@ summary='Supported Operations'>
 	<td>Rejects jobs on a printer.</td>
 </tr>
 <tr>
+	<td>Hold-New-Jobs</td>
+	<td>1.4</td>
+	<td>0x0025</td>
+	<td>Hold new jobs by default.</td>
+</tr>
+<tr>
+	<td>Release-Held-New-Jobs</td>
+	<td>1.4</td>
+	<td>0x0026</td>
+	<td>Releases all jobs that were previously held.</td>
+</tr>
+<tr>
+	<td>Cancel-Jobs</td>
+	<td>1.5</td>
+	<td>0x0038</td>
+	<td>Cancel all jobs (administrator).</td>
+</tr>
+<tr>
+	<td>Cancel-My-Jobs</td>
+	<td>1.5</td>
+	<td>0x0039</td>
+	<td>Cancel all jobs (user).</td>
+</tr>
+<tr>
+	<td>Close-Job</td>
+	<td>1.5</td>
+	<td>0x003b</td>
+	<td>Close a created job.</td>
+</tr>
+<tr>
 	<td><a href='#CUPS_GET_DEFAULT'>CUPS-Get-Default</a></td>
 	<td>1.0</td>
 	<td>0x4001</td>
@@ -274,16 +314,16 @@ summary='Supported Operations'>
 	<td>Delete a printer class.</td>
 </tr>
 <tr>
-	<td><a href='#CUPS_ACCEPT_JOBS'>CUPS-Accept-Jobs</a></td>
+	<td>CUPS-Accept-Jobs</td>
 	<td>1.0</td>
 	<td>0x4008</td>
-	<td>Accept jobs on a printer or printer class.</td>
+	<td>Accept jobs on a printer or printer class. This operation is deprecated - use the Enable-Printer operation instead.</td>
 </tr>
 <tr>
-	<td><a href='#CUPS_REJECT_JOBS'>CUPS-Reject-Jobs</a></td>
+	<td>CUPS-Reject-Jobs</td>
 	<td>1.0</td>
 	<td>0x4009</td>
-	<td>Reject jobs on a printer or printer class.</td>
+	<td>Reject jobs on a printer or printer class. This operation is deprecated - use the Disable-Printer operation instead.</td>
 </tr>
 <tr>
 	<td><a href='#CUPS_SET_DEFAULT'>CUPS-Set-Default</a></td>
@@ -327,536 +367,66 @@ summary='Supported Operations'>
 	<td>0x4027</td>
 	<td>Get a document file from a job.</td>
 </tr>
+<tr>
+	<td><a href='#CUPS_CREATE_LOCAL_PRINTER'>CUPS-Create-Local-Printer</a></td>
+	<td>2.2</td>
+	<td>0x4028</td>
+	<td>Creates a local (temporary) print queue pointing to a remote IPP Everywhere printer.</td>
+</tr>
 </tbody>
 </table></div>
 
 <h2 class='title'><a name='OPERATIONS'>Operations</a></h2>
 
-<p>The following sections describe the operations supported by CUPS.
-In the interest of brevity, operations which use only the standard
-IPP attributes are not described.
+<p>The following sections describe the operations supported by CUPS. In the interest of brevity, operations which use only the standard IPP attributes are not described.
 
-<h3 class='title'><a name='PRINT_JOB'>Print-Job Operation</a></h3>
 
-<p>The Print-Job operation (0x0002) prints a file.
+<h3 class='title'><a name='CANCEL_JOB'>Cancel Job Operation (Extension)</a></h3>
 
-<h4>Print-Job Request</h4>
+<p>The Cancel-Job operation (0x0008) cancels the specified job. CUPS 1.4 added support for the <tt>purge-job (boolean)</tt> operation attribute that (if 'true') removes all history and document files for the job as well.</p>
 
-<p>The following groups of attributes are supplied as part of the
-Print-Job request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri):
-
-	<dd>The client MUST supply a URI for the specified printer.
-
-</dl>
-
-<p>Group 2: Job Template Attributes
-
-<dl>
-
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/OS X 10.5</span>
-
-	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
-
-	<dt>"job-billing" (text(MAX))<span class='info'>CUPS 1.1</span> or
-	"job-account-id (text(MAX))"<span class='info'>CUPS 1.7</span>:
-
-	<dd>The client OPTIONALLY supplies a billing string that is logged
-	with the page accounting information.
-
-	<dt>"job-sheets" (1setof type3 keyword | name(MAX)):<span class='info'>CUPS 1.1</span>
-
-	<dd>The client OPTIONALLY supplies one or two banner pages that
-	are printed before and after any files in the print job. The
-	name of "none" is reserved to indicate that no banner page
-	should be printed. If the client does not specify this
-	attribute then the value of the "job-sheets-default" printer
-	object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single job-sheets attribute
-	value.</blockquote>
-
-	<dt>"media" (1setof type3 keyword | name(MAX)):
-
-	<dd>The client OPTIONALLY supplies one or more media attributes
-	specifying the size, type, source, and color of the output
-	media. If the client does not specify this attribute then the
-	value of the "media-default" printer object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single media attribute
-	value.</blockquote>
-
-	<dt>Other Job Template Attributes
-
-</dl>
-
-<p>The Print-Job request is followed by a file to be printed.
-
-<h4>Print-Job Response</h4>
-
-<p>The following groups of attributes are send as part of the Print-Job
-Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<p>Group 2: Job Attributes
-
-<dl>
-
-	<dt>Standard Job Attributes
-
-</dl>
-
-<p>Group 3: Unsupported Attributes (status=client-eror-attributes-or-values-not-supported)
-
-<dl>
-
-	<dt>auth-info-required (1setOf Type2 keyword)
-
-	<dd>The required authentication information.
-
-</dl>
-
-<h3 class='title'><span class='info'>CUPS 1.1</span><a name='CREATE_JOB'>Create-Job Operation</a></h3>
-
-<p>The Create-Job operation (0x0005) creates a new, empty print job.
-
-<h4>Create-Job Request</h4>
-
-<p>The following groups of attributes are supplied as part of the
-Create-Job request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri):
-
-	<dd>The client MUST supply a URI for the specified printer.
-
-</dl>
-
-<p>Group 2: Job Template Attributes
-
-<dl>
-
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/OS X 10.5</span>
-
-	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
-
-	<dt>"job-billing" (text(MAX))<span class='info'>CUPS 1.1</span> or
-	"job-account-id (text(MAX))<span class='info'>CUPS 1.7</span>:
-
-	<dd>The client OPTIONALLY supplies a billing string that is logged
-	with the page accounting information.
-
-	<dt>"job-sheets" (1setof type3 keyword | name(MAX)):<span class='info'>CUPS 1.1</span>
-
-	<dd>The client OPTIONALLY supplies one or two banner pages that
-	are printed before and after any files in the print job. The
-	name of "none" is reserved to indicate that no banner page
-	should be printed. If the client does not specify this
-	attribute then the value of the "job-sheets-default" printer
-	object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single job-sheets attribute
-	value.</blockquote>
-
-	<dt>"media" (1setof type3 keyword | name(MAX)):
-
-	<dd>The client OPTIONALLY supplies one or more media attributes
-	specifying the size, type, source, and color of the output
-	media. If the client does not specify this attribute then the
-	value of the "media-default" printer object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single media attribute
-	value.</blockquote>
-
-	<dt>Standard Job Template Attributes
-
-</dl>
-
-<h4>Create-Job Response</h4>
-
-<p>The following groups of attributes are send as part of the
-Create-Job Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<p>Group 2: Job Attributes
-
-<dl>
-
-	<dt>Standard Job Attributes
-
-</dl>
-
-<p>Group 3: Unsupported Attributes (status=client-eror-attributes-or-values-not-supported)
-
-<dl>
-
-	<dt>auth-info-required (1setOf Type2 keyword)
-
-	<dd>The required authentication information.
-
-</dl>
-
-<h3 class='title'><a name='CANCEL_JOB'>Cancel Job Operation</a></h3>
-
-<p>The Cancel-Job operation (0x0008) cancels the specified job. CUPS 1.4 adds
-a new <tt>purge-job (boolean)</tt> attribute that allows you to purge both
-active and completed jobs, removing all history and document files for the
-job as well.
-
-<h4>Cancel-Job Request</h4>
-
-<p>The following groups of attributes are supplied as part of the
-Cancel-Job request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri) and "job-id" (integer)
-	<br><i>OR</i>
-	<br>"job-uri":
-
-	<dd>The client MUST supply a URI for the specified printer and
-	a job ID number, or the job URI.
-
-	<dt><span class="info">CUPS 1.4/OS X 10.6</span>"purge-job" (boolean):
-
-	<dd>The client OPTIONALLY supplies this attribute. When true,
-	all job files (history and document) are purged. The default
-	is false, leading to the standard IPP behavior.
-
-</dl>
-
-<h4>Cancel-Job Response</h4>
-
-<p>The following groups of attributes are send as part of the Cancel-Job
-Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
 
 <h3 class='title'><a name='PURGE_JOBS'>Purge-Jobs Operation</a></h3>
 
-<p>The Purge-Jobs operation (0x0012) cancels all of the jobs on a
-given destination and optionally removes all history and document
-files for the jobs as well.
+<p>The Purge-Jobs operation (0x0012) cancels all of the jobs on a given destination and optionally removes all history and document files for the jobs as well. CUPS 1.2 added support for the <tt>purge-job (boolean)</tt> operation attribute that (if 'false') retains all history and document files for the canceled jobs.</p>
 
-<h4>Purge-Jobs Request</h4>
+<blockquote><b>Note:</b>
+	<p>The Cancel-Jobs and Cancel-My-Jobs operations should be used instead of Purge-Jobs.</p>
+</blockquote>
 
-<p>The following groups of attributes are supplied as part of the
-Purge-Jobs request:
 
-<p>Group 1: Operation Attributes
 
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri):
-
-	<dd>The client MUST supply a URI for the specified printer or
-	"ipp://.../printers" for all printers and classes.
-
-	<dt><span class="info">CUPS 1.2/OS X 10.5</span>"requesting-user-name" (name(MAX)):
-
-	<dd>The client OPTIONALLY supplies this attribute to specify whose jobs
-	jobs are purged or canceled.
-
-	<dt><span class="info">CUPS 1.2/OS X 10.5</span>"my-jobs" (boolean):
-
-	<dd>The client OPTIONALLY supplies this attribute to specify that only
-	the jobs owned by the requesting user are purged or canceled. The
-	default is false.
-
-	<dt><span class="info">CUPS 1.2/OS X 10.5</span>"purge-jobs" (boolean):
-
-	<dd>The client OPTIONALLY supplies this attribute to specify
-	whether the jobs are purged (true) or just canceled (false).
-	The default is true.
-
-</dl>
-
-<h4>Purge-Jobs Response</h4>
-
-<p>The following groups of attributes are send as part of the Purge-Jobs
-Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<h3 class='title'><span class='info'>CUPS 1.1</span><a name='SET_JOB_ATTRIBUTES'>Set-Job-Attributes Operation</a></h3>
-
-<p>The Set-Job-Attributes operation (0x0014) changes the attributes of
-an active (not completed) job.
-
-<h4>Set-Job-Attributes Request</h4>
-
-<p>The following groups of attributes are supplied as part of the
-Set-Job-Attributes request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri) and "job-id" (integer)
-	<br><i>OR</i>
-	<br>"job-uri":
-
-	<dd>The client MUST supply a URI for the specified printer and
-	a job ID number, or the job URI.
-
-</dl>
-
-<p>Group 2: Job Template Attributes
-
-<dl>
-
-	<dt>"job-sheets" (1setof type3 keyword | name(MAX)):<span class='info'>CUPS 1.1</span>
-
-	<dd>The client OPTIONALLY supplies one or two banner pages that
-	are printed before and after any files in the print job. The
-	name of "none" is reserved to indicate that no banner page
-	should be printed. If the client does not specify this
-	attribute then the value of the "job-sheets-default" printer
-	object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single job-sheets attribute
-	value.</blockquote>
-
-	<dt>"media" (1setof type3 keyword | name(MAX)):
-
-	<dd>The client OPTIONALLY supplies one or more media attributes
-	specifying the size, type, source, and color of the output
-	media. If the client does not specify this attribute then the
-	value of the "media-default" printer object attribute is used.
-
-	<blockquote><b>Note:</b> Standard IPP only allows
-	specification of a single media attribute
-	value.</blockquote>
-
-	<dt>Other Job Template Attributes
-
-</dl>
-
-<h4>Set-Job-Attributes Response</h4>
-
-<p>The following groups of attributes are send as part of the Set-Job-Attributes
-Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<h3 class='title'><span class='info'>CUPS 1.2/OS X 10.5</span><a
+<h3 class='title'><span class='info'>CUPS 1.2/macOS 10.5</span><a
 name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
-<p>The Create-Printer-Subscription operation (0x0016) creates a
-subscription for printer or server event notifications. CUPS
-provides several additional events in addition to the standard
-events in the IPP notifications specification.</p>
+<p>The Create-Printer-Subscription operation (0x0016) creates a subscription for printer or server event notifications. CUPS provides several additional events in addition to the standard events in the IPP notifications specification. CUPS adds the following <tt>notify-events (1setOf type2 keyword)</tt> values:<p>
 
-<h4>Create-Printer-Subscription Request</h4>
+<ul>
 
-<p>The following groups of attributes are supplied as part of the
-request:</p>
+	<li><tt>printer-added</tt> - Get notified whenever a printer or class is added</li>
 
-<p>Group 1: Operation Attributes</p>
+	<li><tt>printer-deleted</tt> - Get notified whenever a printer or class is deleted</li>
 
-<dl>
+	<li><tt>printer-modified</tt> - Get notified whenever a printer or class is modified</li>
 
-	<dt>Natural Language and Character Set:
+	<li><tt>server-audit</tt> - Get notified when a security condition occurs</li>
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<li><tt>server-restarted</tt> - Get notified when the server is restarted</li>
 
-	<dt>"printer-uri" (uri):
+	<li><tt>server-started</tt> - Get notified when the server is started</li>
 
-	<dd>The printer
-	(<tt>ipp://server/printers/printername</tt>), class
-	(<tt>ipp://server/classes/classname</tt>), or server
-	(<tt>ipp://server/</tt>) URI for event notifications.
+	<li><tt>server-stopped</tt> - Get notified when the server is stopped</li>
 
-	<dt>"notify-events" (1setOf keyword):
+</ul>
 
-	<dd>The events to monitor. In addition to the standard
-	events, CUPS adds the following keywords:
-	<ul>
-
-		<li><tt>printer-added</tt> - Get notified
-		whenever a printer or class is added</li>
-
-		<li><tt>printer-deleted</tt> - Get notified
-		whenever a printer or class is deleted</li>
-
-		<li><tt>printer-modified</tt> - Get notified
-		whenever a printer or class is modified</li>
-
-		<li><tt>server-audit</tt> - Get notified when a
-		security condition occurs</li>
-
-		<li><tt>server-restarted</tt> - Get notified when
-		the server is restarted</li>
-
-		<li><tt>server-started</tt> - Get notified when
-		the server is started</li>
-
-		<li><tt>server-stopped</tt> - Get notified when
-		the server is stopped</li>
-
-	</ul>
-
-</dl>
-
-<h4>Create-Printer-Subscription Response</h4>
-
-<p>The following groups of attributes are send as part of the
-response:</p>
-
-<p>Group 1: Operation Attributes</p>
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<p>Group 2: Subscription Object Attributes</p>
-
-<dl>
-
-	<dt>"subscription-id" (integer):
-
-	<dd>The subscription number.
-
-</dl>
 
 <h3 class='title'><a name='CUPS_GET_DEFAULT'>CUPS-Get-Default Operation</a></h3>
 
-<p>The CUPS-Get-Default operation (0x4001) returns the default printer
-URI and attributes.
+<p>The CUPS-Get-Default operation (0x4001) returns the default printer URI and attributes.
 
 <h4>CUPS-Get-Default Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Get-Default request:
+<p>The following groups of attributes are supplied as part of the CUPS-Get-Default request:
 
 <p>Group 1: Operation Attributes
 
@@ -864,38 +434,29 @@ CUPS-Get-Default request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"requested-attributes" (1setOf keyword) :
+	<dt>"requested-attributes" (1setOf keyword):
 
-	<dd>The client OPTIONALLY supplies a set of attribute names
-	and/or attribute group names in whose values the requester is
-	interested. If the client omits this attribute, the server
-	responds as if this attribute had been supplied with a value of
-	'all'.
+	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
 </dl>
 
 <h4>CUPS-Get-Default Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Get-Default Response:
+<p>The following groups of attributes are send as part of the CUPS-Get-Default Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
 
 </dl>
 
@@ -909,14 +470,11 @@ CUPS-Get-Default Response:
 
 <h3 class='title'><a name='CUPS_GET_PRINTERS'>CUPS-Get-Printers Operation</a></h3>
 
-<p>The CUPS-Get-Printers operation (0x4002) returns the printer
-attributes for every printer known to the system. This may include
-printers that are not served directly by the server.
+<p>The CUPS-Get-Printers operation (0x4002) returns the printer attributes for every printer known to the system. This may include printers that are not served directly by the server.
 
 <h4>CUPS-Get-Printers Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Get-Printers request:
+<p>The following groups of attributes are supplied as part of the CUPS-Get-Printers request:
 
 <p>Group 1: Operation Attributes
 
@@ -924,69 +482,57 @@ CUPS-Get-Printers request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
-	<dd>The client OPTIONALLY supplies this attribute to
-	select the first printer that is returned.
+	<dd>The client OPTIONALLY supplies this attribute to select the first printer that is returned.
 
 	<dt>"limit" (integer (1:MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute limiting the
-	number of printers that are returned.
+	<dd>The client OPTIONALLY supplies this attribute limiting the number of printers that are returned.
+
+	<dt>"printer-id" (integer(0:65535)): <span class='info'>CUPS 2.2</span>
+
+	<dd>The client OPTIONALLY supplies this attribute to select which printer is returned.
 
 	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
 
-	<dd>The client OPTIONALLY supplies this attribute to
-	select which printers are returned.
+	<dd>The client OPTIONALLY supplies this attribute to select which printers are returned.
 
 	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 
-	<dd>The client OPTIONALLY supplies a printer type enumeration to
-	select which printers are returned.
+	<dd>The client OPTIONALLY supplies a printer type enumeration to select which printers are returned.
 
 	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span>
 
-	<dd>The client OPTIONALLY supplies a printer type mask
-	enumeration to select which bits are used in the "printer-type"
-	attribute.
+	<dd>The client OPTIONALLY supplies a printer type mask enumeration to select which bits are used in the "printer-type" attribute.
 
-	<dt>"requested-attributes" (1setOf keyword) :
+	<dt>"requested-attributes" (1setOf keyword):
 
-	<dd>The client OPTIONALLY supplies a set of attribute names
-	and/or attribute group names in whose values the requester is
-	interested. If the client omits this attribute, the server
-	responds as if this attribute had been supplied with a value of
-	'all'.
+	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
-	<dd>The client OPTIONALLY supplies a user name that is used to filter
-	the returned printers.
+	<dd>The client OPTIONALLY supplies a user name that is used to filter the returned printers.
 
 </dl>
 
 <h4>CUPS-Get-Printers Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Get-Printers Response:
+<p>The following groups of attributes are send as part of the CUPS-Get-Printers Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
 
 </dl>
 
@@ -994,20 +540,18 @@ CUPS-Get-Printers Response:
 
 <dl>
 
-	<dt>The set of requested attributes and their current values for
-	each printer.
+	<dt>The set of requested attributes and their current values for each printer.
 
 </dl>
 
+
 <h3 class='title'><a name='CUPS_ADD_MODIFY_PRINTER'>CUPS-Add-Modify-Printer Operation</a></h3>
 
-<p>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or
-modifies an existing printer on the system.
+<p>The CUPS-Add-Modify-Printer operation (0x4003) adds a new printer or modifies an existing printer on the system.
 
 <h4>CUPS-Add-Modify-Printer Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Add-Modify-Printer request:
+<p>The following groups of attributes are supplied as part of the CUPS-Add-Modify-Printer request:
 
 <p>Group 1: Operation Attributes
 
@@ -1015,9 +559,7 @@ CUPS-Add-Modify-Printer request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri):
 
@@ -1029,79 +571,59 @@ CUPS-Add-Modify-Printer request:
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
-	<dt>"job-sheets-default" (1setOf name(127)): <span
-	class='info'>CUPS 1.1.7</span>
+	<dt>"job-sheets-default" (1setOf name(127)): <span class='info'>CUPS 1.1.7</span>
 
-	<dd>The client OPTIONALLY supplies one or two banner page
-	names that are printed before and after files in a job.
-	The reserved name "none" is used to specify that no
-	banner page should be printed.
+	<dd>The client OPTIONALLY supplies one or two banner page names that are printed before and after files in a job. The reserved name "none" is used to specify that no banner page should be printed.
 
 	<dt>"device-uri" (uri):
 
-	<dd>The client OPTIONALLY supplies a device URI for the
-	specified printer.
+	<dd>The client OPTIONALLY supplies a device URI for the specified printer.
 
 	<dt>"port-monitor" (name(127)):
 
-	<dd>The client OPTIONALLY supplies a port monitor name for the
-	specified printer.
+	<dd>The client OPTIONALLY supplies a port monitor name for the specified printer.
 
-	<dt>"ppd-name" (name(127)):
+	<dt>"ppd-name" (name(255)):
 
-	<dd>The client OPTIONALLY supplies a PPD name for the specified
-	printer.
+	<dd>The client OPTIONALLY supplies a PPD name for the specified printer.
 
 	<dt>"printer-is-accepting-jobs" (boolean):
 
-	<dd>The client OPTIONALLY supplies this boolean attribute
-	indicating whether or not the printer object should accept new jobs.
+	<dd>The client OPTIONALLY supplies this boolean attribute indicating whether the printer object should accept new jobs.
 
 	<dt>"printer-info" (text(127)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating the
-	printer information string.
+	<dd>The client OPTIONALLY supplies this attribute indicating the printer information string.
 
 	<dt>"printer-location" (text(127)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	textual location of the printer.
+	<dd>The client OPTIONALLY supplies this attribute indicating a textual location of the printer.
 
 	<dt>"printer-more-info" (uri):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	URI for additional printer information.
+	<dd>The client OPTIONALLY supplies this attribute indicating a URI for additional printer information.
 
 	<dt>"printer-state" (type2 enum):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating the
-	initial/current state of the printer. Only the "idle" and "stopped"
-	enumerations are recognized.
+	<dd>The client OPTIONALLY supplies this attribute indicating the initial/current state of the printer. Only the 'idle(3)' and 'stopped(5)' enumerations are recognized.
 
 	<dt>"printer-state-message" (text(MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	textual reason for the current printer state.
+	<dd>The client OPTIONALLY supplies this attribute indicating a textual reason for the current printer state.
 
 	<dt>"requesting-user-name-allowed" (1setof name(127) | delete)
 	<br><i>OR</i>
 	<br>"requesting-user-name-denied" (1setof name(127) | delete):
 
-	<dd>The client OPTIONALLY supplies one of these attributes to
-	specify an access control list for incoming print jobs. To allow
-	all users access to a printer, use the delete tag for the
-	attribute value.
+	<dd>The client OPTIONALLY supplies one of these attributes to specify an access control list for incoming print jobs. To allow all users access to a printer, use the delete tag for the attribute value.
 
 </dl>
 
-<p>The CUPS-Add-Modify-Printer request can optionally be followed by a PPD
-file or System V interface script to be used for the printer. The
-"ppd-name" attribute overrides any file that is attached to the end of
-the request with a local CUPS PPD file.
+<p>The CUPS-Add-Modify-Printer request can optionally be followed by a PPD file to be used for the printer. The "ppd-name" attribute overrides any file that is attached to the end of the request with a local CUPS PPD file.
 
 <h4>CUPS-Add-Modify-Printer Response</h4>
 
@@ -1112,27 +634,24 @@ CUPS-Add-Modify-Printer Response:
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
+
 
 <h3 class='title'><a name='CUPS_DELETE_PRINTER'>CUPS-Delete-Printer Operation</a></h3>
 
-<p>The CUPS-Delete-Printer operation (0x4004) removes an existing
-printer from the system.
+<p>The CUPS-Delete-Printer operation (0x4004) removes an existing printer from the system.
 
 <h4>CUPS-Delete-Printer Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Delete-Printer request:
+<p>The following groups of attributes are supplied as part of the CUPS-Delete-Printer request:
 
 <p>Group 1: Operation Attributes
 
@@ -1140,9 +659,7 @@ CUPS-Delete-Printer request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri):
 
@@ -1152,35 +669,30 @@ CUPS-Delete-Printer request:
 
 <h4>CUPS-Delete-Printer Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Delete-Printer Response:
+<p>The following groups of attributes are send as part of the CUPS-Delete-Printer Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
 
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
+
 
 <h3 class='title'><a name='CUPS_GET_CLASSES'>CUPS-Get-Classes Operation</a></h3>
 
-<p>The CUPS-Get-Classes operation (0x4005) returns the printer
-attributes for every printer class known to the system. This may
-include printer classes that are not served directly by the server.
+<p>The CUPS-Get-Classes operation (0x4005) returns the printer attributes for every printer class known to the system. This may include printer classes that are not served directly by the server.
 
 <h4>CUPS-Get-Classes Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Get-Classes request:
+<p>The following groups of attributes are supplied as part of the CUPS-Get-Classes request:
 
 <p>Group 1: Operation Attributes
 
@@ -1188,65 +700,53 @@ CUPS-Get-Classes request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dt>"first-printer-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
 
-	<dd>The client OPTIONALLY supplies this attribute to
-	select the first printer that is returned.
+	<dd>The client OPTIONALLY supplies this attribute to select the first printer that is returned.
 
 	<dt>"limit" (integer (1:MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute limiting the
-	number of printer classes that are returned.
+	<dd>The client OPTIONALLY supplies this attribute limiting the number of printer classes that are returned.
 
 	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
-	<dd>The client OPTIONALLY supplies this attribute to
-	select which printer classes are returned.
+
+	<dd>The client OPTIONALLY supplies this attribute to select which printer classes are returned.
 
 	<dt>"printer-type" (type2 enum): <span class='info'>CUPS 1.1.7</span>
-	<dd>The client OPTIONALLY supplies a printer type enumeration to
-	select which printer classes are returned.
+
+	<dd>The client OPTIONALLY supplies a printer type enumeration to select which printer classes are returned.
 
 	<dt>"printer-type-mask" (type2 enum): <span class='info'>CUPS 1.1.7</span>
-	<dd>The client OPTIONALLY supplies a printer type mask
-	enumeration to select which bits are used in the "printer-type"
-	attribute.
 
-	<dt>"requested-attributes" (1setOf keyword) :
+	<dd>The client OPTIONALLY supplies a printer type mask enumeration to select which bits are used in the "printer-type" attribute.
 
-	<dd>The client OPTIONALLY supplies a set of attribute names
-	and/or attribute group names in whose values the requester is
-	interested. If the client omits this attribute, the server responds as
-	if this attribute had been supplied with a value of 'all'.
+	<dt>"requested-attributes" (1setOf keyword):
 
-	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2/OS X 10.5</span>
+	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dd>The client OPTIONALLY supplies a user name that is used to filter
-	the returned printers.
+	<dt>"requested-user-name" (name(127)): <span class='info'>CUPS 1.2/macOS 10.5</span>
+
+	<dd>The client OPTIONALLY supplies a user name that is used to filter the returned printers.
 
 </dl>
 
 <h4>CUPS-Get-Classes Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Get-Classes Response:
+<p>The following groups of attributes are send as part of the CUPS-Get-Classes Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
 
 </dl>
 
@@ -1254,20 +754,17 @@ CUPS-Get-Classes Response:
 
 <dl>
 
-	<dt>The set of requested attributes and their current values for
-	each printer class.
+	<dt>The set of requested attributes and their current values for each printer class.
 
 </dl>
 
 <h3 class='title'><a name='CUPS_ADD_MODIFY_CLASS'>CUPS-Add-Modify-Class Operation</a></h3>
 
-<p>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class or
-modifies and existing printer class on the system.
+<p>The CUPS-Add-Modify-Class operation (0x4006) adds a new printer class or modifies and existing printer class on the system.
 
 <h4>CUPS-Add-Modify-Class Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Add-Modify-Class request:
+<p>The following groups of attributes are supplied as part of the CUPS-Add-Modify-Class request:
 
 <p>Group 1: Operation Attributes
 
@@ -1275,9 +772,7 @@ CUPS-Add-Modify-Class request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri):
 
@@ -1289,54 +784,43 @@ CUPS-Add-Modify-Class request:
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info-required" (1setOf type2 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
 	<dt>"member-uris" (1setof uri):
 
-	<dd>The client OPTIONALLY supplies the "member-uris" set
-	specifying the printers and printer classes that are part of the class.
+	<dd>The client OPTIONALLY supplies the "member-uris" set specifying the printers and printer classes that are part of the class.
 
 	<dt>"printer-is-accepting-jobs" (boolean):
 
-	<dd>The client OPTIONALLY supplies this boolean attribute
-	indicating whether or not the class object should accept new jobs.
+	<dd>The client OPTIONALLY supplies this boolean attribute indicating whether the class object should accept new jobs.
 
 	<dt>"printer-info" (text(127)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating the
-	printer information string.
+	<dd>The client OPTIONALLY supplies this attribute indicating the printer information string.
 
 	<dt>"printer-location" (text(127)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	textual location of the class.
+	<dd>The client OPTIONALLY supplies this attribute indicating a textual location of the class.
 
 	<dt>"printer-more-info" (uri):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	URI for additional class information.
+	<dd>The client OPTIONALLY supplies this attribute indicating a URI for additional class information.
 
 	<dt>"printer-state" (type2 enum):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating the
-	initial/current state of the class. Only the "idle" and "stopped"
-	enumerations are recognized.
+	<dd>The client OPTIONALLY supplies this attribute indicating the initial/current state of the class. Only the 'idle(3)' and 'stopped(5)' enumerations are recognized.
 
 	<dt>"printer-state-message" (text(MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	textual reason for the current class state.
+	<dd>The client OPTIONALLY supplies this attribute indicating a textual reason for the current class state.
 
 	<dt>"requesting-user-name-allowed" (1setof name(127))
 	<br><i>OR</i>
 	<br>"requesting-user-name-denied" (1setof name(127)):
 
-	<dd>The client OPTIONALLY supplies one of these attributes to
-	specify an access control list for incoming print jobs. To allow
-	all users access to a class, use the delete tag for the
-	attribute value.
+	<dd>The client OPTIONALLY supplies one of these attributes to specify an access control list for incoming print jobs. To allow all users access to a class, use the delete tag for the attribute value.
 
 </dl>
 
@@ -1348,27 +832,24 @@ CUPS-Add-Modify-Class request:
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
+
 
 <h3 class='title'><a name='CUPS_DELETE_CLASS'>CUPS-Delete-Class Operation</a></h3>
 
-<p>The CUPS-Delete-Class operation (0x4007) removes an existing printer
-class from the system.
+<p>The CUPS-Delete-Class operation (0x4007) removes an existing printer class from the system.
 
 <h4>CUPS-Delete-Class Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Delete-Class request:
+<p>The following groups of attributes are supplied as part of the CUPS-Delete-Class request:
 
 <p>Group 1: Operation Attributes
 
@@ -1376,9 +857,7 @@ CUPS-Delete-Class request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri):
 
@@ -1388,142 +867,30 @@ CUPS-Delete-Class request:
 
 <h4>CUPS-Delete-Class Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Delete-Class Response:
+<p>The following groups of attributes are send as part of the CUPS-Delete-Class Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
 
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
 
-<h3 class='title'><a name='CUPS_ACCEPT_JOBS'>CUPS-Accept-Jobs Operation</a></h3>
-
-<p>The CUPS-Accept-Jobs operation (0x4008) sets the
-"printer-is-accepting-jobs" attribute to true for the specified printer
-or printer class.
-
-<h4>CUPS-Accept-Jobs Request</h4>
-
-<p>The following groups of attributes are supplied as part of the
-CUPS-Accept-Jobs request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri):
-
-	<dd>The client MUST supply a URI for the specified printer or printer class.
-
-</dl>
-
-<h4>CUPS-Accept-Jobs Response</h4>
-
-<p>The following groups of attributes are send as part of the
-CUPS-Accept-Jobs Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
-
-<h3 class='title'><a name='CUPS_REJECT_JOBS'>CUPS-Reject-Jobs Operation</a></h3>
-
-<p>The CUPS-Reject-Jobs operation (0x4009) sets
-the"printer-is-accepting-jobs" attribute to false for the specified
-printer or printer class.
-
-<h4>CUPS-Reject-Jobs Request</h4>
-
-<p>The following groups of attributes are supplied as part of the
-CUPS-Reject-Jobs request:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
-
-	<dt>"printer-uri" (uri):
-
-	<dd>The client MUST supply a URI for the specified printer or printer class.
-
-</dl>
-
-<p>Group 2: Printer Object Attributes
-
-<dl>
-
-	<dt>"printer-state-message" (text(MAX)):
-
-	<dd>The client OPTIONALLY supplies this attribute indicating a
-	textual reason for the current printer state.
-
-</dl>
-
-<h4>CUPS-Reject-Jobs Response</h4>
-
-<p>The following groups of attributes are send as part of the
-CUPS-Reject-Jobs Response:
-
-<p>Group 1: Operation Attributes
-
-<dl>
-
-	<dt>Status Message:
-
-	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
-</dl>
 
 <h3 class='title'><a name='CUPS_SET_DEFAULT'>CUPS-Set-Default Operation</a></h3>
 
-<p>The CUPS-Set-Default operation (0x400A) sets the default printer
-destination for all clients when a resource name of "/printers" is
-specified.
+<p>The CUPS-Set-Default operation (0x400A) sets the default printer destination for all clients when a resource name of "/printers" is specified.
 
 <h4>CUPS-Set-Default Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Set-Default request:
+<p>The following groups of attributes are supplied as part of the CUPS-Set-Default request:
 
 <p>Group 1: Operation Attributes
 
@@ -1531,47 +898,40 @@ CUPS-Set-Default request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri):
 
-	<dd>The client MUST supply a URI for the specified printer or
-	printer class.
+	<dd>The client MUST supply a URI for the specified printer or printer class.
 
 </dl>
 
 <h4>CUPS-Set-Default Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Set-Default Response:
+<p>The following groups of attributes are send as part of the CUPS-Set-Default Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
 
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.1</span><a name='CUPS_GET_DEVICES'>CUPS-Get-Devices Operation</a></h3>
 
-<p>The CUPS-Get-Devices operation (0x400B) returns all of the
-supported device-uri's for the server.</p>
+<h3 class='title'><span class='info'>Deprecated</span><a name='CUPS_GET_DEVICES'>CUPS-Get-Devices Operation</a></h3>
+
+<p>The CUPS-Get-Devices operation (0x400B) returns all of the supported device-uri's for the server.</p>
 
 <h4>CUPS-Get-Devices Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Get-Devices request:
+<p>The following groups of attributes are supplied as part of the CUPS-Get-Devices request:
 
 <p>Group 1: Operation Attributes
 
@@ -1579,70 +939,53 @@ CUPS-Get-Devices request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"device-class" (type1 keyword):
 
-	<dd>The client OPTIONALLY supplies a device class keyword to select
-	which devices are returned.
+	<dd>The client OPTIONALLY supplies a device class keyword to select which devices are returned.
 
-	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
-	<dd>The client OPTIONALLY supplies a set of scheme names that the
-	requestor does not want to discover. If the client omits this attribute,
-	the server responds with devices of all schemes specified by
-	the "include-schemes" attribute.
+	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor does not want to discover. If the client omits this attribute, the server responds with devices of all schemes specified by the "include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
-	<dd>The client OPTIONALLY supplies a set of scheme names that the
-	requestor wants to discover. If the client omits this attribute,
-	the server responds with devices of all schemes except those specified
-	by the "exclude-schemes" attribute.
+	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor wants to discover. If the client omits this attribute, the server responds with devices of all schemes except those specified by the "exclude-schemes" attribute.
 
 	<dt>"limit" (integer (1:MAX)):
 
-	<dd>The client OPTIONALLY supplies this attribute limiting the number of
-	devices that are returned.
+	<dd>The client OPTIONALLY supplies this attribute limiting the number of devices that are returned.
 
-	<dt>"requested-attributes" (1setOf keyword) :
+	<dt>"requested-attributes" (1setOf keyword):
 
-	<dd>The client OPTIONALLY supplies a set of attribute names and/or
-	attribute group names in whose values the requester is interested. If
-	the client omits this attribute, the server responds as if this
-	attribute had been supplied with a value of 'all'.
+	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'.
 
-	<dt>"timeout" (integer (1:MAX)) :<span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"timeout" (integer (1:MAX)): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
-	<dd>The client OPTIONALLY supplies this attribute to limit the duration
-	of the lookup. The default timeout is 15 seconds.
+	<dd>The client OPTIONALLY supplies this attribute to limit the duration of the lookup. The default timeout is 15 seconds.
 
 </dl>
 
 <h4>CUPS-Get-Devices Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Get-Devices Response:
+<p>The following groups of attributes are send as part of the CUPS-Get-Devices Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
 
-<p>Group 2: Device Object Attributes
+<p>Groups 2-N: Device Object Attributes (using printer-attributes-tag group)
 
 <dl>
 
@@ -1651,15 +994,14 @@ CUPS-Get-Devices Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.1</span><a name='CUPS_GET_PPDS'>CUPS-Get-PPDs Operation</a></h3>
 
-<p>The CUPS-Get-PPDs operation (0x400C) returns all of the
-locally available PPD files on the system.</p>
+<h3 class='title'><span class='info'>Deprecated</span><a name='CUPS_GET_PPDS'>CUPS-Get-PPDs Operation</a></h3>
+
+<p>The CUPS-Get-PPDs operation (0x400C) returns all of the locally available PPD files on the system.</p>
 
 <h4>CUPS-Get-PPDs Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Get-PPDs request:
+<p>The following groups of attributes are supplied as part of the CUPS-Get-PPDs request:
 
 <p>Group 1: Operation Attributes
 
@@ -1667,23 +1009,15 @@ CUPS-Get-PPDs request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
-	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"exclude-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
-	<dd>The client OPTIONALLY supplies a set of scheme names that the
-	requestor does not want to list. If the client omits this attribute,
-	the server responds with PPDs of all schemes specified by the
-	"include-schemes" attribute.
+	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor does not want to list. If the client omits this attribute, the server responds with PPDs of all schemes specified by the "include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4/OS X 10.6</span>
+	<dt>"include-schemes" (1setOf name): <span class='info'>CUPS 1.4/macOS 10.6</span>
 
-	<dd>The client OPTIONALLY supplies a set of scheme names that the
-	requestor wants to list. If the client omits this attribute, the server
-	responds with PPDs of all schemes except those specified by the
-	"exclude-schemes" attribute.
+	<dd>The client OPTIONALLY supplies a set of scheme names that the requestor wants to list. If the client omits this attribute, the server responds with PPDs of all schemes except those specified by the "exclude-schemes" attribute.
 
 	<dt>"limit" (integer (1:MAX)):
 
@@ -1693,31 +1027,31 @@ CUPS-Get-PPDs request:
 
 	<dd>The client OPTIONALLY supplies a printer manufacturer to select which PPDs are returned.
 
-	<dt>"ppd-make-and-model" (text(127)):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-make-and-model" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a make and model to select which PPDs are returned.
 
-	<dt>"ppd-model-number" (integer):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-model-number" (integer): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a model number to select which PPDs are returned.
 
-	<dt>"ppd-natural-language" (naturalLanguage):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-natural-language" (naturalLanguage): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a language to select which PPDs are returned.
 
-	<dt>"ppd-product" (text(127)):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-product" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript product string to select which PPDs are returned.
 
-	<dt>"ppd-psversion" (text(127)):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-psversion" (text(127)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript version string to select which PPDs are returned.
 
-	<dt>"ppd-type" (type1 keyword):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"ppd-type" (type1 keyword): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a driver type to select which PPDs are returned.
 
-	<dt>"requested-attributes" (1setOf keyword) :
+	<dt>"requested-attributes" (1setOf keyword):
 
 	<dd>The client OPTIONALLY supplies a set of attribute names and/or attribute group names in whose values the requester is interested. If the client omits this attribute, the server responds as if this attribute had been supplied with a value of 'all'. Specify "ppd-make" to get a list of manufacturers.
 
@@ -1732,36 +1066,32 @@ CUPS-Get-PPDs Response:
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 </dl>
 
-<p>Group 2: PPD Attributes
+<p>Groups 2-N: PPD Attributes (using printer-attributes-tag group)
 
 <dl>
 
-	<dt>The set of requested attributes and their current values for each
-	PPD file.
+	<dt>The set of requested attributes and their current values for each PPD file.
 
 </dl>
 
+
 <h3 class='title'><span class='info'>CUPS 1.1</span><a name='CUPS_MOVE_JOB'>CUPS-Move-Job Operation</a></h3>
 
-<p>The CUPS-Move-Job operation (0x400D) moves an active print job or all print
-jobs for a printer to a different printer.</p>
+<p>The CUPS-Move-Job operation (0x400D) moves an active print job or all print jobs for a printer to a different printer.</p>
 
 <h4>CUPS-Move-Job Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Move-Job request:
+<p>The following groups of attributes are supplied as part of the CUPS-Move-Job request:
 
 <p>Group 1: Operation Attributes
 
@@ -1769,18 +1099,15 @@ CUPS-Move-Job request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri)
 	<br><i>OR</i>
 	<dt>"printer-uri" (uri) and "job-id" (integer)
 	<br><i>OR</i>
-	<br>"job-uri":
+	<br>"job-uri" (uri):
 
-	<dd>The client MUST supply a URI for the specified printer, the URI for
-	the specified printer and a job ID number, or the job URI.
+	<dd>The client MUST supply a URI for the specified printer, the URI for the specified printer and a job ID number, or the job URI.
 
 </dl>
 
@@ -1788,7 +1115,7 @@ CUPS-Move-Job request:
 
 <dl>
 
-	<dt>"job-printer-uri" (uri)
+	<dt>"job-printer-uri" (uri):
 
 	<dd>The client MUST supply a URI for a printer on the same server.
 
@@ -1796,8 +1123,7 @@ CUPS-Move-Job request:
 
 <h4>CUPS-Move-Job Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Move-Job Response:
+<p>The following groups of attributes are send as part of the CUPS-Move-Job Response:
 
 <p>Group 1: Operation Attributes
 
@@ -1809,23 +1135,17 @@ CUPS-Move-Job Response:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.2/OS X 10.5</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.2/macOS 10.5</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
 
-<p>The CUPS-Authenticate-Job operation (0x400E) authenticates a print job for
-printing, releasing the job if it is held. Typically this is used when printing
-to a remote server. The authentication information is passed in the HTTP
-request; the HTTP connection is normally encrypted for this type of request.</p>
+<p>The CUPS-Authenticate-Job operation (0x400E) authenticates a print job for printing, releasing the job if it is held. Typically this is used when printing to a remote server. The authentication information is passed in the HTTP request; the HTTP connection is normally encrypted for this type of request.</p>
 
 <h4>CUPS-Authenticate-Job Request</h4>
 
-<p>The following groups of attributes are supplied as part of the
-CUPS-Authenticate-Job request:
+<p>The following groups of attributes are supplied as part of the CUPS-Authenticate-Job request:
 
 <p>Group 1: Operation Attributes
 
@@ -1833,16 +1153,13 @@ CUPS-Authenticate-Job request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri) and "job-id" (integer)
 	<br><i>OR</i>
-	<br>"job-uri":
+	<br>"job-uri" (uri):
 
-	<dd>The client MUST supply a URI for the specified printer and
-	a job ID number, or the job URI.
+	<dd>The client MUST supply a URI for the specified printer and a job ID number, or the job URI.
 
 </dl>
 
@@ -1850,36 +1167,31 @@ CUPS-Authenticate-Job request:
 
 <dl>
 
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"auth-info" (1setOf text(MAX)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
-	<dt>"job-hold-until" (keyword | name(MAX)):<span class='info'>CUPS 1.3/OS X 10.5</span>
+	<dt>"job-hold-until" (keyword | name(MAX)): <span class='info'>CUPS 1.3/macOS 10.5</span>
 
-	<dd>The client OPTIONALLY supplies a new job-hold-until value for the
-	job. If specified and not the "no-hold" value, the job is held instead
-	of released for printing.
+	<dd>The client OPTIONALLY supplies a new job-hold-until value for the job. If specified and not the "no-hold" value, the job is held instead of released for printing.
 
 </dl>
 
 <h4>CUPS-Authenticate-Job Response</h4>
 
-<p>The following groups of attributes are send as part of the
-CUPS-Authenticate-Job Response:
+<p>The following groups of attributes are send as part of the CUPS-Authenticate-Job Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
 
 </dl>
 
@@ -1893,28 +1205,20 @@ CUPS-Authenticate-Job Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.3/OS X 10.5</span><a name='CUPS_GET_PPD'>CUPS-Get-PPD Operation</a></h3>
 
-<p>The CUPS-Get-PPD operation (0x400F) gets a PPD file from the
-server. The PPD file can be specified using a <tt>ppd-name</tt>
-returned by <a href='#CUPS_GET_PPDS'><tt>CUPS-Get-PPDs</tt></a>
-or using the <tt>printer-uri</tt> for a queue.</p>
+<h3 class='title'><span class='info'>Deprecated</span><a name='CUPS_GET_PPD'>CUPS-Get-PPD Operation</a></h3>
 
-<p>If the PPD file is found, <tt>successful-ok</tt> is returned with
-the PPD file following the response data.</p>
+<p>The CUPS-Get-PPD operation (0x400F) gets a PPD file from the server. The PPD file can be specified using a <tt>ppd-name</tt> returned by <a href='#CUPS_GET_PPDS'><tt>CUPS-Get-PPDs</tt></a> or using the <tt>printer-uri</tt> for a queue.</p>
 
-<p>If the PPD file cannot be served by the local server because
-the <tt>printer-uri</tt> attribute points to an external printer,
-a <tt>cups-see-other</tt> status is returned with the correct
-URI to use.</p>
+<p>If the PPD file is found, <tt>successful-ok</tt> is returned with the PPD file following the response data.</p>
 
-<p>If the PPD file does not exist, <tt>client-error-not-found</tt> is
-returned.</p>
+<p>If the PPD file cannot be served by the local server because the <tt>printer-uri</tt> attribute points to an external printer, a <tt>cups-see-other</tt> status is returned with the correct URI to use.</p>
+
+<p>If the PPD file does not exist, <tt>client-error-not-found</tt> is returned.</p>
 
 <h4>CUPS-Get-PPD Request</h4>
 
-<p>The following group of attributes is supplied as part of the
-CUPS-Get-PPD request:
+<p>The following group of attributes is supplied as part of the CUPS-Get-PPD request:
 
 <p>Group 1: Operation Attributes
 
@@ -1922,9 +1226,7 @@ CUPS-Get-PPD request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri)
 	<br><i>OR</i>
@@ -1936,53 +1238,42 @@ CUPS-Get-PPD request:
 
 <h4>CUPS-Get-PPD Response</h4>
 
-<p>The following group of attributes is sent as part of the
-CUPS-Get-PPD Response:
+<p>The following group of attributes is sent as part of the CUPS-Get-PPD Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
 
 	<dt>Status Message:
 
 	<dd>The standard response status message.
 
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
-
 	<dt>"printer-uri" (uri):
 
-	<dd>The printer that provides the actual PPD file when
-	the status code is cups-see-other (0x280)
+	<dd>The printer that provides the actual PPD file when the status code is cups-see-other (0x280).
 
 </dl>
 
-<p>If the status code is <tt>successful-ok</tt>, the PPD file follows
-the end of the IPP response.</p>
+<p>If the status code is <tt>successful-ok</tt>, the PPD file follows the end of the IPP response.</p>
 
-<h3 class='title'><span class='info'>CUPS 1.4/OS X 10.6</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
 
-<p>The CUPS-Get-Document operation (0x4027) gets a document file from a
-job on the server. The document file is specified using the
-<tt>document-number</tt> and either the <tt>job-uri</tt> or <tt>printer-uri</tt>
-and <tt>job-id</tt> identifying the job.</p>
+<h3 class='title'><span class='info'>CUPS 1.4/macOS 10.6</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
 
-<p>If the document file is found, <tt>successful-ok</tt> is returned with
-the document file following the response data.</p>
+<p>The CUPS-Get-Document operation (0x4027) gets a document file from a job on the server. The document file is specified using the <tt>document-number</tt> and either the <tt>job-uri</tt> or <tt>printer-uri</tt> and <tt>job-id</tt> identifying the job.</p>
 
-<p>If the document file does not exist, <tt>client-error-not-found</tt> is
-returned.</p>
+<p>If the document file is found, <tt>successful-ok</tt> is returned with the document file following the response data.</p>
 
-<p>If the requesting user does not have access to the document file,
-<tt>client-error-not-authorized</tt> is returned.
+<p>If the document file does not exist, <tt>client-error-not-found</tt> is returned.</p>
+
+<p>If the requesting user does not have access to the document file, <tt>client-error-not-authorized</tt> is returned.
 
 <h4>CUPS-Get-Document Request</h4>
 
-<p>The following group of attributes is supplied as part of the
-CUPS-Get-Document request:
+<p>The following group of attributes is supplied as part of the CUPS-Get-Document request:
 
 <p>Group 1: Operation Attributes
 
@@ -1990,9 +1281,7 @@ CUPS-Get-Document request:
 
 	<dt>Natural Language and Character Set:
 
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.1 of the IPP Model and
-	Semantics document.
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
 
 	<dt>"printer-uri" (uri) and "job-id" (integer)
 	<br><i>OR</i>
@@ -2002,33 +1291,25 @@ CUPS-Get-Document request:
 
 	<dt>"document-number" (integer(1:MAX)):
 
-	<dd>The client MUST supply a document number to retrieve. The
-	<tt>document-count</tt> attribute for the job defines the maximum
-	document number that can be specified. In the case of jobs with
-	banners (<tt>job-sheets</tt> is not "none"), document number 1
-	will typically contain the start banner and document number N
-	will typically contain the end banner.
+	<dd>The client MUST supply a document number to retrieve. The <tt>document-count</tt> attribute for the job defines the maximum document number that can be specified. In the case of jobs with banners (<tt>job-sheets</tt> is not "none"), document number 1 will typically contain the start banner and document number N will typically contain the end banner.
 
 </dl>
 
 <h4>CUPS-Get-Document Response</h4>
 
-<p>The following group of attributes is sent as part of the
-CUPS-Get-Document Response:
+<p>The following group of attributes is sent as part of the CUPS-Get-Document Response:
 
 <p>Group 1: Operation Attributes
 
 <dl>
 
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
 	<dt>Status Message:
 
 	<dd>The standard response status message.
-
-	<dt>Natural Language and Character Set:
-
-	<dd>The "attributes-charset" and "attributes-natural-language"
-	attributes as described in section 3.1.4.2 of the IPP Model and
-	Semantics document.
 
 	<dt>"document-format" (mimeType):
 
@@ -2044,560 +1325,439 @@ CUPS-Get-Document Response:
 
 </dl>
 
-<p>If the status code is <tt>successful-ok</tt>, the document file follows
-the end of the IPP response.</p>
+<p>If the status code is <tt>successful-ok</tt>, the document file follows the end of the IPP response.</p>
+
+
+<h3 class='title'><a name='CUPS_CREATE_LOCAL_PRINTER'>CUPS-Create-Local-Printer</a></h3>
+
+<p>The CUPS-Create-Local-Printer operation (0x4028) creates a local (temporary) print queue pointing to a remote IPP Everywhere Printer. The queue will remain until the scheduler idle exits, is restarted, or the system is restarted or shutdown. Temporary print queues can be made permanent by an administrator by setting the "printer-is-shared" attribute to 'true'.</p>
+
+<p>At a minimum, the scheduler requires a name and URI for the Printer to add. When successful, the local "printer-uri" values are returned and may be used by the Client to submit Job Creation Requests, monitor for state changes, and so forth.</p>
+
+<p>If the named printer already exists, the scheduler will reject the request with the 'client-error-not-possible' status code.</p>
+
+<p>Access Rights: The authenticated user performing this operation MUST be a Local User of the system, and the request MUST be made over a local (domain socket or loopback interface) address. Otherwise, the request will be rejected with the 'client-error-forbidden' status code.</p>
+
+<h4>CUPS-Create-Local-Printer Request</h4>
+
+<p>The following group of attributes is supplied as part of the CUPS-Create-Local-Printer request:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.1 of the IPP Model and Semantics document.
+
+</dl>
+
+<p>Group 2: Printer Attributes
+
+<dl>
+
+	<dt>"printer-name" (name(127)):
+
+	<dd>The Client MUST supply this attribute which provides the name for the new Printer.
+
+	<dt>"device-uri" (uri):
+
+	<dd>The Client MUST supply this attribute which provides an "ipp" or "ipps" URI pointing to an IPP Everywhere Printer.
+
+	<dt>"printer-device-id" (text(1023)):
+
+	<dd>The Client OPTIONALLY supplies this attribute which provides the IEEE 1284 device ID for the new Printer.
+
+	<dt>"printer-geo-location" (uri):
+
+	<dd>The Client OPTIONALLY supplies this attribute which provides the geo-location of the new Printer as a "geo" URI.
+
+	<dt>"printer-info" (text(127)):
+
+	<dd>The Client OPTIONALLY supplies this attribute which provides the description for the new Printer.
+
+	<dt>"printer-location" (text(127)):
+
+	<dd>The Client OPTIONALLY supplies this attribute which provides the location of the new Printer.
+
+</dl>
+
+<h4>CUPS-Create-Local-Printer Response</h4>
+
+<p>The following group of attributes is sent as part of the CUPS-Create-Local-Printer Response:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language" attributes as described in section 3.1.4.2 of the IPP Model and Semantics document.
+
+	<dt>Status Message:
+
+	<dd>The standard response status message.
+
+</dl>
+
+<p>Group 2: Printer Attributes
+
+<dl>
+
+	<dt>"printer-id" (integer(0:65535)):
+
+	<dd>The numeric identifier for the created Printer.
+
+	<dt>"printer-is-accepting-jobs" (boolean):
+
+	<dd>Whether the created Printer is accepting jobs at the time of the response.
+
+	<dt>"printer-state" (type1 enum):
+
+	<dd>The state of the created Printer at the time of the response.
+
+	<dt>"printer-state-reasons" (1setOf type2 keyword):
+
+	<dd>The state keywords for the created Printer at the time of the response.
+
+	<dt>"printer-uri-supported" (1setOf uri):
+
+	<dd>The URIs for the created Printer.
+
+</dl>
 
 
 <h2 class='title'><a name='ATTRIBUTES'>Attributes</a></h2>
 
-<p>CUPS provides many extension attributes to support multiple
-devices, PPD files, standard job filters, printers, and printer
-classes.</p>
+<p>CUPS provides many extension attributes to support multiple devices, PPD files, standard job filters, printers, and printer classes.</p>
 
-<h3 class='title'><a name='DEVICE_ATTRIBUTES'>Device Attributes</a></h3>
+<h3 class='title'><a name='DEVICE_ATTRIBUTES'>Device Attributes</a><span class="info">Deprecated</span></h3>
 
-<p>Device attributes are returned by the CUPS-Get-Devices
-operation and enumerate all of the available hardware devices and
-network protocols that are supported by the server.</p>
+<p>Device attributes are returned by the CUPS-Get-Devices operation and enumerate all of the available hardware devices and network protocols that are supported by the server. Device attributes are reported in the printer-attributes-tag group.</p>
 
-<h4><a name="device-class">device-class (type2 keyword)</a></h4>
+<h4><a name="device-class">device-class (type2 keyword)</a><span class="info">Deprecated</span></h4>
 
-<p>The device-class attribute specifies the class of device and can be
-one of the following:
+<p>The "device-class" attribute provides the class of device and can be one of the following:
 
 <ul>
 
-	<li>"file" - a disk file.
+	<li>'file': A disk file.
 
-	<li>"direct" - a parallel or fixed-rate serial data port,
+	<li>'direct': A parallel or fixed-rate serial data port,
 	currently used for Centronics, IEEE-1284, and USB printer
 	ports.
 
-	<li>"serial" - a variable-rate serial port.
+	<li>'serial': A variable-rate serial port.
 
-	<li>"network" - a network connection, typically via AppSocket,
-	HTTP, IPP, LPD, or SMB/CIFS protocols.
+	<li>'network': A network connection, typically via AppSocket, HTTP, IPP, LPD, or SMB/CIFS protocols.
 
 </ul>
 
-<h4><a name="device-id">device-id (text(127))</a><span class="info">CUPS 1.2/OS X 10.5</span></h4>
+<h4><a name="device-id">device-id (text(1023))</a><span class="info">Deprecated</span></h4>
 
-<p>The device-id attribute specifies the IEEE-1284 device ID
-string for the device.</p>
+<p>The "device-id" attribute provides the IEEE-1284 device ID string for the device.</p>
 
-<h4><a name="device-info">device-info (text(127))</a></h4>
+<h4><a name="device-info">device-info (text(127))</a><span class="info">Deprecated</span></h4>
 
-<p>The device-info attribute specifies a human-readable string describing
-the device, e.g. "Parallel Port #1".
+<p>The "device-info" attribute specifies a human-readable string describing the device, e.g., 'Parallel Port #1'.
 
-<h4><a name="device-location">device-location (text(127))</a><span class="info">CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="device-location">device-location (text(127))</a><span class="info">Deprecated</span></h4>
 
-<p>The device-location attribute specifies the physical location of the
-printer.
+<p>The "device-location" attribute specifies the physical location of the printer, e.g., '2nd Floor Computer Lab'.
 
-<h4><a name="device-make-and-model">device-make-and-model (text(127))</a></h4>
+<h4><a name="device-make-and-model">device-make-and-model (text(127))</a><span class="info">Deprecated</span></h4>
 
-<p>The device-make-and-model attribute specifies a device
-identification string provided by the printer connected to the device.
-If the device or printer does not support identification then this
-attribute contains the string "unknown".
+<p>The "device-make-and-model" attribute specifies a device identification string provided by the printer connected to the device. If the device or printer does not support identification then this attribute contains the string 'unknown'.
 
 <h4><a name="device-uri">device-uri (uri)</a></h4>
 
-<p>The device-uri attribute specifies a unique identifier for the
-device. The actual format of the device-uri string depends on the value
-of the device-class attribute:
+<p>The "device-uri" attribute specifies a unique identifier for the device. The actual format of the "device-uri" string depends on the value of the "device-class" attribute:
 
 <ul>
 
-	<li>"file" - The device-uri will be of the form
-	"file:///path/to/filename".
+	<li>'file': The "device-uri" will be of the form 'file:///path/to/filename'.
 
-	<li>"direct" - The device-uri will be of the form
-	"scheme:/dev/filename" or "scheme://vendor/identifier",
-	where scheme may be "parallel" or "usb" in the current
-	implementation.
+	<li>'direct': The "device-uri" will be of the form 'scheme:/dev/filename' or 'scheme://vendor/identifier', where scheme may be 'parallel' or 'usb' in the current implementation.
 
-	<li>"serial" - The device-uri will be of the form
-	"serial:/dev/filename?baud=value+parity=value+flow=value".
-	The baud value is the data rate in bits per second; the
-	supported values depend on the underlying hardware.
-	The parity value can be one of "none", "even", or "odd".
-	The flow value can be one of "none", "soft" (XON/XOFF
-	handshaking), "hard" or "rts/cts" (RTS/CTS handshaking),
-	or "dtrdsr" (DTR/DSR handshaking).
+	<li>'serial': The "device-uri" will be of the form 'serial:/dev/filename?baud=value+parity=value+flow=value'. The baud value is the data rate in bits per second; the supported values depend on the underlying hardware. The parity value can be one of "none", "even", or "odd". The flow value can be one of "none", "soft" (XON/XOFF handshaking), "hard" or "rts/cts" (RTS/CTS handshaking), or "dtrdsr" (DTR/DSR handshaking).
 
-	<p>The URI returned by CUPS-Get-Devices will contain the
-	maximum baud rate supported by the device and the best
-	type of flow control available ("soft" or "hard").
+	<p>The URI returned by CUPS-Get-Devices will contain the maximum baud rate supported by the device and the best type of flow control available ("soft" or "hard").
 
-	<li>"network" - The device-uri will be of the form
-	"scheme://[username:password@]hostname[:port]/[resource]",
-	where scheme may be "http", "https", "ipp", "lpd", "smb", or
-	"socket" in the current implementation.
+	<li>'network': The "device-uri" will be of the form 'scheme://[username:password@]hostname[:port]/[resource]', where scheme may be "http", "https", "ipp", "lpd", "smb", or "socket" in the current implementation.
 
-	<p>The URI returned by CUPS-Get-Devices will only contain
-	the scheme name ("scheme"). It is up to the client
-	application to add the appropriate host and other
-	information when adding a new printer.
+	<p>The URI returned by CUPS-Get-Devices MAY only contain the scheme name ('scheme'). It is up to the client application to add the appropriate host and other information when adding a new printer.
 
-	<p>The URI returned by Get-Printer-Attributes and
-	CUPS-Get-Printers has any username and password information
-	stripped; the information is still stored and used by the
-	server internally to perform any needed authentication.
+	<p>The URI returned by Get-Printer-Attributes and CUPS-Get-Printers has any username and password information stripped; the information is still stored and used by the server internally to perform any needed authentication.
 
 </ul>
 
-<h3 class='title'><a name='JOB_TEMPLATE_ATTRIBUTES'>Job Template Attributes</a></h3>
 
-<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
+<h3 class='title'><a name='JOB_ATTRIBUTES'>Job Attributes</a></h3>
 
-<p>The auth-info attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
+<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3/macOS 10.5</span></h4>
 
-<h4><a name="cpi">cpi (type2 enum)</a></h4>
-
-<p>The cpi attribute specifies the number of characters per inch when
-printing text files. Only the values 10, 12, and 17 are currently
-supported. The default value is 10.
-
-<h4><a name="fit-to-page">fit-to-page (boolean)</a><span class="info">CUPS 1.4/OS X 10.6</span></h4>
-
-<p>The fit-to-page attribute specifies whether to scale documents to fit on the
-selected media (fit-to-page=true) or use the physical size specified in the
-document (fit-to-page=false). The default value is false.
-
-<h4><a name="job-billing">job-billing (text(MAX))</a><span class='info'>CUPS 1.1</span></h4>
-
-<p>The job-billing attribute provides a text value to associate with a job
-for billing purposes.
-
-<blockquote><b>Note:</b> This attribute has been superceded by the "job-account-id" attribute defined in PWG 5100.11: Job and Printer Extensions - Set 2.</blockquote>
+<p>The "auth-info" attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
 
 <h4><a name="job-cancel-after">job-cancel-after (integer(1:MAX))</a><span class='info'>CUPS 2.0</span></h4>
 
-<p>The job-cancel-after attribute provides the maximum number of seconds that are allowed for processing a job.</p>
+<p>The "job-cancel-after" attribute provides the maximum number of seconds that are allowed for processing a job.</p>
 
 <h4><a name="job-hold-until">job-hold-until (keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
-<p>The job-hold-until attribute specifies a hold time. In addition to the
-standard IPP/1.1 keyword names, CUPS supports name values of the form
-"HH:MM" and "HH:MM:SS" that specify a hold time. The hold time is in
-Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the
-specified time is less than the current time, the job is held until the
-next day.
+<p>The "job-hold-until" attribute specifies a hold time. In addition to the standard IPP/1.1 keyword names, CUPS supports name values of the form "HH:MM" and "HH:MM:SS" that specify a hold time. The hold time is in Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the specified time is less than the current time, the job is held until the next day.
 
-<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
-<p>The job-media-progress attribute specifies the percentage of completion of
-the current page. It is only valid when the job-state attribute has the
-"processing" value (5).</p>
+<p>The "job-media-progress" status attribute specifies the percentage of completion of the current page. It is only valid when the "job-state" attribute has the 'processing(5)' value.</p>
 
-<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The job-printer-state-message attribute provides the last known value of the printer-state-message attribute for the printer that processed (or is processing) the job.</p>
+<p>The "job-printer-state-message" status attribute provides the last known value of the "printer-state-message" attribute for the printer that processed (or is processing) the job.</p>
 
-<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The job-printer-state-reasons attribute provides the last known value of the printer-state-reasons attribute for the printer that processed (or is processing) the job.</p>
+<p>The "job-printer-state-reasons" status attribute provides the last known value of the "printer-state-reasons" attribute for the printer that processed (or is processing) the job.</p>
 
 <h4><a name="job-sheets">job-sheets (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
-<p>The job-sheets attribute specifies one or two banner files that are printed
-before and after a job. The reserved value of "none" disables banner printing.
-The default value is stored in the job-sheets-default attribute.
+<p>The "job-sheets" attribute specifies one or two banner files that are printed before and after a job. The reserved value of "none" disables banner printing. The default value is stored in the "job-sheets-default" attribute.
 
-<p>If only one value is supplied, the banner file is printed before the job.
-If two values are supplied, the first value is used as the starting banner
-file and the second as the ending banner file.
+<p>If only one value is supplied, the banner file is printed before the job. If two values are supplied, the first value is used as the starting banner file and the second as the ending banner file.
 
-<h4><a name="job-originating-host-name">job-originating-host-name (name(MAX))</a></h4>
+<h4><a name="job-originating-host-name">job-originating-host-name (name(MAX))</a><span class='info'>CUPS 1.1.5/macOS 10.2</span></h4>
 
-<p><i>(CUPS 1.1.5 and higher)</i>
-
-<p>The job-originating-host-name attribute specifies the host
-from which the job was queued. The value will be the hostname or
-IP address of the client depending on whether hostname
-resolution is enabled.  The localhost address (127.0.0.1) is
-<b>always</b> resolved to the name "localhost".
+<p>The "job-originating-host-name" status attribute specifies the host from which the job was queued. The value will be the hostname or IP address of the client depending on whether hostname resolution is enabled.  The localhost address (127.0.0.1) is <b>always</b> resolved to the name "localhost".
 
 <p>This attribute is read-only.
 
-<h4><a name="lpi">lpi (type2 enum)</a></h4>
-
-<p>The lpi attribute specifies the number of lines per inch when
-printing text files. Only the values 6 and 8 are currently supported.
-The default value is 6.
-
-<h4><a name="mirror">mirror (boolean)</a></h4>
-
-<p>The mirror attribute specifies whether pages are mirrored on
-their X axis, which is useful for printing transfer images on
-special media. The default value is false.
-
-<h4><a name="number-up-layout">number-up-layout (type2 keyword)</a><span class='info'>Deprecated/Introduced in CUPS 1.1.15</span></h4>
-
-<p>The number-up-layout attribute specifies the order each input
-page is placed on each output page. The following keywords are
-presently defined:
-
-<ul>
-
-	<li><CODE>btlr</CODE> - Bottom to top, left to right</li>
-
-	<li><CODE>btrl</CODE> - Bottom to top, right to left</li>
-
-	<li><CODE>lrbt</CODE> - Left to right, bottom to top</li>
-
-	<li><CODE>lrtb</CODE> - Left to right, top to bottom (default)</li>
-
-	<li><CODE>rlbt</CODE> - Right to left, bottom to top</li>
-
-	<li><CODE>rltb</CODE> - Right to left, top to bottom</li>
-
-	<li><CODE>tblr</CODE> - Top to bottom, left to right</li>
-
-	<li><CODE>tbrl</CODE> - Top to bottom, right to left</li>
-
-</ul>
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is deprecated in favor of the PWG presentation-direction-number-up attribute and will be removed in a future release.</p>
-
-</blockquote>
-
 <h4><a name="page-border">page-border (type2 keyword)</a><span class='info'>CUPS 1.1.15</span></h4>
-<p>The page-border attribute specifies whether a border is
-draw around each page. The following keywords are presently
-defined:
+
+<p>The "page-border" attribute specifies whether a border is draw around each page. The following keywords are presently defined:
 
 <ul>
 
-	<li><CODE>double</CODE> - Two hairline borders are drawn</li>
+	<li>'double': Two hairline borders are drawn</li>
 
-	<li><CODE>double-thick</CODE> - Two 1pt borders are drawn</li>
+	<li>'double-thick': Two 1pt borders are drawn</li>
 
-	<li><CODE>none</CODE> - No border is drawn (default)</li>
+	<li>'none': No border is drawn (default)</li>
 
-	<li><CODE>single</CODE> - A single hairline border is drawn</li>
+	<li>'single': A single hairline border is drawn</li>
 
-	<li><CODE>single-thick</CODE> - A single 1pt border is drawn</li>
+	<li>'single-thick': A single 1pt border is drawn</li>
 
 </ul>
 
-<h4><a name="page-bottom">page-bottom (integer(0:MAX))</a><span class="info">Deprecated</span></h4>
+<h4><a name="page-set">page-set (type2 keyword)</a><span class="info">Deprecated</span></h4>
 
-<p>The page-bottom attribute specifies the bottom margin in points (72 points
-equals 1 inch). The default value is the device physical margin.
+<p>The "page-set" attribute specifies which pages to print in a file. The supported keywords are 'all', 'even', and 'odd'. The default value is 'all'.
 
-<h4><a name="page-label">page-label (text(MAX))</a><span class='info'>Deprecated</span></h4>
-<p>The page-label attribute provides a text value to place in
-the header and footer on each page. If a classification level is
-set on the server, then this classification is printed before
-the page label.
+<h3 class='title'><a name='PPD_ATTRIBUTES'>PPD Attributes</a><span class="info">Deprecated</span></h3>
 
-<h4><a name="page-left">page-left (integer(0:MAX))</a><span class="info">Deprecated</span></h4>
+<p>PPD attributes are returned in the printer-attributes-tag group.
 
-<p>The page-left attribute specifies the left margin in points (72 points
-equals 1 inch). The default value is the device physical margin.
+<h4><a name="ppd-device-id">ppd-device-id (text(127))</a><span class="info">Deprecated</span></h4>
 
-<h4><a name="page-right">page-right (integer(0:MAX))</a><span class="info">Deprecated</span></h4>
+<p>The "ppd-device-id" attribute specifies the IEEE-1284 device ID string for the device described by the PPD file.</p>
 
-<p>The page-right attribute specifies the right margin in points (72 points
-equals 1 inch). The default value is the device physical margin.
+<h4><a name="ppd-make">ppd-make (text(127))</a><span class="info">Deprecated</span></h4>
 
-<h4><a name="page-set">page-set (type2 keyword)</a></h4>
+<p>The "ppd-make" attribute specifies the manufacturer of the printer (the Manufacturer attribute in the PPD file). If the manufacturer is not specified in the PPD file then an educated guess is made using the NickName attribute in the PPD file.
 
-<p>The page-set attribute specifies which pages to print in a file. The
-supported keywords are "all", "even", and "odd". The default value is
-"all".
+<h4><a name="ppd-make-and-model">ppd-make-and-model (text(127))</a><span class="info">Deprecated</span></h4>
 
-<h4><a name="page-top">page-top (integer(0:MAX))</a><span class="info">Deprecated</span></h4>
+<p>The "ppd-make-and-model" attribute specifies the manufacturer and model name of the PPD file (the NickName attribute in the PPD file). If the make and model is not specified in the PPD file then the ModelName or ShortNickName attributes are used instead.
 
-<p>The page-top attribute specifies the top margin in points (72 points
-equals 1 inch). The default value is the device physical margin.
+<h4><a name="ppd-model-number">ppd-model-number (integer)</a><span class="info">Deprecated</span></h4>
 
-<h4><a name="prettyprint">prettyprint (boolean)</a><span class="info">Deprecated</span></h4>
+<p>The "ppd-model-number" attribute provides the <tt>cupsModelNumber</tt> value from the PPD file.
 
-<p>The prettyprint attribute specifies whether text files should be printed
-with a shaded header and keyword highlighting (prettyprint=true) or without
-additional formatting (prettyprint=false). The default value is false.
+<h4><a name="ppd-name">ppd-name (name(255))</a><span class="info">Deprecated</span></h4>
 
-<h4><a name="wrap">wrap (boolean)</a><span class="info">Deprecated</span></h4>
+<p>The "ppd-name" attribute specifies either the PPD filename on the server relative to the model directory or a URI that maps to a specific driver interface in the driver directory. The forward slash (/) is used to delineate directories.
 
-<p>The wrap attribute specifies whether long lines should be wrapped
-(wrap=true) or not (wrap=false) when printing text files. The default
-value is true.
+<h4><a name="ppd-natural-language">ppd-natural-language (1setOf naturalLanguage)</a><span class="info">Deprecated</span></h4>
 
-<h3 class='title'><a name='PPD_ATTRIBUTES'>PPD Attributes</a></h3>
+<p>The "ppd-natural-language" attribute specifies the language encoding of the PPD file (the LanguageVersion attribute in the PPD file). If the language is unknown or undefined then "en" (English) is assumed.
 
-<h4><a name="ppd-device-id">ppd-device-id (text(127))</a></h4>
+<h4><a name="ppd-product">ppd-product (1setOf text(127))</a><span class="info">Deprecated</span></h4>
 
-<p>The ppd-device-id attribute specifies the IEEE-1284 device ID
-string for the device described by the PPD file.</p>
+<p>The "ppd-product" attribute specifies the Product attribute values in the PPD file.
 
-<h4><a name="ppd-make">ppd-make (text(127))</a></h4>
+<h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">Deprecated</span></h4>
 
-<p>The ppd-make attribute specifies the manufacturer of the printer
-(the Manufacturer attribute in the PPD file). If the manufacturer
-is not specified in the PPD file then an educated guess is made using
-the NickName attribute in the PPD file.
+<p>The "ppd-product" attribute specifies the PSVersion attribute values in the PPD file.
 
-<h4><a name="ppd-make-and-model">ppd-make-and-model (text(127))</a></h4>
+<h4><a name="ppd-type">ppd-type (type1 keyword)</a><span class="info">Deprecated</span></h4>
 
-<p>The ppd-make-and-model attribute specifies the manufacturer and model
-name of the PPD file (the NickName attribute in the PPD file). If the
-make and model is not specified in the PPD file then the ModelName or
-ShortNickName attributes are used instead.
-
-<h4><a name="ppd-model-number">ppd-model-number (integer)</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
-
-<p>The ppd-model-number attribute provides the <tt>cupsModelNumber</tt> value from the PPD file.
-
-<h4><a name="ppd-name">ppd-name (name(255))</a></h4>
-
-<p>The ppd-name attribute specifies either the PPD filename on the server relative to the model directory or a URI that maps to a specific driver interface in the driver directory. The forward slash (/) is used to delineate directories.
-
-<h4><a name="ppd-natural-language">ppd-natural-language (1setOf naturalLanguage)</a></h4>
-
-<p>The ppd-natural-language attribute specifies the language encoding
-of the PPD file (the LanguageVersion attribute in the PPD file). If the
-language is unknown or undefined then "en" (English) is assumed.
-
-<h4><a name="ppd-product">ppd-product (1setOf text(127))</a></h4>
-
-<p>The ppd-product attribute specifies the Product attribute values in the PPD file.
-
-<h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
-
-<p>The ppd-product attribute specifies the PSVersion attribute values in the PPD file.
-
-<h4><a name="ppd-type">ppd-type (type1 keyword)</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
-
-<p>The ppd-type attribute specifies the type of driver described by the PPD file:</p>
+<p>The "ppd-type" attribute specifies the type of driver described by the PPD file:</p>
 
 <ul>
 
-	<li><tt>fax</tt> - A facsimile or multi-function device</li>
+	<li>'fax': A facsimile or multi-function device</li>
 
-	<li><tt>pdf</tt> - A PDF printer</li>
+	<li>'pdf': A PDF printer</li>
 
-	<li><tt>postscript</tt> - A PostScript printer (no filters)</li>
+	<li>'postscript': A PostScript printer (no filters)</li>
 
-	<li><tt>raster</tt> - A CUPS raster driver</li>
+	<li>'raster': A CUPS raster driver</li>
 
-	<li><tt>unknown</tt> - An unknown or hybrid driver</li>
+	<li>'unknown': An unknown or hybrid driver</li>
 
 </ul>
 
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>
 
-<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The auth-info-required attribute specifies the authentication information that is required for printing a job. The following keywords are recognized:</p>
+<p>The "auth-info-required" attribute specifies the authentication information that is required for printing a job. The following keywords are recognized:</p>
 
 <ul>
 
-	<li><tt>domain</tt> - A domain name is required.</li>
+	<li>'domain': A domain name is required.</li>
 
-	<li><tt>none</tt> - No authentication is required - this keyword can only appear by itself.</li>
+	<li>'none': No authentication is required - this keyword can only appear by itself.</li>
 
-	<li><tt>password</tt> - A password is required.</li>
+	<li>'password': A password is required.</li>
 
-	<li><tt>username</tt> - A username is required.</li>
+	<li>'username': A username is required.</li>
 
 </ul>
 
 <h4><a name="job-k-limit">job-k-limit (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
-<p>The job-k-limit attribute specifies the maximum number of kilobytes that
-may be printed by a user, including banner files. The default value of 0
-specifies that there is no limit.
+<p>The "job-k-limit" attribute specifies the maximum number of kilobytes that may be printed by a user, including banner files. The default value of 0 specifies that there is no limit.
 
 <h4><a name="job-page-limit">job-page-limit (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
-<p>The job-page-limit attribute specifies the maximum number of pages that
-may be printed by a user, including banner files. The default value of 0
-specifies that there is no limit.
+<p>The "job-page-limit" attribute specifies the maximum number of pages that may be printed by a user, including banner files. The default value of 0 specifies that there is no limit.
 
 <h4><a name="job-quota-period">job-quota-period (integer)</a><span class='info'>CUPS 1.1</span></h4>
 
-<p>The job-quota-period attribute specifies the time period used for quota
-calculations, in seconds. The default value of 0 specifies that the limits
-apply to all jobs that have been printed by a user that are still known to
-the system.
+<p>The "job-quota-period" attribute specifies the time period used for quota calculations, in seconds. The default value of 0 specifies that the limits apply to all jobs that have been printed by a user that are still known to the system.
 
-<h4><a name="job-sheets-supported">job-sheets-supported (1setof type3 keyword | name(MAX))</a><span class='info'>CUPS 1.1</span></h4>
+<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The job-sheets-supported attribute specifies the available banner files.
-There will always be at least one banner file available called "none".
+<p>The "marker-change-time" status attribute specifies the "printer-up-time" value when the last change to the marker-colors, marker-levels, marker-message, marker-names, or marker-types attributes was made.</p>
 
-<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The marker-change-time attribute specifies the printer-up-time value when
-the last change to the marker-colors, marker-levels, marker-message,
-marker-names, or marker-types attributes was made.</p>
+<p>The "marker-colors" status attribute specifies the color(s) for each supply in the printer. It is only available when the driver provides supply levels. The color is either 'none' or one or more hex-encoded sRGB colors of the form '#RRGGBB'.</p>
 
-<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
-<p>The marker-colors attribute specifies the color(s) for each supply in the
-printer. It is only available when the driver provides supply levels. The
-color is either "none" or one or more hex-encoded sRGB colors of the form
-"#RRGGBB".</p>
+<p>The "marker-high-levels" status attribute specifies the supply levels that indicate a near-full condition. A value of 100 should be used for supplies that are consumed/emptied, e.g. ink cartridges.</p>
 
-<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-levels">marker-levels (1setof integer(-3:100))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The marker-high-levels attribute specifies the supply levels that indicate
-a near-full condition. A value of 100 should be used for supplies that are
-consumed/emptied, e.g. ink cartridges.</p>
+<p>The "marker-levels" status attribute specifies the current supply levels for the printer. It is only available when the driver provides supply levels. A value of -1 indicates the level is unavailable, -2 indicates unknown, and -3 indicates the level is unknown but has not yet reached capacity. Values from 0 to 100 indicate the corresponding percentage.</p>
 
-<h4><a name="marker-levels">marker-levels (1setof integer(-3:100))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
-<p>The marker-levels attribute specifies the current supply levels for the
-printer. It is only available when the driver provides supply levels. A
-value of -1 indicates the level is unavailable, -2 indicates unknown, and -3
-indicates the level is unknown but has not yet reached capacity. Values from 0
-to 100 indicate the corresponding percentage.</p>
+<p>The "marker-low-levels" status attribute specifies the supply levels that indicate a near-empty condition. A value of 0 should be used for supplies that are filled, e.g. waste ink tanks.</p>
 
-<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
 
-<p>The marker-low-levels attribute specifies the supply levels that indicate
-a near-empty condition. A value of 0 should be used for supplies that are
-filled, e.g. waste ink tanks.</p>
+<p>The "marker-message" status attribute provides a human-readable status message for the current supply levels, e.g. "12 pages of ink remaining." It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
+<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The marker-message attribute provides a human-readable status message
-for the current supply levels, e.g. "12 pages of ink remaining." It is only
-available when the driver provides supply levels.</p>
+<p>The "marker-names" status attribute specifies the name(s) for each supply in the printer. It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
+<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3/macOS 10.5</span></h4>
 
-<p>The marker-names attribute specifies the name(s) for each supply in the
-printer. It is only available when the driver provides supply levels.</p>
-
-<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3/OS X 10.5</span></h4>
-
-<p>The marker-types attribute specifies the type(s) of each supply in the
-printer. It is only available when the driver provides supply levels. The
-following (RFC 3805) types are currently supported:</p>
+<p>The "marker-types" status attribute specifies the type(s) of each supply in the printer. It is only available when the driver provides supply levels. The following (RFC 3805) types are currently supported:</p>
 
 <ul>
 
-	<li><tt>toner</tt></li>
+	<li>'toner'</li>
 
-	<li><tt>wasteToner</tt></li>
+	<li>'waste-toner'</li>
 
-	<li><tt>ink</tt></li>
+	<li>'ink'</li>
 
-	<li><tt>inkCartridge</tt></li>
+	<li>'ink-cartridge'</li>
 
-	<li><tt>inkRibbon</tt></li>
+	<li>'ink-ribbon'</li>
 
-	<li><tt>wasteInk</tt></li>
+	<li>'waste-ink'</li>
 
-	<li><tt>opc</tt></li>
+	<li>'opc'</li>
 
-	<li><tt>developer</tt></li>
+	<li>'developer'</li>
 
-	<li><tt>fuserOil</tt></li>
+	<li>'fuser-oil'</li>
 
-	<li><tt>solidWax</tt></li>
+	<li>'solid-wax'</li>
 
-	<li><tt>ribbonWax</tt></li>
+	<li>'ribbon-wax'</li>
 
-	<li><tt>wasteWax</tt></li>
+	<li>'waste-wax'</li>
 
-	<li><tt>fuser</tt></li>
+	<li>'fuser'</li>
 
-	<li><tt>coronaWire</tt></li>
+	<li>'corona-wire'</li>
 
-	<li><tt>fuserOilWick</tt></li>
+	<li>'fuser-oil-wick'</li>
 
-	<li><tt>cleanerUnit</tt></li>
+	<li>'cleaner-unit'</li>
 
-	<li><tt>fuserCleaningPad</tt></li>
+	<li>'fuser-cleaning-pad'</li>
 
-	<li><tt>transferUnit</tt></li>
+	<li>'transfer-unit'</li>
 
-	<li><tt>tonerCartridge</tt></li>
+	<li>'toner-cartridge'</li>
 
-	<li><tt>fuserOiler</tt></li>
+	<li>'fuser-oiler'</li>
 
-	<li><tt>water</tt></li>
+	<li>'water'</li>
 
-	<li><tt>wasteWater</tt></li>
+	<li>'waste-water'</li>
 
-	<li><tt>bindingSupply</tt></li>
+	<li>'binding-supply'</li>
 
-	<li><tt>bandingSupply</tt></li>
+	<li>'banding-supply'</li>
 
-	<li><tt>stichingWire</tt></li>
+	<li>'stiching-wire'</li>
 
-	<li><tt>shrinkWrap</tt></li>
+	<li>'shrink-wrap'</li>
 
-	<li><tt>paperWrap</tt></li>
+	<li>'paper-wrap'</li>
 
-	<li><tt>staples</tt></li>
+	<li>'staples'</li>
 
-	<li><tt>inserts</tt></li>
+	<li>'inserts'</li>
 
-	<li><tt>covers</tt></li>
-
-</ul>
-
-<h4><a name="port-monitor">port-monitor" (name(127))</a></h4>
-
-<p>The port-monitor attribute specifies the port monitor to use when printing
-to this printer. The default port monitor is "none".
-
-<h4><a name="port-monitor-supported">port-monitor-supported" (1setOf name(127))</a></h4>
-
-<p>The port-monitor-supported attribute specifies the available port monitors.
-
-<h4><a name="printer-commands">printer-commands (1setOf Type3 keyword)</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
-
-<p>The printer-commands attribute specifies the commands that are supported
-by the CUPS command file filter. The keyword "none" indicates that no commands
-are supported.</p>
-
-<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4/OS X 10.6</span></h4>
-
-<p>The printer-dns-sd-name attribute specifies the registered DNS-SD service
-name for the printer. If the printer is not being shared using this protocol,
-printer-dns-sd-name will have the noValue value.</p>
-
-<h4><a name="printer-state-reasons">printer-state-reasons (1setOf type2 keyword)</a></h4>
-
-<p>The printer-state-reasons attribute provides additional persistent state
-information for a printer. In addition to the keywords defined in RFC 2911,
-CUPS supports vendor-specific keywords with a domain prefix ("com.vendor.foo")
-and the following CUPS-specific keywords:</p>
-
-<ul>
-
-	<li><tt>cups-insecure-filter-warning</tt> - a filter or backend (or the
-	directory containing the filter or backend) has insecure file
-	permissions. CUPS will not execute programs with world write permissions
-	or setuid programs. When run as root (the default), CUPS also does not
-	execute programs that are not owned by root.
-	<span class='info'>CUPS 1.4/OS X 10.6</span></li>
-
-	<li><tt>cups-missing-filter-warning</tt> - a filter or backend is not
-	installed. <span class='info'>CUPS 1.4/OS X 10.6</span></li>
+	<li>'covers'</li>
 
 </ul>
+
+<h4><a name="port-monitor">port-monitor" (name(127))</a><span class="info">Deprecated</span></h4>
+
+<p>The "port-monitor" attribute specifies the port monitor to use when printing to this printer. The default port monitor is 'none'.
+
+<h4><a name="port-monitor-supported">port-monitor-supported" (1setOf name(127))</a><span class="info">Deprecated</span></h4>
+
+<p>The "port-monitor-supported" attribute specifies the available port monitors.
+
+<h4><a name="printer-commands">printer-commands (1setOf Type3 keyword)</a><span class='info'>Deprecated</span></h4>
+
+<p>The "printer-commands" attribute specifies the commands that are supported by the CUPS command file filter. The keyword 'none' indicates that no commands are supported.</p>
+
+<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4/macOS 10.6</span></h4>
+
+<p>The "printer-dns-sd-name" attribute specifies the registered DNS-SD service name for the printer. If the printer is not being shared using this protocol, "printer-dns-sd-name" will have the no-value value.</p>
+
+<h4><a name="printer-id">printer-id (integer(0:65535)</a><span class="info">CUPS 2.2</span></h4>
+
+<p>The "printer-id" status attribute provides a unique integer identifying the printer. It is used when only an IP address and integer are provided for identifying a print queue.</p>
 
 <h4><a name="printer-type">printer-type (type2 enum)</a></h4>
 
-<p>The printer-type attribute specifies printer type and
-capability bits for the printer or class. The default value is
-computed from internal state information and the PPD file for the
-printer. The following bits are defined:</p>
+<p>The "printer-type" status attribute specifies printer type and capability bits for the printer or class. The default value is computed from internal state information and the PPD file for the printer. The following bits are defined:</p>
 
-<div class='table'><table align='center' border='1' width='80%'
-summary='Printer Type Bits'>
+<div class='table'><table align='center' border='1' width='80%' summary='Printer Type Bits'>
 <thead>
 <tr>
 	<th>Bit</th>
@@ -2713,40 +1873,36 @@ summary='Printer Type Bits'>
 	<td>0x04000000</td>
 	<td>Queue is a printer with scanning capabilities.</td>
 </tr>
+<tr>
+	<td>0x08000000</td>
+	<td>Queue is a printer with 3D capabilities.</td>
+</tr>
 </tbody>
 </table></div>
 
 <h4>printer-type-mask (type2 enum)<span class='info'>CUPS 1.1</span></h4>
 
-<p>The printer-type-mask attribute is used to choose printers or classes with
-the CUPS-Get-Printers and CUPS-Get-Classes operations. The bits are defined
-identically to the printer-type attribute and default to all 1's.
+<p>The "printer-type-mask" attribute is used to choose printers or classes with the CUPS-Get-Printers and CUPS-Get-Classes operations. The bits are defined identically to the printer-type attribute and default to all 1's.
 
 <h4>requesting-user-name-allowed (1setof name(127))<span class='info'>CUPS 1.1</span></h4>
 
-<p>The requesting-user-name-allowed attribute lists all of the users that are
-allowed to access a printer or class. Either this attribute or the
-requesting-user-name-denied attribute will be defined, but not both.
+<p>The "requesting-user-name-allowed" attribute lists all of the users that are allowed to access a printer or class. Either this attribute or the "requesting-user-name-denied" attribute will be defined, but not both.
 
 <h4>requesting-user-name-denied (1setof name(127))<span class='info'>CUPS 1.1</span></h4>
 
-<p>The requesting-user-name-denied attribute lists all of the users that are
-not allowed to access a printer or class. Either this attribute or the
-requesting-user-name-allowed attribute will be defined, but not both.
+<p>The "requesting-user-name-denied" attribute lists all of the users that are not allowed to access a printer or class. Either this attribute or the "requesting-user-name-allowed" attribute will be defined, but not both.
 
 <h3 class='title'><a name='CLASS_ATTRIBUTES'>Printer Class Attributes</a></h3>
 
+<p>Printer class attributes are placed in the printer-attributes-tag group.</p>
+
 <h4>member-names (1setof name(127))</h4>
 
-<p>The member-names attribute specifies each of the printer-name attributes of
-the member printers and classes. Each name corresponds to the same element of
-the member-uris attribute.
+<p>The "member-names" attribute specifies the "printer-name" attributes for each the member printer and class. Each name corresponds to the same element of the "member-uris" attribute.
 
 <h4>member-uris (1setof uri)</h4>
 
-<p>The member-uris attribute specifies each of the printer-uri attributes of
-the member printers and classes. Each URI corresponds to the same element of
-the member-names attribute.
+<p>The "member-uris" attribute specifies the "printer-uri-supported" values for each member printer and class. Each URI corresponds to the same element of the "member-names" attribute.
 
 </body>
 </html>

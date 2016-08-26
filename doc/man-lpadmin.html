@@ -71,15 +71,15 @@ The following options are recognized when configuring a printer queue:
 <dt><b>-c </b><i>class</i>
 <dd style="margin-left: 5.0em">Adds the named <i>printer</i> to <i>class</i>.
 If <i>class</i> does not exist it is created automatically.
-<dt><b>-i </b><i>interface</i>
-<dd style="margin-left: 5.0em">Sets a System V style interface script for the printer.
-This option cannot be specified with the <i>-P</i> option (PPD file) and is intended for providing support for legacy printer drivers.
+<dt><b>-i </b><i>ppd-file</i>
+<dd style="margin-left: 5.0em"><dt><b>-P </b><i>ppd-file</i>
+<dd style="margin-left: 5.0em">Specifies a PostScript Printer Description (PPD) file to use with the printer.
 <dt><b>-m </b><i>model</i>
-<dd style="margin-left: 5.0em">Sets a standard System V interface script or PPD file for the printer from the <i>model</i> directory or using one of the driver interfaces.
+<dd style="margin-left: 5.0em">Sets a standard PPD file for the printer from the <i>model</i> directory or using one of the driver interfaces.
 Use the <i>-m</i> option with the
 <a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
 command to get a list of supported models.
-The model "raw" clears any existing interface script or PPD file and the model "everywhere" queries the printer referred to by the specified IPP <i>device-uri</i>.
+The model "raw" clears any existing PPD file and the model "everywhere" queries the printer referred to by the specified IPP <i>device-uri</i>.
 <dt><b>-o cupsIPPSupplies=true</b>
 <dd style="margin-left: 5.0em"><dt><b>-o cupsIPPSupplies=false</b>
 <dd style="margin-left: 5.0em">Specifies whether IPP supply level values should be reported.
@@ -136,6 +136,7 @@ If the resulting class becomes empty it is removed.
 <dd style="margin-left: 5.0em">Sets user-level access control on a destination.
 Names starting with "@" are interpreted as UNIX groups.
 The latter two forms turn user-level access control off.
+Note: The user 'root' is not granted special access - using "-u allow:foo,bar" will allow users 'foo' and 'bar' to access the printer but NOT 'root'.
 <dt><b>-v "</b><i>device-uri</i><b>"</b>
 <dd style="margin-left: 5.0em">Sets the <i>device-uri</i> attribute of the printer queue.
 Use the <i>-v</i> option with the
@@ -151,9 +152,6 @@ and
 programs on the destination.
 <dt><b>-L "</b><i>location</i><b>"</b>
 <dd style="margin-left: 5.0em">Provides a textual location of the destination.
-<dt><b>-P </b><i>ppd-file</i>
-<dd style="margin-left: 5.0em">Specifies a PostScript Printer Description file to use with the printer.
-If specified, this option overrides the <i>-i</i> option (interface script).
 </dl>
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
@@ -176,7 +174,7 @@ Create an IPP Everywhere print queue:
 <a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>

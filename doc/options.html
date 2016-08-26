@@ -145,11 +145,11 @@ lpr -#<EM>num-copies</EM> filename
 </PRE>
 
 <P>Copies are normally <EM>not</EM> collated for you. Use the
-<CODE>-o Collate=True</CODE> option to get collated copies:</P>
+<CODE>-o collate=true</CODE> option to get collated copies:</P>
 
 <PRE CLASS="command">
-lp -n <EM>num-copies</EM> -o Collate=True filename
-lpr -#<EM>num-copies</EM> -o Collate=True filename
+lp -n <EM>num-copies</EM> -o collate=true filename
+lpr -#<EM>num-copies</EM> -o collate=true filename
 </PRE>
 
 
@@ -452,18 +452,6 @@ can make the output page numbering not match the document page numbers.</p>
 </blockquote>
 
 
-<H3><A NAME="PAGESET">Selecting Even or Odd Pages</A></H3>
-
-<P>Use the <CODE>-o page-set=set</CODE> option to select the even or odd pages:</P>
-
-<PRE CLASS="command">
-lp -o page-set=odd filename
-lp -o page-set=even filename
-lpr -o page-set=even filename
-</PRE>
-
-<P>The default is to print all pages.
-
 <H3><A NAME="NUMBERUP">N-Up Printing</A></H3>
 
 <P>The <CODE>-o number-up=value</CODE> option selects N-Up
@@ -576,79 +564,6 @@ lpr -o raw filename
 <PRE CLASS="command">
 lpr -l filename
 </PRE>
-
-
-<H2 CLASS="title"><A NAME="TEXTOPTIONS">Text Options</A></H2>
-
-<P>CUPS supports several options that are only used when printing
-plain text files. These options have absolutely no effect on
-PostScript, PDF, HP-GL/2, or image files.</P>
-
-<H3><A NAME="CPI">Setting the Number of Characters Per Inch</A></H3>
-
-<P>The <CODE>-o cpi=value</CODE> option sets the number of
-characters per inch:</P>
-
-<PRE CLASS="command">
-lp -o cpi=10 filename
-lp -o cpi=12 filename
-lpr -o cpi=17 filename
-</PRE>
-
-<P>The default characters per inch is 10.</P>
-
-<H3><A NAME="LPI">Setting the Number of Lines Per Inch</A></H3>
-
-<P>The <CODE>-o lpi=value</CODE> option sets the number of lines
-per inch:</P>
-
-<PRE CLASS="command">
-lp -o lpi=6 filename
-lpr -o lpi=8 filename
-</PRE>
-
-<P>The default lines per inch is 6.</P>
-
-<H3><A NAME="MARGINS">Setting the Page Margins</A></H3>
-
-<P>Normally the page margins are set to the hard limits of the
-printer. Use the <CODE>-o page-left=value</CODE>, <CODE>-o
-page-right=value</CODE>, <CODE>-o page-top=value</CODE>, and
-<CODE>-o page-bottom=value</CODE> options to adjust the page
-margins:</P>
-
-<PRE CLASS="command">
-lp -o page-left=<EM>value</EM> filename
-lp -o page-right=<EM>value</EM> filename
-lp -o page-top=<EM>value</EM> filename
-lp -o page-bottom=<EM>value</EM> filename
-lpr -o page-left=<EM>value</EM> -o page-right=<EM>value</EM> -o page-top=<EM>value</EM> -o page-bottom=<EM>value</EM> filename
-</PRE>
-
-<P>The <CODE>value</CODE> argument is the margin in points; each
-point is 1/72 inch or 0.35mm.</P>
-
-<H3><A NAME="PRETTYPRINT">Pretty Printing</A></H3>
-
-<P>The <CODE>-o prettyprint</CODE> option puts a header at the
-top of each page with the page number, job title (usually the
-filename), and the date. Also, C and C++ keywords are
-highlighted, and comment lines are italicized:</P>
-
-<PRE CLASS="command">
-lp -o prettyprint filename
-lpr -o prettyprint filename
-</PRE>
-
-<H3><A NAME="WRAP">Turning Off Text Wrapping</A></H3>
-
-<P>The <CODE>-o nowrap</CODE> option disables wrapping of long lines:</P>
-
-<PRE CLASS="command">
-lp -o nowrap filename
-lpr -o nowrap filename
-</PRE>
-
 
 </BODY>
 </HTML>

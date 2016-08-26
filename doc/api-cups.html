@@ -5,7 +5,7 @@
 	<title>CUPS API	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -353,8 +353,6 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
-
   CUPS API header for CUPS.
 
   Copyright 2008-2011 by Apple Inc.
@@ -455,15 +453,10 @@ destination.">cupsGetDestMediaCount</a></li>
 	<li><a href="#cupsGetJobs2" title="Get the jobs from the specified server.">cupsGetJobs2</a></li>
 	<li><a href="#cupsGetNamedDest" title="Get options for the named destination.">cupsGetNamedDest</a></li>
 	<li><a href="#cupsGetOption" title="Get an option value.">cupsGetOption</a></li>
-	<li><a href="#cupsGetPPD" title="Get the PPD file for a printer on the default server.">cupsGetPPD</a></li>
-	<li><a href="#cupsGetPPD2" title="Get the PPD file for a printer from the specified server.">cupsGetPPD2</a></li>
-	<li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
-server if it has changed.">cupsGetPPD3</a></li>
 	<li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
 	<li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
 password callback.">cupsGetPassword2</a></li>
 	<li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
-	<li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
 	<li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
 	<li><a href="#cupsLangEncoding" title="Return the character encoding (us-ascii, etc.)
 for the given language.">cupsLangEncoding</a></li>
@@ -525,8 +518,6 @@ attributes.">pwgInitSize</a></li>
 	<li><a href="#cups_dest_cb_t" title="Destination enumeration callback
 ">cups_dest_cb_t</a></li>
 	<li><a href="#cups_dest_t" title="Destination">cups_dest_t</a></li>
-	<li><a href="#cups_device_cb_t" title="Device callback
-">cups_device_cb_t</a></li>
 	<li><a href="#cups_dinfo_t" title="Destination capability and status
 information ">cups_dinfo_t</a></li>
 	<li><a href="#cups_job_t" title="Job">cups_job_t</a></li>
@@ -562,8 +553,6 @@ constants">cups_ptype_e</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id: api-cups.shtml 7337 2008-02-22 04:44:04Z mike $"
-
   API introduction for CUPS.
 
   Copyright 2007-2013 by Apple Inc.
@@ -1113,7 +1102,7 @@ int cupsAdminExportSamba (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
 <p class="description">Get settings from the server.</p>
 <p class="code">
 int cupsAdminGetServerSettings (<br>
@@ -1137,7 +1126,7 @@ int cupsAdminGetServerSettings (<br>
 you are done with them.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
 <p class="description">Set settings on the server.</p>
 <p class="code">
 int cupsAdminSetServerSettings (<br>
@@ -1177,8 +1166,9 @@ ipp_status_t cupsCancelDestJob (<br>
 <p class="description">Cancel a job on a destination.</p>
 <p class="discussion">The &quot;job_id&quot; is the number returned by cupsCreateDestJob.<br>
 <br>
-Returns IPP_STATUS_OK on success and IPP_NOT_AUTHORIZED or IPP_FORBIDDEN on
-failure.
+Returns <code>IPP_STATUS_OK</code> on success and
+<code>IPP_STATUS_ERRPR_NOT_AUTHORIZED</code> or
+<code>IPP_STATUS_ERROR_FORBIDDEN</code> on failure.
 
 </p>
 <h3 class="function"><a name="cupsCancelJob">cupsCancelJob</a></h3>
@@ -1203,7 +1193,7 @@ to cancel the current job on the named destination.<br>
 <br>
 Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> functions to get
 the cause of any failure.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsCancelJob2">cupsCancelJob2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsCancelJob2">cupsCancelJob2</a></h3>
 <p class="description">Cancel or purge a print job.</p>
 <p class="code">
 ipp_status_t cupsCancelJob2 (<br>
@@ -1236,7 +1226,7 @@ Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cu
 the cause of any failure.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCheckDestSupported">cupsCheckDestSupported</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsCheckDestSupported">cupsCheckDestSupported</a></h3>
 <p class="description">Check that the option and value are supported
 by the destination.</p>
 <p class="code">
@@ -1266,7 +1256,7 @@ int cupsCheckDestSupported (<br>
 <p class="discussion">Returns 1 if supported, 0 otherwise.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCloseDestJob">cupsCloseDestJob</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsCloseDestJob">cupsCloseDestJob</a></h3>
 <p class="description">Close a job and start printing.</p>
 <p class="code">
 ipp_status_t cupsCloseDestJob (<br>
@@ -1294,7 +1284,7 @@ ipp_status_t cupsCloseDestJob (<br>
 on success.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsConnectDest">cupsConnectDest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsConnectDest">cupsConnectDest</a></h3>
 <p class="description">Connect to the server for a destination.</p>
 <p class="code">
 http_t *cupsConnectDest (<br>
@@ -1336,7 +1326,7 @@ to by &quot;cancel&quot; is non-zero, or the callback function (or block) return
 The caller is responsible for calling httpClose() on the returned object.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsConnectDestBlock">cupsConnectDestBlock</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsConnectDestBlock">cupsConnectDestBlock</a></h3>
 <p class="description">Connect to the server for a destination.</p>
 <p class="code">
 http_t *cupsConnectDestBlock (<br>
@@ -1396,7 +1386,7 @@ copy) - for use with the cupsEnumDests* functions. The caller is responsible
 for calling cupsFreeDests() on the returned object(s).
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCopyDestConflicts">cupsCopyDestConflicts</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsCopyDestConflicts">cupsCopyDestConflicts</a></h3>
 <p class="description">Get conflicts and resolutions for a new
 option/value pair.</p>
 <p class="code">
@@ -1457,7 +1447,7 @@ If cupsCopyDestConflicts returns 1 but &quot;num_resolved&quot; and &quot;resolv
 to 0 and <code>NULL</code>, respectively, then the conflict cannot be resolved.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCopyDestInfo">cupsCopyDestInfo</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsCopyDestInfo">cupsCopyDestInfo</a></h3>
 <p class="description">Get the supported values/capabilities for the
 destination.</p>
 <p class="code">
@@ -1479,7 +1469,7 @@ destination.</p>
 value. <code>NULL</code> is returned on error.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCreateDestJob">cupsCreateDestJob</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsCreateDestJob">cupsCreateDestJob</a></h3>
 <p class="description">Create a job on a destination.</p>
 <p class="code">
 ipp_status_t cupsCreateDestJob (<br>
@@ -1515,7 +1505,7 @@ ipp_status_t cupsCreateDestJob (<br>
 in the variable pointed to by &quot;job_id&quot;.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsCreateJob">cupsCreateJob</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsCreateJob">cupsCreateJob</a></h3>
 <p class="description">Create an empty job for streaming.</p>
 <p class="code">
 int cupsCreateJob (<br>
@@ -1564,7 +1554,7 @@ Note: The current encryption setting is tracked separately for each thread
 in a program. Multi-threaded programs that override the setting via the
 <a href="#cupsSetEncryption"><code>cupsSetEncryption</code></a> function need to do so in each thread for the same
 setting to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsEnumDests">cupsEnumDests</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsEnumDests">cupsEnumDests</a></h3>
 <p class="description">Enumerate available destinations with a callback function.</p>
 <p class="code">
 int cupsEnumDests (<br>
@@ -1606,7 +1596,7 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the callback function returns 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsEnumDestsBlock">cupsEnumDestsBlock</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsEnumDestsBlock">cupsEnumDestsBlock</a></h3>
 <p class="description">Enumerate available destinations with a block.</p>
 <p class="code">
 int cupsEnumDestsBlock (<br>
@@ -1644,7 +1634,7 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the block returns 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestDefault (<br>
@@ -1674,7 +1664,7 @@ ipp_attribute_t *cupsFindDestDefault (<br>
 functions to inspect the default value(s) as needed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestReady (<br>
@@ -1704,7 +1694,7 @@ ipp_attribute_t *cupsFindDestReady (<br>
 functions to inspect the default value(s) as needed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestSupported (<br>
@@ -1734,7 +1724,7 @@ ipp_attribute_t *cupsFindDestSupported (<br>
 functions to inspect the default value(s) as needed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsFinishDestDocument">cupsFinishDestDocument</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsFinishDestDocument">cupsFinishDestDocument</a></h3>
 <p class="description">Finish the current document.</p>
 <p class="code">
 ipp_status_t cupsFinishDestDocument (<br>
@@ -1757,7 +1747,7 @@ ipp_status_t cupsFinishDestDocument (<br>
 <p class="discussion">Returns <code>IPP_STATUS_OK</code> or <code>IPP_STATUS_OK_SUBST</code> on success.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
 <p class="description">Finish sending a document.</p>
 <p class="code">
 ipp_status_t cupsFinishDocument (<br>
@@ -1862,7 +1852,7 @@ variables are not set, the server default destination is returned.
 Applications should use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> and <a href="#cupsGetDest"><code>cupsGetDest</code></a>
 functions to get the user-defined default printer, as this function does
 not support the lpoptions-defined default printer.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetDefault2">cupsGetDefault2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsGetDefault2">cupsGetDefault2</a></h3>
 <p class="description">Get the default printer or class for the specified server.</p>
 <p class="code">
 const char *cupsGetDefault2 (<br>
@@ -1909,7 +1899,7 @@ not support the lpoptions-defined default printer.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> or <a href="#cupsGetDests2"><code>cupsGetDests2</code></a> functions to get a
 list of supported destinations for the current user.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
 <p class="description">Get a media name, dimension, and margins for a
 specific size.</p>
 <p class="code">
@@ -1944,7 +1934,7 @@ example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will get the Nth
 borderless size supported by the printer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaByName">cupsGetDestMediaByName</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsGetDestMediaByName">cupsGetDestMediaByName</a></h3>
 <p class="description">Get media names, dimensions, and margins.</p>
 <p class="code">
 int cupsGetDestMediaByName (<br>
@@ -1988,7 +1978,7 @@ The matching result (if any) is returned in the &quot;cups_size_t&quot; structur
 Returns 1 when there is a match and 0 if there is not a match.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaBySize">cupsGetDestMediaBySize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsGetDestMediaBySize">cupsGetDestMediaBySize</a></h3>
 <p class="description">Get media names, dimensions, and margins.</p>
 <p class="code">
 int cupsGetDestMediaBySize (<br>
@@ -2037,7 +2027,7 @@ The matching result (if any) is returned in the &quot;cups_size_t&quot; structur
 Returns 1 when there is a match and 0 if there is not a match.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
 <p class="description">Get the number of sizes supported by a
 destination.</p>
 <p class="code">
@@ -2066,7 +2056,7 @@ counted.  For example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will ret
 the number of borderless sizes.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
 <p class="description">Get the default size for a destination.</p>
 <p class="code">
 int cupsGetDestMediaDefault (<br>
@@ -2097,7 +2087,7 @@ example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return the defaul
 borderless size, typically US Letter or A4, but sometimes 4x6 photo media.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS X 10.10&nbsp;</span><a name="cupsGetDestWithURI">cupsGetDestWithURI</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/macOS 10.10&nbsp;</span><a name="cupsGetDestWithURI">cupsGetDestWithURI</a></h3>
 <p class="description">Get a destination associated with a URI.</p>
 <p class="code">
 <a href="#cups_dest_t">cups_dest_t</a> *cupsGetDestWithURI (<br>
@@ -2144,7 +2134,7 @@ marker-types, and printer-commands attributes as well.<br>
 <br>
 Use the <a href="#cupsFreeDests"><code>cupsFreeDests</code></a> function to free the destination list and
 the <a href="#cupsGetDest"><code>cupsGetDest</code></a> function to find a particular destination.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetDests2">cupsGetDests2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsGetDests2">cupsGetDests2</a></h3>
 <p class="description">Get the list of destinations from the specified server.</p>
 <p class="code">
 int cupsGetDests2 (<br>
@@ -2200,7 +2190,7 @@ int cupsGetJobs (<br>
 of state, while <code>CUPS_WHICHJOBS_ACTIVE</code> returns jobs that are
 pending, processing, or held and <code>CUPS_WHICHJOBS_COMPLETED</code> returns
 jobs that are stopped, canceled, aborted, or completed.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetJobs2">cupsGetJobs2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsGetJobs2">cupsGetJobs2</a></h3>
 <p class="description">Get the jobs from the specified server.</p>
 <p class="code">
 int cupsGetJobs2 (<br>
@@ -2232,7 +2222,7 @@ pending, processing, or held and <code>CUPS_WHICHJOBS_COMPLETED</code> returns
 jobs that are stopped, canceled, aborted, or completed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetNamedDest">cupsGetNamedDest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsGetNamedDest">cupsGetNamedDest</a></h3>
 <p class="description">Get options for the named destination.</p>
 <p class="code">
 <a href="#cups_dest_t">cups_dest_t</a> *cupsGetNamedDest (<br>
@@ -2287,95 +2277,6 @@ const char *cupsGetOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Option value or <code>NULL</code></p>
-<h3 class="function"><a name="cupsGetPPD">cupsGetPPD</a></h3>
-<p class="description">Get the PPD file for a printer on the default server.</p>
-<p class="code">
-const char *cupsGetPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Filename for PPD file</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">For classes, <code>cupsGetPPD</code> returns the PPD file for the first printer
-in the class.<br>
-<br>
-The returned filename is stored in a static buffer and is overwritten with
-each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.  The caller &quot;owns&quot; the
-file that is created and must <code>unlink</code> the returned filename.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetPPD2">cupsGetPPD2</a></h3>
-<p class="description">Get the PPD file for a printer from the specified server.</p>
-<p class="code">
-const char *cupsGetPPD2 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Filename for PPD file</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">For classes, <code>cupsGetPPD2</code> returns the PPD file for the first printer
-in the class.<br>
-<br>
-The returned filename is stored in a static buffer and is overwritten with
-each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.  The caller &quot;owns&quot; the
-file that is created and must <code>unlink</code> the returned filename.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
-<p class="description">Get the PPD file for a printer on the specified
-server if it has changed.</p>
-<p class="code">
-http_status_t cupsGetPPD3 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;time_t *modtime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-<dt>modtime</dt>
-<dd class="description">Modification time</dd>
-<dt>buffer</dt>
-<dd class="description">Filename buffer</dd>
-<dt>bufsize</dt>
-<dd class="description">Size of filename buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">HTTP status</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;modtime&quot; parameter contains the modification time of any
-locally-cached content and is updated with the time from the PPD file on
-the server.<br>
-<br>
-The &quot;buffer&quot; parameter contains the local PPD filename.  If it contains
-the empty string, a new temporary file is created, otherwise the existing
-file will be overwritten as needed.  The caller &quot;owns&quot; the file that is
-created and must <code>unlink</code> the returned filename.<br>
-<br>
-On success, <code>HTTP_STATUS_OK</code> is returned for a new PPD file and
-<code>HTTP_STATUS_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other
-status is an error.<br>
-<br>
-For classes, <code>cupsGetPPD3</code> returns the PPD file for the first printer
-in the class.
-
-</p>
 <h3 class="function"><a name="cupsGetPassword">cupsGetPassword</a></h3>
 <p class="description">Get a password from the user.</p>
 <p class="code">
@@ -2397,7 +2298,7 @@ Note: The current password callback function is tracked separately for each
 thread in a program. Multi-threaded programs that override the setting via
 the <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a> or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a> functions need to
 do so in each thread for the same function to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetPassword2">cupsGetPassword2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsGetPassword2">cupsGetPassword2</a></h3>
 <p class="description">Get a password from the user using the advanced
 password callback.</p>
 <p class="code">
@@ -2446,33 +2347,6 @@ int cupsGetPrinters (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function is deprecated and no longer returns a list of printers - use
 <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsGetServerPPD">cupsGetServerPPD</a></h3>
-<p class="description">Get an available PPD file from the server.</p>
-<p class="code">
-char *cupsGetServerPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Name of PPD file (&quot;ppd-name&quot;)</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Name of PPD file or <code>NULL</code> on error</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns the named PPD file from the server.  The
-list of available PPDs is provided by the IPP <code>CUPS_GET_PPDS</code>
-operation.<br>
-<br>
-You must remove (unlink) the PPD file when you are finished with
-it. The PPD filename is stored in a static location that will be
-overwritten on the next call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a>, <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>,
-or <a href="#cupsGetServerPPD"><code>cupsGetServerPPD</code></a>.
 
 </p>
 <h3 class="function"><a name="cupsLangDefault">cupsLangDefault</a></h3>
@@ -2525,7 +2399,7 @@ cups_lang_t *cupsLangGet (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Language data</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS X 10.10&nbsp;</span><a name="cupsLocalizeDestMedia">cupsLocalizeDestMedia</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/macOS 10.10&nbsp;</span><a name="cupsLocalizeDestMedia">cupsLocalizeDestMedia</a></h3>
 <p class="description">Get the localized string for a destination media
 size.</p>
 <p class="code">
@@ -2556,7 +2430,7 @@ const char *cupsLocalizeDestMedia (<br>
 invalid if the destination information is deleted.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsLocalizeDestOption">cupsLocalizeDestOption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsLocalizeDestOption">cupsLocalizeDestOption</a></h3>
 <p class="description">Get the localized string for a destination
 option.</p>
 <p class="code">
@@ -2584,7 +2458,7 @@ const char *cupsLocalizeDestOption (<br>
 invalid if the destination information is deleted.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsLocalizeDestValue">cupsLocalizeDestValue</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsLocalizeDestValue">cupsLocalizeDestValue</a></h3>
 <p class="description">Get the localized string for a destination
 option+value pair.</p>
 <p class="code">
@@ -2615,7 +2489,7 @@ const char *cupsLocalizeDestValue (<br>
 invalid if the destination information is deleted.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsNotifySubject">cupsNotifySubject</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsNotifySubject">cupsNotifySubject</a></h3>
 <p class="description">Return the subject for the given notification message.</p>
 <p class="code">
 char *cupsNotifySubject (<br>
@@ -2635,7 +2509,7 @@ char *cupsNotifySubject (<br>
 <p class="discussion">The returned string must be freed by the caller using <code>free</code>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsNotifyText">cupsNotifyText</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsNotifyText">cupsNotifyText</a></h3>
 <p class="description">Return the text for the given notification message.</p>
 <p class="code">
 char *cupsNotifyText (<br>
@@ -2705,7 +2579,7 @@ int cupsPrintFile (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsPrintFile2">cupsPrintFile2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsPrintFile2">cupsPrintFile2</a></h3>
 <p class="description">Print a file to a printer or class on the specified
 server.</p>
 <p class="code">
@@ -2763,7 +2637,7 @@ int cupsPrintFiles (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsPrintFiles2">cupsPrintFiles2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsPrintFiles2">cupsPrintFiles2</a></h3>
 <p class="description">Print one or more files to a printer or class on the
 specified server.</p>
 <p class="code">
@@ -2795,7 +2669,7 @@ int cupsPrintFiles2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsRemoveDest">cupsRemoveDest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsRemoveDest">cupsRemoveDest</a></h3>
 <p class="description">Remove a destination from the destination list.</p>
 <p class="code">
 int cupsRemoveDest (<br>
@@ -2824,7 +2698,7 @@ queue, merely the lpoptions for that destination/instance.  Use the
 options for the user.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRemoveOption">cupsRemoveOption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsRemoveOption">cupsRemoveOption</a></h3>
 <p class="description">Remove an option from an option array.</p>
 <p class="code">
 int cupsRemoveOption (<br>
@@ -2862,7 +2736,7 @@ Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server via the
 <a href="#cupsSetServer"><code>cupsSetServer</code></a> function need to do so in each thread for the same
 server to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
 <p class="description">Set the client certificate callback.</p>
 <p class="code">
 void cupsSetClientCertCB (<br>
@@ -2884,7 +2758,7 @@ in a program. Multi-threaded programs that override the callback need to do
 so in each thread for the same callback to be used.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cupsSetCredentials">cupsSetCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cupsSetCredentials">cupsSetCredentials</a></h3>
 <p class="description">Set the default credentials to be used for SSL/TLS
 connections.</p>
 <p class="code">
@@ -2904,7 +2778,7 @@ program. Multi-threaded programs that override the setting need to do so in
 each thread for the same setting to be used.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsSetDefaultDest">cupsSetDefaultDest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsSetDefaultDest">cupsSetDefaultDest</a></h3>
 <p class="description">Set the default destination.</p>
 <p class="code">
 void cupsSetDefaultDest (<br>
@@ -2941,7 +2815,7 @@ void cupsSetDests (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function saves the destinations to /etc/cups/lpoptions when run
 as root and ~/.cups/lpoptions when run as a normal user.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsSetDests2">cupsSetDests2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/macOS 10.4&nbsp;</span><a name="cupsSetDests2">cupsSetDests2</a></h3>
 <p class="description">Save the list of destinations for the specified server.</p>
 <p class="code">
 int cupsSetDests2 (<br>
@@ -3005,7 +2879,7 @@ by a program per thread.<br>
 Note: The current password callback is tracked separately for each thread
 in a program. Multi-threaded programs that override the callback need to do
 so in each thread for the same callback to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
 <p class="description">Set the advanced password callback for CUPS.</p>
 <p class="code">
 void cupsSetPasswordCB2 (<br>
@@ -3051,7 +2925,7 @@ default server name and port.<br>
 Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server need to do so in each
 thread for the same server to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
 <p class="description">Set the server certificate callback.</p>
 <p class="code">
 void cupsSetServerCertCB (<br>
@@ -3090,7 +2964,7 @@ void cupsSetUser (<br>
 Note: The current user name is tracked separately for each thread in a
 program. Multi-threaded programs that override the user name need to do so
 in each thread for the same user name to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsSetUserAgent">cupsSetUserAgent</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsSetUserAgent">cupsSetUserAgent</a></h3>
 <p class="description">Set the default HTTP User-Agent string.</p>
 <p class="code">
 void cupsSetUserAgent (<br>
@@ -3106,7 +2980,7 @@ void cupsSetUserAgent (<br>
 version, IPP version, and operating system version and architecture.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsStartDestDocument">cupsStartDestDocument</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cupsStartDestDocument">cupsStartDestDocument</a></h3>
 <p class="description">Start a new document.</p>
 <p class="code">
 http_status_t cupsStartDestDocument (<br>
@@ -3152,7 +3026,7 @@ if this is the last document to be submitted in the job.  Returns
 <code>HTTP_CONTINUE</code> on success.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsStartDocument">cupsStartDocument</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsStartDocument">cupsStartDocument</a></h3>
 <p class="description">Add a document to a job created with cupsCreateJob().</p>
 <p class="code">
 http_status_t cupsStartDocument (<br>
@@ -3231,7 +3105,7 @@ This function is deprecated and will no longer generate a temporary
 filename - use <a href="#cupsTempFd"><code>cupsTempFd</code></a> or <a href="#cupsTempFile2"><code>cupsTempFile2</code></a> instead.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsTempFile2">cupsTempFile2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsTempFile2">cupsTempFile2</a></h3>
 <p class="description">Creates a temporary CUPS file.</p>
 <p class="code">
 cups_file_t *cupsTempFile2 (<br>
@@ -3263,13 +3137,13 @@ const char *cupsUser (void);</p>
 program. Multi-threaded programs that override the user name with the
 <a href="#cupsSetUser"><code>cupsSetUser</code></a> function need to do so in each thread for the same user
 name to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsUserAgent">cupsUserAgent</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="cupsUserAgent">cupsUserAgent</a></h3>
 <p class="description">Return the default HTTP User-Agent string.</p>
 <p class="code">
 const char *cupsUserAgent (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">User-Agent string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgFormatSizeName">pwgFormatSizeName</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgFormatSizeName">pwgFormatSizeName</a></h3>
 <p class="description">Generate a PWG self-describing media size name.</p>
 <p class="code">
 int pwgFormatSizeName (<br>
@@ -3317,7 +3191,7 @@ units string is <code>NULL</code>, otherwise inches (&quot;in&quot;) or millimet
 are used.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgInitSize">pwgInitSize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgInitSize">pwgInitSize</a></h3>
 <p class="description">Initialize a pwg_size_t structure using IPP Job Template
 attributes.</p>
 <p class="code">
@@ -3347,7 +3221,7 @@ member attribute was specified in the &quot;media-col&quot; Job Template attribu
 otherwise it is initialized to 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForLegacy">pwgMediaForLegacy</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgMediaForLegacy">pwgMediaForLegacy</a></h3>
 <p class="description">Find a PWG media size by ISO/IPP legacy name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForLegacy (<br>
@@ -3365,7 +3239,7 @@ otherwise it is initialized to 0.
 &quot;iso-a4&quot; or &quot;na-letter&quot;.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForPPD">pwgMediaForPPD</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgMediaForPPD">pwgMediaForPPD</a></h3>
 <p class="description">Find a PWG media size by Adobe PPD name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPPD (<br>
@@ -3389,7 +3263,7 @@ thread.  Custom names can be of the form &quot;Custom.WIDTHxLENGTH[units]&quot; 
 &quot;WIDTHxLENGTH[units]&quot;.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForPWG">pwgMediaForPWG</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgMediaForPWG">pwgMediaForPWG</a></h3>
 <p class="description">Find a PWG media size by 5101.1 self-describing name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPWG (<br>
@@ -3411,7 +3285,7 @@ thread-local storage and is overwritten by each call to the function in the
 thread.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForSize">pwgMediaForSize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/macOS 10.9&nbsp;</span><a name="pwgMediaForSize">pwgMediaForSize</a></h3>
 <p class="description">Get the PWG media size for the given dimensions.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForSize (<br>
@@ -3437,19 +3311,19 @@ thread.
 
 </p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
 <p class="description">Client credentials callback
 </p>
 <p class="code">
 typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls, cups_array_t *distinguished_names, void *user_data);
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_dest_block_t">cups_dest_block_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cups_dest_block_t">cups_dest_block_t</a></h3>
 <p class="description">Destination enumeration block
 </p>
 <p class="code">
 typedef int (*cups_dest_block_t(unsigned flags, <a href="#cups_dest_t">cups_dest_t</a> *dest);
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_dest_cb_t">cups_dest_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cups_dest_cb_t">cups_dest_cb_t</a></h3>
 <p class="description">Destination enumeration callback
 </p>
 <p class="code">
@@ -3460,13 +3334,7 @@ typedef int (*cups_dest_cb_t)(void *user_data, unsigned flags, <a href="#cups_de
 <p class="code">
 typedef struct <a href="#cups_dest_s">cups_dest_s</a> cups_dest_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
-<p class="description">Device callback
-</p>
-<p class="code">
-typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
-</p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_dinfo_t">cups_dinfo_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cups_dinfo_t">cups_dinfo_t</a></h3>
 <p class="description">Destination capability and status
 information </p>
 <p class="code">
@@ -3482,7 +3350,7 @@ typedef struct <a href="#cups_job_s">cups_job_s</a> cups_job_t;
 <p class="code">
 typedef struct <a href="#cups_option_s">cups_option_s</a> cups_option_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cups_password_cb2_t">cups_password_cb2_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cups_password_cb2_t">cups_password_cb2_t</a></h3>
 <p class="description">New password callback
 </p>
 <p class="code">
@@ -3498,13 +3366,13 @@ typedef const char *(*cups_password_cb_t)(const char *prompt);
 <p class="code">
 typedef unsigned cups_ptype_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cups_server_cert_cb_t">cups_server_cert_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cups_server_cert_cb_t">cups_server_cert_cb_t</a></h3>
 <p class="description">Server credentials callback
 </p>
 <p class="code">
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *certs, void *user_data);
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_size_t">cups_size_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cups_size_t">cups_size_t</a></h3>
 <p class="description">Media Size </p>
 <p class="code">
 typedef struct <a href="#cups_size_s">cups_size_s</a> cups_size_t;
@@ -3597,7 +3465,7 @@ typedef struct <a href="#pwg_size_s">pwg_size_s</a> pwg_size_t;
 <dt>value </dt>
 <dd class="description">Value of option</dd>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cups_size_s">cups_size_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.6/macOS 10.8&nbsp;</span><a name="cups_size_s">cups_size_s</a></h3>
 <p class="description">Media Size </p>
 <p class="code">struct cups_size_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char media[128];<br>
@@ -3676,8 +3544,8 @@ constants</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_PRINTER_3D <span class="info">&nbsp;CUPS 2.1&nbsp;</span></dt>
-<dd class="description">3D Printing </dd>
-<dt>CUPS_PRINTER_AUTHENTICATED <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Printer with 3D capabilities </dd>
+<dt>CUPS_PRINTER_AUTHENTICATED <span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span></dt>
 <dd class="description">Printer requires authentication
 </dd>
 <dt>CUPS_PRINTER_BIND </dt>
@@ -3690,7 +3558,7 @@ constants</p>
 <dd class="description">Can collage copies</dd>
 <dt>CUPS_PRINTER_COLOR </dt>
 <dd class="description">Can do color printing</dd>
-<dt>CUPS_PRINTER_COMMANDS <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_PRINTER_COMMANDS <span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span></dt>
 <dd class="description">Printer supports maintenance commands
 </dd>
 <dt>CUPS_PRINTER_COPIES </dt>
@@ -3699,7 +3567,7 @@ constants</p>
 <dd class="description">Can cover output</dd>
 <dt>CUPS_PRINTER_DEFAULT </dt>
 <dd class="description">Default printer on network</dd>
-<dt>CUPS_PRINTER_DELETE <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_PRINTER_DELETE <span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span></dt>
 <dd class="description">Delete printer
 </dd>
 <dt>CUPS_PRINTER_DUPLEX </dt>
@@ -3712,10 +3580,10 @@ constants</p>
 <dd class="description">Local printer or class</dd>
 <dt>CUPS_PRINTER_MEDIUM </dt>
 <dd class="description">Can do Tabloid/B/C/A3/A2</dd>
-<dt>CUPS_PRINTER_MFP <span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span></dt>
+<dt>CUPS_PRINTER_MFP <span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span></dt>
 <dd class="description">Printer with scanning capabilities
 </dd>
-<dt>CUPS_PRINTER_NOT_SHARED <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_PRINTER_NOT_SHARED <span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span></dt>
 <dd class="description">Printer is not shared
 </dd>
 <dt>CUPS_PRINTER_PUNCH </dt>
@@ -3724,7 +3592,7 @@ constants</p>
 <dd class="description">Printer is rejecting jobs</dd>
 <dt>CUPS_PRINTER_REMOTE </dt>
 <dd class="description">Remote printer or class</dd>
-<dt>CUPS_PRINTER_SCANNER <span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span></dt>
+<dt>CUPS_PRINTER_SCANNER <span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span></dt>
 <dd class="description">Scanner-only device
 </dd>
 <dt>CUPS_PRINTER_SMALL </dt>

@@ -163,13 +163,10 @@ for a regular print file.
 <dd style="margin-left: 5.0em">The user executing the filter, typically "lp" or "root"; consult the <i>cups-files.conf</i> file for the current setting.
 </dl>
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
-While the filter interface is compatible with System V interface
-scripts, it will only work with the System V interface script as the
-only filter.  Typically the interface script will be provided via the
-<i>lpadmin(8)</i> command using the <i>-i</i> option.
+While the filter interface is compatible with System V interface scripts, CUPS does not support System V interface scripts.
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 CUPS filters are not meant to be run directly by the user.
-Aside from the legacy System V interface issues (<i>argv[0]</i> is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on OS X) has additional restrictions that affect how it runs.
+Aside from the legacy System V interface issues (<i>argv[0]</i> is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs.
 Unless you are a developer and know what you are doing, please do not run filters directly.
 Instead, use the
 <a href="man-cupsfilter.html?TOPIC=Man+Pages"><b>cupsfilter</b>(8)</a>
@@ -183,7 +180,7 @@ program to use the appropriate filters to do the conversions you need.
 <br>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>

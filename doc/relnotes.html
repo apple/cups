@@ -8,6 +8,60 @@
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="0202rc1">CUPS 2.2rc1</a> <em>(August 8, 2016)</em></h2>
+
+<ul>
+
+	<li>Updated the list of supported IPP Everywhere media types.</li>
+	<li>The IPP backend did not validate TLS credentials properly.</li>
+	<li>The printer-state-message attribute was not cleared after a print job with no errors (Issue #4851)</li>
+	<li>The CUPS-Add-Modify-Class and CUPS-Add-Modify-Printer operations did not always return an error for failed adds (Issue #4854)</li>
+	<li>PPD files with names longer than 127 bytes did not work (Issue #4860)</li>
+	<li>Updated localizations (Issue #4846, PR #4858)</li>
+
+</ul>
+
+
+<h2 class="title"><a name="0202b2">CUPS 2.2b2</a> <em>(June 24, 2016)</em></h2>
+
+<ul>
+
+	<li>Added Upstart support (PR #4825)</li>
+	<li>CUPS now supports Let's Encrypt certificates on Linux.</li>
+
+</ul>
+
+
+<h2 class="title"><a name="0202b1">CUPS 2.2b1</a> <em>(June 14, 2016)</em></h2>
+
+<ul>
+
+	<li>All CUPS commands now support POSIX options (Issue #4813)</li>
+	<li>The scheduler now restarts faster (Issue #4760)</li>
+	<li>Improved performance of web interface with large numbers of jobs (Issue #3819)</li>
+	<li>Encrypted printing can now be limited to only trusted printers and servers (&lt;rdar://problem/25711658&gt;)</li>
+	<li>The scheduler now advertises PWG Raster attributes for IPP Everywhere clients (Issue #4428)</li>
+	<li>The scheduler now logs informational messages for jobs at LogLevel "info" (Issue #4815)</li>
+	<li>The scheduler now uses the getgrouplist function when available (Issue #4611)</li>
+	<li>The IPP backend no longer enables compression by default except for certain raster formats that generally benefit from it (&lt;rdar://problem/25166952&gt;)</li>
+	<li>The scheduler did not handle out-of-disk situations gracefully (Issue #4742)</li>
+	<li>The LPD mini-daemon now detects invalid UTF-8 sequences in job, document, and user names (Issue #4748)</li>
+	<li>The IPP backend now continues on to the next job when the remote server/printer puts the job on hold (&lt;rdar://problem/24858548&gt;)</li>
+	<li>The scheduler did not cancel multi-document jobs immediately (&lt;rdar://problem/24854834&gt;)</li>
+	<li>The scheduler did not return non-shared printers to local clients unless they connected to the domain socket</li> (&lt;rdar://problem/24566996&gt;)
+	<li>The scheduler now reads the spool directory if one or more job cache entries point to deleted jobs (&lt;rdar://problem/24048846&gt;)</li>
+	<li>Added support for disc media sizes (&lt;rdar://problem/20219536&gt;)</li>
+	<li>The httpAddrConnect and httpConnect* APIs now try connecting to multiple addresses in parallel (&lt;rdar://problem/20643153&gt;)</li>
+	<li>The cupsd domain socket is no longer world-accessible on macOS (&lt;rdar://problem/7542560&gt;)</li>
+	<li>Interface scripts are no longer supported for security reasons (&lt;rdar://problem/23135640&gt;)</li>
+	<li>Added a new cupsHashData API and support for hashed job passwords (&lt;rdar://problem/20221502&gt;)</li>
+	<li>Localization fixes (&lt;rdar://problem/25292403>, &lt;rdar://problem/25461517>, Issue #4041, Issue #4796)</li>
+	<li>Documentation changes (Issue #4624, Issue #4781)</li>
+	<li>Packaging fixes (PR #4832)</li>
+
+</ul>
+
+
 <h2 class="title"><a name="020104">CUPS 2.1.4</a> <em>(June 14, 2016)</em></h2>
 
 <ul>
