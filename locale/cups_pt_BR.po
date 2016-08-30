@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-25 09:50-0400\n"
+"POT-Creation-Date: 2016-08-30 16:00-0400\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -3160,6 +3160,9 @@ msgstr ""
 
 msgid "Created"
 msgstr "Criada"
+
+msgid "Credentials do not validate against site CA certificate."
+msgstr ""
 
 msgid "Credentials have expired."
 msgstr ""

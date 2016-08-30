@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-25 09:50-0400\n"
+"POT-Creation-Date: 2016-08-30 16:00-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3118,6 +3118,9 @@ msgstr ""
 
 msgid "Created"
 msgstr "ジョブ作成"
+
+msgid "Credentials do not validate against site CA certificate."
+msgstr ""
 
 msgid "Credentials have expired."
 msgstr ""

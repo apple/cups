@@ -808,6 +808,7 @@
 "Cotton Envelope" = "Cotton Envelope";
 "Cover" = "Cover";
 "Created" = "Created";
+"Credentials do not validate against site CA certificate." = "Credentials do not validate against site CA certificate.";
 "Credentials have expired." = "Credentials have expired.";
 "Custom" = "Custom";
 "CustominCutInterval" = "CustominCutInterval";

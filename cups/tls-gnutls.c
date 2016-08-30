@@ -524,8 +524,46 @@ httpCredentialsGetTrust(
   }
   else if (!cg->trust_first)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
-    trust = HTTP_TRUST_INVALID;
+   /*
+    * See if we have a site CA certificate we can compare...
+    */
+
+    if (!httpLoadCredentials(NULL, &tcreds, "site"))
+    {
+      if (cupsArrayCount(credentials) != (cupsArrayCount(tcreds) + 1))
+      {
+       /*
+        * Certificate isn't directly generated from the CA cert...
+	*/
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else
+      {
+       /*
+        * Do a tail comparison of the two certificates...
+	*/
+
+        http_credential_t	*a, *b;		/* Certificates */
+
+        for (a = (http_credential_t *)cupsArrayFirst(tcreds), b = (http_credential_t *)cupsArrayIndex(credentials, 1);
+	     a && b;
+	     a = (http_credential_t *)cupsArrayNext(tcreds), b = (http_credential_t *)cupsArrayNext(credentials))
+	  if (a->datalen != b->datalen || memcmp(a->data, b->data, a->datalen))
+	    break;
+
+        if (a || b)
+	  trust = HTTP_TRUST_INVALID;
+      }
+
+      if (trust != HTTP_TRUST_OK)
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Credentials do not validate against site CA certificate."), 1);
+    }
+    else
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+      trust = HTTP_TRUST_INVALID;
+    }
   }
 
   if (trust == HTTP_TRUST_OK && !cg->expired_certs)
