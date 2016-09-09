@@ -239,6 +239,9 @@ httpAddrConnect2(
       addrlist = addrlist->next;
     }
 
+    if (!addrlist && nfds == 0)
+      break;
+
    /*
     * See if we can connect to any of the addresses so far...
     */

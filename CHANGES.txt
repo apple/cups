@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.0 - 2016-08-26
+CHANGES.txt - 2.2.0 - 2016-09-09
 --------------------------------
 
 CHANGES IN CUPS V2.2.0
@@ -8,6 +8,8 @@ CHANGES IN CUPS V2.2.0
 	- http*Connect did not work on Linux when cupsd was not running
 	  (Issue #4870)
 	- The --no-remote-any option of cupsctl had no effect (Issue #4866)
+	- http*Connect did not return early when all addresses failed
+	  (Issue #4870)
 
 
 CHANGES IN CUPS V2.2rc1
