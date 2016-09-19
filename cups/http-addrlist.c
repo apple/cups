@@ -304,6 +304,7 @@ httpAddrConnect2(
 
     if (result > 0)
     {
+      addrlist = NULL;
       for (i = 0; i < nfds; i ++)
       {
 #  ifdef HAVE_POLL
