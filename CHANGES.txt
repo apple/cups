@@ -1,5 +1,12 @@
-CHANGES.txt - 2.2.0 - 2016-09-09
+CHANGES.txt - 2.2.1 - 2016-09-19
 --------------------------------
+
+CHANGES IN CUPS V2.2.1
+
+	- Added "CreateSelfSignedCerts" directive for cups-files.conf to
+          control whether the scheduler automatically creates its own
+          self-signed X.509 certificates for TLS connections (Issue #4876)
+
 
 CHANGES IN CUPS V2.2.0
 
