@@ -30,8 +30,8 @@ msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2016-08-30 16:00-0400\n"
-"PO-Revision-Date: 2016-04-22 12:25+0100\n"
-"Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
+"PO-Revision-Date: 2016-09-17 18:45+0200\n"
+"Last-Translator: Ettore Atalan <atalanttore@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +50,7 @@ msgstr "\t%d Einträge"
 
 #, c-format
 msgid "\t%s"
-msgstr ""
+msgstr "\t%s"
 
 msgid "\tAfter fault: continue"
 msgstr "\tNach einem Fehler: fortfahren"
@@ -3118,10 +3118,10 @@ msgstr ""
 "Kerberos-Ticket haben."
 
 msgid "Envelope"
-msgstr ""
+msgstr "Umschlag"
 
 msgid "Envelope #10"
-msgstr ""
+msgstr "US Umschlag 10"
 
 msgid "Envelope #11"
 msgstr "US Umschlag 11"
@@ -3193,7 +3193,7 @@ msgid "Envelope Invite"
 msgstr ""
 
 msgid "Envelope Italian"
-msgstr ""
+msgstr "Umschlag italienisch"
 
 msgid "Envelope Kaku2"
 msgstr ""
@@ -3280,7 +3280,7 @@ msgid "Envelope You4 Long Edge"
 msgstr ""
 
 msgid "Environment Variables:"
-msgstr ""
+msgstr "Umgebungsvariablen:"
 
 msgid "Epson"
 msgstr "Epson"
@@ -3340,7 +3340,7 @@ msgid "Expressions:"
 msgstr "Ausdrücke:"
 
 msgid "FAIL"
-msgstr ""
+msgstr "FEHLER"
 
 msgid "Fabric"
 msgstr ""
@@ -3387,7 +3387,7 @@ msgid ""
 msgstr ""
 
 msgid "Film"
-msgstr ""
+msgstr "Film"
 
 msgid "Fine Envelope"
 msgstr ""
@@ -3463,7 +3463,7 @@ msgid "Glossy Paper"
 msgstr "Glanzpapier"
 
 msgid "Glossy Photo Paper"
-msgstr ""
+msgstr "Fotoglanzpapier"
 
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "Drucker-URI Attribut empfangen aber keine Auftrags-ID."
@@ -3493,16 +3493,16 @@ msgid "Hash buffer too small."
 msgstr ""
 
 msgid "Heavyweight Envelope"
-msgstr ""
+msgstr "Schwerer Umschlag"
 
 msgid "Heavyweight Paper"
-msgstr ""
+msgstr "Schweres Papier"
 
 msgid "Help file not in index."
 msgstr "Hilfedatei nicht im Index."
 
 msgid "High"
-msgstr ""
+msgstr "Hoch"
 
 msgid "High Gloss Fabric"
 msgstr ""
@@ -3532,7 +3532,7 @@ msgid "IPP boolean value not 1 byte."
 msgstr ""
 
 msgid "IPP date value not 11 bytes."
-msgstr ""
+msgstr "IPP-Datenwert nicht 11 Bytes."
 
 msgid "IPP endCollection value not 0 bytes."
 msgstr ""
@@ -3550,7 +3550,7 @@ msgid "IPP language length overflows value."
 msgstr ""
 
 msgid "IPP language length too large."
-msgstr ""
+msgstr "IPP-Sprachlänge zu groß."
 
 msgid "IPP member name is not empty."
 msgstr ""
@@ -3583,10 +3583,10 @@ msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr ""
 
 msgid "IPP value larger than 32767 bytes."
-msgstr "IPP Wert länger als 32767 byte"
+msgstr "IPP-Wert länger als 32767 Bytes."
 
 msgid "ISOLatin1"
-msgstr "UTF-8"
+msgstr "ISOLatin1"
 
 msgid "Illegal control character"
 msgstr "Ungültiges Steuerungszeichen"
@@ -3649,7 +3649,7 @@ msgid "Invalid media size."
 msgstr "Ungültige Mediengrösse."
 
 msgid "Invalid ppd-name value."
-msgstr ""
+msgstr "Ungültgier Wert ppd-name"
 
 #, c-format
 msgid "Invalid printer command \"%s\"."
@@ -3774,23 +3774,23 @@ msgid "Label Printer"
 msgstr "Etikettendrucker"
 
 msgid "Label Top"
-msgstr "Etikett (oben)"
+msgstr "Etikett oben"
 
 msgid "Labels"
-msgstr ""
+msgstr "Etiketten"
 
 msgid "Laminate"
-msgstr ""
+msgstr "Laminieren"
 
 msgid "Laminating Foil"
-msgstr ""
+msgstr "Laminierfolie"
 
 #, c-format
 msgid "Language \"%s\" not supported."
 msgstr "Sprache \"%s\" nicht unterstützt."
 
 msgid "Large Address"
-msgstr "Adresse gross"
+msgstr "Große Adresse"
 
 msgid "Large Capacity"
 msgstr ""
@@ -3799,7 +3799,7 @@ msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet Serie PCL 4/5"
 
 msgid "Left"
-msgstr ""
+msgstr "Links"
 
 msgid "Left Gate Fold"
 msgstr ""
@@ -3808,7 +3808,7 @@ msgid "Letter Fold"
 msgstr ""
 
 msgid "Letter Oversize"
-msgstr "Letter Übergrösse"
+msgstr "Letter Übergröße"
 
 msgid "Letter Oversize Long Edge"
 msgstr ""
@@ -4771,7 +4771,7 @@ msgid "Super B/A3"
 msgstr "Super B/A3"
 
 msgid "Switching Protocols"
-msgstr "Protokoll wechseln"
+msgstr "Protokolle wechseln"
 
 msgid "Tab Stock"
 msgstr ""
@@ -6021,7 +6021,7 @@ msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin: Unbekannte Option »%c«."
 
 msgid "lpadmin: Warning - content type list ignored."
-msgstr ""
+msgstr "lpadmin: Warnung - Inhaltstypliste ignoriert."
 
 msgid "lpc> "
 msgstr "lpc> "
@@ -6064,11 +6064,11 @@ msgstr "lpoptions: Hinzufügen von Drucker oder Instanz nicht möglich: %s"
 
 #, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s"
-msgstr "lpoptions: Keine PPD Datei für %s: %s verfügbar"
+msgstr "lpoptions: Keine PPD-Datei für %s: %s verfügbar"
 
 #, c-format
 msgid "lpoptions: Unable to open PPD file for %s."
-msgstr "lpoptions: Keine PPD Datei für %s verfügbar."
+msgstr "lpoptions: Keine PPD-Datei für %s verfügbar."
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: Unbekannter Drucker oder Klasse."
@@ -6471,7 +6471,7 @@ msgstr "ppdc: Schreibe: %s."
 
 #, c-format
 msgid "ppdc: Writing PPD files to directory \"%s\"."
-msgstr ""
+msgstr "ppdc: Schreibe PPD-Dateien in Verzeichnis \"%s\"."
 
 #, c-format
 msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s."
@@ -6479,7 +6479,7 @@ msgstr ""
 
 #, c-format
 msgid "ppdmerge: Ignoring PPD file %s."
-msgstr ""
+msgstr "ppdmerge: PPD-Datei %s wird ignoriert."
 
 #, c-format
 msgid "ppdmerge: Unable to backup %s to %s - %s"
@@ -6491,7 +6491,7 @@ msgstr "Drucker %s ist deaktiviert seit %s"
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
-msgstr "Drucker %s ist im Leerlauf. Aktiviert seit %s"
+msgstr "Drucker %s ist im Leerlauf.  Aktiviert seit %s"
 
 #, c-format
 msgid "printer %s now printing %s-%d.  enabled since %s"
@@ -6503,7 +6503,7 @@ msgstr "Drucker %s/%s deaktiviert seit %s"
 
 #, c-format
 msgid "printer %s/%s is idle.  enabled since %s"
-msgstr "Drucker %s/%s ist im Leerlauf. Aktiviert seit %s"
+msgstr "Drucker %s/%s ist im Leerlauf.  Aktiviert seit %s"
 
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s"
