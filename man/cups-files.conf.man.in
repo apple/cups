@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "20 June 2016" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "19 September 2016" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -54,6 +54,13 @@ The default is "0644" on macOS and "0640" on all other operating systems.
 \fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
+.\"#CreateSelfSignedCerts
+.TP 5
+\fBCreateSelfSignedCerts yes\fR
+.TP 5
+\fBCreateSelfSignedCerts no\fR
+Specifies whether the scheduler automatically creates self-signed certificates for client connections using TLS.
+The default is yes.
 .\"#DataDir
 .TP 5
 \fBDataDir \fIpath\fR

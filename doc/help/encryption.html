@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<!-- SECTION: Getting Started -->
+  <head>
+    <title>Managing Encryption</title>
+    <link rel="STYLESHEET" type="text/css" href="../cups-printable.css">
+  </head>
+  <body>
+    <h1 class="title">Managing Encryption</h1>
+    <p>CUPS supports TLS encryption in two ways:</p>
+    <ol>
+      <li>Using HTTPS (always on) as soon as a connection is established, and</li>
+      <li>Using HTTP Upgrade to TLS (opportunistic) after the connection is established.</li>
+    </ol>
+    <p>CUPS supports self-signed, CA-signed, and enterprise certificates, with configurable certificate validation, cipher suite, and SSL/TLS version policies.</p>
+    <p>Out of the box, CUPS uses a Trust On First Use ("TOFU") certificate validation policy like the popular Secure Shell (ssh) software, requires TLS/1.0 or higher, only allows secure cipher suites, and automatically creates a "self-signed" certificate and private key for the scheduler so that remote administration operations and printer sharing are encrypted by default.</p>
+
+    <h2>Configuring Client TLS Policies</h2>
+    <p>The <a href="man-client.conf.html"><var>client.conf</var></a> file controls the client TLS policies. The default policy is:</p>
+    <pre class="command">
+AllowAnyRoot Yes
+AllowExpiredCerts No
+Encryption IfRequested
+SSLOptions None
+TrustOnFirstUse Yes
+ValidateCerts No
+</pre>
+    <p>A client can be configured to only communicate with trusted TLS/1.1+ servers and printers by copying the corresponding certificates to the client (<a href="#PLATFORM">see below</a>) and using the following policy in the <var>client.conf</var> file or macOS<sup>&reg;</sup> printing preferences:</p>
+    <pre class="command">
+AllowAnyRoot No
+AllowExpiredCerts No
+Encryption Required
+SSLOptions DenyTLS1.0
+TrustOnFirstUse No
+ValidateCerts Yes
+</pre>
+    <p>Similarly, if a client needs to support an older server that only supports SSL/3.0 and RC4 cipher suites you can use the following policy option:</p>
+    <pre class="command">
+SSLOptions AllowRC4 AllowSSL3
+</pre>
+
+    <h2>Configuring Server TLS Policies</h2>
+    <p>Two directives in the <a href="man-cups-files.conf.html"><var>cups-files.conf</var></a> file control the server (scheduler) TLS policies - <a href="man-cups-files.conf.html#CreateSelfSignedCerts"><code>CreateSelfSignedCerts</code></a> and <a href="man-cups-files.conf.html#ServerKeychain"><code>ServerKeychain</code></a>. The default policy creates self-signed certificates as needed.</p>
+    <p>The <a href="man-cupsd.conf.html#DefaultEncryption"><code>DefaultEncryption</code></a> and <a href="man-cupsd.conf.html#Encryption"><code>Encryption</code></a> directives in the <a href="man-cupsd.conf.html"><var>cupsd.conf</var></a> file control whether encryption is used. The default configuration requires encryption for remote access whenever authentication is required.</p>
+
+    <h2><a name="PLATFORM">Platform Differences</a></h2>
+    <h3>macOS<sup>&reg;</sup></h3>
+    <p>On macOS, client configuration settings for ordinary users are stored in the <var>~/Library/Preferences/org.cups.PrintingPrefs.plist</var> file. System-wide and user certificates are stored in the system and login keychains, with private CUPS keychains being used for self-signed and CUPS-managed certificates.</p>
+    <h3>Windows<sup>&reg;</sup></h3>
+    <p>On Windows, client configuration settings are controlled by the SSL/TLS Group Policy settings and certificate stores.</p>
+    <h3>Other Platforms</h3>
+    <p>Other platforms only use the <var>client.conf</var> file and PEM-encoded certificates (<i>hostname</i>.crt) and private keys (<i>hostname</i>.key) in the <var>/etc/cups/ssl</var> and <var>~/.cups/ssl</var> directories. If present, the <var>/etc/cups/ssl/site.crt</var> file defines a site-wide CA certificate that is used to validate server and printer certificates. Certificates for known servers and printers are stored by CUPS in the corresponding <var>ssl</var> directory so they can be validated for subsequent connections.</p>
+    <p>CUPS also supports certificates created and managed by the popular <a href="https://letsencrypt.org/">Let's Encrypt</a> certificate service, which are stored in the <var>/etc/letsencrypt/live</var> directory.</p>
+  </body>
+</html>

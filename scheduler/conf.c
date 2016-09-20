@@ -138,6 +138,9 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "CacheDir",			&CacheDir,		CUPSD_VARTYPE_STRING },
   { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_PERM },
+#ifdef HAVE_SSL
+  { "CreateSelfSignedCerts",	&CreateSelfSignedCerts,	CUPSD_VARTYPE_BOOLEAN },
+#endif /* HAVE_SSL */
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
@@ -739,6 +742,7 @@ cupsdReadConfiguration(void)
   FatalErrors              = parse_fatal_errors(CUPS_DEFAULT_FATAL_ERRORS);
   default_auth_type        = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
+  CreateSelfSignedCerts    = TRUE;
   DefaultEncryption        = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_SSL */
   DirtyCleanInterval       = DEFAULT_KEEPALIVE;
@@ -1181,7 +1185,9 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&ServerKeychain, "%s/%s", ServerRoot, ServerKeychain);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Using keychain \"%s\" for server name \"%s\".", ServerKeychain, ServerName);
-  cupsSetServerCredentials(ServerKeychain, ServerName, 1);
+  if (!CreateSelfSignedCerts)
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Self-signed TLS certificate generation is disabled.");
+  cupsSetServerCredentials(ServerKeychain, ServerName, CreateSelfSignedCerts);
 #endif /* HAVE_SSL */
 
  /*
