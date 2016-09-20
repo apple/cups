@@ -1,1 +1,9 @@
 excerpt_separator: <!--end-excerpt-->
+include: [doc]
+defaults:
+  -
+    scope:
+      path: "doc"
+      type: "pages"
+    values:
+      layout: "sub"

@@ -1,11 +1,6 @@
-<!doctype html>
-<html>
-<!-- SECTION: Getting Started -->
-  <head>
-    <title>Managing Encryption</title>
-    <link rel="STYLESHEET" type="text/css" href="../cups-printable.css">
-  </head>
-  <body>
+---
+title: Managing Encryption
+---
     <h1 class="title">Managing Encryption</h1>
     <p>CUPS supports TLS encryption in two ways:</p>
     <ol>
@@ -51,5 +46,3 @@ SSLOptions AllowRC4 AllowSSL3
     <h3>Other Platforms</h3>
     <p>Other platforms only use the <var>client.conf</var> file and PEM-encoded certificates (<i>hostname</i>.crt) and private keys (<i>hostname</i>.key) in the <var>/etc/cups/ssl</var> and <var>~/.cups/ssl</var> directories. If present, the <var>/etc/cups/ssl/site.crt</var> file defines a site-wide CA certificate that is used to validate server and printer certificates. Certificates for known servers and printers are stored by CUPS in the corresponding <var>ssl</var> directory so they can be validated for subsequent connections.</p>
     <p>CUPS also supports certificates created and managed by the popular <a href="https://letsencrypt.org/">Let's Encrypt</a> certificate service, which are stored in the <var>/etc/letsencrypt/live</var> directory.</p>
-  </body>
-</html>
