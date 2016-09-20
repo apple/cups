@@ -141,8 +141,7 @@ esac
 
 echo ""
 echo "Now you can choose whether to create a SSL/TLS encryption key and"
-echo "certificate for testing; these tests currently require the OpenSSL"
-echo "tools:"
+echo "certificate for testing:"
 echo ""
 echo "0 - Do not do SSL/TLS encryption tests"
 echo "1 - Test but do not require encryption"
