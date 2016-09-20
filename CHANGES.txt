@@ -6,6 +6,7 @@ CHANGES IN CUPS V2.2.1
 	- Added "CreateSelfSignedCerts" directive for cups-files.conf to
           control whether the scheduler automatically creates its own
           self-signed X.509 certificates for TLS connections (Issue #4876)
+        - http*Connect did not handle partial failures (Issue #4866)
         - Updated localizations (PR #4877)
 
 

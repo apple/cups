@@ -304,6 +304,8 @@ httpAddrConnect2(
 
     if (result > 0)
     {
+      http_addrlist_t *connaddr = NULL;	/* Connected address, if any */
+
       for (i = 0; i < nfds; i ++)
       {
 #  ifdef HAVE_POLL
@@ -314,7 +316,7 @@ httpAddrConnect2(
 #  endif /* HAVE_POLL */
 	{
 	  *sock    = fds[i];
-	  addrlist = addrs[i];
+	  connaddr = addrs[i];
 
 #  ifdef DEBUG
 	  len   = sizeof(peer);
@@ -322,11 +324,29 @@ httpAddrConnect2(
 	    DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...", httpAddrString(&peer, temp, sizeof(temp)), httpAddrPort(&peer)));
 #  endif /* DEBUG */
 	}
-	else
+#  ifdef HAVE_POLL
+	else if (pfds[i].revents & (POLLERR | POLLHUP))
+#  else
+	else if (FD_ISSET(fds[i], &error))
+#  endif /* HAVE_POLL */
+        {
+         /*
+          * Error on socket, remove from the "pool"...
+          */
+
 	  httpAddrClose(NULL, fds[i]);
+          nfds --;
+          if (i < nfds)
+          {
+            memmove(fds + i, fds + i + 1, (size_t)(nfds - i) * (sizeof(fds[0])));
+            memmove(addrs + i, addrs + i + 1, (size_t)(nfds - i) * (sizeof(addrs[0])));
+          }
+          i --;
+        }
       }
 
-      return (addrlist);
+      if (connaddr)
+        return (connaddr);
     }
 #endif /* O_NONBLOCK */
 
