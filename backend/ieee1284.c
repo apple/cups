@@ -88,7 +88,7 @@ backendGetDeviceID(
     *device_id = '\0';
 
 #  ifdef __linux
-    if (ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
+    if (ioctl(fd, LPIOC_GET_DEVICE_ID((unsigned)device_id_size), device_id))
     {
      /*
       * Linux has to implement things differently for every device it seems.

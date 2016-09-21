@@ -1179,14 +1179,14 @@ cupsdCheckGroup(
 #ifdef HAVE_GETGROUPLIST
     if (user)
     {
-      int	ngroups,		/* Number of groups */
-		groups[2048];		/* Groups that user belongs to */
+      int	ngroups;		/* Number of groups */
+      gid_t	groups[2048];		/* Groups that user belongs to */
 
       ngroups = (int)(sizeof(groups) / sizeof(groups[0]));
-      getgrouplist(username, (int)user->pw_gid, groups, &ngroups);
+      getgrouplist(username, user->pw_gid, groups, &ngroups);
 
       for (i = 0; i < ngroups; i ++)
-        if ((int)group->gr_gid == groups[i])
+        if (group->gr_gid == groups[i])
 	  return (1);
     }
 #endif /* HAVE_GETGROUPLIST */
