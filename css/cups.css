@@ -123,6 +123,12 @@ P {
   margin-bottom: 20px;
 }
 
+PRE {
+  border: 0px;
+  border-left: 5px solid #ddd;
+  border-radius: 0px;
+}
+
 DIV.footer P {
   margin-bottom: 10px;
 }
