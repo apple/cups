@@ -170,7 +170,7 @@ The device URI associated with the printer.
 .SH FILES
 .I /etc/cups/cups-files.conf
 .SH NOTES
-CUPS backends are not generally design to be run directly by the user. Aside from the device URI issue (
+CUPS backends are not generally designed to be run directly by the user. Aside from the device URI issue (
 .I argv[0]
 and
 .B DEVICE_URI
