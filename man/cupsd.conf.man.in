@@ -689,7 +689,7 @@ The resource for the named printer class
 The path for all jobs (hold-job, release-job, etc.)
 .TP 5
 /jobs/id
-The path for the specified job.
+The path for the specified job
 .TP 5
 /printers
 The path for all printers
