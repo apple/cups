@@ -69,7 +69,7 @@ Back-channel data from the device should be relayed to the job filters using the
 Backends are responsible for reading side-channel requests using the
 .BR cupsSideChannelRead ()
 function and responding with the
-.BR cupsSideChannelWrite()
+.BR cupsSideChannelWrite ()
 function. The
 .B CUPS_SC_FD
 constant defines the file descriptor that should be monitored for incoming requests.
