@@ -10,6 +10,7 @@ CHANGES IN CUPS V2.2.1
         - Addressed some build warnings on Linux (Issue #4881)
         - cupsHashData did not use the correct hashing algorithm
           (<rdar://problem/28209220>)
+        - Updated man pages (PR #4885)
         - Updated localizations (PR #4877, PR #4886)
 
 
