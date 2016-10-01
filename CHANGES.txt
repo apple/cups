@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.1 - 2016-09-22
+CHANGES.txt - 2.2.1 - 2016-10-01
 --------------------------------
 
 CHANGES IN CUPS V2.2.1
@@ -10,7 +10,7 @@ CHANGES IN CUPS V2.2.1
         - Addressed some build warnings on Linux (Issue #4881)
         - cupsHashData did not use the correct hashing algorithm
           (<rdar://problem/28209220>)
-        - Updated localizations (PR #4877)
+        - Updated localizations (PR #4877, PR #4886)
 
 
 CHANGES IN CUPS V2.2.0
