@@ -231,14 +231,14 @@ The default is "30".
 .\"#LimitIPP
 .TP 5
 \fB<Limit \fIoperation \fR...\fB> \fR... \fB</Limit>\fR
-Specifies the IPP operations that are being limited inside a Policy section. IPP operation names are listed below in the section "IPP OPERATIONS".
+Specifies the IPP operations that are being limited inside a Policy section. IPP operation names are listed below in the section "IPP OPERATION NAMES".
 .\"#Limit
 .TP 5
 \fB<Limit \fImethod \fR...\fB> \fR... \fB</Limit>\fR
 .\"#LimitExcept
 .TP 5
 \fB<LimitExcept \fImethod \fR...\fB> \fR... \fB</LimitExcept>\fR
-Specifies the HTTP methods that are being limited inside a Location section. HTTP method names are listed below in the section "HTTP METHODS".
+Specifies the HTTP methods that are being limited inside a Location section. HTTP method names are listed below in the section "HTTP METHOD NAMES".
 .\"#LimitRequestBody
 .TP 5
 \fBLimitRequestBody \fIsize\fR
@@ -689,7 +689,7 @@ The resource for the named printer class
 The path for all jobs (hold-job, release-job, etc.)
 .TP 5
 /jobs/id
-The path for the specified job.
+The path for the specified job
 .TP 5
 /printers
 The path for all printers

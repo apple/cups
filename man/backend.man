@@ -69,7 +69,7 @@ Back-channel data from the device should be relayed to the job filters using the
 Backends are responsible for reading side-channel requests using the
 .BR cupsSideChannelRead ()
 function and responding with the
-.BR cupsSideChannelWrite()
+.BR cupsSideChannelWrite ()
 function. The
 .B CUPS_SC_FD
 constant defines the file descriptor that should be monitored for incoming requests.
@@ -170,7 +170,7 @@ The device URI associated with the printer.
 .SH FILES
 .I /etc/cups/cups-files.conf
 .SH NOTES
-CUPS backends are not generally design to be run directly by the user. Aside from the device URI issue (
+CUPS backends are not generally designed to be run directly by the user. Aside from the device URI issue (
 .I argv[0]
 and
 .B DEVICE_URI
