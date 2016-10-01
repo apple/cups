@@ -103,7 +103,9 @@ program to register the changes to the \fIinetd.conf\fR file.
 CUPS includes configuration files for
 .BR launchd (8),
 .BR systemd (8),
-and \fBxinetd(8)\fR. Simply enable the
+and
+.BR xinetd (8).
+Simply enable the
 .B cups-lpd
 service using the corresponding control program.
 .SH SEE ALSO
