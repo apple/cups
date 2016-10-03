@@ -5,6 +5,18 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="020201">CUPS 2.2.1</a> <em>(October 3, 2016)</em></h2>
+
+<ul>
+	<li>Added &quot;CreateSelfSignedCerts&quot; directive for cups-files.conf to control whether the scheduler automatically creates its own self-signed X.509 certificates for TLS connections (Issue #4876)</li>
+	<li>http*Connect did not handle partial failures (Issue #4870)</li>
+	<li>Addressed some build warnings on Linux (Issue #4881)</li>
+	<li>cupsHashData did not use the correct hashing algorithm (&lt;rdar://problem/28209220&gt;)</li>
+	<li>Updated man pages (PR #4885)</li>
+	<li>Updated localizations (PR #4877, PR #4886)</li>
+</ul>
+
+
 <h2 class="title"><a name="020200">CUPS 2.2.0</a> <em>(September 13, 2016)</em></h2>
 
 <ul>
