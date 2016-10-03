@@ -15,7 +15,7 @@ dnl We need at least autoconf 2.60...
 AC_PREREQ(2.60)
 
 dnl Package name and version...
-AC_INIT([CUPS], [2.2.0], [https://github.com/apple/cups/issues], [cups], [https://www.cups.org/])
+AC_INIT([CUPS], [2.2.1], [https://github.com/apple/cups/issues], [cups], [https://www.cups.org/])
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
