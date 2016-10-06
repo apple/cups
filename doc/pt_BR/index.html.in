@@ -5,7 +5,7 @@
     <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width">
     <title>In&iacute;cio - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
   </head>
@@ -14,7 +14,7 @@
       <ul>
 	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a class="active" href="/">In&iacute;cio</a></li>
-	<li><a href="/admin">Administra&ccedil;&atilde;o</a></li>
+	<li><a href="/admin">Administrar&ccedil;&atilde;o</a></li>
 	<li><a href="/classes/">Classes</a></li>
 	<li><a href="/help/">Ajuda</a></li>
 	<li><a href="/jobs/">Trabalhos</a></li>
