@@ -61,7 +61,7 @@ function may be used to retrieve the correct device URI.
 <p>Backends are responsible for reading side-channel requests using the
 <b>cupsSideChannelRead</b>()
 function and responding with the
-<b>cupsSideChannelWrite()</b>
+<b>cupsSideChannelWrite</b>()
 function. The
 <b>CUPS_SC_FD</b>
 constant defines the file descriptor that should be monitored for incoming requests.
@@ -147,7 +147,7 @@ CUPS backends can expect the following environment variable:
 <h2 class="title"><a name="FILES">Files</a></h2>
 <i>/etc/cups/cups-files.conf</i>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-CUPS backends are not generally design to be run directly by the user. Aside from the device URI issue (
+CUPS backends are not generally designed to be run directly by the user. Aside from the device URI issue (
 <i>argv[0]</i>
 and
 <b>DEVICE_URI</b>

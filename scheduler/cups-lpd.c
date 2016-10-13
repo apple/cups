@@ -1650,16 +1650,24 @@ smart_strlcpy(char       *dst,		/* I - Output buffer */
       *dstptr++ = 0xc0 | (*srcptr >> 6);
       *dstptr++ = 0x80 | (*srcptr++ & 0x3f);
     }
-    else if ((*srcptr & 0xe0) == 0xc0)
+    else if ((*srcptr & 0xe0) == 0xc0 && (srcptr[1] & 0xc0) == 0x80)
     {
+     /*
+      * 2-byte UTF-8 sequence...
+      */
+
       if (dstptr > (dstend - 2))
         break;
 
       *dstptr++ = *srcptr++;
       *dstptr++ = *srcptr++;
     }
-    else if ((*srcptr & 0xf0) == 0xe0)
+    else if ((*srcptr & 0xf0) == 0xe0 && (srcptr[1] & 0xc0) == 0x80 && (srcptr[2] & 0xc0) == 0x80)
     {
+     /*
+      * 3-byte UTF-8 sequence...
+      */
+
       if (dstptr > (dstend - 3))
         break;
 
@@ -1667,8 +1675,12 @@ smart_strlcpy(char       *dst,		/* I - Output buffer */
       *dstptr++ = *srcptr++;
       *dstptr++ = *srcptr++;
     }
-    else if ((*srcptr & 0xf8) == 0xf0)
+    else if ((*srcptr & 0xf8) == 0xf0 && (srcptr[1] & 0xc0) == 0x80 && (srcptr[2] & 0xc0) == 0x80 && (srcptr[3] & 0xc0) == 0x80)
     {
+     /*
+      * 4-byte UTF-8 sequence...
+      */
+
       if (dstptr > (dstend - 4))
         break;
 
@@ -1680,7 +1692,7 @@ smart_strlcpy(char       *dst,		/* I - Output buffer */
     else
     {
      /*
-      * Orphan UTF-8 sequence, this must be an ISO-8859-1 string...
+      * Bad UTF-8 sequence, this must be an ISO-8859-1 string...
       */
 
       saw_8859 = 1;
