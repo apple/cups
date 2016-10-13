@@ -5,6 +5,7 @@ CHANGES IN CUPS V2.2.2
 
 	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
           (Issue #4899)
+        - Updated localizations (PR #4895)
 
 
 CHANGES IN CUPS V2.2.1
