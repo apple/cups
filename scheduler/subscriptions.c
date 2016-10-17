@@ -155,7 +155,7 @@ cupsdAddEvent(
 	            "printer-up-time", time(NULL));
 
       va_start(ap, text);
-      vsnprintf(ftext, sizeof(ftext), text, ap);
+      vsnprintf(ftext, sizeof(ftext), _cupsLangString(cupsLangDefault(), text), ap);
       va_end(ap);
 
       ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_TEXT,

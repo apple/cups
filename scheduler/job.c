@@ -2616,7 +2616,7 @@ cupsdSetJobState(
     va_list	ap;			/* Pointer to additional arguments */
 
     va_start(ap, message);
-    vsnprintf(buffer, sizeof(buffer), message, ap);
+    vsnprintf(buffer, sizeof(buffer), _cupsLangString(cupsLangDefault(), message), ap);
     va_end(ap);
 
     if (newstate > IPP_JOB_STOPPED)
@@ -3161,18 +3161,18 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   switch (job_state = job->state_value)
   {
     case IPP_JOB_PENDING :
-        message = "Job paused.";
+        message = _cupsLangString(cupsLangDefault(), _("Job paused."));
 	break;
 
     case IPP_JOB_HELD :
-        message = "Job held.";
+        message = _cupsLangString(cupsLangDefault(), _("Job held."));
 	break;
 
     default :
     case IPP_JOB_PROCESSING :
     case IPP_JOB_COMPLETED :
 	job_state = IPP_JOB_COMPLETED;
-	message   = "Job completed.";
+	message   = _cupsLangString(cupsLangDefault(), _("Job completed."));
 
         if (!job->status)
 	  ippSetString(job->attrs, &job->reasons, 0,
@@ -3180,19 +3180,19 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
         break;
 
     case IPP_JOB_STOPPED :
-        message = "Job stopped.";
+        message = _cupsLangString(cupsLangDefault(), _("Job stopped."));
 
 	ippSetString(job->attrs, &job->reasons, 0, "job-stopped");
 	break;
 
     case IPP_JOB_CANCELED :
-        message = "Job canceled.";
+        message = _cupsLangString(cupsLangDefault(), _("Job canceled."));
 
 	ippSetString(job->attrs, &job->reasons, 0, "job-canceled-by-user");
 	break;
 
     case IPP_JOB_ABORTED :
-        message = "Job aborted.";
+        message = _cupsLangString(cupsLangDefault(), _("Job aborted."));
 	break;
   }
 
@@ -3254,7 +3254,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
             if (job_state == IPP_JOB_COMPLETED)
 	    {
 	      job_state = IPP_JOB_PENDING;
-	      message   = "Retrying job on another printer.";
+	      message   = _cupsLangString(cupsLangDefault(), _("Retrying job on another printer."));
 
 	      ippSetString(job->attrs, &job->reasons, 0,
 	                   "resources-are-not-ready");
@@ -3270,7 +3270,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
             if (job_state == IPP_JOB_COMPLETED)
 	    {
 	      job_state = IPP_JOB_PENDING;
-	      message   = "Retrying job on same printer.";
+	      message   = _cupsLangString(cupsLangDefault(), _("Retrying job on same printer."));
 
 	      ippSetString(job->attrs, &job->reasons, 0, "none");
 	    }
@@ -3295,7 +3295,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		*/
 
 		snprintf(buffer, sizeof(buffer),
-			 "Job aborted after %d unsuccessful attempts.",
+			 _cupsLangString(cupsLangDefault(), _("Job aborted after %d unsuccessful attempts.")),
 			 JobRetryLimit);
 		job_state = IPP_JOB_ABORTED;
 		message   = buffer;
@@ -3309,7 +3309,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		*/
 
 		snprintf(buffer, sizeof(buffer),
-			 "Job held for %d seconds since it could not be sent.",
+			 _cupsLangString(cupsLangDefault(), _("Job held for %d seconds since it could not be sent.")),
 			 JobRetryInterval);
 
 		job->hold_until = time(NULL) + JobRetryInterval;
@@ -3325,8 +3325,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	           job_state == IPP_JOB_COMPLETED)
 	  {
 	    job_state = IPP_JOB_ABORTED;
-	    message   = "Job aborted due to backend errors; please consult "
-	                "the error_log file for details.";
+	    message   = _cupsLangString(cupsLangDefault(), _("Job aborted due to backend errors; please consult "
+	                "the error_log file for details."));
 
 	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	  }
@@ -3334,8 +3334,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
           {
             job_state     = IPP_JOB_PENDING;
 	    printer_state = IPP_PRINTER_STOPPED;
-	    message       = "Printer stopped due to backend errors; please "
-			    "consult the error_log file for details.";
+	    message       = _cupsLangString(cupsLangDefault(), _("Printer stopped due to backend errors; please "
+			    "consult the error_log file for details."));
 
 	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
@@ -3349,7 +3349,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
 	    job_state = IPP_JOB_CANCELED;
-	    message   = "Job canceled at printer.";
+	    message   = _cupsLangString(cupsLangDefault(), _("Job canceled at printer."));
 
 	    ippSetString(job->attrs, &job->reasons, 0, "canceled-at-device");
 	  }
@@ -3373,34 +3373,34 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	      ippSetString(job->attrs, &job->reasons, 0,
 			   "job-hold-until-specified");
-	      message = "Job held indefinitely due to backend errors; please "
-			"consult the error_log file for details.";
+	      message = _cupsLangString(cupsLangDefault(), _("Job held indefinitely due to backend errors; please "
+			"consult the error_log file for details."));
             }
             else if (!strcmp(reason, "account-info-needed"))
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account information is "
-	                "required.";
+	      message = _cupsLangString(cupsLangDefault(), _("Job held indefinitely - account information is "
+	                "required."));
             }
             else if (!strcmp(reason, "account-closed"))
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account has been closed.";
+	      message = _cupsLangString(cupsLangDefault(), _("Job held indefinitely - account has been closed."));
 	    }
             else if (!strcmp(reason, "account-limit-reached"))
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account limit has been "
-	                "reached.";
+	      message = _cupsLangString(cupsLangDefault(), _("Job held indefinitely - account limit has been "
+	                "reached."));
 	    }
             else
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account authorization failed.";
+	      message = _cupsLangString(cupsLangDefault(), _("Job held indefinitely - account authorization failed."));
 	    }
 
 	    job_state = IPP_JOB_HELD;
@@ -3413,8 +3413,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  */
 
 	  printer_state = IPP_PRINTER_STOPPED;
-	  message       = "Printer stopped due to backend errors; please "
-			  "consult the error_log file for details.";
+	  message       = _cupsLangString(cupsLangDefault(), _("Printer stopped due to backend errors; please "
+			  "consult the error_log file for details."));
 
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
@@ -3435,7 +3435,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    cupsdSetJobHoldUntil(job, "auth-info-required", 1);
 
 	    job_state = IPP_JOB_HELD;
-	    message   = "Job held for authentication.";
+	    message   = _cupsLangString(cupsLangDefault(), _("Job held for authentication."));
 
             if (strncmp(job->reasons->values[0].string.text, "account-", 8))
 	      ippSetString(job->attrs, &job->reasons, 0,
@@ -3460,7 +3460,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	      */
 
 	      snprintf(buffer, sizeof(buffer),
-		       "Job aborted after %d unsuccessful attempts.",
+		       _cupsLangString(cupsLangDefault(), _("Job aborted after %d unsuccessful attempts.")),
 		       JobRetryLimit);
 	      job_state = IPP_JOB_ABORTED;
 	      message   = buffer;
@@ -3474,7 +3474,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	      */
 
 	      snprintf(buffer, sizeof(buffer),
-		       "Job held for %d seconds since it could not be sent.",
+		       _cupsLangString(cupsLangDefault(), _("Job held for %d seconds since it could not be sent.")),
 		       JobRetryInterval);
 
 	      job->hold_until = time(NULL) + JobRetryInterval;
@@ -3495,7 +3495,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
 	    job_state = IPP_JOB_PENDING;
-	    message   = "Retrying job on same printer.";
+	    message   = _cupsLangString(cupsLangDefault(), _("Retrying job on same printer."));
 
 	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
@@ -3511,8 +3511,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
     if (job_state == IPP_JOB_COMPLETED)
     {
       job_state = IPP_JOB_STOPPED;
-      message   = "Job stopped due to filter errors; please consult the "
-		  "error_log file for details.";
+      message   = _cupsLangString(cupsLangDefault(), _("Job stopped due to filter errors; please consult the "
+		  "error_log file for details."));
 
       if (WIFSIGNALED(job->status))
 	ippSetString(job->attrs, &job->reasons, 0, "cups-filter-crashed");
