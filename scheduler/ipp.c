@@ -181,7 +181,7 @@ cupsdProcessIPPRequest(
     */
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                  "%04X %s Bad request version number %d.%d",
+                  _("%04X %s Bad request version number %d.%d"),
 		  IPP_VERSION_NOT_SUPPORTED, con->http->hostname,
                   con->request->request.any.version[0],
 	          con->request->request.any.version[1]);
@@ -198,7 +198,7 @@ cupsdProcessIPPRequest(
     */
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                  "%04X %s Bad request ID %d",
+                  _("%04X %s Bad request ID %d"),
 		  IPP_BAD_REQUEST, con->http->hostname,
                   con->request->request.any.request_id);
 
@@ -208,7 +208,7 @@ cupsdProcessIPPRequest(
   else if (!con->request->attrs)
   {
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                  "%04X %s No attributes in request",
+                  _("%04X %s No attributes in request"),
 		  IPP_BAD_REQUEST, con->http->hostname);
 
     send_ipp_status(con, IPP_BAD_REQUEST, _("No attributes in request."));
@@ -230,7 +230,7 @@ cupsdProcessIPPRequest(
 	*/
 
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                      "%04X %s Attribute groups are out of order",
+                      _("%04X %s Attribute groups are out of order"),
 		      IPP_BAD_REQUEST, con->http->hostname);
 
 	send_ipp_status(con, IPP_BAD_REQUEST,
@@ -320,7 +320,7 @@ cupsdProcessIPPRequest(
         cupsdLogMessage(CUPSD_LOG_ERROR, "Unsupported character set \"%s\"",
 	                charset->values[0].string.text);
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-		      "%04X %s Unsupported attributes-charset value \"%s\"",
+		      _("%04X %s Unsupported attributes-charset value \"%s\""),
 		      IPP_CHARSET, con->http->hostname,
 		      charset->values[0].string.text);
 	send_ipp_status(con, IPP_BAD_REQUEST,
@@ -347,7 +347,7 @@ cupsdProcessIPPRequest(
 	                  "Missing attributes-charset attribute");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	"%04X %s Missing attributes-charset attribute",
+                	_("%04X %s Missing attributes-charset attribute"),
 			IPP_BAD_REQUEST, con->http->hostname);
         }
 
@@ -357,7 +357,7 @@ cupsdProcessIPPRequest(
 	                  "Missing attributes-natural-language attribute");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	"%04X %s Missing attributes-natural-language attribute",
+                	_("%04X %s Missing attributes-natural-language attribute"),
 			IPP_BAD_REQUEST, con->http->hostname);
         }
 
@@ -368,8 +368,8 @@ cupsdProcessIPPRequest(
 			  "attribute");
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	"%04X %s Missing printer-uri, job-uri, or ppd-name "
-			"attribute", IPP_BAD_REQUEST, con->http->hostname);
+                	_("%04X %s Missing printer-uri, job-uri, or ppd-name "
+			"attribute"), IPP_BAD_REQUEST, con->http->hostname);
         }
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "Request attributes follow...");
@@ -610,7 +610,7 @@ cupsdProcessIPPRequest(
 
 	  default :
 	      cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
-                	    "%04X %s Operation %04X (%s) not supported",
+                	    _("%04X %s Operation %04X (%s) not supported"),
 			    IPP_OPERATION_NOT_SUPPORTED, con->http->hostname,
 			    con->request->request.op.operation_id,
 			    ippOpString(con->request->request.op.operation_id));
@@ -808,7 +808,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   printer->state_message[0] = '\0';
 
   cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
-                "Now accepting jobs.");
+                _("Now accepting jobs."));
 
   if (dtype & CUPS_PRINTER_CLASS)
   {
@@ -973,8 +973,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     pclass->accepting = attr->values[0].boolean;
 
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL, "%s accepting jobs.",
-		  pclass->accepting ? "Now" : "No longer");
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL,
+                  pclass->accepting ? ("Now accepting jobs.") : _("No longer accepting jobs"));
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
@@ -1121,7 +1121,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     cupsdSetJobState(pclass->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
-                     "Job restarted because the class was modified.");
+                     _("Job restarted because the class was modified."));
   }
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
@@ -1129,7 +1129,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if (modify)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED,
-		  pclass, NULL, "Class \"%s\" modified by \"%s\".",
+		  pclass, NULL, _("Class \"%s\" modified by \"%s\"."),
 		  pclass->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" modified by \"%s\".",
@@ -1138,7 +1138,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   else
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
-		  pclass, NULL, "New class \"%s\" added by \"%s\".",
+		  pclass, NULL, _("New class \"%s\" added by \"%s\"."),
 		  pclass->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "New class \"%s\" added by \"%s\".",
@@ -1195,7 +1195,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
   if (!compressions || !filetypes)
   {
     cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
-                     "Job aborted because the scheduler ran out of memory.");
+                     _("Job aborted because the scheduler ran out of memory."));
 
     if (con)
       send_ipp_status(con, IPP_INTERNAL_ERROR,
@@ -1896,8 +1896,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
       if ((kbytes = copy_banner(con, job, attr->values[0].string.text)) < 0)
       {
         cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
-	                 "Aborting job because the start banner could not be "
-			 "copied.");
+	                 _("Aborting job because the start banner could not be "
+			  "copied."));
         return (NULL);
       }
 
@@ -1944,7 +1944,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Fire the "job created" event...
   */
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, "Job created.");
+  cupsdAddEvent(CUPSD_EVENT_JOB_CREATED, printer, job, _("Job created."));
 
  /*
   * Return the new job...
@@ -2498,8 +2498,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     printer->accepting = attr->values[0].boolean;
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
-                  "%s accepting jobs.",
-		  printer->accepting ? "Now" : "No longer");
+		  printer->accepting ?
+		  _("Now accepting jobs.") :
+		  _("No longer accepting jobs."));
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
@@ -2621,7 +2622,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
-                  "Printer \"%s\" state changed.", printer->name);
+                  _("Printer \"%s\" state changed."), printer->name);
   }
 
   if (!set_printer_defaults(con, printer))
@@ -2823,7 +2824,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     cupsdSetJobState(printer->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
-                     "Job restarted because the printer was modified.");
+                     _("Job restarted because the printer was modified."));
   }
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
@@ -2831,7 +2832,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if (modify)
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED,
-                  printer, NULL, "Printer \"%s\" modified by \"%s\".",
+                  printer, NULL, _("Printer \"%s\" modified by \"%s\"."),
 		  printer->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" modified by \"%s\".",
@@ -2840,10 +2841,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else
   {
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
-                  printer, NULL, "New printer \"%s\" added by \"%s\".",
+                  printer, NULL, _("New printer \"%s\" added by \"%s\"."),
 		  printer->name, get_username(con));
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "New printer \"%s\" added by \"%s\".",
+    cupsdLogMessage(CUPSD_LOG_INFO, _("New printer \"%s\" added by \"%s\"."),
                     printer->name, get_username(con));
   }
 
@@ -3106,7 +3107,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, NULL, job, "Job authenticated by user");
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, NULL, job, _("Job authenticated by user"));
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Authenticated by \"%s\".", con->username);
 
@@ -3267,8 +3268,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	job = cupsdFindJob(job_ids->values[i].integer);
 
 	cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
-	                 purge == CUPSD_JOB_PURGE ? "Job purged by user." :
-	                                            "Job canceled by user.");
+	                 purge == CUPSD_JOB_PURGE ? _("Job purged by user.") :
+	                                            _("Job canceled by user."));
       }
 
       cupsdLogMessage(CUPSD_LOG_INFO, "Selected jobs were %s by \"%s\".",
@@ -3326,8 +3327,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	job = cupsdFindJob(job_ids->values[i].integer);
 
 	cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
-	                 purge == CUPSD_JOB_PURGE ? "Job purged by user." :
-	                                            "Job canceled by user.");
+	                 purge == CUPSD_JOB_PURGE ? _("Job purged by user.") :
+	                                            _("Job canceled by user."));
       }
 
       cupsdLogMessage(CUPSD_LOG_INFO, "Selected jobs were %s by \"%s\".",
@@ -3546,8 +3547,8 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
-                   purge == CUPSD_JOB_PURGE ? "Job purged by \"%s\"" :
-		                              "Job canceled by \"%s\"",
+                   purge == CUPSD_JOB_PURGE ? _("Job purged by \"%s\"") :
+		                              _("Job canceled by \"%s\""),
 		   username);
   cupsdCheckJobs();
 
@@ -5361,7 +5362,7 @@ create_local_bg_thread(
 
       cupsdSetPrinterAttrs(printer);
 
-      cupsdAddEvent(CUPSD_EVENT_PRINTER_CONFIG, printer, NULL, "Printer \"%s\" is now available.", printer->name);
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_CONFIG, printer, NULL, _("Printer \"%s\" is now available."), printer->name);
       cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" is now available.", printer->name);
     }
   }
@@ -5975,8 +5976,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdAddEvent(CUPSD_EVENT_PRINTER_DELETED, printer, NULL,
-                "%s \"%s\" deleted by \"%s\".",
-		(dtype & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		(dtype & CUPS_PRINTER_CLASS) ?
+		_("Class \"%s\" deleted by \"%s\".") :
+		_("Printer \"%s\" deleted by \"%s\"."),
 		printer->name, get_username(con));
 
   cupsdExpireSubscriptions(printer, NULL);
@@ -7937,13 +7939,13 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     when = attr->values[0].string.text;
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
-		  "Job job-hold-until value changed by user.");
+		  _("Job job-hold-until value changed by user."));
   }
   else
     when = "indefinite";
 
   cupsdSetJobHoldUntil(job, when, 1);
-  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT, "Job held by \"%s\".",
+  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT, _("Job held by \"%s\"."),
                    username);
 
   con->response->request.status.status_code = IPP_OK;
@@ -8859,7 +8861,7 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
             sizeof(printer->state_message));
 
   cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
-                "No longer accepting jobs.");
+                _("No longer accepting jobs."));
 
   if (dtype & CUPS_PRINTER_CLASS)
   {
@@ -9071,7 +9073,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     ippSetString(job->attrs, &attr, 0, "no-hold");
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
-                  "Job job-hold-until value changed by user.");
+                  _("Job job-hold-until value changed by user."));
     ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
@@ -9082,7 +9084,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdReleaseJob(job);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
-                "Job released by user.");
+                _("Job released by user."));
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Released by \"%s\".", username);
 
@@ -9319,7 +9321,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE,
-                  NULL, job, "Job restarted by user with job-hold-until=%s",
+                  NULL, job, _("Job restarted by user with job-hold-until=%s"),
 		  attr->values[0].string.text);
   }
   else
@@ -10109,10 +10111,10 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 
   if (oldprinter)
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, oldprinter, NULL,
-                  "%s is no longer the default printer.", oldprinter->name);
+                  _("%s is no longer the default printer."), oldprinter->name);
 
   cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
-		"%s is now the default printer.", printer->name);
+		_("%s is now the default printer."), printer->name);
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS | CUPSD_DIRTY_CLASSES |
                  CUPSD_DIRTY_PRINTCAP);
@@ -10357,7 +10359,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
 			    attr->values[0].integer);
-                cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer, CUPSD_JOB_DEFAULT, "Job state changed by \"%s\"", username);
+                cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer, CUPSD_JOB_DEFAULT, _("Job state changed by \"%s\""), username);
 		check_jobs = 1;
 	      }
 	      break;
@@ -10387,7 +10389,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 			    attr->values[0].integer);
                 cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer,
 		                 CUPSD_JOB_DEFAULT,
-				 "Job state changed by \"%s\"", username);
+				 _("Job state changed by \"%s\""), username);
                 check_jobs = 1;
 	      }
 	      break;
@@ -10436,7 +10438,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	}
 	else
 	  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT,
-	                   "Job held by \"%s\".", username);
+	                   _("Job held by \"%s\"."), username);
 
         event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
       }
@@ -10489,16 +10491,17 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   if (event & CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED)
     cupsdAddEvent(CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED,
                   cupsdFindDest(job->dest), job,
-                  "Job priority changed by user.");
+                  _("Job priority changed by user."));
 
   if (event & CUPSD_EVENT_JOB_STATE)
     cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
                   job->state_value == IPP_JOB_HELD ?
-		      "Job held by user." : "Job restarted by user.");
+                  _("Job held by user.") :
+                  _("Job restarted by user."));
 
   if (event & CUPSD_EVENT_JOB_CONFIG_CHANGED)
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
-                  "Job options changed by user.");
+                  _("Job options changed by user."));
 
  /*
   * Start jobs if possible...

@@ -205,10 +205,10 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
 
       if (purge)
 	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_PURGE,
-	                 "Job purged by user.");
+	                 _("Job purged by user."));
       else if (job->state_value < IPP_JOB_CANCELED)
 	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
-			 "Job canceled by user.");
+			 _("Job canceled by user."));
     }
   }
 }
@@ -271,9 +271,9 @@ cupsdCheckJobs(void)
       cancel_after = attr ? ippGetInteger(attr, 0) : MaxJobTime;
 
       if (job->completed)
-	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_FORCE, "Marking stuck job as completed after %d seconds.", cancel_after);
+	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_FORCE, _("Marking stuck job as completed after %d seconds."), cancel_after);
       else
-	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT, "Canceling stuck job after %d seconds.", cancel_after);
+	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT, _("Canceling stuck job after %d seconds."), cancel_after);
       continue;
     }
 
@@ -310,7 +310,7 @@ cupsdCheckJobs(void)
       }
 
       cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                       "Job submission timed out.");
+                       _("Job submission timed out."));
     }
 
    /*
@@ -374,8 +374,8 @@ cupsdCheckJobs(void)
 	*/
 
         cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
-	                 "Job aborted because the destination printer/class "
-			 "has gone away.");
+	                 _("Job aborted because the destination printer/class "
+			 "has gone away."));
       }
       else if (printer)
       {
@@ -1318,7 +1318,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)update_job, NULL,
                  job);
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, _("Job #%d started."),
                 job->id);
 
   return;
@@ -2106,10 +2106,10 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
 
   if (job->state_value > IPP_JOB_HELD)
     cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-		     "Stopping job prior to move.");
+		     _("Stopping job prior to move."));
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, oldp, job,
-                "Job #%d moved from %s to %s.", job->id, olddest,
+                _("Job #%d moved from %s to %s."), job->id, olddest,
 		p->name);
 
   cupsdSetString(&job->dest, p->name);
@@ -2120,7 +2120,7 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
     ippSetString(job->attrs, &attr, 0, p->uri);
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
-                "Job #%d moved from %s to %s.", job->id, olddest,
+                _("Job #%d moved from %s to %s."), job->id, olddest,
 		p->name);
 
   job->dirty = 1;
@@ -2148,7 +2148,7 @@ cupsdReleaseJob(cupsd_job_t *job)	/* I - Job */
       cupsdTimeoutJob(job);
 
     cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                     "Job released by user.");
+                     _("Job released by user."));
   }
 }
 
@@ -2165,7 +2165,7 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
 
   if (job->state_value == IPP_JOB_STOPPED || job->num_files)
     cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                     "Job restarted by user.");
+                     _("Job restarted by user."));
 }
 
 
@@ -4640,7 +4640,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   {
     ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
     cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_DEFAULT,
-                     "Aborting job because it has no files.");
+                     _("Aborting job because it has no files."));
     return;
   }
 
@@ -4721,8 +4721,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		"Unable to create job status pipes - %s.", strerror(errno));
 
     cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Job stopped because the scheduler could not create the "
-		     "job status pipes.");
+		     _("Job stopped because the scheduler could not create the "
+		     "job status pipes."));
 
     cupsdDestroyProfile(job->profile);
     job->profile = NULL;
@@ -4744,8 +4744,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		"Unable to create back-channel pipes - %s.", strerror(errno));
 
     cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Job stopped because the scheduler could not create the "
-		     "back-channel pipes.");
+		     _("Job stopped because the scheduler could not create the "
+		     "back-channel pipes."));
 
     cupsdClosePipe(job->status_pipes);
     cupsdStatBufDelete(job->status_buffer);
@@ -4773,8 +4773,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 		"Unable to create side-channel pipes - %s.", strerror(errno));
 
     cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Job stopped because the scheduler could not create the "
-		     "side-channel pipes.");
+		     _("Job stopped because the scheduler could not create the "
+		     "side-channel pipes."));
 
     cupsdClosePipe(job->back_pipes);
 
@@ -4979,7 +4979,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cupsdLogPage(job, message);
 
       if (job->sheets)
-	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job, "Printed %d page(s).", ippGetInteger(job->sheets, 0));
+	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job, _("Printed %d page(s)."), ippGetInteger(job->sheets, 0));
     }
     else if (loglevel == CUPSD_LOG_JOBSTATE)
     {
@@ -5081,7 +5081,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
 	  if (job->sheets)
 	    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-			  "Printing page %d, %d%%",
+			  _("Printing page %d, %d%%"),
 			  job->sheets->values[0].integer, job->progress);
         }
       }
@@ -5230,8 +5230,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
   if (event & CUPSD_EVENT_PRINTER_STATE)
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		  (job->printer->type & CUPS_PRINTER_CLASS) ?
-		      "Class \"%s\" state changed." :
-		      "Printer \"%s\" state changed.",
+		      _("Class \"%s\" state changed.") :
+		      _("Printer \"%s\" state changed."),
 		  job->printer->name);
 
 

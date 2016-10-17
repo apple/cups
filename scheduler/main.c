@@ -680,13 +680,13 @@ main(int  argc,				/* I - Number of command-line args */
 
 #if defined(HAVE_ONDEMAND)
   if (OnDemand)
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started on demand.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, _("Scheduler started on demand."));
   else
 #endif /* HAVE_ONDEMAND */
   if (fg)
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in foreground.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, _("Scheduler started in foreground."));
   else
-    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in background.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, _("Scheduler started in background."));
 
  /*
   * Start any pending print jobs...
@@ -794,7 +794,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
         cupsdAddEvent(CUPSD_EVENT_SERVER_RESTARTED, NULL, NULL,
-                      "Scheduler restarted.");
+                      _("Scheduler restarted."));
       }
     }
 
@@ -1126,14 +1126,14 @@ main(int  argc,				/* I - Number of command-line args */
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Scheduler shutting down normally.");
     cupsdAddEvent(CUPSD_EVENT_SERVER_STOPPED, NULL, NULL,
-                  "Scheduler shutting down normally.");
+                  _("Scheduler shutting down normally."));
   }
   else
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Scheduler shutting down due to program error.");
     cupsdAddEvent(CUPSD_EVENT_SERVER_STOPPED, NULL, NULL,
-                  "Scheduler shutting down due to program error.");
+                  _("Scheduler shutting down due to program error."));
   }
 
  /*

@@ -713,8 +713,8 @@ cupsdDeletePrinter(
 
   if (p->job)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
-                     update ? "Job stopped due to printer being deleted." :
-		              "Job stopped.");
+                     update ? _("Job stopped due to printer being deleted.") :
+		              _("Job stopped."));
 
  /*
   * Remove the printer from the list...
@@ -2705,8 +2705,9 @@ cupsdSetPrinterState(
   {
     cupsdAddEvent(s == IPP_PRINTER_STOPPED ? CUPSD_EVENT_PRINTER_STOPPED :
                       CUPSD_EVENT_PRINTER_STATE, p, NULL,
-		  "%s \"%s\" state changed to %s.",
-		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
+		  (p->type & CUPS_PRINTER_CLASS) ?
+		  _("Class \"%s\" state changed to %s.") :
+		  _("Printer \"%s\" state changed to %s."),
 		  p->name, printer_states[p->state - IPP_PRINTER_IDLE]);
 
    /*
@@ -2781,7 +2782,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
 
   if (p->job && p->job->state_value == IPP_JOB_PROCESSING)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                     "Job stopped due to printer being paused.");
+                     _("Job stopped due to printer being paused."));
 }
 
 
