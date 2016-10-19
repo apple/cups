@@ -2237,6 +2237,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 		need_restart_job,	/* Need to restart job? */
 		set_device_uri,		/* Did we set the device URI? */
 		set_port_monitor;	/* Did we set the port monitor? */
+  int		local;			/* Local connection? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)", con,
@@ -2279,6 +2280,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
+  * Check, if we have local connection...
+  */
+  local = httpAddrLocalhost(&(con->clientaddr));
+
+ /*
   * See if the printer already exists; if not, create a new printer...
   */
 
@@ -2312,6 +2318,17 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
+  }
+  else if (printer && !printer->shared && !local)
+  {
+   /*
+    * Found a local printer, so we could not create or modify local printer...
+    */
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+                    _("Could not update configuration of local printer \"%s\" "
+                      "when remote admin mode is enabled."),
+                    printer->name);
+    return;
   }
   else if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
                                       NULL)) != HTTP_OK)
