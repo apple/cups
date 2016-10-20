@@ -4915,13 +4915,6 @@ if test "x$ac_cv_header_sys_ucred_h" = xyes; then :
 fi
 
 
-ac_fn_c_check_header_mongrel "$LINENO" "asl.h" "ac_cv_header_asl_h" "$ac_includes_default"
-if test "x$ac_cv_header_asl_h" = xyes; then :
-  $as_echo "#define HAVE_ASL_H 1" >>confdefs.h
-
-fi
-
-
 
 ac_fn_c_check_header_mongrel "$LINENO" "iconv.h" "ac_cv_header_iconv_h" "$ac_includes_default"
 if test "x$ac_cv_header_iconv_h" = xyes; then :

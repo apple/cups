@@ -247,13 +247,6 @@
 
 
 /*
- * Do we have the ASL functions?
- */
-
-#define HAVE_ASL_H
-
-
-/*
  * Do we have the systemd journal functions?
  */
 
