@@ -312,7 +312,7 @@ httpAddrConnect2(
 	DEBUG_printf(("pfds[%d].revents=%x\n", i, pfds[i].revents));
 	if (pfds[i].revents && !(pfds[i].revents & (POLLERR | POLLHUP)))
 #  else
-	if (FD_ISSET(fds[i], &input) && !FD_ISSET(fds[i], &error))
+	if (FD_ISSET(fds[i], &input_set) && !FD_ISSET(fds[i], &error_set))
 #  endif /* HAVE_POLL */
 	{
 	  *sock    = fds[i];
@@ -327,7 +327,7 @@ httpAddrConnect2(
 #  ifdef HAVE_POLL
 	else if (pfds[i].revents & (POLLERR | POLLHUP))
 #  else
-	else if (FD_ISSET(fds[i], &error))
+	else if (FD_ISSET(fds[i], &error_set))
 #  endif /* HAVE_POLL */
         {
          /*

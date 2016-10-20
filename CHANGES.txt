@@ -1,10 +1,12 @@
-CHANGES.txt - 2.2.2 - 2016-10-17
+CHANGES.txt - 2.2.2 - 2016-10-20
 --------------------------------
 
 CHANGES IN CUPS V2.2.2
 
 	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
           (Issue #4899)
+        - Fixed builds on systems without a working poll() implementation
+          (Issue #4905)
         - Updated localizations (PR #4895, PR #4904)
 
 
