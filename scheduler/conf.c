@@ -276,20 +276,11 @@ cupsdCheckPermissions(
 			  "Unable to create directory \"%s\" - %s", filename,
 			  strerror(errno));
         else
-#ifdef HAVE_ASL_H
-        {
-	  asl_object_t	m;		/* Log message */
-
-	  m = asl_new(ASL_TYPE_MSG);
-	  asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-	  asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
-	  asl_release(m);
-	}
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
 	  sd_journal_print(LOG_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
 #else
 	  syslog(LOG_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
         return (-1);
       }
@@ -326,20 +317,11 @@ cupsdCheckPermissions(
     if (create_dir >= 0)
       cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory.", filename);
     else
-#ifdef HAVE_ASL_H
-    {
-      asl_object_t	m;		/* Log message */
-
-      m = asl_new(ASL_TYPE_MSG);
-      asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-      asl_log(NULL, m, ASL_LEVEL_ERR, "\"%s\" is not a directory.", filename);
-      asl_release(m);
-    }
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
       sd_journal_print(LOG_ERR, "\"%s\" is not a directory.", filename);
 #else
       syslog(LOG_ERR, "\"%s\" is not a directory.", filename);
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
     return (-1);
   }
@@ -368,20 +350,11 @@ cupsdCheckPermissions(
 			"Unable to change ownership of \"%s\" - %s", filename,
 			strerror(errno));
       else
-#ifdef HAVE_ASL_H
-      {
-	asl_object_t	m;		/* Log message */
-
-	m = asl_new(ASL_TYPE_MSG);
-	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
-	asl_release(m);
-      }
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
 	sd_journal_print(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
 #else
 	syslog(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
       return (1);
     }
@@ -400,20 +373,11 @@ cupsdCheckPermissions(
 			"Unable to change permissions of \"%s\" - %s", filename,
 			strerror(errno));
       else
-#ifdef HAVE_ASL_H
-      {
-	asl_object_t	m;		/* Log message */
-
-	m = asl_new(ASL_TYPE_MSG);
-	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
-	asl_release(m);
-      }
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
 	sd_journal_print(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
 #else
 	syslog(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
       return (1);
     }
@@ -839,20 +803,11 @@ cupsdReadConfiguration(void)
       if (TestConfigFile)
         printf("\"%s\" contains errors.\n", CupsFilesFile);
       else
-#ifdef HAVE_ASL_H
-      {
-	asl_object_t	m;		/* Log message */
-
-	m = asl_new(ASL_TYPE_MSG);
-	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
-	asl_release(m);
-      }
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
 	sd_journal_print(LOG_ERR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
 #else
         syslog(LOG_LPR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
       return (0);
     }
@@ -861,19 +816,11 @@ cupsdReadConfiguration(void)
     cupsdLogMessage(CUPSD_LOG_INFO, "No %s, using defaults.", CupsFilesFile);
   else
   {
-#ifdef HAVE_ASL_H
-    asl_object_t	m;		/* Log message */
-
-    m = asl_new(ASL_TYPE_MSG);
-    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-    asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
-    asl_release(m);
-
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
     sd_journal_print(LOG_ERR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
 #else
     syslog(LOG_LPR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
     return (0);
   }
@@ -887,18 +834,11 @@ cupsdReadConfiguration(void)
 
   if ((fp = cupsFileOpen(ConfigurationFile, "r")) == NULL)
   {
-#ifdef HAVE_ASL_H
-    asl_object_t	m;		/* Log message */
-
-    m = asl_new(ASL_TYPE_MSG);
-    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-    asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
-    asl_release(m);
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
     sd_journal_print(LOG_ERR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
 #else
     syslog(LOG_LPR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
     return (0);
   }
@@ -912,20 +852,11 @@ cupsdReadConfiguration(void)
     if (TestConfigFile)
       printf("\"%s\" contains errors.\n", ConfigurationFile);
     else
-#ifdef HAVE_ASL_H
-    {
-      asl_object_t	m;		/* Log message */
-
-      m = asl_new(ASL_TYPE_MSG);
-      asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-      asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
-      asl_release(m);
-    }
-#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
       sd_journal_print(LOG_ERR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
 #else
       syslog(LOG_LPR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
-#endif /* HAVE_ASL_H */
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
     return (0);
   }
