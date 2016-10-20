@@ -1194,7 +1194,7 @@ cupsdCheckGroup(
 #endif /* __APPLE__ */
 
       for (i = 0; i < ngroups; i ++)
-        if (group->gr_gid == groups[i])
+        if ((int)group->gr_gid == (int)groups[i])
 	  return (1);
     }
 #endif /* HAVE_GETGROUPLIST */

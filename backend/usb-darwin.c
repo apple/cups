@@ -285,7 +285,6 @@ static void parse_options(char *options, char *serial, int serial_size, UInt32 *
 static void setup_cfLanguage(void);
 static void soft_reset(void);
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
-static void log_usb_class_driver(int is_64bit);
 #define IS_64BIT 1
 #define IS_NOT_64BIT 0
 
@@ -470,11 +469,6 @@ print_device(const char *uri,		/* I - Device URI */
 
       return (CUPS_BACKEND_STOP);
     }
-
-#ifdef __x86_64__
-    if (status == noErr && driverBundlePath != NULL && CFStringCompare(driverBundlePath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo)
-      log_usb_class_driver(IS_64BIT);
-#endif /* __x86_64__ */
 
     if (driverBundlePath)
       CFRelease(driverBundlePath);
@@ -2097,8 +2091,6 @@ static void run_legacy_backend(int argc,
 
   if (!usb_legacy_status)
   {
-    log_usb_class_driver(IS_NOT_64BIT);
-
    /*
     * Setup a SIGTERM handler then block it before forking...
     */
@@ -2474,30 +2466,4 @@ static void get_device_id(cups_sc_status_t *status,
   }
 
   *status  = CUPS_SC_STATUS_OK;
-}
-
-
-static void
-log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
-{
- /*
-  * Report the usage of legacy USB class drivers to Apple if the user opts into providing
-  * feedback to Apple...
-  */
-
-  aslmsg aslm = asl_new(ASL_TYPE_MSG);
-  if (aslm)
-  {
-    ppd_file_t *ppd = ppdOpenFile(getenv("PPD"));
-    const char *make_model = ppd ? ppd->nickname : NULL;
-    ppd_attr_t *version = ppdFindAttr(ppd, "FileVersion", "");
-
-    asl_set(aslm, "com.apple.message.domain", "com.apple.printing.usb.64bit");
-    asl_set(aslm, "com.apple.message.result", is_64bit ? "yes" : "no");
-    asl_set(aslm, "com.apple.message.signature", make_model ? make_model : "Unknown");
-    asl_set(aslm, "com.apple.message.signature2", version ? version->value : "?.?");
-    asl_set(aslm, "com.apple.message.summarize", "YES");
-    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "");
-    asl_free(aslm);
-  }
 }
