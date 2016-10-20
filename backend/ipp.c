@@ -2345,13 +2345,12 @@ check_printer_state(
     if ((attr = ippFindAttribute(response, "printer-state",
 				 IPP_TAG_ENUM)) != NULL)
       printer_state = (ipp_pstate_t)attr->values[0].integer;
-
-    ippDelete(response);
   }
 
   fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
 	  ippErrorString(cupsLastError()), cupsLastErrorString());
   debug_attributes(response);
+  ippDelete(response);
 
  /*
   * Return the printer-state value...
