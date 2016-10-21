@@ -2970,6 +2970,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     { "fold", _("Fold") },
     { "fold-accordian", _("Accordian Fold") },
     { "fold-double-gate", _("Double Gate Fold") },
+    { "fold-engineering-z", _("Engineering Z Fold") },
     { "fold-gate", _("Gate Fold") },
     { "fold-half", _("Half Fold") },
     { "fold-half-z", _("Half Z Fold") },
@@ -2998,6 +2999,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     { "punch-triple-left", _("3-Hole Punch (Portrait)") },
     { "punch-triple-right", _("3-Hole Punch (Reverse Portrait)") },
     { "punch-triple-top", _("3-Hole Punch (Landscape)") },
+    { "punch-multiple-bottom", _("Multi-Hole Punch (Reverse Landscape)") },
+    { "punch-multiple-left", _("Multi-Hole Punch (Portrait)") },
+    { "punch-multiple-right", _("Multi-Hole Punch (Reverse Portrait)") },
+    { "punch-multiple-top", _("Multi-Hole Punch (Landscape)") },
     { "saddle-stitch", _("Saddle Stitch") },
     { "staple", _("Staple") },
     { "staple-bottom-left", _("Single Staple (Reverse Landscape)") },
@@ -3146,11 +3151,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
       y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim)
-      {
-        pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
+      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
 	strlcpy(ppdname, pwg->ppd, sizeof(ppdname));
-      }
       else
 	strlcpy(ppdname, "Unknown", sizeof(ppdname));
     }
@@ -3169,12 +3171,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
       y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim)
+      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
       {
         char	twidth[256],		/* Width string */
 		tlength[256];		/* Length string */
-
-        pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
 
         _cupsStrFormatd(twidth, twidth + sizeof(twidth), pwg->width * 72.0 / 2540.0, loc);
         _cupsStrFormatd(tlength, tlength + sizeof(tlength), pwg->length * 72.0 / 2540.0, loc);
@@ -3193,12 +3193,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
       y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim)
+      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
       {
         char	twidth[256],		/* Width string */
 		tlength[256];		/* Length string */
-
-        pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
 
         _cupsStrFormatd(twidth, twidth + sizeof(twidth), pwg->width * 72.0 / 2540.0, loc);
         _cupsStrFormatd(tlength, tlength + sizeof(tlength), pwg->length * 72.0 / 2540.0, loc);
@@ -3216,7 +3214,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
       y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim)
+      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
       {
         char	tleft[256],		/* Left string */
 		tbottom[256],		/* Bottom string */
@@ -3224,8 +3222,6 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 		ttop[256],		/* Top string */
 		twidth[256],		/* Width string */
 		tlength[256];		/* Length string */
-
-        pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
 
         _cupsStrFormatd(tleft, tleft + sizeof(tleft), left * 72.0 / 2540.0, loc);
         _cupsStrFormatd(tbottom, tbottom + sizeof(tbottom), bottom * 72.0 / 2540.0, loc);
@@ -3479,7 +3475,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   */
 
   if ((attr = ippFindAttribute(response, "pwg-raster-document-type-supported", IPP_TAG_KEYWORD)) == NULL)
-    attr = ippFindAttribute(response, "print-color-mode-supported", IPP_TAG_KEYWORD);
+    if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) == NULL)
+      attr = ippFindAttribute(response, "print-color-mode-supported", IPP_TAG_KEYWORD);
 
   if (attr)
   {
@@ -3501,7 +3498,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         if (!default_color)
 	  default_color = "FastGray";
       }
-      else if (!strcmp(keyword, "sgray_8") || !strcmp(keyword, "monochrome") || !strcmp(keyword, "process-monochrome"))
+      else if (!strcmp(keyword, "sgray_8") || !strcmp(keyword, "W8") || !strcmp(keyword, "monochrome") || !strcmp(keyword, "process-monochrome"))
       {
         if (!default_color)
 	  cupsFilePrintf(fp, "*OpenUI *ColorModel/%s: PickOne\n"
@@ -3512,7 +3509,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         if (!default_color || !strcmp(default_color, "FastGray"))
 	  default_color = "Gray";
       }
-      else if (!strcmp(keyword, "srgb_8") || !strcmp(keyword, "color"))
+      else if (!strcmp(keyword, "srgb_8") || !strcmp(keyword, "SRGB24") || !strcmp(keyword, "color"))
       {
         if (!default_color)
 	  cupsFilePrintf(fp, "*OpenUI *ColorModel/%s: PickOne\n"
@@ -3521,6 +3518,16 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         cupsFilePrintf(fp, "*ColorModel RGB/%s: \"<</cupsColorSpace 19/cupsBitsPerColor 8/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Color")));
 
 	default_color = "RGB";
+      }
+      else if (!strcmp(keyword, "adobe-rgb_16") || !strcmp(keyword, "ADOBERGB48"))
+      {
+        if (!default_color)
+	  cupsFilePrintf(fp, "*OpenUI *ColorModel/%s: PickOne\n"
+			     "*OrderDependency: 10 AnySetup *ColorModel\n", _cupsLangString(lang, _("Color Mode")));
+
+        cupsFilePrintf(fp, "*ColorModel AdobeRGB/%s: \"<</cupsColorSpace 20/cupsBitsPerColor 16/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Deep Color")));
+
+	default_color = "AdobeRGB";
       }
     }
 
@@ -3984,7 +3991,7 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 
   for (ptr = name + 1, end = name + namesize - 1; *ipp && ptr < end;)
   {
-    if (*ipp == '-' && _cups_isalpha(ipp[1]))
+    if (*ipp == '-' && _cups_isalnum(ipp[1]))
     {
       ipp ++;
       *ptr++ = (char)toupper(*ipp++ & 255);

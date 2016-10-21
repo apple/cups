@@ -150,6 +150,10 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
   IPP_FINISHINGS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
   IPP_FINISHINGS_PUNCH_QUAD_BOTTOM,	/* Punch 4 holes bottom edge */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_LEFT,	/* Pucnh multiple holes left side */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_TOP,	/* Pucnh multiple holes top edge */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT,	/* Pucnh multiple holes right side */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM,	/* Pucnh multiple holes bottom edge */
   IPP_FINISHINGS_FOLD_ACCORDIAN = 90,	/* Accordian-fold the paper vertically into four sections */
   IPP_FINISHINGS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
   IPP_FINISHINGS_FOLD_GATE,		/* Fold the top and bottom quarters of the paper towards the midline */
@@ -161,6 +165,7 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_FOLD_POSTER,		/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold */
   IPP_FINISHINGS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline */
   IPP_FINISHINGS_FOLD_Z,		/* Fold the paper vertically into three sections, forming a Z */
+  IPP_FINISHINGS_FOLD_ENGINEERING_Z,	/* Fold the paper vertically into two small sections and one larger, forming an elongated Z */
 
   /* CUPS extensions for finishings (pre-standard versions of values above) */
   IPP_FINISHINGS_CUPS_PUNCH_TOP_LEFT = 0x40000046,
