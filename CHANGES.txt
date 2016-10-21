@@ -8,7 +8,7 @@ CHANGES IN CUPS V2.2.2
         - Fixed builds on systems without a working poll() implementation
           (Issue #4905)
         - Updated documentation (PR #4896)
-        - Updated localizations (PR #4895, PR #4904, PR #4908)
+        - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908)
 
 
 CHANGES IN CUPS V2.2.1
