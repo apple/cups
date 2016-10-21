@@ -247,3 +247,6 @@
 
 # Lexmark C540n (Issue #4778)
 0x043d 0x0139 no-reattach
+
+# Kyocera Ecosys P6026cdn (Issue #4900)
+0x0482 0x063f no-reattach
