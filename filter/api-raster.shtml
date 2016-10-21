@@ -34,7 +34,7 @@ function. For example, to read raster data from the standard input, open
 file descriptor 0:</p>
 
 <pre class="example">
-#include &lt;cups/raster.h&gt;>
+#include &lt;cups/raster.h&gt;
 
 <a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
 </pre>
@@ -61,7 +61,7 @@ hardware resolution, and so forth used for the page.</p>
 function:</p>
 
 <pre class="example">
-#include &lt;cups/raster.h&gt;>
+#include &lt;cups/raster.h&gt;
 
 <a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
 <a href="#cups_page_header2_t">cups_page_header2_t</a> header;
@@ -84,7 +84,7 @@ function. A <code>for</code> loop is normally used to read the page one line
 at a time:</p>
 
 <pre class="example">
-#include &lt;cups/raster.h&gt;>
+#include &lt;cups/raster.h&gt;
 
 <a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
 <a href="#cups_page_header2_t">cups_page_header2_t</a> header;
