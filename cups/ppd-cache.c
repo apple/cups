@@ -3159,19 +3159,32 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     else
       strlcpy(ppdname, "Unknown", sizeof(ppdname));
   }
+  else if ((pwg = pwgMediaForPWG(ippGetString(ippFindAttribute(response, "media-default", IPP_TAG_ZERO), 0, NULL))) != NULL)
+    strlcpy(ppdname, pwg->ppd, sizeof(ppdname));
+  else
+    strlcpy(ppdname, "Unknown", sizeof(ppdname));
 
-  if ((attr = ippFindAttribute(response, "media-size-supported", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  if ((attr = ippFindAttribute(response, "media-size-supported", IPP_TAG_BEGIN_COLLECTION)) == NULL)
+    attr = ippFindAttribute(response, "media-supported", IPP_TAG_ZERO);
+  if (attr)
   {
     cupsFilePrintf(fp, "*OpenUI *PageSize: PickOne\n"
 		       "*OrderDependency: 10 AnySetup *PageSize\n"
                        "*DefaultPageSize: %s\n", ppdname);
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
-      media_size = ippGetCollection(attr, i);
-      x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
-      y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
+      if (ippGetValueTag(attr) == IPP_TAG_BEGIN_COLLECTION)
+      {
+	media_size = ippGetCollection(attr, i);
+	x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
+	y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
+	pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
+      }
+      else
+        pwg = pwgMediaForPWG(ippGetString(attr, i, NULL));
+
+      if (pwg)
       {
         char	twidth[256],		/* Width string */
 		tlength[256];		/* Length string */
@@ -3240,12 +3253,12 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   * InputSlot...
   */
 
-  if ((attr = ippFindAttribute(ippGetCollection(defattr, 0), "media-source", IPP_TAG_KEYWORD)) != NULL)
+  if ((attr = ippFindAttribute(ippGetCollection(defattr, 0), "media-source", IPP_TAG_ZERO)) != NULL)
     pwg_ppdize_name(ippGetString(attr, 0, NULL), ppdname, sizeof(ppdname));
   else
     strlcpy(ppdname, "Unknown", sizeof(ppdname));
 
-  if ((attr = ippFindAttribute(response, "media-source-supported", IPP_TAG_KEYWORD)) != NULL && (count = ippGetCount(attr)) > 1)
+  if ((attr = ippFindAttribute(response, "media-source-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
     static const char * const sources[][2] =
     {					/* "media-source" strings */
@@ -3322,12 +3335,12 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   * MediaType...
   */
 
-  if ((attr = ippFindAttribute(ippGetCollection(defattr, 0), "media-type", IPP_TAG_KEYWORD)) != NULL)
+  if ((attr = ippFindAttribute(ippGetCollection(defattr, 0), "media-type", IPP_TAG_ZERO)) != NULL)
     pwg_ppdize_name(ippGetString(attr, 0, NULL), ppdname, sizeof(ppdname));
   else
     strlcpy(ppdname, "Unknown", sizeof(ppdname));
 
-  if ((attr = ippFindAttribute(response, "media-type-supported", IPP_TAG_KEYWORD)) != NULL && (count = ippGetCount(attr)) > 1)
+  if ((attr = ippFindAttribute(response, "media-type-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
     static const char * const media_types[][2] =
     {					/* "media-type" strings */
@@ -3476,7 +3489,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "pwg-raster-document-type-supported", IPP_TAG_KEYWORD)) == NULL)
     if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) == NULL)
-      attr = ippFindAttribute(response, "print-color-mode-supported", IPP_TAG_KEYWORD);
+      if ((attr = ippFindAttribute(response, "print-color-mode-supported", IPP_TAG_KEYWORD)) == NULL)
+        attr = ippFindAttribute(response, "output-mode-supported", IPP_TAG_KEYWORD);
 
   if (attr)
   {
@@ -3986,6 +4000,12 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
   char	*ptr,				/* Pointer into name buffer */
 	*end;				/* End of name buffer */
 
+
+  if (!ipp)
+  {
+    *name = '\0';
+    return;
+  }
 
   *name = (char)toupper(*ipp++);
 

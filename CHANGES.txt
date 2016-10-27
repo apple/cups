@@ -1,9 +1,10 @@
-CHANGES.txt - 2.2.2 - 2016-10-21
+CHANGES.txt - 2.2.2 - 2016-10-27
 --------------------------------
 
 CHANGES IN CUPS V2.2.2
 
-	- Fixed some issues with IPP Everywhere printer support (Issue #4893)
+	- Fixed some issues with IPP Everywhere printer support (Issue #4893,
+	  Issue #4909)
 	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
           (Issue #4899)
         - Fixed builds on systems without a working poll() implementation
