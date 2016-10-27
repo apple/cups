@@ -44,6 +44,10 @@ The default is "0644" on macOS and "0640" on all other operating systems.
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
 <dl class="man">
+<dt><a name="CreateSelfSignedCerts"></a><b>CreateSelfSignedCerts yes</b>
+<dd style="margin-left: 5.0em"><dt><b>CreateSelfSignedCerts no</b>
+<dd style="margin-left: 5.0em">Specifies whether the scheduler automatically creates self-signed certificates for client connections using TLS.
+The default is yes.
 <dt><a name="DataDir"></a><b>DataDir </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies the directory where data files can be found.
 The default is usually "/usr/share/cups".
