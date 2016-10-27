@@ -52,6 +52,9 @@ extern "C" {
 #  define CUPS_RASTER_SYNCv2	0x52615332	/* RaS2 */
 #  define CUPS_RASTER_REVSYNCv2	0x32536152	/* 2SaR */
 
+#  define CUPS_RASTER_SYNCapple	0x554E4952	/* UNIR */
+#  define CUPS_RASTER_REVSYNCapple 0x52494E55	/* RINU */
+
 #  define CUPS_RASTER_SYNC_PWG	CUPS_RASTER_SYNCv2
 
 /*
@@ -74,6 +77,13 @@ extern "C" {
  */
 
 #  define CUPS_RASTER_HAVE_PWGRASTER 1
+
+/*
+ * The following definition can be used to determine if Apple Raster is
+ * supported (beta).
+ */
+
+#  define CUPS_RASTER_HAVE_APPLERASTER 1
 
 /*
  * The following PWG 5102.4 definitions specify indices into the
@@ -202,7 +212,8 @@ enum cups_mode_e			/**** cupsRasterOpen modes ****/
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
   CUPS_RASTER_WRITE_COMPRESSED = 2,	/* Open stream for compressed writing @since CUPS 1.3/macOS 10.5@ */
-  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5/macOS 10.7@ */
+  CUPS_RASTER_WRITE_PWG = 3,		/* Open stream for compressed writing in PWG Raster mode @since CUPS 1.5/macOS 10.7@ */
+  CUPS_RASTER_WRITE_APPLE = 4		/* Open stream for compressed writing in AppleRaster mode (beta) @private@ */
 };
 
 typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/
