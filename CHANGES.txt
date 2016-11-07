@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.2.2
         - Fixed builds on systems without a working poll() implementation
           (Issue #4905)
         - Added a USB quirk rule for the Kyocera Ecosys P6026cdn (Issue #4900)
+        - The scheduler no longer creates log files on startup
+          (<rdar://problem/28332470>)
         - Updated documentation (PR #4896)
         - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908)
 
