@@ -1419,11 +1419,6 @@ ippContainsString(
     case IPP_TAG_CHARSET :
     case IPP_TAG_KEYWORD :
     case IPP_TAG_LANGUAGE :
-    case IPP_TAG_MIMETYPE :
-    case IPP_TAG_NAME :
-    case IPP_TAG_NAMELANG :
-    case IPP_TAG_TEXT :
-    case IPP_TAG_TEXTLANG :
     case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :
 	for (i = attr->num_values, avalue = attr->values;
@@ -1434,6 +1429,25 @@ ippContainsString(
 	                attr->num_values - i, avalue->string.text));
 
 	  if (!strcmp(value, avalue->string.text))
+	  {
+	    DEBUG_puts("1ippContainsString: Returning 1 (match)");
+	    return (1);
+	  }
+        }
+
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+	for (i = attr->num_values, avalue = attr->values;
+	     i > 0;
+	     i --, avalue ++)
+	{
+	  DEBUG_printf(("1ippContainsString: value[%d]=\"%s\"",
+	                attr->num_values - i, avalue->string.text));
+
+	  if (!_cups_strcasecmp(value, avalue->string.text))
 	  {
 	    DEBUG_puts("1ippContainsString: Returning 1 (match)");
 	    return (1);
