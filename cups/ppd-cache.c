@@ -2925,7 +2925,7 @@ _ppdCacheWriteFile(
  *                         of an IPP printer.
  */
 
-char *					/* O - PPD filename or NULL on error */
+char *					/* O - PPD filename or @code NULL@ on error */
 _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
                   size_t bufsize,	/* I - Size of filename buffer */
 		  ipp_t  *response)	/* I - Get-Printer-Attributes response */
@@ -2944,7 +2944,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 			bottom,		/* Largest bottom margin */
 			left,		/* Largest left margin */
 			right,		/* Largest right margin */
-			top;		/* Largest top margin */
+			top,		/* Largest top margin */
+			is_apple = 0,	/* Does the printer support Apple raster? */
+			is_pdf = 0,	/* Does the printer support PDF? */
+			is_pwg = 0;	/* Does the printer support PWG Raster? */
   pwg_media_t		*pwg;		/* PWG media size */
   int			xres, yres;	/* Resolution values */
   cups_lang_t		*lang = cupsLangDefault();
@@ -3089,17 +3092,30 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "document-format-supported", IPP_TAG_MIMETYPE)) != NULL)
   {
+    is_apple = ippContainsString(attr, "image/urf");
+    is_pdf   = ippContainsString(attr, "application/pdf");
+    is_pwg   = ippContainsString(attr, "image/pwg-raster");
+
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
       const char *format = ippGetString(attr, i, NULL);
 					/* PDL */
 
+     /*
+      * Write cupsFilter2 lines for supported formats, except for PostScript
+      * (which has compatibility problems over IPP with some vendors), text,
+      * TIFF, and vendor MIME media types...
+      */
+
       if (!_cups_strcasecmp(format, "application/pdf"))
         cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
-      else if (_cups_strcasecmp(format, "application/octet-stream") && _cups_strcasecmp(format, "application/postscript") && _cups_strncasecmp(format, "application/vnd.hp-pcl", 23) && _cups_strcasecmp(format, "image/tiff") && _cups_strcasecmp(format, "text/plain"))
+      else if (_cups_strcasecmp(format, "application/octet-stream") && _cups_strcasecmp(format, "application/postscript") && _cups_strncasecmp(format, "application/vnd.", 16) && _cups_strncasecmp(format, "image/vnd.", 10) && _cups_strcasecmp(format, "image/tiff") && _cups_strncasecmp(format, "text/", 5))
         cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 10 -\"\n", format, format);
     }
   }
+
+  if (!is_apple && !is_pdf && !is_pwg)
+    goto bad_ppd;
 
  /*
   * PageSize/PageRegion/ImageableArea/PaperDimension
@@ -3246,6 +3262,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       }
     }
   }
+  else
+    goto bad_ppd;
 
  /*
   * InputSlot...
@@ -3539,7 +3557,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
         cupsFilePrintf(fp, "*ColorModel AdobeRGB/%s: \"<</cupsColorSpace 20/cupsBitsPerColor 16/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Deep Color")));
 
-	default_color = "AdobeRGB";
+        if (!default_color)
+	  default_color = "AdobeRGB";
       }
     }
 
@@ -3750,7 +3769,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       * Invalid "urf-supported" value...
       */
 
-      cupsFilePuts(fp, "*DefaultResolution: 300dpi\n");
+      goto bad_ppd;
     }
     else
     {
@@ -3771,6 +3790,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       cupsFilePuts(fp, "*CloseUI: *cupsPrintQuality\n");
     }
   }
+  else if (is_apple || is_pwg)
+    goto bad_ppd;
   else if ((attr = ippFindAttribute(response, "printer-resolution-default", IPP_TAG_RESOLUTION)) != NULL)
   {
     pwg_ppdize_resolution(attr, 0, &xres, &yres, ppdname, sizeof(ppdname));
@@ -3786,6 +3807,18 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cupsFileClose(fp);
 
   return (buffer);
+
+ /*
+  * If we get here then there was a problem creating the PPD...
+  */
+
+  bad_ppd:
+
+  cupsFileClose(fp);
+  unlink(buffer);
+  *buffer = '\0';
+
+  return (NULL);
 }
 
 
