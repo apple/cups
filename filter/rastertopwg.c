@@ -48,7 +48,7 @@ main(int  argc,				/* I - Number of command-line args */
 			lineoffset;	/* Offset into line */
   unsigned char		white;		/* White pixel */
   ppd_file_t		*ppd;		/* PPD file */
-  ppd_attr_t		*back;		/* cupsBackSize attribute */
+  ppd_attr_t		*back;		/* cupsBackSide attribute */
   _ppd_cache_t		*cache;		/* PPD cache */
   pwg_size_t		*pwg_size;	/* PWG media size */
   pwg_media_t		*pwg_media;	/* PWG media name */
