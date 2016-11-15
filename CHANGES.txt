@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.2 - 2016-11-08
+CHANGES.txt - 2.2.2 - 2016-11-15
 --------------------------------
 
 CHANGES IN CUPS V2.2.2
@@ -15,6 +15,8 @@ CHANGES IN CUPS V2.2.2
           (<rdar://problem/28332470>)
 	- The ippContainsString function now uses case-insensitive comparisons
 	  for mimeMediaType, name, and text values in conformance with RFC 2911.
+	- The network backends now log the addresses that were found for a
+	  printer (<rdar://problem/29268474>)
         - Updated documentation (PR #4896)
         - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908)
 

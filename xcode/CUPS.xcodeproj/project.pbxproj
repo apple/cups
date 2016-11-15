@@ -10416,6 +10416,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 2.0.0;
+				DYLIB_CURRENT_VERSION = 2.12.0;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
@@ -10428,6 +10430,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 2.0.0;
+				DYLIB_CURRENT_VERSION = 2.12.0;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;

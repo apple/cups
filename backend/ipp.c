@@ -223,7 +223,6 @@ main(int  argc,				/* I - Number of command-line args */
 		*compatfile = NULL;	/* Compatibility filename */
   off_t		compatsize = 0;		/* Size of compatibility file */
   int		port;			/* Port number (not used) */
-  char		portname[255];		/* Port name */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
   char		print_job_name[1024];	/* Update job-name for Print-Job */
   http_status_t	http_status;		/* Status of HTTP request */
@@ -664,26 +663,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   start_time = time(NULL);
 
-  sprintf(portname, "%d", port);
-
-  update_reasons(NULL, "+connecting-to-device");
-  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO",
-                         _("Unable to locate printer \"%s\"."), hostname);
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-    {
-      update_reasons(NULL, "-connecting-to-device");
-      return (CUPS_BACKEND_STOP);
-    }
-
-    if (job_canceled)
-      return (CUPS_BACKEND_OK);
-  }
+  addrlist = backendLookup(hostname, port, &job_canceled);
 
   http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
                       0, NULL);
