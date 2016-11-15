@@ -1560,6 +1560,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-get-attributes-supported",
     "printer-icc-profiles",
     "printer-icons",
+    "printer-id",               	/* CUPS extension */
     "printer-info",
     "printer-input-tray",		/* IPP JPS3 */
     "printer-is-accepting-jobs",
