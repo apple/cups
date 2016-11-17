@@ -872,6 +872,18 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
   }
 
  /*
+  * Convert the hostname to lowercase as needed...
+  */
+
+  if (s[0] != '/')
+  {
+    char	*ptr;			/* Pointer into string */
+
+    for (ptr = s; *ptr; ptr ++)
+      *ptr = (char)_cups_tolower((int)*ptr);
+  }
+
+ /*
   * Return the hostname with as much domain info as we have...
   */
 
