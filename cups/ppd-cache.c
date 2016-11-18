@@ -3216,11 +3216,18 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
                        "*DefaultPageRegion: %s\n", ppdname);
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
-      media_size = ippGetCollection(attr, i);
-      x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
-      y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
+      if (ippGetValueTag(attr) == IPP_TAG_BEGIN_COLLECTION)
+      {
+	media_size = ippGetCollection(attr, i);
+	x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
+	y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
+	pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
+      }
+      else
+        pwg = pwgMediaForPWG(ippGetString(attr, i, NULL));
+
+      if (pwg)
       {
         char	twidth[256],		/* Width string */
 		tlength[256];		/* Length string */
@@ -3237,11 +3244,18 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 		       "*DefaultPaperDimension: %s\n", ppdname, ppdname);
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
-      media_size = ippGetCollection(attr, i);
-      x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
-      y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
+      if (ippGetValueTag(attr) == IPP_TAG_BEGIN_COLLECTION)
+      {
+	media_size = ippGetCollection(attr, i);
+	x_dim      = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
+	y_dim      = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
 
-      if (x_dim && y_dim && (pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL)
+	pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
+      }
+      else
+        pwg = pwgMediaForPWG(ippGetString(attr, i, NULL));
+
+      if (pwg)
       {
         char	tleft[256],		/* Left string */
 		tbottom[256],		/* Bottom string */
