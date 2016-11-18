@@ -705,10 +705,10 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
             case CUPS_CSPACE_SRGB :
             case CUPS_CSPACE_RGBW :
             case CUPS_CSPACE_ADOBERGB :
-                memset(temp, 0xff, bytes);
+                memset(temp, 0xff, (size_t)bytes);
                 break;
             default :
-                memset(temp, 0x00, bytes);
+                memset(temp, 0x00, (size_t)bytes);
                 break;
           }
 
