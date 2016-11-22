@@ -54,6 +54,7 @@ HELPFILES	=	\
 			help/api-ppd.html \
 			help/api-raster.html \
 			help/cgi.html \
+			help/encryption.html \
 			help/glossary.html \
 			help/kerberos.html \
 			help/license.html \

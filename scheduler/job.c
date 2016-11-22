@@ -3545,6 +3545,13 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   cupsArrayRemove(PrintingJobs, job);
 
  /*
+  * Clear informational messages...
+  */
+
+  if (job->status_level > CUPSD_LOG_ERROR)
+    job->printer->state_message[0] = '\0';
+
+ /*
   * Apply any PPD updates...
   */
 

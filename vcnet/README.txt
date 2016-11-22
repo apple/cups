@@ -1,4 +1,4 @@
-README - CUPS on Windows - 2016-05-13
+README - CUPS on Windows - 2016-08-08
 -------------------------------------
 
 This directory contains Visual Studio project and solution files for building

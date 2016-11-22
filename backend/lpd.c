@@ -111,7 +111,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*filename,		/* File to print */
 		title[256];		/* Title string */
   int		port;			/* Port number */
-  char		portname[256];		/* Port name (string) */
   http_addrlist_t *addrlist;		/* List of addresses for printer */
   int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd;		/* SNMP socket */
@@ -411,23 +410,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Find the printer...
   */
 
-  snprintf(portname, sizeof(portname), "%d", port);
+  addrlist = backendLookup(hostname, port, NULL);
 
-  fputs("STATE: +connecting-to-device\n", stderr);
-  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO",
-			 _("Unable to locate printer \"%s\"."), hostname);
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-    {
-      fputs("STATE: -connecting-to-device\n", stderr);
-      exit(CUPS_BACKEND_FAILED);
-    }
-  }
+ /*
+  * See if the printer supports SNMP...
+  */
 
   if (snmp_enabled)
     snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);

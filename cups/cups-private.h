@@ -124,7 +124,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 			*ppd_size_lut,	/* Lookup table for PPD names */
 			*pwg_size_lut;	/* Lookup table for PWG names */
   pwg_media_t		pwg_media;	/* PWG media data for custom size */
-  char			pwg_name[65];	/* PWG media name for custom size */
+  char			pwg_name[65],	/* PWG media name for custom size */
+			ppd_name[41];	/* PPD media name for custom size */
 
   /* request.c */
   http_t		*http;		/* Current server connection */

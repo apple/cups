@@ -1,7 +1,7 @@
 /*
  * Hashing function for CUPS.
  *
- * Copyright 2015 by Apple Inc.
+ * Copyright 2015-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -53,7 +53,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   }
 
 #ifdef __APPLE__
-  if (strcmp(algorithm, "sha"))
+  if (!strcmp(algorithm, "sha"))
   {
    /*
     * SHA-1...
@@ -70,7 +70,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA1_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-224"))
+  else if (!strcmp(algorithm, "sha2-224"))
   {
     CC_SHA256_CTX	ctx;		/* SHA-224 context */
 
@@ -83,7 +83,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA224_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-256"))
+  else if (!strcmp(algorithm, "sha2-256"))
   {
     CC_SHA256_CTX	ctx;		/* SHA-256 context */
 
@@ -96,7 +96,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA256_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-384"))
+  else if (!strcmp(algorithm, "sha2-384"))
   {
     CC_SHA512_CTX	ctx;		/* SHA-384 context */
 
@@ -109,7 +109,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA384_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-512"))
+  else if (!strcmp(algorithm, "sha2-512"))
   {
     CC_SHA512_CTX	ctx;		/* SHA-512 context */
 
@@ -122,7 +122,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA512_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-512_224"))
+  else if (!strcmp(algorithm, "sha2-512_224"))
   {
     CC_SHA512_CTX	ctx;		/* SHA-512 context */
     unsigned char	temp[CC_SHA512_DIGEST_LENGTH];
@@ -143,7 +143,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     return (CC_SHA224_DIGEST_LENGTH);
   }
-  else if (strcmp(algorithm, "sha2-512_256"))
+  else if (!strcmp(algorithm, "sha2-512_256"))
   {
     CC_SHA512_CTX	ctx;		/* SHA-512 context */
     unsigned char	temp[CC_SHA512_DIGEST_LENGTH];
@@ -171,22 +171,22 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   unsigned char	temp[64];		/* Temporary hash buffer */
   size_t	tempsize = 0;		/* Truncate to this size? */
 
-  if (strcmp(algorithm, "sha"))
+  if (!strcmp(algorithm, "sha"))
     alg = GNUTLS_DIG_SHA1;
-  else if (strcmp(algorithm, "sha2-224"))
+  else if (!strcmp(algorithm, "sha2-224"))
     alg = GNUTLS_DIG_SHA224;
-  else if (strcmp(algorithm, "sha2-256"))
+  else if (!strcmp(algorithm, "sha2-256"))
     alg = GNUTLS_DIG_SHA256;
-  else if (strcmp(algorithm, "sha2-384"))
+  else if (!strcmp(algorithm, "sha2-384"))
     alg = GNUTLS_DIG_SHA384;
-  else if (strcmp(algorithm, "sha2-512"))
+  else if (!strcmp(algorithm, "sha2-512"))
     alg = GNUTLS_DIG_SHA512;
-  else if (strcmp(algorithm, "sha2-512_224"))
+  else if (!strcmp(algorithm, "sha2-512_224"))
   {
     alg      = GNUTLS_DIG_SHA512;
     tempsize = 28;
   }
-  else if (strcmp(algorithm, "sha2-512_256"))
+  else if (!strcmp(algorithm, "sha2-512_256"))
   {
     alg      = GNUTLS_DIG_SHA512;
     tempsize = 32;

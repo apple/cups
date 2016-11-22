@@ -14,16 +14,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 1.6\n"
+"Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-07-07 15:43-0400\n"
-"PO-Revision-Date: 2014-09-23 23:45+0100\n"
+"POT-Creation-Date: 2016-08-30 16:00-0400\n"
+"PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
 "Language: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
 
 msgid "\t\t(all)"
 msgstr "\t\t(todos)"
@@ -257,7 +258,7 @@ msgid ""
 msgstr ""
 "        ADVERTENCIA    La clave de opción Duplex %s puede que no funcione "
 "como se espera y debería llamarse Duplex.\n"
-"                REF: Página 122, sección 5.17"
+"                REF: Página 122, sección 5.17."
 
 msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
 msgstr ""
@@ -280,7 +281,7 @@ msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
 "                REF: Pages 58-59, section 5.3."
 msgstr ""
-"        ADVERTENCIA    Se necesita Manufacturer por especificación de PPD "
+"        ADVERTENCIA    Se necesita fabricante por especificación de PPD "
 "4.3.\n"
 "                REF: Páginas 58-59, sección 5.3."
 
@@ -352,7 +353,7 @@ msgid ""
 "      %s  \"%s %s\" conflicts with \"%s %s\"\n"
 "                (constraint=\"%s %s %s %s\")."
 msgstr ""
-"      %s  \"%s %s\" está en conflictocon \"%s %s\"\n"
+"      %s  \"%s %s\" está en conflicto con \"%s %s\"\n"
 "                (restricción=\"%s %s %s %s\")."
 
 #, c-format
@@ -368,8 +369,8 @@ msgid ""
 "      %s  Bad %s choice %s.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
-"      %s  Preferencia %s incorrecta %s.\n"
-"                REF: Página 122, sección 5.17"
+"      %s  Incorrecto %s preferencia %s.\n"
+"                REF: Página 122, sección 5.17."
 
 #, c-format
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s."
@@ -484,8 +485,8 @@ msgid ""
 "      %s  REQUIRED %s does not define choice None.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
-"      %s  NECESARIA %s no define la opción None.\n"
-"                REF: Página 122, sección 5.17"
+"      %s  NECESARIO %s no define la preferencia None.\n"
+"                REF: Página 122, sección 5.17."
 
 #, c-format
 msgid "      %s  Size \"%s\" defined for %s but not for %s."
@@ -522,8 +523,8 @@ msgid ""
 "      **FAIL**  %s must be 1284DeviceID\n"
 "                REF: Page 72, section 5.5"
 msgstr ""
-"      **FALLO**  %s debe ser 1284DeviceID\n"
-"                REF: Página 72, sección 5.5"
+"      **FALLO**  %s debería ser 1284DeviceID.\n"
+"                REF: Página 72, sección 5.5."
 
 #, c-format
 msgid ""
@@ -624,8 +625,8 @@ msgid ""
 "      **FAIL**  Bad option %s choice %s\n"
 "                REF: Page 84, section 5.9"
 msgstr ""
-"      **FALLO**  Opción %s, preferencia %s incorrecta\n"
-"                REF: Página 84, sección 5.9"
+"      **FALLO**  Opción incorrecta %s preferencia %s\n"
+"                REF: Página 84, sección 5.9."
 
 #, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s"
@@ -677,35 +678,35 @@ msgid ""
 "      **FAIL**  REQUIRED Default%s\n"
 "                REF: Page 40, section 4.5."
 msgstr ""
-"      **FALLO**  SE NECESITA Default%s\n"
+"      **FALLO**  NECESARIO Default%s\n"
 "                REF: Página 40, sección 4.5."
 
 msgid ""
 "      **FAIL**  REQUIRED DefaultImageableArea\n"
 "                REF: Page 102, section 5.15."
 msgstr ""
-"      **FALLO**  SE NECESITA DefaultImageableArea\n"
+"      **FALLO**  NECESARIO DefaultImageableArea\n"
 "                REF: Página 102, sección 5.15."
 
 msgid ""
 "      **FAIL**  REQUIRED DefaultPaperDimension\n"
 "                REF: Page 103, section 5.15."
 msgstr ""
-"      **FALLO**  SE NECESITA DefaultPaperDimension\n"
+"      **FALLO**  NECESARIO DefaultPaperDimension\n"
 "                REF: Página 103, sección 5.15."
 
 msgid ""
 "      **FAIL**  REQUIRED FileVersion\n"
 "                REF: Page 56, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA FileVersion\n"
+"      **FALLO**  NECESARIO FileVersion\n"
 "                REF: Página 56, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED FormatVersion\n"
 "                REF: Page 56, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA FormatVersion\n"
+"      **FALLO**  NECESARIO FormatVersion\n"
 "                REF: Página 56, sección 5.3."
 
 #, c-format
@@ -714,7 +715,7 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 102, section 5.15."
 msgstr ""
-"      **FALLO**  SE NECESITA ImageableArea para PageSize %s\n"
+"      **FALLO**  NECESARIO ImageableArea para PageSize %s\n"
 "                REF: Página 41, sección 5.\n"
 "                REF: Página 102, sección 5.15."
 
@@ -722,56 +723,56 @@ msgid ""
 "      **FAIL**  REQUIRED LanguageEncoding\n"
 "                REF: Pages 56-57, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA LanguageEncoding\n"
+"      **FALLO**  NECESARIO LanguageEncoding\n"
 "                REF: Páginas 56-57, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED LanguageVersion\n"
 "                REF: Pages 57-58, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA LanguageVersion\n"
+"      **FALLO**  NECESARIO LanguageVersion\n"
 "                REF: Páginas 57-58, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED Manufacturer\n"
 "                REF: Pages 58-59, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA Manufacturer\n"
+"      **FALLO**  NECESARIO Manufacturer\n"
 "                REF: Páginas 58-59, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED ModelName\n"
 "                REF: Pages 59-60, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA ModelName\n"
+"      **FALLO**  NECESARIO ModelName\n"
 "                REF: Páginas 59-60, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED NickName\n"
 "                REF: Page 60, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA NickName\n"
+"      **FALLO**  NECESARIO NickName\n"
 "                REF: Página 60, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PCFileName\n"
 "                REF: Pages 61-62, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA PCFileName\n"
+"      **FALLO**  NECESARIO PCFileName\n"
 "                REF: Páginas 61-62, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PSVersion\n"
 "                REF: Pages 62-64, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA PSVersion\n"
+"      **FALLO**  NECESARIO PSVersion\n"
 "                REF: Páginas 62-64, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PageRegion\n"
 "                REF: Page 100, section 5.14."
 msgstr ""
-"      **FALLO**  SE NECESITA PageRegion\n"
+"      **FALLO**  NECESARIO PageRegion\n"
 "                REF: Página 100, sección 5.14."
 
 msgid ""
@@ -779,7 +780,7 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 99, section 5.14."
 msgstr ""
-"      **FALLO**  SE NECESITA PageSize\n"
+"      **FALLO**  NECESARIO PageSize\n"
 "                REF: Página 41, sección 5.\n"
 "                REF: Página 99, sección 5.14."
 
@@ -787,7 +788,7 @@ msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Pages 99-100, section 5.14."
 msgstr ""
-"      **FALLO**  SE NECESITA PageSize\n"
+"      **FALLO**  NECESARIO PageSize\n"
 "                REF: Páginas 99-100, sección 5.14."
 
 #, c-format
@@ -796,7 +797,7 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 103, section 5.15."
 msgstr ""
-"      **FALLO**  SE NECESITA PaperDimension para PageSize %s\n"
+"      **FALLO**  NECESARIO PaperDimension para PageSize %s\n"
 "                REF: Página 41, sección 5.\n"
 "                REF: Página 103, sección 5.15."
 
@@ -804,15 +805,15 @@ msgid ""
 "      **FAIL**  REQUIRED Product\n"
 "                REF: Page 62, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA Product\n"
+"      **FALLO**  NECESARIO Product\n"
 "                REF: Página 62, sección 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED ShortNickName\n"
 "                REF: Page 64-65, section 5.3."
 msgstr ""
-"      **FALLO**  SE NECESITA ShortNickName\n"
-"                REF: Página 64-65, sección 5.3."
+"      **FALLO**  NECESARIO ShortNickName\n"
+"                REF: Páginas 64-65, sección 5.3."
 
 #, c-format
 msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
@@ -831,7 +832,7 @@ msgid ""
 "    Bad %%%%BoundingBox: on line %d.\n"
 "        REF: Page 39, %%%%BoundingBox:"
 msgstr ""
-"    %%%%BoundingBox: incorrecto en línea %d.\n"
+"    %%%%BoundingBox incorrecto: en línea %d.\n"
 "        REF: Página 39, %%%%BoundingBox:"
 
 #, c-format
@@ -839,7 +840,7 @@ msgid ""
 "    Bad %%%%Page: on line %d.\n"
 "        REF: Page 53, %%%%Page:"
 msgstr ""
-"    %%%%Page: incorrecto en línea %d.\n"
+"    %%%%Page incorrecto: en línea %d.\n"
 "        REF: Página 53, %%%%Page:"
 
 #, c-format
@@ -847,7 +848,7 @@ msgid ""
 "    Bad %%%%Pages: on line %d.\n"
 "        REF: Page 43, %%%%Pages:"
 msgstr ""
-"    %%%%Pages: incorrecto en línea %d.\n"
+"    %%%%Pages incorrecto: en línea %d.\n"
 "        REF: Página 43, %%%%Pages:"
 
 #, c-format
@@ -856,14 +857,14 @@ msgid ""
 "        REF: Page 25, Line Length"
 msgstr ""
 "    La línea %d es más larga de 255 caracteres (%d).\n"
-"        REF: Página 25, Longitud de Línea"
+"        REF: Página 25, Line Length"
 
 msgid ""
 "    Missing %!PS-Adobe-3.0 on first line.\n"
 "        REF: Page 17, 3.1 Conforming Documents"
 msgstr ""
 "    Falta %!PS-Adobe-3.0 en la primera línea.\n"
-"        REF: Página 17, 3.1 Conformidad de documentos"
+"        REF: Página 17, 3.1 Conforming Documents"
 
 #, c-format
 msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
@@ -959,7 +960,7 @@ msgid ""
 "  --exec utility [argument ...] ;\n"
 "                          Execute program if true."
 msgstr ""
-"  --exec utilidad [argumento ...] ;\n"
+"  --exec utility [argument ...] ;\n"
 "                          Ejecutar programa si es cierto."
 
 msgid "  --false                 Always false."
@@ -977,7 +978,7 @@ msgstr ""
 "expresión regular."
 
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
-msgstr ""
+msgstr "  --lf                    Finalizar líneas con LF (UNIX/Linux/macOS)."
 
 msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          Listar los filtros a usar."
@@ -994,7 +995,7 @@ msgstr ""
 "regular."
 
 msgid "  --not expression        Unary NOT of expression."
-msgstr "  [parcial]expresión            NOT unario de la expresión."
+msgstr "  --not expresión         NOT unario de la expresión."
 
 msgid "  --path regex            Match resource path to regular expression."
 msgstr ""
@@ -1031,8 +1032,7 @@ msgid "  --true                  Always true."
 msgstr "  --true                  Siempre cierto."
 
 msgid "  --txt key               True if the TXT record contains the key."
-msgstr ""
-"  --txt clave               Cierto si el registro TXT contiene la clave."
+msgstr "  --txt clave             Cierto si el registro TXT contiene la clave."
 
 msgid "  --txt-* regex           Match TXT record key to regular expression."
 msgstr ""
@@ -1064,7 +1064,7 @@ msgid "  -D                      Remove the input file when finished."
 msgstr "  -D                      Eliminar el archivo de entrada al terminar."
 
 msgid "  -D name=value           Set named variable to value."
-msgstr "  -D nombre=valor           Establece la variable nombre al valor."
+msgstr "  -D nombre=valor         Establece la variable nombre al valor."
 
 msgid "  -E                      Encrypt the connection."
 msgstr "  -E                      Cifra la conexión."
@@ -1079,7 +1079,7 @@ msgstr ""
 "consola."
 
 msgid "  -H samba-server         Use the named SAMBA server."
-msgstr "  -H servidor-samba         Usa el servidor SAMBA nombrado."
+msgstr "  -H servidor-samba       Usa el servidor SAMBA nombrado."
 
 msgid "  -I                      Ignore errors."
 msgstr "  -I                      Ignora errores."
@@ -1102,22 +1102,22 @@ msgstr ""
 "prueba a la salida estandar."
 
 msgid "  -P filename.ppd         Set PPD file."
-msgstr "  -P nombre_archivo.ppd         Establece archivo PPD."
+msgstr "  -P nombre_archivo.ppd   Establece archivo PPD."
 
 msgid "  -P number[-number]      Match port to number or range."
 msgstr ""
-"  -P número[-número]    Hacer coincidir el puerto con un número o intervalo "
-"de números."
+"  -P número[-número]      Hacer coincidir el puerto con un número o "
+"intervalo de números."
 
 msgid "  -R root-directory       Set alternate root."
-msgstr "  -R directorio-raíz       Establece directorio raíz alternativo."
+msgstr "  -R directorio-raíz      Establece directorio raíz alternativo."
 
 msgid "  -S                      Test with SSL encryption."
 msgstr "  -S                      Prueba con cifrado SSL."
 
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr ""
-"  -T segundos              Establece el tiempo de espera de navegación en "
+"  -T segundos             Establece el tiempo de espera de navegación en "
 "segundos."
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
@@ -1126,7 +1126,7 @@ msgstr ""
 "en segundos."
 
 msgid "  -U username             Specify username."
-msgstr "  -U nombre_usuario             Especifica el nombre de usuario."
+msgstr "  -U nombre_usuario       Especifica el nombre de usuario."
 
 msgid "  -V version              Set default IPP version."
 msgstr "  -V versión              Establece la versión IPP predeterminada."
@@ -1149,7 +1149,7 @@ msgid "  -c                      Produce CSV output."
 msgstr "  -c                      Produce salida CSV."
 
 msgid "  -c catalog.po           Load the specified message catalog."
-msgstr "  -c catálogo.po           Carga el catálogo de mensajes especificado."
+msgstr "  -c catálogo.po          Carga el catálogo de mensajes especificado."
 
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr "  -c cups-files.conf      Establece el archivo cups-files.conf a usar."
@@ -1158,17 +1158,18 @@ msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           Establece el archivo cupsd.conf a usar."
 
 msgid "  -d name=value           Set named variable to value."
-msgstr "  -d nombre=valor           Establece la variable al valor."
+msgstr "  -d nombre=valor         Establece la variable al valor."
 
 msgid "  -d output-dir           Specify the output directory."
 msgstr "  -d dir-salida           Especifica el directorio de salida."
 
 msgid "  -d printer              Use the named printer."
-msgstr "  -d impresora              Usa la impresora especificada."
+msgstr "  -d impresora            Usa la impresora especificada."
 
 msgid "  -d regex                Match domain to regular expression."
 msgstr ""
-"  -d regex               Hacer coincidir el dominio con la expresión regular."
+"  -d regex                Hacer coincidir el dominio con la expresión "
+"regular."
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Usa cada filtro desde el archivo PPD."
@@ -1177,8 +1178,7 @@ msgid "  -f                      Run in the foreground."
 msgstr "  -f                      Ejecuta en primer plano."
 
 msgid "  -f filename             Set default request filename."
-msgstr ""
-"  -f nombre_archivo             Establece nombre de archivo predeterminado."
+msgstr "  -f nombre_archivo       Establece nombre de archivo predeterminado."
 
 msgid "  -h                      Show this usage message."
 msgstr "  -h                      Muestra este mensaje de uso."
@@ -1189,7 +1189,7 @@ msgstr ""
 "expresión regular."
 
 msgid "  -h server[:port]        Specify server address."
-msgstr "  -h servidor[:puerto]        Especifica la dirección del servidor."
+msgstr "  -h servidor[:puerto]    Especifica la dirección del servidor."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -1199,18 +1199,18 @@ msgstr ""
 msgid ""
 "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
-"  -i segundos              Repite el último archivo con el intervalo de "
+"  -i segundos             Repite el último archivo con el intervalo de "
 "tiempo dado."
 
 msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
 msgstr ""
-"  -j id-trabajo[,N]           Filtra el archivo N desde el trabajo "
-"especificado (predeterminado archivo 1)."
+"  -j id-trabajo[,N]       Filtra el archivo N desde el trabajo especificado "
+"(predeterminado archivo 1)."
 
 msgid "  -l                      List attributes."
-msgstr "  -l                    Lista atributos."
+msgstr "  -l                      Lista atributos."
 
 msgid "  -l                      Produce plain text output."
 msgstr "  -l                      Produce salida en texto plano."
@@ -1220,8 +1220,7 @@ msgstr "  -l                      Ejecuta cupsd según demanda."
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
-"  -l idioma[,idioma,...]      Especifica los idiomas de salida (código "
-"regional)."
+"  -l idioma[,idioma,...]  Especifica los idiomas de salida (código regional)."
 
 msgid "  -m                      Use the ModelName value as the filename."
 msgstr ""
@@ -1239,33 +1238,32 @@ msgstr "  -n copias               Establece el número de copias."
 msgid ""
 "  -n count                Repeat the last file the given number of times."
 msgstr ""
-"  -n contador                Repite el último archivo el número de veces "
+"  -n contador             Repite el último archivo el número de veces "
 "especificado."
 
 msgid "  -n regex                Match service name to regular expression."
 msgstr ""
-"  -n regex            Hacer coincidir el nombre del servicio con la "
+"  -n regex                Hacer coincidir el nombre del servicio con la "
 "expresión regular."
 
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
-"  -o nombre_archivo.drv         Establece el archivo de información del "
+"  -o nombre_archivo.drv   Establece el archivo de información del "
 "controlador (si no, ppdi.drv)."
 
 msgid "  -o filename.ppd[.gz]    Set output file (otherwise stdout)."
 msgstr ""
-"  -o nombre_archivo.ppd[.gz]    Establece el archivo de salida (si no, "
-"stdout)."
+"  -o nombre_archivo.ppd[.gz]  Establece el archivo de salida (si no, stdout)."
 
 msgid "  -o name=value           Set option(s)."
-msgstr "  -o nombre=valor           Establece opciones."
+msgstr "  -o nombre=valor         Establece opciones."
 
 msgid "  -p                      Print URI if true."
 msgstr "  -p                      Imprimir URI si es cierto."
 
 msgid "  -p filename.ppd         Set PPD file."
-msgstr "  -p nombre_archivo.ppd         Establece archivo PPD."
+msgstr "  -p nombre_archivo.ppd   Establece archivo PPD."
 
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
@@ -1285,7 +1283,7 @@ msgid "  -s                      Print service name if true."
 msgstr "  -s                      Imprimir nombre del servicio si es cierto."
 
 msgid "  -s cups-files.conf      Set cups-files.conf file to use."
-msgstr ""
+msgstr "  -s cups-files.conf      Establece el archivo cups-files.conf a usar."
 
 msgid "  -t                      Produce a test report."
 msgstr "  -t                      Produce un informe de la prueba."
@@ -1320,7 +1318,7 @@ msgid ""
 "                          Execute program if true."
 msgstr ""
 "  -x utilidad [argumento ...] ;\n"
-"                        Ejecutar programa si es cierto."
+"                          Ejecutar programa si es cierto."
 
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr "  -z                      Comprimir archivos PPD usando GNU zip."
@@ -1358,14 +1356,14 @@ msgid ""
 "                          Logical AND."
 msgstr ""
 "  expresión --and expresión\n"
-"                            AND lógico."
+"                          Y (AND) lógico."
 
 msgid ""
 "  expression --or expression\n"
 "                          Logical OR."
 msgstr ""
 "  expresión --or expresión\n"
-"                            OR lógico."
+"                          O (OR) lógico."
 
 msgid "  expression expression   Logical AND."
 msgstr "  expresión expresión     AND lógico."
@@ -1704,7 +1702,7 @@ msgstr "%s: %s ha fallado: %s"
 
 #, c-format
 msgid "%s: Bad printer URI \"%s\"."
-msgstr ""
+msgstr "%s: URI de impresora \"%s\" no válida."
 
 #, c-format
 msgid "%s: Bad version %s for \"-V\"."
@@ -1742,7 +1740,7 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - copies must be 1 or more."
-msgstr ""
+msgstr "%s: Error - número de copias debe ser 1 o más."
 
 #, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
@@ -1915,7 +1913,7 @@ msgstr "%s: Lo siento, no está implementado el cifrado."
 
 #, c-format
 msgid "%s: Unable to connect to \"%s:%d\": %s"
-msgstr ""
+msgstr "%s: No se ha podido conectar a \"%s:%d\": %s"
 
 #, c-format
 msgid "%s: Unable to connect to server."
@@ -1927,7 +1925,7 @@ msgstr "%s: No se ha podido contactar con el servidor."
 
 #, c-format
 msgid "%s: Unable to create PPD file: %s"
-msgstr ""
+msgstr "%s: No se ha podido crear el archivo PPD: %s"
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1951,11 +1949,11 @@ msgstr "%s: No se pudo leer base de datos MIME desde \"%s\" o \"%s\"."
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
-msgstr ""
+msgstr "%s: No se ha podido resolver \"%s\"."
 
 #, c-format
 msgid "%s: Unknown argument \"%s\"."
-msgstr ""
+msgstr "%s: Argumento \"%s\" desconocido."
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
@@ -2246,16 +2244,16 @@ msgid "2 inches/sec."
 msgstr "2 pulg./seg"
 
 msgid "2-Hole Punch (Landscape)"
-msgstr ""
+msgstr "Perforación de 2 agujeros (apaisado)"
 
 msgid "2-Hole Punch (Portrait)"
-msgstr ""
+msgstr "Perforación de 2 agujeros (retrato)"
 
 msgid "2-Hole Punch (Reverse Landscape)"
-msgstr ""
+msgstr "Perforación de 2 agujeros (apaisado invertido)"
 
 msgid "2-Hole Punch (Reverse Portrait)"
-msgstr ""
+msgstr "Perforación de 2 agujeros (retrato invertido)"
 
 msgid "2-Sided Printing"
 msgstr "Dúplex"
@@ -2372,16 +2370,16 @@ msgid "3 x 5"
 msgstr "3 x 5"
 
 msgid "3-Hole Punch (Landscape)"
-msgstr ""
+msgstr "Perforación de 3 agujeros (apaisado)"
 
 msgid "3-Hole Punch (Portrait)"
-msgstr ""
+msgstr "Perforación de 3 agujeros (retrato)"
 
 msgid "3-Hole Punch (Reverse Landscape)"
-msgstr ""
+msgstr "Perforación de 3 agujeros (apaisado invertido)"
 
 msgid "3-Hole Punch (Reverse Portrait)"
-msgstr ""
+msgstr "Perforación de 3 agujeros (retrato invertido)"
 
 msgid "3.00x1.00\""
 msgstr "3.00x1.00 pulg."
@@ -2450,16 +2448,16 @@ msgid "4 inches/sec."
 msgstr "4 pulg./seg"
 
 msgid "4-Hole Punch (Landscape)"
-msgstr ""
+msgstr "Perforación de 4 agujeros (apaisado)"
 
 msgid "4-Hole Punch (Portrait)"
-msgstr ""
+msgstr "Perforación de 4 agujeros (retrato)"
 
 msgid "4-Hole Punch (Reverse Landscape)"
-msgstr ""
+msgstr "Perforación de 4 agujeros (apaisado invertido)"
 
 msgid "4-Hole Punch (Reverse Portrait)"
-msgstr ""
+msgstr "Perforación de 4 agujeros (retrato invertido)"
 
 msgid "4.00x1.00\""
 msgstr "4.00x1.00 pulg."
@@ -2761,7 +2759,7 @@ msgid "Accepted"
 msgstr "Aceptado"
 
 msgid "Accordian Fold"
-msgstr ""
+msgstr "Pliegue de acordeón"
 
 msgid "Add Class"
 msgstr "Añadir clase"
@@ -2779,10 +2777,10 @@ msgid "Administration"
 msgstr "Administración"
 
 msgid "Alternate"
-msgstr ""
+msgstr "Alternativo"
 
 msgid "Alternate Roll"
-msgstr ""
+msgstr "Rollo alternativo"
 
 msgid "Aluminum"
 msgstr ""
@@ -2810,18 +2808,18 @@ msgstr ""
 
 #, c-format
 msgid "Attribute \"%s\" is in the wrong group."
-msgstr ""
+msgstr "El atributo \"%s\" está en el grupo equivocado."
 
 #, c-format
 msgid "Attribute \"%s\" is the wrong value type."
-msgstr ""
+msgstr "El atributo \"%s\" es el tipo de valor equivocado."
 
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "Los grupos de atributos están desordenados (%x < %x)."
 
 msgid "Automatic"
-msgstr ""
+msgstr "Automático"
 
 msgid "B0"
 msgstr "B0"
@@ -2882,7 +2880,7 @@ msgid "Bad PPD cache file."
 msgstr "Archivo de caché PPD incorrecto."
 
 msgid "Bad PPD file."
-msgstr ""
+msgstr "Archivo PPD incorrecto."
 
 msgid "Bad Request"
 msgstr "Petición incorrecta"
@@ -3010,25 +3008,25 @@ msgid "Bad/empty URI"
 msgstr "URI incorrecta/vacía"
 
 msgid "Bale"
-msgstr ""
+msgstr "Fardo"
 
 msgid "Banners"
 msgstr "Rótulos"
 
 msgid "Bind"
-msgstr ""
+msgstr "Encuadernar"
 
 msgid "Bind (Landscape)"
-msgstr ""
+msgstr "Encuadernar (apaisado)"
 
 msgid "Bind (Portrait)"
-msgstr ""
+msgstr "Encuadernar (retrato)"
 
 msgid "Bind (Reverse Landscape)"
-msgstr ""
+msgstr "Encuadernar (apaisado invertido)"
 
 msgid "Bind (Reverse Portrait)"
-msgstr ""
+msgstr "Encuadernar (retrato invertido)"
 
 msgid "Bond Envelope"
 msgstr ""
@@ -3037,14 +3035,14 @@ msgid "Bond Paper"
 msgstr "Papel de cartas"
 
 msgid "Booklet Maker"
-msgstr ""
+msgstr "Fabricante de folleto"
 
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr "Se esperaba un valor lógico para la opción waiteof \"%s\"."
 
 msgid "Bottom"
-msgstr ""
+msgstr "Inferior"
 
 msgid "Buffer overflow detected, aborting."
 msgstr "Se ha detectado un desbordamiento de buffer, cancelando."
@@ -3068,7 +3066,7 @@ msgid "Canceling print job."
 msgstr "Cancelando trabajo de impresión."
 
 msgid "Cannot change printer-is-shared for remote queues."
-msgstr ""
+msgstr "No se ha podido cambiar printer-is-shared para colas remotas"
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr "No se puede compartir una impresora remota Kerberizada."
@@ -3077,13 +3075,13 @@ msgid "Cardboard"
 msgstr ""
 
 msgid "Cardstock"
-msgstr ""
+msgstr "Cartulina"
 
 msgid "Cassette"
 msgstr "Casete"
 
 msgid "Center"
-msgstr ""
+msgstr "Centro"
 
 msgid "Change Settings"
 msgstr "Cambiar configuración"
@@ -3102,7 +3100,7 @@ msgid "Close-Job doesn't support the job-uri attribute."
 msgstr "Close-Job no admite el atributo job-uri."
 
 msgid "Coat"
-msgstr ""
+msgstr "Capa"
 
 msgid "Coated Envelope"
 msgstr ""
@@ -3124,9 +3122,8 @@ msgid ""
 "\n"
 "exit    help    quit    status  ?"
 msgstr ""
-"Los comandos se pueden abreviar.  Los comandos son:\n"
-"\n"
-"exit    help    quit    status  ?"
+"Los comandos se pueden abreviar.  Los comandos son:exit    help    quit    "
+"status  ?"
 
 msgid "Community name uses indefinite length"
 msgstr "Nombre de comunidad usa una longitud indefinida"
@@ -3159,10 +3156,16 @@ msgid "Cotton Envelope"
 msgstr ""
 
 msgid "Cover"
-msgstr ""
+msgstr "Carátula"
 
 msgid "Created"
 msgstr "Creado"
+
+msgid "Credentials do not validate against site CA certificate."
+msgstr ""
+
+msgid "Credentials have expired."
+msgstr ""
 
 msgid "Custom"
 msgstr "A medida"
@@ -3177,7 +3180,7 @@ msgid "Cut"
 msgstr "Cortar"
 
 msgid "Cut Media"
-msgstr ""
+msgstr "Medio de corte"
 
 msgid "Cutter"
 msgstr "Cortadora"
@@ -3219,9 +3222,9 @@ msgstr ""
 "Dispositivo: uri = %s\n"
 "        clase = %s\n"
 "        info = %s\n"
-"        marca y modelo = %s\n"
-"        id dispositivo= %s\n"
-"        ubicación = %s"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        ubicación: %s"
 
 msgid "Direct Thermal Media"
 msgstr "Soporte térmico directo"
@@ -3250,32 +3253,32 @@ msgid "Disabled"
 msgstr "Deshabilitado"
 
 msgid "Disc"
-msgstr ""
+msgstr "Disco"
 
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr "El documento #%d no existe en el trabajo #%d."
 
 msgid "Double Gate Fold"
-msgstr ""
+msgstr "Página desplegable doble"
 
 msgid "Double Staple (Landscape)"
-msgstr ""
+msgstr "Grapado doble (apaisado)"
 
 msgid "Double Staple (Portrait)"
-msgstr ""
+msgstr "Grapado doble (retrato)"
 
 msgid "Double Staple (Reverse Landscape)"
-msgstr ""
+msgstr "Grapado doble (apaisado invertido)"
 
 msgid "Double Staple (Reverse Portrait)"
-msgstr ""
+msgstr "Grapado doble (retrato invertido)"
 
 msgid "Double Wall Cardboard"
 msgstr ""
 
 msgid "Draft"
-msgstr ""
+msgstr "Borrador"
 
 msgid "Dry Film"
 msgstr ""
@@ -3324,10 +3327,10 @@ msgstr ""
 "autentificación Kerberos, asegúrese de que tiene un ticket Kerberos válido."
 
 msgid "Envelope"
-msgstr ""
+msgstr "Sobre"
 
 msgid "Envelope #10"
-msgstr ""
+msgstr "Sobre #10"
 
 msgid "Envelope #11"
 msgstr "Sobre #11"
@@ -3417,7 +3420,7 @@ msgid "Envelope Monarch"
 msgstr "Sobre Monarch"
 
 msgid "Envelope PRC1"
-msgstr ""
+msgstr "Sobre PRC1"
 
 msgid "Envelope PRC1 Long Edge"
 msgstr "Sobre PRC1 lado largo"
@@ -3495,7 +3498,7 @@ msgid "Error Policy"
 msgstr "Directiva de error"
 
 msgid "Error reading raster data."
-msgstr ""
+msgstr "Error leyendo trama de datos (raster)."
 
 msgid "Error sending raster data."
 msgstr "Error enviando trama de datos (raster)."
@@ -3561,7 +3564,7 @@ msgid "Fanfold US"
 msgstr "FanFold de EE.UU"
 
 msgid "Fast Grayscale"
-msgstr ""
+msgstr "Escala de grises rápida"
 
 #, c-format
 msgid "File \"%s\" contains a relative path."
@@ -3584,7 +3587,7 @@ msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "Permisos del archivo \"%s\" OK (0%o/uid=%d/gid=%d)."
 
 msgid "File Folder"
-msgstr ""
+msgstr "Carpeta de archivo"
 
 #, c-format
 msgid ""
@@ -3605,7 +3608,7 @@ msgid "Finished page %d."
 msgstr "Acabada la página %d."
 
 msgid "Finishing"
-msgstr ""
+msgstr "Terminando"
 
 msgid "Flexo Base"
 msgstr ""
@@ -3620,7 +3623,7 @@ msgid "Foil"
 msgstr ""
 
 msgid "Fold"
-msgstr ""
+msgstr "Plegado"
 
 msgid "Folio"
 msgstr "Folio"
@@ -3632,7 +3635,7 @@ msgid "Full Cut Tabs"
 msgstr ""
 
 msgid "Gate Fold"
-msgstr ""
+msgstr "Desplegable"
 
 msgid "General"
 msgstr "General"
@@ -3668,7 +3671,7 @@ msgid "Glossy Optical Disc"
 msgstr ""
 
 msgid "Glossy Paper"
-msgstr "Papel satinado"
+msgstr "Papel brillante"
 
 msgid "Glossy Photo Paper"
 msgstr ""
@@ -3686,19 +3689,19 @@ msgid "HP"
 msgstr "HP"
 
 msgid "Hagaki"
-msgstr ""
+msgstr "Hagaki"
 
 msgid "Half Fold"
-msgstr ""
+msgstr "Plegado por la mitad"
 
 msgid "Half Z Fold"
-msgstr ""
+msgstr "Medio plegado en Z"
 
 msgid "Hanging Folder"
 msgstr "Carpeta colgante"
 
 msgid "Hash buffer too small."
-msgstr ""
+msgstr "Memoria temporal hash demasiado pequeña."
 
 msgid "Heavyweight Envelope"
 msgstr ""
@@ -3710,7 +3713,7 @@ msgid "Help file not in index."
 msgstr "El archivo de ayuda no está en el índice."
 
 msgid "High"
-msgstr ""
+msgstr "Alta"
 
 msgid "High Gloss Fabric"
 msgstr ""
@@ -3794,7 +3797,7 @@ msgid "IPP value larger than 32767 bytes."
 msgstr "IPP valor mayor de 32767 bytes."
 
 msgid "ISOLatin1"
-msgstr "UTF-8"
+msgstr "ISOLatin1"
 
 msgid "Illegal control character"
 msgstr "Carácter de control ilegal"
@@ -3857,7 +3860,7 @@ msgid "Invalid media size."
 msgstr "Tamaño de papel no válido."
 
 msgid "Invalid ppd-name value."
-msgstr ""
+msgstr "Valor ppd-name' no válido."
 
 #, c-format
 msgid "Invalid printer command \"%s\"."
@@ -3972,7 +3975,7 @@ msgid "Jobs"
 msgstr "Trabajos"
 
 msgid "Jog"
-msgstr ""
+msgstr "Jog"
 
 msgid "LPD/LPR Host or Printer"
 msgstr "Equipo o impresora LPD/LPR"
@@ -3987,7 +3990,7 @@ msgid "Labels"
 msgstr ""
 
 msgid "Laminate"
-msgstr ""
+msgstr "Laminado"
 
 msgid "Laminating Foil"
 msgstr ""
@@ -4000,19 +4003,19 @@ msgid "Large Address"
 msgstr "Dirección grande"
 
 msgid "Large Capacity"
-msgstr ""
+msgstr "Capacidad grande"
 
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet Series PCL 4/5"
 
 msgid "Left"
-msgstr ""
+msgstr "Izquierda"
 
 msgid "Left Gate Fold"
-msgstr ""
+msgstr "Desplegable izquierdo"
 
 msgid "Letter Fold"
-msgstr ""
+msgstr "Carta plegada"
 
 msgid "Letter Oversize"
 msgstr "Carta Extragrande"
@@ -4021,7 +4024,7 @@ msgid "Letter Oversize Long Edge"
 msgstr "Carta Extragrande lado largo"
 
 msgid "Letterhead"
-msgstr ""
+msgstr "Membrete"
 
 msgid "Light"
 msgstr "Ligero"
@@ -4042,22 +4045,22 @@ msgid "Load paper."
 msgstr "Cargar papel."
 
 msgid "Local printer created."
-msgstr ""
+msgstr "Impresora creada localmente."
 
 msgid "Long-Edge (Portrait)"
 msgstr "Lado largo (retrato)"
 
-msgid "Looking for printer..."
+msgid "Looking for printer."
 msgstr ""
 
 msgid "Main"
-msgstr ""
+msgstr "Principaln"
 
 msgid "Main Roll"
-msgstr ""
+msgstr "Rollo principal"
 
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 msgid "Manual Feed"
 msgstr "Alimentación manual"
@@ -4111,7 +4114,7 @@ msgid "Metal Semi Gloss"
 msgstr ""
 
 msgid "Middle"
-msgstr ""
+msgstr "Medio"
 
 msgid "Missing CloseGroup"
 msgstr "Falta CloseGroup"
@@ -4152,7 +4155,7 @@ msgstr "Falta el atributo requesting-user-name."
 
 #, c-format
 msgid "Missing required attribute \"%s\"."
-msgstr ""
+msgstr "Falta atributo necesario \"%s\"."
 
 msgid "Missing required attributes."
 msgstr "Faltan atributos necesarios."
@@ -4216,7 +4219,7 @@ msgid "Multi Part Form"
 msgstr ""
 
 msgid "Multipurpose"
-msgstr ""
+msgstr "Multipropósito"
 
 msgid "NULL PPD file pointer"
 msgstr "Puntero de archivo PPD NULO"
@@ -4230,6 +4233,12 @@ msgstr "No se permiten clases anidadas."
 msgid "Never"
 msgstr "Nunca"
 
+msgid "New credentials are not valid for name."
+msgstr ""
+
+msgid "New credentials are older than stored credentials."
+msgstr ""
+
 msgid "No"
 msgstr "No"
 
@@ -4237,7 +4246,7 @@ msgid "No Content"
 msgstr "No hay contenido"
 
 msgid "No Finishing"
-msgstr ""
+msgstr "Sin terminar"
 
 msgid "No PPD name"
 msgstr "No hay nombre de PPD"
@@ -4263,6 +4272,9 @@ msgstr "No hay atributos en la solicitud."
 
 msgid "No authentication information provided."
 msgstr "No se ha proporcionado información de autentificación."
+
+msgid "No common name specified."
+msgstr ""
 
 msgid "No community name"
 msgstr "No hay nombre de comunidad"
@@ -4319,6 +4331,9 @@ msgstr "No se ha enviado solicitud."
 
 msgid "No request-id"
 msgstr "No hay request-id"
+
+msgid "No stored credentials, not valid for name."
+msgstr ""
 
 msgid "No subscription attributes in request."
 msgstr "No hay atributos de subscripción en la solicitud."
@@ -4381,7 +4396,7 @@ msgid "Online Help"
 msgstr "Ayuda en línea"
 
 msgid "Only local users can create a local printer."
-msgstr ""
+msgstr "Sólo usuarios locales pueden crear una impresora local."
 
 #, c-format
 msgid "Open of %s failed: %s"
@@ -4410,7 +4425,7 @@ msgid "Options:"
 msgstr "Opciones:"
 
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 msgid "Out of date PPD cache file."
 msgstr "Archivo de caché PPD obsoleto."
@@ -4476,7 +4491,7 @@ msgid "Paper tray is missing."
 msgstr "No se encuentra la bandeja de papel."
 
 msgid "Parallel Fold"
-msgstr ""
+msgstr "Pliegue paralelo"
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4568,7 +4583,7 @@ msgid "Postcard"
 msgstr "Postal"
 
 msgid "Postcard Double"
-msgstr ""
+msgstr "Postal doble"
 
 msgid "Postcard Double Long Edge"
 msgstr "Postal doble lado largo"
@@ -4577,7 +4592,7 @@ msgid "Postcard Long Edge"
 msgstr "Postal lado largo"
 
 msgid "Poster Fold"
-msgstr ""
+msgstr "Póster plegado"
 
 msgid "Pre Cut Tabs"
 msgstr ""
@@ -4601,7 +4616,7 @@ msgid "Print Mode"
 msgstr "Modo de impresión"
 
 msgid "Print Quality"
-msgstr ""
+msgstr "Calidad de impresión"
 
 msgid "Print Rate"
 msgstr "Tasa de impresión"
@@ -4635,7 +4650,7 @@ msgstr "No se acepta el trabajo de impresión."
 
 #, c-format
 msgid "Printer \"%s\" already exists."
-msgstr ""
+msgstr "Ya existe la impresora \"%s\"."
 
 msgid "Printer Added"
 msgstr "Impresora añadida"
@@ -4672,13 +4687,13 @@ msgid "Printing page %d, %u%% complete."
 msgstr "Imprimiendo página %d, %u%% completado."
 
 msgid "Punch"
-msgstr ""
+msgstr "Perforadora"
 
 msgid "Punched Paper"
 msgstr ""
 
 msgid "Quarto"
-msgstr "Quarto"
+msgstr "Libro en cuarto"
 
 msgid "Quota limit reached."
 msgstr "Se ha alcanzado el límite de cuota."
@@ -4687,7 +4702,7 @@ msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr "Rango  Propiet. Trabajo Archivo(s)                      Tamaño total"
 
 msgid "Rear"
-msgstr ""
+msgstr "Posterior"
 
 msgid "Reject Jobs"
 msgstr "Rechazar trabajos"
@@ -4722,43 +4737,43 @@ msgid "Rewind"
 msgstr "Rebobinar"
 
 msgid "Right"
-msgstr ""
+msgstr "Derecho"
 
 msgid "Right Gate Fold"
-msgstr ""
+msgstr "Desplegable derecho"
 
 msgid "Roll"
 msgstr ""
 
 msgid "Roll 1"
-msgstr ""
+msgstr "Rollo 1"
 
 msgid "Roll 10"
-msgstr ""
+msgstr "Rollo 10"
 
 msgid "Roll 2"
-msgstr ""
+msgstr "Rollo 2"
 
 msgid "Roll 3"
-msgstr ""
+msgstr "Rollo 3"
 
 msgid "Roll 4"
-msgstr ""
+msgstr "Rollo 4"
 
 msgid "Roll 5"
-msgstr ""
+msgstr "Rollo 5"
 
 msgid "Roll 6"
-msgstr ""
+msgstr "Rollo 6"
 
 msgid "Roll 7"
-msgstr ""
+msgstr "Rollo 7"
 
 msgid "Roll 8"
-msgstr ""
+msgstr "Rollo 8"
 
 msgid "Roll 9"
-msgstr ""
+msgstr "Rollo 9"
 
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
@@ -4771,7 +4786,7 @@ msgid "SSL/TLS Negotiation Error"
 msgstr "Error en negociación SSL/TLS"
 
 msgid "Saddle Stitch"
-msgstr ""
+msgstr "Encuadernador"
 
 msgid "Satin Labels"
 msgstr ""
@@ -4795,12 +4810,15 @@ msgid "See Other"
 msgstr "Ver otros"
 
 msgid "See remote printer."
-msgstr ""
+msgstr "Ver impresora remota."
 
 msgid "Self Adhesive"
 msgstr ""
 
 msgid "Self Adhesive Film"
+msgstr ""
+
+msgid "Self-signed credentials are blocked."
 msgstr ""
 
 msgid "Semi-Gloss Fabric"
@@ -4861,34 +4879,34 @@ msgid "Shrink Foil"
 msgstr ""
 
 msgid "Side"
-msgstr ""
+msgstr "Lateral"
 
 msgid "Single Face"
 msgstr ""
 
 msgid "Single Punch (Landscape)"
-msgstr ""
+msgstr "Perforación simple (apaisado)"
 
 msgid "Single Punch (Portrait)"
-msgstr ""
+msgstr "Perforación única (retrato)"
 
 msgid "Single Punch (Reverse Landscape)"
-msgstr ""
+msgstr "Perforación única (apaisado invertido)"
 
 msgid "Single Punch (Reverse Portrait)"
-msgstr ""
+msgstr "Perforación única (retrato invertido)"
 
 msgid "Single Staple (Landscape)"
-msgstr ""
+msgstr "Grapado simple (apaisado)"
 
 msgid "Single Staple (Portrait)"
-msgstr ""
+msgstr "Grapado simple (retrato)"
 
 msgid "Single Staple (Reverse Landscape)"
-msgstr ""
+msgstr "Grapado simple (apaisado invertido)"
 
 msgid "Single Staple (Reverse Portrait)"
-msgstr ""
+msgstr "Grapado simple (retrato invertido)"
 
 msgid "Single Wall Cardboard"
 msgstr ""
@@ -4907,22 +4925,22 @@ msgid "Standard"
 msgstr "Estándar"
 
 msgid "Staple"
-msgstr ""
+msgstr "Grapa"
 
 msgid "Staple Edge"
-msgstr ""
+msgstr "Borde de grapas"
 
 msgid "Staple Edge (Landscape)"
-msgstr ""
+msgstr "Borde de grapas (apaisado)"
 
 msgid "Staple Edge (Portrait)"
-msgstr ""
+msgstr "Borde de grapas (retrato)"
 
 msgid "Staple Edge (Reverse Landscape)"
-msgstr ""
+msgstr "Borde de grapas (apaisado invertido)"
 
 msgid "Staple Edge (Reverse Portrait)"
-msgstr ""
+msgstr "Borde de grapas (retrato invertido)"
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
 msgid "Starting Banner"
@@ -4976,10 +4994,10 @@ msgid "Tabloid"
 msgstr "Tabloide"
 
 msgid "Tabloid Oversize"
-msgstr "Tabloide Extragrande"
+msgstr "Tabloide extragrande"
 
 msgid "Tabloid Oversize Long Edge"
-msgstr "Tabloide Extragrande lado largo"
+msgstr "Tabloide extragrande lado largo"
 
 msgid "Tear"
 msgstr "Pestaña"
@@ -5002,6 +5020,8 @@ msgstr "El atributo %s no puede ser usado con jobs-ids."
 msgid ""
 "The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
+"El atributo de estado de trabajo '%s' no puede ser suministrado en una "
+"solicitud de creación de trabajo."
 
 #, c-format
 msgid ""
@@ -5185,7 +5205,7 @@ msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "Demasiados valores printer-state-reasons (%d > %d)."
 
 msgid "Top"
-msgstr ""
+msgstr "Superior"
 
 msgid "Tractor"
 msgstr ""
@@ -5203,40 +5223,40 @@ msgid "Tray 1"
 msgstr "Bandeja 1"
 
 msgid "Tray 10"
-msgstr ""
+msgstr "Bandeja 10"
 
 msgid "Tray 11"
-msgstr ""
+msgstr "Bandeja 11"
 
 msgid "Tray 12"
-msgstr ""
+msgstr "Bandeja 12"
 
 msgid "Tray 13"
-msgstr ""
+msgstr "Bandeja 13"
 
 msgid "Tray 14"
-msgstr ""
+msgstr "Bandeja 14"
 
 msgid "Tray 15"
-msgstr ""
+msgstr "Bandeja 15"
 
 msgid "Tray 16"
-msgstr ""
+msgstr "Bandeja 16"
 
 msgid "Tray 17"
-msgstr ""
+msgstr "Bandeja 17"
 
 msgid "Tray 18"
-msgstr ""
+msgstr "Bandeja 18"
 
 msgid "Tray 19"
-msgstr ""
+msgstr "Bandeja 19"
 
 msgid "Tray 2"
 msgstr "Bandeja 2"
 
 msgid "Tray 20"
-msgstr ""
+msgstr "Bandeja 20"
 
 msgid "Tray 3"
 msgstr "Bandeja 3"
@@ -5245,33 +5265,36 @@ msgid "Tray 4"
 msgstr "Bandeja 4"
 
 msgid "Tray 5"
-msgstr ""
+msgstr "Bandeja 5"
 
 msgid "Tray 6"
-msgstr ""
+msgstr "Bandeja 6"
 
 msgid "Tray 7"
-msgstr ""
+msgstr "Bandeja 7"
 
 msgid "Tray 8"
-msgstr ""
+msgstr "Bandeja 8"
 
 msgid "Tray 9"
-msgstr ""
+msgstr "Bandeja 9"
 
 msgid "Triple Staple (Landscape)"
-msgstr ""
+msgstr "Grapado triple (apaisado)"
 
 msgid "Triple Staple (Portrait)"
-msgstr ""
+msgstr "Grapado triple (retrato)"
 
 msgid "Triple Staple (Reverse Landscape)"
-msgstr ""
+msgstr "Grapado triple (apaisado invertido)"
 
 msgid "Triple Staple (Reverse Portrait)"
-msgstr ""
+msgstr "Grapado triple (retrato invertido)"
 
 msgid "Triple Wall Cardboard"
+msgstr ""
+
+msgid "Trust on first use is disabled."
 msgstr ""
 
 msgid "URI Too Long"
@@ -5406,11 +5429,14 @@ msgstr ""
 "No se han podido copiar los archivos del controlador de impresora de Windows "
 "9x (%d)."
 
+msgid "Unable to create credentials from array."
+msgstr ""
+
 msgid "Unable to create printer-uri"
 msgstr "No se ha podido crear printer-uri"
 
 msgid "Unable to create printer."
-msgstr ""
+msgstr "No se ha podido crear la impresora."
 
 msgid "Unable to create server credentials."
 msgstr "No se han podido crear las credenciales del servidor."
@@ -5570,7 +5596,7 @@ msgid "Unable to read print data."
 msgstr "No se han podido leer los datos de impresión."
 
 msgid "Unable to rename job document file."
-msgstr ""
+msgstr "No se ha podido renombrar el archivo del documento de trabajo."
 
 msgid "Unable to resolve printer-uri."
 msgstr "No se ha podido resolver printer-uri."
@@ -5642,7 +5668,7 @@ msgid "Unknown format character: \"%c\"."
 msgstr "Carácter de formato \"%c\" desconocido."
 
 msgid "Unknown hash algorithm."
-msgstr ""
+msgstr "Algoritmo de hash desconocido."
 
 msgid "Unknown media size name."
 msgstr "Nombre de tamaño de papel desconocido."
@@ -5761,9 +5787,9 @@ msgstr ""
 "    lpadmin [-h servidor] -d destino\n"
 "    lpadmin [-h servidor] -x destino\n"
 "    lpadmin [-h servidor] -p impresora [-c clase] [-i interfaz] [-m modelo]\n"
-"                         [-r clase] [-v dispositivo] [-D descripción]\n"
-"                         [-P archivo_ppd] [-o nombre=valor]\n"
-"                         [-u allow:usuario,usuario] [-u deny:usuario,usuario]"
+"                       [-r clase] [-v dispositivo] [-D descripción]\n"
+"                       [-P archivo-ppd] [-o nombre=valor]\n"
+"                       [-u allow:usuario,usuario] [-u deny:usuario,usuario]"
 
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]"
@@ -5814,9 +5840,9 @@ msgid ""
 "       lpoptions [-h server] [-E] -x printer"
 msgstr ""
 "Uso: lpoptions [-h servidor] [-E] -d impresora\n"
-"     lpoptions [-h servidor] [-E] [-p impresora] -l\n"
-"     lpoptions [-h servidor] [-E] -p impresora -o opción[=valor] ...\n"
-"     lpoptions [-h servidor] [-E] -x impresora"
+"       lpoptions [-h servidor] [-E] [-p impresora] -l\n"
+"       lpoptions [-h servidor] [-E] -p impresora -o opción[=valor] ...\n"
+"       lpoptions [-h servidor] [-E] -x impresora"
 
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
@@ -5896,7 +5922,7 @@ msgstr ""
 "%s:%d%s</A>."
 
 msgid "Z Fold"
-msgstr ""
+msgstr "Plegado en Z"
 
 msgid "ZPL Label Printer"
 msgstr "Impresora de etiquetas ZPL"
@@ -6130,7 +6156,7 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Expected PPD after \"-%c\" option."
-msgstr ""
+msgstr "lpadmin: Se esperaba un PPD tras la opción \"-%c\"."
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
 msgstr "lpadmin: Se esperaba allow/deny:lista_usuarios tras la opción \"-u\"."
@@ -6209,11 +6235,12 @@ msgid ""
 "         You must specify a printer name first."
 msgstr ""
 "lpadmin: No se ha podido borrar la opción:\n"
-"         Primero debe especificar un nombre de impresora."
+"         Debe especificar un nombre de impresora primero."
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
 msgstr ""
+"lpadmin: No se ha podido abrir el archivo PPD: \"%s\": %s en la línea %d."
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
@@ -6224,14 +6251,14 @@ msgid ""
 "         You must specify a printer name first."
 msgstr ""
 "lpadmin: No se ha podido quitar una impresora de la clase:\n"
-"         Primero debe especificar un nombre de impresora."
+"         Debe especificar un nombre de impresora primero."
 
 msgid ""
 "lpadmin: Unable to set the printer options:\n"
 "         You must specify a printer name first."
 msgstr ""
-"lpadmin: No se han podido establecer las opciones de impresora:\n"
-"         Primero debe especificar un nombre de impresora."
+"lpadmin: No se han podido establecer las opciones de la impresora:\n"
+"         Debe especificar un nombre de impresora primero."
 
 #, c-format
 msgid "lpadmin: Unknown allow/deny option \"%s\"."
@@ -6749,7 +6776,7 @@ msgstr "la impresora %s está inactiva.  activada desde %s"
 
 #, c-format
 msgid "printer %s now printing %s-%d.  enabled since %s"
-msgstr "la impresora %s está imprimiendo %s-%d.  activada desde %s"
+msgstr "la impresora %s está ahora imprimiendo %s-%d.  activada desde %s"
 
 #, c-format
 msgid "printer %s/%s disabled since %s -"
@@ -6761,7 +6788,7 @@ msgstr "la impresora %s/%s está inactiva.  activada desde %s"
 
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s"
-msgstr "la impresora %s/%s está imprimiendo %s-%d.  activada desde %s"
+msgstr "la impresora %s/%s está ahora imprimiendo %s-%d.  activada desde %s"
 
 msgid "processing"
 msgstr "en proceso"
@@ -6806,79 +6833,26 @@ msgstr "sin título"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
 
-#~ msgid "\tInterface: %s/interfaces/%s"
-#~ msgstr "\tInterfaz: %s/interfaces/%s"
+#~ msgid "CD/DVD/Bluray"
+#~ msgstr "CD/DVD/Bluray"
 
-#~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
-#~ msgstr ""
-#~ "  --lf                    Finalizar líneas con LF (UNIX/Linux/OS X)."
+#~ msgid "Glossy Photo"
+#~ msgstr "Foto brillante"
 
-#~ msgid "  -a                      Browse for all services."
-#~ msgstr "  -a                      Explorar todos los servicios."
+#~ msgid "High-Gloss Photo"
+#~ msgstr "Foto de alto brillo"
 
-#~ msgid "  -d domain               Browse/resolve in specified domain."
-#~ msgstr ""
-#~ "  -d dominio               Explora/resuelve en el dominio especificado."
+#~ msgid "Label"
+#~ msgstr "Etiqueta"
 
-#~ msgid "  -p program              Run specified program for each service."
-#~ msgstr ""
-#~ "  -p program              Ejecuta el programa especificado para cada "
-#~ "servicio."
+#~ msgid "Looking for printer..."
+#~ msgstr "Buscando impresora..."
 
-#~ msgid "  -t type                 Browse/resolve with specified type."
-#~ msgstr ""
-#~ "  -t tipo                 Explora/resuelve con el tipo especificado."
+#~ msgid "Matte Photo"
+#~ msgstr "Foto mate"
 
-#~ msgid "Envelope #10 "
-#~ msgstr "Sobre #10 "
+#~ msgid "Satin Photo"
+#~ msgstr "Foto satinada"
 
-#~ msgid "Envelope PRC1 "
-#~ msgstr "Sobre PRC1 "
-
-#~ msgid "File Folder "
-#~ msgstr "Carpeta de archivo "
-
-#~ msgid "Looking for printer."
-#~ msgstr "Buscando impresora."
-
-#~ msgid "Postcard Double "
-#~ msgstr "Postal doble "
-
-#~ msgid ""
-#~ "The '%s' Job Description attribute cannot be supplied in a job creation "
-#~ "request."
-#~ msgstr ""
-#~ "El atributo de descripción de trabajo '%s' no puede ser suministrado en "
-#~ "una solicitud de creación de trabajo."
-
-#~ msgid "Unable to copy interface script - %s"
-#~ msgstr "No se ha podido copiar el script de interfaz - %s"
-
-#~ msgid ""
-#~ "Usage: ippdiscover [options] -a\n"
-#~ "       ippdiscover [options] \"service name\"\n"
-#~ "\n"
-#~ "Options:"
-#~ msgstr ""
-#~ "Uso: ippdiscover [opciones] -a\n"
-#~ "       ippdiscover [opciones] \"nombre servicio\"\n"
-#~ "\n"
-#~ "Opciones:"
-
-#~ msgid "lpadmin: Expected PPD after \"-P\" option."
-#~ msgstr "lpadmin: Se esperaba un PPD tras la opción \"-P\"."
-
-#~ msgid "lpadmin: Expected interface after \"-i\" option."
-#~ msgstr "lpadmin: Se esperaba una interfaz tras la opción \"-i\"."
-
-#~ msgid "lpinfo: Unknown argument \"%s\"."
-#~ msgstr "lpinfo: Argumento \"%s\" desconocido."
-
-#~ msgid "lpinfo: Unknown option \"%c\"."
-#~ msgstr "lpinfo: Opción \"%c\" desconocida."
-
-#~ msgid "lpinfo: Unknown option \"%s\"."
-#~ msgstr "lpinfo: Opción \"%s\" desconocida."
-
-#~ msgid "lpmove: Unknown option \"%c\"."
-#~ msgstr "lpmove: Opción \"%c\" desconocida."
+#~ msgid "Semi-Gloss Photo"
+#~ msgstr "Foto semi brillante"

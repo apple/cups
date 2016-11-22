@@ -209,7 +209,7 @@ static const char * const ipp_std_ops[] =
 		  "Close-Job",
 		  "Identify-Printer",
 		  "Validate-Document",
-		  "Send-Hardcopy-Document",
+		  "Add-Document-Images",
 		  "Acknowledge-Document",
 
 		  /* 0x0040 - 0x004a */
@@ -429,10 +429,10 @@ static const char * const ipp_document_states[] =
 		  "punch-quad-top",	/* Finishings 2.0 */
 		  "punch-quad-right",	/* Finishings 2.0 */
 		  "punch-quad-bottom",	/* Finishings 2.0 */
-		  "86",
-		  "87",
-		  "88",
-		  "89",
+		  "punch-multiple-left",/* Finishings 2.1/Canon */
+		  "punch-multiple-top",	/* Finishings 2.1/Canon */
+		  "punch-multiple-right",/* Finishings 2.1/Canon */
+		  "punch-multiple-bottom",/* Finishings 2.1/Canon */
 		  "fold-accordian",	/* Finishings 2.0 */
 		  "fold-double-gate",	/* Finishings 2.0 */
 		  "fold-gate",		/* Finishings 2.0 */
@@ -443,7 +443,8 @@ static const char * const ipp_document_states[] =
 		  "fold-parallel",	/* Finishings 2.0 */
 		  "fold-poster",	/* Finishings 2.0 */
 		  "fold-right-gate",	/* Finishings 2.0 */
-		  "fold-z"		/* Finishings 2.0 */
+		  "fold-z",		/* Finishings 2.0 */
+                  "fold-engineering-z"	/* Finishings 2.1 */
 		},
 		* const ipp_finishings_vendor[] =
 		{
@@ -1559,6 +1560,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-get-attributes-supported",
     "printer-icc-profiles",
     "printer-icons",
+    "printer-id",               	/* CUPS extension */
     "printer-info",
     "printer-input-tray",		/* IPP JPS3 */
     "printer-is-accepting-jobs",

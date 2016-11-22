@@ -1,7 +1,7 @@
 /*
  * Administration utility API definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 2001-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1194,6 +1194,7 @@ cupsAdminSetServerSettings(
   int		cupsd_num_settings;	/* New number of settings */
   int		old_share_printers,	/* Share local printers */
 		old_remote_admin,	/* Remote administration allowed? */
+		old_remote_any,		/* Remote access from anywhere? */
 		old_user_cancel_any,	/* Cancel-job policy set? */
 		old_debug_logging;	/* LogLevel debug set? */
   cups_option_t	*cupsd_settings,	/* New settings */
@@ -1259,12 +1260,12 @@ cupsAdminSetServerSettings(
 
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, cupsd_num_settings,
                            cupsd_settings)) != NULL)
-    remote_any = atoi(val);
+    old_remote_any = atoi(val);
   else
-    remote_any = 0;
+    old_remote_any = 0;
 
   DEBUG_printf(("1cupsAdminSetServerSettings: old remote_any=%d",
-                remote_any));
+                old_remote_any));
 
   if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, cupsd_num_settings,
                            cupsd_settings)) != NULL)
@@ -1310,12 +1311,23 @@ cupsAdminSetServerSettings(
   DEBUG_printf(("1cupsAdminSetServerSettings: debug_logging=%d",
                 debug_logging));
 
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings,
-                           settings)) != NULL)
+  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ANY, num_settings, settings)) != NULL)
+  {
     remote_any = atoi(val);
 
-  DEBUG_printf(("1cupsAdminSetServerSettings: remote_any=%d",
-                remote_any));
+    if (remote_any == old_remote_any)
+    {
+     /*
+      * No change to this setting...
+      */
+
+      remote_any = -1;
+    }
+  }
+  else
+    remote_any = -1;
+
+  DEBUG_printf(("1cupsAdminSetServerSettings: remote_any=%d", remote_any));
 
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_ADMIN, num_settings,
                            settings)) != NULL)
@@ -1430,7 +1442,7 @@ cupsAdminSetServerSettings(
   while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
   {
     if ((!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")) &&
-        (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
+        (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
     {
       if (!wrote_port_listen)
       {
@@ -1616,7 +1628,7 @@ cupsAdminSetServerSettings(
 	                 remote_any > 0 ? "all" : "@LOCAL");
       }
       else if (in_root_location &&
-               (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
+               (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
       {
 	wrote_root_location = 1;
 
@@ -1719,7 +1731,7 @@ cupsAdminSetServerSettings(
       in_cancel_job = 0;
     }
     else if ((((in_admin_location || in_conf_location || in_root_location) &&
-               (remote_admin >= 0 || remote_any > 0)) ||
+               (remote_admin >= 0 || remote_any >= 0)) ||
               (in_root_location && share_printers >= 0)) &&
              (!_cups_strcasecmp(line, "Allow") || !_cups_strcasecmp(line, "Deny") ||
 	      !_cups_strcasecmp(line, "Order")))
@@ -1811,7 +1823,7 @@ cupsAdminSetServerSettings(
   }
 
   if (!wrote_port_listen &&
-      (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
+      (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
   {
     if (remote_admin > 0 || remote_any > 0 || share_printers > 0)
     {
@@ -1832,7 +1844,7 @@ cupsAdminSetServerSettings(
   }
 
   if (!wrote_root_location &&
-      (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
+      (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
   {
     if (remote_admin > 0 && share_printers > 0)
       cupsFilePuts(temp,
@@ -2009,9 +2021,14 @@ cupsAdminSetServerSettings(
                                 	 old_remote_admin ? "1" : "0",
 					 cupsd_num_settings, &cupsd_settings);
 
-    cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
-                                       remote_any ? "1" : "0",
-				       cupsd_num_settings, &cupsd_settings);
+    if (remote_any >= 0)
+      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+					 remote_any ? "1" : "0",
+					 cupsd_num_settings, &cupsd_settings);
+    else
+      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
+					 old_remote_any ? "1" : "0",
+					 cupsd_num_settings, &cupsd_settings);
 
     if (share_printers >= 0)
       cupsd_num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,

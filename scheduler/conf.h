@@ -240,6 +240,8 @@ VAR const char		**MimeTypes		VALUE(NULL);
 					/* Array of MIME types */
 
 #ifdef HAVE_SSL
+VAR int			CreateSelfSignedCerts	VALUE(TRUE);
+					/* Automatically create self-signed certs? */
 VAR char		*ServerKeychain		VALUE(NULL);
 					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */

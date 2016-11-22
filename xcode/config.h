@@ -22,8 +22,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2"
-#define CUPS_MINIMAL "CUPS/2.2"
+#define CUPS_SVERSION "CUPS v2.2.2"
+#define CUPS_MINIMAL "CUPS/2.2.2"
 
 
 /*
@@ -50,7 +50,7 @@
  */
 
 #define CUPS_DEFAULT_LOG_LEVEL "warn"
-#define CUPS_DEFAULT_ACCESS_LOG_LEVEL "actions"
+#define CUPS_DEFAULT_ACCESS_LOG_LEVEL "none"
 
 
 /*
@@ -247,17 +247,10 @@
 
 
 /*
- * Do we have the ASL functions?
- */
-
-#define HAVE_ASL_H
-
-
-/*
  * Do we have the systemd journal functions?
  */
 
-/*#undef HAVE_SYSTEMD_SD_JOURNAL_H*/
+/* #undef HAVE_SYSTEMD_SD_JOURNAL_H */
 
 
 /*
@@ -312,6 +305,7 @@
 
 #define HAVE_CDSASSL 1
 /* #undef HAVE_GNUTLS */
+/* #undef HAVE_SSPISSL */
 #define HAVE_SSL 1
 
 
@@ -595,6 +589,7 @@
 
 /* #undef HAVE_DBUS */
 /* #undef HAVE_DBUS_MESSAGE_ITER_INIT_APPEND */
+/* #undef HAVE_DBUS_THREADS_INIT */
 
 
 /*
@@ -602,7 +597,7 @@
  */
 
 #if !TARGET_OS_IOS
-#  define HAVE_GSS_ACQUIRE_CRED_EX_F 1
+#  define HAVE_GSS_ACQUIRED_CRED_EX_F 1
 #  define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
 #  define HAVE_GSS_GSSAPI_H 1
 /* #undef HAVE_GSS_GSSAPI_SPI_H */
@@ -673,7 +668,7 @@
 
 #ifdef HAVE_ARC4RANDOM
 #  define CUPS_RAND() arc4random()
-#  define CUPS_SRAND(v) arc4random_stir()
+#  define CUPS_SRAND(v)
 #elif defined(HAVE_RANDOM)
 #  define CUPS_RAND() random()
 #  define CUPS_SRAND(v) srandom(v)

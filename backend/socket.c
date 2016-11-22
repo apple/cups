@@ -1,7 +1,7 @@
 /*
  * AppSocket backend for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -69,7 +69,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
-  char		portname[255];		/* Port name */
   int		delay;			/* Delay for retries... */
   int		device_fd;		/* AppSocket */
   int		error;			/* Error code (if any) */
@@ -264,23 +263,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   start_time = time(NULL);
 
-  sprintf(portname, "%d", port);
-
-  fputs("STATE: +connecting-to-device\n", stderr);
-  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO",
-                         _("Unable to locate printer \"%s\"."), hostname);
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-    {
-      fputs("STATE: -connecting-to-device\n", stderr);
-      return (CUPS_BACKEND_STOP);
-    }
-  }
+  addrlist = backendLookup(hostname, port, NULL);
 
  /*
   * See if the printer supports SNMP...

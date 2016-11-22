@@ -20,7 +20,7 @@
       /* Show an error if cookies are disabled */
       function check_cookies() {
 	if (!navigator.cookieEnabled) {
-	      document.getElementById('body').innerHTML = 'Esta p&aacute;gina usa cookies para prevenir ataques comunes de sitios. Por favor, active las cookies en su navegador.';
+	      document.getElementById('body').innerHTML = 'Esta p&aacute;gina usa cookies para prevenir ataques comunes de sitios cruzados. Por favor, active las cookies en su navegador.';
 	}
       }
     --></SCRIPT>

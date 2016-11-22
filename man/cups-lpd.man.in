@@ -104,7 +104,7 @@ CUPS includes configuration files for
 .BR launchd (8),
 .BR systemd (8),
 and
-.BR xinetd(8).
+.BR xinetd (8).
 Simply enable the
 .B cups-lpd
 service using the corresponding control program.

@@ -435,10 +435,16 @@ httpCredentialsGetTrust(
 
 
   if (!common_name)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No common name specified."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create credentials from array."), 1);
     return (HTTP_TRUST_UNKNOWN);
+  }
 
   if (cg->any_root < 0)
   {
@@ -473,14 +479,27 @@ httpCredentialsGetTrust(
         * Do not trust certificates on first use...
 	*/
 
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+
         trust = HTTP_TRUST_INVALID;
       }
-      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) || !httpCredentialsAreValidForName(credentials, common_name))
+      else if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds))
       {
        /*
-        * Either the new credentials are not newly issued, or the common name
-	* does not match the issued certificate...
+        * The new credentials are not newly issued...
 	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are older than stored credentials."), 1);
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (!httpCredentialsAreValidForName(credentials, common_name))
+      {
+       /*
+        * The common name does not match the issued certificate...
+	*/
+
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("New credentials are not valid for name."), 1);
 
         trust = HTTP_TRUST_INVALID;
       }
@@ -499,7 +518,53 @@ httpCredentialsGetTrust(
     httpFreeCredentials(tcreds);
   }
   else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No stored credentials, not valid for name."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
+  else if (!cg->trust_first)
+  {
+   /*
+    * See if we have a site CA certificate we can compare...
+    */
+
+    if (!httpLoadCredentials(NULL, &tcreds, "site"))
+    {
+      if (cupsArrayCount(credentials) != (cupsArrayCount(tcreds) + 1))
+      {
+       /*
+        * Certificate isn't directly generated from the CA cert...
+	*/
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else
+      {
+       /*
+        * Do a tail comparison of the two certificates...
+	*/
+
+        http_credential_t	*a, *b;		/* Certificates */
+
+        for (a = (http_credential_t *)cupsArrayFirst(tcreds), b = (http_credential_t *)cupsArrayIndex(credentials, 1);
+	     a && b;
+	     a = (http_credential_t *)cupsArrayNext(tcreds), b = (http_credential_t *)cupsArrayNext(credentials))
+	  if (a->datalen != b->datalen || memcmp(a->data, b->data, a->datalen))
+	    break;
+
+        if (a || b)
+	  trust = HTTP_TRUST_INVALID;
+      }
+
+      if (trust != HTTP_TRUST_OK)
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Credentials do not validate against site CA certificate."), 1);
+    }
+    else
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Trust on first use is disabled."), 1);
+      trust = HTTP_TRUST_INVALID;
+    }
+  }
 
   if (trust == HTTP_TRUST_OK && !cg->expired_certs)
   {
@@ -508,11 +573,17 @@ httpCredentialsGetTrust(
     time(&curtime);
     if (curtime < gnutls_x509_crt_get_activation_time(cert) ||
         curtime > gnutls_x509_crt_get_expiration_time(cert))
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Credentials have expired."), 1);
       trust = HTTP_TRUST_EXPIRED;
+    }
   }
 
   if (trust == HTTP_TRUST_OK && !cg->any_root && cupsArrayCount(credentials) == 1)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Self-signed credentials are blocked."), 1);
     trust = HTTP_TRUST_INVALID;
+  }
 
   gnutls_x509_crt_deinit(cert);
 
@@ -621,6 +692,8 @@ httpLoadCredentials(
   size_t		alloc_data = 0,	/* Bytes allocated */
 			num_data = 0;	/* Bytes used */
   int			decoded;	/* Bytes decoded */
+  int			in_certificate = 0;
+					/* In a certificate? */
 
 
   if (!credentials || !common_name)
@@ -640,7 +713,7 @@ httpLoadCredentials(
   {
     if (!strcmp(line, "-----BEGIN CERTIFICATE-----"))
     {
-      if (num_data)
+      if (in_certificate)
       {
        /*
 	* Missing END CERTIFICATE...
@@ -650,10 +723,12 @@ httpLoadCredentials(
 	*credentials = NULL;
         break;
       }
+
+      in_certificate = 1;
     }
     else if (!strcmp(line, "-----END CERTIFICATE-----"))
     {
-      if (!num_data)
+      if (!in_certificate || !num_data)
       {
        /*
 	* Missing data...
@@ -674,9 +749,10 @@ httpLoadCredentials(
         break;
       }
 
-      num_data = 0;
+      num_data       = 0;
+      in_certificate = 0;
     }
-    else
+    else if (in_certificate)
     {
       if (alloc_data == 0)
       {
@@ -710,7 +786,7 @@ httpLoadCredentials(
 
   cupsFileClose(fp);
 
-  if (num_data)
+  if (in_certificate)
   {
    /*
     * Missing END CERTIFICATE...
@@ -1295,34 +1371,46 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     if (hostname[0])
     {
      /*
-      * First look for CA certs...
+      * First look in the CUPS keystore...
       */
 
-      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostname);
-      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostname);
-
-      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(hostname, '.')) != NULL)
-      {
-       /*
-        * Try just domain name...
-	*/
-
-        hostptr ++;
-	if (strchr(hostptr, '.'))
-	{
-	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
-	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
-	}
-      }
+      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
+      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
 
       if (access(crtfile, R_OK) || access(keyfile, R_OK))
       {
        /*
-        * Then look in the CUPS keystore...
-	*/
+        * No CUPS-managed certs, look for CA certs...
+        */
 
-	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
-	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
+        char cacrtfile[1024], cakeyfile[1024];	/* CA cert files */
+
+        snprintf(cacrtfile, sizeof(cacrtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostname);
+        snprintf(cakeyfile, sizeof(cakeyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostname);
+
+        if ((access(cacrtfile, R_OK) || access(cakeyfile, R_OK)) && (hostptr = strchr(hostname, '.')) != NULL)
+        {
+         /*
+          * Try just domain name...
+          */
+
+          hostptr ++;
+          if (strchr(hostptr, '.'))
+          {
+            snprintf(cacrtfile, sizeof(cacrtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+            snprintf(cakeyfile, sizeof(cakeyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+          }
+        }
+
+        if (!access(cacrtfile, R_OK) && !access(cakeyfile, R_OK))
+        {
+         /*
+          * Use the CA certs...
+          */
+
+          strlcpy(crtfile, cacrtfile, sizeof(crtfile));
+          strlcpy(keyfile, cakeyfile, sizeof(keyfile));
+        }
       }
 
       have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);
@@ -1330,34 +1418,46 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     else if (tls_common_name)
     {
      /*
-      * First look for CA certs...
+      * First look in the CUPS keystore...
       */
 
-      snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", tls_common_name);
-      snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", tls_common_name);
-
-      if ((access(crtfile, R_OK) || access(keyfile, R_OK)) && (hostptr = strchr(tls_common_name, '.')) != NULL)
-      {
-       /*
-        * Try just domain name...
-	*/
-
-        hostptr ++;
-	if (strchr(hostptr, '.'))
-	{
-	  snprintf(crtfile, sizeof(crtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
-	  snprintf(keyfile, sizeof(keyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
-	}
-      }
+      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
+      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
 
       if (access(crtfile, R_OK) || access(keyfile, R_OK))
       {
        /*
-        * Then look in the CUPS keystore...
-	*/
+        * No CUPS-managed certs, look for CA certs...
+        */
 
-	http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
-	http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
+        char cacrtfile[1024], cakeyfile[1024];	/* CA cert files */
+
+        snprintf(cacrtfile, sizeof(cacrtfile), "/etc/letsencrypt/live/%s/fullchain.pem", tls_common_name);
+        snprintf(cakeyfile, sizeof(cakeyfile), "/etc/letsencrypt/live/%s/privkey.pem", tls_common_name);
+
+        if ((access(cacrtfile, R_OK) || access(cakeyfile, R_OK)) && (hostptr = strchr(tls_common_name, '.')) != NULL)
+        {
+         /*
+          * Try just domain name...
+          */
+
+          hostptr ++;
+          if (strchr(hostptr, '.'))
+          {
+            snprintf(cacrtfile, sizeof(cacrtfile), "/etc/letsencrypt/live/%s/fullchain.pem", hostptr);
+            snprintf(cakeyfile, sizeof(cakeyfile), "/etc/letsencrypt/live/%s/privkey.pem", hostptr);
+          }
+        }
+
+        if (!access(cacrtfile, R_OK) && !access(cakeyfile, R_OK))
+        {
+         /*
+          * Use the CA certs...
+          */
+
+          strlcpy(crtfile, cacrtfile, sizeof(crtfile));
+          strlcpy(keyfile, cakeyfile, sizeof(keyfile));
+        }
       }
 
       have_creds = !access(crtfile, R_OK) && !access(keyfile, R_OK);

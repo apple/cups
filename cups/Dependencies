@@ -261,6 +261,11 @@ testcache.o: testcache.c ppd-private.h ../cups/cups.h file.h versioning.h \
   thread-private.h
 testconflicts.o: testconflicts.c cups.h file.h versioning.h ipp.h http.h \
   array.h language.h pwg.h ppd.h raster.h string-private.h ../config.h
+testcreds.o: testcreds.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h thread-private.h
 testcups.o: testcups.c string-private.h ../config.h cups.h file.h \
   versioning.h ipp.h http.h array.h language.h pwg.h ppd.h raster.h
 testdest.o: testdest.c cups.h file.h versioning.h ipp.h http.h array.h \

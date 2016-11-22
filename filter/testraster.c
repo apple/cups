@@ -208,6 +208,7 @@ main(int  argc,				/* I - Number of command-line args */
     errors += do_raster_tests(CUPS_RASTER_WRITE);
     errors += do_raster_tests(CUPS_RASTER_WRITE_COMPRESSED);
     errors += do_raster_tests(CUPS_RASTER_WRITE_PWG);
+    errors += do_raster_tests(CUPS_RASTER_WRITE_APPLE);
   }
   else
   {
@@ -526,8 +527,9 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 
   printf("cupsRasterOpen(%s): ",
          mode == CUPS_RASTER_WRITE ? "CUPS_RASTER_WRITE" :
-	     mode == CUPS_RASTER_WRITE ? "CUPS_RASTER_WRITE_COMPRESSED" :
-	                                 "CUPS_RASTER_WRITE_PWG");
+	     mode == CUPS_RASTER_WRITE_COMPRESSED ? "CUPS_RASTER_WRITE_COMPRESSED" :
+	     mode == CUPS_RASTER_WRITE_PWG ? "CUPS_RASTER_WRITE_PWG" :
+				             "CUPS_RASTER_WRITE_APPLE");
   fflush(stdout);
 
   if ((fp = fopen("test.raster", "wb")) == NULL)
@@ -554,15 +556,15 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 
     if (page & 1)
     {
-      header.cupsBytesPerLine *= 2;
+      header.cupsBytesPerLine *= 4;
       header.cupsColorSpace = CUPS_CSPACE_CMYK;
       header.cupsColorOrder = CUPS_ORDER_CHUNKED;
       header.cupsNumColors  = 4;
     }
     else
     {
-      header.cupsColorSpace = CUPS_CSPACE_K;
-      header.cupsColorOrder = CUPS_ORDER_BANDED;
+      header.cupsColorSpace = CUPS_CSPACE_W;
+      header.cupsColorOrder = CUPS_ORDER_CHUNKED;
       header.cupsNumColors  = 1;
     }
 
@@ -678,7 +680,7 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     expected.cupsHeight       = 256;
     expected.cupsBytesPerLine = 256;
 
-    if (mode == CUPS_RASTER_WRITE_PWG)
+    if (mode >= CUPS_RASTER_WRITE_PWG)
     {
       strlcpy(expected.MediaClass, "PwgRaster", sizeof(expected.MediaClass));
       expected.cupsInteger[7] = 0xffffff;
@@ -686,15 +688,15 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 
     if (page & 1)
     {
-      expected.cupsBytesPerLine *= 2;
+      expected.cupsBytesPerLine *= 4;
       expected.cupsColorSpace = CUPS_CSPACE_CMYK;
       expected.cupsColorOrder = CUPS_ORDER_CHUNKED;
       expected.cupsNumColors  = 4;
     }
     else
     {
-      expected.cupsColorSpace = CUPS_CSPACE_K;
-      expected.cupsColorOrder = CUPS_ORDER_BANDED;
+      expected.cupsColorSpace = CUPS_CSPACE_W;
+      expected.cupsColorOrder = CUPS_ORDER_CHUNKED;
       expected.cupsNumColors  = 1;
     }
 

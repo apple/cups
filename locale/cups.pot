@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-07-07 15:43-0400\n"
+"POT-Creation-Date: 2016-08-30 16:00-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1766,7 +1766,7 @@ msgstr ""
 msgid "%s accepting requests since %s"
 msgstr ""
 
-#: scheduler/ipp.c:10254
+#: scheduler/ipp.c:10294
 #, c-format
 msgid "%s cannot be changed."
 msgstr ""
@@ -1802,7 +1802,7 @@ msgstr ""
 msgid "%s not accepting requests since %s -"
 msgstr ""
 
-#: scheduler/ipp.c:620
+#: scheduler/ipp.c:619
 #, c-format
 msgid "%s not supported."
 msgstr ""
@@ -3058,12 +3058,12 @@ msgstr ""
 msgid "A Samba username is required to export printer drivers"
 msgstr ""
 
-#: scheduler/ipp.c:2281
+#: scheduler/ipp.c:2298
 #, c-format
 msgid "A class named \"%s\" already exists."
 msgstr ""
 
-#: scheduler/ipp.c:918
+#: scheduler/ipp.c:917
 #, c-format
 msgid "A printer named \"%s\" already exists."
 msgstr ""
@@ -3269,22 +3269,22 @@ msgstr ""
 msgid "Archival Fabric"
 msgstr ""
 
-#: scheduler/ipp.c:1010
+#: scheduler/ipp.c:1012
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
 msgstr ""
 
-#: scheduler/ipp.c:5385 scheduler/ipp.c:5411
+#: scheduler/ipp.c:5425 scheduler/ipp.c:5451
 #, c-format
 msgid "Attribute \"%s\" is in the wrong group."
 msgstr ""
 
-#: scheduler/ipp.c:5387 scheduler/ipp.c:5413
+#: scheduler/ipp.c:5427 scheduler/ipp.c:5453
 #, c-format
 msgid "Attribute \"%s\" is the wrong value type."
 msgstr ""
 
-#: scheduler/ipp.c:238
+#: scheduler/ipp.c:237
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr ""
@@ -3345,7 +3345,7 @@ msgstr ""
 msgid "Back Print Film"
 msgstr ""
 
-#: scheduler/ipp.c:11199
+#: scheduler/ipp.c:11241
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr ""
@@ -3379,7 +3379,7 @@ msgstr ""
 msgid "Bad PPD cache file."
 msgstr ""
 
-#: scheduler/ipp.c:2644
+#: scheduler/ipp.c:2673
 msgid "Bad PPD file."
 msgstr ""
 
@@ -3399,7 +3399,7 @@ msgstr ""
 msgid "Bad arguments to function"
 msgstr ""
 
-#: scheduler/ipp.c:1380
+#: scheduler/ipp.c:1397
 #, c-format
 msgid "Bad copies value %d."
 msgstr ""
@@ -3408,22 +3408,22 @@ msgstr ""
 msgid "Bad custom parameter"
 msgstr ""
 
-#: cups/http-support.c:1600 scheduler/ipp.c:2379
+#: cups/http-support.c:1600 scheduler/ipp.c:2378
 #, c-format
 msgid "Bad device-uri \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:2418
+#: scheduler/ipp.c:2423
 #, c-format
 msgid "Bad device-uri scheme \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:8409 scheduler/ipp.c:8427 scheduler/ipp.c:9655
+#: scheduler/ipp.c:8449 scheduler/ipp.c:8467 scheduler/ipp.c:9695
 #, c-format
 msgid "Bad document-format \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:9673
+#: scheduler/ipp.c:9713
 #, c-format
 msgid "Bad document-format-default \"%s\"."
 msgstr ""
@@ -3436,51 +3436,51 @@ msgstr ""
 msgid "Bad hostname/address in URI"
 msgstr ""
 
-#: scheduler/ipp.c:1555
+#: scheduler/ipp.c:1572
 #, c-format
 msgid "Bad job-name value: %s"
 msgstr ""
 
-#: scheduler/ipp.c:1548
+#: scheduler/ipp.c:1565
 msgid "Bad job-name value: Wrong type or count."
 msgstr ""
 
-#: scheduler/ipp.c:10269
+#: scheduler/ipp.c:10309
 msgid "Bad job-priority value."
 msgstr ""
 
-#: scheduler/ipp.c:1410
+#: scheduler/ipp.c:1427
 #, c-format
 msgid "Bad job-sheets value \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:1394
+#: scheduler/ipp.c:1411
 msgid "Bad job-sheets value type."
 msgstr ""
 
-#: scheduler/ipp.c:10299
+#: scheduler/ipp.c:10339
 msgid "Bad job-state value."
 msgstr ""
 
-#: scheduler/ipp.c:2968 scheduler/ipp.c:3430 scheduler/ipp.c:6194
-#: scheduler/ipp.c:6341 scheduler/ipp.c:7838 scheduler/ipp.c:8107
-#: scheduler/ipp.c:8973 scheduler/ipp.c:9197 scheduler/ipp.c:9549
-#: scheduler/ipp.c:10162
+#: scheduler/ipp.c:3008 scheduler/ipp.c:3470 scheduler/ipp.c:6234
+#: scheduler/ipp.c:6381 scheduler/ipp.c:7878 scheduler/ipp.c:8147
+#: scheduler/ipp.c:9013 scheduler/ipp.c:9237 scheduler/ipp.c:9589
+#: scheduler/ipp.c:10202
 #, c-format
 msgid "Bad job-uri \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:2047 scheduler/ipp.c:5733
+#: scheduler/ipp.c:2064 scheduler/ipp.c:5773
 #, c-format
 msgid "Bad notify-pull-method \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:2011 scheduler/ipp.c:5697
+#: scheduler/ipp.c:2028 scheduler/ipp.c:5737
 #, c-format
 msgid "Bad notify-recipient-uri \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:1426
+#: scheduler/ipp.c:1443
 #, c-format
 msgid "Bad number-up value %d."
 msgstr ""
@@ -3490,7 +3490,7 @@ msgstr ""
 msgid "Bad option + choice on line %d."
 msgstr ""
 
-#: scheduler/ipp.c:1443
+#: scheduler/ipp.c:1460
 #, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr ""
@@ -3499,12 +3499,12 @@ msgstr ""
 msgid "Bad port number in URI"
 msgstr ""
 
-#: scheduler/ipp.c:2461
+#: scheduler/ipp.c:2469
 #, c-format
 msgid "Bad port-monitor \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:2533
+#: scheduler/ipp.c:2550
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr ""
@@ -3513,12 +3513,12 @@ msgstr ""
 msgid "Bad printer-uri."
 msgstr ""
 
-#: scheduler/ipp.c:206
+#: scheduler/ipp.c:205
 #, c-format
 msgid "Bad request ID %d."
 msgstr ""
 
-#: scheduler/ipp.c:191
+#: scheduler/ipp.c:190
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr ""
@@ -3620,15 +3620,15 @@ msgstr ""
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:2236
+#: backend/ipp.c:2268
 msgid "Canceling print job."
 msgstr ""
 
-#: scheduler/ipp.c:989 scheduler/ipp.c:2511
+#: scheduler/ipp.c:988 scheduler/ipp.c:2525
 msgid "Cannot change printer-is-shared for remote queues."
 msgstr ""
 
-#: scheduler/ipp.c:2501
+#: scheduler/ipp.c:2512
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
 
@@ -3653,7 +3653,7 @@ msgstr ""
 msgid "Change Settings"
 msgstr ""
 
-#: scheduler/ipp.c:2059 scheduler/ipp.c:5745
+#: scheduler/ipp.c:2076 scheduler/ipp.c:5785
 #, c-format
 msgid "Character set \"%s\" not supported."
 msgstr ""
@@ -3666,7 +3666,7 @@ msgstr ""
 msgid "Clean Print Heads"
 msgstr ""
 
-#: scheduler/ipp.c:3882
+#: scheduler/ipp.c:3922
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr ""
 
@@ -3706,11 +3706,11 @@ msgstr ""
 msgid "Community name uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:860 backend/lpd.c:953 backend/socket.c:398
+#: backend/ipp.c:892 backend/lpd.c:953 backend/socket.c:398
 msgid "Connected to printer."
 msgstr ""
 
-#: backend/ipp.c:765 backend/lpd.c:776 backend/socket.c:317
+#: backend/ipp.c:727 backend/lpd.c:776 backend/socket.c:317
 msgid "Connecting to printer."
 msgstr ""
 
@@ -3734,7 +3734,7 @@ msgstr ""
 msgid "Control file sent successfully."
 msgstr ""
 
-#: backend/ipp.c:1384 backend/lpd.c:468
+#: backend/ipp.c:1416 backend/lpd.c:468
 msgid "Copying print data."
 msgstr ""
 
@@ -3748,6 +3748,14 @@ msgstr ""
 
 #: cups/http-support.c:1348
 msgid "Created"
+msgstr ""
+
+#: cups/tls-darwin.c:726 cups/tls-gnutls.c:560
+msgid "Credentials do not validate against site CA certificate."
+msgstr ""
+
+#: cups/tls-darwin.c:737 cups/tls-gnutls.c:577
+msgid "Credentials have expired."
 msgstr ""
 
 #: cups/ppd.c:1136 cups/ppd.c:1176 cups/ppd.c:1421 cups/ppd.c:1524
@@ -3802,7 +3810,7 @@ msgstr ""
 msgid "DeskJet Series"
 msgstr ""
 
-#: scheduler/ipp.c:1309
+#: scheduler/ipp.c:1326
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr ""
@@ -3855,7 +3863,7 @@ msgstr ""
 msgid "Disc"
 msgstr ""
 
-#: scheduler/ipp.c:6243
+#: scheduler/ipp.c:6283
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr ""
@@ -4299,7 +4307,7 @@ msgstr ""
 msgid "File Folder"
 msgstr ""
 
-#: scheduler/ipp.c:2397
+#: scheduler/ipp.c:2399
 #, c-format
 msgid "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cups-files.conf\"."
 msgstr ""
@@ -4410,10 +4418,10 @@ msgstr ""
 msgid "Glossy Photo Paper"
 msgstr ""
 
-#: scheduler/ipp.c:2946 scheduler/ipp.c:3356 scheduler/ipp.c:3894
-#: scheduler/ipp.c:6172 scheduler/ipp.c:6319 scheduler/ipp.c:7815
-#: scheduler/ipp.c:8951 scheduler/ipp.c:9175 scheduler/ipp.c:9527
-#: scheduler/ipp.c:10140
+#: scheduler/ipp.c:2986 scheduler/ipp.c:3396 scheduler/ipp.c:3934
+#: scheduler/ipp.c:6212 scheduler/ipp.c:6359 scheduler/ipp.c:7855
+#: scheduler/ipp.c:8991 scheduler/ipp.c:9215 scheduler/ipp.c:9567
+#: scheduler/ipp.c:10180
 msgid "Got a printer-uri attribute but no job-id."
 msgstr ""
 
@@ -4657,7 +4665,7 @@ msgstr ""
 msgid "Invalid media size."
 msgstr ""
 
-#: scheduler/ipp.c:2684 scheduler/ipp.c:6986
+#: scheduler/ipp.c:2719 scheduler/ipp.c:7026
 msgid "Invalid ppd-name value."
 msgstr ""
 
@@ -4726,52 +4734,52 @@ msgstr ""
 msgid "JIS B9"
 msgstr ""
 
-#: scheduler/ipp.c:9247
+#: scheduler/ipp.c:9287
 #, c-format
 msgid "Job #%d cannot be restarted - no files."
 msgstr ""
 
-#: scheduler/ipp.c:2986 scheduler/ipp.c:3220 scheduler/ipp.c:3279
-#: scheduler/ipp.c:3458 scheduler/ipp.c:3904 scheduler/ipp.c:5831
-#: scheduler/ipp.c:6212 scheduler/ipp.c:6359 scheduler/ipp.c:6696
-#: scheduler/ipp.c:7656 scheduler/ipp.c:7678 scheduler/ipp.c:7856
-#: scheduler/ipp.c:8081 scheduler/ipp.c:8124 scheduler/ipp.c:8991
-#: scheduler/ipp.c:9215 scheduler/ipp.c:9567 scheduler/ipp.c:10180
+#: scheduler/ipp.c:3026 scheduler/ipp.c:3260 scheduler/ipp.c:3319
+#: scheduler/ipp.c:3498 scheduler/ipp.c:3944 scheduler/ipp.c:5871
+#: scheduler/ipp.c:6252 scheduler/ipp.c:6399 scheduler/ipp.c:6736
+#: scheduler/ipp.c:7696 scheduler/ipp.c:7718 scheduler/ipp.c:7896
+#: scheduler/ipp.c:8121 scheduler/ipp.c:8164 scheduler/ipp.c:9031
+#: scheduler/ipp.c:9255 scheduler/ipp.c:9607 scheduler/ipp.c:10220
 #, c-format
 msgid "Job #%d does not exist."
 msgstr ""
 
-#: scheduler/ipp.c:3490
+#: scheduler/ipp.c:3530
 #, c-format
 msgid "Job #%d is already aborted - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:3484
+#: scheduler/ipp.c:3524
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:3496
+#: scheduler/ipp.c:3536
 #, c-format
 msgid "Job #%d is already completed - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:7882 scheduler/ipp.c:8166 scheduler/ipp.c:10195
+#: scheduler/ipp.c:7922 scheduler/ipp.c:8206 scheduler/ipp.c:10235
 #, c-format
 msgid "Job #%d is finished and cannot be altered."
 msgstr ""
 
-#: scheduler/ipp.c:9229
+#: scheduler/ipp.c:9269
 #, c-format
 msgid "Job #%d is not complete."
 msgstr ""
 
-#: scheduler/ipp.c:3001
+#: scheduler/ipp.c:3041
 #, c-format
 msgid "Job #%d is not held for authentication."
 msgstr ""
 
-#: scheduler/ipp.c:9005
+#: scheduler/ipp.c:9045
 #, c-format
 msgid "Job #%d is not held."
 msgstr ""
@@ -4792,7 +4800,7 @@ msgstr ""
 msgid "Job Stopped"
 msgstr ""
 
-#: scheduler/ipp.c:10277
+#: scheduler/ipp.c:10317
 msgid "Job is completed and cannot be changed."
 msgstr ""
 
@@ -4800,11 +4808,11 @@ msgstr ""
 msgid "Job operation failed"
 msgstr ""
 
-#: scheduler/ipp.c:10313 scheduler/ipp.c:10330 scheduler/ipp.c:10341
+#: scheduler/ipp.c:10353 scheduler/ipp.c:10370 scheduler/ipp.c:10381
 msgid "Job state cannot be changed."
 msgstr ""
 
-#: scheduler/ipp.c:9095
+#: scheduler/ipp.c:9135
 msgid "Job subscriptions cannot be renewed."
 msgstr ""
 
@@ -4840,7 +4848,7 @@ msgstr ""
 msgid "Laminating Foil"
 msgstr ""
 
-#: scheduler/ipp.c:2068 scheduler/ipp.c:5754
+#: scheduler/ipp.c:2085 scheduler/ipp.c:5794
 #, c-format
 msgid "Language \"%s\" not supported."
 msgstr ""
@@ -4905,7 +4913,7 @@ msgstr ""
 msgid "Load paper."
 msgstr ""
 
-#: scheduler/ipp.c:5463
+#: scheduler/ipp.c:5503
 msgid "Local printer created."
 msgstr ""
 
@@ -4914,7 +4922,7 @@ msgid "Long-Edge (Portrait)"
 msgstr ""
 
 #: cups/http-support.c:1727
-msgid "Looking for printer..."
+msgid "Looking for printer."
 msgstr ""
 
 #: cups/ppd-cache.c:3257
@@ -5013,7 +5021,7 @@ msgstr ""
 msgid "Missing asterisk in column 1"
 msgstr ""
 
-#: scheduler/ipp.c:6235
+#: scheduler/ipp.c:6275
 msgid "Missing document-number attribute."
 msgstr ""
 
@@ -5028,7 +5036,7 @@ msgstr ""
 msgid "Missing form variable"
 msgstr ""
 
-#: scheduler/ipp.c:9621
+#: scheduler/ipp.c:9661
 msgid "Missing last-document attribute in request."
 msgstr ""
 
@@ -5040,7 +5048,7 @@ msgstr ""
 msgid "Missing media-size in media-col."
 msgstr ""
 
-#: scheduler/ipp.c:6836
+#: scheduler/ipp.c:6876
 msgid "Missing notify-subscription-ids attribute."
 msgstr ""
 
@@ -5048,16 +5056,16 @@ msgstr ""
 msgid "Missing option keyword"
 msgstr ""
 
-#: scheduler/ipp.c:3127 scheduler/ipp.c:3152
+#: scheduler/ipp.c:3167 scheduler/ipp.c:3192
 msgid "Missing requesting-user-name attribute."
 msgstr ""
 
-#: scheduler/ipp.c:5383 scheduler/ipp.c:5409
+#: scheduler/ipp.c:5423 scheduler/ipp.c:5449
 #, c-format
 msgid "Missing required attribute \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:387
+#: scheduler/ipp.c:386
 msgid "Missing required attributes."
 msgstr ""
 
@@ -5143,12 +5151,20 @@ msgstr ""
 msgid "Name OID uses indefinite length"
 msgstr ""
 
-#: scheduler/ipp.c:1073
+#: scheduler/ipp.c:1081
 msgid "Nested classes are not allowed."
 msgstr ""
 
 #: ppdc/sample.c:425
 msgid "Never"
+msgstr ""
+
+#: cups/tls-darwin.c:668 cups/tls-gnutls.c:502
+msgid "New credentials are not valid for name."
+msgstr ""
+
+#: cups/tls-darwin.c:658 cups/tls-gnutls.c:492
+msgid "New credentials are older than stored credentials."
 msgstr ""
 
 #: cups/ppd.c:1971
@@ -5183,28 +5199,32 @@ msgstr ""
 msgid "No active connection."
 msgstr ""
 
-#: scheduler/ipp.c:3407
+#: scheduler/ipp.c:3447
 #, c-format
 msgid "No active jobs on %s."
 msgstr ""
 
-#: scheduler/ipp.c:215
+#: scheduler/ipp.c:214
 msgid "No attributes in request."
 msgstr ""
 
-#: scheduler/ipp.c:3028
+#: scheduler/ipp.c:3068
 msgid "No authentication information provided."
+msgstr ""
+
+#: cups/tls-darwin.c:608 cups/tls-gnutls.c:439
+msgid "No common name specified."
 msgstr ""
 
 #: cups/snmp.c:954
 msgid "No community name"
 msgstr ""
 
-#: scheduler/ipp.c:6035
+#: scheduler/ipp.c:6075
 msgid "No default printer."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:422 scheduler/ipp.c:7416
+#: cgi-bin/ipp-var.c:422 scheduler/ipp.c:7456
 msgid "No destinations added."
 msgstr ""
 
@@ -5220,7 +5240,7 @@ msgstr ""
 msgid "No error-status"
 msgstr ""
 
-#: scheduler/ipp.c:8371 scheduler/ipp.c:9635
+#: scheduler/ipp.c:8411 scheduler/ipp.c:9675
 msgid "No file in print request."
 msgstr ""
 
@@ -5249,7 +5269,7 @@ msgstr ""
 msgid "No printer-uri found for class"
 msgstr ""
 
-#: scheduler/ipp.c:6442
+#: scheduler/ipp.c:6482
 msgid "No printer-uri in request."
 msgstr ""
 
@@ -5269,11 +5289,15 @@ msgstr ""
 msgid "No request-id"
 msgstr ""
 
-#: scheduler/ipp.c:5639
+#: cups/tls-darwin.c:688 cups/tls-gnutls.c:522
+msgid "No stored credentials, not valid for name."
+msgstr ""
+
+#: scheduler/ipp.c:5679
 msgid "No subscription attributes in request."
 msgstr ""
 
-#: scheduler/ipp.c:7755
+#: scheduler/ipp.c:7795
 msgid "No subscriptions found."
 msgstr ""
 
@@ -5317,7 +5341,7 @@ msgstr ""
 msgid "Not Supported"
 msgstr ""
 
-#: scheduler/ipp.c:1518 scheduler/ipp.c:10894
+#: scheduler/ipp.c:1535 scheduler/ipp.c:10936
 msgid "Not allowed to print."
 msgstr ""
 
@@ -5345,7 +5369,7 @@ msgstr ""
 msgid "Online Help"
 msgstr ""
 
-#: scheduler/ipp.c:5362
+#: scheduler/ipp.c:5402
 msgid "Only local users can create a local printer."
 msgstr ""
 
@@ -5617,7 +5641,7 @@ msgstr ""
 msgid "Pre Cut Tabs"
 msgstr ""
 
-#: backend/ipp.c:968 backend/ipp.c:976
+#: backend/ipp.c:1000 backend/ipp.c:1008
 msgid "Preparing to print."
 msgstr ""
 
@@ -5673,19 +5697,19 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:2210
+#: backend/ipp.c:2242
 msgid "Print job canceled at printer."
 msgstr ""
 
-#: backend/ipp.c:2202
+#: backend/ipp.c:2234
 msgid "Print job too large."
 msgstr ""
 
-#: backend/ipp.c:1680
+#: backend/ipp.c:1712
 msgid "Print job was not accepted."
 msgstr ""
 
-#: scheduler/ipp.c:5428
+#: scheduler/ipp.c:5468
 #, c-format
 msgid "Printer \"%s\" already exists."
 msgstr ""
@@ -5714,11 +5738,11 @@ msgstr ""
 msgid "Printer Settings"
 msgstr ""
 
-#: backend/ipp.c:2205
+#: backend/ipp.c:2237
 msgid "Printer cannot print supplied content."
 msgstr ""
 
-#: backend/ipp.c:2208
+#: backend/ipp.c:2240
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
@@ -5748,7 +5772,7 @@ msgstr ""
 msgid "Quarto"
 msgstr ""
 
-#: scheduler/ipp.c:1513 scheduler/ipp.c:10889
+#: scheduler/ipp.c:1530 scheduler/ipp.c:10931
 msgid "Quota limit reached."
 msgstr ""
 
@@ -5854,7 +5878,7 @@ msgstr ""
 msgid "Roll 9"
 msgstr ""
 
-#: cups/adminutil.c:2083
+#: cups/adminutil.c:2100
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr ""
@@ -5899,7 +5923,7 @@ msgstr ""
 msgid "See Other"
 msgstr ""
 
-#: scheduler/ipp.c:7040 scheduler/ipp.c:7059
+#: scheduler/ipp.c:7080 scheduler/ipp.c:7099
 msgid "See remote printer."
 msgstr ""
 
@@ -5909,6 +5933,10 @@ msgstr ""
 
 #: cups/ppd-cache.c:3437
 msgid "Self Adhesive Film"
+msgstr ""
+
+#: cups/tls-darwin.c:743 cups/tls-gnutls.c:584
+msgid "Self-signed credentials are blocked."
 msgstr ""
 
 #: cups/ppd-cache.c:3375
@@ -5947,7 +5975,7 @@ msgstr ""
 msgid "Server Stopped"
 msgstr ""
 
-#: cups/tls-darwin.c:1101 cups/tls-gnutls.c:1187
+#: cups/tls-darwin.c:1183 cups/tls-gnutls.c:1263
 msgid "Server credentials not set."
 msgstr ""
 
@@ -6108,8 +6136,8 @@ msgstr ""
 msgid "Stationery Inkjet Paper"
 msgstr ""
 
-#: scheduler/ipp.c:3553 scheduler/ipp.c:6852 scheduler/ipp.c:7562
-#: scheduler/ipp.c:9083
+#: scheduler/ipp.c:3593 scheduler/ipp.c:6892 scheduler/ipp.c:7602
+#: scheduler/ipp.c:9123
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr ""
@@ -6162,33 +6190,33 @@ msgstr ""
 msgid "Tear-Off Adjust Position"
 msgstr ""
 
-#: scheduler/ipp.c:1349
+#: scheduler/ipp.c:1366
 #, c-format
 msgid "The \"%s\" attribute is required for print jobs."
 msgstr ""
 
-#: scheduler/ipp.c:6513 scheduler/ipp.c:6593 scheduler/ipp.c:6606
-#: scheduler/ipp.c:6618 scheduler/ipp.c:6633
+#: scheduler/ipp.c:6553 scheduler/ipp.c:6633 scheduler/ipp.c:6646
+#: scheduler/ipp.c:6658 scheduler/ipp.c:6673
 #, c-format
 msgid "The %s attribute cannot be provided with job-ids."
 msgstr ""
 
-#: scheduler/ipp.c:1328
+#: scheduler/ipp.c:1345
 #, c-format
 msgid "The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
 
-#: scheduler/ipp.c:5190
+#: scheduler/ipp.c:5230
 #, c-format
 msgid "The '%s' operation attribute cannot be supplied in a Create-Job request."
 msgstr ""
 
-#: scheduler/ipp.c:7082
+#: scheduler/ipp.c:7122
 #, c-format
 msgid "The PPD file \"%s\" could not be found."
 msgstr ""
 
-#: scheduler/ipp.c:7071
+#: scheduler/ipp.c:7111
 #, c-format
 msgid "The PPD file \"%s\" could not be opened: %s"
 msgstr ""
@@ -6218,11 +6246,11 @@ msgstr ""
 msgid "The fuser's temperature is low."
 msgstr ""
 
-#: scheduler/ipp.c:2095
+#: scheduler/ipp.c:2112
 msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
 
-#: scheduler/ipp.c:2078 scheduler/ipp.c:5764
+#: scheduler/ipp.c:2095 scheduler/ipp.c:5804
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr ""
@@ -6235,7 +6263,7 @@ msgstr ""
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr ""
 
-#: backend/ipp.c:988
+#: backend/ipp.c:1020
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -6243,8 +6271,8 @@ msgstr ""
 msgid "The printer did not respond."
 msgstr ""
 
-#: backend/ipp.c:831 backend/ipp.c:951 backend/ipp.c:1065 backend/ipp.c:1485
-#: backend/ipp.c:1652 backend/lpd.c:910 backend/socket.c:377
+#: backend/ipp.c:793 backend/ipp.c:983 backend/ipp.c:1097 backend/ipp.c:1517
+#: backend/ipp.c:1684 backend/lpd.c:910 backend/socket.c:377
 #: backend/usb-unix.c:122 backend/usb-unix.c:412 backend/usb-unix.c:495
 msgid "The printer is in use."
 msgstr ""
@@ -6261,7 +6289,7 @@ msgstr ""
 msgid "The printer is not connected."
 msgstr ""
 
-#: backend/ipp.c:809 backend/ipp.c:842 backend/ipp.c:947 backend/lpd.c:889
+#: backend/ipp.c:771 backend/ipp.c:804 backend/ipp.c:979 backend/lpd.c:889
 #: backend/lpd.c:930 backend/socket.c:356 backend/socket.c:389
 msgid "The printer is not responding."
 msgstr ""
@@ -6278,7 +6306,7 @@ msgstr ""
 msgid "The printer is offline."
 msgstr ""
 
-#: backend/ipp.c:824 backend/lpd.c:903 backend/socket.c:370
+#: backend/ipp.c:786 backend/lpd.c:903 backend/socket.c:370
 msgid "The printer is unreachable at this time."
 msgstr ""
 
@@ -6290,7 +6318,7 @@ msgstr ""
 msgid "The printer may be out of toner."
 msgstr ""
 
-#: backend/ipp.c:818 backend/lpd.c:897 backend/socket.c:364
+#: backend/ipp.c:780 backend/lpd.c:897 backend/socket.c:364
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 
@@ -6298,18 +6326,18 @@ msgstr ""
 msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
-#: scheduler/ipp.c:790 scheduler/ipp.c:1067 scheduler/ipp.c:3192
-#: scheduler/ipp.c:3373 scheduler/ipp.c:5173 scheduler/ipp.c:5598
-#: scheduler/ipp.c:5913 scheduler/ipp.c:6479 scheduler/ipp.c:7286
-#: scheduler/ipp.c:7342 scheduler/ipp.c:7668 scheduler/ipp.c:7940
-#: scheduler/ipp.c:8029 scheduler/ipp.c:8062 scheduler/ipp.c:8386
-#: scheduler/ipp.c:8793 scheduler/ipp.c:8875 scheduler/ipp.c:10049
-#: scheduler/ipp.c:10501 scheduler/ipp.c:10852 scheduler/ipp.c:10934
-#: scheduler/ipp.c:11309
+#: scheduler/ipp.c:789 scheduler/ipp.c:1072 scheduler/ipp.c:3232
+#: scheduler/ipp.c:3413 scheduler/ipp.c:5213 scheduler/ipp.c:5638
+#: scheduler/ipp.c:5953 scheduler/ipp.c:6519 scheduler/ipp.c:7326
+#: scheduler/ipp.c:7382 scheduler/ipp.c:7708 scheduler/ipp.c:7980
+#: scheduler/ipp.c:8069 scheduler/ipp.c:8102 scheduler/ipp.c:8426
+#: scheduler/ipp.c:8833 scheduler/ipp.c:8915 scheduler/ipp.c:10089
+#: scheduler/ipp.c:10541 scheduler/ipp.c:10894 scheduler/ipp.c:10976
+#: scheduler/ipp.c:11351
 msgid "The printer or class does not exist."
 msgstr ""
 
-#: scheduler/ipp.c:1267
+#: scheduler/ipp.c:1284
 msgid "The printer or class is not shared."
 msgstr ""
 
@@ -6333,20 +6361,20 @@ msgstr ""
 msgid "The printer's waste bin is full."
 msgstr ""
 
-#: scheduler/ipp.c:896 scheduler/ipp.c:2259
+#: scheduler/ipp.c:895 scheduler/ipp.c:2276
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
 msgstr ""
 
-#: scheduler/ipp.c:3169
+#: scheduler/ipp.c:3209
 msgid "The printer-uri attribute is required."
 msgstr ""
 
-#: scheduler/ipp.c:880
+#: scheduler/ipp.c:879
 msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
 msgstr ""
 
-#: scheduler/ipp.c:2243
+#: scheduler/ipp.c:2260
 msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
 
@@ -6358,12 +6386,12 @@ msgstr ""
 msgid "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it."
 msgstr ""
 
-#: scheduler/ipp.c:6577
+#: scheduler/ipp.c:6617
 #, c-format
 msgid "The which-jobs value \"%s\" is not supported."
 msgstr ""
 
-#: scheduler/ipp.c:5842
+#: scheduler/ipp.c:5882
 msgid "There are too many subscriptions."
 msgstr ""
 
@@ -6376,16 +6404,16 @@ msgstr ""
 msgid "Thermal Transfer Media"
 msgstr ""
 
-#: scheduler/ipp.c:1507
+#: scheduler/ipp.c:1524
 msgid "Too many active jobs."
 msgstr ""
 
-#: scheduler/ipp.c:1401
+#: scheduler/ipp.c:1418
 #, c-format
 msgid "Too many job-sheets values (%d > 2)."
 msgstr ""
 
-#: scheduler/ipp.c:2567
+#: scheduler/ipp.c:2587
 #, c-format
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr ""
@@ -6510,6 +6538,11 @@ msgstr ""
 msgid "Triple Wall Cardboard"
 msgstr ""
 
+#: cups/tls-darwin.c:648 cups/tls-darwin.c:730 cups/tls-gnutls.c:482
+#: cups/tls-gnutls.c:564
+msgid "Trust on first use is disabled."
+msgstr ""
+
 #: cups/http-support.c:1382
 msgid "URI Too Long"
 msgstr ""
@@ -6566,11 +6599,11 @@ msgstr ""
 msgid "Unable to add class"
 msgstr ""
 
-#: backend/ipp.c:1834
+#: backend/ipp.c:1866
 msgid "Unable to add document to print job."
 msgstr ""
 
-#: scheduler/ipp.c:1565
+#: scheduler/ipp.c:1582
 #, c-format
 msgid "Unable to add job for destination \"%s\"."
 msgstr ""
@@ -6579,7 +6612,7 @@ msgstr ""
 msgid "Unable to add printer"
 msgstr ""
 
-#: scheduler/ipp.c:1185
+#: scheduler/ipp.c:1202
 msgid "Unable to allocate memory for file types."
 msgstr ""
 
@@ -6595,7 +6628,7 @@ msgstr ""
 msgid "Unable to cancel RSS subscription"
 msgstr ""
 
-#: backend/ipp.c:2115 backend/ipp.c:2577
+#: backend/ipp.c:2147 backend/ipp.c:2609
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -6629,7 +6662,7 @@ msgstr ""
 msgid "Unable to connect to host."
 msgstr ""
 
-#: backend/ipp.c:787 backend/ipp.c:1263 backend/lpd.c:869 backend/socket.c:336
+#: backend/ipp.c:749 backend/ipp.c:1295 backend/lpd.c:869 backend/socket.c:336
 #: backend/usb-unix.c:108
 msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
@@ -6649,12 +6682,12 @@ msgstr ""
 msgid "Unable to copy CUPS printer driver files (%d)."
 msgstr ""
 
-#: scheduler/ipp.c:2658
+#: scheduler/ipp.c:2690
 #, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr ""
 
-#: scheduler/ipp.c:2697
+#: scheduler/ipp.c:2735
 msgid "Unable to copy PPD file."
 msgstr ""
 
@@ -6668,15 +6701,19 @@ msgstr ""
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 
+#: cups/tls-darwin.c:614 cups/tls-gnutls.c:445
+msgid "Unable to create credentials from array."
+msgstr ""
+
 #: cups/ppd-util.c:542 cups/util.c:482
 msgid "Unable to create printer-uri"
 msgstr ""
 
-#: scheduler/ipp.c:5438
+#: scheduler/ipp.c:5478
 msgid "Unable to create printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1362 cups/tls-gnutls.c:1375
+#: cups/tls-darwin.c:1444 cups/tls-gnutls.c:1451
 msgid "Unable to create server credentials."
 msgstr ""
 
@@ -6700,35 +6737,35 @@ msgstr ""
 msgid "Unable to edit cupsd.conf files larger than 1MB"
 msgstr ""
 
-#: cups/tls-darwin.c:1529
+#: cups/tls-darwin.c:1611
 msgid "Unable to establish a secure connection to host (certificate chain invalid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1519
+#: cups/tls-darwin.c:1601
 msgid "Unable to establish a secure connection to host (certificate not yet valid)."
 msgstr ""
 
-#: cups/tls-darwin.c:1514
+#: cups/tls-darwin.c:1596
 msgid "Unable to establish a secure connection to host (expired certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1524
+#: cups/tls-darwin.c:1606
 msgid "Unable to establish a secure connection to host (host name mismatch)."
 msgstr ""
 
-#: cups/tls-darwin.c:1534
+#: cups/tls-darwin.c:1616
 msgid "Unable to establish a secure connection to host (peer dropped connection before responding)."
 msgstr ""
 
-#: cups/tls-darwin.c:1509
+#: cups/tls-darwin.c:1591
 msgid "Unable to establish a secure connection to host (self-signed certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1504
+#: cups/tls-darwin.c:1586
 msgid "Unable to establish a secure connection to host (untrusted certificate)."
 msgstr ""
 
-#: cups/tls-darwin.c:1561 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
+#: cups/tls-darwin.c:1643 cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
@@ -6740,11 +6777,11 @@ msgstr ""
 msgid "Unable to find printer."
 msgstr ""
 
-#: cups/tls-darwin.c:1375
+#: cups/tls-darwin.c:1457
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3266
+#: backend/ipp.c:3298
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -6772,7 +6809,7 @@ msgstr ""
 msgid "Unable to get printer status"
 msgstr ""
 
-#: backend/ipp.c:1012
+#: backend/ipp.c:1044
 msgid "Unable to get printer status."
 msgstr ""
 
@@ -6828,7 +6865,7 @@ msgstr ""
 msgid "Unable to open device file"
 msgstr ""
 
-#: scheduler/ipp.c:6256
+#: scheduler/ipp.c:6296
 #, c-format
 msgid "Unable to open document #%d in job #%d."
 msgstr ""
@@ -6837,7 +6874,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:384 backend/ipp.c:1580 backend/ipp.c:1789 backend/lpd.c:492
+#: backend/ipp.c:384 backend/ipp.c:1612 backend/ipp.c:1821 backend/lpd.c:492
 #: backend/socket.c:148 backend/usb.c:229 filter/gziptoany.c:71
 #: filter/pstops.c:268
 msgid "Unable to open print file"
@@ -6857,7 +6894,7 @@ msgstr ""
 msgid "Unable to read print data."
 msgstr ""
 
-#: scheduler/ipp.c:8545 scheduler/ipp.c:9788
+#: scheduler/ipp.c:8585 scheduler/ipp.c:9828
 msgid "Unable to rename job document file."
 msgstr ""
 
@@ -6865,7 +6902,7 @@ msgstr ""
 msgid "Unable to resolve printer-uri."
 msgstr ""
 
-#: cups/adminutil.c:2119
+#: cups/adminutil.c:2136
 #, c-format
 msgid "Unable to run \"%s\": %s"
 msgstr ""
@@ -6895,7 +6932,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3125 backend/ipp.c:3202 backend/ipp.c:3210
+#: backend/ipp.c:3157 backend/ipp.c:3234 backend/ipp.c:3242
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6971,12 +7008,12 @@ msgstr ""
 msgid "Unknown print mode: \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:10723
+#: scheduler/ipp.c:10763
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:10706
+#: scheduler/ipp.c:10746
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr ""
@@ -6993,7 +7030,7 @@ msgstr ""
 msgid "Unknown scheme in URI"
 msgstr ""
 
-#: cups/http-addrlist.c:775
+#: cups/http-addrlist.c:783
 msgid "Unknown service name."
 msgstr ""
 
@@ -7002,46 +7039,46 @@ msgstr ""
 msgid "Unknown version option value: \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:11180
+#: scheduler/ipp.c:11222
 #, c-format
 msgid "Unsupported 'compression' value \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:11210
+#: scheduler/ipp.c:11252
 #, c-format
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:11285
+#: scheduler/ipp.c:11327
 msgid "Unsupported 'job-name' value."
 msgstr ""
 
-#: scheduler/ipp.c:328
+#: scheduler/ipp.c:327
 #, c-format
 msgid "Unsupported character set \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:8352 scheduler/ipp.c:9600
+#: scheduler/ipp.c:8392 scheduler/ipp.c:9640
 #, c-format
 msgid "Unsupported compression \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:8488 scheduler/ipp.c:9753
+#: scheduler/ipp.c:8528 scheduler/ipp.c:9793
 #, c-format
 msgid "Unsupported document-format \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:9736
+#: scheduler/ipp.c:9776
 #, c-format
 msgid "Unsupported document-format \"%s/%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:1367
+#: scheduler/ipp.c:1384
 #, c-format
 msgid "Unsupported format \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:1465
+#: scheduler/ipp.c:1482
 msgid "Unsupported margins."
 msgstr ""
 
@@ -7189,7 +7226,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1954
+#: backend/ipp.c:1986
 msgid "Waiting for job to complete."
 msgstr ""
 
@@ -7254,11 +7291,11 @@ msgstr ""
 msgid "completed"
 msgstr ""
 
-#: scheduler/ipp.c:6128
+#: scheduler/ipp.c:6168
 msgid "cups-deviced failed to execute."
 msgstr ""
 
-#: scheduler/ipp.c:7014 scheduler/ipp.c:7253
+#: scheduler/ipp.c:7054 scheduler/ipp.c:7293
 msgid "cups-driverd failed to execute."
 msgstr ""
 
@@ -7518,7 +7555,7 @@ msgstr ""
 msgid "ipptool: Unknown option \"-%c\"."
 msgstr ""
 
-#: scheduler/ipp.c:8018
+#: scheduler/ipp.c:8058
 msgid "job-printer-uri attribute missing."
 msgstr ""
 
@@ -7752,16 +7789,16 @@ msgstr ""
 msgid "no system default destination"
 msgstr ""
 
-#: scheduler/ipp.c:5813
+#: scheduler/ipp.c:5853
 msgid "notify-events not specified."
 msgstr ""
 
-#: scheduler/ipp.c:2032 scheduler/ipp.c:5718
+#: scheduler/ipp.c:2049 scheduler/ipp.c:5758
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" is already used."
 msgstr ""
 
-#: scheduler/ipp.c:2022 scheduler/ipp.c:5708
+#: scheduler/ipp.c:2039 scheduler/ipp.c:5748
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
 msgstr ""
@@ -8294,7 +8331,7 @@ msgstr ""
 msgid "scheduler is running"
 msgstr ""
 
-#: cups/adminutil.c:2190
+#: cups/adminutil.c:2207
 #, c-format
 msgid "stat of %s failed: %s"
 msgstr ""

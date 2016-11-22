@@ -569,6 +569,7 @@ f 0444 root sys $DOCDIR/apple-touch-icon.png doc/apple-touch-icon.png
 d 0755 root sys $DOCDIR/help -
 f 0444 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
 f 0444 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
+f 0444 root sys $DOCDIR/help/encryption.html doc/help/encryption.html
 f 0444 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
 f 0444 root sys $DOCDIR/help/kerberos.html doc/help/kerberos.html
 f 0444 root sys $DOCDIR/help/license.html doc/help/license.html

@@ -1,7 +1,7 @@
 /*
  * Common backend network APIs for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -26,7 +26,6 @@
  * 'backendCheckSideChannel()' - Check the side-channel for pending requests.
  */
 
-
 void
 backendCheckSideChannel(
     int         snmp_fd,		/* I - SNMP socket */
@@ -43,6 +42,65 @@ backendCheckSideChannel(
 
   if (select(CUPS_SC_FD + 1, &input, NULL, NULL, &timeout) > 0)
     backendNetworkSideCB(-1, -1, snmp_fd, addr, 0);
+}
+
+
+/*
+ * 'backendLookup()' - Lookup the given host and log addresses.
+ */
+
+http_addrlist_t	*			/* O - List of addresses or NULL */
+backendLookup(const char *hostname,	/* I - Hostname */
+              int        port,		/* I - Port number */
+	      int        *cancel)	/* I - Variable to watch for job cancel */
+{
+  char			portname[32],	/* Port number as string */
+			addrname[256];	/* Address as string */
+  http_addrlist_t	*addrlist,	/* List of addresses */
+			*current;	/* Current address */
+
+
+ /*
+  * Lookup the address for the named host...
+  */
+
+  snprintf(portname, sizeof(portname), "%d", port);
+
+  fputs("STATE: +connecting-to-device\n", stderr);
+  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
+
+  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer \"%s\"."), hostname);
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+    {
+      fputs("STATE: -connecting-to-device\n", stderr);
+      exit(CUPS_BACKEND_STOP);
+    }
+
+    if (cancel && *cancel)
+    {
+      fputs("STATE: -connecting-to-device\n", stderr);
+      exit(CUPS_BACKEND_OK);
+    }
+  }
+
+  fputs("STATE: -connecting-to-device\n", stderr);
+
+ /*
+  * Log the addresses we got...
+  */
+
+  for (current = addrlist; current; current = current->next)
+    fprintf(stderr, "DEBUG: %s=%s\n", hostname, httpAddrString(&current->addr, addrname, sizeof(addrname)));
+
+ /*
+  * Return...
+  */
+
+  return (addrlist);
 }
 
 

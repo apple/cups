@@ -160,6 +160,7 @@ static void		cancel_job(http_t *http, const char *uri, int id,
 static ipp_pstate_t	check_printer_state(http_t *http, const char *uri,
 		                            const char *resource,
 					    const char *user, int version);
+static void		debug_attributes(ipp_t *ipp);
 static void		*monitor_printer(_cups_monitor_t *monitor);
 static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 			             const char *user, const char *title,
@@ -222,7 +223,6 @@ main(int  argc,				/* I - Number of command-line args */
 		*compatfile = NULL;	/* Compatibility filename */
   off_t		compatsize = 0;		/* Size of compatibility file */
   int		port;			/* Port number (not used) */
-  char		portname[255];		/* Port name */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
   char		print_job_name[1024];	/* Update job-name for Print-Job */
   http_status_t	http_status;		/* Status of HTTP request */
@@ -663,68 +663,11 @@ main(int  argc,				/* I - Number of command-line args */
 
   start_time = time(NULL);
 
-  sprintf(portname, "%d", port);
-
-  update_reasons(NULL, "+connecting-to-device");
-  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO",
-                         _("Unable to locate printer \"%s\"."), hostname);
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-    {
-      update_reasons(NULL, "-connecting-to-device");
-      return (CUPS_BACKEND_STOP);
-    }
-
-    if (job_canceled)
-      return (CUPS_BACKEND_OK);
-  }
+  addrlist = backendLookup(hostname, port, &job_canceled);
 
   http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
                       0, NULL);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
-
-  if (httpIsEncrypted(http))
-  {
-   /*
-    * Validate TLS credentials...
-    */
-
-    cups_array_t	*creds;		/* TLS credentials */
-    cups_array_t	*lcreds = NULL;	/* Loaded credentials */
-    http_trust_t	trust;		/* Trust level */
-    static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
-					/* Trust keywords */
-
-    if (!httpCopyCredentials(http, &creds))
-    {
-      trust = httpCredentialsGetTrust(creds, hostname);
-
-      update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
-      if (trusts[trust])
-      {
-        update_reasons(NULL, trusts[trust]);
-        return (CUPS_BACKEND_STOP);
-      }
-
-      if (httpLoadCredentials(NULL, &lcreds, hostname))
-      {
-       /*
-        * Could not load the credentials, let's save the ones we have so we
-        * can detect changes...
-        */
-
-        httpSaveCredentials(NULL, creds, hostname);
-      }
-
-      httpFreeCredentials(lcreds);
-      httpFreeCredentials(creds);
-    }
-  }
 
  /*
   * See if the printer supports SNMP...
@@ -855,6 +798,76 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_OK);
   else if (!http)
     return (CUPS_BACKEND_FAILED);
+
+  if (httpIsEncrypted(http))
+  {
+   /*
+    * Validate TLS credentials...
+    */
+
+    cups_array_t	*creds;		/* TLS credentials */
+    cups_array_t	*lcreds = NULL;	/* Loaded credentials */
+    http_trust_t	trust;		/* Trust level */
+    char		credinfo[1024],	/* Information on credentials */
+			lcredinfo[1024];/* Information on saved credentials */
+    static const char	* const trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
+					/* Trust keywords */
+    static const char	* const trust_msgs[] =
+    {
+      "Credentials are OK/trusted",
+      "Credentials are invalid",
+      "Credentials have changed",
+      "Credentials are expired",
+      "Credentials have been renewed",
+      "Credentials are unknown/new"
+    };
+
+    fputs("DEBUG: Connection is encrypted.\n", stderr);
+
+    if (!httpCopyCredentials(http, &creds))
+    {
+      trust = httpCredentialsGetTrust(creds, hostname);
+      httpCredentialsString(creds, credinfo, sizeof(credinfo));
+
+      fprintf(stderr, "DEBUG: %s (%s)\n", trust_msgs[trust], cupsLastErrorString());
+      fprintf(stderr, "DEBUG: Printer credentials: %s\n", credinfo);
+
+      if (!httpLoadCredentials(NULL, &lcreds, hostname))
+      {
+        httpCredentialsString(lcreds, lcredinfo, sizeof(lcredinfo));
+	fprintf(stderr, "DEBUG: Stored credentials: %s\n", lcredinfo);
+      }
+      else
+        fputs("DEBUG: No stored credentials.\n", stderr);
+
+      update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
+      if (trusts[trust])
+      {
+        update_reasons(NULL, trusts[trust]);
+        return (CUPS_BACKEND_STOP);
+      }
+
+      if (!lcreds)
+      {
+       /*
+        * Could not load the credentials, let's save the ones we have so we
+        * can detect changes...
+        */
+
+        httpSaveCredentials(NULL, creds, hostname);
+      }
+
+      httpFreeCredentials(lcreds);
+      httpFreeCredentials(creds);
+    }
+    else
+    {
+      fputs("DEBUG: No printer credentials.\n", stderr);
+
+      update_reasons(NULL, "cups-pki-unknown");
+      return (CUPS_BACKEND_STOP);
+    }
+  }
 
   update_reasons(NULL, "-connecting-to-device");
   _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
@@ -1467,6 +1480,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     fprintf(stderr, "DEBUG: Validate-Job: %s (%s)\n",
             ippErrorString(ipp_status), cupsLastErrorString());
+    debug_attributes(response);
 
     if ((job_auth = ippFindAttribute(response, "job-authorization-uri",
 				     IPP_TAG_URI)) != NULL)
@@ -1637,6 +1651,7 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "DEBUG: %s: %s (%s)\n",
             (num_files > 1 || create_job) ? "Create-Job" : "Print-Job",
             ippErrorString(ipp_status), cupsLastErrorString());
+    debug_attributes(response);
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
@@ -1771,6 +1786,9 @@ main(int  argc,				/* I - Number of command-line args */
 		       "compression", NULL, compression);
 
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
+	fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10, ippOpString(ippGetOperation(request)), ippGetRequestId(request));
+	debug_attributes(request);
+
 	http_status = cupsSendRequest(http, request, resource, 0);
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
 	{
@@ -1820,11 +1838,13 @@ main(int  argc,				/* I - Number of command-line args */
           fprintf(stderr, "DEBUG: Error writing document data for "
                           "Send-Document: %s\n", strerror(httpError(http)));
 
-	ippDelete(cupsGetResponse(http, resource));
+	response = cupsGetResponse(http, resource);
 	ippDelete(request);
 
 	fprintf(stderr, "DEBUG: Send-Document: %s (%s)\n",
 		ippErrorString(cupsLastError()), cupsLastErrorString());
+        debug_attributes(response);
+        ippDelete(response);
 
 	if (cupsLastError() > IPP_OK_CONFLICT && !job_canceled)
 	{
@@ -1991,6 +2011,9 @@ main(int  argc,				/* I - Number of command-line args */
                     "requested-attributes", sizeof(jattrs) / sizeof(jattrs[0]),
 		    NULL, jattrs);
 
+      fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10, ippOpString(ippGetOperation(request)), ippGetRequestId(request));
+      debug_attributes(request);
+
      /*
       * Do the request...
       */
@@ -2015,6 +2038,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       fprintf(stderr, "DEBUG: Get-Job-Attributes: %s (%s)\n",
 	      ippErrorString(ipp_status), cupsLastErrorString());
+      debug_attributes(response);
 
       if (ipp_status <= IPP_OK_CONFLICT)
 	password_tries = 0;
@@ -2291,6 +2315,9 @@ check_printer_state(
 		"requested-attributes",
 		(int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
 
+  fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10, ippOpString(ippGetOperation(request)), ippGetRequestId(request));
+  debug_attributes(request);
+
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
     report_printer_state(response);
@@ -2298,18 +2325,63 @@ check_printer_state(
     if ((attr = ippFindAttribute(response, "printer-state",
 				 IPP_TAG_ENUM)) != NULL)
       printer_state = (ipp_pstate_t)attr->values[0].integer;
-
-    ippDelete(response);
   }
 
   fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
 	  ippErrorString(cupsLastError()), cupsLastErrorString());
+  debug_attributes(response);
+  ippDelete(response);
 
  /*
   * Return the printer-state value...
   */
 
   return (printer_state);
+}
+
+
+/*
+ * 'debug_attributes()' - Print out the request or response attributes as DEBUG
+ * messages...
+ */
+
+static void
+debug_attributes(ipp_t *ipp)		/* I - Request or response message */
+{
+  ipp_tag_t	group;			/* Current group */
+  ipp_attribute_t *attr;		/* Current attribute */
+  char		buffer[1024];		/* Value buffer */
+
+
+  for (group = IPP_TAG_ZERO, attr = ippFirstAttribute(ipp);
+       attr;
+       attr = ippNextAttribute(ipp))
+  {
+    const char *name = ippGetName(attr);
+
+    if (!name)
+    {
+      group = IPP_TAG_ZERO;
+      continue;
+    }
+
+    if (group != ippGetGroupTag(attr))
+    {
+      group = ippGetGroupTag(attr);
+      fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(group));
+    }
+
+    if (!strcmp(name, "job-password"))
+      strlcpy(buffer, "---", sizeof(buffer));
+    else
+      ippAttributeString(attr, buffer, sizeof(buffer));
+
+    fprintf(stderr, "DEBUG: %s %s%s %s\n", name,
+            ippGetCount(attr) > 1 ? "1setOf " : "",
+            ippTagString(ippGetValueTag(attr)), buffer);
+  }
+
+  fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(IPP_TAG_END));
 }
 
 
@@ -2614,9 +2686,6 @@ new_request(
 {
   ipp_t		*request;		/* Request data */
   const char	*keyword;		/* PWG keyword */
-  ipp_tag_t	group;			/* Current group */
-  ipp_attribute_t *attr;		/* Current attribute */
-  char		buffer[1024];		/* Value buffer */
 
 
  /*
@@ -2740,33 +2809,8 @@ new_request(
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
 
-  fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10,
-          ippOpString(ippGetOperation(request)), ippGetRequestId(request));
-  for (group = IPP_TAG_ZERO, attr = ippFirstAttribute(request);
-       attr;
-       attr = ippNextAttribute(request))
-  {
-    const char *name = ippGetName(attr);
-
-    if (!name)
-    {
-      group = IPP_TAG_ZERO;
-      continue;
-    }
-
-    if (group != ippGetGroupTag(attr))
-    {
-      group = ippGetGroupTag(attr);
-      fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(group));
-    }
-
-    ippAttributeString(attr, buffer, sizeof(buffer));
-    fprintf(stderr, "DEBUG: %s %s%s %s\n", name,
-            ippGetCount(attr) > 1 ? "1setOf " : "",
-            ippTagString(ippGetValueTag(attr)), buffer);
-  }
-
-  fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(IPP_TAG_END));
+  fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10, ippOpString(ippGetOperation(request)), ippGetRequestId(request));
+  debug_attributes(request);
 
   return (request);
 }

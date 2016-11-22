@@ -1,7 +1,7 @@
 /*
  * Label printer filter for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 2001-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -438,7 +438,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
  */
 
 void
-EndPage(ppd_file_t *ppd,		/* I - PPD file */
+EndPage(ppd_file_t          *ppd,	/* I - PPD file */
         cups_page_header2_t *header)	/* I - Page header */
 {
   int		val;			/* Option value */
@@ -494,6 +494,19 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	*/
 
         puts("^XA");
+
+       /*
+        * Rotate 180 degrees so that the top of the label/page is at the
+	* leading edge...
+	*/
+
+	puts("^POI");
+
+       /*
+        * Set print width...
+	*/
+
+        printf("^PW%u\n", header->cupsWidth);
 
        /*
         * Set print rate...
@@ -605,8 +618,8 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * End the label and eject...
 	*/
 
-        puts("^IDR:CUPS.GRF^FS");
 	puts("^XZ");
+        puts("^IDR:CUPS.GRF^FS");
 
        /*
         * Cut the label as needed...

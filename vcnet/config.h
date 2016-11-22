@@ -94,8 +94,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2"
-#define CUPS_MINIMAL "CUPS/2.2"
+#define CUPS_SVERSION "CUPS v2.2.2"
+#define CUPS_MINIMAL "CUPS/2.2.2"
 
 
 /*
@@ -106,13 +106,14 @@ typedef unsigned long useconds_t;
 #define CUPS_DEFAULT_GROUP	""
 #define CUPS_DEFAULT_SYSTEM_GROUPS ""
 #define CUPS_DEFAULT_PRINTOPERATOR_AUTH ""
+#define CUPS_DEFAULT_SYSTEM_AUTHKEY ""
 
 
 /*
  * Default file permissions...
  */
 
-#define CUPS_DEFAULT_CONFIG_FILE_PERM 0640
+#define CUPS_DEFAULT_CONFIG_FILE_PERM 0644
 #define CUPS_DEFAULT_LOG_FILE_PERM 0644
 
 
@@ -121,7 +122,7 @@ typedef unsigned long useconds_t;
  */
 
 #define CUPS_DEFAULT_LOG_LEVEL "warn"
-#define CUPS_DEFAULT_ACCESS_LOG_LEVEL "actions"
+#define CUPS_DEFAULT_ACCESS_LOG_LEVEL "none"
 
 
 /*
@@ -136,7 +137,7 @@ typedef unsigned long useconds_t;
  */
 
 #define CUPS_DEFAULT_BROWSING 1
-#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS ""
+#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "dnssd"
 #define CUPS_DEFAULT_DEFAULT_SHARED 1
 
 
@@ -180,7 +181,7 @@ typedef unsigned long useconds_t;
  * Default WebInterface value...
  */
 
-#undef CUPS_DEFAULT_WEBIF
+#define CUPS_DEFAULT_WEBIF 0
 
 
 /*
@@ -316,6 +317,13 @@ typedef unsigned long useconds_t;
 
 
 /*
+ * Do we have the systemd journal functions?
+ */
+
+/* #undef HAVE_SYSTEMD_SD_JOURNAL_H */
+
+
+/*
  * Do we have the (v)snprintf() functions?
  */
 
@@ -367,8 +375,8 @@ typedef unsigned long useconds_t;
 
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
-#define HAVE_SSPISSL
-#define HAVE_SSL
+#define HAVE_SSPISSL 1
+#define HAVE_SSL 1
 
 
 /*
@@ -419,6 +427,13 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_SECKEYCHAINOPEN */
+
+
+/*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+#define HAVE_SSLSETENABLEDCIPHERS 1
 
 
 /*
@@ -706,7 +721,7 @@ typedef unsigned long useconds_t;
 
 #ifdef HAVE_ARC4RANDOM
 #  define CUPS_RAND() arc4random()
-#  define CUPS_SRAND(v) arc4random_stir()
+#  define CUPS_SRAND(v)
 #elif defined(HAVE_RANDOM)
 #  define CUPS_RAND() random()
 #  define CUPS_SRAND(v) srandom(v)
@@ -717,13 +732,6 @@ typedef unsigned long useconds_t;
 #  define CUPS_RAND() rand()
 #  define CUPS_SRAND(v) srand(v)
 #endif /* HAVE_ARC4RANDOM */
-
-
-/*
- * Do we have vproc_transaction_begin/end?
- */
-
-/* #undef HAVE_VPROC_TRANSACTION_BEGIN */
 
 
 /*

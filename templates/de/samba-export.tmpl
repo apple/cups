@@ -15,17 +15,18 @@ function select_printers() {
 
 <H2 CLASS="title">Drucker für Samba freigeben</H2>
 
-{error?<P>Kann Drucker nicht für Samba freigeben\:</P>
+{error?<P>Drucker können nicht für Samba freigegeben werden\:</P>
 <BLOCKQUOTE>{error}</BLOCKQUOTE>
-<P>Consult the <A HREF="/admin/log/error_log"
-TARGET="_blank">Fehlerprotokoll</A> Datei um mehr Informationen zu erhalten.</P>:
-<P>Diese Seite erlaubt es Ihnen Drucker für Samba bereitzustellen
-damit auf diese mittels Windows Clients über die Desktopsymbole
-<VAR>Netzwerk Nachbarn</VAR> oder <VAR>Netzwerkumgebung</VAR>
-zugegriffen werden kann. Sie müssen zuerst einen
-Windows PostScript Druckerteiber installieren wie diese in der Hilfe für <A
+<P>Bitte prüfen Sie das <A HREF="/admin/log/error_log"
+TARGET="_blank">Fehlerprotokoll</A> für weitere Informationen.</P>:
+<P>Diese Seite erlaubt es Ihnen Drucker für Samba freizugeben
+damit Windows-Rechner auf diese über das <VAR>Netzwerk</VAR>-
+bzw. <VAR>Netzwerkumgebung</VAR>-Symbol z.B. auf dem Desktop
+zugreifen können. Davor muss allerdings der PostScript-
+Druckertreiber für Windows, wie in der man page <A 
 HREF="/help/man-cupsaddsmb.html"
-TARGET="_blank">cupsaddsmb(8)</A> beschrieben ist.</P>}
+TARGET="_blank">cupsaddsmb(8)</A> beschrieben, installiert
+worden sein.</P>}
 
 <TABLE>
 <TR>
@@ -39,12 +40,12 @@ onChange="select_printers()"> Alle Drucker freigeben
 </TD>
 </TR>
 <TR>
-<TH CLASS="label">Samba Benutzername:</TH>
-<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (benötigt)</TD>
+<TH CLASS="label">Samba-Benutzername:</TH>
+<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (erforderlich)</TD>
 </TR>
 <TR>
-<TH CLASS="label">Samba Passwort:</TH>
-<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (benötigt)</TD>
+<TH CLASS="label">Samba-Passwort:</TH>
+<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (erforderlich)</TD>
 </TR>
 <TR>
 <TD></TD>

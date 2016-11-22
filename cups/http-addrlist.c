@@ -61,20 +61,25 @@ httpAddrConnect2(
     int             *cancel)		/* I - Pointer to "cancel" variable */
 {
   int			val;		/* Socket option value */
-#ifdef O_NONBLOCK
-  int			flags,		/* Socket flags */
-			remaining;	/* Remaining timeout */
+#ifndef WIN32
+  int			flags;		/* Socket flags */
+#endif /* !WIN32 */
+  int			remaining;	/* Remaining timeout */
   int			i,		/* Looping var */
 			nfds,		/* Number of file descriptors */
 			fds[100],	/* Socket file descriptors */
 			result;		/* Result from select() or poll() */
   http_addrlist_t	*addrs[100];	/* Addresses */
+#ifndef HAVE_POLL
+  int			max_fd = -1;	/* Highest file descriptor */
+#endif /* !HAVE_POLL */
+#ifdef O_NONBLOCK
 #  ifdef HAVE_POLL
   struct pollfd		pfds[100];	/* Polled file descriptors */
 #  else
-  int			max_fd = -1;	/* Highest file descriptor */
   fd_set		input_set,	/* select() input set */
-			output_set;	/* select() output set */
+			output_set,	/* select() output set */
+			error_set;	/* select() error set */
   struct timeval	timeout;	/* Timeout */
 #  endif /* HAVE_POLL */
 #endif /* O_NONBLOCK */
@@ -220,7 +225,9 @@ httpAddrConnect2(
 	continue;
       }
 
+#ifndef WIN32
       fcntl(fds[nfds], F_SETFL, flags);
+#endif /* !WIN32 */
 
 #ifndef HAVE_POLL
       if (fds[nfds] > max_fd)
@@ -231,6 +238,9 @@ httpAddrConnect2(
       nfds ++;
       addrlist = addrlist->next;
     }
+
+    if (!addrlist && nfds == 0)
+      break;
 
    /*
     * See if we can connect to any of the addresses so far...
@@ -276,11 +286,12 @@ httpAddrConnect2(
       for (i = 0; i < nfds; i ++)
 	FD_SET(fds[i], &input_set);
       output_set = input_set;
+      error_set  = input_set;
 
       timeout.tv_sec  = 0;
       timeout.tv_usec = (addrlist ? 100 : remaining > 250 ? 250 : remaining) * 1000;
 
-      result = select(max_fd + 1, &input_set, &output_set, NULL, &timeout);
+      result = select(max_fd + 1, &input_set, &output_set, &error_set, &timeout);
 
       DEBUG_printf(("1httpAddrConnect2: select() returned %d (%d)", result, errno));
 #  endif /* HAVE_POLL */
@@ -293,17 +304,19 @@ httpAddrConnect2(
 
     if (result > 0)
     {
+      http_addrlist_t *connaddr = NULL;	/* Connected address, if any */
+
       for (i = 0; i < nfds; i ++)
       {
 #  ifdef HAVE_POLL
 	DEBUG_printf(("pfds[%d].revents=%x\n", i, pfds[i].revents));
-	if (pfds[i].revents)
+	if (pfds[i].revents && !(pfds[i].revents & (POLLERR | POLLHUP)))
 #  else
-	if (FD_ISSET(fds[i], &input))
+	if (FD_ISSET(fds[i], &input_set) && !FD_ISSET(fds[i], &error_set))
 #  endif /* HAVE_POLL */
 	{
 	  *sock    = fds[i];
-	  addrlist = addrs[i];
+	  connaddr = addrs[i];
 
 #  ifdef DEBUG
 	  len   = sizeof(peer);
@@ -311,11 +324,29 @@ httpAddrConnect2(
 	    DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...", httpAddrString(&peer, temp, sizeof(temp)), httpAddrPort(&peer)));
 #  endif /* DEBUG */
 	}
-	else
+#  ifdef HAVE_POLL
+	else if (pfds[i].revents & (POLLERR | POLLHUP))
+#  else
+	else if (FD_ISSET(fds[i], &error_set))
+#  endif /* HAVE_POLL */
+        {
+         /*
+          * Error on socket, remove from the "pool"...
+          */
+
 	  httpAddrClose(NULL, fds[i]);
+          nfds --;
+          if (i < nfds)
+          {
+            memmove(fds + i, fds + i + 1, (size_t)(nfds - i) * (sizeof(fds[0])));
+            memmove(addrs + i, addrs + i + 1, (size_t)(nfds - i) * (sizeof(addrs[0])));
+          }
+          i --;
+        }
       }
 
-      return (addrlist);
+      if (connaddr)
+        return (connaddr);
     }
 #endif /* O_NONBLOCK */
 

@@ -1,9 +1,62 @@
-CHANGES.txt - 2.2rc1 - 2016-07-07
----------------------------------
+CHANGES.txt - 2.2.2 - 2016-11-18
+--------------------------------
+
+CHANGES IN CUPS V2.2.2
+
+	- Fixed some issues with the Zebra ZPL printer driver (Issue #4898)
+	- Fixed some issues with IPP Everywhere printer support (Issue #4893,
+	  Issue #4909, Issue #4916, Issue #4921)
+	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
+          (Issue #4899)
+        - Fixed builds on systems without a working poll() implementation
+          (Issue #4905)
+        - Added a USB quirk rule for the Kyocera Ecosys P6026cdn (Issue #4900)
+        - The scheduler no longer creates log files on startup
+          (<rdar://problem/28332470>)
+	- The ippContainsString function now uses case-insensitive comparisons
+	  for mimeMediaType, name, and text values in conformance with RFC 2911.
+	- The network backends now log the addresses that were found for a
+	  printer (<rdar://problem/29268474>)
+	- Let's Encrypt certificates did not work when the hostname contained
+	  uppercase letters (Issue #4919)
+        - Updated documentation (PR #4896)
+        - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908)
+
+
+CHANGES IN CUPS V2.2.1
+
+	- Added "CreateSelfSignedCerts" directive for cups-files.conf to
+          control whether the scheduler automatically creates its own
+          self-signed X.509 certificates for TLS connections (Issue #4876)
+        - http*Connect did not handle partial failures (Issue #4870)
+        - Addressed some build warnings on Linux (Issue #4881)
+        - cupsHashData did not use the correct hashing algorithm
+          (<rdar://problem/28209220>)
+        - Updated man pages (PR #4885)
+        - Updated localizations (PR #4877, PR #4886)
+
+
+CHANGES IN CUPS V2.2.0
+
+	- Normalized the TLS certificate validation code and added additional
+	  error messages to aid troubleshooting.
+	- http*Connect did not work on Linux when cupsd was not running
+	  (Issue #4870)
+	- The --no-remote-any option of cupsctl had no effect (Issue #4866)
+	- http*Connect did not return early when all addresses failed
+	  (Issue #4870)
+
 
 CHANGES IN CUPS V2.2rc1
 
 	- Updated the list of supported IPP Everywhere media types.
+	- The IPP backend did not validate TLS credentials properly.
+	- The printer-state-message attribute was not cleared after a
+	  print job with no errors (Issue #4851)
+	- The CUPS-Add-Modify-Class and CUPS-Add-Modify-Printer operations did
+	  not always return an error for failed adds (Issue #4854)
+	- PPD files with names longer than 127 bytes did not work (Issue #4860)
+	- Updated localizations (Issue #4846, PR #4858)
 
 
 CHANGES IN CUPS V2.2b2

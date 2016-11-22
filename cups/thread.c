@@ -194,6 +194,41 @@ _cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
 
 
 /*
+ * '_cupsCondBroadcast()' - Wake up waiting threads.
+ */
+
+void
+_cupsCondBroadcast(_cups_cond_t *cond)	/* I - Condition */
+{
+  // TODO: Implement me
+}
+
+
+/*
+ * '_cupsCondInit()' - Initialize a condition variable.
+ */
+
+void
+_cupsCondInit(_cups_cond_t *cond)	/* I - Condition */
+{
+  // TODO: Implement me
+}
+
+
+/*
+ * '_cupsCondWait()' - Wait for a condition with optional timeout.
+ */
+
+void
+_cupsCondWait(_cups_cond_t  *cond,	/* I - Condition */
+              _cups_mutex_t *mutex,	/* I - Mutex */
+	      double        timeout)	/* I - Timeout in seconds (0 or negative for none) */
+{
+  // TODO: Implement me
+}
+
+
+/*
  * '_cupsMutexInit()' - Initialize a mutex.
  */
 
@@ -316,10 +351,48 @@ void *					/* O - Return value */
 _cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
 {
   // TODO: Implement me
+  (void)thread;
+
+  return (NULL);
 }
 
 
-#else
+#else /* No threading */
+/*
+ * '_cupsCondBroadcast()' - Wake up waiting threads.
+ */
+
+void
+_cupsCondBroadcast(_cups_cond_t *cond)	/* I - Condition */
+{
+  // TODO: Implement me
+}
+
+
+/*
+ * '_cupsCondInit()' - Initialize a condition variable.
+ */
+
+void
+_cupsCondInit(_cups_cond_t *cond)	/* I - Condition */
+{
+  // TODO: Implement me
+}
+
+
+/*
+ * '_cupsCondWait()' - Wait for a condition with optional timeout.
+ */
+
+void
+_cupsCondWait(_cups_cond_t  *cond,	/* I - Condition */
+              _cups_mutex_t *mutex,	/* I - Mutex */
+	      double        timeout)	/* I - Timeout in seconds (0 or negative for none) */
+{
+  // TODO: Implement me
+}
+
+
 /*
  * '_cupsMutexInit()' - Initialize a mutex.
  */

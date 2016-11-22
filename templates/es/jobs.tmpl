@@ -8,7 +8,7 @@
 <TR VALIGN="TOP">
 <TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}{?phone? ({phone}):}&nbsp;</TD>
 <TD>{?job_name=?Desconocido:{job_name}}&nbsp;</TD>
-<TD>{job_originating_user_name}&nbsp;</TD>
+<TD>{?job_originating_user_name=?Retenido:{job_originating_user_name}}&nbsp;</TD>
 <TD>{job_k_octets}k&nbsp;</TD>
 <TD>{job_media_sheets_completed=0?Desconocido:{?job_media_sheets_completed}}&nbsp;</TD>
 <TD>{job_state=3?pendiente desde<BR>{?time_at_creation=?Unknown:{time_at_creation}}:{job_state=4?retenido desde<BR>{?time_at_creation=?Unknown:{time_at_creation}}:
@@ -18,7 +18,6 @@
 <TD>
 {job_preserved>0?{job_state>5?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
-<INPUT TYPE="SUBMIT" VALUE="Reimprimir trabajo"></FORM>:}:}
 {job_state=4?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="release-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
 <INPUT TYPE="SUBMIT" VALUE="Liberar trabajo"></FORM>:}

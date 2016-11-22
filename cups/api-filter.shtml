@@ -94,7 +94,7 @@ being printed.</p>
 <p>Filters and backends may also receive <code>SIGPIPE</code> when an upstream or downstream filter/backend exits with a non-zero status. Developers should generally ignore <code>SIGPIPE</code> at the beginning of <code>main()</code> with the following function call:</p>
 
 <pre class="example">
-#include &lt;signal.h&gt;>
+#include &lt;signal.h&gt;
 
 ...
 

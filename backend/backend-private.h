@@ -312,6 +312,7 @@ extern int		backendGetDeviceID(int fd, char *device_id,
 extern int		backendGetMakeModel(const char *device_id,
 			                    char *make_model,
 				            size_t make_model_size);
+extern http_addrlist_t	*backendLookup(const char *hostname, int port, int *cancel);
 extern int		backendNetworkSideCB(int print_fd, int device_fd,
 			                     int snmp_fd, http_addr_t *addr,
 					     int use_bc);
