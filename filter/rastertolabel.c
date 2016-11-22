@@ -494,13 +494,25 @@ EndPage(ppd_file_t          *ppd,	/* I - PPD file */
 	*/
 
         puts("^XA");
-
        /*
-        * Rotate 180 degrees so that the top of the label/page is at the
-	* leading edge...
-	*/
+        * Set Orientation...
+        */
 
-	puts("^POI");
+        if (ppdIsMarked(ppd, "zePrintOrientation", "Normal"))
+        {
+       /*
+        * at the foremost edge
+        */
+          puts("^PON");
+        }
+        else if (ppdIsMarked(ppd, "zePrintOrientation", "Invert"))
+        {
+       /*
+        * at the leading edge
+        */
+
+          puts("^POI");
+        }
 
        /*
         * Set print width...
