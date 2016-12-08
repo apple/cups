@@ -54,7 +54,7 @@ extern const char *cssmErrorString(int error);
 #    else
 #      define GSS_AUTH_IDENTITY_TYPE_1 1
 #      define gss_acquire_cred_ex_f __ApplePrivate_gss_acquire_cred_ex_f
-typedef struct _gss_auth_identity
+typedef struct gss_auth_identity
 {
   uint32_t type;
   uint32_t flags;
@@ -62,7 +62,7 @@ typedef struct _gss_auth_identity
   char *realm;
   char *password;
   gss_buffer_t *credentialsRef;
-} _gss_auth_identity_desc;
+} gss_auth_identity_desc;
 extern OM_uint32 gss_acquire_cred_ex_f(gss_status_id_t, const gss_name_t,
 				       OM_uint32, OM_uint32, const gss_OID,
 				       gss_cred_usage_t, gss_auth_identity_t,
@@ -348,7 +348,7 @@ _cupsSetNegotiateAuthString(
     const char		*username,	/* Username string */
 			*password;	/* Password string */
     _cups_gss_acquire_t	data;		/* Callback data */
-    _gss_auth_identity_desc identity;	/* Kerberos user identity */
+    gss_auth_identity_desc identity;	/* Kerberos user identity */
     _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread global data */
 
