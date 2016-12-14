@@ -36,7 +36,8 @@ struct _cups_raster_s			/**** Raster stream data ****/
   cups_raster_iocb_t	iocb;		/* IO callback */
   cups_mode_t		mode;		/* Read/write mode */
   cups_page_header2_t	header;		/* Raster header for current page */
-  unsigned		count,		/* Current row run-length count */
+  unsigned		rowheight,	/* Row height in lines */
+			count,		/* Current row run-length count */
 			remaining,	/* Remaining rows in page image */
 			bpp;		/* Bytes per pixel/color */
   unsigned char		*pixels,	/* Pixels for current row */
@@ -1008,7 +1009,7 @@ cupsRasterWriteHeader(
  * 'cupsRasterWriteHeader2()' - Write a raster page header from a version 2
  *                              page header structure.
  *
- * The page header can be initialized using @link cupsRasterInterpretPPD@.
+ * The page header can be initialized using @link cupsRasterInitPWGHeader@.
  *
  * @since CUPS 1.2/macOS 10.5@
  */
@@ -1030,6 +1031,16 @@ cupsRasterWriteHeader2(
 
   if (!cups_raster_update(r))
     return (0);
+
+  if (r->mode == CUPS_RASTER_WRITE_APPLE)
+  {
+    r->rowheight = h->HWResolution[0] / h->HWResolution[1];
+
+    if (h->HWResolution[0] != (r->rowheight * h->HWResolution[1]))
+      return (0);
+  }
+  else
+    r->rowheight = 1;
 
  /*
   * Write the raster header...
@@ -1277,7 +1288,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
           * Increase the repeat count...
 	  */
 
-	  r->count ++;
+	  r->count += r->rowheight;
 	  r->pcurrent = r->pixels;
 
 	 /*
@@ -1293,7 +1304,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	    else
 	      return (len);
 	  }
-	  else if (r->count == 256)
+	  else if (r->count > (256 - r->rowheight))
 	  {
 	    if (cups_raster_write(r, r->pixels) <= 0)
 	      return (0);
@@ -1322,7 +1333,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
         * Increase the repeat count...
 	*/
 
-	r->count ++;
+	r->count += r->rowheight;
 	r->pcurrent = r->pixels;
 
        /*

@@ -553,6 +553,12 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     header.cupsWidth        = 256;
     header.cupsHeight       = 256;
     header.cupsBytesPerLine = 256;
+    header.HWResolution[0]  = 64;
+    header.HWResolution[1]  = 64;
+    header.PageSize[0]      = 288;
+    header.PageSize[1]      = 288;
+    header.cupsPageSize[0]  = 288.0f;
+    header.cupsPageSize[1]  = 288.0f;
 
     if (page & 1)
     {
@@ -679,6 +685,16 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     expected.cupsWidth        = 256;
     expected.cupsHeight       = 256;
     expected.cupsBytesPerLine = 256;
+    expected.HWResolution[0]  = 64;
+    expected.HWResolution[1]  = 64;
+    expected.PageSize[0]      = 288;
+    expected.PageSize[1]      = 288;
+
+    if (mode != CUPS_RASTER_WRITE_PWG)
+    {
+      expected.cupsPageSize[0] = 288.0f;
+      expected.cupsPageSize[1] = 288.0f;
+    }
 
     if (mode >= CUPS_RASTER_WRITE_PWG)
     {
