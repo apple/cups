@@ -226,13 +226,13 @@ static pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("oe_photo-l_3.5x5in", NULL, "3.5x5", 3.5, 5),
 
   /* Other Metric Standard Sheet Media Sizes */
-  _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, "om_small-photo", 100, 150),
+  _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, "100x150mm", 100, 150),
   _PWG_MEDIA_MM("om_italian_110x230mm", NULL, "EnvItalian", 110, 230),
-  _PWG_MEDIA_MM("om_large-photo_200x300", NULL, "om_large-photo", 200, 300),
+  _PWG_MEDIA_MM("om_large-photo_200x300", NULL, "200x300mm", 200, 300),
   _PWG_MEDIA_MM("om_folio_210x330mm", "folio", "Folio", 210, 330),
   _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, "FolioSP", 215, 315),
   _PWG_MEDIA_MM("om_invite_220x220mm", NULL, "EnvInvite", 220, 220),
-  _PWG_MEDIA_MM("om_small-photo_100x200mm", NULL, "om_wide-photo", 100, 200),
+  _PWG_MEDIA_MM("om_small-photo_100x200mm", NULL, "100x200mm", 100, 200),
 
   /* Disc Sizes */
   _PWG_MEDIA_MM("disc_standard_40x118mm", NULL, "Disc", 118, 118)
