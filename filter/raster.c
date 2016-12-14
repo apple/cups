@@ -1111,6 +1111,8 @@ cupsRasterWriteHeader2(
     */
 
     unsigned char appleheader[32];	/* Raw page header */
+    unsigned height = r->header.cupsHeight * r->rowheight;
+					/* Computed page height */
 
     if (r->apple_page_count == 0xffffffffU)
     {
@@ -1146,10 +1148,10 @@ cupsRasterWriteHeader2(
     appleheader[13] = (unsigned char)(r->header.cupsWidth >> 16);
     appleheader[14] = (unsigned char)(r->header.cupsWidth >> 8);
     appleheader[15] = (unsigned char)(r->header.cupsWidth);
-    appleheader[16] = (unsigned char)(r->header.cupsHeight >> 24);
-    appleheader[17] = (unsigned char)(r->header.cupsHeight >> 16);
-    appleheader[18] = (unsigned char)(r->header.cupsHeight >> 8);
-    appleheader[19] = (unsigned char)(r->header.cupsHeight);
+    appleheader[16] = (unsigned char)(height >> 24);
+    appleheader[17] = (unsigned char)(height >> 16);
+    appleheader[18] = (unsigned char)(height >> 8);
+    appleheader[19] = (unsigned char)(height);
     appleheader[20] = (unsigned char)(r->header.HWResolution[0] >> 24);
     appleheader[21] = (unsigned char)(r->header.HWResolution[0] >> 16);
     appleheader[22] = (unsigned char)(r->header.HWResolution[0] >> 8);
