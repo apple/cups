@@ -3103,9 +3103,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 					/* PDL */
 
      /*
-      * Write cupsFilter2 lines for supported formats, except for PostScript
-      * (which has compatibility problems over IPP with some vendors), text,
-      * TIFF, and vendor MIME media types...
+      * Write cupsFilter2 lines for supported formats...
       */
 
       if (!_cups_strcasecmp(format, "application/pdf"))
@@ -3114,8 +3112,6 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 0 -\"\n", format, format);
       else if (!_cups_strcasecmp(format, "image/pwg-raster") || !_cups_strcasecmp(format, "image/urf"))
         cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 100 -\"\n", format, format);
-      else if (_cups_strcasecmp(format, "application/octet-stream") && _cups_strcasecmp(format, "application/postscript") && _cups_strncasecmp(format, "application/vnd.", 16) && _cups_strncasecmp(format, "image/vnd.", 10) && _cups_strcasecmp(format, "image/tiff") && _cups_strncasecmp(format, "text/", 5))
-        cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 10 -\"\n", format, format);
     }
   }
 
