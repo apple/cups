@@ -5,7 +5,7 @@ CHANGES IN CUPS V2.2.2
 
 	- Fixed some issues with the Zebra ZPL printer driver (Issue #4898)
 	- Fixed some issues with IPP Everywhere printer support (Issue #4893,
-	  Issue #4909, Issue #4916, Issue #4921, Issue #4933)
+	  Issue #4909, Issue #4916, Issue #4921, Issue #4932, Issue #4933)
 	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
           (Issue #4899)
         - Fixed builds on systems without a working poll() implementation
