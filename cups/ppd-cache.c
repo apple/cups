@@ -3673,6 +3673,79 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   }
 
  /*
+  * Output bin...
+  */
+
+  if ((attr = ippFindAttribute(response, "output-bin-default", IPP_TAG_ZERO)) != NULL)
+    pwg_ppdize_name(ippGetString(attr, 0, NULL), ppdname, sizeof(ppdname));
+  else
+    strlcpy(ppdname, "Unknown", sizeof(ppdname));
+
+  if ((attr = ippFindAttribute(response, "outout-bin-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
+  {
+    static const char * const output_bins[][2] =
+    {					/* "output-bin" strings */
+      { "auto", _("Automatic") },
+      { "bottom", _("Bottom Tray") },
+      { "center", _("Center Tray") },
+      { "face-down", _("Face Down") },
+      { "face-up", _("Face Up") },
+      { "large-capacity", _("Large Capacity Tray") },
+      { "left", _("Left Tray") },
+      { "mailbox-1", _("Mailbox 1") },
+      { "mailbox-2", _("Mailbox 2") },
+      { "mailbox-3", _("Mailbox 3") },
+      { "mailbox-4", _("Mailbox 4") },
+      { "mailbox-5", _("Mailbox 5") },
+      { "mailbox-6", _("Mailbox 6") },
+      { "mailbox-7", _("Mailbox 7") },
+      { "mailbox-8", _("Mailbox 8") },
+      { "mailbox-9", _("Mailbox 9") },
+      { "mailbox-10", _("Mailbox 10") },
+      { "middle", _("Middle") },
+      { "my-mailbox", _("My Mailbox") },
+      { "rear", _("Rear Tray") },
+      { "right", _("Right Tray") },
+      { "side", _("Side Tray") },
+      { "stacker-1", _("Stacker 1") },
+      { "stacker-2", _("Stacker 2") },
+      { "stacker-3", _("Stacker 3") },
+      { "stacker-4", _("Stacker 4") },
+      { "stacker-5", _("Stacker 5") },
+      { "stacker-6", _("Stacker 6") },
+      { "stacker-7", _("Stacker 7") },
+      { "stacker-8", _("Stacker 8") },
+      { "stacker-9", _("Stacker 9") },
+      { "stacker-10", _("Stacker 10") },
+      { "top", _("Top Tray") },
+      { "tray-1", _("Tray 1") },
+      { "tray-2", _("Tray 2") },
+      { "tray-3", _("Tray 3") },
+      { "tray-4", _("Tray 4") },
+      { "tray-5", _("Tray 5") },
+      { "tray-6", _("Tray 6") },
+      { "tray-7", _("Tray 7") },
+      { "tray-8", _("Tray 8") },
+      { "tray-9", _("Tray 9") },
+      { "tray-10", _("Tray 10") }
+    };
+
+    cupsFilePrintf(fp, "*OpenUI *OutputBin: PickOne\n"
+                       "*OrderDependency: 10 AnySetup *OutputBin\n"
+                       "*DefaultOutputBin: %s\n", ppdname);
+    for (i = 0; i < (int)(sizeof(output_bins) / sizeof(output_bins[0])); i ++)
+    {
+      if (!ippContainsString(attr, output_bins[i][0]))
+        continue;
+
+      pwg_ppdize_name(output_bins[i][0], ppdname, sizeof(ppdname));
+
+      cupsFilePrintf(fp, "*OutputBin %s/%s: \"\"\n", ppdname, _cupsLangString(lang, output_bins[i][1]));
+    }
+    cupsFilePuts(fp, "*CloseUI: *OutputBin\n");
+  }
+
+ /*
   * Finishing options...
   */
 
