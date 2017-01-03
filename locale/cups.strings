@@ -771,6 +771,7 @@
 "Booklet Maker" = "Booklet Maker";
 "Boolean expected for waiteof option \"%s\"." = "Boolean expected for waiteof option “%s”.";
 "Bottom" = "Bottom";
+"Bottom Tray" = "Bottom Tray";
 "Buffer overflow detected, aborting." = "Buffer overflow detected, aborting.";
 "CD" = "CD";
 "CMYK" = "CMYK";
@@ -784,6 +785,7 @@
 "Cardstock" = "Cardstock";
 "Cassette" = "Cassette";
 "Center" = "Center";
+"Center Tray" = "Center Tray";
 "Change Settings" = "Change Settings";
 "Character set \"%s\" not supported." = "Character set “%s” not supported.";
 "Classes" = "Classes";
@@ -820,6 +822,7 @@
 "Dark" = "Dark";
 "Darkness" = "Darkness";
 "Data file sent successfully." = "Data file sent successfully.";
+"Deep Color" = "Deep Color";
 "Delete Class" = "Delete Class";
 "Delete Printer" = "Delete Printer";
 "DeskJet Series" = "DeskJet Series";
@@ -853,6 +856,7 @@
 "End Board" = "End Board";
 // TRANSLATORS: Banner/cover sheet after the print job.
 "Ending Banner" = "Ending Banner";
+"Engineering Z Fold" = "Engineering Z Fold";
 "English" = "English";
 "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket." = "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket.";
 "Envelope" = "Envelope";
@@ -931,6 +935,8 @@
 "Expressions:" = "Expressions:";
 "FAIL" = "FAIL";
 "Fabric" = "Fabric";
+"Face Down" = "Face Down";
+"Face Up" = "Face Up";
 "FanFold German" = "FanFold German";
 "FanFold Legal German" = "FanFold Legal German";
 "Fanfold US" = "Fanfold US";
@@ -1074,9 +1080,11 @@
 "Language \"%s\" not supported." = "Language “%s” not supported.";
 "Large Address" = "Large Address";
 "Large Capacity" = "Large Capacity";
+"Large Capacity Tray" = "Large Capacity Tray";
 "LaserJet Series PCL 4/5" = "LaserJet Series PCL 4/5";
 "Left" = "Left";
 "Left Gate Fold" = "Left Gate Fold";
+"Left Tray" = "Left Tray";
 "Letter Fold" = "Letter Fold";
 "Letter Oversize" = "Letter Oversize";
 "Letter Oversize Long Edge" = "Letter Oversize Long Edge";
@@ -1090,6 +1098,16 @@
 "Local printer created." = "Local printer created.";
 "Long-Edge (Portrait)" = "Long-Edge (Portrait)";
 "Looking for printer." = "Looking for printer.";
+"Mailbox 1" = "Mailbox 1";
+"Mailbox 10" = "Mailbox 10";
+"Mailbox 2" = "Mailbox 2";
+"Mailbox 3" = "Mailbox 3";
+"Mailbox 4" = "Mailbox 4";
+"Mailbox 5" = "Mailbox 5";
+"Mailbox 6" = "Mailbox 6";
+"Mailbox 7" = "Mailbox 7";
+"Mailbox 8" = "Mailbox 8";
+"Mailbox 9" = "Mailbox 9";
 "Main" = "Main";
 "Main Roll" = "Main Roll";
 "Manual" = "Manual";
@@ -1141,7 +1159,12 @@
 "Moved Permanently" = "Moved Permanently";
 "Multi Layer" = "Multi Layer";
 "Multi Part Form" = "Multi Part Form";
+"Multi-Hole Punch (Landscape)" = "Multi-Hole Punch (Landscape)";
+"Multi-Hole Punch (Portrait)" = "Multi-Hole Punch (Portrait)";
+"Multi-Hole Punch (Reverse Landscape)" = "Multi-Hole Punch (Reverse Landscape)";
+"Multi-Hole Punch (Reverse Portrait)" = "Multi-Hole Punch (Reverse Portrait)";
 "Multipurpose" = "Multipurpose";
+"My Mailbox" = "My Mailbox";
 "NULL PPD file pointer" = "NULL PPD file pointer";
 "Name OID uses indefinite length" = "Name OID uses indefinite length";
 "Nested classes are not allowed." = "Nested classes are not allowed.";
@@ -1299,6 +1322,7 @@
 "Quota limit reached." = "Quota limit reached.";
 "Rank    Owner   Job     File(s)                         Total Size" = "Rank    Owner   Job     File(s)                         Total Size";
 "Rear" = "Rear";
+"Rear Tray" = "Rear Tray";
 "Reject Jobs" = "Reject Jobs";
 "Remote host did not accept control file (%d)." = "Remote host did not accept control file (%d).";
 "Remote host did not accept data file (%d)." = "Remote host did not accept data file (%d).";
@@ -1311,6 +1335,7 @@
 "Rewind" = "Rewind";
 "Right" = "Right";
 "Right Gate Fold" = "Right Gate Fold";
+"Right Tray" = "Right Tray";
 "Roll" = "Roll";
 "Roll 1" = "Roll 1";
 "Roll 10" = "Roll 10";
@@ -1357,6 +1382,7 @@
 "Short-Edge (Landscape)" = "Short-Edge (Landscape)";
 "Shrink Foil" = "Shrink Foil";
 "Side" = "Side";
+"Side Tray" = "Side Tray";
 "Single Face" = "Single Face";
 "Single Punch (Landscape)" = "Single Punch (Landscape)";
 "Single Punch (Portrait)" = "Single Punch (Portrait)";
@@ -1370,6 +1396,16 @@
 "Sleeve" = "Sleeve";
 "Special Paper" = "Special Paper";
 "Spooling job, %.0f%% complete." = "Spooling job, %.0f%% complete.";
+"Stacker 1" = "Stacker 1";
+"Stacker 10" = "Stacker 10";
+"Stacker 2" = "Stacker 2";
+"Stacker 3" = "Stacker 3";
+"Stacker 4" = "Stacker 4";
+"Stacker 5" = "Stacker 5";
+"Stacker 6" = "Stacker 6";
+"Stacker 7" = "Stacker 7";
+"Stacker 8" = "Stacker 8";
+"Stacker 9" = "Stacker 9";
 "Standard" = "Standard";
 "Staple" = "Staple";
 "Staple Edge" = "Staple Edge";
@@ -1451,6 +1487,7 @@
 "Too many job-sheets values (%d > 2)." = "Too many job-sheets values (%d > 2).";
 "Too many printer-state-reasons values (%d > %d)." = "Too many printer-state-reasons values (%d > %d).";
 "Top" = "Top";
+"Top Tray" = "Top Tray";
 "Tractor" = "Tractor";
 "Transfer" = "Transfer";
 "Transparency" = "Transparency";

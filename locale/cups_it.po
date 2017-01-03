@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-30 16:00-0400\n"
+"POT-Creation-Date: 2017-01-03 16:43-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3042,6 +3042,9 @@ msgstr "È previsto un valore booleano per l'opzione waiteof \"%s\"."
 msgid "Bottom"
 msgstr ""
 
+msgid "Bottom Tray"
+msgstr ""
+
 msgid "Buffer overflow detected, aborting."
 msgstr "È stato individuato un buffer overflow, operazione annullata."
 
@@ -3079,6 +3082,9 @@ msgid "Cassette"
 msgstr "Caricatore"
 
 msgid "Center"
+msgstr ""
+
+msgid "Center Tray"
 msgstr ""
 
 msgid "Change Settings"
@@ -3195,6 +3201,9 @@ msgstr "Oscurità"
 
 msgid "Data file sent successfully."
 msgstr "I dati sono stati inviati con successo."
+
+msgid "Deep Color"
+msgstr ""
 
 msgid "Delete Class"
 msgstr "Elimina la classe"
@@ -3313,6 +3322,9 @@ msgstr ""
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "Termine del banner"
+
+msgid "Engineering Z Fold"
+msgstr ""
 
 msgid "English"
 msgstr "Inglese"
@@ -3552,6 +3564,12 @@ msgid "FAIL"
 msgstr "OPERAZIONE NON RIUSCITA CORRETTAMENTE"
 
 msgid "Fabric"
+msgstr ""
+
+msgid "Face Down"
+msgstr ""
+
+msgid "Face Up"
 msgstr ""
 
 msgid "FanFold German"
@@ -4005,6 +4023,9 @@ msgstr "Large Address"
 msgid "Large Capacity"
 msgstr ""
 
+msgid "Large Capacity Tray"
+msgstr ""
+
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet Series PCL 4/5"
 
@@ -4012,6 +4033,9 @@ msgid "Left"
 msgstr ""
 
 msgid "Left Gate Fold"
+msgstr ""
+
+msgid "Left Tray"
 msgstr ""
 
 msgid "Letter Fold"
@@ -4052,6 +4076,36 @@ msgstr "Long-Edge (Portrait)"
 
 msgid "Looking for printer."
 msgstr "Cerca una stampante."
+
+msgid "Mailbox 1"
+msgstr ""
+
+msgid "Mailbox 10"
+msgstr ""
+
+msgid "Mailbox 2"
+msgstr ""
+
+msgid "Mailbox 3"
+msgstr ""
+
+msgid "Mailbox 4"
+msgstr ""
+
+msgid "Mailbox 5"
+msgstr ""
+
+msgid "Mailbox 6"
+msgstr ""
+
+msgid "Mailbox 7"
+msgstr ""
+
+msgid "Mailbox 8"
+msgstr ""
+
+msgid "Mailbox 9"
+msgstr ""
 
 msgid "Main"
 msgstr ""
@@ -4218,7 +4272,22 @@ msgstr ""
 msgid "Multi Part Form"
 msgstr ""
 
+msgid "Multi-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "Multipurpose"
+msgstr ""
+
+msgid "My Mailbox"
 msgstr ""
 
 msgid "NULL PPD file pointer"
@@ -4705,6 +4774,9 @@ msgstr "Rank    Owner   Job     File(s)                         Total Size"
 msgid "Rear"
 msgstr ""
 
+msgid "Rear Tray"
+msgstr ""
+
 msgid "Reject Jobs"
 msgstr "Stampe rifiutate"
 
@@ -4741,6 +4813,9 @@ msgid "Right"
 msgstr ""
 
 msgid "Right Gate Fold"
+msgstr ""
+
+msgid "Right Tray"
 msgstr ""
 
 msgid "Roll"
@@ -4882,6 +4957,9 @@ msgstr ""
 msgid "Side"
 msgstr ""
 
+msgid "Side Tray"
+msgstr ""
+
 msgid "Single Face"
 msgstr ""
 
@@ -4921,6 +4999,36 @@ msgstr "Carta speciale"
 #, c-format
 msgid "Spooling job, %.0f%% complete."
 msgstr "Processo di spooling, %.0f%% completato."
+
+msgid "Stacker 1"
+msgstr ""
+
+msgid "Stacker 10"
+msgstr ""
+
+msgid "Stacker 2"
+msgstr ""
+
+msgid "Stacker 3"
+msgstr ""
+
+msgid "Stacker 4"
+msgstr ""
+
+msgid "Stacker 5"
+msgstr ""
+
+msgid "Stacker 6"
+msgstr ""
+
+msgid "Stacker 7"
+msgstr ""
+
+msgid "Stacker 8"
+msgstr ""
+
+msgid "Stacker 9"
+msgstr ""
 
 msgid "Standard"
 msgstr "Standard"
@@ -5207,6 +5315,9 @@ msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "Troppi valori di printer-state-reasons (%d > %d)."
 
 msgid "Top"
+msgstr ""
+
+msgid "Top Tray"
 msgstr ""
 
 msgid "Tractor"

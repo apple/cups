@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2016-08-30 16:00-0400\n"
+"POT-Creation-Date: 2017-01-03 16:43-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2775,6 +2775,9 @@ msgstr ""
 msgid "Bottom"
 msgstr ""
 
+msgid "Bottom Tray"
+msgstr ""
+
 msgid "Buffer overflow detected, aborting."
 msgstr ""
 
@@ -2812,6 +2815,9 @@ msgid "Cassette"
 msgstr ""
 
 msgid "Center"
+msgstr ""
+
+msgid "Center Tray"
 msgstr ""
 
 msgid "Change Settings"
@@ -2926,6 +2932,9 @@ msgstr "Tons foncés"
 msgid "Data file sent successfully."
 msgstr ""
 
+msgid "Deep Color"
+msgstr ""
+
 msgid "Delete Class"
 msgstr "Supprimer la classe"
 
@@ -3036,6 +3045,9 @@ msgstr ""
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "Fin de la bannière"
+
+msgid "Engineering Z Fold"
+msgstr ""
 
 msgid "English"
 msgstr "French"
@@ -3272,6 +3284,12 @@ msgid "FAIL"
 msgstr ""
 
 msgid "Fabric"
+msgstr ""
+
+msgid "Face Down"
+msgstr ""
+
+msgid "Face Up"
 msgstr ""
 
 msgid "FanFold German"
@@ -3723,6 +3741,9 @@ msgstr "Adresse étendue"
 msgid "Large Capacity"
 msgstr ""
 
+msgid "Large Capacity Tray"
+msgstr ""
+
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet série PCL 4/5"
 
@@ -3730,6 +3751,9 @@ msgid "Left"
 msgstr ""
 
 msgid "Left Gate Fold"
+msgstr ""
+
+msgid "Left Tray"
 msgstr ""
 
 msgid "Letter Fold"
@@ -3769,6 +3793,36 @@ msgid "Long-Edge (Portrait)"
 msgstr "Bord le plus long (Portrait)"
 
 msgid "Looking for printer."
+msgstr ""
+
+msgid "Mailbox 1"
+msgstr ""
+
+msgid "Mailbox 10"
+msgstr ""
+
+msgid "Mailbox 2"
+msgstr ""
+
+msgid "Mailbox 3"
+msgstr ""
+
+msgid "Mailbox 4"
+msgstr ""
+
+msgid "Mailbox 5"
+msgstr ""
+
+msgid "Mailbox 6"
+msgstr ""
+
+msgid "Mailbox 7"
+msgstr ""
+
+msgid "Mailbox 8"
+msgstr ""
+
+msgid "Mailbox 9"
 msgstr ""
 
 msgid "Main"
@@ -3932,7 +3986,22 @@ msgstr ""
 msgid "Multi Part Form"
 msgstr ""
 
+msgid "Multi-Hole Punch (Landscape)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Portrait)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Reverse Landscape)"
+msgstr ""
+
+msgid "Multi-Hole Punch (Reverse Portrait)"
+msgstr ""
+
 msgid "Multipurpose"
+msgstr ""
+
+msgid "My Mailbox"
 msgstr ""
 
 msgid "NULL PPD file pointer"
@@ -4415,6 +4484,9 @@ msgstr ""
 msgid "Rear"
 msgstr ""
 
+msgid "Rear Tray"
+msgstr ""
+
 msgid "Reject Jobs"
 msgstr "Refuser les tâches"
 
@@ -4451,6 +4523,9 @@ msgid "Right"
 msgstr ""
 
 msgid "Right Gate Fold"
+msgstr ""
+
+msgid "Right Tray"
 msgstr ""
 
 msgid "Roll"
@@ -4592,6 +4667,9 @@ msgstr ""
 msgid "Side"
 msgstr ""
 
+msgid "Side Tray"
+msgstr ""
+
 msgid "Single Face"
 msgstr ""
 
@@ -4630,6 +4708,36 @@ msgstr "Papier spécial"
 
 #, c-format
 msgid "Spooling job, %.0f%% complete."
+msgstr ""
+
+msgid "Stacker 1"
+msgstr ""
+
+msgid "Stacker 10"
+msgstr ""
+
+msgid "Stacker 2"
+msgstr ""
+
+msgid "Stacker 3"
+msgstr ""
+
+msgid "Stacker 4"
+msgstr ""
+
+msgid "Stacker 5"
+msgstr ""
+
+msgid "Stacker 6"
+msgstr ""
+
+msgid "Stacker 7"
+msgstr ""
+
+msgid "Stacker 8"
+msgstr ""
+
+msgid "Stacker 9"
 msgstr ""
 
 msgid "Standard"
@@ -4909,6 +5017,9 @@ msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr ""
 
 msgid "Top"
+msgstr ""
+
+msgid "Top Tray"
 msgstr ""
 
 msgid "Tractor"
