@@ -1,5 +1,6 @@
 [Unit]
 Description=CUPS Scheduler
+PartOf=org.cups.cupsd.service
 
 [Path]
 PathExists=@CUPS_CACHEDIR@/org.cups.cupsd
