@@ -1,11 +1,9 @@
 #
-# "$Id$"
-#
 # RPM "spec" file for CUPS.
 #
 # Original version by Jason McMullan <jmcc@ontv.com>.
 #
-# Copyright 2007-2016 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -279,6 +277,8 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/fr/*
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/*
+%dir /usr/share/doc/cups/pt_BR
+/usr/share/doc/cups/pt_BR/*
 %dir /usr/share/doc/cups/ru
 /usr/share/doc/cups/ru/*
 
@@ -296,6 +296,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/it/cups_it.po
 %dir /usr/share/locale/ja
 /usr/share/locale/ja/cups_ja.po
+%dir /usr/share/locale/pt_BR
+/usr/share/locale/ru/cups_pt_BR.po
 %dir /usr/share/locale/ru
 /usr/share/locale/ru/cups_ru.po
 
@@ -399,8 +401,3 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-lpd
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
-
-
-#
-# End of "$Id$".
-#
