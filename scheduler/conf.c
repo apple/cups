@@ -1099,10 +1099,12 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&CacheDir, "%s/%s", ServerRoot, CacheDir);
 
 #ifdef HAVE_SSL
-  if (ServerKeychain[0] != '/')
+  if (!_cups_strcasecmp(ServerKeychain, "internal"))
+    cupsdClearString(&ServerKeychain);
+  else if (ServerKeychain[0] != '/')
     cupsdSetStringf(&ServerKeychain, "%s/%s", ServerRoot, ServerKeychain);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Using keychain \"%s\" for server name \"%s\".", ServerKeychain, ServerName);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Using keychain \"%s\" for server name \"%s\".", ServerKeychain ? ServerKeychain : "internal", ServerName);
   if (!CreateSelfSignedCerts)
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Self-signed TLS certificate generation is disabled.");
   cupsSetServerCredentials(ServerKeychain, ServerName, CreateSelfSignedCerts);
@@ -2875,7 +2877,7 @@ parse_variable(
 	else
 	  snprintf(temp, sizeof(temp), "%s/%s", ServerRoot, value);
 
-	if (access(temp, 0))
+	if (access(temp, 0) && _cups_strcasecmp(value, "internal") && _cups_strcasecmp(line, "ServerKeychain"))
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 			  "File or directory for \"%s %s\" on line %d of %s "
