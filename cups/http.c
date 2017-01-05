@@ -3667,6 +3667,9 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
       return (0);
     }
 
+    if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_STATE_GET)
+      http->state ++;
+
 #ifdef HAVE_LIBZ
    /*
     * Then start any content encoding...
