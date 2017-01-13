@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.2 - 2017-01-03
+CHANGES.txt - 2.2.2 - 2017-01-13
 --------------------------------
 
 CHANGES IN CUPS V2.2.2
@@ -7,6 +7,8 @@ CHANGES IN CUPS V2.2.2
 	- Fixed some issues with IPP Everywhere printer support (Issue #4893,
 	  Issue #4909, Issue #4916, Issue #4921, Issue #4923, Issue #4932,
 	  Issue #4933, Issue #4938)
+	- The scheduler did not detect when an encrypted connection was closed
+	  by the client on Linux (Issue #4901)
 	- The cups-lpd program did not catch all legacy usage of ISO-8859-1
           (Issue #4899)
         - Fixed builds on systems without a working poll() implementation
