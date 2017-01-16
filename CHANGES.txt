@@ -24,6 +24,7 @@ CHANGES IN CUPS V2.2.2
 	  printer (<rdar://problem/29268474>)
 	- Let's Encrypt certificates did not work when the hostname contained
 	  uppercase letters (Issue #4919)
+	- Fixed reporting of printed pages in the web interface (Issue #4924)
 	- Updated systemd config files (Issue #4935)
         - Updated documentation (PR #4896)
         - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908,
