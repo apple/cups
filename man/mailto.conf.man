@@ -44,4 +44,4 @@ Specifies a prefix string for the subject line of an email notification.
 .BR cupsd (8),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2016 by Apple Inc.
+Copyright \[co] 2007-2017 by Apple Inc.

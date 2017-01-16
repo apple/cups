@@ -157,4 +157,4 @@ Directives may be placed anywhere on a line and are followed by one or more valu
 .BR ppdpo (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2016 by Apple Inc.
+Copyright \[co] 2007-2017 by Apple Inc.

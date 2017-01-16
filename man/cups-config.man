@@ -108,4 +108,4 @@ Compile a simple one-file CUPS filter:
 .BR cups (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2016 by Apple Inc.
+Copyright \[co] 2007-2017 by Apple Inc.

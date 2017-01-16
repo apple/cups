@@ -56,4 +56,4 @@ command or another CUPS-compatible client with that functionality.
 .BR lpstat (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2016 by Apple Inc.
+Copyright \[co] 2007-2017 by Apple Inc.

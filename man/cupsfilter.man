@@ -135,4 +135,4 @@ The following command will generate a PDF preview of job 42 for a printer named 
 .BR mime.types (7),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2016 by Apple Inc.
+Copyright \[co] 2007-2017 by Apple Inc.
