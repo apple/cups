@@ -24,7 +24,8 @@ CHANGES IN CUPS V2.2.2
 	  uppercase letters (Issue #4919)
 	- Updated systemd config files (Issue #4935)
         - Updated documentation (PR #4896)
-        - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908)
+        - Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908,
+          Issue #4946)
         - Updated packaging files (Issue #4940)
 
 
