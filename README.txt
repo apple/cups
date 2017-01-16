@@ -44,7 +44,7 @@ GETTING SUPPORT AND OTHER RESOURCES
     If you have problems, READ THE DOCUMENTATION FIRST!  We also provide two
     mailing lists which are available at:
 
-	http://www.cups.org/lists.php
+	http://lists.cups.org/mailman/listinfo
 
     See the CUPS web site at "http://www.cups.org/" for other resources.
 
@@ -110,6 +110,11 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 
     The sample drivers provide basic printing capabilities, but generally do not
     exercise the full potential of the printers or CUPS.
+
+    CUPS also supports IPP Everywhere printers using the "everywhere" model,
+    for example:
+
+        lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
 
 
 PRINTING FILES
