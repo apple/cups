@@ -8,7 +8,7 @@
  * property of Apple Inc. and are protected by Federal copyright
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * which should have been included with this file.  If this file is
- * file is missing or damaged, see the license at "http://www.cups.org/".
+ * missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -78,7 +78,7 @@ typedef struct cupsd_event_s		/**** Event structure ****/
   ipp_t			*attrs;		/* Notification message */
   cupsd_printer_t	*dest;		/* Associated printer, if any */
   cupsd_job_t		*job;		/* Associated job, if any */
-} cupsd_event_t; 
+} cupsd_event_t;
 
 typedef struct cupsd_subscription_s	/**** Subscription structure ****/
 {

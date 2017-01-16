@@ -8,7 +8,7 @@
  * property of Apple Inc. and are protected by Federal copyright
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * which should have been included with this file.  If this file is
- * file is missing or damaged, see the license at "http://www.cups.org/".
+ * missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -221,7 +221,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (show_models(long_status, device_id, language, make_model, product, include_schemes, exclude_schemes))
 		return (1);
 	      break;
-	      
+
 	  case 'v' : /* Show available devices */
 	      if (show_devices(long_status, timeout, include_schemes, exclude_schemes))
 		return (1);
