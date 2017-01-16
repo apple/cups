@@ -23,8 +23,8 @@
     </div>
     <div class="body">
       <div class="row">
-	<h1>CUPS 2.0.1</h1>
-	<P>CUPS — поддерживающая большинство стандартов, свободная подсистема печати, разрабатываемая компанией <A HREF="http://www.apple.com/">Apple Inc.</A> для операционной системы Mac OS<SUP>&reg;</SUP> X и других UNIX<SUP>&reg;</SUP>-подобных операционных систем.</P>
+	<h1>CUPS @CUPS_VERSION@</h1>
+	<P>CUPS — поддерживающая большинство стандартов, свободная подсистема печати, разрабатываемая компанией <A HREF="http://www.apple.com/">Apple Inc.</A> для операционной системы macOS<SUP>&reg;</SUP> и других UNIX<SUP>&reg;</SUP>-подобных операционных систем.</P>
       </div>
       <div class="row">
 	<div class="thirds">
@@ -51,6 +51,6 @@
 </div>
       </div>
     </div>
-    <div class="footer">CUPS а также логотип CUPS являются зарегистрированными торговыми марками <A HREF="http://www.apple.com">Apple Inc.</A> Авторские права на CUPS принадлежат (2007-2014) компании Apple Inc. Все права защищены.</div>
+    <div class="footer">CUPS а также логотип CUPS являются зарегистрированными торговыми марками <A HREF="http://www.apple.com">Apple Inc.</A> Авторские права на CUPS принадлежат (2007-2017) компании Apple Inc. Все права защищены.</div>
   </body>
 </html>
