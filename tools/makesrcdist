@@ -28,12 +28,14 @@ if test $# = 0; then
 	version="2.2git"
 	fileversion="2.2git-$rev"
 	fileurl="file://$TMPDIR/cups-$fileversion.tar.gz"
+	SIGNFILES=no
 else
 	# Use version from command-line
 	rev="1"
 	version=$1
 	fileversion=$1
 	fileurl="https://github.com/apple/cups/releases/download/release-$fileversion/cups-$fileversion-source.tar.gz"
+	SIGNFILES=yes
 
 	echo Validating sources...
 	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
@@ -100,9 +102,11 @@ cd ..
 echo Archiving...
 tar czf $file cups-$version
 
-echo Signing...
-test -f $file.sig && rm -f $file.sig
-gpg --detach-sign $file
+if test $SIGNFILES = yes; then
+	echo Signing...
+	test -f $file.sig && rm -f $file.sig
+	gpg --detach-sign $file
+fi
 
 echo Removing temporary files...
 rm -rf cups-$version
