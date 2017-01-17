@@ -23,4 +23,4 @@ shift $#
 echo Building rpm...
 #rm -f /usr/src/redhat/RPMS/i386/cups*.rpm
 #rm -f /usr/src/redhat/SRPMS/cups*.rpm
-rpmbuild -ta $args cups-$fileversion-source.tar.bz2
+rpmbuild -ta $args cups-$fileversion-source.tar.gz
