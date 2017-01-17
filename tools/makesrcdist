@@ -15,7 +15,7 @@ if test ! -f tools/makesrcdist; then
 fi
 
 # See if we have local changes (other than this script...)
-if (git status | grep -v makesrcdist | grep -q modified:); then
+if (git status | grep -v makesrcdist | grep -v testrpm | grep -q modified:); then
         echo Local changes remain:
         git status | grep -v makesrcdist | grep modified:
         exit 1
@@ -27,14 +27,14 @@ if test $# = 0; then
 	rev=`git show --oneline | head -1 | awk '{print $1}'`
 	version="2.2git"
 	fileversion="2.2git-$rev"
-	fileurl="file://$TMPDIR/cups-$fileversion.tar.gz"
+	fileurl="file://$TMPDIR/cups-${fileversion}-source.tar.gz"
 	SIGNFILES=no
 else
 	# Use version from command-line
 	rev="1"
 	version=$1
 	fileversion=$1
-	fileurl="https://github.com/apple/cups/releases/download/release-$fileversion/cups-$fileversion-source.tar.gz"
+	fileurl="https://github.com/apple/cups/releases/download/v$fileversion/cups-${fileversion}-source.tar.gz"
 	SIGNFILES=yes
 
 	echo Validating sources...
