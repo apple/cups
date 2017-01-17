@@ -118,8 +118,6 @@ _ppdNormalizeMakeAndModel
 _ppdOpen
 _ppdOpenFile
 _ppdParseOptions
-_pwgGenerateSize
-_pwgInitSize
 _pwgInputSlotForSource
 _pwgMediaNearSize
 _pwgMediaTable
