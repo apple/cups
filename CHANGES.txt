@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.2 - 2017-01-16
+CHANGES.txt - 2.2.2 - 2017-01-17
 --------------------------------
 
 CHANGES IN CUPS V2.2.2
@@ -7,6 +7,7 @@ CHANGES IN CUPS V2.2.2
 	- Fixed some issues with IPP Everywhere printer support (Issue #4893,
 	  Issue #4909, Issue #4916, Issue #4921, Issue #4923, Issue #4932,
 	  Issue #4933, Issue #4938)
+	- The rastertopwg filter could crash with certain input (Issue #4942)
 	- Optimized connection usage in the IPP backend
 	  (<rdar://problem/29547323>)
 	- The scheduler did not detect when an encrypted connection was closed
