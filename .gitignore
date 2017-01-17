@@ -59,6 +59,7 @@ cups/testsnmp
 cups/tlscheck
 desktop/cups.desktop
 doc/index.html
+doc/*/index.html
 filter/commandtops
 filter/gziptoany
 filter/pstops
@@ -83,6 +84,7 @@ man/lpoptions.man
 man/mantohtml
 monitor/bcp
 monitor/tbcp
+notifier/dbus
 notifier/mailto
 notifier/rss
 notifier/testnotify
@@ -138,6 +140,7 @@ systemv/lpoptions
 systemv/lpstat
 systemv/reject
 templates/header.tmpl
+templates/*/header.tmpl
 test/cups-str-*.html
 test/error_log-*
 test/ippfind
