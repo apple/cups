@@ -48,10 +48,10 @@ Release: 0
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://ftp.cups.org/pub/cups/%{version}/cups-%{version}-source.tar.bz2
+Source: https://github.com/apple/cups/releases/download/v%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
-Packager: Anonymous <anonymous@foo.com>
-Vendor: Apple Inc.
+Packager: Anonymous <anonymous@example.com>
+Vendor: Example Corp
 
 # Package names are as defined for Red Hat (and clone) distributions
 BuildRequires: gnutls-devel, pam-devel
