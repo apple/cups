@@ -22,6 +22,9 @@
 
 #  include <stdio.h>
 #  include <cups/transcode.h>
+#  ifdef __APPLE__
+#    include <CoreFoundation/CoreFoundation.h>
+#  endif /* __APPLE__ */
 
 #  ifdef __cplusplus
 extern "C" {
@@ -51,8 +54,8 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
  */
 
 #  ifdef __APPLE__
-extern const char	*_cupsAppleLanguage(const char *locale, char *language,
-			                    size_t langsize);
+extern const char	*_cupsAppleLanguage(const char *locale, char *language, size_t langsize);
+extern const char	*_cupsAppleLocale(CFStringRef languageName, char *locale, size_t localesize);
 #  endif /* __APPLE__ */
 extern void		_cupsCharmapFlush(void);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
