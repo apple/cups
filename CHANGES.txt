@@ -1,5 +1,10 @@
-CHANGES.txt - 2.2.2 - 2017-01-17
+CHANGES.txt - 2.2.3 - 2017-01-26
 --------------------------------
+
+CHANGES IN CUPS V2.2.3
+
+	- Fixed some localization issues on macOS.
+
 
 CHANGES IN CUPS V2.2.2
 
