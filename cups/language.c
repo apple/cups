@@ -1402,10 +1402,11 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       locale = "Japanese";
     else if (!strncmp(locale, "es", 2))
       locale = "Spanish";
-    else if (!strcmp(locale, "zh_HK"))
+    else if (!strcmp(locale, "zh_HK") || !strncmp(locale, "zh-Hant", 7))
     {
      /*
       * <rdar://problem/22130168>
+      * <rdar://problem/27245567>
       *
       * Try zh_TW first, then zh...  Sigh...
       */
