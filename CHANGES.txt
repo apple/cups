@@ -3,6 +3,8 @@ CHANGES.txt - 2.2.3 - 2017-01-26
 
 CHANGES IN CUPS V2.2.3
 
+	- The IPP backend could get into an infinite loop for certain errors,
+	  causing a hung queue (<rdar://problem/28008717>)
 	- Fixed some localization issues on macOS.
 
 

@@ -1,7 +1,7 @@
 /*
  * IPP backend for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1469,7 +1469,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (!job_canceled && validate_job)
   {
-    request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2],
+    request = new_request(IPP_OP_VALIDATE_JOB, version, uri, argv[2],
                           monitor.job_name, num_options, options, compression,
 			  copies_sup ? copies : 1, document_format, pc, ppd,
 			  media_col_sup, doc_handling_sup, print_color_mode_sup);
@@ -1533,6 +1533,8 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status < IPP_REDIRECTION_OTHER_SITE ||
              ipp_status == IPP_BAD_REQUEST)
       break;
+    else if (job_auth == NULL && ipp_status > IPP_BAD_REQUEST)
+      goto cleanup;
   }
 
  /*
@@ -2216,7 +2218,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_HOLD);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
-  else if (ipp_status == IPP_CONFLICT)
+  else if (ipp_status == IPP_CONFLICT || ipp_status == IPP_STATUS_ERROR_REQUEST_ENTITY || ipp_status == IPP_STATUS_ERROR_REQUEST_VALUE)
     return (CUPS_BACKEND_FAILED);
   else if (ipp_status == IPP_REQUEST_VALUE ||
 	   ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES ||
