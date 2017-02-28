@@ -317,7 +317,7 @@ EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 bsd deb epm pkg rpm slackware:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
-.PHONEY:	dist
+.PHONY:	dist
 dist:	all
 	$(RM) -r dist
 	$(MAKE) $(MFLAGS) epm
