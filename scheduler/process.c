@@ -1,7 +1,7 @@
 /*
  * Process management routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -874,7 +874,7 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
     if (ch == '/' && !*src)
       break;				/* Don't add trailing slash */
 
-    if (strchr(".?*()[]^$\\", ch))
+    if (strchr(".?*()[]^$\\\"", ch))
       *dstptr++ = '\\';
 
     *dstptr++ = (char)ch;
