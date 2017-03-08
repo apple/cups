@@ -1,10 +1,12 @@
-CHANGES.txt - 2.2.3 - 2017-01-26
+CHANGES.txt - 2.2.3 - 2017-03-08
 --------------------------------
 
 CHANGES IN CUPS V2.2.3
 
 	- The IPP backend could get into an infinite loop for certain errors,
 	  causing a hung queue (<rdar://problem/28008717>)
+	- The scheduler could pause responding to client requests in order to
+	  save state changes to disk (<rdar://problem/28690656>)
 	- Fixed some localization issues on macOS.
 
 
