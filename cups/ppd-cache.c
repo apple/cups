@@ -32,6 +32,7 @@
  * Local functions...
  */
 
+static void	pwg_add_finishing(cups_array_t *finishings, ipp_finishings_t template, const char *name, const char *value);
 static int	pwg_compare_finishings(_pwg_finishings_t *a,
 		                       _pwg_finishings_t *b);
 static void	pwg_free_finishings(_pwg_finishings_t *f);
@@ -1714,6 +1715,10 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsIPPFinishings", NULL)) != NULL)
   {
+   /*
+    * Have proper vendor mapping of IPP finishings values to PPD options...
+    */
+
     pc->finishings = cupsArrayNew3((cups_array_func_t)pwg_compare_finishings,
                                    NULL, NULL, 0, NULL,
                                    (cups_afree_func_t)pwg_free_finishings);
@@ -1732,6 +1737,114 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
     while ((ppd_attr = ppdFindNextAttr(ppd, "cupsIPPFinishings",
                                        NULL)) != NULL);
+  }
+  else
+  {
+   /*
+    * No IPP mapping data, try to map common/standard PPD keywords...
+    */
+
+    ppd_option_t	*ppd_option;	/* PPD option */
+
+    pc->finishings = cupsArrayNew3((cups_array_func_t)pwg_compare_finishings, NULL, NULL, 0, NULL, (cups_afree_func_t)pwg_free_finishings);
+
+    if ((ppd_option = ppdFindOption(ppd, "StapleLocation")) != NULL)
+    {
+     /*
+      * Add staple finishings...
+      */
+
+      if (ppdFindChoice(ppd_option, "SinglePortrait"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_STAPLE_TOP_LEFT, "StapleLocation", "SinglePortrait");
+      if (ppdFindChoice(ppd_option, "UpperLeft")) /* Ricoh extension */
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_STAPLE_TOP_LEFT, "StapleLocation", "UpperLeft");
+      if (ppdFindChoice(ppd_option, "UpperRight")) /* Ricoh extension */
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_STAPLE_TOP_RIGHT, "StapleLocation", "UpperRight");
+      if (ppdFindChoice(ppd_option, "SingleLandscape"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_STAPLE_BOTTOM_LEFT, "StapleLocation", "SingleLandscape");
+      if (ppdFindChoice(ppd_option, "DualLandscape"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_STAPLE_DUAL_LEFT, "StapleLocation", "DualLandscape");
+    }
+
+    if ((ppd_option = ppdFindOption(ppd, "RIPunch")) != NULL)
+    {
+     /*
+      * Add (Ricoh) punch finishings...
+      */
+
+      if (ppdFindChoice(ppd_option, "Left2"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_DUAL_LEFT, "RIPunch", "Left2");
+      if (ppdFindChoice(ppd_option, "Left3"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_TRIPLE_LEFT, "RIPunch", "Left3");
+      if (ppdFindChoice(ppd_option, "Left4"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_QUAD_LEFT, "RIPunch", "Left4");
+      if (ppdFindChoice(ppd_option, "Right2"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_DUAL_RIGHT, "RIPunch", "Right2");
+      if (ppdFindChoice(ppd_option, "Right3"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_TRIPLE_RIGHT, "RIPunch", "Right3");
+      if (ppdFindChoice(ppd_option, "Right4"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_QUAD_RIGHT, "RIPunch", "Right4");
+      if (ppdFindChoice(ppd_option, "Upper2"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_DUAL_TOP, "RIPunch", "Upper2");
+      if (ppdFindChoice(ppd_option, "Upper3"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_TRIPLE_TOP, "RIPunch", "Upper3");
+      if (ppdFindChoice(ppd_option, "Upper4"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_PUNCH_QUAD_TOP, "RIPunch", "Upper4");
+    }
+
+    if ((ppd_option = ppdFindOption(ppd, "BindEdge")) != NULL)
+    {
+     /*
+      * Add bind finishings...
+      */
+
+      if (ppdFindChoice(ppd_option, "Left"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_BIND_LEFT, "BindEdge", "Left");
+      if (ppdFindChoice(ppd_option, "Right"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_BIND_RIGHT, "BindEdge", "Right");
+      if (ppdFindChoice(ppd_option, "Top"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_BIND_TOP, "BindEdge", "Top");
+      if (ppdFindChoice(ppd_option, "Bottom"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_BIND_BOTTOM, "BindEdge", "Bottom");
+    }
+
+    if ((ppd_option = ppdFindOption(ppd, "FoldType")) != NULL)
+    {
+     /*
+      * Add (Adobe) fold finishings...
+      */
+
+      if (ppdFindChoice(ppd_option, "ZFold"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_Z, "FoldType", "ZFold");
+      if (ppdFindChoice(ppd_option, "Saddle"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_HALF, "FoldType", "Saddle");
+      if (ppdFindChoice(ppd_option, "DoubleGate"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_DOUBLE_GATE, "FoldType", "DoubleGate");
+      if (ppdFindChoice(ppd_option, "LeftGate"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_LEFT_GATE, "FoldType", "LeftGate");
+      if (ppdFindChoice(ppd_option, "RightGate"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_RIGHT_GATE, "FoldType", "RightGate");
+      if (ppdFindChoice(ppd_option, "Letter"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_LETTER, "FoldType", "Letter");
+      if (ppdFindChoice(ppd_option, "XFold"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_POSTER, "FoldType", "XFold");
+    }
+
+    if ((ppd_option = ppdFindOption(ppd, "RIFoldType")) != NULL)
+    {
+     /*
+      * Add (Ricoh) fold finishings...
+      */
+
+      if (ppdFindChoice(ppd_option, "OutsideTwoFold"))
+        pwg_add_finishing(pc->finishings, IPP_FINISHINGS_FOLD_LETTER, "RIFoldType", "OutsideTwoFold");
+    }
+
+    if (cupsArrayCount(pc->finishings) == 0)
+    {
+      cupsArrayDelete(pc->finishings);
+      pc->finishings = NULL;
+    }
   }
 
  /*
@@ -4095,10 +4208,34 @@ _pwgPageSizeForMedia(
 
 
 /*
+ * 'pwg_add_finishing()' - Add a finishings value.
+ */
+
+static void
+pwg_add_finishing(
+    cups_array_t     *finishings,	/* I - Finishings array */
+    ipp_finishings_t template,		/* I - Finishing template */
+    const char       *name,		/* I - PPD option */
+    const char       *value)		/* I - PPD choice */
+{
+  _pwg_finishings_t	*f;		/* New finishings value */
+
+
+  if ((f = (_pwg_finishings_t *)calloc(1, sizeof(_pwg_finishings_t))) != NULL)
+  {
+    f->value       = template;
+    f->num_options = cupsAddOption(name, value, 0, &f->options);
+
+    cupsArrayAdd(finishings, f);
+  }
+}
+
+
+/*
  * 'pwg_compare_finishings()' - Compare two finishings values.
  */
 
-static int				/* O- Result of comparison */
+static int				/* O - Result of comparison */
 pwg_compare_finishings(
     _pwg_finishings_t *a,		/* I - First finishings value */
     _pwg_finishings_t *b)		/* I - Second finishings value */

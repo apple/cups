@@ -1,7 +1,7 @@
 /*
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -4584,6 +4584,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     if (ppdFindOption(ppd, "Collate") != NULL)
       p->type |= CUPS_PRINTER_COLLATE;
 
+    /* TODO: look at finishings array for values */
     if (ppdFindOption(ppd, "StapleLocation") != NULL)
     {
       p->type |= CUPS_PRINTER_STAPLE;
