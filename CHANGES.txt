@@ -7,7 +7,7 @@ CHANGES IN CUPS V2.2.3
 	  causing a hung queue (<rdar://problem/28008717>)
 	- The scheduler could pause responding to client requests in order to
 	  save state changes to disk (<rdar://problem/28690656>)
-	- Fixed some localization issues on macOS.
+	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 
 CHANGES IN CUPS V2.2.2

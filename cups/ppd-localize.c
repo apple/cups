@@ -1,7 +1,7 @@
 /*
  * PPD localization routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -665,7 +665,7 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
    /*
     * <rdar://problem/22130168>
     *
-    * Hong Kong locale needs special handling...  Sigh...
+    * Multiple locales need special handling...  Sigh...
     */
 
     if (!strcmp(ll_CC, "zh_HK"))
