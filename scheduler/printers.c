@@ -3802,7 +3802,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ipp_attribute_t *attr;		/* Attribute data */
   _ipp_value_t	*val;			/* Attribute value */
   int		num_finishings,		/* Number of finishings */
-		finishings[5];		/* finishings-supported values */
+		finishings[100];	/* finishings-supported values */
   int		num_qualities,		/* Number of print-quality values */
 		qualities[3];		/* print-quality values */
   int		num_margins,		/* Number of media-*-margin-supported values */
