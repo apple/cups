@@ -17,6 +17,8 @@ CHANGES IN CUPS V2.2.3
 	  supported by the printer (Issue #4953)
 	- The IPP Everywhere PPD generator did not return useful error messages
 	  (Issue #4954)
+	- The default cupsd.conf file did not work on systems compiled without
+	  Kerberos support (Issue #4947)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 

@@ -2349,17 +2349,15 @@ cupsdSendHeader(
 
     if (auth_type == CUPSD_AUTH_BASIC)
       strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
-#ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
     {
-#  ifdef AF_LOCAL
+#ifdef AF_LOCAL
       if (httpAddrFamily(httpGetAddress(con->http)) == AF_LOCAL)
         strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
       else
-#  endif /* AF_LOCAL */
+#endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
     }
-#endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
         !_cups_strcasecmp(httpGetHostname(con->http, NULL, 0), "localhost"))

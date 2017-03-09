@@ -1,7 +1,7 @@
 /*
  * Configuration routines for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2233,7 +2233,6 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-#ifdef HAVE_GSSAPI
     else if (!_cups_strcasecmp(value, "negotiate"))
     {
       loc->type = CUPSD_AUTH_NEGOTIATE;
@@ -2241,7 +2240,6 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-#endif /* HAVE_GSSAPI */
     else
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
@@ -3175,10 +3173,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	default_auth_type = CUPSD_AUTH_NONE;
       else if (!_cups_strcasecmp(value, "basic"))
 	default_auth_type = CUPSD_AUTH_BASIC;
-#ifdef HAVE_GSSAPI
       else if (!_cups_strcasecmp(value, "negotiate"))
         default_auth_type = CUPSD_AUTH_NEGOTIATE;
-#endif /* HAVE_GSSAPI */
       else if (!_cups_strcasecmp(value, "auto"))
         default_auth_type = CUPSD_AUTH_AUTO;
       else
