@@ -199,41 +199,42 @@ _cupsConvertOptions(ipp_t           *request,	/* I - IPP request */
   if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
     keyword = cupsGetOption("media", num_options, options);
 
-  if ((size = _ppdCacheGetSize(pc, keyword)) != NULL)
+  media_source = _ppdCacheGetSource(pc, cupsGetOption("InputSlot", num_options, options));
+  media_type   = _ppdCacheGetType(pc, cupsGetOption("MediaType", num_options, options));
+  size         = _ppdCacheGetSize(pc, keyword);
+
+  if (size || media_source || media_type)
   {
    /*
     * Add a media-col value...
     */
 
-    media_size = ippNew();
-    ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-		  "x-dimension", size->width);
-    ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-		  "y-dimension", size->length);
-
     media_col = ippNew();
-    ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
 
-    media_source = _ppdCacheGetSource(pc, cupsGetOption("InputSlot",
-							num_options,
-							options));
-    media_type   = _ppdCacheGetType(pc, cupsGetOption("MediaType",
-						      num_options,
-						      options));
+    if (size)
+    {
+      media_size = ippNew();
+      ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+                    "x-dimension", size->width);
+      ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+                    "y-dimension", size->length);
+
+      ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
+    }
 
     for (i = 0; i < media_col_sup->num_values; i ++)
     {
-      if (!strcmp(media_col_sup->values[i].string.text, "media-left-margin"))
+      if (size && !strcmp(media_col_sup->values[i].string.text, "media-left-margin"))
 	ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER, "media-left-margin", size->left);
-      else if (!strcmp(media_col_sup->values[i].string.text, "media-bottom-margin"))
+      else if (size && !strcmp(media_col_sup->values[i].string.text, "media-bottom-margin"))
 	ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER, "media-bottom-margin", size->bottom);
-      else if (!strcmp(media_col_sup->values[i].string.text, "media-right-margin"))
+      else if (size && !strcmp(media_col_sup->values[i].string.text, "media-right-margin"))
 	ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER, "media-right-margin", size->right);
-      else if (!strcmp(media_col_sup->values[i].string.text, "media-top-margin"))
+      else if (size && !strcmp(media_col_sup->values[i].string.text, "media-top-margin"))
 	ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER, "media-top-margin", size->top);
-      else if (!strcmp(media_col_sup->values[i].string.text, "media-source") && media_source)
+      else if (media_source && !strcmp(media_col_sup->values[i].string.text, "media-source"))
 	ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD, "media-source", NULL, media_source);
-      else if (!strcmp(media_col_sup->values[i].string.text, "media-type") && media_type)
+      else if (media_type && !strcmp(media_col_sup->values[i].string.text, "media-type"))
 	ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD, "media-type", NULL, media_type);
     }
 

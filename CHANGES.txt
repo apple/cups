@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.3 - 2017-03-08
+CHANGES.txt - 2.2.3 - 2017-03-09
 --------------------------------
 
 CHANGES IN CUPS V2.2.3
@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.2.3
 	  save state changes to disk (<rdar://problem/28690656>)
 	- Added support for PPD finishing keywords (Issue #4960, Issue #4961,
 	  Issue #4962)
+	- The IPP backend did not send a media-col attribute for just the source
+	  or type (Issue #4963)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 
