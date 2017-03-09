@@ -3595,6 +3595,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       { "multi-part-form", _("Multi Part Form") },
       { "other", _("Other") },
       { "paper", _("Paper") },
+      { "photo", _("Photo Paper") }, /* HP mis-spelling */
       { "photographic", _("Photo Paper") },
       { "photographic-archival", _("Photographic Archival") },
       { "photographic-film", _("Photo Film") },
@@ -3646,14 +3647,20 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     cupsFilePrintf(fp, "*OpenUI *MediaType: PickOne\n"
                        "*OrderDependency: 10 AnySetup *MediaType\n"
                        "*DefaultMediaType: %s\n", ppdname);
-    for (i = 0; i < (int)(sizeof(media_types) / sizeof(media_types[0])); i ++)
+    for (i = 0; i < count; i ++)
     {
-      if (!ippContainsString(attr, media_types[i][0]))
-        continue;
+      const char *keyword = ippGetString(attr, i, NULL);
 
-      pwg_ppdize_name(media_types[i][0], ppdname, sizeof(ppdname));
+      pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
 
-      cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, media_types[i][1]), ppdname);
+      for (j = 0; j < (int)(sizeof(media_types) / sizeof(media_types[0])); j ++)
+        if (!strcmp(keyword, media_types[i][0]))
+          break;
+
+      if (j < (int)(sizeof(media_types) / sizeof(media_types[0])))
+        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, media_types[j][1]), ppdname);
+      else
+        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, keyword, ppdname);
     }
     cupsFilePuts(fp, "*CloseUI: *MediaType\n");
   }
