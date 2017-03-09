@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-01-03 16:43-0500\n"
+"POT-Creation-Date: 2017-03-09 15:19-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -4034,6 +4034,9 @@ msgstr "Žádný obsah"
 msgid "No Finishing"
 msgstr ""
 
+msgid "No IPP attributes."
+msgstr ""
+
 msgid "No PPD name"
 msgstr ""
 
@@ -4457,6 +4460,9 @@ msgid "Printer cannot print supplied content."
 msgstr ""
 
 msgid "Printer cannot print with supplied options."
+msgstr ""
+
+msgid "Printer does not support required IPP attributes or document formats."
 msgstr ""
 
 msgid "Printer:"

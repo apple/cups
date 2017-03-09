@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-01-03 16:43-0500\n"
+"POT-Creation-Date: 2017-03-09 15:19-0500\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -4317,6 +4317,9 @@ msgstr "Nenhum conteúdo"
 msgid "No Finishing"
 msgstr ""
 
+msgid "No IPP attributes."
+msgstr ""
+
 msgid "No PPD name"
 msgstr "Nenhum nome PPD"
 
@@ -4745,6 +4748,9 @@ msgstr "Impressora não consegue imprimir o conteúdo fornecido."
 
 msgid "Printer cannot print with supplied options."
 msgstr "Impressora não consegue imprimir os opções fornecidas."
+
+msgid "Printer does not support required IPP attributes or document formats."
+msgstr ""
 
 msgid "Printer:"
 msgstr "Impressora:"

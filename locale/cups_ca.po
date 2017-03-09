@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-01-03 16:43-0500\n"
+"POT-Creation-Date: 2017-03-09 15:19-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -4244,6 +4244,9 @@ msgstr "No hi ha contingut"
 msgid "No Finishing"
 msgstr ""
 
+msgid "No IPP attributes."
+msgstr ""
+
 msgid "No PPD name"
 msgstr "El PPD no té nom"
 
@@ -4670,6 +4673,9 @@ msgid "Printer cannot print supplied content."
 msgstr "La impressora no pot imprimir el contingut subministrat."
 
 msgid "Printer cannot print with supplied options."
+msgstr ""
+
+msgid "Printer does not support required IPP attributes or document formats."
 msgstr ""
 
 msgid "Printer:"

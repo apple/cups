@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-01-03 16:43-0500\n"
+"POT-Creation-Date: 2017-03-09 15:19-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -4280,6 +4280,9 @@ msgstr "中身がありません"
 msgid "No Finishing"
 msgstr ""
 
+msgid "No IPP attributes."
+msgstr ""
+
 msgid "No PPD name"
 msgstr "PPD の名前がありません"
 
@@ -4706,6 +4709,9 @@ msgstr "プリンターは受信した内容を印刷できませんでした。
 
 msgid "Printer cannot print with supplied options."
 msgstr "指定されたオプションではプリンターは印刷できません。"
+
+msgid "Printer does not support required IPP attributes or document formats."
+msgstr ""
 
 msgid "Printer:"
 msgstr "プリンター:"

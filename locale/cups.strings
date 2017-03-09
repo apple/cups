@@ -1174,6 +1174,7 @@
 "No" = "No";
 "No Content" = "No Content";
 "No Finishing" = "No Finishing";
+"No IPP attributes." = "No IPP attributes.";
 "No PPD name" = "No PPD name";
 "No VarBind SEQUENCE" = "No VarBind SEQUENCE";
 "No Windows printer drivers are installed." = "No Windows printer drivers are installed.";
@@ -1313,6 +1314,7 @@
 "Printer Settings" = "Printer Settings";
 "Printer cannot print supplied content." = "Printer cannot print supplied content.";
 "Printer cannot print with supplied options." = "Printer cannot print with supplied options.";
+"Printer does not support required IPP attributes or document formats." = "Printer does not support required IPP attributes or document formats.";
 "Printer:" = "Printer:";
 "Printers" = "Printers";
 "Printing page %d, %u%% complete." = "Printing page %d, %u%% complete.";

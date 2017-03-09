@@ -3147,15 +3147,27 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   if (buffer)
     *buffer = '\0';
 
-  if (!buffer || bufsize < 1 || !response)
+  if (!buffer || bufsize < 1)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (NULL);
+  }
+
+  if (!response)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No IPP attributes."), 1);
+    return (NULL);
+  }
 
  /*
   * Open a temporary file for the PPD...
   */
 
   if ((fp = cupsTempFile2(buffer, (int)bufsize)) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (NULL);
+  }
 
  /*
   * Standard stuff for PPD file...
@@ -4080,6 +4092,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cupsFileClose(fp);
   unlink(buffer);
   *buffer = '\0';
+
+  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Printer does not support required IPP attributes or document formats."), 1);
 
   return (NULL);
 }

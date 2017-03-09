@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-01-03 16:43-0500\n"
+"POT-Creation-Date: 2017-03-09 15:19-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -4243,6 +4243,9 @@ msgstr "Нет содержимого"
 msgid "No Finishing"
 msgstr ""
 
+msgid "No IPP attributes."
+msgstr ""
+
 msgid "No PPD name"
 msgstr "Нет имени PPD"
 
@@ -4670,6 +4673,9 @@ msgstr "Принтер не может распечатать содержимо
 
 msgid "Printer cannot print with supplied options."
 msgstr "Принтер не может печатать с данными параметрами."
+
+msgid "Printer does not support required IPP attributes or document formats."
+msgstr ""
 
 msgid "Printer:"
 msgstr "Принтер:"

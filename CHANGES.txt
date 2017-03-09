@@ -15,6 +15,8 @@ CHANGES IN CUPS V2.2.3
 	  supported by the printer (Issue #4953)
 	- IPP Everywhere print queues did not always support all media types
 	  supported by the printer (Issue #4953)
+	- The IPP Everywhere PPD generator did not return useful error messages
+	  (Issue #4954)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 
