@@ -4584,17 +4584,74 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     if (ppdFindOption(ppd, "Collate") != NULL)
       p->type |= CUPS_PRINTER_COLLATE;
 
-    /* TODO: look at finishings array for values */
-    if (ppdFindOption(ppd, "StapleLocation") != NULL)
+    if (p->pc && p->pc->finishings)
     {
-      p->type |= CUPS_PRINTER_STAPLE;
-      finishings[num_finishings++] = IPP_FINISHINGS_STAPLE;
-    }
+      _pwg_finishings_t	*fin;		/* Current finishing value */
 
-    if (ppdFindOption(ppd, "BindEdge") != NULL)
-    {
-      p->type |= CUPS_PRINTER_BIND;
-      finishings[num_finishings++] = IPP_FINISHINGS_BIND;
+      for (fin = (_pwg_finishings_t *)cupsArrayFirst(p->pc->finishings); fin; fin = (_pwg_finishings_t *)cupsArrayNext(p->pc->finishings))
+      {
+        if (num_finishings < (int)(sizeof(finishings) / sizeof(finishings[0])))
+          finishings[num_finishings++] = fin->value;
+
+        switch (fin->value)
+        {
+          case IPP_FINISHINGS_BIND :
+          case IPP_FINISHINGS_BIND_LEFT :
+          case IPP_FINISHINGS_BIND_TOP :
+          case IPP_FINISHINGS_BIND_RIGHT :
+          case IPP_FINISHINGS_BIND_BOTTOM :
+          case IPP_FINISHINGS_EDGE_STITCH :
+          case IPP_FINISHINGS_EDGE_STITCH_LEFT :
+          case IPP_FINISHINGS_EDGE_STITCH_TOP :
+          case IPP_FINISHINGS_EDGE_STITCH_RIGHT :
+          case IPP_FINISHINGS_EDGE_STITCH_BOTTOM :
+              p->type |= CUPS_PRINTER_BIND;
+              break;
+
+          case IPP_FINISHINGS_COVER :
+              p->type |= CUPS_PRINTER_COVER;
+              break;
+
+          case IPP_FINISHINGS_PUNCH :
+          case IPP_FINISHINGS_PUNCH_TOP_LEFT :
+          case IPP_FINISHINGS_PUNCH_BOTTOM_LEFT :
+          case IPP_FINISHINGS_PUNCH_TOP_RIGHT :
+          case IPP_FINISHINGS_PUNCH_BOTTOM_RIGHT :
+          case IPP_FINISHINGS_PUNCH_DUAL_LEFT :
+          case IPP_FINISHINGS_PUNCH_DUAL_TOP :
+          case IPP_FINISHINGS_PUNCH_DUAL_RIGHT :
+          case IPP_FINISHINGS_PUNCH_DUAL_BOTTOM :
+          case IPP_FINISHINGS_PUNCH_TRIPLE_LEFT :
+          case IPP_FINISHINGS_PUNCH_TRIPLE_TOP :
+          case IPP_FINISHINGS_PUNCH_TRIPLE_RIGHT :
+          case IPP_FINISHINGS_PUNCH_TRIPLE_BOTTOM :
+          case IPP_FINISHINGS_PUNCH_QUAD_LEFT :
+          case IPP_FINISHINGS_PUNCH_QUAD_TOP :
+          case IPP_FINISHINGS_PUNCH_QUAD_RIGHT :
+          case IPP_FINISHINGS_PUNCH_QUAD_BOTTOM :
+              p->type |= CUPS_PRINTER_PUNCH;
+              break;
+
+          case IPP_FINISHINGS_STAPLE :
+          case IPP_FINISHINGS_STAPLE_TOP_LEFT :
+          case IPP_FINISHINGS_STAPLE_BOTTOM_LEFT :
+          case IPP_FINISHINGS_STAPLE_TOP_RIGHT :
+          case IPP_FINISHINGS_STAPLE_BOTTOM_RIGHT :
+          case IPP_FINISHINGS_STAPLE_DUAL_LEFT :
+          case IPP_FINISHINGS_STAPLE_DUAL_TOP :
+          case IPP_FINISHINGS_STAPLE_DUAL_RIGHT :
+          case IPP_FINISHINGS_STAPLE_DUAL_BOTTOM :
+          case IPP_FINISHINGS_STAPLE_TRIPLE_LEFT :
+          case IPP_FINISHINGS_STAPLE_TRIPLE_TOP :
+          case IPP_FINISHINGS_STAPLE_TRIPLE_RIGHT :
+          case IPP_FINISHINGS_STAPLE_TRIPLE_BOTTOM :
+              p->type |= CUPS_PRINTER_STAPLE;
+              break;
+
+          default :
+              break;
+        }
+      }
     }
 
     for (i = 0; i < ppd->num_sizes; i ++)
@@ -4714,13 +4771,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "printer-commands", NULL, "none");
     }
-
-   /*
-    * 3D printer support...
-    */
-
-    if (ppdFindAttr(ppd, "cups3D", NULL))
-      p->type |= CUPS_PRINTER_3D;
 
    /*
     * Show current and available port monitors for this printer...
