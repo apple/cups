@@ -50,21 +50,20 @@ static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize,
  * attributes and values and adds them to the specified IPP request.
  */
 
-int						/* O - New number of copies */
-_cupsConvertOptions(ipp_t           *request,	/* I - IPP request */
-                    ppd_file_t      *ppd,	/* I - PPD file */
-		    _ppd_cache_t    *pc,	/* I - PPD cache info */
-		    ipp_attribute_t *media_col_sup,
-						/* I - media-col-supported values */
-		    ipp_attribute_t *doc_handling_sup,
-						/* I - multiple-document-handling-supported values */
-		    ipp_attribute_t *print_color_mode_sup,
-						/* I - Printer supports print-color-mode */
-		    const char    *user,	/* I - User info */
-		    const char    *format,	/* I - document-format value */
-		    int           copies,	/* I - Number of copies */
-		    int           num_options,	/* I - Number of options */
-		    cups_option_t *options)	/* I - Options */
+int					/* O - New number of copies */
+_cupsConvertOptions(
+    ipp_t           *request,		/* I - IPP request */
+    ppd_file_t      *ppd,		/* I - PPD file */
+    _ppd_cache_t    *pc,		/* I - PPD cache info */
+    ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
+    ipp_attribute_t *doc_handling_sup,	/* I - multiple-document-handling-supported values */
+    ipp_attribute_t *print_color_mode_sup,
+                                	/* I - Printer supports print-color-mode */
+    const char    *user,		/* I - User info */
+    const char    *format,		/* I - document-format value */
+    int           copies,		/* I - Number of copies */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options)		/* I - Options */
 {
   int		i;			/* Looping var */
   const char	*keyword,		/* PWG keyword */
@@ -3898,88 +3897,179 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
  /*
   * Finishing options...
+  *
+  * Eventually need to re-add support for finishings-col-database, however
+  * it is difficult to map arbitrary finishing-template values to PPD options
+  * and have the right constraints apply (e.g. stapling vs. folding vs.
+  * punching, etc.)
   */
 
-  if ((attr = ippFindAttribute(response, "finishings-col-database", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  if ((attr = ippFindAttribute(response, "finishings-supported", IPP_TAG_ENUM)) != NULL)
   {
-    ipp_t		*col;		/* Collection value */
-    ipp_attribute_t	*template;	/* "finishing-template" member */
     const char		*name;		/* String name */
-    int			value;		/* Enum value, if any */
+    int			value;		/* Enum value */
     cups_array_t	*names;		/* Names we've added */
 
     count = ippGetCount(attr);
     names = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
-    cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickMany\n"
-		       "*OrderDependency: 10 AnySetup *cupsFinishingTemplate\n"
-		       "*DefaultcupsFinishingTemplate: none\n"
-		       "*cupsFinishingTemplate none/%s: \"\"\n"
-		       "*cupsIPPFinishings 3/none: \"*cupsFinishingTemplate none\"\n", _cupsLangString(lang, _("Finishing")), _cupsLangString(lang, _("No Finishing")));
+   /*
+    * Staple/Bind/Stitch
+    */
 
     for (i = 0; i < count; i ++)
     {
-      col      = ippGetCollection(attr, i);
-      template = ippFindAttribute(col, "finishing-template", IPP_TAG_ZERO);
+      value = ippGetInteger(attr, i);
+      name  = ippEnumString("finishings", value);
 
-      if ((name = ippGetString(template, 0, NULL)) == NULL || !strcmp(name, "none"))
-        continue;
+      if (!strncmp(name, "staple-", 7) || !strncmp(name, "bind-", 5) || !strncmp(name, "edge-stitch-", 12) || !strcmp(name, "saddle-stitch"))
+        break;
+    }
 
-      if (cupsArrayFind(names, (char *)name))
-        continue;			/* Already did this finishing template */
+    if (i < count)
+    {
+      cupsFilePrintf(fp, "*OpenUI *StapleLocation/%s: PickOne\n", _cupsLangString(lang, _("Staple")));
+      cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *StapleLocation\n");
+      cupsFilePuts(fp, "*DefaultStapleLocation: None\n");
+      cupsFilePrintf(fp, "*StapleLocation None/%s: \"\"\n", _cupsLangString(lang, _("None")));
 
-      cupsArrayAdd(names, (char *)name);
-
-      for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+      for (; i < count; i ++)
       {
-        if (!strcmp(finishings[j][0], name))
-	{
-          cupsFilePrintf(fp, "*cupsFinishingTemplate %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
+        value = ippGetInteger(attr, i);
+        name  = ippEnumString("finishings", value);
 
-	  value = ippEnumValue("finishings", name);
+        if (strncmp(name, "staple-", 7) && strncmp(name, "bind-", 5) && strncmp(name, "edge-stitch-", 12) && strcmp(name, "saddle-stitch"))
+          continue;
 
-	  if (value)
-	    cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*cupsFinishingTemplate %s\"\n", value, name, name);
-          break;
-	}
+        if (cupsArrayFind(names, (char *)name))
+          continue;			/* Already did this finishing template */
+
+        cupsArrayAdd(names, (char *)name);
+
+        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+        {
+          if (!strcmp(finishings[j][0], name))
+          {
+            cupsFilePrintf(fp, "*StapleLocation %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
+            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*StapleLocation %s\"\n", value, name, name);
+            break;
+          }
+        }
       }
+
+      cupsFilePuts(fp, "*CloseUI: *StapleLocation\n");
+    }
+
+   /*
+    * Fold
+    */
+
+    for (i = 0; i < count; i ++)
+    {
+      value = ippGetInteger(attr, i);
+      name  = ippEnumString("finishings", value);
+
+      if (!strncmp(name, "fold-", 5))
+        break;
+    }
+
+    if (i < count)
+    {
+      cupsFilePrintf(fp, "*OpenUI *FoldType/%s: PickOne\n", _cupsLangString(lang, _("Fold")));
+      cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *FoldType\n");
+      cupsFilePuts(fp, "*DefaultFoldType: None\n");
+      cupsFilePrintf(fp, "*FoldType None/%s: \"\"\n", _cupsLangString(lang, _("None")));
+
+      for (; i < count; i ++)
+      {
+        value = ippGetInteger(attr, i);
+        name  = ippEnumString("finishings", value);
+
+        if (strncmp(name, "fold-", 5))
+          continue;
+
+        if (cupsArrayFind(names, (char *)name))
+          continue;			/* Already did this finishing template */
+
+        cupsArrayAdd(names, (char *)name);
+
+        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+        {
+          if (!strcmp(finishings[j][0], name))
+          {
+            cupsFilePrintf(fp, "*FoldType %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
+            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*FoldType %s\"\n", value, name, name);
+            break;
+          }
+        }
+      }
+
+      cupsFilePuts(fp, "*CloseUI: *FoldType\n");
+    }
+
+   /*
+    * Punch
+    */
+
+    for (i = 0; i < count; i ++)
+    {
+      value = ippGetInteger(attr, i);
+      name  = ippEnumString("finishings", value);
+
+      if (!strncmp(name, "punch-", 6))
+        break;
+    }
+
+    if (i < count)
+    {
+      cupsFilePrintf(fp, "*OpenUI *PunchMedia/%s: PickOne\n", _cupsLangString(lang, _("Punch")));
+      cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *PunchMedia\n");
+      cupsFilePuts(fp, "*DefaultPunchMedia: None\n");
+      cupsFilePrintf(fp, "*PunchMedia None/%s: \"\"\n", _cupsLangString(lang, _("None")));
+
+      for (i = 0; i < count; i ++)
+      {
+        value = ippGetInteger(attr, i);
+        name  = ippEnumString("finishings", value);
+
+        if (strncmp(name, "punch-", 6))
+          continue;
+
+        if (cupsArrayFind(names, (char *)name))
+          continue;			/* Already did this finishing template */
+
+        cupsArrayAdd(names, (char *)name);
+
+        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+        {
+          if (!strcmp(finishings[j][0], name))
+          {
+            cupsFilePrintf(fp, "*PunchMedia %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
+            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*PunchMedia %s\"\n", value, name, name);
+            break;
+          }
+        }
+      }
+
+      cupsFilePuts(fp, "*CloseUI: *PunchMedia\n");
+    }
+
+   /*
+    * Booklet
+    */
+
+    if (ippContainsInteger(attr, IPP_FINISHINGS_BOOKLET_MAKER))
+    {
+      cupsFilePrintf(fp, "*OpenUI *Booklet/%s: Boolean\n", _cupsLangString(lang, _("Booklet")));
+      cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *Booklet\n");
+      cupsFilePuts(fp, "*DefaultBooklet: False\n");
+      cupsFilePuts(fp, "*Booklet False: \"\"\n");
+      cupsFilePuts(fp, "*Booklet True: \"\"\n");
+      cupsFilePrintf(fp, "*cupsIPPFinishings %d/booklet-maker: \"*Booklet True\"\n", IPP_FINISHINGS_BOOKLET_MAKER);
+      cupsFilePuts(fp, "*CloseUI: *Booklet\n");
     }
 
     cupsArrayDelete(names);
-
-    cupsFilePuts(fp, "*CloseUI: *cupsFinishingTemplate\n");
-  }
-  else if ((attr = ippFindAttribute(response, "finishings-supported", IPP_TAG_ENUM)) != NULL && (count = ippGetCount(attr)) > 1 )
-  {
-    const char		*name;		/* String name */
-    int			value;		/* Enum value, if any */
-
-    count = ippGetCount(attr);
-
-    cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickMany\n"
-		       "*OrderDependency: 10 AnySetup *cupsFinishingTemplate\n"
-		       "*DefaultcupsFinishingTemplate: none\n"
-		       "*cupsFinishingTemplate none/%s: \"\"\n"
-		       "*cupsIPPFinishings 3/none: \"*cupsFinishingTemplate none\"\n", _cupsLangString(lang, _("Finishing")), _cupsLangString(lang, _("No Finishing")));
-
-    for (i = 0; i < count; i ++)
-    {
-      if ((value = ippGetInteger(attr, i)) == 3)
-        continue;
-
-      name = ippEnumString("finishings", value);
-      for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
-      {
-        if (!strcmp(finishings[j][0], name))
-	{
-          cupsFilePrintf(fp, "*cupsFinishingTemplate %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
-	  cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*cupsFinishingTemplate %s\"\n", value, name, name);
-          break;
-	}
-      }
-    }
-
-    cupsFilePuts(fp, "*CloseUI: *cupsFinishingTemplate\n");
   }
 
  /*

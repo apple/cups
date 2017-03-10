@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2774,6 +2774,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "Papier pour titres"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr ""
 
@@ -3362,9 +3365,6 @@ msgstr ""
 
 #, c-format
 msgid "Finished page %d."
-msgstr ""
-
-msgid "Finishing"
 msgstr ""
 
 msgid "Flexo Base"
@@ -4070,9 +4070,6 @@ msgstr "Non"
 msgid "No Content"
 msgstr "Aucun contenu"
 
-msgid "No Finishing"
-msgstr ""
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4178,6 +4175,9 @@ msgstr "Non continu (détection de marque)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "Non continu (détection Web)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "Normal"

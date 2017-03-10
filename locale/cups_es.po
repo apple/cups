@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3043,6 +3043,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "Papel de cartas"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr "Fabricante de folleto"
 
@@ -3645,9 +3648,6 @@ msgstr ""
 #, c-format
 msgid "Finished page %d."
 msgstr "Acabada la página %d."
-
-msgid "Finishing"
-msgstr "Terminando"
 
 msgid "Flexo Base"
 msgstr ""
@@ -4356,9 +4356,6 @@ msgstr "No"
 msgid "No Content"
 msgstr "No hay contenido"
 
-msgid "No Finishing"
-msgstr "Sin terminar"
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4466,6 +4463,9 @@ msgstr "No continuo (sensible a señal)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "No continuo (sensible a web)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "Normal"
@@ -6995,6 +6995,9 @@ msgstr "variable-bindings usa una longitud indefinida"
 #~ msgid "CD/DVD/Bluray"
 #~ msgstr "CD/DVD/Bluray"
 
+#~ msgid "Finishing"
+#~ msgstr "Terminando"
+
 #~ msgid "Glossy Photo"
 #~ msgstr "Foto brillante"
 
@@ -7009,6 +7012,9 @@ msgstr "variable-bindings usa una longitud indefinida"
 
 #~ msgid "Matte Photo"
 #~ msgstr "Foto mate"
+
+#~ msgid "No Finishing"
+#~ msgstr "Sin terminar"
 
 #~ msgid "Satin Photo"
 #~ msgstr "Foto satinada"

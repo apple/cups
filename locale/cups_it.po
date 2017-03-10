@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3041,6 +3041,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "Carta per scrivere"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr ""
 
@@ -3645,9 +3648,6 @@ msgstr ""
 #, c-format
 msgid "Finished page %d."
 msgstr "Finito pagina %d."
-
-msgid "Finishing"
-msgstr ""
 
 msgid "Flexo Base"
 msgstr ""
@@ -4356,9 +4356,6 @@ msgstr "No"
 msgid "No Content"
 msgstr "Nessun contenuto"
 
-msgid "No Finishing"
-msgstr ""
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4466,6 +4463,9 @@ msgstr "Non-continuous (Mark sensing)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "Non-continuous (Web sensing)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "Normale"

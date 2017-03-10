@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -2967,6 +2967,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "Paper de valors"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr ""
 
@@ -3569,9 +3572,6 @@ msgstr ""
 #, c-format
 msgid "Finished page %d."
 msgstr "S'ha acabat la pàgina %d."
-
-msgid "Finishing"
-msgstr ""
 
 msgid "Flexo Base"
 msgstr ""
@@ -4283,9 +4283,6 @@ msgstr "No"
 msgid "No Content"
 msgstr "No hi ha contingut"
 
-msgid "No Finishing"
-msgstr ""
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4393,6 +4390,9 @@ msgstr "Discontinu (sensible a les marques)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "Discontinu (Sensible al web)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "Normal"

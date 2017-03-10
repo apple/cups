@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -2774,6 +2774,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "Kancelářský papír"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr ""
 
@@ -3365,9 +3368,6 @@ msgstr ""
 
 #, c-format
 msgid "Finished page %d."
-msgstr ""
-
-msgid "Finishing"
 msgstr ""
 
 msgid "Flexo Base"
@@ -4073,9 +4073,6 @@ msgstr "Ne"
 msgid "No Content"
 msgstr "Žádný obsah"
 
-msgid "No Finishing"
-msgstr ""
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4181,6 +4178,9 @@ msgstr "Není souvislý (Mark Sensing)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "Není souvislý (Web Sensing)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "Normální"

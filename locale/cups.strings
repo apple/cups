@@ -771,6 +771,7 @@
 "Bind (Reverse Portrait)" = "Bind (Reverse Portrait)";
 "Bond Envelope" = "Bond Envelope";
 "Bond Paper" = "Bond Paper";
+"Booklet" = "Booklet";
 "Booklet Maker" = "Booklet Maker";
 "Boolean expected for waiteof option \"%s\"." = "Boolean expected for waiteof option “%s”.";
 "Bottom" = "Bottom";
@@ -958,7 +959,6 @@
 "Film" = "Film";
 "Fine Envelope" = "Fine Envelope";
 "Finished page %d." = "Finished page %d.";
-"Finishing" = "Finishing";
 "Flexo Base" = "Flexo Base";
 "Flexo Photo Polymer" = "Flexo Photo Polymer";
 "Flute" = "Flute";
@@ -1187,7 +1187,6 @@
 "New credentials are older than stored credentials." = "New credentials are older than stored credentials.";
 "No" = "No";
 "No Content" = "No Content";
-"No Finishing" = "No Finishing";
 "No IPP attributes." = "No IPP attributes.";
 "No PPD name" = "No PPD name";
 "No VarBind SEQUENCE" = "No VarBind SEQUENCE";
@@ -1223,6 +1222,7 @@
 "No version number" = "No version number";
 "Non-continuous (Mark sensing)" = "Non-continuous (Mark sensing)";
 "Non-continuous (Web sensing)" = "Non-continuous (Web sensing)";
+"None" = "None";
 "Normal" = "Normal";
 "Not Found" = "Not Found";
 "Not Implemented" = "Not Implemented";

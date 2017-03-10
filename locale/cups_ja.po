@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-10 12:18-0500\n"
+"POT-Creation-Date: 2017-03-10 13:51-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3000,6 +3000,9 @@ msgstr ""
 msgid "Bond Paper"
 msgstr "ボンド紙"
 
+msgid "Booklet"
+msgstr ""
+
 msgid "Booklet Maker"
 msgstr ""
 
@@ -3608,9 +3611,6 @@ msgstr ""
 #, c-format
 msgid "Finished page %d."
 msgstr "ページ %d を終了。"
-
-msgid "Finishing"
-msgstr ""
 
 msgid "Flexo Base"
 msgstr ""
@@ -4319,9 +4319,6 @@ msgstr "いいえ"
 msgid "No Content"
 msgstr "中身がありません"
 
-msgid "No Finishing"
-msgstr ""
-
 msgid "No IPP attributes."
 msgstr ""
 
@@ -4427,6 +4424,9 @@ msgstr "非連続です (Mark sensing)"
 
 msgid "Non-continuous (Web sensing)"
 msgstr "非連続です (Web sensing)"
+
+msgid "None"
+msgstr ""
 
 msgid "Normal"
 msgstr "標準"

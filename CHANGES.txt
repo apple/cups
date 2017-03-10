@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.3 - 2017-03-09
+CHANGES.txt - 2.2.3 - 2017-03-10
 --------------------------------
 
 CHANGES IN CUPS V2.2.3
@@ -17,6 +17,8 @@ CHANGES IN CUPS V2.2.3
 	  supported by the printer (Issue #4953)
 	- The IPP Everywhere PPD generator did not return useful error messages
 	  (Issue #4954)
+	- The IPP Everywhere finishings support did not work correctly with
+	  common UI or command-line options (Issue #4976)
 	- The default cupsd.conf file did not work on systems compiled without
 	  Kerberos support (Issue #4947)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
