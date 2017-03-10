@@ -3537,6 +3537,19 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       { "cardboard", _("Cardboard") },
       { "cardstock", _("Cardstock") },
       { "cd", _("CD") },
+      { "com.hp.advanced-photo", _("Advanced Photo Paper") }, /* HP */
+      { "com.hp.brochure-glossy", _("Glossy Brochure Paper") }, /* HP */
+      { "com.hp.brochure-matte", _("Matte Brochure Paper") }, /* HP */
+      { "com.hp.cover-matte", _("Matte Cover Paper") }, /* HP */
+      { "com.hp.ecosmart-lite", _("Office Recycled Paper") }, /* HP */
+      { "com.hp.everyday-glossy", _("Everyday Glossy Photo Paper") }, /* HP */
+      { "com.hp.everyday-matte", _("Everyday Matte Paper") }, /* HP */
+      { "com.hp.extra-heavy", _("Extra Heavyweight Paper") }, /* HP */
+      { "com.hp.intermediate", _("Multipurpose Paper") }, /* HP */
+      { "com.hp.mid-weight", _("Mid-Weight Paper") }, /* HP */
+      { "com.hp.premium-inkjet", _("Premium Inkjet Paper") }, /* HP */
+      { "com.hp.premium-photo", _("Premium Photo Glossy Paper") }, /* HP */
+      { "com.hp.premium-presentation-matte", _("Premium Presentation Matte Paper") }, /* HP */
       { "continuous", _("Continuous") },
       { "continuous-long", _("Continuous Long") },
       { "continuous-short", _("Continuous Short") },
@@ -3584,6 +3597,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       { "gravure-cylinder", _("Gravure Cylinder") },
       { "image-setter-paper", _("Image Setter Paper") },
       { "imaging-cylinder", _("Imaging Cylinder") },
+      { "jp.co.canon_photo-paper-plus-glossy-ii", _("Photo Paper Plus Glossy II") }, /* Canon */
+      { "jp.co.canon_photo-paper-pro-platinum", _("Photo Paper Pro Platinum") }, /* Canon */
+      { "jp.co.canon-photo-paper-plus-glossy-ii", _("Photo Paper Plus Glossy II") }, /* Canon */
+      { "jp.co.canon-photo-paper-pro-platinum", _("Photo Paper Pro Platinum") }, /* Canon */
       { "labels", _("Labels") },
       { "labels-colored", _("Colored Labels") },
       { "labels-glossy", _("Glossy Labels") },
@@ -3636,14 +3653,14 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       { "single-face", _("Single Face") },
       { "single-wall", _("Single Wall Cardboard") },
       { "sleeve", _("Sleeve") },
-      { "stationery", _("Stationery") },
-      { "stationery-archival", _("Stationery Archival") },
+      { "stationery", _("Plain Paper") },
+      { "stationery-archival", _("Archival Paper") },
       { "stationery-coated", _("Coated Paper") },
-      { "stationery-cotton", _("Stationery Cotton") },
+      { "stationery-cotton", _("Cotton Paper") },
       { "stationery-fine", _("Vellum Paper") },
       { "stationery-heavyweight", _("Heavyweight Paper") },
-      { "stationery-heavyweight-coated", _("Stationery Heavyweight Coated") },
-      { "stationery-inkjet", _("Stationery Inkjet Paper") },
+      { "stationery-heavyweight-coated", _("Heavyweight Coated Paper") },
+      { "stationery-inkjet", _("Inkjet Paper") },
       { "stationery-letterhead", _("Letterhead") },
       { "stationery-lightweight", _("Lightweight Paper") },
       { "stationery-preprinted", _("Preprinted Paper") },
@@ -3666,7 +3683,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
 
       for (j = 0; j < (int)(sizeof(media_types) / sizeof(media_types[0])); j ++)
-        if (!strcmp(keyword, media_types[i][0]))
+        if (!strcmp(keyword, media_types[j][0]))
           break;
 
       if (j < (int)(sizeof(media_types) / sizeof(media_types[0])))
