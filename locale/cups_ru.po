@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-03-09 15:19-0500\n"
+"POT-Creation-Date: 2017-03-10 12:18-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -2709,6 +2709,9 @@ msgstr "Адрес"
 msgid "Administration"
 msgstr "Администрирование"
 
+msgid "Advanced Photo Paper"
+msgstr ""
+
 msgid "Alternate"
 msgstr ""
 
@@ -2731,6 +2734,12 @@ msgid "Archival Envelope"
 msgstr ""
 
 msgid "Archival Fabric"
+msgstr ""
+
+msgid "Archival Paper"
+msgstr ""
+
+msgid "Archival Photo Paper"
 msgstr ""
 
 #, c-format
@@ -3091,6 +3100,9 @@ msgid "Copying print data."
 msgstr "Копирование данных печати."
 
 msgid "Cotton Envelope"
+msgstr ""
+
+msgid "Cotton Paper"
 msgstr ""
 
 msgid "Cover"
@@ -3474,6 +3486,12 @@ msgstr "Каждые 9 этикеток"
 msgid "Every Label"
 msgstr "Каждая этикетка"
 
+msgid "Everyday Glossy Photo Paper"
+msgstr ""
+
+msgid "Everyday Matte Paper"
+msgstr ""
+
 msgid "Executive"
 msgstr "Executive"
 
@@ -3485,6 +3503,9 @@ msgstr "Экспортировать принтеры в Samba"
 
 msgid "Expressions:"
 msgstr "Выражение:"
+
+msgid "Extra Heavyweight Paper"
+msgstr ""
 
 msgid "FAIL"
 msgstr "FAIL"
@@ -3605,6 +3626,9 @@ msgstr ""
 msgid "Glass Textured"
 msgstr ""
 
+msgid "Glossy Brochure Paper"
+msgstr ""
+
 msgid "Glossy Fabric"
 msgstr ""
 
@@ -3645,6 +3669,9 @@ msgid "Hanging Folder"
 msgstr "Папка подвесного хранения"
 
 msgid "Hash buffer too small."
+msgstr ""
+
+msgid "Heavyweight Coated Paper"
 msgstr ""
 
 msgid "Heavyweight Envelope"
@@ -3768,6 +3795,9 @@ msgid "Inkjet Envelope"
 msgstr ""
 
 msgid "Inkjet Labels"
+msgstr ""
+
+msgid "Inkjet Paper"
 msgstr ""
 
 msgid "Installable Options"
@@ -4045,6 +4075,12 @@ msgstr ""
 msgid "Manual Feed"
 msgstr "Ручная подача"
 
+msgid "Matte Brochure Paper"
+msgstr ""
+
+msgid "Matte Cover Paper"
+msgstr ""
+
 msgid "Matte Fabric"
 msgstr ""
 
@@ -4091,6 +4127,9 @@ msgid "Metal Satin"
 msgstr ""
 
 msgid "Metal Semi Gloss"
+msgstr ""
+
+msgid "Mid-Weight Paper"
 msgstr ""
 
 msgid "Middle"
@@ -4211,6 +4250,9 @@ msgid "Multi-Hole Punch (Reverse Portrait)"
 msgstr ""
 
 msgid "Multipurpose"
+msgstr ""
+
+msgid "Multipurpose Paper"
 msgstr ""
 
 msgid "My Mailbox"
@@ -4387,6 +4429,9 @@ msgstr "ОК"
 msgid "Off (1-Sided)"
 msgstr "Выкл. (1-сторонняя печать)"
 
+msgid "Office Recycled Paper"
+msgstr ""
+
 msgid "Oki"
 msgstr "Oki"
 
@@ -4529,7 +4574,10 @@ msgstr "Фотоэтикетки"
 msgid "Photo Paper"
 msgstr ""
 
-msgid "Photographic Archival"
+msgid "Photo Paper Plus Glossy II"
+msgstr ""
+
+msgid "Photo Paper Pro Platinum"
 msgstr ""
 
 msgid "Plain Envelope"
@@ -4593,6 +4641,15 @@ msgid "Poster Fold"
 msgstr ""
 
 msgid "Pre Cut Tabs"
+msgstr ""
+
+msgid "Premium Inkjet Paper"
+msgstr ""
+
+msgid "Premium Photo Glossy Paper"
+msgstr ""
+
+msgid "Premium Presentation Matte Paper"
 msgstr ""
 
 msgid "Preparing to print."
@@ -4993,21 +5050,6 @@ msgstr "Главная страница %d."
 
 msgid "Statement"
 msgstr "Оператор"
-
-msgid "Stationery"
-msgstr ""
-
-msgid "Stationery Archival"
-msgstr ""
-
-msgid "Stationery Cotton"
-msgstr ""
-
-msgid "Stationery Heavyweight Coated"
-msgstr ""
-
-msgid "Stationery Inkjet Paper"
-msgstr ""
 
 #, c-format
 msgid "Subscription #%d does not exist."

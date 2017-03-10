@@ -690,6 +690,7 @@
 "Add RSS Subscription" = "Add RSS Subscription";
 "Address" = "Address";
 "Administration" = "Administration";
+"Advanced Photo Paper" = "Advanced Photo Paper";
 "Alternate" = "Alternate";
 "Alternate Roll" = "Alternate Roll";
 "Aluminum" = "Aluminum";
@@ -698,6 +699,8 @@
 "Applicator" = "Applicator";
 "Archival Envelope" = "Archival Envelope";
 "Archival Fabric" = "Archival Fabric";
+"Archival Paper" = "Archival Paper";
+"Archival Photo Paper" = "Archival Photo Paper";
 "Attempt to set %s printer-state to bad value %d." = "Attempt to set %s printer-state to bad value %d.";
 "Attribute \"%s\" is in the wrong group." = "Attribute “%s” is in the wrong group.";
 "Attribute \"%s\" is the wrong value type." = "Attribute “%s” is the wrong value type.";
@@ -808,6 +811,7 @@
 "Control file sent successfully." = "Control file sent successfully.";
 "Copying print data." = "Copying print data.";
 "Cotton Envelope" = "Cotton Envelope";
+"Cotton Paper" = "Cotton Paper";
 "Cover" = "Cover";
 "Created" = "Created";
 "Credentials do not validate against site CA certificate." = "Credentials do not validate against site CA certificate.";
@@ -929,10 +933,13 @@
 "Every 8 Labels" = "Every 8 Labels";
 "Every 9 Labels" = "Every 9 Labels";
 "Every Label" = "Every Label";
+"Everyday Glossy Photo Paper" = "Everyday Glossy Photo Paper";
+"Everyday Matte Paper" = "Everyday Matte Paper";
 "Executive" = "Executive";
 "Expectation Failed" = "Expectation Failed";
 "Export Printers to Samba" = "Export Printers to Samba";
 "Expressions:" = "Expressions:";
+"Extra Heavyweight Paper" = "Extra Heavyweight Paper";
 "FAIL" = "FAIL";
 "Fabric" = "Fabric";
 "Face Down" = "Face Down";
@@ -969,6 +976,7 @@
 "Glass Opaque" = "Glass Opaque";
 "Glass Surfaced" = "Glass Surfaced";
 "Glass Textured" = "Glass Textured";
+"Glossy Brochure Paper" = "Glossy Brochure Paper";
 "Glossy Fabric" = "Glossy Fabric";
 "Glossy Labels" = "Glossy Labels";
 "Glossy Optical Disc" = "Glossy Optical Disc";
@@ -983,6 +991,7 @@
 "Half Z Fold" = "Half Z Fold";
 "Hanging Folder" = "Hanging Folder";
 "Hash buffer too small." = "Hash buffer too small.";
+"Heavyweight Coated Paper" = "Heavyweight Coated Paper";
 "Heavyweight Envelope" = "Heavyweight Envelope";
 "Heavyweight Paper" = "Heavyweight Paper";
 "Help file not in index." = "Help file not in index.";
@@ -1024,6 +1033,7 @@
 "Imaging Cylinder" = "Imaging Cylinder";
 "Inkjet Envelope" = "Inkjet Envelope";
 "Inkjet Labels" = "Inkjet Labels";
+"Inkjet Paper" = "Inkjet Paper";
 "Installable Options" = "Installable Options";
 "Installed" = "Installed";
 "IntelliBar Label Printer" = "IntelliBar Label Printer";
@@ -1112,6 +1122,8 @@
 "Main Roll" = "Main Roll";
 "Manual" = "Manual";
 "Manual Feed" = "Manual Feed";
+"Matte Brochure Paper" = "Matte Brochure Paper";
+"Matte Cover Paper" = "Matte Cover Paper";
 "Matte Fabric" = "Matte Fabric";
 "Matte Labels" = "Matte Labels";
 "Matte Optical Disc" = "Matte Optical Disc";
@@ -1128,6 +1140,7 @@
 "Metal Matte" = "Metal Matte";
 "Metal Satin" = "Metal Satin";
 "Metal Semi Gloss" = "Metal Semi Gloss";
+"Mid-Weight Paper" = "Mid-Weight Paper";
 "Middle" = "Middle";
 "Missing CloseGroup" = "Missing CloseGroup";
 "Missing PPD-Adobe-4.x header" = "Missing PPD-Adobe-4.x header";
@@ -1164,6 +1177,7 @@
 "Multi-Hole Punch (Reverse Landscape)" = "Multi-Hole Punch (Reverse Landscape)";
 "Multi-Hole Punch (Reverse Portrait)" = "Multi-Hole Punch (Reverse Portrait)";
 "Multipurpose" = "Multipurpose";
+"Multipurpose Paper" = "Multipurpose Paper";
 "My Mailbox" = "My Mailbox";
 "NULL PPD file pointer" = "NULL PPD file pointer";
 "Name OID uses indefinite length" = "Name OID uses indefinite length";
@@ -1220,6 +1234,7 @@
 "Note: this program only validates the DSC comments, not the PostScript itself." = "Note: this program only validates the DSC comments, not the PostScript itself.";
 "OK" = "OK";
 "Off (1-Sided)" = "Off (1-Sided)";
+"Office Recycled Paper" = "Office Recycled Paper";
 "Oki" = "Oki";
 "Online Help" = "Online Help";
 "Only local users can create a local printer." = "Only local users can create a local printer.";
@@ -1266,7 +1281,8 @@
 "Photo Film" = "Photo Film";
 "Photo Labels" = "Photo Labels";
 "Photo Paper" = "Photo Paper";
-"Photographic Archival" = "Photographic Archival";
+"Photo Paper Plus Glossy II" = "Photo Paper Plus Glossy II";
+"Photo Paper Pro Platinum" = "Photo Paper Pro Platinum";
 "Plain Envelope" = "Plain Envelope";
 "Plain Paper" = "Plain Paper";
 "Plastic" = "Plastic";
@@ -1288,6 +1304,9 @@
 "Postcard Long Edge" = "Postcard Long Edge";
 "Poster Fold" = "Poster Fold";
 "Pre Cut Tabs" = "Pre Cut Tabs";
+"Premium Inkjet Paper" = "Premium Inkjet Paper";
+"Premium Photo Glossy Paper" = "Premium Photo Glossy Paper";
+"Premium Presentation Matte Paper" = "Premium Presentation Matte Paper";
 "Preparing to print." = "Preparing to print.";
 "Preprinted Envelope" = "Preprinted Envelope";
 "Preprinted Paper" = "Preprinted Paper";
@@ -1419,11 +1438,6 @@
 "Starting Banner" = "Starting Banner";
 "Starting page %d." = "Starting page %d.";
 "Statement" = "Statement";
-"Stationery" = "Stationery";
-"Stationery Archival" = "Stationery Archival";
-"Stationery Cotton" = "Stationery Cotton";
-"Stationery Heavyweight Coated" = "Stationery Heavyweight Coated";
-"Stationery Inkjet Paper" = "Stationery Inkjet Paper";
 "Subscription #%d does not exist." = "Subscription #%d does not exist.";
 "Substitutions:" = "Substitutions:";
 "Super A" = "Super A";

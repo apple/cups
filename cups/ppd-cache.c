@@ -3626,7 +3626,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       { "paper", _("Paper") },
       { "photo", _("Photo Paper") }, /* HP mis-spelling */
       { "photographic", _("Photo Paper") },
-      { "photographic-archival", _("Photographic Archival") },
+      { "photographic-archival", _("Archival Photo Paper") },
       { "photographic-film", _("Photo Film") },
       { "photographic-glossy", _("Glossy Photo Paper") },
       { "photographic-high-gloss", _("High Gloss Photo Paper") },
