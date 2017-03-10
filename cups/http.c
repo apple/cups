@@ -107,6 +107,9 @@ static const char * const http_fields[] =
 			  "Allow",
 			  "Server"
 			};
+#ifdef HAVE_RES_INIT
+time_t resolv_conf_modtime = 0;
+#endif /* HAVE_RES_INIT */
 
 
 /*
@@ -4814,3 +4817,33 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
   return (bytes);
 }
+
+#ifdef HAVE_RES_INIT
+/*
+ * Function to check modification time of resolv.conf. 
+ * If time is changed, it reloads resolver.
+ */
+
+http_resolv_check_t
+httpCheckResolv()
+{
+  http_resolv_check_t status = HTTP_RESOLV_CHECK_OK;
+  struct stat resolv_conf_status;
+
+  status = stat(HTTP_RESOLV_CONF_PATH, &resolv_conf_status);
+
+  if (status == HTTP_RESOLV_CHECK_ERROR)
+    return (status);
+
+  if (resolv_conf_modtime != 0 && resolv_conf_status.st_mtime != resolv_conf_modtime)
+  {
+    res_init();
+
+    status = HTTP_RESOLV_CHECK_RELOADED;
+  }
+
+  resolv_conf_modtime = resolv_conf_status.st_mtime;
+
+  return (status);
+}
+#endif /* HAVE_RES_INIT */
