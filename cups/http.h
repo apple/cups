@@ -55,6 +55,12 @@ typedef off_t ssize_t;			/* @private@ */
 #      define SO_PEERCRED LOCAL_PEERCRED
 #    endif /* LOCAL_PEERCRED && !SO_PEERCRED */
 #  endif /* WIN32 */
+#  ifdef HAVE_RES_INIT
+#    include <sys/stat.h>
+#    include <unistd.h>
+#    include <arpa/nameser.h>
+#    include <resolv.h>
+#  endif /* HAVE_RES_INIT */
 
 
 /*
@@ -95,6 +101,13 @@ extern "C" {
 #endif /* AF_INET6 && !s6_addr32 */
 
 
+#ifdef HAVE_RES_INIT
+/*
+ * Global variable for storing old modification time of resolv.conf 
+ */
+  extern time_t resolv_conf_modtime;
+#endif /* HAVE_RES_INIT */
+
 /*
  * Limits...
  */
@@ -103,6 +116,9 @@ extern "C" {
 #  define HTTP_MAX_HOST		256	/* Max length of hostname string */
 #  define HTTP_MAX_BUFFER	2048	/* Max length of data buffer */
 #  define HTTP_MAX_VALUE	256	/* Max header field value length */
+#  ifdef HAVE_RES_INIT
+#    define HTTP_RESOLV_CONF_PATH  "/etc/resolv.conf" /* Path to resolv.conf */
+#  endif /* HAVE_RES_INIT */
 
 
 /*
@@ -406,6 +422,15 @@ typedef enum http_version_e		/**** HTTP version numbers ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } http_version_t;
 
+#ifdef HAVE_RES_INIT
+typedef enum http_resolv_check_e
+{
+  HTTP_RESOLV_CHECK_ERROR = -1,
+  HTTP_RESOLV_CHECK_OK = 0,
+  HTTP_RESOLV_CHECK_RELOADED = 1
+} http_resolv_check_t;
+#endif /* HAVE_RES_INIT */
+
 typedef union _http_addr_u		/**** Socket address union, which
 					 **** makes using IPv6 and other
 					 **** address types easier and
@@ -643,6 +668,11 @@ extern void		httpSetKeepAlive(http_t *http, http_keepalive_t keep_alive) _CUPS_A
 extern void		httpShutdown(http_t *http) _CUPS_API_2_0;
 extern const char	*httpStateString(http_state_t state) _CUPS_API_2_0;
 extern const char	*httpURIStatusString(http_uri_status_t status) _CUPS_API_2_0;
+
+/**** Prototype of function to check modification time of /etc/resolv.conf ****/
+#ifdef HAVE_RES_INIT
+extern http_resolv_check_t httpCheckResolv();
+#endif /* HAVE_RES_INIT */
 
 /*
  * C++ magic...
