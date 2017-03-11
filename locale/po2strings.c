@@ -1,7 +1,7 @@
 /*
  * Convert a GNU gettext .po file to an Apple .strings file.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -323,30 +323,41 @@ normalize_string(const char *idstr,	/* I - msgid string */
       *bufptr++ = (char)0xA6;
       idstr += 2;
     }
-    else if (!html && *idstr == '\\' && idstr[1] == '\"' && (quote || strchr(idstr + 2, '\"') != NULL))
+    else if (!html && *idstr == '\\' && idstr[1] == '\"')
     {
       if (quote)
       {
        /*
-        * Convert \" to Unicode right (curley) double quote.
+        * Convert second \" to Unicode right (curley) double quote.
         */
 
 	*bufptr++ = (char)0xE2;
 	*bufptr++ = (char)0x80;
 	*bufptr++ = (char)0x9D;
+	quote     = 0;
       }
-      else
+      else if (strchr(idstr + 2, '\"') != NULL)
       {
        /*
-        * Convert \" to Unicode left (curley) double quote.
+        * Convert first \" to Unicode left (curley) double quote.
         */
 
 	*bufptr++ = (char)0xE2;
 	*bufptr++ = (char)0x80;
 	*bufptr++ = (char)0x9C;
+	quote     = 1;
+      }
+      else
+      {
+       /*
+        * Convert lone \" to Unicode double prime.
+        */
+
+        *bufptr++ = (char)0xE2;
+        *bufptr++ = (char)0x80;
+        *bufptr++ = (char)0xB3;
       }
 
-      quote = !quote;
       idstr ++;
     }
     else
