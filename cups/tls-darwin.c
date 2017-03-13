@@ -41,6 +41,8 @@ static int		tls_auto_create = 0;
 static char		*tls_common_name = NULL;
 					/* Default common name */
 #ifdef HAVE_SECKEYCHAINOPEN
+static int		tls_cups_keychain = 0;
+					/* Opened the CUPS keychain? */
 static SecKeychainRef	tls_keychain = NULL;
 					/* Server cert keychain */
 #else
@@ -1747,6 +1749,7 @@ http_cdsa_copy_server(
   CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
   CFArrayRef		list = NULL;	/* Keychain list */
   SecKeychainRef	syschain = NULL;/* System keychain */
+  SecKeychainStatus	status = 0;	/* Keychain status */
 
 
   DEBUG_printf(("3http_cdsa_copy_server(common_name=\"%s\")", common_name));
@@ -1768,6 +1771,11 @@ http_cdsa_copy_server(
   }
 
   _cupsMutexLock(&tls_mutex);
+
+  err = SecKeychainGetStatus(tls_keychain, &status);
+
+  if (err == noErr && !(status & kSecUnlockStateStatus) && tls_cups_keychain)
+    SecKeychainUnlock(tls_keychain, _CUPS_CDSA_PASSLEN, _CUPS_CDSA_PASSWORD, TRUE);
 
   CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
   CFDictionaryAddValue(query, kSecMatchPolicy, policy);
@@ -1901,9 +1909,15 @@ http_cdsa_open_keychain(
   */
 
   if (!path)
+  {
     path = http_cdsa_default_path(filename, filesize);
+    tls_cups_keychain = 1;
+  }
   else
+  {
     strlcpy(filename, path, filesize);
+    tls_cups_keychain = 0;
+  }
 
  /*
   * Save the interaction setting and disable while we open the keychain...
@@ -1912,7 +1926,7 @@ http_cdsa_open_keychain(
   SecKeychainGetUserInteractionAllowed(&interaction);
   SecKeychainSetUserInteractionAllowed(FALSE);
 
-  if (access(path, R_OK))
+  if (access(path, R_OK) && tls_cups_keychain)
   {
    /*
     * Create a new keychain at the given path...
@@ -1931,7 +1945,7 @@ http_cdsa_open_keychain(
     if (err == noErr)
       err = SecKeychainGetStatus(keychain, &status);
 
-    if (err == noErr && !(status & kSecUnlockStateStatus))
+    if (err == noErr && !(status & kSecUnlockStateStatus) && tls_cups_keychain)
       err = SecKeychainUnlock(keychain, _CUPS_CDSA_PASSLEN, _CUPS_CDSA_PASSWORD, TRUE);
   }
 
