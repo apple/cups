@@ -1,7 +1,7 @@
 /*
  * Man page to HTML conversion program.
  *
- * Copyright 2007-2010, 2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 2004-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1153,8 +1153,11 @@ html_fputs(const char *s,		/* I  - String */
       }
       else
       {
-        if (*s != '\\' && *s == '\"' && *s == '\'' && *s == '-')
+        if (*s != '\\' && *s != '\"' && *s != '\'' && *s != '-')
+        {
           fprintf(stderr, "mantohtml: Unrecognized escape \"\\%c\" ignored.\n", *s);
+          html_putc('\\', fp);
+        }
 
         html_putc(*s++, fp);
       }
