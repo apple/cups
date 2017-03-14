@@ -2123,7 +2123,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
 
       if (is_direct && !is_storage)
         type = PPD_TYPE_OBJECT_DIRECT;
-      if (!is_direct && is_storage)
+      else if (!is_direct && is_storage)
         type = PPD_TYPE_OBJECT_STORAGE;
       else
         type = PPD_TYPE_OBJECT_ANY;
