@@ -1,7 +1,7 @@
 /*
  * Private PPD definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -47,7 +47,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	7	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	8	/* Version number in cache file */
 
 
 /*
@@ -100,7 +100,7 @@ typedef enum _pwg_print_color_mode_e	/**** PWG print-color-mode indices ****/
 {
   _PWG_PRINT_COLOR_MODE_MONOCHROME = 0,	/* print-color-mode=monochrome */
   _PWG_PRINT_COLOR_MODE_COLOR,		/* print-color-mode=color */
-  /* Other proposed values are not supported by CUPS yet. */
+  /* Other values are not supported by CUPS yet. */
   _PWG_PRINT_COLOR_MODE_MAX
 } _pwg_print_color_mode_t;
 
@@ -118,14 +118,6 @@ typedef struct _pwg_finishings_s	/**** PWG finishings mapping data ****/
   int			num_options;	/* Number of options to apply */
   cups_option_t		*options;	/* Options to apply */
 } _pwg_finishings_t;
-
-typedef struct _pwg_material_s		/**** PWG material mapping data ****/
-{
-  char		*key,			/* material-key value */
-		*name;			/* material-name value */
-  int		num_props;		/* Number of properties */
-  cups_option_t	*props;			/* Material properties */
-} _pwg_material_t;
 
 struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 {
@@ -166,11 +158,6 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
   cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
-  char		*cups_3d,		/* cups3D value */
-		*cups_layer_order;	/* cupsLayerOrder value */
-  int		cups_accuracy[3];	/* cupsAccuracy value - x, y, and z in nanometers */
-  int		cups_volume[3];		/* cupsVolume value - x, y, and z in millimeters */
-  cups_array_t	*materials;		/* cupsMaterial values */
 };
 
 
