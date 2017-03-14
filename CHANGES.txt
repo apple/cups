@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.3 - 2017-03-10
+CHANGES.txt - 2.2.3 - 2017-03-14
 --------------------------------
 
 CHANGES IN CUPS V2.2.3
@@ -19,6 +19,7 @@ CHANGES IN CUPS V2.2.3
 	  (Issue #4954)
 	- The IPP Everywhere finishings support did not work correctly with
 	  common UI or command-line options (Issue #4976)
+        - Fixed an error handling issue for the network backends (Issue #4979)
 	- The default cupsd.conf file did not work on systems compiled without
 	  Kerberos support (Issue #4947)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
