@@ -1,4 +1,4 @@
-CHANGES.txt - 2.2.3 - 2017-03-14
+CHANGES.txt - 2.2.3 - 2017-03-28
 --------------------------------
 
 CHANGES IN CUPS V2.2.3
@@ -22,6 +22,8 @@ CHANGES IN CUPS V2.2.3
         - Fixed an error handling issue for the network backends (Issue #4979)
 	- The default cupsd.conf file did not work on systems compiled without
 	  Kerberos support (Issue #4947)
+	- The "reprint job" option was not available for some canceled jobs
+	  (Issue #4915)
 	- Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 
