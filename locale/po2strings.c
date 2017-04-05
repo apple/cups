@@ -360,6 +360,34 @@ normalize_string(const char *idstr,	/* I - msgid string */
 
       idstr ++;
     }
+    else if (*idstr == '\'')
+    {
+      if (strchr(idstr + 1, '\'') == NULL || quote)
+      {
+       /*
+        * Convert second ' (or ' used for a contraction) to Unicode right
+        * (curley) single quote.
+        */
+
+	*bufptr++ = (char)0xE2;
+	*bufptr++ = (char)0x80;
+	*bufptr++ = (char)0x99;
+	quote     = 0;
+      }
+      else
+      {
+       /*
+        * Convert first ' to Unicode left (curley) single quote.
+        */
+
+	*bufptr++ = (char)0xE2;
+	*bufptr++ = (char)0x80;
+	*bufptr++ = (char)0x98;
+	quote     = 1;
+      }
+
+      idstr ++;
+    }
     else
       *bufptr++ = *idstr;
 
