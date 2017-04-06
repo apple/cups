@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:docset="http://developer.apple.com/rss/docset_extensions" xml:lang="en">
+    <id>http://www.cups.org/org.cups.docset.atom/20170406145628</id>
+    <title type="text">cups.org</title>
+    <link rel="self" href="http://www.cups.org/org.cups.docset.atom"></link>
+    <docset:publisherName>CUPS</docset:publisherName>
+    <docset:publisherID>org.cups</docset:publisherID>
+    <updated>2017-04-06T14:56:28-04:00</updated>
+    <entry>
+        <id>tag:www.cups.org,2017-04-6:org.cups.docset/2.2.0</id>
+        <title type="text">CUPS Documentation</title>
+        <updated>2017-04-06T14:56:28-04:00</updated>
+        <content type="text">CUPS Documentation (v2.2.0)</content>
+        <link rel="enclosure" type="application/octet-stream" href="http://www.cups.org/org.cups.docset.xar" length="1231089"></link>
+        <docset:identifier>org.cups.docset</docset:identifier>
+        <docset:version>2.2.0</docset:version>
+    </entry>
+</feed>
