@@ -85,6 +85,7 @@ typedef struct _cups_dnssd_data_s	/* Enumeration data */
   AvahiSimplePoll	*simple_poll;	/* Polling interface */
   AvahiClient		*client;	/* Client information */
   int			got_data;	/* Did we get data? */
+  int			remaining_browsers; /* Remaining running avahi browsers */
 #  endif /* HAVE_DNSSD */
   cups_dest_cb_t	cb;		/* Callback */
   void			*user_data;	/* User data pointer */
@@ -1029,6 +1030,7 @@ cupsEnumDests(
   data.cb        = cb;
   data.user_data = user_data;
   data.devices   = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices, NULL, NULL, 0, NULL, (cups_afree_func_t)cups_dnssd_free_device);
+  data.remaining_browsers = 1;
 
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
@@ -1086,6 +1088,7 @@ cupsEnumDests(
   ipps_ref = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC,
 			               AVAHI_PROTO_UNSPEC, "_ipps._tcp", NULL,
 			               0, cups_dnssd_browse_cb, &data);
+  data.remaining_browsers++;
 #    endif /* HAVE_SSL */
 #  endif /* HAVE_DNSSD */
 
@@ -1094,7 +1097,7 @@ cupsEnumDests(
   else
     remaining = msec;
 
-  while (remaining > 0 && (!cancel || !*cancel))
+  while (data.remaining_browsers > 0 && remaining > 0 && (!cancel || !*cancel))
   {
    /*
     * Check for input...
@@ -2871,8 +2874,11 @@ cups_dnssd_browse_cb(
 	}
 	break;
 
-    case AVAHI_BROWSER_REMOVE:
     case AVAHI_BROWSER_ALL_FOR_NOW:
+	data->remaining_browsers--;
+	break;
+
+    case AVAHI_BROWSER_REMOVE:
     case AVAHI_BROWSER_CACHE_EXHAUSTED:
         break;
   }
