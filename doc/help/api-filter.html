@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html>
 <!-- SECTION: Programming -->
-<head>
-	<title>Filter and Backend Programming	</title>
-	<meta name="keywords" content="Programming">
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
-<style type="text/css"><!--
+  <head>
+    <title>Filter and Backend Programming</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
@@ -349,9 +351,8 @@ div.contents ul.subcontents li {
   text-indent: -1em;
 }
 --></style>
-</head>
-<body>
-<div class='body'>
+  </head>
+  <body>
 <!--
   Filter and backend programming header for CUPS.
 
@@ -392,51 +393,54 @@ div.contents ul.subcontents li {
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-	<li><a href="#SECURITY">Security Considerations</a></li>
-	<li><a href="#SIGNALS">Canceled Jobs and Signal Handling</a></li>
-	<li><a href="#PERMISSIONS">File Permissions</a></li>
-	<li><a href="#TEMPFILES">Temporary Files</a></li>
-	<li><a href="#COPIES">Copy Generation</a></li>
-	<li><a href="#EXITCODES">Exit Codes</a></li>
-	<li><a href="#ENVIRONMENT">Environment Variables</a></li>
-	<li><a href="#MESSAGES">Communicating with the Scheduler</a></li>
-	<li><a href="#COMMUNICATING_BACKEND">Communicating with the Backend</a></li>
-	<li><a href="#COMMUNICATING_FILTER">Communicating with Filters</a></li>
-	<li><a href="#SNMP">Doing SNMP Queries with Network Printers</a></li>
-</ul></li>
-<li><a href="#SANDBOXING">Sandboxing on macOS</a></li>
-<li><a href="#FUNCTIONS">Functions</a><ul class="code">
-	<li><a href="#cupsBackChannelRead" title="Read data from the backchannel.">cupsBackChannelRead</a></li>
-	<li><a href="#cupsBackChannelWrite" title="Write data to the backchannel.">cupsBackChannelWrite</a></li>
-	<li><a href="#cupsBackendDeviceURI" title="Get the device URI for a backend.">cupsBackendDeviceURI</a></li>
-	<li><a href="#cupsBackendReport" title="Write a device line from a backend.">cupsBackendReport</a></li>
-	<li><a href="#cupsSideChannelDoRequest" title="Send a side-channel command to a backend and wait for a response.">cupsSideChannelDoRequest</a></li>
-	<li><a href="#cupsSideChannelRead" title="Read a side-channel message.">cupsSideChannelRead</a></li>
-	<li><a href="#cupsSideChannelSNMPGet" title="Query a SNMP OID's value.">cupsSideChannelSNMPGet</a></li>
-	<li><a href="#cupsSideChannelSNMPWalk" title="Query multiple SNMP OID values.">cupsSideChannelSNMPWalk</a></li>
-	<li><a href="#cupsSideChannelWrite" title="Write a side-channel message.">cupsSideChannelWrite</a></li>
-</ul></li>
-<li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_backend_t" title="Backend exit codes">cups_backend_t</a></li>
-	<li><a href="#cups_sc_bidi_t" title="Bidirectional capabilities">cups_sc_bidi_t</a></li>
-	<li><a href="#cups_sc_command_t" title="Request command codes">cups_sc_command_t</a></li>
-	<li><a href="#cups_sc_connected_t" title="Connectivity values">cups_sc_connected_t</a></li>
-	<li><a href="#cups_sc_state_t" title="Printer state bits">cups_sc_state_t</a></li>
-	<li><a href="#cups_sc_status_t" title="Response status codes">cups_sc_status_t</a></li>
-	<li><a href="#cups_sc_walk_func_t" title="SNMP walk callback">cups_sc_walk_func_t</a></li>
-</ul></li>
-<li><a href="#ENUMERATIONS">Constants</a><ul class="code">
-	<li><a href="#cups_backend_e" title="Backend exit codes">cups_backend_e</a></li>
-	<li><a href="#cups_sc_bidi_e" title="Bidirectional capability values">cups_sc_bidi_e</a></li>
-	<li><a href="#cups_sc_command_e" title="Request command codes">cups_sc_command_e</a></li>
-	<li><a href="#cups_sc_connected_e" title="Connectivity values">cups_sc_connected_e</a></li>
-	<li><a href="#cups_sc_state_e" title="Printer state bits">cups_sc_state_e</a></li>
-	<li><a href="#cups_sc_status_e" title="Response status codes">cups_sc_status_e</a></li>
-</ul></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+          <li><a href="#SECURITY">Security Considerations</a></li>
+          <li><a href="#SIGNALS">Canceled Jobs and Signal Handling</a></li>
+          <li><a href="#PERMISSIONS">File Permissions</a></li>
+          <li><a href="#TEMPFILES">Temporary Files</a></li>
+          <li><a href="#COPIES">Copy Generation</a></li>
+          <li><a href="#EXITCODES">Exit Codes</a></li>
+          <li><a href="#ENVIRONMENT">Environment Variables</a></li>
+          <li><a href="#MESSAGES">Communicating with the Scheduler</a></li>
+          <li><a href="#COMMUNICATING_BACKEND">Communicating with the Backend</a></li>
+          <li><a href="#COMMUNICATING_FILTER">Communicating with Filters</a></li>
+          <li><a href="#SNMP">Doing SNMP Queries with Network Printers</a></li>
+        </ul></li>
+        <li><a href="#SANDBOXING">Sandboxing on macOS</a></li>
+        <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
+          <li><a href="#cupsBackChannelRead">cupsBackChannelRead</a></li>
+          <li><a href="#cupsBackChannelWrite">cupsBackChannelWrite</a></li>
+          <li><a href="#cupsBackendDeviceURI">cupsBackendDeviceURI</a></li>
+          <li><a href="#cupsBackendReport">cupsBackendReport</a></li>
+          <li><a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></li>
+          <li><a href="#cupsSideChannelRead">cupsSideChannelRead</a></li>
+          <li><a href="#cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></li>
+          <li><a href="#cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></li>
+          <li><a href="#cupsSideChannelWrite">cupsSideChannelWrite</a></li>
+        </ul></li>
+        <li><a href="#TYPES">Data Types</a><ul class="subcontents">
+          <li><a href="#cups_backend_t">cups_backend_t</a></li>
+          <li><a href="#cups_sc_bidi_t">cups_sc_bidi_t</a></li>
+          <li><a href="#cups_sc_command_t">cups_sc_command_t</a></li>
+          <li><a href="#cups_sc_connected_t">cups_sc_connected_t</a></li>
+          <li><a href="#cups_sc_state_t">cups_sc_state_t</a></li>
+          <li><a href="#cups_sc_status_t">cups_sc_status_t</a></li>
+          <li><a href="#cups_sc_walk_func_t">cups_sc_walk_func_t</a></li>
+        </ul></li>
+        <li><a href="#ENUMERATIONS">Enumerations</a><ul class="subcontents">
+          <li><a href="#cups_backend_e">cups_backend_e</a></li>
+          <li><a href="#cups_sc_bidi_e">cups_sc_bidi_e</a></li>
+          <li><a href="#cups_sc_command_e">cups_sc_command_e</a></li>
+          <li><a href="#cups_sc_connected_e">cups_sc_connected_e</a></li>
+          <li><a href="#cups_sc_state_e">cups_sc_state_e</a></li>
+          <li><a href="#cups_sc_status_e">cups_sc_status_e</a></li>
+        </ul></li>
+      </ul>
+    </div>
+    <div class="body">
 <!--
   Filter and backend programming introduction for CUPS.
 
@@ -1311,134 +1315,134 @@ void *my_data;
 </ol>
 
 <blockquote><b>Note:</b> The sandbox profile used in CUPS 2.0 still allows some actions that are not listed above - these privileges will be removed over time until the profile matches the list above.</blockquote>
-<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsBackChannelRead">cupsBackChannelRead</a></h3>
-<p class="description">Read data from the backchannel.</p>
+      <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackChannelRead">cupsBackChannelRead</a></h3>
+        <p class="description">Read data from the backchannel.</p>
 <p class="code">
-ssize_t cupsBackChannelRead (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size_t bytes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+ssize_t cupsBackChannelRead (<br />
+&#160;&#160;&#160;&#160;char *buffer,<br />
+&#160;&#160;&#160;&#160;size_t bytes,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>buffer</dt>
-<dd class="description">Buffer to read into</dd>
+        <dd class="description">Buffer to read into</dd>
 <dt>bytes</dt>
-<dd class="description">Bytes to read</dd>
+        <dd class="description">Bytes to read</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds, typically 0.0 to poll</dd>
+        <dd class="description">Timeout in seconds, typically 0.0 to poll</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Bytes read or -1 on error</p>
+        <p class="description">Bytes read or -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Reads up to &quot;bytes&quot; bytes from the backchannel/backend. The &quot;timeout&quot;
+        <p class="discussion">Reads up to &quot;bytes&quot; bytes from the backchannel/backend. The &quot;timeout&quot;
 parameter controls how many seconds to wait for the data - use 0.0 to
 return immediately if there is no data, -1.0 to wait for data indefinitely.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsBackChannelWrite">cupsBackChannelWrite</a></h3>
-<p class="description">Write data to the backchannel.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackChannelWrite">cupsBackChannelWrite</a></h3>
+        <p class="description">Write data to the backchannel.</p>
 <p class="code">
-ssize_t cupsBackChannelWrite (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size_t bytes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+ssize_t cupsBackChannelWrite (<br />
+&#160;&#160;&#160;&#160;const char *buffer,<br />
+&#160;&#160;&#160;&#160;size_t bytes,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>buffer</dt>
-<dd class="description">Buffer to write</dd>
+        <dd class="description">Buffer to write</dd>
 <dt>bytes</dt>
-<dd class="description">Bytes to write</dd>
+        <dd class="description">Bytes to write</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds, typically 1.0</dd>
+        <dd class="description">Timeout in seconds, typically 1.0</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Bytes written or -1 on error</p>
+        <p class="description">Bytes written or -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Writes &quot;bytes&quot; bytes to the backchannel/filter. The &quot;timeout&quot; parameter
+        <p class="discussion">Writes &quot;bytes&quot; bytes to the backchannel/filter. The &quot;timeout&quot; parameter
 controls how many seconds to wait for the data to be written - use
 0.0 to return immediately if the data cannot be written, -1.0 to wait
 indefinitely.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsBackendDeviceURI">cupsBackendDeviceURI</a></h3>
-<p class="description">Get the device URI for a backend.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackendDeviceURI">cupsBackendDeviceURI</a></h3>
+        <p class="description">Get the device URI for a backend.</p>
 <p class="code">
-const char *cupsBackendDeviceURI (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char **argv<br>
+const char *cupsBackendDeviceURI (<br />
+&#160;&#160;&#160;&#160;char **argv<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>argv</dt>
-<dd class="description">Command-line arguments</dd>
+        <dd class="description">Command-line arguments</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Device URI or <code>NULL</code></p>
+        <p class="description">Device URI or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;argv&quot; argument is the argv argument passed to main(). This
+        <p class="discussion">The &quot;argv&quot; argument is the argv argument passed to main(). This
 function returns the device URI passed in the DEVICE_URI environment
 variable or the device URI passed in argv[0], whichever is found
 first.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsBackendReport">cupsBackendReport</a></h3>
-<p class="description">Write a device line from a backend.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsBackendReport">cupsBackendReport</a></h3>
+        <p class="description">Write a device line from a backend.</p>
 <p class="code">
-void cupsBackendReport (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_scheme,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_uri,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_make_and_model,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_info,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_id,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *device_location<br>
+void cupsBackendReport (<br />
+&#160;&#160;&#160;&#160;const char *device_scheme,<br />
+&#160;&#160;&#160;&#160;const char *device_uri,<br />
+&#160;&#160;&#160;&#160;const char *device_make_and_model,<br />
+&#160;&#160;&#160;&#160;const char *device_info,<br />
+&#160;&#160;&#160;&#160;const char *device_id,<br />
+&#160;&#160;&#160;&#160;const char *device_location<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>device_scheme</dt>
-<dd class="description">device-scheme string</dd>
+        <dd class="description">device-scheme string</dd>
 <dt>device_uri</dt>
-<dd class="description">device-uri string</dd>
+        <dd class="description">device-uri string</dd>
 <dt>device_make_and_model</dt>
-<dd class="description">device-make-and-model string or <code>NULL</code></dd>
+        <dd class="description">device-make-and-model string or <code>NULL</code></dd>
 <dt>device_info</dt>
-<dd class="description">device-info string or <code>NULL</code></dd>
+        <dd class="description">device-info string or <code>NULL</code></dd>
 <dt>device_id</dt>
-<dd class="description">device-id string or <code>NULL</code></dd>
+        <dd class="description">device-id string or <code>NULL</code></dd>
 <dt>device_location</dt>
-<dd class="description">device-location string or <code>NULL</code></dd>
+        <dd class="description">device-location string or <code>NULL</code></dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function writes a single device line to stdout for a backend.
+        <p class="discussion">This function writes a single device line to stdout for a backend.
 It handles quoting of special characters in the device-make-and-model,
 device-info, device-id, and device-location strings.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
-<p class="description">Send a side-channel command to a backend and wait for a response.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
+        <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *data,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *datalen,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br />
+&#160;&#160;&#160;&#160;char *data,<br />
+&#160;&#160;&#160;&#160;int *datalen,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>command</dt>
-<dd class="description">Command to send</dd>
+        <dd class="description">Command to send</dd>
 <dt>data</dt>
-<dd class="description">Response data buffer pointer</dd>
+        <dd class="description">Response data buffer pointer</dd>
 <dt>datalen</dt>
-<dd class="description">Size of data buffer on entry, number of bytes in buffer on return</dd>
+        <dd class="description">Size of data buffer on entry, number of bytes in buffer on return</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds</dd>
+        <dd class="description">Timeout in seconds</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Status of command</p>
+        <p class="description">Status of command</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is normally only called by filters, drivers, or port
+        <p class="discussion">This function is normally only called by filters, drivers, or port
 monitors in order to communicate with the backend used by the current
 printer.  Programs must be prepared to handle timeout or &quot;not
 implemented&quot; status codes, which indicate that the backend or device
@@ -1449,33 +1453,33 @@ pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsSideChannelRead">cupsSideChannelRead</a></h3>
-<p class="description">Read a side-channel message.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelRead">cupsSideChannelRead</a></h3>
+        <p class="description">Read a side-channel message.</p>
 <p class="code">
-int cupsSideChannelRead (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> *command,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_status_t">cups_sc_status_t</a> *status,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *data,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *datalen,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+int cupsSideChannelRead (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> *command,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> *status,<br />
+&#160;&#160;&#160;&#160;char *data,<br />
+&#160;&#160;&#160;&#160;int *datalen,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>command</dt>
-<dd class="description">Command code</dd>
+        <dd class="description">Command code</dd>
 <dt>status</dt>
-<dd class="description">Status code</dd>
+        <dd class="description">Status code</dd>
 <dt>data</dt>
-<dd class="description">Data buffer pointer</dd>
+        <dd class="description">Data buffer pointer</dd>
 <dt>datalen</dt>
-<dd class="description">Size of data buffer on entry, number of bytes in buffer on return</dd>
+        <dd class="description">Size of data buffer on entry, number of bytes in buffer on return</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds</dd>
+        <dd class="description">Timeout in seconds</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">0 on success, -1 on error</p>
+        <p class="description">0 on success, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is normally only called by backend programs to read
+        <p class="discussion">This function is normally only called by backend programs to read
 commands from a filter, driver, or port monitor program.  The
 caller must be prepared to handle incomplete or invalid messages
 and return the corresponding status codes.<br>
@@ -1485,30 +1489,30 @@ pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></h3>
-<p class="description">Query a SNMP OID's value.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></h3>
+        <p class="description">Query a SNMP OID's value.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPGet (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *oid,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *data,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *datalen,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPGet (<br />
+&#160;&#160;&#160;&#160;const char *oid,<br />
+&#160;&#160;&#160;&#160;char *data,<br />
+&#160;&#160;&#160;&#160;int *datalen,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>oid</dt>
-<dd class="description">OID to query</dd>
+        <dd class="description">OID to query</dd>
 <dt>data</dt>
-<dd class="description">Buffer for OID value</dd>
+        <dd class="description">Buffer for OID value</dd>
 <dt>datalen</dt>
-<dd class="description">Size of OID buffer on entry, size of value on return</dd>
+        <dd class="description">Size of OID buffer on entry, size of value on return</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds</dd>
+        <dd class="description">Timeout in seconds</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Query status</p>
+        <p class="description">Query status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function asks the backend to do a SNMP OID query on behalf of the
+        <p class="discussion">This function asks the backend to do a SNMP OID query on behalf of the
 filter, port monitor, or backend using the default community name.<br>
 <br>
 &quot;oid&quot; contains a numeric OID consisting of integers separated by periods,
@@ -1526,30 +1530,30 @@ support SNMP queries.  <code>CUPS_SC_STATUS_NO_RESPONSE</code> is returned when
 the printer does not respond to the SNMP query.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></h3>
-<p class="description">Query multiple SNMP OID values.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></h3>
+        <p class="description">Query multiple SNMP OID values.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPWalk (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *oid,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_walk_func_t">cups_sc_walk_func_t</a> cb,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *context<br>
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPWalk (<br />
+&#160;&#160;&#160;&#160;const char *oid,<br />
+&#160;&#160;&#160;&#160;double timeout,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_walk_func_t">cups_sc_walk_func_t</a> cb,<br />
+&#160;&#160;&#160;&#160;void *context<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>oid</dt>
-<dd class="description">First numeric OID to query</dd>
+        <dd class="description">First numeric OID to query</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout for each query in seconds</dd>
+        <dd class="description">Timeout for each query in seconds</dd>
 <dt>cb</dt>
-<dd class="description">Function to call with each value</dd>
+        <dd class="description">Function to call with each value</dd>
 <dt>context</dt>
-<dd class="description">Application-defined pointer to send to callback</dd>
+        <dd class="description">Application-defined pointer to send to callback</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Status of first query of <code>CUPS_SC_STATUS_OK</code> on success</p>
+        <p class="description">Status of first query of <code>CUPS_SC_STATUS_OK</code> on success</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function asks the backend to do multiple SNMP OID queries on behalf
+        <p class="discussion">This function asks the backend to do multiple SNMP OID queries on behalf
 of the filter, port monitor, or backend using the default community name.
 All OIDs under the &quot;parent&quot; OID are queried and the results are sent to
 the callback function you provide.<br>
@@ -1572,175 +1576,175 @@ support SNMP queries.  <code>CUPS_SC_STATUS_NO_RESPONSE</code> is returned when
 the printer does not respond to the first SNMP query.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsSideChannelWrite">cupsSideChannelWrite</a></h3>
-<p class="description">Write a side-channel message.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelWrite">cupsSideChannelWrite</a></h3>
+        <p class="description">Write a side-channel message.</p>
 <p class="code">
-int cupsSideChannelWrite (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_status_t">cups_sc_status_t</a> status,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *data,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int datalen,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
+int cupsSideChannelWrite (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> status,<br />
+&#160;&#160;&#160;&#160;const char *data,<br />
+&#160;&#160;&#160;&#160;int datalen,<br />
+&#160;&#160;&#160;&#160;double timeout<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>command</dt>
-<dd class="description">Command code</dd>
+        <dd class="description">Command code</dd>
 <dt>status</dt>
-<dd class="description">Status code</dd>
+        <dd class="description">Status code</dd>
 <dt>data</dt>
-<dd class="description">Data buffer pointer</dd>
+        <dd class="description">Data buffer pointer</dd>
 <dt>datalen</dt>
-<dd class="description">Number of bytes of data</dd>
+        <dd class="description">Number of bytes of data</dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds</dd>
+        <dd class="description">Timeout in seconds</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">0 on success, -1 on error</p>
+        <p class="description">0 on success, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is normally only called by backend programs to send
+        <p class="discussion">This function is normally only called by backend programs to send
 responses to a filter, driver, or port monitor program.
 
 </p>
-<h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><a name="cups_backend_t">cups_backend_t</a></h3>
-<p class="description">Backend exit codes</p>
-<p class="code">
+      <h2 class="title"><a id="TYPES">Data Types</a></h2>
+      <h3 class="typedef"><a id="cups_backend_t">cups_backend_t</a></h3>
+        <p class="description">Backend exit codes</p>
+      <p class="code">
 typedef enum <a href="#cups_backend_e">cups_backend_e</a> cups_backend_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_bidi_t">cups_sc_bidi_t</a></h3>
-<p class="description">Bidirectional capabilities</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_bidi_t">cups_sc_bidi_t</a></h3>
+        <p class="description">Bidirectional capabilities</p>
+      <p class="code">
 typedef enum <a href="#cups_sc_bidi_e">cups_sc_bidi_e</a> cups_sc_bidi_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_command_t">cups_sc_command_t</a></h3>
-<p class="description">Request command codes</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_command_t">cups_sc_command_t</a></h3>
+        <p class="description">Request command codes</p>
+      <p class="code">
 typedef enum <a href="#cups_sc_command_e">cups_sc_command_e</a> cups_sc_command_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_connected_t">cups_sc_connected_t</a></h3>
-<p class="description">Connectivity values</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_connected_t">cups_sc_connected_t</a></h3>
+        <p class="description">Connectivity values</p>
+      <p class="code">
 typedef enum <a href="#cups_sc_connected_e">cups_sc_connected_e</a> cups_sc_connected_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_state_t">cups_sc_state_t</a></h3>
-<p class="description">Printer state bits</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_state_t">cups_sc_state_t</a></h3>
+        <p class="description">Printer state bits</p>
+      <p class="code">
 typedef enum <a href="#cups_sc_state_e">cups_sc_state_e</a> cups_sc_state_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_status_t">cups_sc_status_t</a></h3>
-<p class="description">Response status codes</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_status_t">cups_sc_status_t</a></h3>
+        <p class="description">Response status codes</p>
+      <p class="code">
 typedef enum <a href="#cups_sc_status_e">cups_sc_status_e</a> cups_sc_status_t;
 </p>
-<h3 class="typedef"><a name="cups_sc_walk_func_t">cups_sc_walk_func_t</a></h3>
-<p class="description">SNMP walk callback</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_sc_walk_func_t">cups_sc_walk_func_t</a></h3>
+        <p class="description">SNMP walk callback</p>
+      <p class="code">
 typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datalen, void *context);
 </p>
-<h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
-<h3 class="enumeration"><a name="cups_backend_e">cups_backend_e</a></h3>
-<p class="description">Backend exit codes</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_BACKEND_AUTH_REQUIRED </dt>
-<dd class="description">Job failed, authentication required</dd>
-<dt>CUPS_BACKEND_CANCEL </dt>
-<dd class="description">Job failed, cancel job</dd>
-<dt>CUPS_BACKEND_FAILED </dt>
-<dd class="description">Job failed, use error-policy</dd>
-<dt>CUPS_BACKEND_HOLD </dt>
-<dd class="description">Job failed, hold job</dd>
-<dt>CUPS_BACKEND_OK </dt>
-<dd class="description">Job completed successfully</dd>
-<dt>CUPS_BACKEND_RETRY </dt>
-<dd class="description">Job failed, retry this job later</dd>
-<dt>CUPS_BACKEND_RETRY_CURRENT </dt>
-<dd class="description">Job failed, retry this job immediately</dd>
-<dt>CUPS_BACKEND_STOP </dt>
-<dd class="description">Job failed, stop queue</dd>
+      <h2 class="title"><a id="ENUMERATIONS">Constants</a></h2>
+      <h3 class="enumeration"><a id="cups_backend_e">cups_backend_e</a></h3>
+        <p class="description">Backend exit codes</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_BACKEND_AUTH_REQUIRED </dt>
+        <dd class="description">Job failed, authentication required</dd>
+        <dt>CUPS_BACKEND_CANCEL </dt>
+        <dd class="description">Job failed, cancel job</dd>
+        <dt>CUPS_BACKEND_FAILED </dt>
+        <dd class="description">Job failed, use error-policy</dd>
+        <dt>CUPS_BACKEND_HOLD </dt>
+        <dd class="description">Job failed, hold job</dd>
+        <dt>CUPS_BACKEND_OK </dt>
+        <dd class="description">Job completed successfully</dd>
+        <dt>CUPS_BACKEND_RETRY </dt>
+        <dd class="description">Job failed, retry this job later</dd>
+        <dt>CUPS_BACKEND_RETRY_CURRENT </dt>
+        <dd class="description">Job failed, retry this job immediately</dd>
+        <dt>CUPS_BACKEND_STOP </dt>
+        <dd class="description">Job failed, stop queue</dd>
 </dl>
-<h3 class="enumeration"><a name="cups_sc_bidi_e">cups_sc_bidi_e</a></h3>
-<p class="description">Bidirectional capability values</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_SC_BIDI_NOT_SUPPORTED </dt>
-<dd class="description">Bidirectional I/O is not supported</dd>
-<dt>CUPS_SC_BIDI_SUPPORTED </dt>
-<dd class="description">Bidirectional I/O is supported</dd>
+      <h3 class="enumeration"><a id="cups_sc_bidi_e">cups_sc_bidi_e</a></h3>
+        <p class="description">Bidirectional capability values</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_SC_BIDI_NOT_SUPPORTED </dt>
+        <dd class="description">Bidirectional I/O is not supported</dd>
+        <dt>CUPS_SC_BIDI_SUPPORTED </dt>
+        <dd class="description">Bidirectional I/O is supported</dd>
 </dl>
-<h3 class="enumeration"><a name="cups_sc_command_e">cups_sc_command_e</a></h3>
-<p class="description">Request command codes</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_SC_CMD_DRAIN_OUTPUT </dt>
-<dd class="description">Drain all pending output</dd>
-<dt>CUPS_SC_CMD_GET_BIDI </dt>
-<dd class="description">Return bidirectional capabilities</dd>
-<dt>CUPS_SC_CMD_GET_CONNECTED <span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span></dt>
-<dd class="description">Return whether the backend is &quot;connected&quot; to the printer </dd>
-<dt>CUPS_SC_CMD_GET_DEVICE_ID </dt>
-<dd class="description">Return the IEEE-1284 device ID</dd>
-<dt>CUPS_SC_CMD_GET_STATE </dt>
-<dd class="description">Return the device state</dd>
-<dt>CUPS_SC_CMD_SNMP_GET <span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span></dt>
-<dd class="description">Query an SNMP OID </dd>
-<dt>CUPS_SC_CMD_SNMP_GET_NEXT <span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span></dt>
-<dd class="description">Query the next SNMP OID </dd>
-<dt>CUPS_SC_CMD_SOFT_RESET </dt>
-<dd class="description">Do a soft reset</dd>
+      <h3 class="enumeration"><a id="cups_sc_command_e">cups_sc_command_e</a></h3>
+        <p class="description">Request command codes</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_SC_CMD_DRAIN_OUTPUT </dt>
+        <dd class="description">Drain all pending output</dd>
+        <dt>CUPS_SC_CMD_GET_BIDI </dt>
+        <dd class="description">Return bidirectional capabilities</dd>
+        <dt>CUPS_SC_CMD_GET_CONNECTED <span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span></dt>
+        <dd class="description">Return whether the backend is &quot;connected&quot; to the printer </dd>
+        <dt>CUPS_SC_CMD_GET_DEVICE_ID </dt>
+        <dd class="description">Return the IEEE-1284 device ID</dd>
+        <dt>CUPS_SC_CMD_GET_STATE </dt>
+        <dd class="description">Return the device state</dd>
+        <dt>CUPS_SC_CMD_SNMP_GET <span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span></dt>
+        <dd class="description">Query an SNMP OID </dd>
+        <dt>CUPS_SC_CMD_SNMP_GET_NEXT <span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span></dt>
+        <dd class="description">Query the next SNMP OID </dd>
+        <dt>CUPS_SC_CMD_SOFT_RESET </dt>
+        <dd class="description">Do a soft reset</dd>
 </dl>
-<h3 class="enumeration"><a name="cups_sc_connected_e">cups_sc_connected_e</a></h3>
-<p class="description">Connectivity values</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_SC_CONNECTED </dt>
-<dd class="description">Backend is &quot;connected&quot; to printer</dd>
-<dt>CUPS_SC_NOT_CONNECTED </dt>
-<dd class="description">Backend is not &quot;connected&quot; to printer</dd>
+      <h3 class="enumeration"><a id="cups_sc_connected_e">cups_sc_connected_e</a></h3>
+        <p class="description">Connectivity values</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_SC_CONNECTED </dt>
+        <dd class="description">Backend is &quot;connected&quot; to printer</dd>
+        <dt>CUPS_SC_NOT_CONNECTED </dt>
+        <dd class="description">Backend is not &quot;connected&quot; to printer</dd>
 </dl>
-<h3 class="enumeration"><a name="cups_sc_state_e">cups_sc_state_e</a></h3>
-<p class="description">Printer state bits</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_SC_STATE_BUSY </dt>
-<dd class="description">Device is busy</dd>
-<dt>CUPS_SC_STATE_ERROR </dt>
-<dd class="description">Other error condition</dd>
-<dt>CUPS_SC_STATE_MARKER_EMPTY </dt>
-<dd class="description">Toner/ink out condition</dd>
-<dt>CUPS_SC_STATE_MARKER_LOW </dt>
-<dd class="description">Toner/ink low condition</dd>
-<dt>CUPS_SC_STATE_MEDIA_EMPTY </dt>
-<dd class="description">Paper out condition</dd>
-<dt>CUPS_SC_STATE_MEDIA_LOW </dt>
-<dd class="description">Paper low condition</dd>
-<dt>CUPS_SC_STATE_OFFLINE </dt>
-<dd class="description">Device is offline</dd>
-<dt>CUPS_SC_STATE_ONLINE </dt>
-<dd class="description">Device is online</dd>
+      <h3 class="enumeration"><a id="cups_sc_state_e">cups_sc_state_e</a></h3>
+        <p class="description">Printer state bits</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_SC_STATE_BUSY </dt>
+        <dd class="description">Device is busy</dd>
+        <dt>CUPS_SC_STATE_ERROR </dt>
+        <dd class="description">Other error condition</dd>
+        <dt>CUPS_SC_STATE_MARKER_EMPTY </dt>
+        <dd class="description">Toner/ink out condition</dd>
+        <dt>CUPS_SC_STATE_MARKER_LOW </dt>
+        <dd class="description">Toner/ink low condition</dd>
+        <dt>CUPS_SC_STATE_MEDIA_EMPTY </dt>
+        <dd class="description">Paper out condition</dd>
+        <dt>CUPS_SC_STATE_MEDIA_LOW </dt>
+        <dd class="description">Paper low condition</dd>
+        <dt>CUPS_SC_STATE_OFFLINE </dt>
+        <dd class="description">Device is offline</dd>
+        <dt>CUPS_SC_STATE_ONLINE </dt>
+        <dd class="description">Device is online</dd>
 </dl>
-<h3 class="enumeration"><a name="cups_sc_status_e">cups_sc_status_e</a></h3>
-<p class="description">Response status codes</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_SC_STATUS_BAD_MESSAGE </dt>
-<dd class="description">The command/response message was invalid</dd>
-<dt>CUPS_SC_STATUS_IO_ERROR </dt>
-<dd class="description">An I/O error occurred</dd>
-<dt>CUPS_SC_STATUS_NONE </dt>
-<dd class="description">No status</dd>
-<dt>CUPS_SC_STATUS_NOT_IMPLEMENTED </dt>
-<dd class="description">Command not implemented</dd>
-<dt>CUPS_SC_STATUS_NO_RESPONSE </dt>
-<dd class="description">The device did not respond</dd>
-<dt>CUPS_SC_STATUS_OK </dt>
-<dd class="description">Operation succeeded</dd>
-<dt>CUPS_SC_STATUS_TIMEOUT </dt>
-<dd class="description">The backend did not respond</dd>
-<dt>CUPS_SC_STATUS_TOO_BIG </dt>
-<dd class="description">Response too big</dd>
+      <h3 class="enumeration"><a id="cups_sc_status_e">cups_sc_status_e</a></h3>
+        <p class="description">Response status codes</p>
+      <h4 class="constants">Constants</h4>
+      <dl>
+        <dt>CUPS_SC_STATUS_BAD_MESSAGE </dt>
+        <dd class="description">The command/response message was invalid</dd>
+        <dt>CUPS_SC_STATUS_IO_ERROR </dt>
+        <dd class="description">An I/O error occurred</dd>
+        <dt>CUPS_SC_STATUS_NONE </dt>
+        <dd class="description">No status</dd>
+        <dt>CUPS_SC_STATUS_NOT_IMPLEMENTED </dt>
+        <dd class="description">Command not implemented</dd>
+        <dt>CUPS_SC_STATUS_NO_RESPONSE </dt>
+        <dd class="description">The device did not respond</dd>
+        <dt>CUPS_SC_STATUS_OK </dt>
+        <dd class="description">Operation succeeded</dd>
+        <dt>CUPS_SC_STATUS_TIMEOUT </dt>
+        <dd class="description">The backend did not respond</dd>
+        <dt>CUPS_SC_STATUS_TOO_BIG </dt>
+        <dd class="description">Response too big</dd>
 </dl>
-</div>
-</body>
+    </div>
+  </body>
 </html>

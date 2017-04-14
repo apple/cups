@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html>
 <!-- SECTION: Programming -->
-<head>
-	<title>Introduction to the PPD Compiler	</title>
-	<meta name="keywords" content="Programming">
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
-<style type="text/css"><!--
+  <head>
+    <title>Introduction to the PPD Compiler</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
@@ -349,9 +351,8 @@ div.contents ul.subcontents li {
   text-indent: -1em;
 }
 --></style>
-</head>
-<body>
-<div class='body'>
+  </head>
+  <body>
 <!--
   PPD compiler documentation for CUPS.
 
@@ -390,23 +391,26 @@ that describe the features and capabilities of one or more printers.</P>
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#BASICS">The Basics</a></li>
-<li><a href="#DRV">Driver Information Files</a><ul class="subcontents">
-	<li><a href="#SIMPLE">A Simple Example</a></li>
-	<li><a href="#GROUPING">Grouping and Inheritance</a></li>
-	<li><a href="#COLOR">Color Support</a></li>
-	<li><a href="#OPTIONS">Defining Custom Options and Option Groups</a></li>
-	<li><a href="#DEFINE">Defining Constants</a></li>
-	<li><a href="#CONDITIONAL">Conditional Statements</a></li>
-	<li><a href="#CONSTRAINTS">Defining Constraints</a></li>
-</ul></li>
-<li><a href="#LOCALIZATION">Localization</a><ul class="subcontents">
-	<li><a href="#PPDPO">The ppdpo Utility</a></li>
-	<li><a href="#PPDC_CATALOG">Using Message Catalogs with the PPD Compiler</a></li>
-</ul></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#BASICS">The Basics</a></li>
+        <li><a href="#DRV">Driver Information Files</a><ul class="subcontents">
+          <li><a href="#SIMPLE">A Simple Example</a></li>
+          <li><a href="#GROUPING">Grouping and Inheritance</a></li>
+          <li><a href="#COLOR">Color Support</a></li>
+          <li><a href="#OPTIONS">Defining Custom Options and Option Groups</a></li>
+          <li><a href="#DEFINE">Defining Constants</a></li>
+          <li><a href="#CONDITIONAL">Conditional Statements</a></li>
+          <li><a href="#CONSTRAINTS">Defining Constraints</a></li>
+        </ul></li>
+        <li><a href="#LOCALIZATION">Localization</a><ul class="subcontents">
+          <li><a href="#PPDPO">The ppdpo Utility</a></li>
+          <li><a href="#PPDC_CATALOG">Using Message Catalogs with the PPD Compiler</a></li>
+        </ul></li>
+      </ul>
+    </div>
+    <div class="body">
 <h2 class='title'><a name='BASICS'>The Basics</a></h2>
 
 <P>The PPD compiler, <a href='man-ppdc.html'><code>ppdc(1)</code></a>, is a
@@ -1290,6 +1294,6 @@ ppdc -l de -d ppd/de mydrivers.drv
 </pre>
 
 <p>to generate German PPD files.</p>
-</div>
-</body>
+    </div>
+  </body>
 </html>

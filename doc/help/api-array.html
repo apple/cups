@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html>
 <!-- SECTION: Programming -->
-<head>
-	<title>Array API	</title>
-	<meta name="keywords" content="Programming">
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
-<style type="text/css"><!--
+  <head>
+    <title>Array API</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
@@ -349,9 +351,8 @@ div.contents ul.subcontents li {
   text-indent: -1em;
 }
 --></style>
-</head>
-<body>
-<div class='body'>
+  </head>
+  <body>
 <!--
   Array API header for CUPS.
 
@@ -384,44 +385,47 @@ div.contents ul.subcontents li {
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-	<li><a href="#MANAGING_ARRAYS">Managing Arrays</a></li>
-	<li><a href="#FINDING_AND_ENUMERATING">Finding and Enumerating Elements</a></li>
-</ul></li>
-<li><a href="#FUNCTIONS">Functions</a><ul class="code">
-	<li><a href="#cupsArrayAdd" title="Add an element to the array.">cupsArrayAdd</a></li>
-	<li><a href="#cupsArrayClear" title="Clear the array.">cupsArrayClear</a></li>
-	<li><a href="#cupsArrayCount" title="Get the number of elements in the array.">cupsArrayCount</a></li>
-	<li><a href="#cupsArrayCurrent" title="Return the current element in the array.">cupsArrayCurrent</a></li>
-	<li><a href="#cupsArrayDelete" title="Free all memory used by the array.">cupsArrayDelete</a></li>
-	<li><a href="#cupsArrayDup" title="Duplicate the array.">cupsArrayDup</a></li>
-	<li><a href="#cupsArrayFind" title="Find an element in the array.">cupsArrayFind</a></li>
-	<li><a href="#cupsArrayFirst" title="Get the first element in the array.">cupsArrayFirst</a></li>
-	<li><a href="#cupsArrayGetIndex" title="Get the index of the current element.">cupsArrayGetIndex</a></li>
-	<li><a href="#cupsArrayGetInsert" title="Get the index of the last inserted element.">cupsArrayGetInsert</a></li>
-	<li><a href="#cupsArrayIndex" title="Get the N-th element in the array.">cupsArrayIndex</a></li>
-	<li><a href="#cupsArrayInsert" title="Insert an element in the array.">cupsArrayInsert</a></li>
-	<li><a href="#cupsArrayLast" title="Get the last element in the array.">cupsArrayLast</a></li>
-	<li><a href="#cupsArrayNew" title="Create a new array.">cupsArrayNew</a></li>
-	<li><a href="#cupsArrayNew2" title="Create a new array with hash.">cupsArrayNew2</a></li>
-	<li><a href="#cupsArrayNew3" title="Create a new array with hash and/or free function.">cupsArrayNew3</a></li>
-	<li><a href="#cupsArrayNext" title="Get the next element in the array.">cupsArrayNext</a></li>
-	<li><a href="#cupsArrayPrev" title="Get the previous element in the array.">cupsArrayPrev</a></li>
-	<li><a href="#cupsArrayRemove" title="Remove an element from the array.">cupsArrayRemove</a></li>
-	<li><a href="#cupsArrayRestore" title="Reset the current element to the last cupsArraySave.">cupsArrayRestore</a></li>
-	<li><a href="#cupsArraySave" title="Mark the current element for a later cupsArrayRestore.">cupsArraySave</a></li>
-	<li><a href="#cupsArrayUserData" title="Return the user data for an array.">cupsArrayUserData</a></li>
-</ul></li>
-<li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_acopy_func_t" title="Array element copy function">cups_acopy_func_t</a></li>
-	<li><a href="#cups_afree_func_t" title="Array element free function">cups_afree_func_t</a></li>
-	<li><a href="#cups_ahash_func_t" title="Array hash function">cups_ahash_func_t</a></li>
-	<li><a href="#cups_array_func_t" title="Array comparison function">cups_array_func_t</a></li>
-	<li><a href="#cups_array_t" title="CUPS array type">cups_array_t</a></li>
-</ul></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+          <li><a href="#MANAGING_ARRAYS">Managing Arrays</a></li>
+          <li><a href="#FINDING_AND_ENUMERATING">Finding and Enumerating Elements</a></li>
+        </ul></li>
+        <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
+          <li><a href="#cupsArrayAdd">cupsArrayAdd</a></li>
+          <li><a href="#cupsArrayClear">cupsArrayClear</a></li>
+          <li><a href="#cupsArrayCount">cupsArrayCount</a></li>
+          <li><a href="#cupsArrayCurrent">cupsArrayCurrent</a></li>
+          <li><a href="#cupsArrayDelete">cupsArrayDelete</a></li>
+          <li><a href="#cupsArrayDup">cupsArrayDup</a></li>
+          <li><a href="#cupsArrayFind">cupsArrayFind</a></li>
+          <li><a href="#cupsArrayFirst">cupsArrayFirst</a></li>
+          <li><a href="#cupsArrayGetIndex">cupsArrayGetIndex</a></li>
+          <li><a href="#cupsArrayGetInsert">cupsArrayGetInsert</a></li>
+          <li><a href="#cupsArrayIndex">cupsArrayIndex</a></li>
+          <li><a href="#cupsArrayInsert">cupsArrayInsert</a></li>
+          <li><a href="#cupsArrayLast">cupsArrayLast</a></li>
+          <li><a href="#cupsArrayNew">cupsArrayNew</a></li>
+          <li><a href="#cupsArrayNew2">cupsArrayNew2</a></li>
+          <li><a href="#cupsArrayNew3">cupsArrayNew3</a></li>
+          <li><a href="#cupsArrayNext">cupsArrayNext</a></li>
+          <li><a href="#cupsArrayPrev">cupsArrayPrev</a></li>
+          <li><a href="#cupsArrayRemove">cupsArrayRemove</a></li>
+          <li><a href="#cupsArrayRestore">cupsArrayRestore</a></li>
+          <li><a href="#cupsArraySave">cupsArraySave</a></li>
+          <li><a href="#cupsArrayUserData">cupsArrayUserData</a></li>
+        </ul></li>
+        <li><a href="#TYPES">Data Types</a><ul class="subcontents">
+          <li><a href="#cups_acopy_func_t">cups_acopy_func_t</a></li>
+          <li><a href="#cups_afree_func_t">cups_afree_func_t</a></li>
+          <li><a href="#cups_ahash_func_t">cups_ahash_func_t</a></li>
+          <li><a href="#cups_array_func_t">cups_array_func_t</a></li>
+          <li><a href="#cups_array_t">cups_array_t</a></li>
+        </ul></li>
+      </ul>
+    </div>
+    <div class="body">
 <!--
   Array API introduction for CUPS.
 
@@ -616,264 +620,264 @@ char *s;
 for (s = (char *)<a href='#cupsArrayFirst'>cupsArrayFirst</a>(array); s != NULL; s = (char *)<a href='#cupsArrayNext'>cupsArrayNext</a>(array))
   puts(s);
 </pre>
-<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayAdd">cupsArrayAdd</a></h3>
-<p class="description">Add an element to the array.</p>
+      <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayAdd">cupsArrayAdd</a></h3>
+        <p class="description">Add an element to the array.</p>
 <p class="code">
-int cupsArrayAdd (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *e<br>
+int cupsArrayAdd (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br />
+&#160;&#160;&#160;&#160;void *e<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 <dt>e</dt>
-<dd class="description">Element</dd>
+        <dd class="description">Element</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
+        <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">When adding an element to a sorted array, non-unique elements are
+        <p class="discussion">When adding an element to a sorted array, non-unique elements are
 appended at the end of the run of identical elements.  For unsorted arrays,
 the element is appended to the end of the array.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayClear">cupsArrayClear</a></h3>
-<p class="description">Clear the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayClear">cupsArrayClear</a></h3>
+        <p class="description">Clear the array.</p>
 <p class="code">
-void cupsArrayClear (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void cupsArrayClear (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is equivalent to removing all elements in the array.
+        <p class="discussion">This function is equivalent to removing all elements in the array.
 The caller is responsible for freeing the memory used by the
 elements themselves.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayCount">cupsArrayCount</a></h3>
-<p class="description">Get the number of elements in the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayCount">cupsArrayCount</a></h3>
+        <p class="description">Get the number of elements in the array.</p>
 <p class="code">
-int cupsArrayCount (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+int cupsArrayCount (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Number of elements</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayCurrent">cupsArrayCurrent</a></h3>
-<p class="description">Return the current element in the array.</p>
+        <p class="description">Number of elements</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayCurrent">cupsArrayCurrent</a></h3>
+        <p class="description">Return the current element in the array.</p>
 <p class="code">
-void *cupsArrayCurrent (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayCurrent (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Element</p>
+        <p class="description">Element</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
 <a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayDelete">cupsArrayDelete</a></h3>
-<p class="description">Free all memory used by the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayDelete">cupsArrayDelete</a></h3>
+        <p class="description">Free all memory used by the array.</p>
 <p class="code">
-void cupsArrayDelete (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void cupsArrayDelete (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The caller is responsible for freeing the memory used by the
+        <p class="discussion">The caller is responsible for freeing the memory used by the
 elements themselves.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayDup">cupsArrayDup</a></h3>
-<p class="description">Duplicate the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayDup">cupsArrayDup</a></h3>
+        <p class="description">Duplicate the array.</p>
 <p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayDup (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+<a href="#cups_array_t">cups_array_t</a> *cupsArrayDup (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Duplicate array</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayFind">cupsArrayFind</a></h3>
-<p class="description">Find an element in the array.</p>
+        <p class="description">Duplicate array</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayFind">cupsArrayFind</a></h3>
+        <p class="description">Find an element in the array.</p>
 <p class="code">
-void *cupsArrayFind (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *e<br>
+void *cupsArrayFind (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br />
+&#160;&#160;&#160;&#160;void *e<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 <dt>e</dt>
-<dd class="description">Element</dd>
+        <dd class="description">Element</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Element found or <code>NULL</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayFirst">cupsArrayFirst</a></h3>
-<p class="description">Get the first element in the array.</p>
+        <p class="description">Element found or <code>NULL</code></p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayFirst">cupsArrayFirst</a></h3>
+        <p class="description">Get the first element in the array.</p>
 <p class="code">
-void *cupsArrayFirst (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayFirst (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">First element or <code>NULL</code> if the array is empty</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsArrayGetIndex">cupsArrayGetIndex</a></h3>
-<p class="description">Get the index of the current element.</p>
+        <p class="description">First element or <code>NULL</code> if the array is empty</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayGetIndex">cupsArrayGetIndex</a></h3>
+        <p class="description">Get the index of the current element.</p>
 <p class="code">
-int cupsArrayGetIndex (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+int cupsArrayGetIndex (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Index of the current element, starting at 0</p>
+        <p class="description">Index of the current element, starting at 0</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
 <a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsArrayGetInsert">cupsArrayGetInsert</a></h3>
-<p class="description">Get the index of the last inserted element.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayGetInsert">cupsArrayGetInsert</a></h3>
+        <p class="description">Get the index of the last inserted element.</p>
 <p class="code">
-int cupsArrayGetInsert (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+int cupsArrayGetInsert (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Index of the last inserted element, starting at 0</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayIndex">cupsArrayIndex</a></h3>
-<p class="description">Get the N-th element in the array.</p>
+        <p class="description">Index of the last inserted element, starting at 0</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayIndex">cupsArrayIndex</a></h3>
+        <p class="description">Get the N-th element in the array.</p>
 <p class="code">
-void *cupsArrayIndex (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int n<br>
+void *cupsArrayIndex (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br />
+&#160;&#160;&#160;&#160;int n<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 <dt>n</dt>
-<dd class="description">Index into array, starting at 0</dd>
+        <dd class="description">Index into array, starting at 0</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">N-th element or <code>NULL</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayInsert">cupsArrayInsert</a></h3>
-<p class="description">Insert an element in the array.</p>
+        <p class="description">N-th element or <code>NULL</code></p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayInsert">cupsArrayInsert</a></h3>
+        <p class="description">Insert an element in the array.</p>
 <p class="code">
-int cupsArrayInsert (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *e<br>
+int cupsArrayInsert (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br />
+&#160;&#160;&#160;&#160;void *e<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 <dt>e</dt>
-<dd class="description">Element</dd>
+        <dd class="description">Element</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">0 on failure, 1 on success</p>
+        <p class="description">0 on failure, 1 on success</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">When inserting an element in a sorted array, non-unique elements are
+        <p class="discussion">When inserting an element in a sorted array, non-unique elements are
 inserted at the beginning of the run of identical elements.  For unsorted
 arrays, the element is inserted at the beginning of the array.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayLast">cupsArrayLast</a></h3>
-<p class="description">Get the last element in the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayLast">cupsArrayLast</a></h3>
+        <p class="description">Get the last element in the array.</p>
 <p class="code">
-void *cupsArrayLast (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayLast (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Last element or <code>NULL</code> if the array is empty</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayNew">cupsArrayNew</a></h3>
-<p class="description">Create a new array.</p>
+        <p class="description">Last element or <code>NULL</code> if the array is empty</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayNew">cupsArrayNew</a></h3>
+        <p class="description">Create a new array.</p>
 <p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *d<br>
+<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br />
+&#160;&#160;&#160;&#160;void *d<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>f</dt>
-<dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
+        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
 <dt>d</dt>
-<dd class="description">User data pointer or <code>NULL</code></dd>
+        <dd class="description">User data pointer or <code>NULL</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Array</p>
+        <p class="description">Array</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
+        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
 receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
 data pointer argument can safely be omitted when not required so functions
 like <code>strcmp</code> can be used for sorted string arrays.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsArrayNew2">cupsArrayNew2</a></h3>
-<p class="description">Create a new array with hash.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayNew2">cupsArrayNew2</a></h3>
+        <p class="description">Create a new array with hash.</p>
 <p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew2 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *d,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int hsize<br>
+<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew2 (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br />
+&#160;&#160;&#160;&#160;void *d,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br />
+&#160;&#160;&#160;&#160;int hsize<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>f</dt>
-<dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
+        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
 <dt>d</dt>
-<dd class="description">User data or <code>NULL</code></dd>
+        <dd class="description">User data or <code>NULL</code></dd>
 <dt>h</dt>
-<dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
+        <dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
 <dt>hsize</dt>
-<dd class="description">Hash size (&gt;= 0)</dd>
+        <dd class="description">Hash size (&gt;= 0)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Array</p>
+        <p class="description">Array</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
+        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
 receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
 data pointer argument can safely be omitted when not required so functions
 like <code>strcmp</code> can be used for sorted string arrays.<br>
@@ -882,36 +886,36 @@ The hash function (&quot;h&quot;) is used to implement cached lookups with the
 specified hash size (&quot;hsize&quot;).
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/macOS 10.7&nbsp;</span><a name="cupsArrayNew3">cupsArrayNew3</a></h3>
-<p class="description">Create a new array with hash and/or free function.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="cupsArrayNew3">cupsArrayNew3</a></h3>
+        <p class="description">Create a new array with hash and/or free function.</p>
 <p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew3 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *d,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int hsize,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_acopy_func_t">cups_acopy_func_t</a> cf,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_afree_func_t">cups_afree_func_t</a> ff<br>
+<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew3 (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br />
+&#160;&#160;&#160;&#160;void *d,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br />
+&#160;&#160;&#160;&#160;int hsize,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_acopy_func_t">cups_acopy_func_t</a> cf,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_afree_func_t">cups_afree_func_t</a> ff<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>f</dt>
-<dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
+        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
 <dt>d</dt>
-<dd class="description">User data or <code>NULL</code></dd>
+        <dd class="description">User data or <code>NULL</code></dd>
 <dt>h</dt>
-<dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
+        <dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
 <dt>hsize</dt>
-<dd class="description">Hash size (&gt;= 0)</dd>
+        <dd class="description">Hash size (&gt;= 0)</dd>
 <dt>cf</dt>
-<dd class="description">Copy function</dd>
+        <dd class="description">Copy function</dd>
 <dt>ff</dt>
-<dd class="description">Free function</dd>
+        <dd class="description">Free function</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Array</p>
+        <p class="description">Array</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
+        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
 receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
 data pointer argument can safely be omitted when not required so functions
 like <code>strcmp</code> can be used for sorted string arrays.<br>
@@ -926,145 +930,145 @@ The free function (&quot;cf&quot;) is used to automatically free/release element
 removed or the array is deleted.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayNext">cupsArrayNext</a></h3>
-<p class="description">Get the next element in the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayNext">cupsArrayNext</a></h3>
+        <p class="description">Get the next element in the array.</p>
 <p class="code">
-void *cupsArrayNext (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayNext (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Next element or <code>NULL</code></p>
+        <p class="description">Next element or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)&quot;.<br>
+        <p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)&quot;.<br>
 <br>
 The next element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
 <a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
 to set the current element.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayPrev">cupsArrayPrev</a></h3>
-<p class="description">Get the previous element in the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayPrev">cupsArrayPrev</a></h3>
+        <p class="description">Get the previous element in the array.</p>
 <p class="code">
-void *cupsArrayPrev (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayPrev (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Previous element or <code>NULL</code></p>
+        <p class="description">Previous element or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) - 1)&quot;.<br>
+        <p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) - 1)&quot;.<br>
 <br>
 The previous element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
 <a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
 to set the current element.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayRemove">cupsArrayRemove</a></h3>
-<p class="description">Remove an element from the array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayRemove">cupsArrayRemove</a></h3>
+        <p class="description">Remove an element from the array.</p>
 <p class="code">
-int cupsArrayRemove (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *e<br>
+int cupsArrayRemove (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br />
+&#160;&#160;&#160;&#160;void *e<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 <dt>e</dt>
-<dd class="description">Element</dd>
+        <dd class="description">Element</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
+        <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">If more than one element matches &quot;e&quot;, only the first matching element is
+        <p class="discussion">If more than one element matches &quot;e&quot;, only the first matching element is
 removed.<br>
 <br>
 The caller is responsible for freeing the memory used by the
 removed element.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayRestore">cupsArrayRestore</a></h3>
-<p class="description">Reset the current element to the last <a href="#cupsArraySave"><code>cupsArraySave</code></a>.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayRestore">cupsArrayRestore</a></h3>
+        <p class="description">Reset the current element to the last <a href="#cupsArraySave"><code>cupsArraySave</code></a>.</p>
 <p class="code">
-void *cupsArrayRestore (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayRestore (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">New current element</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArraySave">cupsArraySave</a></h3>
-<p class="description">Mark the current element for a later <a href="#cupsArrayRestore"><code>cupsArrayRestore</code></a>.</p>
+        <p class="description">New current element</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArraySave">cupsArraySave</a></h3>
+        <p class="description">Mark the current element for a later <a href="#cupsArrayRestore"><code>cupsArrayRestore</code></a>.</p>
 <p class="code">
-int cupsArraySave (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+int cupsArraySave (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
+        <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
 <a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
 to set the current element.<br>
 <br>
 The save/restore stack is guaranteed to be at least 32 elements deep.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/macOS 10.5&nbsp;</span><a name="cupsArrayUserData">cupsArrayUserData</a></h3>
-<p class="description">Return the user data for an array.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayUserData">cupsArrayUserData</a></h3>
+        <p class="description">Return the user data for an array.</p>
 <p class="code">
-void *cupsArrayUserData (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
+void *cupsArrayUserData (<br />
+&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>a</dt>
-<dd class="description">Array</dd>
+        <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">User data</p>
-<h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><a name="cups_acopy_func_t">cups_acopy_func_t</a></h3>
-<p class="description">Array element copy function</p>
-<p class="code">
+        <p class="description">User data</p>
+      <h2 class="title"><a id="TYPES">Data Types</a></h2>
+      <h3 class="typedef"><a id="cups_acopy_func_t">cups_acopy_func_t</a></h3>
+        <p class="description">Array element copy function</p>
+      <p class="code">
 typedef void *(*cups_acopy_func_t)(void *element, void *data);
 </p>
-<h3 class="typedef"><a name="cups_afree_func_t">cups_afree_func_t</a></h3>
-<p class="description">Array element free function</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_afree_func_t">cups_afree_func_t</a></h3>
+        <p class="description">Array element free function</p>
+      <p class="code">
 typedef void (*cups_afree_func_t)(void *element, void *data);
 </p>
-<h3 class="typedef"><a name="cups_ahash_func_t">cups_ahash_func_t</a></h3>
-<p class="description">Array hash function</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_ahash_func_t">cups_ahash_func_t</a></h3>
+        <p class="description">Array hash function</p>
+      <p class="code">
 typedef int (*cups_ahash_func_t)(void *element, void *data);
 </p>
-<h3 class="typedef"><a name="cups_array_func_t">cups_array_func_t</a></h3>
-<p class="description">Array comparison function</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_array_func_t">cups_array_func_t</a></h3>
+        <p class="description">Array comparison function</p>
+      <p class="code">
 typedef int (*cups_array_func_t)(void *first, void *second, void *data);
 </p>
-<h3 class="typedef"><a name="cups_array_t">cups_array_t</a></h3>
-<p class="description">CUPS array type</p>
-<p class="code">
+      <h3 class="typedef"><a id="cups_array_t">cups_array_t</a></h3>
+        <p class="description">CUPS array type</p>
+      <p class="code">
 typedef struct _cups_array_s cups_array_t;
 </p>
-</div>
-</body>
+    </div>
+  </body>
 </html>

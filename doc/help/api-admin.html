@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html>
 <!-- SECTION: Programming -->
-<head>
-	<title>Administration APIs	</title>
-	<meta name="keywords" content="Programming">
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
-<style type="text/css"><!--
+  <head>
+    <title>Administration APIs</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
@@ -349,9 +351,8 @@ div.contents ul.subcontents li {
   text-indent: -1em;
 }
 --></style>
-</head>
-<body>
-<div class='body'>
+  </head>
+  <body>
 <!--
   Administrative API header for CUPS.
 
@@ -386,24 +387,26 @@ div.contents ul.subcontents li {
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-	<li><a href="#SETTINGS">Scheduler Settings</a></li>
-	<li><a href="#DEVICES">Devices</a></li>
-</ul></li>
-<li><a href="#FUNCTIONS">Functions</a><ul class="code">
-	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
-	<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
-	<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
-	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
-	<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
-</ul></li>
-<li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_device_cb_t" title="Device callback
-">cups_device_cb_t</a></li>
-</ul></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+          <li><a href="#SETTINGS">Scheduler Settings</a></li>
+          <li><a href="#DEVICES">Devices</a></li>
+        </ul></li>
+        <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
+          <li><a href="#cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></li>
+          <li><a href="#cupsAdminExportSamba">cupsAdminExportSamba</a></li>
+          <li><a href="#cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></li>
+          <li><a href="#cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></li>
+          <li><a href="#cupsGetDevices">cupsGetDevices</a></li>
+        </ul></li>
+        <li><a href="#TYPES">Data Types</a><ul class="subcontents">
+          <li><a href="#cups_device_cb_t">cups_device_cb_t</a></li>
+        </ul></li>
+      </ul>
+    </div>
+    <div class="body">
 <!--
   Administrative API documentation for CUPS.
 
@@ -500,143 +503,143 @@ show_devices(void)
   <a href="#cupsGetDevices">cupsGetDevices</a>(CUPS_HTTP_DEFAULT, 30, NULL, NULL, get_devices_cb, NULL);
 }
 </pre>
-<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></h3>
-<p class="description">Create the Windows PPD file for a printer.</p>
+      <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></h3>
+        <p class="description">Create the Windows PPD file for a printer.</p>
 <p class="code">
-char *cupsAdminCreateWindowsPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int bufsize<br>
+char *cupsAdminCreateWindowsPPD (<br />
+&#160;&#160;&#160;&#160;http_t *http,<br />
+&#160;&#160;&#160;&#160;const char *dest,<br />
+&#160;&#160;&#160;&#160;char *buffer,<br />
+&#160;&#160;&#160;&#160;int bufsize<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>dest</dt>
-<dd class="description">Printer or class</dd>
+        <dd class="description">Printer or class</dd>
 <dt>buffer</dt>
-<dd class="description">Filename buffer</dd>
+        <dd class="description">Filename buffer</dd>
 <dt>bufsize</dt>
-<dd class="description">Size of filename buffer</dd>
+        <dd class="description">Size of filename buffer</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file or NULL</p>
-<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminExportSamba">cupsAdminExportSamba</a></h3>
-<p class="description">Export a printer to Samba.</p>
+        <p class="description">PPD file or NULL</p>
+<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsAdminExportSamba">cupsAdminExportSamba</a></h3>
+        <p class="description">Export a printer to Samba.</p>
 <p class="code">
-int cupsAdminExportSamba (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *ppd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_server,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_user,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_password,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;FILE *logfile<br>
+int cupsAdminExportSamba (<br />
+&#160;&#160;&#160;&#160;const char *dest,<br />
+&#160;&#160;&#160;&#160;const char *ppd,<br />
+&#160;&#160;&#160;&#160;const char *samba_server,<br />
+&#160;&#160;&#160;&#160;const char *samba_user,<br />
+&#160;&#160;&#160;&#160;const char *samba_password,<br />
+&#160;&#160;&#160;&#160;FILE *logfile<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>dest</dt>
-<dd class="description">Destination to export</dd>
+        <dd class="description">Destination to export</dd>
 <dt>ppd</dt>
-<dd class="description">PPD file</dd>
+        <dd class="description">PPD file</dd>
 <dt>samba_server</dt>
-<dd class="description">Samba server</dd>
+        <dd class="description">Samba server</dd>
 <dt>samba_user</dt>
-<dd class="description">Samba username</dd>
+        <dd class="description">Samba username</dd>
 <dt>samba_password</dt>
-<dd class="description">Samba password</dd>
+        <dd class="description">Samba password</dd>
 <dt>logfile</dt>
-<dd class="description">Log file, if any</dd>
+        <dd class="description">Log file, if any</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
-<p class="description">Get settings from the server.</p>
+        <p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
+        <p class="description">Get settings from the server.</p>
 <p class="code">
-int cupsAdminGetServerSettings (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *num_settings,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t **settings<br>
+int cupsAdminGetServerSettings (<br />
+&#160;&#160;&#160;&#160;http_t *http,<br />
+&#160;&#160;&#160;&#160;int *num_settings,<br />
+&#160;&#160;&#160;&#160;cups_option_t **settings<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>num_settings</dt>
-<dd class="description">Number of settings</dd>
+        <dd class="description">Number of settings</dd>
 <dt>settings</dt>
-<dd class="description">Settings</dd>
+        <dd class="description">Settings</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
+        <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The returned settings should be freed with cupsFreeOptions() when
+        <p class="discussion">The returned settings should be freed with cupsFreeOptions() when
 you are done with them.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
-<p class="description">Set settings on the server.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
+        <p class="description">Set settings on the server.</p>
 <p class="code">
-int cupsAdminSetServerSettings (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int num_settings,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *settings<br>
+int cupsAdminSetServerSettings (<br />
+&#160;&#160;&#160;&#160;http_t *http,<br />
+&#160;&#160;&#160;&#160;int num_settings,<br />
+&#160;&#160;&#160;&#160;cups_option_t *settings<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>num_settings</dt>
-<dd class="description">Number of settings</dd>
+        <dd class="description">Number of settings</dd>
 <dt>settings</dt>
-<dd class="description">Settings</dd>
+        <dd class="description">Settings</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
-<p class="description">Get available printer devices.</p>
+        <p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsGetDevices">cupsGetDevices</a></h3>
+        <p class="description">Get available printer devices.</p>
 <p class="code">
-ipp_status_t cupsGetDevices (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *include_schemes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *exclude_schemes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_device_cb_t">cups_device_cb_t</a> callback,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+ipp_status_t cupsGetDevices (<br />
+&#160;&#160;&#160;&#160;http_t *http,<br />
+&#160;&#160;&#160;&#160;int timeout,<br />
+&#160;&#160;&#160;&#160;const char *include_schemes,<br />
+&#160;&#160;&#160;&#160;const char *exclude_schemes,<br />
+&#160;&#160;&#160;&#160;<a href="#cups_device_cb_t">cups_device_cb_t</a> callback,<br />
+&#160;&#160;&#160;&#160;void *user_data<br />
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>timeout</dt>
-<dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
+        <dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
 <dt>include_schemes</dt>
-<dd class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></dd>
+        <dd class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></dd>
 <dt>exclude_schemes</dt>
-<dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
+        <dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
 <dt>callback</dt>
-<dd class="description">Callback function</dd>
+        <dd class="description">Callback function</dd>
 <dt>user_data</dt>
-<dd class="description">User data pointer</dd>
+        <dd class="description">User data pointer</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Request status - <code>IPP_OK</code> on success.</p>
+        <p class="description">Request status - <code>IPP_OK</code> on success.</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
+        <p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
 devices to the specified callback function. The &quot;timeout&quot; parameter controls
 how long the request lasts, while the &quot;include_schemes&quot; and &quot;exclude_schemes&quot;
 parameters provide comma-delimited lists of backends to include or omit from
 the request respectively.
 
 </p>
-<h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
-<p class="description">Device callback
+      <h2 class="title"><a id="TYPES">Data Types</a></h2>
+      <h3 class="typedef"><a id="cups_device_cb_t"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span>cups_device_cb_t</a></h3>
+        <p class="description">Device callback
 </p>
-<p class="code">
+      <p class="code">
 typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
 </p>
-</div>
-</body>
+    </div>
+  </body>
 </html>

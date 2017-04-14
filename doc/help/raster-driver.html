@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!doctype html>
 <html>
 <!-- SECTION: Programming -->
-<head>
-	<title>Developing Raster Printer Drivers	</title>
-	<meta name="keywords" content="Programming">
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
-<style type="text/css"><!--
+  <head>
+    <title>Developing Raster Printer Drivers</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
@@ -349,9 +351,8 @@ div.contents ul.subcontents li {
   text-indent: -1em;
 }
 --></style>
-</head>
-<body>
-<div class='body'>
+  </head>
+  <body>
 <!--
   Raster printer driver documentation for CUPS.
 
@@ -382,14 +383,17 @@ div.contents ul.subcontents li {
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#BASICS">Printer Driver Basics</a></li>
-<li><a href="#CREATING">Creating New PPD Files</a></li>
-<li><a href="#FILTERS">Using Filters</a></li>
-<li><a href="#COLOR">Implementing Color Management</a></li>
-<li><a href="#MACOSX">Adding macOS Features</a></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#BASICS">Printer Driver Basics</a></li>
+        <li><a href="#CREATING">Creating New PPD Files</a></li>
+        <li><a href="#FILTERS">Using Filters</a></li>
+        <li><a href="#COLOR">Implementing Color Management</a></li>
+        <li><a href="#MACOSX">Adding macOS Features</a></li>
+      </ul>
+    </div>
+    <div class="body">
 <h2 class='title'><a name='BASICS'>Printer Driver Basics</a></h2>
 
 <p>A CUPS raster printer driver consists of a PostScript Printer Description (PPD) file that describes the features and capabilities of the device, one or more <em>filter</em> programs that prepare print data for the device, and zero or more support files for color management, online help, and so forth. The PPD file includes references to all of the filters and support files used by the driver.</p>
@@ -584,6 +588,6 @@ div.contents ul.subcontents li {
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterIconPath "" /Library/Printers/Vendor/filename.icns
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterPreset "name/text" "*option choice ..."
 </pre>
-</div>
-</body>
+    </div>
+  </body>
 </html>

@@ -29,6 +29,7 @@ berkeley/lpc
 berkeley/lpq
 berkeley/lpr
 berkeley/lprm
+cgi-bin/makedocset
 cgi-bin/testcgi
 cgi-bin/testhi
 cgi-bin/testhi.index
@@ -89,6 +90,7 @@ notifier/mailto
 notifier/rss
 notifier/testnotify
 packaging/cups.list
+org.cups.docset*
 patches
 ppdc/genstrings
 ppdc/ppd/
