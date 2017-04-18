@@ -1,5 +1,10 @@
-CHANGES.txt - 2.2.3 - 2017-03-28
+CHANGES.txt - 2.2.4 - 2017-04-18
 --------------------------------
+
+CHANGES IN CUPS V2.2.4
+
+	- The scheduler did not remote old job files (Issue #4987)
+
 
 CHANGES IN CUPS V2.2.3
 

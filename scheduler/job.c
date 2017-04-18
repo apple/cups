@@ -2745,7 +2745,7 @@ cupsdSetJobState(
 	  job->dirty = 1;
 	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
-	else if (!JobHistory && !job->printer)
+	else if (!job->printer)
 	{
 	 /*
 	  * Delete the job immediately if not actively printing...
