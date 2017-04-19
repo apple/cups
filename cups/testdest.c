@@ -218,9 +218,9 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
   (void)flags;
 
   if (dest->instance)
-    printf("%s/%s:\n", dest->name, dest->instance);
+    printf("%s%s/%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->instance);
   else
-    printf("%s:\n", dest->name);
+    printf("%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name);
 
   for (i = 0; i < dest->num_options; i ++)
     printf("    %s=\"%s\"\n", dest->options[i].name, dest->options[i].value);

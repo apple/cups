@@ -101,9 +101,10 @@ typedef struct _cups_dnssd_device_s	/* Enumerated device */
 #  else /* HAVE_AVAHI */
   AvahiRecordBrowser	*ref;		/* Browser for query */
 #  endif /* HAVE_DNSSD */
-  char			*domain,	/* Domain name */
-			*fullName,	/* Full name */
-			*regtype;	/* Registration type */
+  char			*fullName,	/* Full name */
+//			*serviceName,	/* Service name */
+			*regtype,	/* Registration type */
+			*domain;	/* Domain name */
   cups_ptype_t		type;		/* Device registration type */
   cups_dest_t		dest;		/* Destination record */
 } _cups_dnssd_device_t;
@@ -202,6 +203,7 @@ static void		cups_dnssd_query_cb(AvahiRecordBrowser *browser,
 					    AvahiLookupResultFlags flags,
 					    void *context);
 #  endif /* HAVE_DNSSD */
+static void		cups_dnssd_queue_name(char *name, const char *serviceName, size_t namesize);
 static const char	*cups_dnssd_resolve(cups_dest_t *dest, const char *uri,
 					    int msec, int *cancel,
 					    cups_dest_cb_t cb, void *user_data);
@@ -920,14 +922,13 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
 
 int					/* O - 1 on success, 0 on failure */
 cupsEnumDests(
-    unsigned       flags,		/* I - Enumeration flags */
-    int            msec,		/* I - Timeout in milliseconds,
-					 *     -1 for indefinite */
-    int            *cancel,		/* I - Pointer to "cancel" variable */
-    cups_ptype_t   type,		/* I - Printer type bits */
-    cups_ptype_t   mask,		/* I - Mask for printer type bits */
-    cups_dest_cb_t cb,			/* I - Callback function */
-    void           *user_data)		/* I - User data */
+  unsigned       flags,			/* I - Enumeration flags */
+  int            msec,			/* I - Timeout in milliseconds, -1 for indefinite */
+  int            *cancel,		/* I - Pointer to "cancel" variable */
+  cups_ptype_t   type,			/* I - Printer type bits */
+  cups_ptype_t   mask,			/* I - Mask for printer type bits */
+  cups_dest_cb_t cb,			/* I - Callback function */
+  void           *user_data)		/* I - User data */
 {
   int			i,		/* Looping var */
 			num_dests;	/* Number of destinations */
@@ -939,6 +940,7 @@ cupsEnumDests(
 			*user_default;	/* User default printer */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   int			count,		/* Number of queries started */
+			completed,	/* Number of completed queries */
 			remaining;	/* Remainder of timeout */
   _cups_dnssd_data_t	data;		/* Data for callback */
   _cups_dnssd_device_t	*device;	/* Current device */
@@ -1007,28 +1009,69 @@ cupsEnumDests(
       dest->is_default = 1;
   }
 
-  for (i = num_dests, dest = dests;
-       i > 0 && (!cancel || !*cancel);
-       i --, dest ++)
-    if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE,
-               dest))
-      break;
-
-  cupsFreeDests(num_dests, dests);
-
-  if (i > 0 || msec == 0)
-    return (1);
-
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
- /*
-  * Get Bonjour-shared printers...
-  */
-
   data.type      = type;
   data.mask      = mask;
   data.cb        = cb;
   data.user_data = user_data;
   data.devices   = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices, NULL, NULL, 0, NULL, (cups_afree_func_t)cups_dnssd_free_device);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+  for (i = num_dests, dest = dests;
+       i > 0 && (!cancel || !*cancel);
+       i --, dest ++)
+  {
+    const char *device_uri;		/* Device URI */
+
+    if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE,
+               dest))
+      break;
+
+    if (!dest->instance && (device_uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL && !strncmp(device_uri, "dnssd://", 8))
+    {
+     /*
+      * Add existing queue using service name, etc. so we don't list it again...
+      */
+
+      char	scheme[32],		/* URI scheme */
+		userpass[32],		/* Username:password */
+		serviceName[256],	/* Service name (host field) */
+		resource[256],		/* Resource (options) */
+		*regtype,		/* Registration type */
+		*replyDomain;		/* Registration domain */
+      int	port;			/* Port number (not used) */
+
+      if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), serviceName, sizeof(serviceName), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK)
+      {
+        if ((regtype = strstr(serviceName, "._ipp")) != NULL)
+	{
+	  *regtype++ = '\0';
+
+	  if ((replyDomain = strstr(regtype, "._tcp.")) != NULL)
+	  {
+	    replyDomain[5] = '\0';
+	    replyDomain += 6;
+
+	    if ((device = cups_dnssd_get_device(&data, serviceName, regtype, replyDomain)) != NULL)
+	      device->state = _CUPS_DNSSD_ACTIVE;
+	  }
+        }
+      }
+    }
+  }
+
+  cupsFreeDests(num_dests, dests);
+
+  if (i > 0 || msec == 0)
+  {
+    cupsArrayDelete(data.devices);
+    return (1);
+  }
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+ /*
+  * Get Bonjour-shared printers...
+  */
 
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
@@ -1105,27 +1148,25 @@ cupsEnumDests(
     pfd.fd     = main_fd;
     pfd.events = POLLIN;
 
-    nfds = poll(&pfd, 1, remaining > 250 ? 250 : remaining);
+    nfds = poll(&pfd, 1, remaining > 500 ? 500 : remaining);
 
 #    else
     FD_ZERO(&input);
     FD_SET(main_fd, &input);
 
     timeout.tv_sec  = 0;
-    timeout.tv_usec = remaining > 250 ? 250000 : remaining * 1000;
+    timeout.tv_usec = remaining > 500 ? 500000 : remaining * 1000;
 
     nfds = select(main_fd + 1, &input, NULL, NULL, &timeout);
 #    endif /* HAVE_POLL */
 
     if (nfds > 0)
       DNSServiceProcessResult(data.main_ref);
-    else if (nfds == 0)
-      remaining -= 250;
 
 #  else /* HAVE_AVAHI */
     data.got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(data.simple_poll, 250)) > 0)
+    if ((error = avahi_simple_poll_iterate(data.simple_poll, 500)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -1135,17 +1176,20 @@ cupsEnumDests(
       break;
     }
 
-    if (!data.got_data)
-      remaining -= 250;
 #  endif /* HAVE_DNSSD */
 
+    remaining -= 500;
+
     for (device = (_cups_dnssd_device_t *)cupsArrayFirst(data.devices),
-             count = 0;
+             count = 0, completed = 0;
          device;
          device = (_cups_dnssd_device_t *)cupsArrayNext(data.devices))
     {
       if (device->ref)
         count ++;
+
+      if (device->state == _CUPS_DNSSD_ACTIVE)
+        completed ++;
 
       if (!device->ref && device->state == _CUPS_DNSSD_NEW)
       {
@@ -1196,8 +1240,11 @@ cupsEnumDests(
       }
       else if (device->ref && device->state == _CUPS_DNSSD_PENDING)
       {
+        completed ++;
+
         if ((device->type & mask) == type)
         {
+	  DEBUG_printf(("1cupsEnumDests: Add callback for \"%s\".", device->dest.name));
 	  if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, &device->dest))
 	  {
 	    remaining = -1;
@@ -1208,6 +1255,9 @@ cupsEnumDests(
         device->state = _CUPS_DNSSD_ACTIVE;
       }
     }
+
+    if (completed == cupsArrayCount(data.devices))
+      break;
   }
 
   cupsArrayDelete(data.devices);
@@ -2964,8 +3014,9 @@ cups_dnssd_get_device(
 {
   _cups_dnssd_device_t	key,		/* Search key */
 			*device;	/* Device */
-  char			fullName[kDNSServiceMaxDomainName];
+  char			fullName[kDNSServiceMaxDomainName],
 					/* Full name for query */
+			name[128];	/* Queue name */
 
 
   DEBUG_printf(("5cups_dnssd_get_device(data=%p, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\")", (void *)data, serviceName, regtype, replyDomain));
@@ -2974,7 +3025,9 @@ cups_dnssd_get_device(
   * See if this is an existing device...
   */
 
-  key.dest.name = (char *)serviceName;
+  cups_dnssd_queue_name(name, serviceName, sizeof(name));
+
+  key.dest.name = name;
 
   if ((device = cupsArrayFind(data->devices, &key)) != NULL)
   {
@@ -3035,9 +3088,11 @@ cups_dnssd_get_device(
                   replyDomain));
 
     device            = calloc(sizeof(_cups_dnssd_device_t), 1);
-    device->dest.name = _cupsStrAlloc(serviceName);
+    device->dest.name = _cupsStrAlloc(name);
     device->domain    = _cupsStrAlloc(replyDomain);
     device->regtype   = _cupsStrAlloc(regtype);
+
+    device->dest.num_options = cupsAddOption("printer-info", serviceName, 0, &device->dest.options);
 
     cupsArrayAdd(data->devices, device);
   }
@@ -3047,11 +3102,9 @@ cups_dnssd_get_device(
   */
 
 #  ifdef HAVE_DNSSD
-  DNSServiceConstructFullName(fullName, device->dest.name, device->regtype,
-			      device->domain);
+  DNSServiceConstructFullName(fullName, serviceName, regtype, replyDomain);
 #  else /* HAVE_AVAHI */
-  avahi_service_name_join(fullName, kDNSServiceMaxDomainName, serviceName,
-                          regtype, replyDomain);
+  avahi_service_name_join(fullName, kDNSServiceMaxDomainName, serviceName, regtype, replyDomain);
 #  endif /* HAVE_DNSSD */
 
   _cupsStrFree(device->fullName);
@@ -3070,6 +3123,8 @@ cups_dnssd_get_device(
 
   if (device->state == _CUPS_DNSSD_ACTIVE)
   {
+    DEBUG_printf(("6cups_dnssd_get_device: Remove callback for \"%s\".", device->dest.name));
+
     (*data->cb)(data->user_data, CUPS_DEST_FLAGS_REMOVED, &device->dest);
     device->state = _CUPS_DNSSD_NEW;
   }
@@ -3128,7 +3183,10 @@ cups_dnssd_local_cb(
   }
 
   if (device->state == _CUPS_DNSSD_ACTIVE)
+  {
+    DEBUG_printf(("6cups_dnssd_local_cb: Remove callback for \"%s\".", device->dest.name));
     (*data->cb)(data->user_data, CUPS_DEST_FLAGS_REMOVED, &device->dest);
+  }
 
   device->state = _CUPS_DNSSD_LOCAL;
 }
@@ -3214,7 +3272,8 @@ cups_dnssd_query_cb(
 #  endif /* HAVE_DNSSD */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */
-  char			name[1024],	/* Service name */
+  char			serviceName[256],/* Service name */
+			name[128],	/* Queue name */
 			*ptr;		/* Pointer into string */
   _cups_dnssd_device_t	dkey,		/* Search key */
 			*device;	/* Device */
@@ -3255,14 +3314,16 @@ cups_dnssd_query_cb(
   * Lookup the service in the devices array.
   */
 
-  dkey.dest.name = name;
+  cups_dnssd_unquote(serviceName, fullName, sizeof(serviceName));
 
-  cups_dnssd_unquote(name, fullName, sizeof(name));
-
-  if ((ptr = strstr(name, "._")) != NULL)
+  if ((ptr = strstr(serviceName, "._")) != NULL)
     *ptr = '\0';
 
-  if ((device = cupsArrayFind(data->devices, &dkey)) != NULL)
+  cups_dnssd_queue_name(name, serviceName, sizeof(name));
+
+  dkey.dest.name = name;
+
+  if ((device = cupsArrayFind(data->devices, &dkey)) != NULL && device->state == _CUPS_DNSSD_NEW)
   {
    /*
     * Found it, pull out the make and model from the TXT record and save it...
@@ -3618,6 +3679,38 @@ cups_dnssd_unquote(char       *dst,	/* I - Destination buffer */
   *dst = '\0';
 }
 #endif /* HAVE_DNSSD */
+
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+/*
+ * 'cups_dnssd_queue_name()' - Create a local queue name based on the service name.
+ */
+
+static void
+cups_dnssd_queue_name(
+    char       *name,			/* I - Name buffer */
+    const char *serviceName,		/* I - Service name */
+    size_t     namesize)		/* I - Size of name buffer */
+{
+  const char	*ptr;			/* Pointer into serviceName */
+  char		*nameptr;		/* Pointer into name */
+
+
+  for (nameptr = name, ptr = serviceName; *ptr && nameptr < (name + namesize - 1); ptr ++)
+  {
+   /*
+    * Sanitize the printer name...
+    */
+
+    if (_cups_isalnum(*ptr))
+      *nameptr++ = *ptr;
+    else if (nameptr == name || nameptr[-1] != '_')
+      *nameptr++ = '_';
+  }
+
+  *nameptr = '\0';
+}
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
 /*
