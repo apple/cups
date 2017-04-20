@@ -3475,10 +3475,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
       free(statuses[i].if_defined);
     if (statuses[i].if_not_defined)
       free(statuses[i].if_not_defined);
-      if (statuses[i].define_match)
-        free(statuses[i].define_match);
-      if (statuses[i].define_no_match)
-        free(statuses[i].define_no_match);
+    if (statuses[i].define_match)
+      free(statuses[i].define_match);
+    if (statuses[i].define_no_match)
+      free(statuses[i].define_no_match);
   }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
