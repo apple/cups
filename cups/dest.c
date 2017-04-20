@@ -85,6 +85,7 @@ typedef struct _cups_dnssd_data_s	/* Enumeration data */
   AvahiSimplePoll	*simple_poll;	/* Polling interface */
   AvahiClient		*client;	/* Client information */
   int			got_data;	/* Did we get data? */
+  int			browsers;	/* How many browsers are running? */
 #  endif /* HAVE_DNSSD */
   cups_dest_cb_t	cb;		/* Callback */
   void			*user_data;	/* User data pointer */
@@ -102,7 +103,6 @@ typedef struct _cups_dnssd_device_s	/* Enumerated device */
   AvahiRecordBrowser	*ref;		/* Browser for query */
 #  endif /* HAVE_DNSSD */
   char			*fullName,	/* Full name */
-//			*serviceName,	/* Service name */
 			*regtype,	/* Registration type */
 			*domain;	/* Domain name */
   cups_ptype_t		type;		/* Device registration type */
@@ -1021,12 +1021,15 @@ cupsEnumDests(
        i > 0 && (!cancel || !*cancel);
        i --, dest ++)
   {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     const char *device_uri;		/* Device URI */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
     if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE,
                dest))
       break;
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     if (!dest->instance && (device_uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL && !strncmp(device_uri, "dnssd://", 8))
     {
      /*
@@ -1058,13 +1061,17 @@ cupsEnumDests(
         }
       }
     }
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
   }
 
   cupsFreeDests(num_dests, dests);
 
   if (i > 0 || msec == 0)
   {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     cupsArrayDelete(data.devices);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
     return (1);
   }
 
@@ -1122,10 +1129,12 @@ cupsEnumDests(
     return (1);
   }
 
+  data.browsers ++;
   ipp_ref  = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC,
 				       AVAHI_PROTO_UNSPEC, "_ipp._tcp", NULL,
 				       0, cups_dnssd_browse_cb, &data);
 #    ifdef HAVE_SSL
+  data.browsers ++;
   ipps_ref = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC,
 			               AVAHI_PROTO_UNSPEC, "_ipps._tcp", NULL,
 			               0, cups_dnssd_browse_cb, &data);
@@ -1166,7 +1175,7 @@ cupsEnumDests(
 #  else /* HAVE_AVAHI */
     data.got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(data.simple_poll, 500)) > 0)
+    if ((error = avahi_simple_poll_iterate(data.simple_poll, 1000)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -1176,6 +1185,7 @@ cupsEnumDests(
       break;
     }
 
+    DEBUG_printf(("1cupsEnumDests: got_data=%d", data.got_data));
 #  endif /* HAVE_DNSSD */
 
     remaining -= 500;
@@ -1227,14 +1237,14 @@ cupsEnumDests(
 						    cups_dnssd_query_cb,
 						    &data)) != NULL)
         {
+          DEBUG_printf(("1cupsEnumDests: browser ref=%p", device->ref));
 	  count ++;
 	}
 	else
 	{
 	  device->state = _CUPS_DNSSD_ERROR;
 
-	  DEBUG_printf(("1cupsEnumDests: Query failed: %s",
-	                avahi_strerror(avahi_client_errno(data.client))));
+	  DEBUG_printf(("1cupsEnumDests: Query failed: %s", avahi_strerror(avahi_client_errno(data.client))));
 	}
 #  endif /* HAVE_DNSSD */
       }
@@ -1256,8 +1266,17 @@ cupsEnumDests(
       }
     }
 
+#  ifdef HAVE_AVAHI
+    DEBUG_printf(("1cupsEnumDests: browsers=%d, completed=%d, count=%d, devices count=%d", data.browsers, completed, count, cupsArrayCount(data.devices)));
+
+    if (data.browsers == 0 && completed == cupsArrayCount(data.devices))
+      break;
+#  else
+    DEBUG_printf(("1cupsEnumDests: completed=%d, count=%d, devices count=%d", completed, count, cupsArrayCount(data.devices)));
+
     if (completed == cupsArrayCount(data.devices))
       break;
+#  endif /* HAVE_AVAHI */
   }
 
   cupsArrayDelete(data.devices);
@@ -2889,11 +2908,12 @@ cups_dnssd_browse_cb(
   (void)protocol;
   (void)context;
 
+  DEBUG_printf(("cups_dnssd_browse_cb(..., name=\"%s\", type=\"%s\", domain=\"%s\", ...);", name, type, domain));
+
   switch (event)
   {
     case AVAHI_BROWSER_FAILURE:
-	DEBUG_printf(("cups_dnssd_browse_cb: %s",
-		      avahi_strerror(avahi_client_errno(client))));
+	DEBUG_printf(("cups_dnssd_browse_cb: %s", avahi_strerror(avahi_client_errno(client))));
 	avahi_simple_poll_quit(data->simple_poll);
 	break;
 
@@ -2908,8 +2928,7 @@ cups_dnssd_browse_cb(
 	  * This comes from the local machine so ignore it.
 	  */
 
-	  DEBUG_printf(("cups_dnssd_browse_cb: Ignoring local service \"%s\".",
-	                name));
+	  DEBUG_printf(("cups_dnssd_browse_cb: Ignoring local service \"%s\".", name));
 	}
 	else
 	{
@@ -2921,9 +2940,13 @@ cups_dnssd_browse_cb(
 	}
 	break;
 
-    case AVAHI_BROWSER_REMOVE:
-    case AVAHI_BROWSER_ALL_FOR_NOW:
-    case AVAHI_BROWSER_CACHE_EXHAUSTED:
+    case AVAHI_BROWSER_REMOVE :
+    case AVAHI_BROWSER_CACHE_EXHAUSTED :
+        break;
+
+    case AVAHI_BROWSER_ALL_FOR_NOW :
+        DEBUG_puts("cups_dnssd_browse_cb: ALL_FOR_NOW");
+        data->browsers --;
         break;
   }
 }
@@ -2944,6 +2967,8 @@ cups_dnssd_client_cb(
 
 
   (void)client;
+
+  DEBUG_printf(("cups_dnssd_client_cb(client=%p, state=%d, context=%p)", client, state, context));
 
  /*
   * If the connection drops, quit.
@@ -3214,16 +3239,22 @@ cups_dnssd_poll_cb(
   int			val;		/* Return value */
 
 
+  DEBUG_printf(("cups_dnssd_poll_cb(pollfds=%p, num_pollfds=%d, timeout=%d, context=%p)", pollfds, num_pollfds, timeout, context));
+
   (void)timeout;
 
-  val = poll(pollfds, num_pollfds, 250);
+  val = poll(pollfds, num_pollfds, 500);
+
+  DEBUG_printf(("cups_dnssd_poll_cb: poll() returned %d", val));
 
   if (val < 0)
   {
     DEBUG_printf(("cups_dnssd_poll_cb: %s", strerror(errno)));
   }
   else if (val > 0)
+  {
     data->got_data = 1;
+  }
 
   return (val);
 }
@@ -3290,11 +3321,7 @@ cups_dnssd_query_cb(
     return;
 
 #  else /* HAVE_AVAHI */
-  DEBUG_printf(("5cups_dnssd_query_cb(browser=%p, interfaceIndex=%d, "
-		"protocol=%d, event=%d, fullName=\"%s\", rrclass=%u, "
-		"rrtype=%u, rdata=%p, rdlen=%u, flags=%x, context=%p)",
-		browser, interfaceIndex, protocol, event, fullName, rrclass,
-		rrtype, rdata, (unsigned)rdlen, flags, context));
+  DEBUG_printf(("cups_dnssd_query_cb(browser=%p, interfaceIndex=%d, protocol=%d, event=%d, fullName=\"%s\", rrclass=%u, rrtype=%u, rdata=%p, rdlen=%u, flags=%x, context=%p)", browser, interfaceIndex, protocol, event, fullName, rrclass, rrtype, rdata, (unsigned)rdlen, flags, context));
 
  /*
   * Only process "add" data...
@@ -3303,8 +3330,7 @@ cups_dnssd_query_cb(
   if (event != AVAHI_BROWSER_NEW)
   {
     if (event == AVAHI_BROWSER_FAILURE)
-      DEBUG_printf(("cups_dnssd_query_cb: %s",
-		    avahi_strerror(avahi_client_errno(client))));
+      DEBUG_printf(("cups_dnssd_query_cb: %s", avahi_strerror(avahi_client_errno(client))));
 
     return;
   }
