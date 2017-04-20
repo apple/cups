@@ -207,7 +207,6 @@ static void		cups_dnssd_query_cb(AvahiRecordBrowser *browser,
 					    AvahiLookupResultFlags flags,
 					    void *context);
 #  endif /* HAVE_DNSSD */
-static void		cups_dnssd_queue_name(char *name, const char *serviceName, size_t namesize);
 static const char	*cups_dnssd_resolve(cups_dest_t *dest, const char *uri,
 					    int msec, int *cancel,
 					    cups_dest_cb_t cb, void *user_data);
@@ -226,6 +225,7 @@ static int		cups_get_dests(const char *filename, const char *match_name,
 				       int num_dests, cups_dest_t **dests);
 static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
 			                  size_t bufsize);
+static void		cups_queue_name(char *name, const char *serviceName, size_t namesize);
 
 
 /*
@@ -1504,6 +1504,7 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
 		hostname[256],		/* Hostname from URI */
 		resource[1024],		/* Resource path from URI */
 		*ptr;			/* Pointer into string */
+  const char	*info;			/* printer-info string */
   int		port;			/* Port number from URI */
 
 
@@ -1525,7 +1526,11 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
     return (NULL);
   }
 
-  if (!name)
+  if (name)
+  {
+    info = name;
+  }
+  else
   {
    /*
     * Create the name from the URI...
@@ -1537,24 +1542,29 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
       * Use the service instance name...
       */
 
-      if ((ptr = strchr(hostname, '.')) != NULL)
+      if ((ptr = strstr(hostname, "._")) != NULL)
         *ptr = '\0';
 
-      name = hostname;
+      cups_queue_name(temp, hostname, sizeof(temp));
+      name = temp;
+      info = hostname;
     }
     else if (!strncmp(resource, "/classes/", 9))
     {
       snprintf(temp, sizeof(temp), "%s @ %s", resource + 9, hostname);
-      name = temp;
+      name = resource + 9;
+      info = temp;
     }
     else if (!strncmp(resource, "/printers/", 10))
     {
       snprintf(temp, sizeof(temp), "%s @ %s", resource + 10, hostname);
-      name = temp;
+      name = resource + 10;
+      info = temp;
     }
     else
     {
       name = hostname;
+      info = hostname;
     }
   }
 
@@ -1570,7 +1580,7 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
 
   dest->name        = _cupsStrAlloc(name);
   dest->num_options = cupsAddOption("device-uri", uri, dest->num_options, &(dest->options));
-  dest->num_options = cupsAddOption("printer-info", name, dest->num_options, &(dest->options));
+  dest->num_options = cupsAddOption("printer-info", info, dest->num_options, &(dest->options));
 
   return (dest);
 }
@@ -3051,7 +3061,7 @@ cups_dnssd_get_device(
   * See if this is an existing device...
   */
 
-  cups_dnssd_queue_name(name, serviceName, sizeof(name));
+  cups_queue_name(name, serviceName, sizeof(name));
 
   key.dest.name = name;
 
@@ -3346,7 +3356,7 @@ cups_dnssd_query_cb(
   if ((ptr = strstr(serviceName, "._")) != NULL)
     *ptr = '\0';
 
-  cups_dnssd_queue_name(name, serviceName, sizeof(name));
+  cups_queue_name(name, serviceName, sizeof(name));
 
   dkey.dest.name = name;
 
@@ -3542,8 +3552,6 @@ cups_dnssd_query_cb(
     * Save the printer-xxx values...
     */
 
-    device->dest.num_options = cupsAddOption("printer-info", name, device->dest.num_options, &device->dest.options);
-
     if (make_and_model[0])
     {
       strlcat(make_and_model, " ", sizeof(make_and_model));
@@ -3706,38 +3714,6 @@ cups_dnssd_unquote(char       *dst,	/* I - Destination buffer */
   *dst = '\0';
 }
 #endif /* HAVE_DNSSD */
-
-
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-/*
- * 'cups_dnssd_queue_name()' - Create a local queue name based on the service name.
- */
-
-static void
-cups_dnssd_queue_name(
-    char       *name,			/* I - Name buffer */
-    const char *serviceName,		/* I - Service name */
-    size_t     namesize)		/* I - Size of name buffer */
-{
-  const char	*ptr;			/* Pointer into serviceName */
-  char		*nameptr;		/* Pointer into name */
-
-
-  for (nameptr = name, ptr = serviceName; *ptr && nameptr < (name + namesize - 1); ptr ++)
-  {
-   /*
-    * Sanitize the printer name...
-    */
-
-    if (_cups_isalnum(*ptr))
-      *nameptr++ = *ptr;
-    else if (nameptr == name || nameptr[-1] != '_')
-      *nameptr++ = '_';
-  }
-
-  *nameptr = '\0';
-}
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
 /*
@@ -4167,4 +4143,34 @@ cups_make_string(
   *ptr = '\0';
 
   return (buffer);
+}
+
+
+/*
+ * 'cups_queue_name()' - Create a local queue name based on the service name.
+ */
+
+static void
+cups_queue_name(
+    char       *name,			/* I - Name buffer */
+    const char *serviceName,		/* I - Service name */
+    size_t     namesize)		/* I - Size of name buffer */
+{
+  const char	*ptr;			/* Pointer into serviceName */
+  char		*nameptr;		/* Pointer into name */
+
+
+  for (nameptr = name, ptr = serviceName; *ptr && nameptr < (name + namesize - 1); ptr ++)
+  {
+   /*
+    * Sanitize the printer name...
+    */
+
+    if (_cups_isalnum(*ptr))
+      *nameptr++ = *ptr;
+    else if (nameptr == name || nameptr[-1] != '_')
+      *nameptr++ = '_';
+  }
+
+  *nameptr = '\0';
 }
