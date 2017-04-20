@@ -60,6 +60,10 @@
 #  define kUseLastPrinter	CFSTR("UseLastPrinter")
 #endif /* __APPLE__ */
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+#  define _CUPS_DNSSD_MAXTIME	500	/* Milliseconds for maximum quantum of time */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
 
 /*
  * Types...
@@ -211,6 +215,7 @@ static int		cups_dnssd_resolve_cb(void *context);
 static void		cups_dnssd_unquote(char *dst, const char *src,
 			                   size_t dstsize);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+static int		cups_elapsed(struct timeval *t);
 static int		cups_find_dest(const char *name, const char *instance,
 				       int num_dests, cups_dest_t *dests, int prev,
 				       int *rdiff);
@@ -942,6 +947,7 @@ cupsEnumDests(
   int			count,		/* Number of queries started */
 			completed,	/* Number of completed queries */
 			remaining;	/* Remainder of timeout */
+  struct timeval	curtime;	/* Current time */
   _cups_dnssd_data_t	data;		/* Data for callback */
   _cups_dnssd_device_t	*device;	/* Current device */
 #  ifdef HAVE_DNSSD
@@ -1129,15 +1135,12 @@ cupsEnumDests(
     return (1);
   }
 
-  data.browsers ++;
-  ipp_ref  = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC,
-				       AVAHI_PROTO_UNSPEC, "_ipp._tcp", NULL,
-				       0, cups_dnssd_browse_cb, &data);
+  data.browsers = 1;
+  ipp_ref = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, "_ipp._tcp", NULL, 0, cups_dnssd_browse_cb, &data);
+
 #    ifdef HAVE_SSL
   data.browsers ++;
-  ipps_ref = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC,
-			               AVAHI_PROTO_UNSPEC, "_ipps._tcp", NULL,
-			               0, cups_dnssd_browse_cb, &data);
+  ipps_ref = avahi_service_browser_new(data.client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, "_ipps._tcp", NULL, 0, cups_dnssd_browse_cb, &data);
 #    endif /* HAVE_SSL */
 #  endif /* HAVE_DNSSD */
 
@@ -1152,19 +1155,23 @@ cupsEnumDests(
     * Check for input...
     */
 
+    DEBUG_printf(("1cupsEnumDests: remaining=%d", remaining));
+
+    cups_elapsed(&curtime);
+
 #  ifdef HAVE_DNSSD
 #    ifdef HAVE_POLL
     pfd.fd     = main_fd;
     pfd.events = POLLIN;
 
-    nfds = poll(&pfd, 1, remaining > 500 ? 500 : remaining);
+    nfds = poll(&pfd, 1, remaining > _CUPS_DNSSD_MAXTIME ? _CUPS_DNSSD_MAXTIME : remaining);
 
 #    else
     FD_ZERO(&input);
     FD_SET(main_fd, &input);
 
     timeout.tv_sec  = 0;
-    timeout.tv_usec = remaining > 500 ? 500000 : remaining * 1000;
+    timeout.tv_usec = 1000 * (remaining > _CUPS_DNSSD_MAXTIME ? _CUPS_DNSSD_MAXTIME : remaining);
 
     nfds = select(main_fd + 1, &input, NULL, NULL, &timeout);
 #    endif /* HAVE_POLL */
@@ -1175,7 +1182,7 @@ cupsEnumDests(
 #  else /* HAVE_AVAHI */
     data.got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(data.simple_poll, 1000)) > 0)
+    if ((error = avahi_simple_poll_iterate(data.simple_poll, _CUPS_DNSSD_MAXTIME)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -1188,7 +1195,7 @@ cupsEnumDests(
     DEBUG_printf(("1cupsEnumDests: got_data=%d", data.got_data));
 #  endif /* HAVE_DNSSD */
 
-    remaining -= 500;
+    remaining -= cups_elapsed(&curtime);
 
     for (device = (_cups_dnssd_device_t *)cupsArrayFirst(data.devices),
              count = 0, completed = 0;
@@ -1227,17 +1234,9 @@ cupsEnumDests(
 	}
 
 #  else /* HAVE_AVAHI */
-	if ((device->ref = avahi_record_browser_new(data.client,
-	                                            AVAHI_IF_UNSPEC,
-						    AVAHI_PROTO_UNSPEC,
-						    device->fullName,
-						    AVAHI_DNS_CLASS_IN,
-						    AVAHI_DNS_TYPE_TXT,
-						    0,
-						    cups_dnssd_query_cb,
-						    &data)) != NULL)
+	if ((device->ref = avahi_record_browser_new(data.client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, device->fullName, AVAHI_DNS_CLASS_IN, AVAHI_DNS_TYPE_TXT, 0, cups_dnssd_query_cb, &data)) != NULL)
         {
-          DEBUG_printf(("1cupsEnumDests: browser ref=%p", device->ref));
+          DEBUG_printf(("1cupsEnumDests: Query ref=%p", device->ref));
 	  count ++;
 	}
 	else
@@ -1251,6 +1250,8 @@ cupsEnumDests(
       else if (device->ref && device->state == _CUPS_DNSSD_PENDING)
       {
         completed ++;
+
+        DEBUG_printf(("1cupsEnumDests: Query for \"%s\" is complete.", device->fullName));
 
         if ((device->type & mask) == type)
         {
@@ -1267,12 +1268,12 @@ cupsEnumDests(
     }
 
 #  ifdef HAVE_AVAHI
-    DEBUG_printf(("1cupsEnumDests: browsers=%d, completed=%d, count=%d, devices count=%d", data.browsers, completed, count, cupsArrayCount(data.devices)));
+    DEBUG_printf(("1cupsEnumDests: remaining=%d, browsers=%d, completed=%d, count=%d, devices count=%d", remaining, data.browsers, completed, count, cupsArrayCount(data.devices)));
 
     if (data.browsers == 0 && completed == cupsArrayCount(data.devices))
       break;
 #  else
-    DEBUG_printf(("1cupsEnumDests: completed=%d, count=%d, devices count=%d", completed, count, cupsArrayCount(data.devices)));
+    DEBUG_printf(("1cupsEnumDests: remaining=%d, completed=%d, count=%d, devices count=%d", remaining, completed, count, cupsArrayCount(data.devices)));
 
     if (completed == cupsArrayCount(data.devices))
       break;
@@ -3243,7 +3244,7 @@ cups_dnssd_poll_cb(
 
   (void)timeout;
 
-  val = poll(pollfds, num_pollfds, 500);
+  val = poll(pollfds, num_pollfds, _CUPS_DNSSD_MAXTIME);
 
   DEBUG_printf(("cups_dnssd_poll_cb: poll() returned %d", val));
 
@@ -3739,6 +3740,27 @@ cups_dnssd_queue_name(
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
+/*
+ * 'cups_elapsed()' - Return the elapsed time in milliseconds.
+ */
+
+static int				/* O  - Elapsed time in milliseconds */
+cups_elapsed(struct timeval *t)		/* IO - Previous time */
+{
+  int			msecs;		/* Milliseconds */
+  struct timeval	nt;		/* New time */
+
+
+  gettimeofday(&nt, NULL);
+
+  msecs = 1000 * (nt.tv_sec - t->tv_sec) + (nt.tv_usec - t->tv_usec) / 1000;
+
+  *t = nt;
+
+  return (msecs);
+}
+
+ 
 /*
  * 'cups_find_dest()' - Find a destination using a binary search.
  */
