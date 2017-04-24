@@ -1,7 +1,7 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2007-2016 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -161,7 +161,7 @@ AC_CHECK_FUNCS(statfs statvfs)
 
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup strlcat strlcpy)
-if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then
+if test "$host_os_name" = "hp-ux" -a "$host_os_version" = "1020"; then
 	echo Forcing snprintf emulation for HP-UX.
 else
 	AC_CHECK_FUNCS(snprintf vsnprintf)
@@ -180,8 +180,8 @@ dnl Check for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
 
 dnl Checks for signal functions.
-case "$uname" in
-	Linux | GNU)
+case "$host_os_name" in
+	linux | gnu)
 		# Do not use sigset on Linux or GNU HURD
 		;;
 	*)
@@ -229,7 +229,7 @@ AC_SUBST(LIBUSB)
 AC_SUBST(USBQUIRKS)
 
 if test "x$PKGCONFIG" != x; then
-	if test x$enable_libusb != xno -a $uname != Darwin; then
+	if test x$enable_libusb != xno -a $host_os_name != darwin; then
 		AC_MSG_CHECKING(for libusb-1.0)
 		if $PKGCONFIG --exists libusb-1.0; then
 			AC_MSG_RESULT(yes)
@@ -277,8 +277,8 @@ AC_SUBST(INSTALL_GZIP)
 AC_SUBST(LIBZ)
 
 dnl Flags for "ar" command...
-case $uname in
-        Darwin* | *BSD*)
+case $host_os_name in
+        darwin* | *bsd*)
                 ARFLAGS="-rcv"
                 ;;
         *)
@@ -313,7 +313,7 @@ DBUSDIR=""
 DBUS_NOTIFIER=""
 DBUS_NOTIFIERLIBS=""
 
-if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x -a "x$uname" != xDarwin; then
+if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x -a "x$host_os_name" != xdarwin; then
 	AC_MSG_CHECKING(for DBUS)
 	if $PKGCONFIG --exists dbus-1; then
 		AC_MSG_RESULT(yes)
@@ -347,8 +347,8 @@ CUPS_DEFAULT_SYSTEM_AUTHKEY=""
 CUPS_SYSTEM_AUTHKEY=""
 INSTALLXPC=""
 
-case $uname in
-        Darwin*)
+case $host_os_name in
+        darwin*)
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 SERVERLIBS="$SERVERLIBS -framework IOKit -weak_framework ApplicationServices"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
@@ -406,10 +406,10 @@ case $uname in
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
 		dnl Check for sandbox/Seatbelt support
-		if test $uversion -ge 100; then
+		if test $host_os_version -ge 100; then
 			AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
 		fi
-		if test $uversion -ge 110 -a $uversion -lt 120; then
+		if test $host_os_version -ge 110 -a $host_os_version -lt 120; then
 			# Broken public headers in 10.7.x...
 			AC_MSG_CHECKING(for sandbox/private.h presence)
 			if test -f /usr/local/include/sandbox/private.h; then

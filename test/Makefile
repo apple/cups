@@ -1,7 +1,7 @@
 #
 # IPP test makefile for CUPS.
 #
-# Copyright 2007-2016 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -58,7 +58,7 @@ TARGETS		=	\
 			$(IPPFIND_BIN) \
 			ippserver \
 			ipptool \
-			ipptool-static
+			$(LOCALTARGET)
 
 
 #
@@ -87,7 +87,8 @@ unittests:
 #
 
 clean:
-	$(RM) $(TARGETS) $(OBJS) ippfind-static ippserver-shared
+	$(RM) $(TARGETS) $(OBJS)
+	$(RM) ippserver ippserver-shared ipptool-static
 
 
 #
@@ -167,6 +168,13 @@ uninstall:
 		$(RM) $(DATADIR)/ipptool/$$file; \
 	done
 	-$(RMDIR) $(DATADIR)/ipptool
+
+
+#
+# Local programs (not built when cross-compiling...)
+#
+
+local:	ippserver ippserver-shared ipptool-static
 
 
 #

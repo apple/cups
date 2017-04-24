@@ -148,6 +148,7 @@ test/error_log-*
 test/ippfind
 test/ippfind-static
 test/ippserver
+test/ippserver-shared
 test/ipptool
 test/ipptool-static
 xcode/CUPS.xcodeproj/project.xcworkspace/

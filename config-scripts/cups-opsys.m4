@@ -1,7 +1,7 @@
 dnl
 dnl Operating system stuff for CUPS.
 dnl
-dnl Copyright 2007-2012 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -11,23 +11,23 @@ dnl which should have been included with this file.  If this file is
 dnl missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-dnl Get the operating system, version number, and architecture...
-uname=`uname`
-uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
-uarch=`uname -m`
+dnl Get the build and host platforms and split the host_os value
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
 
-case "$uname" in
-	Darwin*)
-		uname="Darwin"
-		if test $uversion -lt 120; then
-			AC_MSG_ERROR([Sorry, this version of CUPS requires macOS 10.8 or higher.])
-		fi
-		;;
+[host_os_name=`echo $host_os | sed -e '1,$s/[0-9.]*$//g'`]
+[host_os_version=`echo $host_os | sed -e '1,$s/^[^0-9.]*//g' | awk -F. '{print $1 $2}'`]
 
-	GNU* | GNU/*)
-		uname="GNU"
-		;;
-	Linux*)
-		uname="Linux"
-		;;
-esac
+if test "$host_os_name" = darwin -a $host_os_version -lt 120; then
+        AC_MSG_ERROR([Sorry, this version of CUPS requires macOS 10.8 or higher.])
+fi
+
+dnl Determine whether we are cross-compiling...
+if test "$build" = "$host"; then
+        # No, build local targets
+	LOCALTARGET="local"
+else
+        # Yes, don't build local targets
+	LOCALTARGET=""
+fi
+AC_SUBST(LOCALTARGET)

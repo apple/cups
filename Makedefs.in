@@ -73,6 +73,14 @@ INSTALL_LANGUAGES =	@INSTALL_LANGUAGES@
 UNINSTALL_LANGUAGES =	@UNINSTALL_LANGUAGES@
 
 #
+# Cross-compilation support: "local" target is used for any tools that are
+# built and run locally.
+#
+
+LOCALTARGET     =       @LOCALTARGET@
+
+
+#
 # Libraries...
 #
 

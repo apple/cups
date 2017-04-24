@@ -1,7 +1,7 @@
 #
 # Makefile for the CUPS PPD Compiler.
 #
-# Copyright 2007-2016 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 2002-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -68,7 +68,7 @@ EXECTARGETS =	\
 TARGETS	=	\
 		$(LIBTARGETS) \
 		$(EXECTARGETS) \
-		genstrings
+		$(LOCALTARGET)
 
 
 #
@@ -99,7 +99,7 @@ unittests:	$(UNITTARGETS)
 clean:
 	$(RM) $(OBJS) core
 	$(RM) *.bak *.bck core.*
-	$(RM) $(TARGETS) $(UNITTARGETS)
+	$(RM) $(TARGETS) $(UNITTARGETS) genstrings
 	$(RM) -r ppd ppd2
 	$(RM) sample-import.drv sample.c test.drv
 	$(RM) libcupsppdc.so libcupsppdc.dylib
@@ -209,6 +209,13 @@ uninstall:
 		$(RM) $(PRIVATEINCLUDE)/ppdc.h; \
 		$(RMDIR) $(PRIVATEINCLUDE); \
 	fi
+
+
+#
+# Local programs (not built when cross-compiling...)
+#
+
+local:	genstrings
 
 
 #

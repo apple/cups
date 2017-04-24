@@ -1,7 +1,7 @@
 dnl
 dnl PAM stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -52,8 +52,8 @@ if test x$enable_pam != xno; then
 
 	LIBS="$SAVELIBS"
 
-	case "$uname" in
-		Darwin*)
+	case "$host_os_name" in
+		marwin*)
 			# Darwin/macOS
 			if test "x$with_pam_module" != x; then
 				PAMFILE="pam.$with_pam_module"

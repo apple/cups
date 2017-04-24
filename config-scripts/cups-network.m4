@@ -28,7 +28,7 @@ AC_SEARCH_LIBS(__res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT),
 
 # Tru64 5.1b leaks file descriptors with these functions; disable until
 # we can come up with a test for this...
-if test "$uname" != "OSF1"; then
+if test "$host_os_name" != "osf1"; then
 	AC_SEARCH_LIBS(getaddrinfo, nsl, AC_DEFINE(HAVE_GETADDRINFO))
 	AC_SEARCH_LIBS(getnameinfo, nsl, AC_DEFINE(HAVE_GETNAMEINFO))
 fi
@@ -45,8 +45,8 @@ AC_ARG_WITH(domainsocket, [  --with-domainsocket     set unix domain socket name
 
 if test x$enable_domainsocket != xno -a x$default_domainsocket != xno; then
 	if test "x$default_domainsocket" = x; then
-		case "$uname" in
-			Darwin*)
+		case "$host_os_name" in
+			darwin*)
 				# Darwin and macOS do their own thing...
 				CUPS_DEFAULT_DOMAINSOCKET="$localstatedir/run/cupsd"
 				;;

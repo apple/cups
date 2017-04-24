@@ -1,7 +1,7 @@
 dnl
 dnl GSSAPI/Kerberos library detection for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl This file contains Kerberos support code, copyright 2006 by
@@ -22,8 +22,8 @@ AC_SUBST(LIBGSSAPI)
 if test x$enable_gssapi != xno; then
 	AC_PATH_TOOL(KRB5CONFIG, krb5-config)
 	if test "x$KRB5CONFIG" != x; then
-		case "$uname" in
-			Darwin)
+		case "$host_os_name" in
+			darwin)
 				# macOS weak-links to the Kerberos framework...
 				LIBGSSAPI="-weak_framework Kerberos"
 				AC_MSG_CHECKING(for GSS framework)
@@ -34,7 +34,7 @@ if test x$enable_gssapi != xno; then
 					AC_MSG_RESULT(no)
 				fi
 				;;
-			SunOS*)
+			sunos*)
 				# Solaris has a non-standard krb5-config, don't use it!
 				AC_CHECK_LIB(gss, gss_display_status,
 					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
@@ -52,13 +52,13 @@ if test x$enable_gssapi != xno; then
 		AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 	else
 		# Check for vendor-specific implementations...
-		case "$uname" in
-			HP-UX*)
+		case "$host_os_name" in
+			hp-ux*)
 				AC_CHECK_LIB(gss, gss_display_status,
 					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 					LIBGSSAPI="-lgss -lgssapi_krb5")
 				;;
-			SunOS*)
+			sunos*)
 				AC_CHECK_LIB(gss, gss_display_status,
 					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 					LIBGSSAPI="-lgss")

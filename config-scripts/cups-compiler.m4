@@ -1,7 +1,7 @@
 dnl
 dnl Compiler stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -46,6 +46,10 @@ fi
 
 dnl Unit tests take up time during a compile...
 if test x$enable_unit_tests = xyes; then
+        if test "$build" != "$host"; then
+                AC_MSG_ERROR([Sorry, cannot build unit tests when cross-compiling.])
+        fi
+
 	UNITTESTS="unittests"
 else
 	UNITTESTS=""
@@ -63,7 +67,7 @@ else
 fi
 
 if test -z "$with_ldarchflags"; then
-	if test "$uname" = Darwin; then
+	if test "$host_os_name" = darwin; then
 		# Only create Intel programs by default
 		LDARCHFLAGS="`echo $ARCHFLAGS | sed -e '1,$s/-arch ppc64//'`"
 	else
@@ -130,8 +134,8 @@ if test -n "$GCC"; then
 		# Not available to LSB binaries...
 		AC_MSG_CHECKING(whether compiler supports -fPIE)
 		OLDCFLAGS="$CFLAGS"
-		case "$uname" in
-			Darwin*)
+		case "$host_os_name" in
+			darwin*)
 				CFLAGS="$CFLAGS -fPIE -Wl,-pie"
 				AC_TRY_COMPILE(,,[
 					PIEFLAGS="-fPIE -Wl,-pie"
@@ -187,8 +191,8 @@ if test -n "$GCC"; then
 		fi
 	fi
 
-	case "$uname" in
-		Darwin*)
+	case "$host_os_name" in
+		darwin*)
 			# -D_FORTIFY_SOURCE=2 adds additional object size
 			# checking, basically wrapping all string functions
 			# with buffer-limited ones.  Not strictly needed for
@@ -197,7 +201,7 @@ if test -n "$GCC"; then
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
 			;;
 
-		Linux*)
+		linux*)
 			# The -z relro option is provided by the Linux linker command to
 			# make relocatable data read-only.
 			if test x$enable_relro = xyes; then
@@ -207,8 +211,8 @@ if test -n "$GCC"; then
 	esac
 else
 	# Add vendor-specific compiler options...
-	case $uname in
-		SunOS*)
+	case $host_os_name in
+		sunos*)
 			# Solaris
 			if test -z "$OPTIM"; then
 				if test "x$with_optim" = x; then
@@ -235,8 +239,8 @@ else
 fi
 
 # Add general compiler options per platform...
-case $uname in
-	Linux*)
+case $host_os_name in
+	linux*)
 		# glibc 2.8 and higher breaks peer credentials unless you
 		# define _GNU_SOURCE...
 		OPTIM="$OPTIM -D_GNU_SOURCE"

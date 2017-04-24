@@ -1,7 +1,7 @@
 dnl
 dnl Launch-on-demand/startup stuff for CUPS.
 dnl
-dnl Copyright 2007-2016 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -27,16 +27,10 @@ if test x$enable_launchd != xno; then
 		AC_DEFINE(HAVE_ONDEMAND)])
 	AC_CHECK_HEADER(launch.h, AC_DEFINE(HAVE_LAUNCH_H))
 
-	case "$uname" in
-		Darwin*)
-			# Darwin, macOS
-			LAUNCHD_DIR="/System/Library/LaunchDaemons"
-			# liblaunch is already part of libSystem
-			;;
-		*)
-			# All others; this test will need to be updated
-			;;
-	esac
+	if test "$host_os_name" = darwin; then
+	        LAUNCHD_DIR="/System/Library/LaunchDaemons"
+		# liblaunch is already part of libSystem
+	fi
 fi
 
 dnl Systemd is used on Linux...
@@ -123,13 +117,13 @@ if test x$rcdir = x; then
 fi
 
 if test "x$rcstart" = x; then
-	case "$uname" in
-        	Linux | GNU | GNU/k*BSD*)
+	case "$host_os_name" in
+        	linux | gnu | gnu/k*bsd*)
                 	# Linux
                         rcstart="81"
                       	;;
 
-		SunOS*)
+		sunos*)
 			# Solaris
                         rcstart="81"
 			;;
@@ -142,8 +136,8 @@ if test "x$rcstart" = x; then
 fi
 
 if test "x$rcstop" = x; then
-	case "$uname" in
-        	Linux | GNU | GNU/k*BSD*)
+	case "$host_os_name" in
+        	linux | gnu | gnu/k*bsd*)
                 	# Linux
                         rcstop="36"
                       	;;
