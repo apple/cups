@@ -577,6 +577,7 @@ apihelp:
 		file.[ch] http.h http*.c ipp.h ipp*.c language.[ch] \
 		notify.c options.c pwg.h pwg-media.c tempfile.c \
 		tls-darwin.c usersys.c util.c \
+		--coverimage cupspm.png \
 		--epub ../doc/help/cupspm.epub
 	mxmldoc --section "Programming" --body cupspm.md \
 		cupspm.xml > ../doc/help/cupspm.html
