@@ -339,7 +339,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/macOS 10.5@ */
   IPP_OP_CUPS_GET_PPD,			/* Get a PPD file @deprecated@ */
   IPP_OP_CUPS_GET_DOCUMENT = 0x4027,	/* Get a document file @since CUPS 1.4/macOS 10.6@ */
-  IPP_OP_CUPS_CREATE_LOCAL_PRINTER	/* Create a local (temporary) printer @since CUPS 2.2 */
+  IPP_OP_CUPS_CREATE_LOCAL_PRINTER	/* Create a local (temporary) printer @since CUPS 2.2@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_PRINT_JOB			IPP_OP_PRINT_JOB
