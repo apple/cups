@@ -8,6 +8,7 @@
     <meta name="creator" content="Mini-XML v2.11">
     <meta name="author" content="Unknown">
     <meta name="copyright" content="Unknown">
+    <meta name="version" content="0.0">
     <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -1319,10 +1320,10 @@ void *my_data;
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackChannelRead">cupsBackChannelRead</a></h3>
         <p class="description">Read data from the backchannel.</p>
 <p class="code">
-ssize_t cupsBackChannelRead (<br />
-&#160;&#160;&#160;&#160;char *buffer,<br />
-&#160;&#160;&#160;&#160;size_t bytes,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+ssize_t cupsBackChannelRead (<br>
+&#160;&#160;&#160;&#160;char *buffer,<br>
+&#160;&#160;&#160;&#160;size_t bytes,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1344,10 +1345,10 @@ return immediately if there is no data, -1.0 to wait for data indefinitely.
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackChannelWrite">cupsBackChannelWrite</a></h3>
         <p class="description">Write data to the backchannel.</p>
 <p class="code">
-ssize_t cupsBackChannelWrite (<br />
-&#160;&#160;&#160;&#160;const char *buffer,<br />
-&#160;&#160;&#160;&#160;size_t bytes,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+ssize_t cupsBackChannelWrite (<br>
+&#160;&#160;&#160;&#160;const char *buffer,<br>
+&#160;&#160;&#160;&#160;size_t bytes,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1370,8 +1371,8 @@ indefinitely.
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsBackendDeviceURI">cupsBackendDeviceURI</a></h3>
         <p class="description">Get the device URI for a backend.</p>
 <p class="code">
-const char *cupsBackendDeviceURI (<br />
-&#160;&#160;&#160;&#160;char **argv<br />
+const char *cupsBackendDeviceURI (<br>
+&#160;&#160;&#160;&#160;char **argv<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1390,13 +1391,13 @@ first.
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsBackendReport">cupsBackendReport</a></h3>
         <p class="description">Write a device line from a backend.</p>
 <p class="code">
-void cupsBackendReport (<br />
-&#160;&#160;&#160;&#160;const char *device_scheme,<br />
-&#160;&#160;&#160;&#160;const char *device_uri,<br />
-&#160;&#160;&#160;&#160;const char *device_make_and_model,<br />
-&#160;&#160;&#160;&#160;const char *device_info,<br />
-&#160;&#160;&#160;&#160;const char *device_id,<br />
-&#160;&#160;&#160;&#160;const char *device_location<br />
+void cupsBackendReport (<br>
+&#160;&#160;&#160;&#160;const char *device_scheme,<br>
+&#160;&#160;&#160;&#160;const char *device_uri,<br>
+&#160;&#160;&#160;&#160;const char *device_make_and_model,<br>
+&#160;&#160;&#160;&#160;const char *device_info,<br>
+&#160;&#160;&#160;&#160;const char *device_id,<br>
+&#160;&#160;&#160;&#160;const char *device_location<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1422,11 +1423,11 @@ device-info, device-id, and device-location strings.
 <h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
         <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br />
-&#160;&#160;&#160;&#160;char *data,<br />
-&#160;&#160;&#160;&#160;int *datalen,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
+&#160;&#160;&#160;&#160;char *data,<br>
+&#160;&#160;&#160;&#160;int *datalen,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1456,12 +1457,12 @@ update the value to contain the number of data bytes in the buffer.
 <h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelRead">cupsSideChannelRead</a></h3>
         <p class="description">Read a side-channel message.</p>
 <p class="code">
-int cupsSideChannelRead (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> *command,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> *status,<br />
-&#160;&#160;&#160;&#160;char *data,<br />
-&#160;&#160;&#160;&#160;int *datalen,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+int cupsSideChannelRead (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> *command,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> *status,<br>
+&#160;&#160;&#160;&#160;char *data,<br>
+&#160;&#160;&#160;&#160;int *datalen,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1492,11 +1493,11 @@ update the value to contain the number of data bytes in the buffer.
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></h3>
         <p class="description">Query a SNMP OID's value.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPGet (<br />
-&#160;&#160;&#160;&#160;const char *oid,<br />
-&#160;&#160;&#160;&#160;char *data,<br />
-&#160;&#160;&#160;&#160;int *datalen,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPGet (<br>
+&#160;&#160;&#160;&#160;const char *oid,<br>
+&#160;&#160;&#160;&#160;char *data,<br>
+&#160;&#160;&#160;&#160;int *datalen,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1533,11 +1534,11 @@ the printer does not respond to the SNMP query.
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></h3>
         <p class="description">Query multiple SNMP OID values.</p>
 <p class="code">
-<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPWalk (<br />
-&#160;&#160;&#160;&#160;const char *oid,<br />
-&#160;&#160;&#160;&#160;double timeout,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_walk_func_t">cups_sc_walk_func_t</a> cb,<br />
-&#160;&#160;&#160;&#160;void *context<br />
+<a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPWalk (<br>
+&#160;&#160;&#160;&#160;const char *oid,<br>
+&#160;&#160;&#160;&#160;double timeout,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_walk_func_t">cups_sc_walk_func_t</a> cb,<br>
+&#160;&#160;&#160;&#160;void *context<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1579,12 +1580,12 @@ the printer does not respond to the first SNMP query.
 <h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSideChannelWrite">cupsSideChannelWrite</a></h3>
         <p class="description">Write a side-channel message.</p>
 <p class="code">
-int cupsSideChannelWrite (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> status,<br />
-&#160;&#160;&#160;&#160;const char *data,<br />
-&#160;&#160;&#160;&#160;int datalen,<br />
-&#160;&#160;&#160;&#160;double timeout<br />
+int cupsSideChannelWrite (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_sc_status_t">cups_sc_status_t</a> status,<br>
+&#160;&#160;&#160;&#160;const char *data,<br>
+&#160;&#160;&#160;&#160;int datalen,<br>
+&#160;&#160;&#160;&#160;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>

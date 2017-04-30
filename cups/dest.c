@@ -769,10 +769,10 @@ cupsConnectDestBlock(
  * @since CUPS 1.6/macOS 10.8@
  */
 
-int
-cupsCopyDest(cups_dest_t *dest,
-             int         num_dests,
-             cups_dest_t **dests)
+int                                     /* O  - New number of destinations */
+cupsCopyDest(cups_dest_t *dest,         /* I  - Destination to copy */
+             int         num_dests,     /* I  - Number of destinations */
+             cups_dest_t **dests)       /* IO - Destination array */
 {
   int		i;			/* Looping var */
   cups_dest_t	*new_dest;		/* New destination pointer */
@@ -3736,7 +3736,7 @@ cups_elapsed(struct timeval *t)		/* IO - Previous time */
   return (msecs);
 }
 
- 
+
 /*
  * 'cups_find_dest()' - Find a destination using a binary search.
  */

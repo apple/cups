@@ -5,6 +5,12 @@ copyright: Copyright (c) 2007-2017 by Apple Inc. All Rights Reserved.
 version: 2.2.4
 ...
 
+> Note: This document is under active development and is incomplete, with a goal
+> completing it prior to releasing CUPS 2.2.4.  Please
+> [file issues on Github](https://github.com/apple/cups/issues)
+> to provide any feedback.
+
+
 # Introduction
 
 CUPS provides the "cups" library to talk to the different parts of CUPS and with
@@ -110,1011 +116,606 @@ and libraries (`cups-config --libs`) needed for the local system.
 
 # Working with Destinations
 
+Destinations, which in CUPS represent individual printers or classes
+(collections) of printers, are represented by the `cups_dest_t` structure which
+includes the name \(`name`), instance \(`instance`, saved options/settings),
+whether the destination is the default for the user \(`is_default`), and the
+options and attributes associated with that destination \(`num_options` and
+`options`).
+
+Historically destinations have been manually maintained by the administrator of
+a system or network, but CUPS also supports dynamic discovery of destinations on
+the current network.
+
 
 ## Finding Available Destinations
 
+The `cupsEnumDests` function finds all of the available destinations:
 
-## Getting Information About a Destination
+     int
+     cupsEnumDests(unsigned flags, int msec, int *cancel,
+                   cups_ptype_t type, cups_ptype_t mask,
+                   cups_dest_cb_t cb, void *user_data)
 
+The `flags` argument specifies enumeration options, which at present must be
+`CUPS_DEST_FLAGS_NONE`.
+
+The `msec` argument specifies the maximum amount of time that should be used for
+enumeration in milliseconds - interactive applications should keep this value to
+5000 or less when run on the main thread.
+
+The `cancel` argument points to an integer variable that, when set to a non-zero
+value, will cause enumeration to stop as soon as possible.  It can be `NULL` if
+not needed.
+
+The `type` and `mask` arguments are bitfields that allow the caller to filter
+the destinations based on categories and/or capabilities.  The destination's
+"printer-type" value is masked by the `mask` value and compared to the `type`
+value when filtering.  For example, to only enumerate destinations that are
+hosted on the local system, pass `CUPS_PRINTER_LOCAL` for the `type` argument
+and `CUPS_PRINTER_REMOTE` for the `mask` argument.  The following constants can
+be used for filtering:
+
+- `CUPS_PRINTER_CLASS`: A collection of destinations.
+- `CUPS_PRINTER_FAX`: A facsimile device.
+- `CUPS_PRINTER_LOCAL`: A local printer or class.  This constant has the value 0
+  (no bits set) and is only used for the `type` argument and is paired with the
+  `CUPS_PRINTER_REMOTE` constant passed in the `mask` argument.
+- `CUPS_PRINTER_REMOTE`: A remote printer or class.
+- `CUPS_PRINTER_BW`: Can do B&W printing.
+- `CUPS_PRINTER_COLOR`: Can do color printing.
+- `CUPS_PRINTER_DUPLEX`: Can do two-sided printing.
+- `CUPS_PRINTER_STAPLE`: Can staple output.
+- `CUPS_PRINTER_COLLATE`: Can quickly collate copies.
+- `CUPS_PRINTER_PUNCH`: Can punch output.
+- `CUPS_PRINTER_COVER`: Can cover output.
+- `CUPS_PRINTER_BIND`: Can bind output.
+- `CUPS_PRINTER_SORT`: Can sort output (mailboxes, etc.)
+- `CUPS_PRINTER_SMALL`: Can print on Letter/Legal/A4-size media.
+- `CUPS_PRINTER_MEDIUM`: Can print on Tabloid/B/C/A3/A2-size media.
+- `CUPS_PRINTER_LARGE`: Can print on D/E/A1/A0-size media.
+- `CUPS_PRINTER_VARIABLE`: Can print on rolls and custom-size media.
+
+The `cb` argument specifies a function to call for every destination that is
+found:
+
+    typedef int (*cups_dest_cb_t)(void *user_data,
+                                  unsigned flags,
+                                  cups_dest_t *dest);
+
+The callback function receives a copy of the `user_data` argument along with a
+bitfield \(`flags`) and the destination that was found.  The `flags` argument
+can have any of the following constant (bit) values set:
+
+- `CUPS_DEST_FLAGS_MORE`: There are more destinations coming.
+- `CUPS_DEST_FLAGS_REMOVED`: The destination has gone away and should be removed
+  from the list of destinations a user can select.
+- `CUPS_DEST_FLAGS_ERROR`: An error occurred.  The reason for the error can be
+  found by calling the `cupsLastError` and/or `cupsLastErrorString` functions.
+
+The callback function returns 0 to stop enumeration or 1 to continue.
+
+The following example shows how to use `cupsEnumDests` to get a filtered array
+of destinations:
+
+    typedef struct
+    {
+      int num_dests;
+      cups_dest_t *dests;
+    } my_user_data_t;
+
+    int
+    my_dest_cb(my_user_data_t *user_data, unsigned flags,
+               cups_dest_t *dest)
+    {
+      if (flags & CUPS_DEST_FLAGS_REMOVED)
+      {
+       /*
+        * Remove destination from array...
+        */
+
+        user_data->num_dests =
+            cupsRemoveDest(dest->name, dest->instance,
+                           user_data->num_dests,
+                           &(user_data->dests));
+      }
+      else
+      {
+       /*
+        * Add destination to array...
+        */
+
+        user_data->num_dests =
+            cupsCopyDest(dest, user_data->num_dests,
+                         &(user_data->dests));
+      }
+
+      return (1);
+    }
+
+    int
+    my_get_dests(cups_ptype_t type, cups_ptype_t mask,
+                 cups_dest_t **dests)
+    {
+      my_user_data_t user_data = { 0, NULL };
+
+      if (!cupsEnumDests(CUPS_DEST_FLAGS_NONE, 1000, NULL, type,
+                         mask, (cups_dest_cb_t)my_dest_cb,
+                         &user_data))
+      {
+       /*
+        * An error occurred, free all of the destinations and
+        * return...
+        */
+
+        cupsFreeDests(user_data.num_dests, user_dasta.dests);
+
+        *dests = NULL;
+
+        return (0);
+      }
+
+     /*
+      * Return the destination array...
+      */
+
+      *dests = user_data.dests;
+
+      return (user_data.num_dests);
+    }
+
+
+## Basic Destination Information
+
+The `num_options` and `options` members of the `cups_dest_t` structure provide
+basic attributes about the destination in addition to the user default options
+and values for that destination.  The following names are predefined for various
+destination attributes:
+
+- "auth-info-required": The type of authentication required for printing to this
+  destination: "none", "username,password", "domain,username,password", or
+  "negotiate" (Kerberos).
+- "printer-info": The human-readable description of the destination such as "My
+  Laser Printer".
+- "printer-is-accepting-jobs": "true" if the destination is accepting new jobs,
+  "false" otherwise.
+- "printer-is-shared": "true" if the destination is being shared with other
+  computers, "false" otherwise.
+- "printer-location": The human-readable location of the destination such as
+  "Lab 4".
+- "printer-make-and-model": The human-readable make and model of the destination
+  such as "ExampleCorp LaserPrinter 4000 Series".
+- "printer-state": "3" if the destination is idle, "4" if the destination is
+  printing a job, and "5" if the destination is stopped.
+- "printer-state-change-time": The UNIX time when the destination entered the
+  current state.
+- "printer-state-reasons": Additional comma-delimited state keywords for the
+  destination such as "media-tray-empty-error" and "toner-low-warning".
+- "printer-type": The `cups_ptype_t` value associated with the destination.
+
+Use the `cupsGetOption` function to retrieve the value.  For example, the
+following code gets the make and model of a destination:
+
+    const char *model = cupsGetOption("printer-make-and-model",
+                                      dest->num_options,
+                                      dest->options);
+
+## Detailed Destination Information
+
+Once a destination has been chosen, the `cupsCopyDestInfo` function can be used
+to gather detailed information about the destination:
+
+    cups_dinfo_t *
+    cupsCopyDestInfo(http_t *http, cups_dest_t *dest);
+
+The `http` argument specifies a connection to the CUPS scheduler and is
+typically the constant `CUPS_HTTP_DEFAULT`.  The `dest` argument specifies the
+destination to query.
+
+The `cups_dinfo_t` structure that is returned contains a snapshot of the
+supported options and their supported, ready, and default values.  It also can
+report constraints between different options and values, and recommend changes
+to resolve those constraints.
 
 ### Getting Supported Options and Values
 
-cupsCheckDestSupported and cups
+The `cupsCheckDestSupported` function can be used to test whether a particular
+option or option and value is supported:
 
-### Getting Default Options and Values
+    int
+    cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *info,
+                           const char *option,
+                           const char *value);
 
-### Getting Ready Options and Values
+The `option` argument specifies the name of the option to check.  The following
+constants can be used to check the various standard options:
 
-### Media Options
+- `CUPS_COPIES`: Controls the number of copies that are produced.
+- `CUPS_FINISHINGS`: A comma-delimited list of integer constants that control
+  the finishing processes that are applied to the job, including stapling,
+  punching, and folding.
+- `CUPS_MEDIA`: Controls the media size that is used, typically one of the
+  following: `CUPS_MEDIA_3X5`, `CUPS_MEDIA_4X6`, `CUPS_MEDIA_5X7`,
+  `CUPS_MEDIA_8X10`, `CUPS_MEDIA_A3`, `CUPS_MEDIA_A4`, `CUPS_MEDIA_A5`,
+  `CUPS_MEDIA_A6`, `CUPS_MEDIA_ENV10`, `CUPS_MEDIA_ENVDL`, `CUPS_MEDIA_LEGAL`,
+  `CUPS_MEDIA_LETTER`, `CUPS_MEDIA_PHOTO_L`, `CUPS_MEDIA_SUPERBA3`, or
+  `CUPS_MEDIA_TABLOID`.
+- `CUPS_MEDIA_SOURCE`: Controls where the media is pulled from, typically either
+  `CUPS_MEDIA_SOURCE_AUTO` or `CUPS_MEDIA_SOURCE_MANUAL`.
+- `CUPS_MEDIA_TYPE`: Controls the type of media that is used, typically one of
+  the following: `CUPS_MEDIA_TYPE_AUTO`, `CUPS_MEDIA_TYPE_ENVELOPE`,
+  `CUPS_MEDIA_TYPE_LABELS`, `CUPS_MEDIA_TYPE_LETTERHEAD`,
+  `CUPS_MEDIA_TYPE_PHOTO`, `CUPS_MEDIA_TYPE_PHOTO_GLOSSY`,
+  `CUPS_MEDIA_TYPE_PHOTO_MATTE`, `CUPS_MEDIA_TYPE_PLAIN`, or
+  `CUPS_MEDIA_TYPE_TRANSPARENCY`.
+- `CUPS_NUMBER_UP`: Controls the number of document pages that are placed on
+  each media side.
+- `CUPS_ORIENTATION`: Controls the orientation of document pages placed on the
+  media: `CUPS_ORIENTATION_PORTRAIT` or `CUPS_ORIENTATION_LANDSCAPE`.
+- `CUPS_PRINT_COLOR_MODE`: Controls whether the output is in color
+  \(`CUPS_PRINT_COLOR_MODE_COLOR`), grayscale
+  \(`CUPS_PRINT_COLOR_MODE_MONOCHROME`), or either
+  \(`CUPS_PRINT_COLOR_MODE_AUTO`).
+- `CUPS_PRINT_QUALITY`: Controls the generate quality of the output:
+  `CUPS_PRINT_QUALITY_DRAFT`, `CUPS_PRINT_QUALITY_NORMAL`, or
+  `CUPS_PRINT_QUALITY_HIGH`.
+- `CUPS_SIDES`: Controls whether prints are placed on one or both sides of the
+  media: `CUPS_SIDES_ONE_SIDED`, `CUPS_SIDES_TWO_SIDED_PORTRAIT`, or
+  `CUPS_SIDES_TWO_SIDED_LANDSCAPE`.
 
-### Other Standard Options
+If the `value` argument is `NULL`, the `cupsCheckDestSupported` function returns
+whether the option is supported by the destination.  Otherwise, the function
+returns whether the specified value of the option is supported.
+
+The `cupsFindDestSupported` function returns the IPP attribute containing the
+supported values for a given option:
+
+     ipp_attribute_t *
+     cupsFindDestSupported(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *dinfo,
+                           const char *option);
+
+For example, the following code prints the supported finishing processes for a
+destination, if any, to the standard output:
+
+    cups_dinfo_t *info = cupsCopyDestInfo(CUPS_HTTP_DEFAULT,
+                                          dest);
+
+    if (cupsCheckDestSupported(CUPS_HTTP_DEFAULT, dest, info,
+                               CUPS_FINISHINGS, NULL))
+    {
+      ipp_attribute_t *finishings =
+          cupsFindDestSupported(CUPS_HTTP_DEFAULT, dest, info,
+                                CUPS_FINISHINGS);
+      int i, count = ippGetCount(finishings);
+
+      puts("finishings supported:");
+      for (i = 0; i < count; i ++)
+        printf("  %d\n", ippGetInteger(finishings, i));
+    }
+    else
+      puts("finishings not supported.");
+
+The "job-creation-attributes" option can be queried to get a list of supported
+options.  For example, the following code prints the list of supported options
+to the standard output:
+
+    ipp_attribute_t *attrs =
+        cupsFindDestSupported(CUPS_HTTP_DEFAULT, dest, info,
+                              "job-creation-attributes");
+    int i, count = ippGetCount(attrs);
+
+    for (i = 0; i < count; i ++)
+      puts(ippGetString(attrs, i, NULL));
+
+
+### Getting Default Values
+
+There are two sets of default values - user defaults that are available via the
+`num_options` and `options` members of the `cups_dest_t` structure, and
+destination defaults that available via the `cups_dinfo_t` structure and the
+`cupsFindDestDefault` function which returns the IPP attribute containing the
+default value(s) for a given option:
+
+    ipp_attribute_t *
+    cupsFindDestDefault(http_t *http, cups_dest_t *dest,
+                        cups_dinfo_t *dinfo,
+                        const char *option);
+
+The user defaults from `cupsGetOption` should always take preference over the
+destination defaults.  For example, the following code prints the default
+finishings value(s) to the standard output:
+
+    const char *def_value =
+        cupsGetOption(CUPS_FINISHINGS, dest->num_options,
+                      dest->options);
+    ipp_attribute_t *def_attr =
+        cupsFindDestDefault(CUPS_HTTP_DEFAULT, dest, info,
+                            CUPS_FINISHINGS);
+
+    if (def_value != NULL)
+    {
+      printf("Default finishings: %s\n", def_value);
+    }
+    else
+    {
+      int i, count = ippGetCount(def_attr);
+
+      printf("Default finishings: %d",
+             ippGetInteger(def_attr, 0));
+      for (i = 1; i < count; i ++)
+        printf(",%d", ippGetInteger(def_attr, i));
+      putchar('\n');
+    }
+
+
+### Getting Ready (Loaded) Values
+
+The finishings and media options also support queries for the ready, or loaded,
+values.  For example, a printer may have punch and staple finishers installed
+but be out of staples - the supported values will list both punch and staple
+finishing processes but the ready values will only list the punch processes.
+Similarly, a printer may support hundreds of different sizes of media but only
+have a single size loaded at any given time - the ready values are limited to
+the media that is actually in the printer.
+
+The `cupsFindDestReady` function finds the IPP attribute containing the ready
+values for a given option:
+
+    ipp_attribute_t *
+    cupsFindDestReady(http_t *http, cups_dest_t *dest,
+                      cups_dinfo_t *dinfo, const char *option);
+
+For example, the following code lists the ready finishing processes:
+
+    ipp_attribute_t *ready_finishings =
+        cupsFindDestReady(CUPS_HTTP_DEFAULT, dest, info,
+                          CUPS_FINISHINGS);
+
+    if (ready_finishings != NULL)
+    {
+      int i, count = ippGetCount(ready_finishings);
+
+      puts("finishings ready:");
+      for (i = 0; i < count; i ++)
+        printf("  %d\n", ippGetInteger(ready_finishings, i));
+    }
+    else
+      puts("no finishings are ready.");
+
+
+### Media Size Options
+
+CUPS provides functions for querying the dimensions and margins for each of the
+supported media size options.  The `cups_size_t` structure is used to describe a
+media size:
+
+    typedef struct cups_size_s
+    {
+      char media[128];
+      int width, length;
+      int bottom, left, right, top;
+    } cups_size_t;
+
+The `width` and `length` members specify the dimensions of the media in
+hundredths of millimeters (1/2540th of an inch).  The `bottom`, `left`, `right`,
+and `top` members specify the margins of the printable area, also in hundredths
+of millimeters.
+
+The `cupsGetDestMediaByName` and `cupsGetDestMediaBySize` functions lookup the
+media size information using a standard media size name or dimensions in
+hundredths of millimeters:
+
+    int
+    cupsGetDestMediaByName(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *dinfo,
+                           const char *media,
+                           unsigned flags, cups_size_t *size);
+
+    int
+    cupsGetDestMediaBySize(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *dinfo,
+                           int width, int length,
+                           unsigned flags, cups_size_t *size);
+
+The `media`, `width`, and `length` arguments specify the size to lookup.  The
+`flags` argument specifies a bitfield controlling various lookup options:
+
+- `CUPS_MEDIA_FLAGS_DEFAULT`: Find the closest size supported by the printer.
+- `CUPS_MEDIA_FLAGS_BORDERLESS`: Find a borderless size.
+- `CUPS_MEDIA_FLAGS_DUPLEX`: Find a size compatible with two-sided printing.
+- `CUPS_MEDIA_FLAGS_EXACT`: Find an exact match for the size.
+- `CUPS_MEDIA_FLAGS_READY`: If the printer supports media sensing or
+  configuration of the media in each tray/source, find the size amongst the
+  "ready" media.
+
+If a matching size is found for the destination, the size information is stored
+in the structure pointed to by the `size` argument and 1 is returned.  Otherwise
+0 is returned.
+
+For example, the following code prints the margins for two-sided printing on US
+Letter media:
+
+    cups_size_t size;
+
+    if (cupsGetDestMediaByName(CUPS_HTTP_DEFAULT, dest, info,
+                               CUPS_MEDIA_LETTER,
+                               CUPS_MEDIA_FLAGS_DUPLEX, &size))
+    {
+      puts("Margins for duplex US Letter:");
+      printf("  Bottom: %.2fin\n", size.bottom / 2540.0);
+      printf("    Left: %.2fin\n", size.left / 2540.0);
+      printf("   Right: %.2fin\n", size.right / 2540.0);
+      printf("     Top: %.2fin\n", size.top / 2540.0);
+    }
+    else
+      puts("Margins for duplex US Letter are not available.");
+
+You can also enumerate all of the sizes that match a given `flags` value using
+the `cupsGetDestMediaByIndex` and `cupsGetDestMediaCount` functions:
+
+    int
+    cupsGetDestMediaByIndex(http_t *http, cups_dest_t *dest,
+                            cups_dinfo_t *dinfo, int n,
+                            unsigned flags, cups_size_t *size);
+
+    int
+    cupsGetDestMediaCount(http_t *http, cups_dest_t *dest,
+                          cups_dinfo_t *dinfo, unsigned flags);
+
+For example, the following code prints the list of ready media and corresponding
+margins:
+
+    cups_size_t size;
+    int i;
+    int count = cupsGetDestMediaCount(CUPS_HTTP_DEFAULT,
+                                      dest, info,
+                                      CUPS_MEDIA_FLAGS_READY);
+
+    for (i = 0; i < count; i ++)
+    {
+      if (cupsGetDestMediaByIndex(CUPS_HTTP_DEFAULT, dest, info,
+                                  i, CUPS_MEDIA_FLAGS_READY,
+                                  &size))
+      {
+        printf("%s:\n", size.name);
+        printf("   Width: %.2fin\n", size.width / 2540.0);
+        printf("  Length: %.2fin\n", size.length / 2540.0);
+        printf("  Bottom: %.2fin\n", size.bottom / 2540.0);
+        printf("    Left: %.2fin\n", size.left / 2540.0);
+        printf("   Right: %.2fin\n", size.right / 2540.0);
+        printf("     Top: %.2fin\n", size.top / 2540.0);
+      }
+    }
+
+Finally, the `cupsGetDestMediaDefault` function returns the default media size:
+
+    int
+    cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
+                            cups_dinfo_t *dinfo, unsigned flags,
+                            cups_size_t *size);
+
 
 ### Localizing Options and Values
 
+CUPS provides three functions to get localized versions of options and values:
+`cupsLocalizeDestMedia`, `cupsLocalizeDestOption`, and `cupsLocalizeDestValue`:
+
+    const char *
+    cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest,
+                          cups_dinfo_t *info, unsigned flags,
+                          cups_size_t *size);
+
+    const char *
+    cupsLocalizeDestOption(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *info,
+                           const char *option);
+
+    const char *
+    cupsLocalizeDestValue(http_t *http, cups_dest_t *dest,
+                          cups_dinfo_t *info,
+                          const char *option, const char *value);
+
+
 ## Submitting a Print Job
 
-## Canceling a Print Job
-
-
-# IPP Requests and Responses
-
-Why you'd want to do this, etc.
-
-
-## Connecting to a Destination
-
-## Sending an IPP Request
-
-## Getting the IPP Response
-
-## Handling Authentication
-
-## Handling Certificate Validation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h3><a name='PRINTERS_AND_CLASSES'>Printers and Classes</a></h3>
-
-<p>Printers and classes (collections of printers) are accessed through
-the <a href="#cups_dest_t"><code>cups_dest_t</code></a> structure which
-includes the name (<code>name</code>), instance (<code>instance</code> -
-a way of selecting certain saved options/settings), and the options and
-attributes associated with that destination (<code>num_options</code> and
-<code>options</code>). Destinations are created using the
-<a href="#cupsGetDests"><code>cupsGetDests</code></a> function and freed
-using the <a href='#cupsFreeDests'><code>cupsFreeDests</code></a> function.
-The <a href='#cupsGetDest'><code>cupsGetDest</code></a> function finds a
-specific destination for printing:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dests;
-int num_dests = <a href='#cupsGetDests'>cupsGetDests</a>(&amp;dests);
-<a href='#cups_dest_t'>cups_dest_t</a> *dest = <a href='#cupsGetDest'>cupsGetDest</a>("name", NULL, num_dests, dests);
-
-/* do something with dest */
-
-<a href='#cupsFreeDests'>cupsFreeDests</a>(num_dests, dests);
-</pre>
-
-<p>Passing <code>NULL</code> to
-<a href='#cupsGetDest'><code>cupsGetDest</code></a> for the destination name
-will return the default destination. Similarly, passing a <code>NULL</code>
-instance will return the default instance for that destination.</p>
-
-<div class='table'><table summary='Table 1: Printer Attributes' width='80%'>
-<caption>Table 1: <a name='TABLE1'>Printer Attributes</a></caption>
-<thead>
-<tr>
-	<th>Attribute Name</th>
-	<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>"auth-info-required"</td>
-	<td>The type of authentication required for printing to this
-	destination: "none", "username,password", "domain,username,password",
-	or "negotiate" (Kerberos)</td>
-</tr>
-<tr>
-	<td>"printer-info"</td>
-	<td>The human-readable description of the destination such as "My
-	Laser Printer".</td>
-</tr>
-<tr>
-	<td>"printer-is-accepting-jobs"</td>
-	<td>"true" if the destination is accepting new jobs, "false" if
-	not.</td>
-</tr>
-<tr>
-	<td>"printer-is-shared"</td>
-	<td>"true" if the destination is being shared with other computers,
-	"false" if not.</td>
-</tr>
-<tr>
-	<td>"printer-location"</td>
-	<td>The human-readable location of the destination such as "Lab 4".</td>
-</tr>
-<tr>
-	<td>"printer-make-and-model"</td>
-	<td>The human-readable make and model of the destination such as "HP
-	LaserJet 4000 Series".</td>
-</tr>
-<tr>
-	<td>"printer-state"</td>
-	<td>"3" if the destination is idle, "4" if the destination is printing
-	a job, and "5" if the destination is stopped.</td>
-</tr>
-<tr>
-	<td>"printer-state-change-time"</td>
-	<td>The UNIX time when the destination entered the current state.</td>
-</tr>
-<tr>
-	<td>"printer-state-reasons"</td>
-	<td>Additional comma-delimited state keywords for the destination
-	such as "media-tray-empty-error" and "toner-low-warning".</td>
-</tr>
-<tr>
-	<td>"printer-type"</td>
-	<td>The <a href='#cups_printer_t'><code>cups_printer_t</code></a>
-	value associated with the destination.</td>
-</tr>
-</tbody>
-</table></div>
-
-<h3><a name='OPTIONS'>Options</a></h3>
-
-<p>Options are stored in arrays of
-<a href='#cups_option_t'><code>cups_option_t</code></a> structures. Each
-option has a name (<code>name</code>) and value (<code>value</code>)
-associated with it. The <a href='#cups_dest_t'><code>cups_dest_t</code></a>
-<code>num_options</code> and <code>options</code> members contain the
-default options for a particular destination, along with several informational
-attributes about the destination as shown in <a href='#TABLE1'>Table 1</a>.
-The <a href='#cupsGetOption'><code>cupsGetOption</code></a> function gets
-the value for the named option. For example, the following code lists the
-available destinations and their human-readable descriptions:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dests;
-int num_dests = <a href='#cupsGetDests'>cupsGetDests</a>(&amp;dests);
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int i;
-const char *value;
-
-for (i = num_dests, dest = dests; i > 0; i --, dest ++)
-  if (dest->instance == NULL)
-  {
-    value = <a href='#cupsGetOption'>cupsGetOption</a>("printer-info", dest->num_options, dest->options);
-    printf("%s (%s)\n", dest->name, value ? value : "no description");
-  }
-
-<a href='#cupsFreeDests'>cupsFreeDests</a>(num_dests, dests);
-</pre>
-
-<p>You can create your own option arrays using the
-<a href='#cupsAddOption'><code>cupsAddOption</code></a> function, which
-adds a single named option to an array:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-int num_options = 0;
-<a href='#cups_option_t'>cups_option_t</a> *options = NULL;
-
-/* The returned num_options value is updated as needed */
-num_options = <a href='#cupsAddOption'>cupsAddOption</a>("first", "value", num_options, &amp;options);
-
-/* This adds a second option value */
-num_options = <a href='#cupsAddOption'>cupsAddOption</a>("second", "value", num_options, &amp;options);
-
-/* This replaces the first option we added */
-num_options = <a href='#cupsAddOption'>cupsAddOption</a>("first", "new value", num_options, &amp;options);
-</pre>
-
-<p>Use a <code>for</code> loop to copy the options from a destination:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-int i;
-int num_options = 0;
-<a href='#cups_option_t'>cups_option_t</a> *options = NULL;
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-
-for (i = 0; i &lt; dest->num_options; i ++)
-  num_options = <a href='#cupsAddOption'>cupsAddOption</a>(dest->options[i].name, dest->options[i].value,
-                              num_options, &amp;options);
-</pre>
-
-<p>Use the <a href='#cupsFreeOptions'><code>cupsFreeOptions</code></a>
-function to free the options array when you are done using it:</p>
-
-<pre class='example'>
-<a href='#cupsFreeOptions'>cupsFreeOptions</a>(num_options, options);
-</pre>
-
-<h3><a name='PRINT_JOBS'>Print Jobs</a></h3>
-
-<p>Print jobs are identified by a locally-unique job ID number from 1 to
-2<sup>31</sup>-1 and have options and one or more files for printing to a
-single destination. The <a href='#cupsPrintFile'><code>cupsPrintFile</code></a>
-function creates a new job with one file. The following code prints the CUPS
-test page file:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int num_options;
-<a href='#cups_option_t'>cups_option_t</a> *options;
-int job_id;
-
-/* Print a single file */
-job_id = <a href='#cupsPrintFile'>cupsPrintFile</a>(dest->name, "/usr/share/cups/data/testprint.ps",
-                        "Test Print", num_options, options);
-</pre>
-
-<p>The <a href='#cupsPrintFiles'><code>cupsPrintFiles</code></a> function
-creates a job with multiple files. The files are provided in a
-<code>char *</code> array:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int num_options;
-<a href='#cups_option_t'>cups_option_t</a> *options;
-int job_id;
-char *files[3] = { "file1.pdf", "file2.pdf", "file3.pdf" };
-
-/* Print three files */
-job_id = <a href='#cupsPrintFiles'>cupsPrintFiles</a>(dest->name, 3, files, "Test Print", num_options, options);
-</pre>
-
-<p>Finally, the <a href='#cupsCreateJob'><code>cupsCreateJob</code></a>
-function creates a new job with no files in it. Files are added using the
-<a href='#cupsStartDocument'><code>cupsStartDocument</code></a>,
-<a href='api-httpipp.html#cupsWriteRequestData'><code>cupsWriteRequestData</code></a>,
-and <a href='#cupsFinishDocument'><code>cupsFinishDocument</code></a> functions.
-The following example creates a job with 10 text files for printing:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int num_options;
-<a href='#cups_option_t'>cups_option_t</a> *options;
-int job_id;
-int i;
-char buffer[1024];
-
-/* Create the job */
-job_id = <a href='#cupsCreateJob'>cupsCreateJob</a>(CUPS_HTTP_DEFAULT, dest->name, "10 Text Files",
-                       num_options, options);
-
-/* If the job is created, add 10 files */
-if (job_id > 0)
-{
-  for (i = 1; i &lt;= 10; i ++)
-  {
-    snprintf(buffer, sizeof(buffer), "file%d.txt", i);
-
-    <a href='#cupsStartDocument'>cupsStartDocument</a>(CUPS_HTTP_DEFAULT, dest->name, job_id, buffer,
-                      CUPS_FORMAT_TEXT, i == 10);
-
-    snprintf(buffer, sizeof(buffer),
-             "File %d\n"
-             "\n"
-             "One fish,\n"
-             "Two fish,\n
-             "Red fish,\n
-             "Blue fish\n", i);
-
-    /* cupsWriteRequestData can be called as many times as needed */
-    <a href='#cupsWriteRequestData'>cupsWriteRequestData</a>(CUPS_HTTP_DEFAULT, buffer, strlen(buffer));
-
-    <a href='#cupsFinishDocument'>cupsFinishDocument</a>(CUPS_HTTP_DEFAULT, dest->name);
-  }
-}
-</pre>
-
-<p>Once you have created a job, you can monitor its status using the
-<a href='#cupsGetJobs'><code>cupsGetJobs</code></a> function, which returns
-an array of <a href='#cups_job_t'><code>cups_job_t</code></a> structures.
-Each contains the job ID (<code>id</code>), destination name
-(<code>dest</code>), title (<code>title</code>), and other information
-associated with the job. The job array is freed using the
-<a href='#cupsFreeJobs'><code>cupsFreeJobs</code></a> function. The following
-example monitors a specific job ID, showing the current job state once every
-5 seconds until the job is completed:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int job_id;
-int num_jobs;
-<a href='#cups_job_t'>cups_job_t</a> *jobs;
-int i;
-ipp_jstate_t job_state = IPP_JOB_PENDING;
-
-while (job_state &lt; IPP_JOB_STOPPED)
-{
-  /* Get my jobs (1) with any state (-1) */
-  num_jobs = <a href='#cupsGetJobs'>cupsGetJobs</a>(&amp;jobs, dest->name, 1, -1);
-
-  /* Loop to find my job */
-  job_state = IPP_JOB_COMPLETED;
-
-  for (i = 0; i &lt; num_jobs; i ++)
-    if (jobs[i].id == job_id)
+Once you are ready to submit a print job, you create a job using the
+`cupsCreateDestJob` function:
+
+    ipp_status_t
+    cupsCreateDestJob(http_t *http, cups_dest_t *dest,
+                      cups_dinfo_t *info, int *job_id,
+                      const char *title, int num_options,
+                      cups_option_t *options);
+
+The `title` argument specifies a name for the print job such as "My Document".
+The `num_options` and `options` arguments specify the options for the print
+job which are allocated using the `cupsAddOption` function.
+
+When successful, the job's numeric identifier is stored in the integer pointed
+to by the `job_id` argument and `IPP_STATUS_OK` is returned.  Otherwise, an IPP
+error status is returned.
+
+For example, the following code creates a new job that will print 42 copies of a
+two-sided US Letter document:
+
+    int job_id = 0;
+    int num_options = 0;
+    cups_option_t *options = NULL;
+
+    num_options = cupsAddOption(CUPS_COPIES, "42",
+                                num_options, &options);
+    num_options = cupsAddOption(CUPS_MEDIA, CUPS_MEDIA_LETTER,
+                                num_options, &options);
+    num_options = cupsAddOption(CUPS_SIDES,
+                                CUPS_SIDES_TWO_SIDED_PORTRAIT,
+                                num_options, &options);
+
+    if (cupsCreateDestJob(CUPS_HTTP_DEFAULT, dest, info,
+                          &job_id, "My Document", num_options,
+                          options) == IPP_STATUS_OK)
+      printf("Created job: %d\n", job_id);
+    else
+      printf("Unable to create job: %s\n",
+             cupsLastErrorString());
+
+Once the job is created, you submit documents for the job using the
+`cupsStartDestDocument`, `cupsWriteRequestData`, and `cupsFinishDestDocument`
+functions:
+
+    http_status_t
+    cupsStartDestDocument(http_t *http, cups_dest_t *dest,
+                          cups_dinfo_t *info, int job_id,
+                          const char *docname,
+                          const char *format,
+                          int num_options,
+                          cups_option_t *options,
+                          int last_document);
+
+    http_status_t
+    cupsWriteRequestData(http_t *http, const char *buffer,
+                         size_t length);
+
+    ipp_status_t
+    cupsFinishDestDocument(http_t *http, cups_dest_t *dest,
+                           cups_dinfo_t *info);
+
+The `docname` argument specifies the name of the document, typically the
+original filename.  The `format` argument specifies the MIME media type of the
+document, including the following constants:
+
+- `CUPS_FORMAT_JPEG`: "image/jpeg"
+- `CUPS_FORMAT_PDF`: "application/pdf"
+- `CUPS_FORMAT_POSTSCRIPT`: "application/postscript"
+- `CUPS_FORMAT_TEXT`: "text/plain"
+
+The `num_options` and `options` arguments specify per-document print options,
+which at present must be 0 and `NULL`.  The `last_document` argument specifies
+whether this is the last document in the job.
+
+For example, the following code submits a PDF file to the job that was just
+created:
+
+    FILE *fp = fopen("filename.pdf", "rb");
+    size_t bytes;
+    char buffer[65536];
+
+    if (cupsStartDestDocument(CUPS_HTTP_DEFAULT, dest, info,
+                              job_id, "filename.pdf", 0, NULL,
+                              1) == HTTP_STATUS_CONTINUE)
     {
-      job_state = jobs[i].state;
-      break;
+      while ((bytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+        if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
+                                 bytes) != HTTP_STATUS_CONTINUE)
+          break;
+
+      if (cupsFinishDestDocument(CUPS_HTTP_DEFAULT, dest,
+                                 info) == IPP_STATUS_OK)
+        puts("Document send succeeded.");
+      else
+        printf("Document send failed: %s\n",
+               cupsLastErrorString());
     }
 
-  /* Free the job array */
-  <a href='#cupsFreeJobs'>cupsFreeJobs</a>(num_jobs, jobs);
-
-  /* Show the current state */
-  switch (job_state)
-  {
-    case IPP_JOB_PENDING :
-        printf("Job %d is pending.\n", job_id);
-        break;
-    case IPP_JOB_HELD :
-        printf("Job %d is held.\n", job_id);
-        break;
-    case IPP_JOB_PROCESSING :
-        printf("Job %d is processing.\n", job_id);
-        break;
-    case IPP_JOB_STOPPED :
-        printf("Job %d is stopped.\n", job_id);
-        break;
-    case IPP_JOB_CANCELED :
-        printf("Job %d is canceled.\n", job_id);
-        break;
-    case IPP_JOB_ABORTED :
-        printf("Job %d is aborted.\n", job_id);
-        break;
-    case IPP_JOB_COMPLETED :
-        printf("Job %d is completed.\n", job_id);
-        break;
-  }
-
-  /* Sleep if the job is not finished */
-  if (job_state &lt; IPP_JOB_STOPPED)
-    sleep(5);
-}
-</pre>
-
-<p>To cancel a job, use the
-<a href='#cupsCancelJob'><code>cupsCancelJob</code></a> function with the
-job ID:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-<a href='#cups_dest_t'>cups_dest_t</a> *dest;
-int job_id;
-
-<a href='#cupsCancelJob'>cupsCancelJob</a>(dest->name, job_id);
-</pre>
-
-<h3><a name='ERROR_HANDLING'>Error Handling</a></h3>
-
-<p>If any of the CUPS API printing functions returns an error, the reason for
-that error can be found by calling the
-<a href='#cupsLastError'><code>cupsLastError</code></a> and
-<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> functions.
-<a href='#cupsLastError'><code>cupsLastError</code></a> returns the last IPP
-error code
-(<a href='api-httpipp.html#ipp_status_t'><code>ipp_status_t</code></a>)
-that was encountered, while
-<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> returns
-a (localized) human-readable string that can be shown to the user. For example,
-if any of the job creation functions returns a job ID of 0, you can use
-<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> to show
-the reason why the job could not be created:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-int job_id;
-
-if (job_id == 0)
-  puts(cupsLastErrorString());
-</pre>
-
-<h3><a name='PASSWORDS_AND_AUTHENTICATION'>Passwords and Authentication</a></h3>
-
-<p>CUPS supports authentication of any request, including submission of print
-jobs. The default mechanism for getting the username and password is to use the
-login user and a password from the console.</p>
-
-<p>To support other types of applications, in particular Graphical User
-Interfaces ("GUIs"), the CUPS API provides functions to set the default
-username and to register a callback function that returns a password string.</p>
-
-<p>The <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a>
-function is used to set a password callback in your program. Only one
-function can be used at any time.</p>
-
-<p>The <a href="#cupsSetUser"><code>cupsSetUser</code></a> function sets the
-current username for authentication. This function can be called by your
-password callback function to change the current username as needed.</p>
-
-<p>The following example shows a simple password callback that gets a
-username and password from the user:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-const char *
-my_password_cb(const char *prompt)
-{
-  char	user[65];
-
-
-  puts(prompt);
-
-  /* Get a username from the user */
-  printf("Username: ");
-  if (fgets(user, sizeof(user), stdin) == NULL)
-    return (NULL);
-
-  /* Strip the newline from the string and set the user */
-  user[strlen(user) - 1] = '\0';
-
-  <a href='#cupsSetUser'>cupsSetUser</a>(user);
-
-  /* Use getpass() to ask for the password... */
-  return (getpass("Password: "));
-}
-
-<a href='#cupsSetPasswordCB'>cupsSetPasswordCB</a>(my_password_cb);
-</pre>
-
-<p>Similarly, a GUI could display the prompt string in a window with input
-fields for the username and password. The username should default to the
-string returned by the <a href="#cupsUser"><code>cupsUser</code></a>
-function.</p>
-<!--
-  HTTP and IPP API introduction for CUPS.
-
-  Copyright 2007-2012 by Apple Inc.
-  Copyright 1997-2006 by Easy Software Products, all rights reserved.
-
-  These coded instructions, statements, and computer programs are the
-  property of Apple Inc. and are protected by Federal copyright
-  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-  which should have been included with this file.  If this file is
-  file is missing or damaged, see the license at "http://www.cups.org/".
--->
-
-<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
-
-<p>The CUPS HTTP and IPP APIs provide low-level access to the HTTP and IPP
-protocols and CUPS scheduler. They are typically used by monitoring and
-administration programs to perform specific functions not supported by the
-high-level CUPS API functions.</p>
-
-<p>The HTTP APIs use an opaque structure called
-<a href='#http_t'><code>http_t</code></a> to manage connections to
-a particular HTTP or IPP server. The
-<a href='#httpConnectEncrypt'><code>httpConnectEncrypt</code></a> function is
-used to create an instance of this structure for a particular server.
-The constant <code>CUPS_HTTP_DEFAULT</code> can be used with all of the
-<code>cups</code> functions to refer to the default CUPS server - the functions
-create a per-thread <a href='#http_t'><code>http_t</code></a> as needed.</p>
-
-<p>The IPP APIs use two opaque structures for requests (messages sent to the CUPS scheduler) and responses (messages sent back to your application from the scheduler). The <a href='#ipp_t'><code>ipp_t</code></a> type holds a complete request or response and is allocated using the <a href='#ippNew'><code>ippNew</code></a> or <a href='#ippNewRequest'><code>ippNewRequest</code></a> functions and freed using the <a href='#ippDelete'><code>ippDelete</code></a> function.</p>
-
-<p>The second opaque structure is called <a href='#ipp_attribute_t'><code>ipp_attribute_t</code></a> and holds a single IPP attribute which consists of a group tag (<a href='#ippGetGroupTag'><code>ippGetGroupTag</code></a>), a value type tag (<a href='#ippGetValueTag'><code>ippGetValueTag</code></a>), the attribute name (<a href='#ippGetName'><code>ippGetName</code></a>), and 1 or more values (<a href='#ippGetCount'><code>ippGetCount</code></a>, <a href='#ippGetBoolean'><code>ippGetBoolean</code></a>, <a href='#ippGetCollection'><code>ippGetCollection</code></a>, <a href='#ippGetDate'><code>ippGetDate</code></a>, <a href='#ippGetInteger'><code>ippGetInteger</code></a>, <a href='#ippGetRange'><code>ippGetRange</code></a>, <a href='#ippGetResolution'><code>ippGetResolution</code></a>, and <a href='#ippGetString'><code>ippGetString</code></a>). Attributes are added to an <a href='#ipp_t'><code>ipp_t</code></a> pointer using one of the <code>ippAdd</code> functions. For example, use <a href='#ippAddString'><code>ippAddString</code></a> to add the "printer-uri" and "requesting-user-name" string attributes to a request:</p>
-
-<pre class='example'>
-<a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(IPP_GET_JOBS);
-
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-             NULL, "ipp://localhost/printers/");
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-             NULL, cupsUser());
-</pre>
-
-<p>Once you have created an IPP request, use the <code>cups</code> functions to send the request to and read the response from the server. For example, the <a href='#cupsDoRequest'><code>cupsDoRequest</code></a> function can be used for simple query operations that do not involve files:</p>
-
-<pre class='example'>
-#include &lt;cups/cups.h&gt;
-
-
-<a href='#ipp_t'>ipp_t</a> *<a name='get_jobs'>get_jobs</a>(void)
-{
-  <a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(IPP_GET_JOBS);
-
-  <a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, "ipp://localhost/printers/");
-  <a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-               NULL, cupsUser());
-
-  return (<a href='#cupsDoRequest'>cupsDoRequest</a>(CUPS_HTTP_DEFAULT, request, "/"));
-}
-</pre>
-
-<p>The <a href='#cupsDoRequest'><code>cupsDoRequest</code></a> function frees the request and returns an IPP response or <code>NULL</code> pointer if the request could not be sent to the server. Once you have a response from the server, you can either use the <a href='#ippFindAttribute'><code>ippFindAttribute</code></a> and <a href='#ippFindNextAttribute'><code>ippFindNextAttribute</code></a> functions to find specific attributes, for example:</p>
-
-<pre class='example'>
-<a href='#ipp_t'>ipp_t</a> *response;
-<a href='#ipp_attribute_t'>ipp_attribute_t</a> *attr;
-
-attr = <a href='#ippFindAttribute'>ippFindAttribute</a>(response, "printer-state", IPP_TAG_ENUM);
-</pre>
-
-<p>You can also walk the list of attributes with a simple <code>for</code> loop like this:</p>
-
-<pre class='example'>
-<a href='#ipp_t'>ipp_t</a> *response;
-<a href='#ipp_attribute_t'>ipp_attribute_t</a> *attr;
-
-for (attr = <a href='#ippFirstAttribute'>ippFirstAttribute</a>(response); attr != NULL; attr = <a href='#ippNextAttribute'>ippNextAttribute</a>(response))
-  if (ippGetName(attr) == NULL)
-    puts("--SEPARATOR--");
-  else
-    puts(ippGetName(attr));
-</pre>
-
-<p>The <code>for</code> loop approach is normally used when collecting attributes for multiple objects (jobs, printers, etc.) in a response. Attributes with <code>NULL</code> names indicate a separator between the attributes of each object. For example, the following code will list the jobs returned from our previous <a href='#get_jobs'><code>get_jobs</code></a> example code:</p>
-
-<pre class='example'>
-<a href='#ipp_t'>ipp_t</a> *response = <a href='#get_jobs'>get_jobs</a>();
-
-if (response != NULL)
-{
-  <a href='#ipp_attribute_t'>ipp_attribute_t</a> *attr;
-  const char *attrname;
-  int job_id = 0;
-  const char *job_name = NULL;
-  const char *job_originating_user_name = NULL;
-
-  puts("Job ID  Owner             Title");
-  puts("------  ----------------  ---------------------------------");
-
-  for (attr = <a href='#ippFirstAttribute'>ippFirstAttribute</a>(response); attr != NULL; attr = <a href='#ippNextAttribute'>ippNextAttribute</a>(response))
-  {
-   /* Attributes without names are separators between jobs */
-    attrname = ippGetName(attr);
-    if (attrname == NULL)
-    {
-      if (job_id > 0)
-      {
-        if (job_name == NULL)
-          job_name = "(withheld)";
-
-        if (job_originating_user_name == NULL)
-          job_originating_user_name = "(withheld)";
-
-        printf("%5d  %-16s  %s\n", job_id, job_originating_user_name, job_name);
-      }
-
-      job_id = 0;
-      job_name = NULL;
-      job_originating_user_name = NULL;
-      continue;
-    }
-    else if (!strcmp(attrname, "job-id") &amp;&amp; ippGetValueTag(attr) == IPP_TAG_INTEGER)
-      job_id = ippGetInteger(attr, 0);
-    else if (!strcmp(attrname, "job-name") &amp;&amp; ippGetValueTag(attr) == IPP_TAG_NAME)
-      job_name = ippGetString(attr, 0, NULL);
-    else if (!strcmp(attrname, "job-originating-user-name") &amp;&amp;
-             ippGetValueTag(attr) == IPP_TAG_NAME)
-      job_originating_user_name = ippGetString(attr, 0, NULL);
-  }
-
-  if (job_id > 0)
-  {
-    if (job_name == NULL)
-      job_name = "(withheld)";
-
-    if (job_originating_user_name == NULL)
-      job_originating_user_name = "(withheld)";
-
-    printf("%5d  %-16s  %s\n", job_id, job_originating_user_name, job_name);
-  }
-}
-</pre>
-
-<h3><a name='CREATING_URI_STRINGS'>Creating URI Strings</a></h3>
-
-<p>To ensure proper encoding, the
-<a href='#httpAssembleURIf'><code>httpAssembleURIf</code></a> function must be
-used to format a "printer-uri" string for all printer-based requests:</p>
-
-<pre class='example'>
-const char *name = "Foo";
-char uri[1024];
-<a href='#ipp_t'>ipp_t</a> *request;
-
-<a href='#httpAssembleURIf'>httpAssembleURIf</a>(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL, cupsServer(),
-                 ippPort(), "/printers/%s", name);
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-</pre>
-
-<h3><a name='SENDING_REQUESTS_WITH_FILES'>Sending Requests with Files</a></h3>
-
-<p>The <a href='#cupsDoFileRequest'><code>cupsDoFileRequest</code></a> and
-<a href='#cupsDoIORequest'><code>cupsDoIORequest</code></a> functions are
-used for requests involving files. The
-<a href='#cupsDoFileRequest'><code>cupsDoFileRequest</code></a> function
-attaches the named file to a request and is typically used when sending a print
-file or changing a printer's PPD file:</p>
-
-<pre class='example'>
-const char *filename = "/usr/share/cups/data/testprint.ps";
-const char *name = "Foo";
-char uri[1024];
-char resource[1024];
-<a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(IPP_PRINT_JOB);
-<a href='#ipp_t'>ipp_t</a> *response;
-
-/* Use httpAssembleURIf for the printer-uri string */
-<a href='#httpAssembleURIf'>httpAssembleURIf</a>(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL, cupsServer(),
-                 ippPort(), "/printers/%s", name);
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-             NULL, cupsUser());
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
-             NULL, "testprint.ps");
-
-/* Use snprintf for the resource path */
-snprintf(resource, sizeof(resource), "/printers/%s", name);
-
-response = <a href='#cupsDoFileRequest'>cupsDoFileRequest</a>(CUPS_HTTP_DEFAULT, request, resource, filename);
-</pre>
-
-<p>The <a href='#cupsDoIORequest'><code>cupsDoIORequest</code></a> function
-optionally attaches a file to the request and optionally saves a file in the
-response from the server. It is used when using a pipe for the request
-attachment or when using a request that returns a file, currently only
-<code>CUPS_GET_DOCUMENT</code> and <code>CUPS_GET_PPD</code>. For example,
-the following code will download the PPD file for the sample HP LaserJet
-printer driver:</p>
-
-<pre class='example'>
-char tempfile[1024];
-int tempfd;
-<a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(CUPS_GET_PPD);
-<a href='#ipp_t'>ipp_t</a> *response;
-
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name",
-             NULL, "laserjet.ppd");
-
-tempfd = cupsTempFd(tempfile, sizeof(tempfile));
-
-response = <a href='#cupsDoIORequest'>cupsDoIORequest</a>(CUPS_HTTP_DEFAULT, request, "/", -1, tempfd);
-</pre>
-
-<p>The example passes <code>-1</code> for the input file descriptor to specify
-that no file is to be attached to the request. The PPD file attached to the
-response is written to the temporary file descriptor we created using the
-<code>cupsTempFd</code> function.</p>
-
-<h3><a name='ASYNCHRONOUS_REQUEST_PROCESSING'>Asynchronous Request Processing</a></h3>
-
-<p>The <a href='#cupsSendRequest'><code>cupsSendRequest</code></a> and
-<a href='#cupsGetResponse'><code>cupsGetResponse</code></a> support
-asynchronous communications with the server. Unlike the other request
-functions, the IPP request is not automatically freed, so remember to
-free your request with the <a href='#ippDelete'><code>ippDelete</code></a>
-function.</p>
-
-<p>File data is attached to the request using the
-<a href='#cupsWriteRequestData'><code>cupsWriteRequestData</code></a>
-function, while file data returned from the server is read using the
-<a href='#cupsReadResponseData'><code>cupsReadResponseData</code></a>
-function. We can rewrite the previous <code>CUPS_GET_PPD</code> example
-to use the asynchronous functions quite easily:</p>
-
-<pre class='example'>
-char tempfile[1024];
-int tempfd;
-<a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(CUPS_GET_PPD);
-<a href='#ipp_t'>ipp_t</a> *response;
-
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name",
-             NULL, "laserjet.ppd");
-
-tempfd = cupsTempFd(tempfile, sizeof(tempfile));
-
-if (<a href='#cupsSendRequest'>cupsSendRequest</a>(CUPS_HTTP_DEFAULT, request, "/") == HTTP_CONTINUE)
-{
-  response = <a href='#cupsGetResponse'>cupsGetResponse</a>(CUPS_HTTP_DEFAULT, "/");
-
-  if (response != NULL)
-  {
-    ssize_t bytes;
-    char buffer[8192];
-
-    while ((bytes = <a href='#cupsReadResponseData'>cupsReadResponseData</a>(CUPS_HTTP_DEFAULT, buffer, sizeof(buffer))) > 0)
-      write(tempfd, buffer, bytes);
-  }
-}
-
-/* Free the request! */
-<a href='#ippDelete'>ippDelete</a>(request);
-</pre>
-
-<p>The <a href='#cupsSendRequest'><code>cupsSendRequest</code></a> function
-returns the initial HTTP request status, typically either
-<code>HTTP_CONTINUE</code> or <code>HTTP_UNAUTHORIZED</code>. The latter status
-is returned when the request requires authentication of some sort. The
-<a href='#cupsDoAuthentication'><code>cupsDoAuthentication</code></a> function
-must be called when your see <code>HTTP_UNAUTHORIZED</code> and the request
-re-sent. We can add authentication support to our example code by using a
-<code>do ... while</code> loop:</p>
-
-<pre class='example'>
-char tempfile[1024];
-int tempfd;
-<a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(CUPS_GET_PPD);
-<a href='#ipp_t'>ipp_t</a> *response;
-http_status_t status;
-
-<a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name",
-             NULL, "laserjet.ppd");
-
-tempfd = cupsTempFd(tempfile, sizeof(tempfile));
-
-/* Loop for authentication */
-do
-{
-  status = <a href='#cupsSendRequest'>cupsSendRequest</a>(CUPS_HTTP_DEFAULT, request, "/");
-
-  if (status == HTTP_UNAUTHORIZED)
-  {
-    /* Try to authenticate, break out of the loop if that fails */
-    if (<a href='#cupsDoAuthentication'>cupsDoAuthentication</a>(CUPS_HTTP_DEFAULT, "POST", "/"))
-      break;
-  }
-}
-while (status != HTTP_CONTINUE &amp;&amp; status != HTTP_UNAUTHORIZED);
-
-if (status == HTTP_CONTINUE)
-{
-  response = <a href='#cupsGetResponse'>cupsGetResponse</a>(CUPS_HTTP_DEFAULT, "/");
-
-  if (response != NULL)
-  {
-    ssize_t bytes;
-    char buffer[8192];
-
-    while ((bytes = <a href='#cupsReadResponseData'>cupsReadResponseData</a>(CUPS_HTTP_DEFAULT, buffer, sizeof(buffer))) > 0)
-      write(tempfd, buffer, bytes);
-  }
-}
-
-/* Free the request! */
-<a href='#ippDelete'>ippDelete</a>(request);
-</pre>
-<!--
-  File and directory API introduction for CUPS.
-
-  Copyright 2007-2011 by Apple Inc.
-  Copyright 1997-2005 by Easy Software Products, all rights reserved.
-
-  These coded instructions, statements, and computer programs are the
-  property of Apple Inc. and are protected by Federal copyright
-  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-  which should have been included with this file.  If this file is
-  file is missing or damaged, see the license at "http://www.cups.org/".
--->
-
-<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
-
-<p>The CUPS file and directory APIs provide portable interfaces
-for manipulating files and listing files and directories. Unlike
-stdio <code>FILE</code> streams, the <code>cupsFile</code> functions
-allow you to open more than 256 files at any given time. They
-also manage the platform-specific details of locking, large file
-support, line endings (CR, LF, or CR LF), and reading and writing
-files using Flate ("gzip") compression. Finally, you can also
-connect, read from, and write to network connections using the
-<code>cupsFile</code> functions.</p>
-
-<p>The <code>cupsDir</code> functions manage the platform-specific
-details of directory access/listing and provide a convenient way
-to get both a list of files and the information (permissions,
-size, timestamp, etc.) for each of those files.</p>
-<!--
-  Array API introduction for CUPS.
-
-  Copyright 2007-2011 by Apple Inc.
-  Copyright 1997-2006 by Easy Software Products, all rights reserved.
-
-  These coded instructions, statements, and computer programs are the
-  property of Apple Inc. and are protected by Federal copyright
-  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-  which should have been included with this file.  If this file is
-  file is missing or damaged, see the license at "http://www.cups.org/".
--->
-
-<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
-
-<p>The CUPS array API provides a high-performance generic array container.
-The contents of the array container can be sorted and the container itself is
-designed for optimal speed and memory usage under a wide variety of conditions.
-Sorted arrays use a binary search algorithm from the last found or inserted
-element to quickly find matching elements in the array. Arrays created with the
-optional hash function can often find elements with a single lookup. The
-<a href='#cups_array_t'><code>cups_array_t</code></a> type is used when
-referring to a CUPS array.</p>
-
-<p>The CUPS scheduler (<tt>cupsd</tt>) and many of the CUPS API
-functions use the array API to efficiently manage large lists of
-data.</p>
-
-<h3><a name='MANAGING_ARRAYS'>Managing Arrays</a></h3>
-
-<p>Arrays are created using either the
-<a href='#cupsArrayNew'><code>cupsArrayNew</code></a>,
-<a href='#cupsArrayNew2'><code>cupsArrayNew2</code></a>, or
-<a href='#cupsArrayNew2'><code>cupsArrayNew3</code></a> functions. The
-first function creates a new array with the specified callback function
-and user data pointer:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-static int compare_func(void *first, void *second, void *user_data);
-
-void *user_data;
-<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>(compare_func, user_data);
-</pre>
-
-<p>The comparison function (type
-<a href="#cups_arrayfunc_t"><code>cups_arrayfunc_t</code></a>) is called
-whenever an element is added to the array and can be <code>NULL</code> to
-create an unsorted array. The function returns -1 if the first element should
-come before the second, 0 if the first and second elements should have the same
-ordering, and 1 if the first element should come after the second.</p>
-
-<p>The "user_data" pointer is passed to your comparison function. Pass
-<code>NULL</code> if you do not need to associate the elements in your array
-with additional information.</p>
-
-<p>The <a href='#cupsArrayNew2'><code>cupsArrayNew2</code></a> function adds
-two more arguments to support hashed lookups, which can potentially provide
-instantaneous ("O(1)") lookups in your array:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-#define HASH_SIZE 512 /* Size of hash table */
-
-static int compare_func(void *first, void *second, void *user_data);
-static int hash_func(void *element, void *user_data);
-
-void *user_data;
-<a href='#cups_array_t'>cups_array_t</a> *hash_array = <a href='#cupsArrayNew2'>cupsArrayNew2</a>(compare_func, user_data, hash_func, HASH_SIZE);
-</pre>
-
-<p>The hash function (type
-<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) should return a
-number from 0 to (hash_size-1) that (hopefully) uniquely identifies the
-element and is called whenever you look up an element in the array with
-<a href='#cupsArrayFind'><code>cupsArrayFind</code></a>. The hash size is
-only limited by available memory, but generally should not be larger than
-16384 to realize any performance improvement.</p>
-
-<p>The <a href='#cupsArrayNew3'><code>cupsArrayNew3</code></a> function adds
-copy and free callbacks to support basic memory management of elements:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-#define HASH_SIZE 512 /* Size of hash table */
-
-static int compare_func(void *first, void *second, void *user_data);
-static void *copy_func(void *element, void *user_data);
-static void free_func(void *element, void *user_data);
-static int hash_func(void *element, void *user_data);
-
-void *user_data;
-<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew3'>cupsArrayNew3</a>(compare_func, user_data, NULL, 0, copy_func, free_func);
-
-<a href='#cups_array_t'>cups_array_t</a> *hash_array = <a href='#cupsArrayNew3'>cupsArrayNew3</a>(compare_func, user_data, hash_func, HASH_SIZE, copy_func, free_func);
-</pre>
-
-<p>Once you have created the array, you add elements using the
-<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a>
-<a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> functions.
-The first function adds an element to the array, adding the new element
-after any elements that have the same order, while the second inserts the
-element before others with the same order. For unsorted arrays,
-<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the element to
-the end of the array while
-<a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> inserts the
-element at the beginning of the array. For example, the following code
-creates a sorted array of character strings:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-/* Use strcmp() to compare strings - it will ignore the user_data pointer */
-<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
-
-/* Add four strings to the array */
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
-</pre>
-
-<p>Elements are removed using the
-<a href='#cupsArrayRemove'><code>cupsArrayRemove</code></a> function, for
-example:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-/* Use strcmp() to compare strings - it will ignore the user_data pointer */
-<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
-
-/* Add four strings to the array */
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
-
-/* Remove "Red Fish" */
-<a href='#cupsArrayRemove'>cupsArrayRemove</a>(array, "Red Fish");
-</pre>
-
-<p>Finally, you free the memory used by the array using the
-<a href='#cupsArrayDelete'><code>cupsArrayDelete</code></a> function. All
-of the memory for the array and hash table (if any) is freed, however <em>CUPS
-does not free the elements unless you provide copy and free functions</em>.</p>
-
-<h3><a name='FINDING_AND_ENUMERATING'>Finding and Enumerating Elements</a></h3>
-
-<p>CUPS provides several functions to find and enumerate elements in an
-array. Each one sets or updates a "current index" into the array, such that
-future lookups will start where the last one left off:</p>
-
-<dl>
-	<dt><a href='#cupsArrayFind'><code>cupsArrayFind</code></a></dt>
-	<dd>Returns the first matching element.</dd>
-	<dt><a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a></dt>
-	<dd>Returns the first element in the array.</dd>
-	<dt><a href='#cupsArrayIndex'><code>cupsArrayIndex</code></a></dt>
-	<dd>Returns the Nth element in the array, starting at 0.</dd>
-	<dt><a href='#cupsArrayLast'><code>cupsArrayLast</code></a></dt>
-	<dd>Returns the last element in the array.</dd>
-	<dt><a href='#cupsArrayNext'><code>cupsArrayNext</code></a></dt>
-	<dd>Returns the next element in the array.</dd>
-	<dt><a href='#cupsArrayPrev'><code>cupsArrayPrev</code></a></dt>
-	<dd>Returns the previous element in the array.</dd>
-</dl>
-
-<p>Each of these functions returns <code>NULL</code> when there is no
-corresponding element.  For example, a simple <code>for</code> loop using the
-<a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a> and
-<a href='#cupsArrayNext'><code>cupsArrayNext</code></a> functions will
-enumerate all of the strings in our previous example:</p>
-
-<pre class='example'>
-#include &lt;cups/array.h&gt;
-
-/* Use strcmp() to compare strings - it will ignore the user_data pointer */
-<a href='#cups_array_t'>cups_array_t</a> *array = <a href='#cupsArrayNew'>cupsArrayNew</a>((<a href='#cups_array_func_t'>cups_array_func_t</a>)strcmp, NULL);
-
-/* Add four strings to the array */
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "One Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Two Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Red Fish");
-<a href='#cupsArrayAdd'>cupsArrayAdd</a>(array, "Blue Fish");
-
-/* Show all of the strings in the array */
-char *s;
-for (s = (char *)<a href='#cupsArrayFirst'>cupsArrayFirst</a>(array); s != NULL; s = (char *)<a href='#cupsArrayNext'>cupsArrayNext</a>(array))
-  puts(s);
-</pre>
+    fclose(fp);

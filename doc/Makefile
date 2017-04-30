@@ -45,15 +45,11 @@ HELPIMAGES	=	\
 HELPFILES	=	\
 			help/accounting.html \
 			help/api-admin.html \
-			help/api-array.html \
-			help/api-cups.html \
-			help/api-filedir.html \
 			help/api-filter.html \
-			help/api-httpipp.html \
-			help/api-overview.html \
 			help/api-ppd.html \
 			help/api-raster.html \
 			help/cgi.html \
+			help/cupspm.html \
 			help/encryption.html \
 			help/glossary.html \
 			help/kerberos.html \

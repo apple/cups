@@ -13,7 +13,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2016 by Apple Inc.
+%copyright 2007-2017` by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -557,6 +557,7 @@ f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 
 d 0755 root sys $DOCDIR/help -
 f 0444 root sys $DOCDIR/help doc/help/api*.html
+f 0444 root sys $DOCDIR/help/cupspm.html doc/help/cupspm.html
 f 0444 root sys $DOCDIR/help/postscript-driver.html doc/help/postscript-driver.html
 f 0444 root sys $DOCDIR/help/ppd-compiler.html doc/help/ppd-compiler.html
 f 0444 root sys $DOCDIR/help/raster-driver.html doc/help/raster-driver.html

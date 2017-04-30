@@ -78,7 +78,7 @@ extern "C" {
 #  define CUPS_DEST_FLAGS_NONE		0x00
 					/* No flags are set */
 #  define CUPS_DEST_FLAGS_UNCONNECTED	0x01
-					/* There is not connection */
+					/* There is no connection */
 #  define CUPS_DEST_FLAGS_MORE		0x02
 					/* There are more destinations */
 #  define CUPS_DEST_FLAGS_REMOVED	0x04
@@ -207,18 +207,18 @@ enum cups_ptype_e			/* Printer type/capability bit
   CUPS_PRINTER_REMOTE = 0x0002,		/* Remote printer or class */
   CUPS_PRINTER_BW = 0x0004,		/* Can do B&W printing */
   CUPS_PRINTER_COLOR = 0x0008,		/* Can do color printing */
-  CUPS_PRINTER_DUPLEX = 0x0010,		/* Can do duplexing */
+  CUPS_PRINTER_DUPLEX = 0x0010,		/* Can do two-sided printing */
   CUPS_PRINTER_STAPLE = 0x0020,		/* Can staple output */
-  CUPS_PRINTER_COPIES = 0x0040,		/* Can do copies */
-  CUPS_PRINTER_COLLATE = 0x0080,	/* Can collage copies */
+  CUPS_PRINTER_COPIES = 0x0040,		/* Can do copies in hardware */
+  CUPS_PRINTER_COLLATE = 0x0080,	/* Can quickly collate copies */
   CUPS_PRINTER_PUNCH = 0x0100,		/* Can punch output */
   CUPS_PRINTER_COVER = 0x0200,		/* Can cover output */
   CUPS_PRINTER_BIND = 0x0400,		/* Can bind output */
   CUPS_PRINTER_SORT = 0x0800,		/* Can sort output */
-  CUPS_PRINTER_SMALL = 0x1000,		/* Can do Letter/Legal/A4 */
-  CUPS_PRINTER_MEDIUM = 0x2000,		/* Can do Tabloid/B/C/A3/A2 */
-  CUPS_PRINTER_LARGE = 0x4000,		/* Can do D/E/A1/A0 */
-  CUPS_PRINTER_VARIABLE = 0x8000,	/* Can do variable sizes */
+  CUPS_PRINTER_SMALL = 0x1000,		/* Can print on Letter/Legal/A4-size media */
+  CUPS_PRINTER_MEDIUM = 0x2000,		/* Can print on Tabloid/B/C/A3/A2-size media */
+  CUPS_PRINTER_LARGE = 0x4000,		/* Can print on D/E/A1/A0-size media */
+  CUPS_PRINTER_VARIABLE = 0x8000,	/* Can print on rolls and custom-size media */
   CUPS_PRINTER_IMPLICIT = 0x10000,	/* Implicit class @private@
 					 * @since Deprecated@ */
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
@@ -269,7 +269,7 @@ typedef struct cups_job_s		/**** Job ****/
   int		id;			/* The job ID */
   char		*dest;			/* Printer or class name */
   char		*title;			/* Title/job name */
-  char		*user;			/* User the submitted the job */
+  char		*user;			/* User that submitted the job */
   char		*format;		/* Document format */
   ipp_jstate_t	state;			/* Job state */
   int		size;			/* Size in kilobytes */
