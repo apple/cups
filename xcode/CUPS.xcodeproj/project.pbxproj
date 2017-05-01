@@ -3576,11 +3576,11 @@
 		72E65BD918DC850A00097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
 		72E65BDC18DC852700097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../scheduler/Makefile; sourceTree = SOURCE_ROOT; };
 		72E65BDD18DCA35700097E89 /* CHANGES-1.7.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-1.7.txt"; path = "../CHANGES-1.7.txt"; sourceTree = "<group>"; };
-		72E65BDE18DCA35700097E89 /* CHANGES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CHANGES.txt; path = ../CHANGES.txt; sourceTree = "<group>"; };
-		72E65BDF18DCA35700097E89 /* CREDITS.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CREDITS.txt; path = ../CREDITS.txt; sourceTree = "<group>"; };
-		72E65BE018DCA35700097E89 /* INSTALL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = INSTALL.txt; path = ../INSTALL.txt; sourceTree = "<group>"; };
+		72E65BDE18DCA35700097E89 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGES.md; path = ../CHANGES.md; sourceTree = "<group>"; };
+		72E65BDF18DCA35700097E89 /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CREDITS.md; path = ../CREDITS.md; sourceTree = "<group>"; };
+		72E65BE018DCA35700097E89 /* INSTALL.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = INSTALL.md; path = ../INSTALL.md; sourceTree = "<group>"; };
 		72E65BE218DCA35700097E89 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE.txt; path = ../LICENSE.txt; sourceTree = "<group>"; };
-		72E65BE318DCA35700097E89 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.txt; path = ../README.txt; sourceTree = "<group>"; };
+		72E65BE318DCA35700097E89 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
 		72F75A611336F9A3004BB496 /* libcupsimage.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcupsimage.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -5234,10 +5234,10 @@
 				72E65BCC18DC7A9800097E89 /* api-raster.shtml */,
 				72E65BDD18DCA35700097E89 /* CHANGES-1.7.txt */,
 				729D4B561A2CB48700692B21 /* CHANGES-2.0.txt */,
-				72E65BDE18DCA35700097E89 /* CHANGES.txt */,
-				72E65BDF18DCA35700097E89 /* CREDITS.txt */,
+				72E65BDE18DCA35700097E89 /* CHANGES.md */,
+				72E65BDF18DCA35700097E89 /* CREDITS.md */,
 				72E65BB918DC7A3600097E89 /* doc */,
-				72E65BE018DCA35700097E89 /* INSTALL.txt */,
+				72E65BE018DCA35700097E89 /* INSTALL.md */,
 				72E65BE218DCA35700097E89 /* LICENSE.txt */,
 				72E65BBA18DC7A3600097E89 /* man */,
 				72E65BCD18DC7A9800097E89 /* postscript-driver.header */,
@@ -5246,7 +5246,7 @@
 				72E65BD018DC7A9800097E89 /* ppd-compiler.shtml */,
 				72E65BD118DC7A9800097E89 /* raster-driver.header */,
 				72E65BD218DC7A9800097E89 /* raster-driver.shtml */,
-				72E65BE318DCA35700097E89 /* README.txt */,
+				72E65BE318DCA35700097E89 /* README.md */,
 				72E65BD318DC7A9800097E89 /* spec-ppd.header */,
 				72E65BD418DC7A9800097E89 /* spec-ppd.shtml */,
 			);

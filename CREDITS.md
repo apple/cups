@@ -1,8 +1,8 @@
-CREDITS.txt - 2016-06-21
-------------------------
+CREDITS - 2017-05-01
+====================
 
-Few projects are completed by one person, and CUPS is no exception.  We'd
-like to thank the following individuals for their contributions:
+Few projects are completed by one person, and CUPS is no exception.  We'd like
+to thank the following individuals for their contributions:
 
     Niklas 'Nille' Åkerström       - Swedish localization.
     Nathaniel Barbour              - Lots of testing and feedback.
