@@ -1,7 +1,7 @@
 ---
 title: CUPS Programming Manual
 author: Michael R Sweet
-copyright: Copyright (c) 2007-2017 by Apple Inc. All Rights Reserved.
+copyright: Copyright © 2007-2017 by Apple Inc. All Rights Reserved.
 version: 2.2.4
 ...
 
@@ -117,11 +117,11 @@ and libraries (`cups-config --libs`) needed for the local system.
 # Working with Destinations
 
 Destinations, which in CUPS represent individual printers or classes
-(collections) of printers, are represented by the `cups_dest_t` structure which
-includes the name \(`name`), instance \(`instance`, saved options/settings),
-whether the destination is the default for the user \(`is_default`), and the
-options and attributes associated with that destination \(`num_options` and
-`options`).
+(collections or pools) of printers, are represented by the `cups_dest_t`
+structure which includes the name \(`name`), instance \(`instance`, saved
+options/settings), whether the destination is the default for the user
+\(`is_default`), and the options and basic information associated with that
+destination \(`num_options` and `options`).
 
 Historically destinations have been manually maintained by the administrator of
 a system or network, but CUPS also supports dynamic discovery of destinations on
