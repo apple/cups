@@ -1,7 +1,7 @@
 /*
  * API versioning definitions for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -17,11 +17,10 @@
 
 /*
  * This header defines several constants - _CUPS_DEPRECATED,
- * _CUPS_DEPRECATED_MSG, _CUPS_INTERNAL_MSG, _CUPS_API_1_1, _CUPS_API_1_1_19,
- * _CUPS_API_1_1_20, _CUPS_API_1_1_21, _CUPS_API_1_2, _CUPS_API_1_3,
- * _CUPS_API_1_4, _CUPS_API_1_5, _CUPS_API_1_6, _CUPS_API_1_7, and
- * _CUPS_API_2_0 - which add compiler-specific attributes that flag functions
- * that are deprecated, added in particular releases, or internal to CUPS.
+ * _CUPS_DEPRECATED_MSG, _CUPS_INTERNAL_MSG, _CUPS_API_major_minor, and
+ * _CUPS_API_major_minor_patch - which add compiler-specific attributes that
+ * flag functions that are deprecated, added in particular releases, or internal
+ * to CUPS.
  *
  * On macOS, the _CUPS_API_* constants are defined based on the values of
  * the MAC_OS_X_VERSION_MIN_ALLOWED and MAC_OS_X_VERSION_MAX_ALLOWED constants
@@ -57,6 +56,9 @@
 #    ifndef AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #      define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER __attribute__((unavailable))
 #    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER */
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_13_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_13_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_13_AND_LATER */
 #    define _CUPS_API_1_1_19 AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #    define _CUPS_API_1_1_20 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #    define _CUPS_API_1_1_21 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
@@ -68,6 +70,7 @@
 #    define _CUPS_API_1_7 AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #    define _CUPS_API_2_0 AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #    define _CUPS_API_2_2 AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
+#    define _CUPS_API_2_2_4 AVAILABLE_MAC_OS_X_VERSION_10_13_AND_LATER
 #  else
 #    define _CUPS_API_1_1_19
 #    define _CUPS_API_1_1_20
@@ -80,6 +83,7 @@
 #    define _CUPS_API_1_7
 #    define _CUPS_API_2_0
 #    define _CUPS_API_2_2
+#    define _CUPS_API_2_2_4
 #  endif /* __APPLE__ && !_CUPS_SOURCE */
 
 /*

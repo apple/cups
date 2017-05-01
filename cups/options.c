@@ -30,6 +30,31 @@ static int	cups_find_option(const char *name, int num_options,
 
 
 /*
+ * 'cupsAddIntegerOption()' - Add an integer option to an option array.
+ *
+ * New option arrays can be initialized simply by passing 0 for the
+ * "num_options" parameter.
+ *
+ * @since CUPS 2.2.4@
+ */
+
+int					/* O  - Number of options */
+cupsAddIntegerOption(
+    const char    *name,		/* I  - Name of option */
+    int           value,		/* I  - Value of option */
+    int           num_options,		/* I  - Number of options */
+    cups_option_t **options)		/* IO - Pointer to options */
+{
+  char	strvalue[32];			/* String value */
+
+
+  snprintf(strvalue, sizeof(strvalue), "%d", value);
+
+  return (cupsAddOption(name, strvalue, num_options, options));
+}
+
+
+/*
  * 'cupsAddOption()' - Add an option to an option array.
  *
  * New option arrays can be initialized simply by passing 0 for the
@@ -151,6 +176,38 @@ cupsFreeOptions(
   }
 
   free(options);
+}
+
+
+/*
+ * 'cupsGetIntegerOption()' - Get an integer option value.
+ *
+ * INT_MIN is returned when the option does not exist, is not an integer, or
+ * exceeds the range of values for the "int" type.
+ *
+ * @since 2.2.4@
+ */
+
+int					/* O - Option value or @code INT_MIN@ */
+cupsGetIntegerOption(
+    const char    *name,		/* I - Name of option */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options)		/* I - Options */
+{
+  const char	*value = cupsGetOption(name, num_options, options);
+					/* String value of option */
+  char		*ptr;			/* Pointer into string value */
+  long		intvalue;		/* Integer value */
+
+
+  if (!value || !*value)
+    return (INT_MIN);
+
+  intvalue = strtol(value, &ptr, 10);
+  if (intvalue < INT_MIN || intvalue > INT_MAX || *ptr)
+    return (INT_MIN);
+
+  return ((int)intvalue);
 }
 
 

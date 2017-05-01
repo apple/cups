@@ -600,6 +600,10 @@ extern int		cupsSetServerCredentials(const char *path, const char *common_name, 
 /* New in CUPS 2.2/macOS 10.12 */
 extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t datalen, unsigned char *hash, size_t hashsize) _CUPS_API_2_2;
 
+/* New in CUPS 2.2.4 */
+extern int		cupsAddIntegerOption(const char *name, int value, int num_options, cups_option_t **options) _CUPS_API_2_2_4;
+extern int		cupsGetIntegerOption(const char *name, int num_options, cups_option_t *options) _CUPS_API_2_2_4;
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
