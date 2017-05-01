@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="creator" content="Mini-XML v2.11">
     <meta name="author" content="Michael R Sweet">
-    <meta name="copyright" content="Copyright (c) 2007-2017 by Apple Inc. All Rights Reserved.">
+    <meta name="copyright" content="Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.">
     <meta name="version" content="2.2.4">
     <style type="text/css"><!--
 body, p, h1, h2, h3, h4 {
@@ -87,6 +87,9 @@ div.contents ul.contents {
 }
 .variable {
 }
+h1, h2, h3, h4, h5, h6 {
+  page-break-inside: avoid;
+}
 blockquote {
   border: solid thin gray;
   box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
@@ -161,7 +164,7 @@ h3.title {
   <body>
     <h1 class="title">CUPS Programming Manual</h1>
     <p>Michael R Sweet</p>
-    <p>Copyright (c) 2007-2017 by Apple Inc. All Rights Reserved.</p>
+    <p>Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.</p>
     <div class="contents">
       <h2 class="title">Contents</h2>
       <ul class="contents">
@@ -648,7 +651,7 @@ h3.title {
     <p>CUPS is designed to insulate users and developers from the implementation details of printers and file formats. The goal is to allow an application to supply a print file in a standard format with the user intent (&quot;print four copies, two-sided on A4 media, and staple each copy&quot;) and have the printing system manage the printer communication and format conversion needed.</p>
     <p>Similarly, printer and job management applications can use standard query operations to obtain the status information in a common, generic form and use standard management operations to control the state of those printers and jobs.</p>
     <h3><a id="TermsUsedinThisDocument">Terms Used in This Document</a></h3>
-    <p>A <em>Destination</em> is a printer or print queue that accepts print jobs. A <em>Print</em> Job* is one or more documents that are processed by a destination using options supplied when creating the job. A <em>Document</em> is a file (JPEG image, PDF file, etc.) suitable for printing. An <em>Option</em> controls some aspect of printing, such as the media used. <em>Media</em> is the sheets or roll that is printed on. An <em>Attribute</em> is an option encoded for an Internet Printing Protocol (IPP) request.</p>
+    <p>A <em>Destination</em> is a printer or print queue that accepts print jobs. A <em>Print</em> <em>Job</em> is one or more documents that are processed by a destination using options supplied when creating the job. A <em>Document</em> is a file (JPEG image, PDF file, etc.) suitable for printing. An <em>Option</em> controls some aspect of printing, such as the media used. <em>Media</em> is the sheets or roll that is printed on. An <em>Attribute</em> is an option encoded for an Internet Printing Protocol (IPP) request.</p>
     <h3><a id="CompilingProgramsThatUsetheCUPSAPI">Compiling Programs That Use the CUPS API</a></h3>
     <p>The CUPS libraries can be used from any C, C++, or Objective C program. The method of compiling against the libraries varies depending on the operating system and installation of CUPS. The following sections show how to compile a simple program (shown below) in two common environments.</p>
     <p>The following simple program lists the available destinations:</p>
@@ -673,17 +676,17 @@ int main(void)
 }
 </code></pre>
     <h4><a id="CompilingwithXcode">Compiling with Xcode</a></h4>
-    <p>In Xcode, choose <em>New</em> Project...* from the <em>File</em> menu (or press SHIFT+CMD+N), then select the <em>Command</em> Line Tool* under the macOS Application project type. Click <em>Next</em> and enter a name for the project, for example &quot;firstcups&quot;. Click <em>Next</em> and choose a project directory. The click <em>Next</em> to create the project.</p>
-    <p>In the project window, click on the <em>Build</em> Phases* group and expand the <em>Link</em> Binary with Libraries* section. Click <em>+</em>, type &quot;libcups&quot; to show the library, and then double-click on <code>libcups.tbd</code>.</p>
+    <p>In Xcode, choose <em>New</em> <em>Project...</em> from the <em>File</em> menu (or press SHIFT+CMD+N), then select the <em>Command</em> <em>Line</em> <em>Tool</em> under the macOS Application project type. Click <em>Next</em> and enter a name for the project, for example &quot;firstcups&quot;. Click <em>Next</em> and choose a project directory. The click <em>Next</em> to create the project.</p>
+    <p>In the project window, click on the <em>Build</em> <em>Phases</em> group and expand the <em>Link</em> <em>Binary</em> <em>with</em> <em>Libraries</em> section. Click <em>+</em>, type &quot;libcups&quot; to show the library, and then double-click on <code>libcups.tbd</code>.</p>
     <p>Finally, click on the <code>main.c</code> file in the sidebar and copy the example program to the file. Build and run (CMD+R) to see the list of destinations.</p>
     <h4><a id="CompilingwithGCC">Compiling with GCC</a></h4>
     <p>From the command-line, create a file called <code>sample.c</code> using your favorite editor, copy the example to this file, and save. Then run the following command to compile it with GCC and run it:</p>
     <pre><code>gcc -o simple `cups-config --cflags` simple.c `cups-config --libs`
 ./simple
 </code></pre>
-    <p>The <code>cups-config</code> command provides the compiler flags (`cups-config --cflags`) and libraries (`cups-config --libs`) needed for the local system.</p>
+    <p>The <code>cups-config</code> command provides the compiler flags (<code>cups-config --cflags</code>) and libraries (<code>cups-config --libs</code>) needed for the local system.</p>
     <h2><a id="WorkingwithDestinations">Working with Destinations</a></h2>
-    <p>Destinations, which in CUPS represent individual printers or classes (collections) of printers, are represented by the <code>cups_dest_t</code> structure which includes the name (`name`), instance (`instance`, saved options/settings), whether the destination is the default for the user (`is_default`), and the options and attributes associated with that destination (`num_options` and <code>options</code>).</p>
+    <p>Destinations, which in CUPS represent individual printers or classes (collections or pools) of printers, are represented by the <code>cups_dest_t</code> structure which includes the name (<code>name</code>), instance (<code>instance</code>, saved options/settings), whether the destination is the default for the user (<code>is_default</code>), and the options and basic information associated with that destination (<code>num_options</code> and <code>options</code>).</p>
     <p>Historically destinations have been manually maintained by the administrator of a system or network, but CUPS also supports dynamic discovery of destinations on the current network.</p>
     <h3><a id="FindingAvailableDestinations">Finding Available Destinations</a></h3>
     <p>The <code>cupsEnumDests</code> function finds all of the available destinations:</p>
@@ -720,7 +723,7 @@ int main(void)
                               unsigned flags,
                               cups_dest_t *dest);
 </code></pre>
-    <p>The callback function receives a copy of the <code>user_data</code> argument along with a bitfield (`flags`) and the destination that was found. The <code>flags</code> argument can have any of the following constant (bit) values set:</p>
+    <p>The callback function receives a copy of the <code>user_data</code> argument along with a bitfield (<code>flags</code>) and the destination that was found. The <code>flags</code> argument can have any of the following constant (bit) values set:</p>
     <ul>
     <li><code>CUPS_DEST_FLAGS_MORE</code>: There are more destinations coming.</li>
     <li><code>CUPS_DEST_FLAGS_REMOVED</code>: The destination has gone away and should be removed from the list of destinations a user can select.</li>
@@ -837,7 +840,7 @@ cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
     <li><code>CUPS_MEDIA_TYPE</code>: Controls the type of media that is used, typically one of the following: <code>CUPS_MEDIA_TYPE_AUTO</code>, <code>CUPS_MEDIA_TYPE_ENVELOPE</code>, <code>CUPS_MEDIA_TYPE_LABELS</code>, <code>CUPS_MEDIA_TYPE_LETTERHEAD</code>, <code>CUPS_MEDIA_TYPE_PHOTO</code>, <code>CUPS_MEDIA_TYPE_PHOTO_GLOSSY</code>, <code>CUPS_MEDIA_TYPE_PHOTO_MATTE</code>, <code>CUPS_MEDIA_TYPE_PLAIN</code>, or <code>CUPS_MEDIA_TYPE_TRANSPARENCY</code>.</li>
     <li><code>CUPS_NUMBER_UP</code>: Controls the number of document pages that are placed on each media side.</li>
     <li><code>CUPS_ORIENTATION</code>: Controls the orientation of document pages placed on the media: <code>CUPS_ORIENTATION_PORTRAIT</code> or <code>CUPS_ORIENTATION_LANDSCAPE</code>.</li>
-    <li><code>CUPS_PRINT_COLOR_MODE</code>: Controls whether the output is in color (`CUPS_PRINT_COLOR_MODE_COLOR`), grayscale (`CUPS_PRINT_COLOR_MODE_MONOCHROME`), or either (`CUPS_PRINT_COLOR_MODE_AUTO`).</li>
+    <li><code>CUPS_PRINT_COLOR_MODE</code>: Controls whether the output is in color (<code>CUPS_PRINT_COLOR_MODE_COLOR</code>), grayscale (<code>CUPS_PRINT_COLOR_MODE_MONOCHROME</code>), or either (<code>CUPS_PRINT_COLOR_MODE_AUTO</code>).</li>
     <li><code>CUPS_PRINT_QUALITY</code>: Controls the generate quality of the output: <code>CUPS_PRINT_QUALITY_DRAFT</code>, <code>CUPS_PRINT_QUALITY_NORMAL</code>, or <code>CUPS_PRINT_QUALITY_HIGH</code>.</li>
     <li><code>CUPS_SIDES</code>: Controls whether prints are placed on one or both sides of the media: <code>CUPS_SIDES_ONE_SIDED</code>, <code>CUPS_SIDES_TWO_SIDED_PORTRAIT</code>, or <code>CUPS_SIDES_TWO_SIDED_LANDSCAPE</code>.</li>
 </ul>
