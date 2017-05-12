@@ -11148,6 +11148,11 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
   pw = getpwnam(username);
   endpwent();
 
+  int i;
+  for (i = 0; i < NumSystemGroups; i ++)
+    if (cupsdCheckGroup(username, pw, SystemGroups[i]))
+      return (1);
+
   for (name = (char *)cupsArrayFirst(p->users);
        name;
        name = (char *)cupsArrayNext(p->users))
