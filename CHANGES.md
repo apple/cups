@@ -1,4 +1,4 @@
-CHANGES - 2.2.4 - 2017-05-01
+CHANGES - 2.2.4 - 2017-05-16
 ============================
 
 CHANGES IN CUPS V2.2.4
@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.2.4
 - Added a new CUPS Programming Manual to replace the aging API documentation.
 - Added the cupsAddIntegerOption and cupsGetIntegerOption functions
   (Issue #4992)
+- Fixed the "cancel all jobs" function in the web interface for several
+  languages (Issue #4999)
 
 
 CHANGES IN CUPS V2.2.3
