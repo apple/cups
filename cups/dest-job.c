@@ -1,7 +1,7 @@
 /*
  * Destination job support for CUPS.
  *
- * Copyright 2012-2016 by Apple Inc.
+ * Copyright 2012-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -82,6 +82,13 @@ cupsCloseDestJob(
 
 
   DEBUG_printf(("cupsCloseDestJob(http=%p, dest=%p(%s/%s), info=%p, job_id=%d)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, job_id));
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -172,6 +179,13 @@ cupsCreateDestJob(
                 "job_id=%p, title=\"%s\", num_options=%d, options=%p)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, (void *)job_id, title, num_options, (void *)options));
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -252,6 +266,13 @@ cupsFinishDestDocument(
   DEBUG_printf(("cupsFinishDestDocument(http=%p, dest=%p(%s/%s), info=%p)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info));
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -305,6 +326,13 @@ cupsStartDestDocument(
 
 
   DEBUG_printf(("cupsStartDestDocument(http=%p, dest=%p(%s/%s), info=%p, job_id=%d, docname=\"%s\", format=\"%s\", num_options=%d, options=%p, last_document=%d)", (void *)http, (void *)dest, dest ? dest->name : NULL, dest ? dest->instance : NULL, (void *)info, job_id, docname, format, num_options, (void *)options, last_document));
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...

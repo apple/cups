@@ -1,7 +1,7 @@
 /*
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -121,6 +121,13 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 #endif /* HAVE_DNSSD */
 
 
+typedef struct _cups_getdata_s
+{
+  int         num_dests;                /* Number of destinations */
+  cups_dest_t *dests;                   /* Destinations */
+} _cups_getdata_t;
+
+
 /*
  * Local functions...
  */
@@ -218,6 +225,7 @@ static int		cups_elapsed(struct timeval *t);
 static int		cups_find_dest(const char *name, const char *instance,
 				       int num_dests, cups_dest_t *dests, int prev,
 				       int *rdiff);
+static int              cups_get_cb(_cups_getdata_t *data, unsigned flags, cups_dest_t *dest);
 static char		*cups_get_default(const char *filename, char *namebuf,
 					  size_t namesize, const char **instance);
 static int		cups_get_dests(const char *filename, const char *match_name,
@@ -1433,6 +1441,8 @@ _cupsGetDestResource(
   int		port;			/* Port number */
 
 
+  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), resource=%p, resourcesize=%d)", dest, dest->name, resource, (int)resourcesize));
+
  /*
   * Range check input...
   */
@@ -1453,6 +1463,8 @@ _cupsGetDestResource(
   if ((uri = cupsGetOption("printer-uri-supported", dest->num_options,
                            dest->options)) == NULL)
   {
+    DEBUG_puts("1_cupsGetDestResource: No printer-uri-supported found.");
+
     if (resource)
       *resource = '\0';
 
@@ -1460,6 +1472,8 @@ _cupsGetDestResource(
 
     return (NULL);
   }
+
+  DEBUG_printf(("1_cupsGetDestResource: printer-uri-supported=\"%s\"", uri));
 
 #ifdef HAVE_DNSSD
   if (strstr(uri, "._tcp"))
@@ -1477,6 +1491,8 @@ _cupsGetDestResource(
 
     return (NULL);
   }
+
+  DEBUG_printf(("1_cupsGetDestResource: resource=\"%s\"", resource));
 
   return (uri);
 }
@@ -1904,8 +1920,8 @@ int					/* O - Number of destinations */
 cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
               cups_dest_t **dests)	/* O - Destinations */
 {
-  int		num_dests;		/* Number of destinations */
-  cups_dest_t	*dest;			/* Destination pointer */
+  _cups_getdata_t data;                 /* Enumeration data */
+  cups_dest_t   *dest;                  /* Current destination */
   const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* Local ~/.cups/lpoptions file */
   const char	*defprinter;		/* Default printer */
@@ -1931,13 +1947,17 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Grab the printers and classes...
   */
 
-  *dests    = (cups_dest_t *)0;
-  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, CUPS_PRINTER_3D);
+  data.num_dests = 0;
+  data.dests     = NULL;
+
+  cupsEnumDests(0, 1000, NULL, 0, CUPS_PRINTER_3D, (cups_dest_cb_t)cups_get_cb, &data);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
-    cupsFreeDests(num_dests, *dests);
+    cupsFreeDests(data.num_dests, data.dests);
+
     *dests = (cups_dest_t *)0;
+
     return (0);
   }
 
@@ -1945,13 +1965,13 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Make a copy of the "real" queues for a later sanity check...
   */
 
-  if (num_dests > 0)
+  if (data.num_dests > 0)
   {
-    num_reals = num_dests;
+    num_reals = data.num_dests;
     reals     = calloc((size_t)num_reals, sizeof(cups_dest_t));
 
     if (reals)
-      memcpy(reals, *dests, (size_t)num_reals * sizeof(cups_dest_t));
+      memcpy(reals, data.dests, (size_t)num_reals * sizeof(cups_dest_t));
     else
       num_reals = 0;
   }
@@ -1986,7 +2006,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * Lookup the printer and instance and make it the default...
     */
 
-    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+    if ((dest = cupsGetDest(name, instance, data.num_dests, data.dests)) != NULL)
       dest->is_default = 1;
   }
   else
@@ -1997,15 +2017,13 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL,
-                             num_dests, dests);
+  data.num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL, data.num_dests, &data.dests);
 
   if ((home = getenv("HOME")) != NULL)
   {
     snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
-    num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL,
-                               num_dests, dests);
+    data.num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL, data.num_dests, &data.dests);
   }
 
  /*
@@ -2020,7 +2038,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * See if we have a default printer...
     */
 
-    if ((dest = cupsGetDest(NULL, NULL, num_dests, *dests)) != NULL)
+    if ((dest = cupsGetDest(NULL, NULL, data.num_dests, data.dests)) != NULL)
     {
      /*
       * Have a default; see if it is real...
@@ -2033,8 +2051,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
         * going to an unexpected printer... (<rdar://problem/14216472>)
         */
 
-        num_dests = cupsRemoveDest(dest->name, dest->instance, num_dests,
-                                   dests);
+        data.num_dests = cupsRemoveDest(dest->name, dest->instance, data.num_dests, &data.dests);
       }
     }
 
@@ -2049,10 +2066,12 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Return the number of destinations...
   */
 
-  if (num_dests > 0)
+  *dests = data.dests;
+
+  if (data.num_dests > 0)
     _cupsSetError(IPP_STATUS_OK, NULL, 0);
 
-  return (num_dests);
+  return (data.num_dests);
 }
 
 
@@ -3837,6 +3856,36 @@ cups_find_dest(const char  *name,	/* I - Destination name */
   *rdiff = diff;
 
   return (current);
+}
+
+
+/*
+ * 'cups_get_cb()' - Collect enumerated destinations.
+ */
+
+static int                              /* O - 1 to continue, 0 to stop */
+cups_get_cb(_cups_getdata_t *data,      /* I - Data from cupsGetDests */
+            unsigned        flags,      /* I - Enumeration flags */
+            cups_dest_t     *dest)      /* I - Destination */
+{
+  if (flags & CUPS_DEST_FLAGS_REMOVED)
+  {
+   /*
+    * Remove destination from array...
+    */
+
+    data->num_dests = cupsRemoveDest(dest->name, dest->instance, data->num_dests, &data->dests);
+  }
+  else
+  {
+   /*
+    * Add destination to array...
+    */
+
+    data->num_dests = cupsCopyDest(dest, data->num_dests, &data->dests);
+  }
+
+  return (1);
 }
 
 

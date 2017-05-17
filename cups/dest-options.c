@@ -1,7 +1,7 @@
 /*
  * Destination option/media support for CUPS.
  *
- * Copyright 2012-2016 by Apple Inc.
+ * Copyright 2012-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -84,6 +84,13 @@ cupsCheckDestSupported(
   ipp_attribute_t	*attr;		/* Attribute */
   _ipp_value_t		*attrval;	/* Current attribute value */
 
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -314,6 +321,13 @@ cupsCopyDestConflicts(
 
   if (resolved)
     *resolved = NULL;
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -575,6 +589,13 @@ cupsCopyDestInfo(
   DEBUG_printf(("cupsCopyDestSupported(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -686,6 +707,13 @@ cupsFindDestDefault(
 
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -725,6 +753,13 @@ cupsFindDestReady(
 {
   char	name[IPP_MAX_NAME];		/* Attribute name */
 
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -768,6 +803,13 @@ cupsFindDestSupported(
 {
   char	name[IPP_MAX_NAME];		/* Attribute name */
 
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -850,6 +892,13 @@ cupsGetDestMediaByIndex(
   _cups_media_db_t	*nsize;		/* Size for N */
   pwg_media_t		*pwg;		/* PWG media name for size */
 
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...
@@ -940,6 +989,13 @@ cupsGetDestMediaByName(
 
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -1008,6 +1064,13 @@ cupsGetDestMediaBySize(
 
 
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -1059,6 +1122,13 @@ cupsGetDestMediaCount(
     unsigned     flags)			/* I - Media flags */
 {
  /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+ /*
   * Range check input...
   */
 
@@ -1102,6 +1172,13 @@ cupsGetDestMediaDefault(
 {
   const char	*media;			/* Default media size */
 
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Range check input...

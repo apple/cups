@@ -602,6 +602,16 @@ if test `uname` = SunOS -a -r /usr/lib/libCrun.so.1; then
 fi
 export LD_PRELOAD
 
+if test -f $root/cups/libcups.2.dylib; then
+        if test "x$DYLD_INSERT_LIBRARIES" = x; then
+                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/filter/libcupsimage.2.dylib:$root/cgi-bin/libcupscgi.1.dylib:$root/scheduler/libcupsmime.1.dylib:$root/ppdc/libcupsppdc.1.dylib"
+        else
+                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/filter/libcupsimage.2.dylib:$root/cgi-bin/libcupscgi.1.dylib:$root/scheduler/libcupsmime.1.dylib:$root/ppdc/libcupsppdc.1.dylib:$DYLD_INSERT_LIBRARIES"
+        fi
+
+        export DYLD_INSERT_LIBRARIES
+fi
+
 if test "x$DYLD_LIBRARY_PATH" = x; then
 	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
 else
@@ -651,7 +661,13 @@ echo "    $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_l
 echo ""
 
 if test `uname` = Darwin -a "x$VALGRIND" = x; then
-	DYLD_INSERT_LIBRARIES="/usr/lib/libgmalloc.dylib" MallocStackLogging=1 ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
+        if test "x$DYLD_INSERT_LIBRARIES" = x; then
+                insert="/usr/lib/libgmalloc.dylib"
+        else
+                insert="/usr/lib/libgmalloc.dylib:$DYLD_INSERT_LIBRARIES"
+        fi
+
+	DYLD_INSERT_LIBRARIES="$insert" MallocStackLogging=1 ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 else
 	$VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 fi
