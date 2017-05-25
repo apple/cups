@@ -1,4 +1,4 @@
-CHANGES - 2.2.4 - 2017-05-17
+CHANGES - 2.2.4 - 2017-05-25
 ============================
 
 CHANGES IN CUPS V2.2.4
@@ -16,6 +16,8 @@ CHANGES IN CUPS V2.2.4
 - IPP Everywhere improvements (Issue #4998)
 - Fixed the "cancel all jobs" function in the web interface for several
   languages (Issue #4999)
+- The scheduler was not deleting temporary queues, leaving behind PPD files
+  (Issue #5003)
 
 
 CHANGES IN CUPS V2.2.3

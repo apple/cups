@@ -1022,7 +1022,10 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (JobHistoryUpdate && current_time >= JobHistoryUpdate)
+    {
       cupsdCleanJobs();
+      cupsdDeleteTemporaryPrinters(0);
+    }
 
    /*
     * Log statistics at most once a minute when in debug mode...
@@ -1151,6 +1154,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   cupsdFreeAllJobs();
+
+ /*
+  * Delete all temporary printers...
+  */
+
+  cupsdDeleteTemporaryPrinters(1);
 
 #ifdef __APPLE__
  /*
@@ -1631,13 +1640,13 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
 
 #ifdef __APPLE__
  /*
-  * When going to sleep, wake up to cancel jobs that don't complete in time.
+  * When going to sleep, wake up to abort jobs that don't complete in time.
   */
 
   if (SleepJobs > 0 && SleepJobs < timeout)
   {
     timeout = SleepJobs;
-    why     = "cancel jobs before sleeping";
+    why     = "abort jobs before sleeping";
   }
 #endif /* __APPLE__ */
 

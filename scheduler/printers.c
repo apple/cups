@@ -756,11 +756,6 @@ cupsdDeletePrinter(
     * Remove any old PPD or script files...
     */
 
-    snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot, p->name);
-    unlink(filename);
-    snprintf(filename, sizeof(filename), "%s/interfaces/%s.O", ServerRoot, p->name);
-    unlink(filename);
-
     snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, p->name);
     unlink(filename);
     snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd.O", ServerRoot, p->name);
@@ -836,6 +831,32 @@ cupsdDeletePrinter(
   cupsArrayRestore(Printers);
 
   return (changed);
+}
+
+
+/*
+ * 'cupsdDeleteTemporaryPrinters()' - Delete unneeded temporary printers.
+ */
+
+void
+cupsdDeleteTemporaryPrinters(int force) /* I - Force deletion instead of auto? */
+{
+  cupsd_printer_t *p;                   /* Current printer */
+  time_t          unused_time;          /* Last time for printer state change */
+
+
+ /*
+  * Allow temporary printers to stick around for 60 seconds after the last job
+  * completes.
+  */
+
+  unused_time = time(NULL) - 60;
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers); p; p = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+    if (p->temporary && (force || p->state_time < unused_time))
+      cupsdDeletePrinter(p, 0);
+  }
 }
 
 
