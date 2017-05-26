@@ -88,6 +88,8 @@ static int		dead_children = 0;
 					/* Dead children? */
 static int		stop_scheduler = 0;
 					/* Should the scheduler stop? */
+static time_t           local_timeout = 0;
+                                        /* Next local printer timeout */
 
 
 /*
@@ -701,6 +703,7 @@ main(int  argc,				/* I - Number of command-line args */
   current_time  = time(NULL);
   event_time    = current_time;
   expire_time   = current_time;
+  local_timeout = current_time + 60;
   fds           = 1;
   report_time   = 0;
   senddoc_time  = current_time;
@@ -957,6 +960,13 @@ main(int  argc,				/* I - Number of command-line args */
       expire_time = current_time;
     }
 
+   /*
+    * Delete stale local printers...
+    */
+
+    if (current_time >= local_timeout)
+      cupsdDeleteTemporaryPrinters(0);
+
 #ifndef HAVE_AUTHORIZATION_H
    /*
     * Update the root certificate once every 5 minutes if we have client
@@ -1022,10 +1032,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (JobHistoryUpdate && current_time >= JobHistoryUpdate)
-    {
       cupsdCleanJobs();
-      cupsdDeleteTemporaryPrinters(0);
-    }
 
    /*
     * Log statistics at most once a minute when in debug mode...
@@ -1604,6 +1611,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   time_t		now;		/* Current time */
   cupsd_client_t	*con;		/* Client information */
   cupsd_job_t		*job;		/* Job information */
+  cupsd_printer_t       *printer;       /* Printer information */
   const char		*why;		/* Debugging aid */
 
 
@@ -1726,6 +1734,22 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       why     = "start pending jobs";
       break;
     }
+  }
+
+ /*
+  * Check for temporary printers that need to be deleted...
+  */
+
+  for (printer = (cupsd_printer_t *)cupsArrayFirst(Printers); printer; printer = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+    if (printer->temporary && !printer->job && local_timeout > (printer->state_time + 60))
+      local_timeout = printer->state_time + 60;
+  }
+
+  if (timeout > local_timeout)
+  {
+    timeout = local_timeout;
+    why     = "delete stale local printers";
   }
 
 #ifdef HAVE_MALLINFO
