@@ -20,6 +20,8 @@ CHANGES IN CUPS V2.2.4
 - The `lpstat` command now supports a `-e` option to enumerate local printers
   (either previously added or on the network) that can be accessed
   (Issue #5005)
+- The `lp` and `lpr` commands now support printing to network printers that
+  haven't yet been added (Issue #5006)
 
 
 CHANGES IN CUPS V2.2.3

@@ -120,12 +120,17 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 } _cups_dnssd_resolve_t;
 #endif /* HAVE_DNSSD */
 
-
 typedef struct _cups_getdata_s
 {
   int         num_dests;                /* Number of destinations */
   cups_dest_t *dests;                   /* Destinations */
 } _cups_getdata_t;
+
+typedef struct _cups_namedata_s
+{
+  const char  *name;                    /* Named destination */
+  cups_dest_t *dest;                    /* Destination */
+} _cups_namedata_t;
 
 
 /*
@@ -233,6 +238,7 @@ static int		cups_get_dests(const char *filename, const char *match_name,
 				       int num_dests, cups_dest_t **dests);
 static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
 			                  size_t bufsize);
+static int              cups_name_cb(_cups_namedata_t *data, unsigned flags, cups_dest_t *dest);
 static void		cups_queue_name(char *name, const char *serviceName, size_t namesize);
 
 
@@ -1460,36 +1466,58 @@ _cupsGetDestResource(
   * Grab the printer URI...
   */
 
-  if ((uri = cupsGetOption("printer-uri-supported", dest->num_options,
-                           dest->options)) == NULL)
+  if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
   {
-    DEBUG_puts("1_cupsGetDestResource: No printer-uri-supported found.");
+    if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
+    {
+      if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
+      {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+        if (strstr(uri, "._tcp"))
+          uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+      }
+    }
 
-    if (resource)
-      *resource = '\0';
+    if (uri)
+    {
+      DEBUG_printf(("1_cupsGetDestResource: Resolved printer-uri-supported=\"%s\"", uri));
 
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
+      uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, uri, resource, resourcesize);
+    }
 
-    return (NULL);
-  }
+    if (uri)
+    {
+      DEBUG_printf(("1_cupsGetDestResource: Local printer-uri-supported=\"%s\"", uri));
 
-  DEBUG_printf(("1_cupsGetDestResource: printer-uri-supported=\"%s\"", uri));
+      dest->num_options = cupsAddOption("printer-uri-supported", uri, dest->num_options, &dest->options);
 
-#ifdef HAVE_DNSSD
-  if (strstr(uri, "._tcp"))
-  {
-    if ((uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL)) == NULL)
+      uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
+    }
+    else
+    {
+      DEBUG_puts("1_cupsGetDestResource: No printer-uri-supported found.");
+
+      if (resource)
+        *resource = '\0';
+
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
+
       return (NULL);
+    }
   }
-#endif /* HAVE_DNSSD */
-
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-                      userpass, sizeof(userpass), hostname, sizeof(hostname),
-                      &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
+  else
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
+    DEBUG_printf(("1_cupsGetDestResource: printer-uri-supported=\"%s\"", uri));
 
-    return (NULL);
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                        userpass, sizeof(userpass), hostname, sizeof(hostname),
+                        &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
+
+      return (NULL);
+    }
   }
 
   DEBUG_printf(("1_cupsGetDestResource: resource=\"%s\"", resource));
@@ -1681,6 +1709,8 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 		  "printer-uri-supported"
 		};
 
+
+  DEBUG_printf(("_cupsGetDests(http=%p, op=%x(%s), name=\"%s\", dests=%p, type=%x, mask=%x)", http, op, ippOpString(op), name, dests, type, mask));
 
 #ifdef __APPLE__
  /*
@@ -2111,6 +2141,8 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
+  DEBUG_printf(("cupsGetNamedDest(http=%p, name=\"%s\", instance=\"%s\")", http, name, instance));
+
  /*
   * If "name" is NULL, find the default destination...
   */
@@ -2161,7 +2193,11 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       */
 
       op = IPP_OP_CUPS_GET_DEFAULT;
+
+      DEBUG_puts("1cupsGetNamedDest: Asking server for default printer...");
     }
+    else
+      DEBUG_printf(("1cupsGetNamedDest: Using name=\"%s\"...", name));
   }
 
  /*
@@ -2169,7 +2205,28 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   if (!_cupsGetDests(http, op, name, &dest, 0, CUPS_PRINTER_3D))
-    return (NULL);
+  {
+    if (name)
+    {
+      _cups_namedata_t  data;           /* Callback data */
+
+      DEBUG_puts("1cupsGetNamedDest: No queue found for printer, looking on network...");
+
+      data.name = name;
+      data.dest = NULL;
+
+      cupsEnumDests(0, 1000, NULL, 0, CUPS_PRINTER_3D, (cups_dest_cb_t)cups_name_cb, &data);
+
+      if (!data.dest)
+        return (NULL);
+
+      dest = data.dest;
+    }
+    else
+      return (NULL);
+  }
+
+  DEBUG_printf(("1cupsGetNamedDest: Got dest=%p", dest));
 
   if (instance)
     dest->instance = _cupsStrAlloc(instance);
@@ -4192,6 +4249,31 @@ cups_make_string(
   *ptr = '\0';
 
   return (buffer);
+}
+
+
+/*
+ * 'cups_name_cb()' - Find an enumerated destination.
+ */
+
+static int                              /* O - 1 to continue, 0 to stop */
+cups_name_cb(_cups_namedata_t *data,    /* I - Data from cupsGetNamedDest */
+             unsigned         flags,    /* I - Enumeration flags */
+             cups_dest_t      *dest)    /* I - Destination */
+{
+  DEBUG_printf(("2cups_name_cb(data=%p(%s), flags=%x, dest=%p(%s)", data, data->name, flags, dest, dest->name));
+
+  if (!(flags & CUPS_DEST_FLAGS_REMOVED) && !dest->instance && !strcasecmp(data->name, dest->name))
+  {
+   /*
+    * Copy destination and stop enumeration...
+    */
+
+    cupsCopyDest(dest, 0, &data->dest);
+    return (0);
+  }
+
+  return (1);
 }
 
 
