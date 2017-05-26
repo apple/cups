@@ -16,8 +16,9 @@ CHANGES IN CUPS V2.2.4
 - IPP Everywhere improvements (Issue #4998)
 - Fixed the "cancel all jobs" function in the web interface for several
   languages (Issue #4999)
-- The scheduler was not deleting temporary queues, leaving behind PPD files
+- The scheduler was not deleting local queues, leaving behind PPD files
   (Issue #5003)
+- Local queues were incorrectly shared (Issue #5008)
 
 
 CHANGES IN CUPS V2.2.3

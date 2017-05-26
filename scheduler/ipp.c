@@ -5479,6 +5479,8 @@ create_local_printer(
     return;
   }
 
+  printer->shared = 0;
+
   cupsdSetDeviceURI(printer, ippGetString(device_uri, 0, NULL));
 
   if (printer_geo_location)
