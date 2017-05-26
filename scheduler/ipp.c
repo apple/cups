@@ -5479,7 +5479,8 @@ create_local_printer(
     return;
   }
 
-  printer->shared = 0;
+  printer->shared    = 0;
+  printer->temporary = 1;
 
   cupsdSetDeviceURI(printer, ippGetString(device_uri, 0, NULL));
 
