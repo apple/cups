@@ -1,7 +1,7 @@
 /*
  * "lpstat" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -24,6 +24,7 @@
 
 static void	check_dest(const char *command, const char *name,
 		           int *num_dests, cups_dest_t **dests);
+static int      enum_cb(void *user_data, unsigned flags, cups_dest_t *dest);
 static int	match_list(const char *list, const char *name);
 static int	show_accepting(const char *printers, int num_dests,
 		               cups_dest_t *dests);
@@ -239,6 +240,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      show_default(dests);
 	      break;
+
+	  case 'e' : /* List destinations */
+	      op = 'e';
+              cupsEnumDests(CUPS_DEST_FLAGS_NONE, 1000, NULL, 0, 0, enum_cb, NULL);
+              break;
 
 	  case 'f' : /* Show forms */
 	      op   = 'f';
@@ -575,6 +581,29 @@ check_dest(const char  *command,	/* I  - Command name */
       exit(1);
     }
   }
+}
+
+
+/*
+ * 'enum_cb()' - Print a destination on the standard output.
+ */
+
+static int                              /* O - 1 to continue */
+enum_cb(void        *user_data,         /* I - User data (unused) */
+        unsigned    flags,              /* I - Enumeration flags */
+        cups_dest_t *dest)              /* I - Destination */
+{
+  (void)user_data;
+
+  if (!(flags & CUPS_DEST_FLAGS_REMOVED))
+  {
+    if (dest->instance)
+      printf("%s/%s\n", dest->name, dest->instance);
+    else
+      puts(dest->name);
+  }
+
+  return (1);
 }
 
 

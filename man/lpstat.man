@@ -1,7 +1,7 @@
 .\"
 .\" lpstat man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2017 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpstat 1 "CUPS" "12 June 2014" "Apple Inc."
+.TH lpstat 1 "CUPS" "26 May 2017" "Apple Inc."
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
@@ -39,6 +39,8 @@ lpstat \- print cups status information
 .I class(es)
 ] ] [
 .B \-d
+] [
+.B \-e
 ] [
 .B \-o
 [
@@ -97,6 +99,9 @@ If no classes are specified then all classes are listed.
 .B \-d
 Shows the current default destination.
 .TP 5
+.B \-e
+Shows all available destinations on the local network.
+.TP 5
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 Specifies an alternate server.
 .TP 5
@@ -133,7 +138,7 @@ If no printers are specified then all printers are listed.
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", and "#".
 Also, printer and class names are \fInot\fR case-sensitive.
 .LP
-The \fI\-h\fR, \fI\-E\fR, \fI\-U\fR, and \fI\-W\fR options are unique to CUPS.
+The \fI\-h\fR, \fI-e\fR, \fI\-E\fR, \fI\-U\fR, and \fI\-W\fR options are unique to CUPS.
 .LP
 The Solaris \fI\-f\fR, \fI\-P\fR, and \fI\-S\fR options are silently ignored.
 .SH SEE ALSO

@@ -17,6 +17,8 @@ CHANGES IN CUPS V2.2.4
 - Fixed the "cancel all jobs" function in the web interface for several
   languages (Issue #4999)
 - Fixed issues with local queues (Issue #5003, Issue #5008, Issue #5009)
+- The `lpstat` command now supports a `-e` option to enumerate local printers
+  (either previously added or on the network) that can be accessed.
 
 
 CHANGES IN CUPS V2.2.3
