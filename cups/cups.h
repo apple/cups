@@ -225,20 +225,19 @@ enum cups_ptype_e			/* Printer type/capability bit
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
   CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer
-					 * @since CUPS 1.2/macOS 10.5@ */
+					 * @deprecated@ @exclude all@ */
   CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared
 					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication
 					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands
 					 * @since CUPS 1.2/macOS 10.5@ */
-  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered
-					 * and added @private@ */
+  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was discovered @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device
 					 * @since CUPS 1.4/macOS 10.6@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities
 					 * @since CUPS 1.4/macOS 10.6@ */
-  CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @private@ */
+  CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @exclude all@ @deprecated@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT |
 					 * DEFAULT | FAX | REJECTING | DELETE |
 					 * NOT_SHARED | AUTHENTICATED |
@@ -340,11 +339,11 @@ extern ipp_t		*cupsDoRequest(http_t *http, ipp_t *request,
 			               const char *resource);
 extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
-extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
+extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsEnumDests instead.");
 extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
 			            int myjobs, int whichjobs);
-extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
+extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsEnumDests instead.");
 extern ipp_status_t	cupsLastError(void);
 extern int		cupsPrintFile(const char *name, const char *filename,
 			              const char *title, int num_options,

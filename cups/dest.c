@@ -928,10 +928,15 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
 /*
  * 'cupsEnumDests()' - Enumerate available destinations with a callback function.
  *
- * Destinations are enumerated from one or more sources. The callback function
- * receives the @code user_data@ pointer, destination name, instance, number of
- * options, and options which can be used as input to the @link cupsAddDest@
- * function.  The function must return 1 to continue enumeration or 0 to stop.
+ * Destinations are enumerated from one or more sources.  The callback function
+ * receives the @code user_data@ pointer and the destination pointer which can
+ * be used as input to the @link cupsCopyDest@ function.  The function must
+ * return 1 to continue enumeration or 0 to stop.
+ *
+ * The @code type@ and @code mask@ arguments allow the caller to filter the
+ * destinations that are enumerated.  Passing 0 for both will enumerate all
+ * printers.  The constant @code CUPS_PRINTER_DISCOVERED@ is used to filter on
+ * destinations that are available but have not yet been added locally.
  *
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the callback function returns 0.
@@ -998,36 +1003,8 @@ cupsEnumDests(
     return (0);
 
  /*
-  * Get the list of local printers and pass them to the callback function...
+  * Get ready to enumerate...
   */
-
-  num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
-                            &dests, type, mask | CUPS_PRINTER_3D);
-
-  if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
-    defprinter = name;
-  else if ((defprinter = cupsGetDefault2(CUPS_HTTP_DEFAULT)) != NULL)
-  {
-    strlcpy(name, defprinter, sizeof(name));
-    defprinter = name;
-  }
-
-  if (defprinter)
-  {
-   /*
-    * Separate printer and instance name...
-    */
-
-    if ((instance = strchr(name, '/')) != NULL)
-      *instance++ = '\0';
-
-   /*
-    * Lookup the printer and instance and make it the default...
-    */
-
-    if ((dest = cupsGetDest(name, instance, num_dests, dests)) != NULL)
-      dest->is_default = 1;
-  }
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   data.type      = type;
@@ -1037,63 +1014,99 @@ cupsEnumDests(
   data.devices   = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices, NULL, NULL, 0, NULL, (cups_afree_func_t)cups_dnssd_free_device);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
-  for (i = num_dests, dest = dests;
-       i > 0 && (!cancel || !*cancel);
-       i --, dest ++)
+  if (!(mask & CUPS_PRINTER_DISCOVERED) || !(type & CUPS_PRINTER_DISCOVERED))
   {
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-    const char *device_uri;		/* Device URI */
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
+   /*
+    * Get the list of local printers and pass them to the callback function...
+    */
 
-    if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE,
-               dest))
-      break;
+    num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
+                              &dests, type, mask);
 
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-    if (!dest->instance && (device_uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL && !strncmp(device_uri, "dnssd://", 8))
+    if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
+      defprinter = name;
+    else if ((defprinter = cupsGetDefault2(CUPS_HTTP_DEFAULT)) != NULL)
+    {
+      strlcpy(name, defprinter, sizeof(name));
+      defprinter = name;
+    }
+
+    if (defprinter)
     {
      /*
-      * Add existing queue using service name, etc. so we don't list it again...
+      * Separate printer and instance name...
       */
 
-      char	scheme[32],		/* URI scheme */
-		userpass[32],		/* Username:password */
-		serviceName[256],	/* Service name (host field) */
-		resource[256],		/* Resource (options) */
-		*regtype,		/* Registration type */
-		*replyDomain;		/* Registration domain */
-      int	port;			/* Port number (not used) */
+      if ((instance = strchr(name, '/')) != NULL)
+        *instance++ = '\0';
 
-      if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), serviceName, sizeof(serviceName), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK)
+     /*
+      * Lookup the printer and instance and make it the default...
+      */
+
+      if ((dest = cupsGetDest(name, instance, num_dests, dests)) != NULL)
+        dest->is_default = 1;
+    }
+
+    for (i = num_dests, dest = dests;
+         i > 0 && (!cancel || !*cancel);
+         i --, dest ++)
+    {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+      const char *device_uri;		/* Device URI */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+      if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE,
+                 dest))
+        break;
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+      if (!dest->instance && (device_uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL && !strncmp(device_uri, "dnssd://", 8))
       {
-        if ((regtype = strstr(serviceName, "._ipp")) != NULL)
-	{
-	  *regtype++ = '\0';
+       /*
+        * Add existing queue using service name, etc. so we don't list it again...
+        */
 
-	  if ((replyDomain = strstr(regtype, "._tcp.")) != NULL)
-	  {
-	    replyDomain[5] = '\0';
-	    replyDomain += 6;
+        char	scheme[32],		/* URI scheme */
+                  userpass[32],		/* Username:password */
+                  serviceName[256],	/* Service name (host field) */
+                  resource[256],		/* Resource (options) */
+                  *regtype,		/* Registration type */
+                  *replyDomain;		/* Registration domain */
+        int	port;			/* Port number (not used) */
 
-	    if ((device = cups_dnssd_get_device(&data, serviceName, regtype, replyDomain)) != NULL)
-	      device->state = _CUPS_DNSSD_ACTIVE;
-	  }
+        if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), serviceName, sizeof(serviceName), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK)
+        {
+          if ((regtype = strstr(serviceName, "._ipp")) != NULL)
+          {
+            *regtype++ = '\0';
+
+            if ((replyDomain = strstr(regtype, "._tcp.")) != NULL)
+            {
+              replyDomain[5] = '\0';
+              replyDomain += 6;
+
+              if ((device = cups_dnssd_get_device(&data, serviceName, regtype, replyDomain)) != NULL)
+                device->state = _CUPS_DNSSD_ACTIVE;
+            }
+          }
         }
       }
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
     }
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+    cupsFreeDests(num_dests, dests);
+
+    if (i > 0 || msec == 0)
+      goto enum_finished;
   }
 
-  cupsFreeDests(num_dests, dests);
+ /*
+  * Return early if the caller doesn't want to do discovery...
+  */
 
-  if (i > 0 || msec == 0)
-  {
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-    cupsArrayDelete(data.devices);
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-    return (1);
-  }
+  if ((mask & CUPS_PRINTER_DISCOVERED) && !(type & CUPS_PRINTER_DISCOVERED))
+    goto enum_finished;
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
  /*
@@ -1294,8 +1307,6 @@ cupsEnumDests(
 #  endif /* HAVE_AVAHI */
   }
 
-  cupsArrayDelete(data.devices);
-
 #  ifdef HAVE_DNSSD
   DNSServiceRefDeallocate(ipp_ref);
   DNSServiceRefDeallocate(local_ipp_ref);
@@ -1318,6 +1329,16 @@ cupsEnumDests(
 #  endif /* HAVE_DNSSD */
 #endif /* HAVE_DNSSD || HAVE_DNSSD */
 
+ /*
+  * Return...
+  */
+
+  enum_finished:
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  cupsArrayDelete(data.devices);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
   return (1);
 }
 
@@ -1326,10 +1347,15 @@ cupsEnumDests(
 /*
  * 'cupsEnumDestsBlock()' - Enumerate available destinations with a block.
  *
- * Destinations are enumerated from one or more sources. The block receives the
- * destination name, instance, number of options, and options which can be used
- * as input to the @link cupsAddDest@ function.  The block must return 1 to
+ * Destinations are enumerated from one or more sources.  The block receives the
+ * @code user_data@ pointer and the destination pointer which can be used as
+ * input to the @link cupsCopyDest@ function.  The block must return 1 to
  * continue enumeration or 0 to stop.
+ *
+ * The @code type@ and @code mask@ arguments allow the caller to filter the
+ * destinations that are enumerated.  Passing 0 for both will enumerate all
+ * printers.  The constant @code CUPS_PRINTER_DISCOVERED@ is used to filter on
+ * destinations that are available but have not yet been added locally.
  *
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the block returns 0.
@@ -1980,7 +2006,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   data.num_dests = 0;
   data.dests     = NULL;
 
-  cupsEnumDests(0, 1000, NULL, 0, CUPS_PRINTER_3D, (cups_dest_cb_t)cups_get_cb, &data);
+  cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -2204,7 +2230,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * Get the printer's attributes...
   */
 
-  if (!_cupsGetDests(http, op, name, &dest, 0, CUPS_PRINTER_3D))
+  if (!_cupsGetDests(http, op, name, &dest, 0, 0))
   {
     if (name)
     {
@@ -2215,7 +2241,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       data.name = name;
       data.dest = NULL;
 
-      cupsEnumDests(0, 1000, NULL, 0, CUPS_PRINTER_3D, (cups_dest_cb_t)cups_name_cb, &data);
+      cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_name_cb, &data);
 
       if (!data.dest)
         return (NULL);
@@ -2401,7 +2427,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Get the server destinations...
   */
 
-  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, CUPS_PRINTER_3D);
+  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, 0);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -3453,7 +3479,7 @@ cups_dnssd_query_cb(
 			model[256],	/* Model */
 			uriname[1024],	/* Name for URI */
 			uri[1024];	/* Printer URI */
-    cups_ptype_t	type = CUPS_PRINTER_REMOTE | CUPS_PRINTER_BW;
+    cups_ptype_t	type = CUPS_PRINTER_DISCOVERED | CUPS_PRINTER_BW;
 					/* Printer type */
     int			saw_printer_type = 0;
 					/* Did we see a printer-type key? */
@@ -3572,7 +3598,7 @@ cups_dnssd_query_cb(
         */
 
 	saw_printer_type = 1;
-        type             = (cups_ptype_t)strtol(value, NULL, 0);
+        type             = (cups_ptype_t)strtol(value, NULL, 0) | CUPS_PRINTER_DISCOVERED;
       }
       else if (!saw_printer_type)
       {

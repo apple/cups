@@ -195,7 +195,7 @@ cupsCreateJob(
   data.name = name;
   data.dest = NULL;
 
-  cupsEnumDests(0, 1000, NULL, 0, CUPS_PRINTER_3D, (cups_dest_cb_t)cups_create_cb, &data);
+  cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_create_cb, &data);
 
   if (!data.dest)
   {

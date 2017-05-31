@@ -153,15 +153,17 @@ the destinations based on categories and/or capabilities.  The destination's
 "printer-type" value is masked by the `mask` value and compared to the `type`
 value when filtering.  For example, to only enumerate destinations that are
 hosted on the local system, pass `CUPS_PRINTER_LOCAL` for the `type` argument
-and `CUPS_PRINTER_REMOTE` for the `mask` argument.  The following constants can
-be used for filtering:
+and `CUPS_PRINTER_DISCOVERED` for the `mask` argument.  The following constants
+can be used for filtering:
 
 - `CUPS_PRINTER_CLASS`: A collection of destinations.
 - `CUPS_PRINTER_FAX`: A facsimile device.
 - `CUPS_PRINTER_LOCAL`: A local printer or class.  This constant has the value 0
   (no bits set) and is only used for the `type` argument and is paired with the
-  `CUPS_PRINTER_REMOTE` constant passed in the `mask` argument.
-- `CUPS_PRINTER_REMOTE`: A remote printer or class.
+  `CUPS_PRINTER_REMOTE` or `CUPS_PRINTER_DISCOVERED` constant passed in the
+  `mask` argument.
+- `CUPS_PRINTER_REMOTE`: A remote (shared) printer or class.
+- `CUPS_PRINTER_DISCOVERED`: An available network printer or class.
 - `CUPS_PRINTER_BW`: Can do B&W printing.
 - `CUPS_PRINTER_COLOR`: Can do color printing.
 - `CUPS_PRINTER_DUPLEX`: Can do two-sided printing.
@@ -292,6 +294,8 @@ destination attributes:
 - "printer-state-reasons": Additional comma-delimited state keywords for the
   destination such as "media-tray-empty-error" and "toner-low-warning".
 - "printer-type": The `cups_ptype_t` value associated with the destination.
+- "printer-uri": The URI associated with the destination; if not set, this
+  destination was discovered but is not yet setup as a local printer.
 
 Use the `cupsGetOption` function to retrieve the value.  For example, the
 following code gets the make and model of a destination:
