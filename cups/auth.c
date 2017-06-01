@@ -54,7 +54,7 @@ extern const char *cssmErrorString(int error);
 #    else
 #      define GSS_AUTH_IDENTITY_TYPE_1 1
 #      define gss_acquire_cred_ex_f __ApplePrivate_gss_acquire_cred_ex_f
-typedef struct gss_auth_identity
+typedef struct gss_auth_identity /* @private@ */
 {
   uint32_t type;
   uint32_t flags;

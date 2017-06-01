@@ -294,8 +294,8 @@ destination attributes:
 - "printer-state-reasons": Additional comma-delimited state keywords for the
   destination such as "media-tray-empty-error" and "toner-low-warning".
 - "printer-type": The `cups_ptype_t` value associated with the destination.
-- "printer-uri": The URI associated with the destination; if not set, this
-  destination was discovered but is not yet setup as a local printer.
+- "printer-uri-supported": The URI associated with the destination; if not set,
+  this destination was discovered but is not yet setup as a local printer.
 
 Use the `cupsGetOption` function to retrieve the value.  For example, the
 following code gets the make and model of a destination:
@@ -303,6 +303,7 @@ following code gets the make and model of a destination:
     const char *model = cupsGetOption("printer-make-and-model",
                                       dest->num_options,
                                       dest->options);
+
 
 ## Detailed Destination Information
 
@@ -320,6 +321,7 @@ The `cups_dinfo_t` structure that is returned contains a snapshot of the
 supported options and their supported, ready, and default values.  It also can
 report constraints between different options and values, and recommend changes
 to resolve those constraints.
+
 
 ### Getting Supported Options and Values
 

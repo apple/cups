@@ -1388,8 +1388,8 @@ variable or the device URI passed in argv[0], whichever is found
 first.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsBackendReport">cupsBackendReport</a></h3>
-        <p class="description">Write a device line from a backend.</p>
+<h3 class="function"><a id="cupsBackendReport">cupsBackendReport</a></h3>
+        <p class="description">PPD attribute</p>
 <p class="code">
 void cupsBackendReport (<br>
 &#160;&#160;&#160;&#160;const char *device_scheme,<br>
@@ -1414,7 +1414,8 @@ void cupsBackendReport (<br>
 <dt>device_location</dt>
         <dd class="description">device-location string or <code>NULL</code></dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Write a device line from a backend.</p>
         <p class="discussion">This function writes a single device line to stdout for a backend.
 It handles quoting of special characters in the device-make-and-model,
 device-info, device-id, and device-location strings.

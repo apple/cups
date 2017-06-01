@@ -168,103 +168,42 @@ h3.title {
     <div class="contents">
       <h2 class="title">Contents</h2>
       <ul class="contents">
-        <li><a href="#Introduction">Introduction</a><ul class="subcontents">
-          <li><a href="#Guidelines">Guidelines</a></li>
-          <li><a href="#TermsUsedinThisDocument">Terms Used in This Document</a></li>
-          <li><a href="#CompilingProgramsThatUsetheCUPSAPI">Compiling Programs That Use the CUPS API</a></li>
+        <li><a href="#introduction">Introduction</a><ul class="subcontents">
+          <li><a href="#guidelines">Guidelines</a></li>
+          <li><a href="#terms-used-in-this-document">Terms Used in This Document</a></li>
+          <li><a href="#compiling-programs-that-use-the-cups-api">Compiling Programs That Use the CUPS API</a></li>
         </ul></li>
-        <li><a href="#WorkingwithDestinations">Working with Destinations</a><ul class="subcontents">
-          <li><a href="#FindingAvailableDestinations">Finding Available Destinations</a></li>
-          <li><a href="#BasicDestinationInformation">Basic Destination Information</a></li>
-          <li><a href="#DetailedDestinationInformation">Detailed Destination Information</a></li>
-          <li><a href="#SubmittingaPrintJob">Submitting a Print Job</a></li>
+        <li><a href="#working-with-destinations">Working with Destinations</a><ul class="subcontents">
+          <li><a href="#finding-available-destinations">Finding Available Destinations</a></li>
+          <li><a href="#basic-destination-information">Basic Destination Information</a></li>
+          <li><a href="#detailed-destination-information">Detailed Destination Information</a></li>
+          <li><a href="#submitting-a-print-job">Submitting a Print Job</a></li>
         </ul></li>
         <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
           <li><a href="#cupsAddDest">cupsAddDest</a></li>
+          <li><a href="#cupsAddIntegerOption">cupsAddIntegerOption</a></li>
           <li><a href="#cupsAddOption">cupsAddOption</a></li>
-          <li><a href="#cupsArrayAdd">cupsArrayAdd</a></li>
-          <li><a href="#cupsArrayClear">cupsArrayClear</a></li>
-          <li><a href="#cupsArrayCount">cupsArrayCount</a></li>
-          <li><a href="#cupsArrayCurrent">cupsArrayCurrent</a></li>
-          <li><a href="#cupsArrayDelete">cupsArrayDelete</a></li>
-          <li><a href="#cupsArrayDup">cupsArrayDup</a></li>
-          <li><a href="#cupsArrayFind">cupsArrayFind</a></li>
-          <li><a href="#cupsArrayFirst">cupsArrayFirst</a></li>
-          <li><a href="#cupsArrayGetIndex">cupsArrayGetIndex</a></li>
-          <li><a href="#cupsArrayGetInsert">cupsArrayGetInsert</a></li>
-          <li><a href="#cupsArrayIndex">cupsArrayIndex</a></li>
-          <li><a href="#cupsArrayInsert">cupsArrayInsert</a></li>
-          <li><a href="#cupsArrayLast">cupsArrayLast</a></li>
-          <li><a href="#cupsArrayNew">cupsArrayNew</a></li>
-          <li><a href="#cupsArrayNew2">cupsArrayNew2</a></li>
-          <li><a href="#cupsArrayNew3">cupsArrayNew3</a></li>
-          <li><a href="#cupsArrayNext">cupsArrayNext</a></li>
-          <li><a href="#cupsArrayPrev">cupsArrayPrev</a></li>
-          <li><a href="#cupsArrayRemove">cupsArrayRemove</a></li>
-          <li><a href="#cupsArrayRestore">cupsArrayRestore</a></li>
-          <li><a href="#cupsArraySave">cupsArraySave</a></li>
-          <li><a href="#cupsArrayUserData">cupsArrayUserData</a></li>
           <li><a href="#cupsCancelDestJob">cupsCancelDestJob</a></li>
-          <li><a href="#cupsCancelJob">cupsCancelJob</a></li>
-          <li><a href="#cupsCancelJob2">cupsCancelJob2</a></li>
           <li><a href="#cupsCheckDestSupported">cupsCheckDestSupported</a></li>
           <li><a href="#cupsCloseDestJob">cupsCloseDestJob</a></li>
           <li><a href="#cupsConnectDest">cupsConnectDest</a></li>
-          <li><a href="#cupsConnectDestBlock">cupsConnectDestBlock</a></li>
           <li><a href="#cupsCopyDest">cupsCopyDest</a></li>
           <li><a href="#cupsCopyDestConflicts">cupsCopyDestConflicts</a></li>
           <li><a href="#cupsCopyDestInfo">cupsCopyDestInfo</a></li>
           <li><a href="#cupsCreateDestJob">cupsCreateDestJob</a></li>
-          <li><a href="#cupsCreateJob">cupsCreateJob</a></li>
-          <li><a href="#cupsDirClose">cupsDirClose</a></li>
-          <li><a href="#cupsDirOpen">cupsDirOpen</a></li>
-          <li><a href="#cupsDirRead">cupsDirRead</a></li>
-          <li><a href="#cupsDirRewind">cupsDirRewind</a></li>
           <li><a href="#cupsDoAuthentication">cupsDoAuthentication</a></li>
           <li><a href="#cupsEncodeOptions">cupsEncodeOptions</a></li>
           <li><a href="#cupsEncodeOptions2">cupsEncodeOptions2</a></li>
           <li><a href="#cupsEncryption">cupsEncryption</a></li>
           <li><a href="#cupsEnumDests">cupsEnumDests</a></li>
-          <li><a href="#cupsEnumDestsBlock">cupsEnumDestsBlock</a></li>
-          <li><a href="#cupsFileClose">cupsFileClose</a></li>
-          <li><a href="#cupsFileCompression">cupsFileCompression</a></li>
-          <li><a href="#cupsFileEOF">cupsFileEOF</a></li>
-          <li><a href="#cupsFileFind">cupsFileFind</a></li>
-          <li><a href="#cupsFileFlush">cupsFileFlush</a></li>
-          <li><a href="#cupsFileGetChar">cupsFileGetChar</a></li>
-          <li><a href="#cupsFileGetConf">cupsFileGetConf</a></li>
-          <li><a href="#cupsFileGetLine">cupsFileGetLine</a></li>
-          <li><a href="#cupsFileGets">cupsFileGets</a></li>
-          <li><a href="#cupsFileLock">cupsFileLock</a></li>
-          <li><a href="#cupsFileNumber">cupsFileNumber</a></li>
-          <li><a href="#cupsFileOpen">cupsFileOpen</a></li>
-          <li><a href="#cupsFileOpenFd">cupsFileOpenFd</a></li>
-          <li><a href="#cupsFilePeekChar">cupsFilePeekChar</a></li>
-          <li><a href="#cupsFilePrintf">cupsFilePrintf</a></li>
-          <li><a href="#cupsFilePutChar">cupsFilePutChar</a></li>
-          <li><a href="#cupsFilePutConf">cupsFilePutConf</a></li>
-          <li><a href="#cupsFilePuts">cupsFilePuts</a></li>
-          <li><a href="#cupsFileRead">cupsFileRead</a></li>
-          <li><a href="#cupsFileRewind">cupsFileRewind</a></li>
-          <li><a href="#cupsFileSeek">cupsFileSeek</a></li>
-          <li><a href="#cupsFileStderr">cupsFileStderr</a></li>
-          <li><a href="#cupsFileStdin">cupsFileStdin</a></li>
-          <li><a href="#cupsFileStdout">cupsFileStdout</a></li>
-          <li><a href="#cupsFileTell">cupsFileTell</a></li>
-          <li><a href="#cupsFileUnlock">cupsFileUnlock</a></li>
-          <li><a href="#cupsFileWrite">cupsFileWrite</a></li>
           <li><a href="#cupsFindDestDefault">cupsFindDestDefault</a></li>
           <li><a href="#cupsFindDestReady">cupsFindDestReady</a></li>
           <li><a href="#cupsFindDestSupported">cupsFindDestSupported</a></li>
           <li><a href="#cupsFinishDestDocument">cupsFinishDestDocument</a></li>
-          <li><a href="#cupsFinishDocument">cupsFinishDocument</a></li>
           <li><a href="#cupsFreeDestInfo">cupsFreeDestInfo</a></li>
           <li><a href="#cupsFreeDests">cupsFreeDests</a></li>
           <li><a href="#cupsFreeJobs">cupsFreeJobs</a></li>
           <li><a href="#cupsFreeOptions">cupsFreeOptions</a></li>
-          <li><a href="#cupsGetClasses">cupsGetClasses</a></li>
-          <li><a href="#cupsGetDefault">cupsGetDefault</a></li>
-          <li><a href="#cupsGetDefault2">cupsGetDefault2</a></li>
           <li><a href="#cupsGetDest">cupsGetDest</a></li>
           <li><a href="#cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></li>
           <li><a href="#cupsGetDestMediaByName">cupsGetDestMediaByName</a></li>
@@ -272,15 +211,11 @@ h3.title {
           <li><a href="#cupsGetDestMediaCount">cupsGetDestMediaCount</a></li>
           <li><a href="#cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></li>
           <li><a href="#cupsGetDestWithURI">cupsGetDestWithURI</a></li>
-          <li><a href="#cupsGetDests">cupsGetDests</a></li>
-          <li><a href="#cupsGetDests2">cupsGetDests2</a></li>
-          <li><a href="#cupsGetJobs">cupsGetJobs</a></li>
+          <li><a href="#cupsGetIntegerOption">cupsGetIntegerOption</a></li>
           <li><a href="#cupsGetJobs2">cupsGetJobs2</a></li>
           <li><a href="#cupsGetNamedDest">cupsGetNamedDest</a></li>
           <li><a href="#cupsGetOption">cupsGetOption</a></li>
-          <li><a href="#cupsGetPassword">cupsGetPassword</a></li>
           <li><a href="#cupsGetPassword2">cupsGetPassword2</a></li>
-          <li><a href="#cupsGetPrinters">cupsGetPrinters</a></li>
           <li><a href="#cupsLangDefault">cupsLangDefault</a></li>
           <li><a href="#cupsLangEncoding">cupsLangEncoding</a></li>
           <li><a href="#cupsLangFlush">cupsLangFlush</a></li>
@@ -293,10 +228,6 @@ h3.title {
           <li><a href="#cupsNotifySubject">cupsNotifySubject</a></li>
           <li><a href="#cupsNotifyText">cupsNotifyText</a></li>
           <li><a href="#cupsParseOptions">cupsParseOptions</a></li>
-          <li><a href="#cupsPrintFile">cupsPrintFile</a></li>
-          <li><a href="#cupsPrintFile2">cupsPrintFile2</a></li>
-          <li><a href="#cupsPrintFiles">cupsPrintFiles</a></li>
-          <li><a href="#cupsPrintFiles2">cupsPrintFiles2</a></li>
           <li><a href="#cupsRemoveDest">cupsRemoveDest</a></li>
           <li><a href="#cupsRemoveOption">cupsRemoveOption</a></li>
           <li><a href="#cupsServer">cupsServer</a></li>
@@ -314,17 +245,12 @@ h3.title {
           <li><a href="#cupsSetUser">cupsSetUser</a></li>
           <li><a href="#cupsSetUserAgent">cupsSetUserAgent</a></li>
           <li><a href="#cupsStartDestDocument">cupsStartDestDocument</a></li>
-          <li><a href="#cupsStartDocument">cupsStartDocument</a></li>
-          <li><a href="#cupsTempFd">cupsTempFd</a></li>
-          <li><a href="#cupsTempFile">cupsTempFile</a></li>
-          <li><a href="#cupsTempFile2">cupsTempFile2</a></li>
           <li><a href="#cupsUser">cupsUser</a></li>
           <li><a href="#cupsUserAgent">cupsUserAgent</a></li>
           <li><a href="#httpAcceptConnection">httpAcceptConnection</a></li>
           <li><a href="#httpAddCredential">httpAddCredential</a></li>
           <li><a href="#httpAddrAny">httpAddrAny</a></li>
           <li><a href="#httpAddrClose">httpAddrClose</a></li>
-          <li><a href="#httpAddrConnect">httpAddrConnect</a></li>
           <li><a href="#httpAddrConnect2">httpAddrConnect2</a></li>
           <li><a href="#httpAddrCopyList">httpAddrCopyList</a></li>
           <li><a href="#httpAddrEqual">httpAddrEqual</a></li>
@@ -346,18 +272,14 @@ h3.title {
           <li><a href="#httpClearFields">httpClearFields</a></li>
           <li><a href="#httpClose">httpClose</a></li>
           <li><a href="#httpCompareCredentials">httpCompareCredentials</a></li>
-          <li><a href="#httpConnect">httpConnect</a></li>
           <li><a href="#httpConnect2">httpConnect2</a></li>
-          <li><a href="#httpConnectEncrypt">httpConnectEncrypt</a></li>
           <li><a href="#httpCopyCredentials">httpCopyCredentials</a></li>
           <li><a href="#httpCredentialsAreValidForName">httpCredentialsAreValidForName</a></li>
           <li><a href="#httpCredentialsGetExpiration">httpCredentialsGetExpiration</a></li>
           <li><a href="#httpCredentialsGetTrust">httpCredentialsGetTrust</a></li>
           <li><a href="#httpCredentialsString">httpCredentialsString</a></li>
-          <li><a href="#httpDecode64">httpDecode64</a></li>
           <li><a href="#httpDecode64_2">httpDecode64_2</a></li>
           <li><a href="#httpDelete">httpDelete</a></li>
-          <li><a href="#httpEncode64">httpEncode64</a></li>
           <li><a href="#httpEncode64_2">httpEncode64_2</a></li>
           <li><a href="#httpEncryption">httpEncryption</a></li>
           <li><a href="#httpError">httpError</a></li>
@@ -372,7 +294,6 @@ h3.title {
           <li><a href="#httpGetBlocking">httpGetBlocking</a></li>
           <li><a href="#httpGetContentEncoding">httpGetContentEncoding</a></li>
           <li><a href="#httpGetCookie">httpGetCookie</a></li>
-          <li><a href="#httpGetDateString">httpGetDateString</a></li>
           <li><a href="#httpGetDateString2">httpGetDateString2</a></li>
           <li><a href="#httpGetDateTime">httpGetDateTime</a></li>
           <li><a href="#httpGetEncryption">httpGetEncryption</a></li>
@@ -382,14 +303,12 @@ h3.title {
           <li><a href="#httpGetHostByName">httpGetHostByName</a></li>
           <li><a href="#httpGetHostname">httpGetHostname</a></li>
           <li><a href="#httpGetKeepAlive">httpGetKeepAlive</a></li>
-          <li><a href="#httpGetLength">httpGetLength</a></li>
           <li><a href="#httpGetLength2">httpGetLength2</a></li>
           <li><a href="#httpGetPending">httpGetPending</a></li>
           <li><a href="#httpGetReady">httpGetReady</a></li>
           <li><a href="#httpGetRemaining">httpGetRemaining</a></li>
           <li><a href="#httpGetState">httpGetState</a></li>
           <li><a href="#httpGetStatus">httpGetStatus</a></li>
-          <li><a href="#httpGetSubField">httpGetSubField</a></li>
           <li><a href="#httpGetSubField2">httpGetSubField2</a></li>
           <li><a href="#httpGetVersion">httpGetVersion</a></li>
           <li><a href="#httpGets">httpGets</a></li>
@@ -402,10 +321,8 @@ h3.title {
           <li><a href="#httpPeek">httpPeek</a></li>
           <li><a href="#httpPost">httpPost</a></li>
           <li><a href="#httpPut">httpPut</a></li>
-          <li><a href="#httpRead">httpRead</a></li>
           <li><a href="#httpRead2">httpRead2</a></li>
           <li><a href="#httpReadRequest">httpReadRequest</a></li>
-          <li><a href="#httpReconnect">httpReconnect</a></li>
           <li><a href="#httpReconnect2">httpReconnect2</a></li>
           <li><a href="#httpResolveHostname">httpResolveHostname</a></li>
           <li><a href="#httpSaveCredentials">httpSaveCredentials</a></li>
@@ -428,7 +345,6 @@ h3.title {
           <li><a href="#httpURIStatusString">httpURIStatusString</a></li>
           <li><a href="#httpUpdate">httpUpdate</a></li>
           <li><a href="#httpWait">httpWait</a></li>
-          <li><a href="#httpWrite">httpWrite</a></li>
           <li><a href="#httpWrite2">httpWrite2</a></li>
           <li><a href="#httpWriteResponse">httpWriteResponse</a></li>
           <li><a href="#ippAddBoolean">ippAddBoolean</a></li>
@@ -530,29 +446,18 @@ h3.title {
           <li><a href="#pwgMediaForSize">pwgMediaForSize</a></li>
         </ul></li>
         <li><a href="#TYPES">Data Types</a><ul class="subcontents">
-          <li><a href="#cups_acopy_func_t">cups_acopy_func_t</a></li>
-          <li><a href="#cups_afree_func_t">cups_afree_func_t</a></li>
-          <li><a href="#cups_ahash_func_t">cups_ahash_func_t</a></li>
-          <li><a href="#cups_array_func_t">cups_array_func_t</a></li>
-          <li><a href="#cups_array_t">cups_array_t</a></li>
           <li><a href="#cups_client_cert_cb_t">cups_client_cert_cb_t</a></li>
-          <li><a href="#cups_dentry_t">cups_dentry_t</a></li>
-          <li><a href="#cups_dest_block_t">cups_dest_block_t</a></li>
           <li><a href="#cups_dest_cb_t">cups_dest_cb_t</a></li>
           <li><a href="#cups_dest_t">cups_dest_t</a></li>
           <li><a href="#cups_dinfo_t">cups_dinfo_t</a></li>
-          <li><a href="#cups_dir_t">cups_dir_t</a></li>
           <li><a href="#cups_encoding_t">cups_encoding_t</a></li>
-          <li><a href="#cups_file_t">cups_file_t</a></li>
           <li><a href="#cups_job_t">cups_job_t</a></li>
           <li><a href="#cups_lang_t">cups_lang_t</a></li>
           <li><a href="#cups_option_t">cups_option_t</a></li>
           <li><a href="#cups_password_cb2_t">cups_password_cb2_t</a></li>
-          <li><a href="#cups_password_cb_t">cups_password_cb_t</a></li>
           <li><a href="#cups_ptype_t">cups_ptype_t</a></li>
           <li><a href="#cups_server_cert_cb_t">cups_server_cert_cb_t</a></li>
           <li><a href="#cups_size_t">cups_size_t</a></li>
-          <li><a href="#gss_auth_identity_desc">gss_auth_identity_desc</a></li>
           <li><a href="#http_addr_t">http_addr_t</a></li>
           <li><a href="#http_addrlist_t">http_addrlist_t</a></li>
           <li><a href="#http_auth_t">http_auth_t</a></li>
@@ -586,23 +491,16 @@ h3.title {
           <li><a href="#pwg_size_t">pwg_size_t</a></li>
         </ul></li>
         <li><a href="#STRUCTURES">Structures</a><ul class="subcontents">
-          <li><a href="#cups_dentry_s">cups_dentry_s</a></li>
           <li><a href="#cups_dest_s">cups_dest_s</a></li>
           <li><a href="#cups_job_s">cups_job_s</a></li>
           <li><a href="#cups_lang_s">cups_lang_s</a></li>
           <li><a href="#cups_option_s">cups_option_s</a></li>
           <li><a href="#cups_size_s">cups_size_s</a></li>
-          <li><a href="#gss_auth_identity">gss_auth_identity</a></li>
           <li><a href="#http_addrlist_s">http_addrlist_s</a></li>
           <li><a href="#http_credential_s">http_credential_s</a></li>
-          <li><a href="#pollfd">pollfd</a></li>
           <li><a href="#pwg_map_s">pwg_map_s</a></li>
           <li><a href="#pwg_media_s">pwg_media_s</a></li>
           <li><a href="#pwg_size_s">pwg_size_s</a></li>
-        </ul></li>
-        <li><a href="#VARIABLES">Variables</a><ul class="subcontents">
-          <li><a href="#CF_RETURNS_RETAINED">CF_RETURNS_RETAINED</a></li>
-          <li><a href="#environ">environ</a></li>
         </ul></li>
         <li><a href="#ENUMERATIONS">Enumerations</a><ul class="subcontents">
           <li><a href="#cups_encoding_e">cups_encoding_e</a></li>
@@ -637,10 +535,10 @@ h3.title {
     <blockquote>
     <p>Note: This document is under active development and is incomplete, with a goal completing it prior to releasing CUPS 2.2.4. Please <a href="https://github.com/apple/cups/issues">file issues on Github</a> to provide any feedback.</p>
 </blockquote>
-    <h2><a id="Introduction">Introduction</a></h2>
+    <h2><a id="introduction">Introduction</a></h2>
     <p>CUPS provides the &quot;cups&quot; library to talk to the different parts of CUPS and with Internet Printing Protocol (IPP) printers. The &quot;cups&quot; library functions are accessed by including the <code>&lt;cups/cups.h&gt;</code> header.</p>
     <p>CUPS is based on the Internet Printing Protocol (&quot;IPP&quot;), which allows clients (applications) to communicate with a server (the scheduler, printers, etc.) to get a list of destinations, send print jobs, and so forth. You identify which server you want to communicate with using a pointer to the opaque structure <code>http_t</code>. The <code>CUPS_HTTP_DEFAULT</code> constant can be used when you want to talk to the CUPS scheduler.</p>
-    <h3><a id="Guidelines">Guidelines</a></h3>
+    <h3><a id="guidelines">Guidelines</a></h3>
     <p>When writing software that uses the &quot;cups&quot; library:</p>
     <ul>
     <li>Do not use undocumented or deprecated APIs,</li>
@@ -650,9 +548,9 @@ h3.title {
 </ul>
     <p>CUPS is designed to insulate users and developers from the implementation details of printers and file formats. The goal is to allow an application to supply a print file in a standard format with the user intent (&quot;print four copies, two-sided on A4 media, and staple each copy&quot;) and have the printing system manage the printer communication and format conversion needed.</p>
     <p>Similarly, printer and job management applications can use standard query operations to obtain the status information in a common, generic form and use standard management operations to control the state of those printers and jobs.</p>
-    <h3><a id="TermsUsedinThisDocument">Terms Used in This Document</a></h3>
+    <h3><a id="terms-used-in-this-document">Terms Used in This Document</a></h3>
     <p>A <em>Destination</em> is a printer or print queue that accepts print jobs. A <em>Print</em> <em>Job</em> is one or more documents that are processed by a destination using options supplied when creating the job. A <em>Document</em> is a file (JPEG image, PDF file, etc.) suitable for printing. An <em>Option</em> controls some aspect of printing, such as the media used. <em>Media</em> is the sheets or roll that is printed on. An <em>Attribute</em> is an option encoded for an Internet Printing Protocol (IPP) request.</p>
-    <h3><a id="CompilingProgramsThatUsetheCUPSAPI">Compiling Programs That Use the CUPS API</a></h3>
+    <h3><a id="compiling-programs-that-use-the-cups-api">Compiling Programs That Use the CUPS API</a></h3>
     <p>The CUPS libraries can be used from any C, C++, or Objective C program. The method of compiling against the libraries varies depending on the operating system and installation of CUPS. The following sections show how to compile a simple program (shown below) in two common environments.</p>
     <p>The following simple program lists the available destinations:</p>
     <pre><code>#include &lt;stdio.h&gt;
@@ -675,20 +573,20 @@ int main(void)
   return (0);
 }
 </code></pre>
-    <h4><a id="CompilingwithXcode">Compiling with Xcode</a></h4>
+    <h4><a id="compiling-with-xcode">Compiling with Xcode</a></h4>
     <p>In Xcode, choose <em>New</em> <em>Project...</em> from the <em>File</em> menu (or press SHIFT+CMD+N), then select the <em>Command</em> <em>Line</em> <em>Tool</em> under the macOS Application project type. Click <em>Next</em> and enter a name for the project, for example &quot;firstcups&quot;. Click <em>Next</em> and choose a project directory. The click <em>Next</em> to create the project.</p>
     <p>In the project window, click on the <em>Build</em> <em>Phases</em> group and expand the <em>Link</em> <em>Binary</em> <em>with</em> <em>Libraries</em> section. Click <em>+</em>, type &quot;libcups&quot; to show the library, and then double-click on <code>libcups.tbd</code>.</p>
     <p>Finally, click on the <code>main.c</code> file in the sidebar and copy the example program to the file. Build and run (CMD+R) to see the list of destinations.</p>
-    <h4><a id="CompilingwithGCC">Compiling with GCC</a></h4>
+    <h4><a id="compiling-with-gcc">Compiling with GCC</a></h4>
     <p>From the command-line, create a file called <code>sample.c</code> using your favorite editor, copy the example to this file, and save. Then run the following command to compile it with GCC and run it:</p>
     <pre><code>gcc -o simple `cups-config --cflags` simple.c `cups-config --libs`
 ./simple
 </code></pre>
     <p>The <code>cups-config</code> command provides the compiler flags (<code>cups-config --cflags</code>) and libraries (<code>cups-config --libs</code>) needed for the local system.</p>
-    <h2><a id="WorkingwithDestinations">Working with Destinations</a></h2>
+    <h2><a id="working-with-destinations">Working with Destinations</a></h2>
     <p>Destinations, which in CUPS represent individual printers or classes (collections or pools) of printers, are represented by the <code>cups_dest_t</code> structure which includes the name (<code>name</code>), instance (<code>instance</code>, saved options/settings), whether the destination is the default for the user (<code>is_default</code>), and the options and basic information associated with that destination (<code>num_options</code> and <code>options</code>).</p>
     <p>Historically destinations have been manually maintained by the administrator of a system or network, but CUPS also supports dynamic discovery of destinations on the current network.</p>
-    <h3><a id="FindingAvailableDestinations">Finding Available Destinations</a></h3>
+    <h3><a id="finding-available-destinations">Finding Available Destinations</a></h3>
     <p>The <code>cupsEnumDests</code> function finds all of the available destinations:</p>
     <pre><code> int
  cupsEnumDests(unsigned flags, int msec, int *cancel,
@@ -698,12 +596,13 @@ int main(void)
     <p>The <code>flags</code> argument specifies enumeration options, which at present must be <code>CUPS_DEST_FLAGS_NONE</code>.</p>
     <p>The <code>msec</code> argument specifies the maximum amount of time that should be used for enumeration in milliseconds - interactive applications should keep this value to 5000 or less when run on the main thread.</p>
     <p>The <code>cancel</code> argument points to an integer variable that, when set to a non-zero value, will cause enumeration to stop as soon as possible. It can be <code>NULL</code> if not needed.</p>
-    <p>The <code>type</code> and <code>mask</code> arguments are bitfields that allow the caller to filter the destinations based on categories and/or capabilities. The destination's &quot;printer-type&quot; value is masked by the <code>mask</code> value and compared to the <code>type</code> value when filtering. For example, to only enumerate destinations that are hosted on the local system, pass <code>CUPS_PRINTER_LOCAL</code> for the <code>type</code> argument and <code>CUPS_PRINTER_REMOTE</code> for the <code>mask</code> argument. The following constants can be used for filtering:</p>
+    <p>The <code>type</code> and <code>mask</code> arguments are bitfields that allow the caller to filter the destinations based on categories and/or capabilities. The destination's &quot;printer-type&quot; value is masked by the <code>mask</code> value and compared to the <code>type</code> value when filtering. For example, to only enumerate destinations that are hosted on the local system, pass <code>CUPS_PRINTER_LOCAL</code> for the <code>type</code> argument and <code>CUPS_PRINTER_DISCOVERED</code> for the <code>mask</code> argument. The following constants can be used for filtering:</p>
     <ul>
     <li><code>CUPS_PRINTER_CLASS</code>: A collection of destinations.</li>
     <li><code>CUPS_PRINTER_FAX</code>: A facsimile device.</li>
-    <li><code>CUPS_PRINTER_LOCAL</code>: A local printer or class. This constant has the value 0 (no bits set) and is only used for the <code>type</code> argument and is paired with the <code>CUPS_PRINTER_REMOTE</code> constant passed in the <code>mask</code> argument.</li>
-    <li><code>CUPS_PRINTER_REMOTE</code>: A remote printer or class.</li>
+    <li><code>CUPS_PRINTER_LOCAL</code>: A local printer or class. This constant has the value 0 (no bits set) and is only used for the <code>type</code> argument and is paired with the <code>CUPS_PRINTER_REMOTE</code> or <code>CUPS_PRINTER_DISCOVERED</code> constant passed in the <code>mask</code> argument.</li>
+    <li><code>CUPS_PRINTER_REMOTE</code>: A remote (shared) printer or class.</li>
+    <li><code>CUPS_PRINTER_DISCOVERED</code>: An available network printer or class.</li>
     <li><code>CUPS_PRINTER_BW</code>: Can do B&amp;W printing.</li>
     <li><code>CUPS_PRINTER_COLOR</code>: Can do color printing.</li>
     <li><code>CUPS_PRINTER_DUPLEX</code>: Can do two-sided printing.</li>
@@ -797,7 +696,7 @@ my_get_dests(cups_ptype_t type, cups_ptype_t mask,
   return (user_data.num_dests);
 }
 </code></pre>
-    <h3><a id="BasicDestinationInformation">Basic Destination Information</a></h3>
+    <h3><a id="basic-destination-information">Basic Destination Information</a></h3>
     <p>The <code>num_options</code> and <code>options</code> members of the <code>cups_dest_t</code> structure provide basic attributes about the destination in addition to the user default options and values for that destination. The following names are predefined for various destination attributes:</p>
     <ul>
     <li>&quot;auth-info-required&quot;: The type of authentication required for printing to this destination: &quot;none&quot;, &quot;username,password&quot;, &quot;domain,username,password&quot;, or &quot;negotiate&quot; (Kerberos).</li>
@@ -810,20 +709,21 @@ my_get_dests(cups_ptype_t type, cups_ptype_t mask,
     <li>&quot;printer-state-change-time&quot;: The UNIX time when the destination entered the current state.</li>
     <li>&quot;printer-state-reasons&quot;: Additional comma-delimited state keywords for the destination such as &quot;media-tray-empty-error&quot; and &quot;toner-low-warning&quot;.</li>
     <li>&quot;printer-type&quot;: The <code>cups_ptype_t</code> value associated with the destination.</li>
+    <li>&quot;printer-uri-supported&quot;: The URI associated with the destination; if not set, this destination was discovered but is not yet setup as a local printer.</li>
 </ul>
     <p>Use the <code>cupsGetOption</code> function to retrieve the value. For example, the following code gets the make and model of a destination:</p>
     <pre><code>const char *model = cupsGetOption(&quot;printer-make-and-model&quot;,
                                   dest-&gt;num_options,
                                   dest-&gt;options);
 </code></pre>
-    <h3><a id="DetailedDestinationInformation">Detailed Destination Information</a></h3>
+    <h3><a id="detailed-destination-information">Detailed Destination Information</a></h3>
     <p>Once a destination has been chosen, the <code>cupsCopyDestInfo</code> function can be used to gather detailed information about the destination:</p>
     <pre><code>cups_dinfo_t *
 cupsCopyDestInfo(http_t *http, cups_dest_t *dest);
 </code></pre>
     <p>The <code>http</code> argument specifies a connection to the CUPS scheduler and is typically the constant <code>CUPS_HTTP_DEFAULT</code>. The <code>dest</code> argument specifies the destination to query.</p>
     <p>The <code>cups_dinfo_t</code> structure that is returned contains a snapshot of the supported options and their supported, ready, and default values. It also can report constraints between different options and values, and recommend changes to resolve those constraints.</p>
-    <h4><a id="GettingSupportedOptionsandValues">Getting Supported Options and Values</a></h4>
+    <h4><a id="getting-supported-options-and-values">Getting Supported Options and Values</a></h4>
     <p>The <code>cupsCheckDestSupported</code> function can be used to test whether a particular option or option and value is supported:</p>
     <pre><code>int
 cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
@@ -879,7 +779,7 @@ int i, count = ippGetCount(attrs);
 for (i = 0; i &lt; count; i ++)
   puts(ippGetString(attrs, i, NULL));
 </code></pre>
-    <h4><a id="GettingDefaultValues">Getting Default Values</a></h4>
+    <h4><a id="getting-default-values">Getting Default Values</a></h4>
     <p>There are two sets of default values - user defaults that are available via the <code>num_options</code> and <code>options</code> members of the <code>cups_dest_t</code> structure, and destination defaults that available via the <code>cups_dinfo_t</code> structure and the <code>cupsFindDestDefault</code> function which returns the IPP attribute containing the default value(s) for a given option:</p>
     <pre><code>ipp_attribute_t *
 cupsFindDestDefault(http_t *http, cups_dest_t *dest,
@@ -909,7 +809,7 @@ else
   putchar('\n');
 }
 </code></pre>
-    <h4><a id="GettingReadyLoadedValues">Getting Ready (Loaded) Values</a></h4>
+    <h4><a id="getting-ready-loaded-values">Getting Ready (Loaded) Values</a></h4>
     <p>The finishings and media options also support queries for the ready, or loaded, values. For example, a printer may have punch and staple finishers installed but be out of staples - the supported values will list both punch and staple finishing processes but the ready values will only list the punch processes. Similarly, a printer may support hundreds of different sizes of media but only have a single size loaded at any given time - the ready values are limited to the media that is actually in the printer.</p>
     <p>The <code>cupsFindDestReady</code> function finds the IPP attribute containing the ready values for a given option:</p>
     <pre><code>ipp_attribute_t *
@@ -932,7 +832,7 @@ if (ready_finishings != NULL)
 else
   puts(&quot;no finishings are ready.&quot;);
 </code></pre>
-    <h4><a id="MediaSizeOptions">Media Size Options</a></h4>
+    <h4><a id="media-size-options">Media Size Options</a></h4>
     <p>CUPS provides functions for querying the dimensions and margins for each of the supported media size options. The <code>cups_size_t</code> structure is used to describe a media size:</p>
     <pre><code>typedef struct cups_size_s
 {
@@ -1019,7 +919,7 @@ cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
                         cups_dinfo_t *dinfo, unsigned flags,
                         cups_size_t *size);
 </code></pre>
-    <h4><a id="LocalizingOptionsandValues">Localizing Options and Values</a></h4>
+    <h4><a id="localizing-options-and-values">Localizing Options and Values</a></h4>
     <p>CUPS provides three functions to get localized versions of options and values: <code>cupsLocalizeDestMedia</code>, <code>cupsLocalizeDestOption</code>, and <code>cupsLocalizeDestValue</code>:</p>
     <pre><code>const char *
 cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest,
@@ -1036,7 +936,7 @@ cupsLocalizeDestValue(http_t *http, cups_dest_t *dest,
                       cups_dinfo_t *info,
                       const char *option, const char *value);
 </code></pre>
-    <h3><a id="SubmittingaPrintJob">Submitting a Print Job</a></h3>
+    <h3><a id="submitting-a-print-job">Submitting a Print Job</a></h3>
     <p>Once you are ready to submit a print job, you create a job using the <code>cupsCreateDestJob</code> function:</p>
     <pre><code>ipp_status_t
 cupsCreateDestJob(http_t *http, cups_dest_t *dest,
@@ -1151,6 +1051,33 @@ a copy of that destination's options.<br>
 <br>
 Use the <a href="#cupsSaveDests"><code>cupsSaveDests</code></a> function to save the updated list of
 destinations to the user's lpoptions file.</p>
+<h3 class="function"><span class="info">&#160;CUPS 2.2.4&#160;</span><a id="cupsAddIntegerOption">cupsAddIntegerOption</a></h3>
+        <p class="description">Add an integer option to an option array.</p>
+<p class="code">
+int cupsAddIntegerOption (<br>
+&#160;&#160;&#160;&#160;const char *name,<br>
+&#160;&#160;&#160;&#160;int value,<br>
+&#160;&#160;&#160;&#160;int num_options,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> **options<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+        <dd class="description">Name of option</dd>
+<dt>value</dt>
+        <dd class="description">Value of option</dd>
+<dt>num_options</dt>
+        <dd class="description">Number of options</dd>
+<dt>options</dt>
+        <dd class="description">Pointer to options</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Number of options</p>
+<h4 class="discussion">Discussion</h4>
+        <p class="discussion">New option arrays can be initialized simply by passing 0 for the
+&quot;num_options&quot; parameter.
+
+</p>
 <h3 class="function"><a id="cupsAddOption">cupsAddOption</a></h3>
         <p class="description">Add an option to an option array.</p>
 <p class="code">
@@ -1176,428 +1103,6 @@ int cupsAddOption (<br>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">New option arrays can be initialized simply by passing 0 for the
 &quot;num_options&quot; parameter.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayAdd">cupsArrayAdd</a></h3>
-        <p class="description">Add an element to the array.</p>
-<p class="code">
-int cupsArrayAdd (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&#160;&#160;&#160;&#160;void *e<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-<dt>e</dt>
-        <dd class="description">Element</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on success, 0 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">When adding an element to a sorted array, non-unique elements are
-appended at the end of the run of identical elements.  For unsorted arrays,
-the element is appended to the end of the array.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayClear">cupsArrayClear</a></h3>
-        <p class="description">Clear the array.</p>
-<p class="code">
-void cupsArrayClear (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is equivalent to removing all elements in the array.
-The caller is responsible for freeing the memory used by the
-elements themselves.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayCount">cupsArrayCount</a></h3>
-        <p class="description">Get the number of elements in the array.</p>
-<p class="code">
-int cupsArrayCount (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of elements</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayCurrent">cupsArrayCurrent</a></h3>
-        <p class="description">Return the current element in the array.</p>
-<p class="code">
-void *cupsArrayCurrent (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Element</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
-<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayDelete">cupsArrayDelete</a></h3>
-        <p class="description">Free all memory used by the array.</p>
-<p class="code">
-void cupsArrayDelete (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The caller is responsible for freeing the memory used by the
-elements themselves.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayDup">cupsArrayDup</a></h3>
-        <p class="description">Duplicate the array.</p>
-<p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayDup (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Duplicate array</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayFind">cupsArrayFind</a></h3>
-        <p class="description">Find an element in the array.</p>
-<p class="code">
-void *cupsArrayFind (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&#160;&#160;&#160;&#160;void *e<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-<dt>e</dt>
-        <dd class="description">Element</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Element found or <code>NULL</code></p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayFirst">cupsArrayFirst</a></h3>
-        <p class="description">Get the first element in the array.</p>
-<p class="code">
-void *cupsArrayFirst (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">First element or <code>NULL</code> if the array is empty</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayGetIndex">cupsArrayGetIndex</a></h3>
-        <p class="description">Get the index of the current element.</p>
-<p class="code">
-int cupsArrayGetIndex (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Index of the current element, starting at 0</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
-<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayGetInsert">cupsArrayGetInsert</a></h3>
-        <p class="description">Get the index of the last inserted element.</p>
-<p class="code">
-int cupsArrayGetInsert (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Index of the last inserted element, starting at 0</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayIndex">cupsArrayIndex</a></h3>
-        <p class="description">Get the N-th element in the array.</p>
-<p class="code">
-void *cupsArrayIndex (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&#160;&#160;&#160;&#160;int n<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-<dt>n</dt>
-        <dd class="description">Index into array, starting at 0</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">N-th element or <code>NULL</code></p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayInsert">cupsArrayInsert</a></h3>
-        <p class="description">Insert an element in the array.</p>
-<p class="code">
-int cupsArrayInsert (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&#160;&#160;&#160;&#160;void *e<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-<dt>e</dt>
-        <dd class="description">Element</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on failure, 1 on success</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">When inserting an element in a sorted array, non-unique elements are
-inserted at the beginning of the run of identical elements.  For unsorted
-arrays, the element is inserted at the beginning of the array.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayLast">cupsArrayLast</a></h3>
-        <p class="description">Get the last element in the array.</p>
-<p class="code">
-void *cupsArrayLast (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Last element or <code>NULL</code> if the array is empty</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayNew">cupsArrayNew</a></h3>
-        <p class="description">Create a new array.</p>
-<p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&#160;&#160;&#160;&#160;void *d<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>f</dt>
-        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
-<dt>d</dt>
-        <dd class="description">User data pointer or <code>NULL</code></dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Array</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
-receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
-data pointer argument can safely be omitted when not required so functions
-like <code>strcmp</code> can be used for sorted string arrays.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsArrayNew2">cupsArrayNew2</a></h3>
-        <p class="description">Create a new array with hash.</p>
-<p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew2 (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&#160;&#160;&#160;&#160;void *d,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br>
-&#160;&#160;&#160;&#160;int hsize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>f</dt>
-        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
-<dt>d</dt>
-        <dd class="description">User data or <code>NULL</code></dd>
-<dt>h</dt>
-        <dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
-<dt>hsize</dt>
-        <dd class="description">Hash size (&gt;= 0)</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Array</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
-receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
-data pointer argument can safely be omitted when not required so functions
-like <code>strcmp</code> can be used for sorted string arrays.<br>
-<br>
-The hash function (&quot;h&quot;) is used to implement cached lookups with the
-specified hash size (&quot;hsize&quot;).
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="cupsArrayNew3">cupsArrayNew3</a></h3>
-        <p class="description">Create a new array with hash and/or free function.</p>
-<p class="code">
-<a href="#cups_array_t">cups_array_t</a> *cupsArrayNew3 (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_func_t">cups_array_func_t</a> f,<br>
-&#160;&#160;&#160;&#160;void *d,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_ahash_func_t">cups_ahash_func_t</a> h,<br>
-&#160;&#160;&#160;&#160;int hsize,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_acopy_func_t">cups_acopy_func_t</a> cf,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_afree_func_t">cups_afree_func_t</a> ff<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>f</dt>
-        <dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
-<dt>d</dt>
-        <dd class="description">User data or <code>NULL</code></dd>
-<dt>h</dt>
-        <dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
-<dt>hsize</dt>
-        <dd class="description">Hash size (&gt;= 0)</dd>
-<dt>cf</dt>
-        <dd class="description">Copy function</dd>
-<dt>ff</dt>
-        <dd class="description">Free function</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Array</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
-receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
-data pointer argument can safely be omitted when not required so functions
-like <code>strcmp</code> can be used for sorted string arrays.<br>
-<br>
-The hash function (&quot;h&quot;) is used to implement cached lookups with the
-specified hash size (&quot;hsize&quot;).<br>
-<br>
-The copy function (&quot;cf&quot;) is used to automatically copy/retain elements when
-added or the array is copied.<br>
-<br>
-The free function (&quot;cf&quot;) is used to automatically free/release elements when
-removed or the array is deleted.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayNext">cupsArrayNext</a></h3>
-        <p class="description">Get the next element in the array.</p>
-<p class="code">
-void *cupsArrayNext (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Next element or <code>NULL</code></p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)&quot;.<br>
-<br>
-The next element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
-<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
-to set the current element.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayPrev">cupsArrayPrev</a></h3>
-        <p class="description">Get the previous element in the array.</p>
-<p class="code">
-void *cupsArrayPrev (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Previous element or <code>NULL</code></p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) - 1)&quot;.<br>
-<br>
-The previous element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
-<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
-to set the current element.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayRemove">cupsArrayRemove</a></h3>
-        <p class="description">Remove an element from the array.</p>
-<p class="code">
-int cupsArrayRemove (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a,<br>
-&#160;&#160;&#160;&#160;void *e<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-<dt>e</dt>
-        <dd class="description">Element</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on success, 0 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">If more than one element matches &quot;e&quot;, only the first matching element is
-removed.<br>
-<br>
-The caller is responsible for freeing the memory used by the
-removed element.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayRestore">cupsArrayRestore</a></h3>
-        <p class="description">Reset the current element to the last <a href="#cupsArraySave"><code>cupsArraySave</code></a>.</p>
-<p class="code">
-void *cupsArrayRestore (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New current element</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArraySave">cupsArraySave</a></h3>
-        <p class="description">Mark the current element for a later <a href="#cupsArrayRestore"><code>cupsArrayRestore</code></a>.</p>
-<p class="code">
-int cupsArraySave (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on success, 0 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
-<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
-to set the current element.<br>
-<br>
-The save/restore stack is guaranteed to be at least 32 elements deep.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsArrayUserData">cupsArrayUserData</a></h3>
-        <p class="description">Return the user data for an array.</p>
-<p class="code">
-void *cupsArrayUserData (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *a<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>a</dt>
-        <dd class="description">Array</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">User data</p>
 <h3 class="function"><a id="cupsCancelDestJob">cupsCancelDestJob</a></h3>
         <p class="description">Include necessary headers...</p>
 <p class="code">
@@ -1622,61 +1127,6 @@ ipp_status_t cupsCancelDestJob (<br>
 Returns <code>IPP_STATUS_OK</code> on success and
 <code>IPP_STATUS_ERRPR_NOT_AUTHORIZED</code> or
 <code>IPP_STATUS_ERROR_FORBIDDEN</code> on failure.
-
-</p>
-<h3 class="function"><a id="cupsCancelJob">cupsCancelJob</a></h3>
-        <p class="description">Cancel a print job on the default server.</p>
-<p class="code">
-int cupsCancelJob (<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int job_id<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-        <dd class="description">Name of printer or class</dd>
-<dt>job_id</dt>
-        <dd class="description">Job ID, <code>CUPS_JOBID_CURRENT</code> for the current job, or <code>CUPS_JOBID_ALL</code> for all jobs</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on success, 0 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Pass <code>CUPS_JOBID_ALL</code> to cancel all jobs or <code>CUPS_JOBID_CURRENT</code>
-to cancel the current job on the named destination.<br>
-<br>
-Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> functions to get
-the cause of any failure.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsCancelJob2">cupsCancelJob2</a></h3>
-        <p class="description">Cancel or purge a print job.</p>
-<p class="code">
-ipp_status_t cupsCancelJob2 (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int job_id,<br>
-&#160;&#160;&#160;&#160;int purge<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-        <dd class="description">Name of printer or class</dd>
-<dt>job_id</dt>
-        <dd class="description">Job ID, <code>CUPS_JOBID_CURRENT</code> for the current job, or <code>CUPS_JOBID_ALL</code> for all jobs</dd>
-<dt>purge</dt>
-        <dd class="description">1 to purge, 0 to cancel</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">IPP status</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Canceled jobs remain in the job history while purged jobs are removed
-from the job history.<br>
-<br>
-Pass <code>CUPS_JOBID_ALL</code> to cancel all jobs or <code>CUPS_JOBID_CURRENT</code>
-to cancel the current job on the named destination.<br>
-<br>
-Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> functions to get
-the cause of any failure.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="cupsCheckDestSupported">cupsCheckDestSupported</a></h3>
@@ -1768,45 +1218,6 @@ on success.
         <dd class="description">Callback function</dd>
 <dt>user_data</dt>
         <dd class="description">User data pointer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Connection to server or <code>NULL</code></p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Connect to the destination, returning a new http_t connection object and
-optionally the resource path to use for the destination.  These calls will
-block until a connection is made, the timeout expires, the integer pointed
-to by &quot;cancel&quot; is non-zero, or the callback function (or block) returns 0,
-The caller is responsible for calling httpClose() on the returned object.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="cupsConnectDestBlock">cupsConnectDestBlock</a></h3>
-        <p class="description">Connect to the server for a destination.</p>
-<p class="code">
-<a href="#http_t">http_t</a> *cupsConnectDestBlock (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
-&#160;&#160;&#160;&#160;unsigned flags,<br>
-&#160;&#160;&#160;&#160;int msec,<br>
-&#160;&#160;&#160;&#160;int *cancel,<br>
-&#160;&#160;&#160;&#160;char *resource,<br>
-&#160;&#160;&#160;&#160;size_t resourcesize,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dest_block_t">cups_dest_block_t</a> block<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dest</dt>
-        <dd class="description">Destination</dd>
-<dt>flags</dt>
-        <dd class="description">Connection flags</dd>
-<dt>msec</dt>
-        <dd class="description">Timeout in milliseconds</dd>
-<dt>cancel</dt>
-        <dd class="description">Pointer to &quot;cancel&quot; variable</dd>
-<dt>resource</dt>
-        <dd class="description">Resource buffer</dd>
-<dt>resourcesize</dt>
-        <dd class="description">Size of resource buffer</dd>
-<dt>block</dt>
-        <dd class="description">Callback block</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Connection to server or <code>NULL</code></p>
@@ -1962,87 +1373,6 @@ ipp_status_t cupsCreateDestJob (<br>
 in the variable pointed to by &quot;job_id&quot;.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsCreateJob">cupsCreateJob</a></h3>
-        <p class="description">Create an empty job for streaming.</p>
-<p class="code">
-int cupsCreateJob (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;const char *title,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>title</dt>
-        <dd class="description">Title of job</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Job ID or 0 on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Use this function when you want to stream print data using the
-<a href="#cupsStartDocument"><code>cupsStartDocument</code></a>, <a href="#cupsWriteRequestData"><code>cupsWriteRequestData</code></a>, and
-<a href="#cupsFinishDocument"><code>cupsFinishDocument</code></a> functions.  If you have one or more files to
-print, use the <a href="#cupsPrintFile2"><code>cupsPrintFile2</code></a> or <a href="#cupsPrintFiles2"><code>cupsPrintFiles2</code></a> function
-instead.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsDirClose">cupsDirClose</a></h3>
-        <p class="description">Close a directory.</p>
-<p class="code">
-void cupsDirClose (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dir_t">cups_dir_t</a> *dp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dp</dt>
-        <dd class="description">Directory pointer</dd>
-</dl>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsDirOpen">cupsDirOpen</a></h3>
-        <p class="description">Open a directory.</p>
-<p class="code">
-<a href="#cups_dir_t">cups_dir_t</a> *cupsDirOpen (<br>
-&#160;&#160;&#160;&#160;const char *directory<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>directory</dt>
-        <dd class="description">Directory name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Directory pointer or <code>NULL</code> if the directory could not be opened.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsDirRead">cupsDirRead</a></h3>
-        <p class="description">Read the next directory entry.</p>
-<p class="code">
-<a href="#cups_dentry_t">cups_dentry_t</a> *cupsDirRead (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dir_t">cups_dir_t</a> *dp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dp</dt>
-        <dd class="description">Directory pointer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Directory entry or <code>NULL</code> when there are no more</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsDirRewind">cupsDirRewind</a></h3>
-        <p class="description">Rewind to the start of the directory.</p>
-<p class="code">
-void cupsDirRewind (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dir_t">cups_dir_t</a> *dp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dp</dt>
-        <dd class="description">Directory pointer</dd>
-</dl>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.20/macOS 10.4&#160;</span><a id="cupsDoAuthentication">cupsDoAuthentication</a></h3>
         <p class="description">Authenticate a request.</p>
 <p class="code">
@@ -2068,7 +1398,7 @@ status, prior to resubmitting your request.
 
 </p>
 <h3 class="function"><a id="cupsEncodeOptions">cupsEncodeOptions</a></h3>
-        <p class="description">Encode printer options into IPP attributes.</p>
+        <p class="description"></p>
 <p class="code">
 void cupsEncodeOptions (<br>
 &#160;&#160;&#160;&#160;<a href="#ipp_t">ipp_t</a> *ipp,<br>
@@ -2084,12 +1414,15 @@ void cupsEncodeOptions (<br>
 <dt>options</dt>
         <dd class="description">Options</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Encode printer options into IPP attributes.</p>
         <p class="discussion">This function adds operation, job, and then subscription attributes,
 in that order. Use the cupsEncodeOptions2() function to add attributes
-for a single group.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsEncodeOptions2">cupsEncodeOptions2</a></h3>
-        <p class="description">Encode printer options into IPP attributes for a group.</p>
+for a single group.
+
+</p>
+<h3 class="function"><a id="cupsEncodeOptions2">cupsEncodeOptions2</a></h3>
+        <p class="description">Add the options in the proper groups &amp; order...</p>
 <p class="code">
 void cupsEncodeOptions2 (<br>
 &#160;&#160;&#160;&#160;<a href="#ipp_t">ipp_t</a> *ipp,<br>
@@ -2108,7 +1441,8 @@ void cupsEncodeOptions2 (<br>
 <dt>group_tag</dt>
         <dd class="description">Group to encode</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Encode printer options into IPP attributes for a group.</p>
         <p class="discussion">This function only adds attributes for a single group. Call this
 function multiple times for each group, or use cupsEncodeOptions()
 to add the standard groups.
@@ -2162,510 +1496,20 @@ int cupsEnumDests (<br>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">Destinations are enumerated from one or more sources. The callback function
-receives the <code>user_data</code> pointer, destination name, instance, number of
-options, and options which can be used as input to the <a href="#cupsAddDest"><code>cupsAddDest</code></a>
-function.  The function must return 1 to continue enumeration or 0 to stop.<br>
+        <p class="discussion">Destinations are enumerated from one or more sources.  The callback function
+receives the <code>user_data</code> pointer and the destination pointer which can
+be used as input to the <a href="#cupsCopyDest"><code>cupsCopyDest</code></a> function.  The function must
+return 1 to continue enumeration or 0 to stop.<br>
+<br>
+The <code>type</code> and <code>mask</code> arguments allow the caller to filter the
+destinations that are enumerated.  Passing 0 for both will enumerate all
+printers.  The constant <code>CUPS_PRINTER_DISCOVERED</code> is used to filter on
+destinations that are available but have not yet been added locally.<br>
 <br>
 Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the callback function returns 0.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="cupsEnumDestsBlock">cupsEnumDestsBlock</a></h3>
-        <p class="description">Enumerate available destinations with a block.</p>
-<p class="code">
-int cupsEnumDestsBlock (<br>
-&#160;&#160;&#160;&#160;unsigned flags,<br>
-&#160;&#160;&#160;&#160;int timeout,<br>
-&#160;&#160;&#160;&#160;int *cancel,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_ptype_t">cups_ptype_t</a> type,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_ptype_t">cups_ptype_t</a> mask,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dest_block_t">cups_dest_block_t</a> block<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>flags</dt>
-        <dd class="description">Enumeration flags</dd>
-<dt>timeout</dt>
-        <dd class="description">Timeout in milliseconds, 0 for indefinite</dd>
-<dt>cancel</dt>
-        <dd class="description">Pointer to &quot;cancel&quot; variable</dd>
-<dt>type</dt>
-        <dd class="description">Printer type bits</dd>
-<dt>mask</dt>
-        <dd class="description">Mask for printer type bits</dd>
-<dt>block</dt>
-        <dd class="description">Block</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on success, 0 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Destinations are enumerated from one or more sources. The block receives the
-destination name, instance, number of options, and options which can be used
-as input to the <a href="#cupsAddDest"><code>cupsAddDest</code></a> function.  The block must return 1 to
-continue enumeration or 0 to stop.<br>
-<br>
-Enumeration happens on the current thread and does not return until all
-destinations have been enumerated or the block returns 0.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileClose">cupsFileClose</a></h3>
-        <p class="description">Close a CUPS file.</p>
-<p class="code">
-int cupsFileClose (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileCompression">cupsFileCompression</a></h3>
-        <p class="description">Return whether a file is compressed.</p>
-<p class="code">
-int cupsFileCompression (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description"><code>CUPS_FILE_NONE</code> or <code>CUPS_FILE_GZIP</code></p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileEOF">cupsFileEOF</a></h3>
-        <p class="description">Return the end-of-file status.</p>
-<p class="code">
-int cupsFileEOF (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">1 on end of file, 0 otherwise</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileFind">cupsFileFind</a></h3>
-        <p class="description">Find a file using the specified path.</p>
-<p class="code">
-const char *cupsFileFind (<br>
-&#160;&#160;&#160;&#160;const char *filename,<br>
-&#160;&#160;&#160;&#160;const char *path,<br>
-&#160;&#160;&#160;&#160;int executable,<br>
-&#160;&#160;&#160;&#160;char *buffer,<br>
-&#160;&#160;&#160;&#160;int bufsize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-        <dd class="description">File to find</dd>
-<dt>path</dt>
-        <dd class="description">Colon/semicolon-separated path</dd>
-<dt>executable</dt>
-        <dd class="description">1 = executable files, 0 = any file/dir</dd>
-<dt>buffer</dt>
-        <dd class="description">Filename buffer</dd>
-<dt>bufsize</dt>
-        <dd class="description">Size of filename buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Full path to file or <code>NULL</code> if not found</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function allows the paths in the path string to be separated by
-colons (UNIX standard) or semicolons (Windows standard) and stores the
-result in the buffer supplied.  If the file cannot be found in any of
-the supplied paths, <code>NULL</code> is returned. A <code>NULL</code> path only
-matches the current directory.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileFlush">cupsFileFlush</a></h3>
-        <p class="description">Flush pending output.</p>
-<p class="code">
-int cupsFileFlush (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileGetChar">cupsFileGetChar</a></h3>
-        <p class="description">Get a single character from a file.</p>
-<p class="code">
-int cupsFileGetChar (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Character or -1 on end of file</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileGetConf">cupsFileGetConf</a></h3>
-        <p class="description">Get a line from a configuration file.</p>
-<p class="code">
-char *cupsFileGetConf (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;char *buf,<br>
-&#160;&#160;&#160;&#160;size_t buflen,<br>
-&#160;&#160;&#160;&#160;char **value,<br>
-&#160;&#160;&#160;&#160;int *linenum<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>buf</dt>
-        <dd class="description">String buffer</dd>
-<dt>buflen</dt>
-        <dd class="description">Size of string buffer</dd>
-<dt>value</dt>
-        <dd class="description">Pointer to value</dd>
-<dt>linenum</dt>
-        <dd class="description">Current line number</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Line read or <code>NULL</code> on end of file or error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileGetLine">cupsFileGetLine</a></h3>
-        <p class="description">Get a CR and/or LF-terminated line that may
-contain binary data.</p>
-<p class="code">
-size_t cupsFileGetLine (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;char *buf,<br>
-&#160;&#160;&#160;&#160;size_t buflen<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">File to read from</dd>
-<dt>buf</dt>
-        <dd class="description">Buffer</dd>
-<dt>buflen</dt>
-        <dd class="description">Size of buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes on line or 0 on end of file</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function differs from <a href="#cupsFileGets"><code>cupsFileGets</code></a> in that the trailing CR
-and LF are preserved, as is any binary data on the line. The buffer is
-nul-terminated, however you should use the returned length to determine
-the number of bytes on the line.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileGets">cupsFileGets</a></h3>
-        <p class="description">Get a CR and/or LF-terminated line.</p>
-<p class="code">
-char *cupsFileGets (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;char *buf,<br>
-&#160;&#160;&#160;&#160;size_t buflen<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>buf</dt>
-        <dd class="description">String buffer</dd>
-<dt>buflen</dt>
-        <dd class="description">Size of string buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Line read or <code>NULL</code> on end of file or error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileLock">cupsFileLock</a></h3>
-        <p class="description">Temporarily lock access to a file.</p>
-<p class="code">
-int cupsFileLock (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;int block<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>block</dt>
-        <dd class="description">1 to wait for the lock, 0 to fail right away</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileNumber">cupsFileNumber</a></h3>
-        <p class="description">Return the file descriptor associated with a CUPS file.</p>
-<p class="code">
-int cupsFileNumber (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">File descriptor</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileOpen">cupsFileOpen</a></h3>
-        <p class="description">Open a CUPS file.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsFileOpen (<br>
-&#160;&#160;&#160;&#160;const char *filename,<br>
-&#160;&#160;&#160;&#160;const char *mode<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-        <dd class="description">Name of file</dd>
-<dt>mode</dt>
-        <dd class="description">Open mode</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file or <code>NULL</code> if the file or socket cannot be opened</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The &quot;mode&quot; parameter can be &quot;r&quot; to read, &quot;w&quot; to write, overwriting any
-existing file, &quot;a&quot; to append to an existing file or create a new file,
-or &quot;s&quot; to open a socket connection.<br>
-<br>
-When opening for writing (&quot;w&quot;), an optional number from 1 to 9 can be
-supplied which enables Flate compression of the file.  Compression is
-not supported for the &quot;a&quot; (append) mode.<br>
-<br>
-When opening a socket connection, the filename is a string of the form
-&quot;address:port&quot; or &quot;hostname:port&quot;. The socket will make an IPv4 or IPv6
-connection as needed, generally preferring IPv6 connections when there is
-a choice.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileOpenFd">cupsFileOpenFd</a></h3>
-        <p class="description">Open a CUPS file using a file descriptor.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsFileOpenFd (<br>
-&#160;&#160;&#160;&#160;int fd,<br>
-&#160;&#160;&#160;&#160;const char *mode<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-        <dd class="description">File descriptor</dd>
-<dt>mode</dt>
-        <dd class="description">Open mode</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file or <code>NULL</code> if the file could not be opened</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The &quot;mode&quot; parameter can be &quot;r&quot; to read, &quot;w&quot; to write, &quot;a&quot; to append,
-or &quot;s&quot; to treat the file descriptor as a bidirectional socket connection.<br>
-<br>
-When opening for writing (&quot;w&quot;), an optional number from 1 to 9 can be
-supplied which enables Flate compression of the file.  Compression is
-not supported for the &quot;a&quot; (append) mode.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFilePeekChar">cupsFilePeekChar</a></h3>
-        <p class="description">Peek at the next character from a file.</p>
-<p class="code">
-int cupsFilePeekChar (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Character or -1 on end of file</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFilePrintf">cupsFilePrintf</a></h3>
-        <p class="description">Write a formatted string.</p>
-<p class="code">
-int cupsFilePrintf (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;const char *format,<br>
-&#160;&#160;&#160;&#160;...<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>format</dt>
-        <dd class="description">Printf-style format string</dd>
-<dt>...</dt>
-        <dd class="description">Additional args as necessary</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes written or -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFilePutChar">cupsFilePutChar</a></h3>
-        <p class="description">Write a character.</p>
-<p class="code">
-int cupsFilePutChar (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;int c<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>c</dt>
-        <dd class="description">Character to write</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsFilePutConf">cupsFilePutConf</a></h3>
-        <p class="description">Write a configuration line.</p>
-<p class="code">
-ssize_t cupsFilePutConf (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;const char *directive,<br>
-&#160;&#160;&#160;&#160;const char *value<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>directive</dt>
-        <dd class="description">Directive</dd>
-<dt>value</dt>
-        <dd class="description">Value</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes written or -1 on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function handles any comment escaping of the value.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFilePuts">cupsFilePuts</a></h3>
-        <p class="description">Write a string.</p>
-<p class="code">
-int cupsFilePuts (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;const char *s<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>s</dt>
-        <dd class="description">String to write</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes written or -1 on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Like the <code>fputs</code> function, no newline is appended to the string.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileRead">cupsFileRead</a></h3>
-        <p class="description">Read from a file.</p>
-<p class="code">
-ssize_t cupsFileRead (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;char *buf,<br>
-&#160;&#160;&#160;&#160;size_t bytes<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>buf</dt>
-        <dd class="description">Buffer</dd>
-<dt>bytes</dt>
-        <dd class="description">Number of bytes to read</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes read or -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileRewind">cupsFileRewind</a></h3>
-        <p class="description">Set the current file position to the beginning of the
-file.</p>
-<p class="code">
-off_t cupsFileRewind (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New file position or -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileSeek">cupsFileSeek</a></h3>
-        <p class="description">Seek in a file.</p>
-<p class="code">
-off_t cupsFileSeek (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;off_t pos<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>pos</dt>
-        <dd class="description">Position in file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New file position or -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileStderr">cupsFileStderr</a></h3>
-        <p class="description">Return a CUPS file associated with stderr.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsFileStderr (void);</p>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileStdin">cupsFileStdin</a></h3>
-        <p class="description">Return a CUPS file associated with stdin.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsFileStdin (void);</p>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileStdout">cupsFileStdout</a></h3>
-        <p class="description">Return a CUPS file associated with stdout.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsFileStdout (void);</p>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileTell">cupsFileTell</a></h3>
-        <p class="description">Return the current file position.</p>
-<p class="code">
-off_t cupsFileTell (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">File position</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileUnlock">cupsFileUnlock</a></h3>
-        <p class="description">Unlock access to a file.</p>
-<p class="code">
-int cupsFileUnlock (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsFileWrite">cupsFileWrite</a></h3>
-        <p class="description">Write to a file.</p>
-<p class="code">
-ssize_t cupsFileWrite (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
-&#160;&#160;&#160;&#160;const char *buf,<br>
-&#160;&#160;&#160;&#160;size_t bytes<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fp</dt>
-        <dd class="description">CUPS file</dd>
-<dt>buf</dt>
-        <dd class="description">Buffer</dd>
-<dt>bytes</dt>
-        <dd class="description">Number of bytes to write</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes written or -1 on error</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="cupsFindDestDefault">cupsFindDestDefault</a></h3>
         <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
@@ -2779,29 +1623,8 @@ ipp_status_t cupsFinishDestDocument (<br>
         <p class="discussion">Returns <code>IPP_STATUS_OK</code> or <code>IPP_STATUS_OK_SUBST</code> on success.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsFinishDocument">cupsFinishDocument</a></h3>
-        <p class="description">Finish sending a document.</p>
-<p class="code">
-ipp_status_t cupsFinishDocument (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Status of document submission</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The document must have been started using <a href="#cupsStartDocument"><code>cupsStartDocument</code></a>.
-
-</p>
 <h3 class="function"><a id="cupsFreeDestInfo">cupsFreeDestInfo</a></h3>
-        <p class="description">Free destination information obtained using
-<a href="#cupsCopyDestInfo"><code>cupsCopyDestInfo</code></a>.</p>
+        <p class="description">Find and return the attribute...</p>
 <p class="code">
 void cupsFreeDestInfo (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo<br>
@@ -2811,8 +1634,11 @@ void cupsFreeDestInfo (<br>
 <dt>dinfo</dt>
         <dd class="description">Destination information</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free destination information obtained using
+<a href="#cupsCopyDestInfo"><code>cupsCopyDestInfo</code></a>.</p>
 <h3 class="function"><a id="cupsFreeDests">cupsFreeDests</a></h3>
-        <p class="description">Free the memory used by the list of destinations.</p>
+        <p class="description">Block</p>
 <p class="code">
 void cupsFreeDests (<br>
 &#160;&#160;&#160;&#160;int num_dests,<br>
@@ -2825,8 +1651,10 @@ void cupsFreeDests (<br>
 <dt>dests</dt>
         <dd class="description">Destinations</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free the memory used by the list of destinations.</p>
 <h3 class="function"><a id="cupsFreeJobs">cupsFreeJobs</a></h3>
-        <p class="description">Free memory used by job data.</p>
+        <p class="description">Printer resource</p>
 <p class="code">
 void cupsFreeJobs (<br>
 &#160;&#160;&#160;&#160;int num_jobs,<br>
@@ -2839,8 +1667,10 @@ void cupsFreeJobs (<br>
 <dt>jobs</dt>
         <dd class="description">Jobs</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free memory used by job data.</p>
 <h3 class="function"><a id="cupsFreeOptions">cupsFreeOptions</a></h3>
-        <p class="description">Free all memory used by options.</p>
+        <p class="description">Match found; free the old value...</p>
 <p class="code">
 void cupsFreeOptions (<br>
 &#160;&#160;&#160;&#160;int num_options,<br>
@@ -2853,59 +1683,8 @@ void cupsFreeOptions (<br>
 <dt>options</dt>
         <dd class="description">Pointer to options</dd>
 </dl>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsGetClasses">cupsGetClasses</a></h3>
-        <p class="description">Get a list of printer classes from the default server.</p>
-<p class="code">
-int cupsGetClasses (<br>
-&#160;&#160;&#160;&#160;char ***classes<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>classes</dt>
-        <dd class="description">Classes</dd>
-</dl>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of classes</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated and no longer returns a list of printer
-classes - use <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
-
-</p>
-<h3 class="function"><a id="cupsGetDefault">cupsGetDefault</a></h3>
-        <p class="description">Get the default printer or class for the default server.</p>
-<p class="code">
-const char *cupsGetDefault (void);</p>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Default printer or <code>NULL</code></p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function returns the default printer or class as defined by
-the LPDEST or PRINTER environment variables. If these environment
-variables are not set, the server default destination is returned.
-Applications should use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> and <a href="#cupsGetDest"><code>cupsGetDest</code></a>
-functions to get the user-defined default printer, as this function does
-not support the lpoptions-defined default printer.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsGetDefault2">cupsGetDefault2</a></h3>
-        <p class="description">Get the default printer or class for the specified server.</p>
-<p class="code">
-const char *cupsGetDefault2 (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Default printer or <code>NULL</code></p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function returns the default printer or class as defined by
-the LPDEST or PRINTER environment variables. If these environment
-variables are not set, the server default destination is returned.
-Applications should use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> and <a href="#cupsGetDest"><code>cupsGetDest</code></a>
-functions to get the user-defined default printer, as this function does
-not support the lpoptions-defined default printer.
-
-</p>
+        <p class="description">Free all memory used by options.</p>
 <h3 class="function"><a id="cupsGetDest">cupsGetDest</a></h3>
         <p class="description">Get the named destination from the list.</p>
 <p class="code">
@@ -3142,86 +1921,30 @@ created using the URI.<br>
 &quot;uri&quot; is the &quot;ipp&quot; or &quot;ipps&quot; URI for the printer.
 
 </p>
-<h3 class="function"><a id="cupsGetDests">cupsGetDests</a></h3>
-        <p class="description">Get the list of destinations from the default server.</p>
+<h3 class="function"><span class="info">&#160;2.2.4&#160;</span><a id="cupsGetIntegerOption">cupsGetIntegerOption</a></h3>
+        <p class="description">Get an integer option value.</p>
 <p class="code">
-int cupsGetDests (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dest_t">cups_dest_t</a> **dests<br>
+int cupsGetIntegerOption (<br>
+&#160;&#160;&#160;&#160;const char *name,<br>
+&#160;&#160;&#160;&#160;int num_options,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
-<dt>dests</dt>
-        <dd class="description">Destinations</dd>
+<dt>name</dt>
+        <dd class="description">Name of option</dd>
+<dt>num_options</dt>
+        <dd class="description">Number of options</dd>
+<dt>options</dt>
+        <dd class="description">Options</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of destinations</p>
+        <p class="description">Option value or <code>INT_MIN</code></p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">Starting with CUPS 1.2, the returned list of destinations include the
-printer-info, printer-is-accepting-jobs, printer-is-shared,
-printer-make-and-model, printer-state, printer-state-change-time,
-printer-state-reasons, and printer-type attributes as options.  CUPS 1.4
-adds the marker-change-time, marker-colors, marker-high-levels,
-marker-levels, marker-low-levels, marker-message, marker-names,
-marker-types, and printer-commands attributes as well.<br>
-<br>
-Use the <a href="#cupsFreeDests"><code>cupsFreeDests</code></a> function to free the destination list and
-the <a href="#cupsGetDest"><code>cupsGetDest</code></a> function to find a particular destination.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsGetDests2">cupsGetDests2</a></h3>
-        <p class="description">Get the list of destinations from the specified server.</p>
-<p class="code">
-int cupsGetDests2 (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_dest_t">cups_dest_t</a> **dests<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>dests</dt>
-        <dd class="description">Destinations</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of destinations</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Starting with CUPS 1.2, the returned list of destinations include the
-printer-info, printer-is-accepting-jobs, printer-is-shared,
-printer-make-and-model, printer-state, printer-state-change-time,
-printer-state-reasons, and printer-type attributes as options.  CUPS 1.4
-adds the marker-change-time, marker-colors, marker-high-levels,
-marker-levels, marker-low-levels, marker-message, marker-names,
-marker-types, and printer-commands attributes as well.<br>
-<br>
-Use the <a href="#cupsFreeDests"><code>cupsFreeDests</code></a> function to free the destination list and
-the <a href="#cupsGetDest"><code>cupsGetDest</code></a> function to find a particular destination.
+        <p class="discussion">INT_MIN is returned when the option does not exist, is not an integer, or
+exceeds the range of values for the &quot;int&quot; type.
 
 </p>
-<h3 class="function"><a id="cupsGetJobs">cupsGetJobs</a></h3>
-        <p class="description">Get the jobs from the default server.</p>
-<p class="code">
-int cupsGetJobs (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_job_t">cups_job_t</a> **jobs,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int myjobs,<br>
-&#160;&#160;&#160;&#160;int whichjobs<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>jobs</dt>
-        <dd class="description">Job data</dd>
-<dt>name</dt>
-        <dd class="description"><code>NULL</code> = all destinations, otherwise show jobs for named destination</dd>
-<dt>myjobs</dt>
-        <dd class="description">0 = all users, 1 = mine</dd>
-<dt>whichjobs</dt>
-        <dd class="description"><code>CUPS_WHICHJOBS_ALL</code>, <code>CUPS_WHICHJOBS_ACTIVE</code>, or <code>CUPS_WHICHJOBS_COMPLETED</code></dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of jobs</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">A &quot;whichjobs&quot; value of <code>CUPS_WHICHJOBS_ALL</code> returns all jobs regardless
-of state, while <code>CUPS_WHICHJOBS_ACTIVE</code> returns jobs that are
-pending, processing, or held and <code>CUPS_WHICHJOBS_COMPLETED</code> returns
-jobs that are stopped, canceled, aborted, or completed.</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsGetJobs2">cupsGetJobs2</a></h3>
         <p class="description">Get the jobs from the specified server.</p>
 <p class="code">
@@ -3309,27 +2032,6 @@ const char *cupsGetOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Option value or <code>NULL</code></p>
-<h3 class="function"><a id="cupsGetPassword">cupsGetPassword</a></h3>
-        <p class="description">Get a password from the user.</p>
-<p class="code">
-const char *cupsGetPassword (<br>
-&#160;&#160;&#160;&#160;const char *prompt<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>prompt</dt>
-        <dd class="description">Prompt string</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Password</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Uses the current password callback function. Returns <code>NULL</code> if the
-user does not provide a password.<br>
-<br>
-Note: The current password callback function is tracked separately for each
-thread in a program. Multi-threaded programs that override the setting via
-the <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a> or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a> functions need to
-do so in each thread for the same function to be used.</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsGetPassword2">cupsGetPassword2</a></h3>
         <p class="description">Get a password from the user using the advanced
 password callback.</p>
@@ -3363,24 +2065,6 @@ the <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a> or <a href="
 do so in each thread for the same function to be used.
 
 </p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsGetPrinters">cupsGetPrinters</a></h3>
-        <p class="description">Get a list of printers from the default server.</p>
-<p class="code">
-int cupsGetPrinters (<br>
-&#160;&#160;&#160;&#160;char ***printers<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>printers</dt>
-        <dd class="description">Printers</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of printers</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated and no longer returns a list of printers - use
-<a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
-
-</p>
 <h3 class="function"><a id="cupsLangDefault">cupsLangDefault</a></h3>
         <p class="description">Return the default language.</p>
 <p class="code">
@@ -3402,11 +2086,13 @@ const char *cupsLangEncoding (<br>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Character encoding</p>
 <h3 class="function"><a id="cupsLangFlush">cupsLangFlush</a></h3>
-        <p class="description">Flush all language data out of the cache.</p>
+        <p class="description">Language data</p>
 <p class="code">
 void cupsLangFlush (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Flush all language data out of the cache.</p>
 <h3 class="function"><a id="cupsLangFree">cupsLangFree</a></h3>
-        <p class="description">Free language data.</p>
+        <p class="description">Then free the language structure itself...</p>
 <p class="code">
 void cupsLangFree (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_lang_t">cups_lang_t</a> *lang<br>
@@ -3416,7 +2102,8 @@ void cupsLangFree (<br>
 <dt>lang</dt>
         <dd class="description">Language to free</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free language data.</p>
         <p class="discussion">This does not actually free anything; use <a href="#cupsLangFlush"><code>cupsLangFlush</code></a> for that.</p>
 <h3 class="function"><a id="cupsLangGet">cupsLangGet</a></h3>
         <p class="description">Get a language.</p>
@@ -3611,121 +2298,6 @@ to the PAPI text option ABNF specification. Collection values
 (&quot;name={a=... b=... c=...}&quot;) are stored with the curley brackets
 intact - use <code>cupsParseOptions</code> on the value to extract the
 collection attributes.</p>
-<h3 class="function"><a id="cupsPrintFile">cupsPrintFile</a></h3>
-        <p class="description">Print a file to a printer or class on the default server.</p>
-<p class="code">
-int cupsPrintFile (<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;const char *filename,<br>
-&#160;&#160;&#160;&#160;const char *title,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>filename</dt>
-        <dd class="description">File to print</dd>
-<dt>title</dt>
-        <dd class="description">Title of job</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsPrintFile2">cupsPrintFile2</a></h3>
-        <p class="description">Print a file to a printer or class on the specified
-server.</p>
-<p class="code">
-int cupsPrintFile2 (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;const char *filename,<br>
-&#160;&#160;&#160;&#160;const char *title,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server</dd>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>filename</dt>
-        <dd class="description">File to print</dd>
-<dt>title</dt>
-        <dd class="description">Title of job</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><a id="cupsPrintFiles">cupsPrintFiles</a></h3>
-        <p class="description">Print one or more files to a printer or class on the
-default server.</p>
-<p class="code">
-int cupsPrintFiles (<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int num_files,<br>
-&#160;&#160;&#160;&#160;const char **files,<br>
-&#160;&#160;&#160;&#160;const char *title,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>num_files</dt>
-        <dd class="description">Number of files</dd>
-<dt>files</dt>
-        <dd class="description">File(s) to print</dd>
-<dt>title</dt>
-        <dd class="description">Title of job</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Job ID or 0 on error</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsPrintFiles2">cupsPrintFiles2</a></h3>
-        <p class="description">Print one or more files to a printer or class on the
-specified server.</p>
-<p class="code">
-int cupsPrintFiles2 (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int num_files,<br>
-&#160;&#160;&#160;&#160;const char **files,<br>
-&#160;&#160;&#160;&#160;const char *title,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_option_t">cups_option_t</a> *options<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>num_files</dt>
-        <dd class="description">Number of files</dd>
-<dt>files</dt>
-        <dd class="description">File(s) to print</dd>
-<dt>title</dt>
-        <dd class="description">Title of job</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Job ID or 0 on error</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsRemoveDest">cupsRemoveDest</a></h3>
         <p class="description">Remove a destination from the destination list.</p>
 <p class="code">
@@ -3793,8 +2365,8 @@ Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server via the
 <a href="#cupsSetServer"><code>cupsSetServer</code></a> function need to do so in each thread for the same
 server to be used.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
-        <p class="description">Set the client certificate callback.</p>
+<h3 class="function"><a id="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetClientCertCB (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_client_cert_cb_t">cups_client_cert_cb_t</a> cb,<br>
@@ -3807,7 +2379,8 @@ void cupsSetClientCertCB (<br>
 <dt>user_data</dt>
         <dd class="description">User data pointer</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the client certificate callback.</p>
         <p class="discussion">Pass <code>NULL</code> to restore the default callback.<br>
 <br>
 Note: The current certificate callback is tracked separately for each thread
@@ -3820,7 +2393,7 @@ so in each thread for the same callback to be used.
 connections.</p>
 <p class="code">
 int cupsSetCredentials (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3835,8 +2408,8 @@ program. Multi-threaded programs that override the setting need to do so in
 each thread for the same setting to be used.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsSetDefaultDest">cupsSetDefaultDest</a></h3>
-        <p class="description">Set the default destination.</p>
+<h3 class="function"><a id="cupsSetDefaultDest">cupsSetDefaultDest</a></h3>
+        <p class="description">Remove the destination from the array...</p>
 <p class="code">
 void cupsSetDefaultDest (<br>
 &#160;&#160;&#160;&#160;const char *name,<br>
@@ -3855,8 +2428,12 @@ void cupsSetDefaultDest (<br>
 <dt>dests</dt>
         <dd class="description">Destinations</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default destination.</p>
+        <p class="discussion"></p>
 <h3 class="function"><a id="cupsSetDests">cupsSetDests</a></h3>
-        <p class="description">Save the list of destinations for the default server.</p>
+        <p class="description">Loop through the array and set the &quot;is_default&quot; flag for the matching
+destination...</p>
 <p class="code">
 void cupsSetDests (<br>
 &#160;&#160;&#160;&#160;int num_dests,<br>
@@ -3869,7 +2446,8 @@ void cupsSetDests (<br>
 <dt>dests</dt>
         <dd class="description">Destinations</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Save the list of destinations for the default server.</p>
         <p class="discussion">This function saves the destinations to /etc/cups/lpoptions when run
 as root and ~/.cups/lpoptions when run as a normal user.</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="cupsSetDests2">cupsSetDests2</a></h3>
@@ -3897,7 +2475,7 @@ as root and ~/.cups/lpoptions when run as a normal user.
 
 </p>
 <h3 class="function"><a id="cupsSetEncryption">cupsSetEncryption</a></h3>
-        <p class="description">Set the encryption preference.</p>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetEncryption (<br>
 &#160;&#160;&#160;&#160;<a href="#http_encryption_t">http_encryption_t</a> e<br>
@@ -3907,7 +2485,8 @@ void cupsSetEncryption (<br>
 <dt>e</dt>
         <dd class="description">New encryption preference</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the encryption preference.</p>
         <p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
 environment variable, then the ~/.cups/client.conf file, and finally the
 /etc/cups/client.conf file. If not set, the default is
@@ -3917,7 +2496,7 @@ Note: The current encryption setting is tracked separately for each thread
 in a program. Multi-threaded programs that override the setting need to do
 so in each thread for the same setting to be used.</p>
 <h3 class="function"><a id="cupsSetPasswordCB">cupsSetPasswordCB</a></h3>
-        <p class="description">Set the password callback for CUPS.</p>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetPasswordCB (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_password_cb_t">cups_password_cb_t</a> cb<br>
@@ -3927,7 +2506,8 @@ void cupsSetPasswordCB (<br>
 <dt>cb</dt>
         <dd class="description">Callback function</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the password callback for CUPS.</p>
         <p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback, which
 reads the password from the console. Programs should call either this
 function or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a>, as only one callback can be registered
@@ -3935,9 +2515,11 @@ by a program per thread.<br>
 <br>
 Note: The current password callback is tracked separately for each thread
 in a program. Multi-threaded programs that override the callback need to do
-so in each thread for the same callback to be used.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
-        <p class="description">Set the advanced password callback for CUPS.</p>
+so in each thread for the same callback to be used.
+
+</p>
+<h3 class="function"><a id="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetPasswordCB2 (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_password_cb2_t">cups_password_cb2_t</a> cb,<br>
@@ -3950,7 +2532,8 @@ void cupsSetPasswordCB2 (<br>
 <dt>user_data</dt>
         <dd class="description">User data pointer</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the advanced password callback for CUPS.</p>
         <p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback, which
 reads the password from the console. Programs should call either this
 function or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a>, as only one callback can be registered
@@ -3962,7 +2545,7 @@ so in each thread for the same callback to be used.
 
 </p>
 <h3 class="function"><a id="cupsSetServer">cupsSetServer</a></h3>
-        <p class="description">Set the default server name and port.</p>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetServer (<br>
 &#160;&#160;&#160;&#160;const char *server<br>
@@ -3972,7 +2555,8 @@ void cupsSetServer (<br>
 <dt>server</dt>
         <dd class="description">Server name</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default server name and port.</p>
         <p class="discussion">The &quot;server&quot; string can be a fully-qualified hostname, a numeric
 IPv4 or IPv6 address, or a domain socket pathname. Hostnames and numeric IP
 addresses can be optionally followed by a colon and port number to override
@@ -3982,8 +2566,8 @@ default server name and port.<br>
 Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server need to do so in each
 thread for the same server to be used.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
-        <p class="description">Set the server certificate callback.</p>
+<h3 class="function"><a id="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetServerCertCB (<br>
 &#160;&#160;&#160;&#160;<a href="#cups_server_cert_cb_t">cups_server_cert_cb_t</a> cb,<br>
@@ -3996,7 +2580,8 @@ void cupsSetServerCertCB (<br>
 <dt>user_data</dt>
         <dd class="description">User data pointer</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the server certificate callback.</p>
         <p class="discussion">Pass <code>NULL</code> to restore the default callback.<br>
 <br>
 Note: The current credentials callback is tracked separately for each thread
@@ -4029,7 +2614,7 @@ This function is threadsafe.
 
 </p>
 <h3 class="function"><a id="cupsSetUser">cupsSetUser</a></h3>
-        <p class="description">Set the default user name.</p>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetUser (<br>
 &#160;&#160;&#160;&#160;const char *user<br>
@@ -4039,14 +2624,15 @@ void cupsSetUser (<br>
 <dt>user</dt>
         <dd class="description">User name</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default user name.</p>
         <p class="discussion">Pass <code>NULL</code> to restore the default user name.<br>
 <br>
 Note: The current user name is tracked separately for each thread in a
 program. Multi-threaded programs that override the user name need to do so
 in each thread for the same user name to be used.</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="cupsSetUserAgent">cupsSetUserAgent</a></h3>
-        <p class="description">Set the default HTTP User-Agent string.</p>
+<h3 class="function"><a id="cupsSetUserAgent">cupsSetUserAgent</a></h3>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void cupsSetUserAgent (<br>
 &#160;&#160;&#160;&#160;const char *user_agent<br>
@@ -4056,7 +2642,8 @@ void cupsSetUserAgent (<br>
 <dt>user_agent</dt>
         <dd class="description">User-Agent string or <code>NULL</code></dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default HTTP User-Agent string.</p>
         <p class="discussion">Setting the string to NULL forces the default value containing the CUPS
 version, IPP version, and operating system version and architecture.
 
@@ -4107,106 +2694,6 @@ if this is the last document to be submitted in the job.  Returns
 <code>HTTP_CONTINUE</code> on success.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsStartDocument">cupsStartDocument</a></h3>
-        <p class="description">Add a document to a job created with cupsCreateJob().</p>
-<p class="code">
-http_status_t cupsStartDocument (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;int job_id,<br>
-&#160;&#160;&#160;&#160;const char *docname,<br>
-&#160;&#160;&#160;&#160;const char *format,<br>
-&#160;&#160;&#160;&#160;int last_document<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-        <dd class="description">Destination name</dd>
-<dt>job_id</dt>
-        <dd class="description">Job ID from <a href="#cupsCreateJob"><code>cupsCreateJob</code></a></dd>
-<dt>docname</dt>
-        <dd class="description">Name of document</dd>
-<dt>format</dt>
-        <dd class="description">MIME type or <code>CUPS_FORMAT_foo</code></dd>
-<dt>last_document</dt>
-        <dd class="description">1 for last document in job, 0 otherwise</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">HTTP status of request</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">Use <a href="#cupsWriteRequestData"><code>cupsWriteRequestData</code></a> to write data for the document and
-<a href="#cupsFinishDocument"><code>cupsFinishDocument</code></a> to finish the document and get the submission status.<br>
-<br>
-The MIME type constants <code>CUPS_FORMAT_AUTO</code>, <code>CUPS_FORMAT_PDF</code>,
-<code>CUPS_FORMAT_POSTSCRIPT</code>, <code>CUPS_FORMAT_RAW</code>, and
-<code>CUPS_FORMAT_TEXT</code> are provided for the &quot;format&quot; argument, although
-any supported MIME type string can be supplied.
-
-</p>
-<h3 class="function"><a id="cupsTempFd">cupsTempFd</a></h3>
-        <p class="description">Creates a temporary file.</p>
-<p class="code">
-int cupsTempFd (<br>
-&#160;&#160;&#160;&#160;char *filename,<br>
-&#160;&#160;&#160;&#160;int len<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-        <dd class="description">Pointer to buffer</dd>
-<dt>len</dt>
-        <dd class="description">Size of buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New file descriptor or -1 on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The temporary filename is returned in the filename buffer.
-The temporary file is opened for reading and writing.</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsTempFile">cupsTempFile</a></h3>
-        <p class="description">Generates a temporary filename.</p>
-<p class="code">
-char *cupsTempFile (<br>
-&#160;&#160;&#160;&#160;char *filename,<br>
-&#160;&#160;&#160;&#160;int len<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-        <dd class="description">Pointer to buffer</dd>
-<dt>len</dt>
-        <dd class="description">Size of buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Filename or <code>NULL</code> on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The temporary filename is returned in the filename buffer.
-This function is deprecated and will no longer generate a temporary
-filename - use <a href="#cupsTempFd"><code>cupsTempFd</code></a> or <a href="#cupsTempFile2"><code>cupsTempFile2</code></a> instead.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsTempFile2">cupsTempFile2</a></h3>
-        <p class="description">Creates a temporary CUPS file.</p>
-<p class="code">
-<a href="#cups_file_t">cups_file_t</a> *cupsTempFile2 (<br>
-&#160;&#160;&#160;&#160;char *filename,<br>
-&#160;&#160;&#160;&#160;int len<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>filename</dt>
-        <dd class="description">Pointer to buffer</dd>
-<dt>len</dt>
-        <dd class="description">Size of buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">CUPS file or <code>NULL</code> on error</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">The temporary filename is returned in the filename buffer.
-The temporary file is opened for writing.
-
-</p>
 <h3 class="function"><a id="cupsUser">cupsUser</a></h3>
         <p class="description">Return the current user's name.</p>
 <p class="code">
@@ -4246,7 +2733,7 @@ blocking, 0 otherwise</dd>
         <p class="description">Allocates and adds a single credential to an array.</p>
 <p class="code">
 int httpAddCredential (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials,<br>
 &#160;&#160;&#160;&#160;const void *data,<br>
 &#160;&#160;&#160;&#160;size_t datalen<br>
 );</p>
@@ -4301,22 +2788,6 @@ listen address for sockets created with <a href="#httpAddrListen"><code>httpAddr
 ensure that domain sockets are removed when closed.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpAddrConnect">httpAddrConnect</a></h3>
-        <p class="description">Connect to any of the addresses in the list.</p>
-<p class="code">
-<a href="#http_addrlist_t">http_addrlist_t</a> *httpAddrConnect (<br>
-&#160;&#160;&#160;&#160;<a href="#http_addrlist_t">http_addrlist_t</a> *addrlist,<br>
-&#160;&#160;&#160;&#160;int *sock<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>addrlist</dt>
-        <dd class="description">List of potential addresses</dd>
-<dt>sock</dt>
-        <dd class="description">Socket</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Connected address or NULL on failure</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="httpAddrConnect2">httpAddrConnect2</a></h3>
         <p class="description">Connect to any of the addresses in the list with a
 timeout and optional cancel.</p>
@@ -4382,8 +2853,8 @@ int httpAddrFamily (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Address family</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpAddrFreeList">httpAddrFreeList</a></h3>
-        <p class="description">Free an address list.</p>
+<h3 class="function"><a id="httpAddrFreeList">httpAddrFreeList</a></h3>
+        <p class="description">Current list entry</p>
 <p class="code">
 void httpAddrFreeList (<br>
 &#160;&#160;&#160;&#160;<a href="#http_addrlist_t">http_addrlist_t</a> *addrlist<br>
@@ -4393,6 +2864,9 @@ void httpAddrFreeList (<br>
 <dt>addrlist</dt>
         <dd class="description">Address list to free</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free an address list.</p>
+        <p class="discussion"></p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpAddrGetList">httpAddrGetList</a></h3>
         <p class="description">Get a list of addresses for a hostname.</p>
 <p class="code">
@@ -4631,7 +3105,7 @@ The buffer needs to be at least 46 bytes in size.
 
 </p>
 <h3 class="function"><a id="httpBlocking">httpBlocking</a></h3>
-        <p class="description">Set blocking/non-blocking behavior on a connection.</p>
+        <p class="description">Credential data</p>
 <p class="code">
 void httpBlocking (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -4644,6 +3118,8 @@ void httpBlocking (<br>
 <dt>b</dt>
         <dd class="description">1 = blocking, 0 = non-blocking</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set blocking/non-blocking behavior on a connection.</p>
 <h3 class="function"><a id="httpCheck">httpCheck</a></h3>
         <p class="description">Check to see if there is a pending response from the server.</p>
 <p class="code">
@@ -4657,8 +3133,8 @@ int httpCheck (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">0 = no data, 1 = data available</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span><a id="httpClearCookie">httpClearCookie</a></h3>
-        <p class="description">Clear the cookie value(s).</p>
+<h3 class="function"><a id="httpClearCookie">httpClearCookie</a></h3>
+        <p class="description">HTTP connection</p>
 <p class="code">
 void httpClearCookie (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
@@ -4668,8 +3144,11 @@ void httpClearCookie (<br>
 <dt>http</dt>
         <dd class="description">HTTP connection</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Clear the cookie value(s).</p>
+        <p class="discussion"></p>
 <h3 class="function"><a id="httpClearFields">httpClearFields</a></h3>
-        <p class="description">Clear HTTP request fields.</p>
+        <p class="description">HTTP connection</p>
 <p class="code">
 void httpClearFields (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
@@ -4679,8 +3158,10 @@ void httpClearFields (<br>
 <dt>http</dt>
         <dd class="description">HTTP connection</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Clear HTTP request fields.</p>
 <h3 class="function"><a id="httpClose">httpClose</a></h3>
-        <p class="description">Close an HTTP connection.</p>
+        <p class="description">HTTP connection</p>
 <p class="code">
 void httpClose (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
@@ -4690,12 +3171,14 @@ void httpClose (<br>
 <dt>http</dt>
         <dd class="description">HTTP connection</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Close an HTTP connection.</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpCompareCredentials">httpCompareCredentials</a></h3>
         <p class="description">Compare two sets of X.509 credentials.</p>
 <p class="code">
 int httpCompareCredentials (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *cred1,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *cred2<br>
+&#160;&#160;&#160;&#160;cups_array_t *cred1,<br>
+&#160;&#160;&#160;&#160;cups_array_t *cred2<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -4706,26 +3189,6 @@ int httpCompareCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 if they match, 0 if they do not</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpConnect">httpConnect</a></h3>
-        <p class="description">Connect to a HTTP server.</p>
-<p class="code">
-<a href="#http_t">http_t</a> *httpConnect (<br>
-&#160;&#160;&#160;&#160;const char *host,<br>
-&#160;&#160;&#160;&#160;int port<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>host</dt>
-        <dd class="description">Host to connect to</dd>
-<dt>port</dt>
-        <dd class="description">Port number</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New HTTP connection</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated - use <a href="#httpConnect2"><code>httpConnect2</code></a> instead.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="httpConnect2">httpConnect2</a></h3>
         <p class="description">Connect to a HTTP server.</p>
 <p class="code">
@@ -4760,37 +3223,13 @@ int httpCompareCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">New HTTP connection</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpConnectEncrypt">httpConnectEncrypt</a></h3>
-        <p class="description">Connect to a HTTP server using encryption.</p>
-<p class="code">
-<a href="#http_t">http_t</a> *httpConnectEncrypt (<br>
-&#160;&#160;&#160;&#160;const char *host,<br>
-&#160;&#160;&#160;&#160;int port,<br>
-&#160;&#160;&#160;&#160;<a href="#http_encryption_t">http_encryption_t</a> encryption<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>host</dt>
-        <dd class="description">Host to connect to</dd>
-<dt>port</dt>
-        <dd class="description">Port number</dd>
-<dt>encryption</dt>
-        <dd class="description">Type of encryption to use</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">New HTTP connection</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is now deprecated. Please use the <a href="#httpConnect2"><code>httpConnect2</code></a> function
-instead.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="httpCopyCredentials">httpCopyCredentials</a></h3>
         <p class="description">Copy the credentials associated with the peer in
 an encrypted connection.</p>
 <p class="code">
 int httpCopyCredentials (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> **credentials<br>
+&#160;&#160;&#160;&#160;cups_array_t **credentials<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -4805,7 +3244,7 @@ int httpCopyCredentials (<br>
         <p class="description">Return whether the credentials are valid for the given name.</p>
 <p class="code">
 int httpCredentialsAreValidForName (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials,<br>
 &#160;&#160;&#160;&#160;const char *common_name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -4821,7 +3260,7 @@ int httpCredentialsAreValidForName (<br>
         <p class="description">Return the expiration date of the credentials.</p>
 <p class="code">
 time_t httpCredentialsGetExpiration (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -4834,7 +3273,7 @@ time_t httpCredentialsGetExpiration (<br>
         <p class="description">Return the trust of credentials.</p>
 <p class="code">
 <a href="#http_trust_t">http_trust_t</a> httpCredentialsGetTrust (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials,<br>
 &#160;&#160;&#160;&#160;const char *common_name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -4850,7 +3289,7 @@ time_t httpCredentialsGetExpiration (<br>
         <p class="description">Return a string representing the credentials.</p>
 <p class="code">
 size_t httpCredentialsString (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials,<br>
 &#160;&#160;&#160;&#160;char *buffer,<br>
 &#160;&#160;&#160;&#160;size_t bufsize<br>
 );</p>
@@ -4865,27 +3304,6 @@ size_t httpCredentialsString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Total size of credentials string</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpDecode64">httpDecode64</a></h3>
-        <p class="description">Base64-decode a string.</p>
-<p class="code">
-char *httpDecode64 (<br>
-&#160;&#160;&#160;&#160;char *out,<br>
-&#160;&#160;&#160;&#160;const char *in<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>out</dt>
-        <dd class="description">String to write to</dd>
-<dt>in</dt>
-        <dd class="description">String to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Decoded string</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated. Use the httpDecode64_2() function instead
-which provides buffer length arguments.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="httpDecode64_2">httpDecode64_2</a></h3>
         <p class="description">Base64-decode a string.</p>
 <p class="code">
@@ -4921,27 +3339,6 @@ int httpDelete (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpEncode64">httpEncode64</a></h3>
-        <p class="description">Base64-encode a string.</p>
-<p class="code">
-char *httpEncode64 (<br>
-&#160;&#160;&#160;&#160;char *out,<br>
-&#160;&#160;&#160;&#160;const char *in<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>out</dt>
-        <dd class="description">String to write to</dd>
-<dt>in</dt>
-        <dd class="description">String to read from</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Encoded string</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated. Use the httpEncode64_2() function instead
-which provides buffer length arguments.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="httpEncode64_2">httpEncode64_2</a></h3>
         <p class="description">Base64-encode a string.</p>
 <p class="code">
@@ -5008,7 +3405,7 @@ name.</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Field index</p>
 <h3 class="function"><a id="httpFlush">httpFlush</a></h3>
-        <p class="description">Flush data from a HTTP connection.</p>
+        <p class="description">Looping var</p>
 <p class="code">
 void httpFlush (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
@@ -5018,6 +3415,8 @@ void httpFlush (<br>
 <dt>http</dt>
         <dd class="description">HTTP connection</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Flush data from a HTTP connection.</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpFlushWrite">httpFlushWrite</a></h3>
         <p class="description">Flush data in write buffer.</p>
 <p class="code">
@@ -5032,16 +3431,18 @@ int httpFlushWrite (<br>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Bytes written or -1 on error</p>
 <h3 class="function"><a id="httpFreeCredentials">httpFreeCredentials</a></h3>
-        <p class="description">Free an array of credentials.</p>
+        <p class="description">Bytes written</p>
 <p class="code">
 void httpFreeCredentials (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>credentials</dt>
         <dd class="description">Array of credentials</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Free an array of credentials.</p>
 <h3 class="function"><a id="httpGet">httpGet</a></h3>
         <p class="description">Send a GET request to the server.</p>
 <p class="code">
@@ -5161,19 +3562,6 @@ const char *httpGetCookie (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Cookie data or NULL</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpGetDateString">httpGetDateString</a></h3>
-        <p class="description">Get a formatted date/time string from a time value.</p>
-<p class="code">
-const char *httpGetDateString (<br>
-&#160;&#160;&#160;&#160;time_t t<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>t</dt>
-        <dd class="description">UNIX time</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Date/time string</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetDateString2">httpGetDateString2</a></h3>
         <p class="description">Get a formatted date/time string from a time value.</p>
 <p class="code">
@@ -5326,25 +3714,6 @@ and gethostbyname() to get the local hostname with domain.
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Keep-Alive state</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpGetLength">httpGetLength</a></h3>
-        <p class="description">Get the amount of data remaining from the
-content-length or transfer-encoding fields.</p>
-<p class="code">
-int httpGetLength (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">HTTP connection</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Content length</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated and will not return lengths larger than
-2^31 - 1; use httpGetLength2() instead.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetLength2">httpGetLength2</a></h3>
         <p class="description">Get the amount of data remaining from the
 content-length or transfer-encoding fields.</p>
@@ -5435,28 +3804,6 @@ http_status_t httpGetStatus (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">HTTP status</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpGetSubField">httpGetSubField</a></h3>
-        <p class="description">Get a sub-field value.</p>
-<p class="code">
-char *httpGetSubField (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;<a href="#http_field_t">http_field_t</a> field,<br>
-&#160;&#160;&#160;&#160;const char *name,<br>
-&#160;&#160;&#160;&#160;char *value<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">HTTP connection</dd>
-<dt>field</dt>
-        <dd class="description">Field index</dd>
-<dt>name</dt>
-        <dd class="description">Name of sub-field</dd>
-<dt>value</dt>
-        <dd class="description">Value string</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Value or NULL</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetSubField2">httpGetSubField2</a></h3>
         <p class="description">Get a sub-field value.</p>
 <p class="code">
@@ -5531,10 +3878,12 @@ int httpHead (<br>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Status of call (0 = success)</p>
 <h3 class="function"><a id="httpInitialize">httpInitialize</a></h3>
-        <p class="description">Initialize the HTTP interface library and set the
-default HTTP proxy (if any).</p>
+        <p class="description">URI for head</p>
 <p class="code">
 void httpInitialize (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Initialize the HTTP interface library and set the
+default HTTP proxy (if any).</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpIsChunked">httpIsChunked</a></h3>
         <p class="description">Report whether a message body is chunked.</p>
 <p class="code">
@@ -5575,7 +3924,7 @@ int httpIsEncrypted (<br>
 <p class="code">
 int httpLoadCredentials (<br>
 &#160;&#160;&#160;&#160;const char *path,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> **credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t **credentials,<br>
 &#160;&#160;&#160;&#160;const char *common_name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -5664,30 +4013,6 @@ int httpPut (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpRead">httpRead</a></h3>
-        <p class="description">Read data from a HTTP connection.</p>
-<p class="code">
-int httpRead (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;char *buffer,<br>
-&#160;&#160;&#160;&#160;int length<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">HTTP connection</dd>
-<dt>buffer</dt>
-        <dd class="description">Buffer for data</dd>
-<dt>length</dt>
-        <dd class="description">Maximum number of bytes</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes read</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated. Use the httpRead2() function which can
-read more than 2GB of data.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpRead2">httpRead2</a></h3>
         <p class="description">Read data from a HTTP connection.</p>
 <p class="code">
@@ -5726,24 +4051,6 @@ ssize_t httpRead2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">New state of connection</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpReconnect">httpReconnect</a></h3>
-        <p class="description">Reconnect to a HTTP server.</p>
-<p class="code">
-int httpReconnect (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">HTTP connection</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, non-zero on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated. Please use the <a href="#httpReconnect2"><code>httpReconnect2</code></a> function
-instead.
-
-</p>
 <h3 class="function"><a id="httpReconnect2">httpReconnect2</a></h3>
         <p class="description">Reconnect to a HTTP server with timeout and optional
 cancel.</p>
@@ -5789,7 +4096,7 @@ const char *httpResolveHostname (<br>
 <p class="code">
 int httpSaveCredentials (<br>
 &#160;&#160;&#160;&#160;const char *path,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials,<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials,<br>
 &#160;&#160;&#160;&#160;const char *common_name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -5803,9 +4110,8 @@ int httpSaveCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">-1 on error, 0 on success</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpSeparate">httpSeparate</a></h3>
-        <p class="description">Separate a Universal Resource Identifier into its
-components.</p>
+<h3 class="function"><a id="httpSeparate">httpSeparate</a></h3>
+        <p class="description">+ 400 year days</p>
 <p class="code">
 void httpSeparate (<br>
 &#160;&#160;&#160;&#160;const char *uri,<br>
@@ -5830,13 +4136,14 @@ void httpSeparate (<br>
 <dt>resource</dt>
         <dd class="description">Resource/filename [1024]</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated; use the httpSeparateURI() function instead.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.21/macOS 10.4&#160;</span><a id="httpSeparate2">httpSeparate2</a></h3>
+<h4 class="returnvalue">Return Value</h4>
         <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
+        <p class="discussion">This function is deprecated; use the httpSeparateURI() function instead.
+
+ </p>
+<h3 class="function"><a id="httpSeparate2">httpSeparate2</a></h3>
+        <p class="description">Resource/filename [1024]</p>
 <p class="code">
 void httpSeparate2 (<br>
 &#160;&#160;&#160;&#160;const char *uri,<br>
@@ -5873,11 +4180,13 @@ void httpSeparate2 (<br>
 <dt>resourcelen</dt>
         <dd class="description">Size of resource buffer</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Separate a Universal Resource Identifier into its
+components.</p>
         <p class="discussion">This function is deprecated; use the httpSeparateURI() function instead.
 
 
-</p>
+ </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpSeparateURI">httpSeparateURI</a></h3>
         <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
@@ -5922,8 +4231,8 @@ components.</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Result of separation</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="httpSetAuthString">httpSetAuthString</a></h3>
-        <p class="description">Set the current authorization string.</p>
+<h3 class="function"><a id="httpSetAuthString">httpSetAuthString</a></h3>
+        <p class="description">Always do encryption via SSL.</p>
 <p class="code">
 void httpSetAuthString (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -5939,15 +4248,16 @@ void httpSetAuthString (<br>
 <dt>data</dt>
         <dd class="description">Auth data (NULL for none)</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the current authorization string.</p>
         <p class="discussion">This function just stores a copy of the current authorization string in
 the HTTP connection object.  You must still call httpSetField() to set
 HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
 httpHead(), httpOptions(), httpPost, or httpPut().
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span><a id="httpSetCookie">httpSetCookie</a></h3>
-        <p class="description">Set the cookie value(s).</p>
+<h3 class="function"><a id="httpSetCookie">httpSetCookie</a></h3>
+        <p class="description">Array of credentials</p>
 <p class="code">
 void httpSetCookie (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -5960,13 +4270,16 @@ void httpSetCookie (<br>
 <dt>cookie</dt>
         <dd class="description">Cookie string</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the cookie value(s).</p>
+        <p class="discussion"></p>
 <h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="httpSetCredentials">httpSetCredentials</a></h3>
         <p class="description">Set the credentials associated with an encrypted
 connection.</p>
 <p class="code">
 int httpSetCredentials (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_array_t">cups_array_t</a> *credentials<br>
+&#160;&#160;&#160;&#160;cups_array_t *credentials<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -5977,8 +4290,8 @@ int httpSetCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="httpSetDefaultField">httpSetDefaultField</a></h3>
-        <p class="description">Set the default value of an HTTP header.</p>
+<h3 class="function"><a id="httpSetDefaultField">httpSetDefaultField</a></h3>
+        <p class="description">Cookie string</p>
 <p class="code">
 void httpSetDefaultField (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -5994,13 +4307,14 @@ void httpSetDefaultField (<br>
 <dt>value</dt>
         <dd class="description">Value</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default value of an HTTP header.</p>
         <p class="discussion">Currently only <code>HTTP_FIELD_ACCEPT_ENCODING</code>, <code>HTTP_FIELD_SERVER</code>,
 and <code>HTTP_FIELD_USER_AGENT</code> can be set.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpSetExpect">httpSetExpect</a></h3>
-        <p class="description">Set the Expect: header in a request.</p>
+<h3 class="function"><a id="httpSetExpect">httpSetExpect</a></h3>
+        <p class="description">Value</p>
 <p class="code">
 void httpSetExpect (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -6014,13 +4328,15 @@ void httpSetExpect (<br>
         <dd class="description">HTTP status to expect
 (<code>HTTP_STATUS_CONTINUE</code>)</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the Expect: header in a request.</p>
         <p class="discussion">Currently only <code>HTTP_STATUS_CONTINUE</code> is supported for the &quot;expect&quot;
 argument.
 
 </p>
 <h3 class="function"><a id="httpSetField">httpSetField</a></h3>
-        <p class="description">Set the value of an HTTP header.</p>
+        <p class="description">HTTP status to expect
+(<code>HTTP_STATUS_CONTINUE</code>)</p>
 <p class="code">
 void httpSetField (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -6036,8 +4352,10 @@ void httpSetField (<br>
 <dt>value</dt>
         <dd class="description">Value</dd>
 </dl>
-<h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpSetKeepAlive">httpSetKeepAlive</a></h3>
-        <p class="description">Set the current Keep-Alive state of a connection.</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the value of an HTTP header.</p>
+<h3 class="function"><a id="httpSetKeepAlive">httpSetKeepAlive</a></h3>
+        <p class="description">Check for a trailing dot on the hostname...</p>
 <p class="code">
 void httpSetKeepAlive (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -6050,8 +4368,11 @@ void httpSetKeepAlive (<br>
 <dt>keep_alive</dt>
         <dd class="description">New Keep-Alive value</dd>
 </dl>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpSetLength">httpSetLength</a></h3>
-        <p class="description">Set the content-length and content-encoding.</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the current Keep-Alive state of a connection.</p>
+        <p class="discussion"></p>
+<h3 class="function"><a id="httpSetLength">httpSetLength</a></h3>
+        <p class="description">New Keep-Alive value</p>
 <p class="code">
 void httpSetLength (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -6064,8 +4385,11 @@ void httpSetLength (<br>
 <dt>length</dt>
         <dd class="description">Length (0 for chunked)</dd>
 </dl>
-<h3 class="function"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span><a id="httpSetTimeout">httpSetTimeout</a></h3>
-        <p class="description">Set read/write timeouts and an optional callback.</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the content-length and content-encoding.</p>
+        <p class="discussion"></p>
+<h3 class="function"><a id="httpSetTimeout">httpSetTimeout</a></h3>
+        <p class="description">Length (0 for chunked)</p>
 <p class="code">
 void httpSetTimeout (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
@@ -6085,13 +4409,14 @@ must be greater than 0</dd>
 <dt>user_data</dt>
         <dd class="description">User data pointer</dd>
 </dl>
-<h4 class="discussion">Discussion</h4>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set read/write timeouts and an optional callback.</p>
         <p class="discussion">The optional timeout callback receives both the HTTP connection and a user
 data pointer and must return 1 to continue or 0 to error (time) out.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpShutdown">httpShutdown</a></h3>
-        <p class="description">Shutdown one side of an HTTP connection.</p>
+<h3 class="function"><a id="httpShutdown">httpShutdown</a></h3>
+        <p class="description">User data pointer</p>
 <p class="code">
 void httpShutdown (<br>
 &#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http<br>
@@ -6101,6 +4426,9 @@ void httpShutdown (<br>
 <dt>http</dt>
         <dd class="description">HTTP connection</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Shutdown one side of an HTTP connection.</p>
+        <p class="discussion"></p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpStateString">httpStateString</a></h3>
         <p class="description">Return the string describing a HTTP state value.</p>
 <p class="code">
@@ -6188,30 +4516,6 @@ int httpWait (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 if data is available, 0 otherwise</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpWrite">httpWrite</a></h3>
-        <p class="description">Write data to a HTTP connection.</p>
-<p class="code">
-int httpWrite (<br>
-&#160;&#160;&#160;&#160;<a href="#http_t">http_t</a> *http,<br>
-&#160;&#160;&#160;&#160;const char *buffer,<br>
-&#160;&#160;&#160;&#160;int length<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-        <dd class="description">HTTP connection</dd>
-<dt>buffer</dt>
-        <dd class="description">Buffer for data</dd>
-<dt>length</dt>
-        <dd class="description">Number of bytes to write</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Number of bytes written</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is deprecated. Use the httpWrite2() function which can
-write more than 2GB of data.
-
-</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpWrite2">httpWrite2</a></h3>
         <p class="description">Write data to a HTTP connection.</p>
 <p class="code">
@@ -7082,7 +5386,7 @@ itself.
         <p class="description">Create a CUPS array of attribute names from the
 given requested-attributes attribute.</p>
 <p class="code">
-<a href="#cups_array_t">cups_array_t</a> *ippCreateRequestedArray (<br>
+cups_array_t *ippCreateRequestedArray (<br>
 &#160;&#160;&#160;&#160;<a href="#ipp_t">ipp_t</a> *request<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -7122,7 +5426,7 @@ time_t ippDateToTime (<br>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">UNIX time value</p>
 <h3 class="function"><a id="ippDelete">ippDelete</a></h3>
-        <p class="description">Delete an IPP message.</p>
+        <p class="description">RFC-1903 date/time format is:</p>
 <p class="code">
 void ippDelete (<br>
 &#160;&#160;&#160;&#160;<a href="#ipp_t">ipp_t</a> *ipp<br>
@@ -7132,8 +5436,23 @@ void ippDelete (<br>
 <dt>ipp</dt>
         <dd class="description">IPP message</dd>
 </dl>
-<h3 class="function"><span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span><a id="ippDeleteAttribute">ippDeleteAttribute</a></h3>
-        <p class="description">Delete a single attribute in an IPP message.</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Delete an IPP message.</p>
+<h4 class="discussion">Discussion</h4>
+        <p class="discussion">Byte(s)  Description
+-------  -----------
+0-1      Year (0 to 65535)
+2        Month (1 to 12)
+3        Day (1 to 31)
+4        Hours (0 to 23)
+5        Minutes (0 to 59)
+6        Seconds (0 to 60, 60 = &quot;leap second&quot;)
+7        Deciseconds (0 to 9)
+8        +/- UTC
+9        UTC hours (0 to 11)
+10       UTC minutes (0 to 59)</p>
+<h3 class="function"><a id="ippDeleteAttribute">ippDeleteAttribute</a></h3>
+        <p class="description">Next attribute</p>
 <p class="code">
 void ippDeleteAttribute (<br>
 &#160;&#160;&#160;&#160;<a href="#ipp_t">ipp_t</a> *ipp,<br>
@@ -7146,6 +5465,9 @@ void ippDeleteAttribute (<br>
 <dt>attr</dt>
         <dd class="description">Attribute to delete</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Delete a single attribute in an IPP message.</p>
+        <p class="discussion"></p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippDeleteValues">ippDeleteValues</a></h3>
         <p class="description">Delete values in an attribute.</p>
 <p class="code">
@@ -8001,7 +6323,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 
 </p>
 <h3 class="function"><a id="ippSetPort">ippSetPort</a></h3>
-        <p class="description">Set the default port number.</p>
+        <p class="description">Pointer to library globals</p>
 <p class="code">
 void ippSetPort (<br>
 &#160;&#160;&#160;&#160;int p<br>
@@ -8011,6 +6333,8 @@ void ippSetPort (<br>
 <dt>p</dt>
         <dd class="description">Port number to use</dd>
 </dl>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Set the default port number.</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetRange">ippSetRange</a></h3>
         <p class="description">Set a rangeOfInteger value in an attribute.</p>
 <p class="code">
@@ -8643,47 +6967,11 @@ thread.
 
 </p>
       <h2 class="title"><a id="TYPES">Data Types</a></h2>
-      <h3 class="typedef"><a id="cups_acopy_func_t">cups_acopy_func_t</a></h3>
-        <p class="description">Array element copy function</p>
-      <p class="code">
-typedef void *(*)(void *element, void *data)cups_acopy_func_t;
-</p>
-      <h3 class="typedef"><a id="cups_afree_func_t">cups_afree_func_t</a></h3>
-        <p class="description">Array element free function</p>
-      <p class="code">
-typedef void(*)(void *element, void *data)cups_afree_func_t;
-</p>
-      <h3 class="typedef"><a id="cups_ahash_func_t">cups_ahash_func_t</a></h3>
-        <p class="description">Array hash function</p>
-      <p class="code">
-typedef int(*)(void *element, void *data)cups_ahash_func_t;
-</p>
-      <h3 class="typedef"><a id="cups_array_func_t">cups_array_func_t</a></h3>
-        <p class="description">Array comparison function</p>
-      <p class="code">
-typedef int(*)(void *first, void *second, void *data)cups_array_func_t;
-</p>
-      <h3 class="typedef"><a id="cups_array_t">cups_array_t</a></h3>
-        <p class="description">CUPS array type</p>
-      <p class="code">
-typedef struct _cups_array_s cups_array_t;
-</p>
       <h3 class="typedef"><a id="cups_client_cert_cb_t"><span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span>cups_client_cert_cb_t</a></h3>
         <p class="description">Client credentials callback
 </p>
       <p class="code">
-typedef int(*)(http_t *http, void *tls, <a href="#cups_array_t">cups_array_t</a> *distinguished_names, void *user_data)cups_client_cert_cb_t;
-</p>
-      <h3 class="typedef"><a id="cups_dentry_t">cups_dentry_t</a></h3>
-        <p class="description">Directory entry type</p>
-      <p class="code">
-typedef struct <a href="#cups_dentry_s">cups_dentry_s</a> cups_dentry_t;
-</p>
-      <h3 class="typedef"><a id="cups_dest_block_t"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span>cups_dest_block_t</a></h3>
-        <p class="description">Destination enumeration block
-</p>
-      <p class="code">
-typedef int()(unsigned flags, <a href="#cups_dest_t">cups_dest_t</a> *dest)cups_dest_block_t;
+typedef int(*)(http_t *http, void *tls, cups_array_t *distinguished_names, void *user_data)cups_client_cert_cb_t;
 </p>
       <h3 class="typedef"><a id="cups_dest_cb_t"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span>cups_dest_cb_t</a></h3>
         <p class="description">Destination enumeration callback
@@ -8702,20 +6990,10 @@ information </p>
       <p class="code">
 typedef struct _cups_dinfo_s cups_dinfo_t;
 </p>
-      <h3 class="typedef"><a id="cups_dir_t">cups_dir_t</a></h3>
-        <p class="description">Directory type</p>
-      <p class="code">
-typedef struct _cups_dir_s cups_dir_t;
-</p>
       <h3 class="typedef"><a id="cups_encoding_t">cups_encoding_t</a></h3>
         <p class="description">Language Encodings</p>
       <p class="code">
 typedef enum <a href="#cups_encoding_e">cups_encoding_e</a> cups_encoding_t;
-</p>
-      <h3 class="typedef"><a id="cups_file_t">cups_file_t</a></h3>
-        <p class="description">CUPS file type</p>
-      <p class="code">
-typedef struct _cups_file_s cups_file_t;
 </p>
       <h3 class="typedef"><a id="cups_job_t">cups_job_t</a></h3>
         <p class="description">Job</p>
@@ -8738,11 +7016,6 @@ typedef struct <a href="#cups_option_s">cups_option_s</a> cups_option_t;
       <p class="code">
 typedef const char *(*)(const char *prompt, <a href="#http_t">http_t</a> *http, const char *method, const char *resource, void *user_data)cups_password_cb2_t;
 </p>
-      <h3 class="typedef"><a id="cups_password_cb_t">cups_password_cb_t</a></h3>
-        <p class="description">Password callback</p>
-      <p class="code">
-typedef const char *(*)(const char *prompt)cups_password_cb_t;
-</p>
       <h3 class="typedef"><a id="cups_ptype_t">cups_ptype_t</a></h3>
         <p class="description">Printer type/capability bits</p>
       <p class="code">
@@ -8752,17 +7025,12 @@ typedef unsigned cups_ptype_t;
         <p class="description">Server credentials callback
 </p>
       <p class="code">
-typedef int(*)(http_t *http, void *tls, <a href="#cups_array_t">cups_array_t</a> *certs, void *user_data)cups_server_cert_cb_t;
+typedef int(*)(http_t *http, void *tls, cups_array_t *certs, void *user_data)cups_server_cert_cb_t;
 </p>
       <h3 class="typedef"><a id="cups_size_t"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span>cups_size_t</a></h3>
         <p class="description">Media Size </p>
       <p class="code">
 typedef struct <a href="#cups_size_s">cups_size_s</a> cups_size_t;
-</p>
-      <h3 class="typedef"><a id="gss_auth_identity_desc">gss_auth_identity_desc</a></h3>
-        <p class="description">Local functions...</p>
-      <p class="code">
-typedef struct <a href="#gss_auth_identity">gss_auth_identity</a> gss_auth_identity_desc;
 </p>
       <h3 class="typedef"><a id="http_addr_t"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span>http_addr_t</a></h3>
         <p class="description">Socket address union, which
@@ -8929,19 +7197,6 @@ typedef struct <a href="#pwg_media_s">pwg_media_s</a> pwg_media_t;
 typedef struct <a href="#pwg_size_s">pwg_size_s</a> pwg_size_t;
 </p>
       <h2 class="title"><a id="STRUCTURES">Structures</a></h2>
-<h3 class="struct"><a id="cups_dentry_s">cups_dentry_s</a></h3>
-        <p class="description">Directory entry type</p>
-<p class="code">struct cups_dentry_s {<br>
-&#160;&#160;&#160;&#160;struct stat fileinfo;<br>
-&#160;&#160;&#160;&#160;char filename[260];<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>fileinfo </dt>
-        <dd class="description">File information</dd>
-<dt>filename[260] </dt>
-        <dd class="description">File name</dd>
-</dl>
 <h3 class="struct"><a id="cups_dest_s">cups_dest_s</a></h3>
         <p class="description">Destination</p>
 <p class="code">struct cups_dest_s {<br>
@@ -9047,25 +7302,6 @@ typedef struct <a href="#pwg_size_s">pwg_size_s</a> pwg_size_t;
         <dd class="description">Top margin in hundredths of
 millimeters</dd>
 </dl>
-<h3 class="struct"><a id="gss_auth_identity">gss_auth_identity</a></h3>
-        <p class="description">Local functions...</p>
-<p class="code">struct gss_auth_identity {<br>
-&#160;&#160;&#160;&#160;gss_buffer_t *credentialsRef;<br>
-&#160;&#160;&#160;&#160;uint32_t flags;<br>
-&#160;&#160;&#160;&#160;char *password;<br>
-&#160;&#160;&#160;&#160;char *realm;<br>
-&#160;&#160;&#160;&#160;uint32_t type;<br>
-&#160;&#160;&#160;&#160;char *username;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>credentialsRef </dt>
-<dt>flags </dt>
-<dt>password </dt>
-<dt>realm </dt>
-<dt>type </dt>
-<dt>username </dt>
-</dl>
 <h3 class="struct"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="http_addrlist_s">http_addrlist_s</a></h3>
         <p class="description">Socket address list, which is
 used to enumerate all of the
@@ -9094,17 +7330,6 @@ with a hostname. </p>
         <dd class="description">Pointer to credential data</dd>
 <dt>datalen </dt>
         <dd class="description">Credential length</dd>
-</dl>
-<h3 class="struct"><a id="pollfd">pollfd</a></h3>
-        <p class="description">User data (unused)</p>
-<p class="code">struct pollfd *pollfds, unsigned int num_pollfds, int timeout, void *context) {<br>
-&#160;&#160;&#160;&#160;void) context;<br>
-&#160;&#160;&#160;&#160;void) timeout;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>context </dt>
-<dt>timeout </dt>
 </dl>
 <h3 class="struct"><a id="pwg_map_s">pwg_map_s</a></h3>
         <p class="description">Map element - PPD to/from PWG</p>
@@ -9142,14 +7367,6 @@ with a hostname. </p>
 <dt>top </dt>
         <dd class="description">Top margin in 2540ths</dd>
 </dl>
-      <h2 class="title"><a id="VARIABLES">Variables</a></h2>
-      <h3 class="variable"><a id="CF_RETURNS_RETAINED">CF_RETURNS_RETAINED</a></h3>
-        <p class="description">Get the Apple language identifier associated with a
-locale ID.</p>
-      <p class="code">const char *locale)CF_RETURNS_RETAINED;</p>
-      <h3 class="variable"><a id="environ">environ</a></h3>
-        <p class="description">Constants, very secure stuff...</p>
-      <p class="code">extern char **environ;</p>
       <h2 class="title"><a id="ENUMERATIONS">Constants</a></h2>
       <h3 class="enumeration"><a id="cups_encoding_e">cups_encoding_e</a></h3>
         <p class="description">Language Encodings</p>
@@ -9241,6 +7458,8 @@ locale ID.</p>
 constants</p>
       <h4 class="constants">Constants</h4>
       <dl>
+        <dt>CUPS_PRINTER_3D <span class="info">&#160;DEPRECATED&#160;</span></dt>
+        <dd class="description">Printer with 3D capabilities  </dd>
         <dt>CUPS_PRINTER_AUTHENTICATED <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
         <dd class="description">Printer requires authentication
 </dd>
@@ -9263,9 +7482,11 @@ constants</p>
         <dd class="description">Can cover output</dd>
         <dt>CUPS_PRINTER_DEFAULT </dt>
         <dd class="description">Default printer on network</dd>
-        <dt>CUPS_PRINTER_DELETE <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
+        <dt>CUPS_PRINTER_DELETE <span class="info">&#160;DEPRECATED&#160;</span></dt>
         <dd class="description">Delete printer
-</dd>
+ </dd>
+        <dt>CUPS_PRINTER_DISCOVERED <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
+        <dd class="description">Printer was discovered </dd>
         <dt>CUPS_PRINTER_DUPLEX </dt>
         <dd class="description">Can do two-sided printing</dd>
         <dt>CUPS_PRINTER_FAX </dt>

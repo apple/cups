@@ -308,11 +308,12 @@ typedef int (*cups_dest_cb_t)(void *user_data, unsigned flags,
 #  ifdef __BLOCKS__
 typedef int (^cups_dest_block_t)(unsigned flags, cups_dest_t *dest);
 			      		/* Destination enumeration block
-					 * @since CUPS 1.6/macOS 10.8@ */
+					 * @since CUPS 1.6/macOS 10.8@
+                                         * @exclude all@ */
 #  endif /* __BLOCKS__ */
 
 typedef const char *(*cups_password_cb_t)(const char *prompt);
-					/* Password callback */
+					/* Password callback @exclude all@ */
 
 typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
 					   const char *method,

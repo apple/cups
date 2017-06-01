@@ -21,7 +21,7 @@
 
 #include <spawn.h>
 
-extern char **environ;
+extern char **environ; /* @private@ */
 
 
 /*

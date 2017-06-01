@@ -1,7 +1,7 @@
 /*
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -543,7 +543,7 @@ httpAssembleUUID(const char *server,	/* I - Server name */
  * This function is deprecated. Use the httpDecode64_2() function instead
  * which provides buffer length arguments.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 char *					/* O - Decoded string */
@@ -671,7 +671,7 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
  * This function is deprecated. Use the httpEncode64_2() function instead
  * which provides buffer length arguments.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 char *					/* O - Encoded string */
@@ -778,7 +778,7 @@ httpEncode64_2(char       *out,		/* I - String to write to */
 /*
  * 'httpGetDateString()' - Get a formatted date/time string from a time value.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 const char *				/* O - Date/time string */
@@ -888,7 +888,7 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
  *
  * This function is deprecated; use the httpSeparateURI() function instead.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 void
@@ -912,7 +912,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
  * This function is deprecated; use the httpSeparateURI() function instead.
  *
  * @since CUPS 1.1.21/macOS 10.4@
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 void
@@ -2310,6 +2310,8 @@ http_resolve_cb(
  * Note: This function is needed because avahi_simple_poll_iterate is broken
  *       and always uses a timeout of 0 (!) milliseconds.
  *       (Avahi Ticket #364)
+ *
+ * @private@
  */
 
 static int				/* O - Number of file descriptors matching */

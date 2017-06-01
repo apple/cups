@@ -571,11 +571,12 @@ tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
 
 apihelp:
 	echo Generating CUPS API help files...
+	$(RM) cupspm.xml
 	mxmldoc --section "Programming" --body cupspm.md \
 		cupspm.xml \
-		array.[ch] auth.c cups.h dest*.c dir.[ch] encode.c \
-		file.[ch] http.h http*.c ipp.h ipp*.c language.[ch] \
-		notify.c options.c pwg.h pwg-media.c tempfile.c \
+		auth.c cups.h dest*.c encode.c \
+		http.h http*.c ipp.h ipp*.c language.[ch] \
+		notify.c options.c pwg.h pwg-media.c \
 		tls-darwin.c usersys.c util.c \
 		--coverimage cupspm.png \
 		--epub ../doc/help/cupspm.epub

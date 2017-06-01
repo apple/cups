@@ -1,7 +1,7 @@
 /*
  * HTTP address list routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -32,7 +32,7 @@
 /*
  * 'httpAddrConnect()' - Connect to any of the addresses in the list.
  *
- * @since CUPS 1.2/macOS 10.5@
+ * @since CUPS 1.2/macOS 10.5@ @exclude all@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */

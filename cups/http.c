@@ -1,7 +1,7 @@
 /*
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -417,7 +417,7 @@ httpCompareCredentials(
  *
  * This function is deprecated - use @link httpConnect2@ instead.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 http_t *				/* O - New HTTP connection */
@@ -482,7 +482,7 @@ httpConnect2(
  * This function is now deprecated. Please use the @link httpConnect2@ function
  * instead.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 http_t *				/* O - New HTTP connection */
@@ -1006,7 +1006,7 @@ httpGetKeepAlive(http_t *http)		/* I - HTTP connection */
  * This function is deprecated and will not return lengths larger than
  * 2^31 - 1; use httpGetLength2() instead.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 int					/* O - Content length */
@@ -1346,7 +1346,7 @@ httpGetStatus(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetSubField()' - Get a sub-field value.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 char *					/* O - Value or NULL */
@@ -1939,7 +1939,7 @@ httpPut(http_t     *http,		/* I - HTTP connection */
  * This function is deprecated. Use the httpRead2() function which can
  * read more than 2GB of data.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 int					/* O - Number of bytes read */
@@ -2326,7 +2326,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
  * This function is deprecated. Please use the @link httpReconnect2@ function
  * instead.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 int					/* O - 0 on success, non-zero on failure */
@@ -3259,7 +3259,7 @@ httpWait(http_t *http,			/* I - HTTP connection */
  * This function is deprecated. Use the httpWrite2() function which can
  * write more than 2GB of data.
  *
- * @deprecated@
+ * @deprecated@ @exclude all@
  */
 
 int					/* O - Number of bytes written */

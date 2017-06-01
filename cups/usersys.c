@@ -1,7 +1,7 @@
 /*
  * User, system, and password routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -132,6 +132,8 @@ cupsEncryption(void)
  * thread in a program. Multi-threaded programs that override the setting via
  * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
  * do so in each thread for the same function to be used.
+ *
+ * @exclude all@
  */
 
 const char *				/* O - Password */
@@ -297,6 +299,8 @@ cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
  * Note: The current password callback is tracked separately for each thread
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
+ *
+ * @exclude all@
  */
 
 void

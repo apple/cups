@@ -8,6 +8,7 @@
     <meta name="creator" content="Mini-XML v2.11">
     <meta name="author" content="Unknown">
     <meta name="copyright" content="Unknown">
+    <meta name="version" content="0.0">
     <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -606,8 +607,8 @@ the memory used to read the raster file:</p>
 <h3 class="function"><a id="cupsRasterClose">cupsRasterClose</a></h3>
         <p class="description">Close a raster stream.</p>
 <p class="code">
-void cupsRasterClose (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r<br />
+void cupsRasterClose (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -620,14 +621,14 @@ separately as needed.</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.2/macOS 10.12&#160;</span><a id="cupsRasterInitPWGHeader">cupsRasterInitPWGHeader</a></h3>
         <p class="description">Initialize a page header for PWG Raster output.</p>
 <p class="code">
-int cupsRasterInitPWGHeader (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br />
-&#160;&#160;&#160;&#160;pwg_media_t *media,<br />
-&#160;&#160;&#160;&#160;const char *type,<br />
-&#160;&#160;&#160;&#160;int xdpi,<br />
-&#160;&#160;&#160;&#160;int ydpi,<br />
-&#160;&#160;&#160;&#160;const char *sides,<br />
-&#160;&#160;&#160;&#160;const char *sheet_back<br />
+int cupsRasterInitPWGHeader (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
+&#160;&#160;&#160;&#160;pwg_media_t *media,<br>
+&#160;&#160;&#160;&#160;const char *type,<br>
+&#160;&#160;&#160;&#160;int xdpi,<br>
+&#160;&#160;&#160;&#160;int ydpi,<br>
+&#160;&#160;&#160;&#160;const char *sides,<br>
+&#160;&#160;&#160;&#160;const char *sheet_back<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -664,12 +665,12 @@ to apply for the back side of a page.  Pass <code>NULL</code> for the front side
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
         <p class="description">Interpret PPD commands to create a page header.</p>
 <p class="code">
-int cupsRasterInterpretPPD (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br />
-&#160;&#160;&#160;&#160;ppd_file_t *ppd,<br />
-&#160;&#160;&#160;&#160;int num_options,<br />
-&#160;&#160;&#160;&#160;cups_option_t *options,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func<br />
+int cupsRasterInterpretPPD (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
+&#160;&#160;&#160;&#160;ppd_file_t *ppd,<br>
+&#160;&#160;&#160;&#160;int num_options,<br>
+&#160;&#160;&#160;&#160;cups_option_t *options,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -715,9 +716,9 @@ are supported.
 <h3 class="function"><a id="cupsRasterOpen">cupsRasterOpen</a></h3>
         <p class="description">Open a raster stream using a file descriptor.</p>
 <p class="code">
-<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br />
-&#160;&#160;&#160;&#160;int fd,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br />
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br>
+&#160;&#160;&#160;&#160;int fd,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -744,10 +745,10 @@ be used - compressed and PWG output is generally 25-50% smaller but adds a
 <h3 class="function"><a id="cupsRasterOpenIO">cupsRasterOpenIO</a></h3>
         <p class="description">Open a raster stream using a callback function.</p>
 <p class="code">
-<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb,<br />
-&#160;&#160;&#160;&#160;void *ctx,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br />
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb,<br>
+&#160;&#160;&#160;&#160;void *ctx,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -775,9 +776,9 @@ be used - compressed and PWG output is generally 25-50% smaller but adds a
         <p class="description">Read a raster page header and store it in a
 version 1 page header structure.</p>
 <p class="code">
-unsigned cupsRasterReadHeader (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br />
+unsigned cupsRasterReadHeader (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -800,9 +801,9 @@ page headers and copying only the version 1 data into the provided buffer.
         <p class="description">Read a raster page header and store it in a
 version 2 page header structure.</p>
 <p class="code">
-unsigned cupsRasterReadHeader2 (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br />
+unsigned cupsRasterReadHeader2 (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -816,10 +817,10 @@ unsigned cupsRasterReadHeader2 (<br />
 <h3 class="function"><a id="cupsRasterReadPixels">cupsRasterReadPixels</a></h3>
         <p class="description">Read raster pixels.</p>
 <p class="code">
-unsigned cupsRasterReadPixels (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;unsigned char *p,<br />
-&#160;&#160;&#160;&#160;unsigned len<br />
+unsigned cupsRasterReadPixels (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;unsigned char *p,<br>
+&#160;&#160;&#160;&#160;unsigned len<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -840,9 +841,9 @@ the line buffer and as the number of bytes to read.</p>
         <p class="description">Write a raster page header from a version 1 page
 header structure.</p>
 <p class="code">
-unsigned cupsRasterWriteHeader (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br />
+unsigned cupsRasterWriteHeader (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -861,9 +862,9 @@ unsigned cupsRasterWriteHeader (<br />
         <p class="description">Write a raster page header from a version 2
 page header structure.</p>
 <p class="code">
-unsigned cupsRasterWriteHeader2 (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br />
+unsigned cupsRasterWriteHeader2 (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -881,10 +882,10 @@ unsigned cupsRasterWriteHeader2 (<br />
 <h3 class="function"><a id="cupsRasterWritePixels">cupsRasterWritePixels</a></h3>
         <p class="description">Write raster pixels.</p>
 <p class="code">
-unsigned cupsRasterWritePixels (<br />
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br />
-&#160;&#160;&#160;&#160;unsigned char *p,<br />
-&#160;&#160;&#160;&#160;unsigned len<br />
+unsigned cupsRasterWritePixels (<br>
+&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&#160;&#160;&#160;&#160;unsigned char *p,<br>
+&#160;&#160;&#160;&#160;unsigned len<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -975,56 +976,56 @@ typedef struct _cups_raster_s cups_raster_t;
       <h2 class="title"><a id="STRUCTURES">Structures</a></h2>
 <h3 class="struct"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cups_page_header2_s">cups_page_header2_s</a></h3>
         <p class="description">Version 2 page header </p>
-<p class="code">struct cups_page_header2_s {<br />
-&#160;&#160;&#160;&#160;unsigned AdvanceDistance;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br />
-&#160;&#160;&#160;&#160;unsigned HWResolution[2];<br />
-&#160;&#160;&#160;&#160;unsigned ImagingBoundingBox[4];<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br />
-&#160;&#160;&#160;&#160;unsigned Margins[2];<br />
-&#160;&#160;&#160;&#160;char MediaClass[64];<br />
-&#160;&#160;&#160;&#160;char MediaColor[64];<br />
-&#160;&#160;&#160;&#160;unsigned MediaPosition;<br />
-&#160;&#160;&#160;&#160;char MediaType[64];<br />
-&#160;&#160;&#160;&#160;unsigned MediaWeight;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br />
-&#160;&#160;&#160;&#160;unsigned NumCopies;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br />
-&#160;&#160;&#160;&#160;char OutputType[64];<br />
-&#160;&#160;&#160;&#160;unsigned PageSize[2];<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBitsPerColor;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBitsPerPixel;<br />
-&#160;&#160;&#160;&#160;float cupsBorderlessScalingFactor;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBytesPerLine;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br />
-&#160;&#160;&#160;&#160;unsigned cupsCompression;<br />
-&#160;&#160;&#160;&#160;unsigned cupsHeight;<br />
-&#160;&#160;&#160;&#160;float cupsImagingBBox[4];<br />
-&#160;&#160;&#160;&#160;unsigned cupsInteger[16];<br />
-&#160;&#160;&#160;&#160;char cupsMarkerType[64];<br />
-&#160;&#160;&#160;&#160;unsigned cupsMediaType;<br />
-&#160;&#160;&#160;&#160;unsigned cupsNumColors;<br />
-&#160;&#160;&#160;&#160;char cupsPageSizeName[64];<br />
-&#160;&#160;&#160;&#160;float cupsPageSize[2];<br />
-&#160;&#160;&#160;&#160;float cupsReal[16];<br />
-&#160;&#160;&#160;&#160;char cupsRenderingIntent[64];<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowCount;<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowFeed;<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowStep;<br />
-&#160;&#160;&#160;&#160;char cupsString[16][64];<br />
-&#160;&#160;&#160;&#160;unsigned cupsWidth;<br />
+<p class="code">struct cups_page_header2_s {<br>
+&#160;&#160;&#160;&#160;unsigned AdvanceDistance;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
+&#160;&#160;&#160;&#160;unsigned HWResolution[2];<br>
+&#160;&#160;&#160;&#160;unsigned ImagingBoundingBox[4];<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
+&#160;&#160;&#160;&#160;unsigned Margins[2];<br>
+&#160;&#160;&#160;&#160;char MediaClass[64];<br>
+&#160;&#160;&#160;&#160;char MediaColor[64];<br>
+&#160;&#160;&#160;&#160;unsigned MediaPosition;<br>
+&#160;&#160;&#160;&#160;char MediaType[64];<br>
+&#160;&#160;&#160;&#160;unsigned MediaWeight;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
+&#160;&#160;&#160;&#160;unsigned NumCopies;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
+&#160;&#160;&#160;&#160;char OutputType[64];<br>
+&#160;&#160;&#160;&#160;unsigned PageSize[2];<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBitsPerColor;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBitsPerPixel;<br>
+&#160;&#160;&#160;&#160;float cupsBorderlessScalingFactor;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBytesPerLine;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
+&#160;&#160;&#160;&#160;unsigned cupsCompression;<br>
+&#160;&#160;&#160;&#160;unsigned cupsHeight;<br>
+&#160;&#160;&#160;&#160;float cupsImagingBBox[4];<br>
+&#160;&#160;&#160;&#160;unsigned cupsInteger[16];<br>
+&#160;&#160;&#160;&#160;char cupsMarkerType[64];<br>
+&#160;&#160;&#160;&#160;unsigned cupsMediaType;<br>
+&#160;&#160;&#160;&#160;unsigned cupsNumColors;<br>
+&#160;&#160;&#160;&#160;char cupsPageSizeName[64];<br>
+&#160;&#160;&#160;&#160;float cupsPageSize[2];<br>
+&#160;&#160;&#160;&#160;float cupsReal[16];<br>
+&#160;&#160;&#160;&#160;char cupsRenderingIntent[64];<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowCount;<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowFeed;<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowStep;<br>
+&#160;&#160;&#160;&#160;char cupsString[16][64];<br>
+&#160;&#160;&#160;&#160;unsigned cupsWidth;<br>
 };</p>
 <h4 class="members">Members</h4>
 <dl>
@@ -1132,46 +1133,46 @@ factor not applied) </dd>
 </dl>
 <h3 class="struct"><span class="info">&#160;DEPRECATED&#160;</span><a id="cups_page_header_s">cups_page_header_s</a></h3>
         <p class="description">Version 1 page header </p>
-<p class="code">struct cups_page_header_s {<br />
-&#160;&#160;&#160;&#160;unsigned AdvanceDistance;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br />
-&#160;&#160;&#160;&#160;unsigned HWResolution[2];<br />
-&#160;&#160;&#160;&#160;unsigned ImagingBoundingBox[4];<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br />
-&#160;&#160;&#160;&#160;unsigned Margins[2];<br />
-&#160;&#160;&#160;&#160;char MediaClass[64];<br />
-&#160;&#160;&#160;&#160;char MediaColor[64];<br />
-&#160;&#160;&#160;&#160;unsigned MediaPosition;<br />
-&#160;&#160;&#160;&#160;char MediaType[64];<br />
-&#160;&#160;&#160;&#160;unsigned MediaWeight;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br />
-&#160;&#160;&#160;&#160;unsigned NumCopies;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br />
-&#160;&#160;&#160;&#160;char OutputType[64];<br />
-&#160;&#160;&#160;&#160;unsigned PageSize[2];<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBitsPerColor;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBitsPerPixel;<br />
-&#160;&#160;&#160;&#160;unsigned cupsBytesPerLine;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br />
-&#160;&#160;&#160;&#160;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br />
-&#160;&#160;&#160;&#160;unsigned cupsCompression;<br />
-&#160;&#160;&#160;&#160;unsigned cupsHeight;<br />
-&#160;&#160;&#160;&#160;unsigned cupsMediaType;<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowCount;<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowFeed;<br />
-&#160;&#160;&#160;&#160;unsigned cupsRowStep;<br />
-&#160;&#160;&#160;&#160;unsigned cupsWidth;<br />
+<p class="code">struct cups_page_header_s {<br>
+&#160;&#160;&#160;&#160;unsigned AdvanceDistance;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
+&#160;&#160;&#160;&#160;unsigned HWResolution[2];<br>
+&#160;&#160;&#160;&#160;unsigned ImagingBoundingBox[4];<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
+&#160;&#160;&#160;&#160;unsigned Margins[2];<br>
+&#160;&#160;&#160;&#160;char MediaClass[64];<br>
+&#160;&#160;&#160;&#160;char MediaColor[64];<br>
+&#160;&#160;&#160;&#160;unsigned MediaPosition;<br>
+&#160;&#160;&#160;&#160;char MediaType[64];<br>
+&#160;&#160;&#160;&#160;unsigned MediaWeight;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
+&#160;&#160;&#160;&#160;unsigned NumCopies;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
+&#160;&#160;&#160;&#160;char OutputType[64];<br>
+&#160;&#160;&#160;&#160;unsigned PageSize[2];<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBitsPerColor;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBitsPerPixel;<br>
+&#160;&#160;&#160;&#160;unsigned cupsBytesPerLine;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&#160;&#160;&#160;&#160;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
+&#160;&#160;&#160;&#160;unsigned cupsCompression;<br>
+&#160;&#160;&#160;&#160;unsigned cupsHeight;<br>
+&#160;&#160;&#160;&#160;unsigned cupsMediaType;<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowCount;<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowFeed;<br>
+&#160;&#160;&#160;&#160;unsigned cupsRowStep;<br>
+&#160;&#160;&#160;&#160;unsigned cupsWidth;<br>
 };</p>
 <h4 class="members">Members</h4>
 <dl>

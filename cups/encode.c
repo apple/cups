@@ -1,7 +1,7 @@
 /*
  * Option encoding routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -331,6 +331,8 @@ static int	compare_ipp_options(_ipp_option_t *a, _ipp_option_t *b);
  * This function adds operation, job, and then subscription attributes,
  * in that order. Use the cupsEncodeOptions2() function to add attributes
  * for a single group.
+ *
+ * @exclude all@
  */
 
 void

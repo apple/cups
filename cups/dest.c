@@ -754,7 +754,7 @@ cupsConnectDest(
  * to by "cancel" is non-zero, or the callback function (or block) returns 0,
  * The caller is responsible for calling httpClose() on the returned object.
  *
- * @since CUPS 1.6/macOS 10.8@
+ * @since CUPS 1.6/macOS 10.8@ @exclude all@
  */
 
 http_t *				/* O - Connection to server or @code NULL@ */
@@ -1360,7 +1360,7 @@ cupsEnumDests(
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the block returns 0.
  *
- * @since CUPS 1.6/macOS 10.8@
+ * @since CUPS 1.6/macOS 10.8@ @exclude all@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1946,6 +1946,8 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
  *
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
+ *
+ * @exclude all@
  */
 
 int					/* O - Number of destinations */
@@ -1969,7 +1971,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
  *
- * @since CUPS 1.1.21/macOS 10.4@
+ * @since CUPS 1.1.21/macOS 10.4@ @exclude all@
  */
 
 int					/* O - Number of destinations */
@@ -3338,6 +3340,8 @@ cups_dnssd_local_cb(
  * Note: This function is needed because avahi_simple_poll_iterate is broken
  *       and always uses a timeout of 0 (!) milliseconds.
  *       (Avahi Ticket #364)
+ *
+ * @private@
  */
 
 static int				/* O - Number of file descriptors matching */
