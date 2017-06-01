@@ -1,7 +1,7 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -397,7 +397,7 @@ httpCredentialsAreValidForName(
         for (i = 0; i < count; i ++)
 	{
 	  rserial_size = sizeof(rserial);
-          if (!gnutls_x509_crl_get_crt_serial(tls_crl, i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+          if (!gnutls_x509_crl_get_crt_serial(tls_crl, (unsigned)i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
 	  {
 	    result = 0;
 	    break;
