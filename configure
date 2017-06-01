@@ -2637,6 +2637,12 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 host_os_name=`echo $host_os | sed -e '1,$s/[0-9.]*$//g'`
 host_os_version=`echo $host_os | sed -e '1,$s/^[^0-9.]*//g' | awk -F. '{print $1 $2}'`
+if test "x$host_os_version" = x; then
+        host_os_version="0"
+fi
+echo "host_os=$host_os"
+echo "host_os_name=$host_os_name"
+echo "host_os_version=$host_os_version"
 
 if test "$host_os_name" = darwin -a $host_os_version -lt 120; then
         as_fn_error $? "Sorry, this version of CUPS requires macOS 10.8 or higher." "$LINENO" 5
@@ -9491,6 +9497,7 @@ fi
 if test "${with_bundledir+set}" = set; then :
   withval=$with_bundledir; CUPS_BUNDLEDIR="$withval"
 else
+  echo "host_os_version=$host_os_version"
   if test "x$host_os_name" = xdarwin -a $host_os_version -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
 		LANGUAGES=""

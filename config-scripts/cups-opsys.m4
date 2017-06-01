@@ -17,6 +17,10 @@ AC_CANONICAL_HOST
 
 [host_os_name=`echo $host_os | sed -e '1,$s/[0-9.]*$//g'`]
 [host_os_version=`echo $host_os | sed -e '1,$s/^[^0-9.]*//g' | awk -F. '{print $1 $2}'`]
+# Linux often does not yield an OS version we can use...
+if test "x$host_os_version" = x; then
+        host_os_version="0"
+fi
 
 if test "$host_os_name" = darwin -a $host_os_version -lt 120; then
         AC_MSG_ERROR([Sorry, this version of CUPS requires macOS 10.8 or higher.])

@@ -30,6 +30,13 @@ Windows, and either MIT (1.6.3 or higher) or Heimdal Kerberos for Kerberos
 support.  CUPS will compile and run without these, however you'll miss out on
 many of the features provided by CUPS.
 
+On a stock Ubuntu install, the following command will install the required
+prerequisites:
+
+    sudo apt-get install autoconf build-essential libavahi-client-dev \
+         libgnutls28-dev libkrb5-dev libnss-mdns libpam-dev \
+         libsystemd-dev libusb-1.0-0-dev zlib1g-dev
+
 Also, please note that CUPS does not include print filters to support PDF or
 raster printing.  You *must* download GPL Ghostscript and/or the Open Printing
 CUPS filters package separately to print on operating systems other than macOS.
