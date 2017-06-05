@@ -1,4 +1,4 @@
-CHANGES - 2.2.4 - 2017-05-31
+CHANGES - 2.2.4 - 2017-06-05
 ============================
 
 CHANGES IN CUPS V2.2.4
@@ -23,6 +23,7 @@ CHANGES IN CUPS V2.2.4
 - The `lp` and `lpr` commands now support printing to network printers that
   haven't yet been added (Issue #5006)
 - Fixed a typo in the mime.types file.
+- Fixed a bug in the Spanish web interface template (Issue #5016)
 
 
 CHANGES IN CUPS V2.2.3
