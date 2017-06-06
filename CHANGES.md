@@ -4,7 +4,7 @@ CHANGES - 2.2.4 - 2017-06-05
 CHANGES IN CUPS V2.2.4
 ----------------------
 
-- The scheduler did not remote old job files (Issue #4987)
+- The scheduler did not remove old job files (Issue #4987)
 - cupsEnumDests did not return early when all printers had been discovered
   (Issue #4989)
 - The CUPS build system now supports cross-compilation (Issue #4897)
