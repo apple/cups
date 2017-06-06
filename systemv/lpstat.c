@@ -250,9 +250,14 @@ main(int  argc,				/* I - Number of command-line arguments */
                 for (j = num_temp, dest = temp; j > 0; j --, dest ++)
                 {
                   if (dest->instance)
-                    printf("%s/%s\n", dest->name, dest->instance);
+                    printf("%s/%s", dest->name, dest->instance);
                   else
-                    puts(dest->name);
+                    fputs(dest->name, stdout);
+
+                  if (long_status)
+                    printf(" %s\n", cupsGetOption("device-uri", dest->num_options, dest->options));
+                  else
+                    putchar('\n');
                 }
 
                 cupsFreeDests(num_temp, temp);
