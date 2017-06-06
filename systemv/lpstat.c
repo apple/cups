@@ -77,7 +77,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
-	switch (argv[i][1])
+	switch (*opt)
 	{
 	  case 'D' : /* Show description */
 	      long_status = 1;
@@ -257,7 +257,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
                 cupsFreeDests(num_temp, temp);
               }
-
               break;
 
 	  case 'f' : /* Show forms */
