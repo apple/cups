@@ -197,6 +197,10 @@ can have any of the following constant (bit) values set:
 
 The callback function returns 0 to stop enumeration or 1 to continue.
 
+> Note that the callback function will likely be called multiple times for the
+> same destination, so it is up to the caller to suppress any duplicate
+> destinations.
+
 The following example shows how to use `cupsEnumDests` to get a filtered array
 of destinations:
 

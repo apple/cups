@@ -941,6 +941,9 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the callback function returns 0.
  *
+ * Note: The callback function will likely receive multiple updates for the same
+ * destinations - it is up to the caller to suppress any duplicate destinations.
+ *
  * @since CUPS 1.6/macOS 10.8@
  */
 
@@ -1359,6 +1362,9 @@ cupsEnumDests(
  *
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the block returns 0.
+ *
+ * Note: The block will likely receive multiple updates for the same
+ * destinations - it is up to the caller to suppress any duplicate destinations.
  *
  * @since CUPS 1.6/macOS 10.8@ @exclude all@
  */
