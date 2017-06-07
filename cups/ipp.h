@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -208,7 +208,7 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
 typedef enum ipp_finishings_e ipp_finish_t;
 #  endif /* !_CUPS_NO_DEPRECATED */
 
-typedef enum ipp_jcollate_e		/**** Job collation types ****/
+typedef enum ipp_jcollate_e		/**** Job collation types @deprecated@ @exclude all@ ****/
 {
   IPP_JCOLLATE_UNCOLLATED_SHEETS = 3,
   IPP_JCOLLATE_COLLATED_DOCUMENTS,
@@ -248,98 +248,98 @@ typedef enum ipp_op_e			/**** IPP operations ****/
 {
   IPP_OP_CUPS_INVALID = -1,		/* Invalid operation name for @link ippOpValue@ */
   IPP_OP_CUPS_NONE = 0,			/* No operation @private@ */
-  IPP_OP_PRINT_JOB = 0x0002,		/* Print a single file */
-  IPP_OP_PRINT_URI,			/* Print a single URL */
-  IPP_OP_VALIDATE_JOB,			/* Validate job options */
-  IPP_OP_CREATE_JOB,			/* Create an empty print job */
-  IPP_OP_SEND_DOCUMENT,			/* Add a file to a job */
-  IPP_OP_SEND_URI,			/* Add a URL to a job */
-  IPP_OP_CANCEL_JOB,			/* Cancel a job */
-  IPP_OP_GET_JOB_ATTRIBUTES,		/* Get job attributes */
-  IPP_OP_GET_JOBS,			/* Get a list of jobs */
-  IPP_OP_GET_PRINTER_ATTRIBUTES,	/* Get printer attributes */
-  IPP_OP_HOLD_JOB,			/* Hold a job for printing */
-  IPP_OP_RELEASE_JOB,			/* Release a job for printing */
-  IPP_OP_RESTART_JOB,			/* Reprint a job */
-  IPP_OP_PAUSE_PRINTER = 0x0010,	/* Stop a printer */
-  IPP_OP_RESUME_PRINTER,		/* Start a printer */
-  IPP_OP_PURGE_JOBS,			/* Cancel all jobs */
-  IPP_OP_SET_PRINTER_ATTRIBUTES,	/* Set printer attributes */
-  IPP_OP_SET_JOB_ATTRIBUTES,		/* Set job attributes */
-  IPP_OP_GET_PRINTER_SUPPORTED_VALUES,	/* Get supported attribute values */
-  IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS,	/* Create one or more printer subscriptions @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_CREATE_JOB_SUBSCRIPTIONS,	/* Create one of more job subscriptions @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_SEND_NOTIFICATIONS,		/* Send notification events @private@ */
-  IPP_OP_GET_RESOURCE_ATTRIBUTES,	/* Get resource attributes @private@ */
-  IPP_OP_GET_RESOURCE_DATA,		/* Get resource data @private@ */
-  IPP_OP_GET_RESOURCES,			/* Get list of resources @private@ */
-  IPP_OP_GET_PRINT_SUPPORT_FILES,	/* Get printer support files @private@ */
-  IPP_OP_ENABLE_PRINTER,		/* Start a printer */
-  IPP_OP_DISABLE_PRINTER,		/* Stop a printer */
+  IPP_OP_PRINT_JOB = 0x0002,		/* Print-Job: Print a single file */
+  IPP_OP_PRINT_URI,			/* Print-URI: Print a single URL @exclude all@ */
+  IPP_OP_VALIDATE_JOB,			/* Validate-Job: Validate job values prior to submission */
+  IPP_OP_CREATE_JOB,			/* Create-Job: Create an empty print job */
+  IPP_OP_SEND_DOCUMENT,			/* Send-Document: Add a file to a job */
+  IPP_OP_SEND_URI,			/* Send-URI: Add a URL to a job @exclude all@ */
+  IPP_OP_CANCEL_JOB,			/* Cancel-Job: Cancel a job */
+  IPP_OP_GET_JOB_ATTRIBUTES,		/* Get-Job-Attribute: Get information about a job */
+  IPP_OP_GET_JOBS,			/* Get-Jobs: Get a list of jobs */
+  IPP_OP_GET_PRINTER_ATTRIBUTES,	/* Get-Printer-Attributes: Get information about a printer */
+  IPP_OP_HOLD_JOB,			/* Hold-Job: Hold a job for printing */
+  IPP_OP_RELEASE_JOB,			/* Release-Job: Release a job for printing */
+  IPP_OP_RESTART_JOB,			/* Restart-Job: Reprint a job @deprecated@ */
+  IPP_OP_PAUSE_PRINTER = 0x0010,	/* Pause-Printer: Stop a printer */
+  IPP_OP_RESUME_PRINTER,		/* Resume-Printer: Start a printer */
+  IPP_OP_PURGE_JOBS,			/* Purge-Jobs: Delete all jobs @deprecated@ @exclude all@ */
+  IPP_OP_SET_PRINTER_ATTRIBUTES,	/* Set-Printer-Attributes: Set printer values */
+  IPP_OP_SET_JOB_ATTRIBUTES,		/* Set-Job-Attributes: Set job values */
+  IPP_OP_GET_PRINTER_SUPPORTED_VALUES,	/* Get-Printer-Supported-Values: Get supported values */
+  IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS,	/* Create-Printer-Subscriptions: Create one or more printer subscriptions @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_CREATE_JOB_SUBSCRIPTIONS,	/* Create-Job-Subscriptions: Create one of more job subscriptions @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get-Subscription-Attributes: Get subscription information @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_GET_SUBSCRIPTIONS,		/* Get-Subscriptions: Get list of subscriptions @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_RENEW_SUBSCRIPTION,		/* Renew-Subscription: Renew a printer subscription @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_CANCEL_SUBSCRIPTION,		/* Cancel-Subscription: Cancel a subscription @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_GET_NOTIFICATIONS,		/* Get-Notifications: Get notification events @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_SEND_NOTIFICATIONS,		/* Send-Notifications: Send notification events @private@ */
+  IPP_OP_GET_RESOURCE_ATTRIBUTES,	/* Get-Resource-Attributes: Get resource information @private@ */
+  IPP_OP_GET_RESOURCE_DATA,		/* Get-Resource-Data: Get resource data @private@ */
+  IPP_OP_GET_RESOURCES,			/* Get-Resources: Get list of resources @private@ */
+  IPP_OP_GET_PRINT_SUPPORT_FILES,	/* Get-Printer-Support-Files: Get printer support files @private@ */
+  IPP_OP_ENABLE_PRINTER,		/* Enable-Printer: Accept new jobs for a printer */
+  IPP_OP_DISABLE_PRINTER,		/* Disable-Printer: Reject new jobs for a printer */
   IPP_OP_PAUSE_PRINTER_AFTER_CURRENT_JOB,
-					/* Stop printer after the current job */
-  IPP_OP_HOLD_NEW_JOBS,			/* Hold new jobs */
-  IPP_OP_RELEASE_HELD_NEW_JOBS,		/* Release new jobs */
-  IPP_OP_DEACTIVATE_PRINTER,		/* Stop a printer */
-  IPP_OP_ACTIVATE_PRINTER,		/* Start a printer */
-  IPP_OP_RESTART_PRINTER,		/* Restart a printer */
-  IPP_OP_SHUTDOWN_PRINTER,		/* Turn a printer off */
-  IPP_OP_STARTUP_PRINTER,		/* Turn a printer on */
-  IPP_OP_REPROCESS_JOB,			/* Reprint a job */
-  IPP_OP_CANCEL_CURRENT_JOB,		/* Cancel the current job */
-  IPP_OP_SUSPEND_CURRENT_JOB,		/* Suspend the current job */
-  IPP_OP_RESUME_JOB,			/* Resume the current job */
-  IPP_OP_PROMOTE_JOB,			/* Promote a job to print sooner */
-  IPP_OP_SCHEDULE_JOB_AFTER,		/* Schedule a job to print after another */
-  IPP_OP_CANCEL_DOCUMENT = 0x0033,	/* Cancel-Document */
-  IPP_OP_GET_DOCUMENT_ATTRIBUTES,	/* Get-Document-Attributes */
-  IPP_OP_GET_DOCUMENTS,			/* Get-Documents */
-  IPP_OP_DELETE_DOCUMENT,		/* Delete-Document */
-  IPP_OP_SET_DOCUMENT_ATTRIBUTES,	/* Set-Document-Attributes */
-  IPP_OP_CANCEL_JOBS,			/* Cancel-Jobs */
-  IPP_OP_CANCEL_MY_JOBS,		/* Cancel-My-Jobs */
-  IPP_OP_RESUBMIT_JOB,			/* Resubmit-Job */
-  IPP_OP_CLOSE_JOB,			/* Close-Job */
-  IPP_OP_IDENTIFY_PRINTER,		/* Identify-Printer */
-  IPP_OP_VALIDATE_DOCUMENT,		/* Validate-Document */
-  IPP_OP_ADD_DOCUMENT_IMAGES,		/* Add-Document-Images */
-  IPP_OP_ACKNOWLEDGE_DOCUMENT,		/* Acknowledge-Document */
-  IPP_OP_ACKNOWLEDGE_IDENTIFY_PRINTER,	/* Acknowledge-Identify-Printer */
-  IPP_OP_ACKNOWLEDGE_JOB,		/* Acknowledge-Job */
-  IPP_OP_FETCH_DOCUMENT,		/* Fetch-Document */
-  IPP_OP_FETCH_JOB,			/* Fetch-Job */
-  IPP_OP_GET_OUTPUT_DEVICE_ATTRIBUTES,	/* Get-Output-Device-Attributes */
-  IPP_OP_UPDATE_ACTIVE_JOBS,		/* Update-Active-Jobs */
-  IPP_OP_DEREGISTER_OUTPUT_DEVICE,	/* Deregister-Output-Device */
-  IPP_OP_UPDATE_DOCUMENT_STATUS,	/* Update-Document-Status */
-  IPP_OP_UPDATE_JOB_STATUS,		/* Update-Job-Status */
+					/* Pause-Printer-After-Current-Job: Stop printer after the current job */
+  IPP_OP_HOLD_NEW_JOBS,			/* Hold-New-Jobs: Hold new jobs */
+  IPP_OP_RELEASE_HELD_NEW_JOBS,		/* Release-Held-New-Jobs: Release new jobs that were previously held */
+  IPP_OP_DEACTIVATE_PRINTER,		/* Deactivate-Printer: Stop a printer and do not accept jobs @deprecated@ @exclude all@ */
+  IPP_OP_ACTIVATE_PRINTER,		/* Activate-Printer: Start a printer and accept jobs @deprecated@ @exclude all@ */
+  IPP_OP_RESTART_PRINTER,		/* Restart-Printer: Restart a printer @exclude all@ */
+  IPP_OP_SHUTDOWN_PRINTER,		/* Shutdown-Printer: Turn a printer off @exclude all@ */
+  IPP_OP_STARTUP_PRINTER,		/* Startup-Printer: Turn a printer on @exclude all@ */
+  IPP_OP_REPROCESS_JOB,			/* Reprocess-Job: Reprint a job @deprecated@ @exclude all@*/
+  IPP_OP_CANCEL_CURRENT_JOB,		/* Cancel-Current-Job: Cancel the current job */
+  IPP_OP_SUSPEND_CURRENT_JOB,		/* Suspend-Current-Job: Suspend the current job */
+  IPP_OP_RESUME_JOB,			/* Resume-Job: Resume the current job */
+  IPP_OP_PROMOTE_JOB,			/* Promote-Job: Promote a job to print sooner */
+  IPP_OP_SCHEDULE_JOB_AFTER,		/* Schedule-Job-After: Schedule a job to print after another */
+  IPP_OP_CANCEL_DOCUMENT = 0x0033,	/* Cancel-Document: Cancel a document @exclude all@ */
+  IPP_OP_GET_DOCUMENT_ATTRIBUTES,	/* Get-Document-Attributes: Get document information @exclude all@ */
+  IPP_OP_GET_DOCUMENTS,			/* Get-Documents: Get a list of documents in a job @exclude all@ */
+  IPP_OP_DELETE_DOCUMENT,		/* Delete-Document: Delete a document @deprecated@  @exclude all@ */
+  IPP_OP_SET_DOCUMENT_ATTRIBUTES,	/* Set-Document-Attributes: Set document values @exclude all@ */
+  IPP_OP_CANCEL_JOBS,			/* Cancel-Jobs: Cancel all jobs (administrative) */
+  IPP_OP_CANCEL_MY_JOBS,		/* Cancel-My-Jobs: Cancel a user's jobs */
+  IPP_OP_RESUBMIT_JOB,			/* Resubmit-Job: Copy and reprint a job @exclude all@ */
+  IPP_OP_CLOSE_JOB,			/* Close-Job: Close a job and start printing */
+  IPP_OP_IDENTIFY_PRINTER,		/* Identify-Printer: Make the printer beep, flash, or display a message for identification */
+  IPP_OP_VALIDATE_DOCUMENT,		/* Validate-Document: Validate document values prior to submission @exclude all@ */
+  IPP_OP_ADD_DOCUMENT_IMAGES,		/* Add-Document-Images: Add image(s) from the specified scanner source @exclude all@ */
+  IPP_OP_ACKNOWLEDGE_DOCUMENT,		/* Acknowledge-Document: Acknowledge processing of a document @exclude all@ */
+  IPP_OP_ACKNOWLEDGE_IDENTIFY_PRINTER,	/* Acknowledge-Identify-Printer: Acknowledge action on an Identify-Printer request @exclude all@ */
+  IPP_OP_ACKNOWLEDGE_JOB,		/* Acknowledge-Job: Acknowledge processing of a job @exclude all@ */
+  IPP_OP_FETCH_DOCUMENT,		/* Fetch-Document: Fetch a document for processing @exclude all@ */
+  IPP_OP_FETCH_JOB,			/* Fetch-Job: Fetch a job for processing @exclude all@ */
+  IPP_OP_GET_OUTPUT_DEVICE_ATTRIBUTES,	/* Get-Output-Device-Attributes: Get printer information for a specific output device @exclude all@ */
+  IPP_OP_UPDATE_ACTIVE_JOBS,		/* Update-Active-Jobs: Update the list of active jobs that a proxy has processed @exclude all@ */
+  IPP_OP_DEREGISTER_OUTPUT_DEVICE,	/* Deregister-Output-Device: Remove an output device @exclude all@ */
+  IPP_OP_UPDATE_DOCUMENT_STATUS,	/* Update-Document-Status: Update document values @exclude all@ */
+  IPP_OP_UPDATE_JOB_STATUS,		/* Update-Job-Status: Update job values @exclude all@ */
   IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES,
-					/* Update-Output-Device-Attributes */
-  IPP_OP_GET_NEXT_DOCUMENT_DATA,	/* Get-Next-Document-Data */
+					/* Update-Output-Device-Attributes: Update output device values @exclude all@ */
+  IPP_OP_GET_NEXT_DOCUMENT_DATA,	/* Get-Next-Document-Data: Scan more document data @exclude all@ */
 
   IPP_OP_PRIVATE = 0x4000,		/* Reserved @private@ */
-  IPP_OP_CUPS_GET_DEFAULT,		/* Get the default printer */
-  IPP_OP_CUPS_GET_PRINTERS,		/* Get a list of printers and/or classes */
-  IPP_OP_CUPS_ADD_MODIFY_PRINTER,	/* Add or modify a printer */
-  IPP_OP_CUPS_DELETE_PRINTER,		/* Delete a printer */
-  IPP_OP_CUPS_GET_CLASSES,		/* Get a list of classes @deprecated@ */
-  IPP_OP_CUPS_ADD_MODIFY_CLASS,		/* Add or modify a class */
-  IPP_OP_CUPS_DELETE_CLASS,		/* Delete a class */
-  IPP_OP_CUPS_ACCEPT_JOBS,		/* Accept new jobs on a printer */
-  IPP_OP_CUPS_REJECT_JOBS,		/* Reject new jobs on a printer */
-  IPP_OP_CUPS_SET_DEFAULT,		/* Set the default printer */
-  IPP_OP_CUPS_GET_DEVICES,		/* Get a list of supported devices @deprecated@ */
-  IPP_OP_CUPS_GET_PPDS,			/* Get a list of supported drivers @deprecated@ */
-  IPP_OP_CUPS_MOVE_JOB,			/* Move a job to a different printer */
-  IPP_OP_CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/macOS 10.5@ */
-  IPP_OP_CUPS_GET_PPD,			/* Get a PPD file @deprecated@ */
-  IPP_OP_CUPS_GET_DOCUMENT = 0x4027,	/* Get a document file @since CUPS 1.4/macOS 10.6@ */
-  IPP_OP_CUPS_CREATE_LOCAL_PRINTER	/* Create a local (temporary) printer @since CUPS 2.2@ */
+  IPP_OP_CUPS_GET_DEFAULT,		/* CUPS-Get-Default: Get the default printer */
+  IPP_OP_CUPS_GET_PRINTERS,		/* CUPS-Get-Printers: Get a list of printers and/or classes */
+  IPP_OP_CUPS_ADD_MODIFY_PRINTER,	/* CUPS-Add-Modify-Printer: Add or modify a printer */
+  IPP_OP_CUPS_DELETE_PRINTER,		/* CUPS-Delete-Printer: Delete a printer */
+  IPP_OP_CUPS_GET_CLASSES,		/* CUPS-Get-Classes: Get a list of classes @deprecated@ @exclude all@ */
+  IPP_OP_CUPS_ADD_MODIFY_CLASS,		/* CUPS-Add-Modify-Class: Add or modify a class */
+  IPP_OP_CUPS_DELETE_CLASS,		/* CUPS-Delete-Class: Delete a class */
+  IPP_OP_CUPS_ACCEPT_JOBS,		/* CUPS-Accept-Jobs: Accept new jobs on a printer @exclude all@ */
+  IPP_OP_CUPS_REJECT_JOBS,		/* CUPS-Reject-Jobs: Reject new jobs on a printer @exclude all@ */
+  IPP_OP_CUPS_SET_DEFAULT,		/* CUPS-Set-Default: Set the default printer */
+  IPP_OP_CUPS_GET_DEVICES,		/* CUPS-Get-Devices: Get a list of supported devices @deprecated@ */
+  IPP_OP_CUPS_GET_PPDS,			/* CUPS-Get-PPDs: Get a list of supported drivers @deprecated@ */
+  IPP_OP_CUPS_MOVE_JOB,			/* CUPS-Move-Job: Move a job to a different printer */
+  IPP_OP_CUPS_AUTHENTICATE_JOB,		/* CUPS-Authenticate-Job: Authenticate a job @since CUPS 1.2/macOS 10.5@ */
+  IPP_OP_CUPS_GET_PPD,			/* CUPS-Get-PPD: Get a PPD file @deprecated@ */
+  IPP_OP_CUPS_GET_DOCUMENT = 0x4027,	/* CUPS-Get-Document: Get a document file @since CUPS 1.4/macOS 10.6@ */
+  IPP_OP_CUPS_CREATE_LOCAL_PRINTER	/* CUPS-Create-Local-Printer: Create a local (temporary) printer @since CUPS 2.2@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_PRINT_JOB			IPP_OP_PRINT_JOB
@@ -364,7 +364,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
 #    define IPP_CREATE_PRINTER_SUBSCRIPTION	IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS
 #    define IPP_CREATE_JOB_SUBSCRIPTION		IPP_OP_CREATE_JOB_SUBSCRIPTIONS
 #    define IPP_OP_CREATE_PRINTER_SUBSCRIPTION	IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS
-#    define IPP_OP_CREATE_JOB_SUBSCRIPTION		IPP_OP_CREATE_JOB_SUBSCRIPTIONS
+#    define IPP_OP_CREATE_JOB_SUBSCRIPTION	IPP_OP_CREATE_JOB_SUBSCRIPTIONS
 #    define IPP_GET_SUBSCRIPTION_ATTRIBUTES	IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES
 #    define IPP_GET_SUBSCRIPTIONS		IPP_OP_GET_SUBSCRIPTIONS
 #    define IPP_RENEW_SUBSCRIPTION		IPP_OP_RENEW_SUBSCRIPTION
@@ -498,7 +498,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_STATUS_OK_EVENTS_COMPLETE,	/* successful-ok-events-complete */
   IPP_STATUS_REDIRECTION_OTHER_SITE = 0x0200,
 					/* redirection-other-site @private@ */
-  IPP_STATUS_CUPS_SEE_OTHER = 0x0280,	/* cups-see-other */
+  IPP_STATUS_CUPS_SEE_OTHER = 0x0280,	/* cups-see-other @private@ */
   IPP_STATUS_ERROR_BAD_REQUEST = 0x0400,/* client-error-bad-request */
   IPP_STATUS_ERROR_FORBIDDEN,		/* client-error-forbidden */
   IPP_STATUS_ERROR_NOT_AUTHENTICATED,	/* client-error-not-authenticated */
@@ -574,7 +574,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED = 0x1000,
 					/* cups-authentication-canceled - Authentication canceled by user @since CUPS 1.5/macOS 10.7@ */
   IPP_STATUS_ERROR_CUPS_PKI,		/* cups-pki-error - Error negotiating a secure connection @since CUPS 1.5/macOS 10.7@ */
-  IPP_STATUS_ERROR_CUPS_UPGRADE_REQUIRED/* cups-upgrade-required - TLS upgrade required */
+  IPP_STATUS_ERROR_CUPS_UPGRADE_REQUIRED/* cups-upgrade-required - TLS upgrade required @since CUPS 1.5/macOS 10.7@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_OK				IPP_STATUS_OK
