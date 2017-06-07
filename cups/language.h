@@ -32,7 +32,7 @@ extern "C" {
  * Types...
  */
 
-typedef enum cups_encoding_e		/**** Language Encodings ****/
+typedef enum cups_encoding_e		/**** Language Encodings @exclude all@ ****/
 {
   CUPS_AUTO_ENCODING = -1,		/* Auto-detect the encoding @private@ */
   CUPS_US_ASCII,			/* US ASCII */

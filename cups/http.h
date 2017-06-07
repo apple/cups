@@ -1,7 +1,7 @@
 /*
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -109,7 +109,7 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum http_auth_e		/**** HTTP authentication types ****/
+typedef enum http_auth_e		/**** HTTP authentication types @exclude all@ ****/
 {
   HTTP_AUTH_NONE,			/* No authentication in use */
   HTTP_AUTH_BASIC,			/* Basic authentication in use */
@@ -393,7 +393,7 @@ typedef enum http_uri_coding_e		/**** URI en/decode flags ****/
   HTTP_URI_CODING_RFC6874 = 16		/* Use RFC 6874 address format */
 } http_uri_coding_t;
 
-typedef enum http_version_e		/**** HTTP version numbers ****/
+typedef enum http_version_e		/**** HTTP version numbers @exclude all@ ****/
 {
   HTTP_VERSION_0_9 = 9,			/* HTTP/0.9 */
   HTTP_VERSION_1_0 = 100,		/* HTTP/1.0 */
@@ -427,6 +427,7 @@ typedef struct http_addrlist_s		/**** Socket address list, which is
 					 **** used to enumerate all of the
 					 **** addresses that are associated
 					 **** with a hostname. @since CUPS 1.2/macOS 10.5@
+                                         **** @exclude all@
 					 ****/
 {
   struct http_addrlist_s *next;		/* Pointer to next address in list */
@@ -435,7 +436,7 @@ typedef struct http_addrlist_s		/**** Socket address list, which is
 
 typedef struct _http_s http_t;		/**** HTTP connection type ****/
 
-typedef struct http_credential_s	/**** HTTP credential data @since CUPS 1.5/macOS 10.7@ ****/
+typedef struct http_credential_s	/**** HTTP credential data @since CUPS 1.5/macOS 10.7@ @exclude all@ ****/
 {
   void		*data;			/* Pointer to credential data */
   size_t	datalen;		/* Credential length */

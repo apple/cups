@@ -234,10 +234,10 @@ enum cups_ptype_e			/* Printer type/capability bit
 					 * @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was discovered @since CUPS 1.2/macOS 10.5@ */
   CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device
-					 * @since CUPS 1.4/macOS 10.6@ */
+					 * @since CUPS 1.4/macOS 10.6@ @private@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities
-					 * @since CUPS 1.4/macOS 10.6@ */
-  CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @exclude all@ @deprecated@ */
+					 * @since CUPS 1.4/macOS 10.6@ @private@ */
+  CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @exclude all@ @private@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT |
 					 * DEFAULT | FAX | REJECTING | DELETE |
 					 * NOT_SHARED | AUTHENTICATED |

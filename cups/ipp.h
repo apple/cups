@@ -77,7 +77,7 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum ipp_dstate_e		/**** Document states ****/
+typedef enum ipp_dstate_e		/**** Document states @exclude all@ ****/
 {
   IPP_DOCUMENT_PENDING = 3,		/* Document is pending */
   IPP_DOCUMENT_PROCESSING = 5,		/* Document is processing */
@@ -94,10 +94,10 @@ typedef enum ipp_dstate_e		/**** Document states ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } ipp_dstate_t;
 
-typedef enum ipp_finishings_e		/**** Finishings ****/
+typedef enum ipp_finishings_e		/**** Finishings values ****/
 {
   IPP_FINISHINGS_NONE = 3,		/* No finishing */
-  IPP_FINISHINGS_STAPLE,		/* Staple (any location) */
+  IPP_FINISHINGS_STAPLE,		/* Staple (any location/method) */
   IPP_FINISHINGS_PUNCH,			/* Punch (any location/count) */
   IPP_FINISHINGS_COVER,			/* Add cover */
   IPP_FINISHINGS_BIND,			/* Bind */
@@ -169,38 +169,38 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
 
   /* CUPS extensions for finishings (pre-standard versions of values above) */
   IPP_FINISHINGS_CUPS_PUNCH_TOP_LEFT = 0x40000046,
-					/* Punch 1 hole top left */
-  IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_LEFT,/* Punch 1 hole bottom left */
-  IPP_FINISHINGS_CUPS_PUNCH_TOP_RIGHT,	/* Punch 1 hole top right */
+					/* Punch 1 hole top left @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_LEFT,/* Punch 1 hole bottom left @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_TOP_RIGHT,	/* Punch 1 hole top right @exclude all@ */
   IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_RIGHT,
-					/* Punch 1 hole bottom right */
-  IPP_FINISHINGS_CUPS_PUNCH_DUAL_LEFT,	/* Punch 2 holes left side */
-  IPP_FINISHINGS_CUPS_PUNCH_DUAL_TOP,	/* Punch 2 holes top edge */
-  IPP_FINISHINGS_CUPS_PUNCH_DUAL_RIGHT,	/* Punch 2 holes right side */
-  IPP_FINISHINGS_CUPS_PUNCH_DUAL_BOTTOM,/* Punch 2 holes bottom edge */
-  IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_LEFT,/* Punch 3 holes left side */
-  IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_TOP,	/* Punch 3 holes top edge */
+					/* Punch 1 hole bottom right @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_DUAL_LEFT,	/* Punch 2 holes left side @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_DUAL_TOP,	/* Punch 2 holes top edge @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_DUAL_RIGHT,	/* Punch 2 holes right side @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_DUAL_BOTTOM,/* Punch 2 holes bottom edge @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_LEFT,/* Punch 3 holes left side @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_TOP,	/* Punch 3 holes top edge @exclude all@ */
   IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_RIGHT,
-					/* Punch 3 holes right side */
+					/* Punch 3 holes right side @exclude all@ */
   IPP_FINISHINGS_CUPS_PUNCH_TRIPLE_BOTTOM,
-					/* Punch 3 holes bottom edge */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM,/* Punch 4 holes bottom edge */
+					/* Punch 3 holes bottom edge @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side @exclude all@ */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM,/* Punch 4 holes bottom edge @exclude all@ */
 
   IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN = 0x4000005A,
-					/* Accordian-fold the paper vertically into four sections */
-  IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
-  IPP_FINISHINGS_CUPS_FOLD_GATE,	/* Fold the top and bottom quarters of the paper towards the midline */
-  IPP_FINISHINGS_CUPS_FOLD_HALF,	/* Fold the paper in half vertically */
-  IPP_FINISHINGS_CUPS_FOLD_HALF_Z,	/* Fold the paper in half horizontally, then Z-fold the paper vertically */
-  IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE,	/* Fold the top quarter of the paper towards the midline */
-  IPP_FINISHINGS_CUPS_FOLD_LETTER,	/* Fold the paper into three sections vertically; sometimes also known as a C fold*/
-  IPP_FINISHINGS_CUPS_FOLD_PARALLEL,	/* Fold the paper in half vertically two times, yielding four sections */
-  IPP_FINISHINGS_CUPS_FOLD_POSTER,	/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold */
-  IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline */
-  IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z */
+					/* Accordian-fold the paper vertically into four sections @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_GATE,	/* Fold the top and bottom quarters of the paper towards the midline @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_HALF,	/* Fold the paper in half vertically @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_HALF_Z,	/* Fold the paper in half horizontally, then Z-fold the paper vertically @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE,	/* Fold the top quarter of the paper towards the midline @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_LETTER,	/* Fold the paper into three sections vertically; sometimes also known as a C fold @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_PARALLEL,	/* Fold the paper in half vertically two times, yielding four sections @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_POSTER,	/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z @exclude all@ */
 } ipp_finishings_t;
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_FINISHINGS_JOB_OFFSET	IPP_FINISHINGS_JOG_OFFSET
@@ -648,7 +648,7 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_SUBSCRIPTION,			/* Subscription group */
   IPP_TAG_EVENT_NOTIFICATION,		/* Event group */
   IPP_TAG_RESOURCE,			/* Resource group @private@ */
-  IPP_TAG_DOCUMENT,			/* Document group */
+  IPP_TAG_DOCUMENT,			/* Document group @exclude all@ */
   IPP_TAG_UNSUPPORTED_VALUE = 0x10,	/* Unsupported value */
   IPP_TAG_DEFAULT,			/* Default value */
   IPP_TAG_UNKNOWN,			/* Unknown value */
@@ -663,10 +663,10 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_DATE,				/* Date/time value */
   IPP_TAG_RESOLUTION,			/* Resolution value */
   IPP_TAG_RANGE,			/* Range value */
-  IPP_TAG_BEGIN_COLLECTION,		/* Beginning of collection value */
+  IPP_TAG_BEGIN_COLLECTION,		/* Beginning of collection value @exclude all@ */
   IPP_TAG_TEXTLANG,			/* Text-with-language value */
   IPP_TAG_NAMELANG,			/* Name-with-language value */
-  IPP_TAG_END_COLLECTION,		/* End of collection value */
+  IPP_TAG_END_COLLECTION,		/* End of collection value @exclude all@ */
   IPP_TAG_TEXT = 0x41,			/* Text value */
   IPP_TAG_NAME,				/* Name value */
   IPP_TAG_RESERVED_STRING,		/* Reserved for future string value @private@ */
@@ -676,8 +676,8 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_CHARSET,			/* Character set value */
   IPP_TAG_LANGUAGE,			/* Language value */
   IPP_TAG_MIMETYPE,			/* MIME media type value */
-  IPP_TAG_MEMBERNAME,			/* Collection member name value */
-  IPP_TAG_EXTENSION = 0x7f,		/* Extension point for 32-bit tags */
+  IPP_TAG_MEMBERNAME,			/* Collection member name value @exclude all@ */
+  IPP_TAG_EXTENSION = 0x7f,		/* Extension point for 32-bit tags @exclude all@ */
   IPP_TAG_CUPS_MASK = 0x7fffffff,	/* Mask for copied attribute values @private@ */
   /* The following expression is used to avoid compiler warnings with +/-0x80000000 */
   IPP_TAG_CUPS_CONST = -0x7fffffff-1	/* Bitflag for copied/const attribute values @private@ */
@@ -688,7 +688,7 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } ipp_tag_t;
 
-typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
+typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character @exclude all@ ****/
 typedef struct _ipp_s ipp_t;		/**** IPP request/response data ****/
 typedef struct _ipp_attribute_s ipp_attribute_t;
 					/**** IPP attribute ****/

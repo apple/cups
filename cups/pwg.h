@@ -1,7 +1,7 @@
 /*
  * PWG media API definitions for CUPS.
  *
- * Copyright 2009-2013 by Apple Inc.
+ * Copyright 2009-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -39,7 +39,7 @@ extern "C" {
  * Types and structures...
  */
 
-typedef struct pwg_map_s		/**** Map element - PPD to/from PWG */
+typedef struct pwg_map_s		/**** Map element - PPD to/from PWG @exclude all@ */
 {
   char		*pwg,			/* PWG media keyword */
 		*ppd;			/* PPD option keyword */
@@ -54,7 +54,7 @@ typedef struct pwg_media_s		/**** Common media size data ****/
 		length;			/* Length in 2540ths */
 } pwg_media_t;
 
-typedef struct pwg_size_s		/**** Size element - PPD to/from PWG */
+typedef struct pwg_size_s		/**** Size element - PPD to/from PWG @exclude all@ */
 {
   pwg_map_t	map;			/* Map element */
   int		width,			/* Width in 2540ths */

@@ -576,7 +576,7 @@ apihelp:
 		cupspm.xml \
 		auth.c cups.h dest*.c encode.c \
 		http.h http*.c ipp.h ipp*.c language.[ch] \
-		notify.c options.c pwg.h pwg-media.c \
+		notify.c options.c \
 		tls-darwin.c usersys.c util.c \
 		--coverimage cupspm.png \
 		--epub ../doc/help/cupspm.epub
