@@ -833,6 +833,8 @@ cupsFindDestSupported(
 /*
  * 'cupsFreeDestInfo()' - Free destination information obtained using
  *                        @link cupsCopyDestInfo@.
+ *
+ * @since CUPS 1.6/macOS 10.8@
  */
 
 void

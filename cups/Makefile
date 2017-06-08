@@ -574,10 +574,8 @@ apihelp:
 	$(RM) cupspm.xml
 	mxmldoc --section "Programming" --body cupspm.md \
 		cupspm.xml \
-		auth.c cups.h dest*.c encode.c \
-		http.h http*.c ipp.h ipp*.c language.[ch] \
-		notify.c options.c \
-		tls-darwin.c usersys.c util.c \
+		auth.c cups.h dest*.c encode.c http.h http*.c ipp.h ipp*.c \
+		options.c tls-darwin.c usersys.c util.c \
 		--coverimage cupspm.png \
 		--epub ../doc/help/cupspm.epub
 	mxmldoc --section "Programming" --body cupspm.md \

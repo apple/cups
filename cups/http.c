@@ -439,7 +439,7 @@ http_t *				/* O - New HTTP connection */
 httpConnect2(
     const char        *host,		/* I - Host to connect to */
     int               port,		/* I - Port number */
-    http_addrlist_t   *addrlist,	/* I - List of addresses or NULL to lookup */
+    http_addrlist_t   *addrlist,	/* I - List of addresses or @code NULL@ to lookup */
     int               family,		/* I - Address family to use or @code AF_UNSPEC@ for any */
     http_encryption_t encryption,	/* I - Type of encryption to use */
     int               blocking,		/* I - 1 for blocking connection, 0 for non-blocking */
@@ -609,7 +609,7 @@ httpFieldValue(const char *name)	/* I - String name */
 
 
 /*
- * 'httpFlush()' - Flush data from a HTTP connection.
+ * 'httpFlush()' - Flush data read from a HTTP connection.
  */
 
 void
@@ -679,7 +679,7 @@ httpFlush(http_t *http)			/* I - HTTP connection */
 
 
 /*
- * 'httpFlushWrite()' - Flush data in write buffer.
+ * 'httpFlushWrite()' - Flush data written to a HTTP connection.
  *
  * @since CUPS 1.2/macOS 10.5@
  */
@@ -751,7 +751,7 @@ httpGet(http_t     *http,		/* I - HTTP connection */
 /*
  * 'httpGetActivity()' - Get the most recent activity for a connection.
  *
- * The return value is the UNIX time of the last read or write.
+ * The return value is the time in seconds of the last read or write.
  *
  * @since CUPS 2.0/OS 10.10@
  */
@@ -766,10 +766,10 @@ httpGetActivity(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetAuthString()' - Get the current authorization string.
  *
- * The authorization string is set by cupsDoAuthentication() and
- * httpSetAuthString().  Use httpGetAuthString() to retrieve the
- * string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
- * value.
+ * The authorization string is set by @link cupsDoAuthentication@ and
+ * @link httpSetAuthString@.  Use @link httpGetAuthString@ to retrieve the
+ * string to use with @link httpSetField@ for the
+ * @code HTTP_FIELD_AUTHORIZATION@ value.
  *
  * @since CUPS 1.3/macOS 10.5@
  */
@@ -891,7 +891,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
  * @since CUPS 1.1.19/macOS 10.3@
  */
 
-const char *				/* O - Cookie data or NULL */
+const char *				/* O - Cookie data or @code NULL@ */
 httpGetCookie(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->cookie : NULL);
@@ -1150,7 +1150,7 @@ httpGetRemaining(http_t *http)		/* I - HTTP connection */
  * 'httpGets()' - Get a line of text from a HTTP connection.
  */
 
-char *					/* O - Line or NULL */
+char *					/* O - Line or @code NULL@ */
 httpGets(char   *line,			/* I - Line to read into */
          int    length,			/* I - Max length of buffer */
 	 http_t *http)			/* I - HTTP connection */
@@ -1349,7 +1349,7 @@ httpGetStatus(http_t *http)		/* I - HTTP connection */
  * @deprecated@ @exclude all@
  */
 
-char *					/* O - Value or NULL */
+char *					/* O - Value or @code NULL@ */
 httpGetSubField(http_t       *http,	/* I - HTTP connection */
                 http_field_t field,	/* I - Field index */
                 const char   *name,	/* I - Name of sub-field */
@@ -1365,7 +1365,7 @@ httpGetSubField(http_t       *http,	/* I - HTTP connection */
  * @since CUPS 1.2/macOS 10.5@
  */
 
-char *					/* O - Value or NULL */
+char *					/* O - Value or @code NULL@ */
 httpGetSubField2(http_t       *http,	/* I - HTTP connection */
                  http_field_t field,	/* I - Field index */
                  const char   *name,	/* I - Name of sub-field */
@@ -1616,7 +1616,7 @@ httpOptions(http_t     *http,		/* I - HTTP connection */
  *
  * This function copies available data from the given HTTP connection, reading
  * a buffer as needed.  The data is still available for reading using
- * @link httpRead@ or @link httpRead2@.
+ * @link httpRead2@.
  *
  * For non-blocking connections the usual timeouts apply.
  *
@@ -2467,9 +2467,10 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
  * 'httpSetAuthString()' - Set the current authorization string.
  *
  * This function just stores a copy of the current authorization string in
- * the HTTP connection object.  You must still call httpSetField() to set
- * HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
- * httpHead(), httpOptions(), httpPost, or httpPut().
+ * the HTTP connection object.  You must still call @link httpSetField@ to set
+ * @code HTTP_FIELD_AUTHORIZATION@ prior to issuing a HTTP request using
+ * @link httpGet@, @link httpHead@, @link httpOptions@, @link httpPost@, or
+ * @link httpPut@.
  *
  * @since CUPS 1.3/macOS 10.5@
  */
@@ -2820,7 +2821,7 @@ httpSetTimeout(
     http_t            *http,		/* I - HTTP connection */
     double            timeout,		/* I - Number of seconds for timeout,
                                                must be greater than 0 */
-    http_timeout_cb_t cb,		/* I - Callback function or NULL */
+    http_timeout_cb_t cb,		/* I - Callback function or @code NULL@ */
     void              *user_data)	/* I - User data pointer */
 {
   if (!http || timeout <= 0.0)
@@ -2864,6 +2865,8 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
 
 /*
  * 'httpTrace()' - Send an TRACE request to the server.
+ *
+ * @exclude all@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -3898,7 +3901,7 @@ static http_t *				/* O - HTTP connection */
 http_create(
     const char        *host,		/* I - Hostname */
     int               port,		/* I - Port number */
-    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
+    http_addrlist_t   *addrlist,	/* I - Address list or @code NULL@ */
     int               family,		/* I - Address family or AF_UNSPEC */
     http_encryption_t encryption,	/* I - Encryption to use */
     int               blocking,		/* I - 1 for blocking mode */

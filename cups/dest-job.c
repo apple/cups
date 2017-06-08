@@ -25,13 +25,13 @@
  * The "job_id" is the number returned by cupsCreateDestJob.
  *
  * Returns @code IPP_STATUS_OK@ on success and
- * @code IPP_STATUS_ERRPR_NOT_AUTHORIZED@ or
+ * @code IPP_STATUS_ERROR_NOT_AUTHORIZED@ or
  * @code IPP_STATUS_ERROR_FORBIDDEN@ on failure.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
 
-ipp_status_t
+ipp_status_t                            /* O - Status of cancel operation */
 cupsCancelDestJob(http_t      *http,	/* I - Connection to destination */
                   cups_dest_t *dest,	/* I - Destination */
                   int         job_id)	/* I - Job ID */

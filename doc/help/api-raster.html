@@ -605,49 +605,38 @@ the memory used to read the raster file:</p>
 </ul>
       <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><a id="cupsRasterClose">cupsRasterClose</a></h3>
-        <p class="description"></p>
-<p class="code">
-void cupsRasterClose (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Stream to close</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
         <p class="description">Close a raster stream.</p>
+<p class="code">
+void cupsRasterClose(<a href="#cups_raster_t">cups_raster_t</a> *r);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Stream to close</td></tr>
+</tbody></table>
+<h4 class="discussion">Discussion</h4>
         <p class="discussion">The file descriptor associated with the raster stream must be closed
 separately as needed.</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.2/macOS 10.12&#160;</span><a id="cupsRasterInitPWGHeader">cupsRasterInitPWGHeader</a></h3>
         <p class="description">Initialize a page header for PWG Raster output.</p>
 <p class="code">
-int cupsRasterInitPWGHeader (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
-&#160;&#160;&#160;&#160;pwg_media_t *media,<br>
-&#160;&#160;&#160;&#160;const char *type,<br>
-&#160;&#160;&#160;&#160;int xdpi,<br>
-&#160;&#160;&#160;&#160;int ydpi,<br>
-&#160;&#160;&#160;&#160;const char *sides,<br>
-&#160;&#160;&#160;&#160;const char *sheet_back<br>
-);</p>
+int cupsRasterInitPWGHeader(<a href="#cups_page_header2_t">cups_page_header2_t</a> *h, pwg_media_t *media, const char *type, int xdpi, int ydpi, const char *sides, const char *sheet_back);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>h</dt>
-        <dd class="description">Page header</dd>
-<dt>media</dt>
-        <dd class="description">PWG media information</dd>
-<dt>type</dt>
-        <dd class="description">PWG raster type string</dd>
-<dt>xdpi</dt>
-        <dd class="description">Cross-feed direction (horizontal) resolution</dd>
-<dt>ydpi</dt>
-        <dd class="description">Feed direction (vertical) resolution</dd>
-<dt>sides</dt>
-        <dd class="description">IPP &quot;sides&quot; option value</dd>
-<dt>sheet_back</dt>
-        <dd class="description">Transform for back side or <code>NULL</code> for none</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>h</th>
+        <td class="description">Page header</td></tr>
+<tr><th>media</th>
+        <td class="description">PWG media information</td></tr>
+<tr><th>type</th>
+        <td class="description">PWG raster type string</td></tr>
+<tr><th>xdpi</th>
+        <td class="description">Cross-feed direction (horizontal) resolution</td></tr>
+<tr><th>ydpi</th>
+        <td class="description">Feed direction (vertical) resolution</td></tr>
+<tr><th>sides</th>
+        <td class="description">IPP &quot;sides&quot; option value</td></tr>
+<tr><th>sheet_back</th>
+        <td class="description">Transform for back side or <code>NULL</code> for none</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
@@ -666,26 +655,20 @@ to apply for the back side of a page.  Pass <code>NULL</code> for the front side
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
         <p class="description">Interpret PPD commands to create a page header.</p>
 <p class="code">
-int cupsRasterInterpretPPD (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
-&#160;&#160;&#160;&#160;ppd_file_t *ppd,<br>
-&#160;&#160;&#160;&#160;int num_options,<br>
-&#160;&#160;&#160;&#160;cups_option_t *options,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func<br>
-);</p>
+int cupsRasterInterpretPPD(<a href="#cups_page_header2_t">cups_page_header2_t</a> *h, ppd_file_t *ppd, int num_options, cups_option_t *options, <a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>h</dt>
-        <dd class="description">Page header to create</dd>
-<dt>ppd</dt>
-        <dd class="description">PPD file</dd>
-<dt>num_options</dt>
-        <dd class="description">Number of options</dd>
-<dt>options</dt>
-        <dd class="description">Options</dd>
-<dt>func</dt>
-        <dd class="description">Optional page header callback (<code>NULL</code> for none)</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>h</th>
+        <td class="description">Page header to create</td></tr>
+<tr><th>ppd</th>
+        <td class="description">PPD file</td></tr>
+<tr><th>num_options</th>
+        <td class="description">Number of options</td></tr>
+<tr><th>options</th>
+        <td class="description">Options</td></tr>
+<tr><th>func</th>
+        <td class="description">Optional page header callback (<code>NULL</code> for none)</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">0 on success, -1 on failure</p>
 <h4 class="discussion">Discussion</h4>
@@ -717,20 +700,17 @@ are supported.
 <h3 class="function"><a id="cupsRasterOpen">cupsRasterOpen</a></h3>
         <p class="description">Open a raster stream using a file descriptor.</p>
 <p class="code">
-<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br>
-&#160;&#160;&#160;&#160;int fd,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
-);</p>
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen(int fd, <a href="#cups_mode_t">cups_mode_t</a> mode);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-        <dd class="description">File descriptor</dd>
-<dt>mode</dt>
-        <dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<table class="list"><tbody>
+<tr><th>fd</th>
+        <td class="description">File descriptor</td></tr>
+<tr><th>mode</th>
+        <td class="description">Mode - <code>CUPS_RASTER_READ</code>,
 <code>CUPS_RASTER_WRITE</code>,
 <code>CUPS_RASTER_WRITE_COMPRESSED</code>,
-or <code>CUPS_RASTER_WRITE_PWG</code></dd>
-</dl>
+or <code>CUPS_RASTER_WRITE_PWG</code></td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">New stream</p>
 <h4 class="discussion">Discussion</h4>
@@ -746,23 +726,19 @@ be used - compressed and PWG output is generally 25-50% smaller but adds a
 <h3 class="function"><a id="cupsRasterOpenIO">cupsRasterOpenIO</a></h3>
         <p class="description">Open a raster stream using a callback function.</p>
 <p class="code">
-<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb,<br>
-&#160;&#160;&#160;&#160;void *ctx,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
-);</p>
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO(<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb, void *ctx, <a href="#cups_mode_t">cups_mode_t</a> mode);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>iocb</dt>
-        <dd class="description">Read/write callback</dd>
-<dt>ctx</dt>
-        <dd class="description">Context pointer for callback</dd>
-<dt>mode</dt>
-        <dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<table class="list"><tbody>
+<tr><th>iocb</th>
+        <td class="description">Read/write callback</td></tr>
+<tr><th>ctx</th>
+        <td class="description">Context pointer for callback</td></tr>
+<tr><th>mode</th>
+        <td class="description">Mode - <code>CUPS_RASTER_READ</code>,
 <code>CUPS_RASTER_WRITE</code>,
 <code>CUPS_RASTER_WRITE_COMPRESSED</code>,
-or <code>CUPS_RASTER_WRITE_PWG</code></dd>
-</dl>
+or <code>CUPS_RASTER_WRITE_PWG</code></td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">New stream</p>
 <h4 class="discussion">Discussion</h4>
@@ -777,17 +753,14 @@ be used - compressed and PWG output is generally 25-50% smaller but adds a
         <p class="description">Read a raster page header and store it in a
 version 1 page header structure.</p>
 <p class="code">
-unsigned cupsRasterReadHeader (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
-);</p>
+unsigned cupsRasterReadHeader(<a href="#cups_raster_t">cups_raster_t</a> *r, <a href="#cups_page_header_t">cups_page_header_t</a> *h);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>h</dt>
-        <dd class="description">Pointer to header data</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>h</th>
+        <td class="description">Pointer to header data</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure/end-of-file</p>
 <h4 class="discussion">Discussion</h4>
@@ -802,36 +775,29 @@ page headers and copying only the version 1 data into the provided buffer.
         <p class="description">Read a raster page header and store it in a
 version 2 page header structure.</p>
 <p class="code">
-unsigned cupsRasterReadHeader2 (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
-);</p>
+unsigned cupsRasterReadHeader2(<a href="#cups_raster_t">cups_raster_t</a> *r, <a href="#cups_page_header2_t">cups_page_header2_t</a> *h);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>h</dt>
-        <dd class="description">Pointer to header data</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>h</th>
+        <td class="description">Pointer to header data</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure/end-of-file</p>
 <h3 class="function"><a id="cupsRasterReadPixels">cupsRasterReadPixels</a></h3>
         <p class="description">Read raster pixels.</p>
 <p class="code">
-unsigned cupsRasterReadPixels (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;unsigned char *p,<br>
-&#160;&#160;&#160;&#160;unsigned len<br>
-);</p>
+unsigned cupsRasterReadPixels(<a href="#cups_raster_t">cups_raster_t</a> *r, unsigned char *p, unsigned len);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>p</dt>
-        <dd class="description">Pointer to pixel buffer</dd>
-<dt>len</dt>
-        <dd class="description">Number of bytes to read</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>p</th>
+        <td class="description">Pointer to pixel buffer</td></tr>
+<tr><th>len</th>
+        <td class="description">Number of bytes to read</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Number of bytes read</p>
 <h4 class="discussion">Discussion</h4>
@@ -842,17 +808,14 @@ the line buffer and as the number of bytes to read.</p>
         <p class="description">Write a raster page header from a version 1 page
 header structure.</p>
 <p class="code">
-unsigned cupsRasterWriteHeader (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
-);</p>
+unsigned cupsRasterWriteHeader(<a href="#cups_raster_t">cups_raster_t</a> *r, <a href="#cups_page_header_t">cups_page_header_t</a> *h);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>h</dt>
-        <dd class="description">Raster page header</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>h</th>
+        <td class="description">Raster page header</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
@@ -863,17 +826,14 @@ unsigned cupsRasterWriteHeader (<br>
         <p class="description">Write a raster page header from a version 2
 page header structure.</p>
 <p class="code">
-unsigned cupsRasterWriteHeader2 (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
-);</p>
+unsigned cupsRasterWriteHeader2(<a href="#cups_raster_t">cups_raster_t</a> *r, <a href="#cups_page_header2_t">cups_page_header2_t</a> *h);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>h</dt>
-        <dd class="description">Raster page header</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>h</th>
+        <td class="description">Raster page header</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
@@ -883,20 +843,16 @@ unsigned cupsRasterWriteHeader2 (<br>
 <h3 class="function"><a id="cupsRasterWritePixels">cupsRasterWritePixels</a></h3>
         <p class="description">Write raster pixels.</p>
 <p class="code">
-unsigned cupsRasterWritePixels (<br>
-&#160;&#160;&#160;&#160;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
-&#160;&#160;&#160;&#160;unsigned char *p,<br>
-&#160;&#160;&#160;&#160;unsigned len<br>
-);</p>
+unsigned cupsRasterWritePixels(<a href="#cups_raster_t">cups_raster_t</a> *r, unsigned char *p, unsigned len);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>r</dt>
-        <dd class="description">Raster stream</dd>
-<dt>p</dt>
-        <dd class="description">Bytes to write</dd>
-<dt>len</dt>
-        <dd class="description">Number of bytes to write</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>r</th>
+        <td class="description">Raster stream</td></tr>
+<tr><th>p</th>
+        <td class="description">Bytes to write</td></tr>
+<tr><th>len</th>
+        <td class="description">Number of bytes to write</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Number of bytes written</p>
 <h4 class="discussion">Discussion</h4>
@@ -1029,109 +985,109 @@ typedef struct _cups_raster_s cups_raster_t;
 &#160;&#160;&#160;&#160;unsigned cupsWidth;<br>
 };</p>
 <h4 class="members">Members</h4>
-<dl>
-<dt>AdvanceDistance </dt>
-        <dd class="description">AdvanceDistance value in points</dd>
-<dt>AdvanceMedia </dt>
-        <dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
-<dt>Collate </dt>
-        <dd class="description">Collated copies value</dd>
-<dt>CutMedia </dt>
-        <dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
-<dt>Duplex </dt>
-        <dd class="description">Duplexed (double-sided) value</dd>
-<dt>HWResolution[2] </dt>
-        <dd class="description">Resolution in dots-per-inch</dd>
-<dt>ImagingBoundingBox[4] </dt>
-        <dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
-<dt>InsertSheet </dt>
-        <dd class="description">InsertSheet value</dd>
-<dt>Jog </dt>
-        <dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
-<dt>LeadingEdge </dt>
-        <dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
-<dt>ManualFeed </dt>
-        <dd class="description">ManualFeed value</dd>
-<dt>Margins[2] </dt>
-        <dd class="description">Lower-lefthand margins in points</dd>
-<dt>MediaClass[64] </dt>
-        <dd class="description">MediaClass string</dd>
-<dt>MediaColor[64] </dt>
-        <dd class="description">MediaColor string</dd>
-<dt>MediaPosition </dt>
-        <dd class="description">MediaPosition value</dd>
-<dt>MediaType[64] </dt>
-        <dd class="description">MediaType string</dd>
-<dt>MediaWeight </dt>
-        <dd class="description">MediaWeight value in grams/m^2</dd>
-<dt>MirrorPrint </dt>
-        <dd class="description">MirrorPrint value</dd>
-<dt>NegativePrint </dt>
-        <dd class="description">NegativePrint value</dd>
-<dt>NumCopies </dt>
-        <dd class="description">Number of copies to produce</dd>
-<dt>Orientation </dt>
-        <dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
-<dt>OutputFaceUp </dt>
-        <dd class="description">OutputFaceUp value</dd>
-<dt>OutputType[64] </dt>
-        <dd class="description">OutputType string</dd>
-<dt>PageSize[2] </dt>
-        <dd class="description">Width and length of page in points</dd>
-<dt>Separations </dt>
-        <dd class="description">Separations value</dd>
-<dt>TraySwitch </dt>
-        <dd class="description">TraySwitch value</dd>
-<dt>Tumble </dt>
-        <dd class="description">Tumble value</dd>
-<dt>cupsBitsPerColor </dt>
-        <dd class="description">Number of bits for each color</dd>
-<dt>cupsBitsPerPixel </dt>
-        <dd class="description">Number of bits for each pixel</dd>
-<dt>cupsBorderlessScalingFactor <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Scaling that was applied to page data </dd>
-<dt>cupsBytesPerLine </dt>
-        <dd class="description">Number of bytes per line</dd>
-<dt>cupsColorOrder </dt>
-        <dd class="description">Order of colors</dd>
-<dt>cupsColorSpace </dt>
-        <dd class="description">True colorspace</dd>
-<dt>cupsCompression </dt>
-        <dd class="description">Device compression to use</dd>
-<dt>cupsHeight </dt>
-        <dd class="description">Height of page image in pixels</dd>
-<dt>cupsImagingBBox[4] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Floating point ImagingBoundingBox
+<table class="list"><tbody>
+<tr><th>AdvanceDistance </th>
+        <td class="description">AdvanceDistance value in points</td></tr>
+<tr><th>AdvanceMedia </th>
+        <td class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</td></tr>
+<tr><th>Collate </th>
+        <td class="description">Collated copies value</td></tr>
+<tr><th>CutMedia </th>
+        <td class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</td></tr>
+<tr><th>Duplex </th>
+        <td class="description">Duplexed (double-sided) value</td></tr>
+<tr><th>HWResolution[2] </th>
+        <td class="description">Resolution in dots-per-inch</td></tr>
+<tr><th>ImagingBoundingBox[4] </th>
+        <td class="description">Pixel region that is painted (points, left, bottom, right, top)</td></tr>
+<tr><th>InsertSheet </th>
+        <td class="description">InsertSheet value</td></tr>
+<tr><th>Jog </th>
+        <td class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</td></tr>
+<tr><th>LeadingEdge </th>
+        <td class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</td></tr>
+<tr><th>ManualFeed </th>
+        <td class="description">ManualFeed value</td></tr>
+<tr><th>Margins[2] </th>
+        <td class="description">Lower-lefthand margins in points</td></tr>
+<tr><th>MediaClass[64] </th>
+        <td class="description">MediaClass string</td></tr>
+<tr><th>MediaColor[64] </th>
+        <td class="description">MediaColor string</td></tr>
+<tr><th>MediaPosition </th>
+        <td class="description">MediaPosition value</td></tr>
+<tr><th>MediaType[64] </th>
+        <td class="description">MediaType string</td></tr>
+<tr><th>MediaWeight </th>
+        <td class="description">MediaWeight value in grams/m^2</td></tr>
+<tr><th>MirrorPrint </th>
+        <td class="description">MirrorPrint value</td></tr>
+<tr><th>NegativePrint </th>
+        <td class="description">NegativePrint value</td></tr>
+<tr><th>NumCopies </th>
+        <td class="description">Number of copies to produce</td></tr>
+<tr><th>Orientation </th>
+        <td class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</td></tr>
+<tr><th>OutputFaceUp </th>
+        <td class="description">OutputFaceUp value</td></tr>
+<tr><th>OutputType[64] </th>
+        <td class="description">OutputType string</td></tr>
+<tr><th>PageSize[2] </th>
+        <td class="description">Width and length of page in points</td></tr>
+<tr><th>Separations </th>
+        <td class="description">Separations value</td></tr>
+<tr><th>TraySwitch </th>
+        <td class="description">TraySwitch value</td></tr>
+<tr><th>Tumble </th>
+        <td class="description">Tumble value</td></tr>
+<tr><th>cupsBitsPerColor </th>
+        <td class="description">Number of bits for each color</td></tr>
+<tr><th>cupsBitsPerPixel </th>
+        <td class="description">Number of bits for each pixel</td></tr>
+<tr><th>cupsBorderlessScalingFactor <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Scaling that was applied to page data </td></tr>
+<tr><th>cupsBytesPerLine </th>
+        <td class="description">Number of bytes per line</td></tr>
+<tr><th>cupsColorOrder </th>
+        <td class="description">Order of colors</td></tr>
+<tr><th>cupsColorSpace </th>
+        <td class="description">True colorspace</td></tr>
+<tr><th>cupsCompression </th>
+        <td class="description">Device compression to use</td></tr>
+<tr><th>cupsHeight </th>
+        <td class="description">Height of page image in pixels</td></tr>
+<tr><th>cupsImagingBBox[4] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Floating point ImagingBoundingBox
 (scaling factor not applied, left,
-bottom, right, top) </dd>
-<dt>cupsInteger[16] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">User-defined integer values </dd>
-<dt>cupsMarkerType[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Ink/toner type </dd>
-<dt>cupsMediaType </dt>
-        <dd class="description">Media type code</dd>
-<dt>cupsNumColors <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Number of color compoents </dd>
-<dt>cupsPageSizeName[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">PageSize name </dd>
-<dt>cupsPageSize[2] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Floating point PageSize (scaling *
-factor not applied) </dd>
-<dt>cupsReal[16] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">User-defined floating-point values </dd>
-<dt>cupsRenderingIntent[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Color rendering intent </dd>
-<dt>cupsRowCount </dt>
-        <dd class="description">Rows per band</dd>
-<dt>cupsRowFeed </dt>
-        <dd class="description">Feed between bands</dd>
-<dt>cupsRowStep </dt>
-        <dd class="description">Spacing between lines</dd>
-<dt>cupsString[16][64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">User-defined string values </dd>
-<dt>cupsWidth </dt>
-        <dd class="description">Width of page image in pixels</dd>
-</dl>
+bottom, right, top) </td></tr>
+<tr><th>cupsInteger[16] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">User-defined integer values </td></tr>
+<tr><th>cupsMarkerType[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Ink/toner type </td></tr>
+<tr><th>cupsMediaType </th>
+        <td class="description">Media type code</td></tr>
+<tr><th>cupsNumColors <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Number of color compoents </td></tr>
+<tr><th>cupsPageSizeName[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">PageSize name </td></tr>
+<tr><th>cupsPageSize[2] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Floating point PageSize (scaling *
+factor not applied) </td></tr>
+<tr><th>cupsReal[16] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">User-defined floating-point values </td></tr>
+<tr><th>cupsRenderingIntent[64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">Color rendering intent </td></tr>
+<tr><th>cupsRowCount </th>
+        <td class="description">Rows per band</td></tr>
+<tr><th>cupsRowFeed </th>
+        <td class="description">Feed between bands</td></tr>
+<tr><th>cupsRowStep </th>
+        <td class="description">Spacing between lines</td></tr>
+<tr><th>cupsString[16][64] <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>
+        <td class="description">User-defined string values </td></tr>
+<tr><th>cupsWidth </th>
+        <td class="description">Width of page image in pixels</td></tr>
+</tbody></table>
 <h3 class="struct"><span class="info">&#160;DEPRECATED&#160;</span><a id="cups_page_header_s">cups_page_header_s</a></h3>
         <p class="description">Version 1 page header </p>
 <p class="code">struct cups_page_header_s {<br>
@@ -1176,296 +1132,214 @@ factor not applied) </dd>
 &#160;&#160;&#160;&#160;unsigned cupsWidth;<br>
 };</p>
 <h4 class="members">Members</h4>
-<dl>
-<dt>AdvanceDistance </dt>
-        <dd class="description">AdvanceDistance value in points</dd>
-<dt>AdvanceMedia </dt>
-        <dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
-<dt>Collate </dt>
-        <dd class="description">Collated copies value</dd>
-<dt>CutMedia </dt>
-        <dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
-<dt>Duplex </dt>
-        <dd class="description">Duplexed (double-sided) value</dd>
-<dt>HWResolution[2] </dt>
-        <dd class="description">Resolution in dots-per-inch</dd>
-<dt>ImagingBoundingBox[4] </dt>
-        <dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
-<dt>InsertSheet </dt>
-        <dd class="description">InsertSheet value</dd>
-<dt>Jog </dt>
-        <dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
-<dt>LeadingEdge </dt>
-        <dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
-<dt>ManualFeed </dt>
-        <dd class="description">ManualFeed value</dd>
-<dt>Margins[2] </dt>
-        <dd class="description">Lower-lefthand margins in points</dd>
-<dt>MediaClass[64] </dt>
-        <dd class="description">MediaClass string</dd>
-<dt>MediaColor[64] </dt>
-        <dd class="description">MediaColor string</dd>
-<dt>MediaPosition </dt>
-        <dd class="description">MediaPosition value</dd>
-<dt>MediaType[64] </dt>
-        <dd class="description">MediaType string</dd>
-<dt>MediaWeight </dt>
-        <dd class="description">MediaWeight value in grams/m^2</dd>
-<dt>MirrorPrint </dt>
-        <dd class="description">MirrorPrint value</dd>
-<dt>NegativePrint </dt>
-        <dd class="description">NegativePrint value</dd>
-<dt>NumCopies </dt>
-        <dd class="description">Number of copies to produce</dd>
-<dt>Orientation </dt>
-        <dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
-<dt>OutputFaceUp </dt>
-        <dd class="description">OutputFaceUp value</dd>
-<dt>OutputType[64] </dt>
-        <dd class="description">OutputType string</dd>
-<dt>PageSize[2] </dt>
-        <dd class="description">Width and length of page in points</dd>
-<dt>Separations </dt>
-        <dd class="description">Separations value</dd>
-<dt>TraySwitch </dt>
-        <dd class="description">TraySwitch value</dd>
-<dt>Tumble </dt>
-        <dd class="description">Tumble value</dd>
-<dt>cupsBitsPerColor </dt>
-        <dd class="description">Number of bits for each color</dd>
-<dt>cupsBitsPerPixel </dt>
-        <dd class="description">Number of bits for each pixel</dd>
-<dt>cupsBytesPerLine </dt>
-        <dd class="description">Number of bytes per line</dd>
-<dt>cupsColorOrder </dt>
-        <dd class="description">Order of colors</dd>
-<dt>cupsColorSpace </dt>
-        <dd class="description">True colorspace</dd>
-<dt>cupsCompression </dt>
-        <dd class="description">Device compression to use</dd>
-<dt>cupsHeight </dt>
-        <dd class="description">Height of page image in pixels</dd>
-<dt>cupsMediaType </dt>
-        <dd class="description">Media type code</dd>
-<dt>cupsRowCount </dt>
-        <dd class="description">Rows per band</dd>
-<dt>cupsRowFeed </dt>
-        <dd class="description">Feed between bands</dd>
-<dt>cupsRowStep </dt>
-        <dd class="description">Spacing between lines</dd>
-<dt>cupsWidth </dt>
-        <dd class="description">Width of page image in pixels</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>AdvanceDistance </th>
+        <td class="description">AdvanceDistance value in points</td></tr>
+<tr><th>AdvanceMedia </th>
+        <td class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</td></tr>
+<tr><th>Collate </th>
+        <td class="description">Collated copies value</td></tr>
+<tr><th>CutMedia </th>
+        <td class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</td></tr>
+<tr><th>Duplex </th>
+        <td class="description">Duplexed (double-sided) value</td></tr>
+<tr><th>HWResolution[2] </th>
+        <td class="description">Resolution in dots-per-inch</td></tr>
+<tr><th>ImagingBoundingBox[4] </th>
+        <td class="description">Pixel region that is painted (points, left, bottom, right, top)</td></tr>
+<tr><th>InsertSheet </th>
+        <td class="description">InsertSheet value</td></tr>
+<tr><th>Jog </th>
+        <td class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</td></tr>
+<tr><th>LeadingEdge </th>
+        <td class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</td></tr>
+<tr><th>ManualFeed </th>
+        <td class="description">ManualFeed value</td></tr>
+<tr><th>Margins[2] </th>
+        <td class="description">Lower-lefthand margins in points</td></tr>
+<tr><th>MediaClass[64] </th>
+        <td class="description">MediaClass string</td></tr>
+<tr><th>MediaColor[64] </th>
+        <td class="description">MediaColor string</td></tr>
+<tr><th>MediaPosition </th>
+        <td class="description">MediaPosition value</td></tr>
+<tr><th>MediaType[64] </th>
+        <td class="description">MediaType string</td></tr>
+<tr><th>MediaWeight </th>
+        <td class="description">MediaWeight value in grams/m^2</td></tr>
+<tr><th>MirrorPrint </th>
+        <td class="description">MirrorPrint value</td></tr>
+<tr><th>NegativePrint </th>
+        <td class="description">NegativePrint value</td></tr>
+<tr><th>NumCopies </th>
+        <td class="description">Number of copies to produce</td></tr>
+<tr><th>Orientation </th>
+        <td class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</td></tr>
+<tr><th>OutputFaceUp </th>
+        <td class="description">OutputFaceUp value</td></tr>
+<tr><th>OutputType[64] </th>
+        <td class="description">OutputType string</td></tr>
+<tr><th>PageSize[2] </th>
+        <td class="description">Width and length of page in points</td></tr>
+<tr><th>Separations </th>
+        <td class="description">Separations value</td></tr>
+<tr><th>TraySwitch </th>
+        <td class="description">TraySwitch value</td></tr>
+<tr><th>Tumble </th>
+        <td class="description">Tumble value</td></tr>
+<tr><th>cupsBitsPerColor </th>
+        <td class="description">Number of bits for each color</td></tr>
+<tr><th>cupsBitsPerPixel </th>
+        <td class="description">Number of bits for each pixel</td></tr>
+<tr><th>cupsBytesPerLine </th>
+        <td class="description">Number of bytes per line</td></tr>
+<tr><th>cupsColorOrder </th>
+        <td class="description">Order of colors</td></tr>
+<tr><th>cupsColorSpace </th>
+        <td class="description">True colorspace</td></tr>
+<tr><th>cupsCompression </th>
+        <td class="description">Device compression to use</td></tr>
+<tr><th>cupsHeight </th>
+        <td class="description">Height of page image in pixels</td></tr>
+<tr><th>cupsMediaType </th>
+        <td class="description">Media type code</td></tr>
+<tr><th>cupsRowCount </th>
+        <td class="description">Rows per band</td></tr>
+<tr><th>cupsRowFeed </th>
+        <td class="description">Feed between bands</td></tr>
+<tr><th>cupsRowStep </th>
+        <td class="description">Spacing between lines</td></tr>
+<tr><th>cupsWidth </th>
+        <td class="description">Width of page image in pixels</td></tr>
+</tbody></table>
       <h2 class="title"><a id="ENUMERATIONS">Constants</a></h2>
       <h3 class="enumeration"><a id="cups_adv_e">cups_adv_e</a></h3>
         <p class="description">AdvanceMedia attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_ADVANCE_FILE </dt>
-        <dd class="description">Advance the roll after this file</dd>
-        <dt>CUPS_ADVANCE_JOB </dt>
-        <dd class="description">Advance the roll after this job</dd>
-        <dt>CUPS_ADVANCE_NONE </dt>
-        <dd class="description">Never advance the roll</dd>
-        <dt>CUPS_ADVANCE_PAGE </dt>
-        <dd class="description">Advance the roll after this page</dd>
-        <dt>CUPS_ADVANCE_SET </dt>
-        <dd class="description">Advance the roll after this set</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_ADVANCE_FILE </th>        <td class="description">Advance the roll after this file</td></tr>
+        <tr><th>CUPS_ADVANCE_JOB </th>        <td class="description">Advance the roll after this job</td></tr>
+        <tr><th>CUPS_ADVANCE_NONE </th>        <td class="description">Never advance the roll</td></tr>
+        <tr><th>CUPS_ADVANCE_PAGE </th>        <td class="description">Advance the roll after this page</td></tr>
+        <tr><th>CUPS_ADVANCE_SET </th>        <td class="description">Advance the roll after this set</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_bool_e">cups_bool_e</a></h3>
         <p class="description">Boolean type</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_FALSE </dt>
-        <dd class="description">Logical false</dd>
-        <dt>CUPS_TRUE </dt>
-        <dd class="description">Logical true</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_FALSE </th>        <td class="description">Logical false</td></tr>
+        <tr><th>CUPS_TRUE </th>        <td class="description">Logical true</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_cspace_e">cups_cspace_e</a></h3>
         <p class="description">cupsColorSpace attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_CSPACE_ADOBERGB <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">Red, green, blue (Adobe RGB) </dd>
-        <dt>CUPS_CSPACE_CIELab <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">CIE Lab </dd>
-        <dt>CUPS_CSPACE_CIEXYZ <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">CIE XYZ </dd>
-        <dt>CUPS_CSPACE_CMY </dt>
-        <dd class="description">Cyan, magenta, yellow (DeviceCMY)</dd>
-        <dt>CUPS_CSPACE_CMYK </dt>
-        <dd class="description">Cyan, magenta, yellow, black (DeviceCMYK)</dd>
-        <dt>CUPS_CSPACE_DEVICE1 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 1 color </dd>
-        <dt>CUPS_CSPACE_DEVICE2 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 2 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE3 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 3 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE4 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 4 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE5 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 5 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE6 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 6 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE7 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 7 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE8 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 8 colors </dd>
-        <dt>CUPS_CSPACE_DEVICE9 <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 9 colors </dd>
-        <dt>CUPS_CSPACE_DEVICEA <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 10 colors </dd>
-        <dt>CUPS_CSPACE_DEVICEB <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 11 colors </dd>
-        <dt>CUPS_CSPACE_DEVICEC <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 12 colors </dd>
-        <dt>CUPS_CSPACE_DEVICED <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 13 colors </dd>
-        <dt>CUPS_CSPACE_DEVICEE <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 14 colors </dd>
-        <dt>CUPS_CSPACE_DEVICEF <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">DeviceN, 15 colors </dd>
-        <dt>CUPS_CSPACE_GMCK <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Gold, magenta, yellow, black </dd>
-        <dt>CUPS_CSPACE_GMCS <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Gold, magenta, yellow, silver </dd>
-        <dt>CUPS_CSPACE_GOLD <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Gold foil </dd>
-        <dt>CUPS_CSPACE_ICC1 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 1 color </dd>
-        <dt>CUPS_CSPACE_ICC2 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 2 colors </dd>
-        <dt>CUPS_CSPACE_ICC3 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 3 colors </dd>
-        <dt>CUPS_CSPACE_ICC4 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 4 colors </dd>
-        <dt>CUPS_CSPACE_ICC5 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 5 colors </dd>
-        <dt>CUPS_CSPACE_ICC6 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 6 colors </dd>
-        <dt>CUPS_CSPACE_ICC7 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 7 colors </dd>
-        <dt>CUPS_CSPACE_ICC8 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 8 colors </dd>
-        <dt>CUPS_CSPACE_ICC9 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 9 colors </dd>
-        <dt>CUPS_CSPACE_ICCA <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 10 colors </dd>
-        <dt>CUPS_CSPACE_ICCB <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 11 colors </dd>
-        <dt>CUPS_CSPACE_ICCC <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 12 colors </dd>
-        <dt>CUPS_CSPACE_ICCD <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 13 colors </dd>
-        <dt>CUPS_CSPACE_ICCE <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 14 colors </dd>
-        <dt>CUPS_CSPACE_ICCF <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></dt>
-        <dd class="description">ICC-based, 15 colors </dd>
-        <dt>CUPS_CSPACE_K </dt>
-        <dd class="description">Black (DeviceK)</dd>
-        <dt>CUPS_CSPACE_KCMY <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Black, cyan, magenta, yellow </dd>
-        <dt>CUPS_CSPACE_KCMYcm <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Black, cyan, magenta, yellow, light-cyan, light-magenta </dd>
-        <dt>CUPS_CSPACE_RGB </dt>
-        <dd class="description">Red, green, blue (DeviceRGB, sRGB by default)</dd>
-        <dt>CUPS_CSPACE_RGBA </dt>
-        <dd class="description">Red, green, blue, alpha (DeviceRGB, sRGB by default)</dd>
-        <dt>CUPS_CSPACE_RGBW <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></dt>
-        <dd class="description">Red, green, blue, white (DeviceRGB, sRGB by default) </dd>
-        <dt>CUPS_CSPACE_SILVER <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Silver foil </dd>
-        <dt>CUPS_CSPACE_SRGB <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">Red, green, blue (sRGB) </dd>
-        <dt>CUPS_CSPACE_SW <span class="info">&#160;CUPS 1.4.5&#160;</span></dt>
-        <dd class="description">Luminance (gamma 2.2) </dd>
-        <dt>CUPS_CSPACE_W </dt>
-        <dd class="description">Luminance (DeviceGray, gamma 2.2 by default)</dd>
-        <dt>CUPS_CSPACE_WHITE <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">White ink (as black) </dd>
-        <dt>CUPS_CSPACE_YMC <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Yellow, magenta, cyan </dd>
-        <dt>CUPS_CSPACE_YMCK <span class="info">&#160;DEPRECATED&#160;</span></dt>
-        <dd class="description">Yellow, magenta, cyan, black </dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_CSPACE_ADOBERGB <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">Red, green, blue (Adobe RGB) </td></tr>
+        <tr><th>CUPS_CSPACE_CIELab <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">CIE Lab </td></tr>
+        <tr><th>CUPS_CSPACE_CIEXYZ <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">CIE XYZ </td></tr>
+        <tr><th>CUPS_CSPACE_CMY </th>        <td class="description">Cyan, magenta, yellow (DeviceCMY)</td></tr>
+        <tr><th>CUPS_CSPACE_CMYK </th>        <td class="description">Cyan, magenta, yellow, black (DeviceCMYK)</td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE1 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 1 color </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE2 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 2 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE3 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 3 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE4 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 4 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE5 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 5 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE6 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 6 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE7 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 7 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE8 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 8 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICE9 <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 9 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICEA <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 10 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICEB <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 11 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICEC <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 12 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICED <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 13 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICEE <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 14 colors </td></tr>
+        <tr><th>CUPS_CSPACE_DEVICEF <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">DeviceN, 15 colors </td></tr>
+        <tr><th>CUPS_CSPACE_GMCK <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Gold, magenta, yellow, black </td></tr>
+        <tr><th>CUPS_CSPACE_GMCS <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Gold, magenta, yellow, silver </td></tr>
+        <tr><th>CUPS_CSPACE_GOLD <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Gold foil </td></tr>
+        <tr><th>CUPS_CSPACE_ICC1 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 1 color </td></tr>
+        <tr><th>CUPS_CSPACE_ICC2 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 2 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC3 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 3 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC4 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 4 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC5 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 5 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC6 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 6 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC7 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 7 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC8 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 8 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICC9 <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 9 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCA <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 10 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCB <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 11 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCC <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 12 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCD <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 13 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCE <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 14 colors </td></tr>
+        <tr><th>CUPS_CSPACE_ICCF <span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span></th>        <td class="description">ICC-based, 15 colors </td></tr>
+        <tr><th>CUPS_CSPACE_K </th>        <td class="description">Black (DeviceK)</td></tr>
+        <tr><th>CUPS_CSPACE_KCMY <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Black, cyan, magenta, yellow </td></tr>
+        <tr><th>CUPS_CSPACE_KCMYcm <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Black, cyan, magenta, yellow, light-cyan, light-magenta </td></tr>
+        <tr><th>CUPS_CSPACE_RGB </th>        <td class="description">Red, green, blue (DeviceRGB, sRGB by default)</td></tr>
+        <tr><th>CUPS_CSPACE_RGBA </th>        <td class="description">Red, green, blue, alpha (DeviceRGB, sRGB by default)</td></tr>
+        <tr><th>CUPS_CSPACE_RGBW <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Red, green, blue, white (DeviceRGB, sRGB by default) </td></tr>
+        <tr><th>CUPS_CSPACE_SILVER <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Silver foil </td></tr>
+        <tr><th>CUPS_CSPACE_SRGB <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">Red, green, blue (sRGB) </td></tr>
+        <tr><th>CUPS_CSPACE_SW <span class="info">&#160;CUPS 1.4.5&#160;</span></th>        <td class="description">Luminance (gamma 2.2) </td></tr>
+        <tr><th>CUPS_CSPACE_W </th>        <td class="description">Luminance (DeviceGray, gamma 2.2 by default)</td></tr>
+        <tr><th>CUPS_CSPACE_WHITE <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">White ink (as black) </td></tr>
+        <tr><th>CUPS_CSPACE_YMC <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Yellow, magenta, cyan </td></tr>
+        <tr><th>CUPS_CSPACE_YMCK <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Yellow, magenta, cyan, black </td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_cut_e">cups_cut_e</a></h3>
         <p class="description">CutMedia attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_CUT_FILE </dt>
-        <dd class="description">Cut the roll after this file</dd>
-        <dt>CUPS_CUT_JOB </dt>
-        <dd class="description">Cut the roll after this job</dd>
-        <dt>CUPS_CUT_NONE </dt>
-        <dd class="description">Never cut the roll</dd>
-        <dt>CUPS_CUT_PAGE </dt>
-        <dd class="description">Cut the roll after this page</dd>
-        <dt>CUPS_CUT_SET </dt>
-        <dd class="description">Cut the roll after this set</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_CUT_FILE </th>        <td class="description">Cut the roll after this file</td></tr>
+        <tr><th>CUPS_CUT_JOB </th>        <td class="description">Cut the roll after this job</td></tr>
+        <tr><th>CUPS_CUT_NONE </th>        <td class="description">Never cut the roll</td></tr>
+        <tr><th>CUPS_CUT_PAGE </th>        <td class="description">Cut the roll after this page</td></tr>
+        <tr><th>CUPS_CUT_SET </th>        <td class="description">Cut the roll after this set</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_edge_e">cups_edge_e</a></h3>
         <p class="description">LeadingEdge attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_EDGE_BOTTOM </dt>
-        <dd class="description">Leading edge is the bottom of the page</dd>
-        <dt>CUPS_EDGE_LEFT </dt>
-        <dd class="description">Leading edge is the left of the page</dd>
-        <dt>CUPS_EDGE_RIGHT </dt>
-        <dd class="description">Leading edge is the right of the page</dd>
-        <dt>CUPS_EDGE_TOP </dt>
-        <dd class="description">Leading edge is the top of the page</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_EDGE_BOTTOM </th>        <td class="description">Leading edge is the bottom of the page</td></tr>
+        <tr><th>CUPS_EDGE_LEFT </th>        <td class="description">Leading edge is the left of the page</td></tr>
+        <tr><th>CUPS_EDGE_RIGHT </th>        <td class="description">Leading edge is the right of the page</td></tr>
+        <tr><th>CUPS_EDGE_TOP </th>        <td class="description">Leading edge is the top of the page</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_jog_e">cups_jog_e</a></h3>
         <p class="description">Jog attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_JOG_FILE </dt>
-        <dd class="description">Move pages after this file</dd>
-        <dt>CUPS_JOG_JOB </dt>
-        <dd class="description">Move pages after this job</dd>
-        <dt>CUPS_JOG_NONE </dt>
-        <dd class="description">Never move pages</dd>
-        <dt>CUPS_JOG_SET </dt>
-        <dd class="description">Move pages after this set</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_JOG_FILE </th>        <td class="description">Move pages after this file</td></tr>
+        <tr><th>CUPS_JOG_JOB </th>        <td class="description">Move pages after this job</td></tr>
+        <tr><th>CUPS_JOG_NONE </th>        <td class="description">Never move pages</td></tr>
+        <tr><th>CUPS_JOG_SET </th>        <td class="description">Move pages after this set</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_mode_e">cups_mode_e</a></h3>
         <p class="description">cupsRasterOpen modes</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_RASTER_READ </dt>
-        <dd class="description">Open stream for reading</dd>
-        <dt>CUPS_RASTER_WRITE </dt>
-        <dd class="description">Open stream for writing</dd>
-        <dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span></dt>
-        <dd class="description">Open stream for compressed writing </dd>
-        <dt>CUPS_RASTER_WRITE_PWG <span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span></dt>
-        <dd class="description">Open stream for compressed writing in PWG Raster mode </dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_RASTER_READ </th>        <td class="description">Open stream for reading</td></tr>
+        <tr><th>CUPS_RASTER_WRITE </th>        <td class="description">Open stream for writing</td></tr>
+        <tr><th>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span></th>        <td class="description">Open stream for compressed writing </td></tr>
+        <tr><th>CUPS_RASTER_WRITE_PWG <span class="info">&#160;CUPS 1.5/macOS 10.7&#160;</span></th>        <td class="description">Open stream for compressed writing in PWG Raster mode </td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_order_e">cups_order_e</a></h3>
         <p class="description">cupsColorOrder attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_ORDER_BANDED </dt>
-        <dd class="description">CCC MMM YYY KKK ...</dd>
-        <dt>CUPS_ORDER_CHUNKED </dt>
-        <dd class="description">CMYK CMYK CMYK ...</dd>
-        <dt>CUPS_ORDER_PLANAR </dt>
-        <dd class="description">CCC ... MMM ... YYY ... KKK ...</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_ORDER_BANDED </th>        <td class="description">CCC MMM YYY KKK ...</td></tr>
+        <tr><th>CUPS_ORDER_CHUNKED </th>        <td class="description">CMYK CMYK CMYK ...</td></tr>
+        <tr><th>CUPS_ORDER_PLANAR </th>        <td class="description">CCC ... MMM ... YYY ... KKK ...</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="cups_orient_e">cups_orient_e</a></h3>
         <p class="description">Orientation attribute values</p>
       <h4 class="constants">Constants</h4>
-      <dl>
-        <dt>CUPS_ORIENT_0 </dt>
-        <dd class="description">Don't rotate the page</dd>
-        <dt>CUPS_ORIENT_180 </dt>
-        <dd class="description">Turn the page upside down</dd>
-        <dt>CUPS_ORIENT_270 </dt>
-        <dd class="description">Rotate the page clockwise</dd>
-        <dt>CUPS_ORIENT_90 </dt>
-        <dd class="description">Rotate the page counter-clockwise</dd>
-</dl>
+      <table class="list"><tbody>
+        <tr><th>CUPS_ORIENT_0 </th>        <td class="description">Don't rotate the page</td></tr>
+        <tr><th>CUPS_ORIENT_180 </th>        <td class="description">Turn the page upside down</td></tr>
+        <tr><th>CUPS_ORIENT_270 </th>        <td class="description">Rotate the page clockwise</td></tr>
+        <tr><th>CUPS_ORIENT_90 </th>        <td class="description">Rotate the page counter-clockwise</td></tr>
+</tbody></table>
     </div>
   </body>
 </html>

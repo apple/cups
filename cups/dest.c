@@ -570,18 +570,19 @@ _cupsAppleSetUseLastPrinter(
 
 
 /*
- * 'cupsConnectDest()' - Connect to the server for a destination.
+ * 'cupsConnectDest()' - Open a conection to the destination.
  *
- * Connect to the destination, returning a new http_t connection object and
- * optionally the resource path to use for the destination.  These calls will
- * block until a connection is made, the timeout expires, the integer pointed
- * to by "cancel" is non-zero, or the callback function (or block) returns 0,
- * The caller is responsible for calling httpClose() on the returned object.
+ * Connect to the destination, returning a new @code http_t@ connection object
+ * and optionally the resource path to use for the destination.  These calls
+ * will block until a connection is made, the timeout expires, the integer
+ * pointed to by "cancel" is non-zero, or the callback function (or block)
+ * returns 0.  The caller is responsible for calling @link httpClose@ on the
+ * returned connection.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
 
-http_t *				/* O - Connection to server or @code NULL@ */
+http_t *				/* O - Connection to destination or @code NULL@ */
 cupsConnectDest(
     cups_dest_t    *dest,		/* I - Destination */
     unsigned       flags,		/* I - Connection flags */
@@ -746,18 +747,18 @@ cupsConnectDest(
 
 #ifdef __BLOCKS__
 /*
- * 'cupsConnectDestBlock()' - Connect to the server for a destination.
+ * 'cupsConnectDestBlock()' - Open a connection to the destination.
  *
- * Connect to the destination, returning a new http_t connection object and
- * optionally the resource path to use for the destination.  These calls will
- * block until a connection is made, the timeout expires, the integer pointed
- * to by "cancel" is non-zero, or the callback function (or block) returns 0,
- * The caller is responsible for calling httpClose() on the returned object.
+ * Connect to the destination, returning a new @code http_t@ connection object
+ * and optionally the resource path to use for the destination.  These calls
+ * will block until a connection is made, the timeout expires, the integer
+ * pointed to by "cancel" is non-zero, or the block returns 0.  The caller is
+ * responsible for calling @link httpClose@ on the returned connection.
  *
  * @since CUPS 1.6/macOS 10.8@ @exclude all@
  */
 
-http_t *				/* O - Connection to server or @code NULL@ */
+http_t *				/* O - Connection to destination or @code NULL@ */
 cupsConnectDestBlock(
     cups_dest_t       *dest,		/* I - Destination */
     unsigned          flags,		/* I - Connection flags */
@@ -1414,7 +1415,7 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
 /*
  * 'cupsGetDest()' - Get the named destination from the list.
  *
- * Use the @link cupsGetDests@ or @link cupsGetDests2@ functions to get a
+ * Use the @link cupsEnumDests@ or @link cupsGetDests2@ functions to get a
  * list of supported destinations for the current user.
  */
 
@@ -1943,12 +1944,18 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
  * 'cupsGetDests()' - Get the list of destinations from the default server.
  *
  * Starting with CUPS 1.2, the returned list of destinations include the
- * printer-info, printer-is-accepting-jobs, printer-is-shared,
- * printer-make-and-model, printer-state, printer-state-change-time,
- * printer-state-reasons, and printer-type attributes as options.  CUPS 1.4
- * adds the marker-change-time, marker-colors, marker-high-levels,
- * marker-levels, marker-low-levels, marker-message, marker-names,
- * marker-types, and printer-commands attributes as well.
+ * "printer-info", "printer-is-accepting-jobs", "printer-is-shared",
+ * "printer-make-and-model", "printer-state", "printer-state-change-time",
+ * "printer-state-reasons", "printer-type", and "printer-uri-supported"
+ * attributes as options.
+ *
+ * CUPS 1.4 adds the "marker-change-time", "marker-colors",
+ * "marker-high-levels", "marker-levels", "marker-low-levels", "marker-message",
+ * "marker-names", "marker-types", and "printer-commands" attributes as options.
+ *
+ * CUPS 2.2 adds accessible IPP printers to the list of destinations that can
+ * be used.  The "printer-uri-supported" option will be present for those IPP
+ * printers that have been recently used.
  *
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
@@ -1967,17 +1974,23 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * 'cupsGetDests2()' - Get the list of destinations from the specified server.
  *
  * Starting with CUPS 1.2, the returned list of destinations include the
- * printer-info, printer-is-accepting-jobs, printer-is-shared,
- * printer-make-and-model, printer-state, printer-state-change-time,
- * printer-state-reasons, and printer-type attributes as options.  CUPS 1.4
- * adds the marker-change-time, marker-colors, marker-high-levels,
- * marker-levels, marker-low-levels, marker-message, marker-names,
- * marker-types, and printer-commands attributes as well.
+ * "printer-info", "printer-is-accepting-jobs", "printer-is-shared",
+ * "printer-make-and-model", "printer-state", "printer-state-change-time",
+ * "printer-state-reasons", "printer-type", and "printer-uri-supported"
+ * attributes as options.
+ *
+ * CUPS 1.4 adds the "marker-change-time", "marker-colors",
+ * "marker-high-levels", "marker-levels", "marker-low-levels", "marker-message",
+ * "marker-names", "marker-types", and "printer-commands" attributes as options.
+ *
+ * CUPS 2.2 adds accessible IPP printers to the list of destinations that can
+ * be used.  The "printer-uri-supported" option will be present for those IPP
+ * printers that have been recently used.
  *
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
  *
- * @since CUPS 1.1.21/macOS 10.4@ @exclude all@
+ * @since CUPS 1.1.21/macOS 10.4@
  */
 
 int					/* O - Number of destinations */
@@ -2143,10 +2156,10 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
  * 'cupsGetNamedDest()' - Get options for the named destination.
  *
  * This function is optimized for retrieving a single destination and should
- * be used instead of @link cupsGetDests@ and @link cupsGetDest@ when you either
- * know the name of the destination or want to print to the default destination.
- * If @code NULL@ is returned, the destination does not exist or there is no
- * default destination.
+ * be used instead of @link cupsGetDests2@ and @link cupsGetDest@ when you
+ * either know the name of the destination or want to print to the default
+ * destination.  If @code NULL@ is returned, the destination does not exist or
+ * there is no default destination.
  *
  * If "http" is @code CUPS_HTTP_DEFAULT@, the connection to the default print
  * server will be used.
@@ -2383,6 +2396,8 @@ cupsSetDefaultDest(
  *
  * This function saves the destinations to /etc/cups/lpoptions when run
  * as root and ~/.cups/lpoptions when run as a normal user.
+ *
+ * @exclude all@
  */
 
 void

@@ -329,10 +329,8 @@ static int	compare_ipp_options(_ipp_option_t *a, _ipp_option_t *b);
  * 'cupsEncodeOptions()' - Encode printer options into IPP attributes.
  *
  * This function adds operation, job, and then subscription attributes,
- * in that order. Use the cupsEncodeOptions2() function to add attributes
+ * in that order. Use the @link cupsEncodeOptions2@ function to add attributes
  * for a single group.
- *
- * @exclude all@
  */
 
 void
@@ -356,7 +354,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
  * 'cupsEncodeOptions2()' - Encode printer options into IPP attributes for a group.
  *
  * This function only adds attributes for a single group. Call this
- * function multiple times for each group, or use cupsEncodeOptions()
+ * function multiple times for each group, or use @link cupsEncodeOptions@
  * to add the standard groups.
  *
  * @since CUPS 1.2/macOS 10.5@

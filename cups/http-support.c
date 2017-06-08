@@ -566,6 +566,10 @@ httpDecode64(char       *out,		/* I - String to write to */
 /*
  * 'httpDecode64_2()' - Base64-decode a string.
  *
+ * The caller must initialize "outlen" to the maximum size of the decoded
+ * string before calling @code httpDecode64_2@.  On return "outlen" contains the
+ * decoded length of the string.
+ *
  * @since CUPS 1.1.21/macOS 10.4@
  */
 
@@ -690,7 +694,7 @@ httpEncode64(char       *out,		/* I - String to write to */
 
 char *					/* O - Encoded string */
 httpEncode64_2(char       *out,		/* I - String to write to */
-	       int        outlen,	/* I - Size of output string */
+	       int        outlen,	/* I - Maximum size of output string */
                const char *in,		/* I - String to read from */
 	       int        inlen)	/* I - Size of input string */
 {
@@ -782,7 +786,7 @@ httpEncode64_2(char       *out,		/* I - String to write to */
  */
 
 const char *				/* O - Date/time string */
-httpGetDateString(time_t t)		/* I - UNIX time */
+httpGetDateString(time_t t)		/* I - Time in seconds */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -798,7 +802,7 @@ httpGetDateString(time_t t)		/* I - UNIX time */
  */
 
 const char *				/* O - Date/time string */
-httpGetDateString2(time_t t,		/* I - UNIX time */
+httpGetDateString2(time_t t,		/* I - Time in seconds */
                    char   *s,		/* I - String buffer */
 		   int    slen)		/* I - Size of string buffer */
 {
@@ -819,7 +823,7 @@ httpGetDateString2(time_t t,		/* I - UNIX time */
  * 'httpGetDateTime()' - Get a time value from a formatted date/time string.
  */
 
-time_t					/* O - UNIX time */
+time_t					/* O - Time in seconds */
 httpGetDateTime(const char *s)		/* I - Date/time string */
 {
   int		i;			/* Looping var */
@@ -1419,7 +1423,7 @@ _httpStatus(cups_lang_t   *lang,	/* I - Language */
  * 'httpStatus()' - Return a short string describing a HTTP status code.
  *
  * The returned string is localized to the current POSIX locale and is based
- * on the status strings defined in RFC 2616.
+ * on the status strings defined in RFC 7231.
  */
 
 const char *				/* O - Localized status string */

@@ -147,7 +147,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
 
 /*
- * 'cupsGetPassword2()' - Get a password from the user using the advanced
+ * 'cupsGetPassword2()' - Get a password from the user using the current
  *                        password callback.
  *
  * Uses the current password callback function. Returns @code NULL@ if the
@@ -155,8 +155,8 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  *
  * Note: The current password callback function is tracked separately for each
  * thread in a program. Multi-threaded programs that override the setting via
- * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
- * do so in each thread for the same function to be used.
+ * the @link cupsSetPasswordCB2@ function need to do so in each thread for the
+ * same function to be used.
  *
  * @since CUPS 1.4/macOS 10.6@
  */

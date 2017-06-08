@@ -1,7 +1,7 @@
 /*
  * Option routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -35,7 +35,7 @@ static int	cups_find_option(const char *name, int num_options,
  * New option arrays can be initialized simply by passing 0 for the
  * "num_options" parameter.
  *
- * @since CUPS 2.2.4@
+ * @since CUPS 2.2.4/macOS 10.13@
  */
 
 int					/* O  - Number of options */
@@ -185,7 +185,7 @@ cupsFreeOptions(
  * INT_MIN is returned when the option does not exist, is not an integer, or
  * exceeds the range of values for the "int" type.
  *
- * @since 2.2.4@
+ * @since CUPS 2.2.4/macOS 10.13@
  */
 
 int					/* O - Option value or @code INT_MIN@ */
