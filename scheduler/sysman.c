@@ -18,7 +18,7 @@
 
 #include "cupsd.h"
 #ifdef __APPLE__
-#  include <vproc.h>
+#  include <xpc/xpc.h>
 #  include <IOKit/pwr_mgt/IOPMLib.h>
 #endif /* __APPLE__ */
 
@@ -129,7 +129,7 @@ cupsdSetBusyState(void)
     "Active clients, printing jobs, and dirty files"
   };
 #ifdef __APPLE__
-  static vproc_transaction_t vtran = 0;	/* Current busy transaction */
+  static int tran = 0;	/* Current busy transaction */
   static IOPMAssertionID keep_awake = 0;/* Keep the system awake while printing */
 #endif /* __APPLE__ */
 
@@ -172,12 +172,15 @@ cupsdSetBusyState(void)
     busy = newbusy;
 
 #ifdef __APPLE__
-    if (busy && !vtran)
-      vtran = vproc_transaction_begin(NULL);
-    else if (!busy && vtran)
+    if (busy && !tran)
     {
-      vproc_transaction_end(NULL, vtran);
-      vtran = 0;
+      xpc_transaction_begin();
+      tran = 1;
+    }
+    else if (!busy && tran)
+    {
+      xpc_transaction_end();
+      tran = 0;
     }
 #endif /* __APPLE__ */
   }
@@ -350,7 +353,7 @@ cupsdStartSystemMonitor(void)
 
   pthread_mutex_init(&SysEventThreadMutex, NULL);
   pthread_cond_init(&SysEventThreadCond, NULL);
-  pthread_create(&SysEventThread, NULL, (void *(*)())sysEventThreadEntry, NULL);
+  pthread_create(&SysEventThread, NULL, (void *(*)(void *))sysEventThreadEntry, NULL);
 
  /*
   * Monitor for power source changes via dispatch queue...

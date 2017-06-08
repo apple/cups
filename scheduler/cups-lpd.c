@@ -29,7 +29,7 @@
 #  include <inttypes.h>
 #endif /* HAVE_INTTYPES_H */
 #ifdef __APPLE__
-#  include <vproc.h>
+#  include <xpc/xpc.h>
 #endif /* __APPLE__ */
 
 
@@ -97,8 +97,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 		hostip[256],		/* IP address */
 		*hostfamily;		/* Address family */
   int		hostlookups;		/* Do hostname lookups? */
+
+
 #ifdef __APPLE__
-  vproc_transaction_t vtran = vproc_transaction_begin(NULL);
+  xpc_transaction_begin();
 #endif /* __APPLE__ */
 
 
@@ -217,7 +219,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     putchar(1);
 
 #ifdef __APPLE__
-    vproc_transaction_end(NULL, vtran);
+    xpc_transaction_end();
 #endif /* __APPLE__ */
 
     return (1);
@@ -313,7 +315,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   closelog();
 
 #ifdef __APPLE__
-  vproc_transaction_end(NULL, vtran);
+  xpc_transaction_end();
 #endif /* __APPLE__ */
 
   return (status);
