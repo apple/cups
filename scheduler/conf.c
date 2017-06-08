@@ -869,6 +869,12 @@ cupsdReadConfiguration(void)
   if (!RemotePort)
     BrowseLocalProtocols = 0;		/* Disable sharing - no remote access */
 
+#ifdef HAVE_RES_INIT
+  http_resolv_check_t res_status;  /* Return status of httpCheckResolv() */
+
+  res_status = httpCheckResolv();
+#endif /* HAVE_RES_INIT */
+
  /*
   * See if the ServerName is an IP address...
   */

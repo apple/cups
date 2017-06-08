@@ -357,6 +357,17 @@ httpAddrLookup(
 
 #ifdef HAVE_RES_INIT
  /*
+  * Check if /etc/resolv.conf is modified.
+  * If so, reload resolver and set need_res_init to 0.
+  */
+
+  http_resolv_check_t status;
+
+  status = httpCheckResolv();
+
+  if (status == HTTP_RESOLV_CHECK_RELOADED && cg->need_res_init == 1)
+    cg->need_res_init = 0;
+ /*
   * STR #2920: Initialize resolver after failure in cups-polld
   *
   * If the previous lookup failed, re-initialize the resolver to prevent

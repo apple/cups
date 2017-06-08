@@ -516,6 +516,17 @@ cups_gss_getname(
   DEBUG_printf(("7cups_gss_getname(http=%p, service_name=\"%s\")", http,
                 service_name));
 
+#ifdef HAVE_RES_INIT
+ /*
+  * Check if /etc/resolv.conf is modified.
+  * If so, reload resolver.
+  */
+
+  http_resolv_check_t status;
+
+  status = httpCheckResolv();
+#endif /* HAVE_RES_INIT */
+
 
  /*
   * Get the hostname...

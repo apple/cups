@@ -135,6 +135,17 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_ONDEMAND */
 
 
+#ifdef HAVE_RES_INIT
+  http_resolv_check_t status;  /* Return status from httpCheckResolv() */
+
+  status = httpCheckResolv();
+  if (status == HTTP_RESOLV_CHECK_ERROR)
+  {
+    fputs("cupsd: Cannot get a status of /etc/resolv.conf\n", stderr);
+   return (1);
+  }
+#endif /* HAVE_RES_INIT */
+
 #ifdef HAVE_GETEUID
  /*
   * Check for setuid invocation, which we do not support!

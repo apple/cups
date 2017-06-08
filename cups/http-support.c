@@ -2258,6 +2258,16 @@ http_resolve_cb(
     http_addrlist_t	*addrlist,	/* List of addresses */
 			*addr;		/* Current address */
 
+#ifdef HAVE_RES_INIT
+   /*
+   * Check if resolv.conf is modified, if so, reload resolver
+   */
+
+    http_resolv_check_t status;
+
+   status = httpCheckResolv();
+#endif /* HAVE_RES_INIT */
+
     DEBUG_printf(("5http_resolve_cb: Looking up \"%s\".", hostTarget));
 
     snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
