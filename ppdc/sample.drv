@@ -1004,6 +1004,10 @@ Version "2.1"
 	*Choice "Saved/Printer Default" ""
 	Choice "Thermal/Thermal Transfer Media" "<</MediaType(Thermal)>>setpagedevice"
 	Choice "Direct/Direct Thermal Media" "<</MediaType(Direct)>>setpagedevice"
+      Option "zePrintOrientation/Orientation" PickOne AnySetup 20.0
+	*Choice "default/Printer Default" ""
+	Choice "Normal/Normal" ""
+	Choice "Invert/Invert" ""
     Group "PrinterSettings/Printer Settings"
       Option "Darkness" PickOne AnySetup 20.0
 	*Choice "-1/Printer Default" "<</cupsCompression -1>>setpagedevice"
@@ -1164,6 +1168,9 @@ Version "2.1"
 	*Choice "Saved/Printer Default" ""
 	Choice "Always/Always" ""
 	Choice "Never/Never" ""
+      Option "CenterOfPixel/Center-of-Pixel" PickOne AnySetup 20.0
+	*Choice "Standard/Postscript Standard" ""
+	Choice "true/True" "true"
   }
 }
 
