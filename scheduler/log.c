@@ -308,23 +308,7 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
   static struct timeval	last_time = { 0, 0 };
 	    				/* Last time we formatted */
   static char		s[1024];	/* Date/time string */
-  static const char * const months[12] =/* Months */
-		{
-		  "Jan",
-		  "Feb",
-		  "Mar",
-		  "Apr",
-		  "May",
-		  "Jun",
-		  "Jul",
-		  "Aug",
-		  "Sep",
-		  "Oct",
-		  "Nov",
-		  "Dec"
-		};
-
-
+  
  /*
   * Make sure we have a valid time...
   */
@@ -357,8 +341,8 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
     date = localtime(&(t->tv_sec));
 
     if (format == CUPSD_TIME_STANDARD)
-      snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+      snprintf(s, sizeof(s), "[%04d-%02d-%02dT%02d:%02d:%02d %+03ld%02ld]",
+	       1900 + date->tm_year, 1 + date->tm_mon, date->tm_mday,
 	       date->tm_hour, date->tm_min, date->tm_sec,
 #ifdef HAVE_TM_GMTOFF
 	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
@@ -366,8 +350,8 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
 	       timezone / 3600, (timezone / 60) % 60);
 #endif /* HAVE_TM_GMTOFF */
     else
-      snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d.%06d %+03ld%02ld]",
-	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+      snprintf(s, sizeof(s), "[%04d-%02d-%02dT%02d:%02d:%02d %+03ld%02ld]",
+	       1900 + date->tm_year, 1 + date->tm_mon, date->tm_mday,
 	       date->tm_hour, date->tm_min, date->tm_sec, (int)t->tv_usec,
 #ifdef HAVE_TM_GMTOFF
 	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
