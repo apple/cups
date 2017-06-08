@@ -18,6 +18,7 @@
 AR		=	@AR@
 AWK		=	@AWK@
 CC		=	@LIBTOOL@ @CC@
+CC_FOR_BUILD	=	@CC_FOR_BUILD@
 CHMOD		=	@CHMOD@
 CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@

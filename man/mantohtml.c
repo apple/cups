@@ -15,8 +15,10 @@
  * Include necessary headers.
  */
 
-#include <cups/string-private.h>
-#include <cups/array-private.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 
@@ -815,7 +817,8 @@ main(int  argc,				/* I - Number of command-line args */
         * Anchor for HTML output...
         */
 
-        strlcpy(anchor, line + 4, sizeof(anchor));
+        strncpy(anchor, line + 4, sizeof(anchor) - 1);
+        anchor[sizeof(anchor) - 1] = '\0';
       }
       else if (strncmp(line, ".\\\"", 3))
       {
@@ -944,7 +947,8 @@ html_alternate(const char *s,		/* I - String */
 		manfile[1024],		/* Man page filename */
 		manurl[1024];		/* Man page URL */
 
-        strlcpy(name, s, sizeof(name));
+        strncpy(name, s, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';
         if ((size_t)(end - s) < sizeof(name))
           name[end - s] = '\0';
 
@@ -1177,7 +1181,8 @@ html_fputs(const char *s,		/* I  - String */
       if (end[-1] == ',' || end[-1] == '.' || end[-1] == ')')
         end --;
 
-      strlcpy(temp, s, sizeof(temp));
+      strncpy(temp, s, sizeof(temp) - 1);
+      temp[sizeof(temp) - 1] = '\0';
       if ((size_t)(end -s) < sizeof(temp))
         temp[end - s] = '\0';
 

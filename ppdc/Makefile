@@ -228,9 +228,6 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
 		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
-	echo Generating localization strings...
-	./genstrings >sample.c
-
 
 #
 # ppdc, the PPD compiler.
