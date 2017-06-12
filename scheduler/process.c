@@ -125,6 +125,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   if (LogLevel >= CUPSD_LOG_DEBUG)
     cupsFilePuts(fp, "(debug deny)\n");
   cupsFilePuts(fp, "(import \"system.sb\")\n");
+  cupsFilePuts(fp, "(import \"com.apple.corefoundation.sb\")\n");
   cupsFilePuts(fp, "(system-network)\n");
   cupsFilePuts(fp, "(allow mach-per-user-lookup)\n");
   cupsFilePuts(fp, "(allow ipc-posix-sem)\n");
