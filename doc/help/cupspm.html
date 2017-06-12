@@ -160,7 +160,6 @@ table.list td {
   padding: 5px 2px 5px 10px;
   text-align: left;
   vertical-align: top;
-  width: 80%;
 }
 h1.title {
 }
@@ -303,7 +302,6 @@ h3.title {
           <li><a href="#httpGetExpect">httpGetExpect</a></li>
           <li><a href="#httpGetFd">httpGetFd</a></li>
           <li><a href="#httpGetField">httpGetField</a></li>
-          <li><a href="#httpGetHostByName">httpGetHostByName</a></li>
           <li><a href="#httpGetHostname">httpGetHostname</a></li>
           <li><a href="#httpGetKeepAlive">httpGetKeepAlive</a></li>
           <li><a href="#httpGetLength2">httpGetLength2</a></li>
@@ -342,7 +340,6 @@ h3.title {
           <li><a href="#httpShutdown">httpShutdown</a></li>
           <li><a href="#httpStateString">httpStateString</a></li>
           <li><a href="#httpStatus">httpStatus</a></li>
-          <li><a href="#httpTrace">httpTrace</a></li>
           <li><a href="#httpURIStatusString">httpURIStatusString</a></li>
           <li><a href="#httpUpdate">httpUpdate</a></li>
           <li><a href="#httpWait">httpWait</a></li>
@@ -2696,7 +2693,7 @@ int httpCompareCredentials(cups_array_t *cred1, cups_array_t *cred2);</p>
 <tr><th>port</th>
         <td class="description">Port number</td></tr>
 <tr><th>addrlist</th>
-        <td class="description">List of addresses or NULL to lookup</td></tr>
+        <td class="description">List of addresses or <code>NULL</code> to lookup</td></tr>
 <tr><th>family</th>
         <td class="description">Address family to use or <code>AF_UNSPEC</code> for any</td></tr>
 <tr><th>encryption</th>
@@ -2793,7 +2790,7 @@ char *httpDecode64_2(char *out, int *outlen, const char *in);</p>
         <p class="description">Decoded string</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The caller must initialize &quot;outlen&quot; to the maximum size of the decoded
-string before calling @httpDecode64_2@.  On return &quot;outlen&quot; contains the
+string before calling <code>httpDecode64_2</code>.  On return &quot;outlen&quot; contains the
 decoded length of the string.
 
 </p>
@@ -2864,7 +2861,7 @@ name.</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Field index</p>
 <h3 class="function"><a id="httpFlush">httpFlush</a></h3>
-        <p class="description">Flush data from a HTTP connection.</p>
+        <p class="description">Flush data read from a HTTP connection.</p>
 <p class="code">
 void httpFlush(<a href="#http_t">http_t</a> *http);</p>
 <h4 class="parameters">Parameters</h4>
@@ -2873,7 +2870,7 @@ void httpFlush(<a href="#http_t">http_t</a> *http);</p>
         <td class="description">HTTP connection</td></tr>
 </tbody></table>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpFlushWrite">httpFlushWrite</a></h3>
-        <p class="description">Flush data in write buffer.</p>
+        <p class="description">Flush data written to a HTTP connection.</p>
 <p class="code">
 int httpFlushWrite(<a href="#http_t">http_t</a> *http);</p>
 <h4 class="parameters">Parameters</h4>
@@ -2917,7 +2914,7 @@ time_t httpGetActivity(<a href="#http_t">http_t</a> *http);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Time of last read or write</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The return value is the UNIX time of the last read or write.
+        <p class="discussion">The return value is the time in seconds of the last read or write.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpGetAddress">httpGetAddress</a></h3>
@@ -2932,7 +2929,11 @@ time_t httpGetActivity(<a href="#http_t">http_t</a> *http);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Connected address or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">Returns <code>NULL</code> if the socket is currently unconnected.
+        <p class="discussion">For connections created with <a href="#httpConnect2"><code>httpConnect2</code></a>, the address is for the
+server.  For connections created with <a href="#httpAccept"><code>httpAccept</code></a>, the address is for
+the client.<br>
+<br>
+Returns <code>NULL</code> if the socket is currently unconnected.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="httpGetAuthString">httpGetAuthString</a></h3>
@@ -2947,10 +2948,10 @@ char *httpGetAuthString(<a href="#http_t">http_t</a> *http);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Authorization string</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The authorization string is set by cupsDoAuthentication() and
-httpSetAuthString().  Use httpGetAuthString() to retrieve the
-string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
-value.
+        <p class="discussion">The authorization string is set by <a href="#cupsDoAuthentication"><code>cupsDoAuthentication</code></a> and
+<a href="#httpSetAuthString"><code>httpSetAuthString</code></a>.  Use <a href="#httpGetAuthString"><code>httpGetAuthString</code></a> to retrieve the
+string to use with <a href="#httpSetField"><code>httpSetField</code></a> for the
+<code>HTTP_FIELD_AUTHORIZATION</code> value.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetBlocking">httpGetBlocking</a></h3>
@@ -2995,7 +2996,7 @@ const char *httpGetCookie(<a href="#http_t">http_t</a> *http);</p>
         <td class="description">HTTP connection</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Cookie data or NULL</p>
+        <p class="description">Cookie data or <code>NULL</code></p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetDateString2">httpGetDateString2</a></h3>
         <p class="description">Get a formatted date/time string from a time value.</p>
 <p class="code">
@@ -3003,7 +3004,7 @@ const char *httpGetDateString2(time_t t, char *s, int slen);</p>
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>t</th>
-        <td class="description">UNIX time</td></tr>
+        <td class="description">Time in seconds</td></tr>
 <tr><th>s</th>
         <td class="description">String buffer</td></tr>
 <tr><th>slen</th>
@@ -3021,7 +3022,7 @@ time_t httpGetDateTime(const char *s);</p>
         <td class="description">Date/time string</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">UNIX time</p>
+        <p class="description">Time in seconds</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpGetEncryption">httpGetEncryption</a></h3>
         <p class="description">Get the current encryption mode of a connection.</p>
 <p class="code">
@@ -3079,18 +3080,6 @@ const char *httpGetField(<a href="#http_t">http_t</a> *http, <a href="#http_fiel
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Field value</p>
-<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="httpGetHostByName">httpGetHostByName</a></h3>
-        <p class="description">Lookup a hostname or IPv4 address, and return
-address records for the specified name.</p>
-<p class="code">
-struct hostent *httpGetHostByName(const char *name);</p>
-<h4 class="parameters">Parameters</h4>
-<table class="list"><tbody>
-<tr><th>name</th>
-        <td class="description">Hostname or IP address</td></tr>
-</tbody></table>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Host entry</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="httpGetHostname">httpGetHostname</a></h3>
         <p class="description">Get the FQDN for the connection or local system.</p>
 <p class="code">
@@ -3221,7 +3210,7 @@ char *httpGetSubField2(<a href="#http_t">http_t</a> *http, <a href="#http_field_
         <td class="description">Size of value buffer</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Value or NULL</p>
+        <p class="description">Value or <code>NULL</code></p>
 <h3 class="function"><a id="httpGetVersion">httpGetVersion</a></h3>
         <p class="description">Get the HTTP version at the other end.</p>
 <p class="code">
@@ -3247,7 +3236,7 @@ char *httpGets(char *line, int length, <a href="#http_t">http_t</a> *http);</p>
         <td class="description">HTTP connection</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Line or NULL</p>
+        <p class="description">Line or <code>NULL</code></p>
 <h3 class="function"><a id="httpHead">httpHead</a></h3>
         <p class="description">Send a HEAD request to the server.</p>
 <p class="code">
@@ -3343,7 +3332,7 @@ ssize_t httpPeek(<a href="#http_t">http_t</a> *http, char *buffer, size_t length
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">This function copies available data from the given HTTP connection, reading
 a buffer as needed.  The data is still available for reading using
-<a href="#httpRead"><code>httpRead</code></a> or <a href="#httpRead2"><code>httpRead2</code></a>.<br>
+<a href="#httpRead2"><code>httpRead2</code></a>.<br>
 <br>
 For non-blocking connections the usual timeouts apply.
 
@@ -3498,9 +3487,10 @@ void httpSetAuthString(<a href="#http_t">http_t</a> *http, const char *scheme, c
 </tbody></table>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">This function just stores a copy of the current authorization string in
-the HTTP connection object.  You must still call httpSetField() to set
-HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
-httpHead(), httpOptions(), httpPost, or httpPut().
+the HTTP connection object.  You must still call <a href="#httpSetField"><code>httpSetField</code></a> to set
+<code>HTTP_FIELD_AUTHORIZATION</code> prior to issuing a HTTP request using
+<a href="#httpGet"><code>httpGet</code></a>, <a href="#httpHead"><code>httpHead</code></a>, <a href="#httpOptions"><code>httpOptions</code></a>, <a href="#httpPost"><code>httpPost</code></a>, or
+<a href="#httpPut"><code>httpPut</code></a>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.1.19/macOS 10.3&#160;</span><a id="httpSetCookie">httpSetCookie</a></h3>
@@ -3610,7 +3600,7 @@ void httpSetTimeout(<a href="#http_t">http_t</a> *http, double timeout, <a href=
         <td class="description">Number of seconds for timeout,
 must be greater than 0</td></tr>
 <tr><th>cb</th>
-        <td class="description">Callback function or NULL</td></tr>
+        <td class="description">Callback function or <code>NULL</code></td></tr>
 <tr><th>user_data</th>
         <td class="description">User data pointer</td></tr>
 </tbody></table>
@@ -3652,20 +3642,7 @@ const char *httpStatus(http_status_t status);</p>
         <p class="description">Localized status string</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The returned string is localized to the current POSIX locale and is based
-on the status strings defined in RFC 2616.</p>
-<h3 class="function"><a id="httpTrace">httpTrace</a></h3>
-        <p class="description">Send an TRACE request to the server.</p>
-<p class="code">
-int httpTrace(<a href="#http_t">http_t</a> *http, const char *uri);</p>
-<h4 class="parameters">Parameters</h4>
-<table class="list"><tbody>
-<tr><th>http</th>
-        <td class="description">HTTP connection</td></tr>
-<tr><th>uri</th>
-        <td class="description">URI for trace</td></tr>
-</tbody></table>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">Status of call (0 = success)</p>
+on the status strings defined in RFC 7231.</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.0/OS 10.10&#160;</span><a id="httpURIStatusString">httpURIStatusString</a></h3>
         <p class="description">Return a string describing a URI status code.</p>
 <p class="code">
@@ -3842,7 +3819,7 @@ event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 
 </p>
 <h3 class="function"><a id="ippAddDate">ippAddDate</a></h3>
-        <p class="description">Add a date attribute to an IPP message.</p>
+        <p class="description">Add a dateTime attribute to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddDate(<a href="#ipp_t">ipp_t</a> *ipp, ipp_tag_t group, const char *name, const <a href="#ipp_uchar_t">ipp_uchar_t</a> *value);</p>
 <h4 class="parameters">Parameters</h4>
@@ -4372,7 +4349,7 @@ int ippContainsString(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, cons
         <p class="description">1 on a match, 0 on no match</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">Returns non-zero when the attribute contains a matching charset, keyword,
-language, mimeMediaType, name, text, URI, or URI scheme value.
+naturalLanguage, mimeMediaType, name, text, uri, or uriScheme value.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippCopyAttribute">ippCopyAttribute</a></h3>
@@ -4456,14 +4433,14 @@ using the <code>cupsArrayDelete</code> function.
 
 </p>
 <h3 class="function"><a id="ippDateToTime">ippDateToTime</a></h3>
-        <p class="description">Convert from RFC 1903 Date/Time format to UNIX time
-in seconds.</p>
+        <p class="description">Convert from RFC 2579 Date/Time format to time in
+seconds.</p>
 <p class="code">
 time_t ippDateToTime(const <a href="#ipp_uchar_t">ipp_uchar_t</a> *date);</p>
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>date</th>
-        <td class="description">RFC 1903 date info</td></tr>
+        <td class="description">RFC 2579 date info</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">UNIX time value</p>
@@ -4625,7 +4602,7 @@ int ippGetBoolean(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int elem
         <p class="description">Boolean value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetCollection">ippGetCollection</a></h3>
@@ -4643,7 +4620,7 @@ int ippGetBoolean(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int elem
         <p class="description">Collection value or <code>NULL</code> on error</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetCount">ippGetCount</a></h3>
@@ -4658,7 +4635,7 @@ int ippGetCount(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Number of values or 0 on error</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetDate">ippGetDate</a></h3>
-        <p class="description">Get a date value for an attribute.</p>
+        <p class="description">Get a dateTime value for an attribute.</p>
 <p class="code">
 const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippGetDate(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int element);</p>
 <h4 class="parameters">Parameters</h4>
@@ -4669,10 +4646,10 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippGetDate(<a href="#ipp_attribute
         <td class="description">Value number (0-based)</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">Date value or <code>NULL</code></p>
+        <p class="description">dateTime value or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetGroupTag">ippGetGroupTag</a></h3>
@@ -4701,7 +4678,7 @@ int ippGetInteger(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int elem
         <p class="description">Value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetName">ippGetName</a></h3>
@@ -4732,7 +4709,7 @@ void *ippGetOctetString(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, in
         <p class="description">Pointer to octetString data</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetOperation">ippGetOperation</a></h3>
@@ -4763,7 +4740,7 @@ int ippGetRange(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int elemen
         <p class="description">Lower value of range or 0</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetRequestId">ippGetRequestId</a></h3>
@@ -4796,7 +4773,7 @@ int ippGetResolution(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, int e
         <p class="description">Horizontal/cross feed resolution or 0</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetState">ippGetState</a></h3>
@@ -4837,7 +4814,7 @@ const char *ippGetString(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr, i
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Get the string and optionally the language code for an attribute.</p>
         <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+<code>ippGetCount(attr)</code> - 1.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippGetValueTag">ippGetValueTag</a></h3>
@@ -4860,7 +4837,7 @@ int ippGetVersion(<a href="#ipp_t">ipp_t</a> *ipp, int *minor);</p>
 <tr><th>ipp</th>
         <td class="description">IPP message</td></tr>
 <tr><th>minor</th>
-        <td class="description">Minor version number or <code>NULL</code></td></tr>
+        <td class="description">Minor version number or <code>NULL</code> for don't care</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Major version number or 0 on error</p>
@@ -4893,9 +4870,9 @@ size_t ippLength(<a href="#ipp_t">ipp_t</a> *ipp);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">IPP request message</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The new request message is initialized with the attributes-charset and
-attributes-natural-language attributes added. The
-attributes-natural-language value is derived from the current locale.
+        <p class="discussion">The new request message is initialized with the &quot;attributes-charset&quot; and
+&quot;attributes-natural-language&quot; attributes added. The
+&quot;attributes-natural-language&quot; value is derived from the current locale.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="ippNewResponse">ippNewResponse</a></h3>
@@ -4910,11 +4887,11 @@ attributes-natural-language value is derived from the current locale.
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">IPP response message</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The new response message is initialized with the same version-number,
-request-id, attributes-charset, and attributes-natural-language as the
-provided request message.  If the attributes-charset or
-attributes-natural-language attributes are missing from the request,
-&quot;utf-8&quot; and a value derived from the current locale are substituted,
+        <p class="discussion">The new response message is initialized with the same &quot;version-number&quot;,
+&quot;request-id&quot;, &quot;attributes-charset&quot;, and &quot;attributes-natural-language&quot; as the
+provided request message.  If the &quot;attributes-charset&quot; or
+&quot;attributes-natural-language&quot; attributes are missing from the request,
+'utf-8' and a value derived from the current locale are substituted,
 respectively.
 
 </p>
@@ -5026,7 +5003,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetCollection">ippSetCollection</a></h3>
@@ -5053,11 +5030,11 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetDate">ippSetDate</a></h3>
-        <p class="description">Set a date value in an attribute.</p>
+        <p class="description">Set a dateTime value in an attribute.</p>
 <p class="code">
 int ippSetDate(<a href="#ipp_t">ipp_t</a> *ipp, <a href="#ipp_attribute_t">ipp_attribute_t</a> **attr, int element, const <a href="#ipp_uchar_t">ipp_uchar_t</a> *datevalue);</p>
 <h4 class="parameters">Parameters</h4>
@@ -5069,7 +5046,7 @@ int ippSetDate(<a href="#ipp_t">ipp_t</a> *ipp, <a href="#ipp_attribute_t">ipp_a
 <tr><th>element</th>
         <td class="description">Value number (0-based)</td></tr>
 <tr><th>datevalue</th>
-        <td class="description">Date value</td></tr>
+        <td class="description">dateTime value</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
@@ -5080,7 +5057,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetGroupTag">ippSetGroupTag</a></h3>
@@ -5135,7 +5112,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetName">ippSetName</a></h3>
@@ -5186,7 +5163,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetOperation">ippSetOperation</a></h3>
@@ -5242,7 +5219,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetRequestId">ippSetRequestId</a></h3>
@@ -5293,7 +5270,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="ippSetState">ippSetState</a></h3>
@@ -5351,7 +5328,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+<code>ippGetCount(attr)</code>.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="ippSetStringf">ippSetStringf</a></h3>
@@ -5380,7 +5357,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.<br>
+<code>ippGetCount(attr)</code>.<br>
 <br>
 The <code>format</code> parameter uses formatting characters compatible with the
 printf family of standard functions.  Additional arguments follow it as
@@ -5414,7 +5391,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 The <code>element</code> parameter specifies which value to set from 0 to
-<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.<br>
+<code>ippGetCount(attr)</code>.<br>
 <br>
 The <code>format</code> parameter uses formatting characters compatible with the
 printf family of standard functions.  Additional arguments follow it as
@@ -5501,7 +5478,7 @@ const char *ippTagString(ipp_tag_t tag);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Tag name</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The returned names are defined in RFC 2911 and 3382.
+        <p class="discussion">The returned names are defined in RFC 8011 and the IANA IPP Registry.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="ippTagValue">ippTagValue</a></h3>
@@ -5516,20 +5493,20 @@ ipp_tag_t ippTagValue(const char *name);</p>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Tag value</p>
 <h4 class="discussion">Discussion</h4>
-        <p class="discussion">The tag names are defined in RFC 2911 and 3382.
+        <p class="discussion">The tag names are defined in RFC 8011 and the IANA IPP Registry.
 
 </p>
 <h3 class="function"><a id="ippTimeToDate">ippTimeToDate</a></h3>
-        <p class="description">Convert from UNIX time to RFC 1903 format.</p>
+        <p class="description">Convert from time in seconds to RFC 2579 format.</p>
 <p class="code">
 const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate(time_t t);</p>
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>t</th>
-        <td class="description">UNIX time value</td></tr>
+        <td class="description">Time in seconds</td></tr>
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-        <p class="description">RFC-1903 date/time data</p>
+        <p class="description">RFC-2579 date/time data</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="ippValidateAttribute">ippValidateAttribute</a></h3>
         <p class="description">Validate the contents of an attribute.</p>
 <p class="code">
@@ -5544,7 +5521,7 @@ int ippValidateAttribute(<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr);<
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">This function validates the contents of an attribute based on the name and
 value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
-failure, cupsLastErrorString() is set to a human-readable message.
+failure, <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> is set to a human-readable message.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span><a id="ippValidateAttributes">ippValidateAttributes</a></h3>
@@ -5560,8 +5537,8 @@ int ippValidateAttributes(<a href="#ipp_t">ipp_t</a> *ipp);</p>
         <p class="description">1 if valid, 0 otherwise</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">This function validates the contents of the IPP message, including each
-attribute.  Like <a href="#ippValidateAttribute"><code>ippValidateAttribute</code></a>, cupsLastErrorString() is set
-to a human-readable message on failure.
+attribute.  Like <a href="#ippValidateAttribute"><code>ippValidateAttribute</code></a>, <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> is
+set to a human-readable message on failure.
 
 </p>
 <h3 class="function"><a id="ippWrite">ippWrite</a></h3>
@@ -5729,15 +5706,13 @@ typedef enum <a href="#http_uri_status_e">http_uri_status_e</a> http_uri_status_
       <p class="code">
 typedef struct _ipp_attribute_s ipp_attribute_t;
 </p>
-      <h3 class="typedef"><a id="ipp_copycb_t">ipp_copycb_t</a></h3>
-        <p class="description">The following structures are PRIVATE starting with CUPS 1.6/macOS 10.8.
-Please use the new accessor functions available in CUPS 1.6 and later, as
-these definitions will be moved to a private header file in a future release.</p>
+      <h3 class="typedef"><a id="ipp_copycb_t"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span>ipp_copycb_t</a></h3>
+        <p class="description">ippCopyAttributes callback function </p>
       <p class="code">
 typedef int(*)(void *context, <a href="#ipp_t">ipp_t</a> *dst, <a href="#ipp_attribute_t">ipp_attribute_t</a> *attr)ipp_copycb_t;
 </p>
       <h3 class="typedef"><a id="ipp_iocb_t"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span>ipp_iocb_t</a></h3>
-        <p class="description">IPP IO Callback Function </p>
+        <p class="description">ippReadIO/ippWriteIO callback function </p>
       <p class="code">
 typedef ssize_t(*)(void *context, ipp_uchar_t *buffer, size_t bytes) ipp_iocb_t;
 </p>
@@ -5747,12 +5722,12 @@ typedef ssize_t(*)(void *context, ipp_uchar_t *buffer, size_t bytes) ipp_iocb_t;
 typedef enum <a href="#ipp_orient_e">ipp_orient_e</a> ipp_orient_t;
 </p>
       <h3 class="typedef"><a id="ipp_pstate_t">ipp_pstate_t</a></h3>
-        <p class="description">Printer states</p>
+        <p class="description">Printer state values</p>
       <p class="code">
 typedef enum <a href="#ipp_pstate_e">ipp_pstate_e</a> ipp_pstate_t;
 </p>
       <h3 class="typedef"><a id="ipp_quality_t">ipp_quality_t</a></h3>
-        <p class="description">Qualities</p>
+        <p class="description">Print quality values</p>
       <p class="code">
 typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 </p>
@@ -5762,7 +5737,7 @@ typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 </p>
       <h3 class="typedef"><a id="ipp_state_t">ipp_state_t</a></h3>
-        <p class="description">IPP states</p>
+        <p class="description">ipp_t state values</p>
       <p class="code">
 typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 </p>
@@ -6221,7 +6196,7 @@ are server-oriented...</p>
         <tr><th>IPP_ORIENT_REVERSE_PORTRAIT </th>        <td class="description">180 degrees</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_pstate_e">ipp_pstate_e</a></h3>
-        <p class="description">Printer states</p>
+        <p class="description">Printer state values</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>IPP_PSTATE_IDLE </th>        <td class="description">Printer is idle</td></tr>
@@ -6229,7 +6204,7 @@ are server-oriented...</p>
         <tr><th>IPP_PSTATE_STOPPED </th>        <td class="description">Printer is stopped</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_quality_e">ipp_quality_e</a></h3>
-        <p class="description">Qualities</p>
+        <p class="description">Print quality values</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>IPP_QUALITY_DRAFT </th>        <td class="description">Draft quality</td></tr>
@@ -6244,7 +6219,7 @@ are server-oriented...</p>
         <tr><th>IPP_RES_PER_INCH </th>        <td class="description">Pixels per inch</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_state_e">ipp_state_e</a></h3>
-        <p class="description">IPP states</p>
+        <p class="description">ipp_t state values</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>IPP_STATE_ATTRIBUTE </th>        <td class="description">One or more attributes need to be sent/received</td></tr>
@@ -6254,7 +6229,7 @@ are server-oriented...</p>
         <tr><th>IPP_STATE_IDLE </th>        <td class="description">Nothing is happening/request completed</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_status_e">ipp_status_e</a></h3>
-        <p class="description">IPP status codes</p>
+        <p class="description">IPP status code values</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>IPP_STATUS_CUPS_INVALID </th>        <td class="description">Invalid status name for <a href="#ippErrorValue"><code>ippErrorValue</code></a></td></tr>
@@ -6317,7 +6292,7 @@ are server-oriented...</p>
         <tr><th>IPP_STATUS_OK_TOO_MANY_EVENTS </th>        <td class="description">successful-ok-too-many-events</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_tag_e">ipp_tag_e</a></h3>
-        <p class="description">Format tags for attributes</p>
+        <p class="description">Value and group tag values for attributes</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>IPP_TAG_ADMINDEFINE </th>        <td class="description">Admin-defined value</td></tr>

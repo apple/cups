@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol support functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2243,7 +2243,7 @@ ippStateString(ipp_state_t state)	/* I - State value */
 /*
  * 'ippTagString()' - Return the tag name corresponding to a tag value.
  *
- * The returned names are defined in RFC 2911 and 3382.
+ * The returned names are defined in RFC 8011 and the IANA IPP Registry.
  *
  * @since CUPS 1.4/macOS 10.6@
  */
@@ -2263,7 +2263,7 @@ ippTagString(ipp_tag_t tag)		/* I - Tag value */
 /*
  * 'ippTagValue()' - Return the tag value corresponding to a tag name.
  *
- * The tag names are defined in RFC 2911 and 3382.
+ * The tag names are defined in RFC 8011 and the IANA IPP Registry.
  *
  * @since CUPS 1.4/macOS 10.6@
  */

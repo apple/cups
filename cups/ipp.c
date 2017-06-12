@@ -316,7 +316,7 @@ ippAddCollections(
 
 
 /*
- * 'ippAddDate()' - Add a date attribute to an IPP message.
+ * 'ippAddDate()' - Add a dateTime attribute to an IPP message.
  *
  * The @code ipp@ parameter refers to an IPP message previously created using
  * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
@@ -1380,7 +1380,7 @@ ippContainsInteger(
  *                         specified string value.
  *
  * Returns non-zero when the attribute contains a matching charset, keyword,
- * language, mimeMediaType, name, text, URI, or URI scheme value.
+ * naturalLanguage, mimeMediaType, name, text, uri, or uriScheme value.
  *
  * @since CUPS 1.7/macOS 10.9@
  */
@@ -1759,12 +1759,12 @@ ippCopyAttributes(
 
 
 /*
- * 'ippDateToTime()' - Convert from RFC 1903 Date/Time format to UNIX time
- *                     in seconds.
+ * 'ippDateToTime()' - Convert from RFC 2579 Date/Time format to time in
+ *                     seconds.
  */
 
 time_t					/* O - UNIX time value */
-ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
+ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 2579 date info */
 {
   struct tm	unixdate;		/* UNIX date/time info */
   time_t	t;			/* Computed time */
@@ -1776,7 +1776,7 @@ ippDateToTime(const ipp_uchar_t *date)	/* I - RFC 1903 date info */
   memset(&unixdate, 0, sizeof(unixdate));
 
  /*
-  * RFC-1903 date/time format is:
+  * RFC-2579 date/time format is:
   *
   *    Byte(s)  Description
   *    -------  -----------
@@ -2152,7 +2152,7 @@ ippFirstAttribute(ipp_t *ipp)		/* I - IPP message */
  * 'ippGetBoolean()' - Get a boolean value for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2181,7 +2181,7 @@ ippGetBoolean(ipp_attribute_t *attr,	/* I - IPP attribute */
  * 'ippGetCollection()' - Get a collection value for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2232,15 +2232,15 @@ ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
 
 
 /*
- * 'ippGetDate()' - Get a date value for an attribute.
+ * 'ippGetDate()' - Get a dateTime value for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
 
-const ipp_uchar_t *			/* O - Date value or @code NULL@ */
+const ipp_uchar_t *			/* O - dateTime value or @code NULL@ */
 ippGetDate(ipp_attribute_t *attr,	/* I - IPP attribute */
            int             element)	/* I - Value number (0-based) */
 {
@@ -2288,7 +2288,7 @@ ippGetGroupTag(ipp_attribute_t *attr)	/* I - IPP attribute */
  * 'ippGetInteger()' - Get the integer/enum value for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2341,7 +2341,7 @@ ippGetName(ipp_attribute_t *attr)	/* I - IPP attribute */
  * 'ippGetOctetString()' - Get an octetString value from an IPP attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.7/macOS 10.9@
  */
@@ -2404,7 +2404,7 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
  * 'ippGetRange()' - Get a rangeOfInteger value from an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2466,7 +2466,7 @@ ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
  * 'ippGetResolution()' - Get a resolution value for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2560,7 +2560,7 @@ ippGetStatusCode(ipp_t *ipp)		/* I - IPP response or event message */
  * 'ippGetString()' - Get the string and optionally the language code for an attribute.
  *
  * The @code element@ parameter specifies which value to get from 0 to
- * @link ippGetCount(attr)@ - 1.
+ * @code ippGetCount(attr)@ - 1.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -2625,7 +2625,7 @@ ippGetValueTag(ipp_attribute_t *attr)	/* I - IPP attribute */
 
 int					/* O - Major version number or 0 on error */
 ippGetVersion(ipp_t *ipp,		/* I - IPP message */
-              int   *minor)		/* O - Minor version number or @code NULL@ */
+              int   *minor)		/* O - Minor version number or @code NULL@ for don't care */
 {
  /*
   * Range check input...
@@ -2722,9 +2722,9 @@ ippNew(void)
 /*
  *  'ippNewRequest()' - Allocate a new IPP request message.
  *
- * The new request message is initialized with the attributes-charset and
- * attributes-natural-language attributes added. The
- * attributes-natural-language value is derived from the current locale.
+ * The new request message is initialized with the "attributes-charset" and
+ * "attributes-natural-language" attributes added. The
+ * "attributes-natural-language" value is derived from the current locale.
  *
  * @since CUPS 1.2/macOS 10.5@
  */
@@ -2786,11 +2786,11 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
 /*
  * 'ippNewResponse()' - Allocate a new IPP response message.
  *
- * The new response message is initialized with the same version-number,
- * request-id, attributes-charset, and attributes-natural-language as the
- * provided request message.  If the attributes-charset or
- * attributes-natural-language attributes are missing from the request,
- * "utf-8" and a value derived from the current locale are substituted,
+ * The new response message is initialized with the same "version-number",
+ * "request-id", "attributes-charset", and "attributes-natural-language" as the
+ * provided request message.  If the "attributes-charset" or
+ * "attributes-natural-language" attributes are missing from the request,
+ * 'utf-8' and a value derived from the current locale are substituted,
  * respectively.
  *
  * @since CUPS 1.7/macOS 10.9@
@@ -3706,7 +3706,7 @@ ippReadIO(void       *src,		/* I - Data source */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -3748,7 +3748,7 @@ ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -3789,7 +3789,7 @@ ippSetCollection(
 
 
 /*
- * 'ippSetDate()' - Set a date value in an attribute.
+ * 'ippSetDate()' - Set a dateTime value in an attribute.
  *
  * The @code ipp@ parameter refers to an IPP message previously created using
  * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
@@ -3797,7 +3797,7 @@ ippSetCollection(
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -3806,7 +3806,7 @@ int					/* O  - 1 on success, 0 on failure */
 ippSetDate(ipp_t             *ipp,	/* I  - IPP message */
            ipp_attribute_t   **attr,	/* IO - IPP attribute */
            int               element,	/* I  - Value number (0-based) */
-           const ipp_uchar_t *datevalue)/* I  - Date value */
+           const ipp_uchar_t *datevalue)/* I  - dateTime value */
 {
   _ipp_value_t	*value;			/* Current value */
 
@@ -3854,7 +3854,7 @@ ippSetGroupTag(
     ipp_tag_t       group_tag)		/* I  - Group tag */
 {
  /*
-  * Range check input - group tag must be 0x01 to 0x0F, per RFC 2911...
+  * Range check input - group tag must be 0x01 to 0x0F, per RFC 8011...
   */
 
   if (!ipp || !attr || !*attr ||
@@ -3881,7 +3881,7 @@ ippSetGroupTag(
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -3966,7 +3966,7 @@ ippSetName(ipp_t           *ipp,	/* I  - IPP message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.7/macOS 10.9@
  */
@@ -4084,7 +4084,7 @@ ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -4164,7 +4164,7 @@ ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -4272,7 +4272,7 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * @since CUPS 1.6/macOS 10.8@
  */
@@ -4334,7 +4334,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * The @code format@ parameter uses formatting characters compatible with the
  * printf family of standard functions.  Additional arguments follow it as
@@ -4372,7 +4372,7 @@ ippSetStringf(ipp_t           *ipp,	/* I  - IPP message */
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * The @code element@ parameter specifies which value to set from 0 to
- * @link ippGetCount(attr)@.
+ * @code ippGetCount(attr)@.
  *
  * The @code format@ parameter uses formatting characters compatible with the
  * printf family of standard functions.  Additional arguments follow it as
@@ -4715,19 +4715,19 @@ ippSetVersion(ipp_t *ipp,		/* I - IPP message */
 
 
 /*
- * 'ippTimeToDate()' - Convert from UNIX time to RFC 1903 format.
+ * 'ippTimeToDate()' - Convert from time in seconds to RFC 2579 format.
  */
 
-const ipp_uchar_t *			/* O - RFC-1903 date/time data */
-ippTimeToDate(time_t t)			/* I - UNIX time value */
+const ipp_uchar_t *			/* O - RFC-2579 date/time data */
+ippTimeToDate(time_t t)			/* I - Time in seconds */
 {
   struct tm	*unixdate;		/* UNIX unixdate/time info */
   ipp_uchar_t	*date = _cupsGlobals()->ipp_date;
-					/* RFC-1903 date/time data */
+					/* RFC-2579 date/time data */
 
 
  /*
-  * RFC-1903 date/time format is:
+  * RFC-2579 date/time format is:
   *
   *    Byte(s)  Description
   *    -------  -----------
@@ -4767,7 +4767,7 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
  *
  * This function validates the contents of an attribute based on the name and
  * value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
- * failure, cupsLastErrorString() is set to a human-readable message.
+ * failure, @link cupsLastErrorString@ is set to a human-readable message.
  *
  * @since CUPS 1.7/macOS 10.9@
  */
@@ -4823,7 +4823,7 @@ ippValidateAttribute(
   {
     ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
                   _("\"%s\": Bad attribute name - invalid character "
-		    "(RFC 2911 section 4.1.3)."), attr->name);
+		    "(RFC 8011 section 5.1.4)."), attr->name);
     return (0);
   }
 
@@ -4831,7 +4831,7 @@ ippValidateAttribute(
   {
     ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
                   _("\"%s\": Bad attribute name - bad length %d "
-		    "(RFC 2911 section 4.1.3)."), attr->name,
+		    "(RFC 8011 section 5.1.4)."), attr->name,
 		  (int)(ptr - attr->name));
     return (0);
   }
@@ -4849,7 +4849,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
                           _("\"%s\": Bad boolen value %d "
-			    "(RFC 2911 section 4.1.11)."), attr->name,
+			    "(RFC 8011 section 5.1.21)."), attr->name,
 			  attr->values[i].boolean);
 	    return (0);
 	  }
@@ -4863,7 +4863,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad enum value %d - out of range "
-			    "(RFC 2911 section 4.1.4)."), attr->name,
+			    "(RFC 8011 section 5.1.5)."), attr->name,
 			    attr->values[i].integer);
             return (0);
 	  }
@@ -4877,7 +4877,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad octetString value - bad length %d "
-			    "(RFC 2911 section 4.1.10)."), attr->name,
+			    "(RFC 8011 section 5.1.20)."), attr->name,
 			    attr->values[i].unknown.length);
 	    return (0);
 	  }
@@ -4893,7 +4893,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime month %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[2]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[2]);
 	    return (0);
 	  }
 
@@ -4901,7 +4901,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime day %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[3]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[3]);
 	    return (0);
 	  }
 
@@ -4909,7 +4909,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime hours %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[4]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[4]);
 	    return (0);
 	  }
 
@@ -4917,7 +4917,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime minutes %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[5]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[5]);
 	    return (0);
 	  }
 
@@ -4925,7 +4925,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime seconds %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[6]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[6]);
 	    return (0);
 	  }
 
@@ -4933,7 +4933,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime deciseconds %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[7]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[7]);
 	    return (0);
 	  }
 
@@ -4941,7 +4941,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC sign '%c' "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[8]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[8]);
 	    return (0);
 	  }
 
@@ -4949,7 +4949,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC hours %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[9]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[9]);
 	    return (0);
 	  }
 
@@ -4957,7 +4957,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC minutes %u "
-			    "(RFC 2911 section 4.1.14)."), attr->name, date[10]);
+			    "(RFC 8011 section 5.1.15)."), attr->name, date[10]);
 	    return (0);
 	  }
 	}
@@ -4971,7 +4971,7 @@ ippValidateAttribute(
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - cross "
 			    "feed resolution must be positive "
-			    "(RFC 2911 section 4.1.15)."), attr->name,
+			    "(RFC 8011 section 5.1.16)."), attr->name,
 			  attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
@@ -4986,7 +4986,7 @@ ippValidateAttribute(
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - feed "
 			    "resolution must be positive "
-			    "(RFC 2911 section 4.1.15)."), attr->name,
+			    "(RFC 8011 section 5.1.16)."), attr->name,
 			  attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
@@ -5001,7 +5001,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - bad "
-			    "units value (RFC 2911 section 4.1.15)."),
+			    "units value (RFC 8011 section 5.1.16)."),
 			  attr->name, attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
@@ -5020,7 +5020,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad rangeOfInteger value %d-%d - lower "
-			    "greater than upper (RFC 2911 section 4.1.13)."),
+			    "greater than upper (RFC 8011 section 5.1.14)."),
 			  attr->name, attr->values[i].range.lower,
 			  attr->values[i].range.upper);
 	    return (0);
@@ -5082,7 +5082,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad text value \"%s\" - bad UTF-8 "
-			    "sequence (RFC 2911 section 4.1.1)."), attr->name,
+			    "sequence (RFC 8011 section 5.1.2)."), attr->name,
 			  attr->values[i].string.text);
 	    return (0);
 	  }
@@ -5091,7 +5091,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad text value \"%s\" - bad length %d "
-			    "(RFC 2911 section 4.1.1)."), attr->name,
+			    "(RFC 8011 section 5.1.2)."), attr->name,
 			  attr->values[i].string.text,
 			  (int)(ptr - attr->values[i].string.text));
 	    return (0);
@@ -5140,7 +5140,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad name value \"%s\" - bad UTF-8 "
-			    "sequence (RFC 2911 section 4.1.2)."), attr->name,
+			    "sequence (RFC 8011 section 5.1.3)."), attr->name,
 			  attr->values[i].string.text);
 	    return (0);
 	  }
@@ -5149,7 +5149,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad name value \"%s\" - bad length %d "
-			    "(RFC 2911 section 4.1.2)."), attr->name,
+			    "(RFC 8011 section 5.1.3)."), attr->name,
 			  attr->values[i].string.text,
 			  (int)(ptr - attr->values[i].string.text));
 	    return (0);
@@ -5169,7 +5169,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad keyword value \"%s\" - invalid "
-			    "character (RFC 2911 section 4.1.3)."),
+			    "character (RFC 8011 section 5.1.4)."),
 			  attr->name, attr->values[i].string.text);
 	    return (0);
 	  }
@@ -5178,7 +5178,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad keyword value \"%s\" - bad "
-			    "length %d (RFC 2911 section 4.1.3)."),
+			    "length %d (RFC 8011 section 5.1.4)."),
 			  attr->name, attr->values[i].string.text,
 			  (int)(ptr - attr->values[i].string.text));
 	    return (0);
@@ -5200,7 +5200,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad URI value \"%s\" - %s "
-			    "(RFC 2911 section 4.1.5)."), attr->name,
+			    "(RFC 8011 section 5.1.6)."), attr->name,
 			  attr->values[i].string.text,
 			  uri_status_strings[uri_status -
 					     HTTP_URI_STATUS_OVERFLOW]);
@@ -5211,7 +5211,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad URI value \"%s\" - bad length %d "
-			    "(RFC 2911 section 4.1.5)."), attr->name,
+			    "(RFC 8011 section 5.1.6)."), attr->name,
 			  attr->values[i].string.text,
 			  (int)strlen(attr->values[i].string.text));
 	  }
@@ -5234,7 +5234,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad uriScheme value \"%s\" - bad "
-			    "characters (RFC 2911 section 4.1.6)."),
+			    "characters (RFC 8011 section 5.1.7)."),
 			  attr->name, attr->values[i].string.text);
 	    return (0);
 	  }
@@ -5243,7 +5243,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad uriScheme value \"%s\" - bad "
-			    "length %d (RFC 2911 section 4.1.6)."),
+			    "length %d (RFC 8011 section 5.1.7)."),
 			  attr->name, attr->values[i].string.text,
 			  (int)(ptr - attr->values[i].string.text));
 	    return (0);
@@ -5263,7 +5263,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad charset value \"%s\" - bad "
-			    "characters (RFC 2911 section 4.1.7)."),
+			    "characters (RFC 8011 section 5.1.8)."),
 			  attr->name, attr->values[i].string.text);
 	    return (0);
 	  }
@@ -5272,7 +5272,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad charset value \"%s\" - bad "
-			    "length %d (RFC 2911 section 4.1.7)."),
+			    "length %d (RFC 8011 section 5.1.8)."),
 			  attr->name, attr->values[i].string.text,
 			  (int)(ptr - attr->values[i].string.text));
 	    return (0);
@@ -5318,7 +5318,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad naturalLanguage value \"%s\" - bad "
-			    "characters (RFC 2911 section 4.1.8)."),
+			    "characters (RFC 8011 section 5.1.9)."),
 			  attr->name, attr->values[i].string.text);
 	    regfree(&re);
 	    return (0);
@@ -5328,7 +5328,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad naturalLanguage value \"%s\" - bad "
-			    "length %d (RFC 2911 section 4.1.8)."),
+			    "length %d (RFC 8011 section 5.1.9)."),
 			  attr->name, attr->values[i].string.text,
 			  (int)strlen(attr->values[i].string.text));
 	    regfree(&re);
@@ -5372,7 +5372,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad mimeMediaType value \"%s\" - bad "
-			    "characters (RFC 2911 section 4.1.9)."),
+			    "characters (RFC 8011 section 5.1.10)."),
 			  attr->name, attr->values[i].string.text);
 	    regfree(&re);
 	    return (0);
@@ -5382,7 +5382,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad mimeMediaType value \"%s\" - bad "
-			    "length %d (RFC 2911 section 4.1.9)."),
+			    "length %d (RFC 8011 section 5.1.10)."),
 			  attr->name, attr->values[i].string.text,
 			  (int)strlen(attr->values[i].string.text));
 	    regfree(&re);
@@ -5405,8 +5405,8 @@ ippValidateAttribute(
  * 'ippValidateAttributes()' - Validate all attributes in an IPP message.
  *
  * This function validates the contents of the IPP message, including each
- * attribute.  Like @link ippValidateAttribute@, cupsLastErrorString() is set
- * to a human-readable message on failure.
+ * attribute.  Like @link ippValidateAttribute@, @link cupsLastErrorString@ is
+ * set to a human-readable message on failure.
  *
  * @since CUPS 1.7/macOS 10.9@
  */

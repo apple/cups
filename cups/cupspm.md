@@ -729,3 +729,21 @@ created:
     }
 
     fclose(fp);
+
+
+# Sending IPP Requests
+
+## Connecting to the Scheduler or Printer
+
+cupsDestConnect and httpConnect2
+
+httpGetTrust, etc.
+
+
+## Creating an IPP Request
+
+## Sending the IPP Request
+
+## Getting the IPP Response
+
+## Authentication

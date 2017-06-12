@@ -1,7 +1,7 @@
 /*
  * Private definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -105,7 +105,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   int			need_res_init;	/* Need to reinitialize resolver? */
 
   /* ipp.c */
-  ipp_uchar_t		ipp_date[11];	/* RFC-1903 date/time data */
+  ipp_uchar_t		ipp_date[11];	/* RFC-2579 date/time data */
   _cups_buffer_t	*cups_buffers;	/* Buffer list */
 
   /* ipp-support.c */

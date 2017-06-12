@@ -276,7 +276,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_GET_NOTIFICATIONS,		/* Get-Notifications: Get notification events @since CUPS 1.2/macOS 10.5@ */
   IPP_OP_SEND_NOTIFICATIONS,		/* Send-Notifications: Send notification events @private@ */
   IPP_OP_GET_RESOURCE_ATTRIBUTES,	/* Get-Resource-Attributes: Get resource information @private@ */
-  IPP_OP_GET_RESOURCE_DATA,		/* Get-Resource-Data: Get resource data @private@ */
+  IPP_OP_GET_RESOURCE_DATA,		/* Get-Resource-Data: Get resource data @private@ @deprecated@ */
   IPP_OP_GET_RESOURCES,			/* Get-Resources: Get list of resources @private@ */
   IPP_OP_GET_PRINT_SUPPORT_FILES,	/* Get-Printer-Support-Files: Get printer support files @private@ */
   IPP_OP_ENABLE_PRINTER,		/* Enable-Printer: Accept new jobs for a printer */
@@ -442,7 +442,7 @@ typedef enum ipp_orient_e		/**** Orientation values ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } ipp_orient_t;
 
-typedef enum ipp_pstate_e		/**** Printer states ****/
+typedef enum ipp_pstate_e		/**** Printer state values ****/
 {
   IPP_PSTATE_IDLE = 3,			/* Printer is idle */
   IPP_PSTATE_PROCESSING,		/* Printer is working */
@@ -455,7 +455,7 @@ typedef enum ipp_pstate_e		/**** Printer states ****/
 #  endif /* _CUPS_NO_DEPRECATED */
 } ipp_pstate_t;
 
-typedef enum ipp_quality_e		/**** Qualities ****/
+typedef enum ipp_quality_e		/**** Print quality values ****/
 {
   IPP_QUALITY_DRAFT = 3,		/* Draft quality */
   IPP_QUALITY_NORMAL,			/* Normal quality */
@@ -468,7 +468,7 @@ typedef enum ipp_res_e			/**** Resolution units ****/
   IPP_RES_PER_CM			/* Pixels per centimeter */
 } ipp_res_t;
 
-typedef enum ipp_state_e		/**** IPP states ****/
+typedef enum ipp_state_e		/**** ipp_t state values ****/
 {
   IPP_STATE_ERROR = -1,			/* An error occurred */
   IPP_STATE_IDLE,			/* Nothing is happening/request completed */
@@ -485,7 +485,7 @@ typedef enum ipp_state_e		/**** IPP states ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } ipp_state_t;
 
-typedef enum ipp_status_e		/**** IPP status codes ****/
+typedef enum ipp_status_e		/**** IPP status code values ****/
 {
   IPP_STATUS_CUPS_INVALID = -1,		/* Invalid status name for @link ippErrorValue@ */
   IPP_STATUS_OK = 0x0000,		/* successful-ok */
@@ -636,7 +636,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
 #  endif /* _CUPS_NO_DEPRECATED */
 } ipp_status_t;
 
-typedef enum ipp_tag_e			/**** Format tags for attributes ****/
+typedef enum ipp_tag_e			/**** Value and group tag values for attributes ****/
 {
   IPP_TAG_CUPS_INVALID = -1,		/* Invalid tag name for @link ippTagValue@ */
   IPP_TAG_ZERO = 0x00,			/* Zero tag - used for separators */
@@ -695,10 +695,11 @@ typedef struct _ipp_attribute_s ipp_attribute_t;
 
 /**** New in CUPS 1.2/macOS 10.5 ****/
 typedef ssize_t	(*ipp_iocb_t)(void *context, ipp_uchar_t *buffer, size_t bytes);
-					/**** IPP IO Callback Function @since CUPS 1.2/macOS 10.5@ ****/
+					/**** ippReadIO/ippWriteIO callback function @since CUPS 1.2/macOS 10.5@ ****/
 
 /**** New in CUPS 1.6/macOS 10.8 ****/
 typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
+                                        /**** ippCopyAttributes callback function @since CUPS 1.6/macOS 10.8 ****/
 
 
 /*
@@ -805,7 +806,7 @@ typedef union _ipp_value_u		/**** Attribute Value ****/
 } _ipp_value_t;
 typedef _ipp_value_t ipp_value_t;	/**** Convenience typedef that will be removed @private@ ****/
 
-struct _ipp_attribute_s			/**** Attribute ****/
+struct _ipp_attribute_s			/**** IPP attribute ****/
 {
   ipp_attribute_t *next;		/* Next attribute in list */
   ipp_tag_t	group_tag,		/* Job/Printer/Operation group tag */
