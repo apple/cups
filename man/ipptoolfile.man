@@ -1,7 +1,7 @@
 .\"
-.\" ipptoolfile man page for CUPS.
+.\" ipptoolfile man page.
 .\"
-.\" Copyright 2010-2014 by Apple Inc.
+.\" Copyright 2010-2017 by Apple Inc.
 .\"
 .\" These coded instructions, statements, and computer programs are the
 .\" property of Apple Inc. and are protected by Federal copyright
@@ -9,28 +9,48 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "4 February 2015" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "13 June 2017" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
 The
 .BR ipptool (1)
-program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
+program accepts free-form plain text files that describe one or more IPP requests.
+Comments start with the "#" character and continue to the end of the line.
+Each request is enclosed by curly braces, for example:
 .nf
 
     # This is a comment
     {
       # The name of the test
-      NAME "Print PostScript File"
+      NAME "Print PDF File"
 
       # The request to send
       OPERATION Print\-Job
+
       GROUP operation\-attributes\-tag
       ATTR charset attributes\-charset utf\-8
       ATTR language attributes\-natural\-language en
       ATTR uri printer\-uri $uri
       ATTR name requesting\-user\-name $user
-      FILE testfile.ps
+      ATTR mimeMediaType document\-format application/pdf
+
+      GROUP job\-attributes\-tag
+      ATTR collection media\-col {
+        # US Letter plain paper from the "main" tray
+        MEMBER collection media\-size {
+          MEMBER integer x\-dimension 21590
+          MEMBER integer y\-dimension 27940
+        }
+        MEMBER integer media\-top\-margin 423
+        MEMBER integer media\-bottom\-margin 423
+        MEMBER integer media\-left\-margin 423
+        MEMBER integer media\-right\-margin 423
+        MEMBER keyword media\-source "main"
+        MEMBER keyword media\-type "stationery"
+      }
+
+      FILE testfile.pdf
 
       # The response to expect
       STATUS successful\-ok
@@ -39,10 +59,11 @@ program accepts free-form plain text files that describe one or more IPP request
     }
     {
       # The name of the test
-      NAME "Get Attributes of PostScript Job"
+      NAME "Wait for Job to Complete"
 
       # The request to send
       OPERATION Get\-Job\-Attributes
+
       GROUP operation\-attributes\-tag
       ATTR charset attributes\-charset utf\-8
       ATTR language attributes\-natural\-language en
@@ -54,8 +75,12 @@ program accepts free-form plain text files that describe one or more IPP request
       STATUS successful\-ok
       EXPECT job\-id OF\-TYPE integer WITH\-VALUE $job\-id
       EXPECT job\-uri OF\-TYPE uri
-      EXPECT job\-state OF\-TYPE enum WITH\-VALUE 3,4,5,6,7,8,9
+      EXPECT job\-state OF\-TYPE enum WITH\-VALUE >5 REPEAT\-NO\-MATCH
       EXPECT job\-originating\-user\-name OF\-TYPE name WITH\-VALUE "$user"
+
+      # Show the job state until completed...
+      DISPLAY job-state
+      DISPLAY job-state-reasons
     }
 .fi
 .SS TOP-LEVEL DIRECTIVES
@@ -140,10 +165,14 @@ Specifies the default IPP version number to use for the tests that follow.
 The following directives are understood within a \fItest\fR:
 .TP 5
 \fBATTR \fItag attribute-name value(s)\fR
-Adds an attribute to the test request. Values are separated by the comma (",") character - escape commas using the "\" character. Common attributes and values are listed in the IANA IPP registry - see references below.
+Adds an attribute to the test request.
+Values are separated by the comma (",") character - escape commas using the "\" character.
+Common attributes and values are listed in the IANA IPP registry - see references below.
 .TP 5
 \fBATTR collection \fIattribute-name \fB{ MEMBER \fItag member-name value(s) ... \fB}\fR [ \fI... \fB,{ \fI... \fB} \fR]
-Adds a collection attribute to the test request. Member attributes follow the same syntax as regular attributes and can themselves be nested collections. Multiple collection values can be supplied as needed, separated by commas.
+Adds a collection attribute to the test request.
+Member attributes follow the same syntax as regular attributes and can themselves be nested collections.
+Multiple collection values can be supplied as needed, separated by commas.
 .TP 5
 \fBCOMPRESSION deflate\fR
 .TP 5
@@ -152,8 +181,9 @@ Adds a collection attribute to the test request. Member attributes follow the sa
 \fBCOMPRESSION none\fR
 Uses the specified compression on the document data following the attributes in a Print-Job or Send-Document request.
 .TP 5
-\fBDELAY \fIseconds\fR
-Specifies a delay before this test will be run.
+\fBDELAY \fIseconds\fR[\fI,repeat-seconds\fR]
+Specifies a delay in seconds before this test will be run.
+If two values are specified, the second value is used as the delay between repeated tests.
 .TP 5
 \fBDISPLAY \fIattribute-name\fR
 Specifies that value of the named attribute should be output as part of the
@@ -612,9 +642,8 @@ if any.
 Inserts the current user's login name.
 .SH SEE ALSO
 .BR ipptool (1),
-CUPS Online Help (http://localhost:631/help),
 IANA IPP Registry (http://www.iana.org/assignments/ipp-registrations),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp),
-RFC 2911 (http://tools.ietf.org/html/rfc3911)
+RFC 8011 (http://tools.ietf.org/html/rfc8011)
 .SH COPYRIGHT
 Copyright \[co] 2007-2017 by Apple Inc.

@@ -775,9 +775,9 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		ignore_errors,		/* Ignore test failures? */
 		skip_previous = 0,	/* Skip on previous test failure? */
 		repeat_count,		/* Repeat count */
-		repeat_interval,	/* Repeat interval */
-		repeat_prev,		/* Previous repeat interval */
 		repeat_test;		/* Repeat a test? */
+  useconds_t	delay,                  /* Initial delay */
+		repeat_interval;	/* Repeat interval (delay) */
   http_t	*http = NULL;		/* HTTP connection to server */
   FILE		*fp = NULL;		/* Test file */
   char		resource[512],		/* Resource for request */
@@ -860,7 +860,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
   * Loop on tests...
   */
 
-  CUPS_SRAND(time(NULL));
+  CUPS_SRAND((unsigned)time(NULL));
 
   errors     = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup,
                              (cups_afree_func_t)free);
@@ -1206,19 +1206,22 @@ do_tests(FILE         *outfile,		/* I - Output file */
     strlcpy(resource, vars->resource, sizeof(resource));
 
     request_id ++;
-    request        = ippNew();
-    op             = (ipp_op_t)0;
-    group          = IPP_TAG_ZERO;
-    ignore_errors  = IgnoreErrors;
-    last_expect    = NULL;
-    last_status    = NULL;
-    filename[0]    = '\0';
-    skip_previous  = 0;
-    skip_test      = 0;
-    test_id[0]     = '\0';
-    version        = Version;
-    transfer       = Transfer;
-    compression[0] = '\0';
+    request         = ippNew();
+    op              = (ipp_op_t)0;
+    group           = IPP_TAG_ZERO;
+    ignore_errors   = IgnoreErrors;
+    last_expect     = NULL;
+    last_status     = NULL;
+    filename[0]     = '\0';
+    skip_previous   = 0;
+    skip_test       = 0;
+    test_id[0]      = '\0';
+    version         = Version;
+    transfer        = Transfer;
+    compression[0]  = '\0';
+    delay           = 0;
+    repeat_count    = 0;
+    repeat_interval = 5000000;
 
     strlcpy(name, testfile, sizeof(name));
     if (strrchr(name, '.') != NULL)
@@ -1633,7 +1636,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
         * Delay before operation...
 	*/
 
-        double delay;
+        double dval;                    /* Delay value */
 
 	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
@@ -1644,19 +1647,37 @@ do_tests(FILE         *outfile,		/* I - Output file */
 
 	expand_variables(vars, token, temp, sizeof(token));
 
-	if ((delay = _cupsStrScand(token, NULL, localeconv())) <= 0.0)
+	if ((dval = _cupsStrScand(token, &tokenptr, localeconv())) <= 0.0 || (*tokenptr && *tokenptr != ','))
 	{
 	  print_fatal_error(outfile, "Bad DELAY value \"%s\" on line %d.", token,
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
-	else
-	{
-	  if (Output == _CUPS_OUTPUT_TEST)
-	    printf("    [%g second delay]\n", delay);
 
-	  usleep((useconds_t)(1000000.0 * delay));
+        delay = (useconds_t)(1000000.0 * dval);
+
+        if (*tokenptr == ',')
+        {
+          if ((dval = _cupsStrScand(tokenptr + 1, &tokenptr, localeconv())) <= 0.0 || *tokenptr)
+          {
+            print_fatal_error(outfile, "Bad DELAY value \"%s\" on line %d.", token,
+                              linenum);
+            pass = 0;
+            goto test_exit;
+          }
+
+          repeat_interval = (useconds_t)(1000000.0 * dval);
+        }
+        else
+          repeat_interval = delay;
+
+        if (delay > 0)
+        {
+	  if (Output == _CUPS_OUTPUT_TEST)
+	    printf("    [%g second delay]\n", delay * 0.000001);
+
+	  usleep(delay);
 	}
       }
       else if (!_cups_strcasecmp(token, "ATTR"))
@@ -2562,9 +2583,6 @@ do_tests(FILE         *outfile,		/* I - Output file */
     }
 
     PasswordTries   = 0;
-    repeat_count    = 0;
-    repeat_interval = 1;
-    repeat_prev     = 1;
 
     do
     {
@@ -3252,8 +3270,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  }
         }
 
-        sleep((unsigned)repeat_interval);
-        repeat_interval = _cupsNextDelay(repeat_interval, &repeat_prev);
+        usleep(repeat_interval);
 
 	if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != stdout))
 	{

@@ -36,6 +36,8 @@ lpstat - print cups status information
 ] ] [
 <b>-d</b>
 ] [
+<b>-e</b>
+] [
 <b>-o</b>
 [
 <i>destination(s)</i>
@@ -85,6 +87,8 @@ If no printers are specified then all printers are listed.
 If no classes are specified then all classes are listed.
 <dt><b>-d</b>
 <dd style="margin-left: 5.0em">Shows the current default destination.
+<dt><b>-e</b>
+<dd style="margin-left: 5.0em">Shows all available destinations on the local network.
 <dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
 <dd style="margin-left: 5.0em">Specifies an alternate server.
 <dt><b>-l</b>
@@ -113,7 +117,7 @@ If no printers are specified then all printers are listed.
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", and "#".
 Also, printer and class names are <i>not</i> case-sensitive.
-<p>The <i>-h</i>, <i>-E</i>, <i>-U</i>, and <i>-W</i> options are unique to CUPS.
+<p>The <i>-h</i>, <i>-e</i>, <i>-E</i>, <i>-U</i>, and <i>-W</i> options are unique to CUPS.
 <p>The Solaris <i>-f</i>, <i>-P</i>, and <i>-S</i> options are silently ignored.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
