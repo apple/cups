@@ -1,7 +1,7 @@
 /*
  * DNS-SD discovery backend for CUPS.
  *
- * Copyright 2008-2015 by Apple Inc.
+ * Copyright 2008-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -949,7 +949,7 @@ get_device(cups_array_t *devices,	/* I - Device array */
  *
  * Note: This function is needed because avahi_simple_poll_iterate is broken
  *       and always uses a timeout of 0 (!) milliseconds.
- *       (Avahi Ticket #364)
+ *       (https://github.com/lathiat/avahi/issues/127)
  */
 
 static int				/* O - Number of file descriptors matching */

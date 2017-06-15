@@ -3360,7 +3360,7 @@ cups_dnssd_local_cb(
  *
  * Note: This function is needed because avahi_simple_poll_iterate is broken
  *       and always uses a timeout of 0 (!) milliseconds.
- *       (Avahi Ticket #364)
+ *       (https://github.com/lathiat/avahi/issues/127)
  *
  * @private@
  */
