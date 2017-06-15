@@ -79,12 +79,6 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				 (contains(0,4096,<0a>%!) + \
 				  !contains(0,4096,"ENTER LANGUAGE")))
 
-application/g-code		gcode
-application/sla			stl string(0,"solid ") + contains(0,4096,"facet") + contains(0,4096,"vertex")
-application/vnd.makerbot-s3g	x3g
-model/amf			amf
-model/vnd.collada+xml		dae
-
 
 ########################################################################
 #
