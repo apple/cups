@@ -144,7 +144,7 @@ systemv/reject
 templates/header.tmpl
 templates/*/header.tmpl
 test/cups-str-*.html
-test/error_log-*
+test/*_log-*
 test/ippfind
 test/ippfind-static
 test/ippserver
