@@ -255,7 +255,18 @@ main(int  argc,				/* I - Number of command-line arguments */
                     fputs(dest->name, stdout);
 
                   if (long_status)
-                    printf(" %s\n", cupsGetOption("device-uri", dest->num_options, dest->options));
+                  {
+                    const char *printer_uri_supported = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
+                    const char *printer_is_temporary = cupsGetOption("printer-is-temporary", dest->num_options, dest->options);
+                    const char *type = "network";
+
+                    if (printer_is_temporary && !strcmp(printer_is_temporary, "true"))
+                      type = "temporary";
+                    else if (printer_uri_supported)
+                      type = "permanent";
+
+                    printf(" %s %s %s\n", type, printer_uri_supported ? printer_uri_supported : "none", cupsGetOption("device-uri", dest->num_options, dest->options));
+                  }
                   else
                     putchar('\n');
                 }
