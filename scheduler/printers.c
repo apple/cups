@@ -5000,31 +5000,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       p->type |= CUPS_PRINTER_REMOTE;
 
      /*
-      * Point the printer-uri-supported attribute to the
-      * remote printer...
-      */
-
-      if (strchr(p->device_uri, '?'))
-      {
-       /*
-	* Strip trailing "?options" from URI...
-	*/
-
-	char	resource[HTTP_MAX_URI],	/* New URI */
-		*ptr;			/* Pointer into URI */
-
-	strlcpy(resource, p->device_uri, sizeof(resource));
-	if ((ptr = strchr(resource, '?')) != NULL)
-	  *ptr = '\0';
-
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-		     "printer-uri-supported", NULL, resource);
-      }
-      else
-	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-		     "printer-uri-supported", NULL, p->device_uri);
-
-     /*
       * Then set the make-and-model accordingly...
       */
 
