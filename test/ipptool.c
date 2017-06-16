@@ -697,12 +697,12 @@ main(int  argc,				/* I - Number of command-line args */
     * Show a summary report if there were multiple tests...
     */
 
-    printf("\nSummary: %d tests, %d passed, %d failed, %d skipped\n"
-           "Score: %d%%\n", TestCount, PassCount, FailCount, SkipCount,
-           100 * (PassCount + SkipCount) / TestCount);
+    cupsFilePrintf(cupsFileStdout(), "\nSummary: %d tests, %d passed, %d failed, %d skipped\nScore: %d%%\n", TestCount, PassCount, FailCount, SkipCount, 100 * (PassCount + SkipCount) / TestCount);
   }
 
- /*
+  cupsFileClose(outfile);
+
+/*
   * Exit...
   */
 
@@ -1265,7 +1265,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       if (Output == _CUPS_OUTPUT_PLIST)
 	print_xml_header(outfile);
       if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
-	printf("\"%s\":\n", testfile);
+	cupsFilePrintf(cupsFileStdout(), "\"%s\":\n", testfile);
 
       show_header = 0;
     }
@@ -2623,14 +2623,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     {
       if (Verbosity)
       {
-	printf("    %s:\n", ippOpString(op));
+	cupsFilePrintf(cupsFileStdout(), "    %s:\n", ippOpString(op));
 
 	for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
 	  print_attr(cupsFileStdout(), _CUPS_OUTPUT_TEST, attrptr, NULL);
       }
 
       cupsFilePrintf(cupsFileStdout(), "    %-68.68s [", name);
-      cupsFileFlush(cupsFileStdout());
     }
 
     if ((skip_previous && !prev_pass) || skip_test)
@@ -2653,7 +2652,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
 
       if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
-	cupsFilePuts(cupsFileStdout(), "SKIP]");
+	cupsFilePuts(cupsFileStdout(), "SKIP]\n");
 
       goto skip_error;
     }
@@ -3325,8 +3324,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
         {
           cupsFilePrintf(cupsFileStdout(), "%04d]\n", repeat_count);
-          cupsFileFlush(cupsFileStdout());
-
+\
 	  if (num_displayed > 0)
 	  {
 	    for (attrptr = ippFirstAttribute(response); attrptr; attrptr = ippNextAttribute(response))
@@ -3350,7 +3348,6 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
 	{
 	  cupsFilePrintf(cupsFileStdout(), "    %-68.68s [", name);
-	  cupsFileFlush(cupsFileStdout());
 	}
       }
     }
@@ -3388,7 +3385,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
     if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
     {
-      cupsFilePuts(cupsFileStdout(), prev_pass ? "PASS]" : "FAIL]");
+      cupsFilePuts(cupsFileStdout(), prev_pass ? "PASS]\n" : "FAIL]\n");
 
       if (!prev_pass || (Verbosity && response))
       {
@@ -3499,8 +3496,6 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
     if (Output == _CUPS_OUTPUT_PLIST)
       cupsFilePuts(outfile, "</dict>\n");
-
-    cupsFileFlush(cupsFileStdout());
 
     ippDelete(response);
     response = NULL;
@@ -4402,8 +4397,7 @@ pause_message(const char *message)	/* I - Message */
   * Display the prompt...
   */
 
-  printf("%s\n---- PRESS ANY KEY ----", message);
-  cupsFileFlush(cupsFileStdout());
+  cupsFilePrintf(cupsFileStdout(), "%s\n---- PRESS ANY KEY ----", message);
 
 #ifdef WIN32
  /*
@@ -4438,7 +4432,6 @@ pause_message(const char *message)	/* I - Message */
   */
 
   cupsFilePuts(cupsFileStdout(), "\r                       \r");
-  cupsFileFlush(cupsFileStdout());
 }
 
 

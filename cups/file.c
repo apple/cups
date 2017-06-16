@@ -1387,7 +1387,11 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   {
     memcpy(fp->ptr, fp->printf_buffer, (size_t)bytes);
     fp->ptr += bytes;
-    return ((int)bytes);
+
+    if (fp->is_stdio && cupsFileFlush(fp))
+      return (-1);
+    else
+      return ((int)bytes);
   }
 }
 
@@ -1566,7 +1570,11 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   {
     memcpy(fp->ptr, s, (size_t)bytes);
     fp->ptr += bytes;
-    return ((int)bytes);
+
+    if (fp->is_stdio && cupsFileFlush(fp))
+      return (-1);
+    else
+      return ((int)bytes);
   }
 }
 

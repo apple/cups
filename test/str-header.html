@@ -1,35 +1,43 @@
-<HTML>
-<HEAD>
-	<META NAME="Description" CONTENT="CUPS Test Report">
-	<META NAME="COPYRIGHT" CONTENT="Copyright 2007-2016, All Rights Reserved">
-	<META NAME="DOCNUMBER" CONTENT="CUPS-STR-2.2">
-	<META NAME="Author" CONTENT="Apple Inc.">
-	<TITLE>CUPS 2.2 Software Test Report</TITLE>
-	<STYLE TYPE="text/css"><!--
-	PRE {
-	  font-size: 80%;
-	  margin-left: 2em;
-	}
-	--></STYLE>
-</HEAD>
-<BODY>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="Description" content="CUPS Test Report">
+    <meta name="Copyright" content="Copyright &copy; 2007-2017, All Rights Reserved">
+    <meta name="Author" content="Apple Inc.">
+    <title>CUPS Software Test Report</title>
+    <style type="text/css"><!--
+blockquote {
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+pre {
+  background: #eee;
+  border-left: 2px solid #ccc;
+  font-size: 80%;
+  margin-left: 2em;
+  padding: 5px;
+  white-space: pre-wrap;
+}
+--></style>
+   </head>
+  <body>
+    <h1>CUPS Software Test Report</h1>
 
-<H1>CUPS 2.2 Software Test Report</H1>
+    <p>This software test report provides detailed test results that are used to evaluate the stability and standards compliance of the CUPS software.</p>
 
-<P>This software test report provides detailed test results that
-are used to evaluate the stability and compliance of CUPS Version 2.2.
+    <h2>Document Overview</h2>
 
-<H2>Document Overview</H2>
+    <p>This software test plan is organized into the following sections:</p>
 
-<P>This software test plan is organized into the following sections:
-
-<UL>
-	<LI><A HREF="#IPP">1 - IPP Compliance Tests</A></LI>
-	<LI><A HREF="#COMMAND">2 - Command Tests</A></LI>
-	<LI><A HREF="#SUMMARY">3 - Test Summary</A></LI>
-	<LI><A HREF="#LOGS">4 - Log Files</A><UL>
-		<LI><A HREF="#access_log">access_log</A></LI>
-		<LI><A HREF="#error_log">error_log</A></LI>
-		<LI><A HREF="#page_log">page_log</A></LI>
-	</UL></LI>
-</UL>
+    <ul>
+      <li><a href="#IPP">1 - IPP Compliance Tests</a></li>
+      <li><a href="#COMMAND">2 - Command Tests</a></li>
+      <li><a href="#SUMMARY">3 - Test Summary</a></li>
+      <li><a href="#LOGS">4 - Log Files</a><ul>
+        <li><a href="#access_log">access_log</a></li>
+        <li><a href="#debug_log">debug_log</a></li>
+        <li><a href="#error_log">error_log</a></li>
+        <li><a href="#page_log">page_log</a></li>
+      </ul></li>
+    </ul>

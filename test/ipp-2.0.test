@@ -1,16 +1,14 @@
 #
-# "$Id$"
+# IPP/2.0 test suite.
 #
-#   IPP/2.0 test suite.
+# Copyright 2007-2017 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 # Usage:
 #
@@ -19,7 +17,7 @@
 
 # Do all of the IPP/1.1 tests as an IPP/2.0 client
 #
-# Required by: PWG 5100.12 section 4.3
+# Required by: PWG 5100.12 section 4.1
 INCLUDE "ipp-1.1.test"
 
 
@@ -108,8 +106,3 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
 }
-
-
-#
-# End of "$Id$".
-#

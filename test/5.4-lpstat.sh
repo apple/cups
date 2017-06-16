@@ -2,7 +2,7 @@
 #
 # Test the lpstat command.
 #
-# Copyright 2007-2011 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 # file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
-echo "LPSTAT Test"
+echo "LPSTAT Basic Test"
 echo ""
 echo "    lpstat -t"
 $VALGRIND ../systemv/lpstat -t 2>&1
@@ -24,7 +24,22 @@ else
 fi
 echo ""
 
-echo "LPSTAT Test"
+echo "LPSTAT Enumeration Test"
+echo ""
+echo "    lpstat -e"
+printers="`$VALGRIND ../systemv/lpstat -e 2>&1`"
+if test $? != 0 -o "x$printers" = x; then
+	echo "    FAILED"
+	exit 1
+else
+	for printer in $printers; do
+	        echo $printer
+	done
+	echo "    PASSED"
+fi
+echo ""
+
+echo "LPSTAT Get Host Test"
 echo ""
 echo "    lpstat -H"
 server="`$VALGRIND ../systemv/lpstat -H 2>&1`"
