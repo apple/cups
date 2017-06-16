@@ -9,7 +9,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "13 June 2017" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "15 June 2017" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -164,9 +164,12 @@ Specifies the default IPP version number to use for the tests that follow.
 .SS TEST DIRECTIVES
 The following directives are understood within a \fItest\fR:
 .TP 5
+\fBATTR \fIout-of-band-tag attribute-name\fR
+.TP 5
 \fBATTR \fItag attribute-name value(s)\fR
 Adds an attribute to the test request.
-Values are separated by the comma (",") character - escape commas using the "\" character.
+Out-of-band tags (admin-define, delete-attribute, no-value, not-settable, unknown, unsupported) have no value.
+Values for other tags are separated by the comma (",") character - escape commas using the "\" character.
 Common attributes and values are listed in the IANA IPP registry - see references below.
 .TP 5
 \fBATTR collection \fIattribute-name \fB{ MEMBER \fItag member-name value(s) ... \fB}\fR [ \fI... \fB,{ \fI... \fB} \fR]
@@ -406,7 +409,7 @@ Specifies the maximum number of times to repeat. The default value is 1000.
 \fBREPEAT\-NO\-MATCH\fR
 Specifies that the current test should be repeated when the response status-code matches or does not match the value specified by the STATUS directive.
 .SS OPERATION CODES
-Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of names supported by
+Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of names supported by
 .BR ipptool (8):
 .nf
 
@@ -479,7 +482,7 @@ Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RF
     Validate\-Job
 .fi
 .SS STATUS CODES
-Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of the names supported by
+Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of the names supported by
 .BR ipptool (8):
 .nf
 
@@ -542,7 +545,7 @@ Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2
     successful\-ok\-too\-many\-events
 .fi
 .SS TAGS
-Value and group tags correspond to the names from RFC 2911 and other IPP extension specifications. Here are the group tags:
+Value and group tags correspond to the names from RFC 8011 and other IPP extension specifications. Here are the group tags:
 .nf
 
     document\-attributes\-tag

@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-04-05 15:24-0400\n"
+"POT-Creation-Date: 2017-06-15 20:52-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1061,9 +1061,9 @@ msgstr ""
 msgid "  -E                      Encrypt the connection."
 msgstr "  -E                      接続を暗号化する。"
 
-msgid "  -E                      Test with HTTP Upgrade to TLS."
+msgid ""
+"  -E                      Test with encryption using HTTP Upgrade to TLS."
 msgstr ""
-"  -E                      HTTP から TLS へのアップグレードでテストする。"
 
 msgid ""
 "  -F                      Run in the foreground but detach from console."
@@ -1104,8 +1104,8 @@ msgstr ""
 msgid "  -R root-directory       Set alternate root."
 msgstr "  -R root-directory       別のルートディレクトリーを指定する。"
 
-msgid "  -S                      Test with SSL encryption."
-msgstr "  -S                      SSL 暗号化でテストする。"
+msgid "  -S                      Test with encryption using HTTPS."
+msgstr ""
 
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr "  -T <秒>                 ブラウズのタイムアウトを秒で指定する。"
@@ -1374,204 +1374,167 @@ msgid " PASS"
 msgstr " 合格"
 
 #, c-format
-msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
-msgstr "\"%s\": URI の値 \"%s\" が誤っています - %s (RFC 2911 4.1.5 節)。"
-
-#, c-format
-msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
 msgstr ""
-"\"%s\": URI の値 \"%s\" が誤っています - 長さの誤り %d (RFC 2911 4.1.5 節)。"
 
 #, c-format
-msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
-msgstr "\"%s\": 属性名が誤っています - 長さの誤り %d (RFC 2911 4.1.3 節)。"
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
+msgstr ""
 
 #, c-format
 msgid ""
-"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
-msgstr "\"%s\": 属性名が誤っています - 不正な文字 (RFC 2911 4.1.3 節)。"
+"\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
-msgstr "\"%s\": 真偽値 %d が誤っています (RFC 2911 4.1.11 節)。"
+msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgstr ""
 
 #, c-format
 msgid ""
-"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
 msgstr ""
-"\"%s\": charset の値 \"%s\" が誤っています - 不正な文字 (RFC 2911 4.1.7 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
 msgstr ""
-"\"%s\": charset の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 section "
-"4.1.7)."
 
 #, c-format
-msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)."
 msgstr ""
-"\"%s\": dateTime UTC の時間指定 %u が誤っています (RFC 2911 4.1.14 節)."
 
 #, c-format
-msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": dateTime UTC の分指定 %u が誤っています (RFC 2911 4.1.14 節)。"
-
-#, c-format
-msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 8011 section 5.1.15)."
 msgstr ""
-"\"%s\": dateTime UTC の符号指定 '%c' が誤っています (RFC 2911 4.1.14 節)。"
 
 #, c-format
-msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": dateTime の日付指定 %u が誤っています (RFC 2911 4.1.14 節)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 8011 section 5.1.15)."
 msgstr ""
-"\"%s\": dateTime の 0.1 秒の指定 %u が誤っています (RFC 2911 4.1.14 節)。"
 
 #, c-format
-msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": dateTime の時間指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+msgid "\"%s\": Bad dateTime day %u (RFC 8011 section 5.1.15)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": dateTime の分指定が誤っています %u (RFC 2911 4.1.14 節)。"
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 8011 section 5.1.15)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": dateTime の月指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+msgid "\"%s\": Bad dateTime hours %u (RFC 8011 section 5.1.15)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": 日時の秒指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+msgid "\"%s\": Bad dateTime minutes %u (RFC 8011 section 5.1.15)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
-msgstr "\"%s\": enum の値 %d が誤っています - 範囲外の値 (RFC 2911 4.1.4 節)。"
+msgid "\"%s\": Bad dateTime month %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
+msgstr ""
 
 #, c-format
 msgid ""
-"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
-"\"%s\": keyword の値 \"%s\" が誤っています -  %d (RFC 2911 section 4.1.3)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
-"4.1.3)."
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section "
+"5.1.4)."
 msgstr ""
-"\"%s\": keyword の値 \"%s\" が誤っています - 不正な文字 (RFC 2911 4.1.3 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
-"4.1.9)."
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section "
+"5.1.10)."
 msgstr ""
-"\"%s\": mimeMediaType の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 "
-"4.1.9 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
-"4.1.9)."
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section "
+"5.1.10)."
 msgstr ""
-"\"%s\": mimeMediaType の値 \"%s\" が誤っています - 長さの誤り %d (RFC 2911 "
-"4.1.9 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": name の値 \"%s\" が誤っています - UTF-8 として誤った並び (RFC 2911 "
-"4.1.2 節)。"
 
 #, c-format
-msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": name の値 \"%s\" が誤っています - 誤った長さ %d (RFC 2911 section "
-"4.1.2)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
-"4.1.8)."
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section "
+"5.1.9)."
 msgstr ""
-"\"%s\": naturalLanguage の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 "
-"4.1.8 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
-"4.1.8)."
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section "
+"5.1.9)."
 msgstr ""
-"\"%s\": naturalLanguage の値 \"%s\" が誤っています - 誤った長さ %d (RFC 2911 "
-"4.1.8 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+"\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
 msgstr ""
-"\"%s\": octetString 値が誤っています - 誤った長さ %d (RFC 2911 4.1.10 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
-"section 4.1.13)."
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 8011 "
+"section 5.1.14)."
 msgstr ""
-"\"%s\": rangeOfInteger の値 %d-%d が誤っています  - 下限が上限よりも大きい "
-"(RFC 2911 4.1.13 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
-"4.1.15)."
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
+"5.1.16)."
 msgstr ""
-"\"%s\": resolution の値 %dx%d%s が誤っています - 単位値の誤り (RFC 2911 "
-"4.1.15 節)。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
-"positive (RFC 2911 section 4.1.15)."
+"positive (RFC 8011 section 5.1.16)."
 msgstr ""
-"\"%s\": resolution の値 %dx%d%s が誤っています - 主走査解像度が負 (RFC 2911 "
-"4.1.15 節)。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
-"2911 section 4.1.15)."
+"8011 section 5.1.16)."
 msgstr ""
-"\"%s\": resolution の値 %dx%d%s が誤っています - 副走査解像度が負 (RFC 2911 "
-"4.1.15 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
 msgstr ""
-"\"%s\": text の値 \"%s\" が誤っています - UTF-8 として誤った並び (RFC 2911 "
-"4.1.1 節)。"
 
 #, c-format
-msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
-"\"%s\": text の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 4.1.1 節)。"
 
 #, c-format
 msgid ""
-"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
 msgstr ""
-"\"%s\": uriScheme の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 4.1.6 "
-"節)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
-"\"%s\": uriScheme の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 4.1.6 "
-"節)."
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
@@ -6954,6 +6917,13 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 #~ msgstr "  --lf                    行末を LF とする (UNIX/Linux/OS X)。"
 
+#~ msgid "  -E                      Test with HTTP Upgrade to TLS."
+#~ msgstr ""
+#~ "  -E                      HTTP から TLS へのアップグレードでテストする。"
+
+#~ msgid "  -S                      Test with SSL encryption."
+#~ msgstr "  -S                      SSL 暗号化でテストする。"
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      すべてのサービスをブラウズする。"
 
@@ -6972,10 +6942,192 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "  -t type                 Browse/resolve with specified type."
 #~ msgstr "  -t タイプ               指定されたタイプでブラウズ/名前解決する。"
 
+#~ msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+#~ msgstr "\"%s\": URI の値 \"%s\" が誤っています - %s (RFC 2911 4.1.5 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+#~ msgstr ""
+#~ "\"%s\": URI の値 \"%s\" が誤っています - 長さの誤り %d (RFC 2911 4.1.5 "
+#~ "節)。"
+
+#~ msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+#~ msgstr "\"%s\": 属性名が誤っています - 長さの誤り %d (RFC 2911 4.1.3 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+#~ msgstr "\"%s\": 属性名が誤っています - 不正な文字 (RFC 2911 4.1.3 節)。"
+
+#~ msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+#~ msgstr "\"%s\": 真偽値 %d が誤っています (RFC 2911 4.1.11 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.7)."
+#~ msgstr ""
+#~ "\"%s\": charset の値 \"%s\" が誤っています - 不正な文字 (RFC 2911 4.1.7 "
+#~ "節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+#~ msgstr ""
+#~ "\"%s\": charset の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 "
+#~ "section 4.1.7)."
+
+#~ msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+#~ msgstr ""
+#~ "\"%s\": dateTime UTC の時間指定 %u が誤っています (RFC 2911 4.1.14 節)."
+
+#~ msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+#~ msgstr ""
+#~ "\"%s\": dateTime UTC の分指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+#~ msgstr ""
+#~ "\"%s\": dateTime UTC の符号指定 '%c' が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": dateTime の日付指定 %u が誤っています (RFC 2911 4.1.14 節)."
+
+#~ msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+#~ msgstr ""
+#~ "\"%s\": dateTime の 0.1 秒の指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+#~ msgstr ""
+#~ "\"%s\": dateTime の時間指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": dateTime の分指定が誤っています %u (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": dateTime の月指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": 日時の秒指定 %u が誤っています (RFC 2911 4.1.14 節)。"
+
+#~ msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+#~ msgstr ""
+#~ "\"%s\": enum の値 %d が誤っています - 範囲外の値 (RFC 2911 4.1.4 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": keyword の値 \"%s\" が誤っています -  %d (RFC 2911 section 4.1.3)."
+
+#~ msgid ""
+#~ "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+#~ "4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": keyword の値 \"%s\" が誤っています - 不正な文字 (RFC 2911 4.1.3 "
+#~ "節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.9)."
+#~ msgstr ""
+#~ "\"%s\": mimeMediaType の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 "
+#~ "4.1.9 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+#~ "4.1.9)."
+#~ msgstr ""
+#~ "\"%s\": mimeMediaType の値 \"%s\" が誤っています - 長さの誤り %d (RFC "
+#~ "2911 4.1.9 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section "
+#~ "4.1.2)."
+#~ msgstr ""
+#~ "\"%s\": name の値 \"%s\" が誤っています - UTF-8 として誤った並び (RFC "
+#~ "2911 4.1.2 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+#~ msgstr ""
+#~ "\"%s\": name の値 \"%s\" が誤っています - 誤った長さ %d (RFC 2911 section "
+#~ "4.1.2)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 "
+#~ "section 4.1.8)."
+#~ msgstr ""
+#~ "\"%s\": naturalLanguage の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 "
+#~ "4.1.8 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 "
+#~ "section 4.1.8)."
+#~ msgstr ""
+#~ "\"%s\": naturalLanguage の値 \"%s\" が誤っています - 誤った長さ %d (RFC "
+#~ "2911 4.1.8 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+#~ msgstr ""
+#~ "\"%s\": octetString 値が誤っています - 誤った長さ %d (RFC 2911 4.1.10 "
+#~ "節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC "
+#~ "2911 section 4.1.13)."
+#~ msgstr ""
+#~ "\"%s\": rangeOfInteger の値 %d-%d が誤っています  - 下限が上限よりも大き"
+#~ "い (RFC 2911 4.1.13 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+#~ "4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": resolution の値 %dx%d%s が誤っています - 単位値の誤り (RFC 2911 "
+#~ "4.1.15 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+#~ "positive (RFC 2911 section 4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": resolution の値 %dx%d%s が誤っています - 主走査解像度が負 (RFC "
+#~ "2911 4.1.15 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive "
+#~ "(RFC 2911 section 4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": resolution の値 %dx%d%s が誤っています - 副走査解像度が負 (RFC "
+#~ "2911 4.1.15 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section "
+#~ "4.1.1)."
+#~ msgstr ""
+#~ "\"%s\": text の値 \"%s\" が誤っています - UTF-8 として誤った並び (RFC "
+#~ "2911 4.1.1 節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+#~ msgstr ""
+#~ "\"%s\": text の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 4.1.1 "
+#~ "節)。"
+
+#~ msgid ""
+#~ "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.6)."
+#~ msgstr ""
+#~ "\"%s\": uriScheme の値 \"%s\" が誤っています - 誤った文字 (RFC 2911 4.1.6 "
+#~ "節)."
+
 #~ msgid ""
 #~ "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 4.1.6 節)."
 #~ msgstr ""
 #~ "\"%s\": uriScheme 値 \"%s\" が誤っています - 誤った長さ %d (RFC 2911 "
+#~ "4.1.6 節)."
+
+#~ msgid ""
+#~ "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section "
+#~ "4.1.6)."
+#~ msgstr ""
+#~ "\"%s\": uriScheme の値 \"%s\" が誤っています - 不正な長さ %d (RFC 2911 "
 #~ "4.1.6 節)."
 
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"

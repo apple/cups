@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-04-05 15:24-0400\n"
+"POT-Creation-Date: 2017-06-15 20:52-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -1018,8 +1018,9 @@ msgstr "  -D name=value           Определение переменной."
 msgid "  -E                      Encrypt the connection."
 msgstr "  -E                      Подключение к серверу шифруется."
 
-msgid "  -E                      Test with HTTP Upgrade to TLS."
-msgstr "  -E                      Проверять что HTTP использует TLS."
+msgid ""
+"  -E                      Test with encryption using HTTP Upgrade to TLS."
+msgstr ""
 
 msgid ""
 "  -F                      Run in the foreground but detach from console."
@@ -1060,8 +1061,8 @@ msgstr ""
 msgid "  -R root-directory       Set alternate root."
 msgstr "  -R root-directory       Задать корневой каталог."
 
-msgid "  -S                      Test with SSL encryption."
-msgstr "  -S                      Проверять шифрование SSL."
+msgid "  -S                      Test with encryption using HTTPS."
+msgstr ""
 
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr "  -T seconds              Задать время ожидания в секундах."
@@ -1334,211 +1335,167 @@ msgid " PASS"
 msgstr " PASS"
 
 #, c-format
-msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
-msgstr "\"%s\": Неправильное значение URI \"%s\" - %s (RFC 2911 раздел 4.1.5)."
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
+msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
 msgstr ""
-"\"%s\": Неправильное значение URI \"%s\" - ошибка длины %d (RFC 2911 раздел "
-"4.1.5)."
 
 #, c-format
-msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
-"\"%s\": Неправильный атрибут имени - ошибка длины %d (RFC 2911 раздел 4.1.3)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+"\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
 msgstr ""
-"\"%s\": Неправильный атрибут имени - недопустимый символ (RFC 2911 раздел "
-"4.1.3)."
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
-msgstr "\"%s\": Неправильное двоичное значение %d (RFC 2911 раздел 4.1.11)."
+msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgstr ""
 
 #, c-format
 msgid ""
-"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
 msgstr ""
-"\"%s\": Неправильное символьное значение \"%s\" - недопустимые символы (RFC "
-"2911 раздел 4.1.7)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
 msgstr ""
-"\"%s\": Неправильное символьное значение \"%s\" - ошибка длины %d (RFC 2911 "
-"раздел 4.1.7)."
 
 #, c-format
-msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime UTC часов %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime UTC минут %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime UTC sign '%c' (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime дни %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime миллисекунды %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime часы %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime минуты %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime месяц %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
-msgstr "\"%s\": Ошибка в dateTime секунды %u (RFC 2911 раздел 4.1.14)."
-
-#, c-format
-msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)."
 msgstr ""
-"\"%s\": Ошибка в значении %d - за пределами диапазона (RFC 2911 раздел "
-"4.1.4)."
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime day %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime hours %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime minutes %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime month %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 8011 section 5.1.15)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
+msgstr ""
 
 #, c-format
 msgid ""
-"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
-"\"%s\": Ошибка в значении \"%s\" - неправильная длина %d (RFC 2911 раздел "
-"4.1.3)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
-"4.1.3)."
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section "
+"5.1.4)."
 msgstr ""
-"\"%s\": Ошибка в значении \"%s\" - недопустимый символ (RFC 2911 раздел "
-"4.1.3)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
-"4.1.9)."
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section "
+"5.1.10)."
 msgstr ""
-"\"%s\": Ошибка mimeMediaType значение \"%s\" - недопустимые символы (RFC "
-"2911  раздел 4.1.9)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
-"4.1.9)."
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section "
+"5.1.10)."
 msgstr ""
-"\"%s\": Ошибка mimeMediaType значение \"%s\" - неправильная длина %d (RFC "
-"2911 раздел 4.1.9)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": Неправильное имя \"%s\" - ошибка в UTF-8 (RFC 2911 раздел 4.1.2)."
 
 #, c-format
-msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": Неправильное имя \"%s\" - неправильная длина %d (RFC 2911 раздел "
-"4.1.2)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
-"4.1.8)."
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section "
+"5.1.9)."
 msgstr ""
-"\"%s\": Ошибка naturalLanguage значение \"%s\" - недопустимые символы (RFC "
-"2911 раздел 4.1.8)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
-"4.1.8)."
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section "
+"5.1.9)."
 msgstr ""
-"\"%s\": Ошибка naturalLanguage значение \"%s\" - неправильная длина %d (RFC "
-"2911 раздел 4.1.8)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+"\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
 msgstr ""
-"\"%s\": Ошибка значения octetString - неправильная длина %d (RFC 2911 раздел "
-"4.1.10)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
-"section 4.1.13)."
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 8011 "
+"section 5.1.14)."
 msgstr ""
-"\"%s\": Ошибка rangeOfInteger значение %d-%d - первое больше чем второе (RFC "
-"2911 раздел 4.1.13)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
-"4.1.15)."
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
+"5.1.16)."
 msgstr ""
-"\"%s\": Неправильное значение разрешения %dx%d%s - ошибка в значении units "
-"(RFC 2911 раздел 4.1.15)."
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
-"positive (RFC 2911 section 4.1.15)."
+"positive (RFC 8011 section 5.1.16)."
 msgstr ""
-"\"%s\": Неправильное значение разрешения %dx%d%s - значение cross feed "
-"должно быть положительным (RFC 2911 раздел 4.1.15)."
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
-"2911 section 4.1.15)."
+"8011 section 5.1.16)."
 msgstr ""
-"\"%s\": Неправильное значение разрешения %dx%d%s - значение feed должно быть "
-"положительным (RFC 2911 раздел 4.1.15)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
 msgstr ""
-"\"%s\": Неправильное текстовое значение \"%s\" - ошибка в UTF-8 (RFC 2911 "
-"раздел 4.1.1)."
 
 #, c-format
-msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
-"\"%s\": Неправильное текстовое значение \"%s\" - ошибка длины %d (RFC 2911 "
-"раздел 4.1.1)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
 msgstr ""
-"\"%s\": Ошибка uriScheme значение \"%s\" - недопустимые символы (RFC 2911 "
-"раздел 4.1.6)."
 
 #, c-format
 msgid ""
-"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
-"\"%s\": Ошибка uriScheme значение \"%s\" - ошибка длины %d (RFC 2911 раздел "
-"4.1.6)."
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
@@ -6883,6 +6840,12 @@ msgstr "Для variable-bindings длина не установлена"
 #~ "  --lf                    Строки заканчиваются на LF (UNIX/Linux/Mac OS "
 #~ "X)."
 
+#~ msgid "  -E                      Test with HTTP Upgrade to TLS."
+#~ msgstr "  -E                      Проверять что HTTP использует TLS."
+
+#~ msgid "  -S                      Test with SSL encryption."
+#~ msgstr "  -S                      Проверять шифрование SSL."
+
 #~ msgid "  -a                      Browse for all services."
 #~ msgstr "  -a                      Обзор всех сервисов."
 
@@ -6894,6 +6857,189 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "  -t type                 Browse/resolve with specified type."
 #~ msgstr "  -t type                 Просмотр/определение по указанному типу."
+
+#~ msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное значение URI \"%s\" - %s (RFC 2911 раздел 4.1.5)."
+
+#~ msgid ""
+#~ "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное значение URI \"%s\" - ошибка длины %d (RFC 2911 "
+#~ "раздел 4.1.5)."
+
+#~ msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": Неправильный атрибут имени - ошибка длины %d (RFC 2911 раздел "
+#~ "4.1.3)."
+
+#~ msgid ""
+#~ "\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": Неправильный атрибут имени - недопустимый символ (RFC 2911 раздел "
+#~ "4.1.3)."
+
+#~ msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+#~ msgstr "\"%s\": Неправильное двоичное значение %d (RFC 2911 раздел 4.1.11)."
+
+#~ msgid ""
+#~ "\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.7)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное символьное значение \"%s\" - недопустимые символы "
+#~ "(RFC 2911 раздел 4.1.7)."
+
+#~ msgid ""
+#~ "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное символьное значение \"%s\" - ошибка длины %d (RFC "
+#~ "2911 раздел 4.1.7)."
+
+#~ msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime UTC часов %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime UTC минут %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime UTC sign '%c' (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime дни %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime миллисекунды %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime часы %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime минуты %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime месяц %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+#~ msgstr "\"%s\": Ошибка в dateTime секунды %u (RFC 2911 раздел 4.1.14)."
+
+#~ msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка в значении %d - за пределами диапазона (RFC 2911 раздел "
+#~ "4.1.4)."
+
+#~ msgid ""
+#~ "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка в значении \"%s\" - неправильная длина %d (RFC 2911 раздел "
+#~ "4.1.3)."
+
+#~ msgid ""
+#~ "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+#~ "4.1.3)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка в значении \"%s\" - недопустимый символ (RFC 2911 раздел "
+#~ "4.1.3)."
+
+#~ msgid ""
+#~ "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.9)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка mimeMediaType значение \"%s\" - недопустимые символы (RFC "
+#~ "2911  раздел 4.1.9)."
+
+#~ msgid ""
+#~ "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+#~ "4.1.9)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка mimeMediaType значение \"%s\" - неправильная длина %d (RFC "
+#~ "2911 раздел 4.1.9)."
+
+#~ msgid ""
+#~ "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section "
+#~ "4.1.2)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное имя \"%s\" - ошибка в UTF-8 (RFC 2911 раздел 4.1.2)."
+
+#~ msgid ""
+#~ "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное имя \"%s\" - неправильная длина %d (RFC 2911 раздел "
+#~ "4.1.2)."
+
+#~ msgid ""
+#~ "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 "
+#~ "section 4.1.8)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка naturalLanguage значение \"%s\" - недопустимые символы "
+#~ "(RFC 2911 раздел 4.1.8)."
+
+#~ msgid ""
+#~ "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 "
+#~ "section 4.1.8)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка naturalLanguage значение \"%s\" - неправильная длина %d "
+#~ "(RFC 2911 раздел 4.1.8)."
+
+#~ msgid ""
+#~ "\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка значения octetString - неправильная длина %d (RFC 2911 "
+#~ "раздел 4.1.10)."
+
+#~ msgid ""
+#~ "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC "
+#~ "2911 section 4.1.13)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка rangeOfInteger значение %d-%d - первое больше чем второе "
+#~ "(RFC 2911 раздел 4.1.13)."
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+#~ "4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное значение разрешения %dx%d%s - ошибка в значении "
+#~ "units (RFC 2911 раздел 4.1.15)."
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+#~ "positive (RFC 2911 section 4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное значение разрешения %dx%d%s - значение cross feed "
+#~ "должно быть положительным (RFC 2911 раздел 4.1.15)."
+
+#~ msgid ""
+#~ "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive "
+#~ "(RFC 2911 section 4.1.15)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное значение разрешения %dx%d%s - значение feed должно "
+#~ "быть положительным (RFC 2911 раздел 4.1.15)."
+
+#~ msgid ""
+#~ "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section "
+#~ "4.1.1)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное текстовое значение \"%s\" - ошибка в UTF-8 (RFC 2911 "
+#~ "раздел 4.1.1)."
+
+#~ msgid ""
+#~ "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+#~ msgstr ""
+#~ "\"%s\": Неправильное текстовое значение \"%s\" - ошибка длины %d (RFC "
+#~ "2911 раздел 4.1.1)."
+
+#~ msgid ""
+#~ "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section "
+#~ "4.1.6)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка uriScheme значение \"%s\" - недопустимые символы (RFC 2911 "
+#~ "раздел 4.1.6)."
+
+#~ msgid ""
+#~ "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section "
+#~ "4.1.6)."
+#~ msgstr ""
+#~ "\"%s\": Ошибка uriScheme значение \"%s\" - ошибка длины %d (RFC 2911 "
+#~ "раздел 4.1.6)."
 
 #~ msgid "File Folder "
 #~ msgstr "Каталог файла "

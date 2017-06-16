@@ -985,7 +985,7 @@ cups_create_cb(
     unsigned           flags,           /* I - Enumeration flags */
     cups_dest_t        *dest)           /* I - Destination */
 {
-  DEBUG_printf(("2cups_create_cb(data=%p(%s), flags=%08x, dest=%p(%s))", data, data->name, flags, dest, dest->name));
+  DEBUG_printf(("2cups_create_cb(data=%p(%s), flags=%08x, dest=%p(%s))", (void *)data, data->name, flags, (void *)dest, dest->name));
 
   (void)flags;
 

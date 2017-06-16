@@ -1117,6 +1117,8 @@ cupsEnumDests(
   * Get Bonjour-shared printers...
   */
 
+  gettimeofday(&curtime, NULL);
+
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
     return (0);
@@ -1480,7 +1482,7 @@ _cupsGetDestResource(
   int		port;			/* Port number */
 
 
-  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), resource=%p, resourcesize=%d)", dest, dest->name, resource, (int)resourcesize));
+  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), resource=%p, resourcesize=%d)", (void *)dest, dest->name, (void *)resource, (int)resourcesize));
 
  /*
   * Range check input...
@@ -1743,7 +1745,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 		};
 
 
-  DEBUG_printf(("_cupsGetDests(http=%p, op=%x(%s), name=\"%s\", dests=%p, type=%x, mask=%x)", http, op, ippOpString(op), name, dests, type, mask));
+  DEBUG_printf(("_cupsGetDests(http=%p, op=%x(%s), name=\"%s\", dests=%p, type=%x, mask=%x)", (void *)http, op, ippOpString(op), name, (void *)dests, type, mask));
 
 #ifdef __APPLE__
  /*
@@ -2188,7 +2190,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  DEBUG_printf(("cupsGetNamedDest(http=%p, name=\"%s\", instance=\"%s\")", http, name, instance));
+  DEBUG_printf(("cupsGetNamedDest(http=%p, name=\"%s\", instance=\"%s\")", (void *)http, name, instance));
 
  /*
   * If "name" is NULL, find the default destination...
@@ -2273,7 +2275,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       return (NULL);
   }
 
-  DEBUG_printf(("1cupsGetNamedDest: Got dest=%p", dest));
+  DEBUG_printf(("1cupsGetNamedDest: Got dest=%p", (void *)dest));
 
   if (instance)
     dest->instance = _cupsStrAlloc(instance);
@@ -3856,7 +3858,7 @@ cups_elapsed(struct timeval *t)		/* IO - Previous time */
 
   gettimeofday(&nt, NULL);
 
-  msecs = 1000 * (nt.tv_sec - t->tv_sec) + (nt.tv_usec - t->tv_usec) / 1000;
+  msecs = (int)(1000 * (nt.tv_sec - t->tv_sec) + (nt.tv_usec - t->tv_usec) / 1000);
 
   *t = nt;
 
@@ -4312,7 +4314,7 @@ cups_name_cb(_cups_namedata_t *data,    /* I - Data from cupsGetNamedDest */
              unsigned         flags,    /* I - Enumeration flags */
              cups_dest_t      *dest)    /* I - Destination */
 {
-  DEBUG_printf(("2cups_name_cb(data=%p(%s), flags=%x, dest=%p(%s)", data, data->name, flags, dest, dest->name));
+  DEBUG_printf(("2cups_name_cb(data=%p(%s), flags=%x, dest=%p(%s)", (void *)data, data->name, flags, (void *)dest, dest->name));
 
   if (!(flags & CUPS_DEST_FLAGS_REMOVED) && !dest->instance && !strcasecmp(data->name, dest->name))
   {
