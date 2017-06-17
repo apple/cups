@@ -61,7 +61,11 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_CONFIG_FILE_PERM, 0$CUPS_CONFIG_FILE_PERM)
 dnl Default permissions for cupsd
 AC_ARG_WITH(cupsd_file_perm, [  --with-cupsd-file-perm  set default cupsd permissions, default=0500],
 	CUPS_CUPSD_FILE_PERM="$withval",
-	CUPS_CUPSD_FILE_PERM="500")
+	if test "x$host_os_name" = xlinux; then
+		CUPS_CUPSD_FILE_PERM="700"
+	else
+		CUPS_CUPSD_FILE_PERM="500"
+	fi)
 AC_SUBST(CUPS_CUPSD_FILE_PERM)
 
 dnl Default LogFilePerm

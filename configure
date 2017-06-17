@@ -9552,7 +9552,11 @@ _ACEOF
 if test "${with_cupsd_file_perm+set}" = set; then :
   withval=$with_cupsd_file_perm; CUPS_CUPSD_FILE_PERM="$withval"
 else
-  CUPS_CUPSD_FILE_PERM="500"
+  if test "x$host_os_name" = xlinux; then
+		CUPS_CUPSD_FILE_PERM="700"
+	else
+		CUPS_CUPSD_FILE_PERM="500"
+	fi
 fi
 
 
