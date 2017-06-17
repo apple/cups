@@ -37,6 +37,16 @@ if test "x$CUPS_BUNDLEDIR" != x; then
 	AC_DEFINE_UNQUOTED(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
 fi
 
+dnl Default executable file permissions
+AC_ARG_WITH(exe_file_perm, [  --with-exe-file-perm set default exectuable permissions value, default=0555],
+	CUPS_EXE_FILE_PERM="$withval",
+	if test "x$host_os_name" = xlinux; then
+		CUPS_EXE_FILE_PERM="755"
+	else
+		CUPS_EXE_FILE_PERM="555"
+	fi)
+AC_SUBST(CUPS_EXE_FILE_PERM)
+
 dnl Default ConfigFilePerm
 AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFilePerm value, default=0640],
 	CUPS_CONFIG_FILE_PERM="$withval",

@@ -1,7 +1,7 @@
 #
 # Common makefile definitions for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -38,14 +38,14 @@ SHELL		=	/bin/sh
 # Installation programs...
 #
 
-INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -c -m 555 @INSTALL_STRIP@
+INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -c -m @CUPS_EXE_FILE_PERM@ @INSTALL_STRIP@
 INSTALL_COMPDATA =	$(INSTALL) -c -m 444 @INSTALL_GZIP@
 INSTALL_CONFIG	=	$(INSTALL) -c -m @CUPS_CONFIG_FILE_PERM@
 INSTALL_DATA	=	$(INSTALL) -c -m 444
 INSTALL_DIR	=	$(INSTALL) -d
-INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -c -m 555 @INSTALL_STRIP@
+INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -c -m @CUPS_EXE_FILE_PERM@ @INSTALL_STRIP@
 INSTALL_MAN	=	$(INSTALL) -c -m 444
-INSTALL_SCRIPT	=	$(INSTALL) -c -m 555
+INSTALL_SCRIPT	=	$(INSTALL) -c -m @CUPS_EXE_FILE_PERM@
 
 #
 # Default user, group, and system groups for the scheduler...
