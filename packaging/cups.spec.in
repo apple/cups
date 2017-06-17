@@ -26,8 +26,8 @@
 %{!?_with_dbus: %define _dbus --disable-dbus}
 
 %{!?_with_dnssd: %{!?_without_dnssd: %define _with_dnssd --with-dnssd}}
-%{?_with_dnssd: %define _dnssd --enable-dnssd}
-%{!?_with_dnssd: %define _dnssd --disable-dnssd}
+%{?_with_dnssd: %define _dnssd --enable-avahi}
+%{!?_with_dnssd: %define _dnssd --disable-avahi}
 
 %{!?_with_libusb1: %{!?_without_libusb1: %define _with_libusb1 --with-libusb1}}
 %{?_with_libusb1: %define _libusb1 --enable-libusb}
