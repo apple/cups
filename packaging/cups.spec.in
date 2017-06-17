@@ -116,7 +116,7 @@ This package provides LPD client support.
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
-    ./configure %{_dbus} %{_dnssd} %{_libusb1} %{_static}
+    ./configure %{_dbus} %{_dnssd} %{_libusb1} %{_static} %{_systemd}
 # If we got this far, all prerequisite libraries must be here.
 make
 

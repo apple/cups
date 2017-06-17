@@ -225,8 +225,8 @@ static const char	*cups_dnssd_resolve(cups_dest_t *dest, const char *uri,
 static int		cups_dnssd_resolve_cb(void *context);
 static void		cups_dnssd_unquote(char *dst, const char *src,
 			                   size_t dstsize);
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
 static int		cups_elapsed(struct timeval *t);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 static int		cups_find_dest(const char *name, const char *instance,
 				       int num_dests, cups_dest_t *dests, int prev,
 				       int *rdiff);
@@ -3845,6 +3845,7 @@ cups_dnssd_unquote(char       *dst,	/* I - Destination buffer */
 #endif /* HAVE_DNSSD */
 
 
+#if defined(HAVE_AVAHI) || defined(HAVE_DNSSD)
 /*
  * 'cups_elapsed()' - Return the elapsed time in milliseconds.
  */
@@ -3864,6 +3865,7 @@ cups_elapsed(struct timeval *t)		/* IO - Previous time */
 
   return (msecs);
 }
+#endif /* HAVE_AVAHI || HAVE_DNSSD */
 
 
 /*
