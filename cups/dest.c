@@ -1324,28 +1324,37 @@ cupsEnumDests(
   enum_finished:
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  cupsArrayDelete(data.devices);
+
 #  ifdef HAVE_DNSSD
-  DNSServiceRefDeallocate(ipp_ref);
-  DNSServiceRefDeallocate(local_ipp_ref);
+  if (ipp_ref)
+    DNSServiceRefDeallocate(ipp_ref);
+  if (local_ipp_ref)
+    DNSServiceRefDeallocate(local_ipp_ref);
 
 #    ifdef HAVE_SSL
-  DNSServiceRefDeallocate(ipp_ref);
-  DNSServiceRefDeallocate(local_ipp_ref);
+  if (ipps_ref)
+    DNSServiceRefDeallocate(ipps_ref);
+  if (local_ipps_ref)
+    DNSServiceRefDeallocate(local_ipps_ref);
 #    endif /* HAVE_SSL */
 
-  DNSServiceRefDeallocate(data.main_ref);
+  if (data.main_ref)
+    DNSServiceRefDeallocate(data.main_ref);
 
 #  else /* HAVE_AVAHI */
-  avahi_service_browser_free(ipp_ref);
+  if (ipp_ref)
+    avahi_service_browser_free(ipp_ref);
 #    ifdef HAVE_SSL
-  avahi_service_browser_free(ipps_ref);
+  if (ipps_ref)
+    avahi_service_browser_free(ipps_ref);
 #    endif /* HAVE_SSL */
 
-  avahi_client_free(data.client);
-  avahi_simple_poll_free(data.simple_poll);
+  if (data.client)
+    avahi_client_free(data.client);
+  if (data.simple_poll)
+    avahi_simple_poll_free(data.simple_poll);
 #  endif /* HAVE_DNSSD */
-
-  cupsArrayDelete(data.devices);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   return (1);
