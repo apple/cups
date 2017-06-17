@@ -20,7 +20,7 @@ fi
 
 if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
 	case "$host_os_name" in
-        	darwin* | linux | gnu | *bsd*)
+        	darwin* | linux* | gnu* | *bsd*)
         		# Darwin, macOS, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
         		AMANDIR="/usr/share/man"
