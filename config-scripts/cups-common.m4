@@ -181,7 +181,7 @@ AC_CHECK_FUNCS(vsyslog)
 
 dnl Checks for signal functions.
 case "$host_os_name" in
-	linux | gnu)
+	linux* | gnu*)
 		# Do not use sigset on Linux or GNU HURD
 		;;
 	*)

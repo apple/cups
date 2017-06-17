@@ -231,7 +231,7 @@ AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$CUPS_FONTPATH")
 # Locale data
 if test "$localedir" = "\${datarootdir}/locale"; then
 	case "$host_os_name" in
-		linux | gnu | *bsd* | darwin*)
+		linux* | gnu* | *bsd* | darwin*)
 			CUPS_LOCALEDIR="$datarootdir/locale"
 			;;
 

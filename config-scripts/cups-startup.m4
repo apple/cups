@@ -118,7 +118,7 @@ fi
 
 if test "x$rcstart" = x; then
 	case "$host_os_name" in
-        	linux | gnu | gnu/k*bsd*)
+        	linux* | gnu*)
                 	# Linux
                         rcstart="81"
                       	;;
@@ -137,7 +137,7 @@ fi
 
 if test "x$rcstop" = x; then
 	case "$host_os_name" in
-        	linux | gnu | gnu/k*bsd*)
+        	linux* | gnu*)
                 	# Linux
                         rcstop="36"
                       	;;

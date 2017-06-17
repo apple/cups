@@ -32,7 +32,7 @@ if test x$enable_shared != xno; then
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
-		linux | gnu | *bsd*)
+		linux* | gnu* | *bsd*)
 			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -137,7 +137,7 @@ if test "$DSO" != ":"; then
 				EXPORT_LDFLAGS="-Wl,-R$libdir"
 			fi
 			;;
-                linux | gnu)
+                linux* | gnu*)
                         # Linux, and HURD...
 			if test $exec_prefix != /usr; then
 				DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
