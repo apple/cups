@@ -1,4 +1,4 @@
-CHANGES - 2.2.4 - 2017-06-05
+CHANGES - 2.2.4 - 2017-06-16
 ============================
 
 CHANGES IN CUPS V2.2.4
@@ -24,6 +24,7 @@ CHANGES IN CUPS V2.2.4
   haven't yet been added (Issue #5006)
 - Fixed a typo in the mime.types file.
 - Fixed a bug in the Spanish web interface template (Issue #5016)
+- Fixed some issues in the RPM spec file (Issue #5032)
 
 
 CHANGES IN CUPS V2.2.3

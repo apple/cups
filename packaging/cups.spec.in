@@ -128,6 +128,15 @@ make BUILDROOT=$RPM_BUILD_ROOT install
 rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners $RPM_BUILD_ROOT/usr/share/cups/data
 
 %post
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+/bin/systemctl enable org.cups.cupsd.service
+
+if test $1 -ge 1; then
+	/bin/systemctl stop org.cups.cupsd.service
+	/bin/systemctl start org.cups.cupsd.service
+fi
+
+%else
 /sbin/chkconfig --add cups
 /sbin/chkconfig cups on
 
@@ -136,21 +145,38 @@ if test $1 -gt 1; then
 	/sbin/service cups stop
 	/sbin/service cups start
 fi
+%endif
 
 %post libs
 /sbin/ldconfig
 
 %preun
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+if test $1 -ge 1; then
+	/bin/systemctl stop org.cups.cupsd.service
+	/bin/systemctl disable org.cups.cupsd.service
+fi
+
+%else
 if test $1 = 0; then
 	/sbin/service cups stop
 	/sbin/chkconfig --del cups
 fi
+%endif
 
 %postun
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+if test $1 -ge 1; then
+	/bin/systemctl stop org.cups.cupsd.service
+	/bin/systemctl start org.cups.cupsd.service
+fi
+
+%else
 if test $1 -ge 1; then
 	/sbin/service cups stop
 	/sbin/service cups start
 fi
+%endif
 
 %postun libs
 /sbin/ldconfig
@@ -194,13 +220,13 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cancel
 /usr/bin/cupstestdsc
 /usr/bin/cupstestppd
-/usr/bin/ippfind
 /usr/bin/ipptool
 /usr/bin/lp*
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
 %if %{?_with_dnssd:1}%{!?_with_dnssd:0}
 # DNS-SD
+/usr/bin/ippfind
 /usr/lib/cups/backend/dnssd
 %endif
 /usr/lib/cups/backend/http
@@ -306,7 +332,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/cups.1.gz
 /usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
+%if %{?_with_dnssd:1}%{!?_with_dnssd:0}
+# DNS-SD
 /usr/share/man/man1/ippfind.1.gz
+%endif
 /usr/share/man/man1/ipptool.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
