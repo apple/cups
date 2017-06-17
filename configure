@@ -9521,15 +9521,15 @@ if test "${with_exe_file_perm+set}" = set; then :
   withval=$with_exe_file_perm; CUPS_EXE_FILE_PERM="$withval"
 else
   case "$host_os_name" in
-		linux* | gnu*
-fi
-
+		linux* | gnu*)
 			CUPS_EXE_FILE_PERM="755"
 			;;
 		*)
 			CUPS_EXE_FILE_PERM="555"
 			;;
-	esac)
+	esac
+fi
+
 
 
 
@@ -9556,15 +9556,15 @@ if test "${with_cupsd_file_perm+set}" = set; then :
   withval=$with_cupsd_file_perm; CUPS_CUPSD_FILE_PERM="$withval"
 else
   case "$host_os_name" in
-		linux* | gnu*
-fi
-
+		linux* | gnu*)
 			CUPS_CUPSD_FILE_PERM="700"
 			;;
 		*)
 			CUPS_CUPSD_FILE_PERM="500"
 			;;
-	esac)
+	esac
+fi
+
 
 
 

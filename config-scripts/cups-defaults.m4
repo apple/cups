@@ -40,38 +40,38 @@ fi
 dnl Default executable file permissions
 AC_ARG_WITH(exe_file_perm, [  --with-exe-file-perm set default exectuable permissions value, default=0555],
 	CUPS_EXE_FILE_PERM="$withval",
-	case "$host_os_name" in
+	[case "$host_os_name" in
 		linux* | gnu*)
 			CUPS_EXE_FILE_PERM="755"
 			;;
 		*)
 			CUPS_EXE_FILE_PERM="555"
 			;;
-	esac)
+	esac])
 AC_SUBST(CUPS_EXE_FILE_PERM)
 
 dnl Default ConfigFilePerm
 AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFilePerm value, default=0640],
 	CUPS_CONFIG_FILE_PERM="$withval",
-	if test "x$host_os_name" = xdarwin; then
+	[if test "x$host_os_name" = xdarwin; then
 		CUPS_CONFIG_FILE_PERM="644"
 	else
 		CUPS_CONFIG_FILE_PERM="640"
-	fi)
+	fi])
 AC_SUBST(CUPS_CONFIG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_CONFIG_FILE_PERM, 0$CUPS_CONFIG_FILE_PERM)
 
 dnl Default permissions for cupsd
 AC_ARG_WITH(cupsd_file_perm, [  --with-cupsd-file-perm  set default cupsd permissions, default=0500],
 	CUPS_CUPSD_FILE_PERM="$withval",
-	case "$host_os_name" in
+	[case "$host_os_name" in
 		linux* | gnu*)
 			CUPS_CUPSD_FILE_PERM="700"
 			;;
 		*)
 			CUPS_CUPSD_FILE_PERM="500"
 			;;
-	esac)
+	esac])
 AC_SUBST(CUPS_CUPSD_FILE_PERM)
 
 dnl Default LogFilePerm
