@@ -739,6 +739,10 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
+#ifdef __clang_analyzer__ /* Suppress bogus clang error */
+  memset(string, 0, sizeof(string));
+#endif /* __clang_analyzer__ */
+
   if (cg->snmp_debug <= 0)
     return;
 

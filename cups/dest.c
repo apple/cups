@@ -976,11 +976,11 @@ cupsEnumDests(
 #  ifdef HAVE_DNSSD
   int			nfds,		/* Number of files responded */
 			main_fd;	/* File descriptor for lookups */
-  DNSServiceRef		ipp_ref,	/* IPP browser */
-			local_ipp_ref;	/* Local IPP browser */
+  DNSServiceRef		ipp_ref = NULL,	/* IPP browser */
+			local_ipp_ref = NULL; /* Local IPP browser */
 #    ifdef HAVE_SSL
-  DNSServiceRef		ipps_ref,	/* IPPS browser */
-			local_ipps_ref;	/* Local IPPS browser */
+  DNSServiceRef		ipps_ref = NULL,/* IPPS browser */
+			local_ipps_ref = NULL; /* Local IPPS browser */
 #    endif /* HAVE_SSL */
 #    ifdef HAVE_POLL
   struct pollfd		pfd;		/* Polling data */
@@ -990,12 +990,13 @@ cupsEnumDests(
 #    endif /* HAVE_POLL */
 #  else /* HAVE_AVAHI */
   int			error;		/* Error value */
-  AvahiServiceBrowser	*ipp_ref;	/* IPP browser */
+  AvahiServiceBrowser	*ipp_ref = NULL;/* IPP browser */
 #    ifdef HAVE_SSL
-  AvahiServiceBrowser	*ipps_ref;	/* IPPS browser */
+  AvahiServiceBrowser	*ipps_ref = NULL; /* IPPS browser */
 #    endif /* HAVE_SSL */
 #  endif /* HAVE_DNSSD */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+
 
  /*
   * Range check input...
@@ -1011,6 +1012,8 @@ cupsEnumDests(
   */
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  memset(&data, 0, sizeof(data));
+
   data.type      = type;
   data.mask      = mask;
   data.cb        = cb;
@@ -1072,11 +1075,11 @@ cupsEnumDests(
         */
 
         char	scheme[32],		/* URI scheme */
-                  userpass[32],		/* Username:password */
-                  serviceName[256],	/* Service name (host field) */
-                  resource[256],		/* Resource (options) */
-                  *regtype,		/* Registration type */
-                  *replyDomain;		/* Registration domain */
+                userpass[32],           /* Username:password */
+                serviceName[256],       /* Service name (host field) */
+                resource[256],          /* Resource (options) */
+                *regtype,               /* Registration type */
+                *replyDomain;           /* Registration domain */
         int	port;			/* Port number (not used) */
 
         if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), serviceName, sizeof(serviceName), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK)
@@ -1312,7 +1315,15 @@ cupsEnumDests(
       break;
 #  endif /* HAVE_AVAHI */
   }
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
+ /*
+  * Return...
+  */
+
+  enum_finished:
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
 #  ifdef HAVE_DNSSD
   DNSServiceRefDeallocate(ipp_ref);
   DNSServiceRefDeallocate(local_ipp_ref);
@@ -1333,15 +1344,7 @@ cupsEnumDests(
   avahi_client_free(data.client);
   avahi_simple_poll_free(data.simple_poll);
 #  endif /* HAVE_DNSSD */
-#endif /* HAVE_DNSSD || HAVE_DNSSD */
 
- /*
-  * Return...
-  */
-
-  enum_finished:
-
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   cupsArrayDelete(data.devices);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 

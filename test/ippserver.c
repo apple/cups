@@ -5007,7 +5007,6 @@ load_attributes(const char *filename,	/* I - File to load */
 		break;
 
 	      ippSetCollection(attrs, &attrptr, ippGetCount(attrptr), col);
-	      lastcol = attrptr;
 	    }
 	    while (!strcmp(token, "{"));
 	    break;
@@ -7015,7 +7014,7 @@ valid_doc_attributes(
     attr = ippAddString(client->request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, format);
   }
 
-  if (!strcmp(format, "application/octet-stream") && (ippGetOperation(client->request) == IPP_OP_PRINT_JOB || ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
+  if (format && !strcmp(format, "application/octet-stream") && (ippGetOperation(client->request) == IPP_OP_PRINT_JOB || ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
   {
    /*
     * Auto-type the file using the first 8 bytes of the file...

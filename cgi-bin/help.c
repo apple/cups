@@ -271,7 +271,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       section = n->section;
     }
 
-    if (!topic || strcmp(n->section, topic))
+    if (!topic || !n->section || strcmp(n->section, topic))
       continue;
 
    /*
