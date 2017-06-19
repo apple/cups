@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2017-06-15 20:52-0400\n"
+"POT-Creation-Date: 2017-06-19 09:12-0400\n"
 "PO-Revision-Date: 2016-09-17 18:45+0200\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5692,7 +5692,7 @@ msgstr "Nicht unterstützter number-up Wert %d, verwende number-up=1."
 #, c-format
 msgid "Unsupported number-up-layout value %s, using number-up-layout=lrtb."
 msgstr ""
-"Nicht unterstützter number-up-layout Wert %d, verwende number-up-layout=lrtb."
+"Nicht unterstützter number-up-layout Wert %s, verwende number-up-layout=lrtb."
 
 #, c-format
 msgid "Unsupported page-border value %s, using page-border=none."
@@ -5919,7 +5919,7 @@ msgstr "cupsd: Unbekanntes Argument \"%s\" - Abbruch."
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
-msgstr "cupsd: Unbekannte Option \"%s\" - Abbruch."
+msgstr "cupsd: Unbekannte Option \"%c\" - Abbruch."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
