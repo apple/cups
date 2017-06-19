@@ -464,6 +464,7 @@ else
 	instfilter pdftopdf pdftopdf passthru
 	instfilter pdftops pdftops ps
 	instfilter pdftoraster pdftoraster raster
+	instfilter pdftoraster pdftourf raster
 	instfilter pstoraster pstoraster raster
 	instfilter texttopdf texttopdf pdf
 
@@ -1114,8 +1115,8 @@ cp $strfile .
 echo "Copied report file \"cups-str-$date-$user.html\" to test directory."
 
 # Clean out old failure log files after 1 week...
-find . -name \*_log-\*-$user -a -mtime +1w -print -exec rm -f '{}' \; | awk '{print "Removed old log file \"" substr($1,3) "\" from test directory."}'
-find . -name cups-str-\*-$user.html -a -mtime +1w -print -exec rm -f '{}' \; | awk '{print "Removed old report file \"" $1 "\" from test directory."}'
+find . -name \*_log-\*-$user -a -mtime +7 -print -exec rm -f '{}' \; | awk '{print "Removed old log file \"" substr($1,3) "\" from test directory."}'
+find . -name cups-str-\*-$user.html -a -mtime +7 -print -exec rm -f '{}' \; | awk '{print "Removed old report file \"" $1 "\" from test directory."}'
 
 echo ""
 
