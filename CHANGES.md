@@ -14,6 +14,7 @@ CHANGES IN CUPS V2.2.4
 - The cupsGetDests and cupsCreateJob functions now support Bonjour printers
   (Issue #4993)
 - Added a USB quirk rule for Lexmark E260dn printers (Issue #4994)
+- Fixed a potential buffer overflow in the cupstestppd utility (Issue #4996)
 - IPP Everywhere improvements (Issue #4998)
 - Fixed the "cancel all jobs" function in the web interface for several
   languages (Issue #4999)
