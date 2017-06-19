@@ -73,7 +73,7 @@ cupsCheckDestSupported(
     cups_dest_t  *dest,			/* I - Destination */
     cups_dinfo_t *dinfo,		/* I - Destination information */
     const char   *option,		/* I - Option */
-    const char   *value)		/* I - Value */
+    const char   *value)		/* I - Value or @code NULL@ */
 {
   int			i;		/* Looping var */
   char			temp[1024];	/* Temporary string */
@@ -96,7 +96,7 @@ cupsCheckDestSupported(
   * Range check input...
   */
 
-  if (!http || !dest || !dinfo || !option || !value)
+  if (!http || !dest || !dinfo || !option)
     return (0);
 
  /*
@@ -114,7 +114,10 @@ cupsCheckDestSupported(
   if (!attr)
     return (0);
 
- /*
+  if (!value)
+    return (1);
+
+/*
   * Compare values...
   */
 
