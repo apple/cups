@@ -923,7 +923,7 @@ main(int  argc,				/* I - Number of command-line args */
 	int	junkint;			/* Temp integer */
 
 
-        if (sscanf(attr->value, "(%[^)])%d", junkstr, &junkint) != 2)
+        if (sscanf(attr->value, "(%254[^)\n])%d", junkstr, &junkint) != 2)
 	{
 	  if (verbose >= 0)
 	  {
