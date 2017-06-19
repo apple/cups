@@ -1745,6 +1745,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 		  "printer-info",
 		  "printer-is-accepting-jobs",
 		  "printer-is-shared",
+                  "printer-is-temporary",
 		  "printer-location",
 		  "printer-make-and-model",
 		  "printer-mandatory-job-attributes",
@@ -1851,7 +1852,8 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 	    !strcmp(attr->name, "marker-types") ||
 	    !strcmp(attr->name, "printer-commands") ||
 	    !strcmp(attr->name, "printer-info") ||
-	    !strcmp(attr->name, "printer-is-shared") ||
+            !strcmp(attr->name, "printer-is-shared") ||
+            !strcmp(attr->name, "printer-is-temporary") ||
 	    !strcmp(attr->name, "printer-make-and-model") ||
 	    !strcmp(attr->name, "printer-mandatory-job-attributes") ||
 	    !strcmp(attr->name, "printer-state") ||

@@ -24,6 +24,8 @@ CHANGES IN CUPS V2.2.4
   haven't yet been added (Issue #5006)
 - Fixed a typo in the mime.types file.
 - Fixed a bug in the Spanish web interface template (Issue #5016)
+- The cupsEnumDests* and cupsGetDest* functions now report the value of the
+  "printer-is-temporary" Printer Status attribute (Issue #5028)
 - The cupsCheckDestSupported function did not support NULL values (Issue #5031)
 - Fixed some issues in the RPM spec file (Issue #5032)
 
