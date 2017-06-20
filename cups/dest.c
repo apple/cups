@@ -645,6 +645,9 @@ cupsConnectDest(
         if (strstr(uri, "._tcp"))
           uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+        if (uri)
+          dest->num_options = cupsAddOption("resolved-device-uri", uri, dest->num_options, &dest->options);
       }
     }
   }
@@ -658,6 +661,9 @@ cupsConnectDest(
         if (strstr(uri, "._tcp"))
           uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+        if (uri)
+          dest->num_options = cupsAddOption("resolved-device-uri", uri, dest->num_options, &dest->options);
       }
     }
 
