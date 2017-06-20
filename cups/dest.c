@@ -637,34 +637,22 @@ cupsConnectDest(
 
   if (flags & CUPS_DEST_FLAGS_DEVICE)
   {
-    if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
+    if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
     {
-      if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
-      {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-        if (strstr(uri, "._tcp"))
-          uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
+      if (strstr(uri, "._tcp"))
+        uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-        if (uri)
-          dest->num_options = cupsAddOption("resolved-device-uri", uri, dest->num_options, &dest->options);
-      }
     }
   }
   else if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
   {
-    if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
+    if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
     {
-      if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
-      {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-        if (strstr(uri, "._tcp"))
-          uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
+      if (strstr(uri, "._tcp"))
+        uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-        if (uri)
-          dest->num_options = cupsAddOption("resolved-device-uri", uri, dest->num_options, &dest->options);
-      }
     }
 
     if (uri)
@@ -1544,15 +1532,12 @@ _cupsGetDestResource(
 
   if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
   {
-    if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
+    if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
     {
-      if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
-      {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-        if (strstr(uri, "._tcp"))
-          uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL);
+      if (strstr(uri, "._tcp"))
+        uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-      }
     }
 
     if (uri)
@@ -3811,9 +3796,9 @@ cups_dnssd_resolve(
   * Save the resolved URI...
   */
 
-  dest->num_options = cupsAddOption("resolved-device-uri", uri, dest->num_options, &dest->options);
+  dest->num_options = cupsAddOption("device-uri", uri, dest->num_options, &dest->options);
 
-  return (cupsGetOption("resolved-device-uri", dest->num_options, dest->options));
+  return (cupsGetOption("device-uri", dest->num_options, dest->options));
 }
 
 
