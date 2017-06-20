@@ -92,6 +92,8 @@ extern "C" {
 					/* A connection is being established */
 #  define CUPS_DEST_FLAGS_CANCELED	0x40
 					/* Operation was canceled */
+#  define CUPS_DEST_FLAGS_DEVICE        0x80
+                                        /* For @link cupsConnectDest@: Connect to device */
 
 /* Flags for cupsGetDestMediaByName/Size */
 #  define CUPS_MEDIA_FLAGS_DEFAULT 	0x00

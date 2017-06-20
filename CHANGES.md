@@ -9,12 +9,12 @@ CHANGES IN CUPS V2.2.4
   (Issue #4989)
 - The CUPS build system now supports cross-compilation (Issue #4897)
 - Added a new CUPS Programming Manual to replace the aging API documentation.
-- Added the cupsAddIntegerOption and cupsGetIntegerOption functions
+- Added the `cupsAddIntegerOption` and `cupsGetIntegerOption` functions
   (Issue #4992)
-- The cupsGetDests and cupsCreateJob functions now support Bonjour printers
+- The `cupsGetDests` and `cupsCreateJob` functions now support Bonjour printers
   (Issue #4993)
 - Added a USB quirk rule for Lexmark E260dn printers (Issue #4994)
-- Fixed a potential buffer overflow in the cupstestppd utility (Issue #4996)
+- Fixed a potential buffer overflow in the `cupstestppd` utility (Issue #4996)
 - IPP Everywhere improvements (Issue #4998)
 - Fixed the "cancel all jobs" function in the web interface for several
   languages (Issue #4999)
@@ -26,11 +26,15 @@ CHANGES IN CUPS V2.2.4
   haven't yet been added (Issue #5006)
 - Fixed a typo in the mime.types file.
 - Fixed a bug in the Spanish web interface template (Issue #5016)
-- The cupsEnumDests* and cupsGetDest* functions now report the value of the
+- The `cupsEnumDests*` and `cupsGetDest*` functions now report the value of the
   "printer-is-temporary" Printer Status attribute (Issue #5028)
 - Added Chinese localization (Issue #5029)
-- The cupsCheckDestSupported function did not support NULL values (Issue #5031)
+- The `cupsCheckDestSupported` function did not support `NULL` values
+  (Issue #5031)
 - Fixed some issues in the RPM spec file (Issue #5032)
+- The `cupsConnectDest` function now supports the `CUPS_DEST_FLAGS_DEVICE` flag
+  for explicitly connecting to the device (printer) associated with the
+  destination.
 
 
 CHANGES IN CUPS V2.2.3

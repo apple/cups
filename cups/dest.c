@@ -579,6 +579,11 @@ _cupsAppleSetUseLastPrinter(
  * returns 0.  The caller is responsible for calling @link httpClose@ on the
  * returned connection.
  *
+ * Starting with CUPS 2.2.4, the caller can pass  @code CUPS_DEST_FLAGS_DEVICE@
+ * for the "flags" argument to connect directly to the device associated with
+ * the destination.  Otherwise, the connection is made to the CUPS scheduler
+ * associated with the destination.
+ *
  * @since CUPS 1.6/macOS 10.8@
  */
 
@@ -630,7 +635,20 @@ cupsConnectDest(
   * Grab the printer URI...
   */
 
-  if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
+  if (flags & CUPS_DEST_FLAGS_DEVICE)
+  {
+    if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
+    {
+      if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
+      {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+        if (strstr(uri, "._tcp"))
+          uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb, user_data);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+      }
+    }
+  }
+  else if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
   {
     if ((uri = cupsGetOption("resolved-device-uri", dest->num_options, dest->options)) == NULL)
     {
@@ -754,6 +772,11 @@ cupsConnectDest(
  * will block until a connection is made, the timeout expires, the integer
  * pointed to by "cancel" is non-zero, or the block returns 0.  The caller is
  * responsible for calling @link httpClose@ on the returned connection.
+ *
+ * Starting with CUPS 2.2.4, the caller can pass  @code CUPS_DEST_FLAGS_DEVICE@
+ * for the "flags" argument to connect directly to the device associated with
+ * the destination.  Otherwise, the connection is made to the CUPS scheduler
+ * associated with the destination.
  *
  * @since CUPS 1.6/macOS 10.8@ @exclude all@
  */
