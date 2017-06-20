@@ -5366,7 +5366,7 @@ create_local_bg_thread(
     }
   }
   else
-    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: PPD creation failed.", printer->name);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: PPD creation failed: %s", printer->name, cupsLastErrorString());
 
   return (NULL);
 }
