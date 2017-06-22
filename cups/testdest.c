@@ -594,7 +594,8 @@ show_supported(http_t       *http,	/* I - Connection to destination */
   }
   else if (!value)
   {
-    puts(option);
+    printf("%s (%s)\n", option, cupsCheckDestSupported(http, dest, dinfo, option, NULL) ? "supported" : "not-supported");
+
     if ((attr = cupsFindDestSupported(http, dest, dinfo, option)) != NULL)
     {
       count = ippGetCount(attr);
