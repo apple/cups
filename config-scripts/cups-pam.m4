@@ -53,7 +53,7 @@ if test x$enable_pam != xno; then
 	LIBS="$SAVELIBS"
 
 	case "$host_os_name" in
-		marwin*)
+		darwin*)
 			# Darwin/macOS
 			if test "x$with_pam_module" != x; then
 				PAMFILE="pam.$with_pam_module"
