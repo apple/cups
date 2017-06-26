@@ -1367,6 +1367,8 @@ cups_set_ssl_options(
       options |= _HTTP_TLS_ALLOW_SSL3;
     else if (!_cups_strcasecmp(start, "AllowDH"))
       options |= _HTTP_TLS_ALLOW_DH;
+    else if (!_cups_strcasecmp(start, "DenyCBC"))
+      options |= _HTTP_TLS_DENY_CBC;
     else if (!_cups_strcasecmp(start, "DenyTLS1.0"))
       options |= _HTTP_TLS_DENY_TLS10;
     else if (!_cups_strcasecmp(start, "None"))

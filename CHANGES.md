@@ -35,6 +35,8 @@ CHANGES IN CUPS V2.2.4
 - The `cupsConnectDest` function now supports the `CUPS_DEST_FLAGS_DEVICE` flag
   for explicitly connecting to the device (printer) associated with the
   destination.
+- The `SSLOptions` directive in "client.conf" and "cupsd.conf" now supports
+  `DenyCBC` and `DenyTLS1.0` options (Issue #5037)
 
 
 CHANGES IN CUPS V2.2.3

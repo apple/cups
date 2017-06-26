@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "21 June 2016" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "26 June 2017" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -480,13 +480,16 @@ Set the specified environment variable to be passed to child processes.
 Listens on the specified address and port for encrypted connections.
 .\"#SSLOptions
 .TP 5
-\fBSSLOptions \fR[\fIAllowRC4\fR] [\fIAllowSSL3\fR]
+\fBSSLOptions \fR[\fIAllowDH\fR] [\fIAllowRC4\fR] [\fIAllowSSL3\fR] [\fIDenyCBC\fR] [\fIDenyTLS1.0\fR]
 .TP 5
 \fBSSLOptions None\fR
 Sets encryption options.
 By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
+The \fIAllowDH\fR option enables cipher suites using plain Diffie-Hellman key negotiation.
 The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
 The \fIAllowSSL3\fR option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
+The \fIDenyCBC\fR option disables all CBC cipher suites.
+The \fIDenyTLS1.0\fR option disables TLS v1.0 support - this sets the minimum protocol version to TLS v1.1.
 .\"#SSLPort
 .TP 5
 \fBSSLPort \fIport\fR

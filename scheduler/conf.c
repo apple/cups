@@ -2987,7 +2987,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
     else if (!_cups_strcasecmp(line, "SSLOptions"))
     {
      /*
-      * SSLOptions [AllowRC4] [AllowSSL3] [None]
+      * SSLOptions [AllowRC4] [AllowSSL3] [AllowDH] [DenyCBC] [DenyTLS1.0] [None]
       */
 
       int	options = 0;		/* SSL/TLS options */
@@ -3018,6 +3018,12 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	    options |= _HTTP_TLS_ALLOW_RC4;
           else if (!_cups_strcasecmp(start, "AllowSSL3"))
 	    options |= _HTTP_TLS_ALLOW_SSL3;
+	  else if (!_cups_strcasecmp(start, "AllowDH"))
+	    options |= _HTTP_TLS_ALLOW_DH;
+	  else if (!_cups_strcasecmp(start, "DenyCBC"))
+	    options |= _HTTP_TLS_DENY_CBC;
+	  else if (!_cups_strcasecmp(start, "DenyTLS1.0"))
+	    options |= _HTTP_TLS_DENY_TLS10;
           else if (!_cups_strcasecmp(start, "None"))
 	    options = 0;
 	  else if (_cups_strcasecmp(start, "NoEmptyFragments"))

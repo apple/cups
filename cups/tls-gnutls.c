@@ -1518,6 +1518,9 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   if (!(tls_options & _HTTP_TLS_ALLOW_DH))
     strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
 
+  if (!(tls_options & _HTTP_TLS_DENY_CBC))
+    strlcat(priority_string, ":!CBC", sizeof(priority_string));
+
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   gnutls_priority_set_direct(http->tls, priority_string, NULL);
 

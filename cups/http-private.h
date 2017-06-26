@@ -1,7 +1,7 @@
 /*
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -184,6 +184,7 @@ extern "C" {
 #define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
 #define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
 #define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
+#define _HTTP_TLS_DENY_CBC	32	/* Deny CBC cipher suites */
 
 
 /*
