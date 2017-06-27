@@ -695,10 +695,11 @@ _cups_strlcat(char       *dst,		/* O - Destination string */
   */
 
   dstlen = strlen(dst);
-  size   -= dstlen + 1;
 
-  if (!size)
-    return (dstlen);		/* No room, return immediately... */
+  if (size < (dstlen + 1))
+    return (dstlen);		        /* No room, return immediately... */
+
+  size -= dstlen + 1;
 
  /*
   * Figure out how much room is needed...
