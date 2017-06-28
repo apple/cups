@@ -2208,6 +2208,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
                  const char *name,	/* I - Destination name or @code NULL@ for the default destination */
                  const char *instance)	/* I - Instance name or @code NULL@ */
 {
+  const char    *dest_name;             /* Working destination name */
   cups_dest_t	*dest;			/* Destination */
   char		filename[1024],		/* Path to lpoptions */
 		defname[256];		/* Default printer name */
@@ -2224,12 +2225,14 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * If "name" is NULL, find the default destination...
   */
 
-  if (!name)
+  dest_name = name;
+
+  if (!dest_name)
   {
     set_as_default = 1;
-    name           = _cupsUserDefault(defname, sizeof(defname));
+    dest_name      = _cupsUserDefault(defname, sizeof(defname));
 
-    if (name)
+    if (dest_name)
     {
       char	*ptr;			/* Temporary pointer... */
 
@@ -2249,7 +2252,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
       snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
-      name = cups_get_default(filename, defname, sizeof(defname), &instance);
+      dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
     }
 
     if (!name)
@@ -2258,12 +2261,11 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       * Still not there?  Try the system lpoptions file...
       */
 
-      snprintf(filename, sizeof(filename), "%s/lpoptions",
-	       cg->cups_serverroot);
-      name = cups_get_default(filename, defname, sizeof(defname), &instance);
+      snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+      dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
     }
 
-    if (!name)
+    if (!dest_name)
     {
      /*
       * No locally-set default destination, ask the server...
@@ -2281,7 +2283,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * Get the printer's attributes...
   */
 
-  if (!_cupsGetDests(http, op, name, &dest, 0, 0))
+  if (!_cupsGetDests(http, op, dest_name, &dest, 0, 0))
   {
     if (name)
     {
@@ -2316,13 +2318,13 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  cups_get_dests(filename, name, instance, 1, 1, &dest);
+  cups_get_dests(filename, dest_name, instance, 1, 1, &dest);
 
   if (home)
   {
     snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
-    cups_get_dests(filename, name, instance, 1, 1, &dest);
+    cups_get_dests(filename, dest_name, instance, 1, 1, &dest);
   }
 
  /*
