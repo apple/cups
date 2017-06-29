@@ -609,8 +609,9 @@ Finally, the `cupsGetDestMediaDefault` function returns the default media size:
 
 ### Localizing Options and Values
 
-CUPS provides three functions to get localized versions of options and values:
-`cupsLocalizeDestMedia`, `cupsLocalizeDestOption`, and `cupsLocalizeDestValue`:
+CUPS provides three functions to get localized, human-readable strings in the
+user's current locale for options and values: `cupsLocalizeDestMedia`,
+`cupsLocalizeDestOption`, and `cupsLocalizeDestValue`:
 
     const char *
     cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest,

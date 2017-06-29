@@ -898,7 +898,7 @@ cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
                         cups_size_t *size);
 </code></pre>
     <h4><a id="localizing-options-and-values">Localizing Options and Values</a></h4>
-    <p>CUPS provides three functions to get localized versions of options and values: <code>cupsLocalizeDestMedia</code>, <code>cupsLocalizeDestOption</code>, and <code>cupsLocalizeDestValue</code>:</p>
+    <p>CUPS provides three functions to get localized, human-readable strings in the user's current locale for options and values: <code>cupsLocalizeDestMedia</code>, <code>cupsLocalizeDestOption</code>, and <code>cupsLocalizeDestValue</code>:</p>
     <pre><code>const char *
 cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest,
                       cups_dinfo_t *info, unsigned flags,
