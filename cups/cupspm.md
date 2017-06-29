@@ -5,10 +5,8 @@ copyright: Copyright © 2007-2017 by Apple Inc. All Rights Reserved.
 version: 2.2.4
 ...
 
-> Note: This document is under active development and is incomplete, with a goal
-> completing it prior to releasing CUPS 2.2.4.  Please
-> [file issues on Github](https://github.com/apple/cups/issues)
-> to provide any feedback.
+> Please [file issues on Github](https://github.com/apple/cups/issues) to
+> provide feedback on this document.
 
 
 # Introduction
