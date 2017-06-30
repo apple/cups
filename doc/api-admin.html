@@ -1,7 +1,359 @@
----
-title: Administration APIs	
----
-<div class='body'>
+<!doctype html>
+<html>
+<!-- SECTION: Programming -->
+  <head>
+    <title>Administration APIs</title>
+    <meta name="keywords" content="Programming">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="author" content="Unknown">
+    <meta name="copyright" content="Unknown">
+    <meta name="version" content="0.0">
+    <style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+  </head>
+  <body>
 <!--
   Administrative API header for CUPS.
 
@@ -36,24 +388,26 @@ title: Administration APIs
 </tr>
 </tbody>
 </table></div>
-<h2 class="title">Contents</h2>
-<ul class="contents">
-<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-	<li><a href="#SETTINGS">Scheduler Settings</a></li>
-	<li><a href="#DEVICES">Devices</a></li>
-</ul></li>
-<li><a href="#FUNCTIONS">Functions</a><ul class="code">
-	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
-	<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
-	<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
-	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
-	<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
-</ul></li>
-<li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_device_cb_t" title="Device callback
-">cups_device_cb_t</a></li>
-</ul></li>
-</ul>
+    <div class="contents">
+      <h2 class="title">Contents</h2>
+      <ul class="contents">
+        <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+          <li><a href="#SETTINGS">Scheduler Settings</a></li>
+          <li><a href="#DEVICES">Devices</a></li>
+        </ul></li>
+        <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
+          <li><a href="#cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></li>
+          <li><a href="#cupsAdminExportSamba">cupsAdminExportSamba</a></li>
+          <li><a href="#cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></li>
+          <li><a href="#cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></li>
+          <li><a href="#cupsGetDevices">cupsGetDevices</a></li>
+        </ul></li>
+        <li><a href="#TYPES">Data Types</a><ul class="subcontents">
+          <li><a href="#cups_device_cb_t">cups_device_cb_t</a></li>
+        </ul></li>
+      </ul>
+    </div>
+    <div class="body">
 <!--
   Administrative API documentation for CUPS.
 
@@ -150,141 +504,116 @@ show_devices(void)
   <a href="#cupsGetDevices">cupsGetDevices</a>(CUPS_HTTP_DEFAULT, 30, NULL, NULL, get_devices_cb, NULL);
 }
 </pre>
-<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></h3>
-<p class="description">Create the Windows PPD file for a printer.</p>
+      <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsAdminCreateWindowsPPD">cupsAdminCreateWindowsPPD</a></h3>
+        <p class="description">Create the Windows PPD file for a printer.</p>
 <p class="code">
-char *cupsAdminCreateWindowsPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int bufsize<br>
-);</p>
+char *cupsAdminCreateWindowsPPD(http_t *http, const char *dest, char *buffer, int bufsize);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>dest</dt>
-<dd class="description">Printer or class</dd>
-<dt>buffer</dt>
-<dd class="description">Filename buffer</dd>
-<dt>bufsize</dt>
-<dd class="description">Size of filename buffer</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></td></tr>
+<tr><th>dest</th>
+        <td class="description">Printer or class</td></tr>
+<tr><th>buffer</th>
+        <td class="description">Filename buffer</td></tr>
+<tr><th>bufsize</th>
+        <td class="description">Size of filename buffer</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">PPD file or NULL</p>
-<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsAdminExportSamba">cupsAdminExportSamba</a></h3>
-<p class="description">Export a printer to Samba.</p>
+        <p class="description">PPD file or NULL</p>
+<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsAdminExportSamba">cupsAdminExportSamba</a></h3>
+        <p class="description">Export a printer to Samba.</p>
 <p class="code">
-int cupsAdminExportSamba (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *dest,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *ppd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_server,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_user,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *samba_password,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;FILE *logfile<br>
-);</p>
+int cupsAdminExportSamba(const char *dest, const char *ppd, const char *samba_server, const char *samba_user, const char *samba_password, FILE *logfile);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dest</dt>
-<dd class="description">Destination to export</dd>
-<dt>ppd</dt>
-<dd class="description">PPD file</dd>
-<dt>samba_server</dt>
-<dd class="description">Samba server</dd>
-<dt>samba_user</dt>
-<dd class="description">Samba username</dd>
-<dt>samba_password</dt>
-<dd class="description">Samba password</dd>
-<dt>logfile</dt>
-<dd class="description">Log file, if any</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>dest</th>
+        <td class="description">Destination to export</td></tr>
+<tr><th>ppd</th>
+        <td class="description">PPD file</td></tr>
+<tr><th>samba_server</th>
+        <td class="description">Samba server</td></tr>
+<tr><th>samba_user</th>
+        <td class="description">Samba username</td></tr>
+<tr><th>samba_password</th>
+        <td class="description">Samba password</td></tr>
+<tr><th>logfile</th>
+        <td class="description">Log file, if any</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
-<p class="description">Get settings from the server.</p>
+        <p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsAdminGetServerSettings">cupsAdminGetServerSettings</a></h3>
+        <p class="description">Get settings from the server.</p>
 <p class="code">
-int cupsAdminGetServerSettings (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *num_settings,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t **settings<br>
-);</p>
+int cupsAdminGetServerSettings(http_t *http, int *num_settings, cups_option_t **settings);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>num_settings</dt>
-<dd class="description">Number of settings</dd>
-<dt>settings</dt>
-<dd class="description">Settings</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></td></tr>
+<tr><th>num_settings</th>
+        <td class="description">Number of settings</td></tr>
+<tr><th>settings</th>
+        <td class="description">Settings</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
+        <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The returned settings should be freed with cupsFreeOptions() when
+        <p class="discussion">The returned settings should be freed with cupsFreeOptions() when
 you are done with them.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/macOS 10.5&nbsp;</span><a name="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
-<p class="description">Set settings on the server.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsAdminSetServerSettings">cupsAdminSetServerSettings</a></h3>
+        <p class="description">Set settings on the server.</p>
 <p class="code">
-int cupsAdminSetServerSettings (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int num_settings,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *settings<br>
-);</p>
+int cupsAdminSetServerSettings(http_t *http, int num_settings, cups_option_t *settings);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>num_settings</dt>
-<dd class="description">Number of settings</dd>
-<dt>settings</dt>
-<dd class="description">Settings</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></td></tr>
+<tr><th>num_settings</th>
+        <td class="description">Number of settings</td></tr>
+<tr><th>settings</th>
+        <td class="description">Settings</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
-<p class="description">Get available printer devices.</p>
+        <p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsGetDevices">cupsGetDevices</a></h3>
+        <p class="description">Get available printer devices.</p>
 <p class="code">
-ipp_status_t cupsGetDevices (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *include_schemes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *exclude_schemes,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_device_cb_t">cups_device_cb_t</a> callback,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
-);</p>
+ipp_status_t cupsGetDevices(http_t *http, int timeout, const char *include_schemes, const char *exclude_schemes, <a href="#cups_device_cb_t">cups_device_cb_t</a> callback, void *user_data);</p>
 <h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>timeout</dt>
-<dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
-<dt>include_schemes</dt>
-<dd class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></dd>
-<dt>exclude_schemes</dt>
-<dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
-<dt>callback</dt>
-<dd class="description">Callback function</dd>
-<dt>user_data</dt>
-<dd class="description">User data pointer</dd>
-</dl>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></td></tr>
+<tr><th>timeout</th>
+        <td class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></td></tr>
+<tr><th>include_schemes</th>
+        <td class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></td></tr>
+<tr><th>exclude_schemes</th>
+        <td class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></td></tr>
+<tr><th>callback</th>
+        <td class="description">Callback function</td></tr>
+<tr><th>user_data</th>
+        <td class="description">User data pointer</td></tr>
+</tbody></table>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Request status - <code>IPP_OK</code> on success.</p>
+        <p class="description">Request status - <code>IPP_OK</code> on success.</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
+        <p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
 devices to the specified callback function. The &quot;timeout&quot; parameter controls
 how long the request lasts, while the &quot;include_schemes&quot; and &quot;exclude_schemes&quot;
 parameters provide comma-delimited lists of backends to include or omit from
 the request respectively.
 
 </p>
-<h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/macOS 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
-<p class="description">Device callback
+      <h2 class="title"><a id="TYPES">Data Types</a></h2>
+      <h3 class="typedef"><a id="cups_device_cb_t"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span>cups_device_cb_t</a></h3>
+        <p class="description">Device callback
 </p>
-<p class="code">
+      <p class="code">
 typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
 </p>
-</div>
+    </div>
+  </body>
+</html>

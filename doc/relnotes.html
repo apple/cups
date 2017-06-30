@@ -5,6 +5,82 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="020204">CUPS 2.2.4</a> <em>(June 30, 2017)</em></h2>
+
+<ul>
+
+	<li>The scheduler did not remove old job files (Issue #4987)</li>
+	<li>cupsEnumDests did not return early when all printers had been discovered (Issue #4989)</li>
+	<li>The CUPS build system now supports cross-compilation (Issue #4897)</li>
+	<li>Added a new CUPS Programming Manual to replace the aging API documentation.</li>
+	<li>Added the `cupsAddIntegerOption` and `cupsGetIntegerOption` functions (Issue #4992)</li>
+	<li>The `cupsGetDests` and `cupsCreateJob` functions now support Bonjour printers (Issue #4993)</li>
+	<li>Added a USB quirk rule for Lexmark E260dn printers (Issue #4994)</li>
+	<li>Fixed a potential buffer overflow in the `cupstestppd` utility (Issue #4996)</li>
+	<li>IPP Everywhere improvements (Issue #4998)</li>
+	<li>Fixed the "cancel all jobs" function in the web interface for several languages (Issue #4999)</li>
+	<li>Fixed issues with local queues (Issue #5003, Issue #5008, Issue #5009)</li>
+	<li>The `lpstat` command now supports a `-e` option to enumerate local printers (either previously added or on the network) that can be accessed (Issue #5005)</li>
+	<li>The `lp` and `lpr` commands now support printing to network printers that haven't yet been added (Issue #5006)</li>
+	<li>Fixed a typo in the mime.types file.</li>
+	<li>Fixed a bug in the Spanish web interface template (Issue #5016)</li>
+	<li>The `cupsEnumDests*` and `cupsGetDest*` functions now report the value of the "printer-is-temporary" Printer Status attribute (Issue #5028)</li>
+	<li>Added Chinese localization (Issue #5029)</li>
+	<li>The `cupsCheckDestSupported` function did not support `NULL` values (Issue #5031)</li>
+	<li>Fixed some issues in the RPM spec file (Issue #5032)</li>
+	<li>The `cupsConnectDest` function now supports the `CUPS_DEST_FLAGS_DEVICE` flag for explicitly connecting to the device (printer) associated with the destination.</li>
+	<li>The `SSLOptions` directive in "client.conf" and "cupsd.conf" now supports `DenyCBC` and `DenyTLS1.0` options (Issue #5037)</li>
+
+</ul>
+
+
+<h2 class="title"><a name="020203">CUPS 2.2.3</a> <em>(March 28, 2017)</em></h2>
+
+<ul>
+
+	<li>The IPP backend could get into an infinite loop for certain errors, causing a hung queue (&lt;rdar://problem/28008717>)</li>
+	<li>The scheduler could pause responding to client requests in order to save state changes to disk (&lt;rdar://problem/28690656>)</li>
+	<li>Added support for PPD finishing keywords (Issue #4960, Issue #4961, Issue #4962)</li>
+	<li>The IPP backend did not send a media-col attribute for just the source or type (Issue #4963)</li>
+	<li>IPP Everywhere print queues did not always support all print qualities supported by the printer (Issue #4953)</li>
+	<li>IPP Everywhere print queues did not always support all media types supported by the printer (Issue #4953)</li>
+	<li>The IPP Everywhere PPD generator did not return useful error messages (Issue #4954)</li>
+	<li>The IPP Everywhere finishings support did not work correctly with common UI or command-line options (Issue #4976)</li>
+	<li>Fixed an error handling issue for the network backends (Issue #4979)</li>
+	<li>The default cupsd.conf file did not work on systems compiled without Kerberos support (Issue #4947)</li>
+	<li>The "reprint job" option was not available for some canceled jobs (Issue #4915)</li>
+	<li>Updated the job listing in the web interface (Issue #4978)</li>
+	<li>Fixed some localization issues on macOS (&lt;rdar://problem/27245567>)</li>
+
+</ul>
+
+
+<h2 class="title"><a name="020202">CUPS 2.2.2</a> <em>(January 17, 2017)</em></h2>
+
+<ul>
+
+	<li>Fixed some issues with the Zebra ZPL printer driver (Issue #4898)</li>
+	<li>Fixed some issues with IPP Everywhere printer support (Issue #4893, Issue #4909, Issue #4916, Issue #4921, Issue #4923, Issue #4932, Issue #4933, Issue #4938)</li>
+	<li>The rastertopwg filter could crash with certain input (Issue #4942)</li>
+	<li>Optimized connection usage in the IPP backend (&lt;rdar://problem/29547323>)</li>
+	<li>The scheduler did not detect when an encrypted connection was closed by the client on Linux (Issue #4901)</li>
+	<li>The cups-lpd program did not catch all legacy usage of ISO-8859-1 (Issue #4899)</li>
+	<li>Fixed builds on systems without a working poll() implementation (Issue #4905)</li>
+	<li>Added a USB quirk rule for the Kyocera Ecosys P6026cdn (Issue #4900)</li>
+	<li>The scheduler no longer creates log files on startup
+  (&lt;rdar://problem/28332470>)</li>
+	<li>The ippContainsString function now uses case-insensitive comparisons for mimeMediaType, name, and text values in conformance with RFC 2911.</li>
+	<li>The network backends now log the addresses that were found for a printer (&lt;rdar://problem/29268474>)</li>
+	<li>Let's Encrypt certificates did not work when the hostname contained uppercase letters (Issue #4919)</li>
+	<li>Fixed reporting of printed pages in the web interface (Issue #4924)</li>
+	<li>Updated systemd config files (Issue #4935)</li>
+	<li>Updated documentation (PR #4896)</li>
+	<li>Updated localizations (PR #4894, PR #4895, PR #4904, PR #4908, Issue #4946)</li>
+	<li>Updated packaging files (Issue #4940)</li>
+
+</ul>
+
+
 <h2 class="title"><a name="020201">CUPS 2.2.1</a> <em>(October 3, 2016)</em></h2>
 
 <ul>

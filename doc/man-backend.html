@@ -1,6 +1,11 @@
----
-title: backend(7)
----
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>backend(7)</title>
+</head>
+<body>
 <h1 class="title">backend(7)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 backend - cups backend transmission interfaces
@@ -56,7 +61,7 @@ function may be used to retrieve the correct device URI.
 <p>Backends are responsible for reading side-channel requests using the
 <b>cupsSideChannelRead</b>()
 function and responding with the
-<b>cupsSideChannelWrite()</b>
+<b>cupsSideChannelWrite</b>()
 function. The
 <b>CUPS_SC_FD</b>
 constant defines the file descriptor that should be monitored for incoming requests.
@@ -142,7 +147,7 @@ CUPS backends can expect the following environment variable:
 <h2 class="title"><a name="FILES">Files</a></h2>
 <i>/etc/cups/cups-files.conf</i>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-CUPS backends are not generally design to be run directly by the user. Aside from the device URI issue (
+CUPS backends are not generally designed to be run directly by the user. Aside from the device URI issue (
 <i>argv[0]</i>
 and
 <b>DEVICE_URI</b>
@@ -168,5 +173,7 @@ for more information.
 <br>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2016 by Apple Inc.
+Copyright &copy; 2007-2017 by Apple Inc.
 
+</body>
+</html>

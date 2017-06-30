@@ -1,28 +1,53 @@
----
-title: ipptoolfile(5)
----
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ipptoolfile(5)</title>
+</head>
+<body>
 <h1 class="title">ipptoolfile(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 ipptoolfile - ipptool file format
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The
 <a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(1)</a>
-program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
+program accepts free-form plain text files that describe one or more IPP requests.
+Comments start with the "#" character and continue to the end of the line.
+Each request is enclosed by curly braces, for example:
 <pre class="man">
 
     # This is a comment
     {
       # The name of the test
-      NAME "Print PostScript File"
+      NAME "Print PDF File"
 
       # The request to send
       OPERATION Print-Job
+
       GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
       ATTR uri printer-uri $uri
       ATTR name requesting-user-name $user
-      FILE testfile.ps
+      ATTR mimeMediaType document-format application/pdf
+
+      GROUP job-attributes-tag
+      ATTR collection media-col {
+        # US Letter plain paper from the "main" tray
+        MEMBER collection media-size {
+          MEMBER integer x-dimension 21590
+          MEMBER integer y-dimension 27940
+        }
+        MEMBER integer media-top-margin 423
+        MEMBER integer media-bottom-margin 423
+        MEMBER integer media-left-margin 423
+        MEMBER integer media-right-margin 423
+        MEMBER keyword media-source "main"
+        MEMBER keyword media-type "stationery"
+      }
+
+      FILE testfile.pdf
 
       # The response to expect
       STATUS successful-ok
@@ -31,10 +56,11 @@ program accepts free-form plain text files that describe one or more IPP request
     }
     {
       # The name of the test
-      NAME "Get Attributes of PostScript Job"
+      NAME "Wait for Job to Complete"
 
       # The request to send
       OPERATION Get-Job-Attributes
+
       GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
@@ -46,8 +72,12 @@ program accepts free-form plain text files that describe one or more IPP request
       STATUS successful-ok
       EXPECT job-id OF-TYPE integer WITH-VALUE $job-id
       EXPECT job-uri OF-TYPE uri
-      EXPECT job-state OF-TYPE enum WITH-VALUE 3,4,5,6,7,8,9
+      EXPECT job-state OF-TYPE enum WITH-VALUE >5 REPEAT-NO-MATCH
       EXPECT job-originating-user-name OF-TYPE name WITH-VALUE "$user"
+
+      # Show the job state until completed...
+      DISPLAY job-state
+      DISPLAY job-state-reasons
     }
 </pre>
 <h3><a name="TOP_LEVEL_DIRECTIVES">Top-level Directives</a></h3>
@@ -110,15 +140,20 @@ command-line. Support for content length requests is required for conformance wi
 The following directives are understood within a <i>test</i>:
 <dl class="man">
 <dt><b>ATTR </b><i>tag attribute-name value(s)</i>
-<dd style="margin-left: 5.0em">Adds an attribute to the test request. Values are separated by the comma (",") character - escape commas using the "" character. Common attributes and values are listed in the IANA IPP registry - see references below.
+<dd style="margin-left: 5.0em">Adds an attribute to the test request.
+Values are separated by the comma (",") character - escape commas using the "" character.
+Common attributes and values are listed in the IANA IPP registry - see references below.
 <dt><b>ATTR collection </b><i>attribute-name </i><b>{ MEMBER </b><i>tag member-name value(s) ... </i><b>}</b> [ <i>... </i><b>,{ </b><i>... </i><b>} </b>]
-<dd style="margin-left: 5.0em">Adds a collection attribute to the test request. Member attributes follow the same syntax as regular attributes and can themselves be nested collections. Multiple collection values can be supplied as needed, separated by commas.
+<dd style="margin-left: 5.0em">Adds a collection attribute to the test request.
+Member attributes follow the same syntax as regular attributes and can themselves be nested collections.
+Multiple collection values can be supplied as needed, separated by commas.
 <dt><b>COMPRESSION deflate</b>
 <dd style="margin-left: 5.0em"><dt><b>COMPRESSION gzip</b>
 <dd style="margin-left: 5.0em"><dt><b>COMPRESSION none</b>
 <dd style="margin-left: 5.0em">Uses the specified compression on the document data following the attributes in a Print-Job or Send-Document request.
-<dt><b>DELAY </b><i>seconds</i>
-<dd style="margin-left: 5.0em">Specifies a delay before this test will be run.
+<dt><b>DELAY </b><i>seconds</i>[<i>,repeat-seconds</i>]
+<dd style="margin-left: 5.0em">Specifies a delay in seconds before this test will be run.
+If two values are specified, the second value is used as the delay between repeated tests.
 <dt><b>DISPLAY </b><i>attribute-name</i>
 <dd style="margin-left: 5.0em">Specifies that value of the named attribute should be output as part of the
 test report.
@@ -491,10 +526,11 @@ if any.
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(1),</a>
-CUPS Online Help (<a href="http://localhost:631/help)">http://localhost:631/help)</a>,
 IANA IPP Registry (<a href="http://www.iana.org/assignments/ipp-registrations)">http://www.iana.org/assignments/ipp-registrations)</a>,
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp)">http://www.pwg.org/ipp)</a>,
-RFC 2911 (<a href="http://tools.ietf.org/html/rfc3911">http://tools.ietf.org/html/rfc3911</a>)
+RFC 8011 (<a href="http://tools.ietf.org/html/rfc8011">http://tools.ietf.org/html/rfc8011</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2016 by Apple Inc.
+Copyright &copy; 2007-2017 by Apple Inc.
 
+</body>
+</html>

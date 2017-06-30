@@ -1,6 +1,11 @@
----
-title: lpstat(1)
----
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpstat(1)</title>
+</head>
+<body>
 <h1 class="title">lpstat(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 lpstat - print cups status information
@@ -30,6 +35,8 @@ lpstat - print cups status information
 <i>class(es)</i>
 ] ] [
 <b>-d</b>
+] [
+<b>-e</b>
 ] [
 <b>-o</b>
 [
@@ -80,6 +87,8 @@ If no printers are specified then all printers are listed.
 If no classes are specified then all classes are listed.
 <dt><b>-d</b>
 <dd style="margin-left: 5.0em">Shows the current default destination.
+<dt><b>-e</b>
+<dd style="margin-left: 5.0em">Shows all available destinations on the local network.
 <dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
 <dd style="margin-left: 5.0em">Specifies an alternate server.
 <dt><b>-l</b>
@@ -108,7 +117,7 @@ If no printers are specified then all printers are listed.
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", and "#".
 Also, printer and class names are <i>not</i> case-sensitive.
-<p>The <i>-h</i>, <i>-E</i>, <i>-U</i>, and <i>-W</i> options are unique to CUPS.
+<p>The <i>-h</i>, <i>-e</i>, <i>-E</i>, <i>-U</i>, and <i>-W</i> options are unique to CUPS.
 <p>The Solaris <i>-f</i>, <i>-P</i>, and <i>-S</i> options are silently ignored.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
@@ -118,5 +127,7 @@ Also, printer and class names are <i>not</i> case-sensitive.
 <a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2016 by Apple Inc.
+Copyright &copy; 2007-2017 by Apple Inc.
 
+</body>
+</html>

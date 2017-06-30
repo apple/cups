@@ -1,6 +1,11 @@
----
-title: cups-files.conf(5)
----
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups-files.conf(5)</title>
+</head>
+<body>
 <h1 class="title">cups-files.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 cups-files.conf - file and directory configuration file for cups
@@ -39,6 +44,10 @@ The default is "0644" on macOS and "0640" on all other operating systems.
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
 <dl class="man">
+<dt><a name="CreateSelfSignedCerts"></a><b>CreateSelfSignedCerts yes</b>
+<dd style="margin-left: 5.0em"><dt><b>CreateSelfSignedCerts no</b>
+<dd style="margin-left: 5.0em">Specifies whether the scheduler automatically creates self-signed certificates for client connections using TLS.
+The default is yes.
 <dt><a name="DataDir"></a><b>DataDir </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies the directory where data files can be found.
 The default is usually "/usr/share/cups".
@@ -155,5 +164,7 @@ The default is "lp".
 <a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2016 by Apple Inc.
+Copyright &copy; 2007-2017 by Apple Inc.
 
+</body>
+</html>
