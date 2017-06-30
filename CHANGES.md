@@ -1,5 +1,11 @@
-CHANGES - 2.2.4 - 2017-06-30
+CHANGES - 2.2.5 - 2017-06-30
 ============================
+
+CHANGES IN CUPS V2.2.5
+----------------------
+
+- Fixed an issue with Chinese localizations on macOS (rdar://32419311)
+
 
 CHANGES IN CUPS V2.2.4
 ----------------------

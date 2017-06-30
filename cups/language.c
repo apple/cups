@@ -123,7 +123,9 @@ static const _apple_language_locale_t apple_language_locale[] =
   { "nb",         "no" },
   { "nb_NO",      "no" },
   { "zh-Hans",    "zh_CN" },
+  { "zh_HANS",    "zh_CN" },
   { "zh-Hant",    "zh_TW" },
+  { "zh_HANT",    "zh_TW" },
   { "zh-Hant_CN", "zh_TW" }
 };
 #endif /* __APPLE__ */
@@ -278,7 +280,10 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
 		   sizeof(apple_language_locale[0]));
 	 i ++)
     {
-      if (!strcmp(locale, apple_language_locale[i].language))
+      size_t len = strlen(apple_language_locale[i].language);
+
+      if (!strcmp(locale, apple_language_locale[i].language) ||
+          (!strncmp(locale, apple_language_locale[i].language, len) && (locale[len] == '_' || locale[len] == '-')))
       {
 	strlcpy(locale, apple_language_locale[i].locale, localesize);
 	break;

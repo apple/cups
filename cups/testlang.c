@@ -138,6 +138,8 @@ main(int  argc,				/* I - Number of command-line arguments */
         }
       }
 
+      printf("media-empty: %s\n", ppdLocalizeIPPReason(ppd, "media-empty", NULL, buffer, sizeof(buffer)));
+
       ppdClose(ppd);
     }
   }
