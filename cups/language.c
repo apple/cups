@@ -256,7 +256,15 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
 {
   int		i;			/* Looping var */
   CFStringRef	localeName;		/* Locale as a CF string */
+#ifdef DEBUG
+  char          temp[1024];             /* Temporary string */
 
+
+  if (!CFStringGetCString(languageName, temp, (CFIndex)sizeof(temp), kCFStringEncodingASCII))
+    temp[0] = '\0';
+
+  DEBUG_printf(("_cupsAppleLocale(languageName=%p(%s), locale=%p, localsize=%d)", languageName, temp, locale, (int)localesize));
+#endif /* DEBUG */
 
   localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(kCFAllocatorDefault, languageName);
 
@@ -268,6 +276,8 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
 
     if (!CFStringGetCString(localeName, locale, (CFIndex)localesize, kCFStringEncodingASCII))
       *locale = '\0';
+
+    DEBUG_printf(("_cupsAppleLocale: locale=\"%s\"", locale));
 
     CFRelease(localeName);
 
@@ -285,6 +295,7 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
       if (!strcmp(locale, apple_language_locale[i].language) ||
           (!strncmp(locale, apple_language_locale[i].language, len) && (locale[len] == '_' || locale[len] == '-')))
       {
+        DEBUG_printf(("_cupsAppleLocale: Updating locale to \"%s\".", apple_language_locale[i].locale));
 	strlcpy(locale, apple_language_locale[i].locale, localesize);
 	break;
       }
@@ -301,7 +312,10 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
   }
 
   if (!*locale)
+  {
+    DEBUG_puts("_cupsAppleLocale: Returning NULL.");
     return (NULL);
+  }
 
  /*
   * Convert language subtag into region subtag...
@@ -312,6 +326,8 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
 
   if (!strchr(locale, '.'))
     strlcat(locale, ".UTF-8", localesize);
+
+  DEBUG_printf(("_cupsAppleLocale: Returning \"%s\".", locale));
 
   return (locale);
 }
