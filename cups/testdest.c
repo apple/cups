@@ -1,7 +1,7 @@
 /*
  * CUPS destination API test program for CUPS.
  *
- * Copyright 2012-2016 by Apple Inc.
+ * Copyright 2012-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -463,10 +463,37 @@ show_default(http_t       *http,	/* I - Connection to destination */
 	     cups_dinfo_t *dinfo,	/* I - Destination information */
 	     const char  *option)	/* I - Option */
 {
-  (void)http;
-  (void)dest;
-  (void)dinfo;
-  (void)option;
+  if (!strcmp(option, "media"))
+  {
+   /*
+    * Show default media option...
+    */
+
+    cups_size_t size;                   /* Media size information */
+
+    if (cupsGetDestMediaDefault(http, dest, dinfo, CUPS_MEDIA_FLAGS_DEFAULT, &size))
+      printf("%s (%.2fx%.2fmm, margins=[%.2f %.2f %.2f %.2f])\n", size.media, size.width * 0.01, size.length * 0.01, size.left * 0.01, size.bottom * 0.01, size.right * 0.01, size.top * 0.01);
+     else
+       puts("FAILED");
+  }
+  else
+  {
+   /*
+    * Show default other option...
+    */
+
+    ipp_attribute_t *defattr;           /* Default attribute */
+
+    if ((defattr = cupsFindDestDefault(http, dest, dinfo, option)) != NULL)
+    {
+      char value[1024];                 /* Value of default attribute */
+
+      ippAttributeString(defattr, value, sizeof(value));
+      puts(value);
+    }
+    else
+      puts("FAILED");
+  }
 }
 
 
