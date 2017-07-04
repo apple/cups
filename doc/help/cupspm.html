@@ -1098,7 +1098,7 @@ if ((attr = ippFindAttribute(response, &quot;printer-state&quot;,
                              IPP_TAG_ENUM)) != NULL)
 {
   printf(&quot;printer-state=%s\n&quot;,
-         ippTagString(&quot;printer-state&quot;, ippGetInteger(attr, 0)));
+         ippEnumString(&quot;printer-state&quot;, ippGetInteger(attr, 0)));
 }
 else
   puts(&quot;printer-state=unknown&quot;);
@@ -1122,7 +1122,7 @@ if ((attr = ippFindAttribute(response, &quot;printer-state-reasons&quot;,
 </code></pre>
     <p>The <code>ippGetCount</code> function returns the number of values in an attribute.</p>
     <p>The <code>ippGetInteger</code> and <code>ippGetString</code> functions return a single integer or string value from an attribute.</p>
-    <p>The <code>ippTagString</code> function converts a enum value to its keyword (string) equivalent.</p>
+    <p>The <code>ippEnumString</code> function converts a enum value to its keyword (string) equivalent.</p>
     <p>Once you are done using the IPP response message, free it using the <code>ippDelete</code> function:</p>
     <pre><code>ippDelete(response);
 </code></pre>

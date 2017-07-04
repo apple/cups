@@ -4,6 +4,7 @@ CHANGES - 2.2.5 - 2017-07-04
 CHANGES IN CUPS V2.2.5
 ----------------------
 
+- Fixed a typo in the CUPS Programming Manual (Issue #5042)
 - Fixed RPM packaging issue (Issue #5043, Issue #5044)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 
