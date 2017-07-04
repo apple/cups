@@ -326,6 +326,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/pt_BR/cups_pt_BR.po
 %dir /usr/share/locale/ru
 /usr/share/locale/ru/cups_ru.po
+# To resolve issue 5043
+%dir /usr/share/locale/zh_CN
+/usr/share/locale/zh_CN/cups_zh_CN.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
