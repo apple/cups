@@ -323,6 +323,8 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
 
   if (locale[2] == '-')
     locale[2] = '_';
+  else if (locale[3] == '-')
+    locale[3] = '_';
 
   if (!strchr(locale, '.'))
     strlcat(locale, ".UTF-8", localesize);
@@ -709,7 +711,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     * Force a POSIX locale for an invalid language name...
     */
 
-    if (strlen(langname) != 2)
+    if (strlen(langname) != 2 && strlen(langname) != 3)
     {
       strlcpy(langname, "C", sizeof(langname));
       country[0] = '\0';
@@ -1357,7 +1359,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
 {
   char			filename[1024],	/* Path to cups.strings file */
 			applelang[256],	/* Apple language ID */
-			baselang[3];	/* Base language */
+			baselang[4];	/* Base language */
   CFURLRef		url;		/* URL to cups.strings file */
   CFReadStreamRef	stream = NULL;	/* File stream */
   CFPropertyListRef	plist = NULL;	/* Localization file */
@@ -1396,6 +1398,9 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
     */
 
     strlcpy(baselang, locale, sizeof(baselang));
+    if (baselang[3] == '-' || baselang[3] == '_')
+      baselang[3] = '\0';
+
     snprintf(filename, sizeof(filename), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", baselang);
   }
 
@@ -1423,7 +1428,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       locale = "Japanese";
     else if (!strncmp(locale, "es", 2))
       locale = "Spanish";
-    else if (!strcmp(locale, "zh_HK") || !strncmp(locale, "zh-Hant", 7))
+    else if (!strcmp(locale, "zh_HK") || !strncasecmp(locale, "zh-Hant", 7) || !strncasecmp(locale, "zh_Hant", 7))
     {
      /*
       * <rdar://problem/22130168>
@@ -1444,6 +1449,9 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       */
 
       strlcpy(baselang, locale, sizeof(baselang));
+      if (baselang[3] == '-' || baselang[3] == '_')
+        baselang[3] = '\0';
+
       locale = baselang;
     }
 
