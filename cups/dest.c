@@ -1015,6 +1015,8 @@ cupsEnumDests(
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
+  DEBUG_printf(("cupsEnumDests(flags=%x, msec=%d, cancel=%p, type=%x, mask=%x, cb=%p, user_data=%p)", flags, msec, (void *)cancel, type, mask, (void *)cb, (void *)user_data));
+
  /*
   * Range check input...
   */
@@ -1022,7 +1024,10 @@ cupsEnumDests(
   (void)flags;
 
   if (!cb)
+  {
+    DEBUG_puts("1cupsEnumDests: No callback, returning 0.");
     return (0);
+  }
 
  /*
   * Get ready to enumerate...
@@ -1141,7 +1146,10 @@ cupsEnumDests(
 
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
+  {
+    DEBUG_puts("1cupsEnumDests: Unable to create service browser, returning 0.");
     return (0);
+  }
 
   main_fd = DNSServiceRefSockFD(data.main_ref);
 
@@ -1172,8 +1180,8 @@ cupsEnumDests(
 #  else /* HAVE_AVAHI */
   if ((data.simple_poll = avahi_simple_poll_new()) == NULL)
   {
-    DEBUG_puts("cupsEnumDests: Unable to create Avahi simple poll object.");
-    return (1);
+    DEBUG_puts("1cupsEnumDests: Unable to create Avahi poll, returning 0.");
+    return (0);
   }
 
   avahi_simple_poll_set_func(data.simple_poll, cups_dnssd_poll_cb, &data);
@@ -1183,9 +1191,9 @@ cupsEnumDests(
 				 &error);
   if (!data.client)
   {
-    DEBUG_puts("cupsEnumDests: Unable to create Avahi client.");
+    DEBUG_puts("1cupsEnumDests: Unable to create Avahi client, returning 0.");
     avahi_simple_poll_free(data.simple_poll);
-    return (1);
+    return (0);
   }
 
   data.browsers = 1;
@@ -1373,6 +1381,8 @@ cupsEnumDests(
     avahi_simple_poll_free(data.simple_poll);
 #  endif /* HAVE_DNSSD */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+  DEBUG_puts("1cupsEnumDests: Returning 1.");
 
   return (1);
 }
@@ -2040,13 +2050,16 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
- /*
+  DEBUG_printf(("cupsGetDests2(http=%p, dests=%p)", (void *)http, (void *)dests));
+
+/*
   * Range check the input...
   */
 
   if (!dests)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad NULL dests pointer"), 1);
+    DEBUG_puts("1cupsGetDests2: NULL dests pointer, returning 0.");
     return (0);
   }
 
@@ -2061,6 +2074,8 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
+    DEBUG_printf(("1cupsGetDests2: cupsLastError() is %s, returning 0.", cupsLastErrorString()));
+
     cupsFreeDests(data.num_dests, data.dests);
 
     *dests = (cups_dest_t *)0;
@@ -2177,6 +2192,8 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if (data.num_dests > 0)
     _cupsSetError(IPP_STATUS_OK, NULL, 0);
+
+  DEBUG_printf(("1cupsGetDests2: Returning %d destinations.", data.num_dests));
 
   return (data.num_dests);
 }
