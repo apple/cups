@@ -9,6 +9,9 @@ CHANGES IN CUPS V2.2.5
 - The `cupsGetDests` function incorrectly returned an empty list of printers if
   there was no default printer (Issue #5046)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
+- The IPP backend now always sends the "finishings" attribute for printers that
+  support it because otherwise the client cannot override printer defaults
+  (rdar://33169732)
 
 
 CHANGES IN CUPS V2.2.4

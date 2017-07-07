@@ -2084,9 +2084,14 @@ _ppdCacheGetFinishingValues(
 
   DEBUG_printf(("_ppdCacheGetFinishingValues(pc=%p, num_options=%d, options=%p, max_values=%d, values=%p)", pc, num_options, options, max_values, values));
 
-  if (!pc || !pc->finishings || num_options < 1 || max_values < 1 || !values)
+  if (!pc || max_values < 1 || !values)
   {
     DEBUG_puts("_ppdCacheGetFinishingValues: Bad arguments, returning 0.");
+    return (0);
+  }
+  else if (!pc->finishings)
+  {
+    DEBUG_puts("_ppdCacheGetFinishingValues: No finishings support, returning 0.");
     return (0);
   }
 
@@ -2114,13 +2119,24 @@ _ppdCacheGetFinishingValues(
 
     if (i == 0)
     {
-      DEBUG_printf(("_ppdCacheGetFinishingValues: Adding %d.", f->value));
+      DEBUG_printf(("_ppdCacheGetFinishingValues: Adding %d (%s)", f->value, ippEnumString("finishings", f->value)));
 
       values[num_values ++] = f->value;
 
       if (num_values >= max_values)
         break;
     }
+  }
+
+  if (num_values == 0)
+  {
+   /*
+    * Always have at least "finishings" = 'none'...
+    */
+
+    DEBUG_puts("_ppdCacheGetFinishingValues: Adding 3 (none).");
+    values[0] = IPP_FINISHINGS_NONE;
+    num_values ++;
   }
 
   DEBUG_printf(("_ppdCacheGetFinishingValues: Returning %d.", num_values));
