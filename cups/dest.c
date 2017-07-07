@@ -2072,17 +2072,6 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
 
-  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
-  {
-    DEBUG_printf(("1cupsGetDests2: cupsLastError() is %s, returning 0.", cupsLastErrorString()));
-
-    cupsFreeDests(data.num_dests, data.dests);
-
-    *dests = (cups_dest_t *)0;
-
-    return (0);
-  }
-
  /*
   * Make a copy of the "real" queues for a later sanity check...
   */
