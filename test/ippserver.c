@@ -1019,7 +1019,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
     * Only accept a single job at a time...
     */
 
-    _cupsRWLockWrite(&(client->printer->rwlock));
+    _cupsRWUnlock(&(client->printer->rwlock));
     return (NULL);
   }
 
