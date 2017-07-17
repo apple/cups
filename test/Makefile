@@ -183,9 +183,9 @@ local:	ippserver ippserver-shared ipptool-static
 
 ippfind:	ippfind.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ippfind.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ ippfind.o $(LIBS)
 	echo Linking $@-static...
-	$(CC) $(LDFLAGS) -o $@-static ippfind.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(LDFLAGS) -o $@-static ippfind.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -195,7 +195,7 @@ ippfind:	ippfind.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSSTATIC)
 
 ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -205,7 +205,7 @@ ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
 
 ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ippserver.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ ippserver.o $(LIBS)
 
 
 #
@@ -214,7 +214,7 @@ ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
 
 ipptool:	ipptool.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ipptool.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ ipptool.o $(LIBS)
 
 
 #
@@ -223,7 +223,7 @@ ipptool:	ipptool.o ../cups/$(LIBCUPS)
 
 ipptool-static:	ipptool.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

@@ -1,7 +1,7 @@
 #
 # Port monitor makefile for CUPS.
 #
-# Copyright 2007-2012 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -121,7 +121,7 @@ uninstall:
 
 bcp:	bcp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ bcp.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ bcp.o $(LIBS)
 
 
 #
@@ -130,7 +130,7 @@ bcp:	bcp.o ../cups/$(LIBCUPS)
 
 tbcp:	tbcp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ tbcp.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ tbcp.o $(LIBS)
 
 
 #

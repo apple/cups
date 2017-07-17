@@ -227,6 +227,6 @@ html:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) mantohtml
 	done
 
 mantohtml:	mantohtml.o ../cups/$(LIBCUPSSTATIC)
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)

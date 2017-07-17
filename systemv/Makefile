@@ -158,7 +158,7 @@ uninstall:
 
 cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
 
 
 #
@@ -167,7 +167,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
 	for file in accept cupsenable cupsdisable cupsreject reject; do \
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
@@ -180,7 +180,7 @@ cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 
 cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
 
 
 #
@@ -189,7 +189,7 @@ cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 
 cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
 
 
 #
@@ -198,7 +198,7 @@ cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 
 cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ cupstestdsc.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ cupstestdsc.o $(LIBS)
 
 
 #
@@ -207,11 +207,11 @@ cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
 
 cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../filter/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
 cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../filter/libcupsimage.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ cupstestppd.o ../filter/libcupsimage.a \
+	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o ../filter/libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
 
 
@@ -221,7 +221,7 @@ cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../filter/libcupsimag
 
 lp:	lp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lp lp.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lp lp.o $(LIBS)
 
 
 #
@@ -230,7 +230,7 @@ lp:	lp.o ../cups/$(LIBCUPS)
 
 lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
 
 
 #
@@ -239,7 +239,7 @@ lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 
 lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
 
 
 #
@@ -248,7 +248,7 @@ lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 
 lpmove:	lpmove.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
 
 
 #
@@ -257,7 +257,7 @@ lpmove:	lpmove.o ../cups/$(LIBCUPS)
 
 lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
 
 
 #
@@ -266,7 +266,7 @@ lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 
 lpstat:	lpstat.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
 
 
 #

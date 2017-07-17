@@ -1,7 +1,7 @@
 dnl
 dnl Libtool stuff for CUPS.
 dnl
-dnl Copyright 2007-2011 by Apple Inc.
+dnl Copyright 2007-2017 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -11,7 +11,7 @@ dnl which should have been included with this file.  If this file is
 dnl missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported
+AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=/path/to/libtool
                           build with libtool (UNSUPPORTED!)],
 	[if test x$enable_libtool_unsupported != xno; then
 		if test x$enable_libtool_unsupported == xyes; then
@@ -25,12 +25,28 @@ AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported
 		LIBTOOL=""
 	fi])
 
-AC_SUBST(LIBTOOL)
-
 if test x$LIBTOOL != x; then
 	LIBCUPS="libcups.la"
+	LIBCUPSCGI="libcupscgi.la"
 	LIBCUPSIMAGE="libcupsimage.la"
+	LIBCUPSMIME="libcupsmime.la"
+	LIBCUPSPPDC="libcupsppdc.la"
+
+	LIBTOOL_COMPILE="\$(LIBTOOL) --mode=compile"
+
 	LINKCUPS="../cups/\$(LIBCUPS)"
 	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
-	DSO="\$(CC)"
+
+	DSO="\$(LIBTOOL) --mode=link ${CC}"
+	LD_CC="\$(LIBTOOL) --mode=link ${CC}"
+	LD_CXX="\$(LIBTOOL) --mode=link ${CXX}"
+else
+	LIBTOOL_COMPILE=""
+	LD_CC="\$(CC)"
+	LD_CC="\$(CXX)"
 fi
+
+AC_SUBST(LIBTOOL)
+AC_SUBST(LIBTOOL_COMPILE)
+AC_SUBST(LD_CC)
+AC_SUBST(LD_CXX)

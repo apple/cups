@@ -1,7 +1,7 @@
 #
 # Locale file makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1993-2007 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -158,9 +158,9 @@ pot:	checkpo po2strings
 
 checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o checkpo checkpo.o \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o checkpo checkpo.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LD_COMMONLIBS) $(LIBZ)
 
 checkall:	checkpo
 	for file in *.po; do \
@@ -177,9 +177,9 @@ checkall:	checkpo
 
 po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o po2strings po2strings.o \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o po2strings po2strings.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LD_COMMONLIBS) $(LIBZ)
 
 
 #
@@ -191,7 +191,7 @@ po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 
 strings2po:	strings2po.o
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o strings2po strings2po.o
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o strings2po strings2po.o
 
 
 #

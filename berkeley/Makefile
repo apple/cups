@@ -1,7 +1,7 @@
 #
 # Berkeley commands makefile for CUPS.
 #
-# Copyright 2007-2012 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -124,7 +124,7 @@ uninstall:
 
 lpc:	lpc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpc lpc.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpc lpc.o $(LIBS)
 
 
 #
@@ -133,7 +133,7 @@ lpc:	lpc.o ../cups/$(LIBCUPS)
 
 lpq:	lpq.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpq lpq.o $(LIBS)
 
 
 #
@@ -142,7 +142,7 @@ lpq:	lpq.o ../cups/$(LIBCUPS)
 
 lpr:	lpr.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpr lpr.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lpr lpr.o $(LIBS)
 
 
 #
@@ -151,7 +151,7 @@ lpr:	lpr.o ../cups/$(LIBCUPS)
 
 lprm:	lprm.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lprm lprm.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o lprm lprm.o $(LIBS)
 
 
 #

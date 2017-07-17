@@ -186,7 +186,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 libcupsppdc.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsppdc.a
-	$(CHMOD) 555 $(LIBDIR)/libcupsppdc.a
+	$(LD_CHMOD) 555 $(LIBDIR)/libcupsppdc.a
 
 
 #
@@ -225,9 +225,9 @@ local:	genstrings
 genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 			sample.drv ../data/media.defs
 	echo Linking $@...
-	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
+	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
 		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
 	echo Generating localization strings...
 	./genstrings >sample.c
 
@@ -238,14 +238,14 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 
 ppdc:			ppdc.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdc.o -L. -lcupsppdc $(LIBS)
+	$(LD_CXX) $(LDFLAGS) -o $@ ppdc.o -L. -lcupsppdc $(LIBS)
 
 
 ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 	echo Linking $@...
-	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
+	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LD_COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -257,7 +257,7 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 
 ppdhtml:			ppdhtml.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdhtml.o -L. -lcupsppdc $(LIBS)
+	$(LD_CXX) $(LDFLAGS) -o $@ ppdhtml.o -L. -lcupsppdc $(LIBS)
 
 
 #
@@ -266,14 +266,14 @@ ppdhtml:			ppdhtml.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 
 ppdi:			ppdi.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdi.o -L. -lcupsppdc $(LIBS)
+	$(LD_CXX) $(LDFLAGS) -o $@ ppdi.o -L. -lcupsppdc $(LIBS)
 
 
 ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
+	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LD_COMMONLIBS) $(LIBZ)
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
 	./ppdc-static -l en -I ../data sample.drv
@@ -293,7 +293,7 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 
 ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdmerge.o $(LIBS)
+	$(LD_CXX) $(LDFLAGS) -o $@ ppdmerge.o $(LIBS)
 
 
 #
@@ -302,7 +302,7 @@ ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 
 ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdpo.o -L. -lcupsppdc $(LIBS)
+	$(LD_CXX) $(LDFLAGS) -o $@ ppdpo.o -L. -lcupsppdc $(LIBS)
 
 
 #
@@ -311,9 +311,9 @@ ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 
 testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
+	$(LD_CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LD_COMMONLIBS) $(LIBZ)
 
 
 #
@@ -340,7 +340,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
 		-exported_symbols_list t.exp \
-		$(LIBOBJS) $(LINKCUPS) $(COMMONLIBS)
+		$(LIBOBJS) $(LINKCUPS) $(LD_COMMONLIBS)
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 
@@ -351,7 +351,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 
 libcupsppdc.la:    $(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 1:0 $(LINKCUPS)
 
 

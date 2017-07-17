@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-07-07
+CHANGES - 2.2.5 - 2017-07-17
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -12,6 +12,8 @@ CHANGES IN CUPS V2.2.5
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
   (rdar://33169732)
+- The --enable-libtool configure option requires a path to the libtool program,
+  but doesn't document or check for it (Issue #5062)
 
 
 CHANGES IN CUPS V2.2.4

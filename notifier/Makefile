@@ -1,7 +1,7 @@
 #
 # Notifier makefile for CUPS.
 #
-# Copyright 2007-2012 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -60,7 +60,7 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
-	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)/rss
+	$(INSTALL_DIR) -m 775 -g $(LD_CUPS_GROUP) $(LD_CACHEDIR)/rss
 
 
 #
@@ -106,7 +106,7 @@ uninstall:
 	done
 	-$(RMDIR) $(SERVERBIN)/notifier
 	-$(RMDIR) $(SERVERBIN)
-	-$(RMDIR) $(CACHEDIR)/rss
+	-$(RMDIR) $(LD_CACHEDIR)/rss
 
 
 #
@@ -123,7 +123,7 @@ depend:
 
 dbus:	dbus.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
 
 
 #
@@ -132,7 +132,7 @@ dbus:	dbus.o ../cups/$(LIBCUPS)
 
 mailto:	mailto.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
 
 
 #
@@ -141,7 +141,7 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 
 rss:	rss.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o rss rss.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o rss rss.o $(LIBS)
 
 
 #
@@ -150,7 +150,7 @@ rss:	rss.o ../cups/$(LIBCUPS)
 
 testnotify:	testnotify.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testnotify testnotify.o $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o testnotify testnotify.o $(LIBS)
 
 
 $(OBJS):	../Makedefs
