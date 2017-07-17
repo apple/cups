@@ -14,6 +14,9 @@ dnl
 AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported
                           build with libtool (UNSUPPORTED!)],
 	[if test x$enable_libtool_unsupported != xno; then
+		if test x$enable_libtool_unsupported == xyes; then
+			AC_MSG_ERROR([Use --enable-libtool-unsupported=/path/to/libtool.])
+		fi
 		LIBTOOL="$enable_libtool_unsupported"
 		enable_shared=no
 		echo "WARNING: libtool is not supported or endorsed by Apple Inc."
