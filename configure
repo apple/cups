@@ -1541,7 +1541,7 @@ Optional Features:
   --enable-libusb         use libusb for USB printing
   --enable-tcp-wrappers   use libwrap for TCP wrappers support
   --enable-acl            build with POSIX ACL support
-  --disable-dbus           build without DBUS support
+  --disable-dbus          build without DBUS support
   --disable-shared        do not create shared libraries
   --enable-libtool-unsupported=/path/to/libtool
                           build with libtool (UNSUPPORTED!)
@@ -1561,7 +1561,7 @@ Optional Features:
   --disable-dnssd         disable DNS Service Discovery support using mDNSResponder
   --disable-launchd       disable launchd support
   --disable-systemd       disable systemd support
- --enable-upstart         enable upstart support
+  --enable-upstart        enable upstart support
   --enable-page-logging   enable page_log by default
   --disable-browsing      disable Browsing by default
   --disable-default-shared
@@ -1594,7 +1594,7 @@ Optional Packages:
   --with-ldarchflags      set program architecture flags
   --with-domainsocket     set unix domain socket name
   --with-gssservicename   set default gss service name
-  --with-pam-module       specify the PAM module to use
+  --with-pam-module       set the PAM module to use
   --with-dnssd-libs       set directory for DNS Service Discovery library
   --with-dnssd-includes   set directory for DNS Service Discovery includes
   --with-systemd          set directory for systemd service files
@@ -1606,7 +1606,7 @@ Optional Packages:
   --with-xinetd           set path for xinetd config files
   --with-languages        set installed languages, default=all
   --with-bundledir        set macOS localization bundle directory
-  --with-exe-file-perm set default exectuable permissions value, default=0555
+  --with-exe-file-perm    set default executable permissions value, default=0555
   --with-config-file-perm set default ConfigFilePerm value, default=0640
   --with-cupsd-file-perm  set default cupsd permissions, default=0500
   --with-log-file-perm    set default LogFilePerm value, default=0644

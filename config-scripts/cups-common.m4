@@ -305,7 +305,7 @@ fi
 LIBS="$SAVELIBS"
 
 dnl Check for DBUS support
-AC_ARG_ENABLE(dbus, [  --disable-dbus           build without DBUS support])
+AC_ARG_ENABLE(dbus, [  --disable-dbus          build without DBUS support])
 AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
 	DBUSDIR="$withval")
 

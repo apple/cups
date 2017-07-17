@@ -12,7 +12,7 @@ dnl missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(pam, [  --disable-pam           disable PAM support])
-AC_ARG_WITH(pam_module, [  --with-pam-module       specify the PAM module to use])
+AC_ARG_WITH(pam_module, [  --with-pam-module       set the PAM module to use])
 
 PAMDIR=""
 PAMFILE="pam.std"

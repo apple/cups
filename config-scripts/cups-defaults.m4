@@ -38,7 +38,7 @@ if test "x$CUPS_BUNDLEDIR" != x; then
 fi
 
 dnl Default executable file permissions
-AC_ARG_WITH(exe_file_perm, [  --with-exe-file-perm set default exectuable permissions value, default=0555],
+AC_ARG_WITH(exe_file_perm, [  --with-exe-file-perm    set default executable permissions value, default=0555],
 	CUPS_EXE_FILE_PERM="$withval",
 	[case "$host_os_name" in
 		linux* | gnu*)
