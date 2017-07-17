@@ -44,7 +44,7 @@ LIBOBJS =	\
 		mime.o \
 		type.o
 COBJS	=	\
-		$(LD_CUPSDOBJS) \
+		$(CUPSDOBJS) \
 		$(LIBOBJS) \
 		cupsfilter.o \
 		cups-deviced.o \
@@ -58,7 +58,7 @@ COBJS	=	\
 CXXOBJS	=	\
 		cups-driverd.o
 OBJS	=	\
-		$(LD_COBJS) \
+		$(COBJS) \
 		$(LD_CXXOBJS)
 LIBTARGETS =	\
 		$(LIBCUPSMIME) \
@@ -119,7 +119,7 @@ clean:
 #
 
 depend:
-	$(CC) -MM $(ALL_CFLAGS) $(LD_COBJS:.o=.c) >Dependencies
+	$(CC) -MM $(ALL_CFLAGS) $(COBJS:.o=.c) >Dependencies
 	$(CXX) -MM $(ALL_CXXFLAGS) $(LD_CXXOBJS:.o=.cxx) >>Dependencies
 
 
@@ -128,7 +128,7 @@ depend:
 #
 
 oclint:
-	oclint -o=oclint.html -html $(LD_CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) -- $(ALL_CFLAGS)
+	oclint -o=oclint.html -html $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) -- $(ALL_CFLAGS)
 
 
 #
@@ -146,28 +146,28 @@ install-data:
 	echo Creating $(SERVERBIN)/driver...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/driver
 	echo Creating $(SERVERROOT)...
-	$(INSTALL_DIR) -m 755 -g $(LD_CUPS_GROUP) $(SERVERROOT)
+	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)
 	echo Creating $(SERVERROOT)/ppd...
-	$(INSTALL_DIR) -m 755 -g $(LD_CUPS_GROUP) $(SERVERROOT)/ppd
+	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)/ppd
 	if test "x`uname`" != xDarwin; then \
 		echo Creating $(SERVERROOT)/ssl...; \
-		$(INSTALL_DIR) -m 700 -g $(LD_CUPS_GROUP) $(SERVERROOT)/ssl; \
+		$(INSTALL_DIR) -m 700 -g $(CUPS_GROUP) $(SERVERROOT)/ssl; \
 	fi
 	if test "$(STATEDIR)" != "$(SERVERROOT)"; then \
 		echo Creating $(STATEDIR)...; \
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
 	fi
 	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 511 -o $(LD_CUPS_USER) -g $(LD_CUPS_PRIMARY_SYSTEM_GROUP) \
+	$(INSTALL_DIR) -m 511 -o $(CUPS_USER) -g $(CUPS_PRIMARY_SYSTEM_GROUP) \
 		$(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
-	$(INSTALL_DIR) -m 710 -g $(LD_CUPS_GROUP) $(REQUESTS)
+	$(INSTALL_DIR) -m 710 -g $(CUPS_GROUP) $(REQUESTS)
 	echo Creating $(REQUESTS)/tmp...
-	$(INSTALL_DIR) -m 1770 -g $(LD_CUPS_GROUP) $(REQUESTS)/tmp
-	echo Creating $(LD_CACHEDIR)...
-	$(INSTALL_DIR) -m 770 -g $(LD_CUPS_GROUP) $(LD_CACHEDIR)
+	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
+	echo Creating $(CACHEDIR)...
+	$(INSTALL_DIR) -m 770 -g $(CUPS_GROUP) $(CACHEDIR)
 	if test "x$(INITDIR)" != x; then \
 		echo Installing init scripts...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
@@ -218,7 +218,7 @@ install-data:
 install-exec:
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	$(INSTALL_BIN) -m $(LD_CUPS_CUPSD_FILE_PERM) cupsd $(SBINDIR)
+	$(INSTALL_BIN) -m $(CUPS_CUPSD_FILE_PERM) cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	echo Installing programs in $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
@@ -274,7 +274,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 libcupsmime.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsmime.a
-	$(LD_CHMOD) 555 $(LIBDIR)/libcupsmime.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsmime.a
 
 
 #
@@ -300,7 +300,7 @@ uninstall:
 	-$(RMDIR) $(REQUESTS)/tmp
 	-$(RMDIR) $(REQUESTS)
 	-$(RMDIR) $(LOGDIR)
-	-$(RMDIR) $(LD_CACHEDIR)
+	-$(RMDIR) $(CACHEDIR)
 	$(RM) $(LIBDIR)/libcupsmime.1.dylib
 	$(RM) $(LIBDIR)/libcupsmime.a
 	$(RM) $(LIBDIR)/libcupsmime.dylib
@@ -354,18 +354,18 @@ uninstall:
 # Make the scheduler executable, "cupsd".
 #
 
-cupsd:	$(LD_CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
+cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsd $(LD_CUPSDOBJS) -L. -lcupsmime \
+	$(LD_CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) -L. -lcupsmime \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) \
                 $(DNSSDLIBS) $(LIBS) $(LIBGSSAPI) $(LIBWRAP)
 
-cupsd-static:	$(LD_CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
+cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsd-static $(LD_CUPSDOBJS) libcupsmime.a \
+	$(LD_CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(LIBZ) $(LIBPAPER) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) $(DNSSDLIBS) \
                 $(LIBGSSAPI) $(LIBWRAP)
 
@@ -383,7 +383,7 @@ cupsfilter:	cupsfilter.o $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 cupsfilter-static:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cupsfilter-static cupsfilter.o libcupsmime.a \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
 		$(DNSSDLIBS) $(LIBGSSAPI)
 
 
@@ -479,7 +479,7 @@ libcupsmime.a:	$(LIBOBJS)
 testlpd:	testlpd.o ../cups/$(LIBCUPSSTATIC) cups-lpd
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/$(LIBCUPSSTATIC) \
-		$(LD_COMMONLIBS) $(LIBZ) $(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
 #
@@ -489,7 +489,7 @@ testlpd:	testlpd.o ../cups/$(LIBCUPSSTATIC) cups-lpd
 testmime:	testmime.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testmime.o libcupsmime.a \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
 		$(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running MIME tests...
 	./testmime
@@ -502,7 +502,7 @@ testmime:	testmime.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 testspeed:	testspeed.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/$(LIBCUPSSTATIC) \
-		$(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -512,7 +512,7 @@ testspeed:	testspeed.o ../cups/$(LIBCUPSSTATIC)
 testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testsub testsub.o ../cups/$(LIBCUPSSTATIC) \
-		$(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -521,7 +521,7 @@ testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 
 sloc:
 	echo "cupsd: \c"
-	sloccount $(LD_CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) cups-driverd.cxx cups-lpd.c 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
+	sloccount $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) cups-driverd.cxx cups-lpd.c 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
 
 
 #

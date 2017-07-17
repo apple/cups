@@ -160,7 +160,7 @@ checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o checkpo checkpo.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 
 checkall:	checkpo
 	for file in *.po; do \
@@ -179,7 +179,7 @@ po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o po2strings po2strings.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 
 
 #

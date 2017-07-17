@@ -229,4 +229,4 @@ html:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) mantohtml
 mantohtml:	mantohtml.o ../cups/$(LIBCUPSSTATIC)
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)

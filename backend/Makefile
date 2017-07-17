@@ -208,7 +208,7 @@ uninstall:
 test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o test1284 test1284.o ../cups/$(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -218,7 +218,7 @@ test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 testbackend:	testbackend.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/$(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -229,7 +229,7 @@ testsupplies:	testsupplies.o libbackend.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -297,7 +297,7 @@ socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o socket-static socket.o libbackend.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 
 
 #

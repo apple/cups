@@ -284,7 +284,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 $(LIBCUPSSTATIC) $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/$(LIBCUPSSTATIC)
-	$(LD_CHMOD) 555 $(LIBDIR)/$(LIBCUPSSTATIC)
+	$(CHMOD) 555 $(LIBDIR)/$(LIBCUPSSTATIC)
 
 
 #
@@ -311,7 +311,7 @@ uninstall:
 libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
-		$(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -333,7 +333,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib t.exp
 	$(LN) $@ libcups.dylib
 
@@ -346,7 +346,7 @@ libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
 		-rpath $(LIBDIR) -version-info 2:12 $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -384,7 +384,7 @@ libcups2.def: $(LIBOBJS) Makefile
 testadmin:	testadmin.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testadmin.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -394,7 +394,7 @@ testadmin:	testadmin.o $(LIBCUPSSTATIC)
 testarray:	testarray.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testarray.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running array API tests...
 	./testarray
 
@@ -406,7 +406,7 @@ testarray:	testarray.o $(LIBCUPSSTATIC)
 testcache:	testcache.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testcache.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -416,7 +416,7 @@ testcache:	testcache.o $(LIBCUPSSTATIC)
 testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testconflicts.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -426,7 +426,7 @@ testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 testcreds:	testcreds.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcreds.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -436,7 +436,7 @@ testcreds:	testcreds.o $(LIBCUPSSTATIC)
 testcups:	testcups.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testcups.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -446,7 +446,7 @@ testcups:	testcups.o $(LIBCUPSSTATIC)
 testdest:	testdest.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testdest.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -456,7 +456,7 @@ testdest:	testdest.o $(LIBCUPSSTATIC)
 testfile:	testfile.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testfile.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running file API tests...
 	./testfile
 
@@ -468,7 +468,7 @@ testfile:	testfile.o $(LIBCUPSSTATIC)
 testhttp:	testhttp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhttp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running HTTP API tests...
 	./testhttp
 
@@ -480,7 +480,7 @@ testhttp:	testhttp.o $(LIBCUPSSTATIC)
 testipp:	testipp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testipp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running IPP API tests...
 	./testipp
 
@@ -492,7 +492,7 @@ testipp:	testipp.o $(LIBCUPSSTATIC)
 testi18n:	testi18n.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running internationalization API tests...
 	./testi18n
 
@@ -504,7 +504,7 @@ testi18n:	testi18n.o $(LIBCUPSSTATIC)
 testlang:	testlang.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testlang.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running language API tests...
 	./testlang
 
@@ -516,7 +516,7 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 testoptions:	testoptions.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testoptions.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running option API tests...
 	./testoptions
 
@@ -528,7 +528,7 @@ testoptions:	testoptions.o $(LIBCUPSSTATIC)
 testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running PPD API tests...
 	./testppd
 
@@ -540,7 +540,7 @@ testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testpwg.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running PWG API tests...
 	./testpwg test.ppd
 
@@ -552,7 +552,7 @@ testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testsnmp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -562,7 +562,7 @@ testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ tlscheck.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

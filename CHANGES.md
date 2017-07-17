@@ -12,6 +12,8 @@ CHANGES IN CUPS V2.2.5
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
   (rdar://33169732)
+- Libtool support was completely broken with current libtool versions that use
+  an incompatible command-line syntax (Issue #5050)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
 

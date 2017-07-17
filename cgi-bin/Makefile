@@ -48,7 +48,7 @@ UNITTARGETS =	\
 
 TARGETS	=	\
 		$(LIBTARGETS) \
-		$(LD_CGIS)
+		$(CGIS)
 
 
 #
@@ -109,12 +109,12 @@ install-data:
 
 install-exec:
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/cgi-bin
-	for file in $(LD_CGIS); do \
+	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(LD_CGIS); do \
+		for file in $(CGIS); do \
 			cp $$file $(SYMROOT); \
 			dsymutil $(SYMROOT)/$$file; \
 		done \
@@ -161,7 +161,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 libcupscgi.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupscgi.a
-	$(LD_CHMOD) 555 $(LIBDIR)/libcupscgi.a
+	$(CHMOD) 555 $(LIBDIR)/libcupscgi.a
 
 
 #
@@ -169,7 +169,7 @@ installstatic:
 #
 
 uninstall:
-	for file in $(LD_CGIS); do \
+	for file in $(CGIS); do \
 		$(RM) $(SERVERBIN)/cgi-bin/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/cgi-bin
@@ -277,7 +277,7 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 makedocset:	makedocset.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ makedocset.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 
 
@@ -297,7 +297,7 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	echo Testing CGI API...
 	./testcgi
@@ -310,7 +310,7 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhi.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(LD_COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	echo Testing help index API...
 	./testhi
@@ -323,7 +323,7 @@ testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
-		$(LD_COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #

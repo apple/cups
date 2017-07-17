@@ -679,9 +679,11 @@ ARCHFLAGS
 UNITTESTS
 OPTIM
 INSTALL_STRIP
-LD_CXX
-LD_CC
-LIBTOOL_COMPILE
+LIBTOOL_LD_CXX
+LIBTOOL_LD_CC
+LIBTOOL_INSTALL
+LIBTOOL_CXX
+LIBTOOL_CC
 LIBTOOL
 EXPORT_LDFLAGS
 IMGLIBS
@@ -5943,20 +5945,15 @@ if test "x$ac_cv_header_Security_Authorization_h" = xyes; then :
 			if test "x$default_adminkey" != xdefault; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey $default_adminkey"
 				CUPS_DEFAULT_SYSTEM_AUTHKEY="$default_adminkey"
-			elif grep -q system.print.operator /etc/authorization; then
+			else
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
 				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.print.admin"
-			else
-				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
-				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.preferences"
 			fi
 
 			if test "x$default_operkey" != xdefault; then
 				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY($default_operkey) @admin @lpadmin"
-			elif grep -q system.print.operator /etc/authorization; then
-				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			else
-				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
+				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			fi
 fi
 
@@ -6673,25 +6670,34 @@ fi
 
 
 if test x$LIBTOOL != x; then
+	DSO="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
+	DSOXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
+
 	LIBCUPS="libcups.la"
+	LIBCUPSSTATIC="libcups.la"
 	LIBCUPSCGI="libcupscgi.la"
 	LIBCUPSIMAGE="libcupsimage.la"
 	LIBCUPSMIME="libcupsmime.la"
 	LIBCUPSPPDC="libcupsppdc.la"
 
-	LIBTOOL_COMPILE="\$(LIBTOOL) --mode=compile"
+	LIBTOOL_CC="\$(LIBTOOL) --mode=compile --tag=CC"
+	LIBTOOL_CXX="\$(LIBTOOL) --mode=compile --tag=CXX"
+	LIBTOOL_INSTALL="\$(LIBTOOL) --mode=install"
+	LIBTOOL_LD_CC="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
+	LIBTOOL_LD_CXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
 
 	LINKCUPS="../cups/\$(LIBCUPS)"
 	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
 
-	DSO="\$(LIBTOOL) --mode=link ${CC}"
-	LD_CC="\$(LIBTOOL) --mode=link ${CC}"
-	LD_CXX="\$(LIBTOOL) --mode=link ${CXX}"
 else
-	LIBTOOL_COMPILE=""
-	LD_CC="\$(CC)"
-	LD_CC="\$(CXX)"
+	LIBTOOL_CC=""
+	LIBTOOL_CXX=""
+	LIBTOOL_INSTALL=""
+	LIBTOOL_LD_CC="\$(CC)"
+	LIBTOOL_LD_CC="\$(CXX)"
 fi
+
+
 
 
 

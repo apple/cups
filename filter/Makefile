@@ -145,7 +145,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 libcupsimage.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsimage.a
-	$(LD_CHMOD) 555 $(LIBDIR)/libcupsimage.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsimage.a
 
 
 #
@@ -336,7 +336,7 @@ rastertopwg:	rastertopwg.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertopwg-static:	rastertopwg.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o libcupsimage.a \
-		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(LD_COMMONLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
@@ -347,7 +347,7 @@ rastertopwg-static:	rastertopwg.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 testraster:	testraster.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
-		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(LD_COMMONLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running raster API tests...
 	./testraster

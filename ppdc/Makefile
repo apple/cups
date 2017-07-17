@@ -186,7 +186,7 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) -m 755 libcupsppdc.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsppdc.a
-	$(LD_CHMOD) 555 $(LIBDIR)/libcupsppdc.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsppdc.a
 
 
 #
@@ -227,7 +227,7 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 	echo Linking $@...
 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
 		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(LD_COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Generating localization strings...
 	./genstrings >sample.c
 
@@ -245,7 +245,7 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 	echo Linking $@...
 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -273,7 +273,7 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
 	./ppdc-static -l en -I ../data sample.drv
@@ -313,7 +313,7 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LD_COMMONLIBS) $(LIBZ)
+		$(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -340,7 +340,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
 		-exported_symbols_list t.exp \
-		$(LIBOBJS) $(LINKCUPS) $(LD_COMMONLIBS)
+		$(LIBOBJS) $(LINKCUPS) $(COMMONLIBS)
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 

@@ -60,7 +60,7 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
-	$(INSTALL_DIR) -m 775 -g $(LD_CUPS_GROUP) $(LD_CACHEDIR)/rss
+	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)/rss
 
 
 #
@@ -106,7 +106,7 @@ uninstall:
 	done
 	-$(RMDIR) $(SERVERBIN)/notifier
 	-$(RMDIR) $(SERVERBIN)
-	-$(RMDIR) $(LD_CACHEDIR)/rss
+	-$(RMDIR) $(CACHEDIR)/rss
 
 
 #

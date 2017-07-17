@@ -26,27 +26,36 @@ AC_ARG_ENABLE(libtool_unsupported, [  --enable-libtool-unsupported=/path/to/libt
 	fi])
 
 if test x$LIBTOOL != x; then
+	DSO="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
+	DSOXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
+
 	LIBCUPS="libcups.la"
+	LIBCUPSSTATIC="libcups.la"
 	LIBCUPSCGI="libcupscgi.la"
 	LIBCUPSIMAGE="libcupsimage.la"
 	LIBCUPSMIME="libcupsmime.la"
 	LIBCUPSPPDC="libcupsppdc.la"
 
-	LIBTOOL_COMPILE="\$(LIBTOOL) --mode=compile"
+	LIBTOOL_CC="\$(LIBTOOL) --mode=compile --tag=CC"
+	LIBTOOL_CXX="\$(LIBTOOL) --mode=compile --tag=CXX"
+	LIBTOOL_INSTALL="\$(LIBTOOL) --mode=install"
+	LIBTOOL_LD_CC="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
+	LIBTOOL_LD_CXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
 
 	LINKCUPS="../cups/\$(LIBCUPS)"
 	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
 
-	DSO="\$(LIBTOOL) --mode=link ${CC}"
-	LD_CC="\$(LIBTOOL) --mode=link ${CC}"
-	LD_CXX="\$(LIBTOOL) --mode=link ${CXX}"
 else
-	LIBTOOL_COMPILE=""
-	LD_CC="\$(CC)"
-	LD_CC="\$(CXX)"
+	LIBTOOL_CC=""
+	LIBTOOL_CXX=""
+	LIBTOOL_INSTALL=""
+	LIBTOOL_LD_CC="\$(CC)"
+	LIBTOOL_LD_CC="\$(CXX)"
 fi
 
 AC_SUBST(LIBTOOL)
-AC_SUBST(LIBTOOL_COMPILE)
-AC_SUBST(LD_CC)
-AC_SUBST(LD_CXX)
+AC_SUBST(LIBTOOL_CC)
+AC_SUBST(LIBTOOL_CXX)
+AC_SUBST(LIBTOOL_INSTALL)
+AC_SUBST(LIBTOOL_LD_CC)
+AC_SUBST(LIBTOOL_LD_CXX)
