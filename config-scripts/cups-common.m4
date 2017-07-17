@@ -388,20 +388,15 @@ case $host_os_name in
 			if test "x$default_adminkey" != xdefault; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey $default_adminkey"
 				CUPS_DEFAULT_SYSTEM_AUTHKEY="$default_adminkey"
-			elif grep -q system.print.operator /etc/authorization; then
+			else
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
 				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.print.admin"
-			else
-				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
-				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.preferences"
 			fi
 
 			if test "x$default_operkey" != xdefault; then
 				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY($default_operkey) @admin @lpadmin"
-			elif grep -q system.print.operator /etc/authorization; then
-				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			else
-				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
+				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			fi])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
