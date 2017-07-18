@@ -18,6 +18,7 @@ CHANGES IN CUPS V2.2.5
   but doesn't document or check for it (Issue #5062)
 - The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
   printers (rdar://33250434)
+- Fixed the `cups.strings` file that is used on macOS (rdar://33287650)
 
 
 CHANGES IN CUPS V2.2.4

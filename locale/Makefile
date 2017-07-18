@@ -163,9 +163,7 @@ checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
 		$(COMMONLIBS) $(LIBZ)
 
 checkall:	checkpo
-	for file in *.po; do \
-		./checkpo $$file; \
-	done
+	./checkpo *.po *.strings
 
 
 #

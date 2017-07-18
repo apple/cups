@@ -2,7 +2,7 @@
  * Verify that translations in the .po file have the same number and type of
  * printf-style format strings.
  *
- * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@
  *
  * Usage:
  *
- *   checkpo filename.po [... filenameN.po]
+ *   checkpo filename.{po,strings} [... filenameN.{po,strings}]
  *
  * Compile with:
  *
@@ -29,11 +29,14 @@
 
 static char		*abbreviate(const char *s, char *buf, int bufsize);
 static cups_array_t	*collect_formats(const char *id);
+static cups_array_t     *cups_load_strings(const char *filename);
+static int	        cups_read_strings(cups_file_t *fp, char *buffer, size_t bufsize, char **id, char **str);
+static char	        *cups_scan_strings(char *buffer);
 static void		free_formats(cups_array_t *fmts);
 
 
 /*
- * 'main()' - Validate .po files.
+ * 'main()' - Validate .po and .strings files.
  */
 
 int					/* O - Exit code */
@@ -57,12 +60,12 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc < 2)
   {
-    puts("Usage: checkpo filename.po [... filenameN.po]");
+    puts("Usage: checkpo filename.{po,strings} [... filenameN.{po,strings}]");
     return (1);
   }
 
  /*
-  * Check every .po file on the command-line...
+  * Check every .po or .strings file on the command-line...
   */
 
   for (i = 1, status = 0; i < argc; i ++)
@@ -71,7 +74,12 @@ main(int  argc,				/* I - Number of command-line args */
     * Use the CUPS .po loader to get the message strings...
     */
 
-    if ((po = _cupsMessageLoad(argv[i], 1)) == NULL)
+    if (strstr(argv[i], ".strings"))
+      po = cups_load_strings(argv[i]);
+    else
+      po = _cupsMessageLoad(argv[i], 1);
+
+    if (!po)
     {
       perror(argv[i]);
       return (1);
@@ -379,6 +387,152 @@ collect_formats(const char *id)		/* I - msgid string */
   }
 
   return (fmts);
+}
+
+
+/*
+ * 'cups_load_strings()' - Load a .strings file into a _cups_msg_t array.
+ */
+
+static cups_array_t *                   /* O - CUPS array of _cups_msg_t values */
+cups_load_strings(const char *filename) /* I - File to load */
+{
+  cups_file_t     *fp;                  /* .strings file */
+  cups_array_t    *po;                  /* Localization array */
+  _cups_message_t *m;                   /* Localization message */
+  char		  buffer[8192],	        /* Message buffer */
+                  *id,		        /* ID string */
+                  *str;		        /* Translated message */
+
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return (NULL);
+
+  po = _cupsMessageNew(NULL);
+
+  while (cups_read_strings(fp, buffer, sizeof(buffer), &id, &str))
+  {
+    if ((m = malloc(sizeof(_cups_message_t))) == NULL)
+      break;
+
+    m->id  = strdup(id);
+    m->str = strdup(str);
+
+    if (m->id && m->str)
+      cupsArrayAdd(po, m);
+    else
+    {
+      if (m->id)
+        free(m->id);
+
+      if (m->str)
+        free(m->str);
+
+      free(m);
+
+      cupsArrayDelete(po);
+      po = NULL;
+      break;
+    }
+  }
+
+  cupsFileClose(fp);
+
+  return (po);
+}
+
+
+/*
+ * 'cups_read_strings()' - Read a pair of strings from a .strings file.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+cups_read_strings(cups_file_t *strings,	/* I - .strings file */
+                  char        *buffer,	/* I - Line buffer */
+                  size_t      bufsize,	/* I - Size of line buffer */
+		  char        **id,	/* O - Pointer to ID string */
+		  char        **str)	/* O - Pointer to translation string */
+{
+  char	*bufptr;			/* Pointer into buffer */
+
+
+  while (cupsFileGets(strings, buffer, bufsize))
+  {
+    if (buffer[0] != '\"')
+      continue;
+
+    *id    = buffer + 1;
+    bufptr = cups_scan_strings(buffer);
+
+    if (*bufptr != '\"')
+      continue;
+
+    *bufptr++ = '\0';
+
+    while (*bufptr && *bufptr != '\"')
+      bufptr ++;
+
+    if (!*bufptr)
+      continue;
+
+    *str   = bufptr + 1;
+    bufptr = cups_scan_strings(bufptr);
+
+    if (*bufptr != '\"')
+      continue;
+
+    *bufptr = '\0';
+
+    return (1);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'cups_scan_strings()' - Scan a quoted string.
+ */
+
+static char *				/* O - End of string */
+cups_scan_strings(char *buffer)		/* I - Start of string */
+{
+  char	*bufptr;			/* Pointer into string */
+
+
+  for (bufptr = buffer + 1; *bufptr && *bufptr != '\"'; bufptr ++)
+  {
+    if (*bufptr == '\\')
+    {
+      if (bufptr[1] >= '0' && bufptr[1] <= '3' &&
+	  bufptr[2] >= '0' && bufptr[2] <= '7' &&
+	  bufptr[3] >= '0' && bufptr[3] <= '7')
+      {
+       /*
+	* Decode \nnn octal escape...
+	*/
+
+	*bufptr = (char)(((((bufptr[1] - '0') << 3) | (bufptr[2] - '0')) << 3) | (bufptr[3] - '0'));
+	_cups_strcpy(bufptr + 1, bufptr + 4);
+      }
+      else
+      {
+       /*
+	* Decode \C escape...
+	*/
+
+	_cups_strcpy(bufptr, bufptr + 1);
+	if (*bufptr == 'n')
+	  *bufptr = '\n';
+	else if (*bufptr == 'r')
+	  *bufptr = '\r';
+	else if (*bufptr == 't')
+	  *bufptr = '\t';
+      }
+    }
+  }
+
+  return (bufptr);
 }
 
 

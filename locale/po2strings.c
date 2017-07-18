@@ -385,8 +385,6 @@ normalize_string(const char *idstr,	/* I - msgid string */
 	*bufptr++ = (char)0x98;
 	quote     = 1;
       }
-
-      idstr ++;
     }
     else
       *bufptr++ = *idstr;
