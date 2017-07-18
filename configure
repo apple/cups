@@ -679,12 +679,12 @@ ARCHFLAGS
 UNITTESTS
 OPTIM
 INSTALL_STRIP
-LIBTOOL_LD_CXX
-LIBTOOL_LD_CC
 LIBTOOL_INSTALL
 LIBTOOL_CXX
 LIBTOOL_CC
 LIBTOOL
+LD_CXX
+LD_CC
 EXPORT_LDFLAGS
 IMGLIBS
 DSOLIBS
@@ -6673,6 +6673,9 @@ if test x$LIBTOOL != x; then
 	DSO="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
 	DSOXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
 
+	LD_CC="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
+	LD_CXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
+
 	LIBCUPS="libcups.la"
 	LIBCUPSSTATIC="libcups.la"
 	LIBCUPSCGI="libcupscgi.la"
@@ -6683,19 +6686,19 @@ if test x$LIBTOOL != x; then
 	LIBTOOL_CC="\$(LIBTOOL) --mode=compile --tag=CC"
 	LIBTOOL_CXX="\$(LIBTOOL) --mode=compile --tag=CXX"
 	LIBTOOL_INSTALL="\$(LIBTOOL) --mode=install"
-	LIBTOOL_LD_CC="\$(LIBTOOL) --mode=link --tag=CC ${CC}"
-	LIBTOOL_LD_CXX="\$(LIBTOOL) --mode=link --tag=CXX ${CXX}"
 
 	LINKCUPS="../cups/\$(LIBCUPS)"
 	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
 
 else
+	LD_CC="\$(CC)"
+	LD_CXX="\$(CXX)"
+
 	LIBTOOL_CC=""
 	LIBTOOL_CXX=""
 	LIBTOOL_INSTALL=""
-	LIBTOOL_LD_CC="\$(CC)"
-	LIBTOOL_LD_CC="\$(CXX)"
 fi
+
 
 
 
