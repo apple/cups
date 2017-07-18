@@ -16,6 +16,8 @@ CHANGES IN CUPS V2.2.5
   an incompatible command-line syntax (Issue #5050)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
+- The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
+  printers (rdar://33250434)
 
 
 CHANGES IN CUPS V2.2.4
