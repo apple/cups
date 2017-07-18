@@ -1,7 +1,7 @@
 /*
  * IPP utilities for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -596,6 +596,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   int			got_status;	/* Did we get the status? */
   ipp_state_t		state;		/* State of IPP processing */
   http_status_t		expect;		/* Expect: header to use */
+  char                  date[256];      /* Date: header value */
 
 
   DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", length=" CUPS_LLFMT ")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, CUPS_LLCAST length));
@@ -685,6 +686,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     httpClearFields(http);
     httpSetExpect(http, expect);
     httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+    httpSetField(http, HTTP_FIELD_DATE, httpGetDateString2(time(NULL), date, (int)sizeof(date)));
     httpSetLength(http, length);
 
 #ifdef HAVE_GSSAPI

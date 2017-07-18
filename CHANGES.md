@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-07-17
+CHANGES - 2.2.5 - 2017-07-18
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -19,6 +19,7 @@ CHANGES IN CUPS V2.2.5
 - The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
   printers (rdar://33250434)
 - Fixed the `cups.strings` file that is used on macOS (rdar://33287650)
+- CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
 
 
 CHANGES IN CUPS V2.2.4
