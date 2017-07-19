@@ -14,7 +14,10 @@ CHANGES IN CUPS V2.2.5
   (rdar://33169732)
 - Libtool support was completely broken with current libtool versions that use
   an incompatible command-line syntax (Issue #5050)
+- Fixed a build issue with `--enable-mallinfo` (Issue #5051)
 - The ippserver test program contained a deadlock issue (Issue #5054)
+- The `cupsLocalizeDest*` functions did not provide base localizations for
+  all registered IPP attributes and values (Issue #5056)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
 - The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
@@ -23,8 +26,6 @@ CHANGES IN CUPS V2.2.5
 - CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
 - The `cupsGetNamedDest` function did not use the local default printer
   (rdar://33228500)
-- The `cupsLocalizeDest*` functions did not provide base localizations for
-  all registered IPP attributes and values (Issue #5056)
 
 
 CHANGES IN CUPS V2.2.4
