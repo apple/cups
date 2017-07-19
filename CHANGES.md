@@ -8,10 +8,6 @@ CHANGES IN CUPS V2.2.5
 - Fixed RPM packaging issue (Issue #5043, Issue #5044)
 - The `cupsGetDests` function incorrectly returned an empty list of printers if
   there was no default printer (Issue #5046)
-- Fixed an issue with Chinese localizations on macOS (rdar://32419311)
-- The IPP backend now always sends the "finishings" attribute for printers that
-  support it because otherwise the client cannot override printer defaults
-  (rdar://33169732)
 - Libtool support was completely broken with current libtool versions that use
   an incompatible command-line syntax (Issue #5050)
 - Fixed a build issue with `--enable-mallinfo` (Issue #5051)
@@ -20,12 +16,16 @@ CHANGES IN CUPS V2.2.5
   all registered IPP attributes and values (Issue #5056)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
+- Fixed an issue with Chinese localizations on macOS (rdar://32419311)
+- The IPP backend now always sends the "finishings" attribute for printers that
+  support it because otherwise the client cannot override printer defaults
+  (rdar://33169732)
+- The `cupsGetNamedDest` function did not use the local default printer
+  (rdar://33228500)
 - The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
   printers (rdar://33250434)
 - Fixed the `cups.strings` file that is used on macOS (rdar://33287650)
 - CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
-- The `cupsGetNamedDest` function did not use the local default printer
-  (rdar://33228500)
 
 
 CHANGES IN CUPS V2.2.4
