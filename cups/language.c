@@ -851,6 +851,9 @@ _cupsLangString(cups_lang_t *lang,	/* I - Language */
 {
   const char *s;			/* Localized message */
 
+
+  DEBUG_printf(("_cupsLangString(lang=%p, message=\"%s\")", (void *)lang, message));
+
  /*
   * Range check input...
   */
@@ -1149,6 +1152,8 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
 			*match;		/* Matching message */
 
 
+  DEBUG_printf(("_cupsMessageLookup(a=%p, m=\"%s\")", (void *)a, m));
+
  /*
   * Lookup the message string; if it doesn't exist in the catalog,
   * then return the message that was passed to us...
@@ -1364,6 +1369,8 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
   CFReadStreamRef	stream = NULL;	/* File stream */
   CFPropertyListRef	plist = NULL;	/* Localization file */
 #ifdef DEBUG
+  const char            *cups_strings = getenv("CUPS_STRINGS");
+                                        /* Test strings file */
   CFErrorRef		error = NULL;	/* Error when opening file */
 #endif /* DEBUG */
 
@@ -1373,6 +1380,15 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
  /*
   * Load the cups.strings file...
   */
+
+#ifdef DEBUG
+  if (cups_strings)
+  {
+    DEBUG_puts("1appleMessageLoad: Using debug CUPS_STRINGS file.");
+    strlcpy(filename, cups_strings, sizeof(filename));
+  }
+  else
+#endif /* DEBUG */
 
   snprintf(filename, sizeof(filename),
            CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings",
@@ -1386,6 +1402,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
     * Try with original locale string...
     */
 
+    DEBUG_printf(("1appleMessageLoad: \"%s\": %s", filename, strerror(errno)));
     snprintf(filename, sizeof(filename), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
   }
 
@@ -1397,6 +1414,8 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
     * Try with just the language code...
     */
 
+    DEBUG_printf(("1appleMessageLoad: \"%s\": %s", filename, strerror(errno)));
+
     strlcpy(baselang, locale, sizeof(baselang));
     if (baselang[3] == '-' || baselang[3] == '_')
       baselang[3] = '\0';
@@ -1404,13 +1423,13 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
     snprintf(filename, sizeof(filename), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", baselang);
   }
 
-  DEBUG_printf(("1appleMessageLoad: filename=\"%s\"", filename));
-
   if (access(filename, 0))
   {
    /*
     * Try alternate lproj directory names...
     */
+
+    DEBUG_printf(("1appleMessageLoad: \"%s\": %s", filename, strerror(errno)));
 
     if (!strncmp(locale, "en", 2))
       locale = "English";
@@ -1457,8 +1476,9 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
 
     snprintf(filename, sizeof(filename),
 	     CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
-    DEBUG_printf(("1appleMessageLoad: alternate filename=\"%s\"", filename));
   }
+
+  DEBUG_printf(("1appleMessageLoad: filename=\"%s\"", filename));
 
   url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
                                                 (UInt8 *)filename,

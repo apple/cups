@@ -23,6 +23,8 @@ CHANGES IN CUPS V2.2.5
 - CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
 - The `cupsGetNamedDest` function did not use the local default printer
   (rdar://33228500)
+- The `cupsLocalizeDest*` functions did not provide base localizations for
+  all registered IPP attributes and values (Issue #5056)
 
 
 CHANGES IN CUPS V2.2.4

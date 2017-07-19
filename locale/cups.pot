@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2.5\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 12:33-0400\n"
+"POT-Creation-Date: 2017-07-19 13:46-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1726,37 +1726,37 @@ msgstr ""
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr ""
 
-#: cups/dest-localization.c:112
+#: cups/dest-localization.c:118
 #, c-format
 msgid "%d x %d mm"
 msgstr ""
 
-#: cups/dest-localization.c:104
+#: cups/dest-localization.c:110
 #, c-format
-msgid "%g x %g"
+msgid "%g x %g \""
 msgstr ""
 
-#: cups/dest-localization.c:167 cups/dest-localization.c:174
+#: cups/dest-localization.c:173 cups/dest-localization.c:180
 #, c-format
 msgid "%s (%s)"
 msgstr ""
 
-#: cups/dest-localization.c:181
+#: cups/dest-localization.c:187
 #, c-format
 msgid "%s (%s, %s)"
 msgstr ""
 
-#: cups/dest-localization.c:158
+#: cups/dest-localization.c:164
 #, c-format
 msgid "%s (Borderless)"
 msgstr ""
 
-#: cups/dest-localization.c:165 cups/dest-localization.c:172
+#: cups/dest-localization.c:171 cups/dest-localization.c:178
 #, c-format
 msgid "%s (Borderless, %s)"
 msgstr ""
 
-#: cups/dest-localization.c:179
+#: cups/dest-localization.c:185
 #, c-format
 msgid "%s (Borderless, %s, %s)"
 msgstr ""

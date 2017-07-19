@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 12:33-0400\n"
+"POT-Creation-Date: 2017-07-19 13:46-0400\n"
 "PO-Revision-Date: 2016-09-17 18:45+0200\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1431,8 +1431,8 @@ msgid "%d x %d mm"
 msgstr "%d×%d mm"
 
 #, c-format
-msgid "%g x %g"
-msgstr "%g×%g"
+msgid "%g x %g \""
+msgstr ""
 
 #, c-format
 msgid "%s (%s)"
@@ -13403,6 +13403,9 @@ msgstr "Y Back Side Image Shift"
 #~ msgid "  -d domain               Browse/resolve in specified domain."
 #~ msgstr ""
 #~ "  -d domain               Browse/löse auf in der angegebenen Domäne."
+
+#~ msgid "%g x %g"
+#~ msgstr "%g×%g"
 
 #~ msgid "720dpi"
 #~ msgstr "720 dpi"

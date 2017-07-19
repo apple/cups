@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 12:33-0400\n"
+"POT-Creation-Date: 2017-07-19 13:46-0400\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1574,8 +1574,8 @@ msgid "%d x %d mm"
 msgstr "%d x %d mm"
 
 #, c-format
-msgid "%g x %g"
-msgstr "%g x %g"
+msgid "%g x %g \""
+msgstr ""
 
 #, c-format
 msgid "%s (%s)"
@@ -13798,6 +13798,9 @@ msgstr "Y Back Side Image Shift"
 #~ msgstr ""
 #~ "\"%s\": Valor uriScheme \"%s\" incorrecto - longitud %d incorrecta (RFC "
 #~ "2911 sección 4.1.6)."
+
+#~ msgid "%g x %g"
+#~ msgstr "%g x %g"
 
 #~ msgid "CD/DVD/Bluray"
 #~ msgstr "CD/DVD/Bluray"

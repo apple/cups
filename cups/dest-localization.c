@@ -60,12 +60,15 @@ cupsLocalizeDestMedia(
 			*ltype;		/* Localized media type */
 
 
+  DEBUG_printf(("cupsLocalizeDestMedia(http=%p, dest=%p, dinfo=%p, flags=%x, size=%p(\"%s\"))", (void *)http, (void *)dest, (void *)dinfo, flags, (void *)size, size ? size->media : "(null)"));
+
  /*
   * Range check input...
   */
 
   if (!http || !dest || !dinfo || !size)
   {
+    DEBUG_puts("1cupsLocalizeDestMedia: Returning NULL.");
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (NULL);
   }
@@ -79,13 +82,24 @@ cupsLocalizeDestMedia(
 
   key.id = size->media;
   if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
+  {
+    DEBUG_printf(("1cupsLocalizeDestMedia: Returning \"%s\".", match->str));
     return (match->str);
+  }
 
  /*
   * If not, get the localized size, source, and type strings...
   */
 
   lang = cupsLangDefault();
+
+  snprintf(temp, sizeof(temp), "media.%s", size->media);
+  if ((lsize = _cupsLangString(lang, temp)) != NULL && strcmp(lsize, temp))
+  {
+    DEBUG_printf(("1cupsLocalizeDestMedia: Returning standard localization \"%s\".", lsize));
+    return (lsize);
+  }
+
   pwg  = pwgMediaForSize(size->width, size->length);
 
   if (pwg->ppd)
@@ -101,7 +115,7 @@ cupsLocalizeDestMedia(
       * Use inches since the size is a multiple of 1/4 inch.
       */
 
-      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%g x %g")), size->width / 2540.0, size->length / 2540.0);
+      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%g x %g \"")), size->width / 2540.0, size->length / 2540.0);
     }
     else
     {
@@ -189,6 +203,8 @@ cupsLocalizeDestMedia(
 
   cupsArrayAdd(dinfo->localizations, match);
 
+  DEBUG_printf(("1cupsLocalizeDestMedia: Returning \"%s\".", match->str));
+
   return (match->str);
 }
 
@@ -212,7 +228,10 @@ cupsLocalizeDestOption(
 {
   _cups_message_t	key,		/* Search key */
 			*match;		/* Matching entry */
+  const char            *localized;     /* Localized string */
 
+
+  DEBUG_printf(("cupsLocalizeDestOption(http=%p, dest=%p, dinfo=%p, option=\"%s\")", (void *)http, (void *)dest, (void *)dinfo, option));
 
   if (!http || !dest || !dinfo)
     return (option);
@@ -220,13 +239,12 @@ cupsLocalizeDestOption(
   if (!dinfo->localizations)
     cups_create_localizations(http, dinfo);
 
-  if (cupsArrayCount(dinfo->localizations) == 0)
-    return (option);
-
   key.id = (char *)option;
   if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations,
                                                 &key)) != NULL)
     return (match->str);
+  else if ((localized = _cupsLangString(cupsLangDefault(), option)) != NULL)
+    return (localized);
   else
     return (option);
 }
@@ -253,22 +271,40 @@ cupsLocalizeDestValue(
   _cups_message_t	key,		/* Search key */
 			*match;		/* Matching entry */
   char			pair[256];	/* option.value pair */
+  const char            *localized;     /* Localized string */
 
+
+  DEBUG_printf(("cupsLocalizeDestValue(http=%p, dest=%p, dinfo=%p, option=\"%s\", value=\"%s\")", (void *)http, (void *)dest, (void *)dinfo, option, value));
 
   if (!http || !dest || !dinfo)
     return (value);
 
+  if (!strcmp(option, "media"))
+  {
+    pwg_media_t *media = pwgMediaForPWG(value);
+    cups_size_t size;
+
+    strlcpy(size.media, value, sizeof(size.media));
+    size.width  = media ? media->width : 0;
+    size.length = media ? media->length : 0;
+    size.left   = 0;
+    size.right  = 0;
+    size.bottom = 0;
+    size.top    = 0;
+
+    return (cupsLocalizeDestMedia(http, dest, dinfo, CUPS_MEDIA_FLAGS_DEFAULT, &size));
+  }
+
   if (!dinfo->localizations)
     cups_create_localizations(http, dinfo);
-
-  if (cupsArrayCount(dinfo->localizations) == 0)
-    return (value);
 
   snprintf(pair, sizeof(pair), "%s.%s", option, value);
   key.id = pair;
   if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations,
                                                 &key)) != NULL)
     return (match->str);
+  else if ((localized = _cupsLangString(cupsLangDefault(), pair)) != NULL && strcmp(localized, pair))
+    return (localized);
   else
     return (value);
 }

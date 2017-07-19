@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 12:33-0400\n"
+"POT-Creation-Date: 2017-07-19 13:46-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1545,8 +1545,8 @@ msgid "%d x %d mm"
 msgstr "%d x %d mm"
 
 #, c-format
-msgid "%g x %g"
-msgstr "%g x %g"
+msgid "%g x %g \""
+msgstr ""
 
 #, c-format
 msgid "%s (%s)"
@@ -13792,6 +13792,9 @@ msgstr "Y Back Side Image Shift"
 
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f バイト"
+
+#~ msgid "%g x %g"
+#~ msgstr "%g x %g"
 
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: エラー - \"-b\" オプションのあとに宛先が必要です。"

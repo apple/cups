@@ -341,7 +341,7 @@
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)." = "“%s”: Bad uriScheme value “%s” - bad length %d (RFC 8011 section 5.1.7).";
 "%-7s %-7.7s %-7d %-31.31s %.0f bytes" = "%-7s %-7.7s %-7d %-31.31s %.0f bytes";
 "%d x %d mm" = "%d x %d mm";
-"%g x %g" = "%g x %g";
+"%g x %g \"" = "%g x %g ″";
 "%s (%s)" = "%s (%s)";
 "%s (%s, %s)" = "%s (%s, %s)";
 "%s (Borderless)" = "%s (Borderless)";

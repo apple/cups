@@ -629,7 +629,7 @@ show_supported(http_t       *http,	/* I - Connection to destination */
   }
   else if (!value)
   {
-    printf("%s (%s)\n", option, cupsCheckDestSupported(http, dest, dinfo, option, NULL) ? "supported" : "not-supported");
+    printf("%s (%s - %s)\n", option, cupsLocalizeDestOption(http, dest, dinfo, option), cupsCheckDestSupported(http, dest, dinfo, option, NULL) ? "supported" : "not-supported");
 
     if ((attr = cupsFindDestSupported(http, dest, dinfo, option)) != NULL)
     {
@@ -644,7 +644,13 @@ show_supported(http_t       *http,	/* I - Connection to destination */
 
         case IPP_TAG_ENUM :
 	    for (i = 0; i < count; i ++)
-              printf("  %s\n", ippEnumString(option, ippGetInteger(attr, i)));
+	    {
+	      int val = ippGetInteger(attr, i);
+	      char valstr[256];
+
+              snprintf(valstr, sizeof(valstr), "%d", val);
+              printf("  %s (%s)\n", ippEnumString(option, ippGetInteger(attr, i)), cupsLocalizeDestValue(http, dest, dinfo, option, valstr));
+            }
 	    break;
 
         case IPP_TAG_RANGE :
@@ -670,11 +676,15 @@ show_supported(http_t       *http,	/* I - Connection to destination */
 	    }
 	    break;
 
+	case IPP_TAG_KEYWORD :
+	    for (i = 0; i < count; i ++)
+              printf("  %s (%s)\n", ippGetString(attr, i, NULL), cupsLocalizeDestValue(http, dest, dinfo, option, ippGetString(attr, i, NULL)));
+	    break;
+
 	case IPP_TAG_TEXTLANG :
 	case IPP_TAG_NAMELANG :
 	case IPP_TAG_TEXT :
 	case IPP_TAG_NAME :
-	case IPP_TAG_KEYWORD :
 	case IPP_TAG_URI :
 	case IPP_TAG_URISCHEME :
 	case IPP_TAG_CHARSET :
