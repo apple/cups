@@ -4,6 +4,8 @@ CHANGES - 2.2.5 - 2017-07-19
 CHANGES IN CUPS V2.2.5
 ----------------------
 
+- The scheduler's `-t` option did not force all errors to the standard error
+  file, making debugging of configuration problems hard (Issue #5041)
 - Fixed a typo in the CUPS Programming Manual (Issue #5042)
 - Fixed RPM packaging issue (Issue #5043, Issue #5044)
 - The `cupsGetDests` function incorrectly returned an empty list of printers if

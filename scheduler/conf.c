@@ -190,7 +190,7 @@ static void		mime_error_cb(void *ctx, const char *message);
 static int		parse_aaa(cupsd_location_t *loc, char *line,
 			          char *value, int linenum);
 static int		parse_fatal_errors(const char *s);
-static int		parse_groups(const char *s);
+static int		parse_groups(const char *s, int linenum);
 static int		parse_protocols(const char *s);
 static int		parse_variable(const char *filename, int linenum,
 			               const char *line, const char *value,
@@ -953,7 +953,7 @@ cupsdReadConfiguration(void)
 
   if (NumSystemGroups == 0)
   {
-    if (!parse_groups(CUPS_DEFAULT_SYSTEM_GROUPS))
+    if (!parse_groups(CUPS_DEFAULT_SYSTEM_GROUPS, 0))
     {
      /*
       * Find the group associated with GID 0...
@@ -2494,7 +2494,8 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
  */
 
 static int				/* O - 1 on success, 0 on failure */
-parse_groups(const char *s)		/* I - Space-delimited groups */
+parse_groups(const char *s,		/* I - Space-delimited groups */
+             int        linenum)        /* I - Line number in cups-files.conf */
 {
   int		status;			/* Return status */
   char		value[1024],		/* Value string */
@@ -2550,7 +2551,14 @@ parse_groups(const char *s)		/* I - Space-delimited groups */
       NumSystemGroups ++;
     }
     else
+    {
+      if (linenum)
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown SystemGroup \"%s\" on line %d of %s.", valstart, linenum, CupsFilesFile);
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown default SystemGroup \"%s\".", valstart);
+
       status = 0;
+    }
 
     endgrent();
 
@@ -3547,11 +3555,8 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       * SystemGroup (admin) group(s)...
       */
 
-      if (!parse_groups(value))
+      if (!parse_groups(value, linenum))
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown SystemGroup \"%s\" on line %d of %s.", value,
-	                linenum, CupsFilesFile);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
           return (0);
       }
