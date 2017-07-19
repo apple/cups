@@ -703,7 +703,18 @@ cupsdLogMessage(int        level,	/* I - Log level */
   * See if we want to log this message...
   */
 
-  if ((TestConfigFile || !ErrorLog) && level <= CUPSD_LOG_WARN)
+  if (TestConfigFile && level <= CUPSD_LOG_WARN)
+  {
+    va_start(ap, message);
+
+    vfprintf(stderr, message, ap);
+    putc('\n', stderr);
+
+    va_end(ap);
+
+    return (1);
+  }
+  else if (!ErrorLog && level <= CUPSD_LOG_WARN)
   {
     va_start(ap, message);
 
@@ -722,12 +733,11 @@ cupsdLogMessage(int        level,	/* I - Log level */
 
     return (1);
   }
-
-  if (level > LogLevel || !ErrorLog)
+  else if (level > LogLevel || !ErrorLog)
     return (1);
 
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H
-  if (!strcmp(ErrorLog, "syslog"))
+  else if (!strcmp(ErrorLog, "syslog"))
   {
     va_start(ap, message);
     sd_journal_printv(log_levels[level], message, ap);
