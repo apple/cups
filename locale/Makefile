@@ -131,8 +131,8 @@ pot:	checkpo po2strings
 	cd ..; xgettext -o locale/cups.pot -cTRANSLATORS -s \
 		--keyword=_ --no-wrap \
 		--copyright-holder="Apple Inc." \
-		--package-name="CUPS" --package-version="1.6" \
-		--msgid-bugs-address="http://www.cups.org/str.php" \
+		--package-name="CUPS" --package-version="$(CUPS_VERSION)" \
+		--msgid-bugs-address="https://github.com/apple/cups/issues" \
 		*/*.c */*.cxx
 	(cat cups.header; tail +6 cups.pot; cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot

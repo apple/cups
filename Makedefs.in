@@ -12,6 +12,13 @@
 #
 
 #
+# CUPS version...
+#
+
+CUPS_VERSION    =       @CUPS_VERSION@
+
+
+#
 # Programs...
 #
 
