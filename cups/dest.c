@@ -61,7 +61,7 @@
 #endif /* __APPLE__ */
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-#  define _CUPS_DNSSD_MAXTIME	500	/* Milliseconds for maximum quantum of time */
+#  define _CUPS_DNSSD_MAXTIME	100	/* Milliseconds for maximum quantum of time */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
