@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-07-18
+CHANGES - 2.2.5 - 2017-07-19
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -14,6 +14,7 @@ CHANGES IN CUPS V2.2.5
   (rdar://33169732)
 - Libtool support was completely broken with current libtool versions that use
   an incompatible command-line syntax (Issue #5050)
+- The ippserver test program contained a deadlock issue (Issue #5054)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
 - The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF
