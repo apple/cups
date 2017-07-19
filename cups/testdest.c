@@ -105,6 +105,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (!strncmp(argv[1], "ipp://", 6) || !strncmp(argv[1], "ipps://", 7))
     dest = cupsGetDestWithURI(NULL, argv[1]);
+  else if (!strcmp(argv[1], "default"))
+  {
+    dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, NULL, NULL);
+    if (dest && dest->instance)
+      printf("default is \"%s/%s\".\n", dest->name, dest->instance);
+    else
+      printf("default is \"%s\".\n", dest->name);
+  }
   else
     dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, argv[1], NULL);
 

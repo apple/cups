@@ -2261,7 +2261,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
     }
 
-    if (!name)
+    if (!dest_name)
     {
      /*
       * Still not there?  Try the system lpoptions file...
