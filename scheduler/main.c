@@ -1752,18 +1752,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     why     = "delete stale local printers";
   }
 
-#ifdef HAVE_MALLINFO
- /*
-  * Log memory usage every minute...
-  */
-
-  if (LogLevel >= CUPSD_LOG_DEBUG && (mallinfo_time + 60) < timeout)
-  {
-    timeout = mallinfo_time + 60;
-    why     = "display memory usage";
-  }
-#endif /* HAVE_MALLINFO */
-
  /*
   * Adjust from absolute to relative time.  We add 1 second to the timeout since
   * events occur after the timeout expires, and limit the timeout to 86400
