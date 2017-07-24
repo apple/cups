@@ -1242,7 +1242,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   int			status;		/* Status of handshake */
   gnutls_certificate_credentials_t *credentials;
 					/* TLS credentials */
-  char			priority_string[1024];
+  char			priority_string[2048];
 					/* Priority string */
 
 
@@ -1519,7 +1519,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
 
   if (!(tls_options & _HTTP_TLS_DENY_CBC))
-    strlcat(priority_string, ":!CBC", sizeof(priority_string));
+    strlcat(priority_string, ":!AES-128-CBC:!AES-256-CBC:!CAMELLIA-128-CBC:!CAMELLIA-256-CBC:!3DES-CBC", sizeof(priority_string));
 
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   gnutls_priority_set_direct(http->tls, priority_string, NULL);
