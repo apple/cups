@@ -61,7 +61,7 @@
 #endif /* __APPLE__ */
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-#  define _CUPS_DNSSD_MAXTIME	100	/* Milliseconds for maximum quantum of time */
+#  define _CUPS_DNSSD_MAXTIME	50	/* Milliseconds for maximum quantum of time */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
@@ -2070,7 +2070,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   data.num_dests = 0;
   data.dests     = NULL;
 
-  cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
+  cupsEnumDests(0, 100, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
