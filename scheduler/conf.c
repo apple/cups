@@ -3330,7 +3330,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s %s; %s) IPP/2.1",
 	                plat.sysname, plat.release, plat.machine);
       else if (!_cups_strcasecmp(value, "None"))
-	cupsdClearString(&ServerHeader);
+	cupsdSetString(&ServerHeader, "");
       else
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d of %s.",
                         value, linenum, ConfigurationFile);

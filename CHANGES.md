@@ -18,6 +18,8 @@ CHANGES IN CUPS V2.2.5
   all registered IPP attributes and values (Issue #5056)
 - The --enable-libtool configure option requires a path to the libtool program,
   but doesn't document or check for it (Issue #5062)
+- Fixed the `SSLOptions DenyCBC` option when using GNU TLS (Issue #5065)
+- Fixed the `ServerTokens None` option (Issue #5065)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
@@ -28,7 +30,6 @@ CHANGES IN CUPS V2.2.5
   printers (rdar://33250434)
 - Fixed the `cups.strings` file that is used on macOS (rdar://33287650)
 - CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
-- Fixed the DenyCBC option when using GNU TLS.
 
 
 CHANGES IN CUPS V2.2.4
