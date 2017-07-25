@@ -2070,7 +2070,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   data.num_dests = 0;
   data.dests     = NULL;
 
-  cupsEnumDests(0, 100, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
+  cupsEnumDests(0, 250, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
