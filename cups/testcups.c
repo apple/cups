@@ -1,7 +1,7 @@
 /*
  * CUPS API test program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -47,7 +47,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests,			/* Destinations */
 		*dest,			/* Current destination */
 		*named_dest;		/* Current named destination */
-  const char	*ppdfile;		/* PPD file */
+  const char	*dest_name,             /* Destination name */
+                *dval,                  /* Destination value */
+                *ppdfile;		/* PPD file */
   ppd_file_t	*ppd;			/* PPD file data */
   int		num_jobs;		/* Number of jobs for queue */
   cups_job_t	*jobs;			/* Jobs for queue */
@@ -360,11 +362,19 @@ main(int  argc,				/* I - Number of command-line arguments */
   * cupsGetDest(printer)
   */
 
-  printf("cupsGetDest(\"%s\"): ", dests[num_dests / 2].name);
+  for (i = 0, dest_name = NULL; i < num_dests; i ++)
+  {
+    if ((dval = cupsGetOption("printer-is-temporary", dests[i].num_options, dest[i].options)) != NULL && !strcmp(dval, "false"))
+    {
+      dest_name = dests[i].name;
+      break;
+    }
+  }
+
+  printf("cupsGetDest(\"%s\"): ", dest_name ? dest_name : "(null)");
   fflush(stdout);
 
-  if ((dest = cupsGetDest(dests[num_dests / 2].name, NULL, num_dests,
-                          dests)) == NULL)
+  if ((dest = cupsGetDest(dest_name, NULL, num_dests, dests)) == NULL)
   {
     puts("FAIL");
     return (1);
@@ -380,8 +390,7 @@ main(int  argc,				/* I - Number of command-line arguments */
          dest->instance ? dest->instance : "(null)");
   fflush(stdout);
 
-  if ((named_dest = cupsGetNamedDest(NULL, dest->name,
-                                     dest->instance)) == NULL ||
+  if ((named_dest = cupsGetNamedDest(NULL, dest->name, dest->instance)) == NULL ||
       !dests_equal(dest, named_dest))
   {
     if (named_dest)
@@ -408,7 +417,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   fputs("cupsPrintFile: ", stdout);
   fflush(stdout);
 
-  if (cupsPrintFile(dest->name, "../data/testprint", "Test Page",
+  if (cupsPrintFile(dest->name, "../test/testfile.pdf", "Test Page",
                     dest->num_options, dest->options) <= 0)
   {
     printf("FAIL (%s)\n", cupsLastErrorString());
@@ -421,7 +430,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * cupsGetPPD(printer)
   */
 
-  fputs("cupsGetPPD(): ", stdout);
+  fputs("cupsGetPPD: ", stdout);
   fflush(stdout);
 
   if ((ppdfile = cupsGetPPD(dest->name)) == NULL)
@@ -436,7 +445,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * ppdOpenFile()
     */
 
-    fputs("ppdOpenFile(): ", stdout);
+    fputs("ppdOpenFile: ", stdout);
     fflush(stdout);
 
     if ((ppd = ppdOpenFile(ppdfile)) == NULL)
@@ -550,33 +559,39 @@ show_diffs(cups_dest_t *a,		/* I - First destination */
 {
   int		i;			/* Looping var */
   cups_option_t	*aoption;		/* Current option */
+  cups_option_t	*boption;		/* Current option */
   const char	*bval;			/* Option value */
 
 
   if (!a || !b)
     return;
 
-  puts("    Item                  cupsGetDest           cupsGetNamedDest");
-  puts("    --------------------  --------------------  --------------------");
+  puts("    Item                  cupsGetDest               cupsGetNamedDest");
+  puts("    --------------------  ------------------------  ------------------------");
 
   if (_cups_strcasecmp(a->name, b->name))
-    printf("    name                  %-20.20s  %-20.20s\n", a->name, b->name);
+    printf("    name                  %-24.24s  %-24.24s\n", a->name, b->name);
 
   if ((a->instance && !b->instance) ||
       (!a->instance && b->instance) ||
       (a->instance && _cups_strcasecmp(a->instance, b->instance)))
-    printf("    instance              %-20.20s  %-20.20s\n",
+    printf("    instance              %-24.24s  %-24.24s\n",
            a->instance ? a->instance : "(null)",
 	   b->instance ? b->instance : "(null)");
 
   if (a->num_options != b->num_options)
-    printf("    num_options           %-20d  %-20d\n", a->num_options,
+    printf("    num_options           %-24d  %-24d\n", a->num_options,
            b->num_options);
 
   for (i = a->num_options, aoption = a->options; i > 0; i --, aoption ++)
     if ((bval = cupsGetOption(aoption->name, b->num_options,
                               b->options)) == NULL ||
         strcmp(aoption->value, bval))
-      printf("    %-20.20s  %-20.20s  %-20.20s\n", aoption->name,
+      printf("    %-20.20s  %-24.24s  %-24.24s\n", aoption->name,
              aoption->value, bval ? bval : "(null)");
+
+  for (i = b->num_options, boption = b->options; i > 0; i --, boption ++)
+    if (!cupsGetOption(boption->name, a->num_options, a->options))
+      printf("    %-20.20s  %-24.24s  %-24.24s\n", boption->name,
+             boption->value, "(null)");
 }
