@@ -89,6 +89,7 @@ TESTOBJS	= \
 		testcups.o \
 		testdest.o \
 		testfile.o \
+		testgetdests.o \
 		testhttp.o \
 		testi18n.o \
 		testipp.o \
@@ -158,6 +159,7 @@ UNITTARGETS =	\
 		testcups \
 		testdest \
 		testfile \
+		testgetdests \
 		testhttp \
 		testi18n \
 		testipp \
@@ -459,6 +461,16 @@ testfile:	testfile.o $(LIBCUPSSTATIC)
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running file API tests...
 	./testfile
+
+
+#
+# testgetdests (dependency on static CUPS library is intentional)
+#
+
+testgetdests:	testgetdests.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(LD_CC) $(LDFLAGS) -o $@ testgetdests.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
