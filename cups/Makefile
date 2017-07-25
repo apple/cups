@@ -520,11 +520,14 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 	echo Creating locale directory structure...
 	$(RM) -r locale
 	$(MKDIR) locale/en
-	$(LN) ../locale/cups.pot locale/en/cups_en.po
+	echo 'msgid "No"' > locale/en/cups_en.po
+	echo 'msgstr "No"' >> locale/en/cups_en.po
+	echo 'msgid "Yes"' >> locale/en/cups_en.po
+	echo 'msgstr "Yes"' >> locale/en/cups_en.po
 	for po in ../locale/cups_*.po; do \
 		lang=`basename $$po .po | sed -e '1,$$s/^cups_//'`; \
 		$(MKDIR) locale/$$lang; \
-		$(LN) $$po locale/$$lang; \
+		$(LN) ../../$$po locale/$$lang; \
 	done
 	echo Running language API tests...
 	LOCALEDIR=locale ./testlang
