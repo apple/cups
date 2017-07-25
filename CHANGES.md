@@ -10,6 +10,7 @@ CHANGES IN CUPS V2.2.5
 - Fixed RPM packaging issue (Issue #5043, Issue #5044)
 - The `cupsGetDests` function incorrectly returned an empty list of printers if
   there was no default printer (Issue #5046)
+- The `cupsGetDests` function waited too long for network printers (Issue #5049)
 - Libtool support was completely broken with current libtool versions that use
   an incompatible command-line syntax (Issue #5050)
 - Fixed a build issue with `--enable-mallinfo` (Issue #5051)
