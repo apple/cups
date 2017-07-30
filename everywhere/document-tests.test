@@ -1,0 +1,618 @@
+#
+# "$Id: document-tests.test 12127 2014-08-28 18:57:27Z msweet $"
+#
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
+#
+# Copyright 2014 by The Printer Working Group.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool -tI printer-uri document-tests.test
+#
+# This test file depends on document data files available at:
+#
+#   http://ftp.pwg.org/pub/pwg/ipp/examples
+#
+# The ZIP files should be extracted in the same directory as the test files,
+# for example the 600dpi files will exist in a directory called
+# "pwg-raster-samples-600dpi-20111130".  The script used to generate the raster
+# data is available in the "everywhere" subdirectory of the CUPS source code.
+#
+
+FILE-ID "org.pwg.ipp-everywhere.20140826.document"
+
+{
+	NAME "D-1. PWG Raster Format Tests (mandatory)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
+
+	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag DEFINE-VALUE RASTER_RESOLUTION
+
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "black-1" DEFINE-MATCH HAVE_BLACK
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "sgray-8" DEFINE-MATCH HAVE_SGRAY
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "srgb-8" DEFINE-MATCH HAVE_SRGB
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "cmyk-8" DEFINE-MATCH HAVE_CMYK
+}
+
+#### 1.1 NO COMPRESSION ####
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black-1"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/black-1/color.jpg-4x6-black-1-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/sgray-8/color.jpg-4x6-sgray-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/srgb-8/color.jpg-4x6-srgb-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/cmyk-8/color.jpg-4x6-cmyk-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### 1.2 DEFLATE COMPRESSION ####
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, deflate"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black-1\, deflate"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression deflate
+	COMPRESSION deflate
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/black-1/color.jpg-4x6-black-1-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, deflate"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray-8\, deflate"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression deflate
+	COMPRESSION deflate
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/sgray-8/color.jpg-4x6-sgray-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, deflate"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb-8\, deflate"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression deflate
+	COMPRESSION deflate
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/srgb-8/color.jpg-4x6-srgb-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, deflate"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk-8\, deflate"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression deflate
+	COMPRESSION deflate
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/cmyk-8/color.jpg-4x6-cmyk-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### 1.3 GZIP COMPRESSION ####
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, gzip"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, black-1\, gzip"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression gzip
+	COMPRESSION gzip
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/black-1/color.jpg-4x6-black-1-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, gzip"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, sgray-8\, gzip"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression gzip
+	COMPRESSION gzip
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/sgray-8/color.jpg-4x6-sgray-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, gzip"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, srgb-8\, gzip"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression gzip
+	COMPRESSION gzip
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/srgb-8/color.jpg-4x6-srgb-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	SKIP-IF-NOT-DEFINED HAVE_GZIP
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, gzip"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg-4x6.pwg @ $RASTER_RESOLUTION\, cmyk-8\, gzip"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	ATTR keyword compression gzip
+	COMPRESSION gzip
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/cmyk-8/color.jpg-4x6-cmyk-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### 1.4 A4 TESTS ####
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, black-1"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, black-1"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/black-1/document-a4-black-1-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, sgray-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, sgray-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/sgray-8/document-a4-sgray-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, srgb-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, srgb-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/srgb-8/document-a4-srgb-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-a4.pwg @ $RASTER_RESOLUTION\, cmyk-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/cmyk-8/document-a4-cmyk-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### 1.5 US Letter TESTS ####
+{
+	SKIP-IF-NOT-DEFINED HAVE_BLACK
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, black-1"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, black-1"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/black-1/document-letter-black-1-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SGRAY
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, sgray-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, sgray-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/sgray-8/document-letter-sgray-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_SRGB
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, srgb-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, srgb-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/srgb-8/document-letter-srgb-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_CMYK
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pwg @ $RASTER_RESOLUTION\, cmyk-8"
+	ATTR mimeMediaType document-format "image/pwg-raster"
+	FILE "pwg-raster-samples-${RASTER_RESOLUTION}-20111130/cmyk-8/document-letter-cmyk-8-600dpi.pwg"
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### JPEG Tests
+{
+	NAME "D-2. JPEG Tests (mandatory)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
+}
+{
+	NAME "D-2.1 Print color.jpg with defaults"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg with defaults"
+	ATTR mimeMediaType document-format "image/jpeg"
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	NAME "D-2.2 Print color.jpg with copies=2"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg with copies=2"
+	ATTR mimeMediaType document-format "image/jpeg"
+	GROUP job-attributes-tag
+	ATTR integer copies 2
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	NAME "D-2.3 Print color.jpg with print-color-mode=monochrome"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg with print-color-mode=monochrome"
+	ATTR mimeMediaType document-format "image/jpeg"
+	GROUP job-attributes-tag
+	ATTR keyword print-color-mode monochrome
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	NAME "D-2.4 Print color.jpg with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR boolean ipp-attribute-fidelity true
+	GROUP job-attributes-tag
+	ATTR keyword media na_letter_8.5x11in
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	NAME "D-2.5 Print color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	ATTR mimeMediaType document-format "image/jpeg"
+	ATTR boolean ipp-attribute-fidelity true
+	GROUP job-attributes-tag
+	ATTR keyword media iso_a4_210x297mm
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#### PDF Tests
+{
+	NAME "D-3. PDF Tests (if PDF is supported)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
+	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "two-sided-long-edge" DEFINE-MATCH HAVE_DUPLEX
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.1 Print document-letter.pdf with defaults"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pdf with defaults"
+	ATTR mimeMediaType document-format "application/pdf"
+	FILE "document-letter.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.2 Print document-letter.pdf with copies=2"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pdf with copies=2"
+	ATTR mimeMediaType document-format "application/pdf"
+	GROUP job-attributes-tag
+	ATTR integer copies 2
+	FILE "document-letter.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.3 Print document-letter.pdf with page-ranges=3-3 and print-color-mode=monochrome"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pdf with page-ranges=3-3 and print-color-mode=monochrome"
+	ATTR mimeMediaType document-format "application/pdf"
+	GROUP job-attributes-tag
+	ATTR rangeOfInteger page-ranges 3-3
+	ATTR keyword print-color-mode monochrome
+	FILE "document-letter.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	SKIP-IF-NOT-DEFINED HAVE_DUPLEX
+	NAME "D-3.4 Print document-letter.pdf with sides=two-sided-long-edge"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pdf with sides=two-sided-long-edge"
+	ATTR mimeMediaType document-format "application/pdf"
+	GROUP job-attributes-tag
+	ATTR keyword sides two-sided-long-edge
+	FILE "document-letter.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.5 Print document-letter.pdf with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-letter.pdf with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	ATTR mimeMediaType document-format "application/pdf"
+	ATTR boolean ipp-attribute-fidelity true
+	GROUP job-attributes-tag
+	ATTR keyword media iso_a4_210x297mm
+	FILE "document-letter.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+{
+	SKIP-IF-NOT-DEFINED HAVE_PDF
+	NAME "D-3.6 Print document-a4.pdf with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "document-a4.pdf with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	ATTR mimeMediaType document-format "application/pdf"
+	ATTR boolean ipp-attribute-fidelity true
+	GROUP job-attributes-tag
+	ATTR keyword media na_letter_8.5x11in
+	FILE "document-a4.pdf"
+
+	STATUS successful-ok
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+}
+
+#
+# End of "$Id: document-tests.test 12127 2014-08-28 18:57:27Z msweet $".
+#

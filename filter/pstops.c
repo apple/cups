@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 12656 2015-05-22 17:27:37Z msweet $"
+ * "$Id: pstops.c 12655 2015-05-22 17:26:40Z msweet $"
  *
  * PostScript filter for CUPS.
  *
@@ -3405,5 +3405,5 @@ write_options(
 
 
 /*
- * End of "$Id: pstops.c 12656 2015-05-22 17:27:37Z msweet $".
+ * End of "$Id: pstops.c 12655 2015-05-22 17:26:40Z msweet $".
  */

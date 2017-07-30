@@ -1,9 +1,9 @@
 /*
- * "$Id: testppd.c 12604 2015-05-06 01:43:05Z msweet $"
+ * "$Id: testppd.c 12603 2015-05-06 01:42:51Z msweet $"
  *
  * PPD test program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -51,6 +51,11 @@ static const char	*default_code =
 			"%%EndFeature\n"
 			"} stopped cleartomark\n"
 			"[{\n"
+			"%%BeginFeature: *OutputBin Tray1\n"
+			"OutputBin=Tray1\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
 			"%%BeginFeature: *MediaType Plain\n"
 			"MediaType=Plain\n"
 			"%%EndFeature\n"
@@ -77,6 +82,11 @@ static const char	*custom_code =
 			"[{\n"
 			"%%BeginFeature: *MediaType Plain\n"
 			"MediaType=Plain\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *OutputBin Tray1\n"
+			"OutputBin=Tray1\n"
 			"%%EndFeature\n"
 			"} stopped cleartomark\n"
 			"[{\n"
@@ -853,6 +863,47 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
     }
   }
+  else if (!strncmp(argv[1], "ipp://", 6) || !strncmp(argv[1], "ipps://", 7))
+  {
+   /*
+    * ipp://... or ipps://...
+    */
+
+    http_t	*http;			/* Connection to printer */
+    ipp_t	*request,		/* Get-Printer-Attributes request */
+		*response;		/* Get-Printer-Attributes response */
+    char	scheme[32],		/* URI scheme */
+		userpass[256],		/* Username:password */
+		host[256],		/* Hostname */
+		resource[256];		/* Resource path */
+    int		port;			/* Port number */
+
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, argv[1], scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    {
+      printf("Bad URI \"%s\".\n", argv[1]);
+      return (1);
+    }
+
+    http = httpConnect2(host, port, NULL, AF_UNSPEC, !strcmp(scheme, "ipps") ? HTTP_ENCRYPTION_ALWAYS : HTTP_ENCRYPTION_IF_REQUESTED, 1, 30000, NULL);
+    if (!http)
+    {
+      printf("Unable to connect to \"%s:%d\": %s\n", host, port, cupsLastErrorString());
+      return (1);
+    }
+
+    request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, argv[1]);
+    response = cupsDoRequest(http, request, resource);
+
+    if (_ppdCreateFromIPP(buffer, sizeof(buffer), response))
+      printf("Created PPD: %s\n", buffer);
+    else
+      puts("Unable to create PPD.");
+
+    ippDelete(response);
+    httpClose(http);
+    return (0);
+  }
   else
   {
     const char	*filename;		/* PPD filename */
@@ -1119,5 +1170,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 12604 2015-05-06 01:43:05Z msweet $".
+ * End of "$Id: testppd.c 12603 2015-05-06 01:42:51Z msweet $".
  */

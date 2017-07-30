@@ -1,5 +1,5 @@
 /*
- * "$Id: lpadmin.c 12604 2015-05-06 01:43:05Z msweet $"
+ * "$Id: lpadmin.c 12603 2015-05-06 01:42:51Z msweet $"
  *
  * "lpadmin" command for CUPS.
  *
@@ -17,6 +17,8 @@
  * Include necessary headers...
  */
 
+#define _CUPS_NO_DEPRECATED
+#define _PPD_DEPRECATED
 #include <cups/cups-private.h>
 
 
@@ -32,6 +34,7 @@ static int		delete_printer_from_class(http_t *http, char *printer,
 static int		delete_printer_option(http_t *http, char *printer,
 			                      char *option);
 static int		enable_printer(http_t *http, char *printer);
+static char		*get_printer_ppd(const char *uri, char *buffer, size_t bufsize);
 static cups_ptype_t	get_printer_type(http_t *http, char *printer, char *uri,
 			                 size_t urisize);
 static int		set_printer_options(http_t *http, char *printer,
@@ -55,7 +58,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
-  char		*file;		/* New PPD file/interface script */
+  char		*file,		/* New PPD file/interface script */
+		evefile[1024] = "";
+				/* IPP Everywhere PPD */
+  const char	*ppd_name,	/* ppd-name value */
+		*device_uri;	/* device-uri value */
 
 
   _cupsSetLocale(argv);
@@ -73,8 +80,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'c' : /* Add printer to class */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -126,8 +132,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'd' : /* Set as default destination */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -217,10 +222,10 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    if (printer == NULL)
 	    {
 #ifdef HAVE_SSL
-	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      cupsSetEncryption(HTTP_ENCRYPTION_REQUIRED);
 
 	      if (http)
-		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+		httpEncryption(http, HTTP_ENCRYPTION_REQUIRED);
 #else
               _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 	                      argv[0]);
@@ -230,8 +235,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -316,8 +320,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'r' : /* Remove printer from class */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -370,8 +373,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'R' : /* Remove option */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -487,8 +489,7 @@ main(int  argc,			/* I - Number of command-line arguments */
         case 'x' : /* Delete a printer */
 	    if (!http)
 	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
+              http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
 	      if (http == NULL)
 	      {
@@ -621,11 +622,19 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Set options as needed...
   */
 
+  if ((ppd_name = cupsGetOption("ppd-name", num_options, options)) != NULL && !strcmp(ppd_name, "everywhere") && (device_uri = cupsGetOption("device-uri", num_options, options)) != NULL)
+  {
+    if ((file = get_printer_ppd(device_uri, evefile, sizeof(evefile))) == NULL)
+      return (1);
+
+    num_options = cupsRemoveOption("ppd-name", num_options, &options);
+  }
+
   if (num_options || file)
   {
     if (!http)
     {
-      http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+      http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
 
       if (http == NULL)
       {
@@ -647,6 +656,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     if (set_printer_options(http, printer, num_options, options, file))
       return (1);
   }
+
+  if (evefile[0])
+    unlink(evefile);
 
   if (printer == NULL)
   {
@@ -692,7 +704,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
                 printer, pclass));
 
  /*
-  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * Build an IPP_OP_GET_PRINTER_ATTRIBUTES request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -701,7 +713,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   *    requesting-user-name
   */
 
-  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                    "localhost", 0, "/classes/%s", pclass);
@@ -717,7 +729,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   response = cupsDoRequest(http, request, "/");
 
  /*
-  * Build a CUPS_ADD_MODIFY_CLASS request, which requires the following
+  * Build a CUPS-Add-Modify-Class request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -727,7 +739,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   *    member-uris
   */
 
-  request = ippNewRequest(CUPS_ADD_MODIFY_CLASS);
+  request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_CLASS);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -786,7 +798,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   ippDelete(response);
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -812,7 +824,7 @@ default_printer(http_t *http,		/* I - Server connection */
   DEBUG_printf(("default_printer(%p, \"%s\")\n", http, printer));
 
  /*
-  * Build a CUPS_SET_DEFAULT request, which requires the following
+  * Build a CUPS-Set-Default request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -824,7 +836,7 @@ default_printer(http_t *http,		/* I - Server connection */
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                    "localhost", 0, "/printers/%s", printer);
 
-  request = ippNewRequest(CUPS_SET_DEFAULT);
+  request = ippNewRequest(IPP_OP_CUPS_SET_DEFAULT);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -837,7 +849,7 @@ default_printer(http_t *http,		/* I - Server connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -863,7 +875,7 @@ delete_printer(http_t *http,		/* I - Server connection */
   DEBUG_printf(("delete_printer(%p, \"%s\")\n", http, printer));
 
  /*
-  * Build a CUPS_DELETE_PRINTER request, which requires the following
+  * Build a CUPS-Delete-Printer request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -872,7 +884,7 @@ delete_printer(http_t *http,		/* I - Server connection */
   *    requesting-user-name
   */
 
-  request = ippNewRequest(CUPS_DELETE_PRINTER);
+  request = ippNewRequest(IPP_OP_CUPS_DELETE_PRINTER);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                    "localhost", 0, "/printers/%s", printer);
@@ -887,7 +899,7 @@ delete_printer(http_t *http,		/* I - Server connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -920,7 +932,7 @@ delete_printer_from_class(
                 printer, pclass));
 
  /*
-  * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
+  * Build an IPP_OP_GET_PRINTER_ATTRIBUTES request, which requires the following
   * attributes:
   *
   *    attributes-charset
@@ -929,7 +941,7 @@ delete_printer_from_class(
   *    requesting-user-name
   */
 
-  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                    "localhost", 0, "/classes/%s", pclass);
@@ -943,7 +955,7 @@ delete_printer_from_class(
   */
 
   if ((response = cupsDoRequest(http, request, "/classes/")) == NULL ||
-      response->request.status.status_code == IPP_NOT_FOUND)
+      response->request.status.status_code == IPP_STATUS_ERROR_NOT_FOUND)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -983,7 +995,7 @@ delete_printer_from_class(
   if (members->num_values == 1)
   {
    /*
-    * Build a CUPS_DELETE_CLASS request, which requires the following
+    * Build a CUPS-Delete-Class request, which requires the following
     * attributes:
     *
     *    attributes-charset
@@ -992,7 +1004,7 @@ delete_printer_from_class(
     *    requesting-user-name
     */
 
-    request = ippNewRequest(CUPS_DELETE_CLASS);
+    request = ippNewRequest(IPP_OP_CUPS_DELETE_CLASS);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
         	 "printer-uri", NULL, uri);
@@ -1002,7 +1014,7 @@ delete_printer_from_class(
   else
   {
    /*
-    * Build a CUPS_ADD_MODIFY_CLASS request, which requires the following
+    * Build a IPP_OP_CUPS_ADD_MODIFY_CLASS request, which requires the following
     * attributes:
     *
     *    attributes-charset
@@ -1012,7 +1024,7 @@ delete_printer_from_class(
     *    member-uris
     */
 
-    request = ippNewRequest(CUPS_ADD_MODIFY_CLASS);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_CLASS);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
         	 "printer-uri", NULL, uri);
@@ -1041,7 +1053,7 @@ delete_printer_from_class(
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -1066,7 +1078,7 @@ delete_printer_option(http_t *http,	/* I - Server connection */
 
 
  /*
-  * Build a CUPS_ADD_MODIFY_PRINTER or CUPS_ADD_MODIFY_CLASS request, which
+  * Build a IPP_OP_CUPS_ADD_MODIFY_PRINTER or IPP_OP_CUPS_ADD_MODIFY_CLASS request, which
   * requires the following attributes:
   *
   *    attributes-charset
@@ -1077,9 +1089,9 @@ delete_printer_option(http_t *http,	/* I - Server connection */
   */
 
   if (get_printer_type(http, printer, uri, sizeof(uri)) & CUPS_PRINTER_CLASS)
-    request = ippNewRequest(CUPS_ADD_MODIFY_CLASS);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_CLASS);
   else
-    request = ippNewRequest(CUPS_ADD_MODIFY_PRINTER);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_PRINTER);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -1093,7 +1105,7 @@ delete_printer_option(http_t *http,	/* I - Server connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -1119,7 +1131,7 @@ enable_printer(http_t *http,		/* I - Server connection */
   DEBUG_printf(("enable_printer(%p, \"%s\")\n", http, printer));
 
  /*
-  * Build a CUPS_ADD_MODIFY_PRINTER or CUPS_ADD_MODIFY_CLASS request, which
+  * Build a IPP_OP_CUPS_ADD_MODIFY_PRINTER or IPP_OP_CUPS_ADD_MODIFY_CLASS request, which
   * require the following attributes:
   *
   *    attributes-charset
@@ -1131,16 +1143,16 @@ enable_printer(http_t *http,		/* I - Server connection */
   */
 
   if (get_printer_type(http, printer, uri, sizeof(uri)) & CUPS_PRINTER_CLASS)
-    request = ippNewRequest(CUPS_ADD_MODIFY_CLASS);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_CLASS);
   else
-    request = ippNewRequest(CUPS_ADD_MODIFY_PRINTER);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_PRINTER);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, cupsUser());
   ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
-                IPP_PRINTER_IDLE);
+                IPP_PSTATE_IDLE);
   ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
 
  /*
@@ -1149,7 +1161,7 @@ enable_printer(http_t *http,		/* I - Server connection */
 
   ippDelete(cupsDoRequest(http, request, "/admin/"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -1157,6 +1169,79 @@ enable_printer(http_t *http,		/* I - Server connection */
   }
   else
     return (0);
+}
+
+
+/*
+ * 'get_printer_ppd()' - Get an IPP Everywhere PPD file for the given URI.
+ */
+
+static char *				/* O - Filename or NULL */
+get_printer_ppd(const char *uri,	/* I - Printer URI */
+                char       *buffer,	/* I - Filename buffer */
+		size_t     bufsize)	/* I - Size of filename buffer */
+{
+  http_t	*http;			/* Connection to printer */
+  ipp_t		*request,		/* Get-Printer-Attributes request */
+		*response;		/* Get-Printer-Attributes response */
+  char		resolved[1024],		/* Resolved URI */
+		scheme[32],		/* URI scheme */
+		userpass[256],		/* Username:password */
+		host[256],		/* Hostname */
+		resource[256];		/* Resource path */
+  int		port;			/* Port number */
+
+
+ /*
+  * Connect to the printer...
+  */
+
+  if (strstr(uri, "._tcp"))
+  {
+   /*
+    * Resolve URI...
+    */
+
+    if (!_httpResolveURI(uri, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
+    {
+      _cupsLangPrintf(stderr, _("%s: Unable to resolve \"%s\"."), "lpadmin", uri);
+      return (NULL);
+    }
+
+    uri = resolved;
+  }
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+  {
+    _cupsLangPrintf(stderr, _("%s: Bad printer URI \"%s\"."), "lpadmin", uri);
+    return (NULL);
+  }
+
+  http = httpConnect2(host, port, NULL, AF_UNSPEC, !strcmp(scheme, "ipps") ? HTTP_ENCRYPTION_ALWAYS : HTTP_ENCRYPTION_IF_REQUESTED, 1, 30000, NULL);
+  if (!http)
+  {
+    _cupsLangPrintf(stderr, _("%s: Unable to connect to \"%s:%d\": %s"), "lpadmin", host, port, cupsLastErrorString());
+    return (NULL);
+  }
+
+ /*
+  * Send a Get-Printer-Attributes request...
+  */
+
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  response = cupsDoRequest(http, request, resource);
+
+  if (!_ppdCreateFromIPP(buffer, bufsize, response))
+    _cupsLangPrintf(stderr, _("%s: Unable to create PPD file: %s"), "lpadmin", strerror(errno));
+
+  ippDelete(response);
+  httpClose(http);
+
+  if (buffer[0])
+    return (buffer);
+  else
+    return (NULL);
 }
 
 
@@ -1189,7 +1274,7 @@ get_printer_type(http_t *http,		/* I - Server connection */
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, (int)urisize, "ipp", NULL, "localhost", ippPort(), "/printers/%s", printer);
 
-  request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
@@ -1257,8 +1342,8 @@ set_printer_options(
 		options, file));
 
  /*
-  * Build a CUPS_ADD_MODIFY_PRINTER or CUPS_ADD_MODIFY_CLASS request, which
-  * requires the following attributes:
+  * Build a CUPS-Add-Modify-Printer or CUPS-Add-Modify-Class request,
+  * which requires the following attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
@@ -1268,31 +1353,16 @@ set_printer_options(
   */
 
   if (get_printer_type(http, printer, uri, sizeof(uri)) & CUPS_PRINTER_CLASS)
-    request = ippNewRequest(CUPS_ADD_MODIFY_CLASS);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_CLASS);
   else
-    request = ippNewRequest(CUPS_ADD_MODIFY_PRINTER);
+    request = ippNewRequest(IPP_OP_CUPS_ADD_MODIFY_PRINTER);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-               "printer-uri", NULL, uri);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, cupsUser());
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
 
  /*
   * Add the options...
   */
-
-  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
-  cupsEncodeOptions2(request, num_options, options, IPP_TAG_PRINTER);
-
-  if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
-  {
-    if (!_cups_strcasecmp(protocol, "bcp"))
-      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
-                   NULL, "bcp");
-    else if (!_cups_strcasecmp(protocol, "tbcp"))
-      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
-                   NULL, "tbcp");
-  }
 
   if (file)
     ppdfile = file;
@@ -1316,12 +1386,25 @@ set_printer_options(
       options        = temp;
     }
   }
-  else if (request->request.op.operation_id == CUPS_ADD_MODIFY_PRINTER)
+  else if (request->request.op.operation_id == IPP_OP_CUPS_ADD_MODIFY_PRINTER)
     ppdfile = cupsGetPPD(printer);
   else
     ppdfile = NULL;
 
-  if (ppdfile != NULL)
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_PRINTER);
+
+  if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
+  {
+    if (!_cups_strcasecmp(protocol, "bcp"))
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
+                   NULL, "bcp");
+    else if (!_cups_strcasecmp(protocol, "tbcp"))
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
+                   NULL, "tbcp");
+  }
+
+  if (ppdfile)
   {
    /*
     * Set default options in the PPD file...
@@ -1493,7 +1576,7 @@ set_printer_options(
   * Check the response...
   */
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() > IPP_STATUS_OK_CONFLICTING)
   {
     _cupsLangPrintf(stderr, _("%s: %s"), "lpadmin", cupsLastErrorString());
 
@@ -1534,5 +1617,5 @@ validate_name(const char *name)		/* I - Name to check */
 
 
 /*
- * End of "$Id: lpadmin.c 12604 2015-05-06 01:43:05Z msweet $".
+ * End of "$Id: lpadmin.c 12603 2015-05-06 01:42:51Z msweet $".
  */

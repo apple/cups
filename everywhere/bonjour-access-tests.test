@@ -1,0 +1,42 @@
+#
+# "$Id: bonjour-access-tests.test 12120 2014-08-27 20:52:33Z msweet $"
+#
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
+#
+# Copyright 2014 by The Printer Working Group.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool -tI printer-uri bonjour-access-tests.test
+#
+
+FILE-ID "org.pwg.ipp-everywhere.20140826.bonjour"
+
+{
+	# The name of the test...
+	NAME "Validate access using Get-Printer-Attributes"
+
+	# The operation to use
+	OPERATION Get-Printer-Attributes
+
+	# Attributes, starting in the operation group...
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	# What statuses are OK?
+	STATUS successful-ok
+}
+
+#
+# End of "$Id: bonjour-access-tests.test 12120 2014-08-27 20:52:33Z msweet $".
+#

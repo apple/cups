@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaccept.man 11913 2014-06-10 19:00:24Z msweet $"
+.\" "$Id: cupsaccept.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" accept/reject man page for CUPS.
 .\"
@@ -88,7 +88,7 @@ Finally, the CUPS versions may ask the user for an access password depending on 
 .br
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cupsaccept.man 11913 2014-06-10 19:00:24Z msweet $".
+.\" End of "$Id: cupsaccept.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

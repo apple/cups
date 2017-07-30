@@ -1,9 +1,9 @@
 /*
- * "$Id: main.c 12701 2015-06-08 18:33:44Z msweet $"
+ * "$Id: main.c 13087 2016-02-12 18:53:24Z msweet $"
  *
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -20,6 +20,12 @@
 #define _MAIN_C_
 #include "cupsd.h"
 #include <sys/resource.h>
+#ifdef HAVE_ASL_H
+#  include <asl.h>
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#  define SD_JOURNAL_SUPPRESS_LOCATION
+#  include <systemd/sd-journal.h>
+#endif /* HAVE_ASL_H */
 #include <syslog.h>
 #include <grp.h>
 
@@ -396,6 +402,8 @@ main(int  argc,				/* I - Number of command-line args */
       close(i);
     }
   }
+  else
+    LogStderr = cupsFileStderr();
 
  /*
   * Run in the background as needed...
@@ -728,8 +736,19 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (!cupsdReadConfiguration())
         {
-          syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-		 ConfigurationFile);
+#ifdef HAVE_ASL_H
+	  asl_object_t	m;		/* Log message */
+
+	  m = asl_new(ASL_TYPE_MSG);
+	  asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	  asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read configuration file \"%s\" - exiting.", ConfigurationFile);
+	  asl_release(m);
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	  sd_journal_print(LOG_ERR, "Unable to read configuration file \"%s\" - exiting.", ConfigurationFile);
+#else
+          syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting.", ConfigurationFile);
+#endif /* HAVE_ASL_H */
+
           break;
 	}
 
@@ -1554,7 +1573,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   time_t		now;		/* Current time */
   cupsd_client_t	*con;		/* Client information */
   cupsd_job_t		*job;		/* Job information */
-  cupsd_subscription_t	*sub;		/* Subscription information */
   const char		*why;		/* Debugging aid */
 
 
@@ -1690,19 +1708,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     why     = "display memory usage";
   }
 #endif /* HAVE_MALLINFO */
-
- /*
-  * Expire subscriptions as needed...
-  */
-
-  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
-       sub;
-       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if (!sub->job && sub->expire && sub->expire < timeout)
-    {
-      timeout = sub->expire;
-      why     = "expire subscription";
-    }
 
  /*
   * Adjust from absolute to relative time.  We add 1 second to the timeout since
@@ -2120,14 +2125,12 @@ service_checkout(void)
 
 
  /*
-  * Create or remove the systemd path file based on whether there are active
+  * Create or remove the "keep-alive" file based on whether there are active
   * jobs or shared printers to advertise...
   */
 
   if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
-#  ifdef HAVE_SYSTEMD
       WebInterface ||			/* Web interface enabled */
-#  endif /* HAVE_SYSTEMD */
       (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
 					/* Printers being shared */
   {
@@ -2160,17 +2163,16 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(fp, _("Options:"));
   _cupsLangPuts(fp, _("  -c cupsd.conf           Set cupsd.conf file to use."));
   _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
-  _cupsLangPuts(fp, _("  -F                      Run in the foreground but "
-                      "detach from console."));
+  _cupsLangPuts(fp, _("  -F                      Run in the foreground but detach from console."));
   _cupsLangPuts(fp, _("  -h                      Show this usage message."));
   _cupsLangPuts(fp, _("  -l                      Run cupsd on demand."));
-  _cupsLangPuts(fp, _("  -t                      Test the configuration "
-                      "file."));
+  _cupsLangPuts(fp, _("  -s cups-files.conf      Set cups-files.conf file to use."));
+  _cupsLangPuts(fp, _("  -t                      Test the configuration file."));
 
   exit(status);
 }
 
 
 /*
- * End of "$Id: main.c 12701 2015-06-08 18:33:44Z msweet $".
+ * End of "$Id: main.c 13087 2016-02-12 18:53:24Z msweet $".
  */

@@ -1,9 +1,9 @@
 /*
- * "$Id: string-private.h 11889 2014-05-22 13:54:15Z msweet $"
+ * "$Id: string-private.h 12928 2015-10-23 21:31:58Z msweet $"
  *
  * Private string definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -147,6 +147,7 @@ extern int _cups_toupper(int ch);
  * Prototypes...
  */
 
+extern ssize_t	_cups_safe_vsnprintf(char *, size_t, const char *, va_list);
 extern void	_cups_strcpy(char *dst, const char *src);
 
 #  ifndef HAVE_STRDUP
@@ -218,5 +219,5 @@ extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval);
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string-private.h 11889 2014-05-22 13:54:15Z msweet $".
+ * End of "$Id: string-private.h 12928 2015-10-23 21:31:58Z msweet $".
  */

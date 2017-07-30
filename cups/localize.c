@@ -1,9 +1,9 @@
 /*
- * "$Id: localize.c 11698 2014-03-17 11:58:18Z msweet $"
+ * "$Id: localize.c 12834 2015-08-06 13:56:32Z msweet $"
  *
  * PPD localization routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -664,8 +664,23 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
   snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll_CC, keyword);
   if ((attr = ppdFindAttr(ppd, lkeyword, spec)) == NULL)
   {
-    snprintf(lkeyword, sizeof(lkeyword), "%2.2s.%s", ll_CC, keyword);
-    attr = ppdFindAttr(ppd, lkeyword, spec);
+   /*
+    * <rdar://problem/22130168>
+    *
+    * Hong Kong locale needs special handling...  Sigh...
+    */
+
+    if (!strcmp(ll_CC, "zh_HK"))
+    {
+      snprintf(lkeyword, sizeof(lkeyword), "zh_TW.%s", keyword);
+      attr = ppdFindAttr(ppd, lkeyword, spec);
+    }
+
+    if (!attr)
+    {
+      snprintf(lkeyword, sizeof(lkeyword), "%2.2s.%s", ll_CC, keyword);
+      attr = ppdFindAttr(ppd, lkeyword, spec);
+    }
 
     if (!attr)
     {
@@ -760,5 +775,5 @@ ppd_ll_CC(char   *ll_CC,		/* O - Country-specific locale name */
 
 
 /*
- * End of "$Id: localize.c 11698 2014-03-17 11:58:18Z msweet $".
+ * End of "$Id: localize.c 12834 2015-08-06 13:56:32Z msweet $".
  */

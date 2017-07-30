@@ -1,0 +1,215 @@
+CHANGES-2.0.txt
+---------------
+
+CHANGES IN CUPS V2.0.4
+
+	- Fixed a bug in cupsRasterWritePixels (STR #4650)
+	- Fixed redirection in the web interface (STR #4538)
+	- The IPP backend did not respond to side-channel requests (STR #4645)
+	- The scheduler did not start all pending jobs at once (STR #4646)
+	- The web search incorrectly searched time-at-xxx values (STR #4652)
+	- Fixed an RPM spec file issue (STR #4657)
+	- The scheduler incorrectly started jobs while canceling multiple jobs
+	  (STR #4648)
+	- Fixed processing of server overrides without port numbers (STR #4675)
+	- Documentation changes (STR #4651, STR #4674)
+
+
+CHANGES IN CUPS V2.0.3
+
+	- Security: Fixed CERT VU #810572 exploiting the dynamic linker
+	  (STR #4609)
+	- Security: The scheduler could hang with malformed gzip data
+	  (STR #4602)
+	- Restored missing generic printer icon file (STR #4587)
+	- Fixed logging of configuration errors to show up as errors (STR #4582)
+	- Fixed potential buffer overflows in raster code and filters
+	  (STR #4598, STR #4599, STR #4600, STR #4601)
+	- Fixed a gzip processing bug (#4602)
+	- Fixed <Limit> inside <Location> (STR #4575)
+	- Fixed lpadmin when both -m and -o are used (STR #4578)
+	- The web interface always showed support for 2-sided printing
+	  (STR #4595)
+	- cupsRasterReadHeader did not fully validate the raster header
+	  (STR #4596)
+	- The rastertopwg filter did not check for truncated input (STR #4597)
+	- The cups-lpd mini-daemon did not check for request parameters
+	  (STR #4603)
+	- The scheduler could get caught in a busy loop (STR #4605)
+	- The sample Epson driver could crash (STR #4616)
+	- The IPP backend now correctly monitors jobs
+	  (<rdar://problem/20495955>)
+	- The ppdhtml and ppdpo utilities crashed when the -D option was used
+	  before a driver information file (STR #4627)
+	- ippfind incorrectly substituted "=port" for service_port.
+	- The IPP/1.1 test file did not handle the initial print job
+	  completing early (STR #4576)
+	- Fixed a memory leak in cupsConnectDest (STR #4634)
+	- PWG Raster Format output contained invalid ImageBox values
+	  (<rdar://problem/21144309>)
+	- Added Russian translation (STR #4577)
+	- Added German translation (STR #4635)
+
+
+CHANGES IN CUPS V2.0.2
+
+	- Security: cupsRasterReadPixels buffer overflow with invalid page
+	  header and compressed raster data (STR #4551)
+	- Command-line programs were not localized on Mac OS X
+	  (<rdar://problem/14546232>)
+	- The scheduler incorrectly cleared the MakeModel string in the
+	  printers.conf file after a restart (<rdar://problem/16827518>)
+	- CUPS did not compile with older versions of GNU TLS (STR #4527)
+	- CUPS did not compile without Avahi or mDNSResponder (STR #4523)
+	- ippLength() did not return the correct length for IPP_TAG_CONST
+	  string values.
+	- The scheduler incorrectly aborted jobs after a job was restarted
+	  (<rdar://problem/19129387>)
+	- The cups-files.conf file contained the old ServerCertificate/Key
+	  directives instead of ServerKeychain.
+	- Fixed builds when no SSL/TLS library is available, or when explicitly
+	  disabled (STR #4531)
+	- Fixed an OpenBSD charset transcoding issue.
+	- Fixed USB printing on OpenBSD (STR #4525)
+	- The --without-xinetd configure option did not work (STR #4542)
+	- Backends needing to load OS X kernel extensions did not work
+	  (<rdar://problem/19015679>)
+	- Mapping of PPD keywords to IPP keywords did not work if the PPD
+	  keyword was already an IPP keyword (<rdar://problem/19121005>)
+	- cupsGetPPD* sent bad requests (STR #4567)
+	- ippserver used the wrong temporary directory on Windows (STR #4547)
+	- ippserver did not handle Bonjour registrations properly (STR #4548)
+	- The scheduler could crash during shutdown if Avahi was shutdown
+	  first (STR #4550)
+	- Added a USB quirk rule for Intermec printers (STR #4553)
+	- The scheduler did not always log which configuration file had the
+	  error (STR #4559)
+	- The ippfind and ipptool programs now correctly match hostnames with
+	  trailing dots (STR #4563)
+	- The ipptool timeout option did not work (STR #4515)
+	- Fixed several issues with client.conf, CUPS_SERVER, and the "-h"
+	  option of most commands (STR #4528)
+	- Another change for OpenBSD (STR #4526)
+	- Added Japanese localization (STR #4524)
+	- Documentation changes (STR #4569)
+
+
+CHANGES IN CUPS V2.0.1
+
+	- Security: SSLv3 is now disabled by default to protect against the
+	  POODLE attack (STR #4476)
+	- Printer sharing did not work when systemd was being used (STR #4497)
+	- cupsGetPPD* would return a symlink to the PPD in /etc/cups/ppd even if
+	  it was not readable by the user (STR #4500)
+	- The web interface now protects against frame "click-jacking" attacks
+	  (STR #4492)
+	- Fixed a crash in ippAttributeString (<rdar://problem/17903871>)
+	- Fixed a crash in the scheduler on Linux/*BSD if colord was not running
+	  (STR #4496)
+	- Fixed a random crash in the scheduler when not using systemd
+	  (STR #4484)
+	- Added systemd support for cups-lpd (STR #4493)
+	- The scheduler did not honor the FatalErrors directive for mis-
+	  configured Group and SystemGroup values (STR #4495)
+	- The network backends no longer report waste-receptacle conditions when
+	  using SNMP (STR #4499)
+	- The IPP backend did not work with some configurations of Windows
+	  (STR #4503)
+	- RPMs did not build (STR #4490)
+	- Added a USB quirk rule for the Brother HL-1250 (STR #4519)
+	- Fixed compiles on unsupported platforms (STR #4510)
+	- "cancel -a" did not cancel all jobs on all destinations (STR #4513)
+	- The web interface did not work on OpenBSD (STR #4496)
+
+
+CHANGES IN CUPS V2.0.0
+
+	- The scheduler did not preserve listener sockets from launchd or
+	  systemd after a restart (<rdar://problem/18112848>)
+	- Added some USB quirk rules for the libusb-based USB backend
+	  (STR #4482)
+	- Spanish localization update (STR #4487)
+	- Updated documentation for 2.0.0 release.
+
+
+CHANGES IN CUPS V2.0rc1
+
+	- Documentation updates (STR #4464)
+	- The scheduler now monitors the AC power status on OS X, allowing for
+	  "sleep printing" when sharing printers (<rdar://problem/17325852>)
+	- The scheduler incorrectly called launch_activate_socket multiple times
+	  on OS X (<rdar://problem/17523218>)
+	- The ippserver test program now passes the IPP Everywhere self-
+	  certification tests (STR #4101)
+	- Relaxed the new OS X filter sandbox slightly (STR #4471,
+	  <rdar://problem/17483959>)
+	- Dropped the old Epson Stylus Color/Photo sample drivers since they
+	  don't work with any current printers and there are free alternatives
+	  that produce much better output (<rdar://problem/18036889>)
+	- Log and configuration files that are not world-readable are again
+	  accessible via the web interface (STR #4461)
+	- PPD files are now created using the permissions specified by the
+	  ConfigFilePerm directive.
+	- Fixed RPM build issues (STR #4459)
+	- Fixed the spinner image and restart page when reconfiguring the
+	  scheduler through the web interface (STR #4475)
+
+
+CHANGES IN CUPS V2.0b1
+
+	- Added a "--list-filters" option to the cupsfilter command (STR #4325)
+        - Added systemd support (STR #3917)
+	- Added support for re-sending a job as a raster file if a higher-level
+	  format such as PDF fails (<rdar://problem/15583721>)
+	- Added support for regular expression matching in the MIME type rules
+	  (<rdar://problem/11131245>)
+	- Added support for TLS certificate validation and policy enforcement
+	  (STR #1616)
+	- Added support for simultaneous XML and test output from ipptool.
+	- Added support for PAUSE directive in ipptool test files.
+	- Added support for auto-typing of TIFF files by ipptool (STR #4418)
+	- The scheduler now returns completed jobs in the correct newest-to-
+	  oldest order (STR #4396)
+	- The configure script now supports target-specific tools for pkg-config
+	  and others (STR #4423)
+	- The ipptool program now supports EXPECT statements for collection
+	  member attributes (<rdar://problem/15355218>)
+	- The ipptool program now supports collection attributes with multiple
+	  values (<rdar://problem/15355124>)
+	- The sample drivers now include all of the installed localizations by
+	  default (<rdar://problem/14756625>)
+	- Adopted Linux man page conventions and updated all man pages
+	  (STR #4372, STR #4329)
+	- The scheduler now supports the "first-index" operation attribute for
+	  the Get-Jobs operation (STR #2913)
+	- Changed the default AccessLogLevel and PageLogFormat to disable the
+	  access_log and page_log files by default (<rdar://problem/16495000>)
+	- cupsRasterInterpretPPD now supports the Orientation header in order to
+	  support long-edge feed raster printers (<rdar://problem/15837926>)
+	- The scheduler now allows run-as-root backends to have group read and
+	  execute permissions (STR #2935)
+	- The ippFindAttribute and ippFindNextAttribute functions now support
+	  hierarchical searches (STR #4395)
+	- Dropped OpenSSL support in favor of GNU TLS.
+	- Dropped "dark wake" support on OS X, which was preventing portables
+	  from going to sleep when there was a stuck job. We now use a variation
+	  of the CUPS 1.4 sleep support to do a cleaner sleep
+	  (<rdar://problem/14323704>)
+	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
+	- Dropped lppasswd and support for Digest authentication in in the
+	  scheduler (STR #4321)
+	- The cupsGetClasses, cupsGetPrinters, and cupsTempFile functions are no
+	  longer supported.
+	- The scheduler now caches more job history data and limits the number
+	  of completed jobs returned by Get-Jobs as needed in order to prevent a
+	  denial-of-service on busy servers (STR #2913)
+	- The filter/backend sandbox on OS X now defaults to a more strict
+	  whitelist (<rdar://problem/15939788>)
+	- Increased the default idle exit timeout to 60 seconds on OS X
+	  (<rdar://problem/16041820>)
+	- Printer classes were not accessible on OS X
+	  (<rdar://problem/16385643>)
+	- The scheduler now uses </DefaultPrinter> to close the default printer
+	  definition in printers.conf (STR #4153)
+	- Canceling all jobs in the web interface now just cancels the jobs
+	  (STR #1914)

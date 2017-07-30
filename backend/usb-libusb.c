@@ -1,9 +1,9 @@
 /*
- * "$Id: usb-libusb.c 12349 2014-12-09 22:10:52Z msweet $"
+ * "$Id: usb-libusb.c 12881 2015-09-15 21:20:02Z msweet $"
  *
  * LIBUSB interface code for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -103,6 +103,7 @@ typedef struct usb_globals_s		/* Global USB printer information */
 #define USB_QUIRK_USB_INIT	0x0010	/* Needs vendor USB init string */
 #define USB_QUIRK_VENDOR_CLASS	0x0020	/* Descriptor uses vendor-specific
 					   Class or SubClass */
+#define USB_QUIRK_DELAY_CLOSE	0x0040	/* Delay close */
 #define USB_QUIRK_WHITELIST	0x0000	/* no quirks */
 
 
@@ -640,6 +641,9 @@ print_device(const char *uri,		/* I - Device URI */
  /*
   * Close the connection and input file and general clean up...
   */
+
+  if (g.printer->quirks & USB_QUIRK_DELAY_CLOSE)
+    sleep(1);
 
   close_device(g.printer);
 
@@ -1211,6 +1215,9 @@ load_quirks(void)
       if (strstr(line, " blacklist"))
         quirk->quirks |= USB_QUIRK_BLACKLIST;
 
+      if (strstr(line, " delay-close"))
+        quirk->quirks |= USB_QUIRK_DELAY_CLOSE;
+
       if (strstr(line, " no-reattach"))
         quirk->quirks |= USB_QUIRK_NO_REATTACH;
 
@@ -1522,6 +1529,16 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
       goto error;
     }
+    else if ((errcode = libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
+    {
+      fprintf(stderr,
+              "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
+              devdesc.idVendor, devdesc.idProduct);
+
+      goto error;
+    }
+
+    sleep (1);
   }
 
  /*
@@ -2004,6 +2021,6 @@ soft_reset_printer(
 
 
 /*
- * End of "$Id: usb-libusb.c 12349 2014-12-09 22:10:52Z msweet $".
+ * End of "$Id: usb-libusb.c 12881 2015-09-15 21:20:02Z msweet $".
  */
 

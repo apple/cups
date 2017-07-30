@@ -1,9 +1,9 @@
 dnl
-dnl "$Id: cups-ssl.m4 12290 2014-12-05 17:25:55Z msweet $"
+dnl "$Id: cups-ssl.m4 12645 2015-05-20 01:20:52Z msweet $"
 dnl
 dnl TLS stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -53,6 +53,10 @@ if test x$enable_ssl != xno; then
 
 		AC_DEFINE(HAVE_CSSMERRORSTRING)
 		AC_DEFINE(HAVE_SECKEYCHAINOPEN)])
+
+		if test $uversion -ge 150; then
+			AC_DEFINE(HAVE_SSLSETENABLEDCIPHERS)
+		fi
 	fi
     fi
 
@@ -104,5 +108,5 @@ EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)
 
 dnl
-dnl End of "$Id: cups-ssl.m4 12290 2014-12-05 17:25:55Z msweet $".
+dnl End of "$Id: cups-ssl.m4 12645 2015-05-20 01:20:52Z msweet $".
 dnl

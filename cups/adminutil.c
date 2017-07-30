@@ -1,9 +1,9 @@
 /*
- * "$Id: adminutil.c 11598 2014-02-18 18:58:19Z msweet $"
+ * "$Id: adminutil.c 12945 2015-10-26 19:46:02Z msweet $"
  *
  * Administration utility API definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 2001-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1175,6 +1175,7 @@ cupsAdminSetServerSettings(
 		in_cancel_job,		/* In a cancel-job section? */
 		in_admin_location,	/* In the /admin location? */
 		in_conf_location,	/* In the /admin/conf location? */
+		in_log_location,	/* In the /admin/log location? */
 		in_root_location;	/* In the / location? */
   const char	*val;			/* Setting value */
   int		share_printers,		/* Share local printers */
@@ -1188,6 +1189,7 @@ cupsAdminSetServerSettings(
 		wrote_loglevel,		/* Wrote the LogLevel line? */
 		wrote_admin_location,	/* Wrote the /admin location? */
 		wrote_conf_location,	/* Wrote the /admin/conf location? */
+		wrote_log_location,	/* Wrote the /admin/log location? */
 		wrote_root_location;	/* Wrote the / location? */
   int		indent;			/* Indentation */
   int		cupsd_num_settings;	/* New number of settings */
@@ -1401,12 +1403,14 @@ cupsAdminSetServerSettings(
   in_conf_location     = 0;
   in_default_policy    = 0;
   in_location          = 0;
+  in_log_location      = 0;
   in_policy            = 0;
   in_root_location     = 0;
   linenum              = 0;
   wrote_admin_location = 0;
   wrote_browsing       = 0;
   wrote_conf_location  = 0;
+  wrote_log_location   = 0;
   wrote_loglevel       = 0;
   wrote_policy         = 0;
   wrote_port_listen    = 0;
@@ -1550,8 +1554,10 @@ cupsAdminSetServerSettings(
       indent += 2;
       if (!strcmp(value, "/admin"))
 	in_admin_location = 1;
-      if (!strcmp(value, "/admin/conf"))
+      else if (!strcmp(value, "/admin/conf"))
 	in_conf_location = 1;
+      else if (!strcmp(value, "/admin/log"))
+	in_log_location = 1;
       else if (!strcmp(value, "/"))
 	in_root_location = 1;
 
@@ -1593,6 +1599,23 @@ cupsAdminSetServerSettings(
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
       }
+      else if (in_log_location && remote_admin >= 0)
+      {
+	wrote_log_location = 1;
+
+	if (remote_admin)
+          cupsFilePuts(temp, "  # Allow remote access to the log "
+	                     "files...\n");
+	else
+          cupsFilePuts(temp, "  # Restrict access to the log "
+	                     "files...\n");
+
+        cupsFilePuts(temp, "  Order allow,deny\n");
+
+	if (remote_admin)
+	  cupsFilePrintf(temp, "  Allow %s\n",
+	                 remote_any > 0 ? "all" : "@LOCAL");
+      }
       else if (in_root_location &&
                (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
       {
@@ -1619,6 +1642,7 @@ cupsAdminSetServerSettings(
 
       in_admin_location = 0;
       in_conf_location  = 0;
+      in_log_location   = 0;
       in_root_location  = 0;
 
       cupsFilePuts(temp, "</Location>\n");
@@ -1857,6 +1881,25 @@ cupsAdminSetServerSettings(
       cupsFilePuts(temp, "# Restrict access to the configuration files...\n");
 
     cupsFilePuts(temp, "<Location /admin/conf>\n"
+                       "  AuthType Default\n"
+                       "  Require user @SYSTEM\n"
+                       "  Order allow,deny\n");
+
+    if (remote_admin)
+      cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
+
+    cupsFilePuts(temp, "</Location>\n");
+  }
+
+  if (!wrote_log_location && remote_admin >= 0)
+  {
+    if (remote_admin)
+      cupsFilePuts(temp,
+                   "# Allow remote access to the log files...\n");
+    else
+      cupsFilePuts(temp, "# Restrict access to the log files...\n");
+
+    cupsFilePuts(temp, "<Location /admin/log>\n"
                        "  AuthType Default\n"
                        "  Require user @SYSTEM\n"
                        "  Order allow,deny\n");
@@ -2326,5 +2369,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 11598 2014-02-18 18:58:19Z msweet $".
+ * End of "$Id: adminutil.c 12945 2015-10-26 19:46:02Z msweet $".
  */

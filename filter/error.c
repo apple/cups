@@ -1,5 +1,5 @@
 /*
- * "$Id: error.c 12748 2015-06-24 15:58:40Z msweet $"
+ * "$Id: error.c 12747 2015-06-24 15:55:05Z msweet $"
  *
  * Raster error handling for CUPS.
  *
@@ -275,5 +275,5 @@ get_error_buffer(void)
 
 
 /*
- * End of "$Id: error.c 12748 2015-06-24 15:58:40Z msweet $".
+ * End of "$Id: error.c 12747 2015-06-24 15:55:05Z msweet $".
  */

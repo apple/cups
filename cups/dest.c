@@ -1,9 +1,9 @@
 /*
- * "$Id: dest.c 12665 2015-05-25 15:08:55Z msweet $"
+ * "$Id: dest.c 13075 2016-01-29 21:14:05Z msweet $"
  *
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -122,7 +122,7 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 #ifdef __APPLE__
 static CFArrayRef	appleCopyLocations(void);
 static CFStringRef	appleCopyNetwork(void);
-static char		*appleGetPaperSize(char *name, int namesize);
+static char		*appleGetPaperSize(char *name, size_t namesize);
 static CFStringRef	appleGetPrinter(CFArrayRef locations,
 			                CFStringRef network, CFIndex *locindex);
 #endif /* __APPLE__ */
@@ -871,7 +871,7 @@ cupsEnumDests(
   */
 
   num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
-                            &dests, type, mask);
+                            &dests, type, mask | CUPS_PRINTER_3D);
 
   if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
     defprinter = name;
@@ -1743,7 +1743,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   *dests    = (cups_dest_t *)0;
-  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, 0);
+  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, CUPS_PRINTER_3D);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -1960,7 +1960,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * Get the printer's attributes...
   */
 
-  if (!_cupsGetDests(http, op, name, &dest, 0, 0))
+  if (!_cupsGetDests(http, op, name, &dest, 0, CUPS_PRINTER_3D))
     return (NULL);
 
   if (instance)
@@ -2136,7 +2136,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Get the server destinations...
   */
 
-  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, 0);
+  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, CUPS_PRINTER_3D);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -2491,8 +2491,8 @@ appleCopyNetwork(void)
  */
 
 static char *				/* O - Default paper size */
-appleGetPaperSize(char *name,		/* I - Paper size name buffer */
-                  int  namesize)	/* I - Size of buffer */
+appleGetPaperSize(char   *name,		/* I - Paper size name buffer */
+                  size_t namesize)	/* I - Size of buffer */
 {
   CFStringRef	defaultPaperID;		/* Default paper ID */
   pwg_media_t	*pwgmedia;		/* PWG media size */
@@ -2501,8 +2501,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
   defaultPaperID = _cupsAppleCopyDefaultPaperID();
   if (!defaultPaperID ||
       CFGetTypeID(defaultPaperID) != CFStringGetTypeID() ||
-      !CFStringGetCString(defaultPaperID, name, namesize,
-			  kCFStringEncodingUTF8))
+      !CFStringGetCString(defaultPaperID, name, (CFIndex)namesize, kCFStringEncodingUTF8))
     name[0] = '\0';
   else if ((pwgmedia = pwgMediaForLegacy(name)) != NULL)
     strlcpy(name, pwgmedia->pwg, namesize);
@@ -3943,5 +3942,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 12665 2015-05-25 15:08:55Z msweet $".
+ * End of "$Id: dest.c 13075 2016-01-29 21:14:05Z msweet $".
  */

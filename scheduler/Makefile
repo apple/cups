@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 12222 2014-10-21 11:55:01Z msweet $"
+# "$Id: Makefile 12519 2015-02-17 13:10:19Z msweet $"
 #
 # Scheduler Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -402,6 +402,12 @@ cupsfilter:	cupsfilter.o $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	$(RM) convert
 	$(LN) cupsfilter convert
 
+cupsfilter-static:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsfilter-static cupsfilter.o libcupsmime.a \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		$(DNSSDLIBS) $(LIBGSSAPI)
+
 
 #
 # Make the device daemon, "cups-deviced".
@@ -548,5 +554,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 12222 2014-10-21 11:55:01Z msweet $".
+# End of "$Id: Makefile 12519 2015-02-17 13:10:19Z msweet $".
 #

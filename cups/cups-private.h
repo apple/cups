@@ -1,9 +1,9 @@
 /*
- * "$Id: cups-private.h 11851 2014-05-07 23:55:35Z msweet $"
+ * "$Id: cups-private.h 12441 2015-01-29 14:42:32Z msweet $"
  *
  *   Private definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
+ *   Copyright 2007-2015 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -281,5 +281,5 @@ extern char		*_cupsUserDefault(char *name, size_t namesize);
 #endif /* !_CUPS_CUPS_PRIVATE_H_ */
 
 /*
- * End of "$Id: cups-private.h 11851 2014-05-07 23:55:35Z msweet $".
+ * End of "$Id: cups-private.h 12441 2015-01-29 14:42:32Z msweet $".
  */

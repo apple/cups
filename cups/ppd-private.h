@@ -1,9 +1,9 @@
 /*
- * "$Id: ppd-private.h 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: ppd-private.h 12733 2015-06-12 01:21:05Z msweet $"
  *
  * Private PPD definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	6	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	7	/* Version number in cache file */
 
 
 /*
@@ -109,6 +109,14 @@ typedef struct _pwg_finishings_s	/**** PWG finishings mapping data ****/
   cups_option_t		*options;	/* Options to apply */
 } _pwg_finishings_t;
 
+typedef struct _pwg_material_s		/**** PWG material mapping data ****/
+{
+  char		*key,			/* material-key value */
+		*name;			/* material-name value */
+  int		num_props;		/* Number of properties */
+  cups_option_t	*props;			/* Material properties */
+} _pwg_material_t;
+
 struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 {
   int		num_bins;		/* Number of output bins */
@@ -148,6 +156,11 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
   cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
+  char		*cups_3d,		/* cups3D value */
+		*cups_layer_order;	/* cupsLayerOrder value */
+  int		cups_accuracy[3];	/* cupsAccuracy value - x, y, and z in nanometers */
+  int		cups_volume[3];		/* cupsVolume value - x, y, and z in millimeters */
+  cups_array_t	*materials;		/* cupsMaterial values */
 };
 
 
@@ -155,6 +168,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
  * Prototypes...
  */
 
+extern int		_cupsConvertOptions(ipp_t *request, ppd_file_t *ppd, _ppd_cache_t *pc, ipp_attribute_t *media_col_sup, ipp_attribute_t *doc_handling_sup, ipp_attribute_t *print_color_mode_sup, const char *user, const char *format, int copies, int num_options, cups_option_t *options);
 extern _ppd_cache_t	*_ppdCacheCreateWithFile(const char *filename,
 			                         ipp_t **attrs);
 extern _ppd_cache_t	*_ppdCacheCreateWithPPD(ppd_file_t *ppd);
@@ -187,6 +201,7 @@ extern const char	*_ppdCacheGetType(_ppd_cache_t *pc,
 			                  const char *media_type);
 extern int		_ppdCacheWriteFile(_ppd_cache_t *pc,
 			                   const char *filename, ipp_t *attrs);
+extern char		*_ppdCreateFromIPP(char *buffer, size_t bufsize, ipp_t *response);
 extern void		_ppdFreeLanguages(cups_array_t *languages);
 extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);
@@ -221,5 +236,5 @@ extern const char	*_pwgPageSizeForMedia(pwg_media_t *media,
 #endif /* !_CUPS_PPD_PRIVATE_H_ */
 
 /*
- * End of "$Id: ppd-private.h 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: ppd-private.h 12733 2015-06-12 01:21:05Z msweet $".
  */

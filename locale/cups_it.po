@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-08-29 22:25-0400\n"
+"POT-Creation-Date: 2015-07-20 14:24-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -1712,6 +1712,10 @@ msgid "%s: %s failed: %s"
 msgstr "%s: %s non riuscito correttamente: %s"
 
 #, c-format
+msgid "%s: Bad printer URI \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr "%s: la versione %s non è valida per \"-V\"."
 
@@ -1918,12 +1922,20 @@ msgid "%s: Sorry, no encryption support."
 msgstr "%s: spiacenti, nessun supporto per la crittografia."
 
 #, c-format
+msgid "%s: Unable to connect to \"%s:%d\": %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to connect to server."
 msgstr "%s: non è possibile connettersi al server."
 
 #, c-format
 msgid "%s: Unable to contact server."
 msgstr "%s: non è possibile contattare il server."
+
+#, c-format
+msgid "%s: Unable to create PPD file: %s"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1945,6 +1957,10 @@ msgstr "%s: non è possibile aprire il file PPD: %s alla riga %d."
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
 msgstr ""
 "%s: non è possibile leggere il database del MIME da \"%s\" oppure da \"%s\"."
+
+#, c-format
+msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
@@ -3302,6 +3318,9 @@ msgstr "Epson"
 msgid "Error Policy"
 msgstr "Policy dell'errore"
 
+msgid "Error reading raster data."
+msgstr ""
+
 msgid "Error sending raster data."
 msgstr "Si è verificato un errore durante l'invio dei dati raster."
 
@@ -3702,8 +3721,8 @@ msgstr ""
 msgid "Long-Edge (Portrait)"
 msgstr "Long-Edge (Portrait)"
 
-msgid "Looking for printer."
-msgstr "Cerca una stampante."
+msgid "Looking for printer..."
+msgstr ""
 
 msgid "Manual Feed"
 msgstr "Alimentazione manuale"
@@ -4351,11 +4370,8 @@ msgstr "L'attributo %s non può essere fornito con job-ids."
 
 #, c-format
 msgid ""
-"The '%s' Job Description attribute cannot be supplied in a job creation "
-"request."
+"The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
-"L'attributo della descrizione del processo '%s' non può essere fornito nella "
-"richiesta di creazione di un processo."
 
 #, c-format
 msgid ""
@@ -4844,6 +4860,9 @@ msgstr "Non è possibile stampare la pagina di prova"
 
 msgid "Unable to read print data."
 msgstr "Non è possibile leggere i dati della stampa."
+
+msgid "Unable to rename job document file."
+msgstr ""
 
 msgid "Unable to resolve printer-uri."
 msgstr ""
@@ -5460,6 +5479,10 @@ msgid ""
 msgstr ""
 "lpadmin: non è possibile eliminare l'opzione:\n"
 "         Bisogna specificare prima un nome per la stampante."
+
+#, c-format
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
@@ -6088,6 +6111,9 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "Enter password:"
 #~ msgstr "Digitare la password:"
 
+#~ msgid "Looking for printer."
+#~ msgstr "Cerca una stampante."
+
 #~ msgid "New Stylus Color Series"
 #~ msgstr "Nuova Stylus Color Series"
 
@@ -6125,6 +6151,13 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Stylus Photo Series"
+
+#~ msgid ""
+#~ "The '%s' Job Description attribute cannot be supplied in a job creation "
+#~ "request."
+#~ msgstr ""
+#~ "L'attributo della descrizione del processo '%s' non può essere fornito "
+#~ "nella richiesta di creazione di un processo."
 
 #~ msgid "The output bin is almost full."
 #~ msgstr "Il raccoglitore di uscita è quasi pieno."

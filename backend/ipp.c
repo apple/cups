@@ -1,9 +1,9 @@
 /*
- * "$Id: ipp.c 12759 2015-06-24 20:06:30Z msweet $"
+ * "$Id: ipp.c 12896 2015-10-09 13:15:22Z msweet $"
  *
  * IPP backend for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -122,6 +122,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-alert",
   "printer-alert-description",
   "printer-is-accepting-jobs",
+  "printer-mandatory-job-attributes",
   "printer-state",
   "printer-state-message",
   "printer-state-reasons"
@@ -145,6 +146,8 @@ static cups_option_t	*attr_cache = NULL;
 static cups_array_t	*state_reasons;	/* Array of printe-state-reasons keywords */
 static char		tmpfilename[1024] = "";
 					/* Temporary spool file name */
+static char		mandatory_attrs[1024] = "";
+					/* cupsMandatory value */
 
 
 /*
@@ -1295,11 +1298,16 @@ main(int  argc,				/* I - Number of command-line args */
       * Load the PPD file and generate PWG attribute mapping information...
       */
 
+      ppd_attr_t *mandatory;		/* cupsMandatory value */
+
       ppd = ppdOpenFile(getenv("PPD"));
       pc  = _ppdCacheCreateWithPPD(ppd);
 
       ppdMarkDefaults(ppd);
       cupsMarkOptions(ppd, num_options, options);
+
+      if ((mandatory = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
+        strlcpy(mandatory_attrs, mandatory->value, sizeof(mandatory_attrs));
     }
   }
   else
@@ -1459,6 +1467,7 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
       goto cleanup;
     else if (ipp_status == IPP_STATUS_ERROR_FORBIDDEN ||
+             ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED ||
 	     ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
     {
       const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
@@ -1791,7 +1800,7 @@ main(int  argc,				/* I - Number of command-line args */
 	fprintf(stderr, "DEBUG: Send-Document: %s (%s)\n",
 		ippErrorString(cupsLastError()), cupsLastErrorString());
 
-	if (cupsLastError() > IPP_OK_CONFLICT)
+	if (cupsLastError() > IPP_OK_CONFLICT && !job_canceled)
 	{
 	  ipp_status = cupsLastError();
 
@@ -1808,6 +1817,9 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
     }
+
+    if (job_canceled)
+      break;
 
     if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
@@ -2018,12 +2030,8 @@ main(int  argc,				/* I - Number of command-line args */
 	                   remote_job_states[job_state->values[0].integer -
 			                     IPP_JOB_PENDING]);
 
-	  if ((job_sheets = ippFindAttribute(response,
-					     "job-media-sheets-completed",
-					     IPP_TAG_INTEGER)) == NULL)
-	    job_sheets = ippFindAttribute(response,
-					  "job-impressions-completed",
-					  IPP_TAG_INTEGER);
+	  if ((job_sheets = ippFindAttribute(response, "job-impressions-completed", IPP_TAG_INTEGER)) == NULL)
+	    job_sheets = ippFindAttribute(response, "job-media-sheets-completed", IPP_TAG_INTEGER);
 
 	  if (job_sheets)
 	    fprintf(stderr, "PAGE: total %d\n",
@@ -2439,6 +2447,17 @@ monitor_printer(
         }
       }
 
+      fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
+              ippEnumString("job-state", monitor->job_state));
+
+      if (!job_canceled &&
+          (monitor->job_state == IPP_JOB_CANCELED ||
+	   monitor->job_state == IPP_JOB_ABORTED))
+      {
+	job_canceled = -1;
+	fprintf(stderr, "DEBUG: (monitor) job_canceled = -1\n");
+      }
+
       if ((attr = ippFindAttribute(response, "job-state-reasons",
                                    IPP_TAG_KEYWORD)) != NULL)
       {
@@ -2460,6 +2479,9 @@ monitor_printer(
             new_reasons |= _CUPS_JSR_JOB_PASSWORD_WAIT;
           else if (!strcmp(attr->values[i].string.text, "job-release-wait"))
             new_reasons |= _CUPS_JSR_JOB_RELEASE_WAIT;
+	  if (!job_canceled &&
+	      (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system")))
+            job_canceled = 1;
         }
 
         if (new_reasons != monitor->job_reasons)
@@ -2485,7 +2507,7 @@ monitor_printer(
 
       ippDelete(response);
 
-      fprintf(stderr, "DEBUG: (monitor) job-state=%s\n",
+      fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
               ippEnumString("job-state", monitor->job_state));
 
       if (!job_canceled &&
@@ -2523,7 +2545,10 @@ monitor_printer(
                  monitor->user, monitor->version);
 
       if (cupsLastError() > IPP_OK_CONFLICT)
+      {
+	fprintf(stderr, "DEBUG: (monitor) cancel_job() = %s\n", cupsLastErrorString());
 	_cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
+      }
     }
   }
 
@@ -2560,19 +2585,10 @@ new_request(
     ipp_attribute_t *print_color_mode_sup)
 					/* I - Printer supports print-color-mode */
 {
-  int		i;			/* Looping var */
   ipp_t		*request;		/* Request data */
   const char	*keyword;		/* PWG keyword */
-  _pwg_size_t	*size;			/* PWG media size */
-  ipp_t		*media_col,		/* media-col value */
-		*media_size;		/* media-size value */
-  const char	*media_source,		/* media-source value */
-		*media_type,		/* media-type value */
-		*collate_str,		/* multiple-document-handling value */
-		*mandatory;		/* Mandatory attributes */
   ipp_tag_t	group;			/* Current group */
   ipp_attribute_t *attr;		/* Current attribute */
-  const char	*color_attr_name;	/* Supported color attribute */
   char		buffer[1024];		/* Value buffer */
 
 
@@ -2592,36 +2608,31 @@ new_request(
   * Add standard attributes...
   */
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-	       NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
   fprintf(stderr, "DEBUG: printer-uri=\"%s\"\n", uri);
 
   if (user && *user)
   {
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		 "requesting-user-name", NULL, user);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, user);
     fprintf(stderr, "DEBUG: requesting-user-name=\"%s\"\n", user);
   }
 
   if (title && *title)
   {
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
-		 title);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, title);
     fprintf(stderr, "DEBUG: job-name=\"%s\"\n", title);
   }
 
   if (format && op != IPP_CREATE_JOB)
   {
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-		 "document-format", NULL, format);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, format);
     fprintf(stderr, "DEBUG: document-format=\"%s\"\n", format);
   }
 
 #ifdef HAVE_LIBZ
   if (compression && op != IPP_OP_CREATE_JOB && op != IPP_OP_VALIDATE_JOB)
   {
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-		 "compression", NULL, compression);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "compression", NULL, compression);
     fprintf(stderr, "DEBUG: compression=\"%s\"\n", compression);
   }
 #endif /* HAVE_LIBZ */
@@ -2634,313 +2645,13 @@ new_request(
   {
     if (pc)
     {
-      int	num_finishings = 0,	/* Number of finishing values */
-		finishings[10];		/* Finishing enum values */
-      ppd_choice_t *choice;		/* Marked choice */
-
      /*
       * Send standard IPP attributes...
       */
 
       fputs("DEBUG: Adding standard IPP operation/job attributes.\n", stderr);
 
-      if (pc->password &&
-          (keyword = cupsGetOption("job-password", num_options,
-                                   options)) != NULL)
-      {
-        ippAddOctetString(request, IPP_TAG_OPERATION, "job-password", keyword, (int)strlen(keyword));
-
-        if ((keyword = cupsGetOption("job-password-encryption", num_options,
-				     options)) == NULL)
-	  keyword = "none";
-
-        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                     "job-password-encryption", NULL, keyword);
-      }
-
-      if (pc->account_id)
-      {
-        if ((keyword = cupsGetOption("job-account-id", num_options,
-				     options)) == NULL)
-	  keyword = cupsGetOption("job-billing", num_options, options);
-
-        if (keyword)
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
-		       NULL, keyword);
-      }
-
-      if (pc->accounting_user_id)
-      {
-        if ((keyword = cupsGetOption("job-accounting-user-id", num_options,
-				     options)) == NULL)
-	  keyword = user;
-
-        if (keyword)
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,
-		       "job-accounting-user-id", NULL, keyword);
-      }
-
-      for (mandatory = (char *)cupsArrayFirst(pc->mandatory);
-           mandatory;
-           mandatory = (char *)cupsArrayNext(pc->mandatory))
-      {
-        if (strcmp(mandatory, "copies") &&
-            strcmp(mandatory, "destination-uris") &&
-            strcmp(mandatory, "finishings") &&
-            strcmp(mandatory, "job-account-id") &&
-            strcmp(mandatory, "job-accounting-user-id") &&
-            strcmp(mandatory, "job-password") &&
-            strcmp(mandatory, "job-password-encryption") &&
-            strcmp(mandatory, "media") &&
-            strncmp(mandatory, "media-col", 9) &&
-            strcmp(mandatory, "multiple-document-handling") &&
-            strcmp(mandatory, "output-bin") &&
-            strcmp(mandatory, "print-color-mode") &&
-            strcmp(mandatory, "print-quality") &&
-            strcmp(mandatory, "sides") &&
-            (keyword = cupsGetOption(mandatory, num_options, options)) != NULL)
-	{
-	  _ipp_option_t *opt = _ippFindOption(mandatory);
-					/* Option type */
-          ipp_tag_t	value_tag = opt ? opt->value_tag : IPP_TAG_NAME;
-					/* Value type */
-
-          switch (value_tag)
-          {
-            case IPP_TAG_INTEGER :
-            case IPP_TAG_ENUM :
-                ippAddInteger(request, IPP_TAG_JOB, value_tag, mandatory,
-                              atoi(keyword));
-                break;
-            case IPP_TAG_BOOLEAN :
-                ippAddBoolean(request, IPP_TAG_JOB, mandatory,
-                              !_cups_strcasecmp(keyword, "true"));
-                break;
-            case IPP_TAG_RANGE :
-                {
-                  int lower, upper;	/* Range */
-
-		  if (sscanf(keyword, "%d-%d", &lower, &upper) != 2)
-		    lower = upper = atoi(keyword);
-
-		  ippAddRange(request, IPP_TAG_JOB, mandatory, lower, upper);
-                }
-                break;
-            case IPP_TAG_STRING :
-                ippAddOctetString(request, IPP_TAG_JOB, mandatory, keyword, (int)strlen(keyword));
-                break;
-            default :
-                if (!strcmp(mandatory, "print-color-mode") && !strcmp(keyword, "monochrome"))
-                {
-                  if (ippContainsString(print_color_mode_sup, "auto-monochrome"))
-                    keyword = "auto-monochrome";
-                  else if (ippContainsString(print_color_mode_sup, "process-monochrome") && !ippContainsString(print_color_mode_sup, "monochrome"))
-                    keyword = "process-monochrome";
-                }
-
-                ippAddString(request, IPP_TAG_JOB, value_tag, mandatory,
-                             NULL, keyword);
-                break;
-	  }
-	}
-      }
-
-      if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
-	keyword = cupsGetOption("media", num_options, options);
-
-      if ((size = _ppdCacheGetSize(pc, keyword)) != NULL)
-      {
-       /*
-        * Add a media-col value...
-	*/
-
-	media_size = ippNew();
-	ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-		      "x-dimension", size->width);
-	ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-		      "y-dimension", size->length);
-
-	media_col = ippNew();
-	ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
-
-	media_source = _ppdCacheGetSource(pc, cupsGetOption("InputSlot",
-							    num_options,
-							    options));
-	media_type   = _ppdCacheGetType(pc, cupsGetOption("MediaType",
-						          num_options,
-							  options));
-
-	for (i = 0; i < media_col_sup->num_values; i ++)
-	{
-	  if (!strcmp(media_col_sup->values[i].string.text,
-		      "media-left-margin"))
-	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-left-margin", size->left);
-	  else if (!strcmp(media_col_sup->values[i].string.text,
-			   "media-bottom-margin"))
-	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-bottom-margin", size->bottom);
-	  else if (!strcmp(media_col_sup->values[i].string.text,
-			   "media-right-margin"))
-	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-right-margin", size->right);
-	  else if (!strcmp(media_col_sup->values[i].string.text,
-			   "media-top-margin"))
-	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-top-margin", size->top);
-	  else if (!strcmp(media_col_sup->values[i].string.text,
-			   "media-source") && media_source)
-	    ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
-			 "media-source", NULL, media_source);
-	  else if (!strcmp(media_col_sup->values[i].string.text,
-			   "media-type") && media_type)
-	    ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
-			 "media-type", NULL, media_type);
-	}
-
-	ippAddCollection(request, IPP_TAG_JOB, "media-col", media_col);
-      }
-
-      if ((keyword = cupsGetOption("output-bin", num_options,
-				   options)) == NULL)
-      {
-        if ((choice = ppdFindMarkedChoice(ppd, "OutputBin")) != NULL)
-	  keyword = _ppdCacheGetBin(pc, choice->choice);
-      }
-
-      if (keyword)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
-		     NULL, keyword);
-
-      color_attr_name = print_color_mode_sup ? "print-color-mode" : "output-mode";
-
-      if ((keyword = cupsGetOption("print-color-mode", num_options,
-				   options)) == NULL)
-      {
-	if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
-	{
-	  if (!_cups_strcasecmp(choice->choice, "Gray"))
-	    keyword = "monochrome";
-	  else
-	    keyword = "color";
-	}
-      }
-
-      if (keyword && !strcmp(keyword, "monochrome"))
-      {
-	if (ippContainsString(print_color_mode_sup, "auto-monochrome"))
-	  keyword = "auto-monochrome";
-	else if (ippContainsString(print_color_mode_sup, "process-monochrome") && !ippContainsString(print_color_mode_sup, "monochrome"))
-	  keyword = "process-monochrome";
-      }
-
-      if (keyword)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, color_attr_name,
-		     NULL, keyword);
-
-      if ((keyword = cupsGetOption("print-quality", num_options,
-				   options)) != NULL)
-	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-		      atoi(keyword));
-      else if ((choice = ppdFindMarkedChoice(ppd, "cupsPrintQuality")) != NULL)
-      {
-	if (!_cups_strcasecmp(choice->choice, "draft"))
-	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-			IPP_QUALITY_DRAFT);
-	else if (!_cups_strcasecmp(choice->choice, "normal"))
-	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-			IPP_QUALITY_NORMAL);
-	else if (!_cups_strcasecmp(choice->choice, "high"))
-	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-			IPP_QUALITY_HIGH);
-      }
-
-      if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-		     NULL, keyword);
-      else if (pc->sides_option &&
-               (choice = ppdFindMarkedChoice(ppd, pc->sides_option)) != NULL)
-      {
-	if (!_cups_strcasecmp(choice->choice, pc->sides_1sided))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-		       NULL, "one-sided");
-	else if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_long))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-		       NULL, "two-sided-long-edge");
-	if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_short))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-		       NULL, "two-sided-short-edge");
-      }
-
-      if ((keyword = cupsGetOption("multiple-document-handling",
-				   num_options, options)) != NULL)
-      {
-        if (strstr(keyword, "uncollated"))
-          keyword = "false";
-        else
-          keyword = "true";
-      }
-      else if ((keyword = cupsGetOption("collate", num_options,
-                                        options)) == NULL)
-        keyword = "true";
-
-      if (format)
-      {
-        if (!_cups_strcasecmp(format, "image/gif") ||
-	    !_cups_strcasecmp(format, "image/jp2") ||
-	    !_cups_strcasecmp(format, "image/jpeg") ||
-	    !_cups_strcasecmp(format, "image/png") ||
-	    !_cups_strcasecmp(format, "image/tiff") ||
-	    !_cups_strncasecmp(format, "image/x-", 8))
-	{
-	 /*
-	  * Collation makes no sense for single page image formats...
-	  */
-
-	  keyword = "false";
-	}
-	else if (!_cups_strncasecmp(format, "image/", 6) ||
-	         !_cups_strcasecmp(format, "application/vnd.cups-raster"))
-	{
-	 /*
-	  * Multi-page image formats will have copies applied by the upstream
-	  * filters...
-	  */
-
-	  copies = 1;
-	}
-      }
-
-      if (doc_handling_sup)
-      {
-        if (!_cups_strcasecmp(keyword, "true"))
-	  collate_str = "separate-documents-collated-copies";
-	else
-	  collate_str = "separate-documents-uncollated-copies";
-
-        for (i = 0; i < doc_handling_sup->num_values; i ++)
-	  if (!strcmp(doc_handling_sup->values[i].string.text, collate_str))
-	  {
-	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "multiple-document-handling", NULL, collate_str);
-	    break;
-          }
-
-        if (i >= doc_handling_sup->num_values)
-          copies = 1;
-      }
-
-     /*
-      * Map finishing options...
-      */
-
-      num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options,
-                                                   (int)(sizeof(finishings) /
-                                                         sizeof(finishings[0])),
-                                                   finishings);
-      if (num_finishings > 0)
-	ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
-		       num_finishings, finishings);
+      copies = _cupsConvertOptions(request, ppd, pc, media_col_sup, doc_handling_sup, print_color_mode_sup, user, format, copies, num_options, options);
 
      /*
       * Map FaxOut options...
@@ -3222,6 +2933,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   ipp_attribute_t	*pa,		/* printer-alert */
 			*pam,		/* printer-alert-message */
+			*pmja,		/* printer-mandatory-job-attributes */
 			*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
@@ -3241,6 +2953,26 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
   if ((pam = ippFindAttribute(ipp, "printer-alert-message",
                               IPP_TAG_TEXT)) != NULL)
     report_attr(pam);
+
+  if ((pmja = ippFindAttribute(ipp, "printer-mandatory-job-attributes", IPP_TAG_KEYWORD)) != NULL)
+  {
+    int	i,				/* Looping var */
+	count = ippGetCount(pmja);	/* Number of values */
+
+    for (i = 0, valptr = value; i < count; i ++, valptr += strlen(valptr))
+    {
+      if (i)
+        snprintf(valptr, sizeof(value) - (size_t)(valptr - value), " %s", ippGetString(pmja, i, NULL));
+      else
+        strlcpy(value, ippGetString(pmja, i, NULL), sizeof(value));
+    }
+
+    if (strcmp(value, mandatory_attrs))
+    {
+      strlcpy(mandatory_attrs, value, sizeof(mandatory_attrs));
+      fprintf(stderr, "PPD: cupsMandatory=\"%s\"\n", value);
+    }
+  }
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
                               IPP_TAG_TEXT)) != NULL)
@@ -3544,7 +3276,7 @@ sigterm_handler(int sig)		/* I - Signal */
     * Flag that the job should be canceled...
     */
 
-    write(2, "DEBUG: job_canceled = 1.\n", 25);
+    write(2, "DEBUG: sigterm_handler: job_canceled = 1.\n", 25);
 
     job_canceled = 1;
     return;
@@ -3770,5 +3502,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 12759 2015-06-24 20:06:30Z msweet $".
+ * End of "$Id: ipp.c 12896 2015-10-09 13:15:22Z msweet $".
  */

@@ -1,9 +1,7 @@
 /*
- * "$Id: ipptool.c 12465 2015-02-01 02:47:23Z msweet $"
- *
  * ipptool command for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -70,13 +68,15 @@ typedef enum _cups_with_e		/**** WITH flags ****/
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
   int		optional,		/* Optional attribute? */
-		not_expect;		/* Don't expect attribute? */
+		not_expect,		/* Don't expect attribute? */
+		expect_all;		/* Expect all attributes to match/not match */
   char		*name,			/* Attribute name */
 		*of_type,		/* Type name */
 		*same_count_as,		/* Parallel attribute name */
 		*if_defined,		/* Only required if variable defined */
 		*if_not_defined,	/* Only required if variable is not defined */
 		*with_value,		/* Attribute must include this value */
+		*with_value_from,	/* Attribute must have one of the values in this attribute */
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
 		*define_value;		/* Variable to define with value */
@@ -151,31 +151,23 @@ static int	PasswordTries = 0;	/* Number of tries with password */
  * Local functions...
  */
 
-static void	add_stringf(cups_array_t *a, const char *s, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
+static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(FILE *outfile, _cups_vars_t *vars, const char *testfile);
-static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize) __attribute__((nonnull(1,2,3)));
+static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(FILE *outfile, _cups_vars_t *vars, FILE *fp, int *linenum);
-static char	*get_filename(const char *testfile, char *dst, const char *src,
-		              size_t dstsize);
-static char	*get_string(ipp_attribute_t *attr, int element, int flags,
-		            char *buffer, size_t bufsize);
-static char	*get_token(FILE *fp, char *buf, int buflen,
-		           int *linenum);
+static char	*get_filename(const char *testfile, char *dst, const char *src, size_t dstsize);
+static const char *get_string(ipp_attribute_t *attr, int element, int flags, char *buffer, size_t bufsize);
+static char	*get_token(FILE *fp, char *buf, int buflen, int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
 static const char *password_cb(const char *prompt);
 static void	pause_message(const char *message);
 static void	print_attr(FILE *outfile, int format, ipp_attribute_t *attr, ipp_tag_t *group);
-static void	print_csv(FILE *outfile, ipp_attribute_t *attr, int num_displayed,
-		          char **displayed, size_t *widths);
-static void	print_fatal_error(FILE *outfile, const char *s, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
-static void	print_line(FILE *outfile, ipp_attribute_t *attr, int num_displayed,
-		           char **displayed, size_t *widths);
+static void	print_csv(FILE *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
+static void	print_fatal_error(FILE *outfile, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_line(FILE *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_xml_header(FILE *outfile);
 static void	print_xml_string(FILE *outfile, const char *element, const char *s);
 static void	print_xml_trailer(FILE *outfile, int success, const char *message);
@@ -186,9 +178,8 @@ static void	sigterm_handler(int sig);
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(FILE *outfile, cups_array_t *errors, ipp_attribute_t *attr);
-static int      with_value(FILE *outfile, cups_array_t *errors, char *value, int flags,
-		           ipp_attribute_t *attr, char *matchbuf,
-		           size_t matchlen);
+static int      with_value(FILE *outfile, cups_array_t *errors, char *value, int flags, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
+static int      with_value_from(cups_array_t *errors, ipp_attribute_t *fromattr, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 
 
 /*
@@ -793,7 +784,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
 		temp[1024],		/* Temporary string */
-		buffer[8192],		/* Copy buffer */
+		buffer[131072],		/* Copy buffer */
 		compression[16];	/* COMPRESSION value */
   ipp_t		*request = NULL,	/* IPP request */
 		*response = NULL;	/* IPP response */
@@ -875,7 +866,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
                              (cups_afree_func_t)free);
   file_id[0] = '\0';
   pass       = 1;
-  linenum    = 1;
+  linenum    = 0;
   request_id = (CUPS_RAND() % 1000) * 137 + 1;
 
   while (!Cancel && get_token(fp, token, sizeof(token), &linenum) != NULL)
@@ -1258,7 +1249,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
           _cups_strcasecmp(token, "WITH-HOSTNAME") &&
           _cups_strcasecmp(token, "WITH-RESOURCE") &&
           _cups_strcasecmp(token, "WITH-SCHEME") &&
-          _cups_strcasecmp(token, "WITH-VALUE"))
+          _cups_strcasecmp(token, "WITH-VALUE") &&
+          _cups_strcasecmp(token, "WITH-VALUE-FROM"))
         last_expect = NULL;
 
       if (_cups_strcasecmp(token, "DEFINE-MATCH") &&
@@ -1717,32 +1709,79 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strchr(token, ','))
-		attrptr = ippAddInteger(request, group, value, attr, (int)strtol(token, &tokenptr, 0));
+	      {
+	        if (isdigit(token[0] & 255) || token[0] == '-')
+		  attrptr = ippAddInteger(request, group, value, attr, (int)strtol(token, &tokenptr, 0));
+		else
+		{
+                  tokenptr = token;
+                  if ((i = ippEnumValue(attr, tokenptr)) >= 0)
+                  {
+                    attrptr  = ippAddInteger(request, group, value, attr, i);
+                    tokenptr += strlen(tokenptr);
+                  }
+		}
+	      }
 	      else
 	      {
 	        int	values[100],	/* Values */
 			num_values = 1;	/* Number of values */
 
-		values[0] = (int)strtol(token, &tokenptr, 10);
+		if (!isdigit(token[0] & 255) && token[0] != '-' && value == IPP_TAG_ENUM)
+		{
+		  char *ptr;		/* Pointer to next terminator */
+
+		  if ((ptr = strchr(token, ',')) != NULL)
+		    *ptr++ = '\0';
+		  else
+		    ptr = token + strlen(token);
+
+		  if ((i = ippEnumValue(attr, token)) < 0)
+		    tokenptr = NULL;
+		  else
+		    tokenptr = ptr;
+		}
+		else
+		  i = (int)strtol(token, &tokenptr, 0);
+
+		values[0] = i;
+
 		while (tokenptr && *tokenptr &&
 		       num_values < (int)(sizeof(values) / sizeof(values[0])))
 		{
 		  if (*tokenptr == ',')
 		    tokenptr ++;
-		  else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
-		    break;
 
-		  values[num_values] = (int)strtol(tokenptr, &tokenptr, 0);
-		  num_values ++;
+		  if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
+		  {
+		    char *ptr;		/* Pointer to next terminator */
+
+		    if (value != IPP_TAG_ENUM)
+		      break;
+
+                    if ((ptr = strchr(tokenptr, ',')) != NULL)
+                      *ptr++ = '\0';
+                    else
+                      ptr = tokenptr + strlen(tokenptr);
+
+                    if ((i = ippEnumValue(attr, tokenptr)) < 0)
+                      break;
+
+                    tokenptr = ptr;
+		  }
+		  else
+		    i = (int)strtol(tokenptr, &tokenptr, 0);
+
+		  values[num_values ++] = i;
 		}
 
 		attrptr = ippAddIntegers(request, group, value, attr, num_values, values);
 	      }
 
-	      if (!tokenptr || *tokenptr)
+	      if ((!token[0] || !tokenptr || *tokenptr) && !skip_test)
 	      {
-		print_fatal_error(outfile, "Bad %s value \"%s\" on line %d.",
-				  ippTagString(value), token, linenum);
+		print_fatal_error(outfile, "Bad %s value \'%s\' for \"%s\" on line %d.",
+				  ippTagString(value), token, attr, linenum);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -1767,8 +1806,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	             _cups_strcasecmp(ptr, "dpcm") &&
 	             _cups_strcasecmp(ptr, "other")))
 	        {
-	          print_fatal_error(outfile, "Bad resolution value \"%s\" on line %d.",
-		                    token, linenum);
+	          if (skip_test)
+	            break;
+
+	          print_fatal_error(outfile, "Bad resolution value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
 		  pass = 0;
 		  goto test_exit;
 	        }
@@ -1798,8 +1839,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
 
                 if ((num_vals & 1) || num_vals == 0)
 		{
-		  print_fatal_error(outfile, "Bad rangeOfInteger value \"%s\" on line "
-		                    "%d.", token, linenum);
+	          if (skip_test)
+	            break;
+
+		  print_fatal_error(outfile, "Bad rangeOfInteger value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
 		  pass = 0;
 		  goto test_exit;
 		}
@@ -1826,10 +1869,11 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		  goto test_exit;
 	        }
               }
+              else if (skip_test)
+		break;
 	      else
 	      {
-		print_fatal_error(outfile, "Bad ATTR collection value on line %d.",
-				  linenum);
+		print_fatal_error(outfile, "Bad ATTR collection value for \"%s\" on line %d.", attr, linenum);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -1837,14 +1881,16 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      do
 	      {
 	        ipp_t	*col;			/* Collection value */
-	        long	pos = ftell(fp);	/* Save position of file */
+	        long	savepos = ftell(fp);	/* Save position of file */
+	        int	savelinenum = linenum;	/* Save line number */
 
 		if (!get_token(fp, token, sizeof(token), &linenum))
 		  break;
 
 		if (strcmp(token, ","))
 		{
-		  fseek(fp, pos, SEEK_SET);
+		  fseek(fp, savepos, SEEK_SET);
+		  linenum = savelinenum;
 		  break;
 		}
 
@@ -1870,8 +1916,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      break;
 
 	  default :
-	      print_fatal_error(outfile, "Unsupported ATTR value tag %s on line %d.",
-				ippTagString(value), linenum);
+	      print_fatal_error(outfile, "Unsupported ATTR value tag %s for \"%s\" on line %d.", ippTagString(value), attr, linenum);
 	      pass = 0;
 	      goto test_exit;
 
@@ -1919,10 +1964,9 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      break;
 	}
 
-	if (!attrptr)
+	if (!attrptr && !skip_test)
 	{
-	  print_fatal_error(outfile, "Unable to add attribute on line %d: %s", linenum,
-	                    cupsLastErrorString());
+	  print_fatal_error(outfile, "Unable to add attribute \"%s\" on line %d.", attr, linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1993,11 +2037,13 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	last_status->repeat_match    = 0;
 	last_status->repeat_no_match = 0;
       }
-      else if (!_cups_strcasecmp(token, "EXPECT"))
+      else if (!_cups_strcasecmp(token, "EXPECT") || !_cups_strcasecmp(token, "EXPECT-ALL"))
       {
        /*
         * Expected attributes...
 	*/
+
+	int expect_all = !_cups_strcasecmp(token, "EXPECT-ALL");
 
         if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
         {
@@ -2018,6 +2064,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 
 	memset(last_expect, 0, sizeof(_cups_expect_t));
 	last_expect->repeat_limit = 1000;
+	last_expect->expect_all   = expect_all;
 
         if (token[0] == '!')
         {
@@ -2369,6 +2416,34 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  goto test_exit;
 	}
       }
+      else if (!_cups_strcasecmp(token, "WITH-VALUE-FROM"))
+      {
+      	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  print_fatal_error(outfile, "Missing %s value on line %d.", token, linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+        if (last_expect)
+	{
+	 /*
+	  * Expand any variables in the value and then save it.
+	  */
+
+	  expand_variables(vars, token, temp, sizeof(token));
+
+	  last_expect->with_value_from = strdup(token);
+	  last_expect->with_flags      = _CUPS_WITH_LITERAL;
+	}
+	else
+	{
+	  print_fatal_error(outfile, "%s without a preceding EXPECT on line %d.", token,
+		            linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
       else if (!_cups_strcasecmp(token, "DISPLAY"))
       {
        /*
@@ -2585,7 +2660,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      http->error != ETIMEDOUT)
 #endif /* WIN32 */
 	  {
-	    if (httpReconnect(http))
+	    if (httpReconnect2(http, 30000, NULL))
 	      prev_pass = 0;
 	  }
 	  else if (status == HTTP_STATUS_ERROR || status == HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED)
@@ -2612,13 +2687,13 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  http->error != ETIMEDOUT)
 #endif /* WIN32 */
       {
-	if (httpReconnect(http))
+	if (httpReconnect2(http, 30000, NULL))
 	  prev_pass = 0;
       }
       else if (status == HTTP_STATUS_ERROR)
       {
         if (!Cancel)
-          httpReconnect(http);
+          httpReconnect2(http, 30000, NULL);
 
 	prev_pass = 0;
       }
@@ -2938,192 +3013,210 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      get_variable(vars, expect->if_not_defined))
 	    continue;
 
-	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+          found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-	  if ((found && expect->not_expect) ||
-	      (!found && !(expect->not_expect || expect->optional)) ||
-	      (found && !expect_matches(expect, found->value_tag)) ||
-	      (found && expect->in_group &&
-	       found->group_tag != expect->in_group))
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
-	    {
-	      if (found && expect->not_expect)
-		add_stringf(errors, "NOT EXPECTED: %s", expect->name);
-	      else if (!found && !(expect->not_expect || expect->optional))
-		add_stringf(errors, "EXPECTED: %s", expect->name);
-	      else if (found)
-	      {
-		if (!expect_matches(expect, found->value_tag))
-		  add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
-			      expect->name, expect->of_type,
-			      ippTagString(found->value_tag));
-
-		if (expect->in_group && found->group_tag != expect->in_group)
-		  add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
-			      expect->name, ippTagString(expect->in_group),
-			      ippTagString(found->group_tag));
-              }
-            }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found)
-	    ippAttributeString(found, buffer, sizeof(buffer));
-
-	  if (found &&
-	      !with_value(outfile, NULL, expect->with_value, expect->with_flags, found,
-			  buffer, sizeof(buffer)))
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value &&
-	             !expect->repeat_match && !expect->repeat_no_match)
-	    {
-	      if (expect->with_flags & _CUPS_WITH_REGEX)
-		add_stringf(errors, "EXPECTED: %s %s /%s/",
-			    expect->name,
-			    (expect->with_flags & _CUPS_WITH_ALL) ?
-			        "WITH-ALL-VALUES" : "WITH-VALUE",
-			    expect->with_value);
-	      else
-		add_stringf(errors, "EXPECTED: %s %s \"%s\"",
-			    expect->name,
-			    (expect->with_flags & _CUPS_WITH_ALL) ?
-			        "WITH-ALL-VALUES" : "WITH-VALUE",
-			    expect->with_value);
-
-	      with_value(outfile, errors, expect->with_value, expect->with_flags, found,
-	                 buffer, sizeof(buffer));
-	    }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found && expect->count > 0 &&
-	      found->num_values != expect->count)
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
-	    {
-	      add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
-			  expect->count, found->num_values);
-	    }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found && expect->same_count_as)
-	  {
-	    attrptr = ippFindAttribute(response, expect->same_count_as,
-				       IPP_TAG_ZERO);
-
-	    if (!attrptr || attrptr->num_values != found->num_values)
+          do
+          {
+	    if ((found && expect->not_expect) ||
+		(!found && !(expect->not_expect || expect->optional)) ||
+		(found && !expect_matches(expect, found->value_tag)) ||
+		(found && expect->in_group &&
+		 found->group_tag != expect->in_group))
 	    {
 	      if (expect->define_no_match)
 		set_variable(outfile, vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value)
 	      {
-		if (!attrptr)
-		  add_stringf(errors,
-			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			      "(not returned)", expect->name,
-			      found->num_values, expect->same_count_as);
-		else if (attrptr->num_values != found->num_values)
-		  add_stringf(errors,
-			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			      "(%d values)", expect->name, found->num_values,
-			      expect->same_count_as, attrptr->num_values);
+		if (found && expect->not_expect)
+		  add_stringf(errors, "NOT EXPECTED: %s", expect->name);
+		else if (!found && !(expect->not_expect || expect->optional))
+		  add_stringf(errors, "EXPECTED: %s", expect->name);
+		else if (found)
+		{
+		  if (!expect_matches(expect, found->value_tag))
+		    add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
+				expect->name, expect->of_type,
+				ippTagString(found->value_tag));
+
+		  if (expect->in_group && found->group_tag != expect->in_group)
+		    add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
+				expect->name, ippTagString(expect->in_group),
+				ippTagString(found->group_tag));
+		}
 	      }
 
 	      if (expect->repeat_no_match &&
-	          repeat_count < expect->repeat_limit)
+		  repeat_count < expect->repeat_limit)
 		repeat_test = 1;
 
-	      continue;
+	      break;
 	    }
-	  }
 
-	  if (found && expect->define_match)
-	    set_variable(outfile, vars, expect->define_match, "1");
+	    if (found)
+	      ippAttributeString(found, buffer, sizeof(buffer));
 
-	  if (found && expect->define_value)
-	  {
-	    if (!expect->with_value)
+            if (found && expect->with_value_from && !with_value_from(NULL, ippFindAttribute(response, expect->with_value_from, IPP_TAG_ZERO), found, buffer, sizeof(buffer)))
 	    {
-	      int last = ippGetCount(found) - 1;
-					/* Last element in attribute */
-
-	      switch (ippGetValueTag(found))
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value && !expect->repeat_match && !expect->repeat_no_match)
 	      {
-	        case IPP_TAG_ENUM :
-		case IPP_TAG_INTEGER :
-		    snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
-		    break;
+		add_stringf(errors, "EXPECTED: %s WITH-VALUES-FROM %s", expect->name, expect->with_value_from);
 
-		case IPP_TAG_BOOLEAN :
-		    if (ippGetBoolean(found, last))
-		      strlcpy(buffer, "true", sizeof(buffer));
-		    else
-		      strlcpy(buffer, "false", sizeof(buffer));
-		    break;
+		with_value_from(errors, ippFindAttribute(response, expect->with_value_from, IPP_TAG_ZERO), found, buffer, sizeof(buffer));
+	      }
 
-		case IPP_TAG_RESOLUTION :
-		    {
-		      int	xres,	/* Horizontal resolution */
-				yres;	/* Vertical resolution */
-		      ipp_res_t	units;	/* Resolution units */
+	      if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
+		repeat_test = 1;
 
-		      xres = ippGetResolution(found, last, &yres, &units);
+	      break;
+	    }
+	    else if (found && !with_value(outfile, NULL, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer)))
+	    {
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value &&
+		       !expect->repeat_match && !expect->repeat_no_match)
+	      {
+		if (expect->with_flags & _CUPS_WITH_REGEX)
+		  add_stringf(errors, "EXPECTED: %s %s /%s/",
+			      expect->name,
+			      (expect->with_flags & _CUPS_WITH_ALL) ?
+				  "WITH-ALL-VALUES" : "WITH-VALUE",
+			      expect->with_value);
+		else
+		  add_stringf(errors, "EXPECTED: %s %s \"%s\"",
+			      expect->name,
+			      (expect->with_flags & _CUPS_WITH_ALL) ?
+				  "WITH-ALL-VALUES" : "WITH-VALUE",
+			      expect->with_value);
 
-		      if (xres == yres)
-		        snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
-		      else
-		        snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
-		    }
-		    break;
+		with_value(outfile, errors, expect->with_value, expect->with_flags, found,
+			   buffer, sizeof(buffer));
+	      }
 
-		case IPP_TAG_CHARSET :
-		case IPP_TAG_KEYWORD :
-		case IPP_TAG_LANGUAGE :
-		case IPP_TAG_MIMETYPE :
-		case IPP_TAG_NAME :
-		case IPP_TAG_NAMELANG :
-		case IPP_TAG_TEXT :
-		case IPP_TAG_TEXTLANG :
-		case IPP_TAG_URI :
-		case IPP_TAG_URISCHEME :
-		    strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
-		    break;
+	      if (expect->repeat_no_match &&
+		  repeat_count < expect->repeat_limit)
+		repeat_test = 1;
 
-		default :
-		    ippAttributeString(found, buffer, sizeof(buffer));
-		    break;
+	      break;
+	    }
+
+	    if (found && expect->count > 0 &&
+		found->num_values != expect->count)
+	    {
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value)
+	      {
+		add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
+			    expect->count, found->num_values);
+	      }
+
+	      if (expect->repeat_no_match &&
+		  repeat_count < expect->repeat_limit)
+		repeat_test = 1;
+
+	      break;
+	    }
+
+	    if (found && expect->same_count_as)
+	    {
+	      attrptr = ippFindAttribute(response, expect->same_count_as,
+					 IPP_TAG_ZERO);
+
+	      if (!attrptr || attrptr->num_values != found->num_values)
+	      {
+		if (expect->define_no_match)
+		  set_variable(outfile, vars, expect->define_no_match, "1");
+		else if (!expect->define_match && !expect->define_value)
+		{
+		  if (!attrptr)
+		    add_stringf(errors,
+				"EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				"(not returned)", expect->name,
+				found->num_values, expect->same_count_as);
+		  else if (attrptr->num_values != found->num_values)
+		    add_stringf(errors,
+				"EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				"(%d values)", expect->name, found->num_values,
+				expect->same_count_as, attrptr->num_values);
+		}
+
+		if (expect->repeat_no_match &&
+		    repeat_count < expect->repeat_limit)
+		  repeat_test = 1;
+
+		break;
 	      }
 	    }
 
-	    set_variable(outfile, vars, expect->define_value, buffer);
-	  }
+	    if (found && expect->define_match)
+	      set_variable(outfile, vars, expect->define_match, "1");
 
-	  if (found && expect->repeat_match &&
-	      repeat_count < expect->repeat_limit)
-	    repeat_test = 1;
+	    if (found && expect->define_value)
+	    {
+	      if (!expect->with_value)
+	      {
+		int last = ippGetCount(found) - 1;
+					  /* Last element in attribute */
+
+		switch (ippGetValueTag(found))
+		{
+		  case IPP_TAG_ENUM :
+		  case IPP_TAG_INTEGER :
+		      snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
+		      break;
+
+		  case IPP_TAG_BOOLEAN :
+		      if (ippGetBoolean(found, last))
+			strlcpy(buffer, "true", sizeof(buffer));
+		      else
+			strlcpy(buffer, "false", sizeof(buffer));
+		      break;
+
+		  case IPP_TAG_RESOLUTION :
+		      {
+			int	xres,	/* Horizontal resolution */
+				  yres;	/* Vertical resolution */
+			ipp_res_t	units;	/* Resolution units */
+
+			xres = ippGetResolution(found, last, &yres, &units);
+
+			if (xres == yres)
+			  snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+			else
+			  snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		      }
+		      break;
+
+		  case IPP_TAG_CHARSET :
+		  case IPP_TAG_KEYWORD :
+		  case IPP_TAG_LANGUAGE :
+		  case IPP_TAG_MIMETYPE :
+		  case IPP_TAG_NAME :
+		  case IPP_TAG_NAMELANG :
+		  case IPP_TAG_TEXT :
+		  case IPP_TAG_TEXTLANG :
+		  case IPP_TAG_URI :
+		  case IPP_TAG_URISCHEME :
+		      strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
+		      break;
+
+		  default :
+		      ippAttributeString(found, buffer, sizeof(buffer));
+		      break;
+		}
+	      }
+
+	      set_variable(outfile, vars, expect->define_value, buffer);
+	    }
+
+	    if (found && expect->repeat_match &&
+		repeat_count < expect->repeat_limit)
+	      repeat_test = 1;
+          }
+          while (expect->expect_all && (found = ippFindNextAttribute(response, expect->name, IPP_TAG_ZERO)) != NULL);
 	}
       }
 
@@ -3463,7 +3556,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	value = getenv(temp);
         src   += tempptr - temp + 5;
       }
-      else if (vars)
+      else
       {
         if (src[1] == '{')
 	{
@@ -3509,11 +3602,6 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	  value = get_variable(vars, temp);
 
         src += tempptr - temp + 1;
-      }
-      else
-      {
-        value = "$";
-	src ++;
       }
 
       if (value)
@@ -3784,6 +3872,11 @@ get_collection(FILE         *outfile,	/* I  - Output file */
 	    break;
       }
     }
+    else
+    {
+      print_fatal_error(outfile, "Unexpected token %s seen on line %d.", token, *linenum);
+      goto col_error;
+    }
   }
 
   return (col);
@@ -3861,26 +3954,27 @@ get_filename(const char *testfile,	/* I - Current test file */
  * 'get_string()' - Get a pointer to a string value or the portion of interest.
  */
 
-static char *				/* O - Pointer to string */
+static const char *			/* O - Pointer to string */
 get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
            int             element,	/* I - Element to fetch */
            int             flags,	/* I - Value ("with") flags */
            char            *buffer,	/* I - Temporary buffer */
 	   size_t          bufsize)	/* I - Size of temporary buffer */
 {
-  char	*ptr,				/* Value */
-	scheme[256],			/* URI scheme */
-	userpass[256],			/* Username/password */
-	hostname[256],			/* Hostname */
-	resource[1024];			/* Resource */
-  int	port;				/* Port number */
+  const char	*value;			/* Value */
+  char		*ptr,			/* Pointer into value */
+		scheme[256],		/* URI scheme */
+		userpass[256],		/* Username/password */
+		hostname[256],		/* Hostname */
+		resource[1024];		/* Resource */
+  int		port;			/* Port number */
 
 
-  ptr = attr->values[element].string.text;
+  value = ippGetString(attr, element, NULL);
 
   if (flags & _CUPS_WITH_HOSTNAME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     ptr = buffer + strlen(buffer) - 1;
@@ -3891,20 +3985,46 @@ get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
   }
   else if (flags & _CUPS_WITH_RESOURCE)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, buffer, (int)bufsize) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, buffer, (int)bufsize) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     return (buffer);
   }
   else if (flags & _CUPS_WITH_SCHEME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, buffer, (int)bufsize, userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, buffer, (int)bufsize, userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     return (buffer);
   }
+  else if (ippGetValueTag(attr) == IPP_TAG_URI && (!strncmp(value, "ipp://", 6) || !strncmp(value, "http://", 7) || !strncmp(value, "ipps://", 7) || !strncmp(value, "https://", 8)))
+  {
+    http_uri_status_t status = httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource));
+
+    if (status < HTTP_URI_STATUS_OK)
+    {
+     /*
+      * Bad URI...
+      */
+
+      buffer[0] = '\0';
+    }
+    else
+    {
+     /*
+      * Normalize URI with no trailing dot...
+      */
+
+      if ((ptr = hostname + strlen(hostname) - 1) >= hostname && *ptr == '.')
+	*ptr = '\0';
+
+      httpAssembleURI(HTTP_URI_CODING_ALL, buffer, (int)bufsize, scheme, userpass, hostname, port, resource);
+    }
+
+    return (buffer);
+  }
   else
-    return (ptr);
+    return (value);
 }
 
 
@@ -4278,10 +4398,11 @@ print_attr(FILE            *outfile,	/* I  - Output file */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-      case IPP_TAG_CHARSET :
       case IPP_TAG_URI :
-      case IPP_TAG_MIMETYPE :
+      case IPP_TAG_URISCHEME :
+      case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
+      case IPP_TAG_MIMETYPE :
 	  for (i = 0; i < attr->num_values; i ++)
 	    print_xml_string(outfile, "string", attr->values[i].string.text);
 	  break;
@@ -4320,7 +4441,7 @@ print_attr(FILE            *outfile,	/* I  - Output file */
   }
   else
   {
-    char	buffer[8192];		/* Value buffer */
+    char	buffer[131072];		/* Value buffer */
 
     if (format == _CUPS_OUTPUT_TEST)
     {
@@ -5824,6 +5945,55 @@ with_value(FILE            *outfile,	/* I - Output file */
 
 	  regfree(&re);
 	}
+	else if (ippGetValueTag(attr) == IPP_TAG_URI)
+	{
+          if (!strncmp(value, "ipp://", 6) || !strncmp(value, "http://", 7) || !strncmp(value, "ipps://", 7) || !strncmp(value, "https://", 8))
+          {
+	    char	scheme[256],	/* URI scheme */
+			userpass[256],	/* username:password, if any */
+			hostname[256],	/* hostname */
+			*hostptr,	/* Pointer into hostname */
+			resource[1024];	/* Resource path */
+	    int		port;		/* Port number */
+
+            if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK && (hostptr = hostname + strlen(hostname) - 1) > hostname && *hostptr == '.')
+            {
+             /*
+              * Strip trailing "." in hostname of URI...
+              */
+
+              *hostptr = '\0';
+              httpAssembleURI(HTTP_URI_CODING_ALL, temp, sizeof(temp), scheme, userpass, hostname, port, resource);
+              value = temp;
+            }
+          }
+
+	 /*
+	  * Value is a literal URI string, see if the value(s) match...
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!strcmp(value, get_string(attr, i, flags, temp, sizeof(temp))))
+	    {
+	      if (!matchbuf[0])
+		strlcpy(matchbuf,
+		        get_string(attr, i, flags, temp, sizeof(temp)),
+		        matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
+	}
 	else
 	{
 	 /*
@@ -5870,5 +6040,160 @@ with_value(FILE            *outfile,	/* I - Output file */
 
 
 /*
- * End of "$Id: ipptool.c 12465 2015-02-01 02:47:23Z msweet $".
+ * 'with_value_from()' - Test a WITH-VALUE-FROM predicate.
  */
+
+static int				/* O - 1 on match, 0 on non-match */
+with_value_from(
+    cups_array_t    *errors,		/* I - Errors array */
+    ipp_attribute_t *fromattr,		/* I - "From" attribute */
+    ipp_attribute_t *attr,		/* I - Attribute to compare */
+    char            *matchbuf,		/* I - Buffer to hold matching value */
+    size_t          matchlen)		/* I - Length of match buffer */
+{
+  int	i, j,				/* Looping vars */
+	count = ippGetCount(attr),	/* Number of attribute values */
+	match = 1;			/* Match? */
+
+
+  *matchbuf = '\0';
+
+ /*
+  * Compare the from value(s) to the attribute value(s)...
+  */
+
+  switch (ippGetValueTag(attr))
+  {
+    case IPP_TAG_INTEGER :
+        if (ippGetValueTag(fromattr) != IPP_TAG_INTEGER && ippGetValueTag(fromattr) != IPP_TAG_RANGE)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int value = ippGetInteger(attr, i);
+					/* Current integer value */
+
+	  if (ippContainsInteger(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      snprintf(matchbuf, matchlen, "%d", value);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_ENUM :
+        if (ippGetValueTag(fromattr) != IPP_TAG_ENUM)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int value = ippGetInteger(attr, i);
+					/* Current integer value */
+
+	  if (ippContainsInteger(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      snprintf(matchbuf, matchlen, "%d", value);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_RESOLUTION :
+        if (ippGetValueTag(fromattr) != IPP_TAG_RESOLUTION)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int xres, yres;
+	  ipp_res_t units;
+          int fromcount = ippGetCount(fromattr);
+	  int fromxres, fromyres;
+	  ipp_res_t fromunits;
+
+	  xres = ippGetResolution(attr, i, &yres, &units);
+
+          for (j = 0; j < fromcount; j ++)
+	  {
+	    fromxres = ippGetResolution(fromattr, j, &fromyres, &fromunits);
+	    if (fromxres == xres && fromyres == yres && fromunits == units)
+	      break;
+	  }
+
+	  if (j < fromcount)
+	  {
+	    if (!matchbuf[0])
+	    {
+	      if (xres == yres)
+	        snprintf(matchbuf, matchlen, "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	      else
+	        snprintf(matchbuf, matchlen, "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    }
+	  }
+	  else
+	  {
+	    if (xres == yres)
+	      add_stringf(errors, "GOT: %s=%d%s", ippGetName(attr), xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    else
+	      add_stringf(errors, "GOT: %s=%dx%d%s", ippGetName(attr), xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_UNKNOWN :
+	return (1);
+
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+	for (i = 0; i < count; i ++)
+	{
+	  const char *value = ippGetString(attr, i, NULL);
+					/* Current string value */
+
+	  if (ippContainsString(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      strlcpy(matchbuf, value, matchlen);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    default :
+        match = 0;
+        break;
+  }
+
+  return (match);
+
+  /* value tag mismatch between fromattr and attr */
+  wrong_value_tag :
+
+  add_stringf(errors, "GOT: %s OF-TYPE %s", ippGetName(attr), ippTagString(ippGetValueTag(attr)));
+
+  return (0);
+}

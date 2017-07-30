@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h 12762 2015-06-24 20:11:53Z msweet $"
+ * "$Id: config.h 12998 2015-12-02 15:09:04Z msweet $"
  *
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -96,8 +96,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.0.4"
-#define CUPS_MINIMAL "CUPS/2.0.4"
+#define CUPS_SVERSION "CUPS v2.1.2"
+#define CUPS_MINIMAL "CUPS/2.1.2"
 
 
 /*
@@ -799,5 +799,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 12762 2015-06-24 20:11:53Z msweet $".
+ * End of "$Id: config.h 12998 2015-12-02 15:09:04Z msweet $".
  */

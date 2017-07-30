@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 12748 2015-06-24 15:58:40Z msweet $"
+ * "$Id: interpret.c 12746 2015-06-24 13:28:36Z msweet $"
  *
  * PPD command interpreter for CUPS.
  *
@@ -1727,5 +1727,5 @@ DEBUG_stack(const char       *prefix,	/* I - Prefix string */
 
 
 /*
- * End of "$Id: interpret.c 12748 2015-06-24 15:58:40Z msweet $".
+ * End of "$Id: interpret.c 12746 2015-06-24 13:28:36Z msweet $".
  */

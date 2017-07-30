@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 11716 2014-03-21 14:50:24Z msweet $"
+# "$Id: Makedefs.in 12519 2015-02-17 13:10:19Z msweet $"
 #
 # Common makefile definitions for CUPS.
 #
@@ -264,5 +264,5 @@ USBQUIRKS	=	@USBQUIRKS@
 
 
 #
-# End of "$Id: Makedefs.in 11716 2014-03-21 14:50:24Z msweet $"
+# End of "$Id: Makedefs.in 12519 2015-02-17 13:10:19Z msweet $"
 #

@@ -1569,7 +1569,7 @@ PPD file extensions was used. Currently it must be the string
 
 <p class="summary">*JCLToPDFInterpreter: "JCL"</p>
 
-<p>This keyword provfides the JCL command to insert a PDF job file into a printer-ready data stream. The JCL command is added after the <tt>JCLBegin</tt> value and any commands for JCL options in the PPD file.</p>
+<p>This keyword provides the JCL command to insert a PDF job file into a printer-ready data stream. The JCL command is added after the <tt>JCLBegin</tt> value and any commands for JCL options in the PPD file.</p>
 
 <p>Example:</p>
 

@@ -1,9 +1,9 @@
 #
-# "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $"
+# "$Id: Makefile 12278 2014-12-01 13:53:56Z msweet $"
 #
 #   Datafile makefile for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2014 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -18,17 +18,6 @@ include ../Makedefs
 #
 # Data files...
 #
-
-BANNERS	=	\
-		classified \
-		confidential \
-		secret \
-		standard \
-		topsecret \
-		unclassified
-
-DATAFILES =	\
-		testprint
 
 PPDCFILES =	\
 		epson.h \
@@ -87,13 +76,7 @@ install:	all install-data install-headers install-libs install-exec
 
 install-data:
 	$(INSTALL_DIR) -m 755 $(DATADIR)/banners
-	for file in $(BANNERS); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
-	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/data
-	for file in $(DATAFILES); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/data; \
-	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/model
 	$(INSTALL_DIR) -m 755 $(DATADIR)/ppdc
 	for file in $(PPDCFILES); do \
@@ -128,12 +111,6 @@ install-libs:
 #
 
 uninstall:
-	for file in $(BANNERS); do \
-		$(RM) $(DATADIR)/banners/$$file; \
-	done
-	for file in $(DATAFILES); do \
-		$(RM) $(DATADIR)/data/$$file; \
-	done
 	for file in $(PPDCFILES); do \
 		$(RM) $(DATADIR)/ppdc/$$file; \
 	done
@@ -146,5 +123,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 10996 2013-05-29 11:51:34Z msweet $".
+# End of "$Id: Makefile 12278 2014-12-01 13:53:56Z msweet $".
 #

@@ -1,9 +1,9 @@
 /*
- * "$Id: testnotify.c 10996 2013-05-29 11:51:34Z msweet $"
+ * "$Id: testnotify.c 13040 2016-01-11 20:29:13Z msweet $"
  *
  *   Test notifier for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2016 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -115,7 +115,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
     ippAttributeString(attr, buffer, sizeof(buffer));
 
-    fprintf(stderr, "DEBUG: %*s%s (%s%s) %s", indent, "", attr->name,
+    fprintf(stderr, "DEBUG: %*s%s (%s%s) %s\n", indent, "", attr->name,
             attr->num_values > 1 ? "1setOf " : "",
 	    ippTagString(attr->value_tag), buffer);
   }
@@ -123,5 +123,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id: testnotify.c 10996 2013-05-29 11:51:34Z msweet $".
+ * End of "$Id: testnotify.c 13040 2016-01-11 20:29:13Z msweet $".
  */

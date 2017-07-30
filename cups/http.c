@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $"
+ * "$Id: http.c 12970 2015-11-13 20:02:51Z msweet $"
  *
  * HTTP routines for CUPS.
  *
@@ -898,7 +898,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
  */
 
 const char *				/* O - Cookie data or NULL */
-httpGetCookie(http_t *http)		/* I - HTTP connecion */
+httpGetCookie(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->cookie : NULL);
 }
@@ -3003,7 +3003,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
     *status = http->status;
     return (0);
   }
-  else if (!strncmp(line, "HTTP/", 5))
+  else if (!strncmp(line, "HTTP/", 5) && http->mode == _HTTP_MODE_CLIENT)
   {
    /*
     * Got the beginning of a response...
@@ -4850,5 +4850,5 @@ http_write_chunk(http_t     *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: http.c 12334 2014-12-09 21:01:55Z msweet $".
+ * End of "$Id: http.c 12970 2015-11-13 20:02:51Z msweet $".
  */

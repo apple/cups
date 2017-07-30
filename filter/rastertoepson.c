@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertoepson.c 12618 2015-05-06 20:28:48Z msweet $"
+ * "$Id: rastertoepson.c 12945 2015-10-26 19:46:02Z msweet $"
  *
  * EPSON ESC/P and ESC/P2 filter for CUPS.
  *
@@ -118,6 +118,30 @@ StartPage(
   int		n, t;			/* Numbers */
   unsigned	plane;			/* Looping var */
 
+
+ /*
+  * Show page device dictionary...
+  */
+
+  fprintf(stderr, "DEBUG: StartPage...\n");
+  fprintf(stderr, "DEBUG: Duplex = %d\n", header->Duplex);
+  fprintf(stderr, "DEBUG: HWResolution = [ %d %d ]\n", header->HWResolution[0], header->HWResolution[1]);
+  fprintf(stderr, "DEBUG: ImagingBoundingBox = [ %d %d %d %d ]\n", header->ImagingBoundingBox[0], header->ImagingBoundingBox[1], header->ImagingBoundingBox[2], header->ImagingBoundingBox[3]);
+  fprintf(stderr, "DEBUG: Margins = [ %d %d ]\n", header->Margins[0], header->Margins[1]);
+  fprintf(stderr, "DEBUG: ManualFeed = %d\n", header->ManualFeed);
+  fprintf(stderr, "DEBUG: MediaPosition = %d\n", header->MediaPosition);
+  fprintf(stderr, "DEBUG: NumCopies = %d\n", header->NumCopies);
+  fprintf(stderr, "DEBUG: Orientation = %d\n", header->Orientation);
+  fprintf(stderr, "DEBUG: PageSize = [ %d %d ]\n", header->PageSize[0], header->PageSize[1]);
+  fprintf(stderr, "DEBUG: cupsWidth = %d\n", header->cupsWidth);
+  fprintf(stderr, "DEBUG: cupsHeight = %d\n", header->cupsHeight);
+  fprintf(stderr, "DEBUG: cupsMediaType = %d\n", header->cupsMediaType);
+  fprintf(stderr, "DEBUG: cupsBitsPerColor = %d\n", header->cupsBitsPerColor);
+  fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d\n", header->cupsBitsPerPixel);
+  fprintf(stderr, "DEBUG: cupsBytesPerLine = %d\n", header->cupsBytesPerLine);
+  fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", header->cupsColorOrder);
+  fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header->cupsColorSpace);
+  fprintf(stderr, "DEBUG: cupsCompression = %d\n", header->cupsCompression);
 
  /*
   * Send a reset sequence.
@@ -263,7 +287,7 @@ StartPage(
   * Allocate memory for a line/row of graphics...
   */
 
-  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  if ((Planes[0] = malloc(header->cupsBytesPerLine + NumPlanes)) == NULL)
   {
     fputs("ERROR: Unable to allocate memory\n", stderr);
     exit(1);
@@ -1150,5 +1174,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertoepson.c 12618 2015-05-06 20:28:48Z msweet $".
+ * End of "$Id: rastertoepson.c 12945 2015-10-26 19:46:02Z msweet $".
  */

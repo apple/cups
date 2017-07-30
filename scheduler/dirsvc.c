@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 12459 2015-01-30 16:16:12Z msweet $"
+ * "$Id: dirsvc.c 12458 2015-01-30 16:15:53Z msweet $"
  *
  * Directory services routines for the CUPS scheduler.
  *
@@ -1823,5 +1823,5 @@ update_smb(int onoff)			/* I - 1 = turn on, 0 = turn off */
 
 
 /*
- * End of "$Id: dirsvc.c 12459 2015-01-30 16:16:12Z msweet $".
+ * End of "$Id: dirsvc.c 12458 2015-01-30 16:15:53Z msweet $".
  */

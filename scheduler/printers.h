@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 11377 2013-11-05 01:05:00Z msweet $"
+ * "$Id: printers.h 12666 2015-05-25 19:38:09Z msweet $"
  *
  * Printer definitions for the CUPS scheduler.
  *
@@ -63,9 +63,12 @@ struct cupsd_printer_s
 		*uuid,			/* Printer UUID */
 		*hostname,		/* Host printer resides on */
 		*name,			/* Printer name */
-		*location,		/* Location code */
+		*location,		/* Location string */
+		*geo_location,		/* Geographic location URI */
 		*make_model,		/* Make and model */
 		*info,			/* Description */
+		*organization,		/* Organization name */
+		*organizational_unit,	/* Organizational unit (department, etc.) */
 		*op_policy,		/* Operation policy name */
 		*error_policy;		/* Error policy */
   cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */
@@ -77,7 +80,8 @@ struct cupsd_printer_s
   char		state_message[1024];	/* Printer state message */
   int		num_reasons;		/* Number of printer-state-reasons */
   char		*reasons[64];		/* printer-state-reasons strings */
-  time_t	state_time;		/* Time at this state */
+  time_t	config_time,		/* Time at this configuration */
+		state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
   char		*device_uri;		/* Device URI */
@@ -190,5 +194,5 @@ extern void		cupsdWritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h 11377 2013-11-05 01:05:00Z msweet $".
+ * End of "$Id: printers.h 12666 2015-05-25 19:38:09Z msweet $".
  */

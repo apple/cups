@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-08-29 22:25-0400\n"
+"POT-Creation-Date: 2015-07-20 14:24-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -1460,6 +1460,10 @@ msgid "%s: %s failed: %s"
 msgstr ""
 
 #, c-format
+msgid "%s: Bad printer URI \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
 
@@ -1655,11 +1659,19 @@ msgid "%s: Sorry, no encryption support."
 msgstr ""
 
 #, c-format
+msgid "%s: Unable to connect to \"%s:%d\": %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to connect to server."
 msgstr ""
 
 #, c-format
 msgid "%s: Unable to contact server."
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to create PPD file: %s"
 msgstr ""
 
 #, c-format
@@ -1680,6 +1692,10 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to resolve \"%s\"."
 msgstr ""
 
 #, c-format
@@ -3024,6 +3040,9 @@ msgstr "Epson"
 msgid "Error Policy"
 msgstr "Chování při chybě"
 
+msgid "Error reading raster data."
+msgstr ""
+
 msgid "Error sending raster data."
 msgstr ""
 
@@ -3422,7 +3441,7 @@ msgstr ""
 msgid "Long-Edge (Portrait)"
 msgstr "Delší okraj (na výšku)"
 
-msgid "Looking for printer."
+msgid "Looking for printer..."
 msgstr ""
 
 msgid "Manual Feed"
@@ -4063,8 +4082,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"The '%s' Job Description attribute cannot be supplied in a job creation "
-"request."
+"The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
 
 #, c-format
@@ -4520,6 +4538,9 @@ msgid "Unable to print test page"
 msgstr "Nelze vytisknout zkušební stránku"
 
 msgid "Unable to read print data."
+msgstr ""
+
+msgid "Unable to rename job document file."
 msgstr ""
 
 msgid "Unable to resolve printer-uri."
@@ -5106,6 +5127,10 @@ msgstr ""
 msgid ""
 "lpadmin: Unable to delete option:\n"
 "         You must specify a printer name first."
+msgstr ""
+
+#, c-format
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
 msgstr ""
 
 #, c-format

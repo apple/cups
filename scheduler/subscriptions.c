@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 11558 2014-02-06 18:33:34Z msweet $"
+ * "$Id: subscriptions.c 13040 2016-01-11 20:29:13Z msweet $"
  *
  * Subscription routines for the CUPS scheduler.
  *
@@ -105,9 +105,7 @@ cupsdAddEvent(
     * Check if this subscription requires this event...
     */
 
-    if ((sub->mask & event) != 0 &&
-        (sub->dest == dest || !sub->dest) &&
-	(sub->job == job || !sub->job))
+    if ((sub->mask & event) != 0 && (sub->dest == dest || !sub->dest || sub->job == job))
     {
      /*
       * Need this event, so create a new event record...
@@ -658,6 +656,8 @@ cupsdExpireSubscriptions(
 
   curtime = time(NULL);
   update  = 0;
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Expiring subscriptions...");
 
   for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
        sub;
@@ -1617,5 +1617,5 @@ cupsd_update_notifier(void)
 
 
 /*
- * End of "$Id: subscriptions.c 11558 2014-02-06 18:33:34Z msweet $".
+ * End of "$Id: subscriptions.c 13040 2016-01-11 20:29:13Z msweet $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: gziptoany.c 12656 2015-05-22 17:27:37Z msweet $"
+ * "$Id: gziptoany.c 12655 2015-05-22 17:26:40Z msweet $"
  *
  * GZIP/raw pre-filter for CUPS.
  *
@@ -112,5 +112,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: gziptoany.c 12656 2015-05-22 17:27:37Z msweet $".
+ * End of "$Id: gziptoany.c 12655 2015-05-22 17:26:40Z msweet $".
  */

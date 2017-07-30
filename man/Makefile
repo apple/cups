@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 12815 2015-07-30 15:03:38Z msweet $"
+# "$Id: Makefile 12814 2015-07-30 15:03:33Z msweet $"
 #
 # Man page makefile for CUPS.
 #
@@ -228,5 +228,5 @@ mantohtml:	mantohtml.o ../cups/$(LIBCUPSSTATIC)
 
 
 #
-# End of "$Id: Makefile 12815 2015-07-30 15:03:38Z msweet $".
+# End of "$Id: Makefile 12814 2015-07-30 15:03:33Z msweet $".
 #

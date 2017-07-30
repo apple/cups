@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 12658 2015-05-22 17:53:45Z msweet $"
+# "$Id: run-stp-tests.sh 12853 2015-08-28 13:38:46Z msweet $"
 #
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
@@ -133,6 +133,7 @@ case "$testtype" in
 		pjobs=10
 		pprinters=0
 		loglevel="debug2"
+		testtype="1"
 		;;
 esac
 
@@ -722,9 +723,9 @@ date=`date "+%Y-%m-%d"`
 
 if test -d $root/.svn; then
 	rev=`svn info . | grep Revision: | awk '{print $2}'`
-	strfile=$BASE/cups-str-2.0-r$rev-$user.html
+	strfile=$BASE/cups-str-2.1-r$rev-$user.html
 else
-	strfile=$BASE/cups-str-2.0-$date-$user.html
+	strfile=$BASE/cups-str-2.1-$date-$user.html
 fi
 
 rm -f $strfile
@@ -737,7 +738,7 @@ cat str-header.html >$strfile
 echo ""
 echo "Running IPP compliance tests..."
 
-echo "<H1>1 - IPP Compliance Tests</H1>" >>$strfile
+echo "<H1><A NAME='IPP'>1 - IPP Compliance Tests</A></H1>" >>$strfile
 echo "<P>This section provides the results to the IPP compliance tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
 echo `date "+%Y-%m-%d"` by $user on `hostname`. >>$strfile
@@ -775,7 +776,7 @@ echo "</PRE>" >>$strfile
 echo ""
 echo "Running command tests..."
 
-echo "<H1>2 - Command Tests</H1>" >>$strfile
+echo "<H1><A NAME='COMMAND'>2 - Command Tests</A></H1>" >>$strfile
 echo "<P>This section provides the results to the command tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
 echo $date by $user on `hostname`. >>$strfile
@@ -840,12 +841,8 @@ echo "</PRE>" >>$strfile
 #
 
 kill $cupsd
-
-#
-# Append the log files for post-mortim...
-#
-
-echo "<H1>3 - Log Files</H1>" >>$strfile
+wait $cupsd
+cupsdstatus=$?
 
 #
 # Verify counts...
@@ -853,7 +850,16 @@ echo "<H1>3 - Log Files</H1>" >>$strfile
 
 echo "Test Summary"
 echo ""
-echo "<H2>Summary</H2>" >>$strfile
+echo "<H1><A NAME='SUMMARY'>3 - Test Summary</A></H1>" >>$strfile
+
+if test $cupsdstatus != 0; then
+	echo "FAIL: cupsd failed with exit status $cupsdstatus."
+	echo "<p>FAIL: cupsd failed with exit status $cupsdstatus.</p>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: cupsd exited with no errors."
+	echo "<p>PASS: cupsd exited with no errors.</p>" >>$strfile
+fi
 
 # Job control files
 count=`ls -1 $BASE/spool | wc -l`
@@ -991,10 +997,10 @@ fi
 
 # Warning log messages
 count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
-if test $count != 18; then
-	echo "FAIL: $count warning messages, expected 18."
+if test $count != 8; then
+	echo "FAIL: $count warning messages, expected 8."
 	$GREP '^W ' $BASE/log/error_log
-	echo "<P>FAIL: $count warning messages, expected 18.</P>" >>$strfile
+	echo "<P>FAIL: $count warning messages, expected 8.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	$GREP '^W ' $BASE/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
@@ -1052,18 +1058,23 @@ else
 	echo "<P>PASS: $count debug2 messages.</P>" >>$strfile
 fi
 
+#
 # Log files...
-echo "<H2>access_log</H2>" >>$strfile
+#
+
+echo "<H1><A NAME='LOGS'>4 - Log Files</A></H1>" >>$strfile
+
+echo "<H2><A NAME='access_log'>access_log</A></H2>" >>$strfile
 echo "<PRE>" >>$strfile
 sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' $BASE/log/access_log >>$strfile
 echo "</PRE>" >>$strfile
 
-echo "<H2>error_log</H2>" >>$strfile
+echo "<H2><A NAME='error_log'>error_log</A></H2>" >>$strfile
 echo "<PRE>" >>$strfile
 $GREP -v '^d' $BASE/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
-echo "<H2>page_log</H2>" >>$strfile
+echo "<H2><A NAME='page_log'>page_log</A></H2>" >>$strfile
 echo "<PRE>" >>$strfile
 sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' $BASE/log/page_log >>$strfile
 echo "</PRE>" >>$strfile
@@ -1103,5 +1114,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 12658 2015-05-22 17:53:45Z msweet $"
+# End of "$Id: run-stp-tests.sh 12853 2015-08-28 13:38:46Z msweet $"
 #

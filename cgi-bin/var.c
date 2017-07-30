@@ -1,9 +1,9 @@
 /*
- * "$Id: var.c 12034 2014-07-16 19:37:34Z msweet $"
+ * "$Id: var.c 12621 2015-05-06 21:32:18Z msweet $"
  *
  * CGI form variable and array functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2005 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -626,6 +626,8 @@ cgi_initialize_cookies(void)
 
   while (*cookie)
   {
+    int	skip = 0;			/* Skip this cookie? */
+
    /*
     * Skip leading whitespace...
     */
@@ -641,9 +643,14 @@ cgi_initialize_cookies(void)
 
     for (ptr = name; *cookie && *cookie != '=';)
       if (ptr < (name + sizeof(name) - 1))
+      {
         *ptr++ = *cookie++;
+      }
       else
-        break;
+      {
+        skip = 1;
+	cookie ++;
+      }
 
     if (*cookie != '=')
       break;
@@ -659,26 +666,38 @@ cgi_initialize_cookies(void)
     {
       for (cookie ++, ptr = value; *cookie && *cookie != '\"';)
         if (ptr < (value + sizeof(value) - 1))
+	{
 	  *ptr++ = *cookie++;
+	}
 	else
-	  break;
+	{
+	  skip = 1;
+	  cookie ++;
+	}
 
       if (*cookie == '\"')
         cookie ++;
+      else
+        skip = 1;
     }
     else
     {
       for (ptr = value; *cookie && *cookie != ';';)
         if (ptr < (value + sizeof(value) - 1))
+	{
 	  *ptr++ = *cookie++;
+	}
 	else
-	  break;
+	{
+	  skip = 1;
+	  cookie ++;
+	}
     }
 
     if (*cookie == ';')
       cookie ++;
     else if (*cookie)
-      break;
+      skip = 1;
 
     *ptr = '\0';
 
@@ -687,7 +706,7 @@ cgi_initialize_cookies(void)
     * "$"...
     */
 
-    if (name[0] != '$')
+    if (name[0] != '$' && !skip)
       num_cookies = cupsAddOption(name, value, num_cookies, &cookies);
   }
 }
@@ -1278,5 +1297,5 @@ cgi_unlink_file(void)
 
 
 /*
- * End of "$Id: var.c 12034 2014-07-16 19:37:34Z msweet $".
+ * End of "$Id: var.c 12621 2015-05-06 21:32:18Z msweet $".
  */

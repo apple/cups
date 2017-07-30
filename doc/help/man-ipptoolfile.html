@@ -131,6 +131,9 @@ test report.
 <dd style="margin-left: 5.0em"><dt><b>EXPECT ?</b><i>attribute-name predicate(s)</i>
 <dd style="margin-left: 5.0em"><dt><b>EXPECT !</b><i>attribute-name</i>
 <dd style="margin-left: 5.0em">Specifies that the response must/may/must not include the named attribute. Additional requirements can be added as predicates - see the "EXPECT PREDICATES" section for more information on predicates. Attribute names can specify member attributes by separating the attribute and member names with the forward slash, for example "media-col/media-size/x-dimension".
+<dt><b>EXPECT-ALL </b><i>attribute-name </i>[ <i>predicate(s) </i>]
+<dd style="margin-left: 5.0em"><dt><b>EXPECT-ALL ?</b><i>attribute-name predicate(s)</i>
+<dd style="margin-left: 5.0em">Specifies that the response must/may include the named attribute and that all occurrences of that attribute must match the given predicates.
 <dt><b>FILE filename</b>
 <dd style="margin-left: 5.0em">Specifies a file to include at the end of the request. This is typically used when sending a test print file.
 <dt><b>GROUP tag</b>
@@ -247,6 +250,9 @@ Specifies the maximum number of times to repeat if the <b>REPEAT-MATCH</b> or <b
 <dd style="margin-left: 5.0em">Requires that at least one value of the <b>EXPECT</b> attribute matches the boolean value given.
 <dt><b>WITH-VALUE "/</b><i>regular expression</i><b>/"</b>
 <dd style="margin-left: 5.0em">Requires that at least one value of the <b>EXPECT</b> attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dt><b>WITH-VALUE-FROM </b><i>attribute-name</i>
+<dd style="margin-left: 5.0em">Requires that the value(s) of the <b>EXPECT</b> attribute matches the value(s) in the specified attribute.
+For example, "EXPECT job-sheets WITH-VALUE-FROM job-sheets-supported" requires that the "job-sheets" value is listed as a value of the "job-sheets-supported" attribute.
 </dl>
 <h3><a name="STATUS_PREDICATES">Status Predicates</a></h3>
 The following predicates are understood following the <b>STATUS</b> test directive:
@@ -495,7 +501,7 @@ IANA IPP Registry (<a href="http://www.iana.org/assignments/ipp-registrations)">
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp)">http://www.pwg.org/ipp)</a>,
 RFC 2911 (<a href="http://tools.ietf.org/html/rfc3911">http://tools.ietf.org/html/rfc3911</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2014 by Apple Inc.
+Copyright &copy; 2007-2015 by Apple Inc.
 
 </body>
 </html>

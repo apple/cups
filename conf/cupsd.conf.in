@@ -39,6 +39,13 @@ WebInterface @CUPS_WEBIF@
   Order allow,deny
 </Location>
 
+# Restrict access to log files...
+<Location /admin/log>
+  AuthType Default
+  Require user @SYSTEM
+  Order allow,deny
+</Location>
+
 # Set the default printer/job policies...
 <Policy default>
   # Job/subscription privacy...

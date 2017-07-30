@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd-helper.man 11817 2014-04-15 16:31:11Z msweet $"
+.\" "$Id: cupsd-helper.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" cupsd-helper man page for CUPS.
 .\"
@@ -88,7 +88,7 @@ Driver information files must conform to the format defined in
 .BR ppdcfile (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cupsd-helper.man 11817 2014-04-15 16:31:11Z msweet $".
+.\" End of "$Id: cupsd-helper.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man.in 11920 2014-06-11 19:03:59Z msweet $"
+.\" "$Id: cupsaddsmb.man.in 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" cupsaddsmb man page for CUPS.
 .\"
@@ -125,7 +125,7 @@ This is useful for debugging SAMBA configuration problems.
 .BR smb.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: cupsaddsmb.man.in 11920 2014-06-11 19:03:59Z msweet $".
+.\" End of "$Id: cupsaddsmb.man.in 12854 2015-08-28 14:08:00Z msweet $".
 .\"

@@ -1,0 +1,1158 @@
+#
+# "$Id: ipp-tests.test 12690 2015-06-04 16:34:20Z msweet $"
+#
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
+#
+# Copyright 2014-2015 by The Printer Working Group.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool -tI printer-uri ipp-tests.test
+#
+# History:
+#
+# This test file is loosely based on the IPP/1.1, IPP/2.0 and IPP Everywhere
+# test files from the CUPS "test" directory.  Many of those tests have been
+# combined or removed, and all print tests are performed using a sample JPEG
+# file.  These tests also validate support for the 'media-empty' and
+# 'media-needed' keywords in the "printer-state-reasons" Printer attribute.
+#
+
+FILE-ID "org.pwg.ipp-everywhere.20140826.ipp"
+
+# All tests use IPP version 2.0, unless overridden in a test...
+VERSION 2.0
+
+# Regular expressions for URI schemes:
+#
+#   HTTP_URI_SCHEME - Matches strings beginning with http:// or https://
+#   IPP_URI_SCHEME  - Matches strings beginning with ipp:// or ipps://
+#   UUID_URI        - Matches UUID URN strings.
+
+DEFINE HTTP_URI_SCHEME "/^https?://.+$$/"
+DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
+DEFINE LINK_LOCAL "/^(\[|\[v1.)fe80:/"
+DEFINE UUID_URI "/^urn:uuid:[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{12,12}/"
+
+# Regular expression for PWG media size names (eek!)
+#
+# Generated with help from: http://www.msweet.org/abnf.php
+DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)){2,}|(custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)$$/"
+
+# Regular expression for printer-alert attribute
+#
+# Generated with help from: http://www.msweet.org/abnf.php
+DEFINE ALERT_REGEX "/^code\=[A-Za-z]+(;(index\=[0-9]+|severity\=[A-Za-z]+|training\=[A-Za-z]+|group\=[A-Za-z]+|groupindex\=[0-9]+|location\=[0-9]+|time\=[0-9]+)){0,1}$$/"
+
+# Regular expression for printer-supply attribute
+#
+# Generated with help from: http://www.msweet.org/abnf.php
+DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([0-9]|\-){0,1})|);*((index\=[0-9]+|markerindex\=[0-9]+|class\=[A-Za-z]+|unit\=[A-Za-z]+|colorantindex\=[0-9]+|colorantrole\=[A-Za-z]+|colorantname\=[A-Za-z]+|coloranttonality\=[0-9]+);){0,1}$$/"
+
+# Test that a request-id value of 0 is not accepted.
+#
+# Required by: RFC 2911 section 3.1.1
+{
+	NAME "I-1. RFC 2911 section 3.1.1: Bad request-id value 0"
+	REQUEST-ID 0
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+
+
+# Test that the first two attributes must be attributes-charset and
+# attributes-natural-language.
+#
+# Required by: RFC 2911 section 3.1.4
+{
+	NAME "I-2. RFC 2911 section 3.1.4: No Operation Attributes"
+	REQUEST-ID random
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "I-3. RFC 2911 section 3.1.4: attributes-charset"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "I-4. RFC 2911 section 3.1.4: attributes-natural-language"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "I-5. RFC 2911 section 3.1.4: attributes-natural-language + attributes-charset"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR charset attributes-charset utf-8
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "I-6. RFC 2911 section 3.1.4: attributes-charset + attributes-natural-language"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS successful-ok
+	EXPECT printer-uri-supported OF-TYPE uri WITH-ALL-VALUES "$IPP_URI_SCHEME"
+}
+
+
+# Test that bad IPP versions are not supported.
+#
+# Required by: RFC 2911 section 3.1.8
+{
+	# The name of the test...
+	NAME "I-7. RFC 2911 section 3.1.8: Unsupported IPP version 0.0"
+	VERSION 0.0
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS server-error-version-not-supported
+	EXPECT !printer-uri-supported
+}
+
+
+# Test that printer operations require the printer-uri operation attribute.
+#
+# Required by: RFC 2911 section 3.2
+{
+	NAME "I-8. RFC 2911 section 3.2: No printer-uri operation attribute"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+
+
+# Test Get-Printer-Attributes operation
+#
+# Required by: PWG 5100.14 Section 5.x
+{
+	NAME "I-9. Get-Printer-Attributes Operation (default)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	# PWG 5100.14 - Table 5 - Operations
+	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0002 # Print-Job
+	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
+	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
+	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
+	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
+	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
+	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
+	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
+	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
+	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
+	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+
+	# PWG 5100.14 - Table 6 - Printer Description Attributes
+	EXPECT charset-configured OF-TYPE charset IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT charset-supported OF-TYPE charset IN-GROUP printer-attributes-tag WITH-VALUE utf-8
+
+	EXPECT color-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT color-supported WITH-VALUE true DEFINE-MATCH HAVE_COLOR
+
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "none"
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH HAVE_DEFLATE
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH HAVE_GZIP
+
+	EXPECT copies-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
+
+	EXPECT document-format-default OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "application/pdf" DEFINE-MATCH HAVE_PDF
+
+	EXPECT document-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_PDF
+
+	EXPECT feed-orientation-supported OF-TYPE keyword IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_FEED_ORIENTATION
+	EXPECT feed-orientation-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_FEED_ORIENTATION
+
+	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3 DEFINE-MATCH HAVE_FINISHINGS
+	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag IF-DEFINED HAVE_FINISHINGS
+
+	EXPECT generated-natural-language-supported OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag
+
+	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/"
+	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)$/"
+
+	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-everywhere"
+
+	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "2.0"
+
+	EXPECT job-account-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true COUNT 1 DEFINE-MATCH HAVE_JOB_ACCOUNT_ID
+	EXPECT job-account-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_JOB_ACCOUNT_ID
+
+	EXPECT job-accounting-user-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true COUNT 1 DEFINE-MATCH HAVE_JOB_ACCOUNTING_USER_ID
+	EXPECT job-accounting-user-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_JOB_ACCOUNTING_USER_ID
+
+	EXPECT job-constraints-supported OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_JOB_CONSTRAINTS
+
+	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(media|print-color-mode)$$/"
+
+	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true
+
+	# TODO: Make job-password-xxx conditionally required
+	EXPECT ?job-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?job-password-encryption-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT job-resolvers-supported OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_JOB_CONSTRAINTS
+
+	EXPECT media-bottom-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+
+	# Default Get-Printer-Attributes MUST NOT return media-col-database, per PWG 5100.11 (JPS2)
+	EXPECT !media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT media-source-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_MEDIA_SOURCE
+
+	EXPECT media-type-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_MEDIA_TYPE
+
+	EXPECT media-col-default OF-TYPE collection IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT media-col-default/media-size OF-TYPE collection COUNT 1
+	EXPECT media-col-default/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-default/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-default/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT media-col-default/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+
+	# TODO: Use EXPECT-ALL (STR #4469)
+	EXPECT media-col-ready OF-TYPE collection|no-value IN-GROUP printer-attributes-tag
+	EXPECT media-col-ready/media-size OF-TYPE collection COUNT 1
+	EXPECT media-col-ready/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-ready/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-ready/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT ?media-col-ready/media-source-properties OF-TYPE collection COUNT 1
+	EXPECT media-col-ready/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+
+	EXPECT media-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT media-col-supported WITH-VALUE "media-size"
+	EXPECT media-col-supported WITH-VALUE "media-source" IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT media-col-supported WITH-VALUE "media-type" IF-DEFINED HAVE_MEDIA_TYPE
+
+	EXPECT media-default OF-TYPE no-value|keyword|name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$MEDIA_REGEX"
+	EXPECT media-default WITH-VALUE "$MEDIA_REGEX" DEFINE-VALUE DEFAULT_MEDIA
+
+	EXPECT media-left-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+
+	EXPECT media-ready OF-TYPE keyword|name|no-value IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$MEDIA_REGEX"
+
+	EXPECT media-right-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+
+	EXPECT media-size-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+	# TODO: Use EXPECT-ALL (STR #4469)
+	EXPECT media-size-supported/x-dimension OF-TYPE integer|rangeOfInteger
+	EXPECT media-size-supported/y-dimension OF-TYPE integer|rangeOfInteger
+
+	# media-source-supported tests above to set HAVE_MEDIA_SOURCE
+
+	EXPECT media-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$MEDIA_REGEX"
+
+	EXPECT media-top-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+
+	# media-type-supported tests above to set HAVE_MEDIA_TYPE
+
+	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT multiple-operation-time-out OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+
+	EXPECT multiple-operation-time-out-action OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(abort-job|hold-job|process-job)$/"
+
+	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag COUNT 1
+
+	# operations-supported tested above for required operations
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6,7
+	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6,7
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT output-bin-default DEFINE-VALUE DEFAULT_OUTPUT_BIN
+	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number" IF-DEFINED HAVE_PDF
+	EXPECT overrides-supported WITH-VALUE "pages" IF-DEFINED HAVE_PDF
+
+	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true IF-DEFINED HAVE_PDF
+
+	EXPECT pages-per-minute OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT pages-per-minute-color OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_COLOR
+	EXPECT !pages-per-minute-color IF-NOT-DEFINED HAVE_COLOR
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
+	EXPECT print-color-mode-default DEFINE-VALUE DEFAULT_PRINT_COLOR_MODE
+	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|graphic|photo|text|text-and-graphic)$/"
+	EXPECT print-content-optimize-default DEFINE-VALUE DEFAULT_PRINT_CONTENT_OPTIMIZE
+	EXPECT print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)$/"
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
+	EXPECT print-rendering-intent-default DEFINE-VALUE DEFAULT_PRINT_RENDERING_INTENT
+	EXPECT print-rendering-intent-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)$/"
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
+	EXPECT print-quality-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5
+
+	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$ALERT_REGEX"
+	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
+
+	EXPECT ?printer-charge-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 DEFINE-MATCH HAVE_CHARGE_INFO
+	EXPECT printer-charge-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED HAVE_CHARGE_INFO
+
+	EXPECT printer-config-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT printer-config-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	EXPECT printer-device-id OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^([-A-Za-z ]+:[^;]*;)+$/"
+
+	EXPECT printer-geo-location OF-TYPE uri|unknown IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^geo:/"
+
+	EXPECT printer-get-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-format"
+
+	# TODO: Use EXPECT-ALL syntax
+	EXPECT printer-icc-profiles-supported OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH HAVE_ICC_PROFILES
+	EXPECT printer-icc-profiles-supported/profile-name OF-TYPE name COUNT 1 IF-DEFINED HAVE_ICC_PROFILES
+	EXPECT printer-icc-profiles-supported/profile-uri OF-TYPE uri COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME" IF-DEFINED HAVE_ICC_PROFILES
+
+	EXPECT printer-icons OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$HTTP_URI_SCHEME"
+	EXPECT printer-icons OF-TYPE uri WITH-ALL-HOSTNAMES "$hostname"
+
+	EXPECT printer-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
+
+	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT printer-location OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
+
+	EXPECT printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
+
+	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
+	# EXPECT !printer-more-info WITH-HOSTNAME "$LINK_LOCAL"
+	# TODO: Provide warnings when hostname doesn't match
+
+	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
+
+	EXPECT printer-organization OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-organizational-unit OF-TYPE text IN-GROUP printer-attributes-tag
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT printer-resolution-default OF-TYPE resolution IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-resolution-default DEFINE-VALUE DEFAULT_PRINTER_RESOLUTION
+	EXPECT printer-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+
+	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+
+	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	EXPECT printer-state-message OF-TYPE text IN-GROUP printer-attributes-tag
+
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX"
+
+	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply
+
+	EXPECT printer-supply-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
+	EXPECT printer-supply-info-uri WITH-HOSTNAME "$hostname"
+	# EXPECT !printer-supply-info-uri WITH-HOSTNAME "$LINK_LOCAL"
+
+	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-security-supported WITH-ALL-VALUES "$IPP_URI_SCHEME"
+	# EXPECT !printer-uri-supported WITH-HOSTNAME "$LINK_LOCAL"
+
+	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+
+	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+
+	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(flipped|manual-tumble|normal|rotated)$$/"
+
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
+
+	# TODO: Use WITH-VALUE-FROM "name-supported" syntax (STR #4470)
+	EXPECT sides-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+	EXPECT sides-default DEFINE-VALUE DEFAULT_SIDES
+	EXPECT sides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+
+	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT uri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-authentication-supported
+
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "completed"
+	EXPECT which-jobs-supported WITH-VALUE "not-completed"
+}
+
+
+# Test Get-Printer-Attributes operation with requested-attributes
+#
+# Required by: RFC 2911 section 3.2.5, PWG 5100.11 (JPS2)
+{
+	NAME "I-10. Get-Printer-Attributes Operation (requested-attributes)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes media-col-database,printer-uri-supported
+
+	STATUS successful-ok
+
+	# TODO: Use EXPECT-ALL (STR #4469)
+	EXPECT media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
+	EXPECT media-col-database/media-size OF-TYPE collection COUNT 1
+	EXPECT media-col-database/media-size/x-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-database/media-size/y-dimension OF-TYPE integer COUNT 1 WITH-VALUE >0
+	EXPECT media-col-database/media-source OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_SOURCE
+	EXPECT ?media-col-database/media-source-properties OF-TYPE collection COUNT 1
+	EXPECT media-col-database/media-type OF-TYPE keyword|name COUNT 1 IF-DEFINED HAVE_MEDIA_TYPE
+
+	EXPECT !printer-name
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
+}
+
+
+# Test Validate-Job operation
+#
+# Required by: RFC 2911 section 3.2.3
+{
+	NAME "I-11 Validate-Job Operation"
+	OPERATION Validate-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "color.jpg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "color.jpg"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/jpeg"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	STATUS successful-ok
+}
+
+
+# Test Print-Job operation
+#
+# Required by: RFC 2911 section 3.2.1
+{
+	NAME "I-12. Print-Job Operation (color.jpg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "job-color.jpg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "document-color.jpg"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/jpeg"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
+
+	NAME "I-13. Get-Jobs Operation (default)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	EXPECT ?job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT !job-name
+	EXPECT !job-state
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
+
+	NAME "I-14. Get-Jobs Operation (requested-attributes)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT ?compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$user"
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<7
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?media OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?page-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
+	EXPECT ?print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	SKIP-IF-DEFINED PRINT_JOB_COMPLETED
+
+	NAME "I-15. Get-Jobs Operation (which-jobs=not-completed)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword which-jobs not-completed
+
+	STATUS successful-ok
+
+	EXPECT ?job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT !job-name
+	EXPECT !job-state
+}
+
+
+# Wait for job to complete...
+{
+	SKIP-IF-NOT-DEFINED PRINT_JOB_ID
+
+	NAME "I-16. Get-Job-Attributes Until Job Complete"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6 REPEAT-NO-MATCH REPEAT-LIMIT 30
+	DISPLAY job-state
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
+	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
+	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document-color.jpg"
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job-color.jpg"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "1"
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
+	EXPECT !page-ranges
+	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
+	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
+	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
+	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
+	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "I-17. Get-Jobs Operation (which-jobs=completed)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword which-jobs completed
+
+	STATUS successful-ok
+
+	# TODO: Use EXPECT-ALL/ANY syntax to check for job that was just completed
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT !job-name
+	EXPECT !job-state
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "I-18. Get-Jobs Operation (which-jobs, requested-attributes)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes all
+	ATTR keyword which-jobs completed
+
+	STATUS successful-ok
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6,<10
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?media OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?page-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
+	EXPECT ?print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+}
+
+
+# Test Cancel-Job operation
+#
+# Required by: RFC 2911 section 3.3.3
+{
+	NAME "I-19. Cancel-Job Operation (completed job)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB_ID
+	ATTR name requesting-user-name $user
+
+	STATUS client-error-not-possible
+}
+
+
+# Test Print-Job operation
+#
+# Required by: RFC 2911 section 3.2.1
+{
+	NAME "I-20. Print-Job Operation (color.jpg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "job2-color.jpg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "document2-color.jpg"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/jpeg"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB2_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+
+# Test Cancel-Job operation
+#
+# Required by: RFC 2911 section 3.3.3
+{
+	NAME "I-21. Cancel-Job Operation (pending/processing job)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB2_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS client-error-not-possible
+}
+
+
+# Test Get-Job-Attributes operation
+#
+# Required by: RFC 2911 section 3.3.4
+{
+	NAME "I-22. Get-Job-Attributes Operation"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB2_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
+	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
+	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document2-color.jpg"
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB2_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job2-color.jpg"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6,<10
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "1"
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
+	EXPECT !page-ranges
+	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
+	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
+	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
+	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
+	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
+}
+
+
+# Test Create-Job and Send-Document operations
+#
+# Defined by: RFC 2911 section 3.2.4 and 3.3.1
+{
+	NAME "I-23. Create-Job Operation"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "job3-color.jpg"
+	ATTR boolean ipp-attribute-fidelity false
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB3_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+{
+	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+
+	NAME "I-24. Send-Document Operation (color.jpg)"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name "document3-color.jpg"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/jpeg"
+
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+}
+
+
+# Wait for job to complete...
+{
+	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
+
+	NAME "I-25. Get-Job-Attributes Until Job Complete"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $PRINT_JOB3_ID
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6 REPEAT-NO-MATCH REPEAT-LIMIT 30
+	DISPLAY job-state
+
+	# PWG 5100.14 - Table 9 - Job Description attributes
+	EXPECT compression-supplied OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "none"
+	EXPECT date-time-at-completed OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-creation OF-TYPE dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT date-time-at-processing OF-TYPE dateTime|no-value IN-GROUP job-attributes-tag COUNT 1
+	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
+	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
+	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document3-color.jpg"
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB3_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job3-color.jpg"
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-up-time OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$uri"
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-uuid OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$UUID_URI"
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	# PWG 5100.15 - Table 8 - Job Template attributes
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "1"
+	EXPECT ?feed-orientation OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
+	EXPECT !page-ranges
+	EXPECT print-color-mode OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_COLOR_MODE"
+	EXPECT print-content-optimize OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	EXPECT print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $DEFAULT_PRINT_QUALITY
+	EXPECT print-rendering-intent OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINT_RENDERING_INTENT"
+	EXPECT printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_PRINTER_RESOLUTION"
+	EXPECT sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "one-sided"
+}
+
+
+# Test 'media-empty' reason
+{
+	PAUSE "Remove media from printer."
+
+	NAME "I-26. Media Empty: Printer correctly reports 'media-empty' when at least one removable tray is empty (MUST NOT be a manual feed or bypass tray)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes "printer-state-reasons"
+
+	STATUS successful-ok
+
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-empty/"
+	EXPECT !printer-state
+}
+
+
+# Test Print-Job operation
+#
+# Required by: RFC 2911 section 3.2.1
+{
+	NAME "I-27. Print-Job Operation (color.jpg)"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "job4-color.jpg"
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name "document4-color.jpg"
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format "image/jpeg"
+
+	GROUP job-attributes-tag
+	ATTR keyword media "$DEFAULT_MEDIA"
+	ATTR keyword print-color-mode "$DEFAULT_PRINT_COLOR_MODE"
+	ATTR keyword print-content-optimize "$DEFAULT_PRINT_CONTENT_OPTIMIZE"
+	ATTR keyword print-rendering-intent "$DEFAULT_PRINT_RENDERING_INTENT"
+	ATTR enum print-quality $DEFAULT_PRINT_QUALITY
+	ATTR resolution printer-resolution $DEFAULT_PRINTER_RESOLUTION
+	ATTR keyword sides "one-sided"
+
+	FILE "color.jpg"
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE >0
+	EXPECT job-id DEFINE-VALUE PRINT_JOB4_ID
+
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
+
+	EXPECT job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+}
+
+
+# Test 'media-needed' reason
+{
+	NAME "I-28. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes "printer-state-reasons"
+
+	STATUS successful-ok
+
+	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^media-needed/"
+	EXPECT !printer-state
+}
+
+
+
+
+#
+# End of "$Id: ipp-tests.test 12690 2015-06-04 16:34:20Z msweet $".
+#

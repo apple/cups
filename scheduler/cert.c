@@ -1,9 +1,9 @@
 /*
- * "$Id: cert.c 12034 2014-07-16 19:37:34Z msweet $"
+ * "$Id: cert.c 12972 2015-11-13 20:30:37Z msweet $"
  *
  * Authentication certificate routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -24,6 +24,13 @@
 #    include <membership.h>
 #  endif /* HAVE_MEMBERSHIP_H */
 #endif /* HAVE_ACL_INIT */
+
+
+/*
+ * Local functions...
+ */
+
+static int	ctcompare(const char *a, const char *b);
 
 
 /*
@@ -101,8 +108,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
     fchmod(fd, 0440);
     fchown(fd, RunUser, SystemGroupIDs[0]);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddCert: NumSystemGroups=%d",
-                    NumSystemGroups);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddCert: NumSystemGroups=%d", NumSystemGroups);
 
 #ifdef HAVE_ACL_INIT
     if (NumSystemGroups > 1)
@@ -278,8 +284,7 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
       * Remove this certificate from the list...
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdDeleteCert: Removing certificate for PID %d", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteCert: Removing certificate for PID %d.", pid);
 
       DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
                     cert->username, cert->certificate));
@@ -353,17 +358,15 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
   cupsd_cert_t	*cert;			/* Current certificate */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)",
-                  certificate);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)", certificate);
   for (cert = Certs; cert != NULL; cert = cert->next)
-    if (!_cups_strcasecmp(certificate, cert->certificate))
+    if (!ctcompare(certificate, cert->certificate))
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning %s...",
-                      cert->username);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning \"%s\".", cert->username);
       return (cert);
     }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Certificate not found!");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Certificate not found.");
 
   return (NULL);
 }
@@ -426,5 +429,27 @@ cupsdInitCerts(void)
 
 
 /*
- * End of "$Id: cert.c 12034 2014-07-16 19:37:34Z msweet $".
+ * 'ctcompare()' - Compare two strings in constant time.
+ */
+
+static int				/* O - 0 on match, non-zero on non-match */
+ctcompare(const char *a,		/* I - First string */
+          const char *b)		/* I - Second string */
+{
+  int	result = 0;			/* Result */
+
+
+  while (*a && *b)
+  {
+    result |= *a ^ *b;
+    a ++;
+    b ++;
+  }
+
+  return (result);
+}
+
+
+/*
+ * End of "$Id: cert.c 12972 2015-11-13 20:30:37Z msweet $".
  */

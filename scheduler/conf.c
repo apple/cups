@@ -1,9 +1,9 @@
 /*
- * "$Id: conf.c 12701 2015-06-08 18:33:44Z msweet $"
+ * "$Id: conf.c 12819 2015-07-31 13:52:00Z msweet $"
  *
  * Configuration routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -21,6 +21,12 @@
 #include <stdarg.h>
 #include <grp.h>
 #include <sys/utsname.h>
+#ifdef HAVE_ASL_H
+#  include <asl.h>
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#  define SD_JOURNAL_SUPPRESS_LOCATION
+#  include <systemd/sd-journal.h>
+#endif /* HAVE_ASL_H */
 #include <syslog.h>
 
 #ifdef HAVE_LIBPAPER
@@ -269,8 +275,20 @@ cupsdCheckPermissions(
 			  "Unable to create directory \"%s\" - %s", filename,
 			  strerror(errno));
         else
-	  syslog(LOG_ERR, "Unable to create directory \"%s\" - %s", filename,
-		 strerror(errno));
+#ifdef HAVE_ASL_H
+        {
+	  asl_object_t	m;		/* Log message */
+
+	  m = asl_new(ASL_TYPE_MSG);
+	  asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	  asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
+	  asl_release(m);
+	}
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	  sd_journal_print(LOG_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
+#else
+	  syslog(LOG_ERR, "Unable to create directory \"%s\" - %s", filename, strerror(errno));
+#endif /* HAVE_ASL_H */
 
         return (-1);
       }
@@ -307,7 +325,20 @@ cupsdCheckPermissions(
     if (create_dir >= 0)
       cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory.", filename);
     else
+#ifdef HAVE_ASL_H
+    {
+      asl_object_t	m;		/* Log message */
+
+      m = asl_new(ASL_TYPE_MSG);
+      asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+      asl_log(NULL, m, ASL_LEVEL_ERR, "\"%s\" is not a directory.", filename);
+      asl_release(m);
+    }
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+      sd_journal_print(LOG_ERR, "\"%s\" is not a directory.", filename);
+#else
       syslog(LOG_ERR, "\"%s\" is not a directory.", filename);
+#endif /* HAVE_ASL_H */
 
     return (-1);
   }
@@ -336,8 +367,20 @@ cupsdCheckPermissions(
 			"Unable to change ownership of \"%s\" - %s", filename,
 			strerror(errno));
       else
-	syslog(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename,
-	       strerror(errno));
+#ifdef HAVE_ASL_H
+      {
+	asl_object_t	m;		/* Log message */
+
+	m = asl_new(ASL_TYPE_MSG);
+	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
+	asl_release(m);
+      }
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	sd_journal_print(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
+#else
+	syslog(LOG_ERR, "Unable to change ownership of \"%s\" - %s", filename, strerror(errno));
+#endif /* HAVE_ASL_H */
 
       return (1);
     }
@@ -356,8 +399,20 @@ cupsdCheckPermissions(
 			"Unable to change permissions of \"%s\" - %s", filename,
 			strerror(errno));
       else
-	syslog(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename,
-	       strerror(errno));
+#ifdef HAVE_ASL_H
+      {
+	asl_object_t	m;		/* Log message */
+
+	m = asl_new(ASL_TYPE_MSG);
+	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
+	asl_release(m);
+      }
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	sd_journal_print(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
+#else
+	syslog(LOG_ERR, "Unable to change permissions of \"%s\" - %s", filename, strerror(errno));
+#endif /* HAVE_ASL_H */
 
       return (1);
     }
@@ -782,8 +837,20 @@ cupsdReadConfiguration(void)
       if (TestConfigFile)
         printf("\"%s\" contains errors.\n", CupsFilesFile);
       else
-        syslog(LOG_LPR, "Unable to read \"%s\" due to errors.",
-               CupsFilesFile);
+#ifdef HAVE_ASL_H
+      {
+	asl_object_t	m;		/* Log message */
+
+	m = asl_new(ASL_TYPE_MSG);
+	asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
+	asl_release(m);
+      }
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	sd_journal_print(LOG_ERR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
+#else
+        syslog(LOG_LPR, "Unable to read \"%s\" due to errors.", CupsFilesFile);
+#endif /* HAVE_ASL_H */
 
       return (0);
     }
@@ -792,8 +859,20 @@ cupsdReadConfiguration(void)
     cupsdLogMessage(CUPSD_LOG_INFO, "No %s, using defaults.", CupsFilesFile);
   else
   {
-    syslog(LOG_LPR, "Unable to open \"%s\": %s", CupsFilesFile,
-	   strerror(errno));
+#ifdef HAVE_ASL_H
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
+    asl_release(m);
+
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+    sd_journal_print(LOG_ERR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
+#else
+    syslog(LOG_LPR, "Unable to open \"%s\" - %s", CupsFilesFile, strerror(errno));
+#endif /* HAVE_ASL_H */
+
     return (0);
   }
 
@@ -806,8 +885,19 @@ cupsdReadConfiguration(void)
 
   if ((fp = cupsFileOpen(ConfigurationFile, "r")) == NULL)
   {
-    syslog(LOG_LPR, "Unable to open \"%s\": %s", ConfigurationFile,
-	   strerror(errno));
+#ifdef HAVE_ASL_H
+    asl_object_t	m;		/* Log message */
+
+    m = asl_new(ASL_TYPE_MSG);
+    asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+    asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
+    asl_release(m);
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+    sd_journal_print(LOG_ERR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
+#else
+    syslog(LOG_LPR, "Unable to open \"%s\" - %s", ConfigurationFile, strerror(errno));
+#endif /* HAVE_ASL_H */
+
     return (0);
   }
 
@@ -820,8 +910,20 @@ cupsdReadConfiguration(void)
     if (TestConfigFile)
       printf("\"%s\" contains errors.\n", ConfigurationFile);
     else
-      syslog(LOG_LPR, "Unable to read \"%s\" due to errors.",
-	     ConfigurationFile);
+#ifdef HAVE_ASL_H
+    {
+      asl_object_t	m;		/* Log message */
+
+      m = asl_new(ASL_TYPE_MSG);
+      asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+      asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
+      asl_release(m);
+    }
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+      sd_journal_print(LOG_ERR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
+#else
+      syslog(LOG_LPR, "Unable to read \"%s\" due to errors.", ConfigurationFile);
+#endif /* HAVE_ASL_H */
 
     return (0);
   }
@@ -948,12 +1050,24 @@ cupsdReadConfiguration(void)
   * Open the system log for cupsd if necessary...
   */
 
-#ifdef HAVE_VSYSLOG
+  if (!LogStderr)
+  {
+    if (!strcmp(AccessLog, "stderr"))
+      cupsdSetString(&AccessLog, "syslog");
+
+    if (!strcmp(ErrorLog, "stderr"))
+      cupsdSetString(&ErrorLog, "syslog");
+
+    if (!strcmp(PageLog, "stderr"))
+      cupsdSetString(&PageLog, "syslog");
+  }
+
+#if defined(HAVE_VSYSLOG) && !defined(HAVE_ASL_H) && !defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(AccessLog, "syslog") ||
       !strcmp(ErrorLog, "syslog") ||
       !strcmp(PageLog, "syslog"))
     openlog("cupsd", LOG_PID | LOG_NOWAIT | LOG_NDELAY, LOG_LPR);
-#endif /* HAVE_VSYSLOG */
+#endif /* HAVE_VSYSLOG && !HAVE_ASL_H && !HAVE_SYSTEMD_SD_JOURNAL_H */
 
  /*
   * Make sure each of the log files exists and gets rotated as necessary...
@@ -1181,6 +1295,19 @@ cupsdReadConfiguration(void)
   */
 
   cupsdUpdateEnv();
+
+  /*
+   * Validate the default error policy...
+   */
+
+  if (strcmp(ErrorPolicy, "retry-current-job") &&
+      strcmp(ErrorPolicy, "abort-job") &&
+      strcmp(ErrorPolicy, "retry-job") &&
+      strcmp(ErrorPolicy, "stop-printer"))
+  {
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid ErrorPolicy \"%s\", resetting to \"stop-printer\".", ErrorPolicy);
+    cupsdSetString(&ErrorPolicy, "stop-printer");
+  }
 
  /*
   * Update default paper size setting as needed...
@@ -3470,7 +3597,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       * Level of sandboxing?
       */
 
-      if (!_cups_strcasecmp(value, "off"))
+      if (!_cups_strcasecmp(value, "off") && getuid())
       {
         Sandboxing = CUPSD_SANDBOXING_OFF;
         cupsdLogMessage(CUPSD_LOG_WARN, "Disabling sandboxing is not recommended (line %d of %s)", linenum, CupsFilesFile);
@@ -3977,121 +4104,106 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
   * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
   * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
   * upgrades do not introduce new security issues...
+  *
+  * CUPS STR #4659: Allow a lone <Limit All> policy.
   */
 
-  if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
-      op->op == IPP_ANY_OPERATION)
+  if (cupsArrayCount(pol->ops) > 1)
   {
-    if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
-	op->op != IPP_ANY_OPERATION)
+    if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
+	op->op == IPP_ANY_OPERATION)
     {
-     /*
-      * Add a new limit for Validate-Job using the Print-Job limit as a
-      * template...
-      */
+      if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
+	  op->op != IPP_ANY_OPERATION)
+      {
+       /*
+	* Add a new limit for Validate-Job using the Print-Job limit as a
+	* template...
+	*/
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Validate-Job defined in policy %s "
-		      "- using Print-Job's policy.", pol->name);
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Validate-Job defined in policy %s - using Print-Job's policy.", pol->name);
 
-      cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
+	cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Validate-Job defined in policy %s and no suitable template found.", pol->name);
     }
-    else
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Validate-Job defined in policy %s "
-		      "and no suitable template found.", pol->name);
-  }
 
-  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
-      op->op == IPP_ANY_OPERATION)
-  {
-    if ((op = cupsdFindPolicyOp(pol, IPP_PAUSE_PRINTER)) != NULL &&
-	op->op != IPP_ANY_OPERATION)
+    if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
+	op->op == IPP_ANY_OPERATION)
     {
-     /*
-      * Add a new limit for Cancel-Jobs using the Pause-Printer limit as a
-      * template...
-      */
+      if ((op = cupsdFindPolicyOp(pol, IPP_PAUSE_PRINTER)) != NULL &&
+	  op->op != IPP_ANY_OPERATION)
+      {
+       /*
+	* Add a new limit for Cancel-Jobs using the Pause-Printer limit as a
+	* template...
+	*/
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Cancel-Jobs defined in policy %s "
-		      "- using Pause-Printer's policy.", pol->name);
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Cancel-Jobs defined in policy %s - using Pause-Printer's policy.", pol->name);
 
-      cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
+	cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Cancel-Jobs defined in policy %s and no suitable template found.", pol->name);
     }
-    else
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Cancel-Jobs defined in policy %s "
-		      "and no suitable template found.", pol->name);
-  }
 
-  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
-      op->op == IPP_ANY_OPERATION)
-  {
-    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-	op->op != IPP_ANY_OPERATION)
+    if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
+	op->op == IPP_ANY_OPERATION)
     {
-     /*
-      * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
-      * a template...
-      */
+      if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	  op->op != IPP_ANY_OPERATION)
+      {
+       /*
+	* Add a new limit for Cancel-My-Jobs using the Send-Document limit as
+	* a template...
+	*/
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Cancel-My-Jobs defined in policy %s "
-		      "- using Send-Document's policy.", pol->name);
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Cancel-My-Jobs defined in policy %s - using Send-Document's policy.", pol->name);
 
-      cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
+	cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Cancel-My-Jobs defined in policy %s and no suitable template found.", pol->name);
     }
-    else
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Cancel-My-Jobs defined in policy %s "
-		      "and no suitable template found.", pol->name);
-  }
 
-  if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
-      op->op == IPP_ANY_OPERATION)
-  {
-    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-	op->op != IPP_ANY_OPERATION)
+    if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
+	op->op == IPP_ANY_OPERATION)
     {
-     /*
-      * Add a new limit for Close-Job using the Send-Document limit as a
-      * template...
-      */
+      if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	  op->op != IPP_ANY_OPERATION)
+      {
+       /*
+	* Add a new limit for Close-Job using the Send-Document limit as a
+	* template...
+	*/
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Close-Job defined in policy %s "
-		      "- using Send-Document's policy.", pol->name);
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Close-Job defined in policy %s - using Send-Document's policy.", pol->name);
 
-      cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
+	cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for Close-Job defined in policy %s and no suitable template found.", pol->name);
     }
-    else
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for Close-Job defined in policy %s "
-		      "and no suitable template found.", pol->name);
-  }
 
-  if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
-      op->op == IPP_ANY_OPERATION)
-  {
-    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-	op->op != IPP_ANY_OPERATION)
+    if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
+	op->op == IPP_ANY_OPERATION)
     {
-     /*
-      * Add a new limit for CUPS-Get-Document using the Send-Document
-      * limit as a template...
-      */
+      if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	  op->op != IPP_ANY_OPERATION)
+      {
+       /*
+	* Add a new limit for CUPS-Get-Document using the Send-Document
+	* limit as a template...
+	*/
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for CUPS-Get-Document defined in policy %s "
-		      "- using Send-Document's policy.", pol->name);
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for CUPS-Get-Document defined in policy %s - using Send-Document's policy.", pol->name);
 
-      cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
+	cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_WARN, "No limit for CUPS-Get-Document defined in policy %s and no suitable template found.", pol->name);
     }
-    else
-      cupsdLogMessage(CUPSD_LOG_WARN,
-		      "No limit for CUPS-Get-Document defined in policy %s "
-		      "and no suitable template found.", pol->name);
   }
 
  /*
@@ -4101,18 +4213,14 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
   if (!pol->job_access)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-		    "No JobPrivateAccess defined in policy %s "
-		    "- using defaults.", pol->name);
+    cupsdLogMessage(CUPSD_LOG_WARN, "No JobPrivateAccess defined in policy %s - using defaults.", pol->name);
     cupsdAddString(&(pol->job_access), "@OWNER");
     cupsdAddString(&(pol->job_access), "@SYSTEM");
   }
 
   if (!pol->job_attrs)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-		    "No JobPrivateValues defined in policy %s "
-		    "- using defaults.", pol->name);
+    cupsdLogMessage(CUPSD_LOG_WARN, "No JobPrivateValues defined in policy %s - using defaults.", pol->name);
     cupsdAddString(&(pol->job_attrs), "job-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
@@ -4121,18 +4229,14 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
   if (!pol->sub_access)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-		    "No SubscriptionPrivateAccess defined in policy %s "
-		    "- using defaults.", pol->name);
+    cupsdLogMessage(CUPSD_LOG_WARN, "No SubscriptionPrivateAccess defined in policy %s - using defaults.", pol->name);
     cupsdAddString(&(pol->sub_access), "@OWNER");
     cupsdAddString(&(pol->sub_access), "@SYSTEM");
   }
 
   if (!pol->sub_attrs)
   {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-		    "No SubscriptionPrivateValues defined in policy %s "
-		    "- using defaults.", pol->name);
+    cupsdLogMessage(CUPSD_LOG_WARN, "No SubscriptionPrivateValues defined in policy %s - using defaults.", pol->name);
     cupsdAddString(&(pol->sub_attrs), "notify-events");
     cupsdAddString(&(pol->sub_attrs), "notify-pull-method");
     cupsdAddString(&(pol->sub_attrs), "notify-recipient-uri");
@@ -4143,5 +4247,5 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
 
 
 /*
- * End of "$Id: conf.c 12701 2015-06-08 18:33:44Z msweet $".
+ * End of "$Id: conf.c 12819 2015-07-31 13:52:00Z msweet $".
  */

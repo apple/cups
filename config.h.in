@@ -1,9 +1,9 @@
 /*
- * "$Id: config.h.in 12329 2014-12-09 20:50:51Z msweet $"
+ * "$Id: config.h.in 12687 2015-06-03 17:19:04Z msweet $"
  *
  * Configuration file for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -243,6 +243,20 @@
 
 
 /*
+ * Do we have the ASL functions?
+ */
+
+#undef HAVE_ASL_H
+
+
+/*
+ * Do we have the systemd journal functions?
+ */
+
+#undef HAVE_SYSTEMD_SD_JOURNAL_H
+
+
+/*
  * Do we have the (v)snprintf() functions?
  */
 
@@ -346,6 +360,13 @@
  */
 
 #undef HAVE_SECKEYCHAINOPEN
+
+
+/*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+#undef HAVE_SSLSETENABLEDCIPHERS
 
 
 /*
@@ -719,5 +740,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 12329 2014-12-09 20:50:51Z msweet $".
+ * End of "$Id: config.h.in 12687 2015-06-03 17:19:04Z msweet $".
  */

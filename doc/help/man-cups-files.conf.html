@@ -23,9 +23,11 @@ The following directives are understood by
 <dl class="man">
 <dt><a name="AccessLog"></a><b>AccessLog</b>
 <dd style="margin-left: 5.0em"><dt><b>AccessLog </b><i>filename</i>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog stderr</b>
 <dd style="margin-left: 5.0em"><dt><b>AccessLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the access log filename.
 Specifying a blank filename disables access log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 <pre class="man">
@@ -50,9 +52,11 @@ The default is usually "/usr/share/cups".
 The default is usually "/usr/share/doc/cups".
 <dt><a name="ErrorLog"></a><b>ErrorLog</b>
 <dd style="margin-left: 5.0em"><dt><b>ErrorLog </b><i>filename</i>
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog stderr</b>
 <dd style="margin-left: 5.0em"><dt><b>ErrorLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the error log filename.
 Specifying a blank filename disables error log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 <pre class="man">
@@ -95,8 +99,10 @@ The default group is operating system specific but is usually "lp" or "nobody".
 <dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes.
 The default is "0644".
 <dt><a name="PageLog"></a><b>PageLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em"><dt><b>PageLog stderr</b>
 <dd style="margin-left: 5.0em"><dt><b>PageLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the page log filename.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
 The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables page log generation.
 The server name may be included in filenames using the string "%s", for example:
@@ -112,8 +118,7 @@ The default is "remroot".
 <dt><a name="RequestRoot"></a><b>RequestRoot </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory that contains print jobs and other HTTP request data.
 The default is "/var/spool/cups".
-<dt><a name="Sandboxing"></a><b>Sandboxing off</b>
-<dd style="margin-left: 5.0em"><dt><b>Sandboxing relaxed</b>
+<dt><a name="Sandboxing"></a><b>Sandboxing relaxed</b>
 <dd style="margin-left: 5.0em"><dt><b>Sandboxing strict</b>
 <dd style="margin-left: 5.0em">Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
 The default is "strict".

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: ppdi.man 11927 2014-06-13 00:01:23Z msweet $"
+.\" "$Id: ppdi.man 12854 2015-08-28 14:08:00Z msweet $"
 .\"
 .\" ppdi man page for CUPS.
 .\"
@@ -52,7 +52,7 @@ If no source file is specified, the filename \fIppdi.drv\fR is used.
 .BR ppdcfile (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
-.\" End of "$Id: ppdi.man 11927 2014-06-13 00:01:23Z msweet $".
+.\" End of "$Id: ppdi.man 12854 2015-08-28 14:08:00Z msweet $".
 .\"

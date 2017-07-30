@@ -1,9 +1,9 @@
 /*
- * "$Id: http-support.c 12124 2014-08-28 15:37:22Z msweet $"
+ * "$Id: http-support.c 12970 2015-11-13 20:02:51Z msweet $"
  *
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1233,6 +1233,12 @@ httpSeparateURI(
 
       *port = (int)strtol(uri + 1, (char **)&uri, 10);
 
+      if (*port <= 0 || *port > 65535)
+      {
+        *port = 0;
+        return (HTTP_URI_STATUS_BAD_PORT);
+      }
+
       if (*uri != '/' && *uri)
       {
         *port = 0;
@@ -1722,7 +1728,7 @@ _httpResolveURI(
 	while (time(NULL) < end_time)
 	{
 	  if (options & _HTTP_RESOLVE_STDERR)
-	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
+	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer..."));
 
 	  if (cb && !(*cb)(context))
 	  {
@@ -2544,5 +2550,5 @@ http_resolve_cb(
 
 
 /*
- * End of "$Id: http-support.c 12124 2014-08-28 15:37:22Z msweet $".
+ * End of "$Id: http-support.c 12970 2015-11-13 20:02:51Z msweet $".
  */
