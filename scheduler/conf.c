@@ -878,6 +878,7 @@ cupsdReadConfiguration(void)
     if (!ServerAlias)
       ServerAlias = cupsArrayNew(NULL, NULL);
 
+    cupsdAddAlias(ServerAlias, ServerName);
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", ServerName);
   }
   else

@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-07-23
+CHANGES - 2.2.5 - 2017-07-31
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -21,6 +21,7 @@ CHANGES IN CUPS V2.2.5
   but doesn't document or check for it (Issue #5062)
 - Fixed the `SSLOptions DenyCBC` option when using GNU TLS (Issue #5065)
 - Fixed the `ServerTokens None` option (Issue #5065)
+- Fixed the default `ServerAlias` value from `ServerName` (Issue #5072)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
