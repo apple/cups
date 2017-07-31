@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 13:46-0400\n"
+"POT-Creation-Date: 2017-07-31 17:33-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -794,7 +794,8 @@ msgid "  --[no-]debug-logging    Turn debug logging on/off."
 msgstr "  --[no-]debug-logging    Activer/désactiver les journaux de débogage."
 
 msgid "  --[no-]remote-admin     Turn remote administration on/off."
-msgstr "  --[no-]remote-admin     Activer/désactiver l'administration à distance."
+msgstr ""
+"  --[no-]remote-admin     Activer/désactiver l'administration à distance."
 
 msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
 msgstr "  --[no-]remote-any       Autoriser/interdire l'accès depuis internet."
@@ -803,7 +804,9 @@ msgid "  --[no-]share-printers   Turn printer sharing on/off."
 msgstr "  --[no-]share-printers   Activer/désactiver le partage d'imprimante."
 
 msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
-msgstr "  --[no-]user-cancel-any  Autoriser/interdire aux utilisateurs d'annuler une impression."
+msgstr ""
+"  --[no-]user-cancel-any  Autoriser/interdire aux utilisateurs d'annuler une "
+"impression."
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    Fin de ligne avec CR (Mac OS 9)."
@@ -812,7 +815,9 @@ msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  Fin de ligne avec CR + LF (Windows)."
 
 msgid "  --domain regex          Match domain to regular expression."
-msgstr "  --domain regex          Correspondance du domaine avec une expression rationnelle."
+msgstr ""
+"  --domain regex          Correspondance du domaine avec une expression "
+"rationnelle."
 
 msgid ""
 "  --exec utility [argument ...] ;\n"
@@ -831,7 +836,9 @@ msgid "  --help                  Show this help."
 msgstr "  --help                  Show cette help."
 
 msgid "  --host regex            Match hostname to regular expression."
-msgstr "  --host regex            Correspondance du nom d'hôte avec une expression rationnelle."
+msgstr ""
+"  --host regex            Correspondance du nom d'hôte avec une expression "
+"rationnelle."
 
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr "  --lf                    Fin de ligne avec LF (UNIX/Linux/macOS)."
@@ -846,16 +853,22 @@ msgid "  --ls                    List attributes."
 msgstr "  --ls                    Attributs de liste."
 
 msgid "  --name regex            Match service name to regular expression."
-msgstr "  --name regex            Correspondance du service avec une expression rationnelle."
+msgstr ""
+"  --name regex            Correspondance du service avec une expression "
+"rationnelle."
 
 msgid "  --not expression        Unary NOT of expression."
 msgstr "  --not expression        Opérateur NON d'une expression."
 
 msgid "  --path regex            Match resource path to regular expression."
-msgstr "  --path regex            Correspondance du chemin d'une ressource avec une expression rationnelle."
+msgstr ""
+"  --path regex            Correspondance du chemin d'une ressource avec une "
+"expression rationnelle."
 
 msgid "  --port number[-number]  Match port to number or range."
-msgstr "  --port numéro[-numéro]  Correspondance du port à un numéro ou une plage de numéros."
+msgstr ""
+"  --port numéro[-numéro]  Correspondance du port à un numéro ou une plage de "
+"numéros."
 
 msgid "  --print                 Print URI if true."
 msgstr "  --print                 Afficher URI si vrai."
@@ -864,7 +877,8 @@ msgid "  --print-name            Print service name if true."
 msgstr "  --print-name            Afficher le nom de service si vrai."
 
 msgid "  --quiet                 Quietly report match via exit code."
-msgstr "  --quiet                 Signale la correspodance par le code de sortie."
+msgstr ""
+"  --quiet                 Signale la correspodance par le code de sortie."
 
 msgid "  --remote                True if service is remote."
 msgstr "  --remote                Vrai si le service est distant."
@@ -880,13 +894,18 @@ msgid "  --true                  Always true."
 msgstr "  --true                  Toujours vrai."
 
 msgid "  --txt key               True if the TXT record contains the key."
-msgstr "  --txt key               Vrai si l'enregistrement TXT contient la clef."
+msgstr ""
+"  --txt key               Vrai si l'enregistrement TXT contient la clef."
 
 msgid "  --txt-* regex           Match TXT record key to regular expression."
-msgstr "  --txt-* regex           Correspondance de la clef TXT avec une expression rationnelle."
+msgstr ""
+"  --txt-* regex           Correspondance de la clef TXT avec une expression "
+"rationnelle."
 
 msgid "  --uri regex             Match URI to regular expression."
-msgstr "  --uri regex             Correspondance d'une URI avec une expression rationnelle."
+msgstr ""
+"  --uri regex             Correspondance d'une URI avec une expression "
+"rationnelle."
 
 msgid "  --version               Show program version."
 msgstr "  --version               Affiche la version du programme."
@@ -904,7 +923,8 @@ msgid "  -C                      Send requests using chunking (default)."
 msgstr ""
 
 msgid "  -D                      Remove the input file when finished."
-msgstr "  -D                      Suppression du fichier d'entrée une fois terminé."
+msgstr ""
+"  -D                      Suppression du fichier d'entrée une fois terminé."
 
 msgid "  -D name=value           Set named variable to value."
 msgstr "  -D nom=valeur           Affecter la variable nom à cette valeur."
@@ -929,7 +949,8 @@ msgid "  -I                      Ignore errors."
 msgstr "  -I                      Ignorer les erreurs."
 
 msgid "  -I include-dir          Add include directory to search path."
-msgstr "  -I rep-inclus           Ajouter le répertoire au chemin des recherches."
+msgstr ""
+"  -I rep-inclus           Ajouter le répertoire au chemin des recherches."
 
 msgid "  -I {filename,filters,none,profiles}"
 msgstr "  -I {nomDeFichier,filtres,none,profils}"
@@ -946,7 +967,9 @@ msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P fichier.ppd          Choisir un fichier PPD."
 
 msgid "  -P number[-number]      Match port to number or range."
-msgstr "  -P numéro[-numéro]      Correspondance du port à un numéro ou une plage de numéro."
+msgstr ""
+"  -P numéro[-numéro]      Correspondance du port à un numéro ou une plage de "
+"numéro."
 
 msgid "  -R root-directory       Set alternate root."
 msgstr "  -R répertoire-root      Choisir une autre racine."
@@ -955,10 +978,14 @@ msgid "  -S                      Test with encryption using HTTPS."
 msgstr "  -S                      Tester avec un chiffrement utilisant HTTPS."
 
 msgid "  -T seconds              Set the browse timeout in seconds."
-msgstr "  -T secondes             Choisir le délai d'expiration de la navigation en secondes."
+msgstr ""
+"  -T secondes             Choisir le délai d'expiration de la navigation en "
+"secondes."
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
-msgstr "  -T secondes             Choisir le délai d'expiration réception/envoi en secondes."
+msgstr ""
+"  -T secondes             Choisir le délai d'expiration réception/envoi en "
+"secondes."
 
 msgid "  -U username             Specify username."
 msgstr "  -U nom                  Indiquer le nom d'utilisateur."
@@ -999,7 +1026,9 @@ msgid "  -d printer              Use the named printer."
 msgstr "  -d imprimante           Utiliser l'imprimante nommée."
 
 msgid "  -d regex                Match domain to regular expression."
-msgstr "  -d regex                Correspondance du domaine avec l'expression rationnelle."
+msgstr ""
+"  -d regex                Correspondance du domaine avec l'expression "
+"rationnelle."
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Utiliser tous les filtres du fichier PPD."
@@ -1014,18 +1043,23 @@ msgid "  -h                      Show this usage message."
 msgstr "  -h                      Afficher le message d'usage."
 
 msgid "  -h regex                Match hostname to regular expression."
-msgstr "  -h regex                Correspondance du nom d'hôte avec l'expression rationnelle."
+msgstr ""
+"  -h regex                Correspondance du nom d'hôte avec l'expression "
+"rationnelle."
 
 msgid "  -h server[:port]        Specify server address."
 msgstr "  -h serveur[:port]       Indiquer l'adresse du serveur."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
-msgstr "  -i mime/type            Affecter le type MIME d'entrée (sinon type automatique)"
+msgstr ""
+"  -i mime/type            Affecter le type MIME d'entrée (sinon type "
+"automatique)"
 
 msgid ""
 "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
-"  -i secondes             Repéter le dernier fichier avec l'intervale de temps indiqué."
+"  -i secondes             Repéter le dernier fichier avec l'intervale de "
+"temps indiqué."
 
 msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
@@ -1044,7 +1078,8 @@ msgid "  -l                      Run cupsd on demand."
 msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
-msgstr "  -l lang[,lang,...]      Indiquer la(les) langue(s) de sortie (locale)."
+msgstr ""
+"  -l lang[,lang,...]      Indiquer la(les) langue(s) de sortie (locale)."
 
 msgid "  -m                      Use the ModelName value as the filename."
 msgstr ""
@@ -1059,18 +1094,24 @@ msgstr "  -n copies               Choisir le nombre de copies."
 msgid ""
 "  -n count                Repeat the last file the given number of times."
 msgstr ""
-"  -n compteur             Repéter le dernier fichier le nombre de fois indiqué."
+"  -n compteur             Repéter le dernier fichier le nombre de fois "
+"indiqué."
 
 msgid "  -n regex                Match service name to regular expression."
-msgstr "  -n regex                Correspondance du nom de service avec une expression rationnelle."
+msgstr ""
+"  -n regex                Correspondance du nom de service avec une "
+"expression rationnelle."
 
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
-"  -o fichier.drv          Affecter le fichier d'infos du pilote (sinon ppdi.drv)."
+"  -o fichier.drv          Affecter le fichier d'infos du pilote (sinon ppdi."
+"drv)."
 
 msgid "  -o filename.ppd[.gz]    Set output file (otherwise stdout)."
-msgstr "  -o fichier.ppd[.gz]     Affecter le fichier de sortie (sinon sortie standard)."
+msgstr ""
+"  -o fichier.ppd[.gz]     Affecter le fichier de sortie (sinon sortie "
+"standard)."
 
 msgid "  -o name=value           Set option(s)."
 msgstr "  -o nom=valeur           Affecter des option(s)."
@@ -1109,7 +1150,8 @@ msgid "  -t                      Test the configuration file."
 msgstr "  -t                      Tester le fichier de configuration."
 
 msgid "  -t key                  True if the TXT record contains the key."
-msgstr "  -t clef                 Vrai si l'enregistrement TXT contient la clef."
+msgstr ""
+"  -t clef                 Vrai si l'enregistrement TXT contient la clef."
 
 msgid "  -t title                Set title."
 msgstr "  -t title                Affecter le titre."
@@ -1118,7 +1160,8 @@ msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      Supprimer le fichier PPD, une fois terminé."
 
 msgid "  -u regex                Match URI to regular expression."
-msgstr "  -u regex                Correspondance URI avec l'expression rationnelle."
+msgstr ""
+"  -u regex                Correspondance URI avec l'expression rationnelle."
 
 msgid "  -v                      Be verbose."
 msgstr "  -v                      Verbeux."
@@ -3000,7 +3043,8 @@ msgstr "Le répertoire « %s » contient un chemin relatif."
 
 #, c-format
 msgid "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
-msgstr "Les permissions du répertoire « %s » sont trop souples (0%o/uid=%d/gid=%d)."
+msgstr ""
+"Les permissions du répertoire « %s » sont trop souples (0%o/uid=%d/gid=%d)."
 
 #, c-format
 msgid "Directory \"%s\" is a file."
@@ -3012,7 +3056,8 @@ msgstr "Le répertoire « %s » n'est pas disponible : %s"
 
 #, c-format
 msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
-msgstr "Les permissions du répertoire « %s » sont correctes (0%o/uid=%d/gid=%d)."
+msgstr ""
+"Les permissions du répertoire « %s » sont correctes (0%o/uid=%d/gid=%d)."
 
 msgid "Disabled"
 msgstr "Désactivé"
@@ -9442,7 +9487,7 @@ msgstr "Italian Envelope"
 msgid "media.om_juuro-ku-kai_198x275mm"
 msgstr "198 x 275mm"
 
-msgid "media.om_large-photo_200x300"
+msgid "media.om_large-photo_200x300mm"
 msgstr "200 x 300mm"
 
 msgid "media.om_medium-photo_130x180mm"
@@ -9669,204 +9714,6 @@ msgstr "Number Of Retries"
 
 msgid "number-up"
 msgstr "Number-Up"
-
-msgid "operations-supported.10"
-msgstr "Get-Jobs"
-
-msgid "operations-supported.11"
-msgstr "Get-Printer-Attributes"
-
-msgid "operations-supported.12"
-msgstr "Hold-Job"
-
-msgid "operations-supported.13"
-msgstr "Release-Job"
-
-msgid "operations-supported.14"
-msgstr "Restart-Job"
-
-msgid "operations-supported.16"
-msgstr "Pause-Printer"
-
-msgid "operations-supported.17"
-msgstr "Resume-Printer"
-
-msgid "operations-supported.18"
-msgstr "Purge-Jobs"
-
-msgid "operations-supported.19"
-msgstr "Set-Printer-Attributes"
-
-msgid "operations-supported.2"
-msgstr "Print-Job"
-
-msgid "operations-supported.20"
-msgstr "Set-Job-Attributes"
-
-msgid "operations-supported.21"
-msgstr "Get-Printer-Supported-Values"
-
-msgid "operations-supported.22"
-msgstr "Create-Printer-Subscriptions"
-
-msgid "operations-supported.23"
-msgstr "Create-Job-Subscriptions"
-
-msgid "operations-supported.24"
-msgstr "Get-Subscription-Attributes"
-
-msgid "operations-supported.25"
-msgstr "Get-Subscriptions"
-
-msgid "operations-supported.26"
-msgstr "Renew-Subscription"
-
-msgid "operations-supported.27"
-msgstr "Cancel-Subscription"
-
-msgid "operations-supported.28"
-msgstr "Get-Notifications"
-
-msgid "operations-supported.3"
-msgstr "Print-URI"
-
-msgid "operations-supported.34"
-msgstr "Enable-Printer"
-
-msgid "operations-supported.35"
-msgstr "Disable-Printer"
-
-msgid "operations-supported.36"
-msgstr "Pause-Printer-After-Current-Job"
-
-msgid "operations-supported.37"
-msgstr "Hold-New-Jobs"
-
-msgid "operations-supported.38"
-msgstr "Release-Held-New-Jobs"
-
-msgid "operations-supported.39"
-msgstr "Deactivate-Printer"
-
-msgid "operations-supported.4"
-msgstr "Validate-Job"
-
-msgid "operations-supported.40"
-msgstr "Activate-Printer"
-
-msgid "operations-supported.41"
-msgstr "Restart-Printer"
-
-msgid "operations-supported.42"
-msgstr "Shutdown-Printer"
-
-msgid "operations-supported.43"
-msgstr "Startup-Printer"
-
-msgid "operations-supported.44"
-msgstr "Reprocess-Job"
-
-msgid "operations-supported.45"
-msgstr "Cancel-Current-Job"
-
-msgid "operations-supported.46"
-msgstr "Suspend-Current-Job"
-
-msgid "operations-supported.47"
-msgstr "Resume-Job"
-
-msgid "operations-supported.48"
-msgstr "Promote-Job"
-
-msgid "operations-supported.49"
-msgstr "Schedule-Job-After"
-
-msgid "operations-supported.5"
-msgstr "Create-Job"
-
-msgid "operations-supported.51"
-msgstr "Cancel-Document"
-
-msgid "operations-supported.52"
-msgstr "Get-Document-Attributes"
-
-msgid "operations-supported.53"
-msgstr "Get-Documents"
-
-msgid "operations-supported.54"
-msgstr "Delete-Document"
-
-msgid "operations-supported.55"
-msgstr "Set-Document-Attributes"
-
-msgid "operations-supported.56"
-msgstr "Cancel-Jobs"
-
-msgid "operations-supported.57"
-msgstr "Cancel-My-Jobs"
-
-msgid "operations-supported.58"
-msgstr "Resubmit-Job"
-
-msgid "operations-supported.59"
-msgstr "Close-Job"
-
-msgid "operations-supported.6"
-msgstr "Send-Document"
-
-msgid "operations-supported.60"
-msgstr "Identify-Printer"
-
-msgid "operations-supported.61"
-msgstr "Validate-Document"
-
-msgid "operations-supported.62"
-msgstr "Add-Document-Images"
-
-msgid "operations-supported.63"
-msgstr "Acknowledge-Document"
-
-msgid "operations-supported.64"
-msgstr "Acknowledge-Identify-Printer"
-
-msgid "operations-supported.65"
-msgstr "Acknowledge-Job"
-
-msgid "operations-supported.66"
-msgstr "Fetch-Document"
-
-msgid "operations-supported.67"
-msgstr "Fetch-Job"
-
-msgid "operations-supported.68"
-msgstr "Get-Output-Device-Attributes"
-
-msgid "operations-supported.69"
-msgstr "Update-Active-Jobs"
-
-msgid "operations-supported.7"
-msgstr "Send-URI"
-
-msgid "operations-supported.70"
-msgstr "Deregister-Output-Device"
-
-msgid "operations-supported.71"
-msgstr "Update-Document-Status"
-
-msgid "operations-supported.72"
-msgstr "Update-Job-Status"
-
-msgid "operations-supported.73"
-msgstr "Update-Output-Device-Attributes"
-
-msgid "operations-supported.74"
-msgstr "Get-Next-Document-Data"
-
-msgid "operations-supported.8"
-msgstr "Cancel-Job"
-
-msgid "operations-supported.9"
-msgstr "Get-Job-Attributes"
 
 msgid "orientation-requested"
 msgstr "Orientation"
@@ -13295,3 +13142,204 @@ msgstr "Y Back Side Image Shift"
 
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Série Stylus Photo"
+
+#~ msgid "media.om_large-photo_200x300"
+#~ msgstr "200 x 300mm"
+
+#~ msgid "operations-supported.10"
+#~ msgstr "Get-Jobs"
+
+#~ msgid "operations-supported.11"
+#~ msgstr "Get-Printer-Attributes"
+
+#~ msgid "operations-supported.12"
+#~ msgstr "Hold-Job"
+
+#~ msgid "operations-supported.13"
+#~ msgstr "Release-Job"
+
+#~ msgid "operations-supported.14"
+#~ msgstr "Restart-Job"
+
+#~ msgid "operations-supported.16"
+#~ msgstr "Pause-Printer"
+
+#~ msgid "operations-supported.17"
+#~ msgstr "Resume-Printer"
+
+#~ msgid "operations-supported.18"
+#~ msgstr "Purge-Jobs"
+
+#~ msgid "operations-supported.19"
+#~ msgstr "Set-Printer-Attributes"
+
+#~ msgid "operations-supported.2"
+#~ msgstr "Print-Job"
+
+#~ msgid "operations-supported.20"
+#~ msgstr "Set-Job-Attributes"
+
+#~ msgid "operations-supported.21"
+#~ msgstr "Get-Printer-Supported-Values"
+
+#~ msgid "operations-supported.22"
+#~ msgstr "Create-Printer-Subscriptions"
+
+#~ msgid "operations-supported.23"
+#~ msgstr "Create-Job-Subscriptions"
+
+#~ msgid "operations-supported.24"
+#~ msgstr "Get-Subscription-Attributes"
+
+#~ msgid "operations-supported.25"
+#~ msgstr "Get-Subscriptions"
+
+#~ msgid "operations-supported.26"
+#~ msgstr "Renew-Subscription"
+
+#~ msgid "operations-supported.27"
+#~ msgstr "Cancel-Subscription"
+
+#~ msgid "operations-supported.28"
+#~ msgstr "Get-Notifications"
+
+#~ msgid "operations-supported.3"
+#~ msgstr "Print-URI"
+
+#~ msgid "operations-supported.34"
+#~ msgstr "Enable-Printer"
+
+#~ msgid "operations-supported.35"
+#~ msgstr "Disable-Printer"
+
+#~ msgid "operations-supported.36"
+#~ msgstr "Pause-Printer-After-Current-Job"
+
+#~ msgid "operations-supported.37"
+#~ msgstr "Hold-New-Jobs"
+
+#~ msgid "operations-supported.38"
+#~ msgstr "Release-Held-New-Jobs"
+
+#~ msgid "operations-supported.39"
+#~ msgstr "Deactivate-Printer"
+
+#~ msgid "operations-supported.4"
+#~ msgstr "Validate-Job"
+
+#~ msgid "operations-supported.40"
+#~ msgstr "Activate-Printer"
+
+#~ msgid "operations-supported.41"
+#~ msgstr "Restart-Printer"
+
+#~ msgid "operations-supported.42"
+#~ msgstr "Shutdown-Printer"
+
+#~ msgid "operations-supported.43"
+#~ msgstr "Startup-Printer"
+
+#~ msgid "operations-supported.44"
+#~ msgstr "Reprocess-Job"
+
+#~ msgid "operations-supported.45"
+#~ msgstr "Cancel-Current-Job"
+
+#~ msgid "operations-supported.46"
+#~ msgstr "Suspend-Current-Job"
+
+#~ msgid "operations-supported.47"
+#~ msgstr "Resume-Job"
+
+#~ msgid "operations-supported.48"
+#~ msgstr "Promote-Job"
+
+#~ msgid "operations-supported.49"
+#~ msgstr "Schedule-Job-After"
+
+#~ msgid "operations-supported.5"
+#~ msgstr "Create-Job"
+
+#~ msgid "operations-supported.51"
+#~ msgstr "Cancel-Document"
+
+#~ msgid "operations-supported.52"
+#~ msgstr "Get-Document-Attributes"
+
+#~ msgid "operations-supported.53"
+#~ msgstr "Get-Documents"
+
+#~ msgid "operations-supported.54"
+#~ msgstr "Delete-Document"
+
+#~ msgid "operations-supported.55"
+#~ msgstr "Set-Document-Attributes"
+
+#~ msgid "operations-supported.56"
+#~ msgstr "Cancel-Jobs"
+
+#~ msgid "operations-supported.57"
+#~ msgstr "Cancel-My-Jobs"
+
+#~ msgid "operations-supported.58"
+#~ msgstr "Resubmit-Job"
+
+#~ msgid "operations-supported.59"
+#~ msgstr "Close-Job"
+
+#~ msgid "operations-supported.6"
+#~ msgstr "Send-Document"
+
+#~ msgid "operations-supported.60"
+#~ msgstr "Identify-Printer"
+
+#~ msgid "operations-supported.61"
+#~ msgstr "Validate-Document"
+
+#~ msgid "operations-supported.62"
+#~ msgstr "Add-Document-Images"
+
+#~ msgid "operations-supported.63"
+#~ msgstr "Acknowledge-Document"
+
+#~ msgid "operations-supported.64"
+#~ msgstr "Acknowledge-Identify-Printer"
+
+#~ msgid "operations-supported.65"
+#~ msgstr "Acknowledge-Job"
+
+#~ msgid "operations-supported.66"
+#~ msgstr "Fetch-Document"
+
+#~ msgid "operations-supported.67"
+#~ msgstr "Fetch-Job"
+
+#~ msgid "operations-supported.68"
+#~ msgstr "Get-Output-Device-Attributes"
+
+#~ msgid "operations-supported.69"
+#~ msgstr "Update-Active-Jobs"
+
+#~ msgid "operations-supported.7"
+#~ msgstr "Send-URI"
+
+#~ msgid "operations-supported.70"
+#~ msgstr "Deregister-Output-Device"
+
+#~ msgid "operations-supported.71"
+#~ msgstr "Update-Document-Status"
+
+#~ msgid "operations-supported.72"
+#~ msgstr "Update-Job-Status"
+
+#~ msgid "operations-supported.73"
+#~ msgstr "Update-Output-Device-Attributes"
+
+#~ msgid "operations-supported.74"
+#~ msgstr "Get-Next-Document-Data"
+
+#~ msgid "operations-supported.8"
+#~ msgstr "Cancel-Job"
+
+#~ msgid "operations-supported.9"
+#~ msgstr "Get-Job-Attributes"

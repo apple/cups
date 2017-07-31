@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2.5\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 13:46-0400\n"
+"POT-Creation-Date: 2017-07-31 17:33-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1136,7 +1136,7 @@ msgstr ""
 msgid "  -E                      Test with encryption using HTTP Upgrade to TLS."
 msgstr ""
 
-#: scheduler/main.c:2084
+#: scheduler/main.c:2072
 msgid "  -F                      Run in the foreground but detach from console."
 msgstr ""
 
@@ -1220,7 +1220,7 @@ msgstr ""
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
-#: scheduler/main.c:2082
+#: scheduler/main.c:2070
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
@@ -1244,7 +1244,7 @@ msgstr ""
 msgid "  -e                      Use every filter from the PPD file."
 msgstr ""
 
-#: scheduler/main.c:2083
+#: scheduler/main.c:2071
 msgid "  -f                      Run in the foreground."
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr ""
 msgid "  -f filename             Set default request filename."
 msgstr ""
 
-#: scheduler/main.c:2085
+#: scheduler/main.c:2073
 msgid "  -h                      Show this usage message."
 msgstr ""
 
@@ -1284,7 +1284,7 @@ msgstr ""
 msgid "  -l                      Produce plain text output."
 msgstr ""
 
-#: scheduler/main.c:2087
+#: scheduler/main.c:2075
 msgid "  -l                      Run cupsd on demand."
 msgstr ""
 
@@ -1352,7 +1352,7 @@ msgstr ""
 msgid "  -s                      Print service name if true."
 msgstr ""
 
-#: scheduler/main.c:2089
+#: scheduler/main.c:2077
 msgid "  -s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
@@ -1364,7 +1364,7 @@ msgstr ""
 msgid "  -t                      Test PPDs instead of generating them."
 msgstr ""
 
-#: scheduler/main.c:2090
+#: scheduler/main.c:2078
 msgid "  -t                      Test the configuration file."
 msgstr ""
 
@@ -1726,37 +1726,37 @@ msgstr ""
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr ""
 
-#: cups/dest-localization.c:118
+#: cups/dest-localization.c:126
 #, c-format
 msgid "%d x %d mm"
 msgstr ""
 
-#: cups/dest-localization.c:110
+#: cups/dest-localization.c:118
 #, c-format
 msgid "%g x %g \""
 msgstr ""
 
-#: cups/dest-localization.c:173 cups/dest-localization.c:180
+#: cups/dest-localization.c:181 cups/dest-localization.c:188
 #, c-format
 msgid "%s (%s)"
 msgstr ""
 
-#: cups/dest-localization.c:187
+#: cups/dest-localization.c:195
 #, c-format
 msgid "%s (%s, %s)"
 msgstr ""
 
-#: cups/dest-localization.c:164
+#: cups/dest-localization.c:172
 #, c-format
 msgid "%s (Borderless)"
 msgstr ""
 
-#: cups/dest-localization.c:171 cups/dest-localization.c:178
+#: cups/dest-localization.c:179 cups/dest-localization.c:186
 #, c-format
 msgid "%s (Borderless, %s)"
 msgstr ""
 
-#: cups/dest-localization.c:185
+#: cups/dest-localization.c:193
 #, c-format
 msgid "%s (Borderless, %s, %s)"
 msgstr ""
@@ -3362,7 +3362,7 @@ msgstr ""
 msgid "Bad 'document-format' value \"%s\"."
 msgstr ""
 
-#: cups/dest.c:2061
+#: cups/dest.c:2089
 msgid "Bad NULL dests pointer"
 msgstr ""
 
@@ -3521,7 +3521,7 @@ msgstr ""
 msgid "Bad printer-state value %d."
 msgstr ""
 
-#: cups/dest.c:683 cups/dest.c:1588 cups/dest.c:1639
+#: cups/dest.c:684 cups/dest.c:1616 cups/dest.c:1667
 msgid "Bad printer-uri."
 msgstr ""
 
@@ -5561,7 +5561,7 @@ msgstr ""
 msgid "Options Installed"
 msgstr ""
 
-#: scheduler/cupsfilter.c:1480 scheduler/main.c:2081 systemv/cupsaddsmb.c:276
+#: scheduler/cupsfilter.c:1480 scheduler/main.c:2069 systemv/cupsaddsmb.c:276
 #: systemv/cupsctl.c:196 systemv/cupstestdsc.c:421 systemv/cupstestppd.c:3859
 #: test/ippfind.c:2751 test/ipptool.c:5053 ppdc/ppdc.cxx:430
 #: ppdc/ppdhtml.cxx:177 ppdc/ppdi.cxx:123 ppdc/ppdmerge.cxx:361
@@ -7112,7 +7112,7 @@ msgstr ""
 msgid "Unable to rename job document file."
 msgstr ""
 
-#: cups/dest.c:3795
+#: cups/dest.c:3823
 msgid "Unable to resolve printer-uri."
 msgstr ""
 
@@ -7356,7 +7356,7 @@ msgstr ""
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
 
-#: scheduler/main.c:2080
+#: scheduler/main.c:2068
 msgid "Usage: cupsd [options]"
 msgstr ""
 
@@ -8945,138 +8945,6 @@ msgid "job-state.8"
 msgstr "Aborted"
 msgid "job-state.9"
 msgstr "Completed"
-msgid "operations-supported.2"
-msgstr "Print-Job"
-msgid "operations-supported.3"
-msgstr "Print-URI"
-msgid "operations-supported.4"
-msgstr "Validate-Job"
-msgid "operations-supported.5"
-msgstr "Create-Job"
-msgid "operations-supported.6"
-msgstr "Send-Document"
-msgid "operations-supported.7"
-msgstr "Send-URI"
-msgid "operations-supported.8"
-msgstr "Cancel-Job"
-msgid "operations-supported.9"
-msgstr "Get-Job-Attributes"
-msgid "operations-supported.10"
-msgstr "Get-Jobs"
-msgid "operations-supported.11"
-msgstr "Get-Printer-Attributes"
-msgid "operations-supported.12"
-msgstr "Hold-Job"
-msgid "operations-supported.13"
-msgstr "Release-Job"
-msgid "operations-supported.14"
-msgstr "Restart-Job"
-msgid "operations-supported.16"
-msgstr "Pause-Printer"
-msgid "operations-supported.17"
-msgstr "Resume-Printer"
-msgid "operations-supported.18"
-msgstr "Purge-Jobs"
-msgid "operations-supported.19"
-msgstr "Set-Printer-Attributes"
-msgid "operations-supported.20"
-msgstr "Set-Job-Attributes"
-msgid "operations-supported.21"
-msgstr "Get-Printer-Supported-Values"
-msgid "operations-supported.22"
-msgstr "Create-Printer-Subscriptions"
-msgid "operations-supported.23"
-msgstr "Create-Job-Subscriptions"
-msgid "operations-supported.24"
-msgstr "Get-Subscription-Attributes"
-msgid "operations-supported.25"
-msgstr "Get-Subscriptions"
-msgid "operations-supported.26"
-msgstr "Renew-Subscription"
-msgid "operations-supported.27"
-msgstr "Cancel-Subscription"
-msgid "operations-supported.28"
-msgstr "Get-Notifications"
-msgid "operations-supported.34"
-msgstr "Enable-Printer"
-msgid "operations-supported.35"
-msgstr "Disable-Printer"
-msgid "operations-supported.36"
-msgstr "Pause-Printer-After-Current-Job"
-msgid "operations-supported.37"
-msgstr "Hold-New-Jobs"
-msgid "operations-supported.38"
-msgstr "Release-Held-New-Jobs"
-msgid "operations-supported.39"
-msgstr "Deactivate-Printer"
-msgid "operations-supported.40"
-msgstr "Activate-Printer"
-msgid "operations-supported.41"
-msgstr "Restart-Printer"
-msgid "operations-supported.42"
-msgstr "Shutdown-Printer"
-msgid "operations-supported.43"
-msgstr "Startup-Printer"
-msgid "operations-supported.44"
-msgstr "Reprocess-Job"
-msgid "operations-supported.45"
-msgstr "Cancel-Current-Job"
-msgid "operations-supported.46"
-msgstr "Suspend-Current-Job"
-msgid "operations-supported.47"
-msgstr "Resume-Job"
-msgid "operations-supported.48"
-msgstr "Promote-Job"
-msgid "operations-supported.49"
-msgstr "Schedule-Job-After"
-msgid "operations-supported.51"
-msgstr "Cancel-Document"
-msgid "operations-supported.52"
-msgstr "Get-Document-Attributes"
-msgid "operations-supported.53"
-msgstr "Get-Documents"
-msgid "operations-supported.54"
-msgstr "Delete-Document"
-msgid "operations-supported.55"
-msgstr "Set-Document-Attributes"
-msgid "operations-supported.56"
-msgstr "Cancel-Jobs"
-msgid "operations-supported.57"
-msgstr "Cancel-My-Jobs"
-msgid "operations-supported.58"
-msgstr "Resubmit-Job"
-msgid "operations-supported.59"
-msgstr "Close-Job"
-msgid "operations-supported.60"
-msgstr "Identify-Printer"
-msgid "operations-supported.61"
-msgstr "Validate-Document"
-msgid "operations-supported.62"
-msgstr "Add-Document-Images"
-msgid "operations-supported.63"
-msgstr "Acknowledge-Document"
-msgid "operations-supported.64"
-msgstr "Acknowledge-Identify-Printer"
-msgid "operations-supported.65"
-msgstr "Acknowledge-Job"
-msgid "operations-supported.66"
-msgstr "Fetch-Document"
-msgid "operations-supported.67"
-msgstr "Fetch-Job"
-msgid "operations-supported.68"
-msgstr "Get-Output-Device-Attributes"
-msgid "operations-supported.69"
-msgstr "Update-Active-Jobs"
-msgid "operations-supported.70"
-msgstr "Deregister-Output-Device"
-msgid "operations-supported.71"
-msgstr "Update-Document-Status"
-msgid "operations-supported.72"
-msgstr "Update-Job-Status"
-msgid "operations-supported.73"
-msgstr "Update-Output-Device-Attributes"
-msgid "operations-supported.74"
-msgstr "Get-Next-Document-Data"
 msgid "orientation-requested"
 msgstr "Orientation"
 msgid "orientation-requested.3"
@@ -9124,11 +8992,11 @@ msgstr "Completed"
 msgid "accuracy-units"
 msgstr "Accuracy Units"
 msgid "accuracy-units.mm"
-msgstr "Mm"
+msgstr "Millimeters"
 msgid "accuracy-units.nm"
-msgstr "Nm"
+msgstr "Nanometers"
 msgid "accuracy-units.um"
-msgstr "Um"
+msgstr "Micrometers"
 msgid "baling-type"
 msgstr "Baling Type"
 msgid "baling-type.band"
@@ -10044,17 +9912,17 @@ msgstr "Translucent"
 msgid "material-amount-units"
 msgstr "Material Amount Units"
 msgid "material-amount-units.g"
-msgstr "G"
+msgstr "Grams"
 msgid "material-amount-units.kg"
-msgstr "Kg"
+msgstr "Kilograms"
 msgid "material-amount-units.l"
-msgstr "L"
+msgstr "Liters"
 msgid "material-amount-units.m"
-msgstr "M"
+msgstr "Meters"
 msgid "material-amount-units.ml"
-msgstr "Ml"
+msgstr "Milliliters"
 msgid "material-amount-units.mm"
-msgstr "Mm"
+msgstr "Millimeters"
 msgid "material-color"
 msgstr "Material Color"
 msgid "material-purpose"
@@ -10304,15 +10172,15 @@ msgstr "Kahu Envelope"
 msgid "media.jpn_kaku2_240x332mm"
 msgstr "Kahu 2 Envelope"
 msgid "media.jpn_kaku3_216x277mm"
-msgstr "216 x 277mme"
+msgstr "216 x 277mm"
 msgid "media.jpn_kaku4_197x267mm"
-msgstr "197 x 267mme"
+msgstr "197 x 267mm"
 msgid "media.jpn_kaku5_190x240mm"
-msgstr "190 x 240mme"
+msgstr "190 x 240mm"
 msgid "media.jpn_kaku7_142x205mm"
-msgstr "142 x 205mme"
+msgstr "142 x 205mm"
 msgid "media.jpn_kaku8_119x197mm"
-msgstr "119 x 197mme"
+msgstr "119 x 197mm"
 msgid "media.jpn_oufuku_148x200mm"
 msgstr "Oufuku Reply Postcard"
 msgid "media.jpn_you4_105x235mm"
@@ -10461,7 +10329,7 @@ msgid "media.om_italian_110x230mm"
 msgstr "Italian Envelope"
 msgid "media.om_juuro-ku-kai_198x275mm"
 msgstr "198 x 275mm"
-msgid "media.om_large-photo_200x300"
+msgid "media.om_large-photo_200x300mm"
 msgstr "200 x 300mm"
 msgid "media.om_medium-photo_130x180mm"
 msgstr "130 x 180mm"
@@ -10802,7 +10670,7 @@ msgstr "Tray 19"
 msgid "media-source.tray-20"
 msgstr "Tray 20"
 msgid "media-tooth"
-msgstr "Media Tooth"
+msgstr "Media Tooth (Texture)"
 msgid "media-tooth.antique"
 msgstr "Antique"
 msgid "media-tooth.calendared"

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-07-19 13:46-0400\n"
+"POT-Creation-Date: 2017-07-31 17:33-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -9724,7 +9724,7 @@ msgstr "Italian Envelope"
 msgid "media.om_juuro-ku-kai_198x275mm"
 msgstr "198 x 275mm"
 
-msgid "media.om_large-photo_200x300"
+msgid "media.om_large-photo_200x300mm"
 msgstr "200 x 300mm"
 
 msgid "media.om_medium-photo_130x180mm"
@@ -9951,204 +9951,6 @@ msgstr "Number Of Retries"
 
 msgid "number-up"
 msgstr "Number-Up"
-
-msgid "operations-supported.10"
-msgstr "Get-Jobs"
-
-msgid "operations-supported.11"
-msgstr "Get-Printer-Attributes"
-
-msgid "operations-supported.12"
-msgstr "Hold-Job"
-
-msgid "operations-supported.13"
-msgstr "Release-Job"
-
-msgid "operations-supported.14"
-msgstr "Restart-Job"
-
-msgid "operations-supported.16"
-msgstr "Pause-Printer"
-
-msgid "operations-supported.17"
-msgstr "Resume-Printer"
-
-msgid "operations-supported.18"
-msgstr "Purge-Jobs"
-
-msgid "operations-supported.19"
-msgstr "Set-Printer-Attributes"
-
-msgid "operations-supported.2"
-msgstr "Print-Job"
-
-msgid "operations-supported.20"
-msgstr "Set-Job-Attributes"
-
-msgid "operations-supported.21"
-msgstr "Get-Printer-Supported-Values"
-
-msgid "operations-supported.22"
-msgstr "Create-Printer-Subscriptions"
-
-msgid "operations-supported.23"
-msgstr "Create-Job-Subscriptions"
-
-msgid "operations-supported.24"
-msgstr "Get-Subscription-Attributes"
-
-msgid "operations-supported.25"
-msgstr "Get-Subscriptions"
-
-msgid "operations-supported.26"
-msgstr "Renew-Subscription"
-
-msgid "operations-supported.27"
-msgstr "Cancel-Subscription"
-
-msgid "operations-supported.28"
-msgstr "Get-Notifications"
-
-msgid "operations-supported.3"
-msgstr "Print-URI"
-
-msgid "operations-supported.34"
-msgstr "Enable-Printer"
-
-msgid "operations-supported.35"
-msgstr "Disable-Printer"
-
-msgid "operations-supported.36"
-msgstr "Pause-Printer-After-Current-Job"
-
-msgid "operations-supported.37"
-msgstr "Hold-New-Jobs"
-
-msgid "operations-supported.38"
-msgstr "Release-Held-New-Jobs"
-
-msgid "operations-supported.39"
-msgstr "Deactivate-Printer"
-
-msgid "operations-supported.4"
-msgstr "Validate-Job"
-
-msgid "operations-supported.40"
-msgstr "Activate-Printer"
-
-msgid "operations-supported.41"
-msgstr "Restart-Printer"
-
-msgid "operations-supported.42"
-msgstr "Shutdown-Printer"
-
-msgid "operations-supported.43"
-msgstr "Startup-Printer"
-
-msgid "operations-supported.44"
-msgstr "Reprocess-Job"
-
-msgid "operations-supported.45"
-msgstr "Cancel-Current-Job"
-
-msgid "operations-supported.46"
-msgstr "Suspend-Current-Job"
-
-msgid "operations-supported.47"
-msgstr "Resume-Job"
-
-msgid "operations-supported.48"
-msgstr "Promote-Job"
-
-msgid "operations-supported.49"
-msgstr "Schedule-Job-After"
-
-msgid "operations-supported.5"
-msgstr "Create-Job"
-
-msgid "operations-supported.51"
-msgstr "Cancel-Document"
-
-msgid "operations-supported.52"
-msgstr "Get-Document-Attributes"
-
-msgid "operations-supported.53"
-msgstr "Get-Documents"
-
-msgid "operations-supported.54"
-msgstr "Delete-Document"
-
-msgid "operations-supported.55"
-msgstr "Set-Document-Attributes"
-
-msgid "operations-supported.56"
-msgstr "Cancel-Jobs"
-
-msgid "operations-supported.57"
-msgstr "Cancel-My-Jobs"
-
-msgid "operations-supported.58"
-msgstr "Resubmit-Job"
-
-msgid "operations-supported.59"
-msgstr "Close-Job"
-
-msgid "operations-supported.6"
-msgstr "Send-Document"
-
-msgid "operations-supported.60"
-msgstr "Identify-Printer"
-
-msgid "operations-supported.61"
-msgstr "Validate-Document"
-
-msgid "operations-supported.62"
-msgstr "Add-Document-Images"
-
-msgid "operations-supported.63"
-msgstr "Acknowledge-Document"
-
-msgid "operations-supported.64"
-msgstr "Acknowledge-Identify-Printer"
-
-msgid "operations-supported.65"
-msgstr "Acknowledge-Job"
-
-msgid "operations-supported.66"
-msgstr "Fetch-Document"
-
-msgid "operations-supported.67"
-msgstr "Fetch-Job"
-
-msgid "operations-supported.68"
-msgstr "Get-Output-Device-Attributes"
-
-msgid "operations-supported.69"
-msgstr "Update-Active-Jobs"
-
-msgid "operations-supported.7"
-msgstr "Send-URI"
-
-msgid "operations-supported.70"
-msgstr "Deregister-Output-Device"
-
-msgid "operations-supported.71"
-msgstr "Update-Document-Status"
-
-msgid "operations-supported.72"
-msgstr "Update-Job-Status"
-
-msgid "operations-supported.73"
-msgstr "Update-Output-Device-Attributes"
-
-msgid "operations-supported.74"
-msgstr "Get-Next-Document-Data"
-
-msgid "operations-supported.8"
-msgstr "Cancel-Job"
-
-msgid "operations-supported.9"
-msgstr "Get-Job-Attributes"
 
 msgid "orientation-requested"
 msgstr "Orientation"
@@ -14003,3 +13805,204 @@ msgstr "Y Back Side Image Shift"
 
 #~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
 #~ msgstr "lppasswd: l'utente \"%s\" ed il gruppo \"%s\" non esistono."
+
+#~ msgid "media.om_large-photo_200x300"
+#~ msgstr "200 x 300mm"
+
+#~ msgid "operations-supported.10"
+#~ msgstr "Get-Jobs"
+
+#~ msgid "operations-supported.11"
+#~ msgstr "Get-Printer-Attributes"
+
+#~ msgid "operations-supported.12"
+#~ msgstr "Hold-Job"
+
+#~ msgid "operations-supported.13"
+#~ msgstr "Release-Job"
+
+#~ msgid "operations-supported.14"
+#~ msgstr "Restart-Job"
+
+#~ msgid "operations-supported.16"
+#~ msgstr "Pause-Printer"
+
+#~ msgid "operations-supported.17"
+#~ msgstr "Resume-Printer"
+
+#~ msgid "operations-supported.18"
+#~ msgstr "Purge-Jobs"
+
+#~ msgid "operations-supported.19"
+#~ msgstr "Set-Printer-Attributes"
+
+#~ msgid "operations-supported.2"
+#~ msgstr "Print-Job"
+
+#~ msgid "operations-supported.20"
+#~ msgstr "Set-Job-Attributes"
+
+#~ msgid "operations-supported.21"
+#~ msgstr "Get-Printer-Supported-Values"
+
+#~ msgid "operations-supported.22"
+#~ msgstr "Create-Printer-Subscriptions"
+
+#~ msgid "operations-supported.23"
+#~ msgstr "Create-Job-Subscriptions"
+
+#~ msgid "operations-supported.24"
+#~ msgstr "Get-Subscription-Attributes"
+
+#~ msgid "operations-supported.25"
+#~ msgstr "Get-Subscriptions"
+
+#~ msgid "operations-supported.26"
+#~ msgstr "Renew-Subscription"
+
+#~ msgid "operations-supported.27"
+#~ msgstr "Cancel-Subscription"
+
+#~ msgid "operations-supported.28"
+#~ msgstr "Get-Notifications"
+
+#~ msgid "operations-supported.3"
+#~ msgstr "Print-URI"
+
+#~ msgid "operations-supported.34"
+#~ msgstr "Enable-Printer"
+
+#~ msgid "operations-supported.35"
+#~ msgstr "Disable-Printer"
+
+#~ msgid "operations-supported.36"
+#~ msgstr "Pause-Printer-After-Current-Job"
+
+#~ msgid "operations-supported.37"
+#~ msgstr "Hold-New-Jobs"
+
+#~ msgid "operations-supported.38"
+#~ msgstr "Release-Held-New-Jobs"
+
+#~ msgid "operations-supported.39"
+#~ msgstr "Deactivate-Printer"
+
+#~ msgid "operations-supported.4"
+#~ msgstr "Validate-Job"
+
+#~ msgid "operations-supported.40"
+#~ msgstr "Activate-Printer"
+
+#~ msgid "operations-supported.41"
+#~ msgstr "Restart-Printer"
+
+#~ msgid "operations-supported.42"
+#~ msgstr "Shutdown-Printer"
+
+#~ msgid "operations-supported.43"
+#~ msgstr "Startup-Printer"
+
+#~ msgid "operations-supported.44"
+#~ msgstr "Reprocess-Job"
+
+#~ msgid "operations-supported.45"
+#~ msgstr "Cancel-Current-Job"
+
+#~ msgid "operations-supported.46"
+#~ msgstr "Suspend-Current-Job"
+
+#~ msgid "operations-supported.47"
+#~ msgstr "Resume-Job"
+
+#~ msgid "operations-supported.48"
+#~ msgstr "Promote-Job"
+
+#~ msgid "operations-supported.49"
+#~ msgstr "Schedule-Job-After"
+
+#~ msgid "operations-supported.5"
+#~ msgstr "Create-Job"
+
+#~ msgid "operations-supported.51"
+#~ msgstr "Cancel-Document"
+
+#~ msgid "operations-supported.52"
+#~ msgstr "Get-Document-Attributes"
+
+#~ msgid "operations-supported.53"
+#~ msgstr "Get-Documents"
+
+#~ msgid "operations-supported.54"
+#~ msgstr "Delete-Document"
+
+#~ msgid "operations-supported.55"
+#~ msgstr "Set-Document-Attributes"
+
+#~ msgid "operations-supported.56"
+#~ msgstr "Cancel-Jobs"
+
+#~ msgid "operations-supported.57"
+#~ msgstr "Cancel-My-Jobs"
+
+#~ msgid "operations-supported.58"
+#~ msgstr "Resubmit-Job"
+
+#~ msgid "operations-supported.59"
+#~ msgstr "Close-Job"
+
+#~ msgid "operations-supported.6"
+#~ msgstr "Send-Document"
+
+#~ msgid "operations-supported.60"
+#~ msgstr "Identify-Printer"
+
+#~ msgid "operations-supported.61"
+#~ msgstr "Validate-Document"
+
+#~ msgid "operations-supported.62"
+#~ msgstr "Add-Document-Images"
+
+#~ msgid "operations-supported.63"
+#~ msgstr "Acknowledge-Document"
+
+#~ msgid "operations-supported.64"
+#~ msgstr "Acknowledge-Identify-Printer"
+
+#~ msgid "operations-supported.65"
+#~ msgstr "Acknowledge-Job"
+
+#~ msgid "operations-supported.66"
+#~ msgstr "Fetch-Document"
+
+#~ msgid "operations-supported.67"
+#~ msgstr "Fetch-Job"
+
+#~ msgid "operations-supported.68"
+#~ msgstr "Get-Output-Device-Attributes"
+
+#~ msgid "operations-supported.69"
+#~ msgstr "Update-Active-Jobs"
+
+#~ msgid "operations-supported.7"
+#~ msgstr "Send-URI"
+
+#~ msgid "operations-supported.70"
+#~ msgstr "Deregister-Output-Device"
+
+#~ msgid "operations-supported.71"
+#~ msgstr "Update-Document-Status"
+
+#~ msgid "operations-supported.72"
+#~ msgstr "Update-Job-Status"
+
+#~ msgid "operations-supported.73"
+#~ msgstr "Update-Output-Device-Attributes"
+
+#~ msgid "operations-supported.74"
+#~ msgstr "Get-Next-Document-Data"
+
+#~ msgid "operations-supported.8"
+#~ msgstr "Cancel-Job"
+
+#~ msgid "operations-supported.9"
+#~ msgstr "Get-Job-Attributes"
