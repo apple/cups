@@ -398,7 +398,7 @@ ppdcDriver::write_ppd_file(
   // If we don't have a message catalog, use an empty (English) one...
   if (!catalog)
   {
-    catalog    = new ppdcCatalog("en");
+    catalog    = new ppdcCatalog(NULL);
     delete_cat = true;
   }
   else
