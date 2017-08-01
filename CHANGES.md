@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-07-31
+CHANGES - 2.2.5 - 2017-08-01
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -24,6 +24,8 @@ CHANGES IN CUPS V2.2.5
 - Fixed the default `ServerAlias` value from `ServerName` (Issue #5072)
 - Fixed the adminurl field in the TXT record for fully-qualified `ServerName`
   values (Issue #5074)
+- The scheduler now creates a PID file when not running on demand with a modern
+  service launcher (Issue #5080)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
