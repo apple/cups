@@ -346,14 +346,17 @@ dnssdBuildTxtRecord(
 {
   int		i,			/* Looping var */
 		count;			/* Count of key/value pairs */
-  char		admin_hostname[256],	/* .local hostname for admin page */
+  char		admin_hostname[256],	/* Hostname for admin page */
 		adminurl_str[256],	/* URL for the admin page */
 		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
 		air_str[1024],		/* auth-info-required string buffer */
-		*keyvalue[32][2];	/* Table of key/value pairs */
+		*keyvalue[32][2],	/* Table of key/value pairs */
+                *ptr;                   /* Pointer in string */
   cupsd_txt_t	txt;			/* TXT record */
+  cupsd_listener_t *lis;                /* Current listener */
+  const char    *admin_scheme = "http"; /* Admin page URL scheme */
 
 
  /*
@@ -382,20 +385,46 @@ dnssdBuildTxtRecord(
     keyvalue[count  ][0] = "ty";
     keyvalue[count++][1] = p->make_model ? p->make_model : "Unknown";
 
-    if (strstr(DNSSDHostName, ".local"))
-      strlcpy(admin_hostname, DNSSDHostName, sizeof(admin_hostname));
+   /*
+    * Get the hostname for the admin page...
+    */
+
+    if (strchr(DNSSDHostName, '.'))
+    {
+     /*
+      * Use the provided hostname, but make sure it ends with a period...
+      */
+
+      if ((ptr = DNSSDHostName + strlen(DNSSDHostName) - 1) >= DNSSDHostName && *ptr == '.')
+        strlcpy(admin_hostname, DNSSDHostName, sizeof(admin_hostname));
+      else
+        snprintf(admin_hostname, sizeof(admin_hostname), "%s.", DNSSDHostName);
+    }
     else
-      snprintf(admin_hostname, sizeof(admin_hostname), "%s.local.",
-               DNSSDHostName);
-    httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str),
+    {
+     /*
+      * Unqualified hostname gets ".local." added to it...
+      */
+
+      snprintf(admin_hostname, sizeof(admin_hostname), "%s.local.", DNSSDHostName);
+    }
+
+   /*
+    * Get the URL scheme for the admin page...
+    */
+
 #  ifdef HAVE_SSL
-		     "https",
-#  else
-		     "http",
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners); lis; lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+    {
+      if (lis->encryption != HTTP_ENCRYPTION_NEVER)
+      {
+        admin_scheme = "https";
+        break;
+      }
+    }
 #  endif /* HAVE_SSL */
-		     NULL, admin_hostname, DNSSDPort, "/%s/%s",
-		     (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
-		     p->name);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str), admin_scheme,  NULL, admin_hostname, DNSSDPort, "/%s/%s", (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers", p->name);
     keyvalue[count  ][0] = "adminurl";
     keyvalue[count++][1] = adminurl_str;
 

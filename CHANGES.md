@@ -22,6 +22,8 @@ CHANGES IN CUPS V2.2.5
 - Fixed the `SSLOptions DenyCBC` option when using GNU TLS (Issue #5065)
 - Fixed the `ServerTokens None` option (Issue #5065)
 - Fixed the default `ServerAlias` value from `ServerName` (Issue #5072)
+- Fixed the adminurl field in the TXT record for fully-qualified `ServerName`
+  values (Issue #5074)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
