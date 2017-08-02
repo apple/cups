@@ -1509,6 +1509,16 @@ ippCopyAttribute(
         dstattr = ippAddSeparator(dst);
 	break;
 
+    case IPP_TAG_UNSUPPORTED_VALUE :
+    case IPP_TAG_DEFAULT :
+    case IPP_TAG_UNKNOWN :
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_NOTSETTABLE :
+    case IPP_TAG_DELETEATTR :
+    case IPP_TAG_ADMINDEFINE :
+        dstattr = ippAddOutOfBand(dst, srcattr->group_tag, srcattr->value_tag & ~IPP_TAG_CUPS_CONST, srcattr->name);
+        break;
+
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
         dstattr = ippAddIntegers(dst, srcattr->group_tag, srcattr->value_tag,
