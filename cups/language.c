@@ -263,7 +263,7 @@ _cupsAppleLocale(CFStringRef languageName,	/* I - Apple language ID */
   if (!CFStringGetCString(languageName, temp, (CFIndex)sizeof(temp), kCFStringEncodingASCII))
     temp[0] = '\0';
 
-  DEBUG_printf(("_cupsAppleLocale(languageName=%p(%s), locale=%p, localsize=%d)", languageName, temp, locale, (int)localesize));
+  DEBUG_printf(("_cupsAppleLocale(languageName=%p(%s), locale=%p, localsize=%d)", (void *)languageName, temp, (void *)locale, (int)localesize));
 #endif /* DEBUG */
 
   localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(kCFAllocatorDefault, languageName);
