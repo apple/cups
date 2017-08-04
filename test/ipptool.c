@@ -135,7 +135,8 @@ static int	Cancel = 0,		/* Cancel test? */
 		IgnoreErrors = 0,	/* Ignore errors? */
 		StopAfterIncludeError = 0,
 					/* Stop after include errors? */
-		Verbosity = 0,		/* Show all attributes? */
+		ValidateHeaders = 0,    /* Validate HTTP headers in response? */
+                Verbosity = 0,          /* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0,		/* 1 if header is written */
 		TestCount = 0,		/* Number of tests run */
@@ -509,6 +510,10 @@ main(int  argc,				/* I - Number of command-line args */
 		set_variable(outfile, &vars, "filetype", "application/octet-stream");
               }
 	      break;
+
+          case 'h' : /* Validate response headers */
+              ValidateHeaders = 1;
+              break;
 
           case 'i' : /* Test every N seconds */
 	      i ++;
@@ -2810,6 +2815,17 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	add_stringf(errors, "Bad HTTP version (%d.%d)", http->version / 100,
 		    http->version % 100);
 
+      if (ValidateHeaders)
+      {
+        const char *header;               /* HTTP header value */
+
+        if ((header = httpGetField(http, HTTP_FIELD_CONTENT_TYPE)) == NULL || _cups_strcasecmp(header, "application/ipp"))
+          add_stringf(errors, "Bad HTTP Content-Type in response (%s)", header && *header ? header : "<missing>");
+
+        if ((header = httpGetField(http, HTTP_FIELD_DATE)) != NULL && *header && httpGetDateTime(header) == 0)
+          add_stringf(errors, "Bad HTTP Date in response (%s)", header);
+      }
+
       if (!response)
       {
        /*
@@ -5070,6 +5086,7 @@ usage(void)
   _cupsLangPuts(stderr, _("  -c                      Produce CSV output."));
   _cupsLangPuts(stderr, _("  -d name=value           Set named variable to value."));
   _cupsLangPuts(stderr, _("  -f filename             Set default request filename."));
+  _cupsLangPuts(stderr, _("  -h                      Validate HTTP response headers."));
   _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with the given time interval."));
   _cupsLangPuts(stderr, _("  -l                      Produce plain text output."));
   _cupsLangPuts(stderr, _("  -n count                Repeat the last file the given number of times."));

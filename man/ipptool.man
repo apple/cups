@@ -9,7 +9,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "13 June 2017" "Apple Inc."
+.TH ipptool 1 "CUPS" "4 August 2017" "Apple Inc."
 .SH NAME
 ipptool \- perform internet printing protocol requests
 .SH SYNOPSIS
@@ -53,6 +53,8 @@ ipptool \- perform internet printing protocol requests
 ] [
 .B \-f
 .I filename
+] [
+.B \-h
 ] [
 .B \-i
 .I seconds
@@ -153,6 +155,9 @@ Defines the named variable.
 .TP 5
 .BI \-f \ filename
 Defines the default request filename for tests.
+.TP 5
+.B \-h
+Validate HTTP response headers.
 .TP 5
 .BI \-i \ seconds
 Specifies that the (last)
