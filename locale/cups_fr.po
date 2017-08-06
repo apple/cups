@@ -1456,7 +1456,7 @@ msgstr "%s accepte des requêtes depuis %s"
 
 #, c-format
 msgid "%s cannot be changed."
-msgstr "Impossible de modifier « %s »"
+msgstr "Impossible de modifier « %s »"
 
 #, c-format
 msgid "%s is not implemented by the CUPS version of lpc."
@@ -1578,11 +1578,11 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - expected hostname after \"-H\" option."
-msgstr ""
+msgstr "%s : erreur - nom d'hôte attendu après l'option « -H »."
 
 #, c-format
 msgid "%s: Error - expected hostname after \"-h\" option."
-msgstr ""
+msgstr "%s : erreur - nom d'hôte attendu après l'option « -h »."
 
 #, c-format
 msgid "%s: Error - expected mode list after \"-y\" option."
@@ -1590,19 +1590,19 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - expected name after \"-%c\" option."
-msgstr ""
+msgstr "%s : erreur - nom attendu après l'option « -%c »."
 
 #, c-format
 msgid "%s: Error - expected option=value after \"-o\" option."
-msgstr ""
+msgstr "%s : erreur - option=valeur attendu après l'option « -o »."
 
 #, c-format
 msgid "%s: Error - expected page list after \"-P\" option."
-msgstr ""
+msgstr "%s : erreur - liste de page attendue après l'option « -P »."
 
 #, c-format
 msgid "%s: Error - expected priority after \"-%c\" option."
-msgstr ""
+msgstr "%s : erreur - priorité attendue après l'option « -%c »."
 
 #, c-format
 msgid "%s: Error - expected reason text after \"-r\" option."
@@ -1610,19 +1610,19 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - expected title after \"-t\" option."
-msgstr ""
+msgstr "%s : erreur - titre attendu après l'option « -t »."
 
 #, c-format
 msgid "%s: Error - expected username after \"-U\" option."
-msgstr ""
+msgstr "%s : erreur - nom d'utilisateur attendu après l'option « -U »."
 
 #, c-format
 msgid "%s: Error - expected username after \"-u\" option."
-msgstr ""
+msgstr "%s : erreur - nom d'utilisateur attendu après l'option « -u »."
 
 #, c-format
 msgid "%s: Error - expected value after \"-%c\" option."
-msgstr ""
+msgstr "%s : erreur - valeur attendue après l'option « -%c »."
 
 #, c-format
 msgid ""
@@ -1632,23 +1632,23 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - no default destination available."
-msgstr ""
+msgstr "%s : erreur - aucune destination par défaut disponible."
 
 #, c-format
 msgid "%s: Error - priority must be between 1 and 100."
-msgstr "%s : erreur - la priorité doit être comprise entre 1 et 100."
+msgstr "%s : erreur - la priorité doit être comprise entre 1 et 100."
 
 #, c-format
 msgid "%s: Error - scheduler not responding."
-msgstr ""
+msgstr "%s : erreur - l'ordonnanceur ne répond pas."
 
 #, c-format
 msgid "%s: Error - too many files - \"%s\"."
-msgstr ""
+msgstr "%s : erreur - trop de fichiers - « %s »."
 
 #, c-format
 msgid "%s: Error - unable to access \"%s\" - %s"
-msgstr ""
+msgstr "%s : erreur - impossible d'accéder à « %s » - « %s »"
 
 #, c-format
 msgid "%s: Error - unable to queue from stdin - %s."
@@ -1656,19 +1656,19 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s\"."
-msgstr ""
+msgstr "%s : erreur - destination inconnue - « %s »."
 
 #, c-format
 msgid "%s: Error - unknown destination \"%s/%s\"."
-msgstr ""
+msgstr "%s : erreur - destination inconnue - « %s/%s »."
 
 #, c-format
 msgid "%s: Error - unknown option \"%c\"."
-msgstr ""
+msgstr "%s : erreur - option inconnue - « %c »."
 
 #, c-format
 msgid "%s: Error - unknown option \"%s\"."
-msgstr ""
+msgstr "%s : erreur - option inconnue - « %s »."
 
 #, c-format
 msgid "%s: Expected job ID after \"-i\" option."
@@ -1684,15 +1684,15 @@ msgstr ""
 
 #, c-format
 msgid "%s: Missing filename for \"-P\"."
-msgstr ""
+msgstr "%s : nom de fichier manquant pour « -P »."
 
 #, c-format
 msgid "%s: Missing timeout for \"-T\"."
-msgstr ""
+msgstr "%s : délai d'expiration manquant pour « -T »."
 
 #, c-format
 msgid "%s: Missing version for \"-V\"."
-msgstr ""
+msgstr "%s : version manquante pour « -V »."
 
 #, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
@@ -1700,31 +1700,31 @@ msgstr ""
 
 #, c-format
 msgid "%s: No filter to convert from %s/%s to %s/%s."
-msgstr ""
+msgstr "%s : aucun filtre pour convertir %s/%s en %s/%s."
 
 #, c-format
 msgid "%s: Operation failed: %s"
-msgstr ""
+msgstr "%s : échec de l'opération : %s"
 
 #, c-format
 msgid "%s: Sorry, no encryption support."
-msgstr ""
+msgstr "%s : désolé, chiffrement indisponible."
 
 #, c-format
 msgid "%s: Unable to connect to \"%s:%d\": %s"
-msgstr ""
+msgstr "%s : impossible de se connecter à « %s/%d » : %s"
 
 #, c-format
 msgid "%s: Unable to connect to server."
-msgstr ""
+msgstr "%s : impossible de se connecter au serveur."
 
 #, c-format
 msgid "%s: Unable to contact server."
-msgstr ""
+msgstr "%s : impossible de contacter au serveur."
 
 #, c-format
 msgid "%s: Unable to create PPD file: %s"
-msgstr ""
+msgstr "%s : impossible de créer le fichier PPD : %s"
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1732,15 +1732,15 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to open \"%s\": %s"
-msgstr ""
+msgstr "%s : impossible d'ouvrir « %s » : %s"
 
 #, c-format
 msgid "%s: Unable to open %s: %s"
-msgstr ""
+msgstr "%s : impossible d'ouvrir %s : %s"
 
 #, c-format
 msgid "%s: Unable to open PPD file: %s on line %d."
-msgstr ""
+msgstr "%s : impossible d'ouvrir le fichier PPD : %s sur la ligne %d."
 
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
@@ -1748,15 +1748,15 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
-msgstr ""
+msgstr "%s : impossible de résoudre « %s »."
 
 #, c-format
 msgid "%s: Unknown argument \"%s\"."
-msgstr ""
+msgstr "%s : paramètre inconnu « %s »."
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
-msgstr ""
+msgstr "%s : destination inconnue « %s »."
 
 #, c-format
 msgid "%s: Unknown destination MIME type %s/%s."
@@ -1764,15 +1764,15 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unknown option \"%c\"."
-msgstr ""
+msgstr "%s : option inconnue « %c »."
 
 #, c-format
 msgid "%s: Unknown option \"%s\"."
-msgstr ""
+msgstr "%s : option inconnue « %s »."
 
 #, c-format
 msgid "%s: Unknown option \"-%c\"."
-msgstr ""
+msgstr "%s : option inconnue « -%c »."
 
 #, c-format
 msgid "%s: Unknown source MIME type %s/%s."
@@ -1854,7 +1854,7 @@ msgstr ""
 
 #, c-format
 msgid "A printer named \"%s\" already exists."
-msgstr ""
+msgstr "Une imprimante nommée « %s » existe déjà."
 
 msgid "Accept Jobs"
 msgstr "Accepter les tâches"
@@ -2289,7 +2289,7 @@ msgstr ""
 "Les permissions du répertoire « %s » sont correctes (0%o/uid=%d/gid=%d)."
 
 msgid "Disc"
-msgstr ""
+msgstr "Disque"
 
 #, c-format
 msgid "Document #%d does not exist in job #%d."
