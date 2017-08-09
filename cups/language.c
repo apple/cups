@@ -1468,8 +1468,8 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       */
 
       strlcpy(baselang, locale, sizeof(baselang));
-      if (baselang[3] == '-' || baselang[3] == '_')
-        baselang[3] = '\0';
+      if (baselang[2] == '-' || baselang[2] == '_')
+        baselang[2] = '\0';
 
       locale = baselang;
     }

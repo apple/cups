@@ -38,6 +38,7 @@ CHANGES IN CUPS V2.2.5
 - CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)
 - The `ippCopyAttribute` function did not copy out-of-band values correctly
   (rdar://33688003)
+- Fixed the localization fallback code on macOS (rdar://33583699)
 - The `ipptool` program now offers an option to validate response headers.
 
 

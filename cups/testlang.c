@@ -37,6 +37,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_lang_t		*language;	/* Message catalog */
   cups_lang_t		*language2;	/* Message catalog */
   struct lconv		*loc;		/* Locale data */
+  const char            *msgid,         /* String identifier */
+                        *msgstr;        /* Localized string */
   char			buffer[1024];	/* String buffer */
   double		number;		/* Number */
   static const char * const tests[] =	/* Test strings */
@@ -74,8 +76,26 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   printf("Language = \"%s\"\n", language->language);
   printf("Encoding = \"%s\"\n", _cupsEncodingName(language->encoding));
-  printf("No       = \"%s\"\n", _cupsLangString(language, "No"));
-  printf("Yes      = \"%s\"\n", _cupsLangString(language, "Yes"));
+
+  msgid  = "No";
+  msgstr = _cupsLangString(language, msgid);
+  if (msgid == msgstr)
+  {
+    printf("%-8s = \"%s\" (FAIL)\n", msgid, msgstr);
+    errors ++;
+  }
+  else
+    printf("%-8s = \"%s\" (PASS)\n", msgid, msgstr);
+
+  msgid  = "Yes";
+  msgstr = _cupsLangString(language, msgid);
+  if (msgid == msgstr)
+  {
+    printf("%-8s = \"%s\" (FAIL)\n", msgid, msgstr);
+    errors ++;
+  }
+  else
+    printf("%-8s = \"%s\" (PASS)\n", msgid, msgstr);
 
   if (language != language2)
   {
