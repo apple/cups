@@ -1,7 +1,7 @@
 /*
  * TLS check program for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -82,9 +82,17 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       tls_options |= _HTTP_TLS_ALLOW_DH;
     }
+    else if (!strcmp(argv[i], "--no-cbc"))
+    {
+      tls_options |= _HTTP_TLS_DENY_CBC;
+    }
     else if (!strcmp(argv[i], "--no-tls10"))
     {
       tls_options |= _HTTP_TLS_DENY_TLS10;
+    }
+    else if (!strcmp(argv[i], "--tls10"))
+    {
+      tls_options |= _HTTP_TLS_ONLY_TLS10;
     }
     else if (!strcmp(argv[i], "--rc4"))
     {
@@ -729,8 +737,10 @@ usage(void)
   puts("");
   puts("Options:");
   puts("  --dh        Allow DH/DHE key exchange");
+  puts("  --no-cbc    Disable CBC cipher suites");
   puts("  --no-tls10  Disable TLS/1.0");
   puts("  --rc4       Allow RC4 encryption");
+  puts("  --tls10     Only use TLS/1.0");
   puts("  --verbose   Be verbose");
   puts("  -4          Connect using IPv4 addresses only");
   puts("  -6          Connect using IPv6 addresses only");

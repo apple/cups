@@ -185,6 +185,7 @@ extern "C" {
 #define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
 #define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
 #define _HTTP_TLS_DENY_CBC	32	/* Deny CBC cipher suites */
+#define _HTTP_TLS_ONLY_TLS10    64      /* Only use TLS 1.0 */
 
 
 /*

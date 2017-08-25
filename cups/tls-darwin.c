@@ -1227,6 +1227,12 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
     error = SSLSetProtocolVersionMin(http->tls, minProtocol);
     DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", minProtocol, (int)error));
+
+    if (!error && (tls_options & _HTTP_TLS_ONLY_TLS10))
+    {
+      error = SSLSetProtocolVersionMax(http->tls, kTLSProtocol1);
+      DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMax(kTLSProtocol1), error=%d", (int)error));
+    }
   }
 
 #  if HAVE_SSLSETENABLEDCIPHERS
@@ -1369,6 +1375,9 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
           case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 :
           case TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256 :
           case TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384 :
+          case TLS_RSA_WITH_3DES_EDE_CBC_SHA :
+          case TLS_RSA_WITH_AES_128_CBC_SHA :
+          case TLS_RSA_WITH_AES_256_CBC_SHA :
               if (tls_options & _HTTP_TLS_DENY_CBC)
 	      {
 	        DEBUG_printf(("4_httpTLSStart: Excluding CBC cipher suite %d", supported[i]));
