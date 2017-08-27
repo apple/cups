@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-08-09
+CHANGES - 2.2.5 - 2017-08-27
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -26,6 +26,8 @@ CHANGES IN CUPS V2.2.5
   values (Issue #5074)
 - The scheduler now creates a PID file when not running on demand with a modern
   service launcher (Issue #5080)
+- The IPP Everywhere PPD generator now sorts the supported resolutions before
+  choosing them for draft, normal, and best quality modes (Issue #5091)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
