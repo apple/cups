@@ -2019,8 +2019,8 @@ service_checkin(void)
 static void
 service_checkout(int shutdown)          /* I - Shutting down? */
 {
-  cups_file_t *fp;			/* File */
-  char  pidfile[1024];                  /* PID/KeepAlive file */
+  cups_file_t   *fp;			/* File */
+  char          pidfile[1024];          /* PID/KeepAlive file */
 
 
  /*
@@ -2030,22 +2030,34 @@ service_checkout(int shutdown)          /* I - Shutting down? */
 
 #ifdef HAVE_ONDEMAND
   if (OnDemand)
+  {
     strlcpy(pidfile, CUPS_KEEPALIVE, sizeof(pidfile));
+
+    if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
+        WebInterface ||			/* Web interface enabled */
+        NeedReload ||			/* Doing a reload */
+        (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
+                                        /* Printers being shared */
+    {
+     /*
+      * Create or remove the "keep-alive" file based on whether there are active
+      * jobs or shared printers to advertise...
+      */
+
+      shutdown = 0;
+    }
+  }
   else
 #endif /* HAVE_ONDEMAND */
   snprintf(pidfile, sizeof(pidfile), "%s/cupsd.pid", StateDir);
 
- /*
-  * Create or remove the "keep-alive" file based on whether there are active
-  * jobs or shared printers to advertise...
-  */
+  if (shutdown)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Removing KeepAlive/PID file \"%s\".", pidfile);
 
-  if (!OnDemand ||                      /* Not running on-demand */
-      cupsArrayCount(ActiveJobs) ||	/* Active jobs */
-      WebInterface ||			/* Web interface enabled */
-      NeedReload ||			/* Doing a reload */
-      (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
-					/* Printers being shared */
+    unlink(pidfile);
+  }
+  else
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating KeepAlive/PID file \"%s\".", pidfile);
 
@@ -2060,12 +2072,6 @@ service_checkout(int shutdown)          /* I - Shutting down? */
     }
     else
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create KeepAlive/PID file \"%s\": %s", pidfile, strerror(errno));
-  }
-  else if (shutdown)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Removing KeepAlive/PID file \"%s\".", pidfile);
-
-    unlink(pidfile);
   }
 }
 
