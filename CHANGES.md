@@ -26,6 +26,7 @@ CHANGES IN CUPS V2.2.5
   values (Issue #5074)
 - The scheduler now creates a PID file when not running on demand with a modern
   service launcher (Issue #5080)
+- Fixed an Avahi-related crash bug in the scheduler (Issue #5085, Issue #5086)
 - The IPP Everywhere PPD generator now sorts the supported resolutions before
   choosing them for draft, normal, and best quality modes (Issue #5091)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
