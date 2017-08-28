@@ -998,7 +998,11 @@ _cupsConnect(void)
     */
 
     if (strcmp(cg->http->hostname, cg->server) ||
+#ifdef AF_LOCAL
+        (httpAddrFamily(cg->http->hostaddr) != AF_LOCAL && cg->ipp_port != httpAddrPort(cg->http->hostaddr)) ||
+#else
         cg->ipp_port != httpAddrPort(cg->http->hostaddr) ||
+#endif /* AF_LOCAL */
         (cg->http->encryption != cg->encryption &&
 	 cg->http->encryption == HTTP_ENCRYPTION_NEVER))
     {
