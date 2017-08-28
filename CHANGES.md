@@ -26,6 +26,8 @@ CHANGES IN CUPS V2.2.5
   values (Issue #5074)
 - The scheduler now creates a PID file when not running on demand with a modern
   service launcher (Issue #5080)
+- The web interface did not support newer language identifiers used by Microsoft
+  web browsers (Issue #5803)
 - Updated the cups-files.conf and cupsd.conf file documentation for missing
   directives (Issue #5084)
 - Fixed an Avahi-related crash bug in the scheduler (Issue #5085, Issue #5086)

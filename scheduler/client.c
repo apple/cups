@@ -3627,42 +3627,12 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   else
     auth_type[0] = '\0';
 
-  if (con->request &&
-      (attr = ippFindAttribute(con->request, "attributes-natural-language",
-                               IPP_TAG_LANGUAGE)) != NULL)
+  if (con->request && (attr = ippFindAttribute(con->request, "attributes-natural-language", IPP_TAG_LANGUAGE)) != NULL)
   {
-    switch (strlen(attr->values[0].string.text))
-    {
-      default :
-	 /*
-	  * This is an unknown or badly formatted language code; use
-	  * the POSIX locale...
-	  */
+    cups_lang_t *language = cupsLangGet(ippGetString(attr, 0, NULL));
 
-	  strlcpy(lang, "LANG=C", sizeof(lang));
-	  break;
-
-      case 2 :
-	 /*
-	  * Just the language code (ll)...
-	  */
-
-	  snprintf(lang, sizeof(lang), "LANG=%s.UTF8",
-		   attr->values[0].string.text);
-	  break;
-
-      case 5 :
-	 /*
-	  * Language and country code (ll-cc)...
-	  */
-
-	  snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c.UTF8",
-		   attr->values[0].string.text[0],
-		   attr->values[0].string.text[1],
-		   toupper(attr->values[0].string.text[3] & 255),
-		   toupper(attr->values[0].string.text[4] & 255));
-	  break;
-    }
+    snprintf(lang, sizeof(lang), "LANG=%s.UTF8", language->language);
+    cupsLangFree(language);
   }
   else if (con->language)
     snprintf(lang, sizeof(lang), "LANG=%s.UTF8", con->language->language);
