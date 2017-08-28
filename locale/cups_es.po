@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-08-01 17:09-0400\n"
+"POT-Creation-Date: 2017-08-28 12:25-0400\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1184,6 +1184,9 @@ msgstr "  -f nombre_archivo       Establece nombre de archivo predeterminado."
 msgid "  -h                      Show this usage message."
 msgstr "  -h                      Muestra este mensaje de uso."
 
+msgid "  -h                      Validate HTTP response headers."
+msgstr ""
+
 msgid "  -h regex                Match hostname to regular expression."
 msgstr ""
 "  -h regex                Hacer coincidir el nombre del equipo con la "
@@ -1957,6 +1960,246 @@ msgstr "%s: Advertencia - opción de formulario no tenida en cuenta."
 msgid "%s: Warning - mode option ignored."
 msgstr "%s: Advertencia - opción de modo no tenida en cuenta."
 
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 pulg./seg"
+
+msgid "1.25x0.25\""
+msgstr "1.25x0.25 pulg."
+
+msgid "1.25x2.25\""
+msgstr "1.25x2.25 pulg."
+
+msgid "1.5 inch/sec."
+msgstr "1.5 pulg./seg"
+
+msgid "1.50x0.25\""
+msgstr "1.50x0.25 pulg."
+
+msgid "1.50x0.50\""
+msgstr "1.50x0.50 pulg."
+
+msgid "1.50x1.00\""
+msgstr "1.50x1.00 pulg."
+
+msgid "1.50x2.00\""
+msgstr "1.50x2.00 pulg."
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 pulg./seg"
+
+msgid "10 x 11"
+msgstr "10 x 11"
+
+msgid "10 x 13"
+msgstr "10 x 13"
+
+msgid "10 x 14"
+msgstr "10 x 14"
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 mm/seg"
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 pulg./seg"
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 pulg./seg"
+
+msgid "12 x 11"
+msgstr "12 x 11"
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 mm/seg"
+
+msgid "120x60dpi"
+msgstr "120x60ppp"
+
+msgid "120x72dpi"
+msgstr "120x72ppp"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136ppp"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 mm/seg"
+
+msgid "15 x 11"
+msgstr "15 x 11"
+
+msgid "150 mm/sec."
+msgstr "150 mm/seg"
+
+msgid "150dpi"
+msgstr "150ppp"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180ppp"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 pulg./seg"
+
 msgid "2-Hole Punch (Landscape)"
 msgstr "Perforación de 2 agujeros (apaisado)"
 
@@ -1972,6 +2215,117 @@ msgstr "Perforación de 2 agujeros (retrato invertido)"
 msgid "2-Sided Printing"
 msgstr "Dúplex"
 
+msgid "2.00x0.37\""
+msgstr "2.00x0.37 pulg."
+
+msgid "2.00x0.50\""
+msgstr "2.00x0.50 pulg."
+
+msgid "2.00x1.00\""
+msgstr "2.00x1.00 pulg."
+
+msgid "2.00x1.25\""
+msgstr "2.00x1.25 pulg."
+
+msgid "2.00x2.00\""
+msgstr "2.00x2.00 pulg."
+
+msgid "2.00x3.00\""
+msgstr "2.00x3.00 pulg."
+
+msgid "2.00x4.00\""
+msgstr "2.00x4.00 pulg."
+
+msgid "2.00x5.50\""
+msgstr "2.00x5.50 pulg."
+
+msgid "2.25x0.50\""
+msgstr "2.25x0.50 pulg."
+
+msgid "2.25x1.25\""
+msgstr "2.25x1.25 pulg."
+
+msgid "2.25x4.00\""
+msgstr "2.25x4.00 pulg."
+
+msgid "2.25x5.50\""
+msgstr "2.25x5.50 pulg."
+
+msgid "2.38x5.50\""
+msgstr "2.38x5.50 pulg."
+
+msgid "2.5 inches/sec."
+msgstr "2.5 pulg./seg"
+
+msgid "2.50x1.00\""
+msgstr "2.50x1.00 pulg."
+
+msgid "2.50x2.00\""
+msgstr "2.50x2.00 pulg."
+
+msgid "2.75x1.25\""
+msgstr "2.75x1.25 pulg."
+
+msgid "2.9 x 1\""
+msgstr "2.9 x 1 pulg."
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 mm/seg"
+
+msgid "200 mm/sec."
+msgstr "200 mm/seg"
+
+msgid "203dpi"
+msgstr "203ppp"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "24-Pin Series"
+
+msgid "240x72dpi"
+msgstr "240x72ppp"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 mm/seg"
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 pulg./seg"
+
+msgid "3 x 5"
+msgstr "3 x 5"
+
 msgid "3-Hole Punch (Landscape)"
 msgstr "Perforación de 3 agujeros (apaisado)"
 
@@ -1984,6 +2338,72 @@ msgstr "Perforación de 3 agujeros (apaisado invertido)"
 msgid "3-Hole Punch (Reverse Portrait)"
 msgstr "Perforación de 3 agujeros (retrato invertido)"
 
+msgid "3.00x1.00\""
+msgstr "3.00x1.00 pulg."
+
+msgid "3.00x1.25\""
+msgstr "3.00x1.25 pulg."
+
+msgid "3.00x2.00\""
+msgstr "3.00x2.00 pulg."
+
+msgid "3.00x3.00\""
+msgstr "3.00x3.00 pulg."
+
+msgid "3.00x5.00\""
+msgstr "3.00x5.00 pulg."
+
+msgid "3.25x2.00\""
+msgstr "3.25x2.00 pulg."
+
+msgid "3.25x5.00\""
+msgstr "3.25x5.00 pulg."
+
+msgid "3.25x5.50\""
+msgstr "3.25x5.50 pulg."
+
+msgid "3.25x5.83\""
+msgstr "3.25x5.83 pulg."
+
+msgid "3.25x7.83\""
+msgstr "3.25x7.83 pulg."
+
+msgid "3.5 x 5"
+msgstr "3.5 x 5"
+
+msgid "3.5\" Disk"
+msgstr "Disco de 3.5 pulg."
+
+msgid "3.50x1.00\""
+msgstr "3.50x1.00 pulg."
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 mm/seg"
+
+msgid "300 mm/sec."
+msgstr "300 mm/seg"
+
+msgid "300dpi"
+msgstr "300ppp"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360ppp"
+
+msgid "360x180dpi"
+msgstr "360x180ppp"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 pulg./seg"
+
 msgid "4-Hole Punch (Landscape)"
 msgstr "Perforación de 4 agujeros (apaisado)"
 
@@ -1995,6 +2415,177 @@ msgstr "Perforación de 4 agujeros (apaisado invertido)"
 
 msgid "4-Hole Punch (Reverse Portrait)"
 msgstr "Perforación de 4 agujeros (retrato invertido)"
+
+msgid "4.00x1.00\""
+msgstr "4.00x1.00 pulg."
+
+msgid "4.00x13.00\""
+msgstr "4.00x13.00 pulg."
+
+msgid "4.00x2.00\""
+msgstr "4.00x2.00 pulg."
+
+msgid "4.00x2.50\""
+msgstr "4.00x2.50 pulg."
+
+msgid "4.00x3.00\""
+msgstr "4.00x3.00 pulg."
+
+msgid "4.00x4.00\""
+msgstr "4.00x4.00 pulg."
+
+msgid "4.00x5.00\""
+msgstr "4.00x5.00 pulg."
+
+msgid "4.00x6.00\""
+msgstr "4.00x6.00 pulg."
+
+msgid "4.00x6.50\""
+msgstr "4.00x6.50 pulg."
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 mm/seg"
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 pulg./seg"
+
+msgid "5 x 7"
+msgstr "5 x 7"
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 pulg./seg"
+
+msgid "6.00x1.00\""
+msgstr "6.00x1.00 pulg."
+
+msgid "6.00x2.00\""
+msgstr "6.00x2.00 pulg."
+
+msgid "6.00x3.00\""
+msgstr "6.00x3.00 pulg."
+
+msgid "6.00x4.00\""
+msgstr "6.00x4.00 pulg."
+
+msgid "6.00x5.00\""
+msgstr "6.00x5.00 pulg."
+
+msgid "6.00x6.00\""
+msgstr "6.00x6.00 pulg."
+
+msgid "6.00x6.50\""
+msgstr "6.00x6.50 pulg."
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 mm/seg"
+
+msgid "600dpi"
+msgstr "600ppp"
+
+msgid "60dpi"
+msgstr "60ppp"
+
+msgid "60x72dpi"
+msgstr "60x72ppp"
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 pulg./seg"
+
+msgid "7 x 9"
+msgstr "7 x 9"
+
+msgid "70"
+msgstr "70"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 pulg./seg"
+
+msgid "8 x 10"
+msgstr "8 x 10"
+
+msgid "8.00x1.00\""
+msgstr "8.00x1.00 pulg."
+
+msgid "8.00x2.00\""
+msgstr "8.00x2.00 pulg."
+
+msgid "8.00x3.00\""
+msgstr "8.00x3.00 pulg."
+
+msgid "8.00x4.00\""
+msgstr "8.00x4.00 pulg."
+
+msgid "8.00x5.00\""
+msgstr "8.00x5.00 pulg."
+
+msgid "8.00x6.00\""
+msgstr "8.00x6.00 pulg."
+
+msgid "8.00x6.50\""
+msgstr "8.00x6.50 pulg."
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 mm/seg"
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 pulg./seg"
+
+msgid "9 x 11"
+msgstr "9 x 11"
+
+msgid "9 x 12"
+msgstr "9 x 12"
+
+msgid "9-Pin Series"
+msgstr "9-Pin Series"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
 
 msgid "?Invalid help command unknown."
 msgstr "?Comando de ayuda no válido desconocido."
@@ -2016,6 +2607,108 @@ msgstr "Ya existe una clase llamada \"%s\"."
 msgid "A printer named \"%s\" already exists."
 msgstr "Ya existe una impresora llamada \"%s\"."
 
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr "A0 lado largo"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr "A1 lado largo"
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr "A2 lado largo"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr "A3 lado largo"
+
+msgid "A3 Oversize"
+msgstr "A3 Extragrande"
+
+msgid "A3 Oversize Long Edge"
+msgstr "A3 Extragrande lado largo"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr "A4 lado largo"
+
+msgid "A4 Oversize"
+msgstr "A4 Extragrande"
+
+msgid "A4 Small"
+msgstr "A4 Pequeño"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr "A5 lado largo"
+
+msgid "A5 Oversize"
+msgstr "A5 Extragrande"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr "A6 lado largo"
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr "ARCH C lado largo"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr "ARCH D lado largo"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
+msgstr "ARCH E lado largo"
+
 msgid "Accept Jobs"
 msgstr "Aceptar trabajos"
 
@@ -2034,6 +2727,9 @@ msgstr "Añadir impresora"
 msgid "Add RSS Subscription"
 msgstr "Añadir subscripción RSS"
 
+msgid "Address"
+msgstr "Dirección"
+
 msgid "Administration"
 msgstr "Administración"
 
@@ -2049,8 +2745,14 @@ msgstr "Rollo alternativo"
 msgid "Aluminum"
 msgstr ""
 
+msgid "Always"
+msgstr "Siempre"
+
 msgid "AppSocket/HP JetDirect"
 msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "Aplicador"
 
 msgid "Archival Envelope"
 msgstr ""
@@ -2084,6 +2786,42 @@ msgstr "Los grupos de atributos están desordenados (%x < %x)."
 
 msgid "Automatic"
 msgstr "Automático"
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr "A5 Extragrande"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
 
 msgid "Back Print Film"
 msgstr ""
@@ -2259,6 +2997,9 @@ msgstr "Encuadernar (retrato invertido)"
 msgid "Bond Envelope"
 msgstr ""
 
+msgid "Bond Paper"
+msgstr "Papel de cartas"
+
 msgid "Booklet"
 msgstr ""
 
@@ -2281,6 +3022,12 @@ msgstr "Se ha detectado un desbordamiento de buffer, cancelando."
 msgid "CD"
 msgstr ""
 
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "Impresora de etiquetas CPCL"
+
 msgid "Cancel Jobs"
 msgstr "Cancelar trabajos"
 
@@ -2301,6 +3048,9 @@ msgstr ""
 
 msgid "Cardstock"
 msgstr "Cartulina"
+
+msgid "Cassette"
+msgstr "Casete"
 
 msgid "Center"
 msgstr "Centro"
@@ -2398,11 +3148,29 @@ msgstr ""
 msgid "Custom"
 msgstr "A medida"
 
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "Cortar"
+
 msgid "Cut Media"
 msgstr "Medio de corte"
 
+msgid "Cutter"
+msgstr "Cortadora"
+
 msgid "DVD"
 msgstr ""
+
+msgid "Dark"
+msgstr "Oscuro"
+
+msgid "Darkness"
+msgstr "Oscuridad"
 
 msgid "Data file sent successfully."
 msgstr "Archivo de datos enviado correctamente."
@@ -2415,6 +3183,9 @@ msgstr "Borrar clase"
 
 msgid "Delete Printer"
 msgstr "Borrar impresora"
+
+msgid "DeskJet Series"
+msgstr "DeskJet Series"
 
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
@@ -2436,6 +3207,9 @@ msgstr ""
 "        device-id = %s\n"
 "        ubicación: %s"
 
+msgid "Direct Thermal Media"
+msgstr "Soporte térmico directo"
+
 #, c-format
 msgid "Directory \"%s\" contains a relative path."
 msgstr "El directorio \"%s\" contiene una ruta relativa."
@@ -2455,6 +3229,9 @@ msgstr "Directorio \"%s\" no disponible: %s"
 #, c-format
 msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "Permisos del directorio \"%s\" OK (0%o/uid=%d/gid=%d)."
+
+msgid "Disabled"
+msgstr "Deshabilitado"
 
 msgid "Disc"
 msgstr "Disco"
@@ -2487,6 +3264,18 @@ msgstr "Borrador"
 msgid "Dry Film"
 msgstr ""
 
+msgid "Duplexer"
+msgstr "Unidad de impresión dúplex"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "Impresora de etiquetas EPL1"
+
+msgid "EPL2 Label Printer"
+msgstr "Impresora de etiquetas EPL2"
+
 msgid "Edit Configuration File"
 msgstr "Editar archivo de configuración"
 
@@ -2509,6 +3298,9 @@ msgstr "Rótulo final"
 msgid "Engineering Z Fold"
 msgstr ""
 
+msgid "English"
+msgstr "Spanish"
+
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -2521,8 +3313,170 @@ msgstr ""
 msgid "Envelope"
 msgstr "Sobre"
 
+msgid "Envelope #10"
+msgstr "Sobre #10"
+
+msgid "Envelope #11"
+msgstr "Sobre #11"
+
+msgid "Envelope #12"
+msgstr "Sobre #12"
+
+msgid "Envelope #14"
+msgstr "Sobre #14"
+
+msgid "Envelope #9"
+msgstr "Sobre #9"
+
+msgid "Envelope B4"
+msgstr "Sobre B4"
+
+msgid "Envelope B5"
+msgstr "Sobre B5"
+
+msgid "Envelope B6"
+msgstr "Sobre B6"
+
+msgid "Envelope C0"
+msgstr "Sobre C0"
+
+msgid "Envelope C1"
+msgstr "Sobre C1"
+
+msgid "Envelope C2"
+msgstr "Sobre C2"
+
+msgid "Envelope C3"
+msgstr "Sobre C3"
+
+msgid "Envelope C4"
+msgstr "Sobre C4"
+
+msgid "Envelope C5"
+msgstr "Sobre C5"
+
+msgid "Envelope C6"
+msgstr "Sobre C6"
+
+msgid "Envelope C65"
+msgstr "Sobre C65"
+
+msgid "Envelope C7"
+msgstr "Sobre C7"
+
+msgid "Envelope Choukei 3"
+msgstr "Sobre Choukei 3"
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr "Sobre Choukei 3 lado largo"
+
+msgid "Envelope Choukei 4"
+msgstr "Sobre Choukei 4"
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr "Sobre Choukei 4 lado largo"
+
+msgid "Envelope DL"
+msgstr "Sobre DL"
+
+msgid "Envelope Feed"
+msgstr "Alimentador de sobre"
+
+msgid "Envelope Invite"
+msgstr "Sobre Invitación"
+
+msgid "Envelope Italian"
+msgstr "Sobre Italiano"
+
+msgid "Envelope Kaku2"
+msgstr "Sobre Kaku2"
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr "Sobre Kaku2 lado largo"
+
+msgid "Envelope Kaku3"
+msgstr "Sobre Kaku3"
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr "Sobre Kaku3 lado largo"
+
+msgid "Envelope Monarch"
+msgstr "Sobre Monarch"
+
+msgid "Envelope PRC1"
+msgstr "Sobre PRC1"
+
+msgid "Envelope PRC1 Long Edge"
+msgstr "Sobre PRC1 lado largo"
+
+msgid "Envelope PRC10"
+msgstr "Sobre PRC10"
+
+msgid "Envelope PRC10 Long Edge"
+msgstr "Sobre PRC10 lado largo"
+
+msgid "Envelope PRC2"
+msgstr "Sobre PRC2"
+
+msgid "Envelope PRC2 Long Edge"
+msgstr "Sobre PRC2 lado largo"
+
+msgid "Envelope PRC3"
+msgstr "Sobre PRC3"
+
+msgid "Envelope PRC3 Long Edge"
+msgstr "Sobre PRC3 lado largo"
+
+msgid "Envelope PRC4"
+msgstr "Sobre PRC4"
+
+msgid "Envelope PRC4 Long Edge"
+msgstr "Sobre PRC4 lado largo"
+
+msgid "Envelope PRC5 Long Edge"
+msgstr "Sobre PRC5 lado largo"
+
+msgid "Envelope PRC5PRC5"
+msgstr "Sobre PRC5PRC5"
+
+msgid "Envelope PRC6"
+msgstr "Sobre PRC6"
+
+msgid "Envelope PRC6 Long Edge"
+msgstr "Sobre PRC6 lado largo"
+
+msgid "Envelope PRC7"
+msgstr "Sobre PRC7"
+
+msgid "Envelope PRC7 Long Edge"
+msgstr "Sobre PRC7 lado largo"
+
+msgid "Envelope PRC8"
+msgstr "Sobre PRC8"
+
+msgid "Envelope PRC8 Long Edge"
+msgstr "Sobre PRC8 lado largo"
+
+msgid "Envelope PRC9"
+msgstr "Sobre PRC9"
+
+msgid "Envelope PRC9 Long Edge"
+msgstr "Sobre PRC9 lado largo"
+
+msgid "Envelope Personal"
+msgstr "Sobre Personal"
+
+msgid "Envelope You4"
+msgstr "Sobre You4"
+
+msgid "Envelope You4 Long Edge"
+msgstr "Sobre You4 lado largo"
+
 msgid "Environment Variables:"
 msgstr "Variables de entorno:"
+
+msgid "Epson"
+msgstr "Epson"
 
 msgid "Error Policy"
 msgstr "Directiva de error"
@@ -2536,11 +3490,44 @@ msgstr "Error enviando trama de datos (raster)."
 msgid "Error: need hostname after \"-h\" option."
 msgstr "Error: se necesita un nombre de equipo tras la opción \"-h\"."
 
+msgid "Every 10 Labels"
+msgstr "Cada 10 etiquetas"
+
+msgid "Every 2 Labels"
+msgstr "Cada 2 etiquetas"
+
+msgid "Every 3 Labels"
+msgstr "Cada 3 etiquetas"
+
+msgid "Every 4 Labels"
+msgstr "Cada 4 etiquetas"
+
+msgid "Every 5 Labels"
+msgstr "Cada 5 etiquetas"
+
+msgid "Every 6 Labels"
+msgstr "Cada 6 etiquetas"
+
+msgid "Every 7 Labels"
+msgstr "Cada 7 etiquetas"
+
+msgid "Every 8 Labels"
+msgstr "Cada 8 etiquetas"
+
+msgid "Every 9 Labels"
+msgstr "Cada 9 etiquetas"
+
+msgid "Every Label"
+msgstr "Cada etiqueta"
+
 msgid "Everyday Glossy Photo Paper"
 msgstr ""
 
 msgid "Everyday Matte Paper"
 msgstr ""
+
+msgid "Executive"
+msgstr "Ejecutivo"
 
 msgid "Expectation Failed"
 msgstr "Lo que se esperaba, falló."
@@ -2566,6 +3553,15 @@ msgstr ""
 msgid "Face Up"
 msgstr ""
 
+msgid "FanFold German"
+msgstr "FanFold alemán"
+
+msgid "FanFold Legal German"
+msgstr "FanFold Legal alemán"
+
+msgid "Fanfold US"
+msgstr "FanFold de EE.UU"
+
 msgid "Fast Grayscale"
 msgstr "Escala de grises rápida"
 
@@ -2588,6 +3584,9 @@ msgstr "Archivo \"%s\" no disponible: %s"
 #, c-format
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "Permisos del archivo \"%s\" OK (0%o/uid=%d/gid=%d)."
+
+msgid "File Folder"
+msgstr "Carpeta de archivo"
 
 #, c-format
 msgid ""
@@ -2622,6 +3621,9 @@ msgstr ""
 msgid "Fold"
 msgstr "Plegado"
 
+msgid "Folio"
+msgstr "Folio"
+
 msgid "Forbidden"
 msgstr "Prohibido"
 
@@ -2633,6 +3635,9 @@ msgstr "Desplegable"
 
 msgid "General"
 msgstr "General"
+
+msgid "Generic"
+msgstr "Genérico"
 
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "Get-Response-PDU usa una longitud indefinida"
@@ -2664,6 +3669,9 @@ msgstr ""
 msgid "Glossy Optical Disc"
 msgstr ""
 
+msgid "Glossy Paper"
+msgstr "Papel brillante"
+
 msgid "Glossy Photo Paper"
 msgstr ""
 
@@ -2676,6 +3684,9 @@ msgstr ""
 msgid "Grayscale"
 msgstr "Escale de grises"
 
+msgid "HP"
+msgstr "HP"
+
 msgid "Hagaki"
 msgstr "Hagaki"
 
@@ -2684,6 +3695,9 @@ msgstr "Plegado por la mitad"
 
 msgid "Half Z Fold"
 msgstr "Medio plegado en Z"
+
+msgid "Hanging Folder"
+msgstr "Carpeta colgante"
 
 msgid "Hash buffer too small."
 msgstr "Memoria temporal hash demasiado pequeña."
@@ -2784,6 +3798,9 @@ msgstr "IPP el valor textWithLanguage menor del mínimo de 4 bytes."
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP valor mayor de 32767 bytes."
 
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
 msgid "Illegal control character"
 msgstr "Carácter de control ilegal"
 
@@ -2814,11 +3831,29 @@ msgstr ""
 msgid "Inkjet Paper"
 msgstr ""
 
+msgid "Installable Options"
+msgstr "Opciones instalables"
+
+msgid "Installed"
+msgstr "Instalada"
+
+msgid "IntelliBar Label Printer"
+msgstr "Impresora de etiquetas IntelliBar"
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
 msgid "Internal Server Error"
 msgstr "Error interno del servidor"
 
 msgid "Internal error"
 msgstr "Error interno"
+
+msgid "Internet Postage 2-Part"
+msgstr "Correo por Internet Parte-2"
+
+msgid "Internet Postage 3-Part"
+msgstr "Correo por Internet Parte-3"
 
 msgid "Internet Printing Protocol"
 msgstr "Protocolo de Impresión de Internet IPP"
@@ -2838,6 +3873,48 @@ msgstr "Comando de impresora \"%s\" no válido."
 
 msgid "JCL"
 msgstr "JCL"
+
+msgid "JIS B0"
+msgstr "JIS B0"
+
+msgid "JIS B1"
+msgstr "JIS B1"
+
+msgid "JIS B10"
+msgstr "JIS B10"
+
+msgid "JIS B2"
+msgstr "JIS B2"
+
+msgid "JIS B3"
+msgstr "JIS B3"
+
+msgid "JIS B4"
+msgstr "JIS B4"
+
+msgid "JIS B4 Long Edge"
+msgstr "JIS B4 lado largo"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "JIS B5 Long Edge"
+msgstr "JIS B5 lado largo"
+
+msgid "JIS B6"
+msgstr "JIS B6"
+
+msgid "JIS B6 Long Edge"
+msgstr "JIS B6 lado largo"
+
+msgid "JIS B7"
+msgstr "JIS B7"
+
+msgid "JIS B8"
+msgstr "JIS B8"
+
+msgid "JIS B9"
+msgstr "JIS B9"
 
 #, c-format
 msgid "Job #%d cannot be restarted - no files."
@@ -2908,6 +3985,12 @@ msgstr "Jog"
 msgid "LPD/LPR Host or Printer"
 msgstr "Equipo o impresora LPD/LPR"
 
+msgid "Label Printer"
+msgstr "Impresora de etiquetas"
+
+msgid "Label Top"
+msgstr "Parte superior de la etiqueta"
+
 msgid "Labels"
 msgstr ""
 
@@ -2921,11 +4004,17 @@ msgstr ""
 msgid "Language \"%s\" not supported."
 msgstr "No se admite el uso del idioma \"%s\"."
 
+msgid "Large Address"
+msgstr "Dirección grande"
+
 msgid "Large Capacity"
 msgstr "Capacidad grande"
 
 msgid "Large Capacity Tray"
 msgstr ""
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet Series PCL 4/5"
 
 msgid "Left"
 msgstr "Izquierda"
@@ -2939,8 +4028,17 @@ msgstr ""
 msgid "Letter Fold"
 msgstr "Carta plegada"
 
+msgid "Letter Oversize"
+msgstr "Carta Extragrande"
+
+msgid "Letter Oversize Long Edge"
+msgstr "Carta Extragrande lado largo"
+
 msgid "Letterhead"
 msgstr "Membrete"
+
+msgid "Light"
+msgstr "Ligero"
 
 msgid "Lightweight Envelope"
 msgstr ""
@@ -3005,6 +4103,9 @@ msgstr "Rollo principal"
 msgid "Manual"
 msgstr "Manual"
 
+msgid "Manual Feed"
+msgstr "Alimentación manual"
+
 msgid "Matte Brochure Paper"
 msgstr ""
 
@@ -3029,8 +4130,14 @@ msgstr "Tamaño de papel"
 msgid "Media Source"
 msgstr "Fuente del papel"
 
+msgid "Media Tracking"
+msgstr "Seguimiento del medio"
+
 msgid "Media Type"
 msgstr "Tipo de papel"
+
+msgid "Medium"
+msgstr "Media"
 
 msgid "Memory allocation error"
 msgstr "Error de reserva de memoria"
@@ -3191,6 +4298,9 @@ msgstr "Nombre OID usa una longitud indefinida"
 msgid "Nested classes are not allowed."
 msgstr "No se permiten clases anidadas."
 
+msgid "Never"
+msgstr "Nunca"
+
 msgid "New credentials are not valid for name."
 msgstr ""
 
@@ -3305,6 +4415,12 @@ msgstr "No hay variable-bindings SEQUENCE"
 msgid "No version number"
 msgstr "No hay número de versión"
 
+msgid "Non-continuous (Mark sensing)"
+msgstr "No continuo (sensible a señal)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "No continuo (sensible a web)"
+
 msgid "None"
 msgstr ""
 
@@ -3317,6 +4433,9 @@ msgstr "No encontrado"
 msgid "Not Implemented"
 msgstr "No implementado"
 
+msgid "Not Installed"
+msgstr "No instalado"
+
 msgid "Not Modified"
 msgstr "No modificado"
 
@@ -3325,6 +4444,9 @@ msgstr "No implementado"
 
 msgid "Not allowed to print."
 msgstr "No se permite imprimir."
+
+msgid "Note"
+msgstr "Nota"
 
 msgid ""
 "Note: this program only validates the DSC comments, not the PostScript "
@@ -3340,6 +4462,9 @@ msgstr "Desactivado (1 cara)"
 
 msgid "Office Recycled Paper"
 msgstr ""
+
+msgid "Oki"
+msgstr "Oki"
 
 msgid "Online Help"
 msgstr "Ayuda en línea"
@@ -3397,6 +4522,27 @@ msgstr "No se encuentra el recipiente de salida."
 msgid "PASS"
 msgstr "PASA"
 
+msgid "PCL Laser Printer"
+msgstr "Impresora Laser PCL"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr "PRC16K lado largo"
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr "PRC32K lado largo"
+
+msgid "PRC32K Oversize"
+msgstr "PRC32K Extragrande"
+
+msgid "PRC32K Oversize Long Edge"
+msgstr "PRC32K Extragrande lado largo"
+
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "El paquete no contiene un Get-Response-PDU"
 
@@ -3421,6 +4567,12 @@ msgstr "No se encuentra la bandeja de papel."
 msgid "Parallel Fold"
 msgstr "Pliegue paralelo"
 
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "¿Contraseña de %s en %s? "
@@ -3435,6 +4587,9 @@ msgstr "Pausar clase"
 msgid "Pause Printer"
 msgstr "Pausar impresora"
 
+msgid "Peel-Off"
+msgstr "Despegar"
+
 msgid "Permanent Labels"
 msgstr ""
 
@@ -3443,6 +4598,9 @@ msgstr "Foto"
 
 msgid "Photo Film"
 msgstr ""
+
+msgid "Photo Labels"
+msgstr "Foto pequeña"
 
 msgid "Photo Paper"
 msgstr ""
@@ -3495,6 +4653,21 @@ msgstr ""
 msgid "Port Monitor"
 msgstr "Monitor de puerto"
 
+msgid "PostScript Printer"
+msgstr "Impresora PostScript"
+
+msgid "Postcard"
+msgstr "Postal"
+
+msgid "Postcard Double"
+msgstr "Postal doble"
+
+msgid "Postcard Double Long Edge"
+msgstr "Postal doble lado largo"
+
+msgid "Postcard Long Edge"
+msgstr "Postal lado largo"
+
 msgid "Poster Fold"
 msgstr "Póster plegado"
 
@@ -3519,17 +4692,35 @@ msgstr ""
 msgid "Preprinted Paper"
 msgstr ""
 
+msgid "Print Density"
+msgstr "Densidad de impresión"
+
 msgid "Print Job:"
 msgstr "Imprimir trabajo:"
+
+msgid "Print Mode"
+msgstr "Modo de impresión"
 
 msgid "Print Quality"
 msgstr "Calidad de impresión"
 
+msgid "Print Rate"
+msgstr "Tasa de impresión"
+
 msgid "Print Self-Test Page"
 msgstr "Imprimir página de auto-prueba"
 
+msgid "Print Speed"
+msgstr "Velocidad de impresión"
+
 msgid "Print Test Page"
 msgstr "Imprimir página de prueba"
+
+msgid "Print and Cut"
+msgstr "Imprimir y cortar"
+
+msgid "Print and Tear"
+msgstr "Imprimir y romper"
 
 msgid "Print file sent."
 msgstr "Archivo de impresión enviado."
@@ -3550,6 +4741,9 @@ msgstr "Ya existe la impresora \"%s\"."
 msgid "Printer Added"
 msgstr "Impresora añadida"
 
+msgid "Printer Default"
+msgstr "Predeterminado de la impresora"
+
 msgid "Printer Deleted"
 msgstr "Impresora borrada"
 
@@ -3558,6 +4752,9 @@ msgstr "Impresora modificada"
 
 msgid "Printer Paused"
 msgstr "Impresora en pausa"
+
+msgid "Printer Settings"
+msgstr "Configuración de la impresora"
 
 msgid "Printer cannot print supplied content."
 msgstr "La impresora no puede imprimir el contenido suministrado."
@@ -3584,6 +4781,9 @@ msgstr "Perforadora"
 msgid "Punched Paper"
 msgstr ""
 
+msgid "Quarto"
+msgstr "Libro en cuarto"
+
 msgid "Quota limit reached."
 msgstr "Se ha alcanzado el límite de cuota."
 
@@ -3607,6 +4807,9 @@ msgstr "El equipo remoto no ha aceptado el archivo de control (%d)."
 msgid "Remote host did not accept data file (%d)."
 msgstr "El equipo remoto no ha aceptado el archivo de datos (%d)."
 
+msgid "Reprint After Error"
+msgstr "Volver a imprimir tras un error"
+
 msgid "Request Entity Too Large"
 msgstr "La entidad requerida es demasiado larga"
 
@@ -3618,6 +4821,12 @@ msgstr "Reanudar clase"
 
 msgid "Resume Printer"
 msgstr "Reanudar impresora"
+
+msgid "Return Address"
+msgstr "Remite"
+
+msgid "Rewind"
+msgstr "Rebobinar"
 
 msgid "Right"
 msgstr "Derecho"
@@ -3755,6 +4964,9 @@ msgstr "Cambiar opciones impresora"
 msgid "Set Publishing"
 msgstr "Hacer pública"
 
+msgid "Shipping Address"
+msgstr "Dirección de envío"
+
 msgid "Short-Edge (Landscape)"
 msgstr "Lado corto (apaisado)"
 
@@ -3800,6 +5012,9 @@ msgstr ""
 msgid "Sleeve"
 msgstr ""
 
+msgid "Special Paper"
+msgstr "Papel especial"
+
 #, c-format
 msgid "Spooling job, %.0f%% complete."
 msgstr "Guardando trabajo en cola, %.0f%% completado."
@@ -3834,6 +5049,9 @@ msgstr ""
 msgid "Stacker 9"
 msgstr ""
 
+msgid "Standard"
+msgstr "Estándar"
+
 msgid "Staple"
 msgstr "Grapa"
 
@@ -3860,6 +5078,9 @@ msgstr "Rótulo inicial"
 msgid "Starting page %d."
 msgstr "Iniciando página %d."
 
+msgid "Statement"
+msgstr "Declaración"
+
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr "Subscripción #%d no existe."
@@ -3867,11 +5088,38 @@ msgstr "Subscripción #%d no existe."
 msgid "Substitutions:"
 msgstr "Substituciones:"
 
+msgid "Super A"
+msgstr "Super A"
+
+msgid "Super B"
+msgstr "Super B (13 x 19  pulg.)"
+
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
 msgid "Switching Protocols"
 msgstr "Protocolos de conexión"
 
 msgid "Tab Stock"
 msgstr ""
+
+msgid "Tabloid"
+msgstr "Tabloide"
+
+msgid "Tabloid Oversize"
+msgstr "Tabloide extragrande"
+
+msgid "Tabloid Oversize Long Edge"
+msgstr "Tabloide extragrande lado largo"
+
+msgid "Tear"
+msgstr "Pestaña"
+
+msgid "Tear-Off"
+msgstr "Pestaña desprendible"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Ajuste de posición de la pestaña desprendible"
 
 #, c-format
 msgid "The \"%s\" attribute is required for print jobs."
@@ -4055,6 +5303,9 @@ msgstr "Hay demasiadas subscripciones."
 msgid "There was an unrecoverable USB error."
 msgstr "Ha habido un error USB irrecuperable."
 
+msgid "Thermal Transfer Media"
+msgstr "Soporte de transferencia térmica"
+
 msgid "Too many active jobs."
 msgstr "Demasiados trabajos activos."
 
@@ -4080,6 +5331,9 @@ msgstr ""
 
 msgid "Transparency"
 msgstr "Transparencia"
+
+msgid "Tray"
+msgstr "Bandeja"
 
 msgid "Tray 1"
 msgstr "Bandeja 1"
@@ -4164,6 +5418,30 @@ msgstr "URI demasiado largo"
 
 msgid "URI too large"
 msgstr "URI demasiado grande"
+
+msgid "US Ledger"
+msgstr "Libro Mayor, 17 x 11 pulg."
+
+msgid "US Legal"
+msgstr "Legal EE.UU."
+
+msgid "US Legal Oversize"
+msgstr "Legal EE.UU. Extragrande"
+
+msgid "US Letter"
+msgstr "Carta EE.UU."
+
+msgid "US Letter Long Edge"
+msgstr "Carta EE.UU. lado largo"
+
+msgid "US Letter Oversize"
+msgstr "Carta EE.UU. Extragrande"
+
+msgid "US Letter Oversize Long Edge"
+msgstr "Carta EE.UU. Extragrande lado largo"
+
+msgid "US Letter Small"
+msgstr "Carta EE.UU. Pequeña"
 
 msgid "Unable to access cupsd.conf file"
 msgstr "No se ha podido acceder al archivo cupsd.conf"
@@ -4761,6 +6039,12 @@ msgstr ""
 
 msgid "Z Fold"
 msgstr "Plegado en Z"
+
+msgid "ZPL Label Printer"
+msgstr "Impresora de etiquetas ZPL"
+
+msgid "Zebra"
+msgstr "Zebra"
 
 msgid "aborted"
 msgstr "cancelado"
@@ -12257,1316 +13541,35 @@ msgstr "Z Offset"
 #~ msgid "%g x %g"
 #~ msgstr "%g x %g"
 
-#~ msgid "-1"
-#~ msgstr "-1"
-
-#~ msgid "-10"
-#~ msgstr "-10"
-
-#~ msgid "-100"
-#~ msgstr "-100"
-
-#~ msgid "-105"
-#~ msgstr "-105"
-
-#~ msgid "-11"
-#~ msgstr "-11"
-
-#~ msgid "-110"
-#~ msgstr "-110"
-
-#~ msgid "-115"
-#~ msgstr "-115"
-
-#~ msgid "-12"
-#~ msgstr "-12"
-
-#~ msgid "-120"
-#~ msgstr "-120"
-
-#~ msgid "-13"
-#~ msgstr "-13"
-
-#~ msgid "-14"
-#~ msgstr "-14"
-
-#~ msgid "-15"
-#~ msgstr "-15"
-
-#~ msgid "-2"
-#~ msgstr "-2"
-
-#~ msgid "-20"
-#~ msgstr "-20"
-
-#~ msgid "-25"
-#~ msgstr "-25"
-
-#~ msgid "-3"
-#~ msgstr "-3"
-
-#~ msgid "-30"
-#~ msgstr "-30"
-
-#~ msgid "-35"
-#~ msgstr "-35"
-
-#~ msgid "-4"
-#~ msgstr "-4"
-
-#~ msgid "-40"
-#~ msgstr "-40"
-
-#~ msgid "-45"
-#~ msgstr "-45"
-
-#~ msgid "-5"
-#~ msgstr "-5"
-
-#~ msgid "-50"
-#~ msgstr "-50"
-
-#~ msgid "-55"
-#~ msgstr "-55"
-
-#~ msgid "-6"
-#~ msgstr "-6"
-
-#~ msgid "-60"
-#~ msgstr "-60"
-
-#~ msgid "-65"
-#~ msgstr "-65"
-
-#~ msgid "-7"
-#~ msgstr "-7"
-
-#~ msgid "-70"
-#~ msgstr "-70"
-
-#~ msgid "-75"
-#~ msgstr "-75"
-
-#~ msgid "-8"
-#~ msgstr "-8"
-
-#~ msgid "-80"
-#~ msgstr "-80"
-
-#~ msgid "-85"
-#~ msgstr "-85"
-
-#~ msgid "-9"
-#~ msgstr "-9"
-
-#~ msgid "-90"
-#~ msgstr "-90"
-
-#~ msgid "-95"
-#~ msgstr "-95"
-
-#~ msgid "0"
-#~ msgstr "0"
-
-#~ msgid "1"
-#~ msgstr "1"
-
-#~ msgid "1 inch/sec."
-#~ msgstr "1 pulg./seg"
-
-#~ msgid "1.25x0.25\""
-#~ msgstr "1.25x0.25 pulg."
-
-#~ msgid "1.25x2.25\""
-#~ msgstr "1.25x2.25 pulg."
-
-#~ msgid "1.5 inch/sec."
-#~ msgstr "1.5 pulg./seg"
-
-#~ msgid "1.50x0.25\""
-#~ msgstr "1.50x0.25 pulg."
-
-#~ msgid "1.50x0.50\""
-#~ msgstr "1.50x0.50 pulg."
-
-#~ msgid "1.50x1.00\""
-#~ msgstr "1.50x1.00 pulg."
-
-#~ msgid "1.50x2.00\""
-#~ msgstr "1.50x2.00 pulg."
-
-#~ msgid "10"
-#~ msgstr "10"
-
-#~ msgid "10 inches/sec."
-#~ msgstr "10 pulg./seg"
-
-#~ msgid "10 x 11"
-#~ msgstr "10 x 11"
-
-#~ msgid "10 x 13"
-#~ msgstr "10 x 13"
-
-#~ msgid "10 x 14"
-#~ msgstr "10 x 14"
-
-#~ msgid "100"
-#~ msgstr "100"
-
-#~ msgid "100 mm/sec."
-#~ msgstr "100 mm/seg"
-
-#~ msgid "105"
-#~ msgstr "105"
-
-#~ msgid "11"
-#~ msgstr "11"
-
-#~ msgid "11 inches/sec."
-#~ msgstr "11 pulg./seg"
-
-#~ msgid "110"
-#~ msgstr "110"
-
-#~ msgid "115"
-#~ msgstr "115"
-
-#~ msgid "12"
-#~ msgstr "12"
-
-#~ msgid "12 inches/sec."
-#~ msgstr "12 pulg./seg"
-
-#~ msgid "12 x 11"
-#~ msgstr "12 x 11"
-
-#~ msgid "120"
-#~ msgstr "120"
-
-#~ msgid "120 mm/sec."
-#~ msgstr "120 mm/seg"
-
-#~ msgid "120x60dpi"
-#~ msgstr "120x60ppp"
-
-#~ msgid "120x72dpi"
-#~ msgstr "120x72ppp"
-
-#~ msgid "13"
-#~ msgstr "13"
-
-#~ msgid "136dpi"
-#~ msgstr "136ppp"
-
-#~ msgid "14"
-#~ msgstr "14"
-
-#~ msgid "15"
-#~ msgstr "15"
-
-#~ msgid "15 mm/sec."
-#~ msgstr "15 mm/seg"
-
-#~ msgid "15 x 11"
-#~ msgstr "15 x 11"
-
-#~ msgid "150 mm/sec."
-#~ msgstr "150 mm/seg"
-
-#~ msgid "150dpi"
-#~ msgstr "150ppp"
-
-#~ msgid "16"
-#~ msgstr "16"
-
-#~ msgid "17"
-#~ msgstr "17"
-
-#~ msgid "18"
-#~ msgstr "18"
-
-#~ msgid "180dpi"
-#~ msgstr "180ppp"
-
-#~ msgid "19"
-#~ msgstr "19"
-
-#~ msgid "2"
-#~ msgstr "2"
-
-#~ msgid "2 inches/sec."
-#~ msgstr "2 pulg./seg"
-
-#~ msgid "2.00x0.37\""
-#~ msgstr "2.00x0.37 pulg."
-
-#~ msgid "2.00x0.50\""
-#~ msgstr "2.00x0.50 pulg."
-
-#~ msgid "2.00x1.00\""
-#~ msgstr "2.00x1.00 pulg."
-
-#~ msgid "2.00x1.25\""
-#~ msgstr "2.00x1.25 pulg."
-
-#~ msgid "2.00x2.00\""
-#~ msgstr "2.00x2.00 pulg."
-
-#~ msgid "2.00x3.00\""
-#~ msgstr "2.00x3.00 pulg."
-
-#~ msgid "2.00x4.00\""
-#~ msgstr "2.00x4.00 pulg."
-
-#~ msgid "2.00x5.50\""
-#~ msgstr "2.00x5.50 pulg."
-
-#~ msgid "2.25x0.50\""
-#~ msgstr "2.25x0.50 pulg."
-
-#~ msgid "2.25x1.25\""
-#~ msgstr "2.25x1.25 pulg."
-
-#~ msgid "2.25x4.00\""
-#~ msgstr "2.25x4.00 pulg."
-
-#~ msgid "2.25x5.50\""
-#~ msgstr "2.25x5.50 pulg."
-
-#~ msgid "2.38x5.50\""
-#~ msgstr "2.38x5.50 pulg."
-
-#~ msgid "2.5 inches/sec."
-#~ msgstr "2.5 pulg./seg"
-
-#~ msgid "2.50x1.00\""
-#~ msgstr "2.50x1.00 pulg."
-
-#~ msgid "2.50x2.00\""
-#~ msgstr "2.50x2.00 pulg."
-
-#~ msgid "2.75x1.25\""
-#~ msgstr "2.75x1.25 pulg."
-
-#~ msgid "2.9 x 1\""
-#~ msgstr "2.9 x 1 pulg."
-
-#~ msgid "20"
-#~ msgstr "20"
-
-#~ msgid "20 mm/sec."
-#~ msgstr "20 mm/seg"
-
-#~ msgid "200 mm/sec."
-#~ msgstr "200 mm/seg"
-
-#~ msgid "203dpi"
-#~ msgstr "203ppp"
-
-#~ msgid "21"
-#~ msgstr "21"
-
-#~ msgid "22"
-#~ msgstr "22"
-
-#~ msgid "23"
-#~ msgstr "23"
-
-#~ msgid "24"
-#~ msgstr "24"
-
-#~ msgid "24-Pin Series"
-#~ msgstr "24-Pin Series"
-
-#~ msgid "240x72dpi"
-#~ msgstr "240x72ppp"
-
-#~ msgid "25"
-#~ msgstr "25"
-
-#~ msgid "250 mm/sec."
-#~ msgstr "250 mm/seg"
-
-#~ msgid "26"
-#~ msgstr "26"
-
-#~ msgid "27"
-#~ msgstr "27"
-
-#~ msgid "28"
-#~ msgstr "28"
-
-#~ msgid "29"
-#~ msgstr "29"
-
-#~ msgid "3"
-#~ msgstr "3"
-
-#~ msgid "3 inches/sec."
-#~ msgstr "3 pulg./seg"
-
-#~ msgid "3 x 5"
-#~ msgstr "3 x 5"
-
-#~ msgid "3.00x1.00\""
-#~ msgstr "3.00x1.00 pulg."
-
-#~ msgid "3.00x1.25\""
-#~ msgstr "3.00x1.25 pulg."
-
-#~ msgid "3.00x2.00\""
-#~ msgstr "3.00x2.00 pulg."
-
-#~ msgid "3.00x3.00\""
-#~ msgstr "3.00x3.00 pulg."
-
-#~ msgid "3.00x5.00\""
-#~ msgstr "3.00x5.00 pulg."
-
-#~ msgid "3.25x2.00\""
-#~ msgstr "3.25x2.00 pulg."
-
-#~ msgid "3.25x5.00\""
-#~ msgstr "3.25x5.00 pulg."
-
-#~ msgid "3.25x5.50\""
-#~ msgstr "3.25x5.50 pulg."
-
-#~ msgid "3.25x5.83\""
-#~ msgstr "3.25x5.83 pulg."
-
-#~ msgid "3.25x7.83\""
-#~ msgstr "3.25x7.83 pulg."
-
-#~ msgid "3.5 x 5"
-#~ msgstr "3.5 x 5"
-
-#~ msgid "3.5\" Disk"
-#~ msgstr "Disco de 3.5 pulg."
-
-#~ msgid "3.50x1.00\""
-#~ msgstr "3.50x1.00 pulg."
-
-#~ msgid "30"
-#~ msgstr "30"
-
-#~ msgid "30 mm/sec."
-#~ msgstr "30 mm/seg"
-
-#~ msgid "300 mm/sec."
-#~ msgstr "300 mm/seg"
-
-#~ msgid "300dpi"
-#~ msgstr "300ppp"
-
-#~ msgid "35"
-#~ msgstr "35"
-
-#~ msgid "360dpi"
-#~ msgstr "360ppp"
-
-#~ msgid "360x180dpi"
-#~ msgstr "360x180ppp"
-
-#~ msgid "4"
-#~ msgstr "4"
-
-#~ msgid "4 inches/sec."
-#~ msgstr "4 pulg./seg"
-
-#~ msgid "4.00x1.00\""
-#~ msgstr "4.00x1.00 pulg."
-
-#~ msgid "4.00x13.00\""
-#~ msgstr "4.00x13.00 pulg."
-
-#~ msgid "4.00x2.00\""
-#~ msgstr "4.00x2.00 pulg."
-
-#~ msgid "4.00x2.50\""
-#~ msgstr "4.00x2.50 pulg."
-
-#~ msgid "4.00x3.00\""
-#~ msgstr "4.00x3.00 pulg."
-
-#~ msgid "4.00x4.00\""
-#~ msgstr "4.00x4.00 pulg."
-
-#~ msgid "4.00x5.00\""
-#~ msgstr "4.00x5.00 pulg."
-
-#~ msgid "4.00x6.00\""
-#~ msgstr "4.00x6.00 pulg."
-
-#~ msgid "4.00x6.50\""
-#~ msgstr "4.00x6.50 pulg."
-
-#~ msgid "40"
-#~ msgstr "40"
-
-#~ msgid "40 mm/sec."
-#~ msgstr "40 mm/seg"
-
-#~ msgid "45"
-#~ msgstr "45"
-
-#~ msgid "5"
-#~ msgstr "5"
-
-#~ msgid "5 inches/sec."
-#~ msgstr "5 pulg./seg"
-
-#~ msgid "5 x 7"
-#~ msgstr "5 x 7"
-
-#~ msgid "50"
-#~ msgstr "50"
-
-#~ msgid "55"
-#~ msgstr "55"
-
-#~ msgid "6"
-#~ msgstr "6"
-
-#~ msgid "6 inches/sec."
-#~ msgstr "6 pulg./seg"
-
-#~ msgid "6.00x1.00\""
-#~ msgstr "6.00x1.00 pulg."
-
-#~ msgid "6.00x2.00\""
-#~ msgstr "6.00x2.00 pulg."
-
-#~ msgid "6.00x3.00\""
-#~ msgstr "6.00x3.00 pulg."
-
-#~ msgid "6.00x4.00\""
-#~ msgstr "6.00x4.00 pulg."
-
-#~ msgid "6.00x5.00\""
-#~ msgstr "6.00x5.00 pulg."
-
-#~ msgid "6.00x6.00\""
-#~ msgstr "6.00x6.00 pulg."
-
-#~ msgid "6.00x6.50\""
-#~ msgstr "6.00x6.50 pulg."
-
-#~ msgid "60"
-#~ msgstr "60"
-
-#~ msgid "60 mm/sec."
-#~ msgstr "60 mm/seg"
-
-#~ msgid "600dpi"
-#~ msgstr "600ppp"
-
-#~ msgid "60dpi"
-#~ msgstr "60ppp"
-
-#~ msgid "60x72dpi"
-#~ msgstr "60x72ppp"
-
-#~ msgid "65"
-#~ msgstr "65"
-
-#~ msgid "7"
-#~ msgstr "7"
-
-#~ msgid "7 inches/sec."
-#~ msgstr "7 pulg./seg"
-
-#~ msgid "7 x 9"
-#~ msgstr "7 x 9"
-
-#~ msgid "70"
-#~ msgstr "70"
-
-#~ msgid "75"
-#~ msgstr "75"
-
-#~ msgid "8"
-#~ msgstr "8"
-
-#~ msgid "8 inches/sec."
-#~ msgstr "8 pulg./seg"
-
-#~ msgid "8 x 10"
-#~ msgstr "8 x 10"
-
-#~ msgid "8.00x1.00\""
-#~ msgstr "8.00x1.00 pulg."
-
-#~ msgid "8.00x2.00\""
-#~ msgstr "8.00x2.00 pulg."
-
-#~ msgid "8.00x3.00\""
-#~ msgstr "8.00x3.00 pulg."
-
-#~ msgid "8.00x4.00\""
-#~ msgstr "8.00x4.00 pulg."
-
-#~ msgid "8.00x5.00\""
-#~ msgstr "8.00x5.00 pulg."
-
-#~ msgid "8.00x6.00\""
-#~ msgstr "8.00x6.00 pulg."
-
-#~ msgid "8.00x6.50\""
-#~ msgstr "8.00x6.50 pulg."
-
-#~ msgid "80"
-#~ msgstr "80"
-
-#~ msgid "80 mm/sec."
-#~ msgstr "80 mm/seg"
-
-#~ msgid "85"
-#~ msgstr "85"
-
-#~ msgid "9"
-#~ msgstr "9"
-
-#~ msgid "9 inches/sec."
-#~ msgstr "9 pulg./seg"
-
-#~ msgid "9 x 11"
-#~ msgstr "9 x 11"
-
-#~ msgid "9 x 12"
-#~ msgstr "9 x 12"
-
-#~ msgid "9-Pin Series"
-#~ msgstr "9-Pin Series"
-
-#~ msgid "90"
-#~ msgstr "90"
-
-#~ msgid "95"
-#~ msgstr "95"
-
-#~ msgid "A0"
-#~ msgstr "A0"
-
-#~ msgid "A0 Long Edge"
-#~ msgstr "A0 lado largo"
-
-#~ msgid "A1"
-#~ msgstr "A1"
-
-#~ msgid "A1 Long Edge"
-#~ msgstr "A1 lado largo"
-
-#~ msgid "A10"
-#~ msgstr "A10"
-
-#~ msgid "A2"
-#~ msgstr "A2"
-
-#~ msgid "A2 Long Edge"
-#~ msgstr "A2 lado largo"
-
-#~ msgid "A3"
-#~ msgstr "A3"
-
-#~ msgid "A3 Long Edge"
-#~ msgstr "A3 lado largo"
-
-#~ msgid "A3 Oversize"
-#~ msgstr "A3 Extragrande"
-
-#~ msgid "A3 Oversize Long Edge"
-#~ msgstr "A3 Extragrande lado largo"
-
-#~ msgid "A4"
-#~ msgstr "A4"
-
-#~ msgid "A4 Long Edge"
-#~ msgstr "A4 lado largo"
-
-#~ msgid "A4 Oversize"
-#~ msgstr "A4 Extragrande"
-
-#~ msgid "A4 Small"
-#~ msgstr "A4 Pequeño"
-
-#~ msgid "A5"
-#~ msgstr "A5"
-
-#~ msgid "A5 Long Edge"
-#~ msgstr "A5 lado largo"
-
-#~ msgid "A5 Oversize"
-#~ msgstr "A5 Extragrande"
-
-#~ msgid "A6"
-#~ msgstr "A6"
-
-#~ msgid "A6 Long Edge"
-#~ msgstr "A6 lado largo"
-
-#~ msgid "A7"
-#~ msgstr "A7"
-
-#~ msgid "A8"
-#~ msgstr "A8"
-
-#~ msgid "A9"
-#~ msgstr "A9"
-
-#~ msgid "ANSI A"
-#~ msgstr "ANSI A"
-
-#~ msgid "ANSI B"
-#~ msgstr "ANSI B"
-
-#~ msgid "ANSI C"
-#~ msgstr "ANSI C"
-
-#~ msgid "ANSI D"
-#~ msgstr "ANSI D"
-
-#~ msgid "ANSI E"
-#~ msgstr "ANSI E"
-
-#~ msgid "ARCH C"
-#~ msgstr "ARCH C"
-
-#~ msgid "ARCH C Long Edge"
-#~ msgstr "ARCH C lado largo"
-
-#~ msgid "ARCH D"
-#~ msgstr "ARCH D"
-
-#~ msgid "ARCH D Long Edge"
-#~ msgstr "ARCH D lado largo"
-
-#~ msgid "ARCH E"
-#~ msgstr "ARCH E"
-
-#~ msgid "ARCH E Long Edge"
-#~ msgstr "ARCH E lado largo"
-
-#~ msgid "Address"
-#~ msgstr "Dirección"
-
-#~ msgid "Always"
-#~ msgstr "Siempre"
-
-#~ msgid "Applicator"
-#~ msgstr "Aplicador"
-
-#~ msgid "B0"
-#~ msgstr "B0"
-
-#~ msgid "B1"
-#~ msgstr "B1"
-
-#~ msgid "B10"
-#~ msgstr "B10"
-
-#~ msgid "B2"
-#~ msgstr "B2"
-
-#~ msgid "B3"
-#~ msgstr "B3"
-
-#~ msgid "B4"
-#~ msgstr "B4"
-
-#~ msgid "B5"
-#~ msgstr "B5"
-
-#~ msgid "B5 Oversize"
-#~ msgstr "A5 Extragrande"
-
-#~ msgid "B6"
-#~ msgstr "B6"
-
-#~ msgid "B7"
-#~ msgstr "B7"
-
-#~ msgid "B8"
-#~ msgstr "B8"
-
-#~ msgid "B9"
-#~ msgstr "B9"
-
-#~ msgid "Bond Paper"
-#~ msgstr "Papel de cartas"
-
 #~ msgid "CD/DVD/Bluray"
 #~ msgstr "CD/DVD/Bluray"
-
-#~ msgid "CMYK"
-#~ msgstr "CMYK"
-
-#~ msgid "CPCL Label Printer"
-#~ msgstr "Impresora de etiquetas CPCL"
-
-#~ msgid "Cassette"
-#~ msgstr "Casete"
-
-#~ msgid "CustominCutInterval"
-#~ msgstr "CustominCutInterval"
-
-#~ msgid "CustominTearInterval"
-#~ msgstr "CustominTearInterval"
-
-#~ msgid "Cut"
-#~ msgstr "Cortar"
-
-#~ msgid "Cutter"
-#~ msgstr "Cortadora"
-
-#~ msgid "Dark"
-#~ msgstr "Oscuro"
-
-#~ msgid "Darkness"
-#~ msgstr "Oscuridad"
-
-#~ msgid "DeskJet Series"
-#~ msgstr "DeskJet Series"
-
-#~ msgid "Direct Thermal Media"
-#~ msgstr "Soporte térmico directo"
-
-#~ msgid "Disabled"
-#~ msgstr "Deshabilitado"
-
-#~ msgid "Duplexer"
-#~ msgstr "Unidad de impresión dúplex"
-
-#~ msgid "Dymo"
-#~ msgstr "Dymo"
-
-#~ msgid "EPL1 Label Printer"
-#~ msgstr "Impresora de etiquetas EPL1"
-
-#~ msgid "EPL2 Label Printer"
-#~ msgstr "Impresora de etiquetas EPL2"
-
-#~ msgid "English"
-#~ msgstr "Spanish"
-
-#~ msgid "Envelope #10"
-#~ msgstr "Sobre #10"
-
-#~ msgid "Envelope #11"
-#~ msgstr "Sobre #11"
-
-#~ msgid "Envelope #12"
-#~ msgstr "Sobre #12"
-
-#~ msgid "Envelope #14"
-#~ msgstr "Sobre #14"
-
-#~ msgid "Envelope #9"
-#~ msgstr "Sobre #9"
-
-#~ msgid "Envelope B4"
-#~ msgstr "Sobre B4"
-
-#~ msgid "Envelope B5"
-#~ msgstr "Sobre B5"
-
-#~ msgid "Envelope B6"
-#~ msgstr "Sobre B6"
-
-#~ msgid "Envelope C0"
-#~ msgstr "Sobre C0"
-
-#~ msgid "Envelope C1"
-#~ msgstr "Sobre C1"
-
-#~ msgid "Envelope C2"
-#~ msgstr "Sobre C2"
-
-#~ msgid "Envelope C3"
-#~ msgstr "Sobre C3"
-
-#~ msgid "Envelope C4"
-#~ msgstr "Sobre C4"
-
-#~ msgid "Envelope C5"
-#~ msgstr "Sobre C5"
-
-#~ msgid "Envelope C6"
-#~ msgstr "Sobre C6"
-
-#~ msgid "Envelope C65"
-#~ msgstr "Sobre C65"
-
-#~ msgid "Envelope C7"
-#~ msgstr "Sobre C7"
-
-#~ msgid "Envelope Choukei 3"
-#~ msgstr "Sobre Choukei 3"
-
-#~ msgid "Envelope Choukei 3 Long Edge"
-#~ msgstr "Sobre Choukei 3 lado largo"
-
-#~ msgid "Envelope Choukei 4"
-#~ msgstr "Sobre Choukei 4"
-
-#~ msgid "Envelope Choukei 4 Long Edge"
-#~ msgstr "Sobre Choukei 4 lado largo"
-
-#~ msgid "Envelope DL"
-#~ msgstr "Sobre DL"
-
-#~ msgid "Envelope Feed"
-#~ msgstr "Alimentador de sobre"
-
-#~ msgid "Envelope Invite"
-#~ msgstr "Sobre Invitación"
-
-#~ msgid "Envelope Italian"
-#~ msgstr "Sobre Italiano"
-
-#~ msgid "Envelope Kaku2"
-#~ msgstr "Sobre Kaku2"
-
-#~ msgid "Envelope Kaku2 Long Edge"
-#~ msgstr "Sobre Kaku2 lado largo"
-
-#~ msgid "Envelope Kaku3"
-#~ msgstr "Sobre Kaku3"
-
-#~ msgid "Envelope Kaku3 Long Edge"
-#~ msgstr "Sobre Kaku3 lado largo"
-
-#~ msgid "Envelope Monarch"
-#~ msgstr "Sobre Monarch"
-
-#~ msgid "Envelope PRC1"
-#~ msgstr "Sobre PRC1"
-
-#~ msgid "Envelope PRC1 Long Edge"
-#~ msgstr "Sobre PRC1 lado largo"
-
-#~ msgid "Envelope PRC10"
-#~ msgstr "Sobre PRC10"
-
-#~ msgid "Envelope PRC10 Long Edge"
-#~ msgstr "Sobre PRC10 lado largo"
-
-#~ msgid "Envelope PRC2"
-#~ msgstr "Sobre PRC2"
-
-#~ msgid "Envelope PRC2 Long Edge"
-#~ msgstr "Sobre PRC2 lado largo"
-
-#~ msgid "Envelope PRC3"
-#~ msgstr "Sobre PRC3"
-
-#~ msgid "Envelope PRC3 Long Edge"
-#~ msgstr "Sobre PRC3 lado largo"
-
-#~ msgid "Envelope PRC4"
-#~ msgstr "Sobre PRC4"
-
-#~ msgid "Envelope PRC4 Long Edge"
-#~ msgstr "Sobre PRC4 lado largo"
-
-#~ msgid "Envelope PRC5 Long Edge"
-#~ msgstr "Sobre PRC5 lado largo"
-
-#~ msgid "Envelope PRC5PRC5"
-#~ msgstr "Sobre PRC5PRC5"
-
-#~ msgid "Envelope PRC6"
-#~ msgstr "Sobre PRC6"
-
-#~ msgid "Envelope PRC6 Long Edge"
-#~ msgstr "Sobre PRC6 lado largo"
-
-#~ msgid "Envelope PRC7"
-#~ msgstr "Sobre PRC7"
-
-#~ msgid "Envelope PRC7 Long Edge"
-#~ msgstr "Sobre PRC7 lado largo"
-
-#~ msgid "Envelope PRC8"
-#~ msgstr "Sobre PRC8"
-
-#~ msgid "Envelope PRC8 Long Edge"
-#~ msgstr "Sobre PRC8 lado largo"
-
-#~ msgid "Envelope PRC9"
-#~ msgstr "Sobre PRC9"
-
-#~ msgid "Envelope PRC9 Long Edge"
-#~ msgstr "Sobre PRC9 lado largo"
-
-#~ msgid "Envelope Personal"
-#~ msgstr "Sobre Personal"
-
-#~ msgid "Envelope You4"
-#~ msgstr "Sobre You4"
-
-#~ msgid "Envelope You4 Long Edge"
-#~ msgstr "Sobre You4 lado largo"
-
-#~ msgid "Epson"
-#~ msgstr "Epson"
-
-#~ msgid "Every 10 Labels"
-#~ msgstr "Cada 10 etiquetas"
-
-#~ msgid "Every 2 Labels"
-#~ msgstr "Cada 2 etiquetas"
-
-#~ msgid "Every 3 Labels"
-#~ msgstr "Cada 3 etiquetas"
-
-#~ msgid "Every 4 Labels"
-#~ msgstr "Cada 4 etiquetas"
-
-#~ msgid "Every 5 Labels"
-#~ msgstr "Cada 5 etiquetas"
-
-#~ msgid "Every 6 Labels"
-#~ msgstr "Cada 6 etiquetas"
-
-#~ msgid "Every 7 Labels"
-#~ msgstr "Cada 7 etiquetas"
-
-#~ msgid "Every 8 Labels"
-#~ msgstr "Cada 8 etiquetas"
-
-#~ msgid "Every 9 Labels"
-#~ msgstr "Cada 9 etiquetas"
-
-#~ msgid "Every Label"
-#~ msgstr "Cada etiqueta"
-
-#~ msgid "Executive"
-#~ msgstr "Ejecutivo"
-
-#~ msgid "FanFold German"
-#~ msgstr "FanFold alemán"
-
-#~ msgid "FanFold Legal German"
-#~ msgstr "FanFold Legal alemán"
-
-#~ msgid "Fanfold US"
-#~ msgstr "FanFold de EE.UU"
-
-#~ msgid "File Folder"
-#~ msgstr "Carpeta de archivo"
 
 #~ msgid "Finishing"
 #~ msgstr "Terminando"
 
-#~ msgid "Folio"
-#~ msgstr "Folio"
-
-#~ msgid "Generic"
-#~ msgstr "Genérico"
-
-#~ msgid "Glossy Paper"
-#~ msgstr "Papel brillante"
-
 #~ msgid "Glossy Photo"
 #~ msgstr "Foto brillante"
-
-#~ msgid "HP"
-#~ msgstr "HP"
-
-#~ msgid "Hanging Folder"
-#~ msgstr "Carpeta colgante"
 
 #~ msgid "High-Gloss Photo"
 #~ msgstr "Foto de alto brillo"
 
-#~ msgid "ISOLatin1"
-#~ msgstr "ISOLatin1"
-
-#~ msgid "Installable Options"
-#~ msgstr "Opciones instalables"
-
-#~ msgid "Installed"
-#~ msgstr "Instalada"
-
-#~ msgid "IntelliBar Label Printer"
-#~ msgstr "Impresora de etiquetas IntelliBar"
-
-#~ msgid "Intellitech"
-#~ msgstr "Intellitech"
-
-#~ msgid "Internet Postage 2-Part"
-#~ msgstr "Correo por Internet Parte-2"
-
-#~ msgid "Internet Postage 3-Part"
-#~ msgstr "Correo por Internet Parte-3"
-
-#~ msgid "JIS B0"
-#~ msgstr "JIS B0"
-
-#~ msgid "JIS B1"
-#~ msgstr "JIS B1"
-
-#~ msgid "JIS B10"
-#~ msgstr "JIS B10"
-
-#~ msgid "JIS B2"
-#~ msgstr "JIS B2"
-
-#~ msgid "JIS B3"
-#~ msgstr "JIS B3"
-
-#~ msgid "JIS B4"
-#~ msgstr "JIS B4"
-
-#~ msgid "JIS B4 Long Edge"
-#~ msgstr "JIS B4 lado largo"
-
-#~ msgid "JIS B5"
-#~ msgstr "JIS B5"
-
-#~ msgid "JIS B5 Long Edge"
-#~ msgstr "JIS B5 lado largo"
-
-#~ msgid "JIS B6"
-#~ msgstr "JIS B6"
-
-#~ msgid "JIS B6 Long Edge"
-#~ msgstr "JIS B6 lado largo"
-
-#~ msgid "JIS B7"
-#~ msgstr "JIS B7"
-
-#~ msgid "JIS B8"
-#~ msgstr "JIS B8"
-
-#~ msgid "JIS B9"
-#~ msgstr "JIS B9"
-
 #~ msgid "Label"
 #~ msgstr "Etiqueta"
-
-#~ msgid "Label Printer"
-#~ msgstr "Impresora de etiquetas"
-
-#~ msgid "Label Top"
-#~ msgstr "Parte superior de la etiqueta"
-
-#~ msgid "Large Address"
-#~ msgstr "Dirección grande"
-
-#~ msgid "LaserJet Series PCL 4/5"
-#~ msgstr "LaserJet Series PCL 4/5"
-
-#~ msgid "Letter Oversize"
-#~ msgstr "Carta Extragrande"
-
-#~ msgid "Letter Oversize Long Edge"
-#~ msgstr "Carta Extragrande lado largo"
-
-#~ msgid "Light"
-#~ msgstr "Ligero"
 
 #~ msgid "Looking for printer..."
 #~ msgstr "Buscando impresora..."
 
-#~ msgid "Manual Feed"
-#~ msgstr "Alimentación manual"
-
 #~ msgid "Matte Photo"
 #~ msgstr "Foto mate"
 
-#~ msgid "Media Tracking"
-#~ msgstr "Seguimiento del medio"
-
-#~ msgid "Medium"
-#~ msgstr "Media"
-
-#~ msgid "Never"
-#~ msgstr "Nunca"
-
 #~ msgid "No Finishing"
 #~ msgstr "Sin terminar"
-
-#~ msgid "Non-continuous (Mark sensing)"
-#~ msgstr "No continuo (sensible a señal)"
-
-#~ msgid "Non-continuous (Web sensing)"
-#~ msgstr "No continuo (sensible a web)"
-
-#~ msgid "Not Installed"
-#~ msgstr "No instalado"
-
-#~ msgid "Note"
-#~ msgstr "Nota"
-
-#~ msgid "Oki"
-#~ msgstr "Oki"
-
-#~ msgid "PCL Laser Printer"
-#~ msgstr "Impresora Laser PCL"
-
-#~ msgid "PRC16K"
-#~ msgstr "PRC16K"
-
-#~ msgid "PRC16K Long Edge"
-#~ msgstr "PRC16K lado largo"
-
-#~ msgid "PRC32K"
-#~ msgstr "PRC32K"
-
-#~ msgid "PRC32K Long Edge"
-#~ msgstr "PRC32K lado largo"
-
-#~ msgid "PRC32K Oversize"
-#~ msgstr "PRC32K Extragrande"
-
-#~ msgid "PRC32K Oversize Long Edge"
-#~ msgstr "PRC32K Extragrande lado largo"
-
-#~ msgid "ParamCustominCutInterval"
-#~ msgstr "ParamCustominCutInterval"
-
-#~ msgid "ParamCustominTearInterval"
-#~ msgstr "ParamCustominTearInterval"
-
-#~ msgid "Peel-Off"
-#~ msgstr "Despegar"
-
-#~ msgid "Photo Labels"
-#~ msgstr "Foto pequeña"
-
-#~ msgid "PostScript Printer"
-#~ msgstr "Impresora PostScript"
-
-#~ msgid "Postcard"
-#~ msgstr "Postal"
-
-#~ msgid "Postcard Double"
-#~ msgstr "Postal doble"
-
-#~ msgid "Postcard Double Long Edge"
-#~ msgstr "Postal doble lado largo"
-
-#~ msgid "Postcard Long Edge"
-#~ msgstr "Postal lado largo"
-
-#~ msgid "Print Density"
-#~ msgstr "Densidad de impresión"
-
-#~ msgid "Print Mode"
-#~ msgstr "Modo de impresión"
-
-#~ msgid "Print Rate"
-#~ msgstr "Tasa de impresión"
-
-#~ msgid "Print Speed"
-#~ msgstr "Velocidad de impresión"
-
-#~ msgid "Print and Cut"
-#~ msgstr "Imprimir y cortar"
-
-#~ msgid "Print and Tear"
-#~ msgstr "Imprimir y romper"
-
-#~ msgid "Printer Default"
-#~ msgstr "Predeterminado de la impresora"
-
-#~ msgid "Printer Settings"
-#~ msgstr "Configuración de la impresora"
-
-#~ msgid "Quarto"
-#~ msgstr "Libro en cuarto"
-
-#~ msgid "Reprint After Error"
-#~ msgstr "Volver a imprimir tras un error"
-
-#~ msgid "Return Address"
-#~ msgstr "Remite"
-
-#~ msgid "Rewind"
-#~ msgstr "Rebobinar"
 
 #~ msgid "Satin Photo"
 #~ msgstr "Foto satinada"
 
 #~ msgid "Semi-Gloss Photo"
 #~ msgstr "Foto semi brillante"
-
-#~ msgid "Shipping Address"
-#~ msgstr "Dirección de envío"
-
-#~ msgid "Special Paper"
-#~ msgstr "Papel especial"
-
-#~ msgid "Standard"
-#~ msgstr "Estándar"
-
-#~ msgid "Statement"
-#~ msgstr "Declaración"
-
-#~ msgid "Super A"
-#~ msgstr "Super A"
-
-#~ msgid "Super B"
-#~ msgstr "Super B (13 x 19  pulg.)"
-
-#~ msgid "Super B/A3"
-#~ msgstr "Super B/A3"
-
-#~ msgid "Tabloid"
-#~ msgstr "Tabloide"
-
-#~ msgid "Tabloid Oversize"
-#~ msgstr "Tabloide extragrande"
-
-#~ msgid "Tabloid Oversize Long Edge"
-#~ msgstr "Tabloide extragrande lado largo"
-
-#~ msgid "Tear"
-#~ msgstr "Pestaña"
-
-#~ msgid "Tear-Off"
-#~ msgstr "Pestaña desprendible"
-
-#~ msgid "Tear-Off Adjust Position"
-#~ msgstr "Ajuste de posición de la pestaña desprendible"
-
-#~ msgid "Thermal Transfer Media"
-#~ msgstr "Soporte de transferencia térmica"
-
-#~ msgid "Tray"
-#~ msgstr "Bandeja"
-
-#~ msgid "US Ledger"
-#~ msgstr "Libro Mayor, 17 x 11 pulg."
-
-#~ msgid "US Legal"
-#~ msgstr "Legal EE.UU."
-
-#~ msgid "US Legal Oversize"
-#~ msgstr "Legal EE.UU. Extragrande"
-
-#~ msgid "US Letter"
-#~ msgstr "Carta EE.UU."
-
-#~ msgid "US Letter Long Edge"
-#~ msgstr "Carta EE.UU. lado largo"
-
-#~ msgid "US Letter Oversize"
-#~ msgstr "Carta EE.UU. Extragrande"
-
-#~ msgid "US Letter Oversize Long Edge"
-#~ msgstr "Carta EE.UU. Extragrande lado largo"
-
-#~ msgid "US Letter Small"
-#~ msgstr "Carta EE.UU. Pequeña"
-
-#~ msgid "ZPL Label Printer"
-#~ msgstr "Impresora de etiquetas ZPL"
-
-#~ msgid "Zebra"
-#~ msgstr "Zebra"
 
 #~ msgid "compression"
 #~ msgstr "Compression"

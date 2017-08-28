@@ -519,7 +519,8 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Creating locale directory structure...
 	$(RM) -r locale
-	$(MKDIR) locale
+	$(MKDIR) locale/en
+	$(LN) ../locale/cups.pot locale/en/cups_en.po
 	for po in ../locale/cups_*.po; do \
 		lang=`basename $$po .po | sed -e '1,$$s/^cups_//'`; \
 		$(MKDIR) locale/$$lang; \

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-08-01 17:09-0400\n"
+"POT-Creation-Date: 2017-08-28 12:25-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -1007,6 +1007,9 @@ msgstr ""
 msgid "  -h                      Show this usage message."
 msgstr ""
 
+msgid "  -h                      Validate HTTP response headers."
+msgstr ""
+
 msgid "  -h regex                Match hostname to regular expression."
 msgstr ""
 
@@ -1740,6 +1743,246 @@ msgstr ""
 msgid "%s: Warning - mode option ignored."
 msgstr ""
 
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 palec/sek."
+
+msgid "1.25x0.25\""
+msgstr "1.25x0.25\""
+
+msgid "1.25x2.25\""
+msgstr "1.25x2.25\""
+
+msgid "1.5 inch/sec."
+msgstr "1.5 palce/sek."
+
+msgid "1.50x0.25\""
+msgstr "1.50x0.25\""
+
+msgid "1.50x0.50\""
+msgstr "1.50x0.50\""
+
+msgid "1.50x1.00\""
+msgstr "1.50x1.00\""
+
+msgid "1.50x2.00\""
+msgstr "1.50x2.00\""
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 palců/sek."
+
+msgid "10 x 11"
+msgstr ""
+
+msgid "10 x 13"
+msgstr ""
+
+msgid "10 x 14"
+msgstr ""
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 mm/sek."
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 palců/sek."
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 palců/sek."
+
+msgid "12 x 11"
+msgstr ""
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 mm/sek."
+
+msgid "120x60dpi"
+msgstr "120x60 dpi"
+
+msgid "120x72dpi"
+msgstr "120x72 dpi"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136 dpi"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 mm/sek."
+
+msgid "15 x 11"
+msgstr ""
+
+msgid "150 mm/sec."
+msgstr "150 mm/sek."
+
+msgid "150dpi"
+msgstr "150 dpi"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180 dpi"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 palce/sek."
+
 msgid "2-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1755,6 +1998,117 @@ msgstr ""
 msgid "2-Sided Printing"
 msgstr "oboustranný tisk"
 
+msgid "2.00x0.37\""
+msgstr "2.00x0.37\""
+
+msgid "2.00x0.50\""
+msgstr "2.00x0.50\""
+
+msgid "2.00x1.00\""
+msgstr "2.00x1.00\""
+
+msgid "2.00x1.25\""
+msgstr "2.00x1.25\""
+
+msgid "2.00x2.00\""
+msgstr "2.00x2.00\""
+
+msgid "2.00x3.00\""
+msgstr "2.00x3.00\""
+
+msgid "2.00x4.00\""
+msgstr "2.00x4.00\""
+
+msgid "2.00x5.50\""
+msgstr "2.00x5.50\""
+
+msgid "2.25x0.50\""
+msgstr "2.25x0.50\""
+
+msgid "2.25x1.25\""
+msgstr "2.25x1.25\""
+
+msgid "2.25x4.00\""
+msgstr "2.25x4.00\""
+
+msgid "2.25x5.50\""
+msgstr "2.25x5.50\""
+
+msgid "2.38x5.50\""
+msgstr "2.38x5.50\""
+
+msgid "2.5 inches/sec."
+msgstr "2.5 palce/sek."
+
+msgid "2.50x1.00\""
+msgstr "2.50x1.00\""
+
+msgid "2.50x2.00\""
+msgstr "2.50x2.00\""
+
+msgid "2.75x1.25\""
+msgstr "2.75x1.25\""
+
+msgid "2.9 x 1\""
+msgstr "2.9 x 1\""
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 mm/sek."
+
+msgid "200 mm/sec."
+msgstr "200 mm/sek."
+
+msgid "203dpi"
+msgstr "203 dpi"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "24 jehličková"
+
+msgid "240x72dpi"
+msgstr "240x72 dpi"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 mm/sek."
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 palce/sek."
+
+msgid "3 x 5"
+msgstr ""
+
 msgid "3-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1767,6 +2121,72 @@ msgstr ""
 msgid "3-Hole Punch (Reverse Portrait)"
 msgstr ""
 
+msgid "3.00x1.00\""
+msgstr "3.00x1.00\""
+
+msgid "3.00x1.25\""
+msgstr "3.00x1.25\""
+
+msgid "3.00x2.00\""
+msgstr "3.00x2.00\""
+
+msgid "3.00x3.00\""
+msgstr "3.00x3.00\""
+
+msgid "3.00x5.00\""
+msgstr "3.00x5.00\""
+
+msgid "3.25x2.00\""
+msgstr "3.25x2.00\""
+
+msgid "3.25x5.00\""
+msgstr "3.25x5.00\""
+
+msgid "3.25x5.50\""
+msgstr "3.25x5.50\""
+
+msgid "3.25x5.83\""
+msgstr "3.25x5.83\""
+
+msgid "3.25x7.83\""
+msgstr "3.25x7.83\""
+
+msgid "3.5 x 5"
+msgstr ""
+
+msgid "3.5\" Disk"
+msgstr "3.5\" Disk"
+
+msgid "3.50x1.00\""
+msgstr "3.50x1.00\""
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 mm/sek."
+
+msgid "300 mm/sec."
+msgstr "300 mm/sek."
+
+msgid "300dpi"
+msgstr "300 dpi"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360 dpi"
+
+msgid "360x180dpi"
+msgstr "360x180 dpi"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 palce/sek."
+
 msgid "4-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1778,6 +2198,177 @@ msgstr ""
 
 msgid "4-Hole Punch (Reverse Portrait)"
 msgstr ""
+
+msgid "4.00x1.00\""
+msgstr "4.00x1.00\""
+
+msgid "4.00x13.00\""
+msgstr "4.00x13.00\""
+
+msgid "4.00x2.00\""
+msgstr "4.00x2.00\""
+
+msgid "4.00x2.50\""
+msgstr "4.00x2.50\""
+
+msgid "4.00x3.00\""
+msgstr "4.00x3.00\""
+
+msgid "4.00x4.00\""
+msgstr "4.00x4.00\""
+
+msgid "4.00x5.00\""
+msgstr "4.00x5.00\""
+
+msgid "4.00x6.00\""
+msgstr "4.00x6.00\""
+
+msgid "4.00x6.50\""
+msgstr "4.00x6.50\""
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 mm/sek."
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 palců/sek."
+
+msgid "5 x 7"
+msgstr ""
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 palců/sek."
+
+msgid "6.00x1.00\""
+msgstr "6.00x1.00\""
+
+msgid "6.00x2.00\""
+msgstr "6.00x2.00\""
+
+msgid "6.00x3.00\""
+msgstr "6.00x3.00\""
+
+msgid "6.00x4.00\""
+msgstr "6.00x4.00\""
+
+msgid "6.00x5.00\""
+msgstr "6.00x5.00\""
+
+msgid "6.00x6.00\""
+msgstr "6.00x6.00\""
+
+msgid "6.00x6.50\""
+msgstr "6.00x6.50\""
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 mm/sek."
+
+msgid "600dpi"
+msgstr "600 dpi"
+
+msgid "60dpi"
+msgstr "60 dpi"
+
+msgid "60x72dpi"
+msgstr ""
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 palců/sek."
+
+msgid "7 x 9"
+msgstr ""
+
+msgid "70"
+msgstr "70"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 palců/sek."
+
+msgid "8 x 10"
+msgstr ""
+
+msgid "8.00x1.00\""
+msgstr "8.00x1.00\""
+
+msgid "8.00x2.00\""
+msgstr "8.00x2.00\""
+
+msgid "8.00x3.00\""
+msgstr "8.00x3.00\""
+
+msgid "8.00x4.00\""
+msgstr "8.00x4.00\""
+
+msgid "8.00x5.00\""
+msgstr "8.00x5.00\""
+
+msgid "8.00x6.00\""
+msgstr "8.00x6.00\""
+
+msgid "8.00x6.50\""
+msgstr "8.00x6.50\""
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 mm/sek."
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 palců/sek."
+
+msgid "9 x 11"
+msgstr ""
+
+msgid "9 x 12"
+msgstr ""
+
+msgid "9-Pin Series"
+msgstr "9 jehličková"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
 
 msgid "?Invalid help command unknown."
 msgstr ""
@@ -1794,6 +2385,108 @@ msgstr ""
 
 #, c-format
 msgid "A printer named \"%s\" already exists."
+msgstr ""
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr ""
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr ""
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr ""
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr ""
+
+msgid "A3 Oversize"
+msgstr ""
+
+msgid "A3 Oversize Long Edge"
+msgstr ""
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr ""
+
+msgid "A4 Oversize"
+msgstr ""
+
+msgid "A4 Small"
+msgstr ""
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr ""
+
+msgid "A5 Oversize"
+msgstr ""
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr ""
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr ""
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr ""
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
 msgstr ""
 
 msgid "Accept Jobs"
@@ -1814,6 +2507,9 @@ msgstr "Přidat tiskárnu"
 msgid "Add RSS Subscription"
 msgstr "Přidat RSS předplatné"
 
+msgid "Address"
+msgstr "Adresa"
+
 msgid "Administration"
 msgstr "Administrace"
 
@@ -1829,8 +2525,14 @@ msgstr ""
 msgid "Aluminum"
 msgstr ""
 
+msgid "Always"
+msgstr "Vždy"
+
 msgid "AppSocket/HP JetDirect"
 msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "Aplikátor"
 
 msgid "Archival Envelope"
 msgstr ""
@@ -1862,6 +2564,42 @@ msgstr ""
 
 msgid "Automatic"
 msgstr ""
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr ""
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
 
 msgid "Back Print Film"
 msgstr ""
@@ -2037,6 +2775,9 @@ msgstr ""
 msgid "Bond Envelope"
 msgstr ""
 
+msgid "Bond Paper"
+msgstr "Kancelářský papír"
+
 msgid "Booklet"
 msgstr ""
 
@@ -2059,6 +2800,12 @@ msgstr ""
 msgid "CD"
 msgstr ""
 
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "Tiskárna štítků CPCL"
+
 msgid "Cancel Jobs"
 msgstr ""
 
@@ -2078,6 +2825,9 @@ msgid "Cardboard"
 msgstr ""
 
 msgid "Cardstock"
+msgstr ""
+
+msgid "Cassette"
 msgstr ""
 
 msgid "Center"
@@ -2174,11 +2924,29 @@ msgstr ""
 msgid "Custom"
 msgstr "Uživatelský"
 
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "Snížit"
+
 msgid "Cut Media"
 msgstr ""
 
+msgid "Cutter"
+msgstr "Výstřižek"
+
 msgid "DVD"
 msgstr ""
+
+msgid "Dark"
+msgstr "Tmavý"
+
+msgid "Darkness"
+msgstr "Tma"
 
 msgid "Data file sent successfully."
 msgstr ""
@@ -2191,6 +2959,9 @@ msgstr "Výmaz třídy"
 
 msgid "Delete Printer"
 msgstr "Výmaz tiskárny"
+
+msgid "DeskJet Series"
+msgstr "Řada DeskJet"
 
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
@@ -2205,6 +2976,9 @@ msgid ""
 "        device-id = %s\n"
 "        location = %s"
 msgstr ""
+
+msgid "Direct Thermal Media"
+msgstr "Termální médium"
 
 #, c-format
 msgid "Directory \"%s\" contains a relative path."
@@ -2225,6 +2999,9 @@ msgstr ""
 #, c-format
 msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr ""
+
+msgid "Disabled"
+msgstr "Zakázaný"
 
 msgid "Disc"
 msgstr ""
@@ -2257,6 +3034,18 @@ msgstr ""
 msgid "Dry Film"
 msgstr ""
 
+msgid "Duplexer"
+msgstr "Duplexní jednotka"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "Tiskárna štítků EPL1"
+
+msgid "EPL2 Label Printer"
+msgstr "Tiskárna štítků EPL2"
+
 msgid "Edit Configuration File"
 msgstr "Úprava konfiguračního souboru"
 
@@ -2279,6 +3068,9 @@ msgstr "Ukončení baneru"
 msgid "Engineering Z Fold"
 msgstr ""
 
+msgid "English"
+msgstr "Čeština"
+
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -2291,8 +3083,170 @@ msgstr ""
 msgid "Envelope"
 msgstr ""
 
+msgid "Envelope #10"
+msgstr ""
+
+msgid "Envelope #11"
+msgstr ""
+
+msgid "Envelope #12"
+msgstr ""
+
+msgid "Envelope #14"
+msgstr ""
+
+msgid "Envelope #9"
+msgstr ""
+
+msgid "Envelope B4"
+msgstr ""
+
+msgid "Envelope B5"
+msgstr ""
+
+msgid "Envelope B6"
+msgstr ""
+
+msgid "Envelope C0"
+msgstr ""
+
+msgid "Envelope C1"
+msgstr ""
+
+msgid "Envelope C2"
+msgstr ""
+
+msgid "Envelope C3"
+msgstr ""
+
+msgid "Envelope C4"
+msgstr ""
+
+msgid "Envelope C5"
+msgstr ""
+
+msgid "Envelope C6"
+msgstr ""
+
+msgid "Envelope C65"
+msgstr ""
+
+msgid "Envelope C7"
+msgstr ""
+
+msgid "Envelope Choukei 3"
+msgstr ""
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr ""
+
+msgid "Envelope Choukei 4"
+msgstr ""
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr ""
+
+msgid "Envelope DL"
+msgstr ""
+
+msgid "Envelope Feed"
+msgstr "Podavač obálek"
+
+msgid "Envelope Invite"
+msgstr ""
+
+msgid "Envelope Italian"
+msgstr ""
+
+msgid "Envelope Kaku2"
+msgstr ""
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr ""
+
+msgid "Envelope Kaku3"
+msgstr ""
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr ""
+
+msgid "Envelope Monarch"
+msgstr ""
+
+msgid "Envelope PRC1"
+msgstr ""
+
+msgid "Envelope PRC1 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC10"
+msgstr ""
+
+msgid "Envelope PRC10 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC2"
+msgstr ""
+
+msgid "Envelope PRC2 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC3"
+msgstr ""
+
+msgid "Envelope PRC3 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC4"
+msgstr ""
+
+msgid "Envelope PRC4 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC5 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC5PRC5"
+msgstr ""
+
+msgid "Envelope PRC6"
+msgstr ""
+
+msgid "Envelope PRC6 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC7"
+msgstr ""
+
+msgid "Envelope PRC7 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC8"
+msgstr ""
+
+msgid "Envelope PRC8 Long Edge"
+msgstr ""
+
+msgid "Envelope PRC9"
+msgstr ""
+
+msgid "Envelope PRC9 Long Edge"
+msgstr ""
+
+msgid "Envelope Personal"
+msgstr ""
+
+msgid "Envelope You4"
+msgstr ""
+
+msgid "Envelope You4 Long Edge"
+msgstr ""
+
 msgid "Environment Variables:"
 msgstr ""
+
+msgid "Epson"
+msgstr "Epson"
 
 msgid "Error Policy"
 msgstr "Chování při chybě"
@@ -2306,10 +3260,43 @@ msgstr ""
 msgid "Error: need hostname after \"-h\" option."
 msgstr ""
 
+msgid "Every 10 Labels"
+msgstr "Každých 10 štítků"
+
+msgid "Every 2 Labels"
+msgstr "Každé 2 štítky"
+
+msgid "Every 3 Labels"
+msgstr "Každé 3 štítky"
+
+msgid "Every 4 Labels"
+msgstr "Každé 4 štítky"
+
+msgid "Every 5 Labels"
+msgstr "Každých 5 štítků"
+
+msgid "Every 6 Labels"
+msgstr "Každých 6 štítků"
+
+msgid "Every 7 Labels"
+msgstr "Každých 7 štítků"
+
+msgid "Every 8 Labels"
+msgstr "Každých 8 štítků"
+
+msgid "Every 9 Labels"
+msgstr "Každých 9 štítků"
+
+msgid "Every Label"
+msgstr "Každý štítek"
+
 msgid "Everyday Glossy Photo Paper"
 msgstr ""
 
 msgid "Everyday Matte Paper"
+msgstr ""
+
+msgid "Executive"
 msgstr ""
 
 msgid "Expectation Failed"
@@ -2336,6 +3323,15 @@ msgstr ""
 msgid "Face Up"
 msgstr ""
 
+msgid "FanFold German"
+msgstr ""
+
+msgid "FanFold Legal German"
+msgstr ""
+
+msgid "Fanfold US"
+msgstr ""
+
 msgid "Fast Grayscale"
 msgstr ""
 
@@ -2357,6 +3353,9 @@ msgstr ""
 
 #, c-format
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr ""
+
+msgid "File Folder"
 msgstr ""
 
 #, c-format
@@ -2390,6 +3389,9 @@ msgstr ""
 msgid "Fold"
 msgstr ""
 
+msgid "Folio"
+msgstr "Fólie"
+
 msgid "Forbidden"
 msgstr "Zakázaný"
 
@@ -2400,6 +3402,9 @@ msgid "Gate Fold"
 msgstr ""
 
 msgid "General"
+msgstr "Obecný"
+
+msgid "Generic"
 msgstr "Obecný"
 
 msgid "Get-Response-PDU uses indefinite length"
@@ -2432,6 +3437,9 @@ msgstr ""
 msgid "Glossy Optical Disc"
 msgstr ""
 
+msgid "Glossy Paper"
+msgstr "Lesklý papír"
+
 msgid "Glossy Photo Paper"
 msgstr ""
 
@@ -2444,6 +3452,9 @@ msgstr ""
 msgid "Grayscale"
 msgstr "Stupně šedi"
 
+msgid "HP"
+msgstr "HP"
+
 msgid "Hagaki"
 msgstr ""
 
@@ -2452,6 +3463,9 @@ msgstr ""
 
 msgid "Half Z Fold"
 msgstr ""
+
+msgid "Hanging Folder"
+msgstr "Závěsná složka"
 
 msgid "Hash buffer too small."
 msgstr ""
@@ -2552,6 +3566,9 @@ msgstr ""
 msgid "IPP value larger than 32767 bytes."
 msgstr ""
 
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
 msgid "Illegal control character"
 msgstr "Neplatný řídící znak"
 
@@ -2582,11 +3599,29 @@ msgstr ""
 msgid "Inkjet Paper"
 msgstr ""
 
+msgid "Installable Options"
+msgstr "Možnosti instalace"
+
+msgid "Installed"
+msgstr "Instalovaný"
+
+msgid "IntelliBar Label Printer"
+msgstr "Tiskárna štítků \"IntelliBar\""
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
 msgid "Internal Server Error"
 msgstr ""
 
 msgid "Internal error"
 msgstr "Vniřní chyba"
+
+msgid "Internet Postage 2-Part"
+msgstr "Internet Postage 2-Part"
+
+msgid "Internet Postage 3-Part"
+msgstr "Internet Postage 3-Part"
 
 msgid "Internet Printing Protocol"
 msgstr "Internetový tiskový protokol"
@@ -2606,6 +3641,48 @@ msgstr ""
 
 msgid "JCL"
 msgstr "JCL"
+
+msgid "JIS B0"
+msgstr ""
+
+msgid "JIS B1"
+msgstr ""
+
+msgid "JIS B10"
+msgstr ""
+
+msgid "JIS B2"
+msgstr ""
+
+msgid "JIS B3"
+msgstr ""
+
+msgid "JIS B4"
+msgstr ""
+
+msgid "JIS B4 Long Edge"
+msgstr ""
+
+msgid "JIS B5"
+msgstr ""
+
+msgid "JIS B5 Long Edge"
+msgstr ""
+
+msgid "JIS B6"
+msgstr ""
+
+msgid "JIS B6 Long Edge"
+msgstr ""
+
+msgid "JIS B7"
+msgstr ""
+
+msgid "JIS B8"
+msgstr ""
+
+msgid "JIS B9"
+msgstr ""
 
 #, c-format
 msgid "Job #%d cannot be restarted - no files."
@@ -2676,6 +3753,12 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR hostitel nebo tiskárna"
 
+msgid "Label Printer"
+msgstr "Tiskárna štítků"
+
+msgid "Label Top"
+msgstr "Horní štítek"
+
 msgid "Labels"
 msgstr ""
 
@@ -2689,11 +3772,17 @@ msgstr ""
 msgid "Language \"%s\" not supported."
 msgstr ""
 
+msgid "Large Address"
+msgstr "Plná adresa"
+
 msgid "Large Capacity"
 msgstr ""
 
 msgid "Large Capacity Tray"
 msgstr ""
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet Serie PCL 4/5"
 
 msgid "Left"
 msgstr ""
@@ -2707,8 +3796,17 @@ msgstr ""
 msgid "Letter Fold"
 msgstr ""
 
+msgid "Letter Oversize"
+msgstr ""
+
+msgid "Letter Oversize Long Edge"
+msgstr ""
+
 msgid "Letterhead"
 msgstr ""
+
+msgid "Light"
+msgstr "Světlý"
 
 msgid "Lightweight Envelope"
 msgstr ""
@@ -2773,6 +3871,9 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
+msgid "Manual Feed"
+msgstr "Ruční podávání"
+
 msgid "Matte Brochure Paper"
 msgstr ""
 
@@ -2797,8 +3898,14 @@ msgstr "Velikost média"
 msgid "Media Source"
 msgstr "Zdroj média"
 
+msgid "Media Tracking"
+msgstr "Sledování média"
+
 msgid "Media Type"
 msgstr "Typ média"
+
+msgid "Medium"
+msgstr "Střední"
 
 msgid "Memory allocation error"
 msgstr "Chyba přidělení paměti"
@@ -2955,6 +4062,9 @@ msgstr "Název \"OID\" má neomezenou délku"
 msgid "Nested classes are not allowed."
 msgstr ""
 
+msgid "Never"
+msgstr "Nikdy"
+
 msgid "New credentials are not valid for name."
 msgstr ""
 
@@ -3067,6 +4177,12 @@ msgstr "Žádná \"variable-bindings\" SEQUENCE"
 msgid "No version number"
 msgstr "Není číslo verze"
 
+msgid "Non-continuous (Mark sensing)"
+msgstr "Není souvislý (Mark Sensing)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "Není souvislý (Web Sensing)"
+
 msgid "None"
 msgstr ""
 
@@ -3079,6 +4195,9 @@ msgstr "Nebyl nalezen"
 msgid "Not Implemented"
 msgstr "Nerealizováno"
 
+msgid "Not Installed"
+msgstr "Nenainstalováno"
+
 msgid "Not Modified"
 msgstr "Nezměněno"
 
@@ -3087,6 +4206,9 @@ msgstr "Nepodporováno"
 
 msgid "Not allowed to print."
 msgstr "Není povoleno tisknout."
+
+msgid "Note"
+msgstr "Poznámka"
 
 msgid ""
 "Note: this program only validates the DSC comments, not the PostScript "
@@ -3101,6 +4223,9 @@ msgstr "Vypnuto (jednostranný)"
 
 msgid "Office Recycled Paper"
 msgstr ""
+
+msgid "Oki"
+msgstr "Oki"
 
 msgid "Online Help"
 msgstr "Nápověda"
@@ -3158,6 +4283,27 @@ msgstr ""
 msgid "PASS"
 msgstr ""
 
+msgid "PCL Laser Printer"
+msgstr "PCL laserová tiskárna"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr ""
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr ""
+
+msgid "PRC32K Oversize"
+msgstr ""
+
+msgid "PRC32K Oversize Long Edge"
+msgstr ""
+
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "Packet neobsahuje \"Get-Response-PDU\""
 
@@ -3182,6 +4328,12 @@ msgstr ""
 msgid "Parallel Fold"
 msgstr ""
 
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "Heslo pro %s na %s? "
@@ -3196,6 +4348,9 @@ msgstr "Pozastavení třídy"
 msgid "Pause Printer"
 msgstr "Pozastavení tiskárny"
 
+msgid "Peel-Off"
+msgstr "Peel-Off"
+
 msgid "Permanent Labels"
 msgstr ""
 
@@ -3204,6 +4359,9 @@ msgstr "Fotografie"
 
 msgid "Photo Film"
 msgstr ""
+
+msgid "Photo Labels"
+msgstr "Foto-samolepky"
 
 msgid "Photo Paper"
 msgstr ""
@@ -3256,6 +4414,21 @@ msgstr ""
 msgid "Port Monitor"
 msgstr "Monitorování portu"
 
+msgid "PostScript Printer"
+msgstr "PostScriptová tiskárna"
+
+msgid "Postcard"
+msgstr "Pohlednice"
+
+msgid "Postcard Double"
+msgstr ""
+
+msgid "Postcard Double Long Edge"
+msgstr ""
+
+msgid "Postcard Long Edge"
+msgstr ""
+
 msgid "Poster Fold"
 msgstr ""
 
@@ -3280,17 +4453,35 @@ msgstr ""
 msgid "Preprinted Paper"
 msgstr ""
 
+msgid "Print Density"
+msgstr "Hustota tisku"
+
 msgid "Print Job:"
 msgstr "Tisk úlohy:"
+
+msgid "Print Mode"
+msgstr "Režim tisku"
 
 msgid "Print Quality"
 msgstr ""
 
+msgid "Print Rate"
+msgstr "Kvalita tisku"
+
 msgid "Print Self-Test Page"
 msgstr "Tisk \"self-test\" stránky"
 
+msgid "Print Speed"
+msgstr "Rychlost tisku"
+
 msgid "Print Test Page"
 msgstr "Tisk zkušební stránky"
+
+msgid "Print and Cut"
+msgstr "Tisk a vyjmout"
+
+msgid "Print and Tear"
+msgstr "Tisk a odtrhnout"
 
 msgid "Print file sent."
 msgstr ""
@@ -3311,6 +4502,9 @@ msgstr ""
 msgid "Printer Added"
 msgstr "Tiskárna přidána"
 
+msgid "Printer Default"
+msgstr "Výchozí tiskárna"
+
 msgid "Printer Deleted"
 msgstr "Tiskárna vymazána"
 
@@ -3319,6 +4513,9 @@ msgstr "Tiskárna upravena"
 
 msgid "Printer Paused"
 msgstr "Tiskárna zastavena"
+
+msgid "Printer Settings"
+msgstr "Nastavení tiskárny"
 
 msgid "Printer cannot print supplied content."
 msgstr ""
@@ -3345,6 +4542,9 @@ msgstr ""
 msgid "Punched Paper"
 msgstr ""
 
+msgid "Quarto"
+msgstr "Quarto"
+
 msgid "Quota limit reached."
 msgstr "Kvóta byla překročena."
 
@@ -3368,6 +4568,9 @@ msgstr ""
 msgid "Remote host did not accept data file (%d)."
 msgstr ""
 
+msgid "Reprint After Error"
+msgstr "Opakovat tisk po chybě"
+
 msgid "Request Entity Too Large"
 msgstr "Dotaz Entity je příliš dlouhý"
 
@@ -3379,6 +4582,12 @@ msgstr "Obnovení třídy"
 
 msgid "Resume Printer"
 msgstr "Obnovení tiskárny"
+
+msgid "Return Address"
+msgstr "Návrat adresy"
+
+msgid "Rewind"
+msgstr "Přetočit"
 
 msgid "Right"
 msgstr ""
@@ -3516,6 +4725,9 @@ msgstr "Nastavení parametrů tiskárny"
 msgid "Set Publishing"
 msgstr "Nastavení vydávání"
 
+msgid "Shipping Address"
+msgstr "Doručovací adresa"
+
 msgid "Short-Edge (Landscape)"
 msgstr "Kratší okraj (na šířku)"
 
@@ -3561,6 +4773,9 @@ msgstr ""
 msgid "Sleeve"
 msgstr ""
 
+msgid "Special Paper"
+msgstr "Speciální papír"
+
 #, c-format
 msgid "Spooling job, %.0f%% complete."
 msgstr ""
@@ -3595,6 +4810,9 @@ msgstr ""
 msgid "Stacker 9"
 msgstr ""
 
+msgid "Standard"
+msgstr "Standardní"
+
 msgid "Staple"
 msgstr ""
 
@@ -3621,6 +4839,9 @@ msgstr "Spuštění baneru"
 msgid "Starting page %d."
 msgstr ""
 
+msgid "Statement"
+msgstr "Prohlášení"
+
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr ""
@@ -3628,11 +4849,38 @@ msgstr ""
 msgid "Substitutions:"
 msgstr ""
 
+msgid "Super A"
+msgstr "Super A"
+
+msgid "Super B"
+msgstr "Super B"
+
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
 msgid "Switching Protocols"
 msgstr "Protokol výměny"
 
 msgid "Tab Stock"
 msgstr ""
+
+msgid "Tabloid"
+msgstr "Tabloid"
+
+msgid "Tabloid Oversize"
+msgstr ""
+
+msgid "Tabloid Oversize Long Edge"
+msgstr ""
+
+msgid "Tear"
+msgstr "Odtrhnout"
+
+msgid "Tear-Off"
+msgstr "Odtrhnout"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Nastavení pozice odtržení"
 
 #, c-format
 msgid "The \"%s\" attribute is required for print jobs."
@@ -3804,6 +5052,9 @@ msgstr "Existuje příliš mnoho předplatných."
 msgid "There was an unrecoverable USB error."
 msgstr ""
 
+msgid "Thermal Transfer Media"
+msgstr "Termální tisková média"
+
 msgid "Too many active jobs."
 msgstr "Příliš mnoho aktivních úloh."
 
@@ -3829,6 +5080,9 @@ msgstr ""
 
 msgid "Transparency"
 msgstr "Průhlednost"
+
+msgid "Tray"
+msgstr "Podavač"
 
 msgid "Tray 1"
 msgstr "Podavač 1"
@@ -3912,6 +5166,30 @@ msgid "URI Too Long"
 msgstr "URI je příliš dlouhá"
 
 msgid "URI too large"
+msgstr ""
+
+msgid "US Ledger"
+msgstr "US Ledger"
+
+msgid "US Legal"
+msgstr "US Legal"
+
+msgid "US Legal Oversize"
+msgstr ""
+
+msgid "US Letter"
+msgstr "US Letter"
+
+msgid "US Letter Long Edge"
+msgstr ""
+
+msgid "US Letter Oversize"
+msgstr ""
+
+msgid "US Letter Oversize Long Edge"
+msgstr ""
+
+msgid "US Letter Small"
 msgstr ""
 
 msgid "Unable to access cupsd.conf file"
@@ -4448,6 +5726,12 @@ msgstr ""
 
 msgid "Z Fold"
 msgstr ""
+
+msgid "ZPL Label Printer"
+msgstr "Tiskárna štítků ZPL"
+
+msgid "Zebra"
+msgstr "Zebra"
 
 msgid "aborted"
 msgstr "zrušeno"
@@ -11702,707 +12986,8 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
-#~ msgid "-1"
-#~ msgstr "-1"
-
-#~ msgid "-10"
-#~ msgstr "-10"
-
-#~ msgid "-100"
-#~ msgstr "-100"
-
-#~ msgid "-105"
-#~ msgstr "-105"
-
-#~ msgid "-11"
-#~ msgstr "-11"
-
-#~ msgid "-110"
-#~ msgstr "-110"
-
-#~ msgid "-115"
-#~ msgstr "-115"
-
-#~ msgid "-12"
-#~ msgstr "-12"
-
-#~ msgid "-120"
-#~ msgstr "-120"
-
-#~ msgid "-13"
-#~ msgstr "-13"
-
-#~ msgid "-14"
-#~ msgstr "-14"
-
-#~ msgid "-15"
-#~ msgstr "-15"
-
-#~ msgid "-2"
-#~ msgstr "-2"
-
-#~ msgid "-20"
-#~ msgstr "-20"
-
-#~ msgid "-25"
-#~ msgstr "-25"
-
-#~ msgid "-3"
-#~ msgstr "-3"
-
-#~ msgid "-30"
-#~ msgstr "-30"
-
-#~ msgid "-35"
-#~ msgstr "-35"
-
-#~ msgid "-4"
-#~ msgstr "-4"
-
-#~ msgid "-40"
-#~ msgstr "-40"
-
-#~ msgid "-45"
-#~ msgstr "-45"
-
-#~ msgid "-5"
-#~ msgstr "-5"
-
-#~ msgid "-50"
-#~ msgstr "-50"
-
-#~ msgid "-55"
-#~ msgstr "-55"
-
-#~ msgid "-6"
-#~ msgstr "-6"
-
-#~ msgid "-60"
-#~ msgstr "-60"
-
-#~ msgid "-65"
-#~ msgstr "-65"
-
-#~ msgid "-7"
-#~ msgstr "-7"
-
-#~ msgid "-70"
-#~ msgstr "-70"
-
-#~ msgid "-75"
-#~ msgstr "-75"
-
-#~ msgid "-8"
-#~ msgstr "-8"
-
-#~ msgid "-80"
-#~ msgstr "-80"
-
-#~ msgid "-85"
-#~ msgstr "-85"
-
-#~ msgid "-9"
-#~ msgstr "-9"
-
-#~ msgid "-90"
-#~ msgstr "-90"
-
-#~ msgid "-95"
-#~ msgstr "-95"
-
-#~ msgid "0"
-#~ msgstr "0"
-
-#~ msgid "1"
-#~ msgstr "1"
-
-#~ msgid "1 inch/sec."
-#~ msgstr "1 palec/sek."
-
-#~ msgid "1.25x0.25\""
-#~ msgstr "1.25x0.25\""
-
-#~ msgid "1.25x2.25\""
-#~ msgstr "1.25x2.25\""
-
-#~ msgid "1.5 inch/sec."
-#~ msgstr "1.5 palce/sek."
-
-#~ msgid "1.50x0.25\""
-#~ msgstr "1.50x0.25\""
-
-#~ msgid "1.50x0.50\""
-#~ msgstr "1.50x0.50\""
-
-#~ msgid "1.50x1.00\""
-#~ msgstr "1.50x1.00\""
-
-#~ msgid "1.50x2.00\""
-#~ msgstr "1.50x2.00\""
-
-#~ msgid "10"
-#~ msgstr "10"
-
-#~ msgid "10 inches/sec."
-#~ msgstr "10 palců/sek."
-
-#~ msgid "100"
-#~ msgstr "100"
-
-#~ msgid "100 mm/sec."
-#~ msgstr "100 mm/sek."
-
-#~ msgid "105"
-#~ msgstr "105"
-
-#~ msgid "11"
-#~ msgstr "11"
-
-#~ msgid "11 inches/sec."
-#~ msgstr "11 palců/sek."
-
-#~ msgid "110"
-#~ msgstr "110"
-
-#~ msgid "115"
-#~ msgstr "115"
-
-#~ msgid "12"
-#~ msgstr "12"
-
-#~ msgid "12 inches/sec."
-#~ msgstr "12 palců/sek."
-
-#~ msgid "120"
-#~ msgstr "120"
-
-#~ msgid "120 mm/sec."
-#~ msgstr "120 mm/sek."
-
-#~ msgid "120x60dpi"
-#~ msgstr "120x60 dpi"
-
-#~ msgid "120x72dpi"
-#~ msgstr "120x72 dpi"
-
-#~ msgid "13"
-#~ msgstr "13"
-
-#~ msgid "136dpi"
-#~ msgstr "136 dpi"
-
-#~ msgid "14"
-#~ msgstr "14"
-
-#~ msgid "15"
-#~ msgstr "15"
-
-#~ msgid "15 mm/sec."
-#~ msgstr "15 mm/sek."
-
-#~ msgid "150 mm/sec."
-#~ msgstr "150 mm/sek."
-
-#~ msgid "150dpi"
-#~ msgstr "150 dpi"
-
-#~ msgid "16"
-#~ msgstr "16"
-
-#~ msgid "17"
-#~ msgstr "17"
-
-#~ msgid "18"
-#~ msgstr "18"
-
-#~ msgid "180dpi"
-#~ msgstr "180 dpi"
-
-#~ msgid "19"
-#~ msgstr "19"
-
-#~ msgid "2"
-#~ msgstr "2"
-
-#~ msgid "2 inches/sec."
-#~ msgstr "2 palce/sek."
-
-#~ msgid "2.00x0.37\""
-#~ msgstr "2.00x0.37\""
-
-#~ msgid "2.00x0.50\""
-#~ msgstr "2.00x0.50\""
-
-#~ msgid "2.00x1.00\""
-#~ msgstr "2.00x1.00\""
-
-#~ msgid "2.00x1.25\""
-#~ msgstr "2.00x1.25\""
-
-#~ msgid "2.00x2.00\""
-#~ msgstr "2.00x2.00\""
-
-#~ msgid "2.00x3.00\""
-#~ msgstr "2.00x3.00\""
-
-#~ msgid "2.00x4.00\""
-#~ msgstr "2.00x4.00\""
-
-#~ msgid "2.00x5.50\""
-#~ msgstr "2.00x5.50\""
-
-#~ msgid "2.25x0.50\""
-#~ msgstr "2.25x0.50\""
-
-#~ msgid "2.25x1.25\""
-#~ msgstr "2.25x1.25\""
-
-#~ msgid "2.25x4.00\""
-#~ msgstr "2.25x4.00\""
-
-#~ msgid "2.25x5.50\""
-#~ msgstr "2.25x5.50\""
-
-#~ msgid "2.38x5.50\""
-#~ msgstr "2.38x5.50\""
-
-#~ msgid "2.5 inches/sec."
-#~ msgstr "2.5 palce/sek."
-
-#~ msgid "2.50x1.00\""
-#~ msgstr "2.50x1.00\""
-
-#~ msgid "2.50x2.00\""
-#~ msgstr "2.50x2.00\""
-
-#~ msgid "2.75x1.25\""
-#~ msgstr "2.75x1.25\""
-
-#~ msgid "2.9 x 1\""
-#~ msgstr "2.9 x 1\""
-
-#~ msgid "20"
-#~ msgstr "20"
-
-#~ msgid "20 mm/sec."
-#~ msgstr "20 mm/sek."
-
-#~ msgid "200 mm/sec."
-#~ msgstr "200 mm/sek."
-
-#~ msgid "203dpi"
-#~ msgstr "203 dpi"
-
-#~ msgid "21"
-#~ msgstr "21"
-
-#~ msgid "22"
-#~ msgstr "22"
-
-#~ msgid "23"
-#~ msgstr "23"
-
-#~ msgid "24"
-#~ msgstr "24"
-
-#~ msgid "24-Pin Series"
-#~ msgstr "24 jehličková"
-
-#~ msgid "240x72dpi"
-#~ msgstr "240x72 dpi"
-
-#~ msgid "25"
-#~ msgstr "25"
-
-#~ msgid "250 mm/sec."
-#~ msgstr "250 mm/sek."
-
-#~ msgid "26"
-#~ msgstr "26"
-
-#~ msgid "27"
-#~ msgstr "27"
-
-#~ msgid "28"
-#~ msgstr "28"
-
-#~ msgid "29"
-#~ msgstr "29"
-
-#~ msgid "3"
-#~ msgstr "3"
-
-#~ msgid "3 inches/sec."
-#~ msgstr "3 palce/sek."
-
-#~ msgid "3.00x1.00\""
-#~ msgstr "3.00x1.00\""
-
-#~ msgid "3.00x1.25\""
-#~ msgstr "3.00x1.25\""
-
-#~ msgid "3.00x2.00\""
-#~ msgstr "3.00x2.00\""
-
-#~ msgid "3.00x3.00\""
-#~ msgstr "3.00x3.00\""
-
-#~ msgid "3.00x5.00\""
-#~ msgstr "3.00x5.00\""
-
-#~ msgid "3.25x2.00\""
-#~ msgstr "3.25x2.00\""
-
-#~ msgid "3.25x5.00\""
-#~ msgstr "3.25x5.00\""
-
-#~ msgid "3.25x5.50\""
-#~ msgstr "3.25x5.50\""
-
-#~ msgid "3.25x5.83\""
-#~ msgstr "3.25x5.83\""
-
-#~ msgid "3.25x7.83\""
-#~ msgstr "3.25x7.83\""
-
-#~ msgid "3.5\" Disk"
-#~ msgstr "3.5\" Disk"
-
-#~ msgid "3.50x1.00\""
-#~ msgstr "3.50x1.00\""
-
-#~ msgid "30"
-#~ msgstr "30"
-
-#~ msgid "30 mm/sec."
-#~ msgstr "30 mm/sek."
-
-#~ msgid "300 mm/sec."
-#~ msgstr "300 mm/sek."
-
-#~ msgid "300dpi"
-#~ msgstr "300 dpi"
-
-#~ msgid "35"
-#~ msgstr "35"
-
-#~ msgid "360dpi"
-#~ msgstr "360 dpi"
-
-#~ msgid "360x180dpi"
-#~ msgstr "360x180 dpi"
-
-#~ msgid "4"
-#~ msgstr "4"
-
-#~ msgid "4 inches/sec."
-#~ msgstr "4 palce/sek."
-
-#~ msgid "4.00x1.00\""
-#~ msgstr "4.00x1.00\""
-
-#~ msgid "4.00x13.00\""
-#~ msgstr "4.00x13.00\""
-
-#~ msgid "4.00x2.00\""
-#~ msgstr "4.00x2.00\""
-
-#~ msgid "4.00x2.50\""
-#~ msgstr "4.00x2.50\""
-
-#~ msgid "4.00x3.00\""
-#~ msgstr "4.00x3.00\""
-
-#~ msgid "4.00x4.00\""
-#~ msgstr "4.00x4.00\""
-
-#~ msgid "4.00x5.00\""
-#~ msgstr "4.00x5.00\""
-
-#~ msgid "4.00x6.00\""
-#~ msgstr "4.00x6.00\""
-
-#~ msgid "4.00x6.50\""
-#~ msgstr "4.00x6.50\""
-
-#~ msgid "40"
-#~ msgstr "40"
-
-#~ msgid "40 mm/sec."
-#~ msgstr "40 mm/sek."
-
-#~ msgid "45"
-#~ msgstr "45"
-
-#~ msgid "5"
-#~ msgstr "5"
-
-#~ msgid "5 inches/sec."
-#~ msgstr "5 palců/sek."
-
-#~ msgid "50"
-#~ msgstr "50"
-
-#~ msgid "55"
-#~ msgstr "55"
-
-#~ msgid "6"
-#~ msgstr "6"
-
-#~ msgid "6 inches/sec."
-#~ msgstr "6 palců/sek."
-
-#~ msgid "6.00x1.00\""
-#~ msgstr "6.00x1.00\""
-
-#~ msgid "6.00x2.00\""
-#~ msgstr "6.00x2.00\""
-
-#~ msgid "6.00x3.00\""
-#~ msgstr "6.00x3.00\""
-
-#~ msgid "6.00x4.00\""
-#~ msgstr "6.00x4.00\""
-
-#~ msgid "6.00x5.00\""
-#~ msgstr "6.00x5.00\""
-
-#~ msgid "6.00x6.00\""
-#~ msgstr "6.00x6.00\""
-
-#~ msgid "6.00x6.50\""
-#~ msgstr "6.00x6.50\""
-
-#~ msgid "60"
-#~ msgstr "60"
-
-#~ msgid "60 mm/sec."
-#~ msgstr "60 mm/sek."
-
-#~ msgid "600dpi"
-#~ msgstr "600 dpi"
-
-#~ msgid "60dpi"
-#~ msgstr "60 dpi"
-
-#~ msgid "65"
-#~ msgstr "65"
-
-#~ msgid "7"
-#~ msgstr "7"
-
-#~ msgid "7 inches/sec."
-#~ msgstr "7 palců/sek."
-
-#~ msgid "70"
-#~ msgstr "70"
-
 #~ msgid "720dpi"
 #~ msgstr "720 dpi"
-
-#~ msgid "75"
-#~ msgstr "75"
-
-#~ msgid "8"
-#~ msgstr "8"
-
-#~ msgid "8 inches/sec."
-#~ msgstr "8 palců/sek."
-
-#~ msgid "8.00x1.00\""
-#~ msgstr "8.00x1.00\""
-
-#~ msgid "8.00x2.00\""
-#~ msgstr "8.00x2.00\""
-
-#~ msgid "8.00x3.00\""
-#~ msgstr "8.00x3.00\""
-
-#~ msgid "8.00x4.00\""
-#~ msgstr "8.00x4.00\""
-
-#~ msgid "8.00x5.00\""
-#~ msgstr "8.00x5.00\""
-
-#~ msgid "8.00x6.00\""
-#~ msgstr "8.00x6.00\""
-
-#~ msgid "8.00x6.50\""
-#~ msgstr "8.00x6.50\""
-
-#~ msgid "80"
-#~ msgstr "80"
-
-#~ msgid "80 mm/sec."
-#~ msgstr "80 mm/sek."
-
-#~ msgid "85"
-#~ msgstr "85"
-
-#~ msgid "9"
-#~ msgstr "9"
-
-#~ msgid "9 inches/sec."
-#~ msgstr "9 palců/sek."
-
-#~ msgid "9-Pin Series"
-#~ msgstr "9 jehličková"
-
-#~ msgid "90"
-#~ msgstr "90"
-
-#~ msgid "95"
-#~ msgstr "95"
-
-#~ msgid "A0"
-#~ msgstr "A0"
-
-#~ msgid "A1"
-#~ msgstr "A1"
-
-#~ msgid "A10"
-#~ msgstr "A10"
-
-#~ msgid "A2"
-#~ msgstr "A2"
-
-#~ msgid "A3"
-#~ msgstr "A3"
-
-#~ msgid "A4"
-#~ msgstr "A4"
-
-#~ msgid "A5"
-#~ msgstr "A5"
-
-#~ msgid "A6"
-#~ msgstr "A6"
-
-#~ msgid "A7"
-#~ msgstr "A7"
-
-#~ msgid "A8"
-#~ msgstr "A8"
-
-#~ msgid "A9"
-#~ msgstr "A9"
-
-#~ msgid "ANSI A"
-#~ msgstr "ANSI A"
-
-#~ msgid "ANSI B"
-#~ msgstr "ANSI B"
-
-#~ msgid "ANSI C"
-#~ msgstr "ANSI C"
-
-#~ msgid "ANSI D"
-#~ msgstr "ANSI D"
-
-#~ msgid "ANSI E"
-#~ msgstr "ANSI E"
-
-#~ msgid "ARCH C"
-#~ msgstr "ARCH C"
-
-#~ msgid "ARCH D"
-#~ msgstr "ARCH D"
-
-#~ msgid "ARCH E"
-#~ msgstr "ARCH E"
-
-#~ msgid "Address"
-#~ msgstr "Adresa"
-
-#~ msgid "Always"
-#~ msgstr "Vždy"
-
-#~ msgid "Applicator"
-#~ msgstr "Aplikátor"
-
-#~ msgid "B0"
-#~ msgstr "B0"
-
-#~ msgid "B1"
-#~ msgstr "B1"
-
-#~ msgid "B10"
-#~ msgstr "B10"
-
-#~ msgid "B2"
-#~ msgstr "B2"
-
-#~ msgid "B3"
-#~ msgstr "B3"
-
-#~ msgid "B4"
-#~ msgstr "B4"
-
-#~ msgid "B5"
-#~ msgstr "B5"
-
-#~ msgid "B6"
-#~ msgstr "B6"
-
-#~ msgid "B7"
-#~ msgstr "B7"
-
-#~ msgid "B8"
-#~ msgstr "B8"
-
-#~ msgid "B9"
-#~ msgstr "B9"
-
-#~ msgid "Bond Paper"
-#~ msgstr "Kancelářský papír"
-
-#~ msgid "CMYK"
-#~ msgstr "CMYK"
-
-#~ msgid "CPCL Label Printer"
-#~ msgstr "Tiskárna štítků CPCL"
-
-#~ msgid "CustominCutInterval"
-#~ msgstr "CustominCutInterval"
-
-#~ msgid "CustominTearInterval"
-#~ msgstr "CustominTearInterval"
-
-#~ msgid "Cut"
-#~ msgstr "Snížit"
-
-#~ msgid "Cutter"
-#~ msgstr "Výstřižek"
-
-#~ msgid "Dark"
-#~ msgstr "Tmavý"
-
-#~ msgid "Darkness"
-#~ msgstr "Tma"
-
-#~ msgid "DeskJet Series"
-#~ msgstr "Řada DeskJet"
-
-#~ msgid "Direct Thermal Media"
-#~ msgstr "Termální médium"
-
-#~ msgid "Disabled"
-#~ msgstr "Zakázaný"
-
-#~ msgid "Duplexer"
-#~ msgstr "Duplexní jednotka"
-
-#~ msgid "Dymo"
-#~ msgstr "Dymo"
-
-#~ msgid "EPL1 Label Printer"
-#~ msgstr "Tiskárna štítků EPL1"
-
-#~ msgid "EPL2 Label Printer"
-#~ msgstr "Tiskárna štítků EPL2"
-
-#~ msgid "English"
-#~ msgstr "Čeština"
 
 #~ msgid "Enter old password:"
 #~ msgstr "Zadejte původní heslo:"
@@ -12413,107 +12998,8 @@ msgstr "Z Offset"
 #~ msgid "Enter password:"
 #~ msgstr "Zadejte heslo:"
 
-#~ msgid "Envelope Feed"
-#~ msgstr "Podavač obálek"
-
-#~ msgid "Epson"
-#~ msgstr "Epson"
-
-#~ msgid "Every 10 Labels"
-#~ msgstr "Každých 10 štítků"
-
-#~ msgid "Every 2 Labels"
-#~ msgstr "Každé 2 štítky"
-
-#~ msgid "Every 3 Labels"
-#~ msgstr "Každé 3 štítky"
-
-#~ msgid "Every 4 Labels"
-#~ msgstr "Každé 4 štítky"
-
-#~ msgid "Every 5 Labels"
-#~ msgstr "Každých 5 štítků"
-
-#~ msgid "Every 6 Labels"
-#~ msgstr "Každých 6 štítků"
-
-#~ msgid "Every 7 Labels"
-#~ msgstr "Každých 7 štítků"
-
-#~ msgid "Every 8 Labels"
-#~ msgstr "Každých 8 štítků"
-
-#~ msgid "Every 9 Labels"
-#~ msgstr "Každých 9 štítků"
-
-#~ msgid "Every Label"
-#~ msgstr "Každý štítek"
-
 #~ msgid "File Folder "
 #~ msgstr "Složka souborů "
-
-#~ msgid "Folio"
-#~ msgstr "Fólie"
-
-#~ msgid "Generic"
-#~ msgstr "Obecný"
-
-#~ msgid "Glossy Paper"
-#~ msgstr "Lesklý papír"
-
-#~ msgid "HP"
-#~ msgstr "HP"
-
-#~ msgid "Hanging Folder"
-#~ msgstr "Závěsná složka"
-
-#~ msgid "ISOLatin1"
-#~ msgstr "ISOLatin1"
-
-#~ msgid "Installable Options"
-#~ msgstr "Možnosti instalace"
-
-#~ msgid "Installed"
-#~ msgstr "Instalovaný"
-
-#~ msgid "IntelliBar Label Printer"
-#~ msgstr "Tiskárna štítků \"IntelliBar\""
-
-#~ msgid "Intellitech"
-#~ msgstr "Intellitech"
-
-#~ msgid "Internet Postage 2-Part"
-#~ msgstr "Internet Postage 2-Part"
-
-#~ msgid "Internet Postage 3-Part"
-#~ msgstr "Internet Postage 3-Part"
-
-#~ msgid "Label Printer"
-#~ msgstr "Tiskárna štítků"
-
-#~ msgid "Label Top"
-#~ msgstr "Horní štítek"
-
-#~ msgid "Large Address"
-#~ msgstr "Plná adresa"
-
-#~ msgid "LaserJet Series PCL 4/5"
-#~ msgstr "LaserJet Serie PCL 4/5"
-
-#~ msgid "Light"
-#~ msgstr "Světlý"
-
-#~ msgid "Manual Feed"
-#~ msgstr "Ruční podávání"
-
-#~ msgid "Media Tracking"
-#~ msgstr "Sledování média"
-
-#~ msgid "Medium"
-#~ msgstr "Střední"
-
-#~ msgid "Never"
-#~ msgstr "Nikdy"
 
 #~ msgid "New Stylus Color Series"
 #~ msgstr "New Stylus Color Series"
@@ -12521,146 +13007,14 @@ msgstr "Z Offset"
 #~ msgid "New Stylus Photo Series"
 #~ msgstr "New Stylus Photo Series"
 
-#~ msgid "Non-continuous (Mark sensing)"
-#~ msgstr "Není souvislý (Mark Sensing)"
-
-#~ msgid "Non-continuous (Web sensing)"
-#~ msgstr "Není souvislý (Web Sensing)"
-
-#~ msgid "Not Installed"
-#~ msgstr "Nenainstalováno"
-
-#~ msgid "Note"
-#~ msgstr "Poznámka"
-
-#~ msgid "Oki"
-#~ msgstr "Oki"
-
-#~ msgid "PCL Laser Printer"
-#~ msgstr "PCL laserová tiskárna"
-
-#~ msgid "PRC16K"
-#~ msgstr "PRC16K"
-
-#~ msgid "PRC32K"
-#~ msgstr "PRC32K"
-
-#~ msgid "ParamCustominCutInterval"
-#~ msgstr "ParamCustominCutInterval"
-
-#~ msgid "ParamCustominTearInterval"
-#~ msgstr "ParamCustominTearInterval"
-
-#~ msgid "Peel-Off"
-#~ msgstr "Peel-Off"
-
-#~ msgid "Photo Labels"
-#~ msgstr "Foto-samolepky"
-
-#~ msgid "PostScript Printer"
-#~ msgstr "PostScriptová tiskárna"
-
-#~ msgid "Postcard"
-#~ msgstr "Pohlednice"
-
-#~ msgid "Print Density"
-#~ msgstr "Hustota tisku"
-
-#~ msgid "Print Mode"
-#~ msgstr "Režim tisku"
-
-#~ msgid "Print Rate"
-#~ msgstr "Kvalita tisku"
-
-#~ msgid "Print Speed"
-#~ msgstr "Rychlost tisku"
-
-#~ msgid "Print and Cut"
-#~ msgstr "Tisk a vyjmout"
-
-#~ msgid "Print and Tear"
-#~ msgstr "Tisk a odtrhnout"
-
-#~ msgid "Printer Default"
-#~ msgstr "Výchozí tiskárna"
-
-#~ msgid "Printer Settings"
-#~ msgstr "Nastavení tiskárny"
-
 #~ msgid "Purge Jobs"
 #~ msgstr "Výmaz úloh"
-
-#~ msgid "Quarto"
-#~ msgstr "Quarto"
-
-#~ msgid "Reprint After Error"
-#~ msgstr "Opakovat tisk po chybě"
-
-#~ msgid "Return Address"
-#~ msgstr "Návrat adresy"
-
-#~ msgid "Rewind"
-#~ msgstr "Přetočit"
-
-#~ msgid "Shipping Address"
-#~ msgstr "Doručovací adresa"
-
-#~ msgid "Special Paper"
-#~ msgstr "Speciální papír"
-
-#~ msgid "Standard"
-#~ msgstr "Standardní"
-
-#~ msgid "Statement"
-#~ msgstr "Prohlášení"
 
 #~ msgid "Stylus Color Series"
 #~ msgstr "Stylus Color Series"
 
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Stylus Photo Series"
-
-#~ msgid "Super A"
-#~ msgstr "Super A"
-
-#~ msgid "Super B"
-#~ msgstr "Super B"
-
-#~ msgid "Super B/A3"
-#~ msgstr "Super B/A3"
-
-#~ msgid "Tabloid"
-#~ msgstr "Tabloid"
-
-#~ msgid "Tear"
-#~ msgstr "Odtrhnout"
-
-#~ msgid "Tear-Off"
-#~ msgstr "Odtrhnout"
-
-#~ msgid "Tear-Off Adjust Position"
-#~ msgstr "Nastavení pozice odtržení"
-
-#~ msgid "Thermal Transfer Media"
-#~ msgstr "Termální tisková média"
-
-#~ msgid "Tray"
-#~ msgstr "Podavač"
-
-#~ msgid "US Ledger"
-#~ msgstr "US Ledger"
-
-#~ msgid "US Legal"
-#~ msgstr "US Legal"
-
-#~ msgid "US Letter"
-#~ msgstr "US Letter"
-
-#~ msgid "ZPL Label Printer"
-#~ msgstr "Tiskárna štítků ZPL"
-
-#~ msgid "Zebra"
-#~ msgstr "Zebra"
 
 #~ msgid "compression"
 #~ msgstr "Compression"

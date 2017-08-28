@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-08-01 17:09-0400\n"
+"POT-Creation-Date: 2017-08-28 12:25-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1170,6 +1170,9 @@ msgstr "  -f filename             デフォルトのリクエストファイル�
 msgid "  -h                      Show this usage message."
 msgstr "  -h                      このヘルプメッセージを表示する。"
 
+msgid "  -h                      Validate HTTP response headers."
+msgstr ""
+
 msgid "  -h regex                Match hostname to regular expression."
 msgstr "  -h <正規表現>           ホスト名が正規表現にマッチするか。"
 
@@ -1926,6 +1929,246 @@ msgstr "%s: 警告 - 用紙オプションは無視されます。"
 msgid "%s: Warning - mode option ignored."
 msgstr "%s: 警告 - モードオプションは無視されます。"
 
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 インチ/秒"
+
+msgid "1.25x0.25\""
+msgstr "1.25x0.25 インチ"
+
+msgid "1.25x2.25\""
+msgstr "1.25x2.25 インチ"
+
+msgid "1.5 inch/sec."
+msgstr "1.5 インチ/秒"
+
+msgid "1.50x0.25\""
+msgstr "1.50x0.25 インチ"
+
+msgid "1.50x0.50\""
+msgstr "1.50x0.50 インチ"
+
+msgid "1.50x1.00\""
+msgstr "1.50x1.00 インチ"
+
+msgid "1.50x2.00\""
+msgstr "1.50x2.00 インチ"
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 インチ/秒"
+
+msgid "10 x 11"
+msgstr "10 x 11 インチ"
+
+msgid "10 x 13"
+msgstr "10 x 13 インチ"
+
+msgid "10 x 14"
+msgstr "10 x 14 インチ"
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 ミリメートル/秒"
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 インチ/秒"
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 インチ/秒"
+
+msgid "12 x 11"
+msgstr "12 x 11 インチ"
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 ミリメートル/秒"
+
+msgid "120x60dpi"
+msgstr "120x60dpi"
+
+msgid "120x72dpi"
+msgstr "120x72dpi"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136dpi"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 ミリメートル/秒"
+
+msgid "15 x 11"
+msgstr "15 x 11 インチ"
+
+msgid "150 mm/sec."
+msgstr "150 ミリメートル/秒"
+
+msgid "150dpi"
+msgstr "150dpi"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180dpi"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 インチ/秒"
+
 msgid "2-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1941,6 +2184,117 @@ msgstr ""
 msgid "2-Sided Printing"
 msgstr "両面印刷"
 
+msgid "2.00x0.37\""
+msgstr "2.00x0.37 インチ"
+
+msgid "2.00x0.50\""
+msgstr "2.00x0.50 インチ"
+
+msgid "2.00x1.00\""
+msgstr "2.00x1.00 インチ"
+
+msgid "2.00x1.25\""
+msgstr "2.00x1.25 インチ"
+
+msgid "2.00x2.00\""
+msgstr "2.00x2.00 インチ"
+
+msgid "2.00x3.00\""
+msgstr "2.00x3.00 インチ"
+
+msgid "2.00x4.00\""
+msgstr "2.00x4.00 インチ"
+
+msgid "2.00x5.50\""
+msgstr "2.00x5.50 インチ"
+
+msgid "2.25x0.50\""
+msgstr "2.25x0.50 インチ"
+
+msgid "2.25x1.25\""
+msgstr "2.25x1.25 インチ"
+
+msgid "2.25x4.00\""
+msgstr "2.25x4.00 インチ"
+
+msgid "2.25x5.50\""
+msgstr "2.25x5.50 インチ"
+
+msgid "2.38x5.50\""
+msgstr "2.38x5.50 インチ"
+
+msgid "2.5 inches/sec."
+msgstr "2.5 インチ/秒"
+
+msgid "2.50x1.00\""
+msgstr "2.50x1.00 インチ"
+
+msgid "2.50x2.00\""
+msgstr "2.50x2.00 インチ"
+
+msgid "2.75x1.25\""
+msgstr "2.75x1.25 インチ"
+
+msgid "2.9 x 1\""
+msgstr "2.9 x 1 インチ"
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 ミリメートル/秒"
+
+msgid "200 mm/sec."
+msgstr "200 ミリメートル/秒"
+
+msgid "203dpi"
+msgstr "203dpi"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "24 ピンシリーズ"
+
+msgid "240x72dpi"
+msgstr "240x72dpi"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 ミリメートル/秒"
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 インチ/秒"
+
+msgid "3 x 5"
+msgstr "3 x 5"
+
 msgid "3-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1953,6 +2307,72 @@ msgstr ""
 msgid "3-Hole Punch (Reverse Portrait)"
 msgstr ""
 
+msgid "3.00x1.00\""
+msgstr "3.00x1.00 インチ"
+
+msgid "3.00x1.25\""
+msgstr "3.00x1.25 インチ"
+
+msgid "3.00x2.00\""
+msgstr "3.00x2.00 インチ"
+
+msgid "3.00x3.00\""
+msgstr "3.00x3.00インチ"
+
+msgid "3.00x5.00\""
+msgstr "3.00x5.00 インチ"
+
+msgid "3.25x2.00\""
+msgstr "3.25x2.00 インチ"
+
+msgid "3.25x5.00\""
+msgstr "3.25x5.00 インチ"
+
+msgid "3.25x5.50\""
+msgstr "3.25x5.50 インチ"
+
+msgid "3.25x5.83\""
+msgstr "3.25x5.83 インチ"
+
+msgid "3.25x7.83\""
+msgstr "3.25x7.83 インチ"
+
+msgid "3.5 x 5"
+msgstr "3.5 x 5"
+
+msgid "3.5\" Disk"
+msgstr "3.5 インチディスク"
+
+msgid "3.50x1.00\""
+msgstr "3.50x1.00 インチ"
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 ミリメートル/秒"
+
+msgid "300 mm/sec."
+msgstr "300 ミリメートル/秒"
+
+msgid "300dpi"
+msgstr "300dpi"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360dpi"
+
+msgid "360x180dpi"
+msgstr "360x180dpi"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 インチ/秒"
+
 msgid "4-Hole Punch (Landscape)"
 msgstr ""
 
@@ -1964,6 +2384,177 @@ msgstr ""
 
 msgid "4-Hole Punch (Reverse Portrait)"
 msgstr ""
+
+msgid "4.00x1.00\""
+msgstr "4.00x1.00 インチ"
+
+msgid "4.00x13.00\""
+msgstr "4.00x13.00 インチ"
+
+msgid "4.00x2.00\""
+msgstr "4.00x2.00 インチ"
+
+msgid "4.00x2.50\""
+msgstr "4.00x2.50 インチ"
+
+msgid "4.00x3.00\""
+msgstr "4.00x3.00 インチ"
+
+msgid "4.00x4.00\""
+msgstr "4.00x4.00 インチ"
+
+msgid "4.00x5.00\""
+msgstr "4.00x5.00 インチ"
+
+msgid "4.00x6.00\""
+msgstr "4.00x6.00 インチ"
+
+msgid "4.00x6.50\""
+msgstr "4.00x6.50 インチ"
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 ミリメートル/秒"
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 インチ/秒"
+
+msgid "5 x 7"
+msgstr "5 x 7 インチ"
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 インチ/秒"
+
+msgid "6.00x1.00\""
+msgstr "6.00x1.00 インチ"
+
+msgid "6.00x2.00\""
+msgstr "6.00x2.00 インチ"
+
+msgid "6.00x3.00\""
+msgstr "6.00x3.00 インチ"
+
+msgid "6.00x4.00\""
+msgstr "6.00x4.00 インチ"
+
+msgid "6.00x5.00\""
+msgstr "6.00x5.00 インチ"
+
+msgid "6.00x6.00\""
+msgstr "6.00x6.00 インチ"
+
+msgid "6.00x6.50\""
+msgstr "6.00x6.50 インチ"
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 ミリメートル/秒"
+
+msgid "600dpi"
+msgstr "600dpi"
+
+msgid "60dpi"
+msgstr "60dpi"
+
+msgid "60x72dpi"
+msgstr "60x72dpi"
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 インチ/秒"
+
+msgid "7 x 9"
+msgstr "7 x 9 インチ"
+
+msgid "70"
+msgstr "70"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 インチ/秒"
+
+msgid "8 x 10"
+msgstr "8 x 10 インチ"
+
+msgid "8.00x1.00\""
+msgstr "8.00x1.00 インチ"
+
+msgid "8.00x2.00\""
+msgstr "8.00x2.00 インチ"
+
+msgid "8.00x3.00\""
+msgstr "8.00x3.00 インチ"
+
+msgid "8.00x4.00\""
+msgstr "8.00x4.00 インチ"
+
+msgid "8.00x5.00\""
+msgstr "8.00x5.00 インチ"
+
+msgid "8.00x6.00\""
+msgstr "8.00x6.00 インチ"
+
+msgid "8.00x6.50\""
+msgstr "8.00x6.50 インチ"
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 ミリメートル/秒"
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 インチ/秒"
+
+msgid "9 x 11"
+msgstr "9 x 11 インチ"
+
+msgid "9 x 12"
+msgstr "9 x 12 インチ"
+
+msgid "9-Pin Series"
+msgstr "9 ピンシリーズ"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
 
 msgid "?Invalid help command unknown."
 msgstr "?無効なヘルプコマンドです"
@@ -1984,6 +2575,108 @@ msgstr "\"%s\" という名前のクラスはすでに存在します。"
 msgid "A printer named \"%s\" already exists."
 msgstr "\"%s\" という名前のプリンターはすでに存在します。"
 
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr "A0 長辺送り"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr "A1 長辺送り"
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr "A2 長辺送り"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr "A3 長辺送り"
+
+msgid "A3 Oversize"
+msgstr "A3 (特大)"
+
+msgid "A3 Oversize Long Edge"
+msgstr "A3 (特大) 長辺送り"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr "A4 長辺送り"
+
+msgid "A4 Oversize"
+msgstr "A4 (特大)"
+
+msgid "A4 Small"
+msgstr "A4 (小)"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr "A5 長辺送り"
+
+msgid "A5 Oversize"
+msgstr "A5 (特大)"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr "A6 長辺送り"
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr "ARCH C 長辺送り"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr "ARCH D 長辺送り"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
+msgstr "ARCH E 長辺送り"
+
 msgid "Accept Jobs"
 msgstr "ジョブの受け付け"
 
@@ -2002,6 +2695,9 @@ msgstr "プリンターの追加"
 msgid "Add RSS Subscription"
 msgstr "RSS 購読を追加"
 
+msgid "Address"
+msgstr "アドレス"
+
 msgid "Administration"
 msgstr "管理"
 
@@ -2017,8 +2713,14 @@ msgstr ""
 msgid "Aluminum"
 msgstr ""
 
+msgid "Always"
+msgstr "常に有効"
+
 msgid "AppSocket/HP JetDirect"
 msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "アプリケーター"
 
 msgid "Archival Envelope"
 msgstr ""
@@ -2050,6 +2752,42 @@ msgstr "属性グループは範囲外です (%x < %x)。"
 
 msgid "Automatic"
 msgstr ""
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr "B5 (特大)"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
 
 msgid "Back Print Film"
 msgstr ""
@@ -2225,6 +2963,9 @@ msgstr ""
 msgid "Bond Envelope"
 msgstr ""
 
+msgid "Bond Paper"
+msgstr "ボンド紙"
+
 msgid "Booklet"
 msgstr ""
 
@@ -2247,6 +2988,12 @@ msgstr "オーバーフローが検出され、中断しました。"
 msgid "CD"
 msgstr ""
 
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "CPCL ラベルプリンター"
+
 msgid "Cancel Jobs"
 msgstr "ジョブをキャンセル"
 
@@ -2267,6 +3014,9 @@ msgstr ""
 
 msgid "Cardstock"
 msgstr ""
+
+msgid "Cassette"
+msgstr "カセット"
 
 msgid "Center"
 msgstr ""
@@ -2365,11 +3115,29 @@ msgstr ""
 msgid "Custom"
 msgstr "カスタム"
 
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "カット"
+
 msgid "Cut Media"
 msgstr ""
 
+msgid "Cutter"
+msgstr "カッター"
+
 msgid "DVD"
 msgstr ""
+
+msgid "Dark"
+msgstr "濃い"
+
+msgid "Darkness"
+msgstr "濃さ"
 
 msgid "Data file sent successfully."
 msgstr "データファイルが正常に送信されました。"
@@ -2382,6 +3150,9 @@ msgstr "クラスの削除"
 
 msgid "Delete Printer"
 msgstr "プリンターの削除"
+
+msgid "DeskJet Series"
+msgstr "DeskJet シリーズ"
 
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
@@ -2402,6 +3173,9 @@ msgstr ""
 "          make-and-model = %s\n"
 "          device-id = %s\n"
 "          location = %s"
+
+msgid "Direct Thermal Media"
+msgstr "感熱紙"
 
 #, c-format
 msgid "Directory \"%s\" contains a relative path."
@@ -2425,6 +3199,9 @@ msgstr "ディレクトリー \"%s\" は利用できません: %s"
 msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr ""
 "ディレクトリー \"%s\" のパーミッションは問題ありません (0%o/uid=%d/gid=%d)。"
+
+msgid "Disabled"
+msgstr "無効"
 
 msgid "Disc"
 msgstr ""
@@ -2457,6 +3234,18 @@ msgstr ""
 msgid "Dry Film"
 msgstr ""
 
+msgid "Duplexer"
+msgstr "両面オプション"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "EPL1 ラベルプリンター"
+
+msgid "EPL2 Label Printer"
+msgstr "EPL2 ラベルプリンター"
+
 msgid "Edit Configuration File"
 msgstr "設定ファイルの編集"
 
@@ -2479,6 +3268,9 @@ msgstr "終了バナー"
 msgid "Engineering Z Fold"
 msgstr ""
 
+msgid "English"
+msgstr "English"
+
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -2491,8 +3283,170 @@ msgstr ""
 msgid "Envelope"
 msgstr ""
 
+msgid "Envelope #10"
+msgstr ""
+
+msgid "Envelope #11"
+msgstr "封筒 #11"
+
+msgid "Envelope #12"
+msgstr "封筒 #12"
+
+msgid "Envelope #14"
+msgstr "封筒 #14"
+
+msgid "Envelope #9"
+msgstr "封筒 #9"
+
+msgid "Envelope B4"
+msgstr "封筒 B4"
+
+msgid "Envelope B5"
+msgstr "封筒 B5"
+
+msgid "Envelope B6"
+msgstr "封筒 B6"
+
+msgid "Envelope C0"
+msgstr "封筒 C0"
+
+msgid "Envelope C1"
+msgstr "封筒 C1"
+
+msgid "Envelope C2"
+msgstr "封筒 C2"
+
+msgid "Envelope C3"
+msgstr "封筒 C3"
+
+msgid "Envelope C4"
+msgstr "封筒 C4"
+
+msgid "Envelope C5"
+msgstr "封筒 C5"
+
+msgid "Envelope C6"
+msgstr "封筒 C6"
+
+msgid "Envelope C65"
+msgstr "封筒 C65"
+
+msgid "Envelope C7"
+msgstr "封筒 C7"
+
+msgid "Envelope Choukei 3"
+msgstr "封筒 長形3号"
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr "封筒 長形3号 長辺送り"
+
+msgid "Envelope Choukei 4"
+msgstr "封筒 長形4号"
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr "封筒 長形4号 長辺送り"
+
+msgid "Envelope DL"
+msgstr "封筒 DL"
+
+msgid "Envelope Feed"
+msgstr "封筒フィード"
+
+msgid "Envelope Invite"
+msgstr "招待状封筒"
+
+msgid "Envelope Italian"
+msgstr "イタリア封筒"
+
+msgid "Envelope Kaku2"
+msgstr "封筒 角2"
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr "封筒 角2 長辺送り"
+
+msgid "Envelope Kaku3"
+msgstr "封筒 角3"
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr "封筒 角3 長辺送り"
+
+msgid "Envelope Monarch"
+msgstr "封筒 Monarch"
+
+msgid "Envelope PRC1"
+msgstr ""
+
+msgid "Envelope PRC1 Long Edge"
+msgstr "封筒 PRC1 長辺送り"
+
+msgid "Envelope PRC10"
+msgstr "封筒 PRC10"
+
+msgid "Envelope PRC10 Long Edge"
+msgstr "封筒 PRC10 長辺送り"
+
+msgid "Envelope PRC2"
+msgstr "封筒 PRC2"
+
+msgid "Envelope PRC2 Long Edge"
+msgstr "封筒 PRC2 長辺送り"
+
+msgid "Envelope PRC3"
+msgstr "封筒 PRC3"
+
+msgid "Envelope PRC3 Long Edge"
+msgstr "封筒 PRC3 長辺送り"
+
+msgid "Envelope PRC4"
+msgstr "封筒 PRC4"
+
+msgid "Envelope PRC4 Long Edge"
+msgstr "封筒 PRC4 長辺送り"
+
+msgid "Envelope PRC5 Long Edge"
+msgstr "封筒 PRC5 長辺送り"
+
+msgid "Envelope PRC5PRC5"
+msgstr "封筒 PRC5"
+
+msgid "Envelope PRC6"
+msgstr "封筒 PRC6"
+
+msgid "Envelope PRC6 Long Edge"
+msgstr "封筒 PRC6 長辺送り"
+
+msgid "Envelope PRC7"
+msgstr "封筒 PRC7"
+
+msgid "Envelope PRC7 Long Edge"
+msgstr "封筒 PRC7 長辺送り"
+
+msgid "Envelope PRC8"
+msgstr "封筒 PRC8"
+
+msgid "Envelope PRC8 Long Edge"
+msgstr "封筒 PRC8 長辺送り"
+
+msgid "Envelope PRC9"
+msgstr "封筒 PRC9"
+
+msgid "Envelope PRC9 Long Edge"
+msgstr "封筒 PRC9 長辺送り"
+
+msgid "Envelope Personal"
+msgstr "パーソナル封筒"
+
+msgid "Envelope You4"
+msgstr "封筒 洋形4号"
+
+msgid "Envelope You4 Long Edge"
+msgstr "封筒 洋形4号 長辺送り"
+
 msgid "Environment Variables:"
 msgstr "環境変数:"
+
+msgid "Epson"
+msgstr "Epson"
 
 msgid "Error Policy"
 msgstr "エラーポリシー"
@@ -2506,11 +3460,44 @@ msgstr "ラスターデータの送信でエラーが起きました。"
 msgid "Error: need hostname after \"-h\" option."
 msgstr "Error: '-h' オプションのあとにはホスト名が必要です。"
 
+msgid "Every 10 Labels"
+msgstr "10 ラベルごと"
+
+msgid "Every 2 Labels"
+msgstr "2 ラベルごと"
+
+msgid "Every 3 Labels"
+msgstr "3 ラベルごと"
+
+msgid "Every 4 Labels"
+msgstr "4 ラベルごと"
+
+msgid "Every 5 Labels"
+msgstr "5 ラベルごと"
+
+msgid "Every 6 Labels"
+msgstr "6 ラベルごと"
+
+msgid "Every 7 Labels"
+msgstr "7 ラベルごと"
+
+msgid "Every 8 Labels"
+msgstr "8 ラベルごと"
+
+msgid "Every 9 Labels"
+msgstr "9 ラベルごと"
+
+msgid "Every Label"
+msgstr "すべてのラベル"
+
 msgid "Everyday Glossy Photo Paper"
 msgstr ""
 
 msgid "Everyday Matte Paper"
 msgstr ""
+
+msgid "Executive"
+msgstr "エグゼクティブ"
 
 msgid "Expectation Failed"
 msgstr "予測に失敗しました"
@@ -2536,6 +3523,15 @@ msgstr ""
 msgid "Face Up"
 msgstr ""
 
+msgid "FanFold German"
+msgstr "FanFold German"
+
+msgid "FanFold Legal German"
+msgstr "FanFold Legal German"
+
+msgid "Fanfold US"
+msgstr "Fanfold US"
+
 msgid "Fast Grayscale"
 msgstr ""
 
@@ -2560,6 +3556,9 @@ msgstr "ファイル \"%s\" は利用できません: %s"
 #, c-format
 msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
 msgstr "ファイル \"%s\" のパーミッションは問題ありません (0%o/uid=%d/gid=%d)。"
+
+msgid "File Folder"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -2594,6 +3593,9 @@ msgstr ""
 msgid "Fold"
 msgstr ""
 
+msgid "Folio"
+msgstr "フォリオ"
+
 msgid "Forbidden"
 msgstr "Forbidden"
 
@@ -2605,6 +3607,9 @@ msgstr ""
 
 msgid "General"
 msgstr "一般"
+
+msgid "Generic"
+msgstr "汎用"
 
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "Get-Response-PDU は不確定の長さを使用しています"
@@ -2636,6 +3641,9 @@ msgstr ""
 msgid "Glossy Optical Disc"
 msgstr ""
 
+msgid "Glossy Paper"
+msgstr "光沢紙"
+
 msgid "Glossy Photo Paper"
 msgstr ""
 
@@ -2648,6 +3656,9 @@ msgstr ""
 msgid "Grayscale"
 msgstr "グレースケール"
 
+msgid "HP"
+msgstr "HP"
+
 msgid "Hagaki"
 msgstr ""
 
@@ -2656,6 +3667,9 @@ msgstr ""
 
 msgid "Half Z Fold"
 msgstr ""
+
+msgid "Hanging Folder"
+msgstr "Hanging Folder"
 
 msgid "Hash buffer too small."
 msgstr ""
@@ -2756,6 +3770,9 @@ msgstr "IPP の textWithLanguage の値が最小値 4 バイト未満です。"
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP の値が 32767 バイト以上です。"
 
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
 msgid "Illegal control character"
 msgstr "不正な制御文字"
 
@@ -2786,11 +3803,29 @@ msgstr ""
 msgid "Inkjet Paper"
 msgstr ""
 
+msgid "Installable Options"
+msgstr "インストール可能オプション"
+
+msgid "Installed"
+msgstr "インストールされています"
+
+msgid "IntelliBar Label Printer"
+msgstr "IntelliBar ラベルプリンター"
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
 msgid "Internal Server Error"
 msgstr "サーバー内部エラー"
 
 msgid "Internal error"
 msgstr "内部エラー"
+
+msgid "Internet Postage 2-Part"
+msgstr "Internet Postage 2-Part"
+
+msgid "Internet Postage 3-Part"
+msgstr "Internet Postage 3-Part"
 
 msgid "Internet Printing Protocol"
 msgstr "インターネット印刷プロトコル"
@@ -2810,6 +3845,48 @@ msgstr "無効なプリンターコマンドです。 \"%s\""
 
 msgid "JCL"
 msgstr "JCL"
+
+msgid "JIS B0"
+msgstr "JIS B0"
+
+msgid "JIS B1"
+msgstr "JIS B1"
+
+msgid "JIS B10"
+msgstr "JIS B10"
+
+msgid "JIS B2"
+msgstr "JIS B2"
+
+msgid "JIS B3"
+msgstr "JIS B3"
+
+msgid "JIS B4"
+msgstr "JIS B4"
+
+msgid "JIS B4 Long Edge"
+msgstr "JIS B4 長辺送り"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "JIS B5 Long Edge"
+msgstr "JIS B5 長辺送り"
+
+msgid "JIS B6"
+msgstr "JIS B6"
+
+msgid "JIS B6 Long Edge"
+msgstr "JIS B6 長辺送り"
+
+msgid "JIS B7"
+msgstr "JIS B7"
+
+msgid "JIS B8"
+msgstr "JIS B8"
+
+msgid "JIS B9"
+msgstr "JIS B9"
 
 #, c-format
 msgid "Job #%d cannot be restarted - no files."
@@ -2880,6 +3957,12 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR ホストまたはプリンター"
 
+msgid "Label Printer"
+msgstr "ラベルプリンター"
+
+msgid "Label Top"
+msgstr "ラベルトップ"
+
 msgid "Labels"
 msgstr ""
 
@@ -2893,11 +3976,17 @@ msgstr ""
 msgid "Language \"%s\" not supported."
 msgstr "言語 \"%s\" はサポートされていません。"
 
+msgid "Large Address"
+msgstr "ラージアドレス"
+
 msgid "Large Capacity"
 msgstr ""
 
 msgid "Large Capacity Tray"
 msgstr ""
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet Series PCL 4/5"
 
 msgid "Left"
 msgstr ""
@@ -2911,8 +4000,17 @@ msgstr ""
 msgid "Letter Fold"
 msgstr ""
 
+msgid "Letter Oversize"
+msgstr "US レター (特大)"
+
+msgid "Letter Oversize Long Edge"
+msgstr "US レター (特大) 長辺送り"
+
 msgid "Letterhead"
 msgstr ""
+
+msgid "Light"
+msgstr "薄い"
 
 msgid "Lightweight Envelope"
 msgstr ""
@@ -2977,6 +4075,9 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
+msgid "Manual Feed"
+msgstr "手差し"
+
 msgid "Matte Brochure Paper"
 msgstr ""
 
@@ -3001,8 +4102,14 @@ msgstr "用紙サイズ"
 msgid "Media Source"
 msgstr "給紙"
 
+msgid "Media Tracking"
+msgstr "用紙の経路"
+
 msgid "Media Type"
 msgstr "用紙種類"
+
+msgid "Medium"
+msgstr "紙質"
 
 msgid "Memory allocation error"
 msgstr "メモリー割り当てエラー"
@@ -3163,6 +4270,9 @@ msgstr "OID 名は限定的な長さを使用します"
 msgid "Nested classes are not allowed."
 msgstr "入れ子になったクラスは許可されていません。"
 
+msgid "Never"
+msgstr "Never"
+
 msgid "New credentials are not valid for name."
 msgstr ""
 
@@ -3275,6 +4385,12 @@ msgstr "variable-bindings SEQUENCE がありません"
 msgid "No version number"
 msgstr "バージョン名がありません"
 
+msgid "Non-continuous (Mark sensing)"
+msgstr "非連続です (Mark sensing)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "非連続です (Web sensing)"
+
 msgid "None"
 msgstr ""
 
@@ -3287,6 +4403,9 @@ msgstr "見つかりません"
 msgid "Not Implemented"
 msgstr "実装されていません"
 
+msgid "Not Installed"
+msgstr "インストールされていません"
+
 msgid "Not Modified"
 msgstr "変更されていません"
 
@@ -3295,6 +4414,9 @@ msgstr "サポートされていません"
 
 msgid "Not allowed to print."
 msgstr "印刷が許可されていません。"
+
+msgid "Note"
+msgstr "注意"
 
 msgid ""
 "Note: this program only validates the DSC comments, not the PostScript "
@@ -3311,6 +4433,9 @@ msgstr "Off (片面)"
 
 msgid "Office Recycled Paper"
 msgstr ""
+
+msgid "Oki"
+msgstr "Oki"
 
 msgid "Online Help"
 msgstr "オンラインヘルプ"
@@ -3368,6 +4493,27 @@ msgstr "排紙ビンがありません。"
 msgid "PASS"
 msgstr "合格"
 
+msgid "PCL Laser Printer"
+msgstr "PCL レーザープリンター"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr "PRC16K 長辺送り"
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr "PRC32K 長辺送り"
+
+msgid "PRC32K Oversize"
+msgstr "PRC32K (特大)"
+
+msgid "PRC32K Oversize Long Edge"
+msgstr "PRC32K (特大) 長辺送り"
+
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "パケットが Get-Response-PDU を含んでいません"
 
@@ -3392,6 +4538,12 @@ msgstr "給紙トレイがありません。"
 msgid "Parallel Fold"
 msgstr ""
 
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "%s のパスワード (%s 上)? "
@@ -3406,6 +4558,9 @@ msgstr "クラスの休止"
 msgid "Pause Printer"
 msgstr "プリンターの休止"
 
+msgid "Peel-Off"
+msgstr "Peel-Off"
+
 msgid "Permanent Labels"
 msgstr ""
 
@@ -3414,6 +4569,9 @@ msgstr "写真"
 
 msgid "Photo Film"
 msgstr ""
+
+msgid "Photo Labels"
+msgstr "写真ラベル"
 
 msgid "Photo Paper"
 msgstr ""
@@ -3466,6 +4624,21 @@ msgstr ""
 msgid "Port Monitor"
 msgstr "ポートモニター"
 
+msgid "PostScript Printer"
+msgstr "PostScript プリンター"
+
+msgid "Postcard"
+msgstr "ハガキ"
+
+msgid "Postcard Double"
+msgstr ""
+
+msgid "Postcard Double Long Edge"
+msgstr "往復ハガキ 長辺送り"
+
+msgid "Postcard Long Edge"
+msgstr "ハガキ 長辺送り"
+
 msgid "Poster Fold"
 msgstr ""
 
@@ -3490,17 +4663,35 @@ msgstr ""
 msgid "Preprinted Paper"
 msgstr ""
 
+msgid "Print Density"
+msgstr "印刷密度"
+
 msgid "Print Job:"
 msgstr "ジョブの印刷:"
+
+msgid "Print Mode"
+msgstr "印刷モード"
 
 msgid "Print Quality"
 msgstr ""
 
+msgid "Print Rate"
+msgstr "印刷レート"
+
 msgid "Print Self-Test Page"
 msgstr "自己テストページの印刷"
 
+msgid "Print Speed"
+msgstr "印刷速度"
+
 msgid "Print Test Page"
 msgstr "テストページの印刷"
+
+msgid "Print and Cut"
+msgstr "プリントしてカット"
+
+msgid "Print and Tear"
+msgstr "プリントして切り取る"
 
 msgid "Print file sent."
 msgstr "プリントファイルが送られました。"
@@ -3521,6 +4712,9 @@ msgstr ""
 msgid "Printer Added"
 msgstr "追加されたプリンター"
 
+msgid "Printer Default"
+msgstr "デフォルトのプリンター"
+
 msgid "Printer Deleted"
 msgstr "削除されたプリンター"
 
@@ -3529,6 +4723,9 @@ msgstr "変更されたプリンター"
 
 msgid "Printer Paused"
 msgstr "プリンターの休止"
+
+msgid "Printer Settings"
+msgstr "プリンター設定"
 
 msgid "Printer cannot print supplied content."
 msgstr "プリンターは受信した内容を印刷できませんでした。"
@@ -3555,6 +4752,9 @@ msgstr ""
 msgid "Punched Paper"
 msgstr ""
 
+msgid "Quarto"
+msgstr "Quarto"
+
 msgid "Quota limit reached."
 msgstr "クォータの制限に達しました。"
 
@@ -3578,6 +4778,9 @@ msgstr "リモートホストがコントロールファイルを受け付けま
 msgid "Remote host did not accept data file (%d)."
 msgstr "リモートホストがデータファイルを受け付けませんでした (%d)。"
 
+msgid "Reprint After Error"
+msgstr "エラー後の再印刷"
+
 msgid "Request Entity Too Large"
 msgstr "要求するエンティティが大きすぎます"
 
@@ -3589,6 +4792,12 @@ msgstr "クラスを再開する"
 
 msgid "Resume Printer"
 msgstr "プリンターを再開する"
+
+msgid "Return Address"
+msgstr "返信用ラベル"
+
+msgid "Rewind"
+msgstr "巻き取り"
 
 msgid "Right"
 msgstr ""
@@ -3726,6 +4935,9 @@ msgstr "プリンターオプションの設定"
 msgid "Set Publishing"
 msgstr "公開の設定"
 
+msgid "Shipping Address"
+msgstr "発送先ラベル"
+
 msgid "Short-Edge (Landscape)"
 msgstr "短辺 (横原稿)"
 
@@ -3771,6 +4983,9 @@ msgstr ""
 msgid "Sleeve"
 msgstr ""
 
+msgid "Special Paper"
+msgstr "特殊紙"
+
 #, c-format
 msgid "Spooling job, %.0f%% complete."
 msgstr "ジョブをスプール中、%.0f%% 完了しました。"
@@ -3805,6 +5020,9 @@ msgstr ""
 msgid "Stacker 9"
 msgstr ""
 
+msgid "Standard"
+msgstr "標準"
+
 msgid "Staple"
 msgstr ""
 
@@ -3831,6 +5049,9 @@ msgstr "開始バナー"
 msgid "Starting page %d."
 msgstr "ページ %d を開始しています。"
 
+msgid "Statement"
+msgstr "記述"
+
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr "サブスクリプション番号 %d は存在しません。"
@@ -3838,11 +5059,38 @@ msgstr "サブスクリプション番号 %d は存在しません。"
 msgid "Substitutions:"
 msgstr "置換:"
 
+msgid "Super A"
+msgstr "スーパー A"
+
+msgid "Super B"
+msgstr "スーパー B"
+
+msgid "Super B/A3"
+msgstr "スーパー B/A3"
+
 msgid "Switching Protocols"
 msgstr "プロトコルの変更"
 
 msgid "Tab Stock"
 msgstr ""
+
+msgid "Tabloid"
+msgstr "タブロイド"
+
+msgid "Tabloid Oversize"
+msgstr "タブロイド (特大)"
+
+msgid "Tabloid Oversize Long Edge"
+msgstr "タブロイド (特大) 長辺送り"
+
+msgid "Tear"
+msgstr "Tear"
+
+msgid "Tear-Off"
+msgstr "Tear-Off"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Tear-Off 位置調節"
 
 #, c-format
 msgid "The \"%s\" attribute is required for print jobs."
@@ -4021,6 +5269,9 @@ msgstr "サブスクリプションが多すぎます。"
 msgid "There was an unrecoverable USB error."
 msgstr "回復不可能な USB のエラーが発生しています。"
 
+msgid "Thermal Transfer Media"
+msgstr "熱転写メディア"
+
 msgid "Too many active jobs."
 msgstr "アクティブなジョブが多すぎます。"
 
@@ -4046,6 +5297,9 @@ msgstr ""
 
 msgid "Transparency"
 msgstr "OHP シート"
+
+msgid "Tray"
+msgstr "トレイ"
 
 msgid "Tray 1"
 msgstr "トレイ 1"
@@ -4130,6 +5384,30 @@ msgstr "URI が長すぎます"
 
 msgid "URI too large"
 msgstr "URI が長すぎる"
+
+msgid "US Ledger"
+msgstr "US レジャー"
+
+msgid "US Legal"
+msgstr "US リーガル"
+
+msgid "US Legal Oversize"
+msgstr "US リーガル (特大)"
+
+msgid "US Letter"
+msgstr "US レター"
+
+msgid "US Letter Long Edge"
+msgstr "US レター 長辺送り"
+
+msgid "US Letter Oversize"
+msgstr "US レター (特大)"
+
+msgid "US Letter Oversize Long Edge"
+msgstr "US レター (特大) 長辺送り"
+
+msgid "US Letter Small"
+msgstr "US レター (小)"
 
 msgid "Unable to access cupsd.conf file"
 msgstr "cupsd.conf ファイルにアクセスできません"
@@ -4697,6 +5975,12 @@ msgstr ""
 
 msgid "Z Fold"
 msgstr ""
+
+msgid "ZPL Label Printer"
+msgstr "ZPL ラベルプリンター"
+
+msgid "Zebra"
+msgstr "ゼブラ"
 
 msgid "aborted"
 msgstr "停止"
@@ -12254,800 +13538,11 @@ msgstr "Z Offset"
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: エラー - \"-b\" オプションのあとに宛先が必要です。"
 
-#~ msgid "-1"
-#~ msgstr "-1"
-
-#~ msgid "-10"
-#~ msgstr "-10"
-
-#~ msgid "-100"
-#~ msgstr "-100"
-
-#~ msgid "-105"
-#~ msgstr "-105"
-
-#~ msgid "-11"
-#~ msgstr "-11"
-
-#~ msgid "-110"
-#~ msgstr "-110"
-
-#~ msgid "-115"
-#~ msgstr "-115"
-
-#~ msgid "-12"
-#~ msgstr "-12"
-
-#~ msgid "-120"
-#~ msgstr "-120"
-
-#~ msgid "-13"
-#~ msgstr "-13"
-
-#~ msgid "-14"
-#~ msgstr "-14"
-
-#~ msgid "-15"
-#~ msgstr "-15"
-
-#~ msgid "-2"
-#~ msgstr "-2"
-
-#~ msgid "-20"
-#~ msgstr "-20"
-
-#~ msgid "-25"
-#~ msgstr "-25"
-
-#~ msgid "-3"
-#~ msgstr "-3"
-
-#~ msgid "-30"
-#~ msgstr "-30"
-
-#~ msgid "-35"
-#~ msgstr "-35"
-
-#~ msgid "-4"
-#~ msgstr "-4"
-
-#~ msgid "-40"
-#~ msgstr "-40"
-
-#~ msgid "-45"
-#~ msgstr "-45"
-
-#~ msgid "-5"
-#~ msgstr "-5"
-
-#~ msgid "-50"
-#~ msgstr "-50"
-
-#~ msgid "-55"
-#~ msgstr "-55"
-
-#~ msgid "-6"
-#~ msgstr "-6"
-
-#~ msgid "-60"
-#~ msgstr "-60"
-
-#~ msgid "-65"
-#~ msgstr "-65"
-
-#~ msgid "-7"
-#~ msgstr "-7"
-
-#~ msgid "-70"
-#~ msgstr "-70"
-
-#~ msgid "-75"
-#~ msgstr "-75"
-
-#~ msgid "-8"
-#~ msgstr "-8"
-
-#~ msgid "-80"
-#~ msgstr "-80"
-
-#~ msgid "-85"
-#~ msgstr "-85"
-
-#~ msgid "-9"
-#~ msgstr "-9"
-
-#~ msgid "-90"
-#~ msgstr "-90"
-
-#~ msgid "-95"
-#~ msgstr "-95"
-
-#~ msgid "0"
-#~ msgstr "0"
-
-#~ msgid "1"
-#~ msgstr "1"
-
-#~ msgid "1 inch/sec."
-#~ msgstr "1 インチ/秒"
-
-#~ msgid "1.25x0.25\""
-#~ msgstr "1.25x0.25 インチ"
-
-#~ msgid "1.25x2.25\""
-#~ msgstr "1.25x2.25 インチ"
-
-#~ msgid "1.5 inch/sec."
-#~ msgstr "1.5 インチ/秒"
-
-#~ msgid "1.50x0.25\""
-#~ msgstr "1.50x0.25 インチ"
-
-#~ msgid "1.50x0.50\""
-#~ msgstr "1.50x0.50 インチ"
-
-#~ msgid "1.50x1.00\""
-#~ msgstr "1.50x1.00 インチ"
-
-#~ msgid "1.50x2.00\""
-#~ msgstr "1.50x2.00 インチ"
-
-#~ msgid "10"
-#~ msgstr "10"
-
-#~ msgid "10 inches/sec."
-#~ msgstr "10 インチ/秒"
-
-#~ msgid "10 x 11"
-#~ msgstr "10 x 11 インチ"
-
-#~ msgid "10 x 13"
-#~ msgstr "10 x 13 インチ"
-
-#~ msgid "10 x 14"
-#~ msgstr "10 x 14 インチ"
-
-#~ msgid "100"
-#~ msgstr "100"
-
-#~ msgid "100 mm/sec."
-#~ msgstr "100 ミリメートル/秒"
-
-#~ msgid "105"
-#~ msgstr "105"
-
-#~ msgid "11"
-#~ msgstr "11"
-
-#~ msgid "11 inches/sec."
-#~ msgstr "11 インチ/秒"
-
-#~ msgid "110"
-#~ msgstr "110"
-
-#~ msgid "115"
-#~ msgstr "115"
-
-#~ msgid "12"
-#~ msgstr "12"
-
-#~ msgid "12 inches/sec."
-#~ msgstr "12 インチ/秒"
-
-#~ msgid "12 x 11"
-#~ msgstr "12 x 11 インチ"
-
-#~ msgid "120"
-#~ msgstr "120"
-
-#~ msgid "120 mm/sec."
-#~ msgstr "120 ミリメートル/秒"
-
-#~ msgid "120x60dpi"
-#~ msgstr "120x60dpi"
-
-#~ msgid "120x72dpi"
-#~ msgstr "120x72dpi"
-
-#~ msgid "13"
-#~ msgstr "13"
-
-#~ msgid "136dpi"
-#~ msgstr "136dpi"
-
-#~ msgid "14"
-#~ msgstr "14"
-
-#~ msgid "15"
-#~ msgstr "15"
-
-#~ msgid "15 mm/sec."
-#~ msgstr "15 ミリメートル/秒"
-
-#~ msgid "15 x 11"
-#~ msgstr "15 x 11 インチ"
-
-#~ msgid "150 mm/sec."
-#~ msgstr "150 ミリメートル/秒"
-
-#~ msgid "150dpi"
-#~ msgstr "150dpi"
-
-#~ msgid "16"
-#~ msgstr "16"
-
-#~ msgid "17"
-#~ msgstr "17"
-
-#~ msgid "18"
-#~ msgstr "18"
-
-#~ msgid "180dpi"
-#~ msgstr "180dpi"
-
-#~ msgid "19"
-#~ msgstr "19"
-
-#~ msgid "2"
-#~ msgstr "2"
-
-#~ msgid "2 inches/sec."
-#~ msgstr "2 インチ/秒"
-
-#~ msgid "2.00x0.37\""
-#~ msgstr "2.00x0.37 インチ"
-
-#~ msgid "2.00x0.50\""
-#~ msgstr "2.00x0.50 インチ"
-
-#~ msgid "2.00x1.00\""
-#~ msgstr "2.00x1.00 インチ"
-
-#~ msgid "2.00x1.25\""
-#~ msgstr "2.00x1.25 インチ"
-
-#~ msgid "2.00x2.00\""
-#~ msgstr "2.00x2.00 インチ"
-
-#~ msgid "2.00x3.00\""
-#~ msgstr "2.00x3.00 インチ"
-
-#~ msgid "2.00x4.00\""
-#~ msgstr "2.00x4.00 インチ"
-
-#~ msgid "2.00x5.50\""
-#~ msgstr "2.00x5.50 インチ"
-
-#~ msgid "2.25x0.50\""
-#~ msgstr "2.25x0.50 インチ"
-
-#~ msgid "2.25x1.25\""
-#~ msgstr "2.25x1.25 インチ"
-
-#~ msgid "2.25x4.00\""
-#~ msgstr "2.25x4.00 インチ"
-
-#~ msgid "2.25x5.50\""
-#~ msgstr "2.25x5.50 インチ"
-
-#~ msgid "2.38x5.50\""
-#~ msgstr "2.38x5.50 インチ"
-
-#~ msgid "2.5 inches/sec."
-#~ msgstr "2.5 インチ/秒"
-
-#~ msgid "2.50x1.00\""
-#~ msgstr "2.50x1.00 インチ"
-
-#~ msgid "2.50x2.00\""
-#~ msgstr "2.50x2.00 インチ"
-
-#~ msgid "2.75x1.25\""
-#~ msgstr "2.75x1.25 インチ"
-
-#~ msgid "2.9 x 1\""
-#~ msgstr "2.9 x 1 インチ"
-
-#~ msgid "20"
-#~ msgstr "20"
-
-#~ msgid "20 mm/sec."
-#~ msgstr "20 ミリメートル/秒"
-
-#~ msgid "200 mm/sec."
-#~ msgstr "200 ミリメートル/秒"
-
-#~ msgid "203dpi"
-#~ msgstr "203dpi"
-
-#~ msgid "21"
-#~ msgstr "21"
-
-#~ msgid "22"
-#~ msgstr "22"
-
-#~ msgid "23"
-#~ msgstr "23"
-
-#~ msgid "24"
-#~ msgstr "24"
-
-#~ msgid "24-Pin Series"
-#~ msgstr "24 ピンシリーズ"
-
-#~ msgid "240x72dpi"
-#~ msgstr "240x72dpi"
-
-#~ msgid "25"
-#~ msgstr "25"
-
-#~ msgid "250 mm/sec."
-#~ msgstr "250 ミリメートル/秒"
-
-#~ msgid "26"
-#~ msgstr "26"
-
-#~ msgid "27"
-#~ msgstr "27"
-
-#~ msgid "28"
-#~ msgstr "28"
-
-#~ msgid "29"
-#~ msgstr "29"
-
-#~ msgid "3"
-#~ msgstr "3"
-
-#~ msgid "3 inches/sec."
-#~ msgstr "3 インチ/秒"
-
-#~ msgid "3 x 5"
-#~ msgstr "3 x 5"
-
-#~ msgid "3.00x1.00\""
-#~ msgstr "3.00x1.00 インチ"
-
-#~ msgid "3.00x1.25\""
-#~ msgstr "3.00x1.25 インチ"
-
-#~ msgid "3.00x2.00\""
-#~ msgstr "3.00x2.00 インチ"
-
-#~ msgid "3.00x3.00\""
-#~ msgstr "3.00x3.00インチ"
-
-#~ msgid "3.00x5.00\""
-#~ msgstr "3.00x5.00 インチ"
-
-#~ msgid "3.25x2.00\""
-#~ msgstr "3.25x2.00 インチ"
-
-#~ msgid "3.25x5.00\""
-#~ msgstr "3.25x5.00 インチ"
-
-#~ msgid "3.25x5.50\""
-#~ msgstr "3.25x5.50 インチ"
-
-#~ msgid "3.25x5.83\""
-#~ msgstr "3.25x5.83 インチ"
-
-#~ msgid "3.25x7.83\""
-#~ msgstr "3.25x7.83 インチ"
-
-#~ msgid "3.5 x 5"
-#~ msgstr "3.5 x 5"
-
-#~ msgid "3.5\" Disk"
-#~ msgstr "3.5 インチディスク"
-
-#~ msgid "3.50x1.00\""
-#~ msgstr "3.50x1.00 インチ"
-
-#~ msgid "30"
-#~ msgstr "30"
-
-#~ msgid "30 mm/sec."
-#~ msgstr "30 ミリメートル/秒"
-
-#~ msgid "300 mm/sec."
-#~ msgstr "300 ミリメートル/秒"
-
-#~ msgid "300dpi"
-#~ msgstr "300dpi"
-
-#~ msgid "35"
-#~ msgstr "35"
-
-#~ msgid "360dpi"
-#~ msgstr "360dpi"
-
-#~ msgid "360x180dpi"
-#~ msgstr "360x180dpi"
-
-#~ msgid "4"
-#~ msgstr "4"
-
-#~ msgid "4 inches/sec."
-#~ msgstr "4 インチ/秒"
-
-#~ msgid "4.00x1.00\""
-#~ msgstr "4.00x1.00 インチ"
-
-#~ msgid "4.00x13.00\""
-#~ msgstr "4.00x13.00 インチ"
-
-#~ msgid "4.00x2.00\""
-#~ msgstr "4.00x2.00 インチ"
-
-#~ msgid "4.00x2.50\""
-#~ msgstr "4.00x2.50 インチ"
-
-#~ msgid "4.00x3.00\""
-#~ msgstr "4.00x3.00 インチ"
-
-#~ msgid "4.00x4.00\""
-#~ msgstr "4.00x4.00 インチ"
-
-#~ msgid "4.00x5.00\""
-#~ msgstr "4.00x5.00 インチ"
-
-#~ msgid "4.00x6.00\""
-#~ msgstr "4.00x6.00 インチ"
-
-#~ msgid "4.00x6.50\""
-#~ msgstr "4.00x6.50 インチ"
-
-#~ msgid "40"
-#~ msgstr "40"
-
-#~ msgid "40 mm/sec."
-#~ msgstr "40 ミリメートル/秒"
-
-#~ msgid "45"
-#~ msgstr "45"
-
-#~ msgid "5"
-#~ msgstr "5"
-
-#~ msgid "5 inches/sec."
-#~ msgstr "5 インチ/秒"
-
-#~ msgid "5 x 7"
-#~ msgstr "5 x 7 インチ"
-
-#~ msgid "50"
-#~ msgstr "50"
-
-#~ msgid "55"
-#~ msgstr "55"
-
-#~ msgid "6"
-#~ msgstr "6"
-
-#~ msgid "6 inches/sec."
-#~ msgstr "6 インチ/秒"
-
-#~ msgid "6.00x1.00\""
-#~ msgstr "6.00x1.00 インチ"
-
-#~ msgid "6.00x2.00\""
-#~ msgstr "6.00x2.00 インチ"
-
-#~ msgid "6.00x3.00\""
-#~ msgstr "6.00x3.00 インチ"
-
-#~ msgid "6.00x4.00\""
-#~ msgstr "6.00x4.00 インチ"
-
-#~ msgid "6.00x5.00\""
-#~ msgstr "6.00x5.00 インチ"
-
-#~ msgid "6.00x6.00\""
-#~ msgstr "6.00x6.00 インチ"
-
-#~ msgid "6.00x6.50\""
-#~ msgstr "6.00x6.50 インチ"
-
-#~ msgid "60"
-#~ msgstr "60"
-
-#~ msgid "60 mm/sec."
-#~ msgstr "60 ミリメートル/秒"
-
-#~ msgid "600dpi"
-#~ msgstr "600dpi"
-
-#~ msgid "60dpi"
-#~ msgstr "60dpi"
-
-#~ msgid "60x72dpi"
-#~ msgstr "60x72dpi"
-
-#~ msgid "65"
-#~ msgstr "65"
-
-#~ msgid "7"
-#~ msgstr "7"
-
-#~ msgid "7 inches/sec."
-#~ msgstr "7 インチ/秒"
-
-#~ msgid "7 x 9"
-#~ msgstr "7 x 9 インチ"
-
-#~ msgid "70"
-#~ msgstr "70"
-
 #~ msgid "720dpi"
 #~ msgstr "720dpi"
 
-#~ msgid "75"
-#~ msgstr "75"
-
-#~ msgid "8"
-#~ msgstr "8"
-
-#~ msgid "8 inches/sec."
-#~ msgstr "8 インチ/秒"
-
-#~ msgid "8 x 10"
-#~ msgstr "8 x 10 インチ"
-
-#~ msgid "8.00x1.00\""
-#~ msgstr "8.00x1.00 インチ"
-
-#~ msgid "8.00x2.00\""
-#~ msgstr "8.00x2.00 インチ"
-
-#~ msgid "8.00x3.00\""
-#~ msgstr "8.00x3.00 インチ"
-
-#~ msgid "8.00x4.00\""
-#~ msgstr "8.00x4.00 インチ"
-
-#~ msgid "8.00x5.00\""
-#~ msgstr "8.00x5.00 インチ"
-
-#~ msgid "8.00x6.00\""
-#~ msgstr "8.00x6.00 インチ"
-
-#~ msgid "8.00x6.50\""
-#~ msgstr "8.00x6.50 インチ"
-
-#~ msgid "80"
-#~ msgstr "80"
-
-#~ msgid "80 mm/sec."
-#~ msgstr "80 ミリメートル/秒"
-
-#~ msgid "85"
-#~ msgstr "85"
-
-#~ msgid "9"
-#~ msgstr "9"
-
-#~ msgid "9 inches/sec."
-#~ msgstr "9 インチ/秒"
-
-#~ msgid "9 x 11"
-#~ msgstr "9 x 11 インチ"
-
-#~ msgid "9 x 12"
-#~ msgstr "9 x 12 インチ"
-
-#~ msgid "9-Pin Series"
-#~ msgstr "9 ピンシリーズ"
-
-#~ msgid "90"
-#~ msgstr "90"
-
-#~ msgid "95"
-#~ msgstr "95"
-
-#~ msgid "A0"
-#~ msgstr "A0"
-
-#~ msgid "A0 Long Edge"
-#~ msgstr "A0 長辺送り"
-
-#~ msgid "A1"
-#~ msgstr "A1"
-
-#~ msgid "A1 Long Edge"
-#~ msgstr "A1 長辺送り"
-
-#~ msgid "A10"
-#~ msgstr "A10"
-
-#~ msgid "A2"
-#~ msgstr "A2"
-
-#~ msgid "A2 Long Edge"
-#~ msgstr "A2 長辺送り"
-
-#~ msgid "A3"
-#~ msgstr "A3"
-
-#~ msgid "A3 Long Edge"
-#~ msgstr "A3 長辺送り"
-
-#~ msgid "A3 Oversize"
-#~ msgstr "A3 (特大)"
-
-#~ msgid "A3 Oversize Long Edge"
-#~ msgstr "A3 (特大) 長辺送り"
-
-#~ msgid "A4"
-#~ msgstr "A4"
-
-#~ msgid "A4 Long Edge"
-#~ msgstr "A4 長辺送り"
-
-#~ msgid "A4 Oversize"
-#~ msgstr "A4 (特大)"
-
-#~ msgid "A4 Small"
-#~ msgstr "A4 (小)"
-
-#~ msgid "A5"
-#~ msgstr "A5"
-
-#~ msgid "A5 Long Edge"
-#~ msgstr "A5 長辺送り"
-
-#~ msgid "A5 Oversize"
-#~ msgstr "A5 (特大)"
-
-#~ msgid "A6"
-#~ msgstr "A6"
-
-#~ msgid "A6 Long Edge"
-#~ msgstr "A6 長辺送り"
-
-#~ msgid "A7"
-#~ msgstr "A7"
-
-#~ msgid "A8"
-#~ msgstr "A8"
-
-#~ msgid "A9"
-#~ msgstr "A9"
-
-#~ msgid "ANSI A"
-#~ msgstr "ANSI A"
-
-#~ msgid "ANSI B"
-#~ msgstr "ANSI B"
-
-#~ msgid "ANSI C"
-#~ msgstr "ANSI C"
-
-#~ msgid "ANSI D"
-#~ msgstr "ANSI D"
-
-#~ msgid "ANSI E"
-#~ msgstr "ANSI E"
-
-#~ msgid "ARCH C"
-#~ msgstr "ARCH C"
-
-#~ msgid "ARCH C Long Edge"
-#~ msgstr "ARCH C 長辺送り"
-
-#~ msgid "ARCH D"
-#~ msgstr "ARCH D"
-
-#~ msgid "ARCH D Long Edge"
-#~ msgstr "ARCH D 長辺送り"
-
-#~ msgid "ARCH E"
-#~ msgstr "ARCH E"
-
-#~ msgid "ARCH E Long Edge"
-#~ msgstr "ARCH E 長辺送り"
-
-#~ msgid "Address"
-#~ msgstr "アドレス"
-
-#~ msgid "Always"
-#~ msgstr "常に有効"
-
-#~ msgid "Applicator"
-#~ msgstr "アプリケーター"
-
-#~ msgid "B0"
-#~ msgstr "B0"
-
-#~ msgid "B1"
-#~ msgstr "B1"
-
-#~ msgid "B10"
-#~ msgstr "B10"
-
-#~ msgid "B2"
-#~ msgstr "B2"
-
-#~ msgid "B3"
-#~ msgstr "B3"
-
-#~ msgid "B4"
-#~ msgstr "B4"
-
-#~ msgid "B5"
-#~ msgstr "B5"
-
-#~ msgid "B5 Oversize"
-#~ msgstr "B5 (特大)"
-
-#~ msgid "B6"
-#~ msgstr "B6"
-
-#~ msgid "B7"
-#~ msgstr "B7"
-
-#~ msgid "B8"
-#~ msgstr "B8"
-
-#~ msgid "B9"
-#~ msgstr "B9"
-
 #~ msgid "Bad printer URI."
 #~ msgstr "不正なプリンター URI です。"
-
-#~ msgid "Bond Paper"
-#~ msgstr "ボンド紙"
-
-#~ msgid "CMYK"
-#~ msgstr "CMYK"
-
-#~ msgid "CPCL Label Printer"
-#~ msgstr "CPCL ラベルプリンター"
-
-#~ msgid "Cassette"
-#~ msgstr "カセット"
-
-#~ msgid "CustominCutInterval"
-#~ msgstr "CustominCutInterval"
-
-#~ msgid "CustominTearInterval"
-#~ msgstr "CustominTearInterval"
-
-#~ msgid "Cut"
-#~ msgstr "カット"
-
-#~ msgid "Cutter"
-#~ msgstr "カッター"
-
-#~ msgid "Dark"
-#~ msgstr "濃い"
-
-#~ msgid "Darkness"
-#~ msgstr "濃さ"
-
-#~ msgid "DeskJet Series"
-#~ msgstr "DeskJet シリーズ"
-
-#~ msgid "Direct Thermal Media"
-#~ msgstr "感熱紙"
-
-#~ msgid "Disabled"
-#~ msgstr "無効"
-
-#~ msgid "Duplexer"
-#~ msgstr "両面オプション"
-
-#~ msgid "Dymo"
-#~ msgstr "Dymo"
-
-#~ msgid "EPL1 Label Printer"
-#~ msgstr "EPL1 ラベルプリンター"
-
-#~ msgid "EPL2 Label Printer"
-#~ msgstr "EPL2 ラベルプリンター"
-
-#~ msgid "English"
-#~ msgstr "English"
 
 #~ msgid "Enter old password:"
 #~ msgstr "古いパスワードを入力:"
@@ -13061,341 +13556,17 @@ msgstr "Z Offset"
 #~ msgid "Envelope #10 "
 #~ msgstr "封筒 #10"
 
-#~ msgid "Envelope #11"
-#~ msgstr "封筒 #11"
-
-#~ msgid "Envelope #12"
-#~ msgstr "封筒 #12"
-
-#~ msgid "Envelope #14"
-#~ msgstr "封筒 #14"
-
-#~ msgid "Envelope #9"
-#~ msgstr "封筒 #9"
-
-#~ msgid "Envelope B4"
-#~ msgstr "封筒 B4"
-
-#~ msgid "Envelope B5"
-#~ msgstr "封筒 B5"
-
-#~ msgid "Envelope B6"
-#~ msgstr "封筒 B6"
-
-#~ msgid "Envelope C0"
-#~ msgstr "封筒 C0"
-
-#~ msgid "Envelope C1"
-#~ msgstr "封筒 C1"
-
-#~ msgid "Envelope C2"
-#~ msgstr "封筒 C2"
-
-#~ msgid "Envelope C3"
-#~ msgstr "封筒 C3"
-
-#~ msgid "Envelope C4"
-#~ msgstr "封筒 C4"
-
-#~ msgid "Envelope C5"
-#~ msgstr "封筒 C5"
-
-#~ msgid "Envelope C6"
-#~ msgstr "封筒 C6"
-
-#~ msgid "Envelope C65"
-#~ msgstr "封筒 C65"
-
-#~ msgid "Envelope C7"
-#~ msgstr "封筒 C7"
-
-#~ msgid "Envelope Choukei 3"
-#~ msgstr "封筒 長形3号"
-
-#~ msgid "Envelope Choukei 3 Long Edge"
-#~ msgstr "封筒 長形3号 長辺送り"
-
-#~ msgid "Envelope Choukei 4"
-#~ msgstr "封筒 長形4号"
-
-#~ msgid "Envelope Choukei 4 Long Edge"
-#~ msgstr "封筒 長形4号 長辺送り"
-
-#~ msgid "Envelope DL"
-#~ msgstr "封筒 DL"
-
-#~ msgid "Envelope Feed"
-#~ msgstr "封筒フィード"
-
-#~ msgid "Envelope Invite"
-#~ msgstr "招待状封筒"
-
-#~ msgid "Envelope Italian"
-#~ msgstr "イタリア封筒"
-
-#~ msgid "Envelope Kaku2"
-#~ msgstr "封筒 角2"
-
-#~ msgid "Envelope Kaku2 Long Edge"
-#~ msgstr "封筒 角2 長辺送り"
-
-#~ msgid "Envelope Kaku3"
-#~ msgstr "封筒 角3"
-
-#~ msgid "Envelope Kaku3 Long Edge"
-#~ msgstr "封筒 角3 長辺送り"
-
-#~ msgid "Envelope Monarch"
-#~ msgstr "封筒 Monarch"
-
 #~ msgid "Envelope PRC1 "
 #~ msgstr "封筒 PRC1"
 
-#~ msgid "Envelope PRC1 Long Edge"
-#~ msgstr "封筒 PRC1 長辺送り"
-
-#~ msgid "Envelope PRC10"
-#~ msgstr "封筒 PRC10"
-
-#~ msgid "Envelope PRC10 Long Edge"
-#~ msgstr "封筒 PRC10 長辺送り"
-
-#~ msgid "Envelope PRC2"
-#~ msgstr "封筒 PRC2"
-
-#~ msgid "Envelope PRC2 Long Edge"
-#~ msgstr "封筒 PRC2 長辺送り"
-
-#~ msgid "Envelope PRC3"
-#~ msgstr "封筒 PRC3"
-
-#~ msgid "Envelope PRC3 Long Edge"
-#~ msgstr "封筒 PRC3 長辺送り"
-
-#~ msgid "Envelope PRC4"
-#~ msgstr "封筒 PRC4"
-
-#~ msgid "Envelope PRC4 Long Edge"
-#~ msgstr "封筒 PRC4 長辺送り"
-
-#~ msgid "Envelope PRC5 Long Edge"
-#~ msgstr "封筒 PRC5 長辺送り"
-
-#~ msgid "Envelope PRC5PRC5"
-#~ msgstr "封筒 PRC5"
-
-#~ msgid "Envelope PRC6"
-#~ msgstr "封筒 PRC6"
-
-#~ msgid "Envelope PRC6 Long Edge"
-#~ msgstr "封筒 PRC6 長辺送り"
-
-#~ msgid "Envelope PRC7"
-#~ msgstr "封筒 PRC7"
-
-#~ msgid "Envelope PRC7 Long Edge"
-#~ msgstr "封筒 PRC7 長辺送り"
-
-#~ msgid "Envelope PRC8"
-#~ msgstr "封筒 PRC8"
-
-#~ msgid "Envelope PRC8 Long Edge"
-#~ msgstr "封筒 PRC8 長辺送り"
-
-#~ msgid "Envelope PRC9"
-#~ msgstr "封筒 PRC9"
-
-#~ msgid "Envelope PRC9 Long Edge"
-#~ msgstr "封筒 PRC9 長辺送り"
-
-#~ msgid "Envelope Personal"
-#~ msgstr "パーソナル封筒"
-
-#~ msgid "Envelope You4"
-#~ msgstr "封筒 洋形4号"
-
-#~ msgid "Envelope You4 Long Edge"
-#~ msgstr "封筒 洋形4号 長辺送り"
-
-#~ msgid "Epson"
-#~ msgstr "Epson"
-
-#~ msgid "Every 10 Labels"
-#~ msgstr "10 ラベルごと"
-
-#~ msgid "Every 2 Labels"
-#~ msgstr "2 ラベルごと"
-
-#~ msgid "Every 3 Labels"
-#~ msgstr "3 ラベルごと"
-
-#~ msgid "Every 4 Labels"
-#~ msgstr "4 ラベルごと"
-
-#~ msgid "Every 5 Labels"
-#~ msgstr "5 ラベルごと"
-
-#~ msgid "Every 6 Labels"
-#~ msgstr "6 ラベルごと"
-
-#~ msgid "Every 7 Labels"
-#~ msgstr "7 ラベルごと"
-
-#~ msgid "Every 8 Labels"
-#~ msgstr "8 ラベルごと"
-
-#~ msgid "Every 9 Labels"
-#~ msgstr "9 ラベルごと"
-
-#~ msgid "Every Label"
-#~ msgstr "すべてのラベル"
-
-#~ msgid "Executive"
-#~ msgstr "エグゼクティブ"
-
-#~ msgid "FanFold German"
-#~ msgstr "FanFold German"
-
-#~ msgid "FanFold Legal German"
-#~ msgstr "FanFold Legal German"
-
-#~ msgid "Fanfold US"
-#~ msgstr "Fanfold US"
-
 #~ msgid "File Folder "
 #~ msgstr "ファイルフォルダー"
-
-#~ msgid "Folio"
-#~ msgstr "フォリオ"
-
-#~ msgid "Generic"
-#~ msgstr "汎用"
-
-#~ msgid "Glossy Paper"
-#~ msgstr "光沢紙"
-
-#~ msgid "HP"
-#~ msgstr "HP"
-
-#~ msgid "Hanging Folder"
-#~ msgstr "Hanging Folder"
-
-#~ msgid "ISOLatin1"
-#~ msgstr "ISOLatin1"
-
-#~ msgid "Installable Options"
-#~ msgstr "インストール可能オプション"
-
-#~ msgid "Installed"
-#~ msgstr "インストールされています"
-
-#~ msgid "IntelliBar Label Printer"
-#~ msgstr "IntelliBar ラベルプリンター"
-
-#~ msgid "Intellitech"
-#~ msgstr "Intellitech"
-
-#~ msgid "Internet Postage 2-Part"
-#~ msgstr "Internet Postage 2-Part"
-
-#~ msgid "Internet Postage 3-Part"
-#~ msgstr "Internet Postage 3-Part"
-
-#~ msgid "JIS B0"
-#~ msgstr "JIS B0"
-
-#~ msgid "JIS B1"
-#~ msgstr "JIS B1"
-
-#~ msgid "JIS B10"
-#~ msgstr "JIS B10"
-
-#~ msgid "JIS B2"
-#~ msgstr "JIS B2"
-
-#~ msgid "JIS B3"
-#~ msgstr "JIS B3"
-
-#~ msgid "JIS B4"
-#~ msgstr "JIS B4"
-
-#~ msgid "JIS B4 Long Edge"
-#~ msgstr "JIS B4 長辺送り"
-
-#~ msgid "JIS B5"
-#~ msgstr "JIS B5"
-
-#~ msgid "JIS B5 Long Edge"
-#~ msgstr "JIS B5 長辺送り"
-
-#~ msgid "JIS B6"
-#~ msgstr "JIS B6"
-
-#~ msgid "JIS B6 Long Edge"
-#~ msgstr "JIS B6 長辺送り"
-
-#~ msgid "JIS B7"
-#~ msgstr "JIS B7"
-
-#~ msgid "JIS B8"
-#~ msgstr "JIS B8"
-
-#~ msgid "JIS B9"
-#~ msgstr "JIS B9"
-
-#~ msgid "Label Printer"
-#~ msgstr "ラベルプリンター"
-
-#~ msgid "Label Top"
-#~ msgstr "ラベルトップ"
-
-#~ msgid "Large Address"
-#~ msgstr "ラージアドレス"
-
-#~ msgid "LaserJet Series PCL 4/5"
-#~ msgstr "LaserJet Series PCL 4/5"
-
-#~ msgid "Letter Oversize"
-#~ msgstr "US レター (特大)"
-
-#~ msgid "Letter Oversize Long Edge"
-#~ msgstr "US レター (特大) 長辺送り"
-
-#~ msgid "Light"
-#~ msgstr "薄い"
-
-#~ msgid "Manual Feed"
-#~ msgstr "手差し"
-
-#~ msgid "Media Tracking"
-#~ msgstr "用紙の経路"
-
-#~ msgid "Medium"
-#~ msgstr "紙質"
-
-#~ msgid "Never"
-#~ msgstr "Never"
 
 #~ msgid "New Stylus Color Series"
 #~ msgstr "New Stylus Color シリーズ"
 
 #~ msgid "New Stylus Photo Series"
 #~ msgstr "New Stylus Photo シリーズ"
-
-#~ msgid "Non-continuous (Mark sensing)"
-#~ msgstr "非連続です (Mark sensing)"
-
-#~ msgid "Non-continuous (Web sensing)"
-#~ msgstr "非連続です (Web sensing)"
-
-#~ msgid "Not Installed"
-#~ msgstr "インストールされていません"
-
-#~ msgid "Note"
-#~ msgstr "注意"
-
-#~ msgid "Oki"
-#~ msgstr "Oki"
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "プリンター %s の出力は %s に送られます"
@@ -13410,71 +13581,8 @@ msgstr "Z Offset"
 #~ msgstr ""
 #~ "プリンター %s/%s の出力は、リモートプリンター %s (%s 上) に送られます"
 
-#~ msgid "PCL Laser Printer"
-#~ msgstr "PCL レーザープリンター"
-
-#~ msgid "PRC16K"
-#~ msgstr "PRC16K"
-
-#~ msgid "PRC16K Long Edge"
-#~ msgstr "PRC16K 長辺送り"
-
-#~ msgid "PRC32K"
-#~ msgstr "PRC32K"
-
-#~ msgid "PRC32K Long Edge"
-#~ msgstr "PRC32K 長辺送り"
-
-#~ msgid "PRC32K Oversize"
-#~ msgstr "PRC32K (特大)"
-
-#~ msgid "PRC32K Oversize Long Edge"
-#~ msgstr "PRC32K (特大) 長辺送り"
-
-#~ msgid "ParamCustominCutInterval"
-#~ msgstr "ParamCustominCutInterval"
-
-#~ msgid "ParamCustominTearInterval"
-#~ msgstr "ParamCustominTearInterval"
-
-#~ msgid "Peel-Off"
-#~ msgstr "Peel-Off"
-
-#~ msgid "Photo Labels"
-#~ msgstr "写真ラベル"
-
-#~ msgid "PostScript Printer"
-#~ msgstr "PostScript プリンター"
-
-#~ msgid "Postcard"
-#~ msgstr "ハガキ"
-
 #~ msgid "Postcard Double "
 #~ msgstr "往復ハガキ"
-
-#~ msgid "Postcard Double Long Edge"
-#~ msgstr "往復ハガキ 長辺送り"
-
-#~ msgid "Postcard Long Edge"
-#~ msgstr "ハガキ 長辺送り"
-
-#~ msgid "Print Density"
-#~ msgstr "印刷密度"
-
-#~ msgid "Print Mode"
-#~ msgstr "印刷モード"
-
-#~ msgid "Print Rate"
-#~ msgstr "印刷レート"
-
-#~ msgid "Print Speed"
-#~ msgstr "印刷速度"
-
-#~ msgid "Print and Cut"
-#~ msgstr "プリントしてカット"
-
-#~ msgid "Print and Tear"
-#~ msgstr "プリントして切り取る"
 
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "プリントファイルを受け付けました - ジョブ ID %d。"
@@ -13485,79 +13593,22 @@ msgstr "Z Offset"
 #~ msgid "Print file was not accepted."
 #~ msgstr "プリントファイルが受け付けられませんでした。"
 
-#~ msgid "Printer Default"
-#~ msgstr "デフォルトのプリンター"
-
-#~ msgid "Printer Settings"
-#~ msgstr "プリンター設定"
-
 #~ msgid "Printing page %d, %d%% complete."
 #~ msgstr "ページ %d を印刷中、%d%% 完了しました。"
 
 #~ msgid "Purge Jobs"
 #~ msgstr "ジョブの削除"
 
-#~ msgid "Quarto"
-#~ msgstr "Quarto"
-
 #~ msgid ""
 #~ "Rank   Owner      Pri  Job        Files                       Total Size"
 #~ msgstr ""
 #~ "ランク 所有者     優先 ジョブ     ファイル                    合計サイズ"
-
-#~ msgid "Reprint After Error"
-#~ msgstr "エラー後の再印刷"
-
-#~ msgid "Return Address"
-#~ msgstr "返信用ラベル"
-
-#~ msgid "Rewind"
-#~ msgstr "巻き取り"
-
-#~ msgid "Shipping Address"
-#~ msgstr "発送先ラベル"
-
-#~ msgid "Special Paper"
-#~ msgstr "特殊紙"
-
-#~ msgid "Standard"
-#~ msgstr "標準"
-
-#~ msgid "Statement"
-#~ msgstr "記述"
 
 #~ msgid "Stylus Color Series"
 #~ msgstr "Stylus Color シリーズ"
 
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Stylus Photo シリーズ"
-
-#~ msgid "Super A"
-#~ msgstr "スーパー A"
-
-#~ msgid "Super B"
-#~ msgstr "スーパー B"
-
-#~ msgid "Super B/A3"
-#~ msgstr "スーパー B/A3"
-
-#~ msgid "Tabloid"
-#~ msgstr "タブロイド"
-
-#~ msgid "Tabloid Oversize"
-#~ msgstr "タブロイド (特大)"
-
-#~ msgid "Tabloid Oversize Long Edge"
-#~ msgstr "タブロイド (特大) 長辺送り"
-
-#~ msgid "Tear"
-#~ msgstr "Tear"
-
-#~ msgid "Tear-Off"
-#~ msgstr "Tear-Off"
-
-#~ msgid "Tear-Off Adjust Position"
-#~ msgstr "Tear-Off 位置調節"
 
 #~ msgid ""
 #~ "The '%s' Job Description attribute cannot be supplied in a job creation "
@@ -13599,36 +13650,6 @@ msgstr "Z Offset"
 
 #~ msgid "There is a paper jam."
 #~ msgstr "用紙づまりが発生しています。"
-
-#~ msgid "Thermal Transfer Media"
-#~ msgstr "熱転写メディア"
-
-#~ msgid "Tray"
-#~ msgstr "トレイ"
-
-#~ msgid "US Ledger"
-#~ msgstr "US レジャー"
-
-#~ msgid "US Legal"
-#~ msgstr "US リーガル"
-
-#~ msgid "US Legal Oversize"
-#~ msgstr "US リーガル (特大)"
-
-#~ msgid "US Letter"
-#~ msgstr "US レター"
-
-#~ msgid "US Letter Long Edge"
-#~ msgstr "US レター 長辺送り"
-
-#~ msgid "US Letter Oversize"
-#~ msgstr "US レター (特大)"
-
-#~ msgid "US Letter Oversize Long Edge"
-#~ msgstr "US レター (特大) 長辺送り"
-
-#~ msgid "US Letter Small"
-#~ msgstr "US レター (小)"
 
 #~ msgid "Unable to copy interface script - %s"
 #~ msgstr "インターフェイススクリプトをコピーできません - %s"
@@ -13677,12 +13698,6 @@ msgstr "Z Offset"
 #~ msgstr ""
 #~ "パスワードは少なくとも 6 文字以上で、あなたのユーザー名を含んではならず、"
 #~ "少なくとも 1 つの英字および数値を含んでなければなりません。"
-
-#~ msgid "ZPL Label Printer"
-#~ msgstr "ZPL ラベルプリンター"
-
-#~ msgid "Zebra"
-#~ msgstr "ゼブラ"
 
 #~ msgid "compression"
 #~ msgstr "Compression"
