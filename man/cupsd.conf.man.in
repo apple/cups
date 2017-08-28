@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "26 June 2017" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "28 August 2017" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -76,21 +76,6 @@ The default is "No".
 \fBBrowsing No\fR
 .br
 Specifies whether shared printers are advertised.
-The default is "No".
-.\"#Classification
-.TP 5
-\fBClassification \fIbanner\fR
-.br
-Specifies the security classification of the server.
-Any valid banner name can be used, including "classified", "confidential", "secret", "topsecret", and "unclassified", or the banner can be omitted to disable secure printing functions.
-The default is no classification banner.
-.\"#ClassifyOverride
-.TP 5
-\fBClassifyOverride Yes\fR
-.TP 5
-\fBClassifyOverride No\fR
-.br
-Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
 The default is "No".
 .\"#DefaultAuthType
 .TP 5
@@ -357,26 +342,6 @@ The default is "1048576" (1MB).
 \fBMultipleOperationTimeout \fIseconds\fR
 Specifies the maximum amount of time to allow between files in a multiple file print job.
 The default is "300" (5 minutes).
-.\"#PageLogFormat
-.TP 5
-\fBPageLogFormat \fIformat-string\fR
-Specifies the format of PageLog lines.
-Sequences beginning with percent (%) characters are replaced with the corresponding information, while all other characters are copied literally.
-The following percent sequences are recognized:
-.nf
-
-    "%%" inserts a single percent character.
-    "%{name}" inserts the value of the specified IPP attribute.
-    "%C" inserts the number of copies for the current page.
-    "%P" inserts the current page number.
-    "%T" inserts the current date and time in common log format.
-    "%j" inserts the job ID.
-    "%p" inserts the printer name.
-    "%u" inserts the username.
-
-.fi
-The default is the empty string, which disables page logging.
-The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
 .\"#PassEnv
 .TP 5
 \fBPassEnv \fIvariable \fR[ ... \fIvariable \fR]
@@ -415,11 +380,6 @@ The default is "Yes".
 \fBReloadTimeout \fIseconds\fR
 Specifies the amount of time to wait for job completion before restarting the scheduler.
 The default is "30".
-.\"#RIPCache
-.TP 5
-\fBRIPCache \fIsize\fR
-Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
-The default is "128m".
 .\"#ServerAdmin
 .TP 5
 \fBServerAdmin \fIemail-address\fR
@@ -848,6 +808,48 @@ file.
 \fBSubscriptionPrivateValues \fIattribute-name \fR[ ... \fIattribute-name \fR]
 Specifies the list of subscription values to make private.
 The "default" values are "notify-events", "notify-pull-method", "notify-recipient-uri", "notify-subscriber-user-name", and "notify-user-data".
+.SS DEPRECATED DIRECTIVES
+The following directives are deprecated and will be removed in a future release of CUPS:
+.\"#Classification
+.TP 5
+\fBClassification \fIbanner\fR
+.br
+Specifies the security classification of the server.
+Any valid banner name can be used, including "classified", "confidential", "secret", "topsecret", and "unclassified", or the banner can be omitted to disable secure printing functions.
+The default is no classification banner.
+.\"#ClassifyOverride
+.TP 5
+\fBClassifyOverride Yes\fR
+.TP 5
+\fBClassifyOverride No\fR
+.br
+Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
+The default is "No".
+.\"#PageLogFormat
+.TP 5
+\fBPageLogFormat \fIformat-string\fR
+Specifies the format of PageLog lines.
+Sequences beginning with percent (%) characters are replaced with the corresponding information, while all other characters are copied literally.
+The following percent sequences are recognized:
+.nf
+
+    "%%" inserts a single percent character.
+    "%{name}" inserts the value of the specified IPP attribute.
+    "%C" inserts the number of copies for the current page.
+    "%P" inserts the current page number.
+    "%T" inserts the current date and time in common log format.
+    "%j" inserts the job ID.
+    "%p" inserts the printer name.
+    "%u" inserts the username.
+
+.fi
+The default is the empty string, which disables page logging.
+The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
+.\"#RIPCache
+.TP 5
+\fBRIPCache \fIsize\fR
+Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
+The default is "128m".
 .SH CONFORMING TO
 The \fBcupsd.conf\fR file format is based on the Apache HTTP Server configuration file format.
 .SH EXAMPLES

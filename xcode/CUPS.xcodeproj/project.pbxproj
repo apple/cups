@@ -3207,6 +3207,9 @@
 		2732E092137A3F5200FAFEF6 /* lpstat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpstat.c; path = ../systemv/lpstat.c; sourceTree = "<group>"; };
 		273BF6BD1333B5000022CAAB /* testcups */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testcups; sourceTree = BUILT_PRODUCTS_DIR; };
 		273BF6C61333B5370022CAAB /* testcups.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testcups.c; path = ../cups/testcups.c; sourceTree = "<group>"; };
+		274561471F545B2E000378E4 /* cupspm.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = cupspm.md; path = ../cups/cupspm.md; sourceTree = "<group>"; };
+		274561481F545B2E000378E4 /* api-admin.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-admin.header"; path = "../cups/api-admin.header"; sourceTree = "<group>"; };
+		274561491F545B2E000378E4 /* api-admin.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-admin.shtml"; path = "../cups/api-admin.shtml"; sourceTree = "<group>"; };
 		274FF5CC13332B1F00317ECB /* cups-driverd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cups-driverd"; sourceTree = BUILT_PRODUCTS_DIR; };
 		274FF5D613332CC700317ECB /* cups-driverd.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cups-driverd.cxx"; path = "../scheduler/cups-driverd.cxx"; sourceTree = "<group>"; };
 		274FF5D713332CC700317ECB /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../scheduler/util.c; sourceTree = "<group>"; };
@@ -3545,16 +3548,8 @@
 		72E65BB718DC79CC00097E89 /* Makedefs.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = Makedefs.in; path = ../Makedefs.in; sourceTree = "<group>"; };
 		72E65BB918DC7A3600097E89 /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = doc; path = ../doc; sourceTree = "<group>"; };
 		72E65BBA18DC7A3600097E89 /* man */ = {isa = PBXFileReference; lastKnownFileType = folder; name = man; path = ../man; sourceTree = "<group>"; };
-		72E65BBB18DC7A6B00097E89 /* api-array.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-array.header"; path = "../cups/api-array.header"; sourceTree = "<group>"; };
-		72E65BBC18DC7A6B00097E89 /* api-array.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-array.shtml"; path = "../cups/api-array.shtml"; sourceTree = "<group>"; };
-		72E65BBD18DC7A6B00097E89 /* api-cups.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-cups.header"; path = "../cups/api-cups.header"; sourceTree = "<group>"; };
-		72E65BBE18DC7A6B00097E89 /* api-cups.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-cups.shtml"; path = "../cups/api-cups.shtml"; sourceTree = "<group>"; };
-		72E65BBF18DC7A6B00097E89 /* api-filedir.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-filedir.header"; path = "../cups/api-filedir.header"; sourceTree = "<group>"; };
-		72E65BC018DC7A6B00097E89 /* api-filedir.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-filedir.shtml"; path = "../cups/api-filedir.shtml"; sourceTree = "<group>"; };
 		72E65BC118DC7A6B00097E89 /* api-filter.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-filter.header"; path = "../cups/api-filter.header"; sourceTree = "<group>"; };
 		72E65BC218DC7A6B00097E89 /* api-filter.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-filter.shtml"; path = "../cups/api-filter.shtml"; sourceTree = "<group>"; };
-		72E65BC318DC7A6B00097E89 /* api-httpipp.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-httpipp.header"; path = "../cups/api-httpipp.header"; sourceTree = "<group>"; };
-		72E65BC418DC7A6B00097E89 /* api-httpipp.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-httpipp.shtml"; path = "../cups/api-httpipp.shtml"; sourceTree = "<group>"; };
 		72E65BC518DC7A6B00097E89 /* api-overview.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-overview.header"; path = "../cups/api-overview.header"; sourceTree = "<group>"; };
 		72E65BC618DC7A6B00097E89 /* api-overview.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-overview.shtml"; path = "../cups/api-overview.shtml"; sourceTree = "<group>"; };
 		72E65BC718DC7A6B00097E89 /* api-ppd.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-ppd.header"; path = "../cups/api-ppd.header"; sourceTree = "<group>"; };
@@ -5216,16 +5211,10 @@
 		72E65BB818DC79F800097E89 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
-				72E65BBB18DC7A6B00097E89 /* api-array.header */,
-				72E65BBC18DC7A6B00097E89 /* api-array.shtml */,
-				72E65BBD18DC7A6B00097E89 /* api-cups.header */,
-				72E65BBE18DC7A6B00097E89 /* api-cups.shtml */,
-				72E65BBF18DC7A6B00097E89 /* api-filedir.header */,
-				72E65BC018DC7A6B00097E89 /* api-filedir.shtml */,
+				274561481F545B2E000378E4 /* api-admin.header */,
+				274561491F545B2E000378E4 /* api-admin.shtml */,
 				72E65BC118DC7A6B00097E89 /* api-filter.header */,
 				72E65BC218DC7A6B00097E89 /* api-filter.shtml */,
-				72E65BC318DC7A6B00097E89 /* api-httpipp.header */,
-				72E65BC418DC7A6B00097E89 /* api-httpipp.shtml */,
 				72E65BC518DC7A6B00097E89 /* api-overview.header */,
 				72E65BC618DC7A6B00097E89 /* api-overview.shtml */,
 				72E65BC718DC7A6B00097E89 /* api-ppd.header */,
@@ -5236,6 +5225,7 @@
 				729D4B561A2CB48700692B21 /* CHANGES-2.0.txt */,
 				72E65BDE18DCA35700097E89 /* CHANGES.md */,
 				72E65BDF18DCA35700097E89 /* CREDITS.md */,
+				274561471F545B2E000378E4 /* cupspm.md */,
 				72E65BB918DC7A3600097E89 /* doc */,
 				72E65BE018DCA35700097E89 /* INSTALL.md */,
 				72E65BE218DCA35700097E89 /* LICENSE.txt */,

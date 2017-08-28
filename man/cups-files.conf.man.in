@@ -1,7 +1,7 @@
 .\"
 .\" cups-files.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2016 by Apple Inc.
+.\" Copyright 2007-2017 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "19 September 2016" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "28 August 2017" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -45,6 +45,11 @@ The server name may be included in filenames using the string "%s", for example:
 
 .fi
 The default is "/var/log/cups/access_log".
+.\"#CacheDir
+.TP 5
+\fBCacheDir \fIdirectory\fR
+Specifies the directory to use for long-lived temporary (cache) files.
+The default is "/var/spool/cups/cache" or "/var/cache/cups" depending on the platform.
 .\"#ConfigFilePerm
 .TP 5
 \fBConfigFilePerm \fImode\fR
@@ -193,6 +198,11 @@ macOS uses its keychain database to store certificates and keys while other plat
 \fBServerRoot \fIdirectory\fR
 Specifies the directory containing the server configuration files.
 The default is "/etc/cups".
+.\"#StateDir
+.TP 5
+\fBStateDir \fIdirectory\fR
+Specifies the directory to use for PID and local certificate files.
+The default is "/var/run/cups" or "/etc/cups" depending on the platform.
 .\"#SyncOnClose
 .TP 5
 \fBSyncOnClose Yes\fR
@@ -210,13 +220,46 @@ The default contains "admin", "lpadmin", "root", "sys", and/or "system".
 .\"#TempDir
 .TP 5
 \fBTempDir \fIdirectory\fR
-Specifies the directory where temporary files are stored.
+Specifies the directory where short-term temporary files are stored.
 The default is "/var/spool/cups/tmp".
 .\"#User
 .TP 5
 \fBUser \fIusername\fR
 Specifies the user name or ID that is used when running external programs.
 The default is "lp".
+.SS DEPRECATED DIRECTIVES
+The following directives are deprecated and will be removed from a future version of CUPS:
+.\"#FontPath
+.TP 5
+\fBFontPath \fIdirectory[:...:directoryN]\fR
+Specifies a colon separated list of directories where fonts can be found.
+On Linux the
+.BR font-config (1)
+mechanism is used instead.
+On macOS the Font Book application manages system-installed fonts.
+.\"#LPDConfigFile
+.TP 5
+\fB LPDConfigFile \fIfilename\fR
+Specifies the LPD service configuration file to update.
+.\"#Printcap
+.TP 5
+\fBPrintcap \fIfilename\fR
+Specifies a file that is filled with a list of local print queues.
+.\"#PrintcapFormat
+.TP 5
+\fBPrintcapFormat bsd\fR
+.TP 5
+\fBPrintcapFormat plist\fR
+.TP 5
+\fBPrintcapFormat solaris\fR
+Specifies the format to use for the Printcap file.
+"bsd" is the historical LPD printcap file format.
+"plist" is the Apple plist file format.
+"solaris" is the historical Solaris LPD printcap file format.
+.\"#SMBConfigFile
+.TP 5
+\fBSMBConfigFile \fIfilename\fR
+Specifies the SMB service configuration file to update.
 .SH SEE ALSO
 .BR classes.conf (5),
 .BR cups (1),

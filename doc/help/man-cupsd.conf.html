@@ -56,16 +56,6 @@ The default is "No".
 <dd style="margin-left: 5.0em"><br>
 Specifies whether shared printers are advertised.
 The default is "No".
-<dt><a name="Classification"></a><b>Classification </b><i>banner</i>
-<dd style="margin-left: 5.0em"><br>
-Specifies the security classification of the server.
-Any valid banner name can be used, including "classified", "confidential", "secret", "topsecret", and "unclassified", or the banner can be omitted to disable secure printing functions.
-The default is no classification banner.
-<dt><a name="ClassifyOverride"></a><b>ClassifyOverride Yes</b>
-<dd style="margin-left: 5.0em"><dt><b>ClassifyOverride No</b>
-<dd style="margin-left: 5.0em"><br>
-Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
-The default is "No".
 <dt><a name="DefaultAuthType"></a><b>DefaultAuthType Basic</b>
 <dd style="margin-left: 5.0em"><dt><b>DefaultAuthType Negotiate</b>
 <dd style="margin-left: 5.0em"><br>
@@ -230,24 +220,6 @@ The default is "1048576" (1MB).
 <dt><a name="MultipleOperationTimeout"></a><b>MultipleOperationTimeout </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the maximum amount of time to allow between files in a multiple file print job.
 The default is "300" (5 minutes).
-<dt><a name="PageLogFormat"></a><b>PageLogFormat </b><i>format-string</i>
-<dd style="margin-left: 5.0em">Specifies the format of PageLog lines.
-Sequences beginning with percent (%) characters are replaced with the corresponding information, while all other characters are copied literally.
-The following percent sequences are recognized:
-<pre class="man">
-
-    "%%" inserts a single percent character.
-    "%{name}" inserts the value of the specified IPP attribute.
-    "%C" inserts the number of copies for the current page.
-    "%P" inserts the current page number.
-    "%T" inserts the current date and time in common log format.
-    "%j" inserts the job ID.
-    "%p" inserts the printer name.
-    "%u" inserts the username.
-
-</pre>
-The default is the empty string, which disables page logging.
-The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
 <dt><a name="PassEnv"></a><b>PassEnv </b><i>variable </i>[ ... <i>variable </i>]
 <dd style="margin-left: 5.0em">Passes the specified environment variable(s) to child processes.
 <dt><a name="Policy"></a><b>&lt;Policy </b><i>name</i><b>> </b>... <b>&lt;/Policy></b>
@@ -270,9 +242,6 @@ The default is "Yes".
 <dt><a name="ReloadTimeout"></a><b>ReloadTimeout </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the amount of time to wait for job completion before restarting the scheduler.
 The default is "30".
-<dt><a name="RIPCache"></a><b>RIPCache </b><i>size</i>
-<dd style="margin-left: 5.0em">Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
-The default is "128m".
 <dt><a name="ServerAdmin"></a><b>ServerAdmin </b><i>email-address</i>
 <dd style="margin-left: 5.0em">Specifies the email address of the server administrator.
 The default value is "root@ServerName".
@@ -566,6 +535,41 @@ file.
 <dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateValues </b><i>attribute-name </i>[ ... <i>attribute-name </i>]
 <dd style="margin-left: 5.0em">Specifies the list of subscription values to make private.
 The "default" values are "notify-events", "notify-pull-method", "notify-recipient-uri", "notify-subscriber-user-name", and "notify-user-data".
+</dl>
+<h3><a name="DEPRECATED_DIRECTIVES">Deprecated Directives</a></h3>
+The following directives are deprecated and will be removed in a future release of CUPS:
+<dl class="man">
+<dt><a name="Classification"></a><b>Classification </b><i>banner</i>
+<dd style="margin-left: 5.0em"><br>
+Specifies the security classification of the server.
+Any valid banner name can be used, including "classified", "confidential", "secret", "topsecret", and "unclassified", or the banner can be omitted to disable secure printing functions.
+The default is no classification banner.
+<dt><a name="ClassifyOverride"></a><b>ClassifyOverride Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>ClassifyOverride No</b>
+<dd style="margin-left: 5.0em"><br>
+Specifies whether users may override the classification (cover page) of individual print jobs using the "job-sheets" option.
+The default is "No".
+<dt><a name="PageLogFormat"></a><b>PageLogFormat </b><i>format-string</i>
+<dd style="margin-left: 5.0em">Specifies the format of PageLog lines.
+Sequences beginning with percent (%) characters are replaced with the corresponding information, while all other characters are copied literally.
+The following percent sequences are recognized:
+<pre class="man">
+
+    "%%" inserts a single percent character.
+    "%{name}" inserts the value of the specified IPP attribute.
+    "%C" inserts the number of copies for the current page.
+    "%P" inserts the current page number.
+    "%T" inserts the current date and time in common log format.
+    "%j" inserts the job ID.
+    "%p" inserts the printer name.
+    "%u" inserts the username.
+
+</pre>
+The default is the empty string, which disables page logging.
+The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
+<dt><a name="RIPCache"></a><b>RIPCache </b><i>size</i>
+<dd style="margin-left: 5.0em">Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
+The default is "128m".
 </dl>
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 The <b>cupsd.conf</b> file format is based on the Apache HTTP Server configuration file format.
