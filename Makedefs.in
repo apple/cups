@@ -36,6 +36,7 @@ LD_CC		=	@LD_CC@
 LD_CXX		=	@LD_CXX@
 LIBTOOL		=	@LIBTOOL@
 LN		=	@LN@ -sf
+MKDIR           =       @MKDIR@ -p
 MV		=	@MV@
 RANLIB		=	@RANLIB@
 RM		=	@RM@ -f

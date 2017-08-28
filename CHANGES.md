@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-08-27
+CHANGES - 2.2.5 - 2017-08-28
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -31,6 +31,7 @@ CHANGES IN CUPS V2.2.5
 - Fixed an Avahi-related crash bug in the scheduler (Issue #5085, Issue #5086)
 - The IPP Everywhere PPD generator now sorts the supported resolutions before
   choosing them for draft, normal, and best quality modes (Issue #5091)
+- Fixed the localization unit test on Linux (Issue #5097)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
 - The IPP backend now always sends the "finishings" attribute for printers that
   support it because otherwise the client cannot override printer defaults
