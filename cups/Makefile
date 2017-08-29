@@ -412,6 +412,16 @@ testcache:	testcache.o $(LIBCUPSSTATIC)
 
 
 #
+# testclient (dependency on static CUPS library is intentional)
+#
+
+testclient:	testclient.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(LD_CC) $(LDFLAGS) -o $@ testclient.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
 # testconflicts (dependency on static CUPS library is intentional)
 #
 
