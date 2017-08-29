@@ -50,8 +50,9 @@ typedef struct _client_monitor_s
  * Local functions...
  */
 
-static const char       *make_raster_file(ipp_t *response, char *tempname, size_t tempsize, const char **format);
+static const char       *make_raster_file(ipp_t *response, int grayscale, char *tempname, size_t tempsize, const char **format);
 static void	        *monitor_printer(_client_monitor_t *monitor);
+static void             show_attributes(const char *title, int request, ipp_t *ipp);
 static void             show_capabilities(ipp_t *response);
 static void             usage(void);
 
@@ -71,6 +72,8 @@ main(int  argc,				/* I - Number of command-line arguments */
                                         /* Print file */
                         *printformat = NULL;
                                         /* Print format */
+  int                   keepfile = 0,   /* Keep temp file? */
+                        grayscale = 0;  /* Force grayscale? */
   char                  tempfile[1024] = "",
                                         /* Temporary file (if any) */
                         scheme[32],     /* URI scheme */
@@ -123,6 +126,14 @@ main(int  argc,				/* I - Number of command-line arguments */
               }
 
               printfile = argv[i];
+              break;
+
+          case 'g' :
+              grayscale = 1;
+              break;
+
+          case 'k' :
+              keepfile = 1;
               break;
 
           default :
@@ -234,7 +245,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * No file specified, make something to test with...
     */
 
-    if ((printfile = make_raster_file(response, tempfile, sizeof(tempfile), &printformat)) == NULL)
+    if ((printfile = make_raster_file(response, grayscale, tempfile, sizeof(tempfile), &printformat)) == NULL)
       return (1);
   }
 
@@ -269,7 +280,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, opt);
 
+  show_attributes("Create-Job request", 1, request);
+
   response = cupsDoRequest(http, request, resource);
+
+  show_attributes("Create-Job response", 0, response);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -291,6 +306,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   monitor.job_id = ippGetInteger(attr, 0);
 
+  printf("CREATED JOB %d, sending %s of type %s\n", monitor.job_id, printfile, printformat);
+
   ippDelete(response);
 
   request = ippNewRequest(IPP_OP_SEND_DOCUMENT);
@@ -300,7 +317,11 @@ main(int  argc,				/* I - Number of command-line arguments */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, printformat);
   ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
 
+  show_attributes("Send-Document request", 1, request);
+
   response = cupsDoFileRequest(http, request, resource, printfile);
+
+  show_attributes("Send-Document response", 0, response);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -310,6 +331,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     goto cleanup;
   }
+
+  puts("WAITING FOR JOB TO COMPLETE");
 
   while (monitor.job_state < IPP_JSTATE_CANCELED)
     sleep(1);
@@ -322,7 +345,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   httpClose(http);
 
-  if (tempfile[0])
+  if (tempfile[0] && !keepfile)
     unlink(tempfile);
 
   return (monitor.job_state == IPP_JSTATE_COMPLETED);
@@ -335,6 +358,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 static const char *                     /* O - Print filename */
 make_raster_file(ipp_t      *response,  /* I - Printer attributes */
+                 int        grayscale,  /* I - Force grayscale? */
                  char       *tempname,  /* I - Temporary filename buffer */
                  size_t     tempsize,   /* I - Size of temp file buffer */
                  const char **format)   /* O - Print format */
@@ -467,11 +491,11 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
     {
       const char *val = ippGetString(attr, i, NULL);
 
-      if (val[0] == 'R')
-        xdpi = ydpi = atoi(val + 1);
-      else if (!strcmp(val, "W8") && !type)
+      if (!strncmp(val, "RS", 2))
+        xdpi = ydpi = atoi(val + 2);
+      else if (!strncmp(val, "W8", 2) && !type)
         type = "sgray_8";
-      else if (!strcmp(val, "SRGB24"))
+      else if (!strncmp(val, "SRGB24", 6) && !grayscale)
         type = "srgb_8";
     }
   }
@@ -493,7 +517,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
 
     if ((attr = ippFindAttribute(response, "pwg-raster-document-type-supported", IPP_TAG_KEYWORD)) != NULL)
     {
-      if (ippContainsString(attr, "srgb_8"))
+      if (!grayscale && ippContainsString(attr, "srgb_8"))
         type = "srgb_8";
       else if (ippContainsString(attr, "sgray_8"))
         type = "sgray_8";
@@ -573,7 +597,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
   for (y = 0; y < yoff; y ++)
     cupsRasterWritePixels(ras, line, header.cupsBytesPerLine);
 
-  for (temprow = 0, tempcolor = 0; y < yend; y ++)
+  for (temprow = 0, tempcolor = 0; y < yend;)
   {
     template = templates[temprow];
     color    = colors[tempcolor];
@@ -584,6 +608,8 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
       temprow = 0;
       tempcolor ++;
       if (tempcolor >= (int)(sizeof(colors) / sizeof(colors[0])))
+        tempcolor = 0;
+      else if (tempcolor > 3 && header.cupsColorSpace == CUPS_CSPACE_SW)
         tempcolor = 0;
     }
 
@@ -779,6 +805,48 @@ monitor_printer(
   httpClose(http);
 
   return (NULL);
+}
+
+
+/*
+ * 'show_attributes()' - Show attributes in a request or response.
+ */
+
+static void
+show_attributes(const char *title,      /* I - Title */
+                int        request,     /* I - 1 for request, 0 for response */
+                ipp_t      *ipp)        /* I - IPP request/response */
+{
+  int                   minor, major = ippGetVersion(ipp, &minor);
+                                        /* IPP version number */
+  ipp_tag_t             group = IPP_TAG_ZERO;
+                                        /* Current group tag */
+  ipp_attribute_t       *attr;          /* Current attribute */
+  const char            *name;          /* Attribute name */
+  char                  buffer[1024];   /* Value */
+
+
+  printf("%s:\n", title);
+  printf("  version=%d.%d\n", major, minor);
+  printf("  request-id=%d\n", ippGetRequestId(ipp));
+  if (!request)
+    printf("  status-code=%s\n", ippErrorString(ippGetStatusCode(ipp)));
+
+  for (attr = ippFirstAttribute(ipp); attr; attr = ippNextAttribute(ipp))
+  {
+    if (group != ippGetGroupTag(attr))
+    {
+      group = ippGetGroupTag(attr);
+      if (group)
+        printf("  %s:\n", ippTagString(group));
+    }
+
+    if ((name = ippGetName(attr)) != NULL)
+    {
+      ippAttributeString(attr, buffer, sizeof(buffer));
+      printf("    %s(%s%s)=%s\n", name, ippGetCount(attr) > 1 ? "1setOf " : "", ippTagString(ippGetValueTag(attr)), buffer);
+    }
+  }
 }
 
 
