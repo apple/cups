@@ -109,6 +109,25 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         switch (*opt)
         {
+          case 'd' : /* -d document-format */
+              if (printformat)
+              {
+                puts("Document format can only be specified once.");
+                usage();
+                return (1);
+              }
+
+              i ++;
+              if (i >= argc)
+              {
+                puts("Expected document format after '-d'.");
+                usage();
+                return (1);
+              }
+
+              printformat = argv[i];
+              break;
+
           case 'f' : /* -f print-file */
               if (printfile)
               {
@@ -426,7 +445,25 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
     return (NULL);
   }
 
-  if (ippContainsString(attr, "image/urf"))
+  if (*format)
+  {
+    if (!ippContainsString(attr, *format))
+    {
+      printf("Printer does not support document-format '%s'.\n", *format);
+      return (NULL);
+    }
+
+    if (!strcmp(*format, "image/urf"))
+      mode = CUPS_RASTER_WRITE_APPLE;
+    else if (!strcmp(*format, "image/pwg-raster"))
+      mode = CUPS_RASTER_WRITE_PWG;
+    else
+    {
+      printf("Unable to generate document-format '%s'.\n", *format);
+      return (NULL);
+    }
+  }
+  else if (ippContainsString(attr, "image/urf"))
   {
    /*
     * Apple Raster format...
@@ -485,7 +522,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
     return (NULL);
   }
 
-  if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+  if (mode == CUPS_RASTER_WRITE_APPLE && (attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
   {
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
@@ -499,7 +536,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
         type = "srgb_8";
     }
   }
-  else if ((attr = ippFindAttribute(response, "pwg-raster-document-resolution-supported", IPP_TAG_RESOLUTION)) != NULL)
+  else if (mode == CUPS_RASTER_WRITE_PWG && (attr = ippFindAttribute(response, "pwg-raster-document-resolution-supported", IPP_TAG_RESOLUTION)) != NULL)
   {
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
@@ -903,5 +940,10 @@ show_capabilities(ipp_t *response)      /* I - Printer attributes */
 static void
 usage(void)
 {
-  puts("Usage: ./testclient printer-uri [-f print-file]");
+  puts("Usage: ./testclient printer-uri [options]");
+  puts("Options:");
+  puts("  -d document-format  Generate the specified format");
+  puts("  -f print-file       Print the named file");
+  puts("  -g                  Force grayscale printing");
+  puts("  -k                  Keep temporary files");
 }
