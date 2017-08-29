@@ -1,7 +1,7 @@
 /*
  * Option marking routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -253,6 +253,7 @@ cupsMarkOptions(
   */
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
+  {
     if (!_cups_strcasecmp(optptr->name, "media") ||
         !_cups_strcasecmp(optptr->name, "output-bin") ||
 	!_cups_strcasecmp(optptr->name, "output-mode") ||
@@ -341,6 +342,19 @@ cupsMarkOptions(
       ppd_mark_option(ppd, "MirrorPrint", optptr->value);
     else
       ppd_mark_option(ppd, optptr->name, optptr->value);
+  }
+
+  if (print_quality)
+  {
+    int pq = atoi(print_quality);       /* print-quaity value */
+
+    if (pq == IPP_QUALITY_DRAFT)
+      ppd_mark_option(ppd, "cupsPrintQuality", "Draft");
+    else if (pq == IPP_QUALITY_HIGH)
+      ppd_mark_option(ppd, "cupsPrintQuality", "High");
+    else
+      ppd_mark_option(ppd, "cupsPrintQuality", "Normal");
+  }
 
   ppd_debug_marked(ppd, "After...");
 

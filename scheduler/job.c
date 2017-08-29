@@ -1,7 +1,7 @@
 /*
  * Job management routines for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -3624,12 +3624,9 @@ get_options(cupsd_job_t *job,		/* I - Job */
   pwgppds     = NULL;
 
   if (pc &&
-      !ippFindAttribute(job->attrs,
-                        "com.apple.print.DocumentTicket.PMSpoolFormat",
-			IPP_TAG_ZERO) &&
+      !ippFindAttribute(job->attrs, "com.apple.print.DocumentTicket.PMSpoolFormat", IPP_TAG_ZERO) &&
       !ippFindAttribute(job->attrs, "APPrinterPreset", IPP_TAG_ZERO) &&
-      (ippFindAttribute(job->attrs, "print-color-mode", IPP_TAG_ZERO) ||
-       ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
+      (ippFindAttribute(job->attrs, "print-color-mode", IPP_TAG_ZERO) || ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO) || ippFindAttribute(job->attrs, "cupsPrintQuality", IPP_TAG_ZERO)))
   {
    /*
     * Map print-color-mode and print-quality to a preset...
@@ -3642,13 +3639,30 @@ get_options(cupsd_job_t *job,		/* I - Job */
     else
       print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
 
-    if ((attr = ippFindAttribute(job->attrs, "print-quality",
-				 IPP_TAG_ENUM)) != NULL &&
-	attr->values[0].integer >= IPP_QUALITY_DRAFT &&
-	attr->values[0].integer <= IPP_QUALITY_HIGH)
-      print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
+    if ((attr = ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ENUM)) != NULL)
+    {
+      ipp_quality_t pq = (ipp_quality_t)ippGetInteger(attr, 0);
+
+      if (pq >= IPP_QUALITY_DRAFT && pq <= IPP_QUALITY_HIGH)
+        print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
+      else
+        print_quality = _PWG_PRINT_QUALITY_NORMAL;
+    }
+    else if ((attr = ippFindAttribute(job->attrs, "cupsPrintQuality", IPP_TAG_NAME)) != NULL)
+    {
+      const char *pq = ippGetString(attr, 0, NULL);
+
+      if (!_cups_strcasecmp(pq, "draft"))
+        print_quality = _PWG_PRINT_QUALITY_DRAFT;
+      else if (!_cups_strcasecmp(pq, "high"))
+        print_quality = _PWG_PRINT_QUALITY_HIGH;
+      else
+        print_quality = _PWG_PRINT_QUALITY_NORMAL;
+    }
     else
+    {
       print_quality = _PWG_PRINT_QUALITY_NORMAL;
+    }
 
     if (pc->num_presets[print_color_mode][print_quality] == 0)
     {
@@ -3689,6 +3703,15 @@ get_options(cupsd_job_t *job,		/* I - Job */
 
   if (pc)
   {
+    if ((attr = ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ENUM)) != NULL)
+    {
+      int pq = ippGetInteger(attr, 0);
+      static const char * const pqs[] = { "Draft", "Normal", "High" };
+
+      if (pq >= IPP_QUALITY_DRAFT && pq <= IPP_QUALITY_HIGH)
+        num_pwgppds = cupsAddOption("cupsPrintQuality", pqs[pq - IPP_QUALITY_DRAFT], num_pwgppds, &pwgppds);
+    }
+
     if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "HPPaperSource", IPP_TAG_ZERO))
     {

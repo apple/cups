@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-08-28
+CHANGES - 2.2.5 - 2017-08-29
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -31,6 +31,8 @@ CHANGES IN CUPS V2.2.5
 - Updated the cups-files.conf and cupsd.conf file documentation for missing
   directives (Issue #5084)
 - Fixed an Avahi-related crash bug in the scheduler (Issue #5085, Issue #5086)
+- Fixed the interactions between the "print-quality" and "cupsPrintQuality"
+  options (Issue #5090)
 - The IPP Everywhere PPD generator now sorts the supported resolutions before
   choosing them for draft, normal, and best quality modes (Issue #5091)
 - Fixed the localization unit test on Linux (Issue #5097)

@@ -2924,8 +2924,10 @@ apply_printer_defaults(
        i --, option ++)
     if (!ippFindAttribute(job->attrs, option->name, IPP_TAG_ZERO))
     {
-      num_options = cupsAddOption(option->name, option->value, num_options,
-                                  &options);
+      if (!strcmp(option->name, "print-quality") && ippFindAttribute(job->attrs, "cupsPrintQuality", IPP_TAG_NAME))
+        continue;                     /* Don't override cupsPrintQuality */
+
+      num_options = cupsAddOption(option->name, option->value, num_options, &options);
     }
 
  /*

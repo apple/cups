@@ -3317,16 +3317,17 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("document-format-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("finishings-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-account-id-default"));
-    cupsArrayAdd(CommonDefaults,
-                 _cupsStrAlloc("job-accounting-user-id-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-accounting-user-id-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-cancel-after-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-hold-until-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-priority-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-sheets-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("media-col-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("notify-lease-duration-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("notify-events-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("number-up-default"));
-    cupsArrayAdd(CommonDefaults,
-                 _cupsStrAlloc("orientation-requested-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("orientation-requested-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("print-quality-default"));
   }
 
  /*
