@@ -29,6 +29,7 @@ LIBTARGETS =	\
 		libcupsimage.a
 UNITTARGETS =	\
 		rasterbench \
+		testclient \
 		testraster
 TARGETS	=	\
 		$(LIBTARGETS) \
@@ -38,7 +39,7 @@ IMAGEOBJS =	error.o interpret.o raster.o
 OBJS	=	$(IMAGEOBJS) \
 		commandtops.o gziptoany.o common.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
-		rastertopwg.o testraster.o
+		rastertopwg.o testclient.o testraster.o
 
 
 #
@@ -338,6 +339,17 @@ rastertopwg-static:	rastertopwg.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+
+
+#
+# testclient (dependency on static libraries is intentional)
+#
+
+testclient:	testclient.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
+	echo Linking $@...
+	$(LD_CC) $(LDFLAGS) -o $@ testclient.o \
+		libcupsimage.a ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
