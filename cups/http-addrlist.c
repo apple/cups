@@ -65,7 +65,7 @@ httpAddrConnect2(
   int			flags;		/* Socket flags */
 #endif /* !WIN32 */
   int			remaining;	/* Remaining timeout */
-  int			i,		/* Looping var */
+  int			i, j,		/* Looping vars */
 			nfds,		/* Number of file descriptors */
 			fds[100],	/* Socket file descriptors */
 			result;		/* Result from select() or poll() */
@@ -323,6 +323,8 @@ httpAddrConnect2(
 	  if (!getpeername(fds[i], (struct sockaddr *)&peer, &len))
 	    DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...", httpAddrString(&peer, temp, sizeof(temp)), httpAddrPort(&peer)));
 #  endif /* DEBUG */
+
+          break;
 	}
 #  ifdef HAVE_POLL
 	else if (pfds[i].revents & (POLLERR | POLLHUP))
@@ -346,7 +348,20 @@ httpAddrConnect2(
       }
 
       if (connaddr)
+      {
+       /*
+        * Connected on one address, close all of the other sockets we have so
+        * far and return...
+        */
+
+        for (j = 0; j < i; j ++)
+          httpAddrClose(NULL, fds[j]);
+
+        for (j ++; j < nfds; j ++)
+          httpAddrClose(NULL, fds[j]);
+
         return (connaddr);
+      }
     }
 #endif /* O_NONBLOCK */
 
