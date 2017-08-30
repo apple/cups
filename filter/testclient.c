@@ -73,7 +73,8 @@ main(int  argc,				/* I - Number of command-line arguments */
                         *printformat = NULL;
                                         /* Print format */
   int                   keepfile = 0,   /* Keep temp file? */
-                        grayscale = 0;  /* Force grayscale? */
+                        grayscale = 0,  /* Force grayscale? */
+                        verbosity = 0;  /* Verbosity */
   char                  tempfile[1024] = "",
                                         /* Temporary file (if any) */
                         scheme[32],     /* URI scheme */
@@ -155,6 +156,10 @@ main(int  argc,				/* I - Number of command-line arguments */
               keepfile = 1;
               break;
 
+          case 'v' :
+              verbosity ++;
+              break;
+
           default :
               printf("Unknown option '-%c'.\n", *opt);
               usage();
@@ -218,7 +223,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   response = cupsDoRequest(http, request, resource);
 
-  show_capabilities(response);
+  if (verbosity)
+    show_capabilities(response);
 
  /*
   * Now figure out what we will be printing...
@@ -299,11 +305,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, opt);
 
-  show_attributes("Create-Job request", 1, request);
+  if (verbosity)
+    show_attributes("Create-Job request", 1, request);
 
   response = cupsDoRequest(http, request, resource);
 
-  show_attributes("Create-Job response", 0, response);
+  if (verbosity)
+    show_attributes("Create-Job response", 0, response);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -336,11 +344,13 @@ main(int  argc,				/* I - Number of command-line arguments */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, printformat);
   ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
 
-  show_attributes("Send-Document request", 1, request);
+  if (verbosity)
+    show_attributes("Send-Document request", 1, request);
 
   response = cupsDoFileRequest(http, request, resource, printfile);
 
-  show_attributes("Send-Document response", 0, response);
+  if (verbosity)
+    show_attributes("Send-Document response", 0, response);
 
   if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
@@ -946,4 +956,5 @@ usage(void)
   puts("  -f print-file       Print the named file");
   puts("  -g                  Force grayscale printing");
   puts("  -k                  Keep temporary files");
+  puts("  -v                  Be more verbose");
 }
