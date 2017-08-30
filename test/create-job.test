@@ -43,9 +43,10 @@
 	ATTR uri printer-uri $uri
 	ATTR integer job-id $job-id
 	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format $filetype
 	ATTR boolean last-document true
 
-	FILE ../data/testprint.ps
+	FILE $filename
 
 	# What statuses are OK?
 	STATUS successful-ok
