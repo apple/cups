@@ -4866,13 +4866,13 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
 
       if ((s[1] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(cupsFileStdout(), '?');
+        cupsFilePutChar(outfile, '?');
         s ++;
       }
       else
       {
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s);
       }
     }
     else if ((*s & 0xf0) == 0xe0)
@@ -4883,14 +4883,14 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
 
       if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(cupsFileStdout(), '?');
+        cupsFilePutChar(outfile, '?');
         s += 2;
       }
       else
       {
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s);
       }
     }
     else if ((*s & 0xf8) == 0xf0)
@@ -4902,15 +4902,15 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
       if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
           (s[3] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(cupsFileStdout(), '?');
+        cupsFilePutChar(outfile, '?');
         s += 3;
       }
       else
       {
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s++);
-        cupsFilePutChar(cupsFileStdout(), *s);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s++);
+        cupsFilePutChar(outfile, *s);
       }
     }
     else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
@@ -4919,10 +4919,10 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
       * Invalid control character...
       */
 
-      cupsFilePutChar(cupsFileStdout(), '?');
+      cupsFilePutChar(outfile, '?');
     }
     else
-      cupsFilePutChar(cupsFileStdout(), *s);
+      cupsFilePutChar(outfile, *s);
 
     s ++;
   }

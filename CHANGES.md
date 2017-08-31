@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-08-29
+CHANGES - 2.2.5 - 2017-08-31
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -53,6 +53,7 @@ CHANGES IN CUPS V2.2.5
   (rdar://33688003)
 - Fixed the localization fallback code on macOS (rdar://33583699)
 - The `ipptool` program now offers an option to validate response headers.
+- The `ipptool` program's `-P` option did not work correctly.
 
 
 CHANGES IN CUPS V2.2.4
