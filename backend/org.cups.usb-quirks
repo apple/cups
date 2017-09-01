@@ -251,5 +251,8 @@
 # Kyocera Ecosys P6026cdn (Issue #4900)
 0x0482 0x063f no-reattach
 
+# Kyocera Ecosys P6130cdn (Issue #5102)
+0x0482 0x0677 no-reattach
+
 # Lexmark E260dn (Issue #4994)
 0x043d 0x0123 no-reattach
