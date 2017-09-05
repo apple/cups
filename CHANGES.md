@@ -37,6 +37,7 @@ CHANGES IN CUPS V2.2.5
   choosing them for draft, normal, and best quality modes (Issue #5091)
 - Fixed the localization unit test on Linux (Issue #5097)
 - The CUPS library did not reuse domain sockets (Issue #5098)
+- Added USB quirk rule for Kyocera printer (Issue #5102, Issue #5103)
 - `httpAddrConnect` leaked sockets in certain circumstances, causing some
   printers to hang (rdar://31965686)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
