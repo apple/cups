@@ -1,0 +1,157 @@
+language: c
+sudo: false
+matrix:
+  include:
+    ###
+    ## Linux builds using various versions of GCC.
+    ###
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-6
+          - g++-6
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-5
+          - g++-5
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-4.9
+          - g++-4.9
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-4.8 && CXX=g++-4.8"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-4.8
+          - g++-4.8
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-4.7 && CXX=g++-4.7"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-4.7
+          - g++-4.7
+    - os: linux
+      env: MATRIX_EVAL="CC=gcc-4.6 && CXX=g++-4.6"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          packages:
+          - gcc-4.6
+          - g++-4.6
+    # - os: linux
+    #   env: MATRIX_EVAL="CC=gcc-4.5 && CXX=g++-4.5"
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-4.5
+    #       - g++-4.5
+    # - os: linux
+    #   env: MATRIX_EVAL="CC=gcc-4.4 && CXX=g++-4.4"
+    #   addons:
+    #     apt:
+    #       sources:
+    #       - ubuntu-toolchain-r-test
+    #       packages:
+    #       - gcc-4.4
+    #       - g++-4.4
+
+    ###
+    ## clang on Linux
+    ###
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+      addons:
+        apt:
+          sources:
+          - llvm-toolchain-trusty-4.0
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-4.0
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+      env:
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+      addons:
+        apt:
+          sources:
+          - llvm-toolchain-precise-3.8
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-3.8
+
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
+      addons:
+        apt:
+          sources:
+          - llvm-toolchain-precise-3.7
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-3.7
+
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
+      addons:
+        apt:
+          sources:
+          - llvm-toolchain-precise-3.6
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-3.6
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-3.5 && CXX=clang++-3.5"
+      addons:
+        apt:
+          sources:
+          - llvm-toolchain-precise-3.5
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-3.5
+
+    ###
+    ## Sanitizers
+    ###
+    - os: linux
+      env: MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8 && CFLAGS='-fno-sanitize-recover=undefined,integer'"
+      addons:
+        apt:
+          sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-precise-3.8
+          packages:
+          - clang-3.8
+
+before_install:
+- eval "${MATRIX_EVAL}"
