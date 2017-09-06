@@ -153,5 +153,10 @@ matrix:
           packages:
           - clang-3.8
 
+script:
+- ./configure
+- make
+- make check
+
 before_install:
 - eval "${MATRIX_EVAL}"
