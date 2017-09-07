@@ -180,6 +180,7 @@ static void	sigterm_handler(int sig);
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(cups_file_t *outfile, cups_array_t *errors, ipp_attribute_t *attr);
+static const char *with_flags_string(int flags);
 static int      with_value(cups_file_t *outfile, cups_array_t *errors, char *value, int flags, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 static int      with_value_from(cups_array_t *errors, ipp_attribute_t *fromattr, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 
@@ -3189,20 +3190,11 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		       !expect->repeat_match && (!expect->repeat_no_match || repeat_count >= expect->repeat_limit))
 	      {
 		if (expect->with_flags & _CUPS_WITH_REGEX)
-		  add_stringf(errors, "EXPECTED: %s %s /%s/",
-			      expect->name,
-			      (expect->with_flags & _CUPS_WITH_ALL) ?
-				  "WITH-ALL-VALUES" : "WITH-VALUE",
-			      expect->with_value);
+		  add_stringf(errors, "EXPECTED: %s %s /%s/", expect->name, with_flags_string(expect->with_flags), expect->with_value);
 		else
-		  add_stringf(errors, "EXPECTED: %s %s \"%s\"",
-			      expect->name,
-			      (expect->with_flags & _CUPS_WITH_ALL) ?
-				  "WITH-ALL-VALUES" : "WITH-VALUE",
-			      expect->with_value);
+		  add_stringf(errors, "EXPECTED: %s %s \"%s\"", expect->name, with_flags_string(expect->with_flags), expect->with_value);
 
-		with_value(outfile, errors, expect->with_value, expect->with_flags, found,
-			   buffer, sizeof(buffer));
+		with_value(outfile, errors, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer));
 	      }
 
 	      if (expect->repeat_no_match &&
@@ -5760,6 +5752,36 @@ validate_attr(cups_file_t     *outfile,	/* I - Output file */
 
 
 /*
+ * 'with_flags_string()' - Return the "WITH-xxx" predicate that corresponds to
+                           the flags.
+ */
+
+static const char *                     /* O - WITH-xxx string */
+with_flags_string(int flags)            /* I - WITH flags */
+{
+  if (flags & _CUPS_WITH_ALL)
+  {
+    if (flags & _CUPS_WITH_HOSTNAME)
+      return ("WITH-ALL-HOSTNAMES");
+    else if (flags & _CUPS_WITH_RESOURCE)
+      return ("WITH-ALL-RESOURCES");
+    else if (flags & _CUPS_WITH_SCHEME)
+      return ("WITH-ALL-SCHEMES");
+    else
+      return ("WITH-ALL-VALUES");
+  }
+  else if (flags & _CUPS_WITH_HOSTNAME)
+    return ("WITH-HOSTNAME");
+  else if (flags & _CUPS_WITH_RESOURCE)
+    return ("WITH-RESOURCE");
+  else if (flags & _CUPS_WITH_SCHEME)
+    return ("WITH-SCHEME");
+  else
+    return ("WITH-VALUE");
+}
+
+
+/*
  * 'with_value()' - Test a WITH-VALUE predicate.
  */
 
@@ -6075,7 +6097,7 @@ with_value(cups_file_t     *outfile,	/* I - Output file */
 
 	  regfree(&re);
 	}
-	else if (ippGetValueTag(attr) == IPP_TAG_URI)
+	else if (ippGetValueTag(attr) == IPP_TAG_URI && !(flags & (_CUPS_WITH_SCHEME | _CUPS_WITH_HOSTNAME | _CUPS_WITH_RESOURCE)))
 	{
 	 /*
 	  * Value is a literal URI string, see if the value(s) match...
@@ -6111,7 +6133,46 @@ with_value(cups_file_t     *outfile,	/* I - Output file */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    if (!strcmp(value, get_string(attr, i, flags, temp, sizeof(temp))))
+	    int result;
+
+            switch (ippGetValueTag(attr))
+            {
+              case IPP_TAG_URI :
+                 /*
+                  * Some URI components are case-sensitive, some not...
+                  */
+
+                  if (flags & (_CUPS_WITH_SCHEME | _CUPS_WITH_HOSTNAME))
+                    result = _cups_strcasecmp(value, get_string(attr, i, flags, temp, sizeof(temp)));
+                  else
+                    result = strcmp(value, get_string(attr, i, flags, temp, sizeof(temp)));
+                  break;
+
+              case IPP_TAG_MIMETYPE :
+              case IPP_TAG_NAME :
+              case IPP_TAG_NAMELANG :
+              case IPP_TAG_TEXT :
+              case IPP_TAG_TEXTLANG :
+                 /*
+                  * mimeMediaType, nameWithoutLanguage, nameWithLanguage,
+                  * textWithoutLanguage, and textWithLanguage are defined to
+                  * be case-insensitive strings...
+                  */
+
+                  result = _cups_strcasecmp(value, get_string(attr, i, flags, temp, sizeof(temp)));
+                  break;
+
+              default :
+                 /*
+                  * Other string syntaxes are defined as lowercased so we use
+                  * case-sensitive comparisons to catch problems...
+                  */
+
+                  result = strcmp(value, get_string(attr, i, flags, temp, sizeof(temp)));
+                  break;
+            }
+
+            if (!result)
 	    {
 	      if (!matchbuf[0])
 		strlcpy(matchbuf,
@@ -6272,7 +6333,6 @@ with_value_from(
     case IPP_TAG_NAMELANG :
     case IPP_TAG_TEXT :
     case IPP_TAG_TEXTLANG :
-    case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :
 	for (i = 0; i < count; i ++)
 	{
@@ -6285,6 +6345,31 @@ with_value_from(
 	      strlcpy(matchbuf, value, matchlen);
 	  }
 	  else
+	  {
+	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_URI :
+	for (i = 0; i < count; i ++)
+	{
+	  const char *value = ippGetString(attr, i, NULL);
+					/* Current string value */
+          int fromcount = ippGetCount(fromattr);
+
+          for (j = 0; j < fromcount; j ++)
+          {
+            if (!compare_uris(value, ippGetString(fromattr, j, NULL)))
+            {
+              if (!matchbuf[0])
+                strlcpy(matchbuf, value, matchlen);
+              break;
+            }
+          }
+
+	  if (j >= fromcount)
 	  {
 	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
 	    match = 0;

@@ -55,6 +55,9 @@ CHANGES IN CUPS V2.2.5
 - Fixed the localization fallback code on macOS (rdar://33583699)
 - The `ipptool` program now offers an option to validate response headers.
 - The `ipptool` program's `-P` option did not work correctly.
+- The `ipptool` program did not compare URI scheme or hostname components
+  correctly for the WITH-ALL-HOSTNAMES, WITH-ALL-SCHEMES, WITH-HOSTNAME, or
+  WITH-SCHEME predicates.
 
 
 CHANGES IN CUPS V2.2.4
