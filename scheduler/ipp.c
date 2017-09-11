@@ -152,9 +152,30 @@ cupsdProcessIPPRequest(
   int			sub_id;		/* Subscription ID */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdProcessIPPRequest(%p[%d]): operation_id = %04x",
-                  con, con->number, con->request->request.op.operation_id);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdProcessIPPRequest(%p[%d]): operation_id=%04x(%s)", con, con->number, con->request->request.op.operation_id, ippOpString(con->request->request.op.operation_id));
+
+  if (LogLevel >= CUPSD_LOG_DEBUG2)
+  {
+    for (group = IPP_TAG_ZERO, attr = ippFirstAttribute(con->request); attr; attr = ippNextAttribute(con->request))
+    {
+      const char  *name;                /* Attribute name */
+      char        value[1024];          /* Attribute value */
+
+      if (group != ippGetGroupTag(attr))
+      {
+        group = ippGetGroupTag(attr);
+        if (group != IPP_TAG_ZERO)
+          cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdProcessIPPRequest: %s", ippTagString(group));
+      }
+
+      if ((name = ippGetName(attr)) == NULL)
+        continue;
+
+      ippAttributeString(attr, value, sizeof(value));
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdProcessIPPRequest: %s %s%s '%s'", name, ippGetCount(attr) > 1 ? "1setOf " : "", ippTagString(ippGetValueTag(attr)), value);
+    }
+  }
 
  /*
   * First build an empty response message for this request...
@@ -2913,6 +2934,8 @@ apply_printer_defaults(
 		*option;		/* Current option */
 
 
+  cupsdLogJob(job, CUPSD_LOG_DEBUG, "Applying default options...");
+
  /*
   * Collect all of the default options and add the missing ones to the
   * job object...
@@ -2926,6 +2949,8 @@ apply_printer_defaults(
     {
       if (!strcmp(option->name, "print-quality") && ippFindAttribute(job->attrs, "cupsPrintQuality", IPP_TAG_NAME))
         continue;                     /* Don't override cupsPrintQuality */
+
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "Adding default %s=%s", option->name, option->value);
 
       num_options = cupsAddOption(option->name, option->value, num_options, &options);
     }

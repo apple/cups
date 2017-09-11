@@ -3658,6 +3658,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
         print_quality = _PWG_PRINT_QUALITY_HIGH;
       else
         print_quality = _PWG_PRINT_QUALITY_NORMAL;
+
+      if (!ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ENUM))
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping cupsPrintQuality=%s to print-quality=%d", pq, print_quality + IPP_QUALITY_DRAFT);
+        num_pwgppds = cupsAddIntegerOption("print-quality", print_quality + IPP_QUALITY_DRAFT, num_pwgppds, &pwgppds);
+      }
     }
     else
     {
@@ -3695,8 +3701,11 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	   i --, preset ++)
       {
         if (!ippFindAttribute(job->attrs, preset->name, IPP_TAG_ZERO))
-	  num_pwgppds = cupsAddOption(preset->name, preset->value, num_pwgppds,
-	                              &pwgppds);
+        {
+          cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Adding preset option %s=%s", preset->name, preset->value);
+
+	  num_pwgppds = cupsAddOption(preset->name, preset->value, num_pwgppds, &pwgppds);
+        }
       }
     }
   }
@@ -3709,7 +3718,11 @@ get_options(cupsd_job_t *job,		/* I - Job */
       static const char * const pqs[] = { "Draft", "Normal", "High" };
 
       if (pq >= IPP_QUALITY_DRAFT && pq <= IPP_QUALITY_HIGH)
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping print-quality=%d to cupsPrintQuality=%s", pq, pqs[pq - IPP_QUALITY_DRAFT]);
+
         num_pwgppds = cupsAddOption("cupsPrintQuality", pqs[pq - IPP_QUALITY_DRAFT], num_pwgppds, &pwgppds);
+      }
     }
 
     if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
@@ -3721,16 +3734,26 @@ get_options(cupsd_job_t *job,		/* I - Job */
     }
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
 	(ppd = _ppdCacheGetMediaType(pc, job->attrs, NULL)) != NULL)
+    {
+      cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping media to MediaType=%s", ppd);
+
       num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);
+    }
 
     if (!ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO) &&
 	(ppd = _ppdCacheGetPageSize(pc, job->attrs, NULL, &exact)) != NULL)
     {
+      cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping media to Pagesize=%s", ppd);
+
       num_pwgppds = cupsAddOption("PageSize", ppd, num_pwgppds, &pwgppds);
 
       if (!ippFindAttribute(job->attrs, "media", IPP_TAG_ZERO))
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Adding media=%s", ppd);
+
         num_pwgppds = cupsAddOption("media", ppd, num_pwgppds, &pwgppds);
+      }
     }
 
     if (!ippFindAttribute(job->attrs, "OutputBin", IPP_TAG_ZERO) &&
@@ -3744,6 +3767,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
       * Map output-bin to OutputBin option...
       */
 
+      cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping output-bin to OutputBin=%s", ppd);
+
       num_pwgppds = cupsAddOption("OutputBin", ppd, num_pwgppds, &pwgppds);
     }
 
@@ -3756,23 +3781,33 @@ get_options(cupsd_job_t *job,		/* I - Job */
       */
 
       if (!strcmp(attr->values[0].string.text, "one-sided"))
-        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_1sided,
-				    num_pwgppds, &pwgppds);
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping sizes to Duplex=%s", pc->sides_1sided);
+
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_1sided, num_pwgppds, &pwgppds);
+      }
       else if (!strcmp(attr->values[0].string.text, "two-sided-long-edge"))
-        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_long,
-				    num_pwgppds, &pwgppds);
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping sizes to Duplex=%s", pc->sides_2sided_long);
+
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_long, num_pwgppds, &pwgppds);
+      }
       else if (!strcmp(attr->values[0].string.text, "two-sided-short-edge"))
-        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_short,
-				    num_pwgppds, &pwgppds);
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG2, "Mapping sizes to Duplex=%s", pc->sides_2sided_short);
+
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_short, num_pwgppds, &pwgppds);
+      }
     }
 
    /*
     * Map finishings values...
     */
 
-    num_pwgppds = _ppdCacheGetFinishingOptions(pc, job->attrs,
-                                               IPP_FINISHINGS_NONE, num_pwgppds,
-                                               &pwgppds);
+    num_pwgppds = _ppdCacheGetFinishingOptions(pc, job->attrs, IPP_FINISHINGS_NONE, num_pwgppds, &pwgppds);
+
+    for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
+      cupsdLogJob(job, CUPSD_LOG_DEBUG2, "After mapping finishings %s=%s", pwgppd->name, pwgppd->value);
   }
 
  /*

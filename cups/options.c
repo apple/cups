@@ -80,6 +80,11 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     return (num_options);
   }
 
+  if (!_cups_strcasecmp(name, "cupsPrintQuality"))
+    num_options = cupsRemoveOption("print-quality", num_options, options);
+  else if (!_cups_strcasecmp(name, "print-quality"))
+    num_options = cupsRemoveOption("cupsPrintQuality", num_options, options);
+
  /*
   * Look for an existing option with the same name...
   */
