@@ -154,6 +154,7 @@ matrix:
           - clang-3.8
 
 script:
+- $CC --version
 - ./configure
 - make
 - make check
