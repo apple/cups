@@ -1720,7 +1720,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	expand_variables(vars, token, temp, sizeof(token));
 
-	if ((dval = _cupsStrScand(token, &tokenptr, localeconv())) <= 0.0 || (*tokenptr && *tokenptr != ','))
+	if ((dval = _cupsStrScand(token, &tokenptr, localeconv())) < 0.0 || (*tokenptr && *tokenptr != ','))
 	{
 	  print_fatal_error(outfile, "Bad DELAY value \"%s\" on line %d.", token,
 	                    linenum);
