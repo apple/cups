@@ -2477,6 +2477,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	* file header...
 	*/
 
+        inflateEnd(&fp->stream);
+
 	fp->compressed = 0;
       }
       else if (status < Z_OK)

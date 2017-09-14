@@ -3323,8 +3323,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
 
      /*
-      * If we are going to repeat this test, sleep 1 second so we don't flood
-      * the printer with requests...
+      * If we are going to repeat this test, display intermediate results...
       */
 
       if (repeat_test)
@@ -3357,6 +3356,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	{
 	  cupsFilePrintf(cupsFileStdout(), "    %-68.68s [", name);
 	}
+
+        ippDelete(response);
+        response = NULL;
       }
     }
     while (repeat_test);

@@ -1175,7 +1175,7 @@ cups_init_client_conf(
   * everything...)
   */
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && defined(HAVE_SSL)
   char	sval[1024];			/* String value */
   int	bval;				/* Boolean value */
 
@@ -1196,7 +1196,7 @@ cups_init_client_conf(
 
   if (cups_apple_get_boolean(kValidateCertsKey, &bval))
     cc->validate_certs = bval;
-#endif /* __APPLE__ */
+#endif /* __APPLE__ && HAVE_SSL */
 }
 
 
