@@ -355,6 +355,18 @@ _cupsThreadCreate(
 
 
 /*
+ * '_cupsThreadDetach()' - Tell the OS that the thread is running independently.
+ */
+
+void
+_cupsThreadDetach(_cups_thread_t thread)/* I - Thread ID */
+{
+  // TODO: Implement me
+  (void)thread;
+}
+
+
+/*
  * '_cupsThreadWait()' - Wait for a thread to exit.
  */
 
