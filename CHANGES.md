@@ -40,6 +40,9 @@ CHANGES IN CUPS V2.2.5
 - The scheduler woke up once per second to remove old temporary queues
   (Issue #5100)
 - Added USB quirk rule for Kyocera printer (Issue #5102, Issue #5103)
+- Re-documented the limits of `file:///...` device URIs and moved the FileDevice
+  directive in `cups-files.conf` to the list of deprecated configuration
+  directives (Issue #5117)
 - `httpAddrConnect` leaked sockets in certain circumstances, causing some
   printers to hang (rdar://31965686)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)

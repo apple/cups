@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "28 August 2017" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "21 September 2017" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -129,13 +129,6 @@ Log file creation or write errors are fatal.
 .B permissions
 Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
 .RE
-.\"#FileDevice
-.TP 5
-\fBFileDevice Yes\fR
-.TP 5
-\fBFileDevice No\fR
-Specifies whether the file pseudo-device can be used for new printer queues.
-The URI "file:///dev/null" is always allowed.
 .\"#Group
 .TP 5
 \fBGroup \fIgroup-name-or-number\fR
@@ -229,6 +222,16 @@ Specifies the user name or ID that is used when running external programs.
 The default is "lp".
 .SS DEPRECATED DIRECTIVES
 The following directives are deprecated and will be removed from a future version of CUPS:
+.\"#FileDevice
+.TP 5
+\fBFileDevice Yes\fR
+.TP 5
+\fBFileDevice No\fR
+Specifies whether the file pseudo-device can be used for new printer queues.
+The URI "file:///dev/null" is always allowed.
+File devices cannot be used with "raw" print queues - a PPD file is required.
+The specified file is overwritten for every print job.
+Writing to directories is not supported.
 .\"#FontPath
 .TP 5
 \fBFontPath \fIdirectory[:...:directoryN]\fR
