@@ -20,6 +20,9 @@ does not endorse or support third-party support software for CUPS.
 >
 > c. software updates will often replace parts of your local installation,
 >    potentially rendering your system unusable.
+>
+> Apple only supports using the Clang supplied with Xcode to build CUPS on
+> macOS.
 
 
 BEFORE YOU BEGIN
