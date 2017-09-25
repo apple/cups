@@ -1,14 +1,25 @@
-INSTALL - CUPS v2.2.4 - 2017-06-30
+INSTALL - CUPS v2.2.5 - 2017-09-25
 ==================================
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
 be found in "CHANGES.txt".
 
-> USING CUPS REQUIRES ADDITIONAL THIRD-PARTY SUPPORT SOFTWARE AND PRINTER
-> DRIVERS.  THESE ARE TYPICALLY INCLUDED WITH YOUR OPERATING SYSTEM
-> DISTRIBUTION.  APPLE DOES NOT ENDORSE OR SUPPORT THIRD-PARTY SUPPORT SOFTWARE
-> FOR CUPS.
+Using CUPS requires additional third-party support software and printer drivers.
+These are typically included with your operating system distribution.  Apple
+does not endorse or support third-party support software for CUPS.
+
+> Note: Current versions of macOS DO NOT allow installation to /usr with the
+> default System Integrity Protection (SIP) settings.  In addition, we do not
+> recommend replacing the CUPS supplied with macOS because:
+>
+> a. not all versions of CUPS are compatible with every macOS release,
+>
+> b. code signing prevents replacement of system libraries and access to the
+>    system keychain (needed for encrypted printer sharing), and
+>
+> c. software updates will often replace parts of your local installation,
+>    potentially rendering your system unusable.
 
 
 BEFORE YOU BEGIN
@@ -52,12 +63,15 @@ main CUPS source directory.  To configure CUPS for your system, type:
 
 The default installation will put the CUPS software in the "/etc", "/usr", and
 "/var" directories on your system, which will overwrite any existing printing
-commands on your system.  Use the "--prefix" option to install the CUPS software
+commands on your system.  Use the `--prefix` option to install the CUPS software
 in another location:
 
     ./configure --prefix=/some/directory
 
-To see a complete list of configuration options, use the --help option:
+> Note: Current versions of macOS DO NOT allow installation to /usr with the
+> default System Integrity Protection (SIP) settings.
+
+To see a complete list of configuration options, use the `--help` option:
 
     ./configure --help
 
@@ -82,25 +96,19 @@ or:
     LDFLAGS="-L/some/directory" \
     ./configure ...
 
-The "--enable-debug" option compiles CUPS with debugging information enabled.
+The `--enable-debug` option compiles CUPS with debugging information enabled.
 Additional debug logging support can be enabled using the
-"--enable-debug-printfs" option - these debug messages are enabled using the
-CUPS_DEBUG_LOG environment variable at run-time.
+`--enable-debug-printfs` option - these debug messages are enabled using the
+`CUPS_DEBUG_xxx` environment variables at run-time.
 
 CUPS also includes an extensive set of unit tests that can be used to find and
 diagnose a variety of common problems - use the "--enable-unit-tests" configure
 option to run them at build time.
 
-On macOS, use the "--with-archflags" option to build with the correct set of
+On macOS, use the `--with-archflags` option to build with the correct set of
 architectures:
 
     ./configure --with-archflags="-arch i386 -arch x86_64" ...
-
-> Note: Current versions of macOS DO NOT allow installation to /usr with the
-> default system integrity settings.  In addition, we do not recommend replacing
-> the CUPS supplied with macOS because not all versions of CUPS are compatible
-> with every macOS release, and because software updates will replace parts
-> of your local installation potentially rendering your system unusable.
 
 Once you have configured things, just type:
 
@@ -184,7 +192,7 @@ for FreeBSD, NetBSD, and OpenBSD.  The <format> target is one of the following:
 GETTING DEBUG LOGGING FROM CUPS
 -------------------------------
 
-When configured with the "--enable-debug-printfs" option, CUPS compiles in
+When configured with the `--enable-debug-printfs` option, CUPS compiles in
 additional debug logging support in the scheduler, CUPS API, and CUPS Imaging
 API.  The following environment variables are used to enable and control debug
 logging:
@@ -195,13 +203,14 @@ logging:
   the logging. The default level is 1.
 - `CUPS_DEBUG_LOG`: Specifies a log file to use.  Specify the name "-" to send
   the messages to stderr.  Prefix a filename with "+" to append to an existing
-  file.
+  file.  You can include a single "%d" in the filename to embed the current
+  process ID.
 
 
 REPORTING PROBLEMS
 ------------------
 
-If you have problems, READ THE DOCUMENTATION FIRST!  If the documentation does
+If you have problems, *read the documentation first*!  If the documentation does
 not solve your problems, please post a message on the users forum at:
 
     https://www.cups.org/
