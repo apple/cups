@@ -16,6 +16,7 @@ AC_ARG_WITH(java, [  --with-java             set Java interpreter for web interf
 	CUPS_JAVA="$withval",
 	CUPS_JAVA="auto")
 
+AC_MSG_CHECKING([for Java interpreter])
 if test "x$CUPS_JAVA" = xauto; then
 	AC_PATH_PROG(JAVA,java)
 	CUPS_JAVA="$JAVA"
@@ -26,7 +27,10 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_JAVA, "$CUPS_JAVA")
 
 if test "x$CUPS_JAVA" != x; then
+	AC_MSG_RESULT([$CUPS_JAVA])
 	AC_DEFINE(HAVE_JAVA)
+else
+	AC_MSG_RESULT([none])
 fi
 
 dnl Do we have Perl?
@@ -34,6 +38,7 @@ AC_ARG_WITH(perl, [  --with-perl             set Perl interpreter for web interf
 	CUPS_PERL="$withval",
 	CUPS_PERL="auto")
 
+AC_MSG_CHECKING([for Perl interpreter])
 if test "x$CUPS_PERL" = xauto; then
 	AC_PATH_PROG(PERL,perl)
 	CUPS_PERL="$PERL"
@@ -44,7 +49,10 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_PERL, "$CUPS_PERL")
 
 if test "x$CUPS_PERL" != x; then
+	AC_MSG_RESULT([$CUPS_PERL])
 	AC_DEFINE(HAVE_PERL)
+else
+	AC_MSG_RESULT([none])
 fi
 
 dnl Do we have PHP?
@@ -52,6 +60,7 @@ AC_ARG_WITH(php, [  --with-php              set PHP interpreter for web interfac
 	CUPS_PHP="$withval",
 	CUPS_PHP="auto")
 
+AC_MSG_CHECKING([for PHP interpreter])
 if test "x$CUPS_PHP" = xauto; then
 	AC_PATH_PROG(PHPCGI,php-cgi)
 	if test "x$PHPCGI" = x; then
@@ -67,7 +76,10 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_PHP, "$CUPS_PHP")
 
 if test "x$CUPS_PHP" != x; then
+	AC_MSG_RESULT([$CUPS_PHP])
 	AC_DEFINE(HAVE_PHP)
+else
+	AC_MSG_RESULT([none])
 fi
 
 dnl Do we have Python?
@@ -75,6 +87,7 @@ AC_ARG_WITH(python, [  --with-python           set Python interpreter for web in
 	CUPS_PYTHON="$withval",
 	CUPS_PYTHON="auto")
 
+AC_MSG_CHECKING([for Python interpreter])
 if test "x$CUPS_PYTHON" = xauto; then
 	AC_PATH_PROG(PYTHON,python)
 	CUPS_PYTHON="$PYTHON"
@@ -85,5 +98,8 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_PYTHON, "$CUPS_PYTHON")
 
 if test "x$CUPS_PYTHON" != x; then
+	AC_MSG_RESULT([$CUPS_PYTHON])
 	AC_DEFINE(HAVE_PYTHON)
+else
+	AC_MSG_RESULT([none])
 fi
