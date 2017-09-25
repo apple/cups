@@ -3571,7 +3571,7 @@
 		72E65BD918DC850A00097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
 		72E65BDC18DC852700097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../scheduler/Makefile; sourceTree = SOURCE_ROOT; };
 		72E65BDD18DCA35700097E89 /* CHANGES-1.7.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-1.7.txt"; path = "../CHANGES-1.7.txt"; sourceTree = "<group>"; };
-		72E65BDE18DCA35700097E89 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGES.md; path = ../CHANGES.md; sourceTree = "<group>"; };
+		72E65BDE18DCA35700097E89 /* CHANGES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGES.md; path = ../CHANGES.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = "<none>"; };
 		72E65BDF18DCA35700097E89 /* CREDITS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CREDITS.md; path = ../CREDITS.md; sourceTree = "<group>"; };
 		72E65BE018DCA35700097E89 /* INSTALL.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = INSTALL.md; path = ../INSTALL.md; sourceTree = "<group>"; };
 		72E65BE218DCA35700097E89 /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE.txt; path = ../LICENSE.txt; sourceTree = "<group>"; };
