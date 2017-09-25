@@ -60,9 +60,7 @@ fi
 
 AC_DEFINE_UNQUOTED(CUPS_PHP, "$CUPS_PHP")
 
-if test "x$CUPS_PHP" = x; then
-	CUPS_PHP="no"
-else
+if test "x$CUPS_PHP" != x; then
 	AC_DEFINE(HAVE_PHP)
 fi
 
