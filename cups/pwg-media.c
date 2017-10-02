@@ -189,6 +189,7 @@ static pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("jis_b1_728x1030mm", "jis-b1", "B1", 728, 1030),
   _PWG_MEDIA_MM("jis_b0_1030x1456mm", "jis-b0", "B0", 1030, 1456),
   _PWG_MEDIA_MM("jis_exec_216x330mm", NULL, "216x330mm", 216, 330),
+  _PWG_MEDIA_MM("jpn_kaku1_270x382mm", NULL, "EnvKaku1", 270, 382),
   _PWG_MEDIA_MM("jpn_kaku2_240x332mm", NULL, "EnvKaku2", 240, 332),
   _PWG_MEDIA_MM("jpn_kaku3_216x277mm", NULL, "EnvKaku3", 216, 277),
   _PWG_MEDIA_MM("jpn_kaku4_197x267mm", NULL, "EnvKaku4", 197, 267),

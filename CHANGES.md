@@ -61,6 +61,7 @@ CHANGES IN CUPS V2.2.5
 - Fixed the localization fallback code on macOS (rdar://33583699)
 - The scheduler did not run with a high enough priority, causing problems on
   busy systems (rdar://33789342)
+- Added support for Japanese Kaku 1 envelope size (rdar://34774110)
 - The `ipptool` program's `-P` option did not work correctly.
 - The `ipptool` program did not compare URI scheme or hostname components
   correctly for the WITH-ALL-HOSTNAMES, WITH-ALL-SCHEMES, WITH-HOSTNAME, or
