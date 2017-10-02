@@ -7,7 +7,7 @@
 	<key>Label</key>
 	<string>org.cups.cups-lpd</string>
 	<key>ProcessType</key>
-	<string>Background</string>
+	<string>Adaptive</string>
 	<key>EnableTransactions</key>
 	<true/>
 	<key>EnablePressuredExit</key>

@@ -1,7 +1,7 @@
 /*
  * Server start/stop routines for the CUPS scheduler.
  *
- * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -78,7 +78,7 @@ cupsdStartServer(void)
               CUPSD_EVENT_SERVER_STARTED;
   started   = 1;
 
-  cupsdSetBusyState();
+  cupsdSetBusyState(0);
 }
 
 

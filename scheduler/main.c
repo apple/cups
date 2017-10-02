@@ -496,6 +496,12 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * Let the system know we are busy while we bring up cupsd...
+  */
+
+  cupsdSetBusyState(1);
+
+ /*
   * Set the timezone info...
   */
 
@@ -682,6 +688,8 @@ main(int  argc,				/* I - Number of command-line args */
     cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in foreground.");
   else
     cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL, "Scheduler started in background.");
+
+  cupsdSetBusyState(0);
 
  /*
   * Start any pending print jobs...

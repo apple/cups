@@ -103,7 +103,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   xpc_transaction_begin();
 #endif /* __APPLE__ */
 
-
  /*
   * Don't buffer the output...
   */

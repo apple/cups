@@ -1,7 +1,7 @@
 /*
  * System management definitions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -54,6 +54,6 @@ VAR int			SysEventPipes[2] VALUE2(-1,-1);
 extern void	cupsdAllowSleep(void);
 extern void	cupsdCleanDirty(void);
 extern void	cupsdMarkDirty(int what);
-extern void	cupsdSetBusyState(void);
+extern void	cupsdSetBusyState(int working);
 extern void	cupsdStartSystemMonitor(void);
 extern void	cupsdStopSystemMonitor(void);

@@ -85,6 +85,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   if (cupsArrayCount(Clients) == MaxClients)
     return;
 
+  cupsdSetBusyState(1);
+
  /*
   * Get a pointer to the next available client...
   */
@@ -439,7 +441,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
   if (httpGetFd(con->http) >= 0)
   {
     cupsArrayRemove(ActiveClients, con);
-    cupsdSetBusyState();
+    cupsdSetBusyState(0);
 
 #ifdef HAVE_SSL
    /*
@@ -760,7 +762,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         if (!cupsArrayFind(ActiveClients, con))
 	{
 	  cupsArrayAdd(ActiveClients, con);
-          cupsdSetBusyState();
+          cupsdSetBusyState(0);
         }
 
     case HTTP_STATE_OPTIONS :
@@ -2082,7 +2084,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     else
     {
       cupsArrayRemove(ActiveClients, con);
-      cupsdSetBusyState();
+      cupsdSetBusyState(0);
     }
   }
 }
@@ -2807,7 +2809,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     else
     {
       cupsArrayRemove(ActiveClients, con);
-      cupsdSetBusyState();
+      cupsdSetBusyState(0);
     }
   }
 }

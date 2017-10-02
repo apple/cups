@@ -1,7 +1,7 @@
 /*
  * System management functions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -75,7 +75,7 @@ cupsdCleanDirty(void)
   DirtyFiles     = CUPSD_DIRTY_NONE;
   DirtyCleanTime = 0;
 
-  cupsdSetBusyState();
+  cupsdSetBusyState(0);
 }
 
 
@@ -101,7 +101,7 @@ cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
   if (!DirtyCleanTime)
     DirtyCleanTime = time(NULL) + DirtyCleanInterval;
 
-  cupsdSetBusyState();
+  cupsdSetBusyState(0);
 }
 
 
@@ -110,7 +110,7 @@ cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
  */
 
 void
-cupsdSetBusyState(void)
+cupsdSetBusyState(int working)          /* I - Doing significant work? */
 {
   int			i;		/* Looping var */
   cupsd_job_t		*job;		/* Current job */
@@ -139,7 +139,7 @@ cupsdSetBusyState(void)
   */
 
   newbusy = (DirtyCleanTime ? 1 : 0) |
-	    (cupsArrayCount(ActiveClients) ? 4 : 0);
+	    ((working || cupsArrayCount(ActiveClients) > 0) ? 4 : 0);
 
   for (job = (cupsd_job_t *)cupsArrayFirst(PrintingJobs);
        job;

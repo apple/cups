@@ -1,4 +1,4 @@
-CHANGES - 2.2.5 - 2017-09-25
+CHANGES - 2.2.5 - 2017-10-02
 ============================
 
 CHANGES IN CUPS V2.2.5
@@ -59,7 +59,8 @@ CHANGES IN CUPS V2.2.5
 - The `ippCopyAttribute` function did not copy out-of-band values correctly
   (rdar://33688003)
 - Fixed the localization fallback code on macOS (rdar://33583699)
-- The `ipptool` program now offers an option to validate response headers.
+- The scheduler did not run with a high enough priority, causing problems on
+  busy systems (rdar://33789342)
 - The `ipptool` program's `-P` option did not work correctly.
 - The `ipptool` program did not compare URI scheme or hostname components
   correctly for the WITH-ALL-HOSTNAMES, WITH-ALL-SCHEMES, WITH-HOSTNAME, or

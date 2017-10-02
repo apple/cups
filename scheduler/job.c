@@ -2768,7 +2768,7 @@ cupsdSetJobState(
   * Update the server "busy" state...
   */
 
-  cupsdSetBusyState();
+  cupsdSetBusyState(0);
 }
 
 
