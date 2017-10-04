@@ -523,12 +523,12 @@ extern ipp_status_t	cupsCreateDestJob(http_t *http, cups_dest_t *dest,
 					  cups_dinfo_t *info, int *job_id,
 					  const char *title, int num_options,
 			                  cups_option_t *options) _CUPS_API_1_6;
-extern int		cupsEnumDests(unsigned flags, int msec, int *cancel,
+extern int		cupsEnumDests(http_t *http, unsigned flags, int msec, int *cancel,
 				      cups_ptype_t type, cups_ptype_t mask,
 				      cups_dest_cb_t cb, void *user_data)
 				      _CUPS_API_1_6;
 #  ifdef __BLOCKS__
-extern int		cupsEnumDestsBlock(unsigned flags, int msec,
+extern int		cupsEnumDestsBlock(http_t *http, unsigned flags, int msec,
 					   int *cancel, cups_ptype_t type,
 					   cups_ptype_t mask,
 					   cups_dest_block_t block)
