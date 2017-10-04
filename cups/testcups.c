@@ -154,7 +154,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         else
           fprintf(stderr, "Unknown argument \"%s\" ignored...\n", argv[i]);
 
-      cupsEnumDests(CUPS_DEST_FLAGS_NONE, msec, NULL, type, mask, enum_cb, NULL);
+      cupsEnumDests(CUPS_HTTP_DEFAULT, CUPS_DEST_FLAGS_NONE, msec, NULL, type, mask, enum_cb, NULL);
     }
     else if (!strcmp(argv[1], "password"))
     {

@@ -99,7 +99,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         usage(argv[i]);
     }
 
-    cupsEnumDests(CUPS_DEST_FLAGS_NONE, 5000, NULL, type, mask, enum_cb, NULL);
+    cupsEnumDests(CUPS_HTTP_DEFAULT, CUPS_DEST_FLAGS_NONE, 5000, NULL, type, mask, enum_cb, NULL);
 
     return (0);
   }

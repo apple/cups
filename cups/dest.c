@@ -970,6 +970,7 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
 
 int					/* O - 1 on success, 0 on failure */
 cupsEnumDests(
+  http_t         *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
   unsigned       flags,			/* I - Enumeration flags */
   int            msec,			/* I - Timeout in milliseconds, -1 for indefinite */
   int            *cancel,		/* I - Pointer to "cancel" variable */
@@ -1032,6 +1033,9 @@ cupsEnumDests(
     return (0);
   }
 
+  if (!http)
+    http = CUPS_HTTP_DEFAULT;
+
  /*
   * Get ready to enumerate...
   */
@@ -1052,12 +1056,12 @@ cupsEnumDests(
     * Get the list of local printers and pass them to the callback function...
     */
 
-    num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL,
+    num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL,
                               &dests, type, mask);
 
     if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
       defprinter = name;
-    else if ((defprinter = cupsGetDefault2(CUPS_HTTP_DEFAULT)) != NULL)
+    else if ((defprinter = cupsGetDefault2(http)) != NULL)
     {
       strlcpy(name, defprinter, sizeof(name));
       defprinter = name;
@@ -1443,6 +1447,7 @@ cupsEnumDests(
 
 int					/* O - 1 on success, 0 on failure */
 cupsEnumDestsBlock(
+    http_t            *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     unsigned          flags,		/* I - Enumeration flags */
     int               timeout,		/* I - Timeout in milliseconds, 0 for indefinite */
     int               *cancel,		/* I - Pointer to "cancel" variable */
@@ -1450,7 +1455,7 @@ cupsEnumDestsBlock(
     cups_ptype_t      mask,		/* I - Mask for printer type bits */
     cups_dest_block_t block)		/* I - Block */
 {
-  return (cupsEnumDests(flags, timeout, cancel, type, mask,
+  return (cupsEnumDests(http, flags, timeout, cancel, type, mask,
                         (cups_dest_cb_t)cups_block_cb, (void *)block));
 }
 #  endif /* __BLOCKS__ */
@@ -2098,7 +2103,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   data.num_dests = 0;
   data.dests     = NULL;
 
-  cupsEnumDests(0, _CUPS_DNSSD_GET_DESTS, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
+  cupsEnumDests(http, 0, _CUPS_DNSSD_GET_DESTS, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
@@ -2328,7 +2333,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       data.name = name;
       data.dest = NULL;
 
-      cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_name_cb, &data);
+      cupsEnumDests(http, 0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_name_cb, &data);
 
       if (!data.dest)
         return (NULL);
