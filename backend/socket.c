@@ -330,8 +330,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(error));
 
-      if (error == ECONNREFUSED || error == EHOSTDOWN ||
-          error == EHOSTUNREACH)
+      if (errno == ECONNREFUSED || errno == EHOSTDOWN || errno == EHOSTUNREACH || errno == ETIMEDOUT || errno == ENOTCONN)
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
@@ -349,13 +348,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 
 	  case EHOSTUNREACH :
+	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
 				   _("The printer is unreachable at this "
 				     "time."));
 	      break;
 
 	  case ECONNREFUSED :
-	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
 	                           _("The printer is in use."));
 	      break;
