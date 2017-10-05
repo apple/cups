@@ -3,7 +3,7 @@
 {printer_is_accepting_jobs=0?Rejette les tâches:accepte les tâches},
 {server_is_sharing_printers=0?non:{printer_is_shared=0?non:}} partagée{default_name={printer_name}?, imprimante par défaut :})</H2>
 
-<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="Maintenance">
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
 <OPTION VALUE="">Maintenance</OPTION>
@@ -35,7 +35,7 @@
 <TABLE SUMMARY="{printer_name}">
 <TR><TH ALIGN="RIGHT" VALIGN="TOP">Description :</TH><TD>{printer_info}</TD></TR>
 <TR><TH ALIGN="RIGHT" VALIGN="TOP">Emplacement :</TH><TD>{printer_location}</TD></TR>
-<TR><TH ALIGN="RIGHT" VALIGN="TOP">Pilote :</TH><TD>{printer_make_and_model} ({color_supported=1?couleur:niveau de gris}{sides_supported=one-sided?:, 2-sided printing})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Pilote :</TH><TD>{printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported=one-sided?:, 2-sided printing})<BR>
 <TR><TH ALIGN="RIGHT" VALIGN="TOP">Connexion :</TH><TD>{device_uri}</TD></TR>
 <TR><TH ALIGN="RIGHT" VALIGN="TOP">Par défaut :</TH><TD>job-sheets={job_sheets_default}
 media={media_default?{media_default}:inconnu}
