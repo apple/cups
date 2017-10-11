@@ -45,6 +45,7 @@ CHANGES IN CUPS V2.2.5
   directives (Issue #5117)
 - Added USB quirk rule for HP LaserJet 1160 printer (Issue #5121)
 - The network backends now retry on more error conditions (Issue #5123)
+- `cupsGetDests2` was not using the supplied HTTP connection (Issue #5135)
 - `httpAddrConnect` leaked sockets in certain circumstances, causing some
   printers to hang (rdar://31965686)
 - Fixed an issue with Chinese localizations on macOS (rdar://32419311)
