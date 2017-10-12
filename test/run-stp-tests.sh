@@ -996,7 +996,7 @@ else
 fi
 
 # Error log messages
-count=`$GREP '^E ' $BASE/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^E ' $BASE/log/error_log | $GREP -v 'Unknown default SystemGroup' | wc -l | awk '{print $1}'`
 if test $count != 33; then
 	echo "FAIL: $count error messages, expected 33."
 	$GREP '^E ' $BASE/log/error_log
