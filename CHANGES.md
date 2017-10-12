@@ -44,6 +44,7 @@ CHANGES IN CUPS V2.2.5
   directive in `cups-files.conf` to the list of deprecated configuration
   directives (Issue #5117)
 - Added USB quirk rule for HP LaserJet 1160 printer (Issue #5121)
+- Fixed the script interpreter detection in the configure script (Issue #5122)
 - The network backends now retry on more error conditions (Issue #5123)
 - Added a French translation of the web interface (Issue #5134)
 - `cupsGetDests2` was not using the supplied HTTP connection (Issue #5135)

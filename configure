@@ -683,7 +683,6 @@ SSLLIBS
 SSLFLAGS
 IPPALIASES
 CUPS_SERVERKEYCHAIN
-LIBGCRYPTCONFIG
 LIBGNUTLSCONFIG
 PTHREAD_FLAGS
 CUPS_DEFAULT_GSSSERVICENAME
@@ -8526,104 +8525,6 @@ else
   LIBGNUTLSCONFIG="$ac_cv_path_LIBGNUTLSCONFIG"
 fi
 
-    	if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}libgcrypt-config", so it can be a program name with args.
-set dummy ${ac_tool_prefix}libgcrypt-config; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_LIBGCRYPTCONFIG+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $LIBGCRYPTCONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_LIBGCRYPTCONFIG="$LIBGCRYPTCONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_LIBGCRYPTCONFIG="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-LIBGCRYPTCONFIG=$ac_cv_path_LIBGCRYPTCONFIG
-if test -n "$LIBGCRYPTCONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LIBGCRYPTCONFIG" >&5
-$as_echo "$LIBGCRYPTCONFIG" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-fi
-if test -z "$ac_cv_path_LIBGCRYPTCONFIG"; then
-  ac_pt_LIBGCRYPTCONFIG=$LIBGCRYPTCONFIG
-  # Extract the first word of "libgcrypt-config", so it can be a program name with args.
-set dummy libgcrypt-config; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_ac_pt_LIBGCRYPTCONFIG+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $ac_pt_LIBGCRYPTCONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_ac_pt_LIBGCRYPTCONFIG="$ac_pt_LIBGCRYPTCONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_ac_pt_LIBGCRYPTCONFIG="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-ac_pt_LIBGCRYPTCONFIG=$ac_cv_path_ac_pt_LIBGCRYPTCONFIG
-if test -n "$ac_pt_LIBGCRYPTCONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_LIBGCRYPTCONFIG" >&5
-$as_echo "$ac_pt_LIBGCRYPTCONFIG" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-  if test "x$ac_pt_LIBGCRYPTCONFIG" = x; then
-    LIBGCRYPTCONFIG=""
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    LIBGCRYPTCONFIG=$ac_pt_LIBGCRYPTCONFIG
-  fi
-else
-  LIBGCRYPTCONFIG="$ac_cv_path_LIBGCRYPTCONFIG"
-fi
-
 	if $PKGCONFIG --exists gnutls; then
 	    have_ssl=1
 	    SSLLIBS=`$PKGCONFIG --libs gnutls`
@@ -10167,11 +10068,11 @@ _ACEOF
 if test "${with_java+set}" = set; then :
   withval=$with_java; CUPS_JAVA="$withval"
 else
-  CUPS_JAVA=""
+  CUPS_JAVA="auto"
 fi
 
 
-if test "x$CUPS_JAVA" = x; then
+if test "x$CUPS_JAVA" = xauto; then
 	# Extract the first word of "java", so it can be a program name with args.
 set dummy java; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -10213,6 +10114,8 @@ fi
 
 
 	CUPS_JAVA="$JAVA"
+elif test "x$CUPS_JAVA" = xno; then
+        CUPS_JAVA=""
 fi
 
 cat >>confdefs.h <<_ACEOF
@@ -10230,11 +10133,11 @@ fi
 if test "${with_perl+set}" = set; then :
   withval=$with_perl; CUPS_PERL="$withval"
 else
-  CUPS_PERL=""
+  CUPS_PERL="auto"
 fi
 
 
-if test "x$CUPS_PERL" = x; then
+if test "x$CUPS_PERL" = xauto; then
 	# Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -10276,6 +10179,8 @@ fi
 
 
 	CUPS_PERL="$PERL"
+elif test "x$CUPS_PERL" = xno; then
+        CUPS_PERL=""
 fi
 
 cat >>confdefs.h <<_ACEOF
@@ -10293,11 +10198,11 @@ fi
 if test "${with_php+set}" = set; then :
   withval=$with_php; CUPS_PHP="$withval"
 else
-  CUPS_PHP=""
+  CUPS_PHP="auto"
 fi
 
 
-if test "x$CUPS_PHP" = x; then
+if test "x$CUPS_PHP" = xauto; then
 	# Extract the first word of "php-cgi", so it can be a program name with args.
 set dummy php-cgi; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -10383,6 +10288,8 @@ fi
 	else
 		CUPS_PHP="$PHPCGI"
 	fi
+elif test "x$CUPS_PHP" = xno; then
+        CUPS_PHP=""
 fi
 
 cat >>confdefs.h <<_ACEOF
@@ -10402,11 +10309,11 @@ fi
 if test "${with_python+set}" = set; then :
   withval=$with_python; CUPS_PYTHON="$withval"
 else
-  CUPS_PYTHON=""
+  CUPS_PYTHON="auto"
 fi
 
 
-if test "x$CUPS_PYTHON" = x; then
+if test "x$CUPS_PYTHON" = xauto; then
 	# Extract the first word of "python", so it can be a program name with args.
 set dummy python; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -10448,6 +10355,8 @@ fi
 
 
 	CUPS_PYTHON="$PYTHON"
+elif test "x$CUPS_PYTHON" = xno; then
+        CUPS_PYTHON=""
 fi
 
 cat >>confdefs.h <<_ACEOF
