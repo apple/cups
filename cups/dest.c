@@ -1657,13 +1657,44 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   }
 
  /*
+  * Connect to the server as needed...
+  */
+
+  if (!http)
+  {
+    if ((http = _cupsConnect()) == NULL)
+    {
+      *dests = NULL;
+
+      return (0);
+    }
+  }
+
+ /*
   * Grab the printers and classes...
   */
 
   data.num_dests = 0;
   data.dests     = NULL;
 
-  cups_enum_dests(http, 0, _CUPS_DNSSD_GET_DESTS, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
+  if (!httpAddrLocalhost(httpGetAddress(http)))
+  {
+   /*
+    * When talking to a remote cupsd, just enumerate printers on the remote
+    * cupsd.
+    */
+
+    cups_enum_dests(http, 0, _CUPS_DNSSD_GET_DESTS, NULL, 0, CUPS_PRINTER_DISCOVERED, (cups_dest_cb_t)cups_get_cb, &data);
+  }
+  else
+  {
+   /*
+    * When talking to a local cupsd, enumerate both local printers and ones we
+    * can find on the network...
+    */
+
+    cups_enum_dests(http, 0, _CUPS_DNSSD_GET_DESTS, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
+  }
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
