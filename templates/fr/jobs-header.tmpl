@@ -1,0 +1,5 @@
+{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Affichage des t&acirc;ches actives"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Affichage des t&acirc;ches termin&eacute;es"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Affichage de toutes les t&acirc;ches"></FORM>}
+
+<P ALIGN="CENTER">{?which_jobs=?Affichage des tâches dan l'ordre d'impression; les tâches maintenues apparraissent en premier.:{which_jobs=Affichage des tâches dans l'ordre croissant.?:Affichage des tâches dans l'ordre décroissant.}}</P>

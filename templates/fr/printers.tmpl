@@ -1,0 +1,11 @@
+{#printer_name=0?:
+<TABLE CLASS="list" SUMMARY="Liste des imprimantes">
+<THEAD>
+<TR><TH>Nom de la file</TH><TH>Description</TH><TH>Emplacement</TH><TH>Marque et modèle</TH><TH>État</TH></TR>
+</THEAD>
+<TBODY>
+{[printer_name]
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{printer_make_and_model}</TD><TD>{printer_state=3?Inoccup&eacute;e:{printer_state=4?En cours d'impression:En pause}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
+}
+</TBODY>
+</TABLE></DIV>}
