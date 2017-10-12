@@ -1,7 +1,7 @@
 README - CUPS v2.2.4 - 2017-06-30
 =================================
 
-Looking for compile instructions?  Read the file "INSTALL.md" instead...
+Looking for compile instructions?  Read the file `INSTALL.md` instead...
 
 
 INTRODUCTION
@@ -35,7 +35,7 @@ bunch of other stuff) online at:
     http://localhost:631/
 
 If you're having trouble getting that far, the documentation is located under
-the "doc/help" directory.
+the `doc/help` directory.
 
 Please read the documentation before asking questions.
 
@@ -43,7 +43,7 @@ Please read the documentation before asking questions.
 GETTING SUPPORT AND OTHER RESOURCES
 -----------------------------------
 
-If you have problems, READ THE DOCUMENTATION FIRST!  We also provide two mailing
+If you have problems, **read the documentation first!**  We also provide two mailing
 lists which are available at:
 
     https://lists.cups.org/mailman/listinfo
@@ -62,10 +62,10 @@ browser to access the printer administration tools:
 
 *Do not* use the hostname for your machine - it will not work with the default
 CUPS configuration.  To enable administration access on other addresses, check
-the "Allow Remote Administration" box and click on the "Change Settings" button.
+the `Allow Remote Administration` box and click on the `Change Settings button.
 
 You will be asked for the administration password (root or any other user in the
-sys/system/root/admin/lpadmin group on your system) when performing any
+`sys/system/root/admin/lpadmin` group on your system) when performing any
 administrative function.
 
 
@@ -94,19 +94,19 @@ CUPS includes several sample PPD files you can use:
     Zebra EPL2 Label Printer       drv:///sample.drv/zebraep2.ppd
     Zebra ZPL Label Printer        drv:///sample.drv/zebra.ppd
 
-Run the "lpinfo -m" command to list the available drivers:
+Run the `lpinfo -m` command to list the available drivers:
 
     lpinfo -m
 
-Run the "lpinfo -v" command to list the available printers:
+Run the `lpinfo -v` command to list the available printers:
 
     lpinfo -v
 
-Then use the correct URI to add the printer using the "lpadmin" command:
+Then use the correct URI to add the printer using the `lpadmin` command:
 
     lpadmin -p printername -E -v device-uri -m ppd-name
 
-Network printers typically use "socket" or "lpd" URIs:
+Network printers typically use `socket` or `lpd` URIs:
 
     lpadmin -p printername -E -v socket://11.22.33.44 -m ppd-name
     lpadmin -p printername -E -v lpd://11.22.33.44/ -m ppd-name
@@ -123,12 +123,12 @@ example:
 PRINTING FILES
 --------------
 
-CUPS provides both the System V "lp" and Berkeley "lpr" commands for printing:
+CUPS provides both the System V `lp` and Berkeley `lpr` commands for printing:
 
     lp filename
     lpr filename
 
-Both the "lp" and "lpr" commands support printing options for the driver:
+Both the `lp` and `lpr` commands support printing options for the driver:
 
     lp -o media=A4 -o resolution=600dpi filename
     lpr -o media=A4 -o resolution=600dpi filename
@@ -137,7 +137,7 @@ CUPS recognizes many types of images files as well as PDF, PostScript, and text
 files, so you can print those files directly rather than through an application.
 
 If you have an application that generates output specifically for your printer
-then you need to use the "-oraw" or "-l" options:
+then you need to use the `-oraw` or `-l` options:
 
     lp -o raw filename
     lpr -l filename
