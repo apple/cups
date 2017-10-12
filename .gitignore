@@ -49,6 +49,7 @@ cups/testcreds
 cups/testcups
 cups/testdest
 cups/testfile
+cups/testgetdests
 cups/testhttp
 cups/testi18n
 cups/testipp
@@ -70,6 +71,7 @@ filter/rastertohp
 filter/rastertolabel
 filter/rastertopwg
 filter/test.raster
+filter/testclient
 filter/testraster
 locale/checkpo
 locale/po2strings
