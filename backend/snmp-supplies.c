@@ -83,6 +83,8 @@ static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
 					/* Supply information */
 static int		supply_state = -1;
 					/* Supply state info */
+static int              use_snmp_pages = 1;
+                                        /* Report pages used or not */
 
 static const int	hrDeviceDescr[] =
 			{ CUPS_OID_hrDeviceDescr, 1, -1 };
@@ -415,16 +417,21 @@ backendSNMPSupplies(
 
     if (page_count)
     {
-      if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-			 _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
-			 prtMarkerLifeCount))
-	return (-1);
+      if (use_snmp_pages)
+      {
+        if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+                            _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+                            prtMarkerLifeCount))
+          return (-1);
 
-      if (!_cupsSNMPRead(snmp_fd, &packet, CUPS_SUPPLY_TIMEOUT) ||
-	  packet.object_type != CUPS_ASN1_COUNTER)
-	return (-1);
-
-      *page_count = packet.object_value.counter;
+        if (!_cupsSNMPRead(snmp_fd, &packet, CUPS_SUPPLY_TIMEOUT) ||
+            packet.object_type != CUPS_ASN1_COUNTER)
+          return (-1);
+        
+        *page_count = packet.object_value.counter;
+      }
+      else
+        *page_count = 0;
     }
 
     return (0);
@@ -524,6 +531,12 @@ backend_init_supplies(
   {
     if (!_cups_strcasecmp(ppdattr->value, "capacity"))
       quirks |= CUPS_SNMP_CAPACITY;
+  }
+
+  if ((ppdattr = ppdFindAttr(ppd, "cupsSNMPPages", NULL)) != NULL )
+  {
+    if (_cups_strcasecmp(ppdattr->value, "true"))
+      use_snmp_pages = 0;
   }
 
   ppdClose(ppd);
