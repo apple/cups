@@ -30,12 +30,10 @@ READING THE DOCUMENTATION
 -------------------------
 
 Once you have installed the software you can access the documentation (and a
-bunch of other stuff) online at:
-
-    http://localhost:631/
+bunch of other stuff) online at <http://localhost:631/>.
 
 If you're having trouble getting that far, the documentation is located under
-the `doc/help` directory.
+the `doc/help` and `man` directories.
 
 Please read the documentation before asking questions.
 
@@ -43,10 +41,8 @@ Please read the documentation before asking questions.
 GETTING SUPPORT AND OTHER RESOURCES
 -----------------------------------
 
-If you have problems, **read the documentation first!**  We also provide two mailing
-lists which are available at:
-
-    https://lists.cups.org/mailman/listinfo
+If you have problems, *read the documentation first!*  We also provide two
+mailing lists which are available at <https://lists.cups.org/mailman/listinfo>.
 
 See the CUPS web site at <https://www.cups.org/> for other resources.
 
@@ -55,27 +51,30 @@ SETTING UP PRINTER QUEUES USING YOUR WEB BROWSER
 ------------------------------------------------
 
 CUPS includes a web-based administration tool that allows you to manage
-printers, classes, and jobs on your server.  Open the following URL in your
-browser to access the printer administration tools:
-
-    http://localhost:631/admin/
+printers, classes, and jobs on your server.  Open <http://localhost:631/admin/>
+in your browser to access the printer administration tools:
 
 *Do not* use the hostname for your machine - it will not work with the default
 CUPS configuration.  To enable administration access on other addresses, check
 the `Allow Remote Administration` box and click on the `Change Settings button.
 
 You will be asked for the administration password (root or any other user in the
-`sys/system/root/admin/lpadmin` group on your system) when performing any
+sys/system/root/admin/lpadmin group on your system) when performing any
 administrative function.
 
 
 SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 -----------------------------------------------
 
-CUPS works best with PPD (PostScript Printer Description) files.  In a pinch you
-can also use System V style printer interface scripts.
+CUPS currently uses PPD (PostScript Printer Description) files that describe
+printer capabilities and driver programs needed for each printer.  The
+`everywhere` PPD is used for nearly all modern networks printers sold since
+about 2009.  For example, the following command creates a print queue for a
+printer at address 11.22.33.44:
 
-CUPS includes several sample PPD files you can use:
+    lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
+
+CUPS also includes several sample PPD files you can use for "legacy" printers:
 
     Driver                         PPD Name
     -----------------------------  ------------------------------
@@ -94,7 +93,7 @@ CUPS includes several sample PPD files you can use:
     Zebra EPL2 Label Printer       drv:///sample.drv/zebraep2.ppd
     Zebra ZPL Label Printer        drv:///sample.drv/zebra.ppd
 
-Run the `lpinfo -m` command to list the available drivers:
+You can run the `lpinfo -m` command to list all of the available drivers:
 
     lpinfo -m
 
@@ -106,18 +105,19 @@ Then use the correct URI to add the printer using the `lpadmin` command:
 
     lpadmin -p printername -E -v device-uri -m ppd-name
 
-Network printers typically use `socket` or `lpd` URIs:
+Current network printers typically use `ipp` or `ipps` URIS:
+
+    lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
+    lpadmin -p printername -E -v ipps://11.22.33.44/ipp/print -m everywhere
+
+Older network printers typically use `socket` or `lpd` URIs:
 
     lpadmin -p printername -E -v socket://11.22.33.44 -m ppd-name
     lpadmin -p printername -E -v lpd://11.22.33.44/ -m ppd-name
 
 The sample drivers provide basic printing capabilities, but generally do not
-exercise the full potential of the printers or CUPS.
-
-CUPS also supports IPP Everywhere printers using the "everywhere" model, for
-example:
-
-    lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
+exercise the full potential of the printers or CUPS.  Other drivers provide
+greater printing capabilities.
 
 
 PRINTING FILES
@@ -157,4 +157,4 @@ CUPS is provided under the terms of version 2 of the GNU General Public License
 and GNU Library General Public License. This program is distributed in the hope
 that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-"doc/help/license.html" or "LICENSE.txt" files for more information.
+`doc/help/license.html` or `LICENSE.txt` files for more information.
