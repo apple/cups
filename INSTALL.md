@@ -1,9 +1,9 @@
-INSTALL - CUPS v2.2.5 - 2017-09-25
+INSTALL - CUPS v2.2.5 - 2017-10-12
 ==================================
 
 This file describes how to compile and install CUPS from source code. For more
-information on CUPS see the file called "README.txt".  A complete change log can
-be found in "CHANGES.txt".
+information on CUPS see the file called "README.md".  A complete change log can
+be found in "CHANGES.md".
 
 Using CUPS requires additional third-party support software and printer drivers.
 These are typically included with your operating system distribution.  Apple
