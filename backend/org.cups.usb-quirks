@@ -76,6 +76,9 @@
 # Canon, Inc. MP510 Printer (https://bugs.launchpad.net/bugs/1050009)
 0x04a9 0x1717 unidir
 
+# Canon, Inc. MP540 Printer, https://bugzilla.redhat.com/967873
+0x04a9 0x1730 unidir
+
 # Canon, Inc. MP550 Printer (Issue #4155)
 0x04a9 0x173d unidir
 
@@ -126,6 +129,9 @@
 
 # All Samsung devices (https://bugs.launchpad.net/bugs/1032456)
 0x04e8 soft-reset
+
+# Samsung ML-2160 Series (https://bugzilla.redhat.com/show_bug.cgi?id=873123)
+0x04e8 0x330f unidir
 
 # All Zebra devices (https://bugs.launchpad.net/bugs/1001028)
 0x0a5f unidir
