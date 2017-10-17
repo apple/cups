@@ -2346,7 +2346,7 @@ http_resolve_cb(
     const char             *type,	/* I - Registration type */
     const char             *domain,	/* I - Domain (unused) */
     const char             *hostTarget,	/* I - Hostname */
-    const AvahiAddress     *address,	/* I - Address (unused) */
+    const AvahiAddress     *address,	/* I - Address */
     uint16_t               port,	/* I - Port number */
     AvahiStringList        *txt,	/* I - TXT record */
     AvahiLookupResultFlags flags,	/* I - Lookup flags (unused) */
@@ -2499,39 +2499,62 @@ http_resolve_cb(
     * getting the IP address of the .local name and then do reverse-lookups...
     */
 
-    http_addrlist_t	*addrlist,	/* List of addresses */
-			*addr;		/* Current address */
+    http_addr_t addr;
+    size_t addrlen;
+    int error;
 
     DEBUG_printf(("5http_resolve_cb: Looking up \"%s\".", hostTarget));
 
-    snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
-    if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
+    switch (address->proto)
     {
-      for (addr = addrlist; addr; addr = addr->next)
+    case AVAHI_PROTO_INET:
+      addr.ipv4.sin_family = AF_INET;
+      addrlen = sizeof (addr.ipv4.sin_addr);
+      memcpy (&addr.ipv4.sin_addr, &address->data, addrlen);
+      break;
+    case AVAHI_PROTO_INET6:
+      addr.ipv6.sin6_family = AF_INET6;
+      addrlen = sizeof (addr.ipv6.sin6_addr);
+      memcpy (&addr.ipv6.sin6_addr, &address->data, addrlen);
+      break;
+    default:
+      DEBUG_printf(("8http_resolve_cb: unknown address family %d",
+		    address->proto));
+      addrlen = 0;
+    }
+
+    if (addrlen > 0) {
+      error = getnameinfo(&addr.addr, httpAddrLength (&addr),
+			  fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+
+      if (!error)
       {
-        int error = getnameinfo(&(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr)), fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+	DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
 
-        if (!error)
+	if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
+	    _cups_strcasecmp(hostptr, ".local"))
+
 	{
-	  DEBUG_printf(("5http_resolve_cb: Found \"%s\".", fqdn));
-
-	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
-	      _cups_strcasecmp(hostptr, ".local"))
-	  {
-	    hostTarget = fqdn;
-	    break;
-	  }
+	  hostTarget = fqdn;
 	}
+      } else {
+	avahi_address_snprint (fqdn, sizeof (fqdn), address);
+	hostTarget = fqdn;
+
 #ifdef DEBUG
-	else
-	  DEBUG_printf(("5http_resolve_cb: \"%s\" did not resolve: %d",
-	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
-			error));
+	DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+		      fqdn, error));
 #endif /* DEBUG */
       }
 
-      httpAddrFreeList(addrlist);
     }
+  } else {
+   /*
+    * Use the IP address that responded...
+    */
+
+   avahi_address_snprint (fqdn, sizeof (fqdn), address);
+   hostTarget = fqdn;
   }
 
  /*
