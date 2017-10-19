@@ -26,16 +26,12 @@
  * Local globals...
  */
 
-static int		tls_auto_create = 0;
-					/* Auto-create self-signed certs? */
-static char		*tls_common_name = NULL;
-					/* Default common name */
-static gnutls_x509_crl_t tls_crl = NULL;/* Certificate revocation list */
-static char		*tls_keypath = NULL;
-					/* Server cert keychain path */
-static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
-					/* Mutex for keychain/certs */
-static int		tls_options = -1;/* Options for TLS connections */
+static int               tls_auto_create = 0;                 /* Auto-create self-signed certs? */
+static char             *tls_common_name = NULL;              /* Default common name */
+static gnutls_x509_crl_t tls_crl = NULL;                      /* Certificate revocation list */
+static char             *tls_keypath = NULL;                  /* Server cert keychain path */
+static _cups_mutex_t     tls_mutex = _CUPS_MUTEX_INITIALIZER; /* Mutex for keychain/certs */
+static unsigned int      tls_options = _HTTP_TLS_NONE;        /* Options for TLS connections */
 
 
 /*
@@ -1224,7 +1220,7 @@ _httpTLSSetCredentials(http_t *http)	/* I - Connection to server */
  */
 
 void
-_httpTLSSetOptions(int options)		/* I - Options */
+_httpTLSSetOptions(unsigned int options)		/* I - Options */
 {
   tls_options = options;
 }
@@ -1248,7 +1244,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
   DEBUG_printf(("3_httpTLSStart(http=%p)", http));
 
-  if (tls_options < 0)
+  if ((tls_options == _HTTP_TLS_UNCHANGED) || (tls_options == _HTTP_TLS_NONE))
   {
     DEBUG_puts("4_httpTLSStart: Setting defaults.");
     _cupsSetDefaults();
@@ -1506,21 +1502,25 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   strlcpy(priority_string, "NORMAL", sizeof(priority_string));
 
   if (tls_options & _HTTP_TLS_DENY_TLS10)
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string));
+    strlcat(priority_string, ":+VERS-TLS-ALL:!VERS-TLS1.0:!VERS-SSL3.0", sizeof(priority_string));
   else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
     strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string));
   else if (tls_options & _HTTP_TLS_ONLY_TLS10)
-    strlcat(priority_string, ":-VERS-TLS-ALL:-VERS-SSL3.0:+VERS-TLS1.0", sizeof(priority_string));
+    strlcat(priority_string, ":!VERS-TLS-ALL:!VERS-SSL3.0:+VERS-TLS1.0", sizeof(priority_string));
   else
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
+    strlcat(priority_string, ":+VERS-TLS-ALL:!VERS-SSL3.0", sizeof(priority_string));
 
-  if (!(tls_options & _HTTP_TLS_ALLOW_RC4))
-    strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
+  if (tls_options & _HTTP_TLS_ALLOW_RC4)
+    strlcat(priority_string, ":+ARCFOUR-128", sizeof(priority_string));
+  else
+    strlcat(priority_string, ":!ARCFOUR-128", sizeof(priority_string));
 
-  if (!(tls_options & _HTTP_TLS_ALLOW_DH))
+  if (tls_options & _HTTP_TLS_ALLOW_DH)
+    strlcat(priority_string, ":+ANON-DH", sizeof(priority_string));
+  else
     strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
 
-  if (!(tls_options & _HTTP_TLS_DENY_CBC))
+  if (tls_options & _HTTP_TLS_DENY_CBC)
     strlcat(priority_string, ":!AES-128-CBC:!AES-256-CBC:!CAMELLIA-128-CBC:!CAMELLIA-256-CBC:!3DES-CBC", sizeof(priority_string));
 
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
