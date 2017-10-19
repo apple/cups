@@ -131,13 +131,12 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Get the default connection as needed...
   */
 
-  if (!http)
-    if ((http = _cupsConnect()) == NULL)
-    {
-      ippDelete(request);
+  if (!http && (http = _cupsConnect()) == NULL)
+  {
+    ippDelete(request);
 
-      return (NULL);
-    }
+    return (NULL);
+  }
 
  /*
   * See if we have a file to send...
@@ -578,9 +577,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Get the default connection as needed...
   */
 
-  if (!http)
-    if ((http = _cupsConnect()) == NULL)
-      return (HTTP_STATUS_SERVICE_UNAVAILABLE);
+  if (!http && (http = _cupsConnect()) == NULL)
+    return (HTTP_STATUS_SERVICE_UNAVAILABLE);
 
  /*
   * If the prior request was not flushed out, do so now...
