@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "26 June 2017" "Apple Inc."
+.TH client.conf 5 "CUPS" "19 October 2017" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups
 .SH DESCRIPTION
@@ -61,8 +61,10 @@ Specifies the address and optionally the port to use when connecting to a server
 \fBSSLOptions None\fR
 Sets encryption options (only in /etc/cups/client.conf).
 By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
-The \fIAllowDH\fR option enables cipher suites using plain Diffie-Hellman key negotiation.
-The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
+Security is reduced when \fIAllow\fR options are used.
+Security is enhanced when \fIDeny\fR options are used.
+The \fIAllowDH\fR option enables cipher suites using plain Diffie-Hellman key negotiation (not supported on systems using GNU TLS).
+The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are required for some older clients.
 The \fIAllowSSL3\fR option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
 The \fIDenyCBC\fR option disables all CBC cipher suites.
 The \fIDenyTLS1.0\fR option disables TLS v1.0 support - this sets the minimum protocol version to TLS v1.1.

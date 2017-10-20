@@ -1141,7 +1141,8 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 void
 _httpTLSSetOptions(int options)		/* I - Options */
 {
-  tls_options = options;
+  if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
+    tls_options = options;
 }
 
 
