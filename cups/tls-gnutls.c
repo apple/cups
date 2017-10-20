@@ -1499,7 +1499,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  strlcpy(priority_string, "NORMAL", sizeof(priority_string));
+  strlcpy(priority_string, "NORMAL:!ANON-ECDH:!ANON-DH", sizeof(priority_string));
 
   if (tls_options & _HTTP_TLS_DENY_TLS10)
     strlcat(priority_string, ":+VERS-TLS-ALL:!VERS-TLS1.0:!VERS-SSL3.0", sizeof(priority_string));
@@ -1515,10 +1515,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   else
     strlcat(priority_string, ":!ARCFOUR-128", sizeof(priority_string));
 
-  if (tls_options & _HTTP_TLS_ALLOW_DH)
-    strlcat(priority_string, ":+ANON-DH", sizeof(priority_string));
-  else
-    strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
+  /* _HTTP_TLS_ALLOW_DH cannot be implemented with gnutls */
 
   if (tls_options & _HTTP_TLS_DENY_CBC)
     strlcat(priority_string, ":!AES-128-CBC:!AES-256-CBC:!CAMELLIA-128-CBC:!CAMELLIA-256-CBC:!3DES-CBC", sizeof(priority_string));
