@@ -52,7 +52,7 @@
  * Local globals...
  */
 
-static int		tls_options = -1;/* Options for TLS connections */
+static unsigned int tls_options = _HTTP_TLS_NONE; /* Options for TLS connections */
 
 
 /*
@@ -911,7 +911,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
  */
 
 void
-_httpTLSSetOptions(int options)		/* I - Options */
+_httpTLSSetOptions(unsigned int options)		/* I - Options */
 {
   tls_options = options;
 }
@@ -930,7 +930,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   DEBUG_printf(("3_httpTLSStart(http=%p)", http));
 
-  if (tls_options < 0)
+  if ((tls_options == _HTTP_TLS_UNCHANGED) || (tls_options == _HTTP_TLS_NONE))
   {
     DEBUG_puts("4_httpTLSStart: Setting defaults.");
     _cupsSetDefaults();

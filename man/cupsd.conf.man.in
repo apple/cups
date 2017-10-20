@@ -445,10 +445,10 @@ Listens on the specified address and port for encrypted connections.
 \fBSSLOptions None\fR
 Sets encryption options.
 By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
-The \fIAllowDH\fR option enables cipher suites using plain Diffie-Hellman key negotiation.
-The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
-The \fIAllowSSL3\fR option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
-The \fIDenyCBC\fR option disables all CBC cipher suites.
+The \fIAllowDH\fR option enables cipher suites using static Diffie-Hellman key negotiation. This option is currently only supported on macOS.
+The \fIAllowRC4\fR option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones. This option is currently not supported on Windows.
+The \fIAllowSSL3\fR option enables the SSL v3.0 protocol, which is required for some older clients that do not support TLS v1.0.
+The \fIDenyCBC\fR option disables all CBC cipher suites. This option is currently not supported on Windows.
 The \fIDenyTLS1.0\fR option disables TLS v1.0 support - this sets the minimum protocol version to TLS v1.1.
 .\"#SSLPort
 .TP 5
