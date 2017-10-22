@@ -36,17 +36,24 @@ extern char **environ; /* @private@ */
  * Local globals...
  */
 
-static int            tls_auto_create = 0;                 /* Auto-create self-signed certs? */
-static char          *tls_common_name = NULL;              /* Default common name */
+static int		tls_auto_create = 0;
+					/* Auto-create self-signed certs? */
+static char		*tls_common_name = NULL;
+					/* Default common name */
 #ifdef HAVE_SECKEYCHAINOPEN
-static int            tls_cups_keychain = 0;               /* Opened the CUPS keychain? */
-static SecKeychainRef tls_keychain = NULL;                 /* Server cert keychain */
+static int		tls_cups_keychain = 0;
+					/* Opened the CUPS keychain? */
+static SecKeychainRef	tls_keychain = NULL;
+					/* Server cert keychain */
 #else
-static SecIdentityRef tls_selfsigned = NULL;               /* Temporary self-signed cert */
+static SecIdentityRef	tls_selfsigned = NULL;
+					/* Temporary self-signed cert */
 #endif /* HAVE_SECKEYCHAINOPEN */
-static char          *tls_keypath = NULL;                  /* Server cert keychain path */
-static _cups_mutex_t  tls_mutex = _CUPS_MUTEX_INITIALIZER; /* Mutex for keychain/certs */
-static unsigned int   tls_options = _HTTP_TLS_NONE;        /* Options for TLS connections */
+static char		*tls_keypath = NULL;
+					/* Server cert keychain path */
+static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for keychain/certs */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -1132,7 +1139,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
  */
 
 void
-_httpTLSSetOptions(unsigned int options)		/* I - Options */
+_httpTLSSetOptions(int options)		/* I - Options */
 {
   tls_options = options;
 }
@@ -1162,7 +1169,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   DEBUG_printf(("3_httpTLSStart(http=%p)", (void *)http));
 
-  if ((tls_options == _HTTP_TLS_UNCHANGED) || (tls_options == _HTTP_TLS_NONE))
+  if (tls_options < 0)
   {
     DEBUG_puts("4_httpTLSStart: Setting defaults.");
     _cupsSetDefaults();

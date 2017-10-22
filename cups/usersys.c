@@ -957,10 +957,7 @@ _cupsSetDefaults(void)
     cg->validate_certs = cc.validate_certs;
 
 #ifdef HAVE_SSL
-  if (cc.ssl_options != _HTTP_TLS_UNCHANGED)
-  {
-    _httpTLSSetOptions(cc.ssl_options);
-  }
+  _httpTLSSetOptions(cc.ssl_options);
 #endif /* HAVE_SSL */
 }
 
@@ -1339,10 +1336,10 @@ cups_set_ssl_options(
   * SSLOptions [AllowRC4] [AllowSSL3] [AllowDH] [DenyTLS1.0] [None]
   */
 
-  unsigned int options = _HTTP_TLS_UNCHANGED; /* SSL/TLS options */
-  char         temp[256],                     /* Copy of value */
-              *start,                         /* Start of option */
-              *end;                           /* End of option */
+  int	options = _HTTP_TLS_NONE;	/* SSL/TLS options */
+  char	temp[256],			/* Copy of value */
+	*start,				/* Start of option */
+	*end;				/* End of option */
 
 
   strlcpy(temp, value, sizeof(temp));
