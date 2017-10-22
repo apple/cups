@@ -957,7 +957,7 @@ _cupsSetDefaults(void)
     cg->validate_certs = cc.validate_certs;
 
 #ifdef HAVE_SSL
-  _httpTLSSetOptions(cc.ssl_options);
+  _httpTLSSetOptions(cc.ssl_options | _HTTP_TLS_SET_DEFAULT);
 #endif /* HAVE_SSL */
 }
 

@@ -172,20 +172,20 @@ extern "C" {
  * Constants...
  */
 
+#  define _HTTP_MAX_SBUFFER	65536	/* Size of (de)compression buffer */
+#  define _HTTP_RESOLVE_DEFAULT	0	/* Just resolve with default options */
+#  define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
+#  define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
+#  define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
 
-#define _HTTP_MAX_SBUFFER	65536	/* Size of (de)compression buffer */
-#define _HTTP_RESOLVE_DEFAULT	0	/* Just resolve with default options */
-#define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
-#define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
-#define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
-
-#define _HTTP_TLS_NONE		0	/* No TLS options */
-#define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
-#define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
-#define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
-#define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
-#define _HTTP_TLS_DENY_CBC	32	/* Deny CBC cipher suites */
-#define _HTTP_TLS_ONLY_TLS10    64      /* Only use TLS 1.0 */
+#  define _HTTP_TLS_NONE	0	/* No TLS options */
+#  define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
+#  define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
+#  define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
+#  define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
+#  define _HTTP_TLS_DENY_CBC	32	/* Deny CBC cipher suites */
+#  define _HTTP_TLS_ONLY_TLS10  64      /* Only use TLS 1.0 */
+#  define _HTTP_TLS_SET_DEFAULT 128     /* Setting the default TLS options */
 
 
 /*

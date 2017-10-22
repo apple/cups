@@ -1,7 +1,15 @@
-CHANGES - 2.2.5 - 2017-10-12
+CHANGES - 2.2.6 - 2017-10-19
 ============================
 
-CHANGES IN CUPS V2.2.5
+
+Changes in CUPS v2.2.6
+----------------------
+
+- Added USB quirks rules for Canon MP540 and Samsung ML-2160 (Issue #5148)
+- Fixed TLS cipher suite selection with GNU TLS (Issue #5145)
+
+
+Changes in CUPS v2.2.5
 ----------------------
 
 - The scheduler's `-t` option did not force all errors to the standard error
@@ -73,7 +81,7 @@ CHANGES IN CUPS V2.2.5
   WITH-SCHEME predicates.
 
 
-CHANGES IN CUPS V2.2.4
+Changes in CUPS v2.2.4
 ----------------------
 
 - The scheduler did not remove old job files (Issue #4987)
@@ -111,7 +119,7 @@ CHANGES IN CUPS V2.2.4
   `DenyCBC` and `DenyTLS1.0` options (Issue #5037)
 
 
-CHANGES IN CUPS V2.2.3
+Changes in CUPS v2.2.3
 ----------------------
 
 - The IPP backend could get into an infinite loop for certain errors, causing a
@@ -139,7 +147,7 @@ CHANGES IN CUPS V2.2.3
 - Fixed some localization issues on macOS (<rdar://problem/27245567>)
 
 
-CHANGES IN CUPS V2.2.2
+Changes in CUPS v2.2.2
 ----------------------
 
 - Fixed some issues with the Zebra ZPL printer driver (Issue #4898)
@@ -169,7 +177,7 @@ CHANGES IN CUPS V2.2.2
 - Updated packaging files (Issue #4940)
 
 
-CHANGES IN CUPS V2.2.1
+Changes in CUPS v2.2.1
 ----------------------
 
 - Added "CreateSelfSignedCerts" directive for cups-files.conf to control whether
@@ -183,7 +191,7 @@ CHANGES IN CUPS V2.2.1
 - Updated localizations (PR #4877, PR #4886)
 
 
-CHANGES IN CUPS V2.2.0
+Changes in CUPS v2.2.0
 ----------------------
 
 - Normalized the TLS certificate validation code and added additional error
@@ -194,7 +202,7 @@ CHANGES IN CUPS V2.2.0
 - http*Connect did not return early when all addresses failed (Issue #4870)
 
 
-CHANGES IN CUPS V2.2rc1
+Changes in CUPS v2.2rc1
 -----------------------
 
 - Updated the list of supported IPP Everywhere media types.
@@ -207,14 +215,14 @@ CHANGES IN CUPS V2.2rc1
 - Updated localizations (Issue #4846, PR #4858)
 
 
-CHANGES IN CUPS V2.2b2
+Changes in CUPS v2.2b2
 ----------------------
 
 - Added Upstart support (PR #4825)
 - CUPS now supports Let's Encrypt certificates on Linux.
 
 
-CHANGES IN CUPS V2.2b1
+Changes in CUPS v2.2b1
 ----------------------
 
 - All CUPS commands now support POSIX options (Issue #4813)
