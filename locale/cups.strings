@@ -926,6 +926,8 @@
 "Error reading raster data." = "Error reading raster data.";
 "Error sending raster data." = "Error sending raster data.";
 "Error: need hostname after \"-h\" option." = "Error: need hostname after “-h” option.";
+"European Fanfold" = "European Fanfold";
+"European Fanfold Legal" = "European Fanfold Legal";
 "Every 10 Labels" = "Every 10 Labels";
 "Every 2 Labels" = "Every 2 Labels";
 "Every 3 Labels" = "Every 3 Labels";
@@ -947,9 +949,6 @@
 "Fabric" = "Fabric";
 "Face Down" = "Face Down";
 "Face Up" = "Face Up";
-"FanFold German" = "FanFold German";
-"FanFold Legal German" = "FanFold Legal German";
-"Fanfold US" = "Fanfold US";
 "Fast Grayscale" = "Fast Grayscale";
 "File \"%s\" contains a relative path." = "File “%s” contains a relative path.";
 "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "File “%s” has insecure permissions (0%o/uid=%d/gid=%d).";
@@ -1538,6 +1537,7 @@
 "Trust on first use is disabled." = "Trust on first use is disabled.";
 "URI Too Long" = "URI Too Long";
 "URI too large" = "URI too large";
+"US Fanfold" = "US Fanfold";
 "US Ledger" = "US Ledger";
 "US Legal" = "US Legal";
 "US Legal Oversize" = "US Legal Oversize";

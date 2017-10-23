@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:29-0400\n"
+"POT-Creation-Date: 2017-10-23 17:48-0400\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3494,6 +3494,12 @@ msgstr "Error enviando trama de datos (raster)."
 msgid "Error: need hostname after \"-h\" option."
 msgstr "Error: se necesita un nombre de equipo tras la opción \"-h\"."
 
+msgid "European Fanfold"
+msgstr ""
+
+msgid "European Fanfold Legal"
+msgstr ""
+
 msgid "Every 10 Labels"
 msgstr "Cada 10 etiquetas"
 
@@ -3556,15 +3562,6 @@ msgstr ""
 
 msgid "Face Up"
 msgstr ""
-
-msgid "FanFold German"
-msgstr "FanFold alemán"
-
-msgid "FanFold Legal German"
-msgstr "FanFold Legal alemán"
-
-msgid "Fanfold US"
-msgstr "FanFold de EE.UU"
 
 msgid "Fast Grayscale"
 msgstr "Escala de grises rápida"
@@ -5422,6 +5419,9 @@ msgstr "URI demasiado largo"
 
 msgid "URI too large"
 msgstr "URI demasiado grande"
+
+msgid "US Fanfold"
+msgstr ""
 
 msgid "US Ledger"
 msgstr "Libro Mayor, 17 x 11 pulg."
@@ -13547,6 +13547,15 @@ msgstr "Z Offset"
 
 #~ msgid "CD/DVD/Bluray"
 #~ msgstr "CD/DVD/Bluray"
+
+#~ msgid "FanFold German"
+#~ msgstr "FanFold alemán"
+
+#~ msgid "FanFold Legal German"
+#~ msgstr "FanFold Legal alemán"
+
+#~ msgid "Fanfold US"
+#~ msgstr "FanFold de EE.UU"
 
 #~ msgid "Finishing"
 #~ msgstr "Terminando"

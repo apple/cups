@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:29-0400\n"
+"POT-Creation-Date: 2017-10-23 17:48-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4238,6 +4238,14 @@ msgstr ""
 msgid "Error: need hostname after \"-h\" option."
 msgstr ""
 
+#: ppdc/sample.c:122
+msgid "European Fanfold"
+msgstr ""
+
+#: ppdc/sample.c:123
+msgid "European Fanfold Legal"
+msgstr ""
+
 #: ppdc/sample.c:350
 msgid "Every 10 Labels"
 msgstr ""
@@ -4326,18 +4334,6 @@ msgstr ""
 
 #: cups/ppd-cache.c:3746
 msgid "Face Up"
-msgstr ""
-
-#: ppdc/sample.c:122
-msgid "FanFold German"
-msgstr ""
-
-#: ppdc/sample.c:123
-msgid "FanFold Legal German"
-msgstr ""
-
-#: ppdc/sample.c:124
-msgid "Fanfold US"
 msgstr ""
 
 #: cups/ppd-cache.c:3624
@@ -6772,6 +6768,10 @@ msgstr ""
 
 #: cups/http-support.c:1461
 msgid "URI too large"
+msgstr ""
+
+#: ppdc/sample.c:124
+msgid "US Fanfold"
 msgstr ""
 
 #: ppdc/sample.c:138

@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:29-0400\n"
+"POT-Creation-Date: 2017-10-23 17:48-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -3466,6 +3466,12 @@ msgstr "S'ha produït un error quan s'enviaven les dades de la trama."
 msgid "Error: need hostname after \"-h\" option."
 msgstr "ERROR: es necessita un nom d'amfitrió després de l'opció «-h»."
 
+msgid "European Fanfold"
+msgstr ""
+
+msgid "European Fanfold Legal"
+msgstr ""
+
 msgid "Every 10 Labels"
 msgstr "Cada 10 etiquetes"
 
@@ -3528,15 +3534,6 @@ msgstr ""
 
 msgid "Face Up"
 msgstr ""
-
-msgid "FanFold German"
-msgstr "Paper continu alemany"
-
-msgid "FanFold Legal German"
-msgstr "Paper continu legal alemany"
-
-msgid "Fanfold US"
-msgstr "Paper continu americà"
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -5393,6 +5390,9 @@ msgid "URI Too Long"
 msgstr "L'URI és massa llarg"
 
 msgid "URI too large"
+msgstr ""
+
+msgid "US Fanfold"
 msgstr ""
 
 msgid "US Ledger"
@@ -13430,6 +13430,15 @@ msgstr "Z Offset"
 
 #~ msgid "Envelope PRC1 "
 #~ msgstr "Sobre PRC1"
+
+#~ msgid "FanFold German"
+#~ msgstr "Paper continu alemany"
+
+#~ msgid "FanFold Legal German"
+#~ msgstr "Paper continu legal alemany"
+
+#~ msgid "Fanfold US"
+#~ msgstr "Paper continu americà"
 
 #~ msgid "File Folder "
 #~ msgstr "Carpeta d'arxivador "

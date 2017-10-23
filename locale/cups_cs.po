@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:29-0400\n"
+"POT-Creation-Date: 2017-10-23 17:48-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -3264,6 +3264,12 @@ msgstr ""
 msgid "Error: need hostname after \"-h\" option."
 msgstr ""
 
+msgid "European Fanfold"
+msgstr ""
+
+msgid "European Fanfold Legal"
+msgstr ""
+
 msgid "Every 10 Labels"
 msgstr "Každých 10 štítků"
 
@@ -3325,15 +3331,6 @@ msgid "Face Down"
 msgstr ""
 
 msgid "Face Up"
-msgstr ""
-
-msgid "FanFold German"
-msgstr ""
-
-msgid "FanFold Legal German"
-msgstr ""
-
-msgid "Fanfold US"
 msgstr ""
 
 msgid "Fast Grayscale"
@@ -5170,6 +5167,9 @@ msgid "URI Too Long"
 msgstr "URI je příliš dlouhá"
 
 msgid "URI too large"
+msgstr ""
+
+msgid "US Fanfold"
 msgstr ""
 
 msgid "US Ledger"

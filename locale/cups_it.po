@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:29-0400\n"
+"POT-Creation-Date: 2017-10-23 17:48-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3492,6 +3492,12 @@ msgstr "Si è verificato un errore durante l'invio dei dati raster."
 msgid "Error: need hostname after \"-h\" option."
 msgstr "Errore: è necessario l'hostname dopo l'opzione \"-h\"."
 
+msgid "European Fanfold"
+msgstr ""
+
+msgid "European Fanfold Legal"
+msgstr ""
+
 msgid "Every 10 Labels"
 msgstr "Ogni 10 etichette"
 
@@ -3554,15 +3560,6 @@ msgstr ""
 
 msgid "Face Up"
 msgstr ""
-
-msgid "FanFold German"
-msgstr "FanFold German"
-
-msgid "FanFold Legal German"
-msgstr "FanFold Legal German"
-
-msgid "Fanfold US"
-msgstr "FanFold US"
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -5421,6 +5418,9 @@ msgid "URI Too Long"
 msgstr "L'URI è troppo lungo"
 
 msgid "URI too large"
+msgstr ""
+
+msgid "US Fanfold"
 msgstr ""
 
 msgid "US Ledger"
@@ -13562,6 +13562,15 @@ msgstr "Z Offset"
 
 #~ msgid "Envelope PRC1 "
 #~ msgstr "Envelope PRC1 "
+
+#~ msgid "FanFold German"
+#~ msgstr "FanFold German"
+
+#~ msgid "FanFold Legal German"
+#~ msgstr "FanFold Legal German"
+
+#~ msgid "Fanfold US"
+#~ msgstr "FanFold US"
 
 #~ msgid "File Folder "
 #~ msgstr "Directory del file"
