@@ -1,12 +1,13 @@
-CHANGES - 2.2.6 - 2017-10-19
+CHANGES - 2.2.6 - 2017-10-23
 ============================
 
 
 Changes in CUPS v2.2.6
 ----------------------
 
+- DBUS notifications could crash the scheduler (Issue #5143)
 - Added USB quirks rules for Canon MP540 and Samsung ML-2160 (Issue #5148)
-- Fixed TLS cipher suite selection with GNU TLS (Issue #5145)
+- Fixed TLS cipher suite selection with GNU TLS (Issue #5145, Issue #5150)
 
 
 Changes in CUPS v2.2.5

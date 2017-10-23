@@ -1597,6 +1597,16 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     return (NULL);
   }
 
+  attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
+
+  if (attr && !ippValidateAttribute(attr))
+  {
+    send_ipp_status(con, IPP_ATTRIBUTES, _("Bad requesting-user-name value: %s"), cupsLastErrorString());
+    if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
+      attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+    return (NULL);
+  }
+
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
     send_ipp_status(con, IPP_INTERNAL_ERROR,
@@ -1614,8 +1624,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   add_job_uuid(job);
   apply_printer_defaults(printer, job);
-
-  attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
 
   if (con->username[0])
   {
