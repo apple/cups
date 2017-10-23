@@ -1509,14 +1509,16 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   if (tls_options & _HTTP_TLS_DENY_TLS10)
     strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string));
   else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string));
+    strlcat(priority_string, ":+VERS-TLS-ALL:+VERS-SSL3.0", sizeof(priority_string));
   else if (tls_options & _HTTP_TLS_ONLY_TLS10)
     strlcat(priority_string, ":-VERS-TLS-ALL:-VERS-SSL3.0:+VERS-TLS1.0", sizeof(priority_string));
   else
     strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
 
-  if (!(tls_options & _HTTP_TLS_ALLOW_RC4))
-    strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
+  if (tls_options & _HTTP_TLS_ALLOW_RC4)
+    strlcat(priority_string, ":+ARCFOUR-128", sizeof(priority_string));
+  else
+    strlcat(priority_string, ":!ARCFOUR-128", sizeof(priority_string));
 
   strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
 
