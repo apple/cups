@@ -757,6 +757,7 @@
 "Bad printer-uri." = "Bad printer-uri.";
 "Bad request ID %d." = "Bad request ID %d.";
 "Bad request version number %d.%d." = "Bad request version number %d.%d.";
+"Bad requesting-user-name value: %s" = "Bad requesting-user-name value: %s";
 "Bad resource in URI" = "Bad resource in URI";
 "Bad scheme in URI" = "Bad scheme in URI";
 "Bad subscription ID" = "Bad subscription ID";

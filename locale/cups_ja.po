@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-08-28 12:25-0400\n"
+"POT-Creation-Date: 2017-10-23 17:29-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -2920,6 +2920,10 @@ msgstr "%d は無効なリクエストIDです。"
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "バージョン番号 %d.%d は無効なリクエストです。"
+
+#, c-format
+msgid "Bad requesting-user-name value: %s"
+msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "URI のリソースが不正"
