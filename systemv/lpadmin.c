@@ -601,25 +601,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   if (num_options || file)
   {
-    if (!http)
-    {
-      http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL);
-
-      if (http == NULL)
-      {
-	_cupsLangPrintf(stderr,
-			_("lpadmin: Unable to connect to server: %s"),
-			strerror(errno));
-	return (1);
-      }
-    }
-
     if (printer == NULL)
     {
       _cupsLangPuts(stderr,
                     _("lpadmin: Unable to set the printer options:\n"
-		      "         You must specify a printer name first."));
+                      "         You must specify a printer name first."));
       return (1);
+    }
+
+    if (!http)
+    {
+      http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC,
+                          cupsEncryption(), 1, 30000, NULL);
+
+      if (http == NULL) {
+        _cupsLangPrintf(stderr, _("lpadmin: Unable to connect to server: %s"),
+                        strerror(errno));
+        return (1);
+      }
     }
 
     if (set_printer_options(http, printer, num_options, options, file))
