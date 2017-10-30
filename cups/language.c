@@ -697,9 +697,9 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       * Map Chinese region codes to legacy country codes.
       */
 
-      if (!strcmp(country, "HANS"))
+      if (!strcmp(language, "zh") && !strcmp(country, "HANS"))
         strlcpy(country, "CN", sizeof(country));
-      if (!strcmp(country, "HANT"))
+      if (!strcmp(language, "zh") && !strcmp(country, "HANT"))
         strlcpy(country, "TW", sizeof(country));
     }
 

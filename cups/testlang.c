@@ -245,6 +245,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 #endif /* __APPLE__ */
 
+  if (errors == 0)
+    puts("ALL TESTS PASSED");
+
   return (errors > 0);
 }
 
