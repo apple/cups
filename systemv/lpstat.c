@@ -1795,20 +1795,16 @@ show_printers(const char  *printers,	/* I - Destinations */
         switch (pstate)
 	{
 	  case IPP_PRINTER_IDLE :
-	      _cupsLangPrintf(stdout,
-	                      _("printer %s is idle.  enabled since %s"),
-			      printer, printer_state_time);
+	      if (ippContainsString(reasons, "hold-new-jobs"))
+		_cupsLangPrintf(stdout, _("printer %s is holding new jobs.  enabled since %s"), printer, printer_state_time);
+	      else
+		_cupsLangPrintf(stdout, _("printer %s is idle.  enabled since %s"), printer, printer_state_time);
 	      break;
 	  case IPP_PRINTER_PROCESSING :
-	      _cupsLangPrintf(stdout,
-	                      _("printer %s now printing %s-%d.  "
-			        "enabled since %s"),
-	        	      printer, printer, jobid, printer_state_time);
+	      _cupsLangPrintf(stdout, _("printer %s now printing %s-%d.  enabled since %s"), printer, printer, jobid, printer_state_time);
 	      break;
 	  case IPP_PRINTER_STOPPED :
-	      _cupsLangPrintf(stdout,
-	                      _("printer %s disabled since %s -"),
-			      printer, printer_state_time);
+	      _cupsLangPrintf(stdout, _("printer %s disabled since %s -"), printer, printer_state_time);
 	      break;
 	}
 
