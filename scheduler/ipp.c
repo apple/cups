@@ -952,6 +952,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
+
+    pclass->printer_id = NextPrinterId ++;
   }
   else if ((status = cupsdCheckPolicy(pclass->op_policy_ptr, con,
                                       NULL)) != HTTP_OK)
@@ -2341,6 +2343,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
+
+    printer->printer_id = NextPrinterId ++;
   }
   else if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
                                       NULL)) != HTTP_OK)
@@ -2841,9 +2845,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Update the printer attributes and return...
   */
 
-  cupsdSetPrinterAttrs(printer);
   if (!printer->temporary)
+  {
+    if (!printer->printer_id)
+      printer->printer_id = NextPrinterId ++;
+
     cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+  }
+
+  cupsdSetPrinterAttrs(printer);
 
   if (need_restart_job && printer->job)
   {
@@ -7462,6 +7472,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		limit;			/* Max number of printers to return */
   int		count;			/* Number of printers that match */
+  int		printer_id;		/* Printer we are interested in */
   cupsd_printer_t *printer;		/* Current printer pointer */
   cups_ptype_t	printer_type,		/* printer-type attribute */
 		printer_mask;		/* printer-type-mask attribute */
@@ -7515,6 +7526,17 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   * Support filtering...
   */
 
+  if ((attr = ippFindAttribute(con->request, "printer-id", IPP_TAG_INTEGER)) != NULL)
+  {
+    if ((printer_id = ippGetInteger(attr, 0)) <= 0)
+    {
+      send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Bad \"printer-id\" value %d."), printer_id);
+      return;
+    }
+  }
+  else
+    printer_id = 0;
+
   if ((attr = ippFindAttribute(con->request, "printer-type",
                                IPP_TAG_ENUM)) != NULL)
     printer_type = (cups_ptype_t)attr->values[0].integer;
@@ -7562,6 +7584,9 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
     if (!local && !printer->shared)
+      continue;
+
+    if (printer_id && printer->printer_id != printer_id)
       continue;
 
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&

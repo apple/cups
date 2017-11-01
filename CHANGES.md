@@ -6,6 +6,7 @@ Changes in CUPS v2.3b1
 ----------------------
 
 - The lpstat command now reports when new jobs are being held (Issue #4761)
+- The scheduler now supports the "printer-id" attribute (Issue #4868)
 - No longer support backslash, question mark, or quotes in printer names
   (Issue #4966)
 - Dropped RSS subscription management from the web interface (Issue #5012)
