@@ -7,3 +7,4 @@ Changes in CUPS v2.3b1
 
 - Fixed the ippserver sample code when threading is disabled or unavailable
   (Issue #5154)
+- Dropped hard-coded CGI scripting language support (Issue #5124)

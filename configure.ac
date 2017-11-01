@@ -36,7 +36,6 @@ sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-dnssd.m4)
 sinclude(config-scripts/cups-startup.m4)
 sinclude(config-scripts/cups-defaults.m4)
-sinclude(config-scripts/cups-scripting.m4)
 
 INSTALL_LANGUAGES=""
 UNINSTALL_LANGUAGES=""

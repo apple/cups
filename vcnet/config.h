@@ -578,20 +578,6 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Various scripting languages...
- */
-
-/* #undef HAVE_JAVA */
-#define CUPS_JAVA	""
-/* #undef HAVE_PERL */
-#define CUPS_PERL	""
-/* #undef HAVE_PHP */
-#define CUPS_PHP	""
-/* #undef HAVE_PYTHON */
-#define CUPS_PYTHON	""
-
-
-/*
  * Do we have CoreFoundation public and private headers?
  */
 

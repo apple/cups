@@ -517,22 +517,6 @@
 
 
 /*
- * Various scripting languages...
- */
-
-#if !TARGET_OS_IOS
-#  define HAVE_JAVA 1
-#  define CUPS_JAVA "/usr/bin/java"
-#  define HAVE_PERL 1
-#  define CUPS_PERL "/usr/bin/perl"
-#  define HAVE_PHP 1
-#  define CUPS_PHP "/usr/bin/php"
-#  define HAVE_PYTHON 1
-#  define CUPS_PYTHON "/usr/bin/python"
-#endif /* !TARGET_OS_IOS */
-
-
-/*
  * Do we have CoreFoundation public and private headers?
  */
 

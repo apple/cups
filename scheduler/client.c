@@ -3115,45 +3115,6 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
       strlcpy(ptr, "index.html", plen);
       status = lstat(filename, filestats);
-
-#ifdef HAVE_JAVA
-      if (status)
-      {
-	strlcpy(ptr, "index.class", plen);
-	status = lstat(filename, filestats);
-      }
-#endif /* HAVE_JAVA */
-
-#ifdef HAVE_PERL
-      if (status)
-      {
-	strlcpy(ptr, "index.pl", plen);
-	status = lstat(filename, filestats);
-      }
-#endif /* HAVE_PERL */
-
-#ifdef HAVE_PHP
-      if (status)
-      {
-	strlcpy(ptr, "index.php", plen);
-	status = lstat(filename, filestats);
-      }
-#endif /* HAVE_PHP */
-
-#ifdef HAVE_PYTHON
-      if (status)
-      {
-	strlcpy(ptr, "index.pyc", plen);
-	status = lstat(filename, filestats);
-      }
-
-      if (status)
-      {
-	strlcpy(ptr, "index.py", plen);
-	status = lstat(filename, filestats);
-      }
-#endif /* HAVE_PYTHON */
-
     }
     while (status && language[0]);
 
@@ -3336,78 +3297,6 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
-#ifdef HAVE_JAVA
-  else if (!_cups_strcasecmp(type->type, "x-httpd-java"))
-  {
-   /*
-    * "application/x-httpd-java" is a Java servlet.
-    */
-
-    cupsdSetString(&con->command, CUPS_JAVA);
-
-    if (options)
-      cupsdSetStringf(&con->options, " %s %s", filename, options);
-    else
-      cupsdSetStringf(&con->options, " %s", filename);
-
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
-    return (1);
-  }
-#endif /* HAVE_JAVA */
-#ifdef HAVE_PERL
-  else if (!_cups_strcasecmp(type->type, "x-httpd-perl"))
-  {
-   /*
-    * "application/x-httpd-perl" is a Perl page.
-    */
-
-    cupsdSetString(&con->command, CUPS_PERL);
-
-    if (options)
-      cupsdSetStringf(&con->options, " %s %s", filename, options);
-    else
-      cupsdSetStringf(&con->options, " %s", filename);
-
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
-    return (1);
-  }
-#endif /* HAVE_PERL */
-#ifdef HAVE_PHP
-  else if (!_cups_strcasecmp(type->type, "x-httpd-php"))
-  {
-   /*
-    * "application/x-httpd-php" is a PHP page.
-    */
-
-    cupsdSetString(&con->command, CUPS_PHP);
-
-    if (options)
-      cupsdSetStringf(&con->options, " %s %s", filename, options);
-    else
-      cupsdSetStringf(&con->options, " %s", filename);
-
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
-    return (1);
-  }
-#endif /* HAVE_PHP */
-#ifdef HAVE_PYTHON
-  else if (!_cups_strcasecmp(type->type, "x-httpd-python"))
-  {
-   /*
-    * "application/x-httpd-python" is a Python page.
-    */
-
-    cupsdSetString(&con->command, CUPS_PYTHON);
-
-    if (options)
-      cupsdSetStringf(&con->options, " %s %s", filename, options);
-    else
-      cupsdSetStringf(&con->options, " %s", filename);
-
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
-    return (1);
-  }
-#endif /* HAVE_PYTHON */
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 0.", filename, filestats, type->super, type->type);
   return (0);
