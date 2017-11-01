@@ -143,12 +143,46 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   */
 
   if (infile >= 0)
-    length = 0;
+  {
+    if (fstat(infile, &fileinfo))
+    {
+     /*
+      * Can't get file information!
+      */
+
+      _cupsSetError(errno == EBADF ? IPP_STATUS_ERROR_NOT_FOUND : IPP_STATUS_ERROR_NOT_AUTHORIZED, NULL, 0);
+      ippDelete(request);
+
+      return (NULL);
+    }
+
+#ifdef WIN32
+    if (fileinfo.st_mode & _S_IFDIR)
+#else
+    if (S_ISDIR(fileinfo.st_mode))
+#endif /* WIN32 */
+    {
+     /*
+      * Can't send a directory...
+      */
+
+      _cupsSetError(IPP_STATUS_ERROR_NOT_POSSIBLE, strerror(EISDIR), 0);
+      ippDelete(request);
+
+      return (NULL);
+    }
+
+#ifndef WIN32
+    if (!S_ISREG(fileinfo.st_mode))
+      length = 0;			/* Chunk when piping */
+    else
+#endif /* !WIN32 */
+    length = ippLength(request) + (size_t)fileinfo.st_size;
+  }
   else
     length = ippLength(request);
 
-  DEBUG_printf(("2cupsDoIORequest: Request length=%ld, total length=%ld",
-                (long)ippLength(request), (long)length));
+  DEBUG_printf(("2cupsDoIORequest: Request length=%ld, total length=%ld", (long)ippLength(request), (long)length));
 
  /*
   * Clear any "Local" authentication data since it is probably stale...
