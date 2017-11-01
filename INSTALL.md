@@ -1,4 +1,4 @@
-INSTALL - CUPS v2.2.5 - 2017-10-12
+INSTALL - CUPS v2.2.6 - 2017-11-01
 ==================================
 
 This file describes how to compile and install CUPS from source code. For more
