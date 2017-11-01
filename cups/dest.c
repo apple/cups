@@ -1883,6 +1883,9 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
+
+      if (dest_name)
+        set_as_default = 2;
     }
 
     if (!dest_name)
@@ -1893,6 +1896,9 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
       snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
+
+      if (dest_name)
+        set_as_default = 3;
     }
 
     if (!dest_name)
@@ -1901,7 +1907,8 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       * No locally-set default destination, ask the server...
       */
 
-      op = IPP_OP_CUPS_GET_DEFAULT;
+      op             = IPP_OP_CUPS_GET_DEFAULT;
+      set_as_default = 4;
 
       DEBUG_puts("1cupsGetNamedDest: Asking server for default printer...");
     }
@@ -1932,7 +1939,36 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       dest = data.dest;
     }
     else
+    {
+      switch (set_as_default)
+      {
+        default :
+            break;
+
+        case 1 : /* Set from env vars */
+            if (getenv("LPDEST"))
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("LPDEST environment variable names default destination that does not exist."), 1);
+	    else if (getenv("PRINTER"))
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("PRINTER environment variable names default destination that does not exist."), 1);
+	    else
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("No default destination."), 1);
+            break;
+
+        case 2 : /* Set from ~/.cups/lpoptions */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("~/.cups/lpoptions file names default destination that does not exist."), 1);
+            break;
+
+        case 3 : /* Set from /etc/cups/lpoptions */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("/etc/cups/lpoptions file names default destination that does not exist."), 1);
+            break;
+
+        case 4 : /* Set from server */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("No default destination."), 1);
+            break;
+      }
+
       return (NULL);
+    }
   }
 
   DEBUG_printf(("1cupsGetNamedDest: Got dest=%p", (void *)dest));
