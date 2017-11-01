@@ -61,19 +61,19 @@ else
 
 	temp=`head -1 README.md | awk '{print $4}'`
 	if test "$temp" != "v$version"; then
-		echo "Still need to update version to v$version in README.txt (saw $temp)"
+		echo "Still need to update version to v$version in README.md (saw $temp)"
 		exit 1
 	fi
 
 	temp=`head -1 INSTALL.md | awk '{print $4}'`
 	if test "$temp" != "v$version"; then
-		echo "Still need to update version to v$version in INSTALL.txt (saw $temp)"
+		echo "Still need to update version to v$version in INSTALL.md (saw $temp)"
 		exit 1
 	fi
 
-	temp=`head -4 CHANGES.md | grep "Changes in" | awk '{print $4}'`
+	temp=`head -6 CHANGES.md | grep "Changes in" | awk '{print $4}'`
 	if test "$temp" != "v$version"; then
-		echo "Still need to add Changes in v$version in CHANGES.txt (saw $temp)"
+		echo "Still need to add Changes in v$version in CHANGES.md (saw $temp)"
 		exit 1
 	fi
 
