@@ -26,7 +26,7 @@ DNS server(s).</li>
 	</ol></li>
 
 	<li>Properly configured Kerberos infrastructure:<ol type='a'>
-		<li>KDC configured to allow CUPS servers to obtain Service Granting Tickets (SGTs) for the "host" service,</li>
+		<li>KDC configured to allow CUPS servers to obtain Service Granting Tickets (SGTs) for the "host" and "HTTP" services/principals,</li>
 		<li>LDAP-based user accounts - both OpenDirectory and ActiveDirectory provide this with the KDC, and</li>
 		<li>CUPS clients and servers bound to the same KDC and LDAP
 	server(s).</li>
@@ -77,11 +77,11 @@ http://server.example.com:631/admin
 
 <H2 CLASS="title"><A NAME="IMPLEMENT">Implementation Information</A></H2>
 
-<P>CUPS implements Kerberos over HTTP using GSSAPI and the service name "host". Because of limitations in the HTTP GSSAPI protocol extension, only a single domain/KDC is supported for authentication. The HTTP extension is described in <a href="http://tools.ietf.org/html/rfc4559">RFC 4559</a>.</P>
+<P>CUPS implements Kerberos over HTTP using GSSAPI and the service/principal names "host/server.example.com" for command-line access and "HTTP/server.example.com" for web-based access, where "server.example.com" is replaced by your CUPS server's hostname. Because of limitations in the HTTP GSSAPI protocol extension, only a single domain/KDC is supported for authentication. The HTTP extension is described in <a href="http://tools.ietf.org/html/rfc4559">RFC 4559</a>.</P>
 
-<P>When doing printing tasks that require authentication, CUPS requests single-use "tickets" from your login session to authenticate who you are. These tickets give CUPS a username of the form "user@REALM", which is then converted to just "user" for purposes of user and group checks.</P>
+<P>When doing printing tasks that require authentication, CUPS requests single-use "tickets" from your login session to authenticate who you are. These tickets give CUPS a username of the form "user@REALM", which is then truncated to just "user" for purposes of user and group checks.</P>
 
-<P>In order to support printing to a shared printer, CUPS runs the IPP backend as the owner of the print job so it can obtain the necessary credentials when the job is de-spooled to the server.</P>
+<P>In order to support printing to a shared printer, CUPS runs the IPP or SMB backend as the owner of the print job so it can obtain the necessary credentials when the job is de-spooled to the server.</P>
 
 </BODY>
 </HTML>
