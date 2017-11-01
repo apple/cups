@@ -1,7 +1,7 @@
 /*
  * Directory services definitions for the CUPS scheduler.
  *
- * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the

@@ -1,7 +1,7 @@
 /*
  * Directory services routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1075,7 +1075,7 @@ dnssdRegisterInstance(
 
   *srv  = DNSSDMaster;
   error = DNSServiceRegister(srv, kDNSServiceFlagsShareConnection,
-			     0, name, temp, NULL, NULL, htons(port),
+			     0, name, temp, NULL, DNSSDHostName, htons(port),
 			     txt ? TXTRecordGetLength(txt) : 0,
 			     txt ? TXTRecordGetBytesPtr(txt) : NULL,
 			     dnssdRegisterCallback, p);
@@ -1090,7 +1090,7 @@ dnssdRegisterInstance(
 
   error = avahi_entry_group_add_service_strlst(*srv, AVAHI_IF_UNSPEC,
                                                AVAHI_PROTO_UNSPEC, 0, name,
-                                               type, NULL, NULL, port,
+                                               type, NULL, DNSSDHostName, port,
                                                txt ? *txt : NULL);
   if (error)
     cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD service add for \"%s\" failed.",
