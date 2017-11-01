@@ -5,6 +5,70 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="020206">CUPS 2.2.6</a> <em>(November 1, 2017)</em></h2>
+
+<ul>
+
+	<li>DBUS notifications could crash the scheduler (Issue #5143)</li>
+	<li>Added USB quirks rules for Canon MP540 and Samsung ML-2160 (Issue #5148)</li>
+	<li>Fixed TLS cipher suite selection with GNU TLS (Issue #5145, Issue #5150)</li>
+	<li>Localization updates (Issue #5152)</li>
+
+</ul>
+
+
+<h2 class="title"><a name="020205">CUPS 2.2.5</a> <em>(October 13, 2017)</em></h2>
+
+<ul>
+
+	<li>The scheduler's `-t` option did not force all errors to the standard error file, making debugging of configuration problems hard (Issue #5041)</li>
+	<li>Fixed a typo in the CUPS Programming Manual (Issue #5042)</li>
+	<li>Fixed RPM packaging issue (Issue #5043, Issue #5044)</li>
+	<li>The `cupsGetDests` function incorrectly returned an empty list of printers if there was no default printer (Issue #5046)</li>
+	<li>The `cupsGetDests` function waited too long for network printers (Issue #5049)</li>
+	<li>Libtool support was completely broken with current libtool versions that use an incompatible command-line syntax (Issue #5050)</li>
+	<li>Fixed a build issue with `--enable-mallinfo` (Issue #5051)</li>
+	<li>The ippserver test program contained a deadlock issue (Issue #5054)</li>
+	<li>The `cupsLocalizeDest*` functions did not provide base localizations for all registered IPP attributes and values (Issue #5056)</li>
+	<li>The --enable-libtool configure option requires a path to the libtool program, but doesn't document or check for it (Issue #5062)</li>
+	<li>Fixed the `SSLOptions DenyCBC` option when using GNU TLS (Issue #5065)</li>
+	<li>Fixed the `ServerTokens None` option (Issue #5065)</li>
+	<li>Fixed the default `ServerAlias` value from `ServerName` (Issue #5072)</li>
+	<li>Fixed the adminurl field in the TXT record for fully-qualified `ServerName` values (Issue #5074)</li>
+	<li>The scheduler now creates a PID file when not running on demand with a modern service launcher (Issue #5080)</li>
+	<li>The web interface did not support newer language identifiers used by Microsoft web browsers (Issue #5803)</li>
+	<li>Updated the cups-files.conf and cupsd.conf file documentation for missing directives (Issue #5084)</li>
+	<li>Fixed an Avahi-related crash bug in the scheduler (Issue #5085, Issue #5086)</li>
+	<li>Fixed the interactions between the "print-quality" and "cupsPrintQuality" options (Issue #5090)</li>
+	<li>The IPP Everywhere PPD generator now sorts the supported resolutions before choosing them for draft, normal, and best quality modes (Issue #5091)</li>
+	<li>Fixed the localization unit test on Linux (Issue #5097)</li>
+	<li>The CUPS library did not reuse domain sockets (Issue #5098)</li>
+	<li>Fixed the "make check" target for some environments (Issue #5099)</li>
+	<li>The scheduler woke up once per second to remove old temporary queues (Issue #5100)</li>
+	<li>Added USB quirk rule for Kyocera printer (Issue #5102, Issue #5103)</li>
+	<li>Re-documented the limits of `file:///...` device URIs and moved the FileDevice directive in `cups-files.conf` to the list of deprecated configuration directives (Issue #5117)</li>
+	<li>Added USB quirk rule for HP LaserJet 1160 printer (Issue #5121)</li>
+	<li>Fixed the script interpreter detection in the configure script (Issue #5122)</li>
+	<li>The network backends now retry on more error conditions (Issue #5123)</li>
+	<li>Added a French translation of the web interface (Issue #5134)</li>
+	<li>`cupsGetDests2` was not using the supplied HTTP connection (Issue #5135)</li>
+	<li>`httpAddrConnect` leaked sockets in certain circumstances, causing some printers to hang (rdar://31965686)</li>
+	<li>Fixed an issue with Chinese localizations on macOS (rdar://32419311)</li>
+	<li>The IPP backend now always sends the "finishings" attribute for printers that support it because otherwise the client cannot override printer defaults (rdar://33169732)</li>
+	<li>The `cupsGetNamedDest` function did not use the local default printer (rdar://33228500)</li>
+	<li>The IPP backend incorrectly sent the "job-pages-per-set" attribute to PDF printers (rdar://33250434)</li>
+	<li>Fixed the `cups.strings` file that is used on macOS (rdar://33287650)</li>
+	<li>CUPS now sends the `Date` HTTP header in IPP requests (rdar://33302034)</li>
+	<li>The `ippCopyAttribute` function did not copy out-of-band values correctly (rdar://33688003)</li>
+	<li>Fixed the localization fallback code on macOS (rdar://33583699)</li>
+	<li>The scheduler did not run with a high enough priority, causing problems on busy systems (rdar://33789342)</li>
+	<li>Added support for Japanese Kaku 1 envelope size (rdar://34774110)</li>
+	<li>The `ipptool` program's `-P` option did not work correctly.</li>
+	<li>The `ipptool` program did not compare URI scheme or hostname components correctly for the WITH-ALL-HOSTNAMES, WITH-ALL-SCHEMES, WITH-HOSTNAME, or WITH-SCHEME predicates.</li>
+
+</ul>
+
+
 <h2 class="title"><a name="020204">CUPS 2.2.4</a> <em>(June 30, 2017)</em></h2>
 
 <ul>
