@@ -1591,8 +1591,7 @@ validate_name(const char *name)		/* I - Name to check */
   for (ptr = name; *ptr; ptr ++)
     if (*ptr == '@')
       break;
-    else if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' ||
-             *ptr == '#')
+    else if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '\\' || *ptr == '?' || *ptr == '\'' || *ptr == '\"' || *ptr == '#')
       return (0);
 
  /*

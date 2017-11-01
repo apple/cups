@@ -695,16 +695,13 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   if ((name = cgiGetVariable("PRINTER_NAME")) != NULL)
   {
     for (ptr = name; *ptr; ptr ++)
-      if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+      if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '\\' || *ptr == '?' || *ptr == '\'' || *ptr == '\"' || *ptr == '#')
 	break;
 
     if (*ptr || ptr == name || strlen(name) > 127)
     {
       cgiSetVariable("ERROR",
-		     cgiText(_("The printer name may only contain up to "
-			       "127 printable characters and may not "
-			       "contain spaces, slashes (/), or the "
-			       "pound sign (#).")));
+		     cgiText(_("The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the pound sign (#).")));
       cgiStartHTML(title);
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
