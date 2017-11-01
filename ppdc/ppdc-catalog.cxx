@@ -58,7 +58,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
   filename = new ppdcString(f);
   messages = new ppdcArray();
 
-  if (l)
+  if (l && strcmp(l, "en"))
   {
     // Try loading the base messages for this locale...
     char	pofile[1024];		// Message catalog file

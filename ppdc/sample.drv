@@ -114,12 +114,12 @@
 #media "w576h468/8.00x6.50\"" 576 468
 
 // Common stuff for all drivers...
-Attribute "cupsVersion" "" "2.2"
+Attribute "cupsVersion" "" "2.3"
 Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright 2007-2014 by Apple Inc."
+Copyright "Copyright 2007-2017 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "These coded instructions, statements, and computer programs are the"
@@ -130,7 +130,7 @@ Copyright "file is missing or damaged, see the license at \"http://www.cups.org/
 
 Font *
 
-Version "2.1"
+Version "2.3"
 
 // Dymo Label Printer
 {
