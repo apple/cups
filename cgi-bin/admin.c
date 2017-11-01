@@ -1,7 +1,7 @@
 /*
  * Administration CGI for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -39,10 +39,8 @@ static int	current_device = 0;	/* Current device shown */
  */
 
 static void	choose_device_cb(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, const char *title);
-static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
-static void	do_cancel_subscription(http_t *http);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
@@ -171,10 +169,6 @@ main(void)
       do_config_server(http);
     else if (!strcmp(op, "export-samba"))
       do_export(http);
-    else if (!strcmp(op, "add-rss-subscription"))
-      do_add_rss_subscription(http);
-    else if (!strcmp(op, "cancel-subscription"))
-      do_cancel_subscription(http);
     else
     {
      /*
@@ -315,202 +309,6 @@ choose_device_cb(
   cgiSetArray("device_location", current_device, device_location);
 
   current_device ++;
-}
-
-
-/*
- * 'do_add_rss_subscription()' - Add a RSS subscription.
- */
-
-static void
-do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
-{
-  ipp_t		*request,		/* IPP request data */
-		*response;		/* IPP response data */
-  char		rss_uri[1024];		/* RSS notify-recipient URI */
-  int		num_events;		/* Number of events */
-  const char	*events[12],		/* Subscribed events */
-		*subscription_name,	/* Subscription name */
-		*printer_uri,		/* Printer URI */
-		*ptr,			/* Pointer into name */
-		*user;			/* Username */
-  int		max_events;		/* Maximum number of events */
-
-
- /*
-  * See if we have all of the required information...
-  */
-
-  subscription_name = cgiGetVariable("SUBSCRIPTION_NAME");
-  printer_uri       = cgiGetVariable("PRINTER_URI");
-  num_events        = 0;
-
-  if (cgiGetVariable("EVENT_JOB_CREATED"))
-    events[num_events ++] = "job-created";
-  if (cgiGetVariable("EVENT_JOB_COMPLETED"))
-    events[num_events ++] = "job-completed";
-  if (cgiGetVariable("EVENT_JOB_STOPPED"))
-    events[num_events ++] = "job-stopped";
-  if (cgiGetVariable("EVENT_JOB_CONFIG_CHANGED"))
-    events[num_events ++] = "job-config-changed";
-  if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
-    events[num_events ++] = "printer-stopped";
-  if (cgiGetVariable("EVENT_PRINTER_ADDED"))
-    events[num_events ++] = "printer-added";
-  if (cgiGetVariable("EVENT_PRINTER_MODIFIED"))
-    events[num_events ++] = "printer-modified";
-  if (cgiGetVariable("EVENT_PRINTER_DELETED"))
-    events[num_events ++] = "printer-deleted";
-  if (cgiGetVariable("EVENT_SERVER_STARTED"))
-    events[num_events ++] = "server-started";
-  if (cgiGetVariable("EVENT_SERVER_STOPPED"))
-    events[num_events ++] = "server-stopped";
-  if (cgiGetVariable("EVENT_SERVER_RESTARTED"))
-    events[num_events ++] = "server-restarted";
-  if (cgiGetVariable("EVENT_SERVER_AUDIT"))
-    events[num_events ++] = "server-audit";
-
-  if ((ptr = cgiGetVariable("MAX_EVENTS")) != NULL)
-    max_events = atoi(ptr);
-  else
-    max_events = 0;
-
-  if (!subscription_name || !printer_uri || !num_events ||
-      max_events <= 0 || max_events > 9999)
-  {
-   /*
-    * Don't have everything we need, so get the available printers
-    * and classes and (re)show the add page...
-    */
-
-    if (cgiGetVariable("EVENT_JOB_CREATED"))
-      cgiSetVariable("EVENT_JOB_CREATED", "CHECKED");
-    if (cgiGetVariable("EVENT_JOB_COMPLETED"))
-      cgiSetVariable("EVENT_JOB_COMPLETED", "CHECKED");
-    if (cgiGetVariable("EVENT_JOB_STOPPED"))
-      cgiSetVariable("EVENT_JOB_STOPPED", "CHECKED");
-    if (cgiGetVariable("EVENT_JOB_CONFIG_CHANGED"))
-      cgiSetVariable("EVENT_JOB_CONFIG_CHANGED", "CHECKED");
-    if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
-      cgiSetVariable("EVENT_PRINTER_STOPPED", "CHECKED");
-    if (cgiGetVariable("EVENT_PRINTER_ADDED"))
-      cgiSetVariable("EVENT_PRINTER_ADDED", "CHECKED");
-    if (cgiGetVariable("EVENT_PRINTER_MODIFIED"))
-      cgiSetVariable("EVENT_PRINTER_MODIFIED", "CHECKED");
-    if (cgiGetVariable("EVENT_PRINTER_DELETED"))
-      cgiSetVariable("EVENT_PRINTER_DELETED", "CHECKED");
-    if (cgiGetVariable("EVENT_SERVER_STARTED"))
-      cgiSetVariable("EVENT_SERVER_STARTED", "CHECKED");
-    if (cgiGetVariable("EVENT_SERVER_STOPPED"))
-      cgiSetVariable("EVENT_SERVER_STOPPED", "CHECKED");
-    if (cgiGetVariable("EVENT_SERVER_RESTARTED"))
-      cgiSetVariable("EVENT_SERVER_RESTARTED", "CHECKED");
-    if (cgiGetVariable("EVENT_SERVER_AUDIT"))
-      cgiSetVariable("EVENT_SERVER_AUDIT", "CHECKED");
-
-    request  = ippNewRequest(CUPS_GET_PRINTERS);
-    response = cupsDoRequest(http, request, "/");
-
-    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-    ippDelete(response);
-
-    cgiStartHTML(cgiText(_("Add RSS Subscription")));
-
-    cgiCopyTemplateLang("add-rss-subscription.tmpl");
-
-    cgiEndHTML();
-    return;
-  }
-
- /*
-  * Make sure we have a username...
-  */
-
-  if ((user = getenv("REMOTE_USER")) == NULL)
-  {
-    puts("Status: 401\n");
-    exit(0);
-  }
-
- /*
-  * Validate the subscription name...
-  */
-
-  for (ptr = subscription_name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' ||
-        *ptr == '?' || *ptr == '#')
-      break;
-
-  if (*ptr)
-  {
-    cgiSetVariable("ERROR",
-                   cgiText(_("The subscription name may not "
-			     "contain spaces, slashes (/), question marks (?), "
-			     "or the pound sign (#).")));
-    cgiStartHTML(_("Add RSS Subscription"));
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
- /*
-  * Add the subscription...
-  */
-
-  ptr = subscription_name + strlen(subscription_name) - 4;
-  if (ptr < subscription_name || strcmp(ptr, ".rss"))
-    httpAssembleURIf(HTTP_URI_CODING_ALL, rss_uri, sizeof(rss_uri), "rss",
-                     NULL, NULL, 0, "/%s.rss?max_events=%d", subscription_name,
-		     max_events);
-  else
-    httpAssembleURIf(HTTP_URI_CODING_ALL, rss_uri, sizeof(rss_uri), "rss",
-                     NULL, NULL, 0, "/%s?max_events=%d", subscription_name,
-		     max_events);
-
-  request = ippNewRequest(IPP_CREATE_PRINTER_SUBSCRIPTION);
-
-  if (!_cups_strcasecmp(printer_uri, "#ALL#"))
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, "ipp://localhost/");
-  else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, printer_uri);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-               NULL, user);
-
-  ippAddString(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
-               "notify-recipient-uri", NULL, rss_uri);
-  ippAddStrings(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD, "notify-events",
-                num_events, NULL, events);
-  ippAddInteger(request, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                "notify-lease-duration", 0);
-
-  ippDelete(cupsDoRequest(http, request, "/"));
-
-  if (cupsLastError() == IPP_NOT_AUTHORIZED)
-  {
-    puts("Status: 401\n");
-    exit(0);
-  }
-  else if (cupsLastError() > IPP_OK_CONFLICT)
-  {
-    cgiStartHTML(_("Add RSS Subscription"));
-    cgiShowIPPError(_("Unable to add RSS subscription"));
-  }
-  else
-  {
-   /*
-    * Redirect successful updates back to the admin page...
-    */
-
-    cgiSetVariable("refresh_page", "5;URL=/admin");
-    cgiStartHTML(_("Add RSS Subscription"));
-    cgiCopyTemplateLang("subscription-added.tmpl");
-  }
-
-  cgiEndHTML();
 }
 
 
@@ -1438,88 +1236,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
   if (oldinfo)
     ippDelete(oldinfo);
-}
-
-
-/*
- * 'do_cancel_subscription()' - Cancel a subscription.
- */
-
-static void
-do_cancel_subscription(http_t *http)/* I - HTTP connection */
-{
-  ipp_t		*request;		/* IPP request data */
-  const char	*var,			/* Form variable */
-		*user;			/* Username */
-  int		id;			/* Subscription ID */
-
-
- /*
-  * See if we have all of the required information...
-  */
-
-  if ((var = cgiGetVariable("NOTIFY_SUBSCRIPTION_ID")) != NULL)
-    id = atoi(var);
-  else
-    id = 0;
-
-  if (id <= 0)
-  {
-    cgiSetVariable("ERROR", cgiText(_("Bad subscription ID")));
-    cgiStartHTML(_("Cancel RSS Subscription"));
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
- /*
-  * Require a username...
-  */
-
-  if ((user = getenv("REMOTE_USER")) == NULL)
-  {
-    puts("Status: 401\n");
-    exit(0);
-  }
-
- /*
-  * Cancel the subscription...
-  */
-
-  request = ippNewRequest(IPP_CANCEL_SUBSCRIPTION);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, "ipp://localhost/");
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
-                "notify-subscription-id", id);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
-               NULL, user);
-
-  ippDelete(cupsDoRequest(http, request, "/"));
-
-  if (cupsLastError() == IPP_NOT_AUTHORIZED)
-  {
-    puts("Status: 401\n");
-    exit(0);
-  }
-  else if (cupsLastError() > IPP_OK_CONFLICT)
-  {
-    cgiStartHTML(_("Cancel RSS Subscription"));
-    cgiShowIPPError(_("Unable to cancel RSS subscription"));
-  }
-  else
-  {
-   /*
-    * Redirect successful updates back to the admin page...
-    */
-
-    cgiSetVariable("refresh_page", "5;URL=/admin");
-    cgiStartHTML(_("Cancel RSS Subscription"));
-    cgiCopyTemplateLang("subscription-canceled.tmpl");
-  }
-
-  cgiEndHTML();
 }
 
 

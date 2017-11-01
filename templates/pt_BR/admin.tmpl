@@ -79,19 +79,3 @@
     </FORM>}
   </div>
 </div>
-
-<div class="row">
-  <H2 CLASS="title">Inscri&ccedil;&otilde;es RSS</H2>
-
-  <P>
-  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Adicionar inscri&ccedil;&atilde;o RSS"></FORM>
-  </P>
-
-  {notify_subscription_id?<TABLE CLASS="list" SUMMARY="Inscri&ccedil;&otilde;es RSS">
-  <THEAD><TR><TH>Nome</TH><TH>Eventos</TH><TH>Nome da fila</TH></TR></THEAD>
-  <TBODY>{[notify_subscription_id]
-  <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancelar inscri&ccedil;&atilde;o RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Todas as filas}</TD></TR>}
-  </TBODY>
-  </TABLE>:}
-</div>
