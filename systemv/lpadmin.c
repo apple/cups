@@ -1,7 +1,7 @@
 /*
  * "lpadmin" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -217,6 +217,25 @@ main(int  argc,			/* I - Number of command-line arguments */
 		}
 
 		file = argv[i];
+	      }
+
+	      if (*opt == 'i')
+	      {
+	       /*
+	        * Check to see that the specified file is, in fact, a PPD...
+	        */
+
+                cups_file_t *fp = cupsFileOpen(file, "r");
+                char line[256];
+
+                if (!cupsFileGets(fp, line, sizeof(line)) || strncmp(line, "*PPD-Adobe", 10))
+                {
+                  _cupsLangPuts(stderr, _("lpadmin: System V interface scripts are no longer supported for security reasons."));
+                  cupsFileClose(fp);
+                  return (1);
+                }
+
+                cupsFileClose(fp);
 	      }
 	      break;
 

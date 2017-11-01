@@ -1,7 +1,7 @@
 .\"
 .\" lpadmin man page for CUPS.
 .\"
-.\" Copyright 2007-2016 by Apple Inc.
+.\" Copyright 2007-2017 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "CUPS" "29 March 2016" "Apple Inc."
+.TH lpadmin 8 "CUPS" "1 November 2017" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -79,8 +79,6 @@ The following options are recognized when configuring a printer queue:
 \fB\-c \fIclass\fR
 Adds the named \fIprinter\fR to \fIclass\fR.
 If \fIclass\fR does not exist it is created automatically.
-.TP 5
-\fB\-i \fIppd-file\fR
 .TP 5
 \fB\-P \fIppd-file\fR
 Specifies a PostScript Printer Description (PPD) file to use with the printer.
@@ -189,6 +187,12 @@ programs on the destination.
 .TP 5
 \fB\-L "\fIlocation\fB"\fR
 Provides a textual location of the destination.
+.SH DEPRECATED OPTIONS
+The following \fBlpadmin\fR options are deprecated:
+.TP 5
+\fB\-i \fIfilename\fR
+This option historically has been used to provide either a System V interface script or (as an implementation side-effect) a PPD file.
+Since interface scripts are no longer supported, the \fI-P\fR option is preferred for providing a PPD file for a printer.
 .SH CONFORMING TO
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are \fInot\fR case-sensitive.
@@ -196,6 +200,7 @@ Finally, the CUPS version of \fBlpadmin\fR may ask the user for an access passwo
 This differs from the System V version which requires the root user to execute this command.
 .SH NOTES
 The CUPS version of \fBlpadmin\fR does not support all of the System V or Solaris printing system configuration options.
+Interface scripts are not supported for security reasons.
 .SH EXAMPLE
 Create an IPP Everywhere print queue:
 .nf
