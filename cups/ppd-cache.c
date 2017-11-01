@@ -4041,7 +4041,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     if (count > (int)(sizeof(resolutions) / sizeof(resolutions[0])))
       count = (int)(sizeof(resolutions) / sizeof(resolutions[0]));
 
-    for (i = 0; i < count; i ++)
+    resolutions[0] = 0; /* Not in loop to silence Clang static analyzer... */
+    for (i = 1; i < count; i ++)
       resolutions[i] = i;
 
     for (i = 0; i < (count - 1); i ++)
