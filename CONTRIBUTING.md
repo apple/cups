@@ -1,4 +1,5 @@
-# Contributing to CUPS
+Contributing to CUPS
+====================
 
 CUPS is developed by Apple Inc. and distributed as open source software under a
 combination of GNU GPL2 and GNU LGPL2 licenses with exceptions to allow
@@ -15,7 +16,8 @@ should be provided as-is or in an archive.  Github pull requests can also be
 used to submit changes.
 
 
-## HOW TO CONTACT THE DEVELOPERS
+How To Contact The Developers
+-----------------------------
 
 The CUPS mailing lists are the primary means of asking questions and informally
 discussing issues and feature requests with the CUPS developers and other
@@ -24,7 +26,8 @@ CUPS usage questions and new software announcements while the "cups-devel"
 mailing list provides a forum for CUPS developers and monitoring new bugs.
 
 
-## INTERFACES
+Interfaces
+----------
 
 CUPS interfaces, including the C APIs and command-line arguments, environment
 variables, configuration files, and output format, are stable across patch
@@ -47,7 +50,8 @@ published C API to access data stored in a file to avoid compatibility problems
 in the future.
 
 
-## BUILD SYSTEM
+Build System
+------------
 
 The CUPS build system uses GNU autoconf to tailor the library to the local
 operating system.  Project files for the current release of Microsoft Visual
@@ -62,7 +66,8 @@ specific extensions, and GNU libtool is not portable or reliable enough for
 CUPS.
 
 
-## VERSION NUMBERING
+Version Numbering
+-----------------
 
 CUPS uses a three-part version number separated by periods to represent the
 major, minor, and patch release numbers.  Major release numbers indicate large
@@ -113,14 +118,15 @@ minor version numbers followed by the release candidate number:
     2.2rc1
 
 
-## CODING GUIDELINES
+Coding Guidelines
+-----------------
 
 Contributed source code must follow the guidelines below.  While the examples
 are for C and C++ source files, source code for other languages should conform
 to the same guidelines as allowed by the language.
 
 
-### SOURCE FILES
+### Source Files
 
 All source files names must be 16 characters or less in length to ensure
 compatibility with older UNIX filesystems.  Source files containing functions
@@ -154,7 +160,7 @@ the following additional comment appears after the contact information:
      * This file is subject to the Apple OS-Developed Software exception.
 
 
-### HEADER FILES
+### Header Files
 
 All public header files must include the "versioning.h" header file, or a header
 that does so.  Function declarations are then "decorated" with the correct
@@ -170,7 +176,7 @@ Typically a private API header file will include the corresponding public API
 header file.
 
 
-### COMMENTS
+### Comments
 
 All source code utilizes block comments within functions to describe the
 operations being performed by a group of statements; avoid putting a comment
@@ -201,7 +207,7 @@ comments ("// comment"):
      } while (i == (sizeof(array) / sizeof(array[0])));
 
 
-### INDENTATION
+### Indentation
 
 All code blocks enclosed by brackets begin with the opening brace on a new
 line.  The code then follows starting on a new line after the brace and is
@@ -239,20 +245,20 @@ spaces after each "case" and "default" case:
     }
 
 
-### SPACING
+### Spacing
 
 A space follows each reserved word such as "if", "while", etc.  Spaces are not
 inserted between a function name and the arguments in parenthesis.
 
 
-### RETURN VALUES
+### Return Values
 
 Parenthesis surround values returned from a function:
 
     return (CUPS_STATE_IDLE);
 
 
-### FUNCTIONS
+### Functions
 
 Functions with a global scope have a lowercase prefix followed by capitalized
 words, e.g., "cupsDoThis", "cupsDoThat", "cupsDoSomethingElse", etc.  Private
@@ -294,7 +300,7 @@ text in the function description comment:
                            function name with an underscore)
 
 
-### VARIABLES
+### Variables
 
 Variables with a global scope are capitalized, e.g., "ThisVariable",
 "ThatVariable", "ThisStateVariable", etc.  Globals in CUPS libraries are either
@@ -314,7 +320,7 @@ comment block describing the variable:
     static int  that_variable;   /* The current state of that */
 
 
-### TYPES
+### Types
 
 All type names are lowercase with underscores between words and "\_t" appended
 to the end of the name, e.g., "cups\_this\_type\_t", "cups\_that\_type\_t", etc.
@@ -327,7 +333,7 @@ Each type has a comment block immediately after the typedef:
     typedef int cups_this_type_t;  /* This type is for CUPS foobar options. */
 
 
-### STRUCTURES
+### Structures
 
 All structure names are lowercase with underscores between words and "\_s"
 appended to the end of the name, e.g., "cups\_this\_s", "cups\_that\_s", etc.
@@ -345,7 +351,7 @@ is documented similar to the variable naming policy above:
     };
 
 
-### CONSTANTS
+### Constants
 
 All constant names are uppercase with underscores between words, e.g.,
 "CUPS\_THIS\_CONSTANT", "CUPS\_THAT\_CONSTANT", etc.  Constants begin with an
@@ -365,14 +371,14 @@ Comment blocks immediately follow each constant:
     } cups_tray_t;
 
 
-## MAKEFILE GUIDELINES
+## Makefile Guidelines
 
 The following is a guide to the makefile-based build system used by CUPS.
 These standards have been developed over the years to allow CUPS to be built on
 as many systems and environments as possible.
 
 
-### GENERAL ORGANIZATION
+### General Organization
 
 The CUPS source code is organized functionally into a top-level makefile,
 include file, and subdirectories each with their own makefile and dependencies
@@ -380,7 +386,7 @@ files.  The ".in" files are template files for the autoconf software and are
 used to generate a static version of the corresponding file.
 
 
-### MAKEFILE DOCUMENTATION
+### Makefile Documentation
 
 Each makefile starts with the standard CUPS header containing the description
 of the file, and CUPS copyright and license notice:
@@ -388,7 +394,7 @@ of the file, and CUPS copyright and license notice:
     #
     # Makefile for ...
     #
-    # Copyright 2016 by Apple Inc.
+    # Copyright 2017 by Apple Inc.
     #
     # These coded instructions, statements, and computer programs are the
     # property of Apple Inc. and are protected by Federal copyright
@@ -398,7 +404,7 @@ of the file, and CUPS copyright and license notice:
     #
 
 
-### PORTABLE MAKEFILE CONSTRUCTION
+### Portable Makefile Construction
 
 CUPS uses a common subset of make program syntax to ensure that the software
 can be compiled "out of the box" on as many systems as possible.  The following
@@ -469,91 +475,91 @@ is a list of assumptions we follow when constructing makefiles:
 - Shell; we assume a POSIX-compatible shell is present on the build system.
 
 
-### STANDARD VARIABLES
+### Standard Variables
 
 The following variables are defined in the "Makedefs" file generated by the
 autoconf software:
 
-- ALL_CFLAGS; the combined C compiler options,
-- ALL_CXXFLAGS; the combined C++ compiler options,
-- AMANDIR; the administrative man page installation directory (section 8/1m
+- `ALL_CFLAGS`; the combined C compiler options,
+- `ALL_CXXFLAGS`; the combined C++ compiler options,
+- `AMANDIR`; the administrative man page installation directory (section 8/1m
   depending on the platform),
-- AR; the library archiver command,
-- ARFLAGS; options for the library archiver command,
-- AWK; the local awk command,
-- BINDIR; the binary installation directory,
-- BUILDROOT; optional installation prefix (defaults to DSTROOT),
-- CC; the C compiler command,
-- CFLAGS; options for the C compiler command,
-- CHMOD; the chmod command,
-- CXX; the C++ compiler command,
-- CXXFLAGS; options for the C++ compiler command,
-- DATADIR; the data file installation directory,
-- DSO; the C shared library building command,
-- DSOXX; the C++ shared library building command,
-- DSOFLAGS; options for the shared library building command,
-- INCLUDEDIR; the public header file installation directory,
-- INSTALL; the install command,
-- INSTALL_BIN; the program installation command,
-- INSTALL_COMPDATA; the compressed data file installation command,
-- INSTALL_CONFIG; the configuration file installation command,
-- INSTALL_DATA; the data file installation command,
-- INSTALL_DIR; the directory installation command,
-- INSTALL_LIB; the library installation command,
-- INSTALL_MAN; the documentation installation command,
-- INSTALL_SCRIPT; the shell script installation command,
-- LD; the linker command,
-- LDFLAGS; options for the linker,
-- LIBDIR; the library installation directory,
-- LIBS; libraries for all programs,
-- LN; the ln command,
-- MAN1EXT; extension for man pages in section 1,
-- MAN3EXT; extension for man pages in section 3,
-- MAN5EXT; extension for man pages in section 5,
-- MAN7EXT; extension for man pages in section 7,
-- MAN8DIR; subdirectory for man pages in section 8,
-- MAN8EXT; extension for man pages in section 8,
-- MANDIR; the man page installation directory,
-- OPTIM; common compiler optimization options,
-- PRIVATEINCLUDE; the private header file installation directory,
-- RM; the rm command,
-- SHELL; the sh (POSIX shell) command,
-- STRIP; the strip command,
-- srcdir; the source directory.
+- `AR`; the library archiver command,
+- `ARFLAGS`; options for the library archiver command,
+- `AWK`; the local awk command,
+- `BINDIR`; the binary installation directory,
+- `BUILDROOT`; optional installation prefix (defaults to DSTROOT),
+- `CC`; the C compiler command,
+- `CFLAGS`; options for the C compiler command,
+- `CHMOD`; the chmod command,
+- `CXX`; the C++ compiler command,
+- `CXXFLAGS`; options for the C++ compiler command,
+- `DATADIR`; the data file installation directory,
+- `DSO`; the C shared library building command,
+- `DSOXX`; the C++ shared library building command,
+- `DSOFLAGS`; options for the shared library building command,
+- `INCLUDEDIR`; the public header file installation directory,
+- `INSTALL`; the install command,
+- `INSTALL_BIN`; the program installation command,
+- `INSTALL_COMPDATA`; the compressed data file installation command,
+- `INSTALL_CONFIG`; the configuration file installation command,
+- `INSTALL_DATA`; the data file installation command,
+- `INSTALL_DIR`; the directory installation command,
+- `INSTALL_LIB`; the library installation command,
+- `INSTALL_MAN`; the documentation installation command,
+- `INSTALL_SCRIPT`; the shell script installation command,
+- `LD`; the linker command,
+- `LDFLAGS`; options for the linker,
+- `LIBDIR`; the library installation directory,
+- `LIBS`; libraries for all programs,
+- `LN`; the ln command,
+- `MAN1EXT`; extension for man pages in section 1,
+- `MAN3EXT`; extension for man pages in section 3,
+- `MAN5EXT`; extension for man pages in section 5,
+- `MAN7EXT`; extension for man pages in section 7,
+- `MAN8DIR`; subdirectory for man pages in section 8,
+- `MAN8EXT`; extension for man pages in section 8,
+- `MANDIR`; the man page installation directory,
+- `OPTIM`; common compiler optimization options,
+- `PRIVATEINCLUDE`; the private header file installation directory,
+- `RM`; the rm command,
+- `SHELL`; the sh (POSIX shell) command,
+- `STRIP`; the strip command,
+- `srcdir`; the source directory.
 
 
-### STANDARD TARGETS
+### Standard Targets
 
 The following standard targets are defined in each makefile:
 
-- all; creates all target programs, libraries, and documentation files,
-- clean; removes all target programs libraries, documentation files, and object
+- `all`; creates all target programs, libraries, and documentation files,
+- `clean`; removes all target programs libraries, documentation files, and object
   files,
-- depend; generates automatic dependencies for any C or C++ source files (also
+- `depend`; generates automatic dependencies for any C or C++ source files (also
   see "DEPENDENCIES"),
-- distclean; removes autoconf-generated files in addition to those removed by
+- `distclean`; removes autoconf-generated files in addition to those removed by
   the "clean" target,
-- install; installs all distribution files in their corresponding locations
+- `install`; installs all distribution files in their corresponding locations
   (also see "INSTALL/UNINSTALL SUPPORT"),
-- install-data; installs all data files in their corresponding locations (also
+- `install-data`; installs all data files in their corresponding locations (also
   see "INSTALL/UNINSTALL SUPPORT"),
-- install-exec; installs all executable files in their corresponding locations
+- `install-exec`; installs all executable files in their corresponding locations
   (also see "INSTALL/UNINSTALL SUPPORT"),
-- install-headers; installs all include files in their corresponding locations
+- `install-headers`; installs all include files in their corresponding locations
   (also see "INSTALL/UNINSTALL SUPPORT"),
-- install-libs; installs all library files in their corresponding locations
+- `install-libs`; installs all library files in their corresponding locations
   (also see "INSTALL/UNINSTALL SUPPORT"), and
-- uninstall; removes all distribution files from their corresponding locations
+- `uninstall`; removes all distribution files from their corresponding locations
   (also see "INSTALL/UNINSTALL SUPPORT").
 
 
-### OBJECT FILES
+### Object Files
 
 Object files (the result of compiling a C or C++ source file) have the
 extension ".o".
 
 
-### PROGRAMS
+### Programs
 
 Program files are the result of linking object files and libraries together to
 form an executable file.  A typical program target looks like:
@@ -562,7 +568,7 @@ form an executable file.  A typical program target looks like:
     TAB echo Linking $@...
     TAB $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
 
-### STATIC LIBRARIES
+### Static Libraries
 
 Static libraries have a prefix of "lib" and the extension ".a". A typical
 static library target looks like:
@@ -573,7 +579,7 @@ static library target looks like:
     TAB $(AR) $(ARFLAGS) $@ $(OBJECTS)
     TAB $(RANLIB) $@
 
-### SHARED LIBRARIES
+### Shared Libraries
 
 Shared libraries have a prefix of "lib" and the extension ".dylib" or ".so"
 depending on the operating system.  A typical shared library is composed of
@@ -598,7 +604,7 @@ several targets that look like:
     TAB $(LN) libname.$(DSOVERSION).dylib libname.$(DSOMAJOR).dylib
     TAB $(LN) libname.$(DSOVERSION).dylib libname.dylib
 
-### DEPENDENCIES
+### Dependencies
 
 Static dependencies are expressed in each makefile following the target, for
 example:
@@ -617,19 +623,18 @@ We regenerate the automatic dependencies on an macOS system and express any
 non-macOS dependencies statically in the makefile.
 
 
-### INSTALL/UNINSTALL SUPPORT
+### Install/Uninstall Support
 
 All makefiles contains install and uninstall rules which install or remove the
 corresponding software.  These rules must use the $(BUILDROOT) variable as a
 prefix to any installation directory so that CUPS can be installed in a
 temporary location for packaging by programs like rpmbuild.
 
-The $(INSTALL\_BIN), $(INSTALL\_COMPDATA), $(INSTALL\_CONFIG), $(INSTALL\_DATA),
-$(INSTALL\_DIR), $(INSTALL\_LIB), $(INSTALL\_MAN), and $(INSTALL\_SCRIPT) variables
+The `INSTALL_BIN`, `INSTALL_COMPDATA`, `INSTALL_CONFIG`, `INSTALL_DATA`,
+`INSTALL_DIR`, `INSTALL_LIB`, `INSTALL_MAN`, and `INSTALL_SCRIPT` variables
 must be used when installing files so that the proper ownership and permissions
 are set on the installed files.
 
-The $(RANLIB) command must be run on any static libraries after installation
+The `$(RANLIB)` command must be run on any static libraries after installation
 since the symbol table is invalidated when the library is copied on some
 platforms.
-
