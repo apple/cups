@@ -9,13 +9,15 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "4 August 2017" "Apple Inc."
+.TH ipptool 1 "CUPS" "1 November 2017" "Apple Inc."
 .SH NAME
 ipptool \- perform internet printing protocol requests
 .SH SYNOPSIS
 .B ipptool
 [
 .B \-\-help
+] [
+.BI \-\-ippserver filename
 ] [
 .B \-\-stop\-after\-include\-error
 ] [
@@ -91,6 +93,11 @@ The following options are recognized by
 .TP 5
 .B \-\-help
 Shows program help.
+.TP 5
+-BI \-\-ippserver filename
+Specifies that the test results should be written to the named
+.B ippserver
+attributes file.
 .TP 5
 .B \-\-stop-after-include-error
 Tells

@@ -51,6 +51,7 @@ typedef enum _cups_output_e		/**** Output mode ****/
   _CUPS_OUTPUT_QUIET,			/* No output */
   _CUPS_OUTPUT_TEST,			/* Traditional CUPS test output */
   _CUPS_OUTPUT_PLIST,			/* XML plist test output */
+  _CUPS_OUTPUT_IPPSERVER,		/* ippserver attribute file output */
   _CUPS_OUTPUT_LIST,			/* Tabular list output */
   _CUPS_OUTPUT_CSV			/* Comma-separated values output */
 } _cups_output_t;
@@ -163,12 +164,14 @@ static char	*get_filename(const char *testfile, char *dst, const char *src, size
 static const char *get_string(ipp_attribute_t *attr, int element, int flags, char *buffer, size_t bufsize);
 static char	*get_token(cups_file_t *fp, char *buf, int buflen, int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
-static char	*iso_date(ipp_uchar_t *date);
+static char	*iso_date(const ipp_uchar_t *date);
 static const char *password_cb(const char *prompt);
 static void	pause_message(const char *message);
 static void	print_attr(cups_file_t *outfile, int format, ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_csv(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_fatal_error(cups_file_t *outfile, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_ippserver_attr(cups_file_t *outfile, ipp_attribute_t *attr, int indent);
+static void	print_ippserver_string(cups_file_t *outfile, const char *s, size_t len);
 static void	print_line(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_xml_header(cups_file_t *outfile);
 static void	print_xml_string(cups_file_t *outfile, const char *element, const char *s);
@@ -248,6 +251,27 @@ main(int  argc,				/* I - Number of command-line args */
     if (!strcmp(argv[i], "--help"))
     {
       usage();
+    }
+    else if (!strcmp(argv[i], "--ippserver"))
+    {
+      i ++;
+
+      if (i >= argc)
+      {
+	_cupsLangPuts(stderr, _("ipptool: Missing filename for \"--ippserver\"."));
+	usage();
+      }
+
+      if (outfile != cupsFileStdout())
+	usage();
+
+      if ((outfile = cupsFileOpen(argv[i], "w")) == NULL)
+      {
+	_cupsLangPrintf(stderr, _("%s: Unable to open \"%s\": %s"), "ipptool", argv[i], strerror(errno));
+	exit(1);
+      }
+
+      Output = _CUPS_OUTPUT_IPPSERVER;
     }
     else if (!strcmp(argv[i], "--stop-after-include-error"))
     {
@@ -537,9 +561,9 @@ main(int  argc,				/* I - Number of command-line args */
 		}
               }
 
-              if (Output == _CUPS_OUTPUT_PLIST && interval)
+              if ((Output == _CUPS_OUTPUT_PLIST || Output == _CUPS_OUTPUT_IPPSERVER) && interval)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"."));
 		usage();
 	      }
 	      break;
@@ -560,9 +584,9 @@ main(int  argc,				/* I - Number of command-line args */
 	      else
 		repeat = atoi(argv[i]);
 
-              if (Output == _CUPS_OUTPUT_PLIST && repeat)
+              if ((Output == _CUPS_OUTPUT_PLIST || Output == _CUPS_OUTPUT_IPPSERVER) && repeat)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"."));
 		usage();
 	      }
 	      break;
@@ -3392,6 +3416,16 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       cupsFilePuts(outfile, "</dict>\n");
       cupsFilePuts(outfile, "</array>\n");
     }
+    else if (Output == _CUPS_OUTPUT_IPPSERVER && response)
+    {
+      for (attrptr = ippFirstAttribute(response), group = IPP_TAG_ZERO; attrptr; attrptr = ippNextAttribute(response))
+      {
+        if (!ippGetName(attrptr) || ippGetGroupTag(attrptr) != IPP_TAG_PRINTER)
+          continue;
+
+        print_ippserver_attr(outfile, attrptr, 0);
+      }
+    }
 
     if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
     {
@@ -4306,7 +4340,7 @@ get_variable(_cups_vars_t *vars,	/* I - Variables */
  */
 
 static char *				/* O - ISO 8601 date/time string */
-iso_date(ipp_uchar_t *date)		/* I - IPP (RFC 1903) date/time value */
+iso_date(const ipp_uchar_t *date)      /* I - IPP (RFC 1903) date/time value */
 {
   time_t	utctime;		/* UTC time since 1970 */
   struct tm	*utcdate;		/* UTC date/time */
@@ -4719,6 +4753,141 @@ print_fatal_error(cups_file_t *outfile,	/* I - Output file */
 
 
 /*
+ * 'print_ippserver_attr()' - Print a attribute suitable for use by ippserver.
+ */
+
+static void
+print_ippserver_attr(
+    cups_file_t     *outfile,		/* I - Output file */
+    ipp_attribute_t *attr,		/* I - Attribute to print */
+    int             indent)		/* I - Indentation level */
+{
+  int			i,		/* Looping var */
+			count = ippGetCount(attr);
+					/* Number of values */
+  ipp_attribute_t	*colattr;	/* Collection attribute */
+
+
+  if (indent == 0)
+    cupsFilePrintf(outfile, "ATTR %s %s", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
+  else
+    cupsFilePrintf(outfile, "%*sMEMBER %s %s", indent, "", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
+
+  switch (ippGetValueTag(attr))
+  {
+    case IPP_TAG_INTEGER :
+    case IPP_TAG_ENUM :
+	for (i = 0; i < count; i ++)
+	  cupsFilePrintf(outfile, "%s%d", i ? "," : " ", ippGetInteger(attr, i));
+	break;
+
+    case IPP_TAG_BOOLEAN :
+	cupsFilePuts(outfile, ippGetBoolean(attr, 0) ? " true" : " false");
+
+	for (i = 1; i < count; i ++)
+	  cupsFilePuts(outfile, ippGetBoolean(attr, 1) ? ",true" : ",false");
+	break;
+
+    case IPP_TAG_RANGE :
+	for (i = 0; i < count; i ++)
+	{
+	  int upper, lower = ippGetRange(attr, i, &upper);
+
+	  cupsFilePrintf(outfile, "%s%d-%d", i ? "," : " ", lower, upper);
+	}
+	break;
+
+    case IPP_TAG_RESOLUTION :
+	for (i = 0; i < count; i ++)
+	{
+	  ipp_res_t units;
+	  int yres, xres = ippGetResolution(attr, i, &yres, &units);
+
+	  cupsFilePrintf(outfile, "%s%dx%d%s", i ? "," : " ", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	}
+	break;
+
+    case IPP_TAG_DATE :
+	for (i = 0; i < count; i ++)
+	  cupsFilePrintf(outfile, "%s%s", i ? "," : " ", iso_date(ippGetDate(attr, i)));
+	break;
+
+    case IPP_TAG_STRING :
+	for (i = 0; i < count; i ++)
+	{
+	  int len;
+	  const char *s = (const char *)ippGetOctetString(attr, i, &len);
+
+	  cupsFilePuts(outfile, i ? "," : " ");
+	  print_ippserver_string(outfile, s, (size_t)len);
+	}
+	break;
+
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+	for (i = 0; i < count; i ++)
+	{
+	  const char *s = ippGetString(attr, i, NULL);
+
+	  cupsFilePuts(outfile, i ? "," : " ");
+	  print_ippserver_string(outfile, s, strlen(s));
+	}
+	break;
+
+    case IPP_TAG_BEGIN_COLLECTION :
+	for (i = 0; i < attr->num_values; i ++)
+	{
+	  ipp_t *col = ippGetCollection(attr, i);
+
+	  cupsFilePuts(outfile, i ? ",{\n" : " {\n");
+	  for (colattr = ippFirstAttribute(col); colattr; colattr = ippNextAttribute(col))
+	    print_ippserver_attr(outfile, colattr, indent + 4);
+	  cupsFilePrintf(outfile, "%*s}", indent, "");
+	}
+	break;
+
+    default :
+	cupsFilePuts(outfile, " \"\"");
+	break;
+  }
+
+  cupsFilePuts(outfile, "\n");
+}
+
+
+/*
+ * 'print_ippserver_string()' - Print a string suitable for use by ippserver.
+ */
+
+static void
+print_ippserver_string(
+    cups_file_t *outfile,		/* I - Output file */
+    const char  *s,			/* I - String to print */
+    size_t      len)			/* I - Length of string */
+{
+  cupsFilePutChar(outfile, '\"');
+  while (len > 0)
+  {
+    if (*s == '\"')
+      cupsFilePutChar(outfile, '\\');
+    cupsFilePutChar(outfile, *s);
+
+    s ++;
+    len --;
+  }
+  cupsFilePutChar(outfile, '\"');
+}
+
+
+/*
  * 'print_line()' - Print a line of formatted or CSV text.
  */
 
@@ -5062,6 +5231,7 @@ usage(void)
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
   _cupsLangPuts(stderr, _("  --help                  Show help."));
+  _cupsLangPuts(stderr, _("  --ippserver filename    Produce ippserver attribute file."));
   _cupsLangPuts(stderr, _("  --stop-after-include-error\n"
                           "                          Stop tests after a failed INCLUDE."));
   _cupsLangPuts(stderr, _("  --version               Show version."));
