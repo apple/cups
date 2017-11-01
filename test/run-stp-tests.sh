@@ -319,6 +319,7 @@ mkdir $BASE/ssl
 ln -s $root/backend/dnssd $BASE/bin/backend
 ln -s $root/backend/http $BASE/bin/backend
 ln -s $root/backend/ipp $BASE/bin/backend
+ln -s ipp $BASE/bin/backend/ipps
 ln -s $root/backend/lpd $BASE/bin/backend
 ln -s $root/backend/mdns $BASE/bin/backend
 ln -s $root/backend/pseudo $BASE/bin/backend
