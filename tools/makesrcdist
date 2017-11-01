@@ -71,9 +71,9 @@ else
 		exit 1
 	fi
 
-	temp=`head -4 CHANGES.md | grep "CHANGES IN" | awk '{print $4}'`
-	if test "$temp" != "V$version"; then
-		echo "Still need to add CHANGES IN V$version in CHANGES.txt (saw $temp)"
+	temp=`head -4 CHANGES.md | grep "Changes in" | awk '{print $4}'`
+	if test "$temp" != "v$version"; then
+		echo "Still need to add Changes in v$version in CHANGES.txt (saw $temp)"
 		exit 1
 	fi
 
