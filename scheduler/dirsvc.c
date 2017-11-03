@@ -1456,23 +1456,24 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
       cupsdSetString(&DNSSDComputerName, ServerName);
     }
 
-   /*
-    * Get the local hostname from the dynamic store...
-    */
-
-    cupsdClearString(&DNSSDHostName);
-
-    if ((nameRef = SCDynamicStoreCopyLocalHostName(sc)) != NULL)
+    if (!DNSSDHostName)
     {
-      if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
-			     kCFStringEncodingUTF8))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Dynamic store host name is \"%s\".", nameBuffer);
-	cupsdSetString(&DNSSDHostName, nameBuffer);
-      }
+     /*
+      * Get the local hostname from the dynamic store...
+      */
 
-      CFRelease(nameRef);
+      if ((nameRef = SCDynamicStoreCopyLocalHostName(sc)) != NULL)
+      {
+	if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
+			       kCFStringEncodingUTF8))
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "Dynamic store host name is \"%s\".", nameBuffer);
+	  cupsdSetString(&DNSSDHostName, nameBuffer);
+	}
+
+	CFRelease(nameRef);
+      }
     }
 
     if (!DNSSDHostName)
@@ -1517,26 +1518,33 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
   if (DNSSDClient)
   {
     const char	*host_name = avahi_client_get_host_name(DNSSDClient);
-    const char	*host_fqdn = avahi_client_get_host_name_fqdn(DNSSDClient);
 
     cupsdSetString(&DNSSDComputerName, host_name ? host_name : ServerName);
 
-    if (host_fqdn)
-      cupsdSetString(&DNSSDHostName, host_fqdn);
-    else if (strchr(ServerName, '.'))
-      cupsdSetString(&DNSSDHostName, ServerName);
-    else
-      cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+    if (!DNSSDHostName)
+    {
+      const char *host_fqdn = avahi_client_get_host_name_fqdn(DNSSDClient);
+
+      if (host_fqdn)
+	cupsdSetString(&DNSSDHostName, host_fqdn);
+      else if (strchr(ServerName, '.'))
+	cupsdSetString(&DNSSDHostName, ServerName);
+      else
+	cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+    }
   }
   else
 #  endif /* HAVE_AVAHI */
   {
     cupsdSetString(&DNSSDComputerName, ServerName);
 
-    if (strchr(ServerName, '.'))
-      cupsdSetString(&DNSSDHostName, ServerName);
-    else
-      cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+    if (!DNSSDHostName)
+    {
+      if (strchr(ServerName, '.'))
+	cupsdSetString(&DNSSDHostName, ServerName);
+      else
+	cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+    }
   }
 
  /*

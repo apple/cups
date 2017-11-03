@@ -83,6 +83,9 @@ static const cupsd_var_t	cupsd_vars[] =
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
   { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_TIME },
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  { "DNSSDHostName",		&DNSSDSubTypes,		CUPSD_VARTYPE_STRING },
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
   { "ErrorPolicy",		&ErrorPolicy,		CUPSD_VARTYPE_STRING },
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
@@ -746,6 +749,7 @@ cupsdReadConfiguration(void)
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   cupsdSetString(&DNSSDSubTypes, "_cups,_print");
+  cupsdClearString(&DNSSDHostName);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);

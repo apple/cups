@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "19 October 2017" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "3 November 2017" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -52,6 +52,12 @@ The default access log level is "actions".
 .br
 Specifies whether to purge job history data automatically when it is no longer required for quotas.
 The default is "No".
+.\"#BrowseDNSSDSubTypes
+.TP 5
+.BI BrowseDNSSDSubTypes _subtype[,...]
+Specifies a list of Bonjour sub-types to advertise for each shared printer.
+For example, "BrowseDNSSDSubTypes _cups,_print" will tell network clients that both CUPS sharing and IPP Everywhere are supported.
+The default is "_cups" which is necessary for printer sharing to work between systems using CUPS.
 .\"#BrowseLocalProtocols
 .TP 5
 \fBBrowseLocalProtocols all\fR
@@ -127,6 +133,11 @@ The default is "Yes".
 Specifies the delay for updating of configuration and state files.
 A value of 0 causes the update to happen as soon as possible, typically within a few milliseconds.
 The default value is "30".
+.\"#DNSSDHostName
+.TP 5
+.BI DNSSDHostName hostname.example.com
+Specifies the fully-qualified domain name for the server that is used for Bonjour sharing.
+The default is typically the server's ".local" hostname.
 .\"#ErrorPolicy
 .TP 5
 \fBErrorPolicy abort-job\fR
