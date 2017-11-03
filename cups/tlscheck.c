@@ -54,6 +54,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		af = AF_UNSPEC,		/* Address family */
 		tls_options = _HTTP_TLS_NONE,
 					/* TLS options */
+		tls_min_version = _HTTP_TLS_1_0,
+		tls_max_version = _HTTP_TLS_MAX,
 		verbose = 0;		/* Verbosity */
   ipp_t		*request,		/* IPP Get-Printer-Attributes request */
 		*response;		/* IPP Get-Printer-Attributes response */
@@ -88,11 +90,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else if (!strcmp(argv[i], "--no-tls10"))
     {
-      tls_options |= _HTTP_TLS_DENY_TLS10;
+      tls_min_version = _HTTP_TLS_1_1;
     }
     else if (!strcmp(argv[i], "--tls10"))
     {
-      tls_options |= _HTTP_TLS_ONLY_TLS10;
+      tls_min_version = _HTTP_TLS_1_0;
+      tls_max_version = _HTTP_TLS_1_0;
     }
     else if (!strcmp(argv[i], "--rc4"))
     {
@@ -148,7 +151,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (!port)
     port = 631;
 
-  _httpTLSSetOptions(tls_options);
+  _httpTLSSetOptions(tls_options, tls_min_version, tls_max_version);
 
   http = httpConnect2(server, port, NULL, af, HTTP_ENCRYPTION_ALWAYS, 1, 30000, NULL);
   if (!http)

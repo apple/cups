@@ -180,12 +180,16 @@ extern "C" {
 
 #  define _HTTP_TLS_NONE	0	/* No TLS options */
 #  define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
-#  define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
-#  define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
-#  define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
-#  define _HTTP_TLS_DENY_CBC	32	/* Deny CBC cipher suites */
-#  define _HTTP_TLS_ONLY_TLS10  64      /* Only use TLS 1.0 */
+#  define _HTTP_TLS_ALLOW_DH	2	/* Allow DH/DHE key negotiation */
+#  define _HTTP_TLS_DENY_CBC	4	/* Deny CBC cipher suites */
 #  define _HTTP_TLS_SET_DEFAULT 128     /* Setting the default TLS options */
+
+#  define _HTTP_TLS_SSL3	0	/* Min/max version is SSL/3.0 */
+#  define _HTTP_TLS_1_0		1	/* Min/max version is TLS/1.0 */
+#  define _HTTP_TLS_1_1		2	/* Min/max version is TLS/1.1 */
+#  define _HTTP_TLS_1_2		3	/* Min/max version is TLS/1.2 */
+#  define _HTTP_TLS_1_3		4	/* Min/max version is TLS/1.3 */
+#  define _HTTP_TLS_MAX		5	/* Highest known TLS version */
 
 
 /*
@@ -442,7 +446,7 @@ extern void		_httpTLSInitialize(void);
 extern size_t		_httpTLSPending(http_t *http);
 extern int		_httpTLSRead(http_t *http, char *buf, int len);
 extern int		_httpTLSSetCredentials(http_t *http);
-extern void		_httpTLSSetOptions(int options);
+extern void		_httpTLSSetOptions(int options, int min_version, int max_version);
 extern int		_httpTLSStart(http_t *http);
 extern void		_httpTLSStop(http_t *http);
 extern int		_httpTLSWrite(http_t *http, const char *buf, int len);

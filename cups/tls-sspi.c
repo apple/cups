@@ -52,7 +52,9 @@
  * Local globals...
  */
 
-static int		tls_options = -1;/* Options for TLS connections */
+static int		tls_options = -1,/* Options for TLS connections */
+			tls_min_version = _HTTP_TLS_1_0,
+			tls_max_version = _HTTP_TLS_MAX;
 
 
 /*
@@ -914,7 +916,11 @@ void
 _httpTLSSetOptions(int options)		/* I - Options */
 {
   if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
-    tls_options = options;
+  {
+    tls_options     = options;
+    tls_min_version = min_version;
+    tls_max_version = max_version;
+  }
 }
 
 
@@ -1782,14 +1788,14 @@ http_sspi_find_credentials(
 #else
   if (http->mode == _HTTP_MODE_SERVER)
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_min_version == _HTTP_TLS_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER | SP_PROT_SSL3_SERVER;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER;
   }
   else
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_min_version == _HTTP_TLS_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_SSL3_CLIENT;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT;

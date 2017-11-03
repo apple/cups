@@ -35,7 +35,9 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = -1;/* Options for TLS connections */
+static int		tls_options = -1,/* Options for TLS connections */
+			tls_min_version = _HTTP_TLS_1_0,
+			tls_max_version = _HTTP_TLS_MAX;
 
 
 /*
@@ -1227,7 +1229,11 @@ void
 _httpTLSSetOptions(int options)		/* I - Options */
 {
   if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
-    tls_options = options;
+  {
+    tls_options     = options;
+    tls_min_version = min_version;
+    tls_max_version = max_version;
+  }
 }
 
 
@@ -1245,6 +1251,16 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 					/* TLS credentials */
   char			priority_string[2048];
 					/* Priority string */
+  int			version;	/* Current version */
+  static const char * const versions[] =/* SSL/TLS versions */
+  {
+    "VERS-SSL3.0",
+    "VERS-TLS1.0",
+    "VERS-TLS1.1",
+    "VERS-TLS1.2",
+    "VERS-TLS1.3",
+    "VERS-TLS-ALL"
+  };
 
 
   DEBUG_printf(("3_httpTLSStart(http=%p)", http));
@@ -1506,14 +1522,40 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
   strlcpy(priority_string, "NORMAL", sizeof(priority_string));
 
-  if (tls_options & _HTTP_TLS_DENY_TLS10)
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string));
-  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+  if (tls_max_version < _HTTP_TLS_MAX)
+  {
+   /*
+    * Require specific TLS versions...
+    */
+
+    strlcat(priority_string, ":-VERS-TLS-ALL", sizeof(priority_string));
+    for (version = tls_min_version; version <= tls_max_version; version ++)
+    {
+      strlcat(priority_string, ":+", sizeof(priority_string));
+      strlcat(priority_string, versions[version], sizeof(priority_string));
+    }
+  }
+  else if (tls_min_version == _HTTP_TLS_SSL3)
+  {
+   /*
+    * Allow all versions of TLS and SSL/3.0...
+    */
+
     strlcat(priority_string, ":+VERS-TLS-ALL:+VERS-SSL3.0", sizeof(priority_string));
-  else if (tls_options & _HTTP_TLS_ONLY_TLS10)
-    strlcat(priority_string, ":-VERS-TLS-ALL:-VERS-SSL3.0:+VERS-TLS1.0", sizeof(priority_string));
+  }
   else
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
+  {
+   /*
+    * Require a minimum version...
+    */
+
+    strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string));
+    for (version = 0; version < tls_min_version; version ++)
+    {
+      strlcat(priority_string, ":-", sizeof(priority_string));
+      strlcat(priority_string, versions[version], sizeof(priority_string));
+    }
+  }
 
   if (tls_options & _HTTP_TLS_ALLOW_RC4)
     strlcat(priority_string, ":+ARCFOUR-128", sizeof(priority_string));

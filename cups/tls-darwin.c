@@ -53,7 +53,9 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = -1;/* Options for TLS connections */
+static int		tls_options = -1,/* Options for TLS connections */
+			tls_min_version = _HTTP_TLS_1_0,
+			tls_max_version = _HTTP_TLS_MAX;
 
 
 /*
@@ -1139,10 +1141,16 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
  */
 
 void
-_httpTLSSetOptions(int options)		/* I - Options */
+_httpTLSSetOptions(int options,		/* I - Options */
+                   int min_version,	/* I - Minimum TLS version */
+                   int max_version)	/* I - Maximum TLS version */
 {
   if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
-    tls_options = options;
+  {
+    tls_options     = options;
+    tls_min_version = min_version;
+    tls_max_version = max_version;
+  }
 }
 
 
@@ -1174,7 +1182,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   {
     DEBUG_puts("4_httpTLSStart: Setting defaults.");
     _cupsSetDefaults();
-    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x, tls_min_version=%d, tls_max_version=%d", tls_options, tls_min_version, tls_max_version));
   }
 
 #ifdef HAVE_SECKEYCHAINOPEN
@@ -1217,22 +1225,23 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   if (!error)
   {
-    SSLProtocol minProtocol;
-
-    if (tls_options & _HTTP_TLS_DENY_TLS10)
-      minProtocol = kTLSProtocol11;
-    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-      minProtocol = kSSLProtocol3;
-    else
-      minProtocol = kTLSProtocol1;
-
-    error = SSLSetProtocolVersionMin(http->tls, minProtocol);
-    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", minProtocol, (int)error));
-
-    if (!error && (tls_options & _HTTP_TLS_ONLY_TLS10))
+    static const SSLProtocol protocols[] =	/* Min/max protocol versions */
     {
-      error = SSLSetProtocolVersionMax(http->tls, kTLSProtocol1);
-      DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMax(kTLSProtocol1), error=%d", (int)error));
+      kSSLProtocol3,
+      kTLSProtocol1,
+      kTLSProtocol11,
+      kTLSProtocol12,
+      kTLSProtocol13,
+      kTLSProtocolMaxSupported
+    };
+
+    error = SSLSetProtocolVersionMin(http->tls, protocols[tls_min_version]);
+    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", protocols[tls_min_version], (int)error));
+
+    if (!error)
+    {
+      error = SSLSetProtocolVersionMax(http->tls, protocols[tls_max_version]);
+      DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMax(%d), error=%d", protocols[tls_max_version], (int)error));
     }
   }
 

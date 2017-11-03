@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-01
+CHANGES - 2.3b1 - 2017-11-03
 ============================
 
 
@@ -19,6 +19,9 @@ Changes in CUPS v2.3b1
   printer cannot be found (Issue #5096)
 - The `lpadmin` command now provides a better error message when an unsupported
   System V interface script is used (Issue #5111)
+- The `SSLOptions` directive now supports `MinTLS` and `MaxTLS` options to
+  control the minimum and maximum TLS versions that will be allowed,
+  respectively (Issue #5119)
 - Dropped hard-coded CGI scripting language support (Issue #5124)
 - Fixed the `ippserver` sample code when threading is disabled or unavailable
   (Issue #5154)
