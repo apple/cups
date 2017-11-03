@@ -84,7 +84,7 @@ static const cupsd_var_t	cupsd_vars[] =
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
   { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_TIME },
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  { "DNSSDHostName",		&DNSSDSubTypes,		CUPSD_VARTYPE_STRING },
+  { "DNSSDHostName",		&DNSSDHostName,		CUPSD_VARTYPE_STRING },
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
   { "ErrorPolicy",		&ErrorPolicy,		CUPSD_VARTYPE_STRING },
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
