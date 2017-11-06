@@ -321,6 +321,33 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES,
 					/* Update-Output-Device-Attributes: Update output device values @exclude all@ */
   IPP_OP_GET_NEXT_DOCUMENT_DATA,	/* Get-Next-Document-Data: Scan more document data @exclude all@ */
+  IPP_OP_ALLOCATE_PRINTER_RESOURCES,    /* Allocate-Printer-Resources: Use resources for a printer. */
+  IPP_OP_CREATE_PRINTER,                /* Create-Printer: Create a new service. */
+  IPP_OP_DEALLOCATE_PRINTER_RESOURCES,  /* Deallocate-Printer-Resources: Stop using resources for a printer. */
+  IPP_OP_DELETE_PRINTER,                /* Delete-Printer: Delete an existing service. */
+  IPP_OP_GET_PRINTERS,                  /* Get-Printers: Get a list of services. */
+  IPP_OP_SHUTDOWN_ONE_PRINTER,          /* Shutdown-One-Printer: Shutdown a service. */
+  IPP_OP_STARTUP_ONE_PRINTER,           /* Startup-One-Printer: Start a service. */
+  IPP_OP_CANCEL_RESOURCE,               /* Cancel-Resource: Uninstall a resource. */
+  IPP_OP_CREATE_RESOURCE,               /* Create-Resource: Create a new (empty) resource. */
+  IPP_OP_INSTALL_RESOURCE,              /* Install-Resource: Install a resource. */
+  IPP_OP_SEND_RESOURCE_DATA,            /* Send-Resource-Data: Upload the data for a resource. */
+  IPP_OP_SET_RESOURCE_ATTRIBUTES,       /* Set-Resource-Attributes: Set resource object  attributes. */
+  IPP_OP_CREATE_RESOURCE_SUBSCRIPTIONS, /* Create-Resource-Subscriptions: Create event subscriptions for a resource. */
+  IPP_OP_CREATE_SYSTEM_SUBSCRIPTIONS,   /* Create-System-Subscriptions: Create event subscriptions for a system. */
+  IPP_OP_DISABLE_ALL_PRINTERS,          /* Disable-All-Printers: Stop accepting new jobs on all services. */
+  IPP_OP_ENABLE_ALL_PRINTERS,           /* Enable-All-Printers: Start accepting new jobs on all services. */
+  IPP_OP_GET_SYSTEM_ATTRIBUTES,         /* Get-System-Attributes: Get system object attributes. */
+  IPP_OP_GET_SYSTEM_SUPPORTED_VALUES,   /* Get-System-Supported-Values: Get supported values for system object attributes. */
+  IPP_OP_PAUSE_ALL_PRINTERS,            /* Pause-All-Printers: Stop all services immediately. */
+  IPP_OP_PAUSE_ALL_PRINTERS_AFTER_CURRENT_JOB,
+                                        /* Pause-All-Printers-After-Current-Job: Stop all services after processing the current jobs. */
+  IPP_OP_REGISTER_OUTPUT_DEVICE,        /* Register-Output-Device: Register a remote service. */
+  IPP_OP_RESTART_SYSTEM,                /* Restart-System: Restart all services. */
+  IPP_OP_RESUME_ALL_PRINTERS,           /* Resume-All-Printers: Start job processing on all services. */
+  IPP_OP_SET_SYSTEM_ATTRIBUTES,         /* Set-System-Attributes: Set system object attributes. */
+  IPP_OP_SHUTDOWN_ALL_PRINTERS,         /* Shutdown-All-Printers: Shutdown all services. */
+  IPP_OP_STARTUP_ALL_PRINTERS,          /* Startup-All-Printers: Startup all services. */
 
   IPP_OP_PRIVATE = 0x4000,		/* Reserved @private@ */
   IPP_OP_CUPS_GET_DEFAULT,		/* CUPS-Get-Default: Get the default printer */
@@ -647,8 +674,9 @@ typedef enum ipp_tag_e			/**** Value and group tag values for attributes ****/
   IPP_TAG_UNSUPPORTED_GROUP,		/* Unsupported attributes group */
   IPP_TAG_SUBSCRIPTION,			/* Subscription group */
   IPP_TAG_EVENT_NOTIFICATION,		/* Event group */
-  IPP_TAG_RESOURCE,			/* Resource group @private@ */
-  IPP_TAG_DOCUMENT,			/* Document group @exclude all@ */
+  IPP_TAG_RESOURCE,			/* Resource group */
+  IPP_TAG_DOCUMENT,			/* Document group */
+  IPP_TAG_SYSTEM,                       /* System group */
   IPP_TAG_UNSUPPORTED_VALUE = 0x10,	/* Unsupported value */
   IPP_TAG_DEFAULT,			/* Default value */
   IPP_TAG_UNKNOWN,			/* Unknown value */
