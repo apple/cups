@@ -27,3 +27,5 @@ Changes in CUPS v2.3b1
 - Dropped hard-coded CGI scripting language support (Issue #5124)
 - Fixed the `ippserver` sample code when threading is disabled or unavailable
   (Issue #5154)
+- Added label markup to checkbox and radio button controls in the web interface
+  templates (Issue #5161)
