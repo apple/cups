@@ -35,8 +35,8 @@ worden sein.</P>}
 <SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
 {[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
 </SELECT><BR>
-<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
-onChange="select_printers()"> Alle Drucker freigeben
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL" ID="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"><LABEL FOR="EXPORT_ALL"> Alle Drucker freigeben</LABEL>
 </TD>
 </TR>
 <TR>

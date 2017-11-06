@@ -33,8 +33,8 @@ impressora PostScript do Windows como descrito na p&aacute;gina de manual do
 <SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
 {[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
 </SELECT><BR>
-<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
-onChange="select_printers()"> Exportar todas as impressoras
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL" ID="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"><LABEL FOR="EXPORT_ALL"> Exportar todas as impressoras</LABEL>
 </TD>
 </TR>
 <TR>

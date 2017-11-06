@@ -43,22 +43,22 @@
     <P><A HREF="/admin/">詳細 <SMALL>&#x25bc;</SMALL></A><BR>
     <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
     <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
-    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> このシステムに接続されているプリンターを共有<BR>
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> このシステムに接続されているプリンターを共有</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大クライアント数\:
     <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> インターネットからの印刷を許可<BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> ウェブインターフェイスを公開<BR>
-    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> リモート管理を許可<BR>
-    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Kerberos 認証を使用 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> 所有者以外のユーザーにもジョブのキャンセルを許可<BR>
-    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> ジョブの履歴を保存<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY"> インターネットからの印刷を許可</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" ID="BROWSE_WEB_IF" {?browse_web_if}><LABEL FOR="BROWSE_WEB_IF"> ウェブインターフェイスを公開</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN"> リモート管理を許可</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS"> Kerberos 認証を使用 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY"> 所有者以外のユーザーにもジョブのキャンセルを許可</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" ID="PRESERVE_JOBS" {?preserve_jobs}><LABEL FOR="PRESERVE_JOBS"> ジョブの履歴を保存</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大ジョブ数 (0 は無制限)\:
     <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;メタデータを保持\:
     <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ドキュメントを保持\:
     <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
-    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> トラブルシューティングのためにデバッグ情報を保存<BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING"> トラブルシューティングのためにデバッグ情報を保存</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最大ログファイルサイズ\:
     <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
 
@@ -66,12 +66,12 @@
 
     <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">詳細 <SMALL>&#x25b6;</SMALL></A><BR>
     <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> このシステムに接続されているプリンターを共有<BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> インターネットからの印刷を許可<BR>
-    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> リモート管理を許可<BR>
-    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Kerberos 認証を使用 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> 所有者以外のユーザーにもジョブのキャンセルを許可<BR>
-    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> トラブルシューティングのためにデバッグ情報を保存</P>
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> このシステムに接続されているプリンターを共有</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY"> インターネットからの印刷を許可</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN"> リモート管理を許可</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS"> Kerberos 認証を使用 (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY"> 所有者以外のユーザーにもジョブのキャンセルを許可</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING"> トラブルシューティングのためにデバッグ情報を保存</LABEL></P>
 
     }
     <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="設定の変更"></P>

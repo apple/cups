@@ -12,8 +12,8 @@
 <TD>
 <INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
 <BR>
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}>Autoriser ces utilisateurs &agrave; imprimer
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?checked:}>Emp&ecirc;cher ces utilisateurs d'imprimer
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' ID='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}><LABEL FOR='requesting-user-name-allowed'>Autoriser ces utilisateurs &agrave; imprimer</LABEL>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' ID='requesting-user-name-denied' {requesting_user_name_denied?checked:}><LABEL FOR='requesting-user-name-denied'>Emp&ecirc;cher ces utilisateurs d'imprimer</LABEL>
 </TD>
 </TR>
 <TR>
