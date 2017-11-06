@@ -1694,6 +1694,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
 
     if (con->type != type && type != CUPSD_AUTH_NONE &&
+#ifdef AF_LOCAL
+        (_httpAddrFamily(con->http.hostaddr) != AF_LOCAL) &&
+#endif /* AF_LOCAL */
 #ifdef HAVE_GSSAPI
         (type != CUPSD_AUTH_NEGOTIATE || con->gss_uid <= 0) &&
 #endif /* HAVE_GSSAPI */
