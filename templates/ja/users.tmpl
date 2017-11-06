@@ -12,8 +12,8 @@
 <TD>
 <INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
 <BR>
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}>これらのユーザーの印刷を許可
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?checked:}>これらのユーザーの印刷を禁止
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' ID='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}><LABEL FOR='requesting-user-name-allowed'>これらのユーザーの印刷を許可</LABEL>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' ID='requesting-user-name-denied' {requesting_user_name_denied?checked:}><LABEL FOR='requesting-user-name-denied'>これらのユーザーの印刷を禁止</LABEL>
 </TD>
 </TR>
 <TR>

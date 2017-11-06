@@ -12,8 +12,8 @@
 <TD>
 <INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
 <BR>
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}>Allow these users to print
-<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?checked:}>Prevent these users from printing
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' ID='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}><LABEL FOR='requesting-user-name-allowed'>Allow these users to print</LABEL>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' ID='requesting-user-name-denied' {requesting_user_name_denied?checked:}><LABEL FOR='requesting-user-name-denied'>Prevent these users from printing</LABEL>
 </TD>
 </TR>
 <TR>

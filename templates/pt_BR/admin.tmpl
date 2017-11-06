@@ -43,22 +43,22 @@
     <P><A HREF="/admin/">Avan&ccedil;ado <SMALL>&#x25bc;</SMALL></A><BR>
     <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
     <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
-    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartilhar impressoras conectadas a este sistema<BR>
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> Compartilhar impressoras conectadas a este sistema</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&aacute;ximo de clientes\:
     <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Permitir impress&atilde;o a partir da Internet<BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Anunciar interface web<BR>
-    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administra&ccedil;&atilde;o remota<BR>
-    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas os seus pr&oacute;prios)<BR>
-    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Preservar o hist&oacute;rico de trabalhos<BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY"> Permitir impress&atilde;o a partir da Internet</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" ID="BROWSE_WEB_IF" {?browse_web_if}><LABEL FOR="BROWSE_WEB_IF"> Anunciar interface web</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN"> Permitir administra&ccedil;&atilde;o remota</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS"> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY"> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas os seus pr&oacute;prios)</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" ID="PRESERVE_JOBS" {?preserve_jobs}><LABEL FOR="PRESERVE_JOBS"> Preservar o hist&oacute;rico de trabalhos</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M&aacute;ximo de trabalhos (0 para sem limite)\:
     <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reter metadados\:
     <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reter documentos\:
     <INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
-    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salvar informa&ccedil;&atilde;o de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas<BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING"> Salvar informa&ccedil;&atilde;o de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas</LABEL><BR>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tamanho m&aacute;ximo do arquivo de log\:
     <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
 
@@ -66,12 +66,12 @@
 
     <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Avan&ccedil;ado <SMALL>&#x25b6;</SMALL></A><BR>
     <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Compartilhar impressoras conectadas a este sistema<BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Permitir impress&atilde;o a partir da Internet<BR>
-    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Permitir administra&ccedil;&atilde;o remota<BR>
-    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
-    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas seus pr&oacute;prios)<BR>
-    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salvar informa&ccedil;&otilde;es de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas</P>
+    <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" ID="SHARE_PRINTERS" {?share_printers}><LABEL FOR="SHARE_PRINTERS"> Compartilhar impressoras conectadas a este sistema</LABEL><BR>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" ID="REMOTE_ANY" {?remote_any}><LABEL FOR="REMOTE_ANY"> Permitir impress&atilde;o a partir da Internet</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" ID="REMOTE_ADMIN" {?remote_admin}><LABEL FOR="REMOTE_ADMIN"> Permitir administra&ccedil;&atilde;o remota</LABEL><BR>
+    {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" ID="KERBEROS" {?kerberos}><LABEL FOR="KERBEROS"> Usar autentica&ccedil;&atilde;o via Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)</LABEL><BR>:}
+    <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" ID="USER_CANCEL_ANY" {?user_cancel_any}><LABEL FOR="USER_CANCEL_ANY"> Permitir aos usu&aacute;rios cancelar qualquer trabalho (n&atilde;o apenas seus pr&oacute;prios)</LABEL><BR>
+    <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" ID="DEBUG_LOGGING" {?debug_logging}><LABEL FOR="DEBUG_LOGGING"> Salvar informa&ccedil;&otilde;es de depura&ccedil;&atilde;o para solu&ccedil;&atilde;o de problemas</LABEL></P>
 
     }
     <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Alterar configura&ccedil;&otilde;es"></P>

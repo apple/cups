@@ -34,8 +34,8 @@ TARGET="_blank">cupsaddsmb(8)</A> man ページに書かれているように、
 <SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
 {[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
 </SELECT><BR>
-<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
-onChange="select_printers()"> すべてのプリンターをエクスポート
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL" ID="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"><LABEL FOR="EXPORT_ALL"> すべてのプリンターをエクスポート</LABEL>
 </TD>
 </TR>
 <TR>
