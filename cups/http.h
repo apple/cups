@@ -494,10 +494,10 @@ extern char		*httpEncode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use 
 extern char		*httpDecode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use httpDecode64_2 instead.");
 extern int		httpGetLength(http_t *http) _CUPS_DEPRECATED_MSG("Use httpGetLength2 instead.");
 extern char		*httpMD5(const char *, const char *, const char *,
-			         char [33]);
+			         char [33]) _CUPS_DEPRECATED_MSG("Use cupsDoAuth or cupsHashData instead.");
 extern char		*httpMD5Final(const char *, const char *, const char *,
-			              char [33]);
-extern char		*httpMD5String(const unsigned char *, char [33]);
+			              char [33]) _CUPS_DEPRECATED_MSG("Use cupsDoAuth or cupsHashData instead.");
+extern char		*httpMD5String(const unsigned char *, char [33]) _CUPS_DEPRECATED_MSG("Use cupsHashString instead.");
 
 /**** New in CUPS 1.1.19 ****/
 extern void		httpClearCookie(http_t *http) _CUPS_API_1_1_19;

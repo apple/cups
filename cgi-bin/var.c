@@ -18,7 +18,6 @@
 /*#define DEBUG*/
 #include "cgi-private.h"
 #include <cups/http.h>
-#include <cups/md5-private.h>
 
 
 /*
@@ -1204,7 +1203,6 @@ cgi_set_sid(void)
 {
   char			buffer[512],	/* SID data */
 			sid[33];	/* SID string */
-  _cups_md5_state_t	md5;		/* MD5 state */
   unsigned char		sum[16];	/* MD5 sum */
   const char		*remote_addr,	/* REMOTE_ADDR */
 			*server_name,	/* SERVER_NAME */
@@ -1225,11 +1223,9 @@ cgi_set_sid(void)
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255);
-  _cupsMD5Init(&md5);
-  _cupsMD5Append(&md5, (unsigned char *)buffer, (int)strlen(buffer));
-  _cupsMD5Finish(&md5, sum);
+  cupsHashData("md5", (unsigned char *)buffer, strlen(buffer), sum, sizeof(sum));
 
-  cgiSetCookie(CUPS_SID, httpMD5String(sum, sid), "/", NULL, 0, 0);
+  cgiSetCookie(CUPS_SID, cupsHashString(sum, sizeof(sum), sid, sizeof(sid)), "/", NULL, 0, 0);
 
   return (cupsGetOption(CUPS_SID, num_cookies, cookies));
 }

@@ -2369,16 +2369,26 @@ cupsdSendHeader(
       * requests when the request requires system group membership - then the
       * client knows the root certificate can/should be used.
       *
-      * Also, for macOS we also look for @AUTHKEY and add an "authkey"
-      * parameter as needed...
+      * Also, for macOS we also look for @AUTHKEY and add an "AuthRef key=foo"
+      * method as needed...
       */
 
       char	*name,			/* Current user name */
 		*auth_key;		/* Auth key buffer */
       size_t	auth_size;		/* Size of remaining buffer */
+      int	need_local = 1;		/* Do we need to list "Local" method? */
 
       auth_key  = auth_str + strlen(auth_str);
       auth_size = sizeof(auth_str) - (size_t)(auth_key - auth_str);
+
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
+      if (httpAddrFamily(httpGetAddress(con->http)) == AF_LOCAL)
+      {
+        strlcpy(auth_key, ", PeerCred", auth_size);
+        auth_key += 10;
+        auth_size -= 10;
+      }
+#endif /* SO_PEERCRED && AF_LOCAL */
 
       for (name = (char *)cupsArrayFirst(con->best->names);
            name;
@@ -2387,7 +2397,8 @@ cupsdSendHeader(
 #ifdef HAVE_AUTHORIZATION_H
 	if (!_cups_strncasecmp(name, "@AUTHKEY(", 9))
 	{
-	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", name + 9);
+	  snprintf(auth_key, auth_size, ", AuthRef key=\"%s\"", name + 9);
+	  need_local = 0;
 	  /* end parenthesis is stripped in conf.c */
 	  break;
         }
@@ -2397,16 +2408,18 @@ cupsdSendHeader(
 	{
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
-	    snprintf(auth_key, auth_size,
-	             ", authkey=\"%s\"",
-		     SystemGroupAuthKey);
+	    snprintf(auth_key, auth_size, ", AuthRef key=\"%s\"", SystemGroupAuthKey);
           else
 #else
-	  strlcpy(auth_key, ", trc=\"y\"", auth_size);
+	  strlcpy(auth_key, ", Local trc=\"y\"", auth_size);
 #endif /* HAVE_AUTHORIZATION_H */
+	  need_local = 0;
 	  break;
 	}
       }
+
+      if (need_local)
+	strlcpy(auth_key, ", Local", auth_size);
     }
 
     if (auth_str[0])

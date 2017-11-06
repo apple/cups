@@ -68,7 +68,6 @@ typedef int socklen_t;
 #  endif /* __APPLE__ && !_SOCKLEN_T */
 
 #  include <cups/http.h>
-#  include "md5-private.h"
 #  include "ipp-private.h"
 
 #  ifdef HAVE_GNUTLS
@@ -301,10 +300,10 @@ struct _http_s				/**** HTTP connection structure ****/
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
   int			_auth_type;	/* Authentication in use (deprecated) */
-  _cups_md5_state_t	md5_state;	/* MD5 state */
+  unsigned char		_md5_state[88];	/* MD5 state (deprecated) */
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
-  int			nonce_count;	/* Nonce count */
+  unsigned		nonce_count;	/* Nonce count */
   http_tls_t		tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
 
@@ -368,6 +367,10 @@ struct _http_s				/**** HTTP connection structure ****/
   z_stream		stream;		/* (De)compression stream */
   Bytef			*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
+
+  /**** New in CUPS 2.3 ****/
+  char			*www_authenticate;
+					/* WWW-Authenticate value */
 };
 #  endif /* !_HTTP_NO_PRIVATE */
 

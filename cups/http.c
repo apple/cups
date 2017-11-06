@@ -325,6 +325,12 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
       http->server = NULL;
     }
 
+    if (http->www_authenticate)
+    {
+      free(http->www_authenticate);
+      http->www_authenticate = NULL;
+    }
+
     http->expect = (http_status_t)0;
   }
 }
@@ -973,12 +979,27 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
         if (http->field_authorization)
 	{
 	 /*
-	  * Special case for WWW-Authenticate: as its contents can be
+	  * Special case for Authorization: as its contents can be
 	  * longer than HTTP_MAX_VALUE...
 	  */
 
 	  return (http->field_authorization);
 	}
+	else
+	  return (http->fields[field]);
+
+    case HTTP_FIELD_WWW_AUTHENTICATE :
+        if (http->www_authenticate)
+	{
+	 /*
+	  * Special case for WWW-Authenticate: as its contents can be
+	  * longer than HTTP_MAX_VALUE...
+	  */
+
+	  return (http->www_authenticate);
+	}
+	else
+	  return (http->fields[field]);
 
     default :
         return (http->fields[field]);
@@ -2683,17 +2704,35 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
         break;
 
     case HTTP_FIELD_WWW_AUTHENTICATE :
-       /* CUPS STR #4503 - don't override WWW-Authenticate for unknown auth schemes */
-        if (http->fields[HTTP_FIELD_WWW_AUTHENTICATE][0] &&
-	    _cups_strncasecmp(value, "Basic ", 6) &&
-	    _cups_strncasecmp(value, "Digest ", 7) &&
-	    _cups_strncasecmp(value, "Negotiate ", 10))
-	{
-	  DEBUG_printf(("1httpSetField: Ignoring unknown auth scheme in \"%s\".", value));
-          return;
-	}
+        if (!http->www_authenticate)
+        {
+	 /*
+	  * First WWW-Authenticate seen, just copy it over...
+	  */
 
-	/* Fall through to copy */
+	  http->www_authenticate = strdup(value);
+	  strlcpy(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], value, HTTP_MAX_VALUE);
+        }
+        else
+        {
+         /*
+          * Nth WWW-Authenticate seen, append to existing string...
+          */
+
+	  size_t len = strlen(http->www_authenticate) + 2 + strlen(value) + 1;
+	  char *temp = realloc(http->www_authenticate, len);
+
+	  if (!temp)
+	    return;
+
+	  http->www_authenticate = temp;
+	  strlcat(http->www_authenticate, ", ", len);
+	  strlcat(http->www_authenticate, value, len);
+
+          /* Probably more efficient than two more strlcat's */
+	  strlcpy(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], http->www_authenticate, HTTP_MAX_VALUE);
+        }
+        break;
 
     default :
 	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);

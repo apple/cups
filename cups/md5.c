@@ -1,7 +1,7 @@
 /*
  * Private MD5 implementation for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 2005 by Easy Software Products
  * Copyright (C) 1999 Aladdin Enterprises.  All rights reserved.
  *
@@ -43,70 +43,71 @@
 #include "md5-private.h"
 #include "string-private.h"
 
-#define T1 0xd76aa478
-#define T2 0xe8c7b756
-#define T3 0x242070db
-#define T4 0xc1bdceee
-#define T5 0xf57c0faf
-#define T6 0x4787c62a
-#define T7 0xa8304613
-#define T8 0xfd469501
-#define T9 0x698098d8
-#define T10 0x8b44f7af
-#define T11 0xffff5bb1
-#define T12 0x895cd7be
-#define T13 0x6b901122
-#define T14 0xfd987193
-#define T15 0xa679438e
-#define T16 0x49b40821
-#define T17 0xf61e2562
-#define T18 0xc040b340
-#define T19 0x265e5a51
-#define T20 0xe9b6c7aa
-#define T21 0xd62f105d
-#define T22 0x02441453
-#define T23 0xd8a1e681
-#define T24 0xe7d3fbc8
-#define T25 0x21e1cde6
-#define T26 0xc33707d6
-#define T27 0xf4d50d87
-#define T28 0x455a14ed
-#define T29 0xa9e3e905
-#define T30 0xfcefa3f8
-#define T31 0x676f02d9
-#define T32 0x8d2a4c8a
-#define T33 0xfffa3942
-#define T34 0x8771f681
-#define T35 0x6d9d6122
-#define T36 0xfde5380c
-#define T37 0xa4beea44
-#define T38 0x4bdecfa9
-#define T39 0xf6bb4b60
-#define T40 0xbebfbc70
-#define T41 0x289b7ec6
-#define T42 0xeaa127fa
-#define T43 0xd4ef3085
-#define T44 0x04881d05
-#define T45 0xd9d4d039
-#define T46 0xe6db99e5
-#define T47 0x1fa27cf8
-#define T48 0xc4ac5665
-#define T49 0xf4292244
-#define T50 0x432aff97
-#define T51 0xab9423a7
-#define T52 0xfc93a039
-#define T53 0x655b59c3
-#define T54 0x8f0ccc92
-#define T55 0xffeff47d
-#define T56 0x85845dd1
-#define T57 0x6fa87e4f
-#define T58 0xfe2ce6e0
-#define T59 0xa3014314
-#define T60 0x4e0811a1
-#define T61 0xf7537e82
-#define T62 0xbd3af235
-#define T63 0x2ad7d2bb
-#define T64 0xeb86d391
+#if !defined(__APPLE__) && !defined(HAVE_GNUTLS)
+#  define T1 0xd76aa478
+#  define T2 0xe8c7b756
+#  define T3 0x242070db
+#  define T4 0xc1bdceee
+#  define T5 0xf57c0faf
+#  define T6 0x4787c62a
+#  define T7 0xa8304613
+#  define T8 0xfd469501
+#  define T9 0x698098d8
+#  define T10 0x8b44f7af
+#  define T11 0xffff5bb1
+#  define T12 0x895cd7be
+#  define T13 0x6b901122
+#  define T14 0xfd987193
+#  define T15 0xa679438e
+#  define T16 0x49b40821
+#  define T17 0xf61e2562
+#  define T18 0xc040b340
+#  define T19 0x265e5a51
+#  define T20 0xe9b6c7aa
+#  define T21 0xd62f105d
+#  define T22 0x02441453
+#  define T23 0xd8a1e681
+#  define T24 0xe7d3fbc8
+#  define T25 0x21e1cde6
+#  define T26 0xc33707d6
+#  define T27 0xf4d50d87
+#  define T28 0x455a14ed
+#  define T29 0xa9e3e905
+#  define T30 0xfcefa3f8
+#  define T31 0x676f02d9
+#  define T32 0x8d2a4c8a
+#  define T33 0xfffa3942
+#  define T34 0x8771f681
+#  define T35 0x6d9d6122
+#  define T36 0xfde5380c
+#  define T37 0xa4beea44
+#  define T38 0x4bdecfa9
+#  define T39 0xf6bb4b60
+#  define T40 0xbebfbc70
+#  define T41 0x289b7ec6
+#  define T42 0xeaa127fa
+#  define T43 0xd4ef3085
+#  define T44 0x04881d05
+#  define T45 0xd9d4d039
+#  define T46 0xe6db99e5
+#  define T47 0x1fa27cf8
+#  define T48 0xc4ac5665
+#  define T49 0xf4292244
+#  define T50 0x432aff97
+#  define T51 0xab9423a7
+#  define T52 0xfc93a039
+#  define T53 0x655b59c3
+#  define T54 0x8f0ccc92
+#  define T55 0xffeff47d
+#  define T56 0x85845dd1
+#  define T57 0x6fa87e4f
+#  define T58 0xfe2ce6e0
+#  define T59 0xa3014314
+#  define T60 0x4e0811a1
+#  define T61 0xf7537e82
+#  define T62 0xbd3af235
+#  define T63 0x2ad7d2bb
+#  define T64 0xeb86d391
 
 static void
 _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
@@ -116,10 +117,10 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
 	c = pms->abcd[2], d = pms->abcd[3];
     unsigned int t;
 
-#ifndef ARCH_IS_BIG_ENDIAN
-# define ARCH_IS_BIG_ENDIAN 1	/* slower, default implementation */
-#endif
-#if ARCH_IS_BIG_ENDIAN
+#  ifndef ARCH_IS_BIG_ENDIAN
+#    define ARCH_IS_BIG_ENDIAN 1	/* slower, default implementation */
+#  endif
+#  if ARCH_IS_BIG_ENDIAN
 
     /*
      * On big-endian machines, we must arrange the bytes in the right
@@ -133,7 +134,7 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
 	X[i] = (unsigned)xp[0] + ((unsigned)xp[1] << 8) +
 	       ((unsigned)xp[2] << 16) + ((unsigned)xp[3] << 24);
 
-#else  /* !ARCH_IS_BIG_ENDIAN */
+#  else  /* !ARCH_IS_BIG_ENDIAN */
 
     /*
      * On little-endian machines, we can process properly aligned data
@@ -150,15 +151,15 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
 	memcpy(xbuf, data, 64);
 	X = xbuf;
     }
-#endif
+#  endif
 
-#define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
+#  define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
 
     /* Round 1. */
     /* Let [abcd k s i] denote the operation
        a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s). */
-#define F(x, y, z) (((x) & (y)) | (~(x) & (z)))
-#define SET(a, b, c, d, k, s, Ti)\
+#  define F(x, y, z) (((x) & (y)) | (~(x) & (z)))
+#  define SET(a, b, c, d, k, s, Ti)\
   t = a + F(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
     /* Do the following 16 operations. */
@@ -178,13 +179,13 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
     SET(d, a, b, c, 13, 12, T14);
     SET(c, d, a, b, 14, 17, T15);
     SET(b, c, d, a, 15, 22, T16);
-#undef SET
+#  undef SET
 
      /* Round 2. */
      /* Let [abcd k s i] denote the operation
           a = b + ((a + G(b,c,d) + X[k] + T[i]) <<< s). */
-#define G(x, y, z) (((x) & (z)) | ((y) & ~(z)))
-#define SET(a, b, c, d, k, s, Ti)\
+#  define G(x, y, z) (((x) & (z)) | ((y) & ~(z)))
+#  define SET(a, b, c, d, k, s, Ti)\
   t = a + G(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
      /* Do the following 16 operations. */
@@ -204,13 +205,13 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
     SET(d, a, b, c,  2,  9, T30);
     SET(c, d, a, b,  7, 14, T31);
     SET(b, c, d, a, 12, 20, T32);
-#undef SET
+#  undef SET
 
      /* Round 3. */
      /* Let [abcd k s t] denote the operation
           a = b + ((a + H(b,c,d) + X[k] + T[i]) <<< s). */
-#define H(x, y, z) ((x) ^ (y) ^ (z))
-#define SET(a, b, c, d, k, s, Ti)\
+#  define H(x, y, z) ((x) ^ (y) ^ (z))
+#  define SET(a, b, c, d, k, s, Ti)\
   t = a + H(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
      /* Do the following 16 operations. */
@@ -230,13 +231,13 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
     SET(d, a, b, c, 12, 11, T46);
     SET(c, d, a, b, 15, 16, T47);
     SET(b, c, d, a,  2, 23, T48);
-#undef SET
+#  undef SET
 
      /* Round 4. */
      /* Let [abcd k s t] denote the operation
           a = b + ((a + I(b,c,d) + X[k] + T[i]) <<< s). */
-#define I(x, y, z) ((y) ^ ((x) | ~(z)))
-#define SET(a, b, c, d, k, s, Ti)\
+#  define I(x, y, z) ((y) ^ ((x) | ~(z)))
+#  define SET(a, b, c, d, k, s, Ti)\
   t = a + I(b,c,d) + X[k] + Ti;\
   a = ROTATE_LEFT(t, s) + b
      /* Do the following 16 operations. */
@@ -256,7 +257,7 @@ _cups_md5_process(_cups_md5_state_t *pms, const unsigned char *data /*[64]*/)
     SET(d, a, b, c, 11, 10, T62);
     SET(c, d, a, b,  2, 15, T63);
     SET(b, c, d, a,  9, 21, T64);
-#undef SET
+#  undef SET
 
      /* Then perform the following additions. (That is increment each
         of the four registers by the value it had before this block
@@ -337,3 +338,4 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
     for (i = 0; i < 16; ++i)
 	digest[i] = (unsigned char)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }
+#endif /* !__APPLE__ && !HAVE_GNUTLS */

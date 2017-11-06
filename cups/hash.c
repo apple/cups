@@ -1,7 +1,7 @@
 /*
  * Hashing function for CUPS.
  *
- * Copyright 2015-2016 by Apple Inc.
+ * Copyright 2015-2017 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -21,6 +21,8 @@
 #  include <CommonCrypto/CommonDigest.h>
 #elif defined(HAVE_GNUTLS)
 #  include <gnutls/crypto.h>
+#else
+#  include "md5-private.h"
 #endif /* __APPLE__ */
 
 
@@ -53,7 +55,24 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   }
 
 #ifdef __APPLE__
-  if (!strcmp(algorithm, "sha"))
+  if (!strcmp(algorithm, "md5"))
+  {
+   /*
+    * MD5 (deprecated but widely used...)
+    */
+
+    CC_MD5_CTX	ctx;			/* MD5 context */
+
+    if (hashsize < CC_MD5_DIGEST_LENGTH)
+      goto too_small;
+
+    CC_MD5_Init(&ctx);
+    CC_MD5_Update(&ctx, data, (CC_LONG)datalen);
+    CC_MD5_Final(hash, &ctx);
+
+    return (CC_MD5_DIGEST_LENGTH);
+  }
+  else if (!strcmp(algorithm, "sha"))
   {
    /*
     * SHA-1...
@@ -171,7 +190,9 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   unsigned char	temp[64];		/* Temporary hash buffer */
   size_t	tempsize = 0;		/* Truncate to this size? */
 
-  if (!strcmp(algorithm, "sha"))
+  if (!strcmp(algorithm, "md5"))
+    alg = GNUTLS_DIG_MD5;
+  else if (!strcmp(algorithm, "sha"))
     alg = GNUTLS_DIG_SHA1;
   else if (!strcmp(algorithm, "sha2-224"))
     alg = GNUTLS_DIG_SHA224;
@@ -219,10 +240,20 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
 #else
  /*
-  * No hash support without CommonCrypto or GNU TLS...
+  * No hash support beyond MD5 without CommonCrypto or GNU TLS...
   */
 
-  if (hashsize < 64)
+  if (!strcmp(algorithm, "md5"))
+  {
+    _cups_md5_state_t	state;		/* MD5 state info */
+
+    _cupsMD5Init(&state);
+    _cupsMD5Append(&state, data, datalen);
+    _cupsMD5Finish(&state, hash);
+
+    return (16);
+  }
+  else if (hashsize < 64)
     goto too_small;
 #endif /* __APPLE__ */
 
@@ -242,4 +273,52 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
   _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Hash buffer too small."), 1);
   return (-1);
+}
+
+
+/*
+ * 'cupsHashString()' - Format a hash value as a hexadecimal string.
+ *
+ * The passed buffer must be at least 2 * hashsize + 1 characters in length.
+ */
+
+const char *				/* O - Formatted string */
+cupsHashString(
+    const unsigned char *hash,		/* I - Hash */
+    size_t              hashsize,	/* I - Size of hash */
+    char                *buffer,	/* I - String buffer */
+    size_t		bufsize)	/* I - Size of string buffer */
+{
+  char		*bufptr = buffer;	/* Pointer into buffer */
+  static const char *hex = "0123456789abcdef";
+					/* Hex characters (lowercase!) */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!hash || hashsize < 1 || !buffer || bufsize < (2 * hashsize + 1))
+  {
+    if (buffer)
+      *buffer = '\0';
+    return (NULL);
+  }
+
+ /*
+  * Loop until we've converted the whole hash...
+  */
+
+  while (hashsize > 0)
+  {
+    *bufptr++ = hex[*hash >> 4];
+    *bufptr++ = hex[*hash & 15];
+
+    hash ++;
+    hashsize --;
+  }
+
+  *bufptr = '\0';
+
+  return (buffer);
 }

@@ -606,6 +606,9 @@ extern ssize_t		cupsHashData(const char *algorithm, const void *data, size_t dat
 extern int		cupsAddIntegerOption(const char *name, int value, int num_options, cups_option_t **options) _CUPS_API_2_2_4;
 extern int		cupsGetIntegerOption(const char *name, int num_options, cups_option_t *options) _CUPS_API_2_2_4;
 
+/* New in CUPS 2.3 */
+extern const char	*cupsHashString(const unsigned char *hash, size_t hashsize, char *buffer, size_t bufsize) _CUPS_API_2_3;
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */

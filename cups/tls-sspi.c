@@ -353,7 +353,6 @@ httpCredentialsString(
     SYSTEMTIME		systime;	/* System time */
     struct tm		tm;		/* UNIX date/time */
     time_t		expiration;	/* Expiration date of cert */
-    _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
     FileTimeToSystemTime(&(cert->pCertInfo->NotAfter), &systime);
@@ -380,9 +379,7 @@ httpCredentialsString(
     else
       strlcpy(cert_name, "unknown", sizeof(cert_name));
 
-    _cupsMD5Init(&md5_state);
-    _cupsMD5Append(&md5_state, first->data, (int)first->datalen);
-    _cupsMD5Finish(&md5_state, md5_digest);
+    cupsHashData("md5", first->data, first->datalen, md5_digest, sizeof(md5_digest));
 
     snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", cert_name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
