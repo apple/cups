@@ -1,10 +1,11 @@
-CHANGES - 2.3b1 - 2017-11-06
+CHANGES - 2.3b1 - 2017-11-08
 ============================
 
 
 Changes in CUPS v2.3b1
 ----------------------
 
+- CUPS is now provided under the Apache License, Version 2.0.
 - Documentation updates (Issue #4580)
 - The `lpstat` command now reports when new jobs are being held (Issue #4761)
 - The CUPS library now supports the latest HTTP Digest authentication

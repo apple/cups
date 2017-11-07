@@ -8,11 +8,7 @@
  * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  *
  * PostScript is a trademark of Adobe Systems, Inc.
  *
@@ -22,8 +18,6 @@
  * (or any derivative of it) with software other than GNU
  * GhostScript (or its derivatives) is governed by the CUPS license
  * agreement.
- *
- * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_PPD_H_

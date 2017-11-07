@@ -1,4 +1,4 @@
-README - CUPS v2.3b1 - 2017-11-01
+README - CUPS v2.3b1 - 2017-11-08
 =================================
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
@@ -148,13 +148,13 @@ This will prevent the filters from misinterpreting your print file.
 LEGAL STUFF
 -----------
 
-CUPS is copyright © 2007-2017 by Apple Inc.  CUPS and the CUPS logo are
-trademarks of Apple Inc.
+Copyright © 2007-2017 by Apple Inc.
 
-The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
+CUPS is provided under the terms of the Apache License, Version 2.0.  A copy of
+this license can be found in the file `LICENSE`.  Additional legal information
+is provided in the file `NOTICE`.
 
-CUPS is provided under the terms of version 2 of the GNU General Public License
-and GNU Library General Public License. This program is distributed in the hope
-that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-`doc/help/license.html` or `LICENSE.txt` files for more information.
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations under the License.

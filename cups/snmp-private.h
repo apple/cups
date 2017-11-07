@@ -9,8 +9,6 @@
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * "LICENSE" which should have been included with this file.  If this
  * file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_SNMP_PRIVATE_H_

@@ -1,0 +1,34 @@
+CUPS
+
+Copyright © 2007-2017 by Apple Inc.
+Copyright 1997-2007 by Easy Software Products.
+
+CUPS and the CUPS logo are trademarks of Apple Inc.
+
+The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
+
+The Kerberos support code ("KSC") is copyright 2006 by Jelmer Vernooij and is
+provided 'as-is', without any express or implied warranty.  In no event will the
+author or Apple Inc. be held liable for any damages arising from the use of the
+KSC.
+
+Sources files containing KSC have the following text at the top of each source
+file:
+
+    This file contains Kerberos support code, copyright 2006 by Jelmer Vernooij.
+
+The KSC copyright and license apply only to Kerberos-related feature code in
+CUPS.  Such code is typically conditionally compiled based on the present of the
+HAVE_GSSAPI preprocessor definition.
+
+Permission is granted to anyone to use the KSC for any purpose, including
+commercial applications, and to alter it and redistribute it freely, subject to
+the following restrictions:
+
+  1. The origin of the KSC must not be misrepresented; you must not claim that
+     you wrote the original software. If you use the KSC in a product, an
+     acknowledgment in the product documentation would be appreciated but is not
+     required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.

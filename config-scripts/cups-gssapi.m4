@@ -7,11 +7,7 @@ dnl
 dnl This file contains Kerberos support code, copyright 2006 by
 dnl Jelmer Vernooij.
 dnl
-dnl These coded instructions, statements, and computer programs are the
-dnl property of Apple Inc. and are protected by Federal copyright
-dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl which should have been included with this file.  If this file is
-dnl missing or damaged, see the license at "http://www.cups.org/".
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 dnl
 
 AC_ARG_ENABLE(gssapi, [  --disable-gssapi        disable GSSAPI support])
