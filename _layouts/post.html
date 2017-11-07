@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/cups.css">
-    <link rel="shortcut icon" href="../apple-touch-icon.png" type="image/png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/cups.css">
+    <link rel="shortcut icon" href="/apple-touch-icon.png" type="image/png">
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=9">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{page.title}} - CUPS.org</title>
     <meta name="keywords" content="printing,printer driver,internet printing protocol,ipp,ipp everywhere,ppd,linux,unix,mac,os x,postscript,pdf,text,image">
@@ -18,16 +18,16 @@
 	<div class="navbar-header">
 	  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#cups-collapsible">
 	  <span class="sr-only">Toggle Navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-	  <a class="navbar-brand" href="../index.html">CUPS.org</a>
+	  <a class="navbar-brand" href="/index.html">CUPS.org</a>
 	</div>
 	<div class="collapse navbar-collapse" id="cups-collapsible">
 	  <ul class="nav navbar-nav">
 	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b class="caret"></b></a><ul class="dropdown-menu">
 {% for post in site.posts offset: 0 limit: 10 %}
-	    <li><a href="..{{ post.url }}">{{post.title}}</a></li>
+	    <li><a href="{{ post.url }}">{{post.title}}</a></li>
 {% endfor %}
 	      <li class="divider"></li>
-	      <li><a href="../blog.html">View All</a></li>
+	      <li><a href="/blog.html">View All</a></li>
 	    </ul>
 	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Bugs <b class="caret"></b></a><ul class="dropdown-menu">
 	      <li><a href="{{site.github.issues_url}}">All Issues</a></li>
@@ -35,12 +35,12 @@
 	      <li><a href="{{site.github.repository_url}}/milestone/4">CUPS 2.3.x Issues</a></li>
 	      <li><a href="{{site.github.repository_url}}/milestone/2">CUPS Future Issues</a></li>
 	    </ul></li>
-	    <li><a href="../documentation.html">Help</a></li>
+	    <li><a href="/documentation.html">Help</a></li>
 	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a><ul class="dropdown-menu">
 	      <li><a href="http://lists.cups.org/mailman/listinfo/cups">User</a></li>
 	      <li><a href="http://lists.cups.org/mailman/listinfo/cups-devel">Developer</a></li>
 	    </ul></li>
-	    <li><a href="../software.html">Software</a></li>
+	    <li><a href="/software.html">Software</a></li>
 	    <li><a href="#modalSearch" data-toggle="modal" data-target="#modalSearch"><span id="searchGlyph" class="glyphicon glyphicon-search"></span> <span class="hidden-sm hidden-md hidden-lg">Search</span></a></li>
 	  </ul>
 	</div>
@@ -82,9 +82,9 @@
       {{ content }}
     </div>
     <div class="footer">
-      <p>Copyright &copy; 2007-{{ site.time | date: "%Y" }} Apple Inc. All rights reserved. CUPS, the CUPS logo, and macOS are trademarks of <a href="http://www.apple.com/legal/intellectual-property/trademark/appletmlist.html">Apple Inc.</a> All other trademarks are the property of their respective owners.</p>
+      <p>Copyright &copy; 2007-{{ site.time | date: "%Y" }} Apple Inc. CUPS is provided under the terms of the <a href="/doc/license.html">Apache License, Version 2.0</a>. CUPS, the CUPS logo, and macOS are trademarks of <a href="http://www.apple.com/legal/intellectual-property/trademark/appletmlist.html">Apple Inc.</a> All other trademarks are the property of their respective owners.</p>
     </div>
-    <script src="../js/jquery.js"></script>
-    <script src="../js/bootstrap.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="   crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   </body>
 </html>

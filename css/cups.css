@@ -1,6 +1,4 @@
 /*
- * "$Id: cups.css 12207 2014-10-16 15:45:58Z msweet $"
- *
  * CUPS stylesheet in addition to bootstrap CSS...
  */
 
@@ -16,17 +14,13 @@ A, A:hover {
   text-decoration: none;
 }
 
-A:link {
-  color: #0088cc;
-}
-
-/*A:visited {
-  color: #005580;
-}*/
-
-A:link:hover, A:visited:hover {
+A:link, A:link:visited, A:visited, A:link:hover, A:visited:hover {
   color: #005580;
   text-decoration: underline;
+}
+
+NAV A:link, NAV A:link:visited, NAV A:visited {
+  text-decoration: none;
 }
 
 A.btn:link, A.btn:hover, A.btn:focus,
@@ -376,7 +370,3 @@ div.body dd {
     display: none !important;
   }
 }
-
-/*
- * End of "$Id: cups.css 12207 2014-10-16 15:45:58Z msweet $".
- */
