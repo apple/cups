@@ -30,9 +30,7 @@ A.btn[disabled], A.navbar-brand:hover {
   text-decoration: none;
 }
 
-A.btn-primary:link, A.btn-primary:hover, A.btn-primary:focus,
-A.btn-primary:active, A.btn-primary.active, A.btn-primary.disabled,
-A.btn-primary[disabled] {
+A.btn-primary:link, A.btn-primary:hover, A.btn-primary:visited, A.btn-primary:focus, A.btn-primary:active, A.btn-primary.active, A.btn-primary.disabled, A.btn-primary[disabled] {
   color: #ffffff;
   text-decoration: none;
 }
