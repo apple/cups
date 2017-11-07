@@ -23,7 +23,7 @@ NAV A:link, NAV A:link:visited, NAV A:visited {
   text-decoration: none;
 }
 
-A.btn:link, A.btn:hover, A.btn:focus,
+A.btn:link, A.btn:hover, A.btn:visited, A.btn:focus,
 A.btn:active, A.btn.active, A.btn.disabled,
 A.btn[disabled], A.navbar-brand:hover {
   color: #000000;
