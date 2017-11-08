@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-07
+CHANGES - 2.3b1 - 2017-11-08
 ============================
 
 
@@ -8,6 +8,8 @@ Changes in CUPS v2.3b1
 - CUPS is now provided under the Apache License, Version 2.0.
 - Documentation updates (Issue #4580)
 - The `lpstat` command now reports when new jobs are being held (Issue #4761)
+- The `ippfind` command now supports finding printers whose name starts with an
+  underscore (Issue #4833)
 - The CUPS library now supports the latest HTTP Digest authentication
   specification including support for SHA-256 (Issue #4862)
 - The scheduler now supports the "printer-id" attribute (Issue #4868)
