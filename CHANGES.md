@@ -24,6 +24,8 @@ Changes in CUPS v2.3b1
   printer cannot be found (Issue #5096)
 - The `lpadmin` command now provides a better error message when an unsupported
   System V interface script is used (Issue #5111)
+- The scheduler did not write out dirty configuration and state files if there
+  were open client connections (Issue #5118)
 - The `SSLOptions` directive now supports `MinTLS` and `MaxTLS` options to
   control the minimum and maximum TLS versions that will be allowed,
   respectively (Issue #5119)

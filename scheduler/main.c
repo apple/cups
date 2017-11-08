@@ -4,11 +4,8 @@
  * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * "LICENSE" which should have been included with this file.  If this
- * file is missing or damaged, see the license at "http://www.cups.org/".
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -893,7 +890,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Write dirty config/state files...
     */
 
-    if (DirtyCleanTime && current_time >= DirtyCleanTime && cupsArrayCount(Clients) == 0)
+    if (DirtyCleanTime && current_time >= DirtyCleanTime)
       cupsdCleanDirty();
 
 #ifdef __APPLE__
