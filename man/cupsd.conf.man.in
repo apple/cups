@@ -6,7 +6,7 @@
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
-.TH cupsd.conf 5 "CUPS" "3 November 2017" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "9 November 2017" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -858,6 +858,7 @@ The following percent sequences are recognized:
 .fi
 The default is the empty string, which disables page logging.
 The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
+Use "%{job-impressions-completed}" to insert the number of pages (sides) that were printed, or "%{job-media-sheets-completed}" to insert the number of sheets that were printed.
 .\"#RIPCache
 .TP 5
 \fBRIPCache \fIsize\fR
