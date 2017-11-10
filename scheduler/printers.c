@@ -4053,6 +4053,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
 		 "printer-make-and-model", NULL, p->make_model);
 
+    if (p->pc->strings_uri)
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-strings-uri", NULL, p->pc->strings_uri);
+
    /*
     * Add media options from the PPD file...
     */
