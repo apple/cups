@@ -1142,7 +1142,8 @@ cupsdCheckGroup(
     const char    *groupname)		/* I - Group name */
 {
   int		i;			/* Looping var */
-  struct group	*group;			/* System group info */
+  struct group	*group;			/* Group info */
+  gid_t		groupid;		/* ID of named group */
 #ifdef HAVE_MBR_UID_TO_UUID
   uuid_t	useruuid,		/* UUID for username */
 		groupuuid;		/* UUID for groupname */
@@ -1172,6 +1173,8 @@ cupsdCheckGroup(
     * Group exists, check it...
     */
 
+    groupid = group->gr_gid;
+
 #ifdef HAVE_GETGROUPLIST
     if (user)
     {
@@ -1190,22 +1193,27 @@ cupsdCheckGroup(
 #endif /* __APPLE__ */
 
       for (i = 0; i < ngroups; i ++)
-        if ((int)group->gr_gid == (int)groups[i])
+        if ((int)groupid == (int)groups[i])
 	  return (1);
     }
-#endif /* HAVE_GETGROUPLIST */
 
+#else
     for (i = 0; group->gr_mem[i]; i ++)
+    {
       if (!_cups_strcasecmp(username, group->gr_mem[i]))
 	return (1);
+    }
+#endif /* HAVE_GETGROUPLIST */
   }
+  else
+    groupid = (gid_t)-1;
 
  /*
   * Group doesn't exist or user not in group list, check the group ID
   * against the user's group ID...
   */
 
-  if (user && group && group->gr_gid == user->pw_gid)
+  if (user && groupid == user->pw_gid)
     return (1);
 
 #ifdef HAVE_MBR_UID_TO_UUID
@@ -1215,13 +1223,13 @@ cupsdCheckGroup(
 
   if (user && !mbr_uid_to_uuid(user->pw_uid, useruuid))
   {
-    if (group)
+    if (groupid != (gid_t)-1)
     {
      /*
       * Map group name to UUID and check membership...
       */
 
-      if (!mbr_gid_to_uuid(group->gr_gid, groupuuid))
+      if (!mbr_gid_to_uuid(groupid, groupuuid))
         if (!mbr_check_membership(useruuid, groupuuid, &is_member))
 	  if (is_member)
 	    return (1);
