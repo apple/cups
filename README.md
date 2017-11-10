@@ -1,4 +1,4 @@
-README - CUPS v2.3b1 - 2017-11-07
+README - CUPS v2.3b1 - 2017-11-10
 =================================
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
@@ -22,8 +22,8 @@ included with CUPS to support many Dymo, EPSON, HP, Intellitech, OKIDATA, and
 Zebra printers.  Many more drivers are available online and (in some cases) on
 the driver CD-ROM that came with your printer.
 
-CUPS is licensed under the GNU General Public License and GNU Library General
-Public License versions 2.  See the file "LICENSE.txt" for more information.
+CUPS is licensed under the Apache License Version 2.0.  See the file
+"LICENSE" for more information.
 
 
 READING THE DOCUMENTATION
