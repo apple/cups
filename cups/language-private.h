@@ -33,12 +33,20 @@ extern "C" {
 
 
 /*
+ * Constants...
+ */
+
+#  define _CUPS_MESSAGE_UNQUOTE	1	/* Unescape \foo in strings? */
+#  define _CUPS_MESSAGE_STRINGS	2	/* Message file is in Apple .strings format */
+
+
+/*
  * Types...
  */
 
 typedef struct _cups_message_s		/**** Message catalog entry ****/
 {
-  char	*id,				/* Original string */
+  char	*msg,				/* Original string */
 	*str;				/* Localized string */
 } _cups_message_t;
 
@@ -64,7 +72,7 @@ extern int		_cupsLangPuts(FILE *fp, const char *message);
 extern const char	*_cupsLangString(cups_lang_t *lang,
 			                 const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
-extern cups_array_t	*_cupsMessageLoad(const char *filename, int unquote);
+extern cups_array_t	*_cupsMessageLoad(const char *filename, int flags);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 extern cups_array_t	*_cupsMessageNew(void *context);
 extern void		_cupsSetLocale(char *argv[]);

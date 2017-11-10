@@ -1,7 +1,7 @@
 /*
  * Destination localization support for CUPS.
  *
- * Copyright 2012-2014 by Apple Inc.
+ * Copyright 2012-2017 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -18,9 +18,6 @@
  */
 
 static void	cups_create_localizations(http_t *http, cups_dinfo_t *dinfo);
-static int	cups_read_strings(cups_file_t *fp, char *buffer, size_t bufsize,
-		                  char **id, char **str);
-static char	*cups_scan_strings(char *buffer);
 
 
 /*
@@ -74,7 +71,7 @@ cupsLocalizeDestMedia(
   if (!dinfo->localizations)
     cups_create_localizations(http, dinfo);
 
-  key.id = size->media;
+  key.msg = size->media;
   if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
   {
     DEBUG_printf(("1cupsLocalizeDestMedia: Returning \"%s\".", match->str));
@@ -192,7 +189,7 @@ cupsLocalizeDestMedia(
   if ((match = (_cups_message_t *)calloc(1, sizeof(_cups_message_t))) == NULL)
     return (NULL);
 
-  match->id  = strdup(size->media);
+  match->msg = strdup(size->media);
   match->str = strdup(name);
 
   cupsArrayAdd(dinfo->localizations, match);
@@ -233,9 +230,8 @@ cupsLocalizeDestOption(
   if (!dinfo->localizations)
     cups_create_localizations(http, dinfo);
 
-  key.id = (char *)option;
-  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations,
-                                                &key)) != NULL)
+  key.msg = (char *)option;
+  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
     return (match->str);
   else if ((localized = _cupsLangString(cupsLangDefault(), option)) != NULL)
     return (localized);
@@ -293,9 +289,8 @@ cupsLocalizeDestValue(
     cups_create_localizations(http, dinfo);
 
   snprintf(pair, sizeof(pair), "%s.%s", option, value);
-  key.id = pair;
-  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations,
-                                                &key)) != NULL)
+  key.msg = pair;
+  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
     return (match->str);
   else if ((localized = _cupsLangString(cupsLangDefault(), pair)) != NULL && strcmp(localized, pair))
     return (localized);
@@ -330,12 +325,6 @@ cups_create_localizations(
 
 
  /*
-  * Create an empty message catalog...
-  */
-
-  dinfo->localizations = _cupsMessageNew(NULL);
-
- /*
   * See if there are any localizations...
   */
 
@@ -343,12 +332,12 @@ cups_create_localizations(
                                IPP_TAG_URI)) == NULL)
   {
    /*
-    * Nope...
+    * Nope, create an empty message catalog...
     */
 
-    DEBUG_puts("4cups_create_localizations: No printer-strings-uri (uri) "
-               "value.");
-    return;				/* Nope */
+    dinfo->localizations = _cupsMessageNew(NULL);
+    DEBUG_puts("4cups_create_localizations: No printer-strings-uri (uri) value.");
+    return;
   }
 
  /*
@@ -361,8 +350,8 @@ cups_create_localizations(
                       hostname, sizeof(hostname), &port, resource,
                       sizeof(resource)) < HTTP_URI_STATUS_OK)
   {
-    DEBUG_printf(("4cups_create_localizations: Bad printer-strings-uri value "
-                  "\"%s\".", attr->values[0].string.text));
+    dinfo->localizations = _cupsMessageNew(NULL);
+    DEBUG_printf(("4cups_create_localizations: Bad printer-strings-uri value \"%s\".", attr->values[0].string.text));
     return;
   }
 
@@ -411,9 +400,9 @@ cups_create_localizations(
   }
 
   status = cupsGetFd(http2, resource, cupsFileNumber(temp));
+  cupsFileClose(temp);
 
-  DEBUG_printf(("4cups_create_localizations: GET %s = %s", resource,
-                httpStatus(status)));
+  DEBUG_printf(("4cups_create_localizations: GET %s = %s", resource, httpStatus(status)));
 
   if (status == HTTP_STATUS_OK)
   {
@@ -421,35 +410,7 @@ cups_create_localizations(
     * Got the file, read it...
     */
 
-    char		buffer[8192],	/* Message buffer */
-    			*id,		/* ID string */
-    			*str;		/* Translated message */
-    _cups_message_t	*m;		/* Current message */
-
-    lseek(cupsFileNumber(temp), 0, SEEK_SET);
-
-    while (cups_read_strings(temp, buffer, sizeof(buffer), &id, &str))
-    {
-      if ((m = malloc(sizeof(_cups_message_t))) == NULL)
-        break;
-
-      m->id  = strdup(id);
-      m->str = strdup(str);
-
-      if (m->id && m->str)
-        cupsArrayAdd(dinfo->localizations, m);
-      else
-      {
-        if (m->id)
-          free(m->id);
-
-        if (m->str)
-          free(m->str);
-
-        free(m);
-        break;
-      }
-    }
+    dinfo->localizations = _cupsMessageLoad(tempfile, _CUPS_MESSAGE_STRINGS);
   }
 
   DEBUG_printf(("4cups_create_localizations: %d messages loaded.",
@@ -460,102 +421,8 @@ cups_create_localizations(
   */
 
   unlink(tempfile);
-  cupsFileClose(temp);
 
   if (http2 != http)
     httpClose(http2);
 }
 
-
-/*
- * 'cups_read_strings()' - Read a pair of strings from a .strings file.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-cups_read_strings(cups_file_t *strings,	/* I - .strings file */
-                  char        *buffer,	/* I - Line buffer */
-                  size_t      bufsize,	/* I - Size of line buffer */
-		  char        **id,	/* O - Pointer to ID string */
-		  char        **str)	/* O - Pointer to translation string */
-{
-  char	*bufptr;			/* Pointer into buffer */
-
-
-  while (cupsFileGets(strings, buffer, bufsize))
-  {
-    if (buffer[0] != '\"')
-      continue;
-
-    *id    = buffer + 1;
-    bufptr = cups_scan_strings(buffer);
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr++ = '\0';
-
-    while (*bufptr && *bufptr != '\"')
-      bufptr ++;
-
-    if (!*bufptr)
-      continue;
-
-    *str   = bufptr + 1;
-    bufptr = cups_scan_strings(bufptr);
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr = '\0';
-
-    return (1);
-  }
-
-  return (0);
-}
-
-
-/*
- * 'cups_scan_strings()' - Scan a quoted string.
- */
-
-static char *				/* O - End of string */
-cups_scan_strings(char *buffer)		/* I - Start of string */
-{
-  char	*bufptr;			/* Pointer into string */
-
-
-  for (bufptr = buffer + 1; *bufptr && *bufptr != '\"'; bufptr ++)
-  {
-    if (*bufptr == '\\')
-    {
-      if (bufptr[1] >= '0' && bufptr[1] <= '3' &&
-	  bufptr[2] >= '0' && bufptr[2] <= '7' &&
-	  bufptr[3] >= '0' && bufptr[3] <= '7')
-      {
-       /*
-	* Decode \nnn octal escape...
-	*/
-
-	*bufptr = (char)(((((bufptr[1] - '0') << 3) | (bufptr[2] - '0')) << 3) | (bufptr[3] - '0'));
-	_cups_strcpy(bufptr + 1, bufptr + 4);
-      }
-      else
-      {
-       /*
-	* Decode \C escape...
-	*/
-
-	_cups_strcpy(bufptr, bufptr + 1);
-	if (*bufptr == 'n')
-	  *bufptr = '\n';
-	else if (*bufptr == 'r')
-	  *bufptr = '\r';
-	else if (*bufptr == 't')
-	  *bufptr = '\t';
-      }
-    }
-  }
-
-  return (bufptr);
-}

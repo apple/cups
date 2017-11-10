@@ -25,9 +25,6 @@
 
 static char		*abbreviate(const char *s, char *buf, int bufsize);
 static cups_array_t	*collect_formats(const char *id);
-static cups_array_t     *cups_load_strings(const char *filename);
-static int	        cups_read_strings(cups_file_t *fp, char *buffer, size_t bufsize, char **id, char **str);
-static char	        *cups_scan_strings(char *buffer);
 static void		free_formats(cups_array_t *fmts);
 
 
@@ -71,9 +68,9 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (strstr(argv[i], ".strings"))
-      po = cups_load_strings(argv[i]);
+      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_STRINGS | _CUPS_MESSAGE_UNQUOTE);
     else
-      po = _cupsMessageLoad(argv[i], 1);
+      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_UNQUOTE);
 
     if (!po)
     {
@@ -102,11 +99,11 @@ main(int  argc,				/* I - Number of command-line args */
       * Make sure filter message prefixes are not translated...
       */
 
-      if (!strncmp(msg->id, "ALERT:", 6) || !strncmp(msg->id, "CRIT:", 5) ||
-          !strncmp(msg->id, "DEBUG:", 6) || !strncmp(msg->id, "DEBUG2:", 7) ||
-          !strncmp(msg->id, "EMERG:", 6) || !strncmp(msg->id, "ERROR:", 6) ||
-          !strncmp(msg->id, "INFO:", 5) || !strncmp(msg->id, "NOTICE:", 7) ||
-          !strncmp(msg->id, "WARNING:", 8))
+      if (!strncmp(msg->msg, "ALERT:", 6) || !strncmp(msg->msg, "CRIT:", 5) ||
+          !strncmp(msg->msg, "DEBUG:", 6) || !strncmp(msg->msg, "DEBUG2:", 7) ||
+          !strncmp(msg->msg, "EMERG:", 6) || !strncmp(msg->msg, "ERROR:", 6) ||
+          !strncmp(msg->msg, "INFO:", 5) || !strncmp(msg->msg, "NOTICE:", 7) ||
+          !strncmp(msg->msg, "WARNING:", 8))
       {
         if (pass)
 	{
@@ -115,11 +112,11 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
 	printf("    Bad prefix on filter message \"%s\"\n",
-	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
+	       abbreviate(msg->msg, idbuf, sizeof(idbuf)));
       }
 
-      idfmt = msg->id + strlen(msg->id) - 1;
-      if (idfmt >= msg->id && *idfmt == '\n')
+      idfmt = msg->msg + strlen(msg->msg) - 1;
+      if (idfmt >= msg->msg && *idfmt == '\n')
       {
         if (pass)
 	{
@@ -128,14 +125,14 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
 	printf("    Trailing newline in message \"%s\"\n",
-	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
+	       abbreviate(msg->msg, idbuf, sizeof(idbuf)));
       }
 
-      for (; idfmt >= msg->id; idfmt --)
+      for (; idfmt >= msg->msg; idfmt --)
         if (!isspace(*idfmt & 255))
 	  break;
 
-      if (idfmt >= msg->id && *idfmt == '!')
+      if (idfmt >= msg->msg && *idfmt == '!')
       {
         if (pass)
 	{
@@ -144,10 +141,10 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
 	printf("    Exclamation in message \"%s\"\n",
-	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
+	       abbreviate(msg->msg, idbuf, sizeof(idbuf)));
       }
 
-      if ((idfmt - 2) >= msg->id && !strncmp(idfmt - 2, "...", 3))
+      if ((idfmt - 2) >= msg->msg && !strncmp(idfmt - 2, "...", 3))
       {
         if (pass)
 	{
@@ -156,7 +153,7 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
 	printf("    Ellipsis in message \"%s\"\n",
-	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
+	       abbreviate(msg->msg, idbuf, sizeof(idbuf)));
       }
 
 
@@ -165,9 +162,9 @@ main(int  argc,				/* I - Number of command-line args */
         untranslated ++;
 	continue;
       }
-      else if (strchr(msg->id, '%'))
+      else if (strchr(msg->msg, '%'))
       {
-        idfmts  = collect_formats(msg->id);
+        idfmts  = collect_formats(msg->msg);
 	strfmts = collect_formats(msg->str);
 	fmtidx  = 0;
 
@@ -211,7 +208,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  printf("    Bad translation string \"%s\"\n        for \"%s\"\n",
 	         abbreviate(msg->str, strbuf, sizeof(strbuf)),
-		 abbreviate(msg->id, idbuf, sizeof(idbuf)));
+		 abbreviate(msg->msg, idbuf, sizeof(idbuf)));
           fputs("    Translation formats:", stdout);
 	  for (strfmt = (char *)cupsArrayFirst(strfmts);
 	       strfmt;
@@ -248,7 +245,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  printf("    Bad escape \\%c in filter message \"%s\"\n"
 	         "      for \"%s\"\n", strfmt[1],
 		 abbreviate(msg->str, strbuf, sizeof(strbuf)),
-		 abbreviate(msg->id, idbuf, sizeof(idbuf)));
+		 abbreviate(msg->msg, idbuf, sizeof(idbuf)));
           break;
         }
     }
@@ -383,152 +380,6 @@ collect_formats(const char *id)		/* I - msgid string */
   }
 
   return (fmts);
-}
-
-
-/*
- * 'cups_load_strings()' - Load a .strings file into a _cups_msg_t array.
- */
-
-static cups_array_t *                   /* O - CUPS array of _cups_msg_t values */
-cups_load_strings(const char *filename) /* I - File to load */
-{
-  cups_file_t     *fp;                  /* .strings file */
-  cups_array_t    *po;                  /* Localization array */
-  _cups_message_t *m;                   /* Localization message */
-  char		  buffer[8192],	        /* Message buffer */
-                  *id,		        /* ID string */
-                  *str;		        /* Translated message */
-
-
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
-    return (NULL);
-
-  po = _cupsMessageNew(NULL);
-
-  while (cups_read_strings(fp, buffer, sizeof(buffer), &id, &str))
-  {
-    if ((m = malloc(sizeof(_cups_message_t))) == NULL)
-      break;
-
-    m->id  = strdup(id);
-    m->str = strdup(str);
-
-    if (m->id && m->str)
-      cupsArrayAdd(po, m);
-    else
-    {
-      if (m->id)
-        free(m->id);
-
-      if (m->str)
-        free(m->str);
-
-      free(m);
-
-      cupsArrayDelete(po);
-      po = NULL;
-      break;
-    }
-  }
-
-  cupsFileClose(fp);
-
-  return (po);
-}
-
-
-/*
- * 'cups_read_strings()' - Read a pair of strings from a .strings file.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-cups_read_strings(cups_file_t *strings,	/* I - .strings file */
-                  char        *buffer,	/* I - Line buffer */
-                  size_t      bufsize,	/* I - Size of line buffer */
-		  char        **id,	/* O - Pointer to ID string */
-		  char        **str)	/* O - Pointer to translation string */
-{
-  char	*bufptr;			/* Pointer into buffer */
-
-
-  while (cupsFileGets(strings, buffer, bufsize))
-  {
-    if (buffer[0] != '\"')
-      continue;
-
-    *id    = buffer + 1;
-    bufptr = cups_scan_strings(buffer);
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr++ = '\0';
-
-    while (*bufptr && *bufptr != '\"')
-      bufptr ++;
-
-    if (!*bufptr)
-      continue;
-
-    *str   = bufptr + 1;
-    bufptr = cups_scan_strings(bufptr);
-
-    if (*bufptr != '\"')
-      continue;
-
-    *bufptr = '\0';
-
-    return (1);
-  }
-
-  return (0);
-}
-
-
-/*
- * 'cups_scan_strings()' - Scan a quoted string.
- */
-
-static char *				/* O - End of string */
-cups_scan_strings(char *buffer)		/* I - Start of string */
-{
-  char	*bufptr;			/* Pointer into string */
-
-
-  for (bufptr = buffer + 1; *bufptr && *bufptr != '\"'; bufptr ++)
-  {
-    if (*bufptr == '\\')
-    {
-      if (bufptr[1] >= '0' && bufptr[1] <= '3' &&
-	  bufptr[2] >= '0' && bufptr[2] <= '7' &&
-	  bufptr[3] >= '0' && bufptr[3] <= '7')
-      {
-       /*
-	* Decode \nnn octal escape...
-	*/
-
-	*bufptr = (char)(((((bufptr[1] - '0') << 3) | (bufptr[2] - '0')) << 3) | (bufptr[3] - '0'));
-	_cups_strcpy(bufptr + 1, bufptr + 4);
-      }
-      else
-      {
-       /*
-	* Decode \C escape...
-	*/
-
-	_cups_strcpy(bufptr, bufptr + 1);
-	if (*bufptr == 'n')
-	  *bufptr = '\n';
-	else if (*bufptr == 'r')
-	  *bufptr = '\r';
-	else if (*bufptr == 't')
-	  *bufptr = '\t';
-      }
-    }
-  }
-
-  return (bufptr);
 }
 
 

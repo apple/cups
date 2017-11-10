@@ -4,16 +4,10 @@
  * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  *
  * PostScript is a trademark of Adobe Systems, Inc.
- *
- * This code and any derivative of it may be used and distributed
- * freely under the terms of the GNU General Public License when
- * used with GNU Ghostscript or its derivatives.  Use of the code
- * (or any derivative of it) with software other than GNU
- * GhostScript (or its derivatives) is governed by the CUPS license
- * agreement.
  */
 
 #ifndef _CUPS_PPD_PRIVATE_H_
@@ -41,7 +35,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	8	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	9	/* Version number in cache file */
 
 
 /*
@@ -151,6 +145,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*password;		/* cupsJobPassword value */
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
+  char		*strings_uri;		/* cupsStringsURI value */
   cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
 };
 

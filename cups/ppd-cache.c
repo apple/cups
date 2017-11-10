@@ -26,6 +26,7 @@
  * Local functions...
  */
 
+static int	cups_get_url(http_t **http, const char *url, char *name, size_t namesize);
 static void	pwg_add_finishing(cups_array_t *finishings, ipp_finishings_t template, const char *name, const char *value);
 static int	pwg_compare_finishings(_pwg_finishings_t *a,
 		                       _pwg_finishings_t *b);
@@ -879,6 +880,8 @@ _ppdCacheCreateWithFile(
       else
         pc->mandatory = _cupsArrayNewStrings(value, ' ');
     }
+    else if (!_cups_strcasecmp(line, "StringsURI"))
+      pc->strings_uri = _cupsStrAlloc(value);
     else if (!_cups_strcasecmp(line, "SupportFile"))
     {
       if (!pc->support_files)
@@ -1825,6 +1828,13 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
     pc->mandatory = _cupsArrayNewStrings(ppd_attr->value, ' ');
+
+ /*
+  * Strings (remote) file...
+  */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsStringsURI", NULL)) != NULL)
+    pc->strings_uri = _cupsStrAlloc(ppd_attr->value);
 
  /*
   * Support files...
@@ -2894,6 +2904,13 @@ _ppdCacheWriteFile(
     cupsFilePutConf(fp, "Mandatory", value);
 
  /*
+  * (Remote) strings file...
+  */
+
+  if (pc->strings_uri)
+    cupsFilePutConf(fp, "StringsURI", pc->strings_uri);
+
+ /*
   * Support files...
   */
 
@@ -2965,6 +2982,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
                                         /* Array of resolution indices */
   cups_lang_t		*lang = cupsLangDefault();
 					/* Localization info */
+  cups_array_t		*strings = NULL;/* Printer strings file */
   struct lconv		*loc = localeconv();
 					/* Locale data */
   static const char * const finishings[][2] =
@@ -3109,7 +3127,31 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   cupsFilePrintf(fp, "*cupsVersion: %d.%d\n", CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR);
   cupsFilePuts(fp, "*cupsSNMPSupplies: False\n");
-  cupsFilePuts(fp, "*cupsLanguages: \"en\"\n");
+  cupsFilePrintf(fp, "*cupsLanguages: \"%s\"\n", lang->language);
+
+  if ((attr = ippFindAttribute(response, "printer-more-info", IPP_TAG_URI)) != NULL)
+    cupsFilePrintf(fp, "*APSupplies: \"%s\"\n", ippGetString(attr, 0, NULL));
+
+  if ((attr = ippFindAttribute(response, "printer-charge-info-uri", IPP_TAG_URI)) != NULL)
+    cupsFilePrintf(fp, "*cupsChargeInfoURI: \"%s\"\n", ippGetString(attr, 0, NULL));
+
+  if ((attr = ippFindAttribute(response, "printer-strings-uri", IPP_TAG_URI)) != NULL)
+  {
+    http_t	*http = NULL;		/* Connection to printer */
+    char	stringsfile[1024];	/* Temporary strings file */
+
+    if (cups_get_url(&http, ippGetString(attr, 0, NULL), stringsfile, sizeof(stringsfile)))
+    {
+      cupsFilePrintf(fp, "*cupsStringsURI: \"%s\"\n", ippGetString(attr, 0, NULL));
+
+      strings = _cupsMessageLoad(stringsfile, _CUPS_MESSAGE_STRINGS | _CUPS_MESSAGE_UNQUOTE);
+
+      unlink(stringsfile);
+    }
+
+    if (http)
+      httpClose(http);
+  }
 
  /*
   * Filters...
@@ -3586,7 +3628,16 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       if (j < (int)(sizeof(media_types) / sizeof(media_types[0])))
         cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, media_types[j][1]), ppdname);
       else
-        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, keyword, ppdname);
+      {
+        char 		msg[256];	/* Message key */
+        const char	*str;		/* Localized string */
+
+        snprintf(msg, sizeof(msg), "media-type.%s", keyword);
+        if ((str = _cupsMessageLookup(strings, msg)) == msg)
+          str = keyword;
+
+        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, str, ppdname);
+      }
     }
     cupsFilePuts(fp, "*CloseUI: *MediaType\n");
   }
@@ -4292,6 +4343,62 @@ _pwgPageSizeForMedia(
   }
 
   return (name);
+}
+
+
+/*
+ * 'cups_get_url()' - Get a copy of the file at the given URL.
+ */
+
+static int				/* O  - 1 on success, 0 on failure */
+cups_get_url(http_t     **http,		/* IO - Current HTTP connection */
+             const char *url,		/* I  - URL to get */
+             char       *name,		/* I  - Temporary filename */
+             size_t     namesize)	/* I  - Size of temporary filename buffer */
+{
+  char			scheme[32],	/* URL scheme */
+			userpass[256],	/* URL username:password */
+			host[256],	/* URL host */
+			curhost[256],	/* Current host */
+			resource[256];	/* URL resource */
+  int			port;		/* URL port */
+  http_encryption_t	encryption;	/* Type of encryption to use */
+  http_status_t		status;		/* Status of GET request */
+  int			fd;		/* Temporary file */
+
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, url, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    return (0);
+
+  if (port == 443 || !strcmp(scheme, "https"))
+    encryption = HTTP_ENCRYPTION_ALWAYS;
+  else
+    encryption = HTTP_ENCRYPTION_IF_REQUESTED;
+
+  if (!*http || strcasecmp(host, httpGetHostname(*http, curhost, sizeof(curhost))) || httpAddrPort(httpGetAddress(*http)) != port)
+  {
+    httpClose(*http);
+    *http = httpConnect2(host, port, NULL, AF_UNSPEC, encryption, 1, 5000, NULL);
+  }
+
+  if (!*http)
+    return (0);
+
+  if ((fd = cupsTempFd(name, (int)namesize)) < 0)
+    return (0);
+
+  status = cupsGetFd(*http, resource, fd);
+
+  close(fd);
+
+  if (status != HTTP_STATUS_OK)
+  {
+    unlink(name);
+    *name = '\0';
+    return (0);
+  }
+
+  return (1);
 }
 
 

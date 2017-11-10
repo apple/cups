@@ -37,3 +37,5 @@ Changes in CUPS v2.3b1
 - Added label markup to checkbox and radio button controls in the web interface
   templates (Issue #5161)
 - Fixed group validation on OpenBSD (Issue #5166)
+- IPP Everywhere PPDs now include localizations of printer-specific media types,
+  when available (Issue #5168)
