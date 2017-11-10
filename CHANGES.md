@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-08
+CHANGES - 2.3b1 - 2017-11-10
 ============================
 
 
@@ -36,3 +36,4 @@ Changes in CUPS v2.3b1
   (Issue #5154)
 - Added label markup to checkbox and radio button controls in the web interface
   templates (Issue #5161)
+- Fixed group validation on OpenBSD (Issue #5166)
