@@ -2400,7 +2400,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   {
     fprintf(stderr, "ERROR: [cups-driverd] Skipping \"%s\": loop detected!\n",
             d);
-    return (0);
+    return (1);
   }
 
  /*
