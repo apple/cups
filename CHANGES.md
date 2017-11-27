@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-10
+CHANGES - 2.3b1 - 2017-11-27
 ============================
 
 
@@ -39,3 +39,6 @@ Changes in CUPS v2.3b1
 - Fixed group validation on OpenBSD (Issue #5166)
 - IPP Everywhere PPDs now include localizations of printer-specific media types,
   when available (Issue #5168)
+- The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop
+  was seen (Issue #5170)
+
