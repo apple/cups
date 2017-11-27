@@ -2985,6 +2985,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cups_array_t		*strings = NULL;/* Printer strings file */
   struct lconv		*loc = localeconv();
 					/* Locale data */
+  cups_array_t		*fin_options = NULL;
+					/* Finishing options */
   static const char * const finishings[][2] =
   {					/* Finishings strings */
     { "bale", _("Bale") },
@@ -3846,11 +3848,6 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
  /*
   * Finishing options...
-  *
-  * Eventually need to re-add support for finishings-col-database, however
-  * it is difficult to map arbitrary finishing-template values to PPD options
-  * and have the right constraints apply (e.g. stapling vs. folding vs.
-  * punching, etc.)
   */
 
   if ((attr = ippFindAttribute(response, "finishings-supported", IPP_TAG_ENUM)) != NULL)
@@ -3859,8 +3856,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     int			value;		/* Enum value */
     cups_array_t	*names;		/* Names we've added */
 
-    count = ippGetCount(attr);
-    names = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
+    count       = ippGetCount(attr);
+    names       = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
+    fin_options = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
    /*
     * Staple/Bind/Stitch
@@ -3877,6 +3875,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     if (i < count)
     {
+      cupsArrayAdd(fin_options, "*StapleLocation");
+
       cupsFilePrintf(fp, "*OpenUI *StapleLocation/%s: PickOne\n", _cupsLangString(lang, _("Staple")));
       cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *StapleLocation\n");
       cupsFilePuts(fp, "*DefaultStapleLocation: None\n");
@@ -3924,6 +3924,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     if (i < count)
     {
+      cupsArrayAdd(fin_options, "*FoldType");
+
       cupsFilePrintf(fp, "*OpenUI *FoldType/%s: PickOne\n", _cupsLangString(lang, _("Fold")));
       cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *FoldType\n");
       cupsFilePuts(fp, "*DefaultFoldType: None\n");
@@ -3971,6 +3973,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     if (i < count)
     {
+      cupsArrayAdd(fin_options, "*PunchMedia");
+
       cupsFilePrintf(fp, "*OpenUI *PunchMedia/%s: PickOne\n", _cupsLangString(lang, _("Punch")));
       cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *PunchMedia\n");
       cupsFilePuts(fp, "*DefaultPunchMedia: None\n");
@@ -4009,6 +4013,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     if (ippContainsInteger(attr, IPP_FINISHINGS_BOOKLET_MAKER))
     {
+      cupsArrayAdd(fin_options, "*Booklet");
+
       cupsFilePrintf(fp, "*OpenUI *Booklet/%s: Boolean\n", _cupsLangString(lang, _("Booklet")));
       cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *Booklet\n");
       cupsFilePuts(fp, "*DefaultBooklet: False\n");
@@ -4020,6 +4026,77 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     cupsArrayDelete(names);
   }
+
+  if ((attr = ippFindAttribute(response, "finishings-col-database", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  {
+    ipp_t	*finishing_col;		/* Current finishing collection */
+    const char	*template,		/* Current finishing template */
+		*loctemplate;		/* Localized template name */
+    cups_array_t *templates;		/* Finishing templates */
+
+    cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickOne\n", _cupsLangString(lang, _("Finishing Preset")));
+    cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *cupsFinishingTemplate\n");
+    cupsFilePuts(fp, "*DefaultcupsFinishingTemplate: None\n");
+    cupsFilePrintf(fp, "*cupsFinishingTemplate None/%s: \"\"\n", _cupsLangString(lang, _("None")));
+
+    templates = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+    count     = ippGetCount(attr);
+
+    for (i = 0; i < count; i ++)
+    {
+      finishing_col = ippGetCollection(attr, i);
+      template      = ippGetString(ippFindAttribute(finishing_col, "finishing_template", IPP_TAG_ZERO), 0, NULL);
+
+      if (!template || cupsArrayFind(templates, (void *)template))
+        continue;
+
+      if (strncmp(template, "fold-", 5) && (strstr(template, "-bottom") || strstr(template, "-left") || strstr(template, "-right") || strstr(template, "-top")))
+        continue;
+
+      cupsArrayAdd(templates, (void *)template);
+
+      for (j = 0, loctemplate = NULL; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+      {
+        if (!strcmp(finishings[j][0], template))
+        {
+          loctemplate = _cupsLangString(lang, finishings[j][1]);
+          break;
+        }
+      }
+
+      if (!loctemplate)
+      {
+        char 		msg[256];	/* Message key */
+
+        snprintf(msg, sizeof(msg), "finishing-template.%s", template);
+        if ((loctemplate = _cupsMessageLookup(strings, msg)) == msg)
+          loctemplate = template;
+      }
+
+      cupsFilePrintf(fp, "*cupsFinishingTemplate %s/%s: \"\"\n", template, loctemplate);
+    }
+
+    cupsFilePuts(fp, "*CloseUI: *cupsFinishingTemplate\n");
+
+    if (cupsArrayCount(fin_options))
+    {
+      const char	*fin_option;	/* Current finishing option */
+
+      cupsFilePuts(fp, "*cupsUIConstraint finisings: \"*cupsFinishingTemplate");
+      for (fin_option = (const char *)cupsArrayFirst(fin_options); fin_option; fin_option = (const char *)cupsArrayNext(fin_options))
+        cupsFilePrintf(fp, " %s", fin_option);
+      cupsFilePuts(fp, "\"\n");
+
+      cupsFilePuts(fp, "*cupsUIResolver finisings: \"*cupsFinishingTemplate None");
+      for (fin_option = (const char *)cupsArrayFirst(fin_options); fin_option; fin_option = (const char *)cupsArrayNext(fin_options))
+        cupsFilePrintf(fp, " %s None", fin_option);
+      cupsFilePuts(fp, "\"\n");
+    }
+
+    cupsArrayDelete(templates);
+  }
+
+  cupsArrayDelete(fin_options);
 
  /*
   * cupsPrintQuality and DefaultResolution...
