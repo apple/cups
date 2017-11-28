@@ -4098,17 +4098,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	input_slot = ppdFindMarkedChoice(ppd, "InputSlot");
 	media_type = ppdFindMarkedChoice(ppd, "MediaType");
 	col        = new_media_col(pwgsize,
-			           input_slot ?
-				       _ppdCacheGetSource(p->pc,
-				                          input_slot->choice) :
-				       NULL,
-				   media_type ?
-				       _ppdCacheGetType(p->pc,
-				                        media_type->choice) :
-				       NULL);
+			           input_slot ? _ppdCacheGetSource(p->pc, input_slot->choice) : NULL,
+				   media_type ? _ppdCacheGetType(p->pc, media_type->choice) : NULL);
 
-	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
-	                 col);
+	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default", col);
         ippDelete(col);
       }
 
@@ -4695,6 +4688,22 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
           default :
               break;
         }
+      }
+    }
+
+    if (p->pc && p->pc->templates)
+    {
+      const char 	*template;	/* Finishing template */
+      ipp_attribute_t	*fin_col_db;	/* finishings-col-database attribute */
+      ipp_t		*fin_col;	/* finishings-col value */
+
+      fin_col_db = ippAddCollections(p->ppd_attrs, IPP_TAG_PRINTER, "finishings-col-database", cupsArrayCount(p->pc->templates), NULL);
+      for (i = 0, template = (const char *)cupsArrayFirst(p->pc->templates); template; i ++, template = (const char *)cupsArrayNext(p->pc->templates))
+      {
+        fin_col = ippNew();
+        ippAddString(fin_col, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "finishing-template", NULL, template);
+        ippSetCollection(p->ppd_attrs, &fin_col_db, i, fin_col);
+        ippDelete(fin_col);
       }
     }
 

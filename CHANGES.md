@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-27
+CHANGES - 2.3b1 - 2017-11-28
 ============================
 
 
@@ -41,4 +41,5 @@ Changes in CUPS v2.3b1
   when available (Issue #5168)
 - The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop
   was seen (Issue #5170)
+- IPP Everywhere PPDs now support finishing templates (Issue #5180)
 

@@ -139,6 +139,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 		*prefilters;		/* cupsPreFilter values */
   int		single_file;		/* cupsSingleFile value */
   cups_array_t	*finishings;		/* cupsIPPFinishings values */
+  cups_array_t	*templates;		/* cupsFinishingTemplate values */
   int		max_copies,		/* cupsMaxCopies value */
 		account_id,		/* cupsJobAccountId value */
 		accounting_user_id;	/* cupsJobAccountingUserId value */

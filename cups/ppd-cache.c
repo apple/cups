@@ -69,7 +69,8 @@ _cupsConvertOptions(
 		*media_type,		/* media-type value */
 		*collate_str,		/* multiple-document-handling value */
 		*color_attr_name,	/* Supported color attribute */
-		*mandatory;		/* Mandatory attributes */
+		*mandatory,		/* Mandatory attributes */
+		*finishing_template;	/* Finishing template */
   int		num_finishings = 0,	/* Number of finishing values */
 		finishings[10];		/* Finishing enum values */
   ppd_choice_t	*choice;		/* Marked choice */
@@ -136,6 +137,8 @@ _cupsConvertOptions(
     if (strcmp(mandatory, "copies") &&
 	strcmp(mandatory, "destination-uris") &&
 	strcmp(mandatory, "finishings") &&
+	strcmp(mandatory, "finishings-col") &&
+	strcmp(mandatory, "finishing-template") &&
 	strcmp(mandatory, "job-account-id") &&
 	strcmp(mandatory, "job-accounting-user-id") &&
 	strcmp(mandatory, "job-password") &&
@@ -358,10 +361,16 @@ _cupsConvertOptions(
   * Map finishing options...
   */
 
-  num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options, (int)(sizeof(finishings) / sizeof(finishings[0])), finishings);
-  if (num_finishings > 0)
+  if ((finishing_template = cupsGetOption("cupsFinishingTemplate", num_options, options)) == NULL)
+    finishing_template = cupsGetOption("finishing-template", num_options, options);
+
+  if (finishing_template)
   {
-    ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings", num_finishings, finishings);
+    ipp_t *fin_col = ippNew();		/* finishings-col value */
+
+    ippAddString(fin_col, IPP_TAG_JOB, IPP_TAG_KEYWORD, "finishing-template", NULL, finishing_template);
+    ippAddCollection(request, IPP_TAG_JOB, "finishings-col", fin_col);
+    ippDelete(fin_col);
 
     if (copies != finishings_copies && (keyword = cupsGetOption("job-impressions", num_options, options)) != NULL)
     {
@@ -370,6 +379,23 @@ _cupsConvertOptions(
       */
 
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", atoi(keyword) / finishings_copies);
+    }
+  }
+  else
+  {
+    num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options, (int)(sizeof(finishings) / sizeof(finishings[0])), finishings);
+    if (num_finishings > 0)
+    {
+      ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings", num_finishings, finishings);
+
+      if (copies != finishings_copies && (keyword = cupsGetOption("job-impressions", num_options, options)) != NULL)
+      {
+       /*
+	* Send job-pages-per-set attribute to apply finishings correctly...
+	*/
+
+	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", atoi(keyword) / finishings_copies);
+      }
     }
   }
 
@@ -863,6 +889,13 @@ _ppdCacheCreateWithFile(
 
       cupsArrayAdd(pc->finishings, finishings);
     }
+    else if (!_cups_strcasecmp(line, "FinishingTemplate"))
+    {
+      if (!pc->templates)
+        pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)_cupsStrAlloc, (cups_afree_func_t)_cupsStrFree);
+
+      cupsArrayAdd(pc->templates, value);
+    }
     else if (!_cups_strcasecmp(line, "MaxCopies"))
       pc->max_copies = atoi(value);
     else if (!_cups_strcasecmp(line, "ChargeInfoURI"))
@@ -958,7 +991,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 			*media_type,	/* MediaType option */
 			*output_bin,	/* OutputBin option */
 			*color_model,	/* ColorModel option */
-			*duplex;	/* Duplex option */
+			*duplex,	/* Duplex option */
+			*ppd_option;	/* Other PPD option */
   ppd_choice_t		*choice;	/* Current InputSlot/MediaType */
   pwg_map_t		*map;		/* Current source/type map */
   ppd_attr_t		*ppd_attr;	/* Current PPD preset attribute */
@@ -1695,8 +1729,6 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     * No IPP mapping data, try to map common/standard PPD keywords...
     */
 
-    ppd_option_t	*ppd_option;	/* PPD option */
-
     pc->finishings = cupsArrayNew3((cups_array_func_t)pwg_compare_finishings, NULL, NULL, 0, NULL, (cups_afree_func_t)pwg_free_finishings);
 
     if ((ppd_option = ppdFindOption(ppd, "StapleLocation")) != NULL)
@@ -1796,6 +1828,14 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       cupsArrayDelete(pc->finishings);
       pc->finishings = NULL;
     }
+  }
+
+  if ((ppd_option = ppdFindOption(ppd, "cupsFinishingTemplate")) != NULL)
+  {
+    pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)_cupsStrAlloc, (cups_afree_func_t)_cupsStrFree);
+
+    for (choice = ppd_option->choices, i = ppd_option->num_choices; i > 0; choice ++, i --)
+      cupsArrayAdd(pc->templates, (void *)choice->choice);
   }
 
  /*
@@ -2730,7 +2770,7 @@ _ppdCacheWriteFile(
   pwg_map_t		*map;		/* Current map */
   _pwg_finishings_t	*f;		/* Current finishing option */
   cups_option_t		*option;	/* Current option */
-  const char		*value;		/* Filter/pre-filter value */
+  const char		*value;		/* String value */
   char			newfile[1024];	/* New filename */
 
 
@@ -2877,6 +2917,9 @@ _ppdCacheWriteFile(
       cupsFilePrintf(fp, " %s=%s", option->name, option->value);
     cupsFilePutChar(fp, '\n');
   }
+
+  for (value = (const char *)cupsArrayFirst(pc->templates); value; value = (const char *)cupsArrayNext(pc->templates))
+    cupsFilePutConf(fp, "FinishingTemplate", value);
 
  /*
   * Max copies...
@@ -4036,8 +4079,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickOne\n", _cupsLangString(lang, _("Finishing Preset")));
     cupsFilePuts(fp, "*OrderDependency: 10 AnySetup *cupsFinishingTemplate\n");
-    cupsFilePuts(fp, "*DefaultcupsFinishingTemplate: None\n");
-    cupsFilePrintf(fp, "*cupsFinishingTemplate None/%s: \"\"\n", _cupsLangString(lang, _("None")));
+    cupsFilePuts(fp, "*DefaultcupsFinishingTemplate: none\n");
+    cupsFilePrintf(fp, "*cupsFinishingTemplate none/%s: \"\"\n", _cupsLangString(lang, _("None")));
 
     templates = cupsArrayNew((cups_array_func_t)strcmp, NULL);
     count     = ippGetCount(attr);
