@@ -44,7 +44,7 @@ cupsLocalizeDestMedia(
   pwg_media_t		*pwg;		/* PWG media information */
   cups_array_t		*db;		/* Media database */
   _cups_media_db_t	*mdb;		/* Media database entry */
-  char			name[1024],	/* Size name */
+  char			lstr[1024],	/* Localized size name */
 			temp[256];	/* Temporary string */
   const char		*lsize,		/* Localized media size */
 			*lsource,	/* Localized media source */
@@ -65,60 +65,8 @@ cupsLocalizeDestMedia(
   }
 
  /*
-  * See if the localization is cached...
+  * Find the matching media database entry...
   */
-
-  if (!dinfo->localizations)
-    cups_create_localizations(http, dinfo);
-
-  key.msg = size->media;
-  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
-  {
-    DEBUG_printf(("1cupsLocalizeDestMedia: Returning \"%s\".", match->str));
-    return (match->str);
-  }
-
- /*
-  * If not, get the localized size, source, and type strings...
-  */
-
-  lang = cupsLangDefault();
-
-  snprintf(temp, sizeof(temp), "media.%s", size->media);
-  if ((lsize = _cupsLangString(lang, temp)) != NULL && strcmp(lsize, temp))
-  {
-    DEBUG_printf(("1cupsLocalizeDestMedia: Returning standard localization \"%s\".", lsize));
-    return (lsize);
-  }
-
-  pwg = pwgMediaForSize(size->width, size->length);
-
-  if (pwg->ppd)
-    lsize = _cupsLangString(lang, pwg->ppd);
-  else
-    lsize = NULL;
-
-  if (!lsize)
-  {
-    if ((size->width % 635) == 0 && (size->length % 635) == 0)
-    {
-     /*
-      * Use inches since the size is a multiple of 1/4 inch.
-      */
-
-      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%g x %g \"")), size->width / 2540.0, size->length / 2540.0);
-    }
-    else
-    {
-     /*
-      * Use millimeters since the size is not a multiple of 1/4 inch.
-      */
-
-      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%d x %d mm")), (size->width + 50) / 100, (size->length + 50) / 100);
-    }
-
-    lsize = temp;
-  }
 
   if (flags & CUPS_MEDIA_FLAGS_READY)
     db = dinfo->ready_db;
@@ -144,6 +92,72 @@ cupsLocalizeDestMedia(
     }
   }
 
+ /*
+  * See if the localization is cached...
+  */
+
+  lang = cupsLangDefault();
+
+  if (!dinfo->localizations)
+    cups_create_localizations(http, dinfo);
+
+  snprintf(temp, sizeof(temp), "media.%s", size->media);
+  key.msg = temp;
+
+  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
+  {
+    lsize = match->str;
+  }
+  else
+  {
+   /*
+    * Not a media name, try a media-key name...
+    */
+
+    snprintf(temp, sizeof(temp), "media-key.%s", size->media);
+    if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
+      lsize = match->str;
+    else
+      lsize = NULL;
+  }
+
+  if (!lsize && (pwg = pwgMediaForSize(size->width, size->length)) != NULL && pwg->ppd)
+  {
+   /*
+    * Get a standard localization...
+    */
+
+    snprintf(temp, sizeof(temp), "media.%s", pwg->pwg);
+    if ((lsize = _cupsLangString(lang, temp)) == temp)
+      lsize = NULL;
+  }
+
+  if (!lsize)
+  {
+   /*
+    * Make a dimensional localization...
+    */
+
+    if ((size->width % 635) == 0 && (size->length % 635) == 0)
+    {
+     /*
+      * Use inches since the size is a multiple of 1/4 inch.
+      */
+
+      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%g x %g \"")), size->width / 2540.0, size->length / 2540.0);
+    }
+    else
+    {
+     /*
+      * Use millimeters since the size is not a multiple of 1/4 inch.
+      */
+
+      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%d x %d mm")), (size->width + 50) / 100, (size->length + 50) / 100);
+    }
+
+    lsize = temp;
+  }
+
   if (mdb)
   {
     DEBUG_printf(("1cupsLocalizeDestMedia: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", (void *)mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
@@ -160,37 +174,37 @@ cupsLocalizeDestMedia(
   if (!lsource && !ltype)
   {
     if (!size->bottom && !size->left && !size->right && !size->top)
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless)")), lsize);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (Borderless)")), lsize);
     else
-      strlcpy(name, lsize, sizeof(name));
+      strlcpy(lstr, lsize, sizeof(lstr));
   }
   else if (!lsource)
   {
     if (!size->bottom && !size->left && !size->right && !size->top)
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, ltype);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, ltype);
     else
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, ltype);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (%s)")), lsize, ltype);
   }
   else if (!ltype)
   {
     if (!size->bottom && !size->left && !size->right && !size->top)
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, lsource);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, lsource);
     else
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, lsource);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (%s)")), lsize, lsource);
   }
   else
   {
     if (!size->bottom && !size->left && !size->right && !size->top)
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s, %s)")), lsize, ltype, lsource);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (Borderless, %s, %s)")), lsize, ltype, lsource);
     else
-      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s, %s)")), lsize, ltype, lsource);
+      snprintf(lstr, sizeof(lstr), _cupsLangString(lang, _("%s (%s, %s)")), lsize, ltype, lsource);
   }
 
   if ((match = (_cups_message_t *)calloc(1, sizeof(_cups_message_t))) == NULL)
     return (NULL);
 
   match->msg = strdup(size->media);
-  match->str = strdup(name);
+  match->str = strdup(lstr);
 
   cupsArrayAdd(dinfo->localizations, match);
 

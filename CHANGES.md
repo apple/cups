@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-11-28
+CHANGES - 2.3b1 - 2017-11-29
 ============================
 
 
@@ -37,6 +37,8 @@ Changes in CUPS v2.3b1
 - Added label markup to checkbox and radio button controls in the web interface
   templates (Issue #5161)
 - Fixed group validation on OpenBSD (Issue #5166)
+- Improved IPP Everywhere media support, including a new
+  `cupsAddDestMediaOptions` function (Issue #5167)
 - IPP Everywhere PPDs now include localizations of printer-specific media types,
   when available (Issue #5168)
 - The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop

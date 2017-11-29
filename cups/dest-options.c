@@ -53,6 +53,104 @@ static void		cups_update_ready(http_t *http, cups_dinfo_t *dinfo);
 
 
 /*
+ * 'cupsAddDestMediaOptions()' - Add the option corresponding to the specified media size.
+ *
+ * @since CUPS 2.3@
+ */
+
+int					/* O  - New number of options */
+cupsAddDestMediaOptions(
+    http_t        *http,		/* I  - Connection to destination */
+    cups_dest_t   *dest,		/* I  - Destination */
+    cups_dinfo_t  *dinfo,		/* I  - Destination information */
+    unsigned      flags,		/* I  - Media matching flags */
+    cups_size_t   *size,		/* I  - Media size */
+    int           num_options,		/* I  - Current number of options */
+    cups_option_t **options)		/* IO - Options */
+{
+  cups_array_t		*db;		/* Media database */
+  _cups_media_db_t	*mdb;		/* Media database entry */
+  char			value[2048];	/* Option value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!http || !dest || !dinfo || !size || !options)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (num_options);
+  }
+
+ /*
+  * Find the matching media size...
+  */
+
+  if (flags & CUPS_MEDIA_FLAGS_READY)
+    db = dinfo->ready_db;
+  else
+    db = dinfo->media_db;
+
+  DEBUG_printf(("1cupsAddDestMediaOptions: size->media=\"%s\"", size->media));
+
+  for (mdb = (_cups_media_db_t *)cupsArrayFirst(db); mdb; mdb = (_cups_media_db_t *)cupsArrayNext(db))
+  {
+    if (mdb->key && !strcmp(mdb->key, size->media))
+      break;
+    else if (mdb->size_name && !strcmp(mdb->size_name, size->media))
+      break;
+  }
+
+  if (!mdb)
+  {
+    for (mdb = (_cups_media_db_t *)cupsArrayFirst(db); mdb; mdb = (_cups_media_db_t *)cupsArrayNext(db))
+    {
+      if (mdb->width == size->width && mdb->length == size->length && mdb->bottom == size->bottom && mdb->left == size->left && mdb->right == size->right && mdb->top == size->top)
+	break;
+    }
+  }
+
+  if (!mdb)
+  {
+    for (mdb = (_cups_media_db_t *)cupsArrayFirst(db); mdb; mdb = (_cups_media_db_t *)cupsArrayNext(db))
+    {
+      if (mdb->width == size->width && mdb->length == size->length)
+	break;
+    }
+  }
+
+  if (!mdb)
+  {
+    DEBUG_puts("1cupsAddDestMediaOptions: Unable to find matching size.");
+    return (num_options);
+  }
+
+  DEBUG_printf(("1cupsAddDestMediaOptions: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", (void *)mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
+
+  if (mdb->source)
+  {
+    if (mdb->type)
+      snprintf(value, sizeof(value), "{media-size={x-dimension=%d y-dimension=%d} media-bottom-margin=%d media-left-margin=%d media-right-margin=%d media-top-margin=%d media-source=\"%s\" media-type=\"%s\"}", mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top, mdb->source, mdb->type);
+    else
+      snprintf(value, sizeof(value), "{media-size={x-dimension=%d y-dimension=%d} media-bottom-margin=%d media-left-margin=%d media-right-margin=%d media-top-margin=%d media-source=\"%s\"}", mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top, mdb->source);
+  }
+  else if (mdb->type)
+  {
+    snprintf(value, sizeof(value), "{media-size={x-dimension=%d y-dimension=%d} media-bottom-margin=%d media-left-margin=%d media-right-margin=%d media-top-margin=%d media-type=\"%s\"}", mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top, mdb->type);
+  }
+  else
+  {
+    snprintf(value, sizeof(value), "{media-size={x-dimension=%d y-dimension=%d} media-bottom-margin=%d media-left-margin=%d media-right-margin=%d media-top-margin=%d}", mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top);
+  }
+
+  num_options = cupsAddOption("media-col", value, num_options, options);
+
+  return (num_options);
+}
+
+
+/*
  * 'cupsCheckDestSupported()' - Check that the option and value are supported
  *                              by the destination.
  *
@@ -1507,6 +1605,7 @@ cups_create_media_db(
   pwg_media_t		*pwg;		/* PWG media info */
   cups_array_t		*db;		/* New media database array */
   _cups_media_db_t	mdb;		/* Media entry */
+  char			media_key[255];	/* Synthesized media-key value */
 
 
   db = cupsArrayNew3((cups_array_func_t)cups_compare_media_db,
@@ -1661,6 +1760,16 @@ cups_create_media_db(
       if ((media_attr = ippFindAttribute(val->collection, "media-top-margin",
                                          IPP_TAG_INTEGER)) != NULL)
         mdb.top = media_attr->values[0].integer;
+
+      if (!mdb.key)
+      {
+        if (flags & CUPS_MEDIA_FLAGS_READY)
+          snprintf(media_key, sizeof(media_key), "cups-media-ready-%d", i + 1);
+	else
+          snprintf(media_key, sizeof(media_key), "cups-media-%d", i + 1);
+
+        mdb.key = media_key;
+      }
 
       cupsArrayAdd(db, &mdb);
     }
@@ -2021,12 +2130,10 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
     * Return the matching size...
     */
 
-    if (!best->bottom && !best->left && !best->right && !best->top)
-      snprintf(size->media, sizeof(size->media), "%s.Borderless", pwg->ppd);
+    if (best->key)
+      strlcpy(size->media, best->key, sizeof(size->media));
     else if (best->size_name)
       strlcpy(size->media, best->size_name, sizeof(size->media));
-    else if (best->key)
-      strlcpy(size->media, best->key, sizeof(size->media));
     else
       strlcpy(size->media, pwg->pwg, sizeof(size->media));
 
