@@ -122,10 +122,10 @@ cupsCheckDestSupported(
     */
 
     pwg_media_t	*pwg;		/* Current PWG media size info */
-    int			min_width,	/* Minimum width */
-			min_length,	/* Minimum length */
-			max_width,	/* Maximum width */
-			max_length;	/* Maximum length */
+    int		min_width,	/* Minimum width */
+		min_length,	/* Minimum length */
+		max_width,	/* Maximum width */
+		max_length;	/* Maximum length */
 
    /*
     * Get the minimum and maximum size...
@@ -2021,7 +2021,9 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
     * Return the matching size...
     */
 
-    if (best->size_name)
+    if (!best->bottom && !best->left && !best->right && !best->top)
+      snprintf(size->media, sizeof(size->media), "%s.Borderless", pwg->ppd);
+    else if (best->size_name)
       strlcpy(size->media, best->size_name, sizeof(size->media));
     else if (best->key)
       strlcpy(size->media, best->key, sizeof(size->media));

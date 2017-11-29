@@ -91,7 +91,7 @@ cupsLocalizeDestMedia(
     return (lsize);
   }
 
-  pwg  = pwgMediaForSize(size->width, size->length);
+  pwg = pwgMediaForSize(size->width, size->length);
 
   if (pwg->ppd)
     lsize = _cupsLangString(lang, pwg->ppd);
@@ -159,28 +159,28 @@ cupsLocalizeDestMedia(
 
   if (!lsource && !ltype)
   {
-    if (size->bottom || size->left || size->right || size->top)
+    if (!size->bottom && !size->left && !size->right && !size->top)
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless)")), lsize);
     else
       strlcpy(name, lsize, sizeof(name));
   }
   else if (!lsource)
   {
-    if (size->bottom || size->left || size->right || size->top)
+    if (!size->bottom && !size->left && !size->right && !size->top)
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, ltype);
     else
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, ltype);
   }
   else if (!ltype)
   {
-    if (size->bottom || size->left || size->right || size->top)
+    if (!size->bottom && !size->left && !size->right && !size->top)
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, lsource);
     else
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, lsource);
   }
   else
   {
-    if (size->bottom || size->left || size->right || size->top)
+    if (!size->bottom && !size->left && !size->right && !size->top)
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s, %s)")), lsize, ltype, lsource);
     else
       snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s, %s)")), lsize, ltype, lsource);
