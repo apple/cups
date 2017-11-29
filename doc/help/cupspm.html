@@ -198,6 +198,7 @@ h3.title {
         </ul></li>
         <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
           <li><a href="#cupsAddDest">cupsAddDest</a></li>
+          <li><a href="#cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></li>
           <li><a href="#cupsAddIntegerOption">cupsAddIntegerOption</a></li>
           <li><a href="#cupsAddOption">cupsAddOption</a></li>
           <li><a href="#cupsCancelDestJob">cupsCancelDestJob</a></li>
@@ -1171,6 +1172,29 @@ a copy of that destination's options.<br>
 <br>
 Use the <a href="#cupsSaveDests"><code>cupsSaveDests</code></a> function to save the updated list of
 destinations to the user's lpoptions file.</p>
+<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></h3>
+        <p class="description">Add the option corresponding to the specified media size.</p>
+<p class="code">
+int cupsAddDestMediaOptions(<a href="#http_t">http_t</a> *http, <a href="#cups_dest_t">cups_dest_t</a> *dest, <a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo, unsigned flags, <a href="#cups_size_t">cups_size_t</a> *size, int num_options, <a href="#cups_option_t">cups_option_t</a> **options);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to destination</td></tr>
+<tr><th>dest</th>
+        <td class="description">Destination</td></tr>
+<tr><th>dinfo</th>
+        <td class="description">Destination information</td></tr>
+<tr><th>flags</th>
+        <td class="description">Media matching flags</td></tr>
+<tr><th>size</th>
+        <td class="description">Media size</td></tr>
+<tr><th>num_options</th>
+        <td class="description">Current number of options</td></tr>
+<tr><th>options</th>
+        <td class="description">Options</td></tr>
+</tbody></table>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">New number of options</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.2.4/macOS 10.13&#160;</span><a id="cupsAddIntegerOption">cupsAddIntegerOption</a></h3>
         <p class="description">Add an integer option to an option array.</p>
 <p class="code">
