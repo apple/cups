@@ -42,4 +42,5 @@ Changes in CUPS v2.3b1
 - The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop
   was seen (Issue #5170)
 - IPP Everywhere PPDs now support finishing templates (Issue #5180)
+- Fixed a journald support bug in the scheduler (Issue #5181)
 
