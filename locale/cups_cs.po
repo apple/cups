@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:48-0400\n"
+"POT-Creation-Date: 2017-11-30 11:38-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -831,6 +831,9 @@ msgstr ""
 msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 
+msgid "  --ippserver filename    Produce ippserver attribute file."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
@@ -1463,6 +1466,10 @@ msgid "%s: Don't know what to do."
 msgstr ""
 
 #, c-format
+msgid "%s: Error - %s"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
 msgstr ""
@@ -1850,6 +1857,9 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "/etc/cups/lpoptions file names default destination that does not exist."
+msgstr ""
 
 msgid "0"
 msgstr "0"
@@ -2504,9 +2514,6 @@ msgstr "Přidat třídu"
 msgid "Add Printer"
 msgstr "Přidat tiskárnu"
 
-msgid "Add RSS Subscription"
-msgstr "Přidat RSS předplatné"
-
 msgid "Address"
 msgstr "Adresa"
 
@@ -2602,6 +2609,10 @@ msgid "B9"
 msgstr "B9"
 
 msgid "Back Print Film"
+msgstr ""
+
+#, c-format
+msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
@@ -2743,9 +2754,6 @@ msgstr ""
 msgid "Bad scheme in URI"
 msgstr ""
 
-msgid "Bad subscription ID"
-msgstr ""
-
 msgid "Bad username in URI"
 msgstr ""
 
@@ -2812,9 +2820,6 @@ msgstr "Tiskárna štítků CPCL"
 
 msgid "Cancel Jobs"
 msgstr ""
-
-msgid "Cancel RSS Subscription"
-msgstr "Zrušit RSS předplatné"
 
 msgid "Canceling print job."
 msgstr ""
@@ -3375,6 +3380,9 @@ msgstr ""
 msgid "Finished page %d."
 msgstr ""
 
+msgid "Finishing Preset"
+msgstr ""
+
 msgid "Flexo Base"
 msgstr ""
 
@@ -3754,6 +3762,10 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR hostitel nebo tiskárna"
 
+msgid ""
+"LPDEST environment variable names default destination that does not exist."
+msgstr ""
+
 msgid "Label Printer"
 msgstr "Tiskárna štítků"
 
@@ -4112,6 +4124,9 @@ msgstr ""
 msgid "No community name"
 msgstr "Žádný název komunity"
 
+msgid "No default destination."
+msgstr ""
+
 msgid "No default printer."
 msgstr ""
 
@@ -4263,6 +4278,12 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
+msgid "Other Media"
+msgstr ""
+
+msgid "Other Tray"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr ""
 
@@ -4303,6 +4324,10 @@ msgid "PRC32K Oversize"
 msgstr ""
 
 msgid "PRC32K Oversize Long Edge"
+msgstr ""
+
+msgid ""
+"PRINTER environment variable names default destination that does not exist."
 msgstr ""
 
 msgid "Packet does not contain a Get-Response-PDU"
@@ -4989,10 +5014,9 @@ msgstr ""
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
+"contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
+"pound sign (#)."
 msgstr ""
-"Název tiskárny může obsahovat až 127 tisknutelných znaků a nesmí obsahovat "
-"mezery, lomítka (/), nebo křížek (#)."
 
 msgid "The printer or class does not exist."
 msgstr ""
@@ -5030,13 +5054,6 @@ msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
 "Tiskárna-URI musí být ve tvaru \"ipp://HOSTNAME/printers/PRINTERNAME\"."
-
-msgid ""
-"The subscription name may not contain spaces, slashes (/), question marks "
-"(?), or the pound sign (#)."
-msgstr ""
-"Název předplatného nesmí obsahovat mezery, lomítka (/), otazník (?), nebo "
-"křížek (#)."
 
 msgid ""
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
@@ -5202,9 +5219,6 @@ msgstr "Nelze získat přístup k souboru \"cupsd.conf\""
 msgid "Unable to access help file."
 msgstr ""
 
-msgid "Unable to add RSS subscription"
-msgstr "Nelze přidat RSS předplatné"
-
 msgid "Unable to add class"
 msgstr "Nelze přidat třídu"
 
@@ -5226,9 +5240,6 @@ msgstr ""
 
 msgid "Unable to allocate memory for pages array"
 msgstr ""
-
-msgid "Unable to cancel RSS subscription"
-msgstr "Nelze zrušit RSS předplatné"
 
 msgid "Unable to cancel print job."
 msgstr ""
@@ -7162,6 +7173,11 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
+msgid ""
+"ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
+"and \"-X\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
@@ -7176,6 +7192,9 @@ msgid "ipptool: May only specify a single URI."
 msgstr ""
 
 msgid "ipptool: Missing count for \"-n\"."
+msgstr ""
+
+msgid "ipptool: Missing filename for \"--ippserver\"."
 msgstr ""
 
 msgid "ipptool: Missing filename for \"-f\"."
@@ -7738,6 +7757,11 @@ msgid "lpadmin: Printer %s is not a member of class %s."
 msgstr ""
 
 msgid "lpadmin: Printer name can only contain printable characters."
+msgstr ""
+
+msgid ""
+"lpadmin: System V interface scripts are no longer supported for security "
+"reasons."
 msgstr ""
 
 msgid ""
@@ -8530,6 +8554,45 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Advanced Photo Paper"
+
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Glossy Brochure Paper"
+
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Matte Brochure Paper"
+
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Cover Paper"
+
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "Office Recycled Paper"
+
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Photo Paper"
+
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+msgid "media-type.com.hp.intermediate"
+msgstr "Multipurpose Paper"
+
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
+
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Premium Inkjet Paper"
+
+msgid "media-type.com.hp.premium-photo"
+msgstr "Premium Photo Glossy Paper"
+
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Presentation Matte Paper"
+
 msgid "media-type.continuous"
 msgstr "Continuous"
 
@@ -8673,6 +8736,18 @@ msgstr "Image Setter Paper"
 
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
+
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 msgid "media-type.labels"
 msgstr "Labels"
@@ -10393,6 +10468,10 @@ msgstr "Standard"
 
 #, c-format
 msgid "printer %s disabled since %s -"
+msgstr ""
+
+#, c-format
+msgid "printer %s is holding new jobs.  enabled since %s"
 msgstr ""
 
 #, c-format
@@ -12990,8 +13069,17 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "~/.cups/lpoptions file names default destination that does not exist."
+msgstr ""
+
 #~ msgid "720dpi"
 #~ msgstr "720 dpi"
+
+#~ msgid "Add RSS Subscription"
+#~ msgstr "Přidat RSS předplatné"
+
+#~ msgid "Cancel RSS Subscription"
+#~ msgstr "Zrušit RSS předplatné"
 
 #~ msgid "Enter old password:"
 #~ msgstr "Zadejte původní heslo:"
@@ -13019,6 +13107,26 @@ msgstr "Z Offset"
 
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Stylus Photo Series"
+
+#~ msgid ""
+#~ "The printer name may only contain up to 127 printable characters and may "
+#~ "not contain spaces, slashes (/), or the pound sign (#)."
+#~ msgstr ""
+#~ "Název tiskárny může obsahovat až 127 tisknutelných znaků a nesmí "
+#~ "obsahovat mezery, lomítka (/), nebo křížek (#)."
+
+#~ msgid ""
+#~ "The subscription name may not contain spaces, slashes (/), question marks "
+#~ "(?), or the pound sign (#)."
+#~ msgstr ""
+#~ "Název předplatného nesmí obsahovat mezery, lomítka (/), otazník (?), nebo "
+#~ "křížek (#)."
+
+#~ msgid "Unable to add RSS subscription"
+#~ msgstr "Nelze přidat RSS předplatné"
+
+#~ msgid "Unable to cancel RSS subscription"
+#~ msgstr "Nelze zrušit RSS předplatné"
 
 #~ msgid "compression"
 #~ msgstr "Compression"

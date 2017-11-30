@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:48-0400\n"
+"POT-Creation-Date: 2017-11-30 11:38-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -977,6 +977,9 @@ msgstr "  --help                  このヘルプを表示する。"
 msgid "  --host regex            Match hostname to regular expression."
 msgstr "  --host <正規表現>       ホスト名が正規表現にマッチするか。"
 
+msgid "  --ippserver filename    Produce ippserver attribute file."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
@@ -1641,6 +1644,10 @@ msgid "%s: Don't know what to do."
 msgstr "%s: 何が起きているか不明です。"
 
 #, c-format
+msgid "%s: Error - %s"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
 msgstr "%s: エラー - 環境変数 %s が存在しない宛先 \"%s\" を指しています。"
@@ -2036,6 +2043,9 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "/etc/cups/lpoptions file names default destination that does not exist."
+msgstr ""
 
 msgid "0"
 msgstr "0"
@@ -2692,9 +2702,6 @@ msgstr "クラスの追加"
 msgid "Add Printer"
 msgstr "プリンターの追加"
 
-msgid "Add RSS Subscription"
-msgstr "RSS 購読を追加"
-
 msgid "Address"
 msgstr "アドレス"
 
@@ -2790,6 +2797,10 @@ msgid "B9"
 msgstr "B9"
 
 msgid "Back Print Film"
+msgstr ""
+
+#, c-format
+msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
@@ -2931,9 +2942,6 @@ msgstr "URI のリソースが不正"
 msgid "Bad scheme in URI"
 msgstr "URI のスキームが不正"
 
-msgid "Bad subscription ID"
-msgstr "不正なサブスクリプション ID"
-
 msgid "Bad username in URI"
 msgstr "URI のユーザー名が不正"
 
@@ -3000,9 +3008,6 @@ msgstr "CPCL ラベルプリンター"
 
 msgid "Cancel Jobs"
 msgstr "ジョブをキャンセル"
-
-msgid "Cancel RSS Subscription"
-msgstr "RSS 購読をキャンセル"
 
 msgid "Canceling print job."
 msgstr "プリントジョブをキャンセルしています。"
@@ -3579,6 +3584,9 @@ msgstr ""
 msgid "Finished page %d."
 msgstr "ページ %d を終了。"
 
+msgid "Finishing Preset"
+msgstr ""
+
 msgid "Flexo Base"
 msgstr ""
 
@@ -3958,6 +3966,10 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR ホストまたはプリンター"
 
+msgid ""
+"LPDEST environment variable names default destination that does not exist."
+msgstr ""
+
 msgid "Label Printer"
 msgstr "ラベルプリンター"
 
@@ -4320,6 +4332,9 @@ msgstr ""
 msgid "No community name"
 msgstr "コミュニティ名がありません"
 
+msgid "No default destination."
+msgstr ""
+
 msgid "No default printer."
 msgstr "デフォルトのプリンターはありません。"
 
@@ -4473,6 +4488,12 @@ msgstr "オプション:"
 msgid "Other"
 msgstr ""
 
+msgid "Other Media"
+msgstr ""
+
+msgid "Other Tray"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr "PPD キャッシュファイルが古すぎます。"
 
@@ -4514,6 +4535,10 @@ msgstr "PRC32K (特大)"
 
 msgid "PRC32K Oversize Long Edge"
 msgstr "PRC32K (特大) 長辺送り"
+
+msgid ""
+"PRINTER environment variable names default destination that does not exist."
+msgstr ""
 
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "パケットが Get-Response-PDU を含んでいません"
@@ -5201,10 +5226,9 @@ msgstr "プリンターは現在存在しないか、使用できないようで
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
+"contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
+"pound sign (#)."
 msgstr ""
-"プリンター名は 127 文字以内の表示可能文字から成り、空白、スラッシュ (/)、ハッ"
-"シュ (#) を含んではなりません。"
 
 msgid "The printer or class does not exist."
 msgstr "プリンターまたはクラスは存在しません。"
@@ -5245,13 +5269,6 @@ msgid ""
 msgstr ""
 "printer-uri は \"ipp://ホスト名/printers/プリンター名\" 形式でなければなりま"
 "せん。"
-
-msgid ""
-"The subscription name may not contain spaces, slashes (/), question marks "
-"(?), or the pound sign (#)."
-msgstr ""
-"サブスクリプション名には、スペース、スラッシュ (/)、疑問府 (?)、ハッシュ (#) "
-"を使用しないでください。"
 
 msgid ""
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
@@ -5419,9 +5436,6 @@ msgstr "cupsd.conf ファイルにアクセスできません"
 msgid "Unable to access help file."
 msgstr "ヘルプファイルにアクセスできません。"
 
-msgid "Unable to add RSS subscription"
-msgstr "RSS 購読を追加できません"
-
 msgid "Unable to add class"
 msgstr "クラスを追加できません"
 
@@ -5443,9 +5457,6 @@ msgstr "ページ情報のメモリー割り当てができません"
 
 msgid "Unable to allocate memory for pages array"
 msgstr "ページアレイのメモリー割り当てができません"
-
-msgid "Unable to cancel RSS subscription"
-msgstr "RSS 購読をキャンセルできません"
 
 msgid "Unable to cancel print job."
 msgstr "プリンターを変更できません。"
@@ -7414,6 +7425,11 @@ msgstr "ippfind: Bonjour を利用できません: %s"
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr "ippfind: \"{%s}\" は不明な変数です。"
 
+msgid ""
+"ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
+"and \"-X\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 "ipptool: \"-i\" および \"-n\" は \"-P\"、\"-X\" と一緒に指定できません。"
@@ -7430,6 +7446,9 @@ msgstr "ipptool: URI は 1 つだけ指定できます。"
 
 msgid "ipptool: Missing count for \"-n\"."
 msgstr "ipptool: \"-n\" に回数の指定がありません。"
+
+msgid "ipptool: Missing filename for \"--ippserver\"."
+msgstr ""
 
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr "ipptool: \"-f\" にファイル名の指定がありません。"
@@ -7994,6 +8013,11 @@ msgstr "lpadmin: プリンター %s はクラス %s のメンバーではあり�
 
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: プリンター名には表示可能文字だけが使用できます。"
+
+msgid ""
+"lpadmin: System V interface scripts are no longer supported for security "
+"reasons."
+msgstr ""
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -8803,6 +8827,45 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Advanced Photo Paper"
+
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Glossy Brochure Paper"
+
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Matte Brochure Paper"
+
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Cover Paper"
+
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "Office Recycled Paper"
+
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Photo Paper"
+
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+msgid "media-type.com.hp.intermediate"
+msgstr "Multipurpose Paper"
+
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
+
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Premium Inkjet Paper"
+
+msgid "media-type.com.hp.premium-photo"
+msgstr "Premium Photo Glossy Paper"
+
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Presentation Matte Paper"
+
 msgid "media-type.continuous"
 msgstr "Continuous"
 
@@ -8946,6 +9009,18 @@ msgstr "Image Setter Paper"
 
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
+
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 msgid "media-type.labels"
 msgstr "Labels"
@@ -10718,6 +10793,10 @@ msgstr "Standard"
 #, c-format
 msgid "printer %s disabled since %s -"
 msgstr "プリンター %s は %s から無効です -"
+
+#, c-format
+msgid "printer %s is holding new jobs.  enabled since %s"
+msgstr ""
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
@@ -13314,6 +13393,9 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "~/.cups/lpoptions file names default destination that does not exist."
+msgstr ""
+
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tインターフェイス: %s/interfaces/%s"
 
@@ -13545,8 +13627,17 @@ msgstr "Z Offset"
 #~ msgid "720dpi"
 #~ msgstr "720dpi"
 
+#~ msgid "Add RSS Subscription"
+#~ msgstr "RSS 購読を追加"
+
 #~ msgid "Bad printer URI."
 #~ msgstr "不正なプリンター URI です。"
+
+#~ msgid "Bad subscription ID"
+#~ msgstr "不正なサブスクリプション ID"
+
+#~ msgid "Cancel RSS Subscription"
+#~ msgstr "RSS 購読をキャンセル"
 
 #~ msgid "Enter old password:"
 #~ msgstr "古いパスワードを入力:"
@@ -13661,8 +13752,28 @@ msgstr "Z Offset"
 #~ msgid "The printer is running low on toner."
 #~ msgstr "プリンターのトナーがもうすぐなくなります。"
 
+#~ msgid ""
+#~ "The printer name may only contain up to 127 printable characters and may "
+#~ "not contain spaces, slashes (/), or the pound sign (#)."
+#~ msgstr ""
+#~ "プリンター名は 127 文字以内の表示可能文字から成り、空白、スラッシュ (/)、"
+#~ "ハッシュ (#) を含んではなりません。"
+
+#~ msgid ""
+#~ "The subscription name may not contain spaces, slashes (/), question marks "
+#~ "(?), or the pound sign (#)."
+#~ msgstr ""
+#~ "サブスクリプション名には、スペース、スラッシュ (/)、疑問府 (?)、ハッシュ "
+#~ "(#) を使用しないでください。"
+
 #~ msgid "There is a paper jam."
 #~ msgstr "用紙づまりが発生しています。"
+
+#~ msgid "Unable to add RSS subscription"
+#~ msgstr "RSS 購読を追加できません"
+
+#~ msgid "Unable to cancel RSS subscription"
+#~ msgstr "RSS 購読をキャンセルできません"
 
 #~ msgid "Unable to copy interface script - %s"
 #~ msgstr "インターフェイススクリプトをコピーできません - %s"

@@ -68,9 +68,9 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (strstr(argv[i], ".strings"))
-      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_STRINGS | _CUPS_MESSAGE_UNQUOTE);
+      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_STRINGS);
     else
-      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_UNQUOTE);
+      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_PO);
 
     if (!po)
     {
@@ -232,22 +232,27 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       for (strfmt = msg->str; *strfmt; strfmt ++)
-        if (*strfmt == '\\' &&
-	    strfmt[1] != '\\' && strfmt[1] != 'n' && strfmt[1] != 'r' &&
-	    strfmt[1] != 't' && strfmt[1] != '\"' && !isdigit(strfmt[1] & 255))
-	{
-	  if (pass)
-	  {
-	    pass = 0;
-	    puts("FAIL");
-	  }
+      {
+        if (*strfmt == '\\')
+        {
+          strfmt ++;
 
-	  printf("    Bad escape \\%c in filter message \"%s\"\n"
-	         "      for \"%s\"\n", strfmt[1],
-		 abbreviate(msg->str, strbuf, sizeof(strbuf)),
-		 abbreviate(msg->msg, idbuf, sizeof(idbuf)));
-          break;
-        }
+          if (*strfmt != '\\' && *strfmt != 'n' && *strfmt != 'r' && *strfmt != 't' && *strfmt != '\"' && !isdigit(*strfmt & 255))
+	  {
+	    if (pass)
+	    {
+	      pass = 0;
+	      puts("FAIL");
+	    }
+
+	    printf("    Bad escape \\%c in filter message \"%s\"\n"
+		   "      for \"%s\"\n", strfmt[1],
+		   abbreviate(msg->str, strbuf, sizeof(strbuf)),
+		   abbreviate(msg->msg, idbuf, sizeof(idbuf)));
+	    break;
+	  }
+	}
+      }
     }
 
     if (pass)

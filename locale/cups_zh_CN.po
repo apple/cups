@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:48-0400\n"
+"POT-Creation-Date: 2017-11-30 11:38-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -952,6 +952,9 @@ msgstr "  --help                  显示此帮助信息。"
 msgid "  --host regex            Match hostname to regular expression."
 msgstr "  --host 正则表达式      使用正则表达式匹配主机名。"
 
+msgid "  --ippserver filename    Produce ippserver attribute file."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr "  --lf                    使用 LF 行末（UNIX/Linux/macOS）。"
 
@@ -1596,6 +1599,10 @@ msgid "%s: Don't know what to do."
 msgstr "%s：不知如何处理。"
 
 #, c-format
+msgid "%s: Error - %s"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
 msgstr "%s：错误 — %s 环境变量指定了不存在的目的地“%s”。"
@@ -1983,6 +1990,9 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "/etc/cups/lpoptions file names default destination that does not exist."
+msgstr ""
 
 msgid "0"
 msgstr "0"
@@ -2637,9 +2647,6 @@ msgstr "添加类"
 msgid "Add Printer"
 msgstr "添加打印机"
 
-msgid "Add RSS Subscription"
-msgstr "添加 RSS 订阅"
-
 msgid "Address"
 msgstr "地址"
 
@@ -2736,6 +2743,10 @@ msgstr "B9"
 
 msgid "Back Print Film"
 msgstr "印片用胶片"
+
+#, c-format
+msgid "Bad \"printer-id\" value %d."
+msgstr ""
 
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
@@ -2876,9 +2887,6 @@ msgstr "URI 中的资源无效"
 msgid "Bad scheme in URI"
 msgstr "URI 中的方案无效"
 
-msgid "Bad subscription ID"
-msgstr "无效的订阅 ID"
-
 msgid "Bad username in URI"
 msgstr "URI 中的用户名无效"
 
@@ -2945,9 +2953,6 @@ msgstr "CPCL 标签打印机"
 
 msgid "Cancel Jobs"
 msgstr "取消任务"
-
-msgid "Cancel RSS Subscription"
-msgstr "取消 RSS 订阅"
 
 msgid "Canceling print job."
 msgstr "正在取消打印任务"
@@ -3518,6 +3523,9 @@ msgstr "精致信封"
 msgid "Finished page %d."
 msgstr "已完成第 %d 页。"
 
+msgid "Finishing Preset"
+msgstr ""
+
 msgid "Flexo Base"
 msgstr "柔性版基"
 
@@ -3897,6 +3905,10 @@ msgstr "垛齐"
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR 主机或打印机"
 
+msgid ""
+"LPDEST environment variable names default destination that does not exist."
+msgstr ""
+
 msgid "Label Printer"
 msgstr "标签打印机"
 
@@ -4259,6 +4271,9 @@ msgstr "未指定通用名称。"
 msgid "No community name"
 msgstr "无社群名称"
 
+msgid "No default destination."
+msgstr ""
+
 msgid "No default printer."
 msgstr "无默认打印机。"
 
@@ -4410,6 +4425,12 @@ msgstr "选项："
 msgid "Other"
 msgstr "其他"
 
+msgid "Other Media"
+msgstr ""
+
+msgid "Other Tray"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr "过时的 PPD 缓存文件。"
 
@@ -4451,6 +4472,10 @@ msgstr "超大 32 开"
 
 msgid "PRC32K Oversize Long Edge"
 msgstr "超大长边缘 32 开"
+
+msgid ""
+"PRINTER environment variable names default destination that does not exist."
+msgstr ""
 
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "包裹中未包含 Get-Response-PDU"
@@ -5137,9 +5162,9 @@ msgstr "打印机暂时不存在或不可用。"
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
+"contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
+"pound sign (#)."
 msgstr ""
-"打印机名称最多可包含 127 可打印字符，不能包含空格、斜杠（/）或井号（#）。"
 
 msgid "The printer or class does not exist."
 msgstr "打印机或类不存在。"
@@ -5176,11 +5201,6 @@ msgstr "printer-uri 必须使用如下格式：“ipp://HOSTNAME/classes/CLASSNA
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr "printer-uri 必须使用如下格式：“ipp://HOSTNAME/printers/PRINTERNAME”。"
-
-msgid ""
-"The subscription name may not contain spaces, slashes (/), question marks "
-"(?), or the pound sign (#)."
-msgstr "订阅名称不得包含空格，斜杠（/），问号（?）或井号（#）。"
 
 msgid ""
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
@@ -5346,9 +5366,6 @@ msgstr "无法访问 cupsd.conf 文件。"
 msgid "Unable to access help file."
 msgstr "无法访问帮助文件。"
 
-msgid "Unable to add RSS subscription"
-msgstr "无法添加 RSS 订阅"
-
 msgid "Unable to add class"
 msgstr "无法添加类"
 
@@ -5370,9 +5387,6 @@ msgstr "无法为页面信息分配内存"
 
 msgid "Unable to allocate memory for pages array"
 msgstr "无法为页面组分配内存"
-
-msgid "Unable to cancel RSS subscription"
-msgstr "无法取消 RSS 订阅"
 
 msgid "Unable to cancel print job."
 msgstr "无法取消打印任务。"
@@ -7325,6 +7339,11 @@ msgstr "ippfind：无法使用 Bonjour：%s"
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr "ippfind：未知变量“{%s}”。"
 
+msgid ""
+"ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
+"and \"-X\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr "ipptool：“-i”和“-n”不能与“-P”和“-X”混用。"
 
@@ -7340,6 +7359,9 @@ msgstr "ipptool：只能指定一个 URI。"
 
 msgid "ipptool: Missing count for \"-n\"."
 msgstr "ipptool：“-n”选项后缺少数量。"
+
+msgid "ipptool: Missing filename for \"--ippserver\"."
+msgstr ""
 
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr "ipptool：“-f”选项后缺少文件名。"
@@ -7902,6 +7924,11 @@ msgstr "lpadmin：打印机 %s 不是类 %s 中的成员。"
 
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin：打印机名称中只能包含可打印字符。"
+
+msgid ""
+"lpadmin: System V interface scripts are no longer supported for security "
+"reasons."
+msgstr ""
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -8701,6 +8728,45 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Advanced Photo Paper"
+
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Glossy Brochure Paper"
+
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Matte Brochure Paper"
+
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Cover Paper"
+
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "Office Recycled Paper"
+
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Photo Paper"
+
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+msgid "media-type.com.hp.intermediate"
+msgstr "Multipurpose Paper"
+
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
+
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Premium Inkjet Paper"
+
+msgid "media-type.com.hp.premium-photo"
+msgstr "Premium Photo Glossy Paper"
+
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Presentation Matte Paper"
+
 msgid "media-type.continuous"
 msgstr "Continuous"
 
@@ -8844,6 +8910,18 @@ msgstr "Image Setter Paper"
 
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
+
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 msgid "media-type.labels"
 msgstr "Labels"
@@ -10570,6 +10648,10 @@ msgstr "Standard"
 #, c-format
 msgid "printer %s disabled since %s -"
 msgstr "打印机 %s 从 %s 开始被禁用 -"
+
+#, c-format
+msgid "printer %s is holding new jobs.  enabled since %s"
+msgstr ""
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
@@ -13166,6 +13248,9 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "~/.cups/lpoptions file names default destination that does not exist."
+msgstr ""
+
 #~ msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 #~ msgstr "  --lf                    使用 LF 行末 (UNIX/Linux/OS X)。"
 
@@ -13341,6 +13426,15 @@ msgstr "Z Offset"
 #~ msgid "%g x %g"
 #~ msgstr "%g x %g"
 
+#~ msgid "Add RSS Subscription"
+#~ msgstr "添加 RSS 订阅"
+
+#~ msgid "Bad subscription ID"
+#~ msgstr "无效的订阅 ID"
+
+#~ msgid "Cancel RSS Subscription"
+#~ msgstr "取消 RSS 订阅"
+
 #~ msgid "Envelope #10 "
 #~ msgstr "10 号信封 "
 
@@ -13362,6 +13456,23 @@ msgstr "Z Offset"
 
 #~ msgid "Postcard Double "
 #~ msgstr "双面明信片 "
+
+#~ msgid ""
+#~ "The printer name may only contain up to 127 printable characters and may "
+#~ "not contain spaces, slashes (/), or the pound sign (#)."
+#~ msgstr ""
+#~ "打印机名称最多可包含 127 可打印字符，不能包含空格、斜杠（/）或井号（#）。"
+
+#~ msgid ""
+#~ "The subscription name may not contain spaces, slashes (/), question marks "
+#~ "(?), or the pound sign (#)."
+#~ msgstr "订阅名称不得包含空格，斜杠（/），问号（?）或井号（#）。"
+
+#~ msgid "Unable to add RSS subscription"
+#~ msgstr "无法添加 RSS 订阅"
+
+#~ msgid "Unable to cancel RSS subscription"
+#~ msgstr "无法取消 RSS 订阅"
 
 #~ msgid ""
 #~ "Usage: ippdiscover [options] -a\n"

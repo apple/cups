@@ -838,18 +838,22 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
    /*
     * Try decoding the self-describing name of the form:
     *
-    * class_name_WWWxHHHin
-    * class_name_WWWxHHHmm
+    * class_name_WWWxHHHin[_something]
+    * class_name_WWWxHHHmm[_something]
     */
 
     int		w, l;			/* Width and length of page */
     int		numer;			/* Scale factor for units */
-    const char	*units = ptr + strlen(ptr) - 2;
-					/* Units from size */
+    const char	*units;			/* Units from size */
 
-    ptr ++;
+     if ((units = strchr(ptr + 1, '_')) != NULL)
+       units -= 2;
+     else
+       units = ptr + strlen(ptr) - 2;
 
-    if (units >= ptr && !strcmp(units, "in"))
+     ptr ++;
+
+    if (units >= ptr && (!strcmp(units, "in") || !strncmp(units, "in_", 3)))
       numer = 2540;
     else
       numer = 100;

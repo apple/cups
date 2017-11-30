@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:48-0400\n"
+"POT-Creation-Date: 2017-11-30 11:38-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -981,6 +981,9 @@ msgstr ""
 "  --host regex            Corrispondenza dell'hostname con l'espressione "
 "regolare."
 
+msgid "  --ippserver filename    Produce ippserver attribute file."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
@@ -1665,6 +1668,10 @@ msgid "%s: Don't know what to do."
 msgstr "%s: non so cosa fare."
 
 #, c-format
+msgid "%s: Error - %s"
+msgstr ""
+
+#, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
 msgstr ""
@@ -2066,6 +2073,9 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "/etc/cups/lpoptions file names default destination that does not exist."
+msgstr ""
 
 msgid "0"
 msgstr "0"
@@ -2722,9 +2732,6 @@ msgstr "Aggiungi una classe"
 msgid "Add Printer"
 msgstr "Aggiungi una stampante"
 
-msgid "Add RSS Subscription"
-msgstr "Aggiungere l'abbonamento RSS"
-
 msgid "Address"
 msgstr "Indirizzo"
 
@@ -2820,6 +2827,10 @@ msgid "B9"
 msgstr "B9"
 
 msgid "Back Print Film"
+msgstr ""
+
+#, c-format
+msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
@@ -2961,9 +2972,6 @@ msgstr ""
 msgid "Bad scheme in URI"
 msgstr ""
 
-msgid "Bad subscription ID"
-msgstr "L'ID della sottoscrizione non è valido"
-
 msgid "Bad username in URI"
 msgstr ""
 
@@ -3030,9 +3038,6 @@ msgstr "CPCL Label Printer"
 
 msgid "Cancel Jobs"
 msgstr ""
-
-msgid "Cancel RSS Subscription"
-msgstr "Eliminare l'abbonamento RSS"
 
 msgid "Canceling print job."
 msgstr "Eliminazione del processo di stampa in corso."
@@ -3605,6 +3610,9 @@ msgstr ""
 msgid "Finished page %d."
 msgstr "Finito pagina %d."
 
+msgid "Finishing Preset"
+msgstr ""
+
 msgid "Flexo Base"
 msgstr ""
 
@@ -3984,6 +3992,10 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR Host o stampante"
 
+msgid ""
+"LPDEST environment variable names default destination that does not exist."
+msgstr ""
+
 msgid "Label Printer"
 msgstr "Label Printer"
 
@@ -4346,6 +4358,9 @@ msgstr ""
 msgid "No community name"
 msgstr "Nessun nome della comunità"
 
+msgid "No default destination."
+msgstr ""
+
 msgid "No default printer."
 msgstr "Nessuna stampante predefinita."
 
@@ -4501,6 +4516,12 @@ msgstr "Opzioni:"
 msgid "Other"
 msgstr ""
 
+msgid "Other Media"
+msgstr ""
+
+msgid "Other Tray"
+msgstr ""
+
 msgid "Out of date PPD cache file."
 msgstr "Il file della cache del PPD non è aggiornato."
 
@@ -4542,6 +4563,10 @@ msgstr "PRC32K Oversize"
 
 msgid "PRC32K Oversize Long Edge"
 msgstr "PRC32K Oversize Long Edge"
+
+msgid ""
+"PRINTER environment variable names default destination that does not exist."
+msgstr ""
 
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "Il pacchetto non contiene un Get-Response-PDU"
@@ -5235,11 +5260,9 @@ msgstr ""
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
-"contain spaces, slashes (/), or the pound sign (#)."
+"contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
+"pound sign (#)."
 msgstr ""
-"Il nome della stampante può contenere solo un massimo di 127 caratteri "
-"stampabili e non può contenere spazi, barre (/) oppure il simbolo del "
-"cancelletto (#)."
 
 msgid "The printer or class does not exist."
 msgstr "Non esiste la stampante o la classe."
@@ -5279,13 +5302,6 @@ msgid ""
 msgstr ""
 "Il printer-uri deve essere del formato \"ipp://HOSTNAME/printers/PRINTERNAME"
 "\"."
-
-msgid ""
-"The subscription name may not contain spaces, slashes (/), question marks "
-"(?), or the pound sign (#)."
-msgstr ""
-"Il nome della sottoscrizione non può contenere spazi, barre (/), punti "
-"interrogativi (?) o cancelletto (#)."
 
 msgid ""
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
@@ -5453,9 +5469,6 @@ msgstr "Non è possibile accedere al file cupsd.conf"
 msgid "Unable to access help file."
 msgstr "Non è possibile accedere al file help."
 
-msgid "Unable to add RSS subscription"
-msgstr "Non è possibile aggiungere l'abbonamento RSS"
-
 msgid "Unable to add class"
 msgstr "Non è possibile aggiungere la classe"
 
@@ -5477,9 +5490,6 @@ msgstr "Non è possibile allocare la memoria per le info della pagina"
 
 msgid "Unable to allocate memory for pages array"
 msgstr "Non è possibile allocare memoria per array di pagine"
-
-msgid "Unable to cancel RSS subscription"
-msgstr "Non è possibile eliminare l'abbonamento RSS"
 
 msgid "Unable to cancel print job."
 msgstr "Non è possibile eliminare il processo di stampa."
@@ -7454,6 +7464,11 @@ msgstr "ippfind: non è possibile utilizzare Bonjour: %s"
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr "ippfind: variabile sconosciuta \"{%s}\"."
 
+msgid ""
+"ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
+"and \"-X\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
@@ -7469,6 +7484,9 @@ msgstr "ipptool: può specificare solo un singolo URI."
 
 msgid "ipptool: Missing count for \"-n\"."
 msgstr "ipptool: conteggio mancante per \"-n\"."
+
+msgid "ipptool: Missing filename for \"--ippserver\"."
+msgstr ""
 
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr "ipptool: manca il file per \"-f\"."
@@ -8032,6 +8050,11 @@ msgstr "lpadmin: la stampante %s non è un membro della classe %s."
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr ""
 "lpadmin: il nome della stampante può contenere solo caratteri stampabili."
+
+msgid ""
+"lpadmin: System V interface scripts are no longer supported for security "
+"reasons."
+msgstr ""
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -8834,6 +8857,45 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Advanced Photo Paper"
+
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Glossy Brochure Paper"
+
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Matte Brochure Paper"
+
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Cover Paper"
+
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "Office Recycled Paper"
+
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Photo Paper"
+
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+msgid "media-type.com.hp.intermediate"
+msgstr "Multipurpose Paper"
+
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
+
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Premium Inkjet Paper"
+
+msgid "media-type.com.hp.premium-photo"
+msgstr "Premium Photo Glossy Paper"
+
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Presentation Matte Paper"
+
 msgid "media-type.continuous"
 msgstr "Continuous"
 
@@ -8977,6 +9039,18 @@ msgstr "Image Setter Paper"
 
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
+
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 msgid "media-type.labels"
 msgstr "Labels"
@@ -10723,6 +10797,10 @@ msgstr "Standard"
 #, c-format
 msgid "printer %s disabled since %s -"
 msgstr "la stampante %s è stata disabilitata da %s"
+
+#, c-format
+msgid "printer %s is holding new jobs.  enabled since %s"
+msgstr ""
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
@@ -13319,6 +13397,9 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "~/.cups/lpoptions file names default destination that does not exist."
+msgstr ""
+
 #~ msgid "\tInterface: %s/interfaces/%s"
 #~ msgstr "\tInterfaccia: %s/interfacce/%s"
 
@@ -13545,8 +13626,17 @@ msgstr "Z Offset"
 #~ msgid "720dpi"
 #~ msgstr "720dpi"
 
+#~ msgid "Add RSS Subscription"
+#~ msgstr "Aggiungere l'abbonamento RSS"
+
 #~ msgid "Bad printer URI."
 #~ msgstr "L'URI della stampante non è valido."
+
+#~ msgid "Bad subscription ID"
+#~ msgstr "L'ID della sottoscrizione non è valido"
+
+#~ msgid "Cancel RSS Subscription"
+#~ msgstr "Eliminare l'abbonamento RSS"
 
 #~ msgid "Enter old password:"
 #~ msgstr "Digitare la vecchia password:"
@@ -13650,8 +13740,29 @@ msgstr "Z Offset"
 #~ msgid "The printer is running low on toner."
 #~ msgstr "Il toner della stampante sta per esaurirsi."
 
+#~ msgid ""
+#~ "The printer name may only contain up to 127 printable characters and may "
+#~ "not contain spaces, slashes (/), or the pound sign (#)."
+#~ msgstr ""
+#~ "Il nome della stampante può contenere solo un massimo di 127 caratteri "
+#~ "stampabili e non può contenere spazi, barre (/) oppure il simbolo del "
+#~ "cancelletto (#)."
+
+#~ msgid ""
+#~ "The subscription name may not contain spaces, slashes (/), question marks "
+#~ "(?), or the pound sign (#)."
+#~ msgstr ""
+#~ "Il nome della sottoscrizione non può contenere spazi, barre (/), punti "
+#~ "interrogativi (?) o cancelletto (#)."
+
 #~ msgid "There is a paper jam."
 #~ msgstr "Vi è un inceppamento della carta."
+
+#~ msgid "Unable to add RSS subscription"
+#~ msgstr "Non è possibile aggiungere l'abbonamento RSS"
+
+#~ msgid "Unable to cancel RSS subscription"
+#~ msgstr "Non è possibile eliminare l'abbonamento RSS"
 
 #~ msgid "Unable to copy interface script - %s"
 #~ msgstr "Non è possibile copiare lo script dell'interfaccia - %s"

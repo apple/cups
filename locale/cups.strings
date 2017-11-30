@@ -191,6 +191,7 @@
 "  --help                  Show help." = "  --help                  Show help.";
 "  --help                  Show this help." = "  --help                  Show this help.";
 "  --host regex            Match hostname to regular expression." = "  --host regex            Match hostname to regular expression.";
+"  --ippserver filename    Produce ippserver attribute file." = "  --ippserver filename    Produce ippserver attribute file.";
 "  --lf                    End lines with LF (UNIX/Linux/macOS)." = "  --lf                    End lines with LF (UNIX/Linux/macOS).";
 "  --list-filters          List filters that will be used." = "  --list-filters          List filters that will be used.";
 "  --local                 True if service is local." = "  --local                 True if service is local.";
@@ -366,6 +367,7 @@
 "%s: Bad printer URI \"%s\"." = "%s: Bad printer URI “%s”.";
 "%s: Bad version %s for \"-V\"." = "%s: Bad version %s for “-V”.";
 "%s: Don't know what to do." = "%s: Don’t know what to do.";
+"%s: Error - %s" = "%s: Error - %s";
 "%s: Error - %s environment variable names non-existent destination \"%s\"." = "%s: Error - %s environment variable names non-existent destination “%s”.";
 "%s: Error - add '/version=1.1' to server name." = "%s: Error - add ‘/version=1.1’ to server name.";
 "%s: Error - bad job ID." = "%s: Error - bad job ID.";
@@ -471,6 +473,7 @@
 "-9" = "-9";
 "-90" = "-90";
 "-95" = "-95";
+"/etc/cups/lpoptions file names default destination that does not exist." = "/etc/cups/lpoptions file names default destination that does not exist.";
 "0" = "0";
 "1" = "1";
 "1 inch/sec." = "1 inch/sec.";
@@ -688,7 +691,6 @@
 "Accordian Fold" = "Accordian Fold";
 "Add Class" = "Add Class";
 "Add Printer" = "Add Printer";
-"Add RSS Subscription" = "Add RSS Subscription";
 "Address" = "Address";
 "Administration" = "Administration";
 "Advanced Photo Paper" = "Advanced Photo Paper";
@@ -720,6 +722,7 @@
 "B8" = "B8";
 "B9" = "B9";
 "Back Print Film" = "Back Print Film";
+"Bad \"printer-id\" value %d." = "Bad “printer-id” value %d.";
 "Bad 'document-format' value \"%s\"." = "Bad ‘document-format’ value “%s”.";
 "Bad NULL dests pointer" = "Bad NULL dests pointer";
 "Bad OpenGroup" = "Bad OpenGroup";
@@ -760,7 +763,6 @@
 "Bad requesting-user-name value: %s" = "Bad requesting-user-name value: %s";
 "Bad resource in URI" = "Bad resource in URI";
 "Bad scheme in URI" = "Bad scheme in URI";
-"Bad subscription ID" = "Bad subscription ID";
 "Bad username in URI" = "Bad username in URI";
 "Bad value string" = "Bad value string";
 "Bad/empty URI" = "Bad/empty URI";
@@ -783,7 +785,6 @@
 "CMYK" = "CMYK";
 "CPCL Label Printer" = "CPCL Label Printer";
 "Cancel Jobs" = "Cancel Jobs";
-"Cancel RSS Subscription" = "Cancel RSS Subscription";
 "Canceling print job." = "Canceling print job.";
 "Cannot change printer-is-shared for remote queues." = "Cannot change printer-is-shared for remote queues.";
 "Cannot share a remote Kerberized printer." = "Cannot share a remote Kerberized printer.";
@@ -960,6 +961,7 @@
 "Film" = "Film";
 "Fine Envelope" = "Fine Envelope";
 "Finished page %d." = "Finished page %d.";
+"Finishing Preset" = "Finishing Preset";
 "Flexo Base" = "Flexo Base";
 "Flexo Photo Polymer" = "Flexo Photo Polymer";
 "Flute" = "Flute";
@@ -1083,6 +1085,7 @@
 "Jobs" = "Jobs";
 "Jog" = "Jog";
 "LPD/LPR Host or Printer" = "LPD/LPR Host or Printer";
+"LPDEST environment variable names default destination that does not exist." = "LPDEST environment variable names default destination that does not exist.";
 "Label Printer" = "Label Printer";
 "Label Top" = "Label Top";
 "Labels" = "Labels";
@@ -1199,6 +1202,7 @@
 "No authentication information provided." = "No authentication information provided.";
 "No common name specified." = "No common name specified.";
 "No community name" = "No community name";
+"No default destination." = "No default destination.";
 "No default printer." = "No default printer.";
 "No destinations added." = "No destinations added.";
 "No device URI found in argv[0] or in DEVICE_URI environment variable." = "No device URI found in argv[0] or in DEVICE_URI environment variable.";
@@ -1248,6 +1252,8 @@
 "Options Installed" = "Options Installed";
 "Options:" = "Options:";
 "Other" = "Other";
+"Other Media" = "Other Media";
+"Other Tray" = "Other Tray";
 "Out of date PPD cache file." = "Out of date PPD cache file.";
 "Out of memory." = "Out of memory.";
 "Output Mode" = "Output Mode";
@@ -1262,6 +1268,7 @@
 "PRC32K Long Edge" = "PRC32K Long Edge";
 "PRC32K Oversize" = "PRC32K Oversize";
 "PRC32K Oversize Long Edge" = "PRC32K Oversize Long Edge";
+"PRINTER environment variable names default destination that does not exist." = "PRINTER environment variable names default destination that does not exist.";
 "Packet does not contain a Get-Response-PDU" = "Packet does not contain a Get-Response-PDU";
 "Packet does not start with SEQUENCE" = "Packet does not start with SEQUENCE";
 "Paper" = "Paper";
@@ -1482,7 +1489,7 @@
 "The printer may be out of ink." = "The printer may be out of ink.";
 "The printer may be out of toner." = "The printer may be out of toner.";
 "The printer may not exist or is unavailable at this time." = "The printer may not exist or is unavailable at this time.";
-"The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)." = "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#).";
+"The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the pound sign (#)." = "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/ \\), quotes (’ ″), question mark (?), or the pound sign (#).";
 "The printer or class does not exist." = "The printer or class does not exist.";
 "The printer or class is not shared." = "The printer or class is not shared.";
 "The printer's cover is open." = "The printer’s cover is open.";
@@ -1494,7 +1501,6 @@
 "The printer-uri attribute is required." = "The printer-uri attribute is required.";
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"." = "The printer-uri must be of the form “ipp://HOSTNAME/classes/CLASSNAME”.";
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"." = "The printer-uri must be of the form “ipp://HOSTNAME/printers/PRINTERNAME”.";
-"The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)." = "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#).";
 "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it." = "The web interface is currently disabled. Run “cupsctl WebInterface=yes” to enable it.";
 "The which-jobs value \"%s\" is not supported." = "The which-jobs value “%s” is not supported.";
 "There are too many subscriptions." = "There are too many subscriptions.";
@@ -1548,7 +1554,6 @@
 "US Letter Small" = "US Letter Small";
 "Unable to access cupsd.conf file" = "Unable to access cupsd.conf file";
 "Unable to access help file." = "Unable to access help file.";
-"Unable to add RSS subscription" = "Unable to add RSS subscription";
 "Unable to add class" = "Unable to add class";
 "Unable to add document to print job." = "Unable to add document to print job.";
 "Unable to add job for destination \"%s\"." = "Unable to add job for destination “%s”.";
@@ -1556,7 +1561,6 @@
 "Unable to allocate memory for file types." = "Unable to allocate memory for file types.";
 "Unable to allocate memory for page info" = "Unable to allocate memory for page info";
 "Unable to allocate memory for pages array" = "Unable to allocate memory for pages array";
-"Unable to cancel RSS subscription" = "Unable to cancel RSS subscription";
 "Unable to cancel print job." = "Unable to cancel print job.";
 "Unable to change printer" = "Unable to change printer";
 "Unable to change printer-is-shared attribute" = "Unable to change printer-is-shared attribute";
@@ -1756,11 +1760,13 @@
 "ippfind: Unable to execute \"%s\": %s" = "ippfind: Unable to execute “%s”: %s";
 "ippfind: Unable to use Bonjour: %s" = "ippfind: Unable to use Bonjour: %s";
 "ippfind: Unknown variable \"{%s}\"." = "ippfind: Unknown variable “{%s}”.";
+"ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"." = "ipptool: “-i” and “-n” are incompatible with “--ippserver”, “-P”, and “-X”.";
 "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"." = "ipptool: “-i” and “-n” are incompatible with “-P” and “-X”.";
 "ipptool: Bad URI - %s." = "ipptool: Bad URI - %s.";
 "ipptool: Invalid seconds for \"-i\"." = "ipptool: Invalid seconds for “-i”.";
 "ipptool: May only specify a single URI." = "ipptool: May only specify a single URI.";
 "ipptool: Missing count for \"-n\"." = "ipptool: Missing count for “-n”.";
+"ipptool: Missing filename for \"--ippserver\"." = "ipptool: Missing filename for “--ippserver”.";
 "ipptool: Missing filename for \"-f\"." = "ipptool: Missing filename for “-f”.";
 "ipptool: Missing name=value for \"-d\"." = "ipptool: Missing name=value for “-d”.";
 "ipptool: Missing seconds for \"-i\"." = "ipptool: Missing seconds for “-i”.";
@@ -1787,6 +1793,7 @@
 "lpadmin: Printer %s is already a member of class %s." = "lpadmin: Printer %s is already a member of class %s.";
 "lpadmin: Printer %s is not a member of class %s." = "lpadmin: Printer %s is not a member of class %s.";
 "lpadmin: Printer name can only contain printable characters." = "lpadmin: Printer name can only contain printable characters.";
+"lpadmin: System V interface scripts are no longer supported for security reasons." = "lpadmin: System V interface scripts are no longer supported for security reasons.";
 "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first." = "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";
 "lpadmin: Unable to create temporary file" = "lpadmin: Unable to create temporary file";
@@ -1917,6 +1924,7 @@
 "ppdmerge: Ignoring PPD file %s." = "ppdmerge: Ignoring PPD file %s.";
 "ppdmerge: Unable to backup %s to %s - %s" = "ppdmerge: Unable to backup %s to %s - %s";
 "printer %s disabled since %s -" = "printer %s disabled since %s -";
+"printer %s is holding new jobs.  enabled since %s" = "printer %s is holding new jobs.  enabled since %s";
 "printer %s is idle.  enabled since %s" = "printer %s is idle.  enabled since %s";
 "printer %s now printing %s-%d.  enabled since %s" = "printer %s now printing %s-%d.  enabled since %s";
 "printer %s/%s disabled since %s -" = "printer %s/%s disabled since %s -";
@@ -1935,6 +1943,7 @@
 "unknown" = "unknown";
 "untitled" = "untitled";
 "variable-bindings uses indefinite length" = "variable-bindings uses indefinite length";
+"~/.cups/lpoptions file names default destination that does not exist." = "~/.cups/lpoptions file names default destination that does not exist.";
 "accuracy-units" = "Accuracy Units";
 "accuracy-units.mm" = "Millimeters";
 "accuracy-units.nm" = "Nanometers";
@@ -2668,24 +2677,24 @@
 "media-size" = "Media Dimensions";
 "media-size-name" = "Media Name";
 "media-source" = "Media Source";
-"media-source.alternate" = "Alternate";
+"media-source.alternate" = "Alternate Tray";
 "media-source.alternate-roll" = "Alternate Roll";
-"media-source.auto" = "Automatic";
-"media-source.bottom" = "Bottom";
+"media-source.auto" = "Automatic Tray";
+"media-source.bottom" = "Bottom Tray";
 "media-source.by-pass-tray" = "By-pass Tray";
-"media-source.center" = "Center";
-"media-source.disc" = "Disc";
-"media-source.envelope" = "Envelope";
-"media-source.hagaki" = "Hagaki";
-"media-source.large-capacity" = "Large Capacity";
-"media-source.left" = "Left";
-"media-source.main" = "Main";
+"media-source.center" = "Center Tray";
+"media-source.disc" = "Disc Feed";
+"media-source.envelope" = "Envelope Feed";
+"media-source.hagaki" = "Hagaki Feed";
+"media-source.large-capacity" = "Large Capacity Tray";
+"media-source.left" = "Left Tray";
+"media-source.main" = "Main Tray";
 "media-source.main-roll" = "Main Roll";
-"media-source.manual" = "Manual";
-"media-source.middle" = "Middle";
-"media-source.photo" = "Photo";
-"media-source.rear" = "Rear";
-"media-source.right" = "Right";
+"media-source.manual" = "Manual Feed";
+"media-source.middle" = "Middle Tray";
+"media-source.photo" = "Photo Tray";
+"media-source.rear" = "Rear Tray";
+"media-source.right" = "Right Tray";
 "media-source.roll-1" = "Roll 1";
 "media-source.roll-10" = "Roll 10";
 "media-source.roll-2" = "Roll 2";
@@ -2738,6 +2747,19 @@
 "media-type.cardboard" = "Cardboard";
 "media-type.cardstock" = "Cardstock";
 "media-type.cd" = "CD";
+"media-type.com.hp.advanced-photo" = "Advanced Photo Paper";
+"media-type.com.hp.brochure-glossy" = "Glossy Brochure Paper";
+"media-type.com.hp.brochure-matte" = "Matte Brochure Paper";
+"media-type.com.hp.cover-matte" = "Matte Cover Paper";
+"media-type.com.hp.ecosmart-lite" = "Office Recycled Paper";
+"media-type.com.hp.everyday-glossy" = "Everyday Glossy Photo Paper";
+"media-type.com.hp.everyday-matte" = "Everyday Matte Paper";
+"media-type.com.hp.extra-heavy" = "Extra Heavyweight Paper";
+"media-type.com.hp.intermediate" = "Multipurpose Paper";
+"media-type.com.hp.mid-weight" = "Mid-Weight Paper";
+"media-type.com.hp.premium-inkjet" = "Premium Inkjet Paper";
+"media-type.com.hp.premium-photo" = "Premium Photo Glossy Paper";
+"media-type.com.hp.premium-presentation-matte" = "Premium Presentation Matte Paper";
 "media-type.continuous" = "Continuous";
 "media-type.continuous-long" = "Continuous Long";
 "media-type.continuous-short" = "Continuous Short";
@@ -2786,6 +2808,10 @@
 "media-type.gravure-cylinder" = "Gravure Cylinder";
 "media-type.image-setter-paper" = "Image Setter Paper";
 "media-type.imaging-cylinder" = "Imaging Cylinder";
+"media-type.jp.co.canon_photo-paper-plus-glossy-ii" = "Photo Paper Plus Glossy II";
+"media-type.jp.co.canon_photo-paper-pro-platinum" = "Photo Paper Pro Platinum";
+"media-type.jp.co.canon-photo-paper-plus-glossy-ii" = "Photo Paper Plus Glossy II";
+"media-type.jp.co.canon-photo-paper-pro-platinum" = "Photo Paper Pro Platinum";
 "media-type.labels" = "Labels";
 "media-type.labels-colored" = "Colored Labels";
 "media-type.labels-glossy" = "Glossy Labels";

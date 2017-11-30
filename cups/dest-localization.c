@@ -162,8 +162,10 @@ cupsLocalizeDestMedia(
   {
     DEBUG_printf(("1cupsLocalizeDestMedia: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", (void *)mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
 
-    lsource = cupsLocalizeDestValue(http, dest, dinfo, "media-source", mdb->source);
-    ltype   = cupsLocalizeDestValue(http, dest, dinfo, "media-type", mdb->type);
+    if ((lsource = cupsLocalizeDestValue(http, dest, dinfo, "media-source", mdb->source)) == mdb->source && mdb->source)
+      lsource = _cupsLangString(lang, _("Other Tray"));
+    if ((ltype = cupsLocalizeDestValue(http, dest, dinfo, "media-type", mdb->type)) == mdb->type && mdb->type)
+      ltype = _cupsLangString(lang, _("Other Media"));
   }
   else
   {

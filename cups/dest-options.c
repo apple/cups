@@ -1030,10 +1030,10 @@ cupsGetDestMediaByIndex(
     return (0);
   }
 
-  if (nsize->size_name)
-    strlcpy(size->media, nsize->size_name, sizeof(size->media));
-  else if (nsize->key)
+  if (nsize->key)
     strlcpy(size->media, nsize->key, sizeof(size->media));
+  else if (nsize->size_name)
+    strlcpy(size->media, nsize->size_name, sizeof(size->media));
   else if ((pwg = pwgMediaForSize(nsize->width, nsize->length)) != NULL)
     strlcpy(size->media, pwg->pwg, sizeof(size->media));
   else
@@ -1605,7 +1605,7 @@ cups_create_media_db(
   pwg_media_t		*pwg;		/* PWG media info */
   cups_array_t		*db;		/* New media database array */
   _cups_media_db_t	mdb;		/* Media entry */
-  char			media_key[255];	/* Synthesized media-key value */
+  char			media_key[256];	/* Synthesized media-key value */
 
 
   db = cupsArrayNew3((cups_array_func_t)cups_compare_media_db,
@@ -1706,70 +1706,91 @@ cups_create_media_db(
 	}
       }
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-color",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-color", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.color = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-info",
-                                         IPP_TAG_TEXT)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-info", IPP_TAG_TEXT)) != NULL)
         mdb.info = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-key",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-key", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.key = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-size-name",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-size-name", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.size_name = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-source",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-source", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.source = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-type",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-type", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.type = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-bottom-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-bottom-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.bottom = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-left-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-left-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.left = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-right-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-right-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.right = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-top-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-top-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.top = media_attr->values[0].integer;
 
       if (!mdb.key)
       {
-        if (flags & CUPS_MEDIA_FLAGS_READY)
-          snprintf(media_key, sizeof(media_key), "cups-media-ready-%d", i + 1);
-	else
-          snprintf(media_key, sizeof(media_key), "cups-media-%d", i + 1);
+        if (!mdb.size_name && (pwg = pwgMediaForSize(mdb.width, mdb.length)) != NULL)
+	  mdb.size_name = (char *)pwg->pwg;
+
+        if (!mdb.size_name)
+        {
+         /*
+          * Use a CUPS-specific identifier if we don't have a size name...
+          */
+
+	  if (flags & CUPS_MEDIA_FLAGS_READY)
+	    snprintf(media_key, sizeof(media_key), "cups-media-ready-%d", i + 1);
+	  else
+	    snprintf(media_key, sizeof(media_key), "cups-media-%d", i + 1);
+        }
+        else if (mdb.source)
+        {
+         /*
+          * Generate key using size name, source, and type (if set)...
+          */
+
+          if (mdb.type)
+            snprintf(media_key, sizeof(media_key), "%s_%s_%s", mdb.size_name, mdb.source, mdb.type);
+	  else
+            snprintf(media_key, sizeof(media_key), "%s_%s", mdb.size_name, mdb.source);
+        }
+        else if (mdb.type)
+        {
+         /*
+          * Generate key using size name and type...
+          */
+
+	  snprintf(media_key, sizeof(media_key), "%s_%s", mdb.size_name, mdb.type);
+        }
+        else
+        {
+         /*
+          * Key is just the size name...
+          */
+
+          strlcpy(media_key, mdb.size_name, sizeof(media_key));
+        }
+
+       /*
+        * Append "_borderless" for borderless media...
+        */
+
+        if (!mdb.bottom && !mdb.left && !mdb.right && !mdb.top)
+          strlcat(media_key, "_borderless", sizeof(media_key));
 
         mdb.key = media_key;
       }
+
+      DEBUG_printf(("1cups_create_media_db: Adding media: key=\"%s\", width=%d, length=%d, source=\"%s\", type=\"%s\".", mdb.key, mdb.width, mdb.length, mdb.source, mdb.type));
 
       cupsArrayAdd(db, &mdb);
     }
