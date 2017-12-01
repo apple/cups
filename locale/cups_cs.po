@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-11-30 11:38-0500\n"
+"POT-Creation-Date: 2017-12-01 17:00-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -1993,18 +1993,6 @@ msgstr "2"
 msgid "2 inches/sec."
 msgstr "2 palce/sek."
 
-msgid "2-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "2-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "2-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "2-Hole Punch (Reverse Portrait)"
-msgstr ""
-
 msgid "2-Sided Printing"
 msgstr "oboustranný tisk"
 
@@ -2119,18 +2107,6 @@ msgstr "3 palce/sek."
 msgid "3 x 5"
 msgstr ""
 
-msgid "3-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "3-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "3-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "3-Hole Punch (Reverse Portrait)"
-msgstr ""
-
 msgid "3.00x1.00\""
 msgstr "3.00x1.00\""
 
@@ -2196,18 +2172,6 @@ msgstr "4"
 
 msgid "4 inches/sec."
 msgstr "4 palce/sek."
-
-msgid "4-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "4-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "4-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "4-Hole Punch (Reverse Portrait)"
-msgstr ""
 
 msgid "4.00x1.00\""
 msgstr "4.00x1.00\""
@@ -2505,9 +2469,6 @@ msgstr "Příjem úloh"
 msgid "Accepted"
 msgstr "Přijatý"
 
-msgid "Accordian Fold"
-msgstr ""
-
 msgid "Add Class"
 msgstr "Přidat třídu"
 
@@ -2520,18 +2481,6 @@ msgstr "Adresa"
 msgid "Administration"
 msgstr "Administrace"
 
-msgid "Advanced Photo Paper"
-msgstr ""
-
-msgid "Alternate"
-msgstr ""
-
-msgid "Alternate Roll"
-msgstr ""
-
-msgid "Aluminum"
-msgstr ""
-
 msgid "Always"
 msgstr "Vždy"
 
@@ -2540,18 +2489,6 @@ msgstr "AppSocket/HP JetDirect"
 
 msgid "Applicator"
 msgstr "Aplikátor"
-
-msgid "Archival Envelope"
-msgstr ""
-
-msgid "Archival Fabric"
-msgstr ""
-
-msgid "Archival Paper"
-msgstr ""
-
-msgid "Archival Photo Paper"
-msgstr ""
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
@@ -2567,9 +2504,6 @@ msgstr ""
 
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
-msgstr ""
-
-msgid "Automatic"
 msgstr ""
 
 msgid "B0"
@@ -2607,9 +2541,6 @@ msgstr "B8"
 
 msgid "B9"
 msgstr "B9"
-
-msgid "Back Print Film"
-msgstr ""
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
@@ -2763,29 +2694,8 @@ msgstr ""
 msgid "Bad/empty URI"
 msgstr ""
 
-msgid "Bale"
-msgstr ""
-
 msgid "Banners"
 msgstr "Banery"
-
-msgid "Bind"
-msgstr ""
-
-msgid "Bind (Landscape)"
-msgstr ""
-
-msgid "Bind (Portrait)"
-msgstr ""
-
-msgid "Bind (Reverse Landscape)"
-msgstr ""
-
-msgid "Bind (Reverse Portrait)"
-msgstr ""
-
-msgid "Bond Envelope"
-msgstr ""
 
 msgid "Bond Paper"
 msgstr "Kancelářský papír"
@@ -2793,23 +2703,11 @@ msgstr "Kancelářský papír"
 msgid "Booklet"
 msgstr ""
 
-msgid "Booklet Maker"
-msgstr ""
-
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr ""
 
-msgid "Bottom"
-msgstr ""
-
-msgid "Bottom Tray"
-msgstr ""
-
 msgid "Buffer overflow detected, aborting."
-msgstr ""
-
-msgid "CD"
 msgstr ""
 
 msgid "CMYK"
@@ -2830,19 +2728,7 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
 
-msgid "Cardboard"
-msgstr ""
-
-msgid "Cardstock"
-msgstr ""
-
 msgid "Cassette"
-msgstr ""
-
-msgid "Center"
-msgstr ""
-
-msgid "Center Tray"
 msgstr ""
 
 msgid "Change Settings"
@@ -2861,23 +2747,11 @@ msgstr "Vyčištění tiskových hlav"
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr ""
 
-msgid "Coat"
-msgstr ""
-
-msgid "Coated Envelope"
-msgstr ""
-
-msgid "Coated Paper"
-msgstr ""
-
 msgid "Color"
 msgstr "Barva"
 
 msgid "Color Mode"
 msgstr "Barevný režim"
-
-msgid "Colored Labels"
-msgstr ""
 
 msgid ""
 "Commands may be abbreviated.  Commands are:\n"
@@ -2900,25 +2774,10 @@ msgstr "Pokračovat"
 msgid "Continuous"
 msgstr "Souvislý"
 
-msgid "Continuous Long"
-msgstr ""
-
-msgid "Continuous Short"
-msgstr ""
-
 msgid "Control file sent successfully."
 msgstr ""
 
 msgid "Copying print data."
-msgstr ""
-
-msgid "Cotton Envelope"
-msgstr ""
-
-msgid "Cotton Paper"
-msgstr ""
-
-msgid "Cover"
 msgstr ""
 
 msgid "Created"
@@ -2942,14 +2801,8 @@ msgstr "CustominTearInterval"
 msgid "Cut"
 msgstr "Snížit"
 
-msgid "Cut Media"
-msgstr ""
-
 msgid "Cutter"
 msgstr "Výstřižek"
-
-msgid "DVD"
-msgstr ""
 
 msgid "Dark"
 msgstr "Tmavý"
@@ -3012,35 +2865,11 @@ msgstr ""
 msgid "Disabled"
 msgstr "Zakázaný"
 
-msgid "Disc"
-msgstr ""
-
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr ""
 
-msgid "Double Gate Fold"
-msgstr ""
-
-msgid "Double Staple (Landscape)"
-msgstr ""
-
-msgid "Double Staple (Portrait)"
-msgstr ""
-
-msgid "Double Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Double Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Double Wall Cardboard"
-msgstr ""
-
 msgid "Draft"
-msgstr ""
-
-msgid "Dry Film"
 msgstr ""
 
 msgid "Duplexer"
@@ -3058,24 +2887,15 @@ msgstr "Tiskárna štítků EPL2"
 msgid "Edit Configuration File"
 msgstr "Úprava konfiguračního souboru"
 
-msgid "Embossing Foil"
-msgstr ""
-
 msgid "Empty PPD file."
 msgstr ""
 
 msgid "Encryption is not supported."
 msgstr ""
 
-msgid "End Board"
-msgstr ""
-
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "Ukončení baneru"
-
-msgid "Engineering Z Fold"
-msgstr ""
 
 msgid "English"
 msgstr "Čeština"
@@ -3088,9 +2908,6 @@ msgstr ""
 "Zadejte své uživatelské jméno a heslo, nebo uživatelské jméno a heslo "
 "administrátora pro přístup na tuto stránku. Pokud používáte ověřování "
 "Kerberos, ujistěte se, že máte platný ticket Kerberosu."
-
-msgid "Envelope"
-msgstr ""
 
 msgid "Envelope #10"
 msgstr ""
@@ -3305,12 +3122,6 @@ msgstr "Každých 9 štítků"
 msgid "Every Label"
 msgstr "Každý štítek"
 
-msgid "Everyday Glossy Photo Paper"
-msgstr ""
-
-msgid "Everyday Matte Paper"
-msgstr ""
-
 msgid "Executive"
 msgstr ""
 
@@ -3323,19 +3134,7 @@ msgstr "Export tiskáren do Samby"
 msgid "Expressions:"
 msgstr ""
 
-msgid "Extra Heavyweight Paper"
-msgstr ""
-
 msgid "FAIL"
-msgstr ""
-
-msgid "Fabric"
-msgstr ""
-
-msgid "Face Down"
-msgstr ""
-
-msgid "Face Up"
 msgstr ""
 
 msgid "Fast Grayscale"
@@ -3370,29 +3169,11 @@ msgid ""
 "in \"%s/cups-files.conf\"."
 msgstr ""
 
-msgid "Film"
-msgstr ""
-
-msgid "Fine Envelope"
-msgstr ""
-
 #, c-format
 msgid "Finished page %d."
 msgstr ""
 
 msgid "Finishing Preset"
-msgstr ""
-
-msgid "Flexo Base"
-msgstr ""
-
-msgid "Flexo Photo Polymer"
-msgstr ""
-
-msgid "Flute"
-msgstr ""
-
-msgid "Foil"
 msgstr ""
 
 msgid "Fold"
@@ -3404,12 +3185,6 @@ msgstr "Fólie"
 msgid "Forbidden"
 msgstr "Zakázaný"
 
-msgid "Full Cut Tabs"
-msgstr ""
-
-msgid "Gate Fold"
-msgstr ""
-
 msgid "General"
 msgstr "Obecný"
 
@@ -3419,43 +3194,10 @@ msgstr "Obecný"
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "\"Get-Response-PDU\" má neomezenou délku"
 
-msgid "Glass"
-msgstr ""
-
-msgid "Glass Colored"
-msgstr ""
-
-msgid "Glass Opaque"
-msgstr ""
-
-msgid "Glass Surfaced"
-msgstr ""
-
-msgid "Glass Textured"
-msgstr ""
-
-msgid "Glossy Brochure Paper"
-msgstr ""
-
-msgid "Glossy Fabric"
-msgstr ""
-
-msgid "Glossy Labels"
-msgstr ""
-
-msgid "Glossy Optical Disc"
-msgstr ""
-
 msgid "Glossy Paper"
 msgstr "Lesklý papír"
 
-msgid "Glossy Photo Paper"
-msgstr ""
-
 msgid "Got a printer-uri attribute but no job-id."
-msgstr ""
-
-msgid "Gravure Cylinder"
 msgstr ""
 
 msgid "Grayscale"
@@ -3464,46 +3206,16 @@ msgstr "Stupně šedi"
 msgid "HP"
 msgstr "HP"
 
-msgid "Hagaki"
-msgstr ""
-
-msgid "Half Fold"
-msgstr ""
-
-msgid "Half Z Fold"
-msgstr ""
-
 msgid "Hanging Folder"
 msgstr "Závěsná složka"
 
 msgid "Hash buffer too small."
 msgstr ""
 
-msgid "Heavyweight Coated Paper"
-msgstr ""
-
-msgid "Heavyweight Envelope"
-msgstr ""
-
-msgid "Heavyweight Paper"
-msgstr ""
-
 msgid "Help file not in index."
 msgstr ""
 
 msgid "High"
-msgstr ""
-
-msgid "High Gloss Fabric"
-msgstr ""
-
-msgid "High Gloss Labels"
-msgstr ""
-
-msgid "High Gloss Optical Disc"
-msgstr ""
-
-msgid "High Gloss Photo Paper"
 msgstr ""
 
 msgid "IPP 1setOf attribute with incompatible value tags."
@@ -3592,21 +3304,6 @@ msgstr "Neplatný překlad řetězce"
 
 msgid "Illegal whitespace character"
 msgstr "Nedovolený prázdný znak"
-
-msgid "Image Setter Paper"
-msgstr ""
-
-msgid "Imaging Cylinder"
-msgstr ""
-
-msgid "Inkjet Envelope"
-msgstr ""
-
-msgid "Inkjet Labels"
-msgstr ""
-
-msgid "Inkjet Paper"
-msgstr ""
 
 msgid "Installable Options"
 msgstr "Možnosti instalace"
@@ -3756,9 +3453,6 @@ msgstr ""
 msgid "Jobs"
 msgstr "Úlohy"
 
-msgid "Jog"
-msgstr ""
-
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR hostitel nebo tiskárna"
 
@@ -3772,15 +3466,6 @@ msgstr "Tiskárna štítků"
 msgid "Label Top"
 msgstr "Horní štítek"
 
-msgid "Labels"
-msgstr ""
-
-msgid "Laminate"
-msgstr ""
-
-msgid "Laminating Foil"
-msgstr ""
-
 #, c-format
 msgid "Language \"%s\" not supported."
 msgstr ""
@@ -3788,26 +3473,8 @@ msgstr ""
 msgid "Large Address"
 msgstr "Plná adresa"
 
-msgid "Large Capacity"
-msgstr ""
-
-msgid "Large Capacity Tray"
-msgstr ""
-
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet Serie PCL 4/5"
-
-msgid "Left"
-msgstr ""
-
-msgid "Left Gate Fold"
-msgstr ""
-
-msgid "Left Tray"
-msgstr ""
-
-msgid "Letter Fold"
-msgstr ""
 
 msgid "Letter Oversize"
 msgstr ""
@@ -3815,17 +3482,8 @@ msgstr ""
 msgid "Letter Oversize Long Edge"
 msgstr ""
 
-msgid "Letterhead"
-msgstr ""
-
 msgid "Light"
 msgstr "Světlý"
-
-msgid "Lightweight Envelope"
-msgstr ""
-
-msgid "Lightweight Paper"
-msgstr ""
 
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "Řádek je delší než maximální povolená velikost (255 znaků)"
@@ -3845,65 +3503,8 @@ msgstr "Delší okraj (na výšku)"
 msgid "Looking for printer."
 msgstr ""
 
-msgid "Mailbox 1"
-msgstr ""
-
-msgid "Mailbox 10"
-msgstr ""
-
-msgid "Mailbox 2"
-msgstr ""
-
-msgid "Mailbox 3"
-msgstr ""
-
-msgid "Mailbox 4"
-msgstr ""
-
-msgid "Mailbox 5"
-msgstr ""
-
-msgid "Mailbox 6"
-msgstr ""
-
-msgid "Mailbox 7"
-msgstr ""
-
-msgid "Mailbox 8"
-msgstr ""
-
-msgid "Mailbox 9"
-msgstr ""
-
-msgid "Main"
-msgstr ""
-
-msgid "Main Roll"
-msgstr ""
-
-msgid "Manual"
-msgstr ""
-
 msgid "Manual Feed"
 msgstr "Ruční podávání"
-
-msgid "Matte Brochure Paper"
-msgstr ""
-
-msgid "Matte Cover Paper"
-msgstr ""
-
-msgid "Matte Fabric"
-msgstr ""
-
-msgid "Matte Labels"
-msgstr ""
-
-msgid "Matte Optical Disc"
-msgstr ""
-
-msgid "Matte Photo Paper"
-msgstr ""
 
 msgid "Media Size"
 msgstr "Velikost média"
@@ -3922,30 +3523,6 @@ msgstr "Střední"
 
 msgid "Memory allocation error"
 msgstr "Chyba přidělení paměti"
-
-msgid "Metal"
-msgstr ""
-
-msgid "Metal Glossy"
-msgstr ""
-
-msgid "Metal High Gloss"
-msgstr ""
-
-msgid "Metal Matte"
-msgstr ""
-
-msgid "Metal Satin"
-msgstr ""
-
-msgid "Metal Semi Gloss"
-msgstr ""
-
-msgid "Mid-Weight Paper"
-msgstr ""
-
-msgid "Middle"
-msgstr ""
 
 msgid "Missing CloseGroup"
 msgstr ""
@@ -4027,9 +3604,6 @@ msgstr "Úprava třídy"
 msgid "Modify Printer"
 msgstr "Úprava tiskárny"
 
-msgid "Mounting Tape"
-msgstr ""
-
 msgid "Move All Jobs"
 msgstr "Přesun všech úloh"
 
@@ -4038,33 +3612,6 @@ msgstr "Přesun úlohy"
 
 msgid "Moved Permanently"
 msgstr "Trvale přesunuto"
-
-msgid "Multi Layer"
-msgstr ""
-
-msgid "Multi Part Form"
-msgstr ""
-
-msgid "Multi-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Reverse Portrait)"
-msgstr ""
-
-msgid "Multipurpose"
-msgstr ""
-
-msgid "Multipurpose Paper"
-msgstr ""
-
-msgid "My Mailbox"
-msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Prázdný ukazatel PPD souboru"
@@ -4237,9 +3784,6 @@ msgstr "OK"
 msgid "Off (1-Sided)"
 msgstr "Vypnuto (jednostranný)"
 
-msgid "Office Recycled Paper"
-msgstr ""
-
 msgid "Oki"
 msgstr "Oki"
 
@@ -4262,9 +3806,6 @@ msgstr "OpenUI/JCLOpenUI nepředcházelo CloseUI/JCLCloseUI"
 msgid "Operation Policy"
 msgstr "Způsob ověření"
 
-msgid "Optical Disc"
-msgstr ""
-
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
 msgstr ""
@@ -4273,9 +3814,6 @@ msgid "Options Installed"
 msgstr "Instalované možnosti"
 
 msgid "Options:"
-msgstr ""
-
-msgid "Other"
 msgstr ""
 
 msgid "Other Media"
@@ -4336,9 +3874,6 @@ msgstr "Packet neobsahuje \"Get-Response-PDU\""
 msgid "Packet does not start with SEQUENCE"
 msgstr "Paket nezačíná SEQUENCÍ"
 
-msgid "Paper"
-msgstr ""
-
 msgid "Paper jam."
 msgstr ""
 
@@ -4349,9 +3884,6 @@ msgid "Paper tray is empty."
 msgstr ""
 
 msgid "Paper tray is missing."
-msgstr ""
-
-msgid "Parallel Fold"
 msgstr ""
 
 msgid "ParamCustominCutInterval"
@@ -4377,65 +3909,17 @@ msgstr "Pozastavení tiskárny"
 msgid "Peel-Off"
 msgstr "Peel-Off"
 
-msgid "Permanent Labels"
-msgstr ""
-
 msgid "Photo"
 msgstr "Fotografie"
-
-msgid "Photo Film"
-msgstr ""
 
 msgid "Photo Labels"
 msgstr "Foto-samolepky"
 
-msgid "Photo Paper"
-msgstr ""
-
-msgid "Photo Paper Plus Glossy II"
-msgstr ""
-
-msgid "Photo Paper Pro Platinum"
-msgstr ""
-
-msgid "Plain Envelope"
-msgstr ""
-
 msgid "Plain Paper"
 msgstr "Obyčejný papír"
 
-msgid "Plastic"
-msgstr ""
-
-msgid "Plastic Archival"
-msgstr ""
-
-msgid "Plastic Colored"
-msgstr ""
-
-msgid "Plastic Glossy"
-msgstr ""
-
-msgid "Plastic High Gloss"
-msgstr ""
-
-msgid "Plastic Matte"
-msgstr ""
-
-msgid "Plastic Satin"
-msgstr ""
-
-msgid "Plastic Semi Gloss"
-msgstr ""
-
-msgid "Plate"
-msgstr ""
-
 msgid "Policies"
 msgstr "Pravidla"
-
-msgid "Polyester"
-msgstr ""
 
 msgid "Port Monitor"
 msgstr "Monitorování portu"
@@ -4455,28 +3939,7 @@ msgstr ""
 msgid "Postcard Long Edge"
 msgstr ""
 
-msgid "Poster Fold"
-msgstr ""
-
-msgid "Pre Cut Tabs"
-msgstr ""
-
-msgid "Premium Inkjet Paper"
-msgstr ""
-
-msgid "Premium Photo Glossy Paper"
-msgstr ""
-
-msgid "Premium Presentation Matte Paper"
-msgstr ""
-
 msgid "Preparing to print."
-msgstr ""
-
-msgid "Preprinted Envelope"
-msgstr ""
-
-msgid "Preprinted Paper"
 msgstr ""
 
 msgid "Print Density"
@@ -4565,9 +4028,6 @@ msgstr ""
 msgid "Punch"
 msgstr ""
 
-msgid "Punched Paper"
-msgstr ""
-
 msgid "Quarto"
 msgstr "Quarto"
 
@@ -4575,12 +4035,6 @@ msgid "Quota limit reached."
 msgstr "Kvóta byla překročena."
 
 msgid "Rank    Owner   Job     File(s)                         Total Size"
-msgstr ""
-
-msgid "Rear"
-msgstr ""
-
-msgid "Rear Tray"
 msgstr ""
 
 msgid "Reject Jobs"
@@ -4615,48 +4069,6 @@ msgstr "Návrat adresy"
 msgid "Rewind"
 msgstr "Přetočit"
 
-msgid "Right"
-msgstr ""
-
-msgid "Right Gate Fold"
-msgstr ""
-
-msgid "Right Tray"
-msgstr ""
-
-msgid "Roll"
-msgstr ""
-
-msgid "Roll 1"
-msgstr ""
-
-msgid "Roll 10"
-msgstr ""
-
-msgid "Roll 2"
-msgstr ""
-
-msgid "Roll 3"
-msgstr ""
-
-msgid "Roll 4"
-msgstr ""
-
-msgid "Roll 5"
-msgstr ""
-
-msgid "Roll 6"
-msgstr ""
-
-msgid "Roll 7"
-msgstr ""
-
-msgid "Roll 8"
-msgstr ""
-
-msgid "Roll 9"
-msgstr ""
-
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr ""
@@ -4667,52 +4079,13 @@ msgstr "\"SEQUENCE\" má neomezenou délku"
 msgid "SSL/TLS Negotiation Error"
 msgstr ""
 
-msgid "Saddle Stitch"
-msgstr ""
-
-msgid "Satin Labels"
-msgstr ""
-
-msgid "Satin Optical Disc"
-msgstr ""
-
-msgid "Satin Photo Paper"
-msgstr ""
-
-msgid "Screen"
-msgstr ""
-
-msgid "Screen Paged"
-msgstr ""
-
-msgid "Security Labels"
-msgstr ""
-
 msgid "See Other"
 msgstr "Viz další"
 
 msgid "See remote printer."
 msgstr ""
 
-msgid "Self Adhesive"
-msgstr ""
-
-msgid "Self Adhesive Film"
-msgstr ""
-
 msgid "Self-signed credentials are blocked."
-msgstr ""
-
-msgid "Semi-Gloss Fabric"
-msgstr ""
-
-msgid "Semi-Gloss Labels"
-msgstr ""
-
-msgid "Semi-Gloss Optical Disc"
-msgstr ""
-
-msgid "Semi-Gloss Photo Paper"
 msgstr ""
 
 msgid "Sending data to printer."
@@ -4757,48 +4130,6 @@ msgstr "Doručovací adresa"
 msgid "Short-Edge (Landscape)"
 msgstr "Kratší okraj (na šířku)"
 
-msgid "Shrink Foil"
-msgstr ""
-
-msgid "Side"
-msgstr ""
-
-msgid "Side Tray"
-msgstr ""
-
-msgid "Single Face"
-msgstr ""
-
-msgid "Single Punch (Landscape)"
-msgstr ""
-
-msgid "Single Punch (Portrait)"
-msgstr ""
-
-msgid "Single Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "Single Punch (Reverse Portrait)"
-msgstr ""
-
-msgid "Single Staple (Landscape)"
-msgstr ""
-
-msgid "Single Staple (Portrait)"
-msgstr ""
-
-msgid "Single Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Single Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Single Wall Cardboard"
-msgstr ""
-
-msgid "Sleeve"
-msgstr ""
-
 msgid "Special Paper"
 msgstr "Speciální papír"
 
@@ -4806,55 +4137,10 @@ msgstr "Speciální papír"
 msgid "Spooling job, %.0f%% complete."
 msgstr ""
 
-msgid "Stacker 1"
-msgstr ""
-
-msgid "Stacker 10"
-msgstr ""
-
-msgid "Stacker 2"
-msgstr ""
-
-msgid "Stacker 3"
-msgstr ""
-
-msgid "Stacker 4"
-msgstr ""
-
-msgid "Stacker 5"
-msgstr ""
-
-msgid "Stacker 6"
-msgstr ""
-
-msgid "Stacker 7"
-msgstr ""
-
-msgid "Stacker 8"
-msgstr ""
-
-msgid "Stacker 9"
-msgstr ""
-
 msgid "Standard"
 msgstr "Standardní"
 
 msgid "Staple"
-msgstr ""
-
-msgid "Staple Edge"
-msgstr ""
-
-msgid "Staple Edge (Landscape)"
-msgstr ""
-
-msgid "Staple Edge (Portrait)"
-msgstr ""
-
-msgid "Staple Edge (Reverse Landscape)"
-msgstr ""
-
-msgid "Staple Edge (Reverse Portrait)"
 msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
@@ -4886,9 +4172,6 @@ msgstr "Super B/A3"
 
 msgid "Switching Protocols"
 msgstr "Protokol výměny"
-
-msgid "Tab Stock"
-msgstr ""
 
 msgid "Tabloid"
 msgstr "Tabloid"
@@ -5084,18 +4367,6 @@ msgstr ""
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr ""
 
-msgid "Top"
-msgstr ""
-
-msgid "Top Tray"
-msgstr ""
-
-msgid "Tractor"
-msgstr ""
-
-msgid "Transfer"
-msgstr ""
-
 msgid "Transparency"
 msgstr "Průhlednost"
 
@@ -5105,77 +4376,14 @@ msgstr "Podavač"
 msgid "Tray 1"
 msgstr "Podavač 1"
 
-msgid "Tray 10"
-msgstr ""
-
-msgid "Tray 11"
-msgstr ""
-
-msgid "Tray 12"
-msgstr ""
-
-msgid "Tray 13"
-msgstr ""
-
-msgid "Tray 14"
-msgstr ""
-
-msgid "Tray 15"
-msgstr ""
-
-msgid "Tray 16"
-msgstr ""
-
-msgid "Tray 17"
-msgstr ""
-
-msgid "Tray 18"
-msgstr ""
-
-msgid "Tray 19"
-msgstr ""
-
 msgid "Tray 2"
 msgstr "Podavač 2"
-
-msgid "Tray 20"
-msgstr ""
 
 msgid "Tray 3"
 msgstr "Podavač 3"
 
 msgid "Tray 4"
 msgstr "Podavač 4"
-
-msgid "Tray 5"
-msgstr ""
-
-msgid "Tray 6"
-msgstr ""
-
-msgid "Tray 7"
-msgstr ""
-
-msgid "Tray 8"
-msgstr ""
-
-msgid "Tray 9"
-msgstr ""
-
-msgid "Triple Staple (Landscape)"
-msgstr ""
-
-msgid "Triple Staple (Portrait)"
-msgstr ""
-
-msgid "Triple Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Triple Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Triple Wall Cardboard"
-msgstr ""
 
 msgid "Trust on first use is disabled."
 msgstr ""
@@ -5698,9 +4906,6 @@ msgstr "Hodnota má neomezenou délku"
 msgid "VarBind uses indefinite length"
 msgstr "VarBind má neomezenou délku"
 
-msgid "Vellum Paper"
-msgstr ""
-
 msgid "Version uses indefinite length"
 msgstr "Version má neomezenou délku"
 
@@ -5716,16 +4921,7 @@ msgstr ""
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr ""
 
-msgid "Waterproof Fabric"
-msgstr ""
-
 msgid "Web Interface is Disabled"
-msgstr ""
-
-msgid "Wet Film"
-msgstr ""
-
-msgid "Windowed Envelope"
 msgstr ""
 
 msgid "Yes"
@@ -5738,9 +4934,6 @@ msgid ""
 msgstr ""
 "Pro přístup k této stránce, použijte adresu URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
-
-msgid "Z Fold"
-msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Tiskárna štítků ZPL"

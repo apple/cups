@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-11-30 11:38-0500\n"
+"POT-Creation-Date: 2017-12-01 17:00-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -2179,18 +2179,6 @@ msgstr "2"
 msgid "2 inches/sec."
 msgstr "2 インチ/秒"
 
-msgid "2-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "2-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "2-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "2-Hole Punch (Reverse Portrait)"
-msgstr ""
-
 msgid "2-Sided Printing"
 msgstr "両面印刷"
 
@@ -2305,18 +2293,6 @@ msgstr "3 インチ/秒"
 msgid "3 x 5"
 msgstr "3 x 5"
 
-msgid "3-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "3-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "3-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "3-Hole Punch (Reverse Portrait)"
-msgstr ""
-
 msgid "3.00x1.00\""
 msgstr "3.00x1.00 インチ"
 
@@ -2382,18 +2358,6 @@ msgstr "4"
 
 msgid "4 inches/sec."
 msgstr "4 インチ/秒"
-
-msgid "4-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "4-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "4-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "4-Hole Punch (Reverse Portrait)"
-msgstr ""
 
 msgid "4.00x1.00\""
 msgstr "4.00x1.00 インチ"
@@ -2693,9 +2657,6 @@ msgstr "ジョブの受け付け"
 msgid "Accepted"
 msgstr "受け付けました"
 
-msgid "Accordian Fold"
-msgstr ""
-
 msgid "Add Class"
 msgstr "クラスの追加"
 
@@ -2708,18 +2669,6 @@ msgstr "アドレス"
 msgid "Administration"
 msgstr "管理"
 
-msgid "Advanced Photo Paper"
-msgstr ""
-
-msgid "Alternate"
-msgstr ""
-
-msgid "Alternate Roll"
-msgstr ""
-
-msgid "Aluminum"
-msgstr ""
-
 msgid "Always"
 msgstr "常に有効"
 
@@ -2728,18 +2677,6 @@ msgstr "AppSocket/HP JetDirect"
 
 msgid "Applicator"
 msgstr "アプリケーター"
-
-msgid "Archival Envelope"
-msgstr ""
-
-msgid "Archival Fabric"
-msgstr ""
-
-msgid "Archival Paper"
-msgstr ""
-
-msgid "Archival Photo Paper"
-msgstr ""
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
@@ -2756,9 +2693,6 @@ msgstr ""
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "属性グループは範囲外です (%x < %x)。"
-
-msgid "Automatic"
-msgstr ""
 
 msgid "B0"
 msgstr "B0"
@@ -2795,9 +2729,6 @@ msgstr "B8"
 
 msgid "B9"
 msgstr "B9"
-
-msgid "Back Print Film"
-msgstr ""
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
@@ -2951,29 +2882,8 @@ msgstr "値文字列がありません"
 msgid "Bad/empty URI"
 msgstr "URI が不正か空"
 
-msgid "Bale"
-msgstr ""
-
 msgid "Banners"
 msgstr "バナー"
-
-msgid "Bind"
-msgstr ""
-
-msgid "Bind (Landscape)"
-msgstr ""
-
-msgid "Bind (Portrait)"
-msgstr ""
-
-msgid "Bind (Reverse Landscape)"
-msgstr ""
-
-msgid "Bind (Reverse Portrait)"
-msgstr ""
-
-msgid "Bond Envelope"
-msgstr ""
 
 msgid "Bond Paper"
 msgstr "ボンド紙"
@@ -2981,24 +2891,12 @@ msgstr "ボンド紙"
 msgid "Booklet"
 msgstr ""
 
-msgid "Booklet Maker"
-msgstr ""
-
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr "論理値は、waiteof オプション \"%s\" であるべきです"
 
-msgid "Bottom"
-msgstr ""
-
-msgid "Bottom Tray"
-msgstr ""
-
 msgid "Buffer overflow detected, aborting."
 msgstr "オーバーフローが検出され、中断しました。"
-
-msgid "CD"
-msgstr ""
 
 msgid "CMYK"
 msgstr "CMYK"
@@ -3018,20 +2916,8 @@ msgstr ""
 msgid "Cannot share a remote Kerberized printer."
 msgstr "リモートの Kerberos 認証のプリンターを共有できません。"
 
-msgid "Cardboard"
-msgstr ""
-
-msgid "Cardstock"
-msgstr ""
-
 msgid "Cassette"
 msgstr "カセット"
-
-msgid "Center"
-msgstr ""
-
-msgid "Center Tray"
-msgstr ""
 
 msgid "Change Settings"
 msgstr "設定の変更"
@@ -3049,23 +2935,11 @@ msgstr "プリントヘッドクリーニング"
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr "Close-Job は job-uri 属性をサポートしていません。"
 
-msgid "Coat"
-msgstr ""
-
-msgid "Coated Envelope"
-msgstr ""
-
-msgid "Coated Paper"
-msgstr ""
-
 msgid "Color"
 msgstr "カラー"
 
 msgid "Color Mode"
 msgstr "カラーモード"
-
-msgid "Colored Labels"
-msgstr ""
 
 msgid ""
 "Commands may be abbreviated.  Commands are:\n"
@@ -3091,26 +2965,11 @@ msgstr "継続"
 msgid "Continuous"
 msgstr "連続"
 
-msgid "Continuous Long"
-msgstr ""
-
-msgid "Continuous Short"
-msgstr ""
-
 msgid "Control file sent successfully."
 msgstr "コントロールファイルが正常に送信されました。"
 
 msgid "Copying print data."
 msgstr "印刷データをコピーしています。"
-
-msgid "Cotton Envelope"
-msgstr ""
-
-msgid "Cotton Paper"
-msgstr ""
-
-msgid "Cover"
-msgstr ""
 
 msgid "Created"
 msgstr "ジョブ作成"
@@ -3133,14 +2992,8 @@ msgstr "CustominTearInterval"
 msgid "Cut"
 msgstr "カット"
 
-msgid "Cut Media"
-msgstr ""
-
 msgid "Cutter"
 msgstr "カッター"
-
-msgid "DVD"
-msgstr ""
 
 msgid "Dark"
 msgstr "濃い"
@@ -3212,35 +3065,11 @@ msgstr ""
 msgid "Disabled"
 msgstr "無効"
 
-msgid "Disc"
-msgstr ""
-
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr "ドキュメント #%d がジョブ #%d に見つかりません。"
 
-msgid "Double Gate Fold"
-msgstr ""
-
-msgid "Double Staple (Landscape)"
-msgstr ""
-
-msgid "Double Staple (Portrait)"
-msgstr ""
-
-msgid "Double Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Double Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Double Wall Cardboard"
-msgstr ""
-
 msgid "Draft"
-msgstr ""
-
-msgid "Dry Film"
 msgstr ""
 
 msgid "Duplexer"
@@ -3258,24 +3087,15 @@ msgstr "EPL2 ラベルプリンター"
 msgid "Edit Configuration File"
 msgstr "設定ファイルの編集"
 
-msgid "Embossing Foil"
-msgstr ""
-
 msgid "Empty PPD file."
 msgstr "PPD ファイルが空です。"
 
 msgid "Encryption is not supported."
 msgstr "暗号化はサポートされていません。"
 
-msgid "End Board"
-msgstr ""
-
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "終了バナー"
-
-msgid "Engineering Z Fold"
-msgstr ""
 
 msgid "English"
 msgstr "English"
@@ -3288,9 +3108,6 @@ msgstr ""
 "このページにアクセスするために、あなたのユーザー名とパスワード、あるいは "
 "root のユーザー名とパスワードを入力してください。Kerberos 認証を使用している"
 "場合、有効な Kerberos チケットがあることを確認してください。"
-
-msgid "Envelope"
-msgstr ""
 
 msgid "Envelope #10"
 msgstr ""
@@ -3505,12 +3322,6 @@ msgstr "9 ラベルごと"
 msgid "Every Label"
 msgstr "すべてのラベル"
 
-msgid "Everyday Glossy Photo Paper"
-msgstr ""
-
-msgid "Everyday Matte Paper"
-msgstr ""
-
 msgid "Executive"
 msgstr "エグゼクティブ"
 
@@ -3523,20 +3334,8 @@ msgstr "Samba へプリンターをエクスポート"
 msgid "Expressions:"
 msgstr "式:"
 
-msgid "Extra Heavyweight Paper"
-msgstr ""
-
 msgid "FAIL"
 msgstr "失敗"
-
-msgid "Fabric"
-msgstr ""
-
-msgid "Face Down"
-msgstr ""
-
-msgid "Face Up"
-msgstr ""
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -3574,29 +3373,11 @@ msgstr ""
 "ファイルデバイス URI は無効になっています。有効にするには、\"%s/cups-files."
 "conf\" の FileDevice ディレクティブを参照してください。"
 
-msgid "Film"
-msgstr ""
-
-msgid "Fine Envelope"
-msgstr ""
-
 #, c-format
 msgid "Finished page %d."
 msgstr "ページ %d を終了。"
 
 msgid "Finishing Preset"
-msgstr ""
-
-msgid "Flexo Base"
-msgstr ""
-
-msgid "Flexo Photo Polymer"
-msgstr ""
-
-msgid "Flute"
-msgstr ""
-
-msgid "Foil"
 msgstr ""
 
 msgid "Fold"
@@ -3608,12 +3389,6 @@ msgstr "フォリオ"
 msgid "Forbidden"
 msgstr "Forbidden"
 
-msgid "Full Cut Tabs"
-msgstr ""
-
-msgid "Gate Fold"
-msgstr ""
-
 msgid "General"
 msgstr "一般"
 
@@ -3623,44 +3398,11 @@ msgstr "汎用"
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "Get-Response-PDU は不確定の長さを使用しています"
 
-msgid "Glass"
-msgstr ""
-
-msgid "Glass Colored"
-msgstr ""
-
-msgid "Glass Opaque"
-msgstr ""
-
-msgid "Glass Surfaced"
-msgstr ""
-
-msgid "Glass Textured"
-msgstr ""
-
-msgid "Glossy Brochure Paper"
-msgstr ""
-
-msgid "Glossy Fabric"
-msgstr ""
-
-msgid "Glossy Labels"
-msgstr ""
-
-msgid "Glossy Optical Disc"
-msgstr ""
-
 msgid "Glossy Paper"
 msgstr "光沢紙"
 
-msgid "Glossy Photo Paper"
-msgstr ""
-
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "printer-uri 属性を取得しましたが、job-id を取得できませんでした。"
-
-msgid "Gravure Cylinder"
-msgstr ""
 
 msgid "Grayscale"
 msgstr "グレースケール"
@@ -3668,46 +3410,16 @@ msgstr "グレースケール"
 msgid "HP"
 msgstr "HP"
 
-msgid "Hagaki"
-msgstr ""
-
-msgid "Half Fold"
-msgstr ""
-
-msgid "Half Z Fold"
-msgstr ""
-
 msgid "Hanging Folder"
 msgstr "Hanging Folder"
 
 msgid "Hash buffer too small."
 msgstr ""
 
-msgid "Heavyweight Coated Paper"
-msgstr ""
-
-msgid "Heavyweight Envelope"
-msgstr ""
-
-msgid "Heavyweight Paper"
-msgstr ""
-
 msgid "Help file not in index."
 msgstr "ヘルプファイルが索引に含まれていません。"
 
 msgid "High"
-msgstr ""
-
-msgid "High Gloss Fabric"
-msgstr ""
-
-msgid "High Gloss Labels"
-msgstr ""
-
-msgid "High Gloss Optical Disc"
-msgstr ""
-
-msgid "High Gloss Photo Paper"
 msgstr ""
 
 msgid "IPP 1setOf attribute with incompatible value tags."
@@ -3796,21 +3508,6 @@ msgstr "不正な翻訳文字列"
 
 msgid "Illegal whitespace character"
 msgstr "不正な空白文字"
-
-msgid "Image Setter Paper"
-msgstr ""
-
-msgid "Imaging Cylinder"
-msgstr ""
-
-msgid "Inkjet Envelope"
-msgstr ""
-
-msgid "Inkjet Labels"
-msgstr ""
-
-msgid "Inkjet Paper"
-msgstr ""
 
 msgid "Installable Options"
 msgstr "インストール可能オプション"
@@ -3960,9 +3657,6 @@ msgstr "ジョブサブスクリプションを更新できません。"
 msgid "Jobs"
 msgstr "ジョブ"
 
-msgid "Jog"
-msgstr ""
-
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR ホストまたはプリンター"
 
@@ -3976,15 +3670,6 @@ msgstr "ラベルプリンター"
 msgid "Label Top"
 msgstr "ラベルトップ"
 
-msgid "Labels"
-msgstr ""
-
-msgid "Laminate"
-msgstr ""
-
-msgid "Laminating Foil"
-msgstr ""
-
 #, c-format
 msgid "Language \"%s\" not supported."
 msgstr "言語 \"%s\" はサポートされていません。"
@@ -3992,26 +3677,8 @@ msgstr "言語 \"%s\" はサポートされていません。"
 msgid "Large Address"
 msgstr "ラージアドレス"
 
-msgid "Large Capacity"
-msgstr ""
-
-msgid "Large Capacity Tray"
-msgstr ""
-
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet Series PCL 4/5"
-
-msgid "Left"
-msgstr ""
-
-msgid "Left Gate Fold"
-msgstr ""
-
-msgid "Left Tray"
-msgstr ""
-
-msgid "Letter Fold"
-msgstr ""
 
 msgid "Letter Oversize"
 msgstr "US レター (特大)"
@@ -4019,17 +3686,8 @@ msgstr "US レター (特大)"
 msgid "Letter Oversize Long Edge"
 msgstr "US レター (特大) 長辺送り"
 
-msgid "Letterhead"
-msgstr ""
-
 msgid "Light"
 msgstr "薄い"
-
-msgid "Lightweight Envelope"
-msgstr ""
-
-msgid "Lightweight Paper"
-msgstr ""
 
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "1 行が最大値 (255 文字) を超えています"
@@ -4049,65 +3707,8 @@ msgstr "長辺給紙 (縦向き)"
 msgid "Looking for printer."
 msgstr "プリンターを探しています。"
 
-msgid "Mailbox 1"
-msgstr ""
-
-msgid "Mailbox 10"
-msgstr ""
-
-msgid "Mailbox 2"
-msgstr ""
-
-msgid "Mailbox 3"
-msgstr ""
-
-msgid "Mailbox 4"
-msgstr ""
-
-msgid "Mailbox 5"
-msgstr ""
-
-msgid "Mailbox 6"
-msgstr ""
-
-msgid "Mailbox 7"
-msgstr ""
-
-msgid "Mailbox 8"
-msgstr ""
-
-msgid "Mailbox 9"
-msgstr ""
-
-msgid "Main"
-msgstr ""
-
-msgid "Main Roll"
-msgstr ""
-
-msgid "Manual"
-msgstr ""
-
 msgid "Manual Feed"
 msgstr "手差し"
-
-msgid "Matte Brochure Paper"
-msgstr ""
-
-msgid "Matte Cover Paper"
-msgstr ""
-
-msgid "Matte Fabric"
-msgstr ""
-
-msgid "Matte Labels"
-msgstr ""
-
-msgid "Matte Optical Disc"
-msgstr ""
-
-msgid "Matte Photo Paper"
-msgstr ""
 
 msgid "Media Size"
 msgstr "用紙サイズ"
@@ -4126,30 +3727,6 @@ msgstr "紙質"
 
 msgid "Memory allocation error"
 msgstr "メモリー割り当てエラー"
-
-msgid "Metal"
-msgstr ""
-
-msgid "Metal Glossy"
-msgstr ""
-
-msgid "Metal High Gloss"
-msgstr ""
-
-msgid "Metal Matte"
-msgstr ""
-
-msgid "Metal Satin"
-msgstr ""
-
-msgid "Metal Semi Gloss"
-msgstr ""
-
-msgid "Mid-Weight Paper"
-msgstr ""
-
-msgid "Middle"
-msgstr ""
 
 msgid "Missing CloseGroup"
 msgstr "CloseGroup がありません"
@@ -4235,9 +3812,6 @@ msgstr "クラスの変更"
 msgid "Modify Printer"
 msgstr "プリンターの変更"
 
-msgid "Mounting Tape"
-msgstr ""
-
 msgid "Move All Jobs"
 msgstr "すべてのジョブの移動"
 
@@ -4246,33 +3820,6 @@ msgstr "ジョブの移動"
 
 msgid "Moved Permanently"
 msgstr "別の場所へ移動しました"
-
-msgid "Multi Layer"
-msgstr ""
-
-msgid "Multi Part Form"
-msgstr ""
-
-msgid "Multi-Hole Punch (Landscape)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Portrait)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "Multi-Hole Punch (Reverse Portrait)"
-msgstr ""
-
-msgid "Multipurpose"
-msgstr ""
-
-msgid "Multipurpose Paper"
-msgstr ""
-
-msgid "My Mailbox"
-msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "PPD ファイルポインターが NULL です"
@@ -4447,9 +3994,6 @@ msgstr "OK"
 msgid "Off (1-Sided)"
 msgstr "Off (片面)"
 
-msgid "Office Recycled Paper"
-msgstr ""
-
 msgid "Oki"
 msgstr "Oki"
 
@@ -4472,9 +4016,6 @@ msgstr "OpenUI/JCLOpenUI の前にまず CloseUI/JCLCloseUI が必要です"
 msgid "Operation Policy"
 msgstr "操作ポリシー"
 
-msgid "Optical Disc"
-msgstr ""
-
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
 msgstr "オプション \"%s\" は %%%%IncludeFeature 経由で含めることはできません。"
@@ -4484,9 +4025,6 @@ msgstr "インストールされたオプション"
 
 msgid "Options:"
 msgstr "オプション:"
-
-msgid "Other"
-msgstr ""
 
 msgid "Other Media"
 msgstr ""
@@ -4546,9 +4084,6 @@ msgstr "パケットが Get-Response-PDU を含んでいません"
 msgid "Packet does not start with SEQUENCE"
 msgstr "パケットが SEQUENCE から始まりません"
 
-msgid "Paper"
-msgstr ""
-
 msgid "Paper jam."
 msgstr "用紙詰まりです。"
 
@@ -4560,9 +4095,6 @@ msgstr "給紙トレイが空です。"
 
 msgid "Paper tray is missing."
 msgstr "給紙トレイがありません。"
-
-msgid "Parallel Fold"
-msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4587,65 +4119,17 @@ msgstr "プリンターの休止"
 msgid "Peel-Off"
 msgstr "Peel-Off"
 
-msgid "Permanent Labels"
-msgstr ""
-
 msgid "Photo"
 msgstr "写真"
-
-msgid "Photo Film"
-msgstr ""
 
 msgid "Photo Labels"
 msgstr "写真ラベル"
 
-msgid "Photo Paper"
-msgstr ""
-
-msgid "Photo Paper Plus Glossy II"
-msgstr ""
-
-msgid "Photo Paper Pro Platinum"
-msgstr ""
-
-msgid "Plain Envelope"
-msgstr ""
-
 msgid "Plain Paper"
 msgstr "普通紙"
 
-msgid "Plastic"
-msgstr ""
-
-msgid "Plastic Archival"
-msgstr ""
-
-msgid "Plastic Colored"
-msgstr ""
-
-msgid "Plastic Glossy"
-msgstr ""
-
-msgid "Plastic High Gloss"
-msgstr ""
-
-msgid "Plastic Matte"
-msgstr ""
-
-msgid "Plastic Satin"
-msgstr ""
-
-msgid "Plastic Semi Gloss"
-msgstr ""
-
-msgid "Plate"
-msgstr ""
-
 msgid "Policies"
 msgstr "ポリシー"
-
-msgid "Polyester"
-msgstr ""
 
 msgid "Port Monitor"
 msgstr "ポートモニター"
@@ -4665,29 +4149,8 @@ msgstr "往復ハガキ 長辺送り"
 msgid "Postcard Long Edge"
 msgstr "ハガキ 長辺送り"
 
-msgid "Poster Fold"
-msgstr ""
-
-msgid "Pre Cut Tabs"
-msgstr ""
-
-msgid "Premium Inkjet Paper"
-msgstr ""
-
-msgid "Premium Photo Glossy Paper"
-msgstr ""
-
-msgid "Premium Presentation Matte Paper"
-msgstr ""
-
 msgid "Preparing to print."
 msgstr "印刷準備中です。"
-
-msgid "Preprinted Envelope"
-msgstr ""
-
-msgid "Preprinted Paper"
-msgstr ""
 
 msgid "Print Density"
 msgstr "印刷密度"
@@ -4775,9 +4238,6 @@ msgstr "ページ %d, %u%% の印刷が完了しました。"
 msgid "Punch"
 msgstr ""
 
-msgid "Punched Paper"
-msgstr ""
-
 msgid "Quarto"
 msgstr "Quarto"
 
@@ -4786,12 +4246,6 @@ msgstr "クォータの制限に達しました。"
 
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr "ランク  所有者  ジョブ  ファイル                        合計サイズ"
-
-msgid "Rear"
-msgstr ""
-
-msgid "Rear Tray"
-msgstr ""
 
 msgid "Reject Jobs"
 msgstr "ジョブの拒否"
@@ -4825,48 +4279,6 @@ msgstr "返信用ラベル"
 msgid "Rewind"
 msgstr "巻き取り"
 
-msgid "Right"
-msgstr ""
-
-msgid "Right Gate Fold"
-msgstr ""
-
-msgid "Right Tray"
-msgstr ""
-
-msgid "Roll"
-msgstr ""
-
-msgid "Roll 1"
-msgstr ""
-
-msgid "Roll 10"
-msgstr ""
-
-msgid "Roll 2"
-msgstr ""
-
-msgid "Roll 3"
-msgstr ""
-
-msgid "Roll 4"
-msgstr ""
-
-msgid "Roll 5"
-msgstr ""
-
-msgid "Roll 6"
-msgstr ""
-
-msgid "Roll 7"
-msgstr ""
-
-msgid "Roll 8"
-msgstr ""
-
-msgid "Roll 9"
-msgstr ""
-
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr "コマンドを実行中: %s %s -N -A %s -c '%s'"
@@ -4877,52 +4289,13 @@ msgstr "SEQUENCE は不定長を使用しています"
 msgid "SSL/TLS Negotiation Error"
 msgstr "SSL/TLS のネゴシエーションエラー"
 
-msgid "Saddle Stitch"
-msgstr ""
-
-msgid "Satin Labels"
-msgstr ""
-
-msgid "Satin Optical Disc"
-msgstr ""
-
-msgid "Satin Photo Paper"
-msgstr ""
-
-msgid "Screen"
-msgstr ""
-
-msgid "Screen Paged"
-msgstr ""
-
-msgid "Security Labels"
-msgstr ""
-
 msgid "See Other"
 msgstr "残りを見てください"
 
 msgid "See remote printer."
 msgstr ""
 
-msgid "Self Adhesive"
-msgstr ""
-
-msgid "Self Adhesive Film"
-msgstr ""
-
 msgid "Self-signed credentials are blocked."
-msgstr ""
-
-msgid "Semi-Gloss Fabric"
-msgstr ""
-
-msgid "Semi-Gloss Labels"
-msgstr ""
-
-msgid "Semi-Gloss Optical Disc"
-msgstr ""
-
-msgid "Semi-Gloss Photo Paper"
 msgstr ""
 
 msgid "Sending data to printer."
@@ -4967,48 +4340,6 @@ msgstr "発送先ラベル"
 msgid "Short-Edge (Landscape)"
 msgstr "短辺 (横原稿)"
 
-msgid "Shrink Foil"
-msgstr ""
-
-msgid "Side"
-msgstr ""
-
-msgid "Side Tray"
-msgstr ""
-
-msgid "Single Face"
-msgstr ""
-
-msgid "Single Punch (Landscape)"
-msgstr ""
-
-msgid "Single Punch (Portrait)"
-msgstr ""
-
-msgid "Single Punch (Reverse Landscape)"
-msgstr ""
-
-msgid "Single Punch (Reverse Portrait)"
-msgstr ""
-
-msgid "Single Staple (Landscape)"
-msgstr ""
-
-msgid "Single Staple (Portrait)"
-msgstr ""
-
-msgid "Single Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Single Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Single Wall Cardboard"
-msgstr ""
-
-msgid "Sleeve"
-msgstr ""
-
 msgid "Special Paper"
 msgstr "特殊紙"
 
@@ -5016,55 +4347,10 @@ msgstr "特殊紙"
 msgid "Spooling job, %.0f%% complete."
 msgstr "ジョブをスプール中、%.0f%% 完了しました。"
 
-msgid "Stacker 1"
-msgstr ""
-
-msgid "Stacker 10"
-msgstr ""
-
-msgid "Stacker 2"
-msgstr ""
-
-msgid "Stacker 3"
-msgstr ""
-
-msgid "Stacker 4"
-msgstr ""
-
-msgid "Stacker 5"
-msgstr ""
-
-msgid "Stacker 6"
-msgstr ""
-
-msgid "Stacker 7"
-msgstr ""
-
-msgid "Stacker 8"
-msgstr ""
-
-msgid "Stacker 9"
-msgstr ""
-
 msgid "Standard"
 msgstr "標準"
 
 msgid "Staple"
-msgstr ""
-
-msgid "Staple Edge"
-msgstr ""
-
-msgid "Staple Edge (Landscape)"
-msgstr ""
-
-msgid "Staple Edge (Portrait)"
-msgstr ""
-
-msgid "Staple Edge (Reverse Landscape)"
-msgstr ""
-
-msgid "Staple Edge (Reverse Portrait)"
 msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
@@ -5096,9 +4382,6 @@ msgstr "スーパー B/A3"
 
 msgid "Switching Protocols"
 msgstr "プロトコルの変更"
-
-msgid "Tab Stock"
-msgstr ""
 
 msgid "Tabloid"
 msgstr "タブロイド"
@@ -5301,18 +4584,6 @@ msgstr "job-sheets 値が多すぎます (%d > 2)。"
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "printer-state-reasons 値が多すぎます (%d > %d)。"
 
-msgid "Top"
-msgstr ""
-
-msgid "Top Tray"
-msgstr ""
-
-msgid "Tractor"
-msgstr ""
-
-msgid "Transfer"
-msgstr ""
-
 msgid "Transparency"
 msgstr "OHP シート"
 
@@ -5322,77 +4593,14 @@ msgstr "トレイ"
 msgid "Tray 1"
 msgstr "トレイ 1"
 
-msgid "Tray 10"
-msgstr ""
-
-msgid "Tray 11"
-msgstr ""
-
-msgid "Tray 12"
-msgstr ""
-
-msgid "Tray 13"
-msgstr ""
-
-msgid "Tray 14"
-msgstr ""
-
-msgid "Tray 15"
-msgstr ""
-
-msgid "Tray 16"
-msgstr ""
-
-msgid "Tray 17"
-msgstr ""
-
-msgid "Tray 18"
-msgstr ""
-
-msgid "Tray 19"
-msgstr ""
-
 msgid "Tray 2"
 msgstr "トレイ 2"
-
-msgid "Tray 20"
-msgstr ""
 
 msgid "Tray 3"
 msgstr "トレイ 3"
 
 msgid "Tray 4"
 msgstr "トレイ 4"
-
-msgid "Tray 5"
-msgstr ""
-
-msgid "Tray 6"
-msgstr ""
-
-msgid "Tray 7"
-msgstr ""
-
-msgid "Tray 8"
-msgstr ""
-
-msgid "Tray 9"
-msgstr ""
-
-msgid "Triple Staple (Landscape)"
-msgstr ""
-
-msgid "Triple Staple (Portrait)"
-msgstr ""
-
-msgid "Triple Staple (Reverse Landscape)"
-msgstr ""
-
-msgid "Triple Staple (Reverse Portrait)"
-msgstr ""
-
-msgid "Triple Wall Cardboard"
-msgstr ""
 
 msgid "Trust on first use is disabled."
 msgstr ""
@@ -5947,9 +5155,6 @@ msgstr "値は不定長です"
 msgid "VarBind uses indefinite length"
 msgstr "VarBind は不定長です"
 
-msgid "Vellum Paper"
-msgstr ""
-
 msgid "Version uses indefinite length"
 msgstr "Version は不定長です"
 
@@ -5965,17 +5170,8 @@ msgstr "プリンターが終了するのを待っています。"
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr "警告、Windows 2000 プリンタードライバーがインストールされていません。"
 
-msgid "Waterproof Fabric"
-msgstr ""
-
 msgid "Web Interface is Disabled"
 msgstr "Web インターフェイスが無効になっています"
-
-msgid "Wet Film"
-msgstr ""
-
-msgid "Windowed Envelope"
-msgstr ""
 
 msgid "Yes"
 msgstr "はい"
@@ -5987,9 +5183,6 @@ msgid ""
 msgstr ""
 "このページには URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> を使ってア"
 "クセスする必要があります。"
-
-msgid "Z Fold"
-msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "ZPL ラベルプリンター"

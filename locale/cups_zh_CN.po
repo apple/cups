@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-11-30 11:38-0500\n"
+"POT-Creation-Date: 2017-12-01 17:00-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -2126,18 +2126,6 @@ msgstr "2"
 msgid "2 inches/sec."
 msgstr "2 英寸/秒"
 
-msgid "2-Hole Punch (Landscape)"
-msgstr "双孔冲压（水平）"
-
-msgid "2-Hole Punch (Portrait)"
-msgstr "双孔冲压（垂直）"
-
-msgid "2-Hole Punch (Reverse Landscape)"
-msgstr "双孔冲压（反向水平）"
-
-msgid "2-Hole Punch (Reverse Portrait)"
-msgstr "双孔冲压（反向垂直）"
-
 msgid "2-Sided Printing"
 msgstr "双面印刷"
 
@@ -2252,18 +2240,6 @@ msgstr "3 英寸/秒"
 msgid "3 x 5"
 msgstr "3×5"
 
-msgid "3-Hole Punch (Landscape)"
-msgstr "三孔冲压（水平）"
-
-msgid "3-Hole Punch (Portrait)"
-msgstr "三孔冲压（垂直）"
-
-msgid "3-Hole Punch (Reverse Landscape)"
-msgstr "三孔冲压（反向水平）"
-
-msgid "3-Hole Punch (Reverse Portrait)"
-msgstr "三孔冲压（反向垂直）"
-
 msgid "3.00x1.00\""
 msgstr "3.00×1.00 英寸"
 
@@ -2329,18 +2305,6 @@ msgstr "4"
 
 msgid "4 inches/sec."
 msgstr "4 英寸/秒"
-
-msgid "4-Hole Punch (Landscape)"
-msgstr "四孔冲压（水平）"
-
-msgid "4-Hole Punch (Portrait)"
-msgstr "四孔冲压（垂直）"
-
-msgid "4-Hole Punch (Reverse Landscape)"
-msgstr "四孔冲压（反向水平）"
-
-msgid "4-Hole Punch (Reverse Portrait)"
-msgstr "四孔冲压（反向垂直）"
 
 msgid "4.00x1.00\""
 msgstr "4.00×1.00 英寸"
@@ -2638,9 +2602,6 @@ msgstr "接受任务"
 msgid "Accepted"
 msgstr "已接受"
 
-msgid "Accordian Fold"
-msgstr "手风琴式折纸法"
-
 msgid "Add Class"
 msgstr "添加类"
 
@@ -2653,18 +2614,6 @@ msgstr "地址"
 msgid "Administration"
 msgstr "管理"
 
-msgid "Advanced Photo Paper"
-msgstr "高级照片纸"
-
-msgid "Alternate"
-msgstr "交替"
-
-msgid "Alternate Roll"
-msgstr "交替滚筒"
-
-msgid "Aluminum"
-msgstr "铝"
-
 msgid "Always"
 msgstr "总是"
 
@@ -2673,18 +2622,6 @@ msgstr "AppSocket/HP JetDirect"
 
 msgid "Applicator"
 msgstr "涂药器"
-
-msgid "Archival Envelope"
-msgstr "档案用信封"
-
-msgid "Archival Fabric"
-msgstr "档案用编织物"
-
-msgid "Archival Paper"
-msgstr "档案用纸张"
-
-msgid "Archival Photo Paper"
-msgstr "档案用照片纸"
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
@@ -2701,9 +2638,6 @@ msgstr "属性“%s”不是正确的值类型。"
 #, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "属性组排序错乱（%x < %x）。"
-
-msgid "Automatic"
-msgstr "自动"
 
 msgid "B0"
 msgstr "B0"
@@ -2740,9 +2674,6 @@ msgstr "B8"
 
 msgid "B9"
 msgstr "B9"
-
-msgid "Back Print Film"
-msgstr "印片用胶片"
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
@@ -2896,29 +2827,8 @@ msgstr "无效的值字串"
 msgid "Bad/empty URI"
 msgstr "无效或空的 URI"
 
-msgid "Bale"
-msgstr "10 令"
-
 msgid "Banners"
 msgstr "条幅"
-
-msgid "Bind"
-msgstr "捆扎"
-
-msgid "Bind (Landscape)"
-msgstr "捆扎（水平）"
-
-msgid "Bind (Portrait)"
-msgstr "捆扎（垂直）"
-
-msgid "Bind (Reverse Landscape)"
-msgstr "捆扎（反向水平）"
-
-msgid "Bind (Reverse Portrait)"
-msgstr "捆扎（反向垂直）"
-
-msgid "Bond Envelope"
-msgstr "证券信封"
 
 msgid "Bond Paper"
 msgstr "证券纸"
@@ -2926,24 +2836,12 @@ msgstr "证券纸"
 msgid "Booklet"
 msgstr "册子"
 
-msgid "Booklet Maker"
-msgstr "册子机"
-
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
 msgstr "waiteof 选项“%s”预期布里值。"
 
-msgid "Bottom"
-msgstr "底部"
-
-msgid "Bottom Tray"
-msgstr "底部纸盘"
-
 msgid "Buffer overflow detected, aborting."
 msgstr "检测到缓冲区溢出，正在中止。"
-
-msgid "CD"
-msgstr "CD"
 
 msgid "CMYK"
 msgstr "CMYK"
@@ -2963,20 +2861,8 @@ msgstr "无法为远程队列更改 printer-is-shared 值。"
 msgid "Cannot share a remote Kerberized printer."
 msgstr "无法共享远程的通过 Kerberos 授权的打印机。"
 
-msgid "Cardboard"
-msgstr "纸板"
-
-msgid "Cardstock"
-msgstr "重磅纸"
-
 msgid "Cassette"
 msgstr "磁带"
-
-msgid "Center"
-msgstr "中部"
-
-msgid "Center Tray"
-msgstr "中部纸盘"
 
 msgid "Change Settings"
 msgstr "更改选项"
@@ -2994,23 +2880,11 @@ msgstr "清理打印头"
 msgid "Close-Job doesn't support the job-uri attribute."
 msgstr "Close-Job 指令不支持 job-uri 属性。"
 
-msgid "Coat"
-msgstr "涂料"
-
-msgid "Coated Envelope"
-msgstr "涂面信封"
-
-msgid "Coated Paper"
-msgstr "涂面纸"
-
 msgid "Color"
 msgstr "彩色"
 
 msgid "Color Mode"
 msgstr "色彩模式"
-
-msgid "Colored Labels"
-msgstr "彩色标签"
 
 msgid ""
 "Commands may be abbreviated.  Commands are:\n"
@@ -3036,26 +2910,11 @@ msgstr "继续"
 msgid "Continuous"
 msgstr "连续"
 
-msgid "Continuous Long"
-msgstr "长连续"
-
-msgid "Continuous Short"
-msgstr "短连续"
-
 msgid "Control file sent successfully."
 msgstr "已成功发送控制文件。"
 
 msgid "Copying print data."
 msgstr "正在复制打印数据。"
-
-msgid "Cotton Envelope"
-msgstr "棉质信封"
-
-msgid "Cotton Paper"
-msgstr "棉质纸张"
-
-msgid "Cover"
-msgstr "封面"
 
 msgid "Created"
 msgstr "创建时间"
@@ -3078,14 +2937,8 @@ msgstr "CustominTearInterval"
 msgid "Cut"
 msgstr "剪切"
 
-msgid "Cut Media"
-msgstr "剪切媒体"
-
 msgid "Cutter"
 msgstr "车床刀具"
-
-msgid "DVD"
-msgstr "DVD"
 
 msgid "Dark"
 msgstr "暗色"
@@ -3154,36 +3007,12 @@ msgstr "目录“%s”的权限许可无问题 (0%o/uid=%d/gid=%d)。"
 msgid "Disabled"
 msgstr "已禁用"
 
-msgid "Disc"
-msgstr "光盘"
-
 #, c-format
 msgid "Document #%d does not exist in job #%d."
 msgstr "任务 #%2$d 中不包含文档 #%1$d。"
 
-msgid "Double Gate Fold"
-msgstr "封面拉页"
-
-msgid "Double Staple (Landscape)"
-msgstr "封面拉页（水平）"
-
-msgid "Double Staple (Portrait)"
-msgstr "封面拉页（垂直）"
-
-msgid "Double Staple (Reverse Landscape)"
-msgstr "封面拉页（反向水平）"
-
-msgid "Double Staple (Reverse Portrait)"
-msgstr "封面拉页（反向垂直）"
-
-msgid "Double Wall Cardboard"
-msgstr "双层纸板"
-
 msgid "Draft"
 msgstr "草稿"
-
-msgid "Dry Film"
-msgstr "干膜"
 
 msgid "Duplexer"
 msgstr "双工器"
@@ -3200,24 +3029,15 @@ msgstr "EPL2 标签打印机"
 msgid "Edit Configuration File"
 msgstr "编辑配置文件"
 
-msgid "Embossing Foil"
-msgstr "压花彩箔"
-
 msgid "Empty PPD file."
 msgstr "空 PPD 文件。"
 
 msgid "Encryption is not supported."
 msgstr "不支持加密。"
 
-msgid "End Board"
-msgstr "结尾板"
-
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
 msgstr "结尾横幅"
-
-msgid "Engineering Z Fold"
-msgstr "工程用 Z 折纸法"
 
 msgid "English"
 msgstr "英语"
@@ -3229,9 +3049,6 @@ msgid ""
 msgstr ""
 "输入你的用户名和密码或 root 的用户名和密码以访问此页面。如果您正在使用 "
 "Kerberos 认证，请求确定您拥有有效的 Kerberos 凭据。"
-
-msgid "Envelope"
-msgstr "信封"
 
 msgid "Envelope #10"
 msgstr "10 号信封"
@@ -3446,12 +3263,6 @@ msgstr "每 9 个标签"
 msgid "Every Label"
 msgstr "每个标签"
 
-msgid "Everyday Glossy Photo Paper"
-msgstr "日常用光面照片纸"
-
-msgid "Everyday Matte Paper"
-msgstr "日常用雾面纸"
-
 msgid "Executive"
 msgstr "执行"
 
@@ -3464,20 +3275,8 @@ msgstr "将打印机导出到 Samba"
 msgid "Expressions:"
 msgstr "表达式："
 
-msgid "Extra Heavyweight Paper"
-msgstr "超重磅纸"
-
 msgid "FAIL"
 msgstr "失败"
-
-msgid "Fabric"
-msgstr "编织物"
-
-msgid "Face Down"
-msgstr "朝下"
-
-msgid "Face Up"
-msgstr "朝上"
 
 msgid "Fast Grayscale"
 msgstr "快速灰度"
@@ -3513,30 +3312,12 @@ msgstr ""
 "已禁用文件设备 URI。要启用此功能，参阅“%s/cups-files.conf”中的 FileDevice 参"
 "数。"
 
-msgid "Film"
-msgstr "胶片"
-
-msgid "Fine Envelope"
-msgstr "精致信封"
-
 #, c-format
 msgid "Finished page %d."
 msgstr "已完成第 %d 页。"
 
 msgid "Finishing Preset"
 msgstr ""
-
-msgid "Flexo Base"
-msgstr "柔性版基"
-
-msgid "Flexo Photo Polymer"
-msgstr "柔性照片聚合物"
-
-msgid "Flute"
-msgstr "瓦楞纸"
-
-msgid "Foil"
-msgstr "烫压"
 
 msgid "Fold"
 msgstr "折纸"
@@ -3547,12 +3328,6 @@ msgstr "对开本"
 msgid "Forbidden"
 msgstr "已禁止"
 
-msgid "Full Cut Tabs"
-msgstr "完整裁剪标签"
-
-msgid "Gate Fold"
-msgstr "对开页"
-
 msgid "General"
 msgstr "常规"
 
@@ -3562,44 +3337,11 @@ msgstr "通用"
 msgid "Get-Response-PDU uses indefinite length"
 msgstr "Get-Response-PDU 使用无限长度"
 
-msgid "Glass"
-msgstr "玻璃"
-
-msgid "Glass Colored"
-msgstr "彩色玻璃"
-
-msgid "Glass Opaque"
-msgstr "不透明玻璃"
-
-msgid "Glass Surfaced"
-msgstr "涂面玻璃"
-
-msgid "Glass Textured"
-msgstr "材质玻璃"
-
-msgid "Glossy Brochure Paper"
-msgstr "光面海报纸"
-
-msgid "Glossy Fabric"
-msgstr "光面编织物"
-
-msgid "Glossy Labels"
-msgstr "光面标签"
-
-msgid "Glossy Optical Disc"
-msgstr "光面光盘"
-
 msgid "Glossy Paper"
 msgstr "光面纸"
 
-msgid "Glossy Photo Paper"
-msgstr "光面照片纸"
-
 msgid "Got a printer-uri attribute but no job-id."
 msgstr "获取到了 printer-uri 属性却未获取到 job-id。"
-
-msgid "Gravure Cylinder"
-msgstr "凹印滚筒"
 
 msgid "Grayscale"
 msgstr "灰度"
@@ -3607,47 +3349,17 @@ msgstr "灰度"
 msgid "HP"
 msgstr "HP"
 
-msgid "Hagaki"
-msgstr "叶书"
-
-msgid "Half Fold"
-msgstr "对折"
-
-msgid "Half Z Fold"
-msgstr "半 Z 折"
-
 msgid "Hanging Folder"
 msgstr "倒挂文件夹"
 
 msgid "Hash buffer too small."
 msgstr "哈希值缓冲区太小。"
 
-msgid "Heavyweight Coated Paper"
-msgstr "重磅涂面纸"
-
-msgid "Heavyweight Envelope"
-msgstr "重磅信封"
-
-msgid "Heavyweight Paper"
-msgstr "重磅纸"
-
 msgid "Help file not in index."
 msgstr "帮助文件不在索引中。"
 
 msgid "High"
 msgstr "高"
-
-msgid "High Gloss Fabric"
-msgstr "高光编织物"
-
-msgid "High Gloss Labels"
-msgstr "高光标签"
-
-msgid "High Gloss Optical Disc"
-msgstr "高光光盘"
-
-msgid "High Gloss Photo Paper"
-msgstr "高光照片纸"
 
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr "带有不兼容值标签的 IPP 1setOf 属性。"
@@ -3735,21 +3447,6 @@ msgstr "非法翻译字串"
 
 msgid "Illegal whitespace character"
 msgstr "非法空白字符"
-
-msgid "Image Setter Paper"
-msgstr "底片输出机纸"
-
-msgid "Imaging Cylinder"
-msgstr "图像滚筒"
-
-msgid "Inkjet Envelope"
-msgstr "喷墨信封"
-
-msgid "Inkjet Labels"
-msgstr "喷墨标签"
-
-msgid "Inkjet Paper"
-msgstr "喷墨纸"
 
 msgid "Installable Options"
 msgstr "可安装选项"
@@ -3899,9 +3596,6 @@ msgstr "无法为任务订阅续期。"
 msgid "Jobs"
 msgstr "任务"
 
-msgid "Jog"
-msgstr "垛齐"
-
 msgid "LPD/LPR Host or Printer"
 msgstr "LPD/LPR 主机或打印机"
 
@@ -3915,15 +3609,6 @@ msgstr "标签打印机"
 msgid "Label Top"
 msgstr "标签顶部"
 
-msgid "Labels"
-msgstr "标签"
-
-msgid "Laminate"
-msgstr "裱"
-
-msgid "Laminating Foil"
-msgstr "裱箔"
-
 #, c-format
 msgid "Language \"%s\" not supported."
 msgstr "不支持的语言“%s”。"
@@ -3931,26 +3616,8 @@ msgstr "不支持的语言“%s”。"
 msgid "Large Address"
 msgstr "大地址"
 
-msgid "Large Capacity"
-msgstr "大容量"
-
-msgid "Large Capacity Tray"
-msgstr "大容量纸盘"
-
 msgid "LaserJet Series PCL 4/5"
 msgstr "LaserJet 系列 PCL 4/5"
-
-msgid "Left"
-msgstr "左"
-
-msgid "Left Gate Fold"
-msgstr "左对开页"
-
-msgid "Left Tray"
-msgstr "左纸盘"
-
-msgid "Letter Fold"
-msgstr "信函折法"
 
 msgid "Letter Oversize"
 msgstr "信函超大"
@@ -3958,17 +3625,8 @@ msgstr "信函超大"
 msgid "Letter Oversize Long Edge"
 msgstr "信函超大长边缘"
 
-msgid "Letterhead"
-msgstr "笺头"
-
 msgid "Light"
 msgstr "轻"
-
-msgid "Lightweight Envelope"
-msgstr "轻型信封"
-
-msgid "Lightweight Paper"
-msgstr "轻型纸张"
 
 msgid "Line longer than the maximum allowed (255 characters)"
 msgstr "行长度超过允许的最大值（255 字符）"
@@ -3988,65 +3646,8 @@ msgstr "长边缘（竖直）"
 msgid "Looking for printer."
 msgstr "正在寻找打印机。"
 
-msgid "Mailbox 1"
-msgstr "1 号信箱"
-
-msgid "Mailbox 10"
-msgstr "10 号信箱"
-
-msgid "Mailbox 2"
-msgstr "2 号信箱"
-
-msgid "Mailbox 3"
-msgstr "3 号信箱"
-
-msgid "Mailbox 4"
-msgstr "4 号信箱"
-
-msgid "Mailbox 5"
-msgstr "5 号信箱"
-
-msgid "Mailbox 6"
-msgstr "6 号信箱"
-
-msgid "Mailbox 7"
-msgstr "7 号信箱"
-
-msgid "Mailbox 8"
-msgstr "8 号信箱"
-
-msgid "Mailbox 9"
-msgstr "9 号信箱"
-
-msgid "Main"
-msgstr "主队列"
-
-msgid "Main Roll"
-msgstr "主滚筒"
-
-msgid "Manual"
-msgstr "手动"
-
 msgid "Manual Feed"
 msgstr "手动喂纸"
-
-msgid "Matte Brochure Paper"
-msgstr "雾面海报纸"
-
-msgid "Matte Cover Paper"
-msgstr "雾面封面纸"
-
-msgid "Matte Fabric"
-msgstr "雾面编织物"
-
-msgid "Matte Labels"
-msgstr "雾面标签"
-
-msgid "Matte Optical Disc"
-msgstr "雾面光盘"
-
-msgid "Matte Photo Paper"
-msgstr "雾面照片纸"
 
 msgid "Media Size"
 msgstr "媒体大小"
@@ -4065,30 +3666,6 @@ msgstr "介质"
 
 msgid "Memory allocation error"
 msgstr "内存分配错误"
-
-msgid "Metal"
-msgstr "金属"
-
-msgid "Metal Glossy"
-msgstr "光面金属"
-
-msgid "Metal High Gloss"
-msgstr "高光金属"
-
-msgid "Metal Matte"
-msgstr "雾面金属"
-
-msgid "Metal Satin"
-msgstr "缎面抛光金属"
-
-msgid "Metal Semi Gloss"
-msgstr "半光面金属"
-
-msgid "Mid-Weight Paper"
-msgstr "中重纸张"
-
-msgid "Middle"
-msgstr "中间"
 
 msgid "Missing CloseGroup"
 msgstr "缺少 CloseGroup"
@@ -4174,9 +3751,6 @@ msgstr "修改类"
 msgid "Modify Printer"
 msgstr "修改打印机"
 
-msgid "Mounting Tape"
-msgstr "装载带"
-
 msgid "Move All Jobs"
 msgstr "移动所有任务"
 
@@ -4185,33 +3759,6 @@ msgstr "移动任务"
 
 msgid "Moved Permanently"
 msgstr "已永久移动"
-
-msgid "Multi Layer"
-msgstr "多面"
-
-msgid "Multi Part Form"
-msgstr "多部表单"
-
-msgid "Multi-Hole Punch (Landscape)"
-msgstr "多孔冲压（水平）"
-
-msgid "Multi-Hole Punch (Portrait)"
-msgstr "多孔冲压（垂直）"
-
-msgid "Multi-Hole Punch (Reverse Landscape)"
-msgstr "多孔冲压（反向水平）"
-
-msgid "Multi-Hole Punch (Reverse Portrait)"
-msgstr "多孔冲压（反向垂直）"
-
-msgid "Multipurpose"
-msgstr "多用"
-
-msgid "Multipurpose Paper"
-msgstr "多用纸"
-
-msgid "My Mailbox"
-msgstr "我的信箱"
 
 msgid "NULL PPD file pointer"
 msgstr "PPD 文件指针为 NULL"
@@ -4384,9 +3931,6 @@ msgstr "确定"
 msgid "Off (1-Sided)"
 msgstr "关（单面）"
 
-msgid "Office Recycled Paper"
-msgstr "办公室用再生纸"
-
 msgid "Oki"
 msgstr "日冲"
 
@@ -4409,9 +3953,6 @@ msgstr "OpenUI/JCLOpenUI 缺少前置 CloseUI/JCLCloseUI"
 msgid "Operation Policy"
 msgstr "操作策略"
 
-msgid "Optical Disc"
-msgstr "光盘"
-
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
 msgstr "选项“%s”不能通过 %%%%IncludeFeature 引用。"
@@ -4421,9 +3962,6 @@ msgstr "已安装选项"
 
 msgid "Options:"
 msgstr "选项："
-
-msgid "Other"
-msgstr "其他"
 
 msgid "Other Media"
 msgstr ""
@@ -4483,9 +4021,6 @@ msgstr "包裹中未包含 Get-Response-PDU"
 msgid "Packet does not start with SEQUENCE"
 msgstr "包裹未使用 SEQUENCE 开头"
 
-msgid "Paper"
-msgstr "纸张"
-
 msgid "Paper jam."
 msgstr "卡纸。"
 
@@ -4497,9 +4032,6 @@ msgstr "纸槽已空。"
 
 msgid "Paper tray is missing."
 msgstr "纸槽缺失。"
-
-msgid "Parallel Fold"
-msgstr "并行折叠"
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4524,65 +4056,17 @@ msgstr "暂停打印机"
 msgid "Peel-Off"
 msgstr "剥片"
 
-msgid "Permanent Labels"
-msgstr "永久标签"
-
 msgid "Photo"
 msgstr "照片"
-
-msgid "Photo Film"
-msgstr "照片胶卷"
 
 msgid "Photo Labels"
 msgstr "照片标签"
 
-msgid "Photo Paper"
-msgstr "照片纸"
-
-msgid "Photo Paper Plus Glossy II"
-msgstr "Photo Paper Plus Glossy II"
-
-msgid "Photo Paper Pro Platinum"
-msgstr "Photo Paper Pro Platinum"
-
-msgid "Plain Envelope"
-msgstr "普通信封"
-
 msgid "Plain Paper"
 msgstr "普通纸"
 
-msgid "Plastic"
-msgstr "塑料"
-
-msgid "Plastic Archival"
-msgstr "档案用塑料"
-
-msgid "Plastic Colored"
-msgstr "彩色塑料"
-
-msgid "Plastic Glossy"
-msgstr "光面塑料"
-
-msgid "Plastic High Gloss"
-msgstr "高光塑料"
-
-msgid "Plastic Matte"
-msgstr "雾面塑料"
-
-msgid "Plastic Satin"
-msgstr "缎面抛光塑料"
-
-msgid "Plastic Semi Gloss"
-msgstr "半光面塑料"
-
-msgid "Plate"
-msgstr "印刷板"
-
 msgid "Policies"
 msgstr "策略"
-
-msgid "Polyester"
-msgstr "聚酯"
 
 msgid "Port Monitor"
 msgstr "端口监视器"
@@ -4602,29 +4086,8 @@ msgstr "超长边缘双面明信片"
 msgid "Postcard Long Edge"
 msgstr "超长边缘明信片"
 
-msgid "Poster Fold"
-msgstr "对折明信片"
-
-msgid "Pre Cut Tabs"
-msgstr "已裁剪标签"
-
-msgid "Premium Inkjet Paper"
-msgstr "高级喷墨纸"
-
-msgid "Premium Photo Glossy Paper"
-msgstr "高级光面照片纸"
-
-msgid "Premium Presentation Matte Paper"
-msgstr "高级雾面展示用纸"
-
 msgid "Preparing to print."
 msgstr "正在准备打印。"
-
-msgid "Preprinted Envelope"
-msgstr "预打印信封"
-
-msgid "Preprinted Paper"
-msgstr "预打印纸"
 
 msgid "Print Density"
 msgstr "打印密度"
@@ -4712,9 +4175,6 @@ msgstr "正在打印第 %d 页，已完成 %u%%。"
 msgid "Punch"
 msgstr "冲压"
 
-msgid "Punched Paper"
-msgstr "打孔纸"
-
 msgid "Quarto"
 msgstr "四开"
 
@@ -4726,12 +4186,6 @@ msgstr "已达到限额上限。"
 # - Will mess up on CJK and double-width environments.
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr "排序    所有者   任务     文件                         总大小"
-
-msgid "Rear"
-msgstr "后部"
-
-msgid "Rear Tray"
-msgstr "后部纸盘"
 
 msgid "Reject Jobs"
 msgstr "拒绝任务"
@@ -4765,48 +4219,6 @@ msgstr "返回地址"
 msgid "Rewind"
 msgstr "回退"
 
-msgid "Right"
-msgstr "右"
-
-msgid "Right Gate Fold"
-msgstr "右对开页"
-
-msgid "Right Tray"
-msgstr "右部纸盘"
-
-msgid "Roll"
-msgstr "滚筒"
-
-msgid "Roll 1"
-msgstr "滚筒 1"
-
-msgid "Roll 10"
-msgstr "滚筒 10"
-
-msgid "Roll 2"
-msgstr "滚筒 2"
-
-msgid "Roll 3"
-msgstr "滚筒 3"
-
-msgid "Roll 4"
-msgstr "滚筒 4"
-
-msgid "Roll 5"
-msgstr "滚筒 5"
-
-msgid "Roll 6"
-msgstr "滚筒 6"
-
-msgid "Roll 7"
-msgstr "滚筒 7"
-
-msgid "Roll 8"
-msgstr "滚筒 8"
-
-msgid "Roll 9"
-msgstr "滚筒 9"
-
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr "正在运行命令：%s %s -N -A %s -c '%s'"
@@ -4817,53 +4229,14 @@ msgstr "SEQUENCE 使用不定长度"
 msgid "SSL/TLS Negotiation Error"
 msgstr "SSL/TLS 协商错误"
 
-msgid "Saddle Stitch"
-msgstr "骑马订装"
-
-msgid "Satin Labels"
-msgstr "缎面抛光标签"
-
-msgid "Satin Optical Disc"
-msgstr "缎面抛光光盘"
-
-msgid "Satin Photo Paper"
-msgstr "缎面抛光照片纸"
-
-msgid "Screen"
-msgstr "网印"
-
-msgid "Screen Paged"
-msgstr "网印分页"
-
-msgid "Security Labels"
-msgstr "安全标签"
-
 msgid "See Other"
 msgstr "查看其他"
 
 msgid "See remote printer."
 msgstr "查看远程打印机。"
 
-msgid "Self Adhesive"
-msgstr "自粘合"
-
-msgid "Self Adhesive Film"
-msgstr "自粘合胶片"
-
 msgid "Self-signed credentials are blocked."
 msgstr "禁止使用自签发的凭据。"
-
-msgid "Semi-Gloss Fabric"
-msgstr "半光面编织物"
-
-msgid "Semi-Gloss Labels"
-msgstr "半光面标签"
-
-msgid "Semi-Gloss Optical Disc"
-msgstr "半光面光盘"
-
-msgid "Semi-Gloss Photo Paper"
-msgstr "半光面照片纸"
 
 msgid "Sending data to printer."
 msgstr "正在向打印机发送数据。"
@@ -4907,48 +4280,6 @@ msgstr "邮寄地址"
 msgid "Short-Edge (Landscape)"
 msgstr "短边缘（水平）"
 
-msgid "Shrink Foil"
-msgstr "热缩铝箔"
-
-msgid "Side"
-msgstr "侧面"
-
-msgid "Side Tray"
-msgstr "侧面纸盘"
-
-msgid "Single Face"
-msgstr "单面"
-
-msgid "Single Punch (Landscape)"
-msgstr "单孔冲压（水平）"
-
-msgid "Single Punch (Portrait)"
-msgstr "单孔冲压（垂直）"
-
-msgid "Single Punch (Reverse Landscape)"
-msgstr "单孔冲压（反向水平）"
-
-msgid "Single Punch (Reverse Portrait)"
-msgstr "单孔冲压（反向垂直）"
-
-msgid "Single Staple (Landscape)"
-msgstr "单钉装（水平）"
-
-msgid "Single Staple (Portrait)"
-msgstr "单钉装（垂直）"
-
-msgid "Single Staple (Reverse Landscape)"
-msgstr "单钉装（反向水平）"
-
-msgid "Single Staple (Reverse Portrait)"
-msgstr "单钉装（反向垂直）"
-
-msgid "Single Wall Cardboard"
-msgstr "单层纸板"
-
-msgid "Sleeve"
-msgstr "套筒"
-
 msgid "Special Paper"
 msgstr "特殊纸张"
 
@@ -4956,56 +4287,11 @@ msgstr "特殊纸张"
 msgid "Spooling job, %.0f%% complete."
 msgstr "正在转存任务，已完成 %.0f%%。"
 
-msgid "Stacker 1"
-msgstr "摞纸器 1"
-
-msgid "Stacker 10"
-msgstr "摞纸器 10"
-
-msgid "Stacker 2"
-msgstr "摞纸器 2"
-
-msgid "Stacker 3"
-msgstr "摞纸器 3"
-
-msgid "Stacker 4"
-msgstr "摞纸器 4"
-
-msgid "Stacker 5"
-msgstr "摞纸器 5"
-
-msgid "Stacker 6"
-msgstr "摞纸器 6"
-
-msgid "Stacker 7"
-msgstr "摞纸器 7"
-
-msgid "Stacker 8"
-msgstr "摞纸器 8"
-
-msgid "Stacker 9"
-msgstr "摞纸器 9"
-
 msgid "Standard"
 msgstr "标准"
 
 msgid "Staple"
 msgstr "装订"
-
-msgid "Staple Edge"
-msgstr "装订边缘"
-
-msgid "Staple Edge (Landscape)"
-msgstr "装订边缘（水平）"
-
-msgid "Staple Edge (Portrait)"
-msgstr "装订边缘（垂直）"
-
-msgid "Staple Edge (Reverse Landscape)"
-msgstr "装订边缘（反向水平）"
-
-msgid "Staple Edge (Reverse Portrait)"
-msgstr "装订边缘（反向垂直）"
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
 msgid "Starting Banner"
@@ -5036,9 +4322,6 @@ msgstr "超大 B/A3"
 
 msgid "Switching Protocols"
 msgstr "正在切换协议"
-
-msgid "Tab Stock"
-msgstr "重磅标签"
 
 msgid "Tabloid"
 msgstr "大幅面"
@@ -5231,18 +4514,6 @@ msgstr "job-sheets 值过多（%d > 2）。"
 msgid "Too many printer-state-reasons values (%d > %d)."
 msgstr "printer-state-reasons 值过多（%d > %d）。"
 
-msgid "Top"
-msgstr "顶部"
-
-msgid "Top Tray"
-msgstr "顶部纸盘"
-
-msgid "Tractor"
-msgstr "墨辊"
-
-msgid "Transfer"
-msgstr "传输"
-
 msgid "Transparency"
 msgstr "透明度"
 
@@ -5252,77 +4523,14 @@ msgstr "托盘"
 msgid "Tray 1"
 msgstr "托盘 1"
 
-msgid "Tray 10"
-msgstr "托盘 10"
-
-msgid "Tray 11"
-msgstr "托盘 11"
-
-msgid "Tray 12"
-msgstr "托盘 12"
-
-msgid "Tray 13"
-msgstr "托盘 13"
-
-msgid "Tray 14"
-msgstr "托盘 14"
-
-msgid "Tray 15"
-msgstr "托盘 15"
-
-msgid "Tray 16"
-msgstr "托盘 16"
-
-msgid "Tray 17"
-msgstr "托盘 17"
-
-msgid "Tray 18"
-msgstr "托盘 18"
-
-msgid "Tray 19"
-msgstr "托盘 19"
-
 msgid "Tray 2"
 msgstr "托盘 2"
-
-msgid "Tray 20"
-msgstr "托盘 20"
 
 msgid "Tray 3"
 msgstr "托盘 3"
 
 msgid "Tray 4"
 msgstr "托盘 4"
-
-msgid "Tray 5"
-msgstr "托盘 5"
-
-msgid "Tray 6"
-msgstr "托盘 6"
-
-msgid "Tray 7"
-msgstr "托盘 7"
-
-msgid "Tray 8"
-msgstr "托盘 8"
-
-msgid "Tray 9"
-msgstr "托盘 9"
-
-msgid "Triple Staple (Landscape)"
-msgstr "三钉装（水平）"
-
-msgid "Triple Staple (Portrait)"
-msgstr "三钉装（垂直）"
-
-msgid "Triple Staple (Reverse Landscape)"
-msgstr "三钉装（反向水平）"
-
-msgid "Triple Staple (Reverse Portrait)"
-msgstr "三钉装（反向垂直）"
-
-msgid "Triple Wall Cardboard"
-msgstr "三层纸板"
 
 msgid "Trust on first use is disabled."
 msgstr "初次使用信任已禁用。"
@@ -5865,9 +5073,6 @@ msgstr "Value 使用不定长度"
 msgid "VarBind uses indefinite length"
 msgstr "VarBind 使用不定长度"
 
-msgid "Vellum Paper"
-msgstr "羊皮纸"
-
 msgid "Version uses indefinite length"
 msgstr "Version 使用不定长度"
 
@@ -5883,17 +5088,8 @@ msgstr "正在等待打印机完成任务。"
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr "警告，未安装 Windows 2000 打印机驱动。"
 
-msgid "Waterproof Fabric"
-msgstr "防水编织物"
-
 msgid "Web Interface is Disabled"
 msgstr "网页界面被禁用"
-
-msgid "Wet Film"
-msgstr "湿膜"
-
-msgid "Windowed Envelope"
-msgstr "透明信封"
 
 msgid "Yes"
 msgstr "是"
@@ -5904,9 +5100,6 @@ msgid ""
 "%s:%d%s</A>."
 msgstr ""
 "你必须通过此 URL 访问此页面：<A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
-
-msgid "Z Fold"
-msgstr "Z 折"
 
 msgid "ZPL Label Printer"
 msgstr "ZPL 标签打印机"
@@ -13426,20 +12619,221 @@ msgstr ""
 #~ msgid "%g x %g"
 #~ msgstr "%g x %g"
 
+#~ msgid "2-Hole Punch (Landscape)"
+#~ msgstr "双孔冲压（水平）"
+
+#~ msgid "2-Hole Punch (Portrait)"
+#~ msgstr "双孔冲压（垂直）"
+
+#~ msgid "2-Hole Punch (Reverse Landscape)"
+#~ msgstr "双孔冲压（反向水平）"
+
+#~ msgid "2-Hole Punch (Reverse Portrait)"
+#~ msgstr "双孔冲压（反向垂直）"
+
+#~ msgid "3-Hole Punch (Landscape)"
+#~ msgstr "三孔冲压（水平）"
+
+#~ msgid "3-Hole Punch (Portrait)"
+#~ msgstr "三孔冲压（垂直）"
+
+#~ msgid "3-Hole Punch (Reverse Landscape)"
+#~ msgstr "三孔冲压（反向水平）"
+
+#~ msgid "3-Hole Punch (Reverse Portrait)"
+#~ msgstr "三孔冲压（反向垂直）"
+
+#~ msgid "4-Hole Punch (Landscape)"
+#~ msgstr "四孔冲压（水平）"
+
+#~ msgid "4-Hole Punch (Portrait)"
+#~ msgstr "四孔冲压（垂直）"
+
+#~ msgid "4-Hole Punch (Reverse Landscape)"
+#~ msgstr "四孔冲压（反向水平）"
+
+#~ msgid "4-Hole Punch (Reverse Portrait)"
+#~ msgstr "四孔冲压（反向垂直）"
+
+#~ msgid "Accordian Fold"
+#~ msgstr "手风琴式折纸法"
+
 #~ msgid "Add RSS Subscription"
 #~ msgstr "添加 RSS 订阅"
+
+#~ msgid "Advanced Photo Paper"
+#~ msgstr "高级照片纸"
+
+#~ msgid "Alternate"
+#~ msgstr "交替"
+
+#~ msgid "Alternate Roll"
+#~ msgstr "交替滚筒"
+
+#~ msgid "Aluminum"
+#~ msgstr "铝"
+
+#~ msgid "Archival Envelope"
+#~ msgstr "档案用信封"
+
+#~ msgid "Archival Fabric"
+#~ msgstr "档案用编织物"
+
+#~ msgid "Archival Paper"
+#~ msgstr "档案用纸张"
+
+#~ msgid "Archival Photo Paper"
+#~ msgstr "档案用照片纸"
+
+#~ msgid "Automatic"
+#~ msgstr "自动"
+
+#~ msgid "Back Print Film"
+#~ msgstr "印片用胶片"
 
 #~ msgid "Bad subscription ID"
 #~ msgstr "无效的订阅 ID"
 
+#~ msgid "Bale"
+#~ msgstr "10 令"
+
+#~ msgid "Bind"
+#~ msgstr "捆扎"
+
+#~ msgid "Bind (Landscape)"
+#~ msgstr "捆扎（水平）"
+
+#~ msgid "Bind (Portrait)"
+#~ msgstr "捆扎（垂直）"
+
+#~ msgid "Bind (Reverse Landscape)"
+#~ msgstr "捆扎（反向水平）"
+
+#~ msgid "Bind (Reverse Portrait)"
+#~ msgstr "捆扎（反向垂直）"
+
+#~ msgid "Bond Envelope"
+#~ msgstr "证券信封"
+
+#~ msgid "Booklet Maker"
+#~ msgstr "册子机"
+
+#~ msgid "Bottom"
+#~ msgstr "底部"
+
+#~ msgid "Bottom Tray"
+#~ msgstr "底部纸盘"
+
+#~ msgid "CD"
+#~ msgstr "CD"
+
 #~ msgid "Cancel RSS Subscription"
 #~ msgstr "取消 RSS 订阅"
+
+#~ msgid "Cardboard"
+#~ msgstr "纸板"
+
+#~ msgid "Cardstock"
+#~ msgstr "重磅纸"
+
+#~ msgid "Center"
+#~ msgstr "中部"
+
+#~ msgid "Center Tray"
+#~ msgstr "中部纸盘"
+
+#~ msgid "Coat"
+#~ msgstr "涂料"
+
+#~ msgid "Coated Envelope"
+#~ msgstr "涂面信封"
+
+#~ msgid "Coated Paper"
+#~ msgstr "涂面纸"
+
+#~ msgid "Colored Labels"
+#~ msgstr "彩色标签"
+
+#~ msgid "Continuous Long"
+#~ msgstr "长连续"
+
+#~ msgid "Continuous Short"
+#~ msgstr "短连续"
+
+#~ msgid "Cotton Envelope"
+#~ msgstr "棉质信封"
+
+#~ msgid "Cotton Paper"
+#~ msgstr "棉质纸张"
+
+#~ msgid "Cover"
+#~ msgstr "封面"
+
+#~ msgid "Cut Media"
+#~ msgstr "剪切媒体"
+
+#~ msgid "DVD"
+#~ msgstr "DVD"
+
+#~ msgid "Disc"
+#~ msgstr "光盘"
+
+#~ msgid "Double Gate Fold"
+#~ msgstr "封面拉页"
+
+#~ msgid "Double Staple (Landscape)"
+#~ msgstr "封面拉页（水平）"
+
+#~ msgid "Double Staple (Portrait)"
+#~ msgstr "封面拉页（垂直）"
+
+#~ msgid "Double Staple (Reverse Landscape)"
+#~ msgstr "封面拉页（反向水平）"
+
+#~ msgid "Double Staple (Reverse Portrait)"
+#~ msgstr "封面拉页（反向垂直）"
+
+#~ msgid "Double Wall Cardboard"
+#~ msgstr "双层纸板"
+
+#~ msgid "Dry Film"
+#~ msgstr "干膜"
+
+#~ msgid "Embossing Foil"
+#~ msgstr "压花彩箔"
+
+#~ msgid "End Board"
+#~ msgstr "结尾板"
+
+#~ msgid "Engineering Z Fold"
+#~ msgstr "工程用 Z 折纸法"
+
+#~ msgid "Envelope"
+#~ msgstr "信封"
 
 #~ msgid "Envelope #10 "
 #~ msgstr "10 号信封 "
 
 #~ msgid "Envelope PRC1 "
 #~ msgstr "中国一号信封 "
+
+#~ msgid "Everyday Glossy Photo Paper"
+#~ msgstr "日常用光面照片纸"
+
+#~ msgid "Everyday Matte Paper"
+#~ msgstr "日常用雾面纸"
+
+#~ msgid "Extra Heavyweight Paper"
+#~ msgstr "超重磅纸"
+
+#~ msgid "Fabric"
+#~ msgstr "编织物"
+
+#~ msgid "Face Down"
+#~ msgstr "朝下"
+
+#~ msgid "Face Up"
+#~ msgstr "朝上"
 
 #~ msgid "FanFold German"
 #~ msgstr "德国式扇折"
@@ -13454,8 +12848,524 @@ msgstr ""
 #~ msgid "File Folder "
 #~ msgstr "文件夹 "
 
+#~ msgid "Film"
+#~ msgstr "胶片"
+
+#~ msgid "Fine Envelope"
+#~ msgstr "精致信封"
+
+#~ msgid "Flexo Base"
+#~ msgstr "柔性版基"
+
+#~ msgid "Flexo Photo Polymer"
+#~ msgstr "柔性照片聚合物"
+
+#~ msgid "Flute"
+#~ msgstr "瓦楞纸"
+
+#~ msgid "Foil"
+#~ msgstr "烫压"
+
+#~ msgid "Full Cut Tabs"
+#~ msgstr "完整裁剪标签"
+
+#~ msgid "Gate Fold"
+#~ msgstr "对开页"
+
+#~ msgid "Glass"
+#~ msgstr "玻璃"
+
+#~ msgid "Glass Colored"
+#~ msgstr "彩色玻璃"
+
+#~ msgid "Glass Opaque"
+#~ msgstr "不透明玻璃"
+
+#~ msgid "Glass Surfaced"
+#~ msgstr "涂面玻璃"
+
+#~ msgid "Glass Textured"
+#~ msgstr "材质玻璃"
+
+#~ msgid "Glossy Brochure Paper"
+#~ msgstr "光面海报纸"
+
+#~ msgid "Glossy Fabric"
+#~ msgstr "光面编织物"
+
+#~ msgid "Glossy Labels"
+#~ msgstr "光面标签"
+
+#~ msgid "Glossy Optical Disc"
+#~ msgstr "光面光盘"
+
+#~ msgid "Glossy Photo Paper"
+#~ msgstr "光面照片纸"
+
+#~ msgid "Gravure Cylinder"
+#~ msgstr "凹印滚筒"
+
+#~ msgid "Hagaki"
+#~ msgstr "叶书"
+
+#~ msgid "Half Fold"
+#~ msgstr "对折"
+
+#~ msgid "Half Z Fold"
+#~ msgstr "半 Z 折"
+
+#~ msgid "Heavyweight Coated Paper"
+#~ msgstr "重磅涂面纸"
+
+#~ msgid "Heavyweight Envelope"
+#~ msgstr "重磅信封"
+
+#~ msgid "Heavyweight Paper"
+#~ msgstr "重磅纸"
+
+#~ msgid "High Gloss Fabric"
+#~ msgstr "高光编织物"
+
+#~ msgid "High Gloss Labels"
+#~ msgstr "高光标签"
+
+#~ msgid "High Gloss Optical Disc"
+#~ msgstr "高光光盘"
+
+#~ msgid "High Gloss Photo Paper"
+#~ msgstr "高光照片纸"
+
+#~ msgid "Image Setter Paper"
+#~ msgstr "底片输出机纸"
+
+#~ msgid "Imaging Cylinder"
+#~ msgstr "图像滚筒"
+
+#~ msgid "Inkjet Envelope"
+#~ msgstr "喷墨信封"
+
+#~ msgid "Inkjet Labels"
+#~ msgstr "喷墨标签"
+
+#~ msgid "Inkjet Paper"
+#~ msgstr "喷墨纸"
+
+#~ msgid "Jog"
+#~ msgstr "垛齐"
+
+#~ msgid "Labels"
+#~ msgstr "标签"
+
+#~ msgid "Laminate"
+#~ msgstr "裱"
+
+#~ msgid "Laminating Foil"
+#~ msgstr "裱箔"
+
+#~ msgid "Large Capacity"
+#~ msgstr "大容量"
+
+#~ msgid "Large Capacity Tray"
+#~ msgstr "大容量纸盘"
+
+#~ msgid "Left"
+#~ msgstr "左"
+
+#~ msgid "Left Gate Fold"
+#~ msgstr "左对开页"
+
+#~ msgid "Left Tray"
+#~ msgstr "左纸盘"
+
+#~ msgid "Letter Fold"
+#~ msgstr "信函折法"
+
+#~ msgid "Letterhead"
+#~ msgstr "笺头"
+
+#~ msgid "Lightweight Envelope"
+#~ msgstr "轻型信封"
+
+#~ msgid "Lightweight Paper"
+#~ msgstr "轻型纸张"
+
+#~ msgid "Mailbox 1"
+#~ msgstr "1 号信箱"
+
+#~ msgid "Mailbox 10"
+#~ msgstr "10 号信箱"
+
+#~ msgid "Mailbox 2"
+#~ msgstr "2 号信箱"
+
+#~ msgid "Mailbox 3"
+#~ msgstr "3 号信箱"
+
+#~ msgid "Mailbox 4"
+#~ msgstr "4 号信箱"
+
+#~ msgid "Mailbox 5"
+#~ msgstr "5 号信箱"
+
+#~ msgid "Mailbox 6"
+#~ msgstr "6 号信箱"
+
+#~ msgid "Mailbox 7"
+#~ msgstr "7 号信箱"
+
+#~ msgid "Mailbox 8"
+#~ msgstr "8 号信箱"
+
+#~ msgid "Mailbox 9"
+#~ msgstr "9 号信箱"
+
+#~ msgid "Main"
+#~ msgstr "主队列"
+
+#~ msgid "Main Roll"
+#~ msgstr "主滚筒"
+
+#~ msgid "Manual"
+#~ msgstr "手动"
+
+#~ msgid "Matte Brochure Paper"
+#~ msgstr "雾面海报纸"
+
+#~ msgid "Matte Cover Paper"
+#~ msgstr "雾面封面纸"
+
+#~ msgid "Matte Fabric"
+#~ msgstr "雾面编织物"
+
+#~ msgid "Matte Labels"
+#~ msgstr "雾面标签"
+
+#~ msgid "Matte Optical Disc"
+#~ msgstr "雾面光盘"
+
+#~ msgid "Matte Photo Paper"
+#~ msgstr "雾面照片纸"
+
+#~ msgid "Metal"
+#~ msgstr "金属"
+
+#~ msgid "Metal Glossy"
+#~ msgstr "光面金属"
+
+#~ msgid "Metal High Gloss"
+#~ msgstr "高光金属"
+
+#~ msgid "Metal Matte"
+#~ msgstr "雾面金属"
+
+#~ msgid "Metal Satin"
+#~ msgstr "缎面抛光金属"
+
+#~ msgid "Metal Semi Gloss"
+#~ msgstr "半光面金属"
+
+#~ msgid "Mid-Weight Paper"
+#~ msgstr "中重纸张"
+
+#~ msgid "Middle"
+#~ msgstr "中间"
+
+#~ msgid "Mounting Tape"
+#~ msgstr "装载带"
+
+#~ msgid "Multi Layer"
+#~ msgstr "多面"
+
+#~ msgid "Multi Part Form"
+#~ msgstr "多部表单"
+
+#~ msgid "Multi-Hole Punch (Landscape)"
+#~ msgstr "多孔冲压（水平）"
+
+#~ msgid "Multi-Hole Punch (Portrait)"
+#~ msgstr "多孔冲压（垂直）"
+
+#~ msgid "Multi-Hole Punch (Reverse Landscape)"
+#~ msgstr "多孔冲压（反向水平）"
+
+#~ msgid "Multi-Hole Punch (Reverse Portrait)"
+#~ msgstr "多孔冲压（反向垂直）"
+
+#~ msgid "Multipurpose"
+#~ msgstr "多用"
+
+#~ msgid "Multipurpose Paper"
+#~ msgstr "多用纸"
+
+#~ msgid "My Mailbox"
+#~ msgstr "我的信箱"
+
+#~ msgid "Office Recycled Paper"
+#~ msgstr "办公室用再生纸"
+
+#~ msgid "Optical Disc"
+#~ msgstr "光盘"
+
+#~ msgid "Other"
+#~ msgstr "其他"
+
+#~ msgid "Paper"
+#~ msgstr "纸张"
+
+#~ msgid "Parallel Fold"
+#~ msgstr "并行折叠"
+
+#~ msgid "Permanent Labels"
+#~ msgstr "永久标签"
+
+#~ msgid "Photo Film"
+#~ msgstr "照片胶卷"
+
+#~ msgid "Photo Paper"
+#~ msgstr "照片纸"
+
+#~ msgid "Photo Paper Plus Glossy II"
+#~ msgstr "Photo Paper Plus Glossy II"
+
+#~ msgid "Photo Paper Pro Platinum"
+#~ msgstr "Photo Paper Pro Platinum"
+
+#~ msgid "Plain Envelope"
+#~ msgstr "普通信封"
+
+#~ msgid "Plastic"
+#~ msgstr "塑料"
+
+#~ msgid "Plastic Archival"
+#~ msgstr "档案用塑料"
+
+#~ msgid "Plastic Colored"
+#~ msgstr "彩色塑料"
+
+#~ msgid "Plastic Glossy"
+#~ msgstr "光面塑料"
+
+#~ msgid "Plastic High Gloss"
+#~ msgstr "高光塑料"
+
+#~ msgid "Plastic Matte"
+#~ msgstr "雾面塑料"
+
+#~ msgid "Plastic Satin"
+#~ msgstr "缎面抛光塑料"
+
+#~ msgid "Plastic Semi Gloss"
+#~ msgstr "半光面塑料"
+
+#~ msgid "Plate"
+#~ msgstr "印刷板"
+
+#~ msgid "Polyester"
+#~ msgstr "聚酯"
+
 #~ msgid "Postcard Double "
 #~ msgstr "双面明信片 "
+
+#~ msgid "Poster Fold"
+#~ msgstr "对折明信片"
+
+#~ msgid "Pre Cut Tabs"
+#~ msgstr "已裁剪标签"
+
+#~ msgid "Premium Inkjet Paper"
+#~ msgstr "高级喷墨纸"
+
+#~ msgid "Premium Photo Glossy Paper"
+#~ msgstr "高级光面照片纸"
+
+#~ msgid "Premium Presentation Matte Paper"
+#~ msgstr "高级雾面展示用纸"
+
+#~ msgid "Preprinted Envelope"
+#~ msgstr "预打印信封"
+
+#~ msgid "Preprinted Paper"
+#~ msgstr "预打印纸"
+
+#~ msgid "Punched Paper"
+#~ msgstr "打孔纸"
+
+#~ msgid "Rear"
+#~ msgstr "后部"
+
+#~ msgid "Rear Tray"
+#~ msgstr "后部纸盘"
+
+#~ msgid "Right"
+#~ msgstr "右"
+
+#~ msgid "Right Gate Fold"
+#~ msgstr "右对开页"
+
+#~ msgid "Right Tray"
+#~ msgstr "右部纸盘"
+
+#~ msgid "Roll"
+#~ msgstr "滚筒"
+
+#~ msgid "Roll 1"
+#~ msgstr "滚筒 1"
+
+#~ msgid "Roll 10"
+#~ msgstr "滚筒 10"
+
+#~ msgid "Roll 2"
+#~ msgstr "滚筒 2"
+
+#~ msgid "Roll 3"
+#~ msgstr "滚筒 3"
+
+#~ msgid "Roll 4"
+#~ msgstr "滚筒 4"
+
+#~ msgid "Roll 5"
+#~ msgstr "滚筒 5"
+
+#~ msgid "Roll 6"
+#~ msgstr "滚筒 6"
+
+#~ msgid "Roll 7"
+#~ msgstr "滚筒 7"
+
+#~ msgid "Roll 8"
+#~ msgstr "滚筒 8"
+
+#~ msgid "Roll 9"
+#~ msgstr "滚筒 9"
+
+#~ msgid "Saddle Stitch"
+#~ msgstr "骑马订装"
+
+#~ msgid "Satin Labels"
+#~ msgstr "缎面抛光标签"
+
+#~ msgid "Satin Optical Disc"
+#~ msgstr "缎面抛光光盘"
+
+#~ msgid "Satin Photo Paper"
+#~ msgstr "缎面抛光照片纸"
+
+#~ msgid "Screen"
+#~ msgstr "网印"
+
+#~ msgid "Screen Paged"
+#~ msgstr "网印分页"
+
+#~ msgid "Security Labels"
+#~ msgstr "安全标签"
+
+#~ msgid "Self Adhesive"
+#~ msgstr "自粘合"
+
+#~ msgid "Self Adhesive Film"
+#~ msgstr "自粘合胶片"
+
+#~ msgid "Semi-Gloss Fabric"
+#~ msgstr "半光面编织物"
+
+#~ msgid "Semi-Gloss Labels"
+#~ msgstr "半光面标签"
+
+#~ msgid "Semi-Gloss Optical Disc"
+#~ msgstr "半光面光盘"
+
+#~ msgid "Semi-Gloss Photo Paper"
+#~ msgstr "半光面照片纸"
+
+#~ msgid "Shrink Foil"
+#~ msgstr "热缩铝箔"
+
+#~ msgid "Side"
+#~ msgstr "侧面"
+
+#~ msgid "Side Tray"
+#~ msgstr "侧面纸盘"
+
+#~ msgid "Single Face"
+#~ msgstr "单面"
+
+#~ msgid "Single Punch (Landscape)"
+#~ msgstr "单孔冲压（水平）"
+
+#~ msgid "Single Punch (Portrait)"
+#~ msgstr "单孔冲压（垂直）"
+
+#~ msgid "Single Punch (Reverse Landscape)"
+#~ msgstr "单孔冲压（反向水平）"
+
+#~ msgid "Single Punch (Reverse Portrait)"
+#~ msgstr "单孔冲压（反向垂直）"
+
+#~ msgid "Single Staple (Landscape)"
+#~ msgstr "单钉装（水平）"
+
+#~ msgid "Single Staple (Portrait)"
+#~ msgstr "单钉装（垂直）"
+
+#~ msgid "Single Staple (Reverse Landscape)"
+#~ msgstr "单钉装（反向水平）"
+
+#~ msgid "Single Staple (Reverse Portrait)"
+#~ msgstr "单钉装（反向垂直）"
+
+#~ msgid "Single Wall Cardboard"
+#~ msgstr "单层纸板"
+
+#~ msgid "Sleeve"
+#~ msgstr "套筒"
+
+#~ msgid "Stacker 1"
+#~ msgstr "摞纸器 1"
+
+#~ msgid "Stacker 10"
+#~ msgstr "摞纸器 10"
+
+#~ msgid "Stacker 2"
+#~ msgstr "摞纸器 2"
+
+#~ msgid "Stacker 3"
+#~ msgstr "摞纸器 3"
+
+#~ msgid "Stacker 4"
+#~ msgstr "摞纸器 4"
+
+#~ msgid "Stacker 5"
+#~ msgstr "摞纸器 5"
+
+#~ msgid "Stacker 6"
+#~ msgstr "摞纸器 6"
+
+#~ msgid "Stacker 7"
+#~ msgstr "摞纸器 7"
+
+#~ msgid "Stacker 8"
+#~ msgstr "摞纸器 8"
+
+#~ msgid "Stacker 9"
+#~ msgstr "摞纸器 9"
+
+#~ msgid "Staple Edge"
+#~ msgstr "装订边缘"
+
+#~ msgid "Staple Edge (Landscape)"
+#~ msgstr "装订边缘（水平）"
+
+#~ msgid "Staple Edge (Portrait)"
+#~ msgstr "装订边缘（垂直）"
+
+#~ msgid "Staple Edge (Reverse Landscape)"
+#~ msgstr "装订边缘（反向水平）"
+
+#~ msgid "Staple Edge (Reverse Portrait)"
+#~ msgstr "装订边缘（反向垂直）"
+
+#~ msgid "Tab Stock"
+#~ msgstr "重磅标签"
 
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
@@ -13467,6 +13377,81 @@ msgstr ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "
 #~ "(?), or the pound sign (#)."
 #~ msgstr "订阅名称不得包含空格，斜杠（/），问号（?）或井号（#）。"
+
+#~ msgid "Top"
+#~ msgstr "顶部"
+
+#~ msgid "Top Tray"
+#~ msgstr "顶部纸盘"
+
+#~ msgid "Tractor"
+#~ msgstr "墨辊"
+
+#~ msgid "Transfer"
+#~ msgstr "传输"
+
+#~ msgid "Tray 10"
+#~ msgstr "托盘 10"
+
+#~ msgid "Tray 11"
+#~ msgstr "托盘 11"
+
+#~ msgid "Tray 12"
+#~ msgstr "托盘 12"
+
+#~ msgid "Tray 13"
+#~ msgstr "托盘 13"
+
+#~ msgid "Tray 14"
+#~ msgstr "托盘 14"
+
+#~ msgid "Tray 15"
+#~ msgstr "托盘 15"
+
+#~ msgid "Tray 16"
+#~ msgstr "托盘 16"
+
+#~ msgid "Tray 17"
+#~ msgstr "托盘 17"
+
+#~ msgid "Tray 18"
+#~ msgstr "托盘 18"
+
+#~ msgid "Tray 19"
+#~ msgstr "托盘 19"
+
+#~ msgid "Tray 20"
+#~ msgstr "托盘 20"
+
+#~ msgid "Tray 5"
+#~ msgstr "托盘 5"
+
+#~ msgid "Tray 6"
+#~ msgstr "托盘 6"
+
+#~ msgid "Tray 7"
+#~ msgstr "托盘 7"
+
+#~ msgid "Tray 8"
+#~ msgstr "托盘 8"
+
+#~ msgid "Tray 9"
+#~ msgstr "托盘 9"
+
+#~ msgid "Triple Staple (Landscape)"
+#~ msgstr "三钉装（水平）"
+
+#~ msgid "Triple Staple (Portrait)"
+#~ msgstr "三钉装（垂直）"
+
+#~ msgid "Triple Staple (Reverse Landscape)"
+#~ msgstr "三钉装（反向水平）"
+
+#~ msgid "Triple Staple (Reverse Portrait)"
+#~ msgstr "三钉装（反向垂直）"
+
+#~ msgid "Triple Wall Cardboard"
+#~ msgstr "三层纸板"
 
 #~ msgid "Unable to add RSS subscription"
 #~ msgstr "无法添加 RSS 订阅"
@@ -13484,6 +13469,21 @@ msgstr ""
 #~ "      \tippdiscover [options] \"service name\"\n"
 #~ "\n"
 #~ "选项："
+
+#~ msgid "Vellum Paper"
+#~ msgstr "羊皮纸"
+
+#~ msgid "Waterproof Fabric"
+#~ msgstr "防水编织物"
+
+#~ msgid "Wet Film"
+#~ msgstr "湿膜"
+
+#~ msgid "Windowed Envelope"
+#~ msgstr "透明信封"
+
+#~ msgid "Z Fold"
+#~ msgstr "Z 折"
 
 #~ msgid "compression"
 #~ msgstr "Compression"

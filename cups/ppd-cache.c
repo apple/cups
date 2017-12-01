@@ -3031,6 +3031,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   int			xres, yres;	/* Resolution values */
   int                   resolutions[1000];
                                         /* Array of resolution indices */
+  char			msgid[256];	/* Message identifier (attr.value) */
+  const char		*keyword,	/* Keyword value */
+			*msgstr;	/* Localized string */
   cups_lang_t		*lang = cupsLangDefault();
 					/* Localization info */
   cups_array_t		*strings = NULL;/* Printer strings file */
@@ -3038,74 +3041,6 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 					/* Locale data */
   cups_array_t		*fin_options = NULL;
 					/* Finishing options */
-  static const char * const finishings[][2] =
-  {					/* Finishings strings */
-    { "bale", _("Bale") },
-    { "bind", _("Bind") },
-    { "bind-bottom", _("Bind (Reverse Landscape)") },
-    { "bind-left", _("Bind (Portrait)") },
-    { "bind-right", _("Bind (Reverse Portrait)") },
-    { "bind-top", _("Bind (Landscape)") },
-    { "booklet-maker", _("Booklet Maker") },
-    { "coat", _("Coat") },
-    { "cover", _("Cover") },
-    { "edge-stitch", _("Staple Edge") },
-    { "edge-stitch-bottom", _("Staple Edge (Reverse Landscape)") },
-    { "edge-stitch-left", _("Staple Edge (Portrait)") },
-    { "edge-stitch-right", _("Staple Edge (Reverse Portrait)") },
-    { "edge-stitch-top", _("Staple Edge (Landscape)") },
-    { "fold", _("Fold") },
-    { "fold-accordian", _("Accordian Fold") },
-    { "fold-double-gate", _("Double Gate Fold") },
-    { "fold-engineering-z", _("Engineering Z Fold") },
-    { "fold-gate", _("Gate Fold") },
-    { "fold-half", _("Half Fold") },
-    { "fold-half-z", _("Half Z Fold") },
-    { "fold-left-gate", _("Left Gate Fold") },
-    { "fold-letter", _("Letter Fold") },
-    { "fold-parallel", _("Parallel Fold") },
-    { "fold-poster", _("Poster Fold") },
-    { "fold-right-gate", _("Right Gate Fold") },
-    { "fold-z", _("Z Fold") },
-    { "jog-offset", _("Jog") },
-    { "laminate", _("Laminate") },
-    { "punch", _("Punch") },
-    { "punch-bottom-left", _("Single Punch (Reverse Landscape)") },
-    { "punch-bottom-right", _("Single Punch (Reverse Portrait)") },
-    { "punch-double-bottom", _("2-Hole Punch (Reverse Portrait)") },
-    { "punch-double-left", _("2-Hole Punch (Reverse Landscape)") },
-    { "punch-double-right", _("2-Hole Punch (Landscape)") },
-    { "punch-double-top", _("2-Hole Punch (Portrait)") },
-    { "punch-quad-bottom", _("4-Hole Punch (Reverse Landscape)") },
-    { "punch-quad-left", _("4-Hole Punch (Portrait)") },
-    { "punch-quad-right", _("4-Hole Punch (Reverse Portrait)") },
-    { "punch-quad-top", _("4-Hole Punch (Landscape)") },
-    { "punch-top-left", _("Single Punch (Portrait)") },
-    { "punch-top-right", _("Single Punch (Landscape)") },
-    { "punch-triple-bottom", _("3-Hole Punch (Reverse Landscape)") },
-    { "punch-triple-left", _("3-Hole Punch (Portrait)") },
-    { "punch-triple-right", _("3-Hole Punch (Reverse Portrait)") },
-    { "punch-triple-top", _("3-Hole Punch (Landscape)") },
-    { "punch-multiple-bottom", _("Multi-Hole Punch (Reverse Landscape)") },
-    { "punch-multiple-left", _("Multi-Hole Punch (Portrait)") },
-    { "punch-multiple-right", _("Multi-Hole Punch (Reverse Portrait)") },
-    { "punch-multiple-top", _("Multi-Hole Punch (Landscape)") },
-    { "saddle-stitch", _("Saddle Stitch") },
-    { "staple", _("Staple") },
-    { "staple-bottom-left", _("Single Staple (Reverse Landscape)") },
-    { "staple-bottom-right", _("Single Staple (Reverse Portrait)") },
-    { "staple-dual-bottom", _("Double Staple (Reverse Landscape)") },
-    { "staple-dual-left", _("Double Staple (Portrait)") },
-    { "staple-dual-right", _("Double Staple (Reverse Portrait)") },
-    { "staple-dual-top", _("Double Staple (Landscape)") },
-    { "staple-top-left", _("Single Staple (Portrait)") },
-    { "staple-top-right", _("Single Staple (Landscape)") },
-    { "staple-triple-bottom", _("Triple Staple (Reverse Landscape)") },
-    { "staple-triple-left", _("Triple Staple (Portrait)") },
-    { "staple-triple-right", _("Triple Staple (Reverse Portrait)") },
-    { "staple-triple-top", _("Triple Staple (Landscape)") },
-    { "trim", _("Cut Media") }
-  };
 
 
  /*
@@ -3623,58 +3558,58 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "media-source-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
-    static const char * const sources[][2] =
-    {					/* "media-source" strings */
-      { "Auto", _("Automatic") },
-      { "Main", _("Main") },
-      { "Alternate", _("Alternate") },
-      { "LargeCapacity", _("Large Capacity") },
-      { "Manual", _("Manual") },
-      { "Envelope", _("Envelope") },
-      { "Disc", _("Disc") },
-      { "Photo", _("Photo") },
-      { "Hagaki", _("Hagaki") },
-      { "MainRoll", _("Main Roll") },
-      { "AlternateRoll", _("Alternate Roll") },
-      { "Top", _("Top") },
-      { "Middle", _("Middle") },
-      { "Bottom", _("Bottom") },
-      { "Side", _("Side") },
-      { "Left", _("Left") },
-      { "Right", _("Right") },
-      { "Center", _("Center") },
-      { "Rear", _("Rear") },
-      { "ByPassTray", _("Multipurpose") },
-      { "Tray1", _("Tray 1") },
-      { "Tray2", _("Tray 2") },
-      { "Tray3", _("Tray 3") },
-      { "Tray4", _("Tray 4") },
-      { "Tray5", _("Tray 5") },
-      { "Tray6", _("Tray 6") },
-      { "Tray7", _("Tray 7") },
-      { "Tray8", _("Tray 8") },
-      { "Tray9", _("Tray 9") },
-      { "Tray10", _("Tray 10") },
-      { "Tray11", _("Tray 11") },
-      { "Tray12", _("Tray 12") },
-      { "Tray13", _("Tray 13") },
-      { "Tray14", _("Tray 14") },
-      { "Tray15", _("Tray 15") },
-      { "Tray16", _("Tray 16") },
-      { "Tray17", _("Tray 17") },
-      { "Tray18", _("Tray 18") },
-      { "Tray19", _("Tray 19") },
-      { "Tray20", _("Tray 20") },
-      { "Roll1", _("Roll 1") },
-      { "Roll2", _("Roll 2") },
-      { "Roll3", _("Roll 3") },
-      { "Roll4", _("Roll 4") },
-      { "Roll5", _("Roll 5") },
-      { "Roll6", _("Roll 6") },
-      { "Roll7", _("Roll 7") },
-      { "Roll8", _("Roll 8") },
-      { "Roll9", _("Roll 9") },
-      { "Roll10", _("Roll 10") }
+    static const char * const sources[] =
+    {					/* Standard "media-source" strings */
+      "auto",
+      "main",
+      "alternate",
+      "large-capacity",
+      "manual",
+      "envelope",
+      "disc",
+      "photo",
+      "hagaki",
+      "main-roll",
+      "alternate-roll",
+      "top",
+      "middle",
+      "bottom",
+      "side",
+      "left",
+      "right",
+      "center",
+      "rear",
+      "by-pass-tray",
+      "tray-1",
+      "tray-2",
+      "tray-3",
+      "tray-4",
+      "tray-5",
+      "tray-6",
+      "tray-7",
+      "tray-8",
+      "tray-9",
+      "tray-10",
+      "tray-11",
+      "tray-12",
+      "tray-13",
+      "tray-14",
+      "tray-15",
+      "tray-16",
+      "tray-17",
+      "tray-18",
+      "tray-19",
+      "tray-20",
+      "roll-1",
+      "roll-2",
+      "roll-3",
+      "roll-4",
+      "roll-5",
+      "roll-6",
+      "roll-7",
+      "roll-8",
+      "roll-9",
+      "roll-10"
     };
 
     cupsFilePrintf(fp, "*OpenUI *InputSlot: PickOne\n"
@@ -3682,12 +3617,15 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
                        "*DefaultInputSlot: %s\n", ppdname);
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
-      pwg_ppdize_name(ippGetString(attr, i, NULL), ppdname, sizeof(ppdname));
+      keyword = ippGetString(attr, i, NULL);
+
+      pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
 
       for (j = 0; j < (int)(sizeof(sources) / sizeof(sources[0])); j ++)
-        if (!strcmp(sources[j][0], ppdname))
+        if (!strcmp(sources[j], keyword))
 	{
-	  cupsFilePrintf(fp, "*InputSlot %s/%s: \"<</MediaPosition %d>>setpagedevice\"\n", ppdname, _cupsLangString(lang, sources[j][1]), j);
+	  snprintf(msgid, sizeof(msgid), "media-source.%s", keyword);
+	  cupsFilePrintf(fp, "*InputSlot %s/%s: \"<</MediaPosition %d>>setpagedevice\"\n", ppdname, _cupsLangString(lang, msgid), j);
 	  break;
 	}
     }
@@ -3705,176 +3643,21 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "media-type-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
-    static const char * const media_types[][2] =
-    {					/* "media-type" strings */
-      { "aluminum", _("Aluminum") },
-      { "auto", _("Automatic") },
-      { "back-print-film", _("Back Print Film") },
-      { "cardboard", _("Cardboard") },
-      { "cardstock", _("Cardstock") },
-      { "cd", _("CD") },
-      { "com.hp.advanced-photo", _("Advanced Photo Paper") }, /* HP */
-      { "com.hp.brochure-glossy", _("Glossy Brochure Paper") }, /* HP */
-      { "com.hp.brochure-matte", _("Matte Brochure Paper") }, /* HP */
-      { "com.hp.cover-matte", _("Matte Cover Paper") }, /* HP */
-      { "com.hp.ecosmart-lite", _("Office Recycled Paper") }, /* HP */
-      { "com.hp.everyday-glossy", _("Everyday Glossy Photo Paper") }, /* HP */
-      { "com.hp.everyday-matte", _("Everyday Matte Paper") }, /* HP */
-      { "com.hp.extra-heavy", _("Extra Heavyweight Paper") }, /* HP */
-      { "com.hp.intermediate", _("Multipurpose Paper") }, /* HP */
-      { "com.hp.mid-weight", _("Mid-Weight Paper") }, /* HP */
-      { "com.hp.premium-inkjet", _("Premium Inkjet Paper") }, /* HP */
-      { "com.hp.premium-photo", _("Premium Photo Glossy Paper") }, /* HP */
-      { "com.hp.premium-presentation-matte", _("Premium Presentation Matte Paper") }, /* HP */
-      { "continuous", _("Continuous") },
-      { "continuous-long", _("Continuous Long") },
-      { "continuous-short", _("Continuous Short") },
-      { "disc", _("Optical Disc") },
-      { "disc-glossy", _("Glossy Optical Disc") },
-      { "disc-high-gloss", _("High Gloss Optical Disc") },
-      { "disc-matte", _("Matte Optical Disc") },
-      { "disc-satin", _("Satin Optical Disc") },
-      { "disc-semi-gloss", _("Semi-Gloss Optical Disc") },
-      { "double-wall", _("Double Wall Cardboard") },
-      { "dry-film", _("Dry Film") },
-      { "dvd", _("DVD") },
-      { "embossing-foil", _("Embossing Foil") },
-      { "end-board", _("End Board") },
-      { "envelope", _("Envelope") },
-      { "envelope-archival", _("Archival Envelope") },
-      { "envelope-bond", _("Bond Envelope") },
-      { "envelope-coated", _("Coated Envelope") },
-      { "envelope-cotton", _("Cotton Envelope") },
-      { "envelope-fine", _("Fine Envelope") },
-      { "envelope-heavyweight", _("Heavyweight Envelope") },
-      { "envelope-inkjet", _("Inkjet Envelope") },
-      { "envelope-lightweight", _("Lightweight Envelope") },
-      { "envelope-plain", _("Plain Envelope") },
-      { "envelope-preprinted", _("Preprinted Envelope") },
-      { "envelope-window", _("Windowed Envelope") },
-      { "fabric", _("Fabric") },
-      { "fabric-archival", _("Archival Fabric") },
-      { "fabric-glossy", _("Glossy Fabric") },
-      { "fabric-high-gloss", _("High Gloss Fabric") },
-      { "fabric-matte", _("Matte Fabric") },
-      { "fabric-semi-gloss", _("Semi-Gloss Fabric") },
-      { "fabric-waterproof", _("Waterproof Fabric") },
-      { "film", _("Film") },
-      { "flexo-base", _("Flexo Base") },
-      { "flexo-photo-polymer", _("Flexo Photo Polymer") },
-      { "flute", _("Flute") },
-      { "foil", _("Foil") },
-      { "full-cut-tabs", _("Full Cut Tabs") },
-      { "glass", _("Glass") },
-      { "glass-colored", _("Glass Colored") },
-      { "glass-opaque", _("Glass Opaque") },
-      { "glass-surfaced", _("Glass Surfaced") },
-      { "glass-textured", _("Glass Textured") },
-      { "gravure-cylinder", _("Gravure Cylinder") },
-      { "image-setter-paper", _("Image Setter Paper") },
-      { "imaging-cylinder", _("Imaging Cylinder") },
-      { "jp.co.canon_photo-paper-plus-glossy-ii", _("Photo Paper Plus Glossy II") }, /* Canon */
-      { "jp.co.canon_photo-paper-pro-platinum", _("Photo Paper Pro Platinum") }, /* Canon */
-      { "jp.co.canon-photo-paper-plus-glossy-ii", _("Photo Paper Plus Glossy II") }, /* Canon */
-      { "jp.co.canon-photo-paper-pro-platinum", _("Photo Paper Pro Platinum") }, /* Canon */
-      { "labels", _("Labels") },
-      { "labels-colored", _("Colored Labels") },
-      { "labels-glossy", _("Glossy Labels") },
-      { "labels-high-gloss", _("High Gloss Labels") },
-      { "labels-inkjet", _("Inkjet Labels") },
-      { "labels-matte", _("Matte Labels") },
-      { "labels-permanent", _("Permanent Labels") },
-      { "labels-satin", _("Satin Labels") },
-      { "labels-security", _("Security Labels") },
-      { "labels-semi-gloss", _("Semi-Gloss Labels") },
-      { "laminating-foil", _("Laminating Foil") },
-      { "letterhead", _("Letterhead") },
-      { "metal", _("Metal") },
-      { "metal-glossy", _("Metal Glossy") },
-      { "metal-high-gloss", _("Metal High Gloss") },
-      { "metal-matte", _("Metal Matte") },
-      { "metal-satin", _("Metal Satin") },
-      { "metal-semi-gloss", _("Metal Semi Gloss") },
-      { "mounting-tape", _("Mounting Tape") },
-      { "multi-layer", _("Multi Layer") },
-      { "multi-part-form", _("Multi Part Form") },
-      { "other", _("Other") },
-      { "paper", _("Paper") },
-      { "photo", _("Photo Paper") }, /* HP mis-spelling */
-      { "photographic", _("Photo Paper") },
-      { "photographic-archival", _("Archival Photo Paper") },
-      { "photographic-film", _("Photo Film") },
-      { "photographic-glossy", _("Glossy Photo Paper") },
-      { "photographic-high-gloss", _("High Gloss Photo Paper") },
-      { "photographic-matte", _("Matte Photo Paper") },
-      { "photographic-satin", _("Satin Photo Paper") },
-      { "photographic-semi-gloss", _("Semi-Gloss Photo Paper") },
-      { "plastic", _("Plastic") },
-      { "plastic-archival", _("Plastic Archival") },
-      { "plastic-colored", _("Plastic Colored") },
-      { "plastic-glossy", _("Plastic Glossy") },
-      { "plastic-high-gloss", _("Plastic High Gloss") },
-      { "plastic-matte", _("Plastic Matte") },
-      { "plastic-satin", _("Plastic Satin") },
-      { "plastic-semi-gloss", _("Plastic Semi Gloss") },
-      { "plate", _("Plate") },
-      { "polyester", _("Polyester") },
-      { "pre-cut-tabs", _("Pre Cut Tabs") },
-      { "roll", _("Roll") },
-      { "screen", _("Screen") },
-      { "screen-paged", _("Screen Paged") },
-      { "self-adhesive", _("Self Adhesive") },
-      { "self-adhesive-film", _("Self Adhesive Film") },
-      { "shrink-foil", _("Shrink Foil") },
-      { "single-face", _("Single Face") },
-      { "single-wall", _("Single Wall Cardboard") },
-      { "sleeve", _("Sleeve") },
-      { "stationery", _("Plain Paper") },
-      { "stationery-archival", _("Archival Paper") },
-      { "stationery-coated", _("Coated Paper") },
-      { "stationery-cotton", _("Cotton Paper") },
-      { "stationery-fine", _("Vellum Paper") },
-      { "stationery-heavyweight", _("Heavyweight Paper") },
-      { "stationery-heavyweight-coated", _("Heavyweight Coated Paper") },
-      { "stationery-inkjet", _("Inkjet Paper") },
-      { "stationery-letterhead", _("Letterhead") },
-      { "stationery-lightweight", _("Lightweight Paper") },
-      { "stationery-preprinted", _("Preprinted Paper") },
-      { "stationery-prepunched", _("Punched Paper") },
-      { "tab-stock", _("Tab Stock") },
-      { "tractor", _("Tractor") },
-      { "transfer", _("Transfer") },
-      { "transparency", _("Transparency") },
-      { "triple-wall", _("Triple Wall Cardboard") },
-      { "wet-film", _("Wet Film") }
-    };
-
     cupsFilePrintf(fp, "*OpenUI *MediaType: PickOne\n"
                        "*OrderDependency: 10 AnySetup *MediaType\n"
                        "*DefaultMediaType: %s\n", ppdname);
     for (i = 0; i < count; i ++)
     {
-      const char *keyword = ippGetString(attr, i, NULL);
+      keyword = ippGetString(attr, i, NULL);
 
       pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
 
-      for (j = 0; j < (int)(sizeof(media_types) / sizeof(media_types[0])); j ++)
-        if (!strcmp(keyword, media_types[j][0]))
-          break;
+      snprintf(msgid, sizeof(msgid), "media-type.%s", keyword);
+      if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	  msgstr = keyword;
 
-      if (j < (int)(sizeof(media_types) / sizeof(media_types[0])))
-        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, _cupsLangString(lang, media_types[j][1]), ppdname);
-      else
-      {
-        char 		msg[256];	/* Message key */
-        const char	*str;		/* Localized string */
-
-        snprintf(msg, sizeof(msg), "media-type.%s", keyword);
-        if ((str = _cupsMessageLookup(strings, msg)) == msg)
-          str = keyword;
-
-        cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, str, ppdname);
-      }
+      cupsFilePrintf(fp, "*MediaType %s/%s: \"<</MediaType(%s)>>setpagedevice\"\n", ppdname, msgstr, ppdname);
     }
     cupsFilePuts(fp, "*CloseUI: *MediaType\n");
   }
@@ -3894,8 +3677,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     for (i = 0, count = ippGetCount(attr); i < count; i ++)
     {
-      const char *keyword = ippGetString(attr, i, NULL);
-					/* Keyword for color/bit depth */
+      keyword = ippGetString(attr, i, NULL);
 
       if (!strcasecmp(keyword, "black_1") || !strcmp(keyword, "bi-level") || !strcmp(keyword, "process-bi-level"))
       {
@@ -3994,8 +3776,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     }
     else if ((attr = ippFindAttribute(response, "pwg-raster-document-sheet-back", IPP_TAG_KEYWORD)) != NULL)
     {
-      const char *keyword = ippGetString(attr, 0, NULL);
-					/* Keyword value */
+      keyword = ippGetString(attr, 0, NULL);
 
       if (!strcmp(keyword, "flipped"))
         cupsFilePuts(fp, "*cupsBackSide: Flipped\n");
@@ -4019,64 +3800,21 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "output-bin-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
-    static const char * const output_bins[][2] =
-    {					/* "output-bin" strings */
-      { "auto", _("Automatic") },
-      { "bottom", _("Bottom Tray") },
-      { "center", _("Center Tray") },
-      { "face-down", _("Face Down") },
-      { "face-up", _("Face Up") },
-      { "large-capacity", _("Large Capacity Tray") },
-      { "left", _("Left Tray") },
-      { "mailbox-1", _("Mailbox 1") },
-      { "mailbox-2", _("Mailbox 2") },
-      { "mailbox-3", _("Mailbox 3") },
-      { "mailbox-4", _("Mailbox 4") },
-      { "mailbox-5", _("Mailbox 5") },
-      { "mailbox-6", _("Mailbox 6") },
-      { "mailbox-7", _("Mailbox 7") },
-      { "mailbox-8", _("Mailbox 8") },
-      { "mailbox-9", _("Mailbox 9") },
-      { "mailbox-10", _("Mailbox 10") },
-      { "middle", _("Middle") },
-      { "my-mailbox", _("My Mailbox") },
-      { "rear", _("Rear Tray") },
-      { "right", _("Right Tray") },
-      { "side", _("Side Tray") },
-      { "stacker-1", _("Stacker 1") },
-      { "stacker-2", _("Stacker 2") },
-      { "stacker-3", _("Stacker 3") },
-      { "stacker-4", _("Stacker 4") },
-      { "stacker-5", _("Stacker 5") },
-      { "stacker-6", _("Stacker 6") },
-      { "stacker-7", _("Stacker 7") },
-      { "stacker-8", _("Stacker 8") },
-      { "stacker-9", _("Stacker 9") },
-      { "stacker-10", _("Stacker 10") },
-      { "top", _("Top Tray") },
-      { "tray-1", _("Tray 1") },
-      { "tray-2", _("Tray 2") },
-      { "tray-3", _("Tray 3") },
-      { "tray-4", _("Tray 4") },
-      { "tray-5", _("Tray 5") },
-      { "tray-6", _("Tray 6") },
-      { "tray-7", _("Tray 7") },
-      { "tray-8", _("Tray 8") },
-      { "tray-9", _("Tray 9") },
-      { "tray-10", _("Tray 10") }
-    };
-
     cupsFilePrintf(fp, "*OpenUI *OutputBin: PickOne\n"
                        "*OrderDependency: 10 AnySetup *OutputBin\n"
                        "*DefaultOutputBin: %s\n", ppdname);
-    for (i = 0; i < (int)(sizeof(output_bins) / sizeof(output_bins[0])); i ++)
+    for (i = 0; i < count; i ++)
     {
-      if (!ippContainsString(attr, output_bins[i][0]))
-        continue;
+      keyword = ippGetString(attr, i, NULL);
 
-      pwg_ppdize_name(output_bins[i][0], ppdname, sizeof(ppdname));
+      pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
 
-      cupsFilePrintf(fp, "*OutputBin %s/%s: \"\"\n", ppdname, _cupsLangString(lang, output_bins[i][1]));
+      snprintf(msgid, sizeof(msgid), "output-bin.%s", keyword);
+      if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	  msgstr = keyword;
+
+      cupsFilePrintf(fp, "*OutputBin %s/%s: \"\"\n", ppdname, msgstr);
     }
     cupsFilePuts(fp, "*CloseUI: *OutputBin\n");
   }
@@ -4087,7 +3825,6 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "finishings-supported", IPP_TAG_ENUM)) != NULL)
   {
-    const char		*name;		/* String name */
     int			value;		/* Enum value */
     cups_array_t	*names;		/* Names we've added */
 
@@ -4101,10 +3838,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     for (i = 0; i < count; i ++)
     {
-      value = ippGetInteger(attr, i);
-      name  = ippEnumString("finishings", value);
+      value   = ippGetInteger(attr, i);
+      keyword = ippEnumString("finishings", value);
 
-      if (!strncmp(name, "staple-", 7) || !strncmp(name, "bind-", 5) || !strncmp(name, "edge-stitch-", 12) || !strcmp(name, "saddle-stitch"))
+      if (!strncmp(keyword, "staple-", 7) || !strncmp(keyword, "bind-", 5) || !strncmp(keyword, "edge-stitch-", 12) || !strcmp(keyword, "saddle-stitch"))
         break;
     }
 
@@ -4119,26 +3856,24 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       for (; i < count; i ++)
       {
-        value = ippGetInteger(attr, i);
-        name  = ippEnumString("finishings", value);
+        value   = ippGetInteger(attr, i);
+        keyword = ippEnumString("finishings", value);
 
-        if (strncmp(name, "staple-", 7) && strncmp(name, "bind-", 5) && strncmp(name, "edge-stitch-", 12) && strcmp(name, "saddle-stitch"))
+        if (strncmp(keyword, "staple-", 7) && strncmp(keyword, "bind-", 5) && strncmp(keyword, "edge-stitch-", 12) && strcmp(keyword, "saddle-stitch"))
           continue;
 
-        if (cupsArrayFind(names, (char *)name))
+        if (cupsArrayFind(names, (char *)keyword))
           continue;			/* Already did this finishing template */
 
-        cupsArrayAdd(names, (char *)name);
+        cupsArrayAdd(names, (char *)keyword);
 
-        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
-        {
-          if (!strcmp(finishings[j][0], name))
-          {
-            cupsFilePrintf(fp, "*StapleLocation %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
-            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*StapleLocation %s\"\n", value, name, name);
-            break;
-          }
-        }
+	snprintf(msgid, sizeof(msgid), "finishings.%d", value);
+	if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	    msgstr = keyword;
+
+	cupsFilePrintf(fp, "*StapleLocation %s/%s: \"\"\n", keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*StapleLocation %s\"\n", value, keyword, keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *StapleLocation\n");
@@ -4150,10 +3885,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     for (i = 0; i < count; i ++)
     {
-      value = ippGetInteger(attr, i);
-      name  = ippEnumString("finishings", value);
+      value   = ippGetInteger(attr, i);
+      keyword = ippEnumString("finishings", value);
 
-      if (!strncmp(name, "fold-", 5))
+      if (!strncmp(keyword, "fold-", 5))
         break;
     }
 
@@ -4168,26 +3903,24 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       for (; i < count; i ++)
       {
-        value = ippGetInteger(attr, i);
-        name  = ippEnumString("finishings", value);
+        value   = ippGetInteger(attr, i);
+        keyword = ippEnumString("finishings", value);
 
-        if (strncmp(name, "fold-", 5))
+        if (strncmp(keyword, "fold-", 5))
           continue;
 
-        if (cupsArrayFind(names, (char *)name))
+        if (cupsArrayFind(names, (char *)keyword))
           continue;			/* Already did this finishing template */
 
-        cupsArrayAdd(names, (char *)name);
+        cupsArrayAdd(names, (char *)keyword);
 
-        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
-        {
-          if (!strcmp(finishings[j][0], name))
-          {
-            cupsFilePrintf(fp, "*FoldType %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
-            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*FoldType %s\"\n", value, name, name);
-            break;
-          }
-        }
+	snprintf(msgid, sizeof(msgid), "finishings.%d", value);
+	if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	    msgstr = keyword;
+
+	cupsFilePrintf(fp, "*FoldType %s/%s: \"\"\n", keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*FoldType %s\"\n", value, keyword, keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *FoldType\n");
@@ -4199,10 +3932,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     for (i = 0; i < count; i ++)
     {
-      value = ippGetInteger(attr, i);
-      name  = ippEnumString("finishings", value);
+      value   = ippGetInteger(attr, i);
+      keyword = ippEnumString("finishings", value);
 
-      if (!strncmp(name, "punch-", 6))
+      if (!strncmp(keyword, "punch-", 6))
         break;
     }
 
@@ -4217,26 +3950,24 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       for (i = 0; i < count; i ++)
       {
-        value = ippGetInteger(attr, i);
-        name  = ippEnumString("finishings", value);
+        value   = ippGetInteger(attr, i);
+        keyword = ippEnumString("finishings", value);
 
-        if (strncmp(name, "punch-", 6))
+        if (strncmp(keyword, "punch-", 6))
           continue;
 
-        if (cupsArrayFind(names, (char *)name))
+        if (cupsArrayFind(names, (char *)keyword))
           continue;			/* Already did this finishing template */
 
-        cupsArrayAdd(names, (char *)name);
+        cupsArrayAdd(names, (char *)keyword);
 
-        for (j = 0; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
-        {
-          if (!strcmp(finishings[j][0], name))
-          {
-            cupsFilePrintf(fp, "*PunchMedia %s/%s: \"\"\n", name, _cupsLangString(lang, finishings[j][1]));
-            cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*PunchMedia %s\"\n", value, name, name);
-            break;
-          }
-        }
+	snprintf(msgid, sizeof(msgid), "finishings.%d", value);
+	if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	    msgstr = keyword;
+
+	cupsFilePrintf(fp, "*PunchMedia %s/%s: \"\"\n", keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*PunchMedia %s\"\n", value, keyword, keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *PunchMedia\n");
@@ -4265,8 +3996,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   if ((attr = ippFindAttribute(response, "finishings-col-database", IPP_TAG_BEGIN_COLLECTION)) != NULL)
   {
     ipp_t	*finishing_col;		/* Current finishing collection */
-    const char	*template,		/* Current finishing template */
-		*loctemplate;		/* Localized template name */
+    ipp_attribute_t *finishing_attr;	/* Current finishing member attribute */
     cups_array_t *templates;		/* Finishing templates */
 
     cupsFilePrintf(fp, "*OpenUI *cupsFinishingTemplate/%s: PickOne\n", _cupsLangString(lang, _("Finishing Preset")));
@@ -4280,35 +4010,35 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     for (i = 0; i < count; i ++)
     {
       finishing_col = ippGetCollection(attr, i);
-      template      = ippGetString(ippFindAttribute(finishing_col, "finishing_template", IPP_TAG_ZERO), 0, NULL);
+      keyword       = ippGetString(ippFindAttribute(finishing_col, "finishing_template", IPP_TAG_ZERO), 0, NULL);
 
-      if (!template || cupsArrayFind(templates, (void *)template))
+      if (!keyword || cupsArrayFind(templates, (void *)keyword))
         continue;
 
-      if (strncmp(template, "fold-", 5) && (strstr(template, "-bottom") || strstr(template, "-left") || strstr(template, "-right") || strstr(template, "-top")))
+      if (strncmp(keyword, "fold-", 5) && (strstr(keyword, "-bottom") || strstr(keyword, "-left") || strstr(keyword, "-right") || strstr(keyword, "-top")))
         continue;
 
-      cupsArrayAdd(templates, (void *)template);
+      cupsArrayAdd(templates, (void *)keyword);
 
-      for (j = 0, loctemplate = NULL; j < (int)(sizeof(finishings) / sizeof(finishings[0])); j ++)
+      snprintf(msgid, sizeof(msgid), "finishing-template.%s", keyword);
+      if ((msgstr = _cupsLangString(lang, msgid)) == msgid || !strcmp(msgid, msgstr))
+	if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
+	  msgstr = keyword;
+
+      cupsFilePrintf(fp, "*cupsFinishingTemplate %s/%s: \"\n", keyword, msgstr);
+      for (finishing_attr = ippFirstAttribute(finishing_col); finishing_attr; finishing_attr = ippNextAttribute(finishing_col))
       {
-        if (!strcmp(finishings[j][0], template))
+        if (ippGetValueTag(finishing_attr) == IPP_TAG_BEGIN_COLLECTION)
         {
-          loctemplate = _cupsLangString(lang, finishings[j][1]);
-          break;
-        }
+	  const char *name = ippGetName(finishing_attr);
+					/* Member attribute name */
+
+          if (strcmp(name, "media-size"))
+            cupsFilePrintf(fp, "%s\n", name);
+	}
       }
-
-      if (!loctemplate)
-      {
-        char 		msg[256];	/* Message key */
-
-        snprintf(msg, sizeof(msg), "finishing-template.%s", template);
-        if ((loctemplate = _cupsMessageLookup(strings, msg)) == msg)
-          loctemplate = template;
-      }
-
-      cupsFilePrintf(fp, "*cupsFinishingTemplate %s/%s: \"\"\n", template, loctemplate);
+      cupsFilePuts(fp, "\"\n");
+      cupsFilePuts(fp, "*End\n");
     }
 
     cupsFilePuts(fp, "*CloseUI: *cupsFinishingTemplate\n");
