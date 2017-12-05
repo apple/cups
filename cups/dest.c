@@ -2160,12 +2160,6 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   if (getuid())
   {
    /*
-    * Merge in server defaults...
-    */
-
-    num_temps = cups_get_dests(filename, NULL, NULL, 0, num_temps, &temps);
-
-   /*
     * Point to user defaults...
     */
 
@@ -2225,8 +2219,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
       else
         wrote = 0;
 
-      if ((temp = cupsGetDest(dest->name, dest->instance, num_temps, temps)) == NULL)
-        temp = cupsGetDest(dest->name, NULL, num_temps, temps);
+      temp = cupsGetDest(dest->name, NULL, num_temps, temps);
 
       for (j = dest->num_options, option = dest->options; j > 0; j --, option ++)
       {
@@ -2234,19 +2227,14 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
         * See if this option is a printer attribute; if so, skip it...
 	*/
 
-        if ((match = _ippFindOption(option->name)) != NULL &&
-	    match->group_tag == IPP_TAG_PRINTER)
+        if ((match = _ippFindOption(option->name)) != NULL && match->group_tag == IPP_TAG_PRINTER)
 	  continue;
 
        /*
-	* See if the server/global options match these; if so, don't
-	* write 'em.
+	* See if the server options match these; if so, don't write 'em.
 	*/
 
-        if (temp &&
-	    (val = cupsGetOption(option->name, temp->num_options,
-	                         temp->options)) != NULL &&
-            !_cups_strcasecmp(val, option->value))
+        if (temp && (val = cupsGetOption(option->name, temp->num_options, temp->options)) != NULL && !_cups_strcasecmp(val, option->value))
 	  continue;
 
        /*
@@ -2263,10 +2251,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
         if (option->value[0])
 	{
-	  if (strchr(option->value, ' ') ||
-	      strchr(option->value, '\\') ||
-	      strchr(option->value, '\"') ||
-	      strchr(option->value, '\''))
+	  if (strchr(option->value, ' ') || strchr(option->value, '\\') || strchr(option->value, '\"') || strchr(option->value, '\''))
 	  {
 	   /*
 	    * Quote the value...
@@ -2317,9 +2302,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
-    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                 dest->name,
-                                                 kCFStringEncodingUTF8);
+    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, dest->name, kCFStringEncodingUTF8);
 					/* Default printer name */
 
     if (name)
