@@ -1217,7 +1217,9 @@ _httpTLSSetCredentials(http_t *http)	/* I - Connection to server */
  */
 
 void
-_httpTLSSetOptions(int options)		/* I - Options */
+_httpTLSSetOptions(int options,		/* I - Options */
+                   int min_version,	/* I - Minimum TLS version */
+                   int max_version)	/* I - Maximum TLS version */
 {
   if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
   {
