@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <!-- SECTION: Getting Started -->
+  <head>
+    <title>Command-Line Printer Administration</title>
+    <link rel="stylesheet" type="text/css" href="../cups-printable.css">
+  </head>
+  <body>
+    <h1 class="title">Command-Line Printer Administration</h1>
+
+    <p>This help document describes how to configure and manage printers with CUPS.</p>
+
+    <h2 class="title"><a name="INTRO">Introduction</a></h2>
+
+    <p>CUPS currently uses PPD (PostScript Printer Description) files that describe printer capabilities and driver programs needed for each printer.  The <code>everywhere</code> PPD is used for nearly all modern networks printers sold since about 2009.  For example, the following command creates a print queue for a printer at address 11.22.33.44:
+
+    <pre class="command">lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere</pre>
+
+    <p>CUPS also includes several sample PPD files you can use for "legacy" printers:</p>
+
+    <div class="table"><table>
+      <thead>
+        <tr><th>Driver</th><th>PPD Name</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Dymo Label Printers</td><td>drv:///sample.drv/dymo.ppd</td></tr>
+        <tr><td>Intellitech Intellibar</td><td>drv:///sample.drv/intelbar.ppd</td></tr>
+        <tr><td>EPSON 9-pin Series</td><td>drv:///sample.drv/epson9.ppd</td></tr>
+        <tr><td>EPSON 24-pin Series</td><td>drv:///sample.drv/epson24.ppd</td></tr>
+        <tr><td>Generic PCL Laser Printer</td><td>drv:///sample.drv/generpcl.ppd</td></tr>
+        <tr><td>Generic PostScript Printer</td><td>drv:///sample.drv/generic.ppd</td></tr>
+        <tr><td>HP DeskJet Series</td><td>drv:///sample.drv/deskjet.ppd</td></tr>
+        <tr><td>HP LaserJet Series</td><td>drv:///sample.drv/laserjet.ppd</td></tr>
+        <tr><td>OKIDATA 9-Pin Series</td><td>drv:///sample.drv/okidata9.ppd</td></tr>
+        <tr><td>OKIDATA 24-Pin Series</td><td>drv:///sample.drv/okidat24.ppd</td></tr>
+        <tr><td>Zebra CPCL Label Printer</td><td>drv:///sample.drv/zebracpl.ppd</td></tr>
+        <tr><td>Zebra EPL1 Label Printer</td><td>drv:///sample.drv/zebraep1.ppd</td></tr>
+        <tr><td>Zebra EPL2 Label Printer</td><td>drv:///sample.drv/zebraep2.ppd</td></tr>
+        <tr><td>Zebra ZPL Label Printer</td><td>drv:///sample.drv/zebra.ppd</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>You can run the <code>lpinfo -m</code> command to list all of the available drivers:</p>
+
+    <pre class="command">lpinfo -m</pre>
+
+    <p>Run the <code>lpinfo -v</code> command to list the available printers:</p>
+
+    <pre class="command">lpinfo -v</pre>
+
+    <p>Then use the correct URI to add the printer using the <code>lpadmin</code> command:</p>
+
+    <pre class="command">lpadmin -p printername -E -v device-uri -m ppd-name</pre>
+
+    <p>Current network printers typically use <code>ipp</code> or <code>ipps</code> URIS:</p>
+
+    <pre class="command">lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
+lpadmin -p printername -E -v ipps://11.22.33.44/ipp/print -m everywhere</pre>
+
+    <p>Older network printers typically use <code>socket</code> or <code>lpd</code> URIs:</p>
+
+    <pre class="command">lpadmin -p printername -E -v socket://11.22.33.44 -m ppd-name
+lpadmin -p printername -E -v lpd://11.22.33.44/ -m ppd-name</pre>
+
+    <p>The sample drivers provide basic printing capabilities, but generally do not exercise the full potential of the printers or CUPS. Other drivers provide greater printing capabilities.</p>
+  </body>
+</html>

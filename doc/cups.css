@@ -120,11 +120,14 @@ PRE {
   font-family: monaco, courier, monospace;
 }
 
-PRE.command {
-  background: #f0f0f0;
-  border: dotted thin #7f7f7f;
-  color: #7f0000;
-  margin-left: 36pt;
+BLOCKQUOTE {
+  border-left: solid 2px #777;
+  padding: 10px;
+}
+
+PRE.command, PRE.example {
+  background: #eee;
+  margin: 0 36pt;
   padding: 10px;
 }
 
@@ -143,13 +146,6 @@ DL.man DT {
 
 PRE.man {
   margin: 0;
-}
-
-PRE.example {
-  background: white;
-  border: dotted thin #999999;
-  margin-left: 36pt;
-  padding: 10px;
 }
 
 PRE.command EM, PRE.example EM {
@@ -300,7 +296,7 @@ DIV.table CAPTION {
 DIV.table TABLE TD {
   background: white;
   border: solid thin #bbbbbb;
-  padding-top: 5pt;
+  padding: 5pt 10pt 0;
 }
 
 DIV.table TABLE TH {
