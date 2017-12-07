@@ -65,10 +65,22 @@ if test x$enable_pam != xno; then
 			# as Linux distributors move things around...
 			if test "x$with_pam_module" != x; then
 				PAMMOD="pam_${with_pam_module}.so"
-			elif test -f /lib/security/pam_unix2.so; then
-				PAMMOD="pam_unix2.so"
-			elif test -f /lib/security/pam_unix.so; then
-				PAMMOD="pam_unix.so"
+			elif test -f /etc/pam.d/common-auth; then
+				PAMFILE="pam.common"
+			else
+				moddir=""
+				for dir in /lib/security /lib64/security /lib/x86_64-linux-gnu/security /var/lib/pam; do
+					if test -d $dir; then
+						moddir=$dir
+						break;
+					fi
+				done
+
+				if test -f $moddir/pam_unix2.so; then
+					PAMMOD="pam_unix2.so"
+				elif test -f $moddir/pam_unix.so; then
+					PAMMOD="pam_unix.so"
+				fi
 			fi
 
 			if test "x$PAMMOD" = xpam_unix.so; then

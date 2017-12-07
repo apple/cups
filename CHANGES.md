@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-12-06
+CHANGES - 2.3b1 - 2017-12-07
 ============================
 
 
@@ -46,4 +46,5 @@ Changes in CUPS v2.3b1
   was seen (Issue #5170)
 - IPP Everywhere PPDs now support finishing templates (Issue #5180)
 - Fixed a journald support bug in the scheduler (Issue #5181)
-
+- Fixed PAM module detection and added support for the common PAM definitions
+  (Issue #5185)
