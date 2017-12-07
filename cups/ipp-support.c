@@ -1616,10 +1616,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-page-limit",			/* CUPS extension */
     "job-password-encryption-supported",
     "job-password-supported",
+    "job-presets-supported",		/* IPP Presets */
     "job-quota-period",			/* CUPS extension */
     "job-resolvers-supported",
     "job-settable-attributes-supported",
     "job-spooling-supported",
+    "job-triggers-supported",		/* IPP Presets */
     "jpeg-k-octets-supported",		/* CUPS extension */
     "jpeg-x-dimension-supported",	/* CUPS extension */
     "jpeg-y-dimension-supported",	/* CUPS extension */
