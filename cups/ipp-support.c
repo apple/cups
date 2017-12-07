@@ -984,9 +984,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "feed-orientation-supported",
     "finishings",
     "finishings-col",
+    "finishings-col-database",
     "finishings-col-default",
+    "finishings-col-ready",
     "finishings-col-supported",
     "finishings-default",
+    "finishings-ready",
     "finishings-supported",
     "font-name-requested",
     "font-name-requested-default",
@@ -1025,6 +1028,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-bottom-margin-supported",
     "media-col",
     "media-col-default",
+    "media-col-ready",
     "media-col-supported",
     "media-color-supported",
     "media-default",
@@ -1039,6 +1043,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-left-margin-supported",
     "media-order-count-supported",
     "media-pre-printed-supported",
+    "media-ready",
     "media-recycled-supported",
     "media-right-margin-supported",
     "media-size-supported",
@@ -1301,9 +1306,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "feed-orientation-supported",
     "finishings",
     "finishings-col",
+    "finishings-col-database",
     "finishings-col-default",
+    "finishings-col-ready",
     "finishings-col-supported",
     "finishings-default",
+    "finishings-ready",
     "finishings-supported",
     "font-name-requested",
     "font-name-requested-default",
@@ -1407,6 +1415,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-bottom-margin-supported",
     "media-col",
     "media-col-default",
+    "media-col-ready",
     "media-col-supported",
     "media-color-supported",
     "media-default",
@@ -1421,6 +1430,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-left-margin-supported",
     "media-order-count-supported",
     "media-pre-printed-supported",
+    "media-ready",
     "media-recycled-supported",
     "media-right-margin-supported",
     "media-size-supported",
@@ -1623,8 +1633,6 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "marker-message",			/* CUPS extension */
     "marker-names",			/* CUPS extension */
     "marker-types",			/* CUPS extension */
-    "media-col-ready",
-    "media-ready",
     "member-names",			/* CUPS extension */
     "member-uris",			/* CUPS extension */
     "multiple-destination-uris-supported",/* IPP FaxOut */
