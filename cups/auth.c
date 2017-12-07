@@ -451,7 +451,7 @@ _cupsSetNegotiateAuthString(
 				      GSS_C_NO_BUFFER, &http->gssmech,
 				      &output_token, NULL, NULL);
 
-#ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
+#  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
   if (major_status == GSS_S_NO_CRED)
   {
    /*
@@ -527,7 +527,7 @@ _cupsSetNegotiateAuthString(
       }
     }
   }
-#endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
+#  endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
   if (GSS_ERROR(major_status))
   {
@@ -537,11 +537,11 @@ _cupsSetNegotiateAuthString(
     return (-1);
   }
 
-#ifdef DEBUG
+#  ifdef DEBUG
   else if (major_status == GSS_S_CONTINUE_NEEDED)
     cups_gss_printf(major_status, minor_status,
 		    "_cupsSetNegotiateAuthString: Continuation needed!");
-#endif /* DEBUG */
+#  endif /* DEBUG */
 
   if (output_token.length > 0 && output_token.length <= 65536)
   {
@@ -579,6 +579,7 @@ _cupsSetNegotiateAuthString(
 
   return (0);
 }
+#endif /* HAVE_GSSAPI */
 
 
 /*
@@ -802,6 +803,7 @@ cups_auth_scheme(const char *www_authenticate,	/* I - Pointer into WWW-Authentic
 }
 
 
+#ifdef HAVE_GSSAPI
 #  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
 /*
  * 'cups_gss_acquire()' - Kerberos credentials callback.
@@ -1012,6 +1014,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     return (1);
   }
 
+  www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+
 #  if defined(HAVE_AUTHORIZATION_H)
  /*
   * Delete any previous authorization reference...
@@ -1022,8 +1026,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
     http->auth_ref = NULL;
   }
-
-  www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 
   if (!getenv("GATEWAY_INTERFACE") && (schemedata = cups_auth_find(www_auth, "AuthKey")) != NULL && cups_auth_param(schemedata, "key", auth_key, sizeof(auth_key)))
   {
