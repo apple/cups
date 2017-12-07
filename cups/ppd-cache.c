@@ -4010,7 +4010,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     for (i = 0; i < count; i ++)
     {
       finishing_col = ippGetCollection(attr, i);
-      keyword       = ippGetString(ippFindAttribute(finishing_col, "finishing_template", IPP_TAG_ZERO), 0, NULL);
+      keyword       = ippGetString(ippFindAttribute(finishing_col, "finishing-template", IPP_TAG_ZERO), 0, NULL);
 
       if (!keyword || cupsArrayFind(templates, (void *)keyword))
         continue;
@@ -4047,12 +4047,12 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     {
       const char	*fin_option;	/* Current finishing option */
 
-      cupsFilePuts(fp, "*cupsUIConstraint finisings: \"*cupsFinishingTemplate");
+      cupsFilePuts(fp, "*cupsUIConstraint finishing-template: \"*cupsFinishingTemplate");
       for (fin_option = (const char *)cupsArrayFirst(fin_options); fin_option; fin_option = (const char *)cupsArrayNext(fin_options))
         cupsFilePrintf(fp, " %s", fin_option);
       cupsFilePuts(fp, "\"\n");
 
-      cupsFilePuts(fp, "*cupsUIResolver finisings: \"*cupsFinishingTemplate None");
+      cupsFilePuts(fp, "*cupsUIResolver finishing-template: \"*cupsFinishingTemplate None");
       for (fin_option = (const char *)cupsArrayFirst(fin_options); fin_option; fin_option = (const char *)cupsArrayNext(fin_options))
         cupsFilePrintf(fp, " %s None", fin_option);
       cupsFilePuts(fp, "\"\n");
