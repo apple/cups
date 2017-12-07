@@ -1,7 +1,7 @@
 #
 # Documentation makefile for CUPS.
 #
-# Copyright 2007-2016 by Apple Inc.
+# Copyright 2007-2017 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -40,6 +40,7 @@ HELPIMAGES	=	\
 			images/smiley.jpg
 HELPFILES	=	\
 			help/accounting.html \
+			help/admin.html \
 			help/api-admin.html \
 			help/api-filter.html \
 			help/api-ppd.html \

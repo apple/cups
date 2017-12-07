@@ -164,15 +164,6 @@ P.formula {
   margin-left: 36pt;
 }
 
-BLOCKQUOTE {
-  background: #f0f0f0;
-  border: inset 1px #eeeeee;
-  padding: 10px;
-  /* These are not implemented by all browsers, but that's OK */
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-}
-
 A IMG {
   border: none;
 }

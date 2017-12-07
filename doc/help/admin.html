@@ -17,7 +17,7 @@
 
     <p><a href="#CLASSES">Classes</a> are associated with one or more printers and are typically used to distribute print jobs amongst a group of printers or provide redundancy or high availability when printing. Print jobs sent to a class are forwarded to the next available printer in the class.</p>
 
-    <p>The <a href="man-lpadmin.html"><code>lpadmin(8)</code></a> program is used to add, modify, or delete destinations, while the <a href="man-lpinfo.html"><code>lpinfo(8)</code></a> command is used to list the available printer drivers and backends. The CUPS web interface ("http://localhost:631" or "https://servername:631") can also be used, and most operating systems provide their own GUI administration tools.</p>
+    <p>The <a href="man-lpadmin.html"><code>lpadmin(8)</code></a> program is used to add, modify, or delete destinations, while the <a href="man-lpinfo.html"><code>lpinfo(8)</code></a> command is used to list the available printer drivers and backends. The <a href="man-cupsctl.html"><code>cupsctl(8)</code></a> program is used to manage the printing system as a whole, including things like <a href="#DEBUG">debug logging</a> and <a href="#SHARING">printer sharing</a>. The CUPS web interface ("http://localhost:631" or "https://servername:631") can also be used, and most operating systems provide their own GUI administration tools.</p>
 
 
     <h2 class="title" id="PRINTERS">Managing Printers</h2>
@@ -49,7 +49,7 @@
 
     </dl>
 
-    <p>The <code>-x<code> option deletes the named printer:</p>
+    <p>The <code>-x</code> option deletes the named printer:</p>
 
     <pre class="command">lpadmin -x printername</pre>
 
@@ -125,6 +125,67 @@ direct usb://ZP/LazerJet%20MFP?serial=42</pre>
     <pre class="command">lpadmin -p printername -v device-uri</pre>
 
 
+    <h3 id="OPTIONS">Printer Options</h3>
+
+    <p>The <code>lpadmin</code> command allows you to set various options for a printer:</p>
+
+    <dl>
+      <dt><code>-o cupsIPPSupplies=false</code></dt>
+      <dd>Turns off IPP supply level reporting for a printer.</dd>
+
+      <dt><code>-o cupsSNMPSupplies=false</code></dt>
+      <dd>Turns off SNMP supply level reporting for a printer.</dd>
+
+      <dt><code>-o name=value</code></dt>
+      <dd>Sets the default value for the named PPD option. For example, <code>-o PageSize=Legal</code> sets the default page size to US Legal.</dd>
+
+      <dt><code>-o printer-error-policy=name</code></dt>
+      <dd>Sets the error handling policy:<dl>
+        <dt><code>abort-job</code></dt>
+        <dd>Aborts the job on error.</dd>
+        <dt><code>retry-job</code></dt>
+        <dd>Retries the job at a future time.</dd>
+        <dt><code>retry-current-job</code></dt>
+        <dd>Retries the current job immediately.</dd>
+        <dt><code>stop-printer</code></dt>
+        <dd>Stops the printer on error.</dd>
+      </dl></dd>
+
+      <dt><code>-o printer-is-shared=true/false</code></dt>
+      <dd>Enables/disables per-printer sharing. See the section on <a href="#SHARING">Printer Sharing</a> for more information.</dd>
+
+      <dt><code>-o printer-op-policy=name</code></dt>
+      <dd>Sets the operation policy associated with the printer. See the <a href="policies.html">Managing Operation Policies</a> help document for more information.</dd>
+
+      <dt><code>-u allow:{user|@group}{,user|,@group}*</code></dt>
+      <dt><code>-u allow:all</code></dt>
+      <dt><code>-u deny:{user|@group}{,user|,@group}*</code></dt>
+      <dt><code>-u deny:none</code></dt>
+      <dd>Sets user-level access control for the printer. The <code>allow:</code> list defines a whitelist of users and groups while the <code>deny:</code> list defines a blacklist of users and groups.</dd>
+    </dl>
+
+
+    <h2 class="title" id="SHARING">Printer Sharing</h2>
+
+    <p>CUPS supports sharing of printers with other computers and mobile devices. Two <code>cupsctl</code> options control the general printer sharing features:</p>
+
+    <dl>
+      <dt><code>--share-printers</code></dt>
+      <dd>Enables sharing of printers with other computers and mobile devices on your local network.</dd>
+
+      <dt><code>--remote-any</code></dt>
+      <dd>Expands printer sharing to any network that can reach your server.</dd>
+    </dl>
+
+    <p>Once you have enabled printer sharing, you then must select which printers will be shared using the <code>lpadmin</code> command and the <code>-o printer-is-shared=true</code> option.</p>
+
+    <p>For example, to share two printers ("foo" and "bar") on the local network, run the following commands:</p>
+
+    <pre class="command">cupsctl --share-printers
+lpadmin -p foo -o printer-is-shared=true
+lpadmin -p bar -o printer-is-shared=true</pre>
+
+
     <h2 class="title" id="CLASSES">Managing Classes</h2>
 
     <p>The <code>lpadmin</code> command is used to create, modify, or delete a class. The <code>-c</code> option specifies a class to create or modify and is combined with the <code>-p</code> option:</p>
@@ -135,9 +196,19 @@ direct usb://ZP/LazerJet%20MFP?serial=42</pre>
 
     <pre class="command">lpadmin -p printername -r classname</pre>
 
-    <p>The <code>-x<code> option deletes the named class:</p>
+    <p>The <code>-x</code> option deletes the named class:</p>
 
     <pre class="command">lpadmin -x classname</pre>
 
+
+    <h2 class="title" id="DEBUG">Debug Logging and Troubleshooting</h2>
+
+    <p>The <a href="man-cupsd-logs.html">printing system log files</a> track the activity of the scheduler, printer drivers, and backends. If problems occur and the log files do not provide sufficient details to diagnose the problem, you can enable debug logging using the <code>cupsctl</code> command:</p>
+
+    <pre class="command">cupsctl --debug-logging</pre>
+
+    <p>To disable debug logging, run the same command with the <code>--no-debug-logging</code> option:</p>
+
+    <pre class="command">cupsctl --no-debug-logging</pre>
   </body>
 </html>
