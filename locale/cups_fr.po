@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-01 17:00-0500\n"
+"POT-Creation-Date: 2017-12-08 18:41-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3674,6 +3674,9 @@ msgstr "Transférer la tâche"
 
 msgid "Moved Permanently"
 msgstr "Transférées de façon permanente"
+
+msgid "Moved Temporarily"
+msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Pointeur de fichier PPD NULL."

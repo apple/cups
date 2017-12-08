@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-01 17:00-0500\n"
+"POT-Creation-Date: 2017-12-08 18:41-0500\n"
 "PO-Revision-Date: 2017-10-25 14:57+0200\n"
 "Last-Translator: Michael Weghorn <m.weghorn@posteo.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3693,6 +3693,9 @@ msgstr "Druckauftrag verschieben"
 
 msgid "Moved Permanently"
 msgstr "Dauerhaft verschoben"
+
+msgid "Moved Temporarily"
+msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "NULL PPD File Pointer"

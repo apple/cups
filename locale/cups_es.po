@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-01 17:00-0500\n"
+"POT-Creation-Date: 2017-12-08 18:41-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3848,6 +3848,9 @@ msgstr "Mover trabajo"
 
 msgid "Moved Permanently"
 msgstr "Movido permanentemente"
+
+msgid "Moved Temporarily"
+msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Puntero de archivo PPD NULO"

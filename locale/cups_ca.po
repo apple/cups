@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-01 17:00-0500\n"
+"POT-Creation-Date: 2017-12-08 18:41-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -3821,6 +3821,9 @@ msgstr "Mou la feina"
 
 msgid "Moved Permanently"
 msgstr "S'ha mogut de manera permanent"
+
+msgid "Moved Temporarily"
+msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Punter del fitxer PPD NUL"

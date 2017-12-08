@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-01 17:00-0500\n"
+"POT-Creation-Date: 2017-12-08 18:41-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3820,6 +3820,9 @@ msgstr "ジョブの移動"
 
 msgid "Moved Permanently"
 msgstr "別の場所へ移動しました"
+
+msgid "Moved Temporarily"
+msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "PPD ファイルポインターが NULL です"
