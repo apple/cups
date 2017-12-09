@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b1\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 18:41-0500\n"
+"POT-Creation-Date: 2017-12-08 19:16-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4133,6 +4133,10 @@ msgstr ""
 msgid "Forbidden"
 msgstr ""
 
+#: cups/http-support.c:1355
+msgid "Found"
+msgstr ""
+
 #: cups/ppd.c:771 cups/ppd.c:1329
 msgid "General"
 msgstr ""
@@ -4704,10 +4708,6 @@ msgstr ""
 
 #: cups/http-support.c:1352
 msgid "Moved Permanently"
-msgstr ""
-
-#: cups/http-support.c:1355
-msgid "Moved Temporarily"
 msgstr ""
 
 #: cups/ppd.c:303

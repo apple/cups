@@ -896,6 +896,7 @@
 "Fold" = "Fold";
 "Folio" = "Folio";
 "Forbidden" = "Forbidden";
+"Found" = "Found";
 "General" = "General";
 "Generic" = "Generic";
 "Get-Response-PDU uses indefinite length" = "Get-Response-PDU uses indefinite length";
@@ -1032,7 +1033,6 @@
 "Move All Jobs" = "Move All Jobs";
 "Move Job" = "Move Job";
 "Moved Permanently" = "Moved Permanently";
-"Moved Temporarily" = "Moved Temporarily";
 "NULL PPD file pointer" = "NULL PPD file pointer";
 "Name OID uses indefinite length" = "Name OID uses indefinite length";
 "Nested classes are not allowed." = "Nested classes are not allowed.";

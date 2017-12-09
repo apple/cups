@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 18:41-0500\n"
+"POT-Creation-Date: 2017-12-08 19:16-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -3185,6 +3185,9 @@ msgstr "Fólie"
 msgid "Forbidden"
 msgstr "Zakázaný"
 
+msgid "Found"
+msgstr ""
+
 msgid "General"
 msgstr "Obecný"
 
@@ -3612,9 +3615,6 @@ msgstr "Přesun úlohy"
 
 msgid "Moved Permanently"
 msgstr "Trvale přesunuto"
-
-msgid "Moved Temporarily"
-msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Prázdný ukazatel PPD souboru"

@@ -1351,8 +1351,8 @@ _httpStatus(cups_lang_t   *lang,	/* I - Language */
     case HTTP_STATUS_MOVED_PERMANENTLY :
         s = _("Moved Permanently");
 	break;
-    case HTTP_STATUS_MOVED_TEMPORARILY :
-        s = _("Moved Temporarily");
+    case HTTP_STATUS_FOUND :
+        s = _("Found");
 	break;
     case HTTP_STATUS_SEE_OTHER :
         s = _("See Other");

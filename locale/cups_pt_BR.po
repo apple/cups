@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 18:41-0500\n"
+"POT-Creation-Date: 2017-12-08 19:16-0500\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -3418,6 +3418,9 @@ msgstr "Fólio"
 msgid "Forbidden"
 msgstr "Proibido"
 
+msgid "Found"
+msgstr ""
+
 msgid "General"
 msgstr "Geral"
 
@@ -3849,9 +3852,6 @@ msgstr "Mover trabalho"
 
 msgid "Moved Permanently"
 msgstr "Mover permanentemente"
-
-msgid "Moved Temporarily"
-msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "Ponteiro NULO para arquivo PPD"

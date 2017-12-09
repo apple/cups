@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 18:41-0500\n"
+"POT-Creation-Date: 2017-12-08 19:16-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -3328,6 +3328,9 @@ msgstr "对开本"
 msgid "Forbidden"
 msgstr "已禁止"
 
+msgid "Found"
+msgstr ""
+
 msgid "General"
 msgstr "常规"
 
@@ -3759,9 +3762,6 @@ msgstr "移动任务"
 
 msgid "Moved Permanently"
 msgstr "已永久移动"
-
-msgid "Moved Temporarily"
-msgstr ""
 
 msgid "NULL PPD file pointer"
 msgstr "PPD 文件指针为 NULL"
