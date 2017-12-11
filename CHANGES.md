@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-12-07
+CHANGES - 2.3b1 - 2017-12-11
 ============================
 
 
@@ -44,6 +44,7 @@ Changes in CUPS v2.3b1
   when available (Issue #5168)
 - The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop
   was seen (Issue #5170)
+- IPP Everywhere PPDs now support IPP job presets (Issue #5179)
 - IPP Everywhere PPDs now support finishing templates (Issue #5180)
 - Fixed a journald support bug in the scheduler (Issue #5181)
 - Fixed PAM module detection and added support for the common PAM definitions

@@ -4210,6 +4210,151 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   }
 
  /*
+  * Presets...
+  */
+
+  if ((attr = ippFindAttribute(response, "job-presets-supported", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  {
+    for (i = 0, count = ippGetCount(attr); i < count; i ++)
+    {
+      ipp_t	*preset = ippGetCollection(attr, i);
+					/* Preset collection */
+      const char *preset_name = ippGetString(ippFindAttribute(preset, "preset-name", IPP_TAG_ZERO), 0, NULL),
+					/* Preset name */
+		*localized_name;	/* Localized preset name */
+      ipp_attribute_t *member;		/* Member attribute in preset */
+      const char *member_name;		/* Member attribute name */
+      char      	member_value[256];	/* Member attribute value */
+
+      if (!preset || !preset_name)
+        continue;
+
+      if ((localized_name = _cupsMessageLookup(strings, preset_name)) == preset_name)
+        cupsFilePrintf(fp, "*APPrinterPreset %s: \"\n", preset_name);
+      else
+        cupsFilePrintf(fp, "*APPrinterPreset %s/%s: \"\n", preset_name, localized_name);
+
+      for (member = ippFirstAttribute(preset); member; member = ippNextAttribute(preset))
+      {
+        member_name = ippGetName(member);
+
+        if (!member_name || !strcmp(member_name, "preset-name"))
+          continue;
+
+        if (!strcmp(member_name, "finishings"))
+        {
+	  for (i = 0, count = ippGetCount(member); i < count; i ++)
+	  {
+	    const char *option = NULL;	/* PPD option name */
+
+	    keyword = ippEnumString("finishings", ippGetInteger(member, i));
+
+	    if (!strcmp(keyword, "booklet-maker"))
+	    {
+	      option  = "Booklet";
+	      keyword = "True";
+	    }
+	    else if (!strncmp(keyword, "fold-", 5))
+	      option = "FoldType";
+	    else if (!strncmp(keyword, "punch-", 6))
+	      option = "PunchMedia";
+	    else if (!strncmp(keyword, "bind-", 5) || !strncmp(keyword, "edge-stitch-", 12) || !strcmp(keyword, "saddle-stitch") || !strncmp(keyword, "staple-", 7))
+	      option = "StapleLocation";
+
+	    if (option && keyword)
+	      cupsFilePrintf(fp, "*%s %s\n", option, keyword);
+	  }
+        }
+        else if (!strcmp(member_name, "finishings-col"))
+        {
+          ipp_t *fin_col;		/* finishings-col value */
+
+          for (i = 0, count = ippGetCount(member); i < count; i ++)
+          {
+            fin_col = ippGetCollection(member, i);
+
+            if ((keyword = ippGetString(ippFindAttribute(fin_col, "finishing-template", IPP_TAG_ZERO), 0, NULL)) != NULL)
+              cupsFilePrintf(fp, "*cupsFinishingTemplate %s\n", keyword);
+          }
+        }
+        else if (!strcmp(member_name, "media"))
+        {
+         /*
+          * Map media to PageSize...
+          */
+
+          if ((pwg = pwgMediaForPWG(ippGetString(member, 0, NULL))) != NULL && pwg->ppd)
+            cupsFilePrintf(fp, "*PageSize %s\n", pwg->ppd);
+        }
+        else if (!strcmp(member_name, "media-col"))
+        {
+          media_col = ippGetCollection(member, 0);
+
+          if ((media_size = ippGetCollection(ippFindAttribute(media_col, "media-size", IPP_TAG_BEGIN_COLLECTION), 0)) != NULL)
+          {
+            x_dim = ippFindAttribute(media_size, "x-dimension", IPP_TAG_INTEGER);
+            y_dim = ippFindAttribute(media_size, "y-dimension", IPP_TAG_INTEGER);
+            if ((pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0))) != NULL && pwg->ppd)
+	      cupsFilePrintf(fp, "*PageSize %s\n", pwg->ppd);
+          }
+
+          if ((keyword = ippGetString(ippFindAttribute(media_col, "media-source", IPP_TAG_ZERO), 0, NULL)) != NULL)
+          {
+            pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
+            cupsFilePrintf(fp, "*InputSlot %s\n", keyword);
+	  }
+
+          if ((keyword = ippGetString(ippFindAttribute(media_col, "media-type", IPP_TAG_ZERO), 0, NULL)) != NULL)
+          {
+            pwg_ppdize_name(keyword, ppdname, sizeof(ppdname));
+            cupsFilePrintf(fp, "*MediaType %s\n", keyword);
+	  }
+        }
+        else if (!strcmp(member_name, "print-quality"))
+        {
+	 /*
+	  * Map print-quality to cupsPrintQuality...
+	  */
+
+          int qval = ippGetInteger(member, 0);
+					/* print-quality value */
+	  static const char * const qualities[] = { "Draft", "Normal", "High" };
+					/* cupsPrintQuality values */
+
+          if (qval >= IPP_QUALITY_DRAFT && qval <= IPP_QUALITY_HIGH)
+            cupsFilePrintf(fp, "*cupsPrintQuality %s\n", qualities[qval - IPP_QUALITY_DRAFT]);
+        }
+        else if (!strcmp(member_name, "output-bin"))
+        {
+          pwg_ppdize_name(ippGetString(member, 0, NULL), ppdname, sizeof(ppdname));
+          cupsFilePrintf(fp, "*OutputBin %s\n", ppdname);
+        }
+        else if (!strcmp(member_name, "sides"))
+        {
+          keyword = ippGetString(member, 0, NULL);
+          if (keyword && !strcmp(keyword, "one-sided"))
+            cupsFilePuts(fp, "*Duplex None\n");
+	  else if (keyword && !strcmp(keyword, "two-sided-long-edge"))
+	    cupsFilePuts(fp, "*Duplex DuplexNoTumble\n");
+	  else if (keyword && !strcmp(keyword, "two-sided-short-edge"))
+	    cupsFilePuts(fp, "*Duplex DuplexTumble\n");
+        }
+        else
+        {
+         /*
+          * Add attribute name and value as-is...
+          */
+
+          ippAttributeString(member, member_value, sizeof(member_value));
+          cupsFilePrintf(fp, "*%s %s\n", member_name, member_value);
+	}
+      }
+
+      cupsFilePuts(fp, "\"\n*End\n");
+    }
+  }
+
+ /*
   * Close up and return...
   */
 
