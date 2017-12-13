@@ -49,3 +49,5 @@ Changes in CUPS v2.3b1
 - Fixed a journald support bug in the scheduler (Issue #5181)
 - Fixed PAM module detection and added support for the common PAM definitions
   (Issue #5185)
+- The scheduler now substitutes default values for invalid job attributes when
+  running in "relaxed conformance" mode (Issue #5186)

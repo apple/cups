@@ -1,7 +1,7 @@
 /*
  * IPP routines for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -1584,15 +1584,30 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                     _("Bad job-name value: Wrong type or count."));
     if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
       attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
-    return (NULL);
+
+    if (StrictConformance)
+      return (NULL);
+
+    /* Don't use invalid attribute */
+    ippDeleteAttribute(con->request, attr);
+
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, "Untitled");
   }
   else if (!ippValidateAttribute(attr))
   {
     send_ipp_status(con, IPP_ATTRIBUTES, _("Bad job-name value: %s"),
                     cupsLastErrorString());
+
     if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
       attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
-    return (NULL);
+
+    if (StrictConformance)
+      return (NULL);
+
+    /* Don't use invalid attribute */
+    ippDeleteAttribute(con->request, attr);
+
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, "Untitled");
   }
 
   attr = ippFindAttribute(con->request, "requesting-user-name", IPP_TAG_NAME);
@@ -1600,9 +1615,17 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   if (attr && !ippValidateAttribute(attr))
   {
     send_ipp_status(con, IPP_ATTRIBUTES, _("Bad requesting-user-name value: %s"), cupsLastErrorString());
+
     if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
       attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
-    return (NULL);
+
+    if (StrictConformance)
+      return (NULL);
+
+    /* Don't use invalid attribute */
+    ippDeleteAttribute(con->request, attr);
+
+    attr = ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "reqeusting-user-name", NULL, "anonymous");
   }
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
