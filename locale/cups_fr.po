@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3556,9 +3556,6 @@ msgstr "Ligne dépassant la longueur maximale autorisée (255 caractères)"
 msgid "List Available Printers"
 msgstr ""
 
-msgid "Load paper."
-msgstr ""
-
 msgid "Local printer created."
 msgstr ""
 
@@ -3896,15 +3893,6 @@ msgstr ""
 msgid "Output Mode"
 msgstr "Mode de sortie"
 
-msgid "Output bin is almost full."
-msgstr ""
-
-msgid "Output bin is full."
-msgstr ""
-
-msgid "Output bin is missing."
-msgstr ""
-
 msgid "PASS"
 msgstr ""
 
@@ -3938,18 +3926,6 @@ msgstr "Le paquet ne contient aucun paramètre Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Le paquet ne commence pas par SEQUENCE"
-
-msgid "Paper jam."
-msgstr "Bourrage papier."
-
-msgid "Paper tray is almost empty."
-msgstr "Le bac à papier est quasiment vide."
-
-msgid "Paper tray is empty."
-msgstr "Le bac à papier est vide."
-
-msgid "Paper tray is missing."
-msgstr "Le bac à papier est manquant."
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4292,18 +4268,6 @@ msgstr ""
 "Le nom de classe doit comporter au plus 127 caractères, tous imprimables, "
 "sans espace, « / » et « # »."
 
-msgid "The developer unit needs to be replaced."
-msgstr ""
-
-msgid "The developer unit will need to be replaced soon."
-msgstr ""
-
-msgid "The fuser's temperature is high."
-msgstr ""
-
-msgid "The fuser's temperature is low."
-msgstr ""
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4314,12 +4278,6 @@ msgstr ""
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr ""
 
-msgid "The optical photoconductor needs to be replaced."
-msgstr ""
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr ""
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -4327,12 +4285,6 @@ msgid "The printer did not respond."
 msgstr ""
 
 msgid "The printer is in use."
-msgstr ""
-
-msgid "The printer is low on ink."
-msgstr ""
-
-msgid "The printer is low on toner."
 msgstr ""
 
 msgid "The printer is not connected."
@@ -4353,12 +4305,6 @@ msgstr ""
 msgid "The printer is unreachable at this time."
 msgstr ""
 
-msgid "The printer may be out of ink."
-msgstr ""
-
-msgid "The printer may be out of toner."
-msgstr ""
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 
@@ -4372,21 +4318,6 @@ msgid "The printer or class does not exist."
 msgstr ""
 
 msgid "The printer or class is not shared."
-msgstr ""
-
-msgid "The printer's cover is open."
-msgstr ""
-
-msgid "The printer's door is open."
-msgstr ""
-
-msgid "The printer's interlock is open."
-msgstr ""
-
-msgid "The printer's waste bin is almost full."
-msgstr ""
-
-msgid "The printer's waste bin is full."
 msgstr ""
 
 #, c-format
@@ -12433,6 +12364,18 @@ msgstr ""
 
 #~ msgid "Paper"
 #~ msgstr "Papier"
+
+#~ msgid "Paper jam."
+#~ msgstr "Bourrage papier."
+
+#~ msgid "Paper tray is almost empty."
+#~ msgstr "Le bac à papier est quasiment vide."
+
+#~ msgid "Paper tray is empty."
+#~ msgstr "Le bac à papier est vide."
+
+#~ msgid "Paper tray is missing."
+#~ msgstr "Le bac à papier est manquant."
 
 #~ msgid "Purge Jobs"
 #~ msgstr "Purger les tâches"

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3724,9 +3724,6 @@ msgstr "Linea più lunga di quella massima consentita (255 caratteri)"
 msgid "List Available Printers"
 msgstr "Elenco delle stampanti disponibili"
 
-msgid "Load paper."
-msgstr ""
-
 msgid "Local printer created."
 msgstr ""
 
@@ -4072,15 +4069,6 @@ msgstr "Memoria insufficiente."
 msgid "Output Mode"
 msgstr "Modalità di output"
 
-msgid "Output bin is almost full."
-msgstr ""
-
-msgid "Output bin is full."
-msgstr ""
-
-msgid "Output bin is missing."
-msgstr ""
-
 msgid "PASS"
 msgstr "OPERAZIONE RIUSCITA CON SUCCESSO"
 
@@ -4114,18 +4102,6 @@ msgstr "Il pacchetto non contiene un Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Il pacchetto non inizia con SEQUENZA"
-
-msgid "Paper jam."
-msgstr ""
-
-msgid "Paper tray is almost empty."
-msgstr ""
-
-msgid "Paper tray is empty."
-msgstr ""
-
-msgid "Paper tray is missing."
-msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4470,18 +4446,6 @@ msgstr ""
 "Il nome della classe può contenere fino a 127 caratteri stampabili e non può "
 "contenere spazi, barre (/) o cancelletto (#)."
 
-msgid "The developer unit needs to be replaced."
-msgstr "L'unità di sviluppo deve essere sostituita."
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "L'unità di sviluppo dovrà essere sostituita a breve."
-
-msgid "The fuser's temperature is high."
-msgstr "La temperatura di fusione è alta."
-
-msgid "The fuser's temperature is low."
-msgstr "La temperatura di fusione è bassa."
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4491,12 +4455,6 @@ msgstr ""
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "Il valore di notify-user-data è troppo grande (%d > 63 ottetti)."
-
-msgid "The optical photoconductor needs to be replaced."
-msgstr "Il fotoconduttore ottico deve essere sostituito."
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "Il fotoconduttore ottico dovrà essere sostituito a breve."
 
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
@@ -4508,12 +4466,6 @@ msgstr "La stampante non ha risposto."
 
 msgid "The printer is in use."
 msgstr "La stampante è in uso."
-
-msgid "The printer is low on ink."
-msgstr ""
-
-msgid "The printer is low on toner."
-msgstr ""
 
 msgid "The printer is not connected."
 msgstr "La stampante non è connessa."
@@ -4533,12 +4485,6 @@ msgstr "La stampante è offline."
 msgid "The printer is unreachable at this time."
 msgstr "In questo momento la stampante non è raggiungibile."
 
-msgid "The printer may be out of ink."
-msgstr "L'inchiostro della stampante potrebbe essere esaurito."
-
-msgid "The printer may be out of toner."
-msgstr "Il toner della stampante potrebbe essere esaurito."
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 "La stampante potrebbe non esistere oppure non è disponibile in questo "
@@ -4555,21 +4501,6 @@ msgstr "Non esiste la stampante o la classe."
 
 msgid "The printer or class is not shared."
 msgstr "La stampante o la classe non è condivisa."
-
-msgid "The printer's cover is open."
-msgstr "Il coperchio della stampante è aperto."
-
-msgid "The printer's door is open."
-msgstr "La porta della stampante è aperta."
-
-msgid "The printer's interlock is open."
-msgstr "Il blocco della stampante è aperto."
-
-msgid "The printer's waste bin is almost full."
-msgstr "Il cestino della stampante è quasi pieno."
-
-msgid "The printer's waste bin is full."
-msgstr "Il cestino della stampante è pieno."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12909,6 +12840,24 @@ msgstr ""
 #~ "L'attributo della descrizione del processo '%s' non può essere fornito "
 #~ "nella richiesta di creazione di un processo."
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "L'unità di sviluppo deve essere sostituita."
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "L'unità di sviluppo dovrà essere sostituita a breve."
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "La temperatura di fusione è alta."
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "La temperatura di fusione è bassa."
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "Il fotoconduttore ottico deve essere sostituito."
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "Il fotoconduttore ottico dovrà essere sostituito a breve."
+
 #~ msgid "The output bin is almost full."
 #~ msgstr "Il raccoglitore di uscita è quasi pieno."
 
@@ -12936,6 +12885,12 @@ msgstr ""
 #~ msgid "The printer is running low on toner."
 #~ msgstr "Il toner della stampante sta per esaurirsi."
 
+#~ msgid "The printer may be out of ink."
+#~ msgstr "L'inchiostro della stampante potrebbe essere esaurito."
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "Il toner della stampante potrebbe essere esaurito."
+
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
 #~ "not contain spaces, slashes (/), or the pound sign (#)."
@@ -12943,6 +12898,21 @@ msgstr ""
 #~ "Il nome della stampante può contenere solo un massimo di 127 caratteri "
 #~ "stampabili e non può contenere spazi, barre (/) oppure il simbolo del "
 #~ "cancelletto (#)."
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "Il coperchio della stampante è aperto."
+
+#~ msgid "The printer's door is open."
+#~ msgstr "La porta della stampante è aperta."
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "Il blocco della stampante è aperto."
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "Il cestino della stampante è quasi pieno."
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "Il cestino della stampante è pieno."
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "

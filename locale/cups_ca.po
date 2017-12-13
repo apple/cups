@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -3699,9 +3699,6 @@ msgstr "La línia la longitud màxima permesa (255 caràcters)"
 msgid "List Available Printers"
 msgstr "Llista les impressores disponibles"
 
-msgid "Load paper."
-msgstr ""
-
 msgid "Local printer created."
 msgstr ""
 
@@ -4046,15 +4043,6 @@ msgstr "Sense memòria."
 msgid "Output Mode"
 msgstr "Mode de sortida"
 
-msgid "Output bin is almost full."
-msgstr ""
-
-msgid "Output bin is full."
-msgstr ""
-
-msgid "Output bin is missing."
-msgstr ""
-
 msgid "PASS"
 msgstr "VÀLID"
 
@@ -4088,18 +4076,6 @@ msgstr "El paquet no conté cap Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "El paquet no comença amb SEQUENCE"
-
-msgid "Paper jam."
-msgstr ""
-
-msgid "Paper tray is almost empty."
-msgstr ""
-
-msgid "Paper tray is empty."
-msgstr ""
-
-msgid "Paper tray is missing."
-msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4445,18 +4421,6 @@ msgstr ""
 "El nom de la classe només pot tenir fins a 127 caràcters imprimibles i no "
 "pot contenir espais, barres (/) o el símbol coixinet (#)."
 
-msgid "The developer unit needs to be replaced."
-msgstr "S'ha de canviar la unitat de desenvolupament."
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "La unitat de desenvolupament s'haurà de canviar aviat."
-
-msgid "The fuser's temperature is high."
-msgstr "La temperatura del fusor és alta."
-
-msgid "The fuser's temperature is low."
-msgstr "La temperatura del fusor és baixa."
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4467,12 +4431,6 @@ msgstr ""
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "El valor de notify-user-data és massa llarg (%d > 63 octets)."
 
-msgid "The optical photoconductor needs to be replaced."
-msgstr "S'ha de canviar el fotoconductor òptic."
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "El fotoconductor òptic s'haurà de canviar aviat."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -4481,12 +4439,6 @@ msgstr "La impressora no ha respost."
 
 msgid "The printer is in use."
 msgstr "La impressora està ocupada."
-
-msgid "The printer is low on ink."
-msgstr ""
-
-msgid "The printer is low on toner."
-msgstr "S'està acabant el tòner de la impressora."
 
 msgid "The printer is not connected."
 msgstr "La impressora no està connectada."
@@ -4506,12 +4458,6 @@ msgstr "La impressora està fora de línia."
 msgid "The printer is unreachable at this time."
 msgstr "Ara mateix no es pot accedir a la impressora."
 
-msgid "The printer may be out of ink."
-msgstr "Es deu haver acabat la tinta de la impressora."
-
-msgid "The printer may be out of toner."
-msgstr "Es deu haver acabat el tòner de la impressora."
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 "Pot ser que la impressora no existeixi o que ara mateix no estigui "
@@ -4528,21 +4474,6 @@ msgstr "La impressora o la classe no existeix."
 
 msgid "The printer or class is not shared."
 msgstr "La impressora o la classe no estan compartides."
-
-msgid "The printer's cover is open."
-msgstr "La tapa de la impressora està oberta."
-
-msgid "The printer's door is open."
-msgstr "La porta de la impressora està oberta."
-
-msgid "The printer's interlock is open."
-msgstr "L'enclavament de seguretat de la impressora està obert."
-
-msgid "The printer's waste bin is almost full."
-msgstr "El dipòsit de residus és gairebé ple."
-
-msgid "The printer's waste bin is full."
-msgstr "El dipòsit de residus és ple."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12831,6 +12762,24 @@ msgstr ""
 #~ msgid "Stylus Photo Series"
 #~ msgstr "Sèrie Stylus Photo"
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "S'ha de canviar la unitat de desenvolupament."
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "La unitat de desenvolupament s'haurà de canviar aviat."
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "La temperatura del fusor és alta."
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "La temperatura del fusor és baixa."
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "S'ha de canviar el fotoconductor òptic."
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "El fotoconductor òptic s'haurà de canviar aviat."
+
 #~ msgid "The output bin is almost full."
 #~ msgstr "La safata de sortida és gairebé plena."
 
@@ -12860,6 +12809,9 @@ msgstr ""
 #~ "La impressora no és compatible amb el IPP/%d.%d, s'està intentant el IPP/"
 #~ "%s."
 
+#~ msgid "The printer is low on toner."
+#~ msgstr "S'està acabant el tòner de la impressora."
+
 #~ msgid "The printer is out of toner."
 #~ msgstr "S'ha acabat el tòner de la impressora"
 
@@ -12869,12 +12821,33 @@ msgstr ""
 #~ msgid "The printer is running low on toner."
 #~ msgstr "S'està acabant el tòner de la impressora."
 
+#~ msgid "The printer may be out of ink."
+#~ msgstr "Es deu haver acabat la tinta de la impressora."
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "Es deu haver acabat el tòner de la impressora."
+
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
 #~ "not contain spaces, slashes (/), or the pound sign (#)."
 #~ msgstr ""
 #~ "El nom de la impressora només pot tenir fins a 127 caràcters imprimibles "
 #~ "i no pot contenir espais, barres (/) o el símbol coixinet (#)."
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "La tapa de la impressora està oberta."
+
+#~ msgid "The printer's door is open."
+#~ msgstr "La porta de la impressora està oberta."
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "L'enclavament de seguretat de la impressora està obert."
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "El dipòsit de residus és gairebé ple."
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "El dipòsit de residus és ple."
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "

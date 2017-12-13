@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b1\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4548,10 +4548,6 @@ msgstr ""
 msgid "List Available Printers"
 msgstr ""
 
-#: cups/ppd-localize.c:277
-msgid "Load paper."
-msgstr ""
-
 #: scheduler/ipp.c:5547
 msgid "Local printer created."
 msgstr ""
@@ -5004,18 +5000,6 @@ msgstr ""
 msgid "Output Mode"
 msgstr ""
 
-#: cups/ppd-localize.c:302
-msgid "Output bin is almost full."
-msgstr ""
-
-#: cups/ppd-localize.c:304
-msgid "Output bin is full."
-msgstr ""
-
-#: cups/ppd-localize.c:300
-msgid "Output bin is missing."
-msgstr ""
-
 #: systemv/cupstestdsc.c:385
 msgid "PASS"
 msgstr ""
@@ -5058,22 +5042,6 @@ msgstr ""
 
 #: cups/snmp.c:945
 msgid "Packet does not start with SEQUENCE"
-msgstr ""
-
-#: cups/ppd-localize.c:279
-msgid "Paper jam."
-msgstr ""
-
-#: cups/ppd-localize.c:296
-msgid "Paper tray is almost empty."
-msgstr ""
-
-#: cups/ppd-localize.c:298
-msgid "Paper tray is empty."
-msgstr ""
-
-#: cups/ppd-localize.c:294
-msgid "Paper tray is missing."
 msgstr ""
 
 #: ppdc/sample.c:355
@@ -5243,7 +5211,7 @@ msgstr ""
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
-#: cups/ppd-cache.c:4230
+#: cups/ppd-cache.c:4375
 msgid "Printer does not support required IPP attributes or document formats."
 msgstr ""
 
@@ -5523,22 +5491,6 @@ msgstr ""
 msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
 msgstr ""
 
-#: cups/ppd-localize.c:324
-msgid "The developer unit needs to be replaced."
-msgstr ""
-
-#: cups/ppd-localize.c:322
-msgid "The developer unit will need to be replaced soon."
-msgstr ""
-
-#: cups/ppd-localize.c:314
-msgid "The fuser's temperature is high."
-msgstr ""
-
-#: cups/ppd-localize.c:316
-msgid "The fuser's temperature is low."
-msgstr ""
-
 #: scheduler/ipp.c:2139
 msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -5546,14 +5498,6 @@ msgstr ""
 #: scheduler/ipp.c:2122 scheduler/ipp.c:5848
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
-msgstr ""
-
-#: cups/ppd-localize.c:320
-msgid "The optical photoconductor needs to be replaced."
-msgstr ""
-
-#: cups/ppd-localize.c:318
-msgid "The optical photoconductor will need to be replaced soon."
 msgstr ""
 
 #: backend/ipp.c:998
@@ -5570,15 +5514,7 @@ msgstr ""
 msgid "The printer is in use."
 msgstr ""
 
-#: cups/ppd-localize.c:306
-msgid "The printer is low on ink."
-msgstr ""
-
-#: cups/ppd-localize.c:284
-msgid "The printer is low on toner."
-msgstr ""
-
-#: backend/runloop.c:239 backend/runloop.c:359 cups/ppd-localize.c:282
+#: backend/runloop.c:239 backend/runloop.c:359
 msgid "The printer is not connected."
 msgstr ""
 
@@ -5603,14 +5539,6 @@ msgstr ""
 msgid "The printer is unreachable at this time."
 msgstr ""
 
-#: cups/ppd-localize.c:308
-msgid "The printer may be out of ink."
-msgstr ""
-
-#: cups/ppd-localize.c:286
-msgid "The printer may be out of toner."
-msgstr ""
-
 #: backend/ipp.c:758 backend/lpd.c:881 backend/socket.c:344
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
@@ -5632,26 +5560,6 @@ msgstr ""
 
 #: scheduler/ipp.c:1303
 msgid "The printer or class is not shared."
-msgstr ""
-
-#: cups/ppd-localize.c:288
-msgid "The printer's cover is open."
-msgstr ""
-
-#: cups/ppd-localize.c:292
-msgid "The printer's door is open."
-msgstr ""
-
-#: cups/ppd-localize.c:290
-msgid "The printer's interlock is open."
-msgstr ""
-
-#: cups/ppd-localize.c:310
-msgid "The printer's waste bin is almost full."
-msgstr ""
-
-#: cups/ppd-localize.c:312
-msgid "The printer's waste bin is full."
 msgstr ""
 
 #: scheduler/ipp.c:912 scheduler/ipp.c:2303

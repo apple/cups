@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -3494,9 +3494,6 @@ msgstr "Řádek je delší než maximální povolená velikost (255 znaků)"
 msgid "List Available Printers"
 msgstr "Seznam dostupných tiskáren"
 
-msgid "Load paper."
-msgstr ""
-
 msgid "Local printer created."
 msgstr ""
 
@@ -3834,15 +3831,6 @@ msgstr ""
 msgid "Output Mode"
 msgstr "Výstupní režim"
 
-msgid "Output bin is almost full."
-msgstr ""
-
-msgid "Output bin is full."
-msgstr ""
-
-msgid "Output bin is missing."
-msgstr ""
-
 msgid "PASS"
 msgstr ""
 
@@ -3876,18 +3864,6 @@ msgstr "Packet neobsahuje \"Get-Response-PDU\""
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Paket nezačíná SEQUENCÍ"
-
-msgid "Paper jam."
-msgstr ""
-
-msgid "Paper tray is almost empty."
-msgstr ""
-
-msgid "Paper tray is empty."
-msgstr ""
-
-msgid "Paper tray is missing."
-msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4230,30 +4206,12 @@ msgstr ""
 "Název třídy může obsahovat až 127 tisknutelných znaků a nesmí obsahovat "
 "mezery, lomítka (/), nebo křížek (#)."
 
-msgid "The developer unit needs to be replaced."
-msgstr ""
-
-msgid "The developer unit will need to be replaced soon."
-msgstr ""
-
-msgid "The fuser's temperature is high."
-msgstr ""
-
-msgid "The fuser's temperature is low."
-msgstr ""
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr "Atribut \"notify-lease-duration\" nelze použít s přihlášenou úlohou."
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
-msgstr ""
-
-msgid "The optical photoconductor needs to be replaced."
-msgstr ""
-
-msgid "The optical photoconductor will need to be replaced soon."
 msgstr ""
 
 msgid "The printer configuration is incorrect or the printer no longer exists."
@@ -4263,12 +4221,6 @@ msgid "The printer did not respond."
 msgstr ""
 
 msgid "The printer is in use."
-msgstr ""
-
-msgid "The printer is low on ink."
-msgstr ""
-
-msgid "The printer is low on toner."
 msgstr ""
 
 msgid "The printer is not connected."
@@ -4289,12 +4241,6 @@ msgstr ""
 msgid "The printer is unreachable at this time."
 msgstr ""
 
-msgid "The printer may be out of ink."
-msgstr ""
-
-msgid "The printer may be out of toner."
-msgstr ""
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 
@@ -4308,21 +4254,6 @@ msgid "The printer or class does not exist."
 msgstr ""
 
 msgid "The printer or class is not shared."
-msgstr ""
-
-msgid "The printer's cover is open."
-msgstr ""
-
-msgid "The printer's door is open."
-msgstr ""
-
-msgid "The printer's interlock is open."
-msgstr ""
-
-msgid "The printer's waste bin is almost full."
-msgstr ""
-
-msgid "The printer's waste bin is full."
 msgstr ""
 
 #, c-format

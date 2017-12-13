@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -3727,9 +3727,6 @@ msgstr "Linha maior do que o máximo permitido (255 caracteres)"
 msgid "List Available Printers"
 msgstr "Lista de impressoras disponíveis"
 
-msgid "Load paper."
-msgstr "Carregar papel."
-
 msgid "Local printer created."
 msgstr ""
 
@@ -4074,15 +4071,6 @@ msgstr "Memória insuficiente."
 msgid "Output Mode"
 msgstr "Mode de saída"
 
-msgid "Output bin is almost full."
-msgstr "Tabuleiro de saída está quase completo."
-
-msgid "Output bin is full."
-msgstr "Tabuleiro de saída está completo."
-
-msgid "Output bin is missing."
-msgstr "Tabuleiro de saída não foi encontrado."
-
 msgid "PASS"
 msgstr "PASSOU"
 
@@ -4116,18 +4104,6 @@ msgstr "Pacote não contém um Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Pacote não inicia com SEQUENCE"
-
-msgid "Paper jam."
-msgstr "Atolamento de papel."
-
-msgid "Paper tray is almost empty."
-msgstr "Bandeja de papel está quase vazia."
-
-msgid "Paper tray is empty."
-msgstr "Bandeja de papel está vazia."
-
-msgid "Paper tray is missing."
-msgstr "Bandeja de papel não foi encontrada."
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4475,18 +4451,6 @@ msgstr ""
 "O nome da classe pode conter somente até 127 caracteres imprimíveis e não "
 "pode conter espaços, barras (/), ou sinal de tralha (#)."
 
-msgid "The developer unit needs to be replaced."
-msgstr "A unidade de desenvolvedor precisa ser substituído."
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "A unidade de desenvolvedor precisará ser substituído em breve."
-
-msgid "The fuser's temperature is high."
-msgstr "A temperatura do fusor está alta."
-
-msgid "The fuser's temperature is low."
-msgstr "A temperatura do fusor está baixa."
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4497,12 +4461,6 @@ msgstr ""
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "O valor de notify-user-data está muito grande (%d > 63 octetos)."
 
-msgid "The optical photoconductor needs to be replaced."
-msgstr "O fotocondutor óptico precisa ser substituído."
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "O fotocondutor óptico precisará ser substituído em breve."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 "A configuração da impressora está incorreta ou a impressora não existe mais."
@@ -4512,12 +4470,6 @@ msgstr "A impressora não respondeu."
 
 msgid "The printer is in use."
 msgstr "A impressora está em uso."
-
-msgid "The printer is low on ink."
-msgstr "A impressora está ficando sem tinta."
-
-msgid "The printer is low on toner."
-msgstr "A impressora está ficando sem toner."
 
 msgid "The printer is not connected."
 msgstr "A impressora não está conectada."
@@ -4537,12 +4489,6 @@ msgstr "A impressora está offline."
 msgid "The printer is unreachable at this time."
 msgstr "A impressora está inacessível neste momento."
 
-msgid "The printer may be out of ink."
-msgstr "A impressora pode estar sem tinta."
-
-msgid "The printer may be out of toner."
-msgstr "A impressora pode estar sem toner."
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr "A impressora pode não existir ou está indisponível neste momento."
 
@@ -4557,21 +4503,6 @@ msgstr "A impressora ou classe não existe."
 
 msgid "The printer or class is not shared."
 msgstr "A impressora ou classe não está compartilhada."
-
-msgid "The printer's cover is open."
-msgstr "A tampa superior da impressora está aberta."
-
-msgid "The printer's door is open."
-msgstr "A tampa da impressora está aberta."
-
-msgid "The printer's interlock is open."
-msgstr "A interlock da impressora está aberta."
-
-msgid "The printer's waste bin is almost full."
-msgstr "A lixeira da impressora está quase completa."
-
-msgid "The printer's waste bin is full."
-msgstr "A lixeira da impressora está completa."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12852,6 +12783,9 @@ msgstr ""
 #~ msgid "File Folder "
 #~ msgstr "Pasta do arquivo "
 
+#~ msgid "Load paper."
+#~ msgstr "Carregar papel."
+
 #~ msgid "Looking for printer..."
 #~ msgstr "Procurando por impressora..."
 
@@ -12860,6 +12794,15 @@ msgstr ""
 
 #~ msgid "New Stylus Photo Series"
 #~ msgstr "Nova Stylus Photos Séries"
+
+#~ msgid "Output bin is almost full."
+#~ msgstr "Tabuleiro de saída está quase completo."
+
+#~ msgid "Output bin is full."
+#~ msgstr "Tabuleiro de saída está completo."
+
+#~ msgid "Output bin is missing."
+#~ msgstr "Tabuleiro de saída não foi encontrado."
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "Saída da impressora %s é enviada para %s"
@@ -12872,6 +12815,18 @@ msgstr ""
 
 #~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
 #~ msgstr "Saída da impressora %s/%s é enviada para impressora remota %s em %s"
+
+#~ msgid "Paper jam."
+#~ msgstr "Atolamento de papel."
+
+#~ msgid "Paper tray is almost empty."
+#~ msgstr "Bandeja de papel está quase vazia."
+
+#~ msgid "Paper tray is empty."
+#~ msgstr "Bandeja de papel está vazia."
+
+#~ msgid "Paper tray is missing."
+#~ msgstr "Bandeja de papel não foi encontrada."
 
 #~ msgid "Postcard Double "
 #~ msgstr "Postal duplo "
@@ -12901,6 +12856,24 @@ msgstr ""
 #~ "O atributo Job Description \"%s\" não pode ser fornecido em uma "
 #~ "requisição de criação de trabalho."
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "A unidade de desenvolvedor precisa ser substituído."
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "A unidade de desenvolvedor precisará ser substituído em breve."
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "A temperatura do fusor está alta."
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "A temperatura do fusor está baixa."
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "O fotocondutor óptico precisa ser substituído."
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "O fotocondutor óptico precisará ser substituído em breve."
+
 #~ msgid "The output bin is almost full."
 #~ msgstr "O tabuleiro de saída está quase completo."
 
@@ -12922,11 +12895,23 @@ msgstr ""
 #~ msgid "The paper tray needs to be filled."
 #~ msgstr "O bandeja de papel precisa ser recarregada."
 
+#~ msgid "The printer is low on ink."
+#~ msgstr "A impressora está ficando sem tinta."
+
+#~ msgid "The printer is low on toner."
+#~ msgstr "A impressora está ficando sem toner."
+
 #~ msgid "The printer is running low on ink."
 #~ msgstr "A impressora está ficando sem tinta."
 
 #~ msgid "The printer is running low on toner."
 #~ msgstr "A impressora está ficando sem toner."
+
+#~ msgid "The printer may be out of ink."
+#~ msgstr "A impressora pode estar sem tinta."
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "A impressora pode estar sem toner."
 
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
@@ -12934,6 +12919,21 @@ msgstr ""
 #~ msgstr ""
 #~ "O nome da impressora pode conter somente até 127 caracteres imprimíveis e "
 #~ "não pode conter espaços, barras (/), ou sinal de tralha (#)."
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "A tampa superior da impressora está aberta."
+
+#~ msgid "The printer's door is open."
+#~ msgstr "A tampa da impressora está aberta."
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "A interlock da impressora está aberta."
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "A lixeira da impressora está quase completa."
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "A lixeira da impressora está completa."
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "

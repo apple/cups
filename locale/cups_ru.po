@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -3655,9 +3655,6 @@ msgstr "Строка длиннее разрешенного предела (255
 msgid "List Available Printers"
 msgstr "Список доступных принтеров"
 
-msgid "Load paper."
-msgstr "Загрузка бумаги."
-
 msgid "Local printer created."
 msgstr ""
 
@@ -4002,15 +3999,6 @@ msgstr "Недостаточно памяти."
 msgid "Output Mode"
 msgstr "Режим вывода"
 
-msgid "Output bin is almost full."
-msgstr "Лоток вывода почти заполнен."
-
-msgid "Output bin is full."
-msgstr "Лоток вывода заполнен."
-
-msgid "Output bin is missing."
-msgstr "Отсутствует лоток вывода."
-
 msgid "PASS"
 msgstr "PASS"
 
@@ -4044,18 +4032,6 @@ msgstr "В пакете нет Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "Нет индикатора SEQUENCE в начале пакета"
-
-msgid "Paper jam."
-msgstr "Замятие бумаги."
-
-msgid "Paper tray is almost empty."
-msgstr "Лоток с бумагой почти пуст."
-
-msgid "Paper tray is empty."
-msgstr "Лоток с бумагой пуст."
-
-msgid "Paper tray is missing."
-msgstr "Лоток с бумагой отсутствует."
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4399,18 +4375,6 @@ msgstr ""
 "Имя группы может содержать максимально 127 печатных символов и не может "
 "содержать пробелы, дроби (/) или знак \"решетки\" (#)."
 
-msgid "The developer unit needs to be replaced."
-msgstr "Developer unit нуждается в замене."
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "Developer unit нуждается в замене в ближайшее время."
-
-msgid "The fuser's temperature is high."
-msgstr "Высокая температура термофиксатора."
-
-msgid "The fuser's temperature is low."
-msgstr "Низкая температура термофиксатора."
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4421,12 +4385,6 @@ msgstr ""
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "Значение notify-user-data слишком большое(%d > 63 октета)"
 
-msgid "The optical photoconductor needs to be replaced."
-msgstr "Оптический фоторегистратор нуждается в замене."
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "Оптический фоторегистратор нуждается в замене в ближайшее время."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr "Неправильная конфигурация принтера, или принтер больше не доступен."
 
@@ -4435,12 +4393,6 @@ msgstr "Принтер не отвечает."
 
 msgid "The printer is in use."
 msgstr "Принтер используется."
-
-msgid "The printer is low on ink."
-msgstr "Заканчиваются чернила."
-
-msgid "The printer is low on toner."
-msgstr "Заканчивается тонер."
 
 msgid "The printer is not connected."
 msgstr "Принтер не подключен."
@@ -4460,12 +4412,6 @@ msgstr "Принтер выключен."
 msgid "The printer is unreachable at this time."
 msgstr "В настоящее время принтер недоступен."
 
-msgid "The printer may be out of ink."
-msgstr "Возможно в принтере закончились чернила."
-
-msgid "The printer may be out of toner."
-msgstr "Возможно в принтере закончился тонер."
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr "Возможно принтер недоступен в настоящее время."
 
@@ -4480,21 +4426,6 @@ msgstr "Принтер или группа не существует."
 
 msgid "The printer or class is not shared."
 msgstr "Принтер или группа без совместного доступа."
-
-msgid "The printer's cover is open."
-msgstr "Крышка принтера открыта."
-
-msgid "The printer's door is open."
-msgstr "Дверца принтера открыта."
-
-msgid "The printer's interlock is open."
-msgstr "Открыт замок."
-
-msgid "The printer's waste bin is almost full."
-msgstr "Отсек для мусора почти заполнен."
-
-msgid "The printer's waste bin is full."
-msgstr "Отсек для мусора заполнен."
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12737,6 +12668,30 @@ msgstr ""
 #~ msgid "File Folder "
 #~ msgstr "Каталог файла "
 
+#~ msgid "Load paper."
+#~ msgstr "Загрузка бумаги."
+
+#~ msgid "Output bin is almost full."
+#~ msgstr "Лоток вывода почти заполнен."
+
+#~ msgid "Output bin is full."
+#~ msgstr "Лоток вывода заполнен."
+
+#~ msgid "Output bin is missing."
+#~ msgstr "Отсутствует лоток вывода."
+
+#~ msgid "Paper jam."
+#~ msgstr "Замятие бумаги."
+
+#~ msgid "Paper tray is almost empty."
+#~ msgstr "Лоток с бумагой почти пуст."
+
+#~ msgid "Paper tray is empty."
+#~ msgstr "Лоток с бумагой пуст."
+
+#~ msgid "Paper tray is missing."
+#~ msgstr "Лоток с бумагой отсутствует."
+
 #~ msgid "Postcard Double "
 #~ msgstr "Открытка двойная"
 
@@ -12746,12 +12701,57 @@ msgstr ""
 #~ msgstr ""
 #~ "Атрибут '%s' Job Description не может быть подставлен при созданиизадания"
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "Developer unit нуждается в замене."
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "Developer unit нуждается в замене в ближайшее время."
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "Высокая температура термофиксатора."
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "Низкая температура термофиксатора."
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "Оптический фоторегистратор нуждается в замене."
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "Оптический фоторегистратор нуждается в замене в ближайшее время."
+
+#~ msgid "The printer is low on ink."
+#~ msgstr "Заканчиваются чернила."
+
+#~ msgid "The printer is low on toner."
+#~ msgstr "Заканчивается тонер."
+
+#~ msgid "The printer may be out of ink."
+#~ msgstr "Возможно в принтере закончились чернила."
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "Возможно в принтере закончился тонер."
+
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
 #~ "not contain spaces, slashes (/), or the pound sign (#)."
 #~ msgstr ""
 #~ "Имя принтера может содержать максимально 127 печатных символов и не может "
 #~ "содержать пробелы, дроби (/) или знак \"решетки\" (#)."
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "Крышка принтера открыта."
+
+#~ msgid "The printer's door is open."
+#~ msgstr "Дверца принтера открыта."
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "Открыт замок."
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "Отсек для мусора почти заполнен."
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "Отсек для мусора заполнен."
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "

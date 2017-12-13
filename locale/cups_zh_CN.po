@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -3637,9 +3637,6 @@ msgstr "行长度超过允许的最大值（255 字符）"
 msgid "List Available Printers"
 msgstr "列出可用打印机"
 
-msgid "Load paper."
-msgstr "装入纸张。"
-
 msgid "Local printer created."
 msgstr "已创建本地打印机。"
 
@@ -3981,15 +3978,6 @@ msgstr "内存耗尽。"
 msgid "Output Mode"
 msgstr "输出模式"
 
-msgid "Output bin is almost full."
-msgstr "出纸盘已几乎用满。"
-
-msgid "Output bin is full."
-msgstr "出纸盘已满。"
-
-msgid "Output bin is missing."
-msgstr "无出纸盘。"
-
 msgid "PASS"
 msgstr "通过"
 
@@ -4023,18 +4011,6 @@ msgstr "包裹中未包含 Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "包裹未使用 SEQUENCE 开头"
-
-msgid "Paper jam."
-msgstr "卡纸。"
-
-msgid "Paper tray is almost empty."
-msgstr "纸张即将耗尽。"
-
-msgid "Paper tray is empty."
-msgstr "纸槽已空。"
-
-msgid "Paper tray is missing."
-msgstr "纸槽缺失。"
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4378,18 +4354,6 @@ msgid ""
 "contain spaces, slashes (/), or the pound sign (#)."
 msgstr "类名最多可包含 127 可打印字符，不能包含空格、斜杠（/）或井号（#）。"
 
-msgid "The developer unit needs to be replaced."
-msgstr "显影单元需替换。"
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "显影单元最近需替换。"
-
-msgid "The fuser's temperature is high."
-msgstr "熔凝器温度高。"
-
-msgid "The fuser's temperature is low."
-msgstr "熔凝器温度低。"
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr "notify-lease-duration 属性不可用于任务订阅。"
@@ -4397,12 +4361,6 @@ msgstr "notify-lease-duration 属性不可用于任务订阅。"
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "notify-user-data 值过大（%d > 63 八位值）。"
-
-msgid "The optical photoconductor needs to be replaced."
-msgstr "光导元件需替换。"
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "光导元件最近需替换。"
 
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr "打印机配置不正确或打印机已不存在。"
@@ -4412,12 +4370,6 @@ msgstr "打印机无响应。"
 
 msgid "The printer is in use."
 msgstr "打印机正在使用中。"
-
-msgid "The printer is low on ink."
-msgstr "打印机墨水即将耗尽。"
-
-msgid "The printer is low on toner."
-msgstr "打印机墨粉即将耗尽。"
 
 msgid "The printer is not connected."
 msgstr "打印机未连接。"
@@ -4437,12 +4389,6 @@ msgstr "打印机离线。"
 msgid "The printer is unreachable at this time."
 msgstr "打印机暂时无法访问。"
 
-msgid "The printer may be out of ink."
-msgstr "打印机墨水可能已耗尽。"
-
-msgid "The printer may be out of toner."
-msgstr "打印机墨粉可能已耗尽。"
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr "打印机暂时不存在或不可用。"
 
@@ -4457,21 +4403,6 @@ msgstr "打印机或类不存在。"
 
 msgid "The printer or class is not shared."
 msgstr "打印机或类未共享。"
-
-msgid "The printer's cover is open."
-msgstr "打印机盖被打开。"
-
-msgid "The printer's door is open."
-msgstr "打印机门被打开。"
-
-msgid "The printer's interlock is open."
-msgstr "打印机联锁被打开。"
-
-msgid "The printer's waste bin is almost full."
-msgstr "打印机的废纸篓即将占满。"
-
-msgid "The printer's waste bin is full."
-msgstr "打印机的废纸篓已满。"
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12992,6 +12923,9 @@ msgstr ""
 #~ msgid "Lightweight Paper"
 #~ msgstr "轻型纸张"
 
+#~ msgid "Load paper."
+#~ msgstr "装入纸张。"
+
 #~ msgid "Mailbox 1"
 #~ msgstr "1 号信箱"
 
@@ -13112,8 +13046,29 @@ msgstr ""
 #~ msgid "Other"
 #~ msgstr "其他"
 
+#~ msgid "Output bin is almost full."
+#~ msgstr "出纸盘已几乎用满。"
+
+#~ msgid "Output bin is full."
+#~ msgstr "出纸盘已满。"
+
+#~ msgid "Output bin is missing."
+#~ msgstr "无出纸盘。"
+
 #~ msgid "Paper"
 #~ msgstr "纸张"
+
+#~ msgid "Paper jam."
+#~ msgstr "卡纸。"
+
+#~ msgid "Paper tray is almost empty."
+#~ msgstr "纸张即将耗尽。"
+
+#~ msgid "Paper tray is empty."
+#~ msgstr "纸槽已空。"
+
+#~ msgid "Paper tray is missing."
+#~ msgstr "纸槽缺失。"
 
 #~ msgid "Parallel Fold"
 #~ msgstr "并行折叠"
@@ -13370,11 +13325,56 @@ msgstr ""
 #~ msgid "Tab Stock"
 #~ msgstr "重磅标签"
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "显影单元需替换。"
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "显影单元最近需替换。"
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "熔凝器温度高。"
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "熔凝器温度低。"
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "光导元件需替换。"
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "光导元件最近需替换。"
+
+#~ msgid "The printer is low on ink."
+#~ msgstr "打印机墨水即将耗尽。"
+
+#~ msgid "The printer is low on toner."
+#~ msgstr "打印机墨粉即将耗尽。"
+
+#~ msgid "The printer may be out of ink."
+#~ msgstr "打印机墨水可能已耗尽。"
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "打印机墨粉可能已耗尽。"
+
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
 #~ "not contain spaces, slashes (/), or the pound sign (#)."
 #~ msgstr ""
 #~ "打印机名称最多可包含 127 可打印字符，不能包含空格、斜杠（/）或井号（#）。"
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "打印机盖被打开。"
+
+#~ msgid "The printer's door is open."
+#~ msgstr "打印机门被打开。"
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "打印机联锁被打开。"
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "打印机的废纸篓即将占满。"
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "打印机的废纸篓已满。"
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "

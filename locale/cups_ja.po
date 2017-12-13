@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-08 19:16-0500\n"
+"POT-Creation-Date: 2017-12-13 14:04-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3698,9 +3698,6 @@ msgstr "1 行が最大値 (255 文字) を超えています"
 msgid "List Available Printers"
 msgstr "使用可能なプリンター一覧"
 
-msgid "Load paper."
-msgstr "用紙を補給してください。"
-
 msgid "Local printer created."
 msgstr ""
 
@@ -4044,15 +4041,6 @@ msgstr "メモリーが足りません。"
 msgid "Output Mode"
 msgstr "出力モード"
 
-msgid "Output bin is almost full."
-msgstr "排紙ビンがほとんど満杯です。"
-
-msgid "Output bin is full."
-msgstr "排紙ビンが満杯です。"
-
-msgid "Output bin is missing."
-msgstr "排紙ビンがありません。"
-
 msgid "PASS"
 msgstr "合格"
 
@@ -4086,18 +4074,6 @@ msgstr "パケットが Get-Response-PDU を含んでいません"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "パケットが SEQUENCE から始まりません"
-
-msgid "Paper jam."
-msgstr "用紙詰まりです。"
-
-msgid "Paper tray is almost empty."
-msgstr "給紙トレイがほとんど空です。"
-
-msgid "Paper tray is empty."
-msgstr "給紙トレイが空です。"
-
-msgid "Paper tray is missing."
-msgstr "給紙トレイがありません。"
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4440,18 +4416,6 @@ msgstr ""
 "クラス名は 127 文字以内の表示可能文字からなり、空白、スラッシュ (/)、ハッ"
 "シュ (#) を含んではなりません。"
 
-msgid "The developer unit needs to be replaced."
-msgstr "現像ユニットの交換が必要です。"
-
-msgid "The developer unit will need to be replaced soon."
-msgstr "もうすぐ現像ユニットの交換時期です。"
-
-msgid "The fuser's temperature is high."
-msgstr "定着器の温度が高すぎます。"
-
-msgid "The fuser's temperature is low."
-msgstr "定着器の温度が低すぎます。"
-
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -4462,12 +4426,6 @@ msgstr ""
 msgid "The notify-user-data value is too large (%d > 63 octets)."
 msgstr "notify-user-data 値が大きすぎます (%d > 63 オクテット)。"
 
-msgid "The optical photoconductor needs to be replaced."
-msgstr "感光体の交換が必要です。"
-
-msgid "The optical photoconductor will need to be replaced soon."
-msgstr "もうすぐ感光体の交換時期です。"
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr "プリンターの設定が正しくないかプリンターはすでに存在しません。"
 
@@ -4476,12 +4434,6 @@ msgstr "プリンターが応答しません。"
 
 msgid "The printer is in use."
 msgstr "プリンターは使用中です。"
-
-msgid "The printer is low on ink."
-msgstr "インク残量が残り少なくなっています。"
-
-msgid "The printer is low on toner."
-msgstr "トナー残量が残り少なくなっています。"
 
 msgid "The printer is not connected."
 msgstr "プリンターは接続されていません。"
@@ -4501,12 +4453,6 @@ msgstr "プリンターはオフラインです。"
 msgid "The printer is unreachable at this time."
 msgstr "プリンターには現在到達できません。"
 
-msgid "The printer may be out of ink."
-msgstr "プリンターのインクがなくなっているようです。"
-
-msgid "The printer may be out of toner."
-msgstr "プリンターのトナーがなくなっているようです。"
-
 msgid "The printer may not exist or is unavailable at this time."
 msgstr "プリンターは現在存在しないか、使用できないようです。"
 
@@ -4521,21 +4467,6 @@ msgstr "プリンターまたはクラスは存在しません。"
 
 msgid "The printer or class is not shared."
 msgstr "プリンターまたはクラスは共有できません。"
-
-msgid "The printer's cover is open."
-msgstr "プリンターのカバーが開いています。"
-
-msgid "The printer's door is open."
-msgstr "プリンターのドアが開いています。"
-
-msgid "The printer's interlock is open."
-msgstr "プリンターのインターロックが開いています。"
-
-msgid "The printer's waste bin is almost full."
-msgstr "プリンターの廃インクまたは廃トナー容器がほとんど一杯です。"
-
-msgid "The printer's waste bin is full."
-msgstr "プリンターの廃インクまたは廃トナー容器が一杯です。"
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -12862,11 +12793,23 @@ msgstr ""
 #~ msgid "File Folder "
 #~ msgstr "ファイルフォルダー"
 
+#~ msgid "Load paper."
+#~ msgstr "用紙を補給してください。"
+
 #~ msgid "New Stylus Color Series"
 #~ msgstr "New Stylus Color シリーズ"
 
 #~ msgid "New Stylus Photo Series"
 #~ msgstr "New Stylus Photo シリーズ"
+
+#~ msgid "Output bin is almost full."
+#~ msgstr "排紙ビンがほとんど満杯です。"
+
+#~ msgid "Output bin is full."
+#~ msgstr "排紙ビンが満杯です。"
+
+#~ msgid "Output bin is missing."
+#~ msgstr "排紙ビンがありません。"
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "プリンター %s の出力は %s に送られます"
@@ -12880,6 +12823,18 @@ msgstr ""
 #~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
 #~ msgstr ""
 #~ "プリンター %s/%s の出力は、リモートプリンター %s (%s 上) に送られます"
+
+#~ msgid "Paper jam."
+#~ msgstr "用紙詰まりです。"
+
+#~ msgid "Paper tray is almost empty."
+#~ msgstr "給紙トレイがほとんど空です。"
+
+#~ msgid "Paper tray is empty."
+#~ msgstr "給紙トレイが空です。"
+
+#~ msgid "Paper tray is missing."
+#~ msgstr "給紙トレイがありません。"
 
 #~ msgid "Postcard Double "
 #~ msgstr "往復ハガキ"
@@ -12915,6 +12870,24 @@ msgstr ""
 #~ "request."
 #~ msgstr "'%s' Job Description 属性はジョブ作成要求の中で指定できません。"
 
+#~ msgid "The developer unit needs to be replaced."
+#~ msgstr "現像ユニットの交換が必要です。"
+
+#~ msgid "The developer unit will need to be replaced soon."
+#~ msgstr "もうすぐ現像ユニットの交換時期です。"
+
+#~ msgid "The fuser's temperature is high."
+#~ msgstr "定着器の温度が高すぎます。"
+
+#~ msgid "The fuser's temperature is low."
+#~ msgstr "定着器の温度が低すぎます。"
+
+#~ msgid "The optical photoconductor needs to be replaced."
+#~ msgstr "感光体の交換が必要です。"
+
+#~ msgid "The optical photoconductor will need to be replaced soon."
+#~ msgstr "もうすぐ感光体の交換時期です。"
+
 #~ msgid "The output bin is almost full."
 #~ msgstr "排紙トレイがほとんど一杯です。"
 
@@ -12942,11 +12915,23 @@ msgstr ""
 #~ msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
 #~ msgstr "プリンターが IPP/%d.%d をサポートしていません。IPP/%s を試します。"
 
+#~ msgid "The printer is low on ink."
+#~ msgstr "インク残量が残り少なくなっています。"
+
+#~ msgid "The printer is low on toner."
+#~ msgstr "トナー残量が残り少なくなっています。"
+
 #~ msgid "The printer is running low on ink."
 #~ msgstr "プリンターのインクがもうすぐなくなります。"
 
 #~ msgid "The printer is running low on toner."
 #~ msgstr "プリンターのトナーがもうすぐなくなります。"
+
+#~ msgid "The printer may be out of ink."
+#~ msgstr "プリンターのインクがなくなっているようです。"
+
+#~ msgid "The printer may be out of toner."
+#~ msgstr "プリンターのトナーがなくなっているようです。"
 
 #~ msgid ""
 #~ "The printer name may only contain up to 127 printable characters and may "
@@ -12954,6 +12939,21 @@ msgstr ""
 #~ msgstr ""
 #~ "プリンター名は 127 文字以内の表示可能文字から成り、空白、スラッシュ (/)、"
 #~ "ハッシュ (#) を含んではなりません。"
+
+#~ msgid "The printer's cover is open."
+#~ msgstr "プリンターのカバーが開いています。"
+
+#~ msgid "The printer's door is open."
+#~ msgstr "プリンターのドアが開いています。"
+
+#~ msgid "The printer's interlock is open."
+#~ msgstr "プリンターのインターロックが開いています。"
+
+#~ msgid "The printer's waste bin is almost full."
+#~ msgstr "プリンターの廃インクまたは廃トナー容器がほとんど一杯です。"
+
+#~ msgid "The printer's waste bin is full."
+#~ msgstr "プリンターの廃インクまたは廃トナー容器が一杯です。"
 
 #~ msgid ""
 #~ "The subscription name may not contain spaces, slashes (/), question marks "
