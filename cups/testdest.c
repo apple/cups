@@ -45,7 +45,20 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (argc < 2)
     usage(NULL);
 
-  if (!strcmp(argv[1], "--enum"))
+  if (!strcmp(argv[1], "--get"))
+  {
+    int		i;			/* Looping var */
+    cups_dest_t	*dests;			/* Destinations */
+    int		num_dests = cupsGetDests2(CUPS_HTTP_DEFAULT, &dests);
+					/* Number of destinations */
+
+    for (i = 0; i < num_dests; i ++)
+      enum_cb(NULL, 0, dests + i);
+
+    cupsFreeDests(num_dests, dests);
+    return (0);
+  }
+  else if (!strcmp(argv[1], "--enum"))
   {
     int			i;		/* Looping var */
     cups_ptype_t	type = 0,	/* Printer type filter */
@@ -220,12 +233,14 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
   (void)flags;
 
   if (dest->instance)
-    printf("%s%s/%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->instance);
+    printf("%s%s/%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->instance, dest->is_default ? " (Default)" : "");
   else
-    printf("%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name);
+    printf("%s%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->is_default ? " (Default)" : "");
 
   for (i = 0; i < dest->num_options; i ++)
     printf("    %s=\"%s\"\n", dest->options[i].name, dest->options[i].value);
+
+  puts("");
 
   return (1);
 }

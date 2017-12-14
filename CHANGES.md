@@ -33,6 +33,8 @@ Changes in CUPS v2.3b1
   control the minimum and maximum TLS versions that will be allowed,
   respectively (Issue #5119)
 - Dropped hard-coded CGI scripting language support (Issue #5124)
+- The `cupsEnumDests` function did not include options from the lpoptions
+  files (Issue #5144)
 - Fixed the `ippserver` sample code when threading is disabled or unavailable
   (Issue #5154)
 - Added label markup to checkbox and radio button controls in the web interface
