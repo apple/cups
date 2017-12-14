@@ -35,17 +35,16 @@
 	</div>
 	<div class="thirds">
 	  <h2>CUPS 管理者向け</h2>
-	  <p><a href="admin">プリンターとクラスの追加</a></p>
+	  <p><a href="help/admin.html">プリンターとクラスの追加</a></p>
 	  <p><a href="help/policies.html">操作ポリシーの管理</a></p>
 	  <p><a href="help/network.html">ネットワークプリンターの使い方</a></p>
+	  <p><a href="help/firewalls.html">Firewalls</a></p>
 	  <p><a href="help/man-cupsd.conf.html">ネットワークプリンターの使い方</a></p>
 	</div>
 	<div class="thirds">
 	  <h2>CUPS 開発者向け</h2>
-	  <p><a href="help/api-overview.html">CUPS プログラミングの導入</a></p>
-	  <p><a href="help/api-cups.html">CUPS API</a></p>
+	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <p><a href="help/api-filter.html">フィルタとバックエンドのプログラミング</a></p>
-	  <p><a href="help/api-httpipp.html">HTTP と IPP の API</a></p>
 	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">開発者フォーラム</a></p>
 	</div>
       </div>

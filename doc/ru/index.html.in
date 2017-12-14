@@ -35,18 +35,17 @@
 	</div>
 	<div class="thirds">
 	  <H2>CUPS для администраторов</H2>
-	  <P><A HREF="admin">Добавление принтеров и групп</A></P>
+	  <P><A HREF="help/admin.html">Добавление принтеров и групп</A></P>
 	  <P><A HREF="help/policies.html">Управление доступом</A></P>
 	  <P><A HREF="help/network.html">Использование сетевых принтеров</A></P>
+	  <p><a href="help/firewalls.html">Firewalls</a></p>
 	  <p><a href="help/man-cupsd.conf.html">Справочник по cupsd.conf</a></p>
 	</div>
 	<div class="thirds">
 
 	  <H2>CUPS для разработчиков</H2>
-	  <P><A HREF="help/api-overview.html">Введение в разработку CUPS</A></P>
-	  <P><A HREF="help/api-cups.html">CUPS API</A></P>
+	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <P><A HREF="help/api-filter.html">Разработка фильтров и модулей</A></P>
-	  <P><A HREF="help/api-httpipp.html">API доступа по HTTP и IPP</A></P>
 	  <P><A HREF="http://www.cups.org/lists.php?LIST=cups-devel">Форум разработчиков</A></P>
 </div>
       </div>

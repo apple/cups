@@ -35,17 +35,16 @@
 	</div>
 	<div class="thirds">
 	  <h2>CUPS für Administratoren</h2>
-	  <p><a href="admin">Drucker und Klassen hinzufügen</a></p>
+	  <p><a href="help/admin.html">Drucker und Klassen hinzufügen</a></p>
 	  <p><a href="help/policies.html">Betriebs-Richtlinie festlegen</a></p>
 	  <p><a href="help/network.html">Benutzung von Netzwerk-Druckern</a></p>
+	  <p><a href="help/firewalls.html">Firewalls</a></p>
 	  <p><a href="help/man-cupsd.conf.html">cupsd.conf Referenz</a></p>
 	</div>
 	<div class="thirds">
 	  <h2>CUPS für Entwickler</h2>
-	  <p><a href="help/api-overview.html">Einführung in die CUPS Programmierung</a></p>
-	  <p><a href="help/api-cups.html">CUPS API</a></p>
+	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <p><a href="help/api-filter.html">Filter und Backend Programmierung</a></p>
-	  <p><a href="help/api-httpipp.html">HTTP und IPP APIs</a></p>
 	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">Entwicklerforum</a></p>
 	</div>
       </div>
