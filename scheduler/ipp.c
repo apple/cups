@@ -1625,7 +1625,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     /* Don't use invalid attribute */
     ippDeleteAttribute(con->request, attr);
 
-    attr = ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "reqeusting-user-name", NULL, "anonymous");
+    attr = ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name", NULL, "anonymous");
   }
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
