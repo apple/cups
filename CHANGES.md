@@ -7,6 +7,8 @@ Changes in CUPS v2.3b1
 
 - CUPS is now provided under the Apache License, Version 2.0.
 - Documentation updates (Issue #4580, Issue #5177, Issue #5192)
+- The `cupsCopyDestConflicts` function now handles collection attribute
+  ("media-col", "finishings-col", etc.) constraints (Issue #4096)
 - The `lpoptions` command incorrectly saved default options (Issue #4717)
 - The `lpstat` command now reports when new jobs are being held (Issue #4761)
 - The `ippfind` command now supports finding printers whose name starts with an

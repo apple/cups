@@ -668,7 +668,6 @@ cupsEncodeOptions2(
 {
   int			i;		/* Looping var */
   char			*val;		/* Pointer to option value */
-  ipp_tag_t		value_tag;	/* IPP value tag */
   cups_option_t		*option;	/* Current option */
   ipp_op_t		op;		/* Operation for this request */
   const ipp_op_t	*ops;		/* List of allowed operations */
@@ -727,8 +726,6 @@ cupsEncodeOptions2(
       if (match->group_tag != group_tag && match->alt_group_tag != group_tag)
         continue;
 
-      value_tag = match->value_tag;
-
       if (match->operations)
         ops = match->operations;
       else if (group_tag == IPP_TAG_JOB)
@@ -771,11 +768,6 @@ cupsEncodeOptions2(
         ops = ipp_doc_creation;
       else
         ops = ipp_set_printer;
-
-      if (!_cups_strcasecmp(option->value, "true") || !_cups_strcasecmp(option->value, "false"))
-	value_tag = IPP_TAG_BOOLEAN;
-      else
-	value_tag = IPP_TAG_NAME;
     }
 
    /*
