@@ -1354,8 +1354,9 @@ static int				/* O - 1 on a match, 0 on a non-match */
 cups_collection_contains(ipp_t *test,	/* I - Collection to test */
                          ipp_t *match)	/* I - Matching values */
 {
-  int			i,		/* Looping var */
-			count;		/* Number of test values */
+  int			i, j,		/* Looping vars */
+			mcount,		/* Number of match values */
+			tcount;		/* Number of test values */
   ipp_attribute_t	*tattr,		/* Testing attribute */
 			*mattr;		/* Matching attribute */
   const char		*tval;		/* Testing string value */
@@ -1366,7 +1367,7 @@ cups_collection_contains(ipp_t *test,	/* I - Collection to test */
     if ((tattr = ippFindAttribute(test, ippGetName(mattr), IPP_TAG_ZERO)) == NULL)
       return (0);
 
-    count = ippGetCount(tattr);
+    tcount = ippGetCount(tattr);
 
     switch (ippGetValueTag(mattr))
     {
@@ -1375,7 +1376,7 @@ cups_collection_contains(ipp_t *test,	/* I - Collection to test */
           if (ippGetValueTag(tattr) != ippGetValueTag(mattr))
             return (0);
 
-          for (i = 0; i < count; i ++)
+          for (i = 0; i < tcount; i ++)
           {
             if (!ippContainsInteger(mattr, ippGetInteger(tattr, i)))
               return (0);
@@ -1386,7 +1387,7 @@ cups_collection_contains(ipp_t *test,	/* I - Collection to test */
           if (ippGetValueTag(tattr) != IPP_TAG_INTEGER)
             return (0);
 
-          for (i = 0; i < count; i ++)
+          for (i = 0; i < tcount; i ++)
           {
             if (!ippContainsInteger(mattr, ippGetInteger(tattr, i)))
               return (0);
@@ -1408,10 +1409,22 @@ cups_collection_contains(ipp_t *test,	/* I - Collection to test */
       case IPP_TAG_CHARSET :
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
-          for (i = 0; i < count; i ++)
+          for (i = 0; i < tcount; i ++)
           {
             if ((tval = ippGetString(tattr, i, NULL)) == NULL || !ippContainsString(mattr, tval))
               return (0);
+          }
+          break;
+
+      case IPP_TAG_BEGIN_COLLECTION :
+          for (i = 0; i < tcount; i ++)
+          {
+            ipp_t *tcol = ippGetCollection(tattr, i);
+					/* Testing collection */
+
+            for (j = 0, mcount = ippGetCount(mattr); j < mcount; j ++)
+              if (!cups_collection_contains(tcol, ippGetCollection(mattr, j)))
+                return (0);
           }
           break;
 
