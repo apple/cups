@@ -48,6 +48,7 @@ HELPFILES	=	\
 			help/cgi.html \
 			help/cupspm.html \
 			help/encryption.html \
+			help/firewalls.html \
 			help/glossary.html \
 			help/kerberos.html \
 			help/license.html \

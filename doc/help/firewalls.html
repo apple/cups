@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<!-- SECTION: Getting Started -->
+  <head>
+    <title>Firewalls</title>
+    <link rel="stylesheet" type="text/css" href="../cups-printable.css">
+  </head>
+  <body>
+    <h1 class="title">Firewalls</h1>
+
+    <p>This help document describes the ports that CUPS uses so that firewall administrators can allow traffic used for printing.</p>
+
+    <h2 class="title">Ports Used for Printer Sharing</h2>
+
+    <p>The following ports are used for printer sharing:</p>
+
+    <div class="table"><table summary="Ports Used for Printer Sharing">
+      <thead>
+        <tr><th>Port</th><th>TCP/UDP</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>53&nbsp;(DNS)</td><td>TCP/UDP</td><td>Domain Name System lookups and service registrations.</td></tr>
+        <tr><td>137&nbsp;(WINS)</td><td>UDP</td><td>Windows Internet Naming Service (name lookup for SMB printing).</td></tr>
+        <tr><td>139&nbsp;(SMB)</td><td>TCP</td><td>Windows SMB printing.</td></tr>
+        <tr><td>445&nbsp;(SMBDS)</td><td>TCP</td><td>Windows SMB Domain Server (authenticated SMB printing).</td></tr>
+        <tr><td>631&nbsp;(IPP/IPPS)</td><td>TCP</td><td>Internet Printing Protocol requests and responses (print jobs, status monitoring, etc.)</td></tr>
+        <tr><td>5353&nbsp;(mDNS)</td><td>UDP</td><td>Multicast DNS lookups and service registrations.</td></tr>
+      </tbody>
+    </table></div>
+
+
+    <h2 class="title">Ports Used for Network Printers</h2>
+
+    <p>The following ports are used for network printers:</p>
+
+    <div class="table"><table summary="Ports Used for Network Printers">
+      <thead>
+        <tr><th>Port(s)</th><th>TCP/UDP</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>53&nbsp;(DNS)</td><td>TCP/UDP</td><td>Domain Name System lookups.</td></tr>
+        <tr><td>137&nbsp;(WINS)</td><td>UDP</td><td>Windows Internet Naming Service (name lookup for SMB printing).</td></tr>
+        <tr><td>139&nbsp;(SMB)</td><td>TCP</td><td>Windows SMB printing.</td></tr>
+        <tr><td>161&nbsp;(SNMP)</td><td>UDP</td><td>SNMP browsing (broadcast) and status monitoring (directed to printer IP address).</td></tr>
+        <tr><td>443&nbsp;(IPPS)</td><td>TCP</td><td>Internet Printing Protocol requests and responses (print jobs, status monitoring, etc.)</td></tr>
+        <tr><td>445&nbsp;(SMBDS)</td><td>TCP</td><td>Windows SMB Domain Server (authenticated SMB printing).</td></tr>
+        <tr><td>515&nbsp;(LPD)</td><td>TCP</td><td>Line Printer Daemon (LPD/lpr) print job submission and status monitoring.</td></tr>
+        <tr><td>631&nbsp;(IPP/IPPS)</td><td>TCP</td><td>Internet Printing Protocol requests and responses (print jobs, status monitoring, etc.)</td></tr>
+        <tr><td>5353&nbsp;(mDNS)</td><td>UDP</td><td>Multicast DNS lookups.</td></tr>
+        <tr><td>9100-9102</td><td>TCP</td><td>Raw print data stream (AppSocket/JetDirect).</td></tr>
+      </tbody>
+    </table></div>
+  </body>
+</html>
