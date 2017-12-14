@@ -752,6 +752,7 @@ usage(const char *arg)			/* I - Argument for usage message */
   puts("  ./testdest name [operation ...]");
   puts("  ./testdest ipp://... [operation ...]");
   puts("  ./testdest ipps://... [operation ...]");
+  puts("  ./testdest --get");
   puts("  ./testdest --enum [grayscale] [color] [duplex] [staple] [small]\n"
        "                    [medium] [large]");
   puts("");
