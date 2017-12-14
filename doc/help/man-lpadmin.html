@@ -71,8 +71,7 @@ The following options are recognized when configuring a printer queue:
 <dt><b>-c </b><i>class</i>
 <dd style="margin-left: 5.0em">Adds the named <i>printer</i> to <i>class</i>.
 If <i>class</i> does not exist it is created automatically.
-<dt><b>-i </b><i>ppd-file</i>
-<dd style="margin-left: 5.0em"><dt><b>-P </b><i>ppd-file</i>
+<dt><b>-P </b><i>ppd-file</i>
 <dd style="margin-left: 5.0em">Specifies a PostScript Printer Description (PPD) file to use with the printer.
 <dt><b>-m </b><i>model</i>
 <dd style="margin-left: 5.0em">Sets a standard PPD file for the printer from the <i>model</i> directory or using one of the driver interfaces.
@@ -153,6 +152,13 @@ programs on the destination.
 <dt><b>-L "</b><i>location</i><b>"</b>
 <dd style="margin-left: 5.0em">Provides a textual location of the destination.
 </dl>
+<h2 class="title"><a name="DEPRECATED_OPTIONS">Deprecated Options</a></h2>
+The following <b>lpadmin</b> options are deprecated:
+<dl class="man">
+<dt><b>-i </b><i>filename</i>
+<dd style="margin-left: 5.0em">This option historically has been used to provide either a System V interface script or (as an implementation side-effect) a PPD file.
+Since interface scripts are no longer supported, the <i>-P</i> option is preferred for providing a PPD file for a printer.
+</dl>
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are <i>not</i> case-sensitive.
@@ -160,6 +166,7 @@ Finally, the CUPS version of <b>lpadmin</b> may ask the user for an access passw
 This differs from the System V version which requires the root user to execute this command.
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 The CUPS version of <b>lpadmin</b> does not support all of the System V or Solaris printing system configuration options.
+Interface scripts are not supported for security reasons.
 <h2 class="title"><a name="EXAMPLE">Example</a></h2>
 Create an IPP Everywhere print queue:
 <pre class="man">

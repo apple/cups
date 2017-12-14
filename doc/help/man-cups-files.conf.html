@@ -95,10 +95,6 @@ The <i>kind</i> strings are:
 <dt><b>permissions</b>
 <dd style="margin-left: 5.0em">Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
 </div>
-<dt><a name="FileDevice"></a><b>FileDevice Yes</b>
-<dd style="margin-left: 5.0em"><dt><b>FileDevice No</b>
-<dd style="margin-left: 5.0em">Specifies whether the file pseudo-device can be used for new printer queues.
-The URI "file:///dev/null" is always allowed.
 <dt><a name="Group"></a><b>Group </b><i>group-name-or-number</i>
 <dd style="margin-left: 5.0em">Specifies the group name or ID that will be used when executing external programs.
 The default group is operating system specific but is usually "lp" or "nobody".
@@ -162,6 +158,13 @@ The default is "lp".
 <h3><a name="DEPRECATED_DIRECTIVES">Deprecated Directives</a></h3>
 The following directives are deprecated and will be removed from a future version of CUPS:
 <dl class="man">
+<dt><a name="FileDevice"></a><b>FileDevice Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>FileDevice No</b>
+<dd style="margin-left: 5.0em">Specifies whether the file pseudo-device can be used for new printer queues.
+The URI "file:///dev/null" is always allowed.
+File devices cannot be used with "raw" print queues - a PPD file is required.
+The specified file is overwritten for every print job.
+Writing to directories is not supported.
 <dt><a name="FontPath"></a><b>FontPath </b><i>directory[:...:directoryN]</i>
 <dd style="margin-left: 5.0em">Specifies a colon separated list of directories where fonts can be found.
 On Linux the

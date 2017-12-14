@@ -13,7 +13,8 @@ ipptool \- perform internet printing protocol requests
 [
 .B \-\-help
 ] [
-.BI \-\-ippserver filename
+.B \-\-ippserver
+.I filename
 ] [
 .B \-\-stop\-after\-include\-error
 ] [
@@ -90,7 +91,7 @@ The following options are recognized by
 .B \-\-help
 Shows program help.
 .TP 5
--BI \-\-ippserver filename
+\fB\-\-ippserver \fIfilename\fR
 Specifies that the test results should be written to the named
 .B ippserver
 attributes file.
