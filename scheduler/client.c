@@ -2390,6 +2390,8 @@ cupsdSendHeader(
            name;
 	   name = (char *)cupsArrayNext(con->best->names))
       {
+        cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendHeader: require \"%s\"", name);
+
 #ifdef HAVE_AUTHORIZATION_H
 	if (!_cups_strncasecmp(name, "@AUTHKEY(", 9))
 	{
@@ -2415,7 +2417,7 @@ cupsdSendHeader(
       }
 
       if (need_local)
-	strlcpy(auth_key, ", Local", auth_size);
+	strlcat(auth_key, ", Local", auth_size);
     }
 
     if (auth_str[0])

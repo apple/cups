@@ -597,14 +597,18 @@ cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticat
   size_t	schemelen = strlen(scheme);	/* Length of scheme */
 
 
+  DEBUG_printf(("8cups_auth_find(www_authenticate=\"%s\", scheme=\"%s\"(%d))", www_authenticate, scheme, (int)schemelen));
+
   while (*www_authenticate)
   {
    /*
     * Skip leading whitespace and commas...
     */
 
+    DEBUG_printf(("9cups_auth_find: Before whitespace: \"%s\"", www_authenticate));
     while (isspace(*www_authenticate & 255) || *www_authenticate == ',')
       www_authenticate ++;
+    DEBUG_printf(("9cups_auth_find: After whitespace: \"%s\"", www_authenticate));
 
    /*
     * See if this is "Scheme" followed by whitespace or the end of the string.
@@ -615,6 +619,8 @@ cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticat
      /*
       * Yes, this is the start of the scheme-specific information...
       */
+
+      DEBUG_printf(("9cups_auth_find: Returning \"%s\".", www_authenticate));
 
       return (www_authenticate);
     }
@@ -631,13 +637,20 @@ cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticat
         * Skip quoted value...
         */
 
-        while (www_authenticate[1] && www_authenticate[1] != '\"')
+        www_authenticate ++;
+        while (*www_authenticate && *www_authenticate != '\"')
           www_authenticate ++;
+
+        DEBUG_printf(("9cups_auth_find: After quoted: \"%s\"", www_authenticate));
       }
 
       www_authenticate ++;
     }
+
+    DEBUG_printf(("9cups_auth_find: After skip: \"%s\"", www_authenticate));
   }
+
+  DEBUG_puts("9cups_auth_find: Returning NULL.");
 
   return (NULL);
 }
@@ -659,6 +672,8 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
   size_t	namelen = strlen(name);		/* Name length */
   int		param;				/* Is this a parameter? */
 
+
+  DEBUG_printf(("8cups_auth_param(scheme=\"%s\", name=\"%s\", value=%p, valsize=%d)", scheme, name, (void *)value, (int)valsize));
 
   while (!isspace(*scheme & 255) && *scheme)
     scheme ++;
@@ -700,6 +715,8 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
 
       *valptr = '\0';
 
+      DEBUG_printf(("9cups_auth_param: Returning \"%s\".", value));
+
       return (value);
     }
 
@@ -719,7 +736,8 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
         * Skip quoted value...
         */
 
-        while (scheme[1] && scheme[1] != '\"')
+        scheme ++;
+        while (*scheme && *scheme != '\"')
           scheme ++;
       }
 
@@ -736,6 +754,8 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
   }
 
   *value = '\0';
+
+  DEBUG_puts("9cups_auth_param: Returning NULL.");
 
   return (NULL);
 }
@@ -759,6 +779,8 @@ cups_auth_scheme(const char *www_authenticate,	/* I - Pointer into WWW-Authentic
 		*send = scheme + schemesize - 1;/* End of scheme buffer */
   int		param;				/* Is this a parameter? */
 
+
+  DEBUG_printf(("8cups_auth_scheme(www_authenticate=\"%s\", scheme=%p, schemesize=%d)", www_authenticate, (void *)scheme, (int)schemesize));
 
   while (*www_authenticate)
   {
@@ -785,7 +807,8 @@ cups_auth_scheme(const char *www_authenticate,	/* I - Pointer into WWW-Authentic
         * Skip quoted value...
         */
 
-        while (www_authenticate[1] && www_authenticate[1] != '\"')
+        www_authenticate ++;
+        while (*www_authenticate && *www_authenticate != '\"')
           www_authenticate ++;
       }
     }
@@ -793,11 +816,16 @@ cups_auth_scheme(const char *www_authenticate,	/* I - Pointer into WWW-Authentic
     if (sptr > scheme && !param)
     {
       *sptr = '\0';
+
+      DEBUG_printf(("9cups_auth_scheme: Returning \"%s\".", start));
+
       return (start);
     }
   }
 
   *scheme = '\0';
+
+  DEBUG_puts("9cups_auth_scheme: Returning NULL.");
 
   return (NULL);
 }
@@ -1027,7 +1055,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     http->auth_ref = NULL;
   }
 
-  if (!getenv("GATEWAY_INTERFACE") && (schemedata = cups_auth_find(www_auth, "AuthKey")) != NULL && cups_auth_param(schemedata, "key", auth_key, sizeof(auth_key)))
+  if (!getenv("GATEWAY_INTERFACE") && (schemedata = cups_auth_find(www_auth, "AuthRef")) != NULL && cups_auth_param(schemedata, "key", auth_key, sizeof(auth_key)))
   {
     status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
@@ -1088,7 +1116,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     return (1);
 #  endif /* HAVE_GSSAPI */
 #  ifdef HAVE_AUTHORIZATION_H
-  if (cups_auth_find(www_auth, "AuthKey"))
+  if (cups_auth_find(www_auth, "AuthRef"))
     return (1);
 #  endif /* HAVE_AUTHORIZATION_H */
 
