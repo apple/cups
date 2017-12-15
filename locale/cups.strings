@@ -2439,14 +2439,14 @@
 "media-thickness" = "Media Thickness";
 "media-tooth" = "Media Tooth (Texture)";
 "media-tooth.antique" = "Antique";
-"media-tooth.calendared" = "Calendared";
+"media-tooth.calendared" = "Extra Smooth";
 "media-tooth.coarse" = "Coarse";
 "media-tooth.fine" = "Fine";
 "media-tooth.linen" = "Linen";
 "media-tooth.medium" = "Medium";
 "media-tooth.smooth" = "Smooth";
 "media-tooth.stipple" = "Stipple";
-"media-tooth.uncalendared" = "Uncalendared";
+"media-tooth.uncalendared" = "Rough";
 "media-tooth.vellum" = "Vellum";
 "media-top-margin" = "Media Top Margin";
 "media-type" = "Media Type";
