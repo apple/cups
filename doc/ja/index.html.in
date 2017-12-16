@@ -12,7 +12,7 @@
   <body>
     <div class="header">
       <ul>
-	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
+	<li><a href="https://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a class="active" href="/">ホーム</a></li>
 	<li><a href="/admin">管理</a></li>
 	<li><a href="/classes/">クラス</a></li>
@@ -24,14 +24,14 @@
     <div class="body">
       <div class="row">
 	<h1>CUPS @CUPS_VERSION@</h1>
-	<p>CUPS は、macOS<sup>&reg;</sup> およびその他の UNIX <SUP>&reg;</sup> 系 OS のために、<a href="http://www.apple.com/">Apple Inc.</a> によって開発された標準ベースのオープンソース印刷システムです。</p>
+	<p>CUPS は、macOS<sup>&reg;</sup> およびその他の UNIX <SUP>&reg;</sup> 系 OS のために、<a href="https://www.apple.com/">Apple Inc.</a> によって開発された標準ベースのオープンソース印刷システムです。</p>
       </div>
       <div class="row">
 	<div class="thirds">
 	  <h2>CUPS ユーザー向け</h2>
 	  <p><a href="help/overview.html">CUPS の概要</a></p>
 	  <p><a href="help/options.html">コマンドラインからの印刷とオプション</a></p>
-	  <p><a href="http://www.cups.org/lists.php?LIST=cups">ユーザーフォーラム</a></p>
+	  <p><a href="https://www.cups.org/lists.php?LIST=cups">ユーザーフォーラム</a></p>
 	</div>
 	<div class="thirds">
 	  <h2>CUPS 管理者向け</h2>
@@ -45,10 +45,10 @@
 	  <h2>CUPS 開発者向け</h2>
 	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <p><a href="help/api-filter.html">フィルタとバックエンドのプログラミング</a></p>
-	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">開発者フォーラム</a></p>
+	  <p><a href="https://www.cups.org/lists.php?LIST=cups-devel">開発者フォーラム</a></p>
 	</div>
       </div>
     </div>
-    <div class="footer">CUPS and the CUPS logo are trademarks of <a href="http://www.apple.com">Apple Inc.</a> Copyright &copy; 2007-2017 Apple Inc. All rights reserved.</div>
+    <div class="footer">CUPS and the CUPS logo are trademarks of <a href="https://www.apple.com">Apple Inc.</a> Copyright &copy; 2007-2017 Apple Inc. All rights reserved.</div>
   </body>
 </html>
