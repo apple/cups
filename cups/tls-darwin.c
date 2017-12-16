@@ -1222,8 +1222,8 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
       kTLSProtocol1,
       kTLSProtocol11,
       kTLSProtocol12,
-      kTLSProtocol13,
-      kTLSProtocolMaxSupported
+      kTLSProtocol12, /* TODO: update to 1.3 when 1.3 is supported */
+      kTLSProtocol12  /* TODO: update to 1.3 when 1.3 is supported */
     };
 
     error = SSLSetProtocolVersionMin(http->tls, protocols[tls_min_version]);
