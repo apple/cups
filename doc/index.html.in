@@ -12,7 +12,7 @@
   <body>
     <div class="header">
       <ul>
-	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
+	<li><a href="httpS://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a class="active" href="/">Home</a></li>
 	<li><a href="/admin">Administration</a></li>
 	<li><a href="/classes/">Classes</a></li>
@@ -24,14 +24,14 @@
     <div class="body">
       <div class="row">
 	<h1>CUPS @CUPS_VERSION@</h1>
-	<p>CUPS is the standards-based, open source printing system developed by <a href="http://www.apple.com/">Apple Inc.</a> for macOS<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems.</p>
+	<p>CUPS is the standards-based, open source printing system developed by <a href="httpS://www.apple.com/">Apple Inc.</a> for macOS<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems.</p>
       </div>
       <div class="row">
 	<div class="thirds">
 	  <h2>CUPS for Users</h2>
 	  <p><a href="help/overview.html">Overview of CUPS</a></p>
 	  <p><a href="help/options.html">Command-Line Printing and Options</a></p>
-	  <p><a href="http://www.cups.org/lists.php?LIST=cups">User Forum</a></p>
+	  <p><a href="httpS://www.cups.org/lists.php?LIST=cups">User Forum</a></p>
 	</div>
 	<div class="thirds">
 	  <h2>CUPS for Administrators</h2>
@@ -45,7 +45,7 @@
 	  <h2>CUPS for Developers</h2>
 	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <p><a href="help/api-filter.html">Filter and Backend Programming</a></p>
-	  <p><a href="http://www.cups.org/lists.php?LIST=cups-devel">Developer Forum</a></p>
+	  <p><a href="httpS://www.cups.org/lists.php?LIST=cups-devel">Developer Forum</a></p>
 	</div>
       </div>
     </div>
