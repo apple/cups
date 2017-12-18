@@ -1,4 +1,4 @@
-CHANGES - 2.3b1 - 2017-12-14
+CHANGES - 2.3b1 - 2017-12-18
 ============================
 
 
@@ -55,3 +55,4 @@ Changes in CUPS v2.3b1
   (Issue #5185)
 - The scheduler now substitutes default values for invalid job attributes when
   running in "relaxed conformance" mode (Issue #5186)
+- The scheduler did not work with older versions of uClibc (Issue #5188)
