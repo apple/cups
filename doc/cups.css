@@ -46,6 +46,9 @@
 .body {
   padding: 40px 20px;
 }
+.row .body {
+  padding: 0px;
+}
 
 .footer {
   background: rgba(46,46,46,.9);
@@ -357,7 +360,7 @@ H1.title {
   display: none;
 }
 
-H2.title, H3.title {
+H2.title, H3.title, .row .body H2, .row .body H3 {
   border-bottom: solid 1pt #999999;
 }
 
@@ -519,26 +522,98 @@ DIV.tab {
 
 /* API documentation styles... */
 div.body h1 {
-  margin: 0;
 }
 div.body h2 {
-  margin-top: 1.5em;
 }
-div.body h3, div.body h4, div.body h5 {
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
+div.body h3 {
 }
-.class, .enumeration, .function, .struct, .typedef, .union {
-  border-bottom: solid thin #999999;
-  margin-bottom: 0;
-  margin-top: 2em;
+div.body h4 {
+}
+div.body h5 {
+}
+div.contents {
+}
+div.contents h1 {
+}
+div.contents h2 {
+}
+div.contents ul.contents {
+}
+div.contents ul.contents li ul {
+  display: none;
+}
+
+.class {
+  border-bottom: solid 2px gray;
+}
+.constants {
 }
 .description {
   margin-top: 0.5em;
 }
-code, p.code, pre, ul.code li {
-  font-family: monaco, courier, monospace;
+.discussion {
+}
+.enumeration {
+  border-bottom: solid 2px gray;
+}
+.function {
+  border-bottom: solid 2px gray;
+  margin-bottom: 0;
+}
+.members {
+}
+.method {
+}
+.parameters {
+}
+.returnvalue {
+}
+.struct {
+  border-bottom: solid 2px gray;
+}
+.typedef {
+  border-bottom: solid 2px gray;
+}
+.union {
+  border-bottom: solid 2px gray;
+}
+.variable {
+}
+h1, h2, h3, h4, h5, h6 {
+  page-break-inside: avoid;
+}
+blockquote {
+  page-break-inside: avoid;
+}
+p code, li code, p.code, pre, ul.code li {
+  background: rgba(127,127,127,0.1);
+  border: thin dotted gray;
+  font-family: monospace;
   font-size: 90%;
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  page-break-inside: avoid;
+}
+p.code, pre, ul.code li {
+  padding: 10px;
+}
+p code, li code {
+  padding: 2px 5px;
+}
+span.info {
+  background: black;
+  border: solid thin black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+h3 span.info, h4 span.info {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  float: right;
+  padding: 3px 6px;
 }
 ul.code, ul.contents, ul.subcontents {
   list-style-type: none;
@@ -554,18 +629,33 @@ ul.contents > li {
 ul.contents li ul.code, ul.contents li ul.subcontents {
   padding-left: 2em;
 }
-div.body dl {
-  margin-left: 0;
-  margin-top: 0;
+table.list {
+  border-collapse: collapse;
+  width: 100%;
 }
-div.body dt {
-  font-style: italic;
-  margin-left: 0;
-  margin-top: 0;
+table.list tr:nth-child(even) {
+  background: rgba(127,127,127,0.1);]n}
+table.list th {
+  border-right: 2px solid gray;
+  font-family: monospace;
+  padding: 5px 10px 5px 2px;
+  text-align: right;
+  vertical-align: top;
 }
-div.body dd {
-  margin-bottom: 0.5em;
+table.list td {
+  padding: 5px 2px 5px 10px;
+  text-align: left;
+  vertical-align: top;
 }
+h1.title {
+}
+h2.title {
+  border-bottom: solid 2px black;
+}
+h3.title {
+  border-bottom: solid 2px black;
+}
+
 /* iPhone/iPod touch overrides */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px),
        only screen and (min-device-width: 320px) and (max-device-width: 568px) {
