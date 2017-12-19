@@ -274,8 +274,10 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/*.*
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/accounting.html
+/usr/share/doc/cups/help/admin.html
 /usr/share/doc/cups/help/cgi.html
 /usr/share/doc/cups/help/encryption.html
+/usr/share/doc/cups/help/firewalls.html
 /usr/share/doc/cups/help/glossary.html
 /usr/share/doc/cups/help/kerberos.html
 /usr/share/doc/cups/help/license.html

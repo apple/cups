@@ -25,8 +25,8 @@ fi
 if test $# = 0; then
 	# Compute version for snapshot
 	rev=`git show --oneline | head -1 | awk '{print $1}'`
-	version="2.2git"
-	fileversion="2.2git-$rev"
+	version="2.3git"
+	fileversion="2.3git-$rev"
 	fileurl="file://$TMPDIR/cups-${fileversion}-source.tar.gz"
 	SIGNFILES=no
 else
@@ -39,7 +39,7 @@ else
 
 	echo Validating sources...
 	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
-	cupsversion=`printf "2.02%02d" $cupsversionpatch`
+	cupsversion=`printf "2.03%02d" $cupsversionpatch`
 
         temp=`grep AC_INIT configure.ac | awk '{print $2}' | sed -e '1,$s/^\[//' -e '1,$s/\],$//'`
         if test "$temp" != $version; then
