@@ -329,20 +329,22 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
       int	inbody;			/* Are we inside the body? */
-
+      char	*lineptr;		/* Pointer into line */
 
       inbody = 0;
 
       while (cupsFileGets(fp, line, sizeof(line)))
       {
+        for (lineptr = line; *lineptr && isspace(*lineptr & 255); lineptr ++);
+
         if (inbody)
 	{
-	  if (!_cups_strncasecmp(line, "</BODY>", 7))
+	  if (!_cups_strncasecmp(lineptr, "</BODY>", 7))
 	    break;
 
 	  printf("%s\n", line);
         }
-	else if (!_cups_strncasecmp(line, "<BODY", 5))
+	else if (!_cups_strncasecmp(lineptr, "<BODY", 5))
 	  inbody = 1;
       }
 
