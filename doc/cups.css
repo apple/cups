@@ -122,7 +122,12 @@ PRE {
 
 BLOCKQUOTE {
   border-left: solid 2px #777;
+  margin: 1em 0;
   padding: 10px;
+}
+
+BLOCKQUOTE OL LI {
+  margin-left: -1em;
 }
 
 PRE.command, PRE.example {

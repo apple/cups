@@ -12,30 +12,50 @@
 
     <h2 class="title">Ports Used for Printer Sharing</h2>
 
-    <p>The following ports are used for printer sharing:</p>
+    <p>Table 1 lists the ports that are used for IPP printer sharing via CUPS.</p>
 
-    <div class="table"><table summary="Ports Used for Printer Sharing">
+    <div class="table"><table summary="Ports Used for IPP Printer Sharing">
+      <caption>Table 1: Ports Used for IPP Printer Sharing</caption>
       <thead>
-        <tr><th>Port</th><th>TCP/UDP</th><th>Description</th></tr>
+        <tr><th>(Destination) Port</th><th>TCP/UDP</th><th>Direction</th><th>Description</th></tr>
       </thead>
       <tbody>
-        <tr><td>53&nbsp;(DNS)</td><td>TCP/UDP</td><td>Domain Name System lookups and service registrations.</td></tr>
-        <tr><td>137&nbsp;(WINS)</td><td>UDP</td><td>Windows Internet Naming Service (name lookup for SMB printing).</td></tr>
-        <tr><td>139&nbsp;(SMB)</td><td>TCP</td><td>Windows SMB printing.</td></tr>
-        <tr><td>445&nbsp;(SMBDS)</td><td>TCP</td><td>Windows SMB Domain Server (authenticated SMB printing).</td></tr>
-        <tr><td>631&nbsp;(IPP/IPPS)</td><td>TCP</td><td>Internet Printing Protocol requests and responses (print jobs, status monitoring, etc.)</td></tr>
-        <tr><td>5353&nbsp;(mDNS)</td><td>UDP</td><td>Multicast DNS lookups and service registrations.</td></tr>
+        <tr><td>53&nbsp;(DNS)</td><td>TCP/UDP</td><td>OUT</td><td>Domain Name System lookups and service registrations.</td></tr>
+        <tr><td>631&nbsp;(IPP/IPPS)</td><td>TCP</td><td>IN</td><td>Internet Printing Protocol requests and responses (print jobs, status monitoring, etc.)</td></tr>
+        <tr><td>5353&nbsp;(mDNS)</td><td>UDP</td><td>IN+OUT</td><td>Multicast DNS lookups and service registrations.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p>Table 2 lists the ports that are used for SMB (Windows) printer sharing, typically via the Samba software.</p>
+
+    <div class="table"><table summary="Ports Used for SMB Printer Sharing">
+      <caption>Table 2: Ports Used for SMB Printer Sharing</caption>
+      <thead>
+        <tr><th>(Destination) Port(s)</th><th>TCP/UDP</th><th>Direction</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>137&nbsp;(WINS)</td><td>UDP</td><td>IN+OUT</td><td>Windows Internet Naming Service (name lookup for SMB printing).</td></tr>
+        <tr><td>139&nbsp;(SMB)</td><td>TCP</td><td>IN</td><td>Windows SMB printing.</td></tr>
+        <tr><td>445&nbsp;(SMBDS)</td><td>TCP</td><td>IN+OUT</td><td>Windows SMB Domain Server (authenticated SMB printing).</td></tr>
       </tbody>
     </table></div>
 
 
     <h2 class="title">Ports Used for Network Printers</h2>
 
-    <p>The following ports are used for network printers:</p>
+    <p>Table 3 lists the outgoing ports that are used for network printers.</p>
 
-    <div class="table"><table summary="Ports Used for Network Printers">
+    <blockquote><b>Notes:</b>
+      <ol>
+        <li>DNS and mDNS are used for all printing protocols except SMB.</li>
+        <li>SNMP is used to provide status and supply level information for AppSocket and LPD printers.</li>
+      </ol>
+    </blockquote>
+
+    <div class="table"><table summary="Outgoing Ports Used for Network Printers">
+      <caption>Table 3: Outgoing Ports Used for Network Printers</caption>
       <thead>
-        <tr><th>Port(s)</th><th>TCP/UDP</th><th>Description</th></tr>
+        <tr><th>(Destination) Port(s)</th><th>TCP/UDP</th><th>Description</th></tr>
       </thead>
       <tbody>
         <tr><td>53&nbsp;(DNS)</td><td>TCP/UDP</td><td>Domain Name System lookups.</td></tr>
