@@ -15,7 +15,7 @@
     <p>CUPS supports self-signed, CA-signed, and enterprise certificates, with configurable certificate validation, cipher suite, and SSL/TLS version policies.</p>
     <p>Out of the box, CUPS uses a Trust On First Use ("TOFU") certificate validation policy like the popular Secure Shell (ssh) software, requires TLS/1.0 or higher, only allows secure cipher suites, and automatically creates a "self-signed" certificate and private key for the scheduler so that remote administration operations and printer sharing are encrypted by default.</p>
 
-    <h2>Configuring Client TLS Policies</h2>
+    <h2 class="title" id="CLIENT">Configuring Client TLS Policies</h2>
     <p>The <a href="man-client.conf.html"><var>client.conf</var></a> file controls the client TLS policies. The default policy is:</p>
     <pre class="command">
 AllowAnyRoot Yes
@@ -39,11 +39,11 @@ ValidateCerts Yes
 SSLOptions AllowRC4 AllowSSL3
 </pre>
 
-    <h2>Configuring Server TLS Policies</h2>
+    <h2 class="title" id="SERVER">Configuring Server TLS Policies</h2>
     <p>Two directives in the <a href="man-cups-files.conf.html"><var>cups-files.conf</var></a> file control the server (scheduler) TLS policies - <a href="man-cups-files.conf.html#CreateSelfSignedCerts"><code>CreateSelfSignedCerts</code></a> and <a href="man-cups-files.conf.html#ServerKeychain"><code>ServerKeychain</code></a>. The default policy creates self-signed certificates as needed.</p>
     <p>The <a href="man-cupsd.conf.html#DefaultEncryption"><code>DefaultEncryption</code></a> and <a href="man-cupsd.conf.html#Encryption"><code>Encryption</code></a> directives in the <a href="man-cupsd.conf.html"><var>cupsd.conf</var></a> file control whether encryption is used. The default configuration requires encryption for remote access whenever authentication is required.</p>
 
-    <h2><a name="PLATFORM">Platform Differences</a></h2>
+    <h2 class="title" id="PLATFORM">Platform Differences</h2>
     <h3>macOS<sup>&reg;</sup></h3>
     <p>On macOS, client configuration settings for ordinary users are stored in the <var>~/Library/Preferences/org.cups.PrintingPrefs.plist</var> file. System-wide and user certificates are stored in the system and login keychains, with private CUPS keychains being used for self-signed and CUPS-managed certificates.</p>
     <h3>Windows<sup>&reg;</sup></h3>

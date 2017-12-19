@@ -1,7 +1,7 @@
 /*
  * Online help index routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -894,13 +894,13 @@ help_load_file(
     * Look for "<TITLE>", "<A NAME", or "<!-- SECTION:" prefix...
     */
 
-    if (!_cups_strncasecmp(line, "<!-- SECTION:", 13))
+    if ((ptr = strstr(line, "<!-- SECTION:")) != NULL)
     {
      /*
       * Got section line, copy it!
       */
 
-      for (ptr = line + 13; isspace(*ptr & 255); ptr ++);
+      for (ptr += 13; isspace(*ptr & 255); ptr ++);
 
       strlcpy(section, ptr, sizeof(section));
       if ((ptr = strstr(section, "-->")) != NULL)
@@ -930,13 +930,22 @@ help_load_file(
 	anchor = NULL;
 	ptr += 6;
       }
-      else if (!_cups_strncasecmp(ptr, "A NAME=", 7))
+      else
       {
+        char *idptr;			/* Pointer to ID */
+
+	if (!_cups_strncasecmp(ptr, "A NAME=", 7))
+	  ptr += 7;
+	else if ((idptr = strstr(ptr, " ID=")) != NULL)
+	  ptr = idptr + 4;
+	else if ((idptr = strstr(ptr, " id=")) != NULL)
+	  ptr = idptr + 4;
+	else
+	  continue;
+
        /*
         * Found an anchor...
 	*/
-
-        ptr += 7;
 
 	if (*ptr == '\"' || *ptr == '\'')
 	{
@@ -961,7 +970,7 @@ help_load_file(
 
 	  for (ptr = anchor; *ptr && *ptr != '>' && !isspace(*ptr & 255); ptr ++);
 
-	  if (*ptr)
+	  if (*ptr != '>')
 	    *ptr++ = '\0';
 	  else
 	    break;
@@ -977,10 +986,8 @@ help_load_file(
         if (*ptr != '>')
 	  break;
 
-        ptr ++;
+        *ptr++ = '\0';
       }
-      else
-        continue;
 
      /*
       * Now collect text for the link...
