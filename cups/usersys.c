@@ -1160,11 +1160,13 @@ cups_init_client_conf(
 
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
-  cc->encryption     = (http_encryption_t)-1;
-  cc->trust_first    = -1;
-  cc->any_root       = -1;
-  cc->expired_certs  = -1;
-  cc->validate_certs = -1;
+  cc->ssl_min_version = _HTTP_TLS_1_0;
+  cc->ssl_max_version = _HTTP_TLS_MAX;
+  cc->encryption      = (http_encryption_t)-1;
+  cc->trust_first     = -1;
+  cc->any_root        = -1;
+  cc->expired_certs   = -1;
+  cc->validate_certs  = -1;
 
  /*
   * Load settings from the org.cups.PrintingPrefs plist (which trump
