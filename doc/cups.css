@@ -361,7 +361,7 @@ H1.title {
 }
 
 H2.title, H3.title, .row .body H2, .row .body H3 {
-  border-bottom: solid 1pt #999999;
+  border-bottom: solid 2pt black;
 }
 
 TABLE.indent {
@@ -646,14 +646,6 @@ table.list td {
   padding: 5px 2px 5px 10px;
   text-align: left;
   vertical-align: top;
-}
-h1.title {
-}
-h2.title {
-  border-bottom: solid 2px black;
-}
-h3.title {
-  border-bottom: solid 2px black;
 }
 
 /* iPhone/iPod touch overrides */
