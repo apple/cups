@@ -142,24 +142,16 @@ The <i>level</i> field contains the type of message:
 <p>The <i>message</i> field contains a free-form textual message.
 Messages from job filters are prefixed with "[Job NNN]" where "NNN" is the job ID.
 <h3><a name="PAGE_LOG_FILE_FORMAT">Page Log File Format</a></h3>
-The <i>page_log</i> file lists each page or group of pages that are sent to a printer.
+The <i>page_log</i> file lists the total number of pages (sheets) that are printed.
 By default, each line contains the following information:
 <pre class="man">
 
-    <i>printer user job-id date-time page-number num-copies job-billing
-      job-originating-host-name job-name media sides</i>
-
-    <i>printer user job-id date-time </i><b>total </b><i>num-impressions job-billing
+    <i>printer user job-id date-time </i><b>total </b><i>num-sheets job-billing
       job-originating-host-name job-name media sides</i>
 
 </pre>
-For example the entries for a two page job called "myjob" might look like:
+For example the entry for a two page job called "myjob" might look like:
 <pre class="man">
-
-    DeskJet root 1 [20/May/1999:19:21:05 +0000] 1 1 acme-123
-      localhost myjob na_letter_8.5x11in one-sided
-    DeskJet root 1 [20/May/1999:19:21:05 +0000] 2 1 acme-123
-      localhost myjob na_letter_8.5x11in one-sided
 
     DeskJet root 1 [20/May/1999:19:21:06 +0000] total 2 acme-123
       localhost myjob na_letter_8.5x11in one-sided
@@ -174,9 +166,7 @@ If you send a job to a printer class, this field will contain the name of the pr
 <p>The <i>job-id</i> field contains the job number of the page being printed.
 <p>The <i>date-time</i> field contains the date and time of when the page started printing.
 The format of this field is identical to the data-time field in the <i>access_log</i> file.
-<p>The <i>page-number</i> and <i>num-copies</i> fields contain the page number and number of copies being printed of that page.
-For printers that cannot produce copies on their own, the num-copies field will always be 1.
-<p>Lines containing the keyword "total" have a <i>num-impressions</i> field instead which provides the total number of impressions (sides) that have been printed on for the job.
+<p>The <i>num-sheets</i> field provides the total number of pages (sheets) that have been printed on for the job.
 <p>The <i>job-billing</i> field contains a copy of the job-billing or job-account-id attributes provided with the IPP Create-Job or Print-Job requests or "-" if neither was provided.
 <p>The <i>job-originating-host-name</i> field contains the hostname or IP address of the client that printed the job.
 <p>The <i>job-name</i> field contains a copy of the job-name attribute provided with the IPP Create-Job or Print-Job requests or "-" if none was provided.

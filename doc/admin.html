@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <!-- SECTION: Getting Started -->
+  <head>
+    <title>Command-Line Printer Administration</title>
+    <link rel="stylesheet" type="text/css" href="../cups-printable.css">
+  </head>
+  <body>
+    <h1 class="title">Command-Line Printer Administration</h1>
+
+    <p>This help document describes how to configure and manage destinations with CUPS.</p>
+
+
+    <h2 class="title" id="INTRO">Introduction</h2>
+
+    <p>Destinations are individual printers and classes (pools) of printers. <a href="#PRINTERS">Printers</a> use a description file with one or more driver ("filter") programs that communicate with the printer through a "backend" program. CUPS currently uses PPD (PostScript Printer Description) files to describe the printer and driver programs needed, some of which come with CUPS while others come with your operating system or Linux distribution. Backends are specified using a URI (Universal Resource Identifier) where the URI scheme is the backend name, e.g., "ipp://11.22.33.44/ipp/print" specifies the "ipp" backend - like PPD files, some backends come with CUPS while others come with your operating system.</p>
+
+    <p><a href="#CLASSES">Classes</a> are associated with one or more printers and are typically used to distribute print jobs amongst a group of printers or provide redundancy or high availability when printing. Print jobs sent to a class are forwarded to the next available printer in the class.</p>
+
+    <p>The <a href="man-lpadmin.html"><code>lpadmin(8)</code></a> program is used to add, modify, or delete destinations, while the <a href="man-lpinfo.html"><code>lpinfo(8)</code></a> command is used to list the available printer drivers and backends. The <a href="man-cupsctl.html"><code>cupsctl(8)</code></a> program is used to manage the printing system as a whole, including things like <a href="#DEBUG">debug logging</a> and <a href="#SHARING">printer sharing</a>. The CUPS web interface ("http://localhost:631" or "https://servername:631") can also be used, and most operating systems provide their own GUI administration tools.</p>
+
+
+    <h2 class="title" id="PRINTERS">Managing Printers</h2>
+
+    <p>The <code>lpadmin</code> command is used to create, modify, or delete a printer. The <code>-p</code> option specifies a printer to create or modify:</p>
+
+    <pre class="command">lpadmin -p printername ...</pre>
+
+    <p>The <code>lpadmin</code> accepts several additional options after <code>-p printername</code> when adding or modifying a printer:</p>
+
+    <dl>
+      <dt><code>-D "description"</code></dt>
+      <dd>Sets the description of the printer which is often shown instead of the printer name, for example "HP LaserJet".</dd>
+
+      <dt><code>-E</code></dt>
+      <dd>Enables the printer and accepts new print jobs.</dd>
+
+      <dt><code>-L "location"</code></dt>
+      <dd>Sets the location of the printer, for example "Conference Room".</dd>
+
+      <dt><code>-m model</code></dt>
+      <dd>Sets the printer driver using the <a href="#MODELS">model name</a>.</dd>
+
+      <dt><code>-o option=value</code></dt>
+      <dd>Sets the <a href="#OPTIONS">named option</a>.</dd>
+
+      <dt><code>-v device-uri</code></dt>
+      <dd>Sets the <a href="#DEVICES">URI for the printer</a>.</dd>
+
+    </dl>
+
+    <p>The <code>-x</code> option deletes the named printer:</p>
+
+    <pre class="command">lpadmin -x printername</pre>
+
+
+    <h3 id="MODELS">Printer Drivers and PPDs</h3>
+
+    <p>The <code>-m</code> option to <code>lpadmin</code> specifies the driver ("model") to use for the printer. You can run the <code>lpinfo -m</code> command to list all of the available drivers ("models") on your system:</p>
+
+    <pre class="command">lpinfo -m</pre>
+
+    <p>Each line contains the driver name followed by its description, for example:</p>
+
+    <pre class="example">drv:///sample.drv/dymo.ppd Dymo Label Printer
+drv:///sample.drv/epson9.ppd Epson 9-Pin Series
+drv:///sample.drv/epson24.ppd Epson 24-Pin Series
+drv:///sample.drv/generpcl.ppd Generic PCL Laser Printer
+drv:///sample.drv/generic.ppd Generic PostScript Printer
+drv:///sample.drv/deskjet.ppd HP DeskJet Series
+drv:///sample.drv/laserjet.ppd HP LaserJet Series PCL 4/5
+drv:///sample.drv/intelbar.ppd Intellitech IntelliBar Label Printer, 2.1
+drv:///sample.drv/okidata9.ppd Oki 9-Pin Series
+drv:///sample.drv/okidat24.ppd Oki 24-Pin Series
+drv:///sample.drv/zebracpl.ppd Zebra CPCL Label Printer
+drv:///sample.drv/zebraep1.ppd Zebra EPL1 Label Printer
+drv:///sample.drv/zebraep2.ppd Zebra EPL2 Label Printer
+drv:///sample.drv/zebra.ppd Zebra ZPL Label Printer
+everywhere IPP Everywhere</pre>
+
+    <p>The <code>everywhere</code> driver is used for nearly all modern networks printers sold since about 2009. For example, the following command creates a destination for a printer at IP address 11.22.33.44:</p>
+
+    <pre class="command">lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere</pre>
+
+    <p>The CUPS sample drivers (the "drv:///sample.drv/..." lines above) can be used for "legacy" printers. For example, the following command creates a destination for a HP LaserJet printer at IP address 11.22.33.44:</p>
+
+    <pre class="command">lpadmin -p printername -E -v socket://11.22.33.44 -m drv:///sample.drv/laserjet.ppd</pre>
+
+    <blockquote>Note: The CUPS sample drivers are designed to provide basic printing capabilities for the broadest range of printers possible, but generally do not exercise the full potential of the printers or CUPS. Other drivers (including the <code>everywhere</code> driver) provide greater printing capabilities and better print quality.</blockquote>
+
+
+    <h3 id="DEVICES">Device URIs (Backends)</h3>
+
+    <p>CUPS comes with several standard backends that communicate with printers:</p>
+
+    <ol>
+      <li><code>dnssd</code>: The Bonjour (DNS-SD) protocol.</li>
+      <li><code>ipp</code>: The Internet Printing Protocol (IPP) with optional encryption.</li>
+      <li><code>ipps</code>: The Internet Printing Protocol with mandatory encryption.</li>
+      <li><code>lpd</code>: The Line Printer Daemon protocol.</li>
+      <li><code>socket</code>: The AppSocket (JetDirect) protocol.</li>
+      <li><code>usb</code>: The Universal Serial Bus (USB) printer class.</li>
+    </ol>
+
+    <p>Run the <code>lpinfo -v</code> command to list the available backends and printers:</p>
+
+    <pre class="command">lpinfo -v</pre>
+
+    <p>Each line contains the backend "class" followed by the backend name or a full printer device URI, for example:</p>
+
+    <pre class="example">network lpd
+network ipps
+network ipp
+network socket
+network dnssd://Acme%20Laser%20Pro._ipp._tcp.local./?uuid=545253fb-1cb7-4d8d-98ed-ab6cd607cea7
+network dnssd://Bar99._printer.tcp.local./?uuid=f9efff58-9086-4c95-accb-81dee876a475
+network dnssd://Example%20EX-42._ipps._tcp.local./?uuid=4a0c67ad-2824-4ddf-9115-7d4226c5fe65
+network dnssd://Foo%20Fighter-1969._pdl-datastream._tcp.local./?uuid=4e216bea-c3de-4f65-a710-c99e11c80d2b
+direct usb://ZP/LazerJet%20MFP?serial=42</pre>
+
+    <p>The <code>network</code> class of backends is used for all network protocols. The <a href="network.html">Using Network Printers</a> help document describes how to use the standard CUPS network backends. The <code>direct</code> class of backends is used for directly-connected printers such as USB and Bluetooth. Because these backends use a system-specific identifier, you should only use the reported device URIs.</p>
+
+    <p>Once you know the correct URI for the printer, set it using the <code>lpadmin</code> command's <code>-v</code> option:</p>
+
+    <pre class="command">lpadmin -p printername -v device-uri</pre>
+
+
+    <h3 id="OPTIONS">Printer Options</h3>
+
+    <p>The <code>lpadmin</code> command allows you to set various options for a printer:</p>
+
+    <dl>
+      <dt><code>-o cupsIPPSupplies=false</code></dt>
+      <dd>Turns off IPP supply level reporting for a printer.</dd>
+
+      <dt><code>-o cupsSNMPSupplies=false</code></dt>
+      <dd>Turns off SNMP supply level reporting for a printer.</dd>
+
+      <dt><code>-o name=value</code></dt>
+      <dd>Sets the default value for the named PPD option. For example, <code>-o PageSize=Legal</code> sets the default page size to US Legal.</dd>
+
+      <dt><code>-o printer-error-policy=name</code></dt>
+      <dd>Sets the error handling policy:<dl>
+        <dt><code>abort-job</code></dt>
+        <dd>Aborts the job on error.</dd>
+        <dt><code>retry-job</code></dt>
+        <dd>Retries the job at a future time.</dd>
+        <dt><code>retry-current-job</code></dt>
+        <dd>Retries the current job immediately.</dd>
+        <dt><code>stop-printer</code></dt>
+        <dd>Stops the printer on error.</dd>
+      </dl></dd>
+
+      <dt><code>-o printer-is-shared=true/false</code></dt>
+      <dd>Enables/disables per-printer sharing. See the section on <a href="#SHARING">Printer Sharing</a> for more information.</dd>
+
+      <dt><code>-o printer-op-policy=name</code></dt>
+      <dd>Sets the operation policy associated with the printer. See the <a href="policies.html">Managing Operation Policies</a> help document for more information.</dd>
+
+      <dt><code>-u allow:{user|@group}{,user|,@group}*</code></dt>
+      <dt><code>-u allow:all</code></dt>
+      <dt><code>-u deny:{user|@group}{,user|,@group}*</code></dt>
+      <dt><code>-u deny:none</code></dt>
+      <dd>Sets user-level access control for the printer. The <code>allow:</code> list defines a whitelist of users and groups while the <code>deny:</code> list defines a blacklist of users and groups.</dd>
+    </dl>
+
+
+    <h2 class="title" id="SHARING">Printer Sharing</h2>
+
+    <p>CUPS supports sharing of printers with other computers and mobile devices. Two <code>cupsctl</code> options control the general printer sharing features:</p>
+
+    <dl>
+      <dt><code>--share-printers</code></dt>
+      <dd>Enables sharing of printers with other computers and mobile devices on your local network.</dd>
+
+      <dt><code>--remote-any</code></dt>
+      <dd>Expands printer sharing to any network that can reach your server.</dd>
+    </dl>
+
+    <p>Once you have enabled printer sharing, you then must select which printers will be shared using the <code>lpadmin</code> command and the <code>-o printer-is-shared=true</code> option.</p>
+
+    <p>For example, to share two printers ("foo" and "bar") on the local network, run the following commands:</p>
+
+    <pre class="command">cupsctl --share-printers
+lpadmin -p foo -o printer-is-shared=true
+lpadmin -p bar -o printer-is-shared=true</pre>
+
+
+    <h2 class="title" id="CLASSES">Managing Classes</h2>
+
+    <p>The <code>lpadmin</code> command is used to create, modify, or delete a class. The <code>-c</code> option specifies a class to create or modify and is combined with the <code>-p</code> option:</p>
+
+    <pre class="command">lpadmin -p printername -c classname</pre>
+
+    <p>The <code>-r</code> option specifies that the named printer is removed from the class:</p>
+
+    <pre class="command">lpadmin -p printername -r classname</pre>
+
+    <p>The <code>-x</code> option deletes the named class:</p>
+
+    <pre class="command">lpadmin -x classname</pre>
+
+
+    <h2 class="title" id="DEBUG">Debug Logging and Troubleshooting</h2>
+
+    <p>The <a href="man-cupsd-logs.html">printing system log files</a> track the activity of the scheduler, printer drivers, and backends. If problems occur and the log files do not provide sufficient details to diagnose the problem, you can enable debug logging using the <code>cupsctl</code> command:</p>
+
+    <pre class="command">cupsctl --debug-logging</pre>
+
+    <p>To disable debug logging, run the same command with the <code>--no-debug-logging</code> option:</p>
+
+    <pre class="command">cupsctl --no-debug-logging</pre>
+  </body>
+</html>

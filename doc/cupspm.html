@@ -198,6 +198,7 @@ h3.title {
         </ul></li>
         <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
           <li><a href="#cupsAddDest">cupsAddDest</a></li>
+          <li><a href="#cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></li>
           <li><a href="#cupsAddIntegerOption">cupsAddIntegerOption</a></li>
           <li><a href="#cupsAddOption">cupsAddOption</a></li>
           <li><a href="#cupsCancelDestJob">cupsCancelDestJob</a></li>
@@ -1171,6 +1172,29 @@ a copy of that destination's options.<br>
 <br>
 Use the <a href="#cupsSaveDests"><code>cupsSaveDests</code></a> function to save the updated list of
 destinations to the user's lpoptions file.</p>
+<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></h3>
+        <p class="description">Add the option corresponding to the specified media size.</p>
+<p class="code">
+int cupsAddDestMediaOptions(<a href="#http_t">http_t</a> *http, <a href="#cups_dest_t">cups_dest_t</a> *dest, <a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo, unsigned flags, <a href="#cups_size_t">cups_size_t</a> *size, int num_options, <a href="#cups_option_t">cups_option_t</a> **options);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>http</th>
+        <td class="description">Connection to destination</td></tr>
+<tr><th>dest</th>
+        <td class="description">Destination</td></tr>
+<tr><th>dinfo</th>
+        <td class="description">Destination information</td></tr>
+<tr><th>flags</th>
+        <td class="description">Media matching flags</td></tr>
+<tr><th>size</th>
+        <td class="description">Media size</td></tr>
+<tr><th>num_options</th>
+        <td class="description">Current number of options</td></tr>
+<tr><th>options</th>
+        <td class="description">Options</td></tr>
+</tbody></table>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">New number of options</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.2.4/macOS 10.13&#160;</span><a id="cupsAddIntegerOption">cupsAddIntegerOption</a></h3>
         <p class="description">Add an integer option to an option array.</p>
 <p class="code">
@@ -6291,15 +6315,21 @@ are server-oriented...</p>
         <p class="description">IPP operations</p>
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
+        <tr><th>IPP_OP_ALLOCATE_PRINTER_RESOURCES </th>        <td class="description">Allocate-Printer-Resources: Use resources for a printer.</td></tr>
         <tr><th>IPP_OP_CANCEL_CURRENT_JOB </th>        <td class="description">Cancel-Current-Job: Cancel the current job</td></tr>
         <tr><th>IPP_OP_CANCEL_JOB </th>        <td class="description">Cancel-Job: Cancel a job</td></tr>
         <tr><th>IPP_OP_CANCEL_JOBS </th>        <td class="description">Cancel-Jobs: Cancel all jobs (administrative)</td></tr>
         <tr><th>IPP_OP_CANCEL_MY_JOBS </th>        <td class="description">Cancel-My-Jobs: Cancel a user's jobs</td></tr>
+        <tr><th>IPP_OP_CANCEL_RESOURCE </th>        <td class="description">Cancel-Resource: Uninstall a resource.</td></tr>
         <tr><th>IPP_OP_CANCEL_SUBSCRIPTION <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Cancel-Subscription: Cancel a subscription </td></tr>
         <tr><th>IPP_OP_CLOSE_JOB </th>        <td class="description">Close-Job: Close a job and start printing</td></tr>
         <tr><th>IPP_OP_CREATE_JOB </th>        <td class="description">Create-Job: Create an empty print job</td></tr>
         <tr><th>IPP_OP_CREATE_JOB_SUBSCRIPTIONS <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Create-Job-Subscriptions: Create one of more job subscriptions </td></tr>
+        <tr><th>IPP_OP_CREATE_PRINTER </th>        <td class="description">Create-Printer: Create a new service.</td></tr>
         <tr><th>IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Create-Printer-Subscriptions: Create one or more printer subscriptions </td></tr>
+        <tr><th>IPP_OP_CREATE_RESOURCE </th>        <td class="description">Create-Resource: Create a new (empty) resource.</td></tr>
+        <tr><th>IPP_OP_CREATE_RESOURCE_SUBSCRIPTIONS </th>        <td class="description">Create-Resource-Subscriptions: Create event subscriptions for a resource.</td></tr>
+        <tr><th>IPP_OP_CREATE_SYSTEM_SUBSCRIPTIONS </th>        <td class="description">Create-System-Subscriptions: Create event subscriptions for a system.</td></tr>
         <tr><th>IPP_OP_CUPS_ADD_MODIFY_CLASS </th>        <td class="description">CUPS-Add-Modify-Class: Add or modify a class</td></tr>
         <tr><th>IPP_OP_CUPS_ADD_MODIFY_PRINTER </th>        <td class="description">CUPS-Add-Modify-Printer: Add or modify a printer</td></tr>
         <tr><th>IPP_OP_CUPS_AUTHENTICATE_JOB <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">CUPS-Authenticate-Job: Authenticate a job </td></tr>
@@ -6315,32 +6345,52 @@ are server-oriented...</p>
         <tr><th>IPP_OP_CUPS_INVALID </th>        <td class="description">Invalid operation name for <a href="#ippOpValue"><code>ippOpValue</code></a></td></tr>
         <tr><th>IPP_OP_CUPS_MOVE_JOB </th>        <td class="description">CUPS-Move-Job: Move a job to a different printer</td></tr>
         <tr><th>IPP_OP_CUPS_SET_DEFAULT </th>        <td class="description">CUPS-Set-Default: Set the default printer</td></tr>
+        <tr><th>IPP_OP_DEALLOCATE_PRINTER_RESOURCES </th>        <td class="description">Deallocate-Printer-Resources: Stop using resources for a printer.</td></tr>
+        <tr><th>IPP_OP_DELETE_PRINTER </th>        <td class="description">Delete-Printer: Delete an existing service.</td></tr>
+        <tr><th>IPP_OP_DISABLE_ALL_PRINTERS </th>        <td class="description">Disable-All-Printers: Stop accepting new jobs on all services.</td></tr>
         <tr><th>IPP_OP_DISABLE_PRINTER </th>        <td class="description">Disable-Printer: Reject new jobs for a printer</td></tr>
+        <tr><th>IPP_OP_ENABLE_ALL_PRINTERS </th>        <td class="description">Enable-All-Printers: Start accepting new jobs on all services.</td></tr>
         <tr><th>IPP_OP_ENABLE_PRINTER </th>        <td class="description">Enable-Printer: Accept new jobs for a printer</td></tr>
         <tr><th>IPP_OP_GET_JOBS </th>        <td class="description">Get-Jobs: Get a list of jobs</td></tr>
         <tr><th>IPP_OP_GET_JOB_ATTRIBUTES </th>        <td class="description">Get-Job-Attribute: Get information about a job</td></tr>
         <tr><th>IPP_OP_GET_NOTIFICATIONS <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Get-Notifications: Get notification events </td></tr>
+        <tr><th>IPP_OP_GET_PRINTERS </th>        <td class="description">Get-Printers: Get a list of services.</td></tr>
         <tr><th>IPP_OP_GET_PRINTER_ATTRIBUTES </th>        <td class="description">Get-Printer-Attributes: Get information about a printer</td></tr>
         <tr><th>IPP_OP_GET_PRINTER_SUPPORTED_VALUES </th>        <td class="description">Get-Printer-Supported-Values: Get supported values</td></tr>
         <tr><th>IPP_OP_GET_SUBSCRIPTIONS <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Get-Subscriptions: Get list of subscriptions </td></tr>
         <tr><th>IPP_OP_GET_SUBSCRIPTION_ATTRIBUTES <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Get-Subscription-Attributes: Get subscription information </td></tr>
+        <tr><th>IPP_OP_GET_SYSTEM_ATTRIBUTES </th>        <td class="description">Get-System-Attributes: Get system object attributes.</td></tr>
+        <tr><th>IPP_OP_GET_SYSTEM_SUPPORTED_VALUES </th>        <td class="description">Get-System-Supported-Values: Get supported values for system object attributes.</td></tr>
         <tr><th>IPP_OP_HOLD_JOB </th>        <td class="description">Hold-Job: Hold a job for printing</td></tr>
         <tr><th>IPP_OP_HOLD_NEW_JOBS </th>        <td class="description">Hold-New-Jobs: Hold new jobs</td></tr>
         <tr><th>IPP_OP_IDENTIFY_PRINTER </th>        <td class="description">Identify-Printer: Make the printer beep, flash, or display a message for identification</td></tr>
+        <tr><th>IPP_OP_INSTALL_RESOURCE </th>        <td class="description">Install-Resource: Install a resource.</td></tr>
+        <tr><th>IPP_OP_PAUSE_ALL_PRINTERS </th>        <td class="description">Pause-All-Printers: Stop all services immediately.</td></tr>
+        <tr><th>IPP_OP_PAUSE_ALL_PRINTERS_AFTER_CURRENT_JOB </th>        <td class="description">Pause-All-Printers-After-Current-Job: Stop all services after processing the current jobs.</td></tr>
         <tr><th>IPP_OP_PAUSE_PRINTER </th>        <td class="description">Pause-Printer: Stop a printer</td></tr>
         <tr><th>IPP_OP_PAUSE_PRINTER_AFTER_CURRENT_JOB </th>        <td class="description">Pause-Printer-After-Current-Job: Stop printer after the current job</td></tr>
         <tr><th>IPP_OP_PRINT_JOB </th>        <td class="description">Print-Job: Print a single file</td></tr>
         <tr><th>IPP_OP_PROMOTE_JOB </th>        <td class="description">Promote-Job: Promote a job to print sooner</td></tr>
+        <tr><th>IPP_OP_REGISTER_OUTPUT_DEVICE </th>        <td class="description">Register-Output-Device: Register a remote service.</td></tr>
         <tr><th>IPP_OP_RELEASE_HELD_NEW_JOBS </th>        <td class="description">Release-Held-New-Jobs: Release new jobs that were previously held</td></tr>
         <tr><th>IPP_OP_RELEASE_JOB </th>        <td class="description">Release-Job: Release a job for printing</td></tr>
         <tr><th>IPP_OP_RENEW_SUBSCRIPTION <span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span></th>        <td class="description">Renew-Subscription: Renew a printer subscription </td></tr>
         <tr><th>IPP_OP_RESTART_JOB <span class="info">&#160;DEPRECATED&#160;</span></th>        <td class="description">Restart-Job: Reprint a job </td></tr>
+        <tr><th>IPP_OP_RESTART_SYSTEM </th>        <td class="description">Restart-System: Restart all services.</td></tr>
+        <tr><th>IPP_OP_RESUME_ALL_PRINTERS </th>        <td class="description">Resume-All-Printers: Start job processing on all services.</td></tr>
         <tr><th>IPP_OP_RESUME_JOB </th>        <td class="description">Resume-Job: Resume the current job</td></tr>
         <tr><th>IPP_OP_RESUME_PRINTER </th>        <td class="description">Resume-Printer: Start a printer</td></tr>
         <tr><th>IPP_OP_SCHEDULE_JOB_AFTER </th>        <td class="description">Schedule-Job-After: Schedule a job to print after another</td></tr>
         <tr><th>IPP_OP_SEND_DOCUMENT </th>        <td class="description">Send-Document: Add a file to a job</td></tr>
+        <tr><th>IPP_OP_SEND_RESOURCE_DATA </th>        <td class="description">Send-Resource-Data: Upload the data for a resource.</td></tr>
         <tr><th>IPP_OP_SET_JOB_ATTRIBUTES </th>        <td class="description">Set-Job-Attributes: Set job values</td></tr>
         <tr><th>IPP_OP_SET_PRINTER_ATTRIBUTES </th>        <td class="description">Set-Printer-Attributes: Set printer values</td></tr>
+        <tr><th>IPP_OP_SET_RESOURCE_ATTRIBUTES </th>        <td class="description">Set-Resource-Attributes: Set resource object  attributes.</td></tr>
+        <tr><th>IPP_OP_SET_SYSTEM_ATTRIBUTES </th>        <td class="description">Set-System-Attributes: Set system object attributes.</td></tr>
+        <tr><th>IPP_OP_SHUTDOWN_ALL_PRINTERS </th>        <td class="description">Shutdown-All-Printers: Shutdown all services.</td></tr>
+        <tr><th>IPP_OP_SHUTDOWN_ONE_PRINTER </th>        <td class="description">Shutdown-One-Printer: Shutdown a service.</td></tr>
+        <tr><th>IPP_OP_STARTUP_ALL_PRINTERS </th>        <td class="description">Startup-All-Printers: Startup all services.</td></tr>
+        <tr><th>IPP_OP_STARTUP_ONE_PRINTER </th>        <td class="description">Startup-One-Printer: Start a service.</td></tr>
         <tr><th>IPP_OP_SUSPEND_CURRENT_JOB </th>        <td class="description">Suspend-Current-Job: Suspend the current job</td></tr>
         <tr><th>IPP_OP_VALIDATE_JOB </th>        <td class="description">Validate-Job: Validate job values prior to submission</td></tr>
 </tbody></table>
@@ -6461,6 +6511,7 @@ are server-oriented...</p>
         <tr><th>IPP_TAG_DATE </th>        <td class="description">Date/time value</td></tr>
         <tr><th>IPP_TAG_DEFAULT </th>        <td class="description">Default value</td></tr>
         <tr><th>IPP_TAG_DELETEATTR </th>        <td class="description">Delete-attribute value</td></tr>
+        <tr><th>IPP_TAG_DOCUMENT </th>        <td class="description">Document group</td></tr>
         <tr><th>IPP_TAG_END </th>        <td class="description">End-of-attributes</td></tr>
         <tr><th>IPP_TAG_ENUM </th>        <td class="description">Enumeration value</td></tr>
         <tr><th>IPP_TAG_EVENT_NOTIFICATION </th>        <td class="description">Event group</td></tr>
@@ -6477,8 +6528,10 @@ are server-oriented...</p>
         <tr><th>IPP_TAG_PRINTER </th>        <td class="description">Printer group</td></tr>
         <tr><th>IPP_TAG_RANGE </th>        <td class="description">Range value</td></tr>
         <tr><th>IPP_TAG_RESOLUTION </th>        <td class="description">Resolution value</td></tr>
+        <tr><th>IPP_TAG_RESOURCE </th>        <td class="description">Resource group</td></tr>
         <tr><th>IPP_TAG_STRING </th>        <td class="description">Octet string value</td></tr>
         <tr><th>IPP_TAG_SUBSCRIPTION </th>        <td class="description">Subscription group</td></tr>
+        <tr><th>IPP_TAG_SYSTEM </th>        <td class="description">System group</td></tr>
         <tr><th>IPP_TAG_TEXT </th>        <td class="description">Text value</td></tr>
         <tr><th>IPP_TAG_TEXTLANG </th>        <td class="description">Text-with-language value</td></tr>
         <tr><th>IPP_TAG_UNKNOWN </th>        <td class="description">Unknown value</td></tr>

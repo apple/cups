@@ -139,9 +139,11 @@ command-line. Support for content length requests is required for conformance wi
 <h3><a name="TEST_DIRECTIVES">Test Directives</a></h3>
 The following directives are understood within a <i>test</i>:
 <dl class="man">
-<dt><b>ATTR </b><i>tag attribute-name value(s)</i>
+<dt><b>ATTR </b><i>out-of-band-tag attribute-name</i>
+<dd style="margin-left: 5.0em"><dt><b>ATTR </b><i>tag attribute-name value(s)</i>
 <dd style="margin-left: 5.0em">Adds an attribute to the test request.
-Values are separated by the comma (",") character - escape commas using the "" character.
+Out-of-band tags (admin-define, delete-attribute, no-value, not-settable, unknown, unsupported) have no value.
+Values for other tags are separated by the comma (",") character - escape commas using the "" character.
 Common attributes and values are listed in the IANA IPP registry - see references below.
 <dt><b>ATTR collection </b><i>attribute-name </i><b>{ MEMBER </b><i>tag member-name value(s) ... </i><b>}</b> [ <i>... </i><b>,{ </b><i>... </i><b>} </b>]
 <dd style="margin-left: 5.0em">Adds a collection attribute to the test request.
@@ -303,7 +305,7 @@ Specifies the maximum number of times to repeat. The default value is 1000.
 <dd style="margin-left: 5.0em">Specifies that the current test should be repeated when the response status-code matches or does not match the value specified by the STATUS directive.
 </dl>
 <h3><a name="OPERATION_CODES">Operation Codes</a></h3>
-Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of names supported by
+Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of names supported by
 <a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8):</a>
 <pre class="man">
 
@@ -376,7 +378,7 @@ Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RF
     Validate-Job
 </pre>
 <h3><a name="STATUS_CODES">Status Codes</a></h3>
-Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2911 and other IPP extension specifications. Here is a complete list of the names supported by
+Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of the names supported by
 <a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8):</a>
 <pre class="man">
 
@@ -439,7 +441,7 @@ Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 2
     successful-ok-too-many-events
 </pre>
 <h3><a name="TAGS">Tags</a></h3>
-Value and group tags correspond to the names from RFC 2911 and other IPP extension specifications. Here are the group tags:
+Value and group tags correspond to the names from RFC 8011 and other IPP extension specifications. Here are the group tags:
 <pre class="man">
 
     document-attributes-tag
