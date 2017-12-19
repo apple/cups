@@ -146,7 +146,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*password;		/* cupsJobPassword value */
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
-  char		*strings_uri;		/* cupsStringsURI value */
+  cups_array_t	*strings;		/* Localization strings */
   cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
 };
 

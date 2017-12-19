@@ -76,6 +76,7 @@ extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename, int flags);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 extern cups_array_t	*_cupsMessageNew(void *context);
+extern int		_cupsMessageSave(const char *filename, int flags, cups_array_t *a);
 extern void		_cupsSetLocale(char *argv[]);
 
 

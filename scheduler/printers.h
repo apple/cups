@@ -65,6 +65,7 @@ struct cupsd_printer_s
 		*info,			/* Description */
 		*organization,		/* Organization name */
 		*organizational_unit,	/* Organizational unit (department, etc.) */
+		*strings,		/* Strings file, if any */
 		*op_policy,		/* Operation policy name */
 		*error_policy;		/* Error policy */
   cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */

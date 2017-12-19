@@ -805,6 +805,7 @@ cupsdDeletePrinter(
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
+  cupsdClearString(&p->strings);
 
   cupsdClearString(&p->alert);
   cupsdClearString(&p->alert_description);
@@ -3824,6 +3825,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ppd_file_t	*ppd;			/* PPD file */
   char		ppd_name[1024];		/* PPD filename */
   struct stat	ppd_info;		/* PPD file info */
+  char		strings_name[1024];	/* Strings filename */
   int		num_media;		/* Number of media options */
   ppd_size_t	*size;			/* Current PPD size */
   ppd_option_t	*duplex,		/* Duplex option */
@@ -3881,6 +3883,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   snprintf(ppd_name, sizeof(ppd_name), "%s/ppd/%s.ppd", ServerRoot, p->name);
   if (stat(ppd_name, &ppd_info))
     ppd_info.st_mtime = 1;
+
+  snprintf(strings_name, sizeof(strings_name), "%s/%s.strings", CacheDir, p->name);
 
   ippDelete(p->ppd_attrs);
   p->ppd_attrs = NULL;
@@ -4053,8 +4057,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
 		 "printer-make-and-model", NULL, p->make_model);
 
-    if (p->pc->strings_uri)
-      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-strings-uri", NULL, p->pc->strings_uri);
+    if (p->pc && p->pc->strings)
+      _cupsMessageSave(strings_name, _CUPS_MESSAGE_STRINGS, p->pc->strings);
+
+    if (!access(strings_name, R_OK))
+      cupsdSetString(&p->strings, strings_name);
+    else
+      cupsdClearString(&p->strings);
 
    /*
     * Add media options from the PPD file...

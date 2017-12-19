@@ -147,6 +147,7 @@ static cups_lang_t	*cups_cache_lookup(const char *name, cups_encoding_t encoding
 static int		cups_message_compare(_cups_message_t *m1, _cups_message_t *m2);
 static void		cups_message_free(_cups_message_t *m);
 static void		cups_message_load(cups_lang_t *lang);
+static void		cups_message_puts(cups_file_t *fp, const char *s);
 static int		cups_read_strings(cups_file_t *fp, int flags, cups_array_t *a);
 static void		cups_unquote(char *d, const char *s);
 
@@ -1225,6 +1226,57 @@ _cupsMessageNew(void *context)		/* I - User data */
 }
 
 
+/*
+ * '_cupsMessageSave()' - Save a message catalog array.
+ */
+
+int					/* O - 0 on success, -1 on failure */
+_cupsMessageSave(const char   *filename,/* I - Output filename */
+                 int          flags,	/* I - Format flags */
+                 cups_array_t *a)	/* I - Message array */
+{
+  cups_file_t		*fp;		/* Output file */
+  _cups_message_t	*m;		/* Current message */
+
+
+ /*
+  * Output message catalog file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+    return (-1);
+
+ /*
+  * Write each message...
+  */
+
+  if (flags & _CUPS_MESSAGE_STRINGS)
+  {
+    for (m = (_cups_message_t *)cupsArrayFirst(a); m; m = (_cups_message_t *)cupsArrayNext(a))
+    {
+      cupsFilePuts(fp, "\"");
+      cups_message_puts(fp, m->msg);
+      cupsFilePuts(fp, "\" = \"");
+      cups_message_puts(fp, m->str);
+      cupsFilePuts(fp, "\";\n");
+    }
+  }
+  else
+  {
+    for (m = (_cups_message_t *)cupsArrayFirst(a); m; m = (_cups_message_t *)cupsArrayNext(a))
+    {
+      cupsFilePuts(fp, "msgid \"");
+      cups_message_puts(fp, m->msg);
+      cupsFilePuts(fp, "\"\nmsgstr \"");
+      cups_message_puts(fp, m->str);
+      cupsFilePuts(fp, "\"\n");
+    }
+  }
+
+  return (cupsFileClose(fp));
+}
+
+
 #ifdef __APPLE__
 /*
  * 'appleLangDefault()' - Get the default locale string.
@@ -1666,6 +1718,44 @@ cups_message_load(cups_lang_t *lang)	/* I - Language */
 
   lang->strings = _cupsMessageLoad(filename, _CUPS_MESSAGE_UNQUOTE);
 #endif /* __APPLE__ && CUPS_BUNDLEDIR */
+}
+
+
+/*
+ * 'cups_message_puts()' - Write a message string with quoting.
+ */
+
+static void
+cups_message_puts(cups_file_t *fp,	/* I - File to write to */
+                  const char  *s)	/* I - String to write */
+{
+  const char	*start,			/* Start of substring */
+		*ptr;			/* Pointer into string */
+
+
+  for (start = s, ptr = s; *ptr; ptr ++)
+  {
+    if (strchr("\\\"\n\t", *ptr))
+    {
+      if (ptr > start)
+      {
+	cupsFileWrite(fp, start, (size_t)(ptr - start));
+	start = ptr + 1;
+      }
+
+      if (*ptr == '\\')
+        cupsFileWrite(fp, "\\\\", 2);
+      else if (*ptr == '\"')
+        cupsFileWrite(fp, "\\\"", 2);
+      else if (*ptr == '\n')
+        cupsFileWrite(fp, "\\n", 2);
+      else /* if (*ptr == '\t') */
+        cupsFileWrite(fp, "\\t", 2);
+    }
+  }
+
+  if (ptr > start)
+    cupsFileWrite(fp, start, (size_t)(ptr - start));
 }
 
 

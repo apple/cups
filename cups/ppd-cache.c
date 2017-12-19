@@ -28,6 +28,7 @@
 
 static int	cups_get_url(http_t **http, const char *url, char *name, size_t namesize);
 static void	pwg_add_finishing(cups_array_t *finishings, ipp_finishings_t template, const char *name, const char *value);
+static void	pwg_add_message(cups_array_t *a, const char *msg, const char *str);
 static int	pwg_compare_finishings(_pwg_finishings_t *a, _pwg_finishings_t *b);
 static int	pwg_compare_sizes(cups_size_t *a, cups_size_t *b);
 static cups_size_t *pwg_copy_size(cups_size_t *size);
@@ -914,8 +915,6 @@ _ppdCacheCreateWithFile(
       else
         pc->mandatory = _cupsArrayNewStrings(value, ' ');
     }
-    else if (!_cups_strcasecmp(line, "StringsURI"))
-      pc->strings_uri = _cupsStrAlloc(value);
     else if (!_cups_strcasecmp(line, "SupportFile"))
     {
       if (!pc->support_files)
@@ -1028,6 +1027,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   pwg_size_t		*new_size;	/* New size to add, if any */
   const char		*filter;	/* Current filter */
   _pwg_finishings_t	*finishings;	/* Current finishings value */
+  char			msg_id[256];	/* Message identifier */
 
 
   DEBUG_printf(("_ppdCacheCreateWithPPD(ppd=%p)", ppd));
@@ -1048,6 +1048,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     DEBUG_puts("_ppdCacheCreateWithPPD: Unable to allocate _ppd_cache_t.");
     goto create_error;
   }
+
+  pc->strings = _cupsMessageNew(NULL);
 
  /*
   * Copy and convert size data...
@@ -1285,6 +1287,13 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
       map->pwg = _cupsStrAlloc(pwg_name);
       map->ppd = _cupsStrAlloc(choice->choice);
+
+     /*
+      * Add localized text for PWG keyword to message catalog...
+      */
+
+      snprintf(msg_id, sizeof(msg_id), "media-source.%s", pwg_name);
+      pwg_add_message(pc->strings, msg_id, choice->text);
     }
   }
 
@@ -1349,6 +1358,13 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
       map->pwg = _cupsStrAlloc(pwg_name);
       map->ppd = _cupsStrAlloc(choice->choice);
+
+     /*
+      * Add localized text for PWG keyword to message catalog...
+      */
+
+      snprintf(msg_id, sizeof(msg_id), "media-type.%s", pwg_name);
+      pwg_add_message(pc->strings, msg_id, choice->text);
     }
   }
 
@@ -1376,6 +1392,13 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
       map->pwg = _cupsStrAlloc(pwg_keyword);
       map->ppd = _cupsStrAlloc(choice->choice);
+
+     /*
+      * Add localized text for PWG keyword to message catalog...
+      */
+
+      snprintf(msg_id, sizeof(msg_id), "output-bin.%s", pwg_name);
+      pwg_add_message(pc->strings, msg_id, choice->text);
     }
   }
 
@@ -1393,6 +1416,17 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
     do
     {
+     /*
+      * Add localized text for PWG keyword to message catalog...
+      */
+
+      snprintf(msg_id, sizeof(msg_id), "preset-name.%s", ppd_attr->spec);
+      pwg_add_message(pc->strings, msg_id, ppd_attr->text);
+
+     /*
+      * Get the options for this preset...
+      */
+
       num_options = _ppdParseOptions(ppd_attr->value, 0, &options,
                                      _PPD_PARSE_ALL);
 
@@ -1836,7 +1870,16 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)_cupsStrAlloc, (cups_afree_func_t)_cupsStrFree);
 
     for (choice = ppd_option->choices, i = ppd_option->num_choices; i > 0; choice ++, i --)
+    {
       cupsArrayAdd(pc->templates, (void *)choice->choice);
+
+     /*
+      * Add localized text for PWG keyword to message catalog...
+      */
+
+      snprintf(msg_id, sizeof(msg_id), "finishing-template.%s", choice->choice);
+      pwg_add_message(pc->strings, msg_id, choice->text);
+    }
   }
 
  /*
@@ -1869,13 +1912,6 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
     pc->mandatory = _cupsArrayNewStrings(ppd_attr->value, ' ');
-
- /*
-  * Strings (remote) file...
-  */
-
-  if ((ppd_attr = ppdFindAttr(ppd, "cupsStringsURI", NULL)) != NULL)
-    pc->strings_uri = _cupsStrAlloc(ppd_attr->value);
 
  /*
   * Support files...
@@ -1999,6 +2035,8 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   cupsArrayDelete(pc->mandatory);
 
   cupsArrayDelete(pc->support_files);
+
+  cupsArrayDelete(pc->strings);
 
   free(pc);
 }
@@ -2946,13 +2984,6 @@ _ppdCacheWriteFile(
        value;
        value = (char *)cupsArrayNext(pc->mandatory))
     cupsFilePutConf(fp, "Mandatory", value);
-
- /*
-  * (Remote) strings file...
-  */
-
-  if (pc->strings_uri)
-    cupsFilePutConf(fp, "StringsURI", pc->strings_uri);
 
  /*
   * Support files...
@@ -4609,6 +4640,27 @@ pwg_add_finishing(
     f->num_options = cupsAddOption(name, value, 0, &f->options);
 
     cupsArrayAdd(finishings, f);
+  }
+}
+
+
+/*
+ * 'pwg_add_message()' - Add a message to the PPD cached strings.
+ */
+
+static void
+pwg_add_message(cups_array_t *a,	/* I - Message catalog */
+                const char   *msg,	/* I - Message identifier */
+                const char   *str)	/* I - Localized string */
+{
+  _cups_message_t	*m;		/* New message */
+
+
+  if ((m = calloc(1, sizeof(_cups_message_t))) != NULL)
+  {
+    m->msg = strdup(msg);
+    m->str = strdup(str);
+    cupsArrayAdd(a, m);
   }
 }
 
