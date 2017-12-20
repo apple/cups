@@ -149,6 +149,7 @@ LEGAL STUFF
 -----------
 
 Copyright © 2007-2017 by Apple Inc.
+Copyright © 1997-2007 by Easy Software Products.
 
 CUPS is provided under the terms of the Apache License, Version 2.0.  A copy of
 this license can be found in the file `LICENSE`.  Additional legal information
