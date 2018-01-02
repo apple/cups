@@ -993,7 +993,7 @@ ppd_test_constraints(
     if (!consts->installable && which == _PPD_INSTALLABLE_CONSTRAINTS)
       continue;				/* Skip non-installable option constraint */
 
-    if (which == _PPD_OPTION_CONSTRAINTS && option)
+    if ((which == _PPD_OPTION_CONSTRAINTS || which == _PPD_INSTALLABLE_CONSTRAINTS) && option)
     {
      /*
       * Skip constraints that do not involve the current option...
