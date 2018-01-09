@@ -1160,8 +1160,10 @@ cups_init_client_conf(
 
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
+#ifdef HAVE_SSL
   cc->ssl_min_version = _HTTP_TLS_1_0;
   cc->ssl_max_version = _HTTP_TLS_MAX;
+#endif /* HAVE_SSL */
   cc->encryption      = (http_encryption_t)-1;
   cc->trust_first     = -1;
   cc->any_root        = -1;
