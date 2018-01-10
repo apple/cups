@@ -1,5 +1,11 @@
-CHANGES - 2.3b1 - 2017-12-19
+CHANGES - 2.3b2 - 2018-01-09
 ============================
+
+
+Changes in CUPS v2.3b2
+----------------------
+
+- The `ppdInstallableConflict` tested too many constraints (Issue #5213)
 
 
 Changes in CUPS v2.3b1

@@ -1,4 +1,4 @@
-README - CUPS v2.3b1 - 2017-12-19
+README - CUPS v2.3b2 - 2018-01-09
 =================================
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
@@ -148,7 +148,7 @@ This will prevent the filters from misinterpreting your print file.
 LEGAL STUFF
 -----------
 
-Copyright © 2007-2017 by Apple Inc.
+Copyright © 2007-2018 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
 CUPS is provided under the terms of the Apache License, Version 2.0.  A copy of
