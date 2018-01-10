@@ -1,7 +1,7 @@
 /*
  * Directory services routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -1463,9 +1463,14 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
 	if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
 			       kCFStringEncodingUTF8))
 	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "Dynamic store host name is \"%s\".", nameBuffer);
-	  cupsdSetString(&DNSSDHostName, nameBuffer);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "Dynamic store host name is \"%s\".", nameBuffer);
+
+	  if (strchr(nameBuffer, '.'))
+	    cupsdSetString(&DNSSDHostName, nameBuffer);
+	  else
+	    cupsdSetStringf(&DNSSDHostName, "%s.local", nameBuffer);
+
+	  cupsdLogMessage(CUPSD_LOG_INFO, "Defaulting to \"DNSSDHostName %s\".", DNSSDHostName);
 	}
 
 	CFRelease(nameRef);
@@ -1478,9 +1483,10 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
       * Use the ServerName instead...
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "Using ServerName \"%s\" as host name.", ServerName);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Using ServerName \"%s\" as host name.", ServerName);
       cupsdSetString(&DNSSDHostName, ServerName);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Defaulting to \"DNSSDHostName %s\".", DNSSDHostName);
     }
 
    /*
@@ -1527,6 +1533,8 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
 	cupsdSetString(&DNSSDHostName, ServerName);
       else
 	cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Defaulting to \"DNSSDHostName %s\".", DNSSDHostName);
     }
   }
   else
@@ -1540,6 +1548,8 @@ dnssdUpdateDNSSDName(int from_callback)	/* I - Called from callback? */
 	cupsdSetString(&DNSSDHostName, ServerName);
       else
 	cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Defaulting to \"DNSSDHostName %s\".", DNSSDHostName);
     }
   }
 
