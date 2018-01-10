@@ -5,6 +5,8 @@ CHANGES - 2.3b2 - 2018-01-09
 Changes in CUPS v2.3b2
 ----------------------
 
+- Localization changes (Issue #5210)
+- Build fixes (Issue #5217)
 - The `ppdInstallableConflict` tested too many constraints (Issue #5213)
 
 
