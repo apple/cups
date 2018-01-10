@@ -1,7 +1,7 @@
 /*
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -73,7 +73,6 @@ typedef enum _cups_dnssd_state_e	/* Enumerated device state */
   _CUPS_DNSSD_QUERY,
   _CUPS_DNSSD_PENDING,
   _CUPS_DNSSD_ACTIVE,
-  _CUPS_DNSSD_LOCAL,
   _CUPS_DNSSD_INCOMPATIBLE,
   _CUPS_DNSSD_ERROR
 } _cups_dnssd_state_t;
@@ -192,14 +191,6 @@ static _cups_dnssd_device_t *
 					      const char *regtype,
 					      const char *replyDomain);
 #  ifdef HAVE_DNSSD
-static void		cups_dnssd_local_cb(DNSServiceRef sdRef,
-					    DNSServiceFlags flags,
-					    uint32_t interfaceIndex,
-					    DNSServiceErrorType errorCode,
-					    const char *serviceName,
-					    const char *regtype,
-					    const char *replyDomain,
-					    void *context);
 static void		cups_dnssd_query_cb(DNSServiceRef sdRef,
 					    DNSServiceFlags flags,
 					    uint32_t interfaceIndex,
@@ -2626,22 +2617,7 @@ cups_dnssd_browse_cb(
 	* This object is new on the network.
 	*/
 
-	if (flags & AVAHI_LOOKUP_RESULT_LOCAL)
-	{
-	 /*
-	  * This comes from the local machine so ignore it.
-	  */
-
-	  DEBUG_printf(("cups_dnssd_browse_cb: Ignoring local service \"%s\".", name));
-	}
-	else
-	{
-	 /*
-	  * Create a device entry for it if it doesn't yet exist.
-	  */
-
-	  cups_dnssd_get_device(data, name, type, domain);
-	}
+	cups_dnssd_get_device(data, name, type, domain);
 	break;
 
     case AVAHI_BROWSER_REMOVE :
@@ -2860,66 +2836,6 @@ cups_dnssd_get_device(
 
   return (device);
 }
-
-
-#  ifdef HAVE_DNSSD
-/*
- * 'cups_dnssd_local_cb()' - Browse for local printers.
- */
-
-static void
-cups_dnssd_local_cb(
-    DNSServiceRef       sdRef,		/* I - Service reference */
-    DNSServiceFlags     flags,		/* I - Option flags */
-    uint32_t            interfaceIndex,	/* I - Interface number */
-    DNSServiceErrorType errorCode,	/* I - Error, if any */
-    const char          *serviceName,	/* I - Name of service/device */
-    const char          *regtype,	/* I - Type of service */
-    const char          *replyDomain,	/* I - Service domain */
-    void                *context)	/* I - Devices array */
-{
-  _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
-					/* Enumeration data */
-  _cups_dnssd_device_t	*device;	/* Device */
-
-
-  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
-
- /*
-  * Only process "add" data...
-  */
-
-  if (errorCode != kDNSServiceErr_NoError || !(flags & kDNSServiceFlagsAdd))
-    return;
-
- /*
-  * Get the device...
-  */
-
-  device = cups_dnssd_get_device(data, serviceName, regtype, replyDomain);
-
- /*
-  * Hide locally-registered devices...
-  */
-
-  DEBUG_printf(("6cups_dnssd_local_cb: Hiding local printer '%s'.",
-                serviceName));
-
-  if (device->ref)
-  {
-    DNSServiceRefDeallocate(device->ref);
-    device->ref = 0;
-  }
-
-  if (device->state == _CUPS_DNSSD_ACTIVE)
-  {
-    DEBUG_printf(("6cups_dnssd_local_cb: Remove callback for \"%s\".", device->dest.name));
-    (*data->cb)(data->user_data, CUPS_DEST_FLAGS_REMOVED, &device->dest);
-  }
-
-  device->state = _CUPS_DNSSD_LOCAL;
-}
-#  endif /* HAVE_DNSSD */
 
 
 #  ifdef HAVE_AVAHI
@@ -3466,11 +3382,9 @@ cups_enum_dests(
 #  ifdef HAVE_DNSSD
   int           nfds,                   /* Number of files responded */
                 main_fd;                /* File descriptor for lookups */
-  DNSServiceRef ipp_ref = NULL,         /* IPP browser */
-                local_ipp_ref = NULL;   /* Local IPP browser */
+  DNSServiceRef ipp_ref = NULL;		/* IPP browser */
 #    ifdef HAVE_SSL
-  DNSServiceRef ipps_ref = NULL,        /* IPPS browser */
-                local_ipps_ref = NULL;  /* Local IPPS browser */
+  DNSServiceRef ipps_ref = NULL;	/* IPPS browser */
 #    endif /* HAVE_SSL */
 #    ifdef HAVE_POLL
   struct pollfd pfd;                    /* Polling data */
@@ -3671,33 +3585,11 @@ cups_enum_dests(
     return (0);
   }
 
-  local_ipp_ref = data.main_ref;
-  if (DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexLocalOnly, "_ipp._tcp", NULL, (DNSServiceBrowseReply)cups_dnssd_local_cb, &data) != kDNSServiceErr_NoError)
-  {
-    DEBUG_puts("1cups_enum_dests: Unable to create local IPP browser, returning 0.");
-    DNSServiceRefDeallocate(data.main_ref);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
-    return (0);
-  }
-
 #    ifdef HAVE_SSL
   ipps_ref = data.main_ref;
   if (DNSServiceBrowse(&ipps_ref, kDNSServiceFlagsShareConnection, 0, "_ipps._tcp", NULL, (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data) != kDNSServiceErr_NoError)
   {
     DEBUG_puts("1cups_enum_dests: Unable to create IPPS browser, returning 0.");
-    DNSServiceRefDeallocate(data.main_ref);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
-    return (0);
-  }
-
-  local_ipps_ref = data.main_ref;
-  if (DNSServiceBrowse(&local_ipps_ref, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexLocalOnly, "_ipps._tcp", NULL, (DNSServiceBrowseReply)cups_dnssd_local_cb, &data) != kDNSServiceErr_NoError)
-  {
-    DEBUG_puts("1cups_enum_dests: Unable to create local IPPS browser, returning 0.");
     DNSServiceRefDeallocate(data.main_ref);
 
     cupsFreeDests(data.num_dests, data.dests);
@@ -3923,14 +3815,10 @@ cups_enum_dests(
 #  ifdef HAVE_DNSSD
   if (ipp_ref)
     DNSServiceRefDeallocate(ipp_ref);
-  if (local_ipp_ref)
-    DNSServiceRefDeallocate(local_ipp_ref);
 
 #    ifdef HAVE_SSL
   if (ipps_ref)
     DNSServiceRefDeallocate(ipps_ref);
-  if (local_ipps_ref)
-    DNSServiceRefDeallocate(local_ipps_ref);
 #    endif /* HAVE_SSL */
 
   if (data.main_ref)

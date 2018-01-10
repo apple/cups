@@ -7,6 +7,8 @@ Changes in CUPS v2.3b2
 
 - Localization changes (Issue #5210)
 - Build fixes (Issue #5217)
+- The `cupsGetDests` and `cupsEnumDests` functions no longer filter out local
+  print services like IPP USB devices (Issue #5206)
 - The `ppdInstallableConflict` tested too many constraints (Issue #5213)
 
 
