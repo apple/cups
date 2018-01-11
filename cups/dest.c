@@ -840,6 +840,8 @@ cupsCopyDest(cups_dest_t *dest,         /* I  - Destination to copy */
 
   if (new_dest)
   {
+    new_dest->is_default = dest->is_default;
+
     if ((new_dest->options = calloc(sizeof(cups_option_t), (size_t)dest->num_options)) == NULL)
       return (cupsRemoveDest(dest->name, dest->instance, num_dests, dests));
 
@@ -2887,9 +2889,9 @@ cups_dnssd_poll_cb(
  * 'cups_dnssd_query_cb()' - Process query data.
  */
 
-#  ifdef HAVE_DNSSD
 static void
 cups_dnssd_query_cb(
+#  ifdef HAVE_DNSSD
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Data flags */
     uint32_t            interfaceIndex,	/* I - Interface */
@@ -2900,11 +2902,7 @@ cups_dnssd_query_cb(
     uint16_t            rdlen,		/* I - Length of record data */
     const void          *rdata,		/* I - Record data */
     uint32_t            ttl,		/* I - Time-to-live */
-    void                *context)	/* I - Enumeration data */
-{
 #  else /* HAVE_AVAHI */
-static void
-cups_dnssd_query_cb(
     AvahiRecordBrowser     *browser,	/* I - Record browser */
     AvahiIfIndex           interfaceIndex,
 					/* I - Interface index (unused) */
@@ -2916,13 +2914,13 @@ cups_dnssd_query_cb(
     const void             *rdata,	/* I - TXT record */
     size_t                 rdlen,	/* I - Length of TXT record */
     AvahiLookupResultFlags flags,	/* I - Flags */
+#  endif /* HAVE_DNSSD */
     void                *context)	/* I - Enumeration data */
 {
-#    ifdef DEBUG
+#  if defined(DEBUG) && defined(HAVE_AVAHI)
   AvahiClient		*client = avahi_record_browser_get_client(browser);
 					/* Client information */
-#    endif /* DEBUG */
-#  endif /* HAVE_DNSSD */
+#  endif /* DEBUG && HAVE_AVAHI */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */
   char			serviceName[256],/* Service name */
@@ -3446,6 +3444,8 @@ cups_enum_dests(
       *data.def_instance++ = '\0';
   }
 
+  DEBUG_printf(("1cups_enum_dests: def_name=\"%s\", def_instance=\"%s\"", data.def_name, data.def_instance));
+
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
   data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
 
@@ -3483,7 +3483,10 @@ cups_enum_dests(
       */
 
       if ((dest = cupsGetDest(data.def_name, data.def_instance, num_dests, dests)) != NULL)
+      {
+	DEBUG_printf(("1cups_enum_dests: Setting is_default on \"%s/%s\".", dest->name, dest->instance));
         dest->is_default = 1;
+      }
     }
 
     for (i = num_dests, dest = dests;
@@ -3773,7 +3776,10 @@ cups_enum_dests(
 	  }
 
           if (!strcasecmp(dest->name, data.def_name) && !data.def_instance)
+	  {
+	    DEBUG_printf(("1cups_enum_dests: Setting is_default on discovered \"%s\".", dest->name));
             dest->is_default = 1;
+	  }
 
           DEBUG_printf(("1cups_enum_dests: Add callback for \"%s\".", device->dest.name));
           if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, dest))
