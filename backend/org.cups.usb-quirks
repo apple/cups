@@ -265,3 +265,6 @@
 
 # HP LaserJet 1160 (Issue #5121)
 0x03f0 0x1e17 delay-close
+
+# Canon, Inc. MP280 series (Issue #5221)
+0x04a9 0x1746 unidir

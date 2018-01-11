@@ -15,6 +15,7 @@ Changes in CUPS v2.3b2
 - The `ppdInstallableConflict` tested too many constraints (Issue #5213)
 - All HTTP field values can now be longer than `HTTP_MAX_VALUE` bytes
   (Issue #5216)
+- Added a USB quirk rule for Canon MP280 series printers (Issue #5221)
 - The scheduler did not add ".local" to the default DNS-SD host name when
   needed.
 
