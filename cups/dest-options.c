@@ -1,7 +1,7 @@
 /*
  * Destination option/media support for CUPS.
  *
- * Copyright 2012-2017 by Apple Inc.
+ * Copyright 2012-2018 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -722,6 +722,8 @@ cupsCopyDestInfo(
     */
 
     request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+
+    ippSetVersion(request, version / 10, version % 10);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
 		 uri);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,

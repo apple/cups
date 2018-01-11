@@ -1,4 +1,4 @@
-CHANGES - 2.3b2 - 2018-01-10
+CHANGES - 2.3b2 - 2018-01-11
 ============================
 
 
@@ -9,6 +9,7 @@ Changes in CUPS v2.3b2
 - Build fixes (Issue #5217)
 - The `cupsGetDests` and `cupsEnumDests` functions no longer filter out local
   print services like IPP USB devices (Issue #5206)
+- Printing to old CUPS servers has been fixed (Issue #5211)
 - The `ppdInstallableConflict` tested too many constraints (Issue #5213)
 - All HTTP field values can now be longer than `HTTP_MAX_VALUE` bytes
   (Issue #5216)
