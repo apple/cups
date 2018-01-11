@@ -10,6 +10,8 @@ Changes in CUPS v2.3b2
 - The `cupsGetDests` and `cupsEnumDests` functions no longer filter out local
   print services like IPP USB devices (Issue #5206)
 - The `ppdInstallableConflict` tested too many constraints (Issue #5213)
+- All HTTP field values can now be longer than `HTTP_MAX_VALUE` bytes
+  (Issue #5216)
 - The scheduler did not add ".local" to the default DNS-SD host name when
   needed.
 

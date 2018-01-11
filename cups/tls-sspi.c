@@ -2,7 +2,7 @@
  * TLS support for CUPS on Windows using the Security Support Provider
  * Interface (SSPI).
  *
- * Copyright 2010-2017 by Apple Inc.
+ * Copyright 2010-2018 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -970,7 +970,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
     * Server: determine hostname to use...
     */
 
-    if (http->fields[HTTP_FIELD_HOST][0])
+    if (http->fields[HTTP_FIELD_HOST])
     {
      /*
       * Use hostname for TLS upgrade...

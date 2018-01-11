@@ -1,13 +1,14 @@
 /*
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -33,6 +34,7 @@
  * Local functions...
  */
 
+static void		http_add_field(http_t *http, http_field_t field, const char *value, int append);
 #ifdef HAVE_LIBZ
 static void		http_content_coding_finish(http_t *http);
 static void		http_content_coding_start(http_t *http,
@@ -281,11 +283,22 @@ httpClearCookie(http_t *http)		/* I - HTTP connection */
 void
 httpClearFields(http_t *http)		/* I - HTTP connection */
 {
+  http_field_t	field;			/* Curent field */
+
+
   DEBUG_printf(("httpClearFields(http=%p)", (void *)http));
 
   if (http)
   {
-    memset(http->fields, 0, sizeof(http->fields));
+    memset(http->_fields, 0, sizeof(http->fields));
+
+    for (field = HTTP_FIELD_ACCEPT_LANGUAGE; field < HTTP_FIELD_MAX; field ++)
+    {
+      if (http->fields[field] && http->fields[field] != http->_fields[field])
+        free(http->fields[field]);
+
+      http->fields[field] = NULL;
+    }
 
     if (http->mode == _HTTP_MODE_CLIENT)
     {
@@ -293,36 +306,6 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
 	httpSetField(http, HTTP_FIELD_HOST, "localhost");
       else
 	httpSetField(http, HTTP_FIELD_HOST, http->hostname);
-    }
-
-    if (http->field_authorization)
-    {
-      free(http->field_authorization);
-      http->field_authorization = NULL;
-    }
-
-    if (http->accept_encoding)
-    {
-      _cupsStrFree(http->accept_encoding);
-      http->accept_encoding = NULL;
-    }
-
-    if (http->allow)
-    {
-      _cupsStrFree(http->allow);
-      http->allow = NULL;
-    }
-
-    if (http->server)
-    {
-      _cupsStrFree(http->server);
-      http->server = NULL;
-    }
-
-    if (http->www_authenticate)
-    {
-      free(http->www_authenticate);
-      http->www_authenticate = NULL;
     }
 
     http->expect = (http_status_t)0;
@@ -815,7 +798,7 @@ const char *				/* O - Content-Coding value or
 httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
 {
 #ifdef HAVE_LIBZ
-  if (http && http->accept_encoding)
+  if (http && http->fields[HTTP_FIELD_ACCEPT_ENCODING])
   {
     int		i;			/* Looping var */
     char	temp[HTTP_MAX_VALUE],	/* Copy of Accepts-Encoding value */
@@ -831,7 +814,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
       "x-gzip"
     };
 
-    strlcpy(temp, http->accept_encoding, sizeof(temp));
+    strlcpy(temp, http->fields[HTTP_FIELD_ACCEPT_ENCODING], sizeof(temp));
 
     for (start = temp; *start; start = end)
     {
@@ -957,47 +940,10 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
-
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        return (http->accept_encoding);
-
-    case HTTP_FIELD_ALLOW :
-        return (http->allow);
-
-    case HTTP_FIELD_SERVER :
-        return (http->server);
-
-    case HTTP_FIELD_AUTHORIZATION :
-        if (http->field_authorization)
-	{
-	 /*
-	  * Special case for Authorization: as its contents can be
-	  * longer than HTTP_MAX_VALUE...
-	  */
-
-	  return (http->field_authorization);
-	}
-	else
-	  return (http->fields[field]);
-
-    case HTTP_FIELD_WWW_AUTHENTICATE :
-        if (http->www_authenticate)
-	{
-	 /*
-	  * Special case for WWW-Authenticate: as its contents can be
-	  * longer than HTTP_MAX_VALUE...
-	  */
-
-	  return (http->www_authenticate);
-	}
-	else
-	  return (http->fields[field]);
-
-    default :
-        return (http->fields[field]);
-  }
+  else if (http->fields[field])
+    return (http->fields[field]);
+  else
+    return ("");
 }
 
 
@@ -1063,7 +1009,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
   if (!http)
     return (-1);
 
-  if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
+  if (http->fields[HTTP_FIELD_TRANSFER_ENCODING] && !_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
     remaining = 0;
@@ -1078,7 +1024,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
     * after the transfer is complete...
     */
 
-    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH] || !http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
     {
      /*
       * Default content length is 0 for errors and certain types of operations,
@@ -2603,36 +2549,13 @@ httpSetDefaultField(http_t       *http,	/* I - HTTP connection */
 {
   DEBUG_printf(("httpSetDefaultField(http=%p, field=%d(%s), value=\"%s\")", (void *)http, field, http_fields[field], value));
 
-  if (!http)
+  if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return;
 
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        if (http->default_accept_encoding)
-          _cupsStrFree(http->default_accept_encoding);
+  if (http->default_fields[field])
+    free(http->default_fields[field]);
 
-        http->default_accept_encoding = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    case HTTP_FIELD_SERVER :
-        if (http->default_server)
-          _cupsStrFree(http->default_server);
-
-        http->default_server = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    case HTTP_FIELD_USER_AGENT :
-        if (http->default_user_agent)
-          _cupsStrFree(http->default_user_agent);
-
-        http->default_user_agent = value ? _cupsStrAlloc(value) : NULL;
-        break;
-
-    default :
-        DEBUG_puts("1httpSetDefaultField: Ignored.");
-	break;
-  }
+  http->default_fields[field] = value ? strdup(value) : NULL;
 }
 
 
@@ -2668,129 +2591,10 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
 {
   DEBUG_printf(("httpSetField(http=%p, field=%d(%s), value=\"%s\")", (void *)http, field, http_fields[field], value));
 
-  if (http == NULL ||
-      field < HTTP_FIELD_ACCEPT_LANGUAGE ||
-      field >= HTTP_FIELD_MAX ||
-      value == NULL)
+  if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX || !value)
     return;
 
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        if (http->accept_encoding)
-          _cupsStrFree(http->accept_encoding);
-
-        http->accept_encoding = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_ALLOW :
-        if (http->allow)
-          _cupsStrFree(http->allow);
-
-        http->allow = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_SERVER :
-        if (http->server)
-          _cupsStrFree(http->server);
-
-        http->server = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_WWW_AUTHENTICATE :
-        if (!http->www_authenticate)
-        {
-	 /*
-	  * First WWW-Authenticate seen, just copy it over...
-	  */
-
-	  http->www_authenticate = strdup(value);
-	  strlcpy(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], value, HTTP_MAX_VALUE);
-        }
-        else
-        {
-         /*
-          * Nth WWW-Authenticate seen, append to existing string...
-          */
-
-	  size_t len = strlen(http->www_authenticate) + 2 + strlen(value) + 1;
-	  char *temp = realloc(http->www_authenticate, len);
-
-	  if (!temp)
-	    return;
-
-	  http->www_authenticate = temp;
-	  strlcat(http->www_authenticate, ", ", len);
-	  strlcat(http->www_authenticate, value, len);
-
-          /* Probably more efficient than two more strlcat's */
-	  strlcpy(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], http->www_authenticate, HTTP_MAX_VALUE);
-        }
-        break;
-
-    default :
-	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
-	break;
-  }
-
-  if (field == HTTP_FIELD_AUTHORIZATION)
-  {
-   /*
-    * Special case for Authorization: as its contents can be
-    * longer than HTTP_MAX_VALUE
-    */
-
-    if (http->field_authorization)
-      free(http->field_authorization);
-
-    http->field_authorization = strdup(value);
-  }
-  else if (field == HTTP_FIELD_HOST)
-  {
-   /*
-    * Special-case for Host: as we don't want a trailing "." on the hostname and
-    * need to bracket IPv6 numeric addresses.
-    */
-
-    char *ptr = strchr(value, ':');
-
-    if (value[0] != '[' && ptr && strchr(ptr + 1, ':'))
-    {
-     /*
-      * Bracket IPv6 numeric addresses...
-      *
-      * This is slightly inefficient (basically copying twice), but is an edge
-      * case and not worth optimizing...
-      */
-
-      snprintf(http->fields[HTTP_FIELD_HOST],
-               sizeof(http->fields[HTTP_FIELD_HOST]), "[%s]", value);
-    }
-    else
-    {
-     /*
-      * Check for a trailing dot on the hostname...
-      */
-
-      ptr = http->fields[HTTP_FIELD_HOST];
-
-      if (*ptr)
-      {
-	ptr += strlen(ptr) - 1;
-
-	if (*ptr == '.')
-	  *ptr = '\0';
-      }
-    }
-  }
-#ifdef HAVE_LIBZ
-  else if (field == HTTP_FIELD_CONTENT_ENCODING &&
-           http->data_encoding != HTTP_ENCODING_FIELDS)
-  {
-    DEBUG_puts("1httpSetField: Calling http_content_coding_start.");
-    http_content_coding_start(http, value);
-  }
-#endif /* HAVE_LIBZ */
+  http_add_field(http, field, value, 0);
 }
 
 
@@ -2827,15 +2631,17 @@ httpSetLength(http_t *http,		/* I - HTTP connection */
 
   if (!length)
   {
-    strlcpy(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked",
-            HTTP_MAX_VALUE);
-    http->fields[HTTP_FIELD_CONTENT_LENGTH][0] = '\0';
+    httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
+    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, "");
   }
   else
   {
-    http->fields[HTTP_FIELD_TRANSFER_ENCODING][0] = '\0';
-    snprintf(http->fields[HTTP_FIELD_CONTENT_LENGTH], HTTP_MAX_VALUE,
-             CUPS_LLFMT, CUPS_LLCAST length);
+    char len[32];			/* Length string */
+
+
+    snprintf(len, sizeof(len), CUPS_LLFMT, CUPS_LLCAST length);
+    httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "");
+    httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, len);
   }
 }
 
@@ -3068,7 +2874,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
       httpSetCookie(http, value);
     }
     else if ((field = httpFieldValue(line)) != HTTP_FIELD_UNKNOWN)
-      httpSetField(http, field, value);
+      http_add_field(http, field, value, 1);
 #ifdef DEBUG
     else
       DEBUG_printf(("1_httpUpdate: unknown field %s seen!", line));
@@ -3528,7 +3334,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   * Set the various standard fields if they aren't already...
   */
 
-  if (!http->fields[HTTP_FIELD_DATE][0])
+  if (!http->fields[HTTP_FIELD_DATE])
     httpSetField(http, HTTP_FIELD_DATE, httpGetDateString(time(NULL)));
 
   if (status >= HTTP_STATUS_BAD_REQUEST && http->keep_alive)
@@ -3539,7 +3345,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   if (http->version == HTTP_VERSION_1_1)
   {
-    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+    if (!http->fields[HTTP_FIELD_CONNECTION])
     {
       if (http->keep_alive)
 	httpSetField(http, HTTP_FIELD_CONNECTION, "Keep-Alive");
@@ -3547,7 +3353,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 	httpSetField(http, HTTP_FIELD_CONNECTION, "close");
     }
 
-    if (http->keep_alive && !http->fields[HTTP_FIELD_KEEP_ALIVE][0])
+    if (http->keep_alive && !http->fields[HTTP_FIELD_KEEP_ALIVE])
       httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "timeout=10");
   }
 
@@ -3555,28 +3361,26 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (status == HTTP_STATUS_UPGRADE_REQUIRED ||
       status == HTTP_STATUS_SWITCHING_PROTOCOLS)
   {
-    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+    if (!http->fields[HTTP_FIELD_CONNECTION])
       httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
 
-    if (!http->fields[HTTP_FIELD_UPGRADE][0])
+    if (!http->fields[HTTP_FIELD_UPGRADE])
       httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
 
-    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH])
       httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, "0");
   }
 #endif /* HAVE_SSL */
 
-  if (!http->server)
-    httpSetField(http, HTTP_FIELD_SERVER,
-                 http->default_server ? http->default_server : CUPS_MINIMAL);
+  if (!http->fields[HTTP_FIELD_SERVER])
+    httpSetField(http, HTTP_FIELD_SERVER, http->default_fields[HTTP_FIELD_SERVER] ? http->default_fields[HTTP_FIELD_SERVER] : CUPS_MINIMAL);
 
  /*
   * Set the Accept-Encoding field if it isn't already...
   */
 
-  if (!http->accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
-                 http->default_accept_encoding ? http->default_accept_encoding :
+  if (!http->fields[HTTP_FIELD_ACCEPT_ENCODING])
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, http->default_fields[HTTP_FIELD_ACCEPT_ENCODING] ? http->default_fields[HTTP_FIELD_ACCEPT_ENCODING] :
 #ifdef HAVE_LIBZ
                                                  "gzip, deflate, identity");
 #else
@@ -3591,8 +3395,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   old_remaining       = http->data_remaining;
   http->data_encoding = HTTP_ENCODING_FIELDS;
 
-  if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100,
-                 http->version % 100, (int)status, httpStatus(status)) < 0)
+  if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100, http->version % 100, (int)status, httpStatus(status)) < 0)
   {
     http->status = HTTP_STATUS_ERROR;
     return (-1);
@@ -3719,6 +3522,141 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   }
 
   return (0);
+}
+
+
+/*
+ * 'http_add_field()' - Add a value for a HTTP field, appending if needed.
+ */
+
+static void
+http_add_field(http_t       *http,	/* I - HTTP connection */
+               http_field_t field,	/* I - HTTP field */
+               const char   *value,	/* I - Value string */
+               int          append)	/* I - Append value? */
+{
+  char		temp[1024];		/* Temporary value string */
+  size_t	fieldlen,		/* Length of existing value */
+		valuelen,		/* Length of value string */
+		total;			/* Total length of string */
+
+
+  if (field == HTTP_FIELD_HOST)
+  {
+   /*
+    * Special-case for Host: as we don't want a trailing "." on the hostname and
+    * need to bracket IPv6 numeric addresses.
+    */
+
+    char *ptr = strchr(value, ':');
+
+    if (value[0] != '[' && ptr && strchr(ptr + 1, ':'))
+    {
+     /*
+      * Bracket IPv6 numeric addresses...
+      *
+      * This is slightly inefficient (basically copying twice), but is an edge
+      * case and not worth optimizing...
+      */
+
+      snprintf(temp, sizeof(temp), "[%s]", value);
+      value = temp;
+    }
+    else if (*value)
+    {
+     /*
+      * Check for a trailing dot on the hostname...
+      */
+
+      strlcpy(temp, value, sizeof(temp));
+      value = temp;
+      ptr   = temp + strlen(temp) - 1;
+
+      if (*ptr == '.')
+	*ptr = '\0';
+    }
+  }
+
+  if (append && field != HTTP_FIELD_ACCEPT_ENCODING && field != HTTP_FIELD_ACCEPT_LANGUAGE && field != HTTP_FIELD_ACCEPT_RANGES && field != HTTP_FIELD_ALLOW && field != HTTP_FIELD_LINK && field != HTTP_FIELD_TRANSFER_ENCODING && field != HTTP_FIELD_UPGRADE && field != HTTP_FIELD_WWW_AUTHENTICATE)
+    append = 0;
+
+  if (!append && http->fields[field])
+  {
+    if (http->fields[field] != http->_fields[field])
+      free(http->fields[field]);
+
+    http->fields[field] = NULL;
+  }
+
+  valuelen = strlen(value);
+
+  if (!valuelen)
+  {
+    http->_fields[field][0] = '\0';
+    return;
+  }
+
+  if (http->fields[field])
+  {
+    fieldlen = strlen(http->fields[field]);
+    total    = fieldlen + 2 + valuelen;
+  }
+  else
+  {
+    fieldlen = 0;
+    total    = valuelen;
+  }
+
+  if (total < HTTP_MAX_VALUE && field < HTTP_FIELD_ACCEPT_ENCODING)
+  {
+   /*
+    * Copy short values to legacy char arrays (maintained for binary
+    * compatibility with CUPS 1.2.x and earlier applications...)
+    */
+
+    if (fieldlen)
+    {
+      char	combined[HTTP_MAX_VALUE];
+					/* Combined value string */
+
+      snprintf(combined, sizeof(combined), "%s, %s", http->_fields[field], value);
+      value = combined;
+    }
+
+    strlcpy(http->_fields[field], value, sizeof(http->_fields[field]));
+    http->fields[field] = http->_fields[field];
+  }
+  else if (fieldlen)
+  {
+   /*
+    * Expand the field value...
+    */
+
+    char	*combined;		/* New value string */
+
+    if ((combined = realloc(http->fields[field], total + 1)) != NULL)
+    {
+      http->fields[field] = combined;
+      strlcat(combined, ", ", total + 1);
+      strlcat(combined, value, total + 1);
+    }
+  }
+  else
+  {
+   /*
+    * Allocate the field value...
+    */
+
+    http->fields[field] = strdup(value);
+  }
+
+#ifdef HAVE_LIBZ
+  if (field == HTTP_FIELD_CONTENT_ENCODING && http->data_encoding != HTTP_ENCODING_FIELDS)
+  {
+    DEBUG_puts("1httpSetField: Calling http_content_coding_start.");
+    http_content_coding_start(http, value);
+  }
+#endif /* HAVE_LIBZ */
 }
 
 
@@ -4334,10 +4272,10 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * Set the User-Agent field if it isn't already...
   */
 
-  if (!http->fields[HTTP_FIELD_USER_AGENT][0])
+  if (!http->fields[HTTP_FIELD_USER_AGENT])
   {
-    if (http->default_user_agent)
-      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_user_agent);
+    if (http->default_fields[HTTP_FIELD_USER_AGENT])
+      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_fields[HTTP_FIELD_USER_AGENT]);
     else
       httpSetField(http, HTTP_FIELD_USER_AGENT, cupsUserAgent());
   }
@@ -4346,9 +4284,8 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * Set the Accept-Encoding field if it isn't already...
   */
 
-  if (!http->accept_encoding && http->default_accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
-                 http->default_accept_encoding);
+  if (!http->fields[HTTP_FIELD_ACCEPT_ENCODING] && http->default_fields[HTTP_FIELD_ACCEPT_ENCODING])
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, http->default_fields[HTTP_FIELD_ACCEPT_ENCODING]);
 
  /*
   * Encode the URI as needed...
@@ -4463,7 +4400,7 @@ http_send(http_t       *http,		/* I - HTTP connection */
   * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->field_authorization && http->authstring &&
+  if (http->fields[HTTP_FIELD_AUTHORIZATION] && http->authstring &&
       (!strncmp(http->authstring, "Negotiate", 9) ||
        !strncmp(http->authstring, "AuthRef", 7)))
   {
@@ -4503,8 +4440,7 @@ http_set_length(http_t *http)		/* I - Connection */
       return (remaining);
     }
 
-    if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING],
-                          "chunked"))
+    if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_TRANSFER_ENCODING), "chunked"))
     {
       DEBUG_puts("1http_set_length: Setting data_encoding to "
                  "HTTP_ENCODING_CHUNKED.");
@@ -4609,10 +4545,15 @@ http_tls_upgrade(http_t *http)		/* I - HTTP connection */
   * encryption on the link...
   */
 
-  http->tls_upgrade         = 1;
-  http->field_authorization = NULL;	/* Don't free the auth string */
+  http->tls_upgrade = 1;
+  memset(http->fields, 0, sizeof(http->fields));
+  http->expect = (http_status_t)0;
 
-  httpClearFields(http);
+  if (http->hostname[0] == '/')
+    httpSetField(http, HTTP_FIELD_HOST, "localhost");
+  else
+    httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
   httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
 
@@ -4629,14 +4570,15 @@ http_tls_upgrade(http_t *http)		/* I - HTTP connection */
   * Restore the HTTP request data...
   */
 
+  memcpy(http->_fields, myhttp._fields, sizeof(http->_fields));
   memcpy(http->fields, myhttp.fields, sizeof(http->fields));
-  http->data_encoding       = myhttp.data_encoding;
-  http->data_remaining      = myhttp.data_remaining;
-  http->_data_remaining     = myhttp._data_remaining;
-  http->expect              = myhttp.expect;
-  http->field_authorization = myhttp.field_authorization;
-  http->digest_tries        = myhttp.digest_tries;
-  http->tls_upgrade         = 0;
+
+  http->data_encoding   = myhttp.data_encoding;
+  http->data_remaining  = myhttp.data_remaining;
+  http->_data_remaining = myhttp._data_remaining;
+  http->expect          = myhttp.expect;
+  http->digest_tries    = myhttp.digest_tries;
+  http->tls_upgrade     = 0;
 
  /*
   * See if we actually went secure...

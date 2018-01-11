@@ -1,7 +1,7 @@
 /*
  * IPP utilities for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -646,7 +646,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Reconnect if the last response had a "Connection: close"...
   */
 
-  if (!_cups_strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
+  if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_CONNECTION), "close"))
   {
     DEBUG_puts("2cupsSendRequest: Connection: close");
     httpClearFields(http);

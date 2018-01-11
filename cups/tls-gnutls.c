@@ -1,7 +1,7 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -1343,7 +1343,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 		keyfile[1024];		/* Private key file */
     int		have_creds = 0;		/* Have credentials? */
 
-    if (http->fields[HTTP_FIELD_HOST][0])
+    if (http->fields[HTTP_FIELD_HOST])
     {
      /*
       * Use hostname for TLS upgrade...
