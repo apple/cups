@@ -1,7 +1,7 @@
 #
 # Locale file makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
+# Copyright 2007-2018 by Apple Inc.
 # Copyright 1993-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -72,6 +72,8 @@ install-languages:
 			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 		fi ; \
 	done
+	$(INSTALL_DIR) -m 7555 $(LOCALEDIR)/en
+	$(INSTALL_DATA) cups.pot $(LOCALEDIR)/en/cups_en.po
 
 install-langbundle: po2strings
 	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj"

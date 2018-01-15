@@ -1,4 +1,4 @@
-CHANGES - 2.3b2 - 2018-01-11
+CHANGES - 2.3b2 - 2018-01-15
 ============================
 
 
@@ -7,6 +7,7 @@ Changes in CUPS v2.3b2
 
 - Localization changes (Issue #5210)
 - Build fixes (Issue #5217)
+- IPP Everywhere PPDs were not localized to English (Issue #5205)
 - The `cupsGetDests` and `cupsEnumDests` functions no longer filter out local
   print services like IPP USB devices (Issue #5206)
 - The `cupsCopyDest` function now correctly copies the `is_default` value

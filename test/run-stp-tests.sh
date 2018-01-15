@@ -3,7 +3,7 @@
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright 2007-2017 by Apple Inc.
+# Copyright 2007-2018 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -304,8 +304,9 @@ for file in ../locale/cups_*.po; do
 	loc=`basename $file .po | cut -c 6-`
 	mkdir $BASE/share/locale/$loc
 	ln -s $root/locale/cups_$loc.po $BASE/share/locale/$loc
-	ln -s $root/locale/ppdc_$loc.po $BASE/share/locale/$loc
 done
+mkdir $BASE/share/locale/en
+ln -s $root/locale/cups.pot $BASE/share/locale/en/cups_en.po
 mkdir $BASE/share/mime
 mkdir $BASE/share/model
 mkdir $BASE/share/ppdc
