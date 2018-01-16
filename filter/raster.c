@@ -40,9 +40,11 @@ struct _cups_raster_s			/**** Raster stream data ****/
   int			compressed,	/* Non-zero if data is compressed */
 			swapped;	/* Non-zero if data is byte-swapped */
   unsigned char		*buffer,	/* Read/write buffer */
+			*buffer2,	/* Read/write buffer */
 			*bufptr,	/* Current (read) position in buffer */
 			*bufend;	/* End of current (read) buffer */
-  size_t		bufsize;	/* Buffer size */
+  size_t		bufsize,	/* Buffer size */
+			bufsize2;	/* Buffer size */
 #ifdef DEBUG
   size_t		iocount;	/* Number of bytes read/written */
 #endif /* DEBUG */
@@ -80,6 +82,8 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
   {
     if (r->buffer)
       free(r->buffer);
+    if (r->buffer2)
+      free(r->buffer2);
 
     if (r->pixels)
       free(r->pixels);
@@ -1181,61 +1185,66 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   if (r == NULL || r->mode == CUPS_RASTER_READ || r->remaining == 0)
     return (0);
 
+ /*
+  * Check whether we need to swap each pair of bytes ...
+  */
+
+  if (r->swapped &&
+      (r->header.cupsBitsPerColor == 16 ||
+       r->header.cupsBitsPerPixel == 12 ||
+       r->header.cupsBitsPerPixel == 16))
+  {
+    unsigned char	*bufptr;	/* Pointer into write buffer */
+    unsigned		count;		/* Remaining count */
+
+   /*
+    * Allocate a buffer for byte-swapping as needed...
+    */
+
+    if ((size_t)len > r->bufsize)
+    {
+      if (r->buffer)
+	bufptr = realloc(r->buffer, len);
+      else
+	bufptr = malloc(len);
+
+      if (!bufptr)
+	return (0);
+
+      r->buffer  = bufptr;
+      r->bufsize = len;
+    }
+
+   /*
+    * Byte swap the pixels...
+    */
+
+    for (bufptr = r->buffer, count = len; count > 1; count -= 2, bufptr += 2)
+    {
+      bufptr[1] = *p++;
+      bufptr[0] = *p++;
+    }
+
+    if (count)			/* This should never happen... */
+      *bufptr = *p;
+  }
+
   if (!r->compressed)
   {
    /*
-    * Without compression, just write the raster data raw unless the data needs
-    * to be swapped...
+    * Without compression, just write the raster data as we have it now ...
     */
 
     r->remaining -= len / r->header.cupsBytesPerLine;
 
     if (r->swapped &&
-        (r->header.cupsBitsPerColor == 16 ||
-         r->header.cupsBitsPerPixel == 12 ||
-         r->header.cupsBitsPerPixel == 16))
-    {
-      unsigned char	*bufptr;	/* Pointer into write buffer */
-      unsigned		count;		/* Remaining count */
-
-     /*
-      * Allocate a write buffer as needed...
-      */
-
-      if ((size_t)len > r->bufsize)
-      {
-	if (r->buffer)
-	  bufptr = realloc(r->buffer, len);
-	else
-	  bufptr = malloc(len);
-
-	if (!bufptr)
-	  return (0);
-
-	r->buffer  = bufptr;
-	r->bufsize = len;
-      }
-
-     /*
-      * Byte swap the pixels...
-      */
-
-      for (bufptr = r->buffer, count = len; count > 1; count -= 2, bufptr += 2)
-      {
-        bufptr[1] = *p++;
-        bufptr[0] = *p++;
-      }
-
-      if (count)			/* This should never happen... */
-        *bufptr = *p;
-
-     /*
-      * Write the byte-swapped buffer...
-      */
-
+	(r->header.cupsBitsPerColor == 16 ||
+	 r->header.cupsBitsPerPixel == 12 ||
+	 r->header.cupsBitsPerPixel == 16))
+      /* Write the byte-swapped buffer... */
       bytes = cups_raster_io(r, r->buffer, len);
-    }
     else
+      /* Write the original raw data... */
       bytes = cups_raster_io(r, p, len);
 
     if (bytes < len)
@@ -1247,6 +1256,13 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
  /*
   * Otherwise, compress each line...
   */
+
+  if (r->swapped &&
+      (r->header.cupsBitsPerColor == 16 ||
+       r->header.cupsBitsPerPixel == 12 ||
+       r->header.cupsBitsPerPixel == 16))
+    /* Compress the byte-swapped buffer... */
+    p = r->buffer;
 
   for (remaining = len; remaining > 0; remaining -= (unsigned)bytes, p += bytes)
   {
@@ -1856,10 +1872,10 @@ cups_raster_write(
   if (count < 65536)
     count = 65536;
 
-  if ((size_t)count > r->bufsize)
+  if ((size_t)count > r->bufsize2)
   {
-    if (r->buffer)
-      wptr = realloc(r->buffer, count);
+    if (r->buffer2)
+      wptr = realloc(r->buffer2, count);
     else
       wptr = malloc(count);
 
@@ -1869,8 +1885,8 @@ cups_raster_write(
       return (-1);
     }
 
-    r->buffer  = wptr;
-    r->bufsize = count;
+    r->buffer2  = wptr;
+    r->bufsize2 = count;
   }
 
  /*
@@ -1880,7 +1896,7 @@ cups_raster_write(
   bpp     = r->bpp;
   pend    = pixels + r->header.cupsBytesPerLine;
   plast   = pend - bpp;
-  wptr    = r->buffer;
+  wptr    = r->buffer2;
   *wptr++ = (unsigned char)(r->count - 1);
 
  /*
@@ -1940,9 +1956,9 @@ cups_raster_write(
     }
   }
 
-  DEBUG_printf(("4cups_raster_write: Writing " CUPS_LLFMT " bytes.", CUPS_LLCAST (wptr - r->buffer)));
+  DEBUG_printf(("4cups_raster_write: Writing " CUPS_LLFMT " bytes.", CUPS_LLCAST (wptr - r->buffer2)));
 
-  return (cups_raster_io(r, r->buffer, (size_t)(wptr - r->buffer)));
+  return (cups_raster_io(r, r->buffer2, (size_t)(wptr - r->buffer2)));
 }
 
 
