@@ -12,10 +12,6 @@ layout: default
   <a class="btn btn-default btn-large" href="faq.html">Frequently Asked Questions</a></p>
 </div>
 
-<blockquote>Note: The CUPS developers will be enjoying the holidays with their
-families and will respond to questions and bug reports after the new year. Have
-a safe and happy holiday.</blockquote>
-
 {% for post in site.posts offset: 0 limit: 3 %}
 <hr>
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
