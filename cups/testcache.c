@@ -64,7 +64,7 @@ main(int  argc,				/* I - Number of command-line args */
   ppdMarkDefaults(ppd);
   cupsMarkOptions(ppd, num_options, options);
 
-  num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options, (int)sizeof(finishings) / sizeof(finishings[0]), finishings);
+  num_finishings = _ppdCacheGetFinishingValues(ppd, pc, (int)sizeof(finishings) / sizeof(finishings[0]), finishings);
 
   if (num_finishings > 0)
   {

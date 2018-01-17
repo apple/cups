@@ -167,11 +167,7 @@ extern int		_ppdCacheGetFinishingOptions(_ppd_cache_t *pc,
 			                             ipp_finishings_t value,
 			                             int num_options,
 			                             cups_option_t **options);
-extern int		_ppdCacheGetFinishingValues(_ppd_cache_t *pc,
-			                            int num_options,
-			                            cups_option_t *options,
-			                            int max_values,
-			                            int *values);
+extern int		_ppdCacheGetFinishingValues(ppd_file_t *ppd, _ppd_cache_t *pc, int max_values, int *values);
 extern const char	*_ppdCacheGetInputSlot(_ppd_cache_t *pc, ipp_t *job,
 			                       const char *keyword);
 extern const char	*_ppdCacheGetMediaType(_ppd_cache_t *pc, ipp_t *job,

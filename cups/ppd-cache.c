@@ -385,7 +385,7 @@ _cupsConvertOptions(
   }
   else
   {
-    num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options, (int)(sizeof(finishings) / sizeof(finishings[0])), finishings);
+    num_finishings = _ppdCacheGetFinishingValues(ppd, pc, (int)(sizeof(finishings) / sizeof(finishings[0])), finishings);
     if (num_finishings > 0)
     {
       ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings", num_finishings, finishings);
@@ -2150,9 +2150,8 @@ _ppdCacheGetFinishingOptions(
 
 int					/* O - Number of finishings values */
 _ppdCacheGetFinishingValues(
+    ppd_file_t    *ppd,			/* I - Marked PPD file */
     _ppd_cache_t  *pc,			/* I - PPD cache and mapping data */
-    int           num_options,		/* I - Number of options */
-    cups_option_t *options,		/* I - Options */
     int           max_values,		/* I - Maximum number of finishings values */
     int           *values)		/* O - Finishings values */
 {
@@ -2160,16 +2159,16 @@ _ppdCacheGetFinishingValues(
 			num_values = 0;	/* Number of values */
   _pwg_finishings_t	*f;		/* Current finishings option */
   cups_option_t		*option;	/* Current option */
-  const char		*val;		/* Value for option */
+  ppd_choice_t		*choice;	/* Marked PPD choice */
 
 
  /*
   * Range check input...
   */
 
-  DEBUG_printf(("_ppdCacheGetFinishingValues(pc=%p, num_options=%d, options=%p, max_values=%d, values=%p)", pc, num_options, options, max_values, values));
+  DEBUG_printf(("_ppdCacheGetFinishingValues(ppd=%p, pc=%p, max_values=%d, values=%p)", ppd, pc, max_values, values));
 
-  if (!pc || max_values < 1 || !values)
+  if (!ppd || !pc || max_values < 1 || !values)
   {
     DEBUG_puts("_ppdCacheGetFinishingValues: Bad arguments, returning 0.");
     return (0);
@@ -2194,8 +2193,7 @@ _ppdCacheGetFinishingValues(
     {
       DEBUG_printf(("_ppdCacheGetFinishingValues: %s=%s?", option->name, option->value));
 
-      if ((val = cupsGetOption(option->name, num_options, options)) == NULL ||
-          _cups_strcasecmp(option->value, val))
+      if ((choice = ppdFindMarkedChoice(ppd, option->name)) == NULL || _cups_strcasecmp(option->value, choice->choice))
       {
         DEBUG_puts("_ppdCacheGetFinishingValues: NO");
         break;
