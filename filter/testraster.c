@@ -1,10 +1,11 @@
 /*
  * Raster test program routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -506,7 +507,7 @@ do_ras_file(const char *filename)	/* I - Filename */
 static int				/* O - Number of errors */
 do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 {
-  unsigned		page, x, y;	/* Looping vars */
+  unsigned		page, x, y, count;/* Looping vars */
   FILE			*fp;		/* Raster file */
   cups_raster_t		*r;		/* Raster stream */
   cups_page_header2_t	header,		/* Page header */
@@ -580,11 +581,15 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
       header.cupsBitsPerPixel = (page & 1) ? 32 : 8;
     }
 
+    printf("cupsRasterWriteHeader2(page %d): ", page + 1);
+
     if (cupsRasterWriteHeader2(r, &header))
-      puts("cupsRasterWriteHeader2: PASS");
+    {
+      puts("PASS");
+    }
     else
     {
-      puts("cupsRasterWriteHeader2: FAIL");
+      puts("FAIL");
       errors ++;
     }
 
@@ -722,7 +727,7 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
       expected.cupsBitsPerPixel = (page & 1) ? 32 : 8;
     }
 
-    fputs("cupsRasterReadHeader2: ", stdout);
+    printf("cupsRasterReadHeader2(page %d): ", page + 1);
     fflush(stdout);
 
     if (!cupsRasterReadHeader2(r, &header))
@@ -731,13 +736,14 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
       errors ++;
       break;
     }
-
-    if (memcmp(&header, &expected, sizeof(header)))
+    else if (memcmp(&header, &expected, sizeof(header)))
     {
       puts("FAIL (bad page header)");
       errors ++;
       print_changes(&header, &expected);
     }
+    else
+      puts("PASS");
 
     fputs("cupsRasterReadPixels: ", stdout);
     fflush(stdout);
@@ -754,6 +760,20 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
       if (data[0] != 0 || memcmp(data, data + 1, header.cupsBytesPerLine - 1))
       {
         printf("FAIL (raster line %d corrupt)\n", y);
+
+	for (x = 0, count = 0; x < header.cupsBytesPerLine && count < 10; x ++)
+        {
+	  if (data[x])
+	  {
+	    count ++;
+
+	    if (count == 10)
+	      puts("   ...");
+	    else
+	      printf("  %4u %02X (expected %02X)\n", x, data[x], 0);
+	  }
+	}
+
 	errors ++;
 	break;
       }
@@ -777,6 +797,20 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 	if (x < header.cupsBytesPerLine)
 	{
 	  printf("FAIL (raster line %d corrupt)\n", y + 64);
+
+	  for (x = 0, count = 0; x < header.cupsBytesPerLine && count < 10; x ++)
+	  {
+	    if (data[x] != (x & 255))
+	    {
+	      count ++;
+
+	      if (count == 10)
+		puts("   ...");
+	      else
+		printf("  %4u %02X (expected %02X)\n", x, data[x], x & 255);
+	    }
+	  }
+
 	  errors ++;
 	  break;
 	}
@@ -796,6 +830,20 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 	  if (data[0] != 255 || memcmp(data, data + 1, header.cupsBytesPerLine - 1))
           {
 	    printf("fail (raster line %d corrupt)\n", y + 128);
+
+	    for (x = 0, count = 0; x < header.cupsBytesPerLine && count < 10; x ++)
+	    {
+	      if (data[x] != 255)
+	      {
+		count ++;
+
+		if (count == 10)
+		  puts("   ...");
+		else
+		  printf("  %4u %02X (expected %02X)\n", x, data[x], 255);
+	      }
+	    }
+
 	    errors ++;
 	    break;
 	  }
@@ -819,6 +867,20 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 	    if (x < header.cupsBytesPerLine)
             {
 	      printf("FAIL (raster line %d corrupt)\n", y + 192);
+
+	      for (x = 0, count = 0; x < header.cupsBytesPerLine && count < 10; x ++)
+	      {
+		if (data[x] != ((x / 4) & 255))
+		{
+		  count ++;
+
+		  if (count == 10)
+		    puts("   ...");
+		  else
+		    printf("  %4u %02X (expected %02X)\n", x, data[x], (x / 4) & 255);
+		}
+	      }
+
 	      errors ++;
 	      break;
 	    }

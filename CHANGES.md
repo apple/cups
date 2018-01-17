@@ -1,4 +1,4 @@
-CHANGES - 2.3b2 - 2018-01-15
+CHANGES - 2.3b2 - 2018-01-17
 ============================
 
 
@@ -17,6 +17,8 @@ Changes in CUPS v2.3b2
 - All HTTP field values can now be longer than `HTTP_MAX_VALUE` bytes
   (Issue #5216)
 - Added a USB quirk rule for Canon MP280 series printers (Issue #5221)
+- The `cupsRasterWritePixels` function did not correctly swap bytes for some
+  formats (Issue #5225)
 - The scheduler did not add ".local" to the default DNS-SD host name when
   needed.
 
