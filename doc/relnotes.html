@@ -5,6 +5,25 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="0203b2">CUPS 2.3b2</a> <em>(January 17, 2018)</em></h2>
+
+<ul>
+	<li>Localization changes (Issue #5210)</li>
+	<li>Build fixes (Issue #5217)</li>
+	<li>IPP Everywhere PPDs were not localized to English (Issue #5205)</li>
+	<li>The `cupsGetDests` and `cupsEnumDests` functions no longer filter out local print services like IPP USB devices (Issue #5206)</li>
+	<li>The `cupsCopyDest` function now correctly copies the `is_default` value (Issue #5208)</li>
+	<li>Printing to old CUPS servers has been fixed (Issue #5211)</li>
+	<li>The `ppdInstallableConflict` tested too many constraints (Issue #5213)</li>
+	<li>All HTTP field values can now be longer than `HTTP_MAX_VALUE` bytes (Issue #5216)</li>
+	<li>Added a USB quirk rule for Canon MP280 series printers (Issue #5221)</li>
+	<li>The `cupsRasterWritePixels` function did not correctly swap bytes for some formats (Issue #5225)</li>
+	<li>Fixed an issue with mapping finishing options (rdar://34250727)</li>
+	<li>The `ppdLocalizeIPPReason` function incorrectly returned a localized version of "none" (rdar://36566269)</li>
+	<li>The scheduler did not add ".local" to the default DNS-SD host name when needed.</li>
+</ul>
+
+
 <h2 class="title"><a name="0203b1">CUPS 2.3b1</a> <em>(December 19, 2017)</em></h2>
 
 <ul>
