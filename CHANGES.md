@@ -19,6 +19,8 @@ Changes in CUPS v2.3b2
 - Added a USB quirk rule for Canon MP280 series printers (Issue #5221)
 - The `cupsRasterWritePixels` function did not correctly swap bytes for some
   formats (Issue #5225)
+- The `ppdLocalizeIPPReason` function incorrectly returned a localized version
+  of "none" (rdar://36566269)
 - The scheduler did not add ".local" to the default DNS-SD host name when
   needed.
 
