@@ -72,7 +72,7 @@ install-languages:
 			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 		fi ; \
 	done
-	$(INSTALL_DIR) -m 7555 $(LOCALEDIR)/en
+	$(INSTALL_DIR) -m 755 $(LOCALEDIR)/en
 	$(INSTALL_DATA) cups.pot $(LOCALEDIR)/en/cups_en.po
 
 install-langbundle: po2strings
