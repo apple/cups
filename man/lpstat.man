@@ -1,7 +1,7 @@
 .\"
 .\" lpstat man page for CUPS.
 .\"
-.\" Copyright 2007-2017 by Apple Inc.
+.\" Copyright 2007-2018 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -145,4 +145,4 @@ The Solaris \fI\-f\fR, \fI\-P\fR, and \fI\-S\fR options are silently ignored.
 .BR lprm (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2017 by Apple Inc.
+Copyright \[co] 2007-2018 by Apple Inc.

@@ -1,7 +1,7 @@
 .\"
 .\" ipptoolfile man page.
 .\"
-.\" Copyright 2010-2017 by Apple Inc.
+.\" Copyright 2010-2018 by Apple Inc.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
@@ -645,4 +645,4 @@ IANA IPP Registry (http://www.iana.org/assignments/ipp-registrations),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp),
 RFC 8011 (http://tools.ietf.org/html/rfc8011)
 .SH COPYRIGHT
-Copyright \[co] 2007-2017 by Apple Inc.
+Copyright \[co] 2007-2018 by Apple Inc.
