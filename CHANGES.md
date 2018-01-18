@@ -1,5 +1,11 @@
-CHANGES - 2.3b2 - 2018-01-17
+CHANGES - 2.3b3 - 2018-01-17
 ============================
+
+Changes in CUPS v2.3b3
+----------------------
+
+- The IPP Everywhere PPD generator did not support deep grayscale or 8-bit per
+  component AdobeRGB (Issue #5227)
 
 
 Changes in CUPS v2.3b2
