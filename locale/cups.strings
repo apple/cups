@@ -782,10 +782,14 @@
 "Darkness" = "Darkness";
 "Data file sent successfully." = "Data file sent successfully.";
 "Deep Color" = "Deep Color";
+"Deep Gray" = "Deep Gray";
 "Delete Class" = "Delete Class";
 "Delete Printer" = "Delete Printer";
 "DeskJet Series" = "DeskJet Series";
 "Destination \"%s\" is not accepting jobs." = "Destination “%s” is not accepting jobs.";
+"Device CMYK" = "Device CMYK";
+"Device Gray" = "Device Gray";
+"Device RGB" = "Device RGB";
 "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s" = "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s";
 "Direct Thermal Media" = "Direct Thermal Media";
 "Directory \"%s\" contains a relative path." = "Directory “%s” contains a relative path.";

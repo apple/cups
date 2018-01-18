@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-15 16:40-0500\n"
+"POT-Creation-Date: 2018-01-18 13:08-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2876,6 +2876,9 @@ msgstr ""
 msgid "Deep Color"
 msgstr ""
 
+msgid "Deep Gray"
+msgstr ""
+
 msgid "Delete Class"
 msgstr "Supprimer la classe"
 
@@ -2888,6 +2891,15 @@ msgstr "Série DeskJet"
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "La destination « %s » n’accepte pas de tâche."
+
+msgid "Device CMYK"
+msgstr ""
+
+msgid "Device Gray"
+msgstr ""
+
+msgid "Device RGB"
+msgstr ""
 
 #, c-format
 msgid ""

@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-12-15 16:40-0500\n"
+"POT-Creation-Date: 2018-01-18 13:08-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3007,6 +3007,9 @@ msgstr "データファイルが正常に送信されました。"
 msgid "Deep Color"
 msgstr ""
 
+msgid "Deep Gray"
+msgstr ""
+
 msgid "Delete Class"
 msgstr "クラスの削除"
 
@@ -3019,6 +3022,15 @@ msgstr "DeskJet シリーズ"
 #, c-format
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "宛先 \"%s\" はジョブを受け付けていません。"
+
+msgid "Device CMYK"
+msgstr ""
+
+msgid "Device Gray"
+msgstr ""
+
+msgid "Device RGB"
+msgstr ""
 
 #, c-format
 msgid ""
