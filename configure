@@ -6614,7 +6614,7 @@ fi
 
 if test x$enable_shared = xno; then
 	LINKCUPS="../cups/lib$cupsbase.a"
-	LINKCUPSIMAGE="../filter/libcupsimage.a"
+	LINKCUPSIMAGE="../cups/libcupsimage.a"
 
 	EXTLINKCUPS="-lcups"
 	EXTLINKCUPSIMAGE="-lcupsimage"
@@ -6715,7 +6715,7 @@ if test x$LIBTOOL != x; then
 	LIBTOOL_INSTALL="\$(LIBTOOL) --mode=install"
 
 	LINKCUPS="../cups/\$(LIBCUPS)"
-	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
+	LINKCUPSIMAGE="../cups/\$(LIBCUPSIMAGE)"
 
 else
 	LD_CC="\$(CC)"

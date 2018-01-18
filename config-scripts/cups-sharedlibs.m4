@@ -1,7 +1,7 @@
 dnl
 dnl Shared library support for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -85,7 +85,7 @@ AC_SUBST(LIBCUPSSTATIC)
 
 if test x$enable_shared = xno; then
 	LINKCUPS="../cups/lib$cupsbase.a"
-	LINKCUPSIMAGE="../filter/libcupsimage.a"
+	LINKCUPSIMAGE="../cups/libcupsimage.a"
 
 	EXTLINKCUPS="-lcups"
 	EXTLINKCUPSIMAGE="-lcupsimage"

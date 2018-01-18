@@ -40,10 +40,13 @@ conf/mime.convs
 conf/pam.std
 conf/snmp.conf
 cups/locale/
+cups/rasterbench
 cups/test.pwg
+cups/test.raster
 cups/testadmin
 cups/testarray
 cups/testcache
+cups/testclient
 cups/testconflicts
 cups/testcreds
 cups/testcups
@@ -57,6 +60,7 @@ cups/testlang
 cups/testoptions
 cups/testppd
 cups/testpwg
+cups/testraster
 cups/testsnmp
 cups/tlscheck
 desktop/cups.desktop
@@ -65,14 +69,10 @@ doc/*/index.html
 filter/commandtops
 filter/gziptoany
 filter/pstops
-filter/rasterbench
 filter/rastertoepson
 filter/rastertohp
 filter/rastertolabel
 filter/rastertopwg
-filter/test.raster
-filter/testclient
-filter/testraster
 locale/checkpo
 locale/po2strings
 locale/strings2po

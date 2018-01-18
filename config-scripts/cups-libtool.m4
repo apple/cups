@@ -1,7 +1,7 @@
 dnl
 dnl Libtool stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -40,7 +40,7 @@ if test x$LIBTOOL != x; then
 	LIBTOOL_INSTALL="\$(LIBTOOL) --mode=install"
 
 	LINKCUPS="../cups/\$(LIBCUPS)"
-	LINKCUPSIMAGE="../filter/\$(LIBCUPSIMAGE)"
+	LINKCUPSIMAGE="../cups/\$(LIBCUPSIMAGE)"
 
 else
 	LD_CC="\$(CC)"

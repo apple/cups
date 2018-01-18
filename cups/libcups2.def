@@ -1,5 +1,5 @@
 LIBRARY libcups2
-VERSION 2.12
+VERSION 2.13
 EXPORTS
 _cupsArrayAddStrings
 _cupsArrayNewStrings
@@ -12,6 +12,7 @@ _cupsCondWait
 _cupsConnect
 _cupsConvertOptions
 _cupsCreateDest
+_cupsEncodeOption
 _cupsEncodingName
 _cupsGet1284Values
 _cupsGetDestResource
@@ -24,13 +25,11 @@ _cupsLangPrintError
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString
-_cupsMD5Append
-_cupsMD5Finish
-_cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
 _cupsMessageNew
+_cupsMessageSave
 _cupsMutexInit
 _cupsMutexLock
 _cupsMutexUnlock
@@ -39,6 +38,9 @@ _cupsRWInit
 _cupsRWLockRead
 _cupsRWLockWrite
 _cupsRWUnlock
+_cupsRasterAddError
+_cupsRasterClearError
+_cupsRasterExecPS
 _cupsSNMPClose
 _cupsSNMPCopyOID
 _cupsSNMPDefaultCommunity
@@ -65,6 +67,7 @@ _cupsStrScand
 _cupsStrStatistics
 _cupsThreadCancel
 _cupsThreadCreate
+_cupsThreadDetach
 _cupsThreadWait
 _cupsUserDefault
 _cups_safe_vsnprintf
@@ -124,6 +127,8 @@ _pwgMediaTable
 _pwgMediaTypeForType
 _pwgPageSizeForMedia
 cupsAddDest
+cupsAddDestMediaOptions
+cupsAddIntegerOption
 cupsAddOption
 cupsAdminCreateWindowsPPD
 cupsAdminExportSamba
@@ -227,6 +232,7 @@ cupsGetDests2
 cupsGetDevices
 cupsGetFd
 cupsGetFile
+cupsGetIntegerOption
 cupsGetJobs
 cupsGetJobs2
 cupsGetNamedDest
@@ -240,6 +246,7 @@ cupsGetPrinters
 cupsGetResponse
 cupsGetServerPPD
 cupsHashData
+cupsHashString
 cupsLangDefault
 cupsLangEncoding
 cupsLangFlush
@@ -261,6 +268,18 @@ cupsPrintFiles
 cupsPrintFiles2
 cupsPutFd
 cupsPutFile
+cupsRasterClose
+cupsRasterErrorString
+cupsRasterInitPWGHeader
+cupsRasterInterpretPPD
+cupsRasterOpen
+cupsRasterOpenIO
+cupsRasterReadHeader
+cupsRasterReadHeader2
+cupsRasterReadPixels
+cupsRasterWriteHeader
+cupsRasterWriteHeader2
+cupsRasterWritePixels
 cupsReadResponseData
 cupsRemoveDest
 cupsRemoveOption
