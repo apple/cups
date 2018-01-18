@@ -3725,7 +3725,13 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	  cupsFilePrintf(fp, "*OpenUI *ColorModel/%s: PickOne\n"
 			     "*OrderDependency: 10 AnySetup *ColorModel\n", _cupsLangString(lang, _("Color Mode")));
 
-        cupsFilePrintf(fp, "*ColorModel Gray/%s: \"<</cupsColorSpace 18/cupsBitsPerColor %s/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Grayscale")), (strstr(keyword, "16") ? "16" : "8"));
+	if (strstr(keyword, "8"))
+	{
+	  cupsFilePrintf(fp, "*ColorModel Gray/%s: \"<</cupsColorSpace 18/cupsBitsPerColor 8/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Grayscale")));
+	  if (strstr(keyword, "16"))
+	    cupsFilePrintf(fp, "*ColorModel GrayHD/%s: \"<</cupsColorSpace 18/cupsBitsPerColor 16/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Grayscale High Definition")));
+	} else if (strstr(keyword, "16"))
+	  cupsFilePrintf(fp, "*ColorModel Gray/%s: \"<</cupsColorSpace 18/cupsBitsPerColor 16/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Grayscale")));
 
         if (!default_color || !strcmp(default_color, "FastGray"))
 	  default_color = "Gray";
@@ -3736,7 +3742,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	  cupsFilePrintf(fp, "*OpenUI *ColorModel/%s: PickOne\n"
 			     "*OrderDependency: 10 AnySetup *ColorModel\n", _cupsLangString(lang, _("Color Mode")));
 
-        cupsFilePrintf(fp, "*ColorModel RGB/%s: \"<</cupsColorSpace 19/cupsBitsPerColor %s/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Color")), (strstr(keyword, "16") || strstr(keyword, "48") ? "16" : "8"));
+        cupsFilePrintf(fp, "*ColorModel RGB/%s: \"<</cupsColorSpace 19/cupsBitsPerColor %s/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n", _cupsLangString(lang, _("Color")), (strstr(keyword, "8") || strstr(keyword, "24") ? "8" : "16"));
 
 	default_color = "RGB";
       }
