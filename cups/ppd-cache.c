@@ -4117,7 +4117,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 					/* Member attribute name */
 
           if (strcmp(name, "media-size"))
-            cupsFilePrintf(fp, "%s\n", name);
+            cupsFilePrintf(fp, "%% %s\n", name);
 	}
       }
       cupsFilePuts(fp, "\"\n");
