@@ -268,7 +268,7 @@ msgstr ""
 
 msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
 msgstr ""
-"        WARN    Datei einthält gemischt CR, LF, und CR LF Zeilenmenden."
+"        WARN    Datei einthält gemischt CR, LF, und CR LF Zeilenenden."
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -967,7 +967,7 @@ msgstr ""
 
 msgid "  -L                      Send requests using content-length."
 msgstr ""
-"  -L                      Send Anfragen unter Benutzung der Content-length "
+"  -L                      Sende Anfragen unter Benutzung der Content-length "
 "Headers."
 
 msgid ""
@@ -1102,7 +1102,7 @@ msgstr "  -m                      Verwende den ModellNamen als Dateinamen."
 msgid ""
 "  -m mime/type            Set output MIME type (otherwise application/pdf)."
 msgstr ""
-"  -m mime/type            Legt den MIME-typ der Ausgabe fest (sonst "
+"  -m mime/type            Legt den MIME-Typ der Ausgabe fest (sonst "
 "application/pdf)."
 
 msgid "  -n copies               Set number of copies."
@@ -4396,7 +4396,7 @@ msgid "There are too many subscriptions."
 msgstr "Es gibt zu viele Subskriptionen."
 
 msgid "There was an unrecoverable USB error."
-msgstr "Ein nicht zu behebenden USB Fehler ist aufgetreten."
+msgstr "Ein nicht zu behebender USB Fehler ist aufgetreten."
 
 msgid "Thermal Transfer Media"
 msgstr "Thermotransferpapier"
@@ -4568,7 +4568,7 @@ msgid "Unable to create server credentials."
 msgstr "Die Server-Anmeldedaten können nicht erzeugt werden."
 
 msgid "Unable to create temporary file"
-msgstr "Temporäre Datei konntenicht erstellt werden"
+msgstr "Temporäre Datei konnte nicht erstellt werden"
 
 msgid "Unable to delete class"
 msgstr "Die Klasse konnte nicht gelöscht werden"
@@ -4593,7 +4593,7 @@ msgstr ""
 "gültig)."
 
 msgid "Unable to establish a secure connection to host (expired certificate)."
-msgstr "Sichere Verbindung zu Host nicht möglich (Zertifikats abgelaufen)."
+msgstr "Sichere Verbindung zu Host nicht möglich (Zertifikate abgelaufen)."
 
 msgid "Unable to establish a secure connection to host (host name mismatch)."
 msgstr "Sichere Verbindung zu Host nicht möglich (Hostname passt nicht)."
@@ -4668,7 +4668,7 @@ msgid "Unable to locate printer \"%s\"."
 msgstr "Der Drucker »%s« kann nicht lokalisiert werden"
 
 msgid "Unable to locate printer."
-msgstr "Der Drucker kann nicht lokalisiet werden"
+msgstr "Der Drucker kann nicht lokalisiert werden"
 
 msgid "Unable to modify class"
 msgstr "Klasse konnte nicht verändert werden:"
@@ -4746,7 +4746,7 @@ msgid "Unable to upload cupsd.conf file"
 msgstr "Die Datei „cupsd.conf“ kann nicht hochgeladen werden:"
 
 msgid "Unable to use legacy USB class driver."
-msgstr "Der alte USB-KlassenTreiber kann nicht verwendet werden."
+msgstr "Der alte USB-Klassentreiber kann nicht verwendet werden."
 
 msgid "Unable to write print data"
 msgstr "Kann Druckdaten nicht schreiben"
