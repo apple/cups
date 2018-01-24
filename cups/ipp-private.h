@@ -68,9 +68,6 @@ struct _ipp_vars_s			/**** Variables ****/
 		portstr[32],		/* Port number string */
 		resource[1024];		/* Resource path from URI */
   int 		port;			/* Port number from URI */
-  http_encryption_t encryption;		/* Encryption for connection? */
-  double	timeout;		/* Timeout for connection */
-  int		family;			/* Address family */
   int		num_vars;		/* Number of variables */
   cups_option_t	*vars;			/* Array of variables */
   int		password_tries;		/* Number of retries for password */

@@ -1,10 +1,11 @@
 /*
  * ipptool command for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -96,51 +97,70 @@ typedef struct _cups_status_s		/**** Status info ****/
 		repeat_no_match;	/* Repeat the test when it matches */
 } _cups_status_t;
 
-typedef struct _cups_var_s		/**** Variable ****/
+typedef struct _cups_testdata_s		/**** Test Data ****/
 {
-  char		*name,			/* Name of variable */
-		*value;			/* Value of variable */
-} _cups_var_t;
-
-typedef struct _cups_vars_s		/**** Set of variables ****/
-{
-  char		*uri,			/* URI for printer */
-		*filename,		/* Filename */
-		scheme[64],		/* Scheme from URI */
-		userpass[256],		/* Username/password from URI */
-		hostname[256],		/* Hostname from URI */
-		resource[1024];		/* Resource path from URI */
-  int 		port;			/* Port number from URI */
-  http_encryption_t encryption;		/* Encryption for connection? */
-  double	timeout;		/* Timeout for connection */
+  /* Global Options */
+  http_encryption_t encryption;		/* Encryption for connection */
   int		family;			/* Address family */
-  cups_array_t	*vars;			/* Array of variables */
-} _cups_vars_t;
+  _cups_output_t output;		/* Output mode */
+  int		stop_after_include_error;
+					/* Stop after include errors? */
+  double	timeout;		/* Timeout for connection */
+  int		validate_headers,	/* Validate HTTP headers in response? */
+                verbosity;		/* Show all attributes? */
+
+  /* Test Defaults */
+  int		def_ignore_errors;	/* Default IGNORE-ERRORS value */
+  _cups_transfer_t def_transfer;	/* Default TRANSFER value */
+  int		def_version;		/* Default IPP version */
+
+  /* Global State */
+  http_t	*http;			/* HTTP connection to printer/server */
+  cups_file_t	*outfile;		/* Output file */
+  int		show_header,		/* Show the test header? */
+		xml_header;		/* 1 if XML plist header was written */
+  int		test_count,		/* Number of tests (total) */
+		pass_count,		/* Number of tests that passed */
+		fail_count,		/* Number of tests that failed */
+		skip_count;		/* Number of tests that were skipped */
+
+  /* Per-Test State */
+  cups_array_t	*errors;		/* Errors array */
+  int		pass,			/* Did we pass the current test? */
+		prev_pass,		/* Did we pass the previous test? */
+		skip_previous,		/* Skip on previous test failure? */
+		repeat_test;		/* Repeat a test? */
+  char		compression[16];	/* COMPRESSION value */
+  useconds_t	delay;                  /* Initial delay */
+  int		num_displayed;		/* Number of displayed attributes */
+  char		*displayed[200];	/* Displayed attributes */
+  int		num_expects;		/* Number of expected attributes */
+  _cups_expect_t expects[200],		/* Expected attributes */
+		*expect,		/* Current expected attribute */
+		*last_expect;		/* Last EXPECT (for predicates) */
+  char		file_id[1024],		/* File identifier */
+		filename[1024];		/* Data filename */
+  int		ignore_errors;		/* Ignore test failures? */
+  char		name[1024];		/* Test name */
+  int	        repeat_count;		/* Repeat count */
+  useconds_t	repeat_interval;	/* Repeat interval (delay) */
+  int		request_id;		/* Current request ID */
+  char		resource[512];		/* Resource for request */
+  int		skip_test,		/* Skip this test? */
+		num_statuses;		/* Number of valid status codes */
+  _cups_status_t statuses[100],		/* Valid status codes */
+		*last_status;		/* Last STATUS (for predicates) */
+  char		test_id[1024];		/* Test identifier */
+  _cups_transfer_t transfer;		/* To chunk or not to chunk */
+  int		version;		/* IPP version number to use */
+} _cups_testdata_t;
 
 
 /*
  * Globals...
  */
 
-static _cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
-					/* How to transfer requests */
-static _cups_output_t	Output = _CUPS_OUTPUT_LIST;
-					/* Output mode */
-static int	Cancel = 0,		/* Cancel test? */
-		IgnoreErrors = 0,	/* Ignore errors? */
-		StopAfterIncludeError = 0,
-					/* Stop after include errors? */
-		ValidateHeaders = 0,    /* Validate HTTP headers in response? */
-                Verbosity = 0,          /* Show all attributes? */
-		Version = 11,		/* Default IPP version */
-		XMLHeader = 0,		/* 1 if header is written */
-		TestCount = 0,		/* Number of tests run */
-		PassCount = 0,		/* Number of passing tests */
-		FailCount = 0,		/* Number of failing tests */
-		SkipCount = 0;		/* Number of skipped tests */
-static char	*Username = NULL,	/* Username from URI */
-		*Password = NULL;	/* Password from URI */
-static int	PasswordTries = 0;	/* Number of tries with password */
+static int	Cancel = 0;		/* Cancel test? */
 
 
 /*
@@ -149,32 +169,29 @@ static int	PasswordTries = 0;	/* Number of tries with password */
 
 static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static int      compare_uris(const char *a, const char *b);
-static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
-static int	do_tests(cups_file_t *outfile, _cups_vars_t *vars, const char *testfile);
-static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
+static int	do_test(_cups_testdata_t *data, _ipp_vars_t *vars, _ipp_file_t *f);
+static int	do_tests(_cups_testdata_t *data, _ipp_vars_t *vars, const char *testfile);
+static int	error_cb(_ipp_file_t *f, _cups_testdata_t *data, const char *error);
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
-static ipp_t	*get_collection(cups_file_t *outfile, _cups_vars_t *vars, cups_file_t *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src, size_t dstsize);
 static const char *get_string(ipp_attribute_t *attr, int element, int flags, char *buffer, size_t bufsize);
-static char	*get_token(cups_file_t *fp, char *buf, int buflen, int *linenum);
-static char	*get_variable(_cups_vars_t *vars, const char *name);
+static void	init_data(_cups_testdata_t *data);
 static char	*iso_date(const ipp_uchar_t *date);
-static const char *password_cb(const char *prompt);
 static void	pause_message(const char *message);
-static void	print_attr(cups_file_t *outfile, int format, ipp_attribute_t *attr, ipp_tag_t *group);
-static void	print_csv(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
-static void	print_fatal_error(cups_file_t *outfile, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
-static void	print_ippserver_attr(cups_file_t *outfile, ipp_attribute_t *attr, int indent);
-static void	print_ippserver_string(cups_file_t *outfile, const char *s, size_t len);
-static void	print_line(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
-static void	print_xml_header(cups_file_t *outfile);
-static void	print_xml_string(cups_file_t *outfile, const char *element, const char *s);
-static void	print_xml_trailer(cups_file_t *outfile, int success, const char *message);
-static void	set_variable(cups_file_t *outfile, _cups_vars_t *vars, const char *name, const char *value);
+static void	print_attr(_cups_testdata_t *data, ipp_attribute_t *attr, ipp_tag_t *group);
+static void	print_csv(_cups_testdata_t *data, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
+static void	print_fatal_error(_cups_testdata_t *data, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_ippserver_attr(_cups_testdata_t *data, ipp_attribute_t *attr, int indent);
+static void	print_ippserver_string(_cups_testdata_t *data, const char *s, size_t len);
+static void	print_line(_cups_testdata_t *data, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
+static void	print_xml_header(_cups_testdata_t *data);
+static void	print_xml_string(_cups_testdata_t *data, const char *element, const char *s);
+static void	print_xml_trailer(_cups_testdata_t *data, int success, const char *message);
 #ifndef WIN32
 static void	sigterm_handler(int sig);
 #endif /* WIN32 */
 static int	timeout_cb(http_t *http, void *user_data);
+static int	token_cb(_ipp_file_t *f, _ipp_vars_t *vars, _cups_testdata_t *data, const char *token);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(cups_file_t *outfile, cups_array_t *errors, ipp_attribute_t *attr);
 static const char *with_flags_string(int flags);
@@ -192,8 +209,6 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int			i;		/* Looping var */
   int			status;		/* Status of tests... */
-  cups_file_t		*outfile = cupsFileStdout();
-                                        /* Output file */
   char			*opt,		/* Current option */
 			name[1024],	/* Name/value buffer */
 			*value,		/* Pointer to value */
@@ -204,7 +219,8 @@ main(int  argc,				/* I - Number of command-line args */
 			*testfile;	/* Test file to use */
   int			interval,	/* Test interval in microseconds */
 			repeat;		/* Repeat count */
-  _cups_vars_t		vars;		/* Variables */
+  _cups_testdata_t	data;		/* Test data */
+  _ipp_vars_t		vars;		/* Variables */
   http_uri_status_t	uri_status;	/* URI separation status */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
@@ -225,9 +241,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   _cupsSetLocale(argv);
 
-  memset(&vars, 0, sizeof(vars));
-  vars.family = AF_UNSPEC;
-  vars.vars   = cupsArrayNew((cups_array_func_t)compare_vars, NULL);
+  init_data(&data);
+
+  _ippVarsInit(&vars);
 
  /*
   * We need at least:
@@ -256,16 +272,16 @@ main(int  argc,				/* I - Number of command-line args */
 	usage();
       }
 
-      if (outfile != cupsFileStdout())
+      if (data.outfile != cupsFileStdout())
 	usage();
 
-      if ((outfile = cupsFileOpen(argv[i], "w")) == NULL)
+      if ((data.outfile = cupsFileOpen(argv[i], "w")) == NULL)
       {
 	_cupsLangPrintf(stderr, _("%s: Unable to open \"%s\": %s"), "ipptool", argv[i], strerror(errno));
 	exit(1);
       }
 
-      Output = _CUPS_OUTPUT_IPPSERVER;
+      data.output = _CUPS_OUTPUT_IPPSERVER;
     }
     else if (!strcmp(argv[i], "--stop-after-include-error"))
     {
@@ -283,12 +299,12 @@ main(int  argc,				/* I - Number of command-line args */
         switch (*opt)
         {
 	  case '4' : /* Connect using IPv4 only */
-	      vars.family = AF_INET;
+	      data.family = AF_INET;
 	      break;
 
 #ifdef AF_INET6
 	  case '6' : /* Connect using IPv6 only */
-	      vars.family = AF_INET6;
+	      data.family = AF_INET6;
 	      break;
 #endif /* AF_INET6 */
 
@@ -298,7 +314,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'E' : /* Encrypt with TLS */
 #ifdef HAVE_SSL
-	      vars.encryption = HTTP_ENCRYPT_REQUIRED;
+	      data.encryption = HTTP_ENCRYPT_REQUIRED;
 #else
 	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 			      argv[0]);
@@ -322,16 +338,16 @@ main(int  argc,				/* I - Number of command-line args */
 		usage();
               }
 
-              if (outfile != cupsFileStdout())
+              if (data.outfile != cupsFileStdout())
                 usage();
 
-              if ((outfile = cupsFileOpen(argv[i], "w")) == NULL)
+              if ((data.outfile = cupsFileOpen(argv[i], "w")) == NULL)
               {
                 _cupsLangPrintf(stderr, _("%s: Unable to open \"%s\": %s"), "ipptool", argv[i], strerror(errno));
                 exit(1);
               }
 
-	      Output = _CUPS_OUTPUT_PLIST;
+	      data.output = _CUPS_OUTPUT_PLIST;
 
               if (interval || repeat)
 	      {
@@ -342,7 +358,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'S' : /* Encrypt with SSL */
 #ifdef HAVE_SSL
-	      vars.encryption = HTTP_ENCRYPT_ALWAYS;
+	      data.encryption = HTTP_ENCRYPT_ALWAYS;
 #else
 	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 			      argv[0]);
@@ -360,7 +376,7 @@ main(int  argc,				/* I - Number of command-line args */
 		usage();
               }
 
-	      vars.timeout = _cupsStrScand(argv[i], NULL, localeconv());
+	      data.timeout = _cupsStrScand(argv[i], NULL, localeconv());
 	      break;
 
 	  case 'V' : /* Set IPP version */
@@ -394,7 +410,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'X' : /* Produce XML output */
-	      Output = _CUPS_OUTPUT_PLIST;
+	      data.output = _CUPS_OUTPUT_PLIST;
 
               if (interval || repeat)
 	      {
@@ -404,7 +420,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'c' : /* CSV output */
-              Output = _CUPS_OUTPUT_CSV;
+              data.output = _CUPS_OUTPUT_CSV;
               break;
 
           case 'd' : /* Define a variable */
@@ -423,7 +439,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      else
 	        value = name + strlen(name);
 
-	      set_variable(outfile, &vars, name, value);
+	      _ippVarsSet(&vars, name, value);
 	      break;
 
           case 'f' : /* Set the default test filename */
@@ -436,10 +452,10 @@ main(int  argc,				/* I - Number of command-line args */
 		usage();
               }
 
-              if (vars.filename)
+              if (data.filename)
               {
-		free(vars.filename);
-		vars.filename = NULL;
+		free(data.filename);
+		data.filename = NULL;
 	      }
 
               if (access(argv[i], 0))
@@ -462,63 +478,63 @@ main(int  argc,				/* I - Number of command-line args */
 		    snprintf(filename, sizeof(filename), "%s/ipptool/%s.gz",
 			     cg->cups_datadir, argv[i]);
 		    if (access(filename, 0))
-		      vars.filename = strdup(argv[i]);
+		      data.filename = strdup(argv[i]);
 		    else
-		      vars.filename = strdup(filename);
+		      data.filename = strdup(filename);
 		  }
 		  else
-		    vars.filename = strdup(filename);
+		    data.filename = strdup(filename);
 		}
 		else
-		  vars.filename = strdup(filename);
+		  data.filename = strdup(filename);
 	      }
               else
-		vars.filename = strdup(argv[i]);
+		data.filename = strdup(argv[i]);
 
-              if ((ext = strrchr(vars.filename, '.')) != NULL)
+              if ((ext = strrchr(data.filename, '.')) != NULL)
               {
                /*
                 * Guess the MIME media type based on the extension...
                 */
 
                 if (!_cups_strcasecmp(ext, ".gif"))
-                  set_variable(outfile, &vars, "filetype", "image/gif");
+                  _ippVarsSet(&vars, "filetype", "image/gif");
                 else if (!_cups_strcasecmp(ext, ".htm") ||
                          !_cups_strcasecmp(ext, ".htm.gz") ||
                          !_cups_strcasecmp(ext, ".html") ||
                          !_cups_strcasecmp(ext, ".html.gz"))
-                  set_variable(outfile, &vars, "filetype", "text/html");
+                  _ippVarsSet(&vars, "filetype", "text/html");
                 else if (!_cups_strcasecmp(ext, ".jpg") ||
                          !_cups_strcasecmp(ext, ".jpeg"))
-                  set_variable(outfile, &vars, "filetype", "image/jpeg");
+                  _ippVarsSet(&vars, "filetype", "image/jpeg");
                 else if (!_cups_strcasecmp(ext, ".pcl") ||
                          !_cups_strcasecmp(ext, ".pcl.gz"))
-                  set_variable(outfile, &vars, "filetype", "application/vnd.hp-PCL");
+                  _ippVarsSet(&vars, "filetype", "application/vnd.hp-PCL");
                 else if (!_cups_strcasecmp(ext, ".pdf"))
-                  set_variable(outfile, &vars, "filetype", "application/pdf");
+                  _ippVarsSet(&vars, "filetype", "application/pdf");
                 else if (!_cups_strcasecmp(ext, ".png"))
-                  set_variable(outfile, &vars, "filetype", "image/png");
+                  _ippVarsSet(&vars, "filetype", "image/png");
                 else if (!_cups_strcasecmp(ext, ".ps") ||
                          !_cups_strcasecmp(ext, ".ps.gz"))
-                  set_variable(outfile, &vars, "filetype", "application/postscript");
+                  _ippVarsSet(&vars, "filetype", "application/postscript");
                 else if (!_cups_strcasecmp(ext, ".pwg") ||
                          !_cups_strcasecmp(ext, ".pwg.gz") ||
                          !_cups_strcasecmp(ext, ".ras") ||
                          !_cups_strcasecmp(ext, ".ras.gz"))
-                  set_variable(outfile, &vars, "filetype", "image/pwg-raster");
+                  _ippVarsSet(&vars, "filetype", "image/pwg-raster");
                 else if (!_cups_strcasecmp(ext, ".tif") ||
                          !_cups_strcasecmp(ext, ".tiff"))
-                  set_variable(outfile, &vars, "filetype", "image/tiff");
+                  _ippVarsSet(&vars, "filetype", "image/tiff");
                 else if (!_cups_strcasecmp(ext, ".txt") ||
                          !_cups_strcasecmp(ext, ".txt.gz"))
-                  set_variable(outfile, &vars, "filetype", "text/plain");
+                  _ippVarsSet(&vars, "filetype", "text/plain");
                 else if (!_cups_strcasecmp(ext, ".urf") ||
                          !_cups_strcasecmp(ext, ".urf.gz"))
-                  set_variable(outfile, &vars, "filetype", "image/urf");
+                  _ippVarsSet(&vars, "filetype", "image/urf");
                 else if (!_cups_strcasecmp(ext, ".xps"))
-                  set_variable(outfile, &vars, "filetype", "application/openxps");
+                  _ippVarsSet(&vars, "filetype", "application/openxps");
                 else
-		  set_variable(outfile, &vars, "filetype", "application/octet-stream");
+		  _ippVarsSet(&vars, "filetype", "application/octet-stream");
               }
               else
               {
@@ -526,7 +542,7 @@ main(int  argc,				/* I - Number of command-line args */
                 * Use the "auto-type" MIME media type...
                 */
 
-		set_variable(outfile, &vars, "filetype", "application/octet-stream");
+		_ippVarsSet(&vars, "filetype", "application/octet-stream");
               }
 	      break;
 
@@ -555,7 +571,7 @@ main(int  argc,				/* I - Number of command-line args */
 		}
               }
 
-              if ((Output == _CUPS_OUTPUT_PLIST || Output == _CUPS_OUTPUT_IPPSERVER) && interval)
+              if ((data.output == _CUPS_OUTPUT_PLIST || data.output == _CUPS_OUTPUT_IPPSERVER) && interval)
 	      {
 	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"."));
 		usage();
@@ -563,7 +579,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'l' : /* List as a table */
-              Output = _CUPS_OUTPUT_LIST;
+              data.output = _CUPS_OUTPUT_LIST;
               break;
 
           case 'n' : /* Repeat count */
@@ -578,7 +594,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      else
 		repeat = atoi(argv[i]);
 
-              if ((Output == _CUPS_OUTPUT_PLIST || Output == _CUPS_OUTPUT_IPPSERVER) && repeat)
+              if ((data.output == _CUPS_OUTPUT_PLIST || data.output == _CUPS_OUTPUT_IPPSERVER) && repeat)
 	      {
 	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"."));
 		usage();
@@ -586,11 +602,11 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'q' : /* Be quiet */
-              Output = _CUPS_OUTPUT_QUIET;
+              data.output = _CUPS_OUTPUT_QUIET;
               break;
 
           case 't' : /* CUPS test output */
-              Output = _CUPS_OUTPUT_TEST;
+              data.output = _CUPS_OUTPUT_TEST;
               break;
 
           case 'v' : /* Be verbose */
@@ -598,16 +614,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 	  default :
-	      _cupsLangPrintf(stderr, _("ipptool: Unknown option \"-%c\"."),
-	                      *opt);
+	      _cupsLangPrintf(stderr, _("%s: Unknown option \"-%c\"."), "ipptool", *opt);
 	      usage();
 	}
       }
     }
     else if (!strncmp(argv[i], "ipp://", 6) || !strncmp(argv[i], "http://", 7)
 #ifdef HAVE_SSL
-	     || !strncmp(argv[i], "ipps://", 7)
-	     || !strncmp(argv[i], "https://", 8)
+	     || !strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8)
 #endif /* HAVE_SSL */
 	     )
     {
@@ -623,36 +637,17 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_SSL
       if (!strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8))
-        vars.encryption = HTTP_ENCRYPT_ALWAYS;
+        data.encryption = HTTP_ENCRYPT_ALWAYS;
 #endif /* HAVE_SSL */
 
-      vars.uri   = argv[i];
-      uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, vars.uri,
-                                   vars.scheme, sizeof(vars.scheme),
-                                   vars.userpass, sizeof(vars.userpass),
-				   vars.hostname, sizeof(vars.hostname),
-				   &(vars.port),
-				   vars.resource, sizeof(vars.resource));
-
-      if (uri_status != HTTP_URI_OK)
+      if (!_ippVarsSet(&vars, "uri", argv[i]))
       {
-        _cupsLangPrintf(stderr, _("ipptool: Bad URI - %s."), httpURIStatusString(uri_status));
+        _cupsLangPrintf(stderr, _("ipptool: Bad URI \"%s\"."), argv[i]);
         return (1);
       }
 
-      if (vars.userpass[0])
-      {
-        if ((Password = strchr(vars.userpass, ':')) != NULL)
-	  *Password++ = '\0';
-
-        Username = vars.userpass;
-	cupsSetPasswordCB(password_cb);
-	set_variable(outfile, &vars, "uriuser", vars.userpass);
-      }
-
-      httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), vars.scheme, NULL,
-                      vars.hostname, vars.port, vars.resource);
-      vars.uri = uri;
+      if (vars.username[0] && vars.password)
+	cupsSetPasswordCB2(_ippVarsPasswordCB, &vars);
     }
     else
     {
@@ -683,7 +678,7 @@ main(int  argc,				/* I - Number of command-line args */
       else
         testfile = argv[i];
 
-      if (!do_tests(outfile, &vars, testfile))
+      if (!do_tests(&data, &vars, testfile))
         status = 1;
     }
   }
@@ -695,14 +690,14 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop if the interval is set...
   */
 
-  if (Output == _CUPS_OUTPUT_PLIST)
-    print_xml_trailer(outfile, !status, NULL);
+  if (data.output == _CUPS_OUTPUT_PLIST)
+    print_xml_trailer(data->outfile, !status, NULL);
   else if (interval > 0 && repeat > 0)
   {
     while (repeat > 1)
     {
       usleep((useconds_t)interval);
-      do_tests(outfile, &vars, testfile);
+      do_tests(data->outfile, &vars, testfile);
       repeat --;
     }
   }
@@ -711,7 +706,7 @@ main(int  argc,				/* I - Number of command-line args */
     for (;;)
     {
       usleep((useconds_t)interval);
-      do_tests(outfile, &vars, testfile);
+      do_tests(data->outfile, &vars, testfile);
     }
   }
 
@@ -724,7 +719,7 @@ main(int  argc,				/* I - Number of command-line args */
     cupsFilePrintf(cupsFileStdout(), "\nSummary: %d tests, %d passed, %d failed, %d skipped\nScore: %d%%\n", TestCount, PassCount, FailCount, SkipCount, 100 * (PassCount + SkipCount) / TestCount);
   }
 
-  cupsFileClose(outfile);
+  cupsFileClose(data->outfile);
 
 /*
   * Exit...
@@ -836,14 +831,15 @@ compare_uris(const char *a,             /* I - First URI */
 
 
 /*
- * 'compare_vars()' - Compare two variables.
+ * 'do_test()' - Do a single test from the test file.
  */
 
-static int				/* O - Result of comparison */
-compare_vars(_cups_var_t *a,		/* I - First variable */
-             _cups_var_t *b)		/* I - Second variable */
+static int				/* O - 1 on success, 0 on failure */
+do_test(_cups_testdata_t *data,		/* I - Test data */
+        _ipp_vars_t      *vars,		/* I - IPP variables */
+        _ipp_file_t      *f)		/* I - IPP data file */
 {
-  return (_cups_strcasecmp(a->name, b->name));
+  return (0);
 }
 
 
@@ -851,10 +847,10 @@ compare_vars(_cups_var_t *a,		/* I - First variable */
  * 'do_tests()' - Do tests as specified in the test file.
  */
 
-static int				/* 1 = success, 0 = failure */
-do_tests(cups_file_t  *outfile,		/* I - Output file */
-         _cups_vars_t *vars,		/* I - Variables */
-         const char   *testfile)	/* I - Test file to use */
+static int				/* O - 1 on success, 0 on failure */
+do_tests(_cups_testdata_t *data,	/* I - Test data */
+         _cups_vars_t     *vars,	/* I - Variables */
+         const char       *testfile)	/* I - Test file to use */
 {
   int		i,			/* Looping var */
 		linenum,		/* Current line number */
@@ -918,7 +914,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
   if ((fp = cupsFileOpen(testfile, "r")) == NULL)
   {
-    print_fatal_error(outfile, "Unable to open test file %s - %s", testfile,
+    print_fatal_error(data, "Unable to open test file %s - %s", testfile,
                       strerror(errno));
     pass = 0;
     goto test_exit;
@@ -931,7 +927,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
   if ((http = httpConnect2(vars->hostname, vars->port, NULL, vars->family,
                            vars->encryption, 1, 30000, NULL)) == NULL)
   {
-    print_fatal_error(outfile, "Unable to connect to %s on port %d - %s", vars->hostname,
+    print_fatal_error(data, "Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, cupsLastErrorString());
     pass = 0;
     goto test_exit;
@@ -972,15 +968,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * DEFINE name value
       */
 
-      if (get_token(fp, attr, sizeof(attr), &linenum) &&
-          get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, name, sizeof(name)) &&
+          _ippFileReadToken(f, temp, sizeof(temp)))
       {
-        expand_variables(vars, token, temp, sizeof(token));
-	set_variable(outfile, vars, attr, token);
+        _ippVarsExpand(vars, token, temp, sizeof(token));
+	_ippVarsSet(vars, attr, token);
       }
       else
       {
-        print_fatal_error(outfile, "Missing DEFINE name and/or value on line %d.",
+        print_fatal_error(data, "Missing DEFINE name and/or value on line %d of \"%s\".",
 	                  linenum);
 	pass = 0;
 	goto test_exit;
@@ -994,17 +990,17 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * DEFINE-DEFAULT name value
       */
 
-      if (get_token(fp, attr, sizeof(attr), &linenum) &&
-          get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, name, sizeof(name)) &&
+          _ippFileReadToken(f, temp, sizeof(temp)))
       {
-        expand_variables(vars, token, temp, sizeof(token));
-	if (!get_variable(vars, attr))
-	  set_variable(outfile, vars, attr, token);
+        _ippVarsExpand(vars, token, temp, sizeof(token));
+	if (!_ippVarsGet(vars, attr))
+	  _ippVarsSet(vars, attr, token);
       }
       else
       {
-        print_fatal_error(outfile, "Missing DEFINE-DEFAULT name and/or value on line "
-	                  "%d.", linenum);
+        print_fatal_error(data, "Missing DEFINE-DEFAULT name and/or value on line "
+	                  "%d.", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1017,13 +1013,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * FILE-ID "string"
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-        expand_variables(vars, file_id, temp, sizeof(file_id));
+        _ippVarsExpand(vars, file_id, temp, sizeof(file_id));
       }
       else
       {
-        print_fatal_error(outfile, "Missing FILE-ID value on line %d.", linenum);
+        print_fatal_error(data, "Missing FILE-ID value on line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1037,14 +1033,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * IGNORE-ERRORS no
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum) &&
+      if (_ippFileReadToken(f, temp, sizeof(temp)) &&
           (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
       {
         IgnoreErrors = !_cups_strcasecmp(temp, "yes");
       }
       else
       {
-        print_fatal_error(outfile, "Missing IGNORE-ERRORS value on line %d.", linenum);
+        print_fatal_error(data, "Missing IGNORE-ERRORS value on line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1058,13 +1054,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * INCLUDE <filename>
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
        /*
         * Map the filename to and then run the tests...
 	*/
 
-        if (!do_tests(outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
+        if (!do_tests(data->outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
 	{
 	  pass = 0;
 
@@ -1074,7 +1070,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
       else
       {
-        print_fatal_error(outfile, "Missing INCLUDE filename on line %d.", linenum);
+        print_fatal_error(data, "Missing INCLUDE filename on line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1089,15 +1085,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * INCLUDE-IF-DEFINED name <filename>
       */
 
-      if (get_token(fp, attr, sizeof(attr), &linenum) &&
-          get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, name, sizeof(name)) &&
+          _ippFileReadToken(f, temp, sizeof(temp)))
       {
        /*
         * Map the filename to and then run the tests...
 	*/
 
-        if (get_variable(vars, attr) &&
-	    !do_tests(outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
+        if (_ippVarsGet(vars, attr) &&
+	    !do_tests(data->outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
 	{
 	  pass = 0;
 
@@ -1107,8 +1103,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
       else
       {
-        print_fatal_error(outfile, "Missing INCLUDE-IF-DEFINED name or filename on line "
-	                  "%d.", linenum);
+        print_fatal_error(data, "Missing INCLUDE-IF-DEFINED name or filename on line "
+	                  "%d.", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1123,15 +1119,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * INCLUDE-IF-NOT-DEFINED name <filename>
       */
 
-      if (get_token(fp, attr, sizeof(attr), &linenum) &&
-          get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, name, sizeof(name)) &&
+          _ippFileReadToken(f, temp, sizeof(temp)))
       {
        /*
         * Map the filename to and then run the tests...
 	*/
 
-        if (!get_variable(vars, attr) &&
-	    !do_tests(outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
+        if (!_ippVarsGet(vars, attr) &&
+	    !do_tests(data->outfile, vars, get_filename(testfile, filename, temp, sizeof(filename))))
 	{
 	  pass = 0;
 
@@ -1141,8 +1137,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
       else
       {
-        print_fatal_error(outfile, "Missing INCLUDE-IF-NOT-DEFINED name or filename on "
-	                  "line %d.", linenum);
+        print_fatal_error(data, "Missing INCLUDE-IF-NOT-DEFINED name or filename on "
+	                  "line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1156,14 +1152,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * SKIP-IF-DEFINED variable
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-        if (get_variable(vars, temp))
+        if (_ippVarsGet(vars, temp))
 	  goto test_exit;
       }
       else
       {
-        print_fatal_error(outfile, "Missing SKIP-IF-DEFINED variable on line %d.",
+        print_fatal_error(data, "Missing SKIP-IF-DEFINED variable on line %d of \"%s\".",
 	                  linenum);
 	pass = 0;
 	goto test_exit;
@@ -1175,14 +1171,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * SKIP-IF-NOT-DEFINED variable
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-        if (!get_variable(vars, temp))
+        if (!_ippVarsGet(vars, temp))
 	  goto test_exit;
       }
       else
       {
-        print_fatal_error(outfile, "Missing SKIP-IF-NOT-DEFINED variable on line %d.",
+        print_fatal_error(data, "Missing SKIP-IF-NOT-DEFINED variable on line %d of \"%s\".",
 	                  linenum);
 	pass = 0;
 	goto test_exit;
@@ -1195,14 +1191,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * STOP-AFTER-INCLUDE-ERROR no
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum) &&
+      if (_ippFileReadToken(f, temp, sizeof(temp)) &&
           (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
       {
         StopAfterIncludeError = !_cups_strcasecmp(temp, "yes");
       }
       else
       {
-        print_fatal_error(outfile, "Missing STOP-AFTER-INCLUDE-ERROR value on line %d.",
+        print_fatal_error(data, "Missing STOP-AFTER-INCLUDE-ERROR value on line %d of \"%s\".",
                           linenum);
 	pass = 0;
 	goto test_exit;
@@ -1218,7 +1214,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       * TRANSFER length
       */
 
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
         if (!strcmp(temp, "auto"))
 	  Transfer = _CUPS_TRANSFER_AUTO;
@@ -1228,7 +1224,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  Transfer = _CUPS_TRANSFER_LENGTH;
 	else
 	{
-	  print_fatal_error(outfile, "Bad TRANSFER value \"%s\" on line %d.", temp,
+	  print_fatal_error(data, "Bad TRANSFER value \"%s\" on line %d of \"%s\".", temp,
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1236,7 +1232,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
       else
       {
-        print_fatal_error(outfile, "Missing TRANSFER value on line %d.", linenum);
+        print_fatal_error(data, "Missing TRANSFER value on line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1245,7 +1241,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     }
     else if (!strcmp(token, "VERSION"))
     {
-      if (get_token(fp, temp, sizeof(temp), &linenum))
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
         if (!strcmp(temp, "1.0"))
 	  Version = 10;
@@ -1259,14 +1255,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  Version = 22;
 	else
 	{
-	  print_fatal_error(outfile, "Bad VERSION \"%s\" on line %d.", temp, linenum);
+	  print_fatal_error(data, "Bad VERSION \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
       }
       else
       {
-        print_fatal_error(outfile, "Missing VERSION number on line %d.", linenum);
+        print_fatal_error(data, "Missing VERSION number on line %d of \"%s\".", f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -1275,7 +1271,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     }
     else if (strcmp(token, "{"))
     {
-      print_fatal_error(outfile, "Unexpected token %s seen on line %d.", token, linenum);
+      print_fatal_error(data, "Unexpected token %s seen on line %d of \"%s\".", token, f->linenum, f->filename);
       pass = 0;
       goto test_exit;
     }
@@ -1287,7 +1283,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     if (show_header)
     {
       if (Output == _CUPS_OUTPUT_PLIST)
-	print_xml_header(outfile);
+	print_xml_header(data->outfile);
       if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
 	cupsFilePrintf(cupsFileStdout(), "\"%s\":\n", testfile);
 
@@ -1364,7 +1360,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* Another collection value
 	*/
 
-	ipp_t	*col = get_collection(outfile, vars, fp, &linenum);
+	ipp_t	*col = get_collection(data->outfile, vars, fp, &linenum);
 					/* Collection value */
 
 	if (col)
@@ -1385,9 +1381,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* COMPRESSION gzip
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  expand_variables(vars, compression, temp, sizeof(compression));
+	  _ippVarsExpand(vars, compression, temp, sizeof(compression));
 #ifdef HAVE_LIBZ
 	  if (strcmp(compression, "none") && strcmp(compression, "deflate") &&
 	      strcmp(compression, "gzip"))
@@ -1395,8 +1391,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  if (strcmp(compression, "none"))
 #endif /* HAVE_LIBZ */
           {
-	    print_fatal_error(outfile, "Unsupported COMPRESSION value '%s' on line %d.",
-	                      compression, linenum);
+	    print_fatal_error(data, "Unsupported COMPRESSION value '%s' on line %d of \"%s\".",
+	                      compression, f->linenum, f->filename);
 	    pass = 0;
 	    goto test_exit;
           }
@@ -1406,7 +1402,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing COMPRESSION value on line %d.", linenum);
+	  print_fatal_error(data, "Missing COMPRESSION value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1417,15 +1413,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* DEFINE name value
 	*/
 
-	if (get_token(fp, attr, sizeof(attr), &linenum) &&
-	    get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, name, sizeof(name)) &&
+	    _ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  expand_variables(vars, token, temp, sizeof(token));
-	  set_variable(outfile, vars, attr, token);
+	  _ippVarsExpand(vars, token, temp, sizeof(token));
+	  _ippVarsSet(vars, attr, token);
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing DEFINE name and/or value on line %d.",
+	  print_fatal_error(data, "Missing DEFINE name and/or value on line %d of \"%s\".",
 			    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1438,14 +1434,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* IGNORE-ERRORS no
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum) &&
+	if (_ippFileReadToken(f, temp, sizeof(temp)) &&
 	    (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
 	{
 	  ignore_errors = !_cups_strcasecmp(temp, "yes");
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing IGNORE-ERRORS value on line %d.", linenum);
+	  print_fatal_error(data, "Missing IGNORE-ERRORS value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1458,8 +1454,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         * Name of test...
 	*/
 
-	get_token(fp, temp, sizeof(temp), &linenum);
-	expand_variables(vars, name, temp, sizeof(name));
+	_ippFileReadToken(f, temp, sizeof(temp));
+	_ippVarsExpand(vars, name, temp, sizeof(name));
       }
       else if (!_cups_strcasecmp(token, "PAUSE"))
       {
@@ -1477,7 +1473,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* REQUEST-ID random
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
 	  if (isdigit(temp[0] & 255))
 	    request_id = atoi(temp);
@@ -1485,7 +1481,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	    request_id = (CUPS_RAND() % 1000) * 137 + 1;
 	  else
 	  {
-	    print_fatal_error(outfile, "Bad REQUEST-ID value \"%s\" on line %d.", temp,
+	    print_fatal_error(data, "Bad REQUEST-ID value \"%s\" on line %d of \"%s\".", temp,
 			      linenum);
 	    pass = 0;
 	    goto test_exit;
@@ -1493,7 +1489,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing REQUEST-ID value on line %d.", linenum);
+	  print_fatal_error(data, "Missing REQUEST-ID value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1504,14 +1500,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* SKIP-IF-DEFINED variable
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  if (get_variable(vars, temp))
+	  if (_ippVarsGet(vars, temp))
 	    skip_test = 1;
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing SKIP-IF-DEFINED value on line %d.",
+	  print_fatal_error(data, "Missing SKIP-IF-DEFINED value on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1523,9 +1519,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* SKIP-IF-MISSING filename
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  expand_variables(vars, token, temp, sizeof(token));
+	  _ippVarsExpand(vars, token, temp, sizeof(token));
 	  get_filename(testfile, filename, token, sizeof(filename));
 
 	  if (access(filename, R_OK))
@@ -1533,7 +1529,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing SKIP-IF-MISSING filename on line %d.",
+	  print_fatal_error(data, "Missing SKIP-IF-MISSING filename on line %d of \"%s\".",
 			    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1545,14 +1541,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* SKIP-IF-NOT-DEFINED variable
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  if (!get_variable(vars, temp))
+	  if (!_ippVarsGet(vars, temp))
 	    skip_test = 1;
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing SKIP-IF-NOT-DEFINED value on line %d.",
+	  print_fatal_error(data, "Missing SKIP-IF-NOT-DEFINED value on line %d of \"%s\".",
 			    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1565,14 +1561,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* SKIP-PREVIOUS-ERROR no
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum) &&
+	if (_ippFileReadToken(f, temp, sizeof(temp)) &&
 	    (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
 	{
 	  skip_previous = !_cups_strcasecmp(temp, "yes");
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing SKIP-PREVIOUS-ERROR value on line %d.", linenum);
+	  print_fatal_error(data, "Missing SKIP-PREVIOUS-ERROR value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1585,13 +1581,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* TEST-ID "string"
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  expand_variables(vars, test_id, temp, sizeof(test_id));
+	  _ippVarsExpand(vars, test_id, temp, sizeof(test_id));
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing TEST-ID value on line %d.", linenum);
+	  print_fatal_error(data, "Missing TEST-ID value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1606,7 +1602,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	* TRANSFER length
 	*/
 
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
 	  if (!strcmp(temp, "auto"))
 	    transfer = _CUPS_TRANSFER_AUTO;
@@ -1616,7 +1612,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	    transfer = _CUPS_TRANSFER_LENGTH;
 	  else
 	  {
-	    print_fatal_error(outfile, "Bad TRANSFER value \"%s\" on line %d.", temp,
+	    print_fatal_error(data, "Bad TRANSFER value \"%s\" on line %d of \"%s\".", temp,
 			      linenum);
 	    pass = 0;
 	    goto test_exit;
@@ -1624,14 +1620,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing TRANSFER value on line %d.", linenum);
+	  print_fatal_error(data, "Missing TRANSFER value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
       }
       else if (!_cups_strcasecmp(token, "VERSION"))
       {
-	if (get_token(fp, temp, sizeof(temp), &linenum))
+	if (_ippFileReadToken(f, temp, sizeof(temp)))
 	{
 	  if (!strcmp(temp, "0.0"))
 	    version = 0;
@@ -1647,16 +1643,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	    version = 22;
 	  else
 	  {
-	    print_fatal_error(outfile, "Bad VERSION \"%s\" on line %d.", temp, linenum);
-	    pass = 0;
-	    goto test_exit;
+	    print_fatal_error(data, "Bad VERSION \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	    return (0);
 	  }
 	}
 	else
 	{
-	  print_fatal_error(outfile, "Missing VERSION number on line %d.", linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Missing VERSION number on line %d of \"%s\".", f->linenum, f->filename);
+	  return (0);
 	}
       }
       else if (!_cups_strcasecmp(token, "RESOURCE"))
@@ -1665,11 +1659,10 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         * Resource name...
 	*/
 
-	if (!get_token(fp, resource, sizeof(resource), &linenum))
+	if (!get_token(fp, data->resource, sizeof(data->resource), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing RESOURCE path on line %d.", linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Missing RESOURCE path on line %d of \"%s\".", f->linenum, f->filename);
+	  return (0);
 	}
       }
       else if (!_cups_strcasecmp(token, "OPERATION"))
@@ -1678,22 +1671,20 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         * Operation...
 	*/
 
-	if (!get_token(fp, temp, sizeof(temp), &linenum))
+        ipp_op_t	op;		/* Operation code */
+
+	if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing OPERATION code on line %d.", linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Missing OPERATION code on line %d of \"%s\".", f->linenum, f->filename);
+	  return (0);
 	}
 
-	expand_variables(vars, token, temp, sizeof(token));
+	_ippVarsExpand(vars, value, temp, sizeof(value));
 
-	if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
-	    (op = (ipp_op_t)strtol(token, NULL, 0)) == 0)
+	if ((op = ippOpValue(value)) == (ipp_op_t)-1 && (op = (ipp_op_t)strtol(token, NULL, 0)) == 0)
 	{
-	  print_fatal_error(outfile, "Bad OPERATION code \"%s\" on line %d.", token,
-	                    linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Bad OPERATION code \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+	  return (0);
 	}
       }
       else if (!_cups_strcasecmp(token, "GROUP"))
@@ -1702,24 +1693,24 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         * Attribute group...
 	*/
 
-	if (!get_token(fp, token, sizeof(token), &linenum))
+        ipp_tag_t	group_tag;	/* Group tag */
+
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing GROUP tag on line %d.", linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Missing GROUP tag on line %d of \"%s\".", f->linenum, f->filename);
+	  return (0);
 	}
 
-	if ((value = ippTagValue(token)) == IPP_TAG_ZERO || value >= IPP_TAG_UNSUPPORTED_VALUE)
+	if ((group_tag = ippTagValue(token)) == IPP_TAG_ZERO || group_tag >= IPP_TAG_UNSUPPORTED_VALUE)
 	{
-	  print_fatal_error(outfile, "Bad GROUP tag \"%s\" on line %d.", token, linenum);
-	  pass = 0;
-	  goto test_exit;
+	  print_fatal_error(data, "Bad GROUP tag \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+	  return (0);
 	}
 
-	if (value == group)
-	  ippAddSeparator(request);
+	if (group_tag == f->group_tag)
+	  ippAddSeparator(f->attrs);
 
-        group = value;
+        f->group_tag = group_tag;
       }
       else if (!_cups_strcasecmp(token, "DELAY"))
       {
@@ -1729,18 +1720,18 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
         double dval;                    /* Delay value */
 
-	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing DELAY value on line %d.", linenum);
+	  print_fatal_error(data, "Missing DELAY value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
-	expand_variables(vars, token, temp, sizeof(token));
+	_ippVarsExpand(vars, token, temp, sizeof(token));
 
 	if ((dval = _cupsStrScand(token, &tokenptr, localeconv())) < 0.0 || (*tokenptr && *tokenptr != ','))
 	{
-	  print_fatal_error(outfile, "Bad DELAY value \"%s\" on line %d.", token,
+	  print_fatal_error(data, "Bad DELAY value \"%s\" on line %d of \"%s\".", token,
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1752,7 +1743,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         {
           if ((dval = _cupsStrScand(tokenptr + 1, &tokenptr, localeconv())) <= 0.0 || *tokenptr)
           {
-            print_fatal_error(outfile, "Bad DELAY value \"%s\" on line %d.", token,
+            print_fatal_error(data, "Bad DELAY value \"%s\" on line %d of \"%s\".", token,
                               linenum);
             pass = 0;
             goto test_exit;
@@ -1771,22 +1762,22 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing ATTR value tag on line %d.", linenum);
+	  print_fatal_error(data, "Missing ATTR value tag on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
 	if ((value = ippTagValue(token)) < IPP_TAG_UNSUPPORTED_VALUE)
 	{
-	  print_fatal_error(outfile, "Bad ATTR value tag \"%s\" on line %d.", token,
+	  print_fatal_error(data, "Bad ATTR value tag \"%s\" on line %d of \"%s\".", token,
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
 
-	if (!get_token(fp, attr, sizeof(attr), &linenum))
+	if (!_ippFileReadToken(f, name, sizeof(name)))
 	{
-	  print_fatal_error(outfile, "Missing ATTR name on line %d.", linenum);
+	  print_fatal_error(data, "Missing ATTR name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1799,15 +1790,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
           token[0] = '\0';
         }
-        else if (!get_token(fp, temp, sizeof(temp), &linenum))
+        else if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing ATTR value on line %d.", linenum);
+	  print_fatal_error(data, "Missing ATTR value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 	else
 	{
-          expand_variables(vars, token, temp, sizeof(token));
+          _ippVarsExpand(vars, token, temp, sizeof(token));
         }
 
         attrptr = NULL;
@@ -1825,7 +1816,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
               }
               else
               {
-                print_fatal_error(outfile, "Unsupported ATTR value tag %s for \"%s\" on line %d.", ippTagString(value), attr, linenum);
+                print_fatal_error(data, "Unsupported ATTR value tag %s for \"%s\" on line %d of \"%s\".", ippTagString(value), attr, f->linenum, f->filename);
                 pass = 0;
                 goto test_exit;
               }
@@ -1912,8 +1903,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	      if ((!token[0] || !tokenptr || *tokenptr) && !skip_test)
 	      {
-		print_fatal_error(outfile, "Bad %s value \'%s\' for \"%s\" on line %d.",
-				  ippTagString(value), token, attr, linenum);
+		print_fatal_error(data, "Bad %s value \'%s\' for \"%s\" on line %d of \"%s\".",
+				  ippTagString(value), token, attr, f->linenum, f->filename);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -1941,7 +1932,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	          if (skip_test)
 	            break;
 
-	          print_fatal_error(outfile, "Bad resolution value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
+	          print_fatal_error(data, "Bad resolution value \'%s\' for \"%s\" on line %d of \"%s\".", token, attr, f->linenum, f->filename);
 		  pass = 0;
 		  goto test_exit;
 	        }
@@ -1974,7 +1965,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	          if (skip_test)
 	            break;
 
-		  print_fatal_error(outfile, "Bad rangeOfInteger value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
+		  print_fatal_error(data, "Bad rangeOfInteger value \'%s\' for \"%s\" on line %d of \"%s\".", token, attr, f->linenum, f->filename);
 		  pass = 0;
 		  goto test_exit;
 		}
@@ -1987,7 +1978,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
           case IPP_TAG_BEGIN_COLLECTION :
 	      if (!strcmp(token, "{"))
 	      {
-	        ipp_t	*col = get_collection(outfile, vars, fp, &linenum);
+	        ipp_t	*col = get_collection(data->outfile, vars, fp, &linenum);
 					/* Collection value */
 
                 if (col)
@@ -2005,7 +1996,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		break;
 	      else
 	      {
-		print_fatal_error(outfile, "Bad ATTR collection value for \"%s\" on line %d.", attr, linenum);
+		print_fatal_error(data, "Bad ATTR collection value for \"%s\" on line %d of \"%s\".", attr, f->linenum, f->filename);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -2028,13 +2019,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 		if (!get_token(fp, token, sizeof(token), &linenum) || strcmp(token, "{"))
 		{
-		  print_fatal_error(outfile, "Unexpected \"%s\" on line %d.", token, linenum);
+		  print_fatal_error(data, "Unexpected \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
 		  pass = 0;
 		  goto test_exit;
 		  break;
 		}
 
-	        if ((col = get_collection(outfile, vars, fp, &linenum)) == NULL)
+	        if ((col = get_collection(data->outfile, vars, fp, &linenum)) == NULL)
 		  break;
 
 		ippSetCollection(request, &attrptr, ippGetCount(attrptr), col);
@@ -2093,7 +2084,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	if (!attrptr && !skip_test)
 	{
-	  print_fatal_error(outfile, "Unable to add attribute \"%s\" on line %d.", attr, linenum);
+	  print_fatal_error(data, "Unable to add attribute \"%s\" on line %d of \"%s\".", attr, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2104,21 +2095,21 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         * File...
 	*/
 
-	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing FILE filename on line %d.", linenum);
+	  print_fatal_error(data, "Missing FILE filename on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
-        expand_variables(vars, token, temp, sizeof(token));
+        _ippVarsExpand(vars, token, temp, sizeof(token));
 	get_filename(testfile, filename, token, sizeof(filename));
 
         if (access(filename, R_OK))
         {
-	  print_fatal_error(outfile, "Filename \"%s\" on line %d cannot be read.",
-	                    temp, linenum);
-	  print_fatal_error(outfile, "Filename mapped to \"%s\".", filename);
+	  print_fatal_error(data, "Filename \"%s\" on line %d cannot be read.",
+	                    temp, f->linenum, f->filename);
+	  print_fatal_error(data, "Filename mapped to \"%s\".", filename);
 	  pass = 0;
 	  goto test_exit;
         }
@@ -2131,14 +2122,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
         if (num_statuses >= (int)(sizeof(statuses) / sizeof(statuses[0])))
 	{
-	  print_fatal_error(outfile, "Too many STATUS's on line %d.", linenum);
+	  print_fatal_error(data, "Too many STATUS's on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing STATUS code on line %d.", linenum);
+	  print_fatal_error(data, "Missing STATUS code on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2147,7 +2138,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	        == (ipp_status_t)-1 &&
 	    (statuses[num_statuses].status = (ipp_status_t)strtol(token, NULL, 0)) == 0)
 	{
-	  print_fatal_error(outfile, "Bad STATUS code \"%s\" on line %d.", token,
+	  print_fatal_error(data, "Bad STATUS code \"%s\" on line %d of \"%s\".", token,
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2174,14 +2165,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
         if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
         {
-	  print_fatal_error(outfile, "Too many EXPECT's on line %d.", linenum);
+	  print_fatal_error(data, "Too many EXPECT's on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
         }
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing EXPECT name on line %d.", linenum);
+	  print_fatal_error(data, "Missing EXPECT name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2210,14 +2201,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing COUNT number on line %d.", linenum);
+	  print_fatal_error(data, "Missing COUNT number on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
         if ((i = atoi(token)) <= 0)
 	{
-	  print_fatal_error(outfile, "Bad COUNT \"%s\" on line %d.", token, linenum);
+	  print_fatal_error(data, "Bad COUNT \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2226,7 +2217,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->count = i;
 	else
 	{
-	  print_fatal_error(outfile, "COUNT without a preceding EXPECT on line %d.",
+	  print_fatal_error(data, "COUNT without a preceding EXPECT on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2236,7 +2227,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing DEFINE-MATCH variable on line %d.",
+	  print_fatal_error(data, "Missing DEFINE-MATCH variable on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2248,8 +2239,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_status->define_match = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "DEFINE-MATCH without a preceding EXPECT or STATUS "
-	                    "on line %d.", linenum);
+	  print_fatal_error(data, "DEFINE-MATCH without a preceding EXPECT or STATUS "
+	                    "on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2258,7 +2249,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing DEFINE-NO-MATCH variable on line %d.",
+	  print_fatal_error(data, "Missing DEFINE-NO-MATCH variable on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2270,8 +2261,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_status->define_no_match = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "DEFINE-NO-MATCH without a preceding EXPECT or "
-	                    "STATUS on line %d.", linenum);
+	  print_fatal_error(data, "DEFINE-NO-MATCH without a preceding EXPECT or "
+	                    "STATUS on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2280,7 +2271,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing DEFINE-VALUE variable on line %d.",
+	  print_fatal_error(data, "Missing DEFINE-VALUE variable on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2290,8 +2281,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->define_value = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "DEFINE-VALUE without a preceding EXPECT on "
-	                    "line %d.", linenum);
+	  print_fatal_error(data, "DEFINE-VALUE without a preceding EXPECT on "
+	                    "line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2300,7 +2291,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing OF-TYPE value tag(s) on line %d.",
+	  print_fatal_error(data, "Missing OF-TYPE value tag(s) on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2310,7 +2301,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->of_type = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "OF-TYPE without a preceding EXPECT on line %d.",
+	  print_fatal_error(data, "OF-TYPE without a preceding EXPECT on line %d of \"%s\".",
 	                    linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2323,14 +2314,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing IN-GROUP group tag on line %d.", linenum);
+	  print_fatal_error(data, "Missing IN-GROUP group tag on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
         if ((in_group = ippTagValue(token)) == IPP_TAG_ZERO || in_group >= IPP_TAG_UNSUPPORTED_VALUE)
 	{
-          print_fatal_error(outfile, "Bad IN-GROUP group tag \"%s\" on line %d.", token, linenum);
+          print_fatal_error(data, "Bad IN-GROUP group tag \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
           pass = 0;
           goto test_exit;
 	}
@@ -2338,7 +2329,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->in_group = in_group;
 	else
 	{
-	  print_fatal_error(outfile, "IN-GROUP without a preceding EXPECT on line %d.", linenum);
+	  print_fatal_error(data, "IN-GROUP without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2347,13 +2338,13 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing REPEAT-LIMIT value on line %d.", linenum);
+	  print_fatal_error(data, "Missing REPEAT-LIMIT value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 	else if (atoi(token) <= 0)
 	{
-	  print_fatal_error(outfile, "Bad REPEAT-LIMIT value on line %d.", linenum);
+	  print_fatal_error(data, "Bad REPEAT-LIMIT value on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2364,7 +2355,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->repeat_limit = atoi(token);
 	else
 	{
-	  print_fatal_error(outfile, "REPEAT-LIMIT without a preceding EXPECT or STATUS on line %d.", linenum);
+	  print_fatal_error(data, "REPEAT-LIMIT without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2377,7 +2368,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->repeat_match = 1;
 	else
 	{
-	  print_fatal_error(outfile, "REPEAT-MATCH without a preceding EXPECT or STATUS on line %d.", linenum);
+	  print_fatal_error(data, "REPEAT-MATCH without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2390,7 +2381,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->repeat_no_match = 1;
 	else
 	{
-	  print_fatal_error(outfile, "REPEAT-NO-MATCH without a preceding EXPECT or STATUS on ine %d.", linenum);
+	  print_fatal_error(data, "REPEAT-NO-MATCH without a preceding EXPECT or STATUS on ine %d.", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2399,7 +2390,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing SAME-COUNT-AS name on line %d.", linenum);
+	  print_fatal_error(data, "Missing SAME-COUNT-AS name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2408,8 +2399,8 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_expect->same_count_as = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "SAME-COUNT-AS without a preceding EXPECT on line "
-	                    "%d.", linenum);
+	  print_fatal_error(data, "SAME-COUNT-AS without a preceding EXPECT on line "
+	                    "%d.", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2418,7 +2409,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing IF-DEFINED name on line %d.", linenum);
+	  print_fatal_error(data, "Missing IF-DEFINED name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2429,7 +2420,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_status->if_defined = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "IF-DEFINED without a preceding EXPECT or STATUS on line %d.", linenum);
+	  print_fatal_error(data, "IF-DEFINED without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2438,7 +2429,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing IF-NOT-DEFINED name on line %d.", linenum);
+	  print_fatal_error(data, "Missing IF-NOT-DEFINED name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2449,7 +2440,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  last_status->if_not_defined = strdup(token);
 	else
 	{
-	  print_fatal_error(outfile, "IF-NOT-DEFINED without a preceding EXPECT or STATUS on line %d.", linenum);
+	  print_fatal_error(data, "IF-NOT-DEFINED without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2479,9 +2470,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	    last_expect->with_flags |= _CUPS_WITH_ALL;
         }
 
-      	if (!get_token(fp, temp, sizeof(temp), &linenum))
+      	if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing %s value on line %d.", token, linenum);
+	  print_fatal_error(data, "Missing %s value on line %d of \"%s\".", token, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2492,7 +2483,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  * Expand any variables in the value and then save it.
 	  */
 
-	  expand_variables(vars, token, temp, sizeof(token));
+	  _ippVarsExpand(vars, token, temp, sizeof(token));
 
 	  tokenptr = token + strlen(token) - 1;
 
@@ -2534,16 +2525,16 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	}
 	else
 	{
-	  print_fatal_error(outfile, "%s without a preceding EXPECT on line %d.", token, linenum);
+	  print_fatal_error(data, "%s without a preceding EXPECT on line %d of \"%s\".", token, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
       }
       else if (!_cups_strcasecmp(token, "WITH-VALUE-FROM"))
       {
-      	if (!get_token(fp, temp, sizeof(temp), &linenum))
+      	if (!_ippFileReadToken(f, temp, sizeof(temp)))
 	{
-	  print_fatal_error(outfile, "Missing %s value on line %d.", token, linenum);
+	  print_fatal_error(data, "Missing %s value on line %d of \"%s\".", token, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2554,14 +2545,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  * Expand any variables in the value and then save it.
 	  */
 
-	  expand_variables(vars, token, temp, sizeof(token));
+	  _ippVarsExpand(vars, token, temp, sizeof(token));
 
 	  last_expect->with_value_from = strdup(token);
 	  last_expect->with_flags      = _CUPS_WITH_LITERAL;
 	}
 	else
 	{
-	  print_fatal_error(outfile, "%s without a preceding EXPECT on line %d.", token, linenum);
+	  print_fatal_error(data, "%s without a preceding EXPECT on line %d of \"%s\".", token, f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2574,14 +2565,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
         if (num_displayed >= (int)(sizeof(displayed) / sizeof(displayed[0])))
 	{
-	  print_fatal_error(outfile, "Too many DISPLAY's on line %d", linenum);
+	  print_fatal_error(data, "Too many DISPLAY's on line %d", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error(outfile, "Missing DISPLAY name on line %d.", linenum);
+	  print_fatal_error(data, "Missing DISPLAY name on line %d of \"%s\".", f->linenum, f->filename);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2591,7 +2582,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
       else
       {
-	print_fatal_error(outfile, "Unexpected token %s seen on line %d.", token, linenum);
+	print_fatal_error(data, "Unexpected token %s seen on line %d of \"%s\".", token, f->linenum, f->filename);
 	pass = 0;
 	goto test_exit;
       }
@@ -2609,38 +2600,38 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
     if (Output == _CUPS_OUTPUT_PLIST)
     {
-      cupsFilePuts(outfile, "<dict>\n");
-      cupsFilePuts(outfile, "<key>Name</key>\n");
-      print_xml_string(outfile, "string", name);
+      cupsFilePuts(data->outfile, "<dict>\n");
+      cupsFilePuts(data->outfile, "<key>Name</key>\n");
+      print_xml_string(data->outfile, "string", name);
       if (file_id[0])
       {
-	cupsFilePuts(outfile, "<key>FileId</key>\n");
-	print_xml_string(outfile, "string", file_id);
+	cupsFilePuts(data->outfile, "<key>FileId</key>\n");
+	print_xml_string(data->outfile, "string", file_id);
       }
       if (test_id[0])
       {
-        cupsFilePuts(outfile, "<key>TestId</key>\n");
-        print_xml_string(outfile, "string", test_id);
+        cupsFilePuts(data->outfile, "<key>TestId</key>\n");
+        print_xml_string(data->outfile, "string", test_id);
       }
-      cupsFilePuts(outfile, "<key>Version</key>\n");
-      cupsFilePrintf(outfile, "<string>%d.%d</string>\n", version / 10, version % 10);
-      cupsFilePuts(outfile, "<key>Operation</key>\n");
-      print_xml_string(outfile, "string", ippOpString(op));
-      cupsFilePuts(outfile, "<key>RequestId</key>\n");
-      cupsFilePrintf(outfile, "<integer>%d</integer>\n", request_id);
-      cupsFilePuts(outfile, "<key>RequestAttributes</key>\n");
-      cupsFilePuts(outfile, "<array>\n");
+      cupsFilePuts(data->outfile, "<key>Version</key>\n");
+      cupsFilePrintf(data->outfile, "<string>%d.%d</string>\n", version / 10, version % 10);
+      cupsFilePuts(data->outfile, "<key>Operation</key>\n");
+      print_xml_string(data->outfile, "string", ippOpString(op));
+      cupsFilePuts(data->outfile, "<key>RequestId</key>\n");
+      cupsFilePrintf(data->outfile, "<integer>%d</integer>\n", request_id);
+      cupsFilePuts(data->outfile, "<key>RequestAttributes</key>\n");
+      cupsFilePuts(data->outfile, "<array>\n");
       if (request->attrs)
       {
-	cupsFilePuts(outfile, "<dict>\n");
+	cupsFilePuts(data->outfile, "<dict>\n");
 	for (attrptr = request->attrs,
 	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
-	  print_attr(outfile, Output, attrptr, &group);
-	cupsFilePuts(outfile, "</dict>\n");
+	  print_attr(data->outfile, Output, attrptr, &group);
+	cupsFilePuts(data->outfile, "</dict>\n");
       }
-      cupsFilePuts(outfile, "</array>\n");
+      cupsFilePuts(data->outfile, "</array>\n");
     }
 
     if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
@@ -2665,14 +2656,14 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
       if (Output == _CUPS_OUTPUT_PLIST)
       {
-	cupsFilePuts(outfile, "<key>Successful</key>\n");
-	cupsFilePuts(outfile, "<true />\n");
-	cupsFilePuts(outfile, "<key>Skipped</key>\n");
-	cupsFilePuts(outfile, "<true />\n");
-	cupsFilePuts(outfile, "<key>StatusCode</key>\n");
-	print_xml_string(outfile, "string", "skip");
-	cupsFilePuts(outfile, "<key>ResponseAttributes</key>\n");
-	cupsFilePuts(outfile, "<dict />\n");
+	cupsFilePuts(data->outfile, "<key>Successful</key>\n");
+	cupsFilePuts(data->outfile, "<true />\n");
+	cupsFilePuts(data->outfile, "<key>Skipped</key>\n");
+	cupsFilePuts(data->outfile, "<true />\n");
+	cupsFilePuts(data->outfile, "<key>StatusCode</key>\n");
+	print_xml_string(data->outfile, "string", "skip");
+	cupsFilePuts(data->outfile, "<key>ResponseAttributes</key>\n");
+	cupsFilePuts(data->outfile, "<dict />\n");
       }
 
       if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
@@ -2865,18 +2856,18 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 					IPP_TAG_INTEGER)) != NULL)
 	{
 	  snprintf(temp, sizeof(temp), "%d", attrptr->values[0].integer);
-	  set_variable(outfile, vars, "job-id", temp);
+	  _ippVarsSet(vars, "job-id", temp);
 	}
 
 	if ((attrptr = ippFindAttribute(response, "job-uri",
 					IPP_TAG_URI)) != NULL)
-	  set_variable(outfile, vars, "job-uri", attrptr->values[0].string.text);
+	  _ippVarsSet(vars, "job-uri", attrptr->values[0].string.text);
 
 	if ((attrptr = ippFindAttribute(response, "notify-subscription-id",
 					IPP_TAG_INTEGER)) != NULL)
 	{
 	  snprintf(temp, sizeof(temp), "%d", attrptr->values[0].integer);
-	  set_variable(outfile, vars, "notify-subscription-id", temp);
+	  _ippVarsSet(vars, "notify-subscription-id", temp);
 	}
 
        /*
@@ -3058,7 +3049,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	      group = attrptr->group_tag;
 	  }
 
-	  validate_attr(outfile, errors, attrptr);
+	  validate_attr(data->outfile, errors, attrptr);
 
           if (attrptr->name)
           {
@@ -3080,11 +3071,11 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	for (i = 0, status_ok = 0; i < num_statuses; i ++)
 	{
 	  if (statuses[i].if_defined &&
-	      !get_variable(vars, statuses[i].if_defined))
+	      !_ippVarsGet(vars, statuses[i].if_defined))
 	    continue;
 
 	  if (statuses[i].if_not_defined &&
-	      get_variable(vars, statuses[i].if_not_defined))
+	      _ippVarsGet(vars, statuses[i].if_not_defined))
 	    continue;
 
 	  if (ippGetStatusCode(response) == statuses[i].status)
@@ -3095,7 +3086,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
               repeat_test = 1;
 
             if (statuses[i].define_match)
-              set_variable(outfile, vars, statuses[i].define_match, "1");
+              _ippVarsSet(vars, statuses[i].define_match, "1");
 	  }
 	  else
 	  {
@@ -3104,7 +3095,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
             if (statuses[i].define_no_match)
             {
-              set_variable(outfile, vars, statuses[i].define_no_match, "1");
+              _ippVarsSet(vars, statuses[i].define_no_match, "1");
               status_ok = 1;
             }
           }
@@ -3115,11 +3106,11 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  for (i = 0; i < num_statuses; i ++)
 	  {
 	    if (statuses[i].if_defined &&
-		!get_variable(vars, statuses[i].if_defined))
+		!_ippVarsGet(vars, statuses[i].if_defined))
 	      continue;
 
 	    if (statuses[i].if_not_defined &&
-		get_variable(vars, statuses[i].if_not_defined))
+		_ippVarsGet(vars, statuses[i].if_not_defined))
 	      continue;
 
             if (!statuses[i].repeat_match || repeat_count >= statuses[i].repeat_limit)
@@ -3136,11 +3127,11 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
-	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
+	  if (expect->if_defined && !_ippVarsGet(vars, expect->if_defined))
 	    continue;
 
 	  if (expect->if_not_defined &&
-	      get_variable(vars, expect->if_not_defined))
+	      _ippVarsGet(vars, expect->if_not_defined))
 	    continue;
 
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -3154,7 +3145,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		 found->group_tag != expect->in_group))
 	    {
 	      if (expect->define_no_match)
-		set_variable(outfile, vars, expect->define_no_match, "1");
+		_ippVarsSet(vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value)
 	      {
 		if (found && expect->not_expect)
@@ -3187,7 +3178,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
             if (found && expect->with_value_from && !with_value_from(NULL, ippFindAttribute(response, expect->with_value_from, IPP_TAG_ZERO), found, buffer, sizeof(buffer)))
 	    {
 	      if (expect->define_no_match)
-		set_variable(outfile, vars, expect->define_no_match, "1");
+		_ippVarsSet(vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value && ((!expect->repeat_match && !expect->repeat_no_match) || repeat_count >= expect->repeat_limit))
 	      {
 		add_stringf(errors, "EXPECTED: %s WITH-VALUES-FROM %s", expect->name, expect->with_value_from);
@@ -3200,10 +3191,10 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 	      break;
 	    }
-	    else if (found && !with_value(outfile, NULL, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer)))
+	    else if (found && !with_value(data->outfile, NULL, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer)))
 	    {
 	      if (expect->define_no_match)
-		set_variable(outfile, vars, expect->define_no_match, "1");
+		_ippVarsSet(vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value &&
 		       !expect->repeat_match && (!expect->repeat_no_match || repeat_count >= expect->repeat_limit))
 	      {
@@ -3212,7 +3203,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		else
 		  add_stringf(errors, "EXPECTED: %s %s \"%s\"", expect->name, with_flags_string(expect->with_flags), expect->with_value);
 
-		with_value(outfile, errors, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer));
+		with_value(data->outfile, errors, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer));
 	      }
 
 	      if (expect->repeat_no_match &&
@@ -3226,7 +3217,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		found->num_values != expect->count)
 	    {
 	      if (expect->define_no_match)
-		set_variable(outfile, vars, expect->define_no_match, "1");
+		_ippVarsSet(vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value)
 	      {
 		add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
@@ -3248,7 +3239,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	      if (!attrptr || attrptr->num_values != found->num_values)
 	      {
 		if (expect->define_no_match)
-		  set_variable(outfile, vars, expect->define_no_match, "1");
+		  _ippVarsSet(vars, expect->define_no_match, "1");
 		else if (!expect->define_match && !expect->define_value)
 		{
 		  if (!attrptr)
@@ -3272,7 +3263,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	    }
 
 	    if (found && expect->define_match)
-	      set_variable(outfile, vars, expect->define_match, "1");
+	      _ippVarsSet(vars, expect->define_match, "1");
 
 	    if (found && expect->define_value)
 	    {
@@ -3329,7 +3320,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 		}
 	      }
 
-	      set_variable(outfile, vars, expect->define_value, buffer);
+	      _ippVarsSet(vars, expect->define_value, buffer);
 	    }
 
 	    if (found && expect->repeat_match &&
@@ -3395,20 +3386,20 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
     if (Output == _CUPS_OUTPUT_PLIST)
     {
-      cupsFilePuts(outfile, "<key>Successful</key>\n");
-      cupsFilePuts(outfile, prev_pass ? "<true />\n" : "<false />\n");
-      cupsFilePuts(outfile, "<key>StatusCode</key>\n");
-      print_xml_string(outfile, "string", ippErrorString(cupsLastError()));
-      cupsFilePuts(outfile, "<key>ResponseAttributes</key>\n");
-      cupsFilePuts(outfile, "<array>\n");
-      cupsFilePuts(outfile, "<dict>\n");
+      cupsFilePuts(data->outfile, "<key>Successful</key>\n");
+      cupsFilePuts(data->outfile, prev_pass ? "<true />\n" : "<false />\n");
+      cupsFilePuts(data->outfile, "<key>StatusCode</key>\n");
+      print_xml_string(data->outfile, "string", ippErrorString(cupsLastError()));
+      cupsFilePuts(data->outfile, "<key>ResponseAttributes</key>\n");
+      cupsFilePuts(data->outfile, "<array>\n");
+      cupsFilePuts(data->outfile, "<dict>\n");
       for (attrptr = response ? response->attrs : NULL,
                group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	   attrptr;
 	   attrptr = attrptr->next)
-	print_attr(outfile, Output, attrptr, &group);
-      cupsFilePuts(outfile, "</dict>\n");
-      cupsFilePuts(outfile, "</array>\n");
+	print_attr(data->outfile, Output, attrptr, &group);
+      cupsFilePuts(data->outfile, "</dict>\n");
+      cupsFilePuts(data->outfile, "</array>\n");
     }
     else if (Output == _CUPS_OUTPUT_IPPSERVER && response)
     {
@@ -3417,7 +3408,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
         if (!ippGetName(attrptr) || ippGetGroupTag(attrptr) != IPP_TAG_PRINTER)
           continue;
 
-        print_ippserver_attr(outfile, attrptr, 0);
+        print_ippserver_attr(data->outfile, attrptr, 0);
       }
     }
 
@@ -3463,9 +3454,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
       }
 
       if (Output == _CUPS_OUTPUT_CSV)
-	print_csv(outfile, NULL, num_displayed, displayed, widths);
+	print_csv(data->outfile, NULL, num_displayed, displayed, widths);
       else
-	print_line(outfile, NULL, num_displayed, displayed, widths);
+	print_line(data->outfile, NULL, num_displayed, displayed, widths);
 
       attrptr = response->attrs;
 
@@ -3477,9 +3468,9 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	if (attrptr)
 	{
 	  if (Output == _CUPS_OUTPUT_CSV)
-	    print_csv(outfile, attrptr, num_displayed, displayed, widths);
+	    print_csv(data->outfile, attrptr, num_displayed, displayed, widths);
 	  else
-	    print_line(outfile, attrptr, num_displayed, displayed, widths);
+	    print_line(data->outfile, attrptr, num_displayed, displayed, widths);
 
 	  while (attrptr && attrptr->group_tag > IPP_TAG_OPERATION)
 	    attrptr = attrptr->next;
@@ -3490,15 +3481,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     {
       if (Output == _CUPS_OUTPUT_PLIST)
       {
-	cupsFilePuts(outfile, "<key>Errors</key>\n");
-	cupsFilePuts(outfile, "<array>\n");
+	cupsFilePuts(data->outfile, "<key>Errors</key>\n");
+	cupsFilePuts(data->outfile, "<array>\n");
 
 	for (error = (char *)cupsArrayFirst(errors);
 	     error;
 	     error = (char *)cupsArrayNext(errors))
-	  print_xml_string(outfile, "string", error);
+	  print_xml_string(data->outfile, "string", error);
 
-	cupsFilePuts(outfile, "</array>\n");
+	cupsFilePuts(data->outfile, "</array>\n");
       }
 
       if (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != cupsFileStdout()))
@@ -3522,7 +3513,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  {
 	    if (!strcmp(displayed[i], attrptr->name))
 	    {
-	      print_attr(outfile, Output, attrptr, NULL);
+	      print_attr(data->outfile, Output, attrptr, NULL);
 	      break;
 	    }
 	  }
@@ -3533,7 +3524,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
     skip_error:
 
     if (Output == _CUPS_OUTPUT_PLIST)
-      cupsFilePuts(outfile, "</dict>\n");
+      cupsFilePuts(data->outfile, "</dict>\n");
 
     ippDelete(response);
     response = NULL;
@@ -3633,111 +3624,15 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
 
 /*
- * 'expand_variables()' - Expand variables in a string.
+ * 'error_cb()' - Print/add an error message.
  */
 
-static void
-expand_variables(_cups_vars_t *vars,	/* I - Variables */
-                 char         *dst,	/* I - Destination string buffer */
-		 const char   *src,	/* I - Source string */
-		 size_t       dstsize)	/* I - Size of destination buffer */
+static int				/* O - 1 to continue, 0 to stop */
+error_cb(_ipp_file_t      *f,		/* I - IPP file data */
+         _cups_testdata_t *data,	/* I - Test data */
+         const char       *error)	/* I - Error message */
 {
-  char		*dstptr,		/* Pointer into destination */
-		*dstend,		/* End of destination */
-		temp[256],		/* Temporary string */
-		*tempptr;		/* Pointer into temporary string */
-  const char	*value;			/* Value to substitute */
-
-
-  dstptr = dst;
-  dstend = dst + dstsize - 1;
-
-  while (*src && dstptr < dstend)
-  {
-    if (*src == '$')
-    {
-     /*
-      * Substitute a string/number...
-      */
-
-      if (!strncmp(src, "$$", 2))
-      {
-        value = "$";
-	src   += 2;
-      }
-      else if (!strncmp(src, "$ENV[", 5))
-      {
-	strlcpy(temp, src + 5, sizeof(temp));
-
-	for (tempptr = temp; *tempptr; tempptr ++)
-	  if (*tempptr == ']')
-	    break;
-
-        if (*tempptr)
-	  *tempptr++ = '\0';
-
-	value = getenv(temp);
-        src   += tempptr - temp + 5;
-      }
-      else
-      {
-        if (src[1] == '{')
-	{
-	  src += 2;
-	  strlcpy(temp, src, sizeof(temp));
-	  if ((tempptr = strchr(temp, '}')) != NULL)
-	    *tempptr = '\0';
-	  else
-	    tempptr = temp + strlen(temp);
-	}
-	else
-	{
-	  strlcpy(temp, src + 1, sizeof(temp));
-
-	  for (tempptr = temp; *tempptr; tempptr ++)
-	    if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
-	      break;
-
-	  if (*tempptr)
-	    *tempptr = '\0';
-        }
-
-	if (!strcmp(temp, "uri"))
-	  value = vars->uri;
-	else if (!strcmp(temp, "filename"))
-	  value = vars->filename;
-	else if (!strcmp(temp, "scheme") || !strcmp(temp, "method"))
-	  value = vars->scheme;
-	else if (!strcmp(temp, "username"))
-	  value = vars->userpass;
-	else if (!strcmp(temp, "hostname"))
-	  value = vars->hostname;
-	else if (!strcmp(temp, "port"))
-	{
-	  snprintf(temp, sizeof(temp), "%d", vars->port);
-	  value = temp;
-	}
-	else if (!strcmp(temp, "resource"))
-	  value = vars->resource;
-	else if (!strcmp(temp, "user"))
-	  value = cupsUser();
-	else
-	  value = get_variable(vars, temp);
-
-        src += tempptr - temp + 1;
-      }
-
-      if (value)
-      {
-        strlcpy(dstptr, value, (size_t)(dstend - dstptr + 1));
-	dstptr += strlen(dstptr);
-      }
-    }
-    else
-      *dstptr++ = *src++;
-  }
-
-  *dstptr = '\0';
+  return (1);
 }
 
 
@@ -3822,7 +3717,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
   ipp_attribute_t *lastcol = NULL;	/* Last collection attribute */
 
 
-  while (get_token(fp, token, sizeof(token), linenum) != NULL)
+  while (get_token(fp, token, sizeof(token), f->linenum, f->filename) != NULL)
   {
     if (!strcmp(token, "}"))
       break;
@@ -3832,7 +3727,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
       * Another collection value
       */
 
-      ipp_t	*subcol = get_collection(outfile, vars, fp, linenum);
+      ipp_t	*subcol = get_collection(data->outfile, vars, fp, f->linenum, f->filename);
 					/* Collection value */
 
       if (subcol)
@@ -3848,22 +3743,22 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 
       lastcol = NULL;
 
-      if (!get_token(fp, token, sizeof(token), linenum))
+      if (!get_token(fp, token, sizeof(token), f->linenum, f->filename))
       {
-	print_fatal_error(outfile, "Missing MEMBER value tag on line %d.", *linenum);
+	print_fatal_error(data, "Missing MEMBER value tag on line %d of \"%s\".", *linenum);
 	goto col_error;
       }
 
       if ((value = ippTagValue(token)) < IPP_TAG_UNSUPPORTED_VALUE)
       {
-	print_fatal_error(outfile, "Bad MEMBER value tag \"%s\" on line %d.", token,
+	print_fatal_error(data, "Bad MEMBER value tag \"%s\" on line %d of \"%s\".", token,
 			  *linenum);
 	goto col_error;
       }
 
-      if (!get_token(fp, attr, sizeof(attr), linenum))
+      if (!get_token(fp, attr, sizeof(attr), f->linenum, f->filename))
       {
-	print_fatal_error(outfile, "Missing MEMBER name on line %d.", *linenum);
+	print_fatal_error(data, "Missing MEMBER name on line %d of \"%s\".", *linenum);
 	goto col_error;
       }
 
@@ -3875,14 +3770,14 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 
         token[0] = '\0';
       }
-      else if (!get_token(fp, temp, sizeof(temp), linenum))
+      else if (!get_token(fp, temp, sizeof(temp), f->linenum, f->filename))
       {
-	print_fatal_error(outfile, "Missing MEMBER value on line %d.", *linenum);
+	print_fatal_error(data, "Missing MEMBER value on line %d of \"%s\".", *linenum);
 	goto col_error;
       }
       else
       {
-        expand_variables(vars, token, temp, sizeof(token));
+        _ippVarsExpand(vars, token, temp, sizeof(token));
       }
 
       switch (value)
@@ -3898,7 +3793,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
               }
               else
               {
-                print_fatal_error(outfile, "Unsupported MEMBER value tag %s for \"%s\" on line %d.", ippTagString(value), attr, *linenum);
+                print_fatal_error(data, "Unsupported MEMBER value tag %s for \"%s\" on line %d of \"%s\".", ippTagString(value), attr, *linenum);
                 goto col_error;
               }
               break;
@@ -3927,7 +3822,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 		   _cups_strcasecmp(units, "dpcm") &&
 		   _cups_strcasecmp(units, "other")))
 	      {
-		print_fatal_error(outfile, "Bad resolution value \"%s\" on line %d.",
+		print_fatal_error(data, "Bad resolution value \"%s\" on line %d of \"%s\".",
 				  token, *linenum);
 		goto col_error;
 	      }
@@ -3957,7 +3852,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 
 	      if ((num_vals & 1) || num_vals == 0)
 	      {
-		print_fatal_error(outfile, "Bad rangeOfInteger value \"%s\" on line %d.",
+		print_fatal_error(data, "Bad rangeOfInteger value \"%s\" on line %d of \"%s\".",
 		                  token, *linenum);
 		goto col_error;
 	      }
@@ -3970,7 +3865,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 	case IPP_TAG_BEGIN_COLLECTION :
 	    if (!strcmp(token, "{"))
 	    {
-	      ipp_t	*subcol = get_collection(outfile, vars, fp, linenum);
+	      ipp_t	*subcol = get_collection(data->outfile, vars, fp, f->linenum, f->filename);
 				      /* Collection value */
 
 	      if (subcol)
@@ -3983,7 +3878,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
 	    }
 	    else
 	    {
-	      print_fatal_error(outfile, "Bad collection value on line %d.", *linenum);
+	      print_fatal_error(data, "Bad collection value on line %d of \"%s\".", *linenum);
 	      goto col_error;
 	    }
 	    break;
@@ -4038,7 +3933,7 @@ get_collection(cups_file_t  *outfile,	/* I  - Output file */
     }
     else
     {
-      print_fatal_error(outfile, "Unexpected token %s seen on line %d.", token, *linenum);
+      print_fatal_error(data, "Unexpected token %s seen on line %d of \"%s\".", token, *linenum);
       goto col_error;
     }
   }
@@ -4310,21 +4205,21 @@ get_token(cups_file_t *fp,		/* I  - File to read from */
 
 
 /*
- * 'get_variable()' - Get the value of a variable.
+ * 'init_data()' - Initialize test data.
  */
 
-static char *				/* O - Value or NULL */
-get_variable(_cups_vars_t *vars,	/* I - Variables */
-             const char   *name)	/* I - Variable name */
+static void
+init_data(_cups_testdata_t *data)	/* I - Data */
 {
-  _cups_var_t	key,			/* Search key */
-		*match;			/* Matching variable, if any */
+  memset(data, 0, sizeof(_cups_testdata_t));
 
-
-  key.name = (char *)name;
-  match    = cupsArrayFind(vars->vars, &key);
-
-  return (match ? match->value : NULL);
+  data->output       = _CUPS_OUTPUT_LIST;
+  data->outfile      = cupsFileStdout();
+  data->family       = AF_UNSPEC;
+  data->def_transfer = _CUPS_TRANSFER_AUTO;
+  data->def_version  = 11;
+  data->prev_pass    = 1;
+  data->show_header  = 1;
 }
 
 
@@ -4334,7 +4229,7 @@ get_variable(_cups_vars_t *vars,	/* I - Variables */
  */
 
 static char *				/* O - ISO 8601 date/time string */
-iso_date(const ipp_uchar_t *date)      /* I - IPP (RFC 1903) date/time value */
+iso_date(const ipp_uchar_t *date)	/* I - IPP (RFC 1903) date/time value */
 {
   time_t	utctime;		/* UTC time since 1970 */
   struct tm	*utcdate;		/* UTC date/time */
@@ -4349,28 +4244,6 @@ iso_date(const ipp_uchar_t *date)      /* I - IPP (RFC 1903) date/time value */
 	   utcdate->tm_hour, utcdate->tm_min, utcdate->tm_sec);
 
   return (buffer);
-}
-
-
-/*
- * 'password_cb()' - Password callback for authenticated tests.
- */
-
-static const char *			/* O - Password */
-password_cb(const char *prompt)		/* I - Prompt (unused) */
-{
-  (void)prompt;
-
-  if (PasswordTries < 3)
-  {
-    PasswordTries ++;
-
-    cupsSetUser(Username);
-
-    return (Password);
-  }
-  else
-    return (NULL);
 }
 
 
@@ -4478,8 +4351,7 @@ pause_message(const char *message)	/* I - Message */
  */
 
 static void
-print_attr(cups_file_t     *outfile,	/* I  - Output file */
-           int             format,	/* I  - Output format */
+print_attr(_cups_testdata_t *data,	/* I  - Test data */
            ipp_attribute_t *attr,	/* I  - Attribute to print */
            ipp_tag_t       *group)	/* IO - Current group */
 {
@@ -4493,8 +4365,8 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
     {
       if (attr->group_tag != IPP_TAG_ZERO)
       {
-	cupsFilePuts(outfile, "</dict>\n");
-	cupsFilePuts(outfile, "<dict>\n");
+	cupsFilePuts(data->outfile, "</dict>\n");
+	cupsFilePuts(data->outfile, "<dict>\n");
       }
 
       if (group)
@@ -4504,33 +4376,33 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
     if (!attr->name)
       return;
 
-    print_xml_string(outfile, "key", attr->name);
+    print_xml_string(data->outfile, "key", attr->name);
     if (attr->num_values > 1)
-      cupsFilePuts(outfile, "<array>\n");
+      cupsFilePuts(data->outfile, "<array>\n");
 
     switch (attr->value_tag)
     {
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
 	  for (i = 0; i < attr->num_values; i ++)
-	    cupsFilePrintf(outfile, "<integer>%d</integer>\n", attr->values[i].integer);
+	    cupsFilePrintf(data->outfile, "<integer>%d</integer>\n", attr->values[i].integer);
 	  break;
 
       case IPP_TAG_BOOLEAN :
 	  for (i = 0; i < attr->num_values; i ++)
-	    cupsFilePuts(outfile, attr->values[i].boolean ? "<true />\n" : "<false />\n");
+	    cupsFilePuts(data->outfile, attr->values[i].boolean ? "<true />\n" : "<false />\n");
 	  break;
 
       case IPP_TAG_RANGE :
 	  for (i = 0; i < attr->num_values; i ++)
-	    cupsFilePrintf(outfile, "<dict><key>lower</key><integer>%d</integer>"
+	    cupsFilePrintf(data->outfile, "<dict><key>lower</key><integer>%d</integer>"
 			     "<key>upper</key><integer>%d</integer></dict>\n",
 		    attr->values[i].range.lower, attr->values[i].range.upper);
 	  break;
 
       case IPP_TAG_RESOLUTION :
 	  for (i = 0; i < attr->num_values; i ++)
-	    cupsFilePrintf(outfile, "<dict><key>xres</key><integer>%d</integer>"
+	    cupsFilePrintf(data->outfile, "<dict><key>xres</key><integer>%d</integer>"
 			     "<key>yres</key><integer>%d</integer>"
 			     "<key>units</key><string>%s</string></dict>\n",
 		   attr->values[i].resolution.xres,
@@ -4541,7 +4413,7 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
 
       case IPP_TAG_DATE :
 	  for (i = 0; i < attr->num_values; i ++)
-	    cupsFilePrintf(outfile, "<date>%s</date>\n", iso_date(attr->values[i].date));
+	    cupsFilePrintf(data->outfile, "<date>%s</date>\n", iso_date(attr->values[i].date));
 	  break;
 
       case IPP_TAG_STRING :
@@ -4550,7 +4422,7 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
 	    char	buffer[IPP_MAX_LENGTH * 5 / 4 + 1];
 					/* Output buffer */
 
-	    cupsFilePrintf(outfile, "<data>%s</data>\n",
+	    cupsFilePrintf(data->outfile, "<data>%s</data>\n",
 		    httpEncode64_2(buffer, sizeof(buffer),
 				   attr->values[i].unknown.data,
 				   attr->values[i].unknown.length));
@@ -4566,40 +4438,40 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
 	  for (i = 0; i < attr->num_values; i ++)
-	    print_xml_string(outfile, "string", attr->values[i].string.text);
+	    print_xml_string(data->outfile, "string", attr->values[i].string.text);
 	  break;
 
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    cupsFilePuts(outfile, "<dict><key>language</key><string>");
-	    print_xml_string(outfile, NULL, attr->values[i].string.language);
-	    cupsFilePuts(outfile, "</string><key>string</key><string>");
-	    print_xml_string(outfile, NULL, attr->values[i].string.text);
-	    cupsFilePuts(outfile, "</string></dict>\n");
+	    cupsFilePuts(data->outfile, "<dict><key>language</key><string>");
+	    print_xml_string(data->outfile, NULL, attr->values[i].string.language);
+	    cupsFilePuts(data->outfile, "</string><key>string</key><string>");
+	    print_xml_string(data->outfile, NULL, attr->values[i].string.text);
+	    cupsFilePuts(data->outfile, "</string></dict>\n");
 	  }
 	  break;
 
       case IPP_TAG_BEGIN_COLLECTION :
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    cupsFilePuts(outfile, "<dict>\n");
+	    cupsFilePuts(data->outfile, "<dict>\n");
 	    for (colattr = attr->values[i].collection->attrs;
 		 colattr;
 		 colattr = colattr->next)
-	      print_attr(outfile, format, colattr, NULL);
-	    cupsFilePuts(outfile, "</dict>\n");
+	      print_attr(data->outfile, format, colattr, NULL);
+	    cupsFilePuts(data->outfile, "</dict>\n");
 	  }
 	  break;
 
       default :
-	  cupsFilePrintf(outfile, "<string>&lt;&lt;%s&gt;&gt;</string>\n", ippTagString(attr->value_tag));
+	  cupsFilePrintf(data->outfile, "<string>&lt;&lt;%s&gt;&gt;</string>\n", ippTagString(attr->value_tag));
 	  break;
     }
 
     if (attr->num_values > 1)
-      cupsFilePuts(outfile, "</array>\n");
+      cupsFilePuts(data->outfile, "</array>\n");
   }
   else
   {
@@ -4609,15 +4481,15 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
     {
       if (!attr->name)
       {
-        cupsFilePuts(outfile, "        -- separator --\n");
+        cupsFilePuts(data->outfile, "        -- separator --\n");
         return;
       }
 
-      cupsFilePrintf(outfile, "        %s (%s%s) = ", attr->name, attr->num_values > 1 ? "1setOf " : "", ippTagString(attr->value_tag));
+      cupsFilePrintf(data->outfile, "        %s (%s%s) = ", attr->name, attr->num_values > 1 ? "1setOf " : "", ippTagString(attr->value_tag));
     }
 
     ippAttributeString(attr, buffer, sizeof(buffer));
-    cupsFilePrintf(outfile, "%s\n", buffer);
+    cupsFilePrintf(data->outfile, "%s\n", buffer);
   }
 }
 
@@ -4628,11 +4500,11 @@ print_attr(cups_file_t     *outfile,	/* I  - Output file */
 
 static void
 print_csv(
-    cups_file_t     *outfile,		/* I - Output file */
-    ipp_attribute_t *attr,		/* I - First attribute for line */
-    int             num_displayed,	/* I - Number of attributes to display */
-    char            **displayed,	/* I - Attributes to display */
-    size_t          *widths)		/* I - Column widths */
+    _cups_testdata_t *data,		/* I - Test data */
+    ipp_attribute_t  *attr,		/* I - First attribute for line */
+    int              num_displayed,	/* I - Number of attributes to display */
+    char             **displayed,	/* I - Attributes to display */
+    size_t           *widths)		/* I - Column widths */
 {
   int		i;			/* Looping var */
   size_t	maxlength;		/* Max length of all columns */
@@ -4663,7 +4535,7 @@ print_csv(
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-        cupsFilePutChar(outfile, ',');
+        cupsFilePutChar(data->outfile, ',');
 
       buffer[0] = '\0';
 
@@ -4691,7 +4563,7 @@ print_csv(
         cupsFilePutChar(cupsFileStdout(), '\"');
       }
       else
-        cupsFilePuts(outfile, buffer);
+        cupsFilePuts(data->outfile, buffer);
     }
     cupsFilePutChar(cupsFileStdout(), '\n');
   }
@@ -4702,7 +4574,7 @@ print_csv(
       if (i)
         cupsFilePutChar(cupsFileStdout(), ',');
 
-      cupsFilePuts(outfile, displayed[i]);
+      cupsFilePuts(data->outfile, displayed[i]);
     }
     cupsFilePutChar(cupsFileStdout(), '\n');
   }
@@ -4716,9 +4588,10 @@ print_csv(
  */
 
 static void
-print_fatal_error(cups_file_t *outfile,	/* I - Output file */
-		  const char  *s,	/* I - Printf-style format string */
-                  ...)			/* I - Additional arguments as needed */
+print_fatal_error(
+    _cups_testdata_t *data,		/* I - Test data */
+    const char       *s,		/* I - Printf-style format string */
+    ...)				/* I - Additional arguments as needed */
 {
   char		buffer[10240];		/* Format buffer */
   va_list	ap;			/* Pointer to arguments */
@@ -4738,8 +4611,8 @@ print_fatal_error(cups_file_t *outfile,	/* I - Output file */
 
   if (Output == _CUPS_OUTPUT_PLIST)
   {
-    print_xml_header(outfile);
-    print_xml_trailer(outfile, 0, buffer);
+    print_xml_header(data->outfile);
+    print_xml_trailer(data->outfile, 0, buffer);
   }
 
   _cupsLangPrintf(stderr, "ipptool: %s", buffer);
@@ -4752,9 +4625,9 @@ print_fatal_error(cups_file_t *outfile,	/* I - Output file */
 
 static void
 print_ippserver_attr(
-    cups_file_t     *outfile,		/* I - Output file */
-    ipp_attribute_t *attr,		/* I - Attribute to print */
-    int             indent)		/* I - Indentation level */
+    _cups_testdata_t *data,		/* I - Test data */
+    ipp_attribute_t  *attr,		/* I - Attribute to print */
+    int              indent)		/* I - Indentation level */
 {
   int			i,		/* Looping var */
 			count = ippGetCount(attr);
@@ -4763,23 +4636,23 @@ print_ippserver_attr(
 
 
   if (indent == 0)
-    cupsFilePrintf(outfile, "ATTR %s %s", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
+    cupsFilePrintf(data->outfile, "ATTR %s %s", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
   else
-    cupsFilePrintf(outfile, "%*sMEMBER %s %s", indent, "", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
+    cupsFilePrintf(data->outfile, "%*sMEMBER %s %s", indent, "", ippTagString(ippGetValueTag(attr)), ippGetName(attr));
 
   switch (ippGetValueTag(attr))
   {
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
 	for (i = 0; i < count; i ++)
-	  cupsFilePrintf(outfile, "%s%d", i ? "," : " ", ippGetInteger(attr, i));
+	  cupsFilePrintf(data->outfile, "%s%d", i ? "," : " ", ippGetInteger(attr, i));
 	break;
 
     case IPP_TAG_BOOLEAN :
-	cupsFilePuts(outfile, ippGetBoolean(attr, 0) ? " true" : " false");
+	cupsFilePuts(data->outfile, ippGetBoolean(attr, 0) ? " true" : " false");
 
 	for (i = 1; i < count; i ++)
-	  cupsFilePuts(outfile, ippGetBoolean(attr, 1) ? ",true" : ",false");
+	  cupsFilePuts(data->outfile, ippGetBoolean(attr, 1) ? ",true" : ",false");
 	break;
 
     case IPP_TAG_RANGE :
@@ -4787,7 +4660,7 @@ print_ippserver_attr(
 	{
 	  int upper, lower = ippGetRange(attr, i, &upper);
 
-	  cupsFilePrintf(outfile, "%s%d-%d", i ? "," : " ", lower, upper);
+	  cupsFilePrintf(data->outfile, "%s%d-%d", i ? "," : " ", lower, upper);
 	}
 	break;
 
@@ -4797,13 +4670,13 @@ print_ippserver_attr(
 	  ipp_res_t units;
 	  int yres, xres = ippGetResolution(attr, i, &yres, &units);
 
-	  cupsFilePrintf(outfile, "%s%dx%d%s", i ? "," : " ", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	  cupsFilePrintf(data->outfile, "%s%dx%d%s", i ? "," : " ", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
 	}
 	break;
 
     case IPP_TAG_DATE :
 	for (i = 0; i < count; i ++)
-	  cupsFilePrintf(outfile, "%s%s", i ? "," : " ", iso_date(ippGetDate(attr, i)));
+	  cupsFilePrintf(data->outfile, "%s%s", i ? "," : " ", iso_date(ippGetDate(attr, i)));
 	break;
 
     case IPP_TAG_STRING :
@@ -4812,8 +4685,8 @@ print_ippserver_attr(
 	  int len;
 	  const char *s = (const char *)ippGetOctetString(attr, i, &len);
 
-	  cupsFilePuts(outfile, i ? "," : " ");
-	  print_ippserver_string(outfile, s, (size_t)len);
+	  cupsFilePuts(data->outfile, i ? "," : " ");
+	  print_ippserver_string(data->outfile, s, (size_t)len);
 	}
 	break;
 
@@ -4831,8 +4704,8 @@ print_ippserver_attr(
 	{
 	  const char *s = ippGetString(attr, i, NULL);
 
-	  cupsFilePuts(outfile, i ? "," : " ");
-	  print_ippserver_string(outfile, s, strlen(s));
+	  cupsFilePuts(data->outfile, i ? "," : " ");
+	  print_ippserver_string(data->outfile, s, strlen(s));
 	}
 	break;
 
@@ -4841,19 +4714,19 @@ print_ippserver_attr(
 	{
 	  ipp_t *col = ippGetCollection(attr, i);
 
-	  cupsFilePuts(outfile, i ? ",{\n" : " {\n");
+	  cupsFilePuts(data->outfile, i ? ",{\n" : " {\n");
 	  for (colattr = ippFirstAttribute(col); colattr; colattr = ippNextAttribute(col))
-	    print_ippserver_attr(outfile, colattr, indent + 4);
-	  cupsFilePrintf(outfile, "%*s}", indent, "");
+	    print_ippserver_attr(data->outfile, colattr, indent + 4);
+	  cupsFilePrintf(data->outfile, "%*s}", indent, "");
 	}
 	break;
 
     default :
-	cupsFilePuts(outfile, " \"\"");
+	cupsFilePuts(data->outfile, " \"\"");
 	break;
   }
 
-  cupsFilePuts(outfile, "\n");
+  cupsFilePuts(data->outfile, "\n");
 }
 
 
@@ -4863,21 +4736,21 @@ print_ippserver_attr(
 
 static void
 print_ippserver_string(
-    cups_file_t *outfile,		/* I - Output file */
-    const char  *s,			/* I - String to print */
-    size_t      len)			/* I - Length of string */
+    _cups_testdata_t *data,		/* I - Test data */
+    const char       *s,		/* I - String to print */
+    size_t           len)		/* I - Length of string */
 {
-  cupsFilePutChar(outfile, '\"');
+  cupsFilePutChar(data->outfile, '\"');
   while (len > 0)
   {
     if (*s == '\"')
-      cupsFilePutChar(outfile, '\\');
-    cupsFilePutChar(outfile, *s);
+      cupsFilePutChar(data->outfile, '\\');
+    cupsFilePutChar(data->outfile, *s);
 
     s ++;
     len --;
   }
-  cupsFilePutChar(outfile, '\"');
+  cupsFilePutChar(data->outfile, '\"');
 }
 
 
@@ -4887,11 +4760,11 @@ print_ippserver_string(
 
 static void
 print_line(
-    cups_file_t     *outfile,		/* I - Output file */
-    ipp_attribute_t *attr,		/* I - First attribute for line */
-    int             num_displayed,	/* I - Number of attributes to display */
-    char            **displayed,	/* I - Attributes to display */
-    size_t          *widths)		/* I - Column widths */
+    _cups_testdata_t *data,		/* I - Test data */
+    ipp_attribute_t  *attr,		/* I - First attribute for line */
+    int              num_displayed,	/* I - Number of attributes to display */
+    char             **displayed,	/* I - Attributes to display */
+    size_t           *widths)		/* I - Column widths */
 {
   int		i;			/* Looping var */
   size_t	maxlength;		/* Max length of all columns */
@@ -4936,7 +4809,7 @@ print_line(
         }
       }
 
-      cupsFilePrintf(outfile, "%*s", (int)-widths[i], buffer);
+      cupsFilePrintf(data->outfile, "%*s", (int)-widths[i], buffer);
     }
     cupsFilePutChar(cupsFileStdout(), '\n');
   }
@@ -4947,7 +4820,7 @@ print_line(
       if (i)
         cupsFilePutChar(cupsFileStdout(), ' ');
 
-      cupsFilePrintf(outfile, "%*s", (int)-widths[i], displayed[i]);
+      cupsFilePrintf(data->outfile, "%*s", (int)-widths[i], displayed[i]);
     }
     cupsFilePutChar(cupsFileStdout(), '\n');
 
@@ -4958,7 +4831,7 @@ print_line(
 
       memset(buffer, '-', widths[i]);
       buffer[widths[i]] = '\0';
-      cupsFilePuts(outfile, buffer);
+      cupsFilePuts(data->outfile, buffer);
     }
     cupsFilePutChar(cupsFileStdout(), '\n');
   }
@@ -4972,25 +4845,25 @@ print_line(
  */
 
 static void
-print_xml_header(cups_file_t *outfile)		/* I - Output file */
+print_xml_header(_cups_testdata_t *data)/* I - Test data */
 {
-  if (!XMLHeader)
+  if (!data->xml_header)
   {
-    cupsFilePuts(outfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    cupsFilePuts(outfile, "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" "
+    cupsFilePuts(data->outfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    cupsFilePuts(data->outfile, "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" "
          "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n");
-    cupsFilePuts(outfile, "<plist version=\"1.0\">\n");
-    cupsFilePuts(outfile, "<dict>\n");
-    cupsFilePuts(outfile, "<key>ipptoolVersion</key>\n");
-    cupsFilePuts(outfile, "<string>" CUPS_SVERSION "</string>\n");
-    cupsFilePuts(outfile, "<key>Transfer</key>\n");
-    cupsFilePrintf(outfile, "<string>%s</string>\n",
+    cupsFilePuts(data->outfile, "<plist version=\"1.0\">\n");
+    cupsFilePuts(data->outfile, "<dict>\n");
+    cupsFilePuts(data->outfile, "<key>ipptoolVersion</key>\n");
+    cupsFilePuts(data->outfile, "<string>" CUPS_SVERSION "</string>\n");
+    cupsFilePuts(data->outfile, "<key>Transfer</key>\n");
+    cupsFilePrintf(data->outfile, "<string>%s</string>\n",
 	    Transfer == _CUPS_TRANSFER_AUTO ? "auto" :
 		Transfer == _CUPS_TRANSFER_CHUNKED ? "chunked" : "length");
-    cupsFilePuts(outfile, "<key>Tests</key>\n");
-    cupsFilePuts(outfile, "<array>\n");
+    cupsFilePuts(data->outfile, "<key>Tests</key>\n");
+    cupsFilePuts(data->outfile, "<array>\n");
 
-    XMLHeader = 1;
+    data->xml_header = 1;
   }
 }
 
@@ -5000,21 +4873,22 @@ print_xml_header(cups_file_t *outfile)		/* I - Output file */
  */
 
 static void
-print_xml_string(cups_file_t *outfile,	/* I - Output file */
-                 const char  *element,	/* I - Element name or NULL */
-		 const char  *s)	/* I - String to print */
+print_xml_string(
+    _cups_testdata_t *data,		/* I - Test data */
+    const char       *element,		/* I - Element name or NULL */
+    const char       *s)		/* I - String to print */
 {
   if (element)
-    cupsFilePrintf(outfile, "<%s>", element);
+    cupsFilePrintf(data->outfile, "<%s>", element);
 
   while (*s)
   {
     if (*s == '&')
-      cupsFilePuts(outfile, "&amp;");
+      cupsFilePuts(data->outfile, "&amp;");
     else if (*s == '<')
-      cupsFilePuts(outfile, "&lt;");
+      cupsFilePuts(data->outfile, "&lt;");
     else if (*s == '>')
-      cupsFilePuts(outfile, "&gt;");
+      cupsFilePuts(data->outfile, "&gt;");
     else if ((*s & 0xe0) == 0xc0)
     {
      /*
@@ -5023,13 +4897,13 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
 
       if ((s[1] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(outfile, '?');
+        cupsFilePutChar(data->outfile, '?');
         s ++;
       }
       else
       {
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s);
       }
     }
     else if ((*s & 0xf0) == 0xe0)
@@ -5040,14 +4914,14 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
 
       if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(outfile, '?');
+        cupsFilePutChar(data->outfile, '?');
         s += 2;
       }
       else
       {
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s);
       }
     }
     else if ((*s & 0xf8) == 0xf0)
@@ -5059,15 +4933,15 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
       if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
           (s[3] & 0xc0) != 0x80)
       {
-        cupsFilePutChar(outfile, '?');
+        cupsFilePutChar(data->outfile, '?');
         s += 3;
       }
       else
       {
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s++);
-        cupsFilePutChar(outfile, *s);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s++);
+        cupsFilePutChar(data->outfile, *s);
       }
     }
     else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
@@ -5076,16 +4950,16 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
       * Invalid control character...
       */
 
-      cupsFilePutChar(outfile, '?');
+      cupsFilePutChar(data->outfile, '?');
     }
     else
-      cupsFilePutChar(outfile, *s);
+      cupsFilePutChar(data->outfile, *s);
 
     s ++;
   }
 
   if (element)
-    cupsFilePrintf(outfile, "</%s>\n", element);
+    cupsFilePrintf(data->outfile, "</%s>\n", element);
 }
 
 
@@ -5094,68 +4968,25 @@ print_xml_string(cups_file_t *outfile,	/* I - Output file */
  */
 
 static void
-print_xml_trailer(cups_file_t *outfile,	/* I - Output file */
-                  int         success,	/* I - 1 on success, 0 on failure */
-                  const char  *message)	/* I - Error message or NULL */
+print_xml_trailer(
+    _cups_testdata_t *data,		/* I - Test data */
+    int              success,		/* I - 1 on success, 0 on failure */
+    const char       *message)		/* I - Error message or NULL */
 {
-  if (XMLHeader)
+  if (data->xml_header)
   {
-    cupsFilePuts(outfile, "</array>\n");
-    cupsFilePuts(outfile, "<key>Successful</key>\n");
-    cupsFilePuts(outfile, success ? "<true />\n" : "<false />\n");
+    cupsFilePuts(data->outfile, "</array>\n");
+    cupsFilePuts(data->outfile, "<key>Successful</key>\n");
+    cupsFilePuts(data->outfile, success ? "<true />\n" : "<false />\n");
     if (message)
     {
-      cupsFilePuts(outfile, "<key>ErrorMessage</key>\n");
-      print_xml_string(outfile, "string", message);
+      cupsFilePuts(data->outfile, "<key>ErrorMessage</key>\n");
+      print_xml_string(data->outfile, "string", message);
     }
-    cupsFilePuts(outfile, "</dict>\n");
-    cupsFilePuts(outfile, "</plist>\n");
+    cupsFilePuts(data->outfile, "</dict>\n");
+    cupsFilePuts(data->outfile, "</plist>\n");
 
-    XMLHeader = 0;
-  }
-}
-
-
-/*
- * 'set_variable()' - Set a variable value.
- */
-
-static void
-set_variable(cups_file_t  *outfile,	/* I - Output file */
-             _cups_vars_t *vars,	/* I - Variables */
-             const char   *name,	/* I - Variable name */
-             const char   *value)	/* I - Value string */
-{
-  _cups_var_t	key,			/* Search key */
-		*var;			/* New variable */
-
-
-  if (!_cups_strcasecmp(name, "filename"))
-  {
-    if (vars->filename)
-      free(vars->filename);
-
-    vars->filename = strdup(value);
-    return;
-  }
-
-  key.name = (char *)name;
-  if ((var = cupsArrayFind(vars->vars, &key)) != NULL)
-  {
-    free(var->value);
-    var->value = strdup(value);
-  }
-  else if ((var = malloc(sizeof(_cups_var_t))) == NULL)
-  {
-    print_fatal_error(outfile, "Unable to allocate memory for variable \"%s\".", name);
-    exit(1);
-  }
-  else
-  {
-    var->name  = strdup(name);
-    var->value = strdup(value);
-
-    cupsArrayAdd(vars->vars, var);
+    data->xml_header = 0;
   }
 }
 
@@ -5191,7 +5022,7 @@ timeout_cb(http_t *http,		/* I - Connection to server */
 
   (void)user_data;
 
-  /*
+ /*
   * If the socket still have data waiting to be sent to the printer (as can
   * happen if the printer runs out of paper), continue to wait until the output
   * buffer is empty...
@@ -5212,6 +5043,1281 @@ timeout_cb(http_t *http,		/* I - Connection to server */
 #endif /* SO_NWRITE */
 
   return (buffered > 0);
+}
+
+
+/*
+ * 'token_cb()' - Parse test file-specific tokens and run tests.
+ */
+
+static int				/* O - 1 to continue, 0 to stop */
+token_cb(_ipp_file_t      *f,		/* I - IPP file data */
+         _ipp_vars_t      *vars,	/* I - IPP variables */
+         _cups_testdata_t *data,	/* I - Test data */
+         const char       *token)	/* I - Current token */
+{
+  char	name[1024],			/* Name string */
+	temp[1024],			/* Temporary string */
+	value[1024];			/* Value string */
+
+
+  if (f->attrs)
+  {
+   /*
+    * Parse until we see a close brace...
+    */
+
+    if (_cups_strcasecmp(token, "COUNT") &&
+	_cups_strcasecmp(token, "DEFINE-MATCH") &&
+	_cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
+	_cups_strcasecmp(token, "DEFINE-VALUE") &&
+	_cups_strcasecmp(token, "IF-DEFINED") &&
+	_cups_strcasecmp(token, "IF-NOT-DEFINED") &&
+	_cups_strcasecmp(token, "IN-GROUP") &&
+	_cups_strcasecmp(token, "OF-TYPE") &&
+	_cups_strcasecmp(token, "REPEAT-LIMIT") &&
+	_cups_strcasecmp(token, "REPEAT-MATCH") &&
+	_cups_strcasecmp(token, "REPEAT-NO-MATCH") &&
+	_cups_strcasecmp(token, "SAME-COUNT-AS") &&
+	_cups_strcasecmp(token, "WITH-ALL-VALUES") &&
+	_cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") &&
+	_cups_strcasecmp(token, "WITH-ALL-RESOURCES") &&
+	_cups_strcasecmp(token, "WITH-ALL-SCHEMES") &&
+	_cups_strcasecmp(token, "WITH-HOSTNAME") &&
+	_cups_strcasecmp(token, "WITH-RESOURCE") &&
+	_cups_strcasecmp(token, "WITH-SCHEME") &&
+	_cups_strcasecmp(token, "WITH-VALUE") &&
+	_cups_strcasecmp(token, "WITH-VALUE-FROM"))
+      data->last_expect = NULL;
+
+    if (_cups_strcasecmp(token, "DEFINE-MATCH") &&
+	_cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
+	_cups_strcasecmp(token, "IF-DEFINED") &&
+	_cups_strcasecmp(token, "IF-NOT-DEFINED") &&
+	_cups_strcasecmp(token, "REPEAT-LIMIT") &&
+	_cups_strcasecmp(token, "REPEAT-MATCH") &&
+	_cups_strcasecmp(token, "REPEAT-NO-MATCH"))
+      data->last_status = NULL;
+
+    if (!strcmp(token, "}"))
+    {
+     /*
+      * TODO: Call do_test and return...
+      */
+
+    }
+    else if (!strcmp(token, "COMPRESSION"))
+    {
+     /*
+      * COMPRESSION none
+      * COMPRESSION deflate
+      * COMPRESSION gzip
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	_ippVarsExpand(vars, data->compression, temp, sizeof(data->compression));
+#ifdef HAVE_LIBZ
+	if (strcmp(data->compression, "none") && strcmp(data->compression, "deflate") &&
+	    strcmp(data->compression, "gzip"))
+#else
+	if (strcmp(data->compression, "none"))
+#endif /* HAVE_LIBZ */
+	{
+	  print_fatal_error(data, "Unsupported COMPRESSION value \"%s\" on line %d of \"%s\".", data->compression, f->linenum, f->filename);
+	  return (0);
+	}
+
+	if (!strcmp(compression, "none"))
+	  data->compression[0] = '\0';
+      }
+      else
+      {
+	print_fatal_error(data, "Missing COMPRESSION value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "DEFINE"))
+    {
+     /*
+      * DEFINE name value
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	_ippVarsExpand(vars, value, temp, sizeof(value));
+	_ippVarsSet(vars, name, value);
+      }
+      else
+      {
+	print_fatal_error(data, "Missing DEFINE name and/or value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "IGNORE-ERRORS"))
+    {
+     /*
+      * IGNORE-ERRORS yes
+      * IGNORE-ERRORS no
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)) && (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
+      {
+	data->ignore_errors = !_cups_strcasecmp(temp, "yes");
+      }
+      else
+      {
+	print_fatal_error(data, "Missing IGNORE-ERRORS value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(token, "NAME"))
+    {
+     /*
+      * Name of test...
+      */
+
+      _ippFileReadToken(f, temp, sizeof(temp));
+      _ippVarsExpand(vars, data->name, temp, sizeof(data->name));
+    }
+    else if (!_cups_strcasecmp(token, "PAUSE"))
+    {
+     /*
+      * Pause with a message...
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        pause_message(temp);
+      }
+      else
+      {
+	print_fatal_error(data, "Missing PAUSE message on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "REQUEST-ID"))
+    {
+     /*
+      * REQUEST-ID #
+      * REQUEST-ID random
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	if (isdigit(temp[0] & 255))
+	{
+	  data->request_id = atoi(temp);
+	}
+	else if (!_cups_strcasecmp(temp, "random"))
+	{
+	  data->request_id = (CUPS_RAND() % 1000) * 137 + 1;
+	}
+	else
+	{
+	  print_fatal_error(data, "Bad REQUEST-ID value \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	  return (0);
+	}
+      }
+      else
+      {
+	print_fatal_error(data, "Missing REQUEST-ID value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "SKIP-IF-DEFINED"))
+    {
+     /*
+      * SKIP-IF-DEFINED variable
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)))
+      {
+	if (_ippVarsGet(vars, name))
+	  data->skip_test = 1;
+      }
+      else
+      {
+	print_fatal_error(data, "Missing SKIP-IF-DEFINED value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "SKIP-IF-MISSING"))
+    {
+     /*
+      * SKIP-IF-MISSING filename
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        char filename[1024];		/* Filename */
+
+	_ippVarsExpand(vars, value, temp, sizeof(value));
+	get_filename(f->filename, filename, temp, sizeof(filename));
+
+	if (access(filename, R_OK))
+	  data->skip_test = 1;
+      }
+      else
+      {
+	print_fatal_error(data, "Missing SKIP-IF-MISSING filename on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "SKIP-IF-NOT-DEFINED"))
+    {
+     /*
+      * SKIP-IF-NOT-DEFINED variable
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)))
+      {
+	if (!_ippVarsGet(vars, name))
+	  data->skip_test = 1;
+      }
+      else
+      {
+	print_fatal_error(data, "Missing SKIP-IF-NOT-DEFINED value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "SKIP-PREVIOUS-ERROR"))
+    {
+     /*
+      * SKIP-PREVIOUS-ERROR yes
+      * SKIP-PREVIOUS-ERROR no
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)) && (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
+      {
+	data->skip_previous = !_cups_strcasecmp(temp, "yes");
+      }
+      else
+      {
+	print_fatal_error(data, "Missing SKIP-PREVIOUS-ERROR value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "TEST-ID"))
+    {
+     /*
+      * TEST-ID "string"
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	_ippVarsExpand(vars, data->test_id, temp, sizeof(data->test_id));
+      }
+      else
+      {
+	print_fatal_error(data, "Missing TEST-ID value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "TRANSFER"))
+    {
+     /*
+      * TRANSFER auto
+      * TRANSFER chunked
+      * TRANSFER length
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	if (!strcmp(temp, "auto"))
+	{
+	  data->transfer = _CUPS_TRANSFER_AUTO;
+	}
+	else if (!strcmp(temp, "chunked"))
+	{
+	  data->transfer = _CUPS_TRANSFER_CHUNKED;
+	}
+	else if (!strcmp(temp, "length"))
+	{
+	  data->transfer = _CUPS_TRANSFER_LENGTH;
+	}
+	else
+	{
+	  print_fatal_error(data, "Bad TRANSFER value \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	  return (0);
+	}
+      }
+      else
+      {
+	print_fatal_error(data, "Missing TRANSFER value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(token, "VERSION"))
+    {
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	if (!strcmp(temp, "0.0"))
+	{
+	  data->version = 0;
+	}
+	else if (!strcmp(temp, "1.0"))
+	{
+	  data->version = 10;
+	}
+	else if (!strcmp(temp, "1.1"))
+	{
+	  data->version = 11;
+	}
+	else if (!strcmp(temp, "2.0"))
+	{
+	  data->version = 20;
+	}
+	else if (!strcmp(temp, "2.1"))
+	{
+	  data->version = 21;
+	}
+	else if (!strcmp(temp, "2.2"))
+	{
+	  data->version = 22;
+	}
+	else
+	{
+	  print_fatal_error(data, "Bad VERSION \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	  return (0);
+	}
+      }
+      else
+      {
+	print_fatal_error(data, "Missing VERSION number on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "RESOURCE"))
+    {
+     /*
+      * Resource name...
+      */
+
+      if (!get_token(fp, resource, sizeof(resource), &linenum))
+      {
+	print_fatal_error(data, "Missing RESOURCE path on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "OPERATION"))
+    {
+     /*
+      * Operation...
+      */
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing OPERATION code on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      _ippVarsExpand(vars, token, temp, sizeof(token));
+
+      if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
+	  (op = (ipp_op_t)strtol(token, NULL, 0)) == 0)
+      {
+	print_fatal_error(data, "Bad OPERATION code \"%s\" on line %d of \"%s\".", token,
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "GROUP"))
+    {
+     /*
+      * Attribute group...
+      */
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing GROUP tag on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if ((value = ippTagValue(token)) == IPP_TAG_ZERO || value >= IPP_TAG_UNSUPPORTED_VALUE)
+      {
+	print_fatal_error(data, "Bad GROUP tag \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (value == group)
+	ippAddSeparator(request);
+
+      group = value;
+    }
+    else if (!_cups_strcasecmp(token, "DELAY"))
+    {
+     /*
+      * Delay before operation...
+      */
+
+      double dval;                    /* Delay value */
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing DELAY value on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      _ippVarsExpand(vars, token, temp, sizeof(token));
+
+      if ((dval = _cupsStrScand(token, &tokenptr, localeconv())) < 0.0 || (*tokenptr && *tokenptr != ','))
+      {
+	print_fatal_error(data, "Bad DELAY value \"%s\" on line %d of \"%s\".", token,
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      delay = (useconds_t)(1000000.0 * dval);
+
+      if (*tokenptr == ',')
+      {
+	if ((dval = _cupsStrScand(tokenptr + 1, &tokenptr, localeconv())) <= 0.0 || *tokenptr)
+	{
+	  print_fatal_error(data, "Bad DELAY value \"%s\" on line %d of \"%s\".", token,
+			    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+	repeat_interval = (useconds_t)(1000000.0 * dval);
+      }
+      else
+	repeat_interval = delay;
+    }
+    else if (!_cups_strcasecmp(token, "FILE"))
+    {
+     /*
+      * File...
+      */
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing FILE filename on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      _ippVarsExpand(vars, token, temp, sizeof(token));
+      get_filename(testfile, filename, token, sizeof(filename));
+
+      if (access(filename, R_OK))
+      {
+	print_fatal_error(data, "Filename \"%s\" on line %d cannot be read.",
+			  temp, f->linenum, f->filename);
+	print_fatal_error(data, "Filename mapped to \"%s\".", filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "STATUS"))
+    {
+     /*
+      * Status...
+      */
+
+      if (num_statuses >= (int)(sizeof(statuses) / sizeof(statuses[0])))
+      {
+	print_fatal_error(data, "Too many STATUS's on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing STATUS code on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if ((statuses[num_statuses].status = ippErrorValue(token))
+	      == (ipp_status_t)-1 &&
+	  (statuses[num_statuses].status = (ipp_status_t)strtol(token, NULL, 0)) == 0)
+      {
+	print_fatal_error(data, "Bad STATUS code \"%s\" on line %d of \"%s\".", token,
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      last_status = statuses + num_statuses;
+      num_statuses ++;
+
+      last_status->define_match    = NULL;
+      last_status->define_no_match = NULL;
+      last_status->if_defined      = NULL;
+      last_status->if_not_defined  = NULL;
+      last_status->repeat_limit    = 1000;
+      last_status->repeat_match    = 0;
+      last_status->repeat_no_match = 0;
+    }
+    else if (!_cups_strcasecmp(token, "EXPECT") || !_cups_strcasecmp(token, "EXPECT-ALL"))
+    {
+     /*
+      * Expected attributes...
+      */
+
+      int expect_all = !_cups_strcasecmp(token, "EXPECT-ALL");
+
+      if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
+      {
+	print_fatal_error(data, "Too many EXPECT's on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing EXPECT name on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      last_expect = expects + num_expects;
+      num_expects ++;
+
+      memset(last_expect, 0, sizeof(_cups_expect_t));
+      last_expect->repeat_limit = 1000;
+      last_expect->expect_all   = expect_all;
+
+      if (token[0] == '!')
+      {
+	last_expect->not_expect = 1;
+	last_expect->name       = strdup(token + 1);
+      }
+      else if (token[0] == '?')
+      {
+	last_expect->optional = 1;
+	last_expect->name     = strdup(token + 1);
+      }
+      else
+	last_expect->name = strdup(token);
+    }
+    else if (!_cups_strcasecmp(token, "COUNT"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing COUNT number on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if ((i = atoi(token)) <= 0)
+      {
+	print_fatal_error(data, "Bad COUNT \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->count = i;
+      else
+      {
+	print_fatal_error(data, "COUNT without a preceding EXPECT on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DEFINE-MATCH"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing DEFINE-MATCH variable on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->define_match = strdup(token);
+      else if (last_status)
+	last_status->define_match = strdup(token);
+      else
+      {
+	print_fatal_error(data, "DEFINE-MATCH without a preceding EXPECT or STATUS "
+			  "on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DEFINE-NO-MATCH"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing DEFINE-NO-MATCH variable on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->define_no_match = strdup(token);
+      else if (last_status)
+	last_status->define_no_match = strdup(token);
+      else
+      {
+	print_fatal_error(data, "DEFINE-NO-MATCH without a preceding EXPECT or "
+			  "STATUS on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DEFINE-VALUE"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing DEFINE-VALUE variable on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->define_value = strdup(token);
+      else
+      {
+	print_fatal_error(data, "DEFINE-VALUE without a preceding EXPECT on "
+			  "line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "OF-TYPE"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing OF-TYPE value tag(s) on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->of_type = strdup(token);
+      else
+      {
+	print_fatal_error(data, "OF-TYPE without a preceding EXPECT on line %d of \"%s\".",
+			  linenum);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "IN-GROUP"))
+    {
+      ipp_tag_t	in_group;	/* IN-GROUP value */
+
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing IN-GROUP group tag on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if ((in_group = ippTagValue(token)) == IPP_TAG_ZERO || in_group >= IPP_TAG_UNSUPPORTED_VALUE)
+      {
+	print_fatal_error(data, "Bad IN-GROUP group tag \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+      else if (last_expect)
+	last_expect->in_group = in_group;
+      else
+      {
+	print_fatal_error(data, "IN-GROUP without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "REPEAT-LIMIT"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing REPEAT-LIMIT value on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+      else if (atoi(token) <= 0)
+      {
+	print_fatal_error(data, "Bad REPEAT-LIMIT value on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_status)
+	last_status->repeat_limit = atoi(token);
+      else if (last_expect)
+	last_expect->repeat_limit = atoi(token);
+      else
+      {
+	print_fatal_error(data, "REPEAT-LIMIT without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "REPEAT-MATCH"))
+    {
+      if (last_status)
+	last_status->repeat_match = 1;
+      else if (last_expect)
+	last_expect->repeat_match = 1;
+      else
+      {
+	print_fatal_error(data, "REPEAT-MATCH without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "REPEAT-NO-MATCH"))
+    {
+      if (last_status)
+	last_status->repeat_no_match = 1;
+      else if (last_expect)
+	last_expect->repeat_no_match = 1;
+      else
+      {
+	print_fatal_error(data, "REPEAT-NO-MATCH without a preceding EXPECT or STATUS on ine %d.", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "SAME-COUNT-AS"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing SAME-COUNT-AS name on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->same_count_as = strdup(token);
+      else
+      {
+	print_fatal_error(data, "SAME-COUNT-AS without a preceding EXPECT on line "
+			  "%d.", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "IF-DEFINED"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing IF-DEFINED name on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->if_defined = strdup(token);
+      else if (last_status)
+	last_status->if_defined = strdup(token);
+      else
+      {
+	print_fatal_error(data, "IF-DEFINED without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "IF-NOT-DEFINED"))
+    {
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing IF-NOT-DEFINED name on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+	last_expect->if_not_defined = strdup(token);
+      else if (last_status)
+	last_status->if_not_defined = strdup(token);
+      else
+      {
+	print_fatal_error(data, "IF-NOT-DEFINED without a preceding EXPECT or STATUS on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") ||
+	     !_cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") ||
+	     !_cups_strcasecmp(token, "WITH-ALL-RESOURCES") ||
+	     !_cups_strcasecmp(token, "WITH-ALL-SCHEMES") ||
+	     !_cups_strcasecmp(token, "WITH-HOSTNAME") ||
+	     !_cups_strcasecmp(token, "WITH-RESOURCE") ||
+	     !_cups_strcasecmp(token, "WITH-SCHEME") ||
+	     !_cups_strcasecmp(token, "WITH-VALUE"))
+    {
+      if (last_expect)
+      {
+	if (!_cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") ||
+	    !_cups_strcasecmp(token, "WITH-HOSTNAME"))
+	  last_expect->with_flags = _CUPS_WITH_HOSTNAME;
+	else if (!_cups_strcasecmp(token, "WITH-ALL-RESOURCES") ||
+	    !_cups_strcasecmp(token, "WITH-RESOURCE"))
+	  last_expect->with_flags = _CUPS_WITH_RESOURCE;
+	else if (!_cups_strcasecmp(token, "WITH-ALL-SCHEMES") ||
+	    !_cups_strcasecmp(token, "WITH-SCHEME"))
+	  last_expect->with_flags = _CUPS_WITH_SCHEME;
+
+	if (!_cups_strncasecmp(token, "WITH-ALL-", 9))
+	  last_expect->with_flags |= _CUPS_WITH_ALL;
+      }
+
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing %s value on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+      {
+       /*
+	* Expand any variables in the value and then save it.
+	*/
+
+	_ippVarsExpand(vars, token, temp, sizeof(token));
+
+	tokenptr = token + strlen(token) - 1;
+
+	if (token[0] == '/' && tokenptr > token && *tokenptr == '/')
+	{
+	 /*
+	  * WITH-VALUE is a POSIX extended regular expression.
+	  */
+
+	  last_expect->with_value = calloc(1, (size_t)(tokenptr - token));
+	  last_expect->with_flags |= _CUPS_WITH_REGEX;
+
+	  if (last_expect->with_value)
+	    memcpy(last_expect->with_value, token + 1, (size_t)(tokenptr - token - 1));
+	}
+	else
+	{
+	 /*
+	  * WITH-VALUE is a literal value...
+	  */
+
+	  char *ptr;			/* Pointer into value */
+
+	  for (ptr = token; *ptr; ptr ++)
+	  {
+	    if (*ptr == '\\' && ptr[1])
+	    {
+	     /*
+	      * Remove \ from \foo...
+	      */
+
+	      _cups_strcpy(ptr, ptr + 1);
+	    }
+	  }
+
+	  last_expect->with_value = strdup(token);
+	  last_expect->with_flags |= _CUPS_WITH_LITERAL;
+	}
+      }
+      else
+      {
+	print_fatal_error(data, "%s without a preceding EXPECT on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "WITH-VALUE-FROM"))
+    {
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing %s value on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (last_expect)
+      {
+       /*
+	* Expand any variables in the value and then save it.
+	*/
+
+	_ippVarsExpand(vars, token, temp, sizeof(token));
+
+	last_expect->with_value_from = strdup(token);
+	last_expect->with_flags      = _CUPS_WITH_LITERAL;
+      }
+      else
+      {
+	print_fatal_error(data, "%s without a preceding EXPECT on line %d of \"%s\".", token, f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DISPLAY"))
+    {
+     /*
+      * Display attributes...
+      */
+
+      if (num_displayed >= (int)(sizeof(displayed) / sizeof(displayed[0])))
+      {
+	print_fatal_error(data, "Too many DISPLAY's on line %d", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      if (!get_token(fp, token, sizeof(token), &linenum))
+      {
+	print_fatal_error(data, "Missing DISPLAY name on line %d of \"%s\".", f->linenum, f->filename);
+	pass = 0;
+	goto test_exit;
+      }
+
+      displayed[num_displayed] = strdup(token);
+      num_displayed ++;
+    }
+    else
+    {
+      print_fatal_error(data, "Unexpected token %s seen on line %d of \"%s\".", token, f->linenum, f->filename);
+      return (0);
+    }
+  }
+  else
+  {
+   /*
+    * Scan for the start of a test (open brace)...
+    */
+
+    if (!strcmp(token, "{"))
+    {
+     /*
+      * Start new test...
+      */
+
+      char *ptr;			/* Pointer into string */
+
+      if (data->show_header)
+      {
+	if (data->output == _CUPS_OUTPUT_PLIST)
+	  print_xml_header(data);
+
+	if (data->output == _CUPS_OUTPUT_TEST || (data->output == _CUPS_OUTPUT_PLIST && data->outfile != cupsFileStdout()))
+	  cupsFilePrintf(cupsFileStdout(), "\"%s\":\n", f->filename);
+
+	data->show_header = 0;
+      }
+
+      data->compression[0] = '\0';
+      data->delay          = 0;
+      data->num_expect     = 0;
+      data->last_expect    = NULL;
+      data->filename[0]    = '\0';
+      data->ignore_errors  = data->def_ignore_errors;
+      strlcpy(data->name, f->filename, sizeof(data->name));
+      if ((ptr = strrchr(data->name, '.')) != NULL)
+        *ptr = '\0';
+      data->repeat_count    = 0;
+      data->repeat_interval = 5000000;
+      data->request_id ++;
+      strlcpy(data->resource, vars->resource, sizeof(data->resource));
+      data->skip_previous = 0;
+      data->skip_test     = 0;
+      data->num_status    = 0;
+      data->last_status   = NULL;
+      data->test_id[0]    = '\0';
+      data->transfer      = data->def_transfer;
+      data->version       = data->def_version;
+
+      f->attrs     = ippNew();
+      f->group_tag = IPP_TAG_ZERO;
+    }
+    else if (!strcmp(token, "DEFINE"))
+    {
+     /*
+      * DEFINE name value
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        _ippVarsExpand(vars, value, temp, sizeof(value));
+	_ippVarsSet(vars, name, value);
+      }
+      else
+      {
+        print_fatal_error(data, "Missing DEFINE name and/or value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "DEFINE-DEFAULT"))
+    {
+     /*
+      * DEFINE-DEFAULT name value
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        if (!_ippVarsGet(vars, name))
+        {
+	  _ippVarsExpand(vars, value, temp, sizeof(value));
+	  _ippVarsSet(vars, name, value);
+	}
+      }
+      else
+      {
+        print_fatal_error(data, "Missing DEFINE-DEFAULT name and/or value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "FILE-ID"))
+    {
+     /*
+      * FILE-ID "string"
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        _ippVarsExpand(vars, data->file_id, temp, sizeof(data->file_id));
+      }
+      else
+      {
+        print_fatal_error(data, "Missing FILE-ID value on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else if (!strcmp(token, "IGNORE-ERRORS"))
+    {
+     /*
+      * IGNORE-ERRORS yes
+      * IGNORE-ERRORS no
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)) && (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
+      {
+        data->def_ignore_errors = !_cups_strcasecmp(temp, "yes");
+      }
+      else
+      {
+        print_fatal_error(data, "Missing IGNORE-ERRORS value on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else if (!strcmp(token, "INCLUDE"))
+    {
+     /*
+      * INCLUDE "filename"
+      * INCLUDE <filename>
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        char	filename[1024],		/* Mapped filename */
+        	save_file_id[1024];	/* Saved FILE-ID value */
+
+        strlcpy(save_file_id, data->file_id, sizeof(save_file_id));
+        data->file_id[0] = '\0';
+
+        if (!do_tests(data, vars, get_filename(f->filename, filename, temp, sizeof(filename))) && data->stop_after_include_error)
+          return (0);
+
+        strlcpy(data->file_id, save_file_id, sizeof(data->file_id));
+      }
+      else
+      {
+        print_fatal_error(data, "Missing INCLUDE filename on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+
+      data->show_header = 1;
+    }
+    else if (!strcmp(token, "INCLUDE-IF-DEFINED"))
+    {
+     /*
+      * INCLUDE-IF-DEFINED name "filename"
+      * INCLUDE-IF-DEFINED name <filename>
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        char	filename[1024],		/* Mapped filename */
+        	save_file_id[1024];	/* Saved FILE-ID value */
+
+        strlcpy(save_file_id, data->file_id, sizeof(save_file_id));
+        data->file_id[0] = '\0';
+
+        if (_ippVarsGet(vars, name) && !do_tests(data, vars, get_filename(f->filename, filename, temp, sizeof(filename))) && data->stop_after_include_error)
+          return (0);
+
+        strlcpy(data->file_id, save_file_id, sizeof(data->file_id));
+      }
+      else
+      {
+        print_fatal_error(data, "Missing INCLUDE-IF-DEFINED name or filename on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+
+      data->show_header = 1;
+    }
+    else if (!strcmp(token, "INCLUDE-IF-NOT-DEFINED"))
+    {
+     /*
+      * INCLUDE-IF-NOT-DEFINED name "filename"
+      * INCLUDE-IF-NOT-DEFINED name <filename>
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        char	filename[1024],		/* Mapped filename */
+        	save_file_id[1024];	/* Saved FILE-ID value */
+
+        strlcpy(save_file_id, data->file_id, sizeof(save_file_id));
+        data->file_id[0] = '\0';
+
+        if (!_ippVarsGet(vars, name) && !do_tests(data, vars, get_filename(f->filename, filename, temp, sizeof(filename))) && data->stop_after_include_error)
+          return (0);
+
+        strlcpy(data->file_id, save_file_id, sizeof(data->file_id));
+      }
+      else
+      {
+        print_fatal_error(data, "Missing INCLUDE-IF-NOT-DEFINED name or filename on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+
+      data->show_header = 1;
+    }
+    else if (!strcmp(token, "SKIP-IF-DEFINED"))
+    {
+     /*
+      * SKIP-IF-DEFINED variable
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)))
+      {
+        if (_ippVarsGet(vars, name))
+          data->skip_test = 1;
+      }
+      else
+      {
+        print_fatal_error(data, "Missing SKIP-IF-DEFINED variable on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else if (!strcmp(token, "SKIP-IF-NOT-DEFINED"))
+    {
+     /*
+      * SKIP-IF-NOT-DEFINED variable
+      */
+
+      if (_ippFileReadToken(f, name, sizeof(name)))
+      {
+        if (!_ippVarsGet(vars, name))
+          data->skip_test = 1;
+      }
+      else
+      {
+        print_fatal_error(data, "Missing SKIP-IF-NOT-DEFINED variable on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else if (!strcmp(token, "STOP-AFTER-INCLUDE-ERROR"))
+    {
+     /*
+      * STOP-AFTER-INCLUDE-ERROR yes
+      * STOP-AFTER-INCLUDE-ERROR no
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)) && (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
+      {
+        data->stop_after_include_error = !_cups_strcasecmp(temp, "yes");
+      }
+      else
+      {
+        print_fatal_error(data, "Missing STOP-AFTER-INCLUDE-ERROR value on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else if (!strcmp(token, "TRANSFER"))
+    {
+     /*
+      * TRANSFER auto
+      * TRANSFER chunked
+      * TRANSFER length
+      */
+
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        if (!strcmp(temp, "auto"))
+	  data->def_transfer = _CUPS_TRANSFER_AUTO;
+	else if (!strcmp(temp, "chunked"))
+	  data->def_transfer = _CUPS_TRANSFER_CHUNKED;
+	else if (!strcmp(temp, "length"))
+	  data->def_transfer = _CUPS_TRANSFER_LENGTH;
+	else
+	{
+	  print_fatal_error(data, "Bad TRANSFER value \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	  return (0);
+	}
+      }
+      else
+      {
+        print_fatal_error(data, "Missing TRANSFER value on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!strcmp(token, "VERSION"))
+    {
+      if (_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+        if (!strcmp(temp, "1.0"))
+	  data->def_version = 10;
+	else if (!strcmp(temp, "1.1"))
+	  data->def_version = 11;
+	else if (!strcmp(temp, "2.0"))
+	  data->def_version = 20;
+	else if (!strcmp(temp, "2.1"))
+	  data->def_version = 21;
+	else if (!strcmp(temp, "2.2"))
+	  data->def_version = 22;
+	else
+	{
+	  print_fatal_error(data, "Bad VERSION \"%s\" on line %d of \"%s\".", temp, f->linenum, f->filename);
+	  return (0);
+	}
+      }
+      else
+      {
+        print_fatal_error(data, "Missing VERSION number on line %d of \"%s\".", f->linenum, f->filename);
+        return (0);
+      }
+    }
+    else
+    {
+      print_fatal_error(data, "Unexpected token %s seen on line %d of \"%s\".", token, f->linenum, f->filename);
+      return (0);
+    }
+  }
+
+  return (1);
 }
 
 
@@ -5527,7 +6633,7 @@ validate_attr(cups_file_t     *outfile,	/* I - Output file */
 	       colattr;
 	       colattr = colattr->next)
 	  {
-	    if (!validate_attr(outfile, NULL, colattr))
+	    if (!validate_attr(data->outfile, NULL, colattr))
 	    {
 	      valid = 0;
 	      break;
@@ -5540,7 +6646,7 @@ validate_attr(cups_file_t     *outfile,	/* I - Output file */
 
 	    while (colattr)
 	    {
-	      validate_attr(outfile, errors, colattr);
+	      validate_attr(data->outfile, errors, colattr);
 	      colattr = colattr->next;
 	    }
 	  }
@@ -5824,7 +6930,7 @@ validate_attr(cups_file_t     *outfile,	/* I - Output file */
           char	temp[256];		/* Temporary error string */
 
           regerror(i, &re, temp, sizeof(temp));
-	  print_fatal_error(outfile, "Unable to compile naturalLanguage regular "
+	  print_fatal_error(data, "Unable to compile naturalLanguage regular "
 	                    "expression: %s.", temp);
 	  break;
         }
@@ -5877,7 +6983,7 @@ validate_attr(cups_file_t     *outfile,	/* I - Output file */
           char	temp[256];		/* Temporary error string */
 
           regerror(i, &re, temp, sizeof(temp));
-	  print_fatal_error(outfile, "Unable to compile mimeMediaType regular "
+	  print_fatal_error(data, "Unable to compile mimeMediaType regular "
 	                    "expression: %s.", temp);
 	  break;
         }
@@ -6229,7 +7335,7 @@ with_value(cups_file_t     *outfile,	/* I - Output file */
 	  {
             regerror(i, &re, temp, sizeof(temp));
 
-	    print_fatal_error(outfile, "Unable to compile WITH-VALUE regular expression "
+	    print_fatal_error(data, "Unable to compile WITH-VALUE regular expression "
 	                      "\"%s\" - %s", value, temp);
 	    return (0);
 	  }
