@@ -160,8 +160,6 @@ void
 _ippVarsInit(_ipp_vars_t *v)		/* I - IPP variables */
 {
   memset(v, 0, sizeof(_ipp_vars_t));
-
-  v->family = AF_UNSPEC;
 }
 
 

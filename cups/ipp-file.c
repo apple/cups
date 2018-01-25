@@ -41,7 +41,6 @@ _ippFileParse(
   _ipp_file_t	f;			/* IPP data file information */
   ipp_attribute_t *attr = NULL;		/* Current attribute */
   char		token[1024];		/* Token string */
-  int		status = 1;		/* Return status */
 
 
   DEBUG_printf(("_ippFileParse(v=%p, filename=\"%s\", tokencb=%p, errorcb=%p, user_data=%p)", (void *)v, filename, (void *)tokencb, (void *)errorcb, user_data));
@@ -88,7 +87,6 @@ _ippFileParse(
       else
       {
         report_error(&f, errorcb, user_data, "Missing %s name and/or value on line %d of \"%s\".", token, f.linenum, f.filename);
-        status = 0;
         break;
       }
     }
@@ -107,20 +105,17 @@ _ippFileParse(
       if (!_ippFileReadToken(&f, syntax, sizeof(syntax)))
       {
         report_error(&f, errorcb, user_data, "Missing ATTR syntax on line %d of \"%s\".", f.linenum, f.filename);
-	status = 0;
 	break;
       }
       else if ((value_tag = ippTagValue(syntax)) < IPP_TAG_UNSUPPORTED_VALUE)
       {
         report_error(&f, errorcb, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f.linenum, f.filename);
-	status = 0;
 	break;
       }
 
       if (!_ippFileReadToken(&f, name, sizeof(name)) || !name[0])
       {
         report_error(&f, errorcb, user_data, "Missing ATTR name on line %d of \"%s\".", f.linenum, f.filename);
-	status = 0;
 	break;
       }
 
@@ -141,10 +136,7 @@ _ippFileParse(
         attr = ippAddString(f.attrs, f.group_tag, value_tag, name, NULL, NULL);
 
         if (!parse_value(&f, v, errorcb, user_data, f.attrs, &attr, 0))
-        {
-          status = 0;
           break;
-	}
       }
 
     }
@@ -155,10 +147,7 @@ _ippFileParse(
       */
 
       if (!parse_value(&f, v, errorcb, user_data, f.attrs, &attr, ippGetCount(attr)))
-      {
-	status = 0;
 	break;
-      }
     }
     else
     {
@@ -246,6 +235,9 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 
   while (ch != EOF)
   {
+    if (ch == '\n')
+      f->linenum ++;
+
     if (ch == quote)
     {
      /*
@@ -326,6 +318,8 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 	  DEBUG_puts("1_ippFileReadToken: EOF");
 	  return (0);
 	}
+	else if (ch == '\n')
+	  f->linenum ++;
       }
 
       if (tokptr < tokend)
