@@ -956,7 +956,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
   *bufptr = '\0';
 
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H
-  if (!strcmp(ErrorLog, "syslog"))
+  if (!strcmp(PageLog, "syslog"))
   {
     static const char * const job_states[] =
     {					/* job-state strings */
