@@ -311,7 +311,7 @@
 "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)." = "“%s”: Bad URI value “%s” - bad length %d (RFC 8011 section 5.1.6).";
 "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)." = "“%s”: Bad attribute name - bad length %d (RFC 8011 section 5.1.4).";
 "\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)." = "“%s”: Bad attribute name - invalid character (RFC 8011 section 5.1.4).";
-"\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)." = "“%s”: Bad boolen value %d (RFC 8011 section 5.1.21).";
+"\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)." = "“%s”: Bad boolean value %d (RFC 8011 section 5.1.21).";
 "\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)." = "“%s”: Bad charset value “%s” - bad characters (RFC 8011 section 5.1.8).";
 "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)." = "“%s”: Bad charset value “%s” - bad length %d (RFC 8011 section 5.1.8).";
 "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)." = "“%s”: Bad dateTime UTC hours %u (RFC 8011 section 5.1.15).";
@@ -1475,7 +1475,7 @@
 "ippfind: Unknown variable \"{%s}\"." = "ippfind: Unknown variable “{%s}”.";
 "ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"." = "ipptool: “-i” and “-n” are incompatible with “--ippserver”, “-P”, and “-X”.";
 "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"." = "ipptool: “-i” and “-n” are incompatible with “-P” and “-X”.";
-"ipptool: Bad URI - %s." = "ipptool: Bad URI - %s.";
+"ipptool: Bad URI \"%s\"." = "ipptool: Bad URI “%s”.";
 "ipptool: Invalid seconds for \"-i\"." = "ipptool: Invalid seconds for “-i”.";
 "ipptool: May only specify a single URI." = "ipptool: May only specify a single URI.";
 "ipptool: Missing count for \"-n\"." = "ipptool: Missing count for “-n”.";
@@ -1484,7 +1484,6 @@
 "ipptool: Missing name=value for \"-d\"." = "ipptool: Missing name=value for “-d”.";
 "ipptool: Missing seconds for \"-i\"." = "ipptool: Missing seconds for “-i”.";
 "ipptool: URI required before test file." = "ipptool: URI required before test file.";
-"ipptool: Unknown option \"-%c\"." = "ipptool: Unknown option “-%c”.";
 "job-printer-uri attribute missing." = "job-printer-uri attribute missing.";
 "lpadmin: Class name can only contain printable characters." = "lpadmin: Class name can only contain printable characters.";
 "lpadmin: Expected PPD after \"-%c\" option." = "lpadmin: Expected PPD after “-%c” option.";

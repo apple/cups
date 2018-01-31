@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-18 13:08-0500\n"
+"POT-Creation-Date: 2018-01-31 14:22-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1397,7 +1397,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
 msgstr ""
 
 #, c-format
@@ -6574,8 +6574,8 @@ msgstr ""
 "ipptool: \"-i\" および \"-n\" は \"-P\"、\"-X\" と一緒に指定できません。"
 
 #, c-format
-msgid "ipptool: Bad URI - %s."
-msgstr "ipptool: 不正な URI です - %s。"
+msgid "ipptool: Bad URI \"%s\"."
+msgstr ""
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool: \"-i\" に不正な秒数が指定されました。"
@@ -6600,10 +6600,6 @@ msgstr "ipptool: \"-i\" に秒数の指定がありません。"
 
 msgid "ipptool: URI required before test file."
 msgstr "ipptool: テストファイルの前に URI の指定が必要です。"
-
-#, c-format
-msgid "ipptool: Unknown option \"-%c\"."
-msgstr "ipptool: \"-%c\"は未知のオプションです。"
 
 msgid "job-account-id"
 msgstr "Job Account ID"
@@ -13117,6 +13113,9 @@ msgstr ""
 #~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 #~ msgstr "ipptool: \"-i\" と \"-n\" は \"-X\" と組み合わせられません。"
 
+#~ msgid "ipptool: Bad URI - %s."
+#~ msgstr "ipptool: 不正な URI です - %s。"
+
 #~ msgid "ipptool: Bad version %s for \"-V\"."
 #~ msgstr "ipptool: \"-V\" オプションに不正なバージョン %s が指定されました。"
 
@@ -13125,6 +13124,9 @@ msgstr ""
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: \"-V\" にバージョンの指定がありません。"
+
+#~ msgid "ipptool: Unknown option \"-%c\"."
+#~ msgstr "ipptool: \"-%c\"は未知のオプションです。"
 
 #~ msgid "job-authorization-uri"
 #~ msgstr "Job Authorization URI"

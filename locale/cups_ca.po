@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-18 13:08-0500\n"
+"POT-Creation-Date: 2018-01-31 14:22-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -1396,7 +1396,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
 msgstr ""
 
 #, c-format
@@ -6591,8 +6591,8 @@ msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
 #, c-format
-msgid "ipptool: Bad URI - %s."
-msgstr "ipptool: l'URI no es correcte - %s."
+msgid "ipptool: Bad URI \"%s\"."
+msgstr ""
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool: els segons de «-i» no són correctes."
@@ -6617,10 +6617,6 @@ msgstr "ipptool: falten els segons a «-i»."
 
 msgid "ipptool: URI required before test file."
 msgstr "ipptool: falta l'URI abans del fitxer de prova."
-
-#, c-format
-msgid "ipptool: Unknown option \"-%c\"."
-msgstr "ipptool: l'opció «-%c» és desconeguda."
 
 msgid "job-account-id"
 msgstr "Job Account ID"
@@ -13029,6 +13025,9 @@ msgstr ""
 #~ msgid "ipptool: \"-n\" is incompatible with \"-X\"."
 #~ msgstr "ipptool: «-n» no és compatible amb «-X»."
 
+#~ msgid "ipptool: Bad URI - %s."
+#~ msgstr "ipptool: l'URI no es correcte - %s."
+
 #~ msgid "ipptool: Bad version %s for \"-V\"."
 #~ msgstr "ipptool: la versió %s de «-V» no és correcta."
 
@@ -13037,6 +13036,9 @@ msgstr ""
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: falta la versió a «-V»."
+
+#~ msgid "ipptool: Unknown option \"-%c\"."
+#~ msgstr "ipptool: l'opció «-%c» és desconeguda."
 
 #~ msgid "job-authorization-uri"
 #~ msgstr "Job Authorization URI"

@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-18 13:08-0500\n"
+"POT-Creation-Date: 2018-01-31 14:22-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1018,7 +1018,7 @@ msgstr ""
 msgid "  --false                 Always false."
 msgstr ""
 
-#: test/ipptool.c:5227
+#: test/ipptool.c:4216
 msgid "  --help                  Show help."
 msgstr ""
 
@@ -1030,7 +1030,7 @@ msgstr ""
 msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 
-#: test/ipptool.c:5228
+#: test/ipptool.c:4217
 msgid "  --ippserver filename    Produce ippserver attribute file."
 msgstr ""
 
@@ -1082,7 +1082,7 @@ msgstr ""
 msgid "  --remote                True if service is remote."
 msgstr ""
 
-#: test/ipptool.c:5229
+#: test/ipptool.c:4218
 msgid ""
 "  --stop-after-include-error\n"
 "                          Stop tests after a failed INCLUDE."
@@ -1108,19 +1108,19 @@ msgstr ""
 msgid "  --version               Show program version."
 msgstr ""
 
-#: test/ipptool.c:5231
+#: test/ipptool.c:4220
 msgid "  --version               Show version."
 msgstr ""
 
-#: test/ippfind.c:2758 test/ipptool.c:5232
+#: test/ippfind.c:2758 test/ipptool.c:4221
 msgid "  -4                      Connect using IPv4."
 msgstr ""
 
-#: test/ippfind.c:2759 test/ipptool.c:5233
+#: test/ippfind.c:2759 test/ipptool.c:4222
 msgid "  -6                      Connect using IPv6."
 msgstr ""
 
-#: test/ipptool.c:5234
+#: test/ipptool.c:4223
 msgid "  -C                      Send requests using chunking (default)."
 msgstr ""
 
@@ -1136,7 +1136,7 @@ msgstr ""
 msgid "  -E                      Encrypt the connection."
 msgstr ""
 
-#: test/ipptool.c:5236
+#: test/ipptool.c:4225
 msgid "  -E                      Test with encryption using HTTP Upgrade to TLS."
 msgstr ""
 
@@ -1148,7 +1148,7 @@ msgstr ""
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr ""
 
-#: test/ipptool.c:5237
+#: test/ipptool.c:4226
 msgid "  -I                      Ignore errors."
 msgstr ""
 
@@ -1160,11 +1160,11 @@ msgstr ""
 msgid "  -I {filename,filters,none,profiles}"
 msgstr ""
 
-#: test/ipptool.c:5238
+#: test/ipptool.c:4227
 msgid "  -L                      Send requests using content-length."
 msgstr ""
 
-#: test/ipptool.c:5239
+#: test/ipptool.c:4228
 msgid "  -P filename.plist       Produce XML plist to a file and test report to standard output."
 msgstr ""
 
@@ -1180,7 +1180,7 @@ msgstr ""
 msgid "  -R root-directory       Set alternate root."
 msgstr ""
 
-#: test/ipptool.c:5240
+#: test/ipptool.c:4229
 msgid "  -S                      Test with encryption using HTTPS."
 msgstr ""
 
@@ -1188,7 +1188,7 @@ msgstr ""
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr ""
 
-#: test/ipptool.c:5241
+#: test/ipptool.c:4230
 msgid "  -T seconds              Set the receive/send timeout in seconds."
 msgstr ""
 
@@ -1196,7 +1196,7 @@ msgstr ""
 msgid "  -U username             Specify username."
 msgstr ""
 
-#: test/ippfind.c:2762 test/ipptool.c:5242
+#: test/ippfind.c:2762 test/ipptool.c:4231
 msgid "  -V version              Set default IPP version."
 msgstr ""
 
@@ -1204,7 +1204,7 @@ msgstr ""
 msgid "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,translations}"
 msgstr ""
 
-#: test/ipptool.c:5243
+#: test/ipptool.c:4232
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 
@@ -1212,7 +1212,7 @@ msgstr ""
 msgid "  -a                      Export all printers."
 msgstr ""
 
-#: test/ipptool.c:5244
+#: test/ipptool.c:4233
 msgid "  -c                      Produce CSV output."
 msgstr ""
 
@@ -1228,7 +1228,7 @@ msgstr ""
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
-#: test/ipptool.c:5245
+#: test/ipptool.c:4234
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
 
@@ -1252,7 +1252,7 @@ msgstr ""
 msgid "  -f                      Run in the foreground."
 msgstr ""
 
-#: test/ipptool.c:5246
+#: test/ipptool.c:4235
 msgid "  -f filename             Set default request filename."
 msgstr ""
 
@@ -1260,7 +1260,7 @@ msgstr ""
 msgid "  -h                      Show this usage message."
 msgstr ""
 
-#: test/ipptool.c:5247
+#: test/ipptool.c:4236
 msgid "  -h                      Validate HTTP response headers."
 msgstr ""
 
@@ -1276,7 +1276,7 @@ msgstr ""
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
 
-#: test/ipptool.c:5248
+#: test/ipptool.c:4237
 msgid "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
 
@@ -1288,7 +1288,7 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr ""
 
-#: test/ipptool.c:5249
+#: test/ipptool.c:4238
 msgid "  -l                      Produce plain text output."
 msgstr ""
 
@@ -1312,7 +1312,7 @@ msgstr ""
 msgid "  -n copies               Set number of copies."
 msgstr ""
 
-#: test/ipptool.c:5250
+#: test/ipptool.c:4239
 msgid "  -n count                Repeat the last file the given number of times."
 msgstr ""
 
@@ -1344,7 +1344,7 @@ msgstr ""
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 
-#: systemv/cupstestppd.c:3862 test/ipptool.c:5251
+#: systemv/cupstestppd.c:3862 test/ipptool.c:4240
 msgid "  -q                      Run silently."
 msgstr ""
 
@@ -1364,7 +1364,7 @@ msgstr ""
 msgid "  -s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
-#: test/ipptool.c:5252
+#: test/ipptool.c:4241
 msgid "  -t                      Produce a test report."
 msgstr ""
 
@@ -1392,7 +1392,7 @@ msgstr ""
 msgid "  -u regex                Match URI to regular expression."
 msgstr ""
 
-#: systemv/cupsaddsmb.c:279 systemv/cupstestppd.c:3864 test/ipptool.c:5253
+#: systemv/cupsaddsmb.c:279 systemv/cupstestppd.c:3864 test/ipptool.c:4242
 #: ppdc/ppdc.cxx:441 ppdc/ppdpo.cxx:248
 msgid "  -v                      Be verbose."
 msgstr ""
@@ -1559,172 +1559,172 @@ msgstr ""
 msgid " PASS"
 msgstr ""
 
-#: cups/ipp.c:5217
+#: cups/ipp.c:5114
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
 msgstr ""
 
-#: cups/ipp.c:5228
+#: cups/ipp.c:5120
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
 msgstr ""
 
-#: cups/ipp.c:4848
+#: cups/ipp.c:4830
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
 
-#: cups/ipp.c:4840
+#: cups/ipp.c:4824
 #, c-format
 msgid "\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
 msgstr ""
 
-#: cups/ipp.c:4866
+#: cups/ipp.c:4845
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
 msgstr ""
 
-#: cups/ipp.c:5280
+#: cups/ipp.c:5165
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
 msgstr ""
 
-#: cups/ipp.c:5289
+#: cups/ipp.c:5171
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
 msgstr ""
 
-#: cups/ipp.c:4966
+#: cups/ipp.c:4922
 #, c-format
 msgid "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4974
+#: cups/ipp.c:4928
 #, c-format
 msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4958
+#: cups/ipp.c:4916
 #, c-format
 msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4918
+#: cups/ipp.c:4886
 #, c-format
 msgid "\"%s\": Bad dateTime day %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4950
+#: cups/ipp.c:4910
 #, c-format
 msgid "\"%s\": Bad dateTime deciseconds %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4926
+#: cups/ipp.c:4892
 #, c-format
 msgid "\"%s\": Bad dateTime hours %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4934
+#: cups/ipp.c:4898
 #, c-format
 msgid "\"%s\": Bad dateTime minutes %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4910
+#: cups/ipp.c:4880
 #, c-format
 msgid "\"%s\": Bad dateTime month %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4942
+#: cups/ipp.c:4904
 #, c-format
 msgid "\"%s\": Bad dateTime seconds %u (RFC 8011 section 5.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4880
+#: cups/ipp.c:4856
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
 msgstr ""
 
-#: cups/ipp.c:5195
+#: cups/ipp.c:5101
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
 
-#: cups/ipp.c:5186
+#: cups/ipp.c:5095
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section 5.1.4)."
 msgstr ""
 
-#: cups/ipp.c:5389
+#: cups/ipp.c:5256
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section 5.1.10)."
 msgstr ""
 
-#: cups/ipp.c:5399
+#: cups/ipp.c:5263
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section 5.1.10)."
 msgstr ""
 
-#: cups/ipp.c:5157
+#: cups/ipp.c:5071
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5166
+#: cups/ipp.c:5077
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5335
+#: cups/ipp.c:5211
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section 5.1.9)."
 msgstr ""
 
-#: cups/ipp.c:5345
+#: cups/ipp.c:5218
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section 5.1.9)."
 msgstr ""
 
-#: cups/ipp.c:4894
+#: cups/ipp.c:4867
 #, c-format
 msgid "\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
 msgstr ""
 
-#: cups/ipp.c:5037
+#: cups/ipp.c:4962
 #, c-format
 msgid "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 8011 section 5.1.14)."
 msgstr ""
 
-#: cups/ipp.c:5018
+#: cups/ipp.c:4951
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section 5.1.16)."
 msgstr ""
 
-#: cups/ipp.c:4987
+#: cups/ipp.c:4939
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be positive (RFC 8011 section 5.1.16)."
 msgstr ""
 
-#: cups/ipp.c:5002
+#: cups/ipp.c:4945
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC 8011 section 5.1.16)."
 msgstr ""
 
-#: cups/ipp.c:5099
+#: cups/ipp.c:5020
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5108
+#: cups/ipp.c:5026
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5251
+#: cups/ipp.c:5141
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
 msgstr ""
 
-#: cups/ipp.c:5260
+#: cups/ipp.c:5147
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
@@ -1849,7 +1849,7 @@ msgstr ""
 msgid "%s: Bad printer URI \"%s\"."
 msgstr ""
 
-#: test/ippfind.c:770 test/ipptool.c:390
+#: test/ippfind.c:770 test/ipptool.c:411
 #, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
@@ -2074,17 +2074,17 @@ msgstr ""
 msgid "%s: Invalid filter string \"%s\"."
 msgstr ""
 
-#: test/ipptool.c:321
+#: test/ipptool.c:333
 #, c-format
 msgid "%s: Missing filename for \"-P\"."
 msgstr ""
 
-#: test/ippfind.c:742 test/ipptool.c:358
+#: test/ippfind.c:742 test/ipptool.c:370
 #, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr ""
 
-#: test/ippfind.c:755 test/ipptool.c:372
+#: test/ippfind.c:755 test/ipptool.c:384
 #, c-format
 msgid "%s: Missing version for \"-V\"."
 msgstr ""
@@ -2107,7 +2107,7 @@ msgstr ""
 #: berkeley/lpq.c:83 berkeley/lpr.c:64 berkeley/lprm.c:61 systemv/cancel.c:75
 #: systemv/cupsaccept.c:85 systemv/cupsaddsmb.c:74 systemv/lp.c:95
 #: systemv/lpadmin.c:247 systemv/lpinfo.c:188 systemv/lpmove.c:66
-#: systemv/lpstat.c:87 test/ipptool.c:303 test/ipptool.c:347
+#: systemv/lpstat.c:87 test/ipptool.c:315 test/ipptool.c:359
 #, c-format
 msgid "%s: Sorry, no encryption support."
 msgstr ""
@@ -2138,7 +2138,7 @@ msgstr ""
 msgid "%s: Unable to determine MIME type of \"%s\"."
 msgstr ""
 
-#: test/ipptool.c:264 test/ipptool.c:330
+#: test/ipptool.c:276 test/ipptool.c:342
 #, c-format
 msgid "%s: Unable to open \"%s\": %s"
 msgstr ""
@@ -2188,7 +2188,7 @@ msgstr ""
 msgid "%s: Unknown option \"%s\"."
 msgstr ""
 
-#: test/ippfind.c:921
+#: test/ippfind.c:921 test/ipptool.c:605
 #, c-format
 msgid "%s: Unknown option \"-%c\"."
 msgstr ""
@@ -4207,7 +4207,7 @@ msgstr ""
 msgid "IPP attribute has no name."
 msgstr ""
 
-#: cups/ipp.c:7007
+#: cups/ipp.c:6868
 msgid "IPP attribute is not a member of the message."
 msgstr ""
 
@@ -4989,7 +4989,7 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1476 scheduler/main.c:2098 systemv/cupsaddsmb.c:272
 #: systemv/cupsctl.c:190 systemv/cupstestdsc.c:415 systemv/cupstestppd.c:3853
-#: test/ippfind.c:2757 test/ipptool.c:5226 ppdc/ppdc.cxx:426
+#: test/ippfind.c:2757 test/ipptool.c:4215 ppdc/ppdc.cxx:426
 #: ppdc/ppdhtml.cxx:173 ppdc/ppdi.cxx:119 ppdc/ppdmerge.cxx:357
 #: ppdc/ppdpo.cxx:243
 msgid "Options:"
@@ -5756,12 +5756,12 @@ msgstr ""
 msgid "Unable to change server settings"
 msgstr ""
 
-#: cups/ipp.c:5379
+#: cups/ipp.c:5248
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
 msgstr ""
 
-#: cups/ipp.c:5325
+#: cups/ipp.c:5203
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
 msgstr ""
@@ -6278,7 +6278,7 @@ msgid ""
 "       ippfind --version"
 msgstr ""
 
-#: test/ipptool.c:5225
+#: test/ipptool.c:4214
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr ""
 
@@ -6605,54 +6605,49 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
-#: test/ipptool.c:560 test/ipptool.c:583
+#: test/ipptool.c:565 test/ipptool.c:587
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", and \"-X\"."
 msgstr ""
 
-#: test/ipptool.c:338 test/ipptool.c:401
+#: test/ipptool.c:350 test/ipptool.c:421
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
-#: test/ipptool.c:639
+#: test/ipptool.c:633
 #, c-format
-msgid "ipptool: Bad URI - %s."
+msgid "ipptool: Bad URI \"%s\"."
 msgstr ""
 
-#: test/ipptool.c:553
+#: test/ipptool.c:558
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:620
+#: test/ipptool.c:622
 msgid "ipptool: May only specify a single URI."
 msgstr ""
 
-#: test/ipptool.c:575
+#: test/ipptool.c:579
 msgid "ipptool: Missing count for \"-n\"."
 msgstr ""
 
-#: test/ipptool.c:255
+#: test/ipptool.c:267
 msgid "ipptool: Missing filename for \"--ippserver\"."
 msgstr ""
 
-#: test/ipptool.c:435
+#: test/ipptool.c:455
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr ""
 
-#: test/ipptool.c:416
+#: test/ipptool.c:436
 msgid "ipptool: Missing name=value for \"-d\"."
 msgstr ""
 
-#: test/ipptool.c:543
+#: test/ipptool.c:550
 msgid "ipptool: Missing seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:665
+#: test/ipptool.c:648
 msgid "ipptool: URI required before test file."
-msgstr ""
-
-#: test/ipptool.c:601
-#, c-format
-msgid "ipptool: Unknown option \"-%c\"."
 msgstr ""
 
 #: scheduler/ipp.c:8108

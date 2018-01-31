@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-18 13:08-0500\n"
+"POT-Creation-Date: 2018-01-31 14:22-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -1219,7 +1219,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
 msgstr ""
 
 #, c-format
@@ -6321,7 +6321,7 @@ msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
 #, c-format
-msgid "ipptool: Bad URI - %s."
+msgid "ipptool: Bad URI \"%s\"."
 msgstr ""
 
 msgid "ipptool: Invalid seconds for \"-i\"."
@@ -6346,10 +6346,6 @@ msgid "ipptool: Missing seconds for \"-i\"."
 msgstr ""
 
 msgid "ipptool: URI required before test file."
-msgstr ""
-
-#, c-format
-msgid "ipptool: Unknown option \"-%c\"."
 msgstr ""
 
 msgid "job-account-id"

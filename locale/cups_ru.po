@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-18 13:08-0500\n"
+"POT-Creation-Date: 2018-01-31 14:22-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -1358,7 +1358,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
+msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
 msgstr ""
 
 #, c-format
@@ -6529,8 +6529,8 @@ msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr "ipptool: Параметры \"-i\" и \"-n\" несовместимы с \"-P\" и \"-X\"."
 
 #, c-format
-msgid "ipptool: Bad URI - %s."
-msgstr "ipptool: Неправильный URI - %s."
+msgid "ipptool: Bad URI \"%s\"."
+msgstr ""
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool: Неправильные секунды для \"-i\"."
@@ -6555,10 +6555,6 @@ msgstr "ipptool: Отсутствуют секунды для \"-i\"."
 
 msgid "ipptool: URI required before test file."
 msgstr "ipptool: Необходим URI перед указанием тест-файла."
-
-#, c-format
-msgid "ipptool: Unknown option \"-%c\"."
-msgstr "ipptool: Неизвестный параметр \"-%c\"."
 
 msgid "job-account-id"
 msgstr "Job Account ID"
@@ -12870,6 +12866,12 @@ msgstr ""
 
 #~ msgid "ipp-attribute-fidelity"
 #~ msgstr "Attribute Fidelity"
+
+#~ msgid "ipptool: Bad URI - %s."
+#~ msgstr "ipptool: Неправильный URI - %s."
+
+#~ msgid "ipptool: Unknown option \"-%c\"."
+#~ msgstr "ipptool: Неизвестный параметр \"-%c\"."
 
 #~ msgid "job-authorization-uri"
 #~ msgstr "Job Authorization URI"
