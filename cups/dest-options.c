@@ -666,6 +666,7 @@ cupsCopyDestInfo(
     cups_dest_t *dest)			/* I - Destination */
 {
   cups_dinfo_t	*dinfo;			/* Destination information */
+  unsigned	dflags;			/* Destination flags */
   ipp_t		*request,		/* Get-Printer-Attributes request */
 		*response;		/* Supported attributes */
   int		tries,			/* Number of tries so far */
@@ -675,6 +676,7 @@ cupsCopyDestInfo(
   char		resource[1024];		/* Resource path */
   int		version;		/* IPP version */
   ipp_status_t	status;			/* Status of request */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   static const char * const requested_attrs[] =
   {					/* Requested attributes */
     "job-template",
@@ -683,14 +685,25 @@ cupsCopyDestInfo(
   };
 
 
-  DEBUG_printf(("cupsCopyDestSupported(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
+  DEBUG_printf(("cupsCopyDestInfo(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
 
  /*
   * Get the default connection as needed...
   */
 
   if (!http)
-    http = _cupsConnect();
+  {
+    http   = _cupsConnect();
+    dflags = CUPS_DEST_FLAGS_NONE;
+  }
+#ifdef AF_LOCAL
+  else if (strcmp(http->hostname, cg->server) || (httpAddrFamily(http->hostaddr) != AF_LOCAL && cg->ipp_port != httpAddrPort(http->hostaddr)))
+#else
+  else if (strcmp(http->hostname, cg->server) || cg->ipp_port != httpAddrPort(http->hostaddr))
+#endif /* AF_LOCAL */
+    dflags = CUPS_DEST_FLAGS_DEVICE;
+  else
+    dflags = CUPS_DEST_FLAGS_NONE;
 
  /*
   * Range check input...
@@ -703,8 +716,11 @@ cupsCopyDestInfo(
   * Get the printer URI and resource path...
   */
 
-  if ((uri = _cupsGetDestResource(dest, resource, sizeof(resource))) == NULL)
+  if ((uri = _cupsGetDestResource(dest, dflags, resource, sizeof(resource))) == NULL)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Unable to get resource.");
     return (NULL);
+  }
 
  /*
   * Get the supported attributes...
@@ -724,28 +740,23 @@ cupsCopyDestInfo(
     request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
 
     ippSetVersion(request, version / 10, version % 10);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-		 uri);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, cupsUser());
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-		  "requested-attributes",
-		  (int)(sizeof(requested_attrs) / sizeof(requested_attrs[0])),
-		  NULL, requested_attrs);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(requested_attrs) / sizeof(requested_attrs[0])), NULL, requested_attrs);
     response = cupsDoRequest(http, request, resource);
     status   = cupsLastError();
 
     if (status > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
     {
-      DEBUG_printf(("cupsCopyDestSupported: Get-Printer-Attributes for '%s' "
-		    "returned %s (%s)", dest->name, ippErrorString(status),
-		    cupsLastErrorString()));
+      DEBUG_printf(("1cupsCopyDestInfo: Get-Printer-Attributes for '%s' returned %s (%s)", dest->name, ippErrorString(status), cupsLastErrorString()));
 
       ippDelete(response);
       response = NULL;
 
-      if (status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED && version > 11)
+      if ((status == IPP_STATUS_ERROR_BAD_REQUEST || status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED) && version > 11)
+      {
         version = 11;
+      }
       else if (status == IPP_STATUS_ERROR_BUSY)
       {
         sleep((unsigned)delay);
@@ -761,7 +772,10 @@ cupsCopyDestInfo(
   while (!response && tries < 10);
 
   if (!response)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Unable to get printer attributes.");
     return (NULL);
+  }
 
  /*
   * Allocate a cups_dinfo_t structure and return it...
@@ -773,6 +787,8 @@ cupsCopyDestInfo(
     ippDelete(response);
     return (NULL);
   }
+
+  DEBUG_printf(("1cupsCopyDestInfo: version=%d, uri=\"%s\", resource=\"%s\".", version, uri, resource));
 
   dinfo->version  = version;
   dinfo->uri      = uri;

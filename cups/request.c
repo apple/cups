@@ -1,8 +1,8 @@
 /*
  * IPP utilities for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */

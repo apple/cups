@@ -1,9 +1,10 @@
 /*
  * Sample IPP Everywhere server for CUPS.
  *
- * Copyright 2010-2017 by Apple Inc.
+ * Copyright © 2010-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -455,6 +456,7 @@ static AvahiClient	*DNSSDClient = NULL;
 #endif /* HAVE_DNSSD */
 
 static int		KeepFiles = 0,
+			MaxVersion = 20,
 			Verbosity = 0;
 
 
@@ -525,6 +527,23 @@ main(int  argc,				/* I - Number of command-line args */
 
           case 'P' : /* -P (PIN printing mode) */
               pin = 1;
+              break;
+
+          case 'V' : /* -V max-version */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+              if (!strcmp(argv[i], "2.2"))
+                MaxVersion = 22;
+	      else if (!strcmp(argv[i], "2.1"))
+                MaxVersion = 21;
+	      else if (!strcmp(argv[i], "2.0"))
+                MaxVersion = 20;
+	      else if (!strcmp(argv[i], "1.1"))
+                MaxVersion = 11;
+	      else
+	        usage(1);
               break;
 
 	  case 'a' : /* -a attributes-file */
@@ -1318,9 +1337,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   };
   static const char * const versions[] =/* ipp-versions-supported values */
   {
-    "1.0",
     "1.1",
-    "2.0"
+    "2.0",
+    "2.1",
+    "2.2"
   };
   static const char * const features[] =/* ipp-features-supported values */
   {
@@ -1732,7 +1752,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* ipp-versions-supported */
   if (!ippFindAttribute(printer->attrs, "ipp-versions-supported", IPP_TAG_ZERO))
-    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]), NULL, versions);
+  {
+    int num_versions = MaxVersion == 11 ? 1 : MaxVersion == 20 ? 2 : MaxVersion == 21 ? 3 : 4;
+					/* Number of supported versions */
+
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", num_versions, NULL, versions);
+  }
 
   /* job-account-id-default */
   if (!ippFindAttribute(printer->attrs, "job-account-id-default", IPP_TAG_ZERO))
@@ -5794,15 +5819,24 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
     * Return an error, since we only support IPP 1.x and 2.x.
     */
 
-    respond_ipp(client, IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED,
-                "Bad request version number %d.%d.", major, minor);
+    respond_ipp(client, IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED, "Bad request version number %d.%d.", major, minor);
+  }
+  else if ((major * 10 + minor) > MaxVersion)
+  {
+    if (httpGetState(client->http) != HTTP_STATE_POST_SEND)
+      httpFlush(client->http);		/* Flush trailing (junk) data */
+
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
+    return (0);
   }
   else if (ippGetRequestId(client->request) <= 0)
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad request-id %d.",
-                ippGetRequestId(client->request));
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad request-id %d.", ippGetRequestId(client->request));
+  }
   else if (!ippFirstAttribute(client->request))
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "No attributes in request.");
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "No attributes in request.");
+  }
   else
   {
    /*
@@ -6871,8 +6905,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2015 by Apple Inc. All rights "
-         "reserved.");
+    puts(CUPS_SVERSION " - Copyright (c) 2010-2018 by Apple Inc. All rights reserved.");
     puts("");
   }
 
@@ -6882,6 +6915,7 @@ usage(int status)			/* O - Exit status */
   puts("-2                      Supports 2-sided printing (default=1-sided)");
   puts("-M manufacturer         Manufacturer name (default=Test)");
   puts("-P                      PIN printing mode");
+  puts("-V max-version          Set maximum supported IPP version");
   puts("-a attributes-file      Load printer attributes from file");
   puts("-c command              Run command for every print job");
   printf("-d spool-directory      Spool directory "

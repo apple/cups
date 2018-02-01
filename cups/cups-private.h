@@ -1,10 +1,11 @@
 /*
  * Private definitions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_CUPS_PRIVATE_H_
@@ -232,13 +233,9 @@ extern void		_cupsBufferRelease(char *b);
 extern http_t		*_cupsConnect(void);
 extern char		*_cupsCreateDest(const char *name, const char *info, const char *device_id, const char *device_uri, char *uri, size_t urisize);
 extern void		_cupsEncodeOption(ipp_t *ipp, ipp_tag_t group_tag, _ipp_option_t *map, const char *name, const char *value);
-extern int		_cupsGet1284Values(const char *device_id,
-			                   cups_option_t **values);
-extern const char	*_cupsGetDestResource(cups_dest_t *dest, char *resource,
-			                      size_t resourcesize);
-extern int		_cupsGetDests(http_t *http, ipp_op_t op,
-			              const char *name, cups_dest_t **dests,
-			              cups_ptype_t type, cups_ptype_t mask);
+extern int		_cupsGet1284Values(const char *device_id, cups_option_t **values);
+extern const char	*_cupsGetDestResource(cups_dest_t *dest, unsigned flags, char *resource, size_t resourcesize);
+extern int		_cupsGetDests(http_t *http, ipp_op_t op, const char *name, cups_dest_t **dests, cups_ptype_t type, cups_ptype_t mask);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
@@ -248,13 +245,10 @@ extern const char	*_cupsGSSServiceName(void);
 #  endif /* HAVE_GSSAPI */
 extern int		_cupsNextDelay(int current, int *previous);
 extern void		_cupsSetDefaults(void);
-extern void		_cupsSetError(ipp_status_t status, const char *message,
-			              int localize);
+extern void		_cupsSetError(ipp_status_t status, const char *message, int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
 #  ifdef HAVE_GSSAPI
-extern int		_cupsSetNegotiateAuthString(http_t *http,
-			                            const char *method,
-						    const char *resource);
+extern int		_cupsSetNegotiateAuthString(http_t *http, const char *method, const char *resource);
 #  endif /* HAVE_GSSAPI */
 extern char		*_cupsUserDefault(char *name, size_t namesize);
 
