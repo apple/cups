@@ -1,8 +1,8 @@
 /*
  * CUPS API test program for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -12,8 +12,7 @@
  */
 
 #undef _CUPS_NO_DEPRECATED
-#include "string-private.h"
-#include "cups.h"
+#include "cups-private.h"
 #include "ppd.h"
 #include <stdlib.h>
 
@@ -35,6 +34,8 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  http_t	*http,			/* First HTTP connection */
+		*http2;			/* Second HTTP connection */
   int		status = 0,		/* Exit status */
 		i,			/* Looping var */
 		num_dests;		/* Number of destinations */
@@ -262,6 +263,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     return (0);
+  }
+
+ /*
+  * _cupsConnect() connection reuse...
+  */
+
+  fputs("_cupsConnect: ", stdout);
+  http  = _cupsConnect();
+  http2 = _cupsConnect();
+
+  if (http == http2)
+  {
+    puts("PASS");
+  }
+  else
+  {
+    puts("FAIL (different connections)");
+    return (1);
   }
 
  /*
