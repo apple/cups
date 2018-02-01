@@ -7,6 +7,8 @@ Changes in CUPS v2.3b3
 - More fixes for printing to old CUPS servers (Issue #5211)
 - The IPP Everywhere PPD generator did not support deep grayscale or 8-bit per
   component AdobeRGB (Issue #5227)
+- Additional changes for the scheduler to substitute default values for invalid
+  job attributes when running in "relaxed conformance" mode (Issue #5229)
 - Localization changes (Issue #5232, rdar://37068158)
 
 
