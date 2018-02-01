@@ -1,9 +1,10 @@
 /*
  * Destination option/media support for CUPS.
  *
- * Copyright 2012-2018 by Apple Inc.
+ * Copyright © 2012-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -693,17 +694,27 @@ cupsCopyDestInfo(
 
   if (!http)
   {
+    DEBUG_puts("1cupsCopyDestInfo: Default server connection.");
     http   = _cupsConnect();
     dflags = CUPS_DEST_FLAGS_NONE;
   }
 #ifdef AF_LOCAL
-  else if (strcmp(http->hostname, cg->server) || (httpAddrFamily(http->hostaddr) != AF_LOCAL && cg->ipp_port != httpAddrPort(http->hostaddr)))
-#else
-  else if (strcmp(http->hostname, cg->server) || cg->ipp_port != httpAddrPort(http->hostaddr))
-#endif /* AF_LOCAL */
-    dflags = CUPS_DEST_FLAGS_DEVICE;
-  else
+  else if (httpAddrFamily(http->hostaddr) == AF_LOCAL)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Connection to server (domain socket).");
     dflags = CUPS_DEST_FLAGS_NONE;
+  }
+#endif /* AF_LOCAL */
+  else if ((strcmp(http->hostname, cg->server) && cg->server[0] != '/') || cg->ipp_port != httpAddrPort(http->hostaddr))
+  {
+    DEBUG_printf(("1cupsCopyDestInfo: Connection to device (%s).", http->hostname));
+    dflags = CUPS_DEST_FLAGS_DEVICE;
+  }
+  else
+  {
+    DEBUG_printf(("1cupsCopyDestInfo: Connection to server (%s).", http->hostname));
+    dflags = CUPS_DEST_FLAGS_NONE;
+  }
 
  /*
   * Range check input...

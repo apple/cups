@@ -1,10 +1,11 @@
 /*
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -1110,7 +1111,7 @@ _cupsGetDestResource(
   int		port;			/* Port number */
 
 
-  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), resource=%p, resourcesize=%d)", (void *)dest, dest->name, (void *)resource, (int)resourcesize));
+  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), flags=%u, resource=%p, resourcesize=%d)", (void *)dest, dest->name, flags, (void *)resource, (int)resourcesize));
 
  /*
   * Range check input...

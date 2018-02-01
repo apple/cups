@@ -10,6 +10,8 @@ Changes in CUPS v2.3b3
 - Additional changes for the scheduler to substitute default values for invalid
   job attributes when running in "relaxed conformance" mode (Issue #5229)
 - Localization changes (Issue #5232, rdar://37068158)
+- The `cupsCopyDestInfo` function did not work with all print queues
+  (Issue #5235)
 
 
 Changes in CUPS v2.3b2
