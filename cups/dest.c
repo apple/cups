@@ -1094,14 +1094,16 @@ cupsGetDest(const char  *name,		/* I - Destination name or @code NULL@ for the d
  * '_cupsGetDestResource()' - Get the resource path and URI for a destination.
  */
 
-const char *				/* O - Printer URI */
+const char *				/* O - URI */
 _cupsGetDestResource(
     cups_dest_t *dest,			/* I - Destination */
     unsigned    flags,			/* I - Destination flags */
     char        *resource,		/* I - Resource buffer */
     size_t      resourcesize)		/* I - Size of resource buffer */
 {
-  const char	*uri;			/* Printer URI */
+  const char	*uri,			/* URI */
+		*device_uri,		/* Device URI */
+		*printer_uri;		/* Printer URI */
   char		scheme[32],		/* URI scheme */
 		userpass[256],		/* Username and password (unused) */
 		hostname[256];		/* Hostname */
@@ -1124,48 +1126,54 @@ _cupsGetDestResource(
   }
 
  /*
-  * Grab the printer URI...
+  * Grab the printer and device URIs...
   */
 
-  if (!(flags & CUPS_DEST_FLAGS_DEVICE))
-    uri = NULL;
-  else
-    uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
+  device_uri  = cupsGetOption("device-uri", dest->num_options, dest->options);
+  printer_uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
 
-  if (uri)
+  DEBUG_printf(("1_cupsGetDestResource: device-uri=\"%s\", printer-uri-supported=\"%s\".", device_uri, printer_uri));
+
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  if (((flags & CUPS_DEST_FLAGS_DEVICE) || !printer_uri) && strstr(device_uri, "._tcp"))
   {
-    DEBUG_printf(("1_cupsGetDestResource: printer-uri-supported=\"%s\"", uri));
+    if ((device_uri = cups_dnssd_resolve(dest, device_uri, 5000, NULL, NULL, NULL)) != NULL)
+    {
+      DEBUG_printf(("1_cupsGetDestResource: Resolved device-uri=\"%s\".", device_uri));
+    }
+    else
+    {
+      DEBUG_puts("1_cupsGetDestResource: Unable to resolve device.");
+
+      if (resource)
+	*resource = '\0';
+
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
+
+      return (NULL);
+    }
+  }
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+  if (flags & CUPS_DEST_FLAGS_DEVICE)
+  {
+    uri = device_uri;
+  }
+  else if (printer_uri)
+  {
+    uri = printer_uri;
   }
   else
   {
-    if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
+    uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, device_uri, resource, resourcesize);
+
+    if (uri)
     {
-#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-      if (strstr(uri, "._tcp"))
-      {
-        uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL);
+      DEBUG_printf(("1_cupsGetDestResource: Local printer-uri-supported=\"%s\"", uri));
 
-        if (uri)
-          DEBUG_printf(("1_cupsGetDestResource: Resolved device-uri=\"%s\"", uri));
-      }
-      else
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
+      dest->num_options = cupsAddOption("printer-uri-supported", uri, dest->num_options, &dest->options);
 
-      DEBUG_printf(("1_cupsGetDestResource: device-uri=\"%s\"", uri));
-    }
-
-    if (uri && !(flags & CUPS_DEST_FLAGS_DEVICE))
-    {
-      uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, uri, resource, resourcesize);
-
-      if (uri)
-      {
-	DEBUG_printf(("1_cupsGetDestResource: Local printer-uri-supported=\"%s\"", uri));
-
-	dest->num_options = cupsAddOption("printer-uri-supported", uri, dest->num_options, &dest->options);
-
-	uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
-      }
+      uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
     }
   }
 
@@ -1180,14 +1188,11 @@ _cupsGetDestResource(
 
     return (NULL);
   }
-  else
+  else if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
-    {
-      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad URI."), 1);
 
-      return (NULL);
-    }
+    return (NULL);
   }
 
   DEBUG_printf(("1_cupsGetDestResource: resource=\"%s\"", resource));
