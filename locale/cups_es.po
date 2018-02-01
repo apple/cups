@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 14:22-0500\n"
+"POT-Creation-Date: 2018-01-31 21:08-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -2798,6 +2798,9 @@ msgstr "Número de versión SNMP incorrecto"
 
 msgid "Bad UIConstraints"
 msgstr "UIConstraints incorrecto"
+
+msgid "Bad URI."
+msgstr ""
 
 msgid "Bad arguments to function"
 msgstr "Argumentos de la función incorrectos"

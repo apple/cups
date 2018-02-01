@@ -1,14 +1,11 @@
 #
 # Message catalog template for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
-# Copyright 2005-2007 by Easy Software Products.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2005-2007 by Easy Software Products.
 #
-# These coded instructions, statements, and computer programs are the
-# property of Apple Inc. and are protected by Federal copyright
-# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-# which should have been included with this file.  If this file is
-# file is missing or damaged, see the license at "http://www.cups.org/".
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 #
@@ -28,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 14:22-0500\n"
+"POT-Creation-Date: 2018-01-31 21:08-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2367,7 +2364,7 @@ msgstr ""
 msgid "-95"
 msgstr ""
 
-#: cups/dest.c:1842
+#: cups/dest.c:1860
 msgid "/etc/cups/lpoptions file names default destination that does not exist."
 msgstr ""
 
@@ -3287,7 +3284,7 @@ msgstr ""
 msgid "Bad 'document-format' value \"%s\"."
 msgstr ""
 
-#: cups/dest.c:1635
+#: cups/dest.c:1653
 msgid "Bad NULL dests pointer"
 msgstr ""
 
@@ -3330,6 +3327,10 @@ msgstr ""
 
 #: cups/ppd.c:313
 msgid "Bad UIConstraints"
+msgstr ""
+
+#: cups/dest.c:1193
+msgid "Bad URI."
 msgstr ""
 
 #: cups/hash.c:47 cups/http-support.c:1458
@@ -3446,7 +3447,7 @@ msgstr ""
 msgid "Bad printer-state value %d."
 msgstr ""
 
-#: cups/dest.c:676 cups/dest.c:1174 cups/dest.c:1225
+#: cups/dest.c:676 cups/dest.c:1243
 msgid "Bad printer-uri."
 msgstr ""
 
@@ -4355,7 +4356,7 @@ msgstr ""
 msgid "Invalid media name arguments."
 msgstr ""
 
-#: cups/dest-options.c:1195
+#: cups/dest-options.c:1211
 msgid "Invalid media size."
 msgstr ""
 
@@ -4518,7 +4519,7 @@ msgstr ""
 msgid "LPD/LPR Host or Printer"
 msgstr ""
 
-#: cups/dest.c:1830
+#: cups/dest.c:1848
 msgid "LPDEST environment variable names default destination that does not exist."
 msgstr ""
 
@@ -4798,7 +4799,7 @@ msgstr ""
 msgid "No community name"
 msgstr ""
 
-#: cups/dest.c:1834 cups/dest.c:1846
+#: cups/dest.c:1852 cups/dest.c:1864
 msgid "No default destination."
 msgstr ""
 
@@ -5047,7 +5048,7 @@ msgstr ""
 msgid "PRC32K Oversize Long Edge"
 msgstr ""
 
-#: cups/dest.c:1832
+#: cups/dest.c:1850
 msgid "PRINTER environment variable names default destination that does not exist."
 msgstr ""
 
@@ -6010,7 +6011,7 @@ msgstr ""
 msgid "Unable to rename job document file."
 msgstr ""
 
-#: cups/dest.c:3239
+#: cups/dest.c:3257
 msgid "Unable to resolve printer-uri."
 msgstr ""
 
@@ -6101,7 +6102,7 @@ msgstr ""
 msgid "Unknown hash algorithm."
 msgstr ""
 
-#: cups/dest-options.c:1120
+#: cups/dest-options.c:1136
 msgid "Unknown media size name."
 msgstr ""
 
@@ -7470,7 +7471,7 @@ msgstr ""
 msgid "variable-bindings uses indefinite length"
 msgstr ""
 
-#: cups/dest.c:1838
+#: cups/dest.c:1856
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
 msgid "accuracy-units"

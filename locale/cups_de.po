@@ -1,17 +1,11 @@
 #
-# "$Id$"
+# Message catalog template for CUPS.
 #
-#   Message catalog template for CUPS.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2005-2007 by Easy Software Products.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 2005-2007 by Easy Software Products.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
-#
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 # Notes for Translators:
 #
@@ -27,7 +21,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 2.0\n"
+"Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2017-12-15 16:40-0500\n"
 "PO-Revision-Date: 2017-10-25 14:57+0200\n"

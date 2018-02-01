@@ -1,11 +1,13 @@
-CHANGES - 2.3b3 - 2018-01-17
+CHANGES - 2.3b3 - 2018-01-31
 ============================
 
 Changes in CUPS v2.3b3
 ----------------------
 
+- More fixes for printing to old CUPS servers (Issue #5211)
 - The IPP Everywhere PPD generator did not support deep grayscale or 8-bit per
   component AdobeRGB (Issue #5227)
+- Localization changes (Issue #5232, rdar://37068158)
 
 
 Changes in CUPS v2.3b2

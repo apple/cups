@@ -710,6 +710,7 @@
 "Bad Request" = "Bad Request";
 "Bad SNMP version number" = "Bad SNMP version number";
 "Bad UIConstraints" = "Bad UIConstraints";
+"Bad URI." = "Bad URI.";
 "Bad arguments to function" = "Bad arguments to function";
 "Bad copies value %d." = "Bad copies value %d.";
 "Bad custom parameter" = "Bad custom parameter";

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 14:22-0500\n"
+"POT-Creation-Date: 2018-01-31 21:08-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -2709,6 +2709,9 @@ msgstr "无效的 SNMP 版本号"
 
 msgid "Bad UIConstraints"
 msgstr "无锡噢的 UIConstraints 值"
+
+msgid "Bad URI."
+msgstr ""
 
 msgid "Bad arguments to function"
 msgstr "函数的参数无效"

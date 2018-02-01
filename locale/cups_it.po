@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 14:22-0500\n"
+"POT-Creation-Date: 2018-01-31 21:08-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -2794,6 +2794,9 @@ msgstr "Il numero di versione di SNMP non è valido"
 
 msgid "Bad UIConstraints"
 msgstr "UIConstraints non è valido"
+
+msgid "Bad URI."
+msgstr ""
 
 msgid "Bad arguments to function"
 msgstr ""

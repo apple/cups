@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 14:22-0500\n"
+"POT-Creation-Date: 2018-01-31 21:08-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -2764,6 +2764,9 @@ msgstr "不正な SNMP バージョン番号"
 
 msgid "Bad UIConstraints"
 msgstr "不正な UIConstraints"
+
+msgid "Bad URI."
+msgstr ""
 
 msgid "Bad arguments to function"
 msgstr "関数の引数が不正"
