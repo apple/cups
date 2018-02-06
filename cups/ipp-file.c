@@ -511,7 +511,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
     case IPP_TAG_ENUM :
     case IPP_TAG_INTEGER :
-        return (ippSetInteger(ipp, attr, element, strtol(value, NULL, 0)));
+        return (ippSetInteger(ipp, attr, element, (int)strtol(value, NULL, 0)));
         break;
 
     case IPP_TAG_RESOLUTION :
