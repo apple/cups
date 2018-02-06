@@ -715,8 +715,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         _ipp_vars_t v;			/* IPP variables */
 
-        _ippVarsInit(&v);
-        request = _ippFileParse(&v, argv[i], token_cb, NULL, NULL);
+        _ippVarsInit(&v, NULL, NULL, token_cb);
+        request = _ippFileParse(&v, argv[i], NULL);
         _ippVarsDeinit(&v);
       }
       else

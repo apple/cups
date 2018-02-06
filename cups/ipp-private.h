@@ -53,6 +53,8 @@ typedef struct				/**** Attribute mapping data ****/
 typedef struct _ipp_file_s _ipp_file_t;/**** File Parser ****/
 typedef struct _ipp_vars_s _ipp_vars_t;/**** Variables ****/
 
+typedef int (*_ipp_fattr_cb_t)(_ipp_file_t *f, void *user_data, const char *attr);
+					/**** File Attribute (Filter) Callback ****/
 typedef int (*_ipp_ferror_cb_t)(_ipp_file_t *f, void *user_data, const char *error);
 					/**** File Parser Error Callback ****/
 typedef int (*_ipp_ftoken_cb_t)(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, const char *token);
@@ -71,6 +73,9 @@ struct _ipp_vars_s			/**** Variables ****/
   int		num_vars;		/* Number of variables */
   cups_option_t	*vars;			/* Array of variables */
   int		password_tries;		/* Number of retries for password */
+  _ipp_fattr_cb_t attrcb;		/* Attribute (filter) callback */
+  _ipp_ferror_cb_t errorcb;		/* Error callback */
+  _ipp_ftoken_cb_t tokencb;		/* Token callback */
 };
 
 struct _ipp_file_s			/**** File Parser */
@@ -94,14 +99,14 @@ extern const char	*_ippCheckOptions(void);
 extern _ipp_option_t	*_ippFindOption(const char *name);
 
 /* ipp-file.c */
-extern ipp_t		*_ippFileParse(_ipp_vars_t *v, const char *filename, _ipp_ftoken_cb_t tokencb, _ipp_ferror_cb_t errorcb, void *user_data);
+extern ipp_t		*_ippFileParse(_ipp_vars_t *v, const char *filename, void *user_data);
 extern int		_ippFileReadToken(_ipp_file_t *f, char *token, size_t tokensize);
 
 /* ipp-vars.c */
 extern void		_ippVarsDeinit(_ipp_vars_t *v);
 extern void		_ippVarsExpand(_ipp_vars_t *v, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
 extern const char	*_ippVarsGet(_ipp_vars_t *v, const char *name);
-extern void		_ippVarsInit(_ipp_vars_t *v);
+extern void		_ippVarsInit(_ipp_vars_t *v, _ipp_fattr_cb_t attrcb, _ipp_ferror_cb_t errorcb, _ipp_ftoken_cb_t tokencb);
 extern const char	*_ippVarsPasswordCB(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data);
 extern int		_ippVarsSet(_ipp_vars_t *v, const char *name, const char *value);
 

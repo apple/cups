@@ -21,9 +21,9 @@
  * Local functions...
  */
 
-static ipp_t	*parse_collection(_ipp_file_t *f, _ipp_vars_t *v, _ipp_ferror_cb_t errorcb, void *user_data);
-static int	parse_value(_ipp_file_t *f, _ipp_vars_t *v, _ipp_ferror_cb_t errorcb, void *user_data, ipp_t *ipp, ipp_attribute_t **attr, int element);
-static void	report_error(_ipp_file_t *f, _ipp_ferror_cb_t errorcb, void *user_data, const char *message, ...) __attribute((__format__ (__printf__, 4, 5)));
+static ipp_t	*parse_collection(_ipp_file_t *f, _ipp_vars_t *v, void *user_data);
+static int	parse_value(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, ipp_t *ipp, ipp_attribute_t **attr, int element);
+static void	report_error(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, const char *message, ...) __attribute((__format__ (__printf__, 4, 5)));
 
 
 /*
@@ -34,16 +34,16 @@ ipp_t *					/* O - IPP attributes or @code NULL@ on failure */
 _ippFileParse(
     _ipp_vars_t      *v,		/* I - Variables */
     const char       *filename,		/* I - Name of file to parse */
-    _ipp_ftoken_cb_t tokencb,		/* I - Callback for unknown tokens */
-    _ipp_ferror_cb_t errorcb,		/* I - Callback for errors */
     void             *user_data)	/* I - User data pointer */
 {
   _ipp_file_t	f;			/* IPP data file information */
+  ipp_t		*attrs = NULL;		/* Active IPP message */
   ipp_attribute_t *attr = NULL;		/* Current attribute */
   char		token[1024];		/* Token string */
+  ipp_t		*ignored = NULL;	/* Ignored attributes */
 
 
-  DEBUG_printf(("_ippFileParse(v=%p, filename=\"%s\", tokencb=%p, errorcb=%p, user_data=%p)", (void *)v, filename, (void *)tokencb, (void *)errorcb, user_data));
+  DEBUG_printf(("_ippFileParse(v=%p, filename=\"%s\", user_data=%p)", (void *)v, filename, user_data));
 
  /*
   * Initialize file info...
@@ -63,7 +63,7 @@ _ippFileParse(
   * Do the callback with a NULL token to setup any initial state...
   */
 
-  (*tokencb)(&f, v, user_data, NULL);
+  (*v->tokencb)(&f, v, user_data, NULL);
 
  /*
   * Read data file, using the callback function as needed...
@@ -86,7 +86,7 @@ _ippFileParse(
       }
       else
       {
-        report_error(&f, errorcb, user_data, "Missing %s name and/or value on line %d of \"%s\".", token, f.linenum, f.filename);
+        report_error(&f, v, user_data, "Missing %s name and/or value on line %d of \"%s\".", token, f.linenum, f.filename);
         break;
       }
     }
@@ -104,19 +104,39 @@ _ippFileParse(
 
       if (!_ippFileReadToken(&f, syntax, sizeof(syntax)))
       {
-        report_error(&f, errorcb, user_data, "Missing ATTR syntax on line %d of \"%s\".", f.linenum, f.filename);
+        report_error(&f, v, user_data, "Missing ATTR syntax on line %d of \"%s\".", f.linenum, f.filename);
 	break;
       }
       else if ((value_tag = ippTagValue(syntax)) < IPP_TAG_UNSUPPORTED_VALUE)
       {
-        report_error(&f, errorcb, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f.linenum, f.filename);
+        report_error(&f, v, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f.linenum, f.filename);
 	break;
       }
 
       if (!_ippFileReadToken(&f, name, sizeof(name)) || !name[0])
       {
-        report_error(&f, errorcb, user_data, "Missing ATTR name on line %d of \"%s\".", f.linenum, f.filename);
+        report_error(&f, v, user_data, "Missing ATTR name on line %d of \"%s\".", f.linenum, f.filename);
 	break;
+      }
+
+      if (!v->attrcb || (*v->attrcb)(&f, user_data, name))
+      {
+       /*
+        * Add this attribute...
+        */
+
+        attrs = f.attrs;
+      }
+      else
+      {
+       /*
+        * Ignore this attribute...
+        */
+
+        if (!ignored)
+          ignored = ippNew();
+
+        attrs = ignored;
       }
 
       if (value_tag < IPP_TAG_INTEGER)
@@ -125,7 +145,7 @@ _ippFileParse(
 	* Add out-of-band attribute - no value string needed...
 	*/
 
-        ippAddOutOfBand(f.attrs, f.group_tag, value_tag, name);
+        ippAddOutOfBand(attrs, f.group_tag, value_tag, name);
       }
       else
       {
@@ -133,9 +153,9 @@ _ippFileParse(
         * Add attribute with one or more values...
         */
 
-        attr = ippAddString(f.attrs, f.group_tag, value_tag, name, NULL, NULL);
+        attr = ippAddString(attrs, f.group_tag, value_tag, name, NULL, NULL);
 
-        if (!parse_value(&f, v, errorcb, user_data, f.attrs, &attr, 0))
+        if (!parse_value(&f, v, user_data, attrs, &attr, 0))
           break;
       }
 
@@ -146,7 +166,7 @@ _ippFileParse(
       * Additional value...
       */
 
-      if (!parse_value(&f, v, errorcb, user_data, f.attrs, &attr, ippGetCount(attr)))
+      if (!parse_value(&f, v, user_data, attrs, &attr, ippGetCount(attr)))
 	break;
     }
     else
@@ -155,18 +175,21 @@ _ippFileParse(
       * Something else...
       */
 
-      attr = NULL;
+      attr  = NULL;
+      attrs = NULL;
 
-      if (!(*tokencb)(&f, v, user_data, token))
+      if (!(*v->tokencb)(&f, v, user_data, token))
         break;
     }
   }
 
  /*
-  * Close the file and free attributes, then return...
+  * Close the file and free ignored attributes, then return any attributes we
+  * kept...
   */
 
   cupsFileClose(f.fp);
+  ippDelete(ignored);
 
   return (f.attrs);
 }
@@ -364,7 +387,6 @@ static ipp_t *				/* O - Collection value or @code NULL@ on error */
 parse_collection(
     _ipp_file_t      *f,		/* I - IPP data file */
     _ipp_vars_t      *v,		/* I - IPP variables */
-    _ipp_ferror_cb_t errorcb,		/* I - Error callback */
     void             *user_data)	/* I - User data pointer */
 {
   ipp_t		*col = ippNew();	/* Collection value */
@@ -400,14 +422,14 @@ parse_collection(
 
       if (!_ippFileReadToken(f, syntax, sizeof(syntax)))
       {
-        report_error(f, errorcb, user_data, "Missing ATTR syntax on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Missing ATTR syntax on line %d of \"%s\".", f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
       }
       else if ((value_tag = ippTagValue(syntax)) < IPP_TAG_UNSUPPORTED_VALUE)
       {
-        report_error(f, errorcb, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f->linenum, f->filename);
+        report_error(f, v, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
@@ -415,7 +437,7 @@ parse_collection(
 
       if (!_ippFileReadToken(f, name, sizeof(name)) || !name[0])
       {
-        report_error(f, errorcb, user_data, "Missing ATTR name on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Missing ATTR name on line %d of \"%s\".", f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
@@ -437,7 +459,7 @@ parse_collection(
 
         attr = ippAddString(col, IPP_TAG_ZERO, value_tag, name, NULL, NULL);
 
-        if (!parse_value(f, v, errorcb, user_data, col, &attr, 0))
+        if (!parse_value(f, v, user_data, col, &attr, 0))
         {
 	  ippDelete(col);
 	  col = NULL;
@@ -452,7 +474,7 @@ parse_collection(
       * Additional value...
       */
 
-      if (!parse_value(f, v, errorcb, user_data, col, &attr, ippGetCount(attr)))
+      if (!parse_value(f, v, user_data, col, &attr, ippGetCount(attr)))
       {
 	ippDelete(col);
 	col = NULL;
@@ -465,7 +487,7 @@ parse_collection(
       * Something else...
       */
 
-      report_error(f, errorcb, user_data, "Unknown directive \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
+      report_error(f, v, user_data, "Unknown directive \"%s\" on line %d of \"%s\".", token, f->linenum, f->filename);
       ippDelete(col);
       col  = NULL;
       attr = NULL;
@@ -485,7 +507,6 @@ parse_collection(
 static int				/* O  - 1 on success or 0 on error */
 parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
             _ipp_vars_t      *v,	/* I  - IPP variables */
-            _ipp_ferror_cb_t errorcb,	/* I  - Error callback */
             void             *user_data,/* I  - User data pointer */
             ipp_t            *ipp,	/* I  - IPP message */
             ipp_attribute_t  **attr,	/* IO - IPP attribute */
@@ -497,7 +518,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
   if (!_ippFileReadToken(f, temp, sizeof(temp)))
   {
-    report_error(f, errorcb, user_data, "Missing value on line %d of \"%s\".", f->linenum, f->filename);
+    report_error(f, v, user_data, "Missing value on line %d of \"%s\".", f->linenum, f->filename);
     return (0);
   }
 
@@ -529,7 +550,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
 	  if (ptr <= value || xres <= 0 || yres <= 0 || !ptr || (_cups_strcasecmp(ptr, "dpi") && _cups_strcasecmp(ptr, "dpc") && _cups_strcasecmp(ptr, "dpcm") && _cups_strcasecmp(ptr, "other")))
 	  {
-	    report_error(f, errorcb, user_data, "Bad resolution value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	    report_error(f, v, user_data, "Bad resolution value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
 	    return (0);
 	  }
 
@@ -549,7 +570,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
           if (sscanf(value, "%d-%d", &lower, &upper) != 2)
           {
-	    report_error(f, errorcb, user_data, "Bad rangeOfInteger value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	    report_error(f, v, user_data, "Bad rangeOfInteger value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
 	    return (0);
 	  }
 
@@ -581,11 +602,11 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
           if (strcmp(value, "{"))
           {
-	    report_error(f, errorcb, user_data, "Bad ATTR collection value on line %d of \"%s\".", f->linenum, f->filename);
+	    report_error(f, v, user_data, "Bad ATTR collection value on line %d of \"%s\".", f->linenum, f->filename);
 	    return (0);
           }
 
-          if ((col = parse_collection(f, v, errorcb, user_data)) == NULL)
+          if ((col = parse_collection(f, v, user_data)) == NULL)
             return (0);
 
 	  status = ippSetCollection(ipp, attr, element, col);
@@ -596,7 +617,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 	break;
 
     default :
-        report_error(f, errorcb, user_data, "Unsupported ATTR value on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Unsupported ATTR value on line %d of \"%s\".", f->linenum, f->filename);
         return (0);
   }
 
@@ -610,10 +631,10 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
 static void
 report_error(
-    _ipp_file_t      *f,		/* I - IPP data file */
-    _ipp_ferror_cb_t errorcb,		/* I - Error callback function, if any */
-    void             *user_data,	/* I - User data pointer */
-    const char       *message,		/* I - Printf-style message */
+    _ipp_file_t *f,			/* I - IPP data file */
+    _ipp_vars_t *v,			/* I - Error callback function, if any */
+    void        *user_data,		/* I - User data pointer */
+    const char  *message,		/* I - Printf-style message */
     ...)				/* I - Additional arguments as needed */
 {
   char		buffer[8192];		/* Formatted string */
@@ -624,8 +645,8 @@ report_error(
   vsnprintf(buffer, sizeof(buffer), message, ap);
   va_end(ap);
 
-  if (errorcb)
-    (*errorcb)(f, user_data, buffer);
+  if (v->errorcb)
+    (*v->errorcb)(f, user_data, buffer);
   else
     fprintf(stderr, "%s\n", buffer);
 }

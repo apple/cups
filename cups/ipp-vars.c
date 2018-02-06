@@ -157,9 +157,16 @@ _ippVarsGet(_ipp_vars_t *v,		/* I - IPP variables */
  */
 
 void
-_ippVarsInit(_ipp_vars_t *v)		/* I - IPP variables */
+_ippVarsInit(_ipp_vars_t      *v,	/* I - IPP variables */
+             _ipp_fattr_cb_t  attrcb,	/* I - Attribute (filter) callback */
+             _ipp_ferror_cb_t errorcb,	/* I - Error callback */
+             _ipp_ftoken_cb_t tokencb)	/* I - Token callback */
 {
   memset(v, 0, sizeof(_ipp_vars_t));
+
+  v->attrcb  = attrcb;
+  v->errorcb = errorcb;
+  v->tokencb = tokencb;
 }
 
 

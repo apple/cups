@@ -239,7 +239,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   init_data(&data);
 
-  _ippVarsInit(&vars);
+  _ippVarsInit(&vars, NULL, (_ipp_ferror_cb_t)error_cb, (_ipp_ftoken_cb_t)token_cb);
 
  /*
   * We need at least:
@@ -1819,7 +1819,7 @@ do_tests(const char       *testfile,	/* I - Test file to use */
   * Run tests...
   */
 
-  _ippFileParse(vars, testfile, (_ipp_ftoken_cb_t)token_cb, (_ipp_ferror_cb_t)error_cb, (void *)data);
+  _ippFileParse(vars, testfile, (void *)data);
 
  /*
   * Close connection and return...
