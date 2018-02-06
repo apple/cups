@@ -535,6 +535,48 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
         return (ippSetInteger(ipp, attr, element, (int)strtol(value, NULL, 0)));
         break;
 
+    case IPP_TAG_DATE :
+        {
+          int	year,			/* Year */
+		month,			/* Month */
+		day,			/* Day of month */
+		hour,			/* Hour */
+		minute,			/* Minute */
+		second,			/* Second */
+		utc_offset = 0;		/* Timezone offset from UTC */
+          ipp_uchar_t date[11];		/* dateTime value */
+
+          if (sscanf(value, "%d-%d-%dT%d:%d:%d-%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          {
+	    report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+	    return (0);
+          }
+
+          date[0] = (ipp_uchar_t)(year >> 8);
+          date[1] = (ipp_uchar_t)(year & 255);
+          date[2] = (ipp_uchar_t)month;
+          date[3] = (ipp_uchar_t)day;
+          date[4] = (ipp_uchar_t)hour;
+          date[5] = (ipp_uchar_t)minute;
+          date[6] = (ipp_uchar_t)second;
+          date[7] = 0;
+          if (utc_offset < 0)
+          {
+            utc_offset = -utc_offset;
+            date[8]    = (ipp_uchar_t)'-';
+	  }
+	  else
+	  {
+            date[8] = (ipp_uchar_t)'+';
+	  }
+
+          date[9]  = (ipp_uchar_t)(utc_offset / 100);
+          date[10] = (ipp_uchar_t)(utc_offset % 100);
+
+          return (ippSetDate(ipp, attr, element, date));
+        }
+        break;
+
     case IPP_TAG_RESOLUTION :
 	{
 	  int	xres,		/* X resolution */
