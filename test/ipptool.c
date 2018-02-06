@@ -4317,7 +4317,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
   {
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
-        for (i = 0; i < ippGetCount(attr); i ++)
+        for (i = 0; i < count; i ++)
         {
 	  char	op,			/* Comparison operator */
 	  	*nextptr;		/* Next pointer */
@@ -4377,13 +4377,13 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
         if (!match && errors)
 	{
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	    add_stringf(data->errors, "GOT: %s=%d", name, ippGetInteger(attr, i));
 	}
 	break;
 
     case IPP_TAG_RANGE :
-        for (i = 0; i < ippGetCount(attr); i ++)
+        for (i = 0; i < count; i ++)
         {
 	  char	op,			/* Comparison operator */
 	  	*nextptr;		/* Next pointer */
@@ -4444,7 +4444,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
         if (!match && errors)
 	{
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	  {
 	    int lower, upper;		/* Range values */
 
@@ -4455,7 +4455,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	break;
 
     case IPP_TAG_BOOLEAN :
-	for (i = 0; i < ippGetCount(attr); i ++)
+	for (i = 0; i < count; i ++)
 	{
           if ((!strcmp(value, "true")) == ippGetBoolean(attr, i))
           {
@@ -4477,13 +4477,13 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
 	if (!match && errors)
 	{
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	    add_stringf(data->errors, "GOT: %s=%s", name, ippGetBoolean(attr, i) ? "true" : "false");
 	}
 	break;
 
     case IPP_TAG_RESOLUTION :
-	for (i = 0; i < ippGetCount(attr); i ++)
+	for (i = 0; i < count; i ++)
 	{
 	  int		xres, yres;	/* Resolution values */
 	  ipp_res_t	units;		/* Resolution units */
@@ -4514,7 +4514,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
 	if (!match && errors)
 	{
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	  {
 	    int		xres, yres;	/* Resolution values */
 	    ipp_res_t	units;		/* Resolution units */
@@ -4565,7 +4565,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  * See if ALL of the values match the given regular expression.
 	  */
 
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	  {
 	    if (!regexec(&re, get_string(attr, i, flags, temp, sizeof(temp)),
 	                 0, NULL, 0))
@@ -4594,7 +4594,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  * Value is a literal URI string, see if the value(s) match...
 	  */
 
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	  {
 	    if (!compare_uris(value, get_string(attr, i, flags, temp, sizeof(temp))))
 	    {
@@ -4620,7 +4620,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  * Value is a literal string, see if the value(s) match...
 	  */
 
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	  {
 	    int result;
 
@@ -4682,7 +4682,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
         if (!match && errors)
         {
-	  for (i = 0; i < ippGetCount(attr); i ++)
+	  for (i = 0; i < count; i ++)
 	    add_stringf(data->errors, "GOT: %s=\"%s\"", name, ippGetString(attr, i, NULL));
         }
 	break;
