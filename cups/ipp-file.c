@@ -546,7 +546,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 		utc_offset = 0;		/* Timezone offset from UTC */
           ipp_uchar_t date[11];		/* dateTime value */
 
-          if (sscanf(value, "%d-%d-%dT%d:%d:%d-%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          if (sscanf(value, "%d-%d-%dT%d:%d:%d%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
           {
 	    report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
 	    return (0);
