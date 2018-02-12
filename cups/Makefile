@@ -212,6 +212,7 @@ unittests:	$(UNITTARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
 	$(RM) libcups.so libcups.dylib
+	$(RM) libcupsimage.so libcupsimage.dylib
 
 
 #
