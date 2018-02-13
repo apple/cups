@@ -1,9 +1,10 @@
 /*
  * Simulated client test program for CUPS.
  *
- * Copyright 2017 by Apple Inc.
+ * Copyright © 2017-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -95,6 +96,9 @@ main(int  argc,				/* I - Number of command-line arguments */
  /*
   * Parse command-line options...
   */
+
+  if (argc == 1)
+    return (0);
 
   for (i = 1; i < argc; i ++)
   {
@@ -617,6 +621,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
   if ((fd = cupsTempFd(tempname, (int)tempsize)) < 0)
   {
     printf("Unable to create temporary print file: %s\n", strerror(errno));
+    free(line);
     return (NULL);
   }
 
@@ -624,6 +629,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
   {
     printf("Unable to open raster stream: %s\n", cupsRasterErrorString());
     close(fd);
+    free(line);
     return (NULL);
   }
 

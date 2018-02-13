@@ -4300,18 +4300,22 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
 {
   char		*temp;			/* Temporary string */
   _ipp_value_t	*value;			/* Current value */
+  ipp_tag_t	value_tag;		/* Value tag */
 
 
  /*
   * Range check input...
   */
 
+  if (attr && *attr)
+    value_tag = (*attr)->value_tag & IPP_TAG_CUPS_MASK;
+  else
+    value_tag = IPP_TAG_ZERO;
+
   if (!ipp || !attr || !*attr ||
-      ((*attr)->value_tag != IPP_TAG_TEXTLANG &&
-      (*attr)->value_tag != IPP_TAG_NAMELANG &&
-       ((*attr)->value_tag < IPP_TAG_TEXT ||
-        (*attr)->value_tag > IPP_TAG_MIMETYPE)) ||
-      element < 0 || element > (*attr)->num_values || !strvalue)
+      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
+       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
+      !strvalue)
     return (0);
 
  /*

@@ -228,8 +228,7 @@ main(void)
     puts("PASS");
   else
   {
-    printf("FAIL (returned %p with %d elements, expected pointer with 4 elements)\n",
-           dup_array, cupsArrayCount(dup_array));
+    printf("FAIL (returned %p with %d elements, expected pointer with 4 elements)\n", (void *)dup_array, cupsArrayCount(dup_array));
     status ++;
   }
 

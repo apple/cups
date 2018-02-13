@@ -1526,18 +1526,18 @@ cups_collection_string(
         if (!ippGetBoolean(member, 0))
         {
 	  if (bufptr < bufend)
-	    strlcpy(bufptr, "no", bufend - bufptr + 1);
+	    strlcpy(bufptr, "no", (size_t)(bufend - bufptr + 1));
 	  bufptr += 2;
         }
 
 	if (bufptr < bufend)
-	  strlcpy(bufptr, mname, bufend - bufptr + 1);
+	  strlcpy(bufptr, mname, (size_t)(bufend - bufptr + 1));
 	bufptr += strlen(mname);
         continue;
       }
 
       if (bufptr < bufend)
-        strlcpy(bufptr, mname, bufend - bufptr + 1);
+        strlcpy(bufptr, mname, (size_t)(bufend - bufptr + 1));
       bufptr += strlen(mname);
 
       if (bufptr < bufend)
@@ -1573,7 +1573,7 @@ cups_collection_string(
           {
             case IPP_TAG_INTEGER :
             case IPP_TAG_ENUM :
-                bufptr += snprintf(bufptr, bufptr < bufend ? (bufend - bufptr + 1) : 0, "%d", ippGetInteger(member, j));
+                bufptr += snprintf(bufptr, bufptr < bufend ? (size_t)(bufend - bufptr + 1) : 0, "%d", ippGetInteger(member, j));
                 break;
 
 	    case IPP_TAG_STRING :

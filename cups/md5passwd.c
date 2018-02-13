@@ -72,7 +72,7 @@ httpMD5Final(const char *nonce,		/* I - Server nonce value */
 
   snprintf(line, sizeof(line), "%s:%s", method, resource);
   cupsHashData("md5", (unsigned char *)line, strlen(line), sum, sizeof(sum));
-  httpMD5String(sum, a2);
+  cupsHashString(sum, sizeof(sum), a2, sizeof(a2));
 
  /*
   * Then combine A1 (MD5 of username, realm, and password) with the nonce

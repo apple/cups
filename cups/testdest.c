@@ -1,7 +1,7 @@
 /*
  * CUPS destination API test program for CUPS.
  *
- * Copyright 2012-2017 by Apple Inc.
+ * Copyright © 2012-2018 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -46,11 +46,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
   if (argc < 2)
-    usage(NULL);
+    return (0);
 
   if (!strcmp(argv[1], "--get"))
   {
-    int		i;			/* Looping var */
     cups_dest_t	*dests;			/* Destinations */
     int		num_dests = cupsGetDests2(CUPS_HTTP_DEFAULT, &dests);
 					/* Number of destinations */
@@ -63,7 +62,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (!strcmp(argv[1], "--enum"))
   {
-    int			i;		/* Looping var */
     cups_ptype_t	type = 0,	/* Printer type filter */
 			mask = 0;	/* Printer type mask */
 
@@ -128,8 +126,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, NULL, NULL);
     if (dest && dest->instance)
       printf("default is \"%s/%s\".\n", dest->name, dest->instance);
-    else
+    else if (dest)
       printf("default is \"%s\".\n", dest->name);
+    else
+      puts("no default destination.");
   }
   else
     dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, argv[i], NULL);
