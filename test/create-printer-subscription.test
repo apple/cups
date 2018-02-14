@@ -1,22 +1,8 @@
-#
-# "$Id$"
-#
 # Create a printer subscription.
-#
-# Copyright 2007-2014 by Apple Inc.
-# Copyright 2001-2006 by Easy Software Products. All rights reserved.
-#
-# These coded instructions, statements, and computer programs are the
-# property of Apple Inc. and are protected by Federal copyright
-# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-# which should have been included with this file.  If this file is
-# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 # Usage:
 #
 #   ./ipptool [-d recipient=uri] printer-uri create-printer-subscription.test
-#
-
 {
 	# The name of the test...
 	NAME "Create a push printer subscription"
@@ -68,8 +54,3 @@
 	EXPECT notify-subscription-id OF-TYPE integer WITH-VALUE >0
 	DISPLAY notify-subscription-id
 }
-
-
-#
-# End of "$Id$"
-#

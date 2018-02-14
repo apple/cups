@@ -1,7 +1,11 @@
 #
-# "$Id$"
+# Verify that the IPP job operations work.
 #
-#   Verify that the IPP job operations work.
+# Copyright © 2007-2013 by Apple Inc.
+# Copyright © 2001-2006 by Easy Software Products. All rights reserved.
+#
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 {
 	# The name of the test...
@@ -324,7 +328,3 @@
 	EXPECT job-state
 	EXPECT job-printer-uri
 }
-
-#
-# End of "$Id$"
-#

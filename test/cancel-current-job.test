@@ -1,23 +1,8 @@
-#
-# "$Id$"
-#
-#   Cancel the currently printing job.
-#
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
-#
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# Cancel the currently printing job.
 #
 # Usage:
 #
 #   ./ipptool printer-uri cancel-current-jobs.test
-#
-
-
 {
 	# The name of the test...
 	NAME "Get current job"
@@ -58,8 +43,3 @@
 	# What statuses are OK?
 	STATUS successful-ok
 }
-
-
-#
-# End of "$Id$".
-#
