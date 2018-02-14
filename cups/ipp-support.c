@@ -1,10 +1,11 @@
 /*
  * Internet Printing Protocol support functions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -1657,6 +1658,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-charge-info",
     "printer-charge-info-uri",
     "printer-commands",			/* CUPS extension */
+    "printer-config-change-date-time",
+    "printer-config-change-time",
     "printer-current-time",
     "printer-detailed-status-messages",
     "printer-device-id",
