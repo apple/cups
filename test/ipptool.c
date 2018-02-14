@@ -1343,6 +1343,8 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
       for (i = data->num_expects, expect = data->expects; i > 0; i --, expect ++)
       {
+	ipp_attribute_t *group_found;	/* Found parent attribute for group tests */
+
 	if (expect->if_defined && !_ippVarsGet(vars, expect->if_defined))
 	  continue;
 
@@ -1354,11 +1356,24 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
 	do
 	{
+	  group_found = found;
+
+          if (expect->in_group && strchr(expect->name, '/'))
+          {
+            char	group_name[256],/* Parent attribute name */
+			*group_ptr;	/* Pointer into parent attribute name */
+
+	    strlcpy(group_name, expect->name, sizeof(group_name));
+	    if ((group_ptr = strchr(group_name, '/')) != NULL)
+	      *group_ptr = '\0';
+
+	    group_found = ippFindAttribute(response, group_name, IPP_TAG_ZERO);
+	  }
+
 	  if ((found && expect->not_expect) ||
 	      (!found && !(expect->not_expect || expect->optional)) ||
 	      (found && !expect_matches(expect, ippGetValueTag(found))) ||
-	      (found && expect->in_group &&
-	       ippGetGroupTag(found) != expect->in_group))
+	      (group_found && expect->in_group && ippGetGroupTag(group_found) != expect->in_group))
 	  {
 	    if (expect->define_no_match)
 	      _ippVarsSet(vars, expect->define_no_match, "1");
@@ -1375,10 +1390,10 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 			      expect->name, expect->of_type,
 			      ippTagString(ippGetValueTag(found)));
 
-		if (expect->in_group && ippGetGroupTag(found) != expect->in_group)
+		if (expect->in_group && ippGetGroupTag(group_found) != expect->in_group)
 		  add_stringf(data->errors, "EXPECTED: %s IN-GROUP %s (got %s).",
 			      expect->name, ippTagString(expect->in_group),
-			      ippTagString(ippGetGroupTag(found)));
+			      ippTagString(ippGetGroupTag(group_found)));
 	      }
 	    }
 
