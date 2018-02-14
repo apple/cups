@@ -3,7 +3,7 @@
  * commands such as IPP and Bonjour conformance tests.  This tool is
  * inspired by the UNIX "find" command, thus its name.
  *
- * Copyright 2008-2017 by Apple Inc.
+ * Copyright © 2008-2018 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -64,6 +64,7 @@ typedef enum ippfind_op_e		/* Operations for expressions */
   IPPFIND_OP_IS_REMOTE,			/* Is a remote service */
   IPPFIND_OP_DOMAIN_REGEX,		/* Domain matches regular expression */
   IPPFIND_OP_NAME_REGEX,		/* Name matches regular expression */
+  IPPFIND_OP_NAME_LITERAL,		/* Name matches literal string */
   IPPFIND_OP_HOST_REGEX,		/* Hostname matches regular expression */
   IPPFIND_OP_PORT_RANGE,		/* Port matches range */
   IPPFIND_OP_PATH_REGEX,		/* Path matches regular expression */
@@ -88,7 +89,7 @@ typedef struct ippfind_expr_s		/* Expression */
 		*child;			/* Child expressions */
   ippfind_op_t	op;			/* Operation code (see above) */
   int		invert;			/* Invert the result */
-  char		*key;			/* TXT record key */
+  char		*name;			/* TXT record key or literal name */
   regex_t	re;			/* Regular expression for matching */
   int		range[2];		/* Port number range */
   int		num_args;		/* Number of arguments for exec */
@@ -269,6 +270,7 @@ main(int  argc,				/* I - Number of command-line args */
     "IS_REMOTE",
     "DOMAIN_REGEX",
     "NAME_REGEX",
+    "NAME_LITERAL",
     "HOST_REGEX",
     "PORT_RANGE",
     "PATH_REGEX",
@@ -412,6 +414,18 @@ main(int  argc,				/* I - Number of command-line args */
         {
           if ((temp = new_expr(IPPFIND_OP_IS_LOCAL, invert, NULL, NULL,
                                NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--literal-name"))
+        {
+          i ++;
+          if (i >= argc)
+          {
+            _cupsLangPrintf(stderr, _("ippfind: Missing name after %s."), "--literal-name");
+            show_usage();
+          }
+
+          if ((temp = new_expr(IPPFIND_OP_NAME_LITERAL, invert, argv[i], NULL, NULL)) == NULL)
             return (IPPFIND_EXIT_MEMORY);
         }
         else if (!strcmp(argv[i], "--name"))
@@ -718,6 +732,18 @@ main(int  argc,				/* I - Number of command-line args */
             case '6' :
                 address_family = AF_INET6;
                 break;
+
+            case 'N' : /* Literal name */
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr, _("ippfind: Missing name after %s."), "-N");
+		  show_usage();
+		}
+
+		if ((temp = new_expr(IPPFIND_OP_NAME_LITERAL, invert, argv[i], NULL, NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+		break;
 
             case 'P' :
 		i ++;
@@ -1790,6 +1816,9 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
       case IPPFIND_OP_NAME_REGEX :
           result = !regexec(&(expression->re), service->name, 0, NULL, 0);
           break;
+      case IPPFIND_OP_NAME_LITERAL :
+          result = !_cups_strcasecmp(expression->name, service->name);
+          break;
       case IPPFIND_OP_HOST_REGEX :
           result = !regexec(&(expression->re), service->host, 0, NULL, 0);
           break;
@@ -1801,11 +1830,11 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
           result = !regexec(&(expression->re), service->resource, 0, NULL, 0);
           break;
       case IPPFIND_OP_TXT_EXISTS :
-          result = cupsGetOption(expression->key, service->num_txt,
+          result = cupsGetOption(expression->name, service->num_txt,
 				 service->txt) != NULL;
           break;
       case IPPFIND_OP_TXT_REGEX :
-          val = cupsGetOption(expression->key, service->num_txt,
+          val = cupsGetOption(expression->name, service->num_txt,
 			      service->txt);
 	  if (val)
 	    result = !regexec(&(expression->re), val, 0, NULL, 0);
@@ -2433,8 +2462,8 @@ new_expr(ippfind_op_t op,		/* I - Operation */
   temp->op = op;
   temp->invert = invert;
 
-  if (op == IPPFIND_OP_TXT_EXISTS || op == IPPFIND_OP_TXT_REGEX)
-    temp->key = (char *)value;
+  if (op == IPPFIND_OP_TXT_EXISTS || op == IPPFIND_OP_TXT_REGEX || op == IPPFIND_OP_NAME_LITERAL)
+    temp->name = (char *)value;
   else if (op == IPPFIND_OP_PORT_RANGE)
   {
    /*

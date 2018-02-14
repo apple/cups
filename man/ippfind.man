@@ -1,11 +1,15 @@
 .\"
-.\" ippfind man page for CUPS.
+.\" ippfind man page.
 .\"
-.\" Copyright 2013-2014 by Apple Inc.
+.\" Copyright © 2013-2018 by Apple Inc.
 .\"
-.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ippfind 1 "CUPS" "11 June 2014" "Apple Inc."
+.TH ippfind 1 "ippsample" "14 February 2018" "Apple Inc."
 .SH NAME
 ippfind \- find internet printing protocol printers
 .SH SYNOPSIS
@@ -79,6 +83,11 @@ The result is true if the URI is accessible, false otherwise.
 .TP 5
 .B \-\-local
 True if the service is local to this computer.
+.TP 5
+\fB\-N \fIname\fR
+.TP 5
+\fB\-\-literal\-name \fIname\fR
+True if the service instance name matches the given name.
 .TP 5
 \fB\-n \fIregex\fR
 .TP 5
