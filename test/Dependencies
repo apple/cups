@@ -1,9 +1,10 @@
 ippfind.o: ippfind.c ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
-  ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
+  ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/http.h \
+  ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/thread-private.h
+  ../cups/thread-private.h
 ippserver.o: ippserver.c ../config.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
   ../cups/language.h ../cups/pwg.h ../cups/string-private.h \
@@ -11,7 +12,7 @@ ippserver.o: ippserver.c ../config.h ../cups/cups.h ../cups/file.h \
 ipptool.o: ipptool.c ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
-  ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
+  ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/http.h \
+  ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/thread-private.h \
-  ../cups/file-private.h
+  ../cups/thread-private.h ../cups/file-private.h
