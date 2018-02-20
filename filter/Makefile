@@ -1,8 +1,8 @@
 #
 # Filter makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -36,14 +36,14 @@ all:	$(TARGETS)
 # Make library targets...
 #
 
-libs:		$(LIBTARGETS)
+libs:
 
 
 #
 # Make unit tests...
 #
 
-unittests:	$(UNITTARGETS)
+unittests:
 
 
 #
@@ -51,8 +51,7 @@ unittests:	$(UNITTARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
-	$(RM) libcupsimage.so libcupsimage.sl libcupsimage.dylib
+	$(RM) $(OBJS) $(TARGETS)
 
 
 #
@@ -83,14 +82,12 @@ install-data:
 
 install-exec:
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
-	for file in $(FILTERS); do \
+	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
-	$(RM) $(SERVERBIN)/filter/rastertodymo
-	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(FILTERS); do \
+		for file in $(TARGETS); do \
 			cp $$file $(SYMROOT); \
 			dsymutil $(SYMROOT)/$$file; \
 		done \
@@ -116,10 +113,9 @@ install-libs:
 #
 
 uninstall:
-	for file in $(FILTERS); do \
+	for file in $(TARGETS); do \
 		$(RM) $(SERVERBIN)/filter/$$file; \
 	done
-	$(RM) $(SERVERBIN)/filter/rastertodymo
 	-$(RMDIR) $(SERVERBIN)/filter
 	-$(RMDIR) $(SERVERBIN)
 
