@@ -5259,6 +5259,7 @@ create_local_bg_thread(
   ipp_t		*request,		/* Request to printer */
 		*response;		/* Response from printer */
   ipp_attribute_t *attr;		/* Attribute in response */
+  ipp_status_t	status;			/* Status code */
 
 
  /*
@@ -5291,12 +5292,35 @@ create_local_bg_thread(
   cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Connected to %s:%d, sending Get-Printer-Attributes request...", printer->name, host, port);
 
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippSetVersion(request, 2, 0);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, printer->device_uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "all");
 
   response = cupsDoRequest(http, request, resource);
+  status   = cupsLastError();
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Get-Printer-Attributes returned %s", printer->name, ippErrorString(cupsLastError()));
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Get-Printer-Attributes returned %s (%s)", printer->name, ippErrorString(cupsLastError()), cupsLastErrorString());
+
+  if (status == IPP_STATUS_ERROR_BAD_REQUEST || status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+  {
+   /*
+    * Try request using IPP/1.1, in case we are talking to an old CUPS server or
+    * printer...
+    */
+
+    ippDelete(response);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Re-sending Get-Printer-Attributes request using IPP/1.1...", printer->name);
+
+    request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+    ippSetVersion(request, 1, 1);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, printer->device_uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "all");
+
+    response = cupsDoRequest(http, request, resource);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: IPP/1.1 Get-Printer-Attributes returned %s (%s)", printer->name, ippErrorString(cupsLastError()), cupsLastErrorString());
+  }
 
   // TODO: Grab printer icon file...
   httpClose(http);
