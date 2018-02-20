@@ -1672,6 +1672,20 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
+
+      if (!ippValidateAttribute(attr))
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdIsAuthorized: Bad requesting-user-name:\"%s\"", attr->values[0].string.text);
+
+        if (StrictConformance)
+          return (HTTP_UNAUTHORIZED);
+
+        /* Don't use invalid attribute */
+        ippDeleteAttribute(con->request, attr);
+
+        attr = ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "requesting-user-name", NULL, "anonymous");
+      }
+
       strlcpy(username, attr->values[0].string.text, sizeof(username));
     }
     else if (best->satisfy == CUPSD_AUTH_SATISFY_ALL || auth == CUPSD_AUTH_DENY)
