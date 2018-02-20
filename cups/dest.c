@@ -564,7 +564,7 @@ _cupsAppleSetUseLastPrinter(
 
 
 /*
- * 'cupsConnectDest()' - Open a conection to the destination.
+ * 'cupsConnectDest()' - Open a connection to the destination.
  *
  * Connect to the destination, returning a new @code http_t@ connection object
  * and optionally the resource path to use for the destination.  These calls
@@ -573,7 +573,7 @@ _cupsAppleSetUseLastPrinter(
  * returns 0.  The caller is responsible for calling @link httpClose@ on the
  * returned connection.
  *
- * Starting with CUPS 2.2.4, the caller can pass  @code CUPS_DEST_FLAGS_DEVICE@
+ * Starting with CUPS 2.2.4, the caller can pass @code CUPS_DEST_FLAGS_DEVICE@
  * for the "flags" argument to connect directly to the device associated with
  * the destination.  Otherwise, the connection is made to the CUPS scheduler
  * associated with the destination.
