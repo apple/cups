@@ -1,8 +1,8 @@
-CHANGES - 2.3b4 - 2018-02-20
-============================
+CHANGES - 2.3rc1 - 2018-02-20
+=============================
 
-Changes in CUPS v2.3b4
-----------------------
+Changes in CUPS v2.3rc1
+-----------------------
 
 - Fixed installation of filters (Issue #5247)
 - Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
