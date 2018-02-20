@@ -5,6 +5,7 @@ Changes in CUPS v2.3b4
 ----------------------
 
 - Fixed installation of filters (Issue #5247)
+- Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
 
 
 Changes in CUPS v2.3b3
