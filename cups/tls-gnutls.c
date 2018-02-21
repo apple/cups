@@ -1,8 +1,8 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -1087,7 +1087,7 @@ http_gnutls_read(
 
   http = (http_t *)ptr;
 
-  if (!http->blocking)
+  if (!http->blocking || http->timeout_value > 0.0)
   {
    /*
     * Make sure we have data before we read...
@@ -1245,6 +1245,9 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   char			priority_string[2048];
 					/* Priority string */
   int			version;	/* Current version */
+  double		old_timeout;	/* Old timeout value */
+  http_timeout_cb_t	old_cb;		/* Old timeout callback */
+  void			*old_data;	/* Old timeout data */
   static const char * const versions[] =/* SSL/TLS versions */
   {
     "VERS-SSL3.0",
@@ -1578,6 +1581,24 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 #endif /* HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
   gnutls_transport_set_push_function(http->tls, http_gnutls_write);
 
+ /*
+  * Enforce a minimum timeout of 10 seconds for the TLS handshake...
+  */
+
+  old_timeout  = http->timeout_value;
+  old_cb       = http->timeout_cb;
+  old_data     = http->timeout_data;
+
+  if (!old_cb || old_timeout < 10.0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting timeout to 10 seconds.");
+    httpSetTimeout(http, 10.0, NULL, NULL);
+  }
+
+ /*
+  * Do the TLS handshake...
+  */
+
   while ((status = gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
   {
     DEBUG_printf(("5_httpStartTLS: gnutls_handshake returned %d (%s)",
@@ -1595,9 +1616,17 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
       free(credentials);
       http->tls = NULL;
 
+      httpSetTimeout(http, old_timeout, old_cb, old_data);
+
       return (-1);
     }
   }
+
+ /*
+  * Restore the previous timeout settings...
+  */
+
+  httpSetTimeout(http, old_timeout, old_cb, old_data);
 
   http->tls_credentials = credentials;
 

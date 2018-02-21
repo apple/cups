@@ -4027,7 +4027,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
   DEBUG_printf(("http_read(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
-  if (!http->blocking)
+  if (!http->blocking || http->timeout_value > 0.0)
   {
     while (!httpWait(http, http->wait_value))
     {
@@ -4626,7 +4626,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
   {
     DEBUG_printf(("3http_write: About to write %d bytes.", (int)length));
 
-    if (http->timeout_cb)
+    if (http->timeout_value > 0.0)
     {
 #ifdef HAVE_POLL
       struct pollfd	pfd;		/* Polled file descriptor */
@@ -4670,7 +4670,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
 	  http->error = errno;
 	  return (-1);
 	}
-	else if (nfds == 0 && !(*http->timeout_cb)(http, http->timeout_data))
+	else if (nfds == 0 && (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data)))
 	{
 #ifdef WIN32
 	  http->error = WSAEWOULDBLOCK;

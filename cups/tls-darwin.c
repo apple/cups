@@ -1,8 +1,8 @@
 /*
  * TLS support code for CUPS on macOS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -1532,7 +1532,28 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   if (!error)
   {
-    int done = 0;			/* Are we done yet? */
+    int			done = 0;	/* Are we done yet? */
+    double		old_timeout;	/* Old timeout value */
+    http_timeout_cb_t	old_cb;		/* Old timeout callback */
+    void		*old_data;	/* Old timeout data */
+
+   /*
+    * Enforce a minimum timeout of 10 seconds for the TLS handshake...
+    */
+
+    old_timeout  = http->timeout_value;
+    old_cb       = http->timeout_cb;
+    old_data     = http->timeout_data;
+
+    if (!old_cb || old_timeout < 10.0)
+    {
+      DEBUG_puts("4_httpTLSStart: Setting timeout to 10 seconds.");
+      httpSetTimeout(http, 10.0, NULL, NULL);
+    }
+
+   /*
+    * Do the TLS handshake...
+    */
 
     while (!error && !done)
     {
@@ -1653,6 +1674,12 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	    break;
       }
     }
+
+   /*
+    * Restore the previous timeout settings...
+    */
+
+    httpSetTimeout(http, old_timeout, old_cb, old_data);
   }
 
   if (error)
@@ -2085,7 +2112,7 @@ http_cdsa_read(
 
   http = (http_t *)connection;
 
-  if (!http->blocking)
+  if (!http->blocking || http->timeout_value > 0.0)
   {
    /*
     * Make sure we have data before we read...
