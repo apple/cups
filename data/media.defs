@@ -1,14 +1,11 @@
 /*
  * Adobe standard media size definitions for the CUPS PPD file compiler.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2005 by Easy Software Products.
+ * Copyright © 2007-2016 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
- * These codedinstructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * copyright law.  Distribution and use rights are outlinedin the file
- * "LICENSE.txt" which should have beenincluded with this file.  If this
- * file is missing or damaged, see the license at "http://www.cups.org/".
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #media "3x5/3 x 5" 216 360

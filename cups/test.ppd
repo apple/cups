@@ -1,7 +1,5 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: test.ppd 7819 2008-08-01 00:27:24Z mike $"
-*%
 *% Test PPD file for CUPS.
 *%
 *% This file is used to test the CUPS PPD API functions and cannot be
@@ -12,22 +10,19 @@
 *% to create your PPD files - not only will it save you time, it produces
 *% consistently high-quality files.
 *%
-*% Copyright 2007-2010 by Apple Inc.
-*% Copyright 2002-2006 by Easy Software Products.
+*% Copyright (c) 2007-2018 by Apple Inc.
+*% Copyright (c) 2002-2006 by Easy Software Products.
 *%
-*% These coded instructions, statements, and computer programs are the
-*% property of Apple Inc. and are protected by Federal copyright
-*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-*% which should have been included with this file.  If this file is
-*% file is missing or damaged, see the license at "http://www.cups.org/".
+*% Licensed under Apache License v2.0.  See the file "LICENSE" for more
+*% information.
 *FormatVersion:	"4.3"
-*FileVersion:	"1.3"
+*FileVersion:	"2.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TEST.PPD"
-*Manufacturer:	"ESP"
+*Manufacturer:	"Apple"
 *Product:	"(Test)"
-*cupsVersion:	1.4
+*cupsVersion:	2.3
 *ModelName:     "Test"
 *ShortNickName: "Test"
 *NickName:      "Test for CUPS"
@@ -266,6 +261,3 @@ help:anchor='foo'%20bookID=Vendor%20Help
 *Font Times-Roman: Standard "(001.007S)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
-*%
-*% End of "$Id: test.ppd 7819 2008-08-01 00:27:24Z mike $".
-*%

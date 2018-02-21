@@ -1,17 +1,12 @@
 /*
- * "$Id: raster.defs 343 2007-07-13 19:52:48Z mike $"
+ * This file contains the standard definitions for enumerated attributes
+ * in the CUPS raster page device dictionary.
  *
- *   This file contains the standard definitions for enumerated attributes
- *   in the CUPS raster page device dictionary.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
- *   Copyright 2007 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
- *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /* Jog values */
@@ -87,8 +82,3 @@
 #define CUPS_CSPACE_ICCD	44	/* ICC-based, 13 colors */
 #define CUPS_CSPACE_ICCE	45	/* ICC-based, 14 colors */
 #define CUPS_CSPACE_ICCF	46	/* ICC-based, 15 colors */
-
-
-/*
- * End of "$Id: raster.defs 343 2007-07-13 19:52:48Z mike $".
- */

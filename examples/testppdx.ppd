@@ -1,27 +1,22 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
-*%
 *% Test PPD file for data encoding example.
 *%
 *% This file cannot be used with any known printers.
 *%
-*% Copyright 2007-2012 by Apple Inc.
-*% Copyright 2002-2006 by Easy Software Products.
+*% Copyright (c) 2007-2012 by Apple Inc.
+*% Copyright (c) 2002-2006 by Easy Software Products.
 *%
-*% These coded instructions, statements, and computer programs are the
-*% property of Apple Inc. and are protected by Federal copyright
-*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-*% which should have been included with this file.  If this file is
-*% file is missing or damaged, see the license at "http://www.cups.org/".
+*% Licensed under Apache License v2.0.  See the file "LICENSE" for more
+*% information.
 *FormatVersion:	"4.3"
-*FileVersion:	"1.3"
+*FileVersion:	"2.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TESTPPDX.PPD"
 *Manufacturer:	"Apple"
 *Product:	"(Test PPDX)"
-*cupsVersion:	1.6
+*cupsVersion:	2.3
 *ModelName:     "Test PPDX"
 *ShortNickName: "Test PPDX"
 *NickName:      "Test PPDX for CUPS"
@@ -108,9 +103,6 @@
 *Font Times-Roman: Standard "(001.007S)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
-*%
-*% End of "$Id$".
-*%
 *EXData0000: "eNqlVm1v2zYQ/hz/ipvWznLgl6T7siXrgCJ2AANBEyQpNmAtAlqiLG4SKZBU7LTIf9/dUW9Og32ZAFsieffcc88dKS2OR3AM0Zt1+ibCJxoA3EvnobJma0UJmbFwc7OEVHgBUicmVXoLci/KqpCAQznvHC9MWSmc3Smfn3WzdG2TBGYGPCJXVbqH2fIBQR+Wq5vb1cWH+9XyfRTBbNs"
 *EXData0001: "GcwTaG6zIqkrh7evgzDVk1Xb3MO7k9N3sHmCDxWRWeuk53KfSxf4paC087ZOvDLaTcF54WUptcdnoVO0KavaS9um7EBYCT6XAQhnK2n9E5hsEIc9yQ6XvUw8RkEelzKVVhQI2TAMEIXYzQGWClmoTU002L1GgmwVIpraF0ozXYoOGUkZXa0vVh/vVnO/91FA2+UqycHlpi5SyMWjhI0"
 *EXData0002: "lBq9kqKmbEl9BFCOETDwOuuHoFxAaQZQKueooljmVJRiK1NUSHL+UKhEaiQpPES599XZYrHb7eZUkLmx20U0lLsPAK7e/I2agDcME1S7vpst5aMsUM0U7kzmd5S03CeyIkVaqAujPdWm759SKB1PYAa3UqShDzNrShDcLdycHJgk3VnlWUnQcgdJXut/HCEvRqMFw62DSricSOeEfYI"

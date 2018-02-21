@@ -1,32 +1,27 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
-*%
 *% Test HP PPD file for CUPS.
 *%
-*% Copyright 2007-2013 by Apple Inc.
-*% Copyright 1997-2005 by Easy Software Products.
+*% Copyright © 2007-2018 by Apple Inc.
+*% Copyright © 1997-2005 by Easy Software Products.
 *%
-*% These coded instructions, statements, and computer programs are the
-*% property of Apple Inc. and are protected by Federal copyright
-*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-*% which should have been included with this file.  If this file is
-*% file is missing or damaged, see the license at "http://www.cups.org/".
+*% Licensed under Apache License v2.0.  See the file "LICENSE" for more
+*% information.
 *%
 *FormatVersion:	"4.3"
-*FileVersion:	"1.7"
+*FileVersion:	"2.3"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TESTHP.PPD"
 *Manufacturer:	"ESP"
-*Product:	"(CUPS v1.5)"
-*cupsVersion:	1.7
+*Product:	"(CUPS v2.3)"
+*cupsVersion:	2.3
 *cupsManualCopies: True
 *cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
 *cupsFilter2:	"application/vnd.cups-raster application/vnd.hp-pcl 50 rastertohp"
 *ModelName:     "Test HP Printer"
 *ShortNickName: "Test HP Printer"
-*NickName:      "Test HP Printer CUPS v1.7"
+*NickName:      "Test HP Printer CUPS v2.3"
 *PSVersion:	"(3010.000) 550"
 *LanguageLevel:	"3"
 *ColorDevice:	True
@@ -183,6 +178,3 @@
 *Font Times-Roman: Standard "(001.007S)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
-*%
-*% End of "$Id$".
-*%
