@@ -283,7 +283,7 @@ httpClearCookie(http_t *http)		/* I - HTTP connection */
 void
 httpClearFields(http_t *http)		/* I - HTTP connection */
 {
-  http_field_t	field;			/* Curent field */
+  http_field_t	field;			/* Current field */
 
 
   DEBUG_printf(("httpClearFields(http=%p)", (void *)http));
