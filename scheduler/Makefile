@@ -1,10 +1,11 @@
 #
 # Scheduler Makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
-# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
-# Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 include ../Makedefs
@@ -55,7 +56,7 @@ CXXOBJS	=	\
 		cups-driverd.o
 OBJS	=	\
 		$(COBJS) \
-		$(LD_CXXOBJS)
+		$(CXXOBJS)
 LIBTARGETS =	\
 		$(LIBCUPSMIME) \
 		libcupsmime.a
