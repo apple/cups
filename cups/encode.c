@@ -1,10 +1,11 @@
 /*
  * Option encoding routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -627,6 +628,22 @@ _cupsEncodeOption(
 
 
 /*
+ * 'cupsEncodeOption()' - Encode a single option into an IPP attribute.
+ *
+ * @since CUPS 2.3@
+ */
+
+ipp_attribute_t	*			/* O - New attribute or @code NULL@ on error */
+cupsEncodeOption(ipp_t      *ipp,	/* I - IPP request/response */
+                 ipp_tag_t  group_tag,	/* I - Attribute group */
+                 const char *name,	/* I - Option name */
+                 const char *value)	/* I - Option string value */
+{
+  return (_cupsEncodeOption(ipp, group_tag, _ippFindOption(name), name, value));
+}
+
+
+/*
  * 'cupsEncodeOptions()' - Encode printer options into IPP attributes.
  *
  * This function adds operation, job, and then subscription attributes,
@@ -635,7 +652,7 @@ _cupsEncodeOption(
  */
 
 void
-cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
+cupsEncodeOptions(ipp_t         *ipp,		/* I - IPP request/response */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
@@ -663,7 +680,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
 
 void
 cupsEncodeOptions2(
-    ipp_t         *ipp,			/* I - Request to add to */
+    ipp_t         *ipp,			/* I - IPP request/response */
     int           num_options,		/* I - Number of options */
     cups_option_t *options,		/* I - Options */
     ipp_tag_t     group_tag)		/* I - Group to encode */

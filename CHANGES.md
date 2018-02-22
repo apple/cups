@@ -14,6 +14,8 @@ Changes in CUPS v2.3rc1
   (rdar://37789645)
 - The ipptool `--ippserver` option did not encode out-of-band attributes
   correctly.
+- Added public `cupsEncodeOption` API for encoding a single option as an IPP
+  attribute.
 - Documentation fixes (Issue #5252)
 
 
