@@ -12,6 +12,8 @@ Changes in CUPS v2.3rc1
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
   (rdar://37789645)
+- The ipptool `--ippserver` option did not encode out-of-band attributes
+  correctly.
 - Documentation fixes (Issue #5252)
 
 

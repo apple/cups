@@ -2594,7 +2594,7 @@ print_ippserver_attr(
 	break;
 
     default :
-	cupsFilePuts(data->outfile, " \"\"");
+        /* Out-of-band value */
 	break;
   }
 
