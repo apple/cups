@@ -1,10 +1,11 @@
 /*
  * Temp file utilities for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -36,8 +37,10 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   int		fd;			/* File descriptor for temp file */
   int		tries;			/* Number of tries */
   const char	*tmpdir;		/* TMPDIR environment var */
+#if defined(__APPLE__) || defined(WIN32)
+  char		tmppath[1024];		/* Temporary directory */
+#endif /* __APPLE__ || WIN32 */
 #ifdef WIN32
-  char		tmppath[1024];		/* Windows temporary directory */
   DWORD		curtime;		/* Current time */
 #else
   struct timeval curtime;		/* Current time */
@@ -54,6 +57,27 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     GetTempPath(sizeof(tmppath), tmppath);
     tmpdir = tmppath;
   }
+
+#elif defined(__APPLE__)
+ /*
+  * On macOS and iOS, the TMPDIR environment variable is not always the best
+  * location to place temporary files due to sandboxing.  Instead, the confstr
+  * function should be called when running as a normal process (not a child of
+  * cupsd) to get the proper per-user, per-process TMPDIR value.  We know
+  * whether the process is running as a child of cupsd by the presence of the
+  * "SOFTWARE" environment variable that cupsd sets.
+  */
+
+  tmpdir = getenv("TMPDIR");
+
+  if (!getenv("SOFTWARE") || !tmpdir)
+  {
+    if (confstr(_CS_DARWIN_USER_TEMP_DIR, tmppath, sizeof(tmppath)))
+      tmpdir = tmppath;
+    else
+      tmpdir = "/private/tmp";		/* This should never happen */
+  }
+
 #else
  /*
   * Previously we put root temporary files in the default CUPS temporary
@@ -63,11 +87,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
-#  if defined(__APPLE__) && !TARGET_OS_IOS
-    tmpdir = "/private/tmp";		/* /tmp is a symlink to /private/tmp */
-#  else
     tmpdir = "/tmp";
-#  endif /* __APPLE__  && !TARGET_OS_IOS */
 #endif /* WIN32 */
 
  /*

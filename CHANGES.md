@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-02-20
+CHANGES - 2.3rc1 - 2018-02-22
 =============================
 
 Changes in CUPS v2.3rc1
@@ -10,6 +10,8 @@ Changes in CUPS v2.3rc1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
+- Temp files could not be created in some sandboxed applications
+  (rdar://37789645)
 - Documentation fixes (Issue #5252)
 
 
