@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 21:08-0500\n"
+"POT-Creation-Date: 2018-02-22 14:19-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1525,6 +1525,12 @@ msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
 
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
+msgstr ""
+
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f バイト"
@@ -2848,10 +2854,6 @@ msgstr "%d は無効なリクエストIDです。"
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "バージョン番号 %d.%d は無効なリクエストです。"
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "URI のリソースが不正"
@@ -6512,6 +6514,10 @@ msgstr "ippfind: \"--or\" の前には式が必要です。"
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind: %s のあとにはキー名が必要です。"
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind: 開きカッコが足りません。"

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 21:08-0500\n"
+"POT-Creation-Date: 2018-02-22 14:19-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -1549,6 +1549,12 @@ msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
 
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
+msgstr ""
+
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f byte"
@@ -2878,10 +2884,6 @@ msgstr "L'ID della richiesta %d non è valido."
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "Il numero della versione richiesta %d.%d non è valido."
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr ""
@@ -6551,6 +6553,10 @@ msgstr "ippfind: manca l'espressione prima di \"--or\"."
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind: manca il nome della chiave dopo %s."
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind: mancano le parentesi aperte."

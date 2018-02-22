@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 21:08-0500\n"
+"POT-Creation-Date: 2018-02-22 14:19-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1566,6 +1566,12 @@ msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
 
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
+msgstr ""
+
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
@@ -2894,10 +2900,6 @@ msgstr "Petición incorrecta de ID %d."
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "Petición incorrecta de número de versión %d.%d."
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "Recurso incorrecto en URI"
@@ -5096,8 +5098,8 @@ msgstr "Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]"
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 msgstr ""
-"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN.ppd"
-"[.gz]]"
+"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN."
+"ppd[.gz]]"
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -6590,6 +6592,10 @@ msgstr "ippfind: Falta una expresión antes de \"--or\"."
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind: Falta un nombre de clave tras %s."
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind: Falta el paréntesis de apertura."

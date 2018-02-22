@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-01-31 21:08-0500\n"
+"POT-Creation-Date: 2018-02-22 14:19-0500\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -1480,6 +1480,12 @@ msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
 
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
+msgstr ""
+
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f 字节"
@@ -2793,10 +2799,6 @@ msgstr "无效的请求 ID %d。"
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "无效的请求版本号 %d.%d。"
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "URI 中的资源无效"
@@ -6426,6 +6428,10 @@ msgstr "ippfind：“--or”前缺少表达式。"
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind：在 %s 后缺少键名。"
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind：缺少左括号。"
