@@ -7,8 +7,8 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="creator" content="Mini-XML v2.11">
     <meta name="author" content="Michael R Sweet">
-    <meta name="copyright" content="Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.">
-    <meta name="version" content="2.2.5">
+    <meta name="copyright" content="Copyright &#xa9; 2007-2018 by Apple Inc. All Rights Reserved.">
+    <meta name="version" content="2.3.0">
     <style type="text/css"><!--
 body, p, h1, h2, h3, h4 {
   font-family: sans-serif;
@@ -174,7 +174,7 @@ h3.title {
   <body>
     <h1 class="title">CUPS Programming Manual</h1>
     <p>Michael R Sweet</p>
-    <p>Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.</p>
+    <p>Copyright &#xa9; 2007-2018 by Apple Inc. All Rights Reserved.</p>
     <div class="contents">
       <h2 class="title">Contents</h2>
       <ul class="contents">
@@ -210,6 +210,7 @@ h3.title {
           <li><a href="#cupsCopyDestInfo">cupsCopyDestInfo</a></li>
           <li><a href="#cupsCreateDestJob">cupsCreateDestJob</a></li>
           <li><a href="#cupsDoAuthentication">cupsDoAuthentication</a></li>
+          <li><a href="#cupsEncodeOption">cupsEncodeOption</a></li>
           <li><a href="#cupsEncodeOptions">cupsEncodeOptions</a></li>
           <li><a href="#cupsEncodeOptions2">cupsEncodeOptions2</a></li>
           <li><a href="#cupsEncryption">cupsEncryption</a></li>
@@ -1483,6 +1484,23 @@ int cupsDoAuthentication(<a href="#http_t">http_t</a> *http, const char *method,
 status, prior to resubmitting your request.
 
 </p>
+<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsEncodeOption">cupsEncodeOption</a></h3>
+        <p class="description">Encode a single option into an IPP attribute.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *cupsEncodeOption(<a href="#ipp_t">ipp_t</a> *ipp, ipp_tag_t group_tag, const char *name, const char *value);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>ipp</th>
+        <td class="description">IPP request/response</td></tr>
+<tr><th>group_tag</th>
+        <td class="description">Attribute group</td></tr>
+<tr><th>name</th>
+        <td class="description">Option name</td></tr>
+<tr><th>value</th>
+        <td class="description">Option string value</td></tr>
+</tbody></table>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">New attribute or <code>NULL</code> on error</p>
 <h3 class="function"><a id="cupsEncodeOptions">cupsEncodeOptions</a></h3>
         <p class="description">Encode printer options into IPP attributes.</p>
 <p class="code">
@@ -1490,7 +1508,7 @@ void cupsEncodeOptions(<a href="#ipp_t">ipp_t</a> *ipp, int num_options, <a href
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>ipp</th>
-        <td class="description">Request to add to</td></tr>
+        <td class="description">IPP request/response</td></tr>
 <tr><th>num_options</th>
         <td class="description">Number of options</td></tr>
 <tr><th>options</th>
@@ -1507,7 +1525,7 @@ void cupsEncodeOptions2(<a href="#ipp_t">ipp_t</a> *ipp, int num_options, <a hre
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>ipp</th>
-        <td class="description">Request to add to</td></tr>
+        <td class="description">IPP request/response</td></tr>
 <tr><th>num_options</th>
         <td class="description">Number of options</td></tr>
 <tr><th>options</th>
