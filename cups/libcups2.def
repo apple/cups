@@ -95,7 +95,15 @@ _httpTLSWrite
 _httpUpdate
 _httpWait
 _ippCheckOptions
+_ippFileParse
+_ippFileReadToken
 _ippFindOption
+_ippVarsDeinit
+_ippVarsExpand
+_ippVarsGet
+_ippVarsInit
+_ippVarsPasswordCB
+_ippVarsSet
 _ppdCacheCreateWithFile
 _ppdCacheCreateWithPPD
 _ppdCacheDestroy
@@ -176,6 +184,7 @@ cupsDoAuthentication
 cupsDoFileRequest
 cupsDoIORequest
 cupsDoRequest
+cupsEncodeOption
 cupsEncodeOptions
 cupsEncodeOptions2
 cupsEncryption
