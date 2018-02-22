@@ -274,6 +274,8 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
  * 'cupsHashString()' - Format a hash value as a hexadecimal string.
  *
  * The passed buffer must be at least 2 * hashsize + 1 characters in length.
+ *
+ * @since CUPS 2.3@
  */
 
 const char *				/* O - Formatted string */
