@@ -337,7 +337,7 @@ static int	compare_ipp_options(_ipp_option_t *a, _ipp_option_t *b);
  * '_cupsEncodeOption()' - Encode a single option as an IPP attribute.
  */
 
-void
+ipp_attribute_t *			/* O - New attribute or @code NULL@ on error */
 _cupsEncodeOption(
     ipp_t         *ipp,			/* I - IPP request/response/collection */
     ipp_tag_t     group_tag,		/* I - Group tag */
@@ -417,7 +417,7 @@ _cupsEncodeOption(
     */
 
     DEBUG_puts("1_cupsEncodeOption: Ran out of memory for attributes.");
-    return;
+    return (NULL);
   }
 
   if (count > 1)
@@ -434,7 +434,7 @@ _cupsEncodeOption(
 
       DEBUG_puts("1_cupsEncodeOption: Ran out of memory for value copy.");
       ippDeleteAttribute(ipp, attr);
-      return;
+      return (NULL);
     }
 
     val = copy;
@@ -605,7 +605,7 @@ _cupsEncodeOption(
 	      free(copy);
 
 	    ippDeleteAttribute(ipp, attr);
-	    return;
+	    return (NULL);
 	  }
 
 	  ippSetCollection(ipp, &attr, i, collection);
@@ -621,6 +621,8 @@ _cupsEncodeOption(
 
   if (copy)
     free(copy);
+
+  return (attr);
 }
 
 
@@ -688,7 +690,7 @@ cupsEncodeOptions2(
 
   op = ippGetOperation(ipp);
 
-  if (group_tag == IPP_TAG_OPERATION && (op == IPP_OP_PRINT_JOB || op == IPP_OP_PRINT_URI ||  op == IPP_OP_SEND_DOCUMENT || op == IPP_OP_SEND_URI))
+  if (group_tag == IPP_TAG_OPERATION && (op == IPP_OP_PRINT_JOB || op == IPP_OP_PRINT_URI || op == IPP_OP_SEND_DOCUMENT || op == IPP_OP_SEND_URI))
   {
    /*
     * Handle the document format stuff first...
