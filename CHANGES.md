@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-02-22
+CHANGES - 2.3rc1 - 2018-02-23
 =============================
 
 Changes in CUPS v2.3rc1
@@ -8,6 +8,7 @@ Changes in CUPS v2.3rc1
 - Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
 - The scheduler now supports using temporary print queues for older IPP/1.1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
+- Fixed a compile issue when PAM is not available (Issue #5253)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
