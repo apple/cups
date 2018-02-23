@@ -28,6 +28,8 @@
 #  else
 #    include <security/pam_appl.h>
 #  endif /* HAVE_PAM_PAM_APPL_H */
+#else
+#  include <cups/md5-private.h>
 #endif /* HAVE_LIBPAM */
 #ifdef HAVE_MEMBERSHIP_H
 #  include <membership.h>
