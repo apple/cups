@@ -746,7 +746,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   */
 
   if ((job->compressions[job->current_file] && (!job->printer->remote || job->num_files == 1)) ||
-      (!job->printer->remote && job->printer->raw && job->num_files > 1))
+      (!job->printer->remote && job->printer->raw &&
+       (job->num_files > 1 || !strncmp(job->printer->device_uri, "file:", 5))))
   {
    /*
     * Add gziptoany filter to the front of the list...
