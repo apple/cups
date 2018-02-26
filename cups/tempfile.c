@@ -62,15 +62,15 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
  /*
   * On macOS and iOS, the TMPDIR environment variable is not always the best
   * location to place temporary files due to sandboxing.  Instead, the confstr
-  * function should be called when running as a normal process (not a child of
-  * cupsd) to get the proper per-user, per-process TMPDIR value.  We know
-  * whether the process is running as a child of cupsd by the presence of the
-  * "SOFTWARE" environment variable that cupsd sets.
+  * function should be called to get the proper per-user, per-process TMPDIR
+  * value.  Currently this only happens if TMPDIR is not set or is set to
+  * "/var/folders/...".
   */
 
-  tmpdir = getenv("TMPDIR");
+  if ((tmpdir = getenv("TMPDIR")) != NULL && !strncmp(tmpdir, "/var/folders/", 13))
+    tmpdir = NULL;
 
-  if (!getenv("SOFTWARE") || !tmpdir)
+  if (!tmpdir)
   {
     if (confstr(_CS_DARWIN_USER_TEMP_DIR, tmppath, sizeof(tmppath)))
       tmpdir = tmppath;
