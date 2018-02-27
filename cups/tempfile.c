@@ -63,11 +63,10 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   * On macOS and iOS, the TMPDIR environment variable is not always the best
   * location to place temporary files due to sandboxing.  Instead, the confstr
   * function should be called to get the proper per-user, per-process TMPDIR
-  * value.  Currently this only happens if TMPDIR is not set or is set to
-  * "/Users/...".
+  * value.
   */
 
-  if ((tmpdir = getenv("TMPDIR")) != NULL && !strncmp(tmpdir, "/Users/", 7))
+  if ((tmpdir = getenv("TMPDIR")) != NULL && access(tmpdir, W_OK))
     tmpdir = NULL;
 
   if (!tmpdir)
