@@ -64,10 +64,10 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   * location to place temporary files due to sandboxing.  Instead, the confstr
   * function should be called to get the proper per-user, per-process TMPDIR
   * value.  Currently this only happens if TMPDIR is not set or is set to
-  * "/var/folders/...".
+  * "/Users/...".
   */
 
-  if ((tmpdir = getenv("TMPDIR")) != NULL && !strncmp(tmpdir, "/var/folders/", 13))
+  if ((tmpdir = getenv("TMPDIR")) != NULL && !strncmp(tmpdir, "/Users/", 7))
     tmpdir = NULL;
 
   if (!tmpdir)
