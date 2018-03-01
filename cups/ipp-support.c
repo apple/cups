@@ -916,7 +916,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "force-front-side-actual",
     "imposition-template-actual",
     "impressions",
+    "impressions-col",
     "impressions-completed",
+    "impressions-completed-col",
     "impressions-completed-current-copy",
     "insert-sheet-actual",
     "k-octets",
@@ -927,7 +929,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-col-actual",
     "media-input-tray-check-actual",
     "media-sheets",
+    "media-sheets-col",
     "media-sheets-completed",
+    "media-sheets-completed-col",
     "more-info",
     "multiple-object-handling-actual",	/* IPP 3D */
     "number-up-actual",
@@ -939,7 +943,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "page-order-received-actual",
     "page-ranges-actual",
     "pages",
+    "pages-col",
     "pages-completed",
+    "pages-completed-col",
     "pages-completed-current-copy",
     "platform-temperature-actual",	/* IPP 3D */
     "presentation-direction-number-up-actual",
@@ -1205,13 +1211,17 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-hold-until-actual",
     "job-id",
     "job-impressions",
+    "job-impressions-col",
     "job-impressions-completed",
+    "job-impressions-completed-col",
     "job-k-octets",
     "job-k-octets-processed",
     "job-mandatory-attributes",
     "job-media-progress",		/* CUPS extension */
     "job-media-sheets",
+    "job-media-sheets-col",
     "job-media-sheets-completed",
+    "job-media-sheets-completed-col",
     "job-message-from-operator",
     "job-more-info",
     "job-name",
@@ -1219,7 +1229,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-originating-user-name",
     "job-originating-user-uri",
     "job-pages",
+    "job-pages-col",
     "job-pages-completed",
+    "job-pages-completed-col",
     "job-pages-completed-current-copy",
     "job-printer-state-message",	/* CUPS extension */
     "job-printer-state-reasons",	/* CUPS extension */
@@ -1741,7 +1753,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "notify-subscriber-user-name",
     "notify-subscriber-user-uri",
     "notify-subscription-id",
-    "subscriptions-uuid"
+    "notify-subscription-uuid"
   };
   static const char * const subscription_template[] =
   {					/* subscription-template group */
