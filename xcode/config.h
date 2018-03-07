@@ -1,8 +1,8 @@
 /*
  * Configuration file for CUPS and Xcode.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -22,8 +22,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2.6"
-#define CUPS_MINIMAL "CUPS/2.2.6"
+#define CUPS_SVERSION "CUPS v2.2.7"
+#define CUPS_MINIMAL "CUPS/2.2.7"
 
 
 /*
