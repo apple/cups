@@ -49,6 +49,8 @@ Changes in CUPS v2.2.7
   of "none" (rdar://36566269)
 - TLS connections now properly timeout (rdar://34938533)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
+- Temporary files are now placed in the correct directory for sandboxed
+  applications on macOS (rdar://problem/37789645)
 
 
 Changes in CUPS v2.2.6

@@ -1,8 +1,8 @@
 /*
  * PPD utilities for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -216,6 +216,27 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
         const char	*tmpdir;	/* TMPDIR environment variable */
 	struct timeval	curtime;	/* Current time */
 
+#ifdef __APPLE__
+       /*
+	* On macOS and iOS, the TMPDIR environment variable is not always the
+	* best location to place temporary files due to sandboxing.  Instead,
+	* the confstr function should be called to get the proper per-user,
+	* per-process TMPDIR value.
+	*/
+
+        char		tmppath[1024];	/* Temporary directory */
+
+	if ((tmpdir = getenv("TMPDIR")) != NULL && access(tmpdir, W_OK))
+	  tmpdir = NULL;
+
+	if (!tmpdir)
+	{
+	  if (confstr(_CS_DARWIN_USER_TEMP_DIR, tmppath, sizeof(tmppath)))
+	    tmpdir = tmppath;
+	  else
+	    tmpdir = "/private/tmp";		/* This should never happen */
+	}
+#else
        /*
 	* Previously we put root temporary files in the default CUPS temporary
 	* directory under /var/spool/cups.  However, since the scheduler cleans
@@ -224,11 +245,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 	*/
 
 	if ((tmpdir = getenv("TMPDIR")) == NULL)
-#  ifdef __APPLE__
-	  tmpdir = "/private/tmp";	/* /tmp is a symlink to /private/tmp */
-#  else
-          tmpdir = "/tmp";
-#  endif /* __APPLE__ */
+	  tmpdir = "/tmp";
+#endif /* __APPLE__ */
 
        /*
 	* Make the temporary name using the specified directory...

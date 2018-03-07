@@ -1,8 +1,8 @@
 /*
  * Temp file utilities for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -42,8 +42,10 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   int		fd;			/* File descriptor for temp file */
   int		tries;			/* Number of tries */
   const char	*tmpdir;		/* TMPDIR environment var */
+#if defined(__APPLE__) || defined(WIN32)
+  char		tmppath[1024];		/* Temporary directory */
+#endif /* __APPLE__ || WIN32 */
 #ifdef WIN32
-  char		tmppath[1024];		/* Windows temporary directory */
   DWORD		curtime;		/* Current time */
 #else
   struct timeval curtime;		/* Current time */
@@ -60,6 +62,26 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     GetTempPath(sizeof(tmppath), tmppath);
     tmpdir = tmppath;
   }
+
+#elif defined(__APPLE__)
+ /*
+  * On macOS and iOS, the TMPDIR environment variable is not always the best
+  * location to place temporary files due to sandboxing.  Instead, the confstr
+  * function should be called to get the proper per-user, per-process TMPDIR
+  * value.
+  */
+
+  if ((tmpdir = getenv("TMPDIR")) != NULL && access(tmpdir, W_OK))
+    tmpdir = NULL;
+
+  if (!tmpdir)
+  {
+    if (confstr(_CS_DARWIN_USER_TEMP_DIR, tmppath, sizeof(tmppath)))
+      tmpdir = tmppath;
+    else
+      tmpdir = "/private/tmp";		/* This should never happen */
+  }
+
 #else
  /*
   * Previously we put root temporary files in the default CUPS temporary
@@ -69,11 +91,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
-#  if defined(__APPLE__) && !TARGET_OS_IOS
-    tmpdir = "/private/tmp";		/* /tmp is a symlink to /private/tmp */
-#  else
     tmpdir = "/tmp";
-#  endif /* __APPLE__  && !TARGET_OS_IOS */
 #endif /* WIN32 */
 
  /*
