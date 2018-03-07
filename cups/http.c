@@ -3643,7 +3643,7 @@ http_add_field(http_t       *http,	/* I - HTTP connection */
       value = newvalue;
     }
   }
-  else if (append && *value && *(oldvalue = httpGetField(http, field)))
+  else if (append && *value && (oldvalue = httpGetField(http, field)) != NULL && *oldvalue)
   {
     snprintf(newvalue, sizeof(newvalue), "%s, %s", oldvalue, value);
     value = newvalue;
