@@ -47,6 +47,10 @@ extern const char *cssmErrorString(int error);
  * Local functions...
  */
 
+static const char	*cups_auth_find(const char *www_authenticate, const char *scheme);
+static const char	*cups_auth_param(const char *scheme, const char *name, char *value, size_t valsize);
+static const char	*cups_auth_scheme(const char *www_authenticate, char *scheme, size_t schemesize);
+
 #ifdef HAVE_GSSAPI
 #  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
 #    ifdef HAVE_GSS_GSSAPI_SPI_H
@@ -112,8 +116,10 @@ cupsDoAuthentication(
     const char *resource)		/* I - Resource path */
 {
   const char	*password,		/* Password string */
-		*www_auth;		/* WWW-Authenticate header */
-  char		prompt[1024],		/* Prompt for user */
+		*www_auth,		/* WWW-Authenticate header */
+		*schemedata;		/* Scheme-specific data */
+  char		scheme[256],		/* Scheme name */
+		prompt[1024],		/* Prompt for user */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
   int		localauth;		/* Local authentication result */
@@ -163,122 +169,237 @@ cupsDoAuthentication(
   }
 
  /*
-  * Nope, see if we should retry the current username:password...
+  * Nope, loop through the authentication schemes to find the first we support.
   */
 
-  www_auth = http->fields[HTTP_FIELD_WWW_AUTHENTICATE];
+  www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 
-  if ((http->digest_tries > 1 || !http->userpass[0]) &&
-      (!_cups_strncasecmp(www_auth, "Basic", 5) ||
-       !_cups_strncasecmp(www_auth, "Digest", 6)))
+  for (schemedata = cups_auth_scheme(www_auth, scheme, sizeof(scheme)); schemedata; schemedata = cups_auth_scheme(schemedata + strlen(scheme), scheme, sizeof(scheme)))
   {
    /*
-    * Nope - get a new password from the user...
+    * Check the scheme name...
     */
-
-    char default_username[HTTP_MAX_VALUE];
-					/* Default username */
-
-    cg = _cupsGlobals();
-
-    if (!cg->lang_default)
-      cg->lang_default = cupsLangDefault();
-
-    if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
-                        default_username))
-      cupsSetUser(default_username);
-
-    snprintf(prompt, sizeof(prompt),
-             _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
-	     cupsUser(),
-	     http->hostname[0] == '/' ? "localhost" : http->hostname);
-
-    http->digest_tries  = _cups_strncasecmp(www_auth, "Digest", 6) != 0;
-    http->userpass[0]   = '\0';
-
-    if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
-    {
-      http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
-      return (-1);
-    }
-
-    snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
-             password);
-  }
-  else if (http->status == HTTP_STATUS_UNAUTHORIZED)
-    http->digest_tries ++;
-
-  if (http->status == HTTP_STATUS_UNAUTHORIZED && http->digest_tries >= 3)
-  {
-    DEBUG_printf(("1cupsDoAuthentication: Too many authentication tries (%d)",
-		  http->digest_tries));
-
-    http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
-    return (-1);
-  }
-
- /*
-  * Got a password; encode it for the server...
-  */
 
 #ifdef HAVE_GSSAPI
-  if (!_cups_strncasecmp(www_auth, "Negotiate", 9))
-  {
+    if (!_cups_strcasecmp(scheme, "Negotiate"))
+    {
+     /*
+      * Kerberos authentication...
+      */
+
+      if (_cupsSetNegotiateAuthString(http, method, resource))
+      {
+	http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
+	return (-1);
+      }
+
+      break;
+    }
+    else
+#endif /* HAVE_GSSAPI */
+    if (_cups_strcasecmp(scheme, "Basic") && _cups_strcasecmp(scheme, "Digest"))
+      continue;				/* Not supported (yet) */
+
    /*
-    * Kerberos authentication...
+    * See if we should retry the current username:password...
     */
 
-    if (_cupsSetNegotiateAuthString(http, method, resource))
+    if ((http->digest_tries > 1 || !http->userpass[0]) && (!_cups_strcasecmp(scheme, "Basic") || (!_cups_strcasecmp(scheme, "Digest"))))
     {
+     /*
+      * Nope - get a new password from the user...
+      */
+
+      char default_username[HTTP_MAX_VALUE];
+					/* Default username */
+
+      cg = _cupsGlobals();
+
+      if (!cg->lang_default)
+	cg->lang_default = cupsLangDefault();
+
+      if (cups_auth_param(scheme, "username", default_username, sizeof(default_username)))
+	cupsSetUser(default_username);
+
+      snprintf(prompt, sizeof(prompt), _cupsLangString(cg->lang_default, _("Password for %s on %s? ")), cupsUser(), http->hostname[0] == '/' ? "localhost" : http->hostname);
+
+      http->digest_tries  = _cups_strncasecmp(scheme, "Digest", 6) != 0;
+      http->userpass[0]   = '\0';
+
+      if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
+      {
+	http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
+	return (-1);
+      }
+
+      snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(), password);
+    }
+    else if (http->status == HTTP_STATUS_UNAUTHORIZED)
+      http->digest_tries ++;
+
+    if (http->status == HTTP_STATUS_UNAUTHORIZED && http->digest_tries >= 3)
+    {
+      DEBUG_printf(("1cupsDoAuthentication: Too many authentication tries (%d)", http->digest_tries));
+
       http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
       return (-1);
     }
-  }
-  else
-#endif /* HAVE_GSSAPI */
-  if (!_cups_strncasecmp(www_auth, "Basic", 5))
-  {
+
    /*
-    * Basic authentication...
+    * Got a password; encode it for the server...
     */
 
-    char	encode[256];		/* Base64 buffer */
+    if (!_cups_strcasecmp(scheme, "Basic"))
+    {
+     /*
+      * Basic authentication...
+      */
 
+      char	encode[256];		/* Base64 buffer */
 
-    httpEncode64_2(encode, sizeof(encode), http->userpass,
-                   (int)strlen(http->userpass));
-    httpSetAuthString(http, "Basic", encode);
+      httpEncode64_2(encode, sizeof(encode), http->userpass, (int)strlen(http->userpass));
+      httpSetAuthString(http, "Basic", encode);
+    }
+    else if (!_cups_strcasecmp(scheme, "Digest"))
+    {
+     /*
+      * Digest authentication...
+      */
+
+      int		i;		/* Looping var */
+      char		algorithm[65],	/* Hashing algorithm */
+			opaque[HTTP_MAX_VALUE],
+					/* Opaque data from server */
+			cnonce[65],	/* cnonce value */
+			kd[65],		/* Final MD5/SHA-256 digest */
+			ha1[65],	/* Hash of username:realm:password */
+			ha2[65],	/* Hash of method:request-uri */
+			hdata[65],	/* Hash of auth data */
+			temp[1024],	/* Temporary string */
+			digest[1024];	/* Digest auth data */
+      unsigned char	hash[32];	/* Hash buffer */
+      const char	*hashalg;	/* Hashing algorithm */
+      size_t		hashsize;	/* Size of hash */
+
+      if (strcmp(nonce, http->nonce))
+      {
+        strlcpy(http->nonce, nonce, sizeof(http->nonce));
+        http->nonce_count = 1;
+      }
+      else
+        http->nonce_count ++;
+
+      cups_auth_param(schemedata, "opaque", opaque, sizeof(opaque));
+      cups_auth_param(schemedata, "nonce", nonce, sizeof(nonce));
+      cups_auth_param(schemedata, "realm", realm, sizeof(realm));
+
+      for (i = 0; i < 64; i ++)
+        cnonce[i] = "0123456789ABCDEF"[CUPS_RAND() & 15];
+      cnonce[64] = '\0';
+
+      if (cups_auth_param(schemedata, "algorithm", algorithm, sizeof(algorithm)))
+      {
+       /*
+        * Follow RFC 2617/7616...
+        */
+
+        if (!_cups_strcasecmp(algorithm, "MD5"))
+        {
+         /*
+          * RFC 2617 Digest with MD5
+          */
+
+          hashalg = "md5";
+	}
+	else if (!_cups_strcasecmp(algorithm, "SHA-256"))
+	{
+	 /*
+	  * RFC 7616 Digest with SHA-256
+	  */
+
+          hashalg = "sha2-256";
+	}
+	else
+	{
+	 /*
+	  * Some other algorithm we don't support, skip this one...
+	  */
+
+	  continue;
+	}
+
+       /*
+        * Calculate digest value...
+        */
+
+        /* H(A1) = H(username:realm:password) */
+        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
+        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
+
+        /* H(A2) = H(method:uri) */
+	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
+        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
+
+        /* H(data) = H(nonce:nc:cnonce:qop:H(A2)) */
+	snprintf(temp, sizeof(temp), "%s:%08x:%s:auth:%s", nonce, http->nonce_count, cnonce, ha2);
+        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, hdata, sizeof(hdata));
+
+        /* KD = H(H(A1):H(data)) */
+	snprintf(temp, sizeof(temp), "%s:%s", ha1, hdata);
+        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, kd, sizeof(kd));
+
+        /* Pass the RFC 2617/7616 WWW-Authenticate header */
+        if (opaque[0])
+	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, opaque=\"%s\", cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, opaque, cnonce, http->nonce_count, resource, kd);
+	else
+	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, cnonce, http->nonce_count, resource, kd);
+      }
+      else
+      {
+       /*
+        * Use old RFC 2069 Digest method...
+        */
+
+        /* H(A1) = H(username:realm:password) */
+        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
+        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
+
+        /* H(A2) = H(method:uri) */
+	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
+        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
+
+        /* KD = H(H(A1):nonce:H(A2)) */
+	snprintf(temp, sizeof(temp), "%s:%s:%s", ha1, nonce, ha2);
+	hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+	cupsHashString(hash, hashsize, kd, sizeof(kd));
+
+        /* Pass the RFC 2069 WWW-Authenticate header */
+	snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, resource, kd);
+      }
+
+      httpSetAuthString(http, "Digest", digest);
+    }
   }
-  else if (!_cups_strncasecmp(www_auth, "Digest", 6))
+
+  if (http->authstring)
   {
-   /*
-    * Digest authentication...
-    */
+    DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\"", http->authstring));
 
-    char	encode[33],		/* MD5 buffer */
-		digest[1024];		/* Digest auth data */
-
-    httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
-    httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
-
-    httpMD5(cupsUser(), realm, strchr(http->userpass, ':') + 1, encode);
-    httpMD5Final(nonce, method, resource, encode);
-    snprintf(digest, sizeof(digest),
-	     "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", "
-	     "response=\"%s\"", cupsUser(), realm, nonce, resource, encode);
-    httpSetAuthString(http, "Digest", digest);
+    return (0);
   }
   else
   {
-    DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"",
-                  www_auth));
+    DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"", www_auth));
     http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
+
     return (-1);
   }
-
-  DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\"", http->authstring));
-
-  return (0);
 }
 
 
@@ -336,7 +457,7 @@ _cupsSetNegotiateAuthString(
 				      GSS_C_NO_BUFFER, &http->gssmech,
 				      &output_token, NULL, NULL);
 
-#ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
+#  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
   if (major_status == GSS_S_NO_CRED)
   {
    /*
@@ -412,7 +533,7 @@ _cupsSetNegotiateAuthString(
       }
     }
   }
-#endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
+#  endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
   if (GSS_ERROR(major_status))
   {
@@ -422,11 +543,11 @@ _cupsSetNegotiateAuthString(
     return (-1);
   }
 
-#ifdef DEBUG
+#  ifdef DEBUG
   else if (major_status == GSS_S_CONTINUE_NEEDED)
     cups_gss_printf(major_status, minor_status,
 		    "_cupsSetNegotiateAuthString: Continuation needed!");
-#endif /* DEBUG */
+#  endif /* DEBUG */
 
   if (output_token.length > 0 && output_token.length <= 65536)
   {
@@ -464,8 +585,259 @@ _cupsSetNegotiateAuthString(
 
   return (0);
 }
+#endif /* HAVE_GSSAPI */
 
 
+/*
+ * 'cups_auth_find()' - Find the named WWW-Authenticate scheme.
+ *
+ * The "www_authenticate" parameter points to the current position in the header.
+ *
+ * Returns @code NULL@ if the auth scheme is not present.
+ */
+
+static const char *				/* O - Start of matching scheme or @code NULL@ if not found */
+cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticate header */
+               const char *scheme)		/* I - Authentication scheme */
+{
+  size_t	schemelen = strlen(scheme);	/* Length of scheme */
+
+
+  DEBUG_printf(("8cups_auth_find(www_authenticate=\"%s\", scheme=\"%s\"(%d))", www_authenticate, scheme, (int)schemelen));
+
+  while (*www_authenticate)
+  {
+   /*
+    * Skip leading whitespace and commas...
+    */
+
+    DEBUG_printf(("9cups_auth_find: Before whitespace: \"%s\"", www_authenticate));
+    while (isspace(*www_authenticate & 255) || *www_authenticate == ',')
+      www_authenticate ++;
+    DEBUG_printf(("9cups_auth_find: After whitespace: \"%s\"", www_authenticate));
+
+   /*
+    * See if this is "Scheme" followed by whitespace or the end of the string.
+    */
+
+    if (!strncmp(www_authenticate, scheme, schemelen) && (isspace(www_authenticate[schemelen] & 255) || !www_authenticate[schemelen]))
+    {
+     /*
+      * Yes, this is the start of the scheme-specific information...
+      */
+
+      DEBUG_printf(("9cups_auth_find: Returning \"%s\".", www_authenticate));
+
+      return (www_authenticate);
+    }
+
+   /*
+    * Skip the scheme name or param="value" string...
+    */
+
+    while (!isspace(*www_authenticate & 255) && *www_authenticate)
+    {
+      if (*www_authenticate == '\"')
+      {
+       /*
+        * Skip quoted value...
+        */
+
+        www_authenticate ++;
+        while (*www_authenticate && *www_authenticate != '\"')
+          www_authenticate ++;
+
+        DEBUG_printf(("9cups_auth_find: After quoted: \"%s\"", www_authenticate));
+      }
+
+      www_authenticate ++;
+    }
+
+    DEBUG_printf(("9cups_auth_find: After skip: \"%s\"", www_authenticate));
+  }
+
+  DEBUG_puts("9cups_auth_find: Returning NULL.");
+
+  return (NULL);
+}
+
+
+/*
+ * 'cups_auth_param()' - Copy the value for the named authentication parameter,
+ *                       if present.
+ */
+
+static const char *				/* O - Parameter value or @code NULL@ if not present */
+cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
+                const char *name,		/* I - Name of parameter */
+                char       *value,		/* I - Value buffer */
+                size_t     valsize)		/* I - Size of value buffer */
+{
+  char		*valptr = value,		/* Pointer into value buffer */
+      		*valend = value + valsize - 1;	/* Pointer to end of buffer */
+  size_t	namelen = strlen(name);		/* Name length */
+  int		param;				/* Is this a parameter? */
+
+
+  DEBUG_printf(("8cups_auth_param(scheme=\"%s\", name=\"%s\", value=%p, valsize=%d)", scheme, name, (void *)value, (int)valsize));
+
+  while (!isspace(*scheme & 255) && *scheme)
+    scheme ++;
+
+  while (*scheme)
+  {
+    while (isspace(*scheme & 255) || *scheme == ',')
+      scheme ++;
+
+    if (!strncmp(scheme, name, namelen) && scheme[namelen] == '=')
+    {
+     /*
+      * Found the parameter, copy the value...
+      */
+
+      scheme += namelen + 1;
+      if (*scheme == '\"')
+      {
+        scheme ++;
+
+	while (*scheme && *scheme != '\"')
+	{
+	  if (valptr < valend)
+	    *valptr++ = *scheme;
+
+	  scheme ++;
+	}
+      }
+      else
+      {
+	while (*scheme && strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~+/=", *scheme))
+	{
+	  if (valptr < valend)
+	    *valptr++ = *scheme;
+
+	  scheme ++;
+	}
+      }
+
+      *valptr = '\0';
+
+      DEBUG_printf(("9cups_auth_param: Returning \"%s\".", value));
+
+      return (value);
+    }
+
+   /*
+    * Skip the param=value string...
+    */
+
+    param = 0;
+
+    while (!isspace(*scheme & 255) && *scheme)
+    {
+      if (*scheme == '=')
+        param = 1;
+      else if (*scheme == '\"')
+      {
+       /*
+        * Skip quoted value...
+        */
+
+        scheme ++;
+        while (*scheme && *scheme != '\"')
+          scheme ++;
+      }
+
+      scheme ++;
+    }
+
+   /*
+    * If this wasn't a parameter, we are at the end of this scheme's
+    * parameters...
+    */
+
+    if (!param)
+      break;
+  }
+
+  *value = '\0';
+
+  DEBUG_puts("9cups_auth_param: Returning NULL.");
+
+  return (NULL);
+}
+
+
+/*
+ * 'cups_auth_scheme()' - Get the (next) WWW-Authenticate scheme.
+ *
+ * The "www_authenticate" parameter points to the current position in the header.
+ *
+ * Returns @code NULL@ if there are no (more) auth schemes present.
+ */
+
+static const char *				/* O - Start of scheme or @code NULL@ if not found */
+cups_auth_scheme(const char *www_authenticate,	/* I - Pointer into WWW-Authenticate header */
+		 char       *scheme,		/* I - Scheme name buffer */
+		 size_t     schemesize)		/* I - Size of buffer */
+{
+  const char	*start;				/* Start of scheme data */
+  char		*sptr = scheme,			/* Pointer into scheme buffer */
+		*send = scheme + schemesize - 1;/* End of scheme buffer */
+  int		param;				/* Is this a parameter? */
+
+
+  DEBUG_printf(("8cups_auth_scheme(www_authenticate=\"%s\", scheme=%p, schemesize=%d)", www_authenticate, (void *)scheme, (int)schemesize));
+
+  while (*www_authenticate)
+  {
+   /*
+    * Skip leading whitespace and commas...
+    */
+
+    while (isspace(*www_authenticate & 255) || *www_authenticate == ',')
+      www_authenticate ++;
+
+   /*
+    * Parse the scheme name or param="value" string...
+    */
+
+    for (sptr = scheme, start = www_authenticate, param = 0; *www_authenticate && !isspace(*www_authenticate & 255); www_authenticate ++)
+    {
+      if (*www_authenticate == '=')
+        param = 1;
+      else if (!param && sptr < send)
+        *sptr++ = *www_authenticate;
+      else if (*www_authenticate == '\"')
+      {
+       /*
+        * Skip quoted value...
+        */
+
+        www_authenticate ++;
+        while (*www_authenticate && *www_authenticate != '\"')
+          www_authenticate ++;
+      }
+    }
+
+    if (sptr > scheme && !param)
+    {
+      *sptr = '\0';
+
+      DEBUG_printf(("9cups_auth_scheme: Returning \"%s\".", start));
+
+      return (start);
+    }
+  }
+
+  *scheme = '\0';
+
+  DEBUG_puts("9cups_auth_scheme: Returning NULL.");
+
+  return (NULL);
+}
+
+
+#ifdef HAVE_GSSAPI
 #  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
 /*
  * 'cups_gss_acquire()' - Kerberos credentials callback.
@@ -650,6 +1022,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   FILE			*fp;		/* Certificate file */
   char			trc[16],	/* Try Root Certificate parameter */
 			filename[1024];	/* Certificate filename */
+  const char		*www_auth,	/* WWW-Authenticate header */
+			*schemedata;	/* Data for the named auth scheme */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 #  if defined(HAVE_AUTHORIZATION_H)
   OSStatus		status;		/* Status */
@@ -668,12 +1042,13 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * See if we are accessing localhost...
   */
 
-  if (!httpAddrLocalhost(http->hostaddr) &&
-      _cups_strcasecmp(http->hostname, "localhost") != 0)
+  if (!httpAddrLocalhost(http->hostaddr) && _cups_strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("8cups_local_auth: Not a local connection!");
     return (1);
   }
+
+  www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 
 #  if defined(HAVE_AUTHORIZATION_H)
  /*
@@ -686,12 +1061,9 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     http->auth_ref = NULL;
   }
 
-  if (!getenv("GATEWAY_INTERFACE") &&
-      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
-		       auth_key, sizeof(auth_key)))
+  if (!getenv("GATEWAY_INTERFACE") && (schemedata = cups_auth_find(www_auth, "AuthRef")) != NULL && cups_auth_param(schemedata, "key", auth_key, sizeof(auth_key)))
   {
-    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment,
-				 kAuthorizationFlagDefaults, &http->auth_ref);
+    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
       DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d (%s)",
@@ -745,6 +1117,15 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 #  endif /* HAVE_AUTHORIZATION_H */
 
+#  ifdef HAVE_GSSAPI
+  if (cups_auth_find(www_auth, "Negotiate"))
+    return (1);
+#  endif /* HAVE_GSSAPI */
+#  ifdef HAVE_AUTHORIZATION_H
+  if (cups_auth_find(www_auth, "AuthRef"))
+    return (1);
+#  endif /* HAVE_AUTHORIZATION_H */
+
 #  if defined(SO_PEERCRED) && defined(AF_LOCAL)
  /*
   * See if we can authenticate using the peer credentials provided over a
@@ -752,16 +1133,9 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * information...
   */
 
-  if (
-#    ifdef HAVE_GSSAPI
-      _cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
-#    endif /* HAVE_GSSAPI */
-#    ifdef HAVE_AUTHORIZATION_H
-      !httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
-		        auth_key, sizeof(auth_key)) &&
-#    endif /* HAVE_AUTHORIZATION_H */
-      http->hostaddr->addr.sa_family == AF_LOCAL &&
-      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
+  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+      !getenv("GATEWAY_INTERFACE") &&	/* Not via CGI programs... */
+      cups_auth_find(www_auth, "PeerCred"))
   {
    /*
     * Verify that the current cupsUser() matches the current UID...
@@ -784,6 +1158,9 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 #  endif /* SO_PEERCRED && AF_LOCAL */
 
+  if ((schemedata = cups_auth_find(www_auth, "Local")) == NULL)
+    return (1);
+
  /*
   * Try opening a certificate file for this PID.  If that fails,
   * try the root certificate...
@@ -797,33 +1174,9 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * No certificate for this PID; see if we can get the root certificate...
     */
 
-    DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s",
-                  filename, strerror(errno)));
+    DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s", filename, strerror(errno)));
 
-#  ifdef HAVE_GSSAPI
-    if (!_cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
-    {
-     /*
-      * Kerberos required, don't try the root certificate...
-      */
-
-      return (1);
-    }
-#  endif /* HAVE_GSSAPI */
-
-#  ifdef HAVE_AUTHORIZATION_H
-    if (httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
-		         auth_key, sizeof(auth_key)))
-    {
-     /*
-      * Don't use the root certificate as a replacement for an authkey...
-      */
-
-      return (1);
-    }
-#  endif /* HAVE_AUTHORIZATION_H */
-    if (!httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "trc", trc,
-	                  sizeof(trc)))
+    if (!cups_auth_param(schemedata, "trc", trc, sizeof(trc)))
     {
      /*
       * Scheduler doesn't want us to use the root certificate...

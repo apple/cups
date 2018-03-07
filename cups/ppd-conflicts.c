@@ -1,7 +1,7 @@
 /*
  * Option conflict management routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -29,7 +29,6 @@
 
 enum
 {
-  _PPD_NORMAL_CONSTRAINTS,
   _PPD_OPTION_CONSTRAINTS,
   _PPD_INSTALLABLE_CONSTRAINTS,
   _PPD_ALL_CONSTRAINTS
@@ -998,7 +997,7 @@ ppd_test_constraints(
     if (!consts->installable && which == _PPD_INSTALLABLE_CONSTRAINTS)
       continue;				/* Skip non-installable option constraint */
 
-    if (which == _PPD_OPTION_CONSTRAINTS && option)
+    if ((which == _PPD_OPTION_CONSTRAINTS || which == _PPD_INSTALLABLE_CONSTRAINTS) && option)
     {
      /*
       * Skip constraints that do not involve the current option...

@@ -1,7 +1,7 @@
 /*
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -39,6 +39,7 @@
  * Local functions...
  */
 
+static void		http_add_field(http_t *http, http_field_t field, const char *value, int append);
 #ifdef HAVE_LIBZ
 static void		http_content_coding_finish(http_t *http);
 static void		http_content_coding_start(http_t *http,
@@ -2659,105 +2660,7 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
       value == NULL)
     return;
 
-  switch (field)
-  {
-    case HTTP_FIELD_ACCEPT_ENCODING :
-        if (http->accept_encoding)
-          _cupsStrFree(http->accept_encoding);
-
-        http->accept_encoding = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_ALLOW :
-        if (http->allow)
-          _cupsStrFree(http->allow);
-
-        http->allow = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_SERVER :
-        if (http->server)
-          _cupsStrFree(http->server);
-
-        http->server = _cupsStrAlloc(value);
-        break;
-
-    case HTTP_FIELD_WWW_AUTHENTICATE :
-       /* CUPS STR #4503 - don't override WWW-Authenticate for unknown auth schemes */
-        if (http->fields[HTTP_FIELD_WWW_AUTHENTICATE][0] &&
-	    _cups_strncasecmp(value, "Basic ", 6) &&
-	    _cups_strncasecmp(value, "Digest ", 7) &&
-	    _cups_strncasecmp(value, "Negotiate ", 10))
-	{
-	  DEBUG_printf(("1httpSetField: Ignoring unknown auth scheme in \"%s\".", value));
-          return;
-	}
-
-	/* Fall through to copy */
-
-    default :
-	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
-	break;
-  }
-
-  if (field == HTTP_FIELD_AUTHORIZATION)
-  {
-   /*
-    * Special case for Authorization: as its contents can be
-    * longer than HTTP_MAX_VALUE
-    */
-
-    if (http->field_authorization)
-      free(http->field_authorization);
-
-    http->field_authorization = strdup(value);
-  }
-  else if (field == HTTP_FIELD_HOST)
-  {
-   /*
-    * Special-case for Host: as we don't want a trailing "." on the hostname and
-    * need to bracket IPv6 numeric addresses.
-    */
-
-    char *ptr = strchr(value, ':');
-
-    if (value[0] != '[' && ptr && strchr(ptr + 1, ':'))
-    {
-     /*
-      * Bracket IPv6 numeric addresses...
-      *
-      * This is slightly inefficient (basically copying twice), but is an edge
-      * case and not worth optimizing...
-      */
-
-      snprintf(http->fields[HTTP_FIELD_HOST],
-               sizeof(http->fields[HTTP_FIELD_HOST]), "[%s]", value);
-    }
-    else
-    {
-     /*
-      * Check for a trailing dot on the hostname...
-      */
-
-      ptr = http->fields[HTTP_FIELD_HOST];
-
-      if (*ptr)
-      {
-	ptr += strlen(ptr) - 1;
-
-	if (*ptr == '.')
-	  *ptr = '\0';
-      }
-    }
-  }
-#ifdef HAVE_LIBZ
-  else if (field == HTTP_FIELD_CONTENT_ENCODING &&
-           http->data_encoding != HTTP_ENCODING_FIELDS)
-  {
-    DEBUG_puts("1httpSetField: Calling http_content_coding_start.");
-    http_content_coding_start(http, value);
-  }
-#endif /* HAVE_LIBZ */
+  http_add_field(http, field, value, 0);
 }
 
 
@@ -3035,7 +2938,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
       httpSetCookie(http, value);
     }
     else if ((field = httpFieldValue(line)) != HTTP_FIELD_UNKNOWN)
-      httpSetField(http, field, value);
+      http_add_field(http, field, value, 1);
 #ifdef DEBUG
     else
       DEBUG_printf(("1_httpUpdate: unknown field %s seen!", line));
@@ -3689,6 +3592,118 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 }
 
 
+/*
+ * 'http_add_field()' - Add a value for a HTTP field, appending if needed.
+ */
+
+static void
+http_add_field(http_t       *http,	/* I - HTTP connection */
+               http_field_t field,	/* I - HTTP field */
+               const char   *value,	/* I - Value string */
+               int          append)	/* I - Append value? */
+{
+  char		newvalue[1024];		/* New value string */
+  const char 	*oldvalue;		/* Old field value */
+
+
+
+ /*
+  * Optionally append the new value to the existing one...
+  */
+
+  if (append && field != HTTP_FIELD_ACCEPT_ENCODING && field != HTTP_FIELD_ACCEPT_LANGUAGE && field != HTTP_FIELD_ACCEPT_RANGES && field != HTTP_FIELD_ALLOW && field != HTTP_FIELD_LINK && field != HTTP_FIELD_TRANSFER_ENCODING && field != HTTP_FIELD_UPGRADE && field != HTTP_FIELD_WWW_AUTHENTICATE)
+    append = 0;
+
+  if (field == HTTP_FIELD_HOST)
+  {
+   /*
+    * Special-case for Host: as we don't want a trailing "." on the hostname and
+    * need to bracket IPv6 numeric addresses.
+    */
+
+    char *ptr = strchr(value, ':');
+
+    if (value[0] != '[' && ptr && strchr(ptr + 1, ':'))
+    {
+     /*
+      * Bracket IPv6 numeric addresses...
+      */
+
+      snprintf(newvalue, sizeof(newvalue), "[%s]", value);
+      value = newvalue;
+    }
+    else if (*value && value[strlen(value) - 1] == '.')
+    {
+     /*
+      * Strip the trailing dot on the hostname...
+      */
+
+      strlcpy(newvalue, value, sizeof(newvalue));
+      newvalue[strlen(newvalue) - 1] = '\0';
+      value = newvalue;
+    }
+  }
+  else if (append && *value && *(oldvalue = httpGetField(http, field)))
+  {
+    snprintf(newvalue, sizeof(newvalue), "%s, %s", oldvalue, value);
+    value = newvalue;
+  }
+
+ /*
+  * Save the new value...
+  */
+
+  switch (field)
+  {
+    case HTTP_FIELD_ACCEPT_ENCODING :
+        if (http->accept_encoding)
+          _cupsStrFree(http->accept_encoding);
+
+        http->accept_encoding = _cupsStrAlloc(value);
+        break;
+
+    case HTTP_FIELD_ALLOW :
+        if (http->allow)
+          _cupsStrFree(http->allow);
+
+        http->allow = _cupsStrAlloc(value);
+        break;
+
+    case HTTP_FIELD_SERVER :
+        if (http->server)
+          _cupsStrFree(http->server);
+
+        http->server = _cupsStrAlloc(value);
+        break;
+
+    default :
+	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
+	break;
+  }
+
+  if (field == HTTP_FIELD_AUTHORIZATION)
+  {
+   /*
+    * Special case for Authorization: as its contents can be
+    * longer than HTTP_MAX_VALUE
+    */
+
+    if (http->field_authorization)
+      free(http->field_authorization);
+
+    http->field_authorization = strdup(value);
+  }
+#ifdef HAVE_LIBZ
+  else if (field == HTTP_FIELD_CONTENT_ENCODING &&
+           http->data_encoding != HTTP_ENCODING_FIELDS)
+  {
+    DEBUG_puts("1http_add_field: Calling http_content_coding_start.");
+    http_content_coding_start(http, value);
+  }
+#endif /* HAVE_LIBZ */
+}
+
+
 #ifdef HAVE_LIBZ
 /*
  * 'http_content_coding_finish()' - Finish doing any content encoding.
@@ -4056,7 +4071,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
   DEBUG_printf(("http_read(http=%p, buffer=%p, length=" CUPS_LLFMT ")", (void *)http, (void *)buffer, CUPS_LLCAST length));
 
-  if (!http->blocking)
+  if (!http->blocking || http->timeout_value > 0.0)
   {
     while (!httpWait(http, http->wait_value))
     {
@@ -4651,7 +4666,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
   {
     DEBUG_printf(("3http_write: About to write %d bytes.", (int)length));
 
-    if (http->timeout_cb)
+    if (http->timeout_value > 0.0)
     {
 #ifdef HAVE_POLL
       struct pollfd	pfd;		/* Polled file descriptor */
@@ -4695,7 +4710,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
 	  http->error = errno;
 	  return (-1);
 	}
-	else if (nfds == 0 && !(*http->timeout_cb)(http, http->timeout_data))
+	else if (nfds == 0 && (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data)))
 	{
 #ifdef WIN32
 	  http->error = WSAEWOULDBLOCK;

@@ -47,6 +47,8 @@ extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
 #define _CUPS_JSR_ACCOUNT_LIMIT_REACHED		0x08
 #define _CUPS_JSR_JOB_PASSWORD_WAIT		0x10
 #define _CUPS_JSR_JOB_RELEASE_WAIT		0x20
+#define _CUPS_JSR_DOCUMENT_FORMAT_ERROR		0x40
+#define _CUPS_JSR_DOCUMENT_UNPRINTABLE		0x80
 
 
 /*
@@ -69,6 +71,7 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
   http_encryption_t	encryption;	/* Use encryption? */
   ipp_jstate_t		job_state;	/* Current job state */
   ipp_pstate_t		printer_state;	/* Current printer state */
+  int			retryable;	/* Is this a job that should be retried? */
 } _cups_monitor_t;
 
 
@@ -1448,6 +1451,7 @@ main(int  argc,				/* I - Number of command-line args */
   monitor.encryption    = cupsEncryption();
   monitor.job_state     = IPP_JOB_PENDING;
   monitor.printer_state = IPP_PRINTER_IDLE;
+  monitor.retryable     = argc == 6 && document_format && strcmp(document_format, "image/pwg-raster") && strcmp(document_format, "image/urf");
 
   if (create_job)
   {
@@ -2568,22 +2572,24 @@ monitor_printer(
 
         for (i = 0; i < attr->num_values; i ++)
         {
-          if (!strcmp(attr->values[i].string.text,
-                      "account-authorization-failed"))
+          if (!strcmp(attr->values[i].string.text, "account-authorization-failed"))
             new_reasons |= _CUPS_JSR_ACCOUNT_AUTHORIZATION_FAILED;
           else if (!strcmp(attr->values[i].string.text, "account-closed"))
             new_reasons |= _CUPS_JSR_ACCOUNT_CLOSED;
           else if (!strcmp(attr->values[i].string.text, "account-info-needed"))
             new_reasons |= _CUPS_JSR_ACCOUNT_INFO_NEEDED;
-          else if (!strcmp(attr->values[i].string.text,
-                           "account-limit-reached"))
+          else if (!strcmp(attr->values[i].string.text, "account-limit-reached"))
             new_reasons |= _CUPS_JSR_ACCOUNT_LIMIT_REACHED;
           else if (!strcmp(attr->values[i].string.text, "job-password-wait"))
             new_reasons |= _CUPS_JSR_JOB_PASSWORD_WAIT;
           else if (!strcmp(attr->values[i].string.text, "job-release-wait"))
             new_reasons |= _CUPS_JSR_JOB_RELEASE_WAIT;
-	  if (!job_canceled &&
-	      (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system")))
+          else if (!strcmp(attr->values[i].string.text, "document-format-error"))
+            new_reasons |= _CUPS_JSR_DOCUMENT_FORMAT_ERROR;
+          else if (!strcmp(attr->values[i].string.text, "document-unprintable"))
+            new_reasons |= _CUPS_JSR_DOCUMENT_UNPRINTABLE;
+
+	  if (!job_canceled && (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system")))
             job_canceled = 1;
         }
 
@@ -2601,6 +2607,26 @@ monitor_printer(
 	    fputs("JOBSTATE: job-password-wait\n", stderr);
 	  else if (new_reasons & _CUPS_JSR_JOB_RELEASE_WAIT)
 	    fputs("JOBSTATE: job-release-wait\n", stderr);
+          else if (new_reasons & (_CUPS_JSR_DOCUMENT_FORMAT_ERROR | _CUPS_JSR_DOCUMENT_UNPRINTABLE))
+          {
+            if (monitor->retryable)
+            {
+             /*
+              * Can't print this, so retry as raster...
+              */
+
+              job_canceled = 1;
+              fputs("JOBSTATE: cups-retry-as-raster\n", stderr);
+	    }
+	    else if (new_reasons & _CUPS_JSR_DOCUMENT_FORMAT_ERROR)
+	    {
+	      fputs("JOBSTATE: document-format-error\n", stderr);
+	    }
+	    else
+	    {
+	      fputs("JOBSTATE: document-unprintable\n", stderr);
+	    }
+          }
 	  else
 	    fputs("JOBSTATE: job-printing\n", stderr);
 

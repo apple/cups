@@ -893,7 +893,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Write dirty config/state files...
     */
 
-    if (DirtyCleanTime && current_time >= DirtyCleanTime && cupsArrayCount(Clients) == 0)
+    if (DirtyCleanTime && current_time >= DirtyCleanTime)
       cupsdCleanDirty();
 
 #ifdef __APPLE__

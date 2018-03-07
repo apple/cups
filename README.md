@@ -1,4 +1,4 @@
-README - CUPS v2.2.6 - 2017-11-01
+README - CUPS v2.2.7 - 2018-03-06
 =================================
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
@@ -148,7 +148,7 @@ This will prevent the filters from misinterpreting your print file.
 LEGAL STUFF
 -----------
 
-CUPS is copyright © 2007-2017 by Apple Inc.  CUPS and the CUPS logo are
+CUPS is copyright © 2007-2018 by Apple Inc.  CUPS and the CUPS logo are
 trademarks of Apple Inc.
 
 The MD5 Digest code is Copyright 1999 Aladdin Enterprises.

@@ -32,8 +32,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		*printer,		/* Destination printer or class */
 		*instance,		/* Instance */
 		*opt;			/* Option pointer */
-  const char	*title,			/* Job title */
-		*val;			/* Environment variable name */
+  const char	*title;			/* Job title */
   int		num_copies;		/* Number of copies per file */
   int		num_files;		/* Number of files to print */
   const char	*files[1000];		/* Files to print */
@@ -345,33 +344,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    val = NULL;
-
-    if ((printer = getenv("LPDEST")) == NULL)
-    {
-      if ((printer = getenv("PRINTER")) != NULL)
-      {
-        if (!strcmp(printer, "lp"))
-          printer = NULL;
-	else
-	  val = "PRINTER";
-      }
-    }
+    if (!cupsGetNamedDest(NULL, NULL, NULL) && cupsLastError() == IPP_STATUS_ERROR_NOT_FOUND)
+      _cupsLangPrintf(stderr, _("%s: Error - %s"), argv[0], cupsLastErrorString());
     else
-      val = "LPDEST";
-
-    if (printer && !cupsGetNamedDest(NULL, printer, NULL))
-      _cupsLangPrintf(stderr,
-                      _("%s: Error - %s environment variable names "
-		        "non-existent destination \"%s\"."), argv[0], val,
-		      printer);
-    else if (cupsLastError() == IPP_NOT_FOUND)
-      _cupsLangPrintf(stderr,
-                      _("%s: Error - no default destination available."),
-		      argv[0]);
-    else
-      _cupsLangPrintf(stderr, _("%s: Error - scheduler not responding."),
-		      argv[0]);
+      _cupsLangPrintf(stderr, _("%s: Error - scheduler not responding."), argv[0]);
 
     return (1);
   }

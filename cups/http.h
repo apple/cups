@@ -248,10 +248,11 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 
   HTTP_STATUS_MULTIPLE_CHOICES = 300,	/* Multiple files match request */
   HTTP_STATUS_MOVED_PERMANENTLY,	/* Document has moved permanently */
-  HTTP_STATUS_MOVED_TEMPORARILY,	/* Document has moved temporarily */
-  HTTP_STATUS_SEE_OTHER,		/* See this other link... */
+  HTTP_STATUS_FOUND,			/* Document was found at a different URI */
+  HTTP_STATUS_SEE_OTHER,		/* See this other link */
   HTTP_STATUS_NOT_MODIFIED,		/* File not modified */
   HTTP_STATUS_USE_PROXY,		/* Must use a proxy to access this URI */
+  HTTP_STATUS_TEMPORARY_REDIRECT = 307,	/* Temporary redirection */
 
   HTTP_STATUS_BAD_REQUEST = 400,	/* Bad request */
   HTTP_STATUS_UNAUTHORIZED,		/* Unauthorized to access host */
@@ -284,6 +285,8 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 					/* User canceled authorization @since CUPS 1.4@ */
   HTTP_STATUS_CUPS_PKI_ERROR,		/* Error negotiating a secure connection @since CUPS 1.5/macOS 10.7@ */
   HTTP_STATUS_CUPS_WEBIF_DISABLED	/* Web interface is disabled @private@ */
+
+#  define HTTP_STATUS_MOVED_TEMPORARILY HTTP_STATUS_FOUND /* Renamed in RFC 7231 */
 
 #  ifndef _CUPS_NO_DEPRECATED
 /* Old names for this enumeration */

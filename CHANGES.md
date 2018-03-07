@@ -1,5 +1,54 @@
-CHANGES - 2.2.6 - 2017-11-01
+CHANGES - 2.2.7 - 2018-03-06
 ============================
+
+
+Changes in CUPS v2.2.7
+----------------------
+
+- Fixed a compile issue when PAM is not available (Issue #5253)
+- Documentation fixes (Issue #5252)
+- Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
+- The scheduler now supports using temporary print queues for older IPP/1.1
+  print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
+- The `cupsRasterWritePixels` function did not correctly swap bytes for some
+  formats (Issue #5225)
+- Added a USB quirk rule for Canon MP280 series printers (Issue #5221)
+- The `ppdInstallableConflict` tested too many constraints (Issue #5213)
+- More fixes for printing to old CUPS servers (Issue #5211)
+- The `cupsCopyDest` function now correctly copies the `is_default` value
+  (Issue #5208)
+- The scheduler did not work with older versions of uClibc (Issue #5188)
+- The scheduler now substitutes default values for invalid job attributes when
+  running in "relaxed conformance" mode (Issue #5186)
+- Fixed PAM module detection and added support for the common PAM definitions
+  (Issue #5185)
+- Fixed a journald support bug in the scheduler (Issue #5181)
+- The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop
+  was seen (Issue #5170)
+- Fixed group validation on OpenBSD (Issue #5166)
+- Fixed the `ippserver` sample code when threading is disabled or unavailable
+  (Issue #5154)
+- The `cupsEnumDests` function did not include options from the lpoptions files
+  (Issue #5144)
+- The `SSLOptions` directive now supports `MinTLS` and `MaxTLS` options to
+  control the minimum and maximum TLS versions that will be allowed,
+  respectively (Issue #5119)
+- The scheduler did not write out dirty configuration and state files if there
+  were open client connections (Issue #5118)
+- The `lpadmin` command now provides a better error message when an unsupported
+  System V interface script is used (Issue #5111)
+- The `lp` and `lpr` commands now provide better error messages when the default
+  printer cannot be found (Issue #5096)
+- No longer support backslash, question mark, or quotes in printer names
+  (Issue #4966)
+- The CUPS library now supports the latest HTTP Digest authentication
+  specification including support for SHA-256 (Issue #4862)
+- The `lpstat` command now reports when new jobs are being held (Issue #4761)
+- The `lpoptions` command incorrectly saved default options (Issue #4717)
+- The `ppdLocalizeIPPReason` function incorrectly returned a localized version
+  of "none" (rdar://36566269)
+- TLS connections now properly timeout (rdar://34938533)
+- The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 
 
 Changes in CUPS v2.2.6
