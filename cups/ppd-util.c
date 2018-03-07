@@ -219,10 +219,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
 #ifdef __APPLE__
        /*
-	* On macOS and iOS, the TMPDIR environment variable is not always the best
-	* location to place temporary files due to sandboxing.  Instead, the confstr
-	* function should be called to get the proper per-user, per-process TMPDIR
-	* value.
+	* On macOS and iOS, the TMPDIR environment variable is not always the
+	* best location to place temporary files due to sandboxing.  Instead,
+	* the confstr function should be called to get the proper per-user,
+	* per-process TMPDIR value.
 	*/
 
         char		tmppath[1024];	/* Temporary directory */
