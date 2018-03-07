@@ -513,13 +513,23 @@ _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
 {
-  fputs("DEBUG: CUPS was compiled without threading support, no thread "
-        "created.\n", stderr);
+  fputs("DEBUG: CUPS was compiled without threading support, no thread created.\n", stderr);
 
   (void)func;
   (void)arg;
 
   return (0);
+}
+
+
+/*
+ * '_cupsThreadDetach()' - Tell the OS that the thread is running independently.
+ */
+
+void
+_cupsThreadDetach(_cups_thread_t thread)/* I - Thread ID */
+{
+  (void)thread;
 }
 
 

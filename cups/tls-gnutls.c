@@ -1,8 +1,8 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -35,7 +35,9 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = -1;/* Options for TLS connections */
+static int		tls_options = -1,/* Options for TLS connections */
+			tls_min_version = _HTTP_TLS_1_0,
+			tls_max_version = _HTTP_TLS_MAX;
 
 
 /*
@@ -397,7 +399,7 @@ httpCredentialsAreValidForName(
         for (i = 0; i < count; i ++)
 	{
 	  rserial_size = sizeof(rserial);
-          if (!gnutls_x509_crl_get_crt_serial(tls_crl, (unsigned)i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+          if (!gnutls_x509_crl_get_crt_serial(tls_crl, (unsigned)i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, (int)rserial_size))
 	  {
 	    result = 0;
 	    break;
@@ -646,7 +648,6 @@ httpCredentialsString(
     char		name[256];	/* Common name associated with cert */
     size_t		namelen;	/* Length of name */
     time_t		expiration;	/* Expiration date of cert */
-    _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
     namelen = sizeof(name) - 1;
@@ -657,9 +658,7 @@ httpCredentialsString(
 
     expiration = gnutls_x509_crt_get_expiration_time(cert);
 
-    _cupsMD5Init(&md5_state);
-    _cupsMD5Append(&md5_state, first->data, (int)first->datalen);
-    _cupsMD5Finish(&md5_state, md5_digest);
+    cupsHashData("md5", first->data, first->datalen, md5_digest, sizeof(md5_digest));
 
     snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
@@ -1094,7 +1093,7 @@ http_gnutls_read(
 
   http = (http_t *)ptr;
 
-  if (!http->blocking)
+  if (!http->blocking || http->timeout_value > 0.0)
   {
    /*
     * Make sure we have data before we read...
@@ -1224,10 +1223,16 @@ _httpTLSSetCredentials(http_t *http)	/* I - Connection to server */
  */
 
 void
-_httpTLSSetOptions(int options)		/* I - Options */
+_httpTLSSetOptions(int options,		/* I - Options */
+                   int min_version,	/* I - Minimum TLS version */
+                   int max_version)	/* I - Maximum TLS version */
 {
   if (!(options & _HTTP_TLS_SET_DEFAULT) || tls_options < 0)
-    tls_options = options;
+  {
+    tls_options     = options;
+    tls_min_version = min_version;
+    tls_max_version = max_version;
+  }
 }
 
 
@@ -1245,6 +1250,19 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 					/* TLS credentials */
   char			priority_string[2048];
 					/* Priority string */
+  int			version;	/* Current version */
+  double		old_timeout;	/* Old timeout value */
+  http_timeout_cb_t	old_cb;		/* Old timeout callback */
+  void			*old_data;	/* Old timeout data */
+  static const char * const versions[] =/* SSL/TLS versions */
+  {
+    "VERS-SSL3.0",
+    "VERS-TLS1.0",
+    "VERS-TLS1.1",
+    "VERS-TLS1.2",
+    "VERS-TLS1.3",
+    "VERS-TLS-ALL"
+  };
 
 
   DEBUG_printf(("3_httpTLSStart(http=%p)", http));
@@ -1506,14 +1524,40 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
   strlcpy(priority_string, "NORMAL", sizeof(priority_string));
 
-  if (tls_options & _HTTP_TLS_DENY_TLS10)
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string));
-  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+  if (tls_max_version < _HTTP_TLS_MAX)
+  {
+   /*
+    * Require specific TLS versions...
+    */
+
+    strlcat(priority_string, ":-VERS-TLS-ALL", sizeof(priority_string));
+    for (version = tls_min_version; version <= tls_max_version; version ++)
+    {
+      strlcat(priority_string, ":+", sizeof(priority_string));
+      strlcat(priority_string, versions[version], sizeof(priority_string));
+    }
+  }
+  else if (tls_min_version == _HTTP_TLS_SSL3)
+  {
+   /*
+    * Allow all versions of TLS and SSL/3.0...
+    */
+
     strlcat(priority_string, ":+VERS-TLS-ALL:+VERS-SSL3.0", sizeof(priority_string));
-  else if (tls_options & _HTTP_TLS_ONLY_TLS10)
-    strlcat(priority_string, ":-VERS-TLS-ALL:-VERS-SSL3.0:+VERS-TLS1.0", sizeof(priority_string));
+  }
   else
-    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
+  {
+   /*
+    * Require a minimum version...
+    */
+
+    strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string));
+    for (version = 0; version < tls_min_version; version ++)
+    {
+      strlcat(priority_string, ":-", sizeof(priority_string));
+      strlcat(priority_string, versions[version], sizeof(priority_string));
+    }
+  }
 
   if (tls_options & _HTTP_TLS_ALLOW_RC4)
     strlcat(priority_string, ":+ARCFOUR-128", sizeof(priority_string));
@@ -1543,6 +1587,24 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 #endif /* HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
   gnutls_transport_set_push_function(http->tls, http_gnutls_write);
 
+ /*
+  * Enforce a minimum timeout of 10 seconds for the TLS handshake...
+  */
+
+  old_timeout  = http->timeout_value;
+  old_cb       = http->timeout_cb;
+  old_data     = http->timeout_data;
+
+  if (!old_cb || old_timeout < 10.0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting timeout to 10 seconds.");
+    httpSetTimeout(http, 10.0, NULL, NULL);
+  }
+
+ /*
+  * Do the TLS handshake...
+  */
+
   while ((status = gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
   {
     DEBUG_printf(("5_httpStartTLS: gnutls_handshake returned %d (%s)",
@@ -1560,9 +1622,17 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
       free(credentials);
       http->tls = NULL;
 
+      httpSetTimeout(http, old_timeout, old_cb, old_data);
+
       return (-1);
     }
   }
+
+ /*
+  * Restore the previous timeout settings...
+  */
+
+  httpSetTimeout(http, old_timeout, old_cb, old_data);
 
   http->tls_credentials = credentials;
 

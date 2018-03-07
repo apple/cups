@@ -3,8 +3,8 @@
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright 2007-2017 by Apple Inc.
-# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
 # property of Apple Inc. and are protected by Federal copyright
@@ -304,8 +304,9 @@ for file in ../locale/cups_*.po; do
 	loc=`basename $file .po | cut -c 6-`
 	mkdir $BASE/share/locale/$loc
 	ln -s $root/locale/cups_$loc.po $BASE/share/locale/$loc
-	ln -s $root/locale/ppdc_$loc.po $BASE/share/locale/$loc
 done
+mkdir $BASE/share/locale/en
+ln -s $root/locale/cups.pot $BASE/share/locale/en/cups_en.po
 mkdir $BASE/share/mime
 mkdir $BASE/share/model
 mkdir $BASE/share/ppdc
@@ -319,6 +320,7 @@ mkdir $BASE/ssl
 ln -s $root/backend/dnssd $BASE/bin/backend
 ln -s $root/backend/http $BASE/bin/backend
 ln -s $root/backend/ipp $BASE/bin/backend
+ln -s ipp $BASE/bin/backend/ipps
 ln -s $root/backend/lpd $BASE/bin/backend
 ln -s $root/backend/mdns $BASE/bin/backend
 ln -s $root/backend/pseudo $BASE/bin/backend
@@ -914,7 +916,7 @@ else
 fi
 
 # Paged printed on Test3
-count=`$GREP '^Test3 ' $BASE/log/page_log | grep -v total | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+count=`$GREP '^Test3 ' $BASE/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=2
 if test $count != $expected; then
 	echo "FAIL: Printer 'Test3' produced $count page(s), expected $expected."

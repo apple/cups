@@ -2,7 +2,7 @@
  * "cupsaccept", "cupsdisable", "cupsenable", and "cupsreject" commands for
  * CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -83,11 +83,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	switch (*opt)
 	{
 	  case 'E' : /* Encrypt */
-  #ifdef HAVE_SSL
+#ifdef HAVE_SSL
 	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-  #else
+#else
 	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."), command);
-  #endif /* HAVE_SSL */
+#endif /* HAVE_SSL */
 	      break;
 
 	  case 'U' : /* Username */

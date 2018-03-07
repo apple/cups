@@ -5,7 +5,7 @@
  * created from driver information files, and dynamically generated PPD files
  * using driver helper programs.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2404,7 +2404,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   {
     fprintf(stderr, "ERROR: [cups-driverd] Skipping \"%s\": loop detected!\n",
             d);
-    return (0);
+    return (1);
   }
 
  /*
@@ -2619,7 +2619,7 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
     unsigned ppdsync;			/* Sync word */
     int      num_ppds;			/* Number of PPDs */
 
-    if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync)) == sizeof(ppdsync) &&
+    if ((size_t)cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync)) == sizeof(ppdsync) &&
         ppdsync == PPD_SYNC &&
         !stat(filename, &fileinfo) &&
 	(((size_t)fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
@@ -2728,7 +2728,7 @@ read_tar(cups_file_t *fp,		/* I - Archive to read */
   tar_rec_t	record;			/* Record from file */
 
 
-  while (cupsFileRead(fp, (char *)&record, sizeof(record)) == sizeof(record))
+  while ((size_t)cupsFileRead(fp, (char *)&record, sizeof(record)) == sizeof(record))
   {
    /*
     * Check for a valid tar header...

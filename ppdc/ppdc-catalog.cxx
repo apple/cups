@@ -1,7 +1,7 @@
 //
 // Shared message catalog class for the CUPS PPD Compiler.
 //
-// Copyright 2007-2016 by Apple Inc.
+// Copyright 2007-2017 by Apple Inc.
 // Copyright 2002-2006 by Easy Software Products.
 //
 // These coded instructions, statements, and computer programs are the
@@ -58,7 +58,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
   filename = new ppdcString(f);
   messages = new ppdcArray();
 
-  if (l)
+  if (l && strcmp(l, "en"))
   {
     // Try loading the base messages for this locale...
     char	pofile[1024];		// Message catalog file

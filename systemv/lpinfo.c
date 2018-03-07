@@ -1,7 +1,7 @@
 /*
  * "lpinfo" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -454,6 +454,25 @@ show_models(
     }
 
     ippDelete(response);
+
+   /*
+    * Show the "everywhere" model, which is handled by the lpadmin command...
+    */
+
+    if ((!include_schemes || strstr(include_schemes, "everywhere")) && (!exclude_schemes || !strstr(exclude_schemes, "everywhere")))
+    {
+      if (long_status)
+      {
+	_cupsLangPrintf(stdout,
+	                _("Model:  name = %s\n"
+			  "        natural_language = %s\n"
+			  "        make-and-model = %s\n"
+			  "        device-id = %s"),
+			"everywhere", cupsLangDefault()->language, "IPP Everywhere", "CMD:PwgRaster");
+      }
+      else
+        _cupsLangPuts(stdout, "everywhere IPP Everywhere");
+    }
   }
   else
   {

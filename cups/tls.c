@@ -36,7 +36,7 @@
 
 
 /*
- * Local functions...
+ * Include platform-specific TLS code...
  */
 
 #ifdef HAVE_SSL

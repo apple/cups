@@ -876,6 +876,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 		host[256],		/* Hostname */
 		resource[256];		/* Resource path */
     int		port;			/* Port number */
+    static const char * const pattrs[] =/* Requested printer attributes */
+    {
+      "job-template",
+      "printer-defaults",
+      "printer-description",
+      "media-col-database"
+    };
 
     if (httpSeparateURI(HTTP_URI_CODING_ALL, argv[1], scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
     {
@@ -892,6 +899,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, argv[1]);
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]), NULL, pattrs);
     response = cupsDoRequest(http, request, resource);
 
     if (_ppdCreateFromIPP(buffer, sizeof(buffer), response))
