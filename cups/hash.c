@@ -1,9 +1,10 @@
 /*
  * Hashing function for CUPS.
  *
- * Copyright 2015-2017 by Apple Inc.
+ * Copyright © 2015-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -275,7 +276,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
  *
  * The passed buffer must be at least 2 * hashsize + 1 characters in length.
  *
- * @since CUPS 2.3@
+ * @since CUPS 2.2.7@
  */
 
 const char *				/* O - Formatted string */
