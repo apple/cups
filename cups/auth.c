@@ -674,7 +674,7 @@ cups_auth_param(const char *scheme,		/* I - Pointer to auth data */
                 size_t     valsize)		/* I - Size of value buffer */
 {
   char		*valptr = value,		/* Pointer into value buffer */
-      		*valend = value + valsize - 1;	/* Pointer to end of buffer */
+		*valend = value + valsize - 1;	/* Pointer to end of buffer */
   size_t	namelen = strlen(name);		/* Name length */
   int		param;				/* Is this a parameter? */
 
