@@ -7,6 +7,7 @@ Changes in CUPS v2.2.7
 
 - The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
   (Issue #5259)
+- The scheduler could crash while adding an IPP Everywhere printer (Issue #5258)
 - Label printers supported by the rastertolabel driver don't support SNMP, so
   don't delay printing to test it (Issue #5256)
 - Fixed a compile issue when PAM is not available (Issue #5253)

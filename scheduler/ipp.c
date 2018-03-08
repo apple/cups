@@ -4896,6 +4896,8 @@ copy_printer_attrs(
   * and document-format attributes that may be provided by the client.
   */
 
+  _cupsRWLockRead(&printer->lock);
+
   curtime = time(NULL);
 
   if (!ra || cupsArrayFind(ra, "marker-change-time"))
@@ -5088,6 +5090,8 @@ copy_printer_attrs(
   if (printer->ppd_attrs)
     copy_attrs(con->response, printer->ppd_attrs, ra, IPP_TAG_ZERO, 0, NULL);
   copy_attrs(con->response, CommonData, ra, IPP_TAG_ZERO, IPP_TAG_COPY, NULL);
+
+  _cupsRWUnlock(&printer->lock);
 }
 
 
