@@ -12,6 +12,13 @@
 #   usb-init      Needs vendor USB initialization string.
 #   vendor-class  Uses vendor-specific class or subclass.
 #   whitelist     The printer is functional with the USB backend.
+#
+# To get the USB vendor and product IDs for a given printer, run the "lsusb"
+# command, which will show something like the following:
+#
+#   Bus 002 Device 003: ID ab21:34dc Acme Example Printer
+#
+# The "ab21:34dc" is the vendor and product ID, separated by a colon.
 
 # HP DeskJet 895C
 0x03f0 0x0004 unidir
@@ -271,3 +278,6 @@
 
 # Star Micronics printers (Issue #5251)
 0x0519 unidir
+
+# Lexmark Optra E310 (Issue #5259)
+0x043d 0x000c no-reattach

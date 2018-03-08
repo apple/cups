@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-02-23
+CHANGES - 2.3rc1 - 2018-03-08
 =============================
 
 Changes in CUPS v2.3rc1
@@ -18,6 +18,8 @@ Changes in CUPS v2.3rc1
 - Added public `cupsEncodeOption` API for encoding a single option as an IPP
   attribute.
 - Documentation fixes (Issue #5252)
+- The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
+  (Issue #5259)
 
 
 Changes in CUPS v2.3b3
