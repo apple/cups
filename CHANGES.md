@@ -1,10 +1,12 @@
-CHANGES - 2.2.7 - 2018-03-06
+CHANGES - 2.2.7 - 2018-03-08
 ============================
 
 
 Changes in CUPS v2.2.7
 ----------------------
 
+- The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
+  (Issue #5259)
 - Fixed a compile issue when PAM is not available (Issue #5253)
 - Documentation fixes (Issue #5252)
 - Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)

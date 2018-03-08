@@ -8,10 +8,17 @@
 #   delay-close   Delay close/reset of selected interface
 #   no-reattach   Do no re-attach usblp kernel module after printing.
 #   soft-reset    Do a soft reset after printing for cleanup.
-#   unidir        Only supported unidirectional I/O
+#   unidir        Only supports unidirectional I/O
 #   usb-init      Needs vendor USB initialization string.
 #   vendor-class  Uses vendor-specific class or subclass.
 #   whitelist     The printer is functional with the USB backend.
+#
+# To get the USB vendor and product IDs for a given printer, run the "lsusb"
+# command, which will show something like the following:
+#
+#   Bus 002 Device 003: ID ab21:34dc Acme Example Printer
+#
+# The "ab21:34dc" is the vendor and product ID, separated by a colon.
 
 # HP DeskJet 895C
 0x03f0 0x0004 unidir
@@ -265,3 +272,12 @@
 
 # HP LaserJet 1160 (Issue #5121)
 0x03f0 0x1e17 delay-close
+
+# Canon, Inc. MP280 series (Issue #5221)
+0x04a9 0x1746 unidir
+
+# Star Micronics printers (Issue #5251)
+0x0519 unidir
+
+# Lexmark Optra E310 (Issue #5259)
+0x043d 0x000c no-reattach
