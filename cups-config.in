@@ -103,7 +103,7 @@ while test $# -gt 0; do
 	    ;;
 	--libs)
 	    if test $static = no; then
-	        libs="@EXTLINKCUPS@ $LIBS";
+	        libs="@EXTLINKCUPS@";
  	        if test $image = yes; then
  	            libs="@EXTLINKCUPSIMAGE@ $libs"
 		fi
