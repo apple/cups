@@ -5,10 +5,15 @@ Changes in CUPS v2.3rc1
 -----------------------
 
 - Fixed installation of filters (Issue #5247)
-- Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
 - The scheduler now supports using temporary print queues for older IPP/1.1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
+- Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
+- Documentation fixes (Issue #5252)
 - Fixed a compile issue when PAM is not available (Issue #5253)
+- Label printers supported by the rastertolabel driver don't support SNMP, so
+  don't delay printing to test it (Issue #5256)
+- The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
+  (Issue #5259)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
@@ -17,9 +22,6 @@ Changes in CUPS v2.3rc1
   correctly.
 - Added public `cupsEncodeOption` API for encoding a single option as an IPP
   attribute.
-- Documentation fixes (Issue #5252)
-- The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
-  (Issue #5259)
 
 
 Changes in CUPS v2.3b3

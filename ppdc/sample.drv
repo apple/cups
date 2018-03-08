@@ -135,6 +135,7 @@ Version "2.3"
   Throughput 8
   ManualCopies Yes
   ColorDevice No
+  Attribute "cupsSNMPSupplies" "" "false"
 
   HWMargins 2 14.9 2 14.9
 
@@ -429,6 +430,7 @@ Version "2.3"
   ModelNumber $INTELLITECH_PCL
   Throughput 8
   ColorDevice No
+  Attribute "cupsSNMPSupplies" "" "false"
 
   HWMargins 0 5.76 0 5.76
   VariablePaperSize Yes
@@ -580,6 +582,7 @@ Version "2.3"
   DriverType label
   Throughput 8
   ColorDevice False
+  Attribute "cupsSNMPSupplies" "" "false"
 
   // Zebra CPCL Label Printer
   {
