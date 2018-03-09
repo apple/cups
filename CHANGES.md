@@ -1,4 +1,4 @@
-CHANGES - 2.2.7 - 2018-03-08
+CHANGES - 2.2.7 - 2018-03-09
 ============================
 
 
@@ -15,6 +15,8 @@ Changes in CUPS v2.2.7
 - Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
 - The scheduler now supports using temporary print queues for older IPP/1.1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
+- Kerberized printing to another CUPS server did not work correctly
+  (Issue #5233)
 - The `cupsRasterWritePixels` function did not correctly swap bytes for some
   formats (Issue #5225)
 - Added a USB quirk rule for Canon MP280 series printers (Issue #5221)
