@@ -363,7 +363,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.13.0 \
+		-current_version 2.14.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -379,7 +379,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:13 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:14 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -401,7 +401,7 @@ libcups.a:	$(LIBOBJS)
 libcups2.def: $(LIBOBJS) $(IMAGEOBJS) Makefile
 	echo Generating $@...
 	echo "LIBRARY libcups2" >libcups2.def
-	echo "VERSION 2.13" >>libcups2.def
+	echo "VERSION 2.14" >>libcups2.def
 	echo "EXPORTS" >>libcups2.def
 	(nm $(LIBOBJS) $(IMAGEOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}'; \
 	 echo __cups_strcpy; echo __cups_strlcat; echo __cups_strlcpy) | \
