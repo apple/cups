@@ -355,8 +355,7 @@ main(int  argc,				/* I - Number of command-line args */
   * that way.
   */
 
-  if (!getuid() && (value = getenv("AUTH_UID")) != NULL &&
-      !getenv("AUTH_PASSWORD"))
+  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
   {
     uid_t	uid = (uid_t)atoi(value);
 					/* User ID */
