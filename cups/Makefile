@@ -1,8 +1,8 @@
 #
 # Library Makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
 # property of Apple Inc. and are protected by Federal copyright
@@ -331,7 +331,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.12.0 \
+		-current_version 2.13.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -347,7 +347,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:12 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:13 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
