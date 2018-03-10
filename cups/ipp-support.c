@@ -1609,6 +1609,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "document-natural-language-default",
     "document-natural-language-supported",
     "document-password-supported",
+    "document-privacy-attributes",	/* IPP Privacy Attributes */
+    "document-privacy-scope",		/* IPP Privacy Attributes */
     "generated-natural-language-supported",
     "identify-actions-default",
     "identify-actions-supported",
@@ -1630,6 +1632,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-password-encryption-supported",
     "job-password-supported",
     "job-presets-supported",		/* IPP Presets */
+    "job-privacy-attributes",		/* IPP Privacy Attributes */
+    "job-privacy-scope",		/* IPP Privacy Attributes */
     "job-quota-period",			/* CUPS extension */
     "job-resolvers-supported",
     "job-settable-attributes-supported",
@@ -1734,6 +1738,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "requesting-user-name-denied",	/* CUPS extension */
     "requesting-user-uri-supported",
     "subordinate-printers-supported",
+    "subscription-privacy-attributes",	/* IPP Privacy Attributes */
+    "subscription-privacy-scope",	/* IPP Privacy Attributes */
     "urf-supported",			/* CUPS extension */
     "uri-authentication-supported",
     "uri-security-supported",

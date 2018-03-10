@@ -81,8 +81,11 @@ _ippFileParse(
 
       if (_ippFileReadToken(&f, name, sizeof(name)) && _ippFileReadToken(&f, temp, sizeof(temp)))
       {
-        _ippVarsExpand(v, value, temp, sizeof(value));
-        _ippVarsSet(v, name, value);
+        if (_cups_strcasecmp(token, "DEFINE-DEFAULT") || !_ippVarsGet(v, name))
+        {
+	  _ippVarsExpand(v, value, temp, sizeof(value));
+	  _ippVarsSet(v, name, value);
+	}
       }
       else
       {
