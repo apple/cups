@@ -1,10 +1,12 @@
-CHANGES - 2.2.7 - 2018-03-09
+CHANGES - 2.2.7 - 2018-03-12
 ============================
 
 
 Changes in CUPS v2.2.7
 ----------------------
 
+- Systemd did not restart cupsd when configuration changes were made that
+  required a restart (Issue #5263)
 - The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
   (Issue #5259)
 - The scheduler could crash while adding an IPP Everywhere printer (Issue #5258)
