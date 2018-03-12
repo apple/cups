@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-03-09
+CHANGES - 2.3rc1 - 2018-03-12
 =============================
 
 Changes in CUPS v2.3rc1
@@ -17,6 +17,8 @@ Changes in CUPS v2.3rc1
 - The scheduler could crash while adding an IPP Everywhere printer (Issue #5258)
 - The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
   (Issue #5259)
+- Systemd did not restart cupsd when configuration changes were made that
+  required a restart (Issue #5263)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
