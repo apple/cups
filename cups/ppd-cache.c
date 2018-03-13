@@ -1,9 +1,10 @@
 /*
  * PPD cache implementation for CUPS.
  *
- * Copyright 2010-2017 by Apple Inc.
+ * Copyright © 2010-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -3178,24 +3179,18 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   {
     is_apple = ippContainsString(attr, "image/urf");
     is_pdf   = ippContainsString(attr, "application/pdf");
-    is_pwg   = ippContainsString(attr, "image/pwg-raster");
+    is_pwg   = ippContainsString(attr, "image/pwg-raster") && !is_apple;
 
-    for (i = 0, count = ippGetCount(attr); i < count; i ++)
-    {
-      const char *format = ippGetString(attr, i, NULL);
-					/* PDL */
-
-     /*
-      * Write cupsFilter2 lines for supported formats...
-      */
-
-      if (!_cups_strcasecmp(format, "application/pdf"))
-        cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
-      else if (!_cups_strcasecmp(format, "image/jpeg") || !_cups_strcasecmp(format, "image/png"))
-        cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 0 -\"\n", format, format);
-      else if (!_cups_strcasecmp(format, "image/pwg-raster") || !_cups_strcasecmp(format, "image/urf"))
-        cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 100 -\"\n", format, format);
-    }
+    if (ippContainsString(attr, "image/jpeg"))
+      cupsFilePuts(fp, "*cupsFilter2: \"image/jpeg image/jpeg 0 -\"\n");
+    if (ippContainsString(attr, "image/png"))
+      cupsFilePuts(fp, "*cupsFilter2: \"image/png image/png 0 -\"\n");
+    if (is_pdf)
+      cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
+    if (is_apple)
+      cupsFilePuts(fp, "*cupsFilter2: \"image/urf image/urf 100 -\"\n");
+    if (is_pwg)
+      cupsFilePuts(fp, "*cupsFilter2: \"image/pwg-raster image/pwg-raster 100 -\"\n");
   }
 
   if (!is_apple && !is_pdf && !is_pwg)

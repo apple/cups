@@ -6,6 +6,7 @@ Changes in CUPS v2.3rc1
 
 - Kerberized printing to another CUPS server did not work correctly
   (Issue #5233)
+- Fixed printing to some IPP Everywhere printers (Issue #5238)
 - Fixed installation of filters (Issue #5247)
 - The scheduler now supports using temporary print queues for older IPP/1.1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
