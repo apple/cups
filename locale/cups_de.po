@@ -25,7 +25,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2017-12-15 16:40-0500\n"
 "PO-Revision-Date: 2017-10-25 14:57+0200\n"
-"Last-Translator: Michael Weghorn <m.weghorn@posteo.de>\n"
+"Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: German\n"
 "MIME-Version: 1.0\n"
@@ -2861,7 +2861,7 @@ msgid "Created"
 msgstr "Erstellt"
 
 msgid "Credentials do not validate against site CA certificate."
-msgstr ""
+msgstr "Anmeldedaten validieren nicht gegen das CA Zertifikat der Seite"
 
 msgid "Credentials have expired."
 msgstr "Berechtigung ist abgelaufen"
@@ -3045,16 +3045,16 @@ msgid "Envelope C7"
 msgstr "Umschlag C7"
 
 msgid "Envelope Choukei 3"
-msgstr ""
+msgstr "Umschlag Choukei 3"
 
 msgid "Envelope Choukei 3 Long Edge"
-msgstr ""
+msgstr "Umschlag Choukei 3 lange Seite"
 
 msgid "Envelope Choukei 4"
-msgstr ""
+msgstr "Umschalg Choukei 4"
 
 msgid "Envelope Choukei 4 Long Edge"
-msgstr ""
+msgstr "Umschlag Choukei 4 lange Seite"
 
 msgid "Envelope DL"
 msgstr "Umschlag DL"
@@ -3063,94 +3063,94 @@ msgid "Envelope Feed"
 msgstr "Umschlagzuführung"
 
 msgid "Envelope Invite"
-msgstr ""
+msgstr "Umschlag Invite"
 
 msgid "Envelope Italian"
 msgstr "Umschlag italienisch"
 
 msgid "Envelope Kaku2"
-msgstr ""
+msgstr "Umschalg Kaku2"
 
 msgid "Envelope Kaku2 Long Edge"
-msgstr ""
+msgstr "Umschlag Kaku2 lange Seite"
 
 msgid "Envelope Kaku3"
-msgstr ""
+msgstr "Umschlag Kaku3"
 
 msgid "Envelope Kaku3 Long Edge"
-msgstr ""
+msgstr "Umschlag Kaku3 lange Seite"
 
 msgid "Envelope Monarch"
-msgstr ""
+msgstr "Umschlag Monatch"
 
 msgid "Envelope PRC1"
-msgstr ""
+msgstr "Umschlag PRC1"
 
 msgid "Envelope PRC1 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC1 lange Seite"
 
 msgid "Envelope PRC10"
-msgstr ""
+msgstr "Umschalg PRC10"
 
 msgid "Envelope PRC10 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC10 lange Seite"
 
 msgid "Envelope PRC2"
-msgstr ""
+msgstr "Umschalg PRC2"
 
 msgid "Envelope PRC2 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC2 lange Seite"
 
 msgid "Envelope PRC3"
-msgstr ""
+msgstr "Umschalg PRC3"
 
 msgid "Envelope PRC3 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC3 lange Seite"
 
 msgid "Envelope PRC4"
-msgstr ""
+msgstr "Umschlag PRC4"
 
 msgid "Envelope PRC4 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC4 lange Seite"
 
 msgid "Envelope PRC5 Long Edge"
-msgstr ""
+msgstr "Umschalg PRC5 lange Seite"
 
 msgid "Envelope PRC5PRC5"
-msgstr ""
+msgstr "Umschlag PRC"
 
 msgid "Envelope PRC6"
-msgstr ""
+msgstr "Umschlag PRC6"
 
 msgid "Envelope PRC6 Long Edge"
-msgstr ""
+msgstr "Umschlag PRC6 lange Seite"
 
 msgid "Envelope PRC7"
-msgstr ""
+msgstr "Umschlag PRC7"
 
 msgid "Envelope PRC7 Long Edge"
-msgstr ""
+msgstr "Umschlag PRC7 lange Seite"
 
 msgid "Envelope PRC8"
-msgstr ""
+msgstr "Umschlag PRC8"
 
 msgid "Envelope PRC8 Long Edge"
-msgstr ""
+msgstr "Umschlag PRC8 lange Seite"
 
 msgid "Envelope PRC9"
-msgstr ""
+msgstr "Umschlag PRC"
 
 msgid "Envelope PRC9 Long Edge"
-msgstr ""
+msgstr "Umschlag PRC9 lange Seite"
 
 msgid "Envelope Personal"
-msgstr ""
+msgstr "Umschlag Personal"
 
 msgid "Envelope You4"
-msgstr ""
+msgstr "Umschalg You4"
 
 msgid "Envelope You4 Long Edge"
-msgstr ""
+msgstr "Umschalg You4 lange Seite"
 
 msgid "Environment Variables:"
 msgstr "Umgebungsvariablen:"
@@ -3171,10 +3171,10 @@ msgid "Error: need hostname after \"-h\" option."
 msgstr "Fehler: Hostname ist nach der \"-h\" Option erforderlich."
 
 msgid "European Fanfold"
-msgstr ""
+msgstr "Europäisches Endospapier"
 
 msgid "European Fanfold Legal"
-msgstr ""
+msgstr "Europäisches Endospapier Legal"
 
 msgid "Every 10 Labels"
 msgstr "Alle 10 Etiketten"
@@ -3207,7 +3207,7 @@ msgid "Every Label"
 msgstr "Bei jedem Etikett"
 
 msgid "Executive"
-msgstr ""
+msgstr "184×267 (Imp)"
 
 msgid "Expectation Failed"
 msgstr "Erwartete Daten nicht erhalten"
@@ -3222,7 +3222,7 @@ msgid "FAIL"
 msgstr "FEHLER"
 
 msgid "Fast Grayscale"
-msgstr ""
+msgstr "Grautöne schnell"
 
 #, c-format
 msgid "File \"%s\" contains a relative path."
@@ -3258,10 +3258,10 @@ msgid "Finished page %d."
 msgstr "Seite %d fertiggestellt."
 
 msgid "Finishing Preset"
-msgstr ""
+msgstr "Voreinstellungen Endverarbeitung"
 
 msgid "Fold"
-msgstr ""
+msgstr "Falten"
 
 msgid "Folio"
 msgstr "Folio"
@@ -3315,22 +3315,22 @@ msgid "IPP attribute is not a member of the message."
 msgstr "IPP-Attribut ist kein Mitglied der Nachricht."
 
 msgid "IPP begCollection value not 0 bytes."
-msgstr ""
+msgstr "IPP begCollection Wert nicht 0 Byte."
 
 msgid "IPP boolean value not 1 byte."
 msgstr "IPP boolescher Wert nicht 1 Byte."
 
 msgid "IPP date value not 11 bytes."
-msgstr "IPP-Datenwert nicht 11 Bytes."
+msgstr "IPP-Datenwert nicht 11 Byte."
 
 msgid "IPP endCollection value not 0 bytes."
-msgstr ""
+msgstr "IPP endCollection Wert nicht 0 Byte."
 
 msgid "IPP enum value not 4 bytes."
-msgstr ""
+msgstr "IPP enum Wert nicht 4 Byte."
 
 msgid "IPP extension tag larger than 0x7FFFFFFF."
-msgstr ""
+msgstr "IPP Erweiterung grösser als 0x7FFFFFFF."
 
 msgid "IPP integer value not 4 bytes."
 msgstr "IPP Integer-Wert nicht 4 Bytes."
@@ -3354,22 +3354,22 @@ msgid "IPP name larger than 32767 bytes."
 msgstr "IPP Name länger als 32767 Byte"
 
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
-msgstr ""
+msgstr "IPP nameWithLanguage Wert weniger als mindestens 4 Byte."
 
 msgid "IPP octetString length too large."
-msgstr ""
+msgstr "IPP Oktett-Zeichenkettenlänge zu gross."
 
 msgid "IPP rangeOfInteger value not 8 bytes."
-msgstr ""
+msgstr "IPP rangeOfInteger Wert nicht 8 Byte."
 
 msgid "IPP resolution value not 9 bytes."
 msgstr "IPP-Auflösungswert nicht 9 Bytes."
 
 msgid "IPP string length overflows value."
-msgstr ""
+msgstr "IPP Zeichenkettenlänge übersteigt Wert."
 
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
-msgstr ""
+msgstr "IPP textWithLanguage Wert weniger als mindestens 4 Byte."
 
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP-Wert länger als 32767 Bytes."
@@ -3644,7 +3644,7 @@ msgid "Missing option keyword"
 msgstr "Fehlende Option Schlüsselwort"
 
 msgid "Missing requesting-user-name attribute."
-msgstr ""
+msgstr "Fehlendes requesting-user-name Attribut."
 
 #, c-format
 msgid "Missing required attribute \"%s\"."
@@ -3715,10 +3715,10 @@ msgid "Never"
 msgstr "Nie"
 
 msgid "New credentials are not valid for name."
-msgstr ""
+msgstr "Neue Anmeldedaten sind für den Namen ungültig."
 
 msgid "New credentials are older than stored credentials."
-msgstr ""
+msgstr "Neue Anmeldedaten sind läter als die gespeicherten Anmeldedaten"
 
 msgid "No"
 msgstr "Nein"
@@ -3755,7 +3755,7 @@ msgid "No authentication information provided."
 msgstr "Keine Authentifizierungsinformation bereitgestellt."
 
 msgid "No common name specified."
-msgstr ""
+msgstr "Keinen gebräuchlichen Namen angegeben."
 
 msgid "No community name"
 msgstr "Kein Community-Name"
@@ -3816,7 +3816,7 @@ msgid "No request-id"
 msgstr "Keine Anfrage-ID"
 
 msgid "No stored credentials, not valid for name."
-msgstr ""
+msgstr "Keine gespeicherten Anmeldedaten, ungültig für Name."
 
 msgid "No subscription attributes in request."
 msgstr "Keine Subskriptions-Attribute in der Anfrage."
@@ -3900,7 +3900,7 @@ msgstr "Nutzungsrichtlinien"
 
 #, c-format
 msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
-msgstr ""
+msgstr "Option \"%s\" kann nicht mittels %%%%IncludeFeature einbezogen werden."
 
 msgid "Options Installed"
 msgstr "Installierte Optionen"
@@ -4002,13 +4002,13 @@ msgid "Postcard"
 msgstr "Postkarte"
 
 msgid "Postcard Double"
-msgstr ""
+msgstr "Doppelpostkarte"
 
 msgid "Postcard Double Long Edge"
-msgstr ""
+msgstr "Doppelpostkarte lange Seite"
 
 msgid "Postcard Long Edge"
-msgstr "Postkarte lange Kante"
+msgstr "Postkarte lange Seite"
 
 msgid "Preparing to print."
 msgstr "Vorbereitung zum Druck."
@@ -4154,10 +4154,10 @@ msgid "See Other"
 msgstr "Siehe auch"
 
 msgid "See remote printer."
-msgstr ""
+msgstr "Siehe entfernter Drucker."
 
 msgid "Self-signed credentials are blocked."
-msgstr ""
+msgstr "Selbstsignierte Anmeldedaten sind blockiert."
 
 msgid "Sending data to printer."
 msgstr "Sende Daten zum Drucker."
@@ -4248,10 +4248,10 @@ msgid "Tabloid"
 msgstr "US Tabloid"
 
 msgid "Tabloid Oversize"
-msgstr ""
+msgstr "US Tabloid übergross"
 
 msgid "Tabloid Oversize Long Edge"
-msgstr ""
+msgstr "US Tabloid übergross lange Seite"
 
 msgid "Tear"
 msgstr "Abreissen"
@@ -4361,7 +4361,7 @@ msgid "The printer-uri \"%s\" contains invalid characters."
 msgstr "Die Drucker-URI »%s« enthält ungültige Zeichen."
 
 msgid "The printer-uri attribute is required."
-msgstr ""
+msgstr "Das printer-uri Attribut ist erforderlich."
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
@@ -4425,7 +4425,7 @@ msgid "Tray 4"
 msgstr "Fach 4"
 
 msgid "Trust on first use is disabled."
-msgstr ""
+msgstr "Vertrauen bei erster Benutzung gesperrt."
 
 msgid "URI Too Long"
 msgstr "URI zu lang"
@@ -4434,7 +4434,7 @@ msgid "URI too large"
 msgstr "URI zu groß"
 
 msgid "US Fanfold"
-msgstr ""
+msgstr "US Fanfold"
 
 msgid "US Ledger"
 msgstr "US Ledger"
@@ -4443,22 +4443,22 @@ msgid "US Legal"
 msgstr "US Lang"
 
 msgid "US Legal Oversize"
-msgstr ""
+msgstr "US Legal übergross"
 
 msgid "US Letter"
 msgstr "US Letter"
 
 msgid "US Letter Long Edge"
-msgstr ""
+msgstr "US Letter lange Seite"
 
 msgid "US Letter Oversize"
-msgstr ""
+msgstr "US Letter übergross"
 
 msgid "US Letter Oversize Long Edge"
-msgstr ""
+msgstr "US Letter übergross, lange Seite"
 
 msgid "US Letter Small"
-msgstr ""
+msgstr "US Letter klein"
 
 msgid "Unable to access cupsd.conf file"
 msgstr "Kein Zugriff auf die Datei cupsd.conf"
@@ -4523,11 +4523,11 @@ msgstr ""
 
 #, c-format
 msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr ""
+msgstr "Die 64-bit CUPS Druckertreiberdateien (%d) können nicht kopiert werden."
 
 #, c-format
 msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr ""
+msgstr "Die 64-bit Windows Druckertreiberdateien (%d) können nicht kopiert werden."
 
 #, c-format
 msgid "Unable to copy CUPS printer driver files (%d)."
@@ -4550,7 +4550,7 @@ msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr "Druckertrieberdateien für Windows 9x können nicht kopiert werden (%d)."
 
 msgid "Unable to create credentials from array."
-msgstr ""
+msgstr "Anmeldedaten aus dem Array können nicht erzeugt werden."
 
 msgid "Unable to create printer-uri"
 msgstr "Drucker-URI kann nicht erzeugt werden"
@@ -4648,11 +4648,11 @@ msgstr "Druckerstatus konnte nicht ermittelt werden:"
 
 #, c-format
 msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr ""
+msgstr "Windows 2000 Druckertreiberdateien (%d) konnten nicht installiert werden."
 
 #, c-format
 msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr ""
+msgstr "Windows 9x Druckertreiberdateien (%d) konnten nicht installiert werden."
 
 msgid "Unable to load help index."
 msgstr "Hilfeindex kann nicht geladen werden."
@@ -4715,7 +4715,7 @@ msgid "Unable to run \"%s\": %s"
 msgstr "Ausführung von »%s« nicht möglich: %s"
 
 msgid "Unable to see in file"
-msgstr ""
+msgstr "In die Datei kann nicht gesehen werden"
 
 msgid "Unable to send command to printer driver"
 msgstr "Befehl kann nicht zum Drucker gesendet werden"
@@ -4864,7 +4864,7 @@ msgstr ""
 
 #, c-format
 msgid "Unsupported page-border value %s, using page-border=none."
-msgstr ""
+msgstr "Nicht unterstützter Wert für page-border, verwende paqe-border=none."
 
 msgid "Unsupported raster data."
 msgstr "Nicht unterstützte Rasterdaten."
@@ -4955,13 +4955,13 @@ msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
 msgstr "Verwendung: ppdc [Optionen] Dateiname.drv [ ... DateinameN.drv ]"
 
 msgid "Usage: ppdhtml [options] filename.drv >filename.html"
-msgstr ""
+msgstr "Verwendung: ppdhtml [Optionen] Dateiname.ppd  Dateiname.html"
 
 msgid "Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]"
-msgstr ""
+msgstr "Verwendung: ppdi [Optionen] Dateiname.ppd [ ... DateinameN.ppd ]"
 
 msgid "Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]"
-msgstr ""
+msgstr "Verwendung: ppdmerge [Optionen] Dateiname.ppd [ ... DateinameN.ppd ]"
 
 msgid ""
 "Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
@@ -4970,7 +4970,7 @@ msgstr ""
 "drv ]"
 
 msgid "Usage: snmp [host-or-ip-address]"
-msgstr "Aufruf: snmp [Host-oder-IP-Adresse]"
+msgstr "Verwendung: snmp [Host-oder-IP-Adresse]"
 
 msgid "Value uses indefinite length"
 msgstr "Wert hat unbestimmte Länge"
@@ -6365,38 +6365,38 @@ msgstr "Insert Sheet"
 
 #, c-format
 msgid "ippfind: Bad regular expression: %s"
-msgstr ""
+msgstr "ippfind: falscher regulärer Ausdruck"
 
 msgid "ippfind: Cannot use --and after --or."
-msgstr ""
+msgstr "ippfind: --and kann nicht zusammen mit --or benutzt werden."
 
 #, c-format
 msgid "ippfind: Expected key name after %s."
-msgstr ""
+msgstr "ippfind: Erwarte Schlüsselname nach %s."
 
 #, c-format
 msgid "ippfind: Expected port range after %s."
-msgstr ""
+msgstr "ippfind: Erwarte Portbereich nach %s."
 
 #, c-format
 msgid "ippfind: Expected program after %s."
-msgstr ""
+msgstr "ippfind: Erwarte Programm nach %s."
 
 #, c-format
 msgid "ippfind: Expected semi-colon after %s."
-msgstr ""
+msgstr "ippfind: Erwarte Semikolon nach %s."
 
 msgid "ippfind: Missing close brace in substitution."
 msgstr ""
 
 msgid "ippfind: Missing close parenthesis."
-msgstr ""
+msgstr "ippfind: Fehlende Schlussklammer."
 
 msgid "ippfind: Missing expression before \"--and\"."
-msgstr ""
+msgstr "ippfind: Fehlender Ausdruck vor  \"--and\"."
 
 msgid "ippfind: Missing expression before \"--or\"."
-msgstr ""
+msgstr "ippfind: Fehlender Ausdruck vor  \"--or\"."
 
 #, c-format
 msgid "ippfind: Missing key name after %s."
@@ -6418,14 +6418,14 @@ msgid "ippfind: Missing semi-colon after %s."
 msgstr ""
 
 msgid "ippfind: Out of memory."
-msgstr ""
+msgstr "ippfind: zu wenig Speicher."
 
 msgid "ippfind: Too many parenthesis."
-msgstr ""
+msgstr "ipp find: zu viele Klammern."
 
 #, c-format
 msgid "ippfind: Unable to browse or resolve: %s"
-msgstr ""
+msgstr "ippfind: Auflösen oder Browsen nicht möglich: %s"
 
 #, c-format
 msgid "ippfind: Unable to execute \"%s\": %s"
@@ -7052,7 +7052,7 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
-msgstr ""
+msgstr "lpadmin: Öffnen der PPD \"%s\": %s in Zeile %d nicht möglich."
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
