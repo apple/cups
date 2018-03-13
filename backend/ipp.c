@@ -389,7 +389,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 #  else /* No XPC, just try to run as the user ID */
     if (uid > 0)
-      seteuid(uid);
+      setuid(uid);
 #  endif /* HAVE_XPC */
   }
 #endif /* HAVE_GSSAPI */
