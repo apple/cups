@@ -1,7 +1,7 @@
 /*
  * Threading primitives for CUPS.
  *
- * Copyright 2009-2017 by Apple Inc.
+ * Copyright © 2009-2018 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -54,10 +54,19 @@ _cupsCondWait(_cups_cond_t  *cond,	/* I - Condition */
 {
   if (timeout > 0.0)
   {
+    struct timeval curtime;		/* Current time */
     struct timespec abstime;		/* Timeout */
 
-    abstime.tv_sec  = (long)timeout;
-    abstime.tv_nsec = (long)(1000000000 * (timeout - (long)timeout));
+    gettimeofday(&curtime, NULL);
+
+    abstime.tv_sec  = (long)timeout + curtime.tv_sec;
+    abstime.tv_nsec = (long)(1000000000 * (timeout - (long)timeout + 1000 * curtime.tv_usec));
+
+    while (abstime.tv_nsec >= 1000000000)
+    {
+      abstime.tv_nsec -= 1000000000;
+      abstime.tv_sec ++;
+    };
 
     pthread_cond_timedwait(cond, mutex, &abstime);
   }
