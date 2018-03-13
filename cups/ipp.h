@@ -79,11 +79,11 @@ extern "C" {
 
 typedef enum ipp_dstate_e		/**** Document states @exclude all@ ****/
 {
-  IPP_DOCUMENT_PENDING = 3,		/* Document is pending */
-  IPP_DOCUMENT_PROCESSING = 5,		/* Document is processing */
-  IPP_DOCUMENT_CANCELED = 7,		/* Document is canceled */
-  IPP_DOCUMENT_ABORTED,			/* Document is aborted */
-  IPP_DOCUMENT_COMPLETED		/* Document is completed */
+  IPP_DSTATE_PENDING = 3,		/* Document is pending */
+  IPP_DSTATE_PROCESSING = 5,		/* Document is processing */
+  IPP_DSTATE_CANCELED = 7,		/* Document is canceled */
+  IPP_DSTATE_ABORTED,			/* Document is aborted */
+  IPP_DSTATE_COMPLETED			/* Document is completed */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_DOCUMENT_PENDING	IPP_DSTATE_PENDING
