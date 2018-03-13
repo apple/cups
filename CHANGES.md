@@ -17,6 +17,7 @@ Changes in CUPS v2.2.7
 - Star Micronics printers need the "unidir" USB quirk rule (Issue #5251)
 - The scheduler now supports using temporary print queues for older IPP/1.1
   print queues like those shared by CUPS 1.3 and earlier (Issue #5241)
+- Fixed printing to some IPP Everywhere printers (Issue #5238)
 - Kerberized printing to another CUPS server did not work correctly
   (Issue #5233)
 - The `cupsRasterWritePixels` function did not correctly swap bytes for some
