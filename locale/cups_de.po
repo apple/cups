@@ -3051,7 +3051,7 @@ msgid "Envelope Choukei 3 Long Edge"
 msgstr "Umschlag Choukei 3 lange Seite"
 
 msgid "Envelope Choukei 4"
-msgstr "Umschalg Choukei 4"
+msgstr "Umschlag Choukei 4"
 
 msgid "Envelope Choukei 4 Long Edge"
 msgstr "Umschlag Choukei 4 lange Seite"
@@ -3069,7 +3069,7 @@ msgid "Envelope Italian"
 msgstr "Umschlag italienisch"
 
 msgid "Envelope Kaku2"
-msgstr "Umschalg Kaku2"
+msgstr "Umschlag Kaku2"
 
 msgid "Envelope Kaku2 Long Edge"
 msgstr "Umschlag Kaku2 lange Seite"
@@ -3081,40 +3081,40 @@ msgid "Envelope Kaku3 Long Edge"
 msgstr "Umschlag Kaku3 lange Seite"
 
 msgid "Envelope Monarch"
-msgstr "Umschlag Monatch"
+msgstr "Umschlag Monarch"
 
 msgid "Envelope PRC1"
 msgstr "Umschlag PRC1"
 
 msgid "Envelope PRC1 Long Edge"
-msgstr "Umschalg PRC1 lange Seite"
+msgstr "Umschlag PRC1 lange Seite"
 
 msgid "Envelope PRC10"
-msgstr "Umschalg PRC10"
+msgstr "Umschlag PRC10"
 
 msgid "Envelope PRC10 Long Edge"
-msgstr "Umschalg PRC10 lange Seite"
+msgstr "Umschlag PRC10 lange Seite"
 
 msgid "Envelope PRC2"
-msgstr "Umschalg PRC2"
+msgstr "Umschlag PRC2"
 
 msgid "Envelope PRC2 Long Edge"
-msgstr "Umschalg PRC2 lange Seite"
+msgstr "Umschlag PRC2 lange Seite"
 
 msgid "Envelope PRC3"
-msgstr "Umschalg PRC3"
+msgstr "Umschlag PRC3"
 
 msgid "Envelope PRC3 Long Edge"
-msgstr "Umschalg PRC3 lange Seite"
+msgstr "Umschlag PRC3 lange Seite"
 
 msgid "Envelope PRC4"
 msgstr "Umschlag PRC4"
 
 msgid "Envelope PRC4 Long Edge"
-msgstr "Umschalg PRC4 lange Seite"
+msgstr "Umschlag PRC4 lange Seite"
 
 msgid "Envelope PRC5 Long Edge"
-msgstr "Umschalg PRC5 lange Seite"
+msgstr "Umschlag PRC5 lange Seite"
 
 msgid "Envelope PRC5PRC5"
 msgstr "Umschlag PRC"
@@ -3147,10 +3147,10 @@ msgid "Envelope Personal"
 msgstr "Umschlag Personal"
 
 msgid "Envelope You4"
-msgstr "Umschalg You4"
+msgstr "Umschlag You4"
 
 msgid "Envelope You4 Long Edge"
-msgstr "Umschalg You4 lange Seite"
+msgstr "Umschlag You4 lange Seite"
 
 msgid "Environment Variables:"
 msgstr "Umgebungsvariablen:"
@@ -3171,10 +3171,10 @@ msgid "Error: need hostname after \"-h\" option."
 msgstr "Fehler: Hostname ist nach der \"-h\" Option erforderlich."
 
 msgid "European Fanfold"
-msgstr "Europäisches Endospapier"
+msgstr "Europäisches Endlospapier"
 
 msgid "European Fanfold Legal"
-msgstr "Europäisches Endospapier Legal"
+msgstr "Europäisches Endlospapier Legal"
 
 msgid "Every 10 Labels"
 msgstr "Alle 10 Etiketten"
@@ -4248,10 +4248,10 @@ msgid "Tabloid"
 msgstr "US Tabloid"
 
 msgid "Tabloid Oversize"
-msgstr "US Tabloid übergross"
+msgstr "US Tabloid übergroß"
 
 msgid "Tabloid Oversize Long Edge"
-msgstr "US Tabloid übergross lange Seite"
+msgstr "US Tabloid übergroß lange Seite"
 
 msgid "Tear"
 msgstr "Abreissen"
@@ -4443,7 +4443,7 @@ msgid "US Legal"
 msgstr "US Lang"
 
 msgid "US Legal Oversize"
-msgstr "US Legal übergross"
+msgstr "US Legal übergroß"
 
 msgid "US Letter"
 msgstr "US Letter"
@@ -4452,10 +4452,10 @@ msgid "US Letter Long Edge"
 msgstr "US Letter lange Seite"
 
 msgid "US Letter Oversize"
-msgstr "US Letter übergross"
+msgstr "US Letter übergroß"
 
 msgid "US Letter Oversize Long Edge"
-msgstr "US Letter übergross, lange Seite"
+msgstr "US Letter übergroß, lange Seite"
 
 msgid "US Letter Small"
 msgstr "US Letter klein"
