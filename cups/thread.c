@@ -54,13 +54,12 @@ _cupsCondWait(_cups_cond_t  *cond,	/* I - Condition */
 {
   if (timeout > 0.0)
   {
-    struct timeval curtime;		/* Current time */
     struct timespec abstime;		/* Timeout */
 
-    gettimeofday(&curtime, NULL);
+    clock_gettime(CLOCK_REALTIME, &abstime);
 
-    abstime.tv_sec  = (long)timeout + curtime.tv_sec;
-    abstime.tv_nsec = (long)(1000000000 * (timeout - (long)timeout + 1000 * curtime.tv_usec));
+    abstime.tv_sec  += (long)timeout;
+    abstime.tv_nsec += (long)(1000000000 * (timeout - (long)timeout));
 
     while (abstime.tv_nsec >= 1000000000)
     {
