@@ -3172,6 +3172,41 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   }
 
  /*
+  * Password/PIN printing...
+  */
+
+  if ((attr = ippFindAttribute(response, "job-password-supported", IPP_TAG_INTEGER)) != NULL)
+  {
+    char	pattern[33];		/* Password pattern */
+    int		maxlen = ippGetInteger(attr, 0);
+					/* Maximum length */
+    const char	*repertoire = ippGetString(ippFindAttribute(response, "job-password-repertoire-configured", IPP_TAG_KEYWORD), 0, NULL);
+					/* Type of password */
+
+    if (maxlen > (int)(sizeof(pattern) - 1))
+      maxlen = sizeof(pattern) - 1;
+
+    if (!repertoire || !strcmp(repertoire, "iana_us-ascii_digits"))
+      memset(pattern, '1', maxlen);
+    else if (!strcmp(repertoire, "iana_us-ascii_letters"))
+      memset(pattern, 'A', maxlen);
+    else if (!strcmp(repertoire, "iana_us-ascii_complex"))
+      memset(pattern, 'C', maxlen);
+    else if (!strcmp(repertoire, "iana_us-ascii_any"))
+      memset(pattern, '.', maxlen);
+    else if (!strcmp(repertoire, "iana_utf-8_digits"))
+      memset(pattern, 'N', maxlen);
+    else if (!strcmp(repertoire, "iana_utf-8_letters"))
+      memset(pattern, 'U', maxlen);
+    else
+      memset(pattern, '*', maxlen);
+
+    pattern[maxlen] = '\0';
+
+    cupsFilePrintf(fp, "*cupsPassword: \"%s\"\n", pattern);
+  }
+
+ /*
   * Filters...
   */
 
