@@ -40,7 +40,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.1.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2017-10-23 17:48-0400\n"
+"POT-Creation-Date: 2018-03-19 18:36-0400\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -1672,6 +1672,10 @@ msgstr "%s: Versão inválida %s para \"-V\"."
 #, c-format
 msgid "%s: Don't know what to do."
 msgstr "%s: Não sei o que fazer."
+
+#, c-format
+msgid "%s: Error - %s"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -3628,6 +3632,9 @@ msgstr "Fólio"
 
 msgid "Forbidden"
 msgstr "Proibido"
+
+msgid "Found"
+msgstr ""
 
 msgid "Full Cut Tabs"
 msgstr ""
@@ -8039,6 +8046,16 @@ msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: Nome da impressora só pode conter caracteres imprimíveis."
 
 msgid ""
+"lpadmin: Raw queues are deprecated and will stop working in a future version "
+"of CUPS."
+msgstr ""
+
+msgid ""
+"lpadmin: System V interface scripts are no longer supported for security "
+"reasons."
+msgstr ""
+
+msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
 "         You must specify a printer name first."
 msgstr ""
@@ -8092,6 +8109,9 @@ msgstr "lpadmin: Argumento desconhecido \"%s\"."
 #, c-format
 msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin: Opção desconhecida \"%c\"."
+
+msgid "lpadmin: Use the 'everywhere' model for shared printers."
+msgstr ""
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin: Aviso - lista de tipos de conteúdos ignorada."
@@ -8838,6 +8858,45 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Advanced Photo Paper"
+
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Glossy Brochure Paper"
+
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Matte Brochure Paper"
+
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Cover Paper"
+
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "Office Recycled Paper"
+
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Photo Paper"
+
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+msgid "media-type.com.hp.intermediate"
+msgstr "Multipurpose Paper"
+
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
+
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Premium Inkjet Paper"
+
+msgid "media-type.com.hp.premium-photo"
+msgstr "Premium Photo Glossy Paper"
+
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Presentation Matte Paper"
+
 msgid "media-type.continuous"
 msgstr "Continuous"
 
@@ -8981,6 +9040,18 @@ msgstr "Image Setter Paper"
 
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
+
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 msgid "media-type.labels"
 msgstr "Labels"
