@@ -23,6 +23,7 @@ Changes in CUPS v2.3rc1
 - The IPP Everywhere PPD generator did not include the `cupsJobPassword`
   keyword, when supported (Issue #5265)
 - Raw print queues are now deprecated (Issue #5269)
+- Printer drivers are now deprecated (Issue #5270)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
