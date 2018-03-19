@@ -695,16 +695,13 @@ dnssdDeregisterInstance(
   DNSServiceRefDeallocate(*srv);
 
 #  else /* HAVE_AVAHI */
-  if (*srv)
-  {
-    if (!from_callback)
-      avahi_threaded_poll_lock(DNSSDMaster);
+  if (!from_callback)
+    avahi_threaded_poll_lock(DNSSDMaster);
 
-    avahi_entry_group_free(*srv);
+  avahi_entry_group_free(*srv);
 
-    if (!from_callback)
-      avahi_threaded_poll_unlock(DNSSDMaster);
-  }
+  if (!from_callback)
+    avahi_threaded_poll_unlock(DNSSDMaster);
 #  endif /* HAVE_DNSSD */
 
   *srv = NULL;
