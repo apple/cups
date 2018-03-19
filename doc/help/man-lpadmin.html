@@ -71,14 +71,13 @@ The following options are recognized when configuring a printer queue:
 <dt><b>-c </b><i>class</i>
 <dd style="margin-left: 5.0em">Adds the named <i>printer</i> to <i>class</i>.
 If <i>class</i> does not exist it is created automatically.
-<dt><b>-P </b><i>ppd-file</i>
-<dd style="margin-left: 5.0em">Specifies a PostScript Printer Description (PPD) file to use with the printer.
 <dt><b>-m </b><i>model</i>
 <dd style="margin-left: 5.0em">Sets a standard PPD file for the printer from the <i>model</i> directory or using one of the driver interfaces.
 Use the <i>-m</i> option with the
 <a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
 command to get a list of supported models.
 The model "raw" clears any existing PPD file and the model "everywhere" queries the printer referred to by the specified IPP <i>device-uri</i>.
+Note: Models other than "everywhere" are deprecated and will not be supported in a future version of CUPS.
 <dt><b>-o cupsIPPSupplies=true</b>
 <dd style="margin-left: 5.0em"><dt><b>-o cupsIPPSupplies=false</b>
 <dd style="margin-left: 5.0em">Specifies whether IPP supply level values should be reported.
@@ -157,7 +156,11 @@ The following <b>lpadmin</b> options are deprecated:
 <dl class="man">
 <dt><b>-i </b><i>filename</i>
 <dd style="margin-left: 5.0em">This option historically has been used to provide either a System V interface script or (as an implementation side-effect) a PPD file.
-Since interface scripts are no longer supported, the <i>-P</i> option is preferred for providing a PPD file for a printer.
+Note: Interface scripts are not supported by CUPS.
+PPD files and printer drivers are deprecated and will not be supported in a future version of CUPS.
+<dt><b>-P </b><i>ppd-file</i>
+<dd style="margin-left: 5.0em">Specifies a PostScript Printer Description (PPD) file to use with the printer.
+Note: PPD files and printer drivers are deprecated and will not be supported in a future version of CUPS.
 </dl>
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".

@@ -622,6 +622,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     num_options = cupsRemoveOption("ppd-name", num_options, &options);
   }
+  else if (ppd_name || file)
+  {
+    _cupsLangPuts(stderr, _("lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS."));
+  }
 
   if (num_options || file)
   {
