@@ -19,7 +19,7 @@
  * Local functions...
  */
 
-static void	device_cb(const char *device_clas, const char *device_id,
+static void	device_cb(const char *device_class, const char *device_id,
 		          const char *device_info,
 			  const char *device_make_and_model,
 			  const char *device_uri, const char *device_location,
