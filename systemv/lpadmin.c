@@ -1,8 +1,8 @@
 /*
  * "lpadmin" command for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -46,23 +46,22 @@ static int		validate_name(const char *name);
  * 'main()' - Parse options and configure the scheduler.
  */
 
-int
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int		i;		/* Looping var */
-  http_t	*http;		/* Connection to server */
-  char		*printer,	/* Destination printer */
-		*pclass,	/* Printer class name */
-		*opt,		/* Option pointer */
-		*val;		/* Pointer to allow/deny value */
-  int		num_options;	/* Number of options */
-  cups_option_t	*options;	/* Options */
-  char		*file,		/* New PPD file */
-		evefile[1024] = "";
-				/* IPP Everywhere PPD */
-  const char	*ppd_name,	/* ppd-name value */
-		*device_uri;	/* device-uri value */
+  int		i;			/* Looping var */
+  http_t	*http;			/* Connection to server */
+  char		*printer,		/* Destination printer */
+		*pclass,		/* Printer class name */
+		*opt,			/* Option pointer */
+		*val;			/* Pointer to allow/deny value */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+  char		*file,			/* New PPD file */
+		evefile[1024] = "";	/* IPP Everywhere PPD */
+  const char	*ppd_name,		/* ppd-name value */
+		*device_uri;		/* device-uri value */
 
 
   _cupsSetLocale(argv);
@@ -610,7 +609,17 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Set options as needed...
   */
 
-  if ((ppd_name = cupsGetOption("ppd-name", num_options, options)) != NULL && !strcmp(ppd_name, "everywhere") && (device_uri = cupsGetOption("device-uri", num_options, options)) != NULL)
+  ppd_name   = cupsGetOption("ppd-name", num_options, options);
+  device_uri = cupsGetOption("device-uri", num_options, options);
+
+  if (ppd_name && !strcmp(ppd_name, "raw"))
+  {
+    _cupsLangPuts(stderr, _("lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS."));
+
+    if (device_uri && (!strncmp(device_uri, "ipp://", 6) || !strncmp(device_uri, "ipps://", 7)) && strstr(device_uri, "/printers/"))
+      _cupsLangPuts(stderr, _("lpadmin: Use the 'everywhere' model for shared printers."));
+  }
+  else if (ppd_name && !strcmp(ppd_name, "everywhere") && device_uri)
   {
     if ((file = get_printer_ppd(device_uri, evefile, sizeof(evefile), &num_options, &options)) == NULL)
       return (1);

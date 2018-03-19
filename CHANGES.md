@@ -5,6 +5,7 @@ CHANGES - 2.2.7 - 2018-03-19
 Changes in CUPS v2.2.7
 ----------------------
 
+- Raw print queues are now deprecated (Issue #5269)
 - The IPP Everywhere PPD generator did not include the `cupsJobPassword`
   keyword, when supported (Issue #5265)
 - Systemd did not restart cupsd when configuration changes were made that

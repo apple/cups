@@ -529,23 +529,16 @@ cups_get_printer_uri(
     int        depth)			/* I - Depth of query */
 {
   int		i;			/* Looping var */
-  int		http_port;		/* Port number */
-  http_t	*http2;			/* Alternate HTTP connection */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* Current attribute */
   char		uri[HTTP_MAX_URI],	/* printer-uri attribute */
 		scheme[HTTP_MAX_URI],	/* Scheme name */
-		username[HTTP_MAX_URI],	/* Username:password */
-		classname[255],		/* Temporary class name */
-		http_hostname[HTTP_MAX_HOST];
-					/* Hostname associated with connection */
+		username[HTTP_MAX_URI];	/* Username:password */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
-		  "device-uri",
 		  "member-uris",
-		  "printer-uri-supported",
-		  "printer-type"
+		  "printer-uri-supported"
 		};
 
 
@@ -566,15 +559,6 @@ cups_get_printer_uri(
   }
 
   DEBUG_printf(("5cups_get_printer_uri: printer-uri=\"%s\"", uri));
-
- /*
-  * Get the hostname and port number we are connected to...
-  */
-
-  httpGetHostname(http, http_hostname, sizeof(http_hostname));
-  http_port = httpAddrPort(http->hostaddr);
-
-  DEBUG_printf(("5cups_get_printer_uri: http_hostname=\"%s\"", http_hostname));
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -600,31 +584,7 @@ cups_get_printer_uri(
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
-    const char *device_uri = NULL;	/* device-uri value */
-
-    if ((attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI)) != NULL)
-    {
-      device_uri = attr->values[0].string.text;
-      DEBUG_printf(("5cups_get_printer_uri: device-uri=\"%s\"", device_uri));
-    }
-
-    if (device_uri &&
-        (((!strncmp(device_uri, "ipp://", 6) || !strncmp(device_uri, "ipps://", 7)) &&
-	  (strstr(device_uri, "/printers/") != NULL || strstr(device_uri, "/classes/") != NULL)) ||
-         ((strstr(device_uri, "._ipp.") != NULL || strstr(device_uri, "._ipps.") != NULL) &&
-          !strcmp(device_uri + strlen(device_uri) - 5, "/cups"))))
-    {
-     /*
-      * Statically-configured shared printer.
-      */
-
-      httpSeparateURI(HTTP_URI_CODING_ALL, _httpResolveURI(device_uri, uri, sizeof(uri), _HTTP_RESOLVE_DEFAULT, NULL, NULL), scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
-      ippDelete(response);
-
-      DEBUG_printf(("5cups_get_printer_uri: Resolved to host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
-      return (1);
-    }
-    else if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
+    if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
     {
      /*
       * Get the first actual printer name in the class...
@@ -647,55 +607,6 @@ cups_get_printer_uri(
 
 	  DEBUG_printf(("5cups_get_printer_uri: Found printer member with host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
 	  return (1);
-	}
-      }
-
-     /*
-      * No printers in this class - try recursively looking for a printer,
-      * but not more than 3 levels deep...
-      */
-
-      if (depth < 3)
-      {
-	for (i = 0; i < attr->num_values; i ++)
-	{
-	  httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text,
-	                  scheme, sizeof(scheme), username, sizeof(username),
-			  host, hostsize, port, resource, resourcesize);
-	  if (!strncmp(resource, "/classes/", 9))
-	  {
-	   /*
-	    * Found a class!  Connect to the right server...
-	    */
-
-	    if (!_cups_strcasecmp(http_hostname, host) && *port == http_port)
-	      http2 = http;
-	    else if ((http2 = httpConnect2(host, *port, NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL)) == NULL)
-	    {
-	      DEBUG_puts("8cups_get_printer_uri: Unable to connect to server");
-
-	      continue;
-	    }
-
-           /*
-	    * Look up printers on that server...
-	    */
-
-            strlcpy(classname, resource + 9, sizeof(classname));
-
-            cups_get_printer_uri(http2, classname, host, hostsize, port,
-	                         resource, resourcesize, depth + 1);
-
-           /*
-	    * Close the connection as needed...
-	    */
-
-	    if (http2 != http)
-	      httpClose(http2);
-
-            if (*host)
-	      return (1);
-	  }
 	}
       }
     }
