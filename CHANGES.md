@@ -1,10 +1,12 @@
-CHANGES - 2.2.7 - 2018-03-12
+CHANGES - 2.2.7 - 2018-03-19
 ============================
 
 
 Changes in CUPS v2.2.7
 ----------------------
 
+- The IPP Everywhere PPD generator did not include the `cupsJobPassword`
+  keyword, when supported (Issue #5265)
 - Systemd did not restart cupsd when configuration changes were made that
   required a restart (Issue #5263)
 - The Lexmark Optra E310 printer needs the "no-reattach" USB quirk rule
