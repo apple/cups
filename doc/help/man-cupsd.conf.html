@@ -283,8 +283,10 @@ The default is "Minimal".
 <dd style="margin-left: 5.0em"><dt><b>SSLOptions None</b>
 <dd style="margin-left: 5.0em">Sets encryption options.
 By default, CUPS only supports encryption using TLS v1.0 or higher using known secure cipher suites.
-The <i>AllowDH</i> option enables cipher suites using plain Diffie-Hellman key negotiation.
-The <i>AllowRC4</i> option enables the 128-bit RC4 cipher suites, which are required for some older clients that do not implement newer ones.
+Security is reduced when <i>Allow</i> options are used.
+Security is enhanced when <i>Deny</i> options are used.
+The <i>AllowDH</i> option enables cipher suites using plain Diffie-Hellman key negotiation (not supported on systems using GNU TLS).
+The <i>AllowRC4</i> option enables the 128-bit RC4 cipher suites, which are required for some older clients.
 The <i>AllowSSL3</i> option enables SSL v3.0, which is required for some older clients that do not support TLS v1.0.
 The <i>DenyCBC</i> option disables all CBC cipher suites.
 The <i>DenyTLS1.0</i> option disables TLS v1.0 support - this sets the minimum protocol version to TLS v1.1.
