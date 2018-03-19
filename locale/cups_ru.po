@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-02-22 14:19-0500\n"
+"POT-Creation-Date: 2018-03-19 18:43-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -7108,8 +7108,18 @@ msgstr "lpadmin: Принтер %s уже находится в группе %s.
 msgid "lpadmin: Printer %s is not a member of class %s."
 msgstr "lpadmin: Принтер %s не находится в группе %s."
 
+msgid ""
+"lpadmin: Printer drivers are deprecated and will stop working in a future "
+"version of CUPS."
+msgstr ""
+
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: Имя принтера может содержать только печатаемые символы."
+
+msgid ""
+"lpadmin: Raw queues are deprecated and will stop working in a future version "
+"of CUPS."
+msgstr ""
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
@@ -7170,6 +7180,9 @@ msgstr "lpadmin: Неизвестный аргумент \"%s\"."
 #, c-format
 msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin: Неизвестный параметр \"%c\"."
+
+msgid "lpadmin: Use the 'everywhere' model for shared printers."
+msgstr ""
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin: Внимание - список типов содержимого пропущен."

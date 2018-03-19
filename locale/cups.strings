@@ -1507,7 +1507,9 @@
 "lpadmin: No member names were seen." = "lpadmin: No member names were seen.";
 "lpadmin: Printer %s is already a member of class %s." = "lpadmin: Printer %s is already a member of class %s.";
 "lpadmin: Printer %s is not a member of class %s." = "lpadmin: Printer %s is not a member of class %s.";
+"lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS." = "lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.";
 "lpadmin: Printer name can only contain printable characters." = "lpadmin: Printer name can only contain printable characters.";
+"lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS." = "lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS.";
 "lpadmin: System V interface scripts are no longer supported for security reasons." = "lpadmin: System V interface scripts are no longer supported for security reasons.";
 "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first." = "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";
@@ -1520,6 +1522,7 @@
 "lpadmin: Unknown allow/deny option \"%s\"." = "lpadmin: Unknown allow/deny option “%s”.";
 "lpadmin: Unknown argument \"%s\"." = "lpadmin: Unknown argument “%s”.";
 "lpadmin: Unknown option \"%c\"." = "lpadmin: Unknown option “%c”.";
+"lpadmin: Use the 'everywhere' model for shared printers." = "lpadmin: Use the ‘everywhere’ model for shared printers.";
 "lpadmin: Warning - content type list ignored." = "lpadmin: Warning - content type list ignored.";
 "lpc> " = "lpc> ";
 "lpinfo: Expected 1284 device ID string after \"--device-id\"." = "lpinfo: Expected 1284 device ID string after “--device-id”.";

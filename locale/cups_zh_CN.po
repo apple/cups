@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-02-22 14:19-0500\n"
+"POT-Creation-Date: 2018-03-19 18:43-0400\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -7049,8 +7049,18 @@ msgstr "lpadmin：打印机 %s 已经是类 %s 中的成员。"
 msgid "lpadmin: Printer %s is not a member of class %s."
 msgstr "lpadmin：打印机 %s 不是类 %s 中的成员。"
 
+msgid ""
+"lpadmin: Printer drivers are deprecated and will stop working in a future "
+"version of CUPS."
+msgstr ""
+
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin：打印机名称中只能包含可打印字符。"
+
+msgid ""
+"lpadmin: Raw queues are deprecated and will stop working in a future version "
+"of CUPS."
+msgstr ""
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
@@ -7111,6 +7121,9 @@ msgstr "lpadmin：未知参数“%s”。"
 #, c-format
 msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin：未知选项“%c”。"
+
+msgid "lpadmin: Use the 'everywhere' model for shared printers."
+msgstr ""
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin：警告 — 内容类型列表已被忽略。"

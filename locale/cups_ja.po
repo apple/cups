@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-02-22 14:19-0500\n"
+"POT-Creation-Date: 2018-03-19 18:43-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -7138,8 +7138,18 @@ msgstr "lpadmin: プリンター %s はすでにクラス %s のメンバーで�
 msgid "lpadmin: Printer %s is not a member of class %s."
 msgstr "lpadmin: プリンター %s はクラス %s のメンバーではありません。"
 
+msgid ""
+"lpadmin: Printer drivers are deprecated and will stop working in a future "
+"version of CUPS."
+msgstr ""
+
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: プリンター名には表示可能文字だけが使用できます。"
+
+msgid ""
+"lpadmin: Raw queues are deprecated and will stop working in a future version "
+"of CUPS."
+msgstr ""
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
@@ -7200,6 +7210,9 @@ msgstr "lpadmin: \"%s\" は未知の引数です。"
 #, c-format
 msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin: \"%c\" は未知のオプションです。"
+
+msgid "lpadmin: Use the 'everywhere' model for shared printers."
+msgstr ""
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin: 警告 - コンテンツタイプリストは無視されます。"
