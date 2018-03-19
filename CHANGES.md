@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-03-12
+CHANGES - 2.3rc1 - 2018-03-19
 =============================
 
 Changes in CUPS v2.3rc1
@@ -20,6 +20,8 @@ Changes in CUPS v2.3rc1
   (Issue #5259)
 - Systemd did not restart cupsd when configuration changes were made that
   required a restart (Issue #5263)
+- The IPP Everywhere PPD generator did not include the `cupsJobPassword`
+  keyword, when supported (Issue #5265)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications
