@@ -12,13 +12,6 @@ include ../Makedefs
 
 
 #
-# Options to build libcups without the use of deprecated APIs...
-#
-
-OPTIONS	=	-D_CUPS_NO_DEPRECATED=1 -D_PPD_DEPRECATED=""
-
-
-#
 # Object files...
 #
 

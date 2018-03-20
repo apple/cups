@@ -32,6 +32,8 @@ Changes in CUPS v2.3rc1
   correctly.
 - Added public `cupsEncodeOption` API for encoding a single option as an IPP
   attribute.
+- Removed support for `-D_PPD_DEPRECATED=""` hack - the PPD API should not be
+  used.
 
 
 Changes in CUPS v2.3b3

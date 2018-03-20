@@ -11,8 +11,6 @@
  * Include necessary headers...
  */
 
-#define _CUPS_NO_DEPRECATED
-#define _PPD_DEPRECATED
 #include <cups/cups-private.h>
 #include <cups/ppd-private.h>
 
