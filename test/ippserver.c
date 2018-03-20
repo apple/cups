@@ -8,11 +8,10 @@
  */
 
 /*
- * Disable private and deprecated stuff so we can verify that the public API
- * is sufficient to implement a server.
+ * Disable deprecated stuff so we can verify that the public API is sufficient
+ * to implement a server.
  */
 
-#define _IPP_PRIVATE_STRUCTURES 0	/* Disable private IPP stuff */
 #define _CUPS_NO_DEPRECATED 1		/* Disable deprecated stuff */
 
 

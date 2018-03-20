@@ -12,7 +12,6 @@
  * Include necessary headers...
  */
 
-#define _IPP_PRIVATE_STRUCTURES 0	/* Disable private IPP stuff */
 #include <cups/cups-private.h>
 #include <cups/file-private.h>
 #include <regex.h>
