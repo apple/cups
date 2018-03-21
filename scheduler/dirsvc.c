@@ -698,7 +698,8 @@ dnssdDeregisterInstance(
   if (!from_callback)
     avahi_threaded_poll_lock(DNSSDMaster);
 
-  avahi_entry_group_free(*srv);
+  if (*srv)
+    avahi_entry_group_free(*srv);
 
   if (!from_callback)
     avahi_threaded_poll_unlock(DNSSDMaster);
