@@ -1,8 +1,8 @@
 /*
  * Directory services routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -698,20 +698,21 @@ dnssdDeregisterInstance(
 
   DNSServiceRefDeallocate(*srv);
 
+  *srv = NULL;
+
 #  else /* HAVE_AVAHI */
+  if (!from_callback)
+    avahi_threaded_poll_lock(DNSSDMaster);
+
   if (*srv)
   {
-    if (!from_callback)
-      avahi_threaded_poll_lock(DNSSDMaster);
-
     avahi_entry_group_free(*srv);
-
-    if (!from_callback)
-      avahi_threaded_poll_unlock(DNSSDMaster);
+    *srv = NULL;
   }
-#  endif /* HAVE_DNSSD */
 
-  *srv = NULL;
+  if (!from_callback)
+    avahi_threaded_poll_unlock(DNSSDMaster);
+#  endif /* HAVE_DNSSD */
 }
 
 
