@@ -1758,20 +1758,7 @@ http://www.vendor.com/help"
 
 <p class='summary'>*cupsJobPassword: "format"</p>
 
-<p>This keyword defines the format of the "job-password" IPP attribute, if supported by the printer. The following format characters are supported:</p>
-
-<ul>
-	<li><code>1</code>: US ASCII digits.</li>
-	<li><code>A</code>: US ASCII letters.</li>
-	<li><code>C</code>: US ASCII letters, numbers, and punctuation.</li>
-	<li><code>.</code>: Any US ASCII printable character (0x20 to 0x7e).</li>
-	<li><code>N</code>: Any Unicode digit character.</li>
-	<li><code>U</code>: Any Unicode letter character.</li>
-	<li><code>*</code>: Any Unicode (utf-8) character.</li>
-</ul>
-
-<p>The format characters are repeated to indicate the length of the
-password string.  For example, "1111" indicated a 4-digit US ASCII PIN code.</p>
+<p>This keyword defines the format of the job-password IPP attribute, if supported by the printer. Currently the only supported format is "1111" indicating a 4-digit PIN code.</p>
 
 <p>Example:</p>
 
