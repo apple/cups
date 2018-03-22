@@ -5,7 +5,7 @@ CHANGES - 2.2.7 - 2018-03-22
 Changes in CUPS v2.2.7
 ----------------------
 
-- Raw print queues are now deprecated (Issue #5269)
+- NOTICE: Raw print queues are now deprecated (Issue #5269)
 - Fixed an Avahi crash bug in the scheduler (Issue #5268)
 - The IPP Everywhere PPD generator did not include the `cupsJobPassword`
   keyword, when supported (Issue #5265)
