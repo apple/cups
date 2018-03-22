@@ -1,8 +1,8 @@
-CHANGES - 2.3rc1 - 2018-03-19
-=============================
+CHANGES - 2.3b4 - 2018-03-22
+============================
 
-Changes in CUPS v2.3rc1
------------------------
+Changes in CUPS v2.3b4
+----------------------
 
 - Kerberized printing to another CUPS server did not work correctly
   (Issue #5233)
