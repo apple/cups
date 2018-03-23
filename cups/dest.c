@@ -1281,6 +1281,12 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
       name = resource + 10;
       info = temp;
     }
+    else if (!strncmp(resource, "/ipp/print/", 11))
+    {
+      snprintf(temp, sizeof(temp), "%s @ %s", resource + 11, hostname);
+      name = resource + 11;
+      info = temp;
+    }
     else
     {
       name = hostname;
