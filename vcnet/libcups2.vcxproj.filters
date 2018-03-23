@@ -167,6 +167,7 @@
     <None Include="..\cups\libcups2.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\cups\adminutil.h">
