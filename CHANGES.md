@@ -1,4 +1,4 @@
-CHANGES - 2.3b4 - 2018-03-22
+CHANGES - 2.3b4 - 2018-03-23
 ============================
 
 Changes in CUPS v2.3b4
@@ -25,6 +25,7 @@ Changes in CUPS v2.3b4
   keyword, when supported (Issue #5265)
 - Fixed an Avahi crash bug in the scheduler (Issue #5268)
 - Raw print queues are now deprecated (Issue #5269)
+- Fixed an RPM packaging problem (Issue #5276)
 - The IPP backend did not properly detect failed PDF prints (rdar://34055474)
 - TLS connections now properly timeout (rdar://34938533)
 - Temp files could not be created in some sandboxed applications

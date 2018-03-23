@@ -313,6 +313,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/cs/cups_cs.po
 %dir /usr/share/locale/de
 /usr/share/locale/de/cups_de.po
+%dir /usr/share/locale/en
+/usr/share/locale/en/cups_en.po
 %dir /usr/share/locale/es
 /usr/share/locale/es/cups_es.po
 %dir /usr/share/locale/fr
