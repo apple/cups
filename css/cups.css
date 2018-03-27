@@ -20,14 +20,58 @@ A:link, A:link:visited, A:visited, A:link:hover, A:visited:hover {
 }
 
 NAV A:link, NAV A:link:visited, NAV A:visited {
+  background: inherit;
+  color: inherit;
   text-decoration: none;
+}
+
+NAV.cups-nav {
+  background: #111;
+  box-shadow: 0px 0px 3px rgba(0,0,0,0.8);
+}
+
+NAV.cups-nav a.navbar-brand {
+  background: none;
+}
+
+.dropdown-divider {
+  border-top-color: #888;
+}
+
+.cups-nav {
+  background: #222;
+  color: #ccc;
 }
 
 A.btn:link, A.btn:hover, A.btn:visited, A.btn:focus,
 A.btn:active, A.btn.active, A.btn.disabled,
 A.btn[disabled], A.navbar-brand:hover {
+  border-radius: 8px;
   color: #000000;
+  margin-right: .5em;
   text-decoration: none;
+}
+
+A.btn-bright:link, A.btn-bright:visited, A.btn-bright.active,
+A.btn-bright.disabled, A.btn-bright[disabled] {
+  background: #fff;
+  color: #000;
+}
+
+A.btn-bright:hover, A.btn-bright:focus, A.btn-bright:active {
+  background: #ccc;
+  color: #000;
+}
+
+A.btn-default:link, A.btn-default:visited, A.btn-default.active,
+A.btn-default.disabled, A.btn-default[disabled] {
+  background: #222;
+  color: #fff;
+}
+
+A.btn-default:hover, A.btn-default:focus, A.btn-default:active {
+  background: #555;
+  color: #fff;
 }
 
 A.btn-primary:link, A.btn-primary:hover, A.btn-primary:visited, A.btn-primary:focus, A.btn-primary:active, A.btn-primary.active, A.btn-primary.disabled, A.btn-primary[disabled] {
@@ -48,7 +92,7 @@ FORM {
 }
 
 INPUT[TYPE="TEXT"], INPUT[TYPE="EMAIL"], INPUT[TYPE="NUMBER"], INPUT[TYPE="PASSWORD"], INPUT[TYPE="SEARCH"], TEXTAREA {
-  font-family: Consolas, "Courier New", monospace;
+/*  font-family: Consolas, "Courier New", monospace;*/
 }
 
 INPUT[TYPE="NUMBER"] {
@@ -82,9 +126,15 @@ INPUT[type="checkbox"] {
 }
 
 DIV.jumbotron {
-  border-radius: 5px;
-  margin-top: 20px;
-  padding: 20px 30px;
+  background: #222;
+  border-radius: 0;
+  color: white;
+  margin: -3px -20px;
+  padding: 20px 30px 50px;
+}
+
+A.jumbolink:link, A.jumbolink:hover, A.jumbolink:focus, A.jumbolink:visited {
+  color: #99f;
 }
 
 DIV.jumbotron H1 {
@@ -99,16 +149,20 @@ DIV.jumbotron P {
 }
 
 DIV.footer {
-  background-color: rgba(248,248,248,0.7);
-  background-image: linear-gradient(rgba(248,248,248,0.7) 0px, rgba(255,255,255,0.7) 100%);
+  background-color: #111;
   bottom: 0px;
-  box-shadow: 0px 0px 5px rgba(0,0,0,0.1) inset;
+  box-shadow: 0px 0px 3px rgba(0,0,0,0.8);
+  color: #ccc;
   font-size: 11px;
   left: 0px;
-  line-height: 12px;
+  line-height: 14px;
   padding: 10px 10px 0px; /* top right+left bottom */
   position: fixed;
   right: 0px;
+}
+
+DIV.footer A, DIV.footer A:hover, DIV.footer A:focus, DIV.footer A:visited {
+  color: #99f;
 }
 
 P {
@@ -126,7 +180,7 @@ DIV.footer P {
 }
 
 DIV.container-top {
-  padding: 50px 20px; /* top+bottom right+left */
+  padding: 55px 20px; /* top+bottom right+left */
 }
 
 .form-control {
@@ -273,7 +327,7 @@ div.body h3, div.body h4, div.body h5 {
   margin-top: 0.5em;
 }
 code, p.code, pre, ul.code li {
-  font-family: monaco, courier, monospace;
+/*  font-family: monaco, courier, monospace;*/
   font-size: 90%;
 }
 ul.code, ul.contents, ul.subcontents {
