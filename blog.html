@@ -3,10 +3,11 @@ title: All Articles - CUPS.org
 layout: default
 ---
 
-<h1>All Articles</h1>
+<div class="jumbotron">
+  <h1>All Articles</h1>
+</div>
 
 {% for post in site.posts offset: 0 %}
-<hr>
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
 {{ post.excerpt }}
 {% if post.excerpt != post.content %}

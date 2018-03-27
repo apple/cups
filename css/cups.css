@@ -65,12 +65,12 @@ A.btn-bright:hover, A.btn-bright:focus, A.btn-bright:active {
 
 A.btn-default:link, A.btn-default:visited, A.btn-default.active,
 A.btn-default.disabled, A.btn-default[disabled] {
-  background: #222;
+  background: #333;
   color: #fff;
 }
 
 A.btn-default:hover, A.btn-default:focus, A.btn-default:active {
-  background: #555;
+  background: #666;
   color: #fff;
 }
 
@@ -129,8 +129,8 @@ DIV.jumbotron {
   background: #222;
   border-radius: 0;
   color: white;
-  margin: -3px -20px;
-  padding: 20px 30px 50px;
+  margin: -3px -20px 20px;
+  padding: 20px 30px 20px;
 }
 
 A.jumbolink:link, A.jumbolink:hover, A.jumbolink:focus, A.jumbolink:visited {
@@ -146,6 +146,13 @@ DIV.jumbotron H1 {
 DIV.jumbotron P {
   font-size: 16px;
   line-height: 20px;
+}
+DIV.jumbotron P.cups-buttons {
+  line-height: 3;
+}
+
+H2 {
+ margin-top: 1em;
 }
 
 DIV.footer {
