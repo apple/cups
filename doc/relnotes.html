@@ -5,6 +5,78 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="0203b4">CUPS 2.3b4</a> <em>(March 27, 2018)</em></h2>
+
+<ul>
+	<li>NOTICE: Printer drivers are now deprecated (Issue #5270)</li>
+	<li>Kerberized printing to another CUPS server did not work correctly (Issue #5233)</li>
+	<li>Fixed printing to some IPP Everywhere printers (Issue #5238)</li>
+	<li>Fixed installation of filters (Issue #5247)</li>
+	<li>The scheduler now supports using temporary print queues for older IPP/1.1 print queues like those shared by CUPS 1.3 and earlier (Issue #5241)</li>
+	<li>Star Micronics printers need the &quot;unidir&quot; USB quirk rule (Issue #5251)</li>
+	<li>Documentation fixes (Issue #5252)</li>
+	<li>Fixed a compile issue when PAM is not available (Issue #5253)</li>
+	<li>Label printers supported by the rastertolabel driver don't support SNMP, so don't delay printing to test it (Issue #5256)</li>
+	<li>The scheduler could crash while adding an IPP Everywhere printer (Issue #5258)</li>
+	<li>The Lexmark Optra E310 printer needs the &quot;no-reattach&quot; USB quirk rule (Issue #5259)</li>
+	<li>Systemd did not restart cupsd when configuration changes were made that required a restart (Issue #5263)</li>
+	<li>The IPP Everywhere PPD generator did not include the `cupsJobPassword` keyword, when supported (Issue #5265)</li>
+	<li>Fixed an Avahi crash bug in the scheduler (Issue #5268)</li>
+	<li>Raw print queues are now deprecated (Issue #5269)</li>
+	<li>Fixed an RPM packaging problem (Issue #5276)</li>
+	<li>The IPP backend did not properly detect failed PDF prints (rdar://34055474)</li>
+	<li>TLS connections now properly timeout (rdar://34938533)</li>
+	<li>Temp files could not be created in some sandboxed applications (rdar://37789645)</li>
+	<li>The ipptool `--ippserver` option did not encode out-of-band attributes correctly.</li>
+	<li>Added public `cupsEncodeOption` API for encoding a single option as an IPP attribute.</li>
+	<li>Removed support for the `-D_PPD_DEPRECATED=&quot;&quot;` developer cheat - the PPD API should no longer be used.</li>
+	<li>Removed support for `-D_IPP_PRIVATE_STRUCTURES=1` developer cheat - the IPP accessor functions should be used instead.</li>
+</ul>
+
+<h2 class="title"><a name="020207">CUPS 2.2.7</a> <em>(March 27, 2018)</em></h2>
+
+<ul>
+	<li>NOTICE: Raw print queues are now deprecated (Issue #5269)</li>
+	<li>Fixed an Avahi crash bug in the scheduler (Issue #5268)</li>
+	<li>The IPP Everywhere PPD generator did not include the `cupsJobPassword` keyword, when supported (Issue #5265)</li>
+	<li>Systemd did not restart cupsd when configuration changes were made that required a restart (Issue #5263)</li>
+	<li>The Lexmark Optra E310 printer needs the &quot;no-reattach&quot; USB quirk rule (Issue #5259)</li>
+	<li>The scheduler could crash while adding an IPP Everywhere printer (Issue #5258)</li>
+	<li>Label printers supported by the rastertolabel driver don't support SNMP, so don't delay printing to test it (Issue #5256)</li>
+	<li>Fixed a compile issue when PAM is not available (Issue #5253)</li>
+	<li>Documentation fixes (Issue #5252)</li>
+	<li>Star Micronics printers need the &quot;unidir&quot; USB quirk rule (Issue #5251)</li>
+	<li>The scheduler now supports using temporary print queues for older IPP/1.1 print queues like those shared by CUPS 1.3 and earlier (Issue #5241)</li>
+	<li>Fixed printing to some IPP Everywhere printers (Issue #5238)</li>
+	<li>Kerberized printing to another CUPS server did not work correctly (Issue #5233)</li>
+	<li>The `cupsRasterWritePixels` function did not correctly swap bytes for some formats (Issue #5225)</li>
+	<li>Added a USB quirk rule for Canon MP280 series printers (Issue #5221)</li>
+	<li>The `ppdInstallableConflict` tested too many constraints (Issue #5213)</li>
+	<li>More fixes for printing to old CUPS servers (Issue #5211)</li>
+	<li>The `cupsCopyDest` function now correctly copies the `is_default` value (Issue #5208)</li>
+	<li>The scheduler did not work with older versions of uClibc (Issue #5188)</li>
+	<li>The scheduler now substitutes default values for invalid job attributes when running in &quot;relaxed conformance&quot; mode (Issue #5186)</li>
+	<li>Fixed PAM module detection and added support for the common PAM definitions (Issue #5185)</li>
+	<li>Fixed a journald support bug in the scheduler (Issue #5181)</li>
+	<li>The cups-driverd program incorrectly stopped scanning PPDs as soon as a loop was seen (Issue #5170)</li>
+	<li>Fixed group validation on OpenBSD (Issue #5166)</li>
+	<li>Fixed the `ippserver` sample code when threading is disabled or unavailable (Issue #5154)</li>
+	<li>The `cupsEnumDests` function did not include options from the lpoptions files (Issue #5144)</li>
+	<li>The `SSLOptions` directive now supports `MinTLS` and `MaxTLS` options to control the minimum and maximum TLS versions that will be allowed, respectively (Issue #5119)</li>
+	<li>The scheduler did not write out dirty configuration and state files if there were open client connections (Issue #5118)</li>
+	<li>The `lpadmin` command now provides a better error message when an unsupported System V interface script is used (Issue #5111)</li>
+	<li>The `lp` and `lpr` commands now provide better error messages when the default printer cannot be found (Issue #5096)</li>
+	<li>No longer support backslash, question mark, or quotes in printer names (Issue #4966)</li>
+	<li>The CUPS library now supports the latest HTTP Digest authentication specification including support for SHA-256 (Issue #4862)</li>
+	<li>The `lpstat` command now reports when new jobs are being held (Issue #4761)</li>
+	<li>The `lpoptions` command incorrectly saved default options (Issue #4717)</li>
+	<li>The `ppdLocalizeIPPReason` function incorrectly returned a localized version of &quot;none&quot; (rdar://36566269)</li>
+	<li>TLS connections now properly timeout (rdar://34938533)</li>
+	<li>The IPP backend did not properly detect failed PDF prints (rdar://34055474)</li>
+	<li>Temporary files are now placed in the correct directory for sandboxed applications on macOS (rdar://problem/37789645)</li>
+</ul>
+
+
 <h2 class="title"><a name="0203b3">CUPS 2.3b3</a> <em>(February 1, 2018)</em></h2>
 
 <ul>
