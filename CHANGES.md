@@ -1,10 +1,12 @@
-CHANGES - 2.2.8 - 2018-04-02
+CHANGES - 2.2.8 - 2018-04-03
 ============================
 
 
 Changes in CUPS v2.2.8
 ----------------------
 
+- Additional changes for the scheduler to substitute default values for invalid
+  job attributes when running in "relaxed conformance" mode (Issue #5229)
 - The `ipptool` program no longer checks for duplicate attributes when running
   in list or CSV mode (Issue #5278)
 - Fixed builds without PAM (Issue #5283)

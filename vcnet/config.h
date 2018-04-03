@@ -94,8 +94,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2.7"
-#define CUPS_MINIMAL "CUPS/2.2.7"
+#define CUPS_SVERSION "CUPS v2.2.8"
+#define CUPS_MINIMAL "CUPS/2.2.8"
 
 
 /*
