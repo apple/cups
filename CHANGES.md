@@ -1,5 +1,11 @@
-CHANGES - 2.2.7 - 2018-03-22
+CHANGES - 2.2.8 - 2018-04-02
 ============================
+
+
+Changes in CUPS v2.2.8
+----------------------
+
+- Fixed builds without PAM (Issue #5283)
 
 
 Changes in CUPS v2.2.7
