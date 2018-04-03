@@ -3044,7 +3044,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 
           if (attrptr->name)
           {
-            if (cupsArrayFind(a, attrptr->name))
+            if (cupsArrayFind(a, attrptr->name) && Output < _CUPS_OUTPUT_LIST)
               add_stringf(errors, "Duplicate \"%s\" attribute in %s group",
 			  attrptr->name, ippTagString(group));
 
