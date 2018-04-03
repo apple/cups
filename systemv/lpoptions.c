@@ -150,6 +150,23 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      changes = -1;
 	      break;
 
+	  case 'U': /* -U username */
+	      if (opt[1] != '\0')
+	      {
+		num_options = cupsAddOption("User", opt + 1, num_options, &options);
+		opt += strlen(opt) - 1;
+	      }
+	      else
+	      {
+		i ++;
+		if (i >= argc)
+		  usage();
+
+		num_options = cupsAddOption("User", argv[i], num_options, &options);
+	      }
+	      changes = 1;
+	      break;
+
 	  case 'o' : /* -o option[=value] */
 	      if (dest == NULL)
 	      {
@@ -516,11 +533,11 @@ static void
 usage(void)
 {
   _cupsLangPuts(stdout,
-                _("Usage: lpoptions [-h server] [-E] -d printer\n"
-		  "       lpoptions [-h server] [-E] [-p printer] -l\n"
-		  "       lpoptions [-h server] [-E] -p printer -o "
+                _("Usage: lpoptions [-U username ] [-h server] [-E] -d printer\n"
+		  "       lpoptions [-U username ] [-h server] [-E] [-p printer] -l\n"
+		  "       lpoptions [-U username ] [-h server] [-E] -p printer -o "
 		  "option[=value] ...\n"
-		  "       lpoptions [-h server] [-E] -x printer"));
+		  "       lpoptions [-U username ] [-h server] [-E] -x printer"));
 
   exit(1);
 }
