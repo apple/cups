@@ -1269,7 +1269,7 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
 	if (ippGetName(attrptr))
 	{
-	  if (cupsArrayFind(a, (void *)ippGetName(attrptr)))
+	  if (cupsArrayFind(a, (void *)ippGetName(attrptr)) && data->output < _CUPS_OUTPUT_LIST)
 	    add_stringf(data->errors, "Duplicate \"%s\" attribute in %s group",
 			ippGetName(attrptr), ippTagString(group));
 

@@ -1,5 +1,12 @@
-CHANGES - 2.3b4 - 2018-03-23
-============================
+CHANGES - 2.3rc1 - 2018-04-02
+=============================
+
+Changes in CUPS v2.3rc1
+-----------------------
+
+- The `ipptool` program no longer checks for duplicate attributes when running
+  in list or CSV mode (Issue #5278)
+
 
 Changes in CUPS v2.3b4
 ----------------------
