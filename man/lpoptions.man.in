@@ -14,9 +14,6 @@ lpoptions \- display or set printer options and defaults
 [
 .B \-E
 ] [
-.B \-U
-.I username
-] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ]
 \fB\-d \fIdestination\fR[\fB/\fIinstance\fR]
@@ -28,9 +25,6 @@ lpoptions \- display or set printer options and defaults
 [
 .B \-E
 ] [
-.B \-U
-.I username
-] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
 \fB\-p \fIdestination\fR[\fB/\fIinstance\fR]
@@ -40,9 +34,6 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [
 .B \-E
-] [
-.B \-U
-.I username
 ] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
@@ -54,9 +45,6 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [
 .B \-E
-] [
-.B \-U
-.I username
 ] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ]
@@ -81,9 +69,6 @@ Otherwise, the per-user defaults are managed in the \fI~/.cups/lpoptions\fR file
 .TP 5
 .B \-E
 Enables encryption when communicating with the CUPS server.
-.TP 5
-\fB\-U \fIusername\fR
-Uses an alternate username.
 .TP 5
 \fB\-d \fIdestination\fR[\fB/\fIinstance\fR]
 Sets the user default printer to \fIdestination\fR.
