@@ -1199,7 +1199,12 @@ main(int  argc,				/* I - Number of command-line args */
 			*domain;	/* Domain, if any */
 
     strlcpy(buf, search, sizeof(buf));
-    if ((regtype = strstr(buf, "._")) != NULL)
+
+    if (!strncmp(buf, "_http._", 7) || !strncmp(buf, "_https._", 8) || !strncmp(buf, "_ipp._", 6) || !strncmp(buf, "_ipps._", 7))
+    {
+      regtype = buf;
+    }
+    else if ((regtype = strstr(buf, "._")) != NULL)
     {
       if (strcmp(regtype, "._tcp"))
       {
@@ -1254,6 +1259,9 @@ main(int  argc,				/* I - Number of command-line args */
 
       service = get_service(services, name, regtype, domain);
 
+      if (getenv("IPPFIND_DEBUG"))
+        fprintf(stderr, "Resolving name=\"%s\", regtype=\"%s\", domain=\"%s\"\n", name, regtype, domain);
+
 #ifdef HAVE_DNSSD
       service->ref = dnssd_ref;
       err          = DNSServiceResolve(&(service->ref),
@@ -1278,6 +1286,9 @@ main(int  argc,				/* I - Number of command-line args */
      /*
       * Browse for services of the given type...
       */
+
+      if (getenv("IPPFIND_DEBUG"))
+        fprintf(stderr, "Browsing for regtype=\"%s\", domain=\"%s\"\n", regtype, domain);
 
 #ifdef HAVE_DNSSD
       DNSServiceRef	ref;		/* Browse reference */
