@@ -8,6 +8,8 @@ Changes in CUPS v2.3rc1
   in list or CSV mode (Issue #5278)
 - The `cupsCreateJob`, `cupsPrintFile2`, and `cupsPrintFiles2` APIs did not use
   the supplied HTTP connection (Issue #5288)
+- Fixed another crash in the scheduler when adding an IPP Everywhere printer
+  (Issue #5290)
 
 
 Changes in CUPS v2.3b4
