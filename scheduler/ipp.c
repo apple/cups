@@ -5360,6 +5360,8 @@ create_local_bg_thread(
 
   if (_ppdCreateFromIPP(fromppd, sizeof(fromppd), response))
   {
+    _cupsRWLockWrite(&printer->lock);
+
     if ((!printer->info || !*(printer->info)) && (attr = ippFindAttribute(response, "printer-info", IPP_TAG_TEXT)) != NULL)
       cupsdSetString(&printer->info, ippGetString(attr, 0, NULL));
 
@@ -5368,6 +5370,8 @@ create_local_bg_thread(
 
     if ((!printer->geo_location || !*(printer->geo_location)) && (attr = ippFindAttribute(response, "printer-geo-location", IPP_TAG_URI)) != NULL)
       cupsdSetString(&printer->geo_location, ippGetString(attr, 0, NULL));
+
+    _cupsRWUnlock(&printer->lock);
 
     if ((from = cupsFileOpen(fromppd, "r")) == NULL)
     {
