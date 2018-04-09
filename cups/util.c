@@ -1,8 +1,8 @@
 /*
  * Printing utilities for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -25,19 +25,6 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
-
-
-/*
- * Enumeration data and callback...
- */
-
-typedef struct _cups_createdata_s
-{
-  const char  *name;                    /* Destination name */
-  cups_dest_t *dest;                    /* Matching destination */
-} _cups_createdata_t;
-
-static int  cups_create_cb(_cups_createdata_t *data, unsigned flags, cups_dest_t *dest);
 
 
 /*
@@ -174,7 +161,7 @@ cupsCreateJob(
 {
   int		job_id = 0;		/* job-id value */
   ipp_status_t  status;                 /* Create-Job status */
-  _cups_createdata_t data;              /* Enumeration data */
+  cups_dest_t	*dest;			/* Destination */
   cups_dinfo_t  *info;                  /* Destination information */
 
 
@@ -194,12 +181,7 @@ cupsCreateJob(
   * Lookup the destination...
   */
 
-  data.name = name;
-  data.dest = NULL;
-
-  cupsEnumDests(0, 1000, NULL, 0, 0, (cups_dest_cb_t)cups_create_cb, &data);
-
-  if (!data.dest)
+  if ((dest = cupsGetNamedDest(http, name, NULL)) == NULL)
   {
     DEBUG_puts("1cupsCreateJob: Destination not found.");
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
@@ -211,18 +193,18 @@ cupsCreateJob(
   */
 
   DEBUG_puts("1cupsCreateJob: Querying destination info.");
-  if ((info = cupsCopyDestInfo(http, data.dest)) == NULL)
+  if ((info = cupsCopyDestInfo(http, dest)) == NULL)
   {
     DEBUG_puts("1cupsCreateJob: Query failed.");
-    cupsFreeDests(1, data.dest);
+    cupsFreeDests(1, dest);
     return (0);
   }
 
-  status = cupsCreateDestJob(http, data.dest, info, &job_id, title, num_options, options);
+  status = cupsCreateDestJob(http, dest, info, &job_id, title, num_options, options);
   DEBUG_printf(("1cupsCreateJob: cupsCreateDestJob returned %04x (%s)", status, ippErrorString(status)));
 
   cupsFreeDestInfo(info);
-  cupsFreeDests(1, data.dest);
+  cupsFreeDests(1, dest);
 
  /*
   * Return the job...
@@ -974,25 +956,3 @@ cupsStartDocument(
   return (status);
 }
 
-
-/*
- * 'cups_create_cb()' - Find the destination for printing.
- */
-
-static int                              /* O - 0 on match */
-cups_create_cb(
-    _cups_createdata_t *data,           /* I - Data from cupsCreateJob call */
-    unsigned           flags,           /* I - Enumeration flags */
-    cups_dest_t        *dest)           /* I - Destination */
-{
-  DEBUG_printf(("2cups_create_cb(data=%p(%s), flags=%08x, dest=%p(%s))", (void *)data, data->name, flags, (void *)dest, dest->name));
-
-  (void)flags;
-
-  if (dest->instance || strcasecmp(data->name, dest->name))
-    return (1);
-
-  cupsCopyDest(dest, 0, &data->dest);
-
-  return (0);
-}

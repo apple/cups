@@ -1,4 +1,4 @@
-CHANGES - 2.2.8 - 2018-04-03
+CHANGES - 2.2.8 - 2018-04-09
 ============================
 
 
@@ -10,6 +10,8 @@ Changes in CUPS v2.2.8
 - The `ipptool` program no longer checks for duplicate attributes when running
   in list or CSV mode (Issue #5278)
 - Fixed builds without PAM (Issue #5283)
+- The `cupsCreateJob`, `cupsPrintFile2`, and `cupsPrintFiles2` APIs did not use
+  the supplied HTTP connection (Issue #5288)
 
 
 Changes in CUPS v2.2.7
