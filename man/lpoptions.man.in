@@ -1,8 +1,8 @@
 .\"
 .\" lpoptions man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
-.\" Copyright 1997-2006 by Easy Software Products.
+.\" Copyright © 2007-2018 by Apple Inc.
+.\" Copyright © 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
 .\" property of Apple Inc. and are protected by Federal copyright
@@ -10,16 +10,13 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpoptions 1 "CUPS" "12 June 2014" "Apple Inc."
+.TH lpoptions 1 "CUPS" "10 April 2018" "Apple Inc."
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
 .B lpoptions
 [
 .B \-E
-] [
-.B \-U
-.I username
 ] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ]
@@ -32,9 +29,6 @@ lpoptions \- display or set printer options and defaults
 [
 .B \-E
 ] [
-.B \-U
-.I username
-] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
 \fB\-p \fIdestination\fR[\fB/\fIinstance\fR]
@@ -44,9 +38,6 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [
 .B \-E
-] [
-.B \-U
-.I username
 ] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ] [
@@ -58,9 +49,6 @@ lpoptions \- display or set printer options and defaults
 .B lpoptions
 [
 .B \-E
-] [
-.B \-U
-.I username
 ] [
 \fB\-h \fIserver\fR[\fB:\fIport\fR]
 ]
@@ -85,9 +73,6 @@ Otherwise, the per-user defaults are managed in the \fI~/.cups/lpoptions\fR file
 .TP 5
 .B \-E
 Enables encryption when communicating with the CUPS server.
-.TP 5
-\fB\-U \fIusername\fR
-Uses an alternate username.
 .TP 5
 \fB\-d \fIdestination\fR[\fB/\fIinstance\fR]
 Sets the user default printer to \fIdestination\fR.
@@ -133,4 +118,4 @@ The \fBlpoptions\fR command is unique to CUPS.
 .BR lprm (1),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2017 by Apple Inc.
+Copyright \[co] 2007-2018 by Apple Inc.
