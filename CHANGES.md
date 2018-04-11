@@ -1,4 +1,4 @@
-CHANGES - 2.2.8 - 2018-04-10
+CHANGES - 2.2.8 - 2018-04-11
 ============================
 
 
@@ -15,6 +15,7 @@ Changes in CUPS v2.2.8
   the supplied HTTP connection (Issue #5288)
 - Fixed another crash in the scheduler when adding an IPP Everywhere printer
   (Issue #5290)
+- Fixed a parsing bug in the new authentication code.
 
 
 Changes in CUPS v2.2.7
