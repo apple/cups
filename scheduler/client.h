@@ -30,6 +30,7 @@ struct cupsd_client_s
   struct timeval	start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
+  int			is_browser;	/* Is the client a web browser? */
   int			type;		/* AuthType for username */
   char			username[HTTP_MAX_VALUE],
 					/* Username from Authorization: line */
