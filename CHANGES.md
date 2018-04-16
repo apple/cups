@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-04-11
+CHANGES - 2.3rc1 - 2018-04-16
 =============================
 
 Changes in CUPS v2.3rc1
@@ -10,6 +10,8 @@ Changes in CUPS v2.3rc1
   the supplied HTTP connection (Issue #5288)
 - Fixed another crash in the scheduler when adding an IPP Everywhere printer
   (Issue #5290)
+- Added a workaround for certain web browsers that do not support multiple
+  authentication schemes in a single response header (Issue #5289)
 - Fixed a parsing bug in the new authentication code.
 
 

@@ -1,10 +1,11 @@
 /*
  * Client definitions for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -26,6 +27,7 @@ struct cupsd_client_s
   struct timeval	start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
+  int			is_browser;	/* Is the client a web browser? */
   int			type;		/* AuthType for username */
   char			username[HTTP_MAX_VALUE],
 					/* Username from Authorization: line */

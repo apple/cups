@@ -1,13 +1,14 @@
 /*
  * Client routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -813,6 +814,18 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
   if (status == HTTP_STATUS_OK)
   {
+   /*
+    * Record whether the client is a web browser.  "Mozilla" was the original
+    * and it seems that every web browser in existence now uses that as the
+    * prefix with additional information identifying *which* browser.
+    *
+    * Chrome (at least) has problems with multiple WWW-Authenticate values in
+    * a single header, so we only report Basic or Negotiate to web browsers and
+    * leave the multiple choices to the native CUPS client...
+    */
+
+    con->is_browser = !strncmp(httpGetField(con->http, HTTP_FIELD_USER_AGENT), "Mozilla/", 8);
+
     if (httpGetField(con->http, HTTP_FIELD_ACCEPT_LANGUAGE)[0])
     {
      /*
@@ -2103,8 +2116,7 @@ cupsdSendHeader(
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
     }
 
-    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
-        !_cups_strcasecmp(httpGetHostname(con->http, NULL, 0), "localhost"))
+    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE && !con->is_browser && !_cups_strcasecmp(httpGetHostname(con->http, NULL, 0), "localhost"))
     {
      /*
       * Add a "trc" (try root certification) parameter for local non-Kerberos
