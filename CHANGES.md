@@ -12,6 +12,7 @@ Changes in CUPS v2.3rc1
   (Issue #5290)
 - Added a workaround for certain web browsers that do not support multiple
   authentication schemes in a single response header (Issue #5289)
+- Fixed policy limits containing the `All` operation (Issue #5296)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
 - Fixed a parsing bug in the new authentication code.
