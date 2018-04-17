@@ -1,8 +1,8 @@
 /*
  * Configuration routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -1481,13 +1481,25 @@ cupsdReadConfiguration(void)
     }
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: NumPolicies=%d",
-                  cupsArrayCount(Policies));
-  for (i = 0, p = (cupsd_policy_t *)cupsArrayFirst(Policies);
-       p;
-       i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i, p->name);
+  if (LogLevel >= CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: NumPolicies=%d",
+		    cupsArrayCount(Policies));
+    for (i = 0, p = (cupsd_policy_t *)cupsArrayFirst(Policies);
+	 p;
+	 i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
+    {
+      int		j;		/* Looping var */
+      cupsd_location_t	*loc;		/* Current location */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: Policies[%d]=\"%s\"", i, p->name);
+
+      for (j = 0, loc = (cupsd_location_t *)cupsArrayFirst(p->ops); loc; j ++, loc = (cupsd_location_t *)cupsArrayNext(p->ops))
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration:     ops[%d]=%s", j, ippOpString(loc->op));
+      }
+    }
+  }
 
  /*
   * If we are doing a full reload or the server root has changed, flush
@@ -3853,11 +3865,9 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
 	{
 	  if (!_cups_strcasecmp(value, "All"))
-	    ops[num_ops] = IPP_ANY_OPERATION;
+	    ops[num_ops ++] = IPP_ANY_OPERATION;
 	  else if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Bad IPP operation name \"%s\" on line %d of %s.",
-	                    value, linenum, ConfigurationFile);
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad IPP operation name \"%s\" on line %d of %s.", value, linenum, ConfigurationFile);
           else
 	    num_ops ++;
 	}
