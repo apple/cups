@@ -2793,7 +2793,9 @@ new_request(
         _httpDecodeURI(phone, keyword, sizeof(phone));
         for (ptr = phone; *ptr;)
 	{
-	  if (!strchr(allowed, *ptr))
+	  if (*ptr == ',')
+	    *ptr = 'p';
+	  else if (!strchr(allowed, *ptr))
 	    _cups_strcpy(ptr, ptr + 1);
 	  else
 	    ptr ++;
