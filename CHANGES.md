@@ -1,4 +1,4 @@
-CHANGES - 2.2.8 - 2018-04-11
+CHANGES - 2.2.8 - 2018-04-17
 ============================
 
 
@@ -17,6 +17,8 @@ Changes in CUPS v2.2.8
   (Issue #5290)
 - Added a workaround for certain web browsers that do not support multiple
   authentication schemes in a single response header (Issue #5289)
+- Fax queues did not support pause (p) or wait-for-dialtone (w) characters
+  (rdar://39212256)
 - Fixed a parsing bug in the new authentication code.
 
 

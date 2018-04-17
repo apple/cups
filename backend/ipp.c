@@ -2785,7 +2785,7 @@ new_request(
 	char	phone[1024],		/* Phone number string */
 		*ptr,			/* Pointer into string */
 		tel_uri[1024];		/* tel: URI */
-        static const char * const allowed = "0123456789#*-+.()";
+        static const char * const allowed = "0123456789#*-+.()pw";
 					/* Allowed characters */
 
         destination = ippNew();
