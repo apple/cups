@@ -800,24 +800,85 @@ httpCredentialsString(
   if ((first = (http_credential_t *)cupsArrayFirst(credentials)) != NULL &&
       (secCert = http_cdsa_create_credential(first)) != NULL)
   {
-    CFStringRef		cf_name;	/* CF common name string */
-    char		name[256];	/* Common name associated with cert */
+   /*
+    * Copy certificate (string) values from the SecCertificateRef and produce
+    * a one-line summary.  The API for accessing certificate values like the
+    * issuer name is, um, "interesting"...
+    */
+
+    CFStringRef		cf_string;	/* CF string */
+    CFDictionaryRef	cf_dict;	/* Dictionary for certificate */
+    char		commonName[256],/* Common name associated with cert */
+			issuer[256],	/* Issuer name */
+			sigalg[256];	/* Signature algorithm */
     time_t		expiration;	/* Expiration date of cert */
     unsigned char	md5_digest[16];	/* MD5 result */
 
-    if ((cf_name = SecCertificateCopySubjectSummary(secCert)) != NULL)
+    if (SecCertificateCopyCommonName(secCert, &cf_string) == noErr)
     {
-      CFStringGetCString(cf_name, name, (CFIndex)sizeof(name), kCFStringEncodingUTF8);
-      CFRelease(cf_name);
+      CFStringGetCString(cf_string, commonName, (CFIndex)sizeof(commonName), kCFStringEncodingUTF8);
+      CFRelease(cf_string);
     }
     else
-      strlcpy(name, "unknown", sizeof(name));
+    {
+      strlcpy(commonName, "unknown", sizeof(commonName));
+    }
+
+    strlcpy(issuer, "unknown", sizeof(issuer));
+    strlcpy(sigalg, "UnknownSignature", sizeof(sigalg));
+
+    if ((cf_dict = SecCertificateCopyValues(secCert, NULL, NULL)) != NULL)
+    {
+      CFDictionaryRef cf_issuer = CFDictionaryGetValue(cf_dict, kSecOIDX509V1IssuerName);
+      CFDictionaryRef cf_sigalg = CFDictionaryGetValue(cf_dict, kSecOIDX509V1SignatureAlgorithm);
+
+      if (cf_issuer)
+      {
+        CFArrayRef cf_values = CFDictionaryGetValue(cf_issuer, kSecPropertyKeyValue);
+        CFIndex i, count = CFArrayGetCount(cf_values);
+        CFDictionaryRef cf_value;
+
+        for (i = 0; i < count; i ++)
+        {
+          cf_value = CFArrayGetValueAtIndex(cf_values, i);
+
+          if (!CFStringCompare(CFDictionaryGetValue(cf_value, kSecPropertyKeyLabel), kSecOIDOrganizationName, kCFCompareCaseInsensitive))
+            CFStringGetCString(CFDictionaryGetValue(cf_value, kSecPropertyKeyValue), issuer, (CFIndex)sizeof(issuer), kCFStringEncodingUTF8);
+        }
+      }
+
+      if (cf_sigalg)
+      {
+        CFArrayRef cf_values = CFDictionaryGetValue(cf_sigalg, kSecPropertyKeyValue);
+        CFIndex i, count = CFArrayGetCount(cf_values);
+        CFDictionaryRef cf_value;
+
+        for (i = 0; i < count; i ++)
+        {
+          cf_value = CFArrayGetValueAtIndex(cf_values, i);
+
+          if (!CFStringCompare(CFDictionaryGetValue(cf_value, kSecPropertyKeyLabel), CFSTR("Algorithm"), kCFCompareCaseInsensitive))
+          {
+            CFStringRef cf_algorithm = CFDictionaryGetValue(cf_value, kSecPropertyKeyValue);
+
+            if (!CFStringCompare(cf_algorithm, CFSTR("1.2.840.113549.1.1.5"), kCFCompareCaseInsensitive))
+              strlcpy(sigalg, "SHA1WithRSAEncryption", sizeof(sigalg));
+	    else if (!CFStringCompare(cf_algorithm, CFSTR("1.2.840.113549.1.1.11"), kCFCompareCaseInsensitive))
+              strlcpy(sigalg, "SHA256WithRSAEncryption", sizeof(sigalg));
+	    else if (!CFStringCompare(cf_algorithm, CFSTR("1.2.840.113549.1.1.4"), kCFCompareCaseInsensitive))
+              strlcpy(sigalg, "MD5WithRSAEncryption", sizeof(sigalg));
+	  }
+        }
+      }
+
+      CFRelease(cf_dict);
+    }
 
     expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
 
     cupsHashData("md5", first->data, first->datalen, md5_digest, sizeof(md5_digest));
 
-    snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
+    snprintf(buffer, bufsize, "%s (issued by %s) / %s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", commonName, issuer, httpGetDateString(expiration), sigalg, md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
     CFRelease(secCert);
   }

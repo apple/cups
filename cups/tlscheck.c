@@ -37,6 +37,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   http_t	*http;			/* HTTP connection */
   const char	*server = NULL;		/* Hostname from command-line */
   int		port = 0;		/* Port number */
+  cups_array_t	*creds;			/* Server credentials */
+  char		creds_str[2048];	/* Credentials string */
   const char	*cipherName = "UNKNOWN";/* Cipher suite name */
   int		dhBits = 0;		/* Diffie-Hellman bits */
   int		tlsVersion = 0;		/* TLS version number */
@@ -152,6 +154,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     printf("%s: ERROR (%s)\n", server, cupsLastErrorString());
     return (1);
+  }
+
+  if (httpCopyCredentials(http, &creds))
+  {
+    strlcpy(creds_str, "Unable to get server X.509 credentials.", sizeof(creds_str));
+  }
+  else
+  {
+    httpCredentialsString(creds, creds_str, sizeof(creds_str));
+    httpFreeCredentials(creds);
   }
 
 #ifdef __APPLE__
@@ -691,6 +703,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
     printf("%s: OK (TLS: %d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
 
+  printf("    %s\n", creds_str);
+
   if (verbose)
   {
     httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipps", NULL, host, port, resource);
@@ -714,6 +728,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     ippDelete(response);
+    puts("");
   }
 
   httpClose(http);
