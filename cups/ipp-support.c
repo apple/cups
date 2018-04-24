@@ -616,7 +616,21 @@ static const char * const ipp_document_states[] =
 		{			/* printer-state enums */
 		  "idle",
 		  "processing",
-		  "stopped",
+		  "stopped"
+		},
+		* const ipp_resource_states[] =
+		{			/* resource-state enums */
+		  "pending",
+		  "available",
+		  "installed",
+		  "canceled",
+		  "aborted"
+		},
+		* const ipp_system_states[] =
+		{			/* system-state enums */
+		  "idle",
+		  "processing",
+		  "stopped"
 		};
 
 
@@ -1923,59 +1937,31 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
   * Check for standard enum values...
   */
 
-  if (!strcmp(attrname, "document-state") &&
-      enumvalue >= 3 &&
-      enumvalue < (3 + (int)(sizeof(ipp_document_states) /
-			     sizeof(ipp_document_states[0]))))
+  if (!strcmp(attrname, "document-state") && enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_document_states) / sizeof(ipp_document_states[0]))))
     return (ipp_document_states[enumvalue - 3]);
-  else if (!strcmp(attrname, "finishings") ||
-	   !strcmp(attrname, "finishings-actual") ||
-	   !strcmp(attrname, "finishings-default") ||
-	   !strcmp(attrname, "finishings-ready") ||
-	   !strcmp(attrname, "finishings-supported") ||
-	   !strcmp(attrname, "job-finishings") ||
-	   !strcmp(attrname, "job-finishings-default") ||
-	   !strcmp(attrname, "job-finishings-supported"))
+  else if (!strcmp(attrname, "finishings") || !strcmp(attrname, "finishings-actual") || !strcmp(attrname, "finishings-default") || !strcmp(attrname, "finishings-ready") || !strcmp(attrname, "finishings-supported") || !strcmp(attrname, "job-finishings") || !strcmp(attrname, "job-finishings-default") || !strcmp(attrname, "job-finishings-supported"))
   {
-    if (enumvalue >= 3 &&
-        enumvalue < (3 + (int)(sizeof(ipp_finishings) /
-			       sizeof(ipp_finishings[0]))))
+    if (enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]))))
       return (ipp_finishings[enumvalue - 3]);
-    else if (enumvalue >= 0x40000000 &&
-             enumvalue <= (0x40000000 + (int)(sizeof(ipp_finishings_vendor) /
-                                              sizeof(ipp_finishings_vendor[0]))))
+    else if (enumvalue >= 0x40000000 && enumvalue <= (0x40000000 + (int)(sizeof(ipp_finishings_vendor) / sizeof(ipp_finishings_vendor[0]))))
       return (ipp_finishings_vendor[enumvalue - 0x40000000]);
   }
-  else if ((!strcmp(attrname, "job-collation-type") ||
-            !strcmp(attrname, "job-collation-type-actual")) &&
-           enumvalue >= 3 &&
-           enumvalue < (3 + (int)(sizeof(ipp_job_collation_types) /
-				  sizeof(ipp_job_collation_types[0]))))
+  else if ((!strcmp(attrname, "job-collation-type") || !strcmp(attrname, "job-collation-type-actual")) && enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_job_collation_types) / sizeof(ipp_job_collation_types[0]))))
     return (ipp_job_collation_types[enumvalue - 3]);
-  else if (!strcmp(attrname, "job-state") &&
-	   enumvalue >= IPP_JSTATE_PENDING && enumvalue <= IPP_JSTATE_COMPLETED)
+  else if (!strcmp(attrname, "job-state") && enumvalue >= IPP_JSTATE_PENDING && enumvalue <= IPP_JSTATE_COMPLETED)
     return (ipp_job_states[enumvalue - IPP_JSTATE_PENDING]);
   else if (!strcmp(attrname, "operations-supported"))
     return (ippOpString((ipp_op_t)enumvalue));
-  else if ((!strcmp(attrname, "orientation-requested") ||
-            !strcmp(attrname, "orientation-requested-actual") ||
-            !strcmp(attrname, "orientation-requested-default") ||
-            !strcmp(attrname, "orientation-requested-supported")) &&
-           enumvalue >= 3 &&
-           enumvalue < (3 + (int)(sizeof(ipp_orientation_requesteds) /
-				  sizeof(ipp_orientation_requesteds[0]))))
+  else if ((!strcmp(attrname, "orientation-requested") || !strcmp(attrname, "orientation-requested-actual") || !strcmp(attrname, "orientation-requested-default") || !strcmp(attrname, "orientation-requested-supported")) && enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_orientation_requesteds) / sizeof(ipp_orientation_requesteds[0]))))
     return (ipp_orientation_requesteds[enumvalue - 3]);
-  else if ((!strcmp(attrname, "print-quality") ||
-            !strcmp(attrname, "print-quality-actual") ||
-            !strcmp(attrname, "print-quality-default") ||
-            !strcmp(attrname, "print-quality-supported")) &&
-           enumvalue >= 3 &&
-           enumvalue < (3 + (int)(sizeof(ipp_print_qualities) /
-				  sizeof(ipp_print_qualities[0]))))
+  else if ((!strcmp(attrname, "print-quality") || !strcmp(attrname, "print-quality-actual") || !strcmp(attrname, "print-quality-default") || !strcmp(attrname, "print-quality-supported")) && enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_print_qualities) / sizeof(ipp_print_qualities[0]))))
     return (ipp_print_qualities[enumvalue - 3]);
-  else if (!strcmp(attrname, "printer-state") &&
-           enumvalue >= IPP_PSTATE_IDLE && enumvalue <= IPP_PSTATE_STOPPED)
+  else if (!strcmp(attrname, "printer-state") && enumvalue >= IPP_PSTATE_IDLE && enumvalue <= IPP_PSTATE_STOPPED)
     return (ipp_printer_states[enumvalue - IPP_PSTATE_IDLE]);
+  else if (!strcmp(attrname, "resource-state") && enumvalue >= IPP_RSTATE_PENDING && enumvalue <= IPP_RSTATE_ABORTED)
+    return (ipp_resource_states[enumvalue - IPP_RSTATE_PENDING]);
+  else if (!strcmp(attrname, "system-state") && enumvalue >= IPP_SSTATE_IDLE && enumvalue <= IPP_SSTATE_STOPPED)
+    return (ipp_system_states[enumvalue - IPP_SSTATE_IDLE]);
 
  /*
   * Not a standard enum value, just return the decimal equivalent...
@@ -2066,6 +2052,16 @@ ippEnumValue(const char *attrname,	/* I - Attribute name */
   {
     num_strings = (int)(sizeof(ipp_printer_states) / sizeof(ipp_printer_states[0]));
     strings     = ipp_printer_states;
+  }
+  else if (!strcmp(attrname, "resource-state"))
+  {
+    num_strings = (int)(sizeof(ipp_resource_states) / sizeof(ipp_resource_states[0]));
+    strings     = ipp_resource_states;
+  }
+  else if (!strcmp(attrname, "system-state"))
+  {
+    num_strings = (int)(sizeof(ipp_system_states) / sizeof(ipp_system_states[0]));
+    strings     = ipp_system_states;
   }
   else
     return (-1);

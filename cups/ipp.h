@@ -490,6 +490,22 @@ typedef enum ipp_res_e			/**** Resolution units ****/
   IPP_RES_PER_CM			/* Pixels per centimeter */
 } ipp_res_t;
 
+typedef enum ipp_rstate_e		/**** resource-state values ****/
+{
+  IPP_RSTATE_PENDING = 3,		/* Resource is created but has no data yet. */
+  IPP_RSTATE_AVAILABLE,			/* Resource is available for installation. */
+  IPP_RSTATE_INSTALLED,			/* Resource is installed.  */
+  IPP_RSTATE_CANCELED,			/* Resource has been canceled and is pending deletion. */
+  IPP_RSTATE_ABORTED			/* Resource has been aborted and is pending deletion. */
+} ipp_rstate_t;
+
+typedef enum ipp_sstate_e		/**** system-state values ****/
+{
+  IPP_SSTATE_IDLE = 3,			/* At least one printer is idle and none are processing a job. */
+  IPP_SSTATE_PROCESSING,		/* At least one printer is processing a job. */
+  IPP_SSTATE_STOPPED			/* All printers are stopped. */
+} ipp_sstate_t;
+
 typedef enum ipp_state_e		/**** ipp_t state values ****/
 {
   IPP_STATE_ERROR = -1,			/* An error occurred */
