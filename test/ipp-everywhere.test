@@ -156,7 +156,7 @@ INCLUDE "ipp-2.0.test"
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 150dpi DEFINE-MATCH HAVE_150DPI
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 180dpi DEFINE-MATCH HAVE_180DPI
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 300dpi DEFINE-MATCH HAVE_300DPI
-	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 3600dpi DEFINE-MATCH HAVE_360DPI
+	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 360dpi DEFINE-MATCH HAVE_360DPI
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 600dpi DEFINE-MATCH HAVE_600DPI
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 720dpi DEFINE-MATCH HAVE_720DPI
 
