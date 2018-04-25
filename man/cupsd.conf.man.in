@@ -1,8 +1,8 @@
 .\"
 .\" cupsd.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2017 by Apple Inc.
-.\" Copyright 1997-2006 by Easy Software Products.
+.\" Copyright © 2007-2018 by Apple Inc.
+.\" Copyright © 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
 .\" property of Apple Inc. and are protected by Federal copyright
@@ -10,7 +10,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "19 October 2017" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "24 April 2018" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -132,11 +132,11 @@ The default value is "30".
 \fBErrorPolicy abort-job\fR
 Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
 .TP 5
+\fBErrorPolicy retry-current-job\fR
+Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+.TP 5
 \fBErrorPolicy retry-job\fR
 Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
-.TP 5
-\fBErrorPolicy retry-this-job\fR
-Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
 .TP 5
 \fBErrorPolicy stop-printer\fR
 Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
@@ -884,4 +884,4 @@ Require authentication for accesses from outside the 10. network:
 .BR subscriptions.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2017 by Apple Inc.
+Copyright \[co] 2007-2018 by Apple Inc.
