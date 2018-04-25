@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2018-04-18
+CHANGES - 2.3rc1 - 2018-04-24
 =============================
 
 Changes in CUPS v2.3rc1
@@ -14,6 +14,7 @@ Changes in CUPS v2.3rc1
   authentication schemes in a single response header (Issue #5289)
 - Fixed policy limits containing the `All` operation (Issue #5296)
 - The scheduler was always restarted after idle-exit with systemd (Issue #5297)
+- Documentation updates (Issue #5301)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
 - Fixed a parsing bug in the new authentication code.

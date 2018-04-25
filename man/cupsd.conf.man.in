@@ -6,7 +6,7 @@
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
-.TH cupsd.conf 5 "CUPS" "9 November 2017" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "24 April 2018" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -139,11 +139,11 @@ The default is typically the server's ".local" hostname.
 \fBErrorPolicy abort-job\fR
 Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
 .TP 5
+\fBErrorPolicy retry-current-job\fR
+Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+.TP 5
 \fBErrorPolicy retry-job\fR
 Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
-.TP 5
-\fBErrorPolicy retry-this-job\fR
-Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
 .TP 5
 \fBErrorPolicy stop-printer\fR
 Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
