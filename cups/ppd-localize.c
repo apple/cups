@@ -163,6 +163,34 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     cupsArrayRestore(ppd->sorted_attrs);
   }
 
+ /*
+  * Translate ppd global properties
+  */
+  if ((attr = ppdFindAttr(ppd, "Manufacturer", NULL)) != NULL)
+  {
+    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
+                                     "Manufacturer", ll_CC)) != NULL)
+      strlcpy(ppd->manufacturer , locattr->text, sizeof(attr->text));
+  }
+  if ((attr = ppdFindAttr(ppd, "ModelName", NULL)) != NULL)
+  {
+    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
+                                     "ModelName", ll_CC)) != NULL)
+      strlcpy(ppd->modelname , locattr->text, sizeof(attr->text));
+  }
+  if ((attr = ppdFindAttr(ppd, "ShortNickName", NULL)) != NULL)
+  {
+    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
+                                     "ShortNickName", ll_CC)) != NULL)
+      strlcpy(ppd->shortnickname , locattr->text, sizeof(attr->text));
+  }
+  if ((attr = ppdFindAttr(ppd, "NickName", NULL)) != NULL)
+  {
+    if ((locattr = _ppdLocalizedAttr(ppd, "Translation",
+                                     "NickName", ll_CC)) != NULL)
+      strlcpy(ppd->nickname , locattr->text, sizeof(attr->text));
+  }
+
   return (0);
 }
 
