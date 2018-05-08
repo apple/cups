@@ -34,16 +34,28 @@ void
 cupsdStartServer(void)
 {
  /*
-  * Start color management (as needed)...
-  */
-
-  cupsdStartColor();
-
- /*
   * Create the default security profile...
   */
 
   DefaultProfile = cupsdCreateProfile(0, 1);
+
+#ifdef HAVE_SANDBOX_H
+  if (!DefaultProfile && UseSandboxing && Sandboxing != CUPSD_SANDBOXING_OFF)
+  {
+   /*
+    * Failure to create the sandbox profile means something really bad has
+    * happened and we need to shutdown immediately.
+    */
+
+    return;
+  }
+#endif /* HAVE_SANDBOX_H */
+
+ /*
+  * Start color management (as needed)...
+  */
+
+  cupsdStartColor();
 
  /*
   * Startup all the networking stuff...

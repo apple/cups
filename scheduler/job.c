@@ -4779,6 +4779,18 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->profile  = cupsdCreateProfile(job->id, 0);
   job->bprofile = cupsdCreateProfile(job->id, 1);
 
+#ifdef HAVE_SANDBOX_H
+  if ((!job->profile || !job->bprofile) && UseSandboxing && Sandboxing != CUPSD_SANDBOXING_OFF)
+  {
+   /*
+    * Failure to create the sandbox profile means something really bad has
+    * happened and we need to shutdown immediately.
+    */
+
+    return;
+  }
+#endif /* HAVE_SANDBOX_H */
+
  /*
   * Create the status pipes and buffer...
   */
