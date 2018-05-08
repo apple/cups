@@ -2033,7 +2033,7 @@ add_job_subscriptions(
 
         snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin,
 	         scheme);
-        if (access(notifier, X_OK))
+        if (access(notifier, X_OK) || !strcmp(scheme, ".") || !strcmp(scheme, ".."))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                  _("notify-recipient-uri URI \"%s\" uses unknown "
