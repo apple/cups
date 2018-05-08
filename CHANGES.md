@@ -5,6 +5,10 @@ CHANGES - 2.2.8 - 2018-06-04
 Changes in CUPS v2.2.8
 ----------------------
 
+- SECURITY: Fixed local privilege escalation to root and sandbox bypasses in
+  scheduler (rdar://37836779, rdar://37836995, rdar://37837252, rdar://37837581)
+- SECURITY: The scheduler did not validate notify-recipient-uri schemes properly
+  (rdar://40068936)
 - Additional changes for the scheduler to substitute default values for invalid
   job attributes when running in "relaxed conformance" mode (Issue #5229)
 - The `ipptool` program no longer checks for duplicate attributes when running

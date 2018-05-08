@@ -342,10 +342,6 @@ The default is "1048576" (1MB).
 \fBMultipleOperationTimeout \fIseconds\fR
 Specifies the maximum amount of time to allow between files in a multiple file print job.
 The default is "300" (5 minutes).
-.\"#PassEnv
-.TP 5
-\fBPassEnv \fIvariable \fR[ ... \fIvariable \fR]
-Passes the specified environment variable(s) to child processes.
 .\"#Policy
 .TP 5
 \fB<Policy \fIname\fB> \fR... \fB</Policy>\fR
@@ -426,10 +422,6 @@ Specifies what information is included in the Server header of HTTP responses.
 command.
 "Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".
 The default is "Minimal".
-.\"#SetEnv
-.TP 5
-\fBSetEnv \fIvariable value\fR
-Set the specified environment variable to be passed to child processes.
 .\"#SSLListen
 .TP 5
 \fBSSLListen \fIipv4-address\fB:\fIport\fR

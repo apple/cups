@@ -492,11 +492,6 @@ StrictConformance Yes
 Browsing Off
 Listen localhost:$port
 Listen $BASE/sock
-PassEnv DYLD_LIBRARY_PATH
-PassEnv LD_LIBRARY_PATH
-PassEnv LD_PRELOAD
-PassEnv LOCALEDIR
-PassEnv SHLIB_PATH
 MaxSubscriptions 3
 MaxLogSize 0
 AccessLogLevel actions
@@ -532,6 +527,12 @@ TempDir $BASE/spool/temp
 AccessLog $BASE/log/access_log
 ErrorLog $BASE/log/error_log
 PageLog $BASE/log/page_log
+
+PassEnv DYLD_LIBRARY_PATH
+PassEnv LD_LIBRARY_PATH
+PassEnv LD_PRELOAD
+PassEnv LOCALEDIR
+PassEnv SHLIB_PATH
 EOF
 
 if test $ssltype != 0 -a `uname` = Darwin; then

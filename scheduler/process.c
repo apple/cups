@@ -1,7 +1,7 @@
 /*
  * Process management routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -102,9 +102,13 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 
   if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
   {
+   /*
+    * This should never happen, and is fatal when sandboxing is enabled.
+    */
+
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d, allow_networking=%d) = NULL", job_id, allow_networking);
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create security profile: %s",
-                    strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_EMERG, "Unable to create security profile: %s", strerror(errno));
+    kill(getpid(), SIGTERM);
     return (NULL);
   }
 
@@ -201,10 +205,8 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* TempDir/... */
 		 " #\"^%s$\""		/* CacheDir */
 		 " #\"^%s/\""		/* CacheDir/... */
-		 " #\"^%s$\""		/* StateDir */
-		 " #\"^%s/\""		/* StateDir/... */
 		 "))\n",
-		 temp, temp, cache, cache, state, state);
+		 temp, temp, cache, cache);
   /* Read common folders */
   cupsFilePrintf(fp,
                  "(allow file-read-data file-read-metadata\n"
@@ -246,8 +248,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* ServerBin/... */
 		 " #\"^%s$\""		/* ServerRoot */
 		 " #\"^%s/\""		/* ServerRoot/... */
+		 " #\"^%s$\""		/* StateDir */
+		 " #\"^%s/\""		/* StateDir/... */
 		 "))\n",
-		 request, request, bin, bin, root, root);
+		 request, request, bin, bin, root, root, state, state);
   if (Sandboxing == CUPSD_SANDBOXING_RELAXED)
   {
     /* Limited write access to /Library/Printers/... */

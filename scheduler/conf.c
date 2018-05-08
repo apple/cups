@@ -2928,13 +2928,10 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 					/* Line from file */
 			temp[HTTP_MAX_BUFFER],
 					/* Temporary buffer for value */
-			*value,		/* Pointer to value */
-			*valueptr;	/* Pointer into value */
+			*value;		/* Pointer to value */
   int			valuelen;	/* Length of value */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Current address */
-  cups_file_t		*incfile;	/* Include file */
-  char			incname[1024];	/* Include filename */
 
 
  /*
@@ -2949,28 +2946,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
     * Decode the directive...
     */
 
-    if (!_cups_strcasecmp(line, "Include") && value)
-    {
-     /*
-      * Include filename
-      */
-
-      if (value[0] == '/')
-        strlcpy(incname, value, sizeof(incname));
-      else
-        snprintf(incname, sizeof(incname), "%s/%s", ServerRoot, value);
-
-      if ((incfile = cupsFileOpen(incname, "rb")) == NULL)
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to include config file \"%s\" - %s",
-	                incname, strerror(errno));
-      else
-      {
-        read_cupsd_conf(incfile);
-	cupsFileClose(incfile);
-      }
-    }
-    else if (!_cups_strcasecmp(line, "<Location") && value)
+    if (!_cups_strcasecmp(line, "<Location") && value)
     {
      /*
       * <Location path>
@@ -3366,31 +3342,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d of %s.",
                         value, linenum, ConfigurationFile);
     }
-    else if (!_cups_strcasecmp(line, "PassEnv") && value)
-    {
-     /*
-      * PassEnv variable [... variable]
-      */
-
-      for (; *value;)
-      {
-        for (valuelen = 0; value[valuelen]; valuelen ++)
-	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
-	    break;
-
-        if (value[valuelen])
-        {
-	  value[valuelen] = '\0';
-	  valuelen ++;
-	}
-
-        cupsdSetEnv(value, NULL);
-
-        for (value += valuelen; *value; value ++)
-	  if (!_cups_isspace(*value) || *value != ',')
-	    break;
-      }
-    }
     else if (!_cups_strcasecmp(line, "ServerAlias") && value)
     {
      /*
@@ -3419,30 +3370,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	    break;
       }
     }
-    else if (!_cups_strcasecmp(line, "SetEnv") && value)
-    {
-     /*
-      * SetEnv variable value
-      */
-
-      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
-
-      if (*valueptr)
-      {
-       /*
-        * Found a value...
-	*/
-
-        while (isspace(*valueptr & 255))
-	  *valueptr++ = '\0';
-
-        cupsdSetEnv(value, valueptr);
-      }
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Missing value for SetEnv directive on line %d of %s.",
-	                linenum, ConfigurationFile);
-    }
     else if (!_cups_strcasecmp(line, "AccessLog") ||
              !_cups_strcasecmp(line, "CacheDir") ||
              !_cups_strcasecmp(line, "ConfigFilePerm") ||
@@ -3456,6 +3383,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
              !_cups_strcasecmp(line, "LogFilePerm") ||
              !_cups_strcasecmp(line, "LPDConfigFile") ||
              !_cups_strcasecmp(line, "PageLog") ||
+             !_cups_strcasecmp(line, "PassEnv") ||
              !_cups_strcasecmp(line, "Printcap") ||
              !_cups_strcasecmp(line, "PrintcapFormat") ||
              !_cups_strcasecmp(line, "RemoteRoot") ||
@@ -3465,6 +3393,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
              !_cups_strcasecmp(line, "ServerKey") ||
              !_cups_strcasecmp(line, "ServerKeychain") ||
              !_cups_strcasecmp(line, "ServerRoot") ||
+             !_cups_strcasecmp(line, "SetEnv") ||
              !_cups_strcasecmp(line, "SMBConfigFile") ||
              !_cups_strcasecmp(line, "StateDir") ||
              !_cups_strcasecmp(line, "SystemGroup") ||
@@ -3494,10 +3423,49 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 static int				/* O - 1 on success, 0 on failure */
 read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
 {
-  int		linenum;		/* Current line number */
+  int		i,			/* Looping var */
+		linenum;		/* Current line number */
   char		line[HTTP_MAX_BUFFER],	/* Line from file */
 		*value;			/* Value from line */
   struct group	*group;			/* Group */
+  static const char * const prohibited_env[] =
+  {					/* Prohibited environment variables */
+    "APPLE_LANGUAGE",
+    "AUTH_DOMAIN",
+    "AUTH_INFO_REQUIRED",
+    "AUTH_NEGOTIATE",
+    "AUTH_PASSWORD",
+    "AUTH_UID",
+    "AUTH_USERNAME",
+    "CHARSET",
+    "CLASS",
+    "CLASSIFICATION",
+    "CONTENT_TYPE",
+    "CUPS_CACHEDIR",
+    "CUPS_DATADIR",
+    "CUPS_DOCROOT",
+    "CUPS_FILETYPE",
+    "CUPS_FONTPATH",
+    "CUPS_MAX_MESSAGE",
+    "CUPS_REQUESTROOT",
+    "CUPS_SERVERBIN",
+    "CUPS_SERVERROOT",
+    "CUPS_STATEDIR",
+    "DEVICE_URI",
+    "FINAL_CONTENT_TYPE",
+    "HOME",
+    "LANG",
+    "PPD",
+    "PRINTER",
+    "PRINTER_INFO",
+    "PRINTER_LOCATION",
+    "PRINTER_STATE_REASONS",
+    "RIP_CACHE",
+    "SERVER_ADMIN",
+    "SOFTWARE",
+    "TMPDIR",
+    "USER"
+  };
 
 
  /*
@@ -3533,6 +3501,47 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
 	  if (FatalErrors & CUPSD_FATAL_CONFIG)
 	    return (0);
 	}
+      }
+    }
+    else if (!_cups_strcasecmp(line, "PassEnv") && value)
+    {
+     /*
+      * PassEnv variable [... variable]
+      */
+
+      int valuelen;			/* Length of variable name */
+
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+        for (i = 0; i < (int)(sizeof(prohibited_env) / sizeof(prohibited_env[0])); i ++)
+        {
+          if (!strcmp(value, prohibited_env[i]))
+          {
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "Environment variable \"%s\" cannot be passed through on line %d of %s.", value, linenum, CupsFilesFile);
+
+	    if (FatalErrors & CUPSD_FATAL_CONFIG)
+	      return (0);
+	    else
+	      break;
+          }
+	}
+
+        if (i >= (int)(sizeof(prohibited_env) / sizeof(prohibited_env[0])))
+          cupsdSetEnv(value, NULL);
+
+        for (value += valuelen; *value; value ++)
+	  if (!_cups_isspace(*value) || *value != ',')
+	    break;
       }
     }
     else if (!_cups_strcasecmp(line, "PrintcapFormat") && value)
@@ -3579,6 +3588,46 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
         if (FatalErrors & CUPSD_FATAL_CONFIG)
           return (0);
       }
+    }
+    else if (!_cups_strcasecmp(line, "SetEnv") && value)
+    {
+     /*
+      * SetEnv variable value
+      */
+
+      char *valueptr;			/* Pointer to environment variable value */
+
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (*valueptr)
+      {
+       /*
+        * Found a value...
+	*/
+
+        while (isspace(*valueptr & 255))
+	  *valueptr++ = '\0';
+
+        for (i = 0; i < (int)(sizeof(prohibited_env) / sizeof(prohibited_env[0])); i ++)
+        {
+          if (!strcmp(value, prohibited_env[i]))
+          {
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "Environment variable \"%s\" cannot be set  on line %d of %s.", value, linenum, CupsFilesFile);
+
+	    if (FatalErrors & CUPSD_FATAL_CONFIG)
+	      return (0);
+	    else
+	      break;
+          }
+	}
+
+        if (i >= (int)(sizeof(prohibited_env) / sizeof(prohibited_env[0])))
+	  cupsdSetEnv(value, valueptr);
+      }
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Missing value for SetEnv directive on line %d of %s.",
+	                linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "SystemGroup") && value)
     {
