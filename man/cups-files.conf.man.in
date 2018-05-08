@@ -153,6 +153,11 @@ The server name may be included in filenames using the string "%s", for example:
 
 .fi
 The default is "/var/log/cups/page_log".
+.\"#PassEnv
+.TP 5
+\fBPassEnv \fIvariable \fR[ ... \fIvariable \fR]
+Passes the specified environment variable(s) to child processes.
+Note: the standard CUPS filter and backend environment variables cannot be overridden using this directive.
 .\"#RemoteRoot
 .TP 5
 \fBRemoteRoot \fIusername\fR
@@ -187,6 +192,11 @@ macOS uses its keychain database to store certificates and keys while other plat
 \fBServerRoot \fIdirectory\fR
 Specifies the directory containing the server configuration files.
 The default is "/etc/cups".
+.\"#SetEnv
+.TP 5
+\fBSetEnv \fIvariable value\fR
+Set the specified environment variable to be passed to child processes.
+Note: the standard CUPS filter and backend environment variables cannot be overridden using this directive.
 .\"#StateDir
 .TP 5
 \fBStateDir \fIdirectory\fR
