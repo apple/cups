@@ -18,6 +18,8 @@ Changes in CUPS v2.3b5
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
+- The scheduler did not validate notify-recipient-uri values properly
+  (rdar://40068936)
 - The IPP parser allowed invalid group tags (rdar://40442124)
 - Fixed a parsing bug in the new authentication code.
 
