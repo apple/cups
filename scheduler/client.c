@@ -2105,14 +2105,16 @@ cupsdSendHeader(
     auth_str[0] = '\0';
 
     if (auth_type == CUPSD_AUTH_BASIC)
+    {
       strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
+    }
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
     {
-#ifdef AF_LOCAL
+#if defined(SO_PEERCRED) && defined(AF_LOCAL)
       if (httpAddrFamily(httpGetAddress(con->http)) == AF_LOCAL)
-        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
+	strlcpy(auth_str, "PeerCred", sizeof(auth_str));
       else
-#endif /* AF_LOCAL */
+#endif /* SO_PEERCRED && AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
     }
 
