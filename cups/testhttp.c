@@ -1,10 +1,11 @@
 /*
  * HTTP test program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -174,6 +175,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad resource */
+			  { HTTP_URI_STATUS_BAD_RESOURCE, "mailto:\r\nbla",
+			    "mailto", "", "", "", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_RESOURCE, "http://server/index.html%",
 			    "http", "", "server", "", 80, 0,
 			    HTTP_URI_CODING_MOST  },

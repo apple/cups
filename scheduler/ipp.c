@@ -5848,7 +5848,26 @@ create_subscriptions(
     }
 
     if (recipient)
+    {
       cupsdLogMessage(CUPSD_LOG_DEBUG, "recipient=\"%s\"", recipient);
+
+
+      if (!strncmp(recipient, "mailto:", 7) && user_data)
+      {
+        char	temp[64];		/* Temporary string */
+
+	memcpy(temp, user_data->values[0].unknown.data, user_data->values[0].unknown.length);
+	temp[user_data->values[0].unknown.length] = '\0';
+
+	if (httpSeparateURI(HTTP_URI_CODING_ALL, temp, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_OK)
+	{
+	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad notify-user-data \"%s\"."), temp);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM, "notify-status-code", IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES);
+	  return;
+	}
+      }
+    }
+
     if (pullmethod)
       cupsdLogMessage(CUPSD_LOG_DEBUG, "pullmethod=\"%s\"", pullmethod);
     cupsdLogMessage(CUPSD_LOG_DEBUG, "notify-lease-duration=%d", lease);
@@ -7959,13 +7978,16 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   * Hold the job and return...
   */
 
-  if ((attr = ippFindAttribute(con->request, "job-hold-until",
-			       IPP_TAG_KEYWORD)) == NULL)
-    attr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
-
-  if (attr)
+  if ((attr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_ZERO)) != NULL)
   {
-    when = attr->values[0].string.text;
+    if ((ippGetValueTag(attr) != IPP_TAG_KEYWORD && ippGetValueTag(attr) != IPP_TAG_NAME && ippGetValueTag(attr) != IPP_TAG_NAMELANG) || ippGetCount(attr) != 1 || !ippValidateAttribute(attr))
+    {
+      send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Unsupported 'job-hold-until' value."));
+      ippCopyAttribute(con->response, attr, 0);
+      return;
+    }
+
+    when = ippGetString(attr, 0, NULL);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
 		  "Job job-hold-until value changed by user.");
@@ -10329,7 +10351,39 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       continue;
     }
 
-    if (!strcmp(attr->name, "job-priority"))
+    if (!ippValidateAttribute(attr))
+    {
+      send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Bad '%s' value."), attr->name);
+      ippCopyAttribute(con->response, attr, 0);
+      return;
+    }
+
+    if (!strcmp(attr->name, "job-hold-until"))
+    {
+      const char *when = ippGetString(attr, 0, NULL);
+					/* job-hold-until value */
+
+      if ((ippGetValueTag(attr) != IPP_TAG_KEYWORD && ippGetValueTag(attr) != IPP_TAG_NAME && ippGetValueTag(attr) != IPP_TAG_NAMELANG) || ippGetCount(attr) != 1)
+      {
+	send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Unsupported 'job-hold-until' value."));
+	ippCopyAttribute(con->response, attr, 0);
+	return;
+      }
+
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-hold-until to %s", when);
+      cupsdSetJobHoldUntil(job, when, 0);
+
+      if (!strcmp(when, "no-hold"))
+      {
+	cupsdReleaseJob(job);
+	check_jobs = 1;
+      }
+      else
+	cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT, "Job held by \"%s\".", username);
+
+      event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
+    }
+    else if (!strcmp(attr->name, "job-priority"))
     {
      /*
       * Change the job priority...
@@ -10449,28 +10503,6 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       ippCopyAttribute(job->attrs, attr, 0);
-
-     /*
-      * See if the job-name or job-hold-until is being changed.
-      */
-
-      if (!strcmp(attr->name, "job-hold-until"))
-      {
-        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-hold-until to %s",
-		    attr->values[0].string.text);
-        cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
-
-	if (!strcmp(attr->values[0].string.text, "no-hold"))
-	{
-	  cupsdReleaseJob(job);
-          check_jobs = 1;
-	}
-	else
-	  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT,
-	                   "Job held by \"%s\".", username);
-
-        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
-      }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
     {
@@ -11289,80 +11321,34 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
+  * Is the job-hold-until value valid?
+  */
+
+  if ((attr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_ZERO)) != NULL && ((ippGetValueTag(attr) != IPP_TAG_KEYWORD && ippGetValueTag(attr) != IPP_TAG_NAME && ippGetValueTag(attr) != IPP_TAG_NAMELANG) || ippGetCount(attr) != 1 || !ippValidateAttribute(attr)))
+  {
+    send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Unsupported 'job-hold-until' value."));
+    ippCopyAttribute(con->response, attr, 0);
+    return;
+  }
+
+ /*
   * Is the job-name valid?
   */
 
   if ((name = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) != NULL)
   {
-    int bad_name = 0;			/* Is the job-name value bad? */
-
     if ((name->value_tag != IPP_TAG_NAME && name->value_tag != IPP_TAG_NAMELANG) ||
-        name->num_values != 1)
-    {
-      bad_name = 1;
-    }
-    else
-    {
-     /*
-      * Validate that job-name conforms to RFC 5198 (Network Unicode) and
-      * IPP Everywhere requirements for "name" values...
-      */
-
-      const unsigned char *nameptr;	/* Pointer into "job-name" attribute */
-
-      for (nameptr = (unsigned char *)name->values[0].string.text;
-           *nameptr;
-           nameptr ++)
-      {
-        if (*nameptr < ' ' && *nameptr != '\t')
-          break;
-        else if (*nameptr == 0x7f)
-          break;
-        else if ((*nameptr & 0xe0) == 0xc0)
-        {
-          if ((nameptr[1] & 0xc0) != 0x80)
-            break;
-
-          nameptr ++;
-        }
-        else if ((*nameptr & 0xf0) == 0xe0)
-        {
-          if ((nameptr[1] & 0xc0) != 0x80 ||
-              (nameptr[2] & 0xc0) != 0x80)
-	    break;
-
-	  nameptr += 2;
-	}
-        else if ((*nameptr & 0xf8) == 0xf0)
-        {
-          if ((nameptr[1] & 0xc0) != 0x80 ||
-	      (nameptr[2] & 0xc0) != 0x80 ||
-	      (nameptr[3] & 0xc0) != 0x80)
-	    break;
-
-	  nameptr += 3;
-	}
-        else if (*nameptr & 0x80)
-          break;
-      }
-
-      if (*nameptr)
-        bad_name = 1;
-    }
-
-    if (bad_name)
+        name->num_values != 1 || !ippValidateAttribute(name))
     {
       if (StrictConformance)
       {
-	send_ipp_status(con, IPP_ATTRIBUTES,
-	                _("Unsupported 'job-name' value."));
+	send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Unsupported 'job-name' value."));
 	ippCopyAttribute(con->response, name, 0);
 	return;
       }
       else
       {
-        cupsdLogMessage(CUPSD_LOG_WARN,
-                        "Unsupported 'job-name' value, deleting from request.");
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unsupported 'job-name' value, deleting from request.");
         ippDeleteAttribute(con->request, name);
       }
     }
