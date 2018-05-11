@@ -1,8 +1,8 @@
 /*
  * "mailto" notifier for CUPS.
  *
- * Copyright 2007-2011 by Apple Inc.
- * Copyright 1997-2005 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -36,8 +36,7 @@ char	mailtoSendmail[1024];		/* Sendmail program to use */
  * Local functions...
  */
 
-void		email_message(const char *to, const char *subject,
-		              const char *text);
+void		email_message(const char *to, const char *subject, const char *text);
 int		load_configuration(void);
 cups_file_t	*pipe_sendmail(const char *to);
 void		print_attributes(ipp_t *ipp, int indent);
@@ -233,7 +232,9 @@ email_message(const char *to,		/* I - Recipient of message */
 
 
     if (strchr(mailtoSMTPServer, ':'))
+    {
       fp = cupsFileOpen(mailtoSMTPServer, "s");
+    }
     else
     {
       char	spec[1024];		/* Host:service spec */
@@ -251,6 +252,10 @@ email_message(const char *to,		/* I - Recipient of message */
     }
 
     fprintf(stderr, "DEBUG: Connected to \"%s\"...\n", mailtoSMTPServer);
+
+    if (!cupsFileGets(fp, response, sizeof(response)) || atoi(response) >= 500)
+      goto smtp_error;
+    fprintf(stderr, "DEBUG: <<< %s\n", response);
 
     cupsFilePrintf(fp, "HELO %s\r\n",
                    httpGetHostname(NULL, hostbuf, sizeof(hostbuf)));
