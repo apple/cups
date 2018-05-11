@@ -1,10 +1,11 @@
 /*
  * "mailto" notifier for CUPS.
  *
- * Copyright 2007-2011 by Apple Inc.
- * Copyright 1997-2005 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -32,8 +33,7 @@ char	mailtoSendmail[1024];		/* Sendmail program to use */
  * Local functions...
  */
 
-void		email_message(const char *to, const char *subject,
-		              const char *text);
+void		email_message(const char *to, const char *subject, const char *text);
 int		load_configuration(void);
 cups_file_t	*pipe_sendmail(const char *to);
 void		print_attributes(ipp_t *ipp, int indent);
@@ -229,7 +229,9 @@ email_message(const char *to,		/* I - Recipient of message */
 
 
     if (strchr(mailtoSMTPServer, ':'))
+    {
       fp = cupsFileOpen(mailtoSMTPServer, "s");
+    }
     else
     {
       char	spec[1024];		/* Host:service spec */
