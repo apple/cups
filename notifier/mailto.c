@@ -248,6 +248,10 @@ email_message(const char *to,		/* I - Recipient of message */
 
     fprintf(stderr, "DEBUG: Connected to \"%s\"...\n", mailtoSMTPServer);
 
+    if (!cupsFileGets(fp, response, sizeof(response)) || atoi(response) >= 500)
+      goto smtp_error;
+    fprintf(stderr, "DEBUG: <<< %s\n", response);
+
     cupsFilePrintf(fp, "HELO %s\r\n",
                    httpGetHostname(NULL, hostbuf, sizeof(hostbuf)));
     fprintf(stderr, "DEBUG: >>> HELO %s\n", hostbuf);
