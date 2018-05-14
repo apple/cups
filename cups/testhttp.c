@@ -143,6 +143,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad scheme */
+			  { HTTP_URI_STATUS_BAD_SCHEME, "://server/ipp",
+			    "", "", "", "", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_SCHEME, "bad_scheme://server/resource",
 			    "", "", "", "", 0, 0,
 			    HTTP_URI_CODING_MOST  },
