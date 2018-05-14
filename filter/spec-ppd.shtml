@@ -1632,7 +1632,7 @@ PPD file extensions was used. Currently it must be the string
 
 <h2 class='title'><a name='MACOSX'>macOS Attributes</a></h2>
 
-<h3><span class='info'>macOS 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+<h3><span class='info'>Deprecated</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
 
@@ -1644,9 +1644,9 @@ plug-ins.</p>
 
 <blockquote><b>Note:</b>
 
-<p>Starting with macOS 10.5, each plug-in must be compiled "4-way fat"
-(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
-in order to be usable with all applications.</p>
+<p>Starting with macOS 10.12, system level security features prevent print
+dialog plug-ins from being loaded into applications that have enabled the
+library validation security feature.</p>
 
 </blockquote>
 

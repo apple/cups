@@ -475,6 +475,8 @@ h3.title {
           <li><a href="#ipp_pstate_t">ipp_pstate_t</a></li>
           <li><a href="#ipp_quality_t">ipp_quality_t</a></li>
           <li><a href="#ipp_res_t">ipp_res_t</a></li>
+          <li><a href="#ipp_rstate_t">ipp_rstate_t</a></li>
+          <li><a href="#ipp_sstate_t">ipp_sstate_t</a></li>
           <li><a href="#ipp_state_t">ipp_state_t</a></li>
           <li><a href="#ipp_t">ipp_t</a></li>
         </ul></li>
@@ -502,6 +504,8 @@ h3.title {
           <li><a href="#ipp_pstate_e">ipp_pstate_e</a></li>
           <li><a href="#ipp_quality_e">ipp_quality_e</a></li>
           <li><a href="#ipp_res_e">ipp_res_e</a></li>
+          <li><a href="#ipp_rstate_e">ipp_rstate_e</a></li>
+          <li><a href="#ipp_sstate_e">ipp_sstate_e</a></li>
           <li><a href="#ipp_state_e">ipp_state_e</a></li>
           <li><a href="#ipp_status_e">ipp_status_e</a></li>
           <li><a href="#ipp_tag_e">ipp_tag_e</a></li>
@@ -5937,6 +5941,16 @@ typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
       <p class="code">
 typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 </p>
+      <h3 class="typedef"><a id="ipp_rstate_t">ipp_rstate_t</a></h3>
+        <p class="description">resource-state values</p>
+      <p class="code">
+typedef enum <a href="#ipp_rstate_e">ipp_rstate_e</a> ipp_rstate_t;
+</p>
+      <h3 class="typedef"><a id="ipp_sstate_t">ipp_sstate_t</a></h3>
+        <p class="description">system-state values</p>
+      <p class="code">
+typedef enum <a href="#ipp_sstate_e">ipp_sstate_e</a> ipp_sstate_t;
+</p>
       <h3 class="typedef"><a id="ipp_state_t">ipp_state_t</a></h3>
         <p class="description">ipp_t state values</p>
       <p class="code">
@@ -6445,6 +6459,24 @@ are server-oriented...</p>
       <table class="list"><tbody>
         <tr><th>IPP_RES_PER_CM </th>        <td class="description">Pixels per centimeter</td></tr>
         <tr><th>IPP_RES_PER_INCH </th>        <td class="description">Pixels per inch</td></tr>
+</tbody></table>
+      <h3 class="enumeration"><a id="ipp_rstate_e">ipp_rstate_e</a></h3>
+        <p class="description">resource-state values</p>
+      <h4 class="constants">Constants</h4>
+      <table class="list"><tbody>
+        <tr><th>IPP_RSTATE_ABORTED </th>        <td class="description">Resource has been aborted and is pending deletion.</td></tr>
+        <tr><th>IPP_RSTATE_AVAILABLE </th>        <td class="description">Resource is available for installation.</td></tr>
+        <tr><th>IPP_RSTATE_CANCELED </th>        <td class="description">Resource has been canceled and is pending deletion.</td></tr>
+        <tr><th>IPP_RSTATE_INSTALLED </th>        <td class="description">Resource is installed.</td></tr>
+        <tr><th>IPP_RSTATE_PENDING </th>        <td class="description">Resource is created but has no data yet.</td></tr>
+</tbody></table>
+      <h3 class="enumeration"><a id="ipp_sstate_e">ipp_sstate_e</a></h3>
+        <p class="description">system-state values</p>
+      <h4 class="constants">Constants</h4>
+      <table class="list"><tbody>
+        <tr><th>IPP_SSTATE_IDLE </th>        <td class="description">At least one printer is idle and none are processing a job.</td></tr>
+        <tr><th>IPP_SSTATE_PROCESSING </th>        <td class="description">At least one printer is processing a job.</td></tr>
+        <tr><th>IPP_SSTATE_STOPPED </th>        <td class="description">All printers are stopped.</td></tr>
 </tbody></table>
       <h3 class="enumeration"><a id="ipp_state_e">ipp_state_e</a></h3>
         <p class="description">ipp_t state values</p>

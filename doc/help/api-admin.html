@@ -657,7 +657,7 @@ int cupsAdminSetServerSettings(http_t *http, int num_settings, cups_option_t *se
 </tbody></table>
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsGetDevices">cupsGetDevices</a></h3>
+<h3 class="function"><span class="info">&#160;DEPRECATED&#160;</span><a id="cupsGetDevices">cupsGetDevices</a></h3>
         <p class="description">Get available printer devices.</p>
 <p class="code">
 ipp_status_t cupsGetDevices(http_t *http, int timeout, const char *include_schemes, const char *exclude_schemes, <a href="#cups_device_cb_t">cups_device_cb_t</a> callback, void *user_data);</p>
@@ -683,7 +683,10 @@ ipp_status_t cupsGetDevices(http_t *http, int timeout, const char *include_schem
 devices to the specified callback function. The &quot;timeout&quot; parameter controls
 how long the request lasts, while the &quot;include_schemes&quot; and &quot;exclude_schemes&quot;
 parameters provide comma-delimited lists of backends to include or omit from
-the request respectively.
+the request respectively.<br>
+<br>
+This function is deprecated with the IPP printer discovery functionality
+being provided by the <a href="#cupsEnumDests"><code>cupsEnumDests</code></a> and @cupsGetDests@ functions.
 
 </p>
       <h2 class="title"><a id="TYPES">Data Types</a></h2>

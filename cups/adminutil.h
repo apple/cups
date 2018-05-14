@@ -77,7 +77,7 @@ extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
 			               const char *include_schemes,
 			               const char *exclude_schemes,
 				       cups_device_cb_t callback,
-				       void *user_data) _CUPS_API_1_4;
+				       void *user_data) _CUPS_DEPRECATED;
 
 
 #  ifdef __cplusplus
