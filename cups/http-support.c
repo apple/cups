@@ -1,7 +1,7 @@
 /*
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1032,7 +1032,7 @@ httpSeparateURI(
 
     *ptr = '\0';
 
-    if (*uri != ':')
+    if (*uri != ':' || *scheme == '.' || !*scheme)
     {
       *scheme = '\0';
       return (HTTP_URI_STATUS_BAD_SCHEME);
