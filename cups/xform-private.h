@@ -90,7 +90,7 @@ typedef struct xform_capabilities_s	/**** Output Capabilities ****/
 		normal_resolution[2],	/* Normal resolution */
 		high_resolution[2];	/* High/best/photo resolution */
   xform_duplex_t duplex;		/* 2-sided capabilities */
-  xform_margins_t margins,		/* Default margins */
+  xform_margins_t margins;		/* Default margins */
   xform_size_t	size;			/* Default size */
   xform_margins_t max_margins;		/* Maximum margins */
   xform_size_t	max_size;		/* Maximum size */

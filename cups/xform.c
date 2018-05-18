@@ -13,8 +13,9 @@
 
 #include "xform-private.h"
 #include "xform-dither.h"
-#include <cups/ppd-private.h>
-#include "config.h"
+#include "ppd-private.h"
+#include "string-private.h"
+
 #ifdef __APPLE__
 #  include <CoreGraphics/CoreGraphics.h>
 extern void CGContextSetCTM(CGContextRef c, CGAffineTransform m);
@@ -41,15 +42,6 @@ static inline fz_matrix fz_make_matrix(float a, float b, float c, float d, float
 #  define XFORM_BG_MASK		(XFORM_BLUE_MASK | XFORM_GREEN_MASK)
 #  define XFORM_RG_MASK		(XFORM_RED_MASK | XFORM_GREEN_MASK)
 
-typedef enum _xform_format_e		/**** Transform Destination Format ****/
-{
-  _XFORM_FORMAT_PDF,			/* PDF output */
-  _XFORM_FORMAT_APPLE_RASTER,		/* Apple Raster output */
-  _XFORM_FORMAT_PWG_RASTER,		/* PWG Raster output */
-  _XFORM_FORMAT_PCL,			/* PCL output */
-  _XFORM_FORMAT_POSTSCRIPT		/* PostScript output */
-} _xform_format_t;
-
 
 /*
  * Types...
@@ -57,8 +49,13 @@ typedef enum _xform_format_e		/**** Transform Destination Format ****/
 
 struct _xform_ctx_s
 {
-  _xform_format_t	format;		/* Output format (TODO: Need this?) */
+  char			*format;	/* Output format */
   xform_capabilities_t	capabilities;	/* Output capabilities */
+  xform_logcb_t		logcb;		/* Logging callback */
+  void			*logdata;	/* User data for logging callback */
+  xform_writecb_t	writecb;	/* Write callback */
+  void			*writedata;	/* User data for write callback */
+
   int			num_options;	/* Number of job options */
   cups_option_t		*options;	/* Job options */
   unsigned		copies;		/* Number of copies */
@@ -95,8 +92,8 @@ struct _xform_ctx_s
  * Local functions...
  */
 
-static void	default_log_cb(void *user_data, int debug, const char *message);
-static void	default_write_cb(void *user_data, const unsigned char *buffer, size_t length);
+static void	default_log_cb(void *user_data, xform_loglevel_t debug, const char *message);
+static ssize_t	default_write_cb(void *user_data, const unsigned char *buffer, size_t length);
 
 #ifdef HAVE_MUPDF
 static void	pack_graya(unsigned char *row, size_t num_pixels);
@@ -107,7 +104,7 @@ static void	pack_rgba_to_gray(unsigned char *row, size_t num_pixels);
 static void	pcl_end_job(xform_ctx_t *ctx);
 static void	pcl_end_page(xform_ctx_t *ctx, unsigned page);
 static void	pcl_init(xform_ctx_t *ctx);
-static void	pcl_printf(ctx, const char *format, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	pcl_printf(xform_ctx_t *ctx, const char *format, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static void	pcl_start_job(xform_ctx_t *ctx);
 static void	pcl_start_page(xform_ctx_t *ctx, unsigned page);
 static void	pcl_write_line(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
@@ -123,6 +120,7 @@ static void	png_end_page(xform_ctx_t *ctx, unsigned page);
 static void	png_init(xform_ctx_t *ctx);
 static void	png_start_job(xform_ctx_t *ctx);
 static void	png_start_page(xform_ctx_t *ctx, unsigned page);
+static void	png_write_line(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
 
 static void	ps_end_job(xform_ctx_t *ctx);
 static void	ps_end_page(xform_ctx_t *ctx, unsigned page);
@@ -139,7 +137,7 @@ static void	raster_write_line(xform_ctx_t *ctx, unsigned y, const unsigned char 
 
 static void	xform_log(xform_ctx_t *ctx, xform_loglevel_t level, const char *message, ...);
 
-static int	xform_document(const char *filename, const char *informat, const char *outformat, const char *resolutions, const char *sheet_back, const char *types, int num_options, cups_option_t *options, _xform_write_cb_t cb, void *ctx);
+static int	xform_document(const char *filename, const char *informat, const char *outformat, const char *resolutions, const char *sheet_back, const char *types, int num_options, cups_option_t *options, xform_writecb_t cb, void *ctx);
 static int	xform_setup(xform_ctx_t *ras, const char *outformat, const char *resolutions, const char *types, const char *sheet_back, int color, unsigned pages, int num_options, cups_option_t *options);
 
 
@@ -152,6 +150,7 @@ static int	xform_setup(xform_ctx_t *ras, const char *outformat, const char *reso
 void
 xformDelete(xform_ctx_t *ctx)		/* I - Transform context */
 {
+  free(ctx->format);
   cupsFreeOptions(ctx->num_options, ctx->options);
   free(ctx);
 }
@@ -171,12 +170,13 @@ xformNew(
 
   if ((ctx = (xform_ctx_t *)calloc(1, sizeof(xform_ctx_t))) != NULL)
   {
-    ctx->capabilities = *capabilities;
+    ctx->format       = strdup(outformat);
+    ctx->capabilities = *outcaps;
     xformSetLogCallback(ctx, NULL, NULL);
     xformSetWriteCallback(ctx, NULL, NULL);
 
     if (!_cups_strcasecmp(outformat, XFORM_FORMAT_APPLE_RASTER) || !_cups_strcasecmp(outformat, XFORM_FORMAT_PWG_RASTER))
-      ras_init(ctx);
+      raster_init(ctx);
     else if (!_cups_strcasecmp(outformat, XFORM_FORMAT_PCL))
       pcl_init(ctx);
     else if (!_cups_strcasecmp(outformat, XFORM_FORMAT_PDF))
@@ -205,6 +205,7 @@ xformRun(xform_ctx_t *ctx,		/* I - Transform context */
          const char  *infile,		/* I - Input filename or `NULL` for `stdin` */
          const char  *informat)		/* I - Input MIME media type */
 {
+  return (0);
 }
 
 
@@ -265,15 +266,15 @@ xformSetWriteCallback(
     xform_writecb_t writecb,		/* I - Write callback */
     void            *writedata)		/* I - User data pointer for callback */
 {
-  if (logcb)
+  if (writecb)
   {
-    ctx->logcb   = logcb;
-    ctx->logdata = logdata;
+    ctx->writecb   = writecb;
+    ctx->writedata = writedata;
   }
   else
   {
-    ctx->logcb   = default_log_cb;
-    ctx->logdata = NULL;
+    ctx->writecb   = default_write_cb;
+    ctx->writedata = NULL;
   }
 }
 
@@ -419,17 +420,13 @@ pack_rgba_to_gray(
  */
 
 static void
-pcl_end_job(xform_ctx_t   *ras,	/* I - Raster information */
-            _xform_write_cb_t cb,	/* I - Write callback */
-            void             *ctx)	/* I - Write context */
+pcl_end_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
-  (void)ras;
-
  /*
   * Send a PCL reset sequence.
   */
 
-  (*cb)(ctx, (const unsigned char *)"\033E", 2);
+  (*ctx->writecb)(ctx->writedata, (const unsigned char *)"\033E", 2);
 }
 
 
@@ -438,30 +435,28 @@ pcl_end_job(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-pcl_end_page(xform_ctx_t   *ras,	/* I - Raster information */
-	     unsigned         page,	/* I - Current page */
-             _xform_write_cb_t cb,	/* I - Write callback */
-             void             *ctx)	/* I - Write context */
+pcl_end_page(xform_ctx_t *ctx,		/* I - Transform context */
+	     unsigned    page)		/* I - Current page */
 {
  /*
   * End graphics...
   */
 
-  (*cb)(ctx, (const unsigned char *)"\033*r0B", 5);
+  (*ctx->writecb)(ctx->writedata, (const unsigned char *)"\033*r0B", 5);
 
  /*
   * Formfeed as needed...
   */
 
-  if (!(ras->header.Duplex && (page & 1)))
-    (*cb)(ctx, (const unsigned char *)"\014", 1);
+  if (!(ctx->header.Duplex && (page & 1)))
+    (*ctx->writecb)(ctx->writedata, (const unsigned char *)"\014", 1);
 
  /*
   * Free the output buffer...
   */
 
-  free(ras->out_buffer);
-  ras->out_buffer = NULL;
+  free(ctx->out_buffer);
+  ctx->out_buffer = NULL;
 }
 
 
@@ -470,13 +465,13 @@ pcl_end_page(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-pcl_init(xform_ctx_t *ras)		/* I - Raster information */
+pcl_init(xform_ctx_t *ctx)		/* I - Transform context */
 {
-  ras->end_job    = pcl_end_job;
-  ras->end_page   = pcl_end_page;
-  ras->start_job  = pcl_start_job;
-  ras->start_page = pcl_start_page;
-  ras->write_line = pcl_write_line;
+  ctx->end_job    = pcl_end_job;
+  ctx->end_page   = pcl_end_page;
+  ctx->start_job  = pcl_start_job;
+  ctx->start_page = pcl_start_page;
+  ctx->write_line = pcl_write_line;
 }
 
 
@@ -485,9 +480,8 @@ pcl_init(xform_ctx_t *ras)		/* I - Raster information */
  */
 
 static void
-pcl_printf(_xform_write_cb_t cb,		/* I - Write callback */
-           void             *ctx,	/* I - Write context */
-	   const char       *format,	/* I - Printf-style format string */
+pcl_printf(xform_ctx_t *ctx,		/* I - Transform context */
+	   const char  *format,		/* I - Printf-style format string */
 	   ...)				/* I - Additional arguments as needed */
 {
   va_list	ap;			/* Argument pointer */
@@ -498,7 +492,7 @@ pcl_printf(_xform_write_cb_t cb,		/* I - Write callback */
   vsnprintf(buffer, sizeof(buffer), format, ap);
   va_end(ap);
 
-  (*cb)(ctx, (const unsigned char *)buffer, strlen(buffer));
+  (*ctx->writecb)(ctx->writedata, (const unsigned char *)buffer, strlen(buffer));
 }
 
 
@@ -507,17 +501,13 @@ pcl_printf(_xform_write_cb_t cb,		/* I - Write callback */
  */
 
 static void
-pcl_start_job(xform_ctx_t   *ras,	/* I - Raster information */
-              _xform_write_cb_t cb,	/* I - Write callback */
-              void             *ctx)	/* I - Write context */
+pcl_start_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
-  (void)ras;
-
  /*
   * Send a PCL reset sequence.
   */
 
-  (*cb)(ctx, (const unsigned char *)"\033E", 2);
+  (*ctx->writecb)(ctx->writedata, (const unsigned char *)"\033E", 2);
 }
 
 
@@ -526,10 +516,8 @@ pcl_start_job(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-pcl_start_page(xform_ctx_t   *ras,	/* I - Raster information */
-               unsigned         page,	/* I - Current page */
-               _xform_write_cb_t cb,	/* I - Write callback */
-               void             *ctx)	/* I - Write context */
+pcl_start_page(xform_ctx_t *ras,	/* I - Raster information */
+               unsigned    page)	/* I - Current page */
 {
  /*
   * Setup margins to be 1/6" top and bottom and 1/4" or .135" on the
@@ -558,58 +546,58 @@ pcl_start_page(xform_ctx_t   *ras,	/* I - Raster information */
     * Set the media size...
     */
 
-    pcl_printf(cb, ctx, "\033&l12D\033&k12H");
+    pcl_printf(ras, "\033&l12D\033&k12H");
 					/* Set 12 LPI, 10 CPI */
-    pcl_printf(cb, ctx, "\033&l0O");	/* Set portrait orientation */
+    pcl_printf(ras, "\033&l0O");	/* Set portrait orientation */
 
     switch (ras->header.PageSize[1])
     {
       case 540 : /* Monarch Envelope */
-          pcl_printf(cb, ctx, "\033&l80A");
+          pcl_printf(ras, "\033&l80A");
 	  break;
 
       case 595 : /* A5 */
-          pcl_printf(cb, ctx, "\033&l25A");
+          pcl_printf(ras, "\033&l25A");
 	  break;
 
       case 624 : /* DL Envelope */
-          pcl_printf(cb, ctx, "\033&l90A");
+          pcl_printf(ras, "\033&l90A");
 	  break;
 
       case 649 : /* C5 Envelope */
-          pcl_printf(cb, ctx, "\033&l91A");
+          pcl_printf(ras, "\033&l91A");
 	  break;
 
       case 684 : /* COM-10 Envelope */
-          pcl_printf(cb, ctx, "\033&l81A");
+          pcl_printf(ras, "\033&l81A");
 	  break;
 
       case 709 : /* B5 Envelope */
-          pcl_printf(cb, ctx, "\033&l100A");
+          pcl_printf(ras, "\033&l100A");
 	  break;
 
       case 756 : /* Executive */
-          pcl_printf(cb, ctx, "\033&l1A");
+          pcl_printf(ras, "\033&l1A");
 	  break;
 
       case 792 : /* Letter */
-          pcl_printf(cb, ctx, "\033&l2A");
+          pcl_printf(ras, "\033&l2A");
 	  break;
 
       case 842 : /* A4 */
-          pcl_printf(cb, ctx, "\033&l26A");
+          pcl_printf(ras, "\033&l26A");
 	  break;
 
       case 1008 : /* Legal */
-          pcl_printf(cb, ctx, "\033&l3A");
+          pcl_printf(ras, "\033&l3A");
 	  break;
 
       case 1191 : /* A3 */
-          pcl_printf(cb, ctx, "\033&l27A");
+          pcl_printf(ras, "\033&l27A");
 	  break;
 
       case 1224 : /* Tabloid */
-          pcl_printf(cb, ctx, "\033&l6A");
+          pcl_printf(ras, "\033&l6A");
 	  break;
     }
 
@@ -617,34 +605,34 @@ pcl_start_page(xform_ctx_t   *ras,	/* I - Raster information */
     * Set top margin and turn off perforation skip...
     */
 
-    pcl_printf(cb, ctx, "\033&l%uE\033&l0L", 12 * ras->top / ras->header.HWResolution[1]);
+    pcl_printf(ras, "\033&l%uE\033&l0L", 12 * ras->top / ras->header.HWResolution[1]);
 
     if (ras->header.Duplex)
     {
       int mode = ras->header.Duplex ? 1 + ras->header.Tumble != 0 : 0;
 
-      pcl_printf(cb, ctx, "\033&l%dS", mode);
+      pcl_printf(ras, "\033&l%dS", mode);
 					/* Set duplex mode */
     }
   }
   else if (ras->header.Duplex)
-    pcl_printf(cb, ctx, "\033&a2G");	/* Print on back side */
+    pcl_printf(ras, "\033&a2G");	/* Print on back side */
 
  /*
   * Set graphics mode...
   */
 
-  pcl_printf(cb, ctx, "\033*t%uR", ras->header.HWResolution[0]);
+  pcl_printf(ras, "\033*t%uR", ras->header.HWResolution[0]);
 					/* Set resolution */
-  pcl_printf(cb, ctx, "\033*r%uS", ras->right - ras->left + 1);
+  pcl_printf(ras, "\033*r%uS", ras->right - ras->left + 1);
 					/* Set width */
-  pcl_printf(cb, ctx, "\033*r%uT", ras->bottom - ras->top + 1);
+  pcl_printf(ras, "\033*r%uT", ras->bottom - ras->top + 1);
 					/* Set height */
-  pcl_printf(cb, ctx, "\033&a0H\033&a%uV", 720 * ras->top / ras->header.HWResolution[1]);
+  pcl_printf(ras, "\033&a0H\033&a%uV", 720 * ras->top / ras->header.HWResolution[1]);
 					/* Set position */
 
-  pcl_printf(cb, ctx, "\033*b2M");	/* Use PackBits compression */
-  pcl_printf(cb, ctx, "\033*r1A");	/* Start graphics */
+  pcl_printf(ras, "\033*b2M");	/* Use PackBits compression */
+  pcl_printf(ras, "\033*r1A");	/* Start graphics */
 
  /*
   * Allocate the output buffer...
@@ -663,11 +651,9 @@ pcl_start_page(xform_ctx_t   *ras,	/* I - Raster information */
 
 static void
 pcl_write_line(
-    xform_ctx_t      *ras,		/* I - Raster information */
+    xform_ctx_t         *ctx,		/* I - Transform context */
     unsigned            y,		/* I - Line number */
-    const unsigned char *line,		/* I - Pixels on line */
-    _xform_write_cb_t    cb,		/* I - Write callback */
-    void                *ctx)		/* I - Write context */
+    const unsigned char *line)		/* I - Pixels on line */
 {
   unsigned	x;			/* Column number */
   unsigned char	bit,			/* Current bit */
@@ -679,13 +665,13 @@ pcl_write_line(
   unsigned	count;			/* Count of bytes for output */
 
 
-  if (line[0] == 255 && !memcmp(line, line + 1, ras->right - ras->left))
+  if (line[0] == 255 && !memcmp(line, line + 1, ctx->right - ctx->left))
   {
    /*
     * Skip blank line...
     */
 
-    ras->out_blanks ++;
+    ctx->out_blanks ++;
     return;
   }
 
@@ -695,7 +681,7 @@ pcl_write_line(
 
   y &= 63;
 
-  for (x = ras->left, bit = 128, byte = 0, outptr = ras->out_buffer; x <= ras->right; x ++, line ++)
+  for (x = ctx->left, bit = 128, byte = 0, outptr = ctx->out_buffer; x <= ctx->right; x ++, line ++)
   {
     if (*line <= threshold[x & 63][y])
       byte |= bit;
@@ -717,9 +703,9 @@ pcl_write_line(
   * Apply compression...
   */
 
-  compptr = ras->comp_buffer;
+  compptr = ctx->comp_buffer;
   outend  = outptr;
-  outptr  = ras->out_buffer;
+  outptr  = ctx->out_buffer;
 
   while (outptr < outend)
   {
@@ -781,18 +767,18 @@ pcl_write_line(
   * Output the line...
   */
 
-  if (ras->out_blanks > 0)
+  if (ctx->out_blanks > 0)
   {
    /*
     * Skip blank lines first...
     */
 
-    pcl_printf(cb, ctx, "\033*b%dY", ras->out_blanks);
-    ras->out_blanks = 0;
+    pcl_printf(ctx, "\033*b%dY", ctx->out_blanks);
+    ctx->out_blanks = 0;
   }
 
-  pcl_printf(cb, ctx, "\033*b%dW", (int)(compptr - ras->comp_buffer));
-  (*cb)(ctx, ras->comp_buffer, (size_t)(compptr - ras->comp_buffer));
+  pcl_printf(ctx, "\033*b%dW", (int)(compptr - ctx->comp_buffer));
+  (*ctx->writecb)(ctx->writedata, ctx->comp_buffer, (size_t)(compptr - ctx->comp_buffer));
 }
 
 
@@ -806,6 +792,10 @@ pdf_end_job(xform_ctx_t *ctx)		/* I - Transform context */
 }
 
 
+/*
+ * 'pdf_end_page()' - End a PDF page.
+ */
+
 static void
 pdf_end_page(xform_ctx_t *ctx,		/* I - Transform context */
              unsigned    page)		/* I - Page number */
@@ -813,17 +803,33 @@ pdf_end_page(xform_ctx_t *ctx,		/* I - Transform context */
 }
 
 
+/*
+ * 'pdf_init()' - Initialize PDF output.
+ */
+
 static void
 pdf_init(xform_ctx_t *ctx)		/* I - Transform context */
 {
+  ctx->end_job    = pdf_end_job;
+  ctx->end_page   = pdf_end_page;
+  ctx->start_job  = pdf_start_job;
+  ctx->start_page = pdf_start_page;
 }
 
+
+/*
+ * 'pdf_start_job()' - Start a PDF "job".
+ */
 
 static void
 pdf_start_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
 }
 
+
+/*
+ * 'pdf_start_page()' - Start a PDF page.
+ */
 
 static void
 pdf_start_page(xform_ctx_t *ctx,	/* I - Transform context */
@@ -832,11 +838,19 @@ pdf_start_page(xform_ctx_t *ctx,	/* I - Transform context */
 }
 
 
+/*
+ * 'png_end_job()' - End a PNG "job".
+ */
+
 static void
 png_end_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
 }
 
+
+/*
+ * 'png_end_page()' - End a PNG page.
+ */
 
 static void
 png_end_page(xform_ctx_t *ctx,		/* I - Transform context */
@@ -845,17 +859,34 @@ png_end_page(xform_ctx_t *ctx,		/* I - Transform context */
 }
 
 
+/*
+ * 'png_init()' - Initialize PNG output.
+ */
+
 static void
 png_init(xform_ctx_t *ctx)		/* I - Transform context */
 {
+  ctx->end_job    = png_end_job;
+  ctx->end_page   = png_end_page;
+  ctx->start_job  = png_start_job;
+  ctx->start_page = png_start_page;
+  ctx->write_line = png_write_line;
 }
 
+
+/*
+ * 'png_start_job()' - Start a PNG "job".
+ */
 
 static void
 png_start_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
 }
 
+
+/*
+ * 'png_start_page()' - Start a PNG page.
+ */
 
 static void
 png_start_page(xform_ctx_t *ctx,	/* I - Transform context */
@@ -864,11 +895,32 @@ png_start_page(xform_ctx_t *ctx,	/* I - Transform context */
 }
 
 
+/*
+ * 'png_write_line()' - Write a line on a page.
+ */
+
+static void
+png_write_line(
+    xform_ctx_t         *ctx,		/* I - Transform context */
+    unsigned            y,		/* I - Line number */
+    const unsigned char *line)		/* I - Pixels */
+{
+}
+
+
+/*
+ * 'ps_end_job()' - End a PostScript "job".
+ */
+
 static void
 ps_end_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
 }
 
+
+/*
+ * 'ps_end_page()' - End a PostScript page.
+ */
 
 static void
 ps_end_page(xform_ctx_t *ctx,		/* I - Transform context */
@@ -877,17 +929,33 @@ ps_end_page(xform_ctx_t *ctx,		/* I - Transform context */
 }
 
 
+/*
+ * 'ps_init()' - Initialize a PostScript output context.
+ */
+
 static void
 ps_init(xform_ctx_t *ctx)		/* I - Transform context */
 {
+  ctx->end_job    = ps_end_job;
+  ctx->end_page   = ps_end_page;
+  ctx->start_job  = ps_start_job;
+  ctx->start_page = ps_start_page;
 }
 
+
+/*
+ * 'ps_start_job()' - Start a PostScript "job".
+ */
 
 static void
 ps_start_job(xform_ctx_t *ctx)		/* I - Transform context */
 {
 }
 
+
+/*
+ * 'ps_start_page()' - Start a PostScript page.
+ */
 
 static void
 ps_start_page(xform_ctx_t *ctx,		/* I - Transform context */
@@ -901,14 +969,9 @@ ps_start_page(xform_ctx_t *ctx,		/* I - Transform context */
  */
 
 static void
-raster_end_job(xform_ctx_t   *ras,	/* I - Raster information */
-	       _xform_write_cb_t cb,	/* I - Write callback */
-	       void             *ctx)	/* I - Write context */
+raster_end_job(xform_ctx_t *ctx)	/* I - Transform context */
 {
-  (void)cb;
-  (void)ctx;
-
-  cupsRasterClose(ras->ras);
+  cupsRasterClose(ctx->ras);
 }
 
 
@@ -917,19 +980,15 @@ raster_end_job(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-raster_end_page(xform_ctx_t   *ras,	/* I - Raster information */
-	        unsigned         page,	/* I - Current page */
-		_xform_write_cb_t cb,	/* I - Write callback */
-		void             *ctx)	/* I - Write context */
+raster_end_page(xform_ctx_t *ctx,	/* I - Transform context */
+	        unsigned    page)	/* I - Current page */
 {
   (void)page;
-  (void)cb;
-  (void)ctx;
 
-  if (ras->header.cupsBitsPerPixel == 1)
+  if (ctx->header.cupsBitsPerPixel == 1)
   {
-    free(ras->out_buffer);
-    ras->out_buffer = NULL;
+    free(ctx->out_buffer);
+    ctx->out_buffer = NULL;
   }
 }
 
@@ -939,13 +998,13 @@ raster_end_page(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-raster_init(xform_ctx_t *ras)	/* I - Raster information */
+raster_init(xform_ctx_t *ctx)		/* I - Transform context */
 {
-  ras->end_job    = raster_end_job;
-  ras->end_page   = raster_end_page;
-  ras->start_job  = raster_start_job;
-  ras->start_page = raster_start_page;
-  ras->write_line = raster_write_line;
+  ctx->end_job    = raster_end_job;
+  ctx->end_page   = raster_end_page;
+  ctx->start_job  = raster_start_job;
+  ctx->start_page = raster_start_page;
+  ctx->write_line = raster_write_line;
 }
 
 
@@ -954,11 +1013,9 @@ raster_init(xform_ctx_t *ras)	/* I - Raster information */
  */
 
 static void
-raster_start_job(xform_ctx_t   *ras,	/* I - Raster information */
-		 _xform_write_cb_t cb,	/* I - Write callback */
-		 void             *ctx)	/* I - Write context */
+raster_start_job(xform_ctx_t *ctx)	/* I - Transform context */
 {
-  ras->ras = cupsRasterOpenIO((cups_raster_iocb_t)cb, ctx, !strcmp(ras->format, "image/pwg-raster") ? CUPS_RASTER_WRITE_PWG : CUPS_RASTER_WRITE_APPLE);
+  ctx->ras = cupsRasterOpenIO((cups_raster_iocb_t)ctx->writecb, ctx->writedata, !strcmp(ctx->format, "image/pwg-raster") ? CUPS_RASTER_WRITE_PWG : CUPS_RASTER_WRITE_APPLE);
 }
 
 
@@ -967,28 +1024,23 @@ raster_start_job(xform_ctx_t   *ras,	/* I - Raster information */
  */
 
 static void
-raster_start_page(xform_ctx_t   *ras,/* I - Raster information */
-		  unsigned         page,/* I - Current page */
-		  _xform_write_cb_t cb,	/* I - Write callback */
-		  void             *ctx)/* I - Write context */
+raster_start_page(xform_ctx_t *ctx,	/* I - Transform context */
+		  unsigned    page)	/* I - Current page */
 {
-  (void)cb;
-  (void)ctx;
+  ctx->left   = 0;
+  ctx->top    = 0;
+  ctx->right  = ctx->header.cupsWidth - 1;
+  ctx->bottom = ctx->header.cupsHeight - 1;
 
-  ras->left   = 0;
-  ras->top    = 0;
-  ras->right  = ras->header.cupsWidth - 1;
-  ras->bottom = ras->header.cupsHeight - 1;
-
-  if (ras->header.Duplex && !(page & 1))
-    cupsRasterWriteHeader2(ras->ras, &ras->back_header);
+  if (ctx->header.Duplex && !(page & 1))
+    cupsRasterWriteHeader2(ctx->ras, &ctx->back_header);
   else
-    cupsRasterWriteHeader2(ras->ras, &ras->header);
+    cupsRasterWriteHeader2(ctx->ras, &ctx->header);
 
-  if (ras->header.cupsBitsPerPixel == 1)
+  if (ctx->header.cupsBitsPerPixel == 1)
   {
-    ras->out_length = ras->header.cupsBytesPerLine;
-    ras->out_buffer = malloc(ras->header.cupsBytesPerLine);
+    ctx->out_length = ctx->header.cupsBytesPerLine;
+    ctx->out_buffer = malloc(ctx->header.cupsBytesPerLine);
   }
 }
 
@@ -999,16 +1051,11 @@ raster_start_page(xform_ctx_t   *ras,/* I - Raster information */
 
 static void
 raster_write_line(
-    xform_ctx_t      *ras,		/* I - Raster information */
+    xform_ctx_t         *ctx,		/* I - Transform context */
     unsigned            y,		/* I - Line number */
-    const unsigned char *line,		/* I - Pixels on line */
-    _xform_write_cb_t    cb,		/* I - Write callback */
-    void                *ctx)		/* I - Write context */
+    const unsigned char *line)		/* I - Pixels on line */
 {
-  (void)cb;
-  (void)ctx;
-
-  if (ras->header.cupsBitsPerPixel == 1)
+  if (ctx->header.cupsBitsPerPixel == 1)
   {
    /*
     * Dither the line into the output buffer...
@@ -1021,9 +1068,9 @@ raster_write_line(
 
     y &= 63;
 
-    if (ras->header.cupsColorSpace == CUPS_CSPACE_SW)
+    if (ctx->header.cupsColorSpace == CUPS_CSPACE_SW)
     {
-      for (x = ras->left, bit = 128, byte = 0, outptr = ras->out_buffer; x <= ras->right; x ++, line ++)
+      for (x = ctx->left, bit = 128, byte = 0, outptr = ctx->out_buffer; x <= ctx->right; x ++, line ++)
       {
 	if (*line > threshold[x % 25][y])
 	  byte |= bit;
@@ -1040,7 +1087,7 @@ raster_write_line(
     }
     else
     {
-      for (x = ras->left, bit = 128, byte = 0, outptr = ras->out_buffer; x <= ras->right; x ++, line ++)
+      for (x = ctx->left, bit = 128, byte = 0, outptr = ctx->out_buffer; x <= ctx->right; x ++, line ++)
       {
 	if (*line <= threshold[x & 63][y])
 	  byte |= bit;
@@ -1059,10 +1106,10 @@ raster_write_line(
     if (bit != 128)
       *outptr++ = byte;
 
-    cupsRasterWritePixels(ras->ras, ras->out_buffer, ras->header.cupsBytesPerLine);
+    cupsRasterWritePixels(ctx->ras, ctx->out_buffer, ctx->header.cupsBytesPerLine);
   }
   else
-    cupsRasterWritePixels(ras->ras, (unsigned char *)line, ras->header.cupsBytesPerLine);
+    cupsRasterWritePixels(ctx->ras, (unsigned char *)line, ctx->header.cupsBytesPerLine);
 }
 
 
@@ -1112,7 +1159,7 @@ main(int  argc,				/* I - Number of command-line args */
   http_t	*http = NULL;		/* Output HTTP connection */
   void		*write_ptr = &fd;	/* Pointer to file/socket/HTTP connection */
   char		resource[1024];		/* URI resource path */
-  _xform_write_cb_t write_cb = (_xform_write_cb_t)write_fd;
+  xform_writecb_t write_cb = (xform_writecb_t)write_fd;
 					/* Write callback */
   int		status = 0;		/* Exit status */
   _cups_thread_t monitor = 0;		/* Monitoring thread ID */
@@ -1444,7 +1491,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       ippDelete(request);
 
-      write_cb  = (_xform_write_cb_t)httpWrite2;
+      write_cb  = (xform_writecb_t)httpWrite2;
       write_ptr = http;
 
       monitor = _cupsThreadCreate((_cups_thread_func_t)monitor_ipp, (void *)device_uri);
@@ -1727,7 +1774,7 @@ xform_document(
     const char       *types,		/* I - Supported types */
     int              num_options,	/* I - Number of options */
     cups_option_t    *options,		/* I - Options */
-    _xform_write_cb_t cb,		/* I - Write callback */
+    xform_writecb_t cb,		/* I - Write callback */
     void             *ctx)		/* I - Write context */
 {
   CFURLRef		url;		/* CFURL object for PDF filename */
@@ -2287,7 +2334,7 @@ xform_document(
     const char       *types,		/* I - Supported types */
     int              num_options,	/* I - Number of options */
     cups_option_t    *options,		/* I - Options */
-    _xform_write_cb_t cb,		/* I - Write callback */
+    xform_writecb_t cb,		/* I - Write callback */
     void             *ctx)		/* I - Write context */
 {
   fz_context		*context;	/* MuPDF context */

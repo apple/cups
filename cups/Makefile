@@ -74,6 +74,8 @@ IMAGEOBJS	= \
 		error.o \
 		interpret.o \
 		raster.o
+XFORMOBJS	= \
+		xform.o
 TESTOBJS	= \
 		rasterbench.o \
 		testadmin.o \
@@ -99,6 +101,7 @@ TESTOBJS	= \
 OBJS	=	\
 		$(LIBOBJS) \
 		$(IMAGEOBJS) \
+		$(XFORMOBJS) \
 		$(TESTOBJS)
 
 
@@ -148,7 +151,8 @@ LIBTARGETS =	\
 		$(LIBCUPSIMAGE) \
 		$(LIBCUPSSTATIC) \
 		$(LIBCUPS) \
-		libcupsimage.a
+		libcupsimage.a \
+		libcupsxform.a
 
 UNITTARGETS =	\
 		rasterbench \
@@ -450,6 +454,17 @@ libcupsimage.a:	$(IMAGEOBJS)
 	echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(IMAGEOBJS)
+	$(RANLIB) $@
+
+
+#
+# libcupsxform.a
+#
+
+libcupsxform.a:	$(XFORMOBJS)
+	echo Archiving $@...
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ $(XFORMOBJS)
 	$(RANLIB) $@
 
 
