@@ -58,7 +58,11 @@ struct _xform_ctx_s
 
   int			num_options;	/* Number of job options */
   cups_option_t		*options;	/* Job options */
-  unsigned		copies;		/* Number of copies */
+  unsigned		pages,		/* Input pages */
+			sides,		/* 0 for one-sided, 1 for two-sided-short-edge, 2 for two-sided-long-edge */
+			copies,		/* Number of copies */
+			impressions,	/* Number of impressions/sides per copy */
+			sheets;		/* Number of media sheets per copy */
   cups_page_header2_t	header;		/* Page header */
   cups_page_header2_t	back_header;	/* Page header for back side */
   cups_page_header2_t	mheader;	/* Page header for monochrome pages */
@@ -67,6 +71,13 @@ struct _xform_ctx_s
   unsigned char		*band_buffer;	/* Band buffer */
   unsigned		band_height;	/* Band height */
   unsigned		band_bpp;	/* Bytes per pixel in band */
+
+  /* Callbacks */
+  void			(*end_job)(xform_ctx_t *ctx);
+  void			(*end_page)(xform_ctx_t *ctx, unsigned page);
+  void			(*start_job)(xform_ctx_t *ctx);
+  void			(*start_page)(xform_ctx_t *ctx, unsigned page);
+  void			(*write_line)(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
 
   /* Set by start_job callback */
   cups_raster_t		*ras;		/* Raster stream */
@@ -78,13 +89,6 @@ struct _xform_ctx_s
   size_t		out_length;	/* Output buffer size */
   unsigned char		*out_buffer;	/* Output (bit) buffer */
   unsigned char		*comp_buffer;	/* Compression buffer */
-
-  /* Callbacks */
-  void			(*end_job)(xform_ctx_t *ctx);
-  void			(*end_page)(xform_ctx_t *ctx, unsigned page);
-  void			(*start_job)(xform_ctx_t *ctx);
-  void			(*start_page)(xform_ctx_t *ctx, unsigned page);
-  void			(*write_line)(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
 };
 
 
@@ -104,7 +108,6 @@ static void	pack_rgba_to_gray(unsigned char *row, size_t num_pixels);
 static void	pcl_end_job(xform_ctx_t *ctx);
 static void	pcl_end_page(xform_ctx_t *ctx, unsigned page);
 static void	pcl_init(xform_ctx_t *ctx);
-static void	pcl_printf(xform_ctx_t *ctx, const char *format, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static void	pcl_start_job(xform_ctx_t *ctx);
 static void	pcl_start_page(xform_ctx_t *ctx, unsigned page);
 static void	pcl_write_line(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
@@ -136,9 +139,8 @@ static void	raster_start_page(xform_ctx_t *ctx, unsigned page);
 static void	raster_write_line(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
 
 static void	xform_log(xform_ctx_t *ctx, xform_loglevel_t level, const char *message, ...);
-
-static int	xform_document(const char *filename, const char *informat, const char *outformat, const char *resolutions, const char *sheet_back, const char *types, int num_options, cups_option_t *options, xform_writecb_t cb, void *ctx);
-static int	xform_setup(xform_ctx_t *ras, const char *outformat, const char *resolutions, const char *types, const char *sheet_back, int color, unsigned pages, int num_options, cups_option_t *options);
+static void	xform_printf(xform_ctx_t *ctx, const char *format, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static int	xform_setup(xform_ctx_t *ctx);
 
 
 
@@ -300,7 +302,7 @@ default_log_cb(
 
   (void)user_data;
 
-  fprintf(stderr, "%s%s\n", levels[level], message);
+  fprintf(stderr, "%s%s", levels[level], message);
 }
 
 
@@ -476,27 +478,6 @@ pcl_init(xform_ctx_t *ctx)		/* I - Transform context */
 
 
 /*
- * 'pcl_printf()' - Write a formatted string.
- */
-
-static void
-pcl_printf(xform_ctx_t *ctx,		/* I - Transform context */
-	   const char  *format,		/* I - Printf-style format string */
-	   ...)				/* I - Additional arguments as needed */
-{
-  va_list	ap;			/* Argument pointer */
-  char		buffer[8192];		/* Buffer */
-
-
-  va_start(ap, format);
-  vsnprintf(buffer, sizeof(buffer), format, ap);
-  va_end(ap);
-
-  (*ctx->writecb)(ctx->writedata, (const unsigned char *)buffer, strlen(buffer));
-}
-
-
-/*
  * 'pcl_start_job()' - Start a PCL "job".
  */
 
@@ -516,7 +497,7 @@ pcl_start_job(xform_ctx_t *ctx)		/* I - Transform context */
  */
 
 static void
-pcl_start_page(xform_ctx_t *ras,	/* I - Raster information */
+pcl_start_page(xform_ctx_t *ctx,	/* I - Transform context */
                unsigned    page)	/* I - Current page */
 {
  /*
@@ -524,80 +505,80 @@ pcl_start_page(xform_ctx_t *ras,	/* I - Raster information */
   * left and right.
   */
 
-  ras->top    = ras->header.HWResolution[1] / 6;
-  ras->bottom = ras->header.cupsHeight - ras->header.HWResolution[1] / 6 - 1;
+  ctx->top    = ctx->header.HWResolution[1] / 6;
+  ctx->bottom = ctx->header.cupsHeight - ctx->header.HWResolution[1] / 6 - 1;
 
-  if (ras->header.PageSize[1] == 842)
+  if (ctx->header.PageSize[1] == 842)
   {
    /* A4 gets special side margins to expose an 8" print area */
-    ras->left  = (ras->header.cupsWidth - 8 * ras->header.HWResolution[0]) / 2;
-    ras->right = ras->left + 8 * ras->header.HWResolution[0] - 1;
+    ctx->left  = (ctx->header.cupsWidth - 8 * ctx->header.HWResolution[0]) / 2;
+    ctx->right = ctx->left + 8 * ctx->header.HWResolution[0] - 1;
   }
   else
   {
    /* All other sizes get 1/4" margins */
-    ras->left  = ras->header.HWResolution[0] / 4;
-    ras->right = ras->header.cupsWidth - ras->header.HWResolution[0] / 4 - 1;
+    ctx->left  = ctx->header.HWResolution[0] / 4;
+    ctx->right = ctx->header.cupsWidth - ctx->header.HWResolution[0] / 4 - 1;
   }
 
-  if (!ras->header.Duplex || (page & 1))
+  if (!ctx->header.Duplex || (page & 1))
   {
    /*
     * Set the media size...
     */
 
-    pcl_printf(ras, "\033&l12D\033&k12H");
+    xform_printf(ctx, "\033&l12D\033&k12H");
 					/* Set 12 LPI, 10 CPI */
-    pcl_printf(ras, "\033&l0O");	/* Set portrait orientation */
+    xform_printf(ctx, "\033&l0O");	/* Set portrait orientation */
 
-    switch (ras->header.PageSize[1])
+    switch (ctx->header.PageSize[1])
     {
       case 540 : /* Monarch Envelope */
-          pcl_printf(ras, "\033&l80A");
+          xform_printf(ctx, "\033&l80A");
 	  break;
 
       case 595 : /* A5 */
-          pcl_printf(ras, "\033&l25A");
+          xform_printf(ctx, "\033&l25A");
 	  break;
 
       case 624 : /* DL Envelope */
-          pcl_printf(ras, "\033&l90A");
+          xform_printf(ctx, "\033&l90A");
 	  break;
 
       case 649 : /* C5 Envelope */
-          pcl_printf(ras, "\033&l91A");
+          xform_printf(ctx, "\033&l91A");
 	  break;
 
       case 684 : /* COM-10 Envelope */
-          pcl_printf(ras, "\033&l81A");
+          xform_printf(ctx, "\033&l81A");
 	  break;
 
       case 709 : /* B5 Envelope */
-          pcl_printf(ras, "\033&l100A");
+          xform_printf(ctx, "\033&l100A");
 	  break;
 
       case 756 : /* Executive */
-          pcl_printf(ras, "\033&l1A");
+          xform_printf(ctx, "\033&l1A");
 	  break;
 
       case 792 : /* Letter */
-          pcl_printf(ras, "\033&l2A");
+          xform_printf(ctx, "\033&l2A");
 	  break;
 
       case 842 : /* A4 */
-          pcl_printf(ras, "\033&l26A");
+          xform_printf(ctx, "\033&l26A");
 	  break;
 
       case 1008 : /* Legal */
-          pcl_printf(ras, "\033&l3A");
+          xform_printf(ctx, "\033&l3A");
 	  break;
 
       case 1191 : /* A3 */
-          pcl_printf(ras, "\033&l27A");
+          xform_printf(ctx, "\033&l27A");
 	  break;
 
       case 1224 : /* Tabloid */
-          pcl_printf(ras, "\033&l6A");
+          xform_printf(ctx, "\033&l6A");
 	  break;
     }
 
@@ -605,43 +586,43 @@ pcl_start_page(xform_ctx_t *ras,	/* I - Raster information */
     * Set top margin and turn off perforation skip...
     */
 
-    pcl_printf(ras, "\033&l%uE\033&l0L", 12 * ras->top / ras->header.HWResolution[1]);
+    xform_printf(ctx, "\033&l%uE\033&l0L", 12 * ctx->top / ctx->header.HWResolution[1]);
 
-    if (ras->header.Duplex)
+    if (ctx->header.Duplex)
     {
-      int mode = ras->header.Duplex ? 1 + ras->header.Tumble != 0 : 0;
+      int mode = ctx->header.Duplex ? 1 + ctx->header.Tumble != 0 : 0;
 
-      pcl_printf(ras, "\033&l%dS", mode);
+      xform_printf(ctx, "\033&l%dS", mode);
 					/* Set duplex mode */
     }
   }
-  else if (ras->header.Duplex)
-    pcl_printf(ras, "\033&a2G");	/* Print on back side */
+  else if (ctx->header.Duplex)
+    xform_printf(ctx, "\033&a2G");	/* Print on back side */
 
  /*
   * Set graphics mode...
   */
 
-  pcl_printf(ras, "\033*t%uR", ras->header.HWResolution[0]);
+  xform_printf(ctx, "\033*t%uR", ctx->header.HWResolution[0]);
 					/* Set resolution */
-  pcl_printf(ras, "\033*r%uS", ras->right - ras->left + 1);
+  xform_printf(ctx, "\033*r%uS", ctx->right - ctx->left + 1);
 					/* Set width */
-  pcl_printf(ras, "\033*r%uT", ras->bottom - ras->top + 1);
+  xform_printf(ctx, "\033*r%uT", ctx->bottom - ctx->top + 1);
 					/* Set height */
-  pcl_printf(ras, "\033&a0H\033&a%uV", 720 * ras->top / ras->header.HWResolution[1]);
+  xform_printf(ctx, "\033&a0H\033&a%uV", 720 * ctx->top / ctx->header.HWResolution[1]);
 					/* Set position */
 
-  pcl_printf(ras, "\033*b2M");	/* Use PackBits compression */
-  pcl_printf(ras, "\033*r1A");	/* Start graphics */
+  xform_printf(ctx, "\033*b2M");	/* Use PackBits compression */
+  xform_printf(ctx, "\033*r1A");	/* Start graphics */
 
  /*
   * Allocate the output buffer...
   */
 
-  ras->out_blanks  = 0;
-  ras->out_length  = (ras->right - ras->left + 8) / 8;
-  ras->out_buffer  = malloc(ras->out_length);
-  ras->comp_buffer = malloc(2 * ras->out_length + 2);
+  ctx->out_blanks  = 0;
+  ctx->out_length  = (ctx->right - ctx->left + 8) / 8;
+  ctx->out_buffer  = malloc(ctx->out_length);
+  ctx->comp_buffer = malloc(2 * ctx->out_length + 2);
 }
 
 
@@ -773,11 +754,11 @@ pcl_write_line(
     * Skip blank lines first...
     */
 
-    pcl_printf(ctx, "\033*b%dY", ctx->out_blanks);
+    xform_printf(ctx, "\033*b%dY", ctx->out_blanks);
     ctx->out_blanks = 0;
   }
 
-  pcl_printf(ctx, "\033*b%dW", (int)(compptr - ctx->comp_buffer));
+  xform_printf(ctx, "\033*b%dW", (int)(compptr - ctx->comp_buffer));
   (*ctx->writecb)(ctx->writedata, ctx->comp_buffer, (size_t)(compptr - ctx->comp_buffer));
 }
 
@@ -1135,6 +1116,323 @@ xform_log(xform_ctx_t      *ctx,	/* I - Transform context */
 }
 
 
+/*
+ * 'xform_printf()' - Write a formatted string.
+ */
+
+static void
+xform_printf(xform_ctx_t *ctx,		/* I - Transform context */
+	   const char  *format,		/* I - Printf-style format string */
+	   ...)				/* I - Additional arguments as needed */
+{
+  va_list	ap;			/* Argument pointer */
+  char		buffer[8192];		/* Buffer */
+
+
+  va_start(ap, format);
+  vsnprintf(buffer, sizeof(buffer), format, ap);
+  va_end(ap);
+
+  (*ctx->writecb)(ctx->writedata, (const unsigned char *)buffer, strlen(buffer));
+}
+
+
+/*
+ * 'xform_setup()' - Setup the transform context for the document.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+xform_setup(xform_ctx_t *ctx)		/* I - Transform context */
+{
+  const char	*copies,		/* "copies" option */
+		*media,			/* "media" option */
+		*media_col,		/* "media-col" option */
+		*print_color_mode,	/* "print-color-mode" option */
+		*print_quality,		/* "print-quality" option */
+		*sides;			/* "sides" option */
+  pwg_media_t	*pwg_media = NULL;	/* PWG media value */
+  ipp_quality_t	pq;			/* print-quality value */
+  unsigned	color = 1,		/* Color output? */
+		colorspace,		/* Output colorspace */
+		bpp,			/* Bits per pixel */
+		xdpi, ydpi;		/* Resolution to use */
+  char		type[255],		/* Colorspace + bits */
+		mtype[255];		/* Monochrome colorspace + bits */
+  static const char * const sheet_backs[] =
+  {					/* pwg-raster-document-sheet-back values */
+    "none",
+    "normal",
+    "rotated",
+    "manual-tumble",
+    "flipped"
+  };
+
+
+ /*
+  * Get the number of copies...
+  */
+
+  if ((copies = cupsGetOption("copies", ctx->num_options, ctx->options)) != NULL)
+  {
+    int temp = atoi(copies);		/* Copies value */
+
+    if (temp < 1 || temp > 9999)
+    {
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Invalid \"copies\" value '%s'.", copies);
+      return (0);
+    }
+
+    ctx->copies = (unsigned)temp;
+  }
+  else
+    ctx->copies = 1;
+
+ /*
+  * Figure out the media size...
+  */
+
+  if ((media = cupsGetOption("media", ctx->num_options, ctx->options)) != NULL)
+  {
+    if ((pwg_media = pwgMediaForPWG(media)) == NULL)
+      pwg_media = pwgMediaForLegacy(media);
+
+    if (!pwg_media)
+    {
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown \"media\" value '%s'.", media);
+      return (0);
+    }
+  }
+  else if ((media_col = cupsGetOption("media-col", ctx->num_options, ctx->options)) != NULL)
+  {
+    int			num_cols;	/* Number of collection values */
+    cups_option_t	*cols;		/* Collection values */
+    const char		*media_size_name,
+			*media_size,	/* Collection attributes */
+			*media_bottom_margin,
+			*media_left_margin,
+			*media_right_margin,
+			*media_top_margin;
+
+    num_cols = cupsParseOptions(media_col, 0, &cols);
+    if ((media_size_name = cupsGetOption("media-size-name", num_cols, cols)) != NULL)
+    {
+      if ((pwg_media = pwgMediaForPWG(media_size_name)) == NULL)
+      {
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown \"media-size-name\" value '%s'.", media_size_name);
+	cupsFreeOptions(num_cols, cols);
+	return (0);
+      }
+    }
+    else if ((media_size = cupsGetOption("media-size", num_cols, cols)) != NULL)
+    {
+      int		num_sizes;	/* Number of collection values */
+      cups_option_t	*sizes;		/* Collection values */
+      const char	*x_dim,		/* Collection attributes */
+			*y_dim;
+
+      num_sizes = cupsParseOptions(media_size, 0, &sizes);
+      if ((x_dim = cupsGetOption("x-dimension", num_sizes, sizes)) != NULL && (y_dim = cupsGetOption("y-dimension", num_sizes, sizes)) != NULL)
+      {
+        pwg_media = pwgMediaForSize(atoi(x_dim), atoi(y_dim));
+      }
+      else
+      {
+        xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Bad \"media-size\" value '%s'.", media_size);
+	cupsFreeOptions(num_sizes, sizes);
+	cupsFreeOptions(num_cols, cols);
+	return (0);
+      }
+
+      cupsFreeOptions(num_sizes, sizes);
+    }
+
+   /*
+    * Check whether the media-col is for a borderless size...
+    */
+
+    if ((media_bottom_margin = cupsGetOption("media-bottom-margin", num_cols, cols)) != NULL && !strcmp(media_bottom_margin, "0") &&
+        (media_left_margin = cupsGetOption("media-left-margin", num_cols, cols)) != NULL && !strcmp(media_left_margin, "0") &&
+        (media_right_margin = cupsGetOption("media-right-margin", num_cols, cols)) != NULL && !strcmp(media_right_margin, "0") &&
+        (media_top_margin = cupsGetOption("media-top-margin", num_cols, cols)) != NULL && !strcmp(media_top_margin, "0"))
+      ctx->borderless = 1;
+
+    cupsFreeOptions(num_cols, cols);
+  }
+
+  if (!pwg_media)
+  {
+   /*
+    * Use default size...
+    */
+
+    pwg_media = pwgMediaForSize(ctx->capabilities.size.width, ctx->capabilities.size.length);
+  }
+
+ /*
+  * Map certain photo sizes (4x6, 5x7, 8x10) to borderless...
+  */
+
+  if ((pwg_media->width == 10160 && pwg_media->length == 15240) ||(pwg_media->width == 12700 && pwg_media->length == 17780) ||(pwg_media->width == 20320 && pwg_media->length == 25400))
+    ctx->borderless = 1;
+
+ /*
+  * Figure out the proper resolution, etc.
+  */
+
+  if ((print_quality = cupsGetOption("print-quality", ctx->num_options, ctx->options)) != NULL)
+    pq = (ipp_quality_t)atoi(print_quality);
+  else
+    pq = IPP_QUALITY_NORMAL;
+
+  if ((print_color_mode = cupsGetOption("print-color-mode", ctx->num_options, ctx->options)) != NULL)
+  {
+    if (!strcmp(print_color_mode, "monochrome") || !strcmp(print_color_mode, "process-monochrome") || !strcmp(print_color_mode, "auto-monochrome"))
+    {
+      color = 0;
+    }
+    else if (!strcmp(print_color_mode, "bi-level") || !strcmp(print_color_mode, "process-bi-level"))
+    {
+      color = 0;
+      pq    = IPP_QUALITY_DRAFT;
+    }
+  }
+
+  switch (pq)
+  {
+    case IPP_QUALITY_DRAFT :
+	xdpi  = ctx->capabilities.draft_resolution[0];
+	ydpi  = ctx->capabilities.draft_resolution[1];
+	bpp   = ctx->capabilities.draft_bits;
+	break;
+
+    default :
+	xform_log(ctx, XFORM_LOGLEVEL_INFO, "Unsupported \"print-quality\" value '%s'.", print_quality);
+
+    case IPP_QUALITY_NORMAL :
+	xdpi = ctx->capabilities.normal_resolution[0];
+	ydpi = ctx->capabilities.normal_resolution[1];
+	bpp  = ctx->capabilities.normal_bits;
+	break;
+
+    case IPP_QUALITY_HIGH :
+	xdpi = ctx->capabilities.high_resolution[0];
+	ydpi = ctx->capabilities.high_resolution[1];
+	bpp  = ctx->capabilities.high_bits;
+	break;
+  }
+
+  if (color)
+  {
+    if (ctx->capabilities.photo && pq == IPP_QUALITY_HIGH)
+      colorspace = ctx->capabilities.photo;
+    else if (ctx->capabilities.color && pq != IPP_QUALITY_DRAFT)
+      colorspace = ctx->capabilities.color;
+    else
+      colorspace = ctx->capabilities.monochrome;
+  }
+  else
+  {
+    colorspace = ctx->capabilities.monochrome;
+  }
+
+  switch (colorspace)
+  {
+    case CUPS_CSPACE_SW :
+    case CUPS_CSPACE_WHITE :
+        if (bpp == 1)
+          strlcpy(type, "black_1", sizeof(type));
+        else
+          snprintf(type, sizeof(type), "sgray_%d", bpp);
+
+        strlcpy(mtype, type, sizeof(mtype));
+        break;
+    default :
+    case CUPS_CSPACE_RGB :
+    case CUPS_CSPACE_SRGB :
+        snprintf(type, sizeof(type), "srgb_%d", bpp);
+        snprintf(mtype, sizeof(mtype), "sgray_%d", bpp);
+        break;
+    case CUPS_CSPACE_ADOBERGB :
+        snprintf(type, sizeof(type), "adobe-rgb_%d", bpp);
+        strlcpy(mtype, type, sizeof(mtype));
+        break;
+  }
+
+ /*
+  * Initialize the raster header...
+  */
+
+  if (ctx->pages == 1 || ctx->capabilities.duplex == XFORM_DUPLEX_NONE)
+  {
+    sides      = "one-sided";
+    ctx->sides = 0;
+  }
+  else if ((sides = cupsGetOption("sides", ctx->num_options, ctx->options)) == NULL)
+  {
+   /*
+    * Default to two-sided-long-edge because we can.
+    */
+
+    sides      = "two-sided-long-edge";
+    ctx->sides = 2;
+  }
+  else if (!strcmp(sides, "one-sided"))
+  {
+    ctx->sides = 0;
+  }
+  else if (!strcmp(sides, "two-sided-short-edge"))
+  {
+    ctx->sides = 1;
+  }
+  else
+  {
+    ctx->sides = 2;
+  }
+
+  ctx->impressions = ctx->pages;
+
+  if (ctx->copies > 1 && (ctx->pages & 1) && ctx->sides)
+    ctx->impressions ++;
+
+  if (ctx->sides)
+    ctx->sheets = ctx->impressions / 2;
+  else
+    ctx->sheets = ctx->impressions;
+
+  if (!cupsRasterInitPWGHeader(&(ctx->header), pwg_media, type, (int)xdpi, (int)ydpi, sides, NULL))
+  {
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize raster context: %s", cupsRasterErrorString());
+    return (0);
+  }
+
+  if (!cupsRasterInitPWGHeader(&(ctx->mheader), pwg_media, mtype, (int)xdpi, (int)ydpi, sides, NULL))
+  {
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize monochrome raster context: %s", cupsRasterErrorString());
+    return (0);
+  }
+
+  if (ctx->sides)
+  {
+    if (!cupsRasterInitPWGHeader(&(ctx->back_header), pwg_media, type, (int)xdpi, (int)ydpi, sides, sheet_backs[ctx->capabilities.duplex]))
+    {
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize back side raster context: %s", cupsRasterErrorString());
+      return (0);
+    }
+
+    if (!cupsRasterInitPWGHeader(&(ctx->back_mheader), pwg_media, mtype, (int)xdpi, (int)ydpi, sides, sheet_backs[ctx->capabilities.duplex]))
+    {
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize back side monochrome raster context: %s", cupsRasterErrorString());
+      return (0);
+    }
+  }
+
+  ctx->header.cupsInteger[CUPS_RASTER_PWG_TotalPageCount]      = ctx->copies * ctx->impressions;
+  ctx->back_header.cupsInteger[CUPS_RASTER_PWG_TotalPageCount] = ctx->copies * ctx->impressions;
+
+  return (1);
+}
+
+
 #if 0
 /*
  * 'main()' - Main entry for transform utility.
@@ -1199,7 +1497,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else
       {
-	fprintf(stderr, "ERROR: Unknown option '%s'.\n", argv[i]);
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown option '%s'.", argv[i]);
 	usage(1);
       }
     }
@@ -1270,7 +1568,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 	  default :
-	      fprintf(stderr, "ERROR: Unknown option '-%c'.\n", *opt);
+	      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown option '-%c'.", *opt);
 	      usage(1);
 	      break;
 	}
@@ -1302,23 +1600,23 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!content_type)
   {
-    fprintf(stderr, "ERROR: Unknown format for \"%s\", please specify with '-i' option.\n", filename);
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown format for \"%s\", please specify with '-i' option.", filename);
     usage(1);
   }
   else if (strcmp(content_type, "application/pdf") && strcmp(content_type, "image/jpeg"))
   {
-    fprintf(stderr, "ERROR: Unsupported format \"%s\" for \"%s\".\n", content_type, filename);
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unsupported format \"%s\" for \"%s\".", content_type, filename);
     usage(1);
   }
 
   if (!output_type)
   {
-    fputs("ERROR: Unknown output format, please specify with '-m' option.\n", stderr);
+    fputs("ERROR: Unknown output format, please specify with '-m' option.", stderr);
     usage(1);
   }
   else if (strcmp(output_type, "application/vnd.hp-pcl") && strcmp(output_type, "image/pwg-raster") && strcmp(output_type, "image/urf"))
   {
-    fprintf(stderr, "ERROR: Unsupported output format \"%s\".\n", output_type);
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unsupported output format \"%s\".", output_type);
     usage(1);
   }
 
@@ -1344,20 +1642,20 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
     {
-      fprintf(stderr, "ERROR: Invalid device URI \"%s\".\n", device_uri);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Invalid device URI \"%s\".", device_uri);
       usage(1);
     }
 
     if (strcmp(scheme, "socket") && strcmp(scheme, "ipp") && strcmp(scheme, "ipps"))
     {
-      fprintf(stderr, "ERROR: Unsupported device URI scheme \"%s\".\n", scheme);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unsupported device URI scheme \"%s\".", scheme);
       usage(1);
     }
 
     snprintf(service, sizeof(service), "%d", port);
     if ((list = httpAddrGetList(host, AF_UNSPEC, service)) == NULL)
     {
-      fprintf(stderr, "ERROR: Unable to lookup device URI host \"%s\": %s\n", host, cupsLastErrorString());
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to lookup device URI host \"%s\": %s", host, cupsLastErrorString());
       return (1);
     }
 
@@ -1369,7 +1667,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (!httpAddrConnect2(list, &fd, 30000, NULL))
       {
-	fprintf(stderr, "ERROR: Unable to connect to \"%s\" on port %d: %s\n", host, port, cupsLastErrorString());
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to connect to \"%s\" on port %d: %s", host, port, cupsLastErrorString());
 	return (1);
       }
     }
@@ -1395,7 +1693,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if ((http = httpConnect2(host, port, list, AF_UNSPEC, encryption, 1, 30000, NULL)) == NULL)
       {
-	fprintf(stderr, "ERROR: Unable to connect to \"%s\" on port %d: %s\n", host, port, cupsLastErrorString());
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to connect to \"%s\" on port %d: %s", host, port, cupsLastErrorString());
 	return (1);
       }
 
@@ -1411,13 +1709,13 @@ main(int  argc,				/* I - Number of command-line args */
       response = cupsDoRequest(http, request, resource);
       if (cupsLastError() > IPP_STATUS_OK_EVENTS_COMPLETE)
       {
-        fprintf(stderr, "ERROR: Unable to get printer capabilities: %s\n", cupsLastErrorString());
+        xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to get printer capabilities: %s", cupsLastErrorString());
 	return (1);
       }
 
       if ((attr = ippFindAttribute(response, "operations-supported", IPP_TAG_ENUM)) == NULL)
       {
-        fputs("ERROR: Unable to get list of supported operations from printer.\n", stderr);
+        fputs("ERROR: Unable to get list of supported operations from printer.", stderr);
 	return (1);
       }
 
@@ -1453,12 +1751,12 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (cupsLastError() > IPP_STATUS_OK_EVENTS_COMPLETE)
 	{
-	  fprintf(stderr, "ERROR: Unable to create print job: %s\n", cupsLastErrorString());
+	  xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to create print job: %s", cupsLastErrorString());
 	  return (1);
 	}
 	else if (job_id <= 0)
 	{
-          fputs("ERROR: No job-id for created print job.\n", stderr);
+          fputs("ERROR: No job-id for created print job.", stderr);
 	  return (1);
 	}
 
@@ -1485,7 +1783,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (cupsSendRequest(http, request, resource, 0) != HTTP_STATUS_CONTINUE)
       {
-        fprintf(stderr, "ERROR: Unable to send print data: %s\n", cupsLastErrorString());
+        xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to send print data: %s", cupsLastErrorString());
 	return (1);
       }
 
@@ -1512,7 +1810,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (cupsLastError() > IPP_STATUS_OK_EVENTS_COMPLETE)
     {
-      fprintf(stderr, "ERROR: Unable to send print data: %s\n", cupsLastErrorString());
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to send print data: %s", cupsLastErrorString());
       status = 1;
     }
 
@@ -1626,7 +1924,7 @@ monitor_ipp(const char *device_uri)	/* I - Device URI */
 
   while ((http = httpConnect2(host, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL)) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to connect to \"%s\" on port %d: %s\n", host, port, cupsLastErrorString());
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to connect to \"%s\" on port %d: %s", host, port, cupsLastErrorString());
     sleep(30);
   }
 
@@ -1672,9 +1970,9 @@ monitor_ipp(const char *device_uri)	/* I - Device URI */
       if (strcmp(value, pvalues[i]))
       {
         if (!strcmp(name, "printer-state-reasons"))
-	  fprintf(stderr, "STATE: %s\n", value);
+	  fprintf(stderr, "STATE: %s", value);
 	else
-	  fprintf(stderr, "ATTR: %s='%s'\n", name, value);
+	  xform_log(ctx, XFORM_LOGLEVEL_ATTR, "%s='%s'", name, value);
 
         strlcpy(pvalues[i], value, sizeof(pvalues[i]));
       }
@@ -1704,7 +2002,7 @@ monitor_ipp(const char *device_uri)	/* I - Device URI */
 static void
 usage(int status)			/* I - Exit status */
 {
-  puts("Usage: ipptransform [options] filename\n");
+  puts("Usage: ipptransform [options] filename");
   puts("Options:");
   puts("  --help");
   puts("  -d device-uri");
@@ -1714,7 +2012,7 @@ usage(int status)			/* I - Exit status */
   puts("  -r resolution[,...,resolution]");
   puts("  -s {flipped|manual-tumble|normal|rotated}");
   puts("  -t type[,...,type]");
-  puts("  -v\n");
+  puts("  -v");
   puts("Device URIs: socket://address[:port], ipp://address[:port]/resource, ipps://address[:port]/resource");
   puts("Input Formats: application/pdf, image/jpeg");
   puts("Output Formats: application/vnd.hp-pcl, image/pwg-raster, image/urf");
@@ -1816,7 +2114,7 @@ xform_document(
 
   if ((url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)filename, (CFIndex)strlen(filename), false)) == NULL)
   {
-    fputs("ERROR: Unable to create CFURL for file.\n", stderr);
+    fputs("ERROR: Unable to create CFURL for file.", stderr);
     return (1);
   }
 
@@ -1831,7 +2129,7 @@ xform_document(
 
     if (!document)
     {
-      fputs("ERROR: Unable to create CFPDFDocument for file.\n", stderr);
+      fputs("ERROR: Unable to create CFPDFDocument for file.", stderr);
       return (1);
     }
 
@@ -1843,7 +2141,7 @@ xform_document(
 
       if (!CGPDFDocumentUnlockWithPassword(document, ""))
       {
-	fputs("ERROR: Document is encrypted and cannot be unlocked.\n", stderr);
+	fputs("ERROR: Document is encrypted and cannot be unlocked.", stderr);
 	CGPDFDocumentRelease(document);
 	return (1);
       }
@@ -1851,7 +2149,7 @@ xform_document(
 
     if (!CGPDFDocumentAllowsPrinting(document))
     {
-      fputs("ERROR: Document does not allow printing.\n", stderr);
+      fputs("ERROR: Document does not allow printing.", stderr);
       CGPDFDocumentRelease(document);
       return (1);
     }
@@ -1864,7 +2162,7 @@ xform_document(
     {
       if (sscanf(page_ranges, "%u-%u", &first, &last) != 2 || first > last)
       {
-	fprintf(stderr, "ERROR: Bad \"page-ranges\" value '%s'.\n", page_ranges);
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Bad \"page-ranges\" value '%s'.", page_ranges);
 	CGPDFDocumentRelease(document);
 	return (1);
       }
@@ -1872,7 +2170,7 @@ xform_document(
       pages = (unsigned)CGPDFDocumentGetNumberOfPages(document);
       if (first > pages)
       {
-	fputs("ERROR: \"page-ranges\" value does not include any pages to print in the document.\n", stderr);
+	fputs("ERROR: \"page-ranges\" value does not include any pages to print in the document.", stderr);
 	CGPDFDocumentRelease(document);
 	return (1);
       }
@@ -1897,7 +2195,7 @@ xform_document(
     if ((src = CGImageSourceCreateWithURL(url, NULL)) == NULL)
     {
       CFRelease(url);
-      fputs("ERROR: Unable to create CFImageSourceRef for file.\n", stderr);
+      fputs("ERROR: Unable to create CFImageSourceRef for file.", stderr);
       return (1);
     }
 
@@ -1906,7 +2204,7 @@ xform_document(
       CFRelease(src);
       CFRelease(url);
 
-      fputs("ERROR: Unable to create CFImageRef for file.\n", stderr);
+      fputs("ERROR: Unable to create CFImageRef for file.", stderr);
       return (1);
     }
 
@@ -1971,11 +2269,11 @@ xform_document(
   yscale = ras.header.HWResolution[1] / 72.0;
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: xscale=%g, yscale=%g\n", xscale, yscale);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "xscale=%g, yscale=%g", xscale, yscale);
   CGContextScaleCTM(context, xscale, yscale);
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: Band height=%u, page height=%u, page translate 0.0,%g\n", ras.band_height, ras.header.cupsHeight, -1.0 * (ras.header.cupsHeight - ras.band_height) / yscale);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Band height=%u, page height=%u, page translate 0.0,%g", ras.band_height, ras.header.cupsHeight, -1.0 * (ras.header.cupsHeight - ras.band_height) / yscale);
   CGContextTranslateCTM(context, 0.0, -1.0 * (ras.header.cupsHeight - ras.band_height) / yscale);
 
   dest.origin.x    = dest.origin.y = 0.0;
@@ -1995,7 +2293,7 @@ xform_document(
   */
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: cupsPageSize=[%g %g]\n", ras.header.cupsPageSize[0], ras.header.cupsPageSize[1]);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "cupsPageSize=[%g %g]", ras.header.cupsPageSize[0], ras.header.cupsPageSize[1]);
 
   (*(ras.start_job))(&ras, cb, ctx);
 
@@ -2029,7 +2327,7 @@ xform_document(
       back_transform = CGAffineTransformMake(1, 0, 0, 1, 0, 0);
 
     if (Verbosity > 1)
-      fprintf(stderr, "DEBUG: back_transform=[%g %g %g %g %g %g]\n", back_transform.a, back_transform.b, back_transform.c, back_transform.d, back_transform.tx, back_transform.ty);
+      xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "back_transform=[%g %g %g %g %g %g]", back_transform.a, back_transform.b, back_transform.c, back_transform.d, back_transform.tx, back_transform.ty);
 
    /*
     * Draw all of the pages...
@@ -2048,7 +2346,7 @@ xform_document(
 	transform = CGPDFPageGetDrawingTransform(pdf_page, kCGPDFCropBox,dest, 0, true);
 
 	if (Verbosity > 1)
-	  fprintf(stderr, "DEBUG: Printing copy %d/%d, page %d/%d, transform=[%g %g %g %g %g %g]\n", copy + 1, ras.copies, page, pages, transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
+	  xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Printing copy %d/%d, page %d/%d, transform=[%g %g %g %g %g %g]", copy + 1, ras.copies, page, pages, transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
 
 	(*(ras.start_page))(&ras, page, cb, ctx);
 
@@ -2066,7 +2364,7 @@ xform_document(
 	      band_endy = ras.bottom;
 
 	    if (Verbosity > 1)
-	      fprintf(stderr, "DEBUG: Drawing band from %u to %u.\n", band_starty, band_endy);
+	      xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Drawing band from %u to %u.", band_starty, band_endy);
 
 	    CGContextSaveGState(context);
 	      if (ras.header.cupsNumColors == 1)
@@ -2080,7 +2378,7 @@ xform_document(
 
 	    CGContextSaveGState(context);
 	      if (Verbosity > 1)
-		fprintf(stderr, "DEBUG: Band translate 0.0,%g\n", y / yscale);
+		xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Band translate 0.0,%g", y / yscale);
 	      CGContextTranslateCTM(context, 0.0, y / yscale);
 	      if (!(page & 1) && ras.header.Duplex)
 		CGContextConcatCTM(context, back_transform);
@@ -2105,11 +2403,11 @@ xform_document(
 	(*(ras.end_page))(&ras, page, cb, ctx);
 
 	impressions ++;
-	fprintf(stderr, "ATTR: job-impressions-completed=%u\n", impressions);
+	xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-impressions-completed=%u", impressions);
 	if (!ras.header.Duplex || !(page & 1))
 	{
 	  media_sheets ++;
-	  fprintf(stderr, "ATTR: job-media-sheets-completed=%u\n", media_sheets);
+	  xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-media-sheets-completed=%u", media_sheets);
 	}
       }
 
@@ -2122,7 +2420,7 @@ xform_document(
 	unsigned	y;		/* Current line */
 
 	if (Verbosity > 1)
-	  fprintf(stderr, "DEBUG: Printing blank page %u for duplex.\n", pages + 1);
+	  xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Printing blank page %u for duplex.", pages + 1);
 
 	memset(ras.band_buffer, 255, ras.header.cupsBytesPerLine);
 
@@ -2134,11 +2432,11 @@ xform_document(
 	(*(ras.end_page))(&ras, page, cb, ctx);
 
 	impressions ++;
-	fprintf(stderr, "ATTR: job-impressions-completed=%u\n", impressions);
+	xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-impressions-completed=%u", impressions);
 	if (!ras.header.Duplex || !(page & 1))
 	{
 	  media_sheets ++;
-	  fprintf(stderr, "ATTR: job-media-sheets-completed=%u\n", media_sheets);
+	  xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-media-sheets-completed=%u", media_sheets);
 	}
       }
     }
@@ -2173,7 +2471,7 @@ xform_document(
     }
 
     if (Verbosity > 1)
-      fprintf(stderr, "DEBUG: image_width=%u, image_height=%u, image_rotation=%d\n", (unsigned)image_width, (unsigned)image_height, image_rotation);
+      xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "image_width=%u, image_height=%u, image_rotation=%d", (unsigned)image_width, (unsigned)image_height, image_rotation);
 
     if ((!strcmp(print_scaling, "auto") && ras.borderless) || !strcmp(print_scaling, "fill"))
     {
@@ -2242,7 +2540,7 @@ xform_document(
       unsigned char	*lineptr;	/* Pointer to line */
 
       if (Verbosity > 1)
-	fprintf(stderr, "DEBUG: Printing copy %d/%d, transform=[%g %g %g %g %g %g]\n", copy + 1, ras.copies, transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
+	xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Printing copy %d/%d, transform=[%g %g %g %g %g %g]", copy + 1, ras.copies, transform.a, transform.b, transform.c, transform.d, transform.tx, transform.ty);
 
       (*(ras.start_page))(&ras, 1, cb, ctx);
 
@@ -2260,7 +2558,7 @@ xform_document(
 	    band_endy = ras.bottom;
 
 	  if (Verbosity > 1)
-	    fprintf(stderr, "DEBUG: Drawing band from %u to %u.\n", band_starty, band_endy);
+	    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Drawing band from %u to %u.", band_starty, band_endy);
 
 	  CGContextSaveGState(context);
 	    if (ras.header.cupsNumColors == 1)
@@ -2274,7 +2572,7 @@ xform_document(
 
 	  CGContextSaveGState(context);
 	    if (Verbosity > 1)
-	      fprintf(stderr, "DEBUG: Band translate 0.0,%g\n", y / yscale);
+	      xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Band translate 0.0,%g", y / yscale);
 	    CGContextTranslateCTM(context, 0.0, y / yscale);
 	    CGContextConcatCTM(context, transform);
 
@@ -2299,9 +2597,9 @@ xform_document(
       (*(ras.end_page))(&ras, 1, cb, ctx);
 
       impressions ++;
-      fprintf(stderr, "ATTR: job-impressions-completed=%u\n", impressions);
+      xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-impressions-completed=%u", impressions);
       media_sheets ++;
-      fprintf(stderr, "ATTR: job-media-sheets-completed=%u\n", media_sheets);
+      xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-media-sheets-completed=%u", media_sheets);
     }
 
     CFRelease(image);
@@ -2325,7 +2623,7 @@ xform_document(
  */
 
 static int				/* O - 0 on success, 1 on error */
-xform_document(
+old_xform_document(
     const char       *filename,		/* I - File to transform */
     const char       *informat,		/* I - Input format (MIME media type) */
     const char       *outformat,	/* I - Output format (MIME media type) */
@@ -2370,7 +2668,7 @@ xform_document(
 
   if ((context = fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED)) == NULL)
   {
-    fputs("ERROR: Unable to create context.\n", stderr);
+    fputs("ERROR: Unable to create context.", stderr);
     return (1);
   }
 
@@ -2379,14 +2677,14 @@ xform_document(
   fz_try(context) document = fz_open_document(context, filename);
   fz_catch(context)
   {
-    fprintf(stderr, "ERROR: Unable to open '%s': %s\n", filename, fz_caught_message(context));
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to open '%s': %s", filename, fz_caught_message(context));
     fz_drop_context(context);
     return (1);
   }
 
   if (fz_needs_password(context, document))
   {
-    fputs("ERROR: Document is encrypted and cannot be unlocked.\n", stderr);
+    fputs("ERROR: Document is encrypted and cannot be unlocked.", stderr);
     fz_drop_document(context, document);
     fz_drop_context(context);
     return (1);
@@ -2400,7 +2698,7 @@ xform_document(
   {
     if (sscanf(page_ranges, "%u-%u", &first, &last) != 2 || first > last)
     {
-      fprintf(stderr, "ERROR: Bad \"page-ranges\" value '%s'.\n", page_ranges);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Bad \"page-ranges\" value '%s'.", page_ranges);
 
       fz_drop_document(context, document);
       fz_drop_context(context);
@@ -2411,7 +2709,7 @@ xform_document(
     pages = (unsigned)fz_count_pages(context, document);
     if (first > pages)
     {
-      fputs("ERROR: \"page-ranges\" value does not include any pages to print in the document.\n", stderr);
+      fputs("ERROR: \"page-ranges\" value does not include any pages to print in the document.", stderr);
 
       fz_drop_document(context, document);
       fz_drop_context(context);
@@ -2487,11 +2785,11 @@ xform_document(
   yscale = ras.header.HWResolution[1] / 72.0;
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: xscale=%g, yscale=%g\n", xscale, yscale);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "xscale=%g, yscale=%g", xscale, yscale);
   fz_scale(&base_transform, xscale, yscale);
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: Band height=%u, page height=%u\n", ras.band_height, ras.header.cupsHeight);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Band height=%u, page height=%u", ras.band_height, ras.header.cupsHeight);
 
   device = fz_new_draw_device(context, &base_transform, pixmap);
 
@@ -2526,9 +2824,9 @@ xform_document(
     back_transform = fz_make_matrix(1, 0, 0, 1, 0, 0);
 
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: cupsPageSize=[%g %g]\n", ras.header.cupsPageSize[0], ras.header.cupsPageSize[1]);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "cupsPageSize=[%g %g]", ras.header.cupsPageSize[0], ras.header.cupsPageSize[1]);
   if (Verbosity > 1)
-    fprintf(stderr, "DEBUG: back_transform=[%g %g %g %g %g %g]\n", back_transform.a, back_transform.b, back_transform.c, back_transform.d, back_transform.e, back_transform.f);
+    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "back_transform=[%g %g %g %g %g %g]", back_transform.a, back_transform.b, back_transform.c, back_transform.d, back_transform.e, back_transform.f);
 
  /*
   * Get print-scaling value...
@@ -2557,7 +2855,7 @@ xform_document(
 
       fz_bound_page(context, pdf_page, &image_box);
 
-      fprintf(stderr, "DEBUG: image_box=[%g %g %g %g]\n", image_box.x0, image_box.y0, image_box.x1, image_box.y1);
+      xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "image_box=[%g %g %g %g]", image_box.x0, image_box.y0, image_box.x1, image_box.y1);
 
       float image_width = image_box.x1 - image_box.x0;
       float image_height = image_box.y1 - image_box.y0;
@@ -2639,7 +2937,7 @@ xform_document(
       }
 
       if (Verbosity > 1)
-        fprintf(stderr, "DEBUG: Printing copy %d/%d, page %d/%d, image_transform=[%g %g %g %g %g %g]\n", copy + 1, ras.copies, page, pages, image_transform.a, image_transform.b, image_transform.c, image_transform.d, image_transform.e, image_transform.f);
+        xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Printing copy %d/%d, page %d/%d, image_transform=[%g %g %g %g %g %g]", copy + 1, ras.copies, page, pages, image_transform.a, image_transform.b, image_transform.c, image_transform.d, image_transform.e, image_transform.f);
 
       (*(ras.start_page))(&ras, page, cb, ctx);
 
@@ -2657,7 +2955,7 @@ xform_document(
 	    band_endy = ras.bottom;
 
 	  if (Verbosity > 1)
-	    fprintf(stderr, "DEBUG: Drawing band from %u to %u.\n", band_starty, band_endy);
+	    xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Drawing band from %u to %u.", band_starty, band_endy);
 
           fz_clear_pixmap_with_value(context, pixmap, 0xff);
 
@@ -2668,7 +2966,7 @@ xform_document(
 
 	  fz_concat(&transform, &transform, &image_transform);
 
-          fprintf(stderr, "DEBUG: page transform=[%g %g %g %g %g %g]\n", transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+          xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "page transform=[%g %g %g %g %g %g]", transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
 
           fz_run_page(context, pdf_page, device, &transform, NULL);
 	}
@@ -2689,11 +2987,11 @@ xform_document(
       (*(ras.end_page))(&ras, page, cb, ctx);
 
       impressions ++;
-      fprintf(stderr, "ATTR: job-impressions-completed=%u\n", impressions);
+      xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-impressions-completed=%u", impressions);
       if (!ras.header.Duplex || !(page & 1))
       {
         media_sheets ++;
-	fprintf(stderr, "ATTR: job-media-sheets-completed=%u\n", media_sheets);
+	xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-media-sheets-completed=%u", media_sheets);
       }
     }
 
@@ -2706,7 +3004,7 @@ xform_document(
       unsigned		y;		/* Current line */
 
       if (Verbosity > 1)
-        fprintf(stderr, "DEBUG: Printing blank page %u for duplex.\n", pages + 1);
+        xform_log(ctx, XFORM_LOGLEVEL_DEBUG, "Printing blank page %u for duplex.", pages + 1);
 
       memset(pixmap->samples, 255, ras.header.cupsBytesPerLine);
 
@@ -2718,11 +3016,11 @@ xform_document(
       (*(ras.end_page))(&ras, page, cb, ctx);
 
       impressions ++;
-      fprintf(stderr, "ATTR: job-impressions-completed=%u\n", impressions);
+      xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-impressions-completed=%u", impressions);
       if (!ras.header.Duplex || !(page & 1))
       {
         media_sheets ++;
-	fprintf(stderr, "ATTR: job-media-sheets-completed=%u\n", media_sheets);
+	xform_log(ctx, XFORM_LOGLEVEL_ATTR, "job-media-sheets-completed=%u", media_sheets);
       }
     }
   }
@@ -2748,7 +3046,7 @@ xform_document(
  */
 
 static int				/* O - 0 on success, -1 on failure */
-xform_setup(xform_ctx_t *ras,	/* I - Raster information */
+old_xform_setup(xform_ctx_t *ras,	/* I - Raster information */
             const char     *format,	/* I - Output format (MIME media type) */
 	    const char     *resolutions,/* I - Supported resolutions */
 	    const char     *sheet_back,	/* I - Back side transform */
@@ -2798,7 +3096,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
     if (temp < 1 || temp > 9999)
     {
-      fprintf(stderr, "ERROR: Invalid \"copies\" value '%s'.\n", copies);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Invalid \"copies\" value '%s'.", copies);
       return (-1);
     }
 
@@ -2818,7 +3116,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
     if (!pwg_media)
     {
-      fprintf(stderr, "ERROR: Unknown \"media\" value '%s'.\n", media);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown \"media\" value '%s'.", media);
       return (-1);
     }
   }
@@ -2838,7 +3136,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
     {
       if ((pwg_media = pwgMediaForPWG(media_size_name)) == NULL)
       {
-	fprintf(stderr, "ERROR: Unknown \"media-size-name\" value '%s'.\n", media_size_name);
+	xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown \"media-size-name\" value '%s'.", media_size_name);
 	cupsFreeOptions(num_cols, cols);
 	return (-1);
       }
@@ -2857,7 +3155,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
       }
       else
       {
-        fprintf(stderr, "ERROR: Bad \"media-size\" value '%s'.\n", media_size);
+        xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Bad \"media-size\" value '%s'.", media_size);
 	cupsFreeOptions(num_sizes, sizes);
 	cupsFreeOptions(num_cols, cols);
 	return (-1);
@@ -2893,7 +3191,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
     if ((pwg_media = pwgMediaForPWG(media_default)) == NULL)
     {
-      fprintf(stderr, "ERROR: Unknown \"media-default\" value '%s'.\n", media_default);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unknown \"media-default\" value '%s'.", media_default);
       return (-1);
     }
   }
@@ -2914,7 +3212,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
   if ((printer_resolution = cupsGetOption("printer-resolution", num_options, options)) != NULL && !cupsArrayFind(res_array, (void *)printer_resolution))
   {
     if (Verbosity)
-      fprintf(stderr, "INFO: Unsupported \"printer-resolution\" value '%s'.\n", printer_resolution);
+      xform_log(ctx, XFORM_LOGLEVEL_INFO, "Unsupported \"printer-resolution\" value '%s'.", printer_resolution);
     printer_resolution = NULL;
   }
 
@@ -2939,7 +3237,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
 	default :
 	    if (Verbosity)
-	      fprintf(stderr, "INFO: Unsupported \"print-quality\" value '%s'.\n", print_quality);
+	      xform_log(ctx, XFORM_LOGLEVEL_INFO, "Unsupported \"print-quality\" value '%s'.", print_quality);
 	    break;
       }
     }
@@ -2950,7 +3248,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
   if (!printer_resolution)
   {
-    fputs("ERROR: No \"printer-resolution\" or \"pwg-raster-document-resolution-supported\" value.\n", stderr);
+    fputs("ERROR: No \"printer-resolution\" or \"pwg-raster-document-resolution-supported\" value.", stderr);
     return (-1);
   }
 
@@ -2966,7 +3264,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
     }
     else
     {
-      fprintf(stderr, "ERROR: Bad resolution value '%s'.\n", printer_resolution);
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Bad resolution value '%s'.", printer_resolution);
       return (-1);
     }
   }
@@ -3021,7 +3319,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
 
   if (!cupsRasterInitPWGHeader(&(ras->header), pwg_media, type, xdpi, ydpi, sides, NULL))
   {
-    fprintf(stderr, "ERROR: Unable to initialize raster context: %s\n", cupsRasterErrorString());
+    xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize raster context: %s", cupsRasterErrorString());
     return (-1);
   }
 
@@ -3029,7 +3327,7 @@ xform_setup(xform_ctx_t *ras,	/* I - Raster information */
   {
     if (!cupsRasterInitPWGHeader(&(ras->back_header), pwg_media, type, xdpi, ydpi, sides, sheet_back))
     {
-      fprintf(stderr, "ERROR: Unable to initialize back side raster context: %s\n", cupsRasterErrorString());
+      xform_log(ctx, XFORM_LOGLEVEL_ERROR, "Unable to initialize back side raster context: %s", cupsRasterErrorString());
       return (-1);
     }
   }
