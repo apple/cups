@@ -115,6 +115,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			  { HTTP_URI_STATUS_OK, "ipp://%22%23%2F%3A%3C%3E%3F%40%5B%5C%5D%5E%60%7B%7C%7D/",
 			    "ipp", "", "\"#/:<>?@[\\]^`{|}", "/", 631, 0,
 			    HTTP_URI_CODING_MOST  },
+			  { HTTP_URI_STATUS_UNKNOWN_SCHEME, "smb://server/Some%20Printer",
+			    "smb", "", "server", "/Some Printer", 0, 0,
+			    HTTP_URI_CODING_ALL },
 
 			  /* Missing scheme */
 			  { HTTP_URI_STATUS_MISSING_SCHEME, "/path/to/file/index.html",
