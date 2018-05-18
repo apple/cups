@@ -37,6 +37,7 @@ extern "C" {
 #  define XFORM_FORMAT_JPEG		"image/jpeg"
 #  define XFORM_FORMAT_PCL		"application/vnd.hp-pcl"
 #  define XFORM_FORMAT_PDF		"application/pdf"
+#  define XFORM_FORMAT_PNG		"image/png"
 #  define XFORM_FORMAT_POSTSCRIPT	"application/postscript"
 #  define XFORM_FORMAT_PWG_RASTER	"image/pwg-raster"
 #  define XFORM_FORMAT_TEXT		"text/plain"
