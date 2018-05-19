@@ -96,7 +96,7 @@ typedef struct xform_capabilities_s	/**** Output Capabilities ****/
   xform_size_t	max_size;		/* Maximum size */
   xform_margins_t min_margins;		/* Minimum margins */
   xform_size_t	min_size;		/* Minimum size */
-} xform_capabilities_t;
+} xform_caps_t;
 
 typedef struct _xform_ctx_s xform_ctx_t;/**** Transform context ****/
 
@@ -112,7 +112,8 @@ typedef ssize_t (*xform_writecb_t)(void *user_data, const unsigned char *buffer,
  */
 
 extern void		xformDelete(xform_ctx_t *ctx);
-extern xform_ctx_t	*xformNew(const char *outformat, xform_capabilities_t *outcaps);
+extern int		xformInitCapabilities(xform_caps_t *caps, ipp_t *supported);
+extern xform_ctx_t	*xformNew(const char *outformat, xform_caps_t *outcaps);
 extern int		xformRun(xform_ctx_t *ctx, const char *infile, const char *informat);
 extern void		xformSetLogCallback(xform_ctx_t *ctx, xform_logcb_t logcb, void *logdata);
 extern void		xformSetOptions(xform_ctx_t *ctx, int num_options, cups_option_t *options);

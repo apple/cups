@@ -14,6 +14,7 @@
 #include "xform-private.h"
 #include "xform-dither.h"
 #include "ppd-private.h"
+#include "array-private.h"
 #include "string-private.h"
 
 #ifdef __APPLE__
@@ -50,7 +51,7 @@ static inline fz_matrix fz_make_matrix(float a, float b, float c, float d, float
 struct _xform_ctx_s
 {
   char			*format;	/* Output format */
-  xform_capabilities_t	capabilities;	/* Output capabilities */
+  xform_caps_t	capabilities;	/* Output capabilities */
   xform_logcb_t		logcb;		/* Logging callback */
   void			*logdata;	/* User data for logging callback */
   xform_writecb_t	writecb;	/* Write callback */
@@ -78,6 +79,13 @@ struct _xform_ctx_s
   void			(*start_job)(xform_ctx_t *ctx);
   void			(*start_page)(xform_ctx_t *ctx, unsigned page);
   void			(*write_line)(xform_ctx_t *ctx, unsigned y, const unsigned char *line);
+
+  /* Set by xformRun */
+#ifdef __APPLE__
+
+#elif defined(HAVE_MUPDF)
+
+#endif /* __APPLE__ */
 
   /* Set by start_job callback */
   cups_raster_t		*ras;		/* Raster stream */
@@ -159,13 +167,191 @@ xformDelete(xform_ctx_t *ctx)		/* I - Transform context */
 
 
 /*
+ * 'xformInitCapabilities()' - Initialize capabilities from standard sources.
+ *
+ * The "supported" parameter provides the attributes from a
+ * Get-Printer-Attributes request.  If `NULL`, this function looks for
+ * capabilities in environment variables as supplied by the CUPS filter
+ * interface and ippserver command interface.
+ */
+
+int					/* O - 0 if the capabilities could not be initialized */
+xformInitCapabilities(
+    xform_caps_t *caps,			/* I - Capabilities structure */
+    ipp_t        *supported)		/* I - Printer attributes or `NULL` */
+{
+  const char	*ppdfile,		/* PPD file (if any) */
+		*pwg_resolutions,	/* pwg-raster-document-resolution-supported */
+		*pwg_sheet_back,	/* pwg-raster-document-sheet-back */
+		*pwg_types;		/* pwg-raster-document-type-supported */
+
+
+  memset(caps, 0, sizeof(xform_caps_t));
+
+  if (supported)
+  {
+    ipp_attribute_t	*attr;		/* IPP attribute */
+
+
+  }
+  else if ((ppdfile = getenv("PPD")) != NULL)
+  {
+    ppd_file_t	*ppd;			/* PPD file */
+
+    if ((ppd = ppdOpenFile(ppdfile)) == NULL)
+      return (0);
+
+  }
+  else if ((pwg_resolutions = getenv("PWG_RASTER_DOCUMENT_RESOLUTION_SUPPORTED")) != NULL && (pwg_types = getenv("PWG_RASTER_DOCUMENT_TYPE_SUPPORTED")) != NULL)
+  {
+    cups_array_t	*temp;		/* Temporary array */
+    const char		*value;		/* Temporary value */
+    unsigned		xdpi, ydpi;	/* Resolutions */
+
+   /*
+    * Resolutions...
+    */
+
+    temp = _cupsArrayNewStrings(pwg_resolutions, ',');
+
+    value = cupsArrayIndex(temp, 0);
+    switch (sscanf(value, "%ux%udpi", &xdpi, &ydpi))
+    {
+      case 0 :
+          xdpi = ydpi = 300;
+          break;
+      case 1 :
+          ydpi = xdpi;
+    }
+    caps->draft_resolution[0] = xdpi;
+    caps->draft_resolution[1] = ydpi;
+
+    value = cupsArrayIndex(temp, cupsArrayCount(temp) / 2);
+    switch (sscanf(value, "%dx%ddpi", &xdpi, &ydpi))
+    {
+      case 0 :
+          xdpi = ydpi = 300;
+          break;
+      case 1 :
+          ydpi = xdpi;
+    }
+    caps->normal_resolution[0] = xdpi;
+    caps->normal_resolution[1] = ydpi;
+
+    value = cupsArrayIndex(temp, cupsArrayCount(temp) - 1);
+    switch (sscanf(value, "%dx%ddpi", &xdpi, &ydpi))
+    {
+      case 0 :
+          xdpi = ydpi = 300;
+          break;
+      case 1 :
+          ydpi = xdpi;
+    }
+    caps->high_resolution[0] = xdpi;
+    caps->high_resolution[1] = ydpi;
+
+    cupsArrayDelete(temp);
+
+   /*
+    * Colorspaces and bit depths...
+    */
+
+    temp = _cupsArrayNewStrings(pwg_types, ',');
+
+    for (value = (const char *)cupsArrayFirst(temp); value; value = (const char *)cupsArrayNext(temp))
+    {
+      if (!_cups_strcasecmp(value, "black_1"))
+      {
+        caps->draft_bits = 1;
+
+        if (!caps->normal_bits)
+        {
+          caps->monochrome  = CUPS_CSPACE_K;
+          caps->normal_bits = 1;
+        }
+      }
+      else if (!_cups_strcasecmp(value, "sgray_8"))
+      {
+        if (!caps->draft_bits)
+          caps->draft_bits = 8;
+
+        caps->monochrome = CUPS_CSPACE_SW;
+
+        caps->normal_bits = 8;
+      }
+      else if (!_cups_strcasecmp(value, "srgb_8"))
+      {
+        if (!caps->draft_bits)
+          caps->draft_bits = 8;
+
+        caps->color = CUPS_CSPACE_SRGB;
+
+        if (!caps->photo)
+          caps->photo = CUPS_CSPACE_SRGB;
+
+        caps->normal_bits = 8;
+
+        if (!caps->high_bits)
+          caps->high_bits = 8;
+      }
+      else if (!_cups_strcasecmp(value, "adobe-rgb_8"))
+      {
+        if (!caps->draft_bits)
+          caps->draft_bits = 8;
+
+        if (!caps->color)
+        {
+          caps->color       = CUPS_CSPACE_ADOBERGB;
+          caps->normal_bits = 8;
+        }
+
+	caps->photo = CUPS_CSPACE_ADOBERGB;
+
+        if (!caps->high_bits)
+          caps->high_bits = 8;
+      }
+      else if (!_cups_strcasecmp(value, "adobe-rgb_16"))
+      {
+	caps->photo     = CUPS_CSPACE_ADOBERGB;
+	caps->high_bits = 16;
+      }
+    }
+
+    cupsArrayDelete(temp);
+
+   /*
+    * Duplex transform for back side...
+    */
+
+    if ((pwg_sheet_back = getenv("PWG_RASTER_DOCUMENT_SHEET_BACK")) != NULL)
+    {
+      if (!strcmp(pwg_sheet_back, "normal"))
+        caps->duplex = XFORM_DUPLEX_NORMAL;
+      else if (!strcmp(pwg_sheet_back, "rotated"))
+        caps->duplex = XFORM_DUPLEX_SHORT_TUMBLE;
+      else if (!strcmp(pwg_sheet_back, "manual-tumble"))
+        caps->duplex = XFORM_DUPLEX_LONG_TUMBLE;
+      else if (!strcmp(pwg_sheet_back, "flipped"))
+        caps->duplex = XFORM_DUPLEX_MIRRORED;
+      else
+        caps->duplex = XFORM_DUPLEX_NONE;
+    }
+    else
+      caps->duplex = XFORM_DUPLEX_NONE;
+  }
+
+  return (1);
+}
+
+
+/*
  * 'xformNew()' - Create a new transform context.
  */
 
 xform_ctx_t *				/* O - New transform context */
 xformNew(
     const char           *outformat,	/* I - Output MIME media type */
-    xform_capabilities_t *outcaps)	/* I - Output capabilities */
+    xform_caps_t *outcaps)	/* I - Output capabilities */
 {
   xform_ctx_t	*ctx;			/* New context */
 
@@ -2063,7 +2249,7 @@ write_fd(int                 *fd,	/* I - File descriptor */
  */
 
 static int				/* O - 0 on success, 1 on error */
-xform_document(
+darwin_xform_document(
     const char       *filename,		/* I - File to transform */
     const char       *informat,		/* I - Input document (MIME media type */
     const char       *outformat,	/* I - Output format (MIME media type) */
