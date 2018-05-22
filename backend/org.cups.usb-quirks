@@ -281,3 +281,9 @@
 
 # Lexmark Optra E310 (Issue #5259)
 0x043d 0x000c no-reattach
+
+# CUSTOM VKP80III
+0x0dd4 0x0205 unidir
+
+# CUSTOM VK80
+0x0dd4 0x0212 unidir
