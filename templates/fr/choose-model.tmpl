@@ -28,7 +28,7 @@
 <TR>
 <TH CLASS="label">Partage :</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
-{?printer_is_shared=?Ne pas:{?printer_is_shared=0?Do Not:}} partager cette imprimante</TD>
+{?printer_is_shared=?Ne pas p:{?printer_is_shared=0?Ne pas p:P}}artager cette imprimante</TD>
 </TR>
 <TR>
 <TH CLASS="label">Marque :</TH>
@@ -38,7 +38,7 @@
 <TH CLASS="label">Modèle :</TH>
 <TD>
 <SELECT NAME="PPD_NAME" SIZE="10">
-{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Pilote courant - {current_make_and_model}</OPTION>:}
+{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Pilote actuel - {current_make_and_model}</OPTION>:}
 {[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
 }</SELECT>
 </TD>

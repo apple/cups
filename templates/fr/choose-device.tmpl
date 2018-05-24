@@ -21,7 +21,7 @@ VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
 </TD>
 </TR>
 <TR>
-<TH CLASS="label">Imprimantes r&eacute;seaux d&eacute;couvertes \:</TH>
+<TH CLASS="label">Imprimantes r&eacute;seau d&eacute;couvertes \:</TH>
 <TD>
 {[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}"
 VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
@@ -31,7 +31,7 @@ VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
 </TR>
 <TR>
 <TR>
-<TH CLASS="label">Autres imprimantes r&eacute;seaux \:</TH>
+<TH CLASS="label">Autres imprimantes r&eacute;seau \:</TH>
 <TD>
 {[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="RADIO" NAME="DEVICE_URI" ID="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}"
 VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
