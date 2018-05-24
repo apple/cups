@@ -1,8 +1,8 @@
 <FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
 {TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
 
-<P ALIGN="CENTER"><B>Search in
-{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}:</B> <INPUT
+<P ALIGN="CENTER"><B>Rechercher dans
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:Tous les documents}}:</B> <INPUT
 TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
 AUTOSAVE="org.cups.help" RESULTS="20">
 <INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Search">
@@ -14,9 +14,9 @@ AUTOSAVE="org.cups.help" RESULTS="20">
 <DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contents">
 <TR><TD>
 
-<H3 CLASS="title">Online Help Documents</H3>
+<H3 CLASS="title">Documentation en ligne</H3>
 
-<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">All Documents</A></P>
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Tous les documents</A></P>
 <HR>
 
 {[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
@@ -24,18 +24,18 @@ AUTOSAVE="org.cups.help" RESULTS="20">
 </TD></TR>
 </TABLE></DIV>
 
-{QUERY?<P>Search Results in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}\:</P>
+{QUERY?<P>Résultats de la recherche dans {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Tous les documents}}\:</P>
 {QTEXT?<UL>
 {[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
 {QTEXT?</UL>:}
-:<P>No matches found.</P>}
+:<P>Aucun résultat.</P>}
 <HR NOSHADE>:}
-{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="View Printable Version"></FORM>:
+{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Voir la version imprimable"></FORM>:
 
-<H1>Online Help</H1>
+<H1>Aide en ligne</H1>
 
-<P>This is the CUPS online help interface. Enter search words above or click on any of the documentation links to display online help information.</P>
+<P>Ceci est l'interface d'aide en ligne de CUPS. Entrez vos termes de recherch ci-dessus ou cliquez sur un des liens vers la documentation pour voir les informations d'aide en ligne.</P>
 
-<P>If you are new to CUPS, read the "<a href="/help/overview.html">Overview of CUPS</a>" page.</P>
+<P>Si vous êtes un nouvel utilisateur de CUPS, lisez la page "<a href="/help/overview.html">Aperçu de CUPS</a>".</P>
 
-<P>The <A HREF="http://www.cups.org/">CUPS home page</A> also provides many resources including user discussion forums, answers to frequently-asked questions, and a form for submitting bug reports and feature requests.</P>}
+<P>La <A HREF="http://www.cups.org/">page d'accueil CUPS</A> procure aussi beaucoup de ressources dont des forums, des FAQ, et un formulaire pour les rapports de bugs et les demandes de fonctionnalités.</P>}
