@@ -2229,7 +2229,7 @@ parse_text(const char *start,		/* I - Start of text value */
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
-  while (bufptr < bufend)
+  while (*start && bufptr < bufend)
   {
     if (isspace(*start & 255) && !level)
       break;
