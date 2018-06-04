@@ -1,7 +1,7 @@
-CHANGES - 2.3rc1 - 2018-05-11
+CHANGES - 2.3b5 - 2018-06-04
 =============================
 
-Changes in CUPS v2.3rc1
+Changes in CUPS v2.3b5
 -----------------------
 
 - The `ipptool` program no longer checks for duplicate attributes when running
@@ -18,6 +18,7 @@ Changes in CUPS v2.3rc1
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
+- The IPP parser allowed invalid group tags (rdar://40442124)
 - Fixed a parsing bug in the new authentication code.
 
 

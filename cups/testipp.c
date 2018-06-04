@@ -738,7 +738,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	if (state != IPP_STATE_DATA)
 	{
-	  printf("Error reading IPP message from \"%s\".\n", argv[i]);
+	  printf("Error reading IPP message from \"%s\": %s\n", argv[i], cupsLastErrorString());
 	  status = 1;
 
 	  ippDelete(request);
