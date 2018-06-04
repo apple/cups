@@ -1,4 +1,4 @@
-CHANGES - 2.2.8 - 2018-05-01
+CHANGES - 2.2.8 - 2018-06-04
 ============================
 
 
@@ -23,6 +23,7 @@ Changes in CUPS v2.2.8
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
+- The IPP parser allowed invalid group tags (rdar://40442124)
 - Fixed a parsing bug in the new authentication code.
 
 
