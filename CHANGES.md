@@ -1,5 +1,5 @@
-CHANGES - 2.3b5 - 2018-06-04
-=============================
+CHANGES - 2.3b5 - 2018-06-05
+============================
 
 Changes in CUPS v2.3b5
 -----------------------
@@ -14,6 +14,7 @@ Changes in CUPS v2.3b5
   authentication schemes in a single response header (Issue #5289)
 - Fixed policy limits containing the `All` operation (Issue #5296)
 - The scheduler was always restarted after idle-exit with systemd (Issue #5297)
+- Added a USB quirks rule for the HP LaserJet P1102 (Issue #5310)
 - The mailto notifier did not wait for the welcome message (Issue #5312)
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
