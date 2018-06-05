@@ -16,6 +16,7 @@ Changes in CUPS v2.3b5
 - The scheduler was always restarted after idle-exit with systemd (Issue #5297)
 - Added a USB quirks rule for the HP LaserJet P1102 (Issue #5310)
 - The mailto notifier did not wait for the welcome message (Issue #5312)
+- Fixed a parsing bug in the pstops filter (Issue #5321)
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
 - The scheduler allowed environment variables to be specified in the
   `cupsd.conf` file (rdar://37836779, rdar://37836995, rdar://37837252,
