@@ -3388,7 +3388,10 @@ ippReadIO(void       *src,		/* I - Data source */
                 value->boolean = (char)buffer[0];
 	        break;
 
-            case IPP_TAG_NOVALUE :
+	    case IPP_TAG_UNSUPPORTED_VALUE :
+	    case IPP_TAG_DEFAULT :
+	    case IPP_TAG_UNKNOWN :
+	    case IPP_TAG_NOVALUE :
 	    case IPP_TAG_NOTSETTABLE :
 	    case IPP_TAG_DELETEATTR :
 	    case IPP_TAG_ADMINDEFINE :
@@ -3408,6 +3411,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	    case IPP_TAG_TEXT :
 	    case IPP_TAG_NAME :
+	    case IPP_TAG_RESERVED_STRING :
 	    case IPP_TAG_KEYWORD :
 	    case IPP_TAG_URI :
 	    case IPP_TAG_URISCHEME :
@@ -6383,6 +6387,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	  }
 	  break;
 
+      case IPP_TAG_UNSUPPORTED_VALUE :
       case IPP_TAG_DEFAULT :
       case IPP_TAG_UNKNOWN :
       case IPP_TAG_NOVALUE :
