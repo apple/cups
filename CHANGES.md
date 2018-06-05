@@ -17,6 +17,9 @@ Changes in CUPS v2.3b5
 - Added a USB quirks rule for the HP LaserJet P1102 (Issue #5310)
 - The mailto notifier did not wait for the welcome message (Issue #5312)
 - Documentation updates (Issue #5299, Issue #5301, Issue #5306)
+- The scheduler allowed environment variables to be specified in the
+  `cupsd.conf` file (rdar://37836779, rdar://37836995, rdar://37837252,
+  rdar://37837581)
 - Fax queues did not support pause (p) or wait-for-dialtone (w) characters
   (rdar://39212256)
 - The scheduler did not validate notify-recipient-uri values properly
