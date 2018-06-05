@@ -1,180 +1,9 @@
-<!doctype html>
-<html>
-<!-- SECTION: Programming -->
-  <head>
-    <title>CUPS Programming Manual</title>
-    <meta name="keywords" content="Programming">
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="Mini-XML v2.11">
-    <meta name="author" content="Michael R Sweet">
-    <meta name="copyright" content="Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.">
-    <meta name="version" content="2.2.5">
-    <style type="text/css"><!--
-body, p, h1, h2, h3, h4 {
-  font-family: sans-serif;
-}
-div.body h1 {
-  font-size: 250%;
-  font-weight: bold;
-  margin: 0;
-}
-div.body h2 {
-  font-size: 250%;
-  margin-top: 1.5em;
-}
-div.body h3 {
-  font-size: 150%;
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-div.body h4 {
-  font-size: 110%;
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-div.body h5 {
-  font-size: 100%;
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-div.contents {
-  background: #e8e8e8;
-  border: solid thin black;
-  padding: 10px;
-}
-div.contents h1 {
-  font-size: 110%;
-}
-div.contents h2 {
-  font-size: 100%;
-}
-div.contents ul.contents {
-  font-size: 80%;
-}
-.class {
-  border-bottom: solid 2px gray;
-}
-.constants {
-}
-.description {
-  margin-top: 0.5em;
-}
-.discussion {
-}
-.enumeration {
-  border-bottom: solid 2px gray;
-}
-.function {
-  border-bottom: solid 2px gray;
-  margin-bottom: 0;
-}
-.members {
-}
-.method {
-}
-.parameters {
-}
-.returnvalue {
-}
-.struct {
-  border-bottom: solid 2px gray;
-}
-.typedef {
-  border-bottom: solid 2px gray;
-}
-.union {
-  border-bottom: solid 2px gray;
-}
-.variable {
-}
-h1, h2, h3, h4, h5, h6 {
-  page-break-inside: avoid;
-}
-blockquote {
-  border: solid thin gray;
-  box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
-  padding: 0px 10px;
-  page-break-inside: avoid;
-}
-p code, li code, p.code, pre, ul.code li {
-  background: rgba(127,127,127,0.1);
-  border: thin dotted gray;
-  font-family: monospace;
-  font-size: 90%;
-  hyphens: manual;
-  -webkit-hyphens: manual;
-  page-break-inside: avoid;
-}
-p.code, pre, ul.code li {
-  padding: 10px;
-}
-p code, li code {
-  padding: 2px 5px;
-}
-a:link, a:visited {
-  text-decoration: none;
-}
-span.info {
-  background: black;
-  border: solid thin black;
-  color: white;
-  font-size: 80%;
-  font-style: italic;
-  font-weight: bold;
-  white-space: nowrap;
-}
-h3 span.info, h4 span.info {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  float: right;
-  padding: 3px 6px;
-}
-ul.code, ul.contents, ul.subcontents {
-  list-style-type: none;
-  margin: 0;
-  padding-left: 0;
-}
-ul.code li {
-  margin: 0;
-}
-ul.contents > li {
-  margin-top: 1em;
-}
-ul.contents li ul.code, ul.contents li ul.subcontents {
-  padding-left: 2em;
-}
-table.list {
-  border-collapse: collapse;
-  width: 100%;
-}
-table.list tr:nth-child(even) {
-  background: rgba(127,127,127,0.1);]n}
-table.list th {
-  border-right: 2px solid gray;
-  font-family: monospace;
-  padding: 5px 10px 5px 2px;
-  text-align: right;
-  vertical-align: top;
-}
-table.list td {
-  padding: 5px 2px 5px 10px;
-  text-align: left;
-  vertical-align: top;
-}
-h1.title {
-}
-h2.title {
-  border-bottom: solid 2px black;
-}
-h3.title {
-  border-bottom: solid 2px black;
-}
---></style>
-  </head>
-  <body>
+---
+title: CUPS Programming Manual
+---
     <h1 class="title">CUPS Programming Manual</h1>
     <p>Michael R Sweet</p>
-    <p>Copyright &#xa9; 2007-2017 by Apple Inc. All Rights Reserved.</p>
+    <p>Copyright &#xa9; 2007-2018 by Apple Inc. All Rights Reserved.</p>
     <div class="contents">
       <h2 class="title">Contents</h2>
       <ul class="contents">
@@ -210,6 +39,7 @@ h3.title {
           <li><a href="#cupsCopyDestInfo">cupsCopyDestInfo</a></li>
           <li><a href="#cupsCreateDestJob">cupsCreateDestJob</a></li>
           <li><a href="#cupsDoAuthentication">cupsDoAuthentication</a></li>
+          <li><a href="#cupsEncodeOption">cupsEncodeOption</a></li>
           <li><a href="#cupsEncodeOptions">cupsEncodeOptions</a></li>
           <li><a href="#cupsEncodeOptions2">cupsEncodeOptions2</a></li>
           <li><a href="#cupsEncryption">cupsEncryption</a></li>
@@ -474,6 +304,8 @@ h3.title {
           <li><a href="#ipp_pstate_t">ipp_pstate_t</a></li>
           <li><a href="#ipp_quality_t">ipp_quality_t</a></li>
           <li><a href="#ipp_res_t">ipp_res_t</a></li>
+          <li><a href="#ipp_rstate_t">ipp_rstate_t</a></li>
+          <li><a href="#ipp_sstate_t">ipp_sstate_t</a></li>
           <li><a href="#ipp_state_t">ipp_state_t</a></li>
           <li><a href="#ipp_t">ipp_t</a></li>
         </ul></li>
@@ -501,6 +333,8 @@ h3.title {
           <li><a href="#ipp_pstate_e">ipp_pstate_e</a></li>
           <li><a href="#ipp_quality_e">ipp_quality_e</a></li>
           <li><a href="#ipp_res_e">ipp_res_e</a></li>
+          <li><a href="#ipp_rstate_e">ipp_rstate_e</a></li>
+          <li><a href="#ipp_sstate_e">ipp_sstate_e</a></li>
           <li><a href="#ipp_state_e">ipp_state_e</a></li>
           <li><a href="#ipp_status_e">ipp_status_e</a></li>
           <li><a href="#ipp_tag_e">ipp_tag_e</a></li>
@@ -1308,7 +1142,7 @@ on success.
 
 </p>
 <h3 class="function"><span class="info">&#160;CUPS 1.6/macOS 10.8&#160;</span><a id="cupsConnectDest">cupsConnectDest</a></h3>
-        <p class="description">Open a conection to the destination.</p>
+        <p class="description">Open a connection to the destination.</p>
 <p class="code">
 <a href="#http_t">http_t</a> *cupsConnectDest(<a href="#cups_dest_t">cups_dest_t</a> *dest, unsigned flags, int msec, int *cancel, char *resource, size_t resourcesize, <a href="#cups_dest_cb_t">cups_dest_cb_t</a> cb, void *user_data);</p>
 <h4 class="parameters">Parameters</h4>
@@ -1340,7 +1174,7 @@ pointed to by &quot;cancel&quot; is non-zero, or the callback function (or block
 returns 0.  The caller is responsible for calling <a href="#httpClose"><code>httpClose</code></a> on the
 returned connection.<br>
 <br>
-Starting with CUPS 2.2.4, the caller can pass  <code>CUPS_DEST_FLAGS_DEVICE</code>
+Starting with CUPS 2.2.4, the caller can pass <code>CUPS_DEST_FLAGS_DEVICE</code>
 for the &quot;flags&quot; argument to connect directly to the device associated with
 the destination.  Otherwise, the connection is made to the CUPS scheduler
 associated with the destination.
@@ -1483,6 +1317,23 @@ int cupsDoAuthentication(<a href="#http_t">http_t</a> *http, const char *method,
 status, prior to resubmitting your request.
 
 </p>
+<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsEncodeOption">cupsEncodeOption</a></h3>
+        <p class="description">Encode a single option into an IPP attribute.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *cupsEncodeOption(<a href="#ipp_t">ipp_t</a> *ipp, ipp_tag_t group_tag, const char *name, const char *value);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>ipp</th>
+        <td class="description">IPP request/response</td></tr>
+<tr><th>group_tag</th>
+        <td class="description">Attribute group</td></tr>
+<tr><th>name</th>
+        <td class="description">Option name</td></tr>
+<tr><th>value</th>
+        <td class="description">Option string value</td></tr>
+</tbody></table>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">New attribute or <code>NULL</code> on error</p>
 <h3 class="function"><a id="cupsEncodeOptions">cupsEncodeOptions</a></h3>
         <p class="description">Encode printer options into IPP attributes.</p>
 <p class="code">
@@ -1490,7 +1341,7 @@ void cupsEncodeOptions(<a href="#ipp_t">ipp_t</a> *ipp, int num_options, <a href
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>ipp</th>
-        <td class="description">Request to add to</td></tr>
+        <td class="description">IPP request/response</td></tr>
 <tr><th>num_options</th>
         <td class="description">Number of options</td></tr>
 <tr><th>options</th>
@@ -1507,7 +1358,7 @@ void cupsEncodeOptions2(<a href="#ipp_t">ipp_t</a> *ipp, int num_options, <a hre
 <h4 class="parameters">Parameters</h4>
 <table class="list"><tbody>
 <tr><th>ipp</th>
-        <td class="description">Request to add to</td></tr>
+        <td class="description">IPP request/response</td></tr>
 <tr><th>num_options</th>
         <td class="description">Number of options</td></tr>
 <tr><th>options</th>
@@ -5919,6 +5770,16 @@ typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
       <p class="code">
 typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 </p>
+      <h3 class="typedef"><a id="ipp_rstate_t">ipp_rstate_t</a></h3>
+        <p class="description">resource-state values</p>
+      <p class="code">
+typedef enum <a href="#ipp_rstate_e">ipp_rstate_e</a> ipp_rstate_t;
+</p>
+      <h3 class="typedef"><a id="ipp_sstate_t">ipp_sstate_t</a></h3>
+        <p class="description">system-state values</p>
+      <p class="code">
+typedef enum <a href="#ipp_sstate_e">ipp_sstate_e</a> ipp_sstate_t;
+</p>
       <h3 class="typedef"><a id="ipp_state_t">ipp_state_t</a></h3>
         <p class="description">ipp_t state values</p>
       <p class="code">
@@ -6149,12 +6010,12 @@ are server-oriented...</p>
         <tr><th>HTTP_STATUS_ERROR </th>        <td class="description">An error response from httpXxxx()</td></tr>
         <tr><th>HTTP_STATUS_EXPECTATION_FAILED </th>        <td class="description">The expectation given in an Expect header field was not met</td></tr>
         <tr><th>HTTP_STATUS_FORBIDDEN </th>        <td class="description">Forbidden to access this URI</td></tr>
+        <tr><th>HTTP_STATUS_FOUND </th>        <td class="description">Document was found at a different URI</td></tr>
         <tr><th>HTTP_STATUS_GATEWAY_TIMEOUT </th>        <td class="description">Gateway connection timed out</td></tr>
         <tr><th>HTTP_STATUS_GONE </th>        <td class="description">Server has gone away</td></tr>
         <tr><th>HTTP_STATUS_LENGTH_REQUIRED </th>        <td class="description">A content length or encoding is required</td></tr>
         <tr><th>HTTP_STATUS_METHOD_NOT_ALLOWED </th>        <td class="description">Method is not allowed</td></tr>
         <tr><th>HTTP_STATUS_MOVED_PERMANENTLY </th>        <td class="description">Document has moved permanently</td></tr>
-        <tr><th>HTTP_STATUS_MOVED_TEMPORARILY </th>        <td class="description">Document has moved temporarily</td></tr>
         <tr><th>HTTP_STATUS_MULTIPLE_CHOICES </th>        <td class="description">Multiple files match request</td></tr>
         <tr><th>HTTP_STATUS_NONE <span class="info">&#160;CUPS 1.7/macOS 10.9&#160;</span></th>        <td class="description">No Expect value </td></tr>
         <tr><th>HTTP_STATUS_NOT_ACCEPTABLE </th>        <td class="description">Not Acceptable</td></tr>
@@ -6173,10 +6034,11 @@ are server-oriented...</p>
         <tr><th>HTTP_STATUS_REQUEST_TIMEOUT </th>        <td class="description">Request timed out</td></tr>
         <tr><th>HTTP_STATUS_REQUEST_TOO_LARGE </th>        <td class="description">Request entity too large</td></tr>
         <tr><th>HTTP_STATUS_RESET_CONTENT </th>        <td class="description">Content was reset/recreated</td></tr>
-        <tr><th>HTTP_STATUS_SEE_OTHER </th>        <td class="description">See this other link...</td></tr>
+        <tr><th>HTTP_STATUS_SEE_OTHER </th>        <td class="description">See this other link</td></tr>
         <tr><th>HTTP_STATUS_SERVER_ERROR </th>        <td class="description">Internal server error</td></tr>
         <tr><th>HTTP_STATUS_SERVICE_UNAVAILABLE </th>        <td class="description">Service is unavailable</td></tr>
         <tr><th>HTTP_STATUS_SWITCHING_PROTOCOLS </th>        <td class="description">HTTP upgrade to TLS/SSL</td></tr>
+        <tr><th>HTTP_STATUS_TEMPORARY_REDIRECT </th>        <td class="description">Temporary redirection</td></tr>
         <tr><th>HTTP_STATUS_UNAUTHORIZED </th>        <td class="description">Unauthorized to access host</td></tr>
         <tr><th>HTTP_STATUS_UNSUPPORTED_MEDIATYPE </th>        <td class="description">The requested media type is unsupported</td></tr>
         <tr><th>HTTP_STATUS_UPGRADE_REQUIRED </th>        <td class="description">Upgrade to SSL/TLS required</td></tr>
@@ -6427,6 +6289,24 @@ are server-oriented...</p>
         <tr><th>IPP_RES_PER_CM </th>        <td class="description">Pixels per centimeter</td></tr>
         <tr><th>IPP_RES_PER_INCH </th>        <td class="description">Pixels per inch</td></tr>
 </tbody></table>
+      <h3 class="enumeration"><a id="ipp_rstate_e">ipp_rstate_e</a></h3>
+        <p class="description">resource-state values</p>
+      <h4 class="constants">Constants</h4>
+      <table class="list"><tbody>
+        <tr><th>IPP_RSTATE_ABORTED </th>        <td class="description">Resource has been aborted and is pending deletion.</td></tr>
+        <tr><th>IPP_RSTATE_AVAILABLE </th>        <td class="description">Resource is available for installation.</td></tr>
+        <tr><th>IPP_RSTATE_CANCELED </th>        <td class="description">Resource has been canceled and is pending deletion.</td></tr>
+        <tr><th>IPP_RSTATE_INSTALLED </th>        <td class="description">Resource is installed.</td></tr>
+        <tr><th>IPP_RSTATE_PENDING </th>        <td class="description">Resource is created but has no data yet.</td></tr>
+</tbody></table>
+      <h3 class="enumeration"><a id="ipp_sstate_e">ipp_sstate_e</a></h3>
+        <p class="description">system-state values</p>
+      <h4 class="constants">Constants</h4>
+      <table class="list"><tbody>
+        <tr><th>IPP_SSTATE_IDLE </th>        <td class="description">At least one printer is idle and none are processing a job.</td></tr>
+        <tr><th>IPP_SSTATE_PROCESSING </th>        <td class="description">At least one printer is processing a job.</td></tr>
+        <tr><th>IPP_SSTATE_STOPPED </th>        <td class="description">All printers are stopped.</td></tr>
+</tbody></table>
       <h3 class="enumeration"><a id="ipp_state_e">ipp_state_e</a></h3>
         <p class="description">ipp_t state values</p>
       <h4 class="constants">Constants</h4>
@@ -6542,5 +6422,3 @@ are server-oriented...</p>
         <tr><th>IPP_TAG_ZERO </th>        <td class="description">Zero tag - used for separators</td></tr>
 </tbody></table>
     </div>
-  </body>
-</html>

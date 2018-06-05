@@ -1,370 +1,14 @@
-<!doctype html>
-<html>
-<!-- SECTION: Specifications -->
-  <head>
-    <title>CUPS PPD Extensions</title>
-    <meta name="keywords" content="Specifications">
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="Mini-XML v2.11">
-    <meta name="author" content="Unknown">
-    <meta name="copyright" content="Unknown">
-    <meta name="version" content="0.0">
-    <style type="text/css"><!--
-BODY {
-  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
-}
-
-H1, H2, H3, H4, H5, H6, P, TD, TH {
-  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
-}
-
-KBD {
-  font-family: monaco, courier, monospace;
-  font-weight: bold;
-}
-
-PRE {
-  font-family: monaco, courier, monospace;
-}
-
-PRE.command {
-  border: dotted thin #7f7f7f;
-  margin-left: 36pt;
-  padding: 10px;
-}
-
-P.compact {
-  margin: 0;
-}
-
-P.example {
-  font-style: italic;
-  margin-left: 36pt;
-}
-
-DL.man DD {
-  margin-left: 5em;
-}
-
-DL.man DT {
-  margin-left: 0;
-}
-
-PRE.man {
-  margin: 0;
-}
-
-PRE.example {
-  background: #eeeeee;
-  border: dotted thin #999999;
-  margin-left: 36pt;
-  padding: 10pt;
-}
-
-PRE.command EM, PRE.example EM {
-  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
-}
-
-P.command {
-  font-family: monaco, courier, monospace;
-  margin-left: 36pt;
-}
-
-P.formula {
-  font-style: italic;
-  margin-left: 36pt;
-}
-
-BLOCKQUOTE {
-  background: #eeeeee;
-  border: solid thin #999999;
-  padding: 10pt;
-}
-
-A IMG {
-  border: none;
-}
-
-A:link:hover IMG {
-  background: #f0f0f0;
-  border-radius: 10px;
-  -moz-border-radius: 10px;
-}
-
-A:link, A:visited {
-  font-weight: inherit;
-  text-decoration: none;
-}
-
-A:link:hover, A:visited:hover, A:active {
-  text-decoration: underline;
-}
-
-SUB, SUP {
-  font-size: 50%;
-}
-
-TR.data, TD.data, TR.data TD {
-  margin-top: 10pt;
-  padding: 5pt;
-  border-bottom: solid 1pt #999999;
-}
-
-TR.data TH {
-  border-bottom: solid 1pt #999999;
-  padding-top: 10pt;
-  padding-left: 5pt;
-  text-align: left;
-}
-
-DIV.table TABLE {
-  border: solid thin #999999;
-  border-collapse: collapse;
-  border-spacing: 0;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-DIV.table CAPTION {
-  caption-side: top;
-  font-size: 120%;
-  font-style: italic;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-DIV.table TABLE TD {
-  border: solid thin #cccccc;
-  padding-top: 5pt;
-}
-
-DIV.table TABLE TH {
-  background: #cccccc;
-  border: none;
-  border-bottom: solid thin #999999;
-}
-
-DIV.figure TABLE {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-DIV.figure CAPTION {
-  caption-side: bottom;
-  font-size: 120%;
-  font-style: italic;
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-TH.label {
-  text-align: right;
-  vertical-align: top;
-}
-
-TH.sublabel {
-  text-align: right;
-  font-weight: normal;
-}
-
-HR {
-  border: solid thin;
-}
-
-SPAN.info {
-  background: black;
-  border: thin solid black;
-  color: white;
-  font-size: 80%;
-  font-style: italic;
-  font-weight: bold;
-  white-space: nowrap;
-}
-
-H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
-  float: right;
-  font-size: 100%;
-}
-
-H1.title {
-}
-
-H2.title, H3.title {
-  border-bottom: solid 2pt #000000;
-}
-
-DIV.indent, TABLE.indent {
-  margin-top: 2em;
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
-
-TABLE.indent {
-  border-collapse: collapse;
-}
-
-TABLE.indent TD, TABLE.indent TH {
-  padding: 0;
-}
-
-TABLE.list {
-  border-collapse: collapse;
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-}
-
-TABLE.list TH {
-  background: white;
-  border-bottom: solid thin #cccccc;
-  color: #444444;
-  padding-top: 10pt;
-  padding-left: 5pt;
-  text-align: left;
-  vertical-align: bottom;
-  white-space: nowrap;
-}
-
-TABLE.list TH A {
-  color: #4444cc;
-}
-
-TABLE.list TD {
-  border-bottom: solid thin #eeeeee;
-  padding-top: 5pt;
-  padding-left: 5pt;
-}
-
-TABLE.list TR:nth-child(even) {
-  background: #f8f8f8;
-}
-
-TABLE.list TR:nth-child(odd) {
-  background: #f4f4f4;
-}
-
-DT {
-  margin-left: 36pt;
-  margin-top: 12pt;
-}
-
-DD {
-  margin-left: 54pt;
-}
-
-DL.category DT {
-  font-weight: bold;
-}
-
-P.summary {
-  margin-left: 36pt;
-  font-family: monaco, courier, monospace;
-}
-
-DIV.summary TABLE {
-  border: solid thin #999999;
-  border-collapse: collapse;
-  border-spacing: 0;
-  margin: 10px;
-}
-
-DIV.summary TABLE TD, DIV.summary TABLE TH {
-  border: solid thin #999999;
-  padding: 5px;
-  text-align: left;
-  vertical-align: top;
-}
-
-DIV.summary TABLE THEAD TH {
-  background: #eeeeee;
-}
-
-/* API documentation styles... */
-div.body h1 {
-  margin: 0;
-}
-div.body h2 {
-  margin-top: 1.5em;
-}
-div.body h3, div.body h4, div.body h5 {
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-.class, .enumeration, .function, .struct, .typedef, .union {
-  border-bottom: solid thin #999999;
-  margin-bottom: 0;
-  margin-top: 2em;
-}
-.description {
-  margin-top: 0.5em;
-}
-code, p.code, pre, ul.code li {
-  font-family: monaco, courier, monospace;
-  font-size: 90%;
-}
-ul.code, ul.contents, ul.subcontents {
-  list-style-type: none;
-  margin: 0;
-  padding-left: 0;
-}
-ul.code li {
-  margin: 0;
-}
-ul.contents > li {
-  margin-top: 1em;
-}
-ul.contents li ul.code, ul.contents li ul.subcontents {
-  padding-left: 2em;
-}
-div.body dl {
-  margin-left: 0;
-  margin-top: 0;
-}
-div.body dt {
-  font-style: italic;
-  margin-left: 0;
-  margin-top: 0;
-}
-div.body dd {
-  margin-bottom: 0.5em;
-}
-
-/* This is just for the HTML files generated with the framedhelp target */
-div.contents {
-  background: #e8e8e8;
-  border: solid thin black;
-  padding: 10px;
-}
-div.contents h1 {
-  font-size: 110%;
-}
-div.contents h2 {
-  font-size: 100%;
-}
-div.contents ul.contents {
-  font-size: 80%;
-}
-div.contents ul.subcontents li {
-  margin-left: 1em;
-  text-indent: -1em;
-}
---></style>
-  </head>
-  <body>
+---
+title: CUPS PPD Extensions
+---
 <!--
   PPD extension documentation for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
-  Copyright 1997-2007 by Easy Software Products.
+  Copyright © 2007-2011 by Apple Inc.
+  Copyright © 1997-2007 by Easy Software Products.
 
-  These coded instructions, statements, and computer programs are the
-  property of Apple Inc. and are protected by Federal copyright
-  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-  which should have been included with this file.  If this file is
-  file is missing or damaged, see the license at "http://www.cups.org/".
+  Licensed under Apache License v2.0.  See the file "LICENSE" for more
+  information.
 -->
 
 <H1 CLASS="title">CUPS PPD Extensions</H1>
@@ -1800,7 +1444,20 @@ http://www.vendor.com/help"
 
 <p class='summary'>*cupsJobPassword: "format"</p>
 
-<p>This keyword defines the format of the job-password IPP attribute, if supported by the printer. Currently the only supported format is "1111" indicating a 4-digit PIN code.</p>
+<p>This keyword defines the format of the "job-password" IPP attribute, if supported by the printer. The following format characters are supported:</p>
+
+<ul>
+	<li><code>1</code>: US ASCII digits.</li>
+	<li><code>A</code>: US ASCII letters.</li>
+	<li><code>C</code>: US ASCII letters, numbers, and punctuation.</li>
+	<li><code>.</code>: Any US ASCII printable character (0x20 to 0x7e).</li>
+	<li><code>N</code>: Any Unicode digit character.</li>
+	<li><code>U</code>: Any Unicode letter character.</li>
+	<li><code>*</code>: Any Unicode (utf-8) character.</li>
+</ul>
+
+<p>The format characters are repeated to indicate the length of the
+password string.  For example, "1111" indicated a 4-digit US ASCII PIN code.</p>
 
 <p>Example:</p>
 
@@ -2094,7 +1751,7 @@ PPD file extensions was used. Currently it must be the string
 
 <h2 class='title'><a name='MACOSX'>macOS Attributes</a></h2>
 
-<h3><span class='info'>macOS 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+<h3><span class='info'>Deprecated</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
 
@@ -2106,9 +1763,13 @@ plug-ins.</p>
 
 <blockquote><b>Note:</b>
 
-<p>Starting with macOS 10.5, each plug-in must be compiled "4-way fat"
-(32-bit and 64-bit for both PowerPC and Intel) with garbage collection enabled
-in order to be usable with all applications.</p>
+<p>Since 2010, AirPrint has enabled the printing of full quality photos and
+documents from the Mac without requiring driver software. Starting with macOS
+10.12, system level security features prevent print dialog plug-ins from being
+loaded into applications that have enabled the library validation security
+feature. As of macOS 10.14 the <code>APDialogExtension</code> attribute used to
+create macOS print drivers is deprecated. All new printer models should support
+AirPrint moving forward.</p>
 
 </blockquote>
 
@@ -2559,5 +2220,3 @@ the device.</p>
 
 </ul>
     </div>
-  </body>
-</html>

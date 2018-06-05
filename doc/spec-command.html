@@ -1,23 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<!-- SECTION: Specifications -->
-<head>
-	<title>CUPS Command File Format</title>
-	<meta name='keywords' content='Programming, CUPS Command File Format'>
-	<link rel='stylesheet' type='text/css' href='../cups-printable.css'>
-</head>
-<body>
+---
+title: CUPS Command File Format
+---
 <!--
   CUPS command file format specification for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
-  Copyright 1997-2006 by Easy Software Products.
+  Copyright © 2007-2018 by Apple Inc.
+  Copyright © 1997-2006 by Easy Software Products.
 
-  These coded instructions, statements, and computer programs are the
-  property of Apple Inc. and are protected by Federal copyright
-  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-  which should have been included with this file.  If this file is
-  file is missing or damaged, see the license at "http://www.cups.org/".
+  Licensed under Apache License v2.0.  See the file "LICENSE" for more
+  information.
 -->
 
 <H1 CLASS="title">CUPS Command File Format</H1>
@@ -43,7 +34,7 @@ files by checking the <code>printer-type</code> attribute for the
 commands separated by spaces, for example:</p>
 
 <pre class='command'>
-*cupsCommand: "AutoConfigure Clean PrintSelfTestPage ReportLevels ReportStatus"
+*cupsCommands: "AutoConfigure Clean PrintSelfTestPage ReportLevels ReportStatus"
 </pre>
 
 <p>If no <code>cupsCommands</code> keyword is provided, the command filter
@@ -212,5 +203,3 @@ SetAlignment 1 14
 </pre>
 
 
-</body>
-</html>

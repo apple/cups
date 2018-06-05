@@ -1,11 +1,6 @@
-<!DOCTYPE HTML>
-<html>
-<!-- SECTION: Man Pages -->
-<head>
-	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
-	<title>cupsd.conf(5)</title>
-</head>
-<body>
+---
+title: cupsd.conf(5)
+---
 <h1 class="title">cupsd.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupsd.conf - server configuration file for cups
@@ -95,10 +90,10 @@ The default value is "30".
 The default is typically the server's ".local" hostname.
 <dt><a name="ErrorPolicy"></a><b>ErrorPolicy abort-job</b>
 <dd style="margin-left: 5.0em">Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
+<dt><b>ErrorPolicy retry-current-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
 <dt><b>ErrorPolicy retry-job</b>
 <dd style="margin-left: 5.0em">Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
-<dt><b>ErrorPolicy retry-this-job</b>
-<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
 <dt><b>ErrorPolicy stop-printer</b>
 <dd style="margin-left: 5.0em">Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
 <dt><a name="FilterLimit"></a><b>FilterLimit </b><i>limit</i>
@@ -616,7 +611,5 @@ Require authentication for accesses from outside the 10. network:
 <a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2017 by Apple Inc.
+Copyright &copy; 2007-2018 by Apple Inc.
 
-</body>
-</html>
