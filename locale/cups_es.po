@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.2\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-03-19 18:36-0400\n"
+"POT-Creation-Date: 2018-06-05 11:58-0400\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1505,6 +1505,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
+"8.1)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
@@ -1555,6 +1561,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
+"8.3)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
 
@@ -1566,6 +1578,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
 msgstr ""
 
 #, c-format
@@ -2831,6 +2849,10 @@ msgid "Back Print Film"
 msgstr ""
 
 #, c-format
+msgid "Bad '%s' value."
+msgstr ""
+
+#, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "Valor 'document-format' \"%s\" incorrecto."
 
@@ -2926,6 +2948,10 @@ msgid "Bad notify-recipient-uri \"%s\"."
 msgstr "notify-recipient-uri \"%s\" incorrecto."
 
 #, c-format
+msgid "Bad notify-user-data \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "Bad number-up value %d."
 msgstr "Valor number-up (páginas por hoja) %d incorrecto."
 
@@ -2958,10 +2984,6 @@ msgstr "Petición incorrecta de ID %d."
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "Petición incorrecta de número de versión %d.%d."
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "Recurso incorrecto en URI"
@@ -3865,6 +3887,9 @@ msgstr "Correo por Internet Parte-3"
 
 msgid "Internet Printing Protocol"
 msgstr "Protocolo de Impresión de Internet IPP"
+
+msgid "Invalid group tag."
+msgstr ""
 
 msgid "Invalid media name arguments."
 msgstr "Argumentos del nombre del papel no válidos."
@@ -5844,6 +5869,9 @@ msgstr "Valor 'compression' \"%s\" no implementado."
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "Valor 'document-format' \"%s\" no implementado."
 
+msgid "Unsupported 'job-hold-until' value."
+msgstr ""
+
 msgid "Unsupported 'job-name' value."
 msgstr "Valor 'job-name' no implementado."
 
@@ -5940,8 +5968,8 @@ msgstr "Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]"
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 msgstr ""
-"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN.ppd"
-"[.gz]]"
+"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN."
+"ppd[.gz]]"
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -7449,6 +7477,10 @@ msgstr "ippfind: Falta una expresión antes de \"--or\"."
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind: Falta un nombre de clave tras %s."
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind: Falta el paréntesis de apertura."

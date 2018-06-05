@@ -1606,9 +1606,13 @@ plug-ins.</p>
 
 <blockquote><b>Note:</b>
 
-<p>Starting with macOS 10.12, system level security features prevent print
-dialog plug-ins from being loaded into applications that have enabled the
-library validation security feature.</p>
+<p>Since 2010, AirPrint has enabled the printing of full quality photos and
+documents from the Mac without requiring driver software. Starting with macOS
+10.12, system level security features prevent print dialog plug-ins from being
+loaded into applications that have enabled the library validation security
+feature. As of macOS 10.14 the <code>APDialogExtension</code> attribute used to
+create macOS print drivers is deprecated. All new printer models should support
+AirPrint moving forward.</p>
 
 </blockquote>
 

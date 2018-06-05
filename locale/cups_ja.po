@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-03-19 18:36-0400\n"
+"POT-Creation-Date: 2018-06-05 11:58-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1476,6 +1476,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
+"8.1)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
@@ -1526,6 +1532,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
+"8.3)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
 
@@ -1537,6 +1549,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute in wrong group."
+msgstr ""
+
+msgid "\"requesting-user-name\" attribute with wrong syntax."
 msgstr ""
 
 #, c-format
@@ -2797,6 +2815,10 @@ msgid "Back Print Film"
 msgstr ""
 
 #, c-format
+msgid "Bad '%s' value."
+msgstr ""
+
+#, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "誤った 'document-format' の値です \"%s\"。"
 
@@ -2892,6 +2914,10 @@ msgid "Bad notify-recipient-uri \"%s\"."
 msgstr "URI \"%s\" は不正な notify-recipient-uri です。"
 
 #, c-format
+msgid "Bad notify-user-data \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "Bad number-up value %d."
 msgstr "%d は不正な number-up 値です。"
 
@@ -2924,10 +2950,6 @@ msgstr "%d は無効なリクエストIDです。"
 #, c-format
 msgid "Bad request version number %d.%d."
 msgstr "バージョン番号 %d.%d は無効なリクエストです。"
-
-#, c-format
-msgid "Bad requesting-user-name value: %s"
-msgstr ""
 
 msgid "Bad resource in URI"
 msgstr "URI のリソースが不正"
@@ -3837,6 +3859,9 @@ msgstr "Internet Postage 3-Part"
 
 msgid "Internet Printing Protocol"
 msgstr "インターネット印刷プロトコル"
+
+msgid "Invalid group tag."
+msgstr ""
 
 msgid "Invalid media name arguments."
 msgstr "無効なメディア名引数です。"
@@ -5784,6 +5809,9 @@ msgstr "\"%s\" はサポートされていない 'compression' の値です。"
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "\"%s\" はサポートされていない 'document-format' の値です。"
 
+msgid "Unsupported 'job-hold-until' value."
+msgstr ""
+
 msgid "Unsupported 'job-name' value."
 msgstr "サポートされていない 'job-name' の値です。"
 
@@ -7383,6 +7411,10 @@ msgstr "ippfind: \"--or\" の前には式が必要です。"
 #, c-format
 msgid "ippfind: Missing key name after %s."
 msgstr "ippfind: %s のあとにはキー名が必要です。"
+
+#, c-format
+msgid "ippfind: Missing name after %s."
+msgstr ""
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind: 開きカッコが足りません。"
