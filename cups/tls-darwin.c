@@ -1897,7 +1897,9 @@ http_cdsa_copy_server(
   DEBUG_printf(("4http_cdsa_copy_server: Returning %p.", (void *)certificates));
 
   return (certificates);
+
 #else
+  (void)common_name;
 
   if (!tls_selfsigned)
     return (NULL);
