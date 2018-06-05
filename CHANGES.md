@@ -1,8 +1,14 @@
-CHANGES - 2.3b5 - 2018-06-05
+CHANGES - 2.3b6 - 2018-06-05
 ============================
 
+Changes in CUPS v2.3b6
+----------------------
+
+- Fixed a memory leak for some IPP (extension) syntaxes.
+
+
 Changes in CUPS v2.3b5
------------------------
+----------------------
 
 - The `ipptool` program no longer checks for duplicate attributes when running
   in list or CSV mode (Issue #5278)
