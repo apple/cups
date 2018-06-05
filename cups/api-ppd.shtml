@@ -1,7 +1,7 @@
 <!--
   PPD API introduction for CUPS.
 
-  Copyright 2007-2012 by Apple Inc.
+  Copyright 2007-2018 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@
 
 <h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
-<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="api-cups.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
+<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="cupspm.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
 
 <p>The CUPS PPD API provides read-only access the data in PostScript Printer
 Description ("PPD") files which are used for all printers with a driver. With
