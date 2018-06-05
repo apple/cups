@@ -329,6 +329,7 @@
 "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section 5.1.10)." = "“%s”: Bad mimeMediaType value “%s” - bad characters (RFC 8011 section 5.1.10).";
 "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section 5.1.10)." = "“%s”: Bad mimeMediaType value “%s” - bad length %d (RFC 8011 section 5.1.10).";
 "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)." = "“%s”: Bad name value “%s” - bad UTF-8 sequence (RFC 8011 section 5.1.3).";
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section 8.1)." = "“%s”: Bad name value “%s” - bad control character (PWG 5100.14 section 8.1).";
 "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)." = "“%s”: Bad name value “%s” - bad length %d (RFC 8011 section 5.1.3).";
 "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section 5.1.9)." = "“%s”: Bad naturalLanguage value “%s” - bad characters (RFC 8011 section 5.1.9).";
 "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section 5.1.9)." = "“%s”: Bad naturalLanguage value “%s” - bad length %d (RFC 8011 section 5.1.9).";
@@ -338,6 +339,7 @@
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be positive (RFC 8011 section 5.1.16)." = "“%s”: Bad resolution value %dx%d%s - cross feed resolution must be positive (RFC 8011 section 5.1.16).";
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC 8011 section 5.1.16)." = "“%s”: Bad resolution value %dx%d%s - feed resolution must be positive (RFC 8011 section 5.1.16).";
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)." = "“%s”: Bad text value “%s” - bad UTF-8 sequence (RFC 8011 section 5.1.2).";
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section 8.3)." = "“%s”: Bad text value “%s” - bad control character (PWG 5100.14 section 8.3).";
 "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)." = "“%s”: Bad text value “%s” - bad length %d (RFC 8011 section 5.1.2).";
 "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)." = "“%s”: Bad uriScheme value “%s” - bad characters (RFC 8011 section 5.1.7).";
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)." = "“%s”: Bad uriScheme value “%s” - bad length %d (RFC 8011 section 5.1.7).";
@@ -702,6 +704,7 @@
 "B8" = "B8";
 "B9" = "B9";
 "Bad \"printer-id\" value %d." = "Bad “printer-id” value %d.";
+"Bad '%s' value." = "Bad ‘%s’ value.";
 "Bad 'document-format' value \"%s\"." = "Bad ‘document-format’ value “%s”.";
 "Bad NULL dests pointer" = "Bad NULL dests pointer";
 "Bad OpenGroup" = "Bad OpenGroup";
@@ -731,6 +734,7 @@
 "Bad job-uri \"%s\"." = "Bad job-uri “%s”.";
 "Bad notify-pull-method \"%s\"." = "Bad notify-pull-method “%s”.";
 "Bad notify-recipient-uri \"%s\"." = "Bad notify-recipient-uri “%s”.";
+"Bad notify-user-data \"%s\"." = "Bad notify-user-data “%s”.";
 "Bad number-up value %d." = "Bad number-up value %d.";
 "Bad option + choice on line %d." = "Bad option + choice on line %d.";
 "Bad page-ranges values %d-%d." = "Bad page-ranges values %d-%d.";
@@ -952,6 +956,7 @@
 "Internet Postage 2-Part" = "Internet Postage 2-Part";
 "Internet Postage 3-Part" = "Internet Postage 3-Part";
 "Internet Printing Protocol" = "Internet Printing Protocol";
+"Invalid group tag." = "Invalid group tag.";
 "Invalid media name arguments." = "Invalid media name arguments.";
 "Invalid media size." = "Invalid media size.";
 "Invalid ppd-name value." = "Invalid ppd-name value.";
@@ -1378,6 +1383,7 @@
 "Unknown version option value: \"%s\"." = "Unknown version option value: “%s”.";
 "Unsupported 'compression' value \"%s\"." = "Unsupported ‘compression’ value “%s”.";
 "Unsupported 'document-format' value \"%s\"." = "Unsupported ‘document-format’ value “%s”.";
+"Unsupported 'job-hold-until' value." = "Unsupported ‘job-hold-until’ value.";
 "Unsupported 'job-name' value." = "Unsupported ‘job-name’ value.";
 "Unsupported character set \"%s\"." = "Unsupported character set “%s”.";
 "Unsupported compression \"%s\"." = "Unsupported compression “%s”.";

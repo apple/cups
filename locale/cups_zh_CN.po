@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-03-19 18:43-0400\n"
+"POT-Creation-Date: 2018-06-05 11:58-0400\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -1417,6 +1417,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
+"8.1)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
@@ -1464,6 +1470,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
+"8.3)."
 msgstr ""
 
 #, c-format
@@ -2669,6 +2681,10 @@ msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
+msgid "Bad '%s' value."
+msgstr ""
+
+#, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "无效的“document-format”值“%s”。"
 
@@ -2765,6 +2781,10 @@ msgstr "无效的 notify-pull-method 值“%s”。"
 #, c-format
 msgid "Bad notify-recipient-uri \"%s\"."
 msgstr "无效的 notify-recipient-uri 值“%s”。"
+
+#, c-format
+msgid "Bad notify-user-data \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "Bad number-up value %d."
@@ -3477,6 +3497,9 @@ msgstr "网邮 3 部"
 
 msgid "Internet Printing Protocol"
 msgstr "互联网打印协议"
+
+msgid "Invalid group tag."
+msgstr ""
 
 msgid "Invalid media name arguments."
 msgstr "无效的媒体名称参数。"
@@ -4854,6 +4877,9 @@ msgstr "不支持的“compression”值“%s”。"
 #, c-format
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "不支持的“document-format”值“%s”。"
+
+msgid "Unsupported 'job-hold-until' value."
+msgstr ""
 
 msgid "Unsupported 'job-name' value."
 msgstr "不支持的“job-name”值。"

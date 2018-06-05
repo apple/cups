@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-03-19 18:43-0400\n"
+"POT-Creation-Date: 2018-06-05 11:58-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1462,6 +1462,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
+"8.1)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
@@ -1509,6 +1515,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
+"8.3)."
 msgstr ""
 
 #, c-format
@@ -2724,6 +2736,10 @@ msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
+msgid "Bad '%s' value."
+msgstr ""
+
+#, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "誤った 'document-format' の値です \"%s\"。"
 
@@ -2820,6 +2836,10 @@ msgstr "\"%s\" は無効な notify-pull-method です。"
 #, c-format
 msgid "Bad notify-recipient-uri \"%s\"."
 msgstr "URI \"%s\" は不正な notify-recipient-uri です。"
+
+#, c-format
+msgid "Bad notify-user-data \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "Bad number-up value %d."
@@ -3538,6 +3558,9 @@ msgstr "Internet Postage 3-Part"
 
 msgid "Internet Printing Protocol"
 msgstr "インターネット印刷プロトコル"
+
+msgid "Invalid group tag."
+msgstr ""
 
 msgid "Invalid media name arguments."
 msgstr "無効なメディア名引数です。"
@@ -4929,6 +4952,9 @@ msgstr "\"%s\" はサポートされていない 'compression' の値です。"
 #, c-format
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "\"%s\" はサポートされていない 'document-format' の値です。"
+
+msgid "Unsupported 'job-hold-until' value."
+msgstr ""
 
 msgid "Unsupported 'job-name' value."
 msgstr "サポートされていない 'job-name' の値です。"
