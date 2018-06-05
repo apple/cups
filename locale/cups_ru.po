@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-03-19 18:43-0400\n"
+"POT-Creation-Date: 2018-06-05 11:58-0400\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -1440,6 +1440,12 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
+"8.1)."
+msgstr ""
+
+#, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
 
@@ -1487,6 +1493,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
+"8.3)."
 msgstr ""
 
 #, c-format
@@ -2709,6 +2721,10 @@ msgid "Bad \"printer-id\" value %d."
 msgstr ""
 
 #, c-format
+msgid "Bad '%s' value."
+msgstr ""
+
+#, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr ""
 
@@ -2805,6 +2821,10 @@ msgstr "Неверное значение notify-pull-method \"%s\"."
 #, c-format
 msgid "Bad notify-recipient-uri \"%s\"."
 msgstr "Неверный notify-recipient-uri \"%s\"."
+
+#, c-format
+msgid "Bad notify-user-data \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "Bad number-up value %d."
@@ -3512,6 +3532,9 @@ msgstr "Наклейки Internet Postage 3-Part"
 
 msgid "Internet Printing Protocol"
 msgstr "Протокол интернет-печати"
+
+msgid "Invalid group tag."
+msgstr ""
 
 msgid "Invalid media name arguments."
 msgstr "Неверные аргументы имени бумаги."
@@ -4905,6 +4928,9 @@ msgstr "Неподдерживаемое значение 'compression' \"%s\"."
 #, c-format
 msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "Неподдерживаемое значение'document-format' \"%s\"."
+
+msgid "Unsupported 'job-hold-until' value."
+msgstr ""
 
 msgid "Unsupported 'job-name' value."
 msgstr "Неподдерживаемое значение 'job-name'."
