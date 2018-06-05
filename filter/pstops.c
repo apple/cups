@@ -1,8 +1,8 @@
 /*
  * PostScript filter for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1993-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -2235,7 +2235,7 @@ parse_text(const char *start,		/* I - Start of text value */
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
-  while (bufptr < bufend)
+  while (*start && bufptr < bufend)
   {
     if (isspace(*start & 255) && !level)
       break;
