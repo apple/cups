@@ -1,7 +1,7 @@
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
-({printer_state=3?En attente:{printer_state=4?En cours d'impression:Arr&ecirc;t&eacute;}},
+({printer_state=3?En attente:{printer_state=4?En cours d'impression:Arr&ecirc;t&eacute;e}},
 {printer_is_accepting_jobs=0?rejette les t&acirc;ches:accepte les t&acirc;ches},
-{server_is_sharing_printers=0?Non:{printer_is_shared=0?Non:}} partag&eacute;e{default_name={printer_name}?, imprimante par d&eacute;faut:})</H2>
+{server_is_sharing_printers=0?Non p:{printer_is_shared=0?Non p:P}}artag&eacute;e{default_name={printer_name}?, imprimante par d&eacute;faut:})</H2>
 
 <FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -13,7 +13,7 @@
 <OPTION VALUE="move-jobs">Transf&eacute;rer toutes les t&acirc;ches</OPTION>
 <OPTION VALUE="purge-jobs">Annuler toutes les t&acirc;ches</OPTION>
 </SELECT>
-<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+<INPUT TYPE="SUBMIT" VALUE="Valider" STYLE="display: none;">
 </FORM>
 
 <FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
@@ -28,7 +28,7 @@
 <OPTION VALUE="set-as-default">D&eacute;finir par d&eacute;faut</OPTION>
 <OPTION VALUE="set-allowed-users">D&eacute;finir les autorisations</OPTION>
 </SELECT>
-<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+<INPUT TYPE="SUBMIT" VALUE="Valider" STYLE="display: none;">
 </FORM>
 
 <TABLE SUMMARY="{printer_name}">
