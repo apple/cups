@@ -1,5 +1,11 @@
-CHANGES - 2.2.8 - 2018-06-05
+CHANGES - 2.2.9 - 2018-06-05
 ============================
+
+
+Changes in CUPS v2.2.9
+----------------------
+
+- Fixed a memory leak for some IPP (extension) syntaxes.
 
 
 Changes in CUPS v2.2.8
