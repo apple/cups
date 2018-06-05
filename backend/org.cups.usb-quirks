@@ -281,3 +281,6 @@
 
 # Lexmark Optra E310 (Issue #5259)
 0x043d 0x000c no-reattach
+
+# HP LaserJet P1102 (Issue #5310)
+0x03F0 0x002A no-reattach
