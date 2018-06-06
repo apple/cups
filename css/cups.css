@@ -9,6 +9,15 @@ BODY {
   margin: 0px;
 }
 
+BLOCKQUOTE {
+  border-left: 2px solid #111;
+  padding: 10px;
+}
+
+BLOCKQUOTE P {
+  margin: 0;
+}
+
 A, A:hover {
   color: black;
   text-decoration: none;
