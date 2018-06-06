@@ -105,7 +105,7 @@ tar czf $file cups-$version
 if test $SIGNFILES = yes; then
 	echo Signing...
 	test -f $file.sig && rm -f $file.sig
-	gpg --detach-sign $file
+	gpg --detach-sign -u security@cups.org $file
 fi
 
 echo Removing temporary files...
