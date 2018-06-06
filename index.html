@@ -14,7 +14,7 @@ layout: default
   </p>
 </div>
 
-{% for post in site.posts offset: 0 limit: 3 %}
+{% for post in site.posts offset: 0 limit: 8 %}
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
 {{ post.excerpt }}
 {% if post.excerpt != post.content %}
