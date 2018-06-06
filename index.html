@@ -18,6 +18,6 @@ layout: default
 <h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
 {{ post.excerpt }}
 {% if post.excerpt != post.content %}
-<p><a class="btn btn-default btn-xs" href=".{{ post.url }}">More</a></p>
+<p><a class="btn btn-default btn-xs" href=".{{ post.url }}">Read</a></p>
 {% endif %}
 {% endfor %}
