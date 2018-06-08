@@ -128,6 +128,7 @@ Version "2.3"
 {
   Manufacturer "Dymo"
   ModelName "Label Printer"
+  Attribute "1284DeviceID" "" "MFG:DYMO;MDL:LabelWriter 400;"
   Attribute NickName "" "Dymo Label Printer"
   PCFileName "dymo.ppd"
   DriverType label
