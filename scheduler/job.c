@@ -610,9 +610,27 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
     if (!filters)
     {
+      mime_filter_t *current;
+
       cupsdLogJob(job, CUPSD_LOG_ERROR,
 		  "Unable to convert file %d to printable format.",
 		  job->current_file);
+
+      cupsdLogJob(job, CUPSD_LOG_ERROR,
+		  "Required: %s/%s -> %s/%s",
+		  job->filetypes[job->current_file]->super,
+		  job->filetypes[job->current_file]->type,
+		  job->printer->filetype->super,
+		  job->printer->filetype->type);
+
+      for (current = (mime_filter_t *)cupsArrayFirst(MimeDatabase->srcs);
+	   current;
+	   current = (mime_filter_t *)cupsArrayNext(MimeDatabase->srcs))
+	  cupsdLogJob(job, CUPSD_LOG_ERROR,
+		      "Available: %s/%s -> %s/%s (%s)",
+		      current->src->super, current->src->type,
+		      current->dst->super, current->dst->type,
+		      current->filter);
 
       abort_message = "Aborting job because it cannot be printed.";
       abort_state   = IPP_JOB_ABORTED;
