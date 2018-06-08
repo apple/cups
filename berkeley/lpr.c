@@ -14,6 +14,31 @@
 #include <cups/cups-private.h>
 
 
+static void
+usage (const char *name)
+{
+  _cupsLangPrintf(stdout,
+"Usage: %s [OPTION] [ file(s) ]\n"
+"Print files.\n\n"
+"  -E                       force encryption\n"
+"  -H server[:port]         specify alternate server\n"
+"  -C title, -J title, -T title\n"
+"                           set the job name\n\n"
+"  -P destination/instance  print to named printer\n"
+"  -U username              specify alternate username\n"
+"  -# num-copies            set number of copies\n"
+"  -h                       disable banner printing\n"
+"  -l                       print without filtering\n"
+"  -m                       send email on completion\n"
+"  -o option[=value]        set a job option\n"
+"  -p                       format text file with header\n"
+"  -q                       hold job for printing\n"
+"  -r                       delete files after printing\n"
+"\nWith no file given, read standard input.\n"
+, name);
+}
+
+
 /*
  * 'main()' - Parse options and send files for printing.
  */
@@ -276,6 +301,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      break;
 
 	  default :
+	    if (!strcmp (argv[i], "--help"))
+	    {
+	      usage (argv[0]);
+	      return (0);
+	    }
+
 	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), argv[0], *opt);
 	      return (1);
 	}
