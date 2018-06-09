@@ -1612,7 +1612,7 @@ asn1_size_length(unsigned length)	/* I - Length value */
 
 
 /*
- * 'asn1_size_oid()' - Figure out the numebr of bytes needed for an
+ * 'asn1_size_oid()' - Figure out the number of bytes needed for an
  *                     OID value.
  */
 
