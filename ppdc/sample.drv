@@ -128,7 +128,6 @@ Version "2.3"
 {
   Manufacturer "Dymo"
   ModelName "Label Printer"
-  Attribute "1284DeviceID" "" "MFG:DYMO;MDL:LabelWriter 400;"
   Attribute NickName "" "Dymo Label Printer"
   PCFileName "dymo.ppd"
   DriverType label
@@ -158,6 +157,12 @@ Version "2.3"
   Darkness 1 Medium
   *Darkness 2 Normal
   Darkness 3 Dark
+
+  //Dymo LabelWriter 400
+  {
+    Attribute "1284DeviceID" "" "MFG:DYMO;MDL:LabelWriter 400;"
+    PCFileName "dymo-lw400.ppd"
+  }
 }
 
 // Epson
