@@ -1,10 +1,12 @@
-CHANGES - 2.2.9 - 2018-06-05
+CHANGES - 2.2.9 - 2018-06-11
 ============================
 
 
 Changes in CUPS v2.2.9
 ----------------------
 
+- Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
+  Issue #5330)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
 
