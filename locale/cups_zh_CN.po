@@ -7,20 +7,20 @@
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
 #
-# Jeff Bai <jeffbai@aosc.xyz>, 2016.
+# Mingcong Bai <jeffbai@aosc.xyz>, 2016, 2017, 2018.
 msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2018-06-05 11:58-0400\n"
-"PO-Revision-Date: 2017-06-11 12:38+0800\n"
+"PO-Revision-Date: 2018-06-12 16:24+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.2\n"
+"X-Generator: Poedit 2.0.6\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "\t\t(all)"
@@ -936,7 +936,7 @@ msgid "  --host regex            Match hostname to regular expression."
 msgstr "  --host 正则表达式      使用正则表达式匹配主机名。"
 
 msgid "  --ippserver filename    Produce ippserver attribute file."
-msgstr ""
+msgstr "  --ippserver filename    提供 ippserver 属性文件。"
 
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr "  --lf                    使用 LF 行末（UNIX/Linux/macOS）。"
@@ -1019,7 +1019,7 @@ msgstr "  -E                      加密连接。"
 
 msgid ""
 "  -E                      Test with encryption using HTTP Upgrade to TLS."
-msgstr ""
+msgstr "  -E                      带有使用 HTTP 升级到 TLS 加密的测试。"
 
 msgid ""
 "  -F                      Run in the foreground but detach from console."
@@ -1056,7 +1056,7 @@ msgid "  -R root-directory       Set alternate root."
 msgstr "  -R root-directory       设置备用根目录。"
 
 msgid "  -S                      Test with encryption using HTTPS."
-msgstr ""
+msgstr "  -S                      使用 HTTPS 加密的测试。"
 
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr "  -T 秒数                设置浏览超时（按秒计）。"
@@ -1118,7 +1118,7 @@ msgid "  -h                      Show this usage message."
 msgstr "  -h                      显示此使用方法信息。"
 
 msgid "  -h                      Validate HTTP response headers."
-msgstr ""
+msgstr "  -h                      验证 HTTP 响应头。"
 
 msgid "  -h regex                Match hostname to regular expression."
 msgstr "  -h 正则表达式           使用正则表达式匹配主机名。"
@@ -1319,184 +1319,190 @@ msgstr " 通过"
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
-msgstr ""
+msgstr "“%s”：无效的 URI 值“%s”— %s（RFC 8011 章节 5.1.6）。"
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
-msgstr ""
+msgstr "“%s”：无效的 URI 值“%s”— 无效长度 %d（RFC 8011 章节 5.1.6）。"
 
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
-msgstr ""
+msgstr "“%s”：无效的属性名称 — 无效长度 %d（RFC 8011 章节 5.1.4）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
-msgstr ""
+msgstr "“%s”：无效的属性名称 — 无效字符（RFC 8011 章节 5.1.4）。"
 
 #, c-format
 msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
-msgstr ""
+msgstr "“%s”：无效的布里值 %d（RFC 8011 章节 5.1.21）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
-msgstr ""
+msgstr "“%s”：无效的字符集值“%s”— 无效字符（RFC 8011 章节 5.1.21）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
-msgstr ""
+msgstr "“%s”：无效的字符集值“%s”— 无效长度 %d（RFC 8011 章节 5.1.21）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime UTC 小时值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime UTC 分钟值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime UTC 符号值“%c”（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime day %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 日期值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime deciseconds %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 十分之一秒值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime hours %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 小时值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime minutes %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 分钟值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime month %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 月份值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad dateTime seconds %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "“%s”：无效的 dateTime 秒值 %u（RFC 8011 章节 5.1.15）。"
 
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
-msgstr ""
+msgstr "“%s”：无效的枚举值 %d - 超出范围（RFC 8011 章节 5.1.5）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
-msgstr ""
+msgstr "“%s”：无效的关键字值“%s”— 无效长度 %d（RFC 8011 章节 5.1.4）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section "
 "5.1.4)."
-msgstr ""
+msgstr "“%s”：无效的关键字值“%s”— 无效字符（RFC 8011 章节 5.1.4）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section "
 "5.1.10)."
-msgstr ""
+msgstr "“%s”：无效的 mimeMediaType 值“%s”— 无效字符（RFC 8011 章节 5.1.10）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.10)."
 msgstr ""
+"“%s”：无效的 mimeMediaType 值“%s”— 无效长度 %d（RFC 8011 章节 5.1.10）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
-msgstr ""
+msgstr "“%s”：无效的名称值“%s”— 无效 UTF-8 序列（RFC 8011 章节 5.1.3）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
 "8.1)."
-msgstr ""
+msgstr "“%s”：无效的名称值“%s”— 无效控制字符（PWG 5100.14 章节 8.1）。"
 
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
-msgstr ""
+msgstr "“%s”：无效的名称值“%s”— 无效长度 %d（RFC 8011 章节 5.1.3）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section "
 "5.1.9)."
-msgstr ""
+msgstr "“%s”：无效的 naturalLanguage 值“%s”— 无效字符（RFC 8011 章节 5.1.9）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.9)."
 msgstr ""
+"“%s”：无效的 naturalLanguage 值“%s”— 无效长度 %d（RFC 8011 章节 5.1.9）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
-msgstr ""
+msgstr "“%s”：无效的 octetString 值 — 无效长度 %d（RFC 8011 章节 5.1.20）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 8011 "
 "section 5.1.14)."
 msgstr ""
+"“%s”：无效的 rangeOfInteger 值 %d-%d — 整数下限大于上限（RFC 8011 章节 "
+"5.1.14）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
 "5.1.16)."
-msgstr ""
+msgstr "“%s”：无效的分辨率值 %dx%d%s — 无效单位值（RFC 8011 章节 5.1.16）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
 "positive (RFC 8011 section 5.1.16)."
 msgstr ""
+"“%s”：无效的分辨率值 %dx%d%s — 横截分辨率必须为正数（RFC 8011 章节 5.1.16）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
 "8011 section 5.1.16)."
 msgstr ""
+"“%s”：无效的分辨率值 %dx%d%s — 顺向分辨率必须为正数（RFC 8011 章节 5.1.16）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
-msgstr ""
+msgstr "“%s”：无效的文本值“%s”— 无效 UTF-8 序列（RFC 8011 章节 5.1.2）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
 "8.3)."
-msgstr ""
+msgstr "“%s”：无效的文本值“%s”— 无效控制字符（PWG 5100.14 章节 8.3）。"
 
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
-msgstr ""
+msgstr "“%s”：无效的文本值“%s”— 无效长度 %d（RFC 8011 章节 5.1.2）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
-msgstr ""
+msgstr "“%s”：无效的 uriScheme 值“%s”— 无效字符（RFC 8011 章节 5.1.7）。"
 
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
-msgstr ""
+msgstr "“%s”：无效的 uriScheme 值“%s”— 无效长度 %d（RFC 8011 章节 5.1.7）。"
 
 msgid "\"requesting-user-name\" attribute in wrong group."
-msgstr ""
+msgstr "“requesting-user-name”属性组不正确。"
 
 msgid "\"requesting-user-name\" attribute with wrong syntax."
-msgstr ""
+msgstr "“requesting-user-name”属性组包含错误的语法。"
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
@@ -1508,7 +1514,7 @@ msgstr "%d x %d 毫米"
 
 #, c-format
 msgid "%g x %g \""
-msgstr ""
+msgstr "%g x %g \""
 
 #, c-format
 msgid "%s (%s)"
@@ -1601,7 +1607,7 @@ msgstr "%s：不知如何处理。"
 
 #, c-format
 msgid "%s: Error - %s"
-msgstr ""
+msgstr "%s：错误 — %s"
 
 #, c-format
 msgid ""
@@ -1993,7 +1999,7 @@ msgid "-95"
 msgstr "-95"
 
 msgid "/etc/cups/lpoptions file names default destination that does not exist."
-msgstr ""
+msgstr "/etc/cups/lpoptions 文件所指定的默认目标不存在。"
 
 msgid "0"
 msgstr "0"
@@ -2678,11 +2684,11 @@ msgstr "B9"
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
-msgstr ""
+msgstr "无效的“printer-id”值 %d。"
 
 #, c-format
 msgid "Bad '%s' value."
-msgstr ""
+msgstr "无效的“%s”值。"
 
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
@@ -2713,10 +2719,10 @@ msgid "Bad SNMP version number"
 msgstr "无效的 SNMP 版本号"
 
 msgid "Bad UIConstraints"
-msgstr "无锡噢的 UIConstraints 值"
+msgstr "无效的 UIConstraints 值"
 
 msgid "Bad URI."
-msgstr ""
+msgstr "无效的 URI。"
 
 msgid "Bad arguments to function"
 msgstr "函数的参数无效"
@@ -2784,7 +2790,7 @@ msgstr "无效的 notify-recipient-uri 值“%s”。"
 
 #, c-format
 msgid "Bad notify-user-data \"%s\"."
-msgstr ""
+msgstr "无效的 notify-user-data “%s”。"
 
 #, c-format
 msgid "Bad number-up value %d."
@@ -2961,7 +2967,7 @@ msgid "Deep Color"
 msgstr "深色"
 
 msgid "Deep Gray"
-msgstr ""
+msgstr "深灰"
 
 msgid "Delete Class"
 msgstr "删除类"
@@ -2977,13 +2983,13 @@ msgid "Destination \"%s\" is not accepting jobs."
 msgstr "目标“%s”不接受任务。"
 
 msgid "Device CMYK"
-msgstr ""
+msgstr "设备 CMYK"
 
 msgid "Device Gray"
-msgstr ""
+msgstr "设备灰度"
 
 msgid "Device RGB"
-msgstr ""
+msgstr "设备 RGB"
 
 #, c-format
 msgid ""
@@ -3248,10 +3254,10 @@ msgid "Error: need hostname after \"-h\" option."
 msgstr "错误：“-h”选项后需要主机名。"
 
 msgid "European Fanfold"
-msgstr ""
+msgstr "欧洲折叠页"
 
 msgid "European Fanfold Legal"
-msgstr ""
+msgstr "欧洲法律用折叠页"
 
 msgid "Every 10 Labels"
 msgstr "每 10 个标签"
@@ -3337,7 +3343,7 @@ msgid "Finished page %d."
 msgstr "已完成第 %d 页。"
 
 msgid "Finishing Preset"
-msgstr ""
+msgstr "结尾预设"
 
 msgid "Fold"
 msgstr "折纸"
@@ -3349,7 +3355,7 @@ msgid "Forbidden"
 msgstr "已禁止"
 
 msgid "Found"
-msgstr ""
+msgstr "已发现"
 
 msgid "General"
 msgstr "常规"
@@ -3499,7 +3505,7 @@ msgid "Internet Printing Protocol"
 msgstr "互联网打印协议"
 
 msgid "Invalid group tag."
-msgstr ""
+msgstr "无效的组标签。"
 
 msgid "Invalid media name arguments."
 msgstr "无效的媒体名称参数。"
@@ -3627,7 +3633,7 @@ msgstr "LPD/LPR 主机或打印机"
 
 msgid ""
 "LPDEST environment variable names default destination that does not exist."
-msgstr ""
+msgstr "LPDEST 环境变量所指定的默认目标不存在。"
 
 msgid "Label Printer"
 msgstr "标签打印机"
@@ -3842,7 +3848,7 @@ msgid "No community name"
 msgstr "无社群名称"
 
 msgid "No default destination."
-msgstr ""
+msgstr "无默认目标。"
 
 msgid "No default printer."
 msgstr "无默认打印机。"
@@ -3987,10 +3993,10 @@ msgid "Options:"
 msgstr "选项："
 
 msgid "Other Media"
-msgstr ""
+msgstr "其他介质"
 
 msgid "Other Tray"
-msgstr ""
+msgstr "其他托盘"
 
 msgid "Out of date PPD cache file."
 msgstr "过时的 PPD 缓存文件。"
@@ -4027,7 +4033,7 @@ msgstr "超大长边缘 32 开"
 
 msgid ""
 "PRINTER environment variable names default destination that does not exist."
-msgstr ""
+msgstr "PRINTER 环境变量所指定的默认目标不存在。"
 
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "包裹中未包含 Get-Response-PDU"
@@ -4420,6 +4426,8 @@ msgid ""
 "contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
 "pound sign (#)."
 msgstr ""
+"打印机名称最多能包含 127 个可打印字符，但不可包含空格，斜杠（/ 或 \\），引号"
+"（' 或 \"），问号（?）或井号（#）。"
 
 msgid "The printer or class does not exist."
 msgstr "打印机或类不存在。"
@@ -4499,7 +4507,7 @@ msgid "URI too large"
 msgstr "URI 过大"
 
 msgid "US Fanfold"
-msgstr ""
+msgstr "US 折叠页"
 
 msgid "US Ledger"
 msgstr "US Ledger"
@@ -4879,7 +4887,7 @@ msgid "Unsupported 'document-format' value \"%s\"."
 msgstr "不支持的“document-format”值“%s”。"
 
 msgid "Unsupported 'job-hold-until' value."
-msgstr ""
+msgstr "不支持的“job-hold-until”值。"
 
 msgid "Unsupported 'job-name' value."
 msgstr "不支持的“job-name”值。"
@@ -6457,7 +6465,7 @@ msgstr "ippfind：在 %s 后缺少键名。"
 
 #, c-format
 msgid "ippfind: Missing name after %s."
-msgstr ""
+msgstr "ippfind：%s 后缺少名称。"
 
 msgid "ippfind: Missing open parenthesis."
 msgstr "ippfind：缺少左括号。"
@@ -6499,14 +6507,14 @@ msgstr "ippfind：未知变量“{%s}”。"
 msgid ""
 "ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
 "and \"-X\"."
-msgstr ""
+msgstr "ipptool：“-i”和“-n”不能与“--ippserver”，“-P”和“-X”混用。"
 
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr "ipptool：“-i”和“-n”不能与“-P”和“-X”混用。"
 
 #, c-format
 msgid "ipptool: Bad URI \"%s\"."
-msgstr ""
+msgstr "ipptool：无效的 URI “%s”。"
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool：“-i”选项后指定的秒数无效。"
@@ -6518,7 +6526,7 @@ msgid "ipptool: Missing count for \"-n\"."
 msgstr "ipptool：“-n”选项后缺少数量。"
 
 msgid "ipptool: Missing filename for \"--ippserver\"."
-msgstr ""
+msgstr "ipptool：“--ippserver”选项后缺少文件名。"
 
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr "ipptool：“-f”选项后缺少文件名。"
@@ -7078,7 +7086,7 @@ msgstr "lpadmin：打印机 %s 不是类 %s 中的成员。"
 msgid ""
 "lpadmin: Printer drivers are deprecated and will stop working in a future "
 "version of CUPS."
-msgstr ""
+msgstr "lpadmin：打印机驱动已被弃用，未来的 CUPS 版本可能破坏其功能性。"
 
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin：打印机名称中只能包含可打印字符。"
@@ -7086,12 +7094,12 @@ msgstr "lpadmin：打印机名称中只能包含可打印字符。"
 msgid ""
 "lpadmin: Raw queues are deprecated and will stop working in a future version "
 "of CUPS."
-msgstr ""
+msgstr "lpadmin：原始序列已被弃用，未来的 CUPS 版本可能破坏其功能性。"
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
 "reasons."
-msgstr ""
+msgstr "lpadmin：由于安全原因，已不再支持 System V 接口脚本。"
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -7149,7 +7157,7 @@ msgid "lpadmin: Unknown option \"%c\"."
 msgstr "lpadmin：未知选项“%c”。"
 
 msgid "lpadmin: Use the 'everywhere' model for shared printers."
-msgstr ""
+msgstr "lpadmin：为共享的打印机使用“everywhere”模型。"
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin：警告 — 内容类型列表已被忽略。"
@@ -9817,7 +9825,7 @@ msgstr "打印机 %s 从 %s 开始被禁用 -"
 
 #, c-format
 msgid "printer %s is holding new jobs.  enabled since %s"
-msgstr ""
+msgstr "打印机 %s 正在保留新任务。从 %s 开始启用"
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
@@ -12415,4 +12423,4 @@ msgid "z-offset"
 msgstr "Z Offset"
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
-msgstr ""
+msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
