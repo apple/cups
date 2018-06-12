@@ -1,6 +1,10 @@
 /*
  * Localization test program for CUPS.
  *
+ * Usage:
+ *
+ *   ./testlang [-l locale] [-p ppd] ["String to localize"]
+ *
  * Copyright 2007-2017 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
@@ -22,7 +26,9 @@
  * Local functions...
  */
 
-static int  test_string(cups_lang_t *language, const char *msgid);
+static int	show_ppd(const char *filename);
+static int	test_string(cups_lang_t *language, const char *msgid);
+static void	usage(void);
 
 
 /*
@@ -34,9 +40,12 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
+  const char		*opt;		/* Current option */
   int			errors = 0;	/* Number of errors */
-  cups_lang_t		*language;	/* Message catalog */
-  cups_lang_t		*language2;	/* Message catalog */
+  int			dotests = 1;	/* Do standard tests? */
+  cups_lang_t		*language = NULL;/* Message catalog */
+  cups_lang_t		*language2 = NULL;
+					/* Message catalog (second time) */
   struct lconv		*loc;		/* Locale data */
   char			buffer[1024];	/* String buffer */
   double		number;		/* Number */
@@ -49,21 +58,84 @@ main(int  argc,				/* I - Number of command-line arguments */
   };
 
 
-  if (argc == 1)
+ /*
+  * Parse command-line...
+  */
+
+  _cupsSetLocale(argv);
+
+  for (i = 1; i < argc; i ++)
+  {
+    if (argv[i][0] == '-')
+    {
+      if (!strcmp(argv[i], "--help"))
+      {
+        usage();
+      }
+      else
+      {
+        for (opt = argv[i] + 1; *opt; opt ++)
+        {
+          switch (*opt)
+          {
+            case 'l' :
+                i ++;
+                if (i >= argc)
+                {
+                  usage();
+                  return (1);
+                }
+
+		language  = cupsLangGet(argv[i]);
+		language2 = cupsLangGet(argv[i]);
+
+		setenv("LANG", argv[i], 1);
+		setenv("SOFTWARE", "CUPS/" CUPS_SVERSION, 1);
+		break;
+
+	    case 'p' :
+                i ++;
+                if (i >= argc)
+                {
+                  usage();
+                  return (1);
+                }
+
+                if (!language)
+                {
+		  language  = cupsLangDefault();
+		  language2 = cupsLangDefault();
+		}
+
+		dotests = 0;
+		errors += show_ppd(argv[i]);
+                break;
+
+            default :
+                usage();
+                return (1);
+	  }
+        }
+      }
+    }
+    else
+    {
+      if (!language)
+      {
+	language  = cupsLangDefault();
+	language2 = cupsLangDefault();
+      }
+
+      dotests = 0;
+      errors += test_string(language, argv[i]);
+    }
+  }
+
+  if (!language)
   {
     language  = cupsLangDefault();
     language2 = cupsLangDefault();
   }
-  else
-  {
-    language  = cupsLangGet(argv[1]);
-    language2 = cupsLangGet(argv[1]);
-
-    setenv("LANG", argv[1], 1);
-    setenv("SOFTWARE", "CUPS/" CUPS_SVERSION, 1);
-  }
-
-  _cupsSetLocale(argv);
 
   if (language != language2)
   {
@@ -76,81 +148,41 @@ main(int  argc,				/* I - Number of command-line arguments */
   printf("Language = \"%s\"\n", language->language);
   printf("Encoding = \"%s\"\n", _cupsEncodingName(language->encoding));
 
-  errors += test_string(language, "No");
-  errors += test_string(language, "Yes");
-
-  if (language != language2)
+  if (dotests)
   {
-    puts("Second result from cupsLangGet:");
+    errors += test_string(language, "No");
+    errors += test_string(language, "Yes");
 
-    printf("Language = \"%s\"\n", language2->language);
-    printf("Encoding = \"%s\"\n", _cupsEncodingName(language2->encoding));
-    printf("No       = \"%s\"\n", _cupsLangString(language2, "No"));
-    printf("Yes      = \"%s\"\n", _cupsLangString(language2, "Yes"));
-  }
-
-  loc = localeconv();
-
-  for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i ++)
-  {
-    number = _cupsStrScand(tests[i], NULL, loc);
-
-    printf("_cupsStrScand(\"%s\") number=%f\n", tests[i], number);
-
-    _cupsStrFormatd(buffer, buffer + sizeof(buffer), number, loc);
-
-    printf("_cupsStrFormatd(%f) buffer=\"%s\"\n", number, buffer);
-
-    if (strcmp(buffer, tests[i]))
+    if (language != language2)
     {
-      errors ++;
-      puts("**** ERROR: Bad formatted number! ****");
+      puts("Second result from cupsLangGet:");
+
+      printf("Language = \"%s\"\n", language2->language);
+      printf("Encoding = \"%s\"\n", _cupsEncodingName(language2->encoding));
+      printf("No       = \"%s\"\n", _cupsLangString(language2, "No"));
+      printf("Yes      = \"%s\"\n", _cupsLangString(language2, "Yes"));
     }
-  }
 
-  if (argc == 3)
-  {
-    ppd_file_t		*ppd;		/* PPD file */
-    ppd_option_t	*option;	/* PageSize option */
-    ppd_choice_t	*choice;	/* PageSize/Letter choice */
+    loc = localeconv();
 
-    if ((ppd = ppdOpenFile(argv[2])) == NULL)
+    for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i ++)
     {
-      printf("Unable to open PPD file \"%s\".\n", argv[2]);
-      errors ++;
-    }
-    else
-    {
-      ppdLocalize(ppd);
+      number = _cupsStrScand(tests[i], NULL, loc);
 
-      if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
+      printf("_cupsStrScand(\"%s\") number=%f\n", tests[i], number);
+
+      _cupsStrFormatd(buffer, buffer + sizeof(buffer), number, loc);
+
+      printf("_cupsStrFormatd(%f) buffer=\"%s\"\n", number, buffer);
+
+      if (strcmp(buffer, tests[i]))
       {
-        puts("No PageSize option.");
-        errors ++;
+	errors ++;
+	puts("**** ERROR: Bad formatted number! ****");
       }
-      else
-      {
-        printf("PageSize: %s\n", option->text);
-
-        if ((choice = ppdFindChoice(option, "Letter")) == NULL)
-        {
-	  puts("No Letter PageSize choice.");
-	  errors ++;
-        }
-        else
-        {
-	  printf("Letter: %s\n", choice->text);
-        }
-      }
-
-      printf("media-empty: %s\n", ppdLocalizeIPPReason(ppd, "media-empty", NULL, buffer, sizeof(buffer)));
-
-      ppdClose(ppd);
     }
-  }
+
 #ifdef __APPLE__
-  else
-  {
    /*
     * Test all possible language IDs for compatibility with _cupsAppleLocale...
     */
@@ -236,13 +268,62 @@ main(int  argc,				/* I - Number of command-line arguments */
 #  if TEST_COUNTRY_CODES
     CFRelease(country_codes);
 #  endif /* TEST_COUNTRY_CODES */
-  }
 #endif /* __APPLE__ */
+  }
 
-  if (errors == 0)
+  if (errors == 0 && dotests)
     puts("ALL TESTS PASSED");
 
   return (errors > 0);
+}
+
+
+/*
+ * 'show_ppd()' - Show localized strings in a PPD file.
+ */
+
+static int				/* O - Number of errors */
+show_ppd(const char *filename)		/* I - Filename */
+{
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_option_t	*option;		/* PageSize option */
+  ppd_choice_t	*choice;		/* PageSize/Letter choice */
+  char		buffer[1024];		/* String buffer */
+
+
+  if ((ppd = ppdOpenFile(filename)) == NULL)
+  {
+    printf("Unable to open PPD file \"%s\".\n", filename);
+    return (1);
+  }
+
+  ppdLocalize(ppd);
+
+  if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
+  {
+    puts("No PageSize option.");
+    return (1);
+  }
+  else
+  {
+    printf("PageSize: %s\n", option->text);
+
+    if ((choice = ppdFindChoice(option, "Letter")) == NULL)
+    {
+      puts("No Letter PageSize choice.");
+      return (1);
+    }
+    else
+    {
+      printf("Letter: %s\n", choice->text);
+    }
+  }
+
+  printf("media-empty: %s\n", ppdLocalizeIPPReason(ppd, "media-empty", NULL, buffer, sizeof(buffer)));
+
+  ppdClose(ppd);
+
+  return (0);
 }
 
 
@@ -281,3 +362,13 @@ test_string(cups_lang_t *language,    /* I - Language */
   return (0);
 }
 
+
+/*
+ * 'usage()' - Show program usage.
+ */
+
+static void
+usage(void)
+{
+  puts("./testlang [-l locale] [-p ppd] [\"String to localize\"]");
+}
