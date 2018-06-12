@@ -1,9 +1,10 @@
-CHANGES - 2.3b6 - 2018-06-11
+CHANGES - 2.3b6 - 2018-06-12
 ============================
 
 Changes in CUPS v2.3b6
 ----------------------
 
+- Localization update (Issue #5339)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
 - Fixed a memory leak for some IPP (extension) syntaxes.
