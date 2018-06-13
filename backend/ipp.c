@@ -1485,6 +1485,30 @@ main(int  argc,				/* I - Number of command-line args */
                                   ippGetString(job_auth, 0, NULL), num_options,
                                   &options);
 
+    if (ipp_status == IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED || ipp_status == IPP_STATUS_OK_CONFLICTING)
+    {
+     /*
+      * One or more options are not supported...
+      */
+
+      ipp_attribute_t	*attr;		/* Unsupported attribute */
+
+      if ((attr = ippFindAttribute(response, "sides", IPP_TAG_ZERO)) != NULL)
+      {
+       /*
+        * The sides value is not supported, revert to one-sided as needed...
+        */
+
+        const char *sides = cupsGetOption("sides", num_options, options);
+
+        if (!strncmp(sides, "two-sided-", 10))
+        {
+          fputs("DEBUG: Unable to do two-sided printing, setting sides to 'one-sided'.\n", stderr);
+          num_options = cupsAddOption("sides", "one-sided", num_options, &options);
+        }
+      }
+    }
+
     ippDelete(response);
 
     if (job_canceled)
