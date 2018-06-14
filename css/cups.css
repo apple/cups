@@ -24,7 +24,7 @@ A, A:hover {
 }
 
 A:link, A:link:visited, A:visited, A:link:hover, A:visited:hover {
-  color: #005580;
+  color: #0062cc;
   text-decoration: underline;
 }
 
@@ -143,7 +143,7 @@ DIV.jumbotron {
 }
 
 A.jumbolink:link, A.jumbolink:hover, A.jumbolink:focus, A.jumbolink:visited {
-  color: #99f;
+  color: #3C92FF;
 }
 
 DIV.jumbotron H1 {
@@ -178,7 +178,7 @@ DIV.footer {
 }
 
 DIV.footer A, DIV.footer A:hover, DIV.footer A:focus, DIV.footer A:visited {
-  color: #99f;
+  color: #3C92FF;
 }
 
 P {
@@ -189,6 +189,7 @@ PRE {
   border: 0px;
   border-left: 5px solid #ddd;
   border-radius: 0px;
+  padding-left: 10px;
 }
 
 DIV.footer P {
