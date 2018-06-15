@@ -93,6 +93,21 @@ main(int  argc,				/* I - Number of command-line arguments */
       tls_min_version = _HTTP_TLS_1_0;
       tls_max_version = _HTTP_TLS_1_0;
     }
+    else if (!strcmp(argv[i], "--tls11"))
+    {
+      tls_min_version = _HTTP_TLS_1_1;
+      tls_max_version = _HTTP_TLS_1_1;
+    }
+    else if (!strcmp(argv[i], "--tls12"))
+    {
+      tls_min_version = _HTTP_TLS_1_2;
+      tls_max_version = _HTTP_TLS_1_2;
+    }
+    else if (!strcmp(argv[i], "--tls13"))
+    {
+      tls_min_version = _HTTP_TLS_1_3;
+      tls_max_version = _HTTP_TLS_1_3;
+    }
     else if (!strcmp(argv[i], "--rc4"))
     {
       tls_options |= _HTTP_TLS_ALLOW_RC4;
@@ -753,6 +768,9 @@ usage(void)
   puts("  --no-tls10  Disable TLS/1.0");
   puts("  --rc4       Allow RC4 encryption");
   puts("  --tls10     Only use TLS/1.0");
+  puts("  --tls11     Only use TLS/1.1");
+  puts("  --tls12     Only use TLS/1.2");
+  puts("  --tls13     Only use TLS/1.3");
   puts("  --verbose   Be verbose");
   puts("  -4          Connect using IPv4 addresses only");
   puts("  -6          Connect using IPv6 addresses only");
