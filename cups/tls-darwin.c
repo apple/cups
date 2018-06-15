@@ -1283,14 +1283,16 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
       kTLSProtocol1,
       kTLSProtocol11,
       kTLSProtocol12,
-      kTLSProtocol12, /* TODO: update to 1.3 when 1.3 is supported */
-      kTLSProtocol12  /* TODO: update to 1.3 when 1.3 is supported */
+      kTLSProtocol13
     };
 
-    error = SSLSetProtocolVersionMin(http->tls, protocols[tls_min_version]);
-    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", protocols[tls_min_version], (int)error));
+    if (tls_min_version < _HTTP_TLS_MAX)
+    {
+      error = SSLSetProtocolVersionMin(http->tls, protocols[tls_min_version]);
+      DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", protocols[tls_min_version], (int)error));
+    }
 
-    if (!error)
+    if (!error && tls_max_version < _HTTP_TLS_MAX)
     {
       error = SSLSetProtocolVersionMax(http->tls, protocols[tls_max_version]);
       DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMax(%d), error=%d", protocols[tls_max_version], (int)error));
