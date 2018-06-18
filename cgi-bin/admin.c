@@ -1076,9 +1076,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         cgiStartHTML(title);
 	if (!cgiGetVariable("PPD_MAKE"))
 	  cgiSetVariable("PPD_MAKE", cgiGetVariable("CURRENT_MAKE"));
-	if (!modify)
-	  cgiSetVariable("CURRENT_MAKE_AND_MODEL",
-	                 cgiGetArray("PPD_MAKE_AND_MODEL", 0));
         if (ipp_everywhere)
 	  cgiSetVariable("SHOW_IPP_EVERYWHERE", "1");
 	cgiCopyTemplateLang("choose-model.tmpl");
