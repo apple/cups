@@ -1,10 +1,11 @@
 /*
  * EPSON ESC/P and ESC/P2 filter for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -301,7 +302,7 @@ StartPage(
 
   if (DotBytes)
   {
-    if ((LineBuffers[0] = calloc((size_t)DotBytes, header->cupsWidth * (size_t)(Shingling + 1))) == NULL)
+    if ((LineBuffers[0] = calloc((size_t)DotBytes, (header->cupsWidth + 7) * (size_t)(Shingling + 1))) == NULL)
     {
       fputs("ERROR: Unable to allocate memory\n", stderr);
       exit(1);
