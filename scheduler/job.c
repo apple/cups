@@ -1,10 +1,11 @@
 /*
  * Job management routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -3813,6 +3814,20 @@ get_options(cupsd_job_t *job,		/* I - Job */
 
     for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
       cupsdLogJob(job, CUPSD_LOG_DEBUG2, "After mapping finishings %s=%s", pwgppd->name, pwgppd->value);
+  }
+
+ /*
+  * Map page-delivery values...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "page-delivery", IPP_TAG_KEYWORD)) != NULL && !ippFindAttribute(job->attrs, "outputorder", IPP_TAG_ZERO))
+  {
+    const char *page_delivery = ippGetString(attr, 0, NULL);
+
+    if (!strncmp(page_delivery, "same-order", 10))
+      num_pwgppds = cupsAddOption("OutputOrder", "Normal", num_pwgppds, &pwgppds);
+    else if (!strncmp(page_delivery, "reverse-order", 13))
+      num_pwgppds = cupsAddOption("OutputOrder", "Reverse", num_pwgppds, &pwgppds);
   }
 
  /*

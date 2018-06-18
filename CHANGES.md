@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-06-12
+CHANGES - 2.3b6 - 2018-06-18
 ============================
 
 Changes in CUPS v2.3b6
@@ -7,6 +7,8 @@ Changes in CUPS v2.3b6
 - Localization update (Issue #5339)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
+- The scheduler did not report all of the supported job options and values
+  (Issue #5340)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
 
