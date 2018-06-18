@@ -1,10 +1,11 @@
 /*
  * Administration CGI for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -928,6 +929,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   else if (!file &&
            (!cgiGetVariable("PPD_NAME") || cgiGetVariable("SELECT_MAKE")))
   {
+    int ipp_everywhere = !strncmp(var, "ipp://", 6) || !strncmp(var, "ipps://", 7) || (!strncmp(var, "dnssd://", 8) && (strstr(var, "_ipp._tcp") || strstr(var, "_ipps._tcp")));
+
     if (modify && !cgiGetVariable("SELECT_MAKE"))
     {
      /*
@@ -1076,6 +1079,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	if (!modify)
 	  cgiSetVariable("CURRENT_MAKE_AND_MODEL",
 	                 cgiGetArray("PPD_MAKE_AND_MODEL", 0));
+        if (ipp_everywhere)
+	  cgiSetVariable("SHOW_IPP_EVERYWHERE", "1");
 	cgiCopyTemplateLang("choose-model.tmpl");
         cgiEndHTML();
       }

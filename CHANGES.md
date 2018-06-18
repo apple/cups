@@ -7,6 +7,7 @@ Changes in CUPS v2.3b6
 - Localization update (Issue #5339)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
+- The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - The scheduler did not report all of the supported job options and values
   (Issue #5340)
 - Fixed a memory leak for some IPP (extension) syntaxes.
