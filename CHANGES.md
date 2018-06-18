@@ -5,6 +5,7 @@ Changes in CUPS v2.3b6
 ----------------------
 
 - Localization update (Issue #5339)
+- The scheduler did not idle-exit on some Linux distributions (Issue #5319)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)

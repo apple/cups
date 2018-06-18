@@ -806,20 +806,31 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_ONDEMAND
    /*
-    * If no other work is scheduled and we're being controlled by
-    * launchd then timeout after 'LaunchdTimeout' seconds of
+    * If no other work is scheduled and we're being controlled by launchd,
+    * systemd, etc. then timeout after 'IdleExitTimeout' seconds of
     * inactivity...
     */
 
     if (timeout == 86400 && OnDemand && IdleExitTimeout &&
-        !cupsArrayCount(ActiveJobs) &&
 #  ifdef HAVE_SYSTEMD
         !WebInterface &&
 #  endif /* HAVE_SYSTEMD */
-	(!Browsing || !BrowseLocalProtocols || !cupsArrayCount(Printers)))
+        !cupsArrayCount(ActiveJobs))
     {
-      timeout		= IdleExitTimeout;
-      service_idle_exit = 1;
+      cupsd_printer_t *p = NULL;	/* Current printer */
+
+      if (Browsing && BrowseLocalProtocols)
+      {
+        for (p = (cupsd_printer_t *)cupsArrayFirst(Printers); p; p = (cupsd_printer_t *)cupsArrayNext(Printers))
+          if (p->shared)
+            break;
+      }
+
+      if (!p)
+      {
+	timeout		  = IdleExitTimeout;
+	service_idle_exit = 1;
+      }
     }
     else
       service_idle_exit = 0;
