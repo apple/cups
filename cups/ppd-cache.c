@@ -3105,8 +3105,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cupsFilePrintf(fp, "*Manufacturer: \"%s\"\n", make);
   cupsFilePrintf(fp, "*ModelName: \"%s\"\n", model);
   cupsFilePrintf(fp, "*Product: \"(%s)\"\n", model);
-  cupsFilePrintf(fp, "*NickName: \"%s\"\n", model);
-  cupsFilePrintf(fp, "*ShortNickName: \"%s\"\n", model);
+  cupsFilePrintf(fp, "*NickName: \"%s - IPP Everywhere\"\n", model);
+  cupsFilePrintf(fp, "*ShortNickName: \"%s - IPP Everywhere\"\n", model);
 
   if ((attr = ippFindAttribute(response, "color-supported", IPP_TAG_BOOLEAN)) != NULL && ippGetBoolean(attr, 0))
     cupsFilePuts(fp, "*ColorDevice: True\n");
