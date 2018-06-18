@@ -1135,7 +1135,14 @@ main(int  argc,				/* I - Number of command-line args */
 	copies_sup = NULL; /* No */
     }
 
-    cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
+    if ((cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT)) != NULL)
+    {
+      const char *version = ippGetString(cups_version, 0, NULL);
+
+      fprintf(stderr, "DEBUG: cups-version = \"%s\"\n", version);
+      if (!strcmp(version, "cups-version"))
+        cups_version = NULL;		/* Bogus cups-version value returned by buggy printers! */
+    }
 
     encryption_sup = ippFindAttribute(supported, "job-password-encryption-supported", IPP_TAG_KEYWORD);
 
