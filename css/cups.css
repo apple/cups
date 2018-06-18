@@ -43,6 +43,14 @@ NAV.cups-nav a.navbar-brand {
   background: none;
 }
 
+NAV a.navbar-brand, NAV a.navbar-brand:visited {
+  color: #ccc;
+}
+
+NAV a.navbar-brand:hover, NAV a.navbar-brand:active {
+  color: #fff;
+}
+
 .dropdown-divider {
   border-top-color: #888;
 }
@@ -54,7 +62,7 @@ NAV.cups-nav a.navbar-brand {
 
 A.btn:link, A.btn:hover, A.btn:visited, A.btn:focus,
 A.btn:active, A.btn.active, A.btn.disabled,
-A.btn[disabled], A.navbar-brand:hover {
+A.btn[disabled] {
   border-radius: 8px;
   color: #000000;
   margin-right: .5em;
