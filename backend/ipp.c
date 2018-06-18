@@ -1,7 +1,7 @@
 /*
  * IPP backend for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1140,7 +1140,14 @@ main(int  argc,				/* I - Number of command-line args */
 	copies_sup = NULL; /* No */
     }
 
-    cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
+    if ((cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT)) != NULL)
+    {
+      const char *version = ippGetString(cups_version, 0, NULL);
+
+      fprintf(stderr, "DEBUG: cups-version = \"%s\"\n", version);
+      if (!strcmp(version, "cups-version"))
+        cups_version = NULL;		/* Bogus cups-version value returned by buggy printers! */
+    }
 
     encryption_sup = ippFindAttribute(supported, "job-password-encryption-supported", IPP_TAG_KEYWORD);
 
