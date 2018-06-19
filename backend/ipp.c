@@ -1137,10 +1137,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT)) != NULL)
     {
-      const char *version = ippGetString(cups_version, 0, NULL);
+      const char *val = ippGetString(cups_version, 0, NULL);
 
-      fprintf(stderr, "DEBUG: cups-version = \"%s\"\n", version);
-      if (!strcmp(version, "cups-version"))
+      fprintf(stderr, "DEBUG: cups-version = \"%s\"\n", val);
+      if (!strcmp(val, "cups-version"))
         cups_version = NULL;		/* Bogus cups-version value returned by buggy printers! */
     }
 
