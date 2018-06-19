@@ -43,7 +43,7 @@ NAV.cups-nav a.navbar-brand {
   background: none;
 }
 
-NAV a.navbar-brand, NAV a.navbar-brand:visited {
+NAV a.navbar-brand:link, NAV a.navbar-brand:visited {
   color: #ccc;
 }
 
