@@ -12,6 +12,7 @@ Changes in CUPS v2.2.9
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)
+- Automatic debug logging of job errors did not work with systemd (Issue #5337)
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
