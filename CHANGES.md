@@ -5,6 +5,8 @@ CHANGES - 2.2.9 - 2018-06-18
 Changes in CUPS v2.2.9
 ----------------------
 
+- The lpadmin command would create a non-working printer in some error cases
+  (Issue #5305)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)
