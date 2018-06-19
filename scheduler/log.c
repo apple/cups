@@ -566,48 +566,17 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     return (1);
 
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H
-  if (!strcmp(ErrorLog, "syslog"))
-  {
-    cupsd_printer_t *printer = job ? (job->printer ? job->printer : (job->dest ? cupsdFindDest(job->dest) : NULL)) : NULL;
-    static const char * const job_states[] =
-    {					/* job-state strings */
-      "Pending",
-      "PendingHeld",
-      "Processing",
-      "ProcessingStopped",
-      "Canceled",
-      "Aborted",
-      "Completed"
-    };
-
-    va_start(ap, message);
-
-    do
-    {
-      va_copy(ap2, ap);
-      status = format_log_line(message, ap2);
-      va_end(ap2);
-    }
-    while (status == 0);
-
-    va_end(ap);
-
-    if (job)
-      sd_journal_send("MESSAGE=%s", log_line,
-		      "PRIORITY=%i", log_levels[level],
-		      PWG_Event"=JobStateChanged",
-		      PWG_ServiceURI"=%s", printer ? printer->uri : "",
-		      PWG_JobID"=%d", job->id,
-		      PWG_JobState"=%s", job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING],
-		      PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
-		      NULL);
-    else
-      sd_journal_send("MESSAGE=%s", log_line,
-		      "PRIORITY=%i", log_levels[level],
-		      NULL);
-
-    return (1);
-  }
+  cupsd_printer_t *printer = job ? (job->printer ? job->printer : (job->dest ? cupsdFindDest(job->dest) : NULL)) : NULL;
+  static const char * const job_states[] =
+  {					/* job-state strings */
+    "Pending",
+    "PendingHeld",
+    "Processing",
+    "ProcessingStopped",
+    "Canceled",
+    "Aborted",
+    "Completed"
+  };
 #endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
 
  /*
@@ -673,7 +642,29 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
       return (1);
     }
     else if (level <= LogLevel)
+    {
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H
+      if (!strcmp(ErrorLog, "syslog"))
+      {
+        if (job)
+          sd_journal_send("MESSAGE=%s", log_line,
+    		      "PRIORITY=%i", log_levels[level],
+    		      PWG_Event"=JobStateChanged",
+    		      PWG_ServiceURI"=%s", printer ? printer->uri : "",
+    		      PWG_JobID"=%d", job->id,
+    		      PWG_JobState"=%s", job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING],
+    		      PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
+    		      NULL);
+        else
+          sd_journal_send("MESSAGE=%s", log_line,
+    		      "PRIORITY=%i", log_levels[level],
+    		      NULL);
+    
+        return (1);
+      }
+#endif /* HAVE_SYSTEMD_SD_JOURNAL_H */
       return (cupsdWriteErrorLog(level, log_line));
+    }
     else
       return (1);
   }
