@@ -7,6 +7,8 @@ Changes in CUPS v2.3b6
 - Localization update (Issue #5339)
 - The lpadmin command would create a non-working printer in some error cases
   (Issue #5305)
+- The scheduler would crash if an empty `AccessLog` directive was specified
+  (Issue #5309)
 - The scheduler did not idle-exit on some Linux distributions (Issue #5319)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
