@@ -1,7 +1,7 @@
 /*
  * Log file routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1050,7 +1050,7 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   * Filter requests as needed...
   */
 
-  if (AccessLogLevel == CUPSD_ACCESSLOG_NONE)
+  if (AccessLogLevel == CUPSD_ACCESSLOG_NONE || !AccessLog)
     return (1);
   else if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
   {

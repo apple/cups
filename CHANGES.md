@@ -7,6 +7,8 @@ Changes in CUPS v2.2.9
 
 - The lpadmin command would create a non-working printer in some error cases
   (Issue #5305)
+- The scheduler would crash if an empty `AccessLog` directive was specified
+  (Issue #5309)
 - Fixed a regression in the changes to ippValidateAttribute (Issue #5322,
   Issue #5330)
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)
