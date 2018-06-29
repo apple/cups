@@ -2155,7 +2155,7 @@ cupsdSendHeader(
 #ifdef HAVE_AUTHORIZATION_H
 	if (!_cups_strncasecmp(name, "@AUTHKEY(", 9))
 	{
-	  snprintf(auth_key, auth_size, ", AuthRef key=\"%s\"", name + 9);
+	  snprintf(auth_key, auth_size, ", AuthRef key=\"%s\", Local trc=\"y\"", name + 9);
 	  need_local = 0;
 	  /* end parenthesis is stripped in conf.c */
 	  break;
@@ -2166,11 +2166,10 @@ cupsdSendHeader(
 	{
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
-	    snprintf(auth_key, auth_size, ", AuthRef key=\"%s\"", SystemGroupAuthKey);
+	    snprintf(auth_key, auth_size, ", AuthRef key=\"%s\", Local trc=\"y\"", SystemGroupAuthKey);
           else
-#else
-	  strlcpy(auth_key, ", Local trc=\"y\"", auth_size);
 #endif /* HAVE_AUTHORIZATION_H */
+	  strlcpy(auth_key, ", Local trc=\"y\"", auth_size);
 	  need_local = 0;
 	  break;
 	}

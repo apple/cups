@@ -1115,10 +1115,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   if (cups_auth_find(www_auth, "Negotiate"))
     return (1);
 #  endif /* HAVE_GSSAPI */
-#  ifdef HAVE_AUTHORIZATION_H
-  if (cups_auth_find(www_auth, "AuthRef"))
-    return (1);
-#  endif /* HAVE_AUTHORIZATION_H */
 
 #  if defined(SO_PEERCRED) && defined(AF_LOCAL)
  /*
@@ -1168,7 +1164,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * No certificate for this PID; see if we can get the root certificate...
     */
 
-    DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s", filename, strerror(errno)));
+    DEBUG_printf(("9cups_local_auth: Unable to open file \"%s\": %s", filename, strerror(errno)));
 
     if (!cups_auth_param(schemedata, "trc", trc, sizeof(trc)))
     {
@@ -1180,7 +1176,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     }
 
     snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
-    fp = fopen(filename, "r");
+    if ((fp = fopen(filename, "r")) == NULL)
+      DEBUG_printf(("9cups_local_auth: Unable to open file \"%s\": %s", filename, strerror(errno)));
   }
 
   if (fp)
