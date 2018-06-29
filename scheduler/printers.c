@@ -150,9 +150,9 @@ cupsdCreateCommonData(void)
   double		spoolsize;	/* FS size */
 #endif /* HAVE_STATVFS */
   static const char * const page_delivery[] =
-  		{			/* page-delivery-supported values */
-  		  "reverse-order",
-  		  "same-order"
+		{			/* page-delivery-supported values */
+		  "reverse-order",
+		  "same-order"
 		};
   static const char * const print_scaling[] =
 		{			/* print-scaling-supported values */

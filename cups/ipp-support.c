@@ -290,11 +290,11 @@ static const char * const ipp_std_ops[] =
 		  "event-notification-attributes-tag",
 					/* 0x07 - RFC 3995 */
 		  "resource-attributes-tag",
-		  			/* 0x08 - IPP System */
+					/* 0x08 - IPP System */
 		  "document-attributes-tag",
 					/* 0x09 - IPP DocObject */
 		  "system-attributes-tag",
-		  			/* 0x0a - IPP System */
+					/* 0x0a - IPP System */
 		  "0x0b",		/* 0x0b */
 		  "0x0c",		/* 0x0c */
 		  "0x0d",		/* 0x0d */
