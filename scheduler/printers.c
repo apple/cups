@@ -165,16 +165,16 @@ cupsdCreateCommonData(void)
   static const int number_up[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const char * const number_up_layout[] =
-  		{			/* number-up-layout-supported values */
-                  "btlr",
-                  "btrl",
-                  "lrbt",
-                  "lrtb",
-                  "rlbt",
-                  "rltb",
-                  "tblr",
-                  "tbrl"
-  		};
+		{			/* number-up-layout-supported values */
+		  "btlr",
+		  "btrl",
+		  "lrbt",
+		  "lrtb",
+		  "rlbt",
+		  "rltb",
+		  "tblr",
+		  "tbrl"
+		};
   static const int orients[4] =/* orientation-requested-supported values */
 		{
 		  IPP_PORTRAIT,
