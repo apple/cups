@@ -15,6 +15,7 @@ Changes in CUPS v2.2.9
 - Automatic debug logging of job errors did not work with systemd (Issue #5337)
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
+- Dropped non-working RSS subscriptions UI from web interface templates.
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
 

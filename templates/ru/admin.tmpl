@@ -66,7 +66,7 @@
     <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Дополнительные параметры <SMALL>&#x25b6;</SMALL></A><BR>
     <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
     <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Разрешить совместный доступ к принтерам, подключенным к этой системе<BR>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Разрешить печать из 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Разрешить печать из
     интернет<BR>
     <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Разрешить удаленное администрирование<BR>
     {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Разрешить аутентификацию Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
@@ -78,20 +78,4 @@
 
     </FORM>}
   </div>
-</div>
-
-<div class="row">
-  <H2 CLASS="title">Подписка по RSS</H2>
-
-  <P>
-  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Добавить подписку по RSS"></FORM>
-  </P>
-
-  {notify_subscription_id?<TABLE CLASS="list" SUMMARY="Подписки по RSS">
-  <THEAD><TR><TH>Название</TH><TH>События</TH><TH>Очередь</TH></TR></THEAD>
-  <TBODY>{[notify_subscription_id]
-  <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-  <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Отменить подписку по RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Все очереди}</TD></TR>}
-  </TBODY>
-  </TABLE>:}
 </div>
