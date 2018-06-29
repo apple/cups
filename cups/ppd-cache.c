@@ -3145,12 +3145,12 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cupsFilePrintf(fp, "*ShortNickName: \"%s - IPP Everywhere\"\n", model);
 
   /* Which is the default output bin? */
-  if ((attr = ippFindAttribute(response, "output-bin-default", IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(response, "output-bin-default", IPP_TAG_ZERO)) != NULL)
     defaultoutbin = strdup(ippGetString(attr, 0, NULL));
   /* Find out on which position of the list of output bins the default one is, if there
      is no default bin, take the first of this list */
   i = 0;
-  if ((attr = ippFindAttribute(response, "output-bin-supported", IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(response, "output-bin-supported", IPP_TAG_ZERO)) != NULL)
   {
     count = ippGetCount(attr);
     for (i = 0; i < count; i ++)
@@ -3168,7 +3168,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     }
   }
   /* Look up the corresponding entry in the "printer-output-tray" attribute */
-  if ((attr = ippFindAttribute(response, "printer-output-tray", IPP_TAG_MIMETYPE)) != NULL &&
+  if ((attr = ippFindAttribute(response, "printer-output-tray", IPP_TAG_ZERO)) != NULL &&
       i < ippGetCount(attr))
   {
     outbin_properties = ippGetString(attr, i, NULL);
@@ -3967,7 +3967,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     cupsFilePrintf(fp, "*OpenUI *OutputBin: PickOne\n"
                        "*OrderDependency: 10 AnySetup *OutputBin\n"
                        "*DefaultOutputBin: %s\n", ppdname);
-    attr2 = ippFindAttribute(response, "printer-output-tray", IPP_TAG_MIMETYPE);
+    attr2 = ippFindAttribute(response, "printer-output-tray", IPP_TAG_ZERO);
     for (i = 0; i < count; i ++)
     {
       keyword = ippGetString(attr, i, NULL);
