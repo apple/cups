@@ -3073,8 +3073,10 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cups_array_t		*fin_options = NULL;
 					/* Finishing options */
   char			*defaultoutbin = NULL;
-  const char		*outbin,
-			*outbin_properties;
+  const char		*outbin;
+  char			outbin_properties[1024];
+  int			octet_str_len;
+  void			*outbin_properties_octet;
   int			outputorderinfofound = 0,
 			faceupdown = 1,
 			firsttolast = 1;
@@ -3168,10 +3170,14 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     }
   }
   /* Look up the corresponding entry in the "printer-output-tray" attribute */
-  if ((attr = ippFindAttribute(response, "printer-output-tray", IPP_TAG_ZERO)) != NULL &&
+  if ((attr = ippFindAttribute(response, "printer-output-tray", IPP_TAG_STRING)) != NULL &&
       i < ippGetCount(attr))
   {
-    outbin_properties = ippGetString(attr, i, NULL);
+    outbin_properties_octet = ippGetOctetString(attr, i, &octet_str_len);
+    memset(outbin_properties, 0, sizeof(outbin_properties));
+    memcpy(outbin_properties, outbin_properties_octet,
+	   ((size_t)octet_str_len < sizeof(outbin_properties) - 1 ?
+	    (size_t)octet_str_len : sizeof(outbin_properties) - 1));
     if (strcasestr(outbin_properties, "pagedelivery=faceUp"))
     {
       outputorderinfofound = 1;
@@ -3967,7 +3973,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     cupsFilePrintf(fp, "*OpenUI *OutputBin: PickOne\n"
                        "*OrderDependency: 10 AnySetup *OutputBin\n"
                        "*DefaultOutputBin: %s\n", ppdname);
-    attr2 = ippFindAttribute(response, "printer-output-tray", IPP_TAG_ZERO);
+    attr2 = ippFindAttribute(response, "printer-output-tray", IPP_TAG_STRING);
     for (i = 0; i < count; i ++)
     {
       keyword = ippGetString(attr, i, NULL);
@@ -3985,7 +3991,11 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       firsttolast = 1;
       if (attr2 && i < ippGetCount(attr2))
       {
-	outbin_properties = ippGetString(attr2, i, NULL);
+	outbin_properties_octet = ippGetOctetString(attr2, i, &octet_str_len);
+	memset(outbin_properties, 0, sizeof(outbin_properties));
+	memcpy(outbin_properties, outbin_properties_octet,
+	       ((size_t)octet_str_len < sizeof(outbin_properties) - 1 ?
+		(size_t)octet_str_len : sizeof(outbin_properties) - 1));
 	if (strcasestr(outbin_properties, "pagedelivery=faceUp"))
 	{
 	  outputorderinfofound = 1;
