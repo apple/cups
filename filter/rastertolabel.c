@@ -299,7 +299,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
 	printf("PAGE-WIDTH %u\r\n", header->cupsWidth);
-	printf("PAGE-HEIGHT %u\r\n", header->cupsWidth);
+	printf("PAGE-HEIGHT %u\r\n", header->cupsHeight);
         break;
 
     case INTELLITECH_PCL :
