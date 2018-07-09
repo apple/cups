@@ -134,11 +134,7 @@ static int		help_load_file(help_index_t *hi,
 			               const char *filename,
 				       const char *relative,
 				       time_t     mtime);
-static help_node_t	*help_new_node(const char *filename, const char *anchor,
-			               const char *section, const char *text,
-				       time_t mtime, off_t offset,
-				       size_t length)
-				       __attribute__((nonnull(1,3,4)));
+static help_node_t	*help_new_node(const char *filename, const char *anchor, const char *section, const char *text, time_t mtime, off_t offset, size_t length) _CUPS_NONNULL(1,3,4);
 static int		help_sort_by_name(help_node_t *p1, help_node_t *p2);
 static int		help_sort_by_score(help_node_t *p1, help_node_t *p2);
 static int		help_sort_words(help_word_t *w1, help_word_t *w2);

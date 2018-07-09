@@ -33,7 +33,7 @@ static int	job_canceled = 0;
  */
 
 static void	sigterm_handler(int sig);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 static void	walk_cb(const char *oid, const char *data, int datalen,
 		        void *context);
 

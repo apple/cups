@@ -21,7 +21,7 @@
 static void	print_packet(cups_snmp_t *packet, void *data);
 static int	show_oid(int fd, const char *community,
 		         http_addr_t *addr, const char *s, int walk);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

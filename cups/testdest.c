@@ -26,7 +26,7 @@ static void	show_conflicts(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo,
 static void	show_default(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, const char *option);
 static void	show_media(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, unsigned flags, const char *name);
 static void	show_supported(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, const char *option, const char *value);
-static void	usage(const char *arg) __attribute__((noreturn));
+static void	usage(const char *arg) _CUPS_NORETURN;
 
 
 /*

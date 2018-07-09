@@ -78,7 +78,7 @@ static int		open_pipe(int *fds);
 static int		read_cups_files_conf(const char *filename);
 static void		set_string(char **s, const char *val);
 static void		sighandler(int sig);
-static void		usage(const char *opt) __attribute__((noreturn));
+static void		usage(const char *opt) _CUPS_NORETURN;
 
 
 /*

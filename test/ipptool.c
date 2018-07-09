@@ -165,8 +165,9 @@ static int	Cancel = 0;		/* Cancel test? */
  * Local functions...
  */
 
-static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	add_stringf(cups_array_t *a, const char *s, ...) _CUPS_FORMAT(2, 3);
 static int      compare_uris(const char *a, const char *b);
+static void	copy_hex_string(char *buffer, unsigned char *data, int datalen, size_t bufsize);
 static int	do_test(_ipp_file_t *f, _ipp_vars_t *vars, _cups_testdata_t *data);
 static int	do_tests(const char *testfile, _ipp_vars_t *vars, _cups_testdata_t *data);
 static int	error_cb(_ipp_file_t *f, _cups_testdata_t *data, const char *error);
@@ -178,7 +179,7 @@ static char	*iso_date(const ipp_uchar_t *date);
 static void	pause_message(const char *message);
 static void	print_attr(cups_file_t *outfile, int output, ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_csv(_cups_testdata_t *data, ipp_t *ipp, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
-static void	print_fatal_error(_cups_testdata_t *data, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_fatal_error(_cups_testdata_t *data, const char *s, ...) _CUPS_FORMAT(2, 3);
 static void	print_ippserver_attr(_cups_testdata_t *data, ipp_attribute_t *attr, int indent);
 static void	print_ippserver_string(_cups_testdata_t *data, const char *s, size_t len);
 static void	print_line(_cups_testdata_t *data, ipp_t *ipp, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
@@ -190,7 +191,7 @@ static void	sigterm_handler(int sig);
 #endif /* WIN32 */
 static int	timeout_cb(http_t *http, void *user_data);
 static int	token_cb(_ipp_file_t *f, _ipp_vars_t *vars, _cups_testdata_t *data, const char *token);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 static const char *with_flags_string(int flags);
 static int      with_value(_cups_testdata_t *data, cups_array_t *errors, char *value, int flags, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 static int      with_value_from(cups_array_t *errors, ipp_attribute_t *fromattr, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
@@ -817,6 +818,69 @@ compare_uris(const char *a,             /* I - First URI */
 
 
 /*
+ * 'copy_hex_string()' - Copy an octetString to a C string and encode as hex if
+ *                       needed.
+ */
+
+static void
+copy_hex_string(char          *buffer,	/* I - String buffer */
+		unsigned char *data,	/* I - octetString data */
+		int           datalen,	/* I - octetString length */
+		size_t        bufsize)	/* I - Size of string buffer */
+{
+  char		*bufptr,		/* Pointer into string buffer */
+		*bufend = buffer + bufsize - 2;
+					/* End of string buffer */
+  unsigned char	*dataptr,		/* Pointer into octetString data */
+		*dataend = data + datalen;
+					/* End of octetString data */
+  static const char *hexdigits = "0123456789ABCDEF";
+					/* Hex digits */
+
+
+ /*
+  * First see if there are any non-ASCII bytes in the octetString...
+  */
+
+  for (dataptr = data; dataptr < dataend; dataptr ++)
+    if (*dataptr < 0x20 || *dataptr >= 0x7f)
+      break;
+
+  if (*dataptr)
+  {
+   /*
+    * Yes, encode as hex...
+    */
+
+    *buffer = '<';
+
+    for (bufptr = buffer + 1, dataptr = data; bufptr < bufend && dataptr < dataend; dataptr ++)
+    {
+      *bufptr++ = hexdigits[*dataptr >> 4];
+      *bufptr++ = hexdigits[*dataptr & 15];
+    }
+
+    if (bufptr < bufend)
+      *bufptr++ = '>';
+
+    *bufptr = '\0';
+  }
+  else
+  {
+   /*
+    * No, copy as a string...
+    */
+
+    if ((size_t)datalen > bufsize)
+      datalen = (int)bufsize - 1;
+
+    memcpy(buffer, data, datalen);
+    buffer[datalen] = '\0';
+  }
+}
+
+
+/*
  * 'do_test()' - Do a single test from the test file.
  */
 
@@ -1351,7 +1415,12 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 	    _ippVarsGet(vars, expect->if_not_defined))
 	  continue;
 
-	found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+	if ((found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO)) != NULL && expect->in_group && expect->in_group != ippGetGroupTag(found))
+	{
+	  while ((found = ippFindNextAttribute(response, expect->name, IPP_TAG_ZERO)) != NULL)
+	    if (expect->in_group == ippGetGroupTag(found))
+	      break;
+	}
 
 	do
 	{
@@ -4700,6 +4769,99 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	    add_stringf(data->errors, "GOT: %s=\"%s\"", name, ippGetString(attr, i, NULL));
         }
 	break;
+
+    case IPP_TAG_STRING :
+        {
+          unsigned char	withdata[1023],	/* WITH-VALUE data */
+			*adata;		/* Pointer to octetString data */
+	  int		withlen,	/* Length of WITH-VALUE data */
+			adatalen;	/* Length of octetString */
+
+          if (*value == '<')
+          {
+           /*
+            * Grab hex-encoded value...
+            */
+
+            if ((withlen = (int)strlen(value)) & 1 || withlen > (2 * (sizeof(withdata) + 1)))
+            {
+	      print_fatal_error(data, "Bad WITH-VALUE hex value.");
+              return (0);
+	    }
+
+	    withlen = withlen / 2 - 1;
+
+            for (valptr = value + 1, adata = withdata; *valptr; valptr += 2)
+            {
+              int ch;			/* Current character/byte */
+
+	      if (isdigit(valptr[0]))
+	        ch = (valptr[0] - '0') << 4;
+	      else if (isalpha(valptr[0]))
+	        ch = (tolower(valptr[0]) - 'a' + 10) << 4;
+	      else
+	        break;
+
+	      if (isdigit(valptr[1]))
+	        ch |= valptr[1] - '0';
+	      else if (isalpha(valptr[1]))
+	        ch |= tolower(valptr[1]) - 'a' + 10;
+	      else
+	        break;
+
+	      *adata++ = (unsigned char)ch;
+	    }
+
+	    if (*valptr)
+	    {
+	      print_fatal_error(data, "Bad WITH-VALUE hex value.");
+              return (0);
+	    }
+          }
+          else
+          {
+           /*
+            * Copy literal string value...
+            */
+
+            withlen = (int)strlen(value);
+
+            memcpy(withdata, value, withlen);
+	  }
+
+	  for (i = 0; i < count; i ++)
+	  {
+	    adata = ippGetOctetString(attr, i, &adatalen);
+
+	    if (withlen == adatalen && !memcmp(withdata, adata, (size_t)withlen))
+	    {
+	      if (!matchbuf[0])
+	        copy_hex_string(matchbuf, adata, adatalen, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
+
+	  if (!match && errors)
+	  {
+	    for (i = 0; i < count; i ++)
+	    {
+	      adata = ippGetOctetString(attr, i, &adatalen);
+	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
+	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
+	    }
+	  }
+        }
+        break;
 
     default :
         break;

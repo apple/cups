@@ -66,7 +66,7 @@ static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
 static void		service_checkin(void);
 static void		service_checkout(int shutdown);
-static void		usage(int status) __attribute__((noreturn));
+static void		usage(int status) _CUPS_NORETURN;
 
 
 /*

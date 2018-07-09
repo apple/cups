@@ -31,7 +31,7 @@ static int	terminate = 0;
 
 static void	print_attributes(ipp_t *ipp, int indent);
 static void	sigterm_handler(int sig);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

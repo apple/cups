@@ -19,7 +19,7 @@
  * Local functions...
  */
 
-static void	usage(const char *opt) __attribute__((noreturn));
+static void	usage(const char *opt) _CUPS_NORETURN;
 
 
 /*

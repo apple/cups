@@ -28,12 +28,8 @@ static ipp_attribute_t	*ipp_add_attr(ipp_t *ipp, const char *name,
 			              int num_values);
 static void		ipp_free_values(ipp_attribute_t *attr, int element,
 			                int count);
-static char		*ipp_get_code(const char *locale, char *buffer,
-			              size_t bufsize)
-			              __attribute__((nonnull(1,2)));
-static char		*ipp_lang_code(const char *locale, char *buffer,
-			               size_t bufsize)
-			               __attribute__((nonnull(1,2)));
+static char		*ipp_get_code(const char *locale, char *buffer, size_t bufsize) _CUPS_NONNULL(1,2);
+static char		*ipp_lang_code(const char *locale, char *buffer, size_t bufsize) _CUPS_NONNULL(1,2);
 static size_t		ipp_length(ipp_t *ipp, int collection);
 static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
 			              size_t length);

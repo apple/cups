@@ -144,23 +144,8 @@ static int	ipp_version = 20;	/* IPP version for LIST */
  */
 
 #ifdef HAVE_DNSSD
-static void DNSSD_API	browse_callback(DNSServiceRef sdRef,
-			                DNSServiceFlags flags,
-				        uint32_t interfaceIndex,
-				        DNSServiceErrorType errorCode,
-				        const char *serviceName,
-				        const char *regtype,
-				        const char *replyDomain, void *context)
-					__attribute__((nonnull(1,5,6,7,8)));
-static void DNSSD_API	browse_local_callback(DNSServiceRef sdRef,
-					      DNSServiceFlags flags,
-					      uint32_t interfaceIndex,
-					      DNSServiceErrorType errorCode,
-					      const char *serviceName,
-					      const char *regtype,
-					      const char *replyDomain,
-					      void *context)
-					      __attribute__((nonnull(1,5,6,7,8)));
+static void DNSSD_API	browse_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context) _CUPS_NONNULL(1,5,6,7,8);
+static void DNSSD_API	browse_local_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context) _CUPS_NONNULL(1,5,6,7,8);
 #elif defined(HAVE_AVAHI)
 static void		browse_callback(AvahiServiceBrowser *browser,
 					AvahiIfIndex interface,
@@ -182,27 +167,14 @@ static int		eval_expr(ippfind_srv_t *service,
 			          ippfind_expr_t *expressions);
 static int		exec_program(ippfind_srv_t *service, int num_args,
 			             char **args);
-static ippfind_srv_t	*get_service(cups_array_t *services,
-				     const char *serviceName,
-				     const char *regtype,
-				     const char *replyDomain)
-				     __attribute__((nonnull(1,2,3,4)));
+static ippfind_srv_t	*get_service(cups_array_t *services, const char *serviceName, const char *regtype, const char *replyDomain) _CUPS_NONNULL(1,2,3,4);
 static double		get_time(void);
 static int		list_service(ippfind_srv_t *service);
 static ippfind_expr_t	*new_expr(ippfind_op_t op, int invert,
 			          const char *value, const char *regex,
 			          char **args);
 #ifdef HAVE_DNSSD
-static void DNSSD_API	resolve_callback(DNSServiceRef sdRef,
-			                 DNSServiceFlags flags,
-				         uint32_t interfaceIndex,
-				         DNSServiceErrorType errorCode,
-				         const char *fullName,
-				         const char *hostTarget, uint16_t port,
-				         uint16_t txtLen,
-				         const unsigned char *txtRecord,
-				         void *context)
-				         __attribute__((nonnull(1,5,6,9, 10)));
+static void DNSSD_API	resolve_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullName, const char *hostTarget, uint16_t port, uint16_t txtLen, const unsigned char *txtRecord, void *context) _CUPS_NONNULL(1,5,6,9, 10);
 #elif defined(HAVE_AVAHI)
 static int		poll_callback(struct pollfd *pollfds,
 			              unsigned int num_pollfds, int timeout,
@@ -222,8 +194,8 @@ static void		resolve_callback(AvahiServiceResolver *res,
 					 void *context);
 #endif /* HAVE_DNSSD */
 static void		set_service_uri(ippfind_srv_t *service);
-static void		show_usage(void) __attribute__((noreturn));
-static void		show_version(void) __attribute__((noreturn));
+static void		show_usage(void) _CUPS_NORETURN;
+static void		show_version(void) _CUPS_NORETURN;
 
 
 /*

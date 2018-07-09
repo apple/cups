@@ -33,7 +33,7 @@
  * Local functions...
  */
 
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

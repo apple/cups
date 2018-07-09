@@ -33,7 +33,7 @@ const char	*SAMBAUser,
  */
 
 int	export_dest(http_t *http, const char *dest);
-void	usage(void) __attribute__((noreturn));
+void	usage(void) _CUPS_NORETURN;
 
 
 /*

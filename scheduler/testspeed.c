@@ -27,7 +27,7 @@
 static int	do_test(const char *server, int port,
 		        http_encryption_t encryption, int requests,
 			const char *opstring, int verbose);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

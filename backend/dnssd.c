@@ -82,23 +82,8 @@ static int		browsers = 0;	/* Number of running browsers */
  */
 
 #ifdef HAVE_DNSSD
-static void		browse_callback(DNSServiceRef sdRef,
-			                DNSServiceFlags flags,
-				        uint32_t interfaceIndex,
-				        DNSServiceErrorType errorCode,
-				        const char *serviceName,
-				        const char *regtype,
-				        const char *replyDomain, void *context)
-					__attribute__((nonnull(1,5,6,7,8)));
-static void		browse_local_callback(DNSServiceRef sdRef,
-					      DNSServiceFlags flags,
-					      uint32_t interfaceIndex,
-					      DNSServiceErrorType errorCode,
-					      const char *serviceName,
-					      const char *regtype,
-					      const char *replyDomain,
-					      void *context)
-					      __attribute__((nonnull(1,5,6,7,8)));
+static void		browse_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context) _CUPS_NONNULL(1,5,6,7,8);
+static void		browse_local_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *serviceName, const char *regtype, const char *replyDomain, void *context) _CUPS_NONNULL(1,5,6,7,8);
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_AVAHI
 static void		browse_callback(AvahiServiceBrowser *browser,
@@ -116,22 +101,10 @@ static void		client_callback(AvahiClient *client,
 #endif /* HAVE_AVAHI */
 
 static int		compare_devices(cups_device_t *a, cups_device_t *b);
-static void		exec_backend(char **argv) __attribute__((noreturn));
-static cups_device_t	*get_device(cups_array_t *devices,
-			            const char *serviceName,
-			            const char *regtype,
-				    const char *replyDomain)
-				    __attribute__((nonnull(1,2,3,4)));
+static void		exec_backend(char **argv) _CUPS_NORETURN;
+static cups_device_t	*get_device(cups_array_t *devices, const char *serviceName, const char *regtype, const char *replyDomain) _CUPS_NONNULL(1,2,3,4);
 #ifdef HAVE_DNSSD
-static void		query_callback(DNSServiceRef sdRef,
-			               DNSServiceFlags flags,
-				       uint32_t interfaceIndex,
-				       DNSServiceErrorType errorCode,
-				       const char *fullName, uint16_t rrtype,
-				       uint16_t rrclass, uint16_t rdlen,
-				       const void *rdata, uint32_t ttl,
-				       void *context)
-				       __attribute__((nonnull(1,5,9,11)));
+static void		query_callback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char *fullName, uint16_t rrtype, uint16_t rrclass, uint16_t rdlen, const void *rdata, uint32_t ttl, void *context) _CUPS_NONNULL(1,5,9,11);
 #elif defined(HAVE_AVAHI)
 static int		poll_callback(struct pollfd *pollfds,
 			              unsigned int num_pollfds, int timeout,
@@ -147,8 +120,7 @@ static void		query_callback(AvahiRecordBrowser *browser,
 				       void *context);
 #endif /* HAVE_DNSSD */
 static void		sigterm_handler(int sig);
-static void		unquote(char *dst, const char *src, size_t dstsize)
-			    __attribute__((nonnull(1,2)));
+static void		unquote(char *dst, const char *src, size_t dstsize) _CUPS_NONNULL(1,2);
 
 
 /*

@@ -25,12 +25,12 @@
  */
 
 static int	do_command(int outfd, int infd, const char *command);
-static int	print_job(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
+static int	print_job(int outfd, int infd, char *dest, char **args) _CUPS_NONNULL(4);
 static int	print_waiting(int outfd, int infd, char *dest);
-static int	remove_job(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
-static int	status_long(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
-static int	status_short(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
-static void	usage(void) __attribute__((noreturn));
+static int	remove_job(int outfd, int infd, char *dest, char **args) _CUPS_NONNULL(4);
+static int	status_long(int outfd, int infd, char *dest, char **args) _CUPS_NONNULL(4);
+static int	status_short(int outfd, int infd, char *dest, char **args) _CUPS_NONNULL(4);
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

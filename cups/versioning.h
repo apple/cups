@@ -25,6 +25,7 @@
  *   - _CUPS_INTERNAL_MSG("msg"): Function is
  *   - _CUPS_NONNULL((arg list)): Specifies the comma-separated argument indices
  *     are assumed non-NULL.  Indices start at 1.
+ *   - _CUPS_NORETURN: Specifies the function does not return.
  *   - _CUPS_PRIVATE: Specifies the function is private to CUPS.
  *   - _CUPS_PUBLIC: Specifies the function is public API.
  */
@@ -41,6 +42,7 @@
 #  ifdef __has_extension		/* Clang */
 #    define _CUPS_HAS_DEPRECATED
 #    define _CUPS_HAS_FORMAT
+#    define _CUPS_HAS_NORETURN
 #    define _CUPS_HAS_VISIBILITY
 #    if __has_extension(attribute_deprecated_with_message)
 #      define _CUPS_HAS_DEPRECATED_WITH_MESSAGE
@@ -52,6 +54,7 @@
 #    if __GNUC__ >= 3			/* GCC 3.0 or higher */
 #      define _CUPS_HAS_DEPRECATED
 #      define _CUPS_HAS_FORMAT
+#      define _CUPS_HAS_NORETURN
 #      define _CUPS_HAS_VISIBILITY
 #    endif /* __GNUC__ >= 3 */
 #    if __GNUC__ >= 5			/* GCC 5.x */
@@ -229,6 +232,17 @@
 #  else
 #    define _CUPS_NONNULL(...)
 #  endif /* _CUPS_HAS_FORMAT */
+
+
+/*
+ * Define _CUPS_NORETURN macro for functions that don't return.
+ */
+
+#  ifdef _CUPS_HAS_NORETURN
+#    define _CUPS_NORETURN	__attribute__ ((noreturn))
+#  else
+#    define _CUPS_NORETURN
+#  endif /* _CUPS_HAS_NORETURN */
 
 
 #endif /* !_CUPS_VERSIONING_H_ */
