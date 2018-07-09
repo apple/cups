@@ -1,10 +1,11 @@
 /*
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_HTTP_H_
@@ -448,53 +449,43 @@ typedef int (*http_timeout_cb_t)(http_t *http, void *user_data);
  * Prototypes...
  */
 
-extern void		httpBlocking(http_t *http, int b);
-extern int		httpCheck(http_t *http);
-extern void		httpClearFields(http_t *http);
-extern void		httpClose(http_t *http);
-extern http_t		*httpConnect(const char *host, int port)
-			             _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
-extern http_t		*httpConnectEncrypt(const char *host, int port,
-			                    http_encryption_t encryption)
-			                    _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
-extern int		httpDelete(http_t *http, const char *uri);
-extern int		httpEncryption(http_t *http, http_encryption_t e);
-extern int		httpError(http_t *http);
-extern void		httpFlush(http_t *http);
-extern int		httpGet(http_t *http, const char *uri);
-extern char		*httpGets(char *line, int length, http_t *http);
-extern const char	*httpGetDateString(time_t t);
-extern time_t		httpGetDateTime(const char *s);
-extern const char	*httpGetField(http_t *http, http_field_t field);
-extern struct hostent	*httpGetHostByName(const char *name);
-extern char		*httpGetSubField(http_t *http, http_field_t field,
-			                 const char *name, char *value);
-extern int		httpHead(http_t *http, const char *uri);
-extern void		httpInitialize(void);
-extern int		httpOptions(http_t *http, const char *uri);
-extern int		httpPost(http_t *http, const char *uri);
-extern int		httpPrintf(http_t *http, const char *format, ...)
-			__attribute__ ((__format__ (__printf__, 2, 3)));
-extern int		httpPut(http_t *http, const char *uri);
+extern void		httpBlocking(http_t *http, int b) _CUPS_PUBLIC;
+extern int		httpCheck(http_t *http) _CUPS_PUBLIC;
+extern void		httpClearFields(http_t *http) _CUPS_PUBLIC;
+extern void		httpClose(http_t *http) _CUPS_PUBLIC;
+extern http_t		*httpConnect(const char *host, int port) _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
+extern http_t		*httpConnectEncrypt(const char *host, int port, http_encryption_t encryption) _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
+extern int		httpDelete(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern int		httpEncryption(http_t *http, http_encryption_t e) _CUPS_PUBLIC;
+extern int		httpError(http_t *http) _CUPS_PUBLIC;
+extern void		httpFlush(http_t *http) _CUPS_PUBLIC;
+extern int		httpGet(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern char		*httpGets(char *line, int length, http_t *http) _CUPS_PUBLIC;
+extern const char	*httpGetDateString(time_t t) _CUPS_PUBLIC;
+extern time_t		httpGetDateTime(const char *s) _CUPS_PUBLIC;
+extern const char	*httpGetField(http_t *http, http_field_t field) _CUPS_PUBLIC;
+extern struct hostent	*httpGetHostByName(const char *name) _CUPS_PUBLIC;
+extern char		*httpGetSubField(http_t *http, http_field_t field, const char *name, char *value) _CUPS_PUBLIC;
+extern int		httpHead(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern void		httpInitialize(void) _CUPS_PUBLIC;
+extern int		httpOptions(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern int		httpPost(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern int		httpPrintf(http_t *http, const char *format, ...) _CUPS_FORMAT(2, 3) _CUPS_PUBLIC;
+extern int		httpPut(http_t *http, const char *uri) _CUPS_PUBLIC;
 extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpRead2 instead.");
 extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED_1_6_MSG("Use httpReconnect2 instead.");
-extern void		httpSeparate(const char *uri, char *method,
-			             char *username, char *host, int *port,
-				     char *resource) _CUPS_DEPRECATED_MSG("Use httpSeparateURI instead.");
-extern void		httpSetField(http_t *http, http_field_t field,
-			             const char *value);
-extern const char	*httpStatus(http_status_t status);
-extern int		httpTrace(http_t *http, const char *uri);
-extern http_status_t	httpUpdate(http_t *http);
+extern void		httpSeparate(const char *uri, char *method, char *username, char *host, int *port, char *resource) _CUPS_DEPRECATED_1_2_MSG("Use httpSeparateURI instead.");
+extern void		httpSetField(http_t *http, http_field_t field, const char *value) _CUPS_PUBLIC;
+extern const char	*httpStatus(http_status_t status) _CUPS_PUBLIC;
+extern int		httpTrace(http_t *http, const char *uri) _CUPS_PUBLIC;
+extern http_status_t	httpUpdate(http_t *http) _CUPS_PUBLIC;
 extern int		httpWrite(http_t *http, const char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpWrite2 instead.");
 extern char		*httpEncode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use httpEncode64_2 instead.");
 extern char		*httpDecode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use httpDecode64_2 instead.");
-extern int		httpGetLength(http_t *http) _CUPS_DEPRECATED_MSG("Use httpGetLength2 instead.");
-extern char		*httpMD5(const char *, const char *, const char *,
-			         char [33]) _CUPS_DEPRECATED_MSG("Use cupsDoAuth or cupsHashData instead.");
-extern char		*httpMD5Final(const char *, const char *, const char *,
-			              char [33]) _CUPS_DEPRECATED_MSG("Use cupsDoAuth or cupsHashData instead.");
-extern char		*httpMD5String(const unsigned char *, char [33]) _CUPS_DEPRECATED_MSG("Use cupsHashString instead.");
+extern int		httpGetLength(http_t *http) _CUPS_DEPRECATED_1_2_MSG("Use httpGetLength2 instead.");
+extern char		*httpMD5(const char *, const char *, const char *, char [33]) _CUPS_DEPRECATED_MSG("Use cupsDoAuth or cupsHashData instead.");
+extern char		*httpMD5Final(const char *, const char *, const char *, char [33]) _CUPS_DEPRECATED_2_2_MSG("Use cupsDoAuth or cupsHashData instead.");
+extern char		*httpMD5String(const unsigned char *, char [33]) _CUPS_DEPRECATED_2_2_MSG("Use cupsHashString instead.");
 
 /**** New in CUPS 1.1.19 ****/
 extern void		httpClearCookie(http_t *http) _CUPS_API_1_1_19;
@@ -504,40 +495,21 @@ extern int		httpWait(http_t *http, int msec) _CUPS_API_1_1_19;
 
 /**** New in CUPS 1.1.21 ****/
 extern char		*httpDecode64_2(char *out, int *outlen, const char *in) _CUPS_API_1_1_21;
-extern char		*httpEncode64_2(char *out, int outlen, const char *in,
-			                int inlen) _CUPS_API_1_1_21;
-extern void		httpSeparate2(const char *uri,
-			              char *method, int methodlen,
-			              char *username, int usernamelen,
-				      char *host, int hostlen, int *port,
-				      char *resource, int resourcelen) _CUPS_DEPRECATED_MSG("Use httpSeparateURI instead.");
+extern char		*httpEncode64_2(char *out, int outlen, const char *in, int inlen) _CUPS_API_1_1_21;
+extern void		httpSeparate2(const char *uri, char *method, int methodlen, char *username, int usernamelen, char *host, int hostlen, int *port, char *resource, int resourcelen) _CUPS_DEPRECATED_1_2_MSG("Use httpSeparateURI instead.");
 
 /**** New in CUPS 1.2/macOS 10.5 ****/
 extern int		httpAddrAny(const http_addr_t *addr) _CUPS_API_1_2;
 extern http_addrlist_t	*httpAddrConnect(http_addrlist_t *addrlist, int *sock) _CUPS_API_1_2;
-extern int		httpAddrEqual(const http_addr_t *addr1,
-			              const http_addr_t *addr2) _CUPS_API_1_2;
+extern int		httpAddrEqual(const http_addr_t *addr1, const http_addr_t *addr2) _CUPS_API_1_2;
 extern void		httpAddrFreeList(http_addrlist_t *addrlist) _CUPS_API_1_2;
-extern http_addrlist_t	*httpAddrGetList(const char *hostname, int family,
-			                 const char *service) _CUPS_API_1_2;
+extern http_addrlist_t	*httpAddrGetList(const char *hostname, int family, const char *service) _CUPS_API_1_2;
 extern int		httpAddrLength(const http_addr_t *addr) _CUPS_API_1_2;
 extern int		httpAddrLocalhost(const http_addr_t *addr) _CUPS_API_1_2;
-extern char		*httpAddrLookup(const http_addr_t *addr,
-                                        char *name, int namelen) _CUPS_API_1_2;
-extern char		*httpAddrString(const http_addr_t *addr,
-			                char *s, int slen) _CUPS_API_1_2;
-extern http_uri_status_t httpAssembleURI(http_uri_coding_t encoding,
-			                 char *uri, int urilen,
-			        	 const char *scheme,
-					 const char *username,
-					 const char *host, int port,
-					 const char *resource) _CUPS_API_1_2;
-extern http_uri_status_t httpAssembleURIf(http_uri_coding_t encoding,
-			                  char *uri, int urilen,
-			        	  const char *scheme,
-					  const char *username,
-					  const char *host, int port,
-					  const char *resourcef, ...) _CUPS_API_1_2;
+extern char		*httpAddrLookup(const http_addr_t *addr, char *name, int namelen) _CUPS_API_1_2;
+extern char		*httpAddrString(const http_addr_t *addr, char *s, int slen) _CUPS_API_1_2;
+extern http_uri_status_t httpAssembleURI(http_uri_coding_t encoding, char *uri, int urilen, const char *scheme, const char *username, const char *host, int port, const char *resource) _CUPS_API_1_2;
+extern http_uri_status_t httpAssembleURIf(http_uri_coding_t encoding, char *uri, int urilen, const char *scheme, const char *username, const char *host, int port, const char *resourcef, ...) _CUPS_FORMAT(8, 9) _CUPS_API_1_2;
 extern int		httpFlushWrite(http_t *http) _CUPS_API_1_2;
 extern int		httpGetBlocking(http_t *http) _CUPS_API_1_2;
 extern const char	*httpGetDateString2(time_t t, char *s, int slen) _CUPS_API_1_2;
@@ -545,76 +517,44 @@ extern int		httpGetFd(http_t *http) _CUPS_API_1_2;
 extern const char	*httpGetHostname(http_t *http, char *s, int slen) _CUPS_API_1_2;
 extern off_t		httpGetLength2(http_t *http) _CUPS_API_1_2;
 extern http_status_t	httpGetStatus(http_t *http) _CUPS_API_1_2;
-extern char		*httpGetSubField2(http_t *http, http_field_t field,
-			                  const char *name, char *value,
-					  int valuelen) _CUPS_API_1_2;
+extern char		*httpGetSubField2(http_t *http, http_field_t field, const char *name, char *value, int valuelen) _CUPS_API_1_2;
 extern ssize_t		httpRead2(http_t *http, char *buffer, size_t length) _CUPS_API_1_2;
-extern http_uri_status_t httpSeparateURI(http_uri_coding_t decoding,
-			                 const char *uri,
-			        	 char *scheme, int schemelen,
-			        	 char *username, int usernamelen,
-					 char *host, int hostlen, int *port,
-					 char *resource, int resourcelen) _CUPS_API_1_2;
+extern http_uri_status_t httpSeparateURI(http_uri_coding_t decoding, const char *uri, char *scheme, int schemelen, char *username, int usernamelen, char *host, int hostlen, int *port, char *resource, int resourcelen) _CUPS_API_1_2;
 extern void		httpSetExpect(http_t *http, http_status_t expect) _CUPS_API_1_2;
 extern void		httpSetLength(http_t *http, size_t length) _CUPS_API_1_2;
-extern ssize_t		httpWrite2(http_t *http, const char *buffer,
-			           size_t length) _CUPS_API_1_2;
+extern ssize_t		httpWrite2(http_t *http, const char *buffer, size_t length) _CUPS_API_1_2;
 
 /**** New in CUPS 1.3/macOS 10.5 ****/
 extern char		*httpGetAuthString(http_t *http) _CUPS_API_1_3;
-extern void		httpSetAuthString(http_t *http, const char *scheme,
-			                  const char *data) _CUPS_API_1_3;
+extern void		httpSetAuthString(http_t *http, const char *scheme, const char *data) _CUPS_API_1_3;
 
 /**** New in CUPS 1.5/macOS 10.7 ****/
-extern int		httpAddCredential(cups_array_t *credentials,
-			                  const void *data, size_t datalen)
-					  _CUPS_API_1_5;
-extern int		httpCopyCredentials(http_t *http,
-					    cups_array_t **credentials)
-					    _CUPS_API_1_5;
+extern int		httpAddCredential(cups_array_t *credentials, const void *data, size_t datalen) _CUPS_API_1_5;
+extern int		httpCopyCredentials(http_t *http, cups_array_t **credentials) _CUPS_API_1_5;
 extern void		httpFreeCredentials(cups_array_t *certs) _CUPS_API_1_5;
-extern int		httpSetCredentials(http_t *http, cups_array_t *certs)
-					   _CUPS_API_1_5;
-extern void		httpSetTimeout(http_t *http, double timeout,
-			               http_timeout_cb_t cb, void *user_data)
-			               _CUPS_API_1_5;
+extern int		httpSetCredentials(http_t *http, cups_array_t *certs) _CUPS_API_1_5;
+extern void		httpSetTimeout(http_t *http, double timeout, http_timeout_cb_t cb, void *user_data) _CUPS_API_1_5;
 
 /**** New in CUPS 1.6/macOS 10.8 ****/
-extern http_addrlist_t	*httpAddrConnect2(http_addrlist_t *addrlist, int *sock,
-			                  int msec, int *cancel)
-			                  _CUPS_API_1_6;
+extern http_addrlist_t	*httpAddrConnect2(http_addrlist_t *addrlist, int *sock, int msec, int *cancel) _CUPS_API_1_6;
 extern http_state_t	httpGetState(http_t *http) _CUPS_API_1_6;
 extern http_version_t	httpGetVersion(http_t *http) _CUPS_API_1_6;
-extern int		httpReconnect2(http_t *http, int msec, int *cancel)
-			               _CUPS_API_1_6;
+extern int		httpReconnect2(http_t *http, int msec, int *cancel) _CUPS_API_1_6;
 
 
 /**** New in CUPS 1.7/macOS 10.9 ****/
-extern http_t		*httpAcceptConnection(int fd, int blocking)
-			                      _CUPS_API_1_7;
+extern http_t		*httpAcceptConnection(int fd, int blocking) _CUPS_API_1_7;
 extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
-extern int		httpAddrListen(http_addr_t *addr, int port)
-			               _CUPS_API_1_7;
+extern int		httpAddrListen(http_addr_t *addr, int port) _CUPS_API_1_7;
 extern int		httpAddrPort(http_addr_t *addr) _CUPS_API_1_7;
-extern char		*httpAssembleUUID(const char *server, int port,
-					  const char *name, int number,
-					  char *buffer, size_t bufsize)
-					  _CUPS_API_1_7;
-extern http_t		*httpConnect2(const char *host, int port,
-				      http_addrlist_t *addrlist,
-				      int family, http_encryption_t encryption,
-				      int blocking, int msec, int *cancel)
-				      _CUPS_API_1_7;
+extern char		*httpAssembleUUID(const char *server, int port, const char *name, int number, char *buffer, size_t bufsize) _CUPS_API_1_7;
+extern http_t		*httpConnect2(const char *host, int port, http_addrlist_t *addrlist, int family, http_encryption_t encryption, int blocking, int msec, int *cancel) _CUPS_API_1_7;
 extern const char	*httpGetContentEncoding(http_t *http) _CUPS_API_1_7;
 extern http_status_t	httpGetExpect(http_t *http) _CUPS_API_1_7;
-extern ssize_t		httpPeek(http_t *http, char *buffer, size_t length)
-			         _CUPS_API_1_7;
-extern http_state_t	httpReadRequest(http_t *http, char *resource,
-			                size_t resourcelen) _CUPS_API_1_7;
-extern void		httpSetDefaultField(http_t *http, http_field_t field,
-			                    const char *value) _CUPS_API_1_7;
-extern http_state_t	httpWriteResponse(http_t *http,
-			                  http_status_t status) _CUPS_API_1_7;
+extern ssize_t		httpPeek(http_t *http, char *buffer, size_t length) _CUPS_API_1_7;
+extern http_state_t	httpReadRequest(http_t *http, char *resource, size_t resourcelen) _CUPS_API_1_7;
+extern void		httpSetDefaultField(http_t *http, http_field_t field, const char *value) _CUPS_API_1_7;
+extern http_state_t	httpWriteResponse(http_t *http, http_status_t status) _CUPS_API_1_7;
 
 /* New in CUPS 2.0/macOS 10.10 */
 extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;

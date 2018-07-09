@@ -1,10 +1,11 @@
 /*
  * Configuration file definitions for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 
@@ -275,20 +276,14 @@ extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
 extern int	cupsdDefaultAuthType(void);
 extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
-extern int	cupsdLogClient(cupsd_client_t *con, int level,
-                               const char *message, ...)
-                               __attribute__((__format__(__printf__, 3, 4)));
-extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result,
-		                  const char *message);
+extern int	cupsdLogClient(cupsd_client_t *con, int level, const char *message, ...) _CUPS_FORMAT(3, 4);
+extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result, const char *message);
 #ifdef HAVE_GSSAPI
-extern int	cupsdLogGSSMessage(int level, OM_uint32 major_status,
-		                   OM_uint32 minor_status,
-		                   const char *message, ...);
+extern int	cupsdLogGSSMessage(int level, OM_uint32 major_status, OM_uint32 minor_status, const char *message, ...) _CUPS_FORMAT(4, 5);
 #endif /* HAVE_GSSAPI */
 extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message,
-		            ...) __attribute__((__format__(__printf__, 3, 4)));
-extern int	cupsdLogMessage(int level, const char *message, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
+		            ...) _CUPS_FORMAT(3, 4);
+extern int	cupsdLogMessage(int level, const char *message, ...) _CUPS_FORMAT(2, 3);
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);

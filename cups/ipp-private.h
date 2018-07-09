@@ -202,7 +202,7 @@ extern int		_ippFileReadToken(_ipp_file_t *f, char *token, size_t tokensize);
 
 /* ipp-vars.c */
 extern void		_ippVarsDeinit(_ipp_vars_t *v);
-extern void		_ippVarsExpand(_ipp_vars_t *v, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
+extern void		_ippVarsExpand(_ipp_vars_t *v, char *dst, const char *src, size_t dstsize) _CUPS_NONNULL(1,2,3);
 extern const char	*_ippVarsGet(_ipp_vars_t *v, const char *name);
 extern void		_ippVarsInit(_ipp_vars_t *v, _ipp_fattr_cb_t attrcb, _ipp_ferror_cb_t errorcb, _ipp_ftoken_cb_t tokencb);
 extern const char	*_ippVarsPasswordCB(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data);

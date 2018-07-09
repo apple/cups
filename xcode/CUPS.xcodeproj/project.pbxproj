@@ -3594,7 +3594,6 @@
 		72E65BAF18DC799B00097E89 /* cups-opsys.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-opsys.m4"; path = "../config-scripts/cups-opsys.m4"; sourceTree = "<group>"; };
 		72E65BB018DC799B00097E89 /* cups-pam.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-pam.m4"; path = "../config-scripts/cups-pam.m4"; sourceTree = "<group>"; };
 		72E65BB118DC799B00097E89 /* cups-poll.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-poll.m4"; path = "../config-scripts/cups-poll.m4"; sourceTree = "<group>"; };
-		72E65BB218DC799B00097E89 /* cups-scripting.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-scripting.m4"; path = "../config-scripts/cups-scripting.m4"; sourceTree = "<group>"; };
 		72E65BB318DC799B00097E89 /* cups-sharedlibs.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-sharedlibs.m4"; path = "../config-scripts/cups-sharedlibs.m4"; sourceTree = "<group>"; };
 		72E65BB418DC799B00097E89 /* cups-ssl.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-ssl.m4"; path = "../config-scripts/cups-ssl.m4"; sourceTree = "<group>"; };
 		72E65BB518DC799B00097E89 /* cups-threads.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-threads.m4"; path = "../config-scripts/cups-threads.m4"; sourceTree = "<group>"; };
@@ -5268,7 +5267,6 @@
 				72E65BAF18DC799B00097E89 /* cups-opsys.m4 */,
 				72E65BB018DC799B00097E89 /* cups-pam.m4 */,
 				72E65BB118DC799B00097E89 /* cups-poll.m4 */,
-				72E65BB218DC799B00097E89 /* cups-scripting.m4 */,
 				72E65BB318DC799B00097E89 /* cups-sharedlibs.m4 */,
 				72E65BB418DC799B00097E89 /* cups-ssl.m4 */,
 				72E65BB518DC799B00097E89 /* cups-threads.m4 */,

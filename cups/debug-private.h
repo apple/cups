@@ -1,10 +1,11 @@
 /*
  * Private debugging macros for CUPS.
  *
- * Copyright 2007-2012 by Apple Inc.
- * Copyright 1997-2005 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_DEBUG_PRIVATE_H_
@@ -61,15 +62,6 @@ extern "C" {
  */
 
 #  ifdef DEBUG
-#    ifdef WIN32
-#      ifdef LIBCUPS2_EXPORTS
-#        define DLLExport __declspec(dllexport)
-#      else
-#        define DLLExport
-#      endif /* LIBCUPS2_EXPORTS */
-#    else
-#      define DLLExport
-#    endif /* WIN32 */
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
 #    define DEBUG_set(logfile,level,filter) _cups_debug_set(logfile,level,filter,1)
@@ -85,16 +77,13 @@ extern "C" {
  * Prototypes...
  */
 
-extern int	_cups_debug_fd;
-extern int	_cups_debug_level;
-extern void	DLLExport _cups_debug_printf(const char *format, ...)
-		__attribute__ ((__format__ (__printf__, 1, 2)));
-extern void	DLLExport _cups_debug_puts(const char *s);
-extern void	DLLExport _cups_debug_set(const char *logfile,
-					  const char *level, const char *filter,
-					  int force);
+extern int	_cups_debug_fd _CUPS_PRIVATE;
+extern int	_cups_debug_level _CUPS_PRIVATE;
+extern void	_cups_debug_printf(const char *format, ...) _CUPS_FORMAT(1,2) _CUPS_PUBLIC;
+extern void	_cups_debug_puts(const char *s) _CUPS_PUBLIC;
+extern void	_cups_debug_set(const char *logfile, const char *level, const char *filter, int force) _CUPS_PUBLIC;
 #  ifdef WIN32
-extern int	_cups_gettimeofday(struct timeval *tv, void *tz);
+extern int	_cups_gettimeofday(struct timeval *tv, void *tz) _CUPS_PRIVATE;
 #    define gettimeofday(a,b) _cups_gettimeofday(a, b)
 #  endif /* WIN32 */
 

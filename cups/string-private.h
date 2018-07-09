@@ -1,10 +1,11 @@
 /*
  * Private string definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_STRING_PRIVATE_H_
@@ -169,8 +170,7 @@ extern size_t _cups_strlcpy(char *, const char *, size_t);
 #  endif /* !HAVE_STRLCPY */
 
 #  ifndef HAVE_SNPRINTF
-extern int	_cups_snprintf(char *, size_t, const char *, ...)
-		__attribute__ ((__format__ (__printf__, 3, 4)));
+extern int	_cups_snprintf(char *, size_t, const char *, ...) _CUPS_FORMAT(3, 4);
 #    define snprintf _cups_snprintf
 #  endif /* !HAVE_SNPRINTF */
 
