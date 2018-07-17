@@ -454,12 +454,13 @@ libcupsimage.a:	$(IMAGEOBJS)
 
 
 #
-# rasterbench
+# rasterbench (dependency on static CUPS library is intentional)
 #
 
-rasterbench:	rasterbench.o libcupsimage.a
+rasterbench:	rasterbench.o libcups.a $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -664,7 +665,7 @@ testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 
 
 #
-# testraster
+# testraster (dependency on static CUPS library is intentional)
 #
 
 testraster:	testraster.o $(LIBCUPSSTATIC) libcupsimage.a
