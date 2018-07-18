@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-07-17
+CHANGES - 2.3b6 - 2018-07-18
 ============================
 
 Changes in CUPS v2.3b6
@@ -17,6 +17,7 @@ Changes in CUPS v2.3b6
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - The scheduler did not report all of the supported job options and values
   (Issue #5340)
+- Fixed some typos in the label printer drivers (Issue #5350)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
