@@ -94,40 +94,35 @@ echo ""
 case "$testtype" in
 	0)
 		echo "Running in test mode (0)"
-		nprinters1=0
-		nprinters2=0
+		nprinters=0
 		pjobs=0
 		pprinters=0
 		loglevel="debug2"
 		;;
 	2)
 		echo "Running the medium tests (2)"
-		nprinters1=10
-		nprinters2=20
+		nprinters=20
 		pjobs=20
 		pprinters=10
 		loglevel="debug"
 		;;
 	3)
 		echo "Running the extreme tests (3)"
-		nprinters1=500
-		nprinters2=1000
+		nprinters=1000
 		pjobs=100
 		pprinters=50
 		loglevel="debug"
 		;;
 	4)
 		echo "Running the torture tests (4)"
-		nprinters1=10000
-		nprinters2=20000
+		nprinters=20000
 		pjobs=200
 		pprinters=100
 		loglevel="debug"
 		;;
 	*)
 		echo "Running the timid tests (1)"
-		nprinters1=0
-		nprinters2=0
+		nprinters=0
 		pjobs=10
 		pprinters=0
 		loglevel="debug2"
@@ -540,13 +535,13 @@ if test $ssltype != 0 -a `uname` = Darwin; then
 fi
 
 #
-# Setup lots of test queues - half with PPD files, half without...
+# Setup lots of test queues with PPD files...
 #
 
 echo "Creating printers.conf for test..."
 
 i=1
-while test $i -le $nprinters1; do
+while test $i -le $nprinters; do
 	cat >>$BASE/printers.conf <<EOF
 <Printer test-$i>
 Accepting Yes
@@ -560,22 +555,6 @@ StateMessage Printer $1 is idle.
 EOF
 
 	cp testps.ppd $BASE/ppd/test-$i.ppd
-
-	i=`expr $i + 1`
-done
-
-while test $i -le $nprinters2; do
-	cat >>$BASE/printers.conf <<EOF
-<Printer test-$i>
-Accepting Yes
-DeviceURI file:/dev/null
-Info Test raw printer $i
-JobSheets none none
-Location CUPS test suite
-State Idle
-StateMessage Printer $1 is idle.
-</Printer>
-EOF
 
 	i=`expr $i + 1`
 done
@@ -930,7 +909,7 @@ fi
 
 # Requests logged
 count=`wc -l $BASE/log/access_log | awk '{print $1}'`
-expected=`expr 37 + 18 + 30 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+expected=`expr 35 + 18 + 30 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
 if test $count != $expected; then
 	echo "FAIL: $count requests logged, expected $expected."
 	echo "    <p>FAIL: $count requests logged, expected $expected.</p>" >>$strfile
