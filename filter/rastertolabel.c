@@ -299,7 +299,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	       header->HWResolution[1], header->cupsHeight,
 	       header->NumCopies);
 	printf("PAGE-WIDTH %u\r\n", header->cupsWidth);
-	printf("PAGE-HEIGHT %u\r\n", header->cupsWidth);
+	printf("PAGE-HEIGHT %u\r\n", header->cupsHeight);
         break;
 
     case INTELLITECH_PCL :
@@ -368,7 +368,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
           if (header->cupsCompression != ~0U)
 	  				/* inPrintDensity */
-	    printf("\033&d%uA", 30 * header->cupsCompression / 100 - 15);
+	    printf("\033&d%dA", 30 * header->cupsCompression / 100 - 15);
 
 	  if ((choice = ppdFindMarkedChoice(ppd, "inPrintMode")) != NULL)
 	  {
