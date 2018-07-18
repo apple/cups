@@ -1,4 +1,4 @@
-CHANGES - 2.2.9 - 2018-07-17
+CHANGES - 2.2.9 - 2018-07-18
 ============================
 
 
@@ -14,6 +14,7 @@ Changes in CUPS v2.2.9
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)
 - Automatic debug logging of job errors did not work with systemd (Issue #5337)
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
+- Fixed some typos in the label printer drivers (Issue #5350)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
