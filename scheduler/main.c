@@ -1,7 +1,7 @@
 /*
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -18,6 +18,9 @@
 #define _MAIN_C_
 #include "cupsd.h"
 #include <sys/resource.h>
+#ifdef __APPLE__
+#  include <xpc/xpc.h>
+#endif /* __APPLE__ */
 #ifdef HAVE_ASL_H
 #  include <asl.h>
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
@@ -1946,6 +1949,10 @@ service_checkin(void)
       service_add_listener(ld_sockets[i], (int)i);
 
     free(ld_sockets);
+
+#  ifdef __APPLE__
+    xpc_transaction_begin();
+#  endif /* __APPLE__ */
   }
 
 #elif defined(HAVE_SYSTEMD)
@@ -2084,6 +2091,12 @@ service_checkout(int shutdown)          /* I - Shutting down? */
     else
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create KeepAlive/PID file \"%s\": %s", pidfile, strerror(errno));
   }
+
+
+#  ifdef __APPLE__
+  if (shutdown)
+    xpc_transaction_end();
+#  endif /* __APPLE__ */
 }
 
 

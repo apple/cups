@@ -8,8 +8,6 @@
 	<string>Adaptive</string>
 	<key>EnableTransactions</key>
 	<true/>
-	<key>EnablePressuredExit</key>
-	<false/>
 	<key>ExitTimeOut</key>
 	<integer>60</integer>
 	<key>KeepAlive</key>
