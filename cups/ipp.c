@@ -3662,6 +3662,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		DEBUG_printf(("2ippReadIO: member name=\"%s\"", attr->name));
 		break;
 
+            case IPP_TAG_STRING :
             default : /* Other unsupported values */
                 if (tag == IPP_TAG_STRING && n > IPP_MAX_LENGTH)
 		{
