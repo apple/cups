@@ -3624,4 +3624,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
     fprintf(stderr, "%s\n", add);
   else if (rem[0])
     fprintf(stderr, "%s\n", rem);
+
+  if (new_reasons != NULL)
+    cupsArrayDelete(new_reasons);
 }
