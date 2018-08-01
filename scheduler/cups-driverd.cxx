@@ -1339,10 +1339,6 @@ list_ppds(int        request_id,	/* I - Request ID */
 	  if (re_matches[i].rm_so >= 0)
 	    ppd->matches ++;
       }
-      /*
-       * Free device_id_re, no longer needed
-       */
-      free(device_id_re);
 
       if (language)
       {
@@ -1375,11 +1371,6 @@ list_ppds(int        request_id,	/* I - Request ID */
 	else
 	  ppd->matches ++;		// Infix match
       }
-      /*
-       * Free make_and_model_re, no longer needed
-       */
-      free(make_and_model_re);
-
 
       if (model_number_str && ppd->record.model_number == model_number)
         ppd->matches ++;
@@ -1575,6 +1566,12 @@ list_ppds(int        request_id,	/* I - Request ID */
     cupsArrayDelete(matches);
   if (requested != NULL)
     cupsArrayDelete(requested);
+
+  /*
+   * Free device_id_re and make_and_model_re, no longer needed
+   */
+  free(device_id_re);
+  free(make_and_model_re);
 
   if (!sent_header && request_id)
   {
