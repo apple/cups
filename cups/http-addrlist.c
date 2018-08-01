@@ -613,7 +613,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  {
 	    httpAddrFreeList(first);
       freeaddrinfo(results);
-      cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	    return (NULL);
 	  }
 
