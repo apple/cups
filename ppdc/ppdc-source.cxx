@@ -2702,8 +2702,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       {
 	// Create the ColorModel option...
 	o = new ppdcOption(PPDC_PICKONE, "ColorModel", "Color Mode", PPDC_SECTION_ANY, 10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
@@ -2794,8 +2792,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       {
         o = new ppdcOption(PPDC_BOOLEAN, "CutMedia", "Cut Media", PPDC_SECTION_ANY, 10.0f);
 
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
 
@@ -2827,8 +2823,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       {
 	// Create the cupsDarkness option...
 	o = new ppdcOption(PPDC_PICKONE, "cupsDarkness", "Darkness", PPDC_SECTION_ANY, 10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
@@ -2915,8 +2909,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       {
 	// Create the cupsFinishing option...
 	o = new ppdcOption(PPDC_PICKONE, "cupsFinishing", "Finishing", PPDC_SECTION_ANY, 10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
@@ -3010,8 +3002,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	// Create the InputSlot option...
 	o = new ppdcOption(PPDC_PICKONE, "InputSlot", "Media Source",
 	                   PPDC_SECTION_ANY, 10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
@@ -3145,8 +3135,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	// Create the MediaType option...
 	o = new ppdcOption(PPDC_PICKONE, "MediaType", "Media Type",
 	                   PPDC_SECTION_ANY, 10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
@@ -3280,8 +3268,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	// Create the Resolution option...
 	o = new ppdcOption(PPDC_PICKONE, "Resolution", NULL, PPDC_SECTION_ANY,
 	                   10.0f);
-  if (g != general)
-    g->release();
 	g = general;
 	g->add_option(o);
       }
