@@ -1568,13 +1568,13 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Free include, exclude, matches, requested, no longer needed
   */
   if (include != NULL)
-    cupsDeleteArray(include);
+    cupsArrayDelete(include);
   if (exclude != NULL)
-    cupsDeleteArray(exclude);
-  if (matches != NULL)
-    cupsDeleteArray(matches);
+    cupsArrayDelete(exclude);
+  if (matches != NULL && matches != PPDsByMakeModel) 
+    cupsArrayDelete(matches);
   if (requested != NULL)
-    cupsDeleteArray(requested);
+    cupsArrayDelete(requested);
 
   if (!sent_header && request_id)
   {

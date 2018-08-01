@@ -2675,8 +2675,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
       if (isdefault)
         o->set_defchoice(c);
-
-      c->release();
     }
     else if (!_cups_strcasecmp(temp, "ColorDevice"))
     {
@@ -3393,11 +3391,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
     }
   }
   else if (inc && td)
-  {
     td->release();
-    if (d != NULL)
-      d->release();
-  }
 
 }
 
