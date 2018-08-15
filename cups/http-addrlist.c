@@ -612,8 +612,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  if (!temp)
 	  {
 	    httpAddrFreeList(first);
-      freeaddrinfo(results);
-      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
+	    freeaddrinfo(results);
+	    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	    return (NULL);
 	  }
 

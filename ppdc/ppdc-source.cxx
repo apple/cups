@@ -3378,7 +3378,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
   }
   else if (inc && td)
     td->release();
-
 }
 
 
