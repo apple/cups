@@ -3916,6 +3916,7 @@ http_create(
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     httpAddrFreeList(addrlist);
+    httpAddrFreeList(myaddrlist);
     return (NULL);
   }
 
