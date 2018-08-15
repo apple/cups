@@ -361,4 +361,5 @@ void
 cgiFreeSearch(void *search)		/* I - Search context */
 {
   regfree((regex_t *)search);
+  free(search);
 }

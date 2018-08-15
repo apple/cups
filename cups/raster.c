@@ -1076,7 +1076,7 @@ cupsRasterWriteHeader(
 
     void *dst = fh.cupsReal; /* Bypass bogus compiler warning */
     void *src = r->header.cupsReal;
-    memcpy(dst, src, sizeof(fh.cupsReal) + sizeof(fh.cupsString));
+    memcpy(dst, src, sizeof(fh.cupsReal));
 					/* VendorData */
 
     strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
