@@ -23,7 +23,7 @@ new feature.
 CUPS development happens on two branches - the stable CUPS 2.2.x branch
 (Git "branch-2.2") and the CUPS 2.3 feature branch (Git "master").  Bug fixes
 are applied to both branches and included in new releases posted on the CUPS web
-site.  Features are limited to CUPS 2.3 unless the feature needed for a 2.2.x
+site.  Features are limited to CUPS 2.3 unless the feature is needed for a 2.2.x
 bug fix.
 
 For example, the most recent CUPS 2.2.8 and CUPS 2.3b5 releases were purely bug
