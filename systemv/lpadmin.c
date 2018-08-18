@@ -608,10 +608,18 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (ppd_name && !strcmp(ppd_name, "raw"))
   {
+#ifdef __APPLE__
+    _cupsLangPuts(stderr, _("lpadmin: Raw queues are no longer supported on macOS."));
+#else
     _cupsLangPuts(stderr, _("lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS."));
+#endif /* __APPLE__ */
 
     if (device_uri && (!strncmp(device_uri, "ipp://", 6) || !strncmp(device_uri, "ipps://", 7)) && strstr(device_uri, "/printers/"))
       _cupsLangPuts(stderr, _("lpadmin: Use the 'everywhere' model for shared printers."));
+
+#ifdef __APPLE__
+    return (1);
+#endif /* __APPLE__ */
   }
   else if (ppd_name && !strcmp(ppd_name, "everywhere") && device_uri)
   {

@@ -248,7 +248,7 @@ cupsdProcessIPPRequest(
       */
 
       attr = con->request->attrs;
-      if (attr && attr->name && !strcmp(attr->name, "attributes-charset") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET)
+      if (attr && attr->name && !strcmp(attr->name, "attributes-charset") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET && attr->group_tag == IPP_TAG_OPERATION)
 	charset = attr;
       else
 	charset = NULL;
@@ -256,7 +256,7 @@ cupsdProcessIPPRequest(
       if (attr)
         attr = attr->next;
 
-      if (attr && attr->name && !strcmp(attr->name, "attributes-natural-language") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
+      if (attr && attr->name && !strcmp(attr->name, "attributes-natural-language") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE && attr->group_tag == IPP_TAG_OPERATION)
       {
 	language = attr;
 
@@ -274,12 +274,12 @@ cupsdProcessIPPRequest(
       else
 	language = NULL;
 
-      if ((attr = ippFindAttribute(con->request, "printer-uri", IPP_TAG_URI)) != NULL)
+      if ((attr = ippFindAttribute(con->request, "printer-uri", IPP_TAG_URI)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
 	uri = attr;
-      else if ((attr = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI)) != NULL)
+      else if ((attr = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
 	uri = attr;
-      else if (con->request->request.op.operation_id == CUPS_GET_PPD)
-        uri = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME);
+      else if (con->request->request.op.operation_id == CUPS_GET_PPD && (attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
+        uri = attr;
       else
 	uri = NULL;
 
@@ -2012,7 +2012,7 @@ add_job_subscriptions(
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
         int	port;			/* Port portion of URI */
-
+        struct stat info;		/* File information */
 
         recipient = attr->values[0].string.text;
 
@@ -2028,9 +2028,8 @@ add_job_subscriptions(
 	  return;
 	}
 
-        snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin,
-	         scheme);
-        if (access(notifier, X_OK) || !strcmp(scheme, ".") || !strcmp(scheme, ".."))
+        snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin, scheme);
+        if (access(notifier, X_OK) || stat(notifier, &info) || !S_ISREG(info.st_mode))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                  _("notify-recipient-uri URI \"%s\" uses unknown "
@@ -5756,7 +5755,7 @@ create_subscriptions(
 
         snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin,
 	         scheme);
-        if (access(notifier, X_OK))
+        if (access(notifier, X_OK) || !strcmp(scheme, ".") || !strcmp(scheme, ".."))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                  _("notify-recipient-uri URI \"%s\" uses unknown "

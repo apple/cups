@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-07-18
+CHANGES - 2.3b6 - 2018-08-18
 ============================
 
 Changes in CUPS v2.3b6
@@ -20,6 +20,8 @@ Changes in CUPS v2.3b6
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
+- The scheduler did not validate that required initial request attributes were
+  in the operation group (rdar://41098178)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
