@@ -1,4 +1,4 @@
-CHANGES - 2.2.9 - 2018-07-18
+CHANGES - 2.2.9 - 2018-08-18
 ============================
 
 
@@ -18,6 +18,8 @@ Changes in CUPS v2.2.9
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
+- The scheduler did not validate that required initial request attributes were
+  in the operation group (rdar://41098178)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
 - Dropped non-working RSS subscriptions UI from web interface templates.
 - Fixed a memory leak for some IPP (extension) syntaxes.

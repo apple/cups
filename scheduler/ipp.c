@@ -253,7 +253,7 @@ cupsdProcessIPPRequest(
       */
 
       attr = con->request->attrs;
-      if (attr && attr->name && !strcmp(attr->name, "attributes-charset") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET)
+      if (attr && attr->name && !strcmp(attr->name, "attributes-charset") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET && attr->group_tag == IPP_TAG_OPERATION)
 	charset = attr;
       else
 	charset = NULL;
@@ -261,7 +261,7 @@ cupsdProcessIPPRequest(
       if (attr)
         attr = attr->next;
 
-      if (attr && attr->name && !strcmp(attr->name, "attributes-natural-language") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
+      if (attr && attr->name && !strcmp(attr->name, "attributes-natural-language") && (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE && attr->group_tag == IPP_TAG_OPERATION)
       {
 	language = attr;
 
@@ -279,12 +279,12 @@ cupsdProcessIPPRequest(
       else
 	language = NULL;
 
-      if ((attr = ippFindAttribute(con->request, "printer-uri", IPP_TAG_URI)) != NULL)
+      if ((attr = ippFindAttribute(con->request, "printer-uri", IPP_TAG_URI)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
 	uri = attr;
-      else if ((attr = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI)) != NULL)
+      else if ((attr = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
 	uri = attr;
-      else if (con->request->request.op.operation_id == CUPS_GET_PPD)
-        uri = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME);
+      else if (con->request->request.op.operation_id == CUPS_GET_PPD && (attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL && attr->group_tag == IPP_TAG_OPERATION)
+        uri = attr;
       else
 	uri = NULL;
 
