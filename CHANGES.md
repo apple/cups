@@ -18,6 +18,8 @@ Changes in CUPS v2.3b6
 - The scheduler did not report all of the supported job options and values
   (Issue #5340)
 - Fixed some typos in the label printer drivers (Issue #5350)
+- The IPP Everywhere "driver" no longer does local filtering when printing to
+  a shared CUPS printer (Issue #5361)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were

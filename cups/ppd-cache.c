@@ -3221,7 +3221,17 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     if (ippContainsString(attr, "image/png"))
       cupsFilePuts(fp, "*cupsFilter2: \"image/png image/png 0 -\"\n");
     if (is_pdf)
-      cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
+    {
+     /*
+      * Don't locally filter PDF content when printing to a CUPS shared
+      * printer, otherwise the options will be applied twice...
+      */
+
+      if (ippContainsString(attr, "application/vnd.cups-pdf"))
+        cupsFilePuts(fp, "*cupsFilter2: \"application/pdf application/pdf 0 -\"\n");
+      else
+        cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
+    }
     if (is_apple)
       cupsFilePuts(fp, "*cupsFilter2: \"image/urf image/urf 100 -\"\n");
     if (is_pwg)
