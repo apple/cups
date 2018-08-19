@@ -149,6 +149,8 @@ Otherwise, enables the destination and accepts jobs; this is the same as running
 and
 <a href="man-cupsenable.html?TOPIC=Man+Pages"><b>cupsenable</b>(8)</a>
 programs on the destination.
+<dt><b>-E before the <i>-d</i>, <i>-p</i>, or <i>-x</i> options</b>
+<dd style="margin-left: 5.0em"> Enforce encryption when connecting to the server. Only applies to protocolls supporting transport layer security like (https/ipps/smb)
 <dt><b>-L "</b><i>location</i><b>"</b>
 <dd style="margin-left: 5.0em">Provides a textual location of the destination.
 </dl>
@@ -177,6 +179,12 @@ Create an IPP Everywhere print queue:
 <pre class="man">
 
     lpadmin -p myprinter -E -v ipp://myprinter.local/ipp/print -m everywhere
+
+</pre>
+Create an IPP Everywhere print queue, that is enabled and use enforced encryption (due to the -E option before -p option):
+<pre class="man">
+
+    lpadmin -E -p myprinter -E -v ipp://myprinter.local/ipp/print -m everywhere
 
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
