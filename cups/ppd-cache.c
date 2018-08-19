@@ -3756,39 +3756,39 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       if (!strcasecmp(keyword, "black_1") || !strcmp(keyword, "bi-level") || !strcmp(keyword, "process-bi-level"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("FastGray", _("Fast Grayscale"), CUPS_CSPACE_K, 1)
 
-        if (!default_color)
+	if (!default_color)
 	  default_color = "FastGray";
       }
       else if (!strcasecmp(keyword, "sgray_8") || !strcmp(keyword, "W8") || !strcmp(keyword, "monochrome") || !strcmp(keyword, "process-monochrome"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("Gray", _("Grayscale"), CUPS_CSPACE_SW, 8)
 
-        if (!default_color || !strcmp(default_color, "FastGray"))
+	if (!default_color || !strcmp(default_color, "FastGray"))
 	  default_color = "Gray";
       }
       else if (!strcasecmp(keyword, "sgray_16") || !strcmp(keyword, "W8-16"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-        if (!strcmp(keyword, "W8-16"))
-        {
+	if (!strcmp(keyword, "W8-16"))
+	{
 	  PRINTF_COLOROPTION("Gray", _("Grayscale"), CUPS_CSPACE_SW, 8)
 
 	  if (!default_color || !strcmp(default_color, "FastGray"))
 	    default_color = "Gray";
-        }
+	}
 
 	PRINTF_COLOROPTION("Gray16", _("Deep Gray"), CUPS_CSPACE_SW, 16)
       }
       else if (!strcasecmp(keyword, "srgb_8") || !strncmp(keyword, "SRGB24", 7) || !strcmp(keyword, "color"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("RGB", _("Color"), CUPS_CSPACE_SRGB, 8)
 
@@ -3796,57 +3796,57 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       }
       else if (!strcasecmp(keyword, "adobe-rgb_16") || !strcmp(keyword, "ADOBERGB48") || !strcmp(keyword, "ADOBERGB24-48"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("AdobeRGB", _("Deep Color"), CUPS_CSPACE_ADOBERGB, 16)
 
-        if (!default_color)
+	if (!default_color)
 	  default_color = "AdobeRGB";
       }
       else if ((!strcasecmp(keyword, "adobe-rgb_8") && !ippContainsString(attr, "adobe-rgb_16")) || !strcmp(keyword, "ADOBERGB24"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("AdobeRGB", _("Deep Color"), CUPS_CSPACE_ADOBERGB, 8)
 
-        if (!default_color)
+	if (!default_color)
 	  default_color = "AdobeRGB";
       }
       else if ((!strcasecmp(keyword, "black_8") && !ippContainsString(attr, "black_16")) || !strcmp(keyword, "DEVW8"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-      	PRINTF_COLOROPTION("DeviceGray", _("Device Gray"), CUPS_CSPACE_W, 8)
+	PRINTF_COLOROPTION("DeviceGray", _("Device Gray"), CUPS_CSPACE_W, 8)
       }
       else if (!strcasecmp(keyword, "black_16") || !strcmp(keyword, "DEVW16") || !strcmp(keyword, "DEVW8-16"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
 	PRINTF_COLOROPTION("DeviceGray", _("Device Gray"), CUPS_CSPACE_W, 16)
       }
       else if ((!strcasecmp(keyword, "cmyk_8") && !ippContainsString(attr, "cmyk_16")) || !strcmp(keyword, "DEVCMYK32"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-      	PRINTF_COLOROPTION("CMYK", _("Device CMYK"), CUPS_CSPACE_CMYK, 8)
+	PRINTF_COLOROPTION("CMYK", _("Device CMYK"), CUPS_CSPACE_CMYK, 8)
       }
       else if (!strcasecmp(keyword, "cmyk_16") || !strcmp(keyword, "DEVCMYK32-64") || !strcmp(keyword, "DEVCMYK64"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-      	PRINTF_COLOROPTION("CMYK", _("Device CMYK"), CUPS_CSPACE_CMYK, 16)
+	PRINTF_COLOROPTION("CMYK", _("Device CMYK"), CUPS_CSPACE_CMYK, 16)
       }
       else if ((!strcasecmp(keyword, "rgb_8") && ippContainsString(attr, "rgb_16")) || !strcmp(keyword, "DEVRGB24"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-      	PRINTF_COLOROPTION("DeviceRGB", _("Device RGB"), CUPS_CSPACE_RGB, 8)
+	PRINTF_COLOROPTION("DeviceRGB", _("Device RGB"), CUPS_CSPACE_RGB, 8)
       }
       else if (!strcasecmp(keyword, "rgb_16") || !strcmp(keyword, "DEVRGB24-48") || !strcmp(keyword, "DEVRGB48"))
       {
-        PRINTF_COLORMODEL
+	PRINTF_COLORMODEL
 
-      	PRINTF_COLOROPTION("DeviceRGB", _("Device RGB"), CUPS_CSPACE_RGB, 16)
+	PRINTF_COLOROPTION("DeviceRGB", _("Device RGB"), CUPS_CSPACE_RGB, 16)
       }
     }
 
