@@ -16,6 +16,8 @@ Changes in CUPS v2.2.9
 - Automatic debug logging of job errors did not work with systemd (Issue #5337)
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - Fixed some typos in the label printer drivers (Issue #5350)
+- The IPP Everywhere "driver" no longer does local filtering when printing to
+  a shared CUPS printer (Issue #5361)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
