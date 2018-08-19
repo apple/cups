@@ -154,16 +154,6 @@ main(int  argc,				/* I - Number of command-line args */
 
   fg = 0;
 
-#ifdef HAVE_LAUNCHD
-  if (getenv("CUPSD_LAUNCHD"))
-  {
-    OnDemand   = 1;
-    fg         = 1;
-    close_all  = 0;
-    disconnect = 0;
-  }
-#endif /* HAVE_LAUNCHD */
-
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
@@ -2092,9 +2082,8 @@ service_checkout(int shutdown)          /* I - Shutting down? */
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create KeepAlive/PID file \"%s\": %s", pidfile, strerror(errno));
   }
 
-
 #  ifdef __APPLE__
-  if (shutdown)
+  if (OnDemand && shutdown)
     xpc_transaction_end();
 #  endif /* __APPLE__ */
 }
