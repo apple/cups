@@ -1,4 +1,4 @@
-CHANGES - 2.2.9 - 2018-08-18
+CHANGES - 2.2.9 - 2018-08-19
 ============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.2.9
 ----------------------
 
 - Localization changes (Issue #5348, Issue #5362)
+- Documentation updates (Issue #5369)
 - The lpadmin command would create a non-working printer in some error cases
   (Issue #5305)
 - The scheduler would crash if an empty `AccessLog` directive was specified
