@@ -1555,6 +1555,24 @@ list_ppds(int        request_id,	/* I - Request ID */
     }
   }
 
+ /*
+  * Free include, exclude, matches, requested, no longer needed
+  */
+  if (include != NULL)
+    cupsArrayDelete(include);
+  if (exclude != NULL)
+    cupsArrayDelete(exclude);
+  if (matches != NULL && matches != PPDsByMakeModel) 
+    cupsArrayDelete(matches);
+  if (requested != NULL)
+    cupsArrayDelete(requested);
+
+  /*
+   * Free device_id_re and make_and_model_re, no longer needed
+   */
+  free(device_id_re);
+  free(make_and_model_re);
+
   if (!sent_header && request_id)
   {
     cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
