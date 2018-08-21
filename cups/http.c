@@ -3915,7 +3915,7 @@ http_create(
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
-    httpAddrFreeList(addrlist);
+    httpAddrFreeList(myaddrlist);
     return (NULL);
   }
 

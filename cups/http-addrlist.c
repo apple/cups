@@ -1,10 +1,11 @@
 /*
  * HTTP address list routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -612,6 +613,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  if (!temp)
 	  {
 	    httpAddrFreeList(first);
+	    freeaddrinfo(results);
 	    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	    return (NULL);
 	  }

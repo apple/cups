@@ -1,10 +1,11 @@
 //
 // Source class for the CUPS PPD Compiler.
 //
-// Copyright 2007-2014 by Apple Inc.
+// Copyright 2007-2018 by Apple Inc.
 // Copyright 2002-2007 by Easy Software Products.
 //
-// Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+// Licensed under Apache License v2.0.  See the file "LICENSE" for more
+// information.
 //
 
 //
@@ -2665,6 +2666,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Add it to the current option...
       if (!o)
       {
+        c->release();
         _cupsLangPrintf(stderr,
 	                _("ppdc: Choice found on line %d of %s with no "
 			  "Option."), fp->line, fp->filename);
