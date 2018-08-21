@@ -367,7 +367,7 @@ _cupsConvertOptions(
   if ((finishing_template = cupsGetOption("cupsFinishingTemplate", num_options, options)) == NULL)
     finishing_template = cupsGetOption("finishing-template", num_options, options);
 
-  if (finishing_template)
+  if (finishing_template && strcmp(finishing_template, "none"))
   {
     ipp_t *fin_col = ippNew();		/* finishings-col value */
 
