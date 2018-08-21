@@ -157,7 +157,7 @@ static ppd_info_t	*add_ppd(const char *filename, const char *name,
 				 size_t size, int model_number, int type,
 				 const char *scheme);
 static int		cat_drv(const char *name, int request_id);
-static int		cat_ppd(const char *name, int request_id);
+static void		cat_ppd(const char *name, int request_id);
 static int		cat_static(const char *name, int request_id);
 static int		cat_tar(const char *name, int request_id);
 static int		compare_inodes(struct stat *a, struct stat *b);
@@ -167,12 +167,12 @@ static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
 			             const ppd_info_t *p1);
-static int		dump_ppds_dat(const char *filename);
+static void		dump_ppds_dat(const char *filename);
 static void		free_array(cups_array_t *a);
 static cups_file_t	*get_file(const char *name, int request_id,
 			          const char *subdir, char *buffer,
 			          size_t bufsize, char **subfile);
-static int		list_ppds(int request_id, int limit, const char *opt);
+static void		list_ppds(int request_id, int limit, const char *opt);
 static int		load_drivers(cups_array_t *include,
 			             cups_array_t *exclude);
 static int		load_drv(const char *filename, const char *name,
@@ -208,13 +208,13 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (argc == 3 && !strcmp(argv[1], "cat"))
-    return (cat_ppd(argv[2], 0));
+    cat_ppd(argv[2], 0);
   else if ((argc == 2 || argc == 3) && !strcmp(argv[1], "dump"))
-    return (dump_ppds_dat(argv[2]));
+    dump_ppds_dat(argv[2]);
   else if (argc == 4 && !strcmp(argv[1], "get"))
-    return (cat_ppd(argv[3], atoi(argv[2])));
+    cat_ppd(argv[3], atoi(argv[2]));
   else if (argc == 5 && !strcmp(argv[1], "list"))
-    return (list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]));
+    list_ppds(atoi(argv[2]), atoi(argv[3]), argv[4]);
   else
   {
     fputs("Usage: cups-driverd cat ppd-name\n", stderr);
@@ -432,7 +432,7 @@ cat_drv(const char *name,		/* I - PPD name */
  * 'cat_ppd()' - Copy a PPD file to stdout.
  */
 
-static int				/* O - Exit code */
+static void
 cat_ppd(const char *name,		/* I - PPD name */
         int        request_id)		/* I - Request ID for response? */
 {
@@ -449,7 +449,7 @@ cat_ppd(const char *name,		/* I - PPD name */
   if (strstr(name, "../"))
   {
     fputs("ERROR: Invalid PPD name.\n", stderr);
-    return (1);
+    exit(1);
   }
 
   strlcpy(scheme, name, sizeof(scheme));
@@ -479,11 +479,11 @@ cat_ppd(const char *name,		/* I - PPD name */
     puts("Content-Type: application/ipp\n");
 
   if (!scheme[0])
-    return (cat_static(name, request_id));
+    exit(cat_static(name, request_id));
   else if (!strcmp(scheme, "drv"))
-    return (cat_drv(name, request_id));
+    exit(cat_drv(name, request_id));
   else if (!strcmp(scheme, "file"))
-    return (cat_tar(name, request_id));
+    exit(cat_tar(name, request_id));
   else
   {
    /*
@@ -521,7 +521,7 @@ cat_ppd(const char *name,		/* I - PPD name */
         cupsdSendIPPTrailer();
       }
 
-      return (1);
+      exit(1);
     }
 
    /*
@@ -551,15 +551,15 @@ cat_ppd(const char *name,		/* I - PPD name */
 
       fprintf(stderr, "ERROR: [cups-driverd] Unable to execute \"%s\" - %s\n",
               line, strerror(errno));
-      return (1);
+      exit(1);
     }
   }
 
  /*
-  * Return with no errors...
+  * Exit with no errors...
   */
 
-  return (0);
+  exit(0);
 }
 
 
@@ -782,7 +782,7 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
  * 'dump_ppds_dat()' - Dump the contents of the ppds.dat file.
  */
 
-static int				/* O - Exit status */
+static void
 dump_ppds_dat(const char *filename)	/* I - Filename */
 {
   char		temp[1024];		/* ppds.dat filename */
@@ -814,7 +814,7 @@ dump_ppds_dat(const char *filename)	/* I - Filename */
 	   ppd->record.make_and_model, ppd->record.device_id,
 	   ppd->record.scheme);
 
-  return (0);
+  exit(0);
 }
 
 
@@ -1008,7 +1008,7 @@ get_file(const char *name,		/* I - Name */
  * 'list_ppds()' - List PPD files.
  */
 
-static int				/* O - Exit code */
+static void
 list_ppds(int        request_id,	/* I - Request ID */
           int        limit,		/* I - Limit */
 	  const char *opt)		/* I - Option argument */
@@ -1570,7 +1570,7 @@ list_ppds(int        request_id,	/* I - Request ID */
   if (request_id)
     cupsdSendIPPTrailer();
 
-  return (0);
+  exit(0);
 }
 
 

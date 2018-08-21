@@ -3593,6 +3593,8 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
     }
   }
 
+  cupsArrayDelete(new_reasons);
+
   _cupsMutexUnlock(&report_mutex);
 
  /*
