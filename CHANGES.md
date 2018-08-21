@@ -1,4 +1,4 @@
-CHANGES - 2.2.9 - 2018-08-19
+CHANGES - 2.2.9 - 2018-08-21
 ============================
 
 
@@ -19,6 +19,7 @@ Changes in CUPS v2.2.9
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
+- Fixed some memory leaks discovered by Coverity (Issue #5375)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
