@@ -21,6 +21,8 @@ Changes in CUPS v2.2.9
   a shared CUPS printer (Issue #5361)
 - Fixed some memory leaks discovered by Coverity (Issue #5375)
 - The PPD compiler incorrectly terminated JCL options (Issue #5379)
+- The cupstestppd utility did not generate errors for missing/mismatched
+  CloseUI/JCLCloseUI keywords (Issue #5381)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
