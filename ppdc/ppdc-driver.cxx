@@ -1,7 +1,7 @@
 //
 // PPD file compiler definitions for the CUPS PPD Compiler.
 //
-// Copyright 2007-2014 by Apple Inc.
+// Copyright 2007-2018 by Apple Inc.
 // Copyright 2002-2006 by Easy Software Products.
 //
 // These coded instructions, statements, and computer programs are the
@@ -1107,7 +1107,10 @@ ppdcDriver::write_ppd_file(
 	  cupsFilePrintf(fp, "*End%s", lf);
       }
 
-      cupsFilePrintf(fp, "*CloseUI: *%s%s", o->name->value, lf);
+      if (o->section == PPDC_SECTION_JCL)
+	cupsFilePrintf(fp, "*JCLCloseUI: *%s%s", o->name->value, lf);
+      else
+	cupsFilePrintf(fp, "*CloseUI: *%s%s", o->name->value, lf);
 
       snprintf(custom, sizeof(custom), "Custom%s", o->name->value);
       if ((a = find_attr(custom, "True")) != NULL)
