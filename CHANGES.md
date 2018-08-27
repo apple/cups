@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-08-21
+CHANGES - 2.3b6 - 2018-08-27
 ============================
 
 Changes in CUPS v2.3b6
@@ -22,6 +22,7 @@ Changes in CUPS v2.3b6
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
 - Fixed some memory leaks discovered by Coverity (Issue #5375)
+- The PPD compiler incorrectly terminated JCL options (Issue #5379)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
