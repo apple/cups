@@ -4809,10 +4809,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-k-octets", job->koctets);
 
     if (job->name && (!ra || cupsArrayFind(ra, "job-name")))
-      ippAddString(con->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_NAME), "job-name", NULL, job->name);
+      ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, job->name);
 
     if (job->username && (!ra || cupsArrayFind(ra, "job-originating-user-name")))
-      ippAddString(con->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_NAME), "job-originating-user-name", NULL, job->username);
+      ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "job-originating-user-name", NULL, job->username);
 
     if (!ra || cupsArrayFind(ra, "job-state"))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", (int)job->state_value);
@@ -4957,12 +4957,9 @@ copy_printer_attrs(
 		  };
 
     if (printer->type & CUPS_PRINTER_CLASS)
-      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
-                   "printer-error-policy-supported", NULL, "retry-current-job");
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "printer-error-policy-supported", NULL, "retry-current-job");
     else
-      ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
-		    "printer-error-policy-supported",
-		    sizeof(errors) / sizeof(errors[0]), NULL, errors);
+      ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "printer-error-policy-supported", sizeof(errors) / sizeof(errors[0]), NULL, errors);
   }
 
   if (!ra || cupsArrayFind(ra, "printer-icons"))
@@ -5107,9 +5104,7 @@ copy_subscription_attrs(
 	* Simple event list...
 	*/
 
-	ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
-		     (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
-		     "notify-events", NULL, name);
+	ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_CONST_TAG(IPP_TAG_KEYWORD), "notify-events", NULL, name);
       }
       else
       {
@@ -5121,15 +5116,12 @@ copy_subscription_attrs(
 	  if (sub->mask & mask)
 	    count ++;
 
-	attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
-			     (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
-			     "notify-events", count, NULL, NULL);
+	attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION, IPP_CONST_TAG(IPP_TAG_KEYWORD), "notify-events", count, NULL, NULL);
 
 	for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
 	  if (sub->mask & mask)
 	  {
-	    attr->values[count].string.text =
-		(char *)cupsdEventName((cupsd_eventmask_t)mask);
+	    attr->values[count].string.text = (char *)cupsdEventName((cupsd_eventmask_t)mask);
 
 	    count ++;
 	  }

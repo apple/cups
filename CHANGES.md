@@ -28,6 +28,7 @@ Changes in CUPS v2.2.9
 - The scheduler did not validate that required initial request attributes were
   in the operation group (rdar://41098178)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
+- The scheduler could crash when job history was purged (rdar://42198057)
 - Dropped non-working RSS subscriptions UI from web interface templates.
 - Fixed a memory leak for some IPP (extension) syntaxes.
 
