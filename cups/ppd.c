@@ -1,7 +1,7 @@
 /*
  * PPD file routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -321,7 +321,9 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  _("Bad custom parameter"),
 		  _("Missing option keyword"),
 		  _("Bad value string"),
-		  _("Missing CloseGroup")
+		  _("Missing CloseGroup"),
+		  _("Bad CloseUI/JCLCloseUI"),
+		  _("Missing CloseUI/JCLCloseUI")
 		};
 
 
@@ -1530,8 +1532,29 @@ _ppdOpen(
         choice->code = _cupsStrRetain(custom_attr->value);
       }
     }
-    else if (!strcmp(keyword, "CloseUI") || !strcmp(keyword, "JCLCloseUI"))
+    else if (!strcmp(keyword, "CloseUI"))
     {
+      if ((!option || option->section == PPD_ORDER_JCL) && pg->ppd_conform == PPD_CONFORM_STRICT)
+      {
+        pg->ppd_status = PPD_BAD_CLOSE_UI;
+
+	goto error;
+      }
+
+      option = NULL;
+
+      _cupsStrFree(string);
+      string = NULL;
+    }
+    else if (!strcmp(keyword, "JCLCloseUI"))
+    {
+      if ((!option || option->section != PPD_ORDER_JCL) && pg->ppd_conform == PPD_CONFORM_STRICT)
+      {
+        pg->ppd_status = PPD_BAD_CLOSE_UI;
+
+	goto error;
+      }
+
       option = NULL;
 
       _cupsStrFree(string);
@@ -1992,6 +2015,16 @@ _ppdOpen(
       ppd_add_attr(ppd, keyword, name, text, string);
     else
       _cupsStrFree(string);
+  }
+
+ /*
+  * Check for a missing CloseUI/JCLCloseUI...
+  */
+
+  if (option && pg->ppd_conform == PPD_CONFORM_STRICT)
+  {
+    pg->ppd_status = PPD_MISSING_CLOSE_UI;
+    goto error;
   }
 
  /*

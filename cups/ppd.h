@@ -109,6 +109,8 @@ typedef enum ppd_status_e		/**** Status Codes @deprecated@ ****/
   PPD_MISSING_OPTION_KEYWORD,		/* Missing option keyword */
   PPD_BAD_VALUE,			/* Bad value string */
   PPD_MISSING_CLOSE_GROUP,		/* Missing CloseGroup */
+  PPD_BAD_CLOSE_UI,			/* Bad CloseUI/JCLCloseUI */
+  PPD_MISSING_CLOSE_UI,			/* Missing CloseUI/JCLCloseUI */
   PPD_MAX_STATUS			/* @private@ */
 } ppd_status_t;
 
