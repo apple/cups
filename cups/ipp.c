@@ -4332,7 +4332,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
   if (!ipp || !attr || !*attr ||
       (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
        value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
-      !strvalue)
+      element < 0 || element > (*attr)->num_values || !strvalue)
     return (0);
 
  /*

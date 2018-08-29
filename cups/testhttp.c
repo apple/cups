@@ -342,6 +342,38 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
 
    /*
+    * _httpDigest()
+    */
+
+    fputs("_httpDigest(MD5): ", stdout);
+    if (!_httpDigest(buffer, sizeof(buffer), "MD5", "Mufasa", "http-auth@example.org", "Circle of Life", "7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v", 1, "f2/wE4q74E6zIJEtWaHKaf5wv/H5QzzpXusqGemxURZJ", "auth", "GET", "/dir/index.html"))
+    {
+      failures ++;
+      puts("FAIL (unable to calculate hash)");
+    }
+    else if (strcmp(buffer, "8ca523f5e9506fed4657c9700eebdbec"))
+    {
+      failures ++;
+      printf("FAIL (got \"%s\", expected \"8ca523f5e9506fed4657c9700eebdbec\")\n", buffer);
+    }
+    else
+      puts("PASS");
+
+    fputs("_httpDigest(SHA-256): ", stdout);
+    if (!_httpDigest(buffer, sizeof(buffer), "SHA-256", "Mufasa", "http-auth@example.org", "Circle of Life", "7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v", 1, "f2/wE4q74E6zIJEtWaHKaf5wv/H5QzzpXusqGemxURZJ", "auth", "GET", "/dir/index.html"))
+    {
+      failures ++;
+      puts("FAIL (unable to calculate hash)");
+    }
+    else if (strcmp(buffer, "753927fa0e85d155564e2e272a28d1802ca10daf4496794697cf8db5856cb6c1"))
+    {
+      failures ++;
+      printf("FAIL (got \"%s\", expected \"753927fa0e85d155564e2e272a28d1802ca10daf4496794697cf8db5856cb6c1\")\n", buffer);
+    }
+    else
+      puts("PASS");
+
+   /*
     * httpGetHostname()
     */
 
