@@ -150,7 +150,7 @@
 #    define _CUPS_DEPRECATED_1_6_MSG(m) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_1_7_MSG(m) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_2_2_MSG(m) _CUPS_PUBLIC
-#  elif defined(__APPLE__)
+#  elif defined(__APPLE__) && defined(_CUPS_NO_DEPRECATED)
     /*
      * Compiler supports the unavailable attribute, so use it when the code
      * wants to exclude the use of deprecated API.
@@ -161,6 +161,18 @@
 #    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+
+#  elif defined(__APPLE__)
+    /*
+     * Just mark things as deprecated...
+     */
+#    define _CUPS_DEPRECATED __attribute__ ((deprecated)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_MSG(m) __attribute__ ((deprecated(m))) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.5)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+
 #  elif defined(_CUPS_HAS_UNAVAILABLE_WITH_MESSAGE) && defined(_CUPS_NO_DEPRECATED)
     /*
      * Compiler supports the unavailable attribute, so use it when the code
