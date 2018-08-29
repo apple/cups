@@ -1514,12 +1514,11 @@ ippCopyAttribute(
 
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
-        if ((dstattr = ippAddIntegers(dst, srcattr->group_tag, srctag, srcattr->name, srcattr->num_values, NULL)) != NULL)
-	  memcpy(dstattr->values, srcattr->values, (size_t)srcattr->num_values * sizeof(_ipp_value_t));
-        break;
-
     case IPP_TAG_BOOLEAN :
-        if ((dstattr = ippAddBooleans(dst, srcattr->group_tag, srcattr->name, srcattr->num_values, NULL)) != NULL)
+    case IPP_TAG_DATE :
+    case IPP_TAG_RESOLUTION :
+    case IPP_TAG_RANGE :
+        if ((dstattr = ipp_add_attr(dst, srcattr->name, srcattr->group_tag, srctag, srcattr->num_values)) != NULL)
 	  memcpy(dstattr->values, srcattr->values, (size_t)srcattr->num_values * sizeof(_ipp_value_t));
         break;
 
@@ -1552,23 +1551,6 @@ ippCopyAttribute(
 	  for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values; i > 0; i --, srcval ++, dstval ++)
 	    dstval->string.text = _cupsStrAlloc(srcval->string.text);
 	}
-        break;
-
-    case IPP_TAG_DATE :
-        if (srcattr->num_values != 1)
-          return (NULL);
-
-        dstattr = ippAddDate(dst, srcattr->group_tag, srcattr->name, srcattr->values[0].date);
-        break;
-
-    case IPP_TAG_RESOLUTION :
-        if ((dstattr = ippAddResolutions(dst, srcattr->group_tag, srcattr->name, srcattr->num_values, IPP_RES_PER_INCH, NULL, NULL)) != NULL)
-	  memcpy(dstattr->values, srcattr->values, (size_t)srcattr->num_values * sizeof(_ipp_value_t));
-        break;
-
-    case IPP_TAG_RANGE :
-        if ((dstattr = ippAddRanges(dst, srcattr->group_tag, srcattr->name, srcattr->num_values, NULL, NULL)) != NULL)
-	  memcpy(dstattr->values, srcattr->values, (size_t)srcattr->num_values * sizeof(_ipp_value_t));
         break;
 
     case IPP_TAG_TEXTLANG :
