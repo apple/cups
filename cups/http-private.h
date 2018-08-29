@@ -423,6 +423,7 @@ extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
 			                size_t dstsize);
+extern char		*_httpDigest(char *buffer, size_t bufsize, const char *algorithm, const char *username, const char *realm, const char *password, const char *nonce, unsigned nc, const char *cnonce, const char *qop, const char *method, const char *resource);
 extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);

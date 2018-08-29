@@ -662,6 +662,111 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 
 
 /*
+ * '_httpDigest()' - Calculate a Digest authentication response using the
+ *                   appropriate RFC 2068/2617/7616 algorithm.
+ */
+
+char *					/* O - Response string */
+_httpDigest(char       *buffer,		/* I - Response buffer */
+            size_t     bufsize,		/* I - Size of response buffer */
+            const char *algorithm,	/* I - algorithm value or `NULL` */
+            const char *username,	/* I - username value */
+            const char *realm,		/* I - realm value */
+            const char *password,	/* I - password value */
+            const char *nonce,		/* I - nonce value */
+            unsigned   nc,		/* I - nc value */
+            const char *cnonce,		/* I - cnonce value or `NULL` */
+            const char *qop,		/* I - qop value */
+            const char *method,		/* I - HTTP method */
+            const char *resource)	/* I - HTTP resource path */
+{
+  char		ha1[65],	/* Hash of username:realm:password */
+		ha2[65],	/* Hash of method:request-uri */
+		temp[1024];	/* Temporary string */
+  unsigned char	hash[32];	/* Hash buffer */
+  const char	*hashalg;	/* Hashing algorithm */
+  size_t	hashsize;	/* Size of hash */
+
+
+  if (algorithm)
+  {
+   /*
+    * Follow RFC 2617/7616...
+    */
+
+    if (!_cups_strcasecmp(algorithm, "MD5"))
+    {
+     /*
+      * RFC 2617 Digest with MD5
+      */
+
+      hashalg = "md5";
+    }
+    else if (!_cups_strcasecmp(algorithm, "SHA-256"))
+    {
+     /*
+      * RFC 7616 Digest with SHA-256
+      */
+
+      hashalg = "sha2-256";
+    }
+    else
+    {
+     /*
+      * Some other algorithm we don't support, skip this one...
+      */
+
+      *buffer = '\0';
+
+      return (NULL);
+    }
+
+   /*
+    * Calculate digest value...
+    */
+
+    /* H(A1) = H(username:realm:password) */
+    snprintf(temp, sizeof(temp), "%s:%s:%s", username, realm, password);
+    hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, ha1, sizeof(ha1));
+
+    /* H(A2) = H(method:uri) */
+    snprintf(temp, sizeof(temp), "%s:%s", method, resource);
+    hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, ha2, sizeof(ha2));
+
+    /* KD = H(H(A1):nonce:nc:cnonce:qop:H(A2)) */
+    snprintf(temp, sizeof(temp), "%s:%s:%08x:%s:%s:%s", ha1, nonce, nc, cnonce, qop, ha2);
+    hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, buffer, bufsize);
+  }
+  else
+  {
+   /*
+    * Use old RFC 2069 Digest method...
+    */
+
+    /* H(A1) = H(username:realm:password) */
+    snprintf(temp, sizeof(temp), "%s:%s:%s", username, realm, password);
+    hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, ha1, sizeof(ha1));
+
+    /* H(A2) = H(method:uri) */
+    snprintf(temp, sizeof(temp), "%s:%s", method, resource);
+    hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, ha2, sizeof(ha2));
+
+    /* KD = H(H(A1):nonce:H(A2)) */
+    snprintf(temp, sizeof(temp), "%s:%s:%s", ha1, nonce, ha2);
+    hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
+    cupsHashString(hash, hashsize, buffer, bufsize);
+  }
+
+  return (buffer);
+}
+
+
+/*
  * 'httpEncode64()' - Base64-encode a string.
  *
  * This function is deprecated. Use the httpEncode64_2() function instead

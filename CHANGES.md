@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-08-27
+CHANGES - 2.3b6 - 2018-08-28
 ============================
 
 Changes in CUPS v2.3b6
@@ -30,6 +30,7 @@ Changes in CUPS v2.3b6
 - The scheduler did not validate that required initial request attributes were
   in the operation group (rdar://41098178)
 - Authentication in the web interface did not work on macOS (rdar://41444473)
+- Fixed an issue with HTTP Digest authentication (rdar://41709086)
 - The scheduler could crash when job history was purged (rdar://42198057)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 

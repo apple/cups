@@ -266,14 +266,7 @@ cupsDoAuthentication(
 					/* Opaque data from server */
 			cnonce[65],	/* cnonce value */
 			kd[65],		/* Final MD5/SHA-256 digest */
-			ha1[65],	/* Hash of username:realm:password */
-			ha2[65],	/* Hash of method:request-uri */
-			hdata[65],	/* Hash of auth data */
-			temp[1024],	/* Temporary string */
 			digest[1024];	/* Digest auth data */
-      unsigned char	hash[32];	/* Hash buffer */
-      const char	*hashalg;	/* Hashing algorithm */
-      size_t		hashsize;	/* Size of hash */
 
       if (strcmp(nonce, http->nonce))
       {
@@ -294,59 +287,12 @@ cupsDoAuthentication(
       if (cups_auth_param(schemedata, "algorithm", algorithm, sizeof(algorithm)))
       {
        /*
-        * Follow RFC 2617/7616...
+        * Calculate and pass the RFC 2617/7616 WWW-Authenticate header...
         */
 
-        if (!_cups_strcasecmp(algorithm, "MD5"))
-        {
-         /*
-          * RFC 2617 Digest with MD5
-          */
+        if (!_httpDigest(kd, sizeof(kd), algorithm, cupsUser(), realm, strchr(http->userpass, ':') + 1, nonce, http->nonce_count, cnonce, "auth", method, resource))
+          continue;
 
-          hashalg = "md5";
-	}
-	else if (!_cups_strcasecmp(algorithm, "SHA-256"))
-	{
-	 /*
-	  * RFC 7616 Digest with SHA-256
-	  */
-
-          hashalg = "sha2-256";
-	}
-	else
-	{
-	 /*
-	  * Some other algorithm we don't support, skip this one...
-	  */
-
-	  continue;
-	}
-
-       /*
-        * Calculate digest value...
-        */
-
-        /* H(A1) = H(username:realm:password) */
-        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
-
-        /* H(A2) = H(method:uri) */
-	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
-
-        /* H(data) = H(nonce:nc:cnonce:qop:H(A2)) */
-	snprintf(temp, sizeof(temp), "%s:%08x:%s:auth:%s", nonce, http->nonce_count, cnonce, ha2);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, hdata, sizeof(hdata));
-
-        /* KD = H(H(A1):H(data)) */
-	snprintf(temp, sizeof(temp), "%s:%s", ha1, hdata);
-        hashsize = (size_t)cupsHashData(hashalg, (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, kd, sizeof(kd));
-
-        /* Pass the RFC 2617/7616 WWW-Authenticate header */
         if (opaque[0])
 	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, opaque=\"%s\", cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, opaque, cnonce, http->nonce_count, resource, kd);
 	else
@@ -355,25 +301,12 @@ cupsDoAuthentication(
       else
       {
        /*
-        * Use old RFC 2069 Digest method...
+        * Calculate and pass the old RFC 2069 WWW-Authenticate header...
         */
 
-        /* H(A1) = H(username:realm:password) */
-        snprintf(temp, sizeof(temp), "%s:%s:%s", cupsUser(), realm, strchr(http->userpass, ':') + 1);
-        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha1, sizeof(ha1));
+        if (!_httpDigest(kd, sizeof(kd), NULL, cupsUser(), realm, strchr(http->userpass, ':') + 1, nonce, http->nonce_count, NULL, NULL, method, resource))
+	  continue;
 
-        /* H(A2) = H(method:uri) */
-	snprintf(temp, sizeof(temp), "%s:%s", method, resource);
-        hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, ha2, sizeof(ha2));
-
-        /* KD = H(H(A1):nonce:H(A2)) */
-	snprintf(temp, sizeof(temp), "%s:%s:%s", ha1, nonce, ha2);
-	hashsize = (size_t)cupsHashData("md5", (unsigned char *)temp, strlen(temp), hash, sizeof(hash));
-	cupsHashString(hash, hashsize, kd, sizeof(kd));
-
-        /* Pass the RFC 2069 WWW-Authenticate header */
 	snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, resource, kd);
       }
 
