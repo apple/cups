@@ -752,7 +752,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	* See if we can do authentication...
 	*/
 
-	if (cupsDoAuthentication(http, "GET", resource))
+	if (cupsDoAuthentication(http, "HEAD", resource))
 	{
 	  status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
 	  break;

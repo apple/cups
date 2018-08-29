@@ -688,6 +688,8 @@ _httpDigest(char       *buffer,		/* I - Response buffer */
   size_t	hashsize;	/* Size of hash */
 
 
+  DEBUG_printf(("2_httpDigest(buffer=%p, bufsize=" CUPS_LLFMT ", algorithm=\%s\", username=\"%s\", realm=\"%s\", password=\"%d chars\", nonce=\"%s\", nc=%u, cnonce=\"%s\", qop=\"%s\", method=\"%s\", resource=\"%s\")", buffer, CUPS_LLCAST bufsize, algorithm, username, realm, (int)strlen(password), nonce, nc, cnonce, qop, method, resource));
+
   if (algorithm)
   {
    /*
