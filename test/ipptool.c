@@ -4783,7 +4783,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
             * Grab hex-encoded value...
             */
 
-            if ((withlen = (int)strlen(value)) & 1 || withlen > (2 * (sizeof(withdata) + 1)))
+            if ((withlen = (int)strlen(value)) & 1 || withlen > (int)(2 * (sizeof(withdata) + 1)))
             {
 	      print_fatal_error(data, "Bad WITH-VALUE hex value.");
               return (0);

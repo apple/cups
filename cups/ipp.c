@@ -6779,7 +6779,9 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
     * Reset pointers in the list...
     */
 
+#ifndef __clang_analyzer__
     DEBUG_printf(("4debug_free: %p %s", (void *)*attr, temp->name));
+#endif /* !__clang_analyzer__ */
     DEBUG_printf(("4debug_alloc: %p %s %s%s (%d)", (void *)temp, temp->name, temp->num_values > 1 ? "1setOf " : "", ippTagString(temp->value_tag), temp->num_values));
 
     if (ipp->current == *attr && ipp->prev)
