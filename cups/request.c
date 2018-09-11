@@ -585,7 +585,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   int			got_status;	/* Did we get the status? */
   ipp_state_t		state;		/* State of IPP processing */
   http_status_t		expect;		/* Expect: header to use */
-  char                  date[256];      /* Date: header value */
+  char			date[256];	/* Date: header value */
+  int			digest;		/* Are we using Digest authentication? */
 
 
   DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", length=" CUPS_LLFMT ")", (void *)http, (void *)request, request ? ippOpString(request->request.op.operation_id) : "?", resource, CUPS_LLCAST length));
@@ -677,6 +678,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     httpSetField(http, HTTP_FIELD_DATE, httpGetDateString2(time(NULL), date, (int)sizeof(date)));
     httpSetLength(http, length);
 
+    digest = http->authstring && !strncmp(http->authstring, "Digest ", 7);
+
 #ifdef HAVE_GSSAPI
     if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
     {
@@ -761,9 +764,9 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Wait up to 1 second to get the 100-continue response as needed...
     */
 
-    if (!got_status)
+    if (!got_status || (digest && status == HTTP_STATUS_CONTINUE))
     {
-      if (expect == HTTP_STATUS_CONTINUE)
+      if (expect == HTTP_STATUS_CONTINUE || digest)
       {
 	DEBUG_puts("2cupsSendRequest: Waiting for 100-continue...");
 
