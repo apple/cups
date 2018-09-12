@@ -20,10 +20,17 @@
 
 
 /*
+ * Constants...
+ */
+
+#define MAX_CLIENTS	16		/* Maximum number of client threads */
+
+
+/*
  * Local types...
  */
 
-typedef struct _client_monitor_s
+typedef struct _client_data_s
 {
   const char		*uri,		/* Printer URI */
 			*hostname,	/* Hostname */
@@ -31,6 +38,10 @@ typedef struct _client_monitor_s
 			*resource;	/* Resource path */
   int			port;		/* Port number */
   http_encryption_t	encryption;	/* Use encryption? */
+  const char		*docfile,	/* Document file */
+			*docformat;	/* Document format */
+  int			grayscale,	/* Force grayscale? */
+			keepfile;	/* Keep temporary file? */
   ipp_pstate_t		printer_state;	/* Current printer state */
   char                  printer_state_reasons[1024];
                                         /* Current printer-state-reasons */
@@ -38,7 +49,14 @@ typedef struct _client_monitor_s
   ipp_jstate_t		job_state;	/* Current job state */
   char                  job_state_reasons[1024];
                                         /* Current job-state-reasons */
-} _client_monitor_t;
+} _client_data_t;
+
+
+/*
+ * Local globals...
+ */
+
+static int		verbosity = 0;
 
 
 /*
@@ -46,7 +64,8 @@ typedef struct _client_monitor_s
  */
 
 static const char       *make_raster_file(ipp_t *response, int grayscale, char *tempname, size_t tempsize, const char **format);
-static void	        *monitor_printer(_client_monitor_t *monitor);
+static void	        *monitor_printer(_client_data_t *data);
+static void		*run_client(_client_data_t *data);
 static void             show_attributes(const char *title, int request, ipp_t *ipp);
 static void             show_capabilities(ipp_t *response);
 static void             usage(void);
@@ -61,36 +80,17 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   int                   i;              /* Looping var */
-  const char            *opt,           /* Current option */
-                        *uri = NULL,    /* Printer URI */
-                        *printfile = NULL,
-                                        /* Print file */
-                        *printformat = NULL;
-                                        /* Print format */
-  int                   keepfile = 0,   /* Keep temp file? */
-                        grayscale = 0,  /* Force grayscale? */
-                        verbosity = 0;  /* Verbosity */
-  char                  tempfile[1024] = "",
-                                        /* Temporary file (if any) */
-                        scheme[32],     /* URI scheme */
+  const char            *opt;           /* Current option */
+  int                   num_clients = 0,/* Number of clients to simulate */
+			total_clients;	/* Total number of clients */
+  _cups_thread_t	clients[MAX_CLIENTS];
+					/* Clients thread IDs */
+  char                  scheme[32],     /* URI scheme */
                         userpass[256],  /* Username:password */
                         hostname[256],  /* Hostname */
                         resource[256];  /* Resource path */
-  int                   port;           /* Port number */
-  http_encryption_t     encryption;     /* Encryption mode */
-  _client_monitor_t     monitor;        /* Monitoring data */
-  http_t                *http;          /* HTTP connection */
-  ipp_t                 *request,       /* IPP request */
-                        *response;      /* IPP response */
-  ipp_attribute_t       *attr;          /* IPP attribute */
-  static const char * const pattrs[] =  /* Printer attributes we are interested in */
-  {
-    "job-template",
-    "printer-defaults",
-    "printer-description",
-    "media-col-database",
-    "media-col-ready"
-  };
+  _client_data_t	data;		/* Client data */
+  int			status = 0;	/* Exit status */
 
 
  /*
@@ -100,6 +100,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (argc == 1)
     return (0);
 
+  memset(&data, 0, sizeof(data));
+
   for (i = 1; i < argc; i ++)
   {
     if (argv[i][0] == '-')
@@ -108,8 +110,32 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         switch (*opt)
         {
+          case 'c' : /* -c num-clients */
+              if (num_clients)
+              {
+                puts("Number of clients can only be specified once.");
+                usage();
+                return (1);
+              }
+
+              i ++;
+              if (i >= argc)
+              {
+                puts("Expected client count after '-c'.");
+                usage();
+                return (1);
+              }
+
+              if ((num_clients = atoi(argv[i])) < 1)
+              {
+                puts("Number of clients must be one or more.");
+                usage();
+                return (1);
+              }
+              break;
+
           case 'd' : /* -d document-format */
-              if (printformat)
+              if (data.docformat)
               {
                 puts("Document format can only be specified once.");
                 usage();
@@ -124,11 +150,11 @@ main(int  argc,				/* I - Number of command-line arguments */
                 return (1);
               }
 
-              printformat = argv[i];
+              data.docformat = argv[i];
               break;
 
           case 'f' : /* -f print-file */
-              if (printfile)
+              if (data.docfile)
               {
                 puts("Print file can only be specified once.");
                 usage();
@@ -143,15 +169,15 @@ main(int  argc,				/* I - Number of command-line arguments */
                 return (1);
               }
 
-              printfile = argv[i];
+              data.docfile = argv[i];
               break;
 
           case 'g' :
-              grayscale = 1;
+              data.grayscale = 1;
               break;
 
           case 'k' :
-              keepfile = 1;
+              data.keepfile = 1;
               break;
 
           case 'v' :
@@ -165,217 +191,77 @@ main(int  argc,				/* I - Number of command-line arguments */
         }
       }
     }
-    else if (uri || (strncmp(argv[i], "ipp://", 6) && strncmp(argv[i], "ipps://", 7)))
+    else if (data.uri || (strncmp(argv[i], "ipp://", 6) && strncmp(argv[i], "ipps://", 7)))
     {
       printf("Unknown command-line argument '%s'.\n", argv[i]);
       usage();
       return (1);
     }
     else
-      uri = argv[i];
+      data.uri = argv[i];
   }
 
  /*
   * Make sure we have everything we need.
   */
 
-  if (!uri)
+  if (!data.uri)
   {
     puts("Expected printer URI.");
     usage();
     return (1);
   }
 
+  if (num_clients < 1)
+    num_clients = 1;
+
  /*
   * Connect to the printer...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, data.uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &data.port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
   {
-    printf("Bad printer URI '%s'.\n", uri);
+    printf("Bad printer URI '%s'.\n", data.uri);
     return (1);
   }
 
-  if (!port)
-    port = IPP_PORT;
+  if (!data.port)
+    data.port = IPP_PORT;
 
   if (!strcmp(scheme, "https") || !strcmp(scheme, "ipps"))
-    encryption = HTTP_ENCRYPTION_ALWAYS;
+    data.encryption = HTTP_ENCRYPTION_ALWAYS;
   else
-    encryption = HTTP_ENCRYPTION_IF_REQUESTED;
-
-  if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 0, NULL)) == NULL)
-  {
-    printf("Unable to connect to '%s' on port %d: %s\n", hostname, port, cupsLastErrorString());
-    return (1);
-  }
+    data.encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
  /*
-  * Query printer status and capabilities...
+  * Start the client threads...
   */
 
-  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
+  data.hostname = hostname;
+  data.resource = resource;
 
-  response = cupsDoRequest(http, request, resource);
-
-  if (verbosity)
-    show_capabilities(response);
-
- /*
-  * Now figure out what we will be printing...
-  */
-
-  if (printfile)
+  for (i = 0, total_clients = 0; i < num_clients; i ++)
   {
-   /*
-    * User specified a print file, figure out the format...
-    */
+    clients[i % MAX_CLIENTS] = _cupsThreadCreate((_cups_thread_func_t)run_client, &data);
 
-    if ((opt = strrchr(printfile, '.')) != NULL)
+    total_clients ++;
+    if (total_clients >= MAX_CLIENTS || (i + 1) >= num_clients)
     {
      /*
-      * Guess the format from the extension...
+      * Wait for them to complete...
       */
 
-      if (!strcmp(opt, ".jpg"))
-        printformat = "image/jpeg";
-      else if (!strcmp(opt, ".pdf"))
-        printformat = "application/pdf";
-      else if (!strcmp(opt, ".ps"))
-        printformat = "application/postscript";
-      else if (!strcmp(opt, ".pwg"))
-        printformat = "image/pwg-raster";
-      else if (!strcmp(opt, ".urf"))
-        printformat = "image/urf";
-      else
-        printformat = "application/octet-stream";
-    }
-    else
-    {
-     /*
-      * Tell the printer to auto-detect...
-      */
+      int j;
 
-      printformat = "application/octet-stream";
+      for (j = 0; j < total_clients; j ++)
+	if (_cupsThreadWait(clients[j]))
+	  status = 1;
+
+      total_clients = 0;
     }
   }
-  else
-  {
-   /*
-    * No file specified, make something to test with...
-    */
 
-    if ((printfile = make_raster_file(response, grayscale, tempfile, sizeof(tempfile), &printformat)) == NULL)
-      return (1);
-  }
-
-  ippDelete(response);
-
- /*
-  * Start monitoring the printer in the background...
-  */
-
-  memset(&monitor, 0, sizeof(monitor));
-
-  monitor.uri           = uri;
-  monitor.hostname      = hostname;
-  monitor.resource      = resource;
-  monitor.port          = port;
-  monitor.encryption    = encryption;
-
-  _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
-
- /*
-  * Create the job and wait for completion...
-  */
-
-  request = ippNewRequest(IPP_OP_CREATE_JOB);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
-
-  if ((opt = strrchr(printfile, '/')) != NULL)
-    opt ++;
-  else
-    opt = printfile;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, opt);
-
-  if (verbosity)
-    show_attributes("Create-Job request", 1, request);
-
-  response = cupsDoRequest(http, request, resource);
-
-  if (verbosity)
-    show_attributes("Create-Job response", 0, response);
-
-  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
-  {
-    printf("Unable to create print job: %s\n", cupsLastErrorString());
-
-    monitor.job_state = IPP_JSTATE_ABORTED;
-
-    goto cleanup;
-  }
-
-  if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
-  {
-    puts("No job-id returned in Create-Job request.");
-
-    monitor.job_state = IPP_JSTATE_ABORTED;
-
-    goto cleanup;
-  }
-
-  monitor.job_id = ippGetInteger(attr, 0);
-
-  printf("CREATED JOB %d, sending %s of type %s\n", monitor.job_id, printfile, printformat);
-
-  ippDelete(response);
-
-  request = ippNewRequest(IPP_OP_SEND_DOCUMENT);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", monitor.job_id);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, printformat);
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
-
-  if (verbosity)
-    show_attributes("Send-Document request", 1, request);
-
-  response = cupsDoFileRequest(http, request, resource, printfile);
-
-  if (verbosity)
-    show_attributes("Send-Document response", 0, response);
-
-  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
-  {
-    printf("Unable to print file: %s\n", cupsLastErrorString());
-
-    monitor.job_state = IPP_JSTATE_ABORTED;
-
-    goto cleanup;
-  }
-
-  puts("WAITING FOR JOB TO COMPLETE");
-
-  while (monitor.job_state < IPP_JSTATE_CANCELED)
-    sleep(1);
-
- /*
-  * Cleanup after ourselves...
-  */
-
-  cleanup:
-
-  httpClose(http);
-
-  if (tempfile[0] && !keepfile)
-    unlink(tempfile);
-
-  return (monitor.job_state == IPP_JSTATE_COMPLETED);
+  return (status);
 }
 
 
@@ -726,7 +612,7 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
 
 static void *				/* O - Thread exit code */
 monitor_printer(
-    _client_monitor_t *monitor)		/* I - Monitoring data */
+    _client_data_t *data)		/* I - Client data */
 {
   http_t	*http;			/* Connection to printer */
   ipp_t		*request,		/* IPP request */
@@ -753,7 +639,7 @@ monitor_printer(
   * Open a connection to the printer...
   */
 
-  http = httpConnect2(monitor->hostname, monitor->port, NULL, AF_UNSPEC, monitor->encryption, 1, 0, NULL);
+  http = httpConnect2(data->hostname, data->port, NULL, AF_UNSPEC, data->encryption, 1, 0, NULL);
 
  /*
   * Loop until the job is canceled, aborted, or completed.
@@ -765,7 +651,7 @@ monitor_printer(
   job_state            = (ipp_jstate_t)0;
   job_state_reasons[0] = '\0';
 
-  while (monitor->job_state < IPP_JSTATE_CANCELED)
+  while (data->job_state < IPP_JSTATE_CANCELED)
   {
    /*
     * Reconnect to the printer as needed...
@@ -781,11 +667,11 @@ monitor_printer(
       */
 
       request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, monitor->uri);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, data->uri);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
       ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
 
-      response = cupsDoRequest(http, request, monitor->resource);
+      response = cupsDoRequest(http, request, data->resource);
 
       if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
         printer_state = (ipp_pstate_t)ippGetInteger(attr, 0);
@@ -793,29 +679,29 @@ monitor_printer(
       if ((attr = ippFindAttribute(response, "printer-state-reasons", IPP_TAG_KEYWORD)) != NULL)
         ippAttributeString(attr, printer_state_reasons, sizeof(printer_state_reasons));
 
-      if (printer_state != monitor->printer_state || strcmp(printer_state_reasons, monitor->printer_state_reasons))
+      if (printer_state != data->printer_state || strcmp(printer_state_reasons, data->printer_state_reasons))
       {
         printf("PRINTER: %s (%s)\n", ippEnumString("printer-state", printer_state), printer_state_reasons);
 
-        monitor->printer_state = printer_state;
-        strlcpy(monitor->printer_state_reasons, printer_state_reasons, sizeof(monitor->printer_state_reasons));
+        data->printer_state = printer_state;
+        strlcpy(data->printer_state_reasons, printer_state_reasons, sizeof(data->printer_state_reasons));
       }
 
       ippDelete(response);
 
-      if (monitor->job_id > 0)
+      if (data->job_id > 0)
       {
        /*
         * Check the status of the job itself...
         */
 
         request = ippNewRequest(IPP_OP_GET_JOB_ATTRIBUTES);
-        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, monitor->uri);
-        ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", monitor->job_id);
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, data->uri);
+        ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", data->job_id);
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
         ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(jattrs) / sizeof(jattrs[0])), NULL, jattrs);
 
-        response = cupsDoRequest(http, request, monitor->resource);
+        response = cupsDoRequest(http, request, data->resource);
 
         if ((attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM)) != NULL)
           job_state = (ipp_jstate_t)ippGetInteger(attr, 0);
@@ -823,19 +709,19 @@ monitor_printer(
         if ((attr = ippFindAttribute(response, "job-state-reasons", IPP_TAG_KEYWORD)) != NULL)
           ippAttributeString(attr, job_state_reasons, sizeof(job_state_reasons));
 
-        if (job_state != monitor->job_state || strcmp(job_state_reasons, monitor->job_state_reasons))
+        if (job_state != data->job_state || strcmp(job_state_reasons, data->job_state_reasons))
         {
-          printf("JOB %d: %s (%s)\n", monitor->job_id, ippEnumString("job-state", job_state), job_state_reasons);
+          printf("JOB %d: %s (%s)\n", data->job_id, ippEnumString("job-state", job_state), job_state_reasons);
 
-          monitor->job_state = job_state;
-          strlcpy(monitor->job_state_reasons, job_state_reasons, sizeof(monitor->job_state_reasons));
+          data->job_state = job_state;
+          strlcpy(data->job_state_reasons, job_state_reasons, sizeof(data->job_state_reasons));
         }
 
         ippDelete(response);
       }
     }
 
-    if (monitor->job_state < IPP_JSTATE_CANCELED)
+    if (data->job_state < IPP_JSTATE_CANCELED)
     {
      /*
       * Sleep for 5 seconds...
@@ -850,6 +736,206 @@ monitor_printer(
   */
 
   httpClose(http);
+
+  printf("FINISHED MONITORING JOB %d\n", data->job_id);
+
+  return (NULL);
+}
+
+
+/*
+ * 'run_client()' - Run a client thread.
+ */
+
+static void *				/* O - Thread exit code */
+run_client(
+    _client_data_t *data)		/* I - Client data */
+{
+  _cups_thread_t monitor_id;		/* Monitoring thread ID */
+  const char	*name;			/* Job name */
+  char		tempfile[1024] = "";	/* Temporary file (if any) */
+  _client_data_t ldata;			/* Local client data */
+  http_t	*http;			/* Connection to printer */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Attribute in response */
+  static const char * const pattrs[] =  /* Printer attributes we are interested in */
+  {
+    "job-template",
+    "printer-defaults",
+    "printer-description",
+    "media-col-database",
+    "media-col-ready"
+  };
+
+
+  ldata = *data;
+
+ /*
+  * Start monitoring the printer in the background...
+  */
+
+  monitor_id = _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &ldata);
+
+ /*
+  * Open a connection to the printer...
+  */
+
+  http = httpConnect2(data->hostname, data->port, NULL, AF_UNSPEC, data->encryption, 1, 0, NULL);
+
+ /*
+  * Query printer status and capabilities...
+  */
+
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, ldata.uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
+
+  response = cupsDoRequest(http, request, ldata.resource);
+
+  if (verbosity)
+    show_capabilities(response);
+
+ /*
+  * Now figure out what we will be printing...
+  */
+
+  if (ldata.docfile)
+  {
+   /*
+    * User specified a print file, figure out the format...
+    */
+    const char *ext;			/* Filename extension */
+
+    if ((ext = strrchr(ldata.docfile, '.')) != NULL)
+    {
+     /*
+      * Guess the format from the extension...
+      */
+
+      if (!strcmp(ext, ".jpg"))
+        ldata.docformat = "image/jpeg";
+      else if (!strcmp(ext, ".pdf"))
+        ldata.docformat = "application/pdf";
+      else if (!strcmp(ext, ".ps"))
+        ldata.docformat = "application/postscript";
+      else if (!strcmp(ext, ".pwg"))
+        ldata.docformat = "image/pwg-raster";
+      else if (!strcmp(ext, ".urf"))
+        ldata.docformat = "image/urf";
+      else
+        ldata.docformat = "application/octet-stream";
+    }
+    else
+    {
+     /*
+      * Tell the printer to auto-detect...
+      */
+
+      ldata.docformat = "application/octet-stream";
+    }
+  }
+  else
+  {
+   /*
+    * No file specified, make something to test with...
+    */
+
+    if ((ldata.docfile = make_raster_file(response, ldata.grayscale, tempfile, sizeof(tempfile), &ldata.docformat)) == NULL)
+      return ((void *)1);
+  }
+
+  ippDelete(response);
+
+ /*
+  * Create a job and wait for completion...
+  */
+
+  request = ippNewRequest(IPP_OP_CREATE_JOB);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, ldata.uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+
+  if ((name = strrchr(ldata.docfile, '/')) != NULL)
+    name ++;
+  else
+    name = ldata.docfile;
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL, name);
+
+  if (verbosity)
+    show_attributes("Create-Job request", 1, request);
+
+  response = cupsDoRequest(http, request, ldata.resource);
+
+  if (verbosity)
+    show_attributes("Create-Job response", 0, response);
+
+  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
+  {
+    printf("Unable to create print job: %s\n", cupsLastErrorString());
+
+    ldata.job_state = IPP_JSTATE_ABORTED;
+
+    goto cleanup;
+  }
+
+  if ((attr = ippFindAttribute(response, "job-id", IPP_TAG_INTEGER)) == NULL)
+  {
+    puts("No job-id returned in Create-Job request.");
+
+    ldata.job_state = IPP_JSTATE_ABORTED;
+
+    goto cleanup;
+  }
+
+  ldata.job_id = ippGetInteger(attr, 0);
+
+  printf("CREATED JOB %d, sending %s of type %s\n", ldata.job_id, ldata.docfile, ldata.docformat);
+
+  ippDelete(response);
+
+  request = ippNewRequest(IPP_OP_SEND_DOCUMENT);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, ldata.uri);
+  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", ldata.job_id);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, ldata.docformat);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
+
+  if (verbosity)
+    show_attributes("Send-Document request", 1, request);
+
+  response = cupsDoFileRequest(http, request, ldata.resource, ldata.docfile);
+
+  if (verbosity)
+    show_attributes("Send-Document response", 0, response);
+
+  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
+  {
+    printf("Unable to print file: %s\n", cupsLastErrorString());
+
+    ldata.job_state = IPP_JSTATE_ABORTED;
+
+    goto cleanup;
+  }
+
+  puts("WAITING FOR JOB TO COMPLETE");
+
+  while (ldata.job_state < IPP_JSTATE_CANCELED)
+    sleep(1);
+
+ /*
+  * Cleanup after ourselves...
+  */
+
+  cleanup:
+
+  httpClose(http);
+
+  if (tempfile[0] && !ldata.keepfile)
+    unlink(tempfile);
+
+  _cupsThreadWait(monitor_id);
 
   return (NULL);
 }
