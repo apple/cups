@@ -11,6 +11,7 @@
  * Include necessary headers...
  */
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/cups.h>
@@ -56,6 +57,8 @@ typedef struct _client_data_s
  * Local globals...
  */
 
+static int		client_count = 0;
+static _cups_mutex_t	client_mutex = _CUPS_MUTEX_INITIALIZER;
 static int		verbosity = 0;
 
 
@@ -79,18 +82,16 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int                   i;              /* Looping var */
-  const char            *opt;           /* Current option */
-  int                   num_clients = 0,/* Number of clients to simulate */
-			total_clients;	/* Total number of clients */
-  _cups_thread_t	clients[MAX_CLIENTS];
-					/* Clients thread IDs */
-  char                  scheme[32],     /* URI scheme */
-                        userpass[256],  /* Username:password */
-                        hostname[256],  /* Hostname */
-                        resource[256];  /* Resource path */
+  int			i;		/* Looping var */
+  const char		*opt;		/* Current option */
+  int			num_clients = 0,/* Number of clients to simulate */
+			clients_started = 0;
+					/* Number of clients that have been started */
+  char			scheme[32],     /* URI scheme */
+			userpass[256],  /* Username:password */
+			hostname[256],  /* Hostname */
+			resource[256];  /* Resource path */
   _client_data_t	data;		/* Client data */
-  int			status = 0;	/* Exit status */
 
 
  /*
@@ -240,28 +241,34 @@ main(int  argc,				/* I - Number of command-line arguments */
   data.hostname = hostname;
   data.resource = resource;
 
-  for (i = 0, total_clients = 0; i < num_clients; i ++)
+  while (clients_started < num_clients)
   {
-    clients[i % MAX_CLIENTS] = _cupsThreadCreate((_cups_thread_func_t)run_client, &data);
-
-    total_clients ++;
-    if (total_clients >= MAX_CLIENTS || (i + 1) >= num_clients)
+    _cupsMutexLock(&client_mutex);
+    if (client_count < MAX_CLIENTS)
     {
-     /*
-      * Wait for them to complete...
-      */
+      _cups_thread_t	tid;		/* New thread */
 
-      int j;
-
-      for (j = 0; j < total_clients; j ++)
-	if (_cupsThreadWait(clients[j]))
-	  status = 1;
-
-      total_clients = 0;
+      client_count ++;
+      _cupsMutexUnlock(&client_mutex);
+      tid = _cupsThreadCreate((_cups_thread_func_t)run_client, &data);
+      _cupsThreadDetach(tid);
+    }
+    else
+    {
+      _cupsMutexUnlock(&client_mutex);
+      sleep(1);
     }
   }
 
-  return (status);
+  while (client_count > 0)
+  {
+    _cupsMutexLock(&client_mutex);
+    printf("%d RUNNING CLIENTS\n", client_count);
+    _cupsMutexUnlock(&client_mutex);
+    sleep(1);
+  }
+
+  return (0);
 }
 
 
@@ -936,6 +943,10 @@ run_client(
     unlink(tempfile);
 
   _cupsThreadWait(monitor_id);
+
+  _cupsMutexLock(&client_mutex);
+  client_count --;
+  _cupsMutexUnlock(&client_mutex);
 
   return (NULL);
 }
