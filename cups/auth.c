@@ -266,15 +266,7 @@ cupsDoAuthentication(
       cups_auth_param(schemedata, "nonce", nonce, sizeof(nonce));
       cups_auth_param(schemedata, "realm", http->realm, sizeof(http->realm));
 
-      if (strcmp(nonce, http->nonce))
-      {
-        strlcpy(http->nonce, nonce, sizeof(http->nonce));
-        http->nonce_count = 1;
-      }
-      else
-        http->nonce_count ++;
-
-      if (_httpSetDigestAuthString(http, method, resource))
+      if (_httpSetDigestAuthString(http, nonce, method, resource))
         break;
     }
   }

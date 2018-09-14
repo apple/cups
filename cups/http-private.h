@@ -440,7 +440,7 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
-extern int		_httpSetDigestAuthString(http_t *http, const char *method, const char *resource);
+extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource);
 extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
 extern void		_httpTLSInitialize(void);
 extern size_t		_httpTLSPending(http_t *http);

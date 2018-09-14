@@ -628,6 +628,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
+    int new_auth;
+
     if (!strcmp(argv[i], "-o"))
     {
       i ++;
@@ -711,6 +713,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     printf("Checking file \"%s\"...\n", resource);
 
+    new_auth = 0;
+
     do
     {
       if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_CONNECTION), "close"))
@@ -723,9 +727,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
       }
 
+      if (http->authstring && !strncmp(http->authstring, "Digest ", 7) && !new_auth)
+        _httpSetDigestAuthString(http, http->nextnonce, "HEAD", resource);
+
       httpClearFields(http);
       httpSetField(http, HTTP_FIELD_AUTHORIZATION, httpGetAuthString(http));
       httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
+
       if (httpHead(http, resource))
       {
         if (httpReconnect2(http, 30000, NULL))
@@ -742,6 +750,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
 
+      new_auth = 0;
+
       if (status == HTTP_STATUS_UNAUTHORIZED)
       {
        /*
@@ -753,6 +763,8 @@ main(int  argc,				/* I - Number of command-line arguments */
        /*
 	* See if we can do authentication...
 	*/
+
+        new_auth = 1;
 
 	if (cupsDoAuthentication(http, "HEAD", resource))
 	{
@@ -802,6 +814,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("Requesting file \"%s\" (Accept-Encoding: %s)...\n", resource,
            encoding ? encoding : "identity");
 
+    new_auth = 0;
+
     do
     {
       if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_CONNECTION), "close"))
@@ -813,6 +827,9 @@ main(int  argc,				/* I - Number of command-line arguments */
           break;
 	}
       }
+
+      if (http->authstring && !strncmp(http->authstring, "Digest ", 7) && !new_auth)
+        _httpSetDigestAuthString(http, http->nextnonce, "GET", resource);
 
       httpClearFields(http);
       httpSetField(http, HTTP_FIELD_AUTHORIZATION, httpGetAuthString(http));
@@ -835,6 +852,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
 
+      new_auth = 0;
+
       if (status == HTTP_STATUS_UNAUTHORIZED)
       {
        /*
@@ -846,6 +865,8 @@ main(int  argc,				/* I - Number of command-line arguments */
        /*
 	* See if we can do authentication...
 	*/
+
+        new_auth = 1;
 
 	if (cupsDoAuthentication(http, "GET", resource))
 	{
