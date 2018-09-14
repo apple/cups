@@ -680,6 +680,24 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     digest = http->authstring && !strncmp(http->authstring, "Digest ", 7);
 
+    if (digest)
+    {
+     /*
+      * Update the Digest authentication string...
+      */
+
+      if (http->nextnonce[0])
+      {
+        strlcpy(http->nonce, http->nextnonce, sizeof(http->nonce));
+        http->nonce_count = 1;
+        http->nextnonce[0] = '\0';
+      }
+      else
+        http->nonce_count ++;
+
+      _httpSetDigestAuthString(http, "POST", resource);
+    }
+
 #ifdef HAVE_GSSAPI
     if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
     {

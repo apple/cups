@@ -101,7 +101,8 @@ static const char * const http_fields[] =
 			  "WWW-Authenticate",
 			  "Accept-Encoding",
 			  "Allow",
-			  "Server"
+			  "Server",
+			  "Authentication-Info"
 			};
 
 
@@ -2874,7 +2875,12 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
       httpSetCookie(http, value);
     }
     else if ((field = httpFieldValue(line)) != HTTP_FIELD_UNKNOWN)
+    {
       http_add_field(http, field, value, 1);
+
+      if (field == HTTP_FIELD_AUTHENTICATION_INFO)
+        httpGetSubField2(http, HTTP_FIELD_AUTHENTICATION_INFO, "nextnonce", http->nextnonce, (int)sizeof(http->nextnonce));
+    }
 #ifdef DEBUG
     else
       DEBUG_printf(("1_httpUpdate: unknown field %s seen!", line));

@@ -336,6 +336,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!j)
       puts("PASS");
 
+#if 0
    /*
     * _httpDigest()
     */
@@ -367,6 +368,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
       puts("PASS");
+#endif /* 0 */
 
    /*
     * httpGetHostname()

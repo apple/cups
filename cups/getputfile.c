@@ -1,10 +1,11 @@
 /*
  * Get/put file functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -39,6 +40,8 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   http_status_t	status;			/* HTTP status from server */
   char		if_modified_since[HTTP_MAX_VALUE];
 					/* If-Modified-Since header */
+  int		new_auth = 0;		/* Using new auth information? */
+  int		digest;			/* Are we using Digest authentication? */
 
 
  /*
@@ -79,8 +82,41 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
     }
 
     httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
     httpSetField(http, HTTP_FIELD_IF_MODIFIED_SINCE, if_modified_since);
+
+    digest = http->authstring && !strncmp(http->authstring, "Digest ", 7);
+
+    if (digest && !new_auth)
+    {
+     /*
+      * Update the Digest authentication string...
+      */
+
+      if (http->nextnonce[0])
+      {
+        strlcpy(http->nonce, http->nextnonce, sizeof(http->nonce));
+        http->nonce_count = 1;
+        http->nextnonce[0] = '\0';
+      }
+      else
+        http->nonce_count ++;
+
+      _httpSetDigestAuthString(http, "GET", resource);
+    }
+
+#ifdef HAVE_GSSAPI
+    if (http->authstring && !strncmp(http->authstring, "Negotiate", 9) && !new_auth)
+    {
+     /*
+      * Do not use cached Kerberos credentials since they will look like a
+      * "replay" attack...
+      */
+
+      _cupsSetNegotiateAuthString(http, "GET", resource);
+    }
+#endif /* HAVE_GSSAPI */
+
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
     if (httpGet(http, resource))
     {
@@ -96,6 +132,8 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
       }
     }
 
+    new_auth = 0;
+
     while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
 
     if (status == HTTP_STATUS_UNAUTHORIZED)
@@ -109,6 +147,8 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
      /*
       * See if we can do authentication...
       */
+
+      new_auth = 1;
 
       if (cupsDoAuthentication(http, "GET", resource))
       {
@@ -261,6 +301,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   int		retries;		/* Number of retries */
   char		buffer[8192];		/* Buffer for file */
   http_status_t	status;			/* HTTP status from server */
+  int		new_auth = 0;		/* Using new auth information? */
+  int		digest;			/* Are we using Digest authentication? */
 
 
  /*
@@ -303,9 +345,42 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
                   http->authstring));
 
     httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
     httpSetField(http, HTTP_FIELD_TRANSFER_ENCODING, "chunked");
     httpSetExpect(http, HTTP_STATUS_CONTINUE);
+
+    digest = http->authstring && !strncmp(http->authstring, "Digest ", 7);
+
+    if (digest && !new_auth)
+    {
+     /*
+      * Update the Digest authentication string...
+      */
+
+      if (http->nextnonce[0])
+      {
+        strlcpy(http->nonce, http->nextnonce, sizeof(http->nonce));
+        http->nonce_count = 1;
+        http->nextnonce[0] = '\0';
+      }
+      else
+        http->nonce_count ++;
+
+      _httpSetDigestAuthString(http, "PUT", resource);
+    }
+
+#ifdef HAVE_GSSAPI
+    if (http->authstring && !strncmp(http->authstring, "Negotiate", 9) && !new_auth)
+    {
+     /*
+      * Do not use cached Kerberos credentials since they will look like a
+      * "replay" attack...
+      */
+
+      _cupsSetNegotiateAuthString(http, "PUT", resource);
+    }
+#endif /* HAVE_GSSAPI */
+
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
     if (httpPut(http, resource))
     {
@@ -377,6 +452,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
 
     DEBUG_printf(("2cupsPutFd: status=%d", status));
 
+    new_auth = 0;
+
     if (status == HTTP_STATUS_UNAUTHORIZED)
     {
      /*
@@ -388,6 +465,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
      /*
       * See if we can do authentication...
       */
+
+      new_auth = 1;
 
       if (cupsDoAuthentication(http, "PUT", resource))
       {
