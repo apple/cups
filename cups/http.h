@@ -181,6 +181,7 @@ typedef enum http_field_e		/**** HTTP field names ****/
   HTTP_FIELD_ACCEPT_ENCODING,		/* Accepting-Encoding field @since CUPS 1.7/macOS 10.9@ */
   HTTP_FIELD_ALLOW,			/* Allow field @since CUPS 1.7/macOS 10.9@ */
   HTTP_FIELD_SERVER,			/* Server field @since CUPS 1.7/macOS 10.9@ */
+  HTTP_FIELD_AUTHENTICATION_INFO,	/* Authentication-Info field (@since CUPS 2.2.9) */
   HTTP_FIELD_MAX			/* Maximum field index */
 } http_field_t;
 

@@ -119,9 +119,7 @@ cupsDoAuthentication(
 		*www_auth,		/* WWW-Authenticate header */
 		*schemedata;		/* Scheme-specific data */
   char		scheme[256],		/* Scheme name */
-		prompt[1024],		/* Prompt for user */
-		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
-		nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
+		prompt[1024];		/* Prompt for user */
   int		localauth;		/* Local authentication result */
   _cups_globals_t *cg;			/* Global data */
 
@@ -259,6 +257,7 @@ cupsDoAuthentication(
 
       httpEncode64_2(encode, sizeof(encode), http->userpass, (int)strlen(http->userpass));
       httpSetAuthString(http, "Basic", encode);
+      break;
     }
     else if (!_cups_strcasecmp(scheme, "Digest"))
     {
@@ -266,57 +265,15 @@ cupsDoAuthentication(
       * Digest authentication...
       */
 
-      int		i;		/* Looping var */
-      char		algorithm[65],	/* Hashing algorithm */
-			opaque[HTTP_MAX_VALUE],
-					/* Opaque data from server */
-			cnonce[65],	/* cnonce value */
-			kd[65],		/* Final MD5/SHA-256 digest */
-			digest[1024];	/* Digest auth data */
+      char nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
 
-      if (strcmp(nonce, http->nonce))
-      {
-        strlcpy(http->nonce, nonce, sizeof(http->nonce));
-        http->nonce_count = 1;
-      }
-      else
-        http->nonce_count ++;
-
-      cups_auth_param(schemedata, "opaque", opaque, sizeof(opaque));
+      cups_auth_param(schemedata, "algorithm", http->algorithm, sizeof(http->algorithm));
+      cups_auth_param(schemedata, "opaque", http->opaque, sizeof(http->opaque));
       cups_auth_param(schemedata, "nonce", nonce, sizeof(nonce));
-      cups_auth_param(schemedata, "realm", realm, sizeof(realm));
+      cups_auth_param(schemedata, "realm", http->realm, sizeof(http->realm));
 
-      for (i = 0; i < 64; i ++)
-        cnonce[i] = "0123456789ABCDEF"[CUPS_RAND() & 15];
-      cnonce[64] = '\0';
-
-      if (cups_auth_param(schemedata, "algorithm", algorithm, sizeof(algorithm)))
-      {
-       /*
-        * Calculate and pass the RFC 2617/7616 WWW-Authenticate header...
-        */
-
-        if (!_httpDigest(kd, sizeof(kd), algorithm, cupsUser(), realm, strchr(http->userpass, ':') + 1, nonce, http->nonce_count, cnonce, "auth", method, resource))
-          continue;
-
-        if (opaque[0])
-	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, opaque=\"%s\", cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, opaque, cnonce, http->nonce_count, resource, kd);
-	else
-	  snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", algorithm=%s, qop=auth, cnonce=\"%s\", nc=%08x, uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, algorithm, cnonce, http->nonce_count, resource, kd);
-      }
-      else
-      {
-       /*
-        * Calculate and pass the old RFC 2069 WWW-Authenticate header...
-        */
-
-        if (!_httpDigest(kd, sizeof(kd), NULL, cupsUser(), realm, strchr(http->userpass, ':') + 1, nonce, http->nonce_count, NULL, NULL, method, resource))
-	  continue;
-
-	snprintf(digest, sizeof(digest), "username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", response=\"%s\"", cupsUser(), realm, nonce, resource, kd);
-      }
-
-      httpSetAuthString(http, "Digest", digest);
+      if (_httpSetDigestAuthString(http, nonce, method, resource))
+        break;
     }
   }
 
