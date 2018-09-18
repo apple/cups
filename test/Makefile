@@ -84,7 +84,7 @@ unittests:
 
 clean:
 	$(RM) $(TARGETS) $(OBJS)
-	$(RM) ippserver ippserver-shared ipptool-static
+	$(RM) ippfind-static ippserver ippserver-shared ipptool-static
 
 
 #
