@@ -16,7 +16,9 @@ cups-config
 Makedefs
 backend/dnssd
 backend/http
+backend/https
 backend/ipp
+backend/ipps
 backend/lpd
 backend/mdns
 backend/snmp
@@ -117,6 +119,7 @@ scheduler/cups.sh
 scheduler/cups.xml
 scheduler/cupsd
 scheduler/cupsfilter
+scheduler/org.cups.cups-lpd.plist
 scheduler/org.cups.cups-lpdAT.service
 scheduler/org.cups.cupsd.path
 scheduler/org.cups.cupsd.service
