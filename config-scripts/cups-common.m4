@@ -1,7 +1,7 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -65,6 +65,14 @@ fi
 if test "x$CC" = x; then
 	AC_MSG_ERROR([Unable to find required C compiler command.])
 fi
+
+AC_MSG_CHECKING(for codesign utility)
+CODE_SIGN="/usr/bin/true"
+AC_SUBST(CODE_SIGN)
+if test $uname = Darwin; then
+	CODE_SIGN="/usr/bin/codesign"
+fi
+AC_MSG_RESULT(using $CODE_SIGN)
 
 dnl Static library option...
 INSTALLSTATIC=""

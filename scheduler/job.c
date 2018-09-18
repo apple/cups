@@ -3336,8 +3336,14 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	           job_state == IPP_JOB_COMPLETED)
 	  {
 	    job_state = IPP_JOB_ABORTED;
-	    message   = "Job aborted due to backend errors; please consult "
-	                "the error_log file for details.";
+
+	    if (ErrorLog)
+	    {
+	      snprintf(buffer, sizeof(buffer), "Job aborted due to backend errors; please consult the %s file for details.", ErrorLog);
+	      message = buffer;
+            }
+            else
+	      message = "Job aborted due to backend errors.";
 
 	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	  }
@@ -3345,8 +3351,14 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
           {
             job_state     = IPP_JOB_PENDING;
 	    printer_state = IPP_PRINTER_STOPPED;
-	    message       = "Printer stopped due to backend errors; please "
-			    "consult the error_log file for details.";
+
+	    if (ErrorLog)
+	    {
+	      snprintf(buffer, sizeof(buffer), "Printer stopped due to backend errors; please consult the %s file for details.", ErrorLog);
+	      message = buffer;
+            }
+            else
+	      message = "Printer stopped due to backend errors.";
 
 	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
@@ -3384,15 +3396,20 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	      ippSetString(job->attrs, &job->reasons, 0,
 			   "job-hold-until-specified");
-	      message = "Job held indefinitely due to backend errors; please "
-			"consult the error_log file for details.";
+
+	      if (ErrorLog)
+	      {
+		snprintf(buffer, sizeof(buffer), "Job held indefinitely due to backend errors; please consult the %s file for details.", ErrorLog);
+		message = buffer;
+	      }
+	      else
+		message = "Job held indefinitely due to backend errors.";
             }
             else if (!strcmp(reason, "account-info-needed"))
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account information is "
-	                "required.";
+	      message = "Job held indefinitely - account information is required.";
             }
             else if (!strcmp(reason, "account-closed"))
             {
@@ -3404,8 +3421,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
             {
 	      cupsdSetJobHoldUntil(job, "indefinite", 0);
 
-	      message = "Job held indefinitely - account limit has been "
-	                "reached.";
+	      message = "Job held indefinitely - account limit has been reached.";
 	    }
             else
             {
@@ -3424,8 +3440,14 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  */
 
 	  printer_state = IPP_PRINTER_STOPPED;
-	  message       = "Printer stopped due to backend errors; please "
-			  "consult the error_log file for details.";
+
+	  if (ErrorLog)
+	  {
+	    snprintf(buffer, sizeof(buffer), "Printer stopped due to backend errors; please consult the %s file for details.", ErrorLog);
+	    message = buffer;
+	  }
+	  else
+	    message = "Printer stopped due to backend errors.";
 
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
@@ -3522,8 +3544,14 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
     if (job_state == IPP_JOB_COMPLETED)
     {
       job_state = IPP_JOB_STOPPED;
-      message   = "Job stopped due to filter errors; please consult the "
-		  "error_log file for details.";
+
+      if (ErrorLog)
+      {
+	snprintf(buffer, sizeof(buffer), "Job stopped due to filter errors; please consult the %s file for details.", ErrorLog);
+	message = buffer;
+      }
+      else
+	message = "Job stopped due to filter errors.";
 
       if (WIFSIGNALED(job->status))
 	ippSetString(job->attrs, &job->reasons, 0, "cups-filter-crashed");

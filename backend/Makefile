@@ -1,7 +1,7 @@
 #
 # Backend makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
+# Copyright 2007-2018 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -203,6 +203,7 @@ test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o test1284 test1284.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -213,6 +214,7 @@ testbackend:	testbackend.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -224,6 +226,7 @@ testsupplies:	testsupplies.o libbackend.a ../cups/$(LIBCUPSSTATIC)
 	$(LD_CC) $(LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -244,6 +247,7 @@ libbackend.a:	$(LIBOBJS)
 dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o dnssd dnssd.o libbackend.a $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	if test `uname` = Darwin; then \
 		$(RM) mdns; \
 		$(LN) dnssd mdns; \
@@ -257,8 +261,11 @@ dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
 ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o ipp ipp.o libbackend.a $(LIBS)
-	$(RM) http
-	$(LN) ipp http
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+	$(RM) http https ipps
+	for file in $(IPPALIASES); do \
+		$(LN) ipp $$file; \
+	done
 
 
 #
@@ -268,6 +275,7 @@ ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpd lpd.o libbackend.a $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -277,6 +285,7 @@ lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o snmp snmp.o libbackend.a $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -286,12 +295,14 @@ snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o socket-static socket.o libbackend.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -302,6 +313,7 @@ usb:	usb.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o usb usb.o libbackend.a $(LIBUSB) \
 		$(BACKLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 usb.o:	usb.c usb-darwin.c usb-libusb.c usb-unix.c
 
 
