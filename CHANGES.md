@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-08-28
+CHANGES - 2.3b6 - 2018-09-18
 ============================
 
 Changes in CUPS v2.3b6
@@ -25,6 +25,7 @@ Changes in CUPS v2.3b6
 - The PPD compiler incorrectly terminated JCL options (Issue #5379)
 - The cupstestppd utility did not generate errors for missing/mismatched
   CloseUI/JCLCloseUI keywords (Issue #5381)
+- The scheduler now reports the actual location of the log file (Issue #5398)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
