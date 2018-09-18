@@ -3337,7 +3337,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  {
 	    job_state = IPP_JOB_ABORTED;
 	    message   = "Job aborted due to backend errors; please consult "
-	                "the error_log file for details.";
+	                "logs for details. See where log location is in cups-files.conf.";
 
 	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	  }
@@ -3346,7 +3346,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
             job_state     = IPP_JOB_PENDING;
 	    printer_state = IPP_PRINTER_STOPPED;
 	    message       = "Printer stopped due to backend errors; please "
-			    "consult the error_log file for details.";
+			    "consult logs for details. See where log location is in cups-files.conf.";
 
 	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
@@ -3385,7 +3385,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	      ippSetString(job->attrs, &job->reasons, 0,
 			   "job-hold-until-specified");
 	      message = "Job held indefinitely due to backend errors; please "
-			"consult the error_log file for details.";
+			"consult logs for details. See where log location is in cups-files.conf.";
             }
             else if (!strcmp(reason, "account-info-needed"))
             {
@@ -3425,7 +3425,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	  printer_state = IPP_PRINTER_STOPPED;
 	  message       = "Printer stopped due to backend errors; please "
-			  "consult the error_log file for details.";
+			  "consult logs for details. See where log location is in cups-files.conf.";
 
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
@@ -3522,8 +3522,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
     if (job_state == IPP_JOB_COMPLETED)
     {
       job_state = IPP_JOB_STOPPED;
-      message   = "Job stopped due to filter errors; please consult the "
-		  "error_log file for details.";
+      message   = "Job stopped due to filter errors; please consult "
+		  "logs for details. See where log location is in cups-files.conf.";
 
       if (WIFSIGNALED(job->status))
 	ippSetString(job->attrs, &job->reasons, 0, "cups-filter-crashed");
