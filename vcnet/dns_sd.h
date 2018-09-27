@@ -294,7 +294,7 @@ enum
      * kDNSServiceFlagsMoreComing flag applies collectively to *all* active
      * operations sharing the same parent DNSServiceRef. If the MoreComing flag is
      * set it means that there are more results queued on this parent DNSServiceRef,
-     * but not necessarily more results for this particular callback function. 
+     * but not necessarily more results for this particular callback function.
      * The implication of this for client programmers is that when a callback
      * is invoked with the MoreComing flag set, the code should update its
      * internal data structures with the new result, and set a variable indicating
@@ -342,35 +342,35 @@ enum
      */
 
     kDNSServiceFlagsSuppressUnusable    = 0x8000,
-	/*
-	 * This flag is meaningful only in DNSServiceQueryRecord which suppresses unusable queries on the
-	 * wire. If "hostname" is a wide-area unicast DNS hostname (i.e. not a ".local." name)
-	 * but this host has no routable IPv6 address, then the call will not try to look up IPv6 addresses
-	 * for "hostname", since any addresses it found would be unlikely to be of any use anyway. Similarly,
-	 * if this host has no routable IPv4 address, the call will not try to look up IPv4 addresses for
-	 * "hostname".
-	 */
+    /*
+     * This flag is meaningful only in DNSServiceQueryRecord which suppresses unusable queries on the
+     * wire. If "hostname" is a wide-area unicast DNS hostname (i.e. not a ".local." name)
+     * but this host has no routable IPv6 address, then the call will not try to look up IPv6 addresses
+     * for "hostname", since any addresses it found would be unlikely to be of any use anyway. Similarly,
+     * if this host has no routable IPv4 address, the call will not try to look up IPv4 addresses for
+     * "hostname".
+     */
 
     kDNSServiceFlagsTimeout            = 0x10000,
-	/*
-	 * When kDNServiceFlagsTimeout is passed to DNSServiceQueryRecord or DNSServiceGetAddrInfo, the query is
-	 * stopped after a certain number of seconds have elapsed. The time at which the query will be stopped
-	 * is determined by the system and cannot be configured by the user. The query will be stopped irrespective
-	 * of whether a response was given earlier or not. When the query is stopped, the callback will be called
-	 * with an error code of kDNSServiceErr_Timeout and a NULL sockaddr will be returned for DNSServiceGetAddrInfo
-	 * and zero length rdata will be returned for DNSServiceQueryRecord.
-	 */
+    /*
+     * When kDNServiceFlagsTimeout is passed to DNSServiceQueryRecord or DNSServiceGetAddrInfo, the query is
+     * stopped after a certain number of seconds have elapsed. The time at which the query will be stopped
+     * is determined by the system and cannot be configured by the user. The query will be stopped irrespective
+     * of whether a response was given earlier or not. When the query is stopped, the callback will be called
+     * with an error code of kDNSServiceErr_Timeout and a NULL sockaddr will be returned for DNSServiceGetAddrInfo
+     * and zero length rdata will be returned for DNSServiceQueryRecord.
+     */
 
     kDNSServiceFlagsIncludeP2P          = 0x20000,
-	/*
-	 * Include P2P interfaces when kDNSServiceInterfaceIndexAny is specified.
-	 * By default, specifying kDNSServiceInterfaceIndexAny does not include P2P interfaces.
-	 */
-	kDNSServiceFlagsWakeOnResolve      = 0x40000
-	/*
-	 * This flag is meaningful only in DNSServiceResolve. When set, it tries to send a magic packet
-	 * to wake up the client.
-	 */
+    /*
+     * Include P2P interfaces when kDNSServiceInterfaceIndexAny is specified.
+     * By default, specifying kDNSServiceInterfaceIndexAny does not include P2P interfaces.
+     */
+    kDNSServiceFlagsWakeOnResolve      = 0x40000
+    /*
+     * This flag is meaningful only in DNSServiceResolve. When set, it tries to send a magic packet
+     * to wake up the client.
+     */
     };
 
 /* Possible protocols for DNSServiceNATPortMappingCreate(). */
@@ -379,7 +379,7 @@ enum
     kDNSServiceProtocol_IPv4 = 0x01,
     kDNSServiceProtocol_IPv6 = 0x02,
     /* 0x04 and 0x08 reserved for future internetwork protocols */
-    
+
     kDNSServiceProtocol_UDP  = 0x10,
     kDNSServiceProtocol_TCP  = 0x20
     /* 0x40 and 0x80 reserved for future transport protocols, e.g. SCTP [RFC 2960]
@@ -621,8 +621,8 @@ enum
  *
  * If applications pass kDNSServiceInterfaceIndexAny to DNSServiceBrowse
  * or DNSServiceQueryRecord, they must set the kDNSServiceFlagsIncludeP2P flag
- * to include P2P. In this case, if a service instance or the record being queried 
- * is found over P2P, the resulting ADD event will indicate kDNSServiceInterfaceIndexP2P 
+ * to include P2P. In this case, if a service instance or the record being queried
+ * is found over P2P, the resulting ADD event will indicate kDNSServiceInterfaceIndexP2P
  * as the interface index.
  */
 
@@ -974,7 +974,7 @@ typedef void (DNSSD_API *DNSServiceRegisterReply)
  *                  bit byte values, including zero bytes. However, due to the nature of
  *                  using a C-string-based API, conventional DNS escaping must be used for
  *                  dots ('.'), commas (','), backslashes ('\') and zero bytes, as shown below:
- *                  
+ *
  *                  % dns-sd -R Test '_test._tcp,s\.one,s\,two,s\\three,s\000four' local 123
  *
  * domain:          If non-NULL, specifies the domain on which to advertise the service.
