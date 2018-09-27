@@ -17,6 +17,7 @@
 #include <sys/resource.h>
 #ifdef __APPLE__
 #  include <xpc/xpc.h>
+#  include <pthread/qos.h>
 #endif /* __APPLE__ */
 #ifdef HAVE_ASL_H
 #  include <asl.h>
@@ -1925,6 +1926,14 @@ service_checkin(void)
     size_t    i,                            /* Looping var */
               count;                        /* Number of listeners */
     int       *ld_sockets;                  /* Listener sockets */
+
+#  ifdef __APPLE__
+   /*
+    * Force "user initiated" priority for the main thread...
+    */
+
+    pthread_set_qos_class_self_np(QOS_CLASS_USER_INITIATED, 0);
+#  endif /* __APPLE__ */
 
    /*
     * Check-in with launchd...
