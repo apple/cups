@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-06-05 11:58-0400\n"
+"POT-Creation-Date: 2018-09-28 11:22-0400\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -1841,6 +1841,10 @@ msgid "%s: Unable to open PPD file: %s on line %d."
 msgstr "%1$s：无法打开 PPD 文件：行 %3$d 上的 %2$s。"
 
 #, c-format
+msgid "%s: Unable to query printer: %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
 msgstr "%s：无法从“%s”或“%s”读取 MIME 数据库。"
 
@@ -2766,6 +2770,9 @@ msgstr ""
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "无效的“document-format”值“%s”。"
+
+msgid "Bad CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Bad NULL dests pointer"
 msgstr "无效的 NULL 目标指针"
@@ -4112,6 +4119,9 @@ msgstr "中间"
 
 msgid "Missing CloseGroup"
 msgstr "缺少 CloseGroup"
+
+msgid "Missing CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Missing PPD-Adobe-4.x header"
 msgstr "缺少 PPD-Adobe-4.x 文件头"

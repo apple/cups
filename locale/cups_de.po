@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-06-05 11:58-0400\n"
+"POT-Creation-Date: 2018-09-28 11:22-0400\n"
 "PO-Revision-Date: 2017-10-25 14:57+0200\n"
 "Last-Translator: Michael Weghorn <m.weghorn@posteo.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1778,6 +1778,10 @@ msgid "%s: Unable to open PPD file: %s on line %d."
 msgstr "%s: Öffnen der PPD Datei: %s in Zeile %d."
 
 #, c-format
+msgid "%s: Unable to query printer: %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
 msgstr "%s: Lesen der MIME Datenbank von \"%s\" oder \"%s\" nicht möglich."
 
@@ -2709,6 +2713,9 @@ msgstr ""
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "Fehlerhafter 'document-format' Wert \"%s\"."
+
+msgid "Bad CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Bad NULL dests pointer"
 msgstr "Ungültiger NULL-Dests-Pointer"
@@ -4050,6 +4057,9 @@ msgstr ""
 
 msgid "Missing CloseGroup"
 msgstr "Fehlendes CloseGroup"
+
+msgid "Missing CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Missing PPD-Adobe-4.x header"
 msgstr "PPD-Adobe-4.x Header fehlt"

@@ -1242,7 +1242,12 @@ get_printer_ppd(
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]), NULL, pattrs);
   response = cupsDoRequest(http, request, resource);
 
-  if (_ppdCreateFromIPP(buffer, bufsize, response))
+  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
+  {
+    _cupsLangPrintf(stderr, _("%s: Unable to query printer: %s"), "lpadmin", cupsLastErrorString());
+    buffer[0] = '\0';
+  }
+  else if (_ppdCreateFromIPP(buffer, bufsize, response))
   {
     if (!cupsGetOption("printer-geo-location", *num_options, *options) && (attr = ippFindAttribute(response, "printer-geo-location", IPP_TAG_URI)) != NULL)
       *num_options = cupsAddOption("printer-geo-location", ippGetString(attr, 0, NULL), *num_options, options);
