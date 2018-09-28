@@ -3790,6 +3790,12 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
   if ((attr = ippFindAttribute(response, "output-bin-supported", IPP_TAG_ZERO)) != NULL && (count = ippGetCount(attr)) > 1)
   {
+    ipp_attribute_t	*trays = ippFindAttribute(response, "printer-output-tray", IPP_TAG_STRING);
+					/* printer-output-tray attribute, if any */
+    const char		*tray_ptr;	/* printer-output-tray value */
+    int			tray_len;	/* Len of printer-output-tray value */
+    char		tray[IPP_MAX_OCTETSTRING];
+					/* printer-output-tray string value */
     static const char * const output_bins[][2] =
     {					/* "output-bin" strings */
       { "auto", _("Automatic") },
@@ -3840,6 +3846,11 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     cupsFilePrintf(fp, "*OpenUI *OutputBin: PickOne\n"
                        "*OrderDependency: 10 AnySetup *OutputBin\n"
                        "*DefaultOutputBin: %s\n", ppdname);
+    if (!strcmp(ppdname, "FaceUp"))
+      cupsFilePuts(fp, "*DefaultOutputOrder: Reverse\n");
+    else
+      cupsFilePuts(fp, "*DefaultOutputOrder: Normal\n");
+
     for (i = 0; i < (int)(sizeof(output_bins) / sizeof(output_bins[0])); i ++)
     {
       if (!ippContainsString(attr, output_bins[i][0]))
@@ -3849,6 +3860,24 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       cupsFilePrintf(fp, "*OutputBin %s: \"\"\n", ppdname);
       cupsFilePrintf(fp, "*%s.OutputBin %s/%s: \"\"\n", lang->language, ppdname, _cupsLangString(lang, output_bins[i][1]));
+
+      if ((tray_ptr = ippGetOctetString(trays, i, &tray_len)) != NULL)
+      {
+        if (tray_len >= (int)sizeof(tray))
+          tray_len = (int)sizeof(tray) - 1;
+
+        memcpy(tray, tray_ptr, tray_len);
+        tray[tray_len] = '\0';
+
+        if (strstr(tray, "stackingorder=lastToFirst;"))
+          cupsFilePrintf(fp, "*PageStackOrder %s: Reverse\n", ppdname);
+        else
+          cupsFilePrintf(fp, "*PageStackOrder %s: Normal\n", ppdname);
+      }
+      else if (!strcmp(ppdname, "FaceUp"))
+	cupsFilePrintf(fp, "*PageStackOrder %s: Reverse\n", ppdname);
+      else
+	cupsFilePrintf(fp, "*PageStackOrder %s: Normal\n", ppdname);
     }
     cupsFilePuts(fp, "*CloseUI: *OutputBin\n");
   }

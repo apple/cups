@@ -1,4 +1,4 @@
-CHANGES - 2.2.9 - 2018-09-18
+CHANGES - 2.2.9 - 2018-09-28
 ============================
 
 
@@ -16,6 +16,8 @@ Changes in CUPS v2.2.9
 - Fixed a crash bug in the Epson dot matrix driver (Issue #5323)
 - Automatic debug logging of job errors did not work with systemd (Issue #5337)
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
+- The IPP Everywhere "driver" now properly supports face-up printers
+  (Issue #5345)
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
