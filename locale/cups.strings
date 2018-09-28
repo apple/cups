@@ -427,6 +427,7 @@
 "%s: Unable to open \"%s\": %s" = "%s: Unable to open “%s”: %s";
 "%s: Unable to open %s: %s" = "%s: Unable to open %s: %s";
 "%s: Unable to open PPD file: %s on line %d." = "%s: Unable to open PPD file: %s on line %d.";
+"%s: Unable to query printer: %s" = "%s: Unable to query printer: %s";
 "%s: Unable to read MIME database from \"%s\" or \"%s\"." = "%s: Unable to read MIME database from “%s” or “%s”.";
 "%s: Unable to resolve \"%s\"." = "%s: Unable to resolve “%s”.";
 "%s: Unknown argument \"%s\"." = "%s: Unknown argument “%s”.";
@@ -706,6 +707,7 @@
 "Bad \"printer-id\" value %d." = "Bad “printer-id” value %d.";
 "Bad '%s' value." = "Bad ‘%s’ value.";
 "Bad 'document-format' value \"%s\"." = "Bad ‘document-format’ value “%s”.";
+"Bad CloseUI/JCLCloseUI" = "Bad CloseUI/JCLCloseUI";
 "Bad NULL dests pointer" = "Bad NULL dests pointer";
 "Bad OpenGroup" = "Bad OpenGroup";
 "Bad OpenUI/JCLOpenUI" = "Bad OpenUI/JCLOpenUI";
@@ -1017,6 +1019,7 @@
 "Medium" = "Medium";
 "Memory allocation error" = "Memory allocation error";
 "Missing CloseGroup" = "Missing CloseGroup";
+"Missing CloseUI/JCLCloseUI" = "Missing CloseUI/JCLCloseUI";
 "Missing PPD-Adobe-4.x header" = "Missing PPD-Adobe-4.x header";
 "Missing asterisk in column 1" = "Missing asterisk in column 1";
 "Missing document-number attribute." = "Missing document-number attribute.";
@@ -1516,6 +1519,7 @@
 "lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS." = "lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.";
 "lpadmin: Printer name can only contain printable characters." = "lpadmin: Printer name can only contain printable characters.";
 "lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS." = "lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS.";
+"lpadmin: Raw queues are no longer supported on macOS." = "lpadmin: Raw queues are no longer supported on macOS.";
 "lpadmin: System V interface scripts are no longer supported for security reasons." = "lpadmin: System V interface scripts are no longer supported for security reasons.";
 "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first." = "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";

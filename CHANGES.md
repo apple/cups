@@ -23,6 +23,8 @@ Changes in CUPS v2.3b6
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
+- The lpadmin command now correctly reports IPP errors when configuring an
+  IPP Everywhere printer (Issue #5370)
 - Fixed some memory leaks discovered by Coverity (Issue #5375)
 - The PPD compiler incorrectly terminated JCL options (Issue #5379)
 - The cupstestppd utility did not generate errors for missing/mismatched

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-06-05 11:58-0400\n"
+"POT-Creation-Date: 2018-09-28 11:21-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -1907,6 +1907,10 @@ msgid "%s: Unable to open PPD file: %s on line %d."
 msgstr "%s: non è possibile aprire il file PPD: %s alla riga %d."
 
 #, c-format
+msgid "%s: Unable to query printer: %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
 msgstr ""
 "%s: non è possibile leggere il database del MIME da \"%s\" oppure da \"%s\"."
@@ -2772,6 +2776,9 @@ msgstr ""
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
 msgstr "Il valore di 'document-format' non è valido \"%s\"."
+
+msgid "Bad CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Bad NULL dests pointer"
 msgstr "Le destinazioni del puntatore NULL non sono valide"
@@ -3779,6 +3786,9 @@ msgstr "Errore di allocazione della memoria"
 
 msgid "Missing CloseGroup"
 msgstr "Manca CloseGroup"
+
+msgid "Missing CloseUI/JCLCloseUI"
+msgstr ""
 
 msgid "Missing PPD-Adobe-4.x header"
 msgstr "Manca la libreria di PPD-Adobe-4.x"
@@ -7212,6 +7222,9 @@ msgstr ""
 msgid ""
 "lpadmin: Raw queues are deprecated and will stop working in a future version "
 "of CUPS."
+msgstr ""
+
+msgid "lpadmin: Raw queues are no longer supported on macOS."
 msgstr ""
 
 msgid ""
