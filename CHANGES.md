@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-09-18
+CHANGES - 2.3b6 - 2018-09-28
 ============================
 
 Changes in CUPS v2.3b6
@@ -18,6 +18,8 @@ Changes in CUPS v2.3b6
 - The web interface did not list the IPP Everywhere "driver" (Issue #5338)
 - The scheduler did not report all of the supported job options and values
   (Issue #5340)
+- The IPP Everywhere "driver" now properly supports face-up printers
+  (Issue #5345)
 - Fixed some typos in the label printer drivers (Issue #5350)
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
