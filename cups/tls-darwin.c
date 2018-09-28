@@ -15,7 +15,50 @@
 
 #include <spawn.h>
 
-extern char **environ; /* @private@ */
+extern char **environ;
+
+
+#ifdef HAVE_SECURETRANSPORTPRIV_H
+#  include <Security/SecureTransportPriv.h>
+#endif /* HAVE_SECURETRANSPORTPRIV_H */
+#ifdef HAVE_SECBASEPRIV_H
+#  include <Security/SecBasePriv.h>
+#endif /* HAVE_SECBASEPRIV_H */
+#ifdef HAVE_SECCERTIFICATEPRIV_H
+#  include <Security/SecCertificatePriv.h>
+#else
+#  ifndef _SECURITY_VERSION_GREATER_THAN_57610_
+typedef CF_OPTIONS(uint32_t, SecKeyUsage) {
+    kSecKeyUsageAll              = 0x7FFFFFFF
+};
+#  endif /* !_SECURITY_VERSION_GREATER_THAN_57610_ */
+extern const void * kSecCSRChallengePassword;
+extern const void * kSecSubjectAltName;
+extern const void * kSecCertificateKeyUsage;
+extern const void * kSecCSRBasicContraintsPathLen;
+extern const void * kSecCertificateExtensions;
+extern const void * kSecCertificateExtensionsEncoded;
+extern const void * kSecOidCommonName;
+extern const void * kSecOidCountryName;
+extern const void * kSecOidStateProvinceName;
+extern const void * kSecOidLocalityName;
+extern const void * kSecOidOrganization;
+extern const void * kSecOidOrganizationalUnit;
+extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
+extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
+extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
+extern SecCertificateRef SecGenerateSelfSignedCertificate(CFArrayRef subject, CFDictionaryRef parameters, SecKeyRef publicKey, SecKeyRef privateKey);
+extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificateRef certificate, SecKeyRef privateKey);
+#endif /* HAVE_SECCERTIFICATEPRIV_H */
+#ifdef HAVE_SECITEMPRIV_H
+#  include <Security/SecItemPriv.h>
+#endif /* HAVE_SECITEMPRIV_H */
+#ifdef HAVE_SECIDENTITYSEARCHPRIV_H
+#  include <Security/SecIdentitySearchPriv.h>
+#endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
+#ifdef HAVE_SECPOLICYPRIV_H
+#  include <Security/SecPolicyPriv.h>
+#endif /* HAVE_SECPOLICYPRIV_H */
 
 
 /*

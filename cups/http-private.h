@@ -72,60 +72,13 @@ typedef int socklen_t;
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
 #    include <Security/SecureTransport.h>
-#    ifdef HAVE_SECURETRANSPORTPRIV_H
-#      include <Security/SecureTransportPriv.h>
-#    endif /* HAVE_SECURETRANSPORTPRIV_H */
 #    ifdef HAVE_SECITEM_H
 #      include <Security/SecItem.h>
 #    endif /* HAVE_SECITEM_H */
-#    ifdef HAVE_SECBASEPRIV_H
-#      include <Security/SecBasePriv.h>
-#    endif /* HAVE_SECBASEPRIV_H */
 #    ifdef HAVE_SECCERTIFICATE_H
 #      include <Security/SecCertificate.h>
 #      include <Security/SecIdentity.h>
 #    endif /* HAVE_SECCERTIFICATE_H */
-#    ifdef HAVE_SECCERTIFICATEPRIV_H
-#      include <Security/SecCertificatePriv.h>
-#    else
-#      ifdef __cplusplus
-extern "C" {
-#      endif /* __cplusplus */
-#      ifndef _SECURITY_VERSION_GREATER_THAN_57610_
-typedef CF_OPTIONS(uint32_t, SecKeyUsage) {
-    kSecKeyUsageAll              = 0x7FFFFFFF
-};
-#       endif /* !_SECURITY_VERSION_GREATER_THAN_57610_ */
-extern const void * kSecCSRChallengePassword;
-extern const void * kSecSubjectAltName;
-extern const void * kSecCertificateKeyUsage;
-extern const void * kSecCSRBasicContraintsPathLen;
-extern const void * kSecCertificateExtensions;
-extern const void * kSecCertificateExtensionsEncoded;
-extern const void * kSecOidCommonName;
-extern const void * kSecOidCountryName;
-extern const void * kSecOidStateProvinceName;
-extern const void * kSecOidLocalityName;
-extern const void * kSecOidOrganization;
-extern const void * kSecOidOrganizationalUnit;
-extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
-extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
-extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
-extern SecCertificateRef SecGenerateSelfSignedCertificate(CFArrayRef subject, CFDictionaryRef parameters, SecKeyRef publicKey, SecKeyRef privateKey);
-extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificateRef certificate, SecKeyRef privateKey);
-#      ifdef __cplusplus
-}
-#      endif /* __cplusplus */
-#    endif /* HAVE_SECCERTIFICATEPRIV_H */
-#    ifdef HAVE_SECITEMPRIV_H
-#      include <Security/SecItemPriv.h>
-#    endif /* HAVE_SECITEMPRIV_H */
-#    ifdef HAVE_SECIDENTITYSEARCHPRIV_H
-#      include <Security/SecIdentitySearchPriv.h>
-#    endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
-#    ifdef HAVE_SECPOLICYPRIV_H
-#      include <Security/SecPolicyPriv.h>
-#    endif /* HAVE_SECPOLICYPRIV_H */
 #  elif defined(HAVE_SSPISSL)
 #    include <wincrypt.h>
 #    include <wintrust.h>
