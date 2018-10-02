@@ -34,7 +34,7 @@ echo $ac_n "Waiting for jobs to complete...$ac_c"
 oldjobs=0
 
 while test $timeout -gt 0; do
-	jobs=`../systemv/lpstat 2>/dev/null | wc -l | tr -d ' '`
+	jobs=`$runcups ../systemv/lpstat 2>/dev/null | wc -l | tr -d ' '`
 	if test $jobs = 0; then
 		break
 	fi

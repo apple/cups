@@ -12,7 +12,7 @@
 echo "LP Default Test"
 echo ""
 echo "    lp testfile.pdf"
-$VALGRIND ../systemv/lp testfile.pdf 2>&1
+$runcups $VALGRIND ../systemv/lp testfile.pdf 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -24,7 +24,7 @@ echo ""
 echo "LP Destination Test"
 echo ""
 echo "    lp -d Test3 -o fit-to-page testfile.jpg"
-$VALGRIND ../systemv/lp -d Test3 -o fit-to-page testfile.jpg 2>&1
+$runcups $VALGRIND ../systemv/lp -d Test3 -o fit-to-page testfile.jpg 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -36,7 +36,7 @@ echo ""
 echo "LP Options Test"
 echo ""
 echo "    lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf"
-$VALGRIND ../systemv/lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf 2>&1
+$runcups $VALGRIND ../systemv/lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -54,13 +54,13 @@ pids=""
 while test $i -lt $1; do
 	j=1
 	while test $j -le $2; do
-		$VALGRIND ../systemv/lp -d test-$j testfile.jpg 2>&1
+		$runcups $VALGRIND ../systemv/lp -d test-$j testfile.jpg 2>&1
 		j=`expr $j + 1`
 	done
 
-	$VALGRIND ../systemv/lp -d Test1 testfile.jpg 2>&1 &
+	$runcups $VALGRIND ../systemv/lp -d Test1 testfile.jpg 2>&1 &
 	pids="$pids $!"
-	$VALGRIND ../systemv/lp -d Test2 testfile.jpg 2>&1 &
+	$runcups $VALGRIND ../systemv/lp -d Test2 testfile.jpg 2>&1 &
 	pids="$pids $!"
 
 	i=`expr $i + 1`
@@ -79,7 +79,7 @@ echo ""
 echo "LPSTAT Completed Jobs Order Test"
 echo ""
 echo "    lpstat -W completed -o"
-$VALGRIND ../systemv/lpstat -W completed -o | tee $BASE/lpstat-completed.txt
+$runcups $VALGRIND ../systemv/lpstat -W completed -o | tee $BASE/lpstat-completed.txt
 if test "`uniq -d $BASE/lpstat-completed.txt`" != ""; then
 	echo "    FAILED"
 	exit 1

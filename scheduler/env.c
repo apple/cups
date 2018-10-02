@@ -201,6 +201,7 @@ cupsdUpdateEnv(void)
   set_if_undefined("CUPS_SERVERBIN", ServerBin);
   set_if_undefined("CUPS_SERVERROOT", ServerRoot);
   set_if_undefined("CUPS_STATEDIR", StateDir);
+  set_if_undefined("DYLD_INSERT_LIBRARIES", NULL);
   set_if_undefined("DYLD_LIBRARY_PATH", NULL);
   set_if_undefined("HOME", TempDir);
   set_if_undefined("LD_ASSUME_KERNEL", NULL);

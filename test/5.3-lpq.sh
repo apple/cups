@@ -12,7 +12,7 @@
 echo "LPQ Test"
 echo ""
 echo "    lpq -P Test1"
-$VALGRIND ../berkeley/lpq -P Test1 2>&1
+$runcups $VALGRIND ../berkeley/lpq -P Test1 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1

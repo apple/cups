@@ -12,7 +12,7 @@
 echo "LPINFO Devices Test"
 echo ""
 echo "    lpinfo -v"
-$VALGRIND ../systemv/lpinfo -v 2>&1
+$runcups $VALGRIND ../systemv/lpinfo -v 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -24,7 +24,7 @@ echo ""
 echo "LPINFO Drivers Test"
 echo ""
 echo "    lpinfo -m"
-$VALGRIND ../systemv/lpinfo -m 2>&1
+$runcups $VALGRIND ../systemv/lpinfo -m 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -36,7 +36,7 @@ echo ""
 echo "LPINFO Drivers Test"
 echo ""
 echo "    lpinfo -m | grep -q sample.drv"
-$VALGRIND ../systemv/lpinfo -m | grep -q sample.drv 2>&1
+$runcups $VALGRIND ../systemv/lpinfo -m | grep -q sample.drv 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1

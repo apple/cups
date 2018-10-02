@@ -12,7 +12,7 @@
 echo "LPSTAT Basic Test"
 echo ""
 echo "    lpstat -t"
-$VALGRIND ../systemv/lpstat -t 2>&1
+$runcups $VALGRIND ../systemv/lpstat -t 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -24,7 +24,7 @@ echo ""
 echo "LPSTAT Enumeration Test"
 echo ""
 echo "    lpstat -e"
-printers="`$VALGRIND ../systemv/lpstat -e 2>&1`"
+printers="`$runcups $VALGRIND ../systemv/lpstat -e 2>&1`"
 if test $? != 0 -o "x$printers" = x; then
 	echo "    FAILED"
 	exit 1
@@ -39,7 +39,7 @@ echo ""
 echo "LPSTAT Get Host Test"
 echo ""
 echo "    lpstat -H"
-server="`$VALGRIND ../systemv/lpstat -H 2>&1`"
+server="`$runcups $VALGRIND ../systemv/lpstat -H 2>&1`"
 if test $? != 0 -o "x$server" != x$CUPS_SERVER; then
 	echo "    FAILED ($server)"
 	exit 1
