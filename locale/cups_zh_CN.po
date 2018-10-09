@@ -13,14 +13,14 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2018-09-28 11:21-0400\n"
-"PO-Revision-Date: 2018-06-12 16:24+0800\n"
-"Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
+"PO-Revision-Date: 2018-10-09 00:21-0500\n"
+"Last-Translator: Mingcong Bai <jeffbai@aosc.io>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.0.9\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "\t\t(all)"
@@ -1834,7 +1834,7 @@ msgstr "%1$s：无法打开 PPD 文件：行 %3$d 上的 %2$s。"
 
 #, c-format
 msgid "%s: Unable to query printer: %s"
-msgstr ""
+msgstr "%s：无法查询打印机：%s"
 
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
@@ -2699,7 +2699,7 @@ msgid "Bad 'document-format' value \"%s\"."
 msgstr "无效的“document-format”值“%s”。"
 
 msgid "Bad CloseUI/JCLCloseUI"
-msgstr ""
+msgstr "无效的 CloseUI/JCLCloseUI"
 
 msgid "Bad NULL dests pointer"
 msgstr "无效的 NULL 目标指针"
@@ -3707,7 +3707,7 @@ msgid "Missing CloseGroup"
 msgstr "缺少 CloseGroup"
 
 msgid "Missing CloseUI/JCLCloseUI"
-msgstr ""
+msgstr "缺少 CloseUI/JCLCloseUI"
 
 msgid "Missing PPD-Adobe-4.x header"
 msgstr "缺少 PPD-Adobe-4.x 文件头"
@@ -7107,7 +7107,7 @@ msgid ""
 msgstr "lpadmin：原始序列已被弃用，未来的 CUPS 版本可能破坏其功能性。"
 
 msgid "lpadmin: Raw queues are no longer supported on macOS."
-msgstr ""
+msgstr "lpadmin：macOS 已不再支持原始序列。"
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
