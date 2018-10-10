@@ -18,7 +18,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <winsock.h>
 #else
 #  include <unistd.h>
@@ -27,7 +27,7 @@
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
 #  include <netdb.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*

@@ -15,12 +15,12 @@
 #  include <time.h>
 #  include <sys/stat.h>
 
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <direct.h>
 #    include <io.h>
 #  else
 #    include <unistd.h>
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 #  include <cups/cups.h>
 #  include <cups/array.h>

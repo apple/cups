@@ -1083,7 +1083,7 @@ mime_check_rules(
 	  break;
 
       case MIME_MAGIC_LOCALE :
-#if defined(WIN32) || defined(__EMX__) || defined(__APPLE__)
+#if defined(_WIN32) || defined(__EMX__) || defined(__APPLE__)
           result = !strcmp(rules->value.localev, setlocale(LC_ALL, ""));
 #else
           result = !strcmp(rules->value.localev, setlocale(LC_MESSAGES, ""));

@@ -20,9 +20,9 @@
 #include "data/epson.h"
 #include "data/hp.h"
 #include "data/label.h"
-#ifndef WIN32
+#ifndef _WIN32
 #  include <sys/utsname.h>
-#endif // !WIN32
+#endif // !_WIN32
 
 
 //
@@ -70,7 +70,7 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
   vars->add(new ppdcVariable("CUPS_VERSION_MINOR", MAKE_STRING(CUPS_VERSION_MINOR)));
   vars->add(new ppdcVariable("CUPS_VERSION_PATCH", MAKE_STRING(CUPS_VERSION_PATCH)));
 
-#ifdef WIN32
+#ifdef _WIN32
   vars->add(new ppdcVariable("PLATFORM_NAME", "Windows"));
   vars->add(new ppdcVariable("PLATFORM_ARCH", "X86"));
 
@@ -87,7 +87,7 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
     vars->add(new ppdcVariable("PLATFORM_NAME", "unknown"));
     vars->add(new ppdcVariable("PLATFORM_ARCH", "unknown"));
   }
-#endif // WIN32
+#endif // _WIN32
 
   if (f)
     read_file(f, ffp);

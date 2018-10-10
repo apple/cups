@@ -18,9 +18,9 @@
 #include <cups/ppd-private.h>
 #include <cups/raster.h>
 #include <math.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  define X_OK 0
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*

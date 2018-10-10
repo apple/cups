@@ -19,14 +19,14 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <winsock.h>
 #else
 #  include <sys/socket.h>
 #  include <netinet/in.h>
 #  include <arpa/inet.h>
 #  include <netdb.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #ifdef __APPLE__
 #  include <CoreFoundation/CFNumber.h>
 #  include <CoreFoundation/CFPreferences.h>
@@ -618,11 +618,11 @@ cups_rresvport(int *port,		/* IO - Port number to bind to */
   * -1...
   */
 
-#ifdef WIN32
+#ifdef _WIN32
   closesocket(fd);
 #else
   close(fd);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
   return (-1);
 }
@@ -730,11 +730,11 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
   ssize_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
   char			buffer[32768];	/* Output buffer */
-#ifdef WIN32
+#ifdef _WIN32
   DWORD			tv;		/* Timeout in milliseconds */
 #else
   struct timeval	tv;		/* Timeout in secs and usecs */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
  /*
@@ -917,7 +917,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
     * Set the timeout...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     tv = (DWORD)(timeout * 1000);
 
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
@@ -928,7 +928,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     fputs("STATE: -connecting-to-device\n", stderr);
     _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
