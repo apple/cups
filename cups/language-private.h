@@ -61,8 +61,8 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
 extern const char	*_cupsAppleLanguage(const char *locale, char *language, size_t langsize) _CUPS_PRIVATE;
 extern const char	*_cupsAppleLocale(CFStringRef languageName, char *locale, size_t localesize) _CUPS_PRIVATE;
 #  endif /* __APPLE__ */
-extern void		_cupsCharmapFlush(void) _CUPS_PRIVATE;
-extern const char	*_cupsEncodingName(cups_encoding_t encoding) _CUPS_PRIVATE;
+extern void		_cupsCharmapFlush(void) _CUPS_INTERNAL;
+extern const char	*_cupsEncodingName(cups_encoding_t encoding) _CUPS_INTERNAL;
 extern void		_cupsLangPrintError(const char *prefix, const char *message) _CUPS_PRIVATE;
 extern int		_cupsLangPrintFilter(FILE *fp, const char *prefix, const char *message, ...) _CUPS_FORMAT(3, 4) _CUPS_PRIVATE;
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...) _CUPS_FORMAT(2, 3) _CUPS_PRIVATE;

@@ -230,7 +230,7 @@ extern void		_cupsAppleSetUseLastPrinter(int uselast) _CUPS_PRIVATE;
 extern char		*_cupsBufferGet(size_t size) _CUPS_PRIVATE;
 extern void		_cupsBufferRelease(char *b) _CUPS_PRIVATE;
 
-extern http_t		*_cupsConnect(void) _CUPS_PRIVATE;
+extern http_t		*_cupsConnect(void) _CUPS_INTERNAL;
 extern char		*_cupsCreateDest(const char *name, const char *info, const char *device_id, const char *device_uri, char *uri, size_t urisize) _CUPS_PRIVATE;
 extern ipp_attribute_t	*_cupsEncodeOption(ipp_t *ipp, ipp_tag_t group_tag, _ipp_option_t *map, const char *name, const char *value) _CUPS_PRIVATE;
 extern int		_cupsGet1284Values(const char *device_id, cups_option_t **values) _CUPS_PRIVATE;
@@ -244,13 +244,13 @@ extern void		_cupsGlobalUnlock(void) _CUPS_PRIVATE;
 extern const char	*_cupsGSSServiceName(void) _CUPS_PRIVATE;
 #  endif /* HAVE_GSSAPI */
 extern int		_cupsNextDelay(int current, int *previous) _CUPS_PRIVATE;
-extern void		_cupsSetDefaults(void) _CUPS_PRIVATE;
+extern void		_cupsSetDefaults(void) _CUPS_INTERNAL;
 extern void		_cupsSetError(ipp_status_t status, const char *message, int localize) _CUPS_PRIVATE;
-extern void		_cupsSetHTTPError(http_status_t status) _CUPS_PRIVATE;
+extern void		_cupsSetHTTPError(http_status_t status) _CUPS_INTERNAL;
 #  ifdef HAVE_GSSAPI
 extern int		_cupsSetNegotiateAuthString(http_t *http, const char *method, const char *resource) _CUPS_PRIVATE;
 #  endif /* HAVE_GSSAPI */
-extern char		*_cupsUserDefault(char *name, size_t namesize) _CUPS_PRIVATE;
+extern char		*_cupsUserDefault(char *name, size_t namesize) _CUPS_INTERNAL;
 
 
 /*
