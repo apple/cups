@@ -22,7 +22,9 @@
  *   - _CUPS_FORMAT(format-index, additional-args-index): Function has a
  *     printf-style format argument followed by zero or more additional
  *     arguments.  Indices start at 1.
- *   - _CUPS_INTERNAL_MSG("msg"): Function is
+ *   - _CUPS_INTERNAL: Function is internal with no replacement API.
+ *   - _CUPS_INTERNAL_MSG("msg"): Function is internal - use specified API
+ *     instead.
  *   - _CUPS_NONNULL((arg list)): Specifies the comma-separated argument indices
  *     are assumed non-NULL.  Indices start at 1.
  *   - _CUPS_NORETURN: Specifies the function does not return.
@@ -67,17 +69,20 @@
 
 
 /*
- * Define _CUPS_PRIVATE and _CUPS_PUBLIC visibilty macros for private/public
- * functions...
+ * Define _CUPS_INTERNAL, _CUPS_PRIVATE, and _CUPS_PUBLIC visibilty macros for
+ * internal/private/public functions...
  */
 
 #  ifdef _CUPS_HAS_VISIBILITY
-#    define _CUPS_PRIVATE	__attribute__ ((visibility("hidden")))
+#    define _CUPS_INTERNAL	__attribute__ ((visibility("hidden")))
+#    define _CUPS_PRIVATE	__attribute__ ((visibility("default")))
 #    define _CUPS_PUBLIC	__attribute__ ((visibility("default")))
 #  elif defined(_WIN32) && defined(LIBCUPS2_EXPORTS)
-#    define _CUPS_PRIVATE
+#    define _CUPS_INTERNAL
+#    define _CUPS_PRIVATE	__declspec(dllexport)
 #    define _CUPS_PUBLIC	__declspec(dllexport)
 #  else
+#    define _CUPS_INTERNAL
 #    define _CUPS_PRIVATE
 #    define _CUPS_PUBLIC
 #  endif /* _CUPS_HAS_VISIBILITY */

@@ -192,21 +192,21 @@ struct _ipp_file_s			/**** File Parser */
 
 /* encode.c */
 #ifdef DEBUG
-extern const char	*_ippCheckOptions(void);
+extern const char	*_ippCheckOptions(void) _CUPS_PRIVATE;
 #endif /* DEBUG */
-extern _ipp_option_t	*_ippFindOption(const char *name);
+extern _ipp_option_t	*_ippFindOption(const char *name) _CUPS_PRIVATE;
 
 /* ipp-file.c */
-extern ipp_t		*_ippFileParse(_ipp_vars_t *v, const char *filename, void *user_data);
-extern int		_ippFileReadToken(_ipp_file_t *f, char *token, size_t tokensize);
+extern ipp_t		*_ippFileParse(_ipp_vars_t *v, const char *filename, void *user_data) _CUPS_PRIVATE;
+extern int		_ippFileReadToken(_ipp_file_t *f, char *token, size_t tokensize) _CUPS_PRIVATE;
 
 /* ipp-vars.c */
-extern void		_ippVarsDeinit(_ipp_vars_t *v);
-extern void		_ippVarsExpand(_ipp_vars_t *v, char *dst, const char *src, size_t dstsize) _CUPS_NONNULL(1,2,3);
-extern const char	*_ippVarsGet(_ipp_vars_t *v, const char *name);
-extern void		_ippVarsInit(_ipp_vars_t *v, _ipp_fattr_cb_t attrcb, _ipp_ferror_cb_t errorcb, _ipp_ftoken_cb_t tokencb);
-extern const char	*_ippVarsPasswordCB(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data);
-extern int		_ippVarsSet(_ipp_vars_t *v, const char *name, const char *value);
+extern void		_ippVarsDeinit(_ipp_vars_t *v) _CUPS_PRIVATE;
+extern void		_ippVarsExpand(_ipp_vars_t *v, char *dst, const char *src, size_t dstsize) _CUPS_NONNULL(1,2,3) _CUPS_PRIVATE;
+extern const char	*_ippVarsGet(_ipp_vars_t *v, const char *name) _CUPS_PRIVATE;
+extern void		_ippVarsInit(_ipp_vars_t *v, _ipp_fattr_cb_t attrcb, _ipp_ferror_cb_t errorcb, _ipp_ftoken_cb_t tokencb) _CUPS_PRIVATE;
+extern const char	*_ippVarsPasswordCB(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data) _CUPS_PRIVATE;
+extern int		_ippVarsSet(_ipp_vars_t *v, const char *name, const char *value) _CUPS_PRIVATE;
 
 
 /*

@@ -44,9 +44,8 @@
  * Prototypes...
  */
 
-extern int		_cupsRasterExecPS(cups_page_header2_t *h, int *preferred_bits,
-			                  const char *code) _CUPS_NONNULL(3);
-extern void		_cupsRasterAddError(const char *f, ...) _CUPS_FORMAT(1,2);
-extern void		_cupsRasterClearError(void);
+extern int		_cupsRasterExecPS(cups_page_header2_t *h, int *preferred_bits, const char *code) _CUPS_NONNULL(3) _CUPS_PRIVATE;
+extern void		_cupsRasterAddError(const char *f, ...) _CUPS_FORMAT(1,2) _CUPS_PRIVATE;
+extern void		_cupsRasterClearError(void) _CUPS_PRIVATE;
 
 #endif /* !_CUPS_RASTER_PRIVATE_H_ */

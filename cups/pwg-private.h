@@ -38,8 +38,8 @@ extern void		_pwgGenerateSize(char *keyword, size_t keysize,
 extern int		_pwgInitSize(pwg_size_t *size, ipp_t *job,
 				     int *margins_set)
 				     _CUPS_INTERNAL_MSG("Use pwgInitSize instead.");
-extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
-extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon);
+extern const pwg_media_t *_pwgMediaTable(size_t *num_media) _CUPS_PRIVATE;
+extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon) _CUPS_PRIVATE;
 
 #  ifdef __cplusplus
 }

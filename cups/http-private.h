@@ -369,9 +369,9 @@ struct ifaddrs				/**** Interface Structure ****/
 #      define ifa_dstaddr ifa_ifu.ifu_dstaddr
 #    endif /* !ifa_dstaddr */
 
-extern int	_cups_getifaddrs(struct ifaddrs **addrs);
+extern int	_cups_getifaddrs(struct ifaddrs **addrs) _CUPS_PRIVATE;
 #    define getifaddrs _cups_getifaddrs
-extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
+extern void	_cups_freeifaddrs(struct ifaddrs *addrs) _CUPS_PRIVATE;
 #    define freeifaddrs _cups_freeifaddrs
 #  endif /* !_WIN32 && !HAVE_GETIFADDRS */
 
@@ -380,31 +380,31 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
-extern void		_httpAddrSetPort(http_addr_t *addr, int port);
+extern void		_httpAddrSetPort(http_addr_t *addr, int port) _CUPS_PRIVATE;
 extern http_tls_credentials_t
-			_httpCreateCredentials(cups_array_t *credentials);
+			_httpCreateCredentials(cups_array_t *credentials) _CUPS_PRIVATE;
 extern char		*_httpDecodeURI(char *dst, const char *src,
-			                size_t dstsize);
-extern void		_httpDisconnect(http_t *http);
+			                size_t dstsize) _CUPS_PRIVATE;
+extern void		_httpDisconnect(http_t *http) _CUPS_PRIVATE;
 extern char		*_httpEncodeURI(char *dst, const char *src,
-			                size_t dstsize);
-extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
+			                size_t dstsize) _CUPS_PRIVATE;
+extern void		_httpFreeCredentials(http_tls_credentials_t credentials) _CUPS_PRIVATE;
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
-					 void *context);
-extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource);
-extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
-extern void		_httpTLSInitialize(void);
-extern size_t		_httpTLSPending(http_t *http);
-extern int		_httpTLSRead(http_t *http, char *buf, int len);
-extern int		_httpTLSSetCredentials(http_t *http);
-extern void		_httpTLSSetOptions(int options, int min_version, int max_version);
-extern int		_httpTLSStart(http_t *http);
-extern void		_httpTLSStop(http_t *http);
-extern int		_httpTLSWrite(http_t *http, const char *buf, int len);
-extern int		_httpUpdate(http_t *http, http_status_t *status);
-extern int		_httpWait(http_t *http, int msec, int usessl);
+					 void *context) _CUPS_PRIVATE;
+extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource) _CUPS_PRIVATE;
+extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status) _CUPS_PRIVATE;
+extern void		_httpTLSInitialize(void) _CUPS_PRIVATE;
+extern size_t		_httpTLSPending(http_t *http) _CUPS_PRIVATE;
+extern int		_httpTLSRead(http_t *http, char *buf, int len) _CUPS_PRIVATE;
+extern int		_httpTLSSetCredentials(http_t *http) _CUPS_PRIVATE;
+extern void		_httpTLSSetOptions(int options, int min_version, int max_version) _CUPS_PRIVATE;
+extern int		_httpTLSStart(http_t *http) _CUPS_PRIVATE;
+extern void		_httpTLSStop(http_t *http) _CUPS_PRIVATE;
+extern int		_httpTLSWrite(http_t *http, const char *buf, int len) _CUPS_PRIVATE;
+extern int		_httpUpdate(http_t *http, http_status_t *status) _CUPS_PRIVATE;
+extern int		_httpWait(http_t *http, int msec, int usessl) _CUPS_PRIVATE;
 
 
 /*

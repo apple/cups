@@ -101,32 +101,32 @@ typedef void (*cups_snmp_cb_t)(cups_snmp_t *packet, void *data);
 extern "C" {
 #  endif /* __cplusplus */
 
-extern void		_cupsSNMPClose(int fd) _CUPS_API_1_4;
+extern void		_cupsSNMPClose(int fd) _CUPS_PRIVATE;
 extern int		*_cupsSNMPCopyOID(int *dst, const int *src, int dstsize)
-			    _CUPS_API_1_4;
-extern const char	*_cupsSNMPDefaultCommunity(void) _CUPS_API_1_4;
+			    _CUPS_PRIVATE;
+extern const char	*_cupsSNMPDefaultCommunity(void) _CUPS_PRIVATE;
 extern int		_cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
-			    _CUPS_API_1_4;
+			    _CUPS_PRIVATE;
 extern int		_cupsSNMPIsOIDPrefixed(cups_snmp_t *packet,
-			                      const int *prefix) _CUPS_API_1_4;
+			                      const int *prefix) _CUPS_PRIVATE;
 extern char		*_cupsSNMPOIDToString(const int *src, char *dst,
-			                      size_t dstsize) _CUPS_API_1_4;
-extern int		_cupsSNMPOpen(int family) _CUPS_API_1_4;
+			                      size_t dstsize) _CUPS_PRIVATE;
+extern int		_cupsSNMPOpen(int family) _CUPS_PRIVATE;
 extern cups_snmp_t	*_cupsSNMPRead(int fd, cups_snmp_t *packet,
-			               double timeout) _CUPS_API_1_4;
-extern void		_cupsSNMPSetDebug(int level) _CUPS_API_1_4;
+			               double timeout) _CUPS_PRIVATE;
+extern void		_cupsSNMPSetDebug(int level) _CUPS_PRIVATE;
 extern int		*_cupsSNMPStringToOID(const char *src,
 			                      int *dst, int dstsize)
-					      _CUPS_API_1_4;
+					      _CUPS_PRIVATE;
 extern int		_cupsSNMPWalk(int fd, http_addr_t *address, int version,
 			              const char *community, const int *prefix,
 				      double timeout, cups_snmp_cb_t cb,
-				      void *data) _CUPS_API_1_4;
+				      void *data) _CUPS_PRIVATE;
 extern int		_cupsSNMPWrite(int fd, http_addr_t *address, int version,
 				       const char *community,
 				       cups_asn1_t request_type,
 				       const unsigned request_id,
-				       const int *oid) _CUPS_API_1_4;
+				       const int *oid) _CUPS_PRIVATE;
 
 #  ifdef __cplusplus
 }

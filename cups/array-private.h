@@ -30,9 +30,9 @@ extern "C" {
  */
 
 extern int		_cupsArrayAddStrings(cups_array_t *a, const char *s,
-			                     char delim) _CUPS_API_1_5;
+			                     char delim) _CUPS_PRIVATE;
 extern cups_array_t	*_cupsArrayNewStrings(const char *s, char delim)
-			                      _CUPS_API_1_5;
+			                      _CUPS_PRIVATE;
 
 #  ifdef __cplusplus
 }

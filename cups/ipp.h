@@ -746,52 +746,52 @@ typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
  */
 
 extern ipp_attribute_t	*ippAddBoolean(ipp_t *ipp, ipp_tag_t group,
-			               const char *name, char value);
+			               const char *name, char value) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
 			                const char *name, int num_values,
-					const char *values);
+					const char *values) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group,
-			            const char *name, const ipp_uchar_t *value);
+			            const char *name, const ipp_uchar_t *value) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group,
 			               ipp_tag_t value_tag, const char *name,
-				       int value);
+				       int value) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group,
 			                ipp_tag_t value_tag, const char *name,
-					int num_values, const int *values);
+					int num_values, const int *values) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group,
-			             const char *name, int lower, int upper);
+			             const char *name, int lower, int upper) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddRanges(ipp_t *ipp, ipp_tag_t group,
 			              const char *name, int num_values,
-				      const int *lower, const int *upper);
+				      const int *lower, const int *upper) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddResolution(ipp_t *ipp, ipp_tag_t group,
 			                  const char *name, ipp_res_t units,
-					  int xres, int yres);
+					  int xres, int yres) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name, int num_values,
 					   ipp_res_t units, const int *xres,
-					   const int *yres);
-extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
+					   const int *yres) _CUPS_PUBLIC;
+extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group,
 			              ipp_tag_t value_tag, const char *name,
-				      const char *language, const char *value);
+				      const char *language, const char *value) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group,
 			               ipp_tag_t value_tag, const char *name,
 				       int num_values, const char *language,
-				       const char * const *values);
-extern time_t		ippDateToTime(const ipp_uchar_t *date);
-extern void		ippDelete(ipp_t *ipp);
-extern const char	*ippErrorString(ipp_status_t error);
+				       const char * const *values) _CUPS_PUBLIC;
+extern time_t		ippDateToTime(const ipp_uchar_t *date) _CUPS_PUBLIC;
+extern void		ippDelete(ipp_t *ipp) _CUPS_PUBLIC;
+extern const char	*ippErrorString(ipp_status_t error) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name,
-			                  ipp_tag_t value_tag);
+			                  ipp_tag_t value_tag) _CUPS_PUBLIC;
 extern ipp_attribute_t	*ippFindNextAttribute(ipp_t *ipp, const char *name,
-			                      ipp_tag_t value_tag);
-extern size_t		ippLength(ipp_t *ipp);
-extern ipp_t		*ippNew(void);
-extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
-extern const ipp_uchar_t *ippTimeToDate(time_t t);
-extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp);
-extern int		ippPort(void);
-extern void		ippSetPort(int p);
+			                      ipp_tag_t value_tag) _CUPS_PUBLIC;
+extern size_t		ippLength(ipp_t *ipp) _CUPS_PUBLIC;
+extern ipp_t		*ippNew(void) _CUPS_PUBLIC;
+extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp) _CUPS_PUBLIC;
+extern const ipp_uchar_t *ippTimeToDate(time_t t) _CUPS_PUBLIC;
+extern ipp_state_t	ippWrite(http_t *http, ipp_t *ipp) _CUPS_PUBLIC;
+extern int		ippPort(void) _CUPS_PUBLIC;
+extern void		ippSetPort(int p) _CUPS_PUBLIC;
 
 /**** New in CUPS 1.1.19 ****/
 extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group,

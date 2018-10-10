@@ -47,6 +47,8 @@
 #ifndef _CUPS_MD5_PRIVATE_H_
 #  define _CUPS_MD5_PRIVATE_H_
 
+#  include <cups/versioning.h>
+
 /* Define the state of the MD5 Algorithm. */
 typedef struct _cups_md5_state_s {
     unsigned int count[2];		/* message length in bits, lsw first */
@@ -59,13 +61,13 @@ extern "C" {
 #  endif /* __cplusplus */
 
 /* Initialize the algorithm. */
-void _cupsMD5Init(_cups_md5_state_t *pms);
+void _cupsMD5Init(_cups_md5_state_t *pms) _CUPS_PRIVATE;
 
 /* Append a string to the message. */
-void _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes);
+void _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes) _CUPS_PRIVATE;
 
 /* Finish the message and return the digest. */
-void _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16]);
+void _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16]) _CUPS_PRIVATE;
 
 #  ifdef __cplusplus
 }  /* end extern "C" */

@@ -90,11 +90,11 @@ typedef struct cups_lang_s		/**** Language Cache Structure ****/
  * Prototypes...
  */
 
-extern cups_lang_t	*cupsLangDefault(void);
-extern const char	*cupsLangEncoding(cups_lang_t *lang);
-extern void		cupsLangFlush(void);
-extern void		cupsLangFree(cups_lang_t *lang);
-extern cups_lang_t	*cupsLangGet(const char *language);
+extern cups_lang_t	*cupsLangDefault(void) _CUPS_PUBLIC;
+extern const char	*cupsLangEncoding(cups_lang_t *lang) _CUPS_PUBLIC;
+extern void		cupsLangFlush(void) _CUPS_PUBLIC;
+extern void		cupsLangFree(cups_lang_t *lang) _CUPS_PUBLIC;
+extern cups_lang_t	*cupsLangGet(const char *language) _CUPS_PUBLIC;
 
 #  ifdef __cplusplus
 }

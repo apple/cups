@@ -58,22 +58,22 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
  */
 
 #  ifdef __APPLE__
-extern const char	*_cupsAppleLanguage(const char *locale, char *language, size_t langsize);
-extern const char	*_cupsAppleLocale(CFStringRef languageName, char *locale, size_t localesize);
+extern const char	*_cupsAppleLanguage(const char *locale, char *language, size_t langsize) _CUPS_PRIVATE;
+extern const char	*_cupsAppleLocale(CFStringRef languageName, char *locale, size_t localesize) _CUPS_PRIVATE;
 #  endif /* __APPLE__ */
-extern void		_cupsCharmapFlush(void);
-extern const char	*_cupsEncodingName(cups_encoding_t encoding);
-extern void		_cupsLangPrintError(const char *prefix, const char *message);
-extern int		_cupsLangPrintFilter(FILE *fp, const char *prefix, const char *message, ...) _CUPS_FORMAT(3, 4);
-extern int		_cupsLangPrintf(FILE *fp, const char *message, ...) _CUPS_FORMAT(2, 3);
-extern int		_cupsLangPuts(FILE *fp, const char *message);
-extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
-extern void		_cupsMessageFree(cups_array_t *a);
-extern cups_array_t	*_cupsMessageLoad(const char *filename, int flags);
-extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
-extern cups_array_t	*_cupsMessageNew(void *context);
-extern int		_cupsMessageSave(const char *filename, int flags, cups_array_t *a);
-extern void		_cupsSetLocale(char *argv[]);
+extern void		_cupsCharmapFlush(void) _CUPS_PRIVATE;
+extern const char	*_cupsEncodingName(cups_encoding_t encoding) _CUPS_PRIVATE;
+extern void		_cupsLangPrintError(const char *prefix, const char *message) _CUPS_PRIVATE;
+extern int		_cupsLangPrintFilter(FILE *fp, const char *prefix, const char *message, ...) _CUPS_FORMAT(3, 4) _CUPS_PRIVATE;
+extern int		_cupsLangPrintf(FILE *fp, const char *message, ...) _CUPS_FORMAT(2, 3) _CUPS_PRIVATE;
+extern int		_cupsLangPuts(FILE *fp, const char *message) _CUPS_PRIVATE;
+extern const char	*_cupsLangString(cups_lang_t *lang, const char *message) _CUPS_PRIVATE;
+extern void		_cupsMessageFree(cups_array_t *a) _CUPS_PRIVATE;
+extern cups_array_t	*_cupsMessageLoad(const char *filename, int flags) _CUPS_PRIVATE;
+extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m) _CUPS_PRIVATE;
+extern cups_array_t	*_cupsMessageNew(void *context) _CUPS_PRIVATE;
+extern int		_cupsMessageSave(const char *filename, int flags, cups_array_t *a) _CUPS_PRIVATE;
+extern void		_cupsSetLocale(char *argv[]) _CUPS_PRIVATE;
 
 
 #  ifdef __cplusplus

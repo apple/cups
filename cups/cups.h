@@ -328,55 +328,55 @@ typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls,
  * Functions...
  */
 
-extern int		cupsCancelJob(const char *name, int job_id);
+extern int		cupsCancelJob(const char *name, int job_id) _CUPS_PUBLIC;
 extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
 			                   const char *resource,
-					   const char *filename);
+					   const char *filename) _CUPS_PUBLIC;
 extern ipp_t		*cupsDoRequest(http_t *http, ipp_t *request,
-			               const char *resource);
+			               const char *resource) _CUPS_PUBLIC;
 extern http_encryption_t cupsEncryption(void);
-extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
+extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs) _CUPS_PUBLIC;
 extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsEnumDests instead.");
-extern const char	*cupsGetDefault(void);
+extern const char	*cupsGetDefault(void) _CUPS_PUBLIC;
 extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
-			            int myjobs, int whichjobs);
+			            int myjobs, int whichjobs) _CUPS_PUBLIC;
 extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsEnumDests instead.");
-extern ipp_status_t	cupsLastError(void);
+extern ipp_status_t	cupsLastError(void) _CUPS_PUBLIC;
 extern int		cupsPrintFile(const char *name, const char *filename,
 			              const char *title, int num_options,
-				      cups_option_t *options);
+				      cups_option_t *options) _CUPS_PUBLIC;
 extern int		cupsPrintFiles(const char *name, int num_files,
 			               const char **files, const char *title,
-				       int num_options, cups_option_t *options);
+				       int num_options, cups_option_t *options) _CUPS_PUBLIC;
 extern char		*cupsTempFile(char *filename, int len) _CUPS_DEPRECATED_MSG("Use cupsTempFd or cupsTempFile2 instead.");
-extern int		cupsTempFd(char *filename, int len);
+extern int		cupsTempFd(char *filename, int len) _CUPS_PUBLIC;
 
 extern int		cupsAddDest(const char *name, const char *instance,
-			            int num_dests, cups_dest_t **dests);
-extern void		cupsFreeDests(int num_dests, cups_dest_t *dests);
+			            int num_dests, cups_dest_t **dests) _CUPS_PUBLIC;
+extern void		cupsFreeDests(int num_dests, cups_dest_t *dests) _CUPS_PUBLIC;
 extern cups_dest_t	*cupsGetDest(const char *name, const char *instance,
-			             int num_dests, cups_dest_t *dests);
-extern int		cupsGetDests(cups_dest_t **dests);
-extern void		cupsSetDests(int num_dests, cups_dest_t *dests);
+			             int num_dests, cups_dest_t *dests) _CUPS_PUBLIC;
+extern int		cupsGetDests(cups_dest_t **dests) _CUPS_PUBLIC;
+extern void		cupsSetDests(int num_dests, cups_dest_t *dests) _CUPS_PUBLIC;
 
 extern int		cupsAddOption(const char *name, const char *value,
-			              int num_options, cups_option_t **options);
+			              int num_options, cups_option_t **options) _CUPS_PUBLIC;
 extern void		cupsEncodeOptions(ipp_t *ipp, int num_options,
-					  cups_option_t *options);
+					  cups_option_t *options) _CUPS_PUBLIC;
 extern void		cupsFreeOptions(int num_options,
-			                cups_option_t *options);
+			                cups_option_t *options) _CUPS_PUBLIC;
 extern const char	*cupsGetOption(const char *name, int num_options,
-			               cups_option_t *options);
+			               cups_option_t *options) _CUPS_PUBLIC;
 extern int		cupsParseOptions(const char *arg, int num_options,
-			                 cups_option_t **options);
+			                 cups_option_t **options) _CUPS_PUBLIC;
 
-extern const char	*cupsGetPassword(const char *prompt);
-extern const char	*cupsServer(void);
-extern void		cupsSetEncryption(http_encryption_t e);
-extern void		cupsSetPasswordCB(cups_password_cb_t cb);
-extern void		cupsSetServer(const char *server);
-extern void		cupsSetUser(const char *user);
-extern const char	*cupsUser(void);
+extern const char	*cupsGetPassword(const char *prompt) _CUPS_PUBLIC;
+extern const char	*cupsServer(void) _CUPS_PUBLIC;
+extern void		cupsSetEncryption(http_encryption_t e) _CUPS_PUBLIC;
+extern void		cupsSetPasswordCB(cups_password_cb_t cb) _CUPS_PUBLIC;
+extern void		cupsSetServer(const char *server) _CUPS_PUBLIC;
+extern void		cupsSetUser(const char *user) _CUPS_PUBLIC;
+extern const char	*cupsUser(void) _CUPS_PUBLIC;
 
 /**** New in CUPS 1.1.20 ****/
 extern int		cupsDoAuthentication(http_t *http, const char *method,
@@ -384,7 +384,7 @@ extern int		cupsDoAuthentication(http_t *http, const char *method,
 			                     _CUPS_API_1_1_20;
 extern http_status_t	cupsGetFile(http_t *http, const char *resource,
 			            const char *filename) _CUPS_API_1_1_20;
-extern http_status_t	cupsGetFd(http_t *http, const char *resource, int fd);
+extern http_status_t	cupsGetFd(http_t *http, const char *resource, int fd) _CUPS_API_1_1_20;
 extern http_status_t	cupsPutFile(http_t *http, const char *resource,
 			            const char *filename) _CUPS_API_1_1_20;
 extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd)
