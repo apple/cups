@@ -2131,11 +2131,11 @@ cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
   ssize_t	count;			/* Number of bytes read */
 
 
-#ifdef WIN32 /* Sigh */
+#ifdef _WIN32 /* Sigh */
   while ((count = read(fd, buf, (unsigned)bytes)) < 0)
 #else
   while ((count = read(fd, buf, bytes)) < 0)
-#endif /* WIN32 */
+#endif /* _WIN32 */
     if (errno != EINTR && errno != EAGAIN)
     {
       DEBUG_printf(("8cups_read_fd: %s", strerror(errno)));
@@ -2212,11 +2212,11 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
   ssize_t	count;			/* Number of bytes written */
 
 
-#ifdef WIN32 /* Sigh */
+#ifdef _WIN32 /* Sigh */
   while ((count = write(fd, buf, (unsigned)bytes)) < 0)
 #else
   while ((count = write(fd, buf, bytes)) < 0)
-#endif /* WIN32 */
+#endif /* _WIN32 */
     if (errno != EINTR && errno != EAGAIN)
     {
       DEBUG_printf(("8cups_write_fd: %s", strerror(errno)));

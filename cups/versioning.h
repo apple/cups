@@ -74,7 +74,7 @@
 #  ifdef _CUPS_HAS_VISIBILITY
 #    define _CUPS_PRIVATE	__attribute__ ((visibility("hidden")))
 #    define _CUPS_PUBLIC	__attribute__ ((visibility("default")))
-#  elif defined(WIN32) && defined(LIBCUPS2_EXPORTS)
+#  elif defined(_WIN32) && defined(LIBCUPS2_EXPORTS)
 #    define _CUPS_PRIVATE
 #    define _CUPS_PUBLIC	__declspec(dllexport)
 #  else

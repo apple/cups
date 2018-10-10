@@ -28,10 +28,10 @@
 #  ifdef HAVE_LIBZ
 #    include <zlib.h>
 #  endif /* HAVE_LIBZ */
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #    include <sys/locking.h>
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 
 /*

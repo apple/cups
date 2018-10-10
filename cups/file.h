@@ -24,11 +24,11 @@
 #  include "versioning.h"
 #  include <stddef.h>
 #  include <sys/types.h>
-#  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#  if defined(_WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
 #    define __CUPS_SSIZE_T_DEFINED
 /* Windows does not support the ssize_t type, so map it to off_t... */
 typedef off_t ssize_t;			/* @private@ */
-#  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
+#  endif /* _WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 
 /*

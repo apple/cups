@@ -15,13 +15,13 @@
 #include "cups-private.h"
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #  elif defined(HAVE_POLL)
 #    include <poll.h>
 #  else
 #    include <sys/select.h>
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #elif defined(HAVE_AVAHI)
 #  include <avahi-client/client.h>
 #  include <avahi-client/lookup.h>
@@ -1763,9 +1763,9 @@ _httpResolveURI(
     _http_uribuf_t	uribuf;		/* URI buffer */
     int			offline = 0;	/* offline-report state set? */
 #  ifdef HAVE_DNSSD
-#    ifdef WIN32
+#    ifdef _WIN32
 #      pragma comment(lib, "dnssd.lib")
-#    endif /* WIN32 */
+#    endif /* _WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref = NULL,/* DNS-SD service reference for domain */
 			ippref = NULL,	/* DNS-SD service reference for network IPP */
@@ -1894,11 +1894,11 @@ _httpResolveURI(
 	  FD_ZERO(&input_set);
 	  FD_SET(DNSServiceRefSockFD(ref), &input_set);
 
-#      ifdef WIN32
+#      ifdef _WIN32
 	  stimeout.tv_sec  = (long)timeout;
 #      else
 	  stimeout.tv_sec  = timeout;
-#      endif /* WIN32 */
+#      endif /* _WIN32 */
 	  stimeout.tv_usec = 0;
 
 	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL,

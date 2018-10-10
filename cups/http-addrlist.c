@@ -19,9 +19,9 @@
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
-#ifndef WIN32
+#ifndef _WIN32
 #  include <fcntl.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*
@@ -56,9 +56,9 @@ httpAddrConnect2(
     int             *cancel)		/* I - Pointer to "cancel" variable */
 {
   int			val;		/* Socket option value */
-#ifndef WIN32
+#ifndef _WIN32
   int			flags;		/* Socket flags */
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   int			remaining;	/* Remaining timeout */
   int			i, j,		/* Looping vars */
 			nfds,		/* Number of file descriptors */
@@ -208,11 +208,11 @@ httpAddrConnect2(
 	return (addrlist);
       }
 
-#ifdef WIN32
+#ifdef _WIN32
       if (WSAGetLastError() != WSAEINPROGRESS && WSAGetLastError() != WSAEWOULDBLOCK)
 #else
       if (errno != EINPROGRESS && errno != EWOULDBLOCK)
-#endif /* WIN32 */
+#endif /* _WIN32 */
       {
 	DEBUG_printf(("1httpAddrConnect2: Unable to connect to %s:%d: %s", httpAddrString(&(addrlist->addr), temp, sizeof(temp)), httpAddrPort(&(addrlist->addr)), strerror(errno)));
 	httpAddrClose(NULL, fds[nfds]);
@@ -220,9 +220,9 @@ httpAddrConnect2(
 	continue;
       }
 
-#ifndef WIN32
+#ifndef _WIN32
       fcntl(fds[nfds], F_SETFL, flags);
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 #ifndef HAVE_POLL
       if (fds[nfds] > max_fd)
@@ -291,11 +291,11 @@ httpAddrConnect2(
       DEBUG_printf(("1httpAddrConnect2: select() returned %d (%d)", result, errno));
 #  endif /* HAVE_POLL */
     }
-#  ifdef WIN32
+#  ifdef _WIN32
     while (result < 0 && (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
     while (result < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
     if (result > 0)
     {
@@ -372,11 +372,11 @@ httpAddrConnect2(
     httpAddrClose(NULL, fds[nfds]);
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   _cupsSetError(IPP_STATUS_ERROR_SERVICE_UNAVAILABLE, "Connection failed", 0);
 #else
   _cupsSetError(IPP_STATUS_ERROR_SERVICE_UNAVAILABLE, strerror(errno), 0);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
   return (NULL);
 }
@@ -844,11 +844,11 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
         temp->addr.ipv6.sin6_family            = AF_INET6;
 	temp->addr.ipv6.sin6_port              = htons(portnum);
-#  ifdef WIN32
+#  ifdef _WIN32
 	temp->addr.ipv6.sin6_addr.u.Byte[15]   = 1;
 #  else
 	temp->addr.ipv6.sin6_addr.s6_addr32[3] = htonl(1);
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
         if (!first)
           first = temp;

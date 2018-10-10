@@ -22,7 +22,7 @@
  * Windows implementation...
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <windows.h>
 
 /*
@@ -418,4 +418,4 @@ cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 
   rewinddir(dp->dir);
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */

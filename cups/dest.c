@@ -2031,9 +2031,9 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   cups_option_t	*option;		/* Current option */
   _ipp_option_t	*match;			/* Matching attribute for option */
   FILE		*fp;			/* File pointer */
-#ifndef WIN32
+#ifndef _WIN32
   const char	*home;			/* HOME environment variable */
-#endif /* WIN32 */
+#endif /* _WIN32 */
   char		filename[1024];		/* lpoptions file */
   int		num_temps;		/* Number of temporary destinations */
   cups_dest_t	*temps = NULL,		/* Temporary destinations */
@@ -2067,7 +2067,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
 
-#ifndef WIN32
+#ifndef _WIN32
   if (getuid())
   {
    /*
@@ -2087,7 +2087,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
       snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
     }
   }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
  /*
   * Try to open the file...
@@ -2099,7 +2099,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     return (-1);
   }
 
-#ifndef WIN32
+#ifndef _WIN32
  /*
   * Set the permissions to 0644 when saving to the /etc/cups/lpoptions
   * file...
@@ -2107,7 +2107,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if (!getuid())
     fchmod(fileno(fp), 0644);
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
  /*
   * Write each printer; each line looks like:

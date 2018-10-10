@@ -18,13 +18,13 @@
 #include "cups-private.h"
 #include <fcntl.h>
 #include <math.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <tchar.h>
 #else
 #  include <signal.h>
 #  include <sys/time.h>
 #  include <sys/resource.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
@@ -1145,11 +1145,11 @@ httpGets(char   *line,			/* I - Line to read into */
     * Pre-load the buffer as needed...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     WSASetLastError(0);
 #else
     errno = 0;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     while (http->used == 0)
     {
@@ -1163,11 +1163,11 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 
         DEBUG_puts("3httpGets: Timed out!");
-#ifdef WIN32
+#ifdef _WIN32
         http->error = WSAETIMEDOUT;
 #else
         http->error = ETIMEDOUT;
-#endif /* WIN32 */
+#endif /* _WIN32 */
         return (NULL);
       }
 
@@ -1181,7 +1181,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	* Nope, can't get a line this time...
 	*/
 
-#ifdef WIN32
+#ifdef _WIN32
         DEBUG_printf(("3httpGets: recv() error %d!", WSAGetLastError()));
 
         if (WSAGetLastError() == WSAEINTR)
@@ -1218,7 +1218,7 @@ httpGets(char   *line,			/* I - Line to read into */
 	  http->error = errno;
 	  continue;
 	}
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
         return (NULL);
       }
@@ -1485,9 +1485,9 @@ void
 httpInitialize(void)
 {
   static int	initialized = 0;	/* Have we been called before? */
-#ifdef WIN32
+#ifdef _WIN32
   WSADATA	winsockdata;		/* WinSock data */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
   _cupsGlobalLock();
@@ -1497,7 +1497,7 @@ httpInitialize(void)
     return;
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   WSAStartup(MAKEWORD(2,2), &winsockdata);
 
 #elif !defined(SO_NOSIGPIPE)
@@ -1519,7 +1519,7 @@ httpInitialize(void)
 #  else
   signal(SIGPIPE, SIG_IGN);
 #  endif /* !SO_NOSIGPIPE */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #  ifdef HAVE_SSL
   _httpTLSInitialize();
@@ -1807,7 +1807,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
   if (bytes < 0)
   {
-#ifdef WIN32
+#ifdef _WIN32
     if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
       bytes = 0;
     else
@@ -1817,7 +1817,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       bytes = 0;
     else
       http->error = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
   }
   else if (bytes == 0)
   {
@@ -2378,11 +2378,11 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
     * Unable to connect...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     http->error  = WSAGetLastError();
 #else
     http->error  = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
     http->status = HTTP_STATUS_ERROR;
 
     DEBUG_printf(("1httpReconnect2: httpAddrConnect failed: %s",
@@ -2695,11 +2695,11 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
     _httpTLSStop(http);
 #endif /* HAVE_SSL */
 
-#ifdef WIN32
+#ifdef _WIN32
   shutdown(http->fd, SD_RECEIVE);	/* Microsoft-ism... */
 #else
   shutdown(http->fd, SHUT_RD);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -3033,12 +3033,12 @@ _httpWait(http_t *http,			/* I - HTTP connection */
 
     DEBUG_printf(("6_httpWait: select() returned %d...", nfds));
   }
-#  ifdef WIN32
+#  ifdef _WIN32
   while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
                       WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
   while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #endif /* HAVE_POLL */
 
   DEBUG_printf(("5_httpWait: returning with nfds=%d, errno=%d...", nfds,
@@ -4058,7 +4058,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
     if (bytes < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       if (WSAGetLastError() != WSAEINTR)
       {
 	http->error = WSAGetLastError();
@@ -4094,7 +4094,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 	http->error = errno;
 	return (-1);
       }
-#endif /* WIN32 */
+#endif /* _WIN32 */
     }
   }
   while (bytes < 0);
@@ -4108,7 +4108,7 @@ http_read(http_t *http,			/* I - HTTP connection */
 
   if (bytes < 0)
   {
-#ifdef WIN32
+#ifdef _WIN32
     if (WSAGetLastError() == WSAEINTR)
       bytes = 0;
     else
@@ -4118,7 +4118,7 @@ http_read(http_t *http,			/* I - HTTP connection */
       bytes = 0;
     else
       http->error = errno;
-#endif /* WIN32 */
+#endif /* _WIN32 */
   }
   else if (bytes == 0)
   {
@@ -4480,7 +4480,7 @@ static void
 http_set_timeout(int    fd,		/* I - File descriptor */
                  double timeout)	/* I - Timeout in seconds */
 {
-#ifdef WIN32
+#ifdef _WIN32
   DWORD tv = (DWORD)(timeout * 1000);
 				      /* Timeout in milliseconds */
 
@@ -4495,7 +4495,7 @@ http_set_timeout(int    fd,		/* I - File descriptor */
 
   setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
   setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -4663,12 +4663,12 @@ http_write(http_t     *http,		/* I - HTTP connection */
 
 	  nfds = select(http->fd + 1, NULL, &output_set, NULL, &timeout);
 	}
-#  ifdef WIN32
+#  ifdef _WIN32
 	while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
 			    WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
 	while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #endif /* HAVE_POLL */
 
         if (nfds < 0)
@@ -4678,11 +4678,11 @@ http_write(http_t     *http,		/* I - HTTP connection */
 	}
 	else if (nfds == 0 && (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data)))
 	{
-#ifdef WIN32
+#ifdef _WIN32
 	  http->error = WSAEWOULDBLOCK;
 #else
 	  http->error = EWOULDBLOCK;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 	  return (-1);
 	}
       }
@@ -4701,7 +4701,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
 
     if (bytes < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       if (WSAGetLastError() == WSAEINTR)
         continue;
       else if (WSAGetLastError() == WSAEWOULDBLOCK)
@@ -4735,7 +4735,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
         http->error = errno;
 	continue;
       }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
       DEBUG_printf(("3http_write: error writing data (%s).",
                     strerror(http->error)));

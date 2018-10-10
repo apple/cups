@@ -82,9 +82,9 @@ static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 				       cups_encoding_t encoding);
 static ppd_option_t	*ppd_get_option(ppd_group_t *group, const char *name);
 static _ppd_globals_t	*ppd_globals_alloc(void);
-#if defined(HAVE_PTHREAD_H) || defined(WIN32)
+#if defined(HAVE_PTHREAD_H) || defined(_WIN32)
 static void		ppd_globals_free(_ppd_globals_t *g);
-#endif /* HAVE_PTHREAD_H || WIN32 */
+#endif /* HAVE_PTHREAD_H || _WIN32 */
 #ifdef HAVE_PTHREAD_H
 static void		ppd_globals_init(void);
 #endif /* HAVE_PTHREAD_H */
@@ -2825,13 +2825,13 @@ ppd_globals_alloc(void)
  * 'ppd_globals_free()' - Free global data.
  */
 
-#if defined(HAVE_PTHREAD_H) || defined(WIN32)
+#if defined(HAVE_PTHREAD_H) || defined(_WIN32)
 static void
 ppd_globals_free(_ppd_globals_t *pg)	/* I - Pointer to global data */
 {
   free(pg);
 }
-#endif /* HAVE_PTHREAD_H || WIN32 */
+#endif /* HAVE_PTHREAD_H || _WIN32 */
 
 
 #ifdef HAVE_PTHREAD_H

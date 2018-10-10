@@ -17,11 +17,11 @@
 #include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 
 #if HAVE_AUTHORIZATION_H
 #  include <Security/Authorization.h>
@@ -895,9 +895,9 @@ static int				/* O - 0 if available */
 					/*    -1 error */
 cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 {
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
  /*
-  * Currently WIN32 and OS-2 do not support the CUPS server...
+  * Currently _WIN32 and OS-2 do not support the CUPS server...
   */
 
   return (1);
@@ -1098,5 +1098,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 
   return (1);
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 }
