@@ -1,10 +1,11 @@
 /*
  * PPD command interpreter for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1993-2007 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1993-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -12,7 +13,7 @@
  */
 
 #include <cups/raster-private.h>
-#include <cups/ppd.h>
+#include <cups/ppd-private.h>
 
 
 /*
