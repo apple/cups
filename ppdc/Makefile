@@ -239,6 +239,7 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 ppdc:			ppdc.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ ppdc.o -L. -lcupsppdc $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
@@ -246,6 +247,7 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -258,6 +260,7 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 ppdhtml:			ppdhtml.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ ppdhtml.o -L. -lcupsppdc $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -267,6 +270,7 @@ ppdhtml:			ppdhtml.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 ppdi:			ppdi.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ ppdi.o -L. -lcupsppdc $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
@@ -274,6 +278,7 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 	$(LD_CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
 	./ppdc-static -l en -I ../data sample.drv
@@ -294,6 +299,7 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ ppdmerge.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -303,6 +309,7 @@ ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o $@ ppdpo.o -L. -lcupsppdc $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -314,6 +321,7 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 	$(LD_CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -323,6 +331,7 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 libcupsppdc.so.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
 
@@ -341,6 +350,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 		-compatibility_version 1.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LINKCUPS) $(COMMONLIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 

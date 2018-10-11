@@ -774,6 +774,7 @@ AWK
 CUPS_BUILD
 CUPS_REVISION
 CUPS_VERSION
+CODE_SIGN
 LOCALTARGET
 host_os
 host_vendor
@@ -2644,6 +2645,16 @@ else
 	LOCALTARGET=""
 fi
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for codesign utility" >&5
+$as_echo_n "checking for codesign utility... " >&6; }
+CODE_SIGN="/usr/bin/true"
+
+if test "$host_os_name" = darwin; then
+	CODE_SIGN="/usr/bin/codesign"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: using $CODE_SIGN" >&5
+$as_echo "using $CODE_SIGN" >&6; }
 
 
 ac_config_headers="$ac_config_headers config.h"

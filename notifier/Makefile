@@ -124,6 +124,7 @@ depend:
 dbus:	dbus.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -133,6 +134,7 @@ dbus:	dbus.o ../cups/$(LIBCUPS)
 mailto:	mailto.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -142,6 +144,7 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 rss:	rss.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o rss rss.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -151,6 +154,7 @@ rss:	rss.o ../cups/$(LIBCUPS)
 testnotify:	testnotify.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o testnotify testnotify.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 $(OBJS):	../Makedefs

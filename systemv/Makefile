@@ -159,6 +159,7 @@ uninstall:
 cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -168,6 +169,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	for file in accept cupsenable cupsdisable cupsreject reject; do \
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
@@ -181,6 +183,7 @@ cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -190,6 +193,7 @@ cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -199,6 +203,7 @@ cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ cupstestdsc.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -208,11 +213,13 @@ cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
 cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../filter/$(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../filter/libcupsimage.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o ../filter/libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -222,6 +229,7 @@ cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../filter/libcupsimag
 lp:	lp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lp lp.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -231,6 +239,7 @@ lp:	lp.o ../cups/$(LIBCUPS)
 lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -240,6 +249,7 @@ lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -249,6 +259,7 @@ lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 lpmove:	lpmove.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -258,6 +269,7 @@ lpmove:	lpmove.o ../cups/$(LIBCUPS)
 lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -267,6 +279,7 @@ lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 lpstat:	lpstat.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #

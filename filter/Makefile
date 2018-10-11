@@ -218,6 +218,7 @@ apihelp:
 commandtops:	commandtops.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ commandtops.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -227,6 +228,7 @@ commandtops:	commandtops.o ../cups/$(LIBCUPS)
 gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -237,6 +239,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) \
 		-L../cups $(LINKCUPS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -252,6 +255,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) $(LIBCUPSIMAGEORDER)
 		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
 		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
 
@@ -297,6 +301,7 @@ libcupsimage.a:	$(IMAGEOBJS)
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -306,6 +311,7 @@ pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -315,6 +321,7 @@ rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -324,6 +331,7 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -333,12 +341,14 @@ rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertopwg:	rastertopwg.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 rastertopwg-static:	rastertopwg.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -350,6 +360,7 @@ testclient:	testclient.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	$(LD_CC) $(LDFLAGS) -o $@ testclient.o \
 		libcupsimage.a ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -361,6 +372,7 @@ testraster:	testraster.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running raster API tests...
 	./testraster
 
@@ -372,6 +384,7 @@ testraster:	testraster.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 rasterbench:	rasterbench.o libcupsimage.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #

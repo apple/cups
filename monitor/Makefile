@@ -122,6 +122,7 @@ uninstall:
 bcp:	bcp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ bcp.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -131,6 +132,7 @@ bcp:	bcp.o ../cups/$(LIBCUPS)
 tbcp:	tbcp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ tbcp.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
