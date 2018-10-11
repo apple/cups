@@ -369,7 +369,9 @@ struct _http_s				/**** HTTP connection structure ****/
 #  endif /* HAVE_LIBZ */
 
   /**** New in CUPS 2.2.9 ****/
-  char			algorithm[65],	/* Algorithm from WWW-Authenticate */
+  char			*authentication_info,
+					/* Authentication-Info header */
+			algorithm[65],	/* Algorithm from WWW-Authenticate */
 			nextnonce[HTTP_MAX_VALUE],
 					/* Next nonce value from Authentication-Info */
 			opaque[HTTP_MAX_VALUE],

@@ -327,6 +327,12 @@ httpClearFields(http_t *http)		/* I - HTTP connection */
       http->server = NULL;
     }
 
+    if (http->authentication_info)
+    {
+      _cupsStrFree(http->authentication_info);
+      http->authentication_info = NULL;
+    }
+
     http->expect = (http_status_t)0;
   }
 }
@@ -971,11 +977,14 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
     case HTTP_FIELD_SERVER :
         return (http->server);
 
+    case HTTP_FIELD_AUTHENTICATION_INFO :
+        return (http->authentication_info);
+
     case HTTP_FIELD_AUTHORIZATION :
         if (http->field_authorization)
 	{
 	 /*
-	  * Special case for WWW-Authenticate: as its contents can be
+	  * Special case for Authorization: as its contents can be
 	  * longer than HTTP_MAX_VALUE...
 	  */
 
@@ -3680,6 +3689,13 @@ http_add_field(http_t       *http,	/* I - HTTP connection */
           _cupsStrFree(http->server);
 
         http->server = _cupsStrAlloc(value);
+        break;
+
+    case HTTP_FIELD_AUTHENTICATION_INFO :
+        if (http->authentication_info)
+          _cupsStrFree(http->authentication_info);
+
+        http->authentication_info = _cupsStrAlloc(value);
         break;
 
     default :

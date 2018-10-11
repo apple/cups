@@ -893,7 +893,7 @@ fi
 
 # Paged printed on Test3
 count=`$GREP '^Test3 ' $BASE/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
-expected=2
+expected=4
 if test $count != $expected; then
 	echo "FAIL: Printer 'Test3' produced $count page(s), expected $expected."
 	echo "    <p>FAIL: Printer 'Test3' produced $count page(s), expected $expected.</p>" >>$strfile
