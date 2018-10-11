@@ -2,20 +2,17 @@
 #
 # Test the lpr command.
 #
-# Copyright 2007-2014 by Apple Inc.
-# Copyright 1997-2005 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2014 by Apple Inc.
+# Copyright © 1997-2005 by Easy Software Products, all rights reserved.
 #
-# These coded instructions, statements, and computer programs are the
-# property of Apple Inc. and are protected by Federal copyright
-# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-# which should have been included with this file.  If this file is
-# file is missing or damaged, see the license at "http://www.cups.org/".
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 echo "LPR Default Test"
 echo ""
 echo "    lpr testfile.pdf"
-$VALGRIND ../berkeley/lpr testfile.pdf 2>&1
+$runcups $VALGRIND ../berkeley/lpr testfile.pdf 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -27,7 +24,7 @@ echo ""
 echo "LPR Destination Test"
 echo ""
 echo "    lpr -P Test3 -o fit-to-page testfile.jpg"
-$VALGRIND ../berkeley/lpr -P Test3 -o fit-to-page testfile.jpg 2>&1
+$runcups $VALGRIND ../berkeley/lpr -P Test3 -o fit-to-page testfile.jpg 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -39,7 +36,7 @@ echo ""
 echo "LPR Options Test"
 echo ""
 echo "    lpr -P Test1 -o number-up=4 -o job-sheets=standard,none testfile.pdf"
-$VALGRIND ../berkeley/lpr -P Test1 -o number-up=4 -o job-sheets=standard,none testfile.pdf 2>&1
+$runcups $VALGRIND ../berkeley/lpr -P Test1 -o number-up=4 -o job-sheets=standard,none testfile.pdf 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -57,13 +54,13 @@ pids=""
 while test $i -lt $1; do
 	j=1
 	while test $j -le $2; do
-		$VALGRIND ../berkeley/lpr -P test-$j testfile.jpg 2>&1
+		$runcups $VALGRIND ../berkeley/lpr -P test-$j testfile.jpg 2>&1
 		j=`expr $j + 1`
 	done
 
-	$VALGRIND ../berkeley/lpr -P Test1 testfile.jpg 2>&1 &
+	$runcups $VALGRIND ../berkeley/lpr -P Test1 testfile.jpg 2>&1 &
 	pids="$pids $!"
-	$VALGRIND ../berkeley/lpr -P Test2 testfile.jpg 2>&1 &
+	$runcups $VALGRIND ../berkeley/lpr -P Test2 testfile.jpg 2>&1 &
 	pids="$pids $!"
 
 	i=`expr $i + 1`
