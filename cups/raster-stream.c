@@ -1011,13 +1011,14 @@ _cupsRasterWriteHeader(
     cups_page_header2_t	fh;		/* File page header */
 
     memset(&fh, 0, sizeof(fh));
-
     strlcpy(fh.MediaClass, "PwgRaster", sizeof(fh.MediaClass));
-					/* PwgRaster */
     strlcpy(fh.MediaColor, r->header.MediaColor, sizeof(fh.MediaColor));
     strlcpy(fh.MediaType, r->header.MediaType, sizeof(fh.MediaType));
     strlcpy(fh.OutputType, r->header.OutputType, sizeof(fh.OutputType));
-					/* PrintContentType */
+    strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
+            sizeof(fh.cupsRenderingIntent));
+    strlcpy(fh.cupsPageSizeName, r->header.cupsPageSizeName,
+            sizeof(fh.cupsPageSizeName));
 
     fh.CutMedia              = htonl(r->header.CutMedia);
     fh.Duplex                = htonl(r->header.Duplex);
@@ -1047,37 +1048,13 @@ _cupsRasterWriteHeader(
     fh.cupsColorSpace        = htonl(r->header.cupsColorSpace);
     fh.cupsNumColors         = htonl(r->header.cupsNumColors);
     fh.cupsInteger[0]        = htonl(r->header.cupsInteger[0]);
-					/* TotalPageCount */
     fh.cupsInteger[1]        = htonl(r->header.cupsInteger[1]);
-					/* CrossFeedTransform */
     fh.cupsInteger[2]        = htonl(r->header.cupsInteger[2]);
-					/* FeedTransform */
-    fh.cupsInteger[3]        = htonl(r->header.cupsInteger[3]);
-					/* ImageBoxLeft */
-    fh.cupsInteger[4]        = htonl(r->header.cupsInteger[4]);
-					/* ImageBoxTop */
-    fh.cupsInteger[5]        = htonl(r->header.cupsInteger[5]);
-					/* ImageBoxRight */
-    fh.cupsInteger[6]        = htonl(r->header.cupsInteger[6]);
-					/* ImageBoxBottom */
-    fh.cupsInteger[7]        = htonl(r->header.cupsInteger[7]);
-					/* BlackPrimary */
-    fh.cupsInteger[8]        = htonl(r->header.cupsInteger[8]);
-					/* PrintQuality */
-    fh.cupsInteger[14]       = htonl(r->header.cupsInteger[14]);
-					/* VendorIdentifier */
-    fh.cupsInteger[15]       = htonl(r->header.cupsInteger[15]);
-					/* VendorLength */
-
-    void *dst = fh.cupsReal; /* Bypass bogus compiler warning */
-    void *src = r->header.cupsReal;
-    memcpy(dst, src, sizeof(fh.cupsReal) + sizeof(fh.cupsString));
-					/* VendorData */
-
-    strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
-            sizeof(fh.cupsRenderingIntent));
-    strlcpy(fh.cupsPageSizeName, r->header.cupsPageSizeName,
-            sizeof(fh.cupsPageSizeName));
+    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] * r->header.HWResolution[1] / 72.0));
+    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] * r->header.HWResolution[1] / 72.0));
+    fh.cupsInteger[7]        = htonl(0xffffff);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
   }
@@ -1089,6 +1066,8 @@ _cupsRasterWriteHeader(
     */
 
     unsigned char appleheader[32];	/* Raw page header */
+    unsigned height = r->header.cupsHeight * r->rowheight;
+					/* Computed page height */
 
     if (r->apple_page_count == 0xffffffffU)
     {
@@ -1124,10 +1103,10 @@ _cupsRasterWriteHeader(
     appleheader[13] = (unsigned char)(r->header.cupsWidth >> 16);
     appleheader[14] = (unsigned char)(r->header.cupsWidth >> 8);
     appleheader[15] = (unsigned char)(r->header.cupsWidth);
-    appleheader[16] = (unsigned char)(r->header.cupsHeight >> 24);
-    appleheader[17] = (unsigned char)(r->header.cupsHeight >> 16);
-    appleheader[18] = (unsigned char)(r->header.cupsHeight >> 8);
-    appleheader[19] = (unsigned char)(r->header.cupsHeight);
+    appleheader[16] = (unsigned char)(height >> 24);
+    appleheader[17] = (unsigned char)(height >> 16);
+    appleheader[18] = (unsigned char)(height >> 8);
+    appleheader[19] = (unsigned char)(height);
     appleheader[20] = (unsigned char)(r->header.HWResolution[0] >> 24);
     appleheader[21] = (unsigned char)(r->header.HWResolution[0] >> 16);
     appleheader[22] = (unsigned char)(r->header.HWResolution[0] >> 8);
