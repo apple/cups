@@ -17,19 +17,6 @@
 
 
 /*
- * Local structures...
- */
-
-
-
-/*
- * Local functions...
- */
-
-static _cups_raster_error_t	*get_error_buffer(void);
-
-
-/*
  * '_cupsRasterAddError()' - Add an error message to the error buffer.
  */
 
