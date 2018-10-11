@@ -1,8 +1,8 @@
 /*
  * Private PPD definitions for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -156,6 +156,8 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
  */
 
 extern int		_cupsConvertOptions(ipp_t *request, ppd_file_t *ppd, _ppd_cache_t *pc, ipp_attribute_t *media_col_sup, ipp_attribute_t *doc_handling_sup, ipp_attribute_t *print_color_mode_sup, const char *user, const char *format, int copies, int num_options, cups_option_t *options) _CUPS_PRIVATE;
+extern int		_cupsRasterInterpretPPD(cups_page_header2_t *h, ppd_file_t *ppd, int num_options, cups_option_t *options, cups_interpret_cb_t func) _CUPS_PRIVATE;
+
 extern _ppd_cache_t	*_ppdCacheCreateWithFile(const char *filename,
 			                         ipp_t **attrs) _CUPS_PRIVATE;
 extern _ppd_cache_t	*_ppdCacheCreateWithPPD(ppd_file_t *ppd) _CUPS_PRIVATE;

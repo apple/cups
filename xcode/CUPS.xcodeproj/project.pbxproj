@@ -840,6 +840,14 @@
 		724FA76F1CC03B820092477B /* cgi-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 727EF030192E3498001EF690 /* cgi-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		724FA7701CC03B820092477B /* cgi.h in Headers */ = {isa = PBXBuildFile; fileRef = 727EF031192E3498001EF690 /* cgi.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		724FA7711CC03B920092477B /* raster-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 2767FC76192696A0000F61D3 /* raster-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		7253C454216E97FF00494ADD /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A691336FA8A004BB496 /* error.c */; };
+		7253C455216E980000494ADD /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A691336FA8A004BB496 /* error.c */; };
+		7253C456216E980200494ADD /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A691336FA8A004BB496 /* error.c */; };
+		7253C457216E981000494ADD /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6B1336FA8A004BB496 /* raster.c */; };
+		7253C458216E981200494ADD /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6B1336FA8A004BB496 /* raster.c */; };
+		7253C459216E981200494ADD /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6B1336FA8A004BB496 /* raster.c */; };
+		7253C45A216E981900494ADD /* interpret.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6A1336FA8A004BB496 /* interpret.c */; };
+		7253C45B216E981A00494ADD /* interpret.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6A1336FA8A004BB496 /* interpret.c */; };
 		7258EAED134594EB009286F1 /* rastertopwg.c in Sources */ = {isa = PBXBuildFile; fileRef = 7258EAEC134594EB009286F1 /* rastertopwg.c */; };
 		7258EAF413459B6D009286F1 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		7258EAF513459B6D009286F1 /* libcupsimage.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A611336F9A3004BB496 /* libcupsimage.dylib */; };
@@ -7443,6 +7451,7 @@
 				270696121CADF3E200FFE5FB /* http-addrlist.c in Sources */,
 				270696131CADF3E200FFE5FB /* http-support.c in Sources */,
 				270696141CADF3E200FFE5FB /* http.c in Sources */,
+				7253C458216E981200494ADD /* raster.c in Sources */,
 				270696161CADF3E200FFE5FB /* dest-options.c in Sources */,
 				270696171CADF3E200FFE5FB /* ipp-support.c in Sources */,
 				270696181CADF3E200FFE5FB /* ipp.c in Sources */,
@@ -7460,6 +7469,7 @@
 				270696291CADF3E200FFE5FB /* request.c in Sources */,
 				2706962C1CADF3E200FFE5FB /* snprintf.c in Sources */,
 				2706962D1CADF3E200FFE5FB /* string.c in Sources */,
+				7253C455216E980000494ADD /* error.c in Sources */,
 				2706965B1CAE1A9A00FFE5FB /* util.c in Sources */,
 				2706962E1CADF3E200FFE5FB /* tempfile.c in Sources */,
 				2706962F1CADF3E200FFE5FB /* thread.c in Sources */,
@@ -7831,6 +7841,7 @@
 			files = (
 				274FF68B1333B1C400317ECB /* adminutil.c in Sources */,
 				274FF68C1333B1C400317ECB /* array.c in Sources */,
+				7253C459216E981200494ADD /* raster.c in Sources */,
 				274FF68D1333B1C400317ECB /* ppd-attr.c in Sources */,
 				274FF68E1333B1C400317ECB /* auth.c in Sources */,
 				274FF68F1333B1C400317ECB /* backchannel.c in Sources */,
@@ -7853,6 +7864,7 @@
 				274FF69E1333B1C400317ECB /* http-addrlist.c in Sources */,
 				274FF69F1333B1C400317ECB /* http-support.c in Sources */,
 				274FF6A01333B1C400317ECB /* http.c in Sources */,
+				7253C45B216E981A00494ADD /* interpret.c in Sources */,
 				72A8B3D81C188CB900A1A547 /* ppd-util.c in Sources */,
 				2767FC7419268F0C000F61D3 /* dest-options.c in Sources */,
 				274FF6A11333B1C400317ECB /* ipp-support.c in Sources */,
@@ -7868,6 +7880,7 @@
 				274FF6AA1333B1C400317ECB /* options.c in Sources */,
 				727AD5B819100A58009F6862 /* tls.c in Sources */,
 				274FF6AB1333B1C400317ECB /* ppd-page.c in Sources */,
+				7253C456216E980200494ADD /* error.c in Sources */,
 				274FF6AC1333B1C400317ECB /* ppd-cache.c in Sources */,
 				2767FC7219268F06000F61D3 /* dest-job.c in Sources */,
 				274FF6AD1333B1C400317ECB /* ppd.c in Sources */,
@@ -7989,6 +8002,7 @@
 			files = (
 				72220EB61333052D00FCA411 /* adminutil.c in Sources */,
 				72220EC51333056300FCA411 /* array.c in Sources */,
+				7253C457216E981000494ADD /* raster.c in Sources */,
 				72220EC71333056300FCA411 /* ppd-attr.c in Sources */,
 				727AD5B719100A58009F6862 /* tls.c in Sources */,
 				72220EC81333056300FCA411 /* auth.c in Sources */,
@@ -8011,6 +8025,7 @@
 				72220F18133305BB00FCA411 /* http-addr.c in Sources */,
 				72220F19133305BB00FCA411 /* http-addrlist.c in Sources */,
 				72220F1B133305BB00FCA411 /* http-support.c in Sources */,
+				7253C45A216E981900494ADD /* interpret.c in Sources */,
 				72A8B3D71C188CB800A1A547 /* ppd-util.c in Sources */,
 				72220F1C133305BB00FCA411 /* http.c in Sources */,
 				72CF95E518A13543000FCAE4 /* dest-options.c in Sources */,
@@ -8026,6 +8041,7 @@
 				72220F2B133305BB00FCA411 /* notify.c in Sources */,
 				72220F2C133305BB00FCA411 /* options.c in Sources */,
 				72220F2D133305BB00FCA411 /* ppd-page.c in Sources */,
+				7253C454216E97FF00494ADD /* error.c in Sources */,
 				72220F2E133305BB00FCA411 /* ppd-cache.c in Sources */,
 				72220F30133305BB00FCA411 /* ppd.c in Sources */,
 				72220F32133305BB00FCA411 /* pwg-media.c in Sources */,

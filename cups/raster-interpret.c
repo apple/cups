@@ -90,7 +90,7 @@ static void		DEBUG_stack(const char *prefix, _cups_ps_stack_t *st);
 
 
 /*
- * 'cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
+ * '_cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
  *
  * This function is used by raster image processing (RIP) filters like
  * cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
@@ -120,7 +120,7 @@ static void		DEBUG_stack(const char *prefix, _cups_ps_stack_t *st);
  */
 
 int					/* O - 0 on success, -1 on failure */
-cupsRasterInterpretPPD(
+_cupsRasterInterpretPPD(
     cups_page_header2_t *h,		/* O - Page header to create */
     ppd_file_t          *ppd,		/* I - PPD file */
     int                 num_options,	/* I - Number of options */

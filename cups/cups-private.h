@@ -51,6 +51,13 @@ typedef struct _cups_buffer_s		/**** Read/write buffer ****/
 			d[1];		/* Data buffer */
 } _cups_buffer_t;
 
+typedef struct _cups_raster_error_s	/**** Error buffer structure ****/
+{
+  char	*start,				/* Start of buffer */
+	*current,			/* Current position in buffer */
+	*end;				/* End of buffer */
+} _cups_raster_error_t;
+
 typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
   /* Multiple places... */
@@ -121,6 +128,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   pwg_media_t		pwg_media;	/* PWG media data for custom size */
   char			pwg_name[65],	/* PWG media name for custom size */
 			ppd_name[41];	/* PPD media name for custom size */
+
+  /* raster-error.c */
+  _cups_raster_error_t	raster_error;	/* Raster error information */
 
   /* request.c */
   http_t		*http;		/* Current server connection */

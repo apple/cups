@@ -56,6 +56,20 @@ extern "C" {
  * Types and structures...
  */
 
+typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bits);
+					/**** cupsRasterInterpretPPD callback function
+					 *
+					 * This function is called by
+					 * @link cupsRasterInterpretPPD@ to
+					 * validate (and update, as needed)
+					 * the page header attributes. The
+					 * "preferred_bits" argument provides
+					 * the value of the
+					 * @code cupsPreferredBitsPerColor@
+					 * key from the PostScript page device
+					 * dictionary and is 0 if undefined.
+					 ****/
+
 typedef enum ppd_ui_e			/**** UI Types @deprecated@ ****/
 {
   PPD_UI_BOOLEAN,			/* True or False option */

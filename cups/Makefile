@@ -59,6 +59,9 @@ LIBOBJS	=	\
 		ppd-page.o \
 		ppd-util.o \
 		pwg-media.o \
+		raster-error.o \
+		raster-interpret.o \
+		raster-stream.o \
 		request.o \
 		sidechannel.o \
 		snmp.o \
@@ -71,9 +74,8 @@ LIBOBJS	=	\
 		usersys.o \
 		util.o
 IMAGEOBJS	= \
-		error.o \
-		interpret.o \
-		raster.o
+		raster-interstub.o \
+		raster-stubs.o
 TESTOBJS	= \
 		rasterbench.o \
 		testadmin.o \
@@ -335,10 +337,10 @@ uninstall:
 # libcups.so.2
 #
 
-libcups.so.2:	$(LIBOBJS)
+libcups.so.2:	$(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
-		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(IMAGEOBJS) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -347,14 +349,14 @@ libcups.so.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS)
+libcups.2.dylib:	$(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.14.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LIBOBJS) $(IMAGEOBJS) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -364,9 +366,10 @@ libcups.2.dylib:	$(LIBOBJS)
 # libcups.la
 #
 
-libcups.la:    $(LIBOBJS)
+libcups.la:    $(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
+	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+		$(LIBOBJS:.o=.lo) $(IMAGEOBJS:.o=.lo) \
 		-rpath $(LIBDIR) -version-info 2:14 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
@@ -375,10 +378,10 @@ libcups.la:    $(LIBOBJS)
 # libcups.a
 #
 
-libcups.a:	$(LIBOBJS)
+libcups.a:	$(LIBOBJS) $(IMAGEOBJS)
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS) $(IMAGEOBJS)
 	$(RANLIB) $@
 
 
@@ -453,9 +456,9 @@ libcupsimage.a:	$(IMAGEOBJS)
 # rasterbench (dependency on static CUPS library is intentional)
 #
 
-rasterbench:	rasterbench.o libcups.a $(LIBCUPSSTATIC)
+rasterbench:	rasterbench.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBCUPSSTATIC) \
+	$(LD_CC) $(LDFLAGS) -o $@ rasterbench.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -682,9 +685,9 @@ testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 # testraster (dependency on static CUPS library is intentional)
 #
 
-testraster:	testraster.o $(LIBCUPSSTATIC) libcupsimage.a
+testraster:	testraster.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o \
 		$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
