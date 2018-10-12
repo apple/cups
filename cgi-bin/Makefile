@@ -192,7 +192,7 @@ uninstall:
 
 libcupscgi.so.1:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`

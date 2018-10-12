@@ -312,7 +312,7 @@ uninstall:
 
 libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .2`

@@ -34,13 +34,18 @@ CPPFLAGS="${CPPFLAGS:=}"
 CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 
+dnl Setting compiler environment
+AR="${AR:=}"
+
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC(clang cc gcc)
 AC_PROG_CPP
 AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
-AC_PATH_PROG(AR,ar)
+if test "x$AR" = x; then
+	AC_PATH_PROG(AR,ar)
+fi
 AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(GZIP,gzip)
 AC_PATH_PROG(LD,ld)

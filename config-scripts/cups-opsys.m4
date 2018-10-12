@@ -37,9 +37,10 @@ fi
 AC_SUBST(LOCALTARGET)
 
 AC_MSG_CHECKING(for codesign utility)
-CODE_SIGN="/usr/bin/true"
-AC_SUBST(CODE_SIGN)
 if test "$host_os_name" = darwin; then
 	CODE_SIGN="/usr/bin/codesign"
+else
+	AC_PATH_PROG(CODE_SIGN,true,"/usr/bin/true")
 fi
+AC_SUBST(CODE_SIGN)
 AC_MSG_RESULT(using $CODE_SIGN)
