@@ -330,7 +330,7 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 
 libcupsppdc.so.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
+	$(DSOXX) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`

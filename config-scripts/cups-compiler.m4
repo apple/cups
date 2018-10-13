@@ -98,7 +98,7 @@ if test -n "$GCC"; then
 	if test -z "$OPTIM"; then
 		if test "x$with_optim" = x; then
 			# Default to optimize-for-size and debug
-       			OPTIM="-Os -g"
+       			OPTIM="-g"
 		else
 			OPTIM="$with_optim $OPTIM"
 		fi
