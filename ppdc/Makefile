@@ -330,7 +330,7 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 
 libcupsppdc.so.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
+	$(DSOXX) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
@@ -344,7 +344,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Creating export list for $@...
 	nm -gm $(LIBOBJS) | grep "__text" | grep -v weak | awk '{print $$NF}' | sort >t.exp
 	echo Linking $@...
-	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+	$(DSOXX) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
@@ -361,7 +361,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 
 libcupsppdc.la:    $(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 1:0 $(LINKCUPS)
 
 
