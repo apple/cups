@@ -1,7 +1,7 @@
 /*
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -48,12 +48,12 @@
 
 
 /*
- * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
- * and strnicmp() functions...
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 _stricmp()
+ * and _strnicmp() functions...
  */
 
-#define strcasecmp	stricmp
-#define strncasecmp	strnicmp
+#define strcasecmp	_stricmp
+#define strncasecmp	_strnicmp
 
 
 /*

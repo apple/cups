@@ -65,6 +65,8 @@
 					/* GCC 4.5 or higher */
 #      define _CUPS_HAS_DEPRECATED_WITH_MESSAGE
 #    endif /* __GNUC__ >= 5 */
+#  elif defined(_WIN32)
+#    define __attribute__(...)
 #  endif /* __has_extension */
 
 
@@ -77,7 +79,7 @@
 #    define _CUPS_INTERNAL	__attribute__ ((visibility("hidden")))
 #    define _CUPS_PRIVATE	__attribute__ ((visibility("default")))
 #    define _CUPS_PUBLIC	__attribute__ ((visibility("default")))
-#  elif defined(_WIN32) && defined(LIBCUPS2_EXPORTS)
+#  elif defined(_WIN32) && defined(LIBCUPS2_EXPORTS) && 0
 #    define _CUPS_INTERNAL
 #    define _CUPS_PRIVATE	__declspec(dllexport)
 #    define _CUPS_PUBLIC	__declspec(dllexport)

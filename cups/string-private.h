@@ -15,6 +15,7 @@
  * Include necessary headers...
  */
 
+#  include "config.h"
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <stdarg.h>
@@ -23,7 +24,6 @@
 #  include <locale.h>
 #  include <time.h>
 
-#  include "config.h"
 #  include <cups/versioning.h>
 
 #  ifdef HAVE_STRING_H
@@ -148,7 +148,7 @@ extern int _cups_toupper(int ch);
  * Prototypes...
  */
 
-extern ssize_t	_cups_safe_vsnprintf(char *, size_t, const char *, va_list) _CUPS_PRIVATE;
+extern ssize_t	_cups_safe_vsnprintf(char *buffer, size_t bufsize, const char *format, va_list args) _CUPS_PRIVATE;
 extern void	_cups_strcpy(char *dst, const char *src) _CUPS_PRIVATE;
 
 #  ifndef HAVE_STRDUP
