@@ -7,9 +7,9 @@
  * information.
  */
 
-#include "dns_sd.h"
-#include <windows.h>
+//#include <cups/http-private.h>
 #include <cups/thread-private.h>
+#include "dns_sd.h"
 
 
 /*
@@ -18,45 +18,24 @@
 
 static int		dnssd_initialized = 0;
 static _cups_mutex_t	dnssd_mutex = _CUPS_MUTEX_INITIALIZER;
-static DNSServiceErrorType DNSSD_API (*dnssd_add_record)(DNSServiceRef sdRef, DNSRecordRef *RecordRef, DNSServiceFlags flags, uint16_t rrtype, uint16_t rdlen, const void *rdata, uint32_t ttl);
-static DNSServiceErrorType DNSSD_API (*dnssd_browse)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *regtype, const char *domain, DNSServiceBrowseReply callBack, void *context);
-static DNSServiceErrorType DNSSD_API (*dnssd_construct_full_name)(char * const fullName, const char * const service, const char * const regtype, const char * const domain);
-static DNSServiceErrorType DNSSD_API (*dnssd_create_connection)(DNSServiceRef *sdRef);
-static DNSServiceErrorType DNSSD_API (*dnssd_process_result)(DNSServiceRef sdRef);
-static DNSServiceErrorType DNSSD_API (*dnssd_query_record)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *fullname, uint16_t rrtype, uint16_t rrclass, DNSServiceQueryRecordReply callBack, void *context);
-static void DNSSD_API (*dnssd_deallocate)(DNSServiceRef sdRef);
-static int DNSSD_API (*dnssd_sock_fd)(DNSServiceRef sdRef);
-static DNSServiceErrorType DNSSD_API (*dnssd_register)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *name, const char *regtype, const char *domain, const char *host, uint16_t port, uint16_t txtLen, const void *txtRecord, DNSServiceRegisterReply callBack, void *context);
-static DNSServiceErrorType DNSSD_API (*dnssd_remove_record)(DNSServiceRef sdRef, DNSRecordRef RecordRef, DNSServiceFlags flags);
-static DNSServiceErrorType DNSSD_API (*dnssd_resolve)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *name, const char *regtype, const char *domain, DNSServiceResolveReply callBack, void *context);
-static DNSServiceErrorType DNSSD_API (*dnssd_update_record)(DNSServiceRef sdRef, DNSRecordRef RecordRef, DNSServiceFlags flags, uint16_t rdlen, const void *rdata, uint32_t ttl);
+static DNSServiceErrorType (*dnssd_add_record)(DNSServiceRef sdRef, DNSRecordRef *RecordRef, DNSServiceFlags flags, uint16_t rrtype, uint16_t rdlen, const void *rdata, uint32_t ttl);
+static DNSServiceErrorType (*dnssd_browse)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *regtype, const char *domain, DNSServiceBrowseReply callBack, void *context);
+static DNSServiceErrorType (*dnssd_construct_full_name)(char * const fullName, const char * const service, const char * const regtype, const char * const domain);
+static DNSServiceErrorType (*dnssd_create_connection)(DNSServiceRef *sdRef);
+static DNSServiceErrorType (*dnssd_process_result)(DNSServiceRef sdRef);
+static DNSServiceErrorType (*dnssd_query_record)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *fullname, uint16_t rrtype, uint16_t rrclass, DNSServiceQueryRecordReply callBack, void *context);
+static void (*dnssd_deallocate)(DNSServiceRef sdRef);
+static int (*dnssd_sock_fd)(DNSServiceRef sdRef);
+static DNSServiceErrorType (*dnssd_register)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *name, const char *regtype, const char *domain, const char *host, uint16_t port, uint16_t txtLen, const void *txtRecord, DNSServiceRegisterReply callBack, void *context);
+static DNSServiceErrorType (*dnssd_remove_record)(DNSServiceRef sdRef, DNSRecordRef RecordRef, DNSServiceFlags flags);
+static DNSServiceErrorType (*dnssd_resolve)(DNSServiceRef *sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, const char *name, const char *regtype, const char *domain, DNSServiceResolveReply callBack, void *context);
+static DNSServiceErrorType (*dnssd_update_record)(DNSServiceRef sdRef, DNSRecordRef RecordRef, DNSServiceFlags flags, uint16_t rdlen, const void *rdata, uint32_t ttl);
 
-
-void DNSSD_API TXTRecordCreate
-    (
-    TXTRecordRef     *txtRecord,
-    uint16_t         bufferLen,
-    void             *buffer
-    );
-void DNSSD_API TXTRecordDeallocate
-    (
-    TXTRecordRef     *txtRecord
-    );
-const void * DNSSD_API TXTRecordGetBytesPtr
-    (
-    const TXTRecordRef *txtRecord
-    );
-uint16_t DNSSD_API TXTRecordGetLength
-    (
-    const TXTRecordRef *txtRecord
-    );
-DNSServiceErrorType DNSSD_API TXTRecordSetValue
-    (
-    TXTRecordRef     *txtRecord,
-    const char       *key,
-    uint8_t          valueSize,        /* may be zero */
-    const void       *value            /* may be NULL */
-    );
+static void (*dnssd_txt_create)(TXTRecordRef *txtRecord, uint16_t bufferLen, void *buffer);
+static void (*dnssd_txt_deallocate)(TXTRecordRef *txtRecord);
+static const void *(*dnssd_txt_get_bytes_ptr)(const TXTRecordRef *txtRecord);
+static uint16_t (*dnssd_txt_get_length)(const TXTRecordRef *txtRecord);
+static DNSServiceErrorType (*dnssd_txt_set_value)(TXTRecordRef *txtRecord, const char *key, uint8_t valueSize, const void *value);
 
 
 /*
@@ -69,28 +48,28 @@ dnssd_init(void)
   _cupsMutexLock(&dnssd_mutex);
   if (!dnssd_initialized)
   {
-    HINSTANCE	dll_handle = LoadLibrary("dnssd.dll");
+    HINSTANCE	dll_handle = LoadLibraryA("dnssd.dll");
 
     if (dll_handle)
     {
-      dnssd_add_record          = GetProcAddress("DNSServiceAddRecord");
-      dnssd_browse              = GetProcAddress("DNSServiceBrowse");
-      dnssd_construct_full_name = GetProcAddress("DNSServiceConstructFullName");
-      dnssd_create_connection   = GetProcAddress("DNSServiceCreateConnection");
-      dnssd_deallocate          = GetProcAddress("DNSServiceRefDeallocate");
-      dnssd_process_result      = GetProcAddress("DNSServiceProcessResult");
-      dnssd_query_record        = GetProcAddress("DNSServiceQueryRecord");
-      dnssd_register            = GetProcAddress("DNSServiceRegister");
-      dnssd_remove_record       = GetProcAddress("DNSServiceRemoveRecord");
-      dnssd_resolve             = GetProcAddress("DNSServiceResolve");
-      dnssd_sock_fd             = GetProcAddress("DNSServiceRefSockFD");
-      dnssd_update_record       = GetProcAddress("DNSServiceUpdateRecord");
+      dnssd_add_record          = (DNSServiceErrorType (*)(DNSServiceRef, DNSRecordRef *, DNSServiceFlags, uint16_t, uint16_t, const void *, uint32_t))GetProcAddress(dll_handle, "DNSServiceAddRecord");
+      dnssd_browse              = (DNSServiceErrorType(*)(DNSServiceRef *, DNSServiceFlags, uint32_t, const char *, const char *, DNSServiceBrowseReply, void *))GetProcAddress(dll_handle, "DNSServiceBrowse");
+      dnssd_construct_full_name = (DNSServiceErrorType(*)(char * const, const char * const, const char * const, const char * const))GetProcAddress(dll_handle, "DNSServiceConstructFullName");
+      dnssd_create_connection   = (DNSServiceErrorType(*)(DNSServiceRef *))GetProcAddress(dll_handle, "DNSServiceCreateConnection");
+      dnssd_deallocate          = (DNSServiceErrorType(*)(DNSServiceRef))GetProcAddress(dll_handle, "DNSServiceRefDeallocate");
+      dnssd_process_result      = (DNSServiceErrorType(*)(DNSServiceRef))GetProcAddress(dll_handle, "DNSServiceProcessResult");
+      dnssd_query_record        = (DNSServiceErrorType(*)(DNSServiceRef *, DNSServiceFlags, uint32_t, const char *, uint16_t, uint16_t, DNSServiceQueryRecordReply, void *))GetProcAddress(dll_handle, "DNSServiceQueryRecord");
+      dnssd_register            = (DNSServiceErrorType(*)(DNSServiceRef *, DNSServiceFlags, uint32_t, const char *, const char *, const char *, const char *, uint16_t, uint16_t, const void *, DNSServiceRegisterReply, void *))GetProcAddress(dll_handle, "DNSServiceRegister");
+      dnssd_remove_record       = (DNSServiceErrorType(*)(DNSServiceRef, DNSRecordRef, DNSServiceFlags))GetProcAddress(dll_handle, "DNSServiceRemoveRecord");
+      dnssd_resolve             = (DNSServiceErrorType(*)(DNSServiceRef *, DNSServiceFlags, uint32_t, const char *, const char *, const char *, DNSServiceResolveReply, void *))GetProcAddress(dll_handle, "DNSServiceResolve");
+      dnssd_sock_fd             = (int(*)(DNSServiceRef))GetProcAddress(dll_handle, "DNSServiceRefSockFD");
+      dnssd_update_record       = (DNSServiceErrorType(*)(DNSServiceRef, DNSRecordRef, DNSServiceFlags, uint16_t, const void *, uint32_t))GetProcAddress(dll_handle, "DNSServiceUpdateRecord");
 
-      dnssd_txt_create          = GetProcAddress("TXTRecordCreate");
-      dnssd_txt_deallocate      = GetProcAddress("TXTRecordDeallocate");
-      dnssd_txt_get_bytes_ptr   = GetProcAddress("TXTRecordGetBytesPtr");
-      dnssd_txt_get_length      = GetProcAddress("TXTRecordGetLength");
-      dnssd_txt_set_value       = GetProcAddress("TXTRecordSetValue");
+      dnssd_txt_create          = (void (*)(TXTRecordRef *, uint16_t, void *))GetProcAddress(dll_handle, "TXTRecordCreate");
+      dnssd_txt_deallocate      = (void (*)(TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordDeallocate");
+      dnssd_txt_get_bytes_ptr   = (const void *(*)(const TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordGetBytesPtr");
+      dnssd_txt_get_length      = (uint16_t (*)(const TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordGetLength");
+      dnssd_txt_set_value       = (DNSServiceErrorType (*)(TXTRecordRef *, const char *, uint8_t, const void *))GetProcAddress(dll_handle, "TXTRecordSetValue");
     }
 
     dnssd_initialized = 1;
@@ -218,9 +197,7 @@ void DNSSD_API DNSServiceRefDeallocate(DNSServiceRef sdRef)
     dnssd_init();
 
   if (dnssd_deallocate)
-    return (*dnssd_deallocate)(sdRef);
-  else
-    return (-1);
+    (*dnssd_deallocate)(sdRef);
 }
 
 
@@ -327,12 +304,11 @@ DNSServiceErrorType DNSSD_API DNSServiceUpdateRecord
 
 
 // TXTRecordCreate
-void DNSSD_API TXTRecordCreate
-    (
+void DNSSD_API
+TXTRecordCreate(
     TXTRecordRef     *txtRecord,
     uint16_t         bufferLen,
-    void             *buffer
-    )
+    void             *buffer)
 {
   if (!dnssd_initialized)
     dnssd_init();

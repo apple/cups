@@ -156,6 +156,10 @@ test/ippserver-shared
 test/ipptool
 test/ipptool-static
 test/pwg-raster-samples-*
+vcnet/.vs
+vcnet/packages
+vcnet/Win32
+vcnet/x64
 xcode/CUPS.xcodeproj/project.xcworkspace/
 xcode/CUPS.xcodeproj/xcuserdata/
 

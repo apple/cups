@@ -14,6 +14,7 @@
  */
 
 #  include "config.h"
+#  include <cups/versioning.h>
 
 
 /*
