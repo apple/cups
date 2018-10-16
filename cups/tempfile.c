@@ -54,7 +54,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 #ifdef _WIN32
   if ((tmpdir = getenv("TEMP")) == NULL)
   {
-    GetTempPath(sizeof(tmppath), tmppath);
+    GetTempPathA(sizeof(tmppath), tmppath);
     tmpdir = tmppath;
   }
 

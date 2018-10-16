@@ -34,7 +34,10 @@ static DNSServiceErrorType (*dnssd_update_record)(DNSServiceRef sdRef, DNSRecord
 static void (*dnssd_txt_create)(TXTRecordRef *txtRecord, uint16_t bufferLen, void *buffer);
 static void (*dnssd_txt_deallocate)(TXTRecordRef *txtRecord);
 static const void *(*dnssd_txt_get_bytes_ptr)(const TXTRecordRef *txtRecord);
+static uint16_t (*dnssd_txt_get_count)(uint16_t txtLen, const void *txtRecord);
 static uint16_t (*dnssd_txt_get_length)(const TXTRecordRef *txtRecord);
+static DNSServiceErrorType (*dnssd_txt_get_item_at_index)(uint16_t txtLen, const void *txtRecord, uint16_t itemIndex, uint16_t keyBufLen, char *key, uint8_t *valueLen, const void **value);
+static const void *(*dnssd_txt_get_value_ptr)(uint16_t txtLen, const void *txtRecord, const char *key, uint8_t *valueLen);
 static DNSServiceErrorType (*dnssd_txt_set_value)(TXTRecordRef *txtRecord, const char *key, uint8_t valueSize, const void *value);
 
 
@@ -68,7 +71,10 @@ dnssd_init(void)
       dnssd_txt_create          = (void (*)(TXTRecordRef *, uint16_t, void *))GetProcAddress(dll_handle, "TXTRecordCreate");
       dnssd_txt_deallocate      = (void (*)(TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordDeallocate");
       dnssd_txt_get_bytes_ptr   = (const void *(*)(const TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordGetBytesPtr");
+      dnssd_txt_get_count       = (uint16_t (*)(uint16_t, const void *))GetProcAddress(dll_handle, "TXTRecordGetCount");
+      dnssd_txt_get_item_at_index = (DNSServiceErrorType (*)(uint16_t, const void *, uint16_t, uint16_t, char *, uint8_t *, const void **))GetProcAddress(dll_handle, "TXTRecordGetItemAtIndex");
       dnssd_txt_get_length      = (uint16_t (*)(const TXTRecordRef *))GetProcAddress(dll_handle, "TXTRecordGetLength");
+      dnssd_txt_get_value_ptr   = (const void *(*)(uint16_t, const void *, const char *, uint8_t *))GetProcAddress(dll_handle, "TXTRecordGetValuePtr");
       dnssd_txt_set_value       = (DNSServiceErrorType (*)(TXTRecordRef *, const char *, uint8_t, const void *))GetProcAddress(dll_handle, "TXTRecordSetValue");
     }
 
@@ -383,3 +389,56 @@ DNSServiceErrorType DNSSD_API TXTRecordSetValue
 }
 
 
+// TXTRecordGetCount
+uint16_t DNSSD_API
+TXTRecordGetCount(
+    uint16_t         txtLen,
+    const void       *txtRecord)
+{
+  if (!dnssd_initialized)
+    dnssd_init();
+
+  if (dnssd_txt_get_count)
+    return (*dnssd_txt_get_count)(txtLen, txtRecord);
+  else
+    return (0);
+}
+
+
+// TXTRecordGetItemAtIndex
+DNSServiceErrorType DNSSD_API
+TXTRecordGetItemAtIndex(
+    uint16_t         txtLen,
+    const void       *txtRecord,
+    uint16_t         itemIndex,
+    uint16_t         keyBufLen,
+    char             *key,
+    uint8_t          *valueLen,
+    const void       **value)
+{
+  if (!dnssd_initialized)
+    dnssd_init();
+
+  if (dnssd_txt_get_item_at_index)
+    return (*dnssd_txt_get_item_at_index)(txtLen, txtRecord, itemIndex, keyBufLen, key, valueLen, value);
+  else
+    return (-1);
+}
+
+
+// TXTRecordGetValuePtr
+const void * DNSSD_API
+TXTRecordGetValuePtr(
+    uint16_t         txtLen,
+    const void       *txtRecord,
+    const char       *key,
+    uint8_t          *valueLen)
+{
+  if (!dnssd_initialized)
+    dnssd_init();
+
+  if (dnssd_txt_get_value_ptr)
+    return (*dnssd_txt_get_value_ptr)(txtLen, txtRecord, key, valueLen);
+  else
+    return (NULL);
+}

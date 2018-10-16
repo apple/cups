@@ -500,7 +500,7 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
 
 #ifdef _WIN32
   version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&version);
+  GetVersionExA(&version);
   GetNativeSystemInfo(&sysinfo);
 
   snprintf(cg->user_agent, sizeof(cg->user_agent),
@@ -1103,7 +1103,7 @@ cups_finalize_client_conf(
     DWORD	size;			/* Size of string */
 
     size = sizeof(cc->user);
-    if (!GetUserName(cc->user, &size))
+    if (!GetUserNameA(cc->user, &size))
 #else
    /*
     * Try the USER environment variable as the default username...

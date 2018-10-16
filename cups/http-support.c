@@ -1763,9 +1763,6 @@ _httpResolveURI(
     _http_uribuf_t	uribuf;		/* URI buffer */
     int			offline = 0;	/* offline-report state set? */
 #  ifdef HAVE_DNSSD
-#    ifdef _WIN32
-#      pragma comment(lib, "dnssd.lib")
-#    endif /* _WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref = NULL,/* DNS-SD service reference for domain */
 			ippref = NULL,	/* DNS-SD service reference for network IPP */

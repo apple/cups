@@ -1188,7 +1188,7 @@ _cupsRasterWritePixels(
     else
       bytes = cups_raster_io(r, p, len);
 
-    if (bytes < len)
+    if (bytes < (ssize_t)len)
       return (0);
     else
       return (len);

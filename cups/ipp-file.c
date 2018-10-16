@@ -23,7 +23,7 @@
 
 static ipp_t	*parse_collection(_ipp_file_t *f, _ipp_vars_t *v, void *user_data);
 static int	parse_value(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, ipp_t *ipp, ipp_attribute_t **attr, int element);
-static void	report_error(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, const char *message, ...) __attribute((__format__ (__printf__, 4, 5)));
+static void	report_error(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, const char *message, ...) _CUPS_FORMAT(4, 5);
 
 
 /*

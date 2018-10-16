@@ -10,16 +10,31 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testfile", "testfile.vcxproj", "{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhttp", "testhttp.vcxproj", "{90B0058C-8393-411F-BD3B-E2C831D4E883}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0899B3A-43E7-4BC3-A785-659E1FD2EA83} = {C0899B3A-43E7-4BC3-A785-659E1FD2EA83}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cupstestppd", "cupstestppd.vcxproj", "{6BE0CDD3-4ED7-409C-A80F-19DF73664B1F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0899B3A-43E7-4BC3-A785-659E1FD2EA83} = {C0899B3A-43E7-4BC3-A785-659E1FD2EA83}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipptool", "ipptool.vcxproj", "{B246D91E-61F2-4433-BFD2-6C2A96FBD4D4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0899B3A-43E7-4BC3-A785-659E1FD2EA83} = {C0899B3A-43E7-4BC3-A785-659E1FD2EA83}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex.vcxproj", "{18950A1B-D37A-40C7-B2DF-C12986C0526E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ippfind", "ippfind.vcxproj", "{B484DA0C-62C8-4C32-83B6-CCEB58968B85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0899B3A-43E7-4BC3-A785-659E1FD2EA83} = {C0899B3A-43E7-4BC3-A785-659E1FD2EA83}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ippserver", "ippserver.vcxproj", "{82A03BC7-0746-4B85-8908-3C7A3FAA58A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C0899B3A-43E7-4BC3-A785-659E1FD2EA83} = {C0899B3A-43E7-4BC3-A785-659E1FD2EA83}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnssdstub", "dnssdstub.vcxproj", "{C0899B3A-43E7-4BC3-A785-659E1FD2EA83}"
 EndProject

@@ -57,13 +57,13 @@ httpAddrConnect2(
 {
   int			val;		/* Socket option value */
 #ifndef _WIN32
-  int			flags;		/* Socket flags */
+  int			i, j,		/* Looping vars */
+			flags,		/* Socket flags */
+			result;		/* Result from select() or poll() */
 #endif /* !_WIN32 */
   int			remaining;	/* Remaining timeout */
-  int			i, j,		/* Looping vars */
-			nfds,		/* Number of file descriptors */
-			fds[100],	/* Socket file descriptors */
-			result;		/* Result from select() or poll() */
+  int			nfds,		/* Number of file descriptors */
+			fds[100];	/* Socket file descriptors */
   http_addrlist_t	*addrs[100];	/* Addresses */
 #ifndef HAVE_POLL
   int			max_fd = -1;	/* Highest file descriptor */
@@ -79,8 +79,10 @@ httpAddrConnect2(
 #  endif /* HAVE_POLL */
 #endif /* O_NONBLOCK */
 #ifdef DEBUG
+#  ifndef _WIN32
   socklen_t		len;		/* Length of value */
   http_addr_t		peer;		/* Peer address */
+#  endif /* !_WIN32 */
   char			temp[256];	/* Temporary address string */
 #endif /* DEBUG */
 
@@ -649,7 +651,11 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       if (error == EAI_FAIL)
         cg->need_res_init = 1;
 
+#  ifdef _WIN32 /* Really, Microsoft?!? */
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gai_strerrorA(error), 0);
+#  else
       _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gai_strerror(error), 0);
+#  endif /* _WIN32 */
     }
 
 #else
