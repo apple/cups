@@ -26,6 +26,7 @@
 
 #  include <limits.h>
 #  ifdef _WIN32
+#    define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #    include <io.h>
 #    include <winsock2.h>
 #    define CUPS_SOCAST (const char *)

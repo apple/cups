@@ -486,7 +486,7 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
 					/* Thread globals */
 #ifdef _WIN32
   SYSTEM_INFO		sysinfo;	/* System information */
-  OSVERSIONINFO		version;	/* OS version info */
+  OSVERSIONINFOA	version;	/* OS version info */
 #else
   struct utsname	name;		/* uname info */
 #endif /* _WIN32 */

@@ -222,8 +222,7 @@ cups_globals_alloc(void)
 
     strlcpy(installdir, "C:/Program Files/cups.org", sizeof(installdir));
 
-    if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ,
-                      &key))
+    if (!RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ, &key))
     {
      /*
       * Grab the installation directory...
@@ -232,7 +231,7 @@ cups_globals_alloc(void)
       char  *ptr;			/* Pointer into installdir */
 
       size = sizeof(installdir);
-      RegQueryValueEx(key, "installdir", NULL, NULL, installdir, &size);
+      RegQueryValueExA(key, "installdir", NULL, NULL, installdir, &size);
       RegCloseKey(key);
 
       for (ptr = installdir; *ptr;)
