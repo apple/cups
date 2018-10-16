@@ -188,7 +188,7 @@ uninstall:
 
 libcupscgi.so.1:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
 
@@ -199,7 +199,7 @@ libcupscgi.so.1:	$(LIBOBJS)
 
 libcupscgi.1.dylib:	$(LIBOBJS) libcupscgi.exp
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
@@ -216,7 +216,7 @@ libcupscgi.1.dylib:	$(LIBOBJS) libcupscgi.exp
 
 libcupscgi.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
 		-version-info 1:0 $(LIBS)
 
 

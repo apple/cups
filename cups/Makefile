@@ -339,7 +339,7 @@ uninstall:
 
 libcups.so.2:	$(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(IMAGEOBJS) \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(IMAGEOBJS) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
@@ -351,7 +351,7 @@ libcups.so.2:	$(LIBOBJS) $(IMAGEOBJS)
 
 libcups.2.dylib:	$(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.14.0 \
 		-compatibility_version 2.0.0 \
@@ -368,7 +368,7 @@ libcups.2.dylib:	$(LIBOBJS) $(IMAGEOBJS)
 
 libcups.la:    $(LIBOBJS) $(IMAGEOBJS)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		$(LIBOBJS:.o=.lo) $(IMAGEOBJS:.o=.lo) \
 		-rpath $(LIBDIR) -version-info 2:14 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
@@ -408,7 +408,7 @@ libcups2.def: $(LIBOBJS) $(IMAGEOBJS) Makefile
 
 libcupsimage.so.2:	$(IMAGEOBJS) libcups.so.2
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) \
 		-L../cups $(LINKCUPS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
@@ -420,7 +420,7 @@ libcupsimage.so.2:	$(IMAGEOBJS) libcups.so.2
 
 libcupsimage.2.dylib:	$(IMAGEOBJS) libcups.2.dylib
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
@@ -436,7 +436,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) libcups.2.dylib
 
 libcupsimage.la:       $(IMAGEOBJS) libcups.la
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
 		-L../cups $(LINKCUPS) \
 		-rpath $(LIBDIR) -version-info 2:3
 
