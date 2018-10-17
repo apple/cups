@@ -153,10 +153,6 @@ extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificate
 #    endif /* HAVE_GETIFADDRS */
 #  endif /* !WIN32 */
 
-#  ifdef HAVE_LIBZ
-#    include <zlib.h>
-#  endif /* HAVE_LIBZ */
-
 
 /*
  * C++ magic...
@@ -364,8 +360,8 @@ struct _http_s				/**** HTTP connection structure ****/
 					/* Default field values */
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
-  z_stream		stream;		/* (De)compression stream */
-  Bytef			*sbuffer;	/* (De)compression buffer */
+  void			*stream;	/* (De)compression stream */
+  unsigned char		*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
 
   /**** New in CUPS 2.2.9 ****/

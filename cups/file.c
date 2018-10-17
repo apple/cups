@@ -6,7 +6,7 @@
  * our own file functions allows us to provide transparent support of
  * different line endings, gzip'd print files, PPD files, etc.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -25,6 +25,39 @@
 #include "file-private.h"
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#  ifdef HAVE_LIBZ
+#    include <zlib.h>
+#  endif /* HAVE_LIBZ */
+
+
+/*
+ * Internal structures...
+ */
+
+struct _cups_file_s			/**** CUPS file structure... ****/
+
+{
+  int		fd;			/* File descriptor */
+  char		mode,			/* Mode ('r' or 'w') */
+		compressed,		/* Compression used? */
+		is_stdio,		/* stdin/out/err? */
+		eof,			/* End of file? */
+		buf[4096],		/* Buffer */
+		*ptr,			/* Pointer into buffer */
+		*end;			/* End of buffer data */
+  off_t		pos,			/* Position in file */
+		bufpos;			/* File position for start of buffer */
+
+#ifdef HAVE_LIBZ
+  z_stream	stream;			/* (De)compression stream */
+  Bytef		cbuf[4096];		/* (De)compression buffer */
+  uLong		crc;			/* (De)compression CRC */
+#endif /* HAVE_LIBZ */
+
+  char		*printf_buffer;		/* cupsFilePrintf buffer */
+  size_t	printf_size;		/* Size of cupsFilePrintf buffer */
+};
 
 
 /*
@@ -1260,6 +1293,18 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 #endif /* !WIN32 */
 
   return (fp);
+}
+
+
+/*
+ * '_cupsFilePeekAhead()' - See if the requested character is buffered up.
+ */
+
+int					/* O - 1 if present, 0 otherwise */
+_cupsFilePeekAhead(cups_file_t *fp,	/* I - CUPS file */
+                   int         ch)	/* I - Character */
+{
+  return (fp && fp->ptr && memchr(fp->ptr, ch, (size_t)(fp->end - fp->ptr)));
 }
 
 

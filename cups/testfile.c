@@ -1,7 +1,7 @@
 /*
  * File test program for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -22,9 +22,6 @@
 #include "file.h"
 #include <stdlib.h>
 #include <time.h>
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#endif /* HAVE_LIBZ */
 #ifdef WIN32
 #  include <io.h>
 #else
