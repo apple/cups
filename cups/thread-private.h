@@ -46,7 +46,7 @@ typedef pthread_key_t	_cups_threadkey_t;
 #    define _cupsThreadGetData(k) pthread_getspecific(k)
 #    define _cupsThreadSetData(k,p) pthread_setspecific(k,p)
 
-#  elif defined(WIN32)			/* Windows threading */
+#  elif defined(_WIN32)			/* Windows threading */
 #    include <winsock2.h>
 #    include <windows.h>
 typedef void *(__stdcall *_cups_thread_func_t)(void *arg);

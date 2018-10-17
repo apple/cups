@@ -24,13 +24,13 @@
 #  include <cups/cups.h>
 #  include <cups/debug-private.h>
 #  include <cups/string-private.h>
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #    include <winsock2.h>		/* for htonl() definition */
 #  else
 #    include <unistd.h>
 #    include <fcntl.h>
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 
 /*

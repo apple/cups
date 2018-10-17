@@ -395,11 +395,11 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
       ready = select(fd + 1, &input_set, NULL, NULL, &stimeout);
     }
-#  ifdef WIN32
+#  ifdef _WIN32
     while (ready < 0 && WSAGetLastError() == WSAEINTR);
 #  else
     while (ready < 0 && (errno == EINTR || errno == EAGAIN));
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 #endif /* HAVE_POLL */
 
    /*

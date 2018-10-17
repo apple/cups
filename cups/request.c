@@ -20,11 +20,11 @@
 #include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* O_BINARY */
@@ -156,11 +156,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       return (NULL);
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     if (fileinfo.st_mode & _S_IFDIR)
 #else
     if (S_ISDIR(fileinfo.st_mode))
-#endif /* WIN32 */
+#endif /* _WIN32 */
     {
      /*
       * Can't send a directory...
@@ -172,11 +172,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       return (NULL);
     }
 
-#ifndef WIN32
+#ifndef _WIN32
     if (!S_ISREG(fileinfo.st_mode))
       length = 0;			/* Chunk when piping */
     else
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
     length = ippLength(request) + (size_t)fileinfo.st_size;
   }
   else
@@ -215,9 +215,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * Send the file with the request...
       */
 
-#ifndef WIN32
+#ifndef _WIN32
       if (S_ISREG(fileinfo.st_mode))
-#endif /* WIN32 */
+#endif /* _WIN32 */
       lseek(infile, 0, SEEK_SET);
 
       while ((bytes = read(infile, buffer, sizeof(buffer))) > 0)
@@ -1028,13 +1028,13 @@ _cupsConnect(void)
       char	ch;			/* Connection check byte */
       ssize_t	n;			/* Number of bytes */
 
-#ifdef WIN32
+#ifdef _WIN32
       if ((n = recv(cg->http->fd, &ch, 1, MSG_PEEK)) == 0 ||
           (n < 0 && WSAGetLastError() != WSAEWOULDBLOCK))
 #else
       if ((n = recv(cg->http->fd, &ch, 1, MSG_PEEK | MSG_DONTWAIT)) == 0 ||
           (n < 0 && errno != EWOULDBLOCK))
-#endif /* WIN32 */
+#endif /* _WIN32 */
       {
        /*
         * Nope, close the connection...

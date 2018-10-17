@@ -52,8 +52,8 @@
 
 
 /*
- * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
- * and strnicmp() functions...
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32
+ * _stricmp() and _strnicmp() functions...
  */
 
 #define strcasecmp	_stricmp
@@ -94,8 +94,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.2.8"
-#define CUPS_MINIMAL "CUPS/2.2.8"
+#define CUPS_SVERSION "CUPS v2.2.9"
+#define CUPS_MINIMAL "CUPS/2.2.9"
 
 
 /*

@@ -21,12 +21,12 @@
 #include "cups-private.h"
 #include "ppd-private.h"
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <io.h>
 #else
 #  include <unistd.h>
 #  include <fcntl.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #include <math.h>
 
 

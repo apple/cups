@@ -494,7 +494,7 @@ main(void)
  * 'get_seconds()' - Get the current time in seconds...
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <windows.h>
 
 
@@ -515,7 +515,7 @@ get_seconds(void)
   gettimeofday(&curtime, NULL);
   return (curtime.tv_sec + 0.000001 * curtime.tv_usec);
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*

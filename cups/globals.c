@@ -34,23 +34,23 @@ static _cups_threadkey_t cups_globals_key = _CUPS_THREADKEY_INITIALIZER;
 static pthread_once_t	cups_globals_key_once = PTHREAD_ONCE_INIT;
 					/* One-time initialization object */
 #endif /* HAVE_PTHREAD_H */
-#if defined(HAVE_PTHREAD_H) || defined(WIN32)
+#if defined(HAVE_PTHREAD_H) || defined(_WIN32)
 static _cups_mutex_t	cups_global_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Global critical section */
-#endif /* HAVE_PTHREAD_H || WIN32 */
+#endif /* HAVE_PTHREAD_H || _WIN32 */
 
 
 /*
  * Local functions...
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 static void		cups_fix_path(char *path);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 static _cups_globals_t	*cups_globals_alloc(void);
-#if defined(HAVE_PTHREAD_H) || defined(WIN32)
+#if defined(HAVE_PTHREAD_H) || defined(_WIN32)
 static void		cups_globals_free(_cups_globals_t *g);
-#endif /* HAVE_PTHREAD_H || WIN32 */
+#endif /* HAVE_PTHREAD_H || _WIN32 */
 #ifdef HAVE_PTHREAD_H
 static void		cups_globals_init(void);
 #endif /* HAVE_PTHREAD_H */
@@ -65,7 +65,7 @@ _cupsGlobalLock(void)
 {
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_lock(&cups_global_mutex);
-#elif defined(WIN32)
+#elif defined(_WIN32)
   EnterCriticalSection(&cups_global_mutex.m_criticalSection);
 #endif /* HAVE_PTHREAD_H */
 }
@@ -120,13 +120,13 @@ _cupsGlobalUnlock(void)
 {
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_unlock(&cups_global_mutex);
-#elif defined(WIN32)
+#elif defined(_WIN32)
   LeaveCriticalSection(&cups_global_mutex.m_criticalSection);
 #endif /* HAVE_PTHREAD_H */
 }
 
 
-#ifdef WIN32
+#ifdef _WIN32
 /*
  * 'DllMain()' - Main entry for library.
  */
@@ -170,7 +170,7 @@ DllMain(HINSTANCE hinst,		/* I - DLL module handle */
 
   return (TRUE);
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*
@@ -182,13 +182,13 @@ cups_globals_alloc(void)
 {
   _cups_globals_t *cg = malloc(sizeof(_cups_globals_t));
 					/* Pointer to global data */
-#ifdef WIN32
+#ifdef _WIN32
   HKEY		key;			/* Registry key */
   DWORD		size;			/* Size of string */
   static char	installdir[1024] = "",	/* Install directory */
 		confdir[1024] = "",	/* Server root directory */
 		localedir[1024] = "";	/* Locale directory */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
   if (!cg)
@@ -219,7 +219,7 @@ cups_globals_alloc(void)
   * Then set directories as appropriate...
   */
 
-#ifdef WIN32
+#ifdef _WIN32
   if (!installdir[0])
   {
    /*
@@ -315,7 +315,7 @@ cups_globals_alloc(void)
     if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
       cg->localedir = CUPS_LOCALEDIR;
   }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
   return (cg);
 }
@@ -325,7 +325,7 @@ cups_globals_alloc(void)
  * 'cups_globals_free()' - Free global data.
  */
 
-#if defined(HAVE_PTHREAD_H) || defined(WIN32)
+#if defined(HAVE_PTHREAD_H) || defined(_WIN32)
 static void
 cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 {
@@ -360,7 +360,7 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 
   free(cg);
 }
-#endif /* HAVE_PTHREAD_H || WIN32 */
+#endif /* HAVE_PTHREAD_H || _WIN32 */
 
 
 #ifdef HAVE_PTHREAD_H

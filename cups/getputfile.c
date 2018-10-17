@@ -20,11 +20,11 @@
 #include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 
 
 /*

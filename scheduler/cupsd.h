@@ -30,11 +30,11 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include <direct.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #include "mime.h"
 

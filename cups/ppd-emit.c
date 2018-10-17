@@ -21,11 +21,11 @@
 
 #include "cups-private.h"
 #include "ppd.h"
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 
 
 /*
@@ -328,11 +328,11 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 
     while (buflength > 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       if ((bytes = (ssize_t)write(fd, bufptr, (unsigned)buflength)) < 0)
 #else
       if ((bytes = write(fd, bufptr, buflength)) < 0)
-#endif /* WIN32 */
+#endif /* _WIN32 */
       {
         if (errno == EAGAIN || errno == EINTR)
 	  continue;

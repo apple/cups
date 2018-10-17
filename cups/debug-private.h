@@ -67,7 +67,7 @@ extern "C" {
  */
 
 #  ifdef DEBUG
-#    ifdef WIN32
+#    ifdef _WIN32
 #      ifdef LIBCUPS2_EXPORTS
 #        define DLLExport __declspec(dllexport)
 #      else
@@ -75,7 +75,7 @@ extern "C" {
 #      endif /* LIBCUPS2_EXPORTS */
 #    else
 #      define DLLExport
-#    endif /* WIN32 */
+#    endif /* _WIN32 */
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
 #    define DEBUG_set(logfile,level,filter) _cups_debug_set(logfile,level,filter,1)
@@ -99,10 +99,10 @@ extern void	DLLExport _cups_debug_puts(const char *s);
 extern void	DLLExport _cups_debug_set(const char *logfile,
 					  const char *level, const char *filter,
 					  int force);
-#  ifdef WIN32
+#  ifdef _WIN32
 extern int	_cups_gettimeofday(struct timeval *tv, void *tz);
 #    define gettimeofday(a,b) _cups_gettimeofday(a, b)
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 #  ifdef __cplusplus
 }

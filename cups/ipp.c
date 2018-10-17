@@ -19,9 +19,9 @@
 
 #include "cups-private.h"
 #include <regex.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <io.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*
@@ -6762,14 +6762,14 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 
     if ((bytes = httpRead2(http, (char *)buffer, length - (size_t)tbytes)) < 0)
     {
-#ifdef WIN32
+#ifdef _WIN32
       break;
 #else
       if (errno != EAGAIN && errno != EINTR)
 	break;
 
       bytes = 0;
-#endif /* WIN32 */
+#endif /* _WIN32 */
     }
     else if (bytes == 0)
       break;
@@ -6797,11 +6797,11 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
               ipp_uchar_t *buffer,	/* O - Read buffer */
 	      size_t      length)	/* I - Number of bytes to read */
 {
-#ifdef WIN32
+#ifdef _WIN32
   return ((ssize_t)read(*fd, buffer, (unsigned)length));
 #else
   return (read(*fd, buffer, length));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -6969,9 +6969,9 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
                ipp_uchar_t *buffer,	/* I - Data to write */
                size_t      length)	/* I - Number of bytes to write */
 {
-#ifdef WIN32
+#ifdef _WIN32
   return ((ssize_t)write(*fd, buffer, (unsigned)length));
 #else
   return (write(*fd, buffer, length));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }

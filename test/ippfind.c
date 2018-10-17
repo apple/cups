@@ -20,12 +20,12 @@
 
 #define _CUPS_NO_DEPRECATED
 #include <cups/cups-private.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <process.h>
 #  include <sys/timeb.h>
 #else
 #  include <sys/wait.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #include <regex.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -39,9 +39,9 @@
 #  define kDNSServiceMaxDomainName AVAHI_DOMAIN_NAME_MAX
 #endif /* HAVE_DNSSD */
 
-#ifndef WIN32
+#ifndef _WIN32
 extern char **environ;			/* Process environment variables */
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 
 /*
@@ -1766,10 +1766,10 @@ dnssd_error_string(int error)		/* I - Error number */
     case kDNSServiceErr_PollingMode :
         return ("Service polling mode error.");
 
-#ifndef WIN32
+#ifndef _WIN32
     case kDNSServiceErr_Timeout :
         return ("Service timeout.");
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   }
 
 #  elif defined(HAVE_AVAHI)
@@ -1920,10 +1920,10 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
   int		i,			/* Looping var */
 		myenvc,			/* Number of environment variables */
 		status;			/* Exit status of program */
-#ifndef WIN32
+#ifndef _WIN32
   char		program[1024];		/* Program to execute */
   int		pid;			/* Process ID */
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 
  /*
@@ -2058,7 +2058,7 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
       myargv[i] = strdup(args[i]);
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   if (getenv("IPPFIND_DEBUG"))
   {
     printf("\nProgram:\n    %s\n", args[0]);
@@ -2121,7 +2121,7 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
     while (wait(&status) != pid)
       ;
   }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
  /*
   * Free memory...
@@ -2139,14 +2139,14 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 
   if (getenv("IPPFIND_DEBUG"))
   {
-#ifdef WIN32
+#ifdef _WIN32
     printf("Exit Status: %d\n", status);
 #else
     if (WIFEXITED(status))
       printf("Exit Status: %d\n", WEXITSTATUS(status));
     else
       printf("Terminating Signal: %d\n", WTERMSIG(status));
-#endif /* WIN32 */
+#endif /* _WIN32 */
   }
 
   return (status == 0);
@@ -2220,7 +2220,7 @@ get_service(cups_array_t *services,	/* I - Service array */
 static double
 get_time(void)
 {
-#ifdef WIN32
+#ifdef _WIN32
   struct _timeb curtime;		/* Current Windows time */
 
   _ftime(&curtime);
@@ -2234,7 +2234,7 @@ get_time(void)
     return (0.0);
   else
     return (curtime.tv_sec + 0.000001 * curtime.tv_usec);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 

@@ -31,10 +31,10 @@
 #  include <stdarg.h>
 #  include <fcntl.h>
 
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #    include <sys/locking.h>
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 
 /*

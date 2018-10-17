@@ -30,7 +30,7 @@
 #  endif /* __sun */
 
 #  include <limits.h>
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include <io.h>
 #    include <winsock2.h>
 #    define CUPS_SOCAST (const char *)
@@ -39,7 +39,7 @@
 #    include <fcntl.h>
 #    include <sys/socket.h>
 #    define CUPS_SOCAST
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 #  ifdef HAVE_GSSAPI
 #    ifdef HAVE_GSS_GSSAPI_H
@@ -140,7 +140,7 @@ extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificate
 #    include <sspi.h>
 #  endif /* HAVE_GNUTLS */
 
-#  ifndef WIN32
+#  ifndef _WIN32
 #    include <net/if.h>
 #    include <resolv.h>
 #    ifdef HAVE_GETIFADDRS
@@ -151,7 +151,7 @@ extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificate
 #        include <sys/sockio.h>
 #      endif /* HAVE_SYS_SOCKIO_H */
 #    endif /* HAVE_GETIFADDRS */
-#  endif /* !WIN32 */
+#  endif /* !_WIN32 */
 
 
 /*
@@ -392,7 +392,7 @@ extern const char *_cups_hstrerror(int error);
  * Some OS's don't have getifaddrs() and freeifaddrs()...
  */
 
-#  if !defined(WIN32) && !defined(HAVE_GETIFADDRS)
+#  if !defined(_WIN32) && !defined(HAVE_GETIFADDRS)
 #    ifdef ifa_dstaddr
 #      undef ifa_dstaddr
 #    endif /* ifa_dstaddr */
@@ -427,7 +427,7 @@ extern int	_cups_getifaddrs(struct ifaddrs **addrs);
 #    define getifaddrs _cups_getifaddrs
 extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #    define freeifaddrs _cups_freeifaddrs
-#  endif /* !WIN32 && !HAVE_GETIFADDRS */
+#  endif /* !_WIN32 && !HAVE_GETIFADDRS */
 
 
 /*

@@ -18,7 +18,7 @@
 
 #include "cups-private.h"
 #include "thread-private.h"
-#ifdef WIN32
+#ifdef _WIN32
 #  include <sys/timeb.h>
 #  include <time.h>
 #  include <io.h>
@@ -36,7 +36,7 @@ _cups_gettimeofday(struct timeval *tv,	/* I  - Timeval struct */
 #else
 #  include <sys/time.h>
 #  include <unistd.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 #include <regex.h>
 #include <fcntl.h>
 

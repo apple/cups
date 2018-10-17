@@ -20,13 +20,13 @@
 #include "cups-private.h"
 #include <stdlib.h>
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #  include <windows.h>
 #else
 #  include <pwd.h>
 #  include <termios.h>
 #  include <sys/utsname.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*
@@ -490,12 +490,12 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
 {
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Thread globals */
-#ifdef WIN32
+#ifdef _WIN32
   SYSTEM_INFO		sysinfo;	/* System information */
   OSVERSIONINFO		version;	/* OS version info */
 #else
   struct utsname	name;		/* uname info */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
   if (user_agent)
@@ -504,7 +504,7 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
     return;
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
   GetVersionEx(&version);
   GetNativeSystemInfo(&sysinfo);
@@ -528,7 +528,7 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
   snprintf(cg->user_agent, sizeof(cg->user_agent),
            CUPS_MINIMAL " (%s %s; %s) IPP/2.0",
 	   name.sysname, name.release, name.machine);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -580,7 +580,7 @@ cupsUserAgent(void)
 const char *				/* O - Password or @code NULL@ if none */
 _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
-#ifdef WIN32
+#ifdef _WIN32
   HANDLE		tty;		/* Console handle */
   DWORD			mode;		/* Console mode */
   char			passch,		/* Current key press */
@@ -846,7 +846,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
     memset(cg->password, 0, sizeof(cg->password));
     return (NULL);
   }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -905,7 +905,7 @@ _cupsSetDefaults(void)
 
 #  ifdef HAVE_GETEUID
   if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
-#  elif !defined(WIN32)
+#  elif !defined(_WIN32)
   if (getuid() && (home = getenv("HOME")) != NULL)
 #  else
   if ((home = getenv("HOME")) != NULL)
@@ -1101,7 +1101,7 @@ cups_finalize_client_conf(
 
   if (!cc->user[0])
   {
-#ifdef WIN32
+#ifdef _WIN32
    /*
     * Get the current user name from the OS...
     */
@@ -1137,7 +1137,7 @@ cups_finalize_client_conf(
     if (pw)
       strlcpy(cc->user, pw->pw_name, sizeof(cc->user));
     else
-#endif /* WIN32 */
+#endif /* _WIN32 */
     {
      /*
       * Use the default "unknown" user name...

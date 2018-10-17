@@ -22,11 +22,11 @@
 #include "adminutil.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #else
 #  include <unistd.h>
 #  include <sys/wait.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
 /*
@@ -2087,7 +2087,7 @@ do_samba_command(const char *command,	/* I - Command to run */
 		 const char *authfile,	/* I - Samba authentication file */
 		 FILE *logfile)		/* I - Optional log file */
 {
-#ifdef WIN32
+#ifdef _WIN32
   return (1);				/* Always fail on Windows... */
 
 #else
@@ -2154,7 +2154,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     return (WEXITSTATUS(status));
   else
     return (-WTERMSIG(status));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 }
 
 
@@ -2172,9 +2172,9 @@ get_cupsd_conf(
     int             *remote)		/* O - Remote file? */
 {
   int		fd;			/* Temporary file descriptor */
-#ifndef WIN32
+#ifndef _WIN32
   struct stat	info;			/* cupsd.conf file information */
-#endif /* WIN32 */
+#endif /* _WIN32 */
   http_status_t	status;			/* Status of getting cupsd.conf */
   char		host[HTTP_MAX_HOST];	/* Hostname for connection */
 
@@ -2191,7 +2191,7 @@ get_cupsd_conf(
   snprintf(name, namesize, "%s/cupsd.conf", cg->cups_serverroot);
   *remote = 0;
 
-#ifndef WIN32
+#ifndef _WIN32
   if (!_cups_strcasecmp(host, "localhost") && !access(name, R_OK))
   {
    /*
@@ -2218,7 +2218,7 @@ get_cupsd_conf(
       status = HTTP_STATUS_OK;
   }
   else
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   {
    /*
     * Read cupsd.conf via a HTTP GET request...

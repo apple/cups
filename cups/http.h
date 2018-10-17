@@ -25,7 +25,7 @@
 #  include <string.h>
 #  include <time.h>
 #  include <sys/types.h>
-#  ifdef WIN32
+#  ifdef _WIN32
 #    ifndef __CUPS_SSIZE_T_DEFINED
 #      define __CUPS_SSIZE_T_DEFINED
 /* Windows does not support the ssize_t type, so map it to off_t... */
@@ -54,7 +54,7 @@ typedef off_t ssize_t;			/* @private@ */
 #    if defined(LOCAL_PEERCRED) && !defined(SO_PEERCRED)
 #      define SO_PEERCRED LOCAL_PEERCRED
 #    endif /* LOCAL_PEERCRED && !SO_PEERCRED */
-#  endif /* WIN32 */
+#  endif /* _WIN32 */
 
 
 /*
@@ -85,7 +85,7 @@ extern "C" {
 #    define s6_addr32	_S6_un._S6_u32
 #  elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)|| defined(__DragonFly__)
 #    define s6_addr32	__u6_addr.__u6_addr32
-#  elif defined(WIN32)
+#  elif defined(_WIN32)
 /*
  * Windows only defines byte and 16-bit word members of the union and
  * requires special casing of all raw address code...

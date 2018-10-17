@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#if defined(WIN32) || defined(__EMX__)
+#if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>
 #else
 #  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#endif /* _WIN32 || __EMX__ */
 
 
 /*
@@ -42,21 +42,21 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
   int		fd;			/* File descriptor for temp file */
   int		tries;			/* Number of tries */
   const char	*tmpdir;		/* TMPDIR environment var */
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
   char		tmppath[1024];		/* Temporary directory */
-#endif /* __APPLE__ || WIN32 */
-#ifdef WIN32
+#endif /* __APPLE__ || _WIN32 */
+#ifdef _WIN32
   DWORD		curtime;		/* Current time */
 #else
   struct timeval curtime;		/* Current time */
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 
  /*
   * See if TMPDIR is defined...
   */
 
-#ifdef WIN32
+#ifdef _WIN32
   if ((tmpdir = getenv("TEMP")) == NULL)
   {
     GetTempPath(sizeof(tmppath), tmppath);
@@ -92,7 +92,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
   if ((tmpdir = getenv("TMPDIR")) == NULL)
     tmpdir = "/tmp";
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
  /*
   * Make the temporary name using the specified directory...
@@ -102,7 +102,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
 
   do
   {
-#ifdef WIN32
+#ifdef _WIN32
    /*
     * Get the current time of day...
     */
@@ -126,21 +126,21 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     */
 
     snprintf(filename, (size_t)len - 1, "%s/%05x%08x", tmpdir, (unsigned)getpid(), (unsigned)(curtime.tv_sec + curtime.tv_usec + tries));
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
    /*
     * Open the file in "exclusive" mode, making sure that we don't
     * stomp on an existing file or someone's symlink crack...
     */
 
-#ifdef WIN32
+#ifdef _WIN32
     fd = open(filename, _O_CREAT | _O_RDWR | _O_TRUNC | _O_BINARY,
               _S_IREAD | _S_IWRITE);
 #elif defined(O_NOFOLLOW)
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
 #else
     fd = open(filename, O_RDWR | O_CREAT | O_EXCL, 0600);
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
     if (fd < 0 && errno != EEXIST)
       break;

@@ -208,7 +208,7 @@ _cupsThreadWait(_cups_thread_t thread)	/* I - Thread ID */
 }
 
 
-#elif defined(WIN32)
+#elif defined(_WIN32)
 #  include <process.h>
 
 
