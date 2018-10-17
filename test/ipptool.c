@@ -3786,6 +3786,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 	     !_cups_strcasecmp(token, "WITH-VALUE"))
     {
       off_t	lastpos;		/* Last file position */
+      int	lastline;		/* Last line number */
 
       if (data->last_expect)
       {
@@ -3815,8 +3816,9 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 
       for (;;)
       {
-        lastpos = cupsFileTell(f->fp);
-        ptr     += strlen(ptr);
+        lastpos  = cupsFileTell(f->fp);
+        lastline = f->linenum;
+        ptr      += strlen(ptr);
 
 	if (!_ippFileReadToken(f, ptr, (sizeof(temp) - (size_t)(ptr - temp))))
 	  break;
@@ -3839,6 +3841,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
           */
 
           cupsFileSeek(f->fp, lastpos);
+          f->linenum = lastline;
           *ptr = '\0';
           break;
 	}
