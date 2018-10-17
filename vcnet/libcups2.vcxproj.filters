@@ -24,9 +24,6 @@
     <ClCompile Include="..\cups\auth.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\cups\backend.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\cups\debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,9 +103,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\cups\request.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cups\snmp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\cups\snprintf.c">
@@ -209,9 +203,6 @@
     <ClInclude Include="..\cups\http.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\cups\i18n.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\cups\ipp-private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -219,15 +210,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\cups\language.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\cups\md5-apple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\cups\md5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\cups\normalize.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\cups\ppd-private.h">
@@ -246,6 +228,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\cups\transcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cups\language-private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cups\array-private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cups\md5-private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cups\pwg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cups\versioning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
