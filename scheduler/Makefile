@@ -238,11 +238,6 @@ install-exec:
 #
 
 install-headers:
-	if test "x$(privateinclude)" != x; then \
-		echo Installing private header files into $(PRIVATEINCLUDE)...; \
-		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
-		$(INSTALL_DATA) mime.h $(PRIVATEINCLUDE); \
-	fi
 
 
 #

@@ -122,13 +122,6 @@ install-exec:
 #
 
 install-headers:
-	if test "x$(privateinclude)" != x; then \
-		echo Installing private header files into $(PRIVATEINCLUDE)...; \
-		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
-		for file in cgi.h help-index.h; do \
-			$(INSTALL_DATA) $$file $(PRIVATEINCLUDE); \
-		done; \
-	fi
 
 
 #
