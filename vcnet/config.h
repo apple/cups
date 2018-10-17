@@ -48,8 +48,8 @@
 
 
 /*
- * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 _stricmp()
- * and _strnicmp() functions...
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32
+ * _stricmp() and _strnicmp() functions...
  */
 
 #define strcasecmp	_stricmp
