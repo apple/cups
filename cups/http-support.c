@@ -1322,7 +1322,7 @@ _httpSetDigestAuthString(
   size_t	hashsize;		/* Size of hash */
 
 
-  DEBUG_printf(("2_httpSetDigestAuthString(http=%p, nonce=\"%s\", method=\"%s\", resource=\"%s\")", http, nonce, method, resource));
+  DEBUG_printf(("2_httpSetDigestAuthString(http=%p, nonce=\"%s\", method=\"%s\", resource=\"%s\")", (void *)http, nonce, method, resource));
 
   if (nonce && *nonce && strcmp(nonce, http->nonce))
   {

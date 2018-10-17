@@ -217,6 +217,8 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
   * Skip whitespace and comments...
   */
 
+  DEBUG_printf(("1_ippFileReadToken: linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
+
   while ((ch = cupsFileGetChar(f->fp)) != EOF)
   {
     if (_cups_isspace(ch))
@@ -226,13 +228,18 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       */
 
       if (ch == '\n')
+      {
         f->linenum ++;
+        DEBUG_printf(("1_ippFileReadToken: LF in leading whitespace, linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
+      }
     }
     else if (ch == '#')
     {
      /*
       * Comment...
       */
+
+      DEBUG_puts("1_ippFileReadToken: Skipping comment in leading whitespace...");
 
       while ((ch = cupsFileGetChar(f->fp)) != EOF)
       {
@@ -241,7 +248,10 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       }
 
       if (ch == '\n')
+      {
         f->linenum ++;
+        DEBUG_printf(("1_ippFileReadToken: LF at end of comment, linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
+      }
       else
         break;
     }
@@ -262,7 +272,10 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
   while (ch != EOF)
   {
     if (ch == '\n')
+    {
       f->linenum ++;
+      DEBUG_printf(("1_ippFileReadToken: LF in token, linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
+    }
 
     if (ch == quote)
     {
@@ -271,7 +284,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       */
 
       *tokptr = '\0';
-      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\".", token));
+      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\" at closing quote.", token));
       return (1);
     }
     else if (!quote && _cups_isspace(ch))
@@ -281,7 +294,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       */
 
       *tokptr = '\0';
-      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\".", token));
+      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\" before whitespace.", token));
       return (1);
     }
     else if (!quote && (ch == '\'' || ch == '\"'))
@@ -291,6 +304,8 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       */
 
       quote = ch;
+
+      DEBUG_printf(("1_ippFileReadToken: Start of quoted string, quote=%c, pos=%ld", quote, (long)cupsFileTell(f->fp)));
     }
     else if (!quote && ch == '#')
     {
@@ -300,7 +315,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 
       cupsFileSeek(f->fp, cupsFileTell(f->fp) - 1);
       *tokptr = '\0';
-      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\".", token));
+      DEBUG_printf(("1_ippFileReadToken: Returning \"%s\" before comment.", token));
       return (1);
     }
     else if (!quote && (ch == '{' || ch == '}' || ch == ','))
@@ -338,6 +353,8 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
         * Quoted character...
         */
 
+        DEBUG_printf(("1_ippFileReadToken: Quoted character at pos=%ld", (long)cupsFileTell(f->fp)));
+
         if ((ch = cupsFileGetChar(f->fp)) == EOF)
         {
 	  *token = '\0';
@@ -345,7 +362,10 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 	  return (0);
 	}
 	else if (ch == '\n')
+	{
 	  f->linenum ++;
+	  DEBUG_printf(("1_ippFileReadToken: quoted LF, linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
+	}
       }
 
       if (tokptr < tokend)
@@ -376,7 +396,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
   }
 
   *tokptr = '\0';
-  DEBUG_printf(("1_ippFileReadToken: Returning \"%s\".", token));
+  DEBUG_printf(("1_ippFileReadToken: Returning \"%s\" at EOF.", token));
 
   return (tokptr > token);
 }

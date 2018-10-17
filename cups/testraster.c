@@ -34,13 +34,12 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		errors;			/* Number of errors */
-  const char	*ext;			/* Filename extension */
+  int	errors = 0;			/* Number of errors */
 
 
   if (argc == 1)
   {
-    errors = do_raster_tests(CUPS_RASTER_WRITE);
+    errors += do_raster_tests(CUPS_RASTER_WRITE);
     errors += do_raster_tests(CUPS_RASTER_WRITE_COMPRESSED);
     errors += do_raster_tests(CUPS_RASTER_WRITE_PWG);
     errors += do_raster_tests(CUPS_RASTER_WRITE_APPLE);
@@ -49,7 +48,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     int			i;		/* Looping var */
 
-    for (errors = 0, i = 1; i < argc; i ++)
+    for (i = 1; i < argc; i ++)
       errors += do_ras_file(argv[i]);
   }
 
