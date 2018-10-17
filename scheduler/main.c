@@ -1474,7 +1474,12 @@ process_children(void)
 	    if (job->filters[i])
 	      job->status = status;	/* Filter failed */
 	    else
+            {
 	      job->status = -status;	/* Backend failed */
+
+              if (job->num_files > 1)
+                cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_FORCE, "Backend failed for job with multiple files, cancelling.");
+            }
           }
 
 	  if (job->state_value == IPP_JOB_PROCESSING &&
