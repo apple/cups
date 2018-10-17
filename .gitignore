@@ -153,6 +153,8 @@ test/ippserver
 test/ippserver-shared
 test/ipptool
 test/ipptool-static
+vcnet/.vs
+vcnet/packages
+vcnet/x64
 xcode/CUPS.xcodeproj/project.xcworkspace/
 xcode/CUPS.xcodeproj/xcuserdata/
-
