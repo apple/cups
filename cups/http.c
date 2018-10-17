@@ -28,6 +28,9 @@
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
+#  ifdef HAVE_LIBZ
+#    include <zlib.h>
+#  endif /* HAVE_LIBZ */
 
 
 /*
@@ -1675,7 +1678,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 #ifdef HAVE_LIBZ
   if (http->used == 0 &&
       (http->coding == _HTTP_CODING_IDENTITY ||
-       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)))
+       (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in == 0)))
 #else
   if (http->used == 0)
 #endif /* HAVE_LIBZ */
@@ -1724,16 +1727,16 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     int		zerr;			/* Decompressor error */
     z_stream	stream;			/* Copy of decompressor stream */
 
-    if (http->used > 0 && http->stream.avail_in < HTTP_MAX_BUFFER)
+    if (http->used > 0 && ((z_stream *)http->stream)->avail_in < HTTP_MAX_BUFFER)
     {
-      size_t buflen = buflen = HTTP_MAX_BUFFER - http->stream.avail_in;
+      size_t buflen = buflen = HTTP_MAX_BUFFER - ((z_stream *)http->stream)->avail_in;
 					/* Number of bytes to copy */
 
-      if (http->stream.avail_in > 0 &&
-	  http->stream.next_in > http->sbuffer)
-        memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
+      if (((z_stream *)http->stream)->avail_in > 0 &&
+	  ((z_stream *)http->stream)->next_in > http->sbuffer)
+        memmove(http->sbuffer, ((z_stream *)http->stream)->next_in, ((z_stream *)http->stream)->avail_in);
 
-      http->stream.next_in = http->sbuffer;
+      ((z_stream *)http->stream)->next_in = http->sbuffer;
 
       if (buflen > (size_t)http->data_remaining)
         buflen = (size_t)http->data_remaining;
@@ -1744,8 +1747,8 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       DEBUG_printf(("1httpPeek: Copying %d more bytes of data into "
 		    "decompression buffer.", (int)buflen));
 
-      memcpy(http->sbuffer + http->stream.avail_in, http->buffer, buflen);
-      http->stream.avail_in += buflen;
+      memcpy(http->sbuffer + ((z_stream *)http->stream)->avail_in, http->buffer, buflen);
+      ((z_stream *)http->stream)->avail_in += buflen;
       http->used            -= (int)buflen;
       http->data_remaining  -= (off_t)buflen;
 
@@ -1754,9 +1757,9 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     }
 
     DEBUG_printf(("2httpPeek: length=%d, avail_in=%d", (int)length,
-                  (int)http->stream.avail_in));
+                  (int)((z_stream *)http->stream)->avail_in));
 
-    if (inflateCopy(&stream, &(http->stream)) != Z_OK)
+    if (inflateCopy(&stream, (z_stream *)http->stream) != Z_OK)
     {
       DEBUG_puts("2httpPeek: Unable to copy decompressor stream.");
       http->error = ENOMEM;
@@ -1773,14 +1776,14 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     {
       DEBUG_printf(("2httpPeek: zerr=%d", zerr));
 #ifdef DEBUG
-      http_debug_hex("2httpPeek", (char *)http->sbuffer, (int)http->stream.avail_in);
+      http_debug_hex("2httpPeek", (char *)http->sbuffer, (int)((z_stream *)http->stream)->avail_in);
 #endif /* DEBUG */
 
       http->error = EIO;
       return (-1);
     }
 
-    bytes = (ssize_t)(length - http->stream.avail_out);
+    bytes = (ssize_t)(length - ((z_stream *)http->stream)->avail_out);
 
 #  else
     DEBUG_puts("2httpPeek: No inflateCopy on this platform, httpPeek does not "
@@ -1947,31 +1950,31 @@ httpRead2(http_t *http,			/* I - HTTP connection */
   {
     do
     {
-      if (http->stream.avail_in > 0)
+      if (((z_stream *)http->stream)->avail_in > 0)
       {
 	int	zerr;			/* Decompressor error */
 
 	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d",
-	              (int)http->stream.avail_in, (int)length));
+	              (int)((z_stream *)http->stream)->avail_in, (int)length));
 
-	http->stream.next_out  = (Bytef *)buffer;
-	http->stream.avail_out = (uInt)length;
+	((z_stream *)http->stream)->next_out  = (Bytef *)buffer;
+	((z_stream *)http->stream)->avail_out = (uInt)length;
 
-	if ((zerr = inflate(&(http->stream), Z_SYNC_FLUSH)) < Z_OK)
+	if ((zerr = inflate((z_stream *)http->stream, Z_SYNC_FLUSH)) < Z_OK)
 	{
 	  DEBUG_printf(("2httpRead2: zerr=%d", zerr));
 #ifdef DEBUG
-          http_debug_hex("2httpRead2", (char *)http->sbuffer, (int)http->stream.avail_in);
+          http_debug_hex("2httpRead2", (char *)http->sbuffer, (int)((z_stream *)http->stream)->avail_in);
 #endif /* DEBUG */
 
 	  http->error = EIO;
 	  return (-1);
 	}
 
-	bytes = (ssize_t)(length - http->stream.avail_out);
+	bytes = (ssize_t)(length - ((z_stream *)http->stream)->avail_out);
 
 	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d, bytes=%d",
-		      http->stream.avail_in, http->stream.avail_out,
+		      ((z_stream *)http->stream)->avail_in, ((z_stream *)http->stream)->avail_out,
 		      (int)bytes));
       }
       else
@@ -1979,16 +1982,16 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
       if (bytes == 0)
       {
-        ssize_t buflen = HTTP_MAX_BUFFER - (ssize_t)http->stream.avail_in;
+        ssize_t buflen = HTTP_MAX_BUFFER - (ssize_t)((z_stream *)http->stream)->avail_in;
 					/* Additional bytes for buffer */
 
         if (buflen > 0)
         {
-          if (http->stream.avail_in > 0 &&
-              http->stream.next_in > http->sbuffer)
-            memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
+          if (((z_stream *)http->stream)->avail_in > 0 &&
+              ((z_stream *)http->stream)->next_in > http->sbuffer)
+            memmove(http->sbuffer, ((z_stream *)http->stream)->next_in, ((z_stream *)http->stream)->avail_in);
 
-	  http->stream.next_in = http->sbuffer;
+	  ((z_stream *)http->stream)->next_in = http->sbuffer;
 
           DEBUG_printf(("1httpRead2: Reading up to %d more bytes of data into "
                         "decompression buffer.", (int)buflen));
@@ -1998,10 +2001,10 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 	    if (buflen > http->data_remaining)
 	      buflen = (ssize_t)http->data_remaining;
 
-	    bytes = http_read_buffered(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
+	    bytes = http_read_buffered(http, (char *)http->sbuffer + ((z_stream *)http->stream)->avail_in, (size_t)buflen);
           }
           else if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-            bytes = http_read_chunk(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
+            bytes = http_read_chunk(http, (char *)http->sbuffer + ((z_stream *)http->stream)->avail_in, (size_t)buflen);
           else
             bytes = 0;
 
@@ -2014,7 +2017,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
                         "decompression buffer.", CUPS_LLCAST bytes));
 
           http->data_remaining  -= bytes;
-          http->stream.avail_in += (uInt)bytes;
+          ((z_stream *)http->stream)->avail_in += (uInt)bytes;
 
 	  if (http->data_remaining <= 0 &&
 	      http->data_encoding == HTTP_ENCODING_CHUNKED)
@@ -2093,7 +2096,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
   if (
 #ifdef HAVE_LIBZ
       (http->coding == _HTTP_CODING_IDENTITY ||
-       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)) &&
+       (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in == 0)) &&
 #endif /* HAVE_LIBZ */
       ((http->data_remaining <= 0 &&
         http->data_encoding == HTTP_ENCODING_LENGTH) ||
@@ -3074,7 +3077,7 @@ httpWait(http_t *http,			/* I - HTTP connection */
   }
 
 #ifdef HAVE_LIBZ
-  if (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in > 0)
+  if (http->coding >= _HTTP_CODING_GUNZIP && ((z_stream *)http->stream)->avail_in > 0)
   {
     DEBUG_puts("3httpWait: Returning 1 since there is buffered data ready.");
     return (1);
@@ -3170,17 +3173,17 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       size_t	slen;			/* Bytes to write */
       ssize_t	sret;			/* Bytes written */
 
-      http->stream.next_in   = (Bytef *)buffer;
-      http->stream.avail_in  = (uInt)length;
+      ((z_stream *)http->stream)->next_in   = (Bytef *)buffer;
+      ((z_stream *)http->stream)->avail_in  = (uInt)length;
 
-      while (deflate(&(http->stream), Z_NO_FLUSH) == Z_OK)
+      while (deflate((z_stream *)http->stream, Z_NO_FLUSH) == Z_OK)
       {
-        DEBUG_printf(("1httpWrite2: avail_out=%d", http->stream.avail_out));
+        DEBUG_printf(("1httpWrite2: avail_out=%d", ((z_stream *)http->stream)->avail_out));
 
-        if (http->stream.avail_out > 0)
+        if (((z_stream *)http->stream)->avail_out > 0)
 	  continue;
 
-	slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+	slen = _HTTP_MAX_SBUFFER - ((z_stream *)http->stream)->avail_out;
 
         DEBUG_printf(("1httpWrite2: Writing intermediate chunk, len=%d", (int)slen));
 
@@ -3197,8 +3200,8 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 	  return (-1);
 	}
 
-	http->stream.next_out  = (Bytef *)http->sbuffer;
-	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+	((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+	((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
       }
 
       bytes = (ssize_t)length;
@@ -3687,13 +3690,13 @@ http_content_coding_finish(
   {
     case _HTTP_CODING_DEFLATE :
     case _HTTP_CODING_GZIP :
-        http->stream.next_in  = dummy;
-        http->stream.avail_in = 0;
+        ((z_stream *)http->stream)->next_in  = dummy;
+        ((z_stream *)http->stream)->avail_in = 0;
 
         do
         {
-          zerr  = deflate(&(http->stream), Z_FINISH);
-	  bytes = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+          zerr  = deflate((z_stream *)http->stream, Z_FINISH);
+	  bytes = _HTTP_MAX_SBUFFER - ((z_stream *)http->stream)->avail_out;
 
           if (bytes > 0)
 	  {
@@ -3705,15 +3708,18 @@ http_content_coding_finish(
 	      http_write(http, (char *)http->sbuffer, bytes);
           }
 
-          http->stream.next_out  = (Bytef *)http->sbuffer;
-          http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+          ((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+          ((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
 	}
         while (zerr == Z_OK);
 
-        deflateEnd(&(http->stream));
+        deflateEnd((z_stream *)http->stream);
 
         free(http->sbuffer);
+        free(http->stream);
+
         http->sbuffer = NULL;
+        http->stream  = NULL;
 
         if (http->wused)
           httpFlushWrite(http);
@@ -3721,9 +3727,13 @@ http_content_coding_finish(
 
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
-        inflateEnd(&(http->stream));
+        inflateEnd((z_stream *)http->stream);
+
         free(http->sbuffer);
+        free(http->stream);
+
         http->sbuffer = NULL;
+        http->stream  = NULL;
         break;
 
     default :
@@ -3793,8 +3803,6 @@ http_content_coding_start(
     return;
   }
 
-  memset(&(http->stream), 0, sizeof(http->stream));
-
   switch (coding)
   {
     case _HTTP_CODING_DEFLATE :
@@ -3815,18 +3823,30 @@ http_content_coding_start(
         * documentation.
         */
 
-        if ((zerr = deflateInit2(&(http->stream), Z_DEFAULT_COMPRESSION,
-                                 Z_DEFLATED,
-				 coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7,
-				 Z_DEFAULT_STRATEGY)) < Z_OK)
+	if ((http->stream = calloc(1, sizeof(z_stream))) == NULL)
+	{
+          free(http->sbuffer);
+
+          http->sbuffer = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = errno;
+          return;
+	}
+
+        if ((zerr = deflateInit2((z_stream *)http->stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7, Z_DEFAULT_STRATEGY)) < Z_OK)
         {
-          http->status = HTTP_STATUS_ERROR;
-          http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
+          free(http->sbuffer);
+          free(http->stream);
+
+          http->sbuffer = NULL;
+          http->stream  = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
 
-	http->stream.next_out  = (Bytef *)http->sbuffer;
-	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+	((z_stream *)http->stream)->next_out  = (Bytef *)http->sbuffer;
+	((z_stream *)http->stream)->avail_out = (uInt)_HTTP_MAX_SBUFFER;
         break;
 
     case _HTTP_CODING_INFLATE :
@@ -3843,19 +3863,30 @@ http_content_coding_start(
         * -15 is raw inflate, 31 is gunzip, per ZLIB documentation.
         */
 
-        if ((zerr = inflateInit2(&(http->stream),
-                                 coding == _HTTP_CODING_INFLATE ? -15 : 31))
-		< Z_OK)
+	if ((http->stream = calloc(1, sizeof(z_stream))) == NULL)
+	{
+          free(http->sbuffer);
+
+          http->sbuffer = NULL;
+          http->status  = HTTP_STATUS_ERROR;
+          http->error   = errno;
+          return;
+	}
+
+        if ((zerr = inflateInit2((z_stream *)http->stream, coding == _HTTP_CODING_INFLATE ? -15 : 31)) < Z_OK)
         {
           free(http->sbuffer);
+          free(http->stream);
+
           http->sbuffer = NULL;
+          http->stream  = NULL;
           http->status  = HTTP_STATUS_ERROR;
           http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
 
-        http->stream.avail_in = 0;
-        http->stream.next_in  = http->sbuffer;
+        ((z_stream *)http->stream)->avail_in = 0;
+        ((z_stream *)http->stream)->next_in  = http->sbuffer;
         break;
 
     default :

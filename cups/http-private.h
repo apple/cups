@@ -102,10 +102,6 @@ typedef int socklen_t;
 #    endif /* HAVE_GETIFADDRS */
 #  endif /* !_WIN32 */
 
-#  ifdef HAVE_LIBZ
-#    include <zlib.h>
-#  endif /* HAVE_LIBZ */
-
 
 /*
  * C++ magic...
@@ -303,8 +299,8 @@ struct _http_s				/**** HTTP connection structure ****/
   _http_mode_t		mode;		/* _HTTP_MODE_CLIENT or _HTTP_MODE_SERVER */
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
-  z_stream		stream;		/* (De)compression stream */
-  Bytef			*sbuffer;	/* (De)compression buffer */
+  void			*stream;	/* (De)compression stream */
+  unsigned char		*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
 
   /**** New in CUPS 2.2.9 ****/

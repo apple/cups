@@ -1,10 +1,11 @@
 /*
  * Device scanning mini-daemon for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -308,7 +309,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 	    }
 	  }
-	  while (bpipe->ptr && memchr(bpipe->ptr, '\n', (size_t)(bpipe->end - bpipe->ptr)));
+	  while (_cupsFilePeekAhead(bpipe, '\n'));
         }
     }
 

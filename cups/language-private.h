@@ -15,6 +15,7 @@
  * Include necessary headers...
  */
 
+#  include "config.h"
 #  include <stdio.h>
 #  include <cups/transcode.h>
 #  ifdef __APPLE__

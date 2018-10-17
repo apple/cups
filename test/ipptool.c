@@ -13,7 +13,6 @@
  */
 
 #include <cups/cups-private.h>
-#include <cups/file-private.h>
 #include <regex.h>
 #include <sys/stat.h>
 #ifdef _WIN32
