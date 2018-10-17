@@ -1470,7 +1470,7 @@ do_ps_tests(void)
   if (_cupsRasterExecPS(&header, &preferred_bits,
                         "792 612 0 0 0\n"
 			"pop pop pop\n"
-                	"<</PageSize[5 -2 roll]/ImagingBBox null>>"
+			"<</PageSize[5 -2 roll]/ImagingBBox null>>"
 			"setpagedevice\n"))
   {
     puts("FAIL (error from function)");
