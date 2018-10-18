@@ -128,12 +128,10 @@ HEADERS	=	\
 HEADERSPRIV =	\
 		array-private.h \
 		cups-private.h \
-		debug-private.h \
 		file-private.h \
 		http-private.h \
 		ipp-private.h \
 		language-private.h \
-		md5-private.h \
 		ppd-private.h \
 		pwg-private.h \
 		raster-private.h \

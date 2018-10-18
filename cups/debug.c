@@ -35,6 +35,7 @@ _cups_gettimeofday(struct timeval *tv,	/* I  - Timeval struct */
 #include <fcntl.h>
 
 
+#ifdef DEBUG
 /*
  * Globals...
  */
@@ -45,7 +46,6 @@ int			_cups_debug_level = 1;
 					/* Log level (0 to 9) */
 
 
-#ifdef DEBUG
 /*
  * Local globals...
  */

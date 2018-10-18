@@ -77,11 +77,14 @@ extern "C" {
  * Prototypes...
  */
 
+#  ifdef DEBUG
 extern int	_cups_debug_fd _CUPS_PRIVATE;
 extern int	_cups_debug_level _CUPS_PRIVATE;
 extern void	_cups_debug_printf(const char *format, ...) _CUPS_FORMAT(1,2) _CUPS_PRIVATE;
 extern void	_cups_debug_puts(const char *s) _CUPS_PRIVATE;
 extern void	_cups_debug_set(const char *logfile, const char *level, const char *filter, int force) _CUPS_PRIVATE;
+#  endif /* DEBUG */
+
 #  ifdef _WIN32
 extern int	_cups_gettimeofday(struct timeval *tv, void *tz) _CUPS_PRIVATE;
 #    define gettimeofday(a,b) _cups_gettimeofday(a, b)
