@@ -395,7 +395,6 @@ extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status) _CUPS_PR
 extern void		_httpTLSInitialize(void) _CUPS_PRIVATE;
 extern size_t		_httpTLSPending(http_t *http) _CUPS_PRIVATE;
 extern int		_httpTLSRead(http_t *http, char *buf, int len) _CUPS_PRIVATE;
-extern int		_httpTLSSetCredentials(http_t *http) _CUPS_PRIVATE;
 extern void		_httpTLSSetOptions(int options, int min_version, int max_version) _CUPS_PRIVATE;
 extern int		_httpTLSStart(http_t *http) _CUPS_PRIVATE;
 extern void		_httpTLSStop(http_t *http) _CUPS_PRIVATE;

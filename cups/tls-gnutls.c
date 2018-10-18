@@ -1210,19 +1210,6 @@ _httpTLSRead(http_t *http,		/* I - Connection to server */
 
 
 /*
- * '_httpTLSSetCredentials()' - Set the TLS credentials.
- */
-
-int					/* O - Status of connection */
-_httpTLSSetCredentials(http_t *http)	/* I - Connection to server */
-{
-  (void)http;
-
-  return (0);
-}
-
-
-/*
  * '_httpTLSSetOptions()' - Set TLS protocol and cipher suite options.
  */
 
