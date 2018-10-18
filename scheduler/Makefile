@@ -91,7 +91,7 @@ all:		$(TARGETS)
 # Make library targets...
 #
 
-libs:		$(LIBTARGETS)
+libs:
 
 
 #
@@ -213,6 +213,16 @@ install-data:
 #
 
 install-exec:
+	if test $(LIBCUPSMIME) != libcupsmime.a; then \
+		echo Installing libraries in $(LIBDIR)...; \
+		$(INSTALL_DIR) -m 755 $(LIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR); \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSMIME) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSMIME); \
+	fi
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) -m $(CUPS_CUPSD_FILE_PERM) cupsd $(SBINDIR)
@@ -244,29 +254,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC)
-	echo Installing libraries in $(LIBDIR)...
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR)
-	if test $(LIBCUPSMIME) = "libcupsmime.so.1"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
-		$(LN) $(LIBCUPSMIME) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
-	fi
-	if test $(LIBCUPSMIME) = "libcupsmime.1.dylib"; then \
-		$(RM) $(LIBDIR)/libcupsmime.dylib; \
-		$(LN) $(LIBCUPSMIME) $(LIBDIR)/libcupsmime.dylib; \
-	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(LIBCUPSMIME) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSMIME); \
-	fi
-
-installstatic:
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) -m 755 libcupsmime.a $(LIBDIR)
-	$(RANLIB) $(LIBDIR)/libcupsmime.a
-	$(CHMOD) 555 $(LIBDIR)/libcupsmime.a
+install-libs:
 
 
 #
@@ -299,10 +287,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsmime.so
 	$(RM) $(LIBDIR)/libcupsmime.so.1
 	-$(RMDIR) $(LIBDIR)
-	-if test "x$(privateinclude)" != x; then \
-		$(RM) $(PRIVATEINCLUDE)/mime.h; \
-		$(RMDIR) $(PRIVATEINCLUDE); \
-	fi
 	if test "x$(INITDIR)" != x; then \
 		echo Uninstalling init scripts...; \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \

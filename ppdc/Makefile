@@ -78,7 +78,7 @@ all:		$(TARGETS)
 # Make library targets...
 #
 
-libs:		$(LIBTARGETS)
+libs:
 
 
 #
@@ -130,6 +130,16 @@ install-data:
 #
 
 install-exec:
+	if test $(LIBCUPSPPDC) != libcupsppdc.a; then \
+		echo Installing libraries in $(LIBDIR)...; \
+		$(INSTALL_DIR) -m 755 $(LIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSPPDC) $(LIBDIR); \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSPPDC) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSPPDC); \
+	fi
 	echo Installing PPD compiler programs...
 	$(INSTALL_DIR) $(BINDIR)
 	for file in $(EXECTARGETS); do \
@@ -155,29 +165,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC)
-	echo Installing libraries in $(LIBDIR)...
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) $(LIBCUPSPPDC) $(LIBDIR)
-	if test $(LIBCUPSPPDC) = "libcupsppdc.so.1"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSPPDC) .1`; \
-		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/`basename $(LIBCUPSPPDC) .1`; \
-	fi
-	if test $(LIBCUPSPPDC) = "libcupsppdc.1.dylib"; then \
-		$(RM) $(LIBDIR)/libcupsppdc.dylib; \
-		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/libcupsppdc.dylib; \
-	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(LIBCUPSPPDC) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSPPDC); \
-	fi
-
-installstatic:
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) -m 755 libcupsppdc.a $(LIBDIR)
-	$(RANLIB) $(LIBDIR)/libcupsppdc.a
-	$(CHMOD) 555 $(LIBDIR)/libcupsppdc.a
+install-libs:
 
 
 #
@@ -196,10 +184,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsppdc.so
 	$(RM) $(LIBDIR)/libcupsppdc.so.1
 	-$(RMDIR) $(LIBDIR)
-	-if test "x$(privateinclude)" != x; then \
-		$(RM) $(PRIVATEINCLUDE)/ppdc.h; \
-		$(RMDIR) $(PRIVATEINCLUDE); \
-	fi
 
 
 #

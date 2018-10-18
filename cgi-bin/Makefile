@@ -58,7 +58,7 @@ all:	$(TARGETS)
 # Make library targets...
 #
 
-libs:		$(LIBTARGETS) $(UNITTESTS)
+libs:
 
 
 #
@@ -74,7 +74,7 @@ unittests:	$(UNITTARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS) makedocset
-	$(RM) libcupscgi.so libcupscgi.dylib
+	$(RM) libcupscgi.so libcupscgi.dylib libcupscgi.a
 
 
 #
@@ -104,6 +104,16 @@ install-data:
 #
 
 install-exec:
+	if test $(LIBCUPSCGI) != libcupscgi.a; then \
+		echo Installing libraries in $(LIBDIR)...; \
+		$(INSTALL_DIR) -m 755 $(LIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSCGI) $(LIBDIR); \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSCGI) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSCGI); \
+	fi
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/cgi-bin
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
@@ -128,29 +138,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC)
-	echo Installing libraries in $(LIBDIR)...
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) $(LIBCUPSCGI) $(LIBDIR)
-	if test $(LIBCUPSCGI) = "libcupscgi.so.1"; then \
-		$(RM) $(LIBDIR)/`basename $(LIBCUPSCGI) .1`; \
-		$(LN) $(LIBCUPSCGI) $(LIBDIR)/`basename $(LIBCUPSCGI) .1`; \
-	fi
-	if test $(LIBCUPSCGI) = "libcupscgi.1.dylib"; then \
-		$(RM) $(LIBDIR)/libcupscgi.dylib; \
-		$(LN) $(LIBCUPSCGI) $(LIBDIR)/libcupscgi.dylib; \
-	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(LIBCUPSCGI) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSCGI); \
-	fi
-
-installstatic:
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) -m 755 libcupscgi.a $(LIBDIR)
-	$(RANLIB) $(LIBDIR)/libcupscgi.a
-	$(CHMOD) 555 $(LIBDIR)/libcupscgi.a
+install-libs:
 
 
 #
@@ -168,11 +156,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupscgi.so
 	$(RM) $(LIBDIR)/libcupscgi.so.1
 	-$(RMDIR) $(LIBDIR)
-	-if test "x$(privateinclude)" != x; then \
-		$(RM) $(PRIVATEINCLUDE)/cgi.h; \
-		$(RM) $(PRIVATEINCLUDE)/help-index.h; \
-		$(RMDIR) $(PRIVATEINCLUDE); \
-	fi
 
 
 #
@@ -261,18 +244,6 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o $@ jobs.o -lcupscgi $(LIBS)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-
-
-#
-# makedocset
-#
-
-makedocset:	makedocset.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
-	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ makedocset.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
