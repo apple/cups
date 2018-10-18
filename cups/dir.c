@@ -14,7 +14,7 @@
  */
 
 #include "string-private.h"
-#include "debug-private.h"
+#include "debug-internal.h"
 #include "dir.h"
 
 

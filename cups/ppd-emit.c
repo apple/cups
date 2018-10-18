@@ -15,6 +15,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include "ppd.h"
 #if defined(_WIN32) || defined(__EMX__)
 #  include <io.h>

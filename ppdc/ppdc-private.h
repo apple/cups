@@ -21,10 +21,16 @@
 // Macros...
 //
 
-#  define PPDC_NEW		DEBUG_printf(("%s: %p new", class_name(), this))
-#  define PPDC_NEWVAL(s)	DEBUG_printf(("%s(\"%s\"): %p new", class_name(), s, this))
-#  define PPDC_DELETE		DEBUG_printf(("%s: %p delete", class_name(), this))
-#  define PPDC_DELETEVAL(s)	DEBUG_printf(("%s(\"%s\"): %p delete", class_name(), s, this))
-
+#  ifdef PPDC_DEBUG
+#    define PPDC_NEW		DEBUG_printf(("%s: %p new", class_name(), this))
+#    define PPDC_NEWVAL(s)	DEBUG_printf(("%s(\"%s\"): %p new", class_name(), s, this))
+#    define PPDC_DELETE		DEBUG_printf(("%s: %p delete", class_name(), this))
+#    define PPDC_DELETEVAL(s)	DEBUG_printf(("%s(\"%s\"): %p delete", class_name(), s, this))
+#  else
+#    define PPDC_NEW
+#    define PPDC_NEWVAL(s)
+#    define PPDC_DELETE
+#    define PPDC_DELETEVAL(s)
+#  endif /* PPDC_DEBUG */
 
 #endif // !_PPDC_PRIVATE_H_

@@ -12,9 +12,16 @@
  */
 
 #include <cups/string-private.h>
-#include <cups/debug-private.h>
 #include <cups/dir.h>
 #include "mime-private.h"
+
+
+/*
+ * Debug macros that used to be private API...
+ */
+
+#define DEBUG_puts(x)
+#define DEBUG_printf(...)
 
 
 /*

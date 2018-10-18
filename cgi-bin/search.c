@@ -36,8 +36,6 @@ cgiCompileSearch(const char *query)	/* I - Query string */
   char		*lword;			/* Last word in query */
 
 
-  DEBUG_printf(("cgiCompileSearch(query=\"%s\")\n", query));
-
  /*
   * Range check input...
   */
@@ -292,8 +290,6 @@ cgiCompileSearch(const char *query)	/* I - Query string */
  /*
   * Compile the regular expression...
   */
-
-  DEBUG_printf(("    s=\"%s\"\n", s));
 
   if (regcomp(re, s, REG_EXTENDED | REG_ICASE))
   {

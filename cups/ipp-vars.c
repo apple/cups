@@ -15,6 +15,7 @@
 #include <cups/cups.h>
 #include "ipp-private.h"
 #include "string-private.h"
+#include "debug-internal.h"
 
 
 /*

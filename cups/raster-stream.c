@@ -14,7 +14,8 @@
  * Include necessary headers...
  */
 
-#include <cups/raster-private.h>
+#include "raster-private.h"
+#include "debug-internal.h"
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #endif /* HAVE_STDINT_H */
@@ -693,7 +694,13 @@ _cupsRasterReadHeader(
   if (!cups_raster_update(r))
     return (0);
 
-  DEBUG_printf(("4_cupsRasterReadHeader: cupsBitsPerPixel=%u, cupsBitsPerColor=%u, cupsBytesPerLine=%u, cupsWidth=%u, cupsHeight=%u, r->bpp=%d", r->header.cupsBitsPerPixel, r->header.cupsBitsPerColor, r->header.cupsBytesPerLine, r->header.cupsWidth, r->header.cupsHeight, r->bpp));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsColorSpace=%s", _cupsRasterColorSpaceString(r->header.cupsColorSpace)));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsBitsPerColor=%u", r->header.cupsBitsPerColor));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsBitsPerPixel=%u", r->header.cupsBitsPerPixel));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsBytesPerLine=%u", r->header.cupsBytesPerLine));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsWidth=%u", r->header.cupsWidth));
+  DEBUG_printf(("4_cupsRasterReadHeader: cupsHeight=%u", r->header.cupsHeight));
+  DEBUG_printf(("4_cupsRasterReadHeader: r->bpp=%d", r->bpp));
 
   return (r->header.cupsBitsPerPixel > 0 && r->header.cupsBitsPerPixel <= 240 && r->header.cupsBitsPerColor > 0 && r->header.cupsBitsPerColor <= 16 && r->header.cupsBytesPerLine > 0 && r->header.cupsBytesPerLine <= 0x7fffffff && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }

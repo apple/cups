@@ -2035,45 +2035,33 @@ pam_func(
   * Answer all of the messages...
   */
 
-  DEBUG_printf(("pam_func: appdata_ptr = %p\n", appdata_ptr));
-
   data = (cupsd_authdata_t *)appdata_ptr;
 
   for (i = 0; i < num_msg; i ++)
   {
-    DEBUG_printf(("pam_func: Message = \"%s\"\n", msg[i]->msg));
-
     switch (msg[i]->msg_style)
     {
       case PAM_PROMPT_ECHO_ON:
-          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_ON, returning \"%s\"...\n",
-	                data->username));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(data->username);
           break;
 
       case PAM_PROMPT_ECHO_OFF:
-          DEBUG_printf(("pam_func: PAM_PROMPT_ECHO_OFF, returning \"%s\"...\n",
-	                data->password));
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = strdup(data->password);
           break;
 
       case PAM_TEXT_INFO:
-          DEBUG_puts("pam_func: PAM_TEXT_INFO...");
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = NULL;
           break;
 
       case PAM_ERROR_MSG:
-          DEBUG_puts("pam_func: PAM_ERROR_MSG...");
           replies[i].resp_retcode = PAM_SUCCESS;
           replies[i].resp         = NULL;
           break;
 
       default:
-          DEBUG_printf(("pam_func: Unknown PAM message %d...\n",
-	                msg[i]->msg_style));
           free(replies);
           return (PAM_CONV_ERR);
     }

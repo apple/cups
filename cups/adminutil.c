@@ -12,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include "ppd.h"
 #include "adminutil.h"
 #include <fcntl.h>

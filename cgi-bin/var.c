@@ -222,14 +222,6 @@ cgiGetVariable(const char *name)	/* I - Name of variable */
 
   var = cgi_find_variable(name);
 
-#ifdef DEBUG
-  if (var == NULL)
-    DEBUG_printf(("cgiGetVariable(\"%s\") is returning NULL...\n", name));
-  else
-    DEBUG_printf(("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name,
-		  var->values[var->nvalues - 1]));
-#endif /* DEBUG */
-
   return ((var == NULL) ? NULL : _cupsStrRetain(var->values[var->nvalues - 1]));
 }
 
@@ -534,9 +526,6 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   if (name == NULL || value == NULL || element < 0 || element > 100000)
     return;
 
-  DEBUG_printf(("cgi_add_variable: Adding variable \'%s\' with value "
-                "\'%s\'...\n", name, value));
-
   if (form_count >= form_alloc)
   {
     _cgi_var_t	*temp_vars;		/* Temporary form pointer */
@@ -715,8 +704,6 @@ cgi_initialize_get(void)
   char	*data;				/* Pointer to form data string */
 
 
-  DEBUG_puts("cgi_initialize_get: Initializing variables using GET method...");
-
  /*
   * Check to see if there is anything for us to read...
   */
@@ -755,8 +742,6 @@ cgi_initialize_multipart(
 		fd;			/* Temporary file descriptor */
   size_t	blen;			/* Length of boundary string */
 
-
-  DEBUG_printf(("cgi_initialize_multipart(boundary=\"%s\")\n", boundary));
 
  /*
   * Read multipart form data until we run out...
@@ -969,8 +954,6 @@ cgi_initialize_post(void)
   ssize_t	nbytes;			/* Number of bytes read this read() */
   int		status;			/* Return status */
 
-
-  DEBUG_puts("cgi_initialize_post: Initializing variables using POST method...");
 
  /*
   * Check to see if there is anything for us to read...
@@ -1234,26 +1217,11 @@ cgi_set_sid(void)
 static void
 cgi_sort_variables(void)
 {
-#ifdef DEBUG
-  int	i;
-
-
-  DEBUG_puts("cgi_sort_variables: Sorting variables...");
-#endif /* DEBUG */
-
   if (form_count < 2)
     return;
 
   qsort(form_vars, (size_t)form_count, sizeof(_cgi_var_t),
         (int (*)(const void *, const void *))cgi_compare_variables);
-
-#ifdef DEBUG
-  DEBUG_puts("cgi_sort_variables: Sorted variable list is:");
-  for (i = 0; i < form_count; i ++)
-    DEBUG_printf(("cgi_sort_variables: %d: %s (%d) = \"%s\" ...\n", i,
-                  form_vars[i].name, form_vars[i].nvalues,
-		  form_vars[i].values[0]));
-#endif /* DEBUG */
 }
 
 

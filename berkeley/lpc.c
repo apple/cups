@@ -230,8 +230,6 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 		};
 
 
-  DEBUG_printf(("show_status(http=%p, dests=\"%s\")\n", http, dests));
-
   if (http == NULL)
     return;
 
@@ -255,8 +253,6 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    DEBUG_puts("show_status: request succeeded...");
-
    /*
     * Loop through the printers returned in the list and display
     * their status...

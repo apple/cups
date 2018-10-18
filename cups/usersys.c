@@ -12,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #ifdef _WIN32

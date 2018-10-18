@@ -11,6 +11,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 
 
 /*

@@ -13,6 +13,7 @@
 
 #include "cups-private.h"
 #include "ppd-private.h"
+#include "debug-internal.h"
 #include <math.h>
 
 

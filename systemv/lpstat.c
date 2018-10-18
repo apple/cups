@@ -688,8 +688,6 @@ show_accepting(const char  *printers,	/* I - Destinations */
 		};
 
 
-  DEBUG_printf(("show_accepting(printers=\"%s\")\n", printers));
-
   if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
@@ -736,8 +734,6 @@ show_accepting(const char  *printers,	/* I - Destinations */
 
   if (response)
   {
-    DEBUG_puts("show_accepting: request succeeded...");
-
    /*
     * Loop through the printers returned in the list and display
     * their devices...
@@ -872,8 +868,6 @@ show_classes(const char *dests)		/* I - Destinations */
 		};
 
 
-  DEBUG_printf(("show_classes(dests=\"%s\")\n", dests));
-
   if (dests != NULL && !strcmp(dests, "all"))
     dests = NULL;
 
@@ -920,8 +914,6 @@ show_classes(const char *dests)		/* I - Destinations */
 
   if (response)
   {
-    DEBUG_puts("show_classes: request succeeded...");
-
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
       _cupsLangPrintf(stderr, "lpstat: %s", cupsLastErrorString());
@@ -1133,8 +1125,6 @@ show_devices(const char  *printers,	/* I - Destinations */
 		};
 
 
-  DEBUG_printf(("show_devices(printers=\"%s\")\n", printers));
-
   if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
@@ -1181,8 +1171,6 @@ show_devices(const char  *printers,	/* I - Destinations */
 
   if (response)
   {
-    DEBUG_puts("show_devices: request succeeded...");
-
    /*
     * Loop through the printers returned in the list and display
     * their devices...
@@ -1320,10 +1308,6 @@ show_jobs(const char *dests,		/* I - Destinations */
 		  "time-at-completed"
 		};
 
-
-  DEBUG_printf(("show_jobs(dests=\"%s\", users=\"%s\", long_status=%d, "
-                "ranking=%d, which=\"%s\")\n", dests, users, long_status,
-		ranking, which));
 
   if (dests != NULL && !strcmp(dests, "all"))
     dests = NULL;
@@ -1570,9 +1554,6 @@ show_printers(const char  *printers,	/* I - Destinations */
 		};
 
 
-  DEBUG_printf(("show_printers(printers=\"%s\", num_dests=%d, dests=%p, "
-                "long_status=%d)\n", printers, num_dests, dests, long_status));
-
   if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
 
@@ -1619,8 +1600,6 @@ show_printers(const char  *printers,	/* I - Destinations */
 
   if (response)
   {
-    DEBUG_puts("show_printers: request succeeded...");
-
    /*
     * Loop through the printers returned in the list and display
     * their status...

@@ -12,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <sys/stat.h>
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>

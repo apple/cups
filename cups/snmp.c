@@ -14,6 +14,7 @@
 
 #include "cups-private.h"
 #include "snmp-private.h"
+#include "debug-internal.h"
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */

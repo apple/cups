@@ -2260,9 +2260,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		*filter;		/* Current filter */
 
 
-  DEBUG_printf(("cupsdSetPrinterAttrs: entering name = %s, type = %x\n", p->name,
-                p->type));
-
  /*
   * Make sure that we have the common attributes defined...
   */
@@ -2592,9 +2589,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   add_printer_formats(p);
-
-  DEBUG_printf(("cupsdSetPrinterAttrs: leaving name = %s, type = %x\n", p->name,
-                p->type));
 
  /*
   * Add name-default attributes...
@@ -3037,9 +3031,6 @@ cupsdValidateDest(
   int			port;		/* Port portion of URI */
 
 
-  DEBUG_printf(("cupsdValidateDest(uri=\"%s\", dtype=%p, printer=%p)\n", uri,
-                dtype, printer));
-
  /*
   * Initialize return values...
   */
@@ -3142,8 +3133,6 @@ cupsdValidateDest(
       }
     }
   }
-
-  DEBUG_printf(("localized hostname is \"%s\"...\n", localname));
 
  /*
   * Find a matching printer or class...

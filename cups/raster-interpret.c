@@ -14,6 +14,7 @@
 
 #include <cups/raster-private.h>
 #include <cups/ppd-private.h>
+#include "debug-internal.h"
 
 
 /*

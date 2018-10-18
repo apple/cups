@@ -11,7 +11,7 @@
  * Include necessary headers...
  */
 
-#include <cups/raster-private.h>
+#include "raster-private.h"
 
 
 /*
@@ -161,8 +161,6 @@ cupsRasterReadHeader(
     cups_raster_t      *r,		/* I - Raster stream */
     cups_page_header_t *h)		/* I - Pointer to header data */
 {
-  DEBUG_printf(("cupsRasterReadHeader(r=%p, h=%p)", (void *)r, (void *)h));
-
  /*
   * Get the raster header...
   */
@@ -170,7 +168,6 @@ cupsRasterReadHeader(
   if (!_cupsRasterReadHeader(r))
   {
     memset(h, 0, sizeof(cups_page_header_t));
-    DEBUG_puts("1cupsRasterReadHeader: Unable to read page header, returning 0.");
     return (0);
   }
 
@@ -179,15 +176,6 @@ cupsRasterReadHeader(
   */
 
   memcpy(h, &(r->header), sizeof(cups_page_header_t));
-
-  DEBUG_printf(("1cupsRasterReadHeader: cupsColorSpace=%s", _cupsRasterColorSpaceString(h->cupsColorSpace)));
-  DEBUG_printf(("1cupsRasterReadHeader: cupsBitsPerColor=%u", h->cupsBitsPerColor));
-  DEBUG_printf(("1cupsRasterReadHeader: cupsBitsPerPixel=%u", h->cupsBitsPerPixel));
-  DEBUG_printf(("1cupsRasterReadHeader: cupsBytesPerLine=%u", h->cupsBytesPerLine));
-  DEBUG_printf(("1cupsRasterReadHeader: cupsWidth=%u", h->cupsWidth));
-  DEBUG_printf(("1cupsRasterReadHeader: cupsHeight=%u", h->cupsHeight));
-
-  DEBUG_puts("1cupsRasterReadHeader: Returning 1.");
   return (1);
 }
 
@@ -208,12 +196,9 @@ cupsRasterReadHeader2(
   * Get the raster header...
   */
 
-  DEBUG_printf(("cupsRasterReadHeader2(r=%p, h=%p)", (void *)r, (void *)h));
-
   if (!_cupsRasterReadHeader(r))
   {
     memset(h, 0, sizeof(cups_page_header2_t));
-    DEBUG_puts("1cupsRasterReadHeader2: Unable to read header, returning 0.");
     return (0);
   }
 
@@ -222,15 +207,6 @@ cupsRasterReadHeader2(
   */
 
   memcpy(h, &(r->header), sizeof(cups_page_header2_t));
-
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsColorSpace=%s", _cupsRasterColorSpaceString(h->cupsColorSpace)));
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsBitsPerColor=%u", h->cupsBitsPerColor));
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsBitsPerPixel=%u", h->cupsBitsPerPixel));
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsBytesPerLine=%u", h->cupsBytesPerLine));
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsWidth=%u", h->cupsWidth));
-  DEBUG_printf(("1cupsRasterReadHeader2: cupsHeight=%u", h->cupsHeight));
-
-  DEBUG_puts("1cupsRasterReadHeader2: Returning 1.");
   return (1);
 }
 
@@ -267,13 +243,8 @@ cupsRasterWriteHeader(
     cups_raster_t      *r,		/* I - Raster stream */
     cups_page_header_t *h)		/* I - Raster page header */
 {
-  DEBUG_printf(("cupsRasterWriteHeader(r=%p, h=%p)", (void *)r, (void *)h));
-
   if (r == NULL || r->mode == CUPS_RASTER_READ)
-  {
-    DEBUG_puts("1cupsRasterWriteHeader: Stream NULL or open for reading, returning 0.");
     return (0);
-  }
 
  /*
   * Make a copy of the header and write using the private function...
@@ -300,13 +271,8 @@ cupsRasterWriteHeader2(
     cups_raster_t       *r,		/* I - Raster stream */
     cups_page_header2_t *h)		/* I - Raster page header */
 {
-  DEBUG_printf(("cupsRasterWriteHeader(r=%p, h=%p)", (void *)r, (void *)h));
-
   if (r == NULL || r->mode == CUPS_RASTER_READ)
-  {
-    DEBUG_puts("1cupsRasterWriteHeader2: Stream NULL or open for reading, returning 0.");
     return (0);
-  }
 
  /*
   * Make a copy of the header, and compute the number of raster
@@ -357,12 +323,7 @@ cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
   while ((count = read(fd, buf, bytes)) < 0)
 #endif /* _WIN32 */
     if (errno != EINTR && errno != EAGAIN)
-    {
-      DEBUG_printf(("8cups_read_fd: %s", strerror(errno)));
       return (-1);
-    }
-
-  DEBUG_printf(("8cups_read_fd: Returning %d bytes.", (int)count));
 
   return (count);
 }
@@ -388,10 +349,7 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
   while ((count = write(fd, buf, bytes)) < 0)
 #endif /* _WIN32 */
     if (errno != EINTR && errno != EAGAIN)
-    {
-      DEBUG_printf(("8cups_write_fd: %s", strerror(errno)));
       return (-1);
-    }
 
   return (count);
 }

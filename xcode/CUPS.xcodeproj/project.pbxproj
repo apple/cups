@@ -171,12 +171,11 @@
 		2706963B1CADF3E200FFE5FB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
 		2706963E1CADF3E200FFE5FB /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EB91333056300FCA411 /* array.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		270696401CADF3E200FFE5FB /* cups-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC01333056300FCA411 /* cups-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		270696411CADF3E200FFE5FB /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC31333056300FCA411 /* debug-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		270696421CADF3E200FFE5FB /* file-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220ED7133305BB00FCA411 /* file-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		270696431CADF3E200FFE5FB /* http-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EE0133305BB00FCA411 /* http-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		270696441CADF3E200FFE5FB /* ipp-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EE4133305BB00FCA411 /* ipp-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		270696451CADF3E200FFE5FB /* language-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EE9133305BB00FCA411 /* language-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		270696461CADF3E200FFE5FB /* md5-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEE133305BB00FCA411 /* md5-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		270696461CADF3E200FFE5FB /* md5-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEE133305BB00FCA411 /* md5-internal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		270696481CADF3E200FFE5FB /* pwg-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EF9133305BB00FCA411 /* pwg-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2706964A1CADF3E200FFE5FB /* string-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220F01133305BB00FCA411 /* string-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2706964B1CADF3E200FFE5FB /* thread-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220F04133305BB00FCA411 /* thread-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -479,7 +478,6 @@
 		72220ECD1333056300FCA411 /* cups-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC01333056300FCA411 /* cups-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220ECE1333056300FCA411 /* cups.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC11333056300FCA411 /* cups.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220ECF1333056300FCA411 /* ppd-custom.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EC21333056300FCA411 /* ppd-custom.c */; };
-		72220ED01333056300FCA411 /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC31333056300FCA411 /* debug-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F0B133305BB00FCA411 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED1133305BB00FCA411 /* debug.c */; };
 		72220F0C133305BB00FCA411 /* dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED2133305BB00FCA411 /* dest.c */; };
 		72220F0D133305BB00FCA411 /* dir.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED3133305BB00FCA411 /* dir.c */; };
@@ -509,7 +507,7 @@
 		72220F25133305BB00FCA411 /* language.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEB133305BB00FCA411 /* language.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220F26133305BB00FCA411 /* ppd-localize.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEC133305BB00FCA411 /* ppd-localize.c */; };
 		72220F27133305BB00FCA411 /* ppd-mark.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EED133305BB00FCA411 /* ppd-mark.c */; };
-		72220F28133305BB00FCA411 /* md5-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEE133305BB00FCA411 /* md5-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		72220F28133305BB00FCA411 /* md5-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEE133305BB00FCA411 /* md5-internal.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F29133305BB00FCA411 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEF133305BB00FCA411 /* md5.c */; };
 		72220F2A133305BB00FCA411 /* md5passwd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF0133305BB00FCA411 /* md5passwd.c */; };
 		72220F2B133305BB00FCA411 /* notify.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF1133305BB00FCA411 /* notify.c */; };
@@ -568,6 +566,12 @@
 		72220FB913330BCE00FCA411 /* type.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220FB513330BCE00FCA411 /* type.c */; };
 		72220FBA13330BEE00FCA411 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		72220FBF13330C1000FCA411 /* libcupsmime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220FAC13330B2200FCA411 /* libcupsmime.dylib */; };
+		722A24EF2178D00D000CAB20 /* debug-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24EE2178D00C000CAB20 /* debug-internal.h */; };
+		722A24F02178D00D000CAB20 /* debug-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24EE2178D00C000CAB20 /* debug-internal.h */; };
+		722A24F12178D00D000CAB20 /* debug-internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24EE2178D00C000CAB20 /* debug-internal.h */; };
+		722A24F32178D091000CAB20 /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24F22178D090000CAB20 /* debug-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		722A24F42178D091000CAB20 /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24F22178D090000CAB20 /* debug-private.h */; };
+		722A24F52178D091000CAB20 /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 722A24F22178D090000CAB20 /* debug-private.h */; };
 		7234F4201378A16F00D3E9C9 /* array-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 7234F41F1378A16F00D3E9C9 /* array-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		724379081333E4A5009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		7243790D1333E4E3009631B9 /* ipp.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790A1333E4E3009631B9 /* ipp.c */; };
@@ -3282,7 +3286,6 @@
 		72220EC01333056300FCA411 /* cups-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "cups-private.h"; path = "../cups/cups-private.h"; sourceTree = "<group>"; };
 		72220EC11333056300FCA411 /* cups.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cups.h; path = ../cups/cups.h; sourceTree = "<group>"; };
 		72220EC21333056300FCA411 /* ppd-custom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-custom.c"; path = "../cups/ppd-custom.c"; sourceTree = "<group>"; };
-		72220EC31333056300FCA411 /* debug-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "debug-private.h"; path = "../cups/debug-private.h"; sourceTree = "<group>"; };
 		72220ED1133305BB00FCA411 /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = debug.c; path = ../cups/debug.c; sourceTree = "<group>"; };
 		72220ED2133305BB00FCA411 /* dest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dest.c; path = ../cups/dest.c; sourceTree = "<group>"; };
 		72220ED3133305BB00FCA411 /* dir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dir.c; path = ../cups/dir.c; sourceTree = "<group>"; };
@@ -3312,7 +3315,7 @@
 		72220EEB133305BB00FCA411 /* language.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = language.h; path = ../cups/language.h; sourceTree = "<group>"; };
 		72220EEC133305BB00FCA411 /* ppd-localize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-localize.c"; path = "../cups/ppd-localize.c"; sourceTree = "<group>"; };
 		72220EED133305BB00FCA411 /* ppd-mark.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-mark.c"; path = "../cups/ppd-mark.c"; sourceTree = "<group>"; };
-		72220EEE133305BB00FCA411 /* md5-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "md5-private.h"; path = "../cups/md5-private.h"; sourceTree = "<group>"; };
+		72220EEE133305BB00FCA411 /* md5-internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "md5-internal.h"; path = "../cups/md5-internal.h"; sourceTree = "<group>"; };
 		72220EEF133305BB00FCA411 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = ../cups/md5.c; sourceTree = "<group>"; };
 		72220EF0133305BB00FCA411 /* md5passwd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5passwd.c; path = ../cups/md5passwd.c; sourceTree = "<group>"; };
 		72220EF1133305BB00FCA411 /* notify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = notify.c; path = ../cups/notify.c; sourceTree = "<group>"; };
@@ -3389,6 +3392,8 @@
 		7226369B18AE6D19004ED309 /* org.cups.cups-lpd.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "org.cups.cups-lpd.plist"; path = "../scheduler/org.cups.cups-lpd.plist"; sourceTree = SOURCE_ROOT; };
 		7226369C18AE6D19004ED309 /* org.cups.cupsd.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = org.cups.cupsd.plist; path = ../scheduler/org.cups.cupsd.plist; sourceTree = SOURCE_ROOT; };
 		7226369D18AE73BB004ED309 /* config.h.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = config.h.in; path = ../config.h.in; sourceTree = "<group>"; };
+		722A24EE2178D00C000CAB20 /* debug-internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "debug-internal.h"; path = "../cups/debug-internal.h"; sourceTree = "<group>"; };
+		722A24F22178D090000CAB20 /* debug-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "debug-private.h"; path = "../cups/debug-private.h"; sourceTree = "<group>"; };
 		7234F41F1378A16F00D3E9C9 /* array-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "array-private.h"; path = "../cups/array-private.h"; sourceTree = "<group>"; };
 		724378FD1333E43E009631B9 /* ipp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ipp; sourceTree = BUILT_PRODUCTS_DIR; };
 		724379091333E4E3009631B9 /* backend-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "backend-private.h"; path = "../backend/backend-private.h"; sourceTree = "<group>"; };
@@ -4869,12 +4874,13 @@
 		72220EB41333050100FCA411 /* libcups */ = {
 			isa = PBXGroup;
 			children = (
-				276683561337A8C5000D33D0 /* cups.strings */,
 				72220EB51333052D00FCA411 /* adminutil.c */,
 				72220EB81333056300FCA411 /* array.c */,
 				72220EBB1333056300FCA411 /* auth.c */,
 				72220EBC1333056300FCA411 /* backchannel.c */,
 				72220EBD1333056300FCA411 /* backend.c */,
+				276683561337A8C5000D33D0 /* cups.strings */,
+				722A24EE2178D00C000CAB20 /* debug-internal.h */,
 				72220ED1133305BB00FCA411 /* debug.c */,
 				72CF95E018A13543000FCAE4 /* dest-job.c */,
 				72CF95E118A13543000FCAE4 /* dest-localization.c */,
@@ -4900,6 +4906,7 @@
 				72220EE8133305BB00FCA411 /* langprintf.c */,
 				72220EEA133305BB00FCA411 /* language.c */,
 				27D3037D134148CB00F022B1 /* libcups2.def */,
+				72220EEE133305BB00FCA411 /* md5-internal.h */,
 				72220EEF133305BB00FCA411 /* md5.c */,
 				72220EF0133305BB00FCA411 /* md5passwd.c */,
 				72220EF1133305BB00FCA411 /* notify.c */,
@@ -4962,15 +4969,14 @@
 		72220F461333060C00FCA411 /* Private Headers */ = {
 			isa = PBXGroup;
 			children = (
-				72220F471333063D00FCA411 /* config.h */,
 				7234F41F1378A16F00D3E9C9 /* array-private.h */,
+				72220F471333063D00FCA411 /* config.h */,
 				72220EC01333056300FCA411 /* cups-private.h */,
-				72220EC31333056300FCA411 /* debug-private.h */,
+				722A24F22178D090000CAB20 /* debug-private.h */,
 				72220ED7133305BB00FCA411 /* file-private.h */,
 				72220EE0133305BB00FCA411 /* http-private.h */,
 				72220EE4133305BB00FCA411 /* ipp-private.h */,
 				72220EE9133305BB00FCA411 /* language-private.h */,
-				72220EEE133305BB00FCA411 /* md5-private.h */,
 				72220EF5133305BB00FCA411 /* ppd-private.h */,
 				72220EF9133305BB00FCA411 /* pwg-private.h */,
 				2767FC76192696A0000F61D3 /* raster-private.h */,
@@ -5264,20 +5270,21 @@
 			files = (
 				2706963E1CADF3E200FFE5FB /* array.h in Headers */,
 				7253C469216ED5D400494ADD /* raster.h in Headers */,
+				722A24F42178D091000CAB20 /* debug-private.h in Headers */,
 				270696401CADF3E200FFE5FB /* cups-private.h in Headers */,
-				270696411CADF3E200FFE5FB /* debug-private.h in Headers */,
 				7253C471216ED6C400494ADD /* array-private.h in Headers */,
 				270696421CADF3E200FFE5FB /* file-private.h in Headers */,
 				270696431CADF3E200FFE5FB /* http-private.h in Headers */,
 				270696441CADF3E200FFE5FB /* ipp-private.h in Headers */,
 				270696451CADF3E200FFE5FB /* language-private.h in Headers */,
-				270696461CADF3E200FFE5FB /* md5-private.h in Headers */,
+				270696461CADF3E200FFE5FB /* md5-internal.h in Headers */,
 				270696481CADF3E200FFE5FB /* pwg-private.h in Headers */,
 				2706964A1CADF3E200FFE5FB /* string-private.h in Headers */,
 				7253C46C216ED5E500494ADD /* raster-private.h in Headers */,
 				2706964B1CADF3E200FFE5FB /* thread-private.h in Headers */,
 				2706964C1CADF3E200FFE5FB /* config.h in Headers */,
 				2706964D1CADF3E200FFE5FB /* cups.h in Headers */,
+				722A24F02178D00D000CAB20 /* debug-internal.h in Headers */,
 				2706964E1CADF3E200FFE5FB /* dir.h in Headers */,
 				2706964F1CADF3E200FFE5FB /* file.h in Headers */,
 				270696501CADF3E200FFE5FB /* http.h in Headers */,
@@ -5302,7 +5309,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				722A24F52178D091000CAB20 /* debug-private.h in Headers */,
 				274FF6C61333B1C400317ECB /* dir.h in Headers */,
+				722A24F12178D00D000CAB20 /* debug-internal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5321,23 +5330,24 @@
 				72220F21133305BB00FCA411 /* ipp.h in Headers */,
 				72220F25133305BB00FCA411 /* language.h in Headers */,
 				72220F31133305BB00FCA411 /* ppd.h in Headers */,
+				722A24F32178D091000CAB20 /* debug-private.h in Headers */,
 				72220F37133305BB00FCA411 /* sidechannel.h in Headers */,
 				72220F41133305BB00FCA411 /* transcode.h in Headers */,
 				72220F44133305BB00FCA411 /* versioning.h in Headers */,
 				7234F4201378A16F00D3E9C9 /* array-private.h in Headers */,
 				72220ECD1333056300FCA411 /* cups-private.h in Headers */,
-				72220ED01333056300FCA411 /* debug-private.h in Headers */,
 				72220F11133305BB00FCA411 /* file-private.h in Headers */,
 				72220F1A133305BB00FCA411 /* http-private.h in Headers */,
 				72220F1E133305BB00FCA411 /* ipp-private.h in Headers */,
 				72220F23133305BB00FCA411 /* language-private.h in Headers */,
 				7253C46F216ED69200494ADD /* pwg.h in Headers */,
-				72220F28133305BB00FCA411 /* md5-private.h in Headers */,
+				72220F28133305BB00FCA411 /* md5-internal.h in Headers */,
 				72220F2F133305BB00FCA411 /* ppd-private.h in Headers */,
 				72220F33133305BB00FCA411 /* pwg-private.h in Headers */,
 				72220F38133305BB00FCA411 /* snmp-private.h in Headers */,
 				72220F3B133305BB00FCA411 /* string-private.h in Headers */,
 				72220F3E133305BB00FCA411 /* thread-private.h in Headers */,
+				722A24EF2178D00D000CAB20 /* debug-internal.h in Headers */,
 				72220F481333063D00FCA411 /* config.h in Headers */,
 				7253C468216ED5D300494ADD /* raster.h in Headers */,
 			);

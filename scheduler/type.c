@@ -12,9 +12,16 @@
  */
 
 #include <cups/string-private.h>
-#include <cups/debug-private.h>
 #include <locale.h>
 #include "mime.h"
+
+
+/*
+ * Debug macros that used to be private API...
+ */
+
+#define DEBUG_puts(x)
+#define DEBUG_printf(...)
 
 
 /*
@@ -44,7 +51,7 @@ static int	mime_patmatch(const char *s, const char *pat);
  * Local globals...
  */
 
-#ifdef DEBUG
+#ifdef MIME_DEBUG
 static const char * const debug_ops[] =
 		{			/* Test names... */
 		  "NOP",		/* No operation */

@@ -40,8 +40,6 @@ ppdcShared::~ppdcShared()
 void
 ppdcShared::release(void)
 {
-  DEBUG_printf(("%s: %p release use=%d", class_name(), this, use));
-
   use --;
 
 #ifdef DEBUG
@@ -65,6 +63,4 @@ void
 ppdcShared::retain()
 {
   use ++;
-
-  DEBUG_printf(("%s: %p retain use=%d", class_name(), this, use));
 }

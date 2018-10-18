@@ -18,6 +18,7 @@
  */
 
 #include "file-private.h"
+#include "debug-internal.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 

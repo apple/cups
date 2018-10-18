@@ -14,6 +14,7 @@
 
 #include "cups-private.h"
 #include "ppd-private.h"
+#include "debug-internal.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(_WIN32) || defined(__EMX__)

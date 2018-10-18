@@ -12,8 +12,9 @@
  * Include necessary headers...
  */
 
-#include <cups/cups-private.h>
-#include <cups/raster-private.h>
+#include "cups-private.h"
+#include "raster-private.h"
+#include "debug-internal.h"
 
 
 /*

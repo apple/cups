@@ -13,6 +13,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <regex.h>
 #ifdef _WIN32
 #  include <io.h>

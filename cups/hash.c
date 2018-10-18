@@ -17,7 +17,7 @@
 #elif defined(HAVE_GNUTLS)
 #  include <gnutls/crypto.h>
 #else
-#  include "md5-private.h"
+#  include "md5-internal.h"
 #endif /* __APPLE__ */
 
 

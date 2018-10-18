@@ -13,6 +13,7 @@
 
 #define _CUPS_STRING_C_
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <stddef.h>
 #include <limits.h>
 

@@ -1,9 +1,10 @@
 /*
  * Debugging functions for CUPS.
  *
- * Copyright 2008-2015 by Apple Inc.
+ * Copyright © 2008-2018 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -11,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include "thread-private.h"
 #ifdef _WIN32
 #  include <sys/timeb.h>

@@ -55,19 +55,12 @@ backendGetDeviceID(
   char	*ptr;				/* Pointer into device ID */
 
 
-  DEBUG_printf(("backendGetDeviceID(fd=%d, device_id=%p, device_id_size=%d, "
-                "make_model=%p, make_model_size=%d, scheme=\"%s\", "
-		"uri=%p, uri_size=%d)\n", fd, device_id, device_id_size,
-		make_model, make_model_size, scheme ? scheme : "(null)",
-		uri, uri_size));
-
  /*
   * Range check input...
   */
 
   if (!device_id || device_id_size < 32)
   {
-    DEBUG_puts("backendGetDeviceID: Bad args!");
     return (-1);
   }
 
@@ -211,8 +204,6 @@ backendGetDeviceID(
     }
     else
     {
-      DEBUG_printf(("backendGetDeviceID: ioctl failed - %s\n",
-                    strerror(errno)));
       *device_id = '\0';
     }
 #  endif /* __linux */
@@ -234,11 +225,6 @@ backendGetDeviceID(
       else
 	device_id[device_id_size - 1] = '\0';
     }
-#    ifdef DEBUG
-    else
-      DEBUG_printf(("backendGetDeviceID: ioctl failed - %s\n",
-                    strerror(errno)));
-#    endif /* DEBUG */
 #  endif /* __sun && ECPPIOC_GETDEVID */
   }
 
@@ -252,13 +238,9 @@ backendGetDeviceID(
       *ptr = ' ';
     else if ((*ptr & 255) < ' ' || *ptr == 127)
     {
-      DEBUG_printf(("backendGetDeviceID: Bad device_id character %d.",
-                    *ptr & 255));
       *device_id = '\0';
       break;
     }
-
-  DEBUG_printf(("backendGetDeviceID: device_id=\"%s\"\n", device_id));
 
   if (scheme && uri)
     *uri = '\0';
@@ -365,17 +347,12 @@ backendGetMakeModel(
 		*des;			/* Description string */
 
 
-  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", make_model=%p, make_model_size=" CUPS_LLFMT ")\n", device_id, make_model, CUPS_LLCAST make_model_size));
-
  /*
   * Range check input...
   */
 
   if (!device_id || !*device_id || !make_model || make_model_size < 32)
-  {
-    DEBUG_puts("backendGetMakeModel: Bad args!");
     return (-1);
-  }
 
   *make_model = '\0';
 

@@ -348,9 +348,6 @@ show_jobs(const char *command,		/* I - Command name */
 		};
 
 
-  DEBUG_printf(("show_jobs(http=%p, dest=%p, user=%p, id=%d, longstatus%d)\n",
-                http, dest, user, id, longstatus));
-
   if (http == NULL)
     return (0);
 

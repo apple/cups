@@ -704,9 +704,6 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
-  DEBUG_printf(("add_printer_to_class(%p, \"%s\", \"%s\")\n", http,
-                printer, pclass));
-
  /*
   * Build an IPP_OP_GET_PRINTER_ATTRIBUTES request, which requires the following
   * attributes:
@@ -825,8 +822,6 @@ default_printer(http_t *http,		/* I - Server connection */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
 
-  DEBUG_printf(("default_printer(%p, \"%s\")\n", http, printer));
-
  /*
   * Build a CUPS-Set-Default request, which requires the following
   * attributes:
@@ -875,8 +870,6 @@ delete_printer(http_t *http,		/* I - Server connection */
   ipp_t		*request;		/* IPP Request */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
-
-  DEBUG_printf(("delete_printer(%p, \"%s\")\n", http, printer));
 
  /*
   * Build a CUPS-Delete-Printer request, which requires the following
@@ -931,9 +924,6 @@ delete_printer_from_class(
 		*members;		/* Members in class */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
-
-  DEBUG_printf(("delete_printer_from_class(%p, \"%s\", \"%s\")\n", http,
-                printer, pclass));
 
  /*
   * Build an IPP_OP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1131,8 +1121,6 @@ enable_printer(http_t *http,		/* I - Server connection */
   ipp_t		*request;		/* IPP Request */
   char		uri[HTTP_MAX_URI];	/* URI for printer/class */
 
-
-  DEBUG_printf(("enable_printer(%p, \"%s\")\n", http, printer));
 
  /*
   * Send IPP_OP_ENABLE_PRINTER and IPP_OP_RESUME_PRINTER requests, which
@@ -1369,10 +1357,6 @@ set_printer_options(
 		wrote_snmp_supplies = 0,/* Wrote cupsSNMPSupplies keyword? */
 		copied_options = 0;	/* Copied options? */
 
-
-  DEBUG_printf(("set_printer_options(http=%p, printer=\"%s\", num_options=%d, "
-                "options=%p, file=\"%s\")\n", http, printer, num_options,
-		options, file));
 
  /*
   * Build a CUPS-Add-Modify-Printer or CUPS-Add-Modify-Class request,

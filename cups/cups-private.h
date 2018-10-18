@@ -16,7 +16,6 @@
  */
 
 #  include "string-private.h"
-#  include "debug-private.h"
 #  include "array-private.h"
 #  include "ipp-private.h"
 #  include "http-private.h"
@@ -240,7 +239,7 @@ extern void		_cupsAppleSetUseLastPrinter(int uselast) _CUPS_PRIVATE;
 extern char		*_cupsBufferGet(size_t size) _CUPS_PRIVATE;
 extern void		_cupsBufferRelease(char *b) _CUPS_PRIVATE;
 
-extern http_t		*_cupsConnect(void) _CUPS_INTERNAL;
+extern http_t		*_cupsConnect(void) _CUPS_PRIVATE;
 extern char		*_cupsCreateDest(const char *name, const char *info, const char *device_id, const char *device_uri, char *uri, size_t urisize) _CUPS_PRIVATE;
 extern ipp_attribute_t	*_cupsEncodeOption(ipp_t *ipp, ipp_tag_t group_tag, _ipp_option_t *map, const char *name, const char *value) _CUPS_PRIVATE;
 extern int		_cupsGet1284Values(const char *device_id, cups_option_t **values) _CUPS_PRIVATE;

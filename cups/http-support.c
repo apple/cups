@@ -13,6 +13,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #  ifdef _WIN32

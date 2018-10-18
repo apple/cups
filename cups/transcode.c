@@ -12,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #include <limits.h>
 #include <time.h>
 #ifdef HAVE_ICONV_H

@@ -2783,8 +2783,6 @@ cupsdStopAllJobs(
   cupsd_job_t	*job;			/* Current job */
 
 
-  DEBUG_puts("cupsdStopAllJobs()");
-
   for (job = (cupsd_job_t *)cupsArrayFirst(PrintingJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(PrintingJobs))

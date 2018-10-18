@@ -13,6 +13,7 @@
 
 #include "sidechannel.h"
 #include "cups-private.h"
+#include "debug-internal.h"
 #ifdef _WIN32
 #  include <io.h>
 #else

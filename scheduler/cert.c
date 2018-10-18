@@ -244,9 +244,6 @@ cupsdAddCert(int        pid,		/* I - Process ID */
     fchown(fd, User, Group);
   }
 
-  DEBUG_printf(("ADD pid=%d, username=%s, cert=%s\n", pid, username,
-                cert->certificate));
-
   write(fd, cert->certificate, strlen(cert->certificate));
   close(fd);
 
@@ -279,9 +276,6 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
       */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteCert: Removing certificate for PID %d.", pid);
-
-      DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
-                    cert->username, cert->certificate));
 
       if (prev == NULL)
         Certs = cert->next;

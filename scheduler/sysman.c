@@ -436,9 +436,6 @@ sysEventThreadEntry(void)
     powerRLS = IONotificationPortGetRunLoopSource(powerNotifierPort);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), powerRLS, kCFRunLoopDefaultMode);
   }
-  else
-    DEBUG_puts("sysEventThreadEntry: error registering for system power "
-               "notifications");
 
  /*
   * Register for system configuration change notifications
@@ -523,17 +520,8 @@ sysEventThreadEntry(void)
 	CFRunLoopAddSource(CFRunLoopGetCurrent(), storeRLS,
 	                   kCFRunLoopDefaultMode);
       }
-      else
-	DEBUG_printf(("sysEventThreadEntry: SCDynamicStoreCreateRunLoopSource "
-	              "failed: %s\n", SCErrorString(SCError())));
     }
-    else
-      DEBUG_printf(("sysEventThreadEntry: SCDynamicStoreSetNotificationKeys "
-                    "failed: %s\n", SCErrorString(SCError())));
   }
-  else
-    DEBUG_printf(("sysEventThreadEntry: SCDynamicStoreCreate failed: %s\n",
-                  SCErrorString(SCError())));
 
   if (keys)
     CFRelease(keys);

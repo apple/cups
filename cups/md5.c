@@ -40,7 +40,7 @@
   1999-05-03 lpd Original version.
  */
 
-#include "md5-private.h"
+#include "md5-internal.h"
 #include "string-private.h"
 
 #if !defined(__APPLE__) && !defined(HAVE_GNUTLS)

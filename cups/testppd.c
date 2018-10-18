@@ -1021,10 +1021,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (!strcmp(argv[1], "--raster"))
   {
-    int			num_options;	/* Number of options */
-    cups_option_t	*options;	/* Options */
-
-
     for (status = 0, num_options = 0, options = NULL, i = 1; i < argc; i ++)
     {
       if (argv[i][0] == '-')

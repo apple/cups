@@ -12,6 +12,7 @@
  */
 
 #include "cups-private.h"
+#include "debug-internal.h"
 #ifdef HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif /* HAVE_LANGINFO_H */
