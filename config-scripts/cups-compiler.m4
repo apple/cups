@@ -181,17 +181,8 @@ if test -n "$GCC"; then
 			AC_MSG_RESULT(no))
 		CFLAGS="$OLDCFLAGS"
 
-		AC_MSG_CHECKING(whether compiler supports -Wno-format-truncation)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-format-truncation"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-format-truncation"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
 		# Additional warning options for development testing...
-		if test -d .svn; then
+		if test -d .git; then
 			OPTIM="-Werror $OPTIM"
 		fi
 	fi
