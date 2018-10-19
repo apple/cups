@@ -268,7 +268,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC)
+install-libs: $(LIBTARGETS) $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)

@@ -1,10 +1,11 @@
 #
 # Locale file makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
-# Copyright 1993-2007 by Easy Software Products.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1993-2007 by Easy Software Products.
 #
-# Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 include ../Makedefs
@@ -76,8 +77,8 @@ install-languages:
 	$(INSTALL_DATA) cups.pot $(LOCALEDIR)/en/cups_en.po
 
 install-langbundle: po2strings
-	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj"
-	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj"
+	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(RESOURCEDIR)"
+	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(RESOURCEDIR)"
 
 
 #
@@ -113,7 +114,7 @@ uninstall-languages:
 	done
 
 uninstall-langbundle:
-	$(RM) "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj/cups.strings"
+	$(RM) "$(BUILDROOT)$(RESOURCEDIR)/cups.strings"
 
 
 #

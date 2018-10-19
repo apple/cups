@@ -23,6 +23,8 @@ if test "$host_os_name" = darwin -a $host_os_version -lt 120; then
         AC_MSG_ERROR([Sorry, this version of CUPS requires macOS 10.8 or higher.])
 fi
 
+echo host_os_version=$host_os_version
+
 dnl Determine whether we are cross-compiling...
 if test "$build" = "$host"; then
         # No, build local targets

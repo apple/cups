@@ -1,10 +1,11 @@
 dnl
 dnl Default cupsd configuration settings for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
-dnl Copyright 2006-2007 by Easy Software Products, all rights reserved.
+dnl Copyright © 2007-2018 by Apple Inc.
+dnl Copyright © 2006-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
+dnl information.
 dnl
 
 dnl Default languages...
@@ -20,18 +21,27 @@ AC_SUBST(LANGUAGES)
 
 dnl macOS bundle-based localization support
 AC_ARG_WITH(bundledir, [  --with-bundledir        set macOS localization bundle directory ],
-	CUPS_BUNDLEDIR="$withval",
+	CUPS_BUNDLEDIR="$withval",[
 	if test "x$host_os_name" = xdarwin -a $host_os_version -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
 		LANGUAGES=""
 	else
 		CUPS_BUNDLEDIR=""
-	fi)
+	fi])
 
 AC_SUBST(CUPS_BUNDLEDIR)
 if test "x$CUPS_BUNDLEDIR" != x; then
 	AC_DEFINE_UNQUOTED(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
+
+	if test $host_os_version -ge 190; then
+		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/en.lproj"
+	else
+		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/English.lproj"
+	fi
+else
+	CUPS_RESOURCEDIR=""
 fi
+AC_SUBST(CUPS_RESOURCEDIR)
 
 dnl Default executable file permissions
 AC_ARG_WITH(exe_file_perm, [  --with-exe-file-perm    set default executable permissions value, default=0555],
