@@ -128,6 +128,7 @@ HEADERS	=	\
 HEADERSPRIV =	\
 		array-private.h \
 		cups-private.h \
+		debug-private.h \
 		file-private.h \
 		http-private.h \
 		ipp-private.h \
