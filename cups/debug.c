@@ -314,6 +314,24 @@ _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
 
   _cupsMutexUnlock(&debug_init_mutex);
 }
+
+
+#else
+/*
+ * '_cups_debug_set()' - Enable or disable debug logging.
+ */
+
+void
+_cups_debug_set(const char *logfile,	/* I - Log file or NULL */
+		const char *level,	/* I - Log level or NULL */
+		const char *filter,	/* I - Filter string or NULL */
+		int        force)	/* I - Force initialization */
+{
+  (void)logfile;
+  (void)level;
+  (void)filter;
+  (void)force;
+}
 #endif /* DEBUG */
 
 
