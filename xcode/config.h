@@ -695,12 +695,14 @@
 
 
 /*
- * Location of macOS localization bundle, if any.
+ * Location of localization bundle, if any.
  */
 
-#if !TARGET_OS_IOS
+#if TARGET_OS_IOS
+#  define CUPS_BUNDLEDIR "/System/Library/PrivateFrameworks/PrintKit.framework/Versions/A"
+#else
 #  define CUPS_BUNDLEDIR "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
-#endif /* !TARGET_OS_IOS */
+#endif /* TARGET_OS_IOS */
 
 
 /*

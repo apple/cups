@@ -876,6 +876,7 @@ with_rcstop
 with_xinetd
 with_languages
 with_bundledir
+with_bundlelang
 with_exe_file_perm
 with_config_file_perm
 with_cupsd_file_perm
@@ -1571,6 +1572,7 @@ Optional Packages:
   --with-components       set components to build:
 			    - "all" (default) builds everything
 			    - "core" builds libcups and ipptool
+			    - "libcups" builds just libcups
   --with-privateinclude   set path for private include files, default=none
   --with-lpdconfig        set URI for LPD config file
   --with-smbconfig        set URI for Samba config file
@@ -1597,7 +1599,8 @@ Optional Packages:
   --with-rcstop           set stop number for rc scripts
   --with-xinetd           set path for xinetd config files
   --with-languages        set installed languages, default=all
-  --with-bundledir        set macOS localization bundle directory
+  --with-bundledir        set localization bundle directory
+  --with-bundlelang       set localization bundle base language (English or en)
   --with-exe-file-perm    set default executable permissions value, default=0555
   --with-config-file-perm set default ConfigFilePerm value, default=0640
   --with-cupsd-file-perm  set default cupsd permissions, default=0500
@@ -6104,11 +6107,15 @@ fi
 
 case "$COMPONENTS" in
 	all)
-		BUILDDIRS="filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
+		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
 		;;
 
 	core)
-		BUILDDIRS="data locale"
+		BUILDDIRS="test locale"
+		;;
+
+	libcups)
+		BUILDDIRS="locale"
 		;;
 
 	*)
@@ -9496,12 +9503,27 @@ if test "x$CUPS_BUNDLEDIR" != x; then
 #define CUPS_BUNDLEDIR "$CUPS_BUNDLEDIR"
 _ACEOF
 
+fi
+
+
+# Check whether --with-bundlelang was given.
+if test "${with_bundlelang+set}" = set; then :
+  withval=$with_bundlelang; cups_bundlelang="$withval"
+else
 
 	if test $host_os_version -ge 190; then
-		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/en.lproj"
+		cups_bundlelang="en"
 	else
-		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/English.lproj"
+		cups_bundlelang="English"
 	fi
+fi
+
+else
+	cups_bundlelang=""
+fi
+
+if test "x$cups_bundlelang" != x -a "x$CUPS_BUNDLEDIR" != x; then
+	CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/$cups_bundlelang.lproj"
 else
 	CUPS_RESOURCEDIR=""
 fi

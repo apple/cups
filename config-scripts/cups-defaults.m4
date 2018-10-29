@@ -20,7 +20,7 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 AC_SUBST(LANGUAGES)
 
 dnl macOS bundle-based localization support
-AC_ARG_WITH(bundledir, [  --with-bundledir        set macOS localization bundle directory ],
+AC_ARG_WITH(bundledir, [  --with-bundledir        set localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",[
 	if test "x$host_os_name" = xdarwin -a $host_os_version -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
@@ -32,12 +32,21 @@ AC_ARG_WITH(bundledir, [  --with-bundledir        set macOS localization bundle 
 AC_SUBST(CUPS_BUNDLEDIR)
 if test "x$CUPS_BUNDLEDIR" != x; then
 	AC_DEFINE_UNQUOTED(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
+fi
 
+AC_ARG_WITH(bundlelang, [  --with-bundlelang       set localization bundle base language (English or en) ],
+	cups_bundlelang="$withval",[
 	if test $host_os_version -ge 190; then
-		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/en.lproj"
+		cups_bundlelang="en"
 	else
-		CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/English.lproj"
-	fi
+		cups_bundlelang="English"
+	fi])
+else
+	cups_bundlelang=""
+fi
+
+if test "x$cups_bundlelang" != x -a "x$CUPS_BUNDLEDIR" != x; then
+	CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/$cups_bundlelang.lproj"
 else
 	CUPS_RESOURCEDIR=""
 fi
