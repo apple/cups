@@ -1,10 +1,11 @@
 #
 # CGI makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products.
 #
-# Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 include ../Makedefs
@@ -34,8 +35,7 @@ CGIS	=	\
 		jobs.cgi \
 		printers.cgi
 LIBTARGETS =	\
-		libcupscgi.a \
-		$(LIBCUPSCGI)
+		libcupscgi.a
 
 UNITTARGETS =	\
 		testcgi \
@@ -74,7 +74,6 @@ unittests:	$(UNITTARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS) makedocset
-	$(RM) libcupscgi.so libcupscgi.dylib libcupscgi.a
 
 
 #
@@ -104,16 +103,6 @@ install-data:
 #
 
 install-exec:
-	if test $(LIBCUPSCGI) != libcupscgi.a; then \
-		echo Installing libraries in $(LIBDIR)...; \
-		$(INSTALL_DIR) -m 755 $(LIBDIR); \
-		$(INSTALL_LIB) $(LIBCUPSCGI) $(LIBDIR); \
-	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(LIBCUPSCGI) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSCGI); \
-	fi
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/cgi-bin
 	for file in $(CGIS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/cgi-bin; \
@@ -150,50 +139,6 @@ uninstall:
 		$(RM) $(SERVERBIN)/cgi-bin/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/cgi-bin
-	$(RM) $(LIBDIR)/libcupscgi.1.dylib
-	$(RM) $(LIBDIR)/libcupscgi.a
-	$(RM) $(LIBDIR)/libcupscgi.dylib
-	$(RM) $(LIBDIR)/libcupscgi.so
-	$(RM) $(LIBDIR)/libcupscgi.so.1
-	-$(RMDIR) $(LIBDIR)
-
-
-#
-# libcupscgi.so.1
-#
-
-libcupscgi.so.1:	$(LIBOBJS)
-	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
-	$(RM) `basename $@ .1`
-	$(LN) $@ `basename $@ .1`
-
-
-#
-# libcupscgi.1.dylib
-#
-
-libcupscgi.1.dylib:	$(LIBOBJS) libcupscgi.exp
-	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/$@ \
-		-current_version 1.0.0 \
-		-compatibility_version 1.0.0 \
-		-exported_symbols_list libcupscgi.exp \
-		$(LIBOBJS) $(LIBS)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-	$(RM) libcupscgi.dylib
-	$(LN) $@ libcupscgi.dylib
-
-
-#
-# libcupscgi.la
-#
-
-libcupscgi.la:    $(LIBOBJS)
-	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 1:0 $(LIBS)
 
 
 #
@@ -211,9 +156,9 @@ libcupscgi.a:	$(LIBOBJS)
 # admin.cgi
 #
 
-admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
+admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ admin.o -lcupscgi $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ admin.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -221,9 +166,9 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # classes.cgi
 #
 
-classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
+classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ classes.o -lcupscgi $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ classes.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -231,9 +176,9 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # help.cgi
 #
 
-help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
+help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ help.o -lcupscgi $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ help.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -241,9 +186,9 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # jobs.cgi
 #
 
-jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
+jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ jobs.o -lcupscgi $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ jobs.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -251,9 +196,9 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # printers.cgi
 #
 
-printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
+printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ printers.o -L. -lcupscgi $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o $@ printers.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

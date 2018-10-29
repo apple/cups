@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-09-28
+CHANGES - 2.3b6 - 2018-10-29
 ============================
 
 Changes in CUPS v2.3b6
@@ -38,6 +38,8 @@ Changes in CUPS v2.3b6
 - Fixed an issue with HTTP Digest authentication (rdar://41709086)
 - The scheduler could crash when job history was purged (rdar://42198057)
 - Fixed a memory leak for some IPP (extension) syntaxes.
+- The `cupscgi`, `cupsmime`, and `cupsppdc` support libraries are no longer
+  installed as shared libraries.
 
 
 Changes in CUPS v2.3b5

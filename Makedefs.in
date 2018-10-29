@@ -1,8 +1,8 @@
 #
 # Common makefile definitions for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
-# Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -92,10 +92,7 @@ LOCALTARGET     =       @LOCALTARGET@
 #
 
 LIBCUPS		=	@LIBCUPS@
-LIBCUPSCGI	=	@LIBCUPSCGI@
 LIBCUPSIMAGE	=	@LIBCUPSIMAGE@
-LIBCUPSMIME	=	@LIBCUPSMIME@
-LIBCUPSPPDC	=	@LIBCUPSPPDC@
 LIBCUPSSTATIC	=	@LIBCUPSSTATIC@
 LIBGSSAPI	=	@LIBGSSAPI@
 LIBMALLOC	=	@LIBMALLOC@

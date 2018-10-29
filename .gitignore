@@ -1,11 +1,8 @@
 *.a
 *.bck
 *.cgi
-*.dylib
 *.gz
 *.o
-*.so
-*.so.*
 *.tokens
 .buildrev
 autom4te.cache
@@ -41,6 +38,14 @@ conf/cupsd.conf
 conf/mime.convs
 conf/pam.std
 conf/snmp.conf
+cups/libcups.dylib
+cups/libcups.2.dylib
+cups/libcups.so
+cups/libcups.so.2
+cups/libcupsimage.dylib
+cups/libcupsimage.2.dylib
+cups/libcupsimage.so
+cups/libcupsimage.so.2
 cups/locale/
 cups/rasterbench
 cups/test.pwg

@@ -58,7 +58,6 @@ OBJS	=	\
 		$(COBJS) \
 		$(CXXOBJS)
 LIBTARGETS =	\
-		$(LIBCUPSMIME) \
 		libcupsmime.a
 
 UNITTARGETS =	\
@@ -108,7 +107,6 @@ unittests:	$(UNITTARGETS)
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGETS) $(UNITTARGETS) convert
-	$(RM) libcupsmime.so libcupsmime.dylib
 
 
 #
@@ -213,16 +211,6 @@ install-data:
 #
 
 install-exec:
-	if test $(LIBCUPSMIME) != libcupsmime.a; then \
-		echo Installing libraries in $(LIBDIR)...; \
-		$(INSTALL_DIR) -m 755 $(LIBDIR); \
-		$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR); \
-	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(LIBCUPSMIME) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSMIME); \
-	fi
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) -m $(CUPS_CUPSD_FILE_PERM) cupsd $(SBINDIR)
@@ -281,12 +269,6 @@ uninstall:
 	-$(RMDIR) $(REQUESTS)
 	-$(RMDIR) $(LOGDIR)
 	-$(RMDIR) $(CACHEDIR)
-	$(RM) $(LIBDIR)/libcupsmime.1.dylib
-	$(RM) $(LIBDIR)/libcupsmime.a
-	$(RM) $(LIBDIR)/libcupsmime.dylib
-	$(RM) $(LIBDIR)/libcupsmime.so
-	$(RM) $(LIBDIR)/libcupsmime.so.1
-	-$(RMDIR) $(LIBDIR)
 	if test "x$(INITDIR)" != x; then \
 		echo Uninstalling init scripts...; \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
@@ -330,9 +312,9 @@ uninstall:
 # Make the scheduler executable, "cupsd".
 #
 
-cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
+cupsd:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) -L. -lcupsmime \
+	$(LD_CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) \
                 $(DNSSDLIBS) $(LIBS) $(LIBGSSAPI) $(LIBWRAP)
@@ -352,9 +334,9 @@ cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 # Make the cupsfilter utility.
 #
 
-cupsfilter:	cupsfilter.o $(LIBCUPSMIME) ../cups/$(LIBCUPS)
+cupsfilter:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsfilter cupsfilter.o -L. -lcupsmime $(LIBS)
+	$(LD_CC) $(LDFLAGS) -o cupsfilter cupsfilter.o libcupsmime.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) convert
 	$(LN) cupsfilter convert
@@ -381,10 +363,10 @@ cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
 # Make the driver daemon, "cups-driverd".
 #
 
-cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/$(LIBCUPSPPDC)
+cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/libcupsppdc.a
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o cups-driverd cups-driverd.o util.o \
-		-L../ppdc -lcupsppdc $(LIBS)
+		../ppdc/libcupsppdc.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -406,44 +388,6 @@ cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cups-lpd cups-lpd.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-
-
-#
-# libcupsmime.so.1
-#
-
-libcupsmime.so.1:	$(LIBOBJS)
-	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
-	$(RM) `basename $@ .1`
-	$(LN) $@ `basename $@ .1`
-
-
-#
-# libcupsmime.1.dylib
-#
-
-libcupsmime.1.dylib:	$(LIBOBJS) libcupsmime.exp
-	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
-		-install_name $(libdir)/$@ \
-		-current_version 1.0.0 \
-		-compatibility_version 1.0.0 \
-		-exported_symbols_list libcupsmime.exp \
-		$(LIBOBJS) $(LIBS)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-	$(RM) libcupsmime.dylib
-	$(LN) $@ libcupsmime.dylib
-
-
-#
-# libcupsmime.la
-#
-
-libcupsmime.la:    $(LIBOBJS)
-	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 1:0 $(LIBS)
 
 
 #

@@ -570,34 +570,28 @@ fi
 echo "Setting up environment variables for test..."
 
 if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
+	LD_LIBRARY_PATH="$root/cups"
 else
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$root/cups:$LD_LIBRARY_PATH"
 fi
 
-LD_PRELOAD="$root/cups/libcups.so.2:$root/cups/libcupsimage.so.2:$root/cgi-bin/libcupscgi.so.1:$root/scheduler/libcupsmime.so.1:$root/ppdc/libcupsppdc.so.1"
+LD_PRELOAD="$root/cups/libcups.so.2:$root/cups/libcupsimage.so.2"
 if test `uname` = SunOS -a -r /usr/lib/libCrun.so.1; then
 	LD_PRELOAD="/usr/lib/libCrun.so.1:$LD_PRELOAD"
 fi
 
 if test -f $root/cups/libcups.2.dylib; then
         if test "x$DYLD_INSERT_LIBRARIES" = x; then
-                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib:$root/cgi-bin/libcupscgi.1.dylib:$root/scheduler/libcupsmime.1.dylib:$root/ppdc/libcupsppdc.1.dylib"
+                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib"
         else
-                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib:$root/cgi-bin/libcupscgi.1.dylib:$root/scheduler/libcupsmime.1.dylib:$root/ppdc/libcupsppdc.1.dylib:$DYLD_INSERT_LIBRARIES"
+                DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib:$DYLD_INSERT_LIBRARIES"
         fi
 fi
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
+	DYLD_LIBRARY_PATH="$root/cups"
 else
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$DYLD_LIBRARY_PATH"
-fi
-
-if test "x$SHLIB_PATH" = x; then
-	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
-else
-	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$SHLIB_PATH"
+	DYLD_LIBRARY_PATH="$root/cups:$DYLD_LIBRARY_PATH"
 fi
 
 # These get exported because they don't have side-effects...
@@ -627,7 +621,6 @@ echo "DYLD_LIBRARY_PATH=\"$DYLD_LIBRARY_PATH\"; export DYLD_LIBRARY_PATH" >>$run
 echo "LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\"; export LD_LIBRARY_PATH" >>$runcups
 echo "LD_PRELOAD=\"$LD_PRELOAD\"; export LD_PRELOAD" >>$runcups
 echo "LOCALEDIR=\"$LOCALEDIR\"; export LOCALEDIR" >>$runcups
-echo "SHLIB_PATH=\"$SHLIB_PATH\"; export SHLIB_PATH" >>$runcups
 if test "x$CUPS_DEBUG_LEVEL" != x; then
 	echo "CUPS_DEBUG_FILTER='$CUPS_DEBUG_FILTER'; export CUPS_DEBUG_FILTER" >>$runcups
 	echo "CUPS_DEBUG_LEVEL=$CUPS_DEBUG_LEVEL; export CUPS_DEBUG_LEVEL" >>$runcups
