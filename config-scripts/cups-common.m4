@@ -434,9 +434,12 @@ COMPONENTS="all"
 AC_ARG_WITH(components, [  --with-components       set components to build:
 			    - "all" (default) builds everything
 			    - "core" builds libcups and ipptool
-			    - "libcups" builds just libcups],
+			    - "libcups" builds just libcups
+			    - "libcupslite" builds just libcups without driver support],
 	COMPONENTS="$withval")
 
+cupsimagebase="cupsimage"
+LIBCUPSOBJS="\$(COREOBJS) \$(DRIVEROBJS)"
 case "$COMPONENTS" in
 	all)
 		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
@@ -448,6 +451,13 @@ case "$COMPONENTS" in
 
 	libcups)
 		BUILDDIRS="locale"
+		cupsimagebase=""
+		;;
+
+	libcupslite)
+		BUILDDIRS="locale"
+		cupsimagebase=""
+		LIBCUPSOBJS="\$(COREOBJS)"
 		;;
 
 	*)
@@ -456,3 +466,4 @@ case "$COMPONENTS" in
 esac
 
 AC_SUBST(BUILDDIRS)
+AC_SUBST(LIBCUPSOBJS)

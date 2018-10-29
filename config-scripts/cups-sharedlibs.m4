@@ -15,27 +15,34 @@ AC_ARG_ENABLE(shared, [  --disable-shared        do not create shared libraries]
 
 cupsbase="cups"
 LIBCUPSBASE="lib$cupsbase"
+LIBCUPSIMAGE=""
 LIBCUPSSTATIC="lib$cupsbase.a"
 
 if test x$enable_shared != xno; then
 	case "$host_os_name" in
 		sunos*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
 		linux* | gnu* | *bsd*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		darwin*)
 			LIBCUPS="lib$cupsbase.2.dylib"
-			LIBCUPSIMAGE="libcupsimage.2.dylib"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.2.dylib"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
@@ -44,7 +51,9 @@ if test x$enable_shared != xno; then
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
@@ -53,7 +62,9 @@ if test x$enable_shared != xno; then
 else
 	PICFLAG=0
 	LIBCUPS="lib$cupsbase.a"
-	LIBCUPSIMAGE="libcupsimage.a"
+	if test "x$cupsimagebase" != x; then
+		LIBCUPSIMAGE="lib$cupsimagebase.a"
+	fi
 	DSO=":"
 	DSOXX=":"
 fi
@@ -68,16 +79,26 @@ AC_SUBST(LIBCUPSSTATIC)
 
 if test x$enable_shared = xno; then
 	LINKCUPS="../cups/lib$cupsbase.a"
-	LINKCUPSIMAGE="../cups/libcupsimage.a"
-
 	EXTLINKCUPS="-lcups"
-	EXTLINKCUPSIMAGE="-lcupsimage"
+
+	if test "x$cupsimagebase" != x; then
+		LINKCUPSIMAGE="../cups/lib$cupsimagebase.a"
+		EXTLINKCUPSIMAGE="-l$cupsimagebase"
+	else
+		LINKCUPSIMAGE=""
+		EXTLINKCUPSIMAGE=""
+	fi
 else
 	LINKCUPS="-l${cupsbase}"
-	LINKCUPSIMAGE="-lcupsimage"
-
 	EXTLINKCUPS="-lcups"
-	EXTLINKCUPSIMAGE="-lcupsimage"
+
+	if test "x$cupsimagebase" != x; then
+		LINKCUPSIMAGE="-l$cupsimagebase"
+		EXTLINKCUPSIMAGE="-l$cupsimagebase"
+	else
+		LINKCUPSIMAGE=""
+		EXTLINKCUPSIMAGE=""
+	fi
 fi
 
 AC_SUBST(EXTLINKCUPS)

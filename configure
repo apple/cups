@@ -716,6 +716,7 @@ CUPS_DATADIR
 CUPS_CACHEDIR
 PRIVATEINCLUDE
 privateinclude
+LIBCUPSOBJS
 BUILDDIRS
 INSTALLXPC
 CUPS_SYSTEM_AUTHKEY
@@ -1573,6 +1574,7 @@ Optional Packages:
 			    - "all" (default) builds everything
 			    - "core" builds libcups and ipptool
 			    - "libcups" builds just libcups
+			    - "libcupslite" builds just libcups without driver support
   --with-privateinclude   set path for private include files, default=none
   --with-lpdconfig        set URI for LPD config file
   --with-smbconfig        set URI for Samba config file
@@ -6105,6 +6107,8 @@ if test "${with_components+set}" = set; then :
 fi
 
 
+cupsimagebase="cupsimage"
+LIBCUPSOBJS="\$(COREOBJS) \$(DRIVEROBJS)"
 case "$COMPONENTS" in
 	all)
 		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
@@ -6116,12 +6120,20 @@ case "$COMPONENTS" in
 
 	libcups)
 		BUILDDIRS="locale"
+		cupsimagebase=""
+		;;
+
+	libcupslite)
+		BUILDDIRS="locale"
+		cupsimagebase=""
+		LIBCUPSOBJS="\$(COREOBJS)"
 		;;
 
 	*)
 		as_fn_error $? "Bad build component \"$COMPONENT\" specified!" "$LINENO" 5
 		;;
 esac
+
 
 
 
@@ -6597,27 +6609,34 @@ fi
 
 cupsbase="cups"
 LIBCUPSBASE="lib$cupsbase"
+LIBCUPSIMAGE=""
 LIBCUPSSTATIC="lib$cupsbase.a"
 
 if test x$enable_shared != xno; then
 	case "$host_os_name" in
 		sunos*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
 		linux* | gnu* | *bsd*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		darwin*)
 			LIBCUPS="lib$cupsbase.2.dylib"
-			LIBCUPSIMAGE="libcupsimage.2.dylib"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.2.dylib"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
@@ -6626,7 +6645,9 @@ if test x$enable_shared != xno; then
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSIMAGE="libcupsimage.so.2"
+			if test "x$cupsimagebase" != x; then
+				LIBCUPSIMAGE="lib$cupsimagebase.so.2"
+			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
@@ -6635,7 +6656,9 @@ if test x$enable_shared != xno; then
 else
 	PICFLAG=0
 	LIBCUPS="lib$cupsbase.a"
-	LIBCUPSIMAGE="libcupsimage.a"
+	if test "x$cupsimagebase" != x; then
+		LIBCUPSIMAGE="lib$cupsimagebase.a"
+	fi
 	DSO=":"
 	DSOXX=":"
 fi
@@ -6650,16 +6673,26 @@ fi
 
 if test x$enable_shared = xno; then
 	LINKCUPS="../cups/lib$cupsbase.a"
-	LINKCUPSIMAGE="../cups/libcupsimage.a"
-
 	EXTLINKCUPS="-lcups"
-	EXTLINKCUPSIMAGE="-lcupsimage"
+
+	if test "x$cupsimagebase" != x; then
+		LINKCUPSIMAGE="../cups/lib$cupsimagebase.a"
+		EXTLINKCUPSIMAGE="-l$cupsimagebase"
+	else
+		LINKCUPSIMAGE=""
+		EXTLINKCUPSIMAGE=""
+	fi
 else
 	LINKCUPS="-l${cupsbase}"
-	LINKCUPSIMAGE="-lcupsimage"
-
 	EXTLINKCUPS="-lcups"
-	EXTLINKCUPSIMAGE="-lcupsimage"
+
+	if test "x$cupsimagebase" != x; then
+		LINKCUPSIMAGE="-l$cupsimagebase"
+		EXTLINKCUPSIMAGE="-l$cupsimagebase"
+	else
+		LINKCUPSIMAGE=""
+		EXTLINKCUPSIMAGE=""
+	fi
 fi
 
 
@@ -9518,9 +9551,6 @@ else
 	fi
 fi
 
-else
-	cups_bundlelang=""
-fi
 
 if test "x$cups_bundlelang" != x -a "x$CUPS_BUNDLEDIR" != x; then
 	CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/$cups_bundlelang.lproj"

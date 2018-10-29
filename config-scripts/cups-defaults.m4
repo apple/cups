@@ -41,9 +41,6 @@ AC_ARG_WITH(bundlelang, [  --with-bundlelang       set localization bundle base 
 	else
 		cups_bundlelang="English"
 	fi])
-else
-	cups_bundlelang=""
-fi
 
 if test "x$cups_bundlelang" != x -a "x$CUPS_BUNDLEDIR" != x; then
 	CUPS_RESOURCEDIR="$CUPS_BUNDLEDIR/Resources/$cups_bundlelang.lproj"

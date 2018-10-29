@@ -15,12 +15,9 @@ include ../Makedefs
 # Object files...
 #
 
-LIBOBJS	=	\
-		adminutil.o \
+COREOBJS	=	\
 		array.o \
 		auth.o \
-		backchannel.o \
-		backend.o \
 		debug.o \
 		dest.o \
 		dest-job.o \
@@ -29,8 +26,6 @@ LIBOBJS	=	\
 		dir.o \
 		encode.o \
 		file.o \
-		getdevices.o \
-		getifaddrs.o \
 		getputfile.o \
 		globals.o \
 		hash.o \
@@ -48,6 +43,26 @@ LIBOBJS	=	\
 		md5passwd.o \
 		notify.o \
 		options.o \
+		pwg-media.o \
+		raster-error.o \
+		raster-stream.o \
+		raster-stubs.o \
+		request.o \
+		snprintf.o \
+		string.o \
+		tempfile.o \
+		thread.o \
+		tls.o \
+		transcode.o \
+		usersys.o \
+		util.o
+
+DRIVEROBJS	=	\
+		adminutil.o \
+		backchannel.o \
+		backend.o \
+		getdevices.o \
+		getifaddrs.o \
 		ppd.o \
 		ppd-attr.o \
 		ppd-cache.o \
@@ -58,24 +73,18 @@ LIBOBJS	=	\
 		ppd-mark.o \
 		ppd-page.o \
 		ppd-util.o \
-		pwg-media.o \
-		raster-error.o \
 		raster-interpret.o \
-		raster-stream.o \
-		request.o \
+		raster-interstub.o \
 		sidechannel.o \
-		snmp.o \
-		snprintf.o \
-		string.o \
-		tempfile.o \
-		thread.o \
-		tls.o \
-		transcode.o \
-		usersys.o \
-		util.o
+		snmp.o
+
+LIBOBJS		= \
+		$(LIBCUPSOBJS)
+
 IMAGEOBJS	= \
 		raster-interstub.o \
 		raster-stubs.o
+
 TESTOBJS	= \
 		rasterbench.o \
 		testadmin.o \
@@ -281,23 +290,25 @@ install-libs: $(LIBTARGETS) $(INSTALLSTATIC)
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
 	fi
-	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
+	-if text "x$(LIBCUPSIMAGE)" != x; then
+		$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR); \
+	fi
+	-if test "x$(LIBCUPSIMAGE)" = "xlibcupsimage.so.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 	fi
-	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
+	-if test "x$(LIBCUPSIMAGE)" = "xlibcupsimage.2.dylib"; then \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPS) $(SYMROOT); \
 		dsymutil $(SYMROOT)/$(LIBCUPS); \
-		cp $(LIBCUPSIMAGE) $(SYMROOT); \
-		dsymutil $(SYMROOT)/$(LIBCUPSIMAGE); \
+		if text "x$(LIBCUPSIMAGE)" != x; then \
+			cp $(LIBCUPSIMAGE) $(SYMROOT); \
+			dsymutil $(SYMROOT)/$(LIBCUPSIMAGE); \
+		fi \
 	fi
 
 installstatic:
@@ -316,7 +327,7 @@ installstatic:
 
 uninstall:
 	$(RM) $(LIBDIR)/libcups.2.dylib
-	$(RM) $(LIBDIR)/$(LIBCUPSSTATIC)
+	$(RM) $(LIBDIR)/libcups.a
 	$(RM) $(LIBDIR)/libcups.dylib
 	$(RM) $(LIBDIR)/libcups.so
 	$(RM) $(LIBDIR)/libcups.so.2
@@ -330,15 +341,21 @@ uninstall:
 		$(RM) $(INCLUDEDIR)/cups/$$file; \
 	done
 	-$(RMDIR) $(INCLUDEDIR)/cups
+	if test "x$(privateinclude)" != x; then \
+		for file in $(HEADERSPRIV); do \
+			$(RM) $(PRIVATEINCLUDE)/cups/$$file; \
+		done
+		$(RMDIR) $(PRIVATEINCLUDE)/cups; \
+	fi
 
 
 #
 # libcups.so.2
 #
 
-libcups.so.2:	$(LIBOBJS) $(IMAGEOBJS)
+libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(IMAGEOBJS) \
+	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
@@ -348,13 +365,13 @@ libcups.so.2:	$(LIBOBJS) $(IMAGEOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS) $(IMAGEOBJS)
+libcups.2.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.14.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) $(IMAGEOBJS) \
+		$(LIBOBJS) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcups.dylib
@@ -365,10 +382,10 @@ libcups.2.dylib:	$(LIBOBJS) $(IMAGEOBJS)
 # libcups.la
 #
 
-libcups.la:    $(LIBOBJS) $(IMAGEOBJS)
+libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) $(DSOFLAGS) -o $@ \
-		$(LIBOBJS:.o=.lo) $(IMAGEOBJS:.o=.lo) \
+		$(LIBOBJS:.o=.lo) \
 		-rpath $(LIBDIR) -version-info 2:14 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
@@ -377,10 +394,10 @@ libcups.la:    $(LIBOBJS) $(IMAGEOBJS)
 # libcups.a
 #
 
-libcups.a:	$(LIBOBJS) $(IMAGEOBJS)
+libcups.a:	$(LIBOBJS)
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(LIBOBJS) $(IMAGEOBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
 
