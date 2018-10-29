@@ -290,7 +290,7 @@ install-libs: $(LIBTARGETS) $(INSTALLSTATIC)
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
 	fi
-	-if text "x$(LIBCUPSIMAGE)" != x; then
+	-if test "x$(LIBCUPSIMAGE)" != x; then \
 		$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR); \
 	fi
 	-if test "x$(LIBCUPSIMAGE)" = "xlibcupsimage.so.2"; then \
@@ -305,10 +305,10 @@ install-libs: $(LIBTARGETS) $(INSTALLSTATIC)
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPS) $(SYMROOT); \
 		dsymutil $(SYMROOT)/$(LIBCUPS); \
-		if text "x$(LIBCUPSIMAGE)" != x; then \
+		if test "x$(LIBCUPSIMAGE)" != x; then \
 			cp $(LIBCUPSIMAGE) $(SYMROOT); \
 			dsymutil $(SYMROOT)/$(LIBCUPSIMAGE); \
-		fi \
+		fi; \
 	fi
 
 installstatic:
