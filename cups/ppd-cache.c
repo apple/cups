@@ -3185,22 +3185,22 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 					/* Type of password */
 
     if (maxlen > (int)(sizeof(pattern) - 1))
-      maxlen = sizeof(pattern) - 1;
+      maxlen = (int)sizeof(pattern) - 1;
 
     if (!repertoire || !strcmp(repertoire, "iana_us-ascii_digits"))
-      memset(pattern, '1', maxlen);
+      memset(pattern, '1', (size_t)maxlen);
     else if (!strcmp(repertoire, "iana_us-ascii_letters"))
-      memset(pattern, 'A', maxlen);
+      memset(pattern, 'A', (size_t)maxlen);
     else if (!strcmp(repertoire, "iana_us-ascii_complex"))
-      memset(pattern, 'C', maxlen);
+      memset(pattern, 'C', (size_t)maxlen);
     else if (!strcmp(repertoire, "iana_us-ascii_any"))
-      memset(pattern, '.', maxlen);
+      memset(pattern, '.', (size_t)maxlen);
     else if (!strcmp(repertoire, "iana_utf-8_digits"))
-      memset(pattern, 'N', maxlen);
+      memset(pattern, 'N', (size_t)maxlen);
     else if (!strcmp(repertoire, "iana_utf-8_letters"))
-      memset(pattern, 'U', maxlen);
+      memset(pattern, 'U', (size_t)maxlen);
     else
-      memset(pattern, '*', maxlen);
+      memset(pattern, '*', (size_t)maxlen);
 
     pattern[maxlen] = '\0';
 
