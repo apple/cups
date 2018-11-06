@@ -1,7 +1,7 @@
 dnl
 dnl Compiler stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -156,46 +156,19 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion $OPTIM"
 
-		AC_MSG_CHECKING(whether compiler supports -Wno-unused-result)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-unused-result"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-unused-result"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
-		AC_MSG_CHECKING(whether compiler supports -Wsign-conversion)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wsign-conversion"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wsign-conversion"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
-		AC_MSG_CHECKING(whether compiler supports -Wno-tautological-compare)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-tautological-compare"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
-
-		AC_MSG_CHECKING(whether compiler supports -Wno-format-truncation)
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-format-truncation"
-		AC_TRY_COMPILE(,,
-			[OPTIM="$OPTIM -Wno-format-truncation"
-			AC_MSG_RESULT(yes)],
-			AC_MSG_RESULT(no))
-		CFLAGS="$OLDCFLAGS"
+		# Test GCC version for certain warning flags since -Werror
+		# doesn't trigger...
+		gccversion=`$CC --version | head -1 | awk '{print $NF}'`
+		case "$gccversion" in
+			7.*)
+				OPTIM="$OPTIM -Wno-format-truncation -Wno-tautological-compare"
+				;;
+		esac
 
 		# Additional warning options for development testing...
-		if test -d .svn; then
+		if test -d .git; then
 			OPTIM="-Werror $OPTIM"
 		fi
 	fi

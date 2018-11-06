@@ -7035,114 +7035,19 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion $OPTIM"
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler supports -Wno-unused-result" >&5
-$as_echo_n "checking whether compiler supports -Wno-unused-result... " >&6; }
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-unused-result"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  OPTIM="$OPTIM -Wno-unused-result"
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-		CFLAGS="$OLDCFLAGS"
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler supports -Wsign-conversion" >&5
-$as_echo_n "checking whether compiler supports -Wsign-conversion... " >&6; }
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wsign-conversion"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  OPTIM="$OPTIM -Wsign-conversion"
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-		CFLAGS="$OLDCFLAGS"
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler supports -Wno-tautological-compare" >&5
-$as_echo_n "checking whether compiler supports -Wno-tautological-compare... " >&6; }
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  OPTIM="$OPTIM -Wno-tautological-compare"
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-		CFLAGS="$OLDCFLAGS"
-
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiler supports -Wno-format-truncation" >&5
-$as_echo_n "checking whether compiler supports -Wno-format-truncation... " >&6; }
-		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -Werror -Wno-format-truncation"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  OPTIM="$OPTIM -Wno-format-truncation"
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-		CFLAGS="$OLDCFLAGS"
+		# Test GCC version for certain warning flags since -Werror
+		# doesn't trigger...
+		gccversion=`$CC --version | head -1 | awk '{print $NF}'`
+		case "$gccversion" in
+			7.*)
+				OPTIM="$OPTIM -Wno-format-truncation -Wno-tautological-compare"
+				;;
+		esac
 
 		# Additional warning options for development testing...
-		if test -d .svn; then
+		if test -d .git; then
 			OPTIM="-Werror $OPTIM"
 		fi
 	fi
