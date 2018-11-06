@@ -5848,7 +5848,7 @@ create_subscriptions(
       {
         char	temp[64];		/* Temporary string */
 
-	memcpy(temp, user_data->values[0].unknown.data, user_data->values[0].unknown.length);
+	memcpy(temp, user_data->values[0].unknown.data, (size_t)user_data->values[0].unknown.length);
 	temp[user_data->values[0].unknown.length] = '\0';
 
 	if (httpSeparateURI(HTTP_URI_CODING_ALL, temp, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_OK)

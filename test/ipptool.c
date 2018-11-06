@@ -873,7 +873,7 @@ copy_hex_string(char          *buffer,	/* I - String buffer */
     if ((size_t)datalen > bufsize)
       datalen = (int)bufsize - 1;
 
-    memcpy(buffer, data, datalen);
+    memcpy(buffer, data, (size_t)datalen);
     buffer[datalen] = '\0';
   }
 }
@@ -4828,7 +4828,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
             withlen = (int)strlen(value);
 
-            memcpy(withdata, value, withlen);
+            memcpy(withdata, value, (size_t)withlen);
 	  }
 
 	  for (i = 0; i < count; i ++)

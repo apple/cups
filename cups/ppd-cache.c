@@ -3964,7 +3964,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         if (tray_len >= (int)sizeof(tray))
           tray_len = (int)sizeof(tray) - 1;
 
-        memcpy(tray, tray_ptr, tray_len);
+        memcpy(tray, tray_ptr, (size_t)tray_len);
         tray[tray_len] = '\0';
 
         if (strstr(tray, "stackingorder=lastToFirst;"))
