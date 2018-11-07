@@ -284,3 +284,6 @@
 
 # HP LaserJet P1102 (Issue #5310)
 0x03F0 0x002A no-reattach
+
+# Lexmark MS317dn
+0x043d 0x0226 no-reattach
