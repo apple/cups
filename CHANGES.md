@@ -19,6 +19,8 @@ Changes in CUPS v2.2.9
 - The IPP Everywhere "driver" now properly supports face-up printers
   (Issue #5345)
 - Fixed some typos in the label printer drivers (Issue #5350)
+- Multi-file jobs could get stuck if the backend failed (Issue #5359,
+  Issue #5413)
 - The IPP Everywhere "driver" no longer does local filtering when printing to
   a shared CUPS printer (Issue #5361)
 - The lpadmin command now correctly reports IPP errors when configuring an

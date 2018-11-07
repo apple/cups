@@ -1463,9 +1463,16 @@ process_children(void)
               (!job->filters[i] && WIFEXITED(old_status)))
           {				/* Backend and filter didn't crash */
 	    if (job->filters[i])
+	    {
 	      job->status = status;	/* Filter failed */
+	    }
 	    else
+	    {
 	      job->status = -status;	/* Backend failed */
+
+	      if (job->current_file < job->num_files)
+	        cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_FORCE, "Canceling multi-file job due to backend failure.");
+	    }
           }
 
 	  if (job->state_value == IPP_JOB_PROCESSING &&

@@ -1,7 +1,7 @@
 /*
  * AppSocket backend for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -402,8 +402,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addrlist->addr), 1,
-                            0, backendNetworkSideCB);
+    if ((bytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addrlist->addr), 1, 0, backendNetworkSideCB)) < 0)
+      tbytes = -1;
+    else
+      tbytes = bytes;
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
@@ -411,7 +413,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
-  if (waiteof)
+  if (waiteof && tbytes >= 0)
   {
    /*
     * Shutdown the socket and wait for the other end to finish...
@@ -448,7 +450,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (print_fd != 0)
     close(print_fd);
 
-  return (CUPS_BACKEND_OK);
+  return (tbytes >= 0 ? CUPS_BACKEND_OK : CUPS_BACKEND_FAILED);
 }
 
 
