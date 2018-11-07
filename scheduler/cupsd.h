@@ -1,7 +1,7 @@
 /*
  * Main header file for the CUPS scheduler.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -171,8 +171,7 @@ VAR int			OnDemand	VALUE(0);
 extern void		cupsdInitEnv(void);
 extern int		cupsdLoadEnv(char *envp[], int envmax);
 extern void		cupsdSetEnv(const char *name, const char *value);
-extern void		cupsdSetEnvf(const char *name, const char *value, ...)
-			__attribute__ ((__format__ (__printf__, 2, 3)));
+extern void		cupsdSetEnvf(const char *name, const char *value, ...) _CUPS_FORMAT(2, 3);
 extern void		cupsdUpdateEnv(void);
 
 /* file.c */
@@ -196,8 +195,7 @@ extern char		*cupsdMakeUUID(const char *name, int number,
 				       char *buffer, size_t bufsize);
 extern void		cupsdReleaseSignals(void);
 extern void		cupsdSetString(char **s, const char *v);
-extern void		cupsdSetStringf(char **s, const char *f, ...)
-			__attribute__ ((__format__ (__printf__, 2, 3)));
+extern void		cupsdSetStringf(char **s, const char *f, ...) _CUPS_FORMAT(2, 3);
 
 /* process.c */
 extern void		*cupsdCreateProfile(int job_id, int allow_networking);

@@ -1,7 +1,7 @@
 /*
  * Sandbox helper for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -37,7 +37,7 @@
  * Local functions...
  */
 
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Private debugging macros for CUPS.
  *
- * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2005 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -67,20 +67,10 @@ extern "C" {
  */
 
 #  ifdef DEBUG
-#    ifdef _WIN32
-#      ifdef LIBCUPS2_EXPORTS
-#        define DLLExport __declspec(dllexport)
-#      else
-#        define DLLExport
-#      endif /* LIBCUPS2_EXPORTS */
-#    else
-#      define DLLExport
-#    endif /* _WIN32 */
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
 #    define DEBUG_set(logfile,level,filter) _cups_debug_set(logfile,level,filter,1)
 #  else
-#    define DLLExport
 #    define DEBUG_puts(x)
 #    define DEBUG_printf(x)
 #    define DEBUG_set(logfile,level,filter)
@@ -93,14 +83,11 @@ extern "C" {
 
 extern int	_cups_debug_fd;
 extern int	_cups_debug_level;
-extern void	DLLExport _cups_debug_printf(const char *format, ...)
-		__attribute__ ((__format__ (__printf__, 1, 2)));
-extern void	DLLExport _cups_debug_puts(const char *s);
-extern void	DLLExport _cups_debug_set(const char *logfile,
-					  const char *level, const char *filter,
-					  int force);
+extern void	_cups_debug_printf(const char *format, ...) _CUPS_FORMAT(1, 2);
+extern void	_cups_debug_puts(const char *s);
+extern void	_cups_debug_set(const char *logfile, const char *level, const char *filter, int force) _CUPS_PRIVATE;
 #  ifdef _WIN32
-extern int	_cups_gettimeofday(struct timeval *tv, void *tz);
+extern int	_cups_gettimeofday(struct timeval *tv, void *tz) _CUPS_PRIVATE;
 #    define gettimeofday(a,b) _cups_gettimeofday(a, b)
 #  endif /* _WIN32 */
 

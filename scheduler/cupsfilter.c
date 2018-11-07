@@ -1,7 +1,7 @@
 /*
  * Filtering program for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -82,7 +82,7 @@ static int		open_pipe(int *fds);
 static int		read_cups_files_conf(const char *filename);
 static void		set_string(char **s, const char *val);
 static void		sighandler(int sig);
-static void		usage(const char *opt) __attribute__((noreturn));
+static void		usage(const char *opt) _CUPS_NORETURN;
 
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Private image library definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1993-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -49,12 +49,8 @@
  * Prototypes...
  */
 
-extern int		_cupsRasterExecPS(cups_page_header2_t *h,
-			                  int *preferred_bits,
-			                  const char *code)
-			                  __attribute__((nonnull(3)));
-extern void		_cupsRasterAddError(const char *f, ...)
-			__attribute__((__format__(__printf__, 1, 2)));
+extern int		_cupsRasterExecPS(cups_page_header2_t *h, int *preferred_bits, const char *code) _CUPS_NONNULL((3));
+extern void		_cupsRasterAddError(const char *f, ...) _CUPS_FORMAT(1,2);
 extern void		_cupsRasterClearError(void);
 
 #endif /* !_CUPS_RASTER_PRIVATE_H_ */

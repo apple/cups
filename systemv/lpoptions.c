@@ -1,7 +1,7 @@
 /*
  * Printer option program for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -25,7 +25,7 @@
 
 static void	list_group(ppd_file_t *ppd, ppd_group_t *group);
 static void	list_options(cups_dest_t *dest);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

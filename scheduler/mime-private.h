@@ -1,7 +1,7 @@
 /*
  * Private MIME type/conversion database definitions for CUPS.
  *
- * Copyright 2011 by Apple Inc.
+ * Copyright 2011-2018 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -29,8 +29,7 @@ extern "C" {
  * Prototypes...
  */
 
-extern void	_mimeError(mime_t *mime, const char *format, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
+extern void	_mimeError(mime_t *mime, const char *format, ...) _CUPS_FORMAT(2, 3);
 
 
 #  ifdef __cplusplus

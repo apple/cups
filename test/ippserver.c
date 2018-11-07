@@ -1,7 +1,7 @@
 /*
  * Sample IPP Everywhere server for CUPS.
  *
- * Copyright 2010-2017 by Apple Inc.
+ * Copyright 2010-2018 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -411,8 +411,7 @@ static void		html_escape(_ipp_client_t *client, const char *s,
 static void		html_footer(_ipp_client_t *client);
 static void		html_header(_ipp_client_t *client, const char *title);
 static void		html_printf(_ipp_client_t *client, const char *format,
-			            ...) __attribute__((__format__(__printf__,
-			                                           2, 3)));
+			            ...) _CUPS_FORMAT(2, 3);
 static void		ipp_cancel_job(_ipp_client_t *client);
 static void		ipp_close_job(_ipp_client_t *client);
 static void		ipp_create_job(_ipp_client_t *client);
@@ -437,14 +436,12 @@ static int		register_printer(_ipp_printer_t *printer, const char *location, cons
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
 				     const char *type, size_t length);
-static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
-			            const char *message, ...)
-			__attribute__ ((__format__ (__printf__, 3, 4)));
+static void		respond_ipp(_ipp_client_t *client, ipp_status_t status, const char *message, ...) _CUPS_FORMAT(3, 4);
 static void		respond_unsupported(_ipp_client_t *client,
 			                    ipp_attribute_t *attr);
 static void		run_printer(_ipp_printer_t *printer);
 static char		*time_string(time_t tv, char *buffer, size_t bufsize);
-static void		usage(int status) __attribute__((noreturn));
+static void		usage(int status) _CUPS_NORETURN;
 static int		valid_doc_attributes(_ipp_client_t *client);
 static int		valid_job_attributes(_ipp_client_t *client);
 

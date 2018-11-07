@@ -1,7 +1,7 @@
 /*
  * DSC test program for CUPS.
  *
- * Copyright 2007-2010 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -27,7 +27,7 @@
  */
 
 static int	check_file(const char *filename);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

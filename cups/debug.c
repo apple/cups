@@ -83,7 +83,7 @@ debug_thread_id(void)
  * '_cups_debug_printf()' - Write a formatted line to the log.
  */
 
-void DLLExport
+void
 _cups_debug_printf(const char *format,	/* I - Printf-style format string */
                    ...)			/* I - Additional arguments as needed */
 {
@@ -168,7 +168,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
  * '_cups_debug_puts()' - Write a single line to the log.
  */
 
-void DLLExport
+void
 _cups_debug_puts(const char *s)		/* I - String to output */
 {
   struct timeval	curtime;	/* Current time */
@@ -248,7 +248,7 @@ _cups_debug_puts(const char *s)		/* I - String to output */
  * '_cups_debug_set()' - Enable or disable debug logging.
  */
 
-void DLLExport
+void
 _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
                 const char *level,	/* I - Log level or NULL */
 		const char *filter,	/* I - Filter string or NULL */

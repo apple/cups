@@ -1,7 +1,7 @@
 /*
  * "lpq" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -26,7 +26,7 @@ static http_t	*connect_server(const char *, http_t *);
 static int	show_jobs(const char *, http_t *, const char *,
 		          const char *, const int, const int);
 static void	show_printer(const char *, http_t *, const char *);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

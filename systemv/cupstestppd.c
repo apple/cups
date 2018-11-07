@@ -1,7 +1,7 @@
 /*
  * PPD test program for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -107,7 +107,7 @@ static int	check_translations(ppd_file_t *ppd, int errors, int verbose,
 		                   int warn);
 static void	show_conflicts(ppd_file_t *ppd, const char *prefix);
 static int	test_raster(ppd_file_t *ppd, int verbose);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 static int	valid_path(const char *keyword, const char *path, int errors,
 		           int verbose, int warn);
 static int	valid_utf8(const char *s);

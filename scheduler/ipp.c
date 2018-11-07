@@ -118,9 +118,7 @@ static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job,
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	send_http_error(cupsd_client_t *con, http_status_t status,
 		                cupsd_printer_t *printer);
-static void	send_ipp_status(cupsd_client_t *con, ipp_status_t status,
-		                const char *message, ...)
-		__attribute__((__format__(__printf__, 3, 4)));
+static void	send_ipp_status(cupsd_client_t *con, ipp_status_t status, const char *message, ...) _CUPS_FORMAT(3, 4);
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);

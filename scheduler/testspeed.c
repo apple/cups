@@ -1,7 +1,7 @@
 /*
  * Scheduler speed test for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2005 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -31,7 +31,7 @@
 static int	do_test(const char *server, int port,
 		        http_encryption_t encryption, int requests,
 			const char *opstring, int verbose);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*

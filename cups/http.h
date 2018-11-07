@@ -1,7 +1,7 @@
 /*
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -480,8 +480,7 @@ extern int		httpHead(http_t *http, const char *uri);
 extern void		httpInitialize(void);
 extern int		httpOptions(http_t *http, const char *uri);
 extern int		httpPost(http_t *http, const char *uri);
-extern int		httpPrintf(http_t *http, const char *format, ...)
-			__attribute__ ((__format__ (__printf__, 2, 3)));
+extern int		httpPrintf(http_t *http, const char *format, ...) _CUPS_FORMAT(2, 3);
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpRead2 instead.");
 extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED_1_6_MSG("Use httpReconnect2 instead.");

@@ -6,7 +6,7 @@
  * our own file functions allows us to provide transparent support of
  * different line endings, gzip'd print files, PPD files, etc.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -85,9 +85,7 @@ extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode)
 			_CUPS_API_1_2;
 extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode) _CUPS_API_1_2;
 extern int		cupsFilePeekChar(cups_file_t *fp) _CUPS_API_1_2;
-extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...)
-			__attribute__((__format__ (__printf__, 2, 3)))
-			_CUPS_API_1_2;
+extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...) _CUPS_FORMAT(2, 3) _CUPS_API_1_2;
 extern int		cupsFilePutChar(cups_file_t *fp, int c) _CUPS_API_1_2;
 extern ssize_t		cupsFilePutConf(cups_file_t *fp, const char *directive,
 			                const char *value) _CUPS_API_1_4;

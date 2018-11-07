@@ -290,10 +290,10 @@ static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
-static void run_legacy_backend(int argc, char *argv[], int fd) __attribute__((noreturn));	/* Starts child backend process running as a ppc executable */
+static void run_legacy_backend(int argc, char *argv[], int fd) _CUPS_NORETURN;	/* Starts child backend process running as a ppc executable */
 #endif /* __i386__ || __x86_64__ */
 static void sigterm_handler(int sig);	/* SIGTERM handler */
-static void sigquit_handler(int sig, siginfo_t *si, void *unused) __attribute__((noreturn));
+static void sigquit_handler(int sig, siginfo_t *si, void *unused) _CUPS_NORETURN;
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);

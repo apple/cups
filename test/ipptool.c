@@ -1,7 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -152,11 +152,11 @@ static int	PasswordTries = 0;	/* Number of tries with password */
  * Local functions...
  */
 
-static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	add_stringf(cups_array_t *a, const char *s, ...) _CUPS_FORMAT(2, 3);
 static int      compare_uris(const char *a, const char *b);
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(cups_file_t *outfile, _cups_vars_t *vars, const char *testfile);
-static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
+static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) _CUPS_NONNULL((1,2,3));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(cups_file_t *outfile, _cups_vars_t *vars, cups_file_t *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src, size_t dstsize);
@@ -168,7 +168,7 @@ static const char *password_cb(const char *prompt);
 static void	pause_message(const char *message);
 static void	print_attr(cups_file_t *outfile, int format, ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_csv(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
-static void	print_fatal_error(cups_file_t *outfile, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_fatal_error(cups_file_t *outfile, const char *s, ...) _CUPS_FORMAT(2, 3);
 static void	print_line(cups_file_t *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_xml_header(cups_file_t *outfile);
 static void	print_xml_string(cups_file_t *outfile, const char *element, const char *s);
@@ -178,7 +178,7 @@ static void	set_variable(cups_file_t *outfile, _cups_vars_t *vars, const char *n
 static void	sigterm_handler(int sig);
 #endif /* _WIN32 */
 static int	timeout_cb(http_t *http, void *user_data);
-static void	usage(void) __attribute__((noreturn));
+static void	usage(void) _CUPS_NORETURN;
 static int	validate_attr(cups_file_t *outfile, cups_array_t *errors, ipp_attribute_t *attr);
 static const char *with_flags_string(int flags);
 static int      with_value(cups_file_t *outfile, cups_array_t *errors, char *value, int flags, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);

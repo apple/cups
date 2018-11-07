@@ -1,7 +1,7 @@
 /*
  * Scheduler control program for CUPS.
  *
- * Copyright 2007-2012 by Apple Inc.
+ * Copyright 2007-2018 by Apple Inc.
  * Copyright 2006-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -25,7 +25,7 @@
  * Local functions...
  */
 
-static void	usage(const char *opt) __attribute__((noreturn));
+static void	usage(const char *opt) _CUPS_NORETURN;
 
 
 /*
