@@ -4,7 +4,7 @@ CHANGES - 2.3b6 - 2018-11-07
 Changes in CUPS v2.3b6
 ----------------------
 
-- Localization update (Issue #5339, Issue #5348, Issue #5362)
+- Localization update (Issue #5339, Issue #5348, Issue #5362, Issue #5408)
 - Documentation updates (Issue #5369)
 - The lpadmin command would create a non-working printer in some error cases
   (Issue #5305)

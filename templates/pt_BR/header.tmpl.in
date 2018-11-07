@@ -31,7 +31,7 @@
       <ul>
 	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a href="/">In&iacute;cio</a></li>
-	<li><a {SECTION=admin?class="active" :}href="/admin">Administra&ccedil;&atilde;o</a></li>
+	<li><a {SECTION=admin?class="active" :}href="/admin">Administração</a></li>
 	<li><a {SECTION=classes?class="active" :}href="/classes/">Classes</a></li>
 	<li><a {SECTION=help?class="active" :}href="/help/">Ajuda</a></li>
 	<li><a {SECTION=jobs?class="active" :}href="/jobs/">Trabalhos</a></li>
