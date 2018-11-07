@@ -366,10 +366,10 @@ cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
 # Make the driver daemon, "cups-driverd".
 #
 
-cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/$(LIBCUPSPPDC)
+cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/libcupsppdc.a
 	echo Linking $@...
 	$(LD_CXX) $(LDFLAGS) -o cups-driverd cups-driverd.o util.o \
-		-L../ppdc -lcupsppdc $(LIBS)
+		../ppdc/libcupsppdc.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
