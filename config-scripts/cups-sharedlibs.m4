@@ -1,7 +1,7 @@
 dnl
 dnl Shared library support for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2018 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -24,30 +24,21 @@ if test x$enable_shared != xno; then
 	case "$host_os_name" in
 		sunos*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
 		linux* | gnu* | *bsd*)
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		darwin*)
 			LIBCUPS="lib$cupsbase.2.dylib"
-			LIBCUPSCGI="libcupscgi.1.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
-			LIBCUPSMIME="libcupsmime.1.dylib"
-			LIBCUPSPPDC="libcupsppdc.1.dylib"
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
@@ -56,10 +47,7 @@ if test x$enable_shared != xno; then
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
 			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
@@ -68,10 +56,7 @@ if test x$enable_shared != xno; then
 else
 	PICFLAG=0
 	LIBCUPS="lib$cupsbase.a"
-	LIBCUPSCGI="libcupscgi.a"
 	LIBCUPSIMAGE="libcupsimage.a"
-	LIBCUPSMIME="libcupsmime.a"
-	LIBCUPSPPDC="libcupsppdc.a"
 	DSO=":"
 	DSOXX=":"
 fi
@@ -81,10 +66,7 @@ AC_SUBST(DSOXX)
 AC_SUBST(DSOFLAGS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSBASE)
-AC_SUBST(LIBCUPSCGI)
 AC_SUBST(LIBCUPSIMAGE)
-AC_SUBST(LIBCUPSMIME)
-AC_SUBST(LIBCUPSPPDC)
 AC_SUBST(LIBCUPSSTATIC)
 
 if test x$enable_shared = xno; then

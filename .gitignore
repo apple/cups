@@ -1,12 +1,7 @@
 *.a
 *.bck
-*.cgi
-*.dylib
 *.gz
 *.o
-*.so
-*.so.*
-*.tokens
 .buildrev
 autom4te.cache
 config.h
@@ -29,7 +24,11 @@ berkeley/lpc
 berkeley/lpq
 berkeley/lpr
 berkeley/lprm
-cgi-bin/makedocset
+cgi-bin/admin.cgi
+cgi-bin/classes.cgi
+cgi-bin/help.cgi
+cgi-bin/jobs.cgi
+cgi-bin/printers.cgi
 cgi-bin/testcgi
 cgi-bin/testhi
 cgi-bin/testhi.index
@@ -39,6 +38,10 @@ conf/cupsd.conf
 conf/mime.convs
 conf/pam.std
 conf/snmp.conf
+cups/libcups.2.dylib
+cups/libcups.dylib
+cups/libcups.so
+cups/libcups.so.2
 cups/locale/
 cups/test.pwg
 cups/testadmin
@@ -64,6 +67,10 @@ doc/index.html
 doc/*/index.html
 filter/commandtops
 filter/gziptoany
+filter/libcupsimage.2.dylib
+filter/libcupsimage.dylib
+filter/libcupsimage.so
+filter/libcupsimage.so.2
 filter/pstops
 filter/rasterbench
 filter/rastertoepson
