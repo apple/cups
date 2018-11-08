@@ -1,12 +1,13 @@
 .\"
 .\" cups-files.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2018 by Apple Inc.
-.\" Copyright 1997-2006 by Easy Software Products.
+.\" Copyright © 2007-2018 by Apple Inc.
+.\" Copyright © 1997-2006 by Easy Software Products.
 .\"
-.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
+.\" information.
 .\"
-.TH cups-files.conf 5 "CUPS" "21 September 2017" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "8 November 2018" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -269,6 +270,13 @@ Specifies the format to use for the Printcap file.
 .TP 5
 \fBSMBConfigFile \fIfilename\fR
 Specifies the SMB service configuration file to update.
+.SH NOTES
+The scheduler MUST be restarted manually after making changes to the \fBcups-files.conf\fR file.
+On Linux this is typically done using the
+.BR systemctl (8)
+command, while on macOS the
+.BR launchctl (8)
+command is used instead.
 .SH SEE ALSO
 .BR classes.conf (5),
 .BR cups (1),

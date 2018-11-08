@@ -1,12 +1,13 @@
 .\"
 .\" cupsd.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2018 by Apple Inc.
-.\" Copyright 1997-2006 by Easy Software Products.
+.\" Copyright © 2007-2018 by Apple Inc.
+.\" Copyright © 1997-2006 by Easy Software Products.
 .\"
-.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
+.\" information.
 .\"
-.TH cupsd.conf 5 "CUPS" "24 April 2018" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "8 November 2018" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -17,10 +18,6 @@ file configures the CUPS scheduler,
 It is normally located in the
 .I /etc/cups
 directory.
-\fBNote:\fR File, directory, and user configuration directives that used to be allowed in the \fBcupsd.conf\fR file are now stored in the
-.BR cups-files.conf (5)
-file instead in order to prevent certain types of privilege escalation attacks.
-.LP
 Each line in the file can be a configuration directive, a blank line, or a comment.
 Configuration directives typically consist of a name and zero or more values separated by whitespace.
 The configuration directive name and values are case-insensitive.
@@ -856,6 +853,17 @@ Use "%{job-impressions-completed}" to insert the number of pages (sides) that we
 \fBRIPCache \fIsize\fR
 Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
 The default is "128m".
+.SH NOTES
+File, directory, and user configuration directives that used to be allowed in the \fBcupsd.conf\fR file are now stored in the
+.BR cups-files.conf (5)
+file instead in order to prevent certain types of privilege escalation attacks.
+.PP
+The scheduler MUST be restarted manually after making changes to the \fBcupsd.conf\fR file.
+On Linux this is typically done using the
+.BR systemctl (8)
+command, while on macOS the
+.BR launchctl (8)
+command is used instead.
 .SH CONFORMING TO
 The \fBcupsd.conf\fR file format is based on the Apache HTTP Server configuration file format.
 .SH EXAMPLES
