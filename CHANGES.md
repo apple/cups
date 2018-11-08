@@ -46,6 +46,7 @@ Changes in CUPS v2.3b6
 - Fixed a memory leak for some IPP (extension) syntaxes.
 - The `cupscgi`, `cupsmime`, and `cupsppdc` support libraries are no longer
   installed as shared libraries.
+- The `snmp` backend is now deprecated.
 
 
 Changes in CUPS v2.3b5
