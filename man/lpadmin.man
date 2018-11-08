@@ -6,7 +6,7 @@
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
-.TH lpadmin 8 "CUPS" "19 August 2018" "Apple Inc."
+.TH lpadmin 8 "CUPS" "8 November 2018" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -196,13 +196,19 @@ Note: PPD files and printer drivers are deprecated and will not be supported in 
 .SH CONFORMING TO
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are \fInot\fR case-sensitive.
+.PP
 Finally, the CUPS version of \fBlpadmin\fR may ask the user for an access password depending on the printing system configuration.
 This differs from the System V version which requires the root user to execute this command.
 .SH NOTES
 The CUPS version of \fBlpadmin\fR does not support all of the System V or Solaris printing system configuration options.
+.PP
 Interface scripts are not supported for security reasons.
 .PP
 The double meaning of the \fB\-E\fR option is an unfortunate historical oddity.
+.PP
+The \fBlpadmin\fR command communicates with the scheduler (\fBcupsd\fR) to make changes to the printing system configuration.
+This configuration information is stored in several files including \fIprinters.conf\fR and \fIclasses.conf\fR.
+These files should not be edited directly and are an implementation detail of CUPS that is subject to change at any time.
 .SH EXAMPLE
 Create an IPP Everywhere print queue:
 .nf
