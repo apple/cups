@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-11-07
+CHANGES - 2.3b6 - 2018-11-08
 ============================
 
 Changes in CUPS v2.3b6
@@ -21,6 +21,9 @@ Changes in CUPS v2.3b6
 - The IPP Everywhere "driver" now properly supports face-up printers
   (Issue #5345)
 - Fixed some typos in the label printer drivers (Issue #5350)
+- Setting the `Community` name to the empty string in `snmp.conf` now disables
+  SNMP supply level monitoring by all the standard network backends
+  (Issue #5354)
 - Multi-file jobs could get stuck if the backend failed (Issue #5359,
   Issue #5413)
 - The IPP Everywhere "driver" no longer does local filtering when printing to

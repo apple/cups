@@ -6,7 +6,7 @@
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
-.TH snmp.conf 5 "CUPS" "10 June 2014" "Apple Inc."
+.TH snmp.conf 5 "CUPS" "8 November 2018" "Apple Inc."
 .SH NAME
 snmp.conf \- snmp configuration file for cups
 .SH DESCRIPTION
@@ -32,6 +32,7 @@ There is no default for the broadcast address.
 Specifies the community name to use.
 Only a single community name may be specified.
 The default community name is "public".
+If no name is specified, all SNMP functions are disabled.
 .TP 5
 \fBDebugLevel \fInumber\fR
 Specifies the logging level from 0 (none) to 3 (everything).

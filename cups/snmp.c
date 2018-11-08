@@ -129,9 +129,13 @@ _cupsSNMPDefaultCommunity(void)
     {
       linenum = 0;
       while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
-	if (!_cups_strcasecmp(line, "Community") && value)
+	if (!_cups_strcasecmp(line, "Community"))
 	{
-	  strlcpy(cg->snmp_community, value, sizeof(cg->snmp_community));
+	  if (value)
+	    strlcpy(cg->snmp_community, value, sizeof(cg->snmp_community));
+	  else
+	    cg->snmp_community[0] = '\0';
+
 	  break;
 	}
 

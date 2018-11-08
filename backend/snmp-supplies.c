@@ -440,6 +440,7 @@ backend_init_supplies(
 {
   int		i,			/* Looping var */
 		type;			/* Current marker type */
+  const char	*community;		/* SNMP community name */
   cups_file_t	*cachefile;		/* Cache file */
   const char	*cachedir;		/* CUPS_CACHEDIR value */
   char		addrstr[1024],		/* Address string */
@@ -507,6 +508,10 @@ backend_init_supplies(
   * See if we should be getting supply levels via SNMP...
   */
 
+  community = _cupsSNMPDefaultCommunity();
+  if (!*community)
+    return;
+
   if ((ppd = ppdOpenFile(getenv("PPD"))) == NULL ||
       ((ppdattr = ppdFindAttr(ppd, "cupsSNMPSupplies", NULL)) != NULL &&
        ppdattr->value && _cups_strcasecmp(ppdattr->value, "true")))
@@ -528,7 +533,7 @@ backend_init_supplies(
   */
 
   if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-		     _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+		     community, CUPS_ASN1_GET_REQUEST, 1,
 		     hrDeviceDescr))
     return;
 
@@ -605,7 +610,7 @@ backend_init_supplies(
 
 
     if (!_cupsSNMPWrite(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-			_cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			community, CUPS_ASN1_GET_REQUEST, 1,
 			prtGeneralCurrentLocalization))
       return;
 
@@ -626,7 +631,7 @@ backend_init_supplies(
 
 
     if (!_cupsSNMPWrite(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-			_cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			community, CUPS_ASN1_GET_REQUEST, 1,
 			oid))
       return;
 
@@ -651,7 +656,7 @@ backend_init_supplies(
     */
 
     _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		  _cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry,
+		  community, prtMarkerSuppliesEntry,
 		  CUPS_SUPPLY_TIMEOUT, backend_walk_cb, NULL);
   }
 
@@ -685,7 +690,7 @@ backend_init_supplies(
     strlcpy(supplies[i].color, "none", sizeof(supplies[i].color));
 
   _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-                _cupsSNMPDefaultCommunity(), prtMarkerColorantValue,
+                community, prtMarkerColorantValue,
 	        CUPS_SUPPLY_TIMEOUT, backend_walk_cb, NULL);
 
  /*
