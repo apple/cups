@@ -140,7 +140,7 @@ direct usb://ZP/LazerJet%20MFP?serial=42</pre>
       <dd>Sets the default value for the named PPD option. For example, <code>-o PageSize=Legal</code> sets the default page size to US Legal.</dd>
 
       <dt><code>-o printer-error-policy=name</code></dt>
-      <dd>Sets the error handling policy:<dl>
+      <dd>Sets the policy for errors such as printers that cannot be found or accessed, don't support the format being printed, fail during submission of the print data, or cause one or more filters to crash:<dl>
         <dt><code>abort-job</code></dt>
         <dd>Aborts the job on error.</dd>
         <dt><code>retry-job</code></dt>
