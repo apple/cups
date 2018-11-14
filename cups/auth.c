@@ -447,7 +447,7 @@ _cupsSetNegotiateAuthString(
     */
 
     int authsize = 10 +			/* "Negotiate " */
-		   (int)output_token.length * 4 / 3 + 1 + 1;
+		   (int)((output_token.length * 4 / 3 + 3) & ~3) + 1;
 		   			/* Base64 + nul */
 
     httpSetAuthString(http, NULL, NULL);
