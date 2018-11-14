@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-11-08
+CHANGES - 2.3b6 - 2018-11-14
 ============================
 
 Changes in CUPS v2.3b6
@@ -37,6 +37,7 @@ Changes in CUPS v2.3b6
   CloseUI/JCLCloseUI keywords (Issue #5381)
 - The scheduler now reports the actual location of the log file (Issue #5398)
 - Added a USB quirk rule (Issue #5420)
+- Kerberos credentials might be truncated (Issue #5435)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
