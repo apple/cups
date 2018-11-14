@@ -1,5 +1,11 @@
-CHANGES - 2.2.9 - 2018-11-09
-============================
+CHANGES - 2.2.10 - 2018-11-14
+=============================
+
+
+Changes in CUPS v2.2.10
+-----------------------
+
+- Kerberos credentials might be truncated (Issue #5435)
 
 
 Changes in CUPS v2.2.9
