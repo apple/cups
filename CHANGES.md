@@ -1,4 +1,4 @@
-CHANGES - 2.2.10 - 2018-11-14
+CHANGES - 2.2.10 - 2018-11-16
 =============================
 
 
@@ -8,6 +8,7 @@ Changes in CUPS v2.2.10
 - The generated PPD files for IPP Everywhere printers did not contain the
   cupsManualCopies keyword (Issue #5433)
 - Kerberos credentials might be truncated (Issue #5435)
+- Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)
 
 
 Changes in CUPS v2.2.9
