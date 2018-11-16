@@ -162,7 +162,7 @@ if test -n "$GCC"; then
 		# doesn't trigger...
 		gccversion=`$CC --version | head -1 | awk '{print $NF}'`
 		case "$gccversion" in
-			7.*)
+			7.* | 8.*)
 				OPTIM="$OPTIM -Wno-format-truncation -Wno-tautological-compare"
 				;;
 		esac
