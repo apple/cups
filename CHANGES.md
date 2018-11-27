@@ -11,6 +11,7 @@ Changes in CUPS v2.2.10
 - Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)
 - Fixed a crash bug when mapping PPD duplex options to IPP attributes
   (rdar://46183976)
+- Added a USB quirk rule (Issue #5443)
 
 
 Changes in CUPS v2.2.9
