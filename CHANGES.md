@@ -1,4 +1,4 @@
-CHANGES - 2.2.10 - 2018-11-16
+CHANGES - 2.2.10 - 2018-11-26
 =============================
 
 
@@ -9,6 +9,8 @@ Changes in CUPS v2.2.10
   cupsManualCopies keyword (Issue #5433)
 - Kerberos credentials might be truncated (Issue #5435)
 - Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)
+- Fixed a crash bug when mapping PPD duplex options to IPP attributes
+  (rdar://46183976)
 
 
 Changes in CUPS v2.2.9
