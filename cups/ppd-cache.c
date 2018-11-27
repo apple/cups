@@ -292,11 +292,11 @@ _cupsConvertOptions(
     ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides", NULL, keyword);
   else if (pc->sides_option && (choice = ppdFindMarkedChoice(ppd, pc->sides_option)) != NULL)
   {
-    if (!_cups_strcasecmp(choice->choice, pc->sides_1sided))
+    if (pc->sides_1sided && !_cups_strcasecmp(choice->choice, pc->sides_1sided))
       ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides", NULL, "one-sided");
-    else if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_long))
+    else if (pc->sides_2sided_long && !_cups_strcasecmp(choice->choice, pc->sides_2sided_long))
       ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides", NULL, "two-sided-long-edge");
-    if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_short))
+    else if (pc->sides_2sided_short && !_cups_strcasecmp(choice->choice, pc->sides_2sided_short))
       ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides", NULL, "two-sided-short-edge");
   }
 

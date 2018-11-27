@@ -47,6 +47,8 @@ Changes in CUPS v2.3b6
 - Authentication in the web interface did not work on macOS (rdar://41444473)
 - Fixed an issue with HTTP Digest authentication (rdar://41709086)
 - The scheduler could crash when job history was purged (rdar://42198057)
+- Fixed a crash bug when mapping PPD duplex options to IPP attributes
+  (rdar://46183976)
 - Fixed a memory leak for some IPP (extension) syntaxes.
 - The `cupscgi`, `cupsmime`, and `cupsppdc` support libraries are no longer
   installed as shared libraries.
