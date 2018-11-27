@@ -36,7 +36,7 @@ Changes in CUPS v2.3b6
 - The cupstestppd utility did not generate errors for missing/mismatched
   CloseUI/JCLCloseUI keywords (Issue #5381)
 - The scheduler now reports the actual location of the log file (Issue #5398)
-- Added a USB quirk rule (Issue #5420)
+- Added USB quirk rules (Issue #5420, Issue #5443)
 - The generated PPD files for IPP Everywhere printers did not contain the
   cupsManualCopies keyword (Issue #5433)
 - Kerberos credentials might be truncated (Issue #5435)

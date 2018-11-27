@@ -287,3 +287,6 @@
 
 # Lexmark MS317dn
 0x043d 0x0226 no-reattach
+
+# Star TSP743 (Issue #5443)
+0x0519 0x0001 delay-close
