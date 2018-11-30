@@ -290,3 +290,6 @@
 
 # Star TSP743 (Issue #5443)
 0x0519 0x0001 delay-close
+
+# Zebra ZD420 (Issue #5395)
+0x0a5f 0x0120 unidir no-reattach
