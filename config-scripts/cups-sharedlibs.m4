@@ -27,7 +27,7 @@ if test x$enable_shared != xno; then
 			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G"
 			;;
 		linux* | gnu* | *bsd*)
 			LIBCUPS="lib$cupsbase.so.2"
@@ -36,7 +36,7 @@ if test x$enable_shared != xno; then
 			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared"
 			;;
 		darwin*)
 			LIBCUPS="lib$cupsbase.2.dylib"
@@ -45,7 +45,7 @@ if test x$enable_shared != xno; then
 			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
+			DSOFLAGS="$DSOFLAGS -Wl,-no_warn_inits -dynamiclib -single_module -lc"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
@@ -56,7 +56,7 @@ if test x$enable_shared != xno; then
 			fi
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
+			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared"
 			;;
 	esac
 else

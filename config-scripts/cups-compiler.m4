@@ -10,18 +10,20 @@ dnl
 dnl Clear the debugging and non-shared library options unless the user asks
 dnl for them...
 INSTALL_STRIP=""
-OPTIM=""
 AC_SUBST(INSTALL_STRIP)
+
+AC_ARG_WITH(optim, [  --with-optim            set optimization flags ],
+	OPTIM="$withval",
+	OPTIM="")
 AC_SUBST(OPTIM)
 
-AC_ARG_WITH(optim, [  --with-optim            set optimization flags ])
 AC_ARG_ENABLE(debug, [  --enable-debug          build with debugging symbols])
 AC_ARG_ENABLE(debug_guards, [  --enable-debug-guards   build with memory allocation guards])
 AC_ARG_ENABLE(debug_printfs, [  --enable-debug-printfs  build with CUPS_DEBUG_LOG support])
 AC_ARG_ENABLE(unit_tests, [  --enable-unit-tests     build and run unit tests])
 
 dnl For debugging, keep symbols, otherwise strip them...
-if test x$enable_debug = xyes; then
+if test x$enable_debug = xyes -a "x$OPTIM" = x; then
 	OPTIM="-g"
 else
 	INSTALL_STRIP="-s"
@@ -79,6 +81,9 @@ AC_SUBST(LDARCHFLAGS)
 dnl Read-only data/program support on Linux...
 AC_ARG_ENABLE(relro, [  --enable-relro          build with the GCC relro option])
 
+dnl Clang/GCC address sanitizer...
+AC_ARG_ENABLE(sanitizer, [  --enable-sanitizer      build with AddressSanitizer])
+
 dnl Update compiler options...
 CXXLIBS="${CXXLIBS:=}"
 AC_SUBST(CXXLIBS)
@@ -89,15 +94,28 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
+WARNING_OPTIONS=""
+AC_SUBST(WARNING_OPTIONS)
+
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
+
+        # Address sanitizer is a useful tool to use when developing/debugging
+        # code but adds about 2x overhead...
+        if test x$enable_sanitizer = xyes; then
+        	# Use -fsanitize=address with debugging...
+		OPTIM="$OPTIM -g -fsanitize=address"
+        else
+        	# Otherwise use the Fortify enhancements to catch any unbounded
+        	# string operations...
+        	CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+        	CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2"
+        fi
+
+	# Default optimization options...
 	if test -z "$OPTIM"; then
-		if test "x$with_optim" = x; then
-			# Default to optimize-for-size and debug
-       			OPTIM="-Os -g"
-		else
-			OPTIM="$with_optim $OPTIM"
-		fi
+		# Default to optimize-for-size and debug
+		OPTIM="-Os -g"
 	fi
 
 	# Generate position-independent code as needed...
@@ -150,54 +168,29 @@ if test -n "$GCC"; then
 		CFLAGS="$OLDCFLAGS"
 	fi
 
-	if test "x$with_optim" = x; then
-		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion $OPTIM"
+	# Add useful warning options for tracking down problems...
+	WARNING_OPTIONS="-Wall -Wno-format-y2k -Wunused -Wno-unused-result -Wsign-conversion"
 
-		# Test GCC version for certain warning flags since -Werror
-		# doesn't trigger...
-		gccversion=`$CC --version | head -1 | awk '{print $NF}'`
-		case "$gccversion" in
-			7.* | 8.*)
-				OPTIM="$OPTIM -Wno-format-truncation -Wno-tautological-compare"
-				;;
-		esac
-
-		# Additional warning options for development testing...
-		if test -d .git; then
-			OPTIM="-Werror $OPTIM"
-		fi
-	fi
-
-	case "$host_os_name" in
-		darwin*)
-			# -D_FORTIFY_SOURCE=2 adds additional object size
-			# checking, basically wrapping all string functions
-			# with buffer-limited ones.  Not strictly needed for
-			# CUPS since we already use buffer-limited calls, but
-			# this will catch any additions that are broken.
-			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
-			;;
-
-		linux*)
-			# The -z relro option is provided by the Linux linker command to
-			# make relocatable data read-only.
-			if test x$enable_relro = xyes; then
-				RELROFLAGS="-Wl,-z,relro,-z,now"
-			fi
+	# Test GCC version for certain warning flags since -Werror
+	# doesn't trigger...
+	gccversion=`$CC --version | head -1 | awk '{print $NF}'`
+	case "$gccversion" in
+		7.* | 8.*)
+			WARNING_OPTIONS="$WARNING_OPTIONS -Wno-format-truncation -Wno-tautological-compare"
 			;;
 	esac
+
+	# Additional warning options for development testing...
+	if test -d .git; then
+		WARNING_OPTIONS="-Werror $WARNING_OPTIONS"
+	fi
 else
 	# Add vendor-specific compiler options...
 	case $host_os_name in
 		sunos*)
 			# Solaris
 			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-xO2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
+				OPTIM="-xO2"
 			fi
 
 			if test $PICFLAG = 1; then
@@ -205,13 +198,13 @@ else
 			fi
 			;;
 		*)
-			# Running some other operating system; inform the user they
-			# should contribute the necessary options to
-			# cups-support@cups.org...
-			echo "Building CUPS with default compiler optimizations; contact"
-			echo "cups-devel@cups.org with uname and compiler options needed"
-			echo "for your platform, or set the CFLAGS and LDFLAGS environment"
-			echo "variables before running configure."
+			# Running some other operating system; inform the user
+			# they should contribute the necessary options via
+			# Github...
+			echo "Building CUPS with default compiler optimizations; contact the CUPS developers on Github"
+			echo "(https://github.com/apple/cups/issues) with the uname and compiler options needed for"
+			echo "your platform, or set the CFLAGS and LDFLAGS environment variables before running"
+			echo "configure."
 			;;
 	esac
 fi
@@ -222,5 +215,11 @@ case $host_os_name in
 		# glibc 2.8 and higher breaks peer credentials unless you
 		# define _GNU_SOURCE...
 		OPTIM="$OPTIM -D_GNU_SOURCE"
+
+		# The -z relro option is provided by the Linux linker command to
+		# make relocatable data read-only.
+		if test x$enable_relro = xyes; then
+			RELROFLAGS="-Wl,-z,relro,-z,now"
+		fi
 		;;
 esac

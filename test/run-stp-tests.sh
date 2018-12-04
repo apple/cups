@@ -569,6 +569,14 @@ fi
 
 echo "Setting up environment variables for test..."
 
+if test "x$ASAN_OPTIONS" = x; then
+	# AddressSanitizer on Linux reports memory leaks from the main function
+	# which is basically useless - in general, programs do not need to free
+	# every object before exit since the OS will recover the process's
+	# memory.
+	ASAN_OPTIONS="suppressions=$root/test/asan-suppressions.txt"
+fi
+
 if test "x$LD_LIBRARY_PATH" = x; then
 	LD_LIBRARY_PATH="$root/cups"
 else
@@ -657,17 +665,7 @@ echo "Starting scheduler:"
 echo "    $runcups $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &"
 echo ""
 
-if test `uname` = Darwin -a "x$VALGRIND" = x; then
-        if test "x$DYLD_INSERT_LIBRARIES" = x; then
-                insert="/usr/lib/libgmalloc.dylib"
-        else
-                insert="/usr/lib/libgmalloc.dylib:$DYLD_INSERT_LIBRARIES"
-        fi
-
-	DYLD_INSERT_LIBRARIES="$insert" MallocStackLogging=1 $runcups ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
-else
-	$runcups $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
-fi
+$runcups $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 
 cupsd=$!
 

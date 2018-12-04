@@ -2009,7 +2009,7 @@ static void parse_options(char *options,
 			     value);
     }
     else if (!_cups_strcasecmp(name, "serial"))
-      strlcpy(serial, value, serial_size);
+      strlcpy(serial, value, (size_t)serial_size);
     else if (!_cups_strcasecmp(name, "location") && location)
       *location = (UInt32)strtoul(value, NULL, 16);
   }
