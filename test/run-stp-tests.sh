@@ -575,32 +575,35 @@ if test "x$ASAN_OPTIONS" = x; then
 	# which is basically useless - in general, programs do not need to free
 	# every object before exit since the OS will recover the process's
 	# memory.
-	ASAN_OPTIONS="suppressions=$root/test/asan-suppressions.txt"
+	ASAN_OPTIONS="detect_leaks=false"
+	export ASAN_OPTIONS
 fi
 
-if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups"
-else
-	LD_LIBRARY_PATH="$root/cups:$LD_LIBRARY_PATH"
+if test -f "$root/cups/libcups.so.2"; then
+        if test "x$LD_LIBRARY_PATH" = x; then
+        	LD_LIBRARY_PATH="$root/cups"
+        else
+        	LD_LIBRARY_PATH="$root/cups:$LD_LIBRARY_PATH"
+        fi
+
+        LD_PRELOAD="$root/cups/libcups.so.2:$root/cups/libcupsimage.so.2"
+        if test `uname` = SunOS -a -r /usr/lib/libCrun.so.1; then
+        	LD_PRELOAD="/usr/lib/libCrun.so.1:$LD_PRELOAD"
+        fi
 fi
 
-LD_PRELOAD="$root/cups/libcups.so.2:$root/cups/libcupsimage.so.2"
-if test `uname` = SunOS -a -r /usr/lib/libCrun.so.1; then
-	LD_PRELOAD="/usr/lib/libCrun.so.1:$LD_PRELOAD"
-fi
-
-if test -f $root/cups/libcups.2.dylib; then
+if test -f "$root/cups/libcups.2.dylib"; then
         if test "x$DYLD_INSERT_LIBRARIES" = x; then
                 DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib"
         else
                 DYLD_INSERT_LIBRARIES="$root/cups/libcups.2.dylib:$root/cups/libcupsimage.2.dylib:$DYLD_INSERT_LIBRARIES"
         fi
-fi
 
-if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups"
-else
-	DYLD_LIBRARY_PATH="$root/cups:$DYLD_LIBRARY_PATH"
+        if test "x$DYLD_LIBRARY_PATH" = x; then
+        	DYLD_LIBRARY_PATH="$root/cups"
+        else
+        	DYLD_LIBRARY_PATH="$root/cups:$DYLD_LIBRARY_PATH"
+        fi
 fi
 
 # These get exported because they don't have side-effects...
