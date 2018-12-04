@@ -525,7 +525,8 @@ PassEnv DYLD_LIBRARY_PATH
 PassEnv LD_LIBRARY_PATH
 PassEnv LD_PRELOAD
 PassEnv LOCALEDIR
-PassEnv SHLIB_PATH
+
+Sandboxing Off
 EOF
 
 if test $ssltype != 0 -a `uname` = Darwin; then
