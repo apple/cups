@@ -1377,12 +1377,6 @@ set_printer_options(
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
 
-  if (enable)
-  {
-    ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", IPP_PSTATE_IDLE);
-    ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
-  }
-
  /*
   * Add the options...
   */
@@ -1415,6 +1409,13 @@ set_printer_options(
     ppdfile = NULL;
 
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
+
+  if (enable)
+  {
+    ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", IPP_PSTATE_IDLE);
+    ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+  }
+
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_PRINTER);
 
   if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
