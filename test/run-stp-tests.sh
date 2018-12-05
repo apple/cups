@@ -783,14 +783,6 @@ for file in 5*.sh; do
 done
 
 #
-# Log all allocations made by the scheduler...
-#
-
-if test `uname` = Darwin -a "x$VALGRIND" = x; then
-	malloc_history $cupsd -callTree -showContent >$BASE/log/malloc_log 2>&1
-fi
-
-#
 # Restart the server...
 #
 
