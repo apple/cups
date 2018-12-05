@@ -16,9 +16,6 @@
 #include "cupsd.h"
 #include <sys/resource.h>
 #ifdef __APPLE__
-#  include <os/object.h>
-typedef struct os_transaction_s *os_transaction_t;
-extern os_transaction_t os_transaction_create(const char *description);
 #  include <xpc/xpc.h>
 #  include <pthread/qos.h>
 #endif /* __APPLE__ */
@@ -91,11 +88,7 @@ static int		dead_children = 0;
 static int		stop_scheduler = 0;
 					/* Should the scheduler stop? */
 static time_t           local_timeout = 0;
-					/* Next local printer timeout */
-#ifdef __APPLE__
-static os_transaction_t	launchd_transaction = NULL;
-					/* Transaction for launchd */
-#endif /* __APPLE__ */
+                                        /* Next local printer timeout */
 
 
 /*
@@ -1972,7 +1965,7 @@ service_checkin(void)
     free(ld_sockets);
 
 #  ifdef __APPLE__
-    launchd_transaction = os_transaction_create("org.cups.cupsd.active-printing");
+    xpc_transaction_begin();
 #  endif /* __APPLE__ */
   }
 
@@ -2114,11 +2107,8 @@ service_checkout(int shutdown)          /* I - Shutting down? */
   }
 
 #  ifdef __APPLE__
-  if (OnDemand && shutdown && launchd_transaction)
-  {
-    os_release(launchd_transaction);
-    launchd_transaction = NULL;
-  }
+  if (OnDemand && shutdown)
+    xpc_transaction_end();
 #  endif /* __APPLE__ */
 }
 
