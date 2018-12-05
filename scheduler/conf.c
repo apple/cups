@@ -3573,10 +3573,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       */
 
       if (!_cups_strcasecmp(value, "off") && getuid())
-      {
         Sandboxing = CUPSD_SANDBOXING_OFF;
-        cupsdLogMessage(CUPSD_LOG_WARN, "Disabling sandboxing is not recommended (line %d of %s)", linenum, CupsFilesFile);
-      }
       else if (!_cups_strcasecmp(value, "relaxed"))
         Sandboxing = CUPSD_SANDBOXING_RELAXED;
       else if (!_cups_strcasecmp(value, "strict"))
