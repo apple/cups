@@ -1,17 +1,18 @@
-CHANGES - 2.2.10 - 2018-11-30
+CHANGES - 2.2.10 - 2018-12-05
 =============================
 
 
 Changes in CUPS v2.2.10
 -----------------------
 
+- Added USB quirk rules (Issue #5395, Issue #5443)
 - The generated PPD files for IPP Everywhere printers did not contain the
   cupsManualCopies keyword (Issue #5433)
 - Kerberos credentials might be truncated (Issue #5435)
+- The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)
 - Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)
 - Fixed a crash bug when mapping PPD duplex options to IPP attributes
   (rdar://46183976)
-- Added USB quirk rules (Issue #5395, Issue #5443)
 
 
 Changes in CUPS v2.2.9

@@ -5148,8 +5148,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
             if (cancel_after)
 	      job->cancel_time = time(NULL) + ippGetInteger(cancel_after, 0);
-	    else
+	    else if (MaxJobTime > 0)
 	      job->cancel_time = time(NULL) + MaxJobTime;
+	    else
+	      job->cancel_time = 0;
 	  }
         }
       }
