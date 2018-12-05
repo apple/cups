@@ -11,6 +11,7 @@ Changes in CUPS v2.2.10
 - Kerberos credentials might be truncated (Issue #5435)
 - The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)
 - Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)
+- Fixed a bug adding a queue with the `-E` option (Issue #5440)
 - Fixed a crash bug when mapping PPD duplex options to IPP attributes
   (rdar://46183976)
 
