@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-11-30
+CHANGES - 2.3b6 - 2018-12-05
 ============================
 
 Changes in CUPS v2.3b6
@@ -40,6 +40,7 @@ Changes in CUPS v2.3b6
 - The generated PPD files for IPP Everywhere printers did not contain the
   cupsManualCopies keyword (Issue #5433)
 - Kerberos credentials might be truncated (Issue #5435)
+- The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were
