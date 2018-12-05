@@ -102,15 +102,15 @@ if test -n "$GCC"; then
 
         # Address sanitizer is a useful tool to use when developing/debugging
         # code but adds about 2x overhead...
-        if test x$enable_sanitizer = xyes; then
-        	# Use -fsanitize=address with debugging...
+	if test x$enable_sanitizer = xyes; then
+		# Use -fsanitize=address with debugging...
 		OPTIM="$OPTIM -g -fsanitize=address"
-        else
-        	# Otherwise use the Fortify enhancements to catch any unbounded
-        	# string operations...
-        	CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
-        	CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2"
-        fi
+	else
+		# Otherwise use the Fortify enhancements to catch any unbounded
+		# string operations...
+		CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+		CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2"
+	fi
 
 	# Default optimization options...
 	if test -z "$OPTIM"; then
