@@ -10067,7 +10067,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config desktop/cups.desktop doc/index.html man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpdAT.service scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket templates/header.tmpl packaging/cups.list $LANGFILES"
+ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config desktop/cups.desktop doc/index.html man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpdAT.service scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket templates/header.tmpl packaging/cups.list $LANGFILES"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -10786,7 +10786,6 @@ do
     "man/cups-files.conf.man") CONFIG_FILES="$CONFIG_FILES man/cups-files.conf.man" ;;
     "man/cups-lpd.man") CONFIG_FILES="$CONFIG_FILES man/cups-lpd.man" ;;
     "man/cups-snmp.man") CONFIG_FILES="$CONFIG_FILES man/cups-snmp.man" ;;
-    "man/cupsaddsmb.man") CONFIG_FILES="$CONFIG_FILES man/cupsaddsmb.man" ;;
     "man/cupsd.conf.man") CONFIG_FILES="$CONFIG_FILES man/cupsd.conf.man" ;;
     "man/cupsd.man") CONFIG_FILES="$CONFIG_FILES man/cupsd.man" ;;
     "man/lpoptions.man") CONFIG_FILES="$CONFIG_FILES man/lpoptions.man" ;;

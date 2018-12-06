@@ -355,7 +355,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cups-driverd.8.gz
 /usr/share/man/man8/cups-exec.8.gz
 /usr/share/man/man8/cups-snmp.8.gz
-/usr/share/man/man8/cupsaddsmb.8.gz
 /usr/share/man/man8/cupsaccept.8.gz
 /usr/share/man/man8/cupsctl.8.gz
 /usr/share/man/man8/cupsfilter.8.gz

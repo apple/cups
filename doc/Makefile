@@ -62,7 +62,6 @@ HELPFILES	=	\
 			help/man-cups-lpd.html \
 			help/man-cups-snmp.html \
 			help/man-cupsaccept.html \
-			help/man-cupsaddsmb.html \
 			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsd-helper.html \

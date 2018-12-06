@@ -70,7 +70,6 @@ AC_OUTPUT(Makedefs
 	  man/cups-files.conf.man
 	  man/cups-lpd.man
 	  man/cups-snmp.man
-	  man/cupsaddsmb.man
 	  man/cupsd.conf.man
 	  man/cupsd.man
 	  man/lpoptions.man

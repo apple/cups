@@ -48,7 +48,6 @@ MAN7	=	backend.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
 		notifier.$(MAN7EXT)
 MAN8	=	cupsaccept.$(MAN8EXT) \
-		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \
 		cupsfilter.$(MAN8EXT) \
 		cups-lpd.$(MAN8EXT) \

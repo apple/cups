@@ -10,9 +10,9 @@
 
 include ../Makedefs
 
-TARGETS	=	cancel cupsaccept cupsaddsmb cupsctl cupstestppd \
+TARGETS	=	cancel cupsaccept cupsctl cupstestppd \
 		lp lpadmin lpinfo lpmove lpoptions lpstat
-OBJS	=	cancel.o cupsaccept.o cupsaddsmb.o cupsctl.o \
+OBJS	=	cancel.o cupsaccept.o cupsctl.o \
 		cupstestppd.o lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o \
 		lpstat.o
 
@@ -77,7 +77,6 @@ install-exec:
 	echo Installing System V admin printing commands in $(SBINDIR)
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) cupsaccept $(SBINDIR)
-	$(INSTALL_BIN) cupsaddsmb $(SBINDIR)
 	$(INSTALL_BIN) cupsctl $(SBINDIR)
 	$(INSTALL_BIN) lpadmin $(SBINDIR)
 	$(INSTALL_BIN) lpinfo $(SBINDIR)
@@ -135,7 +134,6 @@ uninstall:
 	-$(RMDIR) $(BINDIR)
 	$(RM) $(SBINDIR)/accept
 	$(RM) $(SBINDIR)/cupsaccept
-	$(RM) $(SBINDIR)/cupsaddsmb
 	$(RM) $(SBINDIR)/cupsaccept
 	$(RM) $(SBINDIR)/cupsdisable
 	$(RM) $(SBINDIR)/cupsenable
@@ -169,16 +167,6 @@ cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
 	done
-
-
-#
-# cupsaddsmb
-#
-
-cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsaddsmb cupsaddsmb.o $(LIBS)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
