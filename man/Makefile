@@ -17,7 +17,6 @@ include ../Makedefs
 MAN1	=	cancel.$(MAN1EXT) \
 		cups.$(MAN1EXT) \
 		cups-config.$(MAN1EXT) \
-		cupstestdsc.$(MAN1EXT) \
 		cupstestppd.$(MAN1EXT) \
 		$(IPPFIND_MAN) \
 		ipptool.$(MAN1EXT) \

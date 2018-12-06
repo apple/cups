@@ -10,9 +10,9 @@
 
 include ../Makedefs
 
-TARGETS	=	cancel cupsaccept cupsaddsmb cupsctl cupstestdsc cupstestppd \
+TARGETS	=	cancel cupsaccept cupsaddsmb cupsctl cupstestppd \
 		lp lpadmin lpinfo lpmove lpoptions lpstat
-OBJS	=	cancel.o cupsaccept.o cupsaddsmb.o cupsctl.o cupstestdsc.o \
+OBJS	=	cancel.o cupsaccept.o cupsaddsmb.o cupsctl.o \
 		cupstestppd.o lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o \
 		lpstat.o
 
@@ -95,7 +95,6 @@ install-exec:
 	echo Installing System V user printing commands in $(BINDIR)
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
-	$(INSTALL_BIN) cupstestdsc $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
@@ -129,7 +128,6 @@ install-libs:
 
 uninstall:
 	$(RM) $(BINDIR)/cancel
-	$(RM) $(BINDIR)/cupstestdsc
 	$(RM) $(BINDIR)/cupstestppd
 	$(RM) $(BINDIR)/lp
 	$(RM) $(BINDIR)/lpoptions
@@ -190,16 +188,6 @@ cupsaddsmb:	cupsaddsmb.o ../cups/$(LIBCUPS)
 cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-
-
-#
-# cupstestdsc
-#
-
-cupstestdsc:	cupstestdsc.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ cupstestdsc.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

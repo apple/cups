@@ -1,7 +1,7 @@
 #
 # Documentation makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
+# Copyright 2007-2018 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -68,7 +68,6 @@ HELPFILES	=	\
 			help/man-cupsd-helper.html \
 			help/man-cupsd-logs.html \
 			help/man-cupsenable.html \
-			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
 			help/man-ipptool.html \
@@ -107,8 +106,6 @@ HELPFILES	=	\
 			help/spec-command.html \
 			help/spec-design.html \
 			help/spec-ipp.html \
-			help/spec-pdf.html \
-			help/spec-postscript.html \
 			help/spec-ppd.html \
 			help/spec-raster.html \
 			help/spec-stp.html \

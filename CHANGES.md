@@ -45,6 +45,7 @@ Changes in CUPS v2.3b6
 - Kerberos credentials might be truncated (Issue #5435)
 - The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)
 - Fixed a bug adding a queue with the `-E` option (Issue #5440)
+- The `cupstestdsc` program has been removed (Issue #5450)
 - The scheduler was being backgrounded on macOS, causing applications to spin
   (rdar://40436080)
 - The scheduler did not validate that required initial request attributes were

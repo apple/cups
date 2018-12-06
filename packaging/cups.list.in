@@ -335,7 +335,6 @@ l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
 # User commands
 d 0755 root sys $BINDIR -
 f 0555 root sys $BINDIR/cancel systemv/cancel
-f 0555 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
 f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
 f 0555 root sys $BINDIR/ipptool test/ipptool
 f 0555 root sys $BINDIR/lp systemv/lp
@@ -624,7 +623,6 @@ d 0755 root sys $MANDIR/man7 -
 
 f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cups.$MAN1EXT man/cups.$MAN1EXT
-f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ippfind.$MAN1EXT man/ippfind.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
