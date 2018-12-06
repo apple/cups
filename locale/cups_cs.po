@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -291,12 +291,6 @@ msgstr ""
 msgid ""
 "        WARN    ShortNickName required by PPD 4.3 spec.\n"
 "                REF: Pages 64-65, section 5.3."
-msgstr ""
-
-msgid "       cupsaddsmb [options] -a"
-msgstr ""
-
-msgid "       cupstestdsc [options] -"
 msgstr ""
 
 #, c-format
@@ -677,84 +671,7 @@ msgstr ""
 msgid "    %d ERRORS FOUND"
 msgstr ""
 
-msgid "    -h       Show program usage"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-
 msgid "    NO ERRORS FOUND"
-msgstr ""
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr ""
-
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr ""
-
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr ""
-
-msgid "    Warning: file contains binary data."
-msgstr ""
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr ""
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr ""
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
@@ -775,12 +692,6 @@ msgstr ""
 msgid "  -D name=value           Set named variable to value."
 msgstr ""
 
-msgid "  -E                      Encrypt the connection."
-msgstr ""
-
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr ""
-
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
 
@@ -788,9 +699,6 @@ msgid "  -P filename.ppd         Set PPD file."
 msgstr ""
 
 msgid "  -U username             Specify username."
-msgstr ""
-
-msgid "  -a                      Export all printers."
 msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
@@ -806,9 +714,6 @@ msgid "  -d printer              Use the named printer."
 msgstr ""
 
 msgid "  -e                      Use every filter from the PPD file."
-msgstr ""
-
-msgid "  -h server[:port]        Specify server address."
 msgstr ""
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
@@ -2914,10 +2819,6 @@ msgid "Bad number-up value %d."
 msgstr "Chybná hodnota %d."
 
 #, c-format
-msgid "Bad option + choice on line %d."
-msgstr ""
-
-#, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "Chybný rozsah stránek %d-%d."
 
@@ -3163,9 +3064,6 @@ msgstr "Tiskárna štítků EPL2"
 msgid "Edit Configuration File"
 msgstr "Úprava konfiguračního souboru"
 
-msgid "Empty PPD file."
-msgstr ""
-
 msgid "Encryption is not supported."
 msgstr ""
 
@@ -3408,9 +3306,6 @@ msgid "Export Printers to Samba"
 msgstr "Export tiskáren do Samby"
 
 msgid "Expressions:"
-msgstr ""
-
-msgid "FAIL"
 msgstr ""
 
 msgid "Fast Grayscale"
@@ -3844,10 +3739,6 @@ msgstr "Chybí hvězdička ve sloupci 1"
 msgid "Missing document-number attribute."
 msgstr ""
 
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr ""
-
 msgid "Missing form variable"
 msgstr ""
 
@@ -3880,10 +3771,6 @@ msgid "Missing resource in URI"
 msgstr ""
 
 msgid "Missing scheme in URI"
-msgstr ""
-
-#, c-format
-msgid "Missing value on line %d."
 msgstr ""
 
 msgid "Missing value string"
@@ -3953,9 +3840,6 @@ msgstr ""
 
 msgid "No VarBind SEQUENCE"
 msgstr "Žádná VarBind SEQUENCE"
-
-msgid "No Windows printer drivers are installed."
-msgstr ""
 
 msgid "No active connection"
 msgstr "Není aktivní spojení"
@@ -4081,11 +3965,6 @@ msgstr "Není povoleno tisknout."
 msgid "Note"
 msgstr "Poznámka"
 
-msgid ""
-"Note: this program only validates the DSC comments, not the PostScript "
-"itself."
-msgstr ""
-
 msgid "OK"
 msgstr "OK"
 
@@ -4139,9 +4018,6 @@ msgstr ""
 msgid "Output Mode"
 msgstr "Výstupní režim"
 
-msgid "PASS"
-msgstr ""
-
 msgid "PCL Laser Printer"
 msgstr "PCL laserová tiskárna"
 
@@ -4182,10 +4058,6 @@ msgstr "ParamCustominTearInterval"
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "Heslo pro %s na %s? "
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "Heslo pro %s je vyžadováno pro přístup k %s přes Sambu: "
 
 msgid "Pause Class"
 msgstr "Pozastavení třídy"
@@ -4721,30 +4593,10 @@ msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr ""
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr ""
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
-msgstr ""
-
-#, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr ""
 
 msgid "Unable to copy PPD file."
-msgstr ""
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr ""
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 
 msgid "Unable to create credentials from array."
@@ -4837,14 +4689,6 @@ msgstr ""
 msgid "Unable to get printer status."
 msgstr "Nelze získat stav tiskárny."
 
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr ""
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr ""
-
 msgid "Unable to load help index."
 msgstr ""
 
@@ -4912,10 +4756,6 @@ msgid "Unable to send command to printer driver"
 msgstr ""
 
 msgid "Unable to send data to printer."
-msgstr ""
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
 msgstr ""
 
 msgid "Unable to set options"
@@ -5093,9 +4933,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr ""
-
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
 
@@ -5103,9 +4940,6 @@ msgid "Usage: cupsd [options]"
 msgstr ""
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
-msgstr ""
-
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr ""
 
 msgid ""
@@ -5202,9 +5036,6 @@ msgid "Waiting for printer to become available."
 msgstr ""
 
 msgid "Waiting for printer to finish."
-msgstr ""
-
-msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr ""
 
 msgid "Warning: This program will be removed in a future version of CUPS."
@@ -5445,10 +5276,6 @@ msgstr "Nepodařilo se spustit \"cups-deviced\"."
 
 msgid "cups-driverd failed to execute."
 msgstr "Nepodařilo se spustit \"cups-driverd\"."
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
-msgstr ""
 
 msgid "cupsctl: Cannot set Listen or Port directly."
 msgstr ""
@@ -12609,3 +12436,6 @@ msgstr ""
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+
+#~ msgid "Password for %s required to access %s via SAMBA: "
+#~ msgstr "Heslo pro %s je vyžadováno pro přístup k %s přes Sambu: "

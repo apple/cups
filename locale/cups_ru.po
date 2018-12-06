@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -308,12 +308,6 @@ msgid ""
 msgstr ""
 "\tWARN\tShortNickName требуется спецификацией PPD 4.3.\n"
 "                REF: Стр. 64-65, раздел 5.3."
-
-msgid "       cupsaddsmb [options] -a"
-msgstr "\tcupsaddsmb [options] -a"
-
-msgid "       cupstestdsc [options] -"
-msgstr "\tcupstestdsc [options] -"
 
 #, c-format
 msgid ""
@@ -776,101 +770,8 @@ msgstr "\t**FAIL**  Не удается открыть PPD-файл – %s в с
 msgid "    %d ERRORS FOUND"
 msgstr "    ОБНАРУЖЕНО ОШИБОК: %d"
 
-msgid "    -h       Show program usage"
-msgstr "    -h       Показать справку по использованию программы"
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-"    Неверный %%%%BoundingBox: в строке %d\n"
-"        REF: Стр. 39, %%%%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-"    Неверная %%%%Page: в строке %d\n"
-"        REF: Стр. 53, %%%%Page:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-"    Неверная %%%%Pages: в строке %d\n"
-"        REF: Стр. 43, %%%%Pages:"
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-"    Длина строки %d больше 255 символов (%d)\n"
-"        REF: Стр. 25, Длина строки "
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-"    %!PS-Adobe-3.0 отсутствует в первой строке.\n"
-"        REF: Стр. 17, 3.1 Соответствующие документы"
-
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr ""
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-"    Отсутствует или неверный %%BoundingBox: комментарий.\n"
-"        REF: Стр. 39, %%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-"    Отсутствует или неверная %%Page: комментарий.\n"
-"        REF: Стр. 53, %%Page:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-"    Отсутствуют или неверные %%Pages:  комментарий.\n"
-"        REF: Стр. 43, %%Pages:"
-
 msgid "    NO ERRORS FOUND"
 msgstr "    ОШИБОК НЕ ОБНАРУЖЕНО"
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr "\tНайдено %d строк, длина которых превышает 255 символов."
-
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr "\tСлишком много комментариев %%BeginDocument"
-
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr "\tСлишком много комментариев %%EndDocument"
-
-msgid "    Warning: file contains binary data."
-msgstr "\tWARNING: файл содержит бинарные данные."
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr "    WARNING: нет комментария %%EndComments в файле."
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
-msgstr "    WARNING: устаревшая версия DSC %.1f в файле."
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    Строки заканчиваются на CR (Mac OS 9)."
@@ -891,12 +792,6 @@ msgstr "  -D                      Удалить входной файл пос�
 msgid "  -D name=value           Set named variable to value."
 msgstr "  -D name=value           Определение переменной."
 
-msgid "  -E                      Encrypt the connection."
-msgstr "  -E                      Подключение к серверу шифруется."
-
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr "  -H samba-server         Использовать заданный сервер SAMBA."
-
 msgid "  -I include-dir          Add include directory to search path."
 msgstr "  -I include-dir          Добавить каталог include в путь поиска."
 
@@ -905,9 +800,6 @@ msgstr "  -P filename.ppd         Задать PPD-файл."
 
 msgid "  -U username             Specify username."
 msgstr "  -U username             Указание имени пользователя."
-
-msgid "  -a                      Export all printers."
-msgstr "  -a                      Экспорт всех принтеров."
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           Загружается указанный каталог сообщений."
@@ -923,9 +815,6 @@ msgstr "  -d printer              Использовать заданный пр
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Использовать каждый фильтр из PPD-файла."
-
-msgid "  -h server[:port]        Specify server address."
-msgstr "  -h server[:port]        Задать адрес и порт сервера."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -3056,10 +2945,6 @@ msgid "Bad number-up value %d."
 msgstr "Неверное значение number-up %d."
 
 #, c-format
-msgid "Bad option + choice on line %d."
-msgstr "Неверный параметр + выбор в строке %d."
-
-#, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "Неверные значения page-ranges %d-%d."
 
@@ -3308,9 +3193,6 @@ msgstr "Принтер для печати этикеток EPL2"
 msgid "Edit Configuration File"
 msgstr "Редактировать файл конфигурации"
 
-msgid "Empty PPD file."
-msgstr "Пустой PPD файл."
-
 msgid "Encryption is not supported."
 msgstr "Шифрование не поддерживается."
 
@@ -3554,9 +3436,6 @@ msgstr "Экспортировать принтеры в Samba"
 
 msgid "Expressions:"
 msgstr "Выражение:"
-
-msgid "FAIL"
-msgstr "FAIL"
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -3991,10 +3870,6 @@ msgstr "Отсутствует звездочка в колонке 1"
 msgid "Missing document-number attribute."
 msgstr "Отсутствует атрибут document-number"
 
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr "Отсутствует двойная кавычка в строке %d"
-
 msgid "Missing form variable"
 msgstr "Отсутствует переменная формы"
 
@@ -4028,10 +3903,6 @@ msgstr "Отсутствует resource в URI"
 
 msgid "Missing scheme in URI"
 msgstr "Отсутствует scheme в URI"
-
-#, c-format
-msgid "Missing value on line %d."
-msgstr "Отсутствует значение в строке %d."
 
 msgid "Missing value string"
 msgstr "Отсутствует строка значения"
@@ -4104,9 +3975,6 @@ msgstr "Нет имени PPD"
 
 msgid "No VarBind SEQUENCE"
 msgstr "Нет последовательности VarBind"
-
-msgid "No Windows printer drivers are installed."
-msgstr "Нет установленных драйверов принтера Windows."
 
 msgid "No active connection"
 msgstr "Нет рабочего подключения"
@@ -4233,13 +4101,6 @@ msgstr "Не разрешено печатать."
 msgid "Note"
 msgstr "Примечание"
 
-msgid ""
-"Note: this program only validates the DSC comments, not the PostScript "
-"itself."
-msgstr ""
-"Примечание: данная программа проверяет только комментарии DSC, а не сам "
-"PostScript."
-
 msgid "OK"
 msgstr "ОК"
 
@@ -4293,9 +4154,6 @@ msgstr "Недостаточно памяти."
 msgid "Output Mode"
 msgstr "Режим вывода"
 
-msgid "PASS"
-msgstr "PASS"
-
 msgid "PCL Laser Printer"
 msgstr "Лазерный принтер PCL"
 
@@ -4336,10 +4194,6 @@ msgstr "ParamCustominTearInterval"
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "Пароль для %s на %s? "
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "Для доступа к %s через SAMBA требуется пароль для %s: "
 
 msgid "Pause Class"
 msgstr "Приостановить группу"
@@ -4881,32 +4735,11 @@ msgstr ""
 "принтере в группе."
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr "Не удается копировать 64-битовые файлы драйвера принтера CUPS (%d)."
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr ""
-"Не удается копировать 64-битовые файлы драйвера принтера для Windows (%d)."
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
-msgstr "Не удается копировать файлы драйвера принтера CUPS (%d)"
-
-#, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr "Не удается копировать PPD-файл - %s"
 
 msgid "Unable to copy PPD file."
 msgstr "Не удается копировать PPD-файл."
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr "Не удается копировать файлы драйвера принтера Windows 2000 (%d)"
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
-msgstr "Не удается копировать файлы драйвера принтера Windows 9x (%d)"
 
 msgid "Unable to create credentials from array."
 msgstr ""
@@ -5005,14 +4838,6 @@ msgstr "Не удается получить статус принтера"
 msgid "Unable to get printer status."
 msgstr "Не удается получить статус принтера."
 
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr "Не удается установить файлы драйвера принтера Windows 2000 (%d)"
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr "Не удается установить файлы драйвера принтера Windows 9x (%d)"
-
 msgid "Unable to load help index."
 msgstr "Не удается загрузить содержание справки."
 
@@ -5081,10 +4906,6 @@ msgstr "Не удается отправить команду драйверу �
 
 msgid "Unable to send data to printer."
 msgstr "Не удается отправить данные на принтер."
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
-msgstr "Не удается настроить драйвер принтера Windows (%d)."
 
 msgid "Unable to set options"
 msgstr "Не удается настроить параметры"
@@ -5275,9 +5096,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr ""
-
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
 
@@ -5285,9 +5103,6 @@ msgid "Usage: cupsd [options]"
 msgstr ""
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
-msgstr ""
-
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr ""
 
 msgid ""
@@ -5390,9 +5205,6 @@ msgstr "Ожидание доступа к принтеру."
 
 msgid "Waiting for printer to finish."
 msgstr "Ожидание окончания работы принтера."
-
-msgid "Warning, no Windows 2000 printer drivers are installed."
-msgstr "Внимание, драйверы принтера Windows 2000 не установлены"
 
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
@@ -5632,10 +5444,6 @@ msgstr "Не удалось выполнить cups-deviced."
 
 msgid "cups-driverd failed to execute."
 msgstr "Не удалось выполнить cups-driverd."
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
-msgstr "cupsaddsmb: Нет PPD-файла для принтера \"%s\" - %s"
 
 msgid "cupsctl: Cannot set Listen or Port directly."
 msgstr "cupsctl: Не удается задать Listen или Port."
@@ -12832,8 +12640,91 @@ msgstr ""
 #~ msgid "                          Issue warnings instead of errors."
 #~ msgstr "                     Выдавать предупреждения вместо ошибки"
 
+#~ msgid "       cupsaddsmb [options] -a"
+#~ msgstr "\tcupsaddsmb [options] -a"
+
+#~ msgid "       cupstestdsc [options] -"
+#~ msgstr "\tcupstestdsc [options] -"
+
 #~ msgid "       program | cupstestppd [options] -"
 #~ msgstr "\tprogram | cupstestppd [options] -"
+
+#~ msgid "    -h       Show program usage"
+#~ msgstr "    -h       Показать справку по использованию программы"
+
+#~ msgid ""
+#~ "    Bad %%%%BoundingBox: on line %d.\n"
+#~ "        REF: Page 39, %%%%BoundingBox:"
+#~ msgstr ""
+#~ "    Неверный %%%%BoundingBox: в строке %d\n"
+#~ "        REF: Стр. 39, %%%%BoundingBox:"
+
+#~ msgid ""
+#~ "    Bad %%%%Page: on line %d.\n"
+#~ "        REF: Page 53, %%%%Page:"
+#~ msgstr ""
+#~ "    Неверная %%%%Page: в строке %d\n"
+#~ "        REF: Стр. 53, %%%%Page:"
+
+#~ msgid ""
+#~ "    Bad %%%%Pages: on line %d.\n"
+#~ "        REF: Page 43, %%%%Pages:"
+#~ msgstr ""
+#~ "    Неверная %%%%Pages: в строке %d\n"
+#~ "        REF: Стр. 43, %%%%Pages:"
+
+#~ msgid ""
+#~ "    Line %d is longer than 255 characters (%d).\n"
+#~ "        REF: Page 25, Line Length"
+#~ msgstr ""
+#~ "    Длина строки %d больше 255 символов (%d)\n"
+#~ "        REF: Стр. 25, Длина строки "
+
+#~ msgid ""
+#~ "    Missing %!PS-Adobe-3.0 on first line.\n"
+#~ "        REF: Page 17, 3.1 Conforming Documents"
+#~ msgstr ""
+#~ "    %!PS-Adobe-3.0 отсутствует в первой строке.\n"
+#~ "        REF: Стр. 17, 3.1 Соответствующие документы"
+
+#~ msgid ""
+#~ "    Missing or bad %%BoundingBox: comment.\n"
+#~ "        REF: Page 39, %%BoundingBox:"
+#~ msgstr ""
+#~ "    Отсутствует или неверный %%BoundingBox: комментарий.\n"
+#~ "        REF: Стр. 39, %%BoundingBox:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Page: comments.\n"
+#~ "        REF: Page 53, %%Page:"
+#~ msgstr ""
+#~ "    Отсутствует или неверная %%Page: комментарий.\n"
+#~ "        REF: Стр. 53, %%Page:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Pages: comment.\n"
+#~ "        REF: Page 43, %%Pages:"
+#~ msgstr ""
+#~ "    Отсутствуют или неверные %%Pages:  комментарий.\n"
+#~ "        REF: Стр. 43, %%Pages:"
+
+#~ msgid "    Saw %d lines that exceeded 255 characters."
+#~ msgstr "\tНайдено %d строк, длина которых превышает 255 символов."
+
+#~ msgid "    Too many %%BeginDocument comments."
+#~ msgstr "\tСлишком много комментариев %%BeginDocument"
+
+#~ msgid "    Too many %%EndDocument comments."
+#~ msgstr "\tСлишком много комментариев %%EndDocument"
+
+#~ msgid "    Warning: file contains binary data."
+#~ msgstr "\tWARNING: файл содержит бинарные данные."
+
+#~ msgid "    Warning: no %%EndComments comment in file."
+#~ msgstr "    WARNING: нет комментария %%EndComments в файле."
+
+#~ msgid "    Warning: obsolete DSC version %.1f in file."
+#~ msgstr "    WARNING: устаревшая версия DSC %.1f в файле."
 
 #~ msgid "  ! expression            Unary NOT of expression."
 #~ msgstr "  ! expression            Логическое NOT для выражения."
@@ -12954,11 +12845,17 @@ msgstr ""
 #~ "  -C                      Передача запроса с использованием chunking (по "
 #~ "умолчанию)"
 
+#~ msgid "  -E                      Encrypt the connection."
+#~ msgstr "  -E                      Подключение к серверу шифруется."
+
 #~ msgid ""
 #~ "  -F                      Run in the foreground but detach from console."
 #~ msgstr ""
 #~ "  -F                      Запускать с высоким приоритетом и отдельно от "
 #~ "консоли."
+
+#~ msgid "  -H samba-server         Use the named SAMBA server."
+#~ msgstr "  -H samba-server         Использовать заданный сервер SAMBA."
 
 #~ msgid "  -I                      Ignore errors."
 #~ msgstr "  -I                      Игнорировать ошибки."
@@ -13008,6 +12905,9 @@ msgstr ""
 #~ msgstr ""
 #~ "  -X                      Выводить XML plist вместо обычного текста."
 
+#~ msgid "  -a                      Export all printers."
+#~ msgstr "  -a                      Экспорт всех принтеров."
+
 #~ msgid "  -c                      Produce CSV output."
 #~ msgstr "  -c                      Вывод в формате CSV."
 
@@ -13032,6 +12932,9 @@ msgstr ""
 
 #~ msgid "  -h regex                Match hostname to regular expression."
 #~ msgstr "  -h regex                Найти hostname по регулярному выражению."
+
+#~ msgid "  -h server[:port]        Specify server address."
+#~ msgstr "  -h server[:port]        Задать адрес и порт сервера."
 
 #~ msgid ""
 #~ "  -i seconds              Repeat the last file with the given time "
@@ -13170,6 +13073,62 @@ msgstr ""
 #~ msgid "  {}                      URI"
 #~ msgstr "  {}                      URI"
 
+#~ msgid "Bad option + choice on line %d."
+#~ msgstr "Неверный параметр + выбор в строке %d."
+
+#~ msgid "Empty PPD file."
+#~ msgstr "Пустой PPD файл."
+
+#~ msgid "FAIL"
+#~ msgstr "FAIL"
+
+#~ msgid "Missing double quote on line %d."
+#~ msgstr "Отсутствует двойная кавычка в строке %d"
+
+#~ msgid "Missing value on line %d."
+#~ msgstr "Отсутствует значение в строке %d."
+
+#~ msgid "No Windows printer drivers are installed."
+#~ msgstr "Нет установленных драйверов принтера Windows."
+
+#~ msgid ""
+#~ "Note: this program only validates the DSC comments, not the PostScript "
+#~ "itself."
+#~ msgstr ""
+#~ "Примечание: данная программа проверяет только комментарии DSC, а не сам "
+#~ "PostScript."
+
+#~ msgid "PASS"
+#~ msgstr "PASS"
+
+#~ msgid "Password for %s required to access %s via SAMBA: "
+#~ msgstr "Для доступа к %s через SAMBA требуется пароль для %s: "
+
+#~ msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+#~ msgstr "Не удается копировать 64-битовые файлы драйвера принтера CUPS (%d)."
+
+#~ msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+#~ msgstr ""
+#~ "Не удается копировать 64-битовые файлы драйвера принтера для Windows (%d)."
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)."
+#~ msgstr "Не удается копировать файлы драйвера принтера CUPS (%d)"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)."
+#~ msgstr "Не удается копировать файлы драйвера принтера Windows 2000 (%d)"
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)."
+#~ msgstr "Не удается копировать файлы драйвера принтера Windows 9x (%d)"
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)."
+#~ msgstr "Не удается установить файлы драйвера принтера Windows 2000 (%d)"
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)."
+#~ msgstr "Не удается установить файлы драйвера принтера Windows 9x (%d)"
+
+#~ msgid "Unable to set Windows printer driver (%d)."
+#~ msgstr "Не удается настроить драйвер принтера Windows (%d)."
+
 #~ msgid ""
 #~ "Usage: lpoptions [-h server] [-E] -d printer\n"
 #~ "       lpoptions [-h server] [-E] [-p printer] -l\n"
@@ -13181,3 +13140,9 @@ msgstr ""
 #~ "       lpoptions [-h server] [-E] [-p printer] -l\n"
 #~ "       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
 #~ "       lpoptions [-h server] [-E] -x printer"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed."
+#~ msgstr "Внимание, драйверы принтера Windows 2000 не установлены"
+
+#~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+#~ msgstr "cupsaddsmb: Нет PPD-файла для принтера \"%s\" - %s"

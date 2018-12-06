@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -381,14 +381,6 @@ msgstr ""
 msgid ""
 "        WARN    ShortNickName required by PPD 4.3 spec.\n"
 "                REF: Pages 64-65, section 5.3."
-msgstr ""
-
-#: systemv/cupsaddsmb.c:270
-msgid "       cupsaddsmb [options] -a"
-msgstr ""
-
-#: systemv/cupstestdsc.c:413
-msgid "       cupstestdsc [options] -"
 msgstr ""
 
 #: systemv/cupstestppd.c:3788
@@ -856,101 +848,8 @@ msgstr ""
 msgid "    %d ERRORS FOUND"
 msgstr ""
 
-#: systemv/cupstestdsc.c:417
-msgid "    -h       Show program usage"
-msgstr ""
-
-#: systemv/cupstestdsc.c:220 systemv/cupstestdsc.c:262
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:291
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:204 systemv/cupstestdsc.c:244
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:162
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-
-#: systemv/cupstestdsc.c:178
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-
-#: systemv/cupstestdsc.c:348
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr ""
-
-#: systemv/cupstestdsc.c:328
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:358
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:338
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-
 #: systemv/cupstestppd.c:1477
 msgid "    NO ERRORS FOUND"
-msgstr ""
-
-#: systemv/cupstestdsc.c:381
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr ""
-
-#: systemv/cupstestdsc.c:376
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr ""
-
-#: systemv/cupstestdsc.c:368
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr ""
-
-#: systemv/cupstestdsc.c:388
-msgid "    Warning: file contains binary data."
-msgstr ""
-
-#: systemv/cupstestdsc.c:396
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr ""
-
-#: systemv/cupstestdsc.c:392
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr ""
 
 #: ppdc/ppdc.cxx:444
@@ -977,14 +876,6 @@ msgstr ""
 msgid "  -D name=value           Set named variable to value."
 msgstr ""
 
-#: systemv/cupsaddsmb.c:273
-msgid "  -E                      Encrypt the connection."
-msgstr ""
-
-#: systemv/cupsaddsmb.c:274
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr ""
-
 #: ppdc/ppdc.cxx:429 ppdc/ppdhtml.cxx:176 ppdc/ppdi.cxx:120 ppdc/ppdpo.cxx:246
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
@@ -993,12 +884,8 @@ msgstr ""
 msgid "  -P filename.ppd         Set PPD file."
 msgstr ""
 
-#: scheduler/cupsfilter.c:1480 systemv/cupsaddsmb.c:276
+#: scheduler/cupsfilter.c:1480
 msgid "  -U username             Specify username."
-msgstr ""
-
-#: systemv/cupsaddsmb.c:277
-msgid "  -a                      Export all printers."
 msgstr ""
 
 #: ppdc/ppdc.cxx:431
@@ -1019,10 +906,6 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1483
 msgid "  -e                      Use every filter from the PPD file."
-msgstr ""
-
-#: systemv/cupsaddsmb.c:278
-msgid "  -h server[:port]        Specify server address."
 msgstr ""
 
 #: scheduler/cupsfilter.c:1484
@@ -1077,7 +960,7 @@ msgstr ""
 msgid "  -u                      Remove the PPD file when finished."
 msgstr ""
 
-#: systemv/cupsaddsmb.c:279 ppdc/ppdc.cxx:441 ppdc/ppdpo.cxx:248
+#: ppdc/ppdc.cxx:441 ppdc/ppdpo.cxx:248
 msgid "  -v                      Be verbose."
 msgstr ""
 
@@ -1715,9 +1598,9 @@ msgid "%s: Operation failed: %s"
 msgstr ""
 
 #: berkeley/lpq.c:86 berkeley/lpr.c:74 berkeley/lprm.c:71 systemv/cancel.c:85
-#: systemv/cupsaccept.c:95 systemv/cupsaddsmb.c:74 systemv/lp.c:98
-#: systemv/lpadmin.c:249 systemv/lpinfo.c:192 systemv/lpmove.c:69
-#: systemv/lpstat.c:91 test/ipptool.c:314 test/ipptool.c:358
+#: systemv/cupsaccept.c:95 systemv/lp.c:98 systemv/lpadmin.c:249
+#: systemv/lpinfo.c:192 systemv/lpmove.c:69 systemv/lpstat.c:91
+#: test/ipptool.c:314 test/ipptool.c:358
 #, c-format
 msgid "%s: Sorry, no encryption support."
 msgstr ""
@@ -1728,7 +1611,6 @@ msgid "%s: Unable to connect to \"%s:%d\": %s"
 msgstr ""
 
 #: berkeley/lpq.c:292 scheduler/cupsfilter.c:1269 systemv/cancel.c:250
-#: systemv/cupsaddsmb.c:132 systemv/cupsaddsmb.c:159
 #, c-format
 msgid "%s: Unable to connect to server."
 msgstr ""
@@ -3778,11 +3660,6 @@ msgstr ""
 msgid "Bad number-up value %d."
 msgstr ""
 
-#: cups/adminutil.c:274
-#, c-format
-msgid "Bad option + choice on line %d."
-msgstr ""
-
 #: scheduler/ipp.c:1442
 #, c-format
 msgid "Bad page-ranges values %d-%d."
@@ -4107,10 +3984,6 @@ msgstr ""
 msgid "Edit Configuration File"
 msgstr ""
 
-#: cups/adminutil.c:319
-msgid "Empty PPD file."
-msgstr ""
-
 #: cups/http.c:4633
 msgid "Encryption is not supported."
 msgstr ""
@@ -4427,16 +4300,6 @@ msgstr ""
 
 #: test/ippfind.c:2774
 msgid "Expressions:"
-msgstr ""
-
-#: systemv/cupstestdsc.c:158 systemv/cupstestdsc.c:175
-#: systemv/cupstestdsc.c:200 systemv/cupstestdsc.c:217
-#: systemv/cupstestdsc.c:241 systemv/cupstestdsc.c:259
-#: systemv/cupstestdsc.c:288 systemv/cupstestdsc.c:325
-#: systemv/cupstestdsc.c:335 systemv/cupstestdsc.c:345
-#: systemv/cupstestdsc.c:355 systemv/cupstestdsc.c:365
-#: systemv/cupstestdsc.c:373
-msgid "FAIL"
 msgstr ""
 
 #: cups/ppd-cache.c:3764
@@ -5012,11 +4875,6 @@ msgstr ""
 msgid "Missing document-number attribute."
 msgstr ""
 
-#: cups/adminutil.c:255
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr ""
-
 #: cgi-bin/admin.c:505 cgi-bin/admin.c:1801 cgi-bin/admin.c:1886
 #: cgi-bin/admin.c:2480 cgi-bin/admin.c:2734 cgi-bin/admin.c:2845
 #: cgi-bin/admin.c:3555
@@ -5062,11 +4920,6 @@ msgstr ""
 
 #: cups/http-support.c:1630
 msgid "Missing scheme in URI"
-msgstr ""
-
-#: cups/adminutil.c:236
-#, c-format
-msgid "Missing value on line %d."
 msgstr ""
 
 #: cups/ppd.c:307
@@ -5156,10 +5009,6 @@ msgstr ""
 
 #: cups/snmp.c:1001
 msgid "No VarBind SEQUENCE"
-msgstr ""
-
-#: cups/adminutil.c:770
-msgid "No Windows printer drivers are installed."
 msgstr ""
 
 #: cups/request.c:548 cups/request.c:920
@@ -5330,10 +5179,6 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
-#: systemv/cupstestdsc.c:419
-msgid "Note: this program only validates the DSC comments, not the PostScript itself."
-msgstr ""
-
 #: cups/http-support.c:1488 cups/http-support.c:1627 cups/ppd.c:302
 msgid "OK"
 msgstr ""
@@ -5354,7 +5199,7 @@ msgstr ""
 msgid "Only local users can create a local printer."
 msgstr ""
 
-#: cups/adminutil.c:937
+#: cups/adminutil.c:197
 #, c-format
 msgid "Open of %s failed: %s"
 msgstr ""
@@ -5382,12 +5227,12 @@ msgstr ""
 
 #: berkeley/lpq.c:642 berkeley/lpr.c:431 berkeley/lprm.c:232
 #: scheduler/cupsfilter.c:1476 scheduler/main.c:2135 systemv/cancel.c:401
-#: systemv/cupsaccept.c:243 systemv/cupsaddsmb.c:272 systemv/cupsctl.c:191
-#: systemv/cupstestdsc.c:415 systemv/cupstestppd.c:3857 systemv/lp.c:750
-#: systemv/lpadmin.c:1630 systemv/lpinfo.c:497 systemv/lpmove.c:216
-#: systemv/lpoptions.c:538 systemv/lpstat.c:2044 test/ippfind.c:2768
-#: test/ipptool.c:4300 ppdc/ppdc.cxx:426 ppdc/ppdhtml.cxx:173
-#: ppdc/ppdi.cxx:119 ppdc/ppdmerge.cxx:357 ppdc/ppdpo.cxx:243
+#: systemv/cupsaccept.c:243 systemv/cupsctl.c:191 systemv/cupstestppd.c:3857
+#: systemv/lp.c:750 systemv/lpadmin.c:1630 systemv/lpinfo.c:497
+#: systemv/lpmove.c:216 systemv/lpoptions.c:538 systemv/lpstat.c:2044
+#: test/ippfind.c:2768 test/ipptool.c:4300 ppdc/ppdc.cxx:426
+#: ppdc/ppdhtml.cxx:173 ppdc/ppdi.cxx:119 ppdc/ppdmerge.cxx:357
+#: ppdc/ppdpo.cxx:243
 msgid "Options:"
 msgstr ""
 
@@ -5409,10 +5254,6 @@ msgstr ""
 
 #: cups/ppd.c:827 cups/ppd.c:1393
 msgid "Output Mode"
-msgstr ""
-
-#: systemv/cupstestdsc.c:385
-msgid "PASS"
 msgstr ""
 
 #: ppdc/sample.c:252
@@ -5466,11 +5307,6 @@ msgstr ""
 #: cups/auth.c:217 cups/auth.c:365
 #, c-format
 msgid "Password for %s on %s? "
-msgstr ""
-
-#: systemv/cupsaddsmb.c:240
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
 msgstr ""
 
 #: cgi-bin/classes.c:153
@@ -5698,7 +5534,7 @@ msgstr ""
 msgid "Rewind"
 msgstr ""
 
-#: cups/adminutil.c:2094
+#: cups/adminutil.c:1354
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'"
 msgstr ""
@@ -6166,28 +6002,13 @@ msgstr ""
 msgid "Unable to configure printer options."
 msgstr ""
 
-#: cups/adminutil.c:893 cups/request.c:1057
+#: cups/adminutil.c:153 cups/request.c:1057
 msgid "Unable to connect to host."
 msgstr ""
 
 #: backend/ipp.c:727 backend/ipp.c:1279 backend/lpd.c:851 backend/socket.c:314
 #: backend/usb-unix.c:103
 msgid "Unable to contact printer, queuing on next printer in class."
-msgstr ""
-
-#: cups/adminutil.c:708
-#, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr ""
-
-#: cups/adminutil.c:673
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr ""
-
-#: cups/adminutil.c:504
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
 msgstr ""
 
 #: scheduler/ipp.c:2688
@@ -6197,16 +6018,6 @@ msgstr ""
 
 #: scheduler/ipp.c:2733
 msgid "Unable to copy PPD file."
-msgstr ""
-
-#: cups/adminutil.c:469
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr ""
-
-#: cups/adminutil.c:592
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 
 #: cups/tls-darwin.c:655 cups/tls-gnutls.c:442
@@ -6321,16 +6132,6 @@ msgstr ""
 msgid "Unable to get printer status."
 msgstr ""
 
-#: cups/adminutil.c:547 cups/adminutil.c:751
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr ""
-
-#: cups/adminutil.c:621
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr ""
-
 #: cgi-bin/help.c:82
 msgid "Unable to load help index."
 msgstr ""
@@ -6410,7 +6211,7 @@ msgstr ""
 msgid "Unable to resolve printer-uri."
 msgstr ""
 
-#: cups/adminutil.c:2130
+#: cups/adminutil.c:1390
 #, c-format
 msgid "Unable to run \"%s\": %s"
 msgstr ""
@@ -6425,11 +6226,6 @@ msgstr ""
 
 #: backend/usb-darwin.c:758 backend/usb-libusb.c:523
 msgid "Unable to send data to printer."
-msgstr ""
-
-#: cups/adminutil.c:803
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
 msgstr ""
 
 #: cgi-bin/admin.c:3502
@@ -6658,10 +6454,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-#: systemv/cupsaddsmb.c:269
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr ""
-
 #: systemv/cupsctl.c:190
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
@@ -6672,10 +6464,6 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1475
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
-msgstr ""
-
-#: systemv/cupstestdsc.c:411
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr ""
 
 #: systemv/cupstestppd.c:3855
@@ -6797,10 +6585,6 @@ msgstr ""
 msgid "Waiting for printer to finish."
 msgstr ""
 
-#: cups/adminutil.c:775
-msgid "Warning, no Windows 2000 printer drivers are installed."
-msgstr ""
-
 #: systemv/cupstestppd.c:3854
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
@@ -6844,11 +6628,6 @@ msgstr ""
 
 #: scheduler/ipp.c:7081 scheduler/ipp.c:7320
 msgid "cups-driverd failed to execute."
-msgstr ""
-
-#: systemv/cupsaddsmb.c:221
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
 msgstr ""
 
 #: systemv/cupsctl.c:131
@@ -7927,7 +7706,7 @@ msgstr ""
 msgid "scheduler is running"
 msgstr ""
 
-#: cups/adminutil.c:2201
+#: cups/adminutil.c:1461
 #, c-format
 msgid "stat of %s failed: %s"
 msgstr ""

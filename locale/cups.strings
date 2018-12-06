@@ -75,8 +75,6 @@
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n                REF: Pages 78-79, section 5.7." = "        WARN    Protocols contains PJL but JCL attributes are not set.\n                REF: Pages 78-79, section 5.7.";
 "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n                REF: Pages 78-79, section 5.7." = "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n                REF: Pages 78-79, section 5.7.";
 "        WARN    ShortNickName required by PPD 4.3 spec.\n                REF: Pages 64-65, section 5.3." = "        WARN    ShortNickName required by PPD 4.3 spec.\n                REF: Pages 64-65, section 5.3.";
-"       cupsaddsmb [options] -a" = "       cupsaddsmb [options] -a";
-"       cupstestdsc [options] -" = "       cupstestdsc [options] -";
 "      %s  \"%s %s\" conflicts with \"%s %s\"\n                (constraint=\"%s %s %s %s\")." = "      %s  “%s %s” conflicts with “%s %s”\n                (constraint=“%s %s %s %s”).";
 "      %s  %s %s does not exist." = "      %s  %s %s does not exist.";
 "      %s  %s file \"%s\" has the wrong capitalization." = "      %s  %s file “%s” has the wrong capitalization.";
@@ -156,41 +154,21 @@
 "      **FAIL**  REQUIRED ShortNickName\n                REF: Page 64-65, section 5.3." = "      **FAIL**  REQUIRED ShortNickName\n                REF: Page 64-65, section 5.3.";
 "      **FAIL**  Unable to open PPD file - %s on line %d." = "      **FAIL**  Unable to open PPD file - %s on line %d.";
 "    %d ERRORS FOUND" = "    %d ERRORS FOUND";
-"    -h       Show program usage" = "    -h       Show program usage";
-"    Bad %%%%BoundingBox: on line %d.\n        REF: Page 39, %%%%BoundingBox:" = "    Bad %%%%BoundingBox: on line %d.\n        REF: Page 39, %%%%BoundingBox:";
-"    Bad %%%%Page: on line %d.\n        REF: Page 53, %%%%Page:" = "    Bad %%%%Page: on line %d.\n        REF: Page 53, %%%%Page:";
-"    Bad %%%%Pages: on line %d.\n        REF: Page 43, %%%%Pages:" = "    Bad %%%%Pages: on line %d.\n        REF: Page 43, %%%%Pages:";
-"    Line %d is longer than 255 characters (%d).\n        REF: Page 25, Line Length" = "    Line %d is longer than 255 characters (%d).\n        REF: Page 25, Line Length";
-"    Missing %!PS-Adobe-3.0 on first line.\n        REF: Page 17, 3.1 Conforming Documents" = "    Missing %!PS-Adobe-3.0 on first line.\n        REF: Page 17, 3.1 Conforming Documents";
-"    Missing %%EndComments comment.        REF: Page 41, %%EndComments" = "    Missing %%EndComments comment.        REF: Page 41, %%EndComments";
-"    Missing or bad %%BoundingBox: comment.\n        REF: Page 39, %%BoundingBox:" = "    Missing or bad %%BoundingBox: comment.\n        REF: Page 39, %%BoundingBox:";
-"    Missing or bad %%Page: comments.\n        REF: Page 53, %%Page:" = "    Missing or bad %%Page: comments.\n        REF: Page 53, %%Page:";
-"    Missing or bad %%Pages: comment.\n        REF: Page 43, %%Pages:" = "    Missing or bad %%Pages: comment.\n        REF: Page 43, %%Pages:";
 "    NO ERRORS FOUND" = "    NO ERRORS FOUND";
-"    Saw %d lines that exceeded 255 characters." = "    Saw %d lines that exceeded 255 characters.";
-"    Too many %%BeginDocument comments." = "    Too many %%BeginDocument comments.";
-"    Too many %%EndDocument comments." = "    Too many %%EndDocument comments.";
-"    Warning: file contains binary data." = "    Warning: file contains binary data.";
-"    Warning: no %%EndComments comment in file." = "    Warning: no %%EndComments comment in file.";
-"    Warning: obsolete DSC version %.1f in file." = "    Warning: obsolete DSC version %.1f in file.";
 "  --cr                    End lines with CR (Mac OS 9)." = "  --cr                    End lines with CR (Mac OS 9).";
 "  --crlf                  End lines with CR + LF (Windows)." = "  --crlf                  End lines with CR + LF (Windows).";
 "  --lf                    End lines with LF (UNIX/Linux/macOS)." = "  --lf                    End lines with LF (UNIX/Linux/macOS).";
 "  --list-filters          List filters that will be used." = "  --list-filters          List filters that will be used.";
 "  -D                      Remove the input file when finished." = "  -D                      Remove the input file when finished.";
 "  -D name=value           Set named variable to value." = "  -D name=value           Set named variable to value.";
-"  -E                      Encrypt the connection." = "  -E                      Encrypt the connection.";
-"  -H samba-server         Use the named SAMBA server." = "  -H samba-server         Use the named SAMBA server.";
 "  -I include-dir          Add include directory to search path." = "  -I include-dir          Add include directory to search path.";
 "  -P filename.ppd         Set PPD file." = "  -P filename.ppd         Set PPD file.";
 "  -U username             Specify username." = "  -U username             Specify username.";
-"  -a                      Export all printers." = "  -a                      Export all printers.";
 "  -c catalog.po           Load the specified message catalog." = "  -c catalog.po           Load the specified message catalog.";
 "  -c cups-files.conf      Set cups-files.conf file to use." = "  -c cups-files.conf      Set cups-files.conf file to use.";
 "  -d output-dir           Specify the output directory." = "  -d output-dir           Specify the output directory.";
 "  -d printer              Use the named printer." = "  -d printer              Use the named printer.";
 "  -e                      Use every filter from the PPD file." = "  -e                      Use every filter from the PPD file.";
-"  -h server[:port]        Specify server address." = "  -h server[:port]        Specify server address.";
 "  -i mime/type            Set input MIME type (otherwise auto-typed)." = "  -i mime/type            Set input MIME type (otherwise auto-typed).";
 "  -j job-id[,N]           Filter file N from the specified job (default is file 1)." = "  -j job-id[,N]           Filter file N from the specified job (default is file 1).";
 "  -l lang[,lang,...]      Specify the output language(s) (locale)." = "  -l lang[,lang,…]      Specify the output language(s) (locale).";
@@ -811,7 +789,6 @@
 "Bad notify-recipient-uri \"%s\"." = "Bad notify-recipient-uri “%s”.";
 "Bad notify-user-data \"%s\"." = "Bad notify-user-data “%s”.";
 "Bad number-up value %d." = "Bad number-up value %d.";
-"Bad option + choice on line %d." = "Bad option + choice on line %d.";
 "Bad page-ranges values %d-%d." = "Bad page-ranges values %d-%d.";
 "Bad port number in URI" = "Bad port number in URI";
 "Bad port-monitor \"%s\"." = "Bad port-monitor “%s”.";
@@ -886,7 +863,6 @@
 "EPL1 Label Printer" = "EPL1 Label Printer";
 "EPL2 Label Printer" = "EPL2 Label Printer";
 "Edit Configuration File" = "Edit Configuration File";
-"Empty PPD file." = "Empty PPD file.";
 "Encryption is not supported." = "Encryption is not supported.";
 // TRANSLATORS: Banner/cover sheet after the print job.
 "Ending Banner" = "Ending Banner";
@@ -967,7 +943,6 @@
 "Expectation Failed" = "Expectation Failed";
 "Export Printers to Samba" = "Export Printers to Samba";
 "Expressions:" = "Expressions:";
-"FAIL" = "FAIL";
 "Fast Grayscale" = "Fast Grayscale";
 "File \"%s\" contains a relative path." = "File “%s” contains a relative path.";
 "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "File “%s” has insecure permissions (0%o/uid=%d/gid=%d).";
@@ -1104,7 +1079,6 @@
 "Missing PPD-Adobe-4.x header" = "Missing PPD-Adobe-4.x header";
 "Missing asterisk in column 1" = "Missing asterisk in column 1";
 "Missing document-number attribute." = "Missing document-number attribute.";
-"Missing double quote on line %d." = "Missing double quote on line %d.";
 "Missing form variable" = "Missing form variable";
 "Missing last-document attribute in request." = "Missing last-document attribute in request.";
 "Missing media or media-col." = "Missing media or media-col.";
@@ -1116,7 +1090,6 @@
 "Missing required attributes." = "Missing required attributes.";
 "Missing resource in URI" = "Missing resource in URI";
 "Missing scheme in URI" = "Missing scheme in URI";
-"Missing value on line %d." = "Missing value on line %d.";
 "Missing value string" = "Missing value string";
 "Missing x-dimension in media-size." = "Missing x-dimension in media-size.";
 "Missing y-dimension in media-size." = "Missing y-dimension in media-size.";
@@ -1138,7 +1111,6 @@
 "No IPP attributes." = "No IPP attributes.";
 "No PPD name" = "No PPD name";
 "No VarBind SEQUENCE" = "No VarBind SEQUENCE";
-"No Windows printer drivers are installed." = "No Windows printer drivers are installed.";
 "No active connection" = "No active connection";
 "No active connection." = "No active connection.";
 "No active jobs on %s." = "No active jobs on %s.";
@@ -1180,7 +1152,6 @@
 "Not Supported" = "Not Supported";
 "Not allowed to print." = "Not allowed to print.";
 "Note" = "Note";
-"Note: this program only validates the DSC comments, not the PostScript itself." = "Note: this program only validates the DSC comments, not the PostScript itself.";
 "OK" = "OK";
 "Off (1-Sided)" = "Off (1-Sided)";
 "Oki" = "Oki";
@@ -1198,7 +1169,6 @@
 "Out of date PPD cache file." = "Out of date PPD cache file.";
 "Out of memory." = "Out of memory.";
 "Output Mode" = "Output Mode";
-"PASS" = "PASS";
 "PCL Laser Printer" = "PCL Laser Printer";
 "PRC16K" = "PRC16K";
 "PRC16K Long Edge" = "PRC16K Long Edge";
@@ -1212,7 +1182,6 @@
 "ParamCustominCutInterval" = "ParamCustominCutInterval";
 "ParamCustominTearInterval" = "ParamCustominTearInterval";
 "Password for %s on %s? " = "Password for %s on %s? ";
-"Password for %s required to access %s via SAMBA: " = "Password for %s required to access %s via SAMBA: ";
 "Pause Class" = "Pause Class";
 "Pause Printer" = "Pause Printer";
 "Peel-Off" = "Peel-Off";
@@ -1379,13 +1348,8 @@
 "Unable to configure printer options." = "Unable to configure printer options.";
 "Unable to connect to host." = "Unable to connect to host.";
 "Unable to contact printer, queuing on next printer in class." = "Unable to contact printer, queuing on next printer in class.";
-"Unable to copy 64-bit CUPS printer driver files (%d)." = "Unable to copy 64-bit CUPS printer driver files (%d).";
-"Unable to copy 64-bit Windows printer driver files (%d)." = "Unable to copy 64-bit Windows printer driver files (%d).";
-"Unable to copy CUPS printer driver files (%d)." = "Unable to copy CUPS printer driver files (%d).";
 "Unable to copy PPD file - %s" = "Unable to copy PPD file - %s";
 "Unable to copy PPD file." = "Unable to copy PPD file.";
-"Unable to copy Windows 2000 printer driver files (%d)." = "Unable to copy Windows 2000 printer driver files (%d).";
-"Unable to copy Windows 9x printer driver files (%d)." = "Unable to copy Windows 9x printer driver files (%d).";
 "Unable to create credentials from array." = "Unable to create credentials from array.";
 "Unable to create printer-uri" = "Unable to create printer-uri";
 "Unable to create printer." = "Unable to create printer.";
@@ -1414,8 +1378,6 @@
 "Unable to get printer list" = "Unable to get printer list";
 "Unable to get printer status" = "Unable to get printer status";
 "Unable to get printer status." = "Unable to get printer status.";
-"Unable to install Windows 2000 printer driver files (%d)." = "Unable to install Windows 2000 printer driver files (%d).";
-"Unable to install Windows 9x printer driver files (%d)." = "Unable to install Windows 9x printer driver files (%d).";
 "Unable to load help index." = "Unable to load help index.";
 "Unable to locate printer \"%s\"." = "Unable to locate printer “%s”.";
 "Unable to locate printer." = "Unable to locate printer.";
@@ -1438,7 +1400,6 @@
 "Unable to see in file" = "Unable to see in file";
 "Unable to send command to printer driver" = "Unable to send command to printer driver";
 "Unable to send data to printer." = "Unable to send data to printer.";
-"Unable to set Windows printer driver (%d)." = "Unable to set Windows printer driver (%d).";
 "Unable to set options" = "Unable to set options";
 "Unable to set server default" = "Unable to set server default";
 "Unable to start backend process." = "Unable to start backend process.";
@@ -1486,11 +1447,9 @@
 "Usage: %s [options] destination(s)" = "Usage: %s [options] destination(s)";
 "Usage: %s job-id user title copies options [file]" = "Usage: %s job-id user title copies options [file]";
 "Usage: cancel [options] [id]\n       cancel [options] [destination]\n       cancel [options] [destination-id]" = "Usage: cancel [options] [id]\n       cancel [options] [destination]\n       cancel [options] [destination-id]";
-"Usage: cupsaddsmb [options] printer1 ... printerN" = "Usage: cupsaddsmb [options] printer1 … printerN";
 "Usage: cupsctl [options] [param=value ... paramN=valueN]" = "Usage: cupsctl [options] [param=value … paramN=valueN]";
 "Usage: cupsd [options]" = "Usage: cupsd [options]";
 "Usage: cupsfilter [ options ] [ -- ] filename" = "Usage: cupsfilter [ options ] [ -- ] filename";
-"Usage: cupstestdsc [options] filename.ps [... filename.ps]" = "Usage: cupstestdsc [options] filename.ps [… filename.ps]";
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n       program | cupstestppd [options] -" = "Usage: cupstestppd [options] filename1.ppd[.gz] [… filenameN.ppd[.gz]]\n       program | cupstestppd [options] -";
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n       ippfind [options] name[.regtype[.domain.]] ... [expression]\n       ippfind --help\n       ippfind --version" = "Usage: ippfind [options] regtype[,subtype][.domain.] … [expression]\n       ippfind [options] name[.regtype[.domain.]] … [expression]\n       ippfind --help\n       ippfind --version";
 "Usage: ipptool [options] URI filename [ ... filenameN ]" = "Usage: ipptool [options] URI filename [ … filenameN ]";
@@ -1515,7 +1474,6 @@
 "Waiting for job to complete." = "Waiting for job to complete.";
 "Waiting for printer to become available." = "Waiting for printer to become available.";
 "Waiting for printer to finish." = "Waiting for printer to finish.";
-"Warning, no Windows 2000 printer drivers are installed." = "Warning, no Windows 2000 printer drivers are installed.";
 "Warning: This program will be removed in a future version of CUPS." = "Warning: This program will be removed in a future version of CUPS.";
 "Web Interface is Disabled" = "Web Interface is Disabled";
 "Yes" = "Yes";
@@ -1527,7 +1485,6 @@
 "completed" = "completed";
 "cups-deviced failed to execute." = "cups-deviced failed to execute.";
 "cups-driverd failed to execute." = "cups-driverd failed to execute.";
-"cupsaddsmb: No PPD file for printer \"%s\" - %s" = "cupsaddsmb: No PPD file for printer “%s” - %s";
 "cupsctl: Cannot set Listen or Port directly." = "cupsctl: Cannot set Listen or Port directly.";
 "cupsctl: Unable to connect to server: %s" = "cupsctl: Unable to connect to server: %s";
 "cupsctl: Unknown option \"%s\"" = "cupsctl: Unknown option “%s”";

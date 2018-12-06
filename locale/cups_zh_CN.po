@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: 2018-10-09 00:21-0500\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.io>\n"
 "Language-Team: \n"
@@ -317,12 +317,6 @@ msgid ""
 msgstr ""
 "        警告    PPD 4.3 规范需要 ShortNickName。\n"
 "                引用：第 64-65 页，章节 5.3。"
-
-msgid "       cupsaddsmb [options] -a"
-msgstr "       cupsaddsmb [选项] -a"
-
-msgid "       cupstestdsc [options] -"
-msgstr "       cupstestdsc [选项] -"
 
 #, c-format
 msgid ""
@@ -780,102 +774,8 @@ msgstr "      **失败**  无法打开 PPD 文件 — 行 %2$d 上的 %1$s。"
 msgid "    %d ERRORS FOUND"
 msgstr "    发现 %d 个错误"
 
-msgid "    -h       Show program usage"
-msgstr "    -h       显示程序使用方法"
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-"    无效的 %%%%BoundingBox：位于行 %d。\n"
-"        引用：第 39 页，%%%%BoundingBox："
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-"    无效的 %%%%Page：位于行 %d。\n"
-"        引用：第 53 页，%%%%Page："
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-"    无效的 %%%%Pages：位于行 %d。\n"
-"        引用：第 43 页，%%%%Pages："
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-"    行 %d 长度超过 255 个字符 (%d)。\n"
-"        引用：第 25 页，行长度"
-
-# Should chapter titles be translated?
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-"    首行缺少 %!PS-Adobe-3.0。\n"
-"        引用：第 17 页，3.1 符合规范的文档"
-
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr "    缺少 %%EndComments 注释。        引用：第 41 页，%%EndComments"
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-"    %%BoundingBox 缺失或无效：注释。\n"
-"        引用：第 39 页，%%BoundingBox："
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-"    %%Page 缺失或无效：注释。\n"
-"        引用：第 53 页，%%Page："
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-"    %%Pages 缺失或无效：注释。\n"
-"        引用：第 43 页，%%Pages："
-
 msgid "    NO ERRORS FOUND"
 msgstr "    未发现错误"
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr "    共发现 %d 个超过 255 字符的行。"
-
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr "    %%BeginDocument 注释过多。"
-
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr "    %%EndDocument 注释过多。"
-
-msgid "    Warning: file contains binary data."
-msgstr "    警告：文件包含二进制数据。"
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr "    警告：文件中无 %%EndComments 注释。"
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
-msgstr "    警告：文件中包含已遗弃的 DSC 版本 %.1f。"
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    使用 CR 行末 (Mac OS 9)。"
@@ -895,12 +795,6 @@ msgstr "  -D                      完成后删除输入文件。"
 msgid "  -D name=value           Set named variable to value."
 msgstr "  -D 名称=赋值           为指定变量赋值。"
 
-msgid "  -E                      Encrypt the connection."
-msgstr "  -E                      加密连接。"
-
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr "  -H samba-server         使用指定的 Samba 服务器。"
-
 msgid "  -I include-dir          Add include directory to search path."
 msgstr "  -I include-dir          将引用目录加入到搜索路径。"
 
@@ -909,9 +803,6 @@ msgstr "  -P filename.ppd         设置 PPD 文件。"
 
 msgid "  -U username             Specify username."
 msgstr "  -U 用户名              指定用户名。"
-
-msgid "  -a                      Export all printers."
-msgstr "  -a                      导出所有打印机。"
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           载入指定的消息索引。"
@@ -927,9 +818,6 @@ msgstr "  -d 打印机               使用指定的打印机。"
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      使用来自 PPD 文件的所有滤镜。"
-
-msgid "  -h server[:port]        Specify server address."
-msgstr "  -h 服务器[:端口]        指定服务器地址。"
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr "  -i mime/type            设置输入的 MIME 类型（否则自动探测类型）。"
@@ -3041,10 +2929,6 @@ msgid "Bad number-up value %d."
 msgstr "无效的 number-up 值 %d。"
 
 #, c-format
-msgid "Bad option + choice on line %d."
-msgstr "行 %d 中存在无效的选项 + 选择。"
-
-#, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "无效的 page-range 值 %d-%d。"
 
@@ -3299,9 +3183,6 @@ msgstr "EPL2 标签打印机"
 msgid "Edit Configuration File"
 msgstr "编辑配置文件"
 
-msgid "Empty PPD file."
-msgstr "空 PPD 文件。"
-
 msgid "Encryption is not supported."
 msgstr "不支持加密。"
 
@@ -3544,9 +3425,6 @@ msgstr "将打印机导出到 Samba"
 
 msgid "Expressions:"
 msgstr "表达式："
-
-msgid "FAIL"
-msgstr "失败"
 
 msgid "Fast Grayscale"
 msgstr "快速灰度"
@@ -3981,10 +3859,6 @@ msgstr "列 1 中缺少星号"
 msgid "Missing document-number attribute."
 msgstr "缺少 document-number 属性。"
 
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr "行 %d 缺少双引号。"
-
 msgid "Missing form variable"
 msgstr "缺少表单变量"
 
@@ -4018,10 +3892,6 @@ msgstr "URI 中缺少资源"
 
 msgid "Missing scheme in URI"
 msgstr "URI 中缺少方案"
-
-#, c-format
-msgid "Missing value on line %d."
-msgstr "行 %d 缺少值。"
 
 msgid "Missing value string"
 msgstr "缺少值字串。"
@@ -4094,9 +3964,6 @@ msgstr "无 PPD 名称"
 
 msgid "No VarBind SEQUENCE"
 msgstr "无 VarBind SEQUENCE"
-
-msgid "No Windows printer drivers are installed."
-msgstr "未安装 Windows 打印机驱动。"
 
 msgid "No active connection"
 msgstr "无活动连接"
@@ -4222,11 +4089,6 @@ msgstr "不允许打印。"
 msgid "Note"
 msgstr "注释"
 
-msgid ""
-"Note: this program only validates the DSC comments, not the PostScript "
-"itself."
-msgstr "注：此程序仅用于检验 DSC 注释，而非 PostScript 本身。"
-
 msgid "OK"
 msgstr "确定"
 
@@ -4280,9 +4142,6 @@ msgstr "内存耗尽。"
 msgid "Output Mode"
 msgstr "输出模式"
 
-msgid "PASS"
-msgstr "通过"
-
 msgid "PCL Laser Printer"
 msgstr "PCL 激光打印机"
 
@@ -4323,10 +4182,6 @@ msgstr "ParamCustominTearInterval"
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "请输入 %2$s 上 %1$s 的密码 "
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "要通过 SAMBA 访问 %2$s，必须输入 %1$s 的密码："
 
 msgid "Pause Class"
 msgstr "暂停类"
@@ -4864,31 +4719,11 @@ msgid "Unable to contact printer, queuing on next printer in class."
 msgstr "无法联系打印机，已列队于类中的下一台打印机。"
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr "无法复制 64 位 CUPS 打印机驱动文件（%d）。"
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr "无法复制 64 位 Windows 打印机驱动文件（%d）。"
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
-msgstr "无法复制 CUPS 打印机驱动文件（%d）。"
-
-#, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr "无法复制 PPD 文件 — %s"
 
 msgid "Unable to copy PPD file."
 msgstr "无法复制 PPD 文件。"
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr "无法复制 Windows 2000 打印机驱动文件（%d）。"
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
-msgstr "无法复制 Windows 9x 打印机驱动文件（%d）。"
 
 msgid "Unable to create credentials from array."
 msgstr "无法从打印组创建服务器凭据。"
@@ -4980,14 +4815,6 @@ msgstr "无法获取打印机状态"
 msgid "Unable to get printer status."
 msgstr "无法获取打印机状态。"
 
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr "无法安装 Windows 2000 打印机驱动文件（%d）。"
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr "无法安装 Windows 9x 打印机驱动文件（%d）。"
-
 msgid "Unable to load help index."
 msgstr "无法载入帮助索引。"
 
@@ -5057,10 +4884,6 @@ msgstr "无法向打印机驱动发送命令"
 
 msgid "Unable to send data to printer."
 msgstr "无法向打印机发送数据。"
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
-msgstr "无法设置 Windows 打印机驱动（%d）。"
 
 msgid "Unable to set options"
 msgstr "无法设置选项"
@@ -5245,9 +5068,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr "用法：cupsaddsmb [options] printer1 ... printerN"
-
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr "用法：cupsctl [options] [param=value ... paramN=valueN]"
 
@@ -5256,9 +5076,6 @@ msgstr "用法：cupsd [options]"
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
 msgstr "用法：cupsfilter [ options ] [ -- ] filename"
-
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
-msgstr "用法：cupstestdsc [options] filename.ps [... filename.ps]"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -5360,9 +5177,6 @@ msgstr "正在等待打印机变得可用。"
 
 msgid "Waiting for printer to finish."
 msgstr "正在等待打印机完成任务。"
-
-msgid "Warning, no Windows 2000 printer drivers are installed."
-msgstr "警告，未安装 Windows 2000 打印机驱动。"
 
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
@@ -5601,10 +5415,6 @@ msgstr "无法执行 cups-deviced。"
 
 msgid "cups-driverd failed to execute."
 msgstr "无法执行 cups-driverd。"
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
-msgstr "cupsaddsmb：打印机“%s”无 PPD 文件 — %s"
 
 msgid "cupsctl: Cannot set Listen or Port directly."
 msgstr "cupsctl：无法直接设置 Listen 或 Port 值。"
@@ -12785,8 +12595,96 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ msgid "                          Issue warnings instead of errors."
 #~ msgstr "                          发出警告而不是错误。"
 
+#~ msgid "       cupsaddsmb [options] -a"
+#~ msgstr "       cupsaddsmb [选项] -a"
+
+#~ msgid "       cupstestdsc [options] -"
+#~ msgstr "       cupstestdsc [选项] -"
+
 #~ msgid "       program | cupstestppd [options] -"
 #~ msgstr "       程序 | cupstestppd [选项] -"
+
+#~ msgid "    -h       Show program usage"
+#~ msgstr "    -h       显示程序使用方法"
+
+#~ msgid ""
+#~ "    Bad %%%%BoundingBox: on line %d.\n"
+#~ "        REF: Page 39, %%%%BoundingBox:"
+#~ msgstr ""
+#~ "    无效的 %%%%BoundingBox：位于行 %d。\n"
+#~ "        引用：第 39 页，%%%%BoundingBox："
+
+#~ msgid ""
+#~ "    Bad %%%%Page: on line %d.\n"
+#~ "        REF: Page 53, %%%%Page:"
+#~ msgstr ""
+#~ "    无效的 %%%%Page：位于行 %d。\n"
+#~ "        引用：第 53 页，%%%%Page："
+
+#~ msgid ""
+#~ "    Bad %%%%Pages: on line %d.\n"
+#~ "        REF: Page 43, %%%%Pages:"
+#~ msgstr ""
+#~ "    无效的 %%%%Pages：位于行 %d。\n"
+#~ "        引用：第 43 页，%%%%Pages："
+
+#~ msgid ""
+#~ "    Line %d is longer than 255 characters (%d).\n"
+#~ "        REF: Page 25, Line Length"
+#~ msgstr ""
+#~ "    行 %d 长度超过 255 个字符 (%d)。\n"
+#~ "        引用：第 25 页，行长度"
+
+# Should chapter titles be translated?
+#~ msgid ""
+#~ "    Missing %!PS-Adobe-3.0 on first line.\n"
+#~ "        REF: Page 17, 3.1 Conforming Documents"
+#~ msgstr ""
+#~ "    首行缺少 %!PS-Adobe-3.0。\n"
+#~ "        引用：第 17 页，3.1 符合规范的文档"
+
+#~ msgid ""
+#~ "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+#~ msgstr "    缺少 %%EndComments 注释。        引用：第 41 页，%%EndComments"
+
+#~ msgid ""
+#~ "    Missing or bad %%BoundingBox: comment.\n"
+#~ "        REF: Page 39, %%BoundingBox:"
+#~ msgstr ""
+#~ "    %%BoundingBox 缺失或无效：注释。\n"
+#~ "        引用：第 39 页，%%BoundingBox："
+
+#~ msgid ""
+#~ "    Missing or bad %%Page: comments.\n"
+#~ "        REF: Page 53, %%Page:"
+#~ msgstr ""
+#~ "    %%Page 缺失或无效：注释。\n"
+#~ "        引用：第 53 页，%%Page："
+
+#~ msgid ""
+#~ "    Missing or bad %%Pages: comment.\n"
+#~ "        REF: Page 43, %%Pages:"
+#~ msgstr ""
+#~ "    %%Pages 缺失或无效：注释。\n"
+#~ "        引用：第 43 页，%%Pages："
+
+#~ msgid "    Saw %d lines that exceeded 255 characters."
+#~ msgstr "    共发现 %d 个超过 255 字符的行。"
+
+#~ msgid "    Too many %%BeginDocument comments."
+#~ msgstr "    %%BeginDocument 注释过多。"
+
+#~ msgid "    Too many %%EndDocument comments."
+#~ msgstr "    %%EndDocument 注释过多。"
+
+#~ msgid "    Warning: file contains binary data."
+#~ msgstr "    警告：文件包含二进制数据。"
+
+#~ msgid "    Warning: no %%EndComments comment in file."
+#~ msgstr "    警告：文件中无 %%EndComments 注释。"
+
+#~ msgid "    Warning: obsolete DSC version %.1f in file."
+#~ msgstr "    警告：文件中包含已遗弃的 DSC 版本 %.1f。"
 
 #~ msgid "  ! expression            Unary NOT of expression."
 #~ msgstr "  ! 表达式                一元否定表达式。"
@@ -12899,6 +12797,9 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ msgid "  -C                      Send requests using chunking (default)."
 #~ msgstr "  -C                      使用分块请求发送（默认）。"
 
+#~ msgid "  -E                      Encrypt the connection."
+#~ msgstr "  -E                      加密连接。"
+
 #~ msgid ""
 #~ "  -E                      Test with encryption using HTTP Upgrade to TLS."
 #~ msgstr "  -E                      带有使用 HTTP 升级到 TLS 加密的测试。"
@@ -12906,6 +12807,9 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ msgid ""
 #~ "  -F                      Run in the foreground but detach from console."
 #~ msgstr "  -F                      在前台运行但从终端分离。"
+
+#~ msgid "  -H samba-server         Use the named SAMBA server."
+#~ msgstr "  -H samba-server         使用指定的 Samba 服务器。"
 
 #~ msgid "  -I                      Ignore errors."
 #~ msgstr "  -I                      忽略错误。"
@@ -12948,6 +12852,9 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ msgid "  -X                      Produce XML plist instead of plain text."
 #~ msgstr "  -X                      生成 XML plist 而不是纯文本。"
 
+#~ msgid "  -a                      Export all printers."
+#~ msgstr "  -a                      导出所有打印机。"
+
 #~ msgid "  -c                      Produce CSV output."
 #~ msgstr "  -c                      生成 CSV 输出。"
 
@@ -12974,6 +12881,9 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 
 #~ msgid "  -h regex                Match hostname to regular expression."
 #~ msgstr "  -h 正则表达式           使用正则表达式匹配主机名。"
+
+#~ msgid "  -h server[:port]        Specify server address."
+#~ msgstr "  -h 服务器[:端口]        指定服务器地址。"
 
 #~ msgid ""
 #~ "  -i seconds              Repeat the last file with the given time "
@@ -13111,6 +13021,65 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ msgid "  {}                      URI"
 #~ msgstr "  {}                      URI"
 
+#~ msgid "Bad option + choice on line %d."
+#~ msgstr "行 %d 中存在无效的选项 + 选择。"
+
+#~ msgid "Empty PPD file."
+#~ msgstr "空 PPD 文件。"
+
+#~ msgid "FAIL"
+#~ msgstr "失败"
+
+#~ msgid "Missing double quote on line %d."
+#~ msgstr "行 %d 缺少双引号。"
+
+#~ msgid "Missing value on line %d."
+#~ msgstr "行 %d 缺少值。"
+
+#~ msgid "No Windows printer drivers are installed."
+#~ msgstr "未安装 Windows 打印机驱动。"
+
+#~ msgid ""
+#~ "Note: this program only validates the DSC comments, not the PostScript "
+#~ "itself."
+#~ msgstr "注：此程序仅用于检验 DSC 注释，而非 PostScript 本身。"
+
+#~ msgid "PASS"
+#~ msgstr "通过"
+
+#~ msgid "Password for %s required to access %s via SAMBA: "
+#~ msgstr "要通过 SAMBA 访问 %2$s，必须输入 %1$s 的密码："
+
+#~ msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+#~ msgstr "无法复制 64 位 CUPS 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+#~ msgstr "无法复制 64 位 Windows 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)."
+#~ msgstr "无法复制 CUPS 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)."
+#~ msgstr "无法复制 Windows 2000 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)."
+#~ msgstr "无法复制 Windows 9x 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)."
+#~ msgstr "无法安装 Windows 2000 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)."
+#~ msgstr "无法安装 Windows 9x 打印机驱动文件（%d）。"
+
+#~ msgid "Unable to set Windows printer driver (%d)."
+#~ msgstr "无法设置 Windows 打印机驱动（%d）。"
+
+#~ msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+#~ msgstr "用法：cupsaddsmb [options] printer1 ... printerN"
+
+#~ msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+#~ msgstr "用法：cupstestdsc [options] filename.ps [... filename.ps]"
+
 #~ msgid ""
 #~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 #~ msgstr ""
@@ -13134,3 +13103,9 @@ msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
 #~ "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 #~ msgstr ""
 #~ "用法：lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed."
+#~ msgstr "警告，未安装 Windows 2000 打印机驱动。"
+
+#~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+#~ msgstr "cupsaddsmb：打印机“%s”无 PPD 文件 — %s"

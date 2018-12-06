@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: 2016-01-31 16:45-0200\n"
 "Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <traducao-cups-pt-br@googlegroups.com>\n"
@@ -333,12 +333,6 @@ msgid ""
 msgstr ""
 "        AVISO   ShortNickName é necessário pela especificação PPD 4.3.\n"
 "                REF: Páginas 64-65, seção 5.3."
-
-msgid "       cupsaddsmb [options] -a"
-msgstr "     cupsaddsmb [opções] -a"
-
-msgid "       cupstestdsc [options] -"
-msgstr "     cupstestdsc [opções] -"
 
 #, c-format
 msgid ""
@@ -812,103 +806,8 @@ msgstr "      **FALHA** Não foi possível abrir o arquivo PPD - %s na linha %d.
 msgid "    %d ERRORS FOUND"
 msgstr "    %d ERROS ENCONTRADOS"
 
-msgid "    -h       Show program usage"
-msgstr "    -h       Mostra formas de uso do programa"
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-"    %%%%BoundingBox inválida: na linha %d.\n"
-"        REF: Página 39, %%%%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-"    %%%%Page inválida: na linha %d.\n"
-"        REF: Página 53, %%%%Page:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-"    %%%%Pages inválida: na linha %d.\n"
-"        REF: Página 43, %%%%Pages:"
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-"    Linha %d é maior do que 255 caracteres (%d).\n"
-"        REF: Página 25, Line Length"
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-"    Faltando %!PS-Adobe-3.0 na primeira linha.\n"
-"        REF: Página 17, 3.1 Conforming Documents"
-
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr ""
-"    Faltando comentário de %%EndComments.        REF: Página 41, "
-"%%EndComments"
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-"    Faltando %%BoundingBox ou é inválido: comentário.\n"
-"        REF: Página 39, %%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-"    Faltando %%Page ou inválido: comentários.\n"
-"        REF: Página 53, %%Page:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-"    Faltando %%Pages ou inválido: comentário.\n"
-"        REF: Página 43, %%Pages:"
-
 msgid "    NO ERRORS FOUND"
 msgstr "    NENHUM ERRO ENCONTRADO"
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr "    Cortadas %d linhas que excederam a 255 caracteres."
-
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr "    Número excessivo de comentários de %%BeginDocument."
-
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr "    Número excessivo de comentários de %%EndDocument."
-
-msgid "    Warning: file contains binary data."
-msgstr "    Aviso: arquivo contém dados binários."
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr "    Aviso: nenhum comentário de %%EndComments no arquivo."
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
-msgstr "    Aviso: versão %.1f obsoleta de DSC no arquivo."
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    Fim de linhas com CR (Mac OS 9)."
@@ -928,13 +827,6 @@ msgstr "  -D                      Remove o arquivo de entrada ao finalizar."
 msgid "  -D name=value           Set named variable to value."
 msgstr "  -D nome=valor           Define a variável \"nome\" com \"valor\"."
 
-msgid "  -E                      Encrypt the connection."
-msgstr "  -E                      Criptografa a conexão."
-
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr ""
-"  -H servidor-samba       Usa o servidor SAMBA chamado \"servidor-samba\"."
-
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
 "  -I dir-include          Adiciona diretório de include ao caminho de "
@@ -945,9 +837,6 @@ msgstr "  -P arquivo.ppd          Define arquivo PPD."
 
 msgid "  -U username             Specify username."
 msgstr "  -U usuário              Especifica nome do usuário."
-
-msgid "  -a                      Export all printers."
-msgstr "  -a                      Exporta todas as impressoras."
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
@@ -965,9 +854,6 @@ msgstr "  -d impressora           Usa a impressora informada."
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Usa todos os filtros do arquivo PPD."
-
-msgid "  -h server[:port]        Specify server address."
-msgstr "  -h servidor[:porta]     Especifica o endereço do servidor."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -3093,10 +2979,6 @@ msgid "Bad number-up value %d."
 msgstr "Valor de number-up inválido %d."
 
 #, c-format
-msgid "Bad option + choice on line %d."
-msgstr "Opção + escolha inválidas na linha %d."
-
-#, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "Valor de page-ranges inválido %d-%d."
 
@@ -3351,9 +3233,6 @@ msgstr "Impressora de etiqueta EPL2"
 msgid "Edit Configuration File"
 msgstr "Editar arquivo de configuração"
 
-msgid "Empty PPD file."
-msgstr "Arquivo PPD vazio."
-
 msgid "Encryption is not supported."
 msgstr "Não há suporte a criptografia."
 
@@ -3597,9 +3476,6 @@ msgstr "Exportar impressoras para o Samba"
 
 msgid "Expressions:"
 msgstr "Expressões:"
-
-msgid "FAIL"
-msgstr "FALHA"
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -4034,10 +3910,6 @@ msgstr "Faltando asterisco na coluna 1"
 msgid "Missing document-number attribute."
 msgstr "Faltando atributo document-number."
 
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr "Faltando aspas duplas na linha %d."
-
 msgid "Missing form variable"
 msgstr "Faltando variável de formulário"
 
@@ -4071,10 +3943,6 @@ msgstr "Faltando rescurso na URI"
 
 msgid "Missing scheme in URI"
 msgstr "Faltando esquema na URI"
-
-#, c-format
-msgid "Missing value on line %d."
-msgstr "Faltando valor na linha %d."
 
 msgid "Missing value string"
 msgstr "Faltando string de valor"
@@ -4147,9 +4015,6 @@ msgstr "Nenhum nome PPD"
 
 msgid "No VarBind SEQUENCE"
 msgstr "Nenhuma SEQUENCE de VarBind"
-
-msgid "No Windows printer drivers are installed."
-msgstr "Nenhum driver de impressora Windows está instalado."
 
 msgid "No active connection"
 msgstr "Nenhuma conexão ativa"
@@ -4277,12 +4142,6 @@ msgstr "Sem permissão para imprimir."
 msgid "Note"
 msgstr "Nota"
 
-msgid ""
-"Note: this program only validates the DSC comments, not the PostScript "
-"itself."
-msgstr ""
-"Nota: esse programa só valida os comentários DSC, e não o próprio PostScript."
-
 msgid "OK"
 msgstr "OK"
 
@@ -4336,9 +4195,6 @@ msgstr "Memória insuficiente."
 msgid "Output Mode"
 msgstr "Mode de saída"
 
-msgid "PASS"
-msgstr "PASSOU"
-
 msgid "PCL Laser Printer"
 msgstr "Impressora Laser PCL"
 
@@ -4379,10 +4235,6 @@ msgstr "ParamCustominTearInterval"
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "Senha para %s em %s? "
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "Senha para %s é necessária para acessar %s via SAMBA: "
 
 msgid "Pause Class"
 msgstr "Pausar classe"
@@ -4932,37 +4784,11 @@ msgstr ""
 "na classe."
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr ""
-"Não foi possível copiar arquivos de driver de impressora CUPS 64-bit (%d)."
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr ""
-"Não foi possível copiar arquivos de driver de impressora (%d) de Windows 64-"
-"bit."
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
-msgstr "Não foi possível copiar arquivos de driver de impressora (%d) de CUPS."
-
-#, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr "Não foi possível copiar arquivo PPD - %s"
 
 msgid "Unable to copy PPD file."
 msgstr "Não foi possível copiar arquivo PPD."
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr ""
-"Não foi possível copiar arquivos de driver de impressora (%d) de Windows "
-"2000."
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
-msgstr ""
-"Não foi possível copiar arquivos de driver de impressora (%d) de Windows 9x."
 
 msgid "Unable to create credentials from array."
 msgstr ""
@@ -5068,16 +4894,6 @@ msgstr "Não foi possível obter estado da impressora"
 msgid "Unable to get printer status."
 msgstr "Não foi possível obter o estado da impressora."
 
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr ""
-"Não foi possível instalar arquivos de driver de impressora Windows 2000 (%d)."
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr ""
-"Não foi possível instalar arquivos de driver de impressora Windows 9x (%d)."
-
 msgid "Unable to load help index."
 msgstr "Não foi possível carregar índice de ajuda."
 
@@ -5146,10 +4962,6 @@ msgstr "Não foi possível enviar comando ao driver da impressora"
 
 msgid "Unable to send data to printer."
 msgstr "Não foi possível enviar dados à impressora."
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
-msgstr "Não foi possível definir driver de impressora Windows (%d)."
 
 msgid "Unable to set options"
 msgstr "Não foi possível definir opções"
@@ -5335,9 +5147,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr "Uso: cupsaddsmb [opções] impressora1 ... impressoraN"
-
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr "Uso: cupsctl [opções] [param=valor ... paramN=valorN]"
 
@@ -5346,9 +5155,6 @@ msgstr "Uso: cupsd [opções]"
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
 msgstr "Uso: cupsfilter [ opções ] [ -- ] arquivo"
-
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
-msgstr "Uso: cupstestdsc [opções] arquivo.ps [... arquivo.ps]"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -5449,9 +5255,6 @@ msgstr "Esperando a impressora ficar disponível."
 
 msgid "Waiting for printer to finish."
 msgstr "Esperando a impressora finalizar."
-
-msgid "Warning, no Windows 2000 printer drivers are installed."
-msgstr "Aviso, nenhum driver de impressora Windows 2000 está instalado."
 
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
@@ -5691,10 +5494,6 @@ msgstr "cups-deviced falhou na execução."
 
 msgid "cups-driverd failed to execute."
 msgstr "cups-driverd falhou na execução."
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
-msgstr "cupsaddsmb: Nenhum arquivo PPD para a impressora \"%s\" - %s"
 
 msgid "cupsctl: Cannot set Listen or Port directly."
 msgstr "cupsctl: Não foi possível definir diretamente Porta ou Listen."
@@ -12890,8 +12689,97 @@ msgstr ""
 #~ msgid "                          Issue warnings instead of errors."
 #~ msgstr "                          Emite avisos ao invés de erros."
 
+#~ msgid "       cupsaddsmb [options] -a"
+#~ msgstr "     cupsaddsmb [opções] -a"
+
+#~ msgid "       cupstestdsc [options] -"
+#~ msgstr "     cupstestdsc [opções] -"
+
 #~ msgid "       program | cupstestppd [options] -"
 #~ msgstr "     programa | cupstestppd [opções] -"
+
+#~ msgid "    -h       Show program usage"
+#~ msgstr "    -h       Mostra formas de uso do programa"
+
+#~ msgid ""
+#~ "    Bad %%%%BoundingBox: on line %d.\n"
+#~ "        REF: Page 39, %%%%BoundingBox:"
+#~ msgstr ""
+#~ "    %%%%BoundingBox inválida: na linha %d.\n"
+#~ "        REF: Página 39, %%%%BoundingBox:"
+
+#~ msgid ""
+#~ "    Bad %%%%Page: on line %d.\n"
+#~ "        REF: Page 53, %%%%Page:"
+#~ msgstr ""
+#~ "    %%%%Page inválida: na linha %d.\n"
+#~ "        REF: Página 53, %%%%Page:"
+
+#~ msgid ""
+#~ "    Bad %%%%Pages: on line %d.\n"
+#~ "        REF: Page 43, %%%%Pages:"
+#~ msgstr ""
+#~ "    %%%%Pages inválida: na linha %d.\n"
+#~ "        REF: Página 43, %%%%Pages:"
+
+#~ msgid ""
+#~ "    Line %d is longer than 255 characters (%d).\n"
+#~ "        REF: Page 25, Line Length"
+#~ msgstr ""
+#~ "    Linha %d é maior do que 255 caracteres (%d).\n"
+#~ "        REF: Página 25, Line Length"
+
+#~ msgid ""
+#~ "    Missing %!PS-Adobe-3.0 on first line.\n"
+#~ "        REF: Page 17, 3.1 Conforming Documents"
+#~ msgstr ""
+#~ "    Faltando %!PS-Adobe-3.0 na primeira linha.\n"
+#~ "        REF: Página 17, 3.1 Conforming Documents"
+
+#~ msgid ""
+#~ "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+#~ msgstr ""
+#~ "    Faltando comentário de %%EndComments.        REF: Página 41, "
+#~ "%%EndComments"
+
+#~ msgid ""
+#~ "    Missing or bad %%BoundingBox: comment.\n"
+#~ "        REF: Page 39, %%BoundingBox:"
+#~ msgstr ""
+#~ "    Faltando %%BoundingBox ou é inválido: comentário.\n"
+#~ "        REF: Página 39, %%BoundingBox:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Page: comments.\n"
+#~ "        REF: Page 53, %%Page:"
+#~ msgstr ""
+#~ "    Faltando %%Page ou inválido: comentários.\n"
+#~ "        REF: Página 53, %%Page:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Pages: comment.\n"
+#~ "        REF: Page 43, %%Pages:"
+#~ msgstr ""
+#~ "    Faltando %%Pages ou inválido: comentário.\n"
+#~ "        REF: Página 43, %%Pages:"
+
+#~ msgid "    Saw %d lines that exceeded 255 characters."
+#~ msgstr "    Cortadas %d linhas que excederam a 255 caracteres."
+
+#~ msgid "    Too many %%BeginDocument comments."
+#~ msgstr "    Número excessivo de comentários de %%BeginDocument."
+
+#~ msgid "    Too many %%EndDocument comments."
+#~ msgstr "    Número excessivo de comentários de %%EndDocument."
+
+#~ msgid "    Warning: file contains binary data."
+#~ msgstr "    Aviso: arquivo contém dados binários."
+
+#~ msgid "    Warning: no %%EndComments comment in file."
+#~ msgstr "    Aviso: nenhum comentário de %%EndComments no arquivo."
+
+#~ msgid "    Warning: obsolete DSC version %.1f in file."
+#~ msgstr "    Aviso: versão %.1f obsoleta de DSC no arquivo."
 
 #~ msgid "  ! expression            Unary NOT of expression."
 #~ msgstr "  ! expressão             Unário NÃO de expressão."
@@ -13021,11 +12909,18 @@ msgstr ""
 #~ msgstr ""
 #~ "  -C                      Envia requisições usando chunking (padrão)."
 
+#~ msgid "  -E                      Encrypt the connection."
+#~ msgstr "  -E                      Criptografa a conexão."
+
 #~ msgid ""
 #~ "  -F                      Run in the foreground but detach from console."
 #~ msgstr ""
 #~ "  -F                      Executa em primeiro plano, mas desanexa do "
 #~ "console."
+
+#~ msgid "  -H samba-server         Use the named SAMBA server."
+#~ msgstr ""
+#~ "  -H servidor-samba       Usa o servidor SAMBA chamado \"servidor-samba\"."
 
 #~ msgid "  -I                      Ignore errors."
 #~ msgstr "  -I                      Ignora erros."
@@ -13075,6 +12970,9 @@ msgstr ""
 #~ msgstr ""
 #~ "  -X                      Produz plist XML ao invés de texto normal."
 
+#~ msgid "  -a                      Export all printers."
+#~ msgstr "  -a                      Exporta todas as impressoras."
+
 #~ msgid "  -c                      Produce CSV output."
 #~ msgstr "  -c                      Produz saída em CSV."
 
@@ -13102,6 +13000,9 @@ msgstr ""
 #~ msgstr ""
 #~ "  -h regex                Corresponde o nome da máquina à expressão "
 #~ "regular."
+
+#~ msgid "  -h server[:port]        Specify server address."
+#~ msgstr "  -h servidor[:porta]     Especifica o endereço do servidor."
 
 #~ msgid ""
 #~ "  -i seconds              Repeat the last file with the given time "
@@ -13244,6 +13145,79 @@ msgstr ""
 #~ msgid "  {}                      URI"
 #~ msgstr "  {}                      URI"
 
+#~ msgid "Bad option + choice on line %d."
+#~ msgstr "Opção + escolha inválidas na linha %d."
+
+#~ msgid "Empty PPD file."
+#~ msgstr "Arquivo PPD vazio."
+
+#~ msgid "FAIL"
+#~ msgstr "FALHA"
+
+#~ msgid "Missing double quote on line %d."
+#~ msgstr "Faltando aspas duplas na linha %d."
+
+#~ msgid "Missing value on line %d."
+#~ msgstr "Faltando valor na linha %d."
+
+#~ msgid "No Windows printer drivers are installed."
+#~ msgstr "Nenhum driver de impressora Windows está instalado."
+
+#~ msgid ""
+#~ "Note: this program only validates the DSC comments, not the PostScript "
+#~ "itself."
+#~ msgstr ""
+#~ "Nota: esse programa só valida os comentários DSC, e não o próprio "
+#~ "PostScript."
+
+#~ msgid "PASS"
+#~ msgstr "PASSOU"
+
+#~ msgid "Password for %s required to access %s via SAMBA: "
+#~ msgstr "Senha para %s é necessária para acessar %s via SAMBA: "
+
+#~ msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível copiar arquivos de driver de impressora CUPS 64-bit (%d)."
+
+#~ msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível copiar arquivos de driver de impressora (%d) de Windows "
+#~ "64-bit."
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível copiar arquivos de driver de impressora (%d) de CUPS."
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível copiar arquivos de driver de impressora (%d) de Windows "
+#~ "2000."
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível copiar arquivos de driver de impressora (%d) de Windows "
+#~ "9x."
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível instalar arquivos de driver de impressora Windows 2000 "
+#~ "(%d)."
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)."
+#~ msgstr ""
+#~ "Não foi possível instalar arquivos de driver de impressora Windows 9x "
+#~ "(%d)."
+
+#~ msgid "Unable to set Windows printer driver (%d)."
+#~ msgstr "Não foi possível definir driver de impressora Windows (%d)."
+
+#~ msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+#~ msgstr "Uso: cupsaddsmb [opções] impressora1 ... impressoraN"
+
+#~ msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+#~ msgstr "Uso: cupstestdsc [opções] arquivo.ps [... arquivo.ps]"
+
 #~ msgid ""
 #~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 #~ msgstr "Uso: cupstestppd [opções] arquivo1.ppd[.gz] [... arquivoN.ppd[.gz]]"
@@ -13266,3 +13240,9 @@ msgstr ""
 #~ "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 #~ msgstr ""
 #~ "Uso: lpq [-P dest] [-U usuário] [-h máquina[:porta]] [-l] [+intervalo]"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed."
+#~ msgstr "Aviso, nenhum driver de impressora Windows 2000 está instalado."
+
+#~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+#~ msgstr "cupsaddsmb: Nenhum arquivo PPD para a impressora \"%s\" - %s"

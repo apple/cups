@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-12-06 14:40-0500\n"
+"POT-Creation-Date: 2018-12-06 14:58-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -320,12 +320,6 @@ msgid ""
 msgstr ""
 "        警告    ShortNickName は PPD 4.3 仕様で必須です。\n"
 "                参照: 64-65 ページ、セクション 5.3。"
-
-msgid "       cupsaddsmb [options] -a"
-msgstr "       cupsaddsmb [オプション] -a"
-
-msgid "       cupstestdsc [options] -"
-msgstr "       cupstestdsc [オプション] -"
 
 #, c-format
 msgid ""
@@ -802,103 +796,8 @@ msgstr ""
 msgid "    %d ERRORS FOUND"
 msgstr "    %d 個のエラーが見つかりました"
 
-msgid "    -h       Show program usage"
-msgstr "    -h       このプログラムの利用法を表示する"
-
-#, c-format
-msgid ""
-"    Bad %%%%BoundingBox: on line %d.\n"
-"        REF: Page 39, %%%%BoundingBox:"
-msgstr ""
-"    不正な %%%%BoundingBox: (%d 行)。\n"
-"        参照: 39 ページ、%%%%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Page: on line %d.\n"
-"        REF: Page 53, %%%%Page:"
-msgstr ""
-"    不正な %%%%Page: (%d 行)。\n"
-"        参照: 53 ページ、%%%%Page:"
-
-#, c-format
-msgid ""
-"    Bad %%%%Pages: on line %d.\n"
-"        REF: Page 43, %%%%Pages:"
-msgstr ""
-"    不正な %%%%Pages: (%d 行)。\n"
-"        REF: Page 43, %%%%Pages:"
-
-#, c-format
-msgid ""
-"    Line %d is longer than 255 characters (%d).\n"
-"        REF: Page 25, Line Length"
-msgstr ""
-"    %d 行が 255文字より長くなっています (%d)。\n"
-"        参照: 25 ページ、Line Length"
-
-msgid ""
-"    Missing %!PS-Adobe-3.0 on first line.\n"
-"        REF: Page 17, 3.1 Conforming Documents"
-msgstr ""
-"    先頭行に %!PS-Adobe-3.0 がありません。\n"
-"        参照: 17 ページ、3.1 Conforming Documents"
-
-#, c-format
-msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
-msgstr ""
-"    %%EndComments コメントが見つかりません。\n"
-"        参照: 41 ページ、%%EndComments"
-
-#, c-format
-msgid ""
-"    Missing or bad %%BoundingBox: comment.\n"
-"        REF: Page 39, %%BoundingBox:"
-msgstr ""
-"    %%BoundingBox: コメントが見つからないか不正です。\n"
-"        参照: 39 ページ、%%BoundingBox:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Page: comments.\n"
-"        REF: Page 53, %%Page:"
-msgstr ""
-"    %%Page: コメントが見つからないか不正です。\n"
-"        参照: 53 ページ、%%Page:"
-
-#, c-format
-msgid ""
-"    Missing or bad %%Pages: comment.\n"
-"        REF: Page 43, %%Pages:"
-msgstr ""
-"    %%Pages: コメントが見つからないか不正です。\n"
-"        参照: 43 ページ、%%Pages:"
-
 msgid "    NO ERRORS FOUND"
 msgstr "    エラーは見つかりませんでした"
-
-#, c-format
-msgid "    Saw %d lines that exceeded 255 characters."
-msgstr "    255文字を超える %d 行が見つかりました。"
-
-#, c-format
-msgid "    Too many %%BeginDocument comments."
-msgstr "    %%BeginDocument コメントが多すぎます。"
-
-#, c-format
-msgid "    Too many %%EndDocument comments."
-msgstr "    %%EndDocument コメントが多すぎます。"
-
-msgid "    Warning: file contains binary data."
-msgstr "    警告: ファイルにバイナリデータが含まれています。"
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file."
-msgstr "    警告: ファイルに %%EndComments コメントがありません。"
-
-#, c-format
-msgid "    Warning: obsolete DSC version %.1f in file."
-msgstr "    警告: ファイルは時代遅れの DSC バージョン %.1f です。"
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    行末を CR とする (Mac OS 9)。"
@@ -919,12 +818,6 @@ msgid "  -D name=value           Set named variable to value."
 msgstr ""
 "  -D name=value           name で指定された変数に値 value をセットする。"
 
-msgid "  -E                      Encrypt the connection."
-msgstr "  -E                      接続を暗号化する。"
-
-msgid "  -H samba-server         Use the named SAMBA server."
-msgstr "  -H sambaサーバー        指定の SAMBA サーバーを使う。"
-
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
 "  -I include-dir          インクルードディレクトリーを検索パスに含める。"
@@ -934,9 +827,6 @@ msgstr "  -P filename.ppd         PPD ファイルを指定する。"
 
 msgid "  -U username             Specify username."
 msgstr "  -U username             ユーザー名を指定する。"
-
-msgid "  -a                      Export all printers."
-msgstr "  -a                      すべてのプリンターをエクスポートする。"
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           指定したメッセージカタログをロードする。"
@@ -953,9 +843,6 @@ msgstr "  -d printer              指定されたプリンターを利用する�
 msgid "  -e                      Use every filter from the PPD file."
 msgstr ""
 "  -e                      PPD ファイルからすべてのフィルターを使用する。"
-
-msgid "  -h server[:port]        Specify server address."
-msgstr "  -h server[:port]        サーバーアドレスを指定する。"
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -3079,10 +2966,6 @@ msgid "Bad number-up value %d."
 msgstr "%d は不正な number-up 値です。"
 
 #, c-format
-msgid "Bad option + choice on line %d."
-msgstr "%d 行に不正なオプションと選択があります。"
-
-#, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "%d-%d は不正な page-ranges 値です。"
 
@@ -3340,9 +3223,6 @@ msgstr "EPL2 ラベルプリンター"
 msgid "Edit Configuration File"
 msgstr "設定ファイルの編集"
 
-msgid "Empty PPD file."
-msgstr "PPD ファイルが空です。"
-
 msgid "Encryption is not supported."
 msgstr "暗号化はサポートされていません。"
 
@@ -3586,9 +3466,6 @@ msgstr "Samba へプリンターをエクスポート"
 
 msgid "Expressions:"
 msgstr "式:"
-
-msgid "FAIL"
-msgstr "失敗"
 
 msgid "Fast Grayscale"
 msgstr ""
@@ -4025,10 +3902,6 @@ msgstr "1 列目にアスタリスクがありません"
 msgid "Missing document-number attribute."
 msgstr "document-number 属性がありません。"
 
-#, c-format
-msgid "Missing double quote on line %d."
-msgstr "%d 行に二重引用符がありません。"
-
 msgid "Missing form variable"
 msgstr "form 変数がありません。"
 
@@ -4062,10 +3935,6 @@ msgstr "URI のリソースがない"
 
 msgid "Missing scheme in URI"
 msgstr "URI のスキームがない"
-
-#, c-format
-msgid "Missing value on line %d."
-msgstr "%d 行に値がありません。"
 
 msgid "Missing value string"
 msgstr "値文字列がありません"
@@ -4138,9 +4007,6 @@ msgstr "PPD の名前がありません"
 
 msgid "No VarBind SEQUENCE"
 msgstr "VarBind SEQUENCE がありません"
-
-msgid "No Windows printer drivers are installed."
-msgstr "Windows プリンタードライバーがインストールされていません。"
 
 msgid "No active connection"
 msgstr "アクティブな接続はありません"
@@ -4266,13 +4132,6 @@ msgstr "印刷が許可されていません。"
 msgid "Note"
 msgstr "注意"
 
-msgid ""
-"Note: this program only validates the DSC comments, not the PostScript "
-"itself."
-msgstr ""
-"注意: このプログラムは DSC コメントを検証するだけで、PostScript 自身を検証す"
-"るものではありません。"
-
 msgid "OK"
 msgstr "OK"
 
@@ -4326,9 +4185,6 @@ msgstr "メモリーが足りません。"
 msgid "Output Mode"
 msgstr "出力モード"
 
-msgid "PASS"
-msgstr "合格"
-
 msgid "PCL Laser Printer"
 msgstr "PCL レーザープリンター"
 
@@ -4369,10 +4225,6 @@ msgstr "ParamCustominTearInterval"
 #, c-format
 msgid "Password for %s on %s? "
 msgstr "%s のパスワード (%s 上)? "
-
-#, c-format
-msgid "Password for %s required to access %s via SAMBA: "
-msgstr "%s のパスワード (SAMBA 経由で %s にアクセスするのに必要):"
 
 msgid "Pause Class"
 msgstr "クラスの休止"
@@ -4915,33 +4767,11 @@ msgid "Unable to contact printer, queuing on next printer in class."
 msgstr "プリンターと交信できません。クラス内の次のプリンターにキューします。"
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
-msgstr "64-bit 版の CUPS プリンタードライバーファイルをコピーできません (%d)。"
-
-#, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)."
-msgstr "64-bit 版の Windows プリンタードライバーをコピーできません (%d)。"
-
-#, c-format
-msgid "Unable to copy CUPS printer driver files (%d)."
-msgstr "複数の CUPS プリンタードライバーファイルをコピーできません (%d)。"
-
-#, c-format
 msgid "Unable to copy PPD file - %s"
 msgstr "PPD ファイルをコピーできません - %s"
 
 msgid "Unable to copy PPD file."
 msgstr "PPD ファイルをコピーできません。"
-
-#, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)."
-msgstr ""
-"複数の Windows 2000 プリンタードライバーファイルをコピーできません (%d)。"
-
-#, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)."
-msgstr ""
-"複数の Windows 9x プリンタードライバーファイルをコピーできません (%d)。"
 
 msgid "Unable to create credentials from array."
 msgstr ""
@@ -5034,17 +4864,6 @@ msgstr "プリンターの状態を取得できません"
 msgid "Unable to get printer status."
 msgstr "プリンターの状態を取得できません。"
 
-#, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)."
-msgstr ""
-"複数の Windows 2000 プリンタードライバーファイルをインストールできません "
-"(%d)。"
-
-#, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)."
-msgstr ""
-"複数の Windows 9x プリンタードライバーファイルをインストールできません (%d)。"
-
 msgid "Unable to load help index."
 msgstr "ヘルプの索引を読み込めません。"
 
@@ -5113,10 +4932,6 @@ msgstr "プリンタードライバーにコマンドを送信できません"
 
 msgid "Unable to send data to printer."
 msgstr "プリンターにデータを送信することができません。"
-
-#, c-format
-msgid "Unable to set Windows printer driver (%d)."
-msgstr "Windows プリンタードライバーを設定できません (%d)。"
 
 msgid "Unable to set options"
 msgstr "オプションを設定できません"
@@ -5306,9 +5121,6 @@ msgid ""
 "       cancel [options] [destination-id]"
 msgstr ""
 
-msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
-msgstr "Usage: cupsaddsmb [オプション] プリンター1 ... プリンターN"
-
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr "Usage: cupsctl [オプション] [パラメータ=値 ... パラメータN=値N]"
 
@@ -5317,9 +5129,6 @@ msgstr "使い方: cupsd [オプション]"
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
 msgstr "使い方: cupsfilter [ オプション ] [ -- ] ファイル名"
-
-msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
-msgstr "使い方: cupstestdsc [オプション] ファイル名.ps [... ファイル名.ps]"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -5422,9 +5231,6 @@ msgstr "プリンターが使用可能になるのを待っています。"
 
 msgid "Waiting for printer to finish."
 msgstr "プリンターが終了するのを待っています。"
-
-msgid "Warning, no Windows 2000 printer drivers are installed."
-msgstr "警告、Windows 2000 プリンタードライバーがインストールされていません。"
 
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
@@ -5664,10 +5470,6 @@ msgstr "cups-deviced の実行に失敗しました。"
 
 msgid "cups-driverd failed to execute."
 msgstr "cups-driverd の実行に失敗しました。"
-
-#, c-format
-msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
-msgstr "cupsaddsmb: プリンター \"%s\" の PPD ファイルがありません - %s"
 
 msgid "cupsctl: Cannot set Listen or Port directly."
 msgstr "cupsctl: Listen あるいは Port を直接設定できません。"
@@ -12910,8 +12712,97 @@ msgstr ""
 #~ msgid "                          Issue warnings instead of errors."
 #~ msgstr "                          エラーを警告として扱う。"
 
+#~ msgid "       cupsaddsmb [options] -a"
+#~ msgstr "       cupsaddsmb [オプション] -a"
+
+#~ msgid "       cupstestdsc [options] -"
+#~ msgstr "       cupstestdsc [オプション] -"
+
 #~ msgid "       program | cupstestppd [options] -"
 #~ msgstr "       program | cupstestppd [オプション] -"
+
+#~ msgid "    -h       Show program usage"
+#~ msgstr "    -h       このプログラムの利用法を表示する"
+
+#~ msgid ""
+#~ "    Bad %%%%BoundingBox: on line %d.\n"
+#~ "        REF: Page 39, %%%%BoundingBox:"
+#~ msgstr ""
+#~ "    不正な %%%%BoundingBox: (%d 行)。\n"
+#~ "        参照: 39 ページ、%%%%BoundingBox:"
+
+#~ msgid ""
+#~ "    Bad %%%%Page: on line %d.\n"
+#~ "        REF: Page 53, %%%%Page:"
+#~ msgstr ""
+#~ "    不正な %%%%Page: (%d 行)。\n"
+#~ "        参照: 53 ページ、%%%%Page:"
+
+#~ msgid ""
+#~ "    Bad %%%%Pages: on line %d.\n"
+#~ "        REF: Page 43, %%%%Pages:"
+#~ msgstr ""
+#~ "    不正な %%%%Pages: (%d 行)。\n"
+#~ "        REF: Page 43, %%%%Pages:"
+
+#~ msgid ""
+#~ "    Line %d is longer than 255 characters (%d).\n"
+#~ "        REF: Page 25, Line Length"
+#~ msgstr ""
+#~ "    %d 行が 255文字より長くなっています (%d)。\n"
+#~ "        参照: 25 ページ、Line Length"
+
+#~ msgid ""
+#~ "    Missing %!PS-Adobe-3.0 on first line.\n"
+#~ "        REF: Page 17, 3.1 Conforming Documents"
+#~ msgstr ""
+#~ "    先頭行に %!PS-Adobe-3.0 がありません。\n"
+#~ "        参照: 17 ページ、3.1 Conforming Documents"
+
+#~ msgid ""
+#~ "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+#~ msgstr ""
+#~ "    %%EndComments コメントが見つかりません。\n"
+#~ "        参照: 41 ページ、%%EndComments"
+
+#~ msgid ""
+#~ "    Missing or bad %%BoundingBox: comment.\n"
+#~ "        REF: Page 39, %%BoundingBox:"
+#~ msgstr ""
+#~ "    %%BoundingBox: コメントが見つからないか不正です。\n"
+#~ "        参照: 39 ページ、%%BoundingBox:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Page: comments.\n"
+#~ "        REF: Page 53, %%Page:"
+#~ msgstr ""
+#~ "    %%Page: コメントが見つからないか不正です。\n"
+#~ "        参照: 53 ページ、%%Page:"
+
+#~ msgid ""
+#~ "    Missing or bad %%Pages: comment.\n"
+#~ "        REF: Page 43, %%Pages:"
+#~ msgstr ""
+#~ "    %%Pages: コメントが見つからないか不正です。\n"
+#~ "        参照: 43 ページ、%%Pages:"
+
+#~ msgid "    Saw %d lines that exceeded 255 characters."
+#~ msgstr "    255文字を超える %d 行が見つかりました。"
+
+#~ msgid "    Too many %%BeginDocument comments."
+#~ msgstr "    %%BeginDocument コメントが多すぎます。"
+
+#~ msgid "    Too many %%EndDocument comments."
+#~ msgstr "    %%EndDocument コメントが多すぎます。"
+
+#~ msgid "    Warning: file contains binary data."
+#~ msgstr "    警告: ファイルにバイナリデータが含まれています。"
+
+#~ msgid "    Warning: no %%EndComments comment in file."
+#~ msgstr "    警告: ファイルに %%EndComments コメントがありません。"
+
+#~ msgid "    Warning: obsolete DSC version %.1f in file."
+#~ msgstr "    警告: ファイルは時代遅れの DSC バージョン %.1f です。"
 
 #~ msgid "  ! expression            Unary NOT of expression."
 #~ msgstr "! <式>                  式を否定する単項演算子。"
@@ -13028,11 +12919,17 @@ msgstr ""
 #~ msgstr ""
 #~ "  -C                      chunking を用いてリクエストを送る (デフォルト)。"
 
+#~ msgid "  -E                      Encrypt the connection."
+#~ msgstr "  -E                      接続を暗号化する。"
+
 #~ msgid ""
 #~ "  -F                      Run in the foreground but detach from console."
 #~ msgstr ""
 #~ "  -F                      フォアグラウンドで実行するがコンソールからはデ"
 #~ "タッチする。"
+
+#~ msgid "  -H samba-server         Use the named SAMBA server."
+#~ msgstr "  -H sambaサーバー        指定の SAMBA サーバーを使う。"
 
 #~ msgid "  -I                      Ignore errors."
 #~ msgstr "  -I                      エラーを無視する。"
@@ -13076,6 +12973,9 @@ msgstr ""
 #~ msgid "  -X                      Produce XML plist instead of plain text."
 #~ msgstr "  -X                      プレーンテキストの代わりに XML を用いる。"
 
+#~ msgid "  -a                      Export all printers."
+#~ msgstr "  -a                      すべてのプリンターをエクスポートする。"
+
 #~ msgid "  -c                      Produce CSV output."
 #~ msgstr "  -c                      CSV 出力を行う。"
 
@@ -13101,6 +13001,9 @@ msgstr ""
 
 #~ msgid "  -h regex                Match hostname to regular expression."
 #~ msgstr "  -h <正規表現>           ホスト名が正規表現にマッチするか。"
+
+#~ msgid "  -h server[:port]        Specify server address."
+#~ msgstr "  -h server[:port]        サーバーアドレスを指定する。"
 
 #~ msgid ""
 #~ "  -i seconds              Repeat the last file with the given time "
@@ -13234,6 +13137,74 @@ msgstr ""
 #~ msgid "  {}                      URI"
 #~ msgstr "  {}                      URI"
 
+#~ msgid "Bad option + choice on line %d."
+#~ msgstr "%d 行に不正なオプションと選択があります。"
+
+#~ msgid "Empty PPD file."
+#~ msgstr "PPD ファイルが空です。"
+
+#~ msgid "FAIL"
+#~ msgstr "失敗"
+
+#~ msgid "Missing double quote on line %d."
+#~ msgstr "%d 行に二重引用符がありません。"
+
+#~ msgid "Missing value on line %d."
+#~ msgstr "%d 行に値がありません。"
+
+#~ msgid "No Windows printer drivers are installed."
+#~ msgstr "Windows プリンタードライバーがインストールされていません。"
+
+#~ msgid ""
+#~ "Note: this program only validates the DSC comments, not the PostScript "
+#~ "itself."
+#~ msgstr ""
+#~ "注意: このプログラムは DSC コメントを検証するだけで、PostScript 自身を検証"
+#~ "するものではありません。"
+
+#~ msgid "PASS"
+#~ msgstr "合格"
+
+#~ msgid "Password for %s required to access %s via SAMBA: "
+#~ msgstr "%s のパスワード (SAMBA 経由で %s にアクセスするのに必要):"
+
+#~ msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+#~ msgstr ""
+#~ "64-bit 版の CUPS プリンタードライバーファイルをコピーできません (%d)。"
+
+#~ msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+#~ msgstr "64-bit 版の Windows プリンタードライバーをコピーできません (%d)。"
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)."
+#~ msgstr "複数の CUPS プリンタードライバーファイルをコピーできません (%d)。"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)."
+#~ msgstr ""
+#~ "複数の Windows 2000 プリンタードライバーファイルをコピーできません (%d)。"
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)."
+#~ msgstr ""
+#~ "複数の Windows 9x プリンタードライバーファイルをコピーできません (%d)。"
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)."
+#~ msgstr ""
+#~ "複数の Windows 2000 プリンタードライバーファイルをインストールできません "
+#~ "(%d)。"
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)."
+#~ msgstr ""
+#~ "複数の Windows 9x プリンタードライバーファイルをインストールできません "
+#~ "(%d)。"
+
+#~ msgid "Unable to set Windows printer driver (%d)."
+#~ msgstr "Windows プリンタードライバーを設定できません (%d)。"
+
+#~ msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+#~ msgstr "Usage: cupsaddsmb [オプション] プリンター1 ... プリンターN"
+
+#~ msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+#~ msgstr "使い方: cupstestdsc [オプション] ファイル名.ps [... ファイル名.ps]"
+
 #~ msgid ""
 #~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 #~ msgstr ""
@@ -13259,3 +13230,10 @@ msgstr ""
 #~ "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 #~ msgstr ""
 #~ "使い方: lpq [-P 宛先] [-U ユーザー名] [-h ホスト名[:ポート]] [-l] [+間隔]"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed."
+#~ msgstr ""
+#~ "警告、Windows 2000 プリンタードライバーがインストールされていません。"
+
+#~ msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+#~ msgstr "cupsaddsmb: プリンター \"%s\" の PPD ファイルがありません - %s"
