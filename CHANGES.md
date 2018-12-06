@@ -1,10 +1,12 @@
-CHANGES - 2.2.10 - 2018-12-05
+CHANGES - 2.2.10 - 2018-12-06
 =============================
 
 
 Changes in CUPS v2.2.10
 -----------------------
 
+- The `lpoptions` command now works with IPP Everywhere printers that have not
+  yet been added as local queues (Issue #5045)
 - Added USB quirk rules (Issue #5395, Issue #5443)
 - The generated PPD files for IPP Everywhere printers did not contain the
   cupsManualCopies keyword (Issue #5433)
