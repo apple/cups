@@ -1,8 +1,8 @@
 /*
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -153,8 +153,13 @@ main(int  argc,				/* I - Number of command-line args */
   fg = 0;
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
+  {
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-')
+    {
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
+      {
         switch (*opt)
 	{
 	  case 'C' : /* Run as child with config file */
@@ -309,12 +314,15 @@ main(int  argc,				/* I - Number of command-line args */
 	      usage(1);
 	      break;
 	}
+      }
+    }
     else
     {
       _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting."),
                       argv[i]);
       usage(1);
     }
+  }
 
   if (!ConfigurationFile)
     cupsdSetString(&ConfigurationFile, CUPS_SERVERROOT "/cupsd.conf");
@@ -2125,15 +2133,15 @@ usage(int status)			/* O - Exit status */
 
   _cupsLangPuts(fp, _("Usage: cupsd [options]"));
   _cupsLangPuts(fp, _("Options:"));
-  _cupsLangPuts(fp, _("  -c cupsd.conf           Set cupsd.conf file to use."));
-  _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
-  _cupsLangPuts(fp, _("  -F                      Run in the foreground but detach from console."));
-  _cupsLangPuts(fp, _("  -h                      Show this usage message."));
+  _cupsLangPuts(fp, _("-c cupsd.conf           Set cupsd.conf file to use."));
+  _cupsLangPuts(fp, _("-f                      Run in the foreground."));
+  _cupsLangPuts(fp, _("-F                      Run in the foreground but detach from console."));
+  _cupsLangPuts(fp, _("-h                      Show this usage message."));
 #ifdef HAVE_ONDEMAND
-  _cupsLangPuts(fp, _("  -l                      Run cupsd on demand."));
+  _cupsLangPuts(fp, _("-l                      Run cupsd on demand."));
 #endif /* HAVE_ONDEMAND */
-  _cupsLangPuts(fp, _("  -s cups-files.conf      Set cups-files.conf file to use."));
-  _cupsLangPuts(fp, _("  -t                      Test the configuration file."));
+  _cupsLangPuts(fp, _("-s cups-files.conf      Set cups-files.conf file to use."));
+  _cupsLangPuts(fp, _("-t                      Test the configuration file."));
 
   exit(status);
 }
