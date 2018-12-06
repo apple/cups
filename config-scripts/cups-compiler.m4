@@ -182,7 +182,7 @@ if test -n "$GCC"; then
 
 	# Additional warning options for development testing...
 	if test -d .git; then
-		WARNING_OPTIONS="-Werror $WARNING_OPTIONS"
+		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
 	fi
 else
 	# Add vendor-specific compiler options...
