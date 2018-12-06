@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-09-28 11:21-0400\n"
+"POT-Creation-Date: 2018-12-06 14:40-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -141,12 +141,6 @@ msgid ""
 msgstr ""
 "\n"
 "     RESULTAT DETALLAT DEL TEST DE CONFORMITAT"
-
-msgid "                          Ignore specific warnings."
-msgstr "                          Ignora els avisos específics."
-
-msgid "                          Issue warnings instead of errors."
-msgstr "                          Mostra avisos enlloc d'errors."
 
 msgid "                REF: Page 15, section 3.1."
 msgstr "                REF: pàgina 15, secció 3.1."
@@ -339,9 +333,6 @@ msgstr "       cupsaddsmb [opcions] -a"
 
 msgid "       cupstestdsc [options] -"
 msgstr "       cupstestdsc [opcions] -"
-
-msgid "       program | cupstestppd [options] -"
-msgstr "       programa | cupstestppd [opcions] -"
 
 #, c-format
 msgid ""
@@ -909,128 +900,17 @@ msgstr "     Avís: no hi ha cap %%EndComments al fitxer."
 msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr "     Avís: versió del DSC %.1f obsoleta al fitxer."
 
-msgid "  ! expression            Unary NOT of expression."
-msgstr ""
-
-msgid "  ( expressions )         Group expressions."
-msgstr ""
-
-msgid "  --[no-]debug-logging    Turn debug logging on/off."
-msgstr "  --[no-]debug-logging    Activa o desactiva el registre de depuració."
-
-msgid "  --[no-]remote-admin     Turn remote administration on/off."
-msgstr "  --[no-]remote-admin     Activa o desactiva l'administració remota."
-
-msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
-msgstr "  --[no-]remote-any       Permet o impedeix l'accés des d'Internet."
-
-msgid "  --[no-]share-printers   Turn printer sharing on/off."
-msgstr ""
-"  --[no-]share-printers   Activa o desactiva la compartició d'impressores."
-
-msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
-msgstr ""
-"  --[no-]user-cancel-any  Permet o impedeix que els usuaris cancel·lin "
-"tasques."
-
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    Final de línia amb CR (Mac OS 9)."
 
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  Final de línia amb CR + LF (Windows)."
 
-msgid "  --domain regex          Match domain to regular expression."
-msgstr ""
-
-msgid ""
-"  --exec utility [argument ...] ;\n"
-"                          Execute program if true."
-msgstr ""
-
-msgid "  --false                 Always false."
-msgstr ""
-
-msgid "  --help                  Show help."
-msgstr ""
-
-msgid "  --help                  Show this help."
-msgstr ""
-
-msgid "  --host regex            Match hostname to regular expression."
-msgstr ""
-
-msgid "  --ippserver filename    Produce ippserver attribute file."
-msgstr ""
-
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr ""
-
-msgid "  --local                 True if service is local."
-msgstr ""
-
-msgid "  --ls                    List attributes."
-msgstr ""
-
-msgid "  --name regex            Match service name to regular expression."
-msgstr ""
-
-msgid "  --not expression        Unary NOT of expression."
-msgstr ""
-
-msgid "  --path regex            Match resource path to regular expression."
-msgstr ""
-
-msgid "  --port number[-number]  Match port to number or range."
-msgstr ""
-
-msgid "  --print                 Print URI if true."
-msgstr ""
-
-msgid "  --print-name            Print service name if true."
-msgstr ""
-
-msgid "  --quiet                 Quietly report match via exit code."
-msgstr ""
-
-msgid "  --remote                True if service is remote."
-msgstr ""
-
-msgid ""
-"  --stop-after-include-error\n"
-"                          Stop tests after a failed INCLUDE."
-msgstr ""
-
-msgid "  --true                  Always true."
-msgstr ""
-
-msgid "  --txt key               True if the TXT record contains the key."
-msgstr ""
-
-msgid "  --txt-* regex           Match TXT record key to regular expression."
-msgstr ""
-
-msgid "  --uri regex             Match URI to regular expression."
-msgstr ""
-
-msgid "  --version               Show program version."
-msgstr ""
-
-msgid "  --version               Show version."
-msgstr ""
-
-msgid "  -4                      Connect using IPv4."
-msgstr "  -4                      Connecta fent servir IPv4."
-
-msgid "  -6                      Connect using IPv6."
-msgstr "  -6                      Connecta fent servir IPv6."
-
-msgid "  -C                      Send requests using chunking (default)."
-msgstr ""
-"  -C                      Envia les sol·licituds fent servir la fragmentació "
-"(per defecte)."
 
 msgid "  -D                      Remove the input file when finished."
 msgstr "  -D                      Elimina el fitxer d'entrada quan ha acabat."
@@ -1041,78 +921,20 @@ msgstr "  -D nom=valor            Estableix la variable indicada al valor."
 msgid "  -E                      Encrypt the connection."
 msgstr "  -E                      Xifra la connexió."
 
-msgid ""
-"  -E                      Test with encryption using HTTP Upgrade to TLS."
-msgstr ""
-
-msgid ""
-"  -F                      Run in the foreground but detach from console."
-msgstr ""
-"  -F                      Executa en primer pla però separat de la consola."
-
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr "  -H servidor-samba         Fa servir el servidor SAMBA indicat."
-
-msgid "  -I                      Ignore errors."
-msgstr "  -I                      Ignora els errors."
 
 msgid "  -I include-dir          Add include directory to search path."
 msgstr "  -I dir-inclòs          Afegeix el directori inclòs al camí de cerca."
 
-msgid "  -I {filename,filters,none,profiles}"
-msgstr "  -I {nomfitxer,filtres,cap,perfils}"
-
-msgid "  -L                      Send requests using content-length."
-msgstr ""
-"  -L                      Envia les peticions fent servir content-length."
-
-msgid ""
-"  -P filename.plist       Produce XML plist to a file and test report to "
-"standard output."
-msgstr ""
-
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P nomfitxer.ppd         Estableix el fitxer PPD."
-
-msgid "  -P number[-number]      Match port to number or range."
-msgstr ""
-
-msgid "  -R root-directory       Set alternate root."
-msgstr "  -R directori-arrel       Estableix una arrel alternativa."
-
-msgid "  -S                      Test with encryption using HTTPS."
-msgstr ""
-
-msgid "  -T seconds              Set the browse timeout in seconds."
-msgstr ""
-
-msgid "  -T seconds              Set the receive/send timeout in seconds."
-msgstr ""
-"  -T segons              Estableix el temps d'espera màxim per enviar i "
-"rebre en segons."
 
 msgid "  -U username             Specify username."
 msgstr "  -U nomusuari             Especifica un nom d'usuari."
 
-msgid "  -V version              Set default IPP version."
-msgstr "  -V versió              Estableix la versió per defecte del IPP."
-
-msgid ""
-"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
-"translations}"
-msgstr ""
-"  -W {tots,cap,restringits,per defecte,dúplex,filtres,perfils,mides,"
-"traduccions}"
-
-msgid "  -X                      Produce XML plist instead of plain text."
-msgstr ""
-"  -X                      Retorna els plist en XML en comptes de text pla."
-
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Exporta totes les impressores."
-
-msgid "  -c                      Produce CSV output."
-msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catàleg.po           Carrega el catàleg de missatges indicat."
@@ -1120,41 +942,14 @@ msgstr "  -c catàleg.po           Carrega el catàleg de missatges indicat."
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
-msgid "  -c cupsd.conf           Set cupsd.conf file to use."
-msgstr ""
-"  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer servir."
-
-msgid "  -d name=value           Set named variable to value."
-msgstr "  -d nom=valor           Estableix la variable indicada al valor."
-
 msgid "  -d output-dir           Specify the output directory."
 msgstr "  -d dir-sortida           Especifica el directori de sortida."
 
 msgid "  -d printer              Use the named printer."
 msgstr "  -d impressora              Fa servir la impressora indicada."
 
-msgid "  -d regex                Match domain to regular expression."
-msgstr ""
-
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Fa servir tots els filtres del fitxer PPD."
-
-msgid "  -f                      Run in the foreground."
-msgstr "  -f                      Executa en primer pla."
-
-msgid "  -f filename             Set default request filename."
-msgstr ""
-"  -f nomfitxer             Estableix el nom del fitxer per defecte de la "
-"sol·licitud."
-
-msgid "  -h                      Show this usage message."
-msgstr "  -h                      Mostra aquest missatge de sintaxi."
-
-msgid "  -h                      Validate HTTP response headers."
-msgstr ""
-
-msgid "  -h regex                Match hostname to regular expression."
-msgstr ""
 
 msgid "  -h server[:port]        Specify server address."
 msgstr "  -h servidor[:port]        Especifica l'adreça del servidor."
@@ -1165,25 +960,11 @@ msgstr ""
 "no s'especifica)."
 
 msgid ""
-"  -i seconds              Repeat the last file with the given time interval."
-msgstr ""
-"  -i segons              Repeteix l'últim fitxer amb l'interval especificat."
-
-msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
 msgstr ""
 "  -j id-feina[,N]           Filtra el fitxer N a la feina especificada (el "
 "fitxer per defecte és 1)."
-
-msgid "  -l                      List attributes."
-msgstr ""
-
-msgid "  -l                      Produce plain text output."
-msgstr ""
-
-msgid "  -l                      Run cupsd on demand."
-msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
@@ -1204,15 +985,6 @@ msgid "  -n copies               Set number of copies."
 msgstr "  -n còpies               Estableix el nombre de còpies."
 
 msgid ""
-"  -n count                Repeat the last file the given number of times."
-msgstr ""
-"  -n comptador                Repeteix l'últim fitxer el nombre indicat de "
-"vegades."
-
-msgid "  -n regex                Match service name to regular expression."
-msgstr ""
-
-msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
 "  -o nomfitxer.drv         Estableix el fitxer d'informació del controlador "
@@ -1226,41 +998,11 @@ msgstr ""
 msgid "  -o name=value           Set option(s)."
 msgstr "  -o nom=valor           Estableix les opcions."
 
-msgid "  -p                      Print URI if true."
-msgstr ""
-
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p nomfitxer.ppd         Estableix el fitxer PPD."
 
-msgid "  -q                      Quietly report match via exit code."
-msgstr ""
-
-msgid "  -q                      Run silently."
-msgstr "  -q                      S'executa en mode silenciós."
-
-msgid "  -r                      True if service is remote."
-msgstr ""
-
-msgid "  -r                      Use 'relaxed' open mode."
-msgstr "  -r                      Fa servir el mode obert «relaxat»."
-
-msgid "  -s                      Print service name if true."
-msgstr ""
-
-msgid "  -s cups-files.conf      Set cups-files.conf file to use."
-msgstr ""
-
-msgid "  -t                      Produce a test report."
-msgstr "  -t                      Genera un informe de prova."
-
 msgid "  -t                      Test PPDs instead of generating them."
 msgstr "  -t                      Prova els  PPDs en comptes de generar-los."
-
-msgid "  -t                      Test the configuration file."
-msgstr "  -t                      Prova el fitxer de configuració."
-
-msgid "  -t key                  True if the TXT record contains the key."
-msgstr ""
 
 msgid "  -t title                Set title."
 msgstr "  -t títol                Estableix el títol."
@@ -1268,96 +1010,22 @@ msgstr "  -t títol                Estableix el títol."
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      Elimina el fitxer PPD quan ha acabat."
 
-msgid "  -u regex                Match URI to regular expression."
-msgstr ""
-
 msgid "  -v                      Be verbose."
 msgstr "  -v                      Mode detallat."
-
-msgid "  -vv                     Be very verbose."
-msgstr "  -vv                     Mode molt detallat."
-
-msgid ""
-"  -x utility [argument ...] ;\n"
-"                          Execute program if true."
-msgstr ""
 
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr ""
 "  -z                      Comprimeix els fitxers PPD fent servir el zip de "
 "GNU."
 
-msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
-msgstr ""
-
-msgid ""
-"  IPPFIND_SERVICE_HOSTNAME\n"
-"                          Fully-qualified domain name"
-msgstr ""
-
-msgid "  IPPFIND_SERVICE_NAME    Service instance name"
-msgstr ""
-
-msgid "  IPPFIND_SERVICE_PORT    Port number"
-msgstr ""
-
-msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
-msgstr ""
-
-msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
-msgstr ""
-
-msgid "  IPPFIND_SERVICE_URI     URI"
-msgstr ""
-
-msgid "  IPPFIND_TXT_*           Value of TXT record key"
-msgstr ""
-
-msgid ""
-"  expression --and expression\n"
-"                          Logical AND."
-msgstr ""
-
-msgid ""
-"  expression --or expression\n"
-"                          Logical OR."
-msgstr ""
-
-msgid "  expression expression   Logical AND."
-msgstr ""
-
-msgid "  {service_domain}        Domain name"
-msgstr ""
-
-msgid "  {service_hostname}      Fully-qualified domain name"
-msgstr ""
-
-msgid "  {service_name}          Service instance name"
-msgstr ""
-
-msgid "  {service_port}          Port number"
-msgstr ""
-
-msgid "  {service_regtype}       DNS-SD registration type"
-msgstr ""
-
-msgid "  {service_scheme}        URI scheme"
-msgstr ""
-
-msgid "  {service_uri}           URI"
-msgstr ""
-
-msgid "  {txt_*}                 Value of TXT record key"
-msgstr ""
-
-msgid "  {}                      URI"
-msgstr ""
-
 msgid " FAIL"
 msgstr " ERROR"
 
 msgid " PASS"
 msgstr " VÀLID"
+
+msgid "! expression            Unary NOT of expression"
+msgstr ""
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
@@ -1940,6 +1608,136 @@ msgstr "%s: avís - s'ignora l'opció de formulari."
 msgid "%s: Warning - mode option ignored."
 msgstr "%s: avís - s'ignora l'opció de mode."
 
+msgid "( expressions )         Group expressions"
+msgstr ""
+
+msgid "-                       Cancel all jobs"
+msgstr ""
+
+msgid "-# num-copies           Specify the number of copies to print"
+msgstr ""
+
+msgid "--[no-]debug-logging    Turn debug logging on/off"
+msgstr ""
+
+msgid "--[no-]remote-admin     Turn remote administration on/off"
+msgstr ""
+
+msgid "--[no-]remote-any       Allow/prevent access from the Internet"
+msgstr ""
+
+msgid "--[no-]share-printers   Turn printer sharing on/off"
+msgstr ""
+
+msgid "--[no-]user-cancel-any  Allow/prevent users to cancel any job"
+msgstr ""
+
+msgid ""
+"--device-id device-id   Show models matching the given IEEE 1284 device ID"
+msgstr ""
+
+msgid "--domain regex          Match domain to regular expression"
+msgstr ""
+
+msgid ""
+"--exclude-schemes scheme-list\n"
+"                        Exclude the specified URI schemes"
+msgstr ""
+
+msgid ""
+"--exec utility [argument ...] ;\n"
+"                        Execute program if true"
+msgstr ""
+
+msgid "--false                 Always false"
+msgstr ""
+
+msgid "--hold                  Hold new jobs"
+msgstr ""
+
+msgid "--host regex            Match hostname to regular expression"
+msgstr ""
+
+msgid ""
+"--include-schemes scheme-list\n"
+"                        Include only the specified URI schemes"
+msgstr ""
+
+msgid "--ippserver filename    Produce ippserver attribute file"
+msgstr ""
+
+msgid "--language locale       Show models matching the given locale"
+msgstr ""
+
+msgid "--local                 True if service is local"
+msgstr ""
+
+msgid "--ls                    List attributes"
+msgstr ""
+
+msgid ""
+"--make-and-model name   Show models matching the given make and model name"
+msgstr ""
+
+msgid "--name regex            Match service name to regular expression"
+msgstr ""
+
+msgid "--not expression        Unary NOT of expression"
+msgstr ""
+
+msgid "--path regex            Match resource path to regular expression"
+msgstr ""
+
+msgid "--port number[-number]  Match port to number or range"
+msgstr ""
+
+msgid "--print                 Print URI if true"
+msgstr ""
+
+msgid "--print-name            Print service name if true"
+msgstr ""
+
+msgid ""
+"--product name          Show models matching the given PostScript product"
+msgstr ""
+
+msgid "--quiet                 Quietly report match via exit code"
+msgstr ""
+
+msgid "--release               Release previously held jobs"
+msgstr ""
+
+msgid "--remote                True if service is remote"
+msgstr ""
+
+msgid ""
+"--stop-after-include-error\n"
+"                        Stop tests after a failed INCLUDE"
+msgstr ""
+
+msgid ""
+"--timeout seconds       Specify the maximum number of seconds to discover "
+"devices"
+msgstr ""
+
+msgid "--true                  Always true"
+msgstr ""
+
+msgid "--txt key               True if the TXT record contains the key"
+msgstr ""
+
+msgid "--txt-* regex           Match TXT record key to regular expression"
+msgstr ""
+
+msgid "--uri regex             Match URI to regular expression"
+msgstr ""
+
+msgid "--version               Show program version"
+msgstr ""
+
+msgid "--version               Show version"
+msgstr ""
+
 msgid "-1"
 msgstr "-1"
 
@@ -1997,6 +1795,9 @@ msgstr "-35"
 msgid "-4"
 msgstr "-4"
 
+msgid "-4                      Connect using IPv4"
+msgstr ""
+
 msgid "-40"
 msgstr "-40"
 
@@ -2014,6 +1815,9 @@ msgstr "-55"
 
 msgid "-6"
 msgstr "-6"
+
+msgid "-6                      Connect using IPv6"
+msgstr ""
 
 msgid "-60"
 msgstr "-60"
@@ -2047,6 +1851,434 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "-C                      Send requests using chunking (default)"
+msgstr ""
+
+msgid "-D description          Specify the textual description of the printer"
+msgstr ""
+
+msgid ""
+"-E                      Enable and accept jobs on the printer (after -p)"
+msgstr ""
+
+msgid "-E                      Encrypt the connection to the server"
+msgstr ""
+
+msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
+msgstr ""
+
+msgid "-F                      Run in the foreground but detach from console."
+msgstr ""
+
+msgid "-H                      Show the default server and port"
+msgstr ""
+
+msgid "-H HH:MM                Hold the job until the specified UTC time"
+msgstr ""
+
+msgid "-H hold                 Hold the job until released/resumed"
+msgstr ""
+
+msgid "-H immediate            Print the job as soon as possible"
+msgstr ""
+
+msgid "-H restart              Reprint the job"
+msgstr ""
+
+msgid "-H resume               Resume a held job"
+msgstr ""
+
+msgid "-H server[:port]        Connect to the named server and port"
+msgstr ""
+
+msgid "-I                      Ignore errors"
+msgstr ""
+
+msgid ""
+"-I {filename,filters,none,profiles}\n"
+"                          Ignore specific warnings"
+msgstr ""
+
+msgid "-L                      Send requests using content-length"
+msgstr ""
+
+msgid "-L location             Specify the textual location of the printer"
+msgstr ""
+
+msgid "-P destination          Show status for the specified destination"
+msgstr ""
+
+msgid "-P destination          Specify the destination"
+msgstr ""
+
+msgid ""
+"-P filename.plist       Produce XML plist to a file and test report to "
+"standard output"
+msgstr ""
+
+msgid "-P number[-number]      Match port to number or range"
+msgstr ""
+
+msgid "-P page-list            Specify a list of pages to print"
+msgstr ""
+
+msgid "-R                      Show the ranking of jobs"
+msgstr ""
+
+msgid "-R name-default         Remove the default value for the named option"
+msgstr ""
+
+msgid "-R root-directory       Set alternate root"
+msgstr ""
+
+msgid "-S                      Test with encryption using HTTPS"
+msgstr ""
+
+msgid "-T seconds              Set the browse timeout in seconds"
+msgstr ""
+
+msgid "-T seconds              Set the receive/send timeout in seconds"
+msgstr ""
+
+msgid "-T title                Specify the job title"
+msgstr ""
+
+msgid "-U username             Specify the username to use for authentication"
+msgstr ""
+
+msgid "-U username             Specify username to use for authentication"
+msgstr ""
+
+msgid "-V version              Set default IPP version"
+msgstr ""
+
+msgid "-W completed            Show completed jobs"
+msgstr ""
+
+msgid "-W not-completed        Show pending jobs"
+msgstr ""
+
+msgid ""
+"-W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}\n"
+"                          Issue warnings instead of errors"
+msgstr ""
+
+msgid "-X                      Produce XML plist instead of plain text"
+msgstr ""
+
+msgid "-a                      Cancel all jobs"
+msgstr ""
+
+msgid "-a                      Show jobs on all destinations"
+msgstr ""
+
+msgid "-a [destination(s)]     Show the accepting state of destinations"
+msgstr ""
+
+msgid "-c                      Make a copy of the print file(s)"
+msgstr ""
+
+msgid "-c                      Produce CSV output"
+msgstr ""
+
+msgid "-c [class(es)]          Show classes and their member printers"
+msgstr ""
+
+msgid "-c class                Add the named destination to a class"
+msgstr ""
+
+msgid "-c cupsd.conf           Set cupsd.conf file to use."
+msgstr ""
+
+msgid "-d                      Show the default destination"
+msgstr ""
+
+msgid "-d destination          Set default destination"
+msgstr ""
+
+msgid "-d destination          Set the named destination as the server default"
+msgstr ""
+
+msgid "-d name=value           Set named variable to value"
+msgstr ""
+
+msgid "-d regex                Match domain to regular expression"
+msgstr ""
+
+msgid "-e                      Show available destinations on the network"
+msgstr ""
+
+msgid "-f                      Run in the foreground."
+msgstr ""
+
+msgid "-f filename             Set default request filename"
+msgstr ""
+
+msgid "-h                      Show this usage message."
+msgstr ""
+
+msgid "-h                      Validate HTTP response headers"
+msgstr ""
+
+msgid "-h regex                Match hostname to regular expression"
+msgstr ""
+
+msgid "-h server[:port]        Connect to the named server and port"
+msgstr ""
+
+msgid "-i id                   Specify an existing job ID to modify"
+msgstr ""
+
+msgid "-i ppd-file             Specify a PPD file for the printer"
+msgstr ""
+
+msgid ""
+"-i seconds              Repeat the last file with the given time interval"
+msgstr ""
+
+msgid "-l                      List attributes"
+msgstr ""
+
+msgid "-l                      Produce plain text output"
+msgstr ""
+
+msgid "-l                      Run cupsd on demand."
+msgstr ""
+
+msgid "-l                      Show supported options and values"
+msgstr ""
+
+msgid "-l                      Show verbose (long) output"
+msgstr ""
+
+msgid ""
+"-m                      Send an email notification when the job completes"
+msgstr ""
+
+msgid "-m                      Show models"
+msgstr ""
+
+msgid ""
+"-m everywhere           Specify the printer is compatible with IPP Everywhere"
+msgstr ""
+
+msgid ""
+"-m model                Specify a standard model/PPD file for the printer"
+msgstr ""
+
+msgid "-n count                Repeat the last file the given number of times"
+msgstr ""
+
+msgid "-n num-copies           Specify the number of copies to print"
+msgstr ""
+
+msgid "-n regex                Match service name to regular expression"
+msgstr ""
+
+msgid ""
+"-o Name=Value           Specify the default value for the named PPD option "
+msgstr ""
+
+msgid "-o [destination(s)]     Show jobs"
+msgstr ""
+
+msgid ""
+"-o cupsIPPSupplies=false\n"
+"                        Disable supply level reporting via IPP"
+msgstr ""
+
+msgid ""
+"-o cupsSNMPSupplies=false\n"
+"                        Disable supply level reporting via SNMP"
+msgstr ""
+
+msgid "-o job-k-limit=N        Specify the kilobyte limit for per-user quotas"
+msgstr ""
+
+msgid "-o job-page-limit=N     Specify the page limit for per-user quotas"
+msgstr ""
+
+msgid "-o job-quota-period=N   Specify the per-user quota period in seconds"
+msgstr ""
+
+msgid "-o job-sheets=standard  Print a banner page with the job"
+msgstr ""
+
+msgid "-o media=size           Specify the media size to use"
+msgstr ""
+
+msgid "-o name-default=value   Specify the default value for the named option"
+msgstr ""
+
+msgid "-o name[=value]         Set default option and value"
+msgstr ""
+
+msgid ""
+"-o number-up=N          Specify that input pages should be printed N-up (1, "
+"2, 4, 6, 9, and 16 are supported)"
+msgstr ""
+
+msgid "-o option[=value]       Specify a printer-specific option"
+msgstr ""
+
+msgid ""
+"-o orientation-requested=N\n"
+"                        Specify portrait (3) or landscape (4) orientation"
+msgstr ""
+
+msgid ""
+"-o print-quality=N      Specify the print quality - draft (3), normal (4), "
+"or best (5)"
+msgstr ""
+
+msgid ""
+"-o printer-error-policy=name\n"
+"                        Specify the printer error policy"
+msgstr ""
+
+msgid ""
+"-o printer-is-shared=true\n"
+"                        Share the printer"
+msgstr ""
+
+msgid ""
+"-o printer-op-policy=name\n"
+"                        Specify the printer operation policy"
+msgstr ""
+
+msgid "-o sides=one-sided      Specify 1-sided printing"
+msgstr ""
+
+msgid ""
+"-o sides=two-sided-long-edge\n"
+"                        Specify 2-sided portrait printing"
+msgstr ""
+
+msgid ""
+"-o sides=two-sided-short-edge\n"
+"                        Specify 2-sided landscape printing"
+msgstr ""
+
+msgid "-p                      Print URI if true"
+msgstr ""
+
+msgid "-p [printer(s)]         Show the processing state of destinations"
+msgstr ""
+
+msgid "-p destination          Specify a destination"
+msgstr ""
+
+msgid "-p destination          Specify/add the named destination"
+msgstr ""
+
+msgid "-q                      Quietly report match via exit code"
+msgstr ""
+
+msgid "-q                      Run silently"
+msgstr ""
+
+msgid "-q                      Specify the job should be held for printing"
+msgstr ""
+
+msgid "-q priority             Specify the priority from low (1) to high (100)"
+msgstr ""
+
+msgid "-r                      Remove the file(s) after submission"
+msgstr ""
+
+msgid "-r                      Show whether the CUPS server is running"
+msgstr ""
+
+msgid "-r                      True if service is remote"
+msgstr ""
+
+msgid "-r                      Use 'relaxed' open mode"
+msgstr ""
+
+msgid "-r class                Remove the named destination from a class"
+msgstr ""
+
+msgid "-r reason               Specify a reason message that others can see"
+msgstr ""
+
+msgid "-s                      Be silent"
+msgstr ""
+
+msgid "-s                      Print service name if true"
+msgstr ""
+
+msgid "-s                      Show a status summary"
+msgstr ""
+
+msgid "-s cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
+msgid "-t                      Produce a test report"
+msgstr ""
+
+msgid "-t                      Show all status information"
+msgstr ""
+
+msgid "-t                      Test the configuration file."
+msgstr ""
+
+msgid "-t key                  True if the TXT record contains the key"
+msgstr ""
+
+msgid "-t title                Specify the job title"
+msgstr ""
+
+msgid ""
+"-u [user(s)]            Show jobs queued by the current or specified users"
+msgstr ""
+
+msgid "-u allow:all            Allow all users to print"
+msgstr ""
+
+msgid ""
+"-u allow:list           Allow the list of users or groups (@name) to print"
+msgstr ""
+
+msgid ""
+"-u deny:list            Prevent the list of users or groups (@name) to print"
+msgstr ""
+
+msgid "-u owner                Specify the owner to use for jobs"
+msgstr ""
+
+msgid "-u regex                Match URI to regular expression"
+msgstr ""
+
+msgid "-v                      Be verbose"
+msgstr ""
+
+msgid "-v                      Show devices"
+msgstr ""
+
+msgid "-v [printer(s)]         Show the devices for each destination"
+msgstr ""
+
+msgid "-v device-uri           Specify the device URI for the printer"
+msgstr ""
+
+msgid "-vv                     Be very verbose"
+msgstr ""
+
+msgid "-x                      Purge jobs rather than just canceling"
+msgstr ""
+
+msgid "-x destination          Remove default options for destination"
+msgstr ""
+
+msgid "-x destination          Remove the named destination"
+msgstr ""
+
+msgid ""
+"-x utility [argument ...] ;\n"
+"                        Execute program if true"
+msgstr ""
 
 msgid "/etc/cups/lpoptions file names default destination that does not exist."
 msgstr ""
@@ -3519,6 +3751,32 @@ msgstr ""
 
 msgid "IPP value larger than 32767 bytes."
 msgstr "El valor del IPP és més llarg de 32767 bytes."
+
+msgid "IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"IPPFIND_SERVICE_HOSTNAME\n"
+"                        Fully-qualified domain name"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
 
 msgid "ISOLatin1"
 msgstr "ISOLatin1"
@@ -5064,8 +5322,18 @@ msgstr ""
 "                       [-u allow:usuari,usuari] [-u deny:usuari,usuari]"
 
 #, c-format
+msgid "Usage: %s [options] destination(s)"
+msgstr ""
+
+#, c-format
 msgid "Usage: %s job-id user title copies options [file]"
 msgstr "Sintaxi: %s id-feina usuari títol còpies opcions [fitxer]"
+
+msgid ""
+"Usage: cancel [options] [id]\n"
+"       cancel [options] [destination]\n"
+"       cancel [options] [destination-id]"
+msgstr ""
 
 msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
 msgstr "Sintaxi: cupsaddsmb [opcions] impressora1 ... impressoraN"
@@ -5083,9 +5351,9 @@ msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Sintaxi: cupstestdsc [opcions] nomfitxer.ps [...nomfitxer.ps]"
 
 msgid ""
-"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -"
 msgstr ""
-"Sintaxi: cupstestppd [opcions] nomfitxer1.ppd[.gz] [... nomfitxerN.ppd[.gz]]"
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -5097,25 +5365,49 @@ msgstr ""
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr "Sintaxi: ipptool [opcions] URI nomfitxer[ ... nomfitxerN]"
 
-msgid "Usage: lpmove job/src dest"
-msgstr "Sintaxi: lpmove feina/font destí"
+msgid ""
+"Usage: lp [options] [--] [file(s)]\n"
+"       lp [options] -i id"
+msgstr ""
 
 msgid ""
-"Usage: lpoptions [-h server] [-E] -d printer\n"
-"       lpoptions [-h server] [-E] [-p printer] -l\n"
-"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
-"       lpoptions [-h server] [-E] -x printer"
+"Usage: lpadmin [options] -d destination\n"
+"       lpadmin [options] -p destination\n"
+"       lpadmin [options] -p destination -c class\n"
+"       lpadmin [options] -p destination -r class\n"
+"       lpadmin [options] -x destination"
 msgstr ""
-"Sintaxi: lpoptions [-h servidor] [-E] -d impressora\n"
-"         lpoptions [-h servidor] [-E] [-p impressora] -l\n"
-"         lpoptions [-h servidor] [-E] -p impressora -o opció[=valor] ...\n"
-"         lpoptions [-h servidor] [-E] -x impressora"
 
 msgid ""
-"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+"Usage: lpinfo [options] -m\n"
+"       lpinfo [options] -v"
 msgstr ""
-"Sintaxi: lpq [-P destí] [-U nomusuari] [-h nomamfitrió[:port]] [-l] "
-"[+interval]"
+
+msgid ""
+"Usage: lpmove [options] job destination\n"
+"       lpmove [options] source-destination destination"
+msgstr ""
+
+msgid ""
+"Usage: lpoptions [options] -d destination\n"
+"       lpoptions [options] [-p destination] [-l]\n"
+"       lpoptions [options] [-p destination] -o option[=value]\n"
+"       lpoptions [options] -x destination"
+msgstr ""
+
+msgid "Usage: lpq [options] [+interval]"
+msgstr ""
+
+msgid "Usage: lpr [options] [file(s)]"
+msgstr ""
+
+msgid ""
+"Usage: lprm [options] [id]\n"
+"       lprm [options] -"
+msgstr ""
+
+msgid "Usage: lpstat [options]"
+msgstr ""
 
 msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
 msgstr "Sintaxi: ppdc [opcions] nomfitxer.rv [ ... nomfitxerN.drv ]"
@@ -5157,6 +5449,9 @@ msgstr "S'està esperant que la impressora acabi."
 
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr "AVÍS. No hi ha cap controlador per Windows 2000 instal·lat."
+
+msgid "Warning: This program will be removed in a future version of CUPS."
+msgstr ""
 
 msgid "Web Interface is Disabled"
 msgstr "La interfície web està deshabilitada"
@@ -5612,6 +5907,19 @@ msgstr "error-index fa servir una longitud indefinida"
 
 msgid "error-status uses indefinite length"
 msgstr "error-status fa servir una longitud indefinida"
+
+msgid ""
+"expression --and expression\n"
+"                        Logical AND"
+msgstr ""
+
+msgid ""
+"expression --or expression\n"
+"                        Logical OR"
+msgstr ""
+
+msgid "expression expression   Logical AND"
+msgstr ""
 
 msgid "feed-orientation"
 msgstr "Feed Orientation"
@@ -12562,5 +12870,183 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "{service_domain}        Domain name"
+msgstr ""
+
+msgid "{service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "{service_name}          Service instance name"
+msgstr ""
+
+msgid "{service_port}          Port number"
+msgstr ""
+
+msgid "{service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "{service_scheme}        URI scheme"
+msgstr ""
+
+msgid "{service_uri}           URI"
+msgstr ""
+
+msgid "{txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "{}                      URI"
+msgstr ""
+
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+
+#~ msgid "                          Ignore specific warnings."
+#~ msgstr "                          Ignora els avisos específics."
+
+#~ msgid "                          Issue warnings instead of errors."
+#~ msgstr "                          Mostra avisos enlloc d'errors."
+
+#~ msgid "       program | cupstestppd [options] -"
+#~ msgstr "       programa | cupstestppd [opcions] -"
+
+#~ msgid "  --[no-]debug-logging    Turn debug logging on/off."
+#~ msgstr ""
+#~ "  --[no-]debug-logging    Activa o desactiva el registre de depuració."
+
+#~ msgid "  --[no-]remote-admin     Turn remote administration on/off."
+#~ msgstr ""
+#~ "  --[no-]remote-admin     Activa o desactiva l'administració remota."
+
+#~ msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
+#~ msgstr "  --[no-]remote-any       Permet o impedeix l'accés des d'Internet."
+
+#~ msgid "  --[no-]share-printers   Turn printer sharing on/off."
+#~ msgstr ""
+#~ "  --[no-]share-printers   Activa o desactiva la compartició d'impressores."
+
+#~ msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
+#~ msgstr ""
+#~ "  --[no-]user-cancel-any  Permet o impedeix que els usuaris cancel·lin "
+#~ "tasques."
+
+#~ msgid "  -4                      Connect using IPv4."
+#~ msgstr "  -4                      Connecta fent servir IPv4."
+
+#~ msgid "  -6                      Connect using IPv6."
+#~ msgstr "  -6                      Connecta fent servir IPv6."
+
+#~ msgid "  -C                      Send requests using chunking (default)."
+#~ msgstr ""
+#~ "  -C                      Envia les sol·licituds fent servir la "
+#~ "fragmentació (per defecte)."
+
+#~ msgid ""
+#~ "  -F                      Run in the foreground but detach from console."
+#~ msgstr ""
+#~ "  -F                      Executa en primer pla però separat de la "
+#~ "consola."
+
+#~ msgid "  -I                      Ignore errors."
+#~ msgstr "  -I                      Ignora els errors."
+
+#~ msgid "  -I {filename,filters,none,profiles}"
+#~ msgstr "  -I {nomfitxer,filtres,cap,perfils}"
+
+#~ msgid "  -L                      Send requests using content-length."
+#~ msgstr ""
+#~ "  -L                      Envia les peticions fent servir content-length."
+
+#~ msgid "  -R root-directory       Set alternate root."
+#~ msgstr "  -R directori-arrel       Estableix una arrel alternativa."
+
+#~ msgid "  -T seconds              Set the receive/send timeout in seconds."
+#~ msgstr ""
+#~ "  -T segons              Estableix el temps d'espera màxim per enviar i "
+#~ "rebre en segons."
+
+#~ msgid "  -V version              Set default IPP version."
+#~ msgstr "  -V versió              Estableix la versió per defecte del IPP."
+
+#~ msgid ""
+#~ "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+#~ "translations}"
+#~ msgstr ""
+#~ "  -W {tots,cap,restringits,per defecte,dúplex,filtres,perfils,mides,"
+#~ "traduccions}"
+
+#~ msgid "  -X                      Produce XML plist instead of plain text."
+#~ msgstr ""
+#~ "  -X                      Retorna els plist en XML en comptes de text pla."
+
+#~ msgid "  -c cupsd.conf           Set cupsd.conf file to use."
+#~ msgstr ""
+#~ "  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer "
+#~ "servir."
+
+#~ msgid "  -d name=value           Set named variable to value."
+#~ msgstr "  -d nom=valor           Estableix la variable indicada al valor."
+
+#~ msgid "  -f                      Run in the foreground."
+#~ msgstr "  -f                      Executa en primer pla."
+
+#~ msgid "  -f filename             Set default request filename."
+#~ msgstr ""
+#~ "  -f nomfitxer             Estableix el nom del fitxer per defecte de la "
+#~ "sol·licitud."
+
+#~ msgid "  -h                      Show this usage message."
+#~ msgstr "  -h                      Mostra aquest missatge de sintaxi."
+
+#~ msgid ""
+#~ "  -i seconds              Repeat the last file with the given time "
+#~ "interval."
+#~ msgstr ""
+#~ "  -i segons              Repeteix l'últim fitxer amb l'interval "
+#~ "especificat."
+
+#~ msgid ""
+#~ "  -n count                Repeat the last file the given number of times."
+#~ msgstr ""
+#~ "  -n comptador                Repeteix l'últim fitxer el nombre indicat "
+#~ "de vegades."
+
+#~ msgid "  -q                      Run silently."
+#~ msgstr "  -q                      S'executa en mode silenciós."
+
+#~ msgid "  -r                      Use 'relaxed' open mode."
+#~ msgstr "  -r                      Fa servir el mode obert «relaxat»."
+
+#~ msgid "  -t                      Produce a test report."
+#~ msgstr "  -t                      Genera un informe de prova."
+
+#~ msgid "  -t                      Test the configuration file."
+#~ msgstr "  -t                      Prova el fitxer de configuració."
+
+#~ msgid "  -vv                     Be very verbose."
+#~ msgstr "  -vv                     Mode molt detallat."
+
+#~ msgid ""
+#~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+#~ msgstr ""
+#~ "Sintaxi: cupstestppd [opcions] nomfitxer1.ppd[.gz] [... nomfitxerN.ppd[."
+#~ "gz]]"
+
+#~ msgid "Usage: lpmove job/src dest"
+#~ msgstr "Sintaxi: lpmove feina/font destí"
+
+#~ msgid ""
+#~ "Usage: lpoptions [-h server] [-E] -d printer\n"
+#~ "       lpoptions [-h server] [-E] [-p printer] -l\n"
+#~ "       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+#~ "       lpoptions [-h server] [-E] -x printer"
+#~ msgstr ""
+#~ "Sintaxi: lpoptions [-h servidor] [-E] -d impressora\n"
+#~ "         lpoptions [-h servidor] [-E] [-p impressora] -l\n"
+#~ "         lpoptions [-h servidor] [-E] -p impressora -o opció[=valor] ...\n"
+#~ "         lpoptions [-h servidor] [-E] -x impressora"
+
+#~ msgid ""
+#~ "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+#~ msgstr ""
+#~ "Sintaxi: lpq [-P destí] [-U nomusuari] [-h nomamfitrió[:port]] [-l] "
+#~ "[+interval]"

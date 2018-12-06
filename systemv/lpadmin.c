@@ -1637,7 +1637,7 @@ usage(void)
   _cupsLangPuts(stdout, _("-i ppd-file             Specify a PPD file for the printer"));
   _cupsLangPuts(stdout, _("-L location             Specify the textual location of the printer"));
   _cupsLangPuts(stdout, _("-m model                Specify a standard model/PPD file for the printer"));
-  _cupsLangPuts(stdout, _("-m everywhere           Specify the printer is compatible with IPP Everywhere™"));
+  _cupsLangPuts(stdout, _("-m everywhere           Specify the printer is compatible with IPP Everywhere"));
   _cupsLangPuts(stdout, _("-o name-default=value   Specify the default value for the named option"));
   _cupsLangPuts(stdout, _("-o Name=Value           Specify the default value for the named PPD option "));
   _cupsLangPuts(stdout, _("-o cupsIPPSupplies=false\n"

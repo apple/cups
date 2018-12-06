@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-09-28 11:21-0400\n"
+"POT-Creation-Date: 2018-12-06 14:40-0500\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -138,12 +138,6 @@ msgid ""
 msgstr ""
 "\n"
 "    適合テスト結果詳細"
-
-msgid "                          Ignore specific warnings."
-msgstr "                          指定された警告を無視する。"
-
-msgid "                          Issue warnings instead of errors."
-msgstr "                          エラーを警告として扱う。"
 
 msgid "                REF: Page 15, section 3.1."
 msgstr "                参照: 15 ページ、セクション 3.1。"
@@ -332,9 +326,6 @@ msgstr "       cupsaddsmb [オプション] -a"
 
 msgid "       cupstestdsc [options] -"
 msgstr "       cupstestdsc [オプション] -"
-
-msgid "       program | cupstestppd [options] -"
-msgstr "       program | cupstestppd [オプション] -"
 
 #, c-format
 msgid ""
@@ -909,133 +900,17 @@ msgstr "    警告: ファイルに %%EndComments コメントがありません
 msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr "    警告: ファイルは時代遅れの DSC バージョン %.1f です。"
 
-msgid "  ! expression            Unary NOT of expression."
-msgstr "! <式>                  式を否定する単項演算子。"
-
-msgid "  ( expressions )         Group expressions."
-msgstr "  ( <複数の式> )          グループ化された複数の式。"
-
-msgid "  --[no-]debug-logging    Turn debug logging on/off."
-msgstr "  --[no-]debug-logging    デバッグログの有効/無効を切り替える。"
-
-msgid "  --[no-]remote-admin     Turn remote administration on/off."
-msgstr "  --[no-]remote-admin     リモート管理の有効/無効を切り替える。"
-
-msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
-msgstr ""
-"  --[no-]remote-any       インターネットからのアクセスを許可/禁止する。"
-
-msgid "  --[no-]share-printers   Turn printer sharing on/off."
-msgstr "  --[no-]share-printers   プリンター共有の有効/無効を切り替える。"
-
-msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
-msgstr ""
-"  --[no-]user-cancel-any  あらゆるジョブのキャンセルをユーザーに許可/禁止する"
-
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr "  --cr                    行末を CR とする (Mac OS 9)。"
 
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  行末を CR + LF とする (Windows)。"
 
-msgid "  --domain regex          Match domain to regular expression."
-msgstr "  --domain <正規表現>     ドメインが正規表現にマッチするか。"
-
-msgid ""
-"  --exec utility [argument ...] ;\n"
-"                          Execute program if true."
-msgstr ""
-"  --exec <実行ファイル名> [引数 ...] ;\n"
-"                          成功した場合、<実行ファイル名>を実行する。"
-
-msgid "  --false                 Always false."
-msgstr "  --false                 常に失敗。"
-
-msgid "  --help                  Show help."
-msgstr "  --help                  ヘルプを表示する。"
-
-msgid "  --help                  Show this help."
-msgstr "  --help                  このヘルプを表示する。"
-
-msgid "  --host regex            Match hostname to regular expression."
-msgstr "  --host <正規表現>       ホスト名が正規表現にマッチするか。"
-
-msgid "  --ippserver filename    Produce ippserver attribute file."
-msgstr ""
-
 msgid "  --lf                    End lines with LF (UNIX/Linux/macOS)."
 msgstr ""
 
 msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          使用されるフィルターのリストを表示する。"
-
-msgid "  --local                 True if service is local."
-msgstr "  --local                 サービスがローカルなら真。"
-
-msgid "  --ls                    List attributes."
-msgstr "  --ls                    属性の一覧を表示する。"
-
-msgid "  --name regex            Match service name to regular expression."
-msgstr "  --name <正規表現>       サービス名が正規表現とマッチするか。"
-
-msgid "  --not expression        Unary NOT of expression."
-msgstr "  --not <式>              式を否定する単項演算子。"
-
-msgid "  --path regex            Match resource path to regular expression."
-msgstr "  --path <正規表現>       リソースのパスが正規表現とマッチするか。"
-
-msgid "  --port number[-number]  Match port to number or range."
-msgstr ""
-"  --port 番号[-番号]      ポートが指定された番号または範囲とマッチするか。"
-
-msgid "  --print                 Print URI if true."
-msgstr "  --print                 結果が真なら URI を表示する。"
-
-msgid "  --print-name            Print service name if true."
-msgstr "  --print-name            結果が真ならサービス名を表示する。"
-
-msgid "  --quiet                 Quietly report match via exit code."
-msgstr ""
-"  --quiet                 マッチ結果を終了コードで報告し、出力をしない。"
-
-msgid "  --remote                True if service is remote."
-msgstr "  --remote                サービスがリモートなら真。"
-
-msgid ""
-"  --stop-after-include-error\n"
-"                          Stop tests after a failed INCLUDE."
-msgstr ""
-"  --stop-after-include-error\n"
-"                          INCLUDE が失敗したときテストを停止する。"
-
-msgid "  --true                  Always true."
-msgstr "  --true                  常に真。"
-
-msgid "  --txt key               True if the TXT record contains the key."
-msgstr "  --txt <キー名>          TXT レコードがキー名を含んでいたら真。"
-
-msgid "  --txt-* regex           Match TXT record key to regular expression."
-msgstr ""
-"  --txt-* <正規表現>      TXT レコードのキーが正規表現とマッチしたら真。"
-
-msgid "  --uri regex             Match URI to regular expression."
-msgstr "  --uri <正規表現>        URI が正規表現とマッチするか。"
-
-msgid "  --version               Show program version."
-msgstr "  --version               プログラムのバージョンを表示。"
-
-msgid "  --version               Show version."
-msgstr "  --version               バージョンを表示する。"
-
-msgid "  -4                      Connect using IPv4."
-msgstr "  -4                      IPv4 で接続する。"
-
-msgid "  -6                      Connect using IPv6."
-msgstr "  -6                      IPv6 で接続する。"
-
-msgid "  -C                      Send requests using chunking (default)."
-msgstr ""
-"  -C                      chunking を用いてリクエストを送る (デフォルト)。"
 
 msgid "  -D                      Remove the input file when finished."
 msgstr "  -D                      終了したときに入力ファイルを削除する。"
@@ -1047,79 +922,21 @@ msgstr ""
 msgid "  -E                      Encrypt the connection."
 msgstr "  -E                      接続を暗号化する。"
 
-msgid ""
-"  -E                      Test with encryption using HTTP Upgrade to TLS."
-msgstr ""
-
-msgid ""
-"  -F                      Run in the foreground but detach from console."
-msgstr ""
-"  -F                      フォアグラウンドで実行するがコンソールからはデタッ"
-"チする。"
-
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr "  -H sambaサーバー        指定の SAMBA サーバーを使う。"
-
-msgid "  -I                      Ignore errors."
-msgstr "  -I                      エラーを無視する。"
 
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
 "  -I include-dir          インクルードディレクトリーを検索パスに含める。"
 
-msgid "  -I {filename,filters,none,profiles}"
-msgstr "  -I {filename,filters,none,profiles}"
-
-msgid "  -L                      Send requests using content-length."
-msgstr "  -L                      content-length を用いてリクエストを送る。"
-
-msgid ""
-"  -P filename.plist       Produce XML plist to a file and test report to "
-"standard output."
-msgstr ""
-"  -P filename.plist       XML の plist 形式で書き出しテストリポートを標準出力"
-"にする。"
-
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P filename.ppd         PPD ファイルを指定する。"
-
-msgid "  -P number[-number]      Match port to number or range."
-msgstr ""
-"  -P 番号[-番号]          ポートが指定された番号または範囲とマッチするか。"
-
-msgid "  -R root-directory       Set alternate root."
-msgstr "  -R root-directory       別のルートディレクトリーを指定する。"
-
-msgid "  -S                      Test with encryption using HTTPS."
-msgstr ""
-
-msgid "  -T seconds              Set the browse timeout in seconds."
-msgstr "  -T <秒>                 ブラウズのタイムアウトを秒で指定する。"
-
-msgid "  -T seconds              Set the receive/send timeout in seconds."
-msgstr "  -T seconds              受信／送信タイムアウトを秒で指定する。"
 
 msgid "  -U username             Specify username."
 msgstr "  -U username             ユーザー名を指定する。"
 
-msgid "  -V version              Set default IPP version."
-msgstr "  -V version              デフォルトの IPP バージョンを指定する。"
-
-msgid ""
-"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
-"translations}"
-msgstr ""
-"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
-"translations}"
-
-msgid "  -X                      Produce XML plist instead of plain text."
-msgstr "  -X                      プレーンテキストの代わりに XML を用いる。"
-
 msgid "  -a                      Export all printers."
 msgstr "  -a                      すべてのプリンターをエクスポートする。"
-
-msgid "  -c                      Produce CSV output."
-msgstr "  -c                      CSV 出力を行う。"
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           指定したメッセージカタログをロードする。"
@@ -1127,40 +944,15 @@ msgstr "  -c catalog.po           指定したメッセージカタログをロ�
 msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr "  -c cups-files.conf      cups-files.conf を利用するよう設定する。"
 
-msgid "  -c cupsd.conf           Set cupsd.conf file to use."
-msgstr "  -c cupsd.conf           使用する cupsd.conf ファイルを指定する。"
-
-msgid "  -d name=value           Set named variable to value."
-msgstr ""
-"  -d name=value           name で指定された変数に値 value をセットする。"
-
 msgid "  -d output-dir           Specify the output directory."
 msgstr "  -d output-dir           出力先ディレクトリーを指定する。"
 
 msgid "  -d printer              Use the named printer."
 msgstr "  -d printer              指定されたプリンターを利用する。"
 
-msgid "  -d regex                Match domain to regular expression."
-msgstr "  -d <正規表現>           ドメインが正規表現にマッチするか。"
-
 msgid "  -e                      Use every filter from the PPD file."
 msgstr ""
 "  -e                      PPD ファイルからすべてのフィルターを使用する。"
-
-msgid "  -f                      Run in the foreground."
-msgstr "  -f                      フォアグラウンドで実行する。"
-
-msgid "  -f filename             Set default request filename."
-msgstr "  -f filename             デフォルトのリクエストファイル名を指定する。"
-
-msgid "  -h                      Show this usage message."
-msgstr "  -h                      このヘルプメッセージを表示する。"
-
-msgid "  -h                      Validate HTTP response headers."
-msgstr ""
-
-msgid "  -h regex                Match hostname to regular expression."
-msgstr "  -h <正規表現>           ホスト名が正規表現にマッチするか。"
 
 msgid "  -h server[:port]        Specify server address."
 msgstr "  -h server[:port]        サーバーアドレスを指定する。"
@@ -1171,25 +963,11 @@ msgstr ""
 "イプ)。"
 
 msgid ""
-"  -i seconds              Repeat the last file with the given time interval."
-msgstr ""
-"  -i seconds              最後のファイルを与えられた時間間隔で繰り返す。"
-
-msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
 msgstr ""
 "  -j job-id[,N]           フィルターファイル N を指定されたジョブから使用す"
 "る (デフォルトは ファイル 1)。"
-
-msgid "  -l                      List attributes."
-msgstr "  -l                      属性の一覧を表示する。"
-
-msgid "  -l                      Produce plain text output."
-msgstr "  -l                      プレーンテキスト出力を行う。"
-
-msgid "  -l                      Run cupsd on demand."
-msgstr "  -l                      cupsd をオンデマンドで実行する。"
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr "  -l lang[,lang,...]      出力言語を指定する。(複数可能)"
@@ -1207,13 +985,6 @@ msgid "  -n copies               Set number of copies."
 msgstr "  -n copies               部数を指定する。"
 
 msgid ""
-"  -n count                Repeat the last file the given number of times."
-msgstr "  -n count                最後のファイルを与えられた回数だけ繰り返す。"
-
-msgid "  -n regex                Match service name to regular expression."
-msgstr "  -n <正規表現>           サービス名が正規表現とマッチするか。"
-
-msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
 "  -o filename.drv         ドライバー情報ファイルを指定する (指定がなければ "
@@ -1226,42 +997,11 @@ msgstr ""
 msgid "  -o name=value           Set option(s)."
 msgstr "  -o name=value           オプションを指定する。"
 
-msgid "  -p                      Print URI if true."
-msgstr "  -p                      結果が真なら URI を表示する。"
-
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p filename.ppd         PPD ファイルを指定する。"
 
-msgid "  -q                      Quietly report match via exit code."
-msgstr ""
-"  -q                      マッチ結果を終了コードで報告し、出力をしない。"
-
-msgid "  -q                      Run silently."
-msgstr "  -q                      詳細は表示しない。"
-
-msgid "  -r                      True if service is remote."
-msgstr "  -r                      サービスがリモートなら真。"
-
-msgid "  -r                      Use 'relaxed' open mode."
-msgstr "  -r                      寛容モードを用いる。"
-
-msgid "  -s                      Print service name if true."
-msgstr "  -s                      結果が真ならサービス名を表示する。"
-
-msgid "  -s cups-files.conf      Set cups-files.conf file to use."
-msgstr ""
-
-msgid "  -t                      Produce a test report."
-msgstr "  -t                      テストリポートを出力する。"
-
 msgid "  -t                      Test PPDs instead of generating them."
 msgstr "  -t                      PPD を出力しないでテストする。"
-
-msgid "  -t                      Test the configuration file."
-msgstr "  -t                      設定ファイルをテストする。"
-
-msgid "  -t key                  True if the TXT record contains the key."
-msgstr "  -t <キー名>             TXT レコードがキー名を含んでいたら真。"
 
 msgid "  -t title                Set title."
 msgstr "  -t title                タイトルを指定する。"
@@ -1269,98 +1009,20 @@ msgstr "  -t title                タイトルを指定する。"
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      終了したときに PPD ファイルを削除する。"
 
-msgid "  -u regex                Match URI to regular expression."
-msgstr "  -u <正規表現>           URI が正規表現とマッチするか。"
-
 msgid "  -v                      Be verbose."
 msgstr "  -v                      冗長出力を行う。"
 
-msgid "  -vv                     Be very verbose."
-msgstr "  -vv                     より冗長な出力を行う。"
-
-msgid ""
-"  -x utility [argument ...] ;\n"
-"                          Execute program if true."
-msgstr ""
-"  -x <実行ファイル名> [引数 ...] ;\n"
-"                          成功した場合、<実行ファイル名> を実行する。"
-
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr "  -z                      PPD ファイルを GNU zip を使って圧縮する。"
-
-msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
-msgstr "  IPPFIND_SERVICE_DOMAIN  ドメイン名"
-
-msgid ""
-"  IPPFIND_SERVICE_HOSTNAME\n"
-"                          Fully-qualified domain name"
-msgstr ""
-"  IPPFIND_SERVICE_HOSTNAME\n"
-"                          完全修飾ドメイン名 (FQDN)"
-
-msgid "  IPPFIND_SERVICE_NAME    Service instance name"
-msgstr "  IPPFIND_SERVICE_NAME    サービスインスタンス名"
-
-msgid "  IPPFIND_SERVICE_PORT    Port number"
-msgstr "  IPPFIND_SERVICE_PORT    ポート番号"
-
-msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
-msgstr "  IPPFIND_SERVICE_REGTYPE DNS-SD 登録タイプ"
-
-msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
-msgstr "  IPPFIND_SERVICE_SCHEME  URI スキーム"
-
-msgid "  IPPFIND_SERVICE_URI     URI"
-msgstr "  IPPFIND_SERVICE_URI     URI"
-
-msgid "  IPPFIND_TXT_*           Value of TXT record key"
-msgstr "  IPPFIND_TXT_*           TXT レコードキーの値"
-
-msgid ""
-"  expression --and expression\n"
-"                          Logical AND."
-msgstr "  <式> --and <式>         論理 AND。"
-
-msgid ""
-"  expression --or expression\n"
-"                          Logical OR."
-msgstr "  <式> --or <式>          論理 OR。"
-
-msgid "  expression expression   Logical AND."
-msgstr "  <式> <式>               論理 AND。"
-
-msgid "  {service_domain}        Domain name"
-msgstr "  {service_domain}        ドメイン名"
-
-msgid "  {service_hostname}      Fully-qualified domain name"
-msgstr "  {service_hostname}      完全修飾ドメイン名 (FQDN)"
-
-msgid "  {service_name}          Service instance name"
-msgstr "  {service_name}          サービスインスタンス名"
-
-msgid "  {service_port}          Port number"
-msgstr "  {service_port}          ポート番号"
-
-msgid "  {service_regtype}       DNS-SD registration type"
-msgstr "  {service_regtype}       DNS-SD 登録タイプ"
-
-msgid "  {service_scheme}        URI scheme"
-msgstr "  {service_scheme}        URI スキーム"
-
-msgid "  {service_uri}           URI"
-msgstr "  {service_uri}           URI"
-
-msgid "  {txt_*}                 Value of TXT record key"
-msgstr "  {txt_*}                 TXT レコードキーの値"
-
-msgid "  {}                      URI"
-msgstr "  {}                      URI"
 
 msgid " FAIL"
 msgstr " 失敗"
 
 msgid " PASS"
 msgstr " 合格"
+
+msgid "! expression            Unary NOT of expression"
+msgstr ""
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
@@ -1941,6 +1603,136 @@ msgstr "%s: 警告 - 用紙オプションは無視されます。"
 msgid "%s: Warning - mode option ignored."
 msgstr "%s: 警告 - モードオプションは無視されます。"
 
+msgid "( expressions )         Group expressions"
+msgstr ""
+
+msgid "-                       Cancel all jobs"
+msgstr ""
+
+msgid "-# num-copies           Specify the number of copies to print"
+msgstr ""
+
+msgid "--[no-]debug-logging    Turn debug logging on/off"
+msgstr ""
+
+msgid "--[no-]remote-admin     Turn remote administration on/off"
+msgstr ""
+
+msgid "--[no-]remote-any       Allow/prevent access from the Internet"
+msgstr ""
+
+msgid "--[no-]share-printers   Turn printer sharing on/off"
+msgstr ""
+
+msgid "--[no-]user-cancel-any  Allow/prevent users to cancel any job"
+msgstr ""
+
+msgid ""
+"--device-id device-id   Show models matching the given IEEE 1284 device ID"
+msgstr ""
+
+msgid "--domain regex          Match domain to regular expression"
+msgstr ""
+
+msgid ""
+"--exclude-schemes scheme-list\n"
+"                        Exclude the specified URI schemes"
+msgstr ""
+
+msgid ""
+"--exec utility [argument ...] ;\n"
+"                        Execute program if true"
+msgstr ""
+
+msgid "--false                 Always false"
+msgstr ""
+
+msgid "--hold                  Hold new jobs"
+msgstr ""
+
+msgid "--host regex            Match hostname to regular expression"
+msgstr ""
+
+msgid ""
+"--include-schemes scheme-list\n"
+"                        Include only the specified URI schemes"
+msgstr ""
+
+msgid "--ippserver filename    Produce ippserver attribute file"
+msgstr ""
+
+msgid "--language locale       Show models matching the given locale"
+msgstr ""
+
+msgid "--local                 True if service is local"
+msgstr ""
+
+msgid "--ls                    List attributes"
+msgstr ""
+
+msgid ""
+"--make-and-model name   Show models matching the given make and model name"
+msgstr ""
+
+msgid "--name regex            Match service name to regular expression"
+msgstr ""
+
+msgid "--not expression        Unary NOT of expression"
+msgstr ""
+
+msgid "--path regex            Match resource path to regular expression"
+msgstr ""
+
+msgid "--port number[-number]  Match port to number or range"
+msgstr ""
+
+msgid "--print                 Print URI if true"
+msgstr ""
+
+msgid "--print-name            Print service name if true"
+msgstr ""
+
+msgid ""
+"--product name          Show models matching the given PostScript product"
+msgstr ""
+
+msgid "--quiet                 Quietly report match via exit code"
+msgstr ""
+
+msgid "--release               Release previously held jobs"
+msgstr ""
+
+msgid "--remote                True if service is remote"
+msgstr ""
+
+msgid ""
+"--stop-after-include-error\n"
+"                        Stop tests after a failed INCLUDE"
+msgstr ""
+
+msgid ""
+"--timeout seconds       Specify the maximum number of seconds to discover "
+"devices"
+msgstr ""
+
+msgid "--true                  Always true"
+msgstr ""
+
+msgid "--txt key               True if the TXT record contains the key"
+msgstr ""
+
+msgid "--txt-* regex           Match TXT record key to regular expression"
+msgstr ""
+
+msgid "--uri regex             Match URI to regular expression"
+msgstr ""
+
+msgid "--version               Show program version"
+msgstr ""
+
+msgid "--version               Show version"
+msgstr ""
+
 msgid "-1"
 msgstr "-1"
 
@@ -1998,6 +1790,9 @@ msgstr "-35"
 msgid "-4"
 msgstr "-4"
 
+msgid "-4                      Connect using IPv4"
+msgstr ""
+
 msgid "-40"
 msgstr "-40"
 
@@ -2015,6 +1810,9 @@ msgstr "-55"
 
 msgid "-6"
 msgstr "-6"
+
+msgid "-6                      Connect using IPv6"
+msgstr ""
 
 msgid "-60"
 msgstr "-60"
@@ -2048,6 +1846,434 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "-C                      Send requests using chunking (default)"
+msgstr ""
+
+msgid "-D description          Specify the textual description of the printer"
+msgstr ""
+
+msgid ""
+"-E                      Enable and accept jobs on the printer (after -p)"
+msgstr ""
+
+msgid "-E                      Encrypt the connection to the server"
+msgstr ""
+
+msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
+msgstr ""
+
+msgid "-F                      Run in the foreground but detach from console."
+msgstr ""
+
+msgid "-H                      Show the default server and port"
+msgstr ""
+
+msgid "-H HH:MM                Hold the job until the specified UTC time"
+msgstr ""
+
+msgid "-H hold                 Hold the job until released/resumed"
+msgstr ""
+
+msgid "-H immediate            Print the job as soon as possible"
+msgstr ""
+
+msgid "-H restart              Reprint the job"
+msgstr ""
+
+msgid "-H resume               Resume a held job"
+msgstr ""
+
+msgid "-H server[:port]        Connect to the named server and port"
+msgstr ""
+
+msgid "-I                      Ignore errors"
+msgstr ""
+
+msgid ""
+"-I {filename,filters,none,profiles}\n"
+"                          Ignore specific warnings"
+msgstr ""
+
+msgid "-L                      Send requests using content-length"
+msgstr ""
+
+msgid "-L location             Specify the textual location of the printer"
+msgstr ""
+
+msgid "-P destination          Show status for the specified destination"
+msgstr ""
+
+msgid "-P destination          Specify the destination"
+msgstr ""
+
+msgid ""
+"-P filename.plist       Produce XML plist to a file and test report to "
+"standard output"
+msgstr ""
+
+msgid "-P number[-number]      Match port to number or range"
+msgstr ""
+
+msgid "-P page-list            Specify a list of pages to print"
+msgstr ""
+
+msgid "-R                      Show the ranking of jobs"
+msgstr ""
+
+msgid "-R name-default         Remove the default value for the named option"
+msgstr ""
+
+msgid "-R root-directory       Set alternate root"
+msgstr ""
+
+msgid "-S                      Test with encryption using HTTPS"
+msgstr ""
+
+msgid "-T seconds              Set the browse timeout in seconds"
+msgstr ""
+
+msgid "-T seconds              Set the receive/send timeout in seconds"
+msgstr ""
+
+msgid "-T title                Specify the job title"
+msgstr ""
+
+msgid "-U username             Specify the username to use for authentication"
+msgstr ""
+
+msgid "-U username             Specify username to use for authentication"
+msgstr ""
+
+msgid "-V version              Set default IPP version"
+msgstr ""
+
+msgid "-W completed            Show completed jobs"
+msgstr ""
+
+msgid "-W not-completed        Show pending jobs"
+msgstr ""
+
+msgid ""
+"-W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}\n"
+"                          Issue warnings instead of errors"
+msgstr ""
+
+msgid "-X                      Produce XML plist instead of plain text"
+msgstr ""
+
+msgid "-a                      Cancel all jobs"
+msgstr ""
+
+msgid "-a                      Show jobs on all destinations"
+msgstr ""
+
+msgid "-a [destination(s)]     Show the accepting state of destinations"
+msgstr ""
+
+msgid "-c                      Make a copy of the print file(s)"
+msgstr ""
+
+msgid "-c                      Produce CSV output"
+msgstr ""
+
+msgid "-c [class(es)]          Show classes and their member printers"
+msgstr ""
+
+msgid "-c class                Add the named destination to a class"
+msgstr ""
+
+msgid "-c cupsd.conf           Set cupsd.conf file to use."
+msgstr ""
+
+msgid "-d                      Show the default destination"
+msgstr ""
+
+msgid "-d destination          Set default destination"
+msgstr ""
+
+msgid "-d destination          Set the named destination as the server default"
+msgstr ""
+
+msgid "-d name=value           Set named variable to value"
+msgstr ""
+
+msgid "-d regex                Match domain to regular expression"
+msgstr ""
+
+msgid "-e                      Show available destinations on the network"
+msgstr ""
+
+msgid "-f                      Run in the foreground."
+msgstr ""
+
+msgid "-f filename             Set default request filename"
+msgstr ""
+
+msgid "-h                      Show this usage message."
+msgstr ""
+
+msgid "-h                      Validate HTTP response headers"
+msgstr ""
+
+msgid "-h regex                Match hostname to regular expression"
+msgstr ""
+
+msgid "-h server[:port]        Connect to the named server and port"
+msgstr ""
+
+msgid "-i id                   Specify an existing job ID to modify"
+msgstr ""
+
+msgid "-i ppd-file             Specify a PPD file for the printer"
+msgstr ""
+
+msgid ""
+"-i seconds              Repeat the last file with the given time interval"
+msgstr ""
+
+msgid "-l                      List attributes"
+msgstr ""
+
+msgid "-l                      Produce plain text output"
+msgstr ""
+
+msgid "-l                      Run cupsd on demand."
+msgstr ""
+
+msgid "-l                      Show supported options and values"
+msgstr ""
+
+msgid "-l                      Show verbose (long) output"
+msgstr ""
+
+msgid ""
+"-m                      Send an email notification when the job completes"
+msgstr ""
+
+msgid "-m                      Show models"
+msgstr ""
+
+msgid ""
+"-m everywhere           Specify the printer is compatible with IPP Everywhere"
+msgstr ""
+
+msgid ""
+"-m model                Specify a standard model/PPD file for the printer"
+msgstr ""
+
+msgid "-n count                Repeat the last file the given number of times"
+msgstr ""
+
+msgid "-n num-copies           Specify the number of copies to print"
+msgstr ""
+
+msgid "-n regex                Match service name to regular expression"
+msgstr ""
+
+msgid ""
+"-o Name=Value           Specify the default value for the named PPD option "
+msgstr ""
+
+msgid "-o [destination(s)]     Show jobs"
+msgstr ""
+
+msgid ""
+"-o cupsIPPSupplies=false\n"
+"                        Disable supply level reporting via IPP"
+msgstr ""
+
+msgid ""
+"-o cupsSNMPSupplies=false\n"
+"                        Disable supply level reporting via SNMP"
+msgstr ""
+
+msgid "-o job-k-limit=N        Specify the kilobyte limit for per-user quotas"
+msgstr ""
+
+msgid "-o job-page-limit=N     Specify the page limit for per-user quotas"
+msgstr ""
+
+msgid "-o job-quota-period=N   Specify the per-user quota period in seconds"
+msgstr ""
+
+msgid "-o job-sheets=standard  Print a banner page with the job"
+msgstr ""
+
+msgid "-o media=size           Specify the media size to use"
+msgstr ""
+
+msgid "-o name-default=value   Specify the default value for the named option"
+msgstr ""
+
+msgid "-o name[=value]         Set default option and value"
+msgstr ""
+
+msgid ""
+"-o number-up=N          Specify that input pages should be printed N-up (1, "
+"2, 4, 6, 9, and 16 are supported)"
+msgstr ""
+
+msgid "-o option[=value]       Specify a printer-specific option"
+msgstr ""
+
+msgid ""
+"-o orientation-requested=N\n"
+"                        Specify portrait (3) or landscape (4) orientation"
+msgstr ""
+
+msgid ""
+"-o print-quality=N      Specify the print quality - draft (3), normal (4), "
+"or best (5)"
+msgstr ""
+
+msgid ""
+"-o printer-error-policy=name\n"
+"                        Specify the printer error policy"
+msgstr ""
+
+msgid ""
+"-o printer-is-shared=true\n"
+"                        Share the printer"
+msgstr ""
+
+msgid ""
+"-o printer-op-policy=name\n"
+"                        Specify the printer operation policy"
+msgstr ""
+
+msgid "-o sides=one-sided      Specify 1-sided printing"
+msgstr ""
+
+msgid ""
+"-o sides=two-sided-long-edge\n"
+"                        Specify 2-sided portrait printing"
+msgstr ""
+
+msgid ""
+"-o sides=two-sided-short-edge\n"
+"                        Specify 2-sided landscape printing"
+msgstr ""
+
+msgid "-p                      Print URI if true"
+msgstr ""
+
+msgid "-p [printer(s)]         Show the processing state of destinations"
+msgstr ""
+
+msgid "-p destination          Specify a destination"
+msgstr ""
+
+msgid "-p destination          Specify/add the named destination"
+msgstr ""
+
+msgid "-q                      Quietly report match via exit code"
+msgstr ""
+
+msgid "-q                      Run silently"
+msgstr ""
+
+msgid "-q                      Specify the job should be held for printing"
+msgstr ""
+
+msgid "-q priority             Specify the priority from low (1) to high (100)"
+msgstr ""
+
+msgid "-r                      Remove the file(s) after submission"
+msgstr ""
+
+msgid "-r                      Show whether the CUPS server is running"
+msgstr ""
+
+msgid "-r                      True if service is remote"
+msgstr ""
+
+msgid "-r                      Use 'relaxed' open mode"
+msgstr ""
+
+msgid "-r class                Remove the named destination from a class"
+msgstr ""
+
+msgid "-r reason               Specify a reason message that others can see"
+msgstr ""
+
+msgid "-s                      Be silent"
+msgstr ""
+
+msgid "-s                      Print service name if true"
+msgstr ""
+
+msgid "-s                      Show a status summary"
+msgstr ""
+
+msgid "-s cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
+msgid "-t                      Produce a test report"
+msgstr ""
+
+msgid "-t                      Show all status information"
+msgstr ""
+
+msgid "-t                      Test the configuration file."
+msgstr ""
+
+msgid "-t key                  True if the TXT record contains the key"
+msgstr ""
+
+msgid "-t title                Specify the job title"
+msgstr ""
+
+msgid ""
+"-u [user(s)]            Show jobs queued by the current or specified users"
+msgstr ""
+
+msgid "-u allow:all            Allow all users to print"
+msgstr ""
+
+msgid ""
+"-u allow:list           Allow the list of users or groups (@name) to print"
+msgstr ""
+
+msgid ""
+"-u deny:list            Prevent the list of users or groups (@name) to print"
+msgstr ""
+
+msgid "-u owner                Specify the owner to use for jobs"
+msgstr ""
+
+msgid "-u regex                Match URI to regular expression"
+msgstr ""
+
+msgid "-v                      Be verbose"
+msgstr ""
+
+msgid "-v                      Show devices"
+msgstr ""
+
+msgid "-v [printer(s)]         Show the devices for each destination"
+msgstr ""
+
+msgid "-v device-uri           Specify the device URI for the printer"
+msgstr ""
+
+msgid "-vv                     Be very verbose"
+msgstr ""
+
+msgid "-x                      Purge jobs rather than just canceling"
+msgstr ""
+
+msgid "-x destination          Remove default options for destination"
+msgstr ""
+
+msgid "-x destination          Remove the named destination"
+msgstr ""
+
+msgid ""
+"-x utility [argument ...] ;\n"
+"                        Execute program if true"
+msgstr ""
 
 msgid "/etc/cups/lpoptions file names default destination that does not exist."
 msgstr ""
@@ -3520,6 +3746,32 @@ msgstr "IPP の textWithLanguage の値が最小値 4 バイト未満です。"
 
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP の値が 32767 バイト以上です。"
+
+msgid "IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"IPPFIND_SERVICE_HOSTNAME\n"
+"                        Fully-qualified domain name"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
 
 msgid "ISOLatin1"
 msgstr "ISOLatin1"
@@ -5041,8 +5293,18 @@ msgstr ""
 "ザー]"
 
 #, c-format
+msgid "Usage: %s [options] destination(s)"
+msgstr ""
+
+#, c-format
 msgid "Usage: %s job-id user title copies options [file]"
 msgstr "使い方: %s ジョブID ユーザー タイトル コピー数 オプション [ファイル]"
+
+msgid ""
+"Usage: cancel [options] [id]\n"
+"       cancel [options] [destination]\n"
+"       cancel [options] [destination-id]"
+msgstr ""
 
 msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
 msgstr "Usage: cupsaddsmb [オプション] プリンター1 ... プリンターN"
@@ -5060,10 +5322,9 @@ msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "使い方: cupstestdsc [オプション] ファイル名.ps [... ファイル名.ps]"
 
 msgid ""
-"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -"
 msgstr ""
-"使い方: cupstestppd [オプション] ファイル名1.ppd[.gz] [... ファイル名N.ppd[."
-"gz]]"
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -5079,24 +5340,49 @@ msgstr ""
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr "使い方: ipptool [オプション] URI ファイル名 [ ... ファイル名N ]"
 
-msgid "Usage: lpmove job/src dest"
-msgstr "使い方: lpmove ジョブ/ソース 宛先"
+msgid ""
+"Usage: lp [options] [--] [file(s)]\n"
+"       lp [options] -i id"
+msgstr ""
 
 msgid ""
-"Usage: lpoptions [-h server] [-E] -d printer\n"
-"       lpoptions [-h server] [-E] [-p printer] -l\n"
-"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
-"       lpoptions [-h server] [-E] -x printer"
+"Usage: lpadmin [options] -d destination\n"
+"       lpadmin [options] -p destination\n"
+"       lpadmin [options] -p destination -c class\n"
+"       lpadmin [options] -p destination -r class\n"
+"       lpadmin [options] -x destination"
 msgstr ""
-"使い方: lpoptions [-h サーバー] [-E] -d プリンター\n"
-" 　     lpoptions [-h サーバー] [-E] [-p プリンター] -l\n"
-"        lpoptions [-h サーバー] [-E] -p プリンター -o オプション[=値] ...\n"
-"        lpoptions [-h サーバー] [-E] -x プリンター"
 
 msgid ""
-"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+"Usage: lpinfo [options] -m\n"
+"       lpinfo [options] -v"
 msgstr ""
-"使い方: lpq [-P 宛先] [-U ユーザー名] [-h ホスト名[:ポート]] [-l] [+間隔]"
+
+msgid ""
+"Usage: lpmove [options] job destination\n"
+"       lpmove [options] source-destination destination"
+msgstr ""
+
+msgid ""
+"Usage: lpoptions [options] -d destination\n"
+"       lpoptions [options] [-p destination] [-l]\n"
+"       lpoptions [options] [-p destination] -o option[=value]\n"
+"       lpoptions [options] -x destination"
+msgstr ""
+
+msgid "Usage: lpq [options] [+interval]"
+msgstr ""
+
+msgid "Usage: lpr [options] [file(s)]"
+msgstr ""
+
+msgid ""
+"Usage: lprm [options] [id]\n"
+"       lprm [options] -"
+msgstr ""
+
+msgid "Usage: lpstat [options]"
+msgstr ""
 
 msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
 msgstr "使い方: ppdc [オプション] ファイル名.drv [ ... ファイル名N.drv ]"
@@ -5139,6 +5425,9 @@ msgstr "プリンターが終了するのを待っています。"
 
 msgid "Warning, no Windows 2000 printer drivers are installed."
 msgstr "警告、Windows 2000 プリンタードライバーがインストールされていません。"
+
+msgid "Warning: This program will be removed in a future version of CUPS."
+msgstr ""
 
 msgid "Web Interface is Disabled"
 msgstr "Web インターフェイスが無効になっています"
@@ -5596,6 +5885,19 @@ msgstr "error-index は不定長です"
 
 msgid "error-status uses indefinite length"
 msgstr "error-status は不定長です"
+
+msgid ""
+"expression --and expression\n"
+"                        Logical AND"
+msgstr ""
+
+msgid ""
+"expression --or expression\n"
+"                        Logical OR"
+msgstr ""
+
+msgid "expression expression   Logical AND"
+msgstr ""
 
 msgid "feed-orientation"
 msgstr "Feed Orientation"
@@ -12572,5 +12874,388 @@ msgstr "Z Dimension"
 msgid "z-offset"
 msgstr "Z Offset"
 
+msgid "{service_domain}        Domain name"
+msgstr ""
+
+msgid "{service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "{service_name}          Service instance name"
+msgstr ""
+
+msgid "{service_port}          Port number"
+msgstr ""
+
+msgid "{service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "{service_scheme}        URI scheme"
+msgstr ""
+
+msgid "{service_uri}           URI"
+msgstr ""
+
+msgid "{txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "{}                      URI"
+msgstr ""
+
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+
+#~ msgid "                          Ignore specific warnings."
+#~ msgstr "                          指定された警告を無視する。"
+
+#~ msgid "                          Issue warnings instead of errors."
+#~ msgstr "                          エラーを警告として扱う。"
+
+#~ msgid "       program | cupstestppd [options] -"
+#~ msgstr "       program | cupstestppd [オプション] -"
+
+#~ msgid "  ! expression            Unary NOT of expression."
+#~ msgstr "! <式>                  式を否定する単項演算子。"
+
+#~ msgid "  ( expressions )         Group expressions."
+#~ msgstr "  ( <複数の式> )          グループ化された複数の式。"
+
+#~ msgid "  --[no-]debug-logging    Turn debug logging on/off."
+#~ msgstr "  --[no-]debug-logging    デバッグログの有効/無効を切り替える。"
+
+#~ msgid "  --[no-]remote-admin     Turn remote administration on/off."
+#~ msgstr "  --[no-]remote-admin     リモート管理の有効/無効を切り替える。"
+
+#~ msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
+#~ msgstr ""
+#~ "  --[no-]remote-any       インターネットからのアクセスを許可/禁止する。"
+
+#~ msgid "  --[no-]share-printers   Turn printer sharing on/off."
+#~ msgstr "  --[no-]share-printers   プリンター共有の有効/無効を切り替える。"
+
+#~ msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
+#~ msgstr ""
+#~ "  --[no-]user-cancel-any  あらゆるジョブのキャンセルをユーザーに許可/禁止"
+#~ "する"
+
+#~ msgid "  --domain regex          Match domain to regular expression."
+#~ msgstr "  --domain <正規表現>     ドメインが正規表現にマッチするか。"
+
+#~ msgid ""
+#~ "  --exec utility [argument ...] ;\n"
+#~ "                          Execute program if true."
+#~ msgstr ""
+#~ "  --exec <実行ファイル名> [引数 ...] ;\n"
+#~ "                          成功した場合、<実行ファイル名>を実行する。"
+
+#~ msgid "  --false                 Always false."
+#~ msgstr "  --false                 常に失敗。"
+
+#~ msgid "  --help                  Show help."
+#~ msgstr "  --help                  ヘルプを表示する。"
+
+#~ msgid "  --help                  Show this help."
+#~ msgstr "  --help                  このヘルプを表示する。"
+
+#~ msgid "  --host regex            Match hostname to regular expression."
+#~ msgstr "  --host <正規表現>       ホスト名が正規表現にマッチするか。"
+
+#~ msgid "  --local                 True if service is local."
+#~ msgstr "  --local                 サービスがローカルなら真。"
+
+#~ msgid "  --ls                    List attributes."
+#~ msgstr "  --ls                    属性の一覧を表示する。"
+
+#~ msgid "  --name regex            Match service name to regular expression."
+#~ msgstr "  --name <正規表現>       サービス名が正規表現とマッチするか。"
+
+#~ msgid "  --not expression        Unary NOT of expression."
+#~ msgstr "  --not <式>              式を否定する単項演算子。"
+
+#~ msgid "  --path regex            Match resource path to regular expression."
+#~ msgstr "  --path <正規表現>       リソースのパスが正規表現とマッチするか。"
+
+#~ msgid "  --port number[-number]  Match port to number or range."
+#~ msgstr ""
+#~ "  --port 番号[-番号]      ポートが指定された番号または範囲とマッチするか。"
+
+#~ msgid "  --print                 Print URI if true."
+#~ msgstr "  --print                 結果が真なら URI を表示する。"
+
+#~ msgid "  --print-name            Print service name if true."
+#~ msgstr "  --print-name            結果が真ならサービス名を表示する。"
+
+#~ msgid "  --quiet                 Quietly report match via exit code."
+#~ msgstr ""
+#~ "  --quiet                 マッチ結果を終了コードで報告し、出力をしない。"
+
+#~ msgid "  --remote                True if service is remote."
+#~ msgstr "  --remote                サービスがリモートなら真。"
+
+#~ msgid ""
+#~ "  --stop-after-include-error\n"
+#~ "                          Stop tests after a failed INCLUDE."
+#~ msgstr ""
+#~ "  --stop-after-include-error\n"
+#~ "                          INCLUDE が失敗したときテストを停止する。"
+
+#~ msgid "  --true                  Always true."
+#~ msgstr "  --true                  常に真。"
+
+#~ msgid "  --txt key               True if the TXT record contains the key."
+#~ msgstr "  --txt <キー名>          TXT レコードがキー名を含んでいたら真。"
+
+#~ msgid ""
+#~ "  --txt-* regex           Match TXT record key to regular expression."
+#~ msgstr ""
+#~ "  --txt-* <正規表現>      TXT レコードのキーが正規表現とマッチしたら真。"
+
+#~ msgid "  --uri regex             Match URI to regular expression."
+#~ msgstr "  --uri <正規表現>        URI が正規表現とマッチするか。"
+
+#~ msgid "  --version               Show program version."
+#~ msgstr "  --version               プログラムのバージョンを表示。"
+
+#~ msgid "  --version               Show version."
+#~ msgstr "  --version               バージョンを表示する。"
+
+#~ msgid "  -4                      Connect using IPv4."
+#~ msgstr "  -4                      IPv4 で接続する。"
+
+#~ msgid "  -6                      Connect using IPv6."
+#~ msgstr "  -6                      IPv6 で接続する。"
+
+#~ msgid "  -C                      Send requests using chunking (default)."
+#~ msgstr ""
+#~ "  -C                      chunking を用いてリクエストを送る (デフォルト)。"
+
+#~ msgid ""
+#~ "  -F                      Run in the foreground but detach from console."
+#~ msgstr ""
+#~ "  -F                      フォアグラウンドで実行するがコンソールからはデ"
+#~ "タッチする。"
+
+#~ msgid "  -I                      Ignore errors."
+#~ msgstr "  -I                      エラーを無視する。"
+
+#~ msgid "  -I {filename,filters,none,profiles}"
+#~ msgstr "  -I {filename,filters,none,profiles}"
+
+#~ msgid "  -L                      Send requests using content-length."
+#~ msgstr "  -L                      content-length を用いてリクエストを送る。"
+
+#~ msgid ""
+#~ "  -P filename.plist       Produce XML plist to a file and test report to "
+#~ "standard output."
+#~ msgstr ""
+#~ "  -P filename.plist       XML の plist 形式で書き出しテストリポートを標準"
+#~ "出力にする。"
+
+#~ msgid "  -P number[-number]      Match port to number or range."
+#~ msgstr ""
+#~ "  -P 番号[-番号]          ポートが指定された番号または範囲とマッチするか。"
+
+#~ msgid "  -R root-directory       Set alternate root."
+#~ msgstr "  -R root-directory       別のルートディレクトリーを指定する。"
+
+#~ msgid "  -T seconds              Set the browse timeout in seconds."
+#~ msgstr "  -T <秒>                 ブラウズのタイムアウトを秒で指定する。"
+
+#~ msgid "  -T seconds              Set the receive/send timeout in seconds."
+#~ msgstr "  -T seconds              受信／送信タイムアウトを秒で指定する。"
+
+#~ msgid "  -V version              Set default IPP version."
+#~ msgstr "  -V version              デフォルトの IPP バージョンを指定する。"
+
+#~ msgid ""
+#~ "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+#~ "translations}"
+#~ msgstr ""
+#~ "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+#~ "translations}"
+
+#~ msgid "  -X                      Produce XML plist instead of plain text."
+#~ msgstr "  -X                      プレーンテキストの代わりに XML を用いる。"
+
+#~ msgid "  -c                      Produce CSV output."
+#~ msgstr "  -c                      CSV 出力を行う。"
+
+#~ msgid "  -c cupsd.conf           Set cupsd.conf file to use."
+#~ msgstr "  -c cupsd.conf           使用する cupsd.conf ファイルを指定する。"
+
+#~ msgid "  -d name=value           Set named variable to value."
+#~ msgstr ""
+#~ "  -d name=value           name で指定された変数に値 value をセットする。"
+
+#~ msgid "  -d regex                Match domain to regular expression."
+#~ msgstr "  -d <正規表現>           ドメインが正規表現にマッチするか。"
+
+#~ msgid "  -f                      Run in the foreground."
+#~ msgstr "  -f                      フォアグラウンドで実行する。"
+
+#~ msgid "  -f filename             Set default request filename."
+#~ msgstr ""
+#~ "  -f filename             デフォルトのリクエストファイル名を指定する。"
+
+#~ msgid "  -h                      Show this usage message."
+#~ msgstr "  -h                      このヘルプメッセージを表示する。"
+
+#~ msgid "  -h regex                Match hostname to regular expression."
+#~ msgstr "  -h <正規表現>           ホスト名が正規表現にマッチするか。"
+
+#~ msgid ""
+#~ "  -i seconds              Repeat the last file with the given time "
+#~ "interval."
+#~ msgstr ""
+#~ "  -i seconds              最後のファイルを与えられた時間間隔で繰り返す。"
+
+#~ msgid "  -l                      List attributes."
+#~ msgstr "  -l                      属性の一覧を表示する。"
+
+#~ msgid "  -l                      Produce plain text output."
+#~ msgstr "  -l                      プレーンテキスト出力を行う。"
+
+#~ msgid "  -l                      Run cupsd on demand."
+#~ msgstr "  -l                      cupsd をオンデマンドで実行する。"
+
+#~ msgid ""
+#~ "  -n count                Repeat the last file the given number of times."
+#~ msgstr ""
+#~ "  -n count                最後のファイルを与えられた回数だけ繰り返す。"
+
+#~ msgid "  -n regex                Match service name to regular expression."
+#~ msgstr "  -n <正規表現>           サービス名が正規表現とマッチするか。"
+
+#~ msgid "  -p                      Print URI if true."
+#~ msgstr "  -p                      結果が真なら URI を表示する。"
+
+#~ msgid "  -q                      Quietly report match via exit code."
+#~ msgstr ""
+#~ "  -q                      マッチ結果を終了コードで報告し、出力をしない。"
+
+#~ msgid "  -q                      Run silently."
+#~ msgstr "  -q                      詳細は表示しない。"
+
+#~ msgid "  -r                      True if service is remote."
+#~ msgstr "  -r                      サービスがリモートなら真。"
+
+#~ msgid "  -r                      Use 'relaxed' open mode."
+#~ msgstr "  -r                      寛容モードを用いる。"
+
+#~ msgid "  -s                      Print service name if true."
+#~ msgstr "  -s                      結果が真ならサービス名を表示する。"
+
+#~ msgid "  -t                      Produce a test report."
+#~ msgstr "  -t                      テストリポートを出力する。"
+
+#~ msgid "  -t                      Test the configuration file."
+#~ msgstr "  -t                      設定ファイルをテストする。"
+
+#~ msgid "  -t key                  True if the TXT record contains the key."
+#~ msgstr "  -t <キー名>             TXT レコードがキー名を含んでいたら真。"
+
+#~ msgid "  -u regex                Match URI to regular expression."
+#~ msgstr "  -u <正規表現>           URI が正規表現とマッチするか。"
+
+#~ msgid "  -vv                     Be very verbose."
+#~ msgstr "  -vv                     より冗長な出力を行う。"
+
+#~ msgid ""
+#~ "  -x utility [argument ...] ;\n"
+#~ "                          Execute program if true."
+#~ msgstr ""
+#~ "  -x <実行ファイル名> [引数 ...] ;\n"
+#~ "                          成功した場合、<実行ファイル名> を実行する。"
+
+#~ msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+#~ msgstr "  IPPFIND_SERVICE_DOMAIN  ドメイン名"
+
+#~ msgid ""
+#~ "  IPPFIND_SERVICE_HOSTNAME\n"
+#~ "                          Fully-qualified domain name"
+#~ msgstr ""
+#~ "  IPPFIND_SERVICE_HOSTNAME\n"
+#~ "                          完全修飾ドメイン名 (FQDN)"
+
+#~ msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+#~ msgstr "  IPPFIND_SERVICE_NAME    サービスインスタンス名"
+
+#~ msgid "  IPPFIND_SERVICE_PORT    Port number"
+#~ msgstr "  IPPFIND_SERVICE_PORT    ポート番号"
+
+#~ msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+#~ msgstr "  IPPFIND_SERVICE_REGTYPE DNS-SD 登録タイプ"
+
+#~ msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+#~ msgstr "  IPPFIND_SERVICE_SCHEME  URI スキーム"
+
+#~ msgid "  IPPFIND_SERVICE_URI     URI"
+#~ msgstr "  IPPFIND_SERVICE_URI     URI"
+
+#~ msgid "  IPPFIND_TXT_*           Value of TXT record key"
+#~ msgstr "  IPPFIND_TXT_*           TXT レコードキーの値"
+
+#~ msgid ""
+#~ "  expression --and expression\n"
+#~ "                          Logical AND."
+#~ msgstr "  <式> --and <式>         論理 AND。"
+
+#~ msgid ""
+#~ "  expression --or expression\n"
+#~ "                          Logical OR."
+#~ msgstr "  <式> --or <式>          論理 OR。"
+
+#~ msgid "  expression expression   Logical AND."
+#~ msgstr "  <式> <式>               論理 AND。"
+
+#~ msgid "  {service_domain}        Domain name"
+#~ msgstr "  {service_domain}        ドメイン名"
+
+#~ msgid "  {service_hostname}      Fully-qualified domain name"
+#~ msgstr "  {service_hostname}      完全修飾ドメイン名 (FQDN)"
+
+#~ msgid "  {service_name}          Service instance name"
+#~ msgstr "  {service_name}          サービスインスタンス名"
+
+#~ msgid "  {service_port}          Port number"
+#~ msgstr "  {service_port}          ポート番号"
+
+#~ msgid "  {service_regtype}       DNS-SD registration type"
+#~ msgstr "  {service_regtype}       DNS-SD 登録タイプ"
+
+#~ msgid "  {service_scheme}        URI scheme"
+#~ msgstr "  {service_scheme}        URI スキーム"
+
+#~ msgid "  {service_uri}           URI"
+#~ msgstr "  {service_uri}           URI"
+
+#~ msgid "  {txt_*}                 Value of TXT record key"
+#~ msgstr "  {txt_*}                 TXT レコードキーの値"
+
+#~ msgid "  {}                      URI"
+#~ msgstr "  {}                      URI"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+#~ msgstr ""
+#~ "使い方: cupstestppd [オプション] ファイル名1.ppd[.gz] [... ファイル名N.ppd"
+#~ "[.gz]]"
+
+#~ msgid "Usage: lpmove job/src dest"
+#~ msgstr "使い方: lpmove ジョブ/ソース 宛先"
+
+#~ msgid ""
+#~ "Usage: lpoptions [-h server] [-E] -d printer\n"
+#~ "       lpoptions [-h server] [-E] [-p printer] -l\n"
+#~ "       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+#~ "       lpoptions [-h server] [-E] -x printer"
+#~ msgstr ""
+#~ "使い方: lpoptions [-h サーバー] [-E] -d プリンター\n"
+#~ " 　     lpoptions [-h サーバー] [-E] [-p プリンター] -l\n"
+#~ "        lpoptions [-h サーバー] [-E] -p プリンター -o オプション[="
+#~ "値] ...\n"
+#~ "        lpoptions [-h サーバー] [-E] -x プリンター"
+
+#~ msgid ""
+#~ "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+#~ msgstr ""
+#~ "使い方: lpq [-P 宛先] [-U ユーザー名] [-h ホスト名[:ポート]] [-l] [+間隔]"
