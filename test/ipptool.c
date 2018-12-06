@@ -4298,33 +4298,31 @@ usage(void)
 {
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
-  _cupsLangPuts(stderr, _("  --help                  Show help."));
-  _cupsLangPuts(stderr, _("  --ippserver filename    Produce ippserver attribute file."));
-  _cupsLangPuts(stderr, _("  --stop-after-include-error\n"
-                          "                          Stop tests after a failed INCLUDE."));
-  _cupsLangPuts(stderr, _("  --version               Show version."));
-  _cupsLangPuts(stderr, _("  -4                      Connect using IPv4."));
-  _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
-  _cupsLangPuts(stderr, _("  -C                      Send requests using "
-                          "chunking (default)."));
-  _cupsLangPuts(stderr, _("  -E                      Test with encryption using HTTP Upgrade to TLS."));
-  _cupsLangPuts(stderr, _("  -I                      Ignore errors."));
-  _cupsLangPuts(stderr, _("  -L                      Send requests using content-length."));
-  _cupsLangPuts(stderr, _("  -P filename.plist       Produce XML plist to a file and test report to standard output."));
-  _cupsLangPuts(stderr, _("  -S                      Test with encryption using HTTPS."));
-  _cupsLangPuts(stderr, _("  -T seconds              Set the receive/send timeout in seconds."));
-  _cupsLangPuts(stderr, _("  -V version              Set default IPP version."));
-  _cupsLangPuts(stderr, _("  -X                      Produce XML plist instead of plain text."));
-  _cupsLangPuts(stderr, _("  -c                      Produce CSV output."));
-  _cupsLangPuts(stderr, _("  -d name=value           Set named variable to value."));
-  _cupsLangPuts(stderr, _("  -f filename             Set default request filename."));
-  _cupsLangPuts(stderr, _("  -h                      Validate HTTP response headers."));
-  _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with the given time interval."));
-  _cupsLangPuts(stderr, _("  -l                      Produce plain text output."));
-  _cupsLangPuts(stderr, _("  -n count                Repeat the last file the given number of times."));
-  _cupsLangPuts(stderr, _("  -q                      Run silently."));
-  _cupsLangPuts(stderr, _("  -t                      Produce a test report."));
-  _cupsLangPuts(stderr, _("  -v                      Be verbose."));
+  _cupsLangPuts(stderr, _("--ippserver filename    Produce ippserver attribute file"));
+  _cupsLangPuts(stderr, _("--stop-after-include-error\n"
+                          "                        Stop tests after a failed INCLUDE"));
+  _cupsLangPuts(stderr, _("--version               Show version"));
+  _cupsLangPuts(stderr, _("-4                      Connect using IPv4"));
+  _cupsLangPuts(stderr, _("-6                      Connect using IPv6"));
+  _cupsLangPuts(stderr, _("-C                      Send requests using chunking (default)"));
+  _cupsLangPuts(stderr, _("-E                      Test with encryption using HTTP Upgrade to TLS"));
+  _cupsLangPuts(stderr, _("-I                      Ignore errors"));
+  _cupsLangPuts(stderr, _("-L                      Send requests using content-length"));
+  _cupsLangPuts(stderr, _("-P filename.plist       Produce XML plist to a file and test report to standard output"));
+  _cupsLangPuts(stderr, _("-S                      Test with encryption using HTTPS"));
+  _cupsLangPuts(stderr, _("-T seconds              Set the receive/send timeout in seconds"));
+  _cupsLangPuts(stderr, _("-V version              Set default IPP version"));
+  _cupsLangPuts(stderr, _("-X                      Produce XML plist instead of plain text"));
+  _cupsLangPuts(stderr, _("-c                      Produce CSV output"));
+  _cupsLangPuts(stderr, _("-d name=value           Set named variable to value"));
+  _cupsLangPuts(stderr, _("-f filename             Set default request filename"));
+  _cupsLangPuts(stderr, _("-h                      Validate HTTP response headers"));
+  _cupsLangPuts(stderr, _("-i seconds              Repeat the last file with the given time interval"));
+  _cupsLangPuts(stderr, _("-l                      Produce plain text output"));
+  _cupsLangPuts(stderr, _("-n count                Repeat the last file the given number of times"));
+  _cupsLangPuts(stderr, _("-q                      Run silently"));
+  _cupsLangPuts(stderr, _("-t                      Produce a test report"));
+  _cupsLangPuts(stderr, _("-v                      Be verbose"));
 
   exit(1);
 }

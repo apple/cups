@@ -2765,81 +2765,73 @@ show_usage(void)
                           "... [expression]\n"
                           "       ippfind --help\n"
                           "       ippfind --version"));
-  _cupsLangPuts(stderr, "");
   _cupsLangPuts(stderr, _("Options:"));
-  _cupsLangPuts(stderr, _("  -4                      Connect using IPv4."));
-  _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
-  _cupsLangPuts(stderr, _("  -T seconds              Set the browse timeout in "
-                          "seconds."));
-  _cupsLangPuts(stderr, _("  -V version              Set default IPP "
-                          "version."));
-  _cupsLangPuts(stderr, _("  --help                  Show this help."));
-  _cupsLangPuts(stderr, _("  --version               Show program version."));
-  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("-4                      Connect using IPv4"));
+  _cupsLangPuts(stderr, _("-6                      Connect using IPv6"));
+  _cupsLangPuts(stderr, _("-T seconds              Set the browse timeout in seconds"));
+  _cupsLangPuts(stderr, _("-V version              Set default IPP version"));
+  _cupsLangPuts(stderr, _("--version               Show program version"));
   _cupsLangPuts(stderr, _("Expressions:"));
-  _cupsLangPuts(stderr, _("  -P number[-number]      Match port to number or range."));
-  _cupsLangPuts(stderr, _("  -d regex                Match domain to regular expression."));
-  _cupsLangPuts(stderr, _("  -h regex                Match hostname to regular expression."));
-  _cupsLangPuts(stderr, _("  -l                      List attributes."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -p                      Print URI if true."));
-  _cupsLangPuts(stderr, _("  -q                      Quietly report match via exit code."));
-  _cupsLangPuts(stderr, _("  -r                      True if service is remote."));
-  _cupsLangPuts(stderr, _("  -s                      Print service name if true."));
-  _cupsLangPuts(stderr, _("  -t key                  True if the TXT record contains the key."));
-  _cupsLangPuts(stderr, _("  -u regex                Match URI to regular expression."));
-  _cupsLangPuts(stderr, _("  -x utility [argument ...] ;\n"
-                          "                          Execute program if true."));
-  _cupsLangPuts(stderr, _("  --domain regex          Match domain to regular expression."));
-  _cupsLangPuts(stderr, _("  --exec utility [argument ...] ;\n"
-                          "                          Execute program if true."));
-  _cupsLangPuts(stderr, _("  --host regex            Match hostname to regular expression."));
-  _cupsLangPuts(stderr, _("  --ls                    List attributes."));
-  _cupsLangPuts(stderr, _("  --local                 True if service is local."));
-  _cupsLangPuts(stderr, _("  --name regex            Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  --path regex            Match resource path to regular expression."));
-  _cupsLangPuts(stderr, _("  --port number[-number]  Match port to number or range."));
-  _cupsLangPuts(stderr, _("  --print                 Print URI if true."));
-  _cupsLangPuts(stderr, _("  --print-name            Print service name if true."));
-  _cupsLangPuts(stderr, _("  --quiet                 Quietly report match via exit code."));
-  _cupsLangPuts(stderr, _("  --remote                True if service is remote."));
-  _cupsLangPuts(stderr, _("  --txt key               True if the TXT record contains the key."));
-  _cupsLangPuts(stderr, _("  --txt-* regex           Match TXT record key to regular expression."));
-  _cupsLangPuts(stderr, _("  --uri regex             Match URI to regular expression."));
-  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("-P number[-number]      Match port to number or range"));
+  _cupsLangPuts(stderr, _("-d regex                Match domain to regular expression"));
+  _cupsLangPuts(stderr, _("-h regex                Match hostname to regular expression"));
+  _cupsLangPuts(stderr, _("-l                      List attributes"));
+  _cupsLangPuts(stderr, _("-n regex                Match service name to regular expression"));
+  _cupsLangPuts(stderr, _("-p                      Print URI if true"));
+  _cupsLangPuts(stderr, _("-q                      Quietly report match via exit code"));
+  _cupsLangPuts(stderr, _("-r                      True if service is remote"));
+  _cupsLangPuts(stderr, _("-s                      Print service name if true"));
+  _cupsLangPuts(stderr, _("-t key                  True if the TXT record contains the key"));
+  _cupsLangPuts(stderr, _("-u regex                Match URI to regular expression"));
+  _cupsLangPuts(stderr, _("-x utility [argument ...] ;\n"
+                          "                        Execute program if true"));
+  _cupsLangPuts(stderr, _("--domain regex          Match domain to regular expression"));
+  _cupsLangPuts(stderr, _("--exec utility [argument ...] ;\n"
+                          "                        Execute program if true"));
+  _cupsLangPuts(stderr, _("--host regex            Match hostname to regular expression"));
+  _cupsLangPuts(stderr, _("--ls                    List attributes"));
+  _cupsLangPuts(stderr, _("--local                 True if service is local"));
+  _cupsLangPuts(stderr, _("--name regex            Match service name to regular expression"));
+  _cupsLangPuts(stderr, _("--path regex            Match resource path to regular expression"));
+  _cupsLangPuts(stderr, _("--port number[-number]  Match port to number or range"));
+  _cupsLangPuts(stderr, _("--print                 Print URI if true"));
+  _cupsLangPuts(stderr, _("--print-name            Print service name if true"));
+  _cupsLangPuts(stderr, _("--quiet                 Quietly report match via exit code"));
+  _cupsLangPuts(stderr, _("--remote                True if service is remote"));
+  _cupsLangPuts(stderr, _("--txt key               True if the TXT record contains the key"));
+  _cupsLangPuts(stderr, _("--txt-* regex           Match TXT record key to regular expression"));
+  _cupsLangPuts(stderr, _("--uri regex             Match URI to regular expression"));
   _cupsLangPuts(stderr, _("Modifiers:"));
-  _cupsLangPuts(stderr, _("  ( expressions )         Group expressions."));
-  _cupsLangPuts(stderr, _("  ! expression            Unary NOT of expression."));
-  _cupsLangPuts(stderr, _("  --not expression        Unary NOT of expression."));
-  _cupsLangPuts(stderr, _("  --false                 Always false."));
-  _cupsLangPuts(stderr, _("  --true                  Always true."));
-  _cupsLangPuts(stderr, _("  expression expression   Logical AND."));
-  _cupsLangPuts(stderr, _("  expression --and expression\n"
-                          "                          Logical AND."));
-  _cupsLangPuts(stderr, _("  expression --or expression\n"
-                          "                          Logical OR."));
-  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("( expressions )         Group expressions"));
+  _cupsLangPuts(stderr, _("! expression            Unary NOT of expression"));
+  _cupsLangPuts(stderr, _("--not expression        Unary NOT of expression"));
+  _cupsLangPuts(stderr, _("--false                 Always false"));
+  _cupsLangPuts(stderr, _("--true                  Always true"));
+  _cupsLangPuts(stderr, _("expression expression   Logical AND"));
+  _cupsLangPuts(stderr, _("expression --and expression\n"
+                          "                        Logical AND"));
+  _cupsLangPuts(stderr, _("expression --or expression\n"
+                          "                        Logical OR"));
   _cupsLangPuts(stderr, _("Substitutions:"));
-  _cupsLangPuts(stderr, _("  {}                      URI"));
-  _cupsLangPuts(stderr, _("  {service_domain}        Domain name"));
-  _cupsLangPuts(stderr, _("  {service_hostname}      Fully-qualified domain name"));
-  _cupsLangPuts(stderr, _("  {service_name}          Service instance name"));
-  _cupsLangPuts(stderr, _("  {service_port}          Port number"));
-  _cupsLangPuts(stderr, _("  {service_regtype}       DNS-SD registration type"));
-  _cupsLangPuts(stderr, _("  {service_scheme}        URI scheme"));
-  _cupsLangPuts(stderr, _("  {service_uri}           URI"));
-  _cupsLangPuts(stderr, _("  {txt_*}                 Value of TXT record key"));
-  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("{}                      URI"));
+  _cupsLangPuts(stderr, _("{service_domain}        Domain name"));
+  _cupsLangPuts(stderr, _("{service_hostname}      Fully-qualified domain name"));
+  _cupsLangPuts(stderr, _("{service_name}          Service instance name"));
+  _cupsLangPuts(stderr, _("{service_port}          Port number"));
+  _cupsLangPuts(stderr, _("{service_regtype}       DNS-SD registration type"));
+  _cupsLangPuts(stderr, _("{service_scheme}        URI scheme"));
+  _cupsLangPuts(stderr, _("{service_uri}           URI"));
+  _cupsLangPuts(stderr, _("{txt_*}                 Value of TXT record key"));
   _cupsLangPuts(stderr, _("Environment Variables:"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_DOMAIN  Domain name"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_HOSTNAME\n"
-                          "                          Fully-qualified domain name"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_NAME    Service instance name"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_PORT    Port number"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_SCHEME  URI scheme"));
-  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_URI     URI"));
-  _cupsLangPuts(stderr, _("  IPPFIND_TXT_*           Value of TXT record key"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_DOMAIN  Domain name"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_HOSTNAME\n"
+                          "                        Fully-qualified domain name"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_NAME    Service instance name"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_PORT    Port number"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_REGTYPE DNS-SD registration type"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_SCHEME  URI scheme"));
+  _cupsLangPuts(stderr, _("IPPFIND_SERVICE_URI     URI"));
+  _cupsLangPuts(stderr, _("IPPFIND_TXT_*           Value of TXT record key"));
 
   exit(IPPFIND_EXIT_TRUE);
 }
