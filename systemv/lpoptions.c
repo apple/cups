@@ -61,7 +61,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-')
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -529,12 +531,19 @@ list_options(cups_dest_t *dest)		/* I - Destination to list */
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: lpoptions [-h server] [-E] -d printer\n"
-		  "       lpoptions [-h server] [-E] [-p printer] -l\n"
-		  "       lpoptions [-h server] [-E] -p printer -o "
-		  "option[=value] ...\n"
-		  "       lpoptions [-h server] [-E] -x printer"));
+  _cupsLangPuts(stdout, _("Usage: lpoptions [options] -d destination\n"
+                          "       lpoptions [options] [-p destination] [-l]\n"
+                          "       lpoptions [options] [-p destination] -o option[=value]\n"
+                          "       lpoptions [options] -x destination"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("-d destination          Set default destination"));
+  _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
+  _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
+  _cupsLangPuts(stdout, _("-l                      Show supported options and values"));
+  _cupsLangPuts(stdout, _("-o name[=value]         Set default option and value"));
+  _cupsLangPuts(stdout, _("-p destination          Specify a destination"));
+  _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
+  _cupsLangPuts(stdout, _("-x destination          Remove default options for destination"));
 
   exit(1);
 }

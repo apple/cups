@@ -1,10 +1,11 @@
 /*
  * "lpstat" command for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -32,6 +33,7 @@ static int	show_jobs(const char *dests, const char *users, int long_status,
 static int	show_printers(const char *printers, int num_dests,
 		              cups_dest_t *dests, int long_status);
 static void	show_scheduler(void);
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*
@@ -69,7 +71,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-')
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -123,7 +127,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 
 		cupsSetUser(argv[i]);
@@ -143,7 +147,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 
 		which = argv[i];
@@ -152,7 +156,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (strcmp(which, "completed") && strcmp(which, "not-completed") && strcmp(which, "all"))
 	      {
 		_cupsLangPrintf(stderr, _("%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" option."), argv[0]);
-		return (1);
+		usage();
 	      }
 	      break;
 
@@ -481,7 +485,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  default :
 	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."), argv[0], argv[i][1]);
-	      return (1);
+	      usage();
 	}
       }
     }
@@ -2026,4 +2030,38 @@ show_scheduler(void)
   }
   else
     _cupsLangPuts(stdout, _("scheduler is not running"));
+}
+
+
+/*
+ * 'usage()' - Show program usage and exit.
+ */
+
+static void
+usage(void)
+{
+  _cupsLangPuts(stdout, _("Usage: lpstat [options]"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
+  _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
+  _cupsLangPuts(stdout, _("-l                      Show verbose (long) output"));
+  _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
+
+  _cupsLangPuts(stdout, _("-H                      Show the default server and port"));
+  _cupsLangPuts(stdout, _("-W completed            Show completed jobs"));
+  _cupsLangPuts(stdout, _("-W not-completed        Show pending jobs"));
+  _cupsLangPuts(stdout, _("-a [destination(s)]     Show the accepting state of destinations"));
+  _cupsLangPuts(stdout, _("-c [class(es)]          Show classes and their member printers"));
+  _cupsLangPuts(stdout, _("-d                      Show the default destination"));
+  _cupsLangPuts(stdout, _("-e                      Show available destinations on the network"));
+  _cupsLangPuts(stdout, _("-o [destination(s)]     Show jobs"));
+  _cupsLangPuts(stdout, _("-p [printer(s)]         Show the processing state of destinations"));
+  _cupsLangPuts(stdout, _("-r                      Show whether the CUPS server is running"));
+  _cupsLangPuts(stdout, _("-R                      Show the ranking of jobs"));
+  _cupsLangPuts(stdout, _("-s                      Show a status summary"));
+  _cupsLangPuts(stdout, _("-t                      Show all status information"));
+  _cupsLangPuts(stdout, _("-u [user(s)]            Show jobs queued by the current or specified users"));
+  _cupsLangPuts(stdout, _("-v [printer(s)]         Show the devices for each destination"));
+
+  exit(1);
 }

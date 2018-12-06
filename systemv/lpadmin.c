@@ -4,7 +4,8 @@
  * Copyright © 2007-2018 by Apple Inc.
  * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -33,6 +34,7 @@ static cups_ptype_t	get_printer_type(http_t *http, char *printer, char *uri,
 static int		set_printer_options(http_t *http, char *printer,
 			                    int num_options, cups_option_t *options,
 					    char *file, int enable);
+static void		usage(void) _CUPS_NORETURN;
 static int		validate_name(const char *name);
 
 
@@ -69,7 +71,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-')
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -107,7 +111,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected class name after \"-c\" option."));
-		  return (1);
+		  usage();
 		}
 
 		pclass = argv[i];
@@ -149,7 +153,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected printer name after \"-d\" option."));
-		  return (1);
+		  usage();
 		}
 
 		printer = argv[i];
@@ -186,7 +190,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected hostname after \"-h\" option."));
-		  return (1);
+		  usage();
 		}
 
 		cupsSetServer(argv[i]);
@@ -207,7 +211,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("lpadmin: Expected PPD after \"-%c\" option."), argv[i - 1][1]);
-		  return (1);
+		  usage();
 		}
 
 		file = argv[i];
@@ -276,7 +280,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected model after \"-m\" option."));
-		  return (1);
+		  usage();
 		}
 
 		num_options = cupsAddOption("ppd-name", argv[i], num_options, &options);
@@ -296,7 +300,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected name=value after \"-o\" option."));
-		  return (1);
+		  usage();
 		}
 
 		num_options = cupsParseOptions(argv[i], num_options, &options);
@@ -316,7 +320,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected printer after \"-p\" option."));
-		  return (1);
+		  usage();
 		}
 
 		printer = argv[i];
@@ -363,7 +367,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected class after \"-r\" option."));
-		  return (1);
+		  usage();
 		}
 
 		pclass = argv[i];
@@ -411,7 +415,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected name after \"-R\" option."));
-		  return (1);
+		  usage();
 		}
 
 		val = argv[i];
@@ -433,7 +437,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 
 		cupsSetUser(argv[i]);
@@ -453,7 +457,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected allow/deny:userlist after \"-u\" option."));
-		  return (1);
+		  usage();
 		}
 
 		val = argv[i];
@@ -483,7 +487,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected device URI after \"-v\" option."));
-		  return (1);
+		  usage();
 		}
 
 		num_options = cupsAddOption("device-uri", argv[i], num_options, &options);
@@ -516,7 +520,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected printer or class after \"-x\" option."));
-		  return (1);
+		  usage();
 		}
 
 		printer = argv[i];
@@ -547,7 +551,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected description after \"-D\" option."));
-		  return (1);
+		  usage();
 		}
 
 		num_options = cupsAddOption("printer-info", argv[i], num_options, &options);
@@ -560,7 +564,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr, _("lpadmin: Expected file type(s) after \"-I\" option."));
-		return (1);
+		usage();
 	      }
 
 	      _cupsLangPuts(stderr, _("lpadmin: Warning - content type list ignored."));
@@ -579,7 +583,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("lpadmin: Expected location after \"-L\" option."));
-		  return (1);
+		  usage();
 		}
 
 		num_options = cupsAddOption("printer-location", argv[i], num_options, &options);
@@ -588,14 +592,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  default :
 	      _cupsLangPrintf(stderr, _("lpadmin: Unknown option \"%c\"."), *opt);
-	      return (1);
+	      usage();
 	}
       }
     }
     else
     {
       _cupsLangPrintf(stderr, _("lpadmin: Unknown argument \"%s\"."), argv[i]);
-      return (1);
+      usage();
     }
   }
 
@@ -1608,6 +1612,58 @@ set_printer_options(
   }
   else
     return (0);
+}
+
+
+/*
+ * 'usage()' - Show program usage and exit.
+ */
+
+static void
+usage(void)
+{
+  _cupsLangPuts(stdout, _("Usage: lpadmin [options] -d destination\n"
+                          "       lpadmin [options] -p destination\n"
+                          "       lpadmin [options] -p destination -c class\n"
+                          "       lpadmin [options] -p destination -r class\n"
+                          "       lpadmin [options] -x destination"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("-c class                Add the named destination to a class"));
+  _cupsLangPuts(stdout, _("-d destination          Set the named destination as the server default"));
+  _cupsLangPuts(stdout, _("-D description          Specify the textual description of the printer"));
+  _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
+  _cupsLangPuts(stdout, _("-E                      Enable and accept jobs on the printer (after -p)"));
+  _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
+  _cupsLangPuts(stdout, _("-i ppd-file             Specify a PPD file for the printer"));
+  _cupsLangPuts(stdout, _("-L location             Specify the textual location of the printer"));
+  _cupsLangPuts(stdout, _("-m model                Specify a standard model/PPD file for the printer"));
+  _cupsLangPuts(stdout, _("-m everywhere           Specify the printer is compatible with IPP Everywhere™"));
+  _cupsLangPuts(stdout, _("-o name-default=value   Specify the default value for the named option"));
+  _cupsLangPuts(stdout, _("-o Name=Value           Specify the default value for the named PPD option "));
+  _cupsLangPuts(stdout, _("-o cupsIPPSupplies=false\n"
+                          "                        Disable supply level reporting via IPP"));
+  _cupsLangPuts(stdout, _("-o cupsSNMPSupplies=false\n"
+                          "                        Disable supply level reporting via SNMP"));
+  _cupsLangPuts(stdout, _("-o job-k-limit=N        Specify the kilobyte limit for per-user quotas"));
+  _cupsLangPuts(stdout, _("-o job-page-limit=N     Specify the page limit for per-user quotas"));
+  _cupsLangPuts(stdout, _("-o job-quota-period=N   Specify the per-user quota period in seconds"));
+  _cupsLangPuts(stdout, _("-o printer-error-policy=name\n"
+                          "                        Specify the printer error policy"));
+  _cupsLangPuts(stdout, _("-o printer-is-shared=true\n"
+                          "                        Share the printer"));
+  _cupsLangPuts(stdout, _("-o printer-op-policy=name\n"
+                          "                        Specify the printer operation policy"));
+  _cupsLangPuts(stdout, _("-p destination          Specify/add the named destination"));
+  _cupsLangPuts(stdout, _("-r class                Remove the named destination from a class"));
+  _cupsLangPuts(stdout, _("-R name-default         Remove the default value for the named option"));
+  _cupsLangPuts(stdout, _("-u allow:all            Allow all users to print"));
+  _cupsLangPuts(stdout, _("-u allow:list           Allow the list of users or groups (@name) to print"));
+  _cupsLangPuts(stdout, _("-u deny:list            Prevent the list of users or groups (@name) to print"));
+  _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
+  _cupsLangPuts(stdout, _("-v device-uri           Specify the device URI for the printer"));
+  _cupsLangPuts(stdout, _("-x destination          Remove the named destination"));
+
+  exit(1);
 }
 
 

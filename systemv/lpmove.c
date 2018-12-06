@@ -1,10 +1,11 @@
 /*
  * "lpmove" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -18,8 +19,8 @@
  * Local functions...
  */
 
-static int	move_job(http_t *http, const char *src, int jobid,
-		         const char *dest);
+static int	move_job(http_t *http, const char *src, int jobid, const char *dest);
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*
@@ -52,7 +53,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-')
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -80,7 +83,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPuts(stderr, _("Error: need hostname after \"-h\" option."));
-		  return (1);
+		  usage();
 		}
 
 		cupsSetServer(argv[i]);
@@ -89,7 +92,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  default :
 	      _cupsLangPrintf(stderr, _("%s: Unknown option \"%c\"."), argv[0], *opt);
-	      return (1);
+	      usage();
 	}
       }
     }
@@ -112,15 +115,12 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       _cupsLangPrintf(stderr, _("lpmove: Unknown argument \"%s\"."), argv[i]);
-      return (1);
+      usage();
     }
   }
 
   if ((!jobid && !src) || !dest)
-  {
-    _cupsLangPuts(stdout, _("Usage: lpmove job/src dest"));
-    return (1);
-  }
+    usage();
 
   http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
@@ -201,4 +201,22 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
   }
   else
     return (0);
+}
+
+
+/*
+ * 'usage()' - Show program usage and exit.
+ */
+
+static void
+usage(void)
+{
+  _cupsLangPuts(stdout, _("Usage: lpmove [options] job destination\n"
+                          "       lpmove [options] source-destination destination"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
+  _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
+  _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
+
+  exit(1);
 }

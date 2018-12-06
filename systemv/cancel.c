@@ -1,10 +1,11 @@
 /*
  * "cancel" command for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -12,6 +13,13 @@
  */
 
 #include <cups/cups-private.h>
+
+
+/*
+ * Local functions...
+ */
+
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*
@@ -59,7 +67,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-' && argv[i][1])
+    if (!strcmp(argv[i], "--help"))
+      usage();
+    else if (argv[i][0] == '-' && argv[i][1])
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -88,7 +98,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-U\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 
 		cupsSetUser(argv[i]);
@@ -118,7 +128,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - expected hostname after \"-h\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 		else
 		  cupsSetServer(argv[i]);
@@ -140,7 +150,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		if (i >= argc)
 		{
 		  _cupsLangPrintf(stderr, _("%s: Error - expected username after \"-u\" option."), argv[0]);
-		  return (1);
+		  usage();
 		}
 		else
 		  user = argv[i];
@@ -375,4 +385,26 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   return (0);
+}
+
+
+/*
+ * 'usage()' - Show program usage and exit.
+ */
+
+static void
+usage(void)
+{
+  _cupsLangPuts(stdout, _("Usage: cancel [options] [id]\n"
+                          "       cancel [options] [destination]\n"
+                          "       cancel [options] [destination-id]"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("-a                      Cancel all jobs"));
+  _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
+  _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
+  _cupsLangPuts(stdout, _("-u owner                Specify the owner to use for jobs"));
+  _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
+  _cupsLangPuts(stdout, _("-x                      Purge jobs rather than just canceling"));
+
+  exit(1);
 }
