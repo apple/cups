@@ -17,10 +17,7 @@ file configures the CUPS scheduler,
 It is normally located in the
 <i>/etc/cups</i>
 directory.
-<b>Note:</b> File, directory, and user configuration directives that used to be allowed in the <b>cupsd.conf</b> file are now stored in the
-<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
-file instead in order to prevent certain types of privilege escalation attacks.
-<p>Each line in the file can be a configuration directive, a blank line, or a comment.
+Each line in the file can be a configuration directive, a blank line, or a comment.
 Configuration directives typically consist of a name and zero or more values separated by whitespace.
 The configuration directive name and values are case-insensitive.
 Comment lines start with the # character.
@@ -580,6 +577,16 @@ Use "%{job-impressions-completed}" to insert the number of pages (sides) that we
 <dd style="margin-left: 5.0em">Specifies the maximum amount of memory to use when converting documents into bitmaps for a printer.
 The default is "128m".
 </dl>
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+File, directory, and user configuration directives that used to be allowed in the <b>cupsd.conf</b> file are now stored in the
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
+file instead in order to prevent certain types of privilege escalation attacks.
+<p>The scheduler MUST be restarted manually after making changes to the <b>cupsd.conf</b> file.
+On Linux this is typically done using the
+<b>systemctl</b>(8)
+command, while on macOS the
+<b>launchctl</b>(8)
+command is used instead.
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 The <b>cupsd.conf</b> file format is based on the Apache HTTP Server configuration file format.
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>

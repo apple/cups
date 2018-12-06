@@ -191,6 +191,13 @@ On macOS the Font Book application manages system-installed fonts.
 <dt><a name="SMBConfigFile"></a><b>SMBConfigFile </b><i>filename</i>
 <dd style="margin-left: 5.0em">Specifies the SMB service configuration file to update.
 </dl>
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+The scheduler MUST be restarted manually after making changes to the <b>cups-files.conf</b> file.
+On Linux this is typically done using the
+<b>systemctl</b>(8)
+command, while on macOS the
+<b>launchctl</b>(8)
+command is used instead.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
 <a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
