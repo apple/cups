@@ -1,4 +1,4 @@
-CHANGES - 2.3b6 - 2018-12-05
+CHANGES - 2.3b6 - 2018-12-06
 ============================
 
 Changes in CUPS v2.3b6
@@ -7,6 +7,8 @@ Changes in CUPS v2.3b6
 - Localization update (Issue #5339, Issue #5348, Issue #5362, Issue #5408,
   Issue #5410)
 - Documentation updates (Issue #5369, Issue #5402, Issue #5403, Issue #5404)
+- The `lpoptions` command now works with IPP Everywhere printers that have not
+  yet been added as local queues (Issue #5045)
 - The lpadmin command would create a non-working printer in some error cases
   (Issue #5305)
 - The scheduler would crash if an empty `AccessLog` directive was specified
