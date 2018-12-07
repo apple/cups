@@ -1207,6 +1207,7 @@ cgi_set_sid(void)
   const char		*remote_addr,	/* REMOTE_ADDR */
 			*server_name,	/* SERVER_NAME */
 			*server_port;	/* SERVER_PORT */
+  struct timeval	curtime;	/* Current time */
 
 
   if ((remote_addr = getenv("REMOTE_ADDR")) == NULL)
@@ -1216,7 +1217,8 @@ cgi_set_sid(void)
   if ((server_port = getenv("SERVER_PORT")) == NULL)
     server_port = "SERVER_PORT";
 
-  CUPS_SRAND(time(NULL));
+  gettimeofday(&curtime, NULL);
+  CUPS_SRAND(curtime.tv_sec + curtime.tv_usec);
   snprintf(buffer, sizeof(buffer), "%s:%s:%s:%02X%02X%02X%02X%02X%02X%02X%02X",
            remote_addr, server_name, server_port,
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
