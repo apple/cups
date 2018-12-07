@@ -1,6 +1,11 @@
----
-title: cups-files.conf(5)
----
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups-files.conf(5)</title>
+</head>
+<body>
 <h1 class="title">cups-files.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 cups-files.conf - file and directory configuration file for cups
@@ -110,6 +115,9 @@ The server name may be included in filenames using the string "%s", for example:
 
 </pre>
 The default is "/var/log/cups/page_log".
+<dt><a name="PassEnv"></a><b>PassEnv </b><i>variable </i>[ ... <i>variable </i>]
+<dd style="margin-left: 5.0em">Passes the specified environment variable(s) to child processes.
+Note: the standard CUPS filter and backend environment variables cannot be overridden using this directive.
 <dt><a name="RemoteRoot"></a><b>RemoteRoot </b><i>username</i>
 <dd style="margin-left: 5.0em">Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
 The default is "remroot".
@@ -131,6 +139,9 @@ macOS uses its keychain database to store certificates and keys while other plat
 <dt><a name="ServerRoot"></a><b>ServerRoot </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory containing the server configuration files.
 The default is "/etc/cups".
+<dt><a name="SetEnv"></a><b>SetEnv </b><i>variable value</i>
+<dd style="margin-left: 5.0em">Set the specified environment variable to be passed to child processes.
+Note: the standard CUPS filter and backend environment variables cannot be overridden using this directive.
 <dt><a name="StateDir"></a><b>StateDir </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory to use for PID and local certificate files.
 The default is "/var/run/cups" or "/etc/cups" depending on the platform.
@@ -180,6 +191,13 @@ On macOS the Font Book application manages system-installed fonts.
 <dt><a name="SMBConfigFile"></a><b>SMBConfigFile </b><i>filename</i>
 <dd style="margin-left: 5.0em">Specifies the SMB service configuration file to update.
 </dl>
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+The scheduler MUST be restarted manually after making changes to the <b>cups-files.conf</b> file.
+On Linux this is typically done using the
+<b>systemctl</b>(8)
+command, while on macOS the
+<b>launchctl</b>(8)
+command is used instead.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
 <a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
@@ -193,3 +211,5 @@ CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help<
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright &copy; 2007-2018 by Apple Inc.
 
+</body>
+</html>

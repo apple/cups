@@ -5,6 +5,66 @@ layout: sub
 
 <h1 class="title">Release Notes</h1>
 
+<h2 class="title"><a name="020210">CUPS 2.2.10</a> <em>(December 7, 2018)</em></h2>
+
+<ul>
+	<li>CVE-2018-4700: Linux session cookies used a predictable random number seed.</li>
+	<li>The `lpoptions` command now works with IPP Everywhere printers that have not yet been added as local queues (Issue #5045)</li>
+	<li>Added USB quirk rules (Issue #5395, Issue #5443)</li>
+	<li>The generated PPD files for IPP Everywhere printers did not contain the cupsManualCopies keyword (Issue #5433)</li>
+	<li>Kerberos credentials might be truncated (Issue #5435)</li>
+	<li>The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)</li>
+	<li>Incorporated the page accounting changes from CUPS 2.3 (Issue #5439)</li>
+	<li>Fixed a bug adding a queue with the `-E` option (Issue #5440)</li>
+	<li>Fixed a crash bug when mapping PPD duplex options to IPP attributes (rdar://46183976)</li>
+</ul>
+
+
+<h2 class="title"><a name="0203b6">CUPS 2.3b6</a> <em>(December 7, 2018)</em></h2>
+
+<ul>
+	<li>Localization update (Issue #5339, Issue #5348, Issue #5362, Issue #5408, Issue #5410)</li>
+	<li>Documentation updates (Issue #5369, Issue #5402, Issue #5403, Issue #5404)</li>
+	<li>CVE-2018-4700: Linux session cookies used a predictable random number seed.</li>
+	<li>All user commands now support the `--help` option (Issue #5326)</li>
+	<li>The `lpoptions` command now works with IPP Everywhere printers that have not yet been added as local queues (Issue #5045)</li>
+	<li>The lpadmin command would create a non-working printer in some error cases (Issue #5305)</li>
+	<li>The scheduler would crash if an empty `AccessLog` directive was specified (Issue #5309)</li>
+	<li>The scheduler did not idle-exit on some Linux distributions (Issue #5319)</li>
+	<li>Fixed a regression in the changes to ippValidateAttribute (Issue #5322, Issue #5330)</li>
+	<li>Fixed a crash bug in the Epson dot matrix driver (Issue #5323)</li>
+	<li>Automatic debug logging of job errors did not work with systemd (Issue #5337)</li>
+	<li>The web interface did not list the IPP Everywhere &quot;driver&quot; (Issue #5338)</li>
+	<li>The scheduler did not report all of the supported job options and values (Issue #5340)</li>
+	<li>The IPP Everywhere &quot;driver&quot; now properly supports face-up printers (Issue #5345)</li>
+	<li>Fixed some typos in the label printer drivers (Issue #5350)</li>
+	<li>Setting the `Community` name to the empty string in `snmp.conf` now disables SNMP supply level monitoring by all the standard network backends (Issue #5354)</li>
+	<li>Multi-file jobs could get stuck if the backend failed (Issue #5359, Issue #5413)</li>
+	<li>The IPP Everywhere &quot;driver&quot; no longer does local filtering when printing to a shared CUPS printer (Issue #5361)</li>
+	<li>The lpadmin command now correctly reports IPP errors when configuring an IPP Everywhere printer (Issue #5370)</li>
+	<li>Fixed some memory leaks discovered by Coverity (Issue #5375)</li>
+	<li>The PPD compiler incorrectly terminated JCL options (Issue #5379)</li>
+	<li>The cupstestppd utility did not generate errors for missing/mismatched CloseUI/JCLCloseUI keywords (Issue #5381)</li>
+	<li>The scheduler now reports the actual location of the log file (Issue #5398)</li>
+	<li>Added USB quirk rules (Issue #5395, Issue #5420, Issue #5443)</li>
+	<li>The generated PPD files for IPP Everywhere printers did not contain the cupsManualCopies keyword (Issue #5433)</li>
+	<li>Kerberos credentials might be truncated (Issue #5435)</li>
+	<li>The handling of `MaxJobTime 0` did not match the documentation (Issue #5438)</li>
+	<li>Fixed a bug adding a queue with the `-E` option (Issue #5440)</li>
+	<li>The `cupsaddsmb` program has been removed (Issue #5449)</li>
+	<li>The `cupstestdsc` program has been removed (Issue #5450)</li>
+	<li>The scheduler was being backgrounded on macOS, causing applications to spin (rdar://40436080)</li>
+	<li>The scheduler did not validate that required initial request attributes were in the operation group (rdar://41098178)</li>
+	<li>Authentication in the web interface did not work on macOS (rdar://41444473)</li>
+	<li>Fixed an issue with HTTP Digest authentication (rdar://41709086)</li>
+	<li>The scheduler could crash when job history was purged (rdar://42198057)</li>
+	<li>Fixed a crash bug when mapping PPD duplex options to IPP attributes (rdar://46183976)</li>
+	<li>Fixed a memory leak for some IPP (extension) syntaxes.</li>
+	<li>The `cupscgi`, `cupsmime`, and `cupsppdc` support libraries are no longer installed as shared libraries.</li>
+	<li>The `snmp` backend is now deprecated.</li>
+</ul>
+
+
 <h2 class="title"><a name="020209">CUPS 2.2.9</a> <em>(November 8, 2018)</em></h2>
 
 <ul>
