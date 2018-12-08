@@ -1,5 +1,11 @@
-CHANGES - 2.3b6 - 2018-12-07
+CHANGES - 2.3b6 - 2018-12-08
 ============================
+
+Changes in CUPS v2.3b7
+----------------------
+
+- Fixed some build failures (Issue #5451)
+
 
 Changes in CUPS v2.3b6
 ----------------------
