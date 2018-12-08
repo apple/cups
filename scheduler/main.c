@@ -155,7 +155,7 @@ main(int  argc,				/* I - Number of command-line args */
   for (i = 1; i < argc; i ++)
   {
     if (!strcmp(argv[i], "--help"))
-      usage();
+      usage(0);
     else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
