@@ -1,5 +1,11 @@
-CHANGES - 2.2.10 - 2018-12-07
+CHANGES - 2.2.10 - 2018-12-10
 =============================
+
+Changes in CUPS v2.2.11
+-----------------------
+
+- Running ppdmerge with the same input and output filenames did not work as
+  advertised (Issue #5455)
 
 
 Changes in CUPS v2.2.10
