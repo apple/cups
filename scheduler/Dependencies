@@ -149,7 +149,8 @@ network.o: network.c ../cups/http-private.h ../config.h \
   ../cups/pwg-private.h ../cups/thread-private.h ../cups/file-private.h \
   ../cups/ppd-private.h ../cups/ppd.h ../cups/raster.h mime.h sysman.h \
   statbuf.h cert.h auth.h client.h policy.h printers.h classes.h job.h \
-  colorman.h conf.h banners.h dirsvc.h network.h subscriptions.h
+  colorman.h conf.h banners.h dirsvc.h network.h subscriptions.h \
+  ../cups/getifaddrs-internal.h
 policy.o: policy.c cupsd.h ../cups/cups-private.h \
   ../cups/string-private.h ../config.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \

@@ -1,7 +1,7 @@
 /*
  * Network interface functions for the CUPS scheduler.
  *
- * Copyright © 2007-2014 by Apple Inc.
+ * Copyright © 2007-2018 by Apple Inc.
  * Copyright © 1997-2006 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -14,6 +14,7 @@
 
 #include <cups/http-private.h>
 #include "cupsd.h"
+#include <cups/getifaddrs-internal.h>
 
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Network interface functions for CUPS.
  *
- * Copyright © 2007-2010 by Apple Inc.
+ * Copyright © 2007-2018 by Apple Inc.
  * Copyright © 1997-2006 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -12,7 +12,7 @@
  * Include necessary headers.
  */
 
-#include "http-private.h"
+#include "getifaddrs-internal.h"
 
 
 #ifndef HAVE_GETIFADDRS

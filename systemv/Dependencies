@@ -11,26 +11,12 @@ cupsaccept.o: cupsaccept.c ../cups/cups-private.h \
   ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
   ../cups/thread-private.h
-cupsaddsmb.o: cupsaddsmb.c ../cups/cups-private.h \
-  ../cups/string-private.h ../config.h ../cups/versioning.h \
-  ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/http.h \
-  ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
-  ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/thread-private.h ../cups/adminutil.h
 cupsctl.o: cupsctl.c ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/versioning.h ../cups/array-private.h \
   ../cups/array.h ../cups/ipp-private.h ../cups/cups.h ../cups/file.h \
   ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/pwg.h \
   ../cups/http-private.h ../cups/language-private.h ../cups/transcode.h \
   ../cups/pwg-private.h ../cups/thread-private.h ../cups/adminutil.h
-cupstestdsc.o: cupstestdsc.c ../cups/cups-private.h \
-  ../cups/string-private.h ../config.h ../cups/versioning.h \
-  ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/http.h \
-  ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
-  ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/thread-private.h
 cupstestppd.o: cupstestppd.c ../cups/cups-private.h \
   ../cups/string-private.h ../config.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
