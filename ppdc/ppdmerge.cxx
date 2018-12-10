@@ -1,10 +1,11 @@
 //
 // PPD file merge utility for the CUPS PPD Compiler.
 //
-// Copyright 2007-2014 by Apple Inc.
-// Copyright 2002-2007 by Easy Software Products.
+// Copyright © 2007-2018 by Apple Inc.
+// Copyright © 2002-2007 by Easy Software Products.
 //
-// Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+// Licensed under Apache License v2.0.  See the file "LICENSE" for more
+// information.
 //
 
 //
@@ -38,6 +39,7 @@ main(int  argc,				// I - Number of command-line arguments
   cups_array_t	*ppds;			// Array of PPD files
   const char	*inname,		// First input filename
 		*outname;		// Output filename (if any)
+  char		bckname[1024];		// Backup filename
   cups_file_t	*infile,		// Input file
 		*outfile;		// Output file
   cups_array_t	*languages;		// Languages in file
@@ -137,9 +139,6 @@ main(int  argc,				// I - Number of command-line arguments
         if (outname && !strcmp(inname, outname))
 	{
 	  // Rename input filename so that we don't overwrite it...
-	  char bckname[1024];		// Backup filename
-
-
 	  snprintf(bckname, sizeof(bckname), "%s.bck", inname);
 
 	  if (rename(inname, bckname))
