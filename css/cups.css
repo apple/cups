@@ -382,6 +382,26 @@ div.body dd {
   margin-bottom: 0.5em;
 }
 
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: black;
+    color: #eee;
+  }
+  A:link, A:link:visited, A:visited, A:link:hover, A:visited:hover {
+    color: #327DCC;
+    text-decoration: underline;
+  }
+  PRE {
+    background: #333;
+    border-left-color: #666;
+    color: #ccc;
+  }
+  DIV.table TABLE TH {
+    background: #333;
+  }
+}
+
 /* iPhone/iPod touch overrides */
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px),
        only screen and (min-device-width: 320px) and (max-device-width: 568px) {

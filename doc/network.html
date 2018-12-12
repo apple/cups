@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html>
-<!-- SECTION: Getting Started -->
-  <head>
-    <title>Using Network Printers</title>
-    <link rel="stylesheet" type="text/css" href="../cups-printable.css">
-  </head>
-  <body>
+---
+title: Using Network Printers
+layout: sub
+---
+
     <h1 class="title">Using Network Printers</h1>
 
     <p>This help document describes how to discover, configure, and use TCP/IP network printers with CUPS.</p>
@@ -338,5 +335,3 @@ HOST-RESOURCES-MIB::hrDeviceDescr.1 = STRING: HP LaserJet 4000 Series</pre>
     <p>The hrDeviceType line should show hrDevicePrinter; if not, then your printer or print server doesn't identify itself as a printer. The hrDeviceDescr line should provide a human-readable string for the make and model of the printer, although in some cases you'll just see something less useful like "Axis OfficeBASIC Parallel Print Server".</p>
 
     <p>Once you have collected the snmpwalk output, you should go to the  <a href="https://github.com/apple/cups/issues">CUPS Issue Tracker</a> page to submit a feature request to support your printer or print server. Be sure to attach those two log files you created - they will help us to identify the SNMP values we need to look for.</p>
-  </body>
-</html>
