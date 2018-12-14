@@ -1,5 +1,12 @@
-CHANGES - 2.3b6 - 2018-12-14
+CHANGES - 2.3b8 - 2018-12-14
 ============================
+
+
+Changes in CUPS v2.3b8
+----------------------
+
+- Fixed a potential crash bug in cups-driverd (rdar://46625579)
+
 
 Changes in CUPS v2.3b7
 ----------------------
