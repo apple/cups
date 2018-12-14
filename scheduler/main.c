@@ -129,7 +129,7 @@ main(int  argc,				/* I - Number of command-line args */
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
 #if defined(HAVE_ONDEMAND)
-  int			service_idle_exit;
+  int			service_idle_exit = 0;
 					/* Idle exit on select timeout? */
 #endif /* HAVE_ONDEMAND */
 
