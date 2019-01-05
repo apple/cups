@@ -711,7 +711,7 @@ msgstr ""
 
 #, c-format
 msgid "    %d ERRORS FOUND"
-msgstr ""
+msgstr "    %d FEHLER GEFUNDEN"
 
 msgid "    -h       Show program usage"
 msgstr "    -h       Zeige Verwendungshinweis"
@@ -817,7 +817,7 @@ msgstr ""
 "Druckauftrags."
 
 msgid "  --cr                    End lines with CR (Mac OS 9)."
-msgstr "  --cr                    Zeilenenden mit CR (OS 9)"
+msgstr "  --cr                    Zeilenenden mit CR (Mac OS 9)"
 
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  Zeilenenden mit CR+LF (Windows)"
@@ -856,7 +856,7 @@ msgid "  --list-filters          List filters that will be used."
 msgstr "  --list-filters          Liste die Filter auf die benutzt werden."
 
 msgid "  --local                 True if service is local."
-msgstr "  --local                 Wahr wenn der Dienst lokal ist."
+msgstr "  --local                 Wahr, wenn der Dienst lokal ist."
 
 msgid "  --ls                    List attributes."
 msgstr "  --ls                    Liste Attribute auf."
@@ -1071,7 +1071,7 @@ msgstr ""
 msgid ""
 "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
-"  -i Sekunden             Wiederhole die letzte Datei im gegebenen Intervall."
+"  -i Sekunden             Wiederhole die letzte Datei im angegebenen Intervall."
 
 msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
@@ -1257,24 +1257,25 @@ msgid " FAIL"
 msgstr ""
 
 msgid " PASS"
-msgstr ""
+msgstr "BESTANDEN"
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
-msgstr ""
+msgstr "\"%s\": Falscher URI-Wert \"%s\" - %s (RFC 8011 Abschnitt 5.1.6)."
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
-msgstr ""
+msgstr "\"%s\": Falscher URI-Wert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt 5.1.6)."
 
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
-msgstr ""
+msgstr "\"%s\": Falscher Attributname - falsche Länge %d (RFC 8011 Abschnitt 5.1.4)."
 
 #, c-format
 msgid ""
 "\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
 msgstr ""
+"\"%s\": Falscher Attributname - ungültiges Zeichen (RFC 8011 Abschnitt 5.1.4)."
 
 #, c-format
 msgid "\"%s\": Bad boolen value %d (RFC 8011 section 5.1.21)."
@@ -1284,6 +1285,7 @@ msgstr ""
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
 msgstr ""
+"\"%s\": Falscher Zeichensatzwert \"%s\" - falsche Zeichen (RFC 8011 Abschnitt 5.1.8)."
 
 #, c-format
 msgid ""
@@ -1334,12 +1336,15 @@ msgstr ""
 msgid ""
 "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
+"\"%s\": Falscher Schlüsselwortwert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt 5.1.4)."
 
 #, c-format
 msgid ""
 "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section "
 "5.1.4)."
 msgstr ""
+"\"%s\": Falscher Schlüsselwortwert \"%s\" - ungültiges Zeichen (RFC 8011 Abschnitt "
+"5.1.4)."
 
 #, c-format
 msgid ""
@@ -1357,6 +1362,7 @@ msgstr ""
 msgid ""
 "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
 msgstr ""
+"\"%s\": Falscher Namenswert \"%s\" - falsche UTF-8-Sequenz (RFC 8011 Abschnitt 5.1.3)."
 
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
@@ -1390,6 +1396,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
 "5.1.16)."
 msgstr ""
+"\"%s\": Falscher Auflösungswert %dx%d%s - falscher Einheitenwert (RFC 8011 Abschnitt "
+"5.1.16)."
 
 #, c-format
 msgid ""
