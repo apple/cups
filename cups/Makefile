@@ -1,7 +1,7 @@
 #
 # Library Makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -736,35 +736,34 @@ tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
 apihelp:
 	echo Generating CUPS API help files...
 	$(RM) cupspm.xml
-	mxmldoc --section "Programming" --body cupspm.md \
+	codedoc --section "Programming" --body cupspm.md \
 		cupspm.xml \
 		auth.c cups.h dest*.c encode.c http.h http*.c ipp.h ipp*.c \
 		options.c tls-darwin.c usersys.c util.c \
 		--coverimage cupspm.png \
 		--epub ../doc/help/cupspm.epub
-	mxmldoc --section "Programming" --body cupspm.md \
+	codedoc --section "Programming" --body cupspm.md \
 		cupspm.xml > ../doc/help/cupspm.html
 	$(RM) cupspm.xml
-	mxmldoc --section "Programming" --title "Administration APIs" \
+	codedoc --section "Programming" --title "Administration APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-admin.header --intro api-admin.shtml \
 		api-admin.xml \
 		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
 	$(RM) api-admin.xml
-	mxmldoc --section "Programming" --title "PPD API (DEPRECATED)" \
+	codedoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
 		api-ppd.xml ppd.h ppd-*.c >../doc/help/api-ppd.html
 	$(RM) api-ppd.xml
-	mxmldoc --section "Programming" --title "Raster API" \
+	codedoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
 		api-raster.xml \
 		../cups/raster.h interpret.c raster.c \
 		>../doc/help/api-raster.html
-	mxmldoc --tokens help/api-raster.html api-raster.xml >../doc/help/api-raster.tokens
 	$(RM) api-raster.xml
-	mxmldoc --section "Programming" \
+	codedoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
