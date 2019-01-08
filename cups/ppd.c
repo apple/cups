@@ -470,6 +470,7 @@ _ppdOpen(
 			ll_CC[7];	/* Language w/country + '.' */
   size_t		ll_len = 0,	/* Base language length */
 			ll_CC_len = 0;	/* Language w/country length */
+  void			*temp_ptr;	/* Temporary variable with a pointer to resized buffer */
   static const char * const ui_keywords[] =
 			{
 #ifdef CUPS_USE_FULL_UI_KEYWORDS_LIST
@@ -654,6 +655,7 @@ _ppdOpen(
   ppd->landscape      = -90;
   ppd->coptions       = cupsArrayNew((cups_array_func_t)ppd_compare_coptions,
                                      NULL);
+  ppd->emulations     = NULL;
 
  /*
   * Read lines from the PPD file and add them to the file record...
@@ -1202,27 +1204,32 @@ _ppdOpen(
 	    sptr ++;
 	}
 
-      ppd->num_emulations = count;
-      if ((ppd->emulations = calloc((size_t)count, sizeof(ppd_emul_t))) == NULL)
+      temp_ptr = realloc(ppd->emulations, (size_t)(ppd->num_emulations+count)*sizeof(ppd_emul_t));
+      if (temp_ptr == NULL)
       {
         pg->ppd_status = PPD_ALLOC_ERROR;
-
-	goto error;
+        goto error;
       }
+      ppd->emulations = temp_ptr;
 
-      for (i = 0, sptr = string; i < count; i ++)
+      sptr = string;
+      for (i = ppd->num_emulations; i < ppd->num_emulations+count; i ++)
       {
+        ppd->emulations[i].start = NULL;
+        ppd->emulations[i].stop  = NULL;
         for (nameptr = ppd->emulations[i].name;
-	     *sptr != '\0' && *sptr != ' ';
-	     sptr ++)
-	  if (nameptr < (ppd->emulations[i].name + sizeof(ppd->emulations[i].name) - 1))
-	    *nameptr++ = *sptr;
+          *sptr != '\0' && *sptr != ' ';
+          sptr ++)
+            if (nameptr < (ppd->emulations[i].name + sizeof(ppd->emulations[i].name) - 1))
+              *nameptr++ = *sptr;
 
-	*nameptr = '\0';
+        *nameptr = '\0';
 
-	while (*sptr == ' ')
-	  sptr ++;
+        while (*sptr == ' ')
+          sptr ++;
       }
+      ppd->num_emulations += count;
+
     }
     else if (!strncmp(keyword, "StartEmulator_", 14))
     {
