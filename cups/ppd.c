@@ -3038,7 +3038,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
       }
     }
 
-    if (endquote)
+    if (endquote && ch != EOF)
     {
      /*
       * Didn't finish this quoted string...
@@ -3093,7 +3093,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	}
     }
 
-    if (ch != '\n')
+    if (ch != '\n' && ch != EOF)
     {
      /*
       * Didn't finish this line...
