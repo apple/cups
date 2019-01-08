@@ -34,6 +34,24 @@ static cups_array_t	*stringpool = NULL;
 
 static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
 
+static _cups_sp_item_t* create_item(const char *s)
+{
+  _cups_sp_item_t * item;
+  size_t slen = strlen(s);
+  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t) + slen);
+  if (!item)
+  {
+    return (NULL);
+  }
+  item->ref_count = 1;
+  memcpy(item->str, s, slen + 1);
+#ifdef DEBUG_GUARDS
+  item->guard = _CUPS_STR_GUARD;
+  DEBUG_printf(("5_cupsStrAlloc: Created string %p(%s) for \"%s\", guard=%08x, "
+             "ref_count=%d", item, item->str, s, item->guard, item->ref_count));
+#endif /* DEBUG_GUARDS */
+  return item;
+}
 
 /*
  * '_cupsStrAlloc()' - Allocate/reference a string.
@@ -55,6 +73,14 @@ _cupsStrAlloc(const char *s)		/* I - String */
     return (NULL);
 
  /*
+  * Create an item...
+  */
+
+  key = create_item(s);
+  if (!key)
+    return (NULL);
+
+ /*
   * Get the string pool...
   */
 
@@ -66,15 +92,13 @@ _cupsStrAlloc(const char *s)		/* I - String */
   if (!stringpool)
   {
     _cupsMutexUnlock(&sp_mutex);
-
+    free(key);
     return (NULL);
   }
 
  /*
   * See if the string is already in the pool...
   */
-
-  key = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
 
   if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL)
   {
@@ -94,43 +118,19 @@ _cupsStrAlloc(const char *s)		/* I - String */
 #endif /* DEBUG_GUARDS */
 
     _cupsMutexUnlock(&sp_mutex);
-
+    free(key);
     return (item->str);
   }
 
  /*
-  * Not found, so allocate a new one...
+  * Not found, so add the string to the pool and return it...
   */
 
-  slen = strlen(s);
-  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t) + slen);
-  if (!item)
-  {
-    _cupsMutexUnlock(&sp_mutex);
-
-    return (NULL);
-  }
-
-  item->ref_count = 1;
-  memcpy(item->str, s, slen + 1);
-
-#ifdef DEBUG_GUARDS
-  item->guard = _CUPS_STR_GUARD;
-
-  DEBUG_printf(("5_cupsStrAlloc: Created string %p(%s) for \"%s\", guard=%08x, "
-		"ref_count=%d", item, item->str, s, item->guard,
-		item->ref_count));
-#endif /* DEBUG_GUARDS */
-
- /*
-  * Add the string to the pool and return it...
-  */
-
-  cupsArrayAdd(stringpool, item);
+  cupsArrayAdd(stringpool, key);
 
   _cupsMutexUnlock(&sp_mutex);
 
-  return (item->str);
+  return (key->str);
 }
 
 
@@ -303,13 +303,19 @@ _cupsStrFree(const char *s)		/* I - String to free */
   if (!stringpool)
     return;
 
+  /*
+   * Create an item...
+   */
+
+   key = create_item(s);
+   if (!key)
+     return;
+
  /*
   * See if the string is already in the pool...
   */
 
   _cupsMutexLock(&sp_mutex);
-
-  key = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
 
 #ifdef DEBUG_GUARDS
   if (key->guard != _CUPS_STR_GUARD)
@@ -321,7 +327,7 @@ _cupsStrFree(const char *s)		/* I - String to free */
 #endif /* DEBUG_GUARDS */
 
   if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL &&
-      item == key)
+      item->str == s)
   {
    /*
     * Found it, dereference...
@@ -342,6 +348,8 @@ _cupsStrFree(const char *s)		/* I - String to free */
   }
 
   _cupsMutexUnlock(&sp_mutex);
+
+  free(key);
 }
 
 
