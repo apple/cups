@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-01-07
+CHANGES - 2.3b8 - 2019-01-09
 ============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.3b8
 ----------------------
 
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
+- Fixed a potential memory leak when reading at the end of a file (Issue #5473)
 - Localization updates (Issue #5461, Issues #5471)
 
 
