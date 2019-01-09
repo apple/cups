@@ -1,7 +1,7 @@
 /*
  * Simulated client test program for CUPS.
  *
- * Copyright © 2017-2018 by Apple Inc.
+ * Copyright © 2017-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -1049,6 +1049,7 @@ usage(void)
 {
   puts("Usage: ./testclient printer-uri [options]");
   puts("Options:");
+  puts("  -c num-clients      Simulate multiple clients");
   puts("  -d document-format  Generate the specified format");
   puts("  -f print-file       Print the named file");
   puts("  -g                  Force grayscale printing");
