@@ -6,7 +6,7 @@
  * our own file functions allows us to provide transparent support of
  * different line endings, gzip'd print files, PPD files, etc.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -672,6 +672,12 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   if (!fp || (fp->mode != 'r' && fp->mode != 's'))
   {
     DEBUG_puts("5cupsFileGetChar: Bad arguments!");
+    return (-1);
+  }
+
+  if (fp->eof)
+  {
+    DEBUG_puts("5cupsFileGetChar: End-of-file!");
     return (-1);
   }
 
@@ -1646,6 +1652,12 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 
   if (bytes == 0)
     return (0);
+
+  if (fp->eof)
+  {
+    DEBUG_puts("5cupsFileRead: End-of-file!");
+    return (-1);
+  }
 
  /*
   * Loop until all bytes are read...
