@@ -65,10 +65,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
   int		delay;			/* Delay for retries... */
-  int		device_fd;		/* AppSocket */
   int		error;			/* Error code (if any) */
-  http_addrlist_t *addrlist,		/* Address list */
-		*addr;			/* Connected address */
+  http_addrlist_t *addrlist;		/* Address list */
+  http_t	*http;			/* Connection */
   char		addrname[256];		/* Address name */
   int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd,		/* SNMP socket */
@@ -260,6 +259,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   addrlist = backendLookup(hostname, port, NULL);
 
+  http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, HTTP_ENCRYPTION_NEVER, 1,
+		      0, NULL);
+
  /*
   * See if the printer supports SNMP...
   */
@@ -296,10 +298,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   for (delay = 5;;)
   {
-    if ((addr = httpAddrConnect(addrlist, &device_fd)) == NULL)
+    if (httpReconnect2(http, 30000, NULL))
     {
       error     = errno;
-      device_fd = -1;
 
       if (getenv("CLASS") != NULL)
       {
@@ -375,8 +376,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
   fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
-	  httpAddrString(&(addr->addr), addrname, sizeof(addrname)),
-	  httpAddrPort(&(addr->addr)));
+	  httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+	  httpAddrPort(http->hostaddr));
 
  /*
   * Print everything...
@@ -385,22 +386,29 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   tbytes = 0;
 
   if (bytes > 0)
-    tbytes += write(device_fd, buffer, (size_t)bytes);
+    tbytes = httpWrite2(http, buffer, (size_t)bytes);
 
   while (copies > 0 && tbytes >= 0)
   {
     copies --;
 
-    if (print_fd != 0)
+    if (print_fd == 0)
+    {
+      if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 1, backendNetworkSideCB))
+	return (CUPS_BACKEND_FAILED);
+    }
+    else
     {
       fputs("PAGE: 1 1\n", stderr);
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    if ((bytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addrlist->addr), 1, 0, backendNetworkSideCB)) < 0)
+    bytes = read(print_fd, buffer, sizeof(buffer));
+    if (bytes < 0)
       tbytes = -1;
     else
-      tbytes = bytes;
+      tbytes = httpWrite2(http, buffer, (size_t)bytes);
+    httpFlushWrite(http);
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
@@ -416,9 +424,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for printer to finish."));
 
-    shutdown(device_fd, 1);
+    httpShutdown(http);
 
-    while (wait_bc(device_fd, 90) > 0);
+    while (wait_bc(httpGetFd(http), 90) > 0);
   }
 
  /*
@@ -434,9 +442,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Close the socket connection...
   */
 
-  close(device_fd);
-
-  httpAddrFreeList(addrlist);
+  httpClose(http);
 
  /*
   * Close the input file and return...
