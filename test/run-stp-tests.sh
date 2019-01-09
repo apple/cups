@@ -1027,9 +1027,13 @@ fi
 
 # Debug2 log messages
 count=`$GREP '^d ' $BASE/log/error_log | wc -l | awk '{print $1}'`
-if test $count = 0; then
+if test $count = 0 -a $loglevel = debug2; then
 	echo "FAIL: $count debug2 messages, expected more than 0."
 	echo "    <p>FAIL: $count debug2 messages, expected more than 0.</p>" >>$strfile
+	fail=`expr $fail + 1`
+elif test $count != 0 -a $loglevel = debug; then
+	echo "FAIL: $count debug2 messages, expected 0."
+	echo "    <p>FAIL: $count debug2 messages, expected 0.</p>" >>$strfile
 	fail=`expr $fail + 1`
 else
 	echo "PASS: $count debug2 messages."
