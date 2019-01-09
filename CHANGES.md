@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2018-12-14
+CHANGES - 2.2.11 - 2019-01-09
 =============================
 
 Changes in CUPS v2.2.11
@@ -6,6 +6,7 @@ Changes in CUPS v2.2.11
 
 - Running ppdmerge with the same input and output filenames did not work as
   advertised (Issue #5455)
+- Fixed a potential memory leak when reading at the end of a file (Issue #5473)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 
 

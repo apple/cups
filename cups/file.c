@@ -679,6 +679,12 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
     return (-1);
   }
 
+  if (fp->eof)
+  {
+    DEBUG_puts("5cupsFileGetChar: End-of-file!");
+    return (-1);
+  }
+
  /*
   * If the input buffer is empty, try to read more data...
   */
@@ -1650,6 +1656,12 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 
   if (bytes == 0)
     return (0);
+
+  if (fp->eof)
+  {
+    DEBUG_puts("5cupsFileRead: End-of-file!");
+    return (-1);
+  }
 
  /*
   * Loop until all bytes are read...
