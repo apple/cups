@@ -116,6 +116,12 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 IPPALIASES	=	@IPPALIASES@
 
 #
+# Socket backend aliases...
+#
+
+SOCKETALIASES	=	@SOCKETALIASES@
+
+#
 # Install XPC backends?
 #
 

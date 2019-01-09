@@ -162,8 +162,17 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
                   username, sizeof(username), hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
-  if (port == 0)
-    port = 9100;	/* Default to HP JetDirect/Tektronix PhaserShare */
+  if (!strcmp(scheme, "tlsraw"))
+    cupsSetEncryption(HTTP_ENCRYPTION_ALWAYS);
+  else
+    cupsSetEncryption(HTTP_ENCRYPTION_NEVER);
+
+  if (port == 0) {
+    if (cupsEncryption())
+      port = 9143;	/* Default to Zebra TLSRAW */
+    else
+      port = 9100;	/* Default to HP JetDirect/Tektronix PhaserShare */
+  }
 
  /*
   * Get options, if any...
@@ -259,7 +268,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   addrlist = backendLookup(hostname, port, NULL);
 
-  http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, HTTP_ENCRYPTION_NEVER, 1,
+  http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
 		      0, NULL);
 
  /*

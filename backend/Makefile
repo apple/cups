@@ -80,7 +80,7 @@ unittests:	$(UNITTESTS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns socket-static
+	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns socket-static tlsraw tlsraw-static
 
 
 #
@@ -127,6 +127,10 @@ install-exec:	$(INSTALLXPC)
 		$(RM) $(SERVERBIN)/backend/$$file; \
 		$(LN) ipp $(SERVERBIN)/backend/$$file; \
 	done
+	for file in $(SOCKETALIASES); do \
+		$(RM) $(SERVERBIN)/backend/$$file; \
+		$(LN) socket $(SERVERBIN)/backend/$$file; \
+	done
 	if test "x$(DNSSD_BACKEND)" != x -a `uname` = Darwin; then \
 		$(RM) $(SERVERBIN)/backend/mdns; \
 		$(LN) $(DNSSD_BACKEND) $(SERVERBIN)/backend/mdns; \
@@ -146,6 +150,10 @@ install-xpc:	ipp
 	for file in $(IPPALIASES); do \
 		$(RM) $(SERVERBIN)/apple/$$file; \
 		$(LN) ipp $(SERVERBIN)/apple/$$file; \
+	done
+	for file in $(SOCKETALIASES); do \
+		$(RM) $(SERVERBIN)/apple/$$file; \
+		$(LN) socket $(SERVERBIN)/apple/$$file; \
 	done
 
 
@@ -181,14 +189,14 @@ install-libs:
 
 uninstall:
 	$(RM) $(SERVERBIN)/apple/ipp
-	for file in $(IPPALIASES); do \
+	for file in $(IPPALIASES) $(SOCKETALIASES); do \
 		$(RM) $(SERVERBIN)/apple/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/apple
 	for file in $(RBACKENDS) $(UBACKENDS) $(ULBACKENDS); do \
 		$(RM) $(SERVERBIN)/backend/$$file; \
 	done
-	for file in $(IPPALIASES); do \
+	for file in $(IPPALIASES) $(SOCKETALIASES); do \
 		$(RM) $(SERVERBIN)/backend/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/backend
@@ -296,6 +304,10 @@ socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+	$(RM) tlsraw
+	for file in $(SOCKETALIASES); do \
+		$(LN) socket $$file; \
+	done
 
 socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 	echo Linking $@...
@@ -303,6 +315,10 @@ socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+	$(RM) tlsraw-static
+	for file in $(SOCKETALIASES); do \
+		$(LN) socket-static $${file}-static; \
+	done
 
 
 #

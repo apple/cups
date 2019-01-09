@@ -23,6 +23,7 @@ backend/socket
 backend/test1284
 backend/testbackend
 backend/testsupplies
+backend/tlsraw
 backend/usb
 berkeley/lpc
 berkeley/lpq
