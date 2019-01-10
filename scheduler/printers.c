@@ -1,7 +1,7 @@
 /*
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -48,8 +48,7 @@ static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
 static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
-static ipp_t	*new_media_col(pwg_size_t *size, const char *source,
-		               const char *type);
+static ipp_t	*new_media_col(pwg_size_t *size);
 static void	write_xml_string(cups_file_t *fp, const char *s);
 
 
@@ -3799,7 +3798,7 @@ dirty_printer(cupsd_printer_t *p)	/* I - Printer */
 static void
 load_ppd(cupsd_printer_t *p)		/* I - Printer */
 {
-  int		i, j, k;		/* Looping vars */
+  int		i, j;			/* Looping vars */
   char		cache_name[1024];	/* Cache filename */
   struct stat	cache_info;		/* Cache file info */
   ppd_file_t	*ppd;			/* PPD file */
@@ -3811,9 +3810,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		*output_bin,		/* OutputBin option */
 		*output_mode,		/* OutputMode option */
 		*resolution;		/* (Set|JCL|)Resolution option */
-  ppd_choice_t	*choice,		/* Current PPD choice */
-		*input_slot,		/* Current input slot */
-		*media_type;		/* Current media type */
+  ppd_choice_t	*choice;		/* Current PPD choice */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
   int		xdpi,			/* Horizontal resolution */
 		ydpi;			/* Vertical resolution */
@@ -4073,20 +4070,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       {
         ipp_t	*col;			/* Collection value */
 
-	input_slot = ppdFindMarkedChoice(ppd, "InputSlot");
-	media_type = ppdFindMarkedChoice(ppd, "MediaType");
-	col        = new_media_col(pwgsize,
-			           input_slot ?
-				       _ppdCacheGetSource(p->pc,
-				                          input_slot->choice) :
-				       NULL,
-				   media_type ?
-				       _ppdCacheGetType(p->pc,
-				                        media_type->choice) :
-				       NULL);
-
-	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
-	                 col);
+	col = new_media_col(pwgsize);
+	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default", col);
         ippDelete(col);
       }
 
@@ -4280,89 +4265,19 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-col-database
       */
 
-      num_media = p->pc->num_sizes;
-      if (p->pc->num_sources)
+      if ((attr = ippAddCollections(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-database", p->pc->num_sizes, NULL)) != NULL)
       {
-        if (p->pc->num_types > 0)
-	  num_media += p->pc->num_sizes * p->pc->num_sources *
-	               p->pc->num_types;
-	else
-          num_media += p->pc->num_sizes * p->pc->num_sources;
-      }
-      else if (p->pc->num_types)
-        num_media += p->pc->num_sizes * p->pc->num_types;
-
-      if ((attr = ippAddCollections(p->ppd_attrs, IPP_TAG_PRINTER,
-                                    "media-col-database", num_media,
-				    NULL)) != NULL)
-      {
-        for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, val = attr->values;
-	     i > 0;
-	     i --, pwgsize ++)
-	{
-	 /*
-	  * Start by adding the page size without source or type...
-	  */
-
-	  ppdMarkOption(ppd, "PageSize", pwgsize->map.ppd);
-
-          val->collection = new_media_col(pwgsize, NULL, NULL);
-	  val ++;
-
-         /*
-	  * Then add the specific, supported combinations of size, source, and
-	  * type...
-	  */
-
-	  if (p->pc->num_sources > 0)
-	  {
-	    for (j = p->pc->num_sources, pwgsource = p->pc->sources;
-	         j > 0;
-		 j --, pwgsource ++)
-	    {
-	      ppdMarkOption(ppd, "InputSlot", pwgsource->ppd);
-
-	      if (p->pc->num_types > 0)
-	      {
-	        for (k = p->pc->num_types, pwgtype = p->pc->types;
-		     k > 0;
-		     k --, pwgtype ++)
-		{
-		  if (!ppdMarkOption(ppd, "MediaType", pwgtype->ppd))
-		  {
-		    val->collection = new_media_col(pwgsize, pwgsource->pwg,
-		                                    pwgtype->pwg);
-		    val ++;
-		  }
-		}
-	      }
-	      else if (!ppdConflicts(ppd))
-	      {
-	        val->collection = new_media_col(pwgsize, pwgsource->pwg, NULL);
-		val ++;
-	      }
-	    }
-	  }
-	  else if (p->pc->num_types > 0)
-	  {
-	    for (j = p->pc->num_types, pwgtype = p->pc->types;
-	         j > 0;
-		 j --, pwgtype ++)
-	    {
-	      if (!ppdMarkOption(ppd, "MediaType", pwgtype->ppd))
-	      {
-	        val->collection = new_media_col(pwgsize, NULL, pwgtype->pwg);
-		val ++;
-	      }
-	    }
-	  }
-	}
-
        /*
-        * Update the number of media-col-database values...
+	* Adding each page size without source or type...
 	*/
 
-	attr->num_values = val - attr->values;
+        for (i = 0, pwgsize = p->pc->sizes; i < p->pc->num_sizes; i ++, pwgsize ++)
+	{
+          ipp_t *col = new_media_col(pwgsize);
+
+          ippSetCollection(p->ppd_attrs, &attr, i, col);
+          ippDelete(col);
+        }
       }
     }
 
@@ -5060,9 +4975,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
  */
 
 static ipp_t *				/* O - Collection value */
-new_media_col(pwg_size_t *size,	/* I - media-size/margin values */
-              const char  *source,	/* I - media-source value */
-              const char  *type)	/* I - media-type value */
+new_media_col(pwg_size_t *size)		/* I - media-size/margin values */
 {
   ipp_t	*media_col,			/* Collection value */
 	*media_size;			/* media-size value */
@@ -5071,29 +4984,15 @@ new_media_col(pwg_size_t *size,	/* I - media-size/margin values */
   media_col = ippNew();
 
   media_size = ippNew();
-  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"x-dimension", size->width);
-  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"y-dimension", size->length);
+  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "x-dimension", size->width);
+  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "y-dimension", size->length);
   ippAddCollection(media_col, IPP_TAG_PRINTER, "media-size", media_size);
   ippDelete(media_size);
 
-  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"media-bottom-margin", size->bottom);
-  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"media-left-margin", size->left);
-  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"media-right-margin", size->right);
-  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-		"media-top-margin", size->top);
-
-  if (source)
-    ippAddString(media_col, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-source",
-		 NULL, source);
-
-  if (type)
-    ippAddString(media_col, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-type",
-		 NULL, type);
+  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-bottom-margin", size->bottom);
+  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-left-margin", size->left);
+  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-right-margin", size->right);
+  ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "media-top-margin", size->top);
 
   return (media_col);
 }

@@ -1,5 +1,6 @@
-CHANGES - 2.2.11 - 2019-01-09
+CHANGES - 2.2.11 - 2019-01-10
 =============================
+
 
 Changes in CUPS v2.2.11
 -----------------------
@@ -8,6 +9,7 @@ Changes in CUPS v2.2.11
   advertised (Issue #5455)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
+- Fixed a performance regression with large PPDs (rdar://47040759)
 
 
 Changes in CUPS v2.2.10
