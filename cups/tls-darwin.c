@@ -849,8 +849,10 @@ httpCredentialsString(
     * issuer name is, um, "interesting"...
     */
 
-    CFStringRef		cf_string;	/* CF string */
+#  if !TARGET_OS_IOS
     CFDictionaryRef	cf_dict;	/* Dictionary for certificate */
+#  endif /* !TARGET_OS_IOS */
+    CFStringRef		cf_string;	/* CF string */
     char		commonName[256],/* Common name associated with cert */
 			issuer[256],	/* Issuer name */
 			sigalg[256];	/* Signature algorithm */
@@ -870,6 +872,7 @@ httpCredentialsString(
     strlcpy(issuer, "unknown", sizeof(issuer));
     strlcpy(sigalg, "UnknownSignature", sizeof(sigalg));
 
+#  if !TARGET_OS_IOS
     if ((cf_dict = SecCertificateCopyValues(secCert, NULL, NULL)) != NULL)
     {
       CFDictionaryRef cf_issuer = CFDictionaryGetValue(cf_dict, kSecOIDX509V1IssuerName);
@@ -916,6 +919,7 @@ httpCredentialsString(
 
       CFRelease(cf_dict);
     }
+#  endif /* !TARGET_OS_IOS */
 
     expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
 
@@ -1998,6 +2002,8 @@ http_cdsa_copy_server(
 
   return (certificates);
 #else
+
+  (void)common_name;
 
   if (!tls_selfsigned)
     return (NULL);
