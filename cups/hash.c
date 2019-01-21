@@ -1,7 +1,7 @@
 /*
  * Hashing function for CUPS.
  *
- * Copyright © 2015-2018 by Apple Inc.
+ * Copyright © 2015-2019 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -235,7 +235,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     gnutls_hash_fast(alg, data, datalen, hash);
 
-    return (gnutls_hash_get_len(alg));
+    return ((ssize_t)gnutls_hash_get_len(alg));
   }
 
 #else
