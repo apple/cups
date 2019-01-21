@@ -1,8 +1,8 @@
 #
 # Library Makefile for CUPS.
 #
-# Copyright 2007-2019 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -135,6 +135,7 @@ HEADERS	=	\
 		versioning.h
 
 HEADERSPRIV =	\
+		../config.h \
 		array-private.h \
 		cups-private.h \
 		debug-private.h \
@@ -748,29 +749,22 @@ apihelp:
 	codedoc --section "Programming" --title "Administration APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-admin.header --intro api-admin.shtml \
-		api-admin.xml \
 		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
-	$(RM) api-admin.xml
 	codedoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
-		api-ppd.xml ppd.h ppd-*.c >../doc/help/api-ppd.html
-	$(RM) api-ppd.xml
+		ppd.h ppd-*.c >../doc/help/api-ppd.html
 	codedoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
-		api-raster.xml \
 		../cups/raster.h interpret.c raster.c \
 		>../doc/help/api-raster.html
-	$(RM) api-raster.xml
 	codedoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
-		api-filter.xml \
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		>../doc/help/api-filter.html
-	$(RM) api-filter.xml
 
 
 #
