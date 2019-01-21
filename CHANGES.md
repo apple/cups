@@ -13,7 +13,7 @@ Changes in CUPS v2.3b8
 - The lpadmin command, web interface, and scheduler all queried an IPP
   Everywhere printer differently, resulting in different PPDs for the same
   printer (Issue #5484)
-- Localization updates (Issue #5461, Issues #5471)
+- Localization updates (Issue #5461, Issues #5471, Issue #5481)
 
 
 Changes in CUPS v2.3b7
