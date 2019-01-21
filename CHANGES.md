@@ -8,6 +8,7 @@ Changes in CUPS v2.3b8
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)
+- Fixed a potential memory leak when loading a PPD file (Issue #5475)
 - Added a USB quirks rule for the Lexmark E120n (Issue #5478)
 - Fixed a compile error on Linux (Issue #5483)
 - The lpadmin command, web interface, and scheduler all queried an IPP
