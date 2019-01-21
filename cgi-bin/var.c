@@ -1,8 +1,8 @@
 /*
  * CGI form variable and array functions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1997-2005 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2005 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -29,10 +29,10 @@
 
 typedef struct				/**** Form variable structure ****/
 {
-  const char	*name;			/* Name of variable */
+  char		*name;			/* Name of variable */
   int		nvalues,		/* Number of values */
 		avalues;		/* Number of values allocated */
-  const char	**values;		/* Value(s) of variable */
+  char		**values;		/* Value(s) of variable */
 } _cgi_var_t;
 
 
@@ -135,10 +135,10 @@ cgiClearVariables(void)
 
   for (v = form_vars, i = form_count; i > 0; v ++, i --)
   {
-    _cupsStrFree(v->name);
+    free(v->name);
     for (j = 0; j < v->nvalues; j ++)
       if (v->values[j])
-        _cupsStrFree(v->values[j]);
+        free(v->values[j]);
   }
 
   form_count = 0;
@@ -164,7 +164,7 @@ cgiGetArray(const char *name,		/* I - Name of array variable */
   if (element < 0 || element >= var->nvalues)
     return (NULL);
 
-  return (_cupsStrRetain(var->values[element]));
+  return (strdup(var->values[element]));
 }
 
 
@@ -222,7 +222,7 @@ cgiGetVariable(const char *name)	/* I - Name of variable */
 
   var = cgi_find_variable(name);
 
-  return ((var == NULL) ? NULL : _cupsStrRetain(var->values[var->nvalues - 1]));
+  return ((var == NULL) ? NULL : strdup(var->values[var->nvalues - 1]));
 }
 
 
@@ -370,10 +370,9 @@ cgiSetArray(const char *name,		/* I - Name of variable */
   {
     if (element >= var->avalues)
     {
-      const char **temp;		/* Temporary pointer */
+      char **temp;			/* Temporary pointer */
 
-      temp = (const char **)realloc((void *)(var->values),
-                                    sizeof(char *) * (size_t)(element + 16));
+      temp = (char **)realloc((void *)(var->values), sizeof(char *) * (size_t)(element + 16));
       if (!temp)
         return;
 
@@ -389,9 +388,9 @@ cgiSetArray(const char *name,		/* I - Name of variable */
       var->nvalues = element + 1;
     }
     else if (var->values[element])
-      _cupsStrFree((char *)var->values[element]);
+      free((char *)var->values[element]);
 
-    var->values[element] = _cupsStrAlloc(value);
+    var->values[element] = strdup(value);
   }
 }
 
@@ -448,10 +447,9 @@ cgiSetSize(const char *name,		/* I - Name of variable */
 
   if (size >= var->avalues)
   {
-    const char **temp;			/* Temporary pointer */
+    char **temp;			/* Temporary pointer */
 
-    temp = (const char **)realloc((void *)(var->values),
-				  sizeof(char *) * (size_t)(size + 16));
+    temp = (char **)realloc((void *)(var->values), sizeof(char *) * (size_t)(size + 16));
     if (!temp)
       return;
 
@@ -468,7 +466,7 @@ cgiSetSize(const char *name,		/* I - Name of variable */
   {
     for (i = size; i < var->nvalues; i ++)
       if (var->values[i])
-        _cupsStrFree((void *)(var->values[i]));
+        free((void *)(var->values[i]));
   }
 
   var->nvalues = size;
@@ -503,9 +501,9 @@ cgiSetVariable(const char *name,	/* I - Name of variable */
   {
     for (i = 0; i < var->nvalues; i ++)
       if (var->values[i])
-        _cupsStrFree((char *)var->values[i]);
+        free((char *)var->values[i]);
 
-    var->values[0] = _cupsStrAlloc(value);
+    var->values[0] = strdup(value);
     var->nvalues   = 1;
   }
 }
@@ -548,10 +546,10 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   if ((var->values = calloc((size_t)element + 1, sizeof(char *))) == NULL)
     return;
 
-  var->name            = _cupsStrAlloc(name);
+  var->name            = strdup(name);
   var->nvalues         = element + 1;
   var->avalues         = element + 1;
-  var->values[element] = _cupsStrAlloc(value);
+  var->values[element] = strdup(value);
 
   form_count ++;
 }
@@ -583,7 +581,7 @@ cgi_find_variable(const char *name)	/* I - Name of variable */
   if (form_count < 1 || name == NULL)
     return (NULL);
 
-  key.name = name;
+  key.name = (char *)name;
 
   return ((_cgi_var_t *)bsearch(&key, form_vars, (size_t)form_count, sizeof(_cgi_var_t),
                            (int (*)(const void *, const void *))cgi_compare_variables));

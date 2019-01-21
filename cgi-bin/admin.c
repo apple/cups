@@ -562,7 +562,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
     attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris",
                          num_printers, NULL, NULL);
     for (i = 0; i < num_printers; i ++)
-      attr->values[i].string.text = _cupsStrAlloc(cgiGetArray("MEMBER_URIS", i));
+      ippSetString(request, &attr, i, cgiGetArray("MEMBER_URIS", i));
   }
 
  /*
@@ -2123,7 +2123,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
          attr;
 	 attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI))
     {
-      cupsArrayAdd(printer_devices, _cupsStrAlloc(attr->values[0].string.text));
+      cupsArrayAdd(printer_devices, strdup(attr->values[0].string.text));
     }
 
    /*
@@ -2261,7 +2261,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
       for (printer_device = (char *)cupsArrayFirst(printer_devices);
            printer_device;
 	   printer_device = (char *)cupsArrayNext(printer_devices))
-        _cupsStrFree(printer_device);
+        free(printer_device);
 
       cupsArrayDelete(printer_devices);
     }
@@ -2658,7 +2658,7 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
         * Add the name...
 	*/
 
-        attr->values[i].string.text = _cupsStrAlloc(ptr);
+        ippSetString(request, &attr, i, ptr);
 
        /*
         * Advance to the next name...
@@ -3467,8 +3467,8 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
     attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
                          "job-sheets-default", 2, NULL, NULL);
-    attr->values[0].string.text = _cupsStrAlloc(cgiGetVariable("job_sheets_start"));
-    attr->values[1].string.text = _cupsStrAlloc(cgiGetVariable("job_sheets_end"));
+    ippSetString(request, &attr, 0, cgiGetVariable("job_sheets_start"));
+    ippSetString(request, &attr, 1, cgiGetVariable("job_sheets_end"));
 
     if ((var = cgiGetVariable("printer_error_policy")) != NULL)
       ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
