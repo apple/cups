@@ -1,8 +1,8 @@
 /*
  * String functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -316,21 +316,20 @@ _cupsStrFree(const char *s)		/* I - String to free */
 
   key = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
 
-#ifdef DEBUG_GUARDS
-  if (key->guard != _CUPS_STR_GUARD)
-  {
-    DEBUG_printf(("5_cupsStrFree: Freeing string %p(%s), guard=%08x, "
-                  "ref_count=%d", key, key->str, key->guard, key->ref_count));
-    abort();
-  }
-#endif /* DEBUG_GUARDS */
-
   if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL &&
       item == key)
   {
    /*
     * Found it, dereference...
     */
+
+#ifdef DEBUG_GUARDS
+    if (key->guard != _CUPS_STR_GUARD)
+    {
+      DEBUG_printf(("5_cupsStrFree: Freeing string %p(%s), guard=%08x, ref_count=%d", key, key->str, key->guard, key->ref_count));
+      abort();
+    }
+#endif /* DEBUG_GUARDS */
 
     item->ref_count --;
 
