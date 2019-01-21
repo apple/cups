@@ -293,3 +293,6 @@
 
 # Zebra ZD420 (Issue #5395)
 0x0a5f 0x0120 unidir no-reattach
+
+# Lexmark E120n (Issue #5478)
+0x043d 0x00cc no-reattach
