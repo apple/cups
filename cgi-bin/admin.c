@@ -1,7 +1,7 @@
 /*
  * Administration CGI for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -3930,6 +3930,13 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
 		host[256],		/* Hostname */
 		resource[256];		/* Resource path */
   int		port;			/* Port number */
+  static const char * const pattrs[] =	/* Printer attributes we need */
+  {
+    "job-template",
+    "printer-defaults",
+    "printer-description",
+    "media-col-database"
+  };
 
 
  /*
@@ -3970,6 +3977,7 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
 
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes",  (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
   response = cupsDoRequest(http, request, resource);
 
   if (!_ppdCreateFromIPP(buffer, bufsize, response))
