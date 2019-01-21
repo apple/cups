@@ -3932,9 +3932,7 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
   int		port;			/* Port number */
   static const char * const pattrs[] =	/* Printer attributes we need */
   {
-    "job-template",
-    "printer-defaults",
-    "printer-description",
+    "all",
     "media-col-database"
   };
 

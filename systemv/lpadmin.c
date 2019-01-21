@@ -1,7 +1,7 @@
 /*
  * "lpadmin" command for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2006 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -1192,9 +1192,7 @@ get_printer_ppd(
   int		port;			/* Port number */
   static const char * const pattrs[] =	/* Attributes to use */
   {
-    "job-template",
-    "printer-defaults",
-    "printer-description",
+    "all",
     "media-col-database"
   };
 

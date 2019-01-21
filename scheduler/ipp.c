@@ -5258,9 +5258,7 @@ create_local_bg_thread(
   ipp_status_t	status;			/* Status code */
   static const char * const pattrs[] =	/* Printer attributes we need */
   {
-    "job-template",
-    "printer-defaults",
-    "printer-description",
+    "all",
     "media-col-database"
   };
 
