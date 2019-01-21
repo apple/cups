@@ -8,6 +8,7 @@ Changes in CUPS v2.2.11
 - Running ppdmerge with the same input and output filenames did not work as
   advertised (Issue #5455)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)
+- Fixed a potential memory leak when loading a PPD file (Issue #5475)
 - Added a USB quirks rule for the Lexmark E120n (Issue #5478)
 - Fixed a compile error on Linux (Issue #5483)
 - The lpadmin command, web interface, and scheduler all queried an IPP

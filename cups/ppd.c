@@ -1,8 +1,8 @@
 /*
  * PPD file routines for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -117,7 +117,6 @@ void
 ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 {
   int			i;		/* Looping var */
-  ppd_emul_t		*emul;		/* Current emulation */
   ppd_group_t		*group;		/* Current group */
   char			**font;		/* Current font */
   ppd_attr_t		**attr;		/* Current attribute */
@@ -143,21 +142,6 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   _cupsStrFree(ppd->jcl_begin);
   _cupsStrFree(ppd->jcl_end);
   _cupsStrFree(ppd->jcl_ps);
-
- /*
-  * Free any emulations...
-  */
-
-  if (ppd->num_emulations > 0)
-  {
-    for (i = ppd->num_emulations, emul = ppd->emulations; i > 0; i --, emul ++)
-    {
-      _cupsStrFree(emul->start);
-      _cupsStrFree(emul->stop);
-    }
-
-    ppd_free(ppd->emulations);
-  }
 
  /*
   * Free any UI groups, subgroups, and options...
@@ -443,7 +427,6 @@ _ppdOpen(
     _ppd_localization_t	localization)	/* I - Localization to load */
 {
   int			i, j, k;	/* Looping vars */
-  int			count;		/* Temporary count */
   _ppd_line_t		line;		/* Line buffer */
   ppd_file_t		*ppd;		/* PPD file record */
   ppd_group_t		*group,		/* Current group */
@@ -461,7 +444,6 @@ _ppdOpen(
 					/* Human-readable text from file */
 			*string,	/* Code/text from file */
 			*sptr,		/* Pointer into string */
-			*nameptr,	/* Pointer into name */
 			*temp,		/* Temporary string pointer */
 			**tempfonts;	/* Temporary fonts pointer */
   float			order;		/* Order dependency number */
@@ -1202,60 +1184,6 @@ _ppdOpen(
         ppd->landscape = -90;
       else if (!strcmp(string, "Plus90"))
         ppd->landscape = 90;
-    }
-    else if (!strcmp(keyword, "Emulators") && string)
-    {
-      for (count = 1, sptr = string; sptr != NULL;)
-        if ((sptr = strchr(sptr, ' ')) != NULL)
-	{
-	  count ++;
-	  while (*sptr == ' ')
-	    sptr ++;
-	}
-
-      ppd->num_emulations = count;
-      if ((ppd->emulations = calloc((size_t)count, sizeof(ppd_emul_t))) == NULL)
-      {
-        pg->ppd_status = PPD_ALLOC_ERROR;
-
-	goto error;
-      }
-
-      for (i = 0, sptr = string; i < count; i ++)
-      {
-        for (nameptr = ppd->emulations[i].name;
-	     *sptr != '\0' && *sptr != ' ';
-	     sptr ++)
-	  if (nameptr < (ppd->emulations[i].name + sizeof(ppd->emulations[i].name) - 1))
-	    *nameptr++ = *sptr;
-
-	*nameptr = '\0';
-
-	while (*sptr == ' ')
-	  sptr ++;
-      }
-    }
-    else if (!strncmp(keyword, "StartEmulator_", 14))
-    {
-      ppd_decode(string);
-
-      for (i = 0; i < ppd->num_emulations; i ++)
-        if (!strcmp(keyword + 14, ppd->emulations[i].name))
-	{
-	  ppd->emulations[i].start = string;
-	  string = NULL;
-	}
-    }
-    else if (!strncmp(keyword, "StopEmulator_", 13))
-    {
-      ppd_decode(string);
-
-      for (i = 0; i < ppd->num_emulations; i ++)
-        if (!strcmp(keyword + 13, ppd->emulations[i].name))
-	{
-	  ppd->emulations[i].stop = string;
-	  string = NULL;
-	}
     }
     else if (!strcmp(keyword, "JobPatchFile"))
     {
