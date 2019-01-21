@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2019-01-10
+CHANGES - 2.2.11 - 2019-01-21
 =============================
 
 
@@ -8,6 +8,9 @@ Changes in CUPS v2.2.11
 - Running ppdmerge with the same input and output filenames did not work as
   advertised (Issue #5455)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)
+- The lpadmin command, web interface, and scheduler all queried an IPP
+  Everywhere printer differently, resulting in different PPDs for the same
+  printer (Issue #5484)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
 
