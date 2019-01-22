@@ -1,7 +1,7 @@
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright © 2007-2018 by Apple Inc.
+dnl Copyright © 2007-2019 by Apple Inc.
 dnl Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -34,7 +34,6 @@ LDFLAGS="${LDFLAGS:=}"
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC(clang cc gcc)
-AC_PROG_CPP
 AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
