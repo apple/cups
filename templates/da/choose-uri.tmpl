@@ -1,0 +1,41 @@
+<H2 CLASS="title">{op=modify-printer?Rediger {printer_name}:Tilføj printer}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Forbindelse:</TH>
+<TD><INPUT TYPE="URL" SIZE="60" MAXLENGTH="1023" NAME="DEVICE_URI" VALUE="{current_device_uri?{current_device_uri}:{device_uri}}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>Eksempler:
+<PRE>
+    http://værtsnavn:631/ipp/
+    http://værtsnavn:631/ipp/port1
+
+    ipp://værtsnavn/ipp/
+    ipp://værtsnavn/ipp/port1
+
+    lpd://værtsnavn/kø
+
+    socket://værtsnavn
+    socket://værtsnavn:9100
+</PRE>
+
+<P>Se <A HREF="/help/network.html" TARGET="_blank">"Netværksprintere
+"</A> for den korrekte URI til brug med din printer.</P>
+
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Fortsæt"></TD>
+</TR>
+</TABLE>
+
+</FORM>

@@ -1,0 +1,6 @@
+<H2 CLASS="title">Slet printeren {printer_name}</H2>
+
+<P><B>Advarsel:</B> Er du sikker på, at du vil slette printeren
+{printer_name}?</P>
+
+<P ALIGN="CENTER"><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="delete-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}"><INPUT TYPE="SUBMIT" NAME="confirm" VALUE="Slet printer"></FORM></P>
