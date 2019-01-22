@@ -1,7 +1,7 @@
 /*
  * Private image library definitions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1993-2006 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -87,7 +87,6 @@ extern void		_cupsRasterClearError(void) _CUPS_PRIVATE;
 extern const char	*_cupsRasterColorSpaceString(cups_cspace_t cspace) _CUPS_PRIVATE;
 extern void		_cupsRasterDelete(cups_raster_t *r) _CUPS_PRIVATE;
 extern const char	*_cupsRasterErrorString(void) _CUPS_PRIVATE;
-extern int		_cupsRasterExecPS(cups_page_header2_t *h, int *preferred_bits, const char *code) _CUPS_NONNULL(3) _CUPS_PRIVATE;
 extern int		_cupsRasterInitPWGHeader(cups_page_header2_t *h, pwg_media_t *media, const char *type, int xdpi, int ydpi, const char *sides, const char *sheet_back) _CUPS_PRIVATE;
 extern cups_raster_t	*_cupsRasterNew(cups_raster_iocb_t iocb, void *ctx, cups_mode_t mode) _CUPS_PRIVATE;
 extern unsigned		_cupsRasterReadHeader(cups_raster_t *r) _CUPS_PRIVATE;

@@ -717,6 +717,8 @@ CUPS_DATADIR
 CUPS_CACHEDIR
 PRIVATEINCLUDE
 privateinclude
+LIBHEADERSPRIV
+LIBHEADERS
 LIBCUPSOBJS
 BUILDDIRS
 INSTALLXPC
@@ -6106,6 +6108,9 @@ fi
 
 cupsimagebase="cupsimage"
 LIBCUPSOBJS="\$(COREOBJS) \$(DRIVEROBJS)"
+LIBHEADERS="\$(COREHEADERS) \$(DRIVERHEADERS)"
+LIBHEADERSPRIV="\$(COREHEADERSPRIV) \$(DRIVERHEADERSPRIV)"
+
 case "$COMPONENTS" in
 	all)
 		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
@@ -6124,12 +6129,16 @@ case "$COMPONENTS" in
 		BUILDDIRS="locale"
 		cupsimagebase=""
 		LIBCUPSOBJS="\$(COREOBJS)"
+		LIBHEADERS="\$(COREHEADERS)"
+		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"
 		;;
 
 	*)
 		as_fn_error $? "Bad build component \"$COMPONENT\" specified!" "$LINENO" 5
 		;;
 esac
+
+
 
 
 
@@ -8353,19 +8362,9 @@ if test "x$ac_cv_header_Security_SecIdentitySearchPriv_h" = xyes; then :
 fi
 
 
-
-		$as_echo "#define HAVE_CSSMERRORSTRING 1" >>confdefs.h
-
-		$as_echo "#define HAVE_SECKEYCHAINOPEN 1" >>confdefs.h
-
 fi
 
 
-
-		if test $host_os_version -ge 150; then
-			$as_echo "#define HAVE_SSLSETENABLEDCIPHERS 1" >>confdefs.h
-
-		fi
 	fi
     fi
 

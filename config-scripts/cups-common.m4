@@ -440,6 +440,9 @@ AC_ARG_WITH(components, [  --with-components       set components to build:
 
 cupsimagebase="cupsimage"
 LIBCUPSOBJS="\$(COREOBJS) \$(DRIVEROBJS)"
+LIBHEADERS="\$(COREHEADERS) \$(DRIVERHEADERS)"
+LIBHEADERSPRIV="\$(COREHEADERSPRIV) \$(DRIVERHEADERSPRIV)"
+
 case "$COMPONENTS" in
 	all)
 		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
@@ -458,6 +461,8 @@ case "$COMPONENTS" in
 		BUILDDIRS="locale"
 		cupsimagebase=""
 		LIBCUPSOBJS="\$(COREOBJS)"
+		LIBHEADERS="\$(COREHEADERS)"
+		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"
 		;;
 
 	*)
@@ -467,3 +472,5 @@ esac
 
 AC_SUBST(BUILDDIRS)
 AC_SUBST(LIBCUPSOBJS)
+AC_SUBST(LIBHEADERS)
+AC_SUBST(LIBHEADERSPRIV)

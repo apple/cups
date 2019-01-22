@@ -1,8 +1,8 @@
 /*
  * Side-channel API definitions for CUPS.
  *
- * Copyright 2007-2012 by Apple Inc.
- * Copyright 2006 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2006 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
@@ -15,6 +15,13 @@
  */
 
 #  include "versioning.h"
+#  include <sys/types.h>
+#  if defined(_WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
+#    define __CUPS_SSIZE_T_DEFINED
+#    include <stddef.h>
+/* Windows does not support the ssize_t type, so map it to long... */
+typedef long ssize_t;			/* @private@ */
+#  endif /* _WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
 
 /*
@@ -107,6 +114,13 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data,
  * Prototypes...
  */
 
+/**** New in CUPS 1.2/macOS 10.5 ****/
+extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
+			                    double timeout) _CUPS_API_1_2;
+extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
+			                     double timeout) _CUPS_API_1_2;
+
+/**** New in CUPS 1.3/macOS 10.5 ****/
 extern cups_sc_status_t	cupsSideChannelDoRequest(cups_sc_command_t command,
 			                         char *data, int *datalen,
 						 double timeout) _CUPS_API_1_3;
@@ -119,7 +133,7 @@ extern int		cupsSideChannelWrite(cups_sc_command_t command,
 					     const char *data, int datalen,
 					     double timeout) _CUPS_API_1_3;
 
-/**** New in CUPS 1.4 ****/
+/**** New in CUPS 1.4/macOS 10.6 ****/
 extern cups_sc_status_t	cupsSideChannelSNMPGet(const char *oid, char *data,
 			                       int *datalen, double timeout)
 					       _CUPS_API_1_4;

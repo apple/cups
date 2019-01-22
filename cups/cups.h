@@ -1,10 +1,11 @@
 /*
  * API definitions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_CUPS_H_
@@ -410,10 +411,6 @@ extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests) _CUPS_API_1_1_21;
 
 /**** New in CUPS 1.2/macOS 10.5 ****/
-extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
-			                    double timeout) _CUPS_API_1_2;
-extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
-			                     double timeout) _CUPS_API_1_2;
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
 					   ipp_tag_t group_tag) _CUPS_API_1_2;

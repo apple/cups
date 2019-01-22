@@ -117,25 +117,29 @@ OBJS	=	\
 # Header files to install...
 #
 
-HEADERS	=	\
-		adminutil.h \
+COREHEADERS	=	\
 		array.h \
-		backend.h \
 		cups.h \
 		dir.h \
 		file.h \
 		http.h \
 		ipp.h \
 		language.h \
-		ppd.h \
 		pwg.h \
 		raster.h \
-		sidechannel.h \
 		transcode.h \
 		versioning.h
 
-HEADERSPRIV =	\
-		../config.h \
+DRIVERHEADERS	=	\
+		adminutil.h \
+		backend.h \
+		ppd.h \
+		sidechannel.h
+
+HEADERS		=	\
+		$(LIBHEADERS)
+
+COREHEADERSPRIV =	\
 		array-private.h \
 		cups-private.h \
 		debug-private.h \
@@ -143,12 +147,17 @@ HEADERSPRIV =	\
 		http-private.h \
 		ipp-private.h \
 		language-private.h \
-		ppd-private.h \
 		pwg-private.h \
 		raster-private.h \
-		snmp-private.h \
 		string-private.h \
 		thread-private.h
+
+DRIVERHEADERSPRIV	=	\
+		ppd-private.h \
+		snmp-private.h
+
+HEADERSPRIV	=	\
+		$(LIBHEADERSPRIV)
 
 
 #

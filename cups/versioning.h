@@ -164,10 +164,10 @@
      */
 #    define _CUPS_DEPRECATED __attribute__ ((unavailable)) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_MSG(m) __attribute__ ((unavailable(m))) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.5)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.5), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12), ios(11.0,11.0)) _CUPS_PUBLIC
 
 #  elif defined(__APPLE__)
     /*
@@ -175,10 +175,10 @@
      */
 #    define _CUPS_DEPRECATED __attribute__ ((deprecated)) _CUPS_PUBLIC
 #    define _CUPS_DEPRECATED_MSG(m) __attribute__ ((deprecated(m))) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.5)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
-#    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12)) API_UNAVAILABLE(ios) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.5), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_6_MSG(m) API_DEPRECATED(m, macos(10.2,10.8), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_1_7_MSG(m) API_DEPRECATED(m, macos(10.2,10.9), ios(11.0,11.0)) _CUPS_PUBLIC
+#    define _CUPS_DEPRECATED_2_2_MSG(m) API_DEPRECATED(m, macos(10.2,10.12), ios(11.0,11.0)) _CUPS_PUBLIC
 
 #  elif defined(_CUPS_HAS_UNAVAILABLE_WITH_MESSAGE) && defined(_CUPS_NO_DEPRECATED)
     /*

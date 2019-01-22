@@ -329,31 +329,10 @@
 
 
 /*
- * Do we have the cssmErrorString function?
- */
-
-#undef HAVE_CSSMERRORSTRING
-
-
-/*
  * Do we have the SecGenerateSelfSignedCertificate function?
  */
 
 #undef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
-
-
-/*
- * Do we have the SecKeychainOpen function?
- */
-
-#undef HAVE_SECKEYCHAINOPEN
-
-
-/*
- * Do we have (a working) SSLSetEnabledCiphers function?
- */
-
-#undef HAVE_SSLSETENABLEDCIPHERS
 
 
 /*
