@@ -443,7 +443,7 @@ msgid ""
 "                REF: Page 122, section 5.17"
 msgstr ""
 "\t ТРЕБУЕТСЯ %s: %s не определяет выбор \"Нет\".\n"
-"                REF: Стр. 122, раздел 5.17\n"
+"                REF: Стр. 122, раздел 5.17"
 
 #, c-format
 msgid "      %s  Size \"%s\" defined for %s but not for %s."
@@ -5079,8 +5079,7 @@ msgstr ""
 "    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
 "                       [-r remove-class] [-v device] [-D description]\n"
 "                       [-P ppd-file] [-o name=value]\n"
-"                       [-u allow:user,user] [-u deny:user,user]\n"
-"\n"
+"                       [-u allow:user,user] [-u deny:user,user]"
 
 #, c-format
 msgid "Usage: %s [options] destination(s)"
@@ -7386,7 +7385,7 @@ msgid ""
 "\"."
 msgstr ""
 "lpstat: ошибка - %s переменная окружения указывает  несуществующее "
-"назначение \"%s\"\n"
+"назначение \"%s\""
 
 msgid "material-amount"
 msgstr "Amount of Material"
