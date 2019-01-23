@@ -1,0 +1,8 @@
+<H2 CLASS="title">{title} på {printer_name}</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Optaget-indikator"> }Printerkommandojob
+{job_state=3?afventer:{job_state=4?tilbageholdt:
+{job_state=5?behandler:{job_state=6?stoppet:
+{job_state=7?annulleret:{job_state=8?afbrudt:fuldført}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}</P>

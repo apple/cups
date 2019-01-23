@@ -1,0 +1,27 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{OP}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+{IS_CLASS?<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="{IS_CLASS}">:}
+
+<H2 CLASS="title">Tilladte brugere for {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Brugere:</TH>
+<TD>
+<INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
+<BR>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' ID='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}><LABEL FOR='requesting-user-name-allowed'>Giv brugerne tilladelse til at udskrive</LABEL>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' ID='requesting-user-name-denied' {requesting_user_name_denied?checked:}><LABEL FOR='requesting-user-name-denied'>Forhindr brugerne i at udskrive</LABEL>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>
+<INPUT TYPE="SUBMIT" VALUE="Indstil tilladte brugere">
+</TD>
+</TR>
+</TABLE>
+
+</FORM>

@@ -1,0 +1,11 @@
+{#printer_name=0?:
+<TABLE CLASS="list" SUMMARY="Klasseliste">
+<THEAD>
+<TR><TH>Kønavn</TH><TH>Beskrivelse</TH><TH>Placering</TH><TH>Medlemmer</TH><TH>Status</TH></TR>
+</THEAD>
+<TBODY>
+{[printer_name]
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{?member_uris=?Ingen:{member_uris}}</TD><TD>{printer_state=3?Inaktiv:{printer_state=4?Behandler:Sat på pause}}{printer_state_message? - "{printer_state_message}":}</TD></TR>
+}
+</TBODY>
+</TABLE></DIV>}

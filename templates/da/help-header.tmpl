@@ -1,0 +1,41 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Søg i
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:Alle dokumenter}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Søg">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Ryd"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contents">
+<TR><TD>
+
+<H3 CLASS="title">Dokumenter i onlinehjælp</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Alle dokumenter</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Søg efter resultater i {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Alle dokumenter}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (i <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Ingen match fundet.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Vis udskrivningsvenlig version"></FORM>:
+
+<H1>Onlinehjælp</H1>
+
+<P>Dette er grænsefladen til CUPS-onlinehjælp. Indtast søgeord ovenfor eller klik på dokumentationenslinkene for at vise information om onlinehjælp.</P>
+
+<P>Hvis CUPS er nyt for dig, så læs "<a href="/help/overview.html">Oversigt over CUPS</a>"-siden.</P>
+
+<P><A HREF="http://www.cups.org/">CUPS-hjemmesiden</A> giver også mange ressourcer, inklusiv fora til brugerdiskussion, svar på oftest stillede spørgsmål, og en formular til indsendelse af fejlrapporter og anmodninger om funktionaliteter.</P>}

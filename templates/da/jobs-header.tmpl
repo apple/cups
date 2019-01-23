@@ -1,0 +1,5 @@
+{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Vis aktive jobs"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Vis fuldførte jobs"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Vis alle jobs"></FORM>}
+
+<P ALIGN="CENTER">{?which_jobs=?Jobs oplistet i udskrivningsrækkefølge - tilbageholdte jobs vises først.:{which_jobs=Jobs oplistes i stigende rækkefølge.?:Jobs oplistes i faldende rækkefølge.}}</P>

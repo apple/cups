@@ -1,0 +1,43 @@
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Inaktiv:{printer_state=4?Behandler:Sat på pause}},
+{printer_is_accepting_jobs=0?Afviser jobs:Accepterer jobs},
+{server_is_sharing_printers=0?Ikke:{printer_is_shared=0?Ikke:}} Delt{default_name={printer_name}?, Server Default:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Vedligeholdelse</OPTION>
+<OPTION VALUE="print-test-page">Udskriv testside</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Rens printerhoveder</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Udskriv selvtestside</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Genoptag printer</OPTION>:<OPTION VALUE="stop-printer">Sæt printer på pause</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accepter jobs</OPTION>:<OPTION VALUE="reject-jobs">Afvis jobs</OPTION>}
+<OPTION VALUE="move-jobs">Flyt alle jobs</OPTION>
+<OPTION VALUE="cancel-jobs">Annuller alle jobs</OPTION>
+</SELECT>
+<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Go"></NOSCRIPT>
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administration</OPTION>
+<OPTION VALUE="modify-printer">Rediger printer</OPTION>
+<OPTION VALUE="delete-printer">Slet printer</OPTION>
+<OPTION VALUE="set-printer-options">Indstil standardtilvalg</OPTION>
+<OPTION VALUE="set-as-default">Indstil som serverstandard</OPTION>
+<OPTION VALUE="set-allowed-users">Indstil tilladte brugere</OPTION>
+</SELECT>
+<NOSCRIPT><INPUT TYPE="SUBMIT" VALUE="Gå"></NOSCRIPT>
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Beskrivelse:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Placering:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Driver:</TH><TD>{printer_make_and_model} ({color_supported=1?farve:gråtone}{sides_supported=one-sided?:, tosidet udskrivning})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Forbindelse:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Standarder:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:ukendt}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
