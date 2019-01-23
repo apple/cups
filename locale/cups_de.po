@@ -18,7 +18,6 @@
 #
 # where "LL" is your locale.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
@@ -1419,8 +1418,7 @@ msgstr ""
 
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
-msgstr ""
-msgid "\"%s\": Falscher Textwert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt 5.1.2)."
+msgstr "\"%s\": Falscher Textwert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt 5.1.2)."
 
 #, c-format
 msgid ""
@@ -1653,8 +1651,8 @@ msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" "
 "option."
 msgstr ""
-"%s: Fehler - benötigt \"completed\", \"not-completed\", oder \"all\" nach Option"
-"\"-W\" "."
+"%s: Fehler - benötigt \"completed\", \"not-completed\", oder \"all\" nach "
+"Option \"-W\"."
 
 #, c-format
 msgid "%s: Error - no default destination available."
