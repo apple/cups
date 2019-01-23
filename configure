@@ -2626,12 +2626,6 @@ if test "x$host_os_version" = x; then
         host_os_version="0"
 fi
 
-if test "$host_os_name" = darwin -a $host_os_version -lt 120; then
-        as_fn_error $? "Sorry, this version of CUPS requires macOS 10.8 or higher." "$LINENO" 5
-fi
-
-echo host_os_version=$host_os_version
-
 if test "$build" = "$host"; then
         # No, build local targets
 	LOCALTARGET="local"
