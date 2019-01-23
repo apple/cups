@@ -16,7 +16,7 @@ Changes in CUPS v2.3b8
   Everywhere printer differently, resulting in different PPDs for the same
   printer (Issue #5484)
 - Localization updates (Issue #5461, Issues #5471, Issue #5481, Issue #5486,
-  Issue #5489, Issue #5492, Issue #5493, Issue #5494)
+  Issue #5489, Issue #5491, Issue #5492, Issue #5493, Issue #5494)
 
 
 Changes in CUPS v2.3b7
