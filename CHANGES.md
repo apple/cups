@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2019-01-21
+CHANGES - 2.2.11 - 2019-01-23
 =============================
 
 
@@ -11,6 +11,7 @@ Changes in CUPS v2.2.11
 - Fixed potential unaligned accesses in the string pool (Issue #5474)
 - Fixed a potential memory leak when loading a PPD file (Issue #5475)
 - Added a USB quirks rule for the Lexmark E120n (Issue #5478)
+- Updated the USB quirks rule for Zebra label printers (Issue #5395)
 - Fixed a compile error on Linux (Issue #5483)
 - The lpadmin command, web interface, and scheduler all queried an IPP
   Everywhere printer differently, resulting in different PPDs for the same
