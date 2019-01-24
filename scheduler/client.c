@@ -2695,7 +2695,15 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
   language[0] = '\0';
 
-  if ((!strncmp(con->uri, "/ppd/", 5) || !strncmp(con->uri, "/printers/", 10) || !strncmp(con->uri, "/classes/", 9)) && !strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
+  if (!strncmp(con->uri, "/help", 5) && (con->uri[5] == '/' || !con->uri[5]))
+  {
+   /*
+    * All help files are served by the help.cgi program...
+    */
+
+    return (NULL);
+  }
+  else if ((!strncmp(con->uri, "/ppd/", 5) || !strncmp(con->uri, "/printers/", 10) || !strncmp(con->uri, "/classes/", 9)) && !strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
   {
     strlcpy(dest, strchr(con->uri + 1, '/') + 1, sizeof(dest));
     dest[strlen(dest) - 4] = '\0'; /* Strip .ppd */
