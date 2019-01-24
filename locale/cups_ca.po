@@ -5239,7 +5239,7 @@ msgstr "Sí"
 
 #, c-format
 msgid "You must access this page using the URL https://%s:%d%s."
-msgstr "Heu d'accedir a aquesta pagina a través de la URL https://%s:%d."
+msgstr "Heu d'accedir a aquesta pagina a través de la URL https://%s:%d%s."
 
 msgid "ZPL Label Printer"
 msgstr "Impressora d'etiquetes ZPL"
