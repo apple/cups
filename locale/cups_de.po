@@ -1,5 +1,5 @@
 #
-# Message catalog template for CUPS.
+# German message catalog for CUPS.
 #
 # Copyright © 2007-2018 by Apple Inc.
 # Copyright © 2005-2007 by Easy Software Products.
