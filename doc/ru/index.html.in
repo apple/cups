@@ -42,7 +42,6 @@
 	  <p><a href="help/man-cupsd.conf.html">Справочник по cupsd.conf</a></p>
 	</div>
 	<div class="thirds">
-
 	  <H2>CUPS для разработчиков</H2>
 	  <p><a href="help/cupspm.html">CUPS Programming Manual</a></p>
 	  <P><A HREF="help/api-filter.html">Разработка фильтров и модулей</A></P>
