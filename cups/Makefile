@@ -650,11 +650,6 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Creating locale directory structure...
 	$(RM) -r locale
-	$(MKDIR) locale/en
-	echo 'msgid "No"' > locale/en/cups_en.po
-	echo 'msgstr "No"' >> locale/en/cups_en.po
-	echo 'msgid "Yes"' >> locale/en/cups_en.po
-	echo 'msgstr "Yes"' >> locale/en/cups_en.po
 	for po in ../locale/cups_*.po; do \
 		lang=`basename $$po .po | sed -e '1,$$s/^cups_//'`; \
 		$(MKDIR) locale/$$lang; \
