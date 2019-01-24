@@ -256,7 +256,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (pass)
     {
-      if (untranslated >= (cupsArrayCount(po) / 10) && strcmp(argv[i], "cups.pot"))
+      int count = cupsArrayCount(po);	/* Total number of messages */
+
+      if (untranslated >= (count / 10) && strcmp(argv[i], "cups.pot"))
       {
        /*
         * Only allow 10% of messages to be untranslated before we fail...
@@ -264,10 +266,10 @@ main(int  argc,				/* I - Number of command-line args */
 
         pass = 0;
         puts("FAIL");
-	printf("    Too many untranslated messages (%d of %d or %.1f%%)\n", untranslated, cupsArrayCount(po), 100.0 * untranslated / cupsArrayCount(po));
+	printf("    Too many untranslated messages (%d of %d or %.1f%% are translated)\n", count - untranslated, count, 100.0 - 100.0 * untranslated / count);
       }
       else if (untranslated > 0)
-        printf("PASS (%d of %d untranslated or %.1f%%)\n", untranslated, cupsArrayCount(po), 100.0 * untranslated / cupsArrayCount(po));
+        printf("PASS (%d of %d or %.1f%% are translated)\n", count - untranslated, count, 100.0 - 100.0 * untranslated / count);
       else
         puts("PASS");
     }
