@@ -41,7 +41,6 @@ static void	do_am_printer(http_t *http, int modify);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
-static void	do_export(http_t *http);
 static void	do_list_printers(http_t *http);
 static void	do_menu(http_t *http);
 static void	do_set_allowed_users(http_t *http);
@@ -164,8 +163,6 @@ main(void)
       do_set_options(http, 0);
     else if (!strcmp(op, "config-server"))
       do_config_server(http);
-    else if (!strcmp(op, "export-samba"))
-      do_export(http);
     else
     {
      /*
@@ -1939,141 +1936,6 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'do_export()' - Export printers to Samba.
- */
-
-static void
-do_export(http_t *http)			/* I - HTTP connection */
-{
-  int		i, j;			/* Looping vars */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
-  const char	*username,		/* Samba username */
-		*password,		/* Samba password */
-		*export_all;		/* Export all printers? */
-  int		export_count,		/* Number of printers to export */
-		printer_count;		/* Number of available printers */
-  const char	*name,			/* What name to pull */
-		*dest;			/* Current destination */
-  char		ppd[1024];		/* PPD file */
-
-
- /*
-  * Get form data...
-  */
-
-  username     = cgiGetVariable("USERNAME");
-  password     = cgiGetVariable("PASSWORD");
-  export_all   = cgiGetVariable("EXPORT_ALL");
-  export_count = cgiGetSize("EXPORT_NAME");
-
- /*
-  * Get list of available printers...
-  */
-
-  cgiSetSize("PRINTER_NAME", 0);
-  cgiSetSize("PRINTER_EXPORT", 0);
-
-  request = ippNewRequest(CUPS_GET_PRINTERS);
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type", 0);
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type-mask", CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-name");
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-    ippDelete(response);
-
-    if (!export_all)
-    {
-      printer_count = cgiGetSize("PRINTER_NAME");
-
-      for (i = 0; i < printer_count; i ++)
-      {
-        dest = cgiGetArray("PRINTER_NAME", i);
-
-        for (j = 0; j < export_count; j ++)
-	  if (!_cups_strcasecmp(dest, cgiGetArray("EXPORT_NAME", j)))
-            break;
-
-        cgiSetArray("PRINTER_EXPORT", i, j < export_count ? "Y" : "");
-      }
-    }
-  }
-
- /*
-  * Export or get the printers to export...
-  */
-
-  if (username && *username && password && *password &&
-      (export_all || export_count > 0))
-  {
-   /*
-    * Do export...
-    */
-
-    fputs("DEBUG: Export printers...\n", stderr);
-
-    if (export_all)
-    {
-      name         = "PRINTER_NAME";
-      export_count = cgiGetSize("PRINTER_NAME");
-    }
-    else
-      name = "EXPORT_NAME";
-
-    for (i = 0; i < export_count; i ++)
-    {
-      dest = cgiGetArray(name, i);
-
-      if (!cupsAdminCreateWindowsPPD(http, dest, ppd, sizeof(ppd)))
-        break;
-
-      j = cupsAdminExportSamba(dest, ppd, "localhost", username, password,
-                               stderr);
-
-      unlink(ppd);
-
-      if (!j)
-        break;
-    }
-
-    if (i < export_count)
-      cgiSetVariable("ERROR", cupsLastErrorString());
-    else
-    {
-      cgiStartHTML(cgiText(_("Export Printers to Samba")));
-      cgiCopyTemplateLang("samba-exported.tmpl");
-      cgiEndHTML();
-      return;
-    }
-  }
-  else if (username && !*username)
-    cgiSetVariable("ERROR",
-                   cgiText(_("A Samba username is required to export "
-		             "printer drivers")));
-  else if (username && (!password || !*password))
-    cgiSetVariable("ERROR",
-                   cgiText(_("A Samba password is required to export "
-		             "printer drivers")));
-
- /*
-  * Show form...
-  */
-
-  cgiStartHTML(cgiText(_("Export Printers to Samba")));
-  cgiCopyTemplateLang("samba-export.tmpl");
-  cgiEndHTML();
-}
-
-
-/*
  * 'do_list_printers()' - List available printers.
  */
 
@@ -2383,55 +2245,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
   cgiSetVariable("MAX_LOG_SIZE", val);
 
   cupsFreeOptions(num_settings, settings);
-
- /*
-  * See if Samba and the Windows drivers are installed...
-  */
-
-  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-    datadir = CUPS_DATADIR;
-
-  snprintf(filename, sizeof(filename), "%s/drivers/pscript5.dll", datadir);
-  if (!access(filename, R_OK))
-  {
-   /*
-    * Found Windows 2000 driver file, see if we have smbclient and
-    * rpcclient...
-    */
-
-    if (cupsFileFind("smbclient", getenv("PATH"), 1, filename,
-                     sizeof(filename)) &&
-        cupsFileFind("rpcclient", getenv("PATH"), 1, filename,
-	             sizeof(filename)))
-      cgiSetVariable("HAVE_SAMBA", "Y");
-    else
-    {
-      if (!cupsFileFind("smbclient", getenv("PATH"), 1, filename,
-                        sizeof(filename)))
-        fputs("ERROR: smbclient not found!\n", stderr);
-
-      if (!cupsFileFind("rpcclient", getenv("PATH"), 1, filename,
-                        sizeof(filename)))
-        fputs("ERROR: rpcclient not found!\n", stderr);
-    }
-  }
-  else
-    perror(filename);
-
- /*
-  * Subscriptions...
-  */
-
-  request = ippNewRequest(IPP_GET_SUBSCRIPTIONS);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, "ipp://localhost/");
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-    ippDelete(response);
-  }
 
  /*
   * Finally, show the main menu template...

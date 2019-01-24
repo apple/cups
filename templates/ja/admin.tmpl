@@ -6,7 +6,6 @@
     <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="プリンターの追加"></FORM>
     <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="新しいプリンターの検索"></FORM>
     <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="プリンターの管理"></FORM>
-    {have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="プリンターを Samba にエクスポート"></FORM>:}
     </P>
 
     <H2 CLASS="title">クラス</H2>
