@@ -1986,18 +1986,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     {
       text = urltext;
 
-      snprintf(urltext, sizeof(urltext),
-               _cupsLangString(con->language,
-                               _("You must access this page using the URL "
-			         "<A HREF=\"https://%s:%d%s\">"
-				 "https://%s:%d%s</A>.")),
-               con->servername, con->serverport, con->uri,
-	       con->servername, con->serverport, con->uri);
+      snprintf(urltext, sizeof(urltext), _cupsLangString(con->language, _("You must access this page using the URL https://%s:%d%s.")), con->servername, con->serverport, con->uri);
 
-      snprintf(redirect, sizeof(redirect),
-               "<META HTTP-EQUIV=\"Refresh\" "
-	       "CONTENT=\"3;URL=https://%s:%d%s\">\n",
-	       con->servername, con->serverport, con->uri);
+      snprintf(redirect, sizeof(redirect), "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"3;URL=https://%s:%d%s\">\n", con->servername, con->serverport, con->uri);
     }
     else if (code == HTTP_STATUS_CUPS_WEBIF_DISABLED)
       text = _cupsLangString(con->language,

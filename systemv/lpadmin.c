@@ -669,20 +669,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     unlink(evefile);
 
   if (printer == NULL)
-  {
-    _cupsLangPuts(stdout,
-	          _("Usage:\n"
-		    "\n"
-		    "    lpadmin [-h server] -d destination\n"
-		    "    lpadmin [-h server] -x destination\n"
-		    "    lpadmin [-h server] -p printer [-c add-class] "
-		    "[-i interface] [-m model]\n"
-		    "                       [-r remove-class] [-v device] "
-		    "[-D description]\n"
-		    "                       [-P ppd-file] [-o name=value]\n"
-		    "                       [-u allow:user,user] "
-		    "[-u deny:user,user]"));
-  }
+    usage();
 
   if (http)
     httpClose(http);
