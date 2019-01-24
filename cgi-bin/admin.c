@@ -2149,10 +2149,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
   int		num_settings;		/* Number of server settings */
   cups_option_t	*settings;		/* Server settings */
   const char	*val;			/* Setting value */
-  char		filename[1024];		/* Temporary filename */
-  const char	*datadir;		/* Location of data files */
-  ipp_t		*request,		/* IPP request */
-		*response;		/* IPP response */
 
 
  /*
