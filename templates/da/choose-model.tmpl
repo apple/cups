@@ -38,7 +38,7 @@ Del {?printer_is_shared=?ikke:{?printer_is_shared=0?ikke:}} printeren</TD>
 <TH CLASS="label">Model:</TH>
 <TD>
 <SELECT NAME="PPD_NAME" SIZE="10">
-{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Nuvæende driver - {current_make_and_model}</OPTION>:}
+{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Nuværende driver - {current_make_and_model}</OPTION>:}
 {show_ipp_everywhere?<OPTION VALUE="everywhere" SELECTED>{current_make_and_model} - IPP Everywhere &trade;</OPTION>:}
 {[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
 }</SELECT>
