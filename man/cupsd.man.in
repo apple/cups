@@ -23,6 +23,8 @@ cupsd \- cups scheduler
 ] [
 .B \-l
 ] [
+.B \-r
+] [
 .B \-s
 .I cups-files.conf
 ] [
@@ -61,6 +63,10 @@ when it is run from
 .BR launchd (8)
 or
 .BR systemd (8).
+.TP 5
+.B \-r
+Writes a newline to the file descriptor described by the READY_FD environment
+variable to indicate readiness to a service supervisor.
 .TP 5
 .BI \-s \ cups-files.conf
 Uses the named cups-files.conf configuration file.

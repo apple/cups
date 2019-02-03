@@ -70,6 +70,7 @@ static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
 static void		service_checkin(void);
 static void		service_checkout(int shutdown);
+static void		write_readyfd(void);
 static void		usage(int status) _CUPS_NORETURN;
 
 
@@ -104,6 +105,7 @@ main(int  argc,				/* I - Number of command-line args */
   int			close_all = 1,	/* Close all file descriptors? */
 			disconnect = 1,	/* Disconnect from controlling terminal? */
 			fg = 0,		/* Run in foreground? */
+			readyfd = 0,	/* Write to readyfd? */
 			run_as_child = 0,
 					/* Running as child process? */
 			print_profile = 0;
@@ -306,6 +308,10 @@ main(int  argc,				/* I - Number of command-line args */
               fg            = 1;
               disconnect    = 0;
               close_all     = 0;
+              break;
+
+          case 'r' : /* Write to readyfd */
+              readyfd  = 1;
               break;
 
 	  default : /* Unknown option */
@@ -664,6 +670,9 @@ main(int  argc,				/* I - Number of command-line args */
     if (i != 1)
       kill(i, SIGUSR1);
   }
+
+  if (readyfd)
+    write_readyfd();
 
 #ifdef __APPLE__
  /*
@@ -2120,6 +2129,46 @@ service_checkout(int shutdown)          /* I - Shutting down? */
 #  endif /* __APPLE__ */
 }
 
+static void
+write_readyfd(void)
+{
+  int fd = -1;
+  FILE *stream = NULL;
+  char *env = NULL, *endptr = NULL;
+
+  env = getenv("READY_FD");
+
+  if (!env || env[0] == '\0') {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "write_readyfd: READY_FD variable not set");
+    exit(EXIT_FAILURE);
+  }
+
+  if (unsetenv("READY_FD") != 0)
+    cupsdLogMessage(CUPSD_LOG_ERROR, "write_readyfd: failed to unset env variable");
+
+  errno = 0;
+  fd = (int)strtol(env, &endptr, 10);
+
+  if (errno != 0 || endptr[0] != '\0') {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "write_readyfd: could not parse env variable");
+    exit(EXIT_FAILURE);
+  }
+
+  stream = fdopen(fd, "w");
+
+  if (!stream) {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "write_readyfd: could not open for writing");
+    exit(EXIT_FAILURE);
+  }
+
+  if (fputc('\n', stream) == EOF) {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "write_readyfd: could not write to fd");
+    exit(EXIT_FAILURE);
+  }
+
+  fclose(stream);
+}
+
 
 /*
  * 'usage()' - Show scheduler usage.
@@ -2142,6 +2191,7 @@ usage(int status)			/* O - Exit status */
 #endif /* HAVE_ONDEMAND */
   _cupsLangPuts(fp, _("-s cups-files.conf      Set cups-files.conf file to use."));
   _cupsLangPuts(fp, _("-t                      Test the configuration file."));
+  _cupsLangPuts(fp, _("-r                      Write to file descriptor in READY_FD"));
 
   exit(status);
 }
