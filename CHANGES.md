@@ -1,10 +1,12 @@
-CHANGES - 2.2.11 - 2019-01-23
+CHANGES - 2.2.11 - 2019-02-05
 =============================
 
 
 Changes in CUPS v2.2.11
 -----------------------
 
+- The `ippValidateAttribute` function did not catch all instances of invalid
+  UTF-8 strings (Issue #5509)
 - Running ppdmerge with the same input and output filenames did not work as
   advertised (Issue #5455)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)

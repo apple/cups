@@ -4975,30 +4975,24 @@ ippValidateAttribute(
 	  {
 	    if ((*ptr & 0xe0) == 0xc0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80)
 	        break;
+
+	      ptr ++;
 	    }
 	    else if ((*ptr & 0xf0) == 0xe0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 2;
 	    }
 	    else if ((*ptr & 0xf8) == 0xf0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80 || (ptr[3] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 3;
 	    }
 	    else if (*ptr & 0x80)
 	      break;
@@ -5040,30 +5034,24 @@ ippValidateAttribute(
 	  {
 	    if ((*ptr & 0xe0) == 0xc0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80)
 	        break;
+
+	      ptr ++;
 	    }
 	    else if ((*ptr & 0xf0) == 0xe0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 2;
 	    }
 	    else if ((*ptr & 0xf8) == 0xf0)
 	    {
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
+	      if ((ptr[1] & 0xc0) != 0x80 || (ptr[2] & 0xc0) != 0x80 || (ptr[3] & 0xc0) != 0x80)
 	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
-	      ptr ++;
-	      if ((*ptr & 0xc0) != 0x80)
-	        break;
+
+	      ptr += 3;
 	    }
 	    else if (*ptr & 0x80)
 	      break;
