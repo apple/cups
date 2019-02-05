@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-01-24
+CHANGES - 2.3b8 - 2019-02-05
 ============================
 
 
@@ -7,6 +7,8 @@ Changes in CUPS v2.3b8
 
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
+- The `ippValidateAttribute` function did not catch all instances of invalid
+  UTF-8 strings (Issue #5509)
 - Fixed a potential memory leak when reading at the end of a file (Issue #5473)
 - Fixed potential unaligned accesses in the string pool (Issue #5474)
 - Fixed a potential memory leak when loading a PPD file (Issue #5475)
