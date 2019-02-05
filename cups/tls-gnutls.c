@@ -1,7 +1,7 @@
 /*
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -171,7 +171,7 @@ cupsMakeServerCredentials(
   if (num_alt_names > 0)
     gnutls_x509_crt_set_subject_alternative_name(crt, GNUTLS_SAN_DNSNAME, alt_names[0]);
   gnutls_x509_crt_set_key_purpose_oid(crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
-  gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_KEY_ENCIPHERMENT);
+  gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT);
   gnutls_x509_crt_set_version(crt, 3);
 
   bytes = sizeof(buffer);
