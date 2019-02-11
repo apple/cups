@@ -2809,12 +2809,48 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   }
   else if (!strncmp(con->uri, "/admin/log/", 11))
   {
-    if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
-      strlcpy(filename, AccessLog, len);
-    else if (!strncmp(con->uri + 11, "error_log", 9) && ErrorLog[0] == '/')
-      strlcpy(filename, ErrorLog, len);
-    else if (!strncmp(con->uri + 11, "page_log", 8) && PageLog[0] == '/')
-      strlcpy(filename, PageLog, len);
+    if (!strncmp(con->uri + 11, "access_log", 10))
+    {
+      if (AccessLog[0] == '/')
+        strlcpy(filename, AccessLog, len);
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+      else if (!strcmp(AccessLog, "syslog"))
+      {
+        cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
+        strlcpy(filename, SyslogWarn, len);
+      }
+#endif
+      else
+        return(NULL);
+    }
+    else if (!strncmp(con->uri + 11, "error_log", 9))
+    {
+      if (ErrorLog[0] == '/')
+        strlcpy(filename, ErrorLog, len);
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+      else if (!strcmp(ErrorLog, "syslog"))
+      {
+        cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
+        strlcpy(filename, SyslogWarn, len);
+      }
+#endif
+      else
+        return(NULL);
+    }
+    else if (!strncmp(con->uri + 11, "page_log", 8))
+    {
+      if (PageLog[0] == '/')
+        strlcpy(filename, PageLog, len);
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+      else if (!strcmp(PageLog, "syslog"))
+      {
+        cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
+        strlcpy(filename, SyslogWarn, len);
+      }
+#endif
+      else
+        return(NULL);
+    }
     else
       return (NULL);
 

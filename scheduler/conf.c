@@ -160,6 +160,9 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
   { "SyncOnClose",		&SyncOnClose,		CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+  { "SyslogWarn",		&SyslogWarn,		CUPSD_VARTYPE_STRING },
+#endif
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_AUTHORIZATION_H */
@@ -581,6 +584,9 @@ cupsdReadConfiguration(void)
   cupsdSetString(&DataDir, CUPS_DATADIR);
   cupsdSetString(&DocumentRoot, CUPS_DOCROOT);
   cupsdSetString(&AccessLog, CUPS_LOGDIR "/access_log");
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+  cupsdSetString(&SyslogWarn, CUPS_CACHEDIR "/syslog_warn");
+#endif
   cupsdClearString(&ErrorLog);
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
   cupsdSetString(&PageLogFormat,
@@ -828,6 +834,13 @@ cupsdReadConfiguration(void)
 
   if (!ErrorLog)
     cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
+
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+  if (!strcmp(AccessLog, "syslog") || !strcmp(ErrorLog, "syslog") || !strcmp(PageLog, "syslog"))
+    cupsdWriteSyslogWarn();
+  else
+    cupsdCleanFiles(CUPS_CACHEDIR, "*syslog_warn");
+#endif
 
  /*
   * Read the cupsd.conf file...

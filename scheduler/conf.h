@@ -127,6 +127,10 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Error log filename */
 			*PageLog		VALUE(NULL),
 					/* Page log filename */
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+                        *SyslogWarn             VALUE(NULL),
+                                        /* Syslog warning filename */
+#endif
 			*CacheDir		VALUE(NULL),
 					/* Cache file directory */
 			*DataDir		VALUE(NULL),
@@ -227,6 +231,10 @@ VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Error log file */
 			*PageFile		VALUE(NULL);
 					/* Page log file */
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+                        *SyslogWarnFile         VALUE(NULL);
+                                        /* Syslog warning file */
+#endif
 VAR char		*PageLogFormat		VALUE(NULL);
 					/* Page log format */
 VAR mime_t		*MimeDatabase		VALUE(NULL);

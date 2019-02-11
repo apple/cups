@@ -1279,6 +1279,55 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
 }
 
 
+#ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
+/*
+ * 'cupsdWriteSyslogWarn()' - Write warning about log being moved to syslog.
+ *
+ * The function writes warn message about chosen log being moved to syslog.
+ * It is used for prettier message in Web UI, when user tries to see log
+ * which is set to 'syslog'
+ */
+
+int
+cupsdWriteSyslogWarn()
+{
+  int             ret = 1; /* Return value */
+  const char      *warn_message = "The log has been moved to system log. Please consult your logging system for logs.";
+
+  struct stat st;
+  if (stat(SyslogWarn, &st) || st.st_size == 0)
+  {
+    /*
+     * Check if file exists - create it and write the warning into it
+     * if it does not exist.
+     */
+
+    _cupsMutexLock(&log_mutex);
+
+    if (!cupsdCheckLogFile(&SyslogWarnFile, SyslogWarn))
+    {
+      ret = 0;
+    }
+    else
+    {
+     /*
+      * Write the warn message...
+      */
+
+      cupsFilePrintf(SyslogWarnFile, "%s\n", warn_message);
+      cupsFileFlush(SyslogWarnFile);
+
+      cupsFileClose(SyslogWarnFile);
+    }
+
+    _cupsMutexUnlock(&log_mutex);
+  }
+
+  return (ret);
+}
+#endif
+
+
 /*
  * 'format_log_line()' - Format a line for a log file.
  *
