@@ -836,7 +836,8 @@ cupsdReadConfiguration(void)
     cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
 
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
-  if (!strcmp(AccessLog, "syslog") || !strcmp(ErrorLog, "syslog") || !strcmp(PageLog, "syslog"))
+  if (WebInterface && 
+      (!strcmp(AccessLog, "syslog") || !strcmp(ErrorLog, "syslog") || !strcmp(PageLog, "syslog")))
     cupsdWriteSyslogWarn();
   else
     cupsdCleanFiles(CUPS_CACHEDIR, "*syslog_warn");

@@ -2814,7 +2814,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (AccessLog[0] == '/')
         strlcpy(filename, AccessLog, len);
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
-      else if (!strcmp(AccessLog, "syslog"))
+      else if (!strcmp(AccessLog, "syslog") && WebInterface)
       {
         cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
         strlcpy(filename, SyslogWarn, len);
@@ -2828,7 +2828,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (ErrorLog[0] == '/')
         strlcpy(filename, ErrorLog, len);
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
-      else if (!strcmp(ErrorLog, "syslog"))
+      else if (!strcmp(ErrorLog, "syslog") && WebInterface)
       {
         cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
         strlcpy(filename, SyslogWarn, len);
@@ -2842,7 +2842,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (PageLog[0] == '/')
         strlcpy(filename, PageLog, len);
 #ifdef HAVE_SYSTEMD_SD_JOURNAL_H || defined(HAVE_VSYSLOG)
-      else if (!strcmp(PageLog, "syslog"))
+      else if (!strcmp(PageLog, "syslog") && WebInterface)
       {
         cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Log is set to syslog, get syslog warning file \"%s\".", SyslogWarn);
         strlcpy(filename, SyslogWarn, len);
