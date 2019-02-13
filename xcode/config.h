@@ -338,37 +338,12 @@
 
 
 /*
- * Do we have the cssmErrorString function?
- */
-
-#if !TARGET_OS_IOS
-#  define HAVE_CSSMERRORSTRING 1
-#endif /* !TARGET_OS_IOS */
-
-
-/*
  * Do we have the SecGenerateSelfSignedCertificate function?
  */
 
 #if TARGET_OS_IOS
 #  define HAVE_SECGENERATESELFSIGNEDCERTIFICATE 1
 #endif /* TARGET_OS_IOS */
-
-
-/*
- * Do we have the SecKeychainOpen function?
- */
-
-#if !TARGET_OS_IOS
-#  define HAVE_SECKEYCHAINOPEN 1
-#endif /* !TARGET_OS_IOS */
-
-
-/*
- * Do we have (a working) SSLSetEnabledCiphers function?
- */
-
-#define HAVE_SSLSETENABLEDCIPHERS 1
 
 
 /*

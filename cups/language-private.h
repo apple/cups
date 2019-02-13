@@ -41,6 +41,7 @@ extern "C" {
 #  define _CUPS_MESSAGE_PO	0	/* Message file is in GNU .po format */
 #  define _CUPS_MESSAGE_UNQUOTE	1	/* Unescape \foo in strings? */
 #  define _CUPS_MESSAGE_STRINGS	2	/* Message file is in Apple .strings format */
+#  define _CUPS_MESSAGE_EMPTY	4	/* Allow empty localized strings */
 
 
 /*

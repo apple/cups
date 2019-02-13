@@ -43,14 +43,7 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_HEADER(Security/SecBasePriv.h,
 		    AC_DEFINE(HAVE_SECBASEPRIV_H))
 		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
-		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
-
-		AC_DEFINE(HAVE_CSSMERRORSTRING)
-		AC_DEFINE(HAVE_SECKEYCHAINOPEN)])
-
-		if test $host_os_version -ge 150; then
-			AC_DEFINE(HAVE_SSLSETENABLEDCIPHERS)
-		fi
+		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))])
 	fi
     fi
 

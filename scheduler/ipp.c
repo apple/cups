@@ -1,7 +1,7 @@
 /*
  * IPP routines for the CUPS scheduler.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -2601,8 +2601,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       if (!strcmp(attr->values[i].string.text, "none"))
         continue;
 
-      printer->reasons[printer->num_reasons] =
-          _cupsStrRetain(attr->values[i].string.text);
+      printer->reasons[printer->num_reasons] = _cupsStrAlloc(attr->values[i].string.text);
       printer->num_reasons ++;
 
       if (!strcmp(attr->values[i].string.text, "paused") &&
@@ -4892,7 +4891,7 @@ copy_printer_attrs(
 
         if ((p2_uri = ippFindAttribute(p2->attrs, "printer-uri-supported", IPP_TAG_URI)) != NULL)
         {
-          member_uris->values[i].string.text = _cupsStrRetain(p2_uri->values[0].string.text);
+          member_uris->values[i].string.text = _cupsStrAlloc(p2_uri->values[0].string.text);
         }
         else
 	{
@@ -5256,6 +5255,11 @@ create_local_bg_thread(
 		*response;		/* Response from printer */
   ipp_attribute_t *attr;		/* Attribute in response */
   ipp_status_t	status;			/* Status code */
+  static const char * const pattrs[] =	/* Printer attributes we need */
+  {
+    "all",
+    "media-col-database"
+  };
 
 
  /*
@@ -5290,7 +5294,7 @@ create_local_bg_thread(
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
   ippSetVersion(request, 2, 0);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, printer->device_uri);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "all");
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
 
   response = cupsDoRequest(http, request, resource);
   status   = cupsLastError();

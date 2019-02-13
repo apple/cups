@@ -4,7 +4,7 @@
  * THESE APIS ARE DEPRECATED.  THIS HEADER AND THESE FUNCTIONS WILL BE REMOVED
  * IN A FUTURE RELEASE OF CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -295,8 +295,8 @@ typedef struct ppd_file_s		/**** PPD File @deprecated@ ****/
   int		throughput;		/* Pages per minute */
   ppd_cs_t	colorspace;		/* Default colorspace */
   char		*patches;		/* Patch commands to be sent to printer */
-  int		num_emulations;		/* Number of emulations supported */
-  ppd_emul_t	*emulations;		/* Emulations and the code to invoke them */
+  int		num_emulations;		/* Number of emulations supported (no longer supported) @private@ */
+  ppd_emul_t	*emulations;		/* Emulations and the code to invoke them (no longer supported) @private@ */
   char		*jcl_begin;		/* Start JCL commands */
   char		*jcl_ps;		/* Enter PostScript interpreter */
   char		*jcl_end;		/* End JCL commands */

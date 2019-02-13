@@ -8,73 +8,46 @@
 
 <H1 CLASS="title">Translating and Customizing CUPS</H1>
 
-<P>Thanks to its extensive use of templates, images, and message
-catalogs, CUPS can be easily translated (or customized!) to suit
-your needs. This help file will guide you through the CUPS
-localization files so you can get the most out of it.</P>
+<P>Thanks to its extensive use of templates, images, and message catalogs, CUPS can be easily translated (or customized!) to suit your needs. This help file will guide you through the CUPS localization files so you can get the most out of it.</P>
 
 
-<H2 CLASS="title"><A NAME="INTRO">Getting Started</A></H2>
+<H2 CLASS="title" ID="INTRO">Getting Started</H2>
 
-<P>Start by downloading the CUPS source code from <A
-HREF="http://www.cups.org/software.php"
-TARGET="_blank">www.cups.org</A>. After you extract the files
-from the source archive, you will want to copy the following
-files and directories:</P>
+<P>Start by downloading the CUPS source code from <A HREF="https://www.cups.org/" TARGET="_blank">www.cups.org</A>. After you extract the files from the source archive (or clone the Git repository), you will want to copy the following files and directories:</P>
 
 <UL>
 
-	<LI><VAR>desktop/cups.desktop</VAR> - the GNOME/KDE
-	desktop file pointing to the CUPS web interface</LI>
+	<LI><VAR>desktop/cups.desktop</VAR> - the GNOME/KDE desktop file pointing to the CUPS web interface</LI>
 
-	<LI><VAR>doc/index.html</VAR> - the web interface home
-	page</LI>
+	<LI><VAR>doc/index.html.in</VAR> - the web interface home page</LI>
 
 	<LI><VAR>locale/cups.pot</VAR> - the message catalog</LI>
 
-	<LI><VAR>templates/*.tmpl</VAR> - the web interface
-	template files</LI>
-	
+	<LI><VAR>templates/*.tmpl</VAR> and <VAR>templates/header.tmpl.in</VAR> - the web interface 	template files</LI>
+
 </UL>
 
-<P>With the exception of the message catalogs and desktop file,
-localization files are  placed in subdirectories under the
-<VAR>doc</VAR> and <VAR>templates</VAR> using the locale name.
-Locale names are either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where
-"ll" is the 2-letter language code and "CC" is the 2-letter
-country code. <em>CUPS does not currently use or support the newer
-<VAR>ll-region</VAR> syntax for locale names.</em></P>
+<P>With the exception of the message catalogs and desktop file, localization files are placed in subdirectories under the <VAR>doc</VAR> and <VAR>templates</VAR> using the locale name. Locale names are either <VAR>ll</VAR> or <VAR>ll_CC</VAR>, where "ll" is the 2-letter language code and "CC" is the 2-letter country code. <em>CUPS does not currently use or support the newer <VAR>ll-region</VAR> syntax for locale names.</em></P>
 
-<P>All non-image files must be encoded using the UTF-8 character
-set.</P>
+<P>All non-image files must be encoded using the UTF-8 character set.</P>
 
 
-<H2 CLASS="title"><A NAME="SUBMIT">Submitting a Translation for CUPS</A></H2>
+<H2 CLASS="title" ID="SUBMIT">Submitting a Translation for CUPS</H2>
 
-<P>To submit a translation for inclusion in CUPS, translate the
-desktop file, all of the template files, the <VAR>index.html.in</VAR>
-file, and the message catalog. Place these files in the correct
-subdirectories in the CUPS source code archive and run the following
-command to create an archive with your files:</P>
+<P>To submit a translation for inclusion in CUPS, translate the desktop file, all of the template files, the <VAR>index.html.in</VAR> file, and the message catalog. Place these files in the correct subdirectories in the CUPS source code archive and run the following command to create an archive with your files:</P>
 
 <PRE CLASS="command">
-tar cvf <I>ll_CC</I>.tar.gz desktop/cups.desktop doc/<I>ll_CC</I> \
-    locale/cups_<I>ll_CC</I>.po templates/<I>ll_CC</I>
+tar cvf <I>ll_CC</I>.tar.gz desktop/cups.desktop doc/<I>ll_CC</I> locale/cups_<I>ll_CC</I>.po templates/<I>ll_CC</I>
 </PRE>
 
-<P>Replace "ll_CC" with the locale name for your translation.
-Once you have created the archive, go to the <A
-HREF="http://www.cups.org/str.php" TARGET="_blank">CUPS Bugs
-&amp; Features</A> page and submit a bug report, attaching the
-translation to the report.</P>
+<P>Replace "ll_CC" with the locale name for your translation. Once you have created the archive, go to the <A HREF="https://github.com/apple/cups" TARGET="_blank">CUPS project page</A> and submit a bug report, attaching the translation to the report.</P>
+
+<P>Alternately, you can clone the CUPS project on Github, make your changes, and submit a pull request from the same link.</P>
 
 
-<H2 CLASS="title"><A NAME="DESKTOP">The Desktop File</A></H2>
+<H2 CLASS="title" ID="DESKTOP">The Desktop File</H2>
 
-<P>The <VAR>desktop/cups.desktop</VAR> file provides a link to
-the CUPS web interface from desktop environments such as
-GNOME and KDE. To translate this file, add two lines to the
-bottom with the <tt>Name</tt> and <tt>Comment</tt> keys:</P>
+<P>The <VAR>desktop/cups.desktop</VAR> file provides a link to the CUPS web interface from desktop environments such as GNOME and KDE. To translate this file, add two lines to the bottom with the <tt>Name</tt> and <tt>Comment</tt> keys:</P>
 
 <PRE CLASS="command">
 Name[<I>ll_CC</I>]=<I>Translation of "Manage Printing"</I>
@@ -82,42 +55,25 @@ Comment[<I>ll_CC</I>]=<I>Translation of "CUPS Web Interface"</I>
 </PRE>
 
 
-<H2 CLASS="title"><A NAME="HOMEPAGE">The Home Page</A></H2>
+<H2 CLASS="title" ID="HOMEPAGE">The Home Page</H2>
 
-<P>The <VAR>index.html</VAR> file is a complete HTML file that is
-displayed when the user visits "http://localhost:631/". Edit the
-existing <VAR>doc/index.html</VAR> and save it in the
-<VAR>doc/ll_CC</VAR> subdirectory so that the makefile can
-install it. Run "make install" in the <VAR>doc</VAR> subdirectory
-to test the new home page.</P>
+<P>The <VAR>index.html.in</VAR> file is a complete HTML file that is displayed when the user visits "http://localhost:631/". Edit the existing <VAR>doc/index.html.in</VAR> and save it in the <VAR>doc/ll_CC</VAR> subdirectory so that the configure script can generate it. After configuring, run "make install" in the <VAR>doc</VAR> subdirectory to test the new home page.</P>
 
 
-<H2 CLASS="title"><A NAME="CATALOGS">Message Catalogs</A></H2>
+<H2 CLASS="title" ID="CATALOGS">Message Catalogs</H2>
 
-<P>CUPS message catalogs are GNU gettext ".po" text files that
-provide a list of localized message strings for the CUPS
-software. Message catalogs are named <VAR>cups_ll.po</VAR> or
-<VAR>cups_ll_CC.po</VAR>, where "ll" is the standard 2-letter
-abbreviation for the language and "CC" is the standard 2-letter
-abbreviation for the country.</P>
+<P>CUPS message catalogs are GNU gettext ".po" text files that provide a list of localized message strings for the CUPS software. Message catalogs are named <VAR>cups_ll.po</VAR> or <VAR>cups_ll_CC.po</VAR>, where "ll" is the standard 2-letter abbreviation for the language and "CC" is the standard 2-letter abbreviation for the country.</P>
 
-<P>When translating a new message catalog, copy the
-<VAR>cups.pot</VAR> message catalog file in the <VAR>locale</VAR>
-subdirectory of the CUPS source code. For example, to start
-translating the message catalog to Canadian French, you would
-type the following commands:</P>
+<P>When translating a new message catalog, copy the <VAR>cups.pot</VAR> message catalog file in the <VAR>locale</VAR> subdirectory of the CUPS source code. For example, to start translating the message catalog to Canadian French, you would type the following commands:</P>
 
 <PRE CLASS="command">
 cd locale
 cp cups.pot cups_fr_CA.po
 </PRE>
 
-<P>Alternatively, you can copy the existing <VAR>cups_fr.po</VAR>
-message catalog and then make any necessary changes.</P>
+<P>Alternatively, you can copy the existing <VAR>cups_fr.po</VAR> message catalog and then make any necessary changes.</P>
 
-<P>Once you have make your copy of the file, edit it using your
-favorite text editor or translation program to translate the text
-to the desired language.</P>
+<P>Once you have make your copy of the file, edit it using your favorite text editor or translation program to translate the text to the desired language.</P>
 
 <P>Then validate your translation using the <VAR>locale/checkpo</VAR> utility:</P>
 
@@ -126,29 +82,14 @@ cd locale
 ./checkpo cups_ll_CC.po
 </PRE>
 
-<P>After fixing any errors in your translation, add your locale to the <CODE>LANGUAGES</CODE>
-variable in the <VAR>Makedefs</VAR> file and run the "make
-install" command in the <VAR>locale</VAR> subdirectory to test
-the translation.</P>
+<P>After fixing any errors in your translation, add your locale to the <CODE>LANGUAGES</CODE> variable in the <VAR>Makedefs</VAR> file and run the "make install" command in the <VAR>locale</VAR> subdirectory to test the translation. <em>This variable is automatically updated when you run the configure script.</em></P>
 
 
-<H2 CLASS="title"><A NAME="TEMPLATES">Template Files</A></H2>
+<H2 CLASS="title" ID="TEMPLATES">Template Files</H2>
 
-<P>The CUPS scheduler provides a web interface that can be used
-to do many common printing and administration tasks. The built-in
-web server supports localization of web pages through the use of
-subdirectories for each locale, e.g. "fr" for French, "de" for
-German, "fr_ca" for French in Canada, and so forth.</P>
+<P>The CUPS scheduler provides a web interface that can be used to do many common printing and administration tasks. The built-in web server supports localization of web pages through the use of subdirectories for each locale, e.g. "fr" for French, "de" for German, "fr_ca" for French in Canada, and so forth.</P>
 
-<P>Template files are HTML files with special formatting
-characters in them that allow substitution of variables and arrays.
-The CUPS CGI programs (<CODE>admin.cgi</CODE>,
-<CODE>classes.cgi</CODE>, <CODE>help.cgi</CODE>,
-<CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these
-template file to provide dynamic content for the web interface.
-Template files are installed in the
-<VAR>/usr/share/cups/templates</VAR> directory by default. Table
-2 lists the various template files and their purpose.</P>
+<P>Template files are HTML files with special formatting characters in them that allow substitution of variables and arrays. The CUPS CGI programs (<CODE>admin.cgi</CODE>, <CODE>classes.cgi</CODE>, <CODE>help.cgi</CODE>, <CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these template file to provide dynamic content for the web interface. Template files are installed in the <VAR>/usr/share/cups/templates</VAR> directory by default. <A HREF="table1">Table 1</a> lists the various template files and their purpose.</P>
 
 <P>Translated versions of the template files should be saved in
 the <VAR>templates/ll_CC</VAR> subdirectory. For example,
@@ -159,8 +100,8 @@ translated all of the templates, add the locale to the
 <VAR>Makedefs</VAR> file and run "make install" in the
 <VAR>templates</VAR> subdirectory to test the translation.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="Web Interface Template Files">
-<CAPTION>Table 2: Web Interface Template Files</CAPTION>
+<DIV CLASS="table"><TABLE ID="table1" SUMMARY="Web Interface Template Files">
+<CAPTION>Table 1: Web Interface Template Files</CAPTION>
 <THEAD>
 <TR>
 	<TH>Filename</TH>
@@ -170,17 +111,11 @@ translated all of the templates, add the locale to the
 <TBODY>
 <TR>
 	<TD>add-class.tmpl</TD>
-	<TD>This is the initial form that is shown to add a new
-	printer class.</TD>
+	<TD>This is the initial form that is shown to add a new printer class.</TD>
 </TR>
 <TR>
 	<TD>add-printer.tmpl</TD>
-	<TD>This is the initial form that is shown to add a new
-	printer.</TD>
-</TR>
-<TR>
-	<TD>add-rss-subscription.tmpl</TD>
-	<TD>This is the form that is shown to add a new RSS subscription.</TD>
+	<TD>This is the initial form that is shown to add a new printer.</TD>
 </TR>
 <TR>
 	<TD>admin.tmpl</TD>
@@ -188,28 +123,27 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>choose-device.tmpl</TD>
-	<TD>This is the form that shows the list of available
-	devices.</TD>
+	<TD>This is the form that shows the list of available devices.</TD>
 </TR>
 <TR>
 	<TD>choose-make.tmpl</TD>
-	<TD>This is the form that shows the list of available
-	manufacturers.</TD>
+	<TD>This is the form that shows the list of available manufacturers.</TD>
 </TR>
 <TR>
 	<TD>choose-model.tmpl</TD>
-	<TD>This is the form that shows the list of available
-	printer models/drivers.</TD>
+	<TD>This is the form that shows the list of available printer models/drivers.</TD>
 </TR>
 <TR>
 	<TD>choose-serial.tmpl</TD>
-	<TD>This is the form that allows the user to choose
-	a serial port and any options.</TD>
+	<TD>This is the form that allows the user to choose a serial port and any options.</TD>
 </TR>
 <TR>
 	<TD>choose-uri.tmpl</TD>
-	<TD>This is the form that allows the user to enter
-	a device URI for network printers.</TD>
+	<TD>This is the form that allows the user to enter a device URI for network printers.</TD>
+</TR>
+<TR>
+	<TD>class.tmpl</TD>
+	<TD>This template shows information about a single class.</TD>
 </TR>
 <TR>
 	<TD>class-added.tmpl</TD>
@@ -217,8 +151,7 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>class-confirm.tmpl</TD>
-	<TD>This is the template used to confirm the
-	deletion of a class.</TD>
+	<TD>This is the template used to confirm the deletion of a class.</TD>
 </TR>
 <TR>
 	<TD>class-deleted.tmpl</TD>
@@ -226,8 +159,7 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>class-jobs-header.tmpl</TD>
-	<TD>This template shows the "jobs" header for jobs in a
-	class.</TD>
+	<TD>This template shows the "jobs" header for jobs in a class.</TD>
 </TR>
 <TR>
 	<TD>class-modified.tmpl</TD>
@@ -239,8 +171,11 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>classes-header.tmpl</TD>
-	<TD>This template shows the "showing N of M classes" header in
-	the class list.</TD>
+	<TD>This template shows the "showing N of M classes" header in the class list.</TD>
+</TR>
+<TR>
+	<TD>command.tmpl</TD>
+	<TD>This template shows the status of a command job.</TD>
 </TR>
 <TR>
 	<TD>edit-config.tmpl</TD>
@@ -255,9 +190,8 @@ translated all of the templates, add the locale to the
 	<TD>This is the "unknown operation" error page.</TD>
 </TR>
 <TR>
-	<TD>header.tmpl</TD>
-	<TD>This template is used as the standard header on all dynamic
-	content.</TD>
+	<TD>header.tmpl(.in)</TD>
+	<TD>This template is used as the standard header on all dynamic content. Edit the <VAR>header.tmpl.in</VAR> file and let the configure script generate the <VAR>header.tmpl</VAR> file.</TD>
 </TR>
 <TR>
 	<TD>help-header.tmpl</TD>
@@ -265,8 +199,11 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>help-printable.tmpl</TD>
-	<TD>This is the standard page header for the printable
-	version of help files.</TD>
+	<TD>This is the standard page header for the printable version of help files.</TD>
+</TR>
+<TR>
+	<TD>help-trailer.tmpl</TD>
+	<TD>This is the bottom part of the help page.</TD>
 </TR>
 <TR>
 	<TD>job-cancel.tmpl</TD>
@@ -294,36 +231,27 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>jobs.tmpl</TD>
-	<TD>This template is used to list the print jobs on a server,
-	class, or printer.</TD>
+	<TD>This template is used to list the print jobs on a server, class, or printer.</TD>
 </TR>
 <TR>
 	<TD>jobs-header.tmpl</TD>
-	<TD>This template shows the "showing N or M jobs" header in the
-	jobs list.</TD>
+	<TD>This template shows the "showing N or M jobs" header in the jobs list.</TD>
 </TR>
 <TR>
 	<TD>list-available-printers.tmpl</TD>
 	<TD>This template shows a list of new printers that have been found.</TD>
 </TR>
 <TR>
-	<TD>maintenance.tmpl</TD>
-	<TD>This template shows "maintenance commands sent".</TD>
-</TR>
-<TR>
 	<TD>modify-class.tmpl</TD>
-	<TD>This template is used as the first form when modifying a
-	class.</TD>
+	<TD>This template is used as the first form when modifying a class.</TD>
 </TR>
 <TR>
 	<TD>modify-printer.tmpl</TD>
-	<TD>This template is used as the first form when modifying a
-	printer.</TD>
+	<TD>This template is used as the first form when modifying a printer.</TD>
 </TR>
 <TR>
 	<TD>norestart.tmpl</TD>
-	<TD>This template shows "server not restarted because no
-	changes were made to the configuration".</TD>
+	<TD>This template shows "server not restarted because no changes were made to the configuration".</TD>
 </TR>
 <TR>
 	<TD>option-boolean.tmpl</TD>
@@ -354,6 +282,10 @@ translated all of the templates, add the locale to the
 	<TD>This template shows the previous/next pager bar.</TD>
 </TR>
 <TR>
+	<TD>printer.tmpl</TD>
+	<TD>This template shows information about a single printer.</TD>
+</TR>
+<TR>
 	<TD>printer-accept.tmpl</TD>
 	<TD>This template shows "printer now accepting jobs".</TD>
 </TR>
@@ -362,13 +294,16 @@ translated all of the templates, add the locale to the
 	<TD>This template shows "printer added".</TD>
 </TR>
 <TR>
+	<TD>printer-cancel-jobs.tmpl</TD>
+	<TD>This template shows "All jobs on printer have been canceled."</TD>
+</TR>
+<TR>
 	<TD>printer-configured.tmpl</TD>
 	<TD>This template shows "printer configured".</TD>
 </TR>
 <TR>
 	<TD>printer-confirm.tmpl</TD>
-	<TD>This template asks the user to confirm the deletion
-	of a printer.</TD>
+	<TD>This template asks the user to confirm the deletion of a printer.</TD>
 </TR>
 <TR>
 	<TD>printer-default.tmpl</TD>
@@ -380,16 +315,11 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>printer-jobs-header.tmpl</TD>
-	<TD>This templates shows the "jobs" header for jobs on a
-	printer.</TD>
+	<TD>This templates shows the "jobs" header for jobs on a printer.</TD>
 </TR>
 <TR>
 	<TD>printer-modified.tmpl</TD>
 	<TD>This template shows "printer modified".</TD>
-</TR>
-<TR>
-	<TD>printer-purge.tmpl</TD>
-	<TD>This template shows "printer has been purged of all jobs".</TD>
 </TR>
 <TR>
 	<TD>printer-reject.tmpl</TD>
@@ -405,25 +335,15 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>printers.tmpl</TD>
-	<TD>This template is used to list information on one or more
-	printers.</TD>
+	<TD>This template is used to list information on one or more printers.</TD>
 </TR>
 <TR>
 	<TD>printers-header.tmpl</TD>
-	<TD>This template shows the "showing printer N of M" header in
-	the printers list.</TD>
+	<TD>This template shows the "showing printer N of M" header in the printers list.</TD>
 </TR>
 <TR>
 	<TD>restart.tmpl</TD>
 	<TD>This template shows "server restarting".</TD>
-</TR>
-<TR>
-	<TD>samba-export.tmpl</TD>
-	<TD>This template shows the export printers to Samba form.</TD>
-</TR>
-<TR>
-	<TD>samba-exported.tmpl</TD>
-	<TD>This template shows "printers exported to Samba".</TD>
 </TR>
 <TR>
 	<TD>search.tmpl</TD>
@@ -431,21 +351,11 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>set-printer-options-header.tmpl</TD>
-	<TD>This template shows the first part of the set printer options
-	form.</TD>
+	<TD>This template shows the first part of the set printer options form.</TD>
 </TR>
 <TR>
 	<TD>set-printer-options-trailer.tmpl</TD>
-	<TD>This template shows the last part of the set printer options
-	form.</TD>
-</TR>
-<TR>
-	<TD>subscription-added.tmpl</TD>
-	<TD>This template shows "subscription ... added".</TD>
-</TR>
-<TR>
-	<TD>subscription-canceled.tmpl</TD>
-	<TD>This template shows "subscription #NNN canceled".</TD>
+	<TD>This template shows the last part of the set printer options form.</TD>
 </TR>
 <TR>
 	<TD>test-page.tmpl</TD>
@@ -453,8 +363,7 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>trailer.tmpl</TD>
-	<TD>This template is used as the standard trailer on all dynamic
-	content.</TD>
+	<TD>This template is used as the standard trailer on all dynamic content.</TD>
 </TR>
 <TR>
 	<TD>users.tmpl</TD>
@@ -463,42 +372,21 @@ translated all of the templates, add the locale to the
 </TBODY>
 </TABLE></DIV>
 
-<H3><A NAME="VARIABLE">Inserting Attributes and Values</A></H3>
+<H4 ID="VARIABLE">Inserting Attributes and Values</H4>
 
-<P>Template files consist of HTML with variable substitutions for
-named inside curly braces "{name}". Variable names are generally
-the IPP attribute names with the hyphen ("-") replaced by the
-underscore ("_") character. For example, the
-<TT>job-printer-uri</TT> attribute is renamed to
-<TT>job_printer_uri</TT>.</P>
+<P>Template files consist of HTML with variable substitutions for named inside curly braces "{name}". Variable names are generally the IPP attribute names with the hyphen ("-") replaced by the underscore ("_") character. For example, the <TT>job-printer-uri</TT> attribute is renamed to <TT>job_printer_uri</TT>.</P>
 
-<P>Curley braces ("{" and "}") to indicate substitutions, and the
-backslash ("\") character for quoting. To insert any of these
-special characters as-is you need to use the HTML
-<CODE>&amp;name;</CODE> mechanism or prefix each special
-character with the backslash ("\".)</P>
+<P>Curley braces ("{" and "}") to indicate substitutions, and the backslash ("\") character for quoting. To insert any of these special characters as-is you need to use the HTML <CODE>&amp;name;</CODE> mechanism or prefix each special character with the backslash ("\".)</P>
 
-<P>You substitute the value of a variable using
-<CODE>{NAME}</CODE> in your template file. If the variable is
-undefined then the <CODE>{NAME}</CODE> string is output
-as-is.</P>
+<P>You substitute the value of a variable using <CODE>{NAME}</CODE> in your template file. If the variable is undefined then the <CODE>{NAME}</CODE> string is output as-is.</P>
 
-<P>To substitute an empty string if the variable is undefined,
-use <CODE>{?NAME}</CODE> instead.</P>
+<P>To substitute an empty string if the variable is undefined, use <CODE>{?NAME}</CODE> instead.</P>
 
-<H3>Array Substitutions</H3>
+<H4>Array Substitutions</H4>
 
-<P>The number of array elements can be inserted using
-<CODE>{#NAME}</CODE>. If the array is undefined then 0 is output.
-The current array element (starting at 1) is inserted with
-<CODE>{#}</CODE>.</P>
+<P>The number of array elements can be inserted using <CODE>{#NAME}</CODE>. If the array is undefined then 0 is output. The current array element (starting at 1) is inserted with <CODE>{#}</CODE>.</P>
 
-<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning
-of a section and <CODE>}</CODE> at the end. The information
-between the closing bracket ("]") and closing brace ("}") is
-repeated for as many elements as are in the named array. For
-example, the following template will display a list of each job
-in the <CODE>job_id</CODE> array:</P>
+<P>Arrays are handled using <CODE>{[NAME]</CODE> at the beginning of a section and <CODE>}</CODE> at the end. The information between the closing bracket ("]") and closing brace ("}") is repeated for as many elements as are in the named array. For example, the following template will display a list of each job in the <CODE>job_id</CODE> array:</P>
 
 <PRE CLASS="command">
 &lt;TABLE&gt;
@@ -518,13 +406,11 @@ in the <CODE>job_id</CODE> array:</P>
 &lt;/TABLE&gt;
 </PRE>
 
-<P>Arrays can be nested, however all elements within the curly
-braces ("{" and "}") are indexed using the innermost array.</P>
+<P>Arrays can be nested, however all elements within the curly braces ("{" and "}") are indexed using the innermost array.</P>
 
-<H3>Conditional Tests</H3>
+<H4>Conditional Tests</H4>
 
-<P>Templates can also test variables against specific values and
-conditionally include text in the template. The format is:</P>
+<P>Templates can also test variables against specific values and conditionally include text in the template. The format is:</P>
 
 <PRE CLASS="command">
 {<I>variable</I>?<I>true</I>:<I>false</I>}
@@ -534,15 +420,10 @@ conditionally include text in the template. The format is:</P>
 {<I>variable</I>><I>value</I>?<I>true</I>:<I>false</I>}
 </PRE>
 
-<P>where <VAR>true</VAR> is the text that is included if the
-condition is true and <VAR>false</VAR> is the text that is
-included if the condition is false. A value of <CODE>#</CODE> is
-replaced with the current element number (starting at 1.) The
-character after the variable name specifies the condition to
-test. Table 3 shows the available test conditions.</P>
+<P>where <VAR>true</VAR> is the text that is included if the condition is true and <VAR>false</VAR> is the text that is included if the condition is false. A value of <CODE>#</CODE> is replaced with the current element number (starting at 1.) The character after the variable name specifies the condition to test. <A HREF="#table2">Table 2</A> shows the available test conditions.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="Template Substitution Conditions">
-<CAPTION>Table 3: Template Substitution Conditions</CAPTION>
+<DIV CLASS="table"><TABLE ID="table2" SUMMARY="Template Substitution Conditions">
+<CAPTION>Table 2: Template Substitution Conditions</CAPTION>
 <TR>
 	<TH>Char</TH>
 	<TH>Condition</TH>
@@ -569,10 +450,29 @@ test. Table 3 shows the available test conditions.</P>
 </TR>
 </TABLE></DIV>
 
-<H3><A NAME="CGI">CGI Programs</A></H3>
+<H4 ID="LOCTMPL">What to Localize in a Template File</H4>
 
-<P>CUPS uses five CGI programs to manage the dynamic web
-interfaces:</P>
+<P>Because HTML contains both markup (that generally is not localized) and text (which <em>is</em> localized), you should carefully avoid changing the markup unless it contains human-readable text. The following HTML examples show how to correctly localize template files:</P>
+
+<P CLASS="command">
+&lt;!-- English table heading --&gt;<br>
+&lt;table class="list" summary="Printer List"><br>
+<br>
+&lt;!-- Correctly localized to French; the class attribute is unchanged but summary is localized --><br>
+&lt;table class="list" summary="Liste des imprimantes"><br>
+<br>
+<br>
+&lt;!-- English hyperlink --><br>
+&lt;li>&lt;a {SECTION=help?class="active" :}href="/help/">Help&lt;/a>&lt;/li><br>
+<br>
+&lt;!-- Correctly localized to Danish; the href attribute is unchanged while the link text is localized --><br>
+&lt;li>&lt;a {SECTION=help?class="active" :}href="/help/">Hjælp&lt;/a>&lt;/li><br>
+</P>
+
+
+<H3 ID="CGI">CGI Programs</H3>
+
+<P>CUPS uses five CGI programs to manage the dynamic web interfaces:</P>
 
 <UL>
 
@@ -584,21 +484,12 @@ interfaces:</P>
 
 </UL>
 
-<P>Each CGI program accepts standard form variables such as
-<CODE>OP</CODE> for the operation to perform,
-<CODE>PRINTER_NAME</CODE> for the printer or class name to
-operate on, <CODE>QUERY</CODE> for any search words,
-<CODE>FIRST</CODE> for the first class, job, or printer to
-display, and <CODE>ORDER</CODE> to control the order that
-classes, jobs, or printers are displayed.</P>
+<P>Each CGI program accepts standard form variables such as <CODE>OP</CODE> for the operation to perform, <CODE>PRINTER_NAME</CODE> for the printer or class name to operate on, <CODE>QUERY</CODE> for any search words,<CODE>FIRST</CODE> for the first class, job, or printer to display, and <CODE>ORDER</CODE> to control the order that classes, jobs, or printers are displayed.</P>
 
-<P>In addition, the <CODE>classes.cgi</CODE>,
-<CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE> programs
-support a <CODE>WHICH_JOBS</CODE> variable to control which jobs
-are displayed. Table 4 lists the supported values.</P>
+<P>In addition, the <CODE>classes.cgi</CODE>, <CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE> programs support a <CODE>WHICH_JOBS</CODE> variable to control which jobs are displayed. <A HREF="#table3">Table 3</A> lists the supported values.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="WHICH_JOBS Values">
-<CAPTION>Table 4: WHICH_JOBS Values</CAPTION>
+<DIV CLASS="table"><TABLE ID="table3" SUMMARY="WHICH_JOBS Values">
+<CAPTION>Table 3: WHICH_JOBS Values</CAPTION>
 <THEAD>
 <TR>
 	<TH>WHICH_JOBS Value</TH>
@@ -619,17 +510,12 @@ are displayed. Table 4 lists the supported values.</P>
 </TR>
 </TABLE></DIV>
 
-<H4><A NAME="admin.cgi">admin.cgi</A></H4>
+<H4 ID="admin.cgi">admin.cgi</H4>
 
-<P>The <CODE>admin.cgi</CODE> program handles all of the printer
-and class administration functions and is run for all direct
-accesses to the <VAR>/admin</VAR> resource. For most operations
-it uses the <CODE>PRINTER_NAME</CODE> and <CODE>OP</CODE> form
-variables to specify the action requested. Table 5 shows the
-supported <CODE>OP</CODE> values.</P>
+<P>The <CODE>admin.cgi</CODE> program handles all of the printer and class administration functions and is run for all direct accesses to the <VAR>/admin</VAR> resource. For most operations it uses the <CODE>PRINTER_NAME</CODE> and <CODE>OP</CODE> form variables to specify the action requested. <A HREF="#table4">Table 4</A> shows the supported <CODE>OP</CODE> values.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="admin.cgi OP Values">
-<CAPTION>Table 5: admin.cgi OP Values</CAPTION>
+<DIV CLASS="table"><TABLE ID="table4" SUMMARY="admin.cgi OP Values">
+<CAPTION>Table 4: admin.cgi OP Values</CAPTION>
 <THEAD>
 <TR>
 	<TH>OP Value</TH>
@@ -637,10 +523,6 @@ supported <CODE>OP</CODE> values.</P>
 </TR>
 </THEAD>
 <TBODY>
-<TR>
-	<TD>accept-jobs</TD>
-	<TD>Accepts jobs on the named destination.</TD>
-</TR>
 <TR>
 	<TD>add-class</TD>
 	<TD>Adds a new printer class.</TD>
@@ -664,10 +546,6 @@ supported <CODE>OP</CODE> values.</P>
 	may be set to any value to bypass the confirmation page.</TD>
 </TR>
 <TR>
-	<TD>export-samba</TD>
-	<TD>Exports printers to Samba.</TD>
-</TR>
-<TR>
 	<TD>find-new-printers</TD>
 	<TD>Find new printers that have not yet been added.</TD>
 </TR>
@@ -680,17 +558,9 @@ supported <CODE>OP</CODE> values.</P>
 	<TD>Modifies a printer.</TD>
 </TR>
 <TR>
-	<TD>purge-jobs</TD>
-	<TD>Purges all jobs on the named destination.</TD>
-</TR>
-<TR>
 	<TD>redirect</TD>
 	<TD>Redirects the web browser to the location referenced by
 	the URL form variable.</TD>
-</TR>
-<TR>
-	<TD>reject-jobs</TD>
-	<TD>Rejects new jobs on the named destination.</TD>
 </TR>
 <TR>
 	<TD>set-allowed-users</TD>
@@ -708,38 +578,15 @@ supported <CODE>OP</CODE> values.</P>
 	<TD>set-sharing</TD>
 	<TD>Sets the printer-is-shared attribute for a destination.</TD>
 </TR>
-<TR>
-	<TD>start-class</TD>
-	<TD>Starts the named class.</TD>
-</TR>
-<TR>
-	<TD>start-printer</TD>
-	<TD>Starts the named printer.</TD>
-</TR>
-<TR>
-	<TD>stop-class</TD>
-	<TD>Stops the named class.</TD>
-</TR>
-<TR>
-	<TD>stop-printer</TD>
-	<TD>Stops the named printer.</TD>
-</TR>
 </TBODY>
 </TABLE></DIV>
 
-<H4><A NAME="classes.cgi">classes.cgi</A></H4>
+<H4 ID="classes.cgi">classes.cgi</H4>
 
-<P>The <CODE>classes.cgi</CODE> program is responsible for
-listing class information, including jobs destined for that
-class. It is for all direct accesses to the <VAR>/classes</VAR>
-resource and supports the optional form variables <CODE>OP</CODE>
-and <CODE>WHICH_JOBS</CODE>. If no form variables are supplied
-then the CGI lists all or a specific class and the active jobs on
-each class. Table 6 shows the supported <CODE>OP</CODE>
-values.</P>
+<P>The <CODE>classes.cgi</CODE> program is responsible for listing class information, including jobs destined for that class. It is for all direct accesses to the <VAR>/classes</VAR> resource and supports the optional form variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If no form variables are supplied then the CGI lists all or a specific class and the active jobs on each class. <A HREF="#table5">Table 5</A> shows the supported <CODE>OP</CODE> values.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="classes.cgi OP Values">
-<CAPTION>Table 6: classes.cgi OP Values</CAPTION>
+<DIV CLASS="table"><TABLE ID="table5" SUMMARY="classes.cgi OP Values">
+<CAPTION>Table 5: classes.cgi OP Values</CAPTION>
 <THEAD>
 <TR>
 	<TH>OP Value</TH>
@@ -748,35 +595,48 @@ values.</P>
 </THEAD>
 <TBODY>
 <TR>
+	<TD>accept-jobs</TD>
+	<TD>Start accepting jobs for a class.</TD>
+</TR>
+<TR>
+	<TD>cancel-jobs</TD>
+	<TD>Cancel all jobs for a class.</TD>
+</TR>
+<TR>
 	<TD>move-jobs</TD>
-	<TD>Moves the jobs on this class to another destination.</TD>
+	<TD>Move all jobs to a different destination.</TD>
 </TR>
 <TR>
 	<TD>print-test-page</TD>
-	<TD>Prints the standard PostScript test page.</TD>
+	<TD>Print a PostScript test page.</TD>
+</TR>
+<TR>
+	<TD>reject-jobs</TD>
+	<TD>Stop accepting jobs for a class.</TD>
+</TR>
+<TR>
+	<TD>start-class</TD>
+	<TD>Start processing jobs for a class.</TD>
+</TR>
+<TR>
+	<TD>stop-class</TD>
+	<TD>Stop processing jobs for a class.</TD>
 </TR>
 </TBODY>
 </TABLE></DIV>
 
 
-<H4><A NAME="help.cgi">help.cgi</A></H4>
+<H4 ID="help.cgi">help.cgi</H4>
 
-<P>The <CODE>help.cgi</CODE> program handles all of the on-line
-help functions and is run for all direct accesses to the
-<VAR>/help</VAR> resource.</P>
+<P>The <CODE>help.cgi</CODE> program handles all of the on-line help functions and is run for all direct accesses to the <VAR>/help</VAR> resource.</P>
 
 
-<H4><A NAME="jobs.cgi">jobs.cgi</A></H4>
+<H4 ID="jobs.cgi">jobs.cgi</H4>
 
-<P>The <CODE>jobs.cgi</CODE> program handles all of the job
-functions and is run for all direct accesses to the
-<VAR>/jobs</VAR> resource. For most operations it uses the
-<CODE>JOB_ID</CODE>, <CODE>OP</CODE>, and <CODE>WHICH_JOBS</CODE>
-form variables to specify the action requested. Table 7 shows the
-supported <CODE>OP</CODE> values.</P>
+<P>The <CODE>jobs.cgi</CODE> program handles all of the job functions and is run for all direct accesses to the <VAR>/jobs</VAR> resource. For most operations it uses the <CODE>JOB_ID</CODE>, <CODE>OP</CODE>, and <CODE>WHICH_JOBS</CODE> form variables to specify the action requested. <A HREF="#table6">Table 6</A> shows the supported <CODE>OP</CODE> values.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="jobs.cgi OP Values">
-<CAPTION>Table 7: jobs.cgi OP Values</CAPTION>
+<DIV CLASS="table"><TABLE ID="table6" SUMMARY="jobs.cgi OP Values">
+<CAPTION>Table 6: jobs.cgi OP Values</CAPTION>
 <THEAD>
 <TR>
 	<TH>OP Value</TH>
@@ -809,19 +669,12 @@ supported <CODE>OP</CODE> values.</P>
 </TABLE></DIV>
 
 
-<H4><A NAME="printers.cgi">printers.cgi</A></H4>
+<H4 ID="printers.cgi">printers.cgi</H4>
 
-<P>The <CODE>printers.cgi</CODE> program is responsible for
-listing printer information, including jobs destined for that
-printer. It is for all direct accesses to the
-<VAR>/printers</VAR> resource and supports the optional form
-variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If no form
-variables are supplied then the CGI lists all printers or a
-specific printer and the active jobs on that printer. Table 8
-shows the supported <CODE>OP</CODE> values.</P>
+<P>The <CODE>printers.cgi</CODE> program is responsible for listing printer information, including jobs destined for that printer. It is for all direct accesses to the <VAR>/printers</VAR> resource and supports the optional form variables <CODE>OP</CODE> and <CODE>WHICH_JOBS</CODE>. If no form variables are supplied then the CGI lists all printers or a specific printer and the active jobs on that printer. <A HREF="#table7">Table 7</A> shows the supported <CODE>OP</CODE> values.</P>
 
-<DIV CLASS="table"><TABLE SUMMARY="printers.cgi OP Values">
-<CAPTION>Table 8: printers.cgi OP Values</CAPTION>
+<DIV CLASS="table"><TABLE ID="table7" SUMMARY="printers.cgi OP Values">
+<CAPTION>Table 7: printers.cgi OP Values</CAPTION>
 <THEAD>
 <TR>
 	<TH>OP Value</TH>
@@ -829,6 +682,14 @@ shows the supported <CODE>OP</CODE> values.</P>
 </TR>
 </THEAD>
 <TBODY>
+<TR>
+	<TD>accept-jobs</TD>
+	<TD>Start accepting jobs for a printer.</TD>
+</TR>
+<TR>
+	<TD>cancel-jobs</TD>
+	<TD>Cancel all jobs for a printer.</TD>
+</TR>
 <TR>
 	<TD>clean-print-heads</TD>
 	<TD>Clean the print heads.</TD>
@@ -844,6 +705,18 @@ shows the supported <CODE>OP</CODE> values.</P>
 <TR>
 	<TD>print-test-page</TD>
 	<TD>Print a PostScript test page.</TD>
+</TR>
+<TR>
+	<TD>reject-jobs</TD>
+	<TD>Stop accepting jobs for a printer.</TD>
+</TR>
+<TR>
+	<TD>start-printer</TD>
+	<TD>Start processing jobs for a printer.</TD>
+</TR>
+<TR>
+	<TD>stop-printer</TD>
+	<TD>Stop processing jobs for a printer.</TD>
 </TR>
 </TBODY>
 </TABLE></DIV>

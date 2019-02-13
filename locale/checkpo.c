@@ -70,7 +70,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (strstr(argv[i], ".strings"))
       po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_STRINGS);
     else
-      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_PO);
+      po = _cupsMessageLoad(argv[i], _CUPS_MESSAGE_PO | _CUPS_MESSAGE_EMPTY);
 
     if (!po)
     {
@@ -155,7 +155,6 @@ main(int  argc,				/* I - Number of command-line args */
 	printf("    Ellipsis in message \"%s\"\n",
 	       abbreviate(msg->msg, idbuf, sizeof(idbuf)));
       }
-
 
       if (!msg->str || !msg->str[0])
       {
@@ -257,8 +256,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (pass)
     {
-      if ((untranslated * 10) >= cupsArrayCount(po) &&
-          strcmp(argv[i], "cups.pot"))
+      int count = cupsArrayCount(po);	/* Total number of messages */
+
+      if (untranslated >= (count / 10) && strcmp(argv[i], "cups.pot"))
       {
        /*
         * Only allow 10% of messages to be untranslated before we fail...
@@ -266,12 +266,10 @@ main(int  argc,				/* I - Number of command-line args */
 
         pass = 0;
         puts("FAIL");
-	printf("    Too many untranslated messages (%d of %d)\n",
-	       untranslated, cupsArrayCount(po));
+	printf("    Too many untranslated messages (%d of %d or %.1f%% are translated)\n", count - untranslated, count, 100.0 - 100.0 * untranslated / count);
       }
       else if (untranslated > 0)
-        printf("PASS (%d of %d untranslated)\n", untranslated,
-	       cupsArrayCount(po));
+        printf("PASS (%d of %d or %.1f%% are translated)\n", count - untranslated, count, 100.0 - 100.0 * untranslated / count);
       else
         puts("PASS");
     }

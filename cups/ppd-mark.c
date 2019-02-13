@@ -1,8 +1,8 @@
 /*
  * Option marking routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -886,9 +886,9 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 	  case PPD_CUSTOM_PASSWORD :
 	  case PPD_CUSTOM_STRING :
 	      if (cparam->current.custom_string)
-	        _cupsStrFree(cparam->current.custom_string);
+	        free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = _cupsStrAlloc(choice + 7);
+	      cparam->current.custom_string = strdup(choice + 7);
 	      break;
 	}
       }
@@ -963,9 +963,9 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 	  case PPD_CUSTOM_PASSWORD :
 	  case PPD_CUSTOM_STRING :
 	      if (cparam->current.custom_string)
-		_cupsStrFree(cparam->current.custom_string);
+		free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = _cupsStrRetain(val->value);
+	      cparam->current.custom_string = strdup(val->value);
 	      break;
 	}
       }

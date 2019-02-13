@@ -1986,18 +1986,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     {
       text = urltext;
 
-      snprintf(urltext, sizeof(urltext),
-               _cupsLangString(con->language,
-                               _("You must access this page using the URL "
-			         "<A HREF=\"https://%s:%d%s\">"
-				 "https://%s:%d%s</A>.")),
-               con->servername, con->serverport, con->uri,
-	       con->servername, con->serverport, con->uri);
+      snprintf(urltext, sizeof(urltext), _cupsLangString(con->language, _("You must access this page using the URL https://%s:%d%s.")), con->servername, con->serverport, con->uri);
 
-      snprintf(redirect, sizeof(redirect),
-               "<META HTTP-EQUIV=\"Refresh\" "
-	       "CONTENT=\"3;URL=https://%s:%d%s\">\n",
-	       con->servername, con->serverport, con->uri);
+      snprintf(redirect, sizeof(redirect), "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"3;URL=https://%s:%d%s\">\n", con->servername, con->serverport, con->uri);
     }
     else if (code == HTTP_STATUS_CUPS_WEBIF_DISABLED)
       text = _cupsLangString(con->language,
@@ -2704,7 +2695,15 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
   language[0] = '\0';
 
-  if ((!strncmp(con->uri, "/ppd/", 5) || !strncmp(con->uri, "/printers/", 10) || !strncmp(con->uri, "/classes/", 9)) && !strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
+  if (!strncmp(con->uri, "/help", 5) && (con->uri[5] == '/' || !con->uri[5]))
+  {
+   /*
+    * All help files are served by the help.cgi program...
+    */
+
+    return (NULL);
+  }
+  else if ((!strncmp(con->uri, "/ppd/", 5) || !strncmp(con->uri, "/printers/", 10) || !strncmp(con->uri, "/classes/", 9)) && !strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
   {
     strlcpy(dest, strchr(con->uri + 1, '/') + 1, sizeof(dest));
     dest[strlen(dest) - 4] = '\0'; /* Strip .ppd */

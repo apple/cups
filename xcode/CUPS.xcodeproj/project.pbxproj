@@ -815,7 +815,6 @@
 		7253C45A216E981900494ADD /* raster-interpret.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6A1336FA8A004BB496 /* raster-interpret.c */; };
 		7253C45B216E981A00494ADD /* raster-interpret.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6A1336FA8A004BB496 /* raster-interpret.c */; };
 		7253C45E216ED51500494ADD /* raster-interstub.c in Sources */ = {isa = PBXBuildFile; fileRef = 7253C45C216ED51400494ADD /* raster-interstub.c */; };
-		7253C45F216ED51500494ADD /* raster-interstub.c in Sources */ = {isa = PBXBuildFile; fileRef = 7253C45C216ED51400494ADD /* raster-interstub.c */; };
 		7253C460216ED51500494ADD /* raster-interstub.c in Sources */ = {isa = PBXBuildFile; fileRef = 7253C45C216ED51400494ADD /* raster-interstub.c */; };
 		7253C461216ED51500494ADD /* raster-interstub.c in Sources */ = {isa = PBXBuildFile; fileRef = 7253C45C216ED51400494ADD /* raster-interstub.c */; };
 		7253C462216ED51500494ADD /* raster-interstub.c in Sources */ = {isa = PBXBuildFile; fileRef = 7253C45C216ED51400494ADD /* raster-interstub.c */; };
@@ -7353,7 +7352,6 @@
 				270696101CADF3E200FFE5FB /* globals.c in Sources */,
 				270696111CADF3E200FFE5FB /* http-addr.c in Sources */,
 				270696121CADF3E200FFE5FB /* http-addrlist.c in Sources */,
-				7253C45F216ED51500494ADD /* raster-interstub.c in Sources */,
 				270696131CADF3E200FFE5FB /* http-support.c in Sources */,
 				7253C464216ED51500494ADD /* raster-stubs.c in Sources */,
 				270696141CADF3E200FFE5FB /* http.c in Sources */,

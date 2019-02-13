@@ -154,9 +154,6 @@ typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
  * for its IO and protocol management...
  */
 
-#    if !defined(HAVE_SECBASEPRIV_H) && defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */
-extern const char *cssmErrorString(int error);
-#    endif /* !HAVE_SECBASEPRIV_H && HAVE_CSSMERRORSTRING */
 #    if !defined(HAVE_SECIDENTITYSEARCHPRIV_H) && defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
 extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
 				CFStringRef idString, CSSM_KEYUSE keyUsage,

@@ -6,7 +6,6 @@
     <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Tilføj printer"></FORM>
     <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Find nye printere"></FORM>
     <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Håndter printere"></FORM>
-    {have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Eksportér printere til Samba"></FORM>:}
     </P>
 
     <H2 CLASS="title">Klasser</H2>

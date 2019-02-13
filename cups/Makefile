@@ -1,8 +1,8 @@
 #
 # Library Makefile for CUPS.
 #
-# Copyright 2007-2019 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.
@@ -117,24 +117,29 @@ OBJS	=	\
 # Header files to install...
 #
 
-HEADERS	=	\
-		adminutil.h \
+COREHEADERS	=	\
 		array.h \
-		backend.h \
 		cups.h \
 		dir.h \
 		file.h \
 		http.h \
 		ipp.h \
 		language.h \
-		ppd.h \
 		pwg.h \
 		raster.h \
-		sidechannel.h \
 		transcode.h \
 		versioning.h
 
-HEADERSPRIV =	\
+DRIVERHEADERS	=	\
+		adminutil.h \
+		backend.h \
+		ppd.h \
+		sidechannel.h
+
+HEADERS		=	\
+		$(LIBHEADERS)
+
+COREHEADERSPRIV =	\
 		array-private.h \
 		cups-private.h \
 		debug-private.h \
@@ -142,12 +147,17 @@ HEADERSPRIV =	\
 		http-private.h \
 		ipp-private.h \
 		language-private.h \
-		ppd-private.h \
 		pwg-private.h \
 		raster-private.h \
-		snmp-private.h \
 		string-private.h \
 		thread-private.h
+
+DRIVERHEADERSPRIV	=	\
+		ppd-private.h \
+		snmp-private.h
+
+HEADERSPRIV	=	\
+		$(LIBHEADERSPRIV)
 
 
 #
@@ -640,11 +650,6 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Creating locale directory structure...
 	$(RM) -r locale
-	$(MKDIR) locale/en
-	echo 'msgid "No"' > locale/en/cups_en.po
-	echo 'msgstr "No"' >> locale/en/cups_en.po
-	echo 'msgid "Yes"' >> locale/en/cups_en.po
-	echo 'msgstr "Yes"' >> locale/en/cups_en.po
 	for po in ../locale/cups_*.po; do \
 		lang=`basename $$po .po | sed -e '1,$$s/^cups_//'`; \
 		$(MKDIR) locale/$$lang; \
@@ -748,29 +753,22 @@ apihelp:
 	codedoc --section "Programming" --title "Administration APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-admin.header --intro api-admin.shtml \
-		api-admin.xml \
 		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
-	$(RM) api-admin.xml
 	codedoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
-		api-ppd.xml ppd.h ppd-*.c >../doc/help/api-ppd.html
-	$(RM) api-ppd.xml
+		ppd.h ppd-*.c >../doc/help/api-ppd.html
 	codedoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
-		api-raster.xml \
 		../cups/raster.h interpret.c raster.c \
 		>../doc/help/api-raster.html
-	$(RM) api-raster.xml
 	codedoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
-		api-filter.xml \
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		>../doc/help/api-filter.html
-	$(RM) api-filter.xml
 
 
 #

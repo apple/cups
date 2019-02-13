@@ -1017,7 +1017,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 
 	if (m)
 	{
-	  if (m->str && m->str[0])
+	  if (m->str && (m->str[0] || (flags & _CUPS_MESSAGE_EMPTY)))
 	  {
 	    cupsArrayAdd(a, m);
 	  }
@@ -1114,7 +1114,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 
     if (m)
     {
-      if (m->str && m->str[0])
+      if (m->str && (m->str[0] || (flags & _CUPS_MESSAGE_EMPTY)))
       {
 	cupsArrayAdd(a, m);
       }

@@ -1,7 +1,7 @@
 /*
  * PPD cache implementation for CUPS.
  *
- * Copyright © 2010-2018 by Apple Inc.
+ * Copyright © 2010-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -533,24 +533,20 @@ _ppdCacheCreateWithFile(
     else if (!_cups_strcasecmp(line, "Filter"))
     {
       if (!pc->filters)
-        pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0,
-	                            (cups_acopy_func_t)_cupsStrAlloc,
-				    (cups_afree_func_t)_cupsStrFree);
+        pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
       cupsArrayAdd(pc->filters, value);
     }
     else if (!_cups_strcasecmp(line, "PreFilter"))
     {
       if (!pc->prefilters)
-        pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0,
-	                               (cups_acopy_func_t)_cupsStrAlloc,
-				       (cups_afree_func_t)_cupsStrFree);
+        pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
       cupsArrayAdd(pc->prefilters, value);
     }
     else if (!_cups_strcasecmp(line, "Product"))
     {
-      pc->product = _cupsStrAlloc(value);
+      pc->product = strdup(value);
     }
     else if (!_cups_strcasecmp(line, "SingleFile"))
     {
@@ -650,8 +646,8 @@ _ppdCacheCreateWithFile(
       }
 
       map      = pc->bins + pc->num_bins;
-      map->pwg = _cupsStrAlloc(pwg_keyword);
-      map->ppd = _cupsStrAlloc(ppd_keyword);
+      map->pwg = strdup(pwg_keyword);
+      map->ppd = strdup(ppd_keyword);
 
       pc->num_bins ++;
     }
@@ -705,8 +701,8 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      size->map.pwg = _cupsStrAlloc(pwg_keyword);
-      size->map.ppd = _cupsStrAlloc(ppd_keyword);
+      size->map.pwg = strdup(pwg_keyword);
+      size->map.ppd = strdup(ppd_keyword);
 
       pc->num_sizes ++;
     }
@@ -734,15 +730,15 @@ _ppdCacheCreateWithFile(
 
       pwgFormatSizeName(pwg_keyword, sizeof(pwg_keyword), "custom", "max",
 		        pc->custom_max_width, pc->custom_max_length, NULL);
-      pc->custom_max_keyword = _cupsStrAlloc(pwg_keyword);
+      pc->custom_max_keyword = strdup(pwg_keyword);
 
       pwgFormatSizeName(pwg_keyword, sizeof(pwg_keyword), "custom", "min",
 		        pc->custom_min_width, pc->custom_min_length, NULL);
-      pc->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
+      pc->custom_min_keyword = strdup(pwg_keyword);
     }
     else if (!_cups_strcasecmp(line, "SourceOption"))
     {
-      pc->source_option = _cupsStrAlloc(value);
+      pc->source_option = strdup(value);
     }
     else if (!_cups_strcasecmp(line, "NumSources"))
     {
@@ -789,8 +785,8 @@ _ppdCacheCreateWithFile(
       }
 
       map      = pc->sources + pc->num_sources;
-      map->pwg = _cupsStrAlloc(pwg_keyword);
-      map->ppd = _cupsStrAlloc(ppd_keyword);
+      map->pwg = strdup(pwg_keyword);
+      map->ppd = strdup(ppd_keyword);
 
       pc->num_sources ++;
     }
@@ -838,8 +834,8 @@ _ppdCacheCreateWithFile(
       }
 
       map      = pc->types + pc->num_types;
-      map->pwg = _cupsStrAlloc(pwg_keyword);
-      map->ppd = _cupsStrAlloc(ppd_keyword);
+      map->pwg = strdup(pwg_keyword);
+      map->ppd = strdup(ppd_keyword);
 
       pc->num_types ++;
     }
@@ -869,13 +865,13 @@ _ppdCacheCreateWithFile(
 	                   pc->presets[print_color_mode] + print_quality);
     }
     else if (!_cups_strcasecmp(line, "SidesOption"))
-      pc->sides_option = _cupsStrAlloc(value);
+      pc->sides_option = strdup(value);
     else if (!_cups_strcasecmp(line, "Sides1Sided"))
-      pc->sides_1sided = _cupsStrAlloc(value);
+      pc->sides_1sided = strdup(value);
     else if (!_cups_strcasecmp(line, "Sides2SidedLong"))
-      pc->sides_2sided_long = _cupsStrAlloc(value);
+      pc->sides_2sided_long = strdup(value);
     else if (!_cups_strcasecmp(line, "Sides2SidedShort"))
-      pc->sides_2sided_short = _cupsStrAlloc(value);
+      pc->sides_2sided_short = strdup(value);
     else if (!_cups_strcasecmp(line, "Finishings"))
     {
       if (!pc->finishings)
@@ -896,20 +892,20 @@ _ppdCacheCreateWithFile(
     else if (!_cups_strcasecmp(line, "FinishingTemplate"))
     {
       if (!pc->templates)
-        pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)_cupsStrAlloc, (cups_afree_func_t)_cupsStrFree);
+        pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
       cupsArrayAdd(pc->templates, value);
     }
     else if (!_cups_strcasecmp(line, "MaxCopies"))
       pc->max_copies = atoi(value);
     else if (!_cups_strcasecmp(line, "ChargeInfoURI"))
-      pc->charge_info_uri = _cupsStrAlloc(value);
+      pc->charge_info_uri = strdup(value);
     else if (!_cups_strcasecmp(line, "JobAccountId"))
       pc->account_id = !_cups_strcasecmp(value, "true");
     else if (!_cups_strcasecmp(line, "JobAccountingUserId"))
       pc->accounting_user_id = !_cups_strcasecmp(value, "true");
     else if (!_cups_strcasecmp(line, "JobPassword"))
-      pc->password = _cupsStrAlloc(value);
+      pc->password = strdup(value);
     else if (!_cups_strcasecmp(line, "Mandatory"))
     {
       if (pc->mandatory)
@@ -920,9 +916,7 @@ _ppdCacheCreateWithFile(
     else if (!_cups_strcasecmp(line, "SupportFile"))
     {
       if (!pc->support_files)
-        pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0,
-                                          (cups_acopy_func_t)_cupsStrAlloc,
-                                          (cups_afree_func_t)_cupsStrFree);
+        pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
       cupsArrayAdd(pc->support_files, value);
     }
@@ -1166,8 +1160,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	  */
 
 	  new_size = old_size;
-	  _cupsStrFree(old_size->map.ppd);
-	  _cupsStrFree(old_size->map.pwg);
+	  free(old_size->map.ppd);
+	  free(old_size->map.pwg);
 	}
       }
 
@@ -1188,8 +1182,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	* Save this size...
 	*/
 
-	new_size->map.ppd = _cupsStrAlloc(ppd_size->name);
-	new_size->map.pwg = _cupsStrAlloc(pwg_name);
+	new_size->map.ppd = strdup(ppd_size->name);
+	new_size->map.pwg = strdup(pwg_name);
 	new_size->width   = new_width;
 	new_size->length  = new_length;
 	new_size->left    = new_left;
@@ -1209,14 +1203,14 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pwgFormatSizeName(pwg_keyword, sizeof(pwg_keyword), "custom", "max",
 		      PWG_FROM_POINTS(ppd->custom_max[0]),
 		      PWG_FROM_POINTS(ppd->custom_max[1]), NULL);
-    pc->custom_max_keyword = _cupsStrAlloc(pwg_keyword);
+    pc->custom_max_keyword = strdup(pwg_keyword);
     pc->custom_max_width   = PWG_FROM_POINTS(ppd->custom_max[0]);
     pc->custom_max_length  = PWG_FROM_POINTS(ppd->custom_max[1]);
 
     pwgFormatSizeName(pwg_keyword, sizeof(pwg_keyword), "custom", "min",
 		      PWG_FROM_POINTS(ppd->custom_min[0]),
 		      PWG_FROM_POINTS(ppd->custom_min[1]), NULL);
-    pc->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
+    pc->custom_min_keyword = strdup(pwg_keyword);
     pc->custom_min_width   = PWG_FROM_POINTS(ppd->custom_min[0]);
     pc->custom_min_length  = PWG_FROM_POINTS(ppd->custom_min[1]);
 
@@ -1235,7 +1229,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (input_slot)
   {
-    pc->source_option = _cupsStrAlloc(input_slot->keyword);
+    pc->source_option = strdup(input_slot->keyword);
 
     if ((pc->sources = calloc((size_t)input_slot->num_choices, sizeof(pwg_map_t))) == NULL)
     {
@@ -1287,8 +1281,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	                  "_");
       }
 
-      map->pwg = _cupsStrAlloc(pwg_name);
-      map->ppd = _cupsStrAlloc(choice->choice);
+      map->pwg = strdup(pwg_name);
+      map->ppd = strdup(choice->choice);
 
      /*
       * Add localized text for PWG keyword to message catalog...
@@ -1358,8 +1352,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	                  "_");
       }
 
-      map->pwg = _cupsStrAlloc(pwg_name);
-      map->ppd = _cupsStrAlloc(choice->choice);
+      map->pwg = strdup(pwg_name);
+      map->ppd = strdup(choice->choice);
 
      /*
       * Add localized text for PWG keyword to message catalog...
@@ -1392,8 +1386,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     {
       pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword), "_");
 
-      map->pwg = _cupsStrAlloc(pwg_keyword);
-      map->ppd = _cupsStrAlloc(choice->choice);
+      map->pwg = strdup(pwg_keyword);
+      map->ppd = strdup(choice->choice);
 
      /*
       * Add localized text for PWG keyword to message catalog...
@@ -1626,7 +1620,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (duplex)
   {
-    pc->sides_option = _cupsStrAlloc(duplex->keyword);
+    pc->sides_option = strdup(duplex->keyword);
 
     for (i = duplex->num_choices, choice = duplex->choices;
          i > 0;
@@ -1634,16 +1628,16 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     {
       if ((!_cups_strcasecmp(choice->choice, "None") ||
 	   !_cups_strcasecmp(choice->choice, "False")) && !pc->sides_1sided)
-        pc->sides_1sided = _cupsStrAlloc(choice->choice);
+        pc->sides_1sided = strdup(choice->choice);
       else if ((!_cups_strcasecmp(choice->choice, "DuplexNoTumble") ||
 	        !_cups_strcasecmp(choice->choice, "LongEdge") ||
 	        !_cups_strcasecmp(choice->choice, "Top")) && !pc->sides_2sided_long)
-        pc->sides_2sided_long = _cupsStrAlloc(choice->choice);
+        pc->sides_2sided_long = strdup(choice->choice);
       else if ((!_cups_strcasecmp(choice->choice, "DuplexTumble") ||
 	        !_cups_strcasecmp(choice->choice, "ShortEdge") ||
 	        !_cups_strcasecmp(choice->choice, "Bottom")) &&
 	       !pc->sides_2sided_short)
-        pc->sides_2sided_short = _cupsStrAlloc(choice->choice);
+        pc->sides_2sided_short = strdup(choice->choice);
     }
   }
 
@@ -1651,9 +1645,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Copy filters and pre-filters...
   */
 
-  pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0,
-			      (cups_acopy_func_t)_cupsStrAlloc,
-			      (cups_afree_func_t)_cupsStrFree);
+  pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
   cupsArrayAdd(pc->filters,
                "application/vnd.cups-raw application/octet-stream 0 -");
@@ -1710,9 +1702,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsPreFilter", NULL)) != NULL)
   {
-    pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0,
-				   (cups_acopy_func_t)_cupsStrAlloc,
-				   (cups_afree_func_t)_cupsStrFree);
+    pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
     do
     {
@@ -1729,7 +1719,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   */
 
   if (ppd->product)
-    pc->product = _cupsStrAlloc(ppd->product);
+    pc->product = strdup(ppd->product);
 
  /*
   * Copy finishings mapping data...
@@ -1869,7 +1859,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((ppd_option = ppdFindOption(ppd, "cupsFinishingTemplate")) != NULL)
   {
-    pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)_cupsStrAlloc, (cups_afree_func_t)_cupsStrFree);
+    pc->templates = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
     for (choice = ppd_option->choices, i = ppd_option->num_choices; i > 0; choice ++, i --)
     {
@@ -1901,7 +1891,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   */
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsChargeInfoURI", NULL)) != NULL)
-    pc->charge_info_uri = _cupsStrAlloc(ppd_attr->value);
+    pc->charge_info_uri = strdup(ppd_attr->value);
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsJobAccountId", NULL)) != NULL)
     pc->account_id = !_cups_strcasecmp(ppd_attr->value, "true");
@@ -1910,7 +1900,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->accounting_user_id = !_cups_strcasecmp(ppd_attr->value, "true");
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsJobPassword", NULL)) != NULL)
-    pc->password = _cupsStrAlloc(ppd_attr->value);
+    pc->password = strdup(ppd_attr->value);
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
     pc->mandatory = _cupsArrayNewStrings(ppd_attr->value, ' ');
@@ -1919,9 +1909,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Support files...
   */
 
-  pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0,
-				    (cups_acopy_func_t)_cupsStrAlloc,
-				    (cups_afree_func_t)_cupsStrFree);
+  pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
 
   for (ppd_attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
        ppd_attr;
@@ -1977,8 +1965,8 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   {
     for (i = pc->num_bins, map = pc->bins; i > 0; i --, map ++)
     {
-      _cupsStrFree(map->pwg);
-      _cupsStrFree(map->ppd);
+      free(map->pwg);
+      free(map->ppd);
     }
 
     free(pc->bins);
@@ -1988,22 +1976,21 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   {
     for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
     {
-      _cupsStrFree(size->map.pwg);
-      _cupsStrFree(size->map.ppd);
+      free(size->map.pwg);
+      free(size->map.ppd);
     }
 
     free(pc->sizes);
   }
 
-  if (pc->source_option)
-    _cupsStrFree(pc->source_option);
+  free(pc->source_option);
 
   if (pc->sources)
   {
     for (i = pc->num_sources, map = pc->sources; i > 0; i --, map ++)
     {
-      _cupsStrFree(map->pwg);
-      _cupsStrFree(map->ppd);
+      free(map->pwg);
+      free(map->ppd);
     }
 
     free(pc->sources);
@@ -2013,26 +2000,23 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   {
     for (i = pc->num_types, map = pc->types; i > 0; i --, map ++)
     {
-      _cupsStrFree(map->pwg);
-      _cupsStrFree(map->ppd);
+      free(map->pwg);
+      free(map->ppd);
     }
 
     free(pc->types);
   }
 
-  if (pc->custom_max_keyword)
-    _cupsStrFree(pc->custom_max_keyword);
+  free(pc->custom_max_keyword);
+  free(pc->custom_min_keyword);
 
-  if (pc->custom_min_keyword)
-    _cupsStrFree(pc->custom_min_keyword);
-
-  _cupsStrFree(pc->product);
+  free(pc->product);
   cupsArrayDelete(pc->filters);
   cupsArrayDelete(pc->prefilters);
   cupsArrayDelete(pc->finishings);
 
-  _cupsStrFree(pc->charge_info_uri);
-  _cupsStrFree(pc->password);
+  free(pc->charge_info_uri);
+  free(pc->password);
 
   cupsArrayDelete(pc->mandatory);
 

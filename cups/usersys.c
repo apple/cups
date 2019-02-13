@@ -22,6 +22,9 @@
 #  include <termios.h>
 #  include <sys/utsname.h>
 #endif /* _WIN32 */
+#ifdef __APPLE__
+#  include <sys/sysctl.h>
+#endif /* __APPLE__ */
 
 
 /*
@@ -29,14 +32,24 @@
  */
 
 #ifdef __APPLE__
-#  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
-#  define kAllowAnyRootKey	CFSTR("AllowAnyRoot")
-#  define kAllowExpiredCertsKey	CFSTR("AllowExpiredCerts")
-#  define kEncryptionKey	CFSTR("Encryption")
-#  define kGSSServiceNameKey	CFSTR("GSSServiceName")
-#  define kSSLOptionsKey	CFSTR("SSLOptions")
-#  define kTrustOnFirstUseKey	CFSTR("TrustOnFirstUse")
-#  define kValidateCertsKey	CFSTR("ValidateCerts")
+#  if TARGET_OS_IOS
+#    define kCUPSPrintingPrefs	CFSTR(".GlobalPreferences")
+#    define kPREFIX		"AirPrint"
+#  else
+#    define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
+#    define kPREFIX		""
+#  endif /* TARGET_OS_IOS */
+#  define kAllowAnyRootKey	CFSTR(kPREFIX "AllowAnyRoot")
+#  define kAllowExpiredCertsKey	CFSTR(kPREFIX "AllowExpiredCerts")
+#  define kEncryptionKey	CFSTR(kPREFIX "Encryption")
+#  define kGSSServiceNameKey	CFSTR(kPREFIX "GSSServiceName")
+#  define kSSLOptionsKey	CFSTR(kPREFIX "SSLOptions")
+#  define kTrustOnFirstUseKey	CFSTR(kPREFIX "TrustOnFirstUse")
+#  define kValidateCertsKey	CFSTR(kPREFIX "ValidateCerts")
+/* Deprecated */
+#  define kAllowRC4		CFSTR(kPREFIX "AllowRC4")
+#  define kAllowSSL3		CFSTR(kPREFIX "AllowSSL3")
+#  define kAllowDH		CFSTR(kPREFIX "AllowDH")
 #endif /* __APPLE__ */
 
 #define _CUPS_PASSCHAR	'*'		/* Character that is echoed for password */
@@ -488,6 +501,11 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
 #ifdef _WIN32
   SYSTEM_INFO		sysinfo;	/* System information */
   OSVERSIONINFOA	version;	/* OS version info */
+  const char		*machine;	/* Hardware/machine name */
+#elif defined(__APPLE__)
+  struct utsname	name;		/* uname info */
+  char			version[256];	/* macOS/iOS version */
+  size_t		len;		/* Length of value */
 #else
   struct utsname	name;		/* uname info */
 #endif /* _WIN32 */
@@ -500,29 +518,66 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
   }
 
 #ifdef _WIN32
+ /*
+  * Gather Windows version information for the User-Agent string...
+  */
+
   version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
   GetVersionExA(&version);
   GetNativeSystemInfo(&sysinfo);
 
-  snprintf(cg->user_agent, sizeof(cg->user_agent),
-           CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0",
-	   version.dwMajorVersion, version.dwMinorVersion,
-	   sysinfo.wProcessorArchitecture
-	       == PROCESSOR_ARCHITECTURE_AMD64 ? "amd64" :
-	       sysinfo.wProcessorArchitecture
-		   == PROCESSOR_ARCHITECTURE_ARM ? "arm" :
-	       sysinfo.wProcessorArchitecture
-		   == PROCESSOR_ARCHITECTURE_IA64 ? "ia64" :
-	       sysinfo.wProcessorArchitecture
-		   == PROCESSOR_ARCHITECTURE_INTEL ? "intel" :
-	       "unknown");
+  switch (sysinfo.wProcessorArchitecture)
+  {
+    case PROCESSOR_ARCHITECTURE_AMD64 :
+        machine = "amd64";
+        break;
 
-#else
+    case PROCESSOR_ARCHITECTURE_ARM :
+        machine = "arm";
+        break;
+
+    case PROCESSOR_ARCHITECTURE_IA64 :
+        machine = "ia64";
+        break;
+
+    case PROCESSOR_ARCHITECTURE_INTEL :
+        machine = "intel";
+        break;
+
+    default :
+        machine = "unknown";
+        break;
+  }
+
+  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0", version.dwMajorVersion, version.dwMinorVersion, machine);
+
+#elif defined(__APPLE__)
+ /*
+  * Gather macOS/iOS version information for the User-Agent string...
+  */
+
   uname(&name);
 
-  snprintf(cg->user_agent, sizeof(cg->user_agent),
-           CUPS_MINIMAL " (%s %s; %s) IPP/2.0",
-	   name.sysname, name.release, name.machine);
+  len = sizeof(version) - 1;
+  if (!sysctlbyname("kern.osproductversion", version, &len, NULL, 0))
+    version[len] = '\0';
+  else
+    strlcpy(version, "unknown", sizeof(version));
+
+#  if TARGET_OS_IOS
+  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s; %s) IPP/2.0", version, name.machine);
+#  else
+  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (macOS %s; %s) IPP/2.0", version, name.machine);
+#  endif /* TARGET_OS_IOS */
+
+#else
+ /*
+  * Gather generic UNIX version information for the User-Agent string...
+  */
+
+  uname(&name);
+
+  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (%s %s; %s) IPP/2.0", name.sysname, name.release, name.machine);
 #endif /* _WIN32 */
 }
 
@@ -1161,6 +1216,10 @@ cups_init_client_conf(
 
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
+#if TARGET_OS_IOS
+  cups_set_user(cc, "mobile");
+#endif /* TARGET_OS_IOS */
+
 #ifdef HAVE_SSL
   cc->ssl_min_version = _HTTP_TLS_1_0;
   cc->ssl_max_version = _HTTP_TLS_MAX;
@@ -1190,7 +1249,23 @@ cups_init_client_conf(
     cups_set_encryption(cc, sval);
 
   if (cups_apple_get_string(kSSLOptionsKey, sval, sizeof(sval)))
+  {
     cups_set_ssl_options(cc, sval);
+  }
+  else
+  {
+    sval[0] = '\0';
+
+    if (cups_apple_get_boolean(kAllowRC4, &bval) && bval)
+      strlcat(sval, " AllowRC4", sizeof(sval));
+    if (cups_apple_get_boolean(kAllowSSL3, &bval) && bval)
+      strlcat(sval, " AllowSSL3", sizeof(sval));
+    if (cups_apple_get_boolean(kAllowDH, &bval) && bval)
+      strlcat(sval, " AllowDH", sizeof(sval));
+
+    if (sval[0])
+      cups_set_ssl_options(cc, sval);
+  }
 
   if (cups_apple_get_boolean(kTrustOnFirstUseKey, &bval))
     cc->trust_first = bval;
