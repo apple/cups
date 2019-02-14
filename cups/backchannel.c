@@ -12,6 +12,7 @@
  */
 
 #include "cups.h"
+#include "sidechannel.h"
 #include <errno.h>
 #ifdef _WIN32
 #  include <io.h>

@@ -47,6 +47,10 @@ cupsAdminCreateWindowsPPD(
     char       *buffer,			/* I - Filename buffer */
     int        bufsize)			/* I - Size of filename buffer */
 {
+  (void)http;
+  (void)dest;
+  (void)bufsize;
+
   if (buffer)
     *buffer = '\0';
 
@@ -69,6 +73,13 @@ cupsAdminExportSamba(
     const char *samba_password,		/* I - Samba password */
     FILE       *logfile)		/* I - Log file, if any */
 {
+  (void)dest;
+  (void)ppd;
+  (void)samba_server;
+  (void)samba_user;
+  (void)samba_password;
+  (void)logfile;
+
   return (0);
 }
 
