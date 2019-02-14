@@ -1,7 +1,7 @@
 dnl
 dnl TLS stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright 2007-2019 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -27,23 +27,12 @@ if test x$enable_ssl != xno; then
 		CUPS_SERVERKEYCHAIN="/Library/Keychains/System.keychain"
 
 		dnl Check for the various security headers...
-		AC_CHECK_HEADER(Security/SecureTransportPriv.h,
-		    AC_DEFINE(HAVE_SECURETRANSPORTPRIV_H))
 		AC_CHECK_HEADER(Security/SecCertificate.h,
 		    AC_DEFINE(HAVE_SECCERTIFICATE_H))
 		AC_CHECK_HEADER(Security/SecItem.h,
 		    AC_DEFINE(HAVE_SECITEM_H))
-		AC_CHECK_HEADER(Security/SecItemPriv.h,
-		    AC_DEFINE(HAVE_SECITEMPRIV_H),,
-		    [#include <Security/SecItem.h>])
 		AC_CHECK_HEADER(Security/SecPolicy.h,
-		    AC_DEFINE(HAVE_SECPOLICY_H))
-		AC_CHECK_HEADER(Security/SecPolicyPriv.h,
-		    AC_DEFINE(HAVE_SECPOLICYPRIV_H))
-		AC_CHECK_HEADER(Security/SecBasePriv.h,
-		    AC_DEFINE(HAVE_SECBASEPRIV_H))
-		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
-		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))])
+		    AC_DEFINE(HAVE_SECPOLICY_H))])
 	fi
     fi
 

@@ -140,16 +140,6 @@ AC_CHECK_HEADER(iconv.h,
 		SAVELIBS="$SAVELIBS $LIBS")
 	LIBS="$SAVELIBS")
 
-dnl Checks for Mini-XML (www.minixml.org)...
-LIBMXML=""
-AC_CHECK_HEADER(mxml.h,
-	SAVELIBS="$LIBS"
-	AC_SEARCH_LIBS(mmxlNewElement,mxml,
-		AC_DEFINE(HAVE_MXML_H)
-		LIBMXML="-lmxml")
-	LIBS="$SAVELIBS")
-AC_SUBST(LIBMXML)
-
 dnl Checks for statfs and its many headers...
 AC_CHECK_HEADER(sys/mount.h,AC_DEFINE(HAVE_SYS_MOUNT_H))
 AC_CHECK_HEADER(sys/statfs.h,AC_DEFINE(HAVE_SYS_STATFS_H))
@@ -354,15 +344,12 @@ case $host_os_name in
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(ApplicationServices/ApplicationServices.h,AC_DEFINE(HAVE_APPLICATIONSERVICES_H))
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
-		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
-		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
 
 		dnl Check for dynamic store function...
 		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName)
 
 		dnl Check for the new membership functions in MacOSX 10.4...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
-		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
 		dnl Need <dlfcn.h> header...
@@ -396,7 +383,6 @@ case $host_os_name in
 			else
 				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			fi])
-		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
 		dnl Check for sandbox/Seatbelt support
 		if test $host_os_version -ge 100; then
@@ -417,8 +403,6 @@ case $host_os_name in
 		AC_CHECK_HEADER(xpc/xpc.h,
 			AC_DEFINE(HAVE_XPC)
 			INSTALLXPC="install-xpc")
-		AC_CHECK_HEADER(xpc/private.h,
-			AC_DEFINE(HAVE_XPC_PRIVATE_H))
                 ;;
 esac
 

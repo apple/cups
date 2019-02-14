@@ -1,7 +1,7 @@
 /*
  * Authentication functions for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -26,11 +26,6 @@
 
 #if HAVE_AUTHORIZATION_H
 #  include <Security/Authorization.h>
-#  ifdef HAVE_SECBASEPRIV_H
-#    include <Security/SecBasePriv.h>
-#  else
-extern const char *cssmErrorString(int error);
-#  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
 
 #if defined(SO_PEERCRED) && defined(AF_LOCAL)
@@ -951,8 +946,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
-      DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d (%s)",
-		    (int)status, cssmErrorString(status)));
+      DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d",
+		    (int)status));
       return (-1);
     }
 
@@ -993,8 +988,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     else if (status == errAuthorizationCanceled)
       return (-1);
 
-    DEBUG_printf(("9cups_local_auth: AuthorizationCopyRights() returned %d (%s)",
-		  (int)status, cssmErrorString(status)));
+    DEBUG_printf(("9cups_local_auth: AuthorizationCopyRights() returned %d", (int)status));
 
   /*
    * Fall through to try certificates...

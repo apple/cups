@@ -1,7 +1,7 @@
 /*
  * Authorization routines for the CUPS scheduler.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -35,11 +35,6 @@
 #endif /* HAVE_MEMBERSHIP_H */
 #ifdef HAVE_AUTHORIZATION_H
 #  include <Security/AuthorizationTags.h>
-#  ifdef HAVE_SECBASEPRIV_H
-#    include <Security/SecBasePriv.h>
-#  else
-extern const char *cssmErrorString(int error);
-#  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
@@ -344,7 +339,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     if ((status = AuthorizationCreateFromExternalForm((AuthorizationExternalForm *)authdata, &con->authref)) != 0)
     {
-      cupsdLogClient(con, CUPSD_LOG_ERROR, "AuthorizationCreateFromExternalForm returned %d (%s)", (int)status, cssmErrorString(status));
+      cupsdLogClient(con, CUPSD_LOG_ERROR, "AuthorizationCreateFromExternalForm returned %d", (int)status);
       return;
     }
 
@@ -1925,9 +1920,7 @@ check_authref(cupsd_client_t *con,	/* I - Connection */
 					kAuthorizationEmptyEnvironment,
 					authflags, NULL)) != 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "AuthorizationCopyRights(\"%s\") returned %d (%s)",
-		    authright.name, (int)status, cssmErrorString(status));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "AuthorizationCopyRights(\"%s\") returned %d", authright.name, (int)status);
     return (0);
   }
 

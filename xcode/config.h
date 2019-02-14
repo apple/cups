@@ -327,14 +327,9 @@
 #  define HAVE_AUTHORIZATION_H 1
 #endif /* !TARGET_OS_IOS */
 
-/* #undef HAVE_SECBASEPRIV_H */
 #define HAVE_SECCERTIFICATE_H 1
-/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
 #define HAVE_SECITEM_H 1
-/* #undef HAVE_SECITEMPRIV_H */
 #define HAVE_SECPOLICY_H 1
-/* #undef HAVE_SECPOLICYPRIV_H */
-/* #undef HAVE_SECURETRANSPORTPRIV_H */
 
 
 /*
@@ -488,12 +483,10 @@
 
 
 /*
- * Do we have CoreFoundation public and private headers?
+ * Do we have CoreFoundation public headers?
  */
 
 #define HAVE_COREFOUNDATION_H 1
-/* #undef HAVE_CFPRIV_H */
-/* #undef HAVE_CFBUNDLEPRIV_H */
 
 
 /*
@@ -526,7 +519,6 @@
  */
 
 #define HAVE_MEMBERSHIP_H 1
-/* #undef HAVE_MEMBERSHIPPRIV_H */
 #define HAVE_MBR_UID_TO_UUID 1
 
 
@@ -685,14 +677,6 @@
  */
 
 #define HAVE_XPC 1
-/* #undef HAVE_XPC_PRIVATE_H */
-
-
-/*
- * Do we have Mini-XML?
- */
-
-/* #undef HAVE_MXML_H */
 
 
 /*

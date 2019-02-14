@@ -1,7 +1,7 @@
 /*
  * IPP backend for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -23,12 +23,8 @@
 #  define kPMPrintUIToolAgent	"com.apple.printuitool.agent"
 #  define kPMStartJob		100
 #  define kPMWaitForJob		101
-#  ifdef HAVE_XPC_PRIVATE_H
-#    include <xpc/private.h>
-#  else
 extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
 		                              uid_t uid);
-#  endif /* HAVE_XPC_PRIVATE_H */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 
 

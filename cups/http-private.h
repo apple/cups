@@ -154,18 +154,6 @@ typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
  * for its IO and protocol management...
  */
 
-#    if !defined(HAVE_SECIDENTITYSEARCHPRIV_H) && defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
-extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
-				CFStringRef idString, CSSM_KEYUSE keyUsage,
-				CFTypeRef keychainOrArray,
-				Boolean returnOnlyValidIdentities,
-				SecIdentitySearchRef* searchRef);
-#    endif /* !HAVE_SECIDENTITYSEARCHPRIV_H && HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
-#    if !defined(HAVE_SECPOLICYPRIV_H) && defined(HAVE_SECPOLICYSETVALUE) /* Declare prototype for function in that header... */
-extern OSStatus SecPolicySetValue(SecPolicyRef policyRef,
-                                  const CSSM_DATA *value);
-#    endif /* !HAVE_SECPOLICYPRIV_H && HAVE_SECPOLICYSETVALUE */
-
 typedef SSLContextRef	http_tls_t;
 typedef CFArrayRef	http_tls_credentials_t;
 

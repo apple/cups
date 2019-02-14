@@ -735,7 +735,6 @@ INSTALL_GZIP
 LIBWRAP
 USBQUIRKS
 LIBUSB
-LIBMXML
 EGREP
 GREP
 LIBPAPER
@@ -5241,74 +5240,6 @@ fi
 
 
 
-LIBMXML=""
-ac_fn_c_check_header_mongrel "$LINENO" "mxml.h" "ac_cv_header_mxml_h" "$ac_includes_default"
-if test "x$ac_cv_header_mxml_h" = xyes; then :
-  SAVELIBS="$LIBS"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing mmxlNewElement" >&5
-$as_echo_n "checking for library containing mmxlNewElement... " >&6; }
-if ${ac_cv_search_mmxlNewElement+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char mmxlNewElement ();
-int
-main ()
-{
-return mmxlNewElement ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' mxml; do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_search_mmxlNewElement=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext
-  if ${ac_cv_search_mmxlNewElement+:} false; then :
-  break
-fi
-done
-if ${ac_cv_search_mmxlNewElement+:} false; then :
-
-else
-  ac_cv_search_mmxlNewElement=no
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_mmxlNewElement" >&5
-$as_echo "$ac_cv_search_mmxlNewElement" >&6; }
-ac_res=$ac_cv_search_mmxlNewElement
-if test "$ac_res" != no; then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  $as_echo "#define HAVE_MXML_H 1" >>confdefs.h
-
-		LIBMXML="-lmxml"
-fi
-
-	LIBS="$SAVELIBS"
-fi
-
-
-
-
 ac_fn_c_check_header_mongrel "$LINENO" "sys/mount.h" "ac_cv_header_sys_mount_h" "$ac_includes_default"
 if test "x$ac_cv_header_sys_mount_h" = xyes; then :
   $as_echo "#define HAVE_SYS_MOUNT_H 1" >>confdefs.h
@@ -5917,20 +5848,6 @@ if test "x$ac_cv_header_CoreFoundation_CoreFoundation_h" = xyes; then :
 fi
 
 
-		ac_fn_c_check_header_mongrel "$LINENO" "CoreFoundation/CFPriv.h" "ac_cv_header_CoreFoundation_CFPriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_CoreFoundation_CFPriv_h" = xyes; then :
-  $as_echo "#define HAVE_CFPRIV_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "CoreFoundation/CFBundlePriv.h" "ac_cv_header_CoreFoundation_CFBundlePriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_CoreFoundation_CFBundlePriv_h" = xyes; then :
-  $as_echo "#define HAVE_CFBUNDLEPRIV_H 1" >>confdefs.h
-
-fi
-
-
 
 				for ac_func in SCDynamicStoreCopyComputerName
 do :
@@ -5947,13 +5864,6 @@ done
 				ac_fn_c_check_header_mongrel "$LINENO" "membership.h" "ac_cv_header_membership_h" "$ac_includes_default"
 if test "x$ac_cv_header_membership_h" = xyes; then :
   $as_echo "#define HAVE_MEMBERSHIP_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "membershipPriv.h" "ac_cv_header_membershipPriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_membershipPriv_h" = xyes; then :
-  $as_echo "#define HAVE_MEMBERSHIPPRIV_H 1" >>confdefs.h
 
 fi
 
@@ -6036,13 +5946,6 @@ if test "x$ac_cv_header_Security_Authorization_h" = xyes; then :
 fi
 
 
-		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecBasePriv.h" "ac_cv_header_Security_SecBasePriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_Security_SecBasePriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECBASEPRIV_H 1" >>confdefs.h
-
-fi
-
-
 
 				if test $host_os_version -ge 100; then
 			ac_fn_c_check_header_mongrel "$LINENO" "sandbox.h" "ac_cv_header_sandbox_h" "$ac_includes_default"
@@ -6072,13 +5975,6 @@ if test "x$ac_cv_header_xpc_xpc_h" = xyes; then :
   $as_echo "#define HAVE_XPC 1" >>confdefs.h
 
 			INSTALLXPC="install-xpc"
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "xpc/private.h" "ac_cv_header_xpc_private_h" "$ac_includes_default"
-if test "x$ac_cv_header_xpc_private_h" = xyes; then :
-  $as_echo "#define HAVE_XPC_PRIVATE_H 1" >>confdefs.h
-
 fi
 
 
@@ -8305,14 +8201,7 @@ if test "x$ac_cv_header_Security_SecureTransport_h" = xyes; then :
 
 		CUPS_SERVERKEYCHAIN="/Library/Keychains/System.keychain"
 
-				ac_fn_c_check_header_mongrel "$LINENO" "Security/SecureTransportPriv.h" "ac_cv_header_Security_SecureTransportPriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_Security_SecureTransportPriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECURETRANSPORTPRIV_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecCertificate.h" "ac_cv_header_Security_SecCertificate_h" "$ac_includes_default"
+				ac_fn_c_check_header_mongrel "$LINENO" "Security/SecCertificate.h" "ac_cv_header_Security_SecCertificate_h" "$ac_includes_default"
 if test "x$ac_cv_header_Security_SecCertificate_h" = xyes; then :
   $as_echo "#define HAVE_SECCERTIFICATE_H 1" >>confdefs.h
 
@@ -8326,38 +8215,9 @@ if test "x$ac_cv_header_Security_SecItem_h" = xyes; then :
 fi
 
 
-		ac_fn_c_check_header_compile "$LINENO" "Security/SecItemPriv.h" "ac_cv_header_Security_SecItemPriv_h" "#include <Security/SecItem.h>
-"
-if test "x$ac_cv_header_Security_SecItemPriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECITEMPRIV_H 1" >>confdefs.h
-
-fi
-
-
 		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecPolicy.h" "ac_cv_header_Security_SecPolicy_h" "$ac_includes_default"
 if test "x$ac_cv_header_Security_SecPolicy_h" = xyes; then :
   $as_echo "#define HAVE_SECPOLICY_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecPolicyPriv.h" "ac_cv_header_Security_SecPolicyPriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_Security_SecPolicyPriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECPOLICYPRIV_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecBasePriv.h" "ac_cv_header_Security_SecBasePriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_Security_SecBasePriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECBASEPRIV_H 1" >>confdefs.h
-
-fi
-
-
-		ac_fn_c_check_header_mongrel "$LINENO" "Security/SecIdentitySearchPriv.h" "ac_cv_header_Security_SecIdentitySearchPriv_h" "$ac_includes_default"
-if test "x$ac_cv_header_Security_SecIdentitySearchPriv_h" = xyes; then :
-  $as_echo "#define HAVE_SECIDENTITYSEARCHPRIV_H 1" >>confdefs.h
 
 fi
 

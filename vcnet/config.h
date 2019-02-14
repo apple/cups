@@ -1,7 +1,7 @@
 /*
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2018 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -394,21 +394,9 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_AUTHORIZATION_H */
-/* #undef HAVE_SECBASEPRIV_H */
 /* #undef HAVE_SECCERTIFICATE_H */
-/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
 /* #undef HAVE_SECITEM_H */
-/* #undef HAVE_SECITEMPRIV_H */
 /* #undef HAVE_SECPOLICY_H */
-/* #undef HAVE_SECPOLICYPRIV_H */
-/* #undef HAVE_SECURETRANSPORTPRIV_H */
-
-
-/*
- * Do we have the cssmErrorString function?
- */
-
-/* #undef HAVE_CSSMERRORSTRING */
 
 
 /*
@@ -574,12 +562,10 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have CoreFoundation public and private headers?
+ * Do we have CoreFoundation public headers?
  */
 
 /* #undef HAVE_COREFOUNDATION_H */
-/* #undef HAVE_CFPRIV_H */
-/* #undef HAVE_CFBUNDLEPRIV_H */
 
 
 /*
@@ -608,7 +594,6 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_MEMBERSHIP_H */
-/* #undef HAVE_MEMBERSHIPPRIV_H */
 /* #undef HAVE_MBR_UID_TO_UUID */
 
 
@@ -761,14 +746,6 @@ typedef unsigned long useconds_t;
  */
 
 /* #undef HAVE_XPC */
-/* #undef HAVE_XPC_PRIVATE_H */
-
-
-/*
- * Do we have Mini-XML?
- */
-
-/* #undef HAVE_MXML_H */
 
 
 /*
