@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-02-14
+CHANGES - 2.3b8 - 2019-02-15
 ============================
 
 
@@ -21,6 +21,7 @@ Changes in CUPS v2.3b8
   Everywhere printer differently, resulting in different PPDs for the same
   printer (Issue #5484)
 - The web interface no longer provides access to the log files (Issue #5513)
+- Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
 - Eliminated use of private headers and some deprecated macOS APIs (Issue #5516)
 - Localization updates (Issue #5461, Issues #5471, Issue #5481, Issue #5486,
   Issue #5489, Issue #5491, Issue #5492, Issue #5493, Issue #5494, Issue #5495,
