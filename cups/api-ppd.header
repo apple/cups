@@ -1,7 +1,7 @@
 <!--
   PPD API header for CUPS.
 
-  Copyright © 2008-2012 by Apple Inc.
+  Copyright © 2008-2019 by Apple Inc.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
   information.
@@ -9,7 +9,10 @@
 
 <h1 class='title'>PPD API (DEPRECATED)</h1>
 
-<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="api-cups.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
+<blockquote><b>Note:</b>
+
+<p>The PPD API was deprecated in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="cupspm.html">CUPS Programming Manual</a> documentation. These functions will be removed in a future release of CUPS.</p>
+</blockquote>
 
 <div class='summary'><table summary='General Information'>
 <thead>
@@ -26,7 +29,7 @@
 <tr>
 	<th>See Also</th>
 	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='cupspm.html' target='_top'>CUPS Programming Manual</a><br>
 	Specifications: <a href='spec-ppd.html' target='_top'>CUPS PPD Extensions</a></td>
 </tr>
 </tbody>

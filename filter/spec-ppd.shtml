@@ -31,7 +31,7 @@ LINE-END = CR / LF / CR LF
 <p>CUPS supports several methods of auto-configuration via PPD keywords.</p>
 
 
-<h3><span class='info'>macOS 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
+<h3 class="title"><span class='info'>macOS 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
 
 <p class='summary'>*APAutoSetupTool: "/LibraryPrinters/vendor/filename"</p>
 
@@ -47,7 +47,7 @@ LINE-END = CR / LF / CR LF
 </pre>
 
 
-<h3><span class='info'>macOS 10.2/CUPS 1.4</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
+<h3 class="title"><span class='info'>macOS 10.2/CUPS 1.4</span><a name='QUERYKEYWORD'>?MainKeyword</a></h3>
 
 <p class='summary'>*?<i>MainKeyword</i>: "<br>
   PostScript query code that writes a message using the = operator...<br>
@@ -77,7 +77,7 @@ LINE-END = CR / LF / CR LF
 </pre>
 
 
-<h3><span class='info'>macOS 10.4/CUPS 1.5</span><a name='OID'>OIDMainKeyword</a></h3>
+<h3 class="title"><span class='info'>macOS 10.4/CUPS 1.5</span><a name='OID'>OIDMainKeyword</a></h3>
 
 <p class='summary'>*?OID<i>MainKeyword</i>: ".n.n.n..."<br>
 *OID<i>MainKeyword</i> <i>OptionKeyword1</i>: "value"<br>
@@ -109,7 +109,7 @@ LINE-END = CR / LF / CR LF
 </blockquote>
 
 
-<h3><span class='info'>Deprecated</span><a name='cupsColorProfile'>cupsColorProfile</a></h3>
+<h3 class="title"><span class='info'>Deprecated</span><a name='cupsColorProfile'>cupsColorProfile</a></h3>
 
 <p class='summary'>*cupsColorProfile Resolution/MediaType: "density gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
 
@@ -146,7 +146,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </pre>
 
 
-<h3><span class='info'>macOS 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
+<h3 class="title"><span class='info'>macOS 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
 
 <p class='summary'>*cupsICCProfile ColorModel.MediaType.Resolution/Description: "filename"</p>
 
@@ -167,7 +167,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
 </pre>
 
-<h4>Customizing the Profile Selection Keywords</h4>
+<h4 class="title">Customizing the Profile Selection Keywords</h4>
 
 <p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and <tt>Resolution</tt> main keywords can be reassigned to different main keywords, allowing drivers to do color profile selection based on different parameters. The <tt>cupsICCQualifier1</tt>, <tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt> keywords define the mapping from selector to main keyword:</p>
 
@@ -186,7 +186,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </pre>
 
 
-<h3><span class='info'>macOS 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
+<h3 class="title"><span class='info'>macOS 10.4</span><a name='APCustom'>Custom Color Matching Support</a></h3>
 
 <p class='summary'>*<a href='#APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a>: true<br>
 *<a href='#APCustomColorMatchingName'>APCustomColorMatchingName</a> name/text: ""<br>
@@ -201,7 +201,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 
 </blockquote>
 
-<h4><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
+<h4 class="title"><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
 
 <p class='summary'>*APCustomColorMatchingName name/text: ""</p>
 
@@ -215,7 +215,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *fr.APCustomColorMatchingName name/La AcmeColor(tm): ""
 </pre>
 
-<h4><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
+<h4 class="title"><span class='info'>macOS 10.5</span><a name='APCustomColorMatchingProfile'>APCustomColorMatchingProfile</a></h4>
 
 <p class='summary'>*APCustomColorMatchingProfile: name</p>
 
@@ -237,7 +237,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *APCustomColorMatchingProfile: AdobeRGB
 </pre>
 
-<h4><span class='info'>macOS 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
+<h4 class="title"><span class='info'>macOS 10.5</span><a name='APDefaultCustomColorMatchingProfile'>APDefaultCustomColorMatchingProfile</a></h4>
 
 <p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
 
@@ -251,7 +251,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *APDefaultCustomColorMatchingProfile: sRGB
 </pre>
 
-<h4><span class='info'>macOS 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
+<h4 class="title"><span class='info'>macOS 10.4</span><a name='APSupportsCustomColorMatching'>APSupportsCustomColorMatching</a></h4>
 
 <p class='summary'>*APSupportsCustomColorMatching: boolean</p>
 
@@ -288,7 +288,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </blockquote>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
 
 <p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
 *cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
@@ -319,7 +319,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
 
 <p class='summary'>*cupsUIResolver resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
@@ -537,7 +537,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 <p>The resulting dictionary sets the page device attributes that are sent to your raster driver in the page header.</p>
 
 
-<h3>Custom Page Size Code</h3>
+<h3 class="title">Custom Page Size Code</h3>
 
 <p>There are many possible implementations of the <tt>CustomPageSize</tt> code. For CUPS raster drivers, the following code is recommended:</p>
 
@@ -551,7 +551,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 </pre>
 
 
-<h3>Supported PostScript Operators</h3>
+<h3 class="title">Supported PostScript Operators</h3>
 
 <p>CUPS supports the following PostScript operators in addition to the usual PostScript number, string (literal and hex-encoded), boolean, null, and name values:</p>
 
@@ -611,7 +611,7 @@ PRE B {
 </blockquote>
 
 
-<h3>Supported Page Device Attributes</h3>
+<h3 class="title">Supported Page Device Attributes</h3>
 
 <p>Table 2 shows the supported page device attributes along with PostScript code examples.</p>
 
@@ -883,7 +883,7 @@ PRE B {
 size limits based on up to two options.</p>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
 
 <p class='summary'>*cupsMediaQualifier2: MainKeyword</p>
 
@@ -903,7 +903,7 @@ custom page size limits.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
 
 <p class='summary'>*cupsMediaQualifier3: MainKeyword</p>
 
@@ -923,7 +923,7 @@ custom page size limits.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
 
 <p class='summary'>*cupsMinSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMinSize .Qualifier2.: "width length"<br>
@@ -947,7 +947,7 @@ are used to identify options to use for matching.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
 
 <p class='summary'>*cupsMaxSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMaxSize .Qualifier2.: "width length"<br>
@@ -971,7 +971,7 @@ are used to identify options to use for matching.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPageSizeCategory'>cupsPageSizeCategory</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPageSizeCategory'>cupsPageSizeCategory</a></h3>
 
 <p class="summary">*cupsPageSizeCategory name/text: "name name2 ... nameN"</p>
 
@@ -988,7 +988,7 @@ are used to identify options to use for matching.</p>
 
 <h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
 
 <p class='summary'>*cupsBackSide: keyword</p>
 
@@ -1085,7 +1085,7 @@ will be ignored.</p>
 keyword.</p>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
 
 <p class='summary'>*cupsCommands: "name name2 ... nameN"</p>
 
@@ -1101,7 +1101,7 @@ by whitespace.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
 
 <p class='summary'>*cupsEvenDuplex: boolean</p>
 
@@ -1117,7 +1117,7 @@ printing is selected. The default value is <code>false</code>.</p>
 </pre>
 
 
-<h3><a name='cupsFax'>cupsFax</a></h3>
+<h3 class="title"><a name='cupsFax'>cupsFax</a></h3>
 
 <p class='summary'>*cupsFax: boolean</p>
 
@@ -1130,7 +1130,7 @@ printing is selected. The default value is <code>false</code>.</p>
 </pre>
 
 
-<h3><a name='cupsFilter'>cupsFilter</a></h3>
+<h3 class="title"><a name='cupsFilter'>cupsFilter</a></h3>
 
 <p class='summary'>*cupsFilter: "source/type cost program"</p>
 
@@ -1153,7 +1153,7 @@ the special filter program "-" may be specified.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.5</span><a name='cupsFilter2'>cupsFilter2</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.5</span><a name='cupsFilter2'>cupsFilter2</a></h3>
 
 <p class='summary'>*cupsFilter2: "source/type destination/type cost program"</p>
 
@@ -1179,7 +1179,7 @@ the special filter program "-" may be specified.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 2.3</span><a name='cupsFinishingTemplate'>cupsFinishingTemplate</a></h3>
+<h3 class="title"><span class='info'>CUPS 2.3</span><a name='cupsFinishingTemplate'>cupsFinishingTemplate</a></h3>
 
 <p class='summary'>*cupsFinishingTemplate name/text: ""</p>
 
@@ -1198,7 +1198,7 @@ the special filter program "-" may be specified.</p>
 </pre>
 
 
-<h3><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
+<h3 class="title"><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
 
 <p class='summary'>*cupsFlipDuplex: boolean</p>
 
@@ -1234,7 +1234,7 @@ Ghostscript can use:</p>
 </pre></blockquote>
 
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
 
 <p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
 
@@ -1251,7 +1251,7 @@ values to PPD options and choices.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
 
 <p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
 
@@ -1292,7 +1292,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.5</span><a name='cupsIPPSupplies'>cupsIPPSupplies</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.5</span><a name='cupsIPPSupplies'>cupsIPPSupplies</a></h3>
 
 <p class='summary'>*cupsIPPSupplies: boolean</p>
 
@@ -1306,7 +1306,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
 
 <p class='summary'>*cupsJobAccountId: boolean</p>
 
@@ -1320,7 +1320,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
 
 <p class='summary'>*cupsJobAccountingUserId: boolean</p>
 
@@ -1334,7 +1334,7 @@ http://www.vendor.com/help"
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
 
 <p class='summary'>*cupsJobPassword: "format"</p>
 
@@ -1361,7 +1361,7 @@ password string.  For example, "1111" indicated a 4-digit US ASCII PIN code.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
 
 <p class='summary'>*cupsLanguages: "locale list"</p>
 
@@ -1377,7 +1377,7 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsMandatory'>cupsMandatory</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.7/macOS 10.9</span><a name='cupsMandatory'>cupsMandatory</a></h3>
 
 <p class='summary'>*cupsMandatory: "attribute1 attribute2 ... attributeN"</p>
 
@@ -1391,7 +1391,7 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 </pre>
 
 
-<h3><a name='cupsManualCopies'>cupsManualCopies</a></h3>
+<h3 class="title"><a name='cupsManualCopies'>cupsManualCopies</a></h3>
 
 <p class='summary'>*cupsManualCopies: boolean</p>
 
@@ -1407,7 +1407,7 @@ hardware. The default value is <code>false</code>.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
 
 <p class='summary'>*cupsMarkerName/Name Text: ""</p>
 
@@ -1422,7 +1422,7 @@ generated by the driver to human readable text.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
 
 <p class='summary'>*cupsMarkerNotice: "disclaimer text"</p>
 
@@ -1437,7 +1437,7 @@ are approximate".</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.6/macOS 10.8</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.6/macOS 10.8</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
 
 <p class='summary'>*cupsMaxCopies: integer</p>
 
@@ -1451,7 +1451,7 @@ are approximate".</p>
 </pre>
 
 
-<h3><a name='cupsModelNumber'>cupsModelNumber</a></h3>
+<h3 class="title"><a name='cupsModelNumber'>cupsModelNumber</a></h3>
 
 <p class='summary'>*cupsModelNumber: number</p>
 
@@ -1467,7 +1467,7 @@ the output for a specific model of printer.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
 
 <p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
 
@@ -1483,7 +1483,7 @@ assumed.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
 
 <p class='summary'>*cupsPJLDisplay: "what"</p>
 
@@ -1503,7 +1503,7 @@ to use "@PJL RDYMSG DISPLAY". The default is "job".</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.2/macOS 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
 
 <p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
 
@@ -1536,7 +1536,7 @@ to disable the port monitor for the given URI scheme.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.3/macOS 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
 
 <p class='summary'>*cupsPreFilter: "source/type cost program"</p>
 
@@ -1555,7 +1555,7 @@ before the filter that accepts the given MIME type.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.5</span><a name='cupsPrintQuality'>cupsPrintQuality</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.5</span><a name='cupsPrintQuality'>cupsPrintQuality</a></h3>
 
 <p class='summary'>*cupsPrintQuality keyword/text: "code"</p>
 
@@ -1580,7 +1580,7 @@ before the filter that accepts the given MIME type.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.5</span><a name='cupsSingleFile'>cupsSingleFile</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.5</span><a name='cupsSingleFile'>cupsSingleFile</a></h3>
 
 <p class='summary'>*cupsSingleFile: Boolean</p>
 
@@ -1597,7 +1597,7 @@ before the filter that accepts the given MIME type.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
+<h3 class="title"><span class='info'>CUPS 1.4/macOS 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
 
 <p class='summary'>*cupsSNMPSupplies: boolean</p>
 
@@ -1613,7 +1613,7 @@ the standard SNMP Printer MIB OIDs for supply levels. The default value is
 </pre>
 
 
-<h3><a name='cupsVersion'>cupsVersion</a></h3>
+<h3 class="title"><a name='cupsVersion'>cupsVersion</a></h3>
 
 <p class='summary'>*cupsVersion: major.minor</p>
 
@@ -1629,7 +1629,7 @@ PPD file extensions was used. Currently it must be the string
 </pre>
 
 
-<h3><span class="info">CUPS 1.6/macOS 10.8</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
+<h3 class="title"><span class="info">CUPS 1.6/macOS 10.8</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
 
 <p class="summary">*JCLToPDFInterpreter: "JCL"</p>
 
@@ -1645,7 +1645,7 @@ PPD file extensions was used. Currently it must be the string
 
 <h2 class='title'><a name='MACOSX'>macOS Attributes</a></h2>
 
-<h3><span class='info'>Deprecated</span><a name='APDialogExtension'>APDialogExtension</a></h3>
+<h3 class="title"><span class='info'>Deprecated</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
 
@@ -1676,7 +1676,7 @@ AirPrint moving forward.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
+<h3 class="title"><span class='info'>macOS 10.4</span><a name='APDuplexRequiresFlippedMargin'>APDuplexRequiresFlippedMargin</a></h3>
 
 <p class='summary'>*APDuplexRequiresFlippedMargin: boolean</p>
 
@@ -1759,7 +1759,7 @@ and the <tt>Tumble</tt> page attribute.</p>
 keyword.</p>
 
 
-<h3><a name='APHelpBook'>APHelpBook</a></h3>
+<h3 class="title"><a name='APHelpBook'>APHelpBook</a></h3>
 
 <p class='summary'>*APHelpBook: "bundle URL"</p>
 
@@ -1775,7 +1775,7 @@ looking up IPP reason codes for this printer driver. The
 </pre>
 
 
-<h3><span class='info'>macOS 10.6</span><a name='APICADriver'>APICADriver</a></h3>
+<h3 class="title"><span class='info'>macOS 10.6</span><a name='APICADriver'>APICADriver</a></h3>
 
 <p class='summary'>*APICADriver: boolean</p>
 
@@ -1790,7 +1790,7 @@ Architecture (ICA) driver for scanning. The default is <tt>False</tt>.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
+<h3 class="title"><span class='info'>macOS 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
 
 <p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename.icns"</p>
 
@@ -1805,7 +1805,7 @@ displaying the printer. The file must be in the Apple icon format.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
+<h3 class="title"><span class='info'>macOS 10.4</span><a name='APPrinterLowInkTool'>APPrinterLowInkTool</a></h3>
 
 <p class='summary'>*APPrinterLowInkTool: "/Library/Printers/vendor/program"</p>
 
@@ -1823,7 +1823,7 @@ Technical Note TN2144</a> for more information.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
+<h3 class="title"><span class='info'>macOS 10.5</span><a name='APPrinterPreset'>APPrinterPreset</a></h3>
 
 <p class='summary'>*APPrinterPreset name/text: "*Option Choice ..."</p>
 
@@ -1894,7 +1894,7 @@ choice (*MainKeyword OptionKeyword) or a preset identifier and value
 </pre>
 
 
-<h3><span class='info'>macOS 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
+<h3 class="title"><span class='info'>macOS 10.3</span><a name='APPrinterUtilityPath'>APPrinterUtilityPath</a></h3>
 
 <p class='summary'>*APPrinterPrinterUtilityPath: "/Library/Printers/vendor/filename.app"</p>
 
@@ -1910,7 +1910,7 @@ information.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
+<h3 class="title"><span class='info'>macOS 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
 
 <p class='summary'>*APScannerOnly: boolean</p>
 
@@ -1925,7 +1925,7 @@ capabilities. The default is <tt>False</tt>.</p>
 </pre>
 
 
-<h3><span class='info'>macOS 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
+<h3 class="title"><span class='info'>macOS 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>
 
 <p class='summary'>*APScanAppBundleID: "bundle ID"</p>
 
@@ -1942,7 +1942,7 @@ the device.</p>
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
 
-<h3>Changes in CUPS 2.3</h3>
+<h3 class="title">Changes in CUPS 2.3</h3>
 
 <ul>
 
@@ -1951,7 +1951,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.7</h3>
+<h3 class="title">Changes in CUPS 1.7</h3>
 
 <ul>
 
@@ -1963,7 +1963,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.6</h3>
+<h3 class="title">Changes in CUPS 1.6</h3>
 
 <ul>
 
@@ -1978,7 +1978,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.5</h3>
+<h3 class="title">Changes in CUPS 1.5</h3>
 
 <ul>
 
@@ -1987,7 +1987,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.4.5</h3>
+<h3 class="title">Changes in CUPS 1.4.5</h3>
 
 <ul>
 
@@ -1998,7 +1998,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.4</h3>
+<h3 class="title">Changes in CUPS 1.4</h3>
 
 <ul>
 
@@ -2033,7 +2033,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.3.1</h3>
+<h3 class="title">Changes in CUPS 1.3.1</h3>
 
 <ul>
 
@@ -2048,7 +2048,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.3</h3>
+<h3 class="title">Changes in CUPS 1.3</h3>
 
 <ul>
 
@@ -2068,7 +2068,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.2.8</h3>
+<h3 class="title">Changes in CUPS 1.2.8</h3>
 
 <ul>
 
@@ -2078,7 +2078,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.2</h3>
+<h3 class="title">Changes in CUPS 1.2</h3>
 
 <ul>
 
@@ -2104,7 +2104,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.1</h3>
+<h3 class="title">Changes in CUPS 1.1</h3>
 
 <ul>
 

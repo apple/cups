@@ -868,4 +868,7 @@ void *my_data;
 
 </ol>
 
-<blockquote><b>Note:</b> The sandbox profile used in CUPS 2.0 still allows some actions that are not listed above - these privileges will be removed over time until the profile matches the list above.</blockquote>
+<blockquote><b>Note:</b>
+
+<p>The sandbox profile used in CUPS still allows some actions that are not listed above - these privileges will be removed over time until the profile matches the list above.</p>
+</blockquote>

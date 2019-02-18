@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <!-- SECTION: Programming -->
   <head>
     <title>Developing Raster Printer Drivers</title>
     <meta name="keywords" content="Programming">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="creator" content="codedoc v3.1">
     <meta name="author" content="Unknown">
     <meta name="copyright" content="Unknown">
     <meta name="version" content="0.0">
@@ -17,6 +17,11 @@ BODY {
 H1, H2, H3, H4, H5, H6, P, TD, TH {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
+
+H1 { font-size: 2em; }
+H2 { font-size: 1.75em; }
+H3 { font-size: 1.5em; }
+H4 { font-size: 1.25em; }
 
 KBD {
   font-family: monaco, courier, monospace;
@@ -360,14 +365,13 @@ h1, h2, h3, h4, h5, h6 {
 blockquote {
   border: solid thin gray;
   box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
-  padding: 0px 10px;
+  padding: 10px 10px 0px;
   page-break-inside: avoid;
 }
 p code, li code, p.code, pre, ul.code li {
   background: rgba(127,127,127,0.1);
   border: thin dotted gray;
   font-family: monospace;
-  font-size: 90%;
   hyphens: manual;
   -webkit-hyphens: manual;
   page-break-inside: avoid;
@@ -390,11 +394,18 @@ span.info {
   font-weight: bold;
   white-space: nowrap;
 }
-h3 span.info, h4 span.info {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+h2 span.info, h3 span.info, h4 span.info {
+  border-radius: 10px;
   float: right;
+  font-size: 80%;
   padding: 3px 6px;
+}
+h2.title span.info, h3.title span.info, h4.title span.info {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+h2.title span.info {
+  padding: 4px 6px;
 }
 ul.code, ul.contents, ul.subcontents {
   list-style-type: none;

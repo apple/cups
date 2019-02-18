@@ -1,7 +1,7 @@
 ---
 title: CUPS Programming Manual
 author: Michael R Sweet
-copyright: Copyright © 2007-2018 by Apple Inc. All Rights Reserved.
+copyright: Copyright © 2007-2019 by Apple Inc. All Rights Reserved.
 version: 2.3.0
 ...
 
@@ -25,7 +25,7 @@ the CUPS scheduler.
 
 ## Guidelines
 
-When writing software that uses the "cups" library:
+When writing software (other than printer drivers) that uses the "cups" library:
 
 - Do not use undocumented or deprecated APIs,
 - Do not rely on pre-configured printers,
@@ -42,16 +42,23 @@ Similarly, printer and job management applications can use standard query
 operations to obtain the status information in a common, generic form and use
 standard management operations to control the state of those printers and jobs.
 
+> **Note:**
+>
+> CUPS printer drivers necessarily depend on specific file formats and certain
+> implementation details of the CUPS software.  Please consult the Postscript
+> and raster printer driver developer documentation on
+> [CUPS.org](https://www.cups.org/documentation.html) for more information.
+
 
 ## Terms Used in This Document
 
 A *Destination* is a printer or print queue that accepts print jobs.  A
-*Print Job* is one or more documents that are processed by a destination
-using options supplied when creating the job.  A *Document* is a file (JPEG
-image, PDF file, etc.) suitable for printing.  An *Option* controls some aspect
-of printing, such as the media used. *Media* is the sheets or roll that is
-printed on.  An *Attribute* is an option encoded for an Internet Printing
-Protocol (IPP) request.
+*Print Job* is a collection of one or more documents that are processed by a
+destination using options supplied when creating the job.  A *Document* is a
+file (JPEG image, PDF file, etc.) suitable for printing.  An *Option* controls
+some aspect of printing, such as the media used. *Media* is the sheets or roll
+that is printed on.  An *Attribute* is an option encoded for an Internet
+Printing Protocol (IPP) request.
 
 
 ## Compiling Programs That Use the CUPS API
@@ -195,7 +202,9 @@ can have any of the following constant (bit) values set:
 
 The callback function returns 0 to stop enumeration or 1 to continue.
 
-> Note that the callback function will likely be called multiple times for the
+> **Note:**
+>
+> The callback function will likely be called multiple times for the
 > same destination, so it is up to the caller to suppress any duplicate
 > destinations.
 
@@ -817,7 +826,9 @@ which printer is being queried:
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                  "printer-uri", NULL, printer_uri);
 
-> Note: If we wanted to query the scheduler instead of the device, we would look
+> **Note:**
+>
+> If we wanted to query the scheduler instead of the device, we would look
 > up the "printer-uri-supported" option instead of the "device-uri" value.
 
 The `ippAddString` function adds the "printer-uri" attribute the the IPP

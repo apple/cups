@@ -1,7 +1,7 @@
 <!--
   Raster API documentation for CUPS.
 
-  Copyright © 2008-2010 by Apple Inc.
+  Copyright © 2008-2019 by Apple Inc.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
   information.
@@ -19,13 +19,12 @@
 <tbody>
 <tr>
 	<th>Library</th>
-	<td>-lcupsimage</td>
+	<td>-lcups</td>
 </tr>
 <tr>
 	<th>See Also</th>
-	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-cups.html'>CUPS API</a><br>
-	Programming: <a href='api-cups.html'>PPD API</a><br>
+	<td>Programming: <a href='cupspm.html'>CUPS Programming Manual</a><br>
+	Programming: <a href='api-ppd.html'>PPD API</a><br>
 	References: <a href='spec-ppd.html'>CUPS PPD Specification</a></td>
 </tr>
 </tbody>

@@ -752,21 +752,21 @@ apihelp:
 	$(RM) cupspm.xml
 	codedoc --section "Programming" --title "Administration APIs" \
 		--css ../doc/cups-printable.css \
-		--header api-admin.header --intro api-admin.shtml \
+		--header api-admin.header --body api-admin.shtml \
 		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
 	codedoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
-		--header api-ppd.header --intro api-ppd.shtml \
-		ppd.h ppd-*.c >../doc/help/api-ppd.html
+		--header api-ppd.header --body api-ppd.shtml \
+		ppd.h ppd-*.c raster-interstub.c >../doc/help/api-ppd.html
 	codedoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
-		--header api-raster.header --intro api-raster.shtml \
-		../cups/raster.h interpret.c raster.c \
+		--header api-raster.header --body api-raster.shtml \
+		../cups/raster.h raster-stubs.c \
 		>../doc/help/api-raster.html
 	codedoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
-		--header api-filter.header --intro api-filter.shtml \
+		--header api-filter.header --body api-filter.shtml \
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		>../doc/help/api-filter.html
 

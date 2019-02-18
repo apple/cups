@@ -130,25 +130,25 @@ apihelp:
 		--title "Developing PostScript Printer Drivers" \
 		--css ../doc/cups-printable.css \
 		--header postscript-driver.header \
-		--intro postscript-driver.shtml \
+		--body postscript-driver.shtml \
 		>../doc/help/postscript-driver.html
 	codedoc --section "Programming" \
 		--title "Introduction to the PPD Compiler" \
 		--css ../doc/cups-printable.css \
 		--header ppd-compiler.header \
-		--intro ppd-compiler.shtml \
+		--body ppd-compiler.shtml \
 		>../doc/help/ppd-compiler.html
 	codedoc --section "Programming" \
 		--title "Developing Raster Printer Drivers" \
 		--css ../doc/cups-printable.css \
 		--header raster-driver.header \
-		--intro raster-driver.shtml \
+		--body raster-driver.shtml \
 		>../doc/help/raster-driver.html
 	codedoc --section "Specifications" \
 		--title "CUPS PPD Extensions" \
 		--css ../doc/cups-printable.css \
 		--header spec-ppd.header \
-		--intro spec-ppd.shtml \
+		--body spec-ppd.shtml \
 		>../doc/help/spec-ppd.html
 
 

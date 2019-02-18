@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <!-- SECTION: Programming -->
   <head>
     <title>PPD API (DEPRECATED)</title>
     <meta name="keywords" content="Programming">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="creator" content="codedoc v3.1">
     <meta name="author" content="Unknown">
     <meta name="copyright" content="Unknown">
     <meta name="version" content="0.0">
@@ -17,6 +17,11 @@ BODY {
 H1, H2, H3, H4, H5, H6, P, TD, TH {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
+
+H1 { font-size: 2em; }
+H2 { font-size: 1.75em; }
+H3 { font-size: 1.5em; }
+H4 { font-size: 1.25em; }
 
 KBD {
   font-family: monaco, courier, monospace;
@@ -360,14 +365,13 @@ h1, h2, h3, h4, h5, h6 {
 blockquote {
   border: solid thin gray;
   box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
-  padding: 0px 10px;
+  padding: 10px 10px 0px;
   page-break-inside: avoid;
 }
 p code, li code, p.code, pre, ul.code li {
   background: rgba(127,127,127,0.1);
   border: thin dotted gray;
   font-family: monospace;
-  font-size: 90%;
   hyphens: manual;
   -webkit-hyphens: manual;
   page-break-inside: avoid;
@@ -390,11 +394,18 @@ span.info {
   font-weight: bold;
   white-space: nowrap;
 }
-h3 span.info, h4 span.info {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+h2 span.info, h3 span.info, h4 span.info {
+  border-radius: 10px;
   float: right;
+  font-size: 80%;
   padding: 3px 6px;
+}
+h2.title span.info, h3.title span.info, h4.title span.info {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+h2.title span.info {
+  padding: 4px 6px;
 }
 ul.code, ul.contents, ul.subcontents {
   list-style-type: none;
@@ -442,7 +453,7 @@ h3.title {
 <!--
   PPD API header for CUPS.
 
-  Copyright © 2008-2012 by Apple Inc.
+  Copyright © 2008-2019 by Apple Inc.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
   information.
@@ -450,7 +461,10 @@ h3.title {
 
 <h1 class='title'>PPD API (DEPRECATED)</h1>
 
-<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="api-cups.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
+<blockquote><b>Note:</b>
+
+<p>The PPD API was deprecated in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="cupspm.html">CUPS Programming Manual</a> documentation. These functions will be removed in a future release of CUPS.</p>
+</blockquote>
 
 <div class='summary'><table summary='General Information'>
 <thead>
@@ -467,7 +481,7 @@ h3.title {
 <tr>
 	<th>See Also</th>
 	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='cupspm.html' target='_top'>CUPS Programming Manual</a><br>
 	Specifications: <a href='spec-ppd.html' target='_top'>CUPS PPD Extensions</a></td>
 </tr>
 </tbody>
@@ -489,6 +503,7 @@ h3.title {
           <li><a href="#cupsGetPPD3">cupsGetPPD3</a></li>
           <li><a href="#cupsGetServerPPD">cupsGetServerPPD</a></li>
           <li><a href="#cupsMarkOptions">cupsMarkOptions</a></li>
+          <li><a href="#cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></li>
           <li><a href="#cupsResolveConflicts">cupsResolveConflicts</a></li>
           <li><a href="#ppdCollect">ppdCollect</a></li>
           <li><a href="#ppdCollect2">ppdCollect2</a></li>
@@ -524,6 +539,7 @@ h3.title {
           <li><a href="#ppdPageWidth">ppdPageWidth</a></li>
         </ul></li>
         <li><a href="#TYPES">Data Types</a><ul class="subcontents">
+          <li><a href="#cups_interpret_cb_t">cups_interpret_cb_t</a></li>
           <li><a href="#ppd_attr_t">ppd_attr_t</a></li>
           <li><a href="#ppd_choice_t">ppd_choice_t</a></li>
           <li><a href="#ppd_conform_t">ppd_conform_t</a></li>
@@ -575,7 +591,7 @@ h3.title {
 <!--
   PPD API introduction for CUPS.
 
-  Copyright © 2007-2018 by Apple Inc.
+  Copyright © 2007-2019 by Apple Inc.
   Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -584,7 +600,10 @@ h3.title {
 
 <h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
-<blockquote>The PPD API is deprecated starting in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="cupspm.html">CUPS API</a> documentation. These functions will be removed in a future release of CUPS.</blockquote>
+<blockquote><b>Note:</b>
+
+<p>The PPD API was deprecated in CUPS 1.6/macOS 10.8. Please use the new Job Ticket APIs in the <a href="cupspm.html">CUPS Programming Manual</a> documentation. These functions will be removed in a future release of CUPS.</p>
+</blockquote>
 
 <p>The CUPS PPD API provides read-only access the data in PostScript Printer
 Description ("PPD") files which are used for all printers with a driver. With
@@ -601,6 +620,7 @@ features. CUPS also treats option ("MainKeyword") and choice ("OptionKeyword")
 values as case-insensitive strings, so option "InputSlot" and choice "Upper"
 are equivalent to "inputslot" and "upper", respectively.</p>
 </blockquote>
+
 
 <h3><a name="LOADING">Loading a PPD File</a></h3>
 
@@ -689,6 +709,7 @@ int num_options = cupsParseOptions(argv[5], 0, &amp;options);
 cupsFreeOptions(num_options, options);
 </pre>
 
+
 <h3><a name="CONSTRAINTS">Constraints</a></h3>
 
 <p>PPD files support specification of conflict conditions, called
@@ -698,6 +719,7 @@ the options and choices that conflict with each other. The
 <a href="#ppdConflicts"><code>ppdConflicts</code></a> function tells you
 how many of the selected options are incompatible. Since constraints are
 normally specified in pairs, the returned value is typically an even number.</p>
+
 
 <h3><a name="PAGE_SIZES">Page Sizes</a></h3>
 
@@ -752,6 +774,7 @@ in points. Custom page size names can also be specified in inches
 <p>If the PPD does not support variable page sizes, the
 <a href="#ppdPageSize"><code>ppdPageSize</code></a> function will return
 <code>NULL</code>.</p>
+
 
 <h3><a name="ATTRIBUTES">Attributes</a></h3>
 
@@ -937,6 +960,51 @@ int cupsMarkOptions(<a href="#ppd_file_t">ppd_file_t</a> *ppd, int num_options, 
 &quot;multiple-document-handling&quot;, &quot;output-bin&quot;, &quot;print-color-mode&quot;,
 &quot;print-quality&quot;, &quot;printer-resolution&quot;, and &quot;sides&quot; attributes to their
 corresponding PPD options and choices.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
+        <p class="description">Interpret PPD commands to create a page header.</p>
+<p class="code">
+int cupsRasterInterpretPPD(cups_page_header2_t *h, <a href="#ppd_file_t">ppd_file_t</a> *ppd, int num_options, cups_option_t *options, <a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func);</p>
+<h4 class="parameters">Parameters</h4>
+<table class="list"><tbody>
+<tr><th>h</th>
+        <td class="description">Page header to create</td></tr>
+<tr><th>ppd</th>
+        <td class="description">PPD file</td></tr>
+<tr><th>num_options</th>
+        <td class="description">Number of options</td></tr>
+<tr><th>options</th>
+        <td class="description">Options</td></tr>
+<tr><th>func</th>
+        <td class="description">Optional page header callback (<code>NULL</code> for none)</td></tr>
+</tbody></table>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">0 on success, -1 on failure</p>
+<h4 class="discussion">Discussion</h4>
+        <p class="discussion">This function is used by raster image processing (RIP) filters like
+cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
+It is not used by raster printer driver filters which only read CUPS
+raster data.<br>
+<br>
+
+<code>cupsRasterInterpretPPD</code> does not mark the options in the PPD using
+the &quot;num_options&quot; and &quot;options&quot; arguments.  Instead, mark the options with
+<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling it -
+this allows for per-page options without manipulating the options array.<br>
+<br>
+The &quot;func&quot; argument specifies an optional callback function that is
+called prior to the computation of the final raster data.  The function
+can make changes to the <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a> data as needed to use a
+supported raster format and then returns 0 on success and -1 if the
+requested attributes cannot be supported.<br>
+<br>
+
+<code>cupsRasterInterpretPPD</code> supports a subset of the PostScript language.
+Currently only the <code>[</code>, <code>]</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>{</code>,
+<code>}</code>, <code>cleartomark</code>, <code>copy</code>, <code>dup</code>, <code>index</code>,
+<code>pop</code>, <code>roll</code>, <code>setpagedevice</code>, and <code>stopped</code> operators
+are supported.
+
+</p>
 <h3 class="function"><span class="info">&#160;CUPS 1.4/macOS 10.6&#160;</span><a id="cupsResolveConflicts">cupsResolveConflicts</a></h3>
         <p class="description">Resolve conflicts in a marked PPD.</p>
 <p class="code">
@@ -1514,6 +1582,11 @@ float ppdPageWidth(<a href="#ppd_file_t">ppd_file_t</a> *ppd, const char *name);
 <h4 class="returnvalue">Return Value</h4>
         <p class="description">Width of page in points or 0.0</p>
       <h2 class="title"><a id="TYPES">Data Types</a></h2>
+      <h3 class="typedef"><a id="cups_interpret_cb_t">cups_interpret_cb_t</a></h3>
+        <p class="description">cupsRasterInterpretPPD callback function</p>
+      <p class="code">
+typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bits);
+</p>
       <h3 class="typedef"><a id="ppd_attr_t"><span class="info">&#160;DEPRECATED&#160;</span>ppd_attr_t</a></h3>
         <p class="description">PPD Attribute Structure </p>
       <p class="code">
@@ -1741,7 +1814,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 &#160;&#160;&#160;&#160;float custom_margins[4];<br>
 &#160;&#160;&#160;&#160;float custom_max[2];<br>
 &#160;&#160;&#160;&#160;float custom_min[2];<br>
-&#160;&#160;&#160;&#160;<a href="#ppd_emul_t">ppd_emul_t</a> *emulations;<br>
 &#160;&#160;&#160;&#160;char **filters;<br>
 &#160;&#160;&#160;&#160;int flip_duplex;<br>
 &#160;&#160;&#160;&#160;char **fonts;<br>
@@ -1759,7 +1831,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 &#160;&#160;&#160;&#160;char *modelname;<br>
 &#160;&#160;&#160;&#160;char *nickname;<br>
 &#160;&#160;&#160;&#160;int num_consts;<br>
-&#160;&#160;&#160;&#160;int num_emulations;<br>
 &#160;&#160;&#160;&#160;int num_filters;<br>
 &#160;&#160;&#160;&#160;int num_fonts;<br>
 &#160;&#160;&#160;&#160;int num_groups;<br>
@@ -1794,8 +1865,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
         <td class="description">Maximum variable page size</td></tr>
 <tr><th>custom_min[2] </th>
         <td class="description">Minimum variable page size</td></tr>
-<tr><th>emulations </th>
-        <td class="description">Emulations and the code to invoke them</td></tr>
 <tr><th>filters </th>
         <td class="description">Filter strings...</td></tr>
 <tr><th>flip_duplex <span class="info">&#160;DEPRECATED&#160;</span></th>
@@ -1830,8 +1899,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
         <td class="description">Nickname (specific)</td></tr>
 <tr><th>num_consts </th>
         <td class="description">Number of UI/Non-UI constraints</td></tr>
-<tr><th>num_emulations </th>
-        <td class="description">Number of emulations supported</td></tr>
 <tr><th>num_filters </th>
         <td class="description">Number of filters</td></tr>
 <tr><th>num_fonts </th>
@@ -2086,6 +2153,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
       <h4 class="constants">Constants</h4>
       <table class="list"><tbody>
         <tr><th>PPD_ALLOC_ERROR </th>        <td class="description">Memory allocation error</td></tr>
+        <tr><th>PPD_BAD_CLOSE_UI </th>        <td class="description">Bad CloseUI/JCLCloseUI</td></tr>
         <tr><th>PPD_BAD_CUSTOM_PARAM </th>        <td class="description">Bad custom parameter</td></tr>
         <tr><th>PPD_BAD_OPEN_GROUP </th>        <td class="description">Bad OpenGroup</td></tr>
         <tr><th>PPD_BAD_OPEN_UI </th>        <td class="description">Bad OpenUI/JCLOpenUI</td></tr>
@@ -2102,6 +2170,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
         <tr><th>PPD_LINE_TOO_LONG </th>        <td class="description">Line longer than 255 chars</td></tr>
         <tr><th>PPD_MISSING_ASTERISK </th>        <td class="description">Missing asterisk in column 0</td></tr>
         <tr><th>PPD_MISSING_CLOSE_GROUP </th>        <td class="description">Missing CloseGroup</td></tr>
+        <tr><th>PPD_MISSING_CLOSE_UI </th>        <td class="description">Missing CloseUI/JCLCloseUI</td></tr>
         <tr><th>PPD_MISSING_OPTION_KEYWORD </th>        <td class="description">Missing option keyword</td></tr>
         <tr><th>PPD_MISSING_PPDADOBE4 </th>        <td class="description">Missing PPD-Adobe-4.x header</td></tr>
         <tr><th>PPD_MISSING_VALUE </th>        <td class="description">Missing value string</td></tr>

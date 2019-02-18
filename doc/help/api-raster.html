@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <!-- SECTION: Programming -->
   <head>
     <title>Raster API</title>
     <meta name="keywords" content="Programming">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="Mini-XML v2.11">
+    <meta name="creator" content="codedoc v3.1">
     <meta name="author" content="Unknown">
     <meta name="copyright" content="Unknown">
     <meta name="version" content="0.0">
@@ -17,6 +17,11 @@ BODY {
 H1, H2, H3, H4, H5, H6, P, TD, TH {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
+
+H1 { font-size: 2em; }
+H2 { font-size: 1.75em; }
+H3 { font-size: 1.5em; }
+H4 { font-size: 1.25em; }
 
 KBD {
   font-family: monaco, courier, monospace;
@@ -360,14 +365,13 @@ h1, h2, h3, h4, h5, h6 {
 blockquote {
   border: solid thin gray;
   box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
-  padding: 0px 10px;
+  padding: 10px 10px 0px;
   page-break-inside: avoid;
 }
 p code, li code, p.code, pre, ul.code li {
   background: rgba(127,127,127,0.1);
   border: thin dotted gray;
   font-family: monospace;
-  font-size: 90%;
   hyphens: manual;
   -webkit-hyphens: manual;
   page-break-inside: avoid;
@@ -390,11 +394,18 @@ span.info {
   font-weight: bold;
   white-space: nowrap;
 }
-h3 span.info, h4 span.info {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+h2 span.info, h3 span.info, h4 span.info {
+  border-radius: 10px;
   float: right;
+  font-size: 80%;
   padding: 3px 6px;
+}
+h2.title span.info, h3.title span.info, h4.title span.info {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+h2.title span.info {
+  padding: 4px 6px;
 }
 ul.code, ul.contents, ul.subcontents {
   list-style-type: none;
@@ -442,7 +453,7 @@ h3.title {
 <!--
   Raster API documentation for CUPS.
 
-  Copyright © 2008-2010 by Apple Inc.
+  Copyright © 2008-2019 by Apple Inc.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
   information.
@@ -460,13 +471,12 @@ h3.title {
 <tbody>
 <tr>
 	<th>Library</th>
-	<td>-lcupsimage</td>
+	<td>-lcups</td>
 </tr>
 <tr>
 	<th>See Also</th>
-	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-cups.html'>CUPS API</a><br>
-	Programming: <a href='api-cups.html'>PPD API</a><br>
+	<td>Programming: <a href='cupspm.html'>CUPS Programming Manual</a><br>
+	Programming: <a href='api-ppd.html'>PPD API</a><br>
 	References: <a href='spec-ppd.html'>CUPS PPD Specification</a></td>
 </tr>
 </tbody>
@@ -482,8 +492,8 @@ h3.title {
         </ul></li>
         <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
           <li><a href="#cupsRasterClose">cupsRasterClose</a></li>
+          <li><a href="#cupsRasterErrorString">cupsRasterErrorString</a></li>
           <li><a href="#cupsRasterInitPWGHeader">cupsRasterInitPWGHeader</a></li>
-          <li><a href="#cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></li>
           <li><a href="#cupsRasterOpen">cupsRasterOpen</a></li>
           <li><a href="#cupsRasterOpenIO">cupsRasterOpenIO</a></li>
           <li><a href="#cupsRasterReadHeader">cupsRasterReadHeader</a></li>
@@ -499,7 +509,6 @@ h3.title {
           <li><a href="#cups_cspace_t">cups_cspace_t</a></li>
           <li><a href="#cups_cut_t">cups_cut_t</a></li>
           <li><a href="#cups_edge_t">cups_edge_t</a></li>
-          <li><a href="#cups_interpret_cb_t">cups_interpret_cb_t</a></li>
           <li><a href="#cups_jog_t">cups_jog_t</a></li>
           <li><a href="#cups_mode_t">cups_mode_t</a></li>
           <li><a href="#cups_order_t">cups_order_t</a></li>
@@ -530,7 +539,7 @@ h3.title {
 <!--
   Raster API introduction for CUPS.
 
-  Copyright © 2007-2013 by Apple Inc.
+  Copyright © 2007-2019 by Apple Inc.
   Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 
   Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -676,7 +685,7 @@ the memory used to read the raster file:</p>
 
 <ul class="code">
 
-	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
+	<li><a href="#cupsRasterInitPWGHeader" title="Interpret IPP attributes to create a page header.">cupsRasterInitPWGHeader</a></li>
 	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/macOS 10.5</span></li>
 	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a></li>
 	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
@@ -695,6 +704,16 @@ void cupsRasterClose(<a href="#cups_raster_t">cups_raster_t</a> *r);</p>
 <h4 class="discussion">Discussion</h4>
         <p class="discussion">The file descriptor associated with the raster stream must be closed
 separately as needed.</p>
+<h3 class="function"><span class="info">&#160;CUPS 1.3/macOS 10.5&#160;</span><a id="cupsRasterErrorString">cupsRasterErrorString</a></h3>
+        <p class="description">Return the last error from a raster function.</p>
+<p class="code">
+const char *cupsRasterErrorString(void);</p>
+<h4 class="returnvalue">Return Value</h4>
+        <p class="description">Last error or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+        <p class="discussion">If there are no recent errors, <code>NULL</code> is returned.
+
+</p>
 <h3 class="function"><span class="info">&#160;CUPS 2.2/macOS 10.12&#160;</span><a id="cupsRasterInitPWGHeader">cupsRasterInitPWGHeader</a></h3>
         <p class="description">Initialize a page header for PWG Raster output.</p>
 <p class="code">
@@ -729,51 +748,6 @@ inch.<br>
 <br>
 The &quot;sheet_back&quot; argument specifies a &quot;pwg-raster-document-sheet-back&quot; value
 to apply for the back side of a page.  Pass <code>NULL</code> for the front side.
-
-</p>
-<h3 class="function"><span class="info">&#160;CUPS 1.2/macOS 10.5&#160;</span><a id="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
-        <p class="description">Interpret PPD commands to create a page header.</p>
-<p class="code">
-int cupsRasterInterpretPPD(<a href="#cups_page_header2_t">cups_page_header2_t</a> *h, ppd_file_t *ppd, int num_options, cups_option_t *options, <a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func);</p>
-<h4 class="parameters">Parameters</h4>
-<table class="list"><tbody>
-<tr><th>h</th>
-        <td class="description">Page header to create</td></tr>
-<tr><th>ppd</th>
-        <td class="description">PPD file</td></tr>
-<tr><th>num_options</th>
-        <td class="description">Number of options</td></tr>
-<tr><th>options</th>
-        <td class="description">Options</td></tr>
-<tr><th>func</th>
-        <td class="description">Optional page header callback (<code>NULL</code> for none)</td></tr>
-</tbody></table>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description">0 on success, -1 on failure</p>
-<h4 class="discussion">Discussion</h4>
-        <p class="discussion">This function is used by raster image processing (RIP) filters like
-cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
-It is not used by raster printer driver filters which only read CUPS
-raster data.<br>
-<br>
-
-<code>cupsRasterInterpretPPD</code> does not mark the options in the PPD using
-the &quot;num_options&quot; and &quot;options&quot; arguments.  Instead, mark the options with
-<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling it -
-this allows for per-page options without manipulating the options array.<br>
-<br>
-The &quot;func&quot; argument specifies an optional callback function that is
-called prior to the computation of the final raster data.  The function
-can make changes to the <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a> data as needed to use a
-supported raster format and then returns 0 on success and -1 if the
-requested attributes cannot be supported.<br>
-<br>
-
-<code>cupsRasterInterpretPPD</code> supports a subset of the PostScript language.
-Currently only the <code>[</code>, <code>]</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>{</code>,
-<code>}</code>, <code>cleartomark</code>, <code>copy</code>, <code>dup</code>, <code>index</code>,
-<code>pop</code>, <code>roll</code>, <code>setpagedevice</code>, and <code>stopped</code> operators
-are supported.
 
 </p>
 <h3 class="function"><a id="cupsRasterOpen">cupsRasterOpen</a></h3>
@@ -963,11 +937,6 @@ typedef enum <a href="#cups_cut_e">cups_cut_e</a> cups_cut_t;
         <p class="description">LeadingEdge attribute values</p>
       <p class="code">
 typedef enum <a href="#cups_edge_e">cups_edge_e</a> cups_edge_t;
-</p>
-      <h3 class="typedef"><a id="cups_interpret_cb_t">cups_interpret_cb_t</a></h3>
-        <p class="description">cupsRasterInterpretPPD callback function</p>
-      <p class="code">
-typedef int (*cups_interpret_cb_t)(<a href="#cups_page_header2_t">cups_page_header2_t</a> *header, int preferred_bits);
 </p>
       <h3 class="typedef"><a id="cups_jog_t">cups_jog_t</a></h3>
         <p class="description">Jog attribute values</p>

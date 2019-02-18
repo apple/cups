@@ -11,7 +11,7 @@
 
 <p>The administrative APIs provide convenience functions to perform certain administrative functions with the CUPS scheduler.</p>
 
-<blockquote><b>Note:<b>
+<blockquote><b>Note:</b>
   <p>Administrative functions normally require administrative privileges to execute and must not be used in ordinary user applications!</p>
 </blockquote>
 
