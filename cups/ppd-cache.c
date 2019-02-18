@@ -2190,7 +2190,7 @@ _ppdCacheGetFinishingValues(
     {
       DEBUG_printf(("_ppdCacheGetFinishingValues: Adding %d (%s)", f->value, ippEnumString("finishings", f->value)));
 
-      values[num_values ++] = f->value;
+      values[num_values ++] = (int)f->value;
 
       if (num_values >= max_values)
         break;
