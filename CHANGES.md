@@ -22,6 +22,8 @@ Changes in CUPS v2.2.11
   UTF-8 strings (Issue #5509)
 - Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
 - Added a USB quirks rule for Xerox printers (Issue #5523)
+- The scheduler's self-signed certificate did not include all of the alternate
+  names for the server when using GNU TLS (Issue #5525)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
 

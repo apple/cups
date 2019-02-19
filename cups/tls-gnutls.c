@@ -173,8 +173,31 @@ cupsMakeServerCredentials(
   gnutls_x509_crt_set_activation_time(crt, curtime);
   gnutls_x509_crt_set_expiration_time(crt, curtime + 10 * 365 * 86400);
   gnutls_x509_crt_set_ca_status(crt, 0);
+  gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, common_name, (unsigned)strlen(common_name), GNUTLS_FSAN_SET);
+  if (!strchr(common_name, '.'))
+  {
+   /*
+    * Add common_name.local to the list, too...
+    */
+
+    char localname[256];                /* hostname.local */
+
+    snprintf(localname, sizeof(localname), "%s.local", common_name);
+    gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, localname, (unsigned)strlen(localname), GNUTLS_FSAN_APPEND);
+  }
+  gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, "localhost", 9, GNUTLS_FSAN_APPEND);
   if (num_alt_names > 0)
-    gnutls_x509_crt_set_subject_alternative_name(crt, GNUTLS_SAN_DNSNAME, alt_names[0]);
+  {
+    int i;                              /* Looping var */
+
+    for (i = 0; i < num_alt_names; i ++)
+    {
+      if (strcmp(alt_names[i], "localhost"))
+      {
+        gnutls_x509_crt_set_subject_alt_name(crt, GNUTLS_SAN_DNSNAME, alt_names[i], (unsigned)strlen(alt_names[i]), GNUTLS_FSAN_APPEND);
+      }
+    }
+  }
   gnutls_x509_crt_set_key_purpose_oid(crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
   gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_DIGITAL_SIGNATURE | GNUTLS_KEY_KEY_ENCIPHERMENT);
   gnutls_x509_crt_set_version(crt, 3);
