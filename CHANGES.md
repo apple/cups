@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2019-02-15
+CHANGES - 2.2.11 - 2019-02-19
 =============================
 
 
@@ -21,6 +21,7 @@ Changes in CUPS v2.2.11
 - The `ippValidateAttribute` function did not catch all instances of invalid
   UTF-8 strings (Issue #5509)
 - Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
+- Added a USB quirks rule for Xerox printers (Issue #5523)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
 
