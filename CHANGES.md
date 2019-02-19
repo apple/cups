@@ -24,6 +24,8 @@ Changes in CUPS v2.3b8
 - Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
 - Eliminated use of private headers and some deprecated macOS APIs (Issue #5516)
 - Added a USB quirks rule for Xerox printers (Issue #5523)
+- The scheduler's self-signed certificate did not include all of the alternate
+  names for the server when using GNU TLS (Issue #5525)
 - Localization updates (Issue #5461, Issues #5471, Issue #5481, Issue #5486,
   Issue #5489, Issue #5491, Issue #5492, Issue #5493, Issue #5494, Issue #5495,
   Issue #5497, Issue #5499, Issue #5500, Issue #5501, Issue #5504)
