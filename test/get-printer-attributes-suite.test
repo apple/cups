@@ -5,7 +5,7 @@
 #
 # Usage:
 #
-#   ipptool -t printer-uri get-printer-attributes-suite.test
+#   ipptool -tI printer-uri get-printer-attributes-suite.test
 #
 
 # Always use IPP/2.0 for this set of tests...
