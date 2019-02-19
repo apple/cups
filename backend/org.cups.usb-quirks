@@ -131,6 +131,9 @@
 # Xerox WorkCentre 3210 https://bugs.launchpad.net/bugs/1102470
 0x0924 0x4293 no-reattach
 
+# Xerox Phaser 6020 Color Printer
+0x0924 0x3d6f no-reattach
+
 # QinHeng Electronics CH340S (USB -> Parallel adapter) (https://bugs.launchpad.net/bugs/1000253)
 0x1a86 0x7584 no-reattach
 
