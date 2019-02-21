@@ -5,6 +5,7 @@ CHANGES - 2.3b8 - 2019-02-21
 Changes in CUPS v2.3b8
 ----------------------
 
+- Media size matching now uses a tolerance of 0.5mm (rdar://33822024)
 - The lpadmin command would hang with a bad PPD file (rdar://41495016)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)

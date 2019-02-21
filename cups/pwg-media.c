@@ -1,9 +1,10 @@
 /*
  * PWG media name API implementation for CUPS.
  *
- * Copyright 2009-2017 by Apple Inc.
+ * Copyright 2009-2019 by Apple Inc.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -21,6 +22,7 @@
 
 #define _PWG_MEDIA_IN(p,l,a,x,y) {p, l, a, (int)(x * 2540), (int)(y * 2540)}
 #define _PWG_MEDIA_MM(p,l,a,x,y) {p, l, a, (int)(x * 100), (int)(y * 100)}
+#define _PWG_EPSILON	50		/* Matching tolerance */
 
 
 /*
@@ -911,10 +913,11 @@ pwgMediaForSize(int width,		/* I - Width in hundredths of millimeters */
 {
  /*
   * Adobe uses a size matching algorithm with an epsilon of 5 points, which
-  * is just about 176/2540ths...
+  * is just about 176/2540ths...  But a lot of international media sizes are
+  * very close so use 0.5mm (50/2540ths) as the maximum delta.
   */
 
-  return (_pwgMediaNearSize(width, length, 176));
+  return (_pwgMediaNearSize(width, length, _PWG_EPSILON));
 }
 
 
