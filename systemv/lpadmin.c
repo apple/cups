@@ -1431,6 +1431,7 @@ set_printer_options(
 					/* Status code */
 
       _cupsLangPrintf(stderr, _("lpadmin: Unable to open PPD \"%s\": %s on line %d."), ppdfile, ppdErrorString(status), linenum);
+      return (1);
     }
 
     ppdMarkDefaults(ppd);
@@ -1449,9 +1450,7 @@ set_printer_options(
 
     if ((in = cupsFileOpen(ppdfile, "r")) == NULL)
     {
-      _cupsLangPrintf(stderr,
-                      _("lpadmin: Unable to open PPD file \"%s\" - %s"),
-        	      ppdfile, strerror(errno));
+      _cupsLangPrintf(stderr, _("lpadmin: Unable to open PPD \"%s\": %s"), ppdfile, strerror(errno));
       ippDelete(request);
       if (ppdfile != file)
 	unlink(ppdfile);

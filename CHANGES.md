@@ -5,6 +5,7 @@ CHANGES - 2.3b8 - 2019-02-21
 Changes in CUPS v2.3b8
 ----------------------
 
+- The lpadmin command would hang with a bad PPD file (rdar://41495016)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
 - The `ippValidateAttribute` function did not catch all instances of invalid
