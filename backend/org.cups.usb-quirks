@@ -296,3 +296,6 @@
 
 # All Xerox printers (Issue #5523)
 0x0924 no-reattach
+
+# Dymo 450 Turbo (Issue #5521)
+0x0922 0x0021 unidir

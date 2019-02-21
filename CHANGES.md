@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-02-19
+CHANGES - 2.3b8 - 2019-02-21
 ============================
 
 
@@ -23,6 +23,7 @@ Changes in CUPS v2.3b8
 - The web interface no longer provides access to the log files (Issue #5513)
 - Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
 - Eliminated use of private headers and some deprecated macOS APIs (Issue #5516)
+- Added a USB quirks rule for the DYMO 450 Turbo (Issue #5521)
 - Added a USB quirks rule for Xerox printers (Issue #5523)
 - The scheduler's self-signed certificate did not include all of the alternate
   names for the server when using GNU TLS (Issue #5525)
