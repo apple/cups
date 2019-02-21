@@ -1,7 +1,7 @@
 /*
  * Job management routines for the CUPS scheduler.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -3437,6 +3437,12 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  * Stop the printer...
 	  */
 
+          if (job_state == IPP_JSTATE_CANCELED || job_state == IPP_JSTATE_ABORTED)
+          {
+            cupsdLogJob(job, CUPSD_LOG_INFO, "Ignored STOP from backend since the job is %s.", job_state == IPP_JSTATE_CANCELED ? "canceled" : "aborted");
+            break;
+	  }
+
 	  printer_state = IPP_PRINTER_STOPPED;
 
 	  if (ErrorLog)
@@ -3451,8 +3457,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  {
 	    job_state = IPP_JOB_PENDING;
 
-	    ippSetString(job->attrs, &job->reasons, 0,
-	                 "resources-are-not-ready");
+	    ippSetString(job->attrs, &job->reasons, 0, "resources-are-not-ready");
 	  }
           break;
 

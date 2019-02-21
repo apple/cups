@@ -2232,8 +2232,9 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
     fputs("JOBSTATE: account-authorization-failed\n", stderr);
 
-  if (ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED || ipp_status == IPP_STATUS_ERROR_FORBIDDEN ||
-      ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
+  if (job_canceled)
+    return (CUPS_BACKEND_OK);
+  else if (ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED || ipp_status == IPP_STATUS_ERROR_FORBIDDEN || ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
 	   ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
