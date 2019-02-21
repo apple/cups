@@ -1628,7 +1628,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   time_t		now;		/* Current time */
   cupsd_client_t	*con;		/* Client information */
   cupsd_job_t		*job;		/* Job information */
-  cupsd_printer_t       *printer;       /* Printer information */
   const char		*why;		/* Debugging aid */
 
 
