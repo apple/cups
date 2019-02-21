@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-01-24 11:59-0500\n"
+"POT-Creation-Date: 2019-02-21 11:13-0500\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: French <LL@li.org>\n"
@@ -2517,12 +2517,6 @@ msgstr "95"
 msgid "?Invalid help command unknown."
 msgstr ""
 
-msgid "A Samba password is required to export printer drivers"
-msgstr ""
-
-msgid "A Samba username is required to export printer drivers"
-msgstr ""
-
 #, c-format
 msgid "A class named \"%s\" already exists."
 msgstr ""
@@ -3314,9 +3308,6 @@ msgstr ""
 
 msgid "Expectation Failed"
 msgstr "Échec de la condition de valeur attendue"
-
-msgid "Export Printers to Samba"
-msgstr "Exporter les imprimantes vers SAMBA"
 
 msgid "Expressions:"
 msgstr "Expressions :"
@@ -7803,11 +7794,11 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgid "lpadmin: Unable to open PPD \"%s\": %s"
 msgstr ""
 
 #, c-format
-msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
 msgstr ""
 
 msgid ""
@@ -15292,3 +15283,6 @@ msgstr ""
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+
+#~ msgid "Export Printers to Samba"
+#~ msgstr "Exporter les imprimantes vers SAMBA"

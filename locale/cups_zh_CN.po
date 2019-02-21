@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-01-24 11:59-0500\n"
+"POT-Creation-Date: 2019-02-21 11:13-0500\n"
 "PO-Revision-Date: 2018-10-09 00:21-0500\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.io>\n"
 "Language-Team: Chinese (Simplified)\n"
@@ -2616,12 +2616,6 @@ msgstr "95"
 msgid "?Invalid help command unknown."
 msgstr "?无效 未知帮助命令。"
 
-msgid "A Samba password is required to export printer drivers"
-msgstr "需要 Samba 密码以导出打印机驱动"
-
-msgid "A Samba username is required to export printer drivers"
-msgstr "需要 Samba 用户名以导出打印机驱动"
-
 #, c-format
 msgid "A class named \"%s\" already exists."
 msgstr "已存在名为“%s”的类。"
@@ -3419,9 +3413,6 @@ msgstr "执行"
 
 msgid "Expectation Failed"
 msgstr "未满足期望"
-
-msgid "Export Printers to Samba"
-msgstr "将打印机导出到 Samba"
 
 msgid "Expressions:"
 msgstr "表达式："
@@ -7921,12 +7912,12 @@ msgstr ""
 "         你必须先指定打印机名称。"
 
 #, c-format
-msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
-msgstr "lpadmin：无法打开 PPD“%1$s”：在行 %3$d 中的 %2$s。"
+msgid "lpadmin: Unable to open PPD \"%s\": %s"
+msgstr ""
 
 #, c-format
-msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
-msgstr "lpadmin：无法打开 PPD 文件“%s”- %s"
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgstr "lpadmin：无法打开 PPD“%1$s”：在行 %3$d 中的 %2$s。"
 
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
@@ -15419,3 +15410,15 @@ msgstr ""
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr "~/.cups/lpoptions 文件所指定的默认目标不存在。"
+
+#~ msgid "A Samba password is required to export printer drivers"
+#~ msgstr "需要 Samba 密码以导出打印机驱动"
+
+#~ msgid "A Samba username is required to export printer drivers"
+#~ msgstr "需要 Samba 用户名以导出打印机驱动"
+
+#~ msgid "Export Printers to Samba"
+#~ msgstr "将打印机导出到 Samba"
+
+#~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+#~ msgstr "lpadmin：无法打开 PPD 文件“%s”- %s"

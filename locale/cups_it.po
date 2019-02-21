@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-01-24 11:59-0500\n"
+"POT-Creation-Date: 2019-02-21 11:13-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Italian - Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -2657,14 +2657,6 @@ msgstr "95"
 msgid "?Invalid help command unknown."
 msgstr "?Aiuto non valido comando sconosciuto."
 
-msgid "A Samba password is required to export printer drivers"
-msgstr ""
-"Per esportare i driver della stampante è richiesta una password di Samba."
-
-msgid "A Samba username is required to export printer drivers"
-msgstr ""
-"Per esportare i driver della stampante è richiesto un username di Samba"
-
 #, c-format
 msgid "A class named \"%s\" already exists."
 msgstr "Una classe denominata \"%s\" già esiste."
@@ -3464,9 +3456,6 @@ msgstr "Esecutivo"
 
 msgid "Expectation Failed"
 msgstr "Aspettativa non riuscita"
-
-msgid "Export Printers to Samba"
-msgstr "Esporta le stampanti per Samba"
 
 msgid "Expressions:"
 msgstr "Espressioni:"
@@ -7995,12 +7984,12 @@ msgstr ""
 "         Bisogna specificare prima un nome per la stampante."
 
 #, c-format
-msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgid "lpadmin: Unable to open PPD \"%s\": %s"
 msgstr ""
 
 #, c-format
-msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
-msgstr "lpadmin: non è possibile aprile il file PPD \"%s\" - %s"
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgstr ""
 
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
@@ -15516,3 +15505,17 @@ msgstr ""
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+
+#~ msgid "A Samba password is required to export printer drivers"
+#~ msgstr ""
+#~ "Per esportare i driver della stampante è richiesta una password di Samba."
+
+#~ msgid "A Samba username is required to export printer drivers"
+#~ msgstr ""
+#~ "Per esportare i driver della stampante è richiesto un username di Samba"
+
+#~ msgid "Export Printers to Samba"
+#~ msgstr "Esporta le stampanti per Samba"
+
+#~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+#~ msgstr "lpadmin: non è possibile aprile il file PPD \"%s\" - %s"

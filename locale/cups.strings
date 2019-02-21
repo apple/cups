@@ -692,8 +692,6 @@
 "90" = "90";
 "95" = "95";
 "?Invalid help command unknown." = "?Invalid help command unknown.";
-"A Samba password is required to export printer drivers" = "A Samba password is required to export printer drivers";
-"A Samba username is required to export printer drivers" = "A Samba username is required to export printer drivers";
 "A class named \"%s\" already exists." = "A class named “%s” already exists.";
 "A printer named \"%s\" already exists." = "A printer named “%s” already exists.";
 "A0" = "A0";
@@ -941,7 +939,6 @@
 "Every Label" = "Every Label";
 "Executive" = "Executive";
 "Expectation Failed" = "Expectation Failed";
-"Export Printers to Samba" = "Export Printers to Samba";
 "Expressions:" = "Expressions:";
 "Fast Grayscale" = "Fast Grayscale";
 "File \"%s\" contains a relative path." = "File “%s” contains a relative path.";
@@ -2779,8 +2776,8 @@
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";
 "lpadmin: Unable to create temporary file" = "lpadmin: Unable to create temporary file";
 "lpadmin: Unable to delete option:\n         You must specify a printer name first." = "lpadmin: Unable to delete option:\n         You must specify a printer name first.";
+"lpadmin: Unable to open PPD \"%s\": %s" = "lpadmin: Unable to open PPD “%s”: %s";
 "lpadmin: Unable to open PPD \"%s\": %s on line %d." = "lpadmin: Unable to open PPD “%s”: %s on line %d.";
-"lpadmin: Unable to open PPD file \"%s\" - %s" = "lpadmin: Unable to open PPD file “%s” - %s";
 "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first." = "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to set the printer options:\n         You must specify a printer name first." = "lpadmin: Unable to set the printer options:\n         You must specify a printer name first.";
 "lpadmin: Unknown allow/deny option \"%s\"." = "lpadmin: Unknown allow/deny option “%s”.";
