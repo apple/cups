@@ -813,7 +813,7 @@ main(int  argc,				/* I - Number of command-line args */
     * inactivity...
     */
 
-    if (OnDemand && IdleExitTimeout &&
+    if (timeout == 86400 && OnDemand && IdleExitTimeout &&
 #  ifdef HAVE_SYSTEMD
         !WebInterface &&
 #  endif /* HAVE_SYSTEMD */
@@ -999,6 +999,23 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* !HAVE_AUTHORIZATION_H */
 
    /*
+    * Clean job history...
+    */
+
+    if (JobHistoryUpdate && current_time >= JobHistoryUpdate)
+      cupsdCleanJobs();
+
+   /*
+    * Update any pending multi-file documents...
+    */
+
+    if ((current_time - senddoc_time) >= 10)
+    {
+      cupsdCheckJobs();
+      senddoc_time = current_time;
+    }
+
+   /*
     * Check for new data on the client sockets...
     */
 
@@ -1029,23 +1046,6 @@ main(int  argc,				/* I - Number of command-line args */
         continue;
       }
     }
-
-   /*
-    * Update any pending multi-file documents...
-    */
-
-    if ((current_time - senddoc_time) >= 10)
-    {
-      cupsdCheckJobs();
-      senddoc_time = current_time;
-    }
-
-   /*
-    * Clean job history...
-    */
-
-    if (JobHistoryUpdate && current_time >= JobHistoryUpdate)
-      cupsdCleanJobs();
 
    /*
     * Log statistics at most once a minute when in debug mode...
@@ -1717,12 +1717,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * Check for any job activity...
   */
 
-  if (JobHistoryUpdate && timeout > JobHistoryUpdate)
-  {
-    timeout = JobHistoryUpdate;
-    why     = "update job history";
-  }
-
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
@@ -1751,22 +1745,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       why     = "start pending jobs";
       break;
     }
-  }
-
- /*
-  * Check for temporary printers that need to be deleted...
-  */
-
-  for (printer = (cupsd_printer_t *)cupsArrayFirst(Printers); printer; printer = (cupsd_printer_t *)cupsArrayNext(Printers))
-  {
-    if (printer->temporary && !printer->job && (!local_timeout || local_timeout > (printer->state_time + 60)))
-      local_timeout = printer->state_time + 60;
-  }
-
-  if (timeout > local_timeout && local_timeout)
-  {
-    timeout = local_timeout;
-    why     = "delete stale local printers";
   }
 
  /*
