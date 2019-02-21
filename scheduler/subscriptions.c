@@ -1,7 +1,7 @@
 /*
  * Subscription routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -647,6 +647,9 @@ cupsdExpireSubscriptions(
   int			update;		/* Update subscriptions.conf? */
   time_t		curtime;	/* Current time */
 
+
+  if (cupsArrayCount(Subscriptions) == 0)
+    return;
 
   curtime = time(NULL);
   update  = 0;

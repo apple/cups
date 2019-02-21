@@ -1,7 +1,7 @@
 /*
  * Main loop for the CUPS scheduler.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -813,7 +813,7 @@ main(int  argc,				/* I - Number of command-line args */
     * inactivity...
     */
 
-    if (timeout == 86400 && OnDemand && IdleExitTimeout &&
+    if (OnDemand && IdleExitTimeout &&
 #  ifdef HAVE_SYSTEMD
         !WebInterface &&
 #  endif /* HAVE_SYSTEMD */
@@ -963,8 +963,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (current_time > expire_time)
     {
-      if (cupsArrayCount(Subscriptions) > 0)
-        cupsdExpireSubscriptions(NULL, NULL);
+      cupsdExpireSubscriptions(NULL, NULL);
 
       cupsdUnloadCompletedJobs();
 
