@@ -29,6 +29,7 @@ Changes in CUPS v2.2.11
   names for the server when using GNU TLS (Issue #5525)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
+- The scheduler did not always idle exit as quickly as it could.
 
 
 Changes in CUPS v2.2.10
