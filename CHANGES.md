@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2019-02-19
+CHANGES - 2.2.11 - 2019-02-21
 =============================
 
 
@@ -21,6 +21,7 @@ Changes in CUPS v2.2.11
 - The `ippValidateAttribute` function did not catch all instances of invalid
   UTF-8 strings (Issue #5509)
 - Non-Kerberized printing to Windows via IPP was broken (Issue #5515)
+- Added a USB quirks rule for the DYMO 450 Turbo (Issue #5521)
 - Added a USB quirks rule for Xerox printers (Issue #5523)
 - The scheduler's self-signed certificate did not include all of the alternate
   names for the server when using GNU TLS (Issue #5525)
