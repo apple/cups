@@ -6,6 +6,17 @@ Documentation=man:cupsd(8)
 ExecStart=@sbindir@/cupsd -l
 Type=simple
 Restart=on-failure
+CapabilityBoundingSet=CAP_AUDIT_WRITE CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER CAP_FSETID CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+PrivateTmp=true
+PrivateDevices=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+ReadWritePaths=@CUPS_SERVERROOT@ @CUPS_LOGDIR@ @CUPS_STATEDIR@ @CUPS_CACHEDIR@ @CUPS_REQUESTS@
 
 [Install]
 Also=org.cups.cupsd.socket org.cups.cupsd.path
