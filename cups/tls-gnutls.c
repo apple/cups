@@ -398,8 +398,8 @@ httpCredentialsAreValidForName(
 
     if (result)
     {
-      int		i,		/* Looping var */
-			count;		/* Number of revoked certificates */
+      gnutls_x509_crl_iter_t iter = NULL;
+					/* Iterator */
       unsigned char	cserial[1024],	/* Certificate serial number */
 			rserial[1024];	/* Revoked serial number */
       size_t		cserial_size,	/* Size of cert serial number */
@@ -407,22 +407,24 @@ httpCredentialsAreValidForName(
 
       _cupsMutexLock(&tls_mutex);
 
-      count = gnutls_x509_crl_get_crt_count(tls_crl);
-
-      if (count > 0)
+      if (gnutls_x509_crl_get_crt_count(tls_crl) > 0)
       {
         cserial_size = sizeof(cserial);
         gnutls_x509_crt_get_serial(cert, cserial, &cserial_size);
 
-        for (i = 0; i < count; i ++)
-	{
-	  rserial_size = sizeof(rserial);
-          if (!gnutls_x509_crl_get_crt_serial(tls_crl, (unsigned)i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+	rserial_size = sizeof(rserial);
+
+        while (!gnutls_x509_crl_iter_crt_serial(tls_crl, &iter, rserial, &rserial_size, NULL))
+        {
+          if (cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
 	  {
 	    result = 0;
 	    break;
 	  }
+
+	  rserial_size = sizeof(rserial);
 	}
+	gnutls_x509_crl_iter_deinit(iter);
       }
 
       _cupsMutexUnlock(&tls_mutex);
