@@ -16,7 +16,7 @@ matrix:
       sudo: required
       before_install:
         - sudo apt-get update
-        - sudo apt-get install -y libavahi-client-dev libgnutls28-dev libkrb5-dev libnss-mdns libpam-dev libsystemd-dev libusb-1.0-0-dev zlib1g-dev
+        - sudo apt-get install -y libavahi-client-dev libgnutls28-dev libkrb5-dev libnss-mdns libpam0g-dev libsystemd-dev libusb-1.0-0-dev zlib1g-dev
 
     # macOS-specific build stuff
     - os: osx
