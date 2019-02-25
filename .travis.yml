@@ -12,7 +12,7 @@ language: c
 matrix:
   include:
     # Linux-specific build stuff
-    - dist: trusty
+    - dist: xenial
       sudo: required
       before_install:
         - sudo apt-get update
