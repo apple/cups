@@ -398,8 +398,8 @@ httpCredentialsAreValidForName(
 
     if (result)
     {
-      int		i,		/* Looping var */
-			count;		/* Number of revoked certificates */
+      int		i;		/* Looping var */
+      int		count;		/* Number of revoked certificates */
       unsigned char	cserial[1024],	/* Certificate serial number */
 			rserial[1024];	/* Revoked serial number */
       size_t		cserial_size,	/* Size of cert serial number */
@@ -417,7 +417,7 @@ httpCredentialsAreValidForName(
         for (i = 0; i < count; i ++)
 	{
 	  rserial_size = sizeof(rserial);
-          if (!gnutls_x509_crl_get_crt_serial(tls_crl, (unsigned)i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
+          if (!gnutls_x509_crl_get_crt_serial(tls_crl, i, rserial, &rserial_size, NULL) && cserial_size == rserial_size && !memcmp(cserial, rserial, rserial_size))
 	  {
 	    result = 0;
 	    break;
