@@ -1,7 +1,7 @@
 //
 // Array class for the CUPS PPD Compiler.
 //
-// Copyright 2007-2014 by Apple Inc.
+// Copyright 2007-2019 by Apple Inc.
 // Copyright 2002-2005 by Easy Software Products.
 //
 // These coded instructions, statements, and computer programs are the
@@ -64,7 +64,7 @@ ppdcArray::~ppdcArray()
 {
   PPDC_DELETE;
 
-  for (int i = 0; i < count; i ++)
+  for (size_t i = 0; i < count; i ++)
     data[i]->release();
 
   if (alloc)
@@ -134,7 +134,7 @@ ppdcArray::next()
 void
 ppdcArray::remove(ppdcShared *d)		// I - Data element
 {
-  int	i;					// Looping var
+  size_t	i;				// Looping var
 
 
   for (i = 0; i < count; i ++)

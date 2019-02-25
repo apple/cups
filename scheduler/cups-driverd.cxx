@@ -5,8 +5,8 @@
  * created from driver information files, and dynamically generated PPD files
  * using driver helper programs.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright Â 2007-2019 by Apple Inc.
+ * Copyright Â 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -369,8 +369,7 @@ cat_drv(const char *name,		/* I - PPD name */
     ppdcCatalog	*catalog;		// Message catalog in .drv file
 
 
-    fprintf(stderr, "DEBUG2: [cups-driverd] %d locales defined in \"%s\"...\n",
-            src->po_files->count, filename);
+    fprintf(stderr, "DEBUG2: [cups-driverd] %u locales defined in \"%s\"...\n", (unsigned)src->po_files->count, filename);
 
     locales = new ppdcArray();
     for (catalog = (ppdcCatalog *)src->po_files->first();
