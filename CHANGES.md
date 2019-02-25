@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-02-21
+CHANGES - 2.3b8 - 2019-02-25
 ============================
 
 
@@ -31,6 +31,7 @@ Changes in CUPS v2.3b8
 - Added a USB quirks rule for Xerox printers (Issue #5523)
 - The scheduler's self-signed certificate did not include all of the alternate
   names for the server when using GNU TLS (Issue #5525)
+- Fixed a compiler warning with newer versions of GCC (Issue #5533)
 - Localization updates (Issue #5461, Issues #5471, Issue #5481, Issue #5486,
   Issue #5489, Issue #5491, Issue #5492, Issue #5493, Issue #5494, Issue #5495,
   Issue #5497, Issue #5499, Issue #5500, Issue #5501, Issue #5504)

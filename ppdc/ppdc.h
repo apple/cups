@@ -1,7 +1,7 @@
 //
 // Definitions for the CUPS PPD Compiler.
 //
-// Copyright 2007-2009 by Apple Inc.
+// Copyright 2007-2019 by Apple Inc.
 // Copyright 2002-2007 by Easy Software Products.
 //
 // Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -105,7 +105,7 @@ class ppdcArray				//// Shared Array
 {
   public:
 
-  int		count,			// Number of elements
+  size_t	count,			// Number of elements
 		alloc,			// Allocated elements
 		current;		// Current element
   ppdcShared	**data;			// Elements
