@@ -2957,12 +2957,12 @@ _ppdCacheWriteFile(
   if (pc->charge_info_uri)
     cupsFilePutConf(fp, "ChargeInfoURI", pc->charge_info_uri);
 
-  cupsFilePrintf(fp, "AccountId %s\n", pc->account_id ? "true" : "false");
-  cupsFilePrintf(fp, "AccountingUserId %s\n",
+  cupsFilePrintf(fp, "JobAccountId %s\n", pc->account_id ? "true" : "false");
+  cupsFilePrintf(fp, "JobAccountingUserId %s\n",
                  pc->accounting_user_id ? "true" : "false");
 
   if (pc->password)
-    cupsFilePutConf(fp, "Password", pc->password);
+    cupsFilePutConf(fp, "JobPassword", pc->password);
 
   for (value = (char *)cupsArrayFirst(pc->mandatory);
        value;
@@ -3157,6 +3157,16 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   }
 
  /*
+  * Accounting...
+  */
+
+  if (ippGetBoolean(ippFindAttribute(response, "job-account-id-supported", IPP_TAG_BOOLEAN), 0))
+    cupsFilePuts(fp, "*cupsJobAccountId: True\n");
+
+  if (ippGetBoolean(ippFindAttribute(response, "job-accounting-user-id-supported", IPP_TAG_BOOLEAN), 0))
+    cupsFilePuts(fp, "*cupsJobAccountingUserId: True\n");
+
+ /*
   * Password/PIN printing...
   */
 
@@ -3188,7 +3198,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     pattern[maxlen] = '\0';
 
-    cupsFilePrintf(fp, "*cupsPassword: \"%s\"\n", pattern);
+    cupsFilePrintf(fp, "*cupsJobPassword: \"%s\"\n", pattern);
   }
 
  /*
