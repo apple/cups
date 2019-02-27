@@ -904,7 +904,7 @@ _ppdCacheCreateWithFile(
       pc->account_id = !_cups_strcasecmp(value, "true");
     else if (!_cups_strcasecmp(line, "JobAccountingUserId"))
       pc->accounting_user_id = !_cups_strcasecmp(value, "true");
-    else if (!_cups_strcasecmp(line, "JobPassword"))
+    else if (!_cups_strcasecmp(line, "cupsJobPassword"))
       pc->password = strdup(value);
     else if (!_cups_strcasecmp(line, "Mandatory"))
     {
@@ -3188,7 +3188,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
     pattern[maxlen] = '\0';
 
-    cupsFilePrintf(fp, "*cupsPassword: \"%s\"\n", pattern);
+    cupsFilePrintf(fp, "*cupsJobPassword: \"%s\"\n", pattern);
   }
 
  /*
