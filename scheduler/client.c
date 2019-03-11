@@ -951,8 +951,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       }
 
       httpClearFields(con->http);
-      httpSetField(con->http, HTTP_FIELD_ALLOW,
-		   "GET, HEAD, OPTIONS, POST, PUT");
       httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
 
       if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
