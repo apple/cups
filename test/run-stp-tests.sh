@@ -3,7 +3,7 @@
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -479,6 +479,14 @@ else
 	encryption=""
 fi
 
+if test $testtype = 0; then
+	jobhistory="30m"
+	jobfiles="5m"
+else
+	jobhistory="30"
+	jobfiles="Off"
+fi
+
 cat >$BASE/cupsd.conf <<EOF
 StrictConformance Yes
 Browsing Off
@@ -489,8 +497,8 @@ MaxLogSize 0
 AccessLogLevel actions
 LogLevel $loglevel
 LogTimeFormat usecs
-PreserveJobHistory Yes
-PreserveJobFiles 5m
+PreserveJobHistory $jobhistory
+PreserveJobFiles $jobfiles
 <Policy default>
 <Limit All>
 Order Allow,Deny
@@ -812,11 +820,69 @@ else
 	echo PASS
 fi
 
-echo "    </pre>" >>$strfile
+
+#
+# Perform job history test...
+#
+
+echo $ac_n "Starting history test: $ac_c"
+echo "" >>$strfile
+echo "`date '+[%d/%b/%Y:%H:%M:%S %z]'` \"5.11-history\":" >>$strfile
+
+echo "    lp -d Test1 testfile.jpg" >>$strfile
+
+$runcups ../systemv/lp -d Test1 testfile.jpg 2>&1 >>$strfile
+if test $? != 0; then
+	echo "FAIL (unable to queue test job)"
+	echo "    FAILED" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS"
+	echo "    PASSED" >>$strfile
+
+	./waitjobs.sh >>$strfile
+
+        echo $ac_n "Verifying that history still exists: $ac_c"
+
+	echo "    ls -l $BASE/spool" >>$strfile
+	count=`ls -1 $BASE/spool | wc -l`
+	if test $count = 1; then
+		echo "FAIL"
+		echo "    FAILED (job control files not present)" >>$strfile
+		ls -l $BASE/spool >>$strfile
+		fail=`expr $fail + 1`
+	else
+		echo "PASS"
+		echo "    PASSED" >>$strfile
+
+		echo $ac_n "Waiting for job history to expire: $ac_c"
+		echo "" >>$strfile
+		echo "    sleep 35" >>$strfile
+		sleep 35
+
+		echo "    lpstat" >>$strfile
+		$runcups ../systemv/lpstat 2>&1 >>$strfile
+
+		echo "    ls -l $BASE/spool" >>$strfile
+		count=`ls -1 $BASE/spool | wc -l`
+		if test $count != 1; then
+			echo "FAIL"
+			echo "    FAILED (job control files still present)" >>$strfile
+			ls -l $BASE/spool >>$strfile
+			fail=`expr $fail + 1`
+		else
+			echo "PASS"
+			echo "    PASSED" >>$strfile
+		fi
+	fi
+fi
+
 
 #
 # Stop the server...
 #
+
+echo "    </pre>" >>$strfile
 
 kill $cupsd
 wait $cupsd
