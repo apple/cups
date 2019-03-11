@@ -1,4 +1,4 @@
-CHANGES - 2.2.11 - 2019-02-27
+CHANGES - 2.2.11 - 2019-03-11
 =============================
 
 
@@ -30,6 +30,7 @@ Changes in CUPS v2.2.11
 - Fixed compiler warnings with newer versions of GCC (Issue #5532, Issue #5533)
 - Fixed some PPD caching and IPP Everywhere PPD accounting/password bugs
   (Issue #5535)
+- Fixed `PreserveJobHistory` bug with time values (Issue #5538)
 - Media size matching now uses a tolerance of 0.5mm (rdar://33822024)
 - The lpadmin command would hang with a bad PPD file (rdar://41495016)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
