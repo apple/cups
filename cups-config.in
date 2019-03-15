@@ -2,7 +2,7 @@
 #
 # CUPS configuration utility.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 2001-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -18,7 +18,6 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 includedir=@includedir@
 libdir=@libdir@
-imagelibdir=@libdir@
 datarootdir=@datadir@
 datadir=@datadir@
 sysconfdir=@sysconfdir@
@@ -37,9 +36,8 @@ selfdir=`dirname $0`
 
 if test -f "$selfdir/cups/cups.h"; then
     CFLAGS="-I$selfdir"
-    LDFLAGS="-L$selfdir/cups -L$selfdir/filter $LDFLAGS"
+    LDFLAGS="-L$selfdir/cups $LDFLAGS"
     libdir="$selfdir/cups"
-    imagelibdir="$selfdir/filter"
 else
     if test $includedir != /usr/include; then
 	CFLAGS="$CFLAGS -I$includedir"
@@ -93,7 +91,7 @@ while test $# -gt 0; do
 	    usage 0
 	    ;;
 	--image)
-	    image=yes
+	    # Do nothing
 	    ;;
 	--ldflags)
 	    echo $LDFLAGS
@@ -101,14 +99,8 @@ while test $# -gt 0; do
 	--libs)
 	    if test $static = no; then
 	        libs="@EXTLINKCUPS@ $LIBS";
- 	        if test $image = yes; then
- 	            libs="@EXTLINKCUPSIMAGE@ $libs"
-		fi
 	    else
 	        libs="$libdir/libcups.a $LIBS";
- 	        if test $image = yes; then
- 	            libs="$libdir/libcupsimage.a $libs"
-		fi
 	    fi
 	    echo $libs
 	    ;;
