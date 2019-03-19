@@ -1,7 +1,7 @@
 #
 # IPP test makefile for CUPS.
 #
-# Copyright 2007-2017 by Apple Inc.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -179,12 +179,12 @@ local:	ippserver ippserver-shared ipptool-static
 
 ippfind:	ippfind.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ ippfind.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippfind.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 ippfind-static:	ippfind.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@
-	$(LD_CC) $(LDFLAGS) -o $@ ippfind.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippfind.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -195,7 +195,7 @@ ippfind-static:	ippfind.o ../cups/$(LIBCUPSSTATIC)
 
 ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -206,7 +206,7 @@ ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
 
 ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ ippserver.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippserver.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -216,7 +216,7 @@ ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
 
 ipptool:	ipptool.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ ipptool.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ipptool.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -226,7 +226,7 @@ ipptool:	ipptool.o ../cups/$(LIBCUPS)
 
 ipptool-static:	ipptool.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 

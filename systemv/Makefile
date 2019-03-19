@@ -1,7 +1,7 @@
 #
 # System V commands makefile for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -151,7 +151,7 @@ uninstall:
 
 cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cancel cancel.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -161,7 +161,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	for file in accept cupsenable cupsdisable cupsreject reject; do \
 		$(RM) $$file; \
@@ -175,7 +175,7 @@ cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 
 cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsctl cupsctl.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -185,12 +185,12 @@ cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 
 cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../cups/libcupsimage.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ cupstestppd.o ../cups/libcupsimage.a \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ cupstestppd.o ../cups/libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -201,7 +201,7 @@ cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../cups/libcupsimage.
 
 lp:	lp.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lp lp.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lp lp.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -211,7 +211,7 @@ lp:	lp.o ../cups/$(LIBCUPS)
 
 lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpadmin lpadmin.o $(LIBZ) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -221,7 +221,7 @@ lpadmin:	lpadmin.o ../cups/$(LIBCUPS)
 
 lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpinfo lpinfo.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -231,7 +231,7 @@ lpinfo:	lpinfo.o ../cups/$(LIBCUPS)
 
 lpmove:	lpmove.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lpmove lpmove.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpmove lpmove.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -241,7 +241,7 @@ lpmove:	lpmove.o ../cups/$(LIBCUPS)
 
 lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpoptions lpoptions.o $(LIBZ) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -251,7 +251,7 @@ lpoptions:	lpoptions.o ../cups/$(LIBCUPS)
 
 lpstat:	lpstat.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o lpstat lpstat.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpstat lpstat.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

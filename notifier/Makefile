@@ -1,7 +1,7 @@
 #
 # Notifier makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
+# Copyright 2007-2019 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -119,7 +119,7 @@ depend:
 
 dbus:	dbus.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -129,7 +129,7 @@ dbus:	dbus.o ../cups/$(LIBCUPS)
 
 mailto:	mailto.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o mailto mailto.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o mailto mailto.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -139,7 +139,7 @@ mailto:	mailto.o ../cups/$(LIBCUPS)
 
 rss:	rss.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o rss rss.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o rss rss.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -149,7 +149,7 @@ rss:	rss.o ../cups/$(LIBCUPS)
 
 testnotify:	testnotify.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o testnotify testnotify.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o testnotify testnotify.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

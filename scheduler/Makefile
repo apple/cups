@@ -1,7 +1,7 @@
 #
 # Scheduler Makefile for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -314,7 +314,7 @@ uninstall:
 
 cupsd:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libcupsmime.a \
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsd $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) \
                 $(DNSSDLIBS) $(LIBS) $(LIBGSSAPI) $(LIBWRAP)
@@ -322,7 +322,7 @@ cupsd:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPS)
 
 cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) $(DNSSDLIBS) \
@@ -336,14 +336,14 @@ cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 
 cupsfilter:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsfilter cupsfilter.o libcupsmime.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsfilter cupsfilter.o libcupsmime.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) convert
 	$(LN) cupsfilter convert
 
 cupsfilter-static:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cupsfilter-static cupsfilter.o libcupsmime.a \
+	$(LD_CC) $(ALL_LDFLAGS) -o cupsfilter-static cupsfilter.o libcupsmime.a \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
 		$(DNSSDLIBS) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -355,7 +355,7 @@ cupsfilter-static:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 
 cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cups-deviced cups-deviced.o util.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cups-deviced cups-deviced.o util.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -365,7 +365,7 @@ cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
 
 cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/libcupsppdc.a
 	echo Linking $@...
-	$(LD_CXX) $(LDFLAGS) -o cups-driverd cups-driverd.o util.o \
+	$(LD_CXX) $(ALL_LDFLAGS) -o cups-driverd cups-driverd.o util.o \
 		../ppdc/libcupsppdc.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -376,7 +376,7 @@ cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/libcupsppdc.a
 
 cups-exec:	cups-exec.o
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cups-exec cups-exec.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cups-exec cups-exec.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -386,7 +386,7 @@ cups-exec:	cups-exec.o
 
 cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o cups-lpd cups-lpd.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o cups-lpd cups-lpd.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -407,7 +407,7 @@ libcupsmime.a:	$(LIBOBJS)
 
 testlpd:	testlpd.o ../cups/$(LIBCUPSSTATIC) cups-lpd
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o testlpd testlpd.o ../cups/$(LIBCUPSSTATIC) \
 		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
@@ -417,7 +417,7 @@ testlpd:	testlpd.o ../cups/$(LIBCUPSSTATIC) cups-lpd
 
 testmime:	testmime.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testmime.o libcupsmime.a \
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testmime.o libcupsmime.a \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
 		$(DNSSDLIBS) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -431,7 +431,7 @@ testmime:	testmime.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 
 testspeed:	testspeed.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o testspeed testspeed.o ../cups/$(LIBCUPSSTATIC) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -442,7 +442,7 @@ testspeed:	testspeed.o ../cups/$(LIBCUPSSTATIC)
 
 testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o testsub testsub.o ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o testsub testsub.o ../cups/$(LIBCUPSSTATIC) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 

@@ -1,7 +1,7 @@
 #
 # CGI makefile for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2006 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -158,7 +158,7 @@ libcupscgi.a:	$(LIBOBJS)
 
 admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ admin.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ admin.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -168,7 +168,7 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ classes.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ classes.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -178,7 +178,7 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ help.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ help.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -188,7 +188,7 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ jobs.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ jobs.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -198,7 +198,7 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ printers.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ printers.o libcupscgi.a $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -208,7 +208,7 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a \
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testcgi.o libcupscgi.a \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -222,7 +222,7 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 
 testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhi.o libcupscgi.a \
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testhi.o libcupscgi.a \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -236,7 +236,7 @@ testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 
 testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
 		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 

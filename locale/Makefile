@@ -1,7 +1,7 @@
 #
 # Locale file makefile for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1993-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -159,7 +159,7 @@ cups.strings: cups_en.po po2strings
 
 checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o checkpo checkpo.o \
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o checkpo checkpo.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -177,7 +177,7 @@ checkall:	checkpo
 
 po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o po2strings po2strings.o \
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o po2strings po2strings.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
@@ -192,7 +192,7 @@ po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 
 strings2po:	strings2po.o
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(LDFLAGS) -o strings2po strings2po.o
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o strings2po strings2po.o
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

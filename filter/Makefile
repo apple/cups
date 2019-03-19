@@ -158,7 +158,7 @@ apihelp:
 
 commandtops:	commandtops.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ commandtops.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ commandtops.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -168,7 +168,7 @@ commandtops:	commandtops.o ../cups/$(LIBCUPS)
 
 gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ gziptoany.o $(LIBZ) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -178,7 +178,7 @@ gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ pstops.o common.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -188,7 +188,7 @@ pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 
 rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rastertoepson.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -198,7 +198,7 @@ rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 
 rastertohp:	rastertohp.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -208,7 +208,7 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 
 rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -218,12 +218,12 @@ rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 
 rastertopwg:	rastertopwg.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rastertopwg.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 rastertopwg-static:	rastertopwg.o ../cups/$(LIBCUPSSTATIC) ../cups/libcupsimage.a
 	echo Linking $@...
-	$(LD_CC) $(LDFLAGS) -o $@ rastertopwg.o ../cups/libcupsimage.a \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rastertopwg.o ../cups/libcupsimage.a \
 		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
