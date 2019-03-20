@@ -8,19 +8,12 @@
  */
 
 /*
- * Disable deprecated stuff so we can verify that the public API is sufficient
- * to implement a server.
- */
-
-#define _CUPS_NO_DEPRECATED 1		/* Disable deprecated stuff */
-
-
-/*
  * Include necessary headers...
  */
 
 #include <config.h>			/* CUPS configuration header */
 #include <cups/cups.h>			/* Public API */
+#include <cups/ppd.h>			/* PPD API */
 #include <cups/string-private.h>	/* CUPS string functions */
 #include <cups/thread-private.h>	/* For multithreading functions */
 #include <stdio.h>
@@ -370,11 +363,9 @@ static ipp_t		*create_media_col(const char *media, const char *source, const cha
 static ipp_t		*create_media_size(int width, int length);
 static ippeve_printer_t	*create_printer(const char *servername,
 			                const char *name, const char *location,
-			                const char *make, const char *model,
-					const char *icon,
-					const char *docformats, int ppm,
-					int ppm_color, int duplex, int port,
-					int pin, const char *subtype,
+			                const char *icon,
+			                const char *docformats, int port,
+					const char *subtype,
 					const char *directory,
 					const char *command,
 					const char *attrfile);
@@ -419,6 +410,8 @@ static void		ipp_send_document(ippeve_client_t *client);
 static void		ipp_send_uri(ippeve_client_t *client);
 static void		ipp_validate_job(ippeve_client_t *client);
 static void		load_attributes(const char *filename, ipp_t *attrs);
+static char		*make_ppd_attributes(const char *ppdfile, char *buffer, size_t bufsize);
+static char		*make_std_attributes(const char *make, const char *model, int ppm, int ppm_color, int duplex, char *buffer, size_t bufsize);
 static int		parse_options(ippeve_client_t *client, cups_option_t **options);
 static void		process_attr_message(ippeve_job_t *job, char *message);
 static void		*process_client(ippeve_client_t *client);
@@ -1270,20 +1263,14 @@ create_media_size(int width,		/* I - x-dimension in 2540ths */
  *                      printer object.
  */
 
-static ippeve_printer_t *			/* O - Printer */
+static ippeve_printer_t *		/* O - Printer */
 create_printer(const char *servername,	/* I - Server hostname (NULL for default) */
                const char *name,	/* I - printer-name */
 	       const char *location,	/* I - printer-location */
-	       const char *make,	/* I - printer-make-and-model */
-	       const char *model,	/* I - printer-make-and-model */
 	       const char *icon,	/* I - printer-icons */
 	       const char *docformats,	/* I - document-format-supported */
-	       int        ppm,		/* I - Pages per minute in grayscale */
-	       int        ppm_color,	/* I - Pages per minute in color (0 for gray) */
-	       int        duplex,	/* I - 1 = duplex, 0 = simplex */
 	       int        port,		/* I - Port for listeners or 0 for auto */
-	       int        pin,		/* I - Require PIN printing */
-	       const char *subtype,	/* I - Bonjour service subtype */
+	       const char *subtype,	/* I - Bonjour service subtype(s) */
 	       const char *directory,	/* I - Spool directory */
 	       const char *command,	/* I - Command to run on job files */
 	       const char *attrfile)	/* I - Attributes file */
@@ -5075,6 +5062,36 @@ load_attributes(const char *filename,	/* I - File to load */
 
 
 /*
+ * 'make_ppd_attributes()' - Make a temporary IPP attributes file from a PPD.
+ */
+
+static char *				/* O - Temporary filename or `NULL` */
+make_ppd_attributes(const char *ppdfile,/* I - PPD filename */
+                    char       *buffer,	/* I - Temporary filename buffer */
+                    size_t     bufsize)	/* I - Size of buffer */
+{
+}
+
+
+/*
+ * 'make_std_attributes()' - Make a temporary IPP attributes file from the old
+ *                           ippserver options.
+ */
+
+static char *				/* O - Temporary filename or `NULL` */
+make_std_attributes(
+    const char *make,			/* I - Manufacturer name */
+    const char *model,			/* I - Model name */
+    int        ppm,			/* I - pages-per-minute */
+    int        ppm_color,		/* I - pages-per-minute-color */
+    int        duplex,			/* I - Duplex support? */
+    char       *buffer,			/* I - Temporary filename buffer */
+    size_t     bufsize)			/* I - Size of buffer */
+{
+}
+
+
+/*
  * 'parse_options()' - Parse URL options into CUPS options.
  *
  * The client->options string is destroyed by this function.
@@ -6318,7 +6335,7 @@ process_state_message(
   * "+keyword[,keyword,...]" to add keywords.
   *
   * Keywords may or may not have a suffix (-report, -warning, -error) per
-  * RFC 2911.
+  * RFC 8011.
   */
 
   if (*message == '-')
