@@ -1,10 +1,11 @@
 #
 # Documentation makefile for CUPS.
 #
-# Copyright 2007-2018 by Apple Inc.
-# Copyright 1997-2007 by Easy Software Products.
+# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 1997-2007 by Easy Software Products.
 #
-# Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+#s information.
 #
 
 include ../Makedefs
@@ -69,6 +70,7 @@ HELPFILES	=	\
 			help/man-cupsenable.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
+			help/man-ippeveprinter.html \
 			help/man-ipptool.html \
 			help/man-ipptoolfile.html \
 			help/man-lp.html \
@@ -166,6 +168,9 @@ install-data: $(INSTALL_LANGUAGES)
 	for file in $(HELPFILES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
+	if test "x$(IPPFIND_MAN)" != x; then \
+		$(INSTALL_MAN) man-ippfind.html $(DOCDIR)/help; \
+	done
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
 	for file in $(WEBIMAGES) $(HELPIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
@@ -213,10 +218,13 @@ uninstall: $(UNINSTALL_LANGUAGES)
 		$(RM) $(DOCDIR)/$$file; \
 	done
 	for file in $(HELPFILES); do \
-		$(RM) $(DOCDIR)/$$file; \
+		$(RM) $(DOCDIR)/help/$$file; \
+	done
+	if test "x$(IPPFIND_MAN)" != x; then \
+		$(RM) $(DOCDIR)/help/man-ippfind.html; \
 	done
 	for file in $(WEBIMAGES); do \
-		$(RM) $(DOCDIR)/$$file; \
+		$(RM) $(DOCDIR)/images/$$file; \
 	done
 	-$(RMDIR) $(DOCDIR)/images
 	-$(RMDIR) $(DOCDIR)/help

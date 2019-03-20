@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-03-11
+CHANGES - 2.3b8 - 2019-03-20
 ============================
 
 
@@ -40,6 +40,7 @@ Changes in CUPS v2.3b8
   Issue #5489, Issue #5491, Issue #5492, Issue #5493, Issue #5494, Issue #5495,
   Issue #5497, Issue #5499, Issue #5500, Issue #5501, Issue #5504)
 - The scheduler did not always idle exit as quickly as it could.
+- Added a new `ippeveprinter` command based on the old ippserver sample code.
 
 
 Changes in CUPS v2.3b7

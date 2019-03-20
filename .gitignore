@@ -154,10 +154,10 @@ templates/header.tmpl
 templates/*/header.tmpl
 test/cups-str-*.html
 test/*_log-*
+test/ippeveprinter
+test/ippeveprinter-static
 test/ippfind
 test/ippfind-static
-test/ippserver
-test/ippserver-shared
 test/ipptool
 test/ipptool-static
 test/pwg-raster-samples-*

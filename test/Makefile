@@ -47,12 +47,12 @@ TESTFILES	=	\
 			print-job-gzip.test \
 			validate-job.test
 OBJS		=	\
+			ippeveprinter.o \
 			ippfind.o \
-			ippserver.o \
 			ipptool.o
 TARGETS		=	\
+			ippeveprinter \
 			$(IPPFIND_BIN) \
-			ippserver \
 			ipptool \
 			$(LOCALTARGET)
 
@@ -84,7 +84,7 @@ unittests:
 
 clean:
 	$(RM) $(TARGETS) $(OBJS)
-	$(RM) ippfind-static ippserver ippserver-shared ipptool-static
+	$(RM) ippeveprinter-static ippfind-static ipptool-static
 
 
 #
@@ -124,14 +124,19 @@ install-data:
 install-exec:
 	echo Installing ipptool in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
-	$(INSTALL_BIN) ipptool $(BINDIR)
+	$(INSTALL_BIN) ippeveprinter $(BINDIR)
 	if test -x ippfind; then \
 		$(INSTALL_BIN) ippfind $(BINDIR); \
 	fi
+	$(INSTALL_BIN) ipptool $(BINDIR)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		cp ippfind $(SYMROOT); \
-		dsymutil $(SYMROOT)/ippfind; \
+		cp ippeveprinter $(SYMROOT); \
+		dsymutil $(SYMROOT)/ippeveprinter; \
+		if test -x ippfind; then \
+			cp ippfind $(SYMROOT); \
+			dsymutil $(SYMROOT)/ippfind; \
+		fi; \
 		cp ipptool $(SYMROOT); \
 		dsymutil $(SYMROOT)/ipptool; \
 	fi
@@ -157,6 +162,10 @@ install-libs:
 
 uninstall:
 	echo Uninstalling sample ipptool files from $(DATADIR)/ipptool...
+	for file in ippeveprinter ippfind ipptool; do \
+		$(RM) $(BINDIR)/$$file; \
+	done
+	-$(RMDIR) $(BINDIR)
 	for file in $(DATAFILES); do \
 		$(RM) $(DATADIR)/ipptool/$$file; \
 	done
@@ -170,7 +179,28 @@ uninstall:
 # Local programs (not built when cross-compiling...)
 #
 
-local:	ippserver ippserver-shared ipptool-static
+local:	ippeveprinter-static ipptool-static
+
+
+#
+# ippeveprinter
+#
+
+ippeveprinter:	ippeveprinter.o ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+
+
+#
+# ippeveprinter-static
+#
+
+ippeveprinter-static:	ippeveprinter.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
 #
@@ -182,31 +212,15 @@ ippfind:	ippfind.o ../cups/$(LIBCUPS)
 	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippfind.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
+
+#
+# ippfind-static
+#
+
 ippfind-static:	ippfind.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@
 	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippfind.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-
-
-#
-# ippserver
-#
-
-ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
-	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
-	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
-
-
-#
-# ippserver-shared
-#
-
-ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippserver.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

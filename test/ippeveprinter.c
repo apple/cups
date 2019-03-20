@@ -1,7 +1,7 @@
 /*
- * Sample IPP Everywhere server for CUPS.
+ * IPP Everywhere printer application for CUPS.
  *
- * Copyright © 2010-2018 by Apple Inc.
+ * Copyright © 2010-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -73,34 +73,34 @@ extern char **environ;
  * Constants...
  */
 
-enum _ipp_preason_e			/* printer-state-reasons bit values */
+enum ippeve_preason_e			/* printer-state-reasons bit values */
 {
-  _IPP_PREASON_NONE = 0x0000,		/* none */
-  _IPP_PREASON_OTHER = 0x0001,		/* other */
-  _IPP_PREASON_COVER_OPEN = 0x0002,	/* cover-open */
-  _IPP_PREASON_INPUT_TRAY_MISSING = 0x0004,
+  IPPEVE_PREASON_NONE = 0x0000,		/* none */
+  IPPEVE_PREASON_OTHER = 0x0001,		/* other */
+  IPPEVE_PREASON_COVER_OPEN = 0x0002,	/* cover-open */
+  IPPEVE_PREASON_INPUT_TRAY_MISSING = 0x0004,
 					/* input-tray-missing */
-  _IPP_PREASON_MARKER_SUPPLY_EMPTY = 0x0008,
+  IPPEVE_PREASON_MARKER_SUPPLY_EMPTY = 0x0008,
 					/* marker-supply-empty */
-  _IPP_PREASON_MARKER_SUPPLY_LOW = 0x0010,
+  IPPEVE_PREASON_MARKER_SUPPLY_LOW = 0x0010,
 					/* marker-supply-low */
-  _IPP_PREASON_MARKER_WASTE_ALMOST_FULL = 0x0020,
+  IPPEVE_PREASON_MARKER_WASTE_ALMOST_FULL = 0x0020,
 					/* marker-waste-almost-full */
-  _IPP_PREASON_MARKER_WASTE_FULL = 0x0040,
+  IPPEVE_PREASON_MARKER_WASTE_FULL = 0x0040,
 					/* marker-waste-full */
-  _IPP_PREASON_MEDIA_EMPTY = 0x0080,	/* media-empty */
-  _IPP_PREASON_MEDIA_JAM = 0x0100,	/* media-jam */
-  _IPP_PREASON_MEDIA_LOW = 0x0200,	/* media-low */
-  _IPP_PREASON_MEDIA_NEEDED = 0x0400,	/* media-needed */
-  _IPP_PREASON_MOVING_TO_PAUSED = 0x0800,
+  IPPEVE_PREASON_MEDIA_EMPTY = 0x0080,	/* media-empty */
+  IPPEVE_PREASON_MEDIA_JAM = 0x0100,	/* media-jam */
+  IPPEVE_PREASON_MEDIA_LOW = 0x0200,	/* media-low */
+  IPPEVE_PREASON_MEDIA_NEEDED = 0x0400,	/* media-needed */
+  IPPEVE_PREASON_MOVING_TO_PAUSED = 0x0800,
 					/* moving-to-paused */
-  _IPP_PREASON_PAUSED = 0x1000,		/* paused */
-  _IPP_PREASON_SPOOL_AREA_FULL = 0x2000,/* spool-area-full */
-  _IPP_PREASON_TONER_EMPTY = 0x4000,	/* toner-empty */
-  _IPP_PREASON_TONER_LOW = 0x8000	/* toner-low */
+  IPPEVE_PREASON_PAUSED = 0x1000,		/* paused */
+  IPPEVE_PREASON_SPOOL_AREA_FULL = 0x2000,/* spool-area-full */
+  IPPEVE_PREASON_TONER_EMPTY = 0x4000,	/* toner-empty */
+  IPPEVE_PREASON_TONER_LOW = 0x8000	/* toner-low */
 };
-typedef unsigned int _ipp_preason_t;	/* Bitfield for printer-state-reasons */
-static const char * const _ipp_preason_strings[] =
+typedef unsigned int ippeve_preason_t;	/* Bitfield for printer-state-reasons */
+static const char * const ippeve_preason_strings[] =
 {					/* Strings for each bit */
   /* "none" is implied for no bits set */
   "other",
@@ -121,28 +121,28 @@ static const char * const _ipp_preason_strings[] =
   "toner-low"
 };
 
-typedef enum _ipp_media_class_e
+typedef enum ippeve_media_class_e
 {
-  _IPP_GENERAL,				/* General-purpose size */
-  _IPP_PHOTO_ONLY,			/* Photo-only size */
-  _IPP_ENV_ONLY				/* Envelope-only size */
-} _ipp_media_class_t;
+  IPPEVE_GENERAL,				/* General-purpose size */
+  IPPEVE_PHOTO_ONLY,			/* Photo-only size */
+  IPPEVE_ENV_ONLY				/* Envelope-only size */
+} ippeve_media_class_t;
 
-typedef enum _ipp_media_size_e
+typedef enum ippeve_media_size_e
 {
-  _IPP_MEDIA_SIZE_NONE = -1,
-  _IPP_MEDIA_SIZE_A4,
-  _IPP_MEDIA_SIZE_A5,
-  _IPP_MEDIA_SIZE_A6,
-  _IPP_MEDIA_SIZE_DL,
-  _IPP_MEDIA_SIZE_LEGAL,
-  _IPP_MEDIA_SIZE_LETTER,
-  _IPP_MEDIA_SIZE_COM10,
-  _IPP_MEDIA_SIZE_3x5,
-  _IPP_MEDIA_SIZE_L,
-  _IPP_MEDIA_SIZE_4x6,
-  _IPP_MEDIA_SIZE_5x7
-} _ipp_media_size_t;
+  IPPEVE_MEDIA_SIZE_NONE = -1,
+  IPPEVE_MEDIA_SIZE_A4,
+  IPPEVE_MEDIA_SIZE_A5,
+  IPPEVE_MEDIA_SIZE_A6,
+  IPPEVE_MEDIA_SIZE_DL,
+  IPPEVE_MEDIA_SIZE_LEGAL,
+  IPPEVE_MEDIA_SIZE_LETTER,
+  IPPEVE_MEDIA_SIZE_COM10,
+  IPPEVE_MEDIA_SIZE_3x5,
+  IPPEVE_MEDIA_SIZE_L,
+  IPPEVE_MEDIA_SIZE_4x6,
+  IPPEVE_MEDIA_SIZE_5x7
+} ippeve_media_size_t;
 static const char * const media_supported[] =
 {					/* media-supported values */
   "iso_a4_210x297mm",			/* A4 */
@@ -159,28 +159,28 @@ static const char * const media_supported[] =
 };
 static const int media_col_sizes[][3] =
 {					/* media-col-database sizes */
-  { 21000, 29700, _IPP_GENERAL },	/* A4 */
-  { 14800, 21000, _IPP_PHOTO_ONLY },	/* A5 */
-  { 10500, 14800, _IPP_PHOTO_ONLY },	/* A6 */
-  { 11000, 22000, _IPP_ENV_ONLY },	/* DL */
-  { 21590, 35560, _IPP_GENERAL },	/* Legal */
-  { 21590, 27940, _IPP_GENERAL },	/* Letter */
-  { 10477, 24130, _IPP_ENV_ONLY },	/* #10 */
-  {  7630, 12700, _IPP_PHOTO_ONLY },	/* 3x5 */
-  {  8890, 12700, _IPP_PHOTO_ONLY },	/* L */
-  { 10160, 15240, _IPP_PHOTO_ONLY },	/* 4x6 */
-  { 12700, 17780, _IPP_PHOTO_ONLY }	/* 5x7 aka 2L */
+  { 21000, 29700, IPPEVE_GENERAL },	/* A4 */
+  { 14800, 21000, IPPEVE_PHOTO_ONLY },	/* A5 */
+  { 10500, 14800, IPPEVE_PHOTO_ONLY },	/* A6 */
+  { 11000, 22000, IPPEVE_ENV_ONLY },	/* DL */
+  { 21590, 35560, IPPEVE_GENERAL },	/* Legal */
+  { 21590, 27940, IPPEVE_GENERAL },	/* Letter */
+  { 10477, 24130, IPPEVE_ENV_ONLY },	/* #10 */
+  {  7630, 12700, IPPEVE_PHOTO_ONLY },	/* 3x5 */
+  {  8890, 12700, IPPEVE_PHOTO_ONLY },	/* L */
+  { 10160, 15240, IPPEVE_PHOTO_ONLY },	/* 4x6 */
+  { 12700, 17780, IPPEVE_PHOTO_ONLY }	/* 5x7 aka 2L */
 };
 
-typedef enum _ipp_media_source_e
+typedef enum ippeve_media_source_e
 {
-  _IPP_MEDIA_SOURCE_NONE = -1,
-  _IPP_MEDIA_SOURCE_AUTO,
-  _IPP_MEDIA_SOURCE_MAIN,
-  _IPP_MEDIA_SOURCE_MANUAL,
-  _IPP_MEDIA_SOURCE_ENVELOPE,
-  _IPP_MEDIA_SOURCE_PHOTO
-} _ipp_media_source_t;
+  IPPEVE_MEDIA_SOURCE_NONE = -1,
+  IPPEVE_MEDIA_SOURCE_AUTO,
+  IPPEVE_MEDIA_SOURCE_MAIN,
+  IPPEVE_MEDIA_SOURCE_MANUAL,
+  IPPEVE_MEDIA_SOURCE_ENVELOPE,
+  IPPEVE_MEDIA_SOURCE_PHOTO
+} ippeve_media_source_t;
 static const char * const media_source_supported[] =
 				      /* media-source-supported values */
 {
@@ -191,23 +191,23 @@ static const char * const media_source_supported[] =
   "photo"
 };
 
-typedef enum _ipp_media_type_e
+typedef enum ippeve_media_type_e
 {
-  _IPP_MEDIA_TYPE_NONE = -1,
-  _IPP_MEDIA_TYPE_AUTO,
-  _IPP_MEDIA_TYPE_CARDSTOCK,
-  _IPP_MEDIA_TYPE_ENVELOPE,
-  _IPP_MEDIA_TYPE_LABELS,
-  _IPP_MEDIA_TYPE_OTHER,
-  _IPP_MEDIA_TYPE_GLOSSY,
-  _IPP_MEDIA_TYPE_HIGH_GLOSS,
-  _IPP_MEDIA_TYPE_MATTE,
-  _IPP_MEDIA_TYPE_SATIN,
-  _IPP_MEDIA_TYPE_SEMI_GLOSS,
-  _IPP_MEDIA_TYPE_STATIONERY,
-  _IPP_MEDIA_TYPE_LETTERHEAD,
-  _IPP_MEDIA_TYPE_TRANSPARENCY
-} _ipp_media_type_t;
+  IPPEVE_MEDIA_TYPE_NONE = -1,
+  IPPEVE_MEDIA_TYPE_AUTO,
+  IPPEVE_MEDIA_TYPE_CARDSTOCK,
+  IPPEVE_MEDIA_TYPE_ENVELOPE,
+  IPPEVE_MEDIA_TYPE_LABELS,
+  IPPEVE_MEDIA_TYPE_OTHER,
+  IPPEVE_MEDIA_TYPE_GLOSSY,
+  IPPEVE_MEDIA_TYPE_HIGH_GLOSS,
+  IPPEVE_MEDIA_TYPE_MATTE,
+  IPPEVE_MEDIA_TYPE_SATIN,
+  IPPEVE_MEDIA_TYPE_SEMI_GLOSS,
+  IPPEVE_MEDIA_TYPE_STATIONERY,
+  IPPEVE_MEDIA_TYPE_LETTERHEAD,
+  IPPEVE_MEDIA_TYPE_TRANSPARENCY
+} ippeve_media_type_t;
 static const char * const media_type_supported[] =
 				      /* media-type-supported values */
 {
@@ -226,14 +226,14 @@ static const char * const media_type_supported[] =
   "transparency"
 };
 
-typedef enum _ipp_supply_e
+typedef enum ippeve_supply_e
 {
-  _IPP_SUPPLY_CYAN,			/* Cyan Toner */
-  _IPP_SUPPLY_MAGENTA,			/* Magenta Toner */
-  _IPP_SUPPLY_YELLOW,			/* Yellow Toner */
-  _IPP_SUPPLY_BLACK,			/* Black Toner */
-  _IPP_SUPPLY_WASTE			/* Waste Toner */
-} _ipp_supply_t;
+  IPPEVE_SUPPLY_CYAN,			/* Cyan Toner */
+  IPPEVE_SUPPLY_MAGENTA,			/* Magenta Toner */
+  IPPEVE_SUPPLY_YELLOW,			/* Yellow Toner */
+  IPPEVE_SUPPLY_BLACK,			/* Black Toner */
+  IPPEVE_SUPPLY_WASTE			/* Waste Toner */
+} ippeve_supply_t;
 static const char * const printer_supplies[] =
 {					/* printer-supply-description values */
   "Cyan Toner",
@@ -259,8 +259,8 @@ static const char * const printer_supplies[] =
  */
 
 #ifdef HAVE_DNSSD
-typedef DNSServiceRef _ipp_srv_t;	/* Service reference */
-typedef TXTRecordRef _ipp_txt_t;	/* TXT record */
+typedef DNSServiceRef ippeve_srv_t;	/* Service reference */
+typedef TXTRecordRef ippeve_txt_t;	/* TXT record */
 
 #elif defined(HAVE_AVAHI)
 typedef AvahiEntryGroup *_ipp_srv_t;	/* Service reference */
@@ -271,19 +271,19 @@ typedef void *_ipp_srv_t;		/* Service reference */
 typedef void *_ipp_txt_t;		/* TXT record */
 #endif /* HAVE_DNSSD */
 
-typedef struct _ipp_filter_s		/**** Attribute filter ****/
+typedef struct ippeve_filter_s		/**** Attribute filter ****/
 {
   cups_array_t		*ra;		/* Requested attributes */
   ipp_tag_t		group_tag;	/* Group to copy */
-} _ipp_filter_t;
+} ippeve_filter_t;
 
-typedef struct _ipp_job_s _ipp_job_t;
+typedef struct ippeve_job_s ippeve_job_t;
 
-typedef struct _ipp_printer_s		/**** Printer data ****/
+typedef struct ippeve_printer_s		/**** Printer data ****/
 {
   int			ipv4,		/* IPv4 listener */
 			ipv6;		/* IPv6 listener */
-  _ipp_srv_t		ipp_ref,	/* Bonjour IPP service */
+  ippeve_srv_t		ipp_ref,	/* Bonjour IPP service */
 			ipps_ref,	/* Bonjour IPPS service */
 			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
@@ -300,24 +300,24 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
   time_t		start_time;	/* Startup time */
   time_t		config_time;	/* printer-config-change-time */
   ipp_pstate_t		state;		/* printer-state value */
-  _ipp_preason_t	state_reasons;	/* printer-state-reasons values */
+  ippeve_preason_t	state_reasons;	/* printer-state-reasons values */
   time_t		state_time;	/* printer-state-change-time */
   cups_array_t		*jobs;		/* Jobs */
-  _ipp_job_t		*active_job;	/* Current active/pending job */
+  ippeve_job_t		*active_job;	/* Current active/pending job */
   int			next_job_id;	/* Next job-id value */
   _cups_rwlock_t	rwlock;		/* Printer lock */
-  _ipp_media_size_t	main_size;	/* Ready media */
-  _ipp_media_type_t	main_type;
+  ippeve_media_size_t	main_size;	/* Ready media */
+  ippeve_media_type_t	main_type;
   int			main_level;
-  _ipp_media_size_t	envelope_size;
+  ippeve_media_size_t	envelope_size;
   int			envelope_level;
-  _ipp_media_size_t	photo_size;
-  _ipp_media_type_t	photo_type;
+  ippeve_media_size_t	photo_size;
+  ippeve_media_type_t	photo_type;
   int			photo_level;
   int			supplies[5];	/* Supply levels (0-100) */
-} _ipp_printer_t;
+} ippeve_printer_t;
 
-struct _ipp_job_s			/**** Job data ****/
+struct ippeve_job_s			/**** Job data ****/
 {
   int			id;		/* Job ID */
   const char		*name,		/* job-name */
@@ -333,10 +333,10 @@ struct _ipp_job_s			/**** Job data ****/
   int			cancel;		/* Non-zero when job canceled */
   char			*filename;	/* Print file name */
   int			fd;		/* Print file descriptor */
-  _ipp_printer_t	*printer;	/* Printer */
+  ippeve_printer_t	*printer;	/* Printer */
 };
 
-typedef struct _ipp_client_s		/**** Client data ****/
+typedef struct ippeve_client_s		/**** Client data ****/
 {
   http_t		*http;		/* HTTP connection */
   ipp_t			*request,	/* IPP request */
@@ -348,27 +348,27 @@ typedef struct _ipp_client_s		/**** Client data ****/
 			*options;	/* URI options */
   http_addr_t		addr;		/* Client address */
   char			hostname[256];	/* Client hostname */
-  _ipp_printer_t	*printer;	/* Printer */
-  _ipp_job_t		*job;		/* Current job, if any */
-} _ipp_client_t;
+  ippeve_printer_t	*printer;	/* Printer */
+  ippeve_job_t		*job;		/* Current job, if any */
+} ippeve_client_t;
 
 
 /*
  * Local functions...
  */
 
-static void		clean_jobs(_ipp_printer_t *printer);
-static int		compare_jobs(_ipp_job_t *a, _ipp_job_t *b);
+static void		clean_jobs(ippeve_printer_t *printer);
+static int		compare_jobs(ippeve_job_t *a, ippeve_job_t *b);
 static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra,
 			                ipp_tag_t group_tag, int quickcopy);
-static void		copy_job_attributes(_ipp_client_t *client,
-			                    _ipp_job_t *job, cups_array_t *ra);
-static _ipp_client_t	*create_client(_ipp_printer_t *printer, int sock);
-static _ipp_job_t	*create_job(_ipp_client_t *client);
+static void		copy_job_attributes(ippeve_client_t *client,
+			                    ippeve_job_t *job, cups_array_t *ra);
+static ippeve_client_t	*create_client(ippeve_printer_t *printer, int sock);
+static ippeve_job_t	*create_job(ippeve_client_t *client);
 static int		create_listener(int family, int port);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int margins);
 static ipp_t		*create_media_size(int width, int length);
-static _ipp_printer_t	*create_printer(const char *servername,
+static ippeve_printer_t	*create_printer(const char *servername,
 			                const char *name, const char *location,
 			                const char *make, const char *model,
 					const char *icon,
@@ -380,9 +380,9 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					const char *attrfile);
 static void		debug_attributes(const char *title, ipp_t *ipp,
 			                 int response);
-static void		delete_client(_ipp_client_t *client);
-static void		delete_job(_ipp_job_t *job);
-static void		delete_printer(_ipp_printer_t *printer);
+static void		delete_client(ippeve_client_t *client);
+static void		delete_job(ippeve_job_t *job);
+static void		delete_printer(ippeve_printer_t *printer);
 #ifdef HAVE_DNSSD
 static void DNSSD_API	dnssd_callback(DNSServiceRef sdRef,
 				       DNSServiceFlags flags,
@@ -390,55 +390,55 @@ static void DNSSD_API	dnssd_callback(DNSServiceRef sdRef,
 				       const char *name,
 				       const char *regtype,
 				       const char *domain,
-				       _ipp_printer_t *printer);
+				       ippeve_printer_t *printer);
 #elif defined(HAVE_AVAHI)
 static void		dnssd_callback(AvahiEntryGroup *p, AvahiEntryGroupState state, void *context);
 static void		dnssd_client_cb(AvahiClient *c, AvahiClientState state, void *userdata);
 #endif /* HAVE_DNSSD */
 static void		dnssd_init(void);
-static int		filter_cb(_ipp_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
-static _ipp_job_t	*find_job(_ipp_client_t *client);
+static int		filter_cb(ippeve_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
+static ippeve_job_t	*find_job(ippeve_client_t *client);
 static ipp_t		*get_collection(FILE *fp, const char *filename, int *linenum);
 static char		*get_token(FILE *fp, char *buf, int buflen, int *linenum);
-static void		html_escape(_ipp_client_t *client, const char *s,
+static void		html_escape(ippeve_client_t *client, const char *s,
 			            size_t slen);
-static void		html_footer(_ipp_client_t *client);
-static void		html_header(_ipp_client_t *client, const char *title);
-static void		html_printf(_ipp_client_t *client, const char *format,
+static void		html_footer(ippeve_client_t *client);
+static void		html_header(ippeve_client_t *client, const char *title);
+static void		html_printf(ippeve_client_t *client, const char *format,
 			            ...) _CUPS_FORMAT(2, 3);
-static void		ipp_cancel_job(_ipp_client_t *client);
-static void		ipp_close_job(_ipp_client_t *client);
-static void		ipp_create_job(_ipp_client_t *client);
-static void		ipp_get_job_attributes(_ipp_client_t *client);
-static void		ipp_get_jobs(_ipp_client_t *client);
-static void		ipp_get_printer_attributes(_ipp_client_t *client);
-static void		ipp_identify_printer(_ipp_client_t *client);
-static void		ipp_print_job(_ipp_client_t *client);
-static void		ipp_print_uri(_ipp_client_t *client);
-static void		ipp_send_document(_ipp_client_t *client);
-static void		ipp_send_uri(_ipp_client_t *client);
-static void		ipp_validate_job(_ipp_client_t *client);
+static void		ipp_cancel_job(ippeve_client_t *client);
+static void		ipp_close_job(ippeve_client_t *client);
+static void		ipp_create_job(ippeve_client_t *client);
+static void		ipp_get_job_attributes(ippeve_client_t *client);
+static void		ipp_get_jobs(ippeve_client_t *client);
+static void		ipp_get_printer_attributes(ippeve_client_t *client);
+static void		ipp_identify_printer(ippeve_client_t *client);
+static void		ipp_print_job(ippeve_client_t *client);
+static void		ipp_print_uri(ippeve_client_t *client);
+static void		ipp_send_document(ippeve_client_t *client);
+static void		ipp_send_uri(ippeve_client_t *client);
+static void		ipp_validate_job(ippeve_client_t *client);
 static void		load_attributes(const char *filename, ipp_t *attrs);
-static int		parse_options(_ipp_client_t *client, cups_option_t **options);
-static void		process_attr_message(_ipp_job_t *job, char *message);
-static void		*process_client(_ipp_client_t *client);
-static int		process_http(_ipp_client_t *client);
-static int		process_ipp(_ipp_client_t *client);
-static void		*process_job(_ipp_job_t *job);
-static void		process_state_message(_ipp_job_t *job, char *message);
-static int		register_printer(_ipp_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
-static int		respond_http(_ipp_client_t *client, http_status_t code,
+static int		parse_options(ippeve_client_t *client, cups_option_t **options);
+static void		process_attr_message(ippeve_job_t *job, char *message);
+static void		*process_client(ippeve_client_t *client);
+static int		process_http(ippeve_client_t *client);
+static int		process_ipp(ippeve_client_t *client);
+static void		*process_job(ippeve_job_t *job);
+static void		process_state_message(ippeve_job_t *job, char *message);
+static int		register_printer(ippeve_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
+static int		respond_http(ippeve_client_t *client, http_status_t code,
 				     const char *content_coding,
 				     const char *type, size_t length);
-static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
+static void		respond_ipp(ippeve_client_t *client, ipp_status_t status,
 			            const char *message, ...) _CUPS_FORMAT(3, 4);
-static void		respond_unsupported(_ipp_client_t *client,
+static void		respond_unsupported(ippeve_client_t *client,
 			                    ipp_attribute_t *attr);
-static void		run_printer(_ipp_printer_t *printer);
+static void		run_printer(ippeve_printer_t *printer);
 static char		*time_string(time_t tv, char *buffer, size_t bufsize);
 static void		usage(int status) _CUPS_NORETURN;
-static int		valid_doc_attributes(_ipp_client_t *client);
-static int		valid_job_attributes(_ipp_client_t *client);
+static int		valid_doc_attributes(ippeve_client_t *client);
+static int		valid_job_attributes(ippeve_client_t *client);
 
 
 /*
@@ -488,7 +488,7 @@ main(int  argc,				/* I - Number of command-line args */
 		pin = 0;		/* PIN printing mode? */
   char		directory[1024] = "",	/* Spool directory */
 		hostname[1024];		/* Auto-detected hostname */
-  _ipp_printer_t *printer;		/* Printer object */
+  ippeve_printer_t *printer;		/* Printer object */
 
 
  /*
@@ -749,9 +749,9 @@ main(int  argc,				/* I - Number of command-line args */
  */
 
 static void
-clean_jobs(_ipp_printer_t *printer)	/* I - Printer */
+clean_jobs(ippeve_printer_t *printer)	/* I - Printer */
 {
-  _ipp_job_t	*job;			/* Current job */
+  ippeve_job_t	*job;			/* Current job */
   time_t	cleantime;		/* Clean time */
 
 
@@ -761,9 +761,9 @@ clean_jobs(_ipp_printer_t *printer)	/* I - Printer */
   cleantime = time(NULL) - 60;
 
   _cupsRWLockWrite(&(printer->rwlock));
-  for (job = (_ipp_job_t *)cupsArrayFirst(printer->jobs);
+  for (job = (ippeve_job_t *)cupsArrayFirst(printer->jobs);
        job;
-       job = (_ipp_job_t *)cupsArrayNext(printer->jobs))
+       job = (ippeve_job_t *)cupsArrayNext(printer->jobs))
     if (job->completed && job->completed < cleantime)
     {
       cupsArrayRemove(printer->jobs, job);
@@ -780,8 +780,8 @@ clean_jobs(_ipp_printer_t *printer)	/* I - Printer */
  */
 
 static int				/* O - Result of comparison */
-compare_jobs(_ipp_job_t *a,		/* I - First job */
-             _ipp_job_t *b)		/* I - Second job */
+compare_jobs(ippeve_job_t *a,		/* I - First job */
+             ippeve_job_t *b)		/* I - Second job */
 {
   return (b->id - a->id);
 }
@@ -798,7 +798,7 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
 	        ipp_tag_t    group_tag,	/* I - Group to copy */
 	        int          quickcopy)	/* I - Do a quick copy? */
 {
-  _ipp_filter_t	filter;			/* Filter data */
+  ippeve_filter_t	filter;			/* Filter data */
 
 
   filter.ra        = ra;
@@ -814,8 +814,8 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
 
 static void
 copy_job_attributes(
-    _ipp_client_t *client,		/* I - Client */
-    _ipp_job_t    *job,			/* I - Job */
+    ippeve_client_t *client,		/* I - Client */
+    ippeve_job_t    *job,			/* I - Job */
     cups_array_t  *ra)			/* I - requested-attributes */
 {
   copy_attributes(client->response, job->attrs, ra, IPP_TAG_JOB, 0);
@@ -970,14 +970,14 @@ copy_job_attributes(
  *                     object.
  */
 
-static _ipp_client_t *			/* O - Client */
-create_client(_ipp_printer_t *printer,	/* I - Printer */
+static ippeve_client_t *			/* O - Client */
+create_client(ippeve_printer_t *printer,	/* I - Printer */
               int            sock)	/* I - Listen socket */
 {
-  _ipp_client_t	*client;		/* Client */
+  ippeve_client_t	*client;		/* Client */
 
 
-  if ((client = calloc(1, sizeof(_ipp_client_t))) == NULL)
+  if ((client = calloc(1, sizeof(ippeve_client_t))) == NULL)
   {
     perror("Unable to allocate memory for client");
     return (NULL);
@@ -1012,10 +1012,10 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
  *                  request.
  */
 
-static _ipp_job_t *			/* O - Job */
-create_job(_ipp_client_t *client)	/* I - Client */
+static ippeve_job_t *			/* O - Job */
+create_job(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* Job */
+  ippeve_job_t		*job;		/* Job */
   ipp_attribute_t	*attr;		/* Job attribute */
   char			uri[1024],	/* job-uri value */
 			uuid[64];	/* job-uuid value */
@@ -1037,7 +1037,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
   * Allocate and initialize the job object...
   */
 
-  if ((job = calloc(1, sizeof(_ipp_job_t))) == NULL)
+  if ((job = calloc(1, sizeof(ippeve_job_t))) == NULL)
   {
     perror("Unable to allocate memory for job");
     return (NULL);
@@ -1114,8 +1114,8 @@ create_job(_ipp_client_t *client)	/* I - Client */
  */
 
 static void create_job_filename(
-    _ipp_printer_t *printer,		/* I - Printer */
-    _ipp_job_t     *job,		/* I - Job */
+    ippeve_printer_t *printer,		/* I - Printer */
+    ippeve_job_t     *job,		/* I - Job */
     char           *fname,		/* I - Filename buffer */
     size_t         fnamesize)		/* I - Size of filename buffer */
 {
@@ -1270,7 +1270,7 @@ create_media_size(int width,		/* I - x-dimension in 2540ths */
  *                      printer object.
  */
 
-static _ipp_printer_t *			/* O - Printer */
+static ippeve_printer_t *			/* O - Printer */
 create_printer(const char *servername,	/* I - Server hostname (NULL for default) */
                const char *name,	/* I - printer-name */
 	       const char *location,	/* I - printer-location */
@@ -1289,7 +1289,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       const char *attrfile)	/* I - Attributes file */
 {
   int			i, j;		/* Looping vars */
-  _ipp_printer_t	*printer;	/* Printer */
+  ippeve_printer_t	*printer;	/* Printer */
 #ifndef _WIN32
   char			path[1024];	/* Full path to command */
 #endif /* !_WIN32 */
@@ -1527,7 +1527,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   * Allocate memory for the printer...
   */
 
-  if ((printer = calloc(1, sizeof(_ipp_printer_t))) == NULL)
+  if ((printer = calloc(1, sizeof(ippeve_printer_t))) == NULL)
   {
     perror("ippserver: Unable to allocate memory for printer");
     return (NULL);
@@ -1544,7 +1544,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->start_time    = time(NULL);
   printer->config_time   = printer->start_time;
   printer->state         = IPP_PSTATE_IDLE;
-  printer->state_reasons = _IPP_PREASON_NONE;
+  printer->state_reasons = IPPEVE_PREASON_NONE;
   printer->state_time    = printer->start_time;
   printer->jobs          = cupsArrayNew((cups_array_func_t)compare_jobs, NULL);
   printer->next_job_id   = 1;
@@ -1560,22 +1560,22 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   if (icon)
     printer->icon = strdup(icon);
 
-  printer->main_size      = _IPP_MEDIA_SIZE_A4;
-  printer->main_type      = _IPP_MEDIA_TYPE_STATIONERY;
+  printer->main_size      = IPPEVE_MEDIA_SIZE_A4;
+  printer->main_type      = IPPEVE_MEDIA_TYPE_STATIONERY;
   printer->main_level     = 500;
 
-  printer->envelope_size  = _IPP_MEDIA_SIZE_NONE;
+  printer->envelope_size  = IPPEVE_MEDIA_SIZE_NONE;
   printer->envelope_level = 0;
 
-  printer->photo_size     = _IPP_MEDIA_SIZE_NONE;
-  printer->photo_type     = _IPP_MEDIA_TYPE_NONE;
+  printer->photo_size     = IPPEVE_MEDIA_SIZE_NONE;
+  printer->photo_type     = IPPEVE_MEDIA_TYPE_NONE;
   printer->photo_level    = 0;
 
-  printer->supplies[_IPP_SUPPLY_CYAN]    = 100;
-  printer->supplies[_IPP_SUPPLY_MAGENTA] = 100;
-  printer->supplies[_IPP_SUPPLY_YELLOW]  = 100;
-  printer->supplies[_IPP_SUPPLY_BLACK]   = 100;
-  printer->supplies[_IPP_SUPPLY_WASTE]   = 0;
+  printer->supplies[IPPEVE_SUPPLY_CYAN]    = 100;
+  printer->supplies[IPPEVE_SUPPLY_MAGENTA] = 100;
+  printer->supplies[IPPEVE_SUPPLY_YELLOW]  = 100;
+  printer->supplies[IPPEVE_SUPPLY_BLACK]   = 100;
+  printer->supplies[IPPEVE_SUPPLY_WASTE]   = 0;
 
   _cupsRWInit(&(printer->rwlock));
 
@@ -1814,9 +1814,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	 i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
 	 i ++)
     {
-      if (media_col_sizes[i][2] == _IPP_ENV_ONLY)
+      if (media_col_sizes[i][2] == IPPEVE_ENV_ONLY)
 	num_database += 3;		/* auto + manual + envelope */
-      else if (media_col_sizes[i][2] == _IPP_PHOTO_ONLY)
+      else if (media_col_sizes[i][2] == IPPEVE_PHOTO_ONLY)
 	num_database += 6 * 3;		/* auto + photographic-* from auto, manual, and photo */
       else
 	num_database += 2;		/* Regular + borderless */
@@ -1829,7 +1829,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     {
       switch (media_col_sizes[i][2])
       {
-	case _IPP_GENERAL :
+	case IPPEVE_GENERAL :
 	   /*
 	    * Regular + borderless for the general class; no source/type
 	    * selectors...
@@ -1839,7 +1839,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], NULL, NULL, media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[0]));
 	    break;
 
-	case _IPP_ENV_ONLY :
+	case IPPEVE_ENV_ONLY :
 	   /*
 	    * Regular margins for "auto", "manual", and "envelope" sources.
 	    */
@@ -1848,7 +1848,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "manual", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
 	    ippSetCollection(printer->attrs, &media_col_database, media_col_index ++, create_media_col(media_supported[i], "envelope", "envelope", media_col_sizes[i][0], media_col_sizes[i][1], media_xxx_margin_supported[1]));
 	    break;
-	case _IPP_PHOTO_ONLY :
+	case IPPEVE_PHOTO_ONLY :
 	   /*
 	    * Photos have specific media types and can only be printed via
 	    * the auto, manual, and photo sources...
@@ -2252,7 +2252,7 @@ debug_attributes(const char *title,	/* I - Title */
  */
 
 static void
-delete_client(_ipp_client_t *client)	/* I - Client */
+delete_client(ippeve_client_t *client)	/* I - Client */
 {
   if (Verbosity)
     fprintf(stderr, "Closing connection from %s\n", client->hostname);
@@ -2282,7 +2282,7 @@ delete_client(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-delete_job(_ipp_job_t *job)		/* I - Job */
+delete_job(ippeve_job_t *job)		/* I - Job */
 {
   if (Verbosity)
     fprintf(stderr, "Removing job #%d from history.\n", job->id);
@@ -2307,7 +2307,7 @@ delete_job(_ipp_job_t *job)		/* I - Job */
  */
 
 static void
-delete_printer(_ipp_printer_t *printer)	/* I - Printer */
+delete_printer(ippeve_printer_t *printer)	/* I - Printer */
 {
   if (printer->ipv4 >= 0)
     close(printer->ipv4);
@@ -2374,7 +2374,7 @@ dnssd_callback(
     const char          *name,		/* I - Service name */
     const char          *regtype,	/* I - Service type */
     const char          *domain,	/* I - Domain for service */
-    _ipp_printer_t      *printer)	/* I - Printer */
+    ippeve_printer_t      *printer)	/* I - Printer */
 {
   (void)sdRef;
   (void)flags;
@@ -2489,7 +2489,7 @@ dnssd_init(void)
  */
 
 static int				/* O - 1 to copy, 0 to ignore */
-filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
+filter_cb(ippeve_filter_t   *filter,	/* I - Filter parameters */
           ipp_t           *dst,		/* I - Destination (unused) */
 	  ipp_attribute_t *attr)	/* I - Source attribute */
 {
@@ -2515,11 +2515,11 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
  * 'find_job()' - Find a job specified in a request.
  */
 
-static _ipp_job_t *			/* O - Job or NULL */
-find_job(_ipp_client_t *client)		/* I - Client */
+static ippeve_job_t *			/* O - Job or NULL */
+find_job(ippeve_client_t *client)		/* I - Client */
 {
   ipp_attribute_t	*attr;		/* job-id or job-uri attribute */
-  _ipp_job_t		key,		/* Job search key */
+  ippeve_job_t		key,		/* Job search key */
 			*job;		/* Matching job, if any */
 
 
@@ -2537,7 +2537,7 @@ find_job(_ipp_client_t *client)		/* I - Client */
     key.id = ippGetInteger(attr, 0);
 
   _cupsRWLockRead(&(client->printer->rwlock));
-  job = (_ipp_job_t *)cupsArrayFind(client->printer->jobs, &key);
+  job = (ippeve_job_t *)cupsArrayFind(client->printer->jobs, &key);
   _cupsRWUnlock(&(client->printer->rwlock));
 
   return (job);
@@ -2868,7 +2868,7 @@ get_token(FILE *fp,			/* I  - File to read from */
  */
 
 static void
-html_escape(_ipp_client_t *client,	/* I - Client */
+html_escape(ippeve_client_t *client,	/* I - Client */
 	    const char    *s,		/* I - String to write */
 	    size_t        slen)		/* I - Number of characters to write */
 {
@@ -2909,7 +2909,7 @@ html_escape(_ipp_client_t *client,	/* I - Client */
  */
 
 static void
-html_footer(_ipp_client_t *client)	/* I - Client */
+html_footer(ippeve_client_t *client)	/* I - Client */
 {
   html_printf(client,
 	      "</div>\n"
@@ -2924,7 +2924,7 @@ html_footer(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-html_header(_ipp_client_t *client,	/* I - Client */
+html_header(ippeve_client_t *client,	/* I - Client */
             const char    *title)	/* I - Title */
 {
   html_printf(client,
@@ -2972,7 +2972,7 @@ html_header(_ipp_client_t *client,	/* I - Client */
  */
 
 static void
-html_printf(_ipp_client_t *client,	/* I - Client */
+html_printf(ippeve_client_t *client,	/* I - Client */
 	    const char    *format,	/* I - Printf-style format string */
 	    ...)			/* I - Additional arguments as needed */
 {
@@ -3192,9 +3192,9 @@ html_printf(_ipp_client_t *client,	/* I - Client */
  */
 
 static void
-ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
+ipp_cancel_job(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* Job information */
+  ippeve_job_t		*job;		/* Job information */
 
 
  /*
@@ -3258,9 +3258,9 @@ ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_close_job(_ipp_client_t *client)	/* I - Client */
+ipp_close_job(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* Job information */
+  ippeve_job_t		*job;		/* Job information */
 
 
  /*
@@ -3313,9 +3313,9 @@ ipp_close_job(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_create_job(_ipp_client_t *client)	/* I - Client */
+ipp_create_job(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* New job */
+  ippeve_job_t		*job;		/* New job */
   cups_array_t		*ra;		/* Attributes to send in response */
 
 
@@ -3375,9 +3375,9 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
 
 static void
 ipp_get_job_attributes(
-    _ipp_client_t *client)		/* I - Client */
+    ippeve_client_t *client)		/* I - Client */
 {
-  _ipp_job_t	*job;			/* Job */
+  ippeve_job_t	*job;			/* Job */
   cups_array_t	*ra;			/* requested-attributes */
 
 
@@ -3400,7 +3400,7 @@ ipp_get_job_attributes(
  */
 
 static void
-ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
+ipp_get_jobs(ippeve_client_t *client)	/* I - Client */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*which_jobs = NULL;
@@ -3411,7 +3411,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 			limit,		/* Maximum number of jobs to return */
 			count;		/* Number of jobs that match */
   const char		*username;	/* Username */
-  _ipp_job_t		*job;		/* Current job pointer */
+  ippeve_job_t		*job;		/* Current job pointer */
   cups_array_t		*ra;		/* Requested attributes array */
 
 
@@ -3546,9 +3546,9 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 
   _cupsRWLockRead(&(client->printer->rwlock));
 
-  for (count = 0, job = (_ipp_job_t *)cupsArrayFirst(client->printer->jobs);
+  for (count = 0, job = (ippeve_job_t *)cupsArrayFirst(client->printer->jobs);
        (limit <= 0 || count < limit) && job;
-       job = (_ipp_job_t *)cupsArrayNext(client->printer->jobs))
+       job = (ippeve_job_t *)cupsArrayNext(client->printer->jobs))
   {
    /*
     * Filter out jobs that don't match...
@@ -3581,10 +3581,10 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 
 static void
 ipp_get_printer_attributes(
-    _ipp_client_t *client)		/* I - Client */
+    ippeve_client_t *client)		/* I - Client */
 {
   cups_array_t		*ra;		/* Requested attributes array */
-  _ipp_printer_t	*printer;	/* Printer */
+  ippeve_printer_t	*printer;	/* Printer */
 
 
  /*
@@ -3607,18 +3607,18 @@ ipp_get_printer_attributes(
   		num_ready = 0;		/* Number of ready media */
     ipp_t	*ready[3];		/* Ready media */
 
-    if (printer->main_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->main_size != IPPEVE_MEDIA_SIZE_NONE)
     {
-      if (printer->main_type != _IPP_MEDIA_TYPE_NONE)
+      if (printer->main_type != IPPEVE_MEDIA_TYPE_NONE)
         ready[num_ready ++] = create_media_col(media_supported[printer->main_size], "main", media_type_supported[printer->main_type], media_col_sizes[printer->main_size][0], media_col_sizes[printer->main_size][1], 635);
       else
         ready[num_ready ++] = create_media_col(media_supported[printer->main_size], "main", NULL, media_col_sizes[printer->main_size][0], media_col_sizes[printer->main_size][1], 635);
     }
-    if (printer->envelope_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->envelope_size != IPPEVE_MEDIA_SIZE_NONE)
       ready[num_ready ++] = create_media_col(media_supported[printer->envelope_size], "envelope", NULL, media_col_sizes[printer->envelope_size][0], media_col_sizes[printer->envelope_size][1], 635);
-    if (printer->photo_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->photo_size != IPPEVE_MEDIA_SIZE_NONE)
     {
-      if (printer->photo_type != _IPP_MEDIA_TYPE_NONE)
+      if (printer->photo_type != IPPEVE_MEDIA_TYPE_NONE)
         ready[num_ready ++] = create_media_col(media_supported[printer->photo_size], "photo", media_type_supported[printer->photo_type], media_col_sizes[printer->photo_size][0], media_col_sizes[printer->photo_size][1], 0);
       else
         ready[num_ready ++] = create_media_col(media_supported[printer->photo_size], "photo", NULL, media_col_sizes[printer->photo_size][0], media_col_sizes[printer->photo_size][1], 0);
@@ -3639,13 +3639,13 @@ ipp_get_printer_attributes(
     int		num_ready = 0;		/* Number of ready media */
     const char	*ready[3];		/* Ready media */
 
-    if (printer->main_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->main_size != IPPEVE_MEDIA_SIZE_NONE)
       ready[num_ready ++] = media_supported[printer->main_size];
 
-    if (printer->envelope_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->envelope_size != IPPEVE_MEDIA_SIZE_NONE)
       ready[num_ready ++] = media_supported[printer->envelope_size];
 
-    if (printer->photo_size != _IPP_MEDIA_SIZE_NONE)
+    if (printer->photo_size != IPPEVE_MEDIA_SIZE_NONE)
       ready[num_ready ++] = media_supported[printer->photo_size];
 
     if (num_ready)
@@ -3683,22 +3683,22 @@ ipp_get_printer_attributes(
 
   if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
   {
-    if (printer->state_reasons == _IPP_PREASON_NONE)
+    if (printer->state_reasons == IPPEVE_PREASON_NONE)
       ippAddString(client->response, IPP_TAG_PRINTER,
                    IPP_CONST_TAG(IPP_TAG_KEYWORD),
                    "printer-state-reasons", NULL, "none");
     else
     {
       ipp_attribute_t	*attr = NULL;		/* printer-state-reasons */
-      _ipp_preason_t	bit;			/* Reason bit */
+      ippeve_preason_t	bit;			/* Reason bit */
       int		i;			/* Looping var */
       char		reason[32];		/* Reason string */
 
-      for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+      for (i = 0, bit = 1; i < (int)(sizeof(ippeve_preason_strings) / sizeof(ippeve_preason_strings[0])); i ++, bit *= 2)
       {
         if (printer->state_reasons & bit)
 	{
-	  snprintf(reason, sizeof(reason), "%s-%s", _ipp_preason_strings[i], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
+	  snprintf(reason, sizeof(reason), "%s-%s", ippeve_preason_strings[i], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
 	  if (attr)
 	    ippSetString(client->response, &attr, ippGetCount(attr), reason);
 	  else
@@ -3745,7 +3745,7 @@ ipp_get_printer_attributes(
 
 static void
 ipp_identify_printer(
-    _ipp_client_t *client)		/* I - Client */
+    ippeve_client_t *client)		/* I - Client */
 {
   ipp_attribute_t	*actions,	/* identify-actions */
 			*message;	/* message */
@@ -3772,9 +3772,9 @@ ipp_identify_printer(
  */
 
 static void
-ipp_print_job(_ipp_client_t *client)	/* I - Client */
+ipp_print_job(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* New job */
+  ippeve_job_t		*job;		/* New job */
   char			filename[1024],	/* Filename buffer */
 			buffer[4096];	/* Copy buffer */
   ssize_t		bytes;		/* Bytes read */
@@ -3926,9 +3926,9 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_print_uri(_ipp_client_t *client)	/* I - Client */
+ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* New job */
+  ippeve_job_t		*job;		/* New job */
   ipp_attribute_t	*uri;		/* document-uri */
   char			scheme[256],	/* URI scheme */
 			userpass[256],	/* Username and password info */
@@ -4228,9 +4228,9 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_send_document(_ipp_client_t *client)/* I - Client */
+ipp_send_document(ippeve_client_t *client)/* I - Client */
 {
-  _ipp_job_t		*job;		/* Job information */
+  ippeve_job_t		*job;		/* Job information */
   char			filename[1024],	/* Filename buffer */
 			buffer[4096];	/* Copy buffer */
   ssize_t		bytes;		/* Bytes read */
@@ -4420,9 +4420,9 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
  */
 
 static void
-ipp_send_uri(_ipp_client_t *client)	/* I - Client */
+ipp_send_uri(ippeve_client_t *client)	/* I - Client */
 {
-  _ipp_job_t		*job;		/* Job information */
+  ippeve_job_t		*job;		/* Job information */
   ipp_attribute_t	*uri;		/* document-uri */
   char			scheme[256],	/* URI scheme */
 			userpass[256],	/* Username and password info */
@@ -4778,7 +4778,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_validate_job(_ipp_client_t *client)	/* I - Client */
+ipp_validate_job(ippeve_client_t *client)	/* I - Client */
 {
   if (valid_job_attributes(client))
     respond_ipp(client, IPP_STATUS_OK, NULL);
@@ -5081,7 +5081,7 @@ load_attributes(const char *filename,	/* I - File to load */
  */
 
 static int				/* O - Number of options */
-parse_options(_ipp_client_t *client,	/* I - Client */
+parse_options(ippeve_client_t *client,	/* I - Client */
               cups_option_t **options)	/* O - Options */
 {
   char	*name,				/* Name */
@@ -5114,7 +5114,7 @@ parse_options(_ipp_client_t *client,	/* I - Client */
 
 static void
 process_attr_message(
-    _ipp_job_t *job,			/* I - Job */
+    ippeve_job_t *job,			/* I - Job */
     char       *message)		/* I - Message */
 {
   (void)job;
@@ -5127,7 +5127,7 @@ process_attr_message(
  */
 
 static void *				/* O - Exit status */
-process_client(_ipp_client_t *client)	/* I - Client */
+process_client(ippeve_client_t *client)	/* I - Client */
 {
  /*
   * Loop until we are out of requests or timeout (30 seconds)...
@@ -5184,7 +5184,7 @@ process_client(_ipp_client_t *client)	/* I - Client */
  */
 
 int					/* O - 1 on success, 0 on failure */
-process_http(_ipp_client_t *client)	/* I - Client connection */
+process_http(ippeve_client_t *client)	/* I - Client connection */
 {
   char			uri[1024];	/* URI */
   http_state_t		http_state;	/* HTTP state */
@@ -5435,9 +5435,9 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  * Show web status page...
 	  */
 
-          _ipp_job_t	*job;		/* Current job */
+          ippeve_job_t	*job;		/* Current job */
 	  int		i;		/* Looping var */
-	  _ipp_preason_t reason;	/* Current reason */
+	  ippeve_preason_t reason;	/* Current reason */
 	  static const char * const reasons[] =
 	  {				/* Reason strings */
 	    "Other",
@@ -5475,7 +5475,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
             _cupsRWLockRead(&(client->printer->rwlock));
 
 	    html_printf(client, "<table class=\"striped\" summary=\"Jobs\"><thead><tr><th>Job #</th><th>Name</th><th>Owner</th><th>When</th></tr></thead><tbody>\n");
-	    for (job = (_ipp_job_t *)cupsArrayFirst(client->printer->jobs); job; job = (_ipp_job_t *)cupsArrayNext(client->printer->jobs))
+	    for (job = (ippeve_job_t *)cupsArrayFirst(client->printer->jobs); job; job = (ippeve_job_t *)cupsArrayNext(client->printer->jobs))
 	    {
 	      char	when[256],	/* When job queued/started/finished */
 			hhmmss[64];	/* Time HH:MM:SS */
@@ -5597,18 +5597,18 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	      client->printer->photo_level = atoi(val);
 
             if ((client->printer->main_level < 100 && client->printer->main_level > 0) || (client->printer->envelope_level < 25 && client->printer->envelope_level > 0) || (client->printer->photo_level < 25 && client->printer->photo_level > 0))
-	      client->printer->state_reasons |= _IPP_PREASON_MEDIA_LOW;
+	      client->printer->state_reasons |= IPPEVE_PREASON_MEDIA_LOW;
 	    else
-	      client->printer->state_reasons &= (_ipp_preason_t)~_IPP_PREASON_MEDIA_LOW;
+	      client->printer->state_reasons &= (ippeve_preason_t)~IPPEVE_PREASON_MEDIA_LOW;
 
-            if ((client->printer->main_level == 0 && client->printer->main_size > _IPP_MEDIA_SIZE_NONE) || (client->printer->envelope_level == 0 && client->printer->envelope_size > _IPP_MEDIA_SIZE_NONE) || (client->printer->photo_level == 0 && client->printer->photo_size > _IPP_MEDIA_SIZE_NONE))
+            if ((client->printer->main_level == 0 && client->printer->main_size > IPPEVE_MEDIA_SIZE_NONE) || (client->printer->envelope_level == 0 && client->printer->envelope_size > IPPEVE_MEDIA_SIZE_NONE) || (client->printer->photo_level == 0 && client->printer->photo_size > IPPEVE_MEDIA_SIZE_NONE))
 	    {
-	      client->printer->state_reasons |= _IPP_PREASON_MEDIA_EMPTY;
+	      client->printer->state_reasons |= IPPEVE_PREASON_MEDIA_EMPTY;
 	      if (client->printer->active_job)
-	        client->printer->state_reasons |= _IPP_PREASON_MEDIA_NEEDED;
+	        client->printer->state_reasons |= IPPEVE_PREASON_MEDIA_NEEDED;
 	    }
 	    else
-	      client->printer->state_reasons &= (_ipp_preason_t)~(_IPP_PREASON_MEDIA_EMPTY | _IPP_PREASON_MEDIA_NEEDED);
+	      client->printer->state_reasons &= (ippeve_preason_t)~(IPPEVE_PREASON_MEDIA_EMPTY | IPPEVE_PREASON_MEDIA_NEEDED);
 
 	    html_printf(client, "<blockquote>Media updated.</blockquote>\n");
           }
@@ -5687,7 +5687,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	    char	name[64];	/* Form field */
 	    const char	*val;		/* Form value */
 
-            client->printer->state_reasons &= (_ipp_preason_t)~(_IPP_PREASON_MARKER_SUPPLY_EMPTY | _IPP_PREASON_MARKER_SUPPLY_LOW | _IPP_PREASON_MARKER_WASTE_ALMOST_FULL | _IPP_PREASON_MARKER_WASTE_FULL | _IPP_PREASON_TONER_EMPTY | _IPP_PREASON_TONER_LOW);
+            client->printer->state_reasons &= (ippeve_preason_t)~(IPPEVE_PREASON_MARKER_SUPPLY_EMPTY | IPPEVE_PREASON_MARKER_SUPPLY_LOW | IPPEVE_PREASON_MARKER_WASTE_ALMOST_FULL | IPPEVE_PREASON_MARKER_WASTE_FULL | IPPEVE_PREASON_TONER_EMPTY | IPPEVE_PREASON_TONER_LOW);
 
 	    for (i = 0; i < (int)(sizeof(printer_supplies) / sizeof(printer_supplies[0])); i ++)
 	    {
@@ -5700,16 +5700,16 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		if (i < 4)
 		{
 		  if (level == 0)
-		    client->printer->state_reasons |= _IPP_PREASON_TONER_EMPTY;
+		    client->printer->state_reasons |= IPPEVE_PREASON_TONER_EMPTY;
 		  else if (level < 10)
-		    client->printer->state_reasons |= _IPP_PREASON_TONER_LOW;
+		    client->printer->state_reasons |= IPPEVE_PREASON_TONER_LOW;
 		}
 		else
 		{
 		  if (level == 100)
-		    client->printer->state_reasons |= _IPP_PREASON_MARKER_WASTE_FULL;
+		    client->printer->state_reasons |= IPPEVE_PREASON_MARKER_WASTE_FULL;
 		  else if (level > 90)
-		    client->printer->state_reasons |= _IPP_PREASON_MARKER_WASTE_ALMOST_FULL;
+		    client->printer->state_reasons |= IPPEVE_PREASON_MARKER_WASTE_ALMOST_FULL;
 		}
 	      }
             }
@@ -5784,7 +5784,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
  */
 
 static int				/* O - 1 on success, 0 on error */
-process_ipp(_ipp_client_t *client)	/* I - Client */
+process_ipp(ippeve_client_t *client)	/* I - Client */
 {
   ipp_tag_t		group;		/* Current group tag */
   ipp_attribute_t	*attr;		/* Current attribute */
@@ -6026,20 +6026,20 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
  */
 
 static void *				/* O - Thread exit status */
-process_job(_ipp_job_t *job)		/* I - Job */
+process_job(ippeve_job_t *job)		/* I - Job */
 {
   job->state          = IPP_JSTATE_PROCESSING;
   job->printer->state = IPP_PSTATE_PROCESSING;
   job->processing     = time(NULL);
 
-  while (job->printer->state_reasons & _IPP_PREASON_MEDIA_EMPTY)
+  while (job->printer->state_reasons & IPPEVE_PREASON_MEDIA_EMPTY)
   {
-    job->printer->state_reasons |= _IPP_PREASON_MEDIA_NEEDED;
+    job->printer->state_reasons |= IPPEVE_PREASON_MEDIA_NEEDED;
 
     sleep(1);
   }
 
-  job->printer->state_reasons &= (_ipp_preason_t)~_IPP_PREASON_MEDIA_NEEDED;
+  job->printer->state_reasons &= (ippeve_preason_t)~IPPEVE_PREASON_MEDIA_NEEDED;
 
   if (job->printer->command)
   {
@@ -6289,11 +6289,11 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
 static void
 process_state_message(
-    _ipp_job_t *job,			/* I - Job */
+    ippeve_job_t *job,			/* I - Job */
     char       *message)		/* I - Message */
 {
   int		i;			/* Looping var */
-  _ipp_preason_t state_reasons,		/* printer-state-reasons values */
+  ippeve_preason_t state_reasons,		/* printer-state-reasons values */
 		bit;			/* Current reason bit */
   char		*ptr,			/* Pointer into message */
 		*next;			/* Next keyword in message */
@@ -6336,7 +6336,7 @@ process_state_message(
   else
   {
     remove        = 0;
-    state_reasons = _IPP_PREASON_NONE;
+    state_reasons = IPPEVE_PREASON_NONE;
   }
 
   while (*message)
@@ -6351,9 +6351,9 @@ process_state_message(
     else if ((ptr = strstr(message, "-warning")) != NULL)
       *ptr = '\0';
 
-    for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+    for (i = 0, bit = 1; i < (int)(sizeof(ippeve_preason_strings) / sizeof(ippeve_preason_strings[0])); i ++, bit *= 2)
     {
-      if (!strcmp(message, _ipp_preason_strings[i]))
+      if (!strcmp(message, ippeve_preason_strings[i]))
       {
         if (remove)
 	  state_reasons &= ~bit;
@@ -6378,7 +6378,7 @@ process_state_message(
 
 static int				/* O - 1 on success, 0 on error */
 register_printer(
-    _ipp_printer_t *printer,		/* I - Printer */
+    ippeve_printer_t *printer,		/* I - Printer */
     const char     *location,		/* I - Location */
     const char     *make,		/* I - Manufacturer */
     const char     *model,		/* I - Model name */
@@ -6390,7 +6390,7 @@ register_printer(
     const char     *subtype)		/* I - Service subtype */
 {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  _ipp_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
+  ippeve_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 #ifdef HAVE_DNSSD
   DNSServiceErrorType	error;		/* Error from Bonjour */
@@ -6457,7 +6457,7 @@ register_printer(
   }
 
  /*
-  * Then register the _ipp._tcp (IPP) service type with the real port number to
+  * Then register the ippeve._tcp (IPP) service type with the real port number to
   * advertise our IPP printer...
   */
 
@@ -6485,7 +6485,7 @@ register_printer(
 
 #  ifdef HAVE_SSL
  /*
-  * Then register the _ipps._tcp (IPP) service type with the real port number to
+  * Then register the ippeves._tcp (IPP) service type with the real port number to
   * advertise our IPPS printer...
   */
 
@@ -6570,7 +6570,7 @@ register_printer(
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_printer._tcp", NULL, NULL, 0, NULL);
 
  /*
-  * Then register the _ipp._tcp (IPP)...
+  * Then register the ippeve._tcp (IPP)...
   */
 
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, NULL, printer->port, ipp_txt);
@@ -6582,7 +6582,7 @@ register_printer(
 
 #ifdef HAVE_SSL
  /*
-  * _ipps._tcp (IPPS) for secure printing...
+  * ippeves._tcp (IPPS) for secure printing...
   */
 
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, NULL, printer->port, ipp_txt);
@@ -6620,7 +6620,7 @@ register_printer(
 
 int					/* O - 1 on success, 0 on failure */
 respond_http(
-    _ipp_client_t *client,		/* I - Client */
+    ippeve_client_t *client,		/* I - Client */
     http_status_t code,			/* I - HTTP status of response */
     const char    *content_encoding,	/* I - Content-Encoding of response */
     const char    *type,		/* I - MIME media type of response */
@@ -6720,7 +6720,7 @@ respond_http(
  */
 
 static void
-respond_ipp(_ipp_client_t *client,	/* I - Client */
+respond_ipp(ippeve_client_t *client,	/* I - Client */
             ipp_status_t  status,	/* I - status-code */
 	    const char    *message,	/* I - printf-style status-message */
 	    ...)			/* I - Additional args as needed */
@@ -6763,7 +6763,7 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 
 static void
 respond_unsupported(
-    _ipp_client_t   *client,		/* I - Client */
+    ippeve_client_t   *client,		/* I - Client */
     ipp_attribute_t *attr)		/* I - Atribute */
 {
   ipp_attribute_t	*temp;		/* Copy of attribute */
@@ -6784,12 +6784,12 @@ respond_unsupported(
  */
 
 static void
-run_printer(_ipp_printer_t *printer)	/* I - Printer */
+run_printer(ippeve_printer_t *printer)	/* I - Printer */
 {
   int		num_fds;		/* Number of file descriptors */
   struct pollfd	polldata[3];		/* poll() data */
   int		timeout;		/* Timeout for poll() */
-  _ipp_client_t	*client;		/* New client */
+  ippeve_client_t	*client;		/* New client */
 
 
  /*
@@ -6944,7 +6944,7 @@ usage(int status)			/* O - Exit status */
 
 static int				/* O - 1 if valid, 0 if not */
 valid_doc_attributes(
-    _ipp_client_t *client)		/* I - Client */
+    ippeve_client_t *client)		/* I - Client */
 {
   int			valid = 1;	/* Valid attributes? */
   ipp_op_t		op = ippGetOperation(client->request);
@@ -7089,7 +7089,7 @@ valid_doc_attributes(
 
 static int				/* O - 1 if valid, 0 if not */
 valid_job_attributes(
-    _ipp_client_t *client)		/* I - Client */
+    ippeve_client_t *client)		/* I - Client */
 {
   int			i,		/* Looping var */
 			count,		/* Number of values */

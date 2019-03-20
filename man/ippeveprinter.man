@@ -1,15 +1,16 @@
 .\"
-.\" ippserver man page for CUPS.
+.\" ippeveprinter man page for CUPS.
 .\"
-.\" Copyright 2014 by Apple Inc.
+.\" Copyright © 2014-2019 by Apple Inc.
 .\"
-.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+.\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
+.\" information.
 .\"
-.TH ippserver 1 "CUPS" "28 August 2014" "Apple Inc."
+.TH ippeveprinter 1 "CUPS" "20 March 2019" "Apple Inc."
 .SH NAME
-ippserver \- a simple internet printing protocol server
+ippeveprinter \- an ipp everywhere printer application for cups
 .SH SYNOPSIS
-.B ippserver
+.B ippeveprinter
 [
 .B \-2
 ] [
@@ -56,11 +57,11 @@ ippserver \- a simple internet printing protocol server
 ]
 .I service-name
 .SH DESCRIPTION
-.B ippserver
+.B ippeveprinter
 is a simple Internet Printing Protocol (IPP) server conforming to the IPP Everywhere (PWG 5100.14) specification. It can be used to test client software or act as a very basic print server that runs a command for every job that is printed.
 .SH OPTIONS
 The following options are recognized by
-.B ippserver:
+.B ippeveprinter:
 .TP 5
 .B \-2
 Report support for two-sided (duplex) printing.
@@ -125,17 +126,17 @@ The default is "10,0".
 Be (very) verbose when logging activity to the standard output.
 .SH EXIT STATUS
 The
-.B ippserver
+.B ippeveprinter
 program returns 1 if it is unable to process the command-line arguments or register the IPP service.
 Otherwise
-.B ippserver
+.B ippeveprinter
 will run continuously until terminated.
 .SH CONFORMING TO
 The
-.B ippserver
+.B ippeveprinter
 program is unique to CUPS and conforms to the IPP Everywhere (PWG 5100.14) specification.
 .SH ENVIRONMENT
-.B ippserver
+.B ippeveprinter
 adds environment variables starting with "IPP_" for all IPP Job attributes in the print request.
 For example, when executing a command for an IPP Job containing the "media" Job Template attribute, the "IPP_MEDIA" environment variable will be set to the value of that attribute.
 .LP
@@ -143,11 +144,11 @@ Enumerated values are converted to their keyword equivalents.
 For example, a "print-quality" Job Template attribute with a enum value of 3 will become the "IPP_PRINT_QUALITY" environment variable with a value of "draft".
 .SH EXAMPLES
 Run
-.B ippserver
+.B ippeveprinter
 with a service name of My Cool Printer:
 .nf
 
-    ippserver "My Cool Printer"
+    ippeveprinter "My Cool Printer"
 .fi
 .LP
 Run the
@@ -155,9 +156,9 @@ Run the
 command whenever a job is sent to the server:
 .nf
 
-    ippserver \-c file "My Cool Printer"
+    ippeveprinter \-c file "My Cool Printer"
 .fi
 .SH SEE ALSO
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2019 by Apple Inc.
