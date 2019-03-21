@@ -1,5 +1,5 @@
 /*
- * Generic HP PCL printer command for ippeveprinter/CUPS.
+ * Common header for IPP Everywhere printer commands for CUPS.
  *
  * Copyright © 2019 by Apple Inc.
  *
@@ -11,4 +11,10 @@
  * Include necessary headers...
  */
 
-#include "ippevecommon.h"
+#include <cups/cups.h>
+#include <cups/raster.h>
+
+
+/*
+ * Prototypes...
+ */
