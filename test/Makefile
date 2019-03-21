@@ -51,10 +51,10 @@ OBJS		=	\
 			ippfind.o \
 			ipptool.o
 TARGETS		=	\
-			ippeveprinter \
 			$(IPPFIND_BIN) \
 			ipptool \
 			$(LOCALTARGET)
+#			ippeveprinter \
 
 
 #
@@ -179,7 +179,8 @@ uninstall:
 # Local programs (not built when cross-compiling...)
 #
 
-local:	ippeveprinter-static ipptool-static
+#local:	ippeveprinter-static ipptool-static
+local:	ipptool-static
 
 
 #
