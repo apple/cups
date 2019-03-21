@@ -1,10 +1,11 @@
 /*
  * User, system, and password routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -32,13 +33,13 @@
  */
 
 #ifdef __APPLE__
-#  if TARGET_OS_IOS
-#    define kCUPSPrintingPrefs	CFSTR(".GlobalPreferences")
-#    define kPREFIX		"AirPrint"
-#  else
+#  if TARGET_OS_OSX
 #    define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
 #    define kPREFIX		""
-#  endif /* TARGET_OS_IOS */
+#  else
+#    define kCUPSPrintingPrefs	CFSTR(".GlobalPreferences")
+#    define kPREFIX		"AirPrint"
+#  endif /* TARGET_OS_OSX */
 #  define kAllowAnyRootKey	CFSTR(kPREFIX "AllowAnyRoot")
 #  define kAllowExpiredCertsKey	CFSTR(kPREFIX "AllowExpiredCerts")
 #  define kEncryptionKey	CFSTR(kPREFIX "Encryption")
@@ -564,11 +565,11 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
   else
     strlcpy(version, "unknown", sizeof(version));
 
-#  if TARGET_OS_IOS
-  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s; %s) IPP/2.0", version, name.machine);
-#  else
+#  if TARGET_OS_OSX
   snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (macOS %s; %s) IPP/2.0", version, name.machine);
-#  endif /* TARGET_OS_IOS */
+#  else
+  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s; %s) IPP/2.0", version, name.machine);
+#  endif /* TARGET_OS_OSX */
 
 #else
  /*
@@ -1216,9 +1217,9 @@ cups_init_client_conf(
 
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
-#if TARGET_OS_IOS
+#if defined(__APPLE__) && !TARGET_OS_OSX
   cups_set_user(cc, "mobile");
-#endif /* TARGET_OS_IOS */
+#endif /* __APPLE__ && !TARGET_OS_OSX */
 
 #ifdef HAVE_SSL
   cc->ssl_min_version = _HTTP_TLS_1_0;

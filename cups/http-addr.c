@@ -1,10 +1,11 @@
 /*
  * HTTP address routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -19,7 +20,9 @@
 #endif /* HAVE_RESOLV_H */
 #ifdef __APPLE__
 #  include <CoreFoundation/CoreFoundation.h>
-#  include <SystemConfiguration/SystemConfiguration.h>
+#  ifdef HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME
+#    include <SystemConfiguration/SystemConfiguration.h>
+#  endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
 #endif /* __APPLE__ */
 
 

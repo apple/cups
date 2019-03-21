@@ -339,14 +339,18 @@ case $host_os_name in
         darwin*)
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 SERVERLIBS="$SERVERLIBS -framework IOKit -weak_framework ApplicationServices"
-                LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
+                LIBS="-framework CoreFoundation -framework Security $LIBS"
 
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(ApplicationServices/ApplicationServices.h,AC_DEFINE(HAVE_APPLICATIONSERVICES_H))
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
 
 		dnl Check for dynamic store function...
-		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName)
+		SAVELIBS="$LIBS"
+		LIBS="-framework SystemConfiguration $LIBS"
+		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName,[
+		    AC_DEFINE(HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME)],[
+		    LIBS="$SAVELIBS"])
 
 		dnl Check for the new membership functions in MacOSX 10.4...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))

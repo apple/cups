@@ -105,7 +105,107 @@ cupsMakeServerCredentials(
     const char **alt_names,		/* I - Subject Alternate Names */
     time_t     expiration_date)		/* I - Expiration date */
 {
-#if TARGET_OS_IOS
+#if TARGET_OS_OSX
+  int		pid,			/* Process ID of command */
+		status,			/* Status of command */
+		i;			/* Looping var */
+  char		command[1024],		/* Command */
+		*argv[5],		/* Command-line arguments */
+		*envp[1000],		/* Environment variables */
+		days[32],		/* CERTTOOL_EXPIRATION_DAYS env var */
+		keychain[1024],		/* Keychain argument */
+		infofile[1024],		/* Type-in information for cert */
+		filename[1024];		/* Default keychain path */
+  cups_file_t	*fp;			/* Seed/info file */
+
+
+  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, (void *)alt_names, (int)expiration_date));
+
+  (void)num_alt_names;
+  (void)alt_names;
+
+  if (!path)
+    path = http_cdsa_default_path(filename, sizeof(filename));
+
+ /*
+  * Run the "certtool" command to generate a self-signed certificate...
+  */
+
+  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
+    return (-1);
+
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the certtool
+  * command...
+  */
+
+ if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+    return (-1);
+
+  cupsFilePrintf(fp,
+                 "CUPS Self-Signed Certificate\n"
+		 			/* Enter key and certificate label */
+                 "r\n"			/* Generate RSA key pair */
+                 "2048\n"		/* 2048 bit encryption key */
+                 "y\n"			/* OK (y = yes) */
+                 "b\n"			/* Usage (b=signing/encryption) */
+                 "2\n"			/* Sign with SHA256 */
+                 "y\n"			/* OK (y = yes) */
+                 "%s\n"			/* Common name */
+                 "\n"			/* Country (default) */
+                 "\n"			/* Organization (default) */
+                 "\n"			/* Organizational unit (default) */
+                 "\n"			/* State/Province (default) */
+                 "\n"			/* Email address */
+                 "y\n",			/* OK (y = yes) */
+        	 common_name);
+  cupsFileClose(fp);
+
+  snprintf(keychain, sizeof(keychain), "k=%s", path);
+
+  argv[0] = "certtool";
+  argv[1] = "c";
+  argv[2] = keychain;
+  argv[3] = NULL;
+
+  snprintf(days, sizeof(days), "CERTTOOL_EXPIRATION_DAYS=%d", (int)((expiration_date - time(NULL) + 86399) / 86400));
+  envp[0] = days;
+  for (i = 0; i < (int)(sizeof(envp) / sizeof(envp[0]) - 2) && environ[i]; i ++)
+    envp[i + 1] = environ[i];
+  envp[i] = NULL;
+
+  posix_spawn_file_actions_t actions;	/* File actions */
+
+  posix_spawn_file_actions_init(&actions);
+  posix_spawn_file_actions_addclose(&actions, 0);
+  posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
+  posix_spawn_file_actions_addclose(&actions, 1);
+  posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0);
+  posix_spawn_file_actions_addclose(&actions, 2);
+  posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0);
+
+  if (posix_spawn(&pid, command, &actions, NULL, argv, envp))
+  {
+    unlink(infofile);
+    return (-1);
+  }
+
+  posix_spawn_file_actions_destroy(&actions);
+
+  unlink(infofile);
+
+  while (waitpid(pid, &status, 0) < 0)
+    if (errno != EINTR)
+    {
+      status = -1;
+      break;
+    }
+
+  return (!status);
+
+#else
   int			status = 0;	/* Return status */
   OSStatus		err;		/* Error code (if any) */
   CFStringRef		cfcommon_name = NULL;
@@ -263,107 +363,7 @@ cleanup:
   DEBUG_printf(("1cupsMakeServerCredentials: Returning %d.", status));
 
   return (status);
-
-#else /* !TARGET_OS_IOS */
-  int		pid,			/* Process ID of command */
-		status,			/* Status of command */
-		i;			/* Looping var */
-  char		command[1024],		/* Command */
-		*argv[5],		/* Command-line arguments */
-		*envp[1000],		/* Environment variables */
-		days[32],		/* CERTTOOL_EXPIRATION_DAYS env var */
-		keychain[1024],		/* Keychain argument */
-		infofile[1024],		/* Type-in information for cert */
-		filename[1024];		/* Default keychain path */
-  cups_file_t	*fp;			/* Seed/info file */
-
-
-  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, (void *)alt_names, (int)expiration_date));
-
-  (void)num_alt_names;
-  (void)alt_names;
-
-  if (!path)
-    path = http_cdsa_default_path(filename, sizeof(filename));
-
- /*
-  * Run the "certtool" command to generate a self-signed certificate...
-  */
-
-  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
-    return (-1);
-
- /*
-  * Create a file with the certificate information fields...
-  *
-  * Note: This assumes that the default questions are asked by the certtool
-  * command...
-  */
-
- if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
-    return (-1);
-
-  cupsFilePrintf(fp,
-                 "CUPS Self-Signed Certificate\n"
-		 			/* Enter key and certificate label */
-                 "r\n"			/* Generate RSA key pair */
-                 "2048\n"		/* 2048 bit encryption key */
-                 "y\n"			/* OK (y = yes) */
-                 "b\n"			/* Usage (b=signing/encryption) */
-                 "2\n"			/* Sign with SHA256 */
-                 "y\n"			/* OK (y = yes) */
-                 "%s\n"			/* Common name */
-                 "\n"			/* Country (default) */
-                 "\n"			/* Organization (default) */
-                 "\n"			/* Organizational unit (default) */
-                 "\n"			/* State/Province (default) */
-                 "\n"			/* Email address */
-                 "y\n",			/* OK (y = yes) */
-        	 common_name);
-  cupsFileClose(fp);
-
-  snprintf(keychain, sizeof(keychain), "k=%s", path);
-
-  argv[0] = "certtool";
-  argv[1] = "c";
-  argv[2] = keychain;
-  argv[3] = NULL;
-
-  snprintf(days, sizeof(days), "CERTTOOL_EXPIRATION_DAYS=%d", (int)((expiration_date - time(NULL) + 86399) / 86400));
-  envp[0] = days;
-  for (i = 0; i < (int)(sizeof(envp) / sizeof(envp[0]) - 2) && environ[i]; i ++)
-    envp[i + 1] = environ[i];
-  envp[i] = NULL;
-
-  posix_spawn_file_actions_t actions;	/* File actions */
-
-  posix_spawn_file_actions_init(&actions);
-  posix_spawn_file_actions_addclose(&actions, 0);
-  posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
-  posix_spawn_file_actions_addclose(&actions, 1);
-  posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0);
-  posix_spawn_file_actions_addclose(&actions, 2);
-  posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0);
-
-  if (posix_spawn(&pid, command, &actions, NULL, argv, envp))
-  {
-    unlink(infofile);
-    return (-1);
-  }
-
-  posix_spawn_file_actions_destroy(&actions);
-
-  unlink(infofile);
-
-  while (waitpid(pid, &status, 0) < 0)
-    if (errno != EINTR)
-    {
-      status = -1;
-      break;
-    }
-
-  return (!status);
-#endif /* TARGET_OS_IOS */
+#endif /* TARGET_OS_OSX */
 }
 
 
@@ -829,9 +829,9 @@ httpCredentialsString(
     * issuer name is, um, "interesting"...
     */
 
-#  if !TARGET_OS_IOS
+#  if TARGET_OS_OSX
     CFDictionaryRef	cf_dict;	/* Dictionary for certificate */
-#  endif /* !TARGET_OS_IOS */
+#  endif /* TARGET_OS_OSX */
     CFStringRef		cf_string;	/* CF string */
     char		commonName[256],/* Common name associated with cert */
 			issuer[256],	/* Issuer name */
@@ -852,7 +852,7 @@ httpCredentialsString(
     strlcpy(issuer, "unknown", sizeof(issuer));
     strlcpy(sigalg, "UnknownSignature", sizeof(sigalg));
 
-#  if !TARGET_OS_IOS
+#  if TARGET_OS_OSX
     if ((cf_dict = SecCertificateCopyValues(secCert, NULL, NULL)) != NULL)
     {
       CFDictionaryRef cf_issuer = CFDictionaryGetValue(cf_dict, kSecOIDX509V1IssuerName);
@@ -899,7 +899,7 @@ httpCredentialsString(
 
       CFRelease(cf_dict);
     }
-#  endif /* !TARGET_OS_IOS */
+#  endif /* TARGET_OS_OSX */
 
     expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
 

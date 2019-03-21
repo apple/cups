@@ -1,7 +1,7 @@
 /*
  * API versioning definitions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -96,7 +96,7 @@
  * Note: Using any of the _CUPS_API macros automatically adds _CUPS_PUBLIC.
  */
 
-#  if defined(__APPLE__) && !defined(_CUPS_SOURCE) && !TARGET_OS_IOS
+#  if defined(__APPLE__) && !defined(_CUPS_SOURCE) && TARGET_OS_OSX
 /*
  * On Apple operating systems, the _CUPS_API_* constants are defined using the
  * API_ macros in <os/availability.h>.

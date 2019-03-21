@@ -1,7 +1,7 @@
 /*
  * User-defined destination (and option) support for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -44,10 +44,10 @@
  */
 
 #ifdef __APPLE__
-#  if !TARGET_OS_IOS
+#  if HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME
 #    include <SystemConfiguration/SystemConfiguration.h>
 #    define _CUPS_LOCATION_DEFAULTS 1
-#  endif /* !TARGET_OS_IOS */
+#  endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
 #  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
 #  define kDefaultPaperIDKey	CFSTR("DefaultPaperID")
 #  define kLastUsedPrintersKey	CFSTR("LastUsedPrinters")

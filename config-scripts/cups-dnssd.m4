@@ -1,9 +1,10 @@
 dnl
 dnl DNS Service Discovery (aka Bonjour) stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
+dnl Copyright © 2007-2019 by Apple Inc.
 dnl
-dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
+dnl information.
 dnl
 
 AC_ARG_ENABLE(avahi, [  --disable-avahi         disable DNS Service Discovery support using Avahi])
@@ -41,7 +42,6 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 			darwin*)
 				# Darwin and macOS...
 				AC_DEFINE(HAVE_DNSSD)
-				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				DNSSD_BACKEND="dnssd"
 				IPPFIND_BIN="ippfind"
 				IPPFIND_MAN="ippfind.\$(MAN1EXT)"
