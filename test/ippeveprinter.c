@@ -227,6 +227,7 @@ static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra, ipp_tag_t
 static void		copy_job_attributes(ippeve_client_t *client, ippeve_job_t *job, cups_array_t *ra);
 static ippeve_client_t	*create_client(ippeve_printer_t *printer, int sock);
 static ippeve_job_t	*create_job(ippeve_client_t *client);
+static int		create_job_file(ippeve_printer_t *printer, ippeve_job_t *job, char *fname, size_t fnamesize, const char *ext);
 static int		create_listener(const char *name, int port, int family);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int bottom, int left, int right, int top);
 static ipp_t		*create_media_size(int width, int length);
@@ -1002,36 +1003,43 @@ create_job(ippeve_client_t *client)	/* I - Client */
 
 
 /*
- * 'create_job_filename()' - Create the filename for a document in a job.
+ * 'create_job_file()' - Create a file for the document in a job.
  */
 
-static void create_job_filename(
+static int				/* O - File descriptor or -1 on error */
+create_job_file(
     ippeve_printer_t *printer,		/* I - Printer */
     ippeve_job_t     *job,		/* I - Job */
-    char           *fname,		/* I - Filename buffer */
-    size_t         fnamesize)		/* I - Size of filename buffer */
+    char             *fname,		/* I - Filename buffer */
+    size_t           fnamesize,		/* I - Size of filename buffer */
+    const char       *ext)		/* I - Extension (`NULL` for default) */
 {
   char			name[256],	/* "Safe" filename */
 			*nameptr;	/* Pointer into filename */
-  const char		*ext,		/* Filename extension */
-			*job_name;	/* job-name value */
-  ipp_attribute_t	*job_name_attr;	/* job-name attribute */
+  const char		*job_name;	/* job-name value */
 
 
  /*
   * Make a name from the job-name attribute...
   */
 
-  if ((job_name_attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME)) != NULL)
-    job_name = ippGetString(job_name_attr, 0, NULL);
-  else
+  if ((job_name = ippGetString(ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME), 0, NULL)) == NULL)
     job_name = "untitled";
 
   for (nameptr = name; *job_name && nameptr < (name + sizeof(name) - 1); job_name ++)
+  {
     if (isalnum(*job_name & 255) || *job_name == '-')
+    {
       *nameptr++ = (char)tolower(*job_name & 255);
+    }
     else
+    {
       *nameptr++ = '_';
+
+      while (job_name[1] && !isalnum(job_name[1] & 255) && job_name[1] != '-')
+        job_name ++;
+    }
+  }
 
   *nameptr = '\0';
 
@@ -1039,26 +1047,33 @@ static void create_job_filename(
   * Figure out the extension...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
-    ext = "jpg";
-  else if (!strcasecmp(job->format, "image/png"))
-    ext = "png";
-  else if (!strcasecmp(job->format, "image/pwg-raster"))
-    ext = "ras";
-  else if (!strcasecmp(job->format, "image/urf"))
-    ext = "urf";
-  else if (!strcasecmp(job->format, "application/pdf"))
-    ext = "pdf";
-  else if (!strcasecmp(job->format, "application/postscript"))
-    ext = "ps";
-  else
-    ext = "prn";
+  if (!ext)
+  {
+    if (!strcasecmp(job->format, "image/jpeg"))
+      ext = "jpg";
+    else if (!strcasecmp(job->format, "image/png"))
+      ext = "png";
+    else if (!strcasecmp(job->format, "image/pwg-raster"))
+      ext = "pwg";
+    else if (!strcasecmp(job->format, "image/urf"))
+      ext = "urf";
+    else if (!strcasecmp(job->format, "application/pdf"))
+      ext = "pdf";
+    else if (!strcasecmp(job->format, "application/postscript"))
+      ext = "ps";
+    else if (!strcasecmp(job->format, "application/vnd.hp-pcl"))
+      ext = "pcl";
+    else
+      ext = "dat";
+  }
 
  /*
   * Create a filename with the job-id, job-name, and document-format (extension)...
   */
 
   snprintf(fname, fnamesize, "%s/%d-%s.%s", printer->directory, job->id, name, ext);
+
+  return (open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0666));
 }
 
 
@@ -2896,8 +2911,7 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
-                "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_BUSY, "Currently printing another job.");
     return;
   }
 
@@ -2905,19 +2919,16 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  create_job_filename(client->printer, job, filename, sizeof(filename));
-
-  if (Verbosity)
-    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
-
-  if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
+  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to create print file: %s", strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
     return;
   }
+
+  if (Verbosity)
+    fprintf(stderr, "Created job file \"%s\", format \"%s\".\n", filename, job->format);
 
   while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
@@ -2932,8 +2943,7 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
 
       unlink(filename);
 
-      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                  "Unable to write print file: %s", strerror(error));
+      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
       return;
     }
   }
@@ -2951,8 +2961,7 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to read print file.");
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
     return;
   }
 
@@ -2965,8 +2974,7 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to write print file: %s", strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3032,17 +3040,6 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 			buffer[4096];	/* Copy buffer */
   ssize_t		bytes;		/* Bytes read */
   cups_array_t		*ra;		/* Attributes to send in response */
-  static const char * const uri_status_strings[] =
-  {					/* URI decode errors */
-    "URI too large.",
-    "Bad arguments to function.",
-    "Bad resource in URI.",
-    "Bad port number in URI.",
-    "Bad hostname in URI.",
-    "Bad username in URI.",
-    "Bad scheme in URI.",
-    "Bad/empty URI."
-  };
 
 
  /*
@@ -3061,8 +3058,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 
   if (httpGetState(client->http) == HTTP_STATE_POST_RECV)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "Unexpected document data following request.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Unexpected document data following request.");
     return;
   }
 
@@ -3079,8 +3075,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 
   if (ippGetCount(uri) != 1)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "Too many document-uri values.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Too many document-uri values.");
     return;
   }
 
@@ -3090,8 +3085,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
                                &port, resource, sizeof(resource));
   if (uri_status < HTTP_URI_STATUS_OK)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad document-uri: %s",
-                uri_status_strings[uri_status - HTTP_URI_STATUS_OVERFLOW]);
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad document-uri: %s", httpURIStatusString(uri_status));
     return;
   }
 
@@ -3101,15 +3095,13 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
       strcmp(scheme, "http"))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME,
-                "URI scheme \"%s\" not supported.", scheme);
+    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME, "URI scheme \"%s\" not supported.", scheme);
     return;
   }
 
   if (!strcmp(scheme, "file") && access(resource, R_OK))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                "Unable to access URI: %s", strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s", strerror(errno));
     return;
   }
 
@@ -3119,8 +3111,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
-                "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_BUSY, "Currently printing another job.");
     return;
   }
 
@@ -3128,28 +3119,11 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
-    snprintf(filename, sizeof(filename), "%s/%d.jpg",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/png"))
-    snprintf(filename, sizeof(filename), "%s/%d.png",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/pdf"))
-    snprintf(filename, sizeof(filename), "%s/%d.pdf",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/postscript"))
-    snprintf(filename, sizeof(filename), "%s/%d.ps",
-             client->printer->directory, job->id);
-  else
-    snprintf(filename, sizeof(filename), "%s/%d.prn",
-             client->printer->directory, job->id);
-
-  if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
+  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to create print file: %s", strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
     return;
   }
 
@@ -3157,15 +3131,13 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
   {
     if ((infile = open(resource, O_RDONLY)) < 0)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to access URI: %s", strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s", strerror(errno));
       return;
     }
 
     do
     {
-      if ((bytes = read(infile, buffer, sizeof(buffer))) < 0 &&
-          (errno == EAGAIN || errno == EINTR))
+      if ((bytes = read(infile, buffer, sizeof(buffer))) < 0 && (errno == EAGAIN || errno == EINTR))
         bytes = 1;
       else if (bytes > 0 && write(job->fd, buffer, (size_t)bytes) < bytes)
       {
@@ -3179,8 +3151,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 	unlink(filename);
 	close(infile);
 
-	respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-		    "Unable to write print file: %s", strerror(error));
+	respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
 	return;
       }
     }
@@ -3197,12 +3168,9 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
     encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption,
-                             1, 30000, NULL)) == NULL)
+    if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL)) == NULL)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to connect to %s: %s", hostname,
-		  cupsLastErrorString());
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to connect to %s: %s", hostname, cupsLastErrorString());
       job->state = IPP_JSTATE_ABORTED;
 
       close(job->fd);
@@ -3216,8 +3184,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     if (httpGet(http, resource))
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to GET URI: %s", strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s", strerror(errno));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3233,8 +3200,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 
     if (status != HTTP_STATUS_OK)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to GET URI: %s", httpStatus(status));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s", httpStatus(status));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3260,8 +3226,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 	unlink(filename);
 	httpClose(http);
 
-	respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-		    "Unable to write print file: %s", strerror(error));
+	respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
 	return;
       }
     }
@@ -3278,8 +3243,7 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to write print file: %s", strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3316,7 +3280,8 @@ ipp_print_uri(ippeve_client_t *client)	/* I - Client */
  */
 
 static void
-ipp_send_document(ippeve_client_t *client)/* I - Client */
+ipp_send_document(
+    ippeve_client_t *client)		/* I - Client */
 {
   ippeve_job_t		*job;		/* Job information */
   char			filename[1024],	/* Filename buffer */
@@ -3402,23 +3367,20 @@ ipp_send_document(ippeve_client_t *client)/* I - Client */
   * Create a file for the request data...
   */
 
-  create_job_filename(client->printer, job, filename, sizeof(filename));
-
-  if (Verbosity)
-    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
-
-  job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-
-  _cupsRWUnlock(&(client->printer->rwlock));
-
-  if (job->fd < 0)
+  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to create print file: %s", strerror(errno));
+    _cupsRWUnlock(&(client->printer->rwlock));
+
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
     return;
   }
+
+  if (Verbosity)
+    fprintf(stderr, "Created job file \"%s\", format \"%s\".\n", filename, job->format);
+
+  _cupsRWUnlock(&(client->printer->rwlock));
 
   while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
@@ -3433,8 +3395,7 @@ ipp_send_document(ippeve_client_t *client)/* I - Client */
 
       unlink(filename);
 
-      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                  "Unable to write print file: %s", strerror(error));
+      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
       return;
     }
   }
@@ -3452,8 +3413,7 @@ ipp_send_document(ippeve_client_t *client)/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to read print file.");
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
     return;
   }
 
@@ -3466,8 +3426,7 @@ ipp_send_document(ippeve_client_t *client)/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
-                "Unable to write print file: %s", strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3527,17 +3486,6 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
   ssize_t		bytes;		/* Bytes read */
   ipp_attribute_t	*attr;		/* Current attribute */
   cups_array_t		*ra;		/* Attributes to send in response */
-  static const char * const uri_status_strings[] =
-  {					/* URI decode errors */
-    "URI too large.",
-    "Bad arguments to function.",
-    "Bad resource in URI.",
-    "Bad port number in URI.",
-    "Bad hostname in URI.",
-    "Bad username in URI.",
-    "Bad scheme in URI.",
-    "Bad/empty URI."
-  };
 
 
  /*
@@ -3621,8 +3569,7 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
 
   if (ippGetCount(uri) != 1)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "Too many document-uri values.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Too many document-uri values.");
     return;
   }
 
@@ -3632,8 +3579,7 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
                                &port, resource, sizeof(resource));
   if (uri_status < HTTP_URI_STATUS_OK)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad document-uri: %s",
-                uri_status_strings[uri_status - HTTP_URI_STATUS_OVERFLOW]);
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad document-uri: %s", httpURIStatusString(uri_status));
     return;
   }
 
@@ -3643,15 +3589,13 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
       strcmp(scheme, "http"))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME,
-                "URI scheme \"%s\" not supported.", scheme);
+    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME, "URI scheme \"%s\" not supported.", scheme);
     return;
   }
 
   if (!strcmp(scheme, "file") && access(resource, R_OK))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                "Unable to access URI: %s", strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s", strerror(errno));
     return;
   }
 
@@ -3661,8 +3605,7 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
 
   _cupsRWLockWrite(&(client->printer->rwlock));
 
-  if ((attr = ippFindAttribute(job->attrs, "document-format",
-                               IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(job->attrs, "document-format", IPP_TAG_MIMETYPE)) != NULL)
     job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
@@ -3671,41 +3614,24 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
-    snprintf(filename, sizeof(filename), "%s/%d.jpg",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/png"))
-    snprintf(filename, sizeof(filename), "%s/%d.png",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/pdf"))
-    snprintf(filename, sizeof(filename), "%s/%d.pdf",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/postscript"))
-    snprintf(filename, sizeof(filename), "%s/%d.ps",
-             client->printer->directory, job->id);
-  else
-    snprintf(filename, sizeof(filename), "%s/%d.prn",
-             client->printer->directory, job->id);
-
-  job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-
-  _cupsRWUnlock(&(client->printer->rwlock));
-
-  if (job->fd < 0)
+  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
+
+    _cupsRWUnlock(&(client->printer->rwlock));
 
     respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
                 "Unable to create print file: %s", strerror(errno));
     return;
   }
 
+  _cupsRWUnlock(&(client->printer->rwlock));
+
   if (!strcmp(scheme, "file"))
   {
     if ((infile = open(resource, O_RDONLY)) < 0)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to access URI: %s", strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s", strerror(errno));
       return;
     }
 
@@ -3747,9 +3673,7 @@ ipp_send_uri(ippeve_client_t *client)	/* I - Client */
     if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption,
                              1, 30000, NULL)) == NULL)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
-                  "Unable to connect to %s: %s", hostname,
-		  cupsLastErrorString());
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to connect to %s: %s", hostname, cupsLastErrorString());
       job->state = IPP_JSTATE_ABORTED;
 
       close(job->fd);
@@ -5731,26 +5655,25 @@ process_job(ippeve_job_t *job)		/* I - Job */
     * Execute a command with the job spool file and wait for it to complete...
     */
 
-    int 	pid,			/* Process ID */
-		status;			/* Exit status */
-    time_t	start,			/* Start time */
-		end;			/* End time */
-    char	*myargv[3],		/* Command-line arguments */
-		*myenvp[200];		/* Environment variables */
-    int		myenvc;			/* Number of environment variables */
-    ipp_attribute_t *attr;		/* Job attribute */
-    char	val[1280],		/* IPP_NAME=value */
-		*valptr;		/* Pointer into string */
+    int 		pid,		/* Process ID */
+			status;		/* Exit status */
+    time_t		start,		/* Start time */
+			end;		/* End time */
+    char		*myargv[3],	/* Command-line arguments */
+			*myenvp[400];	/* Environment variables */
+    int			myenvc;		/* Number of environment variables */
+    ipp_attribute_t	*attr;		/* Job attribute */
+    char		val[1280],	/* IPP_NAME=value */
+			*valptr;	/* Pointer into string */
 #ifndef _WIN32
-    int		mypipe[2];		/* Pipe for stderr */
-    char	line[2048],		/* Line from stderr */
-		*ptr,			/* Pointer into line */
-		*endptr;		/* End of line */
-    ssize_t	bytes;			/* Bytes read */
+    int			mypipe[2];	/* Pipe for stderr */
+    char		line[2048],	/* Line from stderr */
+			*ptr,		/* Pointer into line */
+			*endptr;	/* End of line */
+    ssize_t		bytes;		/* Bytes read */
 #endif /* !_WIN32 */
 
-    fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
-            job->filename);
+    fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command, job->filename);
     time(&start);
 
    /*
@@ -5762,12 +5685,66 @@ process_job(ippeve_job_t *job)		/* I - Job */
     myargv[2] = NULL;
 
    /*
-    * Copy the current environment, then add ENV variables for every Job
-    * attribute...
+    * Copy the current environment, then add environment variables for every
+    * Job attribute and Printer -default attributes...
     */
 
     for (myenvc = 0; environ[myenvc] && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); myenvc ++)
       myenvp[myenvc] = strdup(environ[myenvc]);
+
+    if (myenvc > (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 32))
+    {
+      fprintf(stderr, "Too many environment variables to process job #%d.\n", job->id);
+      job->state = IPP_JSTATE_ABORTED;
+      goto error;
+    }
+
+    if (asprintf(myenvp + myenvc, "CONTENT_TYPE=%s", job->format) > 0)
+      myenvc ++;
+
+    if (job->printer->device_uri && asprintf(myenvp + myenvc, "DEVICE_URI=%s", job->printer->device_uri) > 0)
+      myenvc ++;
+
+    if (job->printer->ppdfile && asprintf(myenvp + myenvc, "PPD=%s", job->printer->ppdfile) > 0)
+      myenvc ++;
+
+    if ((attr = ippFindAttribute(job->attrs, "document-name", IPP_TAG_NAME)) != NULL && asprintf(myenvp + myenvc, "DOCUMENT_NAME=%s", ippGetString(attr, 0, NULL)) > 0)
+      myenvc ++;
+
+    for (attr = ippFirstAttribute(job->printer->attrs); attr && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); attr = ippNextAttribute(job->printer->attrs))
+    {
+     /*
+      * Convert "attribute-name-default" to "IPP_ATTRIBUTE_NAME_DEFAULT=" and
+      * then add the value(s) from the attribute.
+      */
+
+      const char	*name = ippGetName(attr),
+					/* Attribute name */
+			*suffix = strstr(name, "-default");
+					/* Suffix on attribute name */
+
+      if (!suffix || suffix[8])
+        continue;
+
+      valptr = val;
+      *valptr++ = 'I';
+      *valptr++ = 'P';
+      *valptr++ = 'P';
+      *valptr++ = '_';
+      while (*name && valptr < (val + sizeof(val) - 2))
+      {
+        if (*name == '-')
+	  *valptr++ = '_';
+	else
+	  *valptr++ = (char)toupper(*name & 255);
+
+	name ++;
+      }
+      *valptr++ = '=';
+      ippAttributeString(attr, valptr, sizeof(val) - (size_t)(valptr - val));
+
+      myenvp[myenvc++] = strdup(val);
+    }
 
     for (attr = ippFirstAttribute(job->attrs); attr && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); attr = ippNextAttribute(job->attrs))
     {
@@ -5777,6 +5754,8 @@ process_job(ippeve_job_t *job)		/* I - Job */
       */
 
       const char *name = ippGetName(attr);
+					/* Attribute name */
+
       if (!name)
         continue;
 
@@ -5799,6 +5778,14 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
       myenvp[myenvc++] = strdup(val);
     }
+
+    if (attr)
+    {
+      fprintf(stderr, "Too many environment variables to process job #%d.\n", job->id);
+      job->state = IPP_JSTATE_ABORTED;
+      goto error;
+    }
+
     myenvp[myenvc] = NULL;
 
    /*
@@ -5958,6 +5945,8 @@ process_job(ippeve_job_t *job)		/* I - Job */
     job->state = IPP_JSTATE_CANCELED;
   else if (job->state == IPP_JSTATE_PROCESSING)
     job->state = IPP_JSTATE_COMPLETED;
+
+  error:
 
   job->completed           = time(NULL);
   job->printer->state      = IPP_PSTATE_IDLE;
