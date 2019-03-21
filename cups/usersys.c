@@ -1137,17 +1137,22 @@ cups_finalize_client_conf(
 
   if (!cc->server_name[0])
   {
-#ifdef CUPS_DEFAULT_DOMAINSOCKET
    /*
     * If we are compiled with domain socket support, only use the
     * domain socket if it exists and has the right permissions...
     */
 
+#if defined(__APPLE__) && !TARGET_OS_OSX
+    cups_set_server_name(cc, "/private/var/run/printd");
+
+#else
+#  ifdef CUPS_DEFAULT_DOMAINSOCKET
     if (!access(CUPS_DEFAULT_DOMAINSOCKET, R_OK))
       cups_set_server_name(cc, CUPS_DEFAULT_DOMAINSOCKET);
     else
-#endif /* CUPS_DEFAULT_DOMAINSOCKET */
-      cups_set_server_name(cc, "localhost");
+#  endif /* CUPS_DEFAULT_DOMAINSOCKET */
+    cups_set_server_name(cc, "localhost");
+#endif /* __APPLE__ && !TARGET_OS_OSX */
   }
 
   if (!cc->user[0])
