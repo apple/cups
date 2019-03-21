@@ -245,6 +245,8 @@ static void		dnssd_client_cb(AvahiClient *c, AvahiClientState state, void *userd
 static void		dnssd_init(void);
 static int		filter_cb(ippeve_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
 static ippeve_job_t	*find_job(ippeve_client_t *client);
+static void		finish_document(ippeve_client_t *client, ippeve_job_t *job);
+static void		finish_uri(ippeve_client_t *client, ippeve_job_t *job);
 static void		html_escape(ippeve_client_t *client, const char *s, size_t slen);
 static void		html_footer(ippeve_client_t *client);
 static void		html_header(ippeve_client_t *client, const char *title);
@@ -2039,6 +2041,136 @@ find_job(ippeve_client_t *client)		/* I - Client */
 
 
 /*
+ * 'finish_document()' - Finish receiving a document file and start processing.
+ */
+
+static void
+finish_document(ippeve_client_t *client,/* I - Client */
+                ippeve_job_t    *job)	/* I - Job */
+{
+  char			filename[1024],	/* Filename buffer */
+			buffer[4096];	/* Copy buffer */
+  ssize_t		bytes;		/* Bytes read */
+  cups_array_t		*ra;		/* Attributes to send in response */
+  _cups_thread_t        t;              /* Thread */
+
+
+ /*
+  * Create a file for the request data...
+  *
+  * TODO: Update code to support piping large raster data to the print command.
+  */
+
+  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
+  {
+    job->state = IPP_JSTATE_ABORTED;
+
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
+    return;
+  }
+
+  if (Verbosity)
+    fprintf(stderr, "Created job file \"%s\", format \"%s\".\n", filename, job->format);
+
+  while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
+  {
+    if (write(job->fd, buffer, (size_t)bytes) < bytes)
+    {
+      int error = errno;		/* Write error */
+
+      job->state = IPP_JSTATE_ABORTED;
+
+      close(job->fd);
+      job->fd = -1;
+
+      unlink(filename);
+
+      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
+      return;
+    }
+  }
+
+  if (bytes < 0)
+  {
+   /*
+    * Got an error while reading the print data, so abort this job.
+    */
+
+    job->state = IPP_JSTATE_ABORTED;
+
+    close(job->fd);
+    job->fd = -1;
+
+    unlink(filename);
+
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
+    return;
+  }
+
+  if (close(job->fd))
+  {
+    int error = errno;			/* Write error */
+
+    job->state = IPP_JSTATE_ABORTED;
+    job->fd    = -1;
+
+    unlink(filename);
+
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
+    return;
+  }
+
+  job->fd       = -1;
+  job->filename = strdup(filename);
+  job->state    = IPP_JSTATE_PENDING;
+
+ /*
+  * Process the job...
+  */
+
+  t = _cupsThreadCreate((_cups_thread_func_t)process_job, job);
+
+  if (t)
+  {
+    _cupsThreadDetach(t);
+  }
+  else
+  {
+    job->state = IPP_JSTATE_ABORTED;
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
+    return;
+  }
+
+ /*
+  * Return the job info...
+  */
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+
+  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+  cupsArrayAdd(ra, "job-id");
+  cupsArrayAdd(ra, "job-state");
+  cupsArrayAdd(ra, "job-state-message");
+  cupsArrayAdd(ra, "job-state-reasons");
+  cupsArrayAdd(ra, "job-uri");
+
+  copy_job_attributes(client, job, ra);
+  cupsArrayDelete(ra);
+}
+
+
+/*
+ * 'finish_uri()' - Finish fetching a document URI and start processing.
+ */
+
+static void
+finish_uri(ippeve_client_t *client,	/* I - Client */
+           ippeve_job_t    *job)	/* I - Job */
+{
+}
+
+
+/*
  * 'html_escape()' - Write a HTML-safe string.
  */
 
@@ -2878,11 +3010,6 @@ static void
 ipp_print_job(ippeve_client_t *client)	/* I - Client */
 {
   ippeve_job_t		*job;		/* New job */
-  char			filename[1024],	/* Filename buffer */
-			buffer[4096];	/* Copy buffer */
-  ssize_t		bytes;		/* Bytes read */
-  cups_array_t		*ra;		/* Attributes to send in response */
-  _cups_thread_t        t;              /* Thread */
 
 
  /*
@@ -2906,7 +3033,7 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
   }
 
  /*
-  * Print the job...
+  * Create the job...
   */
 
   if ((job = create_job(client)) == NULL)
@@ -2916,104 +3043,10 @@ ipp_print_job(ippeve_client_t *client)	/* I - Client */
   }
 
  /*
-  * Create a file for the request data...
+  * Then finish getting the document data and process things...
   */
 
-  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
-  {
-    job->state = IPP_JSTATE_ABORTED;
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
-    return;
-  }
-
-  if (Verbosity)
-    fprintf(stderr, "Created job file \"%s\", format \"%s\".\n", filename, job->format);
-
-  while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
-  {
-    if (write(job->fd, buffer, (size_t)bytes) < bytes)
-    {
-      int error = errno;		/* Write error */
-
-      job->state = IPP_JSTATE_ABORTED;
-
-      close(job->fd);
-      job->fd = -1;
-
-      unlink(filename);
-
-      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
-      return;
-    }
-  }
-
-  if (bytes < 0)
-  {
-   /*
-    * Got an error while reading the print data, so abort this job.
-    */
-
-    job->state = IPP_JSTATE_ABORTED;
-
-    close(job->fd);
-    job->fd = -1;
-
-    unlink(filename);
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
-    return;
-  }
-
-  if (close(job->fd))
-  {
-    int error = errno;		/* Write error */
-
-    job->state = IPP_JSTATE_ABORTED;
-    job->fd    = -1;
-
-    unlink(filename);
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
-    return;
-  }
-
-  job->fd       = -1;
-  job->filename = strdup(filename);
-  job->state    = IPP_JSTATE_PENDING;
-
- /*
-  * Process the job...
-  */
-
-  t = _cupsThreadCreate((_cups_thread_func_t)process_job, job);
-
-  if (t)
-  {
-    _cupsThreadDetach(t);
-  }
-  else
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
- /*
-  * Return the job info...
-  */
-
-  respond_ipp(client, IPP_STATUS_OK, NULL);
-
-  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-  cupsArrayAdd(ra, "job-id");
-  cupsArrayAdd(ra, "job-state");
-  cupsArrayAdd(ra, "job-state-message");
-  cupsArrayAdd(ra, "job-state-reasons");
-  cupsArrayAdd(ra, "job-uri");
-
-  copy_job_attributes(client, job, ra);
-  cupsArrayDelete(ra);
+  finish_document(client, job);
 }
 
 
@@ -3309,29 +3342,34 @@ ipp_send_document(
 
   if (job->state > IPP_JSTATE_HELD)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE,
-                "Job is not in a pending state.");
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job is not in a pending state.");
     httpFlush(client->http);
     return;
   }
   else if (job->filename || job->fd >= 0)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_MULTIPLE_JOBS_NOT_SUPPORTED,
-                "Multiple document jobs are not supported.");
+    respond_ipp(client, IPP_STATUS_ERROR_MULTIPLE_JOBS_NOT_SUPPORTED, "Multiple document jobs are not supported.");
     httpFlush(client->http);
     return;
   }
 
-  if ((attr = ippFindAttribute(client->request, "last-document",
-                               IPP_TAG_ZERO)) == NULL)
+ /*
+  * Make sure we have the "last-document" operation attribute...
+  */
+
+  if ((attr = ippFindAttribute(client->request, "last-document", IPP_TAG_ZERO)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
-                "Missing required last-document attribute.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Missing required last-document attribute.");
     httpFlush(client->http);
     return;
   }
-  else if (ippGetValueTag(attr) != IPP_TAG_BOOLEAN || ippGetCount(attr) != 1 ||
-           !ippGetBoolean(attr, 0))
+  else if (ippGetGroupTag(attr) != IPP_TAG_OPERATION)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "The last-document attribute is not in the operation group.");
+    httpFlush(client->http);
+    return;
+  }
+  else if (ippGetValueTag(attr) != IPP_TAG_BOOLEAN || ippGetCount(attr) != 1 || !ippGetBoolean(attr, 0))
   {
     respond_unsupported(client, attr);
     httpFlush(client->http);
@@ -3351,7 +3389,7 @@ ipp_send_document(
   copy_attributes(job->attrs, client->request, NULL, IPP_TAG_JOB, 0);
 
  /*
-  * Get the document format for the job...
+  * Then finish getting the document data and process things...
   */
 
   _cupsRWLockWrite(&(client->printer->rwlock));
@@ -3363,101 +3401,13 @@ ipp_send_document(
   else
     job->format = "application/octet-stream";
 
- /*
-  * Create a file for the request data...
-  */
-
-  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
-  {
-    job->state = IPP_JSTATE_ABORTED;
-
-    _cupsRWUnlock(&(client->printer->rwlock));
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
-    return;
-  }
-
-  if (Verbosity)
-    fprintf(stderr, "Created job file \"%s\", format \"%s\".\n", filename, job->format);
-
-  _cupsRWUnlock(&(client->printer->rwlock));
-
-  while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
-  {
-    if (write(job->fd, buffer, (size_t)bytes) < bytes)
-    {
-      int error = errno;		/* Write error */
-
-      job->state = IPP_JSTATE_ABORTED;
-
-      close(job->fd);
-      job->fd = -1;
-
-      unlink(filename);
-
-      respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
-      return;
-    }
-  }
-
-  if (bytes < 0)
-  {
-   /*
-    * Got an error while reading the print data, so abort this job.
-    */
-
-    job->state = IPP_JSTATE_ABORTED;
-
-    close(job->fd);
-    job->fd = -1;
-
-    unlink(filename);
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
-    return;
-  }
-
-  if (close(job->fd))
-  {
-    int error = errno;			/* Write error */
-
-    job->state = IPP_JSTATE_ABORTED;
-    job->fd    = -1;
-
-    unlink(filename);
-
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s", strerror(error));
-    return;
-  }
-
-  _cupsRWLockWrite(&(client->printer->rwlock));
-
-  job->fd       = -1;
-  job->filename = strdup(filename);
-  job->state    = IPP_JSTATE_PENDING;
-
   _cupsRWUnlock(&(client->printer->rwlock));
 
  /*
-  * Process the job...
+  * Finish reading the document data and process the job...
   */
 
-  process_job(job);
-
- /*
-  * Return the job info...
-  */
-
-  respond_ipp(client, IPP_STATUS_OK, NULL);
-
-  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-  cupsArrayAdd(ra, "job-id");
-  cupsArrayAdd(ra, "job-state");
-  cupsArrayAdd(ra, "job-state-reasons");
-  cupsArrayAdd(ra, "job-uri");
-
-  copy_job_attributes(client, job, ra);
-  cupsArrayDelete(ra);
+  finish_document(client, job);
 }
 
 
