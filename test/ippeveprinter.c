@@ -358,7 +358,7 @@ static ippeve_job_t	*create_job(ippeve_client_t *client);
 static int		create_listener(const char *name, int family, int port);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int margins);
 static ipp_t		*create_media_size(int width, int length);
-static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, const char *docformats, const char *subtypes, const char *directory, const char *command, ipp_t *attrs);
+static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *ppdfile, const char *device_uri, ipp_t *attrs);
 static void		debug_attributes(const char *title, ipp_t *ipp, int response);
 static void		delete_client(ippeve_client_t *client);
 static void		delete_job(ippeve_job_t *job);
@@ -390,9 +390,9 @@ static void		ipp_print_uri(ippeve_client_t *client);
 static void		ipp_send_document(ippeve_client_t *client);
 static void		ipp_send_uri(ippeve_client_t *client);
 static void		ipp_validate_job(ippeve_client_t *client);
-static ipp_t		*load_ippserver_attributes(const char *servername, int serverport, const char *filename);
-static ipp_t		*load_ppd_attributes(const char *ppdfile);
-static ipp_t		*load_std_attributes(const char *make, const char *model, const char *formats, int ppm, int ppm_color, int duplex);
+static ipp_t		*load_ippserver_attributes(const char *servername, int serverport, const char *filename, cups_array_t *docformats);
+static ipp_t		*load_legacy_attributes(const char *make, const char *model, int ppm, int ppm_color, int duplex, cups_array_t *docformats);
+static ipp_t		*load_ppd_attributes(const char *ppdfile, cups_array_t *docformats);
 static int		parse_options(ippeve_client_t *client, cups_option_t **options);
 static void		process_attr_message(ippeve_job_t *job, char *message);
 static void		*process_client(ippeve_client_t *client);
@@ -437,27 +437,27 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option character */
-		*attrfile = NULL,	/* Attributes file */
+		*attrfile = NULL,	/* ippserver attributes file */
 		*command = NULL,	/* Command to run with job files */
-		*servername = NULL,	/* Server host name */
-		*name = NULL,		/* Printer name */
+		*icon = "printer.png",	/* Icon file */
+#ifdef HAVE_SSL
+		*keypath = NULL,	/* Keychain path */
+#endif /* HAVE_SSL */
 		*location = "",		/* Location of printer */
 		*make = "Test",		/* Manufacturer */
 		*model = "Printer",	/* Model */
-		*icon = "printer.png",	/* Icon file */
-		*formats = "application/pdf,image/jpeg,image/pwg-raster";
-	      				/* Supported formats */
-#ifdef HAVE_SSL
-  const char	*keypath = NULL;	/* Keychain path */
-#endif /* HAVE_SSL */
-  const char	*subtypes = "_print";	/* DNS-SD service subtype */
-  int		port = 0,		/* Port number (0 = auto) */
+		*name = NULL,		/* Printer name */
+		*ppdfile = NULL,	/* PPD file */
+		*subtypes = "_print";	/* DNS-SD service subtype */
+  int		legacy = 0,		/* Legacy mode? */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
-		ppm_color = 0,		/* Pages per minute for color */
-		pin = 0;		/* PIN printing mode? */
-  char		directory[1024] = "",	/* Spool directory */
-		hostname[1024];		/* Auto-detected hostname */
+		ppm_color = 0;		/* Pages per minute for color */
+  ipp_t		*attrs = NULL;		/* Printer attributes */
+  char		directory[1024] = "";	/* Spool directory */
+  cups_array_t	*docformats = NULL;	/* Supported formats */
+  const char	*servername = NULL;	/* Server host name */
+  int		serverport = 0;		/* Server port number (0 = auto) */
   ippeve_printer_t *printer;		/* Printer object */
 
 
@@ -466,7 +466,22 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   for (i = 1; i < argc; i ++)
-    if (argv[i][0] == '-')
+  {
+    if (!strcmp(argv[i], "--help"))
+    {
+      usage(0);
+    }
+    else if (!strcmp(argv[i], "--version"))
+    {
+      puts(CUPS_VERSION);
+      return (0);
+    }
+    else if (!strncmp(argv[i], "--", 2))
+    {
+      _cupsLangPrintf(stderr, _("%s: Unknown option \"%s\"."), argv[0], argv[i]);
+      usage(1);
+    }
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -474,6 +489,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  case '2' : /* -2 (enable 2-sided printing) */
 	      duplex = 1;
+	      legacy = 1;
 	      break;
 
 #ifdef HAVE_SSL
@@ -481,6 +497,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      keypath = argv[i];
 	      break;
 #endif /* HAVE_SSL */
@@ -489,11 +506,17 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      make = argv[i];
+
+	      make   = argv[i];
+	      legacy = 1;
 	      break;
 
-          case 'P' : /* -P (PIN printing mode) */
-              pin = 1;
+          case 'P' : /* -P filename.ppd */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+              ppdfile = argv[i];
               break;
 
           case 'V' : /* -V max-version */
@@ -501,11 +524,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	        usage(1);
 
-              if (!strcmp(argv[i], "2.2"))
-                MaxVersion = 22;
-	      else if (!strcmp(argv[i], "2.1"))
-                MaxVersion = 21;
-	      else if (!strcmp(argv[i], "2.0"))
+	      if (!strcmp(argv[i], "2.0"))
                 MaxVersion = 20;
 	      else if (!strcmp(argv[i], "1.1"))
                 MaxVersion = 11;
@@ -533,6 +552,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      strlcpy(directory, argv[i], sizeof(directory));
 	      break;
 
@@ -540,7 +560,9 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      formats = argv[i];
+
+	      docformats = _cupsArrayNewStrings(argv[i], ',');
+	      legacy     = 1;
 	      break;
 
           case 'h' : /* -h (show help) */
@@ -550,6 +572,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      icon = argv[i];
 	      break;
 
@@ -561,6 +584,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      location = argv[i];
 	      break;
 
@@ -568,13 +592,16 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      model = argv[i];
+
+	      model  = argv[i];
+	      legacy = 1;
 	      break;
 
 	  case 'n' : /* -n hostname */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      servername = argv[i];
 	      break;
 
@@ -582,22 +609,27 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc || !isdigit(argv[i][0] & 255))
 	        usage(1);
-	      port = atoi(argv[i]);
+
+	      serverport = atoi(argv[i]);
 	      break;
 
 	  case 'r' : /* -r subtype */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      subtype = argv[i];
+
+	      subtypes = argv[i];
 	      break;
 
 	  case 's' : /* -s speed[,color-speed] */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
+
 	      if (sscanf(argv[i], "%d,%d", &ppm, &ppm_color) < 1)
 	        usage(1);
+
+	      legacy = 1;
 	      break;
 
 	  case 'v' : /* -v (be verbose) */
@@ -605,7 +637,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           default : /* Unknown */
-	      fprintf(stderr, "Unknown option \"-%c\".\n", *opt);
+	      _cupsLangPrintf(stderr, _("%s: Unknown option \"-%c\"."), argv[0], *opt);
 	      usage(1);
 	}
       }
@@ -616,21 +648,25 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
-      fprintf(stderr, "Unexpected command-line argument \"%s\"\n", argv[i]);
+      _cupsLangPrintf(stderr, _("%s: Unknown option \"%s\"."), argv[0], argv[i]);
       usage(1);
     }
+  }
 
   if (!name)
+    usage(1);
+
+  if (((ppdfile != NULL) + (attrfile != NULL) + legacy) > 1)
     usage(1);
 
  /*
   * Apply defaults as needed...
   */
 
-  if (!servername)
-    servername = httpGetHostname(NULL, hostname, sizeof(hostname));
+  if (!docformats)
+    docformats = _cupsArrayNewStrings("application/pdf,image/jpeg,image/pwg-raster", ',');
 
-  if (!port)
+  if (!serverport)
   {
 #ifdef _WIN32
    /*
@@ -638,17 +674,17 @@ main(int  argc,				/* I - Number of command-line args */
     * port number of 8631.
     */
 
-    port = 8631;
+    serverport = 8631;
 
 #else
    /*
     * Use 8000 + UID mod 1000 for the default port number...
     */
 
-    port = 8000 + ((int)getuid() % 1000);
+    serverport = 8000 + ((int)getuid() % 1000);
 #endif /* _WIN32 */
 
-    fprintf(stderr, "Listening on port %d.\n", port);
+    cupsLangPrintf(stderr, _("Listening on port %d."), serverport);
   }
 
   if (!directory[0])
@@ -666,17 +702,16 @@ main(int  argc,				/* I - Number of command-line args */
       tmpdir = "/tmp";
 #endif /* _WIN32 */
 
-    snprintf(directory, sizeof(directory), "%s/ippserver.%d", tmpdir, (int)getpid());
+    snprintf(directory, sizeof(directory), "%s/ippeveprinter.%d", tmpdir, (int)getpid());
 
     if (mkdir(directory, 0755) && errno != EEXIST)
     {
-      fprintf(stderr, "Unable to create spool directory \"%s\": %s\n",
-	      directory, strerror(errno));
+      _cupsLangPrintf(stderr, _("Unable to create spool directory \"%s\": %s", directory, strerror(errno));
       usage(1);
     }
 
     if (Verbosity)
-      fprintf(stderr, "Using spool directory \"%s\".\n", directory);
+      _cupsLangPrintf(stderr, _("Using spool directory \"%s\"."), directory);
   }
 
 #ifdef HAVE_SSL
@@ -684,7 +719,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_SSL */
 
  /*
-  * Initialize Bonjour...
+  * Initialize DNS-SD...
   */
 
   dnssd_init();
@@ -693,9 +728,17 @@ main(int  argc,				/* I - Number of command-line args */
   * Create the printer...
   */
 
-  if ((printer = create_printer(servername, name, location, make, model, icon,
-                                formats, ppm, ppm_color, duplex, port, pin,
-				subtype, directory, command, attrfile)) == NULL)
+  if (!docformats)
+    docformats = _cupsArrayNewStrings("application/octet-stream", ',');
+
+  if (attrfile)
+    attrs = load_ippserver_attributes(attrfile, servername, serverport, docformats);
+  else if (ppdfile)
+    attrs = load_ppd_attributes(ppdfile, docformats);
+  else
+    attrs = load_legacy_attributes(make, model, ppm, ppm_color, duplex, docformats);
+
+  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, attrs)) == NULL)
     return (1);
 
  /*
@@ -1242,16 +1285,19 @@ create_media_size(int width,		/* I - x-dimension in 2540ths */
  */
 
 static ippeve_printer_t *		/* O - Printer */
-create_printer(const char *servername,	/* I - Server hostname (NULL for default) */
-               int        port,		/* I - Port for listeners or 0 for auto */
-	       const char *name,	/* I - printer-name */
-	       const char *location,	/* I - printer-location */
-	       const char *icon,	/* I - printer-icons */
-	       const char *docformats,	/* I - document-format-supported */
-	       const char *subtypes,	/* I - Bonjour service subtype(s) */
-	       const char *directory,	/* I - Spool directory */
-	       const char *command,	/* I - Command to run on job files */
-	       ipp_t      *attrs)	/* I - Capability attributes */
+create_printer(
+    const char   *servername,		/* I - Server hostname (NULL for default) */
+    int          serverport,		/* I - Server port */
+    const char   *name,			/* I - printer-name */
+    const char   *location,		/* I - printer-location */
+    const char   *icon,			/* I - printer-icons */
+    cups_array_t *docformats,		/* I - document-format-supported */
+    const char   *subtypes,		/* I - Bonjour service subtype(s) */
+    const char   *directory,		/* I - Spool directory */
+    const char   *command,		/* I - Command to run on job files, if any */
+    const char   *ppdfile,		/* I - PPD file, if any */
+    const char   *device_uri,		/* I - Output device, if any */
+    ipp_t        *attrs)		/* I - Capability attributes */
 {
   int			i, j;		/* Looping vars */
   ippeve_printer_t	*printer;	/* Printer */
@@ -4851,9 +4897,10 @@ ippserver_token_cb(
 
 static ipp_t *				/* O - IPP attributes or `NULL` on error */
 load_ippserver_attributes(
-    const char *servername,		/* I - Server name or `NULL` for default */
-    int        port,			/* I - Port number */
-    const char *filename)		/* I - ippserver attribute filename */
+    const char   *servername,		/* I - Server name or `NULL` for default */
+    int          serverport,		/* I - Server port number */
+    const char   *filename,		/* I - ippserver attribute filename */
+    cups_array_t *docformats)		/* I - document-format-supported values */
 {
   ipp_t		*attrs;			/* IPP attributes */
   _ipp_vars_t	vars;			/* IPP variables */
@@ -4901,29 +4948,18 @@ load_ippserver_attributes(
 
 
 /*
- * 'load_ppd_attributes()' - Load IPP attributes from a PPD file.
- */
-
-static ipp_t *				/* O - IPP attributes or `NULL` on error */
-load_ppd_attributes(
-    const char *ppdfile)		/* I - PPD filename */
-{
-}
-
-
-/*
- * 'load_std_attributes()' - Load IPP attributes using the old ippserver
+ * 'load_legacy_attributes()' - Load IPP attributes using the old ippserver
  *                           options.
  */
 
 static ipp_t *				/* O - IPP attributes or `NULL` on error */
-load_std_attributes(
-    const char *make,			/* I - Manufacturer name */
-    const char *model,			/* I - Model name */
-    const char *formats,		/* I - Document formats */
-    int        ppm,			/* I - pages-per-minute */
-    int        ppm_color,		/* I - pages-per-minute-color */
-    int        duplex)			/* I - Duplex support? */
+load_legacy_attributes(
+    const char   *make,			/* I - Manufacturer name */
+    const char   *model,		/* I - Model name */
+    int          ppm,			/* I - pages-per-minute */
+    int          ppm_color,		/* I - pages-per-minute-color */
+    int          duplex,		/* I - Duplex support? */
+    cups_array_t *docformats)		/* I - document-format-supported values */
 {
   ipp_t			*attrs;		/* IPP attributes */
   char			device_id[1024],/* printer-device-id */
@@ -5268,6 +5304,18 @@ load_std_attributes(
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "urf-supported", (int)(sizeof(urf_supported) / sizeof(urf_supported[0])) - !duplex, NULL, urf_supported);
 
   return (attrs);
+}
+
+
+/*
+ * 'load_ppd_attributes()' - Load IPP attributes from a PPD file.
+ */
+
+static ipp_t *				/* O - IPP attributes or `NULL` on error */
+load_ppd_attributes(
+    const char   *ppdfile,		/* I - PPD filename */
+    cups_array_t *docformats)		/* I - document-format-supported values */
+{
 }
 
 
