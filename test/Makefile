@@ -133,6 +133,10 @@ install-exec:
 		$(INSTALL_BIN) ippfind $(BINDIR); \
 	fi
 	$(INSTALL_BIN) ipptool $(BINDIR)
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/ippeveprinter
+	for file in $(IPPEVECOMMANDS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/ippeveprinter; \
+	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp ippeveprinter $(SYMROOT); \
@@ -170,6 +174,10 @@ uninstall:
 		$(RM) $(BINDIR)/$$file; \
 	done
 	-$(RMDIR) $(BINDIR)
+	for file in $(IPPEVECOMMANDS); do \
+		$(RM) $(SERVERBIN)/ippeveprinter/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/ippeveprinter
 	for file in $(DATAFILES); do \
 		$(RM) $(DATADIR)/ipptool/$$file; \
 	done

@@ -70,6 +70,7 @@ HELPFILES	=	\
 			help/man-cupsenable.html \
 			help/man-cupstestppd.html \
 			help/man-filter.html \
+			help/man-ippevepcl.html \
 			help/man-ippeveprinter.html \
 			help/man-ipptool.html \
 			help/man-ipptoolfile.html \

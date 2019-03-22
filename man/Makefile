@@ -47,6 +47,7 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		subscriptions.conf.$(MAN5EXT)
 MAN7	=	backend.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
+		ippevepcl.$(MAN7EXT) \
 		notifier.$(MAN7EXT)
 MAN8	=	cupsaccept.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \
@@ -126,6 +127,8 @@ install-data: all
 		echo Installing $$file in $(MANDIR)/man7...; \
 		$(INSTALL_MAN) $$file $(MANDIR)/man7; \
 	done
+	$(RM) $(MANDIR)/man7/ippeveps.$(MAN7EXT)
+	$(LN) ippevepcl.$(MAN7EXT) $(MANDIR)/man7/ippeveps.$(MAN7EXT)
 	$(INSTALL_DIR) -m 755 $(AMANDIR)/man$(MAN8DIR)
 	for file in $(MAN8); do \
 		echo Installing $$file in $(AMANDIR)/man$(MAN8DIR)...; \
