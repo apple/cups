@@ -152,6 +152,7 @@ typedef struct ippeve_job_s ippeve_job_t;
 
 typedef struct ippeve_printer_s		/**** Printer data ****/
 {
+  /* TODO: One IPv4 and one IPv6 listener are really not sufficient */
   int			ipv4,		/* IPv4 listener */
 			ipv6;		/* IPv6 listener */
   ippeve_srv_t		ipp_ref,	/* Bonjour IPP service */
@@ -313,7 +314,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*attrfile = NULL,	/* ippserver attributes file */
 		*command = NULL,	/* Command to run with job files */
 		*device_uri = NULL,	/* Device URI */
-		*icon = "printer.png",	/* Icon file */
+		*icon = NULL,		/* Icon file */
 #ifdef HAVE_SSL
 		*keypath = NULL,	/* Keychain path */
 #endif /* HAVE_SSL */
@@ -446,9 +447,6 @@ main(int  argc,				/* I - Number of command-line args */
 	      docformats = _cupsArrayNewStrings(argv[i], ',');
 	      legacy     = 1;
 	      break;
-
-          case 'h' : /* -h (show help) */
-	      usage(0);
 
 	  case 'i' : /* -i icon.png */
 	      i ++;
@@ -1375,7 +1373,7 @@ create_printer(
 
   if ((printer = calloc(1, sizeof(ippeve_printer_t))) == NULL)
   {
-    perror("ippserver: Unable to allocate memory for printer");
+    _cupsLangPrintError(NULL, _("Unable to allocate memory for printer"));
     return (NULL);
   }
 
@@ -1878,8 +1876,7 @@ dnssd_callback(
 
   if (errorCode)
   {
-    fprintf(stderr, "DNSServiceRegister for %s failed with error %d.\n",
-            regtype, (int)errorCode);
+    fprintf(stderr, "DNSServiceRegister for %s failed with error %d.\n", regtype, (int)errorCode);
     return;
   }
   else if (strcasecmp(name, printer->dnssd_name))
@@ -1931,7 +1928,7 @@ dnssd_client_cb(
   switch (state)
   {
     default :
-        fprintf(stderr, "Ignore Avahi state %d.\n", state);
+        fprintf(stderr, "Ignored Avahi state %d.\n", state);
 	break;
 
     case AVAHI_CLIENT_FAILURE:
@@ -3093,8 +3090,7 @@ ipp_get_jobs(ippeve_client_t *client)	/* I - Client */
   {
     first_job_id = ippGetInteger(attr, 0);
 
-    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->hostname,
-            first_job_id);
+    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->hostname, first_job_id);
   }
   else
     first_job_id = 1;
@@ -3110,8 +3106,7 @@ ipp_get_jobs(ippeve_client_t *client)	/* I - Client */
   {
     int my_jobs = ippGetBoolean(attr, 0);
 
-    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->hostname,
-            my_jobs ? "true" : "false");
+    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->hostname, my_jobs ? "true" : "false");
 
     if (my_jobs)
     {
@@ -3125,8 +3120,7 @@ ipp_get_jobs(ippeve_client_t *client)	/* I - Client */
 
       username = ippGetString(attr, 0, NULL);
 
-      fprintf(stderr, "%s Get-Jobs requesting-user-name=\"%s\"\n",
-              client->hostname, username);
+      fprintf(stderr, "%s Get-Jobs requesting-user-name=\"%s\"\n", client->hostname, username);
     }
   }
 
@@ -3786,7 +3780,7 @@ load_ippserver_attributes(
 
 /*
  * 'load_legacy_attributes()' - Load IPP attributes using the old ippserver
- *                           options.
+ *                              options.
  */
 
 static ipp_t *				/* O - IPP attributes or `NULL` on error */
@@ -4612,8 +4606,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
     if (httpError(client->http) == EPIPE)
       fprintf(stderr, "%s Client closed connection.\n", client->hostname);
     else
-      fprintf(stderr, "%s Bad request line (%s).\n", client->hostname,
-              strerror(httpError(client->http)));
+      fprintf(stderr, "%s Bad request line (%s).\n", client->hostname, strerror(httpError(client->http)));
 
     return (0);
   }
@@ -4630,8 +4623,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
     return (0);
   }
 
-  fprintf(stderr, "%s %s %s\n", client->hostname, http_states[http_state],
-          uri);
+  fprintf(stderr, "%s %s %s\n", client->hostname, http_states[http_state], uri);
 
  /*
   * Separate the URI into its components...
@@ -4776,11 +4768,9 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 
           fprintf(stderr, "Icon file is \"%s\".\n", client->printer->icon);
 
-          if (!stat(client->printer->icon, &fileinfo) &&
-	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
+          if (!stat(client->printer->icon, &fileinfo) && (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
-	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png",
-	                      (size_t)fileinfo.st_size))
+	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png", (size_t)fileinfo.st_size))
 	    {
 	      close(fd);
 	      return (0);
@@ -4830,7 +4820,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 
           html_header(client, client->printer->name);
           html_printf(client,
-		      "<p><img align=\"right\" src=\"/icon.png\" width=\"64\" height=\"64\"><b>ippserver (" CUPS_SVERSION ")</b></p>\n"
+		      "<p><img align=\"right\" src=\"/icon.png\" width=\"64\" height=\"64\"><b>ippeveprinter (" CUPS_SVERSION ")</b></p>\n"
 		      "<p>%s, %d job(s).", client->printer->state == IPP_PSTATE_IDLE ? "Idle" : client->printer->state == IPP_PSTATE_PROCESSING ? "Printing" : "Stopped", cupsArrayCount(client->printer->jobs));
 	  for (i = 0, reason = 1; i < (int)(sizeof(reasons) / sizeof(reasons[0])); i ++, reason <<= 1)
 	    if (client->printer->state_reasons & reason)
@@ -5143,8 +5133,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	{
 	  if (ipp_state == IPP_STATE_ERROR)
 	  {
-            fprintf(stderr, "%s IPP read error (%s).\n", client->hostname,
-	            cupsLastErrorString());
+            fprintf(stderr, "%s IPP read error (%s).\n", client->hostname, cupsLastErrorString());
 	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
 	    return (0);
 	  }
@@ -5686,20 +5675,17 @@ process_job(ippeve_job_t *job)		/* I - Job */
 #ifndef _WIN32
       if (WIFEXITED(status))
 #endif /* !_WIN32 */
-	fprintf(stderr, "Command \"%s\" exited with status %d.\n",
-		job->printer->command, WEXITSTATUS(status));
+	fprintf(stderr, "Command \"%s\" exited with status %d.\n", job->printer->command, WEXITSTATUS(status));
 #ifndef _WIN32
       else
-	fprintf(stderr, "Command \"%s\" terminated with signal %d.\n",
-		job->printer->command, WTERMSIG(status));
+	fprintf(stderr, "Command \"%s\" terminated with signal %d.\n", job->printer->command, WTERMSIG(status));
 #endif /* !_WIN32 */
       job->state = IPP_JSTATE_ABORTED;
     }
     else if (status < 0)
       job->state = IPP_JSTATE_ABORTED;
     else
-      fprintf(stderr, "Command \"%s\" completed successfully.\n",
-	      job->printer->command);
+      fprintf(stderr, "Command \"%s\" completed successfully.\n", job->printer->command);
 
    /*
     * Make sure processing takes at least 5 seconds...
@@ -6191,24 +6177,19 @@ respond_ipp(ippeve_client_t *client,	/* I - Client */
     ipp_attribute_t	*attr;		/* New status-message attribute */
 
     va_start(ap, message);
-    if ((attr = ippFindAttribute(client->response, "status-message",
-				 IPP_TAG_TEXT)) != NULL)
+    if ((attr = ippFindAttribute(client->response, "status-message", IPP_TAG_TEXT)) != NULL)
       ippSetStringfv(client->response, &attr, 0, message, ap);
     else
-      attr = ippAddStringfv(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
-			    "status-message", NULL, message, ap);
+      attr = ippAddStringfv(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT, "status-message", NULL, message, ap);
     va_end(ap);
 
     formatted = ippGetString(attr, 0, NULL);
   }
 
   if (formatted)
-    fprintf(stderr, "%s %s %s (%s)\n", client->hostname,
-	    ippOpString(client->operation_id), ippErrorString(status),
-	    formatted);
+    fprintf(stderr, "%s %s %s (%s)\n", client->hostname, ippOpString(client->operation_id), ippErrorString(status), formatted);
   else
-    fprintf(stderr, "%s %s %s\n", client->hostname,
-	    ippOpString(client->operation_id), ippErrorString(status));
+    fprintf(stderr, "%s %s %s\n", client->hostname, ippOpString(client->operation_id), ippErrorString(status));
 }
 
 
@@ -6224,10 +6205,7 @@ respond_unsupported(
   ipp_attribute_t	*temp;		/* Copy of attribute */
 
 
-  respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES,
-              "Unsupported %s %s%s value.", ippGetName(attr),
-              ippGetCount(attr) > 1 ? "1setOf " : "",
-	      ippTagString(ippGetValueTag(attr)));
+  respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, "Unsupported %s %s%s value.", ippGetName(attr), ippGetCount(attr) > 1 ? "1setOf " : "", ippTagString(ippGetValueTag(attr)));
 
   temp = ippCopyAttribute(client->response, attr, 0);
   ippSetGroupTag(client->response, &temp, IPP_TAG_UNSUPPORTED_GROUP);
@@ -6355,35 +6333,31 @@ time_string(time_t tv,			/* I - Time value */
 static void
 usage(int status)			/* O - Exit status */
 {
-  if (!status)
-  {
-    puts(CUPS_SVERSION " - Copyright (c) 2010-2018 by Apple Inc. All rights reserved.");
-    puts("");
-  }
-
-  puts("Usage: ippserver [options] \"name\"");
-  puts("");
-  puts("Options:");
-  puts("-2                      Supports 2-sided printing (default=1-sided)");
-  puts("-M manufacturer         Manufacturer name (default=Test)");
-  puts("-P                      PIN printing mode");
-  puts("-V max-version          Set maximum supported IPP version");
-  puts("-a attributes-file      Load printer attributes from file");
-  puts("-c command              Run command for every print job");
-  printf("-d spool-directory      Spool directory "
-         "(default=/tmp/ippserver.%d)\n", (int)getpid());
-  puts("-f type/subtype[,...]   List of supported types "
-       "(default=application/pdf,image/jpeg)");
-  puts("-h                      Show program help");
-  puts("-i iconfile.png         PNG icon file (default=printer.png)");
-  puts("-k                      Keep job spool files");
-  puts("-l location             Location of printer (default=empty string)");
-  puts("-m model                Model name (default=Printer)");
-  puts("-n hostname             Hostname for printer");
-  puts("-p port                 Port number (default=auto)");
-  puts("-r subtype              Bonjour service subtype (default=_print)");
-  puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
-  puts("-v[vvv]                 Be (very) verbose");
+  _cupsLangPuts(stdout, _("Usage: ippeveprinter [options] \"name\""));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stderr, _("--help                  Show program help"));
+  _cupsLangPuts(stderr, _("--version               Show program version"));
+  _cupsLangPuts(stdout, _("-2                      Set 2-sided printing support (default=1-sided)"));
+  _cupsLangPuts(stdout, _("-D device-uri           Set the device URI for the printer"));
+#ifdef HAVE_SSL
+  _cupsLangPuts(stdout, _("-K keypath              Set location of server X.509 certificates and keys."));
+#endif /* HAVE_SSL */
+  _cupsLangPuts(stdout, _("-M manufacturer         Set manufacturer name (default=Test)"));
+  _cupsLangPuts(stdout, _("-P filename.ppd         Load printer attributes from PPD file"));
+  _cupsLangPuts(stdout, _("-V version              Set default IPP version"));
+  _cupsLangPuts(stdout, _("-a filename.conf        Load printer attributes from conf file"));
+  _cupsLangPuts(stdout, _("-c command              Set print command"));
+  _cupsLangPuts(stdout, _("-d spool-directory      Set spool directory"));
+  _cupsLangPuts(stdout, _("-f type/subtype[,...]   Set supported file types"));
+  _cupsLangPuts(stdout, _("-i iconfile.png         Set icon file"));
+  _cupsLangPuts(stdout, _("-k                      Keep job spool files"));
+  _cupsLangPuts(stdout, _("-l location             Set location of printer"));
+  _cupsLangPuts(stdout, _("-m model                Set model name (default=Printer)"));
+  _cupsLangPuts(stdout, _("-n hostname             Set hostname for printer"));
+  _cupsLangPuts(stdout, _("-p port                 Set port number for printer"));
+  _cupsLangPuts(stdout, _("-r subtype              Set DNS-SD service subtype"));
+  _cupsLangPuts(stdout, _("-s speed[,color-speed]  Set speed in pages per minute"));
+  _cupsLangPuts(stderr, _("-v                      Be verbose"));
 
   exit(status);
 }
@@ -6468,8 +6442,7 @@ valid_doc_attributes(
     {
       format = ippGetString(attr, 0, NULL);
 
-      fprintf(stderr, "%s %s document-format=\"%s\"\n",
-	      client->hostname, op_name, format);
+      fprintf(stderr, "%s %s document-format=\"%s\"\n", client->hostname, op_name, format);
 
       ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-supplied", NULL, format);
     }
@@ -6511,8 +6484,7 @@ valid_doc_attributes(
 
     if (format)
     {
-      fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
-	      client->hostname, op_name, format);
+      fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n", client->hostname, op_name, format);
 
       ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-detected", NULL, format);
     }
