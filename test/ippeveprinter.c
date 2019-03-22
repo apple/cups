@@ -63,6 +63,8 @@ extern char **environ;
 #  include <sys/vfs.h>
 #endif /* HAVE_SYS_VFS_H */
 
+#include "printer-png.h"
+
 
 /*
  * Constants...
@@ -1862,6 +1864,10 @@ delete_printer(ippeve_printer_t *printer)	/* I - Printer */
     free(printer->icon);
   if (printer->command)
     free(printer->command);
+  if (printer->device_uri)
+    free(printer->device_uri);
+  if (printer->ppdfile)
+    free(printer->ppdfile);
   if (printer->directory)
     free(printer->directory);
   if (printer->hostname)
@@ -4357,7 +4363,7 @@ load_legacy_attributes(
   else
   {
     attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], strlen(printer_supply[0]));
-    for (i = 1; i < (int)(sizeof(printer_supply_color) / sizeof(printer_supply_color[0])); i ++)
+    for (i = 1; i < (int)(sizeof(printer_supply) / sizeof(printer_supply[0])); i ++)
       ippSetOctetString(attrs, &attr, i, printer_supply[i], strlen(printer_supply[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description) / sizeof(printer_supply_description[0])), NULL, printer_supply_description);
@@ -4784,30 +4790,43 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	  * Send PNG icon file.
 	  */
 
-          int		fd;		/* Icon file */
-	  struct stat	fileinfo;	/* Icon file information */
-	  char		buffer[4096];	/* Copy buffer */
-	  ssize_t	bytes;		/* Bytes */
+          if (client->printer->icon)
+          {
+	    int		fd;		/* Icon file */
+	    struct stat	fileinfo;	/* Icon file information */
+	    char	buffer[4096];	/* Copy buffer */
+	    ssize_t	bytes;		/* Bytes */
 
-          fprintf(stderr, "Icon file is \"%s\".\n", client->printer->icon);
+	    fprintf(stderr, "Icon file is \"%s\".\n", client->printer->icon);
 
-          if (!stat(client->printer->icon, &fileinfo) && (fd = open(client->printer->icon, O_RDONLY)) >= 0)
-	  {
-	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png", (size_t)fileinfo.st_size))
+	    if (!stat(client->printer->icon, &fileinfo) && (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	    {
+	      if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png", (size_t)fileinfo.st_size))
+	      {
+		close(fd);
+		return (0);
+	      }
+
+	      while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+		httpWrite2(client->http, buffer, (size_t)bytes);
+
+	      httpFlushWrite(client->http);
+
 	      close(fd);
-	      return (0);
 	    }
-
-	    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-	      httpWrite2(client->http, buffer, (size_t)bytes);
-
-	    httpFlushWrite(client->http);
-
-	    close(fd);
+	    else
+	      return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
 	  }
 	  else
-	    return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
+	  {
+	    fputs("Icon file is internal printer.png.\n", stderr);
+
+	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png", sizeof(printer_png)))
+	      return (0);
+
+            httpWrite2(client->http, (const char *)printer_png, sizeof(printer_png));
+	    httpFlushWrite(client->http);
+	  }
 	}
 	else if (!strcmp(client->uri, "/"))
 	{
@@ -4854,7 +4873,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	  {
             _cupsRWLockRead(&(client->printer->rwlock));
 
-	    html_printf(client, "<table class=\"striped\" summary=\"Jobs\"><thead><tr><th>Job #</th><th>Name</th><th>Owner</th><th>When</th></tr></thead><tbody>\n");
+	    html_printf(client, "<table class=\"striped\" summary=\"Jobs\"><thead><tr><th>Job #</th><th>Name</th><th>Owner</th><th>Status</th></tr></thead><tbody>\n");
 	    for (job = (ippeve_job_t *)cupsArrayFirst(client->printer->jobs); job; job = (ippeve_job_t *)cupsArrayNext(client->printer->jobs))
 	    {
 	      char	when[256],	/* When job queued/started/finished */
