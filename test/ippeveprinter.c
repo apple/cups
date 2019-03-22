@@ -5213,6 +5213,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
     char		val[1280],	/* IPP_NAME=value */
 			*valptr;	/* Pointer into string */
 #ifndef _WIN32
+    int			mystdout = -1;	/* File for stdout */
     int			mypipe[2];	/* Pipe for stderr */
     char		line[2048],	/* Line from stderr */
 			*ptr,		/* Pointer into line */
@@ -5345,6 +5346,75 @@ process_job(ippeve_job_t *job)		/* I - Job */
     status = _spawnvpe(_P_WAIT, job->printer->command, myargv, myenvp);
 
 #else
+    if (job->printer->device_uri)
+    {
+      char	scheme[32],		/* URI scheme */
+		userpass[256],		/* username:password (unused) */
+		host[256],		/* Hostname or IP address */
+		resource[256];		/* Resource path */
+      int	port;			/* Port number */
+
+
+      if (httpSeparateURI(HTTP_URI_CODING_ALL, job->printer->device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+      {
+        fprintf(stderr, "Bad device URI \"%s\".\n", job->printer->device_uri);
+      }
+      else if (!strcmp(scheme, "file"))
+      {
+        struct stat	fileinfo;	/* See if this is a file or directory... */
+
+        if (stat(resource, &fileinfo))
+        {
+          if (errno == ENOENT)
+          {
+            if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+	      fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
+          }
+          else
+            fprintf(stderr, "Unable to access \"%s\": %s\n", resource, strerror(errno));
+        }
+        else if (S_ISDIR(fileinfo.st_mode))
+        {
+          snprintf(line, sizeof(line), "%s/%d.prn", resource, job->id);
+
+	  if ((mystdout = open(line, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+            fprintf(stderr, "Unable to create \"%s\": %s\n", line, strerror(errno));
+        }
+	else if (!S_ISREG(fileinfo.st_mode))
+	{
+	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+            fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
+	}
+        else if ((mystdout = open(resource, O_WRONLY)) < 0)
+	  fprintf(stderr, "Unable to open \"%s\": %s\n", resource, strerror(errno));
+      }
+      else if (!strcmp(scheme, "socket"))
+      {
+        http_addrlist_t	*addrlist;	/* List of addresses */
+        char		service[32];	/* Service number */
+
+        snprintf(service, sizeof(service), "%d", port);
+
+        if ((addrlist = httpAddrGetList(host, AF_UNSPEC, service)) == NULL)
+          fprintf(stderr, "Unable to find \"%s\": %s\n", host, cupsLastErrorString());
+        else if (!httpAddrConnect2(addrlist, &mystdout, 30000, &(job->cancel)))
+          fprintf(stderr, "Unable to connect to \"%s\": %s\n", host, cupsLastErrorString());
+
+        httpAddrFreeList(addrlist);
+      }
+      else
+      {
+        fprintf(stderr, "Unsupported device URI scheme \"%s\".\n", scheme);
+      }
+    }
+    else if ((mystdout = create_job_file(job->printer, job, line, sizeof(line), "prn")) >= 0)
+    {
+      fprintf(stderr, "Saving print command output to \"%s\".\n", line);
+    }
+
+    if (mystdout < 0)
+      mystdout = open("/dev/null", O_WRONLY);
+
     if (pipe(mypipe))
     {
       perror("Unable to create pipe for stderr");
@@ -5356,6 +5426,10 @@ process_job(ippeve_job_t *job)		/* I - Job */
      /*
       * Child comes here...
       */
+
+      close(1);
+      dup2(mystdout, 1);
+      close(mystdout);
 
       close(2);
       dup2(mypipe[1], 2);
@@ -5374,6 +5448,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
       perror("Unable to start job processing command");
       status = -1;
 
+      close(mystdout);
       close(mypipe[0]);
       close(mypipe[1]);
 
@@ -5392,6 +5467,12 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
       while (myenvc > 0)
 	free(myenvp[-- myenvc]);
+
+     /*
+      * Close the output file in the parent process...
+      */
+
+      close(mystdout);
 
      /*
       * If the pipe exists, read from it until EOF...
