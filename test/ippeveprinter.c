@@ -235,7 +235,7 @@ static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra, ipp_tag_t
 static void		copy_job_attributes(ippeve_client_t *client, ippeve_job_t *job, cups_array_t *ra);
 static ippeve_client_t	*create_client(ippeve_printer_t *printer, int sock);
 static ippeve_job_t	*create_job(ippeve_client_t *client);
-static int		create_job_file(ippeve_printer_t *printer, ippeve_job_t *job, char *fname, size_t fnamesize, const char *ext);
+static int		create_job_file(ippeve_job_t *job, char *fname, size_t fnamesize, const char *dir, const char *ext);
 static int		create_listener(const char *name, int port, int family);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int bottom, int left, int right, int top);
 static ipp_t		*create_media_size(int width, int length);
@@ -1036,10 +1036,10 @@ create_job(ippeve_client_t *client)	/* I - Client */
 
 static int				/* O - File descriptor or -1 on error */
 create_job_file(
-    ippeve_printer_t *printer,		/* I - Printer */
     ippeve_job_t     *job,		/* I - Job */
     char             *fname,		/* I - Filename buffer */
     size_t           fnamesize,		/* I - Size of filename buffer */
+    const char       *directory,	/* I - Directory to store in */
     const char       *ext)		/* I - Extension (`NULL` for default) */
 {
   char			name[256],	/* "Safe" filename */
@@ -1099,7 +1099,7 @@ create_job_file(
   * Create a filename with the job-id, job-name, and document-format (extension)...
   */
 
-  snprintf(fname, fnamesize, "%s/%d-%s.%s", printer->directory, job->id, name, ext);
+  snprintf(fname, fnamesize, "%s/%d-%s.%s", directory, job->id, name, ext);
 
   return (open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0666));
 }
@@ -2093,7 +2093,7 @@ finish_document_data(
   * TODO: Update code to support piping large raster data to the print command.
   */
 
-  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
+  if ((job->fd = create_job_file(job, filename, sizeof(filename), client->printer->directory, NULL)) < 0)
   {
     respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to create print file: %s", strerror(errno));
 
@@ -2306,7 +2306,7 @@ finish_document_uri(
   * Create a file for the request data...
   */
 
-  if ((job->fd = create_job_file(client->printer, job, filename, sizeof(filename), NULL)) < 0)
+  if ((job->fd = create_job_file(job, filename, sizeof(filename), client->printer->directory, NULL)) < 0)
   {
     _cupsRWUnlock(&(client->printer->rwlock));
 
@@ -5367,7 +5367,9 @@ process_job(ippeve_job_t *job)		/* I - Job */
         {
           if (errno == ENOENT)
           {
-            if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+            if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
+	      fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	    else
 	      fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
           }
           else
@@ -5375,17 +5377,21 @@ process_job(ippeve_job_t *job)		/* I - Job */
         }
         else if (S_ISDIR(fileinfo.st_mode))
         {
-          snprintf(line, sizeof(line), "%s/%d.prn", resource, job->id);
-
-	  if ((mystdout = open(line, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+          if ((mystdout = create_job_file(job, line, sizeof(line), resource, "prn")) >= 0)
+	    fprintf(stderr, "Saving print command output to \"%s\".\n", line);
+          else
             fprintf(stderr, "Unable to create \"%s\": %s\n", line, strerror(errno));
         }
 	else if (!S_ISREG(fileinfo.st_mode))
 	{
-	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) < 0)
+	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
+	    fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	  else
             fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
 	}
-        else if ((mystdout = open(resource, O_WRONLY)) < 0)
+        else if ((mystdout = open(resource, O_WRONLY)) >= 0)
+	  fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	else
 	  fprintf(stderr, "Unable to open \"%s\": %s\n", resource, strerror(errno));
       }
       else if (!strcmp(scheme, "socket"))
@@ -5407,7 +5413,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
         fprintf(stderr, "Unsupported device URI scheme \"%s\".\n", scheme);
       }
     }
-    else if ((mystdout = create_job_file(job->printer, job, line, sizeof(line), "prn")) >= 0)
+    else if ((mystdout = create_job_file(job, line, sizeof(line), job->printer->directory, "prn")) >= 0)
     {
       fprintf(stderr, "Saving print command output to \"%s\".\n", line);
     }
