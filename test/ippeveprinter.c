@@ -257,7 +257,7 @@ static void		finish_document_data(ippeve_client_t *client, ippeve_job_t *job);
 static void		finish_document_uri(ippeve_client_t *client, ippeve_job_t *job);
 static void		html_escape(ippeve_client_t *client, const char *s, size_t slen);
 static void		html_footer(ippeve_client_t *client);
-static void		html_header(ippeve_client_t *client, const char *title);
+static void		html_header(ippeve_client_t *client, const char *title, int refresh);
 static void		html_printf(ippeve_client_t *client, const char *format, ...) _CUPS_FORMAT(2, 3);
 static void		ipp_cancel_job(ippeve_client_t *client);
 static void		ipp_close_job(ippeve_client_t *client);
@@ -2550,7 +2550,8 @@ html_footer(ippeve_client_t *client)	/* I - Client */
 
 static void
 html_header(ippeve_client_t *client,	/* I - Client */
-            const char    *title)	/* I - Title */
+            const char    *title,	/* I - Title */
+            int           refresh)	/* I - Refresh timer, if any */
 {
   html_printf(client,
 	      "<!doctype html>\n"
@@ -2559,7 +2560,10 @@ html_header(ippeve_client_t *client,	/* I - Client */
 	      "<title>%s</title>\n"
 	      "<link rel=\"shortcut icon\" href=\"/icon.png\" type=\"image/png\">\n"
 	      "<link rel=\"apple-touch-icon\" href=\"/icon.png\" type=\"image/png\">\n"
-	      "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=9\">\n"
+	      "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=9\">\n", title);
+  if (refresh > 0)
+    html_printf(client, "<meta http-equiv=\"refresh\" content=\"%d\">\n", refresh);
+  html_printf(client,
 	      "<meta name=\"viewport\" content=\"width=device-width\">\n"
 	      "<style>\n"
 	      "body { font-family: sans-serif; margin: 0; }\n"
@@ -2588,7 +2592,7 @@ html_header(ippeve_client_t *client,	/* I - Client */
 	      "<td class=\"nav%s\"><a href=\"/supplies\">Supplies</a></td>"
 	      "<td class=\"nav%s\"><a href=\"/media\">Media</a></td>"
 	      "</tr></table>\n"
-	      "<div class=\"body\">\n", title, !strcmp(client->uri, "/") ? " sel" : "", !strcmp(client->uri, "/supplies") ? " sel" : "", !strcmp(client->uri, "/media") ? " sel" : "");
+	      "<div class=\"body\">\n", !strcmp(client->uri, "/") ? " sel" : "", !strcmp(client->uri, "/supplies") ? " sel" : "", !strcmp(client->uri, "/media") ? " sel" : "");
 }
 
 
@@ -3883,8 +3887,6 @@ load_legacy_attributes(
   {					/* media-source-supported values */
     "auto",
     "main",
-    "manual",
-    "by-pass-tray",			/* AKA multi-purpose tray */
     "photo"
   };
   static const char * const media_type_supported[] =
@@ -3965,6 +3967,19 @@ load_legacy_attributes(
     IPP_QUALITY_DRAFT,
     IPP_QUALITY_NORMAL,
     IPP_QUALITY_HIGH
+  };
+  static const char * const printer_input_tray[] =
+  {					/* printer-input-tray values */
+    "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=-2;level=-2;status=0;name=auto",
+    "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=250;level=100;status=0;name=main",
+    "type=sheetFeedManual;mediafeed=0;mediaxfeed=0;maxcapacity=1;level=-2;status=0;name=manual",
+    "type=sheetFeedAutoNonRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=25;level=-2;status=0;name=by-pass-tray"
+  };
+  static const char * const printer_input_tray_color[] =
+  {					/* printer-input-tray values */
+    "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=-2;level=-2;status=0;name=auto",
+    "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=250;level=-2;status=0;name=main",
+    "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=25;level=-2;status=0;name=photo"
   };
   static const char * const printer_supply[] =
   {					/* printer-supply values */
@@ -4158,7 +4173,7 @@ load_legacy_attributes(
   }
 
   /* media-col-ready */
-  attr = ippAddCollections(attrs, IPP_TAG_PRINTER, "media-col-database", num_ready, NULL);
+  attr = ippAddCollections(attrs, IPP_TAG_PRINTER, "media-col-ready", num_ready, NULL);
   for (i = 0; i < num_ready; i ++)
   {
     int		bottom, left,		/* media-xxx-margins */
@@ -4347,6 +4362,20 @@ load_legacy_attributes(
     *ptr = '\0';
   }
   ippAddString(attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-device-id", NULL, device_id);
+
+  /* printer-input-tray */
+  if (ppm_color > 0)
+  {
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], strlen(printer_input_tray_color[0]));
+    for (i = 1; i < (int)(sizeof(printer_input_tray_color) / sizeof(printer_input_tray_color[0])); i ++)
+      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], strlen(printer_input_tray_color[i]));
+  }
+  else
+  {
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], strlen(printer_input_tray[0]));
+    for (i = 1; i < (int)(sizeof(printer_input_tray) / sizeof(printer_input_tray[0])); i ++)
+      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], strlen(printer_input_tray[i]));
+  }
 
   /* printer-make-and-model */
   snprintf(make_model, sizeof(make_model), "%s %s", make, model);
@@ -6103,14 +6132,15 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
     100,
     25,
     5,
-    0
+    0,
+    -2
   };
 
 
   if (!respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0))
     return (0);
 
-  html_header(client, printer->name);
+  html_header(client, printer->name, 0);
 
   if ((media_col_ready = ippFindAttribute(printer->attrs, "media-col-ready", IPP_TAG_BEGIN_COLLECTION)) == NULL)
   {
@@ -6181,9 +6211,6 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 
     _cupsRWLockWrite(&printer->rwlock);
 
-    ippDeleteAttribute(printer->attrs, input_tray);
-    input_tray = NULL;
-
     ippDeleteAttribute(printer->attrs, media_col_ready);
     media_col_ready = NULL;
 
@@ -6198,6 +6225,9 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
     for (i = 0; i < num_sources; i ++)
     {
       media_source = ippGetString(media_sources, i, NULL);
+
+      if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual"))
+	continue;
 
       snprintf(name, sizeof(name), "size%d", i);
       if ((media_size = cupsGetOption(name, num_options, options)) != NULL && (media = pwgMediaForPWG(media_size)) != NULL)
@@ -6228,12 +6258,9 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       else
         ready_sheets = 0;
 
-      snprintf(tray_str, sizeof(tray_str), "type=sheetFeedAutoRemovableTray;mediafeed=%d;mediaxfeed=%d;maxcapacity=250;level=%d;status=0;name=%s;", media ? media->length : 0, media ? media->width : 0, ready_sheets, media_source);
+      snprintf(tray_str, sizeof(tray_str), "type=sheetFeedAuto%sRemovableTray;mediafeed=%d;mediaxfeed=%d;maxcapacity=%d;level=%d;status=0;name=%s;", !strcmp(media_source, "by-pass-tray") ? "Non" : "", media ? media->length : 0, media ? media->width : 0, !strcmp(media_source, "main") ? 250 : 25, ready_sheets, media_source);
 
-      if (input_tray)
-        ippSetOctetString(printer->attrs, &input_tray, ippGetCount(input_tray), tray_str, (int)strlen(tray_str));
-      else
-        input_tray = ippAddOctetString(printer->attrs, IPP_TAG_PRINTER, "printer-input-tray", tray_str, (int)strlen(tray_str));
+      ippSetOctetString(printer->attrs, &input_tray, i, tray_str, (int)strlen(tray_str));
 
       if (ready_sheets == 0)
       {
@@ -6241,7 +6268,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
         if (printer->active_job)
           printer->state_reasons |= IPPEVE_PREASON_MEDIA_NEEDED;
       }
-      else if (ready_sheets < 25)
+      else if (ready_sheets < 25 && ready_sheets > 0)
         printer->state_reasons |= IPPEVE_PREASON_MEDIA_LOW;
     }
 
@@ -6262,6 +6289,9 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
   for (i = 0; i < num_sources; i ++)
   {
     media_source = ippGetString(media_sources, i, NULL);
+
+    if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual"))
+      continue;
 
     for (j = 0, ready_size = NULL, ready_type = NULL; j < num_ready; j ++)
     {
@@ -6325,7 +6355,15 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 
     html_printf(client, "<select name=\"level%d\">", i);
     for (j = 0; j < (int)(sizeof(sheets) / sizeof(sheets[0])); j ++)
-      html_printf(client, "<option value=\"%d\"%s>%d sheets</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "", sheets[j]);
+    {
+      if (strcmp(media_source, "main") && sheets[j] > 25)
+        continue;
+
+      if (sheets[j] < 0)
+	html_printf(client, "<option value=\"%d\"%s>Unknown</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "");
+      else
+	html_printf(client, "<option value=\"%d\"%s>%d sheets</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "", sheets[j]);
+    }
     html_printf(client, "</select></td></tr>\n");
   }
 
@@ -6367,13 +6405,19 @@ show_status(ippeve_client_t  *client)	/* I - Client connection */
     "Toner Empty",
     "Toner Low"
   };
+  static const char * const state_colors[] =
+  {					/* State colors */
+    "#0C0",				/* Idle */
+    "#EE0",				/* Processing */
+    "#C00"				/* Stopped */
+  };
 
 
   if (!respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0))
     return (0);
 
-  html_header(client, printer->name);
-  html_printf(client, "<h1><img align=\"left\" src=\"/icon.png\" width=\"64\" height=\"64\">%s Jobs</h1>\n", printer->name);
+  html_header(client, printer->name, printer->state == IPP_PSTATE_PROCESSING ? 5 : 15);
+  html_printf(client, "<h1><img style=\"background: %s; border-radius: 10px; float: left; margin-right: 10px; padding: 10px;\" src=\"/icon.png\" width=\"64\" height=\"64\">%s Jobs</h1>\n", state_colors[printer->state - IPP_PSTATE_IDLE], printer->name);
   html_printf(client, "<p>%s, %d job(s).", printer->state == IPP_PSTATE_IDLE ? "Idle" : printer->state == IPP_PSTATE_PROCESSING ? "Printing" : "Stopped", cupsArrayCount(printer->jobs));
   for (i = 0, reason = 1; i < (int)(sizeof(reasons) / sizeof(reasons[0])); i ++, reason <<= 1)
     if (printer->state_reasons & reason)
@@ -6471,7 +6515,7 @@ show_supplies(
   if (!respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0))
     return (0);
 
-  html_header(client, printer->name);
+  html_header(client, printer->name, 0);
 
   if ((supply = ippFindAttribute(printer->attrs, "printer-supply", IPP_TAG_STRING)) == NULL)
   {
