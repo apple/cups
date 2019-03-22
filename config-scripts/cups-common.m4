@@ -427,6 +427,7 @@ AC_ARG_WITH(components, [  --with-components       set components to build:
 	COMPONENTS="$withval")
 
 cupsimagebase="cupsimage"
+IPPEVECOMMANDS="ippevepcl ippeveps"
 LIBCUPSOBJS="\$(COREOBJS) \$(DRIVEROBJS)"
 LIBHEADERS="\$(COREHEADERS) \$(DRIVERHEADERS)"
 LIBHEADERSPRIV="\$(COREHEADERSPRIV) \$(DRIVERHEADERSPRIV)"
@@ -440,14 +441,26 @@ case "$COMPONENTS" in
 		BUILDDIRS="test locale"
 		;;
 
+	corelite)
+		AC_DEFINE(CUPS_LITE)
+		BUILDDIRS="test locale"
+		cupsimagebase=""
+		IPPEVECOMMANDS="ippevepcl"
+		LIBCUPSOBJS="\$(COREOBJS)"
+		LIBHEADERS="\$(COREHEADERS)"
+		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"
+		;;
+
 	libcups)
 		BUILDDIRS="locale"
 		cupsimagebase=""
 		;;
 
 	libcupslite)
+		AC_DEFINE(CUPS_LITE)
 		BUILDDIRS="locale"
 		cupsimagebase=""
+		IPPEVECOMMANDS="ippevepcl"
 		LIBCUPSOBJS="\$(COREOBJS)"
 		LIBHEADERS="\$(COREHEADERS)"
 		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"
@@ -459,6 +472,7 @@ case "$COMPONENTS" in
 esac
 
 AC_SUBST(BUILDDIRS)
+AC_SUBST(IPPEVECOMMANDS)
 AC_SUBST(LIBCUPSOBJS)
 AC_SUBST(LIBHEADERS)
 AC_SUBST(LIBHEADERSPRIV)

@@ -13,3 +13,18 @@
 
 #include "ippevecommon.h"
 #include <cups/ppd.h>
+
+
+/*
+ * 'main()' - Main entry for PostScript printer command.
+ */
+
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
+{
+  (void)argc;
+  (void)argv;
+
+  return (0);
+}

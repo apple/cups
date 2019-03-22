@@ -116,6 +116,14 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 
 IPPALIASES	=	@IPPALIASES@
 
+
+#
+# ippeveprinter commands...
+#
+
+IPPEVECOMMANDS	=	@IPPEVECOMMANDS@
+
+
 #
 # Install XPC backends?
 #

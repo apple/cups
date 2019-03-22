@@ -36,6 +36,7 @@ TESTFILES	=	\
 			get-jobs.test \
 			get-notifications.test \
 			get-printer-attributes.test \
+			get-printer-attributes-suite.test \
 			get-subscriptions.test \
 			ipp-1.1.test \
 			ipp-2.0.test \
@@ -47,10 +48,13 @@ TESTFILES	=	\
 			print-job-gzip.test \
 			validate-job.test
 OBJS		=	\
+			ippevepcl.o \
 			ippeveprinter.o \
+			ippeveps.o \
 			ippfind.o \
 			ipptool.o
 TARGETS		=	\
+			$(IPPEVECOMMANDS) \
 			ippeveprinter \
 			$(IPPFIND_BIN) \
 			ipptool \
@@ -200,6 +204,26 @@ ippeveprinter-static:	ippeveprinter.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+
+
+#
+# ippevepcl
+#
+
+ippevepcl:	ippevepcl.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippevepcl.o $(LIBS)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+
+
+#
+# ippeveps
+#
+
+ippeveps:	ippeveps.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveps.o $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

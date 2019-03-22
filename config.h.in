@@ -17,6 +17,7 @@
 
 #define CUPS_SVERSION	""
 #define CUPS_MINIMAL	""
+#define CUPS_LITE	0
 
 
 /*

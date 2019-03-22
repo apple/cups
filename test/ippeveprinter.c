@@ -19,7 +19,10 @@
  */
 
 #include <cups/cups-private.h>
-#include <cups/ppd-private.h>
+#if !CUPS_LITE
+#  include <cups/ppd-private.h>
+#endif /* !CUPS_LITE */
+
 #include <limits.h>
 #include <sys/stat.h>
 
@@ -166,7 +169,9 @@ typedef struct ippeve_printer_s		/**** Printer data ****/
 			*hostname,	/* Hostname */
 			*uri,		/* printer-uri-supported */
 			*device_uri,	/* Device URI (if any) */
+#if !CUPS_LITE
 			*ppdfile,	/* PPD file (if any) */
+#endif /* !CUPS_LITE */
 			*command;	/* Command to run with job file */
   int			port;		/* Port */
   size_t		urilen;		/* Length of printer URI */
@@ -232,7 +237,7 @@ static int		create_job_file(ippeve_printer_t *printer, ippeve_job_t *job, char *
 static int		create_listener(const char *name, int port, int family);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int bottom, int left, int right, int top);
 static ipp_t		*create_media_size(int width, int length);
-static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *ppdfile, const char *device_uri, ipp_t *attrs);
+static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *device_uri, ipp_t *attrs);
 static void		debug_attributes(const char *title, ipp_t *ipp, int response);
 static void		delete_client(ippeve_client_t *client);
 static void		delete_job(ippeve_job_t *job);
@@ -266,7 +271,9 @@ static void		ipp_send_uri(ippeve_client_t *client);
 static void		ipp_validate_job(ippeve_client_t *client);
 static ipp_t		*load_ippserver_attributes(const char *servername, int serverport, const char *filename, cups_array_t *docformats);
 static ipp_t		*load_legacy_attributes(const char *make, const char *model, int ppm, int ppm_color, int duplex, cups_array_t *docformats);
+#if !CUPS_LITE
 static ipp_t		*load_ppd_attributes(const char *ppdfile, cups_array_t *docformats);
+#endif /* !CUPS_LITE */
 static int		parse_options(ippeve_client_t *client, cups_option_t **options);
 static void		process_attr_message(ippeve_job_t *job, char *message);
 static void		*process_client(ippeve_client_t *client);
@@ -322,7 +329,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*make = "Test",		/* Manufacturer */
 		*model = "Printer",	/* Model */
 		*name = NULL,		/* Printer name */
+#if !CUPS_LITE
 		*ppdfile = NULL,	/* PPD file */
+#endif /* !CUPS_LITE */
 		*subtypes = "_print";	/* DNS-SD service subtype */
   int		legacy = 0,		/* Legacy mode? */
 		duplex = 0,		/* Duplex mode */
@@ -394,6 +403,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      legacy = 1;
 	      break;
 
+#if !CUPS_LITE
           case 'P' : /* -P filename.ppd */
 	      i ++;
 	      if (i >= argc)
@@ -401,6 +411,7 @@ main(int  argc,				/* I - Number of command-line args */
 
               ppdfile = argv[i];
               break;
+#endif /* !CUPS_LITE */
 
           case 'V' : /* -V max-version */
 	      i ++;
@@ -536,8 +547,13 @@ main(int  argc,				/* I - Number of command-line args */
   if (!name)
     usage(1);
 
+#if CUPS_LITE
+  if (attrfile != NULL && legacy)
+    usage(1);
+#else
   if (((ppdfile != NULL) + (attrfile != NULL) + legacy) > 1)
     usage(1);
+#endif /* CUPS_LITE */
 
  /*
   * Apply defaults as needed...
@@ -613,13 +629,20 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (attrfile)
     attrs = load_ippserver_attributes(servername, serverport, attrfile, docformats);
+#if !CUPS_LITE
   else if (ppdfile)
     attrs = load_ppd_attributes(ppdfile, docformats);
+#endif /* !CUPS_LITE */
   else
     attrs = load_legacy_attributes(make, model, ppm, ppm_color, duplex, docformats);
 
-  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, ppdfile, device_uri, attrs)) == NULL)
+  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, device_uri, attrs)) == NULL)
     return (1);
+
+#if !CUPS_LITE
+  if (ppdfile)
+    printer->ppdfile = strdup(ppdfile);
+#endif /* !CUPS_LITE */
 
  /*
   * Run the print service...
@@ -1189,7 +1212,6 @@ create_printer(
     const char   *subtypes,		/* I - Bonjour service subtype(s) */
     const char   *directory,		/* I - Spool directory */
     const char   *command,		/* I - Command to run on job files, if any */
-    const char   *ppdfile,		/* I - PPD file, if any */
     const char   *device_uri,		/* I - Output device, if any */
     ipp_t        *attrs)		/* I - Capability attributes */
 {
@@ -1386,7 +1408,6 @@ create_printer(
   printer->directory     = strdup(directory);
   printer->icon          = icon ? strdup(icon) : NULL;
   printer->port          = serverport;
-  printer->ppdfile       = ppdfile ? strdup(ppdfile) : NULL;
   printer->start_time    = time(NULL);
   printer->config_time   = printer->start_time;
   printer->state         = IPP_PSTATE_IDLE;
@@ -4391,6 +4412,7 @@ load_legacy_attributes(
 }
 
 
+#if !CUPS_LITE
 /*
  * 'load_ppd_attributes()' - Load IPP attributes from a PPD file.
  */
@@ -4433,6 +4455,7 @@ load_ppd_attributes(
 
   return (NULL);
 }
+#endif /* !CUPS_LITE */
 
 
 /*
@@ -5471,8 +5494,10 @@ process_job(ippeve_job_t *job)		/* I - Job */
     if (job->printer->device_uri && asprintf(myenvp + myenvc, "DEVICE_URI=%s", job->printer->device_uri) > 0)
       myenvc ++;
 
+#if !CUPS_LITE
     if (job->printer->ppdfile && asprintf(myenvp + myenvc, "PPD=%s", job->printer->ppdfile) > 0)
       myenvc ++;
+#endif /* !CUPS_LITE */
 
     if ((attr = ippFindAttribute(job->attrs, "document-name", IPP_TAG_NAME)) != NULL && asprintf(myenvp + myenvc, "DOCUMENT_NAME=%s", ippGetString(attr, 0, NULL)) > 0)
       myenvc ++;
