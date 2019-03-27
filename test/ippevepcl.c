@@ -80,7 +80,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if ((fd = open(argv[1], O_RDONLY)) < 0)
     {
-      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", argv[i], strerror(errno));
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", argv[1], strerror(errno));
       return (1);
     }
   }
@@ -122,7 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     pcl_start_page(&header, page);
     for (y = 0; y < header.cupsHeight; y ++)
     {
-      if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine)
+      if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine))
         pcl_write_line(&header, y, line);
       else
         break;
@@ -184,23 +184,23 @@ pcl_start_page(
   * left and right.
   */
 
-  pcl_top    = ras->header.HWResolution[1] / 6;
-  pcl_bottom = ras->header.cupsHeight - ras->header.HWResolution[1] / 6 - 1;
+  pcl_top    = header->HWResolution[1] / 6;
+  pcl_bottom = header->cupsHeight - header->HWResolution[1] / 6 - 1;
 
-  if (ras->header.PageSize[1] == 842)
+  if (header->PageSize[1] == 842)
   {
    /* A4 gets special side margins to expose an 8" print area */
-    pcl_left  = (ras->header.cupsWidth - 8 * ras->header.HWResolution[0]) / 2;
-    pcl_right = ras->left + 8 * ras->header.HWResolution[0] - 1;
+    pcl_left  = (header->cupsWidth - 8 * header->HWResolution[0]) / 2;
+    pcl_right = pcl_left + 8 * header->HWResolution[0] - 1;
   }
   else
   {
    /* All other sizes get 1/4" margins */
-    pcl_left  = ras->header.HWResolution[0] / 4;
-    pcl_right = ras->header.cupsWidth - ras->header.HWResolution[0] / 4 - 1;
+    pcl_left  = header->HWResolution[0] / 4;
+    pcl_right = header->cupsWidth - header->HWResolution[0] / 4 - 1;
   }
 
-  if (!ras->header.Duplex || (page & 1))
+  if (!header->Duplex || (page & 1))
   {
    /*
     * Set the media size...
@@ -209,7 +209,7 @@ pcl_start_page(
     printf("\033&l12D\033&k12H");	/* Set 12 LPI, 10 CPI */
     printf("\033&l0O");			/* Set portrait orientation */
 
-    switch (ras->header.PageSize[1])
+    switch (header->PageSize[1])
     {
       case 540 : /* Monarch Envelope */
           printf("\033&l80A");
@@ -264,29 +264,29 @@ pcl_start_page(
     * Set top margin and turn off perforation skip...
     */
 
-    printf("\033&l%uE\033&l0L", 12 * ras->top / ras->header.HWResolution[1]);
+    printf("\033&l%uE\033&l0L", 12 * pcl_top / header->HWResolution[1]);
 
-    if (ras->header.Duplex)
+    if (header->Duplex)
     {
-      int mode = ras->header.Duplex ? 1 + ras->header.Tumble != 0 : 0;
+      int mode = header->Duplex ? 1 + header->Tumble != 0 : 0;
 
       printf("\033&l%dS", mode);	/* Set duplex mode */
     }
   }
-  else if (ras->header.Duplex)
+  else if (header->Duplex)
     printf("\033&a2G");			/* Print on back side */
 
  /*
   * Set graphics mode...
   */
 
-  printf("\033*t%uR", ras->header.HWResolution[0]);
+  printf("\033*t%uR", header->HWResolution[0]);
 					/* Set resolution */
-  printf("\033*r%uS", ras->right - ras->left + 1);
+  printf("\033*r%uS", pcl_right - pcl_left + 1);
 					/* Set width */
-  printf("\033*r%uT", ras->bottom - ras->top + 1);
+  printf("\033*r%uT", pcl_bottom - pcl_top + 1);
 					/* Set height */
-  printf("\033&a0H\033&a%uV", 720 * ras->top / ras->header.HWResolution[1]);
+  printf("\033&a0H\033&a%uV", 720 * pcl_top / header->HWResolution[1]);
 					/* Set position */
 
   printf("\033*b2M");	/* Use PackBits compression */
@@ -308,11 +308,9 @@ pcl_start_page(
 
 static void
 pcl_write_line(
-    xform_raster_t      *ras,		/* I - Raster information */
+    cups_page_header2_t *header,		/* I - Raster information */
     unsigned            y,		/* I - Line number */
-    const unsigned char *line,		/* I - Pixels on line */
-    xform_write_cb_t    cb,		/* I - Write callback */
-    void                *ctx)		/* I - Write context */
+    const unsigned char *line)		/* I - Pixels on line */
 {
   unsigned	x;			/* Column number */
   unsigned char	bit,			/* Current bit */
@@ -325,13 +323,13 @@ pcl_write_line(
   const unsigned char	*ditherline;	/* Pointer into dither table */
 
 
-  if (line[0] == 255 && !memcmp(line, line + 1, ras->right - ras->left))
+  if (line[0] == 255 && !memcmp(line, line + 1, pcl_right - pcl_left))
   {
    /*
     * Skip blank line...
     */
 
-    ras->out_blanks ++;
+    pcl_blanks ++;
     return;
   }
 
@@ -340,9 +338,9 @@ pcl_write_line(
   */
 
   y &= 63;
-  ditherline = ras->dither[y];
+  ditherline = threshold[y];
 
-  for (x = ras->left, bit = 128, byte = 0, outptr = ras->out_buffer; x <= ras->right; x ++, line ++)
+  for (x = pcl_left, bit = 128, byte = 0, outptr = pcl_line; x <= pcl_right; x ++, line ++)
   {
     if (*line <= ditherline[x & 63])
       byte |= bit;
@@ -364,9 +362,9 @@ pcl_write_line(
   * Apply compression...
   */
 
-  compptr = ras->comp_buffer;
+  compptr = pcl_comp;
   outend  = outptr;
-  outptr  = ras->out_buffer;
+  outptr  = pcl_line;
 
   while (outptr < outend)
   {
@@ -428,16 +426,16 @@ pcl_write_line(
   * Output the line...
   */
 
-  if (ras->out_blanks > 0)
+  if (pcl_blanks > 0)
   {
    /*
     * Skip blank lines first...
     */
 
-    printf("\033*b%dY", ras->out_blanks);
-    ras->out_blanks = 0;
+    printf("\033*b%dY", pcl_blanks);
+    pcl_blanks = 0;
   }
 
-  printf("\033*b%dW", (int)(compptr - ras->comp_buffer));
-  (*cb)(ctx, ras->comp_buffer, (size_t)(compptr - ras->comp_buffer));
+  printf("\033*b%dW", (int)(compptr - pcl_comp));
+  fwrite(pcl_comp, 1, (size_t)(compptr - pcl_comp), stdout);
 }
