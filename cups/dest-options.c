@@ -264,6 +264,15 @@ cupsCheckDestSupported(
         pwg->length >= min_length && pwg->length <= max_length)
       return (1);
   }
+  else if (!strcmp(option, "job-password")) 
+  {
+   /*
+    * Check that the length of the password doesn't exceed the maximum supported length.
+    */
+    
+    size_t max_length = attr->values[0].integer;
+    return strlen(value) <= max_length;
+  }
   else
   {
    /*
