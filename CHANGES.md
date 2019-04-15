@@ -1,5 +1,12 @@
-CHANGES - 2.2.11 - 2019-03-22
+CHANGES - 2.2.12 - 2019-04-15
 =============================
+
+
+Changes in CUPS v2.2.12
+-----------------------
+
+- The scheduler did not encode octetString values like "job-password" correctly
+  for the print filters (Issue #5558)
 
 
 Changes in CUPS v2.2.11
