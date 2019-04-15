@@ -4030,6 +4030,45 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	      break;
 
           case IPP_TAG_STRING :
+              {
+                int length = attr->values[i].unknown.length;
+
+		for (valptr = attr->values[i].unknown.data; length > 0; length --)
+		{
+		  if ((*valptr & 255) < 0x20 || *valptr == 0x7f)
+		    break;
+		}
+
+		if (length > 0)
+		{
+		 /*
+		  * Encode this string as hex characters...
+		  */
+
+                  *optptr++ = '<';
+
+		  for (valptr = attr->values[i].unknown.data, length = attr->values[i].unknown.length; length > 0; length --)
+		  {
+		    snprintf(optptr, optlength - (size_t)(optptr - options) - 1, "%02X", *valptr & 255);
+		    optptr += 2;
+		  }
+
+                  *optptr++ = '>';
+		}
+		else
+		{
+		  for (valptr = attr->values[i].unknown.data, length = attr->values[i].unknown.length; length > 0; length --)
+		  {
+		    if (strchr(" \t\n\\\'\"", *valptr))
+		      *optptr++ = '\\';
+		    *optptr++ = *valptr++;
+		  }
+		}
+	      }
+
+	      *optptr = '\0';
+	      break;
+
 	  case IPP_TAG_TEXT :
 	  case IPP_TAG_NAME :
 	  case IPP_TAG_KEYWORD :
@@ -4175,6 +4214,16 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
 	  break;
 
       case IPP_TAG_STRING :
+         /*
+	  * Octet strings can contain characters that need quoting.  We need
+	  * at least 2 * len + 2 characters to cover the quotes and any
+	  * backslashes in the string.
+	  */
+
+          for (i = 0; i < attr->num_values; i ++)
+	    bytes += 2 * (size_t)attr->values[i].unknown.length + 2;
+	  break;
+
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
