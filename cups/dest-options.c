@@ -1,7 +1,7 @@
 /*
  * Destination option/media support for CUPS.
  *
- * Copyright © 2012-2018 by Apple Inc.
+ * Copyright © 2012-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -179,6 +179,7 @@ cupsCheckDestSupported(
   ipp_res_t		units_value;	/* Resolution units */
   ipp_attribute_t	*attr;		/* Attribute */
   _ipp_value_t		*attrval;	/* Current attribute value */
+  _ipp_option_t		*map;		/* Option mapping information */
 
 
  /*
@@ -270,9 +271,14 @@ cupsCheckDestSupported(
     * Check literal values...
     */
 
+    map = _ippFindOption(option);
+
     switch (attr->value_tag)
     {
       case IPP_TAG_INTEGER :
+          if (map && map->value_tag == IPP_TAG_STRING)
+            return (strlen(value) <= (size_t)attr->values[0].integer);
+
       case IPP_TAG_ENUM :
           int_value = atoi(value);
 
@@ -285,7 +291,10 @@ cupsCheckDestSupported(
           return (attr->values[0].boolean);
 
       case IPP_TAG_RANGE :
-          int_value = atoi(value);
+          if (map && map->value_tag == IPP_TAG_STRING)
+            int_value = (int)strlen(value);
+          else
+            int_value = atoi(value);
 
           for (i = 0; i < attr->num_values; i ++)
             if (int_value >= attr->values[i].range.lower &&

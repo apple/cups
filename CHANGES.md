@@ -11,6 +11,8 @@ Changes in CUPS v2.3b8
 - Fixed a performance regression with large PPDs (rdar://47040759)
 - The scheduler did not encode octetString values like "job-password" correctly
   for the print filters (Issue #5558)
+- The `cupsCheckDestSupported` function did not check octetString values
+  correctly (Issue #5557)
 - Updated the systemd service file for cupsd (Issue #5551)
 - The `ippValidateAttribute` function did not catch all instances of invalid
   UTF-8 strings (Issue #5509)
