@@ -154,8 +154,10 @@ templates/header.tmpl
 templates/*/header.tmpl
 test/cups-str-*.html
 test/*_log-*
+test/ippevepcl
 test/ippeveprinter
 test/ippeveprinter-static
+test/ippeveps
 test/ippfind
 test/ippfind-static
 test/ipptool
