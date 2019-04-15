@@ -1182,6 +1182,24 @@ _ppdOpen(
       else if (!strcmp(string, "Plus90"))
         ppd->landscape = 90;
     }
+    else if (!strcmp(keyword, "Emulators") && string && ppd->num_emulations == 0)
+    {
+     /*
+      * Issue #5562: Samsung printer drivers incorrectly use Emulators keyword
+      *              to configure themselves
+      *
+      * The Emulators keyword was loaded but never used by anything in CUPS,
+      * and has no valid purpose in CUPS.  The old code was removed due to a
+      * memory leak (Issue #5475), so the following (new) code supports a single
+      * name for the Emulators keyword, allowing these drivers to work until we
+      * remove PPD and driver support entirely in a future version of CUPS.
+      */
+
+      ppd->num_emulations = 1;
+      ppd->emulations     = calloc(1, sizeof(ppd_emul_t));
+
+      strlcpy(ppd->emulations[0].name, string, sizeof(ppd->emulations[0].name));
+    }
     else if (!strcmp(keyword, "JobPatchFile"))
     {
      /*

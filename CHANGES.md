@@ -10,6 +10,8 @@ Changes in CUPS v2.2.12
   correctly (Issue #5557)
 - The scheduler did not encode octetString values like "job-password" correctly
   for the print filters (Issue #5558)
+- Restored minimal support for the `Emulators` keyword in PPD files to allow
+  old Samsung printer drivers to continue to work (Issue #5562)
 
 
 Changes in CUPS v2.2.11
