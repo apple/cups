@@ -6,6 +6,8 @@ Changes in CUPS v2.2.12
 -----------------------
 
 - Updated the systemd service file for cupsd (Issue #5551)
+- The `cupsCheckDestSupported` function did not check octetString values
+  correctly (Issue #5557)
 - The scheduler did not encode octetString values like "job-password" correctly
   for the print filters (Issue #5558)
 
