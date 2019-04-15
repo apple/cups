@@ -9,6 +9,8 @@ Changes in CUPS v2.3b8
 - The lpadmin command would hang with a bad PPD file (rdar://41495016)
 - Fixed a potential crash bug in cups-driverd (rdar://46625579)
 - Fixed a performance regression with large PPDs (rdar://47040759)
+- Restored minimal support for the `Emulators` keyword in PPD files to allow
+  old Samsung printer drivers to continue to work (Issue #5562)
 - The scheduler did not encode octetString values like "job-password" correctly
   for the print filters (Issue #5558)
 - The `cupsCheckDestSupported` function did not check octetString values
