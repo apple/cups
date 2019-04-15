@@ -4540,7 +4540,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
     case IPP_TAG_BOOLEAN :
 	for (i = 0; i < count; i ++)
 	{
-          if ((!strcmp(value, "true")) == ippGetBoolean(attr, i))
+          if ((!strcmp(value, "true") || !strcmp(value, "1")) == ippGetBoolean(attr, i))
           {
             if (!matchbuf[0])
 	      strlcpy(matchbuf, value, matchlen);
