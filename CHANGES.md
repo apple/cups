@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-03-20
+CHANGES - 2.3b8 - 2019-04-15
 ============================
 
 
@@ -57,7 +57,7 @@ Changes in CUPS v2.3b6
 - Localization update (Issue #5339, Issue #5348, Issue #5362, Issue #5408,
   Issue #5410)
 - Documentation updates (Issue #5369, Issue #5402, Issue #5403, Issue #5404)
-- CVE-2018-4700: Linux session cookies used a predictable random number seed.
+- CVE-2018-4300: Linux session cookies used a predictable random number seed.
 - All user commands now support the `--help` option (Issue #5326)
 - The `lpoptions` command now works with IPP Everywhere printers that have not
   yet been added as local queues (Issue #5045)
