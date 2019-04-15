@@ -41,7 +41,7 @@ Changes in CUPS v2.2.11
 Changes in CUPS v2.2.10
 -----------------------
 
-- CVE-2018-4700: Linux session cookies used a predictable random number seed.
+- CVE-2018-4300: Linux session cookies used a predictable random number seed.
 - The `lpoptions` command now works with IPP Everywhere printers that have not
   yet been added as local queues (Issue #5045)
 - Added USB quirk rules (Issue #5395, Issue #5443)
