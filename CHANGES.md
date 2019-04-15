@@ -15,6 +15,7 @@ Changes in CUPS v2.3b8
   for the print filters (Issue #5558)
 - The `cupsCheckDestSupported` function did not check octetString values
   correctly (Issue #5557)
+- Added support for `UserAgentTokens` directive in "client.conf" (Issue #5555)
 - Updated the systemd service file for cupsd (Issue #5551)
 - The `ippValidateAttribute` function did not catch all instances of invalid
   UTF-8 strings (Issue #5509)

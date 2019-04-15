@@ -6,7 +6,7 @@
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
 .\"
-.TH client.conf 5 "CUPS" "3 November 2017" "Apple Inc."
+.TH client.conf 5 "CUPS" "15 April 2019" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups
 .SH DESCRIPTION
@@ -76,6 +76,30 @@ The default is "Yes".
 .TP 5
 \fBUser \fIname\fR
 Specifies the default user name to use for requests.
+.\"#UserAgentTokens
+.TP 5
+\fBUserAgentTokens None\fR
+.TP 5
+\fBUserAgentTokens ProductOnly\fR
+.TP 5
+\fBUserAgentTokens Major\fR
+.TP 5
+\fBUserAgentTokens Minor\fR
+.TP 5
+\fBUserAgentTokens Minimal\fR
+.TP 5
+\fBUserAgentTokens OS\fR
+.TP 5
+\fBUserAgentTokens Full\fR
+Specifies what information is included in the User-Agent header of HTTP requests.
+"None" disables the User-Agent header.
+"ProductOnly" reports "CUPS".
+"Major" reports "CUPS/major IPP/2".
+"Minor" reports "CUPS/major.minor IPP/2.1".
+"Minimal" reports "CUPS/major.minor.patch IPP/2.1".
+"OS" reports "CUPS/major.minor.path (osname osversion) IPP/2.1".
+"Full" reports "CUPS/major.minor.path (osname osversion; architecture) IPP/2.1".
+The default is "Minimal".
 .TP 5
 \fBValidateCerts Yes\fR
 .TP 5

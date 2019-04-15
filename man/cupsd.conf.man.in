@@ -7,7 +7,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH cupsd.conf 5 "CUPS" "8 November 2018" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "15 April 2019" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -418,13 +418,11 @@ command.
 Specifies what information is included in the Server header of HTTP responses.
 "None" disables the Server header.
 "ProductOnly" reports "CUPS".
-"Major" reports "CUPS 2".
-"Minor" reports "CUPS 2.0".
-"Minimal" reports "CUPS 2.0.0".
-"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the
-.BR uname (1)
-command.
-"Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".
+"Major" reports "CUPS/major IPP/2".
+"Minor" reports "CUPS/major.minor IPP/2.1".
+"Minimal" reports "CUPS/major.minor.patch IPP/2.1".
+"OS" reports "CUPS/major.minor.path (osname osversion) IPP/2.1".
+"Full" reports "CUPS/major.minor.path (osname osversion; architecture) IPP/2.1".
 The default is "Minimal".
 .\"#SSLListen
 .TP 5

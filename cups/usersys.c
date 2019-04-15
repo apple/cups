@@ -40,6 +40,7 @@
 #    define kCUPSPrintingPrefs	CFSTR(".GlobalPreferences")
 #    define kPREFIX		"AirPrint"
 #  endif /* TARGET_OS_OSX */
+#  define kUserAgentTokensKey	CFSTR(kPREFIX "UserAgentTokens")
 #  define kAllowAnyRootKey	CFSTR(kPREFIX "AllowAnyRoot")
 #  define kAllowExpiredCertsKey	CFSTR(kPREFIX "AllowExpiredCerts")
 #  define kEncryptionKey	CFSTR(kPREFIX "Encryption")
@@ -62,6 +63,7 @@
 
 typedef struct _cups_client_conf_s	/**** client.conf config data ****/
 {
+  _cups_uatokens_t	uatokens;	/* UserAgentTokens values */
 #ifdef HAVE_SSL
   int			ssl_options,	/* SSLOptions values */
 			ssl_min_version,/* Minimum SSL/TLS version */
@@ -103,6 +105,7 @@ static void	cups_set_server_name(_cups_client_conf_t *cc, const char *value);
 #ifdef HAVE_SSL
 static void	cups_set_ssl_options(_cups_client_conf_t *cc, const char *value);
 #endif /* HAVE_SSL */
+static void	cups_set_uatokens(_cups_client_conf_t *cc, const char *value);
 static void	cups_set_user(_cups_client_conf_t *cc, const char *value);
 
 
@@ -518,6 +521,29 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
     return;
   }
 
+  if (cg->uatokens < _CUPS_UATOKENS_OS)
+  {
+    switch (cg->uatokens)
+    {
+      default :
+      case _CUPS_UATOKENS_NONE :
+	  cg->user_agent[0] = '\0';
+	  break;
+      case _CUPS_UATOKENS_PRODUCT_ONLY :
+	  strlcpy(cg->user_agent, "CUPS IPP", sizeof(cg->user_agent));
+	  break;
+      case _CUPS_UATOKENS_MAJOR :
+	  snprintf(cg->user_agent, sizeof(cg->user_agent), "CUPS/%d IPP/2", CUPS_VERSION_MAJOR);
+	  break;
+      case _CUPS_UATOKENS_MINOR :
+	  snprintf(cg->user_agent, sizeof(cg->user_agent), "CUPS/%d.%d IPP/2.1", CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR);
+	  break;
+      case _CUPS_UATOKENS_MINIMAL :
+	  strlcpy(cg->user_agent, CUPS_MINIMAL " IPP/2.1", sizeof(cg->user_agent));
+	  break;
+    }
+  }
+
 #ifdef _WIN32
  /*
   * Gather Windows version information for the User-Agent string...
@@ -550,7 +576,10 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
         break;
   }
 
-  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0", version.dwMajorVersion, version.dwMinorVersion, machine);
+  if (cg->uatokens == _CUPS_UATOKENS_OS)
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (Windows %d.%d) IPP/2.0", version.dwMajorVersion, version.dwMinorVersion);
+  else
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0", version.dwMajorVersion, version.dwMinorVersion, machine);
 
 #elif defined(__APPLE__)
  /*
@@ -566,9 +595,16 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
     strlcpy(version, "unknown", sizeof(version));
 
 #  if TARGET_OS_OSX
-  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (macOS %s; %s) IPP/2.0", version, name.machine);
+  if (cg->uatokens == _CUPS_UATOKENS_OS)
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (macOS %s) IPP/2.0", version);
+  else
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (macOS %s; %s) IPP/2.0", version, name.machine);
+
 #  else
-  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s; %s) IPP/2.0", version, name.machine);
+  if (cg->uatokens == _CUPS_UATOKENS_OS)
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s) IPP/2.0", version);
+  else
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (iOS %s; %s) IPP/2.0", version, name.machine);
 #  endif /* TARGET_OS_OSX */
 
 #else
@@ -578,7 +614,10 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
 
   uname(&name);
 
-  snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (%s %s; %s) IPP/2.0", name.sysname, name.release, name.machine);
+  if (cg->uatokens == _CUPS_UATOKENS_OS)
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (%s %s) IPP/2.0", name.sysname, name.release);
+  else
+    snprintf(cg->user_agent, sizeof(cg->user_agent), CUPS_MINIMAL " (%s %s; %s) IPP/2.0", name.sysname, name.release, name.machine);
 #endif /* _WIN32 */
 }
 
@@ -980,6 +1019,8 @@ _cupsSetDefaults(void)
 
   cups_finalize_client_conf(&cc);
 
+  cg->uatokens = cc.uatokens;
+
   if (cg->encryption == (http_encryption_t)-1)
     cg->encryption = cc.encryption;
 
@@ -1222,6 +1263,8 @@ cups_init_client_conf(
 
   memset(cc, 0, sizeof(_cups_client_conf_t));
 
+  cc->uatokens = _CUPS_UATOKENS_MINIMAL;
+
 #if defined(__APPLE__) && !TARGET_OS_OSX
   cups_set_user(cc, "mobile");
 #endif /* __APPLE__ && !TARGET_OS_OSX */
@@ -1241,8 +1284,9 @@ cups_init_client_conf(
   * everything...)
   */
 
-#if defined(__APPLE__) && defined(HAVE_SSL)
+#if defined(__APPLE__)
   char	sval[1024];			/* String value */
+#  ifdef HAVE_SSL
   int	bval;				/* Boolean value */
 
   if (cups_apple_get_boolean(kAllowAnyRootKey, &bval))
@@ -1278,7 +1322,13 @@ cups_init_client_conf(
 
   if (cups_apple_get_boolean(kValidateCertsKey, &bval))
     cc->validate_certs = bval;
-#endif /* __APPLE__ && HAVE_SSL */
+#  endif /* HAVE_SSL */
+
+  if (cups_apple_get_string(kUserAgentTokensKey, sval, sizeof(sval)))
+  {
+    cups_set_uatokens(cc, sval);
+  }
+#endif /* __APPLE__ */
 }
 
 
@@ -1315,6 +1365,8 @@ cups_read_client_conf(
 #endif /* !__APPLE__ */
     else if (!_cups_strcasecmp(line, "User") && value)
       cups_set_user(cc, value);
+    else if (!_cups_strcasecmp(line, "UserAgentTokens") && value)
+      cups_set_uatokens(cc, value);
     else if (!_cups_strcasecmp(line, "TrustOnFirstUse") && value)
       cc->trust_first = cups_boolean_value(value);
     else if (!_cups_strcasecmp(line, "AllowAnyRoot") && value)
@@ -1482,6 +1534,38 @@ cups_set_ssl_options(
   DEBUG_printf(("4cups_set_ssl_options(cc=%p, value=\"%s\") options=%x, min_version=%d, max_version=%d", (void *)cc, value, options, min_version, max_version));
 }
 #endif /* HAVE_SSL */
+
+
+/*
+ * 'cups_set_uatokens()' - Set the UserAgentTokens value.
+ */
+
+static void
+cups_set_uatokens(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  int	i;				/* Looping var */
+  static const char * const uatokens[] =/* UserAgentTokens values */
+  {
+    "NONE",
+    "PRODUCTONLY",
+    "MAJOR",
+    "MINOR",
+    "MINIMAL",
+    "OS",
+    "FULL"
+  };
+
+  for (i = 0; i < (int)(sizeof(uatokens) / sizeof(uatokens[0])); i ++)
+  {
+    if (!_cups_strcasecmp(value, uatokens[i]))
+    {
+      cc->uatokens = (_cups_uatokens_t)i;
+      return;
+    }
+  }
+}
 
 
 /*

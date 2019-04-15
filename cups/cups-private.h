@@ -1,7 +1,7 @@
 /*
  * Private definitions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -56,6 +56,17 @@ typedef struct _cups_raster_error_s	/**** Error buffer structure ****/
 	*current,			/* Current position in buffer */
 	*end;				/* End of buffer */
 } _cups_raster_error_t;
+
+typedef enum _cups_uatokens_e		/**** UserAgentTokens values */
+{
+  _CUPS_UATOKENS_NONE,			/* Do not send User-Agent */
+  _CUPS_UATOKENS_PRODUCT_ONLY,		/* CUPS IPP */
+  _CUPS_UATOKENS_MAJOR,			/* CUPS/major IPP/2 */
+  _CUPS_UATOKENS_MINOR,			/* CUPS/major.minor IPP/2.1 */
+  _CUPS_UATOKENS_MINIMAL,		/* CUPS/major.minor.patch IPP/2.1 */
+  _CUPS_UATOKENS_OS,			/* CUPS/major.minor.patch (osname osversion) IPP/2.1 */
+  _CUPS_UATOKENS_FULL			/* CUPS/major.minor.patch (osname osversion; architecture) IPP/2.1 */
+} _cups_uatokens_t;
 
 typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
@@ -146,6 +157,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			tempfile[1024];	/* cupsTempFd/File buffer */
 
   /* usersys.c */
+  _cups_uatokens_t	uatokens;	/* UserAgentTokens setting */
   http_encryption_t	encryption;	/* Encryption setting */
   char			user[65],	/* User name */
 			user_agent[256],/* User-Agent string */
