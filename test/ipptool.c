@@ -1,7 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -4771,7 +4771,82 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	break;
 
     case IPP_TAG_STRING :
+        if (flags & _CUPS_WITH_REGEX)
+	{
+	 /*
+	  * Value is an extended, case-sensitive POSIX regular expression...
+	  */
+
+	  regex_t	re;		/* Regular expression */
+
+          if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
+	  {
+            regerror(i, &re, temp, sizeof(temp));
+
+	    print_fatal_error(data, "Unable to compile WITH-VALUE regular expression \"%s\" - %s", value, temp);
+	    return (0);
+	  }
+
+         /*
+	  * See if ALL of the values match the given regular expression.
+	  */
+
+	  for (i = 0; i < count; i ++)
+	  {
+	    void	*data;		/* Pointer to octetString data */
+            int		datalen;	/* Length of octetString */
+
+            if ((data = ippGetOctetString(attr, i, &datalen)) == NULL || datalen >= (int)sizeof(temp))
+            {
+              match = 0;
+              break;
+            }
+            memcpy(temp, data, (size_t)datalen);
+            temp[datalen] = '\0';
+
+	    if (!regexec(&re, temp, 0, NULL, 0))
+	    {
+	      if (!matchbuf[0])
+		strlcpy(matchbuf, temp, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
+
+	  regfree(&re);
+
+	  if (!match && errors)
+	  {
+	    for (i = 0; i < count; i ++)
+	    {
+	      int	adatalen;
+	      void	*adata = ippGetOctetString(attr, i, &adatalen);
+
+              if (adatalen >= (int)sizeof(temp))
+                adatalen = (int)sizeof(temp) - 1;
+
+	      memcpy(temp, adata, (size_t)adatalen);
+	      temp[adatalen] = '\0';
+
+	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
+	    }
+	  }
+	}
+	else
         {
+         /*
+          * Value is a literal or hex-encoded string...
+          */
+
           unsigned char	withdata[1023],	/* WITH-VALUE data */
 			*adata;		/* Pointer to octetString data */
 	  int		withlen,	/* Length of WITH-VALUE data */
@@ -4836,7 +4911,19 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	    if (withlen == adatalen && !memcmp(withdata, adata, (size_t)withlen))
 	    {
 	      if (!matchbuf[0])
-	        copy_hex_string(matchbuf, adata, adatalen, matchlen);
+	      {
+	        if (*value == '<')
+		{
+		  copy_hex_string(matchbuf, adata, adatalen, matchlen);
+		}
+		else
+		{
+		  size_t len = (size_t)adatalen >= matchlen ? matchlen - 1 : (size_t)adatalen;
+
+		  memcpy(matchbuf, adata, len);
+		  matchbuf[len] = '\0';
+		}
+	      }
 
 	      if (!(flags & _CUPS_WITH_ALL))
 	      {
@@ -4856,7 +4943,17 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	    for (i = 0; i < count; i ++)
 	    {
 	      adata = ippGetOctetString(attr, i, &adatalen);
-	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
+	      if (*value == '<')
+	      {
+		copy_hex_string(temp, adata, adatalen, sizeof(temp));
+	      }
+	      else
+	      {
+		size_t len = (size_t)adatalen >= sizeof(temp) ? sizeof(temp) - 1 : (size_t)adatalen;
+
+		memcpy(temp, adata, len);
+		temp[len] = '\0';
+	      }
 	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
 	    }
 	  }
