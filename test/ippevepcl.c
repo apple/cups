@@ -24,7 +24,8 @@ static unsigned		pcl_bottom,	/* Bottom line */
 			pcl_right,	/* Right offset in line */
 			pcl_top,	/* Top line */
 			pcl_blanks;	/* Number of blank lines to skip */
-static unsigned char	*pcl_line,	/* Line buffer */
+static unsigned char	pcl_white,	/* White color */
+			*pcl_line,	/* Line buffer */
 			*pcl_comp;	/* Compression buffer */
 
 /*
@@ -145,7 +146,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 static void
 pcl_end_page(
-    cups_page_header2_t *header,	/* Page header */
+    cups_page_header2_t *header,	/* I - Page header */
     unsigned            page)		/* I - Current page */
 {
  /*
@@ -296,6 +297,7 @@ pcl_start_page(
   * Allocate the output buffers...
   */
 
+  pcl_white  = header->cupsBitsPerColor == 1 ? 0 : 255;
   pcl_blanks = 0;
   pcl_line   = malloc(header->cupsWidth / 8 + 1);
   pcl_comp   = malloc(2 * header->cupsBytesPerLine + 2);
@@ -308,7 +310,7 @@ pcl_start_page(
 
 static void
 pcl_write_line(
-    cups_page_header2_t *header,		/* I - Raster information */
+    cups_page_header2_t *header,	/* I - Raster information */
     unsigned            y,		/* I - Line number */
     const unsigned char *line)		/* I - Pixels on line */
 {
@@ -323,7 +325,7 @@ pcl_write_line(
   const unsigned char	*ditherline;	/* Pointer into dither table */
 
 
-  if (line[0] == 255 && !memcmp(line, line + 1, pcl_right - pcl_left))
+  if (line[0] == pcl_white && !memcmp(line, line + 1, header->cupsBytesPerLine - 1))
   {
    /*
     * Skip blank line...
@@ -333,38 +335,51 @@ pcl_write_line(
     return;
   }
 
- /*
-  * Dither the line into the output buffer...
-  */
-
-  y &= 63;
-  ditherline = threshold[y];
-
-  for (x = pcl_left, bit = 128, byte = 0, outptr = pcl_line; x <= pcl_right; x ++, line ++)
+  if (header->cupsBitsPerPixel == 1)
   {
-    if (*line <= ditherline[x & 63])
-      byte |= bit;
+   /*
+    * B&W bitmap data can be used directly...
+    */
 
-    if (bit == 1)
-    {
-      *outptr++ = byte;
-      byte      = 0;
-      bit       = 128;
-    }
-    else
-      bit >>= 1;
+    outend = (unsigned char *)line + (pcl_right + 7) / 8;
+    outptr = (unsigned char *)line + pcl_left / 8;
   }
+  else
+  {
+   /*
+    * Dither 8-bit grayscale to B&W...
+    */
 
-  if (bit != 128)
-    *outptr++ = byte;
+    y &= 63;
+    ditherline = threshold[y];
+
+    for (x = pcl_left, bit = 128, byte = 0, outptr = pcl_line; x <= pcl_right; x ++, line ++)
+    {
+      if (*line <= ditherline[x & 63])
+	byte |= bit;
+
+      if (bit == 1)
+      {
+	*outptr++ = byte;
+	byte      = 0;
+	bit       = 128;
+      }
+      else
+	bit >>= 1;
+    }
+
+    if (bit != 128)
+      *outptr++ = byte;
+
+    outend = outptr;
+    outptr = pcl_line;
+  }
 
  /*
   * Apply compression...
   */
 
   compptr = pcl_comp;
-  outend  = outptr;
-  outptr  = pcl_line;
 
   while (outptr < outend)
   {
