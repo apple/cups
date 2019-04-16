@@ -1304,8 +1304,8 @@ create_printer(
     "document-password",
     "finishings",
     "finishings-col",
-    "media",
-    "media-col",
+    "job-password",
+    "job-password-encryption",
     "orientation-requested",
     "output-bin",
     "overrides",
@@ -1528,12 +1528,14 @@ create_printer(
   job_attrs[num_job_attrs ++] = "ipp-attribute-fidelity";
   job_attrs[num_job_attrs ++] = "job-name";
   job_attrs[num_job_attrs ++] = "job-priority";
+  job_attrs[num_job_attrs ++] = "media";
+  job_attrs[num_job_attrs ++] = "media-col";
   job_attrs[num_job_attrs ++] = "multiple-document-handling";
 
   for (i = 0; i < (int)(sizeof(job_creation) / sizeof(job_creation[0])) && num_job_attrs < (int)(sizeof(job_attrs) / sizeof(job_attrs[0])); i ++)
   {
     snprintf(xxx_supported, sizeof(xxx_supported), "%s-supported", job_creation[i]);
-    if (ippFindAttribute(printer->attrs, xxx_supported, IPP_TAG_ZERO))
+    if (ippFindAttribute(attrs, xxx_supported, IPP_TAG_ZERO))
       job_attrs[num_job_attrs ++] = job_creation[i];
   }
 
@@ -3952,6 +3954,14 @@ load_legacy_attributes(
     IPP_ORIENT_REVERSE_LANDSCAPE,
     IPP_ORIENT_REVERSE_PORTRAIT
   };
+  static const char * const overrides_supported[] =
+  {					/* overrides-supported values */
+    "document-numbers",
+    "media",
+    "media-col",
+    "orientation-requested",
+    "pages"
+  };
   static const char * const print_color_mode_supported[] =
   {					/* print-color-mode-supported values */
     "monochrome"
@@ -4105,6 +4115,10 @@ load_legacy_attributes(
   /* copies-supported */
   ippAddRange(attrs, IPP_TAG_PRINTER, "copies-supported", 1, (cupsArrayFind(docformats, (void *)"application/pdf") != NULL || cupsArrayFind(docformats, (void *)"image/jpeg") != NULL) ? 999 : 1);
 
+  /* document-password-supported */
+  if (cupsArrayFind(docformats, (void *)"application/pdf"))
+    ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "document-password-supported", 1023);
+
   /* finishings-default */
   ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-default", IPP_FINISHINGS_NONE);
 
@@ -4163,14 +4177,20 @@ load_legacy_attributes(
     col = create_media_col(media[i], source, NULL, pwg->width, pwg->length, bottom, left, right, top);
     ippSetCollection(attrs, &attr, i, col);
 
-    if (i == 0)
-    {
-      /* media-col-default */
-      ippAddCollection(attrs, IPP_TAG_PRINTER, "media-col-default", col);
-    }
-
     ippDelete(col);
   }
+
+  /* media-col-default */
+  pwg = pwgMediaForPWG(ready[0]);
+
+  if (pwg->width == 21000)
+    col = create_media_col(ready[0], "main", "stationery", pwg->width, pwg->length, ppm_color > 0 ? media_bottom_margin_supported_color[1] : media_bottom_margin_supported[0], media_lr_margin_supported[0], media_lr_margin_supported[0], ppm_color > 0 ? media_top_margin_supported_color[1] : media_top_margin_supported[0]);
+  else
+    col = create_media_col(ready[0], "main", "stationery", pwg->width, pwg->length, ppm_color > 0 ? media_bottom_margin_supported_color[1] : media_bottom_margin_supported[0], media_lr_margin_supported[1], media_lr_margin_supported[1], ppm_color > 0 ? media_top_margin_supported_color[1] : media_top_margin_supported[0]);
+
+  ippAddCollection(attrs, IPP_TAG_PRINTER, "media-col-default", col);
+
+  ippDelete(col);
 
   /* media-col-ready */
   attr = ippAddCollections(attrs, IPP_TAG_PRINTER, "media-col-ready", num_ready, NULL);
@@ -4220,7 +4240,7 @@ load_legacy_attributes(
       top    = ppm_color > 0 ? media_top_margin_supported_color[1] : media_top_margin_supported[0];
     }
 
-    col = create_media_col(media[i], source, NULL, pwg->width, pwg->length, bottom, left, right, top);
+    col = create_media_col(ready[i], source, type, pwg->width, pwg->length, bottom, left, right, top);
     ippSetCollection(attrs, &attr, i, col);
     ippDelete(col);
   }
@@ -4275,6 +4295,9 @@ load_legacy_attributes(
   else
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "media-type-supported", (int)(sizeof(media_type_supported) / sizeof(media_type_supported[0])), NULL, media_type_supported);
 
+  /* orientation-requested-default */
+  ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "orientation-requested-default", IPP_ORIENT_PORTRAIT);
+
   /* orientation-requested-supported */
   if (cupsArrayFind(docformats, (void *)"application/pdf") || cupsArrayFind(docformats, (void *)"image/jpeg"))
     ippAddIntegers(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "orientation-requested-supported", (int)(sizeof(orientation_requested_supported) / sizeof(orientation_requested_supported[0])), orientation_requested_supported);
@@ -4293,6 +4316,10 @@ load_legacy_attributes(
   else
     ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "output-bin-supported", NULL, "face-down");
 
+  /* overrides-supported */
+  if (cupsArrayFind(docformats, (void *)"application/pdf"))
+    ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "overrides-supported", (int)(sizeof(overrides_supported) / sizeof(overrides_supported[0])), NULL, overrides_supported);
+
   /* page-ranges-supported */
   ippAddBoolean(attrs, IPP_TAG_PRINTER, "page-ranges-supported", cupsArrayFind(docformats, (void *)"application/pdf") != NULL);
 
@@ -4304,7 +4331,7 @@ load_legacy_attributes(
     ippAddInteger(attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "pages-per-minute-color", ppm_color);
 
   /* print-color-mode-default */
-  ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-default", NULL, "auto");
+  ippAddString(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-default", NULL, ppm_color > 0 ? "auto" : "monochrome");
 
   /* print-color-mode-supported */
   if (ppm_color > 0)
