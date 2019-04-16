@@ -399,6 +399,9 @@ div.body dd {
   DIV.table TABLE TH {
     background: #333;
   }
+  DIV.footer {
+    background: #222;
+  }
 }
 
 /* iPhone/iPod touch overrides */
