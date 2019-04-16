@@ -845,7 +845,7 @@ copy_hex_string(char          *buffer,	/* I - String buffer */
     if (*dataptr < 0x20 || *dataptr >= 0x7f)
       break;
 
-  if (*dataptr)
+  if (dataptr < dataend)
   {
    /*
     * Yes, encode as hex...
@@ -4831,12 +4831,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	      int	adatalen;
 	      void	*adata = ippGetOctetString(attr, i, &adatalen);
 
-              if (adatalen >= (int)sizeof(temp))
-                adatalen = (int)sizeof(temp) - 1;
-
-	      memcpy(temp, adata, (size_t)adatalen);
-	      temp[adatalen] = '\0';
-
+	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
 	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
 	    }
 	  }
@@ -4911,19 +4906,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	    if (withlen == adatalen && !memcmp(withdata, adata, (size_t)withlen))
 	    {
 	      if (!matchbuf[0])
-	      {
-	        if (*value == '<')
-		{
-		  copy_hex_string(matchbuf, adata, adatalen, matchlen);
-		}
-		else
-		{
-		  size_t len = (size_t)adatalen >= matchlen ? matchlen - 1 : (size_t)adatalen;
-
-		  memcpy(matchbuf, adata, len);
-		  matchbuf[len] = '\0';
-		}
-	      }
+                copy_hex_string(matchbuf, adata, adatalen, matchlen);
 
 	      if (!(flags & _CUPS_WITH_ALL))
 	      {
@@ -4943,17 +4926,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	    for (i = 0; i < count; i ++)
 	    {
 	      adata = ippGetOctetString(attr, i, &adatalen);
-	      if (*value == '<')
-	      {
-		copy_hex_string(temp, adata, adatalen, sizeof(temp));
-	      }
-	      else
-	      {
-		size_t len = (size_t)adatalen >= sizeof(temp) ? sizeof(temp) - 1 : (size_t)adatalen;
-
-		memcpy(temp, adata, len);
-		temp[len] = '\0';
-	      }
+	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
 	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
 	    }
 	  }
