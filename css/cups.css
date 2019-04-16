@@ -390,7 +390,6 @@ div.body dd {
   }
   A:link, A:link:visited, A:visited, A:link:hover, A:visited:hover {
     color: #327DCC;
-    text-decoration: underline;
   }
   PRE {
     background: #333;
