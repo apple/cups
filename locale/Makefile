@@ -74,7 +74,7 @@ install-languages:
 		fi ; \
 	done
 
-install-langbundle: cups.strings
+install-langbundle:
 	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(RESOURCEDIR)"
 	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(RESOURCEDIR)"
 
