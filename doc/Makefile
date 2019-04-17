@@ -170,7 +170,7 @@ install-data: $(INSTALL_LANGUAGES)
 		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
 	if test "x$(IPPFIND_MAN)" != x; then \
-		$(INSTALL_MAN) man-ippfind.html $(DOCDIR)/help; \
+		$(INSTALL_MAN) help/man-ippfind.html $(DOCDIR)/help; \
 	fi
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
 	for file in $(WEBIMAGES) $(HELPIMAGES); do \
