@@ -146,7 +146,7 @@ cupsMakeServerCredentials(
 
   cupsFilePrintf(fp,
                  "CUPS Self-Signed Certificate\n"
-		 			/* Enter key and certificate label */
+					/* Enter key and certificate label */
                  "r\n"			/* Generate RSA key pair */
                  "2048\n"		/* 2048 bit encryption key */
                  "y\n"			/* OK (y = yes) */
