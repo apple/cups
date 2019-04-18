@@ -1,5 +1,10 @@
-README - CUPS v2.3b7 - 2018-12-14
+README - CUPS v2.3b8 - 2019-04-18
 =================================
+
+> **Note:** CUPS v2.3b8 is not production code.  Do not use on production
+> systems.  For a production version of CUPS, please see the CUPS 2.2.x
+> releases.  **Do not use CUPS v2.3b8 on production systems.**
+
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
 
