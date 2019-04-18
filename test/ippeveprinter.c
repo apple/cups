@@ -160,7 +160,11 @@ typedef struct ippeve_printer_s		/**** Printer data ****/
   /* TODO: One IPv4 and one IPv6 listener are really not sufficient */
   int			ipv4,		/* IPv4 listener */
 			ipv6;		/* IPv6 listener */
+  #ifdef HAVE_DNSSD
   ippeve_srv_t		ipp_ref,	/* Bonjour IPP service */
+  #elif HAVE_AVAHI
+  _ipp_srv_t ipp_ref,
+  #endif
 			ipps_ref,	/* Bonjour IPPS service */
 			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
@@ -4828,7 +4832,10 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
   */
 
   encoding = httpGetContentEncoding(client->http);
-
+  /*
+  *	Below line is added to make sure we don't get unused variable warning(error).
+  */
+  encoding = encoding;		
   switch (client->operation)
   {
     case HTTP_STATE_OPTIONS :
@@ -5715,7 +5722,11 @@ register_printer(
     const char       *subtypes)		/* I - Service subtype(s) */
 {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+  #ifdef HAVE_DNSSD
   ippeve_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
+  #elif HAVE_AVAHI
+  _ipp_txt_t ipp_txt;
+  #endif
   int			i,		/* Looping var */
 			count;		/* Number of values */
   ipp_attribute_t	*color_supported,
@@ -5914,7 +5925,7 @@ register_printer(
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, NULL, printer->port, ipp_txt);
   if (subtypes && *subtypes)
   {
-    snprintf(temp, sizeof(temp), "%s._sub._ipp._tcp", subtype);
+    snprintf(temp, sizeof(temp), "%s._sub._ipp._tcp", subtypes);
     avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, temp);
   }
 
@@ -5926,7 +5937,7 @@ register_printer(
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, NULL, printer->port, ipp_txt);
   if (subtypes && *subtypes)
   {
-    snprintf(temp, sizeof(temp), "%s._sub._ipps._tcp", subtype);
+    snprintf(temp, sizeof(temp), "%s._sub._ipps._tcp", subtypes);
     avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, temp);
   }
 #endif /* HAVE_SSL */
