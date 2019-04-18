@@ -3644,7 +3644,15 @@ http_add_field(http_t       *http,	/* I - HTTP connection */
 
     char	*combined;		/* New value string */
 
-    if ((combined = realloc(http->fields[field], total + 1)) != NULL)
+    if (http->fields[field] == http->_fields[field])
+    {
+      if ((combined = malloc(total + 1)) != NULL)
+      {
+	http->fields[field] = combined;
+	snprintf(combined, total + 1, "%s, %s", http->_fields[field], value);
+      }
+    }
+    else if ((combined = realloc(http->fields[field], total + 1)) != NULL)
     {
       http->fields[field] = combined;
       strlcat(combined, ", ", total + 1);
