@@ -1,14 +1,14 @@
 /*
- * common header for ipp everywhere printer commands for cups.
+ * Common header for IPP Everywhere printer commands for CUPS.
  *
- * copyright © 2019 by apple inc.
+ * Copyright © 2019 by Apple Inc.
  *
- * licensed under apache license v2.0.  see the file "license" for more
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
  */
 
 /*
- * include necessary headers...
+ * Include necessary headers...
  */
 
 #include <cups/cups.h>
@@ -22,5 +22,5 @@
 
 
 /*
- * prototypes...
+ * Prototypes...
  */

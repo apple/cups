@@ -176,6 +176,7 @@ typedef struct ippeve_printer_s		/**** Printer data ****/
 #endif /* !CUPS_LITE */
 			*command;	/* Command to run with job file */
   int			port;		/* Port */
+  int			web_forms;	/* Enable web interface forms? */
   size_t		urilen;		/* Length of printer URI */
   ipp_t			*attrs;		/* Static attributes */
   time_t		start_time;	/* Startup time */
@@ -341,7 +342,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		legacy = 0,		/* Legacy mode? */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
-		ppm_color = 0;		/* Pages per minute for color */
+		ppm_color = 0,		/* Pages per minute for color */
+		web_forms = 1;		/* Enable web site forms? */
   ipp_t		*attrs = NULL;		/* Printer attributes */
   char		directory[1024] = "";	/* Spool directory */
   cups_array_t	*docformats = NULL;	/* Supported formats */
@@ -359,6 +361,10 @@ main(int  argc,				/* I - Number of command-line args */
     if (!strcmp(argv[i], "--help"))
     {
       usage(0);
+    }
+    else if (!strcmp(argv[i], "--no-web-forms"))
+    {
+      web_forms = 0;
     }
     else if (!strcmp(argv[i], "--version"))
     {
@@ -643,6 +649,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, device_uri, attrs)) == NULL)
     return (1);
+
+  printer->web_forms = web_forms;
 
 #if !CUPS_LITE
   if (ppdfile)
@@ -2570,9 +2578,11 @@ html_header(ippeve_client_t *client,	/* I - Client */
 	      "<style>\n"
 	      "body { font-family: sans-serif; margin: 0; }\n"
 	      "div.body { padding: 0px 10px 10px; }\n"
-	      "blockquote { background: #dfd; border-radius: 5px; color: #006; padding: 10px; }\n"
-	      "table.form { border-collapse: collapse; margin-top: 10px; width: 100%%; }\n"
-	      "table.form td, table.form th { padding: 5px 2px; width: 50%%; }\n"
+	      "span.badge { background: #090; border-radius: 5px; color: #fff; padding: 5px 10px; }\n"
+	      "span.bar { box-shadow: 0px 1px 5px #333; font-size: 75%%; }\n"
+	      "table.form { border-collapse: collapse; margin-left: auto; margin-right: auto; margin-top: 10px; width: auto; }\n"
+	      "table.form td, table.form th { padding: 5px 2px; }\n"
+	      "table.form td.meter { border-right: solid 1px #ccc; padding: 0px; width: 400px; }\n"
 	      "table.form th { text-align: right; }\n"
 	      "table.striped { border-bottom: solid thin black; border-collapse: collapse; width: 100%%; }\n"
 	      "table.striped tr:nth-child(even) { background: #fcfcfc; }\n"
@@ -6309,7 +6319,12 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
   * Process form data if present...
   */
 
-  if ((num_options = parse_options(client, &options)) > 0)
+  if (printer->web_forms)
+    num_options = parse_options(client, &options);
+  else
+    num_options = 0;
+
+  if (num_options > 0)
   {
    /*
     * WARNING: A real printer/server implementation MUST NOT implement
@@ -6393,11 +6408,10 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       media_ready = ippAddOutOfBand(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE, "media-ready");
 
     _cupsRWUnlock(&printer->rwlock);
-
-    html_printf(client, "<blockquote>Media updated.</blockquote>\n");
   }
 
-  html_printf(client, "<form method=\"GET\" action=\"/media\">\n");
+  if (printer->web_forms)
+    html_printf(client, "<form method=\"GET\" action=\"/media\">\n");
 
   html_printf(client, "<table class=\"form\" summary=\"Media\">\n");
   for (i = 0; i < num_sources; i ++)
@@ -6422,31 +6436,43 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       ready_type   = NULL;
     }
 
+    html_printf(client, "<tr><th>%s:</th>", media_source);
+
    /*
     * Media size...
     */
 
-    html_printf(client, "<tr><th>%s:</th><td><select name=\"size%d\"><option value=\"\">None</option>", media_source, i);
-    for (j = 0; j < num_sizes; j ++)
+    if (printer->web_forms)
     {
-      media_size = ippGetString(media_sizes, j, NULL);
+      html_printf(client, "<td><select name=\"size%d\"><option value=\"\">None</option>", i);
+      for (j = 0; j < num_sizes; j ++)
+      {
+	media_size = ippGetString(media_sizes, j, NULL);
 
-      html_printf(client, "<option%s>%s</option>", (ready_size && !strcmp(ready_size, media_size)) ? " selected" : "", media_size);
+	html_printf(client, "<option%s>%s</option>", (ready_size && !strcmp(ready_size, media_size)) ? " selected" : "", media_size);
+      }
+      html_printf(client, "</select>");
     }
-    html_printf(client, "</select>\n");
+    else
+      html_printf(client, "<td>%s", ready_size);
 
    /*
     * Media type...
     */
 
-    html_printf(client, "<select name=\"type%d\"><option value=\"\">None</option>", i);
-    for (j = 0; j < num_types; j ++)
+    if (printer->web_forms)
     {
-      media_type = ippGetString(media_types, j, NULL);
+      html_printf(client, " <select name=\"type%d\"><option value=\"\">None</option>", i);
+      for (j = 0; j < num_types; j ++)
+      {
+	media_type = ippGetString(media_types, j, NULL);
 
-      html_printf(client, "<option%s>%s</option>", (ready_type && !strcmp(ready_type, media_type)) ? " selected" : "", media_type);
+	html_printf(client, "<option%s>%s</option>", (ready_type && !strcmp(ready_type, media_type)) ? " selected" : "", media_type);
+      }
+      html_printf(client, "</select>");
     }
-    html_printf(client, "</select>\n");
+    else
+      html_printf(client, ", %s", ready_type);
 
    /*
     * Level/sheets loaded...
@@ -6467,21 +6493,46 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
     else
       ready_sheets = 0;
 
-    html_printf(client, "<select name=\"level%d\">", i);
-    for (j = 0; j < (int)(sizeof(sheets) / sizeof(sheets[0])); j ++)
+    if (printer->web_forms)
     {
-      if (strcmp(media_source, "main") && sheets[j] > 25)
-        continue;
+      html_printf(client, " <select name=\"level%d\">", i);
+      for (j = 0; j < (int)(sizeof(sheets) / sizeof(sheets[0])); j ++)
+      {
+	if (strcmp(media_source, "main") && sheets[j] > 25)
+	  continue;
 
-      if (sheets[j] < 0)
-	html_printf(client, "<option value=\"%d\"%s>Unknown</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "");
-      else
-	html_printf(client, "<option value=\"%d\"%s>%d sheets</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "", sheets[j]);
+	if (sheets[j] < 0)
+	  html_printf(client, "<option value=\"%d\"%s>Unknown</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "");
+	else
+	  html_printf(client, "<option value=\"%d\"%s>%d sheets</option>", sheets[j], sheets[j] == ready_sheets ? " selected" : "", sheets[j]);
+      }
+      html_printf(client, "</select></td></tr>\n");
     }
-    html_printf(client, "</select></td></tr>\n");
+    else if (ready_sheets > 0)
+      html_printf(client, ", %d sheets</td></tr>\n", ready_sheets);
+    else
+      html_printf(client, "</td></tr>\n");
   }
 
-  html_printf(client, "<tr><td></td><td><input type=\"submit\" value=\"Update Media\"></td></tr></table></form>\n");
+  if (printer->web_forms)
+  {
+    html_printf(client, "<tr><td></td><td><input type=\"submit\" value=\"Update Media\">");
+    if (num_options > 0)
+      html_printf(client, " <span class=\"badge\" id=\"status\">Media updated.</span>\n");
+    html_printf(client, "</td></tr></table></form>\n");
+
+    if (num_options > 0)
+      html_printf(client, "<script>\n"
+			  "setTimeout(hide_status, 3000);\n"
+			  "function hide_status() {\n"
+			  "  var status = document.getElementById('status');\n"
+			  "  status.style.display = 'none';\n"
+			  "}\n"
+			  "</script>\n");
+  }
+  else
+    html_printf(client, "</table>\n");
+
   html_footer(client);
 
   return (1);
@@ -6616,13 +6667,21 @@ show_supplies(
     "index=5;class=supplyThatIsConsumed;type=toner;unit=percent;"
         "maxcapacity=100;level=%d;colorantname=yellow;"
   };
-  static const char * const colors[] =	/* Colors for the supply-level bars */
-  {
+  static const char * const backgrounds[] =
+  {					/* Background colors for the supply-level bars */
     "#777 linear-gradient(#333,#777)",
     "#000 linear-gradient(#666,#000)",
     "#0FF linear-gradient(#6FF,#0FF)",
     "#F0F linear-gradient(#F6F,#F0F)",
     "#CC0 linear-gradient(#EE6,#EE0)"
+  };
+  static const char * const colors[] =	/* Text colors for the supply-level bars */
+  {
+    "#fff",
+    "#fff",
+    "#000",
+    "#000",
+    "#000"
   };
 
 
@@ -6654,7 +6713,12 @@ show_supplies(
     return (1);
   }
 
-  if ((num_options = parse_options(client, &options)) > 0)
+  if (printer->web_forms)
+    num_options = parse_options(client, &options);
+  else
+    num_options = 0;
+
+  if (num_options > 0)
   {
    /*
     * WARNING: A real printer/server implementation MUST NOT implement
@@ -6705,11 +6769,10 @@ show_supplies(
     }
 
     _cupsRWUnlock(&printer->rwlock);
-
-    html_printf(client, "<blockquote>Supplies updated.</blockquote>\n");
   }
 
-  html_printf(client, "<form method=\"GET\" action=\"/supplies\">\n");
+  if (printer->web_forms)
+    html_printf(client, "<form method=\"GET\" action=\"/supplies\">\n");
 
   html_printf(client, "<table class=\"form\" summary=\"Supplies\">\n");
   for (i = 0; i < num_supply; i ++)
@@ -6726,9 +6789,36 @@ show_supplies(
     else
       level = 50;
 
-    html_printf(client, "<tr><th>%s:</th><td><input name=\"supply%d\" size=\"3\" value=\"%d\"><span class=\"bar\" style=\"background: %s; width: %dpx;\"></span></td></tr>\n", ippGetString(supply_desc, i, NULL), i, level, colors[i], level * 2);
+    if (printer->web_forms)
+      html_printf(client, "<tr><th>%s:</th><td><input name=\"supply%d\" size=\"3\" value=\"%d\"></td>", ippGetString(supply_desc, i, NULL), i, level);
+    else
+      html_printf(client, "<tr><th>%s:</th>", ippGetString(supply_desc, i, NULL));
+
+    if (level < 10)
+      html_printf(client, "<td class=\"meter\"><span class=\"bar\" style=\"background: %s; padding: 5px %dpx;\"></span>&nbsp;%d%%</td></tr>\n", backgrounds[i], level * 2, level);
+    else
+      html_printf(client, "<td class=\"meter\"><span class=\"bar\" style=\"background: %s; color: %s; padding: 5px %dpx;\">%d%%</span></td></tr>\n", backgrounds[i], colors[i], level * 2, level);
   }
-  html_printf(client, "<tr><td></td><td><input type=\"submit\" value=\"Update Supplies\"></td></tr>\n</table>\n</form>\n");
+
+  if (printer->web_forms)
+  {
+    html_printf(client, "<tr><td></td><td colspan=\"2\"><input type=\"submit\" value=\"Update Supplies\">");
+    if (num_options > 0)
+      html_printf(client, " <span class=\"badge\" id=\"status\">Supplies updated.</span>\n");
+    html_printf(client, "</td></tr>\n</table>\n</form>\n");
+
+    if (num_options > 0)
+      html_printf(client, "<script>\n"
+			  "setTimeout(hide_status, 3000);\n"
+			  "function hide_status() {\n"
+			  "  var status = document.getElementById('status');\n"
+			  "  status.style.display = 'none';\n"
+			  "}\n"
+			  "</script>\n");
+  }
+  else
+    html_printf(client, "</table>\n");
+
   html_footer(client);
 
   return (1);
@@ -6762,6 +6852,7 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(stdout, _("Usage: ippeveprinter [options] \"name\""));
   _cupsLangPuts(stdout, _("Options:"));
   _cupsLangPuts(stderr, _("--help                  Show program help"));
+  _cupsLangPuts(stderr, _("--no-web-forms          Disable web forms for media and supplies"));
   _cupsLangPuts(stderr, _("--version               Show program version"));
   _cupsLangPuts(stdout, _("-2                      Set 2-sided printing support (default=1-sided)"));
   _cupsLangPuts(stdout, _("-D device-uri           Set the device URI for the printer"));
