@@ -6,12 +6,18 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ippeveprinter 1 "CUPS" "20 March 2019" "Apple Inc."
+.TH ippeveprinter 1 "CUPS" "19 April 2019" "Apple Inc."
 .SH NAME
 ippeveprinter \- an ipp everywhere printer application for cups
 .SH SYNOPSIS
 .B ippeveprinter
 [
+.B \-\-help
+] [
+.B \-\-no\-web\-forms
+] [
+.B \-\-version
+] [
 .B \-2
 ] [
 .B \-M
@@ -62,6 +68,15 @@ is a simple Internet Printing Protocol (IPP) server conforming to the IPP Everyw
 .SH OPTIONS
 The following options are recognized by
 .B ippeveprinter:
+.TP 5
+.B \-\-help
+Show program usage.
+.TP 5
+.B \-\-no\-web\-forms
+Disable the web interface forms used to update the media and supply levels.
+.TP 5
+.B \-\-version
+Show the CUPS version.
 .TP 5
 .B \-2
 Report support for two-sided (duplex) printing.

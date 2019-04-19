@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-02-21 11:13-0500\n"
+"POT-Creation-Date: 2019-04-19 16:34-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: Japanese - OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1534,6 +1534,9 @@ msgstr ""
 msgid "--false                 Always false"
 msgstr ""
 
+msgid "--help                  Show program help"
+msgstr ""
+
 msgid "--hold                  Hold new jobs"
 msgstr ""
 
@@ -1562,6 +1565,9 @@ msgid ""
 msgstr ""
 
 msgid "--name regex            Match service name to regular expression"
+msgstr ""
+
+msgid "--no-web-forms          Disable web forms for media and supplies"
 msgstr ""
 
 msgid "--not expression        Unary NOT of expression"
@@ -1659,6 +1665,9 @@ msgstr "-15"
 msgid "-2"
 msgstr "-2"
 
+msgid "-2                      Set 2-sided printing support (default=1-sided)"
+msgstr ""
+
 msgid "-20"
 msgstr "-20"
 
@@ -1740,6 +1749,9 @@ msgstr ""
 msgid "-D description          Specify the textual description of the printer"
 msgstr ""
 
+msgid "-D device-uri           Set the device URI for the printer"
+msgstr ""
+
 msgid ""
 "-E                      Enable and accept jobs on the printer (after -p)"
 msgstr ""
@@ -1782,10 +1794,17 @@ msgid ""
 "                          Ignore specific warnings"
 msgstr ""
 
+msgid ""
+"-K keypath              Set location of server X.509 certificates and keys."
+msgstr ""
+
 msgid "-L                      Send requests using content-length"
 msgstr ""
 
 msgid "-L location             Specify the textual location of the printer"
+msgstr ""
+
+msgid "-M manufacturer         Set manufacturer name (default=Test)"
 msgstr ""
 
 msgid "-P destination          Show status for the specified destination"
@@ -1797,6 +1816,9 @@ msgstr ""
 msgid ""
 "-P filename.plist       Produce XML plist to a file and test report to "
 "standard output"
+msgstr ""
+
+msgid "-P filename.ppd         Load printer attributes from PPD file"
 msgstr ""
 
 msgid "-P number[-number]      Match port to number or range"
@@ -1859,6 +1881,9 @@ msgstr ""
 msgid "-a [destination(s)]     Show the accepting state of destinations"
 msgstr ""
 
+msgid "-a filename.conf        Load printer attributes from conf file"
+msgstr ""
+
 msgid "-c                      Make a copy of the print file(s)"
 msgstr ""
 
@@ -1869,6 +1894,9 @@ msgid "-c [class(es)]          Show classes and their member printers"
 msgstr ""
 
 msgid "-c class                Add the named destination to a class"
+msgstr ""
+
+msgid "-c command              Set print command"
 msgstr ""
 
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
@@ -1889,6 +1917,9 @@ msgstr ""
 msgid "-d regex                Match domain to regular expression"
 msgstr ""
 
+msgid "-d spool-directory      Set spool directory"
+msgstr ""
+
 msgid "-e                      Show available destinations on the network"
 msgstr ""
 
@@ -1896,6 +1927,9 @@ msgid "-f                      Run in the foreground."
 msgstr ""
 
 msgid "-f filename             Set default request filename"
+msgstr ""
+
+msgid "-f type/subtype[,...]   Set supported file types"
 msgstr ""
 
 msgid "-h                      Show this usage message."
@@ -1910,6 +1944,9 @@ msgstr ""
 msgid "-h server[:port]        Connect to the named server and port"
 msgstr ""
 
+msgid "-i iconfile.png         Set icon file"
+msgstr ""
+
 msgid "-i id                   Specify an existing job ID to modify"
 msgstr ""
 
@@ -1918,6 +1955,9 @@ msgstr ""
 
 msgid ""
 "-i seconds              Repeat the last file with the given time interval"
+msgstr ""
+
+msgid "-k                      Keep job spool files"
 msgstr ""
 
 msgid "-l                      List attributes"
@@ -1935,6 +1975,9 @@ msgstr ""
 msgid "-l                      Show verbose (long) output"
 msgstr ""
 
+msgid "-l location             Set location of printer"
+msgstr ""
+
 msgid ""
 "-m                      Send an email notification when the job completes"
 msgstr ""
@@ -1946,11 +1989,17 @@ msgid ""
 "-m everywhere           Specify the printer is compatible with IPP Everywhere"
 msgstr ""
 
+msgid "-m model                Set model name (default=Printer)"
+msgstr ""
+
 msgid ""
 "-m model                Specify a standard model/PPD file for the printer"
 msgstr ""
 
 msgid "-n count                Repeat the last file the given number of times"
+msgstr ""
+
+msgid "-n hostname             Set hostname for printer"
 msgstr ""
 
 msgid "-n num-copies           Specify the number of copies to print"
@@ -2055,6 +2104,9 @@ msgstr ""
 msgid "-p destination          Specify/add the named destination"
 msgstr ""
 
+msgid "-p port                 Set port number for printer"
+msgstr ""
+
 msgid "-q                      Quietly report match via exit code"
 msgstr ""
 
@@ -2085,6 +2137,9 @@ msgstr ""
 msgid "-r reason               Specify a reason message that others can see"
 msgstr ""
 
+msgid "-r subtype              Set DNS-SD service subtype"
+msgstr ""
+
 msgid "-s                      Be silent"
 msgstr ""
 
@@ -2095,6 +2150,9 @@ msgid "-s                      Show a status summary"
 msgstr ""
 
 msgid "-s cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
+msgid "-s speed[,color-speed]  Set speed in pages per minute"
 msgstr ""
 
 msgid "-t                      Produce a test report"
@@ -3846,6 +3904,10 @@ msgstr "1 行が最大値 (255 文字) を超えています"
 msgid "List Available Printers"
 msgstr "使用可能なプリンター一覧"
 
+#, c-format
+msgid "Listening on port %d."
+msgstr ""
+
 msgid "Local printer created."
 msgstr ""
 
@@ -4722,6 +4784,9 @@ msgstr "ページ情報のメモリー割り当てができません"
 msgid "Unable to allocate memory for pages array"
 msgstr "ページアレイのメモリー割り当てができません"
 
+msgid "Unable to allocate memory for printer"
+msgstr ""
+
 msgid "Unable to cancel print job."
 msgstr "プリンターを変更できません。"
 
@@ -4769,6 +4834,10 @@ msgstr ""
 
 msgid "Unable to create server credentials."
 msgstr "サーバー証明書を作成できません。"
+
+#, c-format
+msgid "Unable to create spool directory \"%s\": %s"
+msgstr ""
 
 msgid "Unable to create temporary file"
 msgstr "テンポラリーファイルを作成できません"
@@ -4819,6 +4888,10 @@ msgstr "ホストへの安全な接続が確立できません (信用できな�
 
 msgid "Unable to establish a secure connection to host."
 msgstr "ホストへの安全な接続を確立できません。"
+
+#, c-format
+msgid "Unable to execute command \"%s\": %s"
+msgstr ""
 
 msgid "Unable to find destination for job"
 msgstr "ジョブの宛先が見つかりません"
@@ -4903,6 +4976,10 @@ msgstr "テストページを印刷できません"
 msgid "Unable to read print data."
 msgstr "プリントデータを読み込めません。"
 
+#, c-format
+msgid "Unable to register \"%s.%s\": %d"
+msgstr ""
+
 msgid "Unable to rename job document file."
 msgstr ""
 
@@ -4952,6 +5029,10 @@ msgstr "未知"
 #, c-format
 msgid "Unknown choice \"%s\" for option \"%s\"."
 msgstr "\"%s\" (オプション \"%s\" 用) は未知の設定です。"
+
+#, c-format
+msgid "Unknown directive \"%s\" on line %d of \"%s\" ignored."
+msgstr ""
 
 #, c-format
 msgid "Unknown encryption option value: \"%s\"."
@@ -5099,6 +5180,9 @@ msgid ""
 "       program | cupstestppd [options] -"
 msgstr ""
 
+msgid "Usage: ippeveprinter [options] \"name\""
+msgstr ""
+
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
 "       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
@@ -5177,6 +5261,10 @@ msgstr ""
 
 msgid "Usage: snmp [host-or-ip-address]"
 msgstr "使い方: snmp [ホスト名またはIPアドレス]"
+
+#, c-format
+msgid "Using spool directory \"%s\"."
+msgstr ""
 
 msgid "Value uses indefinite length"
 msgstr "値は不定長です"
