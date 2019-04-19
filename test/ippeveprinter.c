@@ -139,12 +139,12 @@ typedef DNSServiceRef ippeve_srv_t;	/* Service reference */
 typedef TXTRecordRef ippeve_txt_t;	/* TXT record */
 
 #elif defined(HAVE_AVAHI)
-typedef AvahiEntryGroup *_ipp_srv_t;	/* Service reference */
-typedef AvahiStringList *_ipp_txt_t;	/* TXT record */
+typedef AvahiEntryGroup *ippeve_srv_t;	/* Service reference */
+typedef AvahiStringList *ippeve_txt_t;	/* TXT record */
 
 #else
-typedef void *_ipp_srv_t;		/* Service reference */
-typedef void *_ipp_txt_t;		/* TXT record */
+typedef void *ippeve_srv_t;		/* Service reference */
+typedef void *ippeve_txt_t;		/* TXT record */
 #endif /* HAVE_DNSSD */
 
 typedef struct ippeve_filter_s		/**** Attribute filter ****/
