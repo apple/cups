@@ -1,7 +1,7 @@
 /*
  * PPD code emission routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -832,7 +832,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	    *bufptr++ = *cptr++;
 	}
       }
-      else
+      else if (choices[i]->code)
       {
        /*
         * Otherwise just copy the option code directly...
@@ -1065,7 +1065,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       DEBUG_printf(("2ppdEmitString: Offset in string is %d...",
                     (int)(bufptr - buffer)));
     }
-    else
+    else if (choices[i]->code)
     {
       strlcpy(bufptr, choices[i]->code, (size_t)(bufend - bufptr + 1));
       bufptr += strlen(bufptr);

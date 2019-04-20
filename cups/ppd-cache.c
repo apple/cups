@@ -1393,7 +1393,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       * Add localized text for PWG keyword to message catalog...
       */
 
-      snprintf(msg_id, sizeof(msg_id), "output-bin.%s", pwg_name);
+      snprintf(msg_id, sizeof(msg_id), "output-bin.%s", pwg_keyword);
       pwg_add_message(pc->strings, msg_id, choice->text);
     }
   }

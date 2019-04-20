@@ -1,7 +1,7 @@
 /*
  * IPP data file parsing functions.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -134,7 +134,9 @@ const char *				/* O - Value or @code NULL@ if not set */
 _ippVarsGet(_ipp_vars_t *v,		/* I - IPP variables */
             const char  *name)		/* I - Variable name */
 {
-  if (!strcmp(name, "uri"))
+  if (!v)
+    return (NULL);
+  else if (!strcmp(name, "uri"))
     return (v->uri);
   else if (!strcmp(name, "uriuser") || !strcmp(name, "username"))
     return (v->username[0] ? v->username : NULL);

@@ -611,8 +611,6 @@ _ppdOpen(
 
   DEBUG_printf(("2_ppdOpen: keyword=%s, string=%p", keyword, string));
 
-  free(string);
-
  /*
   * Allocate memory for the PPD file record...
   */
@@ -627,12 +625,14 @@ _ppdOpen(
     return (NULL);
   }
 
+  free(string);
+  string = NULL;
+
   ppd->language_level = 2;
   ppd->color_device   = 0;
   ppd->colorspace     = PPD_CS_N;
   ppd->landscape      = -90;
-  ppd->coptions       = cupsArrayNew((cups_array_func_t)ppd_compare_coptions,
-                                     NULL);
+  ppd->coptions       = cupsArrayNew((cups_array_func_t)ppd_compare_coptions, NULL);
 
  /*
   * Read lines from the PPD file and add them to the file record...

@@ -4,7 +4,7 @@
  * Copyright © 2010-2019 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
- * information.
+ * information.º
  *
  * Note: This program began life as the "ippserver" sample code that first
  * appeared in CUPS 1.4.  The name has been changed in order to distinguish it
@@ -73,7 +73,7 @@ extern char **environ;
 enum ippeve_preason_e			/* printer-state-reasons bit values */
 {
   IPPEVE_PREASON_NONE = 0x0000,		/* none */
-  IPPEVE_PREASON_OTHER = 0x0001,		/* other */
+  IPPEVE_PREASON_OTHER = 0x0001,	/* other */
   IPPEVE_PREASON_COVER_OPEN = 0x0002,	/* cover-open */
   IPPEVE_PREASON_INPUT_TRAY_MISSING = 0x0004,
 					/* input-tray-missing */
@@ -91,7 +91,7 @@ enum ippeve_preason_e			/* printer-state-reasons bit values */
   IPPEVE_PREASON_MEDIA_NEEDED = 0x0400,	/* media-needed */
   IPPEVE_PREASON_MOVING_TO_PAUSED = 0x0800,
 					/* moving-to-paused */
-  IPPEVE_PREASON_PAUSED = 0x1000,		/* paused */
+  IPPEVE_PREASON_PAUSED = 0x1000,	/* paused */
   IPPEVE_PREASON_SPOOL_AREA_FULL = 0x2000,/* spool-area-full */
   IPPEVE_PREASON_TONER_EMPTY = 0x4000,	/* toner-empty */
   IPPEVE_PREASON_TONER_LOW = 0x8000	/* toner-low */
@@ -3788,6 +3788,8 @@ load_ippserver_attributes(
   char		temp[256];		/* Temporary string */
 
 
+  (void)docformats; /* for now */
+
  /*
   * Setup callbacks and variables for the printer configuration file...
   *
@@ -5809,7 +5811,7 @@ register_printer(
   TXTRecordSetValue(&ipp_txt, "TLS", 3, "1.2");
 #  endif /* HAVE_SSL */
   if (urf[0])
-    TXTRecordSetValue(&ipp_txt, "URF", strlen(urf), urf);
+    TXTRecordSetValue(&ipp_txt, "URF", (uint8_t)strlen(urf), urf);
   TXTRecordSetValue(&ipp_txt, "txtvers", 1, "1");
   TXTRecordSetValue(&ipp_txt, "qtotal", 1, "1");
 
@@ -6480,8 +6482,8 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 
     if ((ready_tray = ippGetOctetString(input_tray, i, &tray_len)) != NULL)
     {
-      if (tray_len > (sizeof(tray_str) - 1))
-        tray_len = sizeof(tray_str) - 1;
+      if (tray_len > (int)(sizeof(tray_str) - 1))
+        tray_len = (int)sizeof(tray_str) - 1;
       memcpy(tray_str, ready_tray, (size_t)tray_len);
       tray_str[tray_len] = '\0';
 
@@ -6778,8 +6780,8 @@ show_supplies(
   for (i = 0; i < num_supply; i ++)
   {
     supply_value = ippGetOctetString(supply, i, &supply_len);
-    if (supply_len > (sizeof(supply_text) - 1))
-      supply_len = sizeof(supply_text) - 1;
+    if (supply_len > (int)(sizeof(supply_text) - 1))
+      supply_len = (int)sizeof(supply_text) - 1;
 
     memcpy(supply_text, supply_value, (size_t)supply_len);
     supply_text[supply_len] = '\0';
