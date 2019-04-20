@@ -347,8 +347,7 @@ cat_drv(const char *name,		/* I - PPD name */
     return (1);
   }
 
-  if ((fp = get_file(resource, request_id, "drv", filename, sizeof(filename),
-                     &pc_file_name)) == NULL)
+  if ((fp = get_file(resource, request_id, "drv", filename, sizeof(filename), &pc_file_name)) == NULL || !pc_file_name)
     return (1);
 
   src = new ppdcSource(filename, fp);

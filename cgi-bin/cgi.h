@@ -1,10 +1,11 @@
 /*
  * CGI support library definitions for CUPS.
  *
- * Copyright 2007-2010 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_CGI_H_
@@ -66,14 +67,14 @@ extern void		cgiEndMultipart(void);
 extern char		*cgiFormEncode(char *dst, const char *src,
 			               size_t dstsize);
 extern void		cgiFreeSearch(void *search);
-extern const char	*cgiGetArray(const char *name, int element);
+extern char		*cgiGetArray(const char *name, int element);
 extern void		cgiGetAttributes(ipp_t *request, const char *tmpl);
 extern const char	*cgiGetCookie(const char *name);
 extern const cgi_file_t	*cgiGetFile(void);
 extern cups_array_t	*cgiGetIPPObjects(ipp_t *response, void *search);
 extern int		cgiGetSize(const char *name);
 extern char		*cgiGetTemplateDir(void);
-extern const char	*cgiGetVariable(const char *name);
+extern char		*cgiGetVariable(const char *name);
 extern int		cgiInitialize(void);
 extern int		cgiIsPOST(void);
 extern void		cgiMoveJobs(http_t *http, const char *dest, int job_id);

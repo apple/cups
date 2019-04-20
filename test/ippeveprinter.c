@@ -4660,7 +4660,6 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 			hostname[HTTP_MAX_HOST];
 					/* Hostname */
   int			port;		/* Port number */
-  const char		*encoding;	/* Content-Encoding value */
   static const char * const http_states[] =
   {					/* Strings for logging HTTP method */
     "WAITING",
@@ -4838,8 +4837,6 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
  /*
   * Handle new transfers...
   */
-
-  encoding = httpGetContentEncoding(client->http);
 
   switch (client->operation)
   {

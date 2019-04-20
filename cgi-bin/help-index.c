@@ -1,10 +1,11 @@
 /*
  * Online help index routines for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -340,6 +341,8 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
 	    while (isspace(*ptr & 255))
               ptr ++;
           }
+          else
+            section[0] = '\0';
 
           if (*ptr != '\"')
 	    break;
@@ -1188,7 +1191,7 @@ help_new_node(const char   *filename,	/* I - Filename */
 
   n->filename = strdup(filename);
   n->anchor   = anchor ? strdup(anchor) : NULL;
-  n->section  = *section ? strdup(section) : NULL;
+  n->section  = (section && *section) ? strdup(section) : NULL;
   n->text     = strdup(text);
   n->mtime    = mtime;
   n->offset   = offset;

@@ -4777,6 +4777,8 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  * Value is an extended, case-sensitive POSIX regular expression...
 	  */
 
+	  void		*adata;		/* Pointer to octetString data */
+	  int		adatalen;	/* Length of octetString */
 	  regex_t	re;		/* Regular expression */
 
           if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
@@ -4793,16 +4795,13 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 
 	  for (i = 0; i < count; i ++)
 	  {
-	    void	*data;		/* Pointer to octetString data */
-            int		datalen;	/* Length of octetString */
-
-            if ((data = ippGetOctetString(attr, i, &datalen)) == NULL || datalen >= (int)sizeof(temp))
+            if ((adata = ippGetOctetString(attr, i, &adatalen)) == NULL || adatalen >= (int)sizeof(temp))
             {
               match = 0;
               break;
             }
-            memcpy(temp, data, (size_t)datalen);
-            temp[datalen] = '\0';
+            memcpy(temp, adata, (size_t)adatalen);
+            temp[adatalen] = '\0';
 
 	    if (!regexec(&re, temp, 0, NULL, 0))
 	    {
@@ -4828,9 +4827,7 @@ with_value(_cups_testdata_t *data,	/* I - Test data */
 	  {
 	    for (i = 0; i < count; i ++)
 	    {
-	      int	adatalen;
-	      void	*adata = ippGetOctetString(attr, i, &adatalen);
-
+	      adata = ippGetOctetString(attr, i, &adatalen);
 	      copy_hex_string(temp, adata, adatalen, sizeof(temp));
 	      add_stringf(data->errors, "GOT: %s=\"%s\"", name, temp);
 	    }

@@ -4,7 +4,8 @@
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2005 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -113,7 +114,12 @@ cgiCheckVariables(const char *names)	/* I - Variables to look for */
       return (0);
 
     if (*val == '\0')
+    {
+      free((void *)val);
       return (0);	/* Can't be blank, either! */
+    }
+
+    free((void *)val);
   }
 
   return (1);
@@ -151,7 +157,7 @@ cgiClearVariables(void)
  * 'cgiGetArray()' - Get an element from a form array.
  */
 
-const char *				/* O - Element value or NULL */
+char *					/* O - Element value or NULL */
 cgiGetArray(const char *name,		/* I - Name of array variable */
             int        element)		/* I - Element number (0 to N) */
 {
@@ -214,7 +220,7 @@ cgiGetSize(const char *name)		/* I - Name of variable */
  * array of values, returns the last element.
  */
 
-const char *				/* O - Value of variable */
+char *					/* O - Value of variable */
 cgiGetVariable(const char *name)	/* I - Name of variable */
 {
   const _cgi_var_t	*var;		/* Returned variable */
@@ -312,11 +318,18 @@ cgiInitialize(void)
       else
 	fputs("DEBUG: " CUPS_SID " form variable is not present.\n", stderr);
 
+      free((void *)cups_sid_form);
+
       cgiClearVariables();
+
       return (0);
     }
     else
+    {
+      free((void *)cups_sid_form);
+
       return (1);
+    }
   }
   else
     return (0);
@@ -868,12 +881,13 @@ cgi_initialize_multipart(
 	  if (line[0])
             cgiSetArray(name, atoi(ptr) - 1, line);
 	}
-	else if (cgiGetVariable(name))
+	else if ((ptr = cgiGetVariable(name)) != NULL)
 	{
 	 /*
 	  * Add another element in the array...
 	  */
 
+          free(ptr);
 	  cgiSetArray(name, cgiGetSize(name), line);
 	}
 	else
@@ -1028,7 +1042,8 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
   char	*s,				/* Pointer to current form string */
 	ch,				/* Temporary character */
 	name[255],			/* Name of form variable */
-	value[65536];			/* Variable value */
+	value[65536],			/* Variable value */
+	*temp;				/* Temporary pointer */
 
 
  /*
@@ -1130,8 +1145,11 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
       if (value[0])
         cgiSetArray(name, atoi(s) - 1, value);
     }
-    else if (cgiGetVariable(name) != NULL)
+    else if ((temp = cgiGetVariable(name)) != NULL)
+    {
+      free(temp);
       cgiSetArray(name, cgiGetSize(name), value);
+    }
     else
       cgiSetVariable(name, value);
   }

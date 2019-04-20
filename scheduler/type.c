@@ -1,10 +1,11 @@
 /*
  * MIME typing routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
- * Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2006 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -527,14 +528,16 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	case MIME_MAGIC_STRING :
 	case MIME_MAGIC_ISTRING :
 	    temp->offset = strtol(value[0], NULL, 0);
-	    if ((size_t)length[1] > sizeof(temp->value.stringv))
+	    if (num_values < 2 || (size_t)length[1] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[1];
 	    memcpy(temp->value.stringv, value[1], (size_t)length[1]);
 	    break;
 	case MIME_MAGIC_CHAR :
 	    temp->offset = strtol(value[0], NULL, 0);
-	    if (length[1] == 1)
+	    if (num_values < 2)
+	      return (-1);
+	    else if (length[1] == 1)
 	      temp->value.charv = (unsigned char)value[1][0];
 	    else
 	      temp->value.charv = (unsigned char)strtol(value[1], NULL, 0);
@@ -559,7 +562,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	case MIME_MAGIC_CONTAINS :
 	    temp->offset = strtol(value[0], NULL, 0);
 	    temp->region = strtol(value[1], NULL, 0);
-	    if ((size_t)length[2] > sizeof(temp->value.stringv))
+	    if (num_values < 3 || (size_t)length[2] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[2];
 	    memcpy(temp->value.stringv, value[2], (size_t)length[2]);

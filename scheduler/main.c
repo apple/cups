@@ -345,6 +345,7 @@ main(int  argc,				/* I - Number of command-line args */
     strlcpy(filename, ConfigurationFile, len);
     if ((slash = strrchr(filename, '/')) == NULL)
     {
+      free(filename);
       _cupsLangPrintf(stderr,
 		      _("cupsd: Unable to get path to "
 			"cups-files.conf file."));

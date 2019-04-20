@@ -1303,9 +1303,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   cupsdClosePipe(filterfds[slot]);
 
   for (i = 6; i < argc; i ++)
-    if (argv[i])
-      free(argv[i]);
-
+    free(argv[i]);
   free(argv);
 
   if (printer_state_reasons)
@@ -1338,8 +1336,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   if (argv)
   {
     for (i = 6; i < argc; i ++)
-      if (argv[i])
-	free(argv[i]);
+      free(argv[i]);
+
+    free(argv);
   }
 
   if (printer_state_reasons)
