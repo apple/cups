@@ -2173,7 +2173,7 @@ _ppdCacheGetFinishingValues(
        f;
        f = (_pwg_finishings_t *)cupsArrayNext(pc->finishings))
   {
-    DEBUG_printf(("_ppdCacheGetFinishingValues: Checking %d (%s)", f->value, ippEnumString("finishings", f->value)));
+    DEBUG_printf(("_ppdCacheGetFinishingValues: Checking %d (%s)", (int)f->value, ippEnumString("finishings", (int)f->value)));
 
     for (i = f->num_options, option = f->options; i > 0; i --, option ++)
     {
@@ -2188,7 +2188,7 @@ _ppdCacheGetFinishingValues(
 
     if (i == 0)
     {
-      DEBUG_printf(("_ppdCacheGetFinishingValues: Adding %d (%s)", f->value, ippEnumString("finishings", f->value)));
+      DEBUG_printf(("_ppdCacheGetFinishingValues: Adding %d (%s)", (int)f->value, ippEnumString("finishings", (int)f->value)));
 
       values[num_values ++] = (int)f->value;
 

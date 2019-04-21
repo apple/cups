@@ -1755,8 +1755,8 @@ static int				/* O - Result of evaluation */
 eval_expr(ippfind_srv_t  *service,	/* I - Service */
 	  ippfind_expr_t *expressions)	/* I - Expressions */
 {
-  int			logic,		/* Logical operation */
-			result;		/* Result of current expression */
+  ippfind_op_t		logic;		/* Logical operation */
+  int			result;		/* Result of current expression */
   ippfind_expr_t	*expression;	/* Current expression */
   const char		*val;		/* TXT value */
 
@@ -2336,10 +2336,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
     ippDelete(response);
     httpClose(http);
 
-    _cupsLangPrintf(stdout, "%s %s %s %s", service->uri,
-                    ippEnumString("printer-state", pstate),
-                    paccepting ? "accepting-jobs" : "not-accepting-jobs",
-                    preasons);
+    _cupsLangPrintf(stdout, "%s %s %s %s", service->uri, ippEnumString("printer-state", (int)pstate), paccepting ? "accepting-jobs" : "not-accepting-jobs", preasons);
   }
   else if (!strncmp(service->regtype, "_http._tcp", 10) ||
            !strncmp(service->regtype, "_https._tcp", 11))

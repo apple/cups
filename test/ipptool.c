@@ -176,7 +176,7 @@ static const char *get_string(ipp_attribute_t *attr, int element, int flags, cha
 static void	init_data(_cups_testdata_t *data);
 static char	*iso_date(const ipp_uchar_t *date);
 static void	pause_message(const char *message);
-static void	print_attr(cups_file_t *outfile, int output, ipp_attribute_t *attr, ipp_tag_t *group);
+static void	print_attr(cups_file_t *outfile, _cups_output_t output, ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_csv(_cups_testdata_t *data, ipp_t *ipp, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_fatal_error(_cups_testdata_t *data, const char *s, ...) _CUPS_FORMAT(2, 3);
 static void	print_ippserver_attr(_cups_testdata_t *data, ipp_attribute_t *attr, int indent);
@@ -1150,7 +1150,7 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
     if (httpGetVersion(data->http) != HTTP_1_1)
     {
-      int version = httpGetVersion(data->http);
+      int version = (int)httpGetVersion(data->http);
 
       add_stringf(data->errors, "Bad HTTP version (%d.%d)", version / 100, version % 100);
     }
@@ -2280,7 +2280,7 @@ pause_message(const char *message)	/* I - Message */
 
 static void
 print_attr(cups_file_t     *outfile,	/* I  - Output file */
-           int             output,	/* I  - Output format */
+           _cups_output_t  output,	/* I  - Output format */
            ipp_attribute_t *attr,	/* I  - Attribute to print */
            ipp_tag_t       *group)	/* IO - Current group */
 {

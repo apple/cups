@@ -688,7 +688,7 @@ monitor_printer(
 
       if (printer_state != data->printer_state || strcmp(printer_state_reasons, data->printer_state_reasons))
       {
-        printf("PRINTER: %s (%s)\n", ippEnumString("printer-state", printer_state), printer_state_reasons);
+        printf("PRINTER: %s (%s)\n", ippEnumString("printer-state", (int)printer_state), printer_state_reasons);
 
         data->printer_state = printer_state;
         strlcpy(data->printer_state_reasons, printer_state_reasons, sizeof(data->printer_state_reasons));
@@ -718,7 +718,7 @@ monitor_printer(
 
         if (job_state != data->job_state || strcmp(job_state_reasons, data->job_state_reasons))
         {
-          printf("JOB %d: %s (%s)\n", data->job_id, ippEnumString("job-state", job_state), job_state_reasons);
+          printf("JOB %d: %s (%s)\n", data->job_id, ippEnumString("job-state", (int)job_state), job_state_reasons);
 
           data->job_state = job_state;
           strlcpy(data->job_state_reasons, job_state_reasons, sizeof(data->job_state_reasons));

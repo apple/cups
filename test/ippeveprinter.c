@@ -775,8 +775,7 @@ copy_job_attributes(
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-printer-up-time", (int)(time(NULL) - client->printer->start_time));
 
   if (!ra || cupsArrayFind(ra, "job-state"))
-    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_ENUM,
-		  "job-state", job->state);
+    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", (int)job->state);
 
   if (!ra || cupsArrayFind(ra, "job-state-message"))
   {
@@ -3250,8 +3249,7 @@ ipp_get_printer_attributes(
 
 
   if (!ra || cupsArrayFind(ra, "printer-state"))
-    ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                  "printer-state", printer->state);
+    ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", (int)printer->state);
 
   if (!ra || cupsArrayFind(ra, "printer-state-change-date-time"))
     ippAddDate(client->response, IPP_TAG_PRINTER, "printer-state-change-date-time", ippTimeToDate(printer->state_time));
@@ -5917,26 +5915,50 @@ register_printer(
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_printer._tcp", NULL, NULL, 0, NULL);
 
  /*
-  * Then register the ippeve._tcp (IPP)...
+  * Then register the _ipp._tcp (IPP)...
   */
 
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, NULL, printer->port, ipp_txt);
   if (subtypes && *subtypes)
   {
-    snprintf(temp, sizeof(temp), "%s._sub._ipp._tcp", subtype);
-    avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, temp);
+    char *temptypes = strdup(subtypes), *start, *end;
+
+    for (start = temptypes; *start; start = end)
+    {
+      if ((end = strchr(start, ',')) != NULL)
+        *end++ = '\0';
+      else
+        end = start + strlen(start);
+
+      snprintf(temp, sizeof(temp), "%s._sub._ipp._tcp", start);
+      avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipp._tcp", NULL, temp);
+    }
+
+    free(temptypes);
   }
 
 #ifdef HAVE_SSL
  /*
-  * ippeves._tcp (IPPS) for secure printing...
+  * _ipps._tcp (IPPS) for secure printing...
   */
 
   avahi_entry_group_add_service_strlst(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, NULL, printer->port, ipp_txt);
   if (subtypes && *subtypes)
   {
-    snprintf(temp, sizeof(temp), "%s._sub._ipps._tcp", subtype);
-    avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, temp);
+    char *temptypes = strdup(subtypes), *start, *end;
+
+    for (start = temptypes; *start; start = end)
+    {
+      if ((end = strchr(start, ',')) != NULL)
+        *end++ = '\0';
+      else
+        end = start + strlen(start);
+
+      snprintf(temp, sizeof(temp), "%s._sub._ipps._tcp", start);
+      avahi_entry_group_add_service_subtype(printer->ipp_ref, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, printer->dnssd_name, "_ipps._tcp", NULL, temp);
+    }
+
+    free(temptypes);
   }
 #endif /* HAVE_SSL */
 

@@ -31,8 +31,8 @@ unsigned char	*Planes[4],		/* Output buffers */
 unsigned 	NumPlanes,		/* Number of color planes */
 		ColorBits,		/* Number of bits per color */
 		Feed;			/* Number of lines to skip */
-int		Duplex,			/* Current duplex mode */
-		Page,			/* Current page number */
+cups_bool_t	Duplex;			/* Current duplex mode */
+int		Page,			/* Current page number */
 		Canceled;		/* Has the current job been canceled? */
 
 
