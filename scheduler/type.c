@@ -451,6 +451,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	snprintf(value[0], sizeof(value[0]), "*.%s", name);
 	length[0]  = (int)strlen(value[0]);
 	op         = MIME_MAGIC_MATCH;
+	num_values = 1;
       }
 
      /*
