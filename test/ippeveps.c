@@ -15,6 +15,7 @@
 #if !CUPS_LITE
 #  include <cups/ppd-private.h>
 #endif /* !CUPS_LITE */
+#include <limits.h>
 
 #ifdef __APPLE__
 #  define PDFTOPS CUPS_SERVERBIN "/filter/cgpdftops"
@@ -38,15 +39,15 @@ static _ppd_cache_t	*ppd_cache = NULL;
  * Local functions...
  */
 
-//static void	ascii85(const unsigned char *data, int length, int eod);
-static void	dsc_header(int num_options, cups_option_t *options, int num_pages);
+static void	ascii85(const unsigned char *data, int length, int eod);
+static void	dsc_header(int num_pages);
 static void	dsc_page(int page);
 static void	dsc_trailer(int num_pages);
 static int	get_options(cups_option_t **options);
-static int	jpeg_to_ps(const char *filename, int copies, int num_options, cups_option_t *options);
+static int	jpeg_to_ps(const char *filename, int copies);
 static int	pdf_to_ps(const char *filename, int copies, int num_options, cups_option_t *options);
-static int	ps_to_ps(const char *filename, int copies, int num_options, cups_option_t *options);
-static int	raster_to_ps(const char *filename, int num_options, cups_option_t *options);
+static int	ps_to_ps(const char *filename, int copies);
+static int	raster_to_ps(const char *filename);
 
 
 /*
@@ -94,15 +95,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (!strcasecmp(content_type, "application/postscript"))
   {
-    return (ps_to_ps(argv[1], copies, num_options, options));
+    return (ps_to_ps(argv[1], copies));
   }
   else if (!strcasecmp(content_type, "image/jpeg"))
   {
-    return (jpeg_to_ps(argv[1], copies, num_options, options));
+    return (jpeg_to_ps(argv[1], copies));
   }
   else if (!strcasecmp(content_type, "image/pwg-raster") || !strcasecmp(content_type, "image/urf"))
   {
-    return (raster_to_ps(argv[1], num_options, options));
+    return (raster_to_ps(argv[1]));
   }
   else
   {
@@ -112,7 +113,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 }
 
 
-#if 0
 /*
  * 'ascii85()' - Write binary data using a Base85 encoding...
  */
@@ -225,7 +225,6 @@ ascii85(const unsigned char *data,	/* I - Data to write */
     col = 0;
   }
 }
-#endif // 0
 
 
 /*
@@ -234,9 +233,7 @@ ascii85(const unsigned char *data,	/* I - Data to write */
  */
 
 static void
-dsc_header(int           num_options,	/* I - Number of options */
-           cups_option_t *options,	/* I - Options */
-           int           num_pages)	/* I - Number of pages in output */
+dsc_header(int num_pages)		/* I - Number of pages or 0 if not known */
 {
   const char	*job_name = getenv("IPP_JOB_NAME");
 					/* job-name value */
@@ -360,15 +357,6 @@ get_options(cups_option_t **options)	/* O - Options */
   */
 
   *options = NULL;
-
- /*
-  * Copies...
-  */
-
-  if ((value = getenv("IPP_COPIES")) == NULL)
-    value = getenv("IPP_COPIES_DEFAULT");
-  if (value)
-    num_options = cupsAddOption("copies", value, num_options, options);
 
  /*
   * Media...
@@ -531,15 +519,240 @@ get_options(cups_option_t **options)	/* O - Options */
 
 static int				/* O - Exit status */
 jpeg_to_ps(const char    *filename,	/* I - Filename */
-           int           copies,	/* I - Number of copies */
-           int           num_options,	/* I - Number of options */
-           cups_option_t *options)	/* I - options */
+           int           copies)	/* I - Number of copies */
 {
-  (void)filename;
+  int		fd;			/* JPEG file descriptor */
+  int		copy;			/* Current copy */
+  int		width = 0,		/* Width */
+		height = 0,		/* Height */
+		depth = 0,		/* Number of colors */
+		length;			/* Length of marker */
+  unsigned char	buffer[65536],		/* Copy buffer */
+		*bufptr,		/* Pointer info buffer */
+		*bufend;		/* End of buffer */
+  ssize_t	bytes;			/* Bytes in buffer */
+  const char	*decode;		/* Decode array */
+  float		page_left,		/* Left margin */
+		page_top,		/* Top margin */
+		page_width,		/* Page width in points */
+		page_height,		/* Page heigth in points */
+		x_factor,		/* X image scaling factor */
+		y_factor,		/* Y image scaling factor */
+		page_scaling;		/* Image scaling factor */
+#if !CUPS_LITE
+  ppd_size_t	*page_size;		/* Current page size */
+#endif /* !CUPS_LITE */
 
-  dsc_header(num_options, options, copies);
 
-  dsc_page(1);
+ /*
+  * Open the input file...
+  */
+
+  if (filename)
+  {
+    if ((fd = open(filename, O_RDONLY)) < 0)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+    fd     = 0;
+    copies = 1;
+  }
+
+ /*
+  * Read the JPEG dimensions...
+  */
+
+  bytes = read(fd, buffer, sizeof(buffer));
+
+  if (bytes < 3 || memcmp(buffer, "\377\330\377", 3))
+  {
+    fputs("ERROR: Not a JPEG image.\n", stderr);
+
+    if (fd > 0)
+      close(fd);
+
+    return (1);
+  }
+
+  for (bufptr = buffer + 2, bufend = buffer + bytes; bufptr < bufend;)
+  {
+   /*
+    * Scan the file for a SOFn marker, then we can get the dimensions...
+    */
+
+    if (*bufptr == 0xff)
+    {
+      bufptr ++;
+
+      if (bufptr >= bufend)
+      {
+       /*
+	* If we are at the end of the current buffer, re-fill and continue...
+	*/
+
+	if ((bytes = read(fd, buffer, sizeof(buffer))) <= 0)
+	  break;
+
+	bufptr = buffer;
+	bufend = buffer + bytes;
+      }
+
+      if (*bufptr == 0xff)
+	continue;
+
+      if ((bufptr + 16) >= bufend)
+      {
+       /*
+	* Read more of the marker...
+	*/
+
+	bytes = bufend - bufptr;
+
+	memmove(buffer, bufptr, (size_t)bytes);
+	bufptr = buffer;
+	bufend = buffer + bytes;
+
+	if ((bytes = read(fd, bufend, sizeof(buffer) - (size_t)bytes)) <= 0)
+	  break;
+
+	bufend += bytes;
+      }
+
+      length = (size_t)((bufptr[1] << 8) | bufptr[2]);
+
+      if ((*bufptr >= 0xc0 && *bufptr <= 0xc3) || (*bufptr >= 0xc5 && *bufptr <= 0xc7) || (*bufptr >= 0xc9 && *bufptr <= 0xcb) || (*bufptr >= 0xcd && *bufptr <= 0xcf))
+      {
+       /*
+	* SOFn marker, look for dimensions...
+	*/
+
+	width  = (bufptr[6] << 8) | bufptr[7];
+	height = (bufptr[4] << 8) | bufptr[5];
+	depth  = bufptr[8];
+	break;
+      }
+
+     /*
+      * Skip past this marker...
+      */
+
+      bufptr ++;
+      bytes = bufend - bufptr;
+
+      while (length >= bytes)
+      {
+	length -= bytes;
+
+	if ((bytes = read(fd, buffer, sizeof(buffer))) <= 0)
+	  break;
+
+	bufptr = buffer;
+	bufend = buffer + bytes;
+      }
+
+      if (length > bytes)
+	break;
+
+      bufptr += length;
+    }
+  }
+
+  fprintf(stderr, "DEBUG: JPEG dimensions are %dx%dx%d\n", width, height, depth);
+
+  if (width <= 0 || height <= 0 || depth <= 0)
+  {
+    fputs("ERROR: No valid image data in JPEG file.\n", stderr);
+
+    if (fd > 0)
+      close(fd);
+
+    return (1);
+  }
+
+ /*
+  * Figure out the dimensions/scaling of the final image...
+  */
+
+#if CUPS_LITE
+  page_left   = 18.0f;
+  page_top    = 756.0f;
+  page_width  = 576.0f;
+  page_height = 720.0f;
+
+#else
+  if ((page_size = ppdPageSize(ppd, NULL)) != NULL)
+  {
+    page_left   = page_size->left;
+    page_top    = page_size->top;
+    page_width  = page_size->right - page_left;
+    page_height = page_top - page_size->bottom;
+  }
+  else
+  {
+    page_left   = 18.0f;
+    page_top    = 756.0f;
+    page_width  = 576.0f;
+    page_height = 720.0f;
+  }
+#endif /* CUPS_LITE */
+
+  fprintf(stderr, "DEBUG: page_left=%.2f, page_top=%.2f, page_width=%.2f, page_height=%.2f\n", page_left, page_top, page_width, page_height);
+
+  /* TODO: Support orientation/rotation, different print-scaling modes */
+  x_factor = page_width / width;
+  y_factor = page_height / height;
+
+  if (x_factor > y_factor && (height * x_factor) <= page_height)
+    page_scaling = x_factor;
+  else
+    page_scaling = y_factor;
+
+  fprintf(stderr, "DEBUG: Scaled dimensions are %.2fx%.2f\n", width * page_scaling, height * page_scaling);
+
+ /*
+  * Write pages...
+  */
+
+  dsc_header(copies);
+
+  for (copy = 1; copy <= copies; copy ++)
+  {
+    dsc_page(copy);
+
+    if (depth == 1)
+    {
+      puts("/DeviceGray setcolorspace");
+      decode = "0 1";
+    }
+    else if (depth == 3)
+    {
+      puts("/DeviceRGB setcolorspace");
+      decode = "0 1 0 1 0 1";
+    }
+    else
+    {
+      puts("/DeviceCMYK setcolorspace");
+      decode = "0 1 0 1 0 1 0 1";
+    }
+
+/*    printf("1 0 0 setrgbcolor %.2f %.2f moveto %.2f 0 rlineto 0 %.2f rlineto %.2f 0 rlineto closepath stroke\n", page_left, page_top, page_width, -page_height, -page_width);*/
+    printf("gsave %.3f %.3f translate %.3f %.3f scale\n", page_left + 0.5f * (page_width - width * page_scaling), page_top - 0.5f * (page_height - height * page_scaling), page_scaling, page_scaling);
+    printf("<</ImageType 1/Width %d/Height %d/BitsPerComponent 8/ImageMatrix[1 0 0 -1 0 1]/Decode[%s]/DataSource currentfile/ASCII85Decode filter/DCTDecode filter/Interpolate true>>image\n", width, height, decode);
+
+    if (fd > 0)
+      lseek(fd, 0, SEEK_SET);
+
+    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+      ascii85(buffer, (int)bytes, 0);
+
+    ascii85(buffer, 0, 1);
+
+    puts("grestore showpage");
+  }
 
   dsc_trailer(0);
 
@@ -650,7 +863,7 @@ pdf_to_ps(const char    *filename,	/* I - Filename */
   * Copy the PostScript output from the command...
   */
 
-  status = ps_to_ps(tempfile, copies, num_options, options);
+  status = ps_to_ps(tempfile, copies);
 
   unlink(tempfile);
 
@@ -664,17 +877,105 @@ pdf_to_ps(const char    *filename,	/* I - Filename */
 
 static int				/* O - Exit status */
 ps_to_ps(const char    *filename,	/* I - Filename */
-	 int           copies,		/* I - Number of copies */
-	 int           num_options,	/* I - Number of options */
-	 cups_option_t *options)	/* I - options */
+	 int           copies)		/* I - Number of copies */
 {
-  (void)filename;
+  FILE		*fp;				/* File to read from */
+  int		copy,				/* Current copy */
+		page,				/* Current page number */
+		num_pages = 0,			/* Total number of pages */
+		first_page,			/* First page */
+		last_page;			/* Last page */
+  const char	*page_ranges;			/* page-ranges option */
+  long		first_pos = -1;			/* Offset for first page */
+  char		line[1024];			/* Line from file */
 
-  dsc_header(num_options, options, 0);
 
-  dsc_page(1);
+ /*
+  * Open the print file...
+  */
 
-  dsc_trailer(0);
+  if (filename)
+  {
+    if ((fp = fopen(filename, "rb")) == NULL)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+    copies = 1;
+    fp     = stdin;
+  }
+
+ /*
+  * Check page ranges...
+  */
+
+  if ((page_ranges = getenv("IPP_PAGE_RANGES")) != NULL)
+  {
+    if (sscanf(page_ranges, "%d-%d", &first_page, &last_page) != 2)
+    {
+      first_page = 1;
+      last_page  = INT_MAX;
+    }
+  }
+  else
+  {
+    first_page = 1;
+    last_page  = INT_MAX;
+  }
+
+ /*
+  * Write the PostScript header for the document...
+  */
+
+  dsc_header(0);
+
+  while (fgets(line, sizeof(line), fp))
+  {
+    if (!strncmp(line, "%%Page:", 7))
+      break;
+
+    if (line[0] != '%')
+      fputs(line, stdout);
+  }
+
+  if (!strncmp(line, "%%Page:", 7))
+  {
+    first_pos = ftell(fp) - (long)strlen(line);
+
+    for (copy = 0; copy < copies; copy ++)
+    {
+      int copy_page = 0;		/* Do we copy the page data? */
+
+      if (fp != stdin && copy > 0)
+        fseek(fp, first_pos, SEEK_SET);
+
+      page = 0;
+      while (fgets(line, sizeof(line), fp))
+      {
+        if (!strncmp(line, "%%Page:", 7))
+        {
+          page ++;
+          copy_page = page >= first_page && page <= last_page;
+
+          if (copy_page)
+          {
+	    num_pages ++;
+	    dsc_page(num_pages);
+	  }
+	}
+	else if (copy_page)
+	  fputs(line, stdout);
+      }
+    }
+  }
+
+  dsc_trailer(num_pages);
+
+  if (fp != stdin)
+    fclose(fp);
 
   return (0);
 }
@@ -685,17 +986,116 @@ ps_to_ps(const char    *filename,	/* I - Filename */
  */
 
 static int				/* O - Exit status */
-raster_to_ps(const char    *filename,	/* I - Filename */
-	     int           num_options,	/* I - Number of options */
-	     cups_option_t *options)	/* I - options */
+raster_to_ps(const char *filename)	/* I - Filename */
 {
-  (void)filename;
+  int			fd;		/* Input file */
+  cups_raster_t		*ras;		/* Raster stream */
+  cups_page_header2_t	header;		/* Page header */
+  int			page = 0;	/* Current page */
+  unsigned		y;		/* Current line */
+  unsigned char		*line;		/* Line buffer */
+  unsigned char		white;		/* White color */
 
-  dsc_header(num_options, options, 0);
 
-  dsc_page(1);
+ /*
+  * Open the input file...
+  */
 
-  dsc_trailer(0);
+  if (filename)
+  {
+    if ((fd = open(filename, O_RDONLY)) < 0)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+    fd = 0;
+  }
+
+ /*
+  * Open the raster stream and send pages...
+  */
+
+  if ((ras = cupsRasterOpen(fd, CUPS_RASTER_READ)) == NULL)
+  {
+    fputs("ERROR: Unable to read raster data, aborting.\n", stderr);
+    return (1);
+  }
+
+  fputs("\033E", stdout);
+
+  dsc_header(0);
+
+  while (cupsRasterReadHeader2(ras, &header))
+  {
+    page ++;
+
+    if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_SW && header.cupsColorSpace != CUPS_CSPACE_K && header.cupsColorSpace != CUPS_CSPACE_RGB && header.cupsColorSpace != CUPS_CSPACE_SRGB)
+    {
+      fputs("ERROR: Unsupported color space, aborting.\n", stderr);
+      break;
+    }
+    else if (header.cupsBitsPerColor != 1 && header.cupsBitsPerColor != 8)
+    {
+      fputs("ERROR: Unsupported bit depth, aborting.\n", stderr);
+      break;
+    }
+
+    line = malloc(header.cupsBytesPerLine);
+
+    dsc_page(page);
+
+    puts("gsave");
+    printf("%.6f %.6f scale\n", 72.0f / header.HWResolution[0], 72.0f / header.HWResolution[1]);
+
+    printf("/L{gsave 0 exch translate <</ImageType 1/Width %u/Height 1/ImageMatrix[%u 0 0 -1 0 1]/DataSource currentfile/ASCII85Decode filter/BitsPerComponent %u", header.cupsWidth, header.cupsWidth, header.cupsBitsPerColor);
+    switch (header.cupsColorSpace)
+    {
+      case CUPS_CSPACE_W :
+      case CUPS_CSPACE_SW :
+          puts("/Decode[0 1]>>image}def bind");
+          puts("/DeviceGray setcolorspace");
+          white = 255;
+          break;
+
+      case CUPS_CSPACE_K :
+          puts("/Decode[1 0]>>image}def bind");
+          puts("/DeviceGray setcolorspace");
+          white = 0;
+          break;
+
+      default :
+          puts("/Decode[0 1 0 1 0 1]>>image}def bind");
+          puts("/DeviceRGB setcolorspace");
+          white = 255;
+          break;
+    }
+
+    for (y = header.cupsHeight - 1; y >= 0; y --)
+    {
+      if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine))
+      {
+        if (line[0] != white || memcmp(line, line + 1, header.cupsBytesPerLine - 1))
+        {
+          printf("%d L\n", y);
+          ascii85(line, (int)header.cupsBytesPerLine, 1);
+        }
+      }
+      else
+        break;
+    }
+
+    puts("grestore");
+    puts("showpage");
+
+    free(line);
+  }
+
+  cupsRasterClose(ras);
+
+  dsc_trailer(page);
 
   return (0);
 }

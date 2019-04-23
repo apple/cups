@@ -492,7 +492,7 @@ raster_to_pcl(const char *filename)	/* I - File to print (NULL for stdin) */
   {
     page ++;
 
-    if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_K)
+    if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_SW && header.cupsColorSpace != CUPS_CSPACE_K)
     {
       fputs("ERROR: Unsupported color space, aborting.\n", stderr);
       break;

@@ -4693,10 +4693,11 @@ load_ppd_attributes(
 
  /*
   * PostScript printers accept PDF via one of the CUPS PDF to PostScript
-  * filters...
+  * filters, along with PostScript (of course)...
   */
 
   cupsArrayAdd(docformats, "application/pdf");
+  cupsArrayAdd(docformats, "application/postscript");
 
  /*
   * Create the attributes...
