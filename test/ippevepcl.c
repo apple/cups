@@ -34,7 +34,9 @@ static unsigned char	pcl_white,	/* White color */
 
 static void	pcl_end_page(cups_page_header2_t *header, unsigned page);
 static void	pcl_start_page(cups_page_header2_t *header, unsigned page);
+static int	pcl_to_pcl(const char *filename);
 static void	pcl_write_line(cups_page_header2_t *header, unsigned y, const unsigned char *line);
+static int	raster_to_pcl(const char *filename);
 
 
 /*
@@ -46,98 +48,36 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   const char		*content_type;	/* Content type to print */
-  int			fd;		/* Input file */
-  cups_raster_t		*ras;		/* Raster stream */
-  cups_page_header2_t	header;		/* Page header */
-  unsigned		page = 0,	/* Current page */
-			y;		/* Current line */
-  unsigned char		*line;		/* Line buffer */
 
 
  /*
-  * First make sure we can read what is being printed.
+  * Print it...
   */
 
-  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+  if (argc > 2)
+  {
+    fputs("ERROR: Too many arguments supplied, aborting.\n", stderr);
+    return (1);
+  }
+  else if ((content_type = getenv("CONTENT_TYPE")) == NULL)
   {
     fputs("ERROR: CONTENT_TYPE environment variable not set, aborting.\n", stderr);
     return (1);
   }
-  else if (strcasecmp(content_type, "image/pwg-raster") && strcasecmp(content_type, "image/urf"))
+  else if (!strcasecmp(content_type, "application/vnd.hp-pcl"))
+  {
+    return (pcl_to_pcl(argv[1]));
+  }
+  else if (!strcasecmp(content_type, "image/pwg-raster") || !strcasecmp(content_type, "image/urf"))
+  {
+    return (raster_to_pcl(argv[1]));
+  }
+  else
   {
     fprintf(stderr, "ERROR: CONTENT_TYPE %s not supported.\n", content_type);
     return (1);
   }
-
- /*
-  * Then get the input file...
-  */
-
-  if (argc == 1)
-  {
-    fd = 0;
-  }
-  else if (argc == 2)
-  {
-    if ((fd = open(argv[1], O_RDONLY)) < 0)
-    {
-      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", argv[1], strerror(errno));
-      return (1);
-    }
-  }
-  else
-  {
-    fputs("ERROR: Too many arguments provided, aborting.\n", stderr);
-    return (1);
-  }
-
- /*
-  * Open the raster stream and send pages...
-  */
-
-  if ((ras = cupsRasterOpen(fd, CUPS_RASTER_READ)) == NULL)
-  {
-    fputs("ERROR: Unable to read raster data, aborting.\n", stderr);
-    return (1);
-  }
-
-  fputs("\033E", stdout);
-
-  while (cupsRasterReadHeader2(ras, &header))
-  {
-    page ++;
-
-    if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_K)
-    {
-      fputs("ERROR: Unsupported color space, aborting.\n", stderr);
-      break;
-    }
-    else if (header.cupsBitsPerColor != 1 && header.cupsBitsPerColor != 8)
-    {
-      fputs("ERROR: Unsupported bit depth, aborting.\n", stderr);
-      break;
-    }
-
-    line = malloc(header.cupsBytesPerLine);
-
-    pcl_start_page(&header, page);
-    for (y = 0; y < header.cupsHeight; y ++)
-    {
-      if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine))
-        pcl_write_line(&header, y, line);
-      else
-        break;
-    }
-    pcl_end_page(&header, page);
-
-    free(line);
-  }
-
-  cupsRasterClose(ras);
-
-  return (0);
 }
-
 
 
 /*
@@ -305,6 +245,53 @@ pcl_start_page(
 
 
 /*
+ * 'pcl_to_pcl()' - Pass through PCL data.
+ */
+
+static int				/* O - Exit status */
+pcl_to_pcl(const char *filename)	/* I - File to print or NULL for stdin */
+{
+  int		fd;			/* File to read from */
+  char		buffer[65536];		/* Copy buffer */
+  ssize_t	bytes;			/* Bytes to write */
+
+
+ /*
+  * Open the input file...
+  */
+
+  if (filename)
+  {
+    if ((fd = open(filename, O_RDONLY)) < 0)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+    fd = 0;
+  }
+
+ /*
+  * Copy to stdout...
+  */
+
+  while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+    write(1, buffer, (size_t)bytes);
+
+ /*
+  * Close the input file...
+  */
+
+  if (fd > 0)
+    close(fd);
+
+  return (0);
+}
+
+
+/*
  * 'pcl_write_line()' - Write a line of raster data.
  */
 
@@ -453,4 +440,85 @@ pcl_write_line(
 
   printf("\033*b%dW", (int)(compptr - pcl_comp));
   fwrite(pcl_comp, 1, (size_t)(compptr - pcl_comp), stdout);
+}
+
+
+/*
+ * 'raster_to_pcl()' - Convert raster data to PCL.
+ */
+
+static int				/* O - Exit status */
+raster_to_pcl(const char *filename)	/* I - File to print (NULL for stdin) */
+{
+  int			fd;		/* Input file */
+  cups_raster_t		*ras;		/* Raster stream */
+  cups_page_header2_t	header;		/* Page header */
+  unsigned		page = 0,	/* Current page */
+			y;		/* Current line */
+  unsigned char		*line;		/* Line buffer */
+
+
+
+ /*
+  * Open the input file...
+  */
+
+  if (filename)
+  {
+    if ((fd = open(filename, O_RDONLY)) < 0)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\": %s\n", filename, strerror(errno));
+      return (1);
+    }
+  }
+  else
+  {
+    fd = 0;
+  }
+
+ /*
+  * Open the raster stream and send pages...
+  */
+
+  if ((ras = cupsRasterOpen(fd, CUPS_RASTER_READ)) == NULL)
+  {
+    fputs("ERROR: Unable to read raster data, aborting.\n", stderr);
+    return (1);
+  }
+
+  fputs("\033E", stdout);
+
+  while (cupsRasterReadHeader2(ras, &header))
+  {
+    page ++;
+
+    if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_K)
+    {
+      fputs("ERROR: Unsupported color space, aborting.\n", stderr);
+      break;
+    }
+    else if (header.cupsBitsPerColor != 1 && header.cupsBitsPerColor != 8)
+    {
+      fputs("ERROR: Unsupported bit depth, aborting.\n", stderr);
+      break;
+    }
+
+    line = malloc(header.cupsBytesPerLine);
+
+    pcl_start_page(&header, page);
+    for (y = 0; y < header.cupsHeight; y ++)
+    {
+      if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine))
+        pcl_write_line(&header, y, line);
+      else
+        break;
+    }
+    pcl_end_page(&header, page);
+
+    free(line);
+  }
+
+  cupsRasterClose(ras);
+
+  return (0);
 }

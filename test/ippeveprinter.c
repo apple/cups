@@ -5881,9 +5881,6 @@ process_job(ippeve_job_t *job)		/* I - Job */
       myenvc ++;
 #endif /* !CUPS_LITE */
 
-    if ((attr = ippFindAttribute(job->attrs, "document-name", IPP_TAG_NAME)) != NULL && asprintf(myenvp + myenvc, "DOCUMENT_NAME=%s", ippGetString(attr, 0, NULL)) > 0)
-      myenvc ++;
-
     for (attr = ippFirstAttribute(job->printer->attrs); attr && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); attr = ippNextAttribute(job->printer->attrs))
     {
      /*
