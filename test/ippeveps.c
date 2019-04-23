@@ -777,6 +777,8 @@ pdf_to_ps(const char    *filename,	/* I - Filename */
   const char	*pdf_argv[8];		/* Command-line arguments */
   char		pdf_options[1024];	/* Options */
   const char	*value;			/* Option value */
+  const char	*job_id,		/* job-id value */
+		*job_name;		/* job-name value */
 
 
  /*
@@ -798,10 +800,15 @@ pdf_to_ps(const char    *filename,	/* I - Filename */
   else
     pdf_options[0] = '\0';
 
+  if ((job_id = getenv("IPP_JOB_ID")) == NULL)
+    job_id = "42";
+  if ((job_name = getenv("IPP_JOB_NAME")) == NULL)
+    job_name = "untitled";
+
   pdf_argv[0] = "printer";
-  pdf_argv[1] = getenv("IPP_JOB_ID");
+  pdf_argv[1] = job_id;
   pdf_argv[2] = cupsUser();
-  pdf_argv[3] = getenv("IPP_JOB_NAME");
+  pdf_argv[3] = job_name;
   pdf_argv[4] = "1";
   pdf_argv[5] = pdf_options;
   pdf_argv[6] = filename;
@@ -932,10 +939,14 @@ ps_to_ps(const char    *filename,	/* I - Filename */
 
   dsc_header(0);
 
+  first_pos = 0;
+
   while (fgets(line, sizeof(line), fp))
   {
     if (!strncmp(line, "%%Page:", 7))
       break;
+
+    first_pos = ftell(fp);
 
     if (line[0] != '%')
       fputs(line, stdout);
@@ -943,13 +954,11 @@ ps_to_ps(const char    *filename,	/* I - Filename */
 
   if (!strncmp(line, "%%Page:", 7))
   {
-    first_pos = ftell(fp) - (long)strlen(line);
-
     for (copy = 0; copy < copies; copy ++)
     {
       int copy_page = 0;		/* Do we copy the page data? */
 
-      if (fp != stdin && copy > 0)
+      if (fp != stdin)
         fseek(fp, first_pos, SEEK_SET);
 
       page = 0;
