@@ -1,7 +1,7 @@
 #
 # ESP Package Manager (EPM) file list for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -10,7 +10,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2018 by Apple Inc.
+%copyright 2007-2019 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE
 %readme LICENSE
@@ -298,6 +298,9 @@ l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
+d 0755 root sys $SERVERBIN/ippeveprinter -
+f 0555 root sys $SERVERBIN/ippeveprinter/ippevepcl test/ippevepcl
+f 0555 root sys $SERVERBIN/ippeveprinter/ippeveps test/ippeveps
 d 0755 root sys $SERVERBIN/notifier -
 f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto
 
@@ -335,6 +338,10 @@ l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
 d 0755 root sys $BINDIR -
 f 0555 root sys $BINDIR/cancel systemv/cancel
 f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
+f 0555 root sys $BINDIR/ippeveprinter test/ippeveprinter
+%if DNSSD_BACKEND
+f 0555 root sys $BINDIR/ippfind test/ippfind
+%endif
 f 0555 root sys $BINDIR/ipptool test/ipptool
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
@@ -623,6 +630,7 @@ d 0755 root sys $MANDIR/man7 -
 f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cups.$MAN1EXT man/cups.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ippeveprinter.$MAN1EXT man/ippeveprinter.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ippfind.$MAN1EXT man/ippfind.$MAN1EXT
 f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
@@ -643,6 +651,9 @@ f 0444 root sys $MANDIR/man5/mailto.conf.$MAN5EXT man/mailto.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT
 f 0444 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
+
+f 0444 root sys $MANDIR/man7/ippevepcl.$MAN7EXT man/ippevepcl.$MAN7EXT
+l 0644 root sys $MANDIR/man7/ippeveps.$MAN7EXT ippevepcl.$MAN7EXT
 
 l 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT cupsaccept.$MAN8EXT
 f 0444 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
