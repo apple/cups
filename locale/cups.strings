@@ -522,7 +522,7 @@
 "-r                      Use 'relaxed' open mode" = "-r                      Use ‘relaxed’ open mode";
 "-r class                Remove the named destination from a class" = "-r class                Remove the named destination from a class";
 "-r reason               Specify a reason message that others can see" = "-r reason               Specify a reason message that others can see";
-"-r subtype              Set DNS-SD service subtype" = "-r subtype              Set DNS-SD service subtype";
+"-r subtype,[subtype]    Set DNS-SD service subtype" = "-r subtype,[subtype]    Set DNS-SD service subtype";
 "-s                      Be silent" = "-s                      Be silent";
 "-s                      Print service name if true" = "-s                      Print service name if true";
 "-s                      Show a status summary" = "-s                      Show a status summary";
@@ -2393,6 +2393,7 @@
 "insert-count" = "Insert Count";
 // TRANSLATORS: Insert Sheet
 "insert-sheet" = "Insert Sheet";
+"ippeveprinter: Unable to open \"%s\": %s on line %d." = "ippeveprinter: Unable to open “%s”: %s on line %d.";
 "ippfind: Bad regular expression: %s" = "ippfind: Bad regular expression: %s";
 "ippfind: Cannot use --and after --or." = "ippfind: Cannot use --and after --or.";
 "ippfind: Expected key name after %s." = "ippfind: Expected key name after %s.";

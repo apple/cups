@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-19 16:34-0400\n"
+"POT-Creation-Date: 2019-04-24 18:36-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: Stéphane Blondon <stephane.blondon@gmail.com>\n"
 "Language-Team: French <LL@li.org>\n"
@@ -2003,7 +2003,7 @@ msgstr ""
 msgid "-r reason               Specify a reason message that others can see"
 msgstr ""
 
-msgid "-r subtype              Set DNS-SD service subtype"
+msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
 msgstr ""
 
 msgid "-s                      Be silent"
@@ -6966,6 +6966,10 @@ msgstr ""
 
 #. TRANSLATORS: Insert Sheet
 msgid "insert-sheet"
+msgstr ""
+
+#, c-format
+msgid "ippeveprinter: Unable to open \"%s\": %s on line %d."
 msgstr ""
 
 #, c-format

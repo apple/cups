@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b7\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-19 16:34-0400\n"
+"POT-Creation-Date: 2019-04-24 18:36-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1030,7 +1030,7 @@ msgstr ""
 msgid " PASS"
 msgstr ""
 
-#: test/ippfind.c:2806
+#: test/ippfind.c:2803
 msgid "! expression            Unary NOT of expression"
 msgstr ""
 
@@ -1680,12 +1680,12 @@ msgstr ""
 msgid "%s: Unknown option \"%c\"."
 msgstr ""
 
-#: test/ippeveprinter.c:376 test/ippeveprinter.c:553 test/ippfind.c:627
+#: test/ippeveprinter.c:378 test/ippeveprinter.c:555 test/ippfind.c:627
 #, c-format
 msgid "%s: Unknown option \"%s\"."
 msgstr ""
 
-#: test/ippeveprinter.c:542 test/ippfind.c:919 test/ipptool.c:604
+#: test/ippeveprinter.c:544 test/ippfind.c:919 test/ipptool.c:604
 #, c-format
 msgid "%s: Unknown option \"-%c\"."
 msgstr ""
@@ -1720,7 +1720,7 @@ msgstr ""
 msgid "%s: Warning - mode option ignored."
 msgstr ""
 
-#: test/ippfind.c:2805
+#: test/ippfind.c:2802
 msgid "( expressions )         Group expressions"
 msgstr ""
 
@@ -1756,7 +1756,7 @@ msgstr ""
 msgid "--device-id device-id   Show models matching the given IEEE 1284 device ID"
 msgstr ""
 
-#: test/ippfind.c:2788
+#: test/ippfind.c:2785
 msgid "--domain regex          Match domain to regular expression"
 msgstr ""
 
@@ -1766,17 +1766,17 @@ msgid ""
 "                        Exclude the specified URI schemes"
 msgstr ""
 
-#: test/ippfind.c:2789
+#: test/ippfind.c:2786
 msgid ""
 "--exec utility [argument ...] ;\n"
 "                        Execute program if true"
 msgstr ""
 
-#: test/ippfind.c:2808
+#: test/ippfind.c:2805
 msgid "--false                 Always false"
 msgstr ""
 
-#: test/ippeveprinter.c:6854
+#: test/ippeveprinter.c:7587
 msgid "--help                  Show program help"
 msgstr ""
 
@@ -1784,7 +1784,7 @@ msgstr ""
 msgid "--hold                  Hold new jobs"
 msgstr ""
 
-#: test/ippfind.c:2791
+#: test/ippfind.c:2788
 msgid "--host regex            Match hostname to regular expression"
 msgstr ""
 
@@ -1802,11 +1802,11 @@ msgstr ""
 msgid "--language locale       Show models matching the given locale"
 msgstr ""
 
-#: test/ippfind.c:2793
+#: test/ippfind.c:2790
 msgid "--local                 True if service is local"
 msgstr ""
 
-#: test/ippfind.c:2792
+#: test/ippfind.c:2789
 msgid "--ls                    List attributes"
 msgstr ""
 
@@ -1814,31 +1814,31 @@ msgstr ""
 msgid "--make-and-model name   Show models matching the given make and model name"
 msgstr ""
 
-#: test/ippfind.c:2794
+#: test/ippfind.c:2791
 msgid "--name regex            Match service name to regular expression"
 msgstr ""
 
-#: test/ippeveprinter.c:6855
+#: test/ippeveprinter.c:7588
 msgid "--no-web-forms          Disable web forms for media and supplies"
 msgstr ""
 
-#: test/ippfind.c:2807
+#: test/ippfind.c:2804
 msgid "--not expression        Unary NOT of expression"
 msgstr ""
 
-#: test/ippfind.c:2795
+#: test/ippfind.c:2792
 msgid "--path regex            Match resource path to regular expression"
 msgstr ""
 
-#: test/ippfind.c:2796
+#: test/ippfind.c:2793
 msgid "--port number[-number]  Match port to number or range"
 msgstr ""
 
-#: test/ippfind.c:2797
+#: test/ippfind.c:2794
 msgid "--print                 Print URI if true"
 msgstr ""
 
-#: test/ippfind.c:2798
+#: test/ippfind.c:2795
 msgid "--print-name            Print service name if true"
 msgstr ""
 
@@ -1846,7 +1846,7 @@ msgstr ""
 msgid "--product name          Show models matching the given PostScript product"
 msgstr ""
 
-#: test/ippfind.c:2799
+#: test/ippfind.c:2796
 msgid "--quiet                 Quietly report match via exit code"
 msgstr ""
 
@@ -1854,7 +1854,7 @@ msgstr ""
 msgid "--release               Release previously held jobs"
 msgstr ""
 
-#: test/ippfind.c:2800
+#: test/ippfind.c:2797
 msgid "--remote                True if service is remote"
 msgstr ""
 
@@ -1868,23 +1868,23 @@ msgstr ""
 msgid "--timeout seconds       Specify the maximum number of seconds to discover devices"
 msgstr ""
 
-#: test/ippfind.c:2809
+#: test/ippfind.c:2806
 msgid "--true                  Always true"
 msgstr ""
 
-#: test/ippfind.c:2801
+#: test/ippfind.c:2798
 msgid "--txt key               True if the TXT record contains the key"
 msgstr ""
 
-#: test/ippfind.c:2802
+#: test/ippfind.c:2799
 msgid "--txt-* regex           Match TXT record key to regular expression"
 msgstr ""
 
-#: test/ippfind.c:2803
+#: test/ippfind.c:2800
 msgid "--uri regex             Match URI to regular expression"
 msgstr ""
 
-#: test/ippeveprinter.c:6856 test/ippfind.c:2773
+#: test/ippeveprinter.c:7589 test/ippfind.c:2770
 msgid "--version               Show program version"
 msgstr ""
 
@@ -1944,7 +1944,7 @@ msgstr ""
 msgid "-2"
 msgstr ""
 
-#: test/ippeveprinter.c:6857
+#: test/ippeveprinter.c:7590
 msgid "-2                      Set 2-sided printing support (default=1-sided)"
 msgstr ""
 
@@ -1972,7 +1972,7 @@ msgstr ""
 msgid "-4"
 msgstr ""
 
-#: test/ippfind.c:2769 test/ipptool.c:4305
+#: test/ippfind.c:2766 test/ipptool.c:4305
 msgid "-4                      Connect using IPv4"
 msgstr ""
 
@@ -2000,7 +2000,7 @@ msgstr ""
 msgid "-6"
 msgstr ""
 
-#: test/ippfind.c:2770 test/ipptool.c:4306
+#: test/ippfind.c:2767 test/ipptool.c:4306
 msgid "-6                      Connect using IPv6"
 msgstr ""
 
@@ -2056,7 +2056,7 @@ msgstr ""
 msgid "-D description          Specify the textual description of the printer"
 msgstr ""
 
-#: test/ippeveprinter.c:6858
+#: test/ippeveprinter.c:7591
 msgid "-D device-uri           Set the device URI for the printer"
 msgstr ""
 
@@ -2075,7 +2075,7 @@ msgstr ""
 msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
 msgstr ""
 
-#: scheduler/main.c:2114
+#: scheduler/main.c:2115
 msgid "-F                      Run in the foreground but detach from console."
 msgstr ""
 
@@ -2117,7 +2117,7 @@ msgid ""
 "                          Ignore specific warnings"
 msgstr ""
 
-#: test/ippeveprinter.c:6860
+#: test/ippeveprinter.c:7593
 msgid "-K keypath              Set location of server X.509 certificates and keys."
 msgstr ""
 
@@ -2129,7 +2129,7 @@ msgstr ""
 msgid "-L location             Specify the textual location of the printer"
 msgstr ""
 
-#: test/ippeveprinter.c:6862
+#: test/ippeveprinter.c:7595
 msgid "-M manufacturer         Set manufacturer name (default=Test)"
 msgstr ""
 
@@ -2145,11 +2145,11 @@ msgstr ""
 msgid "-P filename.plist       Produce XML plist to a file and test report to standard output"
 msgstr ""
 
-#: test/ippeveprinter.c:6863
+#: test/ippeveprinter.c:7596
 msgid "-P filename.ppd         Load printer attributes from PPD file"
 msgstr ""
 
-#: test/ippfind.c:2775
+#: test/ippfind.c:2772
 msgid "-P number[-number]      Match port to number or range"
 msgstr ""
 
@@ -2173,7 +2173,7 @@ msgstr ""
 msgid "-S                      Test with encryption using HTTPS"
 msgstr ""
 
-#: test/ippfind.c:2771
+#: test/ippfind.c:2768
 msgid "-T seconds              Set the browse timeout in seconds"
 msgstr ""
 
@@ -2196,7 +2196,7 @@ msgstr ""
 msgid "-U username             Specify username to use for authentication"
 msgstr ""
 
-#: test/ippeveprinter.c:6864 test/ippfind.c:2772 test/ipptool.c:4314
+#: test/ippeveprinter.c:7597 test/ippfind.c:2769 test/ipptool.c:4314
 msgid "-V version              Set default IPP version"
 msgstr ""
 
@@ -2230,7 +2230,7 @@ msgstr ""
 msgid "-a [destination(s)]     Show the accepting state of destinations"
 msgstr ""
 
-#: test/ippeveprinter.c:6865
+#: test/ippeveprinter.c:7598
 msgid "-a filename.conf        Load printer attributes from conf file"
 msgstr ""
 
@@ -2250,11 +2250,11 @@ msgstr ""
 msgid "-c class                Add the named destination to a class"
 msgstr ""
 
-#: test/ippeveprinter.c:6866
+#: test/ippeveprinter.c:7599
 msgid "-c command              Set print command"
 msgstr ""
 
-#: scheduler/main.c:2112
+#: scheduler/main.c:2113
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
@@ -2274,11 +2274,11 @@ msgstr ""
 msgid "-d name=value           Set named variable to value"
 msgstr ""
 
-#: test/ippfind.c:2776
+#: test/ippfind.c:2773
 msgid "-d regex                Match domain to regular expression"
 msgstr ""
 
-#: test/ippeveprinter.c:6867
+#: test/ippeveprinter.c:7600
 msgid "-d spool-directory      Set spool directory"
 msgstr ""
 
@@ -2286,7 +2286,7 @@ msgstr ""
 msgid "-e                      Show available destinations on the network"
 msgstr ""
 
-#: scheduler/main.c:2113
+#: scheduler/main.c:2114
 msgid "-f                      Run in the foreground."
 msgstr ""
 
@@ -2294,11 +2294,11 @@ msgstr ""
 msgid "-f filename             Set default request filename"
 msgstr ""
 
-#: test/ippeveprinter.c:6868
+#: test/ippeveprinter.c:7601
 msgid "-f type/subtype[,...]   Set supported file types"
 msgstr ""
 
-#: scheduler/main.c:2115
+#: scheduler/main.c:2116
 msgid "-h                      Show this usage message."
 msgstr ""
 
@@ -2306,7 +2306,7 @@ msgstr ""
 msgid "-h                      Validate HTTP response headers"
 msgstr ""
 
-#: test/ippfind.c:2777
+#: test/ippfind.c:2774
 msgid "-h regex                Match hostname to regular expression"
 msgstr ""
 
@@ -2317,7 +2317,7 @@ msgstr ""
 msgid "-h server[:port]        Connect to the named server and port"
 msgstr ""
 
-#: test/ippeveprinter.c:6869
+#: test/ippeveprinter.c:7602
 msgid "-i iconfile.png         Set icon file"
 msgstr ""
 
@@ -2333,11 +2333,11 @@ msgstr ""
 msgid "-i seconds              Repeat the last file with the given time interval"
 msgstr ""
 
-#: test/ippeveprinter.c:6870
+#: test/ippeveprinter.c:7603
 msgid "-k                      Keep job spool files"
 msgstr ""
 
-#: test/ippfind.c:2778
+#: test/ippfind.c:2775
 msgid "-l                      List attributes"
 msgstr ""
 
@@ -2345,7 +2345,7 @@ msgstr ""
 msgid "-l                      Produce plain text output"
 msgstr ""
 
-#: scheduler/main.c:2117
+#: scheduler/main.c:2118
 msgid "-l                      Run cupsd on demand."
 msgstr ""
 
@@ -2357,7 +2357,7 @@ msgstr ""
 msgid "-l                      Show verbose (long) output"
 msgstr ""
 
-#: test/ippeveprinter.c:6871
+#: test/ippeveprinter.c:7604
 msgid "-l location             Set location of printer"
 msgstr ""
 
@@ -2373,7 +2373,7 @@ msgstr ""
 msgid "-m everywhere           Specify the printer is compatible with IPP Everywhere"
 msgstr ""
 
-#: test/ippeveprinter.c:6872
+#: test/ippeveprinter.c:7605
 msgid "-m model                Set model name (default=Printer)"
 msgstr ""
 
@@ -2385,7 +2385,7 @@ msgstr ""
 msgid "-n count                Repeat the last file the given number of times"
 msgstr ""
 
-#: test/ippeveprinter.c:6873
+#: test/ippeveprinter.c:7606
 msgid "-n hostname             Set hostname for printer"
 msgstr ""
 
@@ -2393,7 +2393,7 @@ msgstr ""
 msgid "-n num-copies           Specify the number of copies to print"
 msgstr ""
 
-#: test/ippfind.c:2779
+#: test/ippfind.c:2776
 msgid "-n regex                Match service name to regular expression"
 msgstr ""
 
@@ -2497,7 +2497,7 @@ msgid ""
 "                        Specify 2-sided landscape printing"
 msgstr ""
 
-#: test/ippfind.c:2780
+#: test/ippfind.c:2777
 msgid "-p                      Print URI if true"
 msgstr ""
 
@@ -2513,11 +2513,11 @@ msgstr ""
 msgid "-p destination          Specify/add the named destination"
 msgstr ""
 
-#: test/ippeveprinter.c:6874
+#: test/ippeveprinter.c:7607
 msgid "-p port                 Set port number for printer"
 msgstr ""
 
-#: test/ippfind.c:2781
+#: test/ippfind.c:2778
 msgid "-q                      Quietly report match via exit code"
 msgstr ""
 
@@ -2541,7 +2541,7 @@ msgstr ""
 msgid "-r                      Show whether the CUPS server is running"
 msgstr ""
 
-#: test/ippfind.c:2782
+#: test/ippfind.c:2779
 msgid "-r                      True if service is remote"
 msgstr ""
 
@@ -2557,15 +2557,15 @@ msgstr ""
 msgid "-r reason               Specify a reason message that others can see"
 msgstr ""
 
-#: test/ippeveprinter.c:6875
-msgid "-r subtype              Set DNS-SD service subtype"
+#: test/ippeveprinter.c:7608
+msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
 msgstr ""
 
 #: systemv/lp.c:776
 msgid "-s                      Be silent"
 msgstr ""
 
-#: test/ippfind.c:2783
+#: test/ippfind.c:2780
 msgid "-s                      Print service name if true"
 msgstr ""
 
@@ -2573,11 +2573,11 @@ msgstr ""
 msgid "-s                      Show a status summary"
 msgstr ""
 
-#: scheduler/main.c:2119
+#: scheduler/main.c:2120
 msgid "-s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
-#: test/ippeveprinter.c:6876
+#: test/ippeveprinter.c:7609
 msgid "-s speed[,color-speed]  Set speed in pages per minute"
 msgstr ""
 
@@ -2589,11 +2589,11 @@ msgstr ""
 msgid "-t                      Show all status information"
 msgstr ""
 
-#: scheduler/main.c:2120
+#: scheduler/main.c:2121
 msgid "-t                      Test the configuration file."
 msgstr ""
 
-#: test/ippfind.c:2784
+#: test/ippfind.c:2781
 msgid "-t key                  True if the TXT record contains the key"
 msgstr ""
 
@@ -2621,11 +2621,11 @@ msgstr ""
 msgid "-u owner                Specify the owner to use for jobs"
 msgstr ""
 
-#: test/ippfind.c:2785
+#: test/ippfind.c:2782
 msgid "-u regex                Match URI to regular expression"
 msgstr ""
 
-#: systemv/cupstestppd.c:3865 test/ippeveprinter.c:6877 test/ipptool.c:4325
+#: systemv/cupstestppd.c:3865 test/ippeveprinter.c:7610 test/ipptool.c:4325
 msgid "-v                      Be verbose"
 msgstr ""
 
@@ -2657,7 +2657,7 @@ msgstr ""
 msgid "-x destination          Remove the named destination"
 msgstr ""
 
-#: test/ippfind.c:2786
+#: test/ippfind.c:2783
 msgid ""
 "-x utility [argument ...] ;\n"
 "                        Execute program if true"
@@ -3871,11 +3871,11 @@ msgstr ""
 msgid "Community name uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:865 backend/lpd.c:934 backend/socket.c:375
+#: backend/ipp.c:865 backend/lpd.c:929 backend/socket.c:375
 msgid "Connected to printer."
 msgstr ""
 
-#: backend/ipp.c:701 backend/lpd.c:758 backend/socket.c:295
+#: backend/ipp.c:701 backend/lpd.c:753 backend/socket.c:295
 msgid "Connecting to printer."
 msgstr ""
 
@@ -3887,11 +3887,11 @@ msgstr ""
 msgid "Continuous"
 msgstr ""
 
-#: backend/lpd.c:1083 backend/lpd.c:1215
+#: backend/lpd.c:1078 backend/lpd.c:1210
 msgid "Control file sent successfully."
 msgstr ""
 
-#: backend/ipp.c:1396 backend/lpd.c:450
+#: backend/ipp.c:1396 backend/lpd.c:445
 msgid "Copying print data."
 msgstr ""
 
@@ -3935,7 +3935,7 @@ msgstr ""
 msgid "Darkness"
 msgstr ""
 
-#: backend/lpd.c:1168
+#: backend/lpd.c:1163
 msgid "Data file sent successfully."
 msgstr ""
 
@@ -4281,7 +4281,7 @@ msgstr ""
 msgid "Envelope You4 Long Edge"
 msgstr ""
 
-#: test/ippfind.c:2825
+#: test/ippfind.c:2822
 msgid "Environment Variables:"
 msgstr ""
 
@@ -4362,7 +4362,7 @@ msgstr ""
 msgid "Expectation Failed"
 msgstr ""
 
-#: test/ippfind.c:2774
+#: test/ippfind.c:2771
 msgid "Expressions:"
 msgstr ""
 
@@ -4569,37 +4569,37 @@ msgstr ""
 msgid "IPP value larger than 32767 bytes."
 msgstr ""
 
-#: test/ippfind.c:2826
+#: test/ippfind.c:2823
 msgid "IPPFIND_SERVICE_DOMAIN  Domain name"
 msgstr ""
 
-#: test/ippfind.c:2827
+#: test/ippfind.c:2824
 msgid ""
 "IPPFIND_SERVICE_HOSTNAME\n"
 "                        Fully-qualified domain name"
 msgstr ""
 
-#: test/ippfind.c:2829
+#: test/ippfind.c:2826
 msgid "IPPFIND_SERVICE_NAME    Service instance name"
 msgstr ""
 
-#: test/ippfind.c:2830
+#: test/ippfind.c:2827
 msgid "IPPFIND_SERVICE_PORT    Port number"
 msgstr ""
 
-#: test/ippfind.c:2831
+#: test/ippfind.c:2828
 msgid "IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
 msgstr ""
 
-#: test/ippfind.c:2832
+#: test/ippfind.c:2829
 msgid "IPPFIND_SERVICE_SCHEME  URI scheme"
 msgstr ""
 
-#: test/ippfind.c:2833
+#: test/ippfind.c:2830
 msgid "IPPFIND_SERVICE_URI     URI"
 msgstr ""
 
-#: test/ippfind.c:2834
+#: test/ippfind.c:2831
 msgid "IPPFIND_TXT_*           Value of TXT record key"
 msgstr ""
 
@@ -4830,7 +4830,7 @@ msgstr ""
 msgid "Jobs"
 msgstr ""
 
-#: backend/lpd.c:167
+#: backend/lpd.c:162
 msgid "LPD/LPR Host or Printer"
 msgstr ""
 
@@ -4879,7 +4879,7 @@ msgstr ""
 msgid "List Available Printers"
 msgstr ""
 
-#: test/ippeveprinter.c:594
+#: test/ippeveprinter.c:593
 #, c-format
 msgid "Listening on port %d."
 msgstr ""
@@ -5012,7 +5012,7 @@ msgid ""
 "        device-id = %s"
 msgstr ""
 
-#: test/ippfind.c:2804
+#: test/ippfind.c:2801
 msgid "Modifiers:"
 msgstr ""
 
@@ -5295,11 +5295,11 @@ msgid "Options Installed"
 msgstr ""
 
 #: berkeley/lpq.c:642 berkeley/lpr.c:431 berkeley/lprm.c:232
-#: scheduler/cupsfilter.c:1476 scheduler/main.c:2111 systemv/cancel.c:401
+#: scheduler/cupsfilter.c:1476 scheduler/main.c:2112 systemv/cancel.c:401
 #: systemv/cupsaccept.c:243 systemv/cupsctl.c:191 systemv/cupstestppd.c:3857
 #: systemv/lp.c:750 systemv/lpadmin.c:1615 systemv/lpinfo.c:497
 #: systemv/lpmove.c:216 systemv/lpoptions.c:538 systemv/lpstat.c:2044
-#: test/ippeveprinter.c:6853 test/ippfind.c:2768 test/ipptool.c:4300
+#: test/ippeveprinter.c:7586 test/ippfind.c:2765 test/ipptool.c:4300
 #: ppdc/ppdc.cxx:426 ppdc/ppdhtml.cxx:173 ppdc/ppdi.cxx:119
 #: ppdc/ppdmerge.cxx:356 ppdc/ppdpo.cxx:243
 msgid "Options:"
@@ -5565,12 +5565,12 @@ msgstr ""
 msgid "Reject Jobs"
 msgstr ""
 
-#: backend/lpd.c:1079 backend/lpd.c:1211
+#: backend/lpd.c:1074 backend/lpd.c:1206
 #, c-format
 msgid "Remote host did not accept control file (%d)."
 msgstr ""
 
-#: backend/lpd.c:1164
+#: backend/lpd.c:1159
 #, c-format
 msgid "Remote host did not accept data file (%d)."
 msgstr ""
@@ -5684,7 +5684,7 @@ msgstr ""
 msgid "Special Paper"
 msgstr ""
 
-#: backend/lpd.c:1120
+#: backend/lpd.c:1115
 #, c-format
 msgid "Spooling job, %.0f%% complete."
 msgstr ""
@@ -5718,7 +5718,7 @@ msgstr ""
 msgid "Subscription #%d does not exist."
 msgstr ""
 
-#: test/ippfind.c:2815
+#: test/ippfind.c:2812
 msgid "Substitutions:"
 msgstr ""
 
@@ -5815,12 +5815,12 @@ msgstr ""
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
-#: backend/lpd.c:683 backend/lpd.c:1072 backend/lpd.c:1154 backend/lpd.c:1204
+#: backend/lpd.c:678 backend/lpd.c:1067 backend/lpd.c:1149 backend/lpd.c:1199
 msgid "The printer did not respond."
 msgstr ""
 
 #: backend/ipp.c:766 backend/ipp.c:956 backend/ipp.c:1070 backend/ipp.c:1523
-#: backend/ipp.c:1693 backend/lpd.c:891 backend/socket.c:354
+#: backend/ipp.c:1693 backend/lpd.c:886 backend/socket.c:354
 #: backend/usb-unix.c:117 backend/usb-unix.c:407 backend/usb-unix.c:490
 msgid "The printer is in use."
 msgstr ""
@@ -5829,8 +5829,8 @@ msgstr ""
 msgid "The printer is not connected."
 msgstr ""
 
-#: backend/ipp.c:744 backend/ipp.c:777 backend/ipp.c:952 backend/lpd.c:870
-#: backend/lpd.c:911 backend/socket.c:333 backend/socket.c:366
+#: backend/ipp.c:744 backend/ipp.c:777 backend/ipp.c:952 backend/lpd.c:865
+#: backend/lpd.c:906 backend/socket.c:333 backend/socket.c:366
 msgid "The printer is not responding."
 msgstr ""
 
@@ -5846,11 +5846,11 @@ msgstr ""
 msgid "The printer is offline."
 msgstr ""
 
-#: backend/ipp.c:760 backend/lpd.c:885 backend/socket.c:348
+#: backend/ipp.c:760 backend/lpd.c:880 backend/socket.c:348
 msgid "The printer is unreachable at this time."
 msgstr ""
 
-#: backend/ipp.c:753 backend/lpd.c:878 backend/socket.c:341
+#: backend/ipp.c:753 backend/lpd.c:873 backend/socket.c:341
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 
@@ -6036,11 +6036,11 @@ msgstr ""
 msgid "Unable to allocate memory for pages array"
 msgstr ""
 
-#: test/ippeveprinter.c:1415
+#: test/ippeveprinter.c:1425
 msgid "Unable to allocate memory for printer"
 msgstr ""
 
-#: backend/ipp.c:2165 backend/ipp.c:2698
+#: backend/ipp.c:2165 backend/ipp.c:2696
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -6074,7 +6074,7 @@ msgstr ""
 msgid "Unable to connect to host."
 msgstr ""
 
-#: backend/ipp.c:723 backend/ipp.c:1275 backend/lpd.c:851 backend/socket.c:314
+#: backend/ipp.c:723 backend/ipp.c:1275 backend/lpd.c:846 backend/socket.c:314
 #: backend/usb-unix.c:103
 msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
@@ -6104,7 +6104,7 @@ msgstr ""
 msgid "Unable to create server credentials."
 msgstr ""
 
-#: test/ippeveprinter.c:616
+#: test/ippeveprinter.c:615
 #, c-format
 msgid "Unable to create spool directory \"%s\": %s"
 msgstr ""
@@ -6166,7 +6166,7 @@ msgstr ""
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
-#: test/ippeveprinter.c:1390 test/ippeveprinter.c:1400
+#: test/ippeveprinter.c:1400 test/ippeveprinter.c:1410
 #, c-format
 msgid "Unable to execute command \"%s\": %s"
 msgstr ""
@@ -6183,7 +6183,7 @@ msgstr ""
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3361
+#: backend/ipp.c:3359
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -6224,7 +6224,7 @@ msgstr ""
 msgid "Unable to locate printer \"%s\"."
 msgstr ""
 
-#: backend/dnssd.c:752 backend/ipp.c:336 backend/lpd.c:186
+#: backend/dnssd.c:752 backend/ipp.c:336 backend/lpd.c:181
 #: backend/socket.c:155
 msgid "Unable to locate printer."
 msgstr ""
@@ -6266,7 +6266,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:377 backend/ipp.c:1620 backend/ipp.c:1833 backend/lpd.c:474
+#: backend/ipp.c:377 backend/ipp.c:1620 backend/ipp.c:1833 backend/lpd.c:469
 #: backend/socket.c:142 backend/usb.c:224 filter/gziptoany.c:65
 #: filter/pstops.c:262
 msgid "Unable to open print file"
@@ -6286,8 +6286,8 @@ msgstr ""
 msgid "Unable to read print data."
 msgstr ""
 
-#: test/ippeveprinter.c:5825 test/ippeveprinter.c:5843
-#: test/ippeveprinter.c:5862 test/ippeveprinter.c:5876
+#: test/ippeveprinter.c:6533 test/ippeveprinter.c:6551
+#: test/ippeveprinter.c:6570 test/ippeveprinter.c:6584
 #, c-format
 msgid "Unable to register \"%s.%s\": %d"
 msgstr ""
@@ -6320,7 +6320,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3220 backend/ipp.c:3297 backend/ipp.c:3305
+#: backend/ipp.c:3218 backend/ipp.c:3295 backend/ipp.c:3303
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6358,7 +6358,7 @@ msgstr ""
 msgid "Unknown choice \"%s\" for option \"%s\"."
 msgstr ""
 
-#: test/ippeveprinter.c:3768
+#: test/ippeveprinter.c:3780
 #, c-format
 msgid "Unknown directive \"%s\" on line %d of \"%s\" ignored."
 msgstr ""
@@ -6368,12 +6368,12 @@ msgstr ""
 msgid "Unknown encryption option value: \"%s\"."
 msgstr ""
 
-#: backend/lpd.c:332
+#: backend/lpd.c:327
 #, c-format
 msgid "Unknown file order: \"%s\"."
 msgstr ""
 
-#: backend/lpd.c:303
+#: backend/lpd.c:298
 #, c-format
 msgid "Unknown format character: \"%c\"."
 msgstr ""
@@ -6396,7 +6396,7 @@ msgstr ""
 msgid "Unknown option \"%s\"."
 msgstr ""
 
-#: backend/lpd.c:318
+#: backend/lpd.c:313
 #, c-format
 msgid "Unknown print mode: \"%s\"."
 msgstr ""
@@ -6516,7 +6516,7 @@ msgstr ""
 msgid "Usage: %s [options] destination(s)"
 msgstr ""
 
-#: backend/dnssd.c:192 backend/ipp.c:325 backend/lpd.c:173
+#: backend/dnssd.c:192 backend/ipp.c:325 backend/lpd.c:168
 #: backend/socket.c:119 backend/usb.c:170 filter/commandtops.c:57
 #: filter/gziptoany.c:38 filter/pstops.c:223 monitor/bcp.c:48
 #: monitor/tbcp.c:47
@@ -6535,7 +6535,7 @@ msgstr ""
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr ""
 
-#: scheduler/main.c:2110
+#: scheduler/main.c:2111
 msgid "Usage: cupsd [options]"
 msgstr ""
 
@@ -6549,11 +6549,11 @@ msgid ""
 "       program | cupstestppd [options] -"
 msgstr ""
 
-#: test/ippeveprinter.c:6852
+#: test/ippeveprinter.c:7585
 msgid "Usage: ippeveprinter [options] \"name\""
 msgstr ""
 
-#: test/ippfind.c:2762
+#: test/ippfind.c:2759
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
 "       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
@@ -6642,7 +6642,7 @@ msgstr ""
 msgid "Usage: snmp [host-or-ip-address]"
 msgstr ""
 
-#: test/ippeveprinter.c:621
+#: test/ippeveprinter.c:620
 #, c-format
 msgid "Using spool directory \"%s\"."
 msgstr ""
@@ -7100,7 +7100,7 @@ msgstr ""
 msgid "cupsd: Unable to get current directory."
 msgstr ""
 
-#: scheduler/main.c:340 scheduler/main.c:349
+#: scheduler/main.c:340 scheduler/main.c:350
 msgid "cupsd: Unable to get path to cups-files.conf file."
 msgstr ""
 
@@ -7449,19 +7449,19 @@ msgstr ""
 msgid "error-status uses indefinite length"
 msgstr ""
 
-#: test/ippfind.c:2811
+#: test/ippfind.c:2808
 msgid ""
 "expression --and expression\n"
 "                        Logical AND"
 msgstr ""
 
-#: test/ippfind.c:2813
+#: test/ippfind.c:2810
 msgid ""
 "expression --or expression\n"
 "                        Logical OR"
 msgstr ""
 
-#: test/ippfind.c:2810
+#: test/ippfind.c:2807
 msgid "expression expression   Logical AND"
 msgstr ""
 
@@ -8987,7 +8987,12 @@ msgstr ""
 msgid "insert-sheet"
 msgstr ""
 
-#: test/ippfind.c:2481
+#: test/ippeveprinter.c:4634
+#, c-format
+msgid "ippeveprinter: Unable to open \"%s\": %s on line %d."
+msgstr ""
+
+#: test/ippfind.c:2478
 #, c-format
 msgid "ippfind: Bad regular expression: %s"
 msgstr ""
@@ -9071,7 +9076,7 @@ msgstr ""
 msgid "ippfind: Too many parenthesis."
 msgstr ""
 
-#: test/ippfind.c:1287 test/ippfind.c:1415 test/ippfind.c:2573
+#: test/ippfind.c:1287 test/ippfind.c:1415 test/ippfind.c:2570
 #, c-format
 msgid "ippfind: Unable to browse or resolve: %s"
 msgstr ""
@@ -14284,7 +14289,7 @@ msgstr ""
 msgid "ppdc: Need a msgid line before any translation strings on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-driver.cxx:706
+#: ppdc/ppdc-driver.cxx:707
 #, c-format
 msgid "ppdc: No message catalog provided for locale %s."
 msgstr ""
@@ -19457,39 +19462,39 @@ msgstr ""
 msgid "z-offset"
 msgstr ""
 
-#: test/ippfind.c:2817
+#: test/ippfind.c:2814
 msgid "{service_domain}        Domain name"
 msgstr ""
 
-#: test/ippfind.c:2818
+#: test/ippfind.c:2815
 msgid "{service_hostname}      Fully-qualified domain name"
 msgstr ""
 
-#: test/ippfind.c:2819
+#: test/ippfind.c:2816
 msgid "{service_name}          Service instance name"
 msgstr ""
 
-#: test/ippfind.c:2820
+#: test/ippfind.c:2817
 msgid "{service_port}          Port number"
 msgstr ""
 
-#: test/ippfind.c:2821
+#: test/ippfind.c:2818
 msgid "{service_regtype}       DNS-SD registration type"
 msgstr ""
 
-#: test/ippfind.c:2822
+#: test/ippfind.c:2819
 msgid "{service_scheme}        URI scheme"
 msgstr ""
 
-#: test/ippfind.c:2823
+#: test/ippfind.c:2820
 msgid "{service_uri}           URI"
 msgstr ""
 
-#: test/ippfind.c:2824
+#: test/ippfind.c:2821
 msgid "{txt_*}                 Value of TXT record key"
 msgstr ""
 
-#: test/ippfind.c:2816
+#: test/ippfind.c:2813
 msgid "{}                      URI"
 msgstr ""
 

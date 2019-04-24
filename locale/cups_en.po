@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3b6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-19 16:34-0400\n"
+"POT-Creation-Date: 2019-04-24 18:36-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -2203,7 +2203,7 @@ msgstr "-r class                Remove the named destination from a class"
 msgid "-r reason               Specify a reason message that others can see"
 msgstr "-r reason               Specify a reason message that others can see"
 
-msgid "-r subtype              Set DNS-SD service subtype"
+msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
 msgstr ""
 
 msgid "-s                      Be silent"
@@ -7232,6 +7232,10 @@ msgstr "Insert Count"
 #. TRANSLATORS: Insert Sheet
 msgid "insert-sheet"
 msgstr "Insert Sheet"
+
+#, c-format
+msgid "ippeveprinter: Unable to open \"%s\": %s on line %d."
+msgstr ""
 
 #, c-format
 msgid "ippfind: Bad regular expression: %s"
