@@ -241,6 +241,8 @@ pcl_start_page(
   pcl_blanks = 0;
   pcl_line   = malloc(header->cupsWidth / 8 + 1);
   pcl_comp   = malloc(2 * header->cupsBytesPerLine + 2);
+
+  fprintf(stderr, "ATTR: job-impressions-completed=%d\n", page);
 }
 
 
@@ -272,6 +274,8 @@ pcl_to_pcl(const char *filename)	/* I - File to print or NULL for stdin */
   {
     fd = 0;
   }
+
+  fputs("ATTR: job-impressions=unknown\n", stderr);
 
  /*
   * Copy to stdout...
@@ -519,6 +523,8 @@ raster_to_pcl(const char *filename)	/* I - File to print (NULL for stdin) */
   }
 
   cupsRasterClose(ras);
+
+  fprintf(stderr, "ATTR: job-impressions=%d\n", page);
 
   return (0);
 }

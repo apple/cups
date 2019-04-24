@@ -300,6 +300,8 @@ dsc_page(int page)			/* I - Page numebr (1-based) */
 {
   printf("%%%%Page: (%d) %d\n", page, page);
 
+  fprintf(stderr, "ATTR: job-impressions-completed=%d\n", page);
+
 #if !CUPS_LITE
   if (ppd)
   {
@@ -673,6 +675,8 @@ jpeg_to_ps(const char    *filename,	/* I - Filename */
     return (1);
   }
 
+  fputs("ATTR: job-impressions=1\n", stderr);
+
  /*
   * Figure out the dimensions/scaling of the final image...
   */
@@ -739,7 +743,6 @@ jpeg_to_ps(const char    *filename,	/* I - Filename */
       decode = "0 1 0 1 0 1 0 1";
     }
 
-/*    printf("1 0 0 setrgbcolor %.2f %.2f moveto %.2f 0 rlineto 0 %.2f rlineto %.2f 0 rlineto closepath stroke\n", page_left, page_top, page_width, -page_height, -page_width);*/
     printf("gsave %.3f %.3f translate %.3f %.3f scale\n", page_left + 0.5f * (page_width - width * page_scaling), page_top - 0.5f * (page_height - height * page_scaling), page_scaling, page_scaling);
     printf("<</ImageType 1/Width %d/Height %d/BitsPerComponent 8/ImageMatrix[1 0 0 -1 0 1]/Decode[%s]/DataSource currentfile/ASCII85Decode filter/DCTDecode filter/Interpolate true>>image\n", width, height, decode);
 
@@ -983,6 +986,8 @@ ps_to_ps(const char    *filename,	/* I - Filename */
 
   dsc_trailer(num_pages);
 
+  fprintf(stderr, "ATTR: job-impressions=%d\n", num_pages / copies);
+
   if (fp != stdin)
     fclose(fp);
 
@@ -1121,6 +1126,8 @@ raster_to_ps(const char *filename)	/* I - Filename */
   cupsRasterClose(ras);
 
   dsc_trailer(page);
+
+  fprintf(stderr, "ATTR: job-impressions=%d\n", page);
 
   return (0);
 }

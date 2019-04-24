@@ -5189,8 +5189,67 @@ process_attr_message(
     ippeve_job_t *job,			/* I - Job */
     char       *message)		/* I - Message */
 {
-  (void)job;
-  (void)message;
+  int		i,			/* Looping var */
+		num_options = 0;	/* Number of name=value pairs */
+  cups_option_t	*options = NULL,	/* name=value pairs from message */
+		*option;		/* Current option */
+  ipp_attribute_t *attr;		/* Current attribute */
+
+
+ /*
+  * Grab attributes from the message line...
+  */
+
+  num_options = cupsParseOptions(message + 5, num_options, &options);
+
+ /*
+  * Loop through the options and record them in the printer or job objects...
+  */
+
+  for (i = num_options, option = options; i > 0; i --, option ++)
+  {
+    if (!strcmp(option->name, "job-impressions"))
+    {
+     /*
+      * Update job-impressions attribute...
+      */
+
+      job->impressions = atoi(option->value);
+    }
+    else if (!strcmp(option->name, "job-impressions-completed"))
+    {
+     /*
+      * Update job-impressions-completed attribute...
+      */
+
+      job->impcompleted = atoi(option->value);
+    }
+    else if (!strncmp(option->name, "marker-", 7) || !strcmp(option->name, "printer-alert") || !strcmp(option->name, "printer-supply") || !strcmp(option->name, "printer-supply-description"))
+    {
+     /*
+      * Update Printer Status attribute...
+      */
+
+      _cupsRWLockWrite(&job->printer->rwlock);
+
+      if ((attr = ippFindAttribute(job->printer->attrs, option->name, IPP_TAG_ZERO)) != NULL)
+        ippDeleteAttribute(job->printer->attrs, attr);
+
+      cupsEncodeOption(job->printer->attrs, IPP_TAG_PRINTER, option->name, option->value);
+
+      _cupsRWUnlock(&job->printer->rwlock);
+    }
+    else
+    {
+     /*
+      * Something else that isn't currently supported...
+      */
+
+      fprintf(stderr, "[Job %d] Ignoring update of attribute \"%s\" with value \"%s\".\n", job->id, option->name, option->value);
+    }
+  }
+
+  cupsFreeOptions(num_options, options);
 }
 
 
@@ -5847,7 +5906,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
     int 		pid,		/* Process ID */
 			status;		/* Exit status */
-    time_t		start,		/* Start time */
+    struct timeval	start,		/* Start time */
 			end;		/* End time */
     char		*myargv[3],	/* Command-line arguments */
 			*myenvp[400];	/* Environment variables */
@@ -5864,8 +5923,8 @@ process_job(ippeve_job_t *job)		/* I - Job */
     ssize_t		bytes;		/* Bytes read */
 #endif /* !_WIN32 */
 
-    fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command, job->filename);
-    time(&start);
+    fprintf(stderr, "[Job %d] Running command \"%s %s\".\n", job->id, job->printer->command, job->filename);
+    gettimeofday(&start, NULL);
 
    /*
     * Setup the command-line arguments...
@@ -5885,7 +5944,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
     if (myenvc > (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 32))
     {
-      fprintf(stderr, "Too many environment variables to process job #%d.\n", job->id);
+      fprintf(stderr, "[Job %d] Too many environment variables to process job.\n", job->id);
       job->state = IPP_JSTATE_ABORTED;
       goto error;
     }
@@ -5971,7 +6030,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
     if (attr)
     {
-      fprintf(stderr, "Too many environment variables to process job #%d.\n", job->id);
+      fprintf(stderr, "[Job %d] Too many environment variables to process job.\n", job->id);
       job->state = IPP_JSTATE_ABORTED;
       goto error;
     }
@@ -5997,7 +6056,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
       if (httpSeparateURI(HTTP_URI_CODING_ALL, job->printer->device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       {
-        fprintf(stderr, "Bad device URI \"%s\".\n", job->printer->device_uri);
+        fprintf(stderr, "[Job %d] Bad device URI \"%s\".\n", job->id, job->printer->device_uri);
       }
       else if (!strcmp(scheme, "file"))
       {
@@ -6008,31 +6067,31 @@ process_job(ippeve_job_t *job)		/* I - Job */
           if (errno == ENOENT)
           {
             if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
-	      fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	      fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	    else
-	      fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
+	      fprintf(stderr, "[Job %d] Unable to create \"%s\": %s\n", job->id, resource, strerror(errno));
           }
           else
-            fprintf(stderr, "Unable to access \"%s\": %s\n", resource, strerror(errno));
+            fprintf(stderr, "[Job %d] Unable to access \"%s\": %s\n", job->id, resource, strerror(errno));
         }
         else if (S_ISDIR(fileinfo.st_mode))
         {
           if ((mystdout = create_job_file(job, line, sizeof(line), resource, "prn")) >= 0)
-	    fprintf(stderr, "Saving print command output to \"%s\".\n", line);
+	    fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, line);
           else
-            fprintf(stderr, "Unable to create \"%s\": %s\n", line, strerror(errno));
+            fprintf(stderr, "[Job %d] Unable to create \"%s\": %s\n", job->id, line, strerror(errno));
         }
 	else if (!S_ISREG(fileinfo.st_mode))
 	{
 	  if ((mystdout = open(resource, O_WRONLY | O_CREAT | O_TRUNC, 0666)) >= 0)
-	    fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	    fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	  else
-            fprintf(stderr, "Unable to create \"%s\": %s\n", resource, strerror(errno));
+            fprintf(stderr, "[Job %d] Unable to create \"%s\": %s\n", job->id, resource, strerror(errno));
 	}
         else if ((mystdout = open(resource, O_WRONLY)) >= 0)
-	  fprintf(stderr, "Saving print command output to \"%s\".\n", resource);
+	  fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, resource);
 	else
-	  fprintf(stderr, "Unable to open \"%s\": %s\n", resource, strerror(errno));
+	  fprintf(stderr, "[Job %d] Unable to open \"%s\": %s\n", job->id, resource, strerror(errno));
       }
       else if (!strcmp(scheme, "socket"))
       {
@@ -6042,20 +6101,20 @@ process_job(ippeve_job_t *job)		/* I - Job */
         snprintf(service, sizeof(service), "%d", port);
 
         if ((addrlist = httpAddrGetList(host, AF_UNSPEC, service)) == NULL)
-          fprintf(stderr, "Unable to find \"%s\": %s\n", host, cupsLastErrorString());
+          fprintf(stderr, "[Job %d] Unable to find \"%s\": %s\n", job->id, host, cupsLastErrorString());
         else if (!httpAddrConnect2(addrlist, &mystdout, 30000, &(job->cancel)))
-          fprintf(stderr, "Unable to connect to \"%s\": %s\n", host, cupsLastErrorString());
+          fprintf(stderr, "[Job %d] Unable to connect to \"%s\": %s\n", job->id, host, cupsLastErrorString());
 
         httpAddrFreeList(addrlist);
       }
       else
       {
-        fprintf(stderr, "Unsupported device URI scheme \"%s\".\n", scheme);
+        fprintf(stderr, "[Job %d] Unsupported device URI scheme \"%s\".\n", job->id, scheme);
       }
     }
     else if ((mystdout = create_job_file(job, line, sizeof(line), job->printer->directory, "prn")) >= 0)
     {
-      fprintf(stderr, "Saving print command output to \"%s\".\n", line);
+      fprintf(stderr, "[Job %d] Saving print command output to \"%s\".\n", job->id, line);
     }
 
     if (mystdout < 0)
@@ -6063,7 +6122,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
     if (pipe(mypipe))
     {
-      perror("Unable to create pipe for stderr");
+      fprintf(stderr, "[Job %d] Unable to create pipe for stderr: %s\n", job->id, strerror(errno));
       mypipe[0] = mypipe[1] = -1;
     }
 
@@ -6091,7 +6150,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
       * Unable to fork process...
       */
 
-      perror("Unable to start job processing command");
+      fprintf(stderr, "[Job %d] Unable to start job processing command: %s\n", job->id, strerror(errno));
       status = -1;
 
       close(mystdout);
@@ -6138,6 +6197,9 @@ process_job(ippeve_job_t *job)		/* I - Job */
 	  {
 	    *ptr++ = '\0';
 
+	    if (Verbosity > 1)
+	      fprintf(stderr, "[Job %d] Command - %s\n", job->id, line);
+
 	    if (!strncmp(line, "STATE:", 6))
 	    {
 	     /*
@@ -6149,13 +6211,11 @@ process_job(ippeve_job_t *job)		/* I - Job */
 	    else if (!strncmp(line, "ATTR:", 5))
 	    {
 	     /*
-	      * Process printer attribute update.
+	      * Process job/printer attribute updates.
 	      */
 
 	      process_attr_message(job, line);
 	    }
-	    else if (Verbosity > 1)
-	      fprintf(stderr, "%s: %s\n", job->printer->command, line);
 
 	    bytes = ptr - line;
             if (ptr < endptr)
@@ -6185,25 +6245,25 @@ process_job(ippeve_job_t *job)		/* I - Job */
 #ifndef _WIN32
       if (WIFEXITED(status))
 #endif /* !_WIN32 */
-	fprintf(stderr, "Command \"%s\" exited with status %d.\n", job->printer->command, WEXITSTATUS(status));
+	fprintf(stderr, "[Job %d] Command \"%s\" exited with status %d.\n", job->id,  job->printer->command, WEXITSTATUS(status));
 #ifndef _WIN32
       else
-	fprintf(stderr, "Command \"%s\" terminated with signal %d.\n", job->printer->command, WTERMSIG(status));
+	fprintf(stderr, "[Job %d] Command \"%s\" terminated with signal %d.\n", job->id, job->printer->command, WTERMSIG(status));
 #endif /* !_WIN32 */
       job->state = IPP_JSTATE_ABORTED;
     }
     else if (status < 0)
       job->state = IPP_JSTATE_ABORTED;
     else
-      fprintf(stderr, "Command \"%s\" completed successfully.\n", job->printer->command);
+      fprintf(stderr, "[Job %d] Command \"%s\" completed successfully.\n", job->id, job->printer->command);
 
    /*
-    * Make sure processing takes at least 5 seconds...
+    * Report the total processing time...
     */
 
-    time(&end);
-    if ((end - start) < 5)
-      sleep(5);
+    gettimeofday(&end, NULL);
+
+    fprintf(stderr, "[Job %d] Processing time was %.3f seconds.\n", job->id, end.tv_sec - start.tv_sec + 0.000001 * (end.tv_usec - start.tv_usec));
   }
   else
   {
