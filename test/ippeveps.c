@@ -243,13 +243,13 @@ dsc_header(int num_pages)		/* I - Number of pages or 0 if not known */
   const char	*job_id = getenv("IPP_JOB_ID");
   					/* job-id value */
 
-  ppdEmitJCL(ppd, stdout, job_id ? atoi(job_id) : 0, cupsUser(), job_name);
+  ppdEmitJCL(ppd, stdout, job_id ? atoi(job_id) : 0, cupsUser(), job_name ? job_name : "Unknown");
 #endif /* !CUPS_LITE */
 
   puts("%!PS-Adobe-3.0");
   puts("%%LanguageLevel: 2");
   printf("%%%%Creator: ippeveps/%d.%d.%d\n", CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH);
-  if ((job_name = getenv("IPP_JOB_NAME")) != NULL)
+  if (job_name)
   {
     fputs("%%Title: ", stdout);
     while (*job_name)
@@ -992,6 +992,18 @@ ps_to_ps(const char    *filename,	/* I - Filename */
 
 /*
  * 'raster_to_ps()' - Convert PWG Raster/Apple Raster to PostScript.
+ *
+ * The current implementation locally-decodes the raster data and then writes
+ * whole, non-blank lines as 1-line high images with base-85 encoding, resulting
+ * in between 10 and 20 times larger output.  A alternate implementation (if it
+ * is deemed necessary) would be to implement a PostScript decode procedure that
+ * handles the modified packbits decompression so that we just have the base-85
+ * encoding overhead (25%).  Furthermore, Level 3 PostScript printers also
+ * support Flate compression.
+ *
+ * That said, the most efficient path with the highest quality is for Clients
+ * to supply PDF files and us to use the existing PDF to PostScript conversion
+ * filters.
  */
 
 static int				/* O - Exit status */
@@ -1004,6 +1016,7 @@ raster_to_ps(const char *filename)	/* I - Filename */
   unsigned		y;		/* Current line */
   unsigned char		*line;		/* Line buffer */
   unsigned char		white;		/* White color */
+  const char		*decode;	/* Image decode array */
 
 
  /*
@@ -1033,13 +1046,13 @@ raster_to_ps(const char *filename)	/* I - Filename */
     return (1);
   }
 
-  fputs("\033E", stdout);
-
   dsc_header(0);
 
   while (cupsRasterReadHeader2(ras, &header))
   {
     page ++;
+
+    fprintf(stderr, "DEBUG: Page %d: %ux%ux%u\n", page, header.cupsWidth, header.cupsHeight, header.cupsBitsPerPixel);
 
     if (header.cupsColorSpace != CUPS_CSPACE_W && header.cupsColorSpace != CUPS_CSPACE_SW && header.cupsColorSpace != CUPS_CSPACE_K && header.cupsColorSpace != CUPS_CSPACE_RGB && header.cupsColorSpace != CUPS_CSPACE_SRGB)
     {
@@ -1059,36 +1072,37 @@ raster_to_ps(const char *filename)	/* I - Filename */
     puts("gsave");
     printf("%.6f %.6f scale\n", 72.0f / header.HWResolution[0], 72.0f / header.HWResolution[1]);
 
-    printf("/L{gsave 0 exch translate <</ImageType 1/Width %u/Height 1/ImageMatrix[%u 0 0 -1 0 1]/DataSource currentfile/ASCII85Decode filter/BitsPerComponent %u", header.cupsWidth, header.cupsWidth, header.cupsBitsPerColor);
     switch (header.cupsColorSpace)
     {
       case CUPS_CSPACE_W :
       case CUPS_CSPACE_SW :
-          puts("/Decode[0 1]>>image}def bind");
+          decode = "0 1";
           puts("/DeviceGray setcolorspace");
           white = 255;
           break;
 
       case CUPS_CSPACE_K :
-          puts("/Decode[1 0]>>image}def bind");
+          decode = "0 1";
           puts("/DeviceGray setcolorspace");
           white = 0;
           break;
 
       default :
-          puts("/Decode[0 1 0 1 0 1]>>image}def bind");
+          decode = "0 1 0 1 0 1";
           puts("/DeviceRGB setcolorspace");
           white = 255;
           break;
     }
 
-    for (y = header.cupsHeight - 1; y >= 0; y --)
+    printf("gsave /L{grestore gsave 0 exch translate <</ImageType 1/Width %u/Height 1/BitsPerComponent %u/ImageMatrix[1 0 0 -1 0 1]/DataSource currentfile/ASCII85Decode filter/Decode[%s]>>image}bind def\n", header.cupsWidth, header.cupsBitsPerColor, decode);
+
+    for (y = header.cupsHeight; y > 0; y --)
     {
       if (cupsRasterReadPixels(ras, line, header.cupsBytesPerLine))
       {
         if (line[0] != white || memcmp(line, line + 1, header.cupsBytesPerLine - 1))
         {
-          printf("%d L\n", y);
+          printf("%d L\n", y - 1);
           ascii85(line, (int)header.cupsBytesPerLine, 1);
         }
       }
@@ -1096,7 +1110,9 @@ raster_to_ps(const char *filename)	/* I - Filename */
         break;
     }
 
-    puts("grestore");
+    fprintf(stderr, "DEBUG: y=%d at end...\n", y);
+
+    puts("grestore grestore");
     puts("showpage");
 
     free(line);

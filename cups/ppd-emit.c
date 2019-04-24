@@ -441,6 +441,9 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     * Clean up the job title...
     */
 
+    if (!title)
+      title = "Unknown";
+
     if ((ptr = strrchr(title, '/')) != NULL)
     {
      /*
@@ -489,6 +492,9 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     * Generate the display message, truncating at 32 characters + nul to avoid
     * issues with some printer's PJL implementations...
     */
+
+    if (!user)
+      user = "anonymous";
 
     snprintf(displaymsg, sizeof(displaymsg), "%d %s %s", job_id, user, temp);
 
