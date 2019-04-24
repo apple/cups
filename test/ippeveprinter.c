@@ -197,6 +197,8 @@ struct ippeve_job_s			/**** Job data ****/
 			*username,	/* job-originating-user-name */
 			*format;	/* document-format */
   ipp_jstate_t		state;		/* job-state value */
+  char			*message;	/* job-state-message value */
+  int			msglevel;	/* job-state-message log level (0=error, 1=info) */
   time_t		created,	/* time-at-creation value */
 			processing,	/* time-at-processing value */
 			completed;	/* time-at-completed value */
@@ -332,7 +334,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*keypath = NULL,	/* Keychain path */
 #endif /* HAVE_SSL */
 		*location = "",		/* Location of printer */
-		*make = "Test",		/* Manufacturer */
+		*make = "Example",	/* Manufacturer */
 		*model = "Printer",	/* Model */
 		*name = NULL,		/* Printer name */
 #if !CUPS_LITE
@@ -781,43 +783,50 @@ copy_job_attributes(
 
   if (!ra || cupsArrayFind(ra, "job-state-message"))
   {
-    switch (job->state)
+    if (job->message)
     {
-      case IPP_JSTATE_PENDING :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job pending.");
-	  break;
+      ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_TEXT, "job-state-message", NULL, job->message);
+    }
+    else
+    {
+      switch (job->state)
+      {
+	case IPP_JSTATE_PENDING :
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job pending.");
+	    break;
 
-      case IPP_JSTATE_HELD :
-          if (job->fd >= 0)
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job incoming.");
-	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job held.");
-          else
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job created.");
-	  break;
+	case IPP_JSTATE_HELD :
+	    if (job->fd >= 0)
+	      ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job incoming.");
+	    else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
+	      ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job held.");
+	    else
+	      ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job created.");
+	    break;
 
-      case IPP_JSTATE_PROCESSING :
-	  if (job->cancel)
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceling.");
-	  else
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job printing.");
-	  break;
+	case IPP_JSTATE_PROCESSING :
+	    if (job->cancel)
+	      ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceling.");
+	    else
+	      ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job printing.");
+	    break;
 
-      case IPP_JSTATE_STOPPED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job stopped.");
-	  break;
+	case IPP_JSTATE_STOPPED :
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job stopped.");
+	    break;
 
-      case IPP_JSTATE_CANCELED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceled.");
-	  break;
+	case IPP_JSTATE_CANCELED :
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceled.");
+	    break;
 
-      case IPP_JSTATE_ABORTED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job aborted.");
-	  break;
+	case IPP_JSTATE_ABORTED :
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job aborted.");
+	    break;
 
-      case IPP_JSTATE_COMPLETED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job completed.");
-	  break;
+	case IPP_JSTATE_COMPLETED :
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job completed.");
+	    break;
+      }
     }
   }
 
@@ -1820,9 +1829,12 @@ static void
 delete_job(ippeve_job_t *job)		/* I - Job */
 {
   if (Verbosity)
-    fprintf(stderr, "Removing job #%d from history.\n", job->id);
+    fprintf(stderr, "[Job %d] Removing job from history.\n", job->id);
 
   ippDelete(job->attrs);
+
+  if (job->message)
+    free(job->message);
 
   if (job->filename)
   {
@@ -5224,7 +5236,7 @@ process_attr_message(
 
       job->impcompleted = atoi(option->value);
     }
-    else if (!strncmp(option->name, "marker-", 7) || !strcmp(option->name, "printer-alert") || !strcmp(option->name, "printer-supply") || !strcmp(option->name, "printer-supply-description"))
+    else if (!strncmp(option->name, "marker-", 7) || !strcmp(option->name, "printer-alert") || !strcmp(option->name, "printer-alert-description") || !strcmp(option->name, "printer-supply") || !strcmp(option->name, "printer-supply-description"))
     {
      /*
       * Update Printer Status attribute...
@@ -6195,20 +6207,11 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
           while ((ptr = strchr(line, '\n')) != NULL)
 	  {
+	    int level = 3;		/* Message log level */
+
 	    *ptr++ = '\0';
 
-	    if (Verbosity > 1)
-	      fprintf(stderr, "[Job %d] Command - %s\n", job->id, line);
-
-	    if (!strncmp(line, "STATE:", 6))
-	    {
-	     /*
-	      * Process printer-state-reasons keywords.
-	      */
-
-	      process_state_message(job, line);
-	    }
-	    else if (!strncmp(line, "ATTR:", 5))
+	    if (!strncmp(line, "ATTR:", 5))
 	    {
 	     /*
 	      * Process job/printer attribute updates.
@@ -6216,6 +6219,48 @@ process_job(ippeve_job_t *job)		/* I - Job */
 
 	      process_attr_message(job, line);
 	    }
+	    else if (!strncmp(line, "DEBUG:", 6))
+	    {
+	     /*
+	      * Debug message...
+	      */
+
+              level = 2;
+	    }
+	    else if (!strncmp(line, "ERROR:", 6))
+	    {
+	     /*
+	      * Error message...
+	      */
+
+              level         = 0;
+              job->message  = strdup(line + 6);
+              job->msglevel = 0;
+	    }
+	    else if (!strncmp(line, "INFO:", 5))
+	    {
+	     /*
+	      * Informational/progress message...
+	      */
+
+              level = 1;
+              if (job->msglevel)
+              {
+                job->message  = strdup(line + 5);
+                job->msglevel = 1;
+	      }
+	    }
+	    else if (!strncmp(line, "STATE:", 6))
+	    {
+	     /*
+	      * Process printer-state-reasons keywords.
+	      */
+
+	      process_state_message(job, line);
+	    }
+
+	    if (Verbosity >= level)
+	      fprintf(stderr, "[Job %d] Command - %s\n", job->id, line);
 
 	    bytes = ptr - line;
             if (ptr < endptr)
@@ -7560,7 +7605,7 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(stdout, _("-m model                Set model name (default=Printer)"));
   _cupsLangPuts(stdout, _("-n hostname             Set hostname for printer"));
   _cupsLangPuts(stdout, _("-p port                 Set port number for printer"));
-  _cupsLangPuts(stdout, _("-r subtype              Set DNS-SD service subtype"));
+  _cupsLangPuts(stdout, _("-r subtype,[subtype]    Set DNS-SD service subtype"));
   _cupsLangPuts(stdout, _("-s speed[,color-speed]  Set speed in pages per minute"));
   _cupsLangPuts(stderr, _("-v                      Be verbose"));
 

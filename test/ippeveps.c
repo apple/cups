@@ -420,6 +420,7 @@ get_options(cups_option_t **options)	/* O - Options */
   {
     ppd_cache = _ppdCacheCreateWithPPD(ppd);
 
+    /* TODO: Fix me - values are names, not numbers... Also need to support finishings-col */
     if ((value = getenv("IPP_FINISHINGS")) == NULL)
       value = getenv("IPP_FINISHINGS_DEFAULT");
 
@@ -482,10 +483,12 @@ get_options(cups_option_t **options)	/* O - Options */
       int		num_presets;	/* Number of presets */
       cups_option_t	*presets;	/* Presets */
 
-      if ((pq = atoi(value) - 3) < 0)
-	pq = 0;
-      else if (pq > 2)
-	pq = 2;
+      if (!strcmp(value, "draft"))
+        pq = 0;
+      else if (!strcmp(value, "high"))
+        pq = 2;
+      else
+        pq = 1;
 
       if ((value = getenv("IPP_PRINT_COLOR_MODE")) == NULL)
 	value = getenv("IPP_PRINT_COLOR_MODE_DEFAULT");
