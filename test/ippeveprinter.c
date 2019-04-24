@@ -4509,9 +4509,12 @@ load_ppd_attributes(
   ipp_t		*col;			/* Current collection value */
   ppd_file_t	*ppd;			/* PPD data */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
+  ppd_choice_t	*ppd_choice;		/* PPD choice */
   ppd_size_t	*ppd_size;		/* Default PPD size */
   pwg_size_t	*pwg_size,		/* Current PWG size */
 		*default_size = NULL;	/* Default PWG size */
+  const char	*default_source = NULL,	/* Default media source */
+		*default_type = NULL;	/* Default media type */
   pwg_map_t	*pwg_map;		/* Mapping from PWG to PPD keywords */
   _ppd_cache_t	*pc;			/* PPD cache */
   _pwg_finishings_t *finishings;	/* Current finishings value */
@@ -4659,6 +4662,12 @@ load_ppd_attributes(
       default_size = pc->sizes;		/* Last resort: first size */
   }
 
+  if ((ppd_choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
+    default_source = _ppdCacheGetSource(pc, ppd_choice->choice);
+
+  if ((ppd_choice = ppdFindMarkedChoice(ppd, "MediaType")) != NULL)
+    default_source = _ppdCacheGetType(pc, ppd_choice->choice);
+
   if ((ppd_attr = ppdFindAttr(ppd, "DefaultResolution", NULL)) != NULL)
   {
    /*
@@ -4693,11 +4702,12 @@ load_ppd_attributes(
 
  /*
   * PostScript printers accept PDF via one of the CUPS PDF to PostScript
-  * filters, along with PostScript (of course)...
+  * filters, along with PostScript (of course) and JPEG...
   */
 
   cupsArrayAdd(docformats, "application/pdf");
   cupsArrayAdd(docformats, "application/postscript");
+  cupsArrayAdd(docformats, "image/jpeg");
 
  /*
   * Create the attributes...
@@ -4818,12 +4828,12 @@ load_ppd_attributes(
   }
 
   /* media-col-default */
-  col = create_media_col(default_size->map.pwg, NULL, NULL, default_size->width, default_size->length, default_size->bottom, default_size->left, default_size->right, default_size->top);
+  col = create_media_col(default_size->map.pwg, default_source, default_type, default_size->width, default_size->length, default_size->bottom, default_size->left, default_size->right, default_size->top);
   ippAddCollection(attrs, IPP_TAG_PRINTER, "media-col-default", col);
   ippDelete(col);
 
   /* media-col-ready */
-  col = create_media_col(default_size->map.pwg, pc->num_sources > 0 ? pc->sources[0].pwg : NULL, pc->num_types > 0 ? pc->types[0].pwg : NULL, default_size->width, default_size->length, default_size->bottom, default_size->left, default_size->right, default_size->top);
+  col = create_media_col(default_size->map.pwg, default_source, default_type, default_size->width, default_size->length, default_size->bottom, default_size->left, default_size->right, default_size->top);
   ippAddCollection(attrs, IPP_TAG_PRINTER, "media-col-ready", col);
   ippDelete(col);
 
@@ -5045,20 +5055,29 @@ load_ppd_attributes(
   }
 
   /* printer-input-tray */
-#if 0
-  if (ppm_color > 0)
+  if (pc->num_sources > 0)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], strlen(printer_input_tray_color[0]));
-    for (i = 1; i < (int)(sizeof(printer_input_tray_color) / sizeof(printer_input_tray_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], strlen(printer_input_tray_color[i]));
+    for (i = 0, attr = NULL; i < pc->num_sources; i ++)
+    {
+      char	input_tray[1024];	/* printer-input-tray value */
+
+      if (!strcmp(pc->sources[i].pwg, "manual") || strstr(pc->sources[i].pwg, "-man") != NULL)
+        snprintf(input_tray, sizeof(input_tray), "type=sheetFeedManual;mediafeed=0;mediaxfeed=0;maxcapacity=1;level=-2;status=0;name=%s", pc->sources[i].pwg);
+      else
+        snprintf(input_tray, sizeof(input_tray), "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=250;level=125;status=0;name=%s", pc->sources[i].pwg);
+
+      if (attr)
+        ippSetOctetString(attrs, &attr, i, input_tray, (int)strlen(input_tray));
+      else
+        attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", input_tray, (int)strlen(input_tray));
+    }
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], strlen(printer_input_tray[0]));
-    for (i = 1; i < (int)(sizeof(printer_input_tray) / sizeof(printer_input_tray[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], strlen(printer_input_tray[i]));
+    static const char *printer_input_tray = "type=sheetFeedAutoRemovableTray;mediafeed=0;mediaxfeed=0;maxcapacity=-2;level=-2;status=0;name=auto";
+
+    ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray, (int)strlen(printer_input_tray));
   }
-#endif /* 0 */
 
   /* printer-make-and-model */
   ippAddString(attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-make-and-model", NULL, ppd->nickname);
@@ -6861,7 +6880,8 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
   static const int	sheets[] =	/* Number of sheets */
   {
     250,
-    100,
+    125,
+    50,
     25,
     5,
     0,
@@ -6963,7 +6983,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
     {
       media_source = ippGetString(media_sources, i, NULL);
 
-      if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual"))
+      if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual") || strstr(media_source, "-man") != NULL)
 	continue;
 
       snprintf(name, sizeof(name), "size%d", i);
@@ -6995,7 +7015,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       else
         ready_sheets = 0;
 
-      snprintf(tray_str, sizeof(tray_str), "type=sheetFeedAuto%sRemovableTray;mediafeed=%d;mediaxfeed=%d;maxcapacity=%d;level=%d;status=0;name=%s;", !strcmp(media_source, "by-pass-tray") ? "Non" : "", media ? media->length : 0, media ? media->width : 0, !strcmp(media_source, "main") ? 250 : 25, ready_sheets, media_source);
+      snprintf(tray_str, sizeof(tray_str), "type=sheetFeedAuto%sRemovableTray;mediafeed=%d;mediaxfeed=%d;maxcapacity=%d;level=%d;status=0;name=%s;", !strcmp(media_source, "by-pass-tray") ? "Non" : "", media ? media->length : 0, media ? media->width : 0, strcmp(media_source, "by-pass-tray") ? 250 : 25, ready_sheets, media_source);
 
       ippSetOctetString(printer->attrs, &input_tray, i, tray_str, (int)strlen(tray_str));
 
@@ -7026,7 +7046,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
   {
     media_source = ippGetString(media_sources, i, NULL);
 
-    if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual"))
+    if (!strcmp(media_source, "auto") || !strcmp(media_source, "manual") || strstr(media_source, "-man") != NULL)
       continue;
 
     for (j = 0, ready_size = NULL, ready_type = NULL; j < num_ready; j ++)
@@ -7106,7 +7126,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       html_printf(client, " <select name=\"level%d\">", i);
       for (j = 0; j < (int)(sizeof(sheets) / sizeof(sheets[0])); j ++)
       {
-	if (strcmp(media_source, "main") && sheets[j] > 25)
+	if (!strcmp(media_source, "by-pass-tray") && sheets[j] > 25)
 	  continue;
 
 	if (sheets[j] < 0)
