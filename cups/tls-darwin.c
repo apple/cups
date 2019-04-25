@@ -1,10 +1,11 @@
 /*
  * TLS support code for CUPS on macOS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /**** This file is included from tls.c ****/
@@ -145,22 +146,22 @@ cupsMakeServerCredentials(
     return (-1);
 
   cupsFilePrintf(fp,
-                 "CUPS Self-Signed Certificate\n"
+		 "CUPS Self-Signed Certificate\n"
 					/* Enter key and certificate label */
-                 "r\n"			/* Generate RSA key pair */
-                 "2048\n"		/* 2048 bit encryption key */
-                 "y\n"			/* OK (y = yes) */
-                 "b\n"			/* Usage (b=signing/encryption) */
-                 "2\n"			/* Sign with SHA256 */
-                 "y\n"			/* OK (y = yes) */
-                 "%s\n"			/* Common name */
-                 "\n"			/* Country (default) */
-                 "\n"			/* Organization (default) */
-                 "\n"			/* Organizational unit (default) */
-                 "\n"			/* State/Province (default) */
-                 "\n"			/* Email address */
-                 "y\n",			/* OK (y = yes) */
-        	 common_name);
+		 "r\n"			/* Generate RSA key pair */
+		 "2048\n"		/* 2048 bit encryption key */
+		 "y\n"			/* OK (y = yes) */
+		 "b\n"			/* Usage (b=signing/encryption) */
+		 "2\n"			/* Sign with SHA256 */
+		 "y\n"			/* OK (y = yes) */
+		 "%s\n"			/* Common name */
+		 "\n"			/* Country (default) */
+		 "\n"			/* Organization (default) */
+		 "\n"			/* Organizational unit (default) */
+		 "\n"			/* State/Province (default) */
+		 "\n"			/* Email address */
+		 "y\n",			/* OK (y = yes) */
+		 common_name);
   cupsFileClose(fp);
 
   snprintf(keychain, sizeof(keychain), "k=%s", path);
