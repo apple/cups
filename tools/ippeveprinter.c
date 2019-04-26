@@ -4169,7 +4169,7 @@ load_legacy_attributes(
 
     if (pwg->width < 21000 && pwg->length < 21000)
     {
-      source = "photo";    		/* Photo size media from photo tray */
+      source = "photo";			/* Photo size media from photo tray */
       bottom =				/* Borderless margins */
       left   =
       right  =
@@ -4231,7 +4231,7 @@ load_legacy_attributes(
 
     if (pwg->width < 21000 && pwg->length < 21000)
     {
-      source = "photo";    		/* Photo size media from photo tray */
+      source = "photo";			/* Photo size media from photo tray */
       type   = "photographic-glossy";	/* Glossy photo paper */
       bottom =				/* Borderless margins */
       left   =
@@ -5171,7 +5171,7 @@ parse_options(ippeve_client_t *client,	/* I - Client */
               cups_option_t   **options)/* O - Options */
 {
   char	*name,				/* Name */
-      	*value,				/* Value */
+	*value,				/* Value */
 	*next;				/* Next name=value pair */
   int	num_options = 0;		/* Number of options */
 

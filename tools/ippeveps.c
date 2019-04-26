@@ -241,7 +241,7 @@ dsc_header(int num_pages)		/* I - Number of pages or 0 if not known */
 
 #if !CUPS_LITE
   const char	*job_id = getenv("IPP_JOB_ID");
-  					/* job-id value */
+					/* job-id value */
 
   ppdEmitJCL(ppd, stdout, job_id ? atoi(job_id) : 0, cupsUser(), job_name ? job_name : "Unknown");
 #endif /* !CUPS_LITE */
