@@ -1,7 +1,6 @@
 *.a
 *.bck
 *.cgi
-*.gz
 *.o
 autom4te.cache
 config.h
