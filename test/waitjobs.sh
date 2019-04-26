@@ -2,7 +2,7 @@
 #
 # Script to wait for jobs to complete.
 #
-# Copyright © 2008-2009 by Apple Inc.
+# Copyright © 2008-2019 by Apple Inc.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
 # information.

@@ -19,6 +19,13 @@ DIRS	=	cups $(BUILDDIRS)
 
 
 #
+# Test suite options - normally blank, override with make command...
+#
+
+TESTOPTIONS	=
+
+
+#
 # Make all targets...
 #
 
@@ -246,7 +253,7 @@ uninstall:
 
 test:	all unittests
 	echo Running CUPS test suite...
-	cd test; ./run-stp-tests.sh
+	cd test; ./run-stp-tests.sh $(TESTOPTIONS)
 
 
 check:	all unittests

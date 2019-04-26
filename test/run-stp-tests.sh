@@ -737,19 +737,19 @@ echo "    $date by $user on `hostname`." >>$strfile
 echo "    <pre>" >>$strfile
 
 fail=0
-for file in 4*.test ipp-2.1.test; do
-	echo $ac_n "Performing $file: $ac_c"
+for file in 4*.test ../examples/ipp-2.1.test; do
+	echo $ac_n "Performing `basename $file`: $ac_c"
 	echo "" >>$strfile
         echo $ac_n "`date '+[%d/%b/%Y:%H:%M:%S %z]'` $ac_c" >>$strfile
 
-	if test $file = ipp-2.1.test; then
+	if test $file = ../examples/ipp-2.1.test; then
 		uri="ipp://localhost:$port/printers/Test1"
 		options="-V 2.1 -d NOPRINT=1 -f testfile.ps"
 	else
 		uri="ipp://localhost:$port/printers"
 		options=""
 	fi
-	$runcups $VALGRIND ./ipptool -tI $options $uri $file >> $strfile
+	$runcups $VALGRIND ../tools/ipptool -tI $options $uri $file >> $strfile
 	status=$?
 
 	if test $status != 0; then
@@ -831,7 +831,7 @@ echo "`date '+[%d/%b/%Y:%H:%M:%S %z]'` \"5.11-history\":" >>$strfile
 
 echo "    lp -d Test1 testfile.jpg" >>$strfile
 
-$runcups ../systemv/lp -d Test1 testfile.jpg 2>&1 >>$strfile
+$runcups ../systemv/lp -d Test1 ../examples/testfile.jpg 2>&1 >>$strfile
 if test $? != 0; then
 	echo "FAIL (unable to queue test job)"
 	echo "    FAILED" >>$strfile
