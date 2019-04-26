@@ -96,7 +96,7 @@ install-exec:
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(IPPTOOLS) $(IPPEVECOMMANDS); do
+		for file in $(IPPTOOLS) $(IPPEVECOMMANDS); do \
 			cp $$file $(SYMROOT); \
 			dsymutil $(SYMROOT)/$$file; \
 		done; \
