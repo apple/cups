@@ -1,63 +1,29 @@
 #
-# IPP test makefile for CUPS.
+# IPP tools makefile for CUPS.
 #
-# Copyright 2007-2019 by Apple Inc.
-# Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
-# Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+# Licensed under Apache License v2.0.  See the file "LICENSE" for more
+# information.
 #
 
 include ../Makedefs
 
 
-#
-# Sample test files.
-#
-
-DATAFILES	=	\
-			color.jpg \
-			document-a4.pdf \
-			document-a4.ps \
-			document-letter.pdf \
-			document-letter.ps \
-			gray.jpg \
-			onepage-a4.pdf \
-			onepage-a4.ps \
-			onepage-letter.pdf \
-			onepage-letter.ps \
-			testfile.jpg \
-			testfile.pcl \
-			testfile.pdf \
-			testfile.ps \
-			testfile.txt
-TESTFILES	=	\
-			create-printer-subscription.test \
-			get-completed-jobs.test \
-			get-jobs.test \
-			get-notifications.test \
-			get-printer-attributes.test \
-			get-printer-attributes-suite.test \
-			get-subscriptions.test \
-			ipp-1.1.test \
-			ipp-2.0.test \
-			ipp-2.1.test \
-			ipp-2.2.test \
-			ipp-everywhere.test \
-			print-job.test \
-			print-job-deflate.test \
-			print-job-gzip.test \
-			validate-job.test
 OBJS		=	\
 			ippevepcl.o \
 			ippeveprinter.o \
 			ippeveps.o \
 			ippfind.o \
 			ipptool.o
-TARGETS		=	\
-			$(IPPEVECOMMANDS) \
+IPPTOOLS	=	\
 			ippeveprinter \
 			$(IPPFIND_BIN) \
-			ipptool \
+			ipptool
+TARGETS		=	\
+			$(IPPEVECOMMANDS) \
+			$(IPPTOOLS) \
 			$(LOCALTARGET)
 
 
@@ -87,7 +53,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(TARGETS) $(OBJS)
+	$(RM) $(IPPTOOLS) $(IPPEVECOMMANDS) $(OBJS)
 	$(RM) ippeveprinter-static ippfind-static ipptool-static
 
 
@@ -111,14 +77,6 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
-	echo Installing sample ipptool files in $(DATADIR)/ipptool...
-	$(INSTALL_DIR) -m 755 $(DATADIR)/ipptool
-	for file in $(DATAFILES); do \
-		$(INSTALL_COMPDATA) $$file $(DATADIR)/ipptool; \
-	done
-	for file in $(TESTFILES); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/ipptool; \
-	done
 
 
 #
@@ -126,27 +84,22 @@ install-data:
 #
 
 install-exec:
-	echo Installing ipptool in $(BINDIR)...
+	echo Installing IPP tools in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
-	$(INSTALL_BIN) ippeveprinter $(BINDIR)
-	if test -x ippfind; then \
-		$(INSTALL_BIN) ippfind $(BINDIR); \
-	fi
-	$(INSTALL_BIN) ipptool $(BINDIR)
+	for file in $(IPPTOOLS); do \
+		$(INSTALL_BIN) $$file $(BINDIR); \
+	done
+	echo Installing printer commands in $(SERVERBIN)/ippeveprinter...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/ippeveprinter
 	for file in $(IPPEVECOMMANDS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/ippeveprinter; \
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		cp ippeveprinter $(SYMROOT); \
-		dsymutil $(SYMROOT)/ippeveprinter; \
-		if test -x ippfind; then \
-			cp ippfind $(SYMROOT); \
-			dsymutil $(SYMROOT)/ippfind; \
-		fi; \
-		cp ipptool $(SYMROOT); \
-		dsymutil $(SYMROOT)/ipptool; \
+		for file in $(IPPTOOLS) $(IPPEVECOMMANDS); do
+			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
+		done; \
 	fi
 
 
@@ -169,22 +122,16 @@ install-libs:
 #
 
 uninstall:
-	echo Uninstalling sample ipptool files from $(DATADIR)/ipptool...
-	for file in ippeveprinter ippfind ipptool; do \
+	echo Uninstalling IPP tools from $(BINDIR)...
+	for file in $(IPPTOOLS); do \
 		$(RM) $(BINDIR)/$$file; \
 	done
 	-$(RMDIR) $(BINDIR)
+	echo Uninstalling print commands from $(SERVERBIN)/ippeveprinter...
 	for file in $(IPPEVECOMMANDS); do \
 		$(RM) $(SERVERBIN)/ippeveprinter/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/ippeveprinter
-	for file in $(DATAFILES); do \
-		$(RM) $(DATADIR)/ipptool/$$file; \
-	done
-	for file in $(TESTFILES); do \
-		$(RM) $(DATADIR)/ipptool/$$file; \
-	done
-	-$(RMDIR) $(DATADIR)/ipptool
 
 
 #
@@ -210,7 +157,7 @@ ippeveprinter:	ippeveprinter.o ../cups/$(LIBCUPSSTATIC)
 
 ippeveprinter-static:	ippeveprinter.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o  ../cups/$(LIBCUPSSTATIC) \
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
@@ -278,10 +225,10 @@ ipptool-static:	ipptool.o ../cups/$(LIBCUPSSTATIC)
 
 
 #
-# printer-png.h
+# Generate the header containing the data for printer.png...
 #
 
-printer-png.h:	printer.png
+pngheader:
 	echo "Generating printer-png.h from printer.png..."
 	echo "static const unsigned char printer_png[] =" >printer-png.h
 	echo "{" >>printer-png.h

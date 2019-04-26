@@ -6018,19 +6018,18 @@ LIBHEADERSPRIV="\$(COREHEADERSPRIV) \$(DRIVERHEADERSPRIV)"
 
 case "$COMPONENTS" in
 	all)
-		BUILDDIRS="test filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
+		BUILDDIRS="tools filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
 		;;
 
 	core)
-		BUILDDIRS="test locale"
+		BUILDDIRS="tools examples locale"
 		;;
 
 	corelite)
 		$as_echo "#define CUPS_LITE 1" >>confdefs.h
 
-		BUILDDIRS="test locale"
+		BUILDDIRS="tools examples locale"
 		cupsimagebase=""
-		IPPEVECOMMANDS="ippevepcl"
 		LIBCUPSOBJS="\$(COREOBJS)"
 		LIBHEADERS="\$(COREHEADERS)"
 		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"
@@ -6046,7 +6045,6 @@ case "$COMPONENTS" in
 
 		BUILDDIRS="locale"
 		cupsimagebase=""
-		IPPEVECOMMANDS="ippevepcl"
 		LIBCUPSOBJS="\$(COREOBJS)"
 		LIBHEADERS="\$(COREHEADERS)"
 		LIBHEADERSPRIV="\$(COREHEADERSPRIV)"

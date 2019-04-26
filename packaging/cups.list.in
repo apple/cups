@@ -299,8 +299,8 @@ f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
 d 0755 root sys $SERVERBIN/ippeveprinter -
-f 0555 root sys $SERVERBIN/ippeveprinter/ippevepcl test/ippevepcl
-f 0555 root sys $SERVERBIN/ippeveprinter/ippeveps test/ippeveps
+f 0555 root sys $SERVERBIN/ippeveprinter/ippevepcl tools/ippevepcl
+f 0555 root sys $SERVERBIN/ippeveprinter/ippeveps tools/ippeveps
 d 0755 root sys $SERVERBIN/notifier -
 f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto
 
@@ -338,11 +338,11 @@ l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
 d 0755 root sys $BINDIR -
 f 0555 root sys $BINDIR/cancel systemv/cancel
 f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
-f 0555 root sys $BINDIR/ippeveprinter test/ippeveprinter
+f 0555 root sys $BINDIR/ippeveprinter tools/ippeveprinter
 %if DNSSD_BACKEND
-f 0555 root sys $BINDIR/ippfind test/ippfind
+f 0555 root sys $BINDIR/ippfind tools/ippfind
 %endif
-f 0555 root sys $BINDIR/ipptool test/ipptool
+f 0555 root sys $BINDIR/ipptool tools/ipptool
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
 f 0555 root sys $BINDIR/lpq berkeley/lpq
@@ -359,20 +359,12 @@ l 0755 root sys /usr/bsd/lprm $BINDIR/lprm
 # DSOs
 %if DSOLIBS
 %subpackage libs
-%system hpux
-f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2 nostrip()
-l 0755 root sys $LIBDIR/libcups.sl libcups.sl.2
-f 0555 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2 nostrip()
-l 0755 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
-%system aix
-f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a nostrip()
-f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a nostrip()
 %system darwin
 f 0555 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcups.dylib libcups.2.dylib
 f 0555 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
-%system !hpux !aix !darwin
+%system !darwin
 f 0555 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.so libcups.so.2
 f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2 nostrip()
@@ -431,17 +423,11 @@ d 0755 root sys $DATADIR/examples -
 f 0444 root sys $DATADIR/examples examples/*.drv
 
 d 0755 root sys $DATADIR/ipptool -
-f 0444 root sys $DATADIR/ipptool/create-printer-subscription.test test/create-printer-subscription.test
-f 0444 root sys $DATADIR/ipptool/get-completed-jobs.test test/get-completed-jobs.test
-f 0444 root sys $DATADIR/ipptool/get-jobs.test test/get-jobs.test
-f 0444 root sys $DATADIR/ipptool/get-printer-attributes.test test/get-printer-attributes.test
-f 0444 root sys $DATADIR/ipptool/print-job.test test/print-job.test
-f 0444 root sys $DATADIR/ipptool test/document-*.p*
-f 0444 root sys $DATADIR/ipptool test/ipp-*.test
-f 0444 root sys $DATADIR/ipptool test/onepage-*.p*
-f 0444 root sys $DATADIR/ipptool test/testfile.*
-f 0444 root sys $DATADIR/ipptool/color.jpg test/color.jpg
-f 0444 root sys $DATADIR/ipptool/gray.jpg test/gray.jpg
+f 0444 root sys $DATADIR/ipptool examples/*.jpg
+f 0444 root sys $DATADIR/ipptool examples/*.test
+f 0444 root sys $DATADIR/ipptool examples/document-*.p*
+f 0444 root sys $DATADIR/ipptool examples/onepage-*.p*
+f 0444 root sys $DATADIR/ipptool examples/testfile.*
 
 d 0755 root sys $DATADIR/mime -
 f 0444 root sys $DATADIR/mime/mime.convs conf/mime.convs
@@ -541,7 +527,7 @@ f 0444 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 
 d 0755 root sys $DOCDIR/help -
 f 0444 root sys $DOCDIR/help doc/help/api*.html
-f 0444 root sys $DOCDIR/help/cupspm.html doc/help/cupspm.html
+f 0444 root sys $DOCDIR/help doc/help/cupspm.*
 f 0444 root sys $DOCDIR/help/postscript-driver.html doc/help/postscript-driver.html
 f 0444 root sys $DOCDIR/help/ppd-compiler.html doc/help/ppd-compiler.html
 f 0444 root sys $DOCDIR/help/raster-driver.html doc/help/raster-driver.html
@@ -555,8 +541,10 @@ f 0444 root sys $DOCDIR doc/*.html
 f 0444 root sys $DOCDIR/apple-touch-icon.png doc/apple-touch-icon.png
 d 0755 root sys $DOCDIR/help -
 f 0444 root sys $DOCDIR/help/accounting.html doc/help/accounting.html
+f 0444 root sys $DOCDIR/help/admin.html doc/help/admin.html
 f 0444 root sys $DOCDIR/help/cgi.html doc/help/cgi.html
 f 0444 root sys $DOCDIR/help/encryption.html doc/help/encryption.html
+f 0444 root sys $DOCDIR/help/firewalls.html doc/help/firewalls.html
 f 0444 root sys $DOCDIR/help/glossary.html doc/help/glossary.html
 f 0444 root sys $DOCDIR/help/kerberos.html doc/help/kerberos.html
 f 0444 root sys $DOCDIR/help/license.html doc/help/license.html

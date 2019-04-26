@@ -1,6 +1,7 @@
 ippevepcl.o: ippevepcl.c ippevecommon.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
-  ../cups/language.h ../cups/pwg.h ../cups/raster.h
+  ../cups/language.h ../cups/pwg.h ../cups/raster.h \
+  ../cups/string-private.h ../config.h dither.h
 ippeveprinter.o: ippeveprinter.c ../cups/cups-private.h \
   ../cups/string-private.h ../config.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
@@ -11,7 +12,9 @@ ippeveprinter.o: ippeveprinter.c ../cups/cups-private.h \
   ../cups/raster.h printer-png.h
 ippeveps.o: ippeveps.c ippevecommon.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
-  ../cups/language.h ../cups/pwg.h ../cups/raster.h ../cups/ppd.h
+  ../cups/language.h ../cups/pwg.h ../cups/raster.h \
+  ../cups/string-private.h ../config.h ../cups/ppd-private.h \
+  ../cups/ppd.h ../cups/pwg-private.h
 ippfind.o: ippfind.c ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/versioning.h ../cups/array-private.h \
   ../cups/array.h ../cups/ipp-private.h ../cups/cups.h ../cups/file.h \

@@ -413,7 +413,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/api*.html
-/usr/share/doc/cups/help/cupspm.html
+/usr/share/doc/cups/help/cupspm.*
 /usr/share/doc/cups/help/postscript-driver.html
 /usr/share/doc/cups/help/ppd-compiler.html
 /usr/share/doc/cups/help/raster-driver.html
