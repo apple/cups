@@ -102,16 +102,14 @@ distclean:	clean
 	$(RM) Makedefs config.h config.log config.status
 	$(RM) conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf
 	$(RM) cups-config
-	$(RM) data/testprint
 	$(RM) desktop/cups.desktop
 	$(RM) doc/index.html
-	$(RM) man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man
 	$(RM) packaging/cups.list
 	$(RM) scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpdAT.service scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket
 	$(RM) templates/header.tmpl
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
-	-$(RM) -r autom4te*.cache clang cups/charmaps cups/locale
+	-$(RM) -r autom4te*.cache cups/charmaps cups/locale
 
 
 #
@@ -123,25 +121,6 @@ depend:
 		echo Making dependencies in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) depend) || exit 1;\
 	done
-
-
-#
-# Run the Clang static code analysis tool on the sources, available here:
-#
-#    http://clang-analyzer.llvm.org
-#
-# At least checker-231 is required.
-#
-# Alternatively, use "--analyze -Xanalyzer -analyzer-output=text" for OPTIM (text
-# output instead of HTML...)
-#
-
-.PHONY: clang clang-changes
-clang:
-	$(RM) -r clang
-	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) clean all
-clang-changes:
-	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) all
 
 
 #

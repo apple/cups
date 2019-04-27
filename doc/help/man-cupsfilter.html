@@ -8,7 +8,7 @@
 <body>
 <h1 class="title">cupsfilter(8)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-cupsfilter - convert a file to another format using cups filters
+cupsfilter - convert a file to another format using cups filters (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>cupsfilter</b>
 [
@@ -92,7 +92,7 @@ generates a PDF file. The converted file is sent to the standard output.
 returns a non-zero exit status on any error.
 <h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
 All of the standard
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1)</a>
+<b>cups</b>(1)
 environment variables affect the operation of
 <b>cupsfilter</b>.
 <h2 class="title"><a name="FILES">Files</a></h2>
@@ -103,7 +103,10 @@ environment variables affect the operation of
 /usr/share/cups/mime/*.convs
 /usr/share/cups/mime/*.types
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-Unlike when printing, filters run using the
+CUPS printer drivers, filters, and backends are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
+<p>Unlike when printing, filters run using the
 <b>cupsfilter</b>
 command use the current user and security session. This may result in different output or unexpected behavior.
 <h2 class="title"><a name="EXAMPLE">Example</a></h2>
@@ -113,14 +116,14 @@ The following command will generate a PDF preview of job 42 for a printer named 
     cupsfilter -m application/pdf -d myprinter -j 42 >preview.pdf
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
-<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<b>cups</b>(1),
+<b>cupsd.conf</b>(5),
 <b>filter(7),</b>
-<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(7),</a>
-<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(7),</a>
+<b>mime.convs</b>(7),
+<b>mime.types</b>(7),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

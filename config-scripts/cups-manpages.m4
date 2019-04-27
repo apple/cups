@@ -1,10 +1,11 @@
 dnl
 dnl Manpage stuff for CUPS.
 dnl
-dnl Copyright 2007-2017 by Apple Inc.
-dnl Copyright 1997-2006 by Easy Software Products, all rights reserved.
+dnl Copyright © 2007-2019 by Apple Inc.
+dnl Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 dnl
-dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more
+dnl information.
 dnl
 
 dnl Fix "mandir" variable...
@@ -19,54 +20,10 @@ if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
         	darwin* | linux* | gnu* | *bsd*)
         		# Darwin, macOS, Linux, GNU HURD, and *BSD
         		mandir="/usr/share/man"
-        		AMANDIR="/usr/share/man"
-        		PMANDIR="/usr/share/man"
         		;;
         	*)
         		# All others
         		mandir="/usr/man"
-        		AMANDIR="/usr/man"
-        		PMANDIR="/usr/man"
         		;;
 	esac
-else
-	AMANDIR="$mandir"
-	PMANDIR="$mandir"
 fi
-
-AC_SUBST(AMANDIR)
-AC_SUBST(PMANDIR)
-
-dnl Setup manpage extensions...
-case "$host_os_name" in
-	sunos*)
-		# Solaris
-		MAN1EXT=1
-		MAN5EXT=5
-		MAN7EXT=7
-		MAN8EXT=1m
-		MAN8DIR=1m
-		;;
-	linux* | gnu* | darwin*)
-		# Linux, GNU Hurd, and macOS
-		MAN1EXT=1.gz
-		MAN5EXT=5.gz
-		MAN7EXT=7.gz
-		MAN8EXT=8.gz
-		MAN8DIR=8
-		;;
-	*)
-		# All others
-		MAN1EXT=1
-		MAN5EXT=5
-		MAN7EXT=7
-		MAN8EXT=8
-		MAN8DIR=8
-		;;
-esac
-
-AC_SUBST(MAN1EXT)
-AC_SUBST(MAN5EXT)
-AC_SUBST(MAN7EXT)
-AC_SUBST(MAN8EXT)
-AC_SUBST(MAN8DIR)

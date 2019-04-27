@@ -47,10 +47,11 @@ backend - cups backend transmission interfaces
 </pre>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 Backends are a special type of
-<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7)</a>
+<b>filter</b>(7)
 which is used to send print data to and discover different devices on the system.
 <p>Like filters, backends must be capable of reading from a filename on the command-line or from the standard input, copying the standard input to a temporary file as required by the physical interface.
-<p>The command name (<i>argv[0]</i>) is set to the device URI of the destination printer. Authentication information in
+<p>The command name (<i>argv[0]</i>) is set to the device URI of the destination printer.
+Authentication information in
 <i>argv[0]</i>
 is removed, so backend developers are urged to use the
 <b>DEVICE_URI</b>
@@ -66,7 +67,8 @@ function. The
 <b>CUPS_SC_FD</b>
 constant defines the file descriptor that should be monitored for incoming requests.
 <h3><a name="DEVICE_DISCOVERY">Device Discovery</a></h3>
-When run with no arguments, the backend should list the devices and schemes it supports or is advertising to the standard output. The output consists of zero or more lines consisting of any of the following forms:
+When run with no arguments, the backend should list the devices and schemes it supports or is advertising to the standard output.
+The output consists of zero or more lines consisting of any of the following forms:
 <pre class="man">
 
     device-class scheme "Unknown" "device-info"
@@ -89,19 +91,24 @@ field is one of the following values:
 <dd style="margin-left: 5.0em">The device-uri refers to a networked device and conforms to the general form for
 network URIs.
 <dt><b>serial</b>
-<dd style="margin-left: 5.0em">The device-uri refers to a serial device with configurable baud rate and other options. If the device-uri contains a baud value, it represents the maximum baud rate supported by the device.
+<dd style="margin-left: 5.0em">The device-uri refers to a serial device with configurable baud rate and other options.
+If the device-uri contains a baud value, it represents the maximum baud rate supported by the device.
 </dl>
 <p>The
 <i>scheme</i>
-field provides the URI scheme that is supported by the backend. Backends should use this form only when the backend supports any URI using that scheme. The
+field provides the URI scheme that is supported by the backend.
+Backends should use this form only when the backend supports any URI using that scheme.
+The
 <i>device-uri</i>
 field specifies the full URI to use when communicating with the device.
 <p>The
 <i>device-make-and-model</i>
-field specifies the make and model of the device, e.g. "Example Foojet 2000". If the make and model is not known, you must report "Unknown".
+field specifies the make and model of the device, e.g. "Example Foojet 2000".
+If the make and model is not known, you must report "Unknown".
 <p>The
 <i>device-info</i>
-field specifies additional information about the device. Typically this includes the make and model along with the port number or network address, e.g. "Example Foojet 2000 USB #1".
+field specifies additional information about the device.
+Typically this includes the make and model along with the port number or network address, e.g. "Example Foojet 2000 USB #1".
 <p>The optional
 <i>device-id</i>
 field specifies the IEEE-1284 device ID string for the device, which is used to select a matching driver.
@@ -109,7 +116,8 @@ field specifies the IEEE-1284 device ID string for the device, which is used to 
 <i>device-location</i>
 field specifies the physical location of the device, which is often used to pre-populate the printer-location attribute when adding a printer.
 <h3><a name="PERMISSIONS">Permissions</a></h3>
-Backends without world read and execute permissions are run as the root user. Otherwise, the backend is run using an unprivileged user account, typically "lp".
+Backends without world read and execute permissions are run as the root user.
+Otherwise, the backend is run using an unprivileged user account, typically "lp".
 <h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
 The following exit codes are defined for backends:
 <dl class="man">
@@ -117,28 +125,35 @@ The following exit codes are defined for backends:
 <dd style="margin-left: 5.0em">The print file was successfully transmitted to the device or remote server.
 <dt><b>CUPS_BACKEND_FAILED</b>
 <dd style="margin-left: 5.0em"><br>
-The print file was not successfully transmitted to the device or remote server. The scheduler will respond to this by canceling the job, retrying the job, or stopping the queue depending on the state of the
+The print file was not successfully transmitted to the device or remote server.
+The scheduler will respond to this by canceling the job, retrying the job, or stopping the queue depending on the state of the
 <i>printer-error-policy</i>
 attribute.
 <dt><b>CUPS_BACKEND_AUTH_REQUIRED</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because valid authentication information is required. The scheduler will respond to this by holding the job and adding the 'cups-held-for-authentication' keyword to the "job-reasons" Job Description attribute.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because valid authentication information is required.
+The scheduler will respond to this by holding the job and adding the 'cups-held-for-authentication' keyword to the "job-reasons" Job Description attribute.
 <dt><b>CUPS_BACKEND_HOLD</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by holding the job.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time.
+The scheduler will respond to this by holding the job.
 <dt><b>CUPS_BACKEND_STOP</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by stopping the queue.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time.
+The scheduler will respond to this by stopping the queue.
 <dt><b>CUPS_BACKEND_CANCEL</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because one or more attributes are not supported or the job was canceled at the printer. The scheduler will respond to this by canceling the job.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because one or more attributes are not supported or the job was canceled at the printer.
+The scheduler will respond to this by canceling the job.
 <dt><b>CUPS_BACKEND_RETRY</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job at a future time - other jobs may print before this one.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job at a future time - other jobs may print before this one.
 <dt><b>CUPS_BACKEND_RETRY_CURRENT</b>
-<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job immediately without allowing intervening jobs.
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job immediately without allowing intervening jobs.
 </dl>
 <p>All other exit code values are reserved.
 <h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
 In addition to the environment variables listed in
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1)</a>
+<b>cups</b>(1)
 and
-<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
+<b>filter</b>(7),
 CUPS backends can expect the following environment variable:
 <dl class="man">
 <dt><b>DEVICE_URI</b>
@@ -147,20 +162,28 @@ CUPS backends can expect the following environment variable:
 <h2 class="title"><a name="FILES">Files</a></h2>
 <i>/etc/cups/cups-files.conf</i>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-CUPS backends are not generally designed to be run directly by the user. Aside from the device URI issue (
+CUPS backends are not generally designed to be run directly by the user.
+Aside from the device URI issue (
 <i>argv[0]</i>
 and
 <b>DEVICE_URI</b>
-environment variable contain the device URI), CUPS backends also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs. Backends can also be installed with restricted permissions (0500 or 0700) that tell the scheduler to run them as the "root" user instead of an unprivileged user (typically "lp") on the system.
-<p>Unless you are a developer and know what you are doing, please do not run backends directly. Instead, use the
-<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1)</a>
+environment variable contain the device URI), CUPS backends also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs.
+Backends can also be installed with restricted permissions (0500 or 0700) that tell the scheduler to run them as the "root" user instead of an unprivileged user (typically "lp") on the system.
+<p>Unless you are a developer and know what you are doing, please do not run backends directly.
+Instead, use the
+<b>lp</b>(1)
 or
-<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1)</a>
+<b>lpr</b>(1)
 programs to send print jobs or
-<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
-to query for available printers using the backend. The one exception is the SNMP backend - see
-<a href="man-cups-snmp.html?TOPIC=Man+Pages"><b>cups-snmp</b>(8)</a>
+<b>lpinfo</b>(8)
+to query for available printers using the backend.
+The one exception is the SNMP backend - see
+<b>cups-snmp</b>(8)
 for more information.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+CUPS printer drivers and backends are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>cups</i>(1),
 <i>cups-files.conf</i>(5),
@@ -173,7 +196,7 @@ for more information.
 <br>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

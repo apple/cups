@@ -165,22 +165,25 @@ for a regular print file.
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 While the filter interface is compatible with System V interface scripts, CUPS does not support System V interface scripts.
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-CUPS filters are not meant to be run directly by the user.
+CUPS printer drivers and backends are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
+<p>CUPS filters are not meant to be run directly by the user.
 Aside from the legacy System V interface issues (<i>argv[0]</i> is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on macOS) has additional restrictions that affect how it runs.
 Unless you are a developer and know what you are doing, please do not run filters directly.
 Instead, use the
-<a href="man-cupsfilter.html?TOPIC=Man+Pages"><b>cupsfilter</b>(8)</a>
+<b>cupsfilter</b>(8)
 program to use the appropriate filters to do the conversions you need.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
-<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
-<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
-<a href="man-cupsfilter.html?TOPIC=Man+Pages"><b>cupsfilter</b>(8),</a>
+<b>backend</b>(7),
+<b>cups</b>(1),
+<b>cups-files.conf</b>(5),
+<b>cupsd</b>(8),
+<b>cupsfilter</b>(8),
 <br>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

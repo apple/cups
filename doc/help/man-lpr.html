@@ -56,9 +56,9 @@ If no files are listed on the command-line, <b>lpr</b> reads the print file from
 <h3><a name="THE_DEFAULT_DESTINATION">The Default Destination</a></h3>
 CUPS provides many ways to set the default destination. The <b>LPDEST</b> and <b>PRINTER</b> environment variables are consulted first.
 If neither are set, the current default set using the
-<a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1)</a>
+<b>lpoptions</b>(1)
 command is used, followed by the default set using the
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+<b>lpadmin</b>(8)
 command.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The following options are recognized by <i>lpr</i>:
@@ -97,7 +97,7 @@ This option is equivalent to <i>-o prettyprint</i> and is only useful when print
 </dl>
 <h3><a name="COMMON_JOB_OPTIONS">Common Job Options</a></h3>
 Aside from the printer-specific options reported by the
-<a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1)</a>
+<b>lpoptions</b>(1)
 command, the following generic options are available:
 <dl class="man">
 <dt><b>-o job-sheets=</b><i>name</i>
@@ -145,16 +145,16 @@ Print a presentation document 2-up to a printer called "foo":
     lpr -P foo -o number-up=2 filename
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
-<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
-<a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
-<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
-<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
-<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+<b>cancel</b>(1),
+<b>lp</b>(1),
+<b>lpadmin</b>(8),
+<b>lpoptions</b>(1),
+<b>lpq</b>(1),
+<b>lprm</b>(1),
+<b>lpstat</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

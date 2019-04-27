@@ -11,7 +11,7 @@
 ipptoolfile - ipptool file format
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(1)</a>
+<b>ipptool</b>(1)
 program accepts free-form plain text files that describe one or more IPP requests.
 Comments start with the "#" character and continue to the end of the line.
 Each request is enclosed by curly braces, for example:
@@ -87,7 +87,7 @@ The following directives can be used outside of a <i>test</i>:
 <dd style="margin-left: 5.0em">Defines a test.
 <dt><b>DEFINE </b><i>variable-name value</i>
 <dd style="margin-left: 5.0em">Defines the named variable to the given value. This is equivalent to specifying <i>-d variable-name=value</i> on the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 command-line.
 <dt><b>DEFINE-DEFAULT </b><i>variable-name value</i>
 <dd style="margin-left: 5.0em">Defines the named variable to the given value if it does not already have a value.
@@ -96,22 +96,22 @@ command-line.
 <dt><b>IGNORE-ERRORS yes</b>
 <dd style="margin-left: 5.0em"><dt><b>IGNORE-ERRORS no</b>
 <dd style="margin-left: 5.0em">Specifies whether, by default,
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 will ignore errors and continue with subsequent tests.
 <dt><b>INCLUDE "</b><i>filename</i><b>"</b>
 <dd style="margin-left: 5.0em"><dt><b>INCLUDE &lt;</b><i>filename</i><b>></b>
 <dd style="margin-left: 5.0em">Includes another test file. The first form includes a file relative to the current test file, while the second form includes a file from the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 include directory.
 <dt><b>INCLUDE-IF-DEFINED </b><i>name </i><b>"</b><i>filename</i><b>"</b>
 <dd style="margin-left: 5.0em"><dt><b>INCLUDE-IF-DEFINED </b><i>name </i><b>&lt;</b><i>filename</i><b>></b>
 <dd style="margin-left: 5.0em">Includes another test file if the named variable is defined. The first form includes a file relative to the current test file, while the second form includes a file from the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 include directory.
 <dt><b>INCLUDE-IF-NOT-DEFINED </b><i>name </i><b>"</b><i>filename</i><b>"</b>
 <dd style="margin-left: 5.0em"><dt><b>INCLUDE-IF-NOT-DEFINED </b><i>name </i><b>&lt;</b><i>filename</i><b>></b>
 <dd style="margin-left: 5.0em">Includes another test file if the named variable is not defined. The first form includes a file relative to the current test file, while the second form includes a file from the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 include directory.
 <dt><b>SKIP-IF-DEFINED </b><i>variable-name</i>
 <dd style="margin-left: 5.0em"><dt><b>SKIP-IF-NOT-DEFINED </b><i>variable-name</i>
@@ -123,11 +123,11 @@ include directory.
 <dd style="margin-left: 5.0em">Specifies that tests will, by default, use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
 <dt><b>TRANSFER chunked</b>
 <dd style="margin-left: 5.0em">Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding: chunked" header. This is the default and is equivalent to specifying <i>-c</i> on the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 command-line. Support for chunked requests is required for conformance with all versions of IPP.
 <dt><b>TRANSFER length</b>
 <dd style="margin-left: 5.0em">Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:" header. This is equivalent to specifying <i>-l</i> on the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 command-line. Support for content length requests is required for conformance with all versions of IPP.
 <dt><b>VERSION 1.0</b>
 <dd style="margin-left: 5.0em"><dt><b>VERSION 1.1</b>
@@ -173,7 +173,7 @@ test report.
 <dt><b>IGNORE-ERRORS yes</b>
 <dd style="margin-left: 5.0em"><dt><b>IGNORE-ERRORS no</b>
 <dd style="margin-left: 5.0em">Specifies whether
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 will ignore errors and continue with subsequent tests.
 <dt><b>NAME "</b><i>literal string</i><b>"</b>
 <dd style="margin-left: 5.0em">Specifies the human-readable name of the test.
@@ -186,7 +186,7 @@ will ignore errors and continue with subsequent tests.
 <dd style="margin-left: 5.0em">Specifies the request-id value to use in the request, either an integer or the word "random" to use a randomly generated value (the default).
 <dt><b>RESOURCE </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies an alternate resource path that is used for the HTTP POST request. The default is the resource from the URI provided to the
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 program.
 <dt><b>SKIP-IF-DEFINED </b><i>variable-name</i>
 <dd style="margin-left: 5.0em"><dt><b>SKIP-IF-NOT-DEFINED </b><i>variable-name</i>
@@ -194,7 +194,7 @@ program.
 <dt><b>SKIP-PREVIOUS-ERROR yes</b>
 <dd style="margin-left: 5.0em"><dt><b>SKIP-PREVIOUS-ERROR no</b>
 <dd style="margin-left: 5.0em">Specifies whether
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 will skip the current test if the previous test resulted in an error/failure.
 <dt><b>STATUS </b><i>status-code </i>[ <i>predicate</i> ]
 <dd style="margin-left: 5.0em">Specifies an expected response status-code value. Additional requirements can be added as predicates - see the "STATUS PREDICATES" section for more information on predicates.
@@ -306,7 +306,7 @@ Specifies the maximum number of times to repeat. The default value is 1000.
 </dl>
 <h3><a name="OPERATION_CODES">Operation Codes</a></h3>
 Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of names supported by
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8):</a>
+<b>ipptool</b>(8):
 <pre class="man">
 
     Activate-Printer
@@ -379,7 +379,7 @@ Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from RF
 </pre>
 <h3><a name="STATUS_CODES">Status Codes</a></h3>
 Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC 8011 and other IPP extension specifications. Here is a complete list of the names supported by
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8):</a>
+<b>ipptool</b>(8):
 <pre class="man">
 
     client-error-account-authorization-failed
@@ -483,7 +483,7 @@ Value and group tags correspond to the names from RFC 8011 and other IPP extensi
 </pre>
 <h3><a name="VARIABLES">Variables</a></h3>
 The
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 program maintains a list of variables that can be used in any literal string or attribute value by specifying "<i>$variable-name</i>". Aside from variables defined using the <i>-d</i> option or <b>DEFINE</b> directive, the following pre-defined variables are available:
 <dl class="man">
 <dt><b>$$</b>
@@ -492,15 +492,15 @@ program maintains a list of variables that can be used in any literal string or 
 <dd style="margin-left: 5.0em">Inserts the value of the named environment variable, or an empty string if the environment variable is not defined.
 <dt><b>$filename</b>
 <dd style="margin-left: 5.0em">Inserts the filename provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 with the <i>-f</i> option.
 <dt><b>$filetype</b>
 <dd style="margin-left: 5.0em">Inserts the MIME media type for the filename provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8)</a>
+<b>ipptool</b>(8)
 with the <i>-f</i> option.
 <dt><b>$hostname</b>
 <dd style="margin-left: 5.0em">Inserts the hostname from the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8).</a>
+<b>ipptool</b>(8).
 <dt><b>$job-id</b>
 <dd style="margin-left: 5.0em">Inserts the last "job-id" attribute value returned in a test response or 0 if no "job-id" attribute has been seen.
 <dt><b>$job-uri</b>
@@ -509,30 +509,30 @@ with the <i>-f</i> option.
 <dd style="margin-left: 5.0em">Inserts the last "notify-subscription-id" attribute value returned in a test response or 0 if no "notify-subscription-id" attribute has been seen.
 <dt><b>$port</b>
 <dd style="margin-left: 5.0em">Inserts the port number from the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8).</a>
+<b>ipptool</b>(8).
 <dt><b>$resource</b>
 <dd style="margin-left: 5.0em">Inserts the resource path from the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8).</a>
+<b>ipptool</b>(8).
 <dt><b>$scheme</b>
 <dd style="margin-left: 5.0em">Inserts the scheme from the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8).</a>
+<b>ipptool</b>(8).
 <dt><b>$uri</b>
 <dd style="margin-left: 5.0em">Inserts the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8).</a>
+<b>ipptool</b>(8).
 <dt><b>$uriuser</b>
 <dd style="margin-left: 5.0em">Inserts the username from the URI provided to
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(8),</a>
+<b>ipptool</b>(8),
 if any.
 <dt><b>$user</b>
 <dd style="margin-left: 5.0em">Inserts the current user's login name.
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-ipptool.html?TOPIC=Man+Pages"><b>ipptool</b>(1),</a>
+<b>ipptool</b>(1),
 IANA IPP Registry (<a href="http://www.iana.org/assignments/ipp-registrations)">http://www.iana.org/assignments/ipp-registrations)</a>,
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp)">http://www.pwg.org/ipp)</a>,
 RFC 8011 (<a href="http://tools.ietf.org/html/rfc8011">http://tools.ietf.org/html/rfc8011</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

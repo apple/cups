@@ -8,7 +8,7 @@
 <body>
 <h1 class="title">client.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-client.conf - client configuration file for cups
+client.conf - client configuration file for cups (deprecated on macos)
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The <b>client.conf</b> file configures the CUPS client and is normally located in the <i>/etc/cups</i> and/or <i>~/.cups</i> directories.
 Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character.
@@ -94,11 +94,11 @@ defaults read /Library/Preferences/org.cups.PrintingPrefs.plist Encryption
 </pre>
 On Linux and other systems using GNU TLS, the <i>/etc/cups/ssl/site.crl</i> file, if present, provides a list of revoked X.509 certificates and is used when validating certificates.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<b>cups</b>(1),
 <b>default</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

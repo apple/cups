@@ -61,9 +61,6 @@ The <b>cups-config</b> command accepts the following command-line options:
 <dd style="margin-left: 5.0em">Reports the default CUPS data directory.
 <dt><b>--help</b>
 <dd style="margin-left: 5.0em">Reports the program usage message.
-<dt><b>--image</b>
-<dd style="margin-left: 5.0em">When used with <i>--libs</i>, adds the CUPS imaging library to the
-list of libraries.
 <dt><b>--ldflags</b>
 <dd style="margin-left: 5.0em">Reports the necessary linker options.
 <dt><b>--libs</b>
@@ -90,11 +87,17 @@ Compile a simple one-file CUPS filter:
     cc `cups-config --cflags --ldflags` -o filter filter.c \
         `cups-config --libs`
 </pre>
+<h2 class="title"><a name="DEPRECATED_OPTIONS">Deprecated Options</a></h2>
+The following options are deprecated but continue to work for backwards compatibility:
+<dl class="man">
+<dt><b>--image</b>
+<dd style="margin-left: 5.0em">Formerly used to add the CUPS imaging library to the list of libraries.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<b>cups</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

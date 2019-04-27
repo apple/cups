@@ -35,9 +35,9 @@ The easiest way to start is by using the web interface to configure your printer
 <p>After the printer is added you will be asked to set the default printer options (paper size, output mode, etc.) for the printer. Make any changes as needed and then click/press on the Set Default Options button to save them. Some printers also support auto-configuration - click/press on the Query Printer for Default Options button to update the options automatically.
 <p>Once you have added the printer, you can print to it from any application. You can also choose Print Test Page from the maintenance menu to print a simple test page and verify that everything is working properly.
 <p>You can also use the
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+<b>lpadmin</b>(8)
 and
-<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8)</a>
+<b>lpinfo</b>(8)
 commands to add printers to
 <b>CUPS</b>.
 Additionally, your operating system may include graphical user interfaces or automatically create printer queues when you connect a printer to your computer.
@@ -96,24 +96,28 @@ commands use the following environment variables to override the default locatio
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 <b>CUPS</b>
 conforms to the Internet Printing Protocol version 2.1 and implements the Berkeley and System V UNIX print commands.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+CUPS printer drivers, backends, and PPD files are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
-<a href="man-client.conf.html?TOPIC=Man+Pages"><b>client.conf</b>(7),</a>
-<a href="man-cupsctl.html?TOPIC=Man+Pages"><b>cupsctl</b>(8),</a>
-<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
-<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
-<a href="man-lpinfo.html?TOPIC=Man+Pages"><b>lpinfo</b>(8),</a>
-<a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
-<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
-<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
-<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
-<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+<b>cancel</b>(1),
+<b>client.conf</b>(7),
+<b>cupsctl</b>(8),
+<b>cupsd</b>(8),
+<b>lp</b>(1),
+<b>lpadmin</b>(8),
+<b>lpinfo</b>(8),
+<b>lpoptions</b>(1),
+<b>lpr</b>(1),
+<b>lprm</b>(1),
+<b>lpq</b>(1),
+<b>lpstat</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help)">http://localhost:631/help)</a>,
 CUPS Web Site (<a href="http://www.CUPS.org)">http://www.CUPS.org)</a>,
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp">http://www.pwg.org/ipp</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
 </html>

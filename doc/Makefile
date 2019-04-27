@@ -239,13 +239,3 @@ uninstall-languages:
 	done
 
 install-langbundle:
-
-
-#
-# Install the docset bits locally...
-#
-
-docset:
-	cp $(HELPFILES) ../org.cups.docset/Contents/Resources/Documentation/help
-	cp cups-printable.css ../org.cups.docset/Contents/Resources/Documentation
-	cp $(HELPIMAGES) ../org.cups.docset/Contents/Resources/Documentation/images
