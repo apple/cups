@@ -304,10 +304,12 @@ cupsdCheckJobs(void)
 
         if (cupsdTimeoutJob(job))
 	  continue;
-      }
 
-      cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT, "Job submission timed out.");
-      cupsdLogJob(job, CUPSD_LOG_ERROR, "Job submission timed out.");
+	cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT, "Job submission timed out.");
+	cupsdLogJob(job, CUPSD_LOG_ERROR, "Job submission timed out.");
+      }
+      else
+	cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT, "Job hold expired.");
     }
 
    /*
