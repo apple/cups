@@ -1,10 +1,11 @@
 /*
  * Configuration file for CUPS on Windows.
  *
- * Copyright 2007-2019 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -40,10 +41,8 @@
 #define open		_open
 #define read	        _read
 #define rmdir		_rmdir
-#define snprintf 	_snprintf
 #define strdup		_strdup
 #define unlink		_unlink
-#define vsnprintf 	_vsnprintf
 #define write		_write
 
 
@@ -323,8 +322,9 @@ typedef unsigned long useconds_t;
  * Do we have the (v)snprintf() functions?
  */
 
-#define HAVE_SNPRINTF 1
-#define HAVE_VSNPRINTF 1
+/* Windows snprintf/vsnprintf are non-conforming */
+/* #undef HAVE_SNPRINTF */
+/* #undef HAVE_VSNPRINTF */
 
 
 /*
