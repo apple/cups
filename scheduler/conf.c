@@ -729,7 +729,7 @@ cupsdReadConfiguration(void)
   MaxClientsPerHost        = 0;
   MaxLogSize               = 1024 * 1024;
   MaxRequestSize           = 0;
-  MultipleOperationTimeout = DEFAULT_TIMEOUT;
+  MultipleOperationTimeout = 900;
   NumSystemGroups          = 0;
   ReloadTimeout	           = DEFAULT_KEEPALIVE;
   RootCertDuration         = 300;

@@ -1,4 +1,4 @@
-CHANGES - 2.2.12 - 2019-04-15
+CHANGES - 2.2.12 - 2019-05-01
 =============================
 
 
@@ -12,6 +12,7 @@ Changes in CUPS v2.2.12
   for the print filters (Issue #5558)
 - Restored minimal support for the `Emulators` keyword in PPD files to allow
   old Samsung printer drivers to continue to work (Issue #5562)
+- Timed out job submission now yields an error (Issue #5570)
 
 
 Changes in CUPS v2.2.11
