@@ -1,10 +1,11 @@
 /*
  * snprintf functions for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -171,7 +172,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, double));
-	    templen = strlen(temp):
+	    templen = strlen(temp);
 
             bytes += (int)templen;
 
@@ -202,7 +203,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, int));
-	    templen = strlen(temp):
+	    templen = strlen(temp);
 
             bytes += (int)templen;
 
@@ -226,7 +227,7 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 	      break;
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
-	    templen = strlen(temp):
+	    templen = strlen(temp);
 
             bytes += (int)templen;
 
