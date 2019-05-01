@@ -10,12 +10,12 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupsd-logs - cupsd log files (access_log, error_log, and page_log)
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<b>cupsd</b>(8)
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
 normally maintains three log files: <i>access_log</i> to track requests that are submitted to the scheduler, <i>error_log</i> to track progress and errors, and <i>page_log</i> to track pages that are printed.
 Configuration directives in
-<b>cupsd.conf</b>(5)
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5)</a>
 and
-<b>cups-files.conf</b>(5)
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 control what information is logged and where it is stored.
 <h3><a name="ACCESS_LOG_FILE_FORMAT">Access Log File Format</a></h3>
 The <i>access_log</i> file lists each HTTP resource that is accessed by a web browser or client.
@@ -93,7 +93,7 @@ For POST requests the bytes field contains the number of bytes of non-IPP data t
 <p>The <i>ipp-status</i> field contains either "-" for non-IPP requests or the IPP status code name for POST requests containing an IPP response.
 <h3><a name="ERROR_LOG_FILE_FORMAT">Error Log File Format</a></h3>
 The <i>error_log</i> file lists messages from the scheduler - errors, warnings, etc. The LogLevel directive in the
-<b>cupsd.conf</b>(5)
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5)</a>
 file controls which messages are logged:
 <pre class="man">
 
@@ -158,7 +158,7 @@ For example the entry for a two page job called "myjob" might look like:
 
 </pre>
 The PageLogFormat directive in the
-<b>cupsd.conf</b>(5)
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5)</a>
 file can be used to change this information.
 <p>The <i>printer</i> field contains the name of the printer that printed the page.
 If you send a job to a printer class, this field will contain the name of the printer that was assigned the job.
@@ -173,9 +173,9 @@ The format of this field is identical to the data-time field in the <i>access_lo
 <p>The <i>media</i> field contains a copy of the media or media-col/media-size attribute provided with the IPP Create-Job or Print-Job requests or "-" if none was provided.
 <p>The <i>sides</i> field contains a copy of the sides attribute provided with the IPP Create-Job or Print-Job requests or "-" if none was provided.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<b>cupsd</b>(8),
-<b>cupsd.conf</b>(5),
-<b>cups-files.conf</b>(5),
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright &copy; 2007-2019 by Apple Inc.

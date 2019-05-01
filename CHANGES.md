@@ -1,4 +1,4 @@
-CHANGES - 2.3b8 - 2019-04-18
+CHANGES - 2.3b8 - 2019-05-01
 ============================
 
 
@@ -11,6 +11,7 @@ Changes in CUPS v2.3b8
 - Fixed a performance regression with large PPDs (rdar://47040759)
 - Fixed a memory reallocation bug in HTTP header value expansion
   (rdar://problem/50000749)
+- Timed out job submission now yields an error (Issue #5570)
 - Restored minimal support for the `Emulators` keyword in PPD files to allow
   old Samsung printer drivers to continue to work (Issue #5562)
 - The scheduler did not encode octetString values like "job-password" correctly
