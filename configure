@@ -8953,7 +8953,7 @@ $as_echo "yes" >&6; }
 		DNSSDLIBS="`$PKGCONFIG --libs avahi-client`"
 		DNSSD_BACKEND="dnssd"
 		IPPFIND_BIN="ippfind"
-		IPPFIND_MAN="ippfind.1)"
+		IPPFIND_MAN="ippfind.1"
 		$as_echo "#define HAVE_AVAHI 1" >>confdefs.h
 
 	else

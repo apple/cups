@@ -96,7 +96,7 @@ sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
 	-e '1,$s/^Source:.*/Source: '$fileurl'/' \
 	<packaging/cups.spec.in \
 	>packaging/cups.spec
-rm -rf tools .gitignore
+rm -rf .gitignore
 cd ..
 
 echo Archiving...
