@@ -6,16 +6,16 @@
 TMPDIR="${TMPDIR:=/tmp}"
 
 # Make sure we are running in the right directory...
-if test ! -f tools/makesrcdist; then
+if test ! -f scripts/makesrcdist; then
         echo "Run this script from the top-level CUPS source directory, e.g.:"
         echo ""
-        echo "    tools/makesrcdist $*"
+        echo "    scripts/makesrcdist $*"
         echo ""
         exit 1
 fi
 
 # See if we have local changes (other than this script...)
-if (git status | grep -v makesrcdist | grep -v testrpm | grep -q modified:); then
+if (git status | grep -v makesrcdist | grep -v makerpm | grep -q modified:); then
         echo Local changes remain:
         git status | grep -v makesrcdist | grep modified:
         exit 1
