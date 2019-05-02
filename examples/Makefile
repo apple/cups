@@ -150,7 +150,7 @@ install:	all install-data install-headers install-libs install-exec
 install-data:
 	echo Installing sample PPD compiler files in $(DATADIR)/examples...
 	$(INSTALL_DIR) $(DATADIR)/examples
-	for file in $(EXAMPLES); do \
+	for file in $(DRVFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/examples; \
 	done
 	echo Installing sample ipptool files in $(DATADIR)/ipptool...
@@ -190,7 +190,7 @@ install-libs:
 
 uninstall:
 	echo Uninstalling sample PPD compiler files from $(DATADIR)/examples...
-	for file in $(EXAMPLES); do \
+	for file in $(DRVFILES); do \
 		$(RM) $(DATADIR)/examples/$$file; \
 	done
 	-$(RMDIR) $(DATADIR)/examples
