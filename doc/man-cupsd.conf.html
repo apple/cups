@@ -1,8 +1,11 @@
----
-title: cupsd.conf(5)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd.conf(5)</title>
+</head>
+<body>
 <h1 class="title">cupsd.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupsd.conf - server configuration file for cups
@@ -220,7 +223,7 @@ The value "0" disables log rotation.
 The default is "1048576" (1MB).
 <dt><a name="MultipleOperationTimeout"></a><b>MultipleOperationTimeout </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the maximum amount of time to allow between files in a multiple file print job.
-The default is "300" (5 minutes).
+The default is "900" (15 minutes).
 <dt><a name="Policy"></a><b>&lt;Policy </b><i>name</i><b>> </b>... <b>&lt;/Policy></b>
 <dd style="margin-left: 5.0em">Specifies access control for the named policy.
 <dt><a name="Port"></a><b>Port </b><i>number</i>
@@ -264,13 +267,11 @@ command.
 <dd style="margin-left: 5.0em">Specifies what information is included in the Server header of HTTP responses.
 "None" disables the Server header.
 "ProductOnly" reports "CUPS".
-"Major" reports "CUPS 2".
-"Minor" reports "CUPS 2.0".
-"Minimal" reports "CUPS 2.0.0".
-"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the
-<b>uname</b>(1)
-command.
-"Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".
+"Major" reports "CUPS/major IPP/2".
+"Minor" reports "CUPS/major.minor IPP/2.1".
+"Minimal" reports "CUPS/major.minor.patch IPP/2.1".
+"OS" reports "CUPS/major.minor.path (osname osversion) IPP/2.1".
+"Full" reports "CUPS/major.minor.path (osname osversion; architecture) IPP/2.1".
 The default is "Minimal".
 <dt><a name="SSLListen"></a><b>SSLListen </b><i>ipv4-address</i><b>:</b><i>port</i>
 <dd style="margin-left: 5.0em"><dt><b>SSLListen [</b><i>ipv6-address</i><b>]:</b><i>port</i>
@@ -298,7 +299,7 @@ Not all operating systems support TLS 1.3 at this time.
 The default is "No".
 <dt><a name="Timeout"></a><b>Timeout </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the HTTP request timeout.
-The default is "300" (5 minutes).
+The default is "900" (15 minutes).
 <dt><a name="WebInterface"></a><b>WebInterface yes</b>
 <dd style="margin-left: 5.0em"><dt><b>WebInterface no</b>
 <dd style="margin-left: 5.0em">Specifies whether the web interface is enabled.
@@ -607,13 +608,16 @@ Require authentication for accesses from outside the 10. network:
     &lt;/Location>
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<b>classes.conf</b>(5),
 <a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
-<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
-<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
-<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
-<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+<b>mime.convs</b>(5),
+<b>mime.types</b>(5),
+<b>printers.conf</b>(5),
+<b>subscriptions.conf</b>(5),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

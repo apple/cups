@@ -1,11 +1,14 @@
----
-title: cupsd-helper(8)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd-helper(8)</title>
+</head>
+<body>
 <h1 class="title">cupsd-helper(8)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-cupsd-helper - cupsd helper programs
+cupsd-helper - cupsd helper programs (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>cups-deviced</b>
 <i>request-id</i>
@@ -43,7 +46,7 @@ cupsd-helper - cupsd helper programs
 The <b>cupsd-helper</b> programs perform long-running operations on behalf of the scheduler,
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
 The <b>cups-deviced</b> helper program runs each CUPS
-<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7)</a>
+<b>backend</b>(7)
 with no arguments in order to discover the available printers.
 <p>The <b>cups-driverd</b> helper program lists all available printer drivers, a subset of "matching" printer drivers, or a copy of a specific driver PPD file.
 <p>The <b>cups-exec</b> helper program runs backends, filters, and other programs. On macOS these programs are run in a secure sandbox.
@@ -65,14 +68,21 @@ program or placed in compressed
 <b>tar</b>(1)
 archives to further reduce their size.
 <p>Driver information files must conform to the format defined in
-<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5).</a>
+<b>ppdcfile</b>(5).
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+CUPS printer drivers, backends, and PPD files are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<b>backend</b>(7),
+<b>cups</b>(1),
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
 <a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
-<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
-<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+<b>filter</b>(7),
+<b>ppdcfile</b>(5),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

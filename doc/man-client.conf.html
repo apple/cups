@@ -1,11 +1,14 @@
----
-title: client.conf(5)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>client.conf(5)</title>
+</head>
+<body>
 <h1 class="title">client.conf(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-client.conf - client configuration file for cups
+client.conf - client configuration file for cups (deprecated on macos)
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The <b>client.conf</b> file configures the CUPS client and is normally located in the <i>/etc/cups</i> and/or <i>~/.cups</i> directories.
 Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character.
@@ -57,6 +60,22 @@ Not all operating systems support TLS 1.3 at this time.
 The default is "Yes".
 <dt><b>User </b><i>name</i>
 <dd style="margin-left: 5.0em">Specifies the default user name to use for requests.
+<dt><a name="UserAgentTokens"></a><b>UserAgentTokens None</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens ProductOnly</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens Major</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens Minor</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens Minimal</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens OS</b>
+<dd style="margin-left: 5.0em"><dt><b>UserAgentTokens Full</b>
+<dd style="margin-left: 5.0em">Specifies what information is included in the User-Agent header of HTTP requests.
+"None" disables the User-Agent header.
+"ProductOnly" reports "CUPS".
+"Major" reports "CUPS/major IPP/2".
+"Minor" reports "CUPS/major.minor IPP/2.1".
+"Minimal" reports "CUPS/major.minor.patch IPP/2.1".
+"OS" reports "CUPS/major.minor.path (osname osversion) IPP/2.1".
+"Full" reports "CUPS/major.minor.path (osname osversion; architecture) IPP/2.1".
+The default is "Minimal".
 <dt><b>ValidateCerts Yes</b>
 <dd style="margin-left: 5.0em"><dt><b>ValidateCerts No</b>
 <dd style="margin-left: 5.0em">Specifies whether to only allow TLS with certificates whose common name matches the hostname.
@@ -75,8 +94,11 @@ defaults read /Library/Preferences/org.cups.PrintingPrefs.plist Encryption
 </pre>
 On Linux and other systems using GNU TLS, the <i>/etc/cups/ssl/site.crl</i> file, if present, provides a list of revoked X.509 certificates and is used when validating certificates.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<b>cups</b>(1),
 <b>default</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

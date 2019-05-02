@@ -1,8 +1,11 @@
----
-title: ppdmerge(1)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ppdmerge(1)</title>
+</head>
+<body>
 <h1 class="title">ppdmerge(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 ppdmerge - merge ppd files (deprecated)
@@ -30,14 +33,20 @@ If not specified, the merged PPD file is written to the standard output.
 If the output file already exists, it is silently overwritten.
 </dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-<b>ppdmerge</b> does not check whether the merged PPD files are for the same device.
+PPD files are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
+<p><b>ppdmerge</b> does not check whether the merged PPD files are for the same device.
 Merging of different device PPDs will yield unpredictable results.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-ppdc.html?TOPIC=Man+Pages"><b>ppdc</b>(1),</a>
-<a href="man-ppdhtml.html?TOPIC=Man+Pages"><b>ppdhtml</b>(1),</a>
-<a href="man-ppdi.html?TOPIC=Man+Pages"><b>ppdi</b>(1),</a>
-<a href="man-ppdpo.html?TOPIC=Man+Pages"><b>ppdpo</b>(1),</a>
-<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+<b>ppdc</b>(1),
+<b>ppdhtml</b>(1),
+<b>ppdi</b>(1),
+<b>ppdpo</b>(1),
+<b>ppdcfile</b>(5),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

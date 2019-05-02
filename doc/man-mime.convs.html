@@ -1,11 +1,14 @@
----
-title: mime.convs(5)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>mime.convs(5)</title>
+</head>
+<body>
 <h1 class="title">mime.convs(5)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-mime.convs - mime type conversion file for cups
+mime.convs - mime type conversion file for cups (deprecated)
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The <b>mime.convs</b> file defines the filters that are available for converting files from one format to another.
 The standard filters support text, PDF, PostScript, and many types of image files.
@@ -38,12 +41,19 @@ Define a filter that converts PostScript documents to CUPS Raster format:
     application/vnd.cups-postscript application/vnd.cups-raster 50 pstoraster
 
 </pre>
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+CUPS filters are deprecated and will no longer be supported in a future feature release of CUPS.
+Printers that do not support IPP can be supported using applications such as
+<b>ippeveprinter</b>(1).
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
 <a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
-<a href="man-cupsfilter.html?TOPIC=Man+Pages"><b>cupsfilter</b>(8),</a>
-<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<b>cupsfilter</b>(8),
+<b>mime.types</b>(5),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

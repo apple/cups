@@ -1,8 +1,11 @@
----
-title: lpr(1)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpr(1)</title>
+</head>
+<body>
 <h1 class="title">lpr(1)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
 lpr - print files
@@ -55,7 +58,7 @@ CUPS provides many ways to set the default destination. The <b>LPDEST</b> and <b
 If neither are set, the current default set using the
 <a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1)</a>
 command is used, followed by the default set using the
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+<b>lpadmin</b>(8)
 command.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The following options are recognized by <i>lpr</i>:
@@ -142,13 +145,16 @@ Print a presentation document 2-up to a printer called "foo":
     lpr -P foo -o number-up=2 filename
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
-<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+<b>cancel</b>(1),
+<b>lp</b>(1),
+<b>lpadmin</b>(8),
 <a href="man-lpoptions.html?TOPIC=Man+Pages"><b>lpoptions</b>(1),</a>
-<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
-<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
-<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+<b>lpq</b>(1),
+<b>lprm</b>(1),
+<b>lpstat</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>

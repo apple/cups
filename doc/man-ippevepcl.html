@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ippevepcl/ps(7)</title>
+</head>
+<body>
+<h1 class="title">ippevepcl/ps(7)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ippevepcl/ps - pcl and postscript print commands for ippeveprinter
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ippevepcl</b>
+[
+<i>filename</i>
+]
+<br>
+<b>ippeveps</b>
+[
+<i>filename</i>
+]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ippevepcl</b>
+and
+<b>ippeveps</b>
+are print commands for
+<b>ippeveprinter</b>(1).
+As with all print commands, these commands read either the filename specified on the command-line or from the standard input.
+Output is sent to the standard output.
+Status and progress messages are sent to the standard error.
+<p><b>ippevepcl</b>
+prints to B&amp;W HP PCL laser printers and supports printing of HP PCL (application/vnd.hp-pcl), PWG Raster (image/pwg-raster), and Apple Raster (image/urf) print files.
+<p><b>ippeveps</b>
+print to Adobe PostScript printers and supports printing of PDF (application/pdf), PostScript (application/postscript), JPEG (image/jpeg), PWG Raster (image/pwg-raster), and Apple Raster (image/urf) print files.
+Printer-specific commands are read from a supplied PPD file.
+If no PPD file is specified, generic commands suitable for any Level 2 or Level 3 PostScript printer are used instead to specify duplex printing and media size.
+<h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
+These programs return 1 on error and 0 on success.
+<h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
+These program inherit the environment provided by the
+<b>ippeveprinter</b>
+program.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<b>ippeveprinter</b>(8)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2019 by Apple Inc.
+
+</body>
+</html>

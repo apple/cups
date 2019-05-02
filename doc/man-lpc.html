@@ -1,11 +1,14 @@
----
-title: lpc(8)
-layout: sub
----
-
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpc(8)</title>
+</head>
+<body>
 <h1 class="title">lpc(8)</h1>
 <h2 class="title"><a name="NAME">Name</a></h2>
-lpc - line printer control program
+lpc - line printer control program (deprecated)
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>lpc</b>
 [
@@ -30,19 +33,23 @@ The <b>lpc</b> program accepts a subset of commands accepted by the Berkeley <b>
 <dd style="margin-left: 5.0em">Displays the status of one or more printer or class queues.
 </dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
-Since <b>lpc</b> is geared towards the Berkeley printing system, it is impossible to use <b>lpc</b> to configure printer or class queues provided by CUPS.
+This program is deprecated and will be removed in a future feature release of CUPS.
+<p>Since <b>lpc</b> is geared towards the Berkeley printing system, it is impossible to use <b>lpc</b> to configure printer or class queues provided by CUPS.
 To configure printer or class queues you must use the
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8)</a>
+<b>lpadmin</b>(8)
 command or another CUPS-compatible client with that functionality.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
-<a href="man-cupsaccept.html?TOPIC=Man+Pages"><b>cupsaccept</b>(8),</a>
-<a href="man-cupsenable.html?TOPIC=Man+Pages"><b>cupsenable</b>(8),</a>
-<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
-<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
-<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
-<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
-<a href="man-lpstat.html?TOPIC=Man+Pages"><b>lpstat</b>(1),</a>
+<b>cancel</b>(1),
+<b>cupsaccept</b>(8),
+<b>cupsenable</b>(8),
+<b>lp</b>(1),
+<b>lpadmin</b>(8),
+<b>lpr</b>(1),
+<b>lprm</b>(1),
+<b>lpstat</b>(1),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2018 by Apple Inc.
+Copyright &copy; 2007-2019 by Apple Inc.
+
+</body>
+</html>
