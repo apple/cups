@@ -16,6 +16,7 @@
 #  include <cups/ppd-private.h>
 #endif /* !CUPS_LITE */
 #include <limits.h>
+#include <sys/wait.h>
 
 #ifdef __APPLE__
 #  define PDFTOPS CUPS_SERVERBIN "/filter/cgpdftops"
