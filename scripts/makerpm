@@ -4,10 +4,10 @@
 #
 
 # Make sure we are running in the right directory...
-if test ! -f tools/testrpm; then
+if test ! -f scripts/makerpm; then
         echo "Run this script from the top-level CUPS source directory, e.g.:"
         echo ""
-        echo "    tools/testrpm [rpmbuild options]"
+        echo "    scripts/makerpm [rpmbuild options]"
         echo ""
         exit 1
 fi
@@ -17,7 +17,7 @@ args="$*"
 shift $#
 
 # Get a snapshot of the current source...
-. tools/makesrcdist
+. scripts/makesrcdist
 
 # Build the RPM...
 echo Building rpm...
