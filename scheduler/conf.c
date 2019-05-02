@@ -736,7 +736,7 @@ cupsdReadConfiguration(void)
   Sandboxing               = CUPSD_SANDBOXING_STRICT;
   StrictConformance        = FALSE;
   SyncOnClose              = FALSE;
-  Timeout                  = DEFAULT_TIMEOUT;
+  Timeout                  = 900;
   WebInterface             = CUPS_DEFAULT_WEBIF;
 
   BrowseLocalProtocols     = parse_protocols(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS);
