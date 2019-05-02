@@ -1,4 +1,4 @@
-README - CUPS v2.3b8 - 2019-04-18
+README - CUPS v2.3b8 - 2019-05-02
 =================================
 
 > **Note:** CUPS v2.3b8 is not production code.  Do not use on production
@@ -153,7 +153,7 @@ This will prevent the filters from misinterpreting your print file.
 LEGAL STUFF
 -----------
 
-Copyright © 2007-2018 by Apple Inc.
+Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
 CUPS is provided under the terms of the Apache License, Version 2.0.  A copy of
