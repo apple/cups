@@ -134,8 +134,8 @@ install-data: all
 	for file in $(MAN8); do \
 		$(INSTALL_MAN) $$file $(MANDIR)/man8; \
 	done
-	$(RM) $(MANDIR)/man8/cupsenable.8
-	$(LN) cupsdisable.8 $(MANDIR)/man8/cupsenable.8
+	$(RM) $(MANDIR)/man8/cupsdisable.8
+	$(LN) cupsenable.8 $(MANDIR)/man8/cupsdisable.8
 	$(RM) $(MANDIR)/man8/cupsreject.8
 	$(LN) cupsaccept.8 $(MANDIR)/man8/cupsreject.8
 	for file in cups-deviced.8 cups-driverd.8 cups-exec.8; do \
