@@ -236,6 +236,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/backend/usb
 %dir /usr/lib/cups/cgi-bin
 /usr/lib/cups/cgi-bin/*
+%dir /usr/lib/cups/command
+/usr/lib/cups/command/*
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-deviced
 /usr/lib/cups/daemon/cups-driverd
@@ -243,8 +245,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups/driver
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/*
-%dir /usr/lib/cups/ippeveprinter
-/usr/lib/cups/ippeveprinter/*
 %dir /usr/lib/cups/monitor
 /usr/lib/cups/monitor/*
 %dir /usr/lib/cups/notifier

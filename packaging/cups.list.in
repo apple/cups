@@ -278,6 +278,9 @@ f 0555 root sys $SERVERBIN/cgi-bin/classes.cgi cgi-bin/classes.cgi
 f 0555 root sys $SERVERBIN/cgi-bin/help.cgi cgi-bin/help.cgi
 f 0555 root sys $SERVERBIN/cgi-bin/jobs.cgi cgi-bin/jobs.cgi
 f 0555 root sys $SERVERBIN/cgi-bin/printers.cgi cgi-bin/printers.cgi
+d 0755 root sys $SERVERBIN/command -
+f 0555 root sys $SERVERBIN/command/ippevepcl tools/ippevepcl
+f 0555 root sys $SERVERBIN/command/ippeveps tools/ippeveps
 d 0755 root sys $SERVERBIN/daemon -
 f 0555 root sys $SERVERBIN/daemon/cups-deviced scheduler/cups-deviced
 f 0555 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
@@ -291,9 +294,6 @@ l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
-d 0755 root sys $SERVERBIN/ippeveprinter -
-f 0555 root sys $SERVERBIN/ippeveprinter/ippevepcl tools/ippevepcl
-f 0555 root sys $SERVERBIN/ippeveprinter/ippeveps tools/ippeveps
 d 0755 root sys $SERVERBIN/notifier -
 f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto
 

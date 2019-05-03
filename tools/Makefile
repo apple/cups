@@ -89,10 +89,10 @@ install-exec:
 	for file in $(IPPTOOLS); do \
 		$(INSTALL_BIN) $$file $(BINDIR); \
 	done
-	echo Installing printer commands in $(SERVERBIN)/ippeveprinter...
-	$(INSTALL_DIR) -m 755 $(SERVERBIN)/ippeveprinter
+	echo Installing printer commands in $(SERVERBIN)/command...
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/command
 	for file in $(IPPEVECOMMANDS); do \
-		$(INSTALL_BIN) $$file $(SERVERBIN)/ippeveprinter; \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/command; \
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
@@ -127,9 +127,9 @@ uninstall:
 		$(RM) $(BINDIR)/$$file; \
 	done
 	-$(RMDIR) $(BINDIR)
-	echo Uninstalling print commands from $(SERVERBIN)/ippeveprinter...
+	echo Uninstalling print commands from $(SERVERBIN)/command...
 	for file in $(IPPEVECOMMANDS); do \
-		$(RM) $(SERVERBIN)/ippeveprinter/$$file; \
+		$(RM) $(SERVERBIN)/command/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/ippeveprinter
 

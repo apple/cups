@@ -1,5 +1,12 @@
-CHANGES - 2.3b8 - 2019-05-02
-============================
+CHANGES - 2.3rc1 - 2019-05-03
+=============================
+
+
+Changes in CUPS v2.3rc1
+-----------------------
+
+- The `ippeveprinter` command now looks for print commands in the "command"
+  subdirectory.
 
 
 Changes in CUPS v2.3b8

@@ -1403,7 +1403,7 @@ create_printer(
     }
     else
     {
-      snprintf(path, sizeof(path), "%s/ippeveprinter/%s", cg->cups_serverbin, command);
+      snprintf(path, sizeof(path), "%s/command/%s", cg->cups_serverbin, command);
 
       if (access(command, X_OK))
       {
