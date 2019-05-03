@@ -1779,6 +1779,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "requesting-user-name-allowed",	/* CUPS extension */
     "requesting-user-name-denied",	/* CUPS extension */
     "requesting-user-uri-supported",
+    "smi2699-auth-print-group",		/* PWG ippserver extension */
+    "smi2699-auth-proxy-group",		/* PWG ippserver extension */
+    "smi2699-device-command",		/* PWG ippserver extension */
+    "smi2699-device-format",		/* PWG ippserver extension */
+    "smi2699-device-name",		/* PWG ippserver extension */
+    "smi2699-device-uri",		/* PWG ippserver extension */
     "subordinate-printers-supported",
     "subscription-privacy-attributes",	/* IPP Privacy Attributes */
     "subscription-privacy-scope",	/* IPP Privacy Attributes */
@@ -1874,6 +1880,11 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "power-timeout-policy-col",
     "printer-creation-attributes-supported",
     "resource-settable-attributes-supported",
+    "smi2699-auth-group-supported",	/* PWG ippserver extension */
+    "smi2699-device-command-supported",	/* PWG ippserver extension */
+    "smi2699-device-format-format",	/* PWG ippserver extension */
+    "smi2699-device-uri-schemes-supported",
+					/* PWG ippserver extension */
     "system-contact-col",
     "system-current-time",
     "system-default-printer-id",
