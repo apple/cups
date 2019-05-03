@@ -1,11 +1,6 @@
 *.a
 *.bck
 *.cgi
-*.1.gz
-*.3.gz
-*.5.gz
-*.7.gz
-*.8.gz
 *.o
 autom4te.cache
 config.h
