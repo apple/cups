@@ -366,6 +366,20 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 	  f->linenum ++;
 	  DEBUG_printf(("1_ippFileReadToken: quoted LF, linenum=%d, pos=%ld", f->linenum, (long)cupsFileTell(f->fp)));
 	}
+	else if (ch == 'a')
+	  ch = '\a';
+	else if (ch == 'b')
+	  ch = '\b';
+	else if (ch == 'f')
+	  ch = '\f';
+	else if (ch == 'n')
+	  ch = '\n';
+	else if (ch == 'r')
+	  ch = '\r';
+	else if (ch == 't')
+	  ch = '\t';
+	else if (ch == 'v')
+	  ch = '\v';
       }
 
       if (tokptr < tokend)
