@@ -1260,8 +1260,8 @@ create_printer(
   int			num_formats;	/* Number of supported document formats */
   const char		*formats[100],	/* Supported document formats */
 			*format;	/* Current format */
-  int			num_job_attrs;	/* Number of supported job attributes */
-  const char		*job_attrs[100];/* Job attributes */
+  int			num_sup_attrs;	/* Number of supported attributes */
+  const char		*sup_attrs[100];/* Supported attributes */
   char			xxx_supported[256];
 					/* Name of -supported attribute */
   _cups_globals_t	*cg = _cupsGlobals();
@@ -1319,21 +1319,67 @@ create_printer(
   static const char * const job_creation[] =
   {					/* job-creation-attributes-supported values */
     "copies",
+    "document-access",
+    "document-charset",
+    "document-format",
+    "document-message",
+    "document-metadata",
+    "document-name",
+    "document-natural-language",
     "document-password",
     "finishings",
     "finishings-col",
+    "ipp-attribute-fidelity",
+    "job-account-id",
+    "job-account-type",
+    "job-accouunting-sheets",
+    "job-accounting-user-id",
+    "job-authorization-uri",
+    "job-error-action",
+    "job-error-sheet",
+    "job-hold-until",
+    "job-hold-until-time",
+    "job-mandatory-attributes",
+    "job-message-to-operator",
+    "job-name",
+    "job-pages-per-set",
     "job-password",
     "job-password-encryption",
+    "job-phone-number",
+    "job-priority",
+    "job-recipient-name",
+    "job-resource-ids",
+    "job-sheet-message",
+    "job-sheets",
+    "job-sheets-col",
+    "media",
+    "media-col",
+    "multiple-document-handling",
+    "number-up",
     "orientation-requested",
     "output-bin",
+    "output-device",
     "overrides",
+    "page-delivery",
     "page-ranges",
+    "presentation-direction-number-up",
     "print-color-mode",
     "print-content-optimize",
-    "print-rendering-intent",
     "print-quality",
+    "print-rendering-intent",
+    "print-scaling",
     "printer-resolution",
-    "sides"
+    "proof-print",
+    "separator-sheets",
+    "sides",
+    "x-image-position",
+    "x-image-shift",
+    "x-side1-image-shift",
+    "x-side2-image-shift",
+    "y-image-position",
+    "y-image-shift",
+    "y-side1-image-shift",
+    "y-side2-image-shift"
   };
   static const char * const media_col_supported[] =
   {					/* media-col-supported values */
@@ -1542,19 +1588,23 @@ create_printer(
   * Get the list of attributes that can be used when creating a job...
   */
 
-  num_job_attrs = 0;
-  job_attrs[num_job_attrs ++] = "ipp-attribute-fidelity";
-  job_attrs[num_job_attrs ++] = "job-name";
-  job_attrs[num_job_attrs ++] = "job-priority";
-  job_attrs[num_job_attrs ++] = "media";
-  job_attrs[num_job_attrs ++] = "media-col";
-  job_attrs[num_job_attrs ++] = "multiple-document-handling";
+  num_sup_attrs = 0;
+  sup_attrs[num_sup_attrs ++] = "document-access";
+  sup_attrs[num_sup_attrs ++] = "document-charset";
+  sup_attrs[num_sup_attrs ++] = "document-format";
+  sup_attrs[num_sup_attrs ++] = "document-message";
+  sup_attrs[num_sup_attrs ++] = "document-metadata";
+  sup_attrs[num_sup_attrs ++] = "document-name";
+  sup_attrs[num_sup_attrs ++] = "document-natural-language";
+  sup_attrs[num_sup_attrs ++] = "ipp-attribute-fidelity";
+  sup_attrs[num_sup_attrs ++] = "job-name";
+  sup_attrs[num_sup_attrs ++] = "job-priority";
 
-  for (i = 0; i < (int)(sizeof(job_creation) / sizeof(job_creation[0])) && num_job_attrs < (int)(sizeof(job_attrs) / sizeof(job_attrs[0])); i ++)
+  for (i = 0; i < (int)(sizeof(job_creation) / sizeof(job_creation[0])) && num_sup_attrs < (int)(sizeof(sup_attrs) / sizeof(sup_attrs[0])); i ++)
   {
     snprintf(xxx_supported, sizeof(xxx_supported), "%s-supported", job_creation[i]);
     if (ippFindAttribute(attrs, xxx_supported, IPP_TAG_ZERO))
-      job_attrs[num_job_attrs ++] = job_creation[i];
+      sup_attrs[num_sup_attrs ++] = job_creation[i];
   }
 
  /*
@@ -1598,7 +1648,7 @@ create_printer(
     ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "ipp-versions-supported", (int)(sizeof(versions) / sizeof(versions[0])), NULL, versions);
 
   /* job-creation-attributes-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", num_job_attrs, NULL, job_attrs);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "job-creation-attributes-supported", num_sup_attrs, NULL, sup_attrs);
 
   /* job-ids-supported */
   ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-ids-supported", 1);
