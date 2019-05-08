@@ -79,6 +79,7 @@
   float: left;
   margin-left: 0.5%;
   margin-right: 0;
+  padding-bottom: 40px;
   width: 33%;
 }
 .row .thirds:first-child {
@@ -89,6 +90,7 @@
   float: left;
   margin-left: 0.5%;
   margin-right: 0;
+  padding-bottom: 40px;
   width: 49.75%;
 }
 .row .halves:first-child {

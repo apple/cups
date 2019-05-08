@@ -1,10 +1,12 @@
-CHANGES - 2.3rc1 - 2019-05-03
+CHANGES - 2.3rc1 - 2019-05-08
 =============================
 
 
 Changes in CUPS v2.3rc1
 -----------------------
 
+- The footer in the web interface covered some content on small displays
+  (Issue #5574)
 - The `ippeveprinter` command now looks for print commands in the "command"
   subdirectory.
 
