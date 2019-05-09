@@ -4469,15 +4469,15 @@ load_legacy_attributes(
   /* printer-input-tray */
   if (ppm_color > 0)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], strlen(printer_input_tray_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray_color[0], (int)strlen(printer_input_tray_color[0]));
     for (i = 1; i < (int)(sizeof(printer_input_tray_color) / sizeof(printer_input_tray_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], strlen(printer_input_tray_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_input_tray_color[i], (int)strlen(printer_input_tray_color[i]));
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], strlen(printer_input_tray[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-input-tray", printer_input_tray[0], (int)strlen(printer_input_tray[0]));
     for (i = 1; i < (int)(sizeof(printer_input_tray) / sizeof(printer_input_tray[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], strlen(printer_input_tray[i]));
+      ippSetOctetString(attrs, &attr, i, printer_input_tray[i], (int)strlen(printer_input_tray[i]));
   }
 
   /* printer-make-and-model */
@@ -4493,17 +4493,17 @@ load_legacy_attributes(
   /* printer-supply and printer-supply-description */
   if (ppm_color > 0)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], strlen(printer_supply_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], (int)strlen(printer_supply_color[0]));
     for (i = 1; i < (int)(sizeof(printer_supply_color) / sizeof(printer_supply_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], strlen(printer_supply_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], (int)strlen(printer_supply_color[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description_color) / sizeof(printer_supply_description_color[0])), NULL, printer_supply_description_color);
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], strlen(printer_supply[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], (int)strlen(printer_supply[0]));
     for (i = 1; i < (int)(sizeof(printer_supply) / sizeof(printer_supply[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply[i], strlen(printer_supply[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply[i], (int)strlen(printer_supply[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description) / sizeof(printer_supply_description[0])), NULL, printer_supply_description);
   }
@@ -5155,17 +5155,17 @@ load_ppd_attributes(
   /* printer-supply and printer-supply-description */
   if (ppd->color_device)
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], strlen(printer_supply_color[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply_color[0], (int)strlen(printer_supply_color[0]));
     for (i = 1; i < (int)(sizeof(printer_supply_color) / sizeof(printer_supply_color[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], strlen(printer_supply_color[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply_color[i], (int)strlen(printer_supply_color[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description_color) / sizeof(printer_supply_description_color[0])), NULL, printer_supply_description_color);
   }
   else
   {
-    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], strlen(printer_supply[0]));
+    attr = ippAddOctetString(attrs, IPP_TAG_PRINTER, "printer-supply", printer_supply[0], (int)strlen(printer_supply[0]));
     for (i = 1; i < (int)(sizeof(printer_supply) / sizeof(printer_supply[0])); i ++)
-      ippSetOctetString(attrs, &attr, i, printer_supply[i], strlen(printer_supply[i]));
+      ippSetOctetString(attrs, &attr, i, printer_supply[i], (int)strlen(printer_supply[i]));
 
     ippAddStrings(attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-supply-description", (int)(sizeof(printer_supply_description) / sizeof(printer_supply_description[0])), NULL, printer_supply_description);
   }
