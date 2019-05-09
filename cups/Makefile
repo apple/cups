@@ -420,7 +420,8 @@ libcups2.def: $(LIBOBJS) $(IMAGEOBJS) Makefile
 	echo "VERSION 2.14" >>libcups2.def
 	echo "EXPORTS" >>libcups2.def
 	(nm $(LIBOBJS) $(IMAGEOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}'; \
-	 echo __cups_strcpy; echo __cups_strlcat; echo __cups_strlcpy) | \
+	 echo __cups_strcpy; echo __cups_strlcat; echo __cups_strlcpy; \
+	 echo __cups_snprintf; echo __cups_vsnprintf; echo __cups_gettimeofday) | \
 		grep -v -E \
 		    -e 'cups_debug|Apple|BackChannel|Backend|FileCheck|Filter|GSSService|SetNegotiate|SideChannel|SNMP' \
 		    -e 'Block$$' | \
