@@ -7032,8 +7032,8 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 			*tray_ptr;	/* Pointer into value */
   int			tray_len;	/* Length of printer-input-tray value */
   int			ready_sheets;	/* printer-input-tray sheets value */
-  int			num_options;	/* Number of form options */
-  cups_option_t		*options;	/* Form options */
+  int			num_options = 0;/* Number of form options */
+  cups_option_t		*options = NULL;/* Form options */
   static const int	sheets[] =	/* Number of sheets */
   {
     250,
@@ -7106,8 +7106,6 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
 
   if (printer->web_forms)
     num_options = parse_options(client, &options);
-  else
-    num_options = 0;
 
   if (num_options > 0)
   {
