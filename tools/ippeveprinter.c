@@ -7430,8 +7430,8 @@ show_supplies(
 		num_supply;		/* Number of supplies */
   ipp_attribute_t *supply,		/* printer-supply attribute */
 		*supply_desc;		/* printer-supply-description attribute */
-  int		num_options;		/* Number of form options */
-  cups_option_t	*options;		/* Form options */
+  int		num_options = 0;	/* Number of form options */
+  cups_option_t	*options = NULL;	/* Form options */
   int		supply_len,		/* Length of supply value */
 		level;			/* Supply level */
   const char	*supply_value;		/* Supply value */
@@ -7498,8 +7498,6 @@ show_supplies(
 
   if (printer->web_forms)
     num_options = parse_options(client, &options);
-  else
-    num_options = 0;
 
   if (num_options > 0)
   {
