@@ -7254,7 +7254,7 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       }
       html_printf(client, "</select>");
     }
-    else
+    else if (ready_type)
       html_printf(client, ", %s", ready_type);
 
    /*
@@ -7291,6 +7291,8 @@ show_media(ippeve_client_t  *client)	/* I - Client connection */
       }
       html_printf(client, "</select></td></tr>\n");
     }
+    else if (ready_sheets == 1)
+      html_printf(client, ", 1 sheet</td></tr>\n");
     else if (ready_sheets > 0)
       html_printf(client, ", %d sheets</td></tr>\n", ready_sheets);
     else
