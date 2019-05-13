@@ -1,4 +1,4 @@
-CHANGES - 2.3rc1 - 2019-05-08
+CHANGES - 2.3rc1 - 2019-05-13
 =============================
 
 
@@ -9,6 +9,9 @@ Changes in CUPS v2.3rc1
   (Issue #5574)
 - The `ippeveprinter` command now looks for print commands in the "command"
   subdirectory.
+- The `ipptool` command now supports `$date-current` and `$date-start` variables
+  to insert the current and starting date and time values, as well as ISO-8601
+  relative time values such as "PT30S" for 30 seconds in the future.
 
 
 Changes in CUPS v2.3b8
