@@ -6,7 +6,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ipptoolfile 5 "CUPS" "26 April 2019" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "13 May 2019" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -593,6 +593,12 @@ Inserts a single "$" character.
 .TP 5
 \fB$ENV[\fIname\fB]\fR
 Inserts the value of the named environment variable, or an empty string if the environment variable is not defined.
+.TP 5
+\fB$date-current\fR
+Inserts the current date and time using the ISO-8601 format ("yyyy-mm-ddThh:mm:ssZ").
+.TP 5
+\fB$date-start\fR
+Inserts the starting date and time using the ISO-8601 format ("yyyy-mm-ddThh:mm:ssZ").
 .TP 5
 \fB$filename\fR
 Inserts the filename provided to

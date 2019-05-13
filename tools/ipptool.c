@@ -240,6 +240,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   _ippVarsInit(&vars, NULL, (_ipp_ferror_cb_t)error_cb, (_ipp_ftoken_cb_t)token_cb);
 
+  _ippVarsSet(&vars, "date-start", iso_date(ippTimeToDate(time(NULL))));
+
  /*
   * We need at least:
   *
@@ -3992,6 +3994,8 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
       data->transfer      = data->def_transfer;
       data->version       = data->def_version;
 
+      _ippVarsSet(vars, "date-current", iso_date(ippTimeToDate(time(NULL))));
+
       f->attrs     = ippNew();
       f->group_tag = IPP_TAG_ZERO;
     }
@@ -4003,6 +4007,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, name, sizeof(name)) && _ippFileReadToken(f, temp, sizeof(temp)))
       {
+        _ippVarsSet(vars, "date-current", iso_date(ippTimeToDate(time(NULL))));
         _ippVarsExpand(vars, value, temp, sizeof(value));
 	_ippVarsSet(vars, name, value);
       }
@@ -4022,6 +4027,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
       {
         if (!_ippVarsGet(vars, name))
         {
+          _ippVarsSet(vars, "date-current", iso_date(ippTimeToDate(time(NULL))));
 	  _ippVarsExpand(vars, value, temp, sizeof(value));
 	  _ippVarsSet(vars, name, value);
 	}
@@ -4040,6 +4046,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
+        _ippVarsSet(vars, "date-current", iso_date(ippTimeToDate(time(NULL))));
         _ippVarsExpand(vars, data->file_id, temp, sizeof(data->file_id));
       }
       else

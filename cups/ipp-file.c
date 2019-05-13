@@ -592,8 +592,80 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 		utc_offset = 0;		/* Timezone offset from UTC */
           ipp_uchar_t date[11];		/* dateTime value */
 
-          if (sscanf(value, "%d-%d-%dT%d:%d:%d%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          if (*value == 'P')
           {
+           /*
+            * Time period...
+            */
+
+            time_t	curtime;	/* Current time in seconds */
+            int		period = 0,	/* Current period value */
+			saw_T = 0;	/* Saw time separator */
+
+            curtime = time(NULL);
+
+            for (valueptr = value + 1; *valueptr; valueptr ++)
+            {
+              if (isdigit(*valueptr & 255))
+              {
+                period = strtol(valueptr, &valueptr, 10);
+
+                if (!valueptr || period < 0)
+                {
+		  report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+		  return (0);
+		}
+              }
+
+              if (*valueptr == 'Y')
+              {
+                curtime += 365 * 86400 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'M')
+              {
+                if (saw_T)
+                  curtime += 60 * period;
+                else
+                  curtime += 30 * 86400 * period;
+
+                period = 0;
+              }
+              else if (*valueptr == 'D')
+              {
+                curtime += 86400 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'H')
+              {
+                curtime += 3600 * period;
+                period  = 0;
+              }
+              else if (*valueptr == 'S')
+              {
+                curtime += period;
+                period = 0;
+              }
+              else if (*valueptr == 'T')
+              {
+                saw_T  = 1;
+                period = 0;
+              }
+              else
+	      {
+		report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
+		return (0);
+	      }
+	    }
+
+	    return (ippSetDate(ipp, attr, element, ippTimeToDate(curtime)));
+          }
+          else if (sscanf(value, "%d-%d-%dT%d:%d:%d%d", &year, &month, &day, &hour, &minute, &second, &utc_offset) < 6)
+          {
+           /*
+            * Date/time value did not parse...
+            */
+
 	    report_error(f, v, user_data, "Bad dateTime value \"%s\" on line %d of \"%s\".", value, f->linenum, f->filename);
 	    return (0);
           }
