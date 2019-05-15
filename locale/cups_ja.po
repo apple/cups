@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-24 18:36-0400\n"
+"POT-Creation-Date: 2019-05-15 10:30-0400\n"
 "PO-Revision-Date: 2014-11-15 19:27+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: Japanese - OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -5595,8 +5595,9 @@ msgstr "cups-deviced の実行に失敗しました。"
 msgid "cups-driverd failed to execute."
 msgstr "cups-driverd の実行に失敗しました。"
 
-msgid "cupsctl: Cannot set Listen or Port directly."
-msgstr "cupsctl: Listen あるいは Port を直接設定できません。"
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
+msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -15626,6 +15627,9 @@ msgstr ""
 
 #~ msgid "Export Printers to Samba"
 #~ msgstr "Samba へプリンターをエクスポート"
+
+#~ msgid "cupsctl: Cannot set Listen or Port directly."
+#~ msgstr "cupsctl: Listen あるいは Port を直接設定できません。"
 
 #~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
 #~ msgstr "lpadmin: PPD ファイル \"%s\" を開けません - %s"

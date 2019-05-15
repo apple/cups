@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-24 18:36-0400\n"
+"POT-Creation-Date: 2019-05-15 10:30-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Italian - Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -5615,8 +5615,9 @@ msgstr "cups-deviced ha smesso di funzionare."
 msgid "cups-driverd failed to execute."
 msgstr "cups-driverd ha smesso di funzionare."
 
-msgid "cupsctl: Cannot set Listen or Port directly."
-msgstr "cupsctl: non è possibile impostare direttamente Listen o Port."
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
+msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -15608,6 +15609,9 @@ msgstr ""
 
 #~ msgid "Export Printers to Samba"
 #~ msgstr "Esporta le stampanti per Samba"
+
+#~ msgid "cupsctl: Cannot set Listen or Port directly."
+#~ msgstr "cupsctl: non è possibile impostare direttamente Listen o Port."
 
 #~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
 #~ msgstr "lpadmin: non è possibile aprile il file PPD \"%s\" - %s"

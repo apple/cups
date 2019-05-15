@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-24 18:36-0400\n"
+"POT-Creation-Date: 2019-05-15 10:30-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -5412,7 +5412,8 @@ msgstr "Nepodařilo se spustit \"cups-deviced\"."
 msgid "cups-driverd failed to execute."
 msgstr "Nepodařilo se spustit \"cups-driverd\"."
 
-msgid "cupsctl: Cannot set Listen or Port directly."
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
 msgstr ""
 
 #, c-format

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-04-24 18:36-0400\n"
+"POT-Creation-Date: 2019-05-15 10:30-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -5613,8 +5613,9 @@ msgstr "no s'ha pogut executar correctament la cups-deviced."
 msgid "cups-driverd failed to execute."
 msgstr "no s'ha pogut executar correctament la cups-driverd"
 
-msgid "cupsctl: Cannot set Listen or Port directly."
-msgstr "cupsctl: no es pot establir Listen o Port directament."
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
+msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -15618,6 +15619,9 @@ msgstr ""
 
 #~ msgid "Export Printers to Samba"
 #~ msgstr "Exportar les impressores al Samba"
+
+#~ msgid "cupsctl: Cannot set Listen or Port directly."
+#~ msgstr "cupsctl: no es pot establir Listen o Port directament."
 
 #~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
 #~ msgstr "lpadmin: no s'ha pogut obrir el fitxer PPD «%s» - %s"
