@@ -1,7 +1,7 @@
 /*
  * Client routines for the CUPS scheduler.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -1975,11 +1975,20 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     redirect[0] = '\0';
 
     if (code == HTTP_STATUS_UNAUTHORIZED)
+    {
       text = _cupsLangString(con->language,
                              _("Enter your username and password or the "
 			       "root username and password to access this "
 			       "page. If you are using Kerberos authentication, "
 			       "make sure you have a valid Kerberos ticket."));
+    }
+    else if (code == HTTP_STATUS_FORBIDDEN)
+    {
+      if (con->username[0])
+        text = _cupsLangString(con->language, _("Your account does not have the necessary privileges."));
+      else
+        text = _cupsLangString(con->language, _("You cannot access this page."));
+    }
     else if (code == HTTP_STATUS_UPGRADE_REQUIRED)
     {
       text = urltext;
