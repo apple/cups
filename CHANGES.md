@@ -5,6 +5,8 @@ CHANGES - 2.3rc1 - 2019-05-15
 Changes in CUPS v2.3rc1
 -----------------------
 
+- The supplied example print documents have been optimized for size
+  (Issue #5529)
 - The `cupsctl` command now prevents setting "cups-files.conf" directives
   (Issue #5530)
 - The "forbidden" message in the web interface is now explained (Issue #5547)
