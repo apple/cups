@@ -1722,7 +1722,7 @@
 "cups-deviced failed to execute." = "cups-deviced failed to execute.";
 "cups-driverd failed to execute." = "cups-driverd failed to execute.";
 "cupsaddsmb: No PPD file for printer \"%s\" - %s" = "cupsaddsmb: No PPD file for printer “%s” - %s";
-"cupsctl: Cannot set Listen or Port directly." = "cupsctl: Cannot set Listen or Port directly.";
+"cupsctl: Cannot set %s directly." = "cupsctl: Cannot set %s directly.";
 "cupsctl: Unable to connect to server: %s" = "cupsctl: Unable to connect to server: %s";
 "cupsctl: Unknown option \"%s\"" = "cupsctl: Unknown option “%s”";
 "cupsctl: Unknown option \"-%c\"" = "cupsctl: Unknown option “-%c”";

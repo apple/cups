@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-09-28 11:22-0400\n"
+"POT-Creation-Date: 2019-05-15 10:31-0400\n"
 "PO-Revision-Date: 2017-06-11 12:38+0800\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.xyz>\n"
 "Language-Team: \n"
@@ -6165,8 +6165,9 @@ msgstr "无法执行 cups-driverd。"
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
 msgstr "cupsaddsmb：打印机“%s”无 PPD 文件 — %s"
 
-msgid "cupsctl: Cannot set Listen or Port directly."
-msgstr "cupsctl：无法直接设置 Listen 或 Port 值。"
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
+msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -13504,6 +13505,9 @@ msgstr "Z Offset"
 
 #~ msgid "compression.none"
 #~ msgstr "None"
+
+#~ msgid "cupsctl: Cannot set Listen or Port directly."
+#~ msgstr "cupsctl：无法直接设置 Listen 或 Port 值。"
 
 #~ msgid "destination-accesses"
 #~ msgstr "Destination Accesses"

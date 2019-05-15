@@ -1,10 +1,12 @@
-CHANGES - 2.2.12 - 2019-05-08
+CHANGES - 2.2.12 - 2019-05-15
 =============================
 
 
 Changes in CUPS v2.2.12
 -----------------------
 
+- The `cupsctl` command now prevents setting "cups-files.conf" directives
+  (Issue #5530)
 - Updated the systemd service file for cupsd (Issue #5551)
 - The `cupsCheckDestSupported` function did not check octetString values
   correctly (Issue #5557)

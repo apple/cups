@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2018-09-28 11:22-0400\n"
+"POT-Creation-Date: 2019-05-15 10:31-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -6271,8 +6271,9 @@ msgstr "no s'ha pogut executar correctament la cups-driverd"
 msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
 msgstr "cupsaddsmb: falta el fitxer PPD per la impressora «%s» - %s"
 
-msgid "cupsctl: Cannot set Listen or Port directly."
-msgstr "cupsctl: no es pot establir Listen o Port directament."
+#, c-format
+msgid "cupsctl: Cannot set %s directly."
+msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -13775,6 +13776,9 @@ msgstr "Z Offset"
 #~ msgstr ""
 #~ "convert: feu servir l'opció -f per especificar el fitxer que voleu "
 #~ "convertir."
+
+#~ msgid "cupsctl: Cannot set Listen or Port directly."
+#~ msgstr "cupsctl: no es pot establir Listen o Port directament."
 
 #~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
 #~ msgstr ""
