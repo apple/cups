@@ -83,7 +83,7 @@ else
 fi
 
 fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
-file="cups-$fileversion-source.tar.gz"
+file="$HOME/cups-$fileversion-source.tar"
 
 echo Exporting $fileversion...
 rm -rf $TMPDIR/cups-$version
@@ -100,15 +100,23 @@ rm -rf .gitignore
 cd ..
 
 echo Archiving...
-tar czf $file cups-$version
+tar cf $file cups-$version
+
+echo Compressing...
+if (which zopfli >/dev/null); then
+	zopfli $file
+	rm -f $file
+else
+	gzip -v9 $file
+fi
 
 if test $SIGNFILES = yes; then
 	echo Signing...
-	test -f $file.sig && rm -f $file.sig
-	gpg --detach-sign -u security@cups.org $file
+	test -f $file.gz.sig && rm -f $file.gz.sig
+	gpg --detach-sign -u security@cups.org $file.gz
 fi
 
 echo Removing temporary files...
 rm -rf cups-$version
 
-echo "Done - files in $TMPDIR."
+echo "Done - files in $HOME."
