@@ -297,7 +297,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       DEBUG_printf(("1_ippFileReadToken: Returning \"%s\" before whitespace.", token));
       return (1);
     }
-    else if (!quote && (ch == '\'' || ch == '\"' || ch == '<'))
+    else if (!quote && (ch == '\'' || ch == '\"'))
     {
      /*
       * Start of quoted text or regular expression...
@@ -385,26 +385,23 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
 	  ch = '\v';
       }
 
-      if (quote != '>' || !isspace(ch & 255))
+      if (tokptr < tokend)
       {
-	if (tokptr < tokend)
-	{
-	 /*
-	  * Add to current token...
-	  */
+       /*
+	* Add to current token...
+	*/
 
-	  *tokptr++ = (char)ch;
-	}
-	else
-	{
-	 /*
-	  * Token too long...
-	  */
+	*tokptr++ = (char)ch;
+      }
+      else
+      {
+       /*
+	* Token too long...
+	*/
 
-	  *tokptr = '\0';
-	  DEBUG_printf(("1_ippFileReadToken: Too long: \"%s\".", token));
-	  return (0);
-	}
+	*tokptr = '\0';
+	DEBUG_printf(("1_ippFileReadToken: Too long: \"%s\".", token));
+	return (0);
       }
     }
 
