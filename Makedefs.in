@@ -168,14 +168,13 @@ DBUS_NOTIFIER	=	@DBUS_NOTIFIER@
 DBUS_NOTIFIERLIBS =	@DBUS_NOTIFIERLIBS@
 DNSSD_BACKEND	=	@DNSSD_BACKEND@
 DSOFLAGS	=	@DSOFLAGS@
-DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 DNSSDLIBS	=	@DNSSDLIBS@
 IPPFIND_BIN	=	@IPPFIND_BIN@
 IPPFIND_MAN	=	@IPPFIND_MAN@
 LDFLAGS		=	@LDFLAGS@
-LINKCUPS	=	@LINKCUPS@ $(LIBGSSAPI) $(DNSSDLIBS) $(SSLLIBS) $(LIBZ)
-LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
-LIBS		=	$(LINKCUPS) $(COMMONLIBS)
+LINKCUPS	=	@LINKCUPS@
+LINKCUPSSTATIC	=	../cups/$(LIBCUPSSTATIC) $(LIBS)
+LIBS		=	$(LIBGSSAPI) $(DNSSDLIBS) $(SSLLIBS) $(LIBZ) $(COMMONLIBS)
 ONDEMANDFLAGS	=	@ONDEMANDFLAGS@
 ONDEMANDLIBS	=	@ONDEMANDLIBS@
 OPTIM		=	@OPTIM@
@@ -265,7 +264,7 @@ USBQUIRKS	=	@USBQUIRKS@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .3 .3.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .gz
+.SUFFIXES:	.a .c .cxx .h .o
 
 .c.o:
 	echo Compiling $<...
@@ -274,13 +273,3 @@ USBQUIRKS	=	@USBQUIRKS@
 .cxx.o:
 	echo Compiling $<...
 	$(CXX) $(ARCHFLAGS) $(OPTIM) $(ALL_CXXFLAGS) -c -o $@ $<
-
-.man.1 .man.1m .man.3 .man.5 .man.7 .man.8:
-	echo Linking $<...
-	$(RM) $@
-	$(LN) $< $@
-
-.man.1.gz .man.1m.gz .man.3.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
-	echo -n Compressing $<...
-	$(RM) $@
-	gzip -v9 <$< >$@

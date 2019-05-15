@@ -365,8 +365,7 @@ uninstall:
 
 libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(LIBOBJS) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -381,8 +380,7 @@ libcups.2.dylib:	$(LIBOBJS)
 		-install_name $(libdir)/$@ \
 		-current_version 2.14.0 \
 		-compatibility_version 2.0.0 \
-		$(LIBOBJS) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBOBJS) $(LIBS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
@@ -395,8 +393,7 @@ libcups.2.dylib:	$(LIBOBJS)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:14 $(LIBGSSAPI) $(SSLLIBS) \
-		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+		-rpath $(LIBDIR) -version-info 2:14 $(LIBS)
 
 
 #
@@ -434,7 +431,7 @@ libcups2.def: $(LIBOBJS) $(IMAGEOBJS) Makefile
 
 libcupsimage.so.2:	$(IMAGEOBJS) libcups.so.2
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS)
+	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(IMAGEOBJS) $(LINKCUPS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -449,7 +446,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) libcups.2.dylib
 		-install_name $(libdir)/$@ \
 		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
-		$(IMAGEOBJS) $(DSOLIBS) $(LINKCUPS)
+		$(IMAGEOBJS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
@@ -461,7 +458,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) libcups.2.dylib
 
 libcupsimage.la:       $(IMAGEOBJS) libcups.la
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) $(DSOLIBS) \
+	$(DSO) $(ARCHFLAGS) $(ALL_DSOFLAGS) -o $@ $(IMAGEOBJS:.o=.lo) \
 		$(LINKCUPS) -rpath $(LIBDIR) -version-info 2:3
 
 
@@ -482,8 +479,7 @@ libcupsimage.a:	$(IMAGEOBJS)
 
 rasterbench:	rasterbench.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ rasterbench.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ rasterbench.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -493,8 +489,7 @@ rasterbench:	rasterbench.o $(LIBCUPSSTATIC)
 
 testadmin:	testadmin.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testadmin.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testadmin.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -504,8 +499,7 @@ testadmin:	testadmin.o $(LIBCUPSSTATIC)
 
 testarray:	testarray.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testarray.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testarray.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running array API tests...
 	./testarray
@@ -517,8 +511,7 @@ testarray:	testarray.o $(LIBCUPSSTATIC)
 
 testcache:	testcache.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testcache.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testcache.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -528,8 +521,7 @@ testcache:	testcache.o $(LIBCUPSSTATIC)
 
 testclient:	testclient.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testclient.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testclient.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -539,8 +531,7 @@ testclient:	testclient.o $(LIBCUPSSTATIC)
 
 testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testconflicts.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testconflicts.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -550,8 +541,7 @@ testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 
 testcreds:	testcreds.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testcreds.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testcreds.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -561,8 +551,7 @@ testcreds:	testcreds.o $(LIBCUPSSTATIC)
 
 testcups:	testcups.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testcups.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testcups.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -572,8 +561,7 @@ testcups:	testcups.o $(LIBCUPSSTATIC)
 
 testdest:	testdest.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testdest.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testdest.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -583,8 +571,7 @@ testdest:	testdest.o $(LIBCUPSSTATIC)
 
 testfile:	testfile.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testfile.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testfile.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running file API tests...
 	./testfile
@@ -596,8 +583,7 @@ testfile:	testfile.o $(LIBCUPSSTATIC)
 
 testgetdests:	testgetdests.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testgetdests.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testgetdests.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -607,8 +593,7 @@ testgetdests:	testgetdests.o $(LIBCUPSSTATIC)
 
 testhttp:	testhttp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testhttp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testhttp.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running HTTP API tests...
 	./testhttp
@@ -620,8 +605,7 @@ testhttp:	testhttp.o $(LIBCUPSSTATIC)
 
 testipp:	testipp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testipp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testipp.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running IPP API tests...
 	./testipp
@@ -633,8 +617,7 @@ testipp:	testipp.o $(LIBCUPSSTATIC)
 
 testi18n:	testi18n.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testi18n.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testi18n.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running internationalization API tests...
 	./testi18n
@@ -646,8 +629,7 @@ testi18n:	testi18n.o $(LIBCUPSSTATIC)
 
 testlang:	testlang.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testlang.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testlang.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Creating locale directory structure...
 	$(RM) -r locale
@@ -666,8 +648,7 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 
 testoptions:	testoptions.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testoptions.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testoptions.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running option API tests...
 	./testoptions
@@ -679,8 +660,7 @@ testoptions:	testoptions.o $(LIBCUPSSTATIC)
 
 testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testppd.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testppd.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running PPD API tests...
 	./testppd
@@ -692,8 +672,7 @@ testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 
 testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testpwg.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testpwg.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running PWG API tests...
 	./testpwg test.ppd
@@ -705,9 +684,7 @@ testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 
 testraster:	testraster.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testraster.o \
-		$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
-		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testraster.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Running raster API tests...
 	./testraster
@@ -719,8 +696,7 @@ testraster:	testraster.o $(LIBCUPSSTATIC)
 
 testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testsnmp.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testsnmp.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -730,8 +706,7 @@ testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 
 tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ tlscheck.o $(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ tlscheck.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

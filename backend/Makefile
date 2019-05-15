@@ -201,8 +201,7 @@ uninstall:
 
 test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o test1284 test1284.o ../cups/$(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o test1284 test1284.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -212,8 +211,7 @@ test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 
 testbackend:	testbackend.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o testbackend testbackend.o ../cups/$(LIBCUPSSTATIC) \
-		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	$(LD_CC) $(ALL_LDFLAGS) -o testbackend testbackend.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -224,8 +222,7 @@ testbackend:	testbackend.o ../cups/$(LIBCUPSSTATIC)
 testsupplies:	testsupplies.o libbackend.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ALL_LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
-		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -246,7 +243,7 @@ libbackend.a:	$(LIBOBJS)
 
 dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o dnssd dnssd.o libbackend.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o dnssd dnssd.o libbackend.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	if test `uname` = Darwin; then \
 		$(RM) mdns; \
@@ -260,7 +257,7 @@ dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
 
 ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o ipp ipp.o libbackend.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o ipp ipp.o libbackend.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	$(RM) http https ipps
 	for file in $(IPPALIASES); do \
@@ -274,7 +271,7 @@ ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 
 lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o lpd lpd.o libbackend.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpd lpd.o libbackend.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -284,7 +281,7 @@ lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 
 snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o snmp snmp.o libbackend.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o snmp snmp.o libbackend.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -294,14 +291,13 @@ snmp:	snmp.o ../cups/$(LIBCUPS) libbackend.a
 
 socket:	socket.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o socket socket.o libbackend.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o socket socket.o libbackend.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(ALL_LDFLAGS) -o socket-static socket.o libbackend.a \
-		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -312,7 +308,7 @@ socket-static:	socket.o  ../cups/$(LIBCUPSSTATIC) libbackend.a
 usb:	usb.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o usb usb.o libbackend.a $(LIBUSB) \
-		$(BACKLIBS) $(LIBS)
+		$(BACKLIBS) $(COMMONLIBS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 usb.o:	usb.c usb-darwin.c usb-libusb.c usb-unix.c
 

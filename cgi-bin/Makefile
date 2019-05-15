@@ -158,7 +158,7 @@ libcupscgi.a:	$(LIBOBJS)
 
 admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ admin.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ admin.o libcupscgi.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -168,7 +168,7 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ classes.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ classes.o libcupscgi.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -178,7 +178,7 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ help.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ help.o libcupscgi.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -188,7 +188,7 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ jobs.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ jobs.o libcupscgi.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -198,7 +198,7 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 
 printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ printers.o libcupscgi.a $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ printers.o libcupscgi.a $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -209,8 +209,7 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) libcupscgi.a
 testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testcgi.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LIBZ) $(LIBGSSAPI)
+		$(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Testing CGI API...
 	./testcgi
@@ -223,8 +222,7 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ARCHFLAGS) $(ALL_LDFLAGS) -o $@ testhi.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LIBZ) $(LIBGSSAPI)
+		$(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	echo Testing help index API...
 	./testhi
@@ -236,8 +234,7 @@ testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 
 testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
-		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testtemplate.o libcupscgi.a $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

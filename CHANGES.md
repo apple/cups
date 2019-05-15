@@ -5,6 +5,8 @@ CHANGES - 2.3rc1 - 2019-05-15
 Changes in CUPS v2.3rc1
 -----------------------
 
+- The `cups-config` script no longer puts non-CUPS libraries when they are not
+  needed (Issue #5261)
 - The supplied example print documents have been optimized for size
   (Issue #5529)
 - The `cupsctl` command now prevents setting "cups-files.conf" directives
@@ -12,6 +14,8 @@ Changes in CUPS v2.3rc1
 - The "forbidden" message in the web interface is now explained (Issue #5547)
 - The footer in the web interface covered some content on small displays
   (Issue #5574)
+- The `cups-config` script no longer adds extra libraries when linking against
+  shared libraries (Issue #5261)
 - The `ippeveprinter` command now looks for print commands in the "command"
   subdirectory.
 - The `ipptool` command now supports `$date-current` and `$date-start` variables

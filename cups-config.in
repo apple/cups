@@ -26,10 +26,10 @@ cups_serverbin=@CUPS_SERVERBIN@
 cups_serverroot=@CUPS_SERVERROOT@
 INSTALLSTATIC=@INSTALLSTATIC@
 
-# flags for C++ compiler:
+# flags for compiler and linker...
 CFLAGS=""
 LDFLAGS="@EXPORT_LDFLAGS@"
-LIBS="@LIBGSSAPI@ @EXPORT_SSLLIBS@ @LIBZ@ @LIBS@"
+LIBS="@LIBGSSAPI@ @DNSSDLIBS@ @EXPORT_SSLLIBS@ @LIBZ@ @LIBS@"
 
 # Check for local invocation...
 selfdir=`dirname $0`
@@ -71,7 +71,6 @@ fi
 
 # Parse command line options
 static=no
-image=no
 
 while test $# -gt 0; do
     case $1 in
@@ -98,7 +97,7 @@ while test $# -gt 0; do
 	    ;;
 	--libs)
 	    if test $static = no; then
-	        libs="@EXTLINKCUPS@ $LIBS";
+	        libs="@EXTLINKCUPS@";
 	    else
 	        libs="$libdir/libcups.a $LIBS";
 	    fi
@@ -112,7 +111,7 @@ while test $# -gt 0; do
 	    ;;
 	--static)
 	    if test -z "$INSTALLSTATIC"; then
-	        echo "WARNING: Static libraries not installed!" >&2
+	        echo "WARNING: Static libraries not installed." >&2
 	    else
 	        static=yes
 	    fi

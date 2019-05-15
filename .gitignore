@@ -127,7 +127,6 @@ scheduler/testlpd
 scheduler/testmime
 scheduler/testspeed
 scheduler/testsub
-systemv/accept
 systemv/cancel
 systemv/cupsaccept
 systemv/cupsaddsmb
@@ -143,7 +142,6 @@ systemv/lpinfo
 systemv/lpmove
 systemv/lpoptions
 systemv/lpstat
-systemv/reject
 templates/header.tmpl
 templates/*/header.tmpl
 test/cups-str-*.html

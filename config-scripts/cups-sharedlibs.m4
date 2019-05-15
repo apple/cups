@@ -78,45 +78,20 @@ AC_SUBST(LIBCUPSIMAGE)
 AC_SUBST(LIBCUPSSTATIC)
 
 if test x$enable_shared = xno; then
-	LINKCUPS="../cups/lib$cupsbase.a"
-	EXTLINKCUPS="-lcups"
-
-	if test "x$cupsimagebase" != x; then
-		LINKCUPSIMAGE="../cups/lib$cupsimagebase.a"
-		EXTLINKCUPSIMAGE="-l$cupsimagebase"
-	else
-		LINKCUPSIMAGE=""
-		EXTLINKCUPSIMAGE=""
-	fi
+	LINKCUPS="../cups/lib$cupsbase.a \$(LIBS)"
+	EXTLINKCUPS="-lcups \$LIBS"
 else
-	LINKCUPS="-l${cupsbase}"
+	LINKCUPS="-L../cups -l${cupsbase}"
 	EXTLINKCUPS="-lcups"
-
-	if test "x$cupsimagebase" != x; then
-		LINKCUPSIMAGE="-l$cupsimagebase"
-		EXTLINKCUPSIMAGE="-l$cupsimagebase"
-	else
-		LINKCUPSIMAGE=""
-		EXTLINKCUPSIMAGE=""
-	fi
 fi
 
 AC_SUBST(EXTLINKCUPS)
-AC_SUBST(EXTLINKCUPSIMAGE)
 AC_SUBST(LINKCUPS)
-AC_SUBST(LINKCUPSIMAGE)
 
 dnl Update libraries for DSOs...
 EXPORT_LDFLAGS=""
 
 if test "$DSO" != ":"; then
-	# When using DSOs the image libraries are linked to libcupsimage.so
-	# rather than to the executables.  This makes things smaller if you
-	# are using any static libraries, and it also allows us to distribute
-	# a single DSO rather than a bunch...
-	DSOLIBS="\$(LIBZ)"
-	IMGLIBS=""
-
 	# Tell the run-time linkers where to find a DSO.  Some platforms
 	# need this option, even when the library is installed in a
 	# standard location...
@@ -146,11 +121,6 @@ if test "$DSO" != ":"; then
 			fi
 			;;
 	esac
-else
-	DSOLIBS=""
-	IMGLIBS="\$(LIBZ)"
 fi
 
-AC_SUBST(DSOLIBS)
-AC_SUBST(IMGLIBS)
 AC_SUBST(EXPORT_LDFLAGS)

@@ -120,7 +120,7 @@ uninstall:
 
 lpc:	lpc.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o lpc lpc.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpc lpc.o $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -130,7 +130,7 @@ lpc:	lpc.o ../cups/$(LIBCUPS)
 
 lpq:	lpq.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o lpq lpq.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpq lpq.o $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -140,7 +140,7 @@ lpq:	lpq.o ../cups/$(LIBCUPS)
 
 lpr:	lpr.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o lpr lpr.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lpr lpr.o $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -150,7 +150,7 @@ lpr:	lpr.o ../cups/$(LIBCUPS)
 
 lprm:	lprm.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o lprm lprm.o $(LIBS)
+	$(LD_CC) $(ALL_LDFLAGS) -o lprm lprm.o $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
