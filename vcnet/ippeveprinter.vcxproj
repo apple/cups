@@ -99,7 +99,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\ippeveprinter.c" />
+    <ClCompile Include="..\tools\ippeveprinter.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="dnssdstub.vcxproj">
