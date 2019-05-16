@@ -19,6 +19,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/debug-private.h>
 #if !CUPS_LITE
 #  include <cups/ppd-private.h>
 #endif /* !CUPS_LITE */
@@ -6013,15 +6014,21 @@ process_job(ippeve_job_t *job)		/* I - Job */
       goto error;
     }
 
-    if (asprintf(myenvp + myenvc, "CONTENT_TYPE=%s", job->format) > 0)
-      myenvc ++;
+    snprintf(val, sizeof(val), "CONTENT_TYPE=%s", job->format);
+    myenvp[myenvc ++] = strdup(val);
 
-    if (job->printer->device_uri && asprintf(myenvp + myenvc, "DEVICE_URI=%s", job->printer->device_uri) > 0)
-      myenvc ++;
+    if (job->printer->device_uri)
+    {
+      snprintf(val, sizeof(val), "DEVICE_URI=%s", job->printer->device_uri);
+      myenvp[myenvc ++] = strdup(val);
+    }
 
 #if !CUPS_LITE
-    if (job->printer->ppdfile && asprintf(myenvp + myenvc, "PPD=%s", job->printer->ppdfile) > 0)
-      myenvc ++;
+    if (job->printer->ppdfile)
+    {
+      snprintf(val, sizeof(val), "PPD=%s", job->printer->ppdfile);
+      myenvp[myenvc++] = strdup(val);
+    }
 #endif /* !CUPS_LITE */
 
     for (attr = ippFirstAttribute(job->printer->attrs); attr && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); attr = ippNextAttribute(job->printer->attrs))
