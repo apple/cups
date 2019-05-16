@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test\ippserver.c">
+    <ClCompile Include="..\test\ippeveprinter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
