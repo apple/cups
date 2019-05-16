@@ -605,7 +605,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
             {
               if (isdigit(*valueptr & 255))
               {
-                period = strtol(valueptr, &valueptr, 10);
+                period = (int)strtol(valueptr, &valueptr, 10);
 
                 if (!valueptr || period < 0)
                 {
