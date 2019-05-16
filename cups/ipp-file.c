@@ -462,14 +462,14 @@ parse_collection(
 
       if (!_ippFileReadToken(f, syntax, sizeof(syntax)))
       {
-        report_error(f, v, user_data, "Missing ATTR syntax on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Missing MEMBER syntax on line %d of \"%s\".", f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
       }
       else if ((value_tag = ippTagValue(syntax)) < IPP_TAG_UNSUPPORTED_VALUE)
       {
-        report_error(f, v, user_data, "Bad ATTR syntax \"%s\" on line %d of \"%s\".", syntax, f->linenum, f->filename);
+        report_error(f, v, user_data, "Bad MEMBER syntax \"%s\" on line %d of \"%s\".", syntax, f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
@@ -477,7 +477,7 @@ parse_collection(
 
       if (!_ippFileReadToken(f, name, sizeof(name)) || !name[0])
       {
-        report_error(f, v, user_data, "Missing ATTR name on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Missing MEMBER name on line %d of \"%s\".", f->linenum, f->filename);
 	ippDelete(col);
 	col = NULL;
 	break;
@@ -742,7 +742,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
         {
           if (valuelen & 1)
           {
-	    report_error(f, v, user_data, "Bad ATTR octetString value on line %d of \"%s\".", f->linenum, f->filename);
+	    report_error(f, v, user_data, "Bad octetString value on line %d of \"%s\".", f->linenum, f->filename);
 	    return (0);
           }
 
@@ -753,7 +753,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
           {
 	    if (!isxdigit(valueptr[0] & 255) || !isxdigit(valueptr[1] & 255))
 	    {
-	      report_error(f, v, user_data, "Bad ATTR octetString value on line %d of \"%s\".", f->linenum, f->filename);
+	      report_error(f, v, user_data, "Bad octetString value on line %d of \"%s\".", f->linenum, f->filename);
 	      return (0);
 	    }
 
@@ -796,7 +796,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
           if (strcmp(value, "{"))
           {
-	    report_error(f, v, user_data, "Bad ATTR collection value on line %d of \"%s\".", f->linenum, f->filename);
+	    report_error(f, v, user_data, "Bad collection value on line %d of \"%s\".", f->linenum, f->filename);
 	    return (0);
           }
 
@@ -811,7 +811,7 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 	break;
 
     default :
-        report_error(f, v, user_data, "Unsupported ATTR value on line %d of \"%s\".", f->linenum, f->filename);
+        report_error(f, v, user_data, "Unsupported value on line %d of \"%s\".", f->linenum, f->filename);
         return (0);
   }
 
