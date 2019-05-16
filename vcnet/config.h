@@ -407,20 +407,6 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Do we have the SecKeychainOpen function?
- */
-
-/* #undef HAVE_SECKEYCHAINOPEN */
-
-
-/*
- * Do we have (a working) SSLSetEnabledCiphers function?
- */
-
-#define HAVE_SSLSETENABLEDCIPHERS 1
-
-
-/*
  * Do we have libpaper?
  */
 
