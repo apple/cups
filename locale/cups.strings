@@ -409,6 +409,7 @@
 "-E                      Encrypt the connection to the server" = "-E                      Encrypt the connection to the server";
 "-E                      Test with encryption using HTTP Upgrade to TLS" = "-E                      Test with encryption using HTTP Upgrade to TLS";
 "-F                      Run in the foreground but detach from console." = "-F                      Run in the foreground but detach from console.";
+"-F output-type/subtype  Set the output format for the printer" = "-F output-type/subtype  Set the output format for the printer";
 "-H                      Show the default server and port" = "-H                      Show the default server and port";
 "-H HH:MM                Hold the job until the specified UTC time" = "-H HH:MM                Hold the job until the specified UTC time";
 "-H hold                 Hold the job until released/resumed" = "-H hold                 Hold the job until released/resumed";
@@ -1499,7 +1500,9 @@
 "Warning: This program will be removed in a future version of CUPS." = "Warning: This program will be removed in a future version of CUPS.";
 "Web Interface is Disabled" = "Web Interface is Disabled";
 "Yes" = "Yes";
+"You cannot access this page." = "You cannot access this page.";
 "You must access this page using the URL https://%s:%d%s." = "You must access this page using the URL https://%s:%d%s.";
+"Your account does not have the necessary privileges." = "Your account does not have the necessary privileges.";
 "ZPL Label Printer" = "ZPL Label Printer";
 "Zebra" = "Zebra";
 "aborted" = "aborted";

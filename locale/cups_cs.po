@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-05-15 10:30-0400\n"
+"POT-Creation-Date: 2019-05-17 10:17-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -1618,6 +1618,9 @@ msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
 msgstr ""
 
 msgid "-F                      Run in the foreground but detach from console."
+msgstr ""
+
+msgid "-F output-type/subtype  Set the output format for the printer"
 msgstr ""
 
 msgid "-H                      Show the default server and port"
@@ -5111,9 +5114,15 @@ msgstr ""
 msgid "Yes"
 msgstr "Ano"
 
+msgid "You cannot access this page."
+msgstr ""
+
 #, c-format
 msgid "You must access this page using the URL https://%s:%d%s."
 msgstr "Pro přístup k této stránce, použijte adresu URL https://%s:%d%s."
+
+msgid "Your account does not have the necessary privileges."
+msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Tiskárna štítků ZPL"

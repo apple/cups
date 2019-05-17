@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-05-15 10:30-0400\n"
+"POT-Creation-Date: 2019-05-17 10:17-0400\n"
 "PO-Revision-Date: 2018-10-09 00:21-0500\n"
 "Last-Translator: Mingcong Bai <jeffbai@aosc.io>\n"
 "Language-Team: Chinese (Simplified)\n"
@@ -1728,6 +1728,9 @@ msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
 msgstr ""
 
 msgid "-F                      Run in the foreground but detach from console."
+msgstr ""
+
+msgid "-F output-type/subtype  Set the output format for the printer"
 msgstr ""
 
 msgid "-H                      Show the default server and port"
@@ -5243,9 +5246,15 @@ msgstr "网页界面被禁用"
 msgid "Yes"
 msgstr "是"
 
+msgid "You cannot access this page."
+msgstr ""
+
 #, c-format
 msgid "You must access this page using the URL https://%s:%d%s."
 msgstr "你必须通过此 URL 访问此页面：https://%s:%d%s"
+
+msgid "Your account does not have the necessary privileges."
+msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "ZPL 标签打印机"
