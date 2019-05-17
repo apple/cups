@@ -179,7 +179,7 @@ cupsctl:	cupsctl.o ../cups/$(LIBCUPS)
 
 cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ cupstestppd.o $(LINKCUPS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ cupstestppd.o -lm $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC)

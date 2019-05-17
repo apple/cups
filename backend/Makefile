@@ -243,7 +243,7 @@ libbackend.a:	$(LIBOBJS)
 
 dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o dnssd dnssd.o libbackend.a $(LINKCUPS)
+	$(LD_CC) $(ALL_LDFLAGS) -o dnssd dnssd.o libbackend.a $(DNSSDLIBS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 	if test `uname` = Darwin; then \
 		$(RM) mdns; \
