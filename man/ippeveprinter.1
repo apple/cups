@@ -6,7 +6,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ippeveprinter 1 "CUPS" "3 May 2019" "Apple Inc."
+.TH ippeveprinter 1 "CUPS" "17 May 2019" "Apple Inc."
 .SH NAME
 ippeveprinter \- an ipp everywhere printer application for cups
 .SH SYNOPSIS
@@ -22,6 +22,9 @@ ippeveprinter \- an ipp everywhere printer application for cups
 ] [
 .B \-D
 .I device-uri
+] [
+.B \-F
+.I output-type/subtype
 ] [
 .B \-K
 .I keypath
@@ -98,6 +101,10 @@ The URI can be a filename, directory, or a network socket URI of the form "socke
 When specifying a directory,
 .B ippeveprinter
 will create an output file using the job ID and name.
+.TP 5
+\fB\-F \fIoutput-type/subtype[,...]\fR
+Specifies the output MIME media type.
+The default is "application/postscript" when the \fB\-P\fR option is specified.
 .TP 5
 \fB\-M \fImanufacturer\fR
 Set the manufacturer of the printer.
@@ -189,14 +196,14 @@ program is unique to CUPS and conforms to the IPP Everywhere (PWG 5100.14) speci
 adds environment variables starting with "IPP_" for all IPP Job attributes in the print request.
 For example, when executing a command for an IPP Job containing the "media" Job Template attribute, the "IPP_MEDIA" environment variable will be set to the value of that attribute.
 .LP
-In addition, all IPP "xxx-default" Printer Description attributes are added to the environment.
+In addition, all IPP "xxx-default" and "pwg-xxx" Printer Description attributes are added to the environment.
 For example, the "IPP_MEDIA_DEFAULT" environment variable will be set to the default value for the "media" Job Template attribute.
 .LP
 Enumerated values are converted to their keyword equivalents.
 For example, a "print-quality" Job Template attribute with a enum value of 3 will become the "IPP_PRINT_QUALITY" environment variable with a value of "draft".
 This string conversion only happens for standard Job Template attributes, currently "finishings", "orientation-requested", and "print-quality".
 .LP
-Finally, the "CONTENT_TYPE" environment variable contains the MIME media type of the document being printed, the "DEVICE_URI" environment variable contains the device URI as specified with the "\-D" option, and the "PPD" environment variable contains the PPD filename as specified with the "\-P" option.
+Finally, the "CONTENT_TYPE" environment variable contains the MIME media type of the document being printed, the "DEVICE_URI" environment variable contains the device URI as specified with the "\-D" option, the "OUTPUT_FORMAT" environment variable contains the output MIME media type, and the "PPD" environment variable contains the PPD filename as specified with the "\-P" option.
 .SH COMMAND OUTPUT
 Unless they communicate directly with a printer, print commands send printer-ready data to the standard output.
 .LP
@@ -242,6 +249,8 @@ command whenever a job is sent to the server:
     ippeveprinter \-c /usr/bin/file "My Cool Printer"
 .fi
 .SH SEE ALSO
+.BR ippevepcl (7),
+.BR ippeveps (7),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 .SH COPYRIGHT
 Copyright \[co] 2007-2019 by Apple Inc.

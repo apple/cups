@@ -172,6 +172,7 @@ typedef struct ippeve_printer_s		/**** Printer data ****/
 			*hostname,	/* Hostname */
 			*uri,		/* printer-uri-supported */
 			*device_uri,	/* Device URI (if any) */
+			*output_format,	/* Output format */
 #if !CUPS_LITE
 			*ppdfile,	/* PPD file (if any) */
 #endif /* !CUPS_LITE */
@@ -243,7 +244,7 @@ static int		create_job_file(ippeve_job_t *job, char *fname, size_t fnamesize, co
 static int		create_listener(const char *name, int port, int family);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int bottom, int left, int right, int top);
 static ipp_t		*create_media_size(int width, int length);
-static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *device_uri, ipp_t *attrs);
+static ippeve_printer_t	*create_printer(const char *servername, int serverport, const char *name, const char *location, const char *icon, cups_array_t *docformats, const char *subtypes, const char *directory, const char *command, const char *device_uri, const char *output_format, ipp_t *attrs);
 static void		debug_attributes(const char *title, ipp_t *ipp, int response);
 static void		delete_client(ippeve_client_t *client);
 static void		delete_job(ippeve_job_t *job);
@@ -330,6 +331,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*attrfile = NULL,	/* ippserver attributes file */
 		*command = NULL,	/* Command to run with job files */
 		*device_uri = NULL,	/* Device URI */
+		*output_format = NULL,	/* Output format */
 		*icon = NULL,		/* Icon file */
 #ifdef HAVE_SSL
 		*keypath = NULL,	/* Keychain path */
@@ -396,6 +398,14 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(1);
 
 	      device_uri = argv[i];
+	      break;
+
+          case 'F' : /* -F output/format */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+
+	      output_format = argv[i];
 	      break;
 
 #ifdef HAVE_SSL
@@ -647,12 +657,15 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (!command)
       command = "ippeveps";
+
+    if (!output_format)
+      output_format = "application/postscript";
   }
 #endif /* !CUPS_LITE */
   else
     attrs = load_legacy_attributes(make, model, ppm, ppm_color, duplex, docformats);
 
-  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, device_uri, attrs)) == NULL)
+  if ((printer = create_printer(servername, serverport, name, location, icon, docformats, subtypes, directory, command, device_uri, output_format, attrs)) == NULL)
     return (1);
 
   printer->web_forms = web_forms;
@@ -1241,6 +1254,7 @@ create_printer(
     const char   *directory,		/* I - Spool directory */
     const char   *command,		/* I - Command to run on job files, if any */
     const char   *device_uri,		/* I - Output device, if any */
+    const char   *output_format,	/* I - Output format, if any */
     ipp_t        *attrs)		/* I - Capability attributes */
 {
   ippeve_printer_t	*printer;	/* Printer */
@@ -1479,6 +1493,7 @@ create_printer(
   printer->dnssd_name    = strdup(name);
   printer->command       = command ? strdup(command) : NULL;
   printer->device_uri    = device_uri ? strdup(device_uri) : NULL;
+  printer->output_format = output_format ? strdup(output_format) : NULL;
   printer->directory     = strdup(directory);
   printer->icon          = icon ? strdup(icon) : NULL;
   printer->port          = serverport;
@@ -6023,6 +6038,12 @@ process_job(ippeve_job_t *job)		/* I - Job */
       myenvp[myenvc ++] = strdup(val);
     }
 
+    if (job->printer->output_format)
+    {
+      snprintf(val, sizeof(val), "OUTPUT_TYPE=%s", job->printer->output_format);
+      myenvp[myenvc ++] = strdup(val);
+    }
+
 #if !CUPS_LITE
     if (job->printer->ppdfile)
     {
@@ -6035,7 +6056,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
     {
      /*
       * Convert "attribute-name-default" to "IPP_ATTRIBUTE_NAME_DEFAULT=" and
-      * then add the value(s) from the attribute.
+      * "pwg-xxx" to "IPP_PWG_XXX", then add the value(s) from the attribute.
       */
 
       const char	*name = ippGetName(attr),
@@ -6043,7 +6064,7 @@ process_job(ippeve_job_t *job)		/* I - Job */
 			*suffix = strstr(name, "-default");
 					/* Suffix on attribute name */
 
-      if (!suffix || suffix[8])
+      if (strncmp(name, "pwg-", 4) && (!suffix || suffix[8]))
         continue;
 
       valptr = val;
@@ -7646,6 +7667,7 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(stderr, _("--version               Show program version"));
   _cupsLangPuts(stdout, _("-2                      Set 2-sided printing support (default=1-sided)"));
   _cupsLangPuts(stdout, _("-D device-uri           Set the device URI for the printer"));
+  _cupsLangPuts(stdout, _("-F output-type/subtype  Set the output format for the printer"));
 #ifdef HAVE_SSL
   _cupsLangPuts(stdout, _("-K keypath              Set location of server X.509 certificates and keys."));
 #endif /* HAVE_SSL */
