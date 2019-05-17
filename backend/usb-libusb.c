@@ -1,7 +1,7 @@
 /*
  * LIBUSB interface code for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -1746,8 +1746,7 @@ static void *read_thread(void *reference)
     * Make sure this loop executes no more than once every 250 miliseconds...
     */
 
-    if ((readstatus != LIBUSB_SUCCESS || rbytes == 0) &&
-        (g.wait_eof || !g.read_thread_stop))
+    if ((g.wait_eof || !g.read_thread_stop))
     {
       gettimeofday(&now, NULL);
       if (timercmp(&now, &end, <))

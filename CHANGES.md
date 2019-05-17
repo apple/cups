@@ -1,4 +1,4 @@
-CHANGES - 2.2.12 - 2019-05-15
+CHANGES - 2.2.12 - 2019-05-17
 =============================
 
 
@@ -17,6 +17,8 @@ Changes in CUPS v2.2.12
 - Timed out job submission now yields an error (Issue #5570)
 - The footer in the web interface covered some content on small displays
   (Issue #5574)
+- The libusb-based USB backend now enforces read limits, improving print speed
+  in many cases (Issue #5583)
 
 
 Changes in CUPS v2.2.11
