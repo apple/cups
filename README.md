@@ -1,5 +1,5 @@
-README - CUPS v2.3b8 - 2019-05-02
-=================================
+README - CUPS v2.3rc1 - 2019-05-21
+==================================
 
 > **Note:** CUPS v2.3b8 is not production code.  Do not use on production
 > systems.  For a production version of CUPS, please see the CUPS 2.2.x
