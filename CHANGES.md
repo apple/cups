@@ -1,5 +1,11 @@
-CHANGES - 2.3rc1 - 2019-05-21
-=============================
+CHANGES - 2.3.0 - 2019-05-23
+============================
+
+
+Changes in CUPS v2.3.0
+----------------------
+
+- Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 
 
 Changes in CUPS v2.3rc1

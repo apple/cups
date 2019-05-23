@@ -1448,7 +1448,7 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 	      _ippVarsSet(vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
 	    {
-	      if (found && expect->not_expect)
+	      if (found && expect->not_expect && !expect->with_value && !expect->with_value_from)
 		add_stringf(data->errors, "NOT EXPECTED: %s", expect->name);
 	      else if (!found && !(expect->not_expect || expect->optional))
 		add_stringf(data->errors, "EXPECTED: %s", expect->name);
