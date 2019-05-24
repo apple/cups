@@ -1,4 +1,4 @@
-CHANGES - 2.2.12 - 2019-05-17
+CHANGES - 2.2.12 - 2019-05-24
 =============================
 
 
@@ -19,6 +19,7 @@ Changes in CUPS v2.2.12
   (Issue #5574)
 - The libusb-based USB backend now enforces read limits, improving print speed
   in many cases (Issue #5583)
+- Fixed a command ordering issue in the Zebra ZPL driver.
 
 
 Changes in CUPS v2.2.11

@@ -1,7 +1,7 @@
 /*
  * Label printer filter for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 2001-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -618,8 +618,8 @@ EndPage(ppd_file_t          *ppd,	/* I - PPD file */
         * End the label and eject...
 	*/
 
-	puts("^XZ");
         puts("^IDR:CUPS.GRF^FS");
+	puts("^XZ");
 
        /*
         * Cut the label as needed...
