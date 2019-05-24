@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-05-23
+CHANGES - 2.3.0 - 2019-05-24
 ============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.3.0
 ----------------------
 
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
+- Fixed a command ordering issue in the Zebra ZPL driver.
 
 
 Changes in CUPS v2.3rc1
