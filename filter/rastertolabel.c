@@ -618,6 +618,13 @@ EndPage(ppd_file_t          *ppd,	/* I - PPD file */
         * End the label and eject...
 	*/
 
+	puts("^XZ");
+
+       /*
+        * Delete the label image...
+        */
+
+	puts("^XA");
         puts("^IDR:CUPS.GRF^FS");
 	puts("^XZ");
 
