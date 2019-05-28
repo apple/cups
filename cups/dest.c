@@ -79,7 +79,6 @@ typedef enum _cups_dnssd_state_e	/* Enumerated device state */
   _CUPS_DNSSD_QUERY,
   _CUPS_DNSSD_PENDING,
   _CUPS_DNSSD_ACTIVE,
-  _CUPS_DNSSD_LOCAL,
   _CUPS_DNSSD_INCOMPATIBLE,
   _CUPS_DNSSD_ERROR
 } _cups_dnssd_state_t;
@@ -99,6 +98,10 @@ typedef struct _cups_dnssd_data_s	/* Enumeration data */
   cups_ptype_t		type,		/* Printer type filter */
 			mask;		/* Printer type mask */
   cups_array_t		*devices;	/* Devices found so far */
+  int			num_dests;	/* Number of lpoptions destinations */
+  cups_dest_t		*dests;		/* lpoptions destinations */
+  char			def_name[1024],	/* Default printer name, if any */
+			*def_instance;	/* Default printer instance, if any */
 } _cups_dnssd_data_t;
 
 typedef struct _cups_dnssd_device_s	/* Enumerated device */
@@ -125,8 +128,10 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 
 typedef struct _cups_getdata_s
 {
-  int         num_dests;                /* Number of destinations */
-  cups_dest_t *dests;                   /* Destinations */
+  int		num_dests;		/* Number of destinations */
+  cups_dest_t	*dests;			/* Destinations */
+  char		def_name[1024],		/* Default printer name, if any */
+		*def_instance;		/* Default printer instance, if any */
 } _cups_getdata_t;
 
 typedef struct _cups_namedata_s
@@ -192,14 +197,6 @@ static _cups_dnssd_device_t *
 					      const char *regtype,
 					      const char *replyDomain);
 #  ifdef HAVE_DNSSD
-static void		cups_dnssd_local_cb(DNSServiceRef sdRef,
-					    DNSServiceFlags flags,
-					    uint32_t interfaceIndex,
-					    DNSServiceErrorType errorCode,
-					    const char *serviceName,
-					    const char *regtype,
-					    const char *replyDomain,
-					    void *context);
 static void		cups_dnssd_query_cb(DNSServiceRef sdRef,
 					    DNSServiceFlags flags,
 					    uint32_t interfaceIndex,
@@ -237,9 +234,7 @@ static int		cups_find_dest(const char *name, const char *instance,
 static int              cups_get_cb(_cups_getdata_t *data, unsigned flags, cups_dest_t *dest);
 static char		*cups_get_default(const char *filename, char *namebuf,
 					  size_t namesize, const char **instance);
-static int		cups_get_dests(const char *filename, const char *match_name,
-			               const char *match_inst, int user_default_set,
-				       int num_dests, cups_dest_t **dests);
+static int		cups_get_dests(const char *filename, const char *match_name, const char *match_inst, int load_all, int user_default_set, int num_dests, cups_dest_t **dests);
 static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
 			                  size_t bufsize);
 static int              cups_name_cb(_cups_namedata_t *data, unsigned flags, cups_dest_t *dest);
@@ -574,7 +569,7 @@ _cupsAppleSetUseLastPrinter(
 
 
 /*
- * 'cupsConnectDest()' - Open a conection to the destination.
+ * 'cupsConnectDest()' - Open a connection to the destination.
  *
  * Connect to the destination, returning a new @code http_t@ connection object
  * and optionally the resource path to use for the destination.  These calls
@@ -583,7 +578,7 @@ _cupsAppleSetUseLastPrinter(
  * returns 0.  The caller is responsible for calling @link httpClose@ on the
  * returned connection.
  *
- * Starting with CUPS 2.2.4, the caller can pass  @code CUPS_DEST_FLAGS_DEVICE@
+ * Starting with CUPS 2.2.4, the caller can pass @code CUPS_DEST_FLAGS_DEVICE@
  * for the "flags" argument to connect directly to the device associated with
  * the destination.  Otherwise, the connection is made to the CUPS scheduler
  * associated with the destination.
@@ -851,6 +846,8 @@ cupsCopyDest(cups_dest_t *dest,         /* I  - Destination to copy */
 
   if (new_dest)
   {
+    new_dest->is_default = dest->is_default;
+
     if ((new_dest->options = calloc(sizeof(cups_option_t), (size_t)dest->num_options)) == NULL)
       return (cupsRemoveDest(dest->name, dest->instance, num_dests, dests));
 
@@ -1103,20 +1100,23 @@ cupsGetDest(const char  *name,		/* I - Destination name or @code NULL@ for the d
  * '_cupsGetDestResource()' - Get the resource path and URI for a destination.
  */
 
-const char *				/* O - Printer URI */
+const char *				/* O - URI */
 _cupsGetDestResource(
     cups_dest_t *dest,			/* I - Destination */
+    unsigned    flags,			/* I - Destination flags */
     char        *resource,		/* I - Resource buffer */
     size_t      resourcesize)		/* I - Size of resource buffer */
 {
-  const char	*uri;			/* Printer URI */
+  const char	*uri,			/* URI */
+		*device_uri,		/* Device URI */
+		*printer_uri;		/* Printer URI */
   char		scheme[32],		/* URI scheme */
 		userpass[256],		/* Username and password (unused) */
 		hostname[256];		/* Hostname */
   int		port;			/* Port number */
 
 
-  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), resource=%p, resourcesize=%d)", (void *)dest, dest->name, (void *)resource, (int)resourcesize));
+  DEBUG_printf(("_cupsGetDestResource(dest=%p(%s), flags=%u, resource=%p, resourcesize=%d)", (void *)dest, dest->name, flags, (void *)resource, (int)resourcesize));
 
  /*
   * Range check input...
@@ -1132,25 +1132,46 @@ _cupsGetDestResource(
   }
 
  /*
-  * Grab the printer URI...
+  * Grab the printer and device URIs...
   */
 
-  if ((uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options)) == NULL)
-  {
-    if ((uri = cupsGetOption("device-uri", dest->num_options, dest->options)) != NULL)
-    {
+  device_uri  = cupsGetOption("device-uri", dest->num_options, dest->options);
+  printer_uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
+
+  DEBUG_printf(("1_cupsGetDestResource: device-uri=\"%s\", printer-uri-supported=\"%s\".", device_uri, printer_uri));
+
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-      if (strstr(uri, "._tcp"))
-        uri = cups_dnssd_resolve(dest, uri, 5000, NULL, NULL, NULL);
-#endif /* HAVE_DNSSD || HAVE_AVAHI */
-    }
-
-    if (uri)
+  if (((flags & CUPS_DEST_FLAGS_DEVICE) || !printer_uri) && strstr(device_uri, "._tcp"))
+  {
+    if ((device_uri = cups_dnssd_resolve(dest, device_uri, 5000, NULL, NULL, NULL)) != NULL)
     {
-      DEBUG_printf(("1_cupsGetDestResource: Resolved printer-uri-supported=\"%s\"", uri));
-
-      uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, uri, resource, resourcesize);
+      DEBUG_printf(("1_cupsGetDestResource: Resolved device-uri=\"%s\".", device_uri));
     }
+    else
+    {
+      DEBUG_puts("1_cupsGetDestResource: Unable to resolve device.");
+
+      if (resource)
+	*resource = '\0';
+
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
+
+      return (NULL);
+    }
+  }
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+  if (flags & CUPS_DEST_FLAGS_DEVICE)
+  {
+    uri = device_uri;
+  }
+  else if (printer_uri)
+  {
+    uri = printer_uri;
+  }
+  else
+  {
+    uri = _cupsCreateDest(dest->name, cupsGetOption("printer-info", dest->num_options, dest->options), NULL, device_uri, resource, resourcesize);
 
     if (uri)
     {
@@ -1160,30 +1181,24 @@ _cupsGetDestResource(
 
       uri = cupsGetOption("printer-uri-supported", dest->num_options, dest->options);
     }
-    else
-    {
-      DEBUG_puts("1_cupsGetDestResource: No printer-uri-supported found.");
-
-      if (resource)
-        *resource = '\0';
-
-      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
-
-      return (NULL);
-    }
   }
-  else
+
+  if (!uri)
   {
-    DEBUG_printf(("1_cupsGetDestResource: printer-uri-supported=\"%s\"", uri));
+    DEBUG_puts("1_cupsGetDestResource: No printer-uri-supported or device-uri found.");
 
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-                        userpass, sizeof(userpass), hostname, sizeof(hostname),
-                        &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
-    {
-      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
+    if (resource)
+      *resource = '\0';
 
-      return (NULL);
-    }
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
+
+    return (NULL);
+  }
+  else if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad URI."), 1);
+
+    return (NULL);
   }
 
   DEBUG_printf(("1_cupsGetDestResource: resource=\"%s\"", resource));
@@ -1269,6 +1284,12 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
     {
       snprintf(temp, sizeof(temp), "%s @ %s", resource + 10, hostname);
       name = resource + 10;
+      info = temp;
+    }
+    else if (!strncmp(resource, "/ipp/print/", 11))
+    {
+      snprintf(temp, sizeof(temp), "%s @ %s", resource + 11, hostname);
+      name = resource + 11;
       info = temp;
     }
     else
@@ -1631,16 +1652,6 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
               cups_dest_t **dests)	/* O - Destinations */
 {
   _cups_getdata_t data;                 /* Enumeration data */
-  cups_dest_t   *dest;                  /* Current destination */
-  const char	*home;			/* HOME environment variable */
-  char		filename[1024];		/* Local ~/.cups/lpoptions file */
-  const char	*defprinter;		/* Default printer */
-  char		name[1024],		/* Copy of printer name */
-		*instance,		/* Pointer to instance name */
-		*user_default;		/* User default printer */
-  int		num_reals;		/* Number of real queues */
-  cups_dest_t	*reals;			/* Real queues */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cupsGetDests2(http=%p, dests=%p)", (void *)http, (void *)dests));
@@ -1694,107 +1705,6 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     */
 
     cups_enum_dests(http, 0, _CUPS_DNSSD_GET_DESTS, NULL, 0, 0, (cups_dest_cb_t)cups_get_cb, &data);
-  }
-
- /*
-  * Make a copy of the "real" queues for a later sanity check...
-  */
-
-  if (data.num_dests > 0)
-  {
-    num_reals = data.num_dests;
-    reals     = calloc((size_t)num_reals, sizeof(cups_dest_t));
-
-    if (reals)
-      memcpy(reals, data.dests, (size_t)num_reals * sizeof(cups_dest_t));
-    else
-      num_reals = 0;
-  }
-  else
-  {
-    num_reals = 0;
-    reals     = NULL;
-  }
-
- /*
-  * Grab the default destination...
-  */
-
-  if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
-    defprinter = name;
-  else if ((defprinter = cupsGetDefault2(http)) != NULL)
-  {
-    strlcpy(name, defprinter, sizeof(name));
-    defprinter = name;
-  }
-
-  if (defprinter)
-  {
-   /*
-    * Separate printer and instance name...
-    */
-
-    if ((instance = strchr(name, '/')) != NULL)
-      *instance++ = '\0';
-
-   /*
-    * Lookup the printer and instance and make it the default...
-    */
-
-    if ((dest = cupsGetDest(name, instance, data.num_dests, data.dests)) != NULL)
-      dest->is_default = 1;
-  }
-  else
-    instance = NULL;
-
- /*
-  * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
-  */
-
-  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  data.num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL, data.num_dests, &data.dests);
-
-  if ((home = getenv("HOME")) != NULL)
-  {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-
-    data.num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL, data.num_dests, &data.dests);
-  }
-
- /*
-  * Validate the current default destination - this prevents old
-  * Default lines in /etc/cups/lpoptions and ~/.cups/lpoptions from
-  * pointing to a non-existent printer or class...
-  */
-
-  if (num_reals)
-  {
-   /*
-    * See if we have a default printer...
-    */
-
-    if ((dest = cupsGetDest(NULL, NULL, data.num_dests, data.dests)) != NULL)
-    {
-     /*
-      * Have a default; see if it is real...
-      */
-
-      if (!cupsGetDest(dest->name, NULL, num_reals, reals))
-      {
-       /*
-        * Remove the non-real printer from the list, since we don't want jobs
-        * going to an unexpected printer... (<rdar://problem/14216472>)
-        */
-
-        data.num_dests = cupsRemoveDest(dest->name, dest->instance, data.num_dests, &data.dests);
-      }
-    }
-
-   /*
-    * Free memory...
-    */
-
-    free(reals);
   }
 
  /*
@@ -1883,6 +1793,9 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
+
+      if (dest_name)
+        set_as_default = 2;
     }
 
     if (!dest_name)
@@ -1893,6 +1806,9 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
       snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
+
+      if (dest_name)
+        set_as_default = 3;
     }
 
     if (!dest_name)
@@ -1901,7 +1817,8 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       * No locally-set default destination, ask the server...
       */
 
-      op = IPP_OP_CUPS_GET_DEFAULT;
+      op             = IPP_OP_CUPS_GET_DEFAULT;
+      set_as_default = 4;
 
       DEBUG_puts("1cupsGetNamedDest: Asking server for default printer...");
     }
@@ -1932,7 +1849,36 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       dest = data.dest;
     }
     else
+    {
+      switch (set_as_default)
+      {
+        default :
+            break;
+
+        case 1 : /* Set from env vars */
+            if (getenv("LPDEST"))
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("LPDEST environment variable names default destination that does not exist."), 1);
+	    else if (getenv("PRINTER"))
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("PRINTER environment variable names default destination that does not exist."), 1);
+	    else
+              _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("No default destination."), 1);
+            break;
+
+        case 2 : /* Set from ~/.cups/lpoptions */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("~/.cups/lpoptions file names default destination that does not exist."), 1);
+            break;
+
+        case 3 : /* Set from /etc/cups/lpoptions */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("/etc/cups/lpoptions file names default destination that does not exist."), 1);
+            break;
+
+        case 4 : /* Set from server */
+	    _cupsSetError(IPP_STATUS_ERROR_NOT_FOUND, _("No default destination."), 1);
+            break;
+      }
+
       return (NULL);
+    }
   }
 
   DEBUG_printf(("1cupsGetNamedDest: Got dest=%p", (void *)dest));
@@ -1948,13 +1894,13 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  cups_get_dests(filename, dest_name, instance, 1, 1, &dest);
+  cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
 
   if (home)
   {
     snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
-    cups_get_dests(filename, dest_name, instance, 1, 1, &dest);
+    cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
   }
 
  /*
@@ -2130,12 +2076,6 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   if (getuid())
   {
    /*
-    * Merge in server defaults...
-    */
-
-    num_temps = cups_get_dests(filename, NULL, NULL, 0, num_temps, &temps);
-
-   /*
     * Point to user defaults...
     */
 
@@ -2195,8 +2135,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
       else
         wrote = 0;
 
-      if ((temp = cupsGetDest(dest->name, dest->instance, num_temps, temps)) == NULL)
-        temp = cupsGetDest(dest->name, NULL, num_temps, temps);
+      temp = cupsGetDest(dest->name, NULL, num_temps, temps);
 
       for (j = dest->num_options, option = dest->options; j > 0; j --, option ++)
       {
@@ -2204,19 +2143,14 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
         * See if this option is a printer attribute; if so, skip it...
 	*/
 
-        if ((match = _ippFindOption(option->name)) != NULL &&
-	    match->group_tag == IPP_TAG_PRINTER)
+        if ((match = _ippFindOption(option->name)) != NULL && match->group_tag == IPP_TAG_PRINTER)
 	  continue;
 
        /*
-	* See if the server/global options match these; if so, don't
-	* write 'em.
+	* See if the server options match these; if so, don't write 'em.
 	*/
 
-        if (temp &&
-	    (val = cupsGetOption(option->name, temp->num_options,
-	                         temp->options)) != NULL &&
-            !_cups_strcasecmp(val, option->value))
+        if (temp && (val = cupsGetOption(option->name, temp->num_options, temp->options)) != NULL && !_cups_strcasecmp(val, option->value))
 	  continue;
 
        /*
@@ -2233,10 +2167,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
         if (option->value[0])
 	{
-	  if (strchr(option->value, ' ') ||
-	      strchr(option->value, '\\') ||
-	      strchr(option->value, '\"') ||
-	      strchr(option->value, '\''))
+	  if (strchr(option->value, ' ') || strchr(option->value, '\\') || strchr(option->value, '\"') || strchr(option->value, '\''))
 	  {
 	   /*
 	    * Quote the value...
@@ -2287,9 +2218,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
   {
-    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                 dest->name,
-                                                 kCFStringEncodingUTF8);
+    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, dest->name, kCFStringEncodingUTF8);
 					/* Default printer name */
 
     if (name)
@@ -2720,22 +2649,7 @@ cups_dnssd_browse_cb(
 	* This object is new on the network.
 	*/
 
-	if (flags & AVAHI_LOOKUP_RESULT_LOCAL)
-	{
-	 /*
-	  * This comes from the local machine so ignore it.
-	  */
-
-	  DEBUG_printf(("cups_dnssd_browse_cb: Ignoring local service \"%s\".", name));
-	}
-	else
-	{
-	 /*
-	  * Create a device entry for it if it doesn't yet exist.
-	  */
-
-	  cups_dnssd_get_device(data, name, type, domain);
-	}
+	cups_dnssd_get_device(data, name, type, domain);
 	break;
 
     case AVAHI_BROWSER_REMOVE :
@@ -2956,66 +2870,6 @@ cups_dnssd_get_device(
 }
 
 
-#  ifdef HAVE_DNSSD
-/*
- * 'cups_dnssd_local_cb()' - Browse for local printers.
- */
-
-static void
-cups_dnssd_local_cb(
-    DNSServiceRef       sdRef,		/* I - Service reference */
-    DNSServiceFlags     flags,		/* I - Option flags */
-    uint32_t            interfaceIndex,	/* I - Interface number */
-    DNSServiceErrorType errorCode,	/* I - Error, if any */
-    const char          *serviceName,	/* I - Name of service/device */
-    const char          *regtype,	/* I - Type of service */
-    const char          *replyDomain,	/* I - Service domain */
-    void                *context)	/* I - Devices array */
-{
-  _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
-					/* Enumeration data */
-  _cups_dnssd_device_t	*device;	/* Device */
-
-
-  DEBUG_printf(("5cups_dnssd_local_cb(sdRef=%p, flags=%x, interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", regtype=\"%s\", replyDomain=\"%s\", context=%p)", (void *)sdRef, flags, interfaceIndex, errorCode, serviceName, regtype, replyDomain, context));
-
- /*
-  * Only process "add" data...
-  */
-
-  if (errorCode != kDNSServiceErr_NoError || !(flags & kDNSServiceFlagsAdd))
-    return;
-
- /*
-  * Get the device...
-  */
-
-  device = cups_dnssd_get_device(data, serviceName, regtype, replyDomain);
-
- /*
-  * Hide locally-registered devices...
-  */
-
-  DEBUG_printf(("6cups_dnssd_local_cb: Hiding local printer '%s'.",
-                serviceName));
-
-  if (device->ref)
-  {
-    DNSServiceRefDeallocate(device->ref);
-    device->ref = 0;
-  }
-
-  if (device->state == _CUPS_DNSSD_ACTIVE)
-  {
-    DEBUG_printf(("6cups_dnssd_local_cb: Remove callback for \"%s\".", device->dest.name));
-    (*data->cb)(data->user_data, CUPS_DEST_FLAGS_REMOVED, &device->dest);
-  }
-
-  device->state = _CUPS_DNSSD_LOCAL;
-}
-#  endif /* HAVE_DNSSD */
-
-
 #  ifdef HAVE_AVAHI
 /*
  * 'cups_dnssd_poll_cb()' - Wait for input on the specified file descriptors.
@@ -3065,9 +2919,9 @@ cups_dnssd_poll_cb(
  * 'cups_dnssd_query_cb()' - Process query data.
  */
 
-#  ifdef HAVE_DNSSD
 static void
 cups_dnssd_query_cb(
+#  ifdef HAVE_DNSSD
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Data flags */
     uint32_t            interfaceIndex,	/* I - Interface */
@@ -3078,11 +2932,7 @@ cups_dnssd_query_cb(
     uint16_t            rdlen,		/* I - Length of record data */
     const void          *rdata,		/* I - Record data */
     uint32_t            ttl,		/* I - Time-to-live */
-    void                *context)	/* I - Enumeration data */
-{
 #  else /* HAVE_AVAHI */
-static void
-cups_dnssd_query_cb(
     AvahiRecordBrowser     *browser,	/* I - Record browser */
     AvahiIfIndex           interfaceIndex,
 					/* I - Interface index (unused) */
@@ -3094,13 +2944,13 @@ cups_dnssd_query_cb(
     const void             *rdata,	/* I - TXT record */
     size_t                 rdlen,	/* I - Length of TXT record */
     AvahiLookupResultFlags flags,	/* I - Flags */
-    void                   *context)	/* I - Enumeration data */
+#  endif /* HAVE_DNSSD */
+    void                *context)	/* I - Enumeration data */
 {
-#    ifdef DEBUG
+#  if defined(DEBUG) && defined(HAVE_AVAHI)
   AvahiClient		*client = avahi_record_browser_get_client(browser);
 					/* Client information */
-#    endif /* DEBUG */
-#  endif /* HAVE_DNSSD */
+#  endif /* DEBUG && HAVE_AVAHI */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */
   char			serviceName[256],/* Service name */
@@ -3543,29 +3393,26 @@ cups_enum_dests(
   cups_dest_cb_t cb,                    /* I - Callback function */
   void           *user_data)            /* I - User data */
 {
-  int           i,                      /* Looping var */
+  int           i, j,			/* Looping vars */
                 num_dests;              /* Number of destinations */
   cups_dest_t   *dests = NULL,          /* Destinations */
-                *dest;                  /* Current destination */
-  const char    *defprinter;            /* Default printer */
-  char          name[1024],             /* Copy of printer name */
-                *instance,              /* Pointer to instance name */
-                *user_default;          /* User default printer */
+                *dest,                  /* Current destination */
+                *user_dest;		/* User destination */
+  cups_option_t	*option;		/* Current option */
+  char          *user_default;          /* User default printer */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   int           count,                  /* Number of queries started */
                 completed,              /* Number of completed queries */
                 remaining;              /* Remainder of timeout */
   struct timeval curtime;               /* Current time */
-  _cups_dnssd_data_t data;              /* Data for callback */
+  _cups_dnssd_data_t data;		/* Data for callback */
   _cups_dnssd_device_t *device;         /* Current device */
 #  ifdef HAVE_DNSSD
   int           nfds,                   /* Number of files responded */
                 main_fd;                /* File descriptor for lookups */
-  DNSServiceRef ipp_ref = NULL,         /* IPP browser */
-                local_ipp_ref = NULL;   /* Local IPP browser */
+  DNSServiceRef ipp_ref = NULL;		/* IPP browser */
 #    ifdef HAVE_SSL
-  DNSServiceRef ipps_ref = NULL,        /* IPPS browser */
-                local_ipps_ref = NULL;  /* Local IPPS browser */
+  DNSServiceRef ipps_ref = NULL;	/* IPPS browser */
 #    endif /* HAVE_SSL */
 #    ifdef HAVE_POLL
   struct pollfd pfd;                    /* Polling data */
@@ -3580,7 +3427,12 @@ cups_enum_dests(
   AvahiServiceBrowser *ipps_ref = NULL; /* IPPS browser */
 #    endif /* HAVE_SSL */
 #  endif /* HAVE_DNSSD */
+#else
+  _cups_getdata_t data;			/* Data for callback */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+  const char	*home;			/* HOME environment variable */
+  char		filename[1024];		/* Local lpoptions file */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_printf(("cups_enum_dests(flags=%x, msec=%d, cancel=%p, type=%x, mask=%x, cb=%p, user_data=%p)", flags, msec, (void *)cancel, type, mask, (void *)cb, (void *)user_data));
@@ -3598,12 +3450,47 @@ cups_enum_dests(
   }
 
  /*
+  * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
+  */
+
+  memset(&data, 0, sizeof(data));
+
+  if ((user_default = _cupsUserDefault(data.def_name, sizeof(data.def_name))) == NULL)
+  {
+    const char *defprinter = cupsGetDefault2(http);
+					/* Server default, if any */
+
+    if (defprinter)
+      strlcpy(data.def_name, defprinter, sizeof(data.def_name));
+  }
+
+  if (data.def_name[0])
+  {
+   /*
+    * Separate printer and instance name...
+    */
+
+    if ((data.def_instance = strchr(data.def_name, '/')) != NULL)
+      *data.def_instance++ = '\0';
+  }
+
+  DEBUG_printf(("1cups_enum_dests: def_name=\"%s\", def_instance=\"%s\"", data.def_name, data.def_instance));
+
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+  data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
+
+  if ((home = getenv("HOME")) != NULL)
+  {
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+
+    data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
+  }
+
+ /*
   * Get ready to enumerate...
   */
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  memset(&data, 0, sizeof(data));
-
   data.type      = type;
   data.mask      = mask;
   data.cb        = cb;
@@ -3619,29 +3506,17 @@ cups_enum_dests(
 
     num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &dests, type, mask);
 
-    if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
-      defprinter = name;
-    else if ((defprinter = cupsGetDefault2(http)) != NULL)
-    {
-      strlcpy(name, defprinter, sizeof(name));
-      defprinter = name;
-    }
-
-    if (defprinter)
+    if (data.def_name[0])
     {
      /*
-      * Separate printer and instance name...
+      * Lookup the named default printer and instance and make it the default...
       */
 
-      if ((instance = strchr(name, '/')) != NULL)
-        *instance++ = '\0';
-
-     /*
-      * Lookup the printer and instance and make it the default...
-      */
-
-      if ((dest = cupsGetDest(name, instance, num_dests, dests)) != NULL)
+      if ((dest = cupsGetDest(data.def_name, data.def_instance, num_dests, dests)) != NULL)
+      {
+	DEBUG_printf(("1cups_enum_dests: Setting is_default on \"%s/%s\".", dest->name, dest->instance));
         dest->is_default = 1;
+      }
     }
 
     for (i = num_dests, dest = dests;
@@ -3651,6 +3526,16 @@ cups_enum_dests(
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
       const char *device_uri;    /* Device URI */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+      if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
+      {
+       /*
+        * Apply user defaults to this destination...
+        */
+
+        for (j = user_dest->num_options, option = user_dest->options; j > 0; j --, option ++)
+          dest->num_options = cupsAddOption(option->name, option->value, dest->num_options, &dest->options);
+      }
 
       if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE, dest))
         break;
@@ -3714,6 +3599,9 @@ cups_enum_dests(
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
   {
     DEBUG_puts("1cups_enum_dests: Unable to create service browser, returning 0.");
+
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 
@@ -3724,14 +3612,9 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create IPP browser, returning 0.");
     DNSServiceRefDeallocate(data.main_ref);
-    return (0);
-  }
 
-  local_ipp_ref = data.main_ref;
-  if (DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexLocalOnly, "_ipp._tcp", NULL, (DNSServiceBrowseReply)cups_dnssd_local_cb, &data) != kDNSServiceErr_NoError)
-  {
-    DEBUG_puts("1cups_enum_dests: Unable to create local IPP browser, returning 0.");
-    DNSServiceRefDeallocate(data.main_ref);
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 
@@ -3741,14 +3624,9 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create IPPS browser, returning 0.");
     DNSServiceRefDeallocate(data.main_ref);
-    return (0);
-  }
 
-  local_ipps_ref = data.main_ref;
-  if (DNSServiceBrowse(&local_ipps_ref, kDNSServiceFlagsShareConnection, kDNSServiceInterfaceIndexLocalOnly, "_ipps._tcp", NULL, (DNSServiceBrowseReply)cups_dnssd_local_cb, &data) != kDNSServiceErr_NoError)
-  {
-    DEBUG_puts("1cups_enum_dests: Unable to create local IPPS browser, returning 0.");
-    DNSServiceRefDeallocate(data.main_ref);
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 #    endif /* HAVE_SSL */
@@ -3757,6 +3635,9 @@ cups_enum_dests(
   if ((data.simple_poll = avahi_simple_poll_new()) == NULL)
   {
     DEBUG_puts("1cups_enum_dests: Unable to create Avahi poll, returning 0.");
+
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 
@@ -3769,6 +3650,9 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create Avahi client, returning 0.");
     avahi_simple_poll_free(data.simple_poll);
+
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 
@@ -3779,6 +3663,9 @@ cups_enum_dests(
 
     avahi_client_free(data.client);
     avahi_simple_poll_free(data.simple_poll);
+
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 
@@ -3791,6 +3678,9 @@ cups_enum_dests(
     avahi_service_browser_free(ipp_ref);
     avahi_client_free(data.client);
     avahi_simple_poll_free(data.simple_poll);
+
+    cupsFreeDests(data.num_dests, data.dests);
+
     return (0);
   }
 #    endif /* HAVE_SSL */
@@ -3903,8 +3793,26 @@ cups_enum_dests(
 
         if ((device->type & mask) == type)
         {
+          dest = &device->dest;
+
+	  if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
+	  {
+	   /*
+	    * Apply user defaults to this destination...
+	    */
+
+	    for (j = user_dest->num_options, option = user_dest->options; j > 0; j --, option ++)
+	      dest->num_options = cupsAddOption(option->name, option->value, dest->num_options, &dest->options);
+	  }
+
+          if (!strcasecmp(dest->name, data.def_name) && !data.def_instance)
+	  {
+	    DEBUG_printf(("1cups_enum_dests: Setting is_default on discovered \"%s\".", dest->name));
+            dest->is_default = 1;
+	  }
+
           DEBUG_printf(("1cups_enum_dests: Add callback for \"%s\".", device->dest.name));
-          if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, &device->dest))
+          if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, dest))
           {
             remaining = -1;
             break;
@@ -3935,20 +3843,18 @@ cups_enum_dests(
 
   enum_finished:
 
+  cupsFreeDests(data.num_dests, data.dests);
+
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   cupsArrayDelete(data.devices);
 
 #  ifdef HAVE_DNSSD
   if (ipp_ref)
     DNSServiceRefDeallocate(ipp_ref);
-  if (local_ipp_ref)
-    DNSServiceRefDeallocate(local_ipp_ref);
 
 #    ifdef HAVE_SSL
   if (ipps_ref)
     DNSServiceRefDeallocate(ipps_ref);
-  if (local_ipps_ref)
-    DNSServiceRefDeallocate(local_ipps_ref);
 #    endif /* HAVE_SSL */
 
   if (data.main_ref)
@@ -4166,6 +4072,7 @@ cups_get_dests(
     const char  *filename,		/* I - File to read from */
     const char  *match_name,		/* I - Destination name we want */
     const char  *match_inst,		/* I - Instance name we want */
+    int         load_all,		/* I - Load all saved destinations? */
     int         user_default_set,	/* I - User default printer set? */
     int         num_dests,		/* I - Number of destinations */
     cups_dest_t **dests)		/* IO - Destinations */
@@ -4180,7 +4087,7 @@ cups_get_dests(
   int		linenum;		/* Current line number */
 
 
-  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", match_inst=\"%s\", user_default_set=%d, num_dests=%d, dests=%p)", filename, match_name, match_inst, user_default_set, num_dests, (void *)dests));
+  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", match_inst=\"%s\", load_all=%d, user_default_set=%d, num_dests=%d, dests=%p)", filename, match_name, match_inst, load_all, user_default_set, num_dests, (void *)dests));
 
  /*
   * Try to open the file...
@@ -4248,8 +4155,7 @@ cups_get_dests(
                   instance));
 
    /*
-    * See if the primary instance of the destination exists; if not,
-    * ignore this entry and move on...
+    * Match and/or ignore missing destinations...
     */
 
     if (match_name)
@@ -4262,7 +4168,7 @@ cups_get_dests(
 
       dest = *dests;
     }
-    else if (cupsGetDest(name, NULL, num_dests, *dests) == NULL)
+    else if (!load_all && cupsGetDest(name, NULL, num_dests, *dests) == NULL)
     {
       DEBUG_puts("9cups_get_dests: Not found!");
       continue;
@@ -4290,8 +4196,7 @@ cups_get_dests(
     * Add options until we hit the end of the line...
     */
 
-    dest->num_options = cupsParseOptions(lineptr, dest->num_options,
-                                         &(dest->options));
+    dest->num_options = cupsParseOptions(lineptr, dest->num_options, &(dest->options));
 
    /*
     * If we found what we were looking for, stop now...

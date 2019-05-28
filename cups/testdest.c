@@ -1,15 +1,9 @@
 /*
  * CUPS destination API test program for CUPS.
  *
- * Copyright 2012-2018 by Apple Inc.
+ * Copyright © 2012-2018 by Apple Inc.
  *
- * These coded instructions, statements, and computer programs are the
- * property of Apple Inc. and are protected by Federal copyright
- * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- * which should have been included with this file.  If this file is
- * missing or damaged, see the license at "http://www.cups.org/".
- *
- * This file is subject to the Apple OS-Developed Software exception.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
 /*
@@ -43,17 +37,31 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		i;			/* Looping var */
   http_t	*http;			/* Connection to destination */
   cups_dest_t	*dest = NULL;		/* Destination */
   cups_dinfo_t	*dinfo;			/* Destination info */
+  unsigned	dflags = CUPS_DEST_FLAGS_NONE;
+					/* Destination flags */
 
 
   if (argc < 2)
-    usage(NULL);
+    return (0);
 
-  if (!strcmp(argv[1], "--enum"))
+  if (!strcmp(argv[1], "--get"))
   {
-    int			i;		/* Looping var */
+    cups_dest_t	*dests;			/* Destinations */
+    int		num_dests = cupsGetDests2(CUPS_HTTP_DEFAULT, &dests);
+					/* Number of destinations */
+
+    for (i = 0; i < num_dests; i ++)
+      enum_cb(NULL, 0, dests + i);
+
+    cupsFreeDests(num_dests, dests);
+    return (0);
+  }
+  else if (!strcmp(argv[1], "--enum"))
+  {
     cups_ptype_t	type = 0,	/* Printer type filter */
 			mask = 0;	/* Printer type mask */
 
@@ -103,78 +111,91 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     return (0);
   }
-  else if (!strncmp(argv[1], "ipp://", 6) || !strncmp(argv[1], "ipps://", 7))
-    dest = cupsGetDestWithURI(NULL, argv[1]);
-  else if (!strcmp(argv[1], "default"))
+
+  i = 1;
+  if (!strcmp(argv[i], "--device"))
+  {
+    dflags = CUPS_DEST_FLAGS_DEVICE;
+    i ++;
+  }
+
+  if (!strncmp(argv[i], "ipp://", 6) || !strncmp(argv[i], "ipps://", 7))
+    dest = cupsGetDestWithURI(NULL, argv[i]);
+  else if (!strcmp(argv[i], "default"))
   {
     dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, NULL, NULL);
     if (dest && dest->instance)
       printf("default is \"%s/%s\".\n", dest->name, dest->instance);
-    else
+    else if (dest)
       printf("default is \"%s\".\n", dest->name);
+    else
+      puts("no default destination.");
   }
   else
-    dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, argv[1], NULL);
+    dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, argv[i], NULL);
 
   if (!dest)
   {
-    printf("testdest: Unable to get destination \"%s\": %s\n", argv[1], cupsLastErrorString());
+    printf("testdest: Unable to get destination \"%s\": %s\n", argv[i], cupsLastErrorString());
     return (1);
   }
 
-  if ((http = cupsConnectDest(dest, CUPS_DEST_FLAGS_NONE, 30000, NULL, NULL, 0, NULL, NULL)) == NULL)
+  i ++;
+
+  if ((http = cupsConnectDest(dest, dflags, 30000, NULL, NULL, 0, NULL, NULL)) == NULL)
   {
-    printf("testdest: Unable to connect to destination \"%s\": %s\n", argv[1], cupsLastErrorString());
+    printf("testdest: Unable to connect to destination \"%s\": %s\n", dest->name, cupsLastErrorString());
     return (1);
   }
 
   if ((dinfo = cupsCopyDestInfo(http, dest)) == NULL)
   {
-    printf("testdest: Unable to get information for destination \"%s\": %s\n", argv[1], cupsLastErrorString());
+    printf("testdest: Unable to get information for destination \"%s\": %s\n", dest->name, cupsLastErrorString());
     return (1);
   }
 
-  if (argc == 2 || (!strcmp(argv[2], "supported") && argc < 6))
+  if (i == argc || !strcmp(argv[i], "supported"))
   {
-    if (argc > 3)
-      show_supported(http, dest, dinfo, argv[3], argv[4]);
+    i ++;
+
+    if ((i + 1) < argc)
+      show_supported(http, dest, dinfo, argv[i], argv[i + 1]);
     else if (argc > 2)
-      show_supported(http, dest, dinfo, argv[3], NULL);
+      show_supported(http, dest, dinfo, argv[i], NULL);
     else
       show_supported(http, dest, dinfo, NULL, NULL);
   }
-  else if (!strcmp(argv[2], "conflicts") && argc > 3)
+  else if (!strcmp(argv[i], "conflicts") && (i + 1) < argc)
   {
-    int			i,		/* Looping var */
-			num_options = 0;/* Number of options */
+    int			num_options = 0;/* Number of options */
     cups_option_t	*options = NULL;/* Options */
 
-    for (i = 3; i < argc; i ++)
+    for (i ++; i < argc; i ++)
       num_options = cupsParseOptions(argv[i], num_options, &options);
 
     show_conflicts(http, dest, dinfo, num_options, options);
   }
-  else if (!strcmp(argv[2], "default") && argc == 4)
+  else if (!strcmp(argv[i], "default") && (i + 1) < argc)
   {
-    show_default(http, dest, dinfo, argv[3]);
+    show_default(http, dest, dinfo, argv[i + 1]);
   }
-  else if (!strcmp(argv[2], "localize") && argc < 6)
+  else if (!strcmp(argv[i], "localize"))
   {
-    if (argc > 3)
-      localize(http, dest, dinfo, argv[3], argv[4]);
+    i ++;
+    if ((i + 1) < argc)
+      localize(http, dest, dinfo, argv[i], argv[i + 1]);
     else if (argc > 2)
-      localize(http, dest, dinfo, argv[3], NULL);
+      localize(http, dest, dinfo, argv[i], NULL);
     else
       localize(http, dest, dinfo, NULL, NULL);
   }
-  else if (!strcmp(argv[2], "media"))
+  else if (!strcmp(argv[i], "media"))
   {
-    int		i;			/* Looping var */
     const char	*name = NULL;		/* Media name, if any */
     unsigned	flags = CUPS_MEDIA_FLAGS_DEFAULT;
 					/* Media selection flags */
 
-    for (i = 3; i < argc; i ++)
+    for (i ++; i < argc; i ++)
     {
       if (!strcmp(argv[i], "borderless"))
 	flags = CUPS_MEDIA_FLAGS_BORDERLESS;
@@ -192,19 +213,19 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     show_media(http, dest, dinfo, flags, name);
   }
-  else if (!strcmp(argv[2], "print") && argc > 3)
+  else if (!strcmp(argv[i], "print") && (i + 1) < argc)
   {
-    int			i,		/* Looping var */
-			num_options = 0;/* Number of options */
+    int			num_options = 0;/* Number of options */
     cups_option_t	*options = NULL;/* Options */
+    const char		*filename = argv[i + 1];
 
-    for (i = 4; i < argc; i ++)
+    for (i += 2; i < argc; i ++)
       num_options = cupsParseOptions(argv[i], num_options, &options);
 
-    print_file(http, dest, dinfo, argv[3], num_options, options);
+    print_file(http, dest, dinfo, filename, num_options, options);
   }
   else
-    usage(argv[2]);
+    usage(argv[i]);
 
   return (0);
 }
@@ -226,12 +247,14 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
   (void)flags;
 
   if (dest->instance)
-    printf("%s%s/%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->instance);
+    printf("%s%s/%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->instance, dest->is_default ? " (Default)" : "");
   else
-    printf("%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name);
+    printf("%s%s%s:\n", (flags & CUPS_DEST_FLAGS_REMOVED) ? "REMOVE " : "", dest->name, dest->is_default ? " (Default)" : "");
 
   for (i = 0; i < dest->num_options; i ++)
     printf("    %s=\"%s\"\n", dest->options[i].name, dest->options[i].value);
+
+  puts("");
 
   return (1);
 }
@@ -740,9 +763,10 @@ usage(const char *arg)			/* I - Argument for usage message */
     printf("testdest: Unknown option \"%s\".\n", arg);
 
   puts("Usage:");
-  puts("  ./testdest name [operation ...]");
-  puts("  ./testdest ipp://... [operation ...]");
-  puts("  ./testdest ipps://... [operation ...]");
+  puts("  ./testdest [--device] name [operation ...]");
+  puts("  ./testdest [--device] ipp://... [operation ...]");
+  puts("  ./testdest [--device] ipps://... [operation ...]");
+  puts("  ./testdest --get");
   puts("  ./testdest --enum [grayscale] [color] [duplex] [staple] [small]\n"
        "                    [medium] [large]");
   puts("");

@@ -129,10 +129,10 @@ cupsCheckDestSupported(
     */
 
     pwg_media_t	*pwg;		/* Current PWG media size info */
-    int			min_width,	/* Minimum width */
-			min_length,	/* Minimum length */
-			max_width,	/* Maximum width */
-			max_length;	/* Maximum length */
+    int		min_width,	/* Minimum width */
+		min_length,	/* Minimum length */
+		max_width,	/* Maximum width */
+		max_length;	/* Maximum length */
 
    /*
     * Get the minimum and maximum size...
@@ -581,6 +581,7 @@ cupsCopyDestInfo(
     cups_dest_t *dest)			/* I - Destination */
 {
   cups_dinfo_t	*dinfo;			/* Destination information */
+  unsigned	dflags;			/* Destination flags */
   ipp_t		*request,		/* Get-Printer-Attributes request */
 		*response;		/* Supported attributes */
   int		tries,			/* Number of tries so far */
@@ -590,6 +591,7 @@ cupsCopyDestInfo(
   char		resource[1024];		/* Resource path */
   int		version;		/* IPP version */
   ipp_status_t	status;			/* Status of request */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   static const char * const requested_attrs[] =
   {					/* Requested attributes */
     "job-template",
@@ -598,14 +600,35 @@ cupsCopyDestInfo(
   };
 
 
-  DEBUG_printf(("cupsCopyDestSupported(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
+  DEBUG_printf(("cupsCopyDestInfo(http=%p, dest=%p(%s))", (void *)http, (void *)dest, dest ? dest->name : ""));
 
  /*
   * Get the default connection as needed...
   */
 
   if (!http)
-    http = _cupsConnect();
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Default server connection.");
+    http   = _cupsConnect();
+    dflags = CUPS_DEST_FLAGS_NONE;
+  }
+#ifdef AF_LOCAL
+  else if (httpAddrFamily(http->hostaddr) == AF_LOCAL)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Connection to server (domain socket).");
+    dflags = CUPS_DEST_FLAGS_NONE;
+  }
+#endif /* AF_LOCAL */
+  else if ((strcmp(http->hostname, cg->server) && cg->server[0] != '/') || cg->ipp_port != httpAddrPort(http->hostaddr))
+  {
+    DEBUG_printf(("1cupsCopyDestInfo: Connection to device (%s).", http->hostname));
+    dflags = CUPS_DEST_FLAGS_DEVICE;
+  }
+  else
+  {
+    DEBUG_printf(("1cupsCopyDestInfo: Connection to server (%s).", http->hostname));
+    dflags = CUPS_DEST_FLAGS_NONE;
+  }
 
  /*
   * Range check input...
@@ -618,8 +641,11 @@ cupsCopyDestInfo(
   * Get the printer URI and resource path...
   */
 
-  if ((uri = _cupsGetDestResource(dest, resource, sizeof(resource))) == NULL)
+  if ((uri = _cupsGetDestResource(dest, dflags, resource, sizeof(resource))) == NULL)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Unable to get resource.");
     return (NULL);
+  }
 
  /*
   * Get the supported attributes...
@@ -637,28 +663,25 @@ cupsCopyDestInfo(
     */
 
     request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-		 uri);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, cupsUser());
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-		  "requested-attributes",
-		  (int)(sizeof(requested_attrs) / sizeof(requested_attrs[0])),
-		  NULL, requested_attrs);
+
+    ippSetVersion(request, version / 10, version % 10);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(requested_attrs) / sizeof(requested_attrs[0])), NULL, requested_attrs);
     response = cupsDoRequest(http, request, resource);
     status   = cupsLastError();
 
     if (status > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
     {
-      DEBUG_printf(("cupsCopyDestSupported: Get-Printer-Attributes for '%s' "
-		    "returned %s (%s)", dest->name, ippErrorString(status),
-		    cupsLastErrorString()));
+      DEBUG_printf(("1cupsCopyDestInfo: Get-Printer-Attributes for '%s' returned %s (%s)", dest->name, ippErrorString(status), cupsLastErrorString()));
 
       ippDelete(response);
       response = NULL;
 
-      if (status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED && version > 11)
+      if ((status == IPP_STATUS_ERROR_BAD_REQUEST || status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED) && version > 11)
+      {
         version = 11;
+      }
       else if (status == IPP_STATUS_ERROR_BUSY)
       {
         sleep((unsigned)delay);
@@ -674,7 +697,10 @@ cupsCopyDestInfo(
   while (!response && tries < 10);
 
   if (!response)
+  {
+    DEBUG_puts("1cupsCopyDestInfo: Unable to get printer attributes.");
     return (NULL);
+  }
 
  /*
   * Allocate a cups_dinfo_t structure and return it...
@@ -686,6 +712,8 @@ cupsCopyDestInfo(
     ippDelete(response);
     return (NULL);
   }
+
+  DEBUG_printf(("1cupsCopyDestInfo: version=%d, uri=\"%s\", resource=\"%s\".", version, uri, resource));
 
   dinfo->version  = version;
   dinfo->uri      = uri;
@@ -947,10 +975,10 @@ cupsGetDestMediaByIndex(
     return (0);
   }
 
-  if (nsize->size_name)
-    strlcpy(size->media, nsize->size_name, sizeof(size->media));
-  else if (nsize->key)
+  if (nsize->key)
     strlcpy(size->media, nsize->key, sizeof(size->media));
+  else if (nsize->size_name)
+    strlcpy(size->media, nsize->size_name, sizeof(size->media));
   else if ((pwg = pwgMediaForSize(nsize->width, nsize->length)) != NULL)
     strlcpy(size->media, pwg->pwg, sizeof(size->media));
   else
@@ -1211,25 +1239,19 @@ cupsGetDestMediaDefault(
   * Get the default media size, if any...
   */
 
-  if ((media = cupsGetOption("media", dest->num_options,
-                             dest->options)) == NULL)
+  if ((media = cupsGetOption("media", dest->num_options, dest->options)) == NULL)
     media = "na_letter_8.5x11in";
 
   if (cupsGetDestMediaByName(http, dest, dinfo, media, flags, size))
     return (1);
 
-  if (strcmp(media, "na_letter_8.5x11in") &&
-      cupsGetDestMediaByName(http, dest, dinfo, "iso_a4_210x297mm", flags,
-                             size))
+  if (strcmp(media, "na_letter_8.5x11in") && cupsGetDestMediaByName(http, dest, dinfo, "iso_a4_210x297mm", flags, size))
     return (1);
 
-  if (strcmp(media, "iso_a4_210x297mm") &&
-      cupsGetDestMediaByName(http, dest, dinfo, "na_letter_8.5x11in", flags,
-                             size))
+  if (strcmp(media, "iso_a4_210x297mm") && cupsGetDestMediaByName(http, dest, dinfo, "na_letter_8.5x11in", flags, size))
     return (1);
 
-  if ((flags & CUPS_MEDIA_FLAGS_BORDERLESS) &&
-      cupsGetDestMediaByName(http, dest, dinfo, "na_index_4x6in", flags, size))
+  if ((flags & CUPS_MEDIA_FLAGS_BORDERLESS) && cupsGetDestMediaByName(http, dest, dinfo, "na_index_4x6in", flags, size))
     return (1);
 
  /*
@@ -1522,6 +1544,7 @@ cups_create_media_db(
   pwg_media_t		*pwg;		/* PWG media info */
   cups_array_t		*db;		/* New media database array */
   _cups_media_db_t	mdb;		/* Media entry */
+  char			media_key[256];	/* Synthesized media-key value */
 
 
   db = cupsArrayNew3((cups_array_func_t)cups_compare_media_db,
@@ -1622,60 +1645,91 @@ cups_create_media_db(
 	}
       }
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-color",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-color", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.color = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-info",
-                                         IPP_TAG_TEXT)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-info", IPP_TAG_TEXT)) != NULL)
         mdb.info = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-key",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-key", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.key = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-size-name",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-size-name", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.size_name = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-source",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-source", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.source = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-type",
-                                         IPP_TAG_ZERO)) != NULL &&
-          (media_attr->value_tag == IPP_TAG_NAME ||
-           media_attr->value_tag == IPP_TAG_NAMELANG ||
-           media_attr->value_tag == IPP_TAG_KEYWORD))
+      if ((media_attr = ippFindAttribute(val->collection, "media-type", IPP_TAG_ZERO)) != NULL && (media_attr->value_tag == IPP_TAG_NAME || media_attr->value_tag == IPP_TAG_NAMELANG || media_attr->value_tag == IPP_TAG_KEYWORD))
         mdb.type = media_attr->values[0].string.text;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-bottom-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-bottom-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.bottom = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-left-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-left-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.left = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-right-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-right-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.right = media_attr->values[0].integer;
 
-      if ((media_attr = ippFindAttribute(val->collection, "media-top-margin",
-                                         IPP_TAG_INTEGER)) != NULL)
+      if ((media_attr = ippFindAttribute(val->collection, "media-top-margin", IPP_TAG_INTEGER)) != NULL)
         mdb.top = media_attr->values[0].integer;
+
+      if (!mdb.key)
+      {
+        if (!mdb.size_name && (pwg = pwgMediaForSize(mdb.width, mdb.length)) != NULL)
+	  mdb.size_name = (char *)pwg->pwg;
+
+        if (!mdb.size_name)
+        {
+         /*
+          * Use a CUPS-specific identifier if we don't have a size name...
+          */
+
+	  if (flags & CUPS_MEDIA_FLAGS_READY)
+	    snprintf(media_key, sizeof(media_key), "cups-media-ready-%d", i + 1);
+	  else
+	    snprintf(media_key, sizeof(media_key), "cups-media-%d", i + 1);
+        }
+        else if (mdb.source)
+        {
+         /*
+          * Generate key using size name, source, and type (if set)...
+          */
+
+          if (mdb.type)
+            snprintf(media_key, sizeof(media_key), "%s_%s_%s", mdb.size_name, mdb.source, mdb.type);
+	  else
+            snprintf(media_key, sizeof(media_key), "%s_%s", mdb.size_name, mdb.source);
+        }
+        else if (mdb.type)
+        {
+         /*
+          * Generate key using size name and type...
+          */
+
+	  snprintf(media_key, sizeof(media_key), "%s_%s", mdb.size_name, mdb.type);
+        }
+        else
+        {
+         /*
+          * Key is just the size name...
+          */
+
+          strlcpy(media_key, mdb.size_name, sizeof(media_key));
+        }
+
+       /*
+        * Append "_borderless" for borderless media...
+        */
+
+        if (!mdb.bottom && !mdb.left && !mdb.right && !mdb.top)
+          strlcat(media_key, "_borderless", sizeof(media_key));
+
+        mdb.key = media_key;
+      }
+
+      DEBUG_printf(("1cups_create_media_db: Adding media: key=\"%s\", width=%d, length=%d, source=\"%s\", type=\"%s\".", mdb.key, mdb.width, mdb.length, mdb.source, mdb.type));
 
       cupsArrayAdd(db, &mdb);
     }
@@ -2036,12 +2090,14 @@ cups_get_media_db(http_t       *http,	/* I - Connection to destination */
     * Return the matching size...
     */
 
-    if (best->size_name)
-      strlcpy(size->media, best->size_name, sizeof(size->media));
-    else if (best->key)
+    if (best->key)
       strlcpy(size->media, best->key, sizeof(size->media));
-    else
+    else if (best->size_name)
+      strlcpy(size->media, best->size_name, sizeof(size->media));
+    else if (pwg && pwg->pwg)
       strlcpy(size->media, pwg->pwg, sizeof(size->media));
+    else
+      strlcpy(size->media, "unknown", sizeof(size->media));
 
     size->width  = best->width;
     size->length = best->length;
