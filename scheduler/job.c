@@ -447,7 +447,7 @@ cupsdCleanJobs(void)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCleanJobs: Job %d, state=%d, printer=%p, history_time=%d, file_time=%d", job->id, (int)job->state_value, (void *)job->printer, (int)job->history_time, (int)job->file_time);
 
-    if ((job->history_time && job->history_time) < JobHistoryUpdate || !JobHistoryUpdate)
+    if ((job->history_time && job->history_time < JobHistoryUpdate) || !JobHistoryUpdate)
       JobHistoryUpdate = job->history_time;
 
     if ((job->file_time && job->file_time < JobHistoryUpdate) || !JobHistoryUpdate)
