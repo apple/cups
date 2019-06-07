@@ -1910,7 +1910,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state_value);
+                (int)job->state_value);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_TEXT, "job-state-message", NULL, "");
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons",
                NULL, job->reasons->values[0].string.text);
@@ -3283,7 +3283,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       * Cancel all jobs on all printers...
       */
 
-      cupsdCancelJobs(NULL, username, purge);
+      cupsdCancelJobs(NULL, username, (int)purge);
 
       cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
 		      purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
@@ -3342,7 +3342,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       * Cancel all of the jobs on the named printer...
       */
 
-      cupsdCancelJobs(printer->name, username, purge);
+      cupsdCancelJobs(printer->name, username, (int)purge);
 
       cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
 		      printer->name,
@@ -3999,7 +3999,7 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state_value);
+                (int)job->state_value);
 
   con->response->request.status.status_code = IPP_OK;
 
@@ -4965,7 +4965,7 @@ copy_printer_attrs(
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-op-policy", NULL, printer->op_policy);
 
   if (!ra || cupsArrayFind(ra, "printer-state"))
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", printer->state);
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", (int)printer->state);
 
   if (!ra || cupsArrayFind(ra, "printer-state-change-date-time"))
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-state-change-date-time", ippTimeToDate(printer->state_time));
@@ -5510,7 +5510,7 @@ create_local_printer(
   add_printer_attributes:
 
   ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", (char)printer->accepting);
-  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", printer->state);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", (int)printer->state);
   add_printer_state_reasons(con, printer);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), httpIsEncrypted(con->http) ? "ipps" : "ipp", NULL, con->clientname, con->clientport, "/printers/%s", printer->name);
@@ -9955,7 +9955,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job->state_value);
+                (int)job->state_value);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons",
                NULL, job->reasons->values[0].string.text);
 
