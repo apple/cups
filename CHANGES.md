@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-05-30
+CHANGES - 2.3.0 - 2019-06-10
 ============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.3.0
 ----------------------
 
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
+- Removed dead code from the scheduler (Issue #5593)
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 - Fixed a command ordering issue in the Zebra ZPL driver.
 
