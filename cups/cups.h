@@ -603,6 +603,10 @@ extern const char	*cupsHashString(const unsigned char *hash, size_t hashsize, ch
 /* New in CUPS 2.3 */
 extern int		cupsAddDestMediaOptions(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, unsigned flags, cups_size_t *size, int num_options, cups_option_t **options) _CUPS_API_2_3;
 extern ipp_attribute_t	*cupsEncodeOption(ipp_t *ipp, ipp_tag_t group_tag, const char *name, const char *value) _CUPS_API_2_3;
+extern int		cupsEnumDests2(http_t *http, unsigned flags, int msec, int *cancel,
+				      cups_ptype_t type, cups_ptype_t mask,
+				      cups_dest_cb_t cb, void *user_data)
+				      _CUPS_API_2_3;
 
 #  ifdef __cplusplus
 }

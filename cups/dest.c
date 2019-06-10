@@ -975,6 +975,43 @@ cupsEnumDests(
   return (cups_enum_dests(CUPS_HTTP_DEFAULT, flags, msec, cancel, type, mask, cb, user_data));
 }
 
+/*
+ * 'cupsEnumDests2()' - Enumerate available destinations from the specified server
+ *                      with a callback function.
+ *
+ * Destinations are enumerated from one or more sources.  The callback function
+ * receives the @code user_data@ pointer and the destination pointer which can
+ * be used as input to the @link cupsCopyDest@ function.  The function must
+ * return 1 to continue enumeration or 0 to stop.
+ *
+ * The @code type@ and @code mask@ arguments allow the caller to filter the
+ * destinations that are enumerated.  Passing 0 for both will enumerate all
+ * printers.  The constant @code CUPS_PRINTER_DISCOVERED@ is used to filter on
+ * destinations that are available but have not yet been added locally.
+ *
+ * Enumeration happens on the current thread and does not return until all
+ * destinations have been enumerated or the callback function returns 0.
+ *
+ * Note: The callback function will likely receive multiple updates for the same
+ * destinations - it is up to the caller to suppress any duplicate destinations.
+ *
+ * @since CUPS 2.3@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsEnumDests2(
+  http_t         *http, 		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
+  unsigned       flags,			/* I - Enumeration flags */
+  int            msec,			/* I - Timeout in milliseconds, -1 for indefinite */
+  int            *cancel,		/* I - Pointer to "cancel" variable */
+  cups_ptype_t   type,			/* I - Printer type bits */
+  cups_ptype_t   mask,			/* I - Mask for printer type bits */
+  cups_dest_cb_t cb,			/* I - Callback function */
+  void           *user_data)		/* I - User data */
+{
+  return (cups_enum_dests(http, flags, msec, cancel, type, mask, cb, user_data));
+}
+
 
 #  ifdef __BLOCKS__
 /*
