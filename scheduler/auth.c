@@ -67,8 +67,6 @@ static void		free_authmask(cupsd_authmask_t *am, void *data);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
-#else
-static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
 
@@ -2067,25 +2065,5 @@ pam_func(
   *resp = replies;
 
   return (PAM_SUCCESS);
-}
-#else
-
-
-/*
- * 'to64()' - Base64-encode an integer value...
- */
-
-static void
-to64(char          *s,			/* O - Output string */
-     unsigned long v,			/* I - Value to encode */
-     int           n)			/* I - Number of digits */
-{
-  const char	*itoa64 = "./0123456789"
-                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                          "abcdefghijklmnopqrstuvwxyz";
-
-
-  for (; n > 0; n --, v >>= 6)
-    *s++ = itoa64[v & 0x3f];
 }
 #endif /* HAVE_LIBPAM */
