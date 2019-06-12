@@ -1,4 +1,4 @@
-CHANGES - 2.2.12 - 2019-05-30
+CHANGES - 2.2.12 - 2019-06-12
 =============================
 
 
@@ -21,6 +21,7 @@ Changes in CUPS v2.2.12
   in many cases (Issue #5583)
 - Fixed some compatibility issues with old releases of CUPS (Issue #5587)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
+- "make" failed with GZIP options (Issue #5595)
 - Fixed a command ordering issue in the Zebra ZPL driver.
 
 
