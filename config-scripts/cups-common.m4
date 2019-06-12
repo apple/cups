@@ -39,7 +39,11 @@ AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
-AC_PATH_PROG(GZIP,gzip)
+AC_PATH_PROG(GZIPPROG,gzip)
+AC_MSG_CHECKING(for install-sh script)
+INSTALL="`pwd`/install-sh"
+AC_SUBST(INSTALL)
+AC_MSG_RESULT(using $INSTALL)
 AC_PATH_PROG(LD,ld)
 AC_PATH_PROG(LN,ln)
 AC_PATH_PROG(MKDIR,mkdir)
@@ -48,17 +52,13 @@ AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(RMDIR,rmdir)
 AC_PATH_PROG(SED,sed)
 AC_PATH_PROG(XDGOPEN,xdg-open)
+
 if test "x$XDGOPEN" = x; then
 	CUPS_HTMLVIEW="htmlview"
 else
 	CUPS_HTMLVIEW="$XDGOPEN"
 fi
 AC_SUBST(CUPS_HTMLVIEW)
-
-AC_MSG_CHECKING(for install-sh script)
-INSTALL="`pwd`/install-sh"
-AC_SUBST(INSTALL)
-AC_MSG_RESULT(using $INSTALL)
 
 if test "x$AR" = x; then
 	AC_MSG_ERROR([Unable to find required library archive command.])
@@ -253,14 +253,14 @@ dnl ZLIB
 INSTALL_GZIP=""
 LIBZ=""
 AC_CHECK_HEADER(zlib.h,
-    AC_CHECK_LIB(z, gzgets,
+    AC_CHECK_LIB(z, gzgets,[
 	AC_DEFINE(HAVE_LIBZ)
 	LIBZ="-lz"
 	LIBS="$LIBS -lz"
 	AC_CHECK_LIB(z, inflateCopy, AC_DEFINE(HAVE_INFLATECOPY))
-	if test "x$GZIP" != z; then
+	if test "x$GZIPPROG" != x; then
 		INSTALL_GZIP="-z"
-	fi))
+	fi]))
 AC_SUBST(INSTALL_GZIP)
 AC_SUBST(LIBZ)
 
