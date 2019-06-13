@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-06-12
+CHANGES - 2.3.0 - 2019-06-13
 ============================
 
 
@@ -7,6 +7,7 @@ Changes in CUPS v2.3.0
 
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - Fixed builds when there is no TLS library (Issue #5590)
+- Eliminated some new GCC compiler warnings (Issue #5591)
 - Removed dead code from the scheduler (Issue #5593)
 - "make" failed with GZIP options (Issue #5595)
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.

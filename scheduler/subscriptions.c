@@ -163,27 +163,18 @@ cupsdAddEvent(
 	* Add printer attributes...
 	*/
 
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_URI,
-	             "notify-printer-uri", NULL, dest->uri);
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_URI, "notify-printer-uri", NULL, dest->uri);
 
-	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
-	             "printer-name", NULL, dest->name);
+	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME, "printer-name", NULL, dest->name);
 
-	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	              "printer-state", dest->state);
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM, "printer-state", (int)dest->state);
 
 	if (dest->num_reasons == 0)
-	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	               IPP_TAG_KEYWORD, "printer-state-reasons", NULL,
-		       dest->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "printer-state-reasons", NULL, dest->state == IPP_PRINTER_STOPPED ? "paused" : "none");
 	else
-	  ippAddStrings(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	                IPP_TAG_KEYWORD, "printer-state-reasons",
-			dest->num_reasons, NULL,
-			(const char * const *)dest->reasons);
+	  ippAddStrings(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "printer-state-reasons", dest->num_reasons, NULL, (const char * const *)dest->reasons);
 
-	ippAddBoolean(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-	              "printer-is-accepting-jobs", (char)dest->accepting);
+	ippAddBoolean(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, "printer-is-accepting-jobs", (char)dest->accepting);
       }
 
       if (job)
@@ -192,75 +183,51 @@ cupsdAddEvent(
 	* Add job attributes...
 	*/
 
-	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	              "notify-job-id", job->id);
-	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	              "job-state", job->state_value);
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER, "notify-job-id", job->id);
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM, "job-state", (int)job->state_value);
 
-        if ((attr = ippFindAttribute(job->attrs, "job-name",
-	                             IPP_TAG_NAME)) != NULL)
-	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME,
-	               "job-name", NULL, attr->values[0].string.text);
+        if ((attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME)) != NULL)
+	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_NAME, "job-name", NULL, attr->values[0].string.text);
 
 	switch (job->state_value)
 	{
 	  case IPP_JOB_PENDING :
               if (dest && dest->state == IPP_PRINTER_STOPPED)
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "printer-stopped");
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "printer-stopped");
               else
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "none");
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "none");
               break;
 
 	  case IPP_JOB_HELD :
               if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_KEYWORD) != NULL ||
 		  ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME) != NULL)
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-hold-until-specified");
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-hold-until-specified");
               else
-        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		             IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			     "job-incoming");
+        	ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-incoming");
               break;
 
 	  case IPP_JOB_PROCESSING :
-              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			   "job-printing");
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-printing");
               break;
 
 	  case IPP_JOB_STOPPED :
-              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			   "job-stopped");
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-stopped");
               break;
 
 	  case IPP_JOB_CANCELED :
-              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			   "job-canceled-by-user");
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-canceled-by-user");
               break;
 
 	  case IPP_JOB_ABORTED :
-              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			   "aborted-by-system");
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "aborted-by-system");
               break;
 
 	  case IPP_JOB_COMPLETED :
-              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
-		           IPP_TAG_KEYWORD, "job-state-reasons", NULL,
-			   "job-completed-successfully");
+              ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-completed-successfully");
               break;
 	}
 
-	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
-	              "job-impressions-completed",
-		      job->sheets ? job->sheets->values[0].integer : 0);
+	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER, "job-impressions-completed", job->sheets ? job->sheets->values[0].integer : 0);
       }
 
      /*
@@ -274,8 +241,7 @@ cupsdAddEvent(
   if (temp)
     cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
   else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Discarding unused %s event...",
-                    cupsdEventName(event));
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Discarding unused %s event...", cupsdEventName(event));
 }
 
 

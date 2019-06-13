@@ -4586,7 +4586,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       for (fin = (_pwg_finishings_t *)cupsArrayFirst(p->pc->finishings); fin; fin = (_pwg_finishings_t *)cupsArrayNext(p->pc->finishings))
       {
         if (num_finishings < (int)(sizeof(finishings) / sizeof(finishings[0])))
-          finishings[num_finishings++] = fin->value;
+          finishings[num_finishings++] = (int)fin->value;
 
         switch (fin->value)
         {

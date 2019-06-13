@@ -4861,13 +4861,13 @@ load_ppd_attributes(
   attr = ippAddIntegers(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-ready", cupsArrayCount(pc->finishings) + 1, NULL);
   ippSetInteger(attrs, &attr, 0, IPP_FINISHINGS_NONE);
   for (i = 1, finishings = (_pwg_finishings_t *)cupsArrayFirst(pc->finishings); finishings; i ++, finishings = (_pwg_finishings_t *)cupsArrayNext(pc->finishings))
-    ippSetInteger(attrs, &attr, i, finishings->value);
+    ippSetInteger(attrs, &attr, i, (int)finishings->value);
 
   /* finishings-supported */
   attr = ippAddIntegers(attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM, "finishings-supported", cupsArrayCount(pc->finishings) + 1, NULL);
   ippSetInteger(attrs, &attr, 0, IPP_FINISHINGS_NONE);
   for (i = 1, finishings = (_pwg_finishings_t *)cupsArrayFirst(pc->finishings); finishings; i ++, finishings = (_pwg_finishings_t *)cupsArrayNext(pc->finishings))
-    ippSetInteger(attrs, &attr, i, finishings->value);
+    ippSetInteger(attrs, &attr, i, (int)finishings->value);
 
   /* media-bottom-margin-supported */
   for (i = 0, num_margins = 0, pwg_size = pc->sizes; i < pc->num_sizes && num_margins < (int)(sizeof(margins) / sizeof(margins[0])); i ++, pwg_size ++)
