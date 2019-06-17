@@ -11,6 +11,8 @@ Changes in CUPS v2.3.0
 - Removed dead code from the scheduler (Issue #5593)
 - "make" failed with GZIP options (Issue #5595)
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
+- Fixed an issue with unsupported "sides" values in the IPP backend
+  (rdar://51775322)
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 - Fixed a command ordering issue in the Zebra ZPL driver.
 

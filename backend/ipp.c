@@ -1504,7 +1504,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         const char *sides = cupsGetOption("sides", num_options, options);
 
-        if (!strncmp(sides, "two-sided-", 10))
+        if (!sides || !strncmp(sides, "two-sided-", 10))
         {
           fputs("DEBUG: Unable to do two-sided printing, setting sides to 'one-sided'.\n", stderr);
           num_options = cupsAddOption("sides", "one-sided", num_options, &options);
