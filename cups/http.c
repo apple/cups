@@ -1,8 +1,8 @@
 /*
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
@@ -1345,8 +1345,11 @@ httpGetSubField2(http_t       *http,	/* I - HTTP connection */
 
   DEBUG_printf(("2httpGetSubField2(http=%p, field=%d, name=\"%s\", value=%p, valuelen=%d)", (void *)http, field, name, (void *)value, valuelen));
 
+  if (value)
+    *value = '\0';
+
   if (!http || !name || !value || valuelen < 2 ||
-      field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
+      field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX || !http->fields[field])
     return (NULL);
 
   end = value + valuelen - 1;
