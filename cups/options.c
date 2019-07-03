@@ -80,6 +80,15 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
   else if (!_cups_strcasecmp(name, "print-quality"))
     num_options = cupsRemoveOption("cupsPrintQuality", num_options, options);
 
+  /* remove *Duplex* option read from lpoptions file if "sides" is specified on command line */
+  if (!_cups_strcasecmp(name, "sides")) {
+    num_options = cupsRemoveOption("Duplex", num_options, options);
+    num_options = cupsRemoveOption("EFDuplex", num_options, options);
+    num_options = cupsRemoveOption("EFDuplexing", num_options, options);
+    num_options = cupsRemoveOption("KD03Duplex", num_options, options);
+    num_options = cupsRemoveOption("JCLDuplex", num_options, options);
+  }
+
  /*
   * Look for an existing option with the same name...
   */
