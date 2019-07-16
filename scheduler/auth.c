@@ -1188,13 +1188,19 @@ cupsdCheckGroup(
 	  return (1);
     }
 
-#else
+#endif /* HAVE_GETGROUPLIST */
+    /*
+     * Searching group->gr_mem after getgrouplist failure may
+     * yield success because some NSS source have better
+     * success searching on group name instead of iterating 
+     * on user name. For instance, nss_ldap looking up an
+     * OpenLDAP dyngroup.
+     */
     for (i = 0; group->gr_mem[i]; i ++)
     {
       if (!_cups_strcasecmp(username, group->gr_mem[i]))
 	return (1);
     }
-#endif /* HAVE_GETGROUPLIST */
   }
   else
     groupid = (gid_t)-1;
