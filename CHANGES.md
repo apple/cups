@@ -5,6 +5,7 @@ CHANGES - 2.3.0 - 2019-07-16
 Changes in CUPS v2.3.0
 ----------------------
 
+- Documentation updates (Issue #5604)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - Fixed builds when there is no TLS library (Issue #5590)
 - Eliminated some new GCC compiler warnings (Issue #5591)

@@ -7,7 +7,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH cupsd.conf 5 "CUPS" "2 May 2019" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "16 July 2019" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -690,6 +690,8 @@ The following directives may be placed inside Location and Limit sections in the
 .TP 5
 \fBAllow @LOCAL\fR
 Allows access from the named hosts, domains, addresses, or interfaces.
+The @IF(name) form uses the current subnets configured for the named interface.
+The @LOCAL form uses the current subnets configured for all interfaces that are not point-to-point, for example Ethernet and Wi-Fi interfaces are used but DSL and VPN interfaces are not.
 The Order directive controls whether Allow lines are evaluated before or after Deny lines.
 .TP 5
 \fBAuthType None\fR
@@ -724,6 +726,8 @@ The value "Default" corresponds to the DefaultAuthType value.
 .TP 5
 \fBDeny @LOCAL\fR
 Denies access from the named hosts, domains, addresses, or interfaces.
+The @IF(name) form uses the current subnets configured for the named interface.
+The @LOCAL form uses the current subnets configured for all interfaces that are not point-to-point, for example Ethernet and Wi-Fi interfaces are used but DSL and VPN interfaces are not.
 The Order directive controls whether Deny lines are evaluated before or after Allow lines.
 .TP 5
 \fBEncryption IfRequested\fR
@@ -862,6 +866,10 @@ On Linux this is typically done using the
 command, while on macOS the
 .BR launchctl (8)
 command is used instead.
+.PP
+The @LOCAL macro name can be confusing since the system running
+.B cupsd
+often belongs to a different set of subnets from its clients.
 .SH CONFORMING TO
 The \fBcupsd.conf\fR file format is based on the Apache HTTP Server configuration file format.
 .SH EXAMPLES
