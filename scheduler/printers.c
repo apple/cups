@@ -1072,8 +1072,7 @@ cupsdLoadAllPrinters(void)
     }
     else if (!_cups_strcasecmp(line, "Info"))
     {
-      if (value)
-	cupsdSetString(&p->info, value);
+      cupsdSetString(&p->info, value ? value : "");
     }
     else if (!_cups_strcasecmp(line, "MakeModel"))
     {
@@ -1082,23 +1081,19 @@ cupsdLoadAllPrinters(void)
     }
     else if (!_cups_strcasecmp(line, "Location"))
     {
-      if (value)
-	cupsdSetString(&p->location, value);
+      cupsdSetString(&p->location, value ? value : "");
     }
     else if (!_cups_strcasecmp(line, "GeoLocation"))
     {
-      if (value)
-        cupsdSetString(&p->geo_location, value);
+      cupsdSetString(&p->geo_location, value ? value : "");
     }
     else if (!_cups_strcasecmp(line, "Organization"))
     {
-      if (value)
-	cupsdSetString(&p->organization, value);
+      cupsdSetString(&p->organization, value ? value : "");
     }
     else if (!_cups_strcasecmp(line, "OrganizationalUnit"))
     {
-      if (value)
-	cupsdSetString(&p->organizational_unit, value);
+      cupsdSetString(&p->organizational_unit, value ? value : "");
     }
     else if (!_cups_strcasecmp(line, "DeviceURI"))
     {

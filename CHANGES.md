@@ -12,6 +12,8 @@ Changes in CUPS v2.3.0
 - Removed dead code from the scheduler (Issue #5593)
 - "make" failed with GZIP options (Issue #5595)
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
+- The scheduler no longer provides a default value for the description
+  (Issue #5603)
 - The scheduler now logs jobs held for authentication using the error level so
   it is clear what happened (Issue #5604)
 - The `lpadmin` command did not always update the PPD file for changes to the
