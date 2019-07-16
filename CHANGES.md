@@ -22,6 +22,9 @@ Changes in CUPS v2.2.12
 - Fixed some compatibility issues with old releases of CUPS (Issue #5587)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - "make" failed with GZIP options (Issue #5595)
+- The scheduler now uses both the group's membership list as well as the
+  various OS-specific membership functions to determine whether a user belongs
+  to a named group (Issue #5613)
 - The scheduler would restart continuously when idle and printers were not
   shared (rdar://52561199)
 - Fixed a command ordering issue in the Zebra ZPL driver.
