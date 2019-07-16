@@ -462,7 +462,7 @@ cupsdCleanJobs(void)
         cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing from history.");
 	cupsdDeleteJob(job, CUPSD_JOB_PURGE);
       }
-      else if (job->file_time && job->file_time <= curtime)
+      else if (job->file_time && job->file_time <= curtime && job->num_files > 0)
       {
         cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing document files.");
         remove_job_files(job);

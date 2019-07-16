@@ -11,6 +11,8 @@ Changes in CUPS v2.3.0
 - Eliminated some new GCC compiler warnings (Issue #5591)
 - Removed dead code from the scheduler (Issue #5593)
 - "make" failed with GZIP options (Issue #5595)
+- Fixed potential excess logging from the scheduler when removing job files
+  (Issue #5597)
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
 - The scheduler no longer provides a default value for the description
   (Issue #5603)
