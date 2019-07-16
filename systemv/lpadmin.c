@@ -1472,7 +1472,7 @@ set_printer_options(
 	               (!_cups_strcasecmp(boolval, "true") ||
 		        !_cups_strcasecmp(boolval, "yes") ||
 		        !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
-        ppdchanged = 1;
+		    ppdchanged = 1;
       }
       else if (!strncmp(line, "*cupsSNMPSupplies:", 18) &&
 	       (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
@@ -1483,7 +1483,7 @@ set_printer_options(
 	               (!_cups_strcasecmp(boolval, "true") ||
 		        !_cups_strcasecmp(boolval, "yes") ||
 		        !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
-        ppdchanged = 1;
+		    ppdchanged = 1;
       }
       else if (strncmp(line, "*Default", 8))
         cupsFilePrintf(out, "%s\n", line);
