@@ -1166,7 +1166,23 @@ cupsdCheckGroup(
 
     groupid = group->gr_gid;
 
+    for (i = 0; group->gr_mem[i]; i ++)
+    {
+     /*
+      * User appears in the group membership...
+      */
+
+      if (!_cups_strcasecmp(username, group->gr_mem[i]))
+	return (1);
+    }
+
 #ifdef HAVE_GETGROUPLIST
+   /*
+    * If the user isn't in the group membership list, try the results from
+    * getgrouplist() which is supposed to return the full list of groups a user
+    * belongs to...
+    */
+
     if (user)
     {
       int	ngroups;		/* Number of groups */
@@ -1186,13 +1202,6 @@ cupsdCheckGroup(
       for (i = 0; i < ngroups; i ++)
         if ((int)groupid == (int)groups[i])
 	  return (1);
-    }
-
-#else
-    for (i = 0; group->gr_mem[i]; i ++)
-    {
-      if (!_cups_strcasecmp(username, group->gr_mem[i]))
-	return (1);
     }
 #endif /* HAVE_GETGROUPLIST */
   }

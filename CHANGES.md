@@ -11,6 +11,9 @@ Changes in CUPS v2.3.0
 - Removed dead code from the scheduler (Issue #5593)
 - "make" failed with GZIP options (Issue #5595)
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
+- The scheduler now uses both the group's membership list as well as the
+  various OS-specific membership functions to determine whether a user belongs
+  to a named group (Issue #5613)
 - Fixed an issue with unsupported "sides" values in the IPP backend
   (rdar://51775322)
 - The scheduler would restart continuously when idle and printers were not
