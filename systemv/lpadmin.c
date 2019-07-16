@@ -1488,6 +1488,7 @@ set_printer_options(
 	  (boolval = cupsGetOption("cupsIPPSupplies", num_options,
 	                           options)) != NULL)
       {
+        ppdchanged         = 1;
         wrote_ipp_supplies = 1;
         cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
 	               (!_cups_strcasecmp(boolval, "true") ||
@@ -1498,6 +1499,7 @@ set_printer_options(
 	       (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
 	                                options)) != NULL)
       {
+        ppdchanged          = 1;
         wrote_snmp_supplies = 1;
         cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
 	               (!_cups_strcasecmp(boolval, "true") ||
@@ -1558,6 +1560,8 @@ set_printer_options(
 	(boolval = cupsGetOption("cupsIPPSupplies", num_options,
 				 options)) != NULL)
     {
+      ppdchanged = 1;
+
       cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
 		     (!_cups_strcasecmp(boolval, "true") ||
 		      !_cups_strcasecmp(boolval, "yes") ||
@@ -1568,6 +1572,8 @@ set_printer_options(
         (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
 			         options)) != NULL)
     {
+      ppdchanged = 1;
+
       cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
 		     (!_cups_strcasecmp(boolval, "true") ||
 		      !_cups_strcasecmp(boolval, "yes") ||
@@ -1582,8 +1588,7 @@ set_printer_options(
     * Do the request...
     */
 
-    ippDelete(cupsDoFileRequest(http, request, "/admin/",
-                                ppdchanged ? tempfile : file));
+    ippDelete(cupsDoFileRequest(http, request, "/admin/", ppdchanged ? tempfile : file));
 
    /*
     * Clean up temp files... (TODO: catch signals in case we CTRL-C during
