@@ -756,7 +756,10 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_ONDEMAND
 	if (OnDemand)
+	{
+	  stop_scheduler = 1;
 	  break;
+	}
 #endif /* HAVE_ONDEMAND */
 
         DoingShutdown = 1;
@@ -2048,13 +2051,31 @@ service_checkout(int shutdown)          /* I - Shutting down? */
 #ifdef HAVE_ONDEMAND
   if (OnDemand)
   {
+    int shared_printers = 0;		/* Do we have shared printers? */
+
     strlcpy(pidfile, CUPS_KEEPALIVE, sizeof(pidfile));
+
+   /*
+    * If printer sharing is on see if there are any actual shared printers...
+    */
+
+    if (Browsing && BrowseLocalProtocols)
+    {
+      cupsd_printer_t *p = NULL;	/* Current printer */
+
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers); p; p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      {
+        if (p->shared)
+          break;
+      }
+
+      shared_printers = (p != NULL);
+    }
 
     if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
         WebInterface ||			/* Web interface enabled */
         NeedReload ||			/* Doing a reload */
-        (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
-                                        /* Printers being shared */
+        shared_printers)                /* Printers being shared */
     {
      /*
       * Create or remove the "keep-alive" file based on whether there are active

@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-06-17
+CHANGES - 2.3.0 - 2019-07-16
 ============================
 
 
@@ -13,6 +13,8 @@ Changes in CUPS v2.3.0
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
 - Fixed an issue with unsupported "sides" values in the IPP backend
   (rdar://51775322)
+- The scheduler would restart continuously when idle and printers were not
+  shared (rdar://52561199)
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 - Fixed a command ordering issue in the Zebra ZPL driver.
 
