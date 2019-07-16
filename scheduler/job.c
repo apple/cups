@@ -2625,7 +2625,7 @@ cupsdSetJobState(
     else
       cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "%s", buffer);
 
-    if (newstate == IPP_JOB_STOPPED || newstate == IPP_JOB_ABORTED)
+    if (newstate == IPP_JOB_STOPPED || newstate == IPP_JOB_ABORTED || newstate == IPP_JOB_HELD)
       cupsdLogJob(job, CUPSD_LOG_ERROR, "%s", buffer);
     else
       cupsdLogJob(job, CUPSD_LOG_INFO, "%s", buffer);
