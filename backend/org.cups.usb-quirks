@@ -242,6 +242,9 @@
 # All Intermec devices (Issue #4553)
 0x067e no-reattach
 
+# HP LaserJet 1015 (Issue #5617)
+0x03f0 0x0e17 delay-close
+
 # HP LaserJet 1150 (Issue #4549)
 0x03f0 0x0f17 delay-close
 
