@@ -20,7 +20,40 @@
 #  include "md5-internal.h"
 #endif /* __APPLE__ */
 
+/* 'cupsHashNoCryptoData()' - Perform MD5 hash function on given data,
+ *                            which does not have crypto purpose
+ *
+ *  The function is stub over "cupsHashData" called with MD5 hash function.
+ *  It turns on and of GNUTLS relax mode for FIPS140-2 in case CUPS is built
+ *  with GNUTLS to make sure the hash is done even when MD5 is disabled
+ *  by default in GNUTLS. *
+ *
+ *  The current non crypto usages of MD5 hash function in CUPS are:
+ *  - UUID generation
+ *  - cookie generation
+ *  - showing a digest of a certificate chain
+ */
 
+ssize_t						/* O - Size of hash or -1 on error */
+cupsHashNoCryptoData(const void    *data,	/* I - Data to hash */
+                     size_t        datalen,	/* I - Length of data to hash */
+                     unsigned char *hash,	/* I - Hash buffer */
+                     size_t        hashsize)	/* I - Size of hash buffer */
+{
+  ssize_t result_hashsize;
+
+#if defined(HAVE_GNUTLS) && defined(HAVE_GNUTLS_RELAX_MODE)
+  GNUTLS_FIPS140_SET_LAX_MODE();
+#endif
+
+  result_hashsize = cupsHashData("md5", data, datalen, hash, hashsize);
+
+#if defined(HAVE_GNUTLS) && defined(HAVE_GNUTLS_RELAX_MODE)
+  GNUTLS_FIPS140_SET_STRICT_MODE();
+#endif
+
+  return result_hashsize; 
+}
 /*
  * 'cupsHashData()' - Perform a hash function on the given data.
  *

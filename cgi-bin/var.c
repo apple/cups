@@ -1220,7 +1220,7 @@ cgi_set_sid(void)
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
 	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255);
-  cupsHashData("md5", (unsigned char *)buffer, strlen(buffer), sum, sizeof(sum));
+  cupsHashNoCryptoData((unsigned char *)buffer, strlen(buffer), sum, sizeof(sum));
 
   cgiSetCookie(CUPS_SID, cupsHashString(sum, sizeof(sum), sid, sizeof(sid)), "/", NULL, 0, 0);
 

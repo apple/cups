@@ -512,7 +512,7 @@ httpAssembleUUID(const char *server,	/* I - Server name */
            port, name ? name : server, number,
 	   (unsigned)CUPS_RAND() & 0xffff, (unsigned)CUPS_RAND() & 0xffff);
 
-  cupsHashData("md5", (unsigned char *)data, strlen(data), md5sum, sizeof(md5sum));
+  cupsHashNoCryptoData((unsigned char *)data, strlen(data), md5sum, sizeof(md5sum));
 
  /*
   * Generate the UUID from the MD5...
