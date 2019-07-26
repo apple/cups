@@ -54,6 +54,7 @@ cupsHashNoCryptoData(const void    *data,	/* I - Data to hash */
 
   return result_hashsize; 
 }
+
 /*
  * 'cupsHashData()' - Perform a hash function on the given data.
  *
