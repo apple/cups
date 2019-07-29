@@ -10,6 +10,7 @@ dnl
 AC_ARG_ENABLE(ssl, [  --disable-ssl           disable SSL/TLS support])
 AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=first])
 AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=second])
+AC_ARG_ENABLE(gnutls_relax_mode, [  --enable-gnutls-relax-mode         use GNU TLS in relax mode for MD5 hash function at non-crypto cases, default=disabled])
 
 SSLFLAGS=""
 SSLLIBS=""
@@ -61,6 +62,10 @@ if test x$enable_ssl != xno; then
 	    AC_CHECK_FUNC(gnutls_transport_set_pull_timeout_function, AC_DEFINE(HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION))
 	    AC_CHECK_FUNC(gnutls_priority_set_direct, AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT))
 	    LIBS="$SAVELIBS"
+
+	    if "x$enable_gnutls_relax_mode" != "xno"; then
+	        AC_DEFINE(HAVE_GNUTLS_RELAX_MODE)
+	    fi
 	fi
     fi
 fi

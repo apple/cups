@@ -219,7 +219,16 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
       if (hashsize < tempsize)
         goto too_small;
 
+# if defined(HAVE_GNUTLS_RELAX_MODE)
+      GNUTLS_FIPS140_SET_LAX_MODE();
+# endif
+
       gnutls_hash_fast(alg, data, datalen, temp);
+
+# if defined(HAVE_GNUTLS_RELAX_MODE)
+      GNUTLS_FIPS140_SET_STRICT_MODE();
+# endif
+
       memcpy(hash, temp, tempsize);
 
       return ((ssize_t)tempsize);
@@ -228,7 +237,15 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
     if (hashsize < gnutls_hash_get_len(alg))
       goto too_small;
 
+# if defined(HAVE_GNUTLS_RELAX_MODE)
+    GNUTLS_FIPS140_SET_LAX_MODE();
+# endif
+
     gnutls_hash_fast(alg, data, datalen, hash);
+
+# if defined(HAVE_GNUTLS_RELAX_MODE)
+    GNUTLS_FIPS140_SET_STRICT_MODE();
+# endif
 
     return ((ssize_t)gnutls_hash_get_len(alg));
   }
