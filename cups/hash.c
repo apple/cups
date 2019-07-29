@@ -186,7 +186,13 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   size_t	tempsize = 0;		/* Truncate to this size? */
 
   if (!strcmp(algorithm, "md5"))
+  {
     alg = GNUTLS_DIG_MD5;
+
+# if defined(HAVE_GNUTLS_RELAX_MODE)
+    GNUTLS_FIPS140_SET_LAX_MODE();
+# endif
+  }
   else if (!strcmp(algorithm, "sha"))
     alg = GNUTLS_DIG_SHA1;
   else if (!strcmp(algorithm, "sha2-224"))
@@ -219,15 +225,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
       if (hashsize < tempsize)
         goto too_small;
 
-# if defined(HAVE_GNUTLS_RELAX_MODE)
-      GNUTLS_FIPS140_SET_LAX_MODE();
-# endif
-
       gnutls_hash_fast(alg, data, datalen, temp);
-
-# if defined(HAVE_GNUTLS_RELAX_MODE)
-      GNUTLS_FIPS140_SET_STRICT_MODE();
-# endif
 
       memcpy(hash, temp, tempsize);
 
@@ -237,14 +235,11 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
     if (hashsize < gnutls_hash_get_len(alg))
       goto too_small;
 
-# if defined(HAVE_GNUTLS_RELAX_MODE)
-    GNUTLS_FIPS140_SET_LAX_MODE();
-# endif
-
     gnutls_hash_fast(alg, data, datalen, hash);
 
 # if defined(HAVE_GNUTLS_RELAX_MODE)
-    GNUTLS_FIPS140_SET_STRICT_MODE();
+    if (!strcmp(algorithm, "md5"))
+      GNUTLS_FIPS140_SET_STRICT_MODE();
 # endif
 
     return ((ssize_t)gnutls_hash_get_len(alg));
