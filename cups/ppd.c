@@ -75,7 +75,8 @@ static void		ppd_free_option(ppd_option_t *option);
 static ppd_coption_t	*ppd_get_coption(ppd_file_t *ppd, const char *name);
 static ppd_cparam_t	*ppd_get_cparam(ppd_coption_t *opt,
 			                const char *param,
-					const char *text);
+					const char *text,
+					ppd_cptype_t etype);
 static ppd_group_t	*ppd_get_group(ppd_file_t *ppd, const char *name,
 			               const char *text, _ppd_globals_t *pg,
 				       cups_encoding_t encoding);
@@ -964,31 +965,13 @@ _ppdOpen(
     {
       ppd_coption_t	*coption;	/* Custom option */
       ppd_cparam_t	*cparam;	/* Custom parameter */
+      ppd_cptype_t	etype;	/* Data type as enum*/
       int		corder;		/* Order number */
       char		ctype[33],	/* Data type */
 			cminimum[65],	/* Minimum value */
 			cmaximum[65];	/* Maximum value */
 
-
-     /*
-      * Get the custom option and parameter...
-      */
-
-      if ((coption = ppd_get_coption(ppd, keyword + 11)) == NULL)
-      {
-        pg->ppd_status = PPD_ALLOC_ERROR;
-
-	goto error;
-      }
-
-      if ((cparam = ppd_get_cparam(coption, name, text)) == NULL)
-      {
-        pg->ppd_status = PPD_ALLOC_ERROR;
-
-	goto error;
-      }
-
-     /*
+    /*
       * Get the parameter data...
       */
 
@@ -1001,61 +984,78 @@ _ppdOpen(
 	goto error;
       }
 
-      cparam->order = corder;
-
-      if (!strcmp(ctype, "curve"))
-      {
-        cparam->type = PPD_CUSTOM_CURVE;
-	cparam->minimum.custom_curve = (float)_cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_curve = (float)_cupsStrScand(cmaximum, NULL, loc);
-      }
-      else if (!strcmp(ctype, "int"))
-      {
-        cparam->type = PPD_CUSTOM_INT;
-	cparam->minimum.custom_int = atoi(cminimum);
-	cparam->maximum.custom_int = atoi(cmaximum);
-      }
-      else if (!strcmp(ctype, "invcurve"))
-      {
-        cparam->type = PPD_CUSTOM_INVCURVE;
-	cparam->minimum.custom_invcurve = (float)_cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_invcurve = (float)_cupsStrScand(cmaximum, NULL, loc);
-      }
-      else if (!strcmp(ctype, "passcode"))
-      {
-        cparam->type = PPD_CUSTOM_PASSCODE;
-	cparam->minimum.custom_passcode = atoi(cminimum);
-	cparam->maximum.custom_passcode = atoi(cmaximum);
-      }
-      else if (!strcmp(ctype, "password"))
-      {
-        cparam->type = PPD_CUSTOM_PASSWORD;
-	cparam->minimum.custom_password = atoi(cminimum);
-	cparam->maximum.custom_password = atoi(cmaximum);
-      }
-      else if (!strcmp(ctype, "points"))
-      {
-        cparam->type = PPD_CUSTOM_POINTS;
-	cparam->minimum.custom_points = (float)_cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_points = (float)_cupsStrScand(cmaximum, NULL, loc);
-      }
-      else if (!strcmp(ctype, "real"))
-      {
-        cparam->type = PPD_CUSTOM_REAL;
-	cparam->minimum.custom_real = (float)_cupsStrScand(cminimum, NULL, loc);
-	cparam->maximum.custom_real = (float)_cupsStrScand(cmaximum, NULL, loc);
-      }
-      else if (!strcmp(ctype, "string"))
-      {
-        cparam->type = PPD_CUSTOM_STRING;
-	cparam->minimum.custom_string = atoi(cminimum);
-	cparam->maximum.custom_string = atoi(cmaximum);
-      }
+      if (!strcmp(ctype, "curve")) etype = PPD_CUSTOM_CURVE;
+      else if (!strcmp(ctype, "int")) etype = PPD_CUSTOM_INT;
+      else if (!strcmp(ctype, "invcurve")) etype = PPD_CUSTOM_INVCURVE;
+      else if (!strcmp(ctype, "passcode")) etype = PPD_CUSTOM_PASSCODE;
+      else if (!strcmp(ctype, "password")) etype = PPD_CUSTOM_PASSWORD;
+      else if (!strcmp(ctype, "points")) etype = PPD_CUSTOM_POINTS;
+      else if (!strcmp(ctype, "real")) etype = PPD_CUSTOM_REAL;
+      else if (!strcmp(ctype, "string")) etype = PPD_CUSTOM_STRING;
       else
       {
         pg->ppd_status = PPD_BAD_CUSTOM_PARAM;
 
 	goto error;
+      }
+
+     /*
+      * Get the custom option and parameter...
+      */
+
+      if ((coption = ppd_get_coption(ppd, keyword + 11)) == NULL)
+      {
+        pg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
+
+      if ((cparam = ppd_get_cparam(coption, name, text, etype)) == NULL)
+      {
+        pg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
+
+     /*
+      * Set the parameter data...
+      */
+
+      cparam->order = corder;
+
+      switch (etype) {
+        case PPD_CUSTOM_CURVE:
+          cparam->minimum.custom_curve = (float)_cupsStrScand(cminimum, NULL, loc);
+          cparam->maximum.custom_curve = (float)_cupsStrScand(cmaximum, NULL, loc);
+          break;
+        case PPD_CUSTOM_INT:
+          cparam->minimum.custom_int = atoi(cminimum);
+          cparam->maximum.custom_int = atoi(cmaximum);
+          break;
+        case PPD_CUSTOM_INVCURVE:
+          cparam->minimum.custom_invcurve = (float)_cupsStrScand(cminimum, NULL, loc);
+          cparam->maximum.custom_invcurve = (float)_cupsStrScand(cmaximum, NULL, loc);
+          break;
+        case PPD_CUSTOM_PASSCODE:
+          cparam->minimum.custom_passcode = atoi(cminimum);
+          cparam->maximum.custom_passcode = atoi(cmaximum);
+          break;
+        case PPD_CUSTOM_PASSWORD:
+          cparam->minimum.custom_password = atoi(cminimum);
+          cparam->maximum.custom_password = atoi(cmaximum);
+          break;
+        case PPD_CUSTOM_POINTS:
+          cparam->minimum.custom_points = (float)_cupsStrScand(cminimum, NULL, loc);
+          cparam->maximum.custom_points = (float)_cupsStrScand(cmaximum, NULL, loc);
+          break;
+        case PPD_CUSTOM_REAL:
+          cparam->minimum.custom_real = (float)_cupsStrScand(cminimum, NULL, loc);
+          cparam->maximum.custom_real = (float)_cupsStrScand(cmaximum, NULL, loc);
+          break;
+        case PPD_CUSTOM_STRING:
+          cparam->minimum.custom_string = atoi(cminimum);
+          cparam->maximum.custom_string = atoi(cmaximum);
+          break;
       }
 
      /*
@@ -2617,7 +2617,8 @@ ppd_get_coption(ppd_file_t *ppd,	/* I - PPD file */
 static ppd_cparam_t *			/* O - Extended option... */
 ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
                const char    *param,	/* I - Name of parameter */
-	       const char    *text)	/* I - Human-readable text */
+	       const char    *text,	/* I - Human-readable text */
+           ppd_cptype_t	etype)	/* I - type of the parameter */
 {
   ppd_cparam_t	*cparam;		/* New custom parameter */
 
@@ -2627,7 +2628,11 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
   */
 
   if ((cparam = ppdFindCustomParam(opt, param)) != NULL)
+  {
+    if (cparam->type != etype)
+      return (NULL);
     return (cparam);
+  }
 
  /*
   * Not found, so create the custom parameter record...
@@ -2638,6 +2643,8 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
 
   strlcpy(cparam->name, param, sizeof(cparam->name));
   strlcpy(cparam->text, text[0] ? text : param, sizeof(cparam->text));
+  cparam->type = etype;
+  cparam->current.custom_string = NULL;
 
  /*
   * Add this record to the array...
