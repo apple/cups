@@ -22,6 +22,7 @@ Changes in CUPS v2.2.12
 - Fixed some compatibility issues with old releases of CUPS (Issue #5587)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - "make" failed with GZIP options (Issue #5595)
+- Added FIPS-140 workarounds for GNU TLS (Issue #5601, Issue #5622)
 - The scheduler no longer provides a default value for the description
   (Issue #5603)
 - The `lpadmin` command did not always update the PPD file for changes to the
