@@ -14,6 +14,7 @@ Changes in CUPS v2.3.0
 - Fixed potential excess logging from the scheduler when removing job files
   (Issue #5597)
 - Fixed a NULL pointer dereference bug in `httpGetSubField2` (Issue #5598)
+- Added FIPS-140 workarounds for GNU TLS (Issue #5601, Issue #5622)
 - The scheduler no longer provides a default value for the description
   (Issue #5603)
 - The scheduler now logs jobs held for authentication using the error level so
