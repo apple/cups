@@ -705,6 +705,8 @@ _ppdOpen(
 	   strncmp(ll, keyword, ll_len)))
       {
 	DEBUG_printf(("2_ppdOpen: Ignoring localization: \"%s\"\n", keyword));
+	free(string);
+	string = NULL;
 	continue;
       }
       else if (localization == _PPD_LOCALIZATION_ICC_PROFILES)
@@ -724,6 +726,8 @@ _ppdOpen(
 	if (i >= (int)(sizeof(color_keywords) / sizeof(color_keywords[0])))
 	{
 	  DEBUG_printf(("2_ppdOpen: Ignoring localization: \"%s\"\n", keyword));
+	  free(string);
+	  string = NULL;
 	  continue;
 	}
       }
