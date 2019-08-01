@@ -32,6 +32,7 @@ Changes in CUPS v2.2.12
 - The scheduler would restart continuously when idle and printers were not
   shared (rdar://52561199)
 - Fixed a command ordering issue in the Zebra ZPL driver.
+- Fixed a memory leak in `ppdOpen`.
 
 
 Changes in CUPS v2.2.11
