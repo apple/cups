@@ -1,10 +1,11 @@
 /*
  * IPP test program for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2005 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -223,6 +224,7 @@ static ipp_uchar_t mixed[] =		/* Mixed value buffer */
 void	hex_dump(const char *title, ipp_uchar_t *buffer, size_t bytes);
 void	print_attributes(ipp_t *ipp, int indent);
 ssize_t	read_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
+ssize_t	read_hex(cups_file_t *fp, ipp_uchar_t *buffer, size_t bytes);
 int	token_cb(_ipp_file_t *f, _ipp_vars_t *v, void *user_data, const char *token);
 ssize_t	write_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
 
@@ -719,6 +721,33 @@ main(int  argc,			/* I - Number of command-line arguments */
         request = _ippFileParse(&v, argv[i], NULL);
         _ippVarsDeinit(&v);
       }
+      else if (strlen(argv[i]) > 4 && !strcmp(argv[i] + strlen(argv[i]) - 4, ".hex"))
+      {
+       /*
+        * Read a hex-encoded IPP message...
+        */
+
+	if ((fp = cupsFileOpen(argv[i], "r")) == NULL)
+	{
+	  printf("Unable to open \"%s\" - %s\n", argv[i], strerror(errno));
+	  status = 1;
+	  continue;
+	}
+
+	request = ippNew();
+	while ((state = ippReadIO(fp, (ipp_iocb_t)read_hex, 1, NULL, request)) == IPP_STATE_ATTRIBUTE);
+
+	if (state != IPP_STATE_DATA)
+	{
+	  printf("Error reading IPP message from \"%s\": %s\n", argv[i], cupsLastErrorString());
+	  status = 1;
+
+	  ippDelete(request);
+	  request = NULL;
+	}
+
+        cupsFileClose(fp);
+      }
       else
       {
        /*
@@ -883,6 +912,48 @@ read_cb(_ippdata_t   *data,		/* I - Data */
   */
 
   return ((ssize_t)count);
+}
+
+
+/*
+ * 'read_hex()' - Read a hex dump of an IPP request.
+ */
+
+ssize_t					/* O - Number of bytes read */
+read_hex(cups_file_t *fp,		/* I - File to read from */
+         ipp_uchar_t *buffer,		/* I - Buffer to read */
+         size_t      bytes)		/* I - Number of bytes to read */
+{
+  size_t	total = 0;		/* Total bytes read */
+  static char	hex[256] = "";		/* Line from file */
+  static char	*hexptr = NULL;		/* Pointer in line */
+
+
+  while (total < bytes)
+  {
+    if (!hexptr || (isspace(hexptr[0] & 255) && isspace(hexptr[1] & 255)))
+    {
+      if (!cupsFileGets(fp, hex, sizeof(hex)))
+        break;
+
+      hexptr = hex;
+      while (isxdigit(*hexptr & 255))
+        hexptr ++;
+      while (isspace(*hexptr & 255))
+        hexptr ++;
+
+      if (!isxdigit(*hexptr & 255))
+      {
+        hexptr = NULL;
+        continue;
+      }
+    }
+
+    *buffer++ = (ipp_uchar_t)strtol(hexptr, &hexptr, 16);
+    total ++;
+  }
+
+  return (total == 0 ? -1 : (ssize_t)total);
 }
 
 
