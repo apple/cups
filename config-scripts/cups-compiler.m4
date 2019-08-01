@@ -175,8 +175,10 @@ if test -n "$GCC"; then
 	# doesn't trigger...
 	gccversion=`$CC --version | head -1 | awk '{print $NF}'`
 	case "$gccversion" in
-		7.* | 8.*)
-			WARNING_OPTIONS="$WARNING_OPTIONS -Wno-format-truncation -Wno-tautological-compare"
+		1.* | 2.* | 3.* | 4.* | 5.* | 6.* | \(clang-*)
+			;;
+		*)
+			WARNING_OPTIONS="$WARNING_OPTIONS -Wno-format-truncation -Wno-format-overflow -Wno-tautological-compare"
 			;;
 	esac
 
