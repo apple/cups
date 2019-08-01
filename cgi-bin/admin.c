@@ -2929,6 +2929,9 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
 	      switch (cparam->type)
 	      {
+	        case PPD_CUSTOM_UNKNOWN :
+	            break;
+
 		case PPD_CUSTOM_POINTS :
 		    if (!_cups_strncasecmp(option->defchoice, "Custom.", 7))
 		    {
@@ -3528,6 +3531,9 @@ get_option_value(
 
     switch (cparam->type)
     {
+      case PPD_CUSTOM_UNKNOWN :
+	  break;
+
       case PPD_CUSTOM_CURVE :
       case PPD_CUSTOM_INVCURVE :
       case PPD_CUSTOM_REAL :
@@ -3606,6 +3612,9 @@ get_option_value(
 
       switch (cparam->type)
       {
+	case PPD_CUSTOM_UNKNOWN :
+	    break;
+
 	case PPD_CUSTOM_CURVE :
 	case PPD_CUSTOM_INVCURVE :
 	case PPD_CUSTOM_REAL :
