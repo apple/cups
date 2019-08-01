@@ -185,6 +185,13 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   unsigned char	temp[64];		/* Temporary hash buffer */
   size_t	tempsize = 0;		/* Truncate to this size? */
 
+
+#  ifdef HAVE_GNUTLS_FIPS140_SET_MODE
+  unsigned oldmode = gnutls_fips140_mode_enabled();
+
+  gnutls_fips140_set_mode(GNUTLS_FIPS140_LAX, GNUTLS_FIPS140_SET_MODE_THREAD);
+#  endif /* HAVE_GNUTLS_FIPS140_SET_MODE */
+
   if (!strcmp(algorithm, "md5"))
     alg = GNUTLS_DIG_MD5;
   else if (!strcmp(algorithm, "sha"))
@@ -222,6 +229,10 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
       gnutls_hash_fast(alg, data, datalen, temp);
       memcpy(hash, temp, tempsize);
 
+#  ifdef HAVE_GNUTLS_FIPS140_SET_MODE
+      gnutls_fips140_set_mode(oldmode, GNUTLS_FIPS140_SET_MODE_THREAD);
+#  endif /* HAVE_GNUTLS_FIPS140_SET_MODE */
+
       return ((ssize_t)tempsize);
     }
 
@@ -230,8 +241,16 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
     gnutls_hash_fast(alg, data, datalen, hash);
 
+#  ifdef HAVE_GNUTLS_FIPS140_SET_MODE
+    gnutls_fips140_set_mode(oldmode, GNUTLS_FIPS140_SET_MODE_THREAD);
+#  endif /* HAVE_GNUTLS_FIPS140_SET_MODE */
+
     return ((ssize_t)gnutls_hash_get_len(alg));
   }
+
+#  ifdef HAVE_GNUTLS_FIPS140_SET_MODE
+  gnutls_fips140_set_mode(oldmode, GNUTLS_FIPS140_SET_MODE_THREAD);
+#  endif /* HAVE_GNUTLS_FIPS140_SET_MODE */
 
 #else
  /*
@@ -265,6 +284,10 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   */
 
   too_small:
+
+#ifdef HAVE_GNUTLS_FIPS140_SET_MODE
+  gnutls_fips140_set_mode(oldmode, GNUTLS_FIPS140_SET_MODE_THREAD);
+#endif /* HAVE_GNUTLS_FIPS140_SET_MODE */
 
   _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Hash buffer too small."), 1);
   return (-1);
