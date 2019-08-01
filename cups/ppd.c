@@ -992,6 +992,13 @@ _ppdOpen(
 	goto error;
       }
 
+      if (cparam->type != PPD_CUSTOM_UNKNOWN)
+      {
+        pg->ppd_status = PPD_BAD_CUSTOM_PARAM;
+
+        goto error;
+      }
+
      /*
       * Get the parameter data...
       */
@@ -1865,6 +1872,13 @@ _ppdOpen(
     }
     else if (!strcmp(keyword, "PaperDimension"))
     {
+      if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
+      {
+        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
+
+        goto error;
+      }
+
       if ((size = ppdPageSize(ppd, name)) == NULL)
 	size = ppd_add_size(ppd, name);
 
@@ -1887,6 +1901,13 @@ _ppdOpen(
     }
     else if (!strcmp(keyword, "ImageableArea"))
     {
+      if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
+      {
+        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
+
+        goto error;
+      }
+
       if ((size = ppdPageSize(ppd, name)) == NULL)
 	size = ppd_add_size(ppd, name);
 
@@ -1915,6 +1936,13 @@ _ppdOpen(
 	     !strcmp(keyword, option->keyword))
     {
       DEBUG_printf(("2_ppdOpen: group=%p, subgroup=%p", group, subgroup));
+
+      if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
+      {
+        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
+
+        goto error;
+      }
 
       if (!strcmp(keyword, "PageSize"))
       {
@@ -2640,6 +2668,7 @@ ppd_get_cparam(ppd_coption_t *opt,	/* I - PPD file */
   if ((cparam = calloc(1, sizeof(ppd_cparam_t))) == NULL)
     return (NULL);
 
+  cparam->type = PPD_CUSTOM_UNKNOWN;
   strlcpy(cparam->name, param, sizeof(cparam->name));
   strlcpy(cparam->text, text[0] ? text : param, sizeof(cparam->text));
 

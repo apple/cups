@@ -1245,6 +1245,10 @@ main(int  argc,				/* I - Number of command-line arguments */
             {
 	      switch (cparam->type)
 	      {
+	        case PPD_CUSTOM_UNKNOWN :
+		    printf("              %s(%s): PPD_CUSTOM_UNKNOWN (error)\n", cparam->name, cparam->text);
+	            break;
+
 	        case PPD_CUSTOM_CURVE :
 		    printf("              %s(%s): PPD_CUSTOM_CURVE (%g to %g)\n",
 		           cparam->name, cparam->text,

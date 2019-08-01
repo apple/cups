@@ -226,6 +226,7 @@ typedef struct ppd_profile_s		/**** sRGB Color Profiles @deprecated@ ****/
 /**** New in CUPS 1.2/macOS 10.5 ****/
 typedef enum ppd_cptype_e		/**** Custom Parameter Type @deprecated@ ****/
 {
+  PPD_CUSTOM_UNKNOWN = -1,		/* Unknown type (error) */
   PPD_CUSTOM_CURVE,			/* Curve value for f(x) = x^value */
   PPD_CUSTOM_INT,			/* Integer number value */
   PPD_CUSTOM_INVCURVE,			/* Curve value for f(x) = x^(1/value) */

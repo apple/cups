@@ -851,6 +851,9 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
         switch (cparam->type)
 	{
+	  case PPD_CUSTOM_UNKNOWN :
+	      break;
+
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
@@ -928,6 +931,9 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
 	switch (cparam->type)
 	{
+	  case PPD_CUSTOM_UNKNOWN :
+	      break;
+
 	  case PPD_CUSTOM_CURVE :
 	  case PPD_CUSTOM_INVCURVE :
 	  case PPD_CUSTOM_REAL :
