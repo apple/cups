@@ -24,6 +24,7 @@ Changes in CUPS v2.3.0
 - The scheduler now uses both the group's membership list as well as the
   various OS-specific membership functions to determine whether a user belongs
   to a named group (Issue #5613)
+- Added USB quirks rule for HP LaserJet 1015 (Issue #5617)
 - Fixed some PPD parser issues (Issue #5623, Issue #5624)
 - Fixed an issue with unsupported "sides" values in the IPP backend
   (rdar://51775322)
