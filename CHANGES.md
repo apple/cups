@@ -1,4 +1,4 @@
-CHANGES - 2.2.12 - 2019-07-16
+CHANGES - 2.2.12 - 2019-08-01
 =============================
 
 
@@ -29,6 +29,7 @@ Changes in CUPS v2.2.12
 - The scheduler now uses both the group's membership list as well as the
   various OS-specific membership functions to determine whether a user belongs
   to a named group (Issue #5613)
+- Fixed some PPD parser issues (Issue #5623, Issue #5624)
 - The scheduler would restart continuously when idle and printers were not
   shared (rdar://52561199)
 - Fixed a command ordering issue in the Zebra ZPL driver.
