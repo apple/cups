@@ -45,7 +45,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,
-		  			/* Request ID */
+					/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
@@ -75,7 +75,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		  IPP_TAG_JOB,		/* job group tag */
 
 		  IPP_TAG_BEGIN_COLLECTION,
-		  			/* begCollection tag */
+					/* begCollection tag */
 		  0x00, 0x09,		/* Name length + name */
 		  'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l',
 		  0x00, 0x00,		/* No value */
@@ -84,11 +84,11 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
 		    IPP_TAG_BEGIN_COLLECTION,
-		    			/* begCollection tag */
+					/* begCollection tag */
 		    0x00, 0x00,		/* Name length + name */
 		    0x00, 0x00,		/* No value */
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -97,7 +97,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x54, 0x56,
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -106,7 +106,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x6d, 0x24,
 		    IPP_TAG_END_COLLECTION,
-		    			/* endCollection tag */
+					/* endCollection tag */
 		    0x00, 0x00,		/* No name */
 		    0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -127,12 +127,12 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x05,		/* Value length + value */
 		    'p', 'l', 'a', 'i', 'n',
 		  IPP_TAG_END_COLLECTION,
-		  			/* endCollection tag */
+					/* endCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 
 		  IPP_TAG_BEGIN_COLLECTION,
-		  			/* begCollection tag */
+					/* begCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -140,11 +140,11 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
 		    IPP_TAG_BEGIN_COLLECTION,
-		    			/* begCollection tag */
+					/* begCollection tag */
 		    0x00, 0x00,		/* Name length + name */
 		    0x00, 0x00,		/* No value */
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -153,7 +153,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x52, 0x08,
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -162,7 +162,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x74, 0x04,
 		    IPP_TAG_END_COLLECTION,
-		    			/* endCollection tag */
+					/* endCollection tag */
 		    0x00, 0x00,		/* No name */
 		    0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -183,7 +183,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x06,		/* Value length + value */
 		    'g', 'l', 'o', 's', 's', 'y',
 		  IPP_TAG_END_COLLECTION,
-		  			/* endCollection tag */
+					/* endCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 
@@ -194,7 +194,7 @@ static ipp_uchar_t bad_collection[] =	/* Collection buffer (bad encoding) */
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,
-		  			/* Request ID */
+					/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
@@ -224,12 +224,12 @@ static ipp_uchar_t bad_collection[] =	/* Collection buffer (bad encoding) */
 		  IPP_TAG_JOB,		/* job group tag */
 
 		  IPP_TAG_BEGIN_COLLECTION,
-		  			/* begCollection tag */
+					/* begCollection tag */
 		  0x00, 0x09,		/* Name length + name */
 		  'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l',
 		  0x00, 0x00,		/* No value */
 		    IPP_TAG_BEGIN_COLLECTION,
-		    			/* begCollection tag */
+					/* begCollection tag */
 		    0x00, 0x0a,		/* Name length + name */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
 		    0x00, 0x00,		/* No value */
@@ -244,11 +244,11 @@ static ipp_uchar_t bad_collection[] =	/* Collection buffer (bad encoding) */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x6d, 0x24,
 		    IPP_TAG_END_COLLECTION,
-		    			/* endCollection tag */
+					/* endCollection tag */
 		    0x00, 0x00,		/* No name */
 		    0x00, 0x00,		/* No value */
 		  IPP_TAG_END_COLLECTION,
-		  			/* endCollection tag */
+					/* endCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 
@@ -260,7 +260,7 @@ static ipp_uchar_t mixed[] =		/* Mixed value buffer */
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,
-		  			/* Request ID */
+					/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
