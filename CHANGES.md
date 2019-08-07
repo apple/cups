@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-08-01
+CHANGES - 2.3.0 - 2019-08-07
 ============================
 
 
@@ -26,6 +26,8 @@ Changes in CUPS v2.3.0
   to a named group (Issue #5613)
 - Added USB quirks rule for HP LaserJet 1015 (Issue #5617)
 - Fixed some PPD parser issues (Issue #5623, Issue #5624)
+- The IPP parser no longer allows invalid member attributes in collections
+  (Issue #5630)
 - Fixed an issue with unsupported "sides" values in the IPP backend
   (rdar://51775322)
 - The scheduler would restart continuously when idle and printers were not
