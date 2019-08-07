@@ -1,7 +1,7 @@
 /*
  * IPP test program for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2005 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -50,7 +50,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,
-		  			/* Request ID */
+					/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
@@ -80,7 +80,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		  IPP_TAG_JOB,		/* job group tag */
 
 		  IPP_TAG_BEGIN_COLLECTION,
-		  			/* begCollection tag */
+					/* begCollection tag */
 		  0x00, 0x09,		/* Name length + name */
 		  'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l',
 		  0x00, 0x00,		/* No value */
@@ -89,11 +89,11 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
 		    IPP_TAG_BEGIN_COLLECTION,
-		    			/* begCollection tag */
+					/* begCollection tag */
 		    0x00, 0x00,		/* Name length + name */
 		    0x00, 0x00,		/* No value */
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -102,7 +102,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x54, 0x56,
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -111,7 +111,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x6d, 0x24,
 		    IPP_TAG_END_COLLECTION,
-		    			/* endCollection tag */
+					/* endCollection tag */
 		    0x00, 0x00,		/* No name */
 		    0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -132,12 +132,12 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x05,		/* Value length + value */
 		    'p', 'l', 'a', 'i', 'n',
 		  IPP_TAG_END_COLLECTION,
-		  			/* endCollection tag */
+					/* endCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 
 		  IPP_TAG_BEGIN_COLLECTION,
-		  			/* begCollection tag */
+					/* begCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -145,11 +145,11 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
 		    IPP_TAG_BEGIN_COLLECTION,
-		    			/* begCollection tag */
+					/* begCollection tag */
 		    0x00, 0x00,		/* Name length + name */
 		    0x00, 0x00,		/* No value */
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -158,7 +158,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x52, 0x08,
 		      IPP_TAG_MEMBERNAME,
-		      			/* memberAttrName tag */
+					/* memberAttrName tag */
 		      0x00, 0x00,	/* No name */
 		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
@@ -167,7 +167,7 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x74, 0x04,
 		    IPP_TAG_END_COLLECTION,
-		    			/* endCollection tag */
+					/* endCollection tag */
 		    0x00, 0x00,		/* No name */
 		    0x00, 0x00,		/* No value */
 		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
@@ -188,7 +188,72 @@ static ipp_uchar_t collection[] =	/* Collection buffer */
 		    0x00, 0x06,		/* Value length + value */
 		    'g', 'l', 'o', 's', 's', 'y',
 		  IPP_TAG_END_COLLECTION,
-		  			/* endCollection tag */
+					/* endCollection tag */
+		  0x00, 0x00,		/* No name */
+		  0x00, 0x00,		/* No value */
+
+		  IPP_TAG_END		/* end tag */
+		};
+static ipp_uchar_t bad_collection[] =	/* Collection buffer (bad encoding) */
+		{
+		  0x01, 0x01,		/* IPP version */
+		  0x00, 0x02,		/* Print-Job operation */
+		  0x00, 0x00, 0x00, 0x01,
+					/* Request ID */
+
+		  IPP_TAG_OPERATION,
+
+		  IPP_TAG_CHARSET,
+		  0x00, 0x12,		/* Name length + name */
+		  'a','t','t','r','i','b','u','t','e','s','-',
+		  'c','h','a','r','s','e','t',
+		  0x00, 0x05,		/* Value length + value */
+		  'u','t','f','-','8',
+
+		  IPP_TAG_LANGUAGE,
+		  0x00, 0x1b,		/* Name length + name */
+		  'a','t','t','r','i','b','u','t','e','s','-',
+		  'n','a','t','u','r','a','l','-','l','a','n',
+		  'g','u','a','g','e',
+		  0x00, 0x02,		/* Value length + value */
+		  'e','n',
+
+		  IPP_TAG_URI,
+		  0x00, 0x0b,		/* Name length + name */
+		  'p','r','i','n','t','e','r','-','u','r','i',
+		  0x00, 0x1c,			/* Value length + value */
+		  'i','p','p',':','/','/','l','o','c','a','l',
+		  'h','o','s','t','/','p','r','i','n','t','e',
+		  'r','s','/','f','o','o',
+
+		  IPP_TAG_JOB,		/* job group tag */
+
+		  IPP_TAG_BEGIN_COLLECTION,
+					/* begCollection tag */
+		  0x00, 0x09,		/* Name length + name */
+		  'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l',
+		  0x00, 0x00,		/* No value */
+		    IPP_TAG_BEGIN_COLLECTION,
+					/* begCollection tag */
+		    0x00, 0x0a,		/* Name length + name */
+		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
+		    0x00, 0x00,		/* No value */
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x0b,	/* Name length + name */
+		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      0x00, 0x04,	/* Value length + value */
+		      0x00, 0x00, 0x54, 0x56,
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x0b,	/* Name length + name */
+		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      0x00, 0x04,	/* Value length + value */
+		      0x00, 0x00, 0x6d, 0x24,
+		    IPP_TAG_END_COLLECTION,
+					/* endCollection tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x00,		/* No value */
+		  IPP_TAG_END_COLLECTION,
+					/* endCollection tag */
 		  0x00, 0x00,		/* No name */
 		  0x00, 0x00,		/* No value */
 
@@ -200,7 +265,7 @@ static ipp_uchar_t mixed[] =		/* Mixed value buffer */
 		  0x01, 0x01,		/* IPP version */
 		  0x00, 0x02,		/* Print-Job operation */
 		  0x00, 0x00, 0x00, 0x01,
-		  			/* Request ID */
+					/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
@@ -590,11 +655,32 @@ main(int  argc,			/* I - Number of command-line arguments */
     ippDelete(request);
 
    /*
+    * Read the bad collection data and confirm we get an error...
+    */
+
+    fputs("Read Bad Collection from Memory: ", stdout);
+
+    request = ippNew();
+    data.rpos    = 0;
+    data.wused   = sizeof(bad_collection);
+    data.wsize   = sizeof(bad_collection);
+    data.wbuffer = bad_collection;
+
+    while ((state = ippReadIO(&data, (ipp_iocb_t)read_cb, 1, NULL, request)) != IPP_STATE_DATA)
+      if (state == IPP_STATE_ERROR)
+	break;
+
+    if (state != IPP_STATE_ERROR)
+      puts("FAIL (read successful)");
+    else
+      puts("PASS");
+
+   /*
     * Read the mixed data and confirm we converted everything to rangeOfInteger
     * values...
     */
 
-    printf("Read Mixed integer/rangeOfInteger from Memory: ");
+    fputs("Read Mixed integer/rangeOfInteger from Memory: ", stdout);
 
     request = ippNew();
     data.rpos    = 0;
