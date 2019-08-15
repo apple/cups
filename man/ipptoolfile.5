@@ -6,7 +6,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ipptoolfile 5 "CUPS" "5 August 2019" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "15 August 2019" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -166,7 +166,7 @@ The following directives are understood within a \fItest\fR:
 \fBATTR \fItag attribute-name value(s)\fR
 Adds an attribute to the test request.
 Out-of-band tags (admin-define, delete-attribute, no-value, not-settable, unknown, unsupported) have no value.
-Values for other tags are separated by the comma (",") character - escape commas using the "\" character.
+Values for other tags are delimited by the comma (",") character - escape commas using the "\\" character.
 Common attributes and values are listed in the IANA IPP registry - see references below.
 .TP 5
 \fBATTR collection \fIattribute-name \fB{ MEMBER \fItag member-name value(s) ... \fB}\fR [ \fI... \fB,{ \fI... \fB} \fR]
