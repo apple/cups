@@ -4550,9 +4550,7 @@ ippSetValueTag(
         break;
 
     case IPP_TAG_NAME :
-        if (temp_tag != IPP_TAG_KEYWORD && temp_tag != IPP_TAG_URI &&
-            temp_tag != IPP_TAG_URISCHEME && temp_tag != IPP_TAG_LANGUAGE &&
-            temp_tag != IPP_TAG_MIMETYPE)
+        if (temp_tag != IPP_TAG_KEYWORD)
           return (0);
 
         (*attr)->value_tag = (ipp_tag_t)(IPP_TAG_NAME | ((*attr)->value_tag & IPP_TAG_CUPS_CONST));
@@ -4560,10 +4558,7 @@ ippSetValueTag(
 
     case IPP_TAG_NAMELANG :
     case IPP_TAG_TEXTLANG :
-        if (value_tag == IPP_TAG_NAMELANG &&
-            (temp_tag != IPP_TAG_NAME && temp_tag != IPP_TAG_KEYWORD &&
-             temp_tag != IPP_TAG_URI && temp_tag != IPP_TAG_URISCHEME &&
-             temp_tag != IPP_TAG_LANGUAGE && temp_tag != IPP_TAG_MIMETYPE))
+        if (value_tag == IPP_TAG_NAMELANG && (temp_tag != IPP_TAG_NAME && temp_tag != IPP_TAG_KEYWORD))
           return (0);
 
         if (value_tag == IPP_TAG_TEXTLANG && temp_tag != IPP_TAG_TEXT)

@@ -1233,6 +1233,9 @@ asn1_get_integer(
   int	value;				/* Integer value */
 
 
+  if (*buffer >= bufend)
+    return (0);
+
   if (length > sizeof(int))
   {
     (*buffer) += length;
@@ -1258,6 +1261,9 @@ asn1_get_length(unsigned char **buffer,	/* IO - Pointer in buffer */
 {
   unsigned	length;			/* Length */
 
+
+  if (*buffer >= bufend)
+    return (0);
 
   length = **buffer;
   (*buffer) ++;
@@ -1300,6 +1306,9 @@ asn1_get_oid(
 		*oidend;		/* End of OID buffer */
   int		number;			/* OID number */
 
+
+  if (*buffer >= bufend)
+    return (0);
 
   valend = *buffer + length;
   oidptr = oid;
@@ -1349,9 +1358,12 @@ asn1_get_packed(
   int	value;				/* Value */
 
 
+  if (*buffer >= bufend)
+    return (0);
+
   value = 0;
 
-  while ((**buffer & 128) && *buffer < bufend)
+  while (*buffer < bufend && (**buffer & 128))
   {
     value = (value << 7) | (**buffer & 127);
     (*buffer) ++;
@@ -1379,6 +1391,9 @@ asn1_get_string(
     char          *string,		/* I  - String buffer */
     size_t        strsize)		/* I  - String buffer size */
 {
+  if (*buffer >= bufend)
+    return (NULL);
+
   if (length > (unsigned)(bufend - *buffer))
     length = (unsigned)(bufend - *buffer);
 
@@ -1420,6 +1435,9 @@ asn1_get_type(unsigned char **buffer,	/* IO - Pointer in buffer */
 {
   int	type;				/* Type */
 
+
+  if (*buffer >= bufend)
+    return (0);
 
   type = **buffer;
   (*buffer) ++;

@@ -5,6 +5,7 @@ CHANGES - 2.3.0 - 2019-08-07
 Changes in CUPS v2.3.0
 ----------------------
 
+- CVE-2019-8696 and CVE-2019-8675: Fixed SNMP buffer overflows (rdar://51685251)
 - Documentation updates (Issue #5604)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - Fixed builds when there is no TLS library (Issue #5590)
@@ -28,6 +29,9 @@ Changes in CUPS v2.3.0
 - Fixed some PPD parser issues (Issue #5623, Issue #5624)
 - The IPP parser no longer allows invalid member attributes in collections
   (Issue #5630)
+- Fixed IPP buffer overflow (rdar://50035411)
+- Fixed memory disclosure issue in the scheduler (rdar://51373853)
+- Fixed DoS issues in the scheduler (rdar://51373929)
 - Fixed an issue with unsupported "sides" values in the IPP backend
   (rdar://51775322)
 - The scheduler would restart continuously when idle and printers were not
@@ -35,6 +39,8 @@ Changes in CUPS v2.3.0
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 - Fixed a command ordering issue in the Zebra ZPL driver.
 - Fixed a memory leak in `ppdOpen`.
+
+
 
 
 Changes in CUPS v2.3rc1
