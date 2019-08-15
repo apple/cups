@@ -568,6 +568,17 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdReadClient: error=%d, used=%d, state=%s, data_encoding=HTTP_ENCODING_%s, data_remaining=" CUPS_LLFMT ", request=%p(%s), file=%d", httpError(con->http), (int)httpGetReady(con->http), httpStateString(httpGetState(con->http)), httpIsChunked(con->http) ? "CHUNKED" : "LENGTH", CUPS_LLCAST httpGetRemaining(con->http), con->request, con->request ? ippStateString(ippGetState(con->request)) : "", con->file);
 
+  if (httpError(con->http) == EPIPE && !httpGetReady(con->http) && recv(httpGetFd(con->http), buf, 1, MSG_PEEK) < 1)
+  {
+   /*
+    * Connection closed...
+    */
+
+    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on EOF.");
+    cupsdCloseClient(con);
+    return;
+  }
+
   if (httpGetState(con->http) == HTTP_STATE_GET_SEND ||
       httpGetState(con->http) == HTTP_STATE_POST_SEND ||
       httpGetState(con->http) == HTTP_STATE_STATUS)
@@ -576,17 +587,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     * If we get called in the wrong state, then something went wrong with the
     * connection and we need to shut it down...
     */
-
-    if (!httpGetReady(con->http) && recv(httpGetFd(con->http), buf, 1, MSG_PEEK) < 1)
-    {
-     /*
-      * Connection closed...
-      */
-
-      cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on EOF.");
-      cupsdCloseClient(con);
-      return;
-    }
 
     cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.", httpStateString(httpGetState(con->http)));
     cupsdCloseClient(con);
@@ -2209,6 +2209,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   strlcpy(location, httpGetField(con->http, HTTP_FIELD_LOCATION), sizeof(location));
 
   httpClearFields(con->http);
+  httpClearCookie(con->http);
 
   httpSetField(con->http, HTTP_FIELD_LOCATION, location);
 

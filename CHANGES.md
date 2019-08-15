@@ -1,10 +1,11 @@
-CHANGES - 2.2.12 - 2019-08-07
+CHANGES - 2.2.12 - 2019-08-15
 =============================
 
 
 Changes in CUPS v2.2.12
 -----------------------
 
+- CVE-2019-8696 and CVE-2019-8675: Fixed SNMP buffer overflows (rdar://51685251)
 - The `cupsctl` command now prevents setting "cups-files.conf" directives
   (Issue #5530)
 - Updated the systemd service file for cupsd (Issue #5551)
@@ -34,6 +35,9 @@ Changes in CUPS v2.2.12
 - Fixed some PPD parser issues (Issue #5623, Issue #5624)
 - The IPP parser no longer allows invalid member attributes in collections
   (Issue #5630)
+- Fixed IPP buffer overflow (rdar://50035411)
+- Fixed memory disclosure issue in the scheduler (rdar://51373853)
+- Fixed DoS issues in the scheduler (rdar://51373929)
 - The scheduler would restart continuously when idle and printers were not
   shared (rdar://52561199)
 - Fixed a command ordering issue in the Zebra ZPL driver.

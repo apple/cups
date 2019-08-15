@@ -1905,7 +1905,7 @@ httpPrintf(http_t     *http,		/* I - HTTP connection */
 	   ...)				/* I - Additional args as needed */
 {
   ssize_t	bytes;			/* Number of bytes to write */
-  char		buf[16384];		/* Buffer for formatted string */
+  char		buf[65536];		/* Buffer for formatted string */
   va_list	ap;			/* Variable argument pointer */
 
 
@@ -1917,7 +1917,12 @@ httpPrintf(http_t     *http,		/* I - HTTP connection */
 
   DEBUG_printf(("3httpPrintf: (" CUPS_LLFMT " bytes) %s", CUPS_LLCAST bytes, buf));
 
-  if (http->data_encoding == HTTP_ENCODING_FIELDS)
+  if (bytes > (ssize_t)(sizeof(buf) - 1))
+  {
+    http->error = ENOMEM;
+    return (-1);
+  }
+  else if (http->data_encoding == HTTP_ENCODING_FIELDS)
     return ((int)httpWrite2(http, buf, (size_t)bytes));
   else
   {
