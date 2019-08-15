@@ -457,6 +457,8 @@ The following directives may be placed inside Location and Limit sections in the
 <dd style="margin-left: 5.0em"><dt><b>Allow @IF(</b><i>name</i><b>)</b>
 <dd style="margin-left: 5.0em"><dt><b>Allow @LOCAL</b>
 <dd style="margin-left: 5.0em">Allows access from the named hosts, domains, addresses, or interfaces.
+The @IF(name) form uses the current subnets configured for the named interface.
+The @LOCAL form uses the current subnets configured for all interfaces that are not point-to-point, for example Ethernet and Wi-Fi interfaces are used but DSL and VPN interfaces are not.
 The Order directive controls whether Allow lines are evaluated before or after Deny lines.
 <dt><b>AuthType None</b>
 <dd style="margin-left: 5.0em"><dt><b>AuthType Basic</b>
@@ -476,6 +478,8 @@ The value "Default" corresponds to the DefaultAuthType value.
 <dd style="margin-left: 5.0em"><dt><b>Deny @IF(</b><i>name</i><b>)</b>
 <dd style="margin-left: 5.0em"><dt><b>Deny @LOCAL</b>
 <dd style="margin-left: 5.0em">Denies access from the named hosts, domains, addresses, or interfaces.
+The @IF(name) form uses the current subnets configured for the named interface.
+The @LOCAL form uses the current subnets configured for all interfaces that are not point-to-point, for example Ethernet and Wi-Fi interfaces are used but DSL and VPN interfaces are not.
 The Order directive controls whether Deny lines are evaluated before or after Allow lines.
 <dt><b>Encryption IfRequested</b>
 <dd style="margin-left: 5.0em"><dt><b>Encryption Never</b>
@@ -585,6 +589,9 @@ On Linux this is typically done using the
 command, while on macOS the
 <b>launchctl</b>(8)
 command is used instead.
+<p>The @LOCAL macro name can be confusing since the system running
+<b>cupsd</b>
+often belongs to a different set of subnets from its clients.
 <h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 The <b>cupsd.conf</b> file format is based on the Apache HTTP Server configuration file format.
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>

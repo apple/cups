@@ -3,6 +3,38 @@ title: Release Notes
 layout: sub
 ---
 
+<h2 class="title"><a name="020212">CUPS 2.2.12</a> <em>(August 15, 2019)</em></h2>
+
+<ul>
+	<li>CVE-2019-8696 and CVE-2019-8675: Fixed SNMP buffer overflows (rdar://51685251)</li>
+	<li>The `cupsctl` command now prevents setting &quot;cups-files.conf&quot; directives (Issue #5530)</li>
+	<li>Updated the systemd service file for cupsd (Issue #5551)</li>
+	<li>The `cupsCheckDestSupported` function did not check octetString values correctly (Issue #5557)</li>
+	<li>The scheduler did not encode octetString values like &quot;job-password&quot; correctly for the print filters (Issue #5558)</li>
+	<li>Restored minimal support for the `Emulators` keyword in PPD files to allow old Samsung printer drivers to continue to work (Issue #5562)</li>
+	<li>Timed out job submission now yields an error (Issue #5570)</li>
+	<li>The footer in the web interface covered some content on small displays (Issue #5574)</li>
+	<li>The libusb-based USB backend now enforces read limits, improving print speed in many cases (Issue #5583)</li>
+	<li>Fixed some compatibility issues with old releases of CUPS (Issue #5587)</li>
+	<li>Fixed a bug in the scheduler job cleanup code (Issue #5588)</li>
+	<li>&quot;make&quot; failed with GZIP options (Issue #5595)</li>
+	<li>Added FIPS-140 workarounds for GNU TLS (Issue #5601, Issue #5622)</li>
+	<li>The scheduler no longer provides a default value for the description (Issue #5603)</li>
+	<li>The `lpadmin` command did not always update the PPD file for changes to the `cupsIPPSupplies` and `cupsSNMPSupplies` keywords (Issue #5610)</li>
+	<li>The scheduler now uses both the group's membership list as well as the various OS-specific membership functions to determine whether a user belongs to a named group (Issue #5613)</li>
+	<li>Added USB quirks rule for HP LaserJet 1015 (Issue #5617)</li>
+	<li>Fixed some PPD parser issues (Issue #5623, Issue #5624)</li>
+	<li>The IPP parser no longer allows invalid member attributes in collections (Issue #5630)</li>
+	<li>Fixed IPP buffer overflow (rdar://50035411)</li>
+	<li>Fixed memory disclosure issue in the scheduler (rdar://51373853)</li>
+	<li>Fixed DoS issues in the scheduler (rdar://51373929)</li>
+	<li>The scheduler would restart continuously when idle and printers were not shared (rdar://52561199)</li>
+	<li>Fixed a command ordering issue in the Zebra ZPL driver.</li>
+	<li>Fixed a memory leak in `ppdOpen`.</li>
+</ul>
+
+
+
 <h2 class="title"><a name="0203rc1">CUPS 2.3rc1</a> <em>(May 21, 2019)</em></h2>
 
 <ul>

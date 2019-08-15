@@ -143,7 +143,7 @@ The following directives are understood within a <i>test</i>:
 <dd style="margin-left: 5.0em"><dt><b>ATTR </b><i>tag attribute-name value(s)</i>
 <dd style="margin-left: 5.0em">Adds an attribute to the test request.
 Out-of-band tags (admin-define, delete-attribute, no-value, not-settable, unknown, unsupported) have no value.
-Values for other tags are separated by the comma (",") character - escape commas using the "" character.
+Values for other tags are delimited by the comma (",") character - escape commas using the "\" character.
 Common attributes and values are listed in the IANA IPP registry - see references below.
 <dt><b>ATTR collection </b><i>attribute-name </i><b>{ MEMBER </b><i>tag member-name value(s) ... </i><b>}</b> [ <i>... </i><b>,{ </b><i>... </i><b>} </b>]
 <dd style="margin-left: 5.0em">Adds a collection attribute to the test request.
@@ -230,7 +230,7 @@ The following predicates are understood following the <b>EXPECT</b> test directi
 <dd style="margin-left: 5.0em">Makes the <b>EXPECT</b> conditions apply only if the specified variable is not defined.
 <dt><b>IN-GROUP </b><i>tag</i>
 <dd style="margin-left: 5.0em">Requires the <b>EXPECT</b> attribute to be in the specified group tag.
-<dt><b>OF-TYPE </b><i>tag[,tag,...]</i>
+<dt><b>OF-TYPE </b><i>tag[|tag,...]</i>
 <dd style="margin-left: 5.0em">Requires the <b>EXPECT</b> attribute to use one of the specified value tag(s).
 <dt><b>REPEAT-LIMIT </b><i>number</i>
 <dd style="margin-left: 5.0em"><br>
