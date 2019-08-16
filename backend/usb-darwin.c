@@ -1279,6 +1279,9 @@ static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf,
         (*printerIntf)->GetAlternateSetting(printerIntf, &intfAltSetting);
         (*printerIntf)->GetInterfaceNumber(printerIntf, &intfNumber);
         (*printerIntf)->GetLocationID(printerIntf, &intfLocation);
+          
+        if (intfProtocol == kUSBPrintingProtocolIPP)
+            return keepLooking;
 
         if (g.serial != NULL && CFStringGetLength(g.serial) > 0)
         {
@@ -1287,12 +1290,9 @@ static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf,
             g.interfaceProtocol = intfProtocol;
             g.location = intfLocation;
             g.alternateSetting = intfAltSetting;
-            if (intfProtocol != kUSBPrintingProtocolIPP)
-            {
-              g.printer_obj = obj;
-              IOObjectRetain(obj);
-            }
-            keepLooking = (intfProtocol == kUSBPrintingProtocolIPP);
+            g.printer_obj = obj;
+            IOObjectRetain(obj);
+            keepLooking = false;
           }
         }
         else
@@ -1300,14 +1300,14 @@ static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf,
           if (g.printer_obj != 0)
             IOObjectRelease(g.printer_obj);
 
+            if (g.location == 0 || g.location == intfLocation)
+                keepLooking = false;
+
             g.location = intfLocation;
             g.alternateSetting = intfAltSetting;
             g.interfaceProtocol = intfProtocol;
             g.printer_obj = obj;
             IOObjectRetain(obj);
-
-            if (g.location == 0 || g.location == intfLocation)
-              keepLooking = false;
         }
 
         if (!keepLooking)

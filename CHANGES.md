@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-08-07
+CHANGES - 2.3.0 - 2019-08-16
 ============================
 
 
@@ -29,6 +29,7 @@ Changes in CUPS v2.3.0
 - Fixed some PPD parser issues (Issue #5623, Issue #5624)
 - The IPP parser no longer allows invalid member attributes in collections
   (Issue #5630)
+- Fixed a USB printing issue on macOS (rdar://31433931)
 - Fixed IPP buffer overflow (rdar://50035411)
 - Fixed memory disclosure issue in the scheduler (rdar://51373853)
 - Fixed DoS issues in the scheduler (rdar://51373929)
