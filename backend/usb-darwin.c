@@ -1279,7 +1279,7 @@ static Boolean find_device_cb(io_service_t obj, printer_interface_t printerIntf,
         (*printerIntf)->GetAlternateSetting(printerIntf, &intfAltSetting);
         (*printerIntf)->GetInterfaceNumber(printerIntf, &intfNumber);
         (*printerIntf)->GetLocationID(printerIntf, &intfLocation);
-          
+
         if (intfProtocol == kUSBPrintingProtocolIPP)
             return keepLooking;
 
