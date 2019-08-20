@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-08-16
+CHANGES - 2.3.0 - 2019-08-20
 ============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.3.0
 ----------------------
 
 - CVE-2019-8696 and CVE-2019-8675: Fixed SNMP buffer overflows (rdar://51685251)
+- Added a GPL2/LGPL2 exception to the new CUPS license terms.
 - Documentation updates (Issue #5604)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - Fixed builds when there is no TLS library (Issue #5590)
@@ -40,8 +41,6 @@ Changes in CUPS v2.3.0
 - Fixed an issue with `EXPECT !name WITH-VALUE ...` tests.
 - Fixed a command ordering issue in the Zebra ZPL driver.
 - Fixed a memory leak in `ppdOpen`.
-
-
 
 
 Changes in CUPS v2.3rc1
