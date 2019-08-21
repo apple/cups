@@ -277,7 +277,7 @@ msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF."
 msgstr ""
-"        WARN    Nicht-Windows PPD Dateien sollten ausschliesslich LF "
+"        WARN    Nicht-Windows PPD Dateien sollten ausschließlich LF "
 "Zeilenenden verwenden, nicht CR LF."
 
 #, c-format
@@ -3216,7 +3216,7 @@ msgid ""
 "valid Kerberos ticket."
 msgstr ""
 "Geben Sie Ihren Benutzernamen und das Passwort oder den root-Benutzernamen "
-"und -passwort ein, um auf diese Seite zuzgreifen. Falls Sie die Kerberos-"
+"und -passwort ein, um auf diese Seite zuzugreifen. Falls Sie die Kerberos-"
 "Authentifizierung verwenden, stellen Sie sicher, dass Sie ein gültiges "
 "Kerberos-Ticket haben."
 
@@ -3578,7 +3578,7 @@ msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr "IPP nameWithLanguage Wert weniger als mindestens 4 Byte."
 
 msgid "IPP octetString length too large."
-msgstr "IPP Oktett-Zeichenkettenlänge zu gross."
+msgstr "IPP Oktett-Zeichenkettenlänge zu groß."
 
 msgid "IPP rangeOfInteger value not 8 bytes."
 msgstr "IPP rangeOfInteger Wert nicht 8 Byte."
@@ -4273,7 +4273,7 @@ msgid "Print and Cut"
 msgstr "Drucken und abschneiden"
 
 msgid "Print and Tear"
-msgstr "Drucken und abreissen"
+msgstr "Drucken und abreißen"
 
 msgid "Print file sent."
 msgstr "Druckdatei gesendet."
@@ -4282,7 +4282,7 @@ msgid "Print job canceled at printer."
 msgstr "Druckauftrag wurde am Drucker abgebrochen."
 
 msgid "Print job too large."
-msgstr "Der Druckauftrag ist zu gross."
+msgstr "Der Druckauftrag ist zu groß."
 
 msgid "Print job was not accepted."
 msgstr "Der Druckauftrag wurde nicht angenommen."
@@ -4482,7 +4482,7 @@ msgid "Tabloid Oversize Long Edge"
 msgstr "US Tabloid übergroß lange Seite"
 
 msgid "Tear"
-msgstr "Abreissen"
+msgstr "Abreißen"
 
 msgid "Tear-Off"
 msgstr "Abriss"
@@ -4538,7 +4538,7 @@ msgstr ""
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
-msgstr "Der WErt für notify-user-data ist zu gross (%d > 63 octets)."
+msgstr "Der WErt für notify-user-data ist zu groß (%d > 63 octets)."
 
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
