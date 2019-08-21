@@ -117,7 +117,7 @@ are for C and C++ source files, source code for other languages should conform
 to the same guidelines as allowed by the language.
 
 Source code comments provide the reference portion of the CUPS Programming
-Manual, which is generated using the [codedoc](https://msweet.org/codedoc)
+Manual, which is generated using the [codedoc](https://www.msweet.org/codedoc)
 software.
 
 
@@ -276,7 +276,7 @@ Return/output values are indicated using an "O" prefix, input values are
 indicated using the "I" prefix, and values that are both input and output use
 the "IO" prefix for the corresponding in-line comment.
 
-The [codedoc](https://msweet.org/codedoc) documentation generator also
+The [codedoc](https://www.msweet.org/codedoc) documentation generator also
 understands the following special text in the function description comment:
 
     @deprecated@         - Marks the function as deprecated: not recommended
