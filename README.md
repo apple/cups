@@ -1,12 +1,8 @@
-README - CUPS v2.3.0 - 2019-05-24
+README - CUPS v2.3.0 - 2019-08-21
 =================================
-
-Looking for compile instructions?  Read the file `INSTALL.md` instead...
-
 
 INTRODUCTION
 ------------
-
 
 CUPS is a standards-based, open source printing system developed by Apple Inc.
 for macOS® and other UNIX®-like operating systems.  CUPS uses the Internet
@@ -29,8 +25,21 @@ CUPS is licensed under the Apache License Version 2.0.  See the file
 READING THE DOCUMENTATION
 -------------------------
 
+Initial documentation to get you started is provided in the root directory of
+the CUPS sources:
+
+- `CHANGES.md`: A list of changes in the current major release of CUPS.
+- `CONTRIBUTING.md`: Guidelines for contributing to the CUPS project.
+- `CREDITS.md`: A list of past contributors to the CUPS project.
+- `DEVELOPING.md`: Guidelines for developing code for the CUPS project.
+- `INSTALL.md`: Instructions for building and installing CUPS.
+- `LICENSE`: The CUPS license agreement (Apache 2.0).
+- `NOTICE`: Copyright notices and exceptions to the CUPS license agreement.
+- `README.md`: This file.
+
 Once you have installed the software you can access the documentation (and a
-bunch of other stuff) online at <http://localhost:631/>.
+bunch of other stuff) online at <http://localhost:631/> and using the `man`
+command, for example `man cups`.
 
 If you're having trouble getting that far, the documentation is located under
 the `doc/help` and `man` directories.
@@ -76,22 +85,22 @@ printer at address 11.22.33.44:
 
 CUPS also includes several sample PPD files you can use for "legacy" printers:
 
-    Driver                         PPD Name
-    -----------------------------  ------------------------------
-    Dymo Label Printers            drv:///sample.drv/dymo.ppd
-    Intellitech Intellibar         drv:///sample.drv/intelbar.ppd
-    EPSON 9-pin Series             drv:///sample.drv/epson9.ppd
-    EPSON 24-pin Series            drv:///sample.drv/epson24.ppd
-    Generic PCL Laser Printer      drv:///sample.drv/generpcl.ppd
-    Generic PostScript Printer     drv:///sample.drv/generic.ppd
-    HP DeskJet Series              drv:///sample.drv/deskjet.ppd
-    HP LaserJet Series             drv:///sample.drv/laserjet.ppd
-    OKIDATA 9-Pin Series           drv:///sample.drv/okidata9.ppd
-    OKIDATA 24-Pin Series          drv:///sample.drv/okidat24.ppd
-    Zebra CPCL Label Printer       drv:///sample.drv/zebracpl.ppd
-    Zebra EPL1 Label Printer       drv:///sample.drv/zebraep1.ppd
-    Zebra EPL2 Label Printer       drv:///sample.drv/zebraep2.ppd
-    Zebra ZPL Label Printer        drv:///sample.drv/zebra.ppd
+   Driver                         | PPD Name
+   -----------------------------  | ------------------------------
+   Dymo Label Printers            | drv:///sample.drv/dymo.ppd
+   Intellitech Intellibar         | drv:///sample.drv/intelbar.ppd
+   EPSON 9-pin Series             | drv:///sample.drv/epson9.ppd
+   EPSON 24-pin Series            | drv:///sample.drv/epson24.ppd
+   Generic PCL Laser Printer      | drv:///sample.drv/generpcl.ppd
+   Generic PostScript Printer     | drv:///sample.drv/generic.ppd
+   HP DeskJet Series              | drv:///sample.drv/deskjet.ppd
+   HP LaserJet Series             | drv:///sample.drv/laserjet.ppd
+   OKIDATA 9-Pin Series           | drv:///sample.drv/okidata9.ppd
+   OKIDATA 24-Pin Series          | drv:///sample.drv/okidat24.ppd
+   Zebra CPCL Label Printer       | drv:///sample.drv/zebracpl.ppd
+   Zebra EPL1 Label Printer       | drv:///sample.drv/zebraep1.ppd
+   Zebra EPL2 Label Printer       | drv:///sample.drv/zebraep2.ppd
+   Zebra ZPL Label Printer        | drv:///sample.drv/zebra.ppd
 
 You can run the `lpinfo -m` command to list all of the available drivers:
 
@@ -151,9 +160,9 @@ LEGAL STUFF
 Copyright © 2007-2019 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
-CUPS is provided under the terms of the Apache License, Version 2.0.  A copy of
-this license can be found in the file `LICENSE`.  Additional legal information
-is provided in the file `NOTICE`.
+CUPS is provided under the terms of the Apache License, Version 2.0 with
+exceptions for GPL2/LGPL2 software.  A copy of this license can be found in the
+file `LICENSE`.  Additional legal information is provided in the file `NOTICE`.
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR

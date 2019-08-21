@@ -63,7 +63,9 @@ major, minor, and patch release numbers.  Major release numbers indicate large
 design changes or backwards-incompatible changes to the CUPS API or CUPS
 Imaging API.  Minor release numbers indicate new features and other smaller
 changes which are backwards-compatible with previous CUPS releases.  Patch
-numbers indicate bug fixes to the previous feature or patch release.
+numbers indicate bug fixes to the previous feature or patch release.  This
+version numbering scheme is consistent with the
+[Semantic Versioning](http://semver.org) specification.
 
 > Note:
 >
@@ -113,6 +115,10 @@ Coding Guidelines
 Contributed source code must follow the guidelines below.  While the examples
 are for C and C++ source files, source code for other languages should conform
 to the same guidelines as allowed by the language.
+
+Source code comments provide the reference portion of the CUPS Programming
+Manual, which is generated using the [codedoc](https://msweet.org/codedoc)
+software.
 
 
 ### Source Files
@@ -270,15 +276,17 @@ Return/output values are indicated using an "O" prefix, input values are
 indicated using the "I" prefix, and values that are both input and output use
 the "IO" prefix for the corresponding in-line comment.
 
-The Mini-XML documentation generator also understands the following special
-text in the function description comment:
+The [codedoc](https://msweet.org/codedoc) documentation generator also
+understands the following special text in the function description comment:
 
-    @deprecated@         - Marks the function as deprecated (not recommended
-                           for new development and scheduled for removal)
+    @deprecated@         - Marks the function as deprecated: not recommended
+                           for new development and scheduled for removal.
+    @link name@          - Provides a hyperlink to the corresponding function
+                           or type definition.
     @since CUPS version@ - Marks the function as new in the specified version
                            of CUPS.
-    @private@            - Marks the function as private (same as starting the
-                           function name with an underscore)
+    @private@            - Marks the function as private so it will not be
+                           included in the documentation.
 
 
 ### Variables

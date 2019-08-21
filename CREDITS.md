@@ -1,4 +1,4 @@
-CREDITS - 2017-05-01
+CREDITS - 2019-08-21
 ====================
 
 Few projects are completed by one person, and CUPS is no exception.  We'd like
