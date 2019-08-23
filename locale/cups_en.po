@@ -1,7 +1,7 @@
 #
-# Message catalog template for CUPS.
+# English message catalog for CUPS.
 #
-# Copyright © 2007-2018 by Apple Inc.
+# Copyright © 2007-2019 by Apple Inc.
 # Copyright © 2005-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -22,9 +22,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 2.3b6\n"
+"Project-Id-Version: CUPS 2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-05-17 10:17-0400\n"
+"POT-Creation-Date: 2019-08-23 09:13-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -1558,7 +1558,7 @@ msgid "--false                 Always false"
 msgstr "--false                 Always false"
 
 msgid "--help                  Show program help"
-msgstr ""
+msgstr "--help                  Show program help"
 
 msgid "--hold                  Hold new jobs"
 msgstr "--hold                  Hold new jobs"
@@ -1594,7 +1594,7 @@ msgid "--name regex            Match service name to regular expression"
 msgstr "--name regex            Match service name to regular expression"
 
 msgid "--no-web-forms          Disable web forms for media and supplies"
-msgstr ""
+msgstr "--no-web-forms          Disable web forms for media and supplies"
 
 msgid "--not expression        Unary NOT of expression"
 msgstr "--not expression        Unary NOT of expression"
@@ -1697,7 +1697,7 @@ msgid "-2"
 msgstr "-2"
 
 msgid "-2                      Set 2-sided printing support (default=1-sided)"
-msgstr ""
+msgstr "-2                      Set 2-sided printing support (default=1-sided)"
 
 msgid "-20"
 msgstr "-20"
@@ -1781,7 +1781,7 @@ msgid "-D description          Specify the textual description of the printer"
 msgstr "-D description          Specify the textual description of the printer"
 
 msgid "-D device-uri           Set the device URI for the printer"
-msgstr ""
+msgstr "-D device-uri           Set the device URI for the printer"
 
 msgid ""
 "-E                      Enable and accept jobs on the printer (after -p)"
@@ -1798,7 +1798,7 @@ msgid "-F                      Run in the foreground but detach from console."
 msgstr "-F                      Run in the foreground but detach from console."
 
 msgid "-F output-type/subtype  Set the output format for the printer"
-msgstr ""
+msgstr "-F output-type/subtype  Set the output format for the printer"
 
 msgid "-H                      Show the default server and port"
 msgstr "-H                      Show the default server and port"
@@ -1834,6 +1834,7 @@ msgstr ""
 msgid ""
 "-K keypath              Set location of server X.509 certificates and keys."
 msgstr ""
+"-K keypath              Set location of server X.509 certificates and keys."
 
 msgid "-L                      Send requests using content-length"
 msgstr "-L                      Send requests using content-length"
@@ -1842,7 +1843,7 @@ msgid "-L location             Specify the textual location of the printer"
 msgstr "-L location             Specify the textual location of the printer"
 
 msgid "-M manufacturer         Set manufacturer name (default=Test)"
-msgstr ""
+msgstr "-M manufacturer         Set manufacturer name (default=Test)"
 
 msgid "-P destination          Show status for the specified destination"
 msgstr "-P destination          Show status for the specified destination"
@@ -1858,7 +1859,7 @@ msgstr ""
 "standard output"
 
 msgid "-P filename.ppd         Load printer attributes from PPD file"
-msgstr ""
+msgstr "-P filename.ppd         Load printer attributes from PPD file"
 
 msgid "-P number[-number]      Match port to number or range"
 msgstr "-P number[-number]      Match port to number or range"
@@ -1924,7 +1925,7 @@ msgid "-a [destination(s)]     Show the accepting state of destinations"
 msgstr "-a [destination(s)]     Show the accepting state of destinations"
 
 msgid "-a filename.conf        Load printer attributes from conf file"
-msgstr ""
+msgstr "-a filename.conf        Load printer attributes from conf file"
 
 msgid "-c                      Make a copy of the print file(s)"
 msgstr "-c                      Make a copy of the print file(s)"
@@ -1939,7 +1940,7 @@ msgid "-c class                Add the named destination to a class"
 msgstr "-c class                Add the named destination to a class"
 
 msgid "-c command              Set print command"
-msgstr ""
+msgstr "-c command              Set print command"
 
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
 msgstr "-c cupsd.conf           Set cupsd.conf file to use."
@@ -1961,7 +1962,7 @@ msgid "-d regex                Match domain to regular expression"
 msgstr "-d regex                Match domain to regular expression"
 
 msgid "-d spool-directory      Set spool directory"
-msgstr ""
+msgstr "-d spool-directory      Set spool directory"
 
 msgid "-e                      Show available destinations on the network"
 msgstr "-e                      Show available destinations on the network"
@@ -1973,7 +1974,7 @@ msgid "-f filename             Set default request filename"
 msgstr "-f filename             Set default request filename"
 
 msgid "-f type/subtype[,...]   Set supported file types"
-msgstr ""
+msgstr "-f type/subtype[,...]   Set supported file types"
 
 msgid "-h                      Show this usage message."
 msgstr "-h                      Show this usage message."
@@ -1988,7 +1989,7 @@ msgid "-h server[:port]        Connect to the named server and port"
 msgstr "-h server[:port]        Connect to the named server and port"
 
 msgid "-i iconfile.png         Set icon file"
-msgstr ""
+msgstr "-i iconfile.png         Set icon file"
 
 msgid "-i id                   Specify an existing job ID to modify"
 msgstr "-i id                   Specify an existing job ID to modify"
@@ -2002,7 +2003,7 @@ msgstr ""
 "-i seconds              Repeat the last file with the given time interval"
 
 msgid "-k                      Keep job spool files"
-msgstr ""
+msgstr "-k                      Keep job spool files"
 
 msgid "-l                      List attributes"
 msgstr "-l                      List attributes"
@@ -2020,7 +2021,7 @@ msgid "-l                      Show verbose (long) output"
 msgstr "-l                      Show verbose (long) output"
 
 msgid "-l location             Set location of printer"
-msgstr ""
+msgstr "-l location             Set location of printer"
 
 msgid ""
 "-m                      Send an email notification when the job completes"
@@ -2036,7 +2037,7 @@ msgstr ""
 "-m everywhere           Specify the printer is compatible with IPP Everywhere"
 
 msgid "-m model                Set model name (default=Printer)"
-msgstr ""
+msgstr "-m model                Set model name (default=Printer)"
 
 msgid ""
 "-m model                Specify a standard model/PPD file for the printer"
@@ -2047,7 +2048,7 @@ msgid "-n count                Repeat the last file the given number of times"
 msgstr "-n count                Repeat the last file the given number of times"
 
 msgid "-n hostname             Set hostname for printer"
-msgstr ""
+msgstr "-n hostname             Set hostname for printer"
 
 msgid "-n num-copies           Specify the number of copies to print"
 msgstr "-n num-copies           Specify the number of copies to print"
@@ -2173,7 +2174,7 @@ msgid "-p destination          Specify/add the named destination"
 msgstr "-p destination          Specify/add the named destination"
 
 msgid "-p port                 Set port number for printer"
-msgstr ""
+msgstr "-p port                 Set port number for printer"
 
 msgid "-q                      Quietly report match via exit code"
 msgstr "-q                      Quietly report match via exit code"
@@ -2207,7 +2208,7 @@ msgid "-r reason               Specify a reason message that others can see"
 msgstr "-r reason               Specify a reason message that others can see"
 
 msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
-msgstr ""
+msgstr "-r subtype,[subtype]    Set DNS-SD service subtype"
 
 msgid "-s                      Be silent"
 msgstr "-s                      Be silent"
@@ -2222,7 +2223,7 @@ msgid "-s cups-files.conf      Set cups-files.conf file to use."
 msgstr "-s cups-files.conf      Set cups-files.conf file to use."
 
 msgid "-s speed[,color-speed]  Set speed in pages per minute"
-msgstr ""
+msgstr "-s speed[,color-speed]  Set speed in pages per minute"
 
 msgid "-t                      Produce a test report"
 msgstr "-t                      Produce a test report"
@@ -3823,6 +3824,9 @@ msgstr "Invalid media name arguments."
 msgid "Invalid media size."
 msgstr "Invalid media size."
 
+msgid "Invalid named IPP attribute in collection."
+msgstr "Invalid named IPP attribute in collection."
+
 msgid "Invalid ppd-name value."
 msgstr "Invalid ppd-name value."
 
@@ -3979,7 +3983,7 @@ msgstr "List Available Printers"
 
 #, c-format
 msgid "Listening on port %d."
-msgstr ""
+msgstr "Listening on port %d."
 
 msgid "Local printer created."
 msgstr "Local printer created."
@@ -4862,7 +4866,7 @@ msgid "Unable to allocate memory for pages array"
 msgstr "Unable to allocate memory for pages array"
 
 msgid "Unable to allocate memory for printer"
-msgstr ""
+msgstr "Unable to allocate memory for printer"
 
 msgid "Unable to cancel print job."
 msgstr "Unable to cancel print job."
@@ -4914,7 +4918,7 @@ msgstr "Unable to create server credentials."
 
 #, c-format
 msgid "Unable to create spool directory \"%s\": %s"
-msgstr ""
+msgstr "Unable to create spool directory \"%s\": %s"
 
 msgid "Unable to create temporary file"
 msgstr "Unable to create temporary file"
@@ -4973,7 +4977,7 @@ msgstr "Unable to establish a secure connection to host."
 
 #, c-format
 msgid "Unable to execute command \"%s\": %s"
-msgstr ""
+msgstr "Unable to execute command \"%s\": %s"
 
 msgid "Unable to find destination for job"
 msgstr "Unable to find destination for job"
@@ -5060,7 +5064,7 @@ msgstr "Unable to read print data."
 
 #, c-format
 msgid "Unable to register \"%s.%s\": %d"
-msgstr ""
+msgstr "Unable to register \"%s.%s\": %d"
 
 msgid "Unable to rename job document file."
 msgstr "Unable to rename job document file."
@@ -5114,7 +5118,7 @@ msgstr "Unknown choice \"%s\" for option \"%s\"."
 
 #, c-format
 msgid "Unknown directive \"%s\" on line %d of \"%s\" ignored."
-msgstr ""
+msgstr "Unknown directive \"%s\" on line %d of \"%s\" ignored."
 
 #, c-format
 msgid "Unknown encryption option value: \"%s\"."
@@ -5265,7 +5269,7 @@ msgstr ""
 "       program | cupstestppd [options] -"
 
 msgid "Usage: ippeveprinter [options] \"name\""
-msgstr ""
+msgstr "Usage: ippeveprinter [options] \"name\""
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -5364,7 +5368,7 @@ msgstr "Usage: snmp [host-or-ip-address]"
 
 #, c-format
 msgid "Using spool directory \"%s\"."
-msgstr ""
+msgstr "Using spool directory \"%s\"."
 
 msgid "Value uses indefinite length"
 msgstr "Value uses indefinite length"
@@ -5394,14 +5398,14 @@ msgid "Yes"
 msgstr "Yes"
 
 msgid "You cannot access this page."
-msgstr ""
+msgstr "You cannot access this page."
 
 #, c-format
 msgid "You must access this page using the URL https://%s:%d%s."
 msgstr "You must access this page using the URL https://%s:%d%s."
 
 msgid "Your account does not have the necessary privileges."
-msgstr ""
+msgstr "Your account does not have the necessary privileges."
 
 msgid "ZPL Label Printer"
 msgstr "ZPL Label Printer"
@@ -5702,7 +5706,7 @@ msgstr "cups-driverd failed to execute."
 
 #, c-format
 msgid "cupsctl: Cannot set %s directly."
-msgstr ""
+msgstr "cupsctl: Cannot set %s directly."
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -5998,10 +6002,6 @@ msgstr "Aborted"
 #. TRANSLATORS: Completed
 msgid "document-state.9"
 msgstr "Completed"
-
-#. TRANSLATORS: End Power State
-msgid "end-power-state"
-msgstr "End Power State"
 
 msgid "error-index uses indefinite length"
 msgstr "error-index uses indefinite length"
@@ -7043,194 +7043,6 @@ msgstr "None"
 msgid "imposition-template.signature"
 msgstr "Signature"
 
-#. TRANSLATORS: Scanner Options
-msgid "input-attributes"
-msgstr "Scanner Options"
-
-#. TRANSLATORS: Scan Auto Scaling
-msgid "input-auto-scaling"
-msgstr "Scan Auto Scaling"
-
-#. TRANSLATORS: Scan Auto Skew Correction
-msgid "input-auto-skew-correction"
-msgstr "Scan Auto Skew Correction"
-
-#. TRANSLATORS: Scan Brightness
-msgid "input-brightness"
-msgstr "Scan Brightness"
-
-#. TRANSLATORS: Scanning Mode
-msgid "input-color-mode"
-msgstr "Scanning Mode"
-
-#. TRANSLATORS: Automatic
-msgid "input-color-mode.auto"
-msgstr "Automatic"
-
-#. TRANSLATORS: Text
-msgid "input-color-mode.bi-level"
-msgstr "Text"
-
-#. TRANSLATORS: 16-bit CMYK
-msgid "input-color-mode.cmyk_16"
-msgstr "16-bit CMYK"
-
-#. TRANSLATORS: 8-bit CMYK
-msgid "input-color-mode.cmyk_8"
-msgstr "8-bit CMYK"
-
-#. TRANSLATORS: Color
-msgid "input-color-mode.color"
-msgstr "Color"
-
-#. TRANSLATORS: 8-bit Color
-msgid "input-color-mode.color_8"
-msgstr "8-bit Color"
-
-#. TRANSLATORS: Monochrome
-msgid "input-color-mode.monochrome"
-msgstr "Monochrome"
-
-#. TRANSLATORS: 16-bit Monochrome
-msgid "input-color-mode.monochrome_16"
-msgstr "16-bit Monochrome"
-
-#. TRANSLATORS: 4-bit Monochrome
-msgid "input-color-mode.monochrome_4"
-msgstr "4-bit Monochrome"
-
-#. TRANSLATORS: 8-bit Monochrome
-msgid "input-color-mode.monochrome_8"
-msgstr "8-bit Monochrome"
-
-#. TRANSLATORS: 16-bit RGB
-msgid "input-color-mode.rgb_16"
-msgstr "16-bit RGB"
-
-#. TRANSLATORS: 16-bit RGBA
-msgid "input-color-mode.rgba_16"
-msgstr "16-bit RGBA"
-
-#. TRANSLATORS: 8-bit RGBA
-msgid "input-color-mode.rgba_8"
-msgstr "8-bit RGBA"
-
-#. TRANSLATORS: Scan Content
-msgid "input-content-type"
-msgstr "Scan Content"
-
-#. TRANSLATORS: Automatic
-msgid "input-content-type.auto"
-msgstr "Automatic"
-
-#. TRANSLATORS: Halftone
-msgid "input-content-type.halftone"
-msgstr "Halftone"
-
-#. TRANSLATORS: Line Art
-msgid "input-content-type.line-art"
-msgstr "Line Art"
-
-#. TRANSLATORS: Magazine
-msgid "input-content-type.magazine"
-msgstr "Magazine"
-
-#. TRANSLATORS: Photo
-msgid "input-content-type.photo"
-msgstr "Photo"
-
-#. TRANSLATORS: Text
-msgid "input-content-type.text"
-msgstr "Text"
-
-#. TRANSLATORS: Text And Photo
-msgid "input-content-type.text-and-photo"
-msgstr "Text And Photo"
-
-#. TRANSLATORS: Scan Contrast
-msgid "input-contrast"
-msgstr "Scan Contrast"
-
-#. TRANSLATORS: Film Type
-msgid "input-film-scan-mode"
-msgstr "Film Type"
-
-#. TRANSLATORS: Black And White Negative Film
-msgid "input-film-scan-mode.black-and-white-negative-film"
-msgstr "Black And White Negative Film"
-
-#. TRANSLATORS: Color Negative Film
-msgid "input-film-scan-mode.color-negative-film"
-msgstr "Color Negative Film"
-
-#. TRANSLATORS: Color Slide Film
-msgid "input-film-scan-mode.color-slide-film"
-msgstr "Color Slide Film"
-
-#. TRANSLATORS: Not Applicable
-msgid "input-film-scan-mode.not-applicable"
-msgstr "Not Applicable"
-
-#. TRANSLATORS: Scan Images To Transfer
-msgid "input-images-to-transfer"
-msgstr "Scan Images To Transfer"
-
-#. TRANSLATORS: Scan Media
-msgid "input-media"
-msgstr "Scan Media"
-
-#. TRANSLATORS: Automatic
-msgid "input-media.auto"
-msgstr "Automatic"
-
-#. TRANSLATORS: Scan Orientation
-msgid "input-orientation-requested"
-msgstr "Scan Orientation"
-
-#. TRANSLATORS: Scan Quality
-msgid "input-quality"
-msgstr "Scan Quality"
-
-#. TRANSLATORS: Scan Resolution
-msgid "input-resolution"
-msgstr "Scan Resolution"
-
-#. TRANSLATORS: Scan Scaling Height
-msgid "input-scaling-height"
-msgstr "Scan Scaling Height"
-
-#. TRANSLATORS: Scan Scaling Width
-msgid "input-scaling-width"
-msgstr "Scan Scaling Width"
-
-#. TRANSLATORS: Scan Regions
-msgid "input-scan-regions"
-msgstr "Scan Regions"
-
-#. TRANSLATORS: Scan Sharpness
-msgid "input-sharpness"
-msgstr "Scan Sharpness"
-
-#. TRANSLATORS: 2-Sided Scanning
-msgid "input-sides"
-msgstr "2-Sided Scanning"
-
-#. TRANSLATORS: Scan Source
-msgid "input-source"
-msgstr "Scan Source"
-
-#. TRANSLATORS: Automatic Document Feeder
-msgid "input-source.adf"
-msgstr "Automatic Document Feeder"
-
-#. TRANSLATORS: Film Reader
-msgid "input-source.film-reader"
-msgstr "Film Reader"
-
-#. TRANSLATORS: Platen
-msgid "input-source.platen"
-msgstr "Platen"
-
 #. TRANSLATORS: Insert Page Number
 msgid "insert-after-page-number"
 msgstr "Insert Page Number"
@@ -7245,7 +7057,7 @@ msgstr "Insert Sheet"
 
 #, c-format
 msgid "ippeveprinter: Unable to open \"%s\": %s on line %d."
-msgstr ""
+msgstr "ippeveprinter: Unable to open \"%s\": %s on line %d."
 
 #, c-format
 msgid "ippfind: Bad regular expression: %s"
@@ -7409,21 +7221,9 @@ msgstr "Standard"
 msgid "job-accounting-user-id"
 msgstr "Job Accounting User ID"
 
-#. TRANSLATORS: Collate Copies
-msgid "job-collation-type"
-msgstr "Collate Copies"
-
-#. TRANSLATORS: Uncollated Sheets
-msgid "job-collation-type.3"
-msgstr "Uncollated Sheets"
-
-#. TRANSLATORS: Collated Documents
-msgid "job-collation-type.4"
-msgstr "Collated Documents"
-
-#. TRANSLATORS: Uncollated Documents
-msgid "job-collation-type.5"
-msgstr "Uncollated Documents"
+#. TRANSLATORS: Job Cancel After
+msgid "job-cancel-after"
+msgstr "Cancel job after"
 
 #. TRANSLATORS: Copies
 msgid "job-copies"
@@ -7644,9 +7444,37 @@ msgstr "Owner"
 msgid "job-recipient-name"
 msgstr "Job Recipient Name"
 
-#. TRANSLATORS: Job Resource Ids
-msgid "job-resource-ids"
-msgstr "Job Resource Ids"
+#. TRANSLATORS: Job Retain Until
+msgid "job-retain-until"
+msgstr "Retain job until"
+
+#. TRANSLATORS: Job Retain Until Interval
+msgid "job-retain-until-interval"
+msgstr "Retain job until interval"
+
+#. TRANSLATORS: Job Retain Until Time
+msgid "job-retain-until-time"
+msgstr "Retain job until time"
+
+#. TRANSLATORS: End Of Day
+msgid "job-retain-until.end-of-day"
+msgstr "End of day"
+
+#. TRANSLATORS: End Of Month
+msgid "job-retain-until.end-of-month"
+msgstr "End of month"
+
+#. TRANSLATORS: End Of Week
+msgid "job-retain-until.end-of-week"
+msgstr "End of week"
+
+#. TRANSLATORS: Indefinite
+msgid "job-retain-until.indefinite"
+msgstr "Indefinitely"
+
+#. TRANSLATORS: None
+msgid "job-retain-until.none"
+msgstr "Never"
 
 #. TRANSLATORS: Job Save Disposition
 msgid "job-save-disposition"
@@ -7700,7 +7528,7 @@ msgstr "Job State Message"
 msgid "job-state-reasons"
 msgstr "Detailed Job State"
 
-#. TRANSLATORS: Aborted By System
+#. TRANSLATORS: Stopping
 msgid "job-state-reasons.aborted-by-system"
 msgstr "Aborted By System"
 
@@ -7720,7 +7548,7 @@ msgstr "Account Info Needed"
 msgid "job-state-reasons.account-limit-reached"
 msgstr "Account Limit Reached"
 
-#. TRANSLATORS: Compression Error
+#. TRANSLATORS: Decompression error
 msgid "job-state-reasons.compression-error"
 msgstr "Compression Error"
 
@@ -7776,31 +7604,31 @@ msgstr "Document Unprintable Error"
 msgid "job-state-reasons.errors-detected"
 msgstr "Errors Detected"
 
-#. TRANSLATORS: Job Canceled At Device
+#. TRANSLATORS: Canceled at printer
 msgid "job-state-reasons.job-canceled-at-device"
 msgstr "Job Canceled At Device"
 
-#. TRANSLATORS: Job Canceled By Operator
+#. TRANSLATORS: Canceled by operator
 msgid "job-state-reasons.job-canceled-by-operator"
 msgstr "Job Canceled By Operator"
 
-#. TRANSLATORS: Job Canceled By User
+#. TRANSLATORS: Canceled by user
 msgid "job-state-reasons.job-canceled-by-user"
 msgstr "Job Canceled By User"
 
-#. TRANSLATORS: Job Completed Successfully
+#. TRANSLATORS:
 msgid "job-state-reasons.job-completed-successfully"
 msgstr "Job Completed Successfully"
 
-#. TRANSLATORS: Job Completed With Errors
+#. TRANSLATORS: Completed with errors
 msgid "job-state-reasons.job-completed-with-errors"
 msgstr "Job Completed With Errors"
 
-#. TRANSLATORS: Job Completed With Warnings
+#. TRANSLATORS: Completed with warnings
 msgid "job-state-reasons.job-completed-with-warnings"
 msgstr "Job Completed With Warnings"
 
-#. TRANSLATORS: Job Data Insufficient
+#. TRANSLATORS: Insufficient data
 msgid "job-state-reasons.job-data-insufficient"
 msgstr "Job Data Insufficient"
 
@@ -7820,19 +7648,19 @@ msgstr "Job Fetchable"
 msgid "job-state-reasons.job-held-for-review"
 msgstr "Job Held For Review"
 
-#. TRANSLATORS: Job Hold Until Specified
+#. TRANSLATORS: Job held
 msgid "job-state-reasons.job-hold-until-specified"
 msgstr "Job Hold Until Specified"
 
-#. TRANSLATORS: Job Incoming
+#. TRANSLATORS: Incoming
 msgid "job-state-reasons.job-incoming"
 msgstr "Job Incoming"
 
-#. TRANSLATORS: Job Interpreting
+#. TRANSLATORS: Interpreting
 msgid "job-state-reasons.job-interpreting"
 msgstr "Job Interpreting"
 
-#. TRANSLATORS: Job Outgoing
+#. TRANSLATORS: Outgoing
 msgid "job-state-reasons.job-outgoing"
 msgstr "Job Outgoing"
 
@@ -7852,15 +7680,15 @@ msgstr "Job Printed With Errors"
 msgid "job-state-reasons.job-printed-with-warnings"
 msgstr "Job Printed With Warnings"
 
-#. TRANSLATORS: Job Printing
+#. TRANSLATORS: Printing
 msgid "job-state-reasons.job-printing"
 msgstr "Job Printing"
 
-#. TRANSLATORS: Job Queued
+#. TRANSLATORS: Preparing to print
 msgid "job-state-reasons.job-queued"
 msgstr "Job Queued"
 
-#. TRANSLATORS: Job Queued For Marker
+#. TRANSLATORS: Processing document
 msgid "job-state-reasons.job-queued-for-marker"
 msgstr "Job Queued For Marker"
 
@@ -7868,7 +7696,7 @@ msgstr "Job Queued For Marker"
 msgid "job-state-reasons.job-release-wait"
 msgstr "Job Release Wait"
 
-#. TRANSLATORS: Job Restartable
+#. TRANSLATORS: Restartable
 msgid "job-state-reasons.job-restartable"
 msgstr "Job Restartable"
 
@@ -7900,7 +7728,7 @@ msgstr "Job Spooling"
 msgid "job-state-reasons.job-streaming"
 msgstr "Job Streaming"
 
-#. TRANSLATORS: Job Suspended
+#. TRANSLATORS: Suspended
 msgid "job-state-reasons.job-suspended"
 msgstr "Job Suspended"
 
@@ -7924,7 +7752,7 @@ msgstr "Job Suspending"
 msgid "job-state-reasons.job-transferring"
 msgstr "Job Transferring"
 
-#. TRANSLATORS: Job Transforming
+#. TRANSLATORS: Transforming
 msgid "job-state-reasons.job-transforming"
 msgstr "Job Transforming"
 
@@ -7932,19 +7760,19 @@ msgstr "Job Transforming"
 msgid "job-state-reasons.none"
 msgstr "None"
 
-#. TRANSLATORS: Printer Stopped
+#. TRANSLATORS: Printer offline
 msgid "job-state-reasons.printer-stopped"
 msgstr "Printer Stopped"
 
-#. TRANSLATORS: Printer Stopped Partly
+#. TRANSLATORS: Printer partially stopped
 msgid "job-state-reasons.printer-stopped-partly"
 msgstr "Printer Stopped Partly"
 
-#. TRANSLATORS: Processing To Stop Point
+#. TRANSLATORS: Stopping
 msgid "job-state-reasons.processing-to-stop-point"
 msgstr "Processing To Stop Point"
 
-#. TRANSLATORS: Queued In Device
+#. TRANSLATORS: Ready
 msgid "job-state-reasons.queued-in-device"
 msgstr "Queued In Device"
 
@@ -7956,7 +7784,7 @@ msgstr "Resources Are Not Ready"
 msgid "job-state-reasons.resources-are-not-supported"
 msgstr "Resources Are Not Supported"
 
-#. TRANSLATORS: Service Off Line
+#. TRANSLATORS: Service offline
 msgid "job-state-reasons.service-off-line"
 msgstr "Service Off Line"
 
@@ -8174,7 +8002,7 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s"
-msgstr ""
+msgstr "lpadmin: Unable to open PPD \"%s\": %s"
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
@@ -10022,6 +9850,10 @@ msgstr "Envelope Chou 2"
 msgid "media.jpn_chou3_120x235mm"
 msgstr "Envelope Chou 3"
 
+#. TRANSLATORS: Envelope Chou 40
+msgid "media.jpn_chou40_90x225mm"
+msgstr "Envelope Chou 40"
+
 #. TRANSLATORS: Envelope Chou 4
 msgid "media.jpn_chou4_90x205mm"
 msgstr "Envelope Chou 4"
@@ -10619,14 +10451,6 @@ msgstr "None"
 msgid "notify-events.printer-config-changed"
 msgstr "Printer Config Changed"
 
-#. TRANSLATORS: Printer Created
-msgid "notify-events.printer-created"
-msgstr "Printer Created"
-
-#. TRANSLATORS: Printer Deleted
-msgid "notify-events.printer-deleted"
-msgstr "Printer Deleted"
-
 #. TRANSLATORS: Printer Finishings Changed
 msgid "notify-events.printer-finishings-changed"
 msgstr "Printer Finishings Changed"
@@ -10654,46 +10478,6 @@ msgstr "Printer State Changed"
 #. TRANSLATORS: Printer Stopped
 msgid "notify-events.printer-stopped"
 msgstr "Printer Stopped"
-
-#. TRANSLATORS: Resource Canceled
-msgid "notify-events.resource-canceled"
-msgstr "Resource Canceled"
-
-#. TRANSLATORS: Resource Config Changed
-msgid "notify-events.resource-config-changed"
-msgstr "Resource Config Changed"
-
-#. TRANSLATORS: Resource Created
-msgid "notify-events.resource-created"
-msgstr "Resource Created"
-
-#. TRANSLATORS: Resource Installed
-msgid "notify-events.resource-installed"
-msgstr "Resource Installed"
-
-#. TRANSLATORS: Resource State Changed
-msgid "notify-events.resource-state-changed"
-msgstr "Resource State Changed"
-
-#. TRANSLATORS: System Config Changed
-msgid "notify-events.system-config-changed"
-msgstr "System Config Changed"
-
-#. TRANSLATORS: System Restarted
-msgid "notify-events.system-restarted"
-msgstr "System Restarted"
-
-#. TRANSLATORS: System Shutdown
-msgid "notify-events.system-shutdown"
-msgstr "System Shutdown"
-
-#. TRANSLATORS: System State Changed
-msgid "notify-events.system-state-changed"
-msgstr "System State Changed"
-
-#. TRANSLATORS: System Stopped
-msgid "notify-events.system-stopped"
-msgstr "System Stopped"
 
 #. TRANSLATORS: Notify Get Interval
 msgid "notify-get-interval"
@@ -11061,182 +10845,6 @@ msgstr "Platform Temperature"
 #. TRANSLATORS: Post-dial String
 msgid "post-dial-string"
 msgstr "Post-dial String"
-
-#. TRANSLATORS: Power State
-msgid "power-state"
-msgstr "Power State"
-
-#. TRANSLATORS: Reset Mbr
-msgid "power-state.100"
-msgstr "Reset Mbr"
-
-#. TRANSLATORS: Reset Nmi
-msgid "power-state.110"
-msgstr "Reset Nmi"
-
-#. TRANSLATORS: Off Soft Graceful
-msgid "power-state.120"
-msgstr "Off Soft Graceful"
-
-#. TRANSLATORS: Off Hard Graceful
-msgid "power-state.130"
-msgstr "Off Hard Graceful"
-
-#. TRANSLATORS: Reset Mbr Graceful
-msgid "power-state.140"
-msgstr "Reset Mbr Graceful"
-
-#. TRANSLATORS: Reset Soft Graceful
-msgid "power-state.150"
-msgstr "Reset Soft Graceful"
-
-#. TRANSLATORS: Reset Hard Graceful
-msgid "power-state.160"
-msgstr "Reset Hard Graceful"
-
-#. TRANSLATORS: Reset Init
-msgid "power-state.170"
-msgstr "Reset Init"
-
-#. TRANSLATORS: Not Applicable
-msgid "power-state.180"
-msgstr "Not Applicable"
-
-#. TRANSLATORS: No Change
-msgid "power-state.190"
-msgstr "No Change"
-
-#. TRANSLATORS: On
-msgid "power-state.20"
-msgstr "On"
-
-#. TRANSLATORS: On Vendor1
-msgid "power-state.21"
-msgstr "On Vendor1"
-
-#. TRANSLATORS: On Vendor2
-msgid "power-state.22"
-msgstr "On Vendor2"
-
-#. TRANSLATORS: On Vendor3
-msgid "power-state.23"
-msgstr "On Vendor3"
-
-#. TRANSLATORS: On Vendor4
-msgid "power-state.24"
-msgstr "On Vendor4"
-
-#. TRANSLATORS: On Vendor5
-msgid "power-state.25"
-msgstr "On Vendor5"
-
-#. TRANSLATORS: Standby
-msgid "power-state.30"
-msgstr "Standby"
-
-#. TRANSLATORS: Standby Vendor1
-msgid "power-state.31"
-msgstr "Standby Vendor1"
-
-#. TRANSLATORS: Standby Vendor2
-msgid "power-state.32"
-msgstr "Standby Vendor2"
-
-#. TRANSLATORS: Standby Vendor3
-msgid "power-state.33"
-msgstr "Standby Vendor3"
-
-#. TRANSLATORS: Standby Vendor4
-msgid "power-state.34"
-msgstr "Standby Vendor4"
-
-#. TRANSLATORS: Standby Vendor5
-msgid "power-state.35"
-msgstr "Standby Vendor5"
-
-#. TRANSLATORS: Suspend
-msgid "power-state.40"
-msgstr "Suspend"
-
-#. TRANSLATORS: Suspend Vendor1
-msgid "power-state.41"
-msgstr "Suspend Vendor1"
-
-#. TRANSLATORS: Suspend Vendor2
-msgid "power-state.42"
-msgstr "Suspend Vendor2"
-
-#. TRANSLATORS: Suspend Vendor3
-msgid "power-state.43"
-msgstr "Suspend Vendor3"
-
-#. TRANSLATORS: Suspend Vendor4
-msgid "power-state.44"
-msgstr "Suspend Vendor4"
-
-#. TRANSLATORS: Suspend Vendor5
-msgid "power-state.45"
-msgstr "Suspend Vendor5"
-
-#. TRANSLATORS: Reset Soft
-msgid "power-state.50"
-msgstr "Reset Soft"
-
-#. TRANSLATORS: Off Hard
-msgid "power-state.60"
-msgstr "Off Hard"
-
-#. TRANSLATORS: Hibernate
-msgid "power-state.70"
-msgstr "Hibernate"
-
-#. TRANSLATORS: Hibernate Vendor1
-msgid "power-state.71"
-msgstr "Hibernate Vendor1"
-
-#. TRANSLATORS: Hibernate Vendor2
-msgid "power-state.72"
-msgstr "Hibernate Vendor2"
-
-#. TRANSLATORS: Hibernate Vendor3
-msgid "power-state.73"
-msgstr "Hibernate Vendor3"
-
-#. TRANSLATORS: Hibernate Vendor4
-msgid "power-state.74"
-msgstr "Hibernate Vendor4"
-
-#. TRANSLATORS: Hibernate Vendor5
-msgid "power-state.75"
-msgstr "Hibernate Vendor5"
-
-#. TRANSLATORS: Off Soft
-msgid "power-state.80"
-msgstr "Off Soft"
-
-#. TRANSLATORS: Off Soft Vendor1
-msgid "power-state.81"
-msgstr "Off Soft Vendor1"
-
-#. TRANSLATORS: Off Soft Vendor2
-msgid "power-state.82"
-msgstr "Off Soft Vendor2"
-
-#. TRANSLATORS: Off Soft Vendor3
-msgid "power-state.83"
-msgstr "Off Soft Vendor3"
-
-#. TRANSLATORS: Off Soft Vendor4
-msgid "power-state.84"
-msgstr "Off Soft Vendor4"
-
-#. TRANSLATORS: Off Soft Vendor5
-msgid "power-state.85"
-msgstr "Off Soft Vendor5"
-
-#. TRANSLATORS: Reset Hard
-msgid "power-state.90"
-msgstr "Reset Hard"
 
 #, c-format
 msgid "ppdc: Adding include directory \"%s\"."
@@ -11738,12 +11346,20 @@ msgstr "Process Monochrome"
 msgid "print-content-optimize"
 msgstr "Print Optimization"
 
+#. TRANSLATORS: Print Content Optimize Actual
+msgid "print-content-optimize-actual"
+msgstr "Print Optimization"
+
 #. TRANSLATORS: Automatic
 msgid "print-content-optimize.auto"
 msgstr "Automatic"
 
 #. TRANSLATORS: Graphics
 msgid "print-content-optimize.graphic"
+msgstr "Graphics"
+
+#. TRANSLATORS: Graphics
+msgid "print-content-optimize.graphics"
 msgstr "Graphics"
 
 #. TRANSLATORS: Photo
@@ -11756,6 +11372,10 @@ msgstr "Text"
 
 #. TRANSLATORS: Text and Graphics
 msgid "print-content-optimize.text-and-graphic"
+msgstr "Text and Graphics"
+
+#. TRANSLATORS: Text And Graphics
+msgid "print-content-optimize.text-and-graphics"
 msgstr "Text and Graphics"
 
 #. TRANSLATORS: Print Objects
@@ -11878,21 +11498,45 @@ msgstr "printer %s/%s is idle.  enabled since %s"
 msgid "printer %s/%s now printing %s-%d.  enabled since %s"
 msgstr "printer %s/%s now printing %s-%d.  enabled since %s"
 
-#. TRANSLATORS: Printer Geo Location
-msgid "printer-geo-location"
-msgstr "Printer Geo Location"
+#. TRANSLATORS: Printer Kind
+msgid "printer-kind"
+msgstr "Printer Kind"
 
-#. TRANSLATORS: Printer ID
-msgid "printer-id"
-msgstr "Printer ID"
+#. TRANSLATORS: Disc
+msgid "printer-kind.disc"
+msgstr "Disc"
 
-#. TRANSLATORS: Printer Ids
-msgid "printer-ids"
-msgstr "Printer Ids"
+#. TRANSLATORS: Document
+msgid "printer-kind.document"
+msgstr "Document"
 
-#. TRANSLATORS: Printer Location
-msgid "printer-location"
-msgstr "Printer Location"
+#. TRANSLATORS: Envelope
+msgid "printer-kind.envelope"
+msgstr "Envelope"
+
+#. TRANSLATORS: Label
+msgid "printer-kind.label"
+msgstr "Label"
+
+#. TRANSLATORS: Large Format
+msgid "printer-kind.large-format"
+msgstr "Large format"
+
+#. TRANSLATORS: Photo
+msgid "printer-kind.photo"
+msgstr "Photo"
+
+#. TRANSLATORS: Postcard
+msgid "printer-kind.postcard"
+msgstr "Postcard"
+
+#. TRANSLATORS: Receipt
+msgid "printer-kind.receipt"
+msgstr "Receipt"
+
+#. TRANSLATORS: Roll
+msgid "printer-kind.roll"
+msgstr "Roll"
 
 #. TRANSLATORS: Message From Operator
 msgid "printer-message-from-operator"
@@ -11901,38 +11545,6 @@ msgstr "Message From Operator"
 #. TRANSLATORS: Print Resolution
 msgid "printer-resolution"
 msgstr "Print Resolution"
-
-#. TRANSLATORS: Printer Service Type
-msgid "printer-service-type"
-msgstr "Printer Service Type"
-
-#. TRANSLATORS: Copy
-msgid "printer-service-type.copy"
-msgstr "Copy"
-
-#. TRANSLATORS: Faxin
-msgid "printer-service-type.faxin"
-msgstr "Faxin"
-
-#. TRANSLATORS: Faxout
-msgid "printer-service-type.faxout"
-msgstr "Faxout"
-
-#. TRANSLATORS: Print
-msgid "printer-service-type.print"
-msgstr "Print"
-
-#. TRANSLATORS: Print3d
-msgid "printer-service-type.print3d"
-msgstr "Print3d"
-
-#. TRANSLATORS: Scan
-msgid "printer-service-type.scan"
-msgstr "Scan"
-
-#. TRANSLATORS: Transform
-msgid "printer-service-type.transform"
-msgstr "Transform"
 
 #. TRANSLATORS: Printer State
 msgid "printer-state"
@@ -12282,10 +11894,6 @@ msgstr "Cover Open"
 msgid "printer-state-reasons.deactivated"
 msgstr "Deactivated"
 
-#. TRANSLATORS: Deleted
-msgid "printer-state-reasons.deleted"
-msgstr "Deleted"
-
 #. TRANSLATORS: Developer Empty
 msgid "printer-state-reasons.developer-empty"
 msgstr "Developer Empty"
@@ -12470,6 +12078,26 @@ msgstr "Extruder Temperature Low"
 msgid "printer-state-reasons.fan-failure"
 msgstr "Fan Failure"
 
+#. TRANSLATORS: Fax Modem Life Almost Over
+msgid "printer-state-reasons.fax-modem-life-almost-over"
+msgstr "Fax Modem Life Almost Over"
+
+#. TRANSLATORS: Fax Modem Life Over
+msgid "printer-state-reasons.fax-modem-life-over"
+msgstr "Fax Modem Life Over"
+
+#. TRANSLATORS: Fax Modem Missing
+msgid "printer-state-reasons.fax-modem-missing"
+msgstr "Fax Modem Missing"
+
+#. TRANSLATORS: Fax Modem Turned Off
+msgid "printer-state-reasons.fax-modem-turned-off"
+msgstr "Fax Modem Turned Off"
+
+#. TRANSLATORS: Fax Modem Turned On
+msgid "printer-state-reasons.fax-modem-turned-on"
+msgstr "Fax Modem Turned On"
+
 #. TRANSLATORS: Folder Added
 msgid "printer-state-reasons.folder-added"
 msgstr "Folder Added"
@@ -12614,11 +12242,11 @@ msgstr "Folder Unrecoverable Storage Error"
 msgid "printer-state-reasons.folder-warming-up"
 msgstr "Folder Warming Up"
 
-#. TRANSLATORS: Fuser Over Temp
+#. TRANSLATORS: Fuser temperature high
 msgid "printer-state-reasons.fuser-over-temp"
 msgstr "Fuser Over Temp"
 
-#. TRANSLATORS: Fuser Under Temp
+#. TRANSLATORS: Fuser temperature low
 msgid "printer-state-reasons.fuser-under-temp"
 msgstr "Fuser Under Temp"
 
@@ -12794,6 +12422,18 @@ msgstr "Input Media Form Parts Change"
 msgid "printer-state-reasons.input-media-size-change"
 msgstr "Input Media Size Change"
 
+#. TRANSLATORS: Input Media Tray Failure
+msgid "printer-state-reasons.input-media-tray-failure"
+msgstr "Input Media Tray Failure"
+
+#. TRANSLATORS: Input Media Tray Feed Error
+msgid "printer-state-reasons.input-media-tray-feed-error"
+msgstr "Input Media Tray Feed Error"
+
+#. TRANSLATORS: Input Media Tray Jam
+msgid "printer-state-reasons.input-media-tray-jam"
+msgstr "Input Media Tray Jam"
+
 #. TRANSLATORS: Input Media Type Change
 msgid "printer-state-reasons.input-media-type-change"
 msgstr "Input Media Type Change"
@@ -12802,11 +12442,27 @@ msgstr "Input Media Type Change"
 msgid "printer-state-reasons.input-media-weight-change"
 msgstr "Input Media Weight Change"
 
+#. TRANSLATORS: Input Pick Roller Failure
+msgid "printer-state-reasons.input-pick-roller-failure"
+msgstr "Input Pick Roller Failure"
+
+#. TRANSLATORS: Input Pick Roller Life Over
+msgid "printer-state-reasons.input-pick-roller-life-over"
+msgstr "Input Pick Roller Life Over"
+
+#. TRANSLATORS: Input Pick Roller Life Warn
+msgid "printer-state-reasons.input-pick-roller-life-warn"
+msgstr "Input Pick Roller Life Warn"
+
+#. TRANSLATORS: Input Pick Roller Missing
+msgid "printer-state-reasons.input-pick-roller-missing"
+msgstr "Input Pick Roller Missing"
+
 #. TRANSLATORS: Input Tray Elevation Failure
 msgid "printer-state-reasons.input-tray-elevation-failure"
 msgstr "Input Tray Elevation Failure"
 
-#. TRANSLATORS: Input Tray Missing
+#. TRANSLATORS: Paper tray is missing
 msgid "printer-state-reasons.input-tray-missing"
 msgstr "Input Tray Missing"
 
@@ -12994,7 +12650,7 @@ msgstr "Interpreter Resource Added"
 msgid "printer-state-reasons.interpreter-resource-deleted"
 msgstr "Interpreter Resource Deleted"
 
-#. TRANSLATORS: Interpreter Resource Unavailable
+#. TRANSLATORS: Printer resource unavailable
 msgid "printer-state-reasons.interpreter-resource-unavailable"
 msgstr "Interpreter Resource Unavailable"
 
@@ -13170,6 +12826,10 @@ msgstr "Envelope Maker Warming Up"
 msgid "printer-state-reasons.marker-adjusting-print-quality"
 msgstr "Marker Adjusting Print Quality"
 
+#. TRANSLATORS: Marker Cleaner Missing
+msgid "printer-state-reasons.marker-cleaner-missing"
+msgstr "Marker Cleaner Missing"
+
 #. TRANSLATORS: Marker Developer Almost Empty
 msgid "printer-state-reasons.marker-developer-almost-empty"
 msgstr "Marker Developer Almost Empty"
@@ -13177,6 +12837,14 @@ msgstr "Marker Developer Almost Empty"
 #. TRANSLATORS: Marker Developer Empty
 msgid "printer-state-reasons.marker-developer-empty"
 msgstr "Marker Developer Empty"
+
+#. TRANSLATORS: Marker Developer Missing
+msgid "printer-state-reasons.marker-developer-missing"
+msgstr "Marker Developer Missing"
+
+#. TRANSLATORS: Marker Fuser Missing
+msgid "printer-state-reasons.marker-fuser-missing"
+msgstr "Marker Fuser Missing"
 
 #. TRANSLATORS: Marker Fuser Thermistor Failure
 msgid "printer-state-reasons.marker-fuser-thermistor-failure"
@@ -13188,39 +12856,63 @@ msgstr "Marker Fuser Timing Failure"
 
 #. TRANSLATORS: Marker Ink Almost Empty
 msgid "printer-state-reasons.marker-ink-almost-empty"
-msgstr "Marker Ink Almost Empty"
+msgstr "Low ink"
 
 #. TRANSLATORS: Marker Ink Empty
 msgid "printer-state-reasons.marker-ink-empty"
-msgstr "Marker Ink Empty"
+msgstr "Ink empty"
 
-#. TRANSLATORS: Marker Print Ribbon Almost Empty
+#. TRANSLATORS: Marker Ink Missing
+msgid "printer-state-reasons.marker-ink-missing"
+msgstr "Ink missing"
+
+#. TRANSLATORS: Marker Opc Missing
+msgid "printer-state-reasons.marker-opc-missing"
+msgstr "OPC missing"
+
+#. TRANSLATORS: Print ribbon Almost Empty
 msgid "printer-state-reasons.marker-print-ribbon-almost-empty"
-msgstr "Marker Print Ribbon Almost Empty"
+msgstr "Print ribbon Almost Empty"
 
-#. TRANSLATORS: Marker Print Ribbon Empty
+#. TRANSLATORS: Print ribbon Empty
 msgid "printer-state-reasons.marker-print-ribbon-empty"
-msgstr "Marker Print Ribbon Empty"
+msgstr "Print ribbon Empty"
 
-#. TRANSLATORS: Marker Supply Empty
+#. TRANSLATORS: Print ribbon Missing
+msgid "printer-state-reasons.marker-print-ribbon-missing"
+msgstr "Print ribbon missing"
+
+#. TRANSLATORS: Marker Supply Almost Empty
+msgid "printer-state-reasons.marker-supply-almost-empty"
+msgstr "Ink/toner almost empty"
+
+#. TRANSLATORS: Ink/toner empty
 msgid "printer-state-reasons.marker-supply-empty"
-msgstr "Marker Supply Empty"
+msgstr "Ink/toner empty"
 
-#. TRANSLATORS: Marker Supply Low
+#. TRANSLATORS: Ink/toner low
 msgid "printer-state-reasons.marker-supply-low"
-msgstr "Marker Supply Low"
+msgstr "Ink/toner low"
+
+#. TRANSLATORS: Marker Supply Missing
+msgid "printer-state-reasons.marker-supply-missing"
+msgstr "Ink/toner missing"
 
 #. TRANSLATORS: Marker Toner Cartridge Missing
 msgid "printer-state-reasons.marker-toner-cartridge-missing"
-msgstr "Marker Toner Cartridge Missing"
+msgstr "Toner cartridge missing"
 
-#. TRANSLATORS: Marker Waste Almost Full
+#. TRANSLATORS: Marker Toner Missing
+msgid "printer-state-reasons.marker-toner-missing"
+msgstr "Toner missing"
+
+#. TRANSLATORS: Ink/toner waste bin almost full
 msgid "printer-state-reasons.marker-waste-almost-full"
-msgstr "Marker Waste Almost Full"
+msgstr "Ink/toner waste bin almost full"
 
-#. TRANSLATORS: Marker Waste Full
+#. TRANSLATORS: Ink/toner waste bin full
 msgid "printer-state-reasons.marker-waste-full"
-msgstr "Marker Waste Full"
+msgstr "Ink/toner waste bin full"
 
 #. TRANSLATORS: Marker Waste Ink Receptacle Almost Full
 msgid "printer-state-reasons.marker-waste-ink-receptacle-almost-full"
@@ -13230,6 +12922,14 @@ msgstr "Marker Waste Ink Receptacle Almost Full"
 msgid "printer-state-reasons.marker-waste-ink-receptacle-full"
 msgstr "Marker Waste Ink Receptacle Full"
 
+#. TRANSLATORS: Marker Waste Ink Receptacle Missing
+msgid "printer-state-reasons.marker-waste-ink-receptacle-missing"
+msgstr "Marker Waste Ink Receptacle Missing"
+
+#. TRANSLATORS: Marker Waste Missing
+msgid "printer-state-reasons.marker-waste-missing"
+msgstr "Ink/toner waste bin missing"
+
 #. TRANSLATORS: Marker Waste Toner Receptacle Almost Full
 msgid "printer-state-reasons.marker-waste-toner-receptacle-almost-full"
 msgstr "Marker Waste Toner Receptacle Almost Full"
@@ -13237,6 +12937,10 @@ msgstr "Marker Waste Toner Receptacle Almost Full"
 #. TRANSLATORS: Marker Waste Toner Receptacle Full
 msgid "printer-state-reasons.marker-waste-toner-receptacle-full"
 msgstr "Marker Waste Toner Receptacle Full"
+
+#. TRANSLATORS: Marker Waste Toner Receptacle Missing
+msgid "printer-state-reasons.marker-waste-toner-receptacle-missing"
+msgstr "Marker Waste Toner Receptacle Missing"
 
 #. TRANSLATORS: Material Empty
 msgid "printer-state-reasons.material-empty"
@@ -13254,25 +12958,49 @@ msgstr "Material Needed"
 msgid "printer-state-reasons.media-drying"
 msgstr "Media Drying"
 
-#. TRANSLATORS: Media Empty
+#. TRANSLATORS: Paper tray is empty
 msgid "printer-state-reasons.media-empty"
 msgstr "Media Empty"
 
-#. TRANSLATORS: Media Jam
+#. TRANSLATORS: Paper jam
 msgid "printer-state-reasons.media-jam"
 msgstr "Media Jam"
 
-#. TRANSLATORS: Media Low
+#. TRANSLATORS: Paper tray is almost empty
 msgid "printer-state-reasons.media-low"
-msgstr "Media Low"
+msgstr "Paper tray is almost empty"
 
-#. TRANSLATORS: Media Needed
+#. TRANSLATORS: Load paper
 msgid "printer-state-reasons.media-needed"
-msgstr "Media Needed"
+msgstr "Load paper"
 
 #. TRANSLATORS: Media Path Cannot Do 2-Sided Printing
 msgid "printer-state-reasons.media-path-cannot-duplex-media-selected"
 msgstr "Media Path Cannot Do 2-Sided Printing"
+
+#. TRANSLATORS: Media Path Failure
+msgid "printer-state-reasons.media-path-failure"
+msgstr "Media Path Failure"
+
+#. TRANSLATORS: Media Path Input Empty
+msgid "printer-state-reasons.media-path-input-empty"
+msgstr "Media Path Input Empty"
+
+#. TRANSLATORS: Media Path Input Feed Error
+msgid "printer-state-reasons.media-path-input-feed-error"
+msgstr "Media Path Input Feed Error"
+
+#. TRANSLATORS: Media Path Input Jam
+msgid "printer-state-reasons.media-path-input-jam"
+msgstr "Media Path Input Jam"
+
+#. TRANSLATORS: Media Path Input Request
+msgid "printer-state-reasons.media-path-input-request"
+msgstr "Media Path Input Request"
+
+#. TRANSLATORS: Media Path Jam
+msgid "printer-state-reasons.media-path-jam"
+msgstr "Media Path Jam"
 
 #. TRANSLATORS: Media Path Media Tray Almost Full
 msgid "printer-state-reasons.media-path-media-tray-almost-full"
@@ -13286,11 +13014,39 @@ msgstr "Media Path Media Tray Full"
 msgid "printer-state-reasons.media-path-media-tray-missing"
 msgstr "Media Path Media Tray Missing"
 
+#. TRANSLATORS: Media Path Output Feed Error
+msgid "printer-state-reasons.media-path-output-feed-error"
+msgstr "Media Path Output Feed Error"
+
+#. TRANSLATORS: Media Path Output Full
+msgid "printer-state-reasons.media-path-output-full"
+msgstr "Media Path Output Full"
+
+#. TRANSLATORS: Media Path Output Jam
+msgid "printer-state-reasons.media-path-output-jam"
+msgstr "Media Path Output Jam"
+
+#. TRANSLATORS: Media Path Pick Roller Failure
+msgid "printer-state-reasons.media-path-pick-roller-failure"
+msgstr "Media Path Pick Roller Failure"
+
+#. TRANSLATORS: Media Path Pick Roller Life Over
+msgid "printer-state-reasons.media-path-pick-roller-life-over"
+msgstr "Media Path Pick Roller Life Over"
+
+#. TRANSLATORS: Media Path Pick Roller Life Warn
+msgid "printer-state-reasons.media-path-pick-roller-life-warn"
+msgstr "Media Path Pick Roller Life Warn"
+
+#. TRANSLATORS: Media Path Pick Roller Missing
+msgid "printer-state-reasons.media-path-pick-roller-missing"
+msgstr "Media Path Pick Roller Missing"
+
 #. TRANSLATORS: Motor Failure
 msgid "printer-state-reasons.motor-failure"
 msgstr "Motor Failure"
 
-#. TRANSLATORS: Moving To Paused
+#. TRANSLATORS: Printer going offline
 msgid "printer-state-reasons.moving-to-paused"
 msgstr "Moving To Paused"
 
@@ -13302,19 +13058,19 @@ msgstr "None"
 msgid "printer-state-reasons.opc-life-over"
 msgstr "Optical Photoconductor Life Over"
 
-#. TRANSLATORS: Optical Photoconductor Near End-of-life
+#. TRANSLATORS: OPC almost at end-of-life
 msgid "printer-state-reasons.opc-near-eol"
 msgstr "Optical Photoconductor Near End-of-life"
 
-#. TRANSLATORS: Other
+#. TRANSLATORS: Check the printer for errors
 msgid "printer-state-reasons.other"
 msgstr "Other"
 
-#. TRANSLATORS: Output Area Almost Full
+#. TRANSLATORS: Output bin is almost full
 msgid "printer-state-reasons.output-area-almost-full"
 msgstr "Output Area Almost Full"
 
-#. TRANSLATORS: Output Area Full
+#. TRANSLATORS: Output bin is full
 msgid "printer-state-reasons.output-area-full"
 msgstr "Output Area Full"
 
@@ -13322,7 +13078,19 @@ msgstr "Output Area Full"
 msgid "printer-state-reasons.output-mailbox-select-failure"
 msgstr "Output Mailbox Select Failure"
 
-#. TRANSLATORS: Output Tray Missing
+#. TRANSLATORS: Output Media Tray Failure
+msgid "printer-state-reasons.output-media-tray-failure"
+msgstr "Output Media Tray Failure"
+
+#. TRANSLATORS: Output Media Tray Feed Error
+msgid "printer-state-reasons.output-media-tray-feed-error"
+msgstr "Output Media Tray Feed Error"
+
+#. TRANSLATORS: Output Media Tray Jam
+msgid "printer-state-reasons.output-media-tray-jam"
+msgstr "Output Media Tray Jam"
+
+#. TRANSLATORS: Output tray is missing
 msgid "printer-state-reasons.output-tray-missing"
 msgstr "Output Tray Missing"
 
@@ -13658,10 +13426,6 @@ msgstr "Puncher Unrecoverable Storage Error"
 msgid "printer-state-reasons.puncher-warming-up"
 msgstr "Puncher Warming Up"
 
-#. TRANSLATORS: Resuming
-msgid "printer-state-reasons.resuming"
-msgstr "Resuming"
-
 #. TRANSLATORS: Separation Cutter Added
 msgid "printer-state-reasons.separation-cutter-added"
 msgstr "Separation Cutter Added"
@@ -13950,7 +13714,7 @@ msgstr "Sheet Rotator Unrecoverable Storage Error"
 msgid "printer-state-reasons.sheet-rotator-warming-up"
 msgstr "Sheet Rotator Warming Up"
 
-#. TRANSLATORS: Shutdown
+#. TRANSLATORS: Printer offline
 msgid "printer-state-reasons.shutdown"
 msgstr "Shutdown"
 
@@ -14534,7 +14298,7 @@ msgstr "Stitcher Unrecoverable Storage Error"
 msgid "printer-state-reasons.stitcher-warming-up"
 msgstr "Stitcher Warming Up"
 
-#. TRANSLATORS: Stopped Partly
+#. TRANSLATORS: Partially stopped
 msgid "printer-state-reasons.stopped-partly"
 msgstr "Stopped Partly"
 
@@ -14666,15 +14430,15 @@ msgstr "Subunit Unrecoverable Storage"
 msgid "printer-state-reasons.subunit-warming-up"
 msgstr "Subunit Warming Up"
 
-#. TRANSLATORS: Timed Out
+#. TRANSLATORS: Printer stopped responding
 msgid "printer-state-reasons.timed-out"
 msgstr "Timed Out"
 
-#. TRANSLATORS: Toner Empty
+#. TRANSLATORS: Out of toner
 msgid "printer-state-reasons.toner-empty"
 msgstr "Toner Empty"
 
-#. TRANSLATORS: Toner Low
+#. TRANSLATORS: Toner low
 msgid "printer-state-reasons.toner-low"
 msgstr "Toner Low"
 
@@ -14986,10 +14750,6 @@ msgstr "Stopped"
 msgid "printer-up-time"
 msgstr "Printer Uptime"
 
-#. TRANSLATORS: Printer Xri
-msgid "printer-xri-requested"
-msgstr "Printer Xri"
-
 msgid "processing"
 msgstr "processing"
 
@@ -15040,145 +14800,9 @@ msgstr "request id is %s-%d (%d file(s))"
 msgid "request-id uses indefinite length"
 msgstr "request-id uses indefinite length"
 
-#. TRANSLATORS: Request Power State
-msgid "request-power-state"
-msgstr "Request Power State"
-
 #. TRANSLATORS: Requested Attributes
 msgid "requested-attributes"
 msgstr "Requested Attributes"
-
-#. TRANSLATORS: Resource Format
-msgid "resource-format"
-msgstr "Resource Format"
-
-#. TRANSLATORS: Resource Format Accepted
-msgid "resource-format-accepted"
-msgstr "Resource Format Accepted"
-
-#. TRANSLATORS: Resource Formats
-msgid "resource-formats"
-msgstr "Resource Formats"
-
-#. TRANSLATORS: Resource ID
-msgid "resource-id"
-msgstr "Resource ID"
-
-#. TRANSLATORS: Resource Ids
-msgid "resource-ids"
-msgstr "Resource Ids"
-
-#. TRANSLATORS: Resource K Octets
-msgid "resource-k-octets"
-msgstr "Resource K Octets"
-
-#. TRANSLATORS: Resource Signature
-msgid "resource-signature"
-msgstr "Resource Signature"
-
-#. TRANSLATORS: Resource State
-msgid "resource-state"
-msgstr "Resource State"
-
-#. TRANSLATORS: Resource State Reasons
-msgid "resource-state-reasons"
-msgstr "Resource State Reasons"
-
-#. TRANSLATORS: Cancel
-msgid "resource-state-reasons.cancel-requested"
-msgstr "Cancel"
-
-#. TRANSLATORS: Install
-msgid "resource-state-reasons.install-requested"
-msgstr "Install"
-
-#. TRANSLATORS: Resource Incoming
-msgid "resource-state-reasons.resource-incoming"
-msgstr "Resource Incoming"
-
-#. TRANSLATORS: Pending
-msgid "resource-state.3"
-msgstr "Pending"
-
-#. TRANSLATORS: Available
-msgid "resource-state.4"
-msgstr "Available"
-
-#. TRANSLATORS: Installed
-msgid "resource-state.5"
-msgstr "Installed"
-
-#. TRANSLATORS: Canceled
-msgid "resource-state.6"
-msgstr "Canceled"
-
-#. TRANSLATORS: Aborted
-msgid "resource-state.7"
-msgstr "Aborted"
-
-#. TRANSLATORS: Resource States
-msgid "resource-states"
-msgstr "Resource States"
-
-#. TRANSLATORS: Resource Type
-msgid "resource-type"
-msgstr "Resource Type"
-
-#. TRANSLATORS: Executable Firmware
-msgid "resource-type.executable-firmware"
-msgstr "Executable Firmware"
-
-#. TRANSLATORS: Executable Software
-msgid "resource-type.executable-software"
-msgstr "Executable Software"
-
-#. TRANSLATORS: Static Font
-msgid "resource-type.static-font"
-msgstr "Static Font"
-
-#. TRANSLATORS: Static Form
-msgid "resource-type.static-form"
-msgstr "Static Form"
-
-#. TRANSLATORS: Static Icc Profile
-msgid "resource-type.static-icc-profile"
-msgstr "Static Icc Profile"
-
-#. TRANSLATORS: Static Image
-msgid "resource-type.static-image"
-msgstr "Static Image"
-
-#. TRANSLATORS: Static Logo
-msgid "resource-type.static-logo"
-msgstr "Static Logo"
-
-#. TRANSLATORS: Static Other
-msgid "resource-type.static-other"
-msgstr "Static Other"
-
-#. TRANSLATORS: Static Strings
-msgid "resource-type.static-strings"
-msgstr "Static Strings"
-
-#. TRANSLATORS: Template Document
-msgid "resource-type.template-document"
-msgstr "Template Document"
-
-#. TRANSLATORS: Template Job
-msgid "resource-type.template-job"
-msgstr "Template Job"
-
-#. TRANSLATORS: Template Printer
-msgid "resource-type.template-printer"
-msgstr "Template Printer"
-
-#. TRANSLATORS: Resource Types
-msgid "resource-types"
-msgstr "Resource Types"
-
-#. TRANSLATORS: Restart Get Interval
-msgid "restart-get-interval"
-msgstr "Restart Get Interval"
 
 #. TRANSLATORS: Retry Interval
 msgid "retry-interval"
@@ -15254,18 +14878,6 @@ msgstr "Slip Sheets"
 msgid "separator-sheets-type.start-sheet"
 msgstr "Start Sheet"
 
-#. TRANSLATORS: Collate Copies
-msgid "sheet-collate"
-msgstr "Collate Copies"
-
-#. TRANSLATORS: Yes
-msgid "sheet-collate.collated"
-msgstr "Yes"
-
-#. TRANSLATORS: No
-msgid "sheet-collate.uncollated"
-msgstr "No"
-
 #. TRANSLATORS: 2-Sided Printing
 msgid "sides"
 msgstr "2-Sided Printing"
@@ -15281,10 +14893,6 @@ msgstr "On (Portrait)"
 #. TRANSLATORS: On (Landscape)
 msgid "sides.two-sided-short-edge"
 msgstr "On (Landscape)"
-
-#. TRANSLATORS: Start Power State
-msgid "start-power-state"
-msgstr "Start Power State"
 
 #, c-format
 msgid "stat of %s failed: %s"
@@ -15408,49 +15016,9 @@ msgstr "system default destination: %s"
 msgid "system default destination: %s/%s"
 msgstr "system default destination: %s/%s"
 
-#. TRANSLATORS: System State
-msgid "system-state"
-msgstr "System State"
-
-#. TRANSLATORS: System State Reasons
-msgid "system-state-reasons"
-msgstr "System State Reasons"
-
-#. TRANSLATORS: Idle
-msgid "system-state.3"
-msgstr "Idle"
-
-#. TRANSLATORS: Processing
-msgid "system-state.4"
-msgstr "Processing"
-
-#. TRANSLATORS: Stopped
-msgid "system-state.5"
-msgstr "Stopped"
-
-#. TRANSLATORS: System URI
-msgid "system-uri"
-msgstr "System URI"
-
 #. TRANSLATORS: T33 Subaddress
 msgid "t33-subaddress"
 msgstr "T33 Subaddress"
-
-#. TRANSLATORS: Timeout Predicate
-msgid "timeout-predicate"
-msgstr "Timeout Predicate"
-
-#. TRANSLATORS: Activity
-msgid "timeout-predicate.activity"
-msgstr "Activity"
-
-#. TRANSLATORS: Inactivity
-msgid "timeout-predicate.inactivity"
-msgstr "Inactivity"
-
-#. TRANSLATORS: None
-msgid "timeout-predicate.none"
-msgstr "None"
 
 #. TRANSLATORS: To Name
 msgid "to-name"
@@ -15569,38 +15137,6 @@ msgstr "untitled"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings uses indefinite length"
 
-#. TRANSLATORS: Which Printers
-msgid "which-printers"
-msgstr "Which Printers"
-
-#. TRANSLATORS: All
-msgid "which-printers.all"
-msgstr "All"
-
-#. TRANSLATORS: Idle
-msgid "which-printers.idle"
-msgstr "Idle"
-
-#. TRANSLATORS: Not Accepting
-msgid "which-printers.not-accepting"
-msgstr "Not Accepting"
-
-#. TRANSLATORS: Processing
-msgid "which-printers.processing"
-msgstr "Processing"
-
-#. TRANSLATORS: Shutdown
-msgid "which-printers.shutdown"
-msgstr "Shutdown"
-
-#. TRANSLATORS: Stopped
-msgid "which-printers.stopped"
-msgstr "Stopped"
-
-#. TRANSLATORS: Testing
-msgid "which-printers.testing"
-msgstr "Testing"
-
 #. TRANSLATORS: X Accuracy
 msgid "x-accuracy"
 msgstr "X Accuracy"
@@ -15674,46 +15210,3 @@ msgstr "{}                      URI"
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr "~/.cups/lpoptions file names default destination that does not exist."
-
-#~ msgid "A Samba password is required to export printer drivers"
-#~ msgstr "A Samba password is required to export printer drivers"
-
-#~ msgid "A Samba username is required to export printer drivers"
-#~ msgstr "A Samba username is required to export printer drivers"
-
-#~ msgid "Export Printers to Samba"
-#~ msgstr "Export Printers to Samba"
-
-#~ msgid ""
-#~ "Usage:\n"
-#~ "\n"
-#~ "    lpadmin [-h server] -d destination\n"
-#~ "    lpadmin [-h server] -x destination\n"
-#~ "    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m "
-#~ "model]\n"
-#~ "                       [-r remove-class] [-v device] [-D description]\n"
-#~ "                       [-P ppd-file] [-o name=value]\n"
-#~ "                       [-u allow:user,user] [-u deny:user,user]"
-#~ msgstr ""
-#~ "Usage:\n"
-#~ "\n"
-#~ "    lpadmin [-h server] -d destination\n"
-#~ "    lpadmin [-h server] -x destination\n"
-#~ "    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m "
-#~ "model]\n"
-#~ "                       [-r remove-class] [-v device] [-D description]\n"
-#~ "                       [-P ppd-file] [-o name=value]\n"
-#~ "                       [-u allow:user,user] [-u deny:user,user]"
-
-#~ msgid ""
-#~ "You must access this page using the URL <A HREF=\"https://%s:%d%s"
-#~ "\">https://%s:%d%s</A>."
-#~ msgstr ""
-#~ "You must access this page using the URL <A HREF=\"https://%s:%d%s"
-#~ "\">https://%s:%d%s</A>."
-
-#~ msgid "cupsctl: Cannot set Listen or Port directly."
-#~ msgstr "cupsctl: Cannot set Listen or Port directly."
-
-#~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
-#~ msgstr "lpadmin: Unable to open PPD file \"%s\" - %s"
