@@ -1,4 +1,4 @@
-CHANGES - 2.3.0 - 2019-08-20
+CHANGES - 2.3.0 - 2019-08-23
 ============================
 
 
@@ -8,6 +8,7 @@ Changes in CUPS v2.3.0
 - CVE-2019-8696 and CVE-2019-8675: Fixed SNMP buffer overflows (rdar://51685251)
 - Added a GPL2/LGPL2 exception to the new CUPS license terms.
 - Documentation updates (Issue #5604)
+- Localization updates (Issue #5637)
 - Fixed a bug in the scheduler job cleanup code (Issue #5588)
 - Fixed builds when there is no TLS library (Issue #5590)
 - Eliminated some new GCC compiler warnings (Issue #5591)
