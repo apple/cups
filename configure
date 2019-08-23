@@ -9601,7 +9601,7 @@ else
 $as_echo_n "checking for default system groups... " >&6; }
 		if test -f /etc/group; then
 			CUPS_SYSTEM_GROUPS=""
-			GROUP_LIST="lpadmin sys system root"
+			GROUP_LIST="lpadmin sys system root wheel"
 			for group in $GROUP_LIST; do
 				if test "`grep \^${group}: /etc/group`" != ""; then
 					if test "x$CUPS_SYSTEM_GROUPS" = x; then
