@@ -245,7 +245,7 @@ AC_ARG_WITH(system_groups, [  --with-system-groups    set default system groups 
 		AC_MSG_CHECKING(for default system groups)
 		if test -f /etc/group; then
 			CUPS_SYSTEM_GROUPS=""
-			GROUP_LIST="lpadmin sys system root"
+			GROUP_LIST="lpadmin sys system root wheel"
 			for group in $GROUP_LIST; do
 				if test "`grep \^${group}: /etc/group`" != ""; then
 					if test "x$CUPS_SYSTEM_GROUPS" = x; then
