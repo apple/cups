@@ -1,7 +1,7 @@
 /*
  * Option encoding routines for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -673,7 +673,7 @@ _cupsEncodeOption(
 /*
  * 'cupsEncodeOption()' - Encode a single option into an IPP attribute.
  *
- * @since CUPS 2.3@
+ * @since CUPS 2.3/macOS 10.14@
  */
 
 ipp_attribute_t	*			/* O - New attribute or @code NULL@ on error */

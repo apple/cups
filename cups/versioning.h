@@ -116,9 +116,9 @@
 #    define _CUPS_API_1_7 API_AVAILABLE(macos(10.9), ios(11.0)) _CUPS_PUBLIC
 #    define _CUPS_API_2_0 API_AVAILABLE(macos(10.10), ios(11.0)) _CUPS_PUBLIC
 #    define _CUPS_API_2_2 API_AVAILABLE(macos(10.12), ios(11.0)) _CUPS_PUBLIC
-#    define _CUPS_API_2_2_4 API_AVAILABLE(macos(10.13), ios(11.0)) _CUPS_PUBLIC
-#    define _CUPS_API_2_2_7 API_AVAILABLE(macos(10.14), ios(11.0)) _CUPS_PUBLIC
-#    define _CUPS_API_2_3 _CUPS_PUBLIC
+#    define _CUPS_API_2_2_4 API_AVAILABLE(macos(10.13), ios(12.0)) _CUPS_PUBLIC
+#    define _CUPS_API_2_2_7 API_AVAILABLE(macos(10.14), ios(13.0)) _CUPS_PUBLIC
+#    define _CUPS_API_2_3 API_AVAILABLE(macos(10.14), ios(13.0)) _CUPS_PUBLIC
 #  else
 #    define _CUPS_API_1_1_19 _CUPS_PUBLIC
 #    define _CUPS_API_1_1_20 _CUPS_PUBLIC

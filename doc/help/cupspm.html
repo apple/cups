@@ -187,7 +187,6 @@ h2.title, h3.title {
           <li><a href="#authentication">Authentication</a></li>
         </ul></li>
         <li><a href="#FUNCTIONS">Functions</a><ul class="subcontents">
-          <li><a href="#CF_OPTIONS">CF_OPTIONS</a></li>
           <li><a href="#cupsAddDest">cupsAddDest</a></li>
           <li><a href="#cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></li>
           <li><a href="#cupsAddIntegerOption">cupsAddIntegerOption</a></li>
@@ -476,9 +475,6 @@ h2.title, h3.title {
           <li><a href="#cups_job_s">cups_job_s</a></li>
           <li><a href="#cups_option_s">cups_option_s</a></li>
           <li><a href="#cups_size_s">cups_size_s</a></li>
-        </ul></li>
-        <li><a href="#VARIABLES">Variables</a><ul class="subcontents">
-          <li><a href="#kSecOidOrganizationalUnit">kSecOidOrganizationalUnit</a></li>
         </ul></li>
         <li><a href="#ENUMERATIONS">Enumerations</a><ul class="subcontents">
           <li><a href="#cups_ptype_e">cups_ptype_e</a></li>
@@ -1215,19 +1211,6 @@ cups_password_cb2(const char *prompt, http_t *http,
     <p>The <code>resource</code> argument specifies the path used for the request.</p>
     <p>The <code>user_data</code> argument provides the user data pointer from the <code>cupsSetPasswordCB2</code> call.</p>
       <h2 class="title"><a id="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><a id="CF_OPTIONS">CF_OPTIONS</a></h3>
-        <p class="description"></p>
-<p class="code">
-typedef CF_OPTIONS(uint32_t, SecKeyUsage);</p>
-<h4 class="parameters">Parameters</h4>
-<table class="list"><tbody>
-<tr><th>uint32_t</th>
-</tr>
-<tr><th>SecKeyUsage</th>
-</tr>
-</tbody></table>
-<h4 class="returnvalue">Return Value</h4>
-        <p class="description"></p>
 <h3 class="function"><a id="cupsAddDest">cupsAddDest</a></h3>
         <p class="description">Add a destination to the list of destinations.</p>
 <p class="code">
@@ -1256,7 +1239,7 @@ a copy of that destination's options.<br>
 <br>
 Use the <a href="#cupsSaveDests"><code>cupsSaveDests</code></a> function to save the updated list of
 destinations to the user's lpoptions file.</p>
-<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></h3>
+<h3 class="function"><span class="info">&#160;CUPS 2.3/macOS 10.14&#160;</span><a id="cupsAddDestMediaOptions">cupsAddDestMediaOptions</a></h3>
         <p class="description">Add the option corresponding to the specified media size.</p>
 <p class="code">
 int cupsAddDestMediaOptions(<a href="#http_t">http_t</a> *http, <a href="#cups_dest_t">cups_dest_t</a> *dest, <a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo, unsigned flags, <a href="#cups_size_t">cups_size_t</a> *size, int num_options, <a href="#cups_option_t">cups_option_t</a> **options);</p>
@@ -1567,7 +1550,7 @@ int cupsDoAuthentication(<a href="#http_t">http_t</a> *http, const char *method,
 status, prior to resubmitting your request.
 
 </p>
-<h3 class="function"><span class="info">&#160;CUPS 2.3&#160;</span><a id="cupsEncodeOption">cupsEncodeOption</a></h3>
+<h3 class="function"><span class="info">&#160;CUPS 2.3/macOS 10.14&#160;</span><a id="cupsEncodeOption">cupsEncodeOption</a></h3>
         <p class="description">Encode a single option into an IPP attribute.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *cupsEncodeOption(<a href="#ipp_t">ipp_t</a> *ipp, ipp_tag_t group_tag, const char *name, const char *value);</p>
@@ -6127,10 +6110,6 @@ typedef struct _ipp_s ipp_t;
         <td class="description">Top margin in hundredths of
 millimeters</td></tr>
 </tbody></table>
-      <h2 class="title"><a id="VARIABLES">Variables</a></h2>
-      <h3 class="variable"><a id="kSecOidOrganizationalUnit">kSecOidOrganizationalUnit</a></h3>
-        <p class="description">Constants, very secure stuff...</p>
-      <p class="code">extern const void *kSecOidOrganizationalUnit;</p>
       <h2 class="title"><a id="ENUMERATIONS">Constants</a></h2>
       <h3 class="enumeration"><a id="cups_ptype_e">cups_ptype_e</a></h3>
         <p class="description">Printer type/capability bit

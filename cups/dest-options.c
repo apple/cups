@@ -59,7 +59,7 @@ static void		cups_update_ready(http_t *http, cups_dinfo_t *dinfo);
 /*
  * 'cupsAddDestMediaOptions()' - Add the option corresponding to the specified media size.
  *
- * @since CUPS 2.3@
+ * @since CUPS 2.3/macOS 10.14@
  */
 
 int					/* O  - New number of options */
