@@ -1,7 +1,7 @@
 /*
  * API definitions for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -47,10 +47,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			2.0212
+#  define CUPS_VERSION			2.0213
 #  define CUPS_VERSION_MAJOR		2
 #  define CUPS_VERSION_MINOR		2
-#  define CUPS_VERSION_PATCH		12
+#  define CUPS_VERSION_PATCH		13
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for

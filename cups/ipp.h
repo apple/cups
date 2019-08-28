@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol definitions for CUPS.
  *
- * Copyright 2007-2017 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -154,7 +154,7 @@ typedef enum ipp_finishings_e		/**** Finishings values ****/
   IPP_FINISHINGS_PUNCH_MULTIPLE_TOP,	/* Pucnh multiple holes top edge */
   IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT,	/* Pucnh multiple holes right side */
   IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM,	/* Pucnh multiple holes bottom edge */
-  IPP_FINISHINGS_FOLD_ACCORDIAN = 90,	/* Accordian-fold the paper vertically into four sections */
+  IPP_FINISHINGS_FOLD_ACCORDION = 90,	/* Accordion-fold the paper vertically into four sections */
   IPP_FINISHINGS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
   IPP_FINISHINGS_FOLD_GATE,		/* Fold the top and bottom quarters of the paper towards the midline */
   IPP_FINISHINGS_FOLD_HALF,		/* Fold the paper in half vertically */
@@ -189,8 +189,8 @@ typedef enum ipp_finishings_e		/**** Finishings values ****/
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side @exclude all@ */
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM,/* Punch 4 holes bottom edge @exclude all@ */
 
-  IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN = 0x4000005A,
-					/* Accordian-fold the paper vertically into four sections @exclude all@ */
+  IPP_FINISHINGS_CUPS_FOLD_ACCORDION = 0x4000005A,
+					/* Accordion-fold the paper vertically into four sections @exclude all@ */
   IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically @exclude all@ */
   IPP_FINISHINGS_CUPS_FOLD_GATE,	/* Fold the top and bottom quarters of the paper towards the midline @exclude all@ */
   IPP_FINISHINGS_CUPS_FOLD_HALF,	/* Fold the paper in half vertically @exclude all@ */
@@ -203,8 +203,10 @@ typedef enum ipp_finishings_e		/**** Finishings values ****/
   IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z @exclude all@ */
 } ipp_finishings_t;
 #  ifndef _CUPS_NO_DEPRECATED
+#    define IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN IPP_FINISHINGS_CUPS_FOLD_ACCORDION
+#    define IPP_FINISHINGS_FOLD_ACCORDIAN IPP_FINISHINGS_FOLD_ACCORDION
 #    define IPP_FINISHINGS_JOB_OFFSET	IPP_FINISHINGS_JOG_OFFSET
-					/* Long-time misspelling... */
+					/* Long-time misspellings... */
 typedef enum ipp_finishings_e ipp_finish_t;
 #  endif /* !_CUPS_NO_DEPRECATED */
 
