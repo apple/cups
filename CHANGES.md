@@ -1,5 +1,11 @@
-CHANGES - 2.3.0 - 2019-08-23
+CHANGES - 2.3.1 - 2019-08-27
 ============================
+
+
+Changes in CUPS v2.3.1
+----------------------
+
+- Fixed spelling of "fold-accordion".
 
 
 Changes in CUPS v2.3.0

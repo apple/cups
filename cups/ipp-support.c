@@ -460,7 +460,7 @@ static const char * const ipp_document_states[] =
 		  "punch-multiple-top",	/* IPP Finishings 2.1/Canon */
 		  "punch-multiple-right",/* IPP Finishings 2.1/Canon */
 		  "punch-multiple-bottom",/* IPP Finishings 2.1/Canon */
-		  "fold-accordian",	/* IPP Finishings 2.0 */
+		  "fold-accordion",	/* IPP Finishings 2.0 */
 		  "fold-double-gate",	/* IPP Finishings 2.0 */
 		  "fold-gate",		/* IPP Finishings 2.0 */
 		  "fold-half",		/* IPP Finishings 2.0 */
@@ -571,7 +571,7 @@ static const char * const ipp_document_states[] =
 		  "0x40000057",
 		  "0x40000058",
 		  "0x40000059",
-		  "cups-fold-accordian",
+		  "cups-fold-accordion",
 		  "cups-fold-double-gate",
 		  "cups-fold-gate",
 		  "cups-fold-half",
