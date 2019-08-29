@@ -1968,6 +1968,11 @@ http_sspi_make_credentials(
   GetSystemTime(&et);
   et.wYear += years;
 
+  // If today is February 29th, and the above addition operation results in a year that is *not* a leap year,
+  // then use February 28th instead.  Otherwise CertCreateSelfSignCertificate would fail.
+  BOOL isLeapYear = et.wYear % 4 == 0 && (et.wYear % 100 != 0 || et.wYear % 400 == 0);
+  et.wDay = et.wMonth == 2 && et.wDay == 29 && !isLeapYear ? 28 : et.wDay;
+
   ZeroMemory(&exts, sizeof(exts));
 
   createdContext = CertCreateSelfSignCertificate(hProv, &sib, 0, &kpi, NULL, NULL, &et, &exts);
