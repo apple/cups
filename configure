@@ -8308,12 +8308,6 @@ fi
 
 	    SAVELIBS="$LIBS"
 	    LIBS="$LIBS $SSLLIBS"
-	    ac_fn_c_check_func "$LINENO" "gnutls_fips140_set_mode" "ac_cv_func_gnutls_fips140_set_mode"
-if test "x$ac_cv_func_gnutls_fips140_set_mode" = xyes; then :
-  $as_echo "#define HAVE_GNUTLS_FIPS140_SET_MODE 1" >>confdefs.h
-
-fi
-
 	    ac_fn_c_check_func "$LINENO" "gnutls_transport_set_pull_timeout_function" "ac_cv_func_gnutls_transport_set_pull_timeout_function"
 if test "x$ac_cv_func_gnutls_transport_set_pull_timeout_function" = xyes; then :
   $as_echo "#define HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION 1" >>confdefs.h
