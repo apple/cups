@@ -43,7 +43,7 @@
 #include "md5-internal.h"
 #include "string-private.h"
 
-#if !defined(__APPLE__) && !defined(HAVE_GNUTLS)
+#if !defined(__APPLE__)
 #  define T1 0xd76aa478
 #  define T2 0xe8c7b756
 #  define T3 0x242070db
@@ -338,4 +338,4 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
     for (i = 0; i < 16; ++i)
 	digest[i] = (unsigned char)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }
-#endif /* !__APPLE__ && !HAVE_GNUTLS */
+#endif /* !__APPLE__ */

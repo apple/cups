@@ -16,6 +16,7 @@
 #  include <CommonCrypto/CommonDigest.h>
 #elif defined(HAVE_GNUTLS)
 #  include <gnutls/crypto.h>
+#  include "md5-internal.h"
 #else
 #  include "md5-internal.h"
 #endif /* __APPLE__ */
@@ -187,7 +188,22 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
 
 
   if (!strcmp(algorithm, "md5"))
-    alg = GNUTLS_DIG_MD5;
+  {
+   /*
+    * Some versions of GNU TLS disable MD5 without warning...
+    */
+
+    _cups_md5_state_t	state;		/* MD5 state info */
+
+    if (hashsize < 16)
+      goto too_small;
+
+    _cupsMD5Init(&state);
+    _cupsMD5Append(&state, data, datalen);
+    _cupsMD5Finish(&state, hash);
+
+    return (16);
+  }
   else if (!strcmp(algorithm, "sha"))
     alg = GNUTLS_DIG_SHA1;
   else if (!strcmp(algorithm, "sha2-224"))
@@ -242,6 +258,9 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
   if (!strcmp(algorithm, "md5"))
   {
     _cups_md5_state_t	state;		/* MD5 state info */
+
+    if (hashsize < 16)
+      goto too_small;
 
     _cupsMD5Init(&state);
     _cupsMD5Append(&state, data, datalen);
