@@ -5,6 +5,7 @@ CHANGES - 2.2.13 - 2019-09-05
 Changes in CUPS v2.2.13
 -----------------------
 
+- Added a workaround for the scheduler's systemd support (Issue #5640)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippserver`.
 
