@@ -150,10 +150,10 @@ typedef enum ipp_finishings_e		/**** Finishings values ****/
   IPP_FINISHINGS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
   IPP_FINISHINGS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
   IPP_FINISHINGS_PUNCH_QUAD_BOTTOM,	/* Punch 4 holes bottom edge */
-  IPP_FINISHINGS_PUNCH_MULTIPLE_LEFT,	/* Pucnh multiple holes left side */
-  IPP_FINISHINGS_PUNCH_MULTIPLE_TOP,	/* Pucnh multiple holes top edge */
-  IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT,	/* Pucnh multiple holes right side */
-  IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM,	/* Pucnh multiple holes bottom edge */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_LEFT,	/* Punch multiple holes left side */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_TOP,	/* Punch multiple holes top edge */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT,	/* Punch multiple holes right side */
+  IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM,	/* Punch multiple holes bottom edge */
   IPP_FINISHINGS_FOLD_ACCORDION = 90,	/* Accordion-fold the paper vertically into four sections */
   IPP_FINISHINGS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
   IPP_FINISHINGS_FOLD_GATE,		/* Fold the top and bottom quarters of the paper towards the midline */
