@@ -631,10 +631,6 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsLangPrintf(stderr, _("Using spool directory \"%s\"."), directory);
   }
 
-#ifdef HAVE_SSL
-  cupsSetServerCredentials(keypath, servername, 1);
-#endif /* HAVE_SSL */
-
  /*
   * Initialize DNS-SD...
   */
@@ -674,6 +670,10 @@ main(int  argc,				/* I - Number of command-line args */
   if (ppdfile)
     printer->ppdfile = strdup(ppdfile);
 #endif /* !CUPS_LITE */
+
+#ifdef HAVE_SSL
+  cupsSetServerCredentials(keypath, printer->hostname, 1);
+#endif /* HAVE_SSL */
 
  /*
   * Run the print service...
