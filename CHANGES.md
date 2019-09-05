@@ -1,4 +1,4 @@
-CHANGES - 2.2.13 - 2019-08-27
+CHANGES - 2.2.13 - 2019-09-05
 =============================
 
 
@@ -6,6 +6,7 @@ Changes in CUPS v2.2.13
 -----------------------
 
 - Fixed spelling of "fold-accordion".
+- Fixed the default common name for TLS certificates used by `ippserver`.
 
 
 Changes in CUPS v2.2.12
