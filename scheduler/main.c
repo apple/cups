@@ -757,7 +757,9 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_ONDEMAND
 	if (OnDemand)
 	{
+#  ifndef HAVE_SYSTEMD /* Issue #5640: systemd doesn't actually support launch-on-demand services, need to fake it */
 	  stop_scheduler = 1;
+#  endif /* HAVE_SYSTEMD */
 	  break;
 	}
 #endif /* HAVE_ONDEMAND */
