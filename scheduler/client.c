@@ -1099,7 +1099,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		}
 	      }
             }
-            else if (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/printers", 9) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/help", 5) || !strncmp(con->uri, "/jobs", 5))
+            else if (!buf[0] && (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/help", 5) || !strncmp(con->uri, "/jobs", 5) || !strncmp(con->uri, "/printers", 9)))
 	    {
 	      if (!WebInterface)
 	      {
@@ -1125,14 +1125,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdSetStringf(&con->command, "%s/cgi-bin/admin.cgi", ServerBin);
 		cupsdSetString(&con->options, strchr(con->uri + 6, '?'));
 	      }
-              else if (!strncmp(con->uri, "/printers", 9))
-	      {
-		cupsdSetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
-                if (con->uri[9] && con->uri[10])
-		  cupsdSetString(&con->options, con->uri + 9);
-		else
-		  cupsdSetString(&con->options, NULL);
-	      }
 	      else if (!strncmp(con->uri, "/classes", 8))
 	      {
 		cupsdSetStringf(&con->command, "%s/cgi-bin/classes.cgi", ServerBin);
@@ -1146,6 +1138,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdSetStringf(&con->command, "%s/cgi-bin/jobs.cgi", ServerBin);
                 if (con->uri[5] && con->uri[6])
 		  cupsdSetString(&con->options, con->uri + 5);
+		else
+		  cupsdSetString(&con->options, NULL);
+	      }
+              else if (!strncmp(con->uri, "/printers", 9))
+	      {
+		cupsdSetStringf(&con->command, "%s/cgi-bin/printers.cgi", ServerBin);
+                if (con->uri[9] && con->uri[10])
+		  cupsdSetString(&con->options, con->uri + 9);
 		else
 		  cupsdSetString(&con->options, NULL);
 	      }
@@ -1458,7 +1458,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      break;
 	    }
 
-	    if (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/printers", 9) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/help", 5) || !strncmp(con->uri, "/jobs", 5))
+	    if (!buf[0] && (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/help", 5) || !strncmp(con->uri, "/jobs", 5) || !strncmp(con->uri, "/printers", 9)))
 	    {
 	     /*
 	      * CGI output...
@@ -2701,6 +2701,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * Figure out the real filename...
   */
 
+  filename[0] = '\0';
   language[0] = '\0';
 
   if (!strncmp(con->uri, "/help", 5) && (con->uri[5] == '/' || !con->uri[5]))
@@ -2718,6 +2719,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
     if ((p = cupsdFindDest(dest)) == NULL)
     {
+      strlcpy(filename, "/", len);
       cupsdLogClient(con, CUPSD_LOG_INFO, "No destination \"%s\" found.", dest);
       return (NULL);
     }
@@ -2754,6 +2756,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
     if ((p = cupsdFindDest(dest)) == NULL)
     {
+      strlcpy(filename, "/", len);
       cupsdLogClient(con, CUPSD_LOG_INFO, "No destination \"%s\" found.", dest);
       return (NULL);
     }
@@ -2786,6 +2789,14 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
     perm_check = 0;
   }
+  else if (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/jobs", 5) || !strncmp(con->uri, "/printers", 9))
+  {
+   /*
+    * Admin/class/job/printer pages are served by CGI...
+    */
+
+    return (NULL);
+  }
   else if (!strncmp(con->uri, "/rss/", 5) && !strchr(con->uri + 5, '/'))
     snprintf(filename, len, "%s/rss/%s", CacheDir, con->uri + 5);
   else if (!strncmp(con->uri, "/strings/", 9) && !strcmp(con->uri + strlen(con->uri) - 8, ".strings"))
@@ -2795,12 +2806,14 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
     if ((p = cupsdFindDest(dest)) == NULL)
     {
+      strlcpy(filename, "/", len);
       cupsdLogClient(con, CUPSD_LOG_INFO, "No destination \"%s\" found.", dest);
       return (NULL);
     }
 
     if (!p->strings)
     {
+      strlcpy(filename, "/", len);
       cupsdLogClient(con, CUPSD_LOG_INFO, "No strings files for \"%s\".", dest);
       return (NULL);
     }

@@ -1,4 +1,4 @@
-CHANGES - 2.3.1 - 2019-09-05
+CHANGES - 2.3.1 - 2019-10-02
 ============================
 
 
@@ -8,6 +8,7 @@ Changes in CUPS v2.3.1
 - Added a workaround for the scheduler's systemd support (Issue #5640)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
+- Fixed a bug in the handling of printer resource files (Issue #5652)
 
 
 Changes in CUPS v2.3.0
