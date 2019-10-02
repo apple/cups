@@ -106,6 +106,7 @@ TESTOBJS	= \
 		testpwg.o \
 		testraster.o \
 		testsnmp.o \
+		testthreads.o \
 		tlscheck.o
 OBJS	=	\
 		$(LIBOBJS) \
@@ -191,6 +192,7 @@ UNITTARGETS =	\
 		testpwg \
 		testraster \
 		testsnmp \
+		testthreads \
 		tlscheck
 
 TARGETS	=	\
@@ -697,6 +699,16 @@ testraster:	testraster.o $(LIBCUPSSTATIC)
 testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(LD_CC) $(ALL_LDFLAGS) -o $@ testsnmp.o $(LINKCUPSSTATIC)
+	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
+
+
+#
+# testthreads (dependency on static CUPS library is intentional)
+#
+
+testthreads:	testthreads.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ testthreads.o $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

@@ -188,7 +188,7 @@ tls.o: tls.c cups-private.h string-private.h ../config.h \
   ipp-private.h ../cups/cups.h file.h ipp.h http.h array.h language.h \
   pwg.h http-private.h ../cups/language.h ../cups/http.h \
   language-private.h ../cups/transcode.h pwg-private.h thread-private.h \
-  debug-internal.h debug-private.h tls-darwin.c
+  debug-internal.h debug-private.h tls-darwin.c tls-darwin.h
 transcode.o: transcode.c cups-private.h string-private.h ../config.h \
   ../cups/versioning.h array-private.h ../cups/array.h versioning.h \
   ipp-private.h ../cups/cups.h file.h ipp.h http.h array.h language.h \
@@ -214,7 +214,7 @@ adminutil.o: adminutil.c cups-private.h string-private.h ../config.h \
   language-private.h ../cups/transcode.h pwg-private.h thread-private.h \
   debug-internal.h debug-private.h ppd.h cups.h raster.h adminutil.h
 backchannel.o: backchannel.c cups.h file.h versioning.h ipp.h http.h \
-  array.h language.h pwg.h
+  array.h language.h pwg.h sidechannel.h
 backend.o: backend.c cups-private.h string-private.h ../config.h \
   ../cups/versioning.h array-private.h ../cups/array.h versioning.h \
   ipp-private.h ../cups/cups.h file.h ipp.h http.h array.h language.h \
@@ -401,6 +401,9 @@ testsnmp.o: testsnmp.c cups-private.h string-private.h ../config.h \
   pwg.h http-private.h ../cups/language.h ../cups/http.h \
   language-private.h ../cups/transcode.h pwg-private.h thread-private.h \
   snmp-private.h
+testthreads.o: testthreads.c ../cups/cups.h file.h versioning.h ipp.h \
+  http.h array.h language.h pwg.h ../cups/thread-private.h ../config.h \
+  ../cups/versioning.h
 tlscheck.o: tlscheck.c cups-private.h string-private.h ../config.h \
   ../cups/versioning.h array-private.h ../cups/array.h versioning.h \
   ipp-private.h ../cups/cups.h file.h ipp.h http.h array.h language.h \
