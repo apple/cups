@@ -60,6 +60,8 @@ enum_dests_cb(void        *_name,	/* I - Printer name, if any */
   cups_dest_t		*cdest;		/* Copied destination */
 
 
+  (void)flags;
+
  /*
   * If a name was specified, compare it...
   */
