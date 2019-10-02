@@ -1,10 +1,11 @@
 /*
  * Side-channel API code for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
- * Copyright 2006 by Easy Software Products.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2006 by Easy Software Products.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -589,8 +590,8 @@ cupsSideChannelWrite(
   if ((buffer = _cupsBufferGet((size_t)datalen + 4)) == NULL)
     return (-1);
 
-  buffer[0] = command;
-  buffer[1] = status;
+  buffer[0] = (char)command;
+  buffer[1] = (char)status;
   buffer[2] = (char)(datalen >> 8);
   buffer[3] = (char)(datalen & 255);
 

@@ -1,7 +1,7 @@
 /*
  * SNMP functions for CUPS.
  *
- * Copyright © 2007-2014 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 2006-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -1167,7 +1167,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
   memcpy(bufptr, packet->community, commlen);
   bufptr += commlen;
 
-  *bufptr++ = packet->request_type;	/* Get-Request-PDU/Get-Next-Request-PDU */
+  *bufptr++ = (unsigned char)packet->request_type;	/* Get-Request-PDU/Get-Next-Request-PDU */
   asn1_set_length(&bufptr, reqlen);
 
   asn1_set_integer(&bufptr, (int)packet->request_id);

@@ -10429,7 +10429,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 	  case IPP_JOB_PROCESSING :
 	  case IPP_JOB_STOPPED :
-	      if (job->state_value != attr->values[0].integer)
+	      if (job->state_value != (ipp_jstate_t)attr->values[0].integer)
 	      {
 		send_ipp_status(con, IPP_NOT_POSSIBLE,
 		                _("Job state cannot be changed."));
