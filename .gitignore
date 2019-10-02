@@ -65,6 +65,7 @@ cups/testppd
 cups/testpwg
 cups/testraster
 cups/testsnmp
+cups/testthreads
 cups/tlscheck
 desktop/cups.desktop
 doc/index.html
