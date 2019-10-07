@@ -11,6 +11,8 @@ Changes in CUPS v2.3.1
 - Fixed a bug in the handling of printer resource files (Issue #5652)
 - The libusb-based USB backend now reports an error when the distribution
   permissions are wrong (Issue #5658)
+- The IPP backend did not detect all cases where a job should be retried using
+  a raster format (rdar://56021091)
 
 
 Changes in CUPS v2.3.0
