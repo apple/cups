@@ -4,7 +4,7 @@ README - CUPS v2.3.0 - 2019-08-21
 INTRODUCTION
 ------------
 
-CUPS is a standards-based, open source printing system developed by Apple Inc.
+CUPS is a standards-based, open-source printing system developed by Apple Inc.
 for macOS® and other UNIX®-like operating systems.  CUPS uses the Internet
 Printing Protocol ("IPP") and provides System V and Berkeley command-line
 interfaces, a web interface, and a C API to manage printers and print jobs.  It
@@ -12,8 +12,8 @@ supports printing to both local (parallel, serial, USB) and networked printers,
 and printers can be shared from one computer to another, even over the Internet!
 
 Internally, CUPS uses PostScript Printer Description ("PPD") files to describe
-printer capabilities and features and a wide variety of generic and device-
-specific programs to convert and print many types of files.  Sample drivers are
+printer capabilities and features and a wide variety of generic and device-specefic
+programs to convert and print many types of files.  Sample drivers are
 included with CUPS to support many Dymo, EPSON, HP, Intellitech, OKIDATA, and
 Zebra printers.  Many more drivers are available online and (in some cases) on
 the driver CD-ROM that came with your printer.
@@ -39,7 +39,7 @@ the CUPS sources:
 
 Once you have installed the software you can access the documentation (and a
 bunch of other stuff) online at <http://localhost:631/> and using the `man`
-command, for example `man cups`.
+command, for example, `man cups`.
 
 If you're having trouble getting that far, the documentation is located under
 the `doc/help` and `man` directories.
@@ -51,7 +51,7 @@ GETTING SUPPORT AND OTHER RESOURCES
 -----------------------------------
 
 If you have problems, *read the documentation first!*  We also provide two
-mailing lists which are available at <https://lists.cups.org/mailman/listinfo>.
+mailing lists that are available at <https://lists.cups.org/mailman/listinfo>.
 
 See the CUPS web site at <https://www.cups.org/> for other resources.
 
@@ -65,7 +65,7 @@ in your browser to access the printer administration tools:
 
 *Do not* use the hostname for your machine - it will not work with the default
 CUPS configuration.  To enable administration access on other addresses, check
-the `Allow Remote Administration` box and click on the `Change Settings button.
+the `Allow Remote Administration` box and click on the `Change Setting's button.
 
 You will be asked for the administration password (root or any other user in the
 sys/system/root/admin/lpadmin group on your system) when performing any
@@ -132,24 +132,24 @@ greater printing capabilities.
 PRINTING FILES
 --------------
 
-CUPS provides both the System V `lp` and Berkeley `lpr` commands for printing:
+CUPS provides both the System V `lp` and Berkeley LPR commands for printing:
 
     lp filename
-    lpr filename
+    LPR filename
 
 Both the `lp` and `lpr` commands support printing options for the driver:
 
     lp -o media=A4 -o resolution=600dpi filename
-    lpr -o media=A4 -o resolution=600dpi filename
+    LPR -o media=A4 -o resolution=600dpi filename
 
 CUPS recognizes many types of images files as well as PDF, PostScript, and text
 files, so you can print those files directly rather than through an application.
 
 If you have an application that generates output specifically for your printer
-then you need to use the `-oraw` or `-l` options:
+then you need to use the `-raw` or `-l` options:
 
     lp -o raw filename
-    lpr -l filename
+    LPR -l filename
 
 This will prevent the filters from misinterpreting your print file.
 
