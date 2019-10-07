@@ -2619,7 +2619,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
-	  print_attr(outfile, Output, attrptr, &group);
+	  print_attr(outfile, (int)Output, attrptr, &group);
 	cupsFilePuts(outfile, "</dict>\n");
       }
       cupsFilePuts(outfile, "</array>\n");
@@ -3388,7 +3388,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
                group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	   attrptr;
 	   attrptr = attrptr->next)
-	print_attr(outfile, Output, attrptr, &group);
+	print_attr(outfile, (int)Output, attrptr, &group);
       cupsFilePuts(outfile, "</dict>\n");
       cupsFilePuts(outfile, "</array>\n");
     }
@@ -3494,7 +3494,7 @@ do_tests(cups_file_t  *outfile,		/* I - Output file */
 	  {
 	    if (!strcmp(displayed[i], attrptr->name))
 	    {
-	      print_attr(outfile, Output, attrptr, NULL);
+	      print_attr(outfile, (int)Output, attrptr, NULL);
 	      break;
 	    }
 	  }

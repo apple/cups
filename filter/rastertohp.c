@@ -111,7 +111,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   * Setup printer/job attributes...
   */
 
-  Duplex    = header->Duplex;
+  Duplex    = (int)header->Duplex;
   ColorBits = header->cupsBitsPerColor;
 
   if ((!Duplex || (Page & 1)) && header->MediaPosition)

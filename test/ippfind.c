@@ -1798,7 +1798,7 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
   */
 
   if (expressions && expressions->parent)
-    logic = expressions->parent->op;
+    logic = (int)expressions->parent->op;
   else
     logic = IPPFIND_OP_AND;
 
@@ -2370,7 +2370,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
     httpClose(http);
 
     _cupsLangPrintf(stdout, "%s %s %s %s", service->uri,
-                    ippEnumString("printer-state", pstate),
+                    ippEnumString("printer-state", (int)pstate),
                     paccepting ? "accepting-jobs" : "not-accepting-jobs",
                     preasons);
   }

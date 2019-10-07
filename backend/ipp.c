@@ -2572,7 +2572,7 @@ monitor_printer(
       }
 
       fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
-              ippEnumString("job-state", monitor->job_state));
+              ippEnumString("job-state", (int)monitor->job_state));
 
       if (!job_canceled &&
           (monitor->job_state == IPP_JSTATE_CANCELED ||
@@ -2654,7 +2654,7 @@ monitor_printer(
       ippDelete(response);
 
       fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
-              ippEnumString("job-state", monitor->job_state));
+              ippEnumString("job-state", (int)monitor->job_state));
 
       if (!job_canceled &&
           (monitor->job_state == IPP_JSTATE_CANCELED ||

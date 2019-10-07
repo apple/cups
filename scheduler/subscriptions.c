@@ -174,7 +174,7 @@ cupsdAddEvent(
 	             "printer-name", NULL, dest->name);
 
 	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	              "printer-state", dest->state);
+	              "printer-state", (int)dest->state);
 
 	if (dest->num_reasons == 0)
 	  ippAddString(temp->attrs, IPP_TAG_EVENT_NOTIFICATION,
@@ -199,7 +199,7 @@ cupsdAddEvent(
 	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_INTEGER,
 	              "notify-job-id", job->id);
 	ippAddInteger(temp->attrs, IPP_TAG_EVENT_NOTIFICATION, IPP_TAG_ENUM,
-	              "job-state", job->state_value);
+	              "job-state", (int)job->state_value);
 
         if ((attr = ippFindAttribute(job->attrs, "job-name",
 	                             IPP_TAG_NAME)) != NULL)
