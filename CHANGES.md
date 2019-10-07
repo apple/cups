@@ -1,4 +1,4 @@
-CHANGES - 2.3.1 - 2019-10-02
+CHANGES - 2.3.1 - 2019-10-07
 ============================
 
 
@@ -9,6 +9,8 @@ Changes in CUPS v2.3.1
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
 - Fixed a bug in the handling of printer resource files (Issue #5652)
+- The libusb-based USB backend now reports an error when the distribution
+  permissions are wrong (Issue #5658)
 
 
 Changes in CUPS v2.3.0
