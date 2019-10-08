@@ -1,4 +1,4 @@
-README - CUPS v2.3.0 - 2019-08-21
+README - CUPS v2.3.1 - 2019-10-07
 =================================
 
 INTRODUCTION
@@ -65,11 +65,11 @@ in your browser to access the printer administration tools:
 
 *Do not* use the hostname for your machine - it will not work with the default
 CUPS configuration.  To enable administration access on other addresses, check
-the `Allow Remote Administration` box and click on the `Change Settings button.
+the `Allow Remote Administration` box and click on the `Change Settings` button.
 
 You will be asked for the administration password (root or any other user in the
-sys/system/root/admin/lpadmin group on your system) when performing any
-administrative function.
+"sys", "system", "root", "admin", or "lpadmin" group on your system) when
+performing any administrative function.
 
 
 SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
@@ -79,7 +79,7 @@ CUPS currently uses PPD (PostScript Printer Description) files that describe
 printer capabilities and driver programs needed for each printer.  The
 `everywhere` PPD is used for nearly all modern networks printers sold since
 about 2009.  For example, the following command creates a print queue for a
-printer at address 11.22.33.44:
+printer at address "11.22.33.44":
 
     lpadmin -p printername -E -v ipp://11.22.33.44/ipp/print -m everywhere
 
