@@ -61,6 +61,7 @@ static pthread_once_t	ppd_globals_key_once = PTHREAD_ONCE_INIT;
 static ppd_attr_t	*ppd_add_attr(ppd_file_t *ppd, const char *name,
 			              const char *spec, const char *text,
 				      const char *value);
+static ppd_choice_t	*ppd_grow_choices(ppd_option_t *option);
 static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 static int		ppd_compare_attrs(ppd_attr_t *a, ppd_attr_t *b);
@@ -2354,6 +2355,33 @@ ppd_add_attr(ppd_file_t *ppd,		/* I - PPD file data */
   return (temp);
 }
 
+/*
+ * 'ppd_grow_choices()' - Expand choices if necessary.
+ */
+static ppd_choice_t *                   /* O - Choice (possibly realloc'd) */
+ppd_grow_choices(ppd_option_t *option)  /* I - Choice-carrying option */
+{
+  int new_choices_capacity = 0;
+  ppd_choice_t *choice = option->choices;
+
+  /* We're being called while at capacity - time to realloc. */
+  if (option->num_choices == option->choices_capacity) {
+    new_choices_capacity = option->choices_capacity * 2;
+
+    if (option->choices_capacity == 0) {
+      new_choices_capacity = 1;
+      option->choices = NULL;
+    }
+
+    choice = realloc(option->choices,
+		     sizeof(ppd_choice_t) * (size_t)(new_choices_capacity));
+    if (choice) {
+      option->choices_capacity = new_choices_capacity;
+    }
+  }
+
+  return choice;
+}
 
 /*
  * 'ppd_add_choice()' - Add a choice to an option.
@@ -2365,13 +2393,7 @@ ppd_add_choice(ppd_option_t *option,	/* I - Option */
 {
   ppd_choice_t	*choice;		/* Choice */
 
-
-  if (option->num_choices == 0)
-    choice = malloc(sizeof(ppd_choice_t));
-  else
-    choice = realloc(option->choices, sizeof(ppd_choice_t) * (size_t)(option->num_choices + 1));
-
-  if (choice == NULL)
+  if ((choice = ppd_grow_choices(option)) == NULL)
     return (NULL);
 
   option->choices = choice;
