@@ -749,7 +749,7 @@ usage(void)
                           "       lp [options] -i id"));
   _cupsLangPuts(stdout, _("Options:"));
   _cupsLangPuts(stdout, _("-c                      Make a copy of the print file(s)"));
-  _cupsLangPuts(stdout, _("-d destination          Specify the destination printer or class"));
+  _cupsLangPuts(stdout, _("-d destination          Specify the destination"));
   _cupsLangPuts(stdout, _("-E                      Encrypt the connection to the server"));
   _cupsLangPuts(stdout, _("-h server[:port]        Connect to the named server and port"));
   _cupsLangPuts(stdout, _("-H HH:MM                Hold the job until the specified UTC time"));

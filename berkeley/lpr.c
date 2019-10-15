@@ -1,7 +1,7 @@
 /*
  * "lpr" command for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -445,9 +445,9 @@ usage(void)
                           "                        Specify 2-sided portrait printing"));
   _cupsLangPuts(stdout, _("-o sides=two-sided-short-edge\n"
                           "                        Specify 2-sided landscape printing"));
+  _cupsLangPuts(stdout, _("-P destination          Specify the destination"));
   _cupsLangPuts(stdout, _("-q                      Specify the job should be held for printing"));
   _cupsLangPuts(stdout, _("-r                      Remove the file(s) after submission"));
-  _cupsLangPuts(stdout, _("-P destination          Specify the destination"));
   _cupsLangPuts(stdout, _("-T title                Specify the job title"));
   _cupsLangPuts(stdout, _("-U username             Specify the username to use for authentication"));
 
