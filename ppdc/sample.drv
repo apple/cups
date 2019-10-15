@@ -1,7 +1,7 @@
 //
 // Driver info file for CUPS-supplied PPDs.
 //
-// Copyright © 2007-2018 by Apple Inc.
+// Copyright © 2007-2019 by Apple Inc.
 // Copyright © 1993-2006 by Easy Software Products.
 //
 // Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -66,6 +66,7 @@
 #media "w144h396/2.00x5.50\"" 144 396
 #media "w162h36/2.25x0.50\"" 162 36
 #media "w162h90/2.25x1.25\"" 162 90
+#media "w162h225/30859 Paint Can Label" 162 225
 #media "w162h288/2.25x4.00\"" 162 288
 #media "w162h396/2.25x5.50\"" 162 396
 #media "w171h396/2.38x5.50\"" 171 396
@@ -142,7 +143,8 @@ Version "2.3"
   *MediaSize w81h252
   MediaSize w101h252
   MediaSize w54h144
-  MediaSize w167h288
+  MediaSize w162h225
+  MediaSize w162h288
   MediaSize w162h540
   MediaSize w162h504
   MediaSize w41h248
