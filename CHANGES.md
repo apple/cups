@@ -6,6 +6,7 @@ Changes in CUPS v2.3.1
 ----------------------
 
 - Documentation updates (Issue #5661)
+- PPD files containing "custom" option keywords did not work (Issue #5639)
 - Added a workaround for the scheduler's systemd support (Issue #5640)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.

@@ -1874,9 +1874,9 @@ _ppdOpen(
     {
       if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
       {
-        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
-
-        goto error;
+        char cname[PPD_MAX_NAME];	/* Rewrite with a leading underscore */
+        snprintf(cname, sizeof(cname), "_%s", name);
+        strlcpy(name, cname, sizeof(name));
       }
 
       if ((size = ppdPageSize(ppd, name)) == NULL)
@@ -1903,9 +1903,9 @@ _ppdOpen(
     {
       if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
       {
-        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
-
-        goto error;
+        char cname[PPD_MAX_NAME];	/* Rewrite with a leading underscore */
+        snprintf(cname, sizeof(cname), "_%s", name);
+        strlcpy(name, cname, sizeof(name));
       }
 
       if ((size = ppdPageSize(ppd, name)) == NULL)
@@ -1939,9 +1939,9 @@ _ppdOpen(
 
       if (!_cups_strcasecmp(name, "custom") || !_cups_strncasecmp(name, "custom.", 7))
       {
-        pg->ppd_status = PPD_ILLEGAL_OPTION_KEYWORD;
-
-        goto error;
+        char cname[PPD_MAX_NAME];	/* Rewrite with a leading underscore */
+        snprintf(cname, sizeof(cname), "_%s", name);
+        strlcpy(name, cname, sizeof(name));
       }
 
       if (!strcmp(keyword, "PageSize"))
