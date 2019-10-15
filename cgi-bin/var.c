@@ -170,6 +170,9 @@ cgiGetArray(const char *name,		/* I - Name of array variable */
   if (element < 0 || element >= var->nvalues)
     return (NULL);
 
+  if (var->values[element] == NULL)
+    return (NULL);
+
   return (strdup(var->values[element]));
 }
 
