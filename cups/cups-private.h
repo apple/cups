@@ -57,6 +57,12 @@ typedef struct _cups_raster_error_s	/**** Error buffer structure ****/
 	*end;				/* End of buffer */
 } _cups_raster_error_t;
 
+typedef enum _cups_digestoptions_e	/**** Digest Options values */
+{
+  _CUPS_DIGESTOPTIONS_NONE,		/* No Digest authentication options */
+  _CUPS_DIGESTOPTIONS_DENYMD5		/* Do not use MD5 hashes for digest */
+} _cups_digestoptions_t;
+
 typedef enum _cups_uatokens_e		/**** UserAgentTokens values */
 {
   _CUPS_UATOKENS_NONE,			/* Do not send User-Agent */
@@ -157,6 +163,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			tempfile[1024];	/* cupsTempFd/File buffer */
 
   /* usersys.c */
+  _cups_digestoptions_t	digestoptions;	/* DigestOptions setting */
   _cups_uatokens_t	uatokens;	/* UserAgentTokens setting */
   http_encryption_t	encryption;	/* Encryption setting */
   char			user[65],	/* User name */

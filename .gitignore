@@ -80,14 +80,6 @@ filter/rastertopwg
 locale/checkpo
 locale/po2strings
 locale/strings2po
-man/client.conf.man
-man/cups-files.conf.man
-man/cups-lpd.man
-man/cups-snmp.man
-man/cupsaddsmb.man
-man/cupsd.conf.man
-man/cupsd.man
-man/lpoptions.man
 man/mantohtml
 monitor/bcp
 monitor/tbcp

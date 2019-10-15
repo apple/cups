@@ -289,7 +289,7 @@ cupsDoAuthentication(
 
       if (_httpSetDigestAuthString(http, nonce, method, resource))
       {
-	DEBUG_puts("2cupsDoAuthentication: Using Basic.");
+	DEBUG_puts("2cupsDoAuthentication: Using Digest.");
         break;
       }
     }

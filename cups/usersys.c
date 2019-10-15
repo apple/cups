@@ -40,6 +40,8 @@
 #    define kCUPSPrintingPrefs	CFSTR(".GlobalPreferences")
 #    define kPREFIX		"AirPrint"
 #  endif /* TARGET_OS_OSX */
+#  define kDigestOptionsKey	CFSTR(kPREFIX "DigestOptions")
+#  define kUserKey		CFSTR(kPREFIX "User")
 #  define kUserAgentTokensKey	CFSTR(kPREFIX "UserAgentTokens")
 #  define kAllowAnyRootKey	CFSTR(kPREFIX "AllowAnyRoot")
 #  define kAllowExpiredCertsKey	CFSTR(kPREFIX "AllowExpiredCerts")
@@ -63,6 +65,7 @@
 
 typedef struct _cups_client_conf_s	/**** client.conf config data ****/
 {
+  _cups_digestoptions_t	digestoptions;	/* DigestOptions values */
   _cups_uatokens_t	uatokens;	/* UserAgentTokens values */
 #ifdef HAVE_SSL
   int			ssl_options,	/* SSLOptions values */
@@ -97,6 +100,7 @@ static void	cups_finalize_client_conf(_cups_client_conf_t *cc);
 static void	cups_init_client_conf(_cups_client_conf_t *cc);
 static void	cups_read_client_conf(cups_file_t *fp, _cups_client_conf_t *cc);
 static void	cups_set_default_ipp_port(_cups_globals_t *cg);
+static void	cups_set_digestoptions(_cups_client_conf_t *cc, const char *value);
 static void	cups_set_encryption(_cups_client_conf_t *cc, const char *value);
 #ifdef HAVE_GSSAPI
 static void	cups_set_gss_service_name(_cups_client_conf_t *cc, const char *value);
@@ -1324,10 +1328,14 @@ cups_init_client_conf(
     cc->validate_certs = bval;
 #  endif /* HAVE_SSL */
 
+  if (cups_apple_get_string(kDigestOptionsKey, sval, sizeof(sval)))
+    cups_set_digestoptions(cc, sval);
+
+  if (cups_apple_get_string(kUserKey, sval, sizeof(sval)))
+    strlcpy(cc->user, sval, sizeof(cc->user));
+
   if (cups_apple_get_string(kUserAgentTokensKey, sval, sizeof(sval)))
-  {
     cups_set_uatokens(cc, sval);
-  }
 #endif /* __APPLE__ */
 }
 
@@ -1353,7 +1361,9 @@ cups_read_client_conf(
   linenum = 0;
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!_cups_strcasecmp(line, "Encryption") && value)
+    if (!_cups_strcasecmp(line, "DigestOptions") && value)
+      cups_set_digestoptions(cc, value);
+    else if (!_cups_strcasecmp(line, "Encryption") && value)
       cups_set_encryption(cc, value);
 #ifndef __APPLE__
    /*
@@ -1407,6 +1417,23 @@ cups_set_default_ipp_port(
   else
     cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
 }
+
+
+/*
+ * 'cups_set_digestoptions()' - Set the DigestOptions value.
+ */
+
+static void
+cups_set_digestoptions(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  if (!_cups_strcasecmp(value, "DenyMD5"))
+    cc->digestoptions = _CUPS_DIGESTOPTIONS_DENYMD5;
+  else if (!_cups_strcasecmp(value, "None"))
+    cc->digestoptions = _CUPS_DIGESTOPTIONS_NONE;
+}
+
 
 /*
  * 'cups_set_encryption()' - Set the Encryption value.

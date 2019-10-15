@@ -9,14 +9,16 @@ Changes in CUPS v2.3.1
 - Fixed a crash bug in the web interface (Issue #5621)
 - PPD files containing "custom" option keywords did not work (Issue #5639)
 - Added a workaround for the scheduler's systemd support (Issue #5640)
-- Fixed spelling of "fold-accordion".
-- Fixed the default common name for TLS certificates used by `ippeveprinter`.
+- Added a DigestOptions directive for the `client.conf` file to control whether
+  MD5-based Digest authentication is allowed (Issue #5647)
 - Fixed a bug in the handling of printer resource files (Issue #5652)
 - The libusb-based USB backend now reports an error when the distribution
   permissions are wrong (Issue #5658)
 - Added paint can labels to Dymo driver (Issue #5662)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
+- Fixed spelling of "fold-accordion".
+- Fixed the default common name for TLS certificates used by `ippeveprinter`.
 
 
 Changes in CUPS v2.3.0

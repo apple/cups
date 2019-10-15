@@ -7,7 +7,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH client.conf 5 "CUPS" "26 April 2019" "Apple Inc."
+.TH client.conf 5 "CUPS" "15 October 2019" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups (deprecated on macos)
 .SH DESCRIPTION
@@ -20,18 +20,28 @@ Starting with macOS 10.12, all applications can access these settings in the \fI
 See the NOTES section below for more information.
 .SS DIRECTIVES
 The following directives are understood by the client. Consult the online help for detailed descriptions:
+.\"#AllowAnyRoot
 .TP 5
 \fBAllowAnyRoot Yes\fR
 .TP 5
 \fBAllowAnyRoot No\fR
 Specifies whether to allow TLS with certificates that have not been signed by a trusted Certificate Authority.
 The default is "Yes".
+.\"#AllowExpiredCerts
 .TP 5
 \fBAllowExpiredCerts Yes\fR
 .TP 5
 \fBAllowExpiredCerts No\fR
 Specifies whether to allow TLS with expired certificates.
 The default is "No".
+.\"#DigestOptions
+.TP 5
+\fBDigestOptions DenyMD5\fR
+.TP 5
+\fBDigestOptions None\fR
+Specifies HTTP Digest authentication options.
+\fBDenyMD5\fR disables support for the original MD5 hash algorithm.
+.\"#Encryption
 .TP 5
 \fBEncryption IfRequested\fR
 .TP 5
@@ -39,10 +49,12 @@ The default is "No".
 .TP 5
 \fBEncryption Required\fR
 Specifies the level of encryption that should be used.
+.\"#GSSServiceName
 .TP 5
 \fBGSSServiceName \fIname\fR
 Specifies the Kerberos service name that is used for authentication, typically "host", "http", or "ipp".
 CUPS adds the remote hostname ("name@server.example.com") for you. The default name is "http".
+.\"#ServerName
 .TP 5
 \fBServerName \fIhostname-or-ip-address\fR[\fI:port\fR]
 .TP 5
@@ -52,6 +64,7 @@ Specifies the address and optionally the port to use when connecting to the serv
 .TP 5
 \fBServerName \fIhostname-or-ip-address\fR[\fI:port\fR]\fB/version=1.1\fR
 Specifies the address and optionally the port to use when connecting to a server running CUPS 1.3.12 and earlier.
+.\"#SSLOptions
 .TP 5
 \fBSSLOptions \fR[\fIAllowDH\fR] [\fIAllowRC4\fR] [\fIAllowSSL3\fR] [\fIDenyCBC\fR] [\fIDenyTLS1.0\fR] [\fIMaxTLS1.0\fR] [\fIMaxTLS1.1\fR] [\fIMaxTLS1.2\fR] [\fIMaxTLS1.3\fR] [\fIMinTLS1.0\fR] [\fIMinTLS1.1\fR] [\fIMinTLS1.2\fR] [\fIMinTLS1.3\fR]
 .TP 5
@@ -68,12 +81,14 @@ The \fIDenyTLS1.0\fR option disables TLS v1.0 support - this sets the minimum pr
 The \fIMinTLS\fR options set the minimum TLS version to support.
 The \fIMaxTLS\fR options set the maximum TLS version to support.
 Not all operating systems support TLS 1.3 at this time.
+.\"#TrustOnFirstUse
 .TP 5
 \fBTrustOnFirstUse Yes\fR
 .TP 5
 \fBTrustOnFirstUse No\fR
 Specifies whether to trust new TLS certificates by default.
 The default is "Yes".
+.\"#User
 .TP 5
 \fBUser \fIname\fR
 Specifies the default user name to use for requests.
@@ -101,6 +116,7 @@ Specifies what information is included in the User-Agent header of HTTP requests
 "OS" reports "CUPS/major.minor.path (osname osversion) IPP/2.1".
 "Full" reports "CUPS/major.minor.path (osname osversion; architecture) IPP/2.1".
 The default is "Minimal".
+.\"#ValidateCerts
 .TP 5
 \fBValidateCerts Yes\fR
 .TP 5
