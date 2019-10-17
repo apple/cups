@@ -19,6 +19,7 @@ Changes in CUPS v2.3.1
   a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
+- Fixed the option names used for IPP Everywhere finishing options.
 
 
 Changes in CUPS v2.3.0
