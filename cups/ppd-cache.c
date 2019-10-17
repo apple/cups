@@ -3983,7 +3983,89 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   if ((attr = ippFindAttribute(response, "finishings-supported", IPP_TAG_ENUM)) != NULL)
   {
     int			value;		/* Enum value */
+    const char		*ppd_keyword;	/* PPD keyword for enum */
     cups_array_t	*names;		/* Names we've added */
+    static const char * const base_keywords[] =
+    {					/* Base STD 92 keywords */
+      NULL,				/* none */
+      "SingleAuto",			/* staple */
+      "SingleAuto",			/* punch */
+      NULL,				/* cover */
+      "BindAuto",			/* bind */
+      "SaddleStitch",			/* saddle-stitch */
+      "EdgeStitchAuto",			/* edge-stitch */
+      "Auto",				/* fold */
+      NULL,				/* trim */
+      NULL,				/* bale */
+      NULL,				/* booklet-maker */
+      NULL,				/* jog-offset */
+      NULL,				/* coat */
+      NULL				/* laminate */
+    };
+    static const char * const staple_keywords[] =
+    {					/* StapleLocation keywords */
+      "SinglePortrait",
+      "SingleRevLandscape",
+      "SingleLandscape",
+      "SingleRevPortrait",
+      "EdgeStitchPortrait",
+      "EdgeStitchLandscape",
+      "EdgeStitchRevPortrait",
+      "EdgeStitchRevLandscape",
+      "DualPortrait",
+      "DualLandscape",
+      "DualRevPortrait",
+      "DualRevLandscape",
+      "TriplePortrait",
+      "TripleLandscape",
+      "TripleRevPortrait",
+      "TripleRevLandscape"
+    };
+    static const char * const bind_keywords[] =
+    {					/* StapleLocation binding keywords */
+      "BindPortrait",
+      "BindLandscape",
+      "BindRevPortrait",
+      "BindRevLandscape"
+    };
+    static const char * const punch_keywords[] =
+    {					/* PunchMedia keywords */
+      "SinglePortrait",
+      "SingleRevLandscape",
+      "SingleLandscape",
+      "SingleRevPortrait",
+      "DualPortrait",
+      "DualLandscape",
+      "DualRevPortrait",
+      "DualRevLandscape",
+      "TriplePortrait",
+      "TripleLandscape",
+      "TripleRevPortrait",
+      "TripleRevLandscape",
+      "QuadPortrait",
+      "QuadLandscape",
+      "QuadRevPortrait",
+      "QuadRevLandscape",
+      "MultiplePortrait",
+      "MultipleLandscape",
+      "MultipleRevPortrait",
+      "MultipleRevLandscape"
+    };
+    static const char * const fold_keywords[] =
+    {					/* FoldType keywords */
+      "Accordion",
+      "DoubleGate",
+      "Gate",
+      "Half",
+      "HalfZ",
+      "LeftGate",
+      "Letter",
+      "Parallel",
+      "XFold",
+      "RightGate",
+      "ZFold",
+      "EngineeringZ"
+    };
 
     count       = ippGetCount(attr);
     names       = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0, (cups_acopy_func_t)strdup, (cups_afree_func_t)free);
@@ -4031,9 +4113,21 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
 	    msgstr = keyword;
 
-	cupsFilePrintf(fp, "*StapleLocation %s: \"\"\n", keyword);
-	cupsFilePrintf(fp, "*%s.StapleLocation %s/%s: \"\"\n", lang->language, keyword, msgstr);
-	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*StapleLocation %s\"\n", value, keyword, keyword);
+        if (value >= IPP_FINISHINGS_NONE && value <= IPP_FINISHINGS_LAMINATE)
+          ppd_keyword = base_keywords[value - IPP_FINISHINGS_NONE];
+        else if (value >= IPP_FINISHINGS_STAPLE_TOP_LEFT && value <= IPP_FINISHINGS_STAPLE_TRIPLE_BOTTOM)
+          ppd_keyword = staple_keywords[value - IPP_FINISHINGS_STAPLE_TOP_LEFT];
+        else if (value >= IPP_FINISHINGS_BIND_LEFT && value <= IPP_FINISHINGS_BIND_BOTTOM)
+          ppd_keyword = bind_keywords[value - IPP_FINISHINGS_BIND_LEFT];
+        else
+          ppd_keyword = NULL;
+
+        if (!ppd_keyword)
+          continue;
+
+	cupsFilePrintf(fp, "*StapleLocation %s: \"\"\n", ppd_keyword);
+	cupsFilePrintf(fp, "*%s.StapleLocation %s/%s: \"\"\n", lang->language, ppd_keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*StapleLocation %s\"\n", value, keyword, ppd_keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *StapleLocation\n");
@@ -4048,7 +4142,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       value   = ippGetInteger(attr, i);
       keyword = ippEnumString("finishings", value);
 
-      if (!strncmp(keyword, "fold-", 5))
+      if (!strncmp(keyword, "cups-fold-", 10) || !strcmp(keyword, "fold") || !strncmp(keyword, "fold-", 5))
         break;
     }
 
@@ -4068,7 +4162,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         value   = ippGetInteger(attr, i);
         keyword = ippEnumString("finishings", value);
 
-        if (strncmp(keyword, "fold-", 5))
+        if (!strncmp(keyword, "cups-fold-", 10))
+          keyword += 5;
+        else if (strcmp(keyword, "fold") && strncmp(keyword, "fold-", 5))
           continue;
 
         if (cupsArrayFind(names, (char *)keyword))
@@ -4081,9 +4177,21 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
 	    msgstr = keyword;
 
-	cupsFilePrintf(fp, "*FoldType %s: \"\"\n", keyword);
-	cupsFilePrintf(fp, "*%s.FoldType %s/%s: \"\"\n", lang->language, keyword, msgstr);
-	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*FoldType %s\"\n", value, keyword, keyword);
+        if (value >= IPP_FINISHINGS_NONE && value <= IPP_FINISHINGS_LAMINATE)
+          ppd_keyword = base_keywords[value - IPP_FINISHINGS_NONE];
+        else if (value >= IPP_FINISHINGS_FOLD_ACCORDION && value <= IPP_FINISHINGS_FOLD_ENGINEERING_Z)
+          ppd_keyword = fold_keywords[value - IPP_FINISHINGS_FOLD_ACCORDION];
+        else if (value >= IPP_FINISHINGS_CUPS_FOLD_ACCORDION && value <= IPP_FINISHINGS_CUPS_FOLD_Z)
+          ppd_keyword = fold_keywords[value - IPP_FINISHINGS_CUPS_FOLD_ACCORDION];
+        else
+          ppd_keyword = NULL;
+
+        if (!ppd_keyword)
+          continue;
+
+	cupsFilePrintf(fp, "*FoldType %s: \"\"\n", ppd_keyword);
+	cupsFilePrintf(fp, "*%s.FoldType %s/%s: \"\"\n", lang->language, ppd_keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*FoldType %s\"\n", value, keyword, ppd_keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *FoldType\n");
@@ -4098,7 +4206,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       value   = ippGetInteger(attr, i);
       keyword = ippEnumString("finishings", value);
 
-      if (!strncmp(keyword, "punch-", 6))
+      if (!strncmp(keyword, "cups-punch-", 11) || !strncmp(keyword, "punch-", 6))
         break;
     }
 
@@ -4118,7 +4226,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         value   = ippGetInteger(attr, i);
         keyword = ippEnumString("finishings", value);
 
-        if (strncmp(keyword, "punch-", 6))
+        if (!strncmp(keyword, "cups-punch-", 11))
+          keyword += 5;
+        else if (strncmp(keyword, "punch-", 6))
           continue;
 
         if (cupsArrayFind(names, (char *)keyword))
@@ -4131,9 +4241,21 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	  if ((msgstr = _cupsMessageLookup(strings, msgid)) == msgid)
 	    msgstr = keyword;
 
-	cupsFilePrintf(fp, "*PunchMedia %s: \"\"\n", keyword);
-	cupsFilePrintf(fp, "*%s.PunchMedia %s/%s: \"\"\n", lang->language, keyword, msgstr);
-	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*PunchMedia %s\"\n", value, keyword, keyword);
+        if (value >= IPP_FINISHINGS_NONE && value <= IPP_FINISHINGS_LAMINATE)
+          ppd_keyword = base_keywords[value - IPP_FINISHINGS_NONE];
+        else if (value >= IPP_FINISHINGS_PUNCH_TOP_LEFT && value <= IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM)
+          ppd_keyword = punch_keywords[value - IPP_FINISHINGS_PUNCH_TOP_LEFT];
+        else if (value >= IPP_FINISHINGS_CUPS_PUNCH_TOP_LEFT && value <= IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM)
+          ppd_keyword = punch_keywords[value - IPP_FINISHINGS_CUPS_PUNCH_TOP_LEFT];
+        else
+          ppd_keyword = NULL;
+
+        if (!ppd_keyword)
+          continue;
+
+	cupsFilePrintf(fp, "*PunchMedia %s: \"\"\n", ppd_keyword);
+	cupsFilePrintf(fp, "*%s.PunchMedia %s/%s: \"\"\n", lang->language, ppd_keyword, msgstr);
+	cupsFilePrintf(fp, "*cupsIPPFinishings %d/%s: \"*PunchMedia %s\"\n", value, keyword, ppd_keyword);
       }
 
       cupsFilePuts(fp, "*CloseUI: *PunchMedia\n");
@@ -4184,7 +4306,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       if (!keyword || cupsArrayFind(templates, (void *)keyword))
         continue;
 
-      if (strncmp(keyword, "fold-", 5) && (strstr(keyword, "-bottom") || strstr(keyword, "-left") || strstr(keyword, "-right") || strstr(keyword, "-top")))
+      if (!strcmp(keyword, "none"))
         continue;
 
       cupsArrayAdd(templates, (void *)keyword);
