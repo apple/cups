@@ -1,4 +1,4 @@
-CHANGES - 2.3.1 - 2019-10-15
+CHANGES - 2.3.1 - 2019-10-21
 ============================
 
 
@@ -15,6 +15,7 @@ Changes in CUPS v2.3.1
 - The libusb-based USB backend now reports an error when the distribution
   permissions are wrong (Issue #5658)
 - Added paint can labels to Dymo driver (Issue #5662)
+- The `--with-dbusdir` option was ignored by the configure script (Issue #5671)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
