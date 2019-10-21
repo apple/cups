@@ -5775,6 +5775,10 @@ fi
 fi
 LIBS="$SAVELIBS"
 
+DBUSDIR=""
+DBUS_NOTIFIER=""
+DBUS_NOTIFIERLIBS=""
+
 # Check whether --enable-dbus was given.
 if test "${enable_dbus+set}" = set; then :
   enableval=$enable_dbus;
@@ -5786,10 +5790,6 @@ if test "${with_dbusdir+set}" = set; then :
   withval=$with_dbusdir; DBUSDIR="$withval"
 fi
 
-
-DBUSDIR=""
-DBUS_NOTIFIER=""
-DBUS_NOTIFIERLIBS=""
 
 if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x -a "x$host_os_name" != xdarwin; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for DBUS" >&5
@@ -5818,7 +5818,7 @@ if test "x$ac_cv_func_dbus_threads_init" = xyes; then :
 fi
 
 		LIBS="$SAVELIBS"
-		if test -d /etc/dbus-1; then
+		if test -d /etc/dbus-1 -a "x$DBUSDIR" = x; then
 			DBUSDIR="/etc/dbus-1"
 		fi
 	else
