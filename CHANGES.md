@@ -1,11 +1,11 @@
-CHANGES - 2.3.1 - 2019-10-21
+CHANGES - 2.3.1 - 2019-10-31
 ============================
 
 
 Changes in CUPS v2.3.1
 ----------------------
 
-- Documentation updates (Issue #5661)
+- Documentation updates (Issue #5661, 5674)
 - Fixed a crash bug in the web interface (Issue #5621)
 - PPD files containing "custom" option keywords did not work (Issue #5639)
 - Added a workaround for the scheduler's systemd support (Issue #5640)
