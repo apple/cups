@@ -35,7 +35,11 @@
 
 	<li><a href="http://ftp.pwg.org/pub/pwg/candidates/cs-ipptrans10-20131108-5100.16.pdf">PWG 5100.16: IPP Transaction-Based Printing Extensions</a></li>
 
-	<li><a href="http://tools.ietf.org/html/rfc3998">RFC 3998: IPP Job and Printer Administrative Operations</a> (Disable-Printer, Enable-Printer, Hold-New-Jobs, and Release-Held-New-Jobs operations)</li>
+	<li><a href="http://tools.ietf.org/html/rfc3995">RFC 3995: IPP: Event Notifications and Subscriptions</a></li>
+
+	<li><a href="http://tools.ietf.org/html/rfc3996">RFC 3996: IPP: The 'ippget' Delivery Method for Event Notifications</li>
+
+	<li><a href="http://tools.ietf.org/html/rfc3998">RFC 3998: IPP: Job and Printer Administrative Operations</a> (Disable-Printer, Enable-Printer, Hold-New-Jobs, and Release-Held-New-Jobs operations)</li>
 
 	<li><a href="http://tools.ietf.org/html/rfc7472">RFC 7472: IPP over HTTPS Transport Binding and 'ipps' URI Scheme</a></li>
 
@@ -1614,11 +1618,13 @@ CUPS-Get-PPDs Response:
 
 	<li>'domain': A domain name is required.</li>
 
+	<li>'negotiate': Kerberos is required - this keyword can only appear by itself and causes cupsd to collect the UID of the printing user.</li>
+
 	<li>'none': No authentication is required - this keyword can only appear by itself.</li>
 
 	<li>'password': A password is required.</li>
 
-	<li>'username': A username is required.</li>
+	<li>'username': A username is required. Some protocols (like SMB) prefix the username with the domain, for example "DOMAIN\user".</li>
 
 </ul>
 
