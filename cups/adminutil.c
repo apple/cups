@@ -989,7 +989,7 @@ cupsAdminSetServerSettings(
 
       in_cancel_job = 0;
     }
-    else if ((((in_admin_location || in_conf_location || in_root_location) &&
+    else if ((((in_admin_location || in_conf_location || in_root_location || in_log_location) &&
                (remote_admin >= 0 || remote_any >= 0)) ||
               (in_root_location && share_printers >= 0)) &&
              (!_cups_strcasecmp(line, "Allow") || !_cups_strcasecmp(line, "Deny") ||
