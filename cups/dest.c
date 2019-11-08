@@ -230,6 +230,7 @@ static int		cups_find_dest(const char *name, const char *instance,
 static int              cups_get_cb(_cups_getdata_t *data, unsigned flags, cups_dest_t *dest);
 static char		*cups_get_default(const char *filename, char *namebuf,
 					  size_t namesize, const char **instance);
+static int		cups_get_dests_from_lpoptions(const char *match_name, const char *match_inst, int load_all,	int user_default_set, int num_dests, cups_dest_t **dests);
 static int		cups_get_dests(const char *filename, const char *match_name, const char *match_inst, int load_all, int user_default_set, int num_dests, cups_dest_t **dests);
 static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
 			                  size_t bufsize);
@@ -1889,15 +1890,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   * Then add local options...
   */
 
-  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
-
-  if (home)
-  {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-
-    cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
-  }
+  cups_get_dests_from_lpoptions(dest_name, instance, 0, 1, 1, &dest);
 
  /*
   * Return the result...
@@ -3426,10 +3419,6 @@ cups_enum_dests(
 #else
   _cups_getdata_t data;			/* Data for callback */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-  const char	*home;			/* HOME environment variable */
-  char		filename[1024];		/* Local lpoptions file */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-
 
   DEBUG_printf(("cups_enum_dests(flags=%x, msec=%d, cancel=%p, type=%x, mask=%x, cb=%p, user_data=%p)", flags, msec, (void *)cancel, type, mask, (void *)cb, (void *)user_data));
 
@@ -3444,10 +3433,6 @@ cups_enum_dests(
     DEBUG_puts("1cups_enum_dests: No callback, returning 0.");
     return (0);
   }
-
- /*
-  * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
-  */
 
   memset(&data, 0, sizeof(data));
 
@@ -3472,15 +3457,11 @@ cups_enum_dests(
 
   DEBUG_printf(("1cups_enum_dests: def_name=\"%s\", def_instance=\"%s\"", data.def_name, data.def_instance));
 
-  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
+  /*
+   * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
+   */
 
-  if ((home = getenv("HOME")) != NULL)
-  {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-
-    data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
-  }
+  data.num_dests = cups_get_dests_from_lpoptions(NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
 
  /*
   * Get ready to enumerate...
@@ -4058,6 +4039,35 @@ cups_get_default(const char *filename,	/* I - File to read */
   return (*namebuf ? namebuf : NULL);
 }
 
+/*
+ * 'cups_get_dests_from_lpoptions()' - Get destinations from the
+ * global and user lpoptions files.
+ */
+
+static int				/* O - Number of destinations */
+cups_get_dests_from_lpoptions(
+    const char  *match_name,		/* I - Destination name we want */
+    const char  *match_inst,		/* I - Instance name we want */
+    int         load_all,		/* I - Load all saved destinations? */
+    int         user_default_set,	/* I - User default printer set? */
+    int         num_dests,		/* I - Number of destinations */
+    cups_dest_t **dests)		/* IO - Destinations */
+{
+  char		filename[1024];	/* lpoptions file */
+  const char	*home;			/* HOME environment variable */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+  num_dests = cups_get_dests(filename, match_name, match_inst, load_all, user_default_set, num_dests, dests);
+
+  if ((home = getenv("HOME")) != NULL)
+  {
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+    num_dests = cups_get_dests(filename, match_name, match_inst, load_all, user_default_set, num_dests, dests);
+  }
+
+  return num_dests;
+}
 
 /*
  * 'cups_get_dests()' - Get destinations from a file.
