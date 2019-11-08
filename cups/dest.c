@@ -3457,12 +3457,6 @@ cups_enum_dests(
 
   DEBUG_printf(("1cups_enum_dests: def_name=\"%s\", def_instance=\"%s\"", data.def_name, data.def_instance));
 
-  /*
-   * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
-   */
-
-  data.num_dests = cups_get_dests_from_lpoptions(NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
-
  /*
   * Get ready to enumerate...
   */
@@ -3482,6 +3476,13 @@ cups_enum_dests(
     */
 
     num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &dests, type, mask);
+
+    /*
+     * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files,
+     * which also applies the user defaults to the destinations.
+     */
+
+    num_dests = cups_get_dests_from_lpoptions(NULL, NULL, 1, user_default != NULL, num_dests, &dests);
 
     if (data.def_name[0])
     {
@@ -3503,16 +3504,6 @@ cups_enum_dests(
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
       const char *device_uri;    /* Device URI */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-      if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
-      {
-       /*
-        * Apply user defaults to this destination...
-        */
-
-        for (j = user_dest->num_options, option = user_dest->options; j > 0; j --, option ++)
-          dest->num_options = cupsAddOption(option->name, option->value, dest->num_options, &dest->options);
-      }
 
       if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE, dest))
         break;
@@ -3576,9 +3567,6 @@ cups_enum_dests(
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
   {
     DEBUG_puts("1cups_enum_dests: Unable to create service browser, returning 0.");
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 
@@ -3589,9 +3577,6 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create IPP browser, returning 0.");
     DNSServiceRefDeallocate(data.main_ref);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 
@@ -3601,9 +3586,6 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create IPPS browser, returning 0.");
     DNSServiceRefDeallocate(data.main_ref);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 #    endif /* HAVE_SSL */
@@ -3612,9 +3594,6 @@ cups_enum_dests(
   if ((data.simple_poll = avahi_simple_poll_new()) == NULL)
   {
     DEBUG_puts("1cups_enum_dests: Unable to create Avahi poll, returning 0.");
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 
@@ -3627,9 +3606,6 @@ cups_enum_dests(
   {
     DEBUG_puts("1cups_enum_dests: Unable to create Avahi client, returning 0.");
     avahi_simple_poll_free(data.simple_poll);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 
@@ -3640,9 +3616,6 @@ cups_enum_dests(
 
     avahi_client_free(data.client);
     avahi_simple_poll_free(data.simple_poll);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 
@@ -3655,9 +3628,6 @@ cups_enum_dests(
     avahi_service_browser_free(ipp_ref);
     avahi_client_free(data.client);
     avahi_simple_poll_free(data.simple_poll);
-
-    cupsFreeDests(data.num_dests, data.dests);
-
     return (0);
   }
 #    endif /* HAVE_SSL */
@@ -3667,6 +3637,12 @@ cups_enum_dests(
     remaining = INT_MAX;
   else
     remaining = msec;
+
+  /*
+   * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
+   */
+
+  data.num_dests = cups_get_dests_from_lpoptions(NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
 
   while (remaining > 0 && (!cancel || !*cancel))
   {
