@@ -1748,7 +1748,6 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   cups_dest_t	*dest;			/* Destination */
   char		filename[1024],		/* Path to lpoptions */
 		defname[256];		/* Default printer name */
-  const char	*home = getenv("HOME");	/* Home directory */
   int		set_as_default = 0;	/* Set returned destination as default */
   ipp_op_t	op = IPP_OP_GET_PRINTER_ATTRIBUTES;
 					/* IPP operation to get server ops */
@@ -1780,13 +1779,13 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       else
         instance = NULL;
     }
-    else if (home)
+    else if (cg->home)
     {
      /*
       * No default in the environment, try the user's lpoptions files...
       */
 
-      snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+      snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
 
       dest_name = cups_get_default(filename, defname, sizeof(defname), &instance);
 
@@ -1892,9 +1891,9 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
   cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
 
-  if (home)
+  if (cg->home)
   {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
 
     cups_get_dests(filename, dest_name, instance, 0, 1, 1, &dest);
   }
@@ -2032,9 +2031,6 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   cups_option_t	*option;		/* Current option */
   _ipp_option_t	*match;			/* Matching attribute for option */
   FILE		*fp;			/* File pointer */
-#ifndef _WIN32
-  const char	*home;			/* HOME environment variable */
-#endif /* _WIN32 */
   char		filename[1024];		/* lpoptions file */
   int		num_temps;		/* Number of temporary destinations */
   cups_dest_t	*temps = NULL,		/* Temporary destinations */
@@ -2068,27 +2064,18 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
 
-#ifndef _WIN32
-  if (getuid())
+  if (cg->home)
   {
    /*
-    * Point to user defaults...
+    * Create ~/.cups subdirectory...
     */
 
-    if ((home = getenv("HOME")) != NULL)
-    {
-     /*
-      * Create ~/.cups subdirectory...
-      */
+    snprintf(filename, sizeof(filename), "%s/.cups", cg->home);
+    if (access(filename, 0))
+      mkdir(filename, 0700);
 
-      snprintf(filename, sizeof(filename), "%s/.cups", home);
-      if (access(filename, 0))
-        mkdir(filename, 0700);
-
-      snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-    }
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
   }
-#endif /* !_WIN32 */
 
  /*
   * Try to open the file...
@@ -3426,7 +3413,6 @@ cups_enum_dests(
 #else
   _cups_getdata_t data;			/* Data for callback */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
-  const char	*home;			/* HOME environment variable */
   char		filename[1024];		/* Local lpoptions file */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -3475,9 +3461,9 @@ cups_enum_dests(
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
   data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
 
-  if ((home = getenv("HOME")) != NULL)
+  if (cg->home)
   {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
 
     data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
   }

@@ -1,10 +1,11 @@
 /*
  * Global variable access routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
- * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
- * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
+ * Licensed under Apache License v2.0.  See the file "LICENSE" for more
+ * information.
  */
 
 /*
@@ -12,6 +13,9 @@
  */
 
 #include "cups-private.h"
+#ifndef _WIN32
+#  include <pwd.h>
+#endif /* !_WIN32 */
 
 
 /*
@@ -269,6 +273,8 @@ cups_globals_alloc(void)
   if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
     cg->localedir = localedir;
 
+  cg->home = getenv("HOME");
+
 #else
 #  ifdef HAVE_GETEUID
   if ((geteuid() != getuid() && getuid()) || getegid() != getgid())
@@ -307,8 +313,22 @@ cups_globals_alloc(void)
 
     if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
       cg->localedir = CUPS_LOCALEDIR;
+
+#  ifndef __APPLE__ /* Sandboxing now exposes the container as the home directory */
+    cg->home = getenv("HOME");
+#endif /* !__APPLE__ */
+  }
+
+  if (!cg->home)
+  {
+    struct passwd	*pw;		/* User info */
+
+    if ((pw = getpwuid(getuid())) != NULL)
+      cg->home = _cupsStrAlloc(pw->pw_dir);
   }
 #endif /* _WIN32 */
+
+  fprintf(stderr, "Using \"%s\" as home directory.\n", cg->home);
 
   return (cg);
 }

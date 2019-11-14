@@ -2002,7 +2002,8 @@ static const char *			/* O - Keychain path */
 http_cdsa_default_path(char   *buffer,	/* I - Path buffer */
                        size_t bufsize)	/* I - Size of buffer */
 {
-  const char *home = getenv("HOME");	/* HOME environment variable */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
 
 
  /*
@@ -2011,8 +2012,8 @@ http_cdsa_default_path(char   *buffer,	/* I - Path buffer */
   * 10.11.4 (!), so we need to create our own keychain just for CUPS.
   */
 
-  if (getuid() && home)
-    snprintf(buffer, bufsize, "%s/.cups/ssl.keychain", home);
+  if (cg->home)
+    snprintf(buffer, bufsize, "%s/.cups/ssl.keychain", cg->home);
   else
     strlcpy(buffer, "/etc/cups/ssl.keychain", bufsize);
 

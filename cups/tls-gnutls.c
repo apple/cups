@@ -935,12 +935,13 @@ static const char *			/* O - Path or NULL on error */
 http_gnutls_default_path(char   *buffer,/* I - Path buffer */
                          size_t bufsize)/* I - Size of path buffer */
 {
-  const char *home = getenv("HOME");	/* HOME environment variable */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
 
 
-  if (getuid() && home)
+  if (cg->home)
   {
-    snprintf(buffer, bufsize, "%s/.cups", home);
+    snprintf(buffer, bufsize, "%s/.cups", cg->home);
     if (access(buffer, 0))
     {
       DEBUG_printf(("1http_gnutls_default_path: Making directory \"%s\".", buffer));
@@ -951,7 +952,7 @@ http_gnutls_default_path(char   *buffer,/* I - Path buffer */
       }
     }
 
-    snprintf(buffer, bufsize, "%s/.cups/ssl", home);
+    snprintf(buffer, bufsize, "%s/.cups/ssl", cg->home);
     if (access(buffer, 0))
     {
       DEBUG_printf(("1http_gnutls_default_path: Making directory \"%s\".", buffer));

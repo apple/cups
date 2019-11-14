@@ -82,6 +82,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 			*cups_serverroot,
 					/* CUPS_SERVERROOT environment var */
 			*cups_statedir,	/* CUPS_STATEDIR environment var */
+			*home,		/* HOME environment var */
 			*localedir;	/* LOCALDIR environment var */
 
   /* adminutil.c */

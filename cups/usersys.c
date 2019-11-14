@@ -971,7 +971,6 @@ void
 _cupsSetDefaults(void)
 {
   cups_file_t	*fp;			/* File */
-  const char	*home;			/* Home directory of user */
   char		filename[1024];		/* Filename */
   _cups_client_conf_t cc;		/* client.conf values */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -997,19 +996,13 @@ _cupsSetDefaults(void)
     cupsFileClose(fp);
   }
 
-#  ifdef HAVE_GETEUID
-  if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
-#  elif !defined(_WIN32)
-  if (getuid() && (home = getenv("HOME")) != NULL)
-#  else
-  if ((home = getenv("HOME")) != NULL)
-#  endif /* HAVE_GETEUID */
+  if (cg->home)
   {
    /*
     * Look for ~/.cups/client.conf...
     */
 
-    snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
+    snprintf(filename, sizeof(filename), "%s/.cups/client.conf", cg->home);
     if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
       cups_read_client_conf(fp, &cc);
