@@ -17,6 +17,7 @@ Changes in CUPS v2.3.1
 - Added paint can labels to Dymo driver (Issue #5662)
 - The `--with-dbusdir` option was ignored by the configure script (Issue #5671)
 - Log file access controls were not preserved by `cupsctl` (Issue #5677)
+- Default printers set with `lpoptions` did not work in all cases (Issue #5681)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
