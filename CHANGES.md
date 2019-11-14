@@ -9,6 +9,8 @@ Changes in CUPS v2.3.1
 - Fixed a crash bug in the web interface (Issue #5621)
 - PPD files containing "custom" option keywords did not work (Issue #5639)
 - Added a workaround for the scheduler's systemd support (Issue #5640)
+- On Windows, TLS certificates generated on February 29 would likely fail
+  (Issue #5643)
 - Added a DigestOptions directive for the `client.conf` file to control whether
   MD5-based Digest authentication is allowed (Issue #5647)
 - Fixed a bug in the handling of printer resource files (Issue #5652)

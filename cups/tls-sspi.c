@@ -1967,6 +1967,8 @@ http_sspi_make_credentials(
 
   GetSystemTime(&et);
   et.wYear += years;
+  if (et.wMonth == 2 && et.wDay == 29)
+    et.wDay = 28;			/* Avoid Feb 29th due to leap years */
 
   ZeroMemory(&exts, sizeof(exts));
 
