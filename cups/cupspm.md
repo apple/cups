@@ -2,7 +2,7 @@
 title: CUPS Programming Manual
 author: Michael R Sweet
 copyright: Copyright © 2007-2019 by Apple Inc. All Rights Reserved.
-version: 2.3.0
+version: 2.3.1
 ...
 
 > Please [file issues on Github](https://github.com/apple/cups/issues) to
@@ -108,7 +108,7 @@ to the file.  Build and run (CMD+R) to see the list of destinations.
 
 ### Compiling with GCC
 
-From the command-line, create a file called `sample.c` using your favorite
+From the command-line, create a file called `simple.c` using your favorite
 editor, copy the example to this file, and save.  Then run the following command
 to compile it with GCC and run it:
 

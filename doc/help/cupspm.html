@@ -5,61 +5,90 @@
     <title>CUPS Programming Manual</title>
     <meta name="keywords" content="Programming">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <meta name="creator" content="codedoc v3.2">
+    <meta name="creator" content="codedoc v3.1">
     <meta name="author" content="Michael R Sweet">
     <meta name="copyright" content="Copyright &#xa9; 2007-2019 by Apple Inc. All Rights Reserved.">
-    <meta name="version" content="2.3.0">
+    <meta name="version" content="2.3.1">
     <style type="text/css"><!--
-body, p, h1, h2, h3, h4, h5, h6 {
+body, p, h1, h2, h3, h4 {
   font-family: sans-serif;
-  line-height: 1.4;
 }
-h1, h2, h3, h4, h5, h6 {
-  font-weight: bold;
-  page-break-inside: avoid;
-}
-h1 {
+div.body h1 {
   font-size: 250%;
+  font-weight: bold;
   margin: 0;
 }
-h2 {
+div.body h2 {
   font-size: 250%;
   margin-top: 1.5em;
 }
-h3 {
-  font-size: 200%;
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-h4 {
+div.body h3 {
   font-size: 150%;
   margin-bottom: 0.5em;
   margin-top: 1.5em;
 }
-h5 {
-  font-size: 125%;
-  margin-bottom: 0.5em;
-  margin-top: 1.5em;
-}
-h6 {
+div.body h4 {
   font-size: 110%;
   margin-bottom: 0.5em;
   margin-top: 1.5em;
 }
-div.header h1, div.header p {
-  text-align: center;
+div.body h5 {
+  font-size: 100%;
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
 }
-div.contents, div.body, div.footer {
-  page-break-before: always;
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
 }
-.class, .enumeration, .function, .struct, .typedef, .union {
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+.class {
   border-bottom: solid 2px gray;
+}
+.constants {
 }
 .description {
   margin-top: 0.5em;
 }
+.discussion {
+}
+.enumeration {
+  border-bottom: solid 2px gray;
+}
 .function {
+  border-bottom: solid 2px gray;
   margin-bottom: 0;
+}
+.members {
+}
+.method {
+}
+.parameters {
+}
+.returnvalue {
+}
+.struct {
+  border-bottom: solid 2px gray;
+}
+.typedef {
+  border-bottom: solid 2px gray;
+}
+.union {
+  border-bottom: solid 2px gray;
+}
+.variable {
+}
+h1, h2, h3, h4, h5, h6 {
+  page-break-inside: avoid;
 }
 blockquote {
   border: solid thin gray;
@@ -68,15 +97,19 @@ blockquote {
   page-break-inside: avoid;
 }
 p code, li code, p.code, pre, ul.code li {
-  font-family: monospace;
-  hyphens: manual;
-  -webkit-hyphens: manual;
-}
-p.code, pre, ul.code li {
   background: rgba(127,127,127,0.1);
   border: thin dotted gray;
-  padding: 10px;
+  font-family: monospace;
+  font-size: 90%;
+  hyphens: manual;
+  -webkit-hyphens: manual;
   page-break-inside: avoid;
+}
+p.code, pre, ul.code li {
+  padding: 10px;
+}
+p code, li code {
+  padding: 2px 5px;
 }
 a:link, a:visited {
   text-decoration: none;
@@ -90,7 +123,7 @@ span.info {
   font-weight: bold;
   white-space: nowrap;
 }
-h1 span.info, h2 span.info, h3 span.info, h4 span.info {
+h3 span.info, h4 span.info {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   float: right;
@@ -110,38 +143,13 @@ ul.contents > li {
 ul.contents li ul.code, ul.contents li ul.subcontents {
   padding-left: 2em;
 }
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-td {
-  border: solid 1px #666;
-  padding: 5px 10px;
-  vertical-align: top;
-}
-td.left {
-  text-align: left;
-}
-td.center {
-  text-align: center;
-}
-td.right {
-  text-align: right;
-}
-th {
-  border-bottom: solid 2px #000;
-  padding: 1px 5px;
-  text-align: center;
-  vertical-align: bottom;
-}
-tr:nth-child(even) {
-  background: rgba(127,127,127,0.1);n}
 table.list {
   border-collapse: collapse;
   width: 100%;
 }
+table.list tr:nth-child(even) {
+  background: rgba(127,127,127,0.1);]n}
 table.list th {
-  border-bottom: none;
   border-right: 2px solid gray;
   font-family: monospace;
   padding: 5px 10px 5px 2px;
@@ -149,22 +157,24 @@ table.list th {
   vertical-align: top;
 }
 table.list td {
-  border: none;
   padding: 5px 2px 5px 10px;
   text-align: left;
   vertical-align: top;
 }
-h2.title, h3.title {
+h1.title {
+}
+h2.title {
+  border-bottom: solid 2px black;
+}
+h3.title {
   border-bottom: solid 2px black;
 }
 --></style>
   </head>
   <body>
-    <div class="header">
-      <h1 class="title">CUPS Programming Manual</h1>
-      <p>Michael R Sweet</p>
-      <p>Copyright &#xa9; 2007-2019 by Apple Inc. All Rights Reserved.</p>
-    </div>
+    <h1 class="title">CUPS Programming Manual</h1>
+    <p>Michael R Sweet</p>
+    <p>Copyright &#xa9; 2007-2019 by Apple Inc. All Rights Reserved.</p>
     <div class="contents">
       <h2 class="title">Contents</h2>
       <ul class="contents">
@@ -506,20 +516,16 @@ h2.title, h3.title {
     <blockquote>
     <p>Please <a href="https://github.com/apple/cups/issues">file issues on Github</a> to provide feedback on this document.</p>
 </blockquote>
-    <h2 class="title" id="introduction">Introduction</h2>
+    <h2><a id="introduction">Introduction</a></h2>
     <p>CUPS provides the &quot;cups&quot; library to talk to the different parts of CUPS and with Internet Printing Protocol (IPP) printers. The &quot;cups&quot; library functions are accessed by including the <code>&lt;cups/cups.h&gt;</code> header.</p>
     <p>CUPS is based on the Internet Printing Protocol (&quot;IPP&quot;), which allows clients (applications) to communicate with a server (the scheduler, printers, etc.) to get a list of destinations, send print jobs, and so forth. You identify which server you want to communicate with using a pointer to the opaque structure <code>http_t</code>. The <code>CUPS_HTTP_DEFAULT</code> constant can be used when you want to talk to the CUPS scheduler.</p>
-    <h3 class="title" id="guidelines">Guidelines</h3>
+    <h3><a id="guidelines">Guidelines</a></h3>
     <p>When writing software (other than printer drivers) that uses the &quot;cups&quot; library:</p>
     <ul>
-    <li>    <p>Do not use undocumented or deprecated APIs,</p>
-</li>
-    <li>    <p>Do not rely on pre-configured printers,</p>
-</li>
-    <li>    <p>Do not assume that printers support specific features or formats, and</p>
-</li>
-    <li>    <p>Do not rely on implementation details (PPDs, etc.)</p>
-</li>
+    <li>Do not use undocumented or deprecated APIs,</li>
+    <li>Do not rely on pre-configured printers,</li>
+    <li>Do not assume that printers support specific features or formats, and</li>
+    <li>Do not rely on implementation details (PPDs, etc.)</li>
 </ul>
     <p>CUPS is designed to insulate users and developers from the implementation details of printers and file formats. The goal is to allow an application to supply a print file in a standard format with the user intent (&quot;print four copies, two-sided on A4 media, and staple each copy&quot;) and have the printing system manage the printer communication and format conversion needed.</p>
     <p>Similarly, printer and job management applications can use standard query operations to obtain the status information in a common, generic form and use standard management operations to control the state of those printers and jobs.</p>
@@ -527,9 +533,9 @@ h2.title, h3.title {
     <p><strong>Note:</strong></p>
     <p>CUPS printer drivers necessarily depend on specific file formats and certain implementation details of the CUPS software. Please consult the Postscript and raster printer driver developer documentation on <a href="https://www.cups.org/documentation.html">CUPS.org</a> for more information.</p>
 </blockquote>
-    <h3 class="title" id="terms-used-in-this-document">Terms Used in This Document</h3>
-    <p>A <em>Destination</em> is a printer or print queue that accepts print jobs. A <em>Print Job</em> is a collection of one or more documents that are processed by a destination using options supplied when creating the job. A <em>Document</em> is a file (JPEG image, PDF file, etc.) suitable for printing. An <em>Option</em> controls some aspect of printing, such as the media used. <em>Media</em> is the sheets or roll that is printed on. An <em>Attribute</em> is an option encoded for an Internet Printing Protocol (IPP) request.</p>
-    <h3 class="title" id="compiling-programs-that-use-the-cups-api">Compiling Programs That Use the CUPS API</h3>
+    <h3><a id="terms-used-in-this-document">Terms Used in This Document</a></h3>
+    <p>A <em>Destination</em> is a printer or print queue that accepts print jobs. A <em>Print</em> <em>Job</em> is a collection of one or more documents that are processed by a destination using options supplied when creating the job. A <em>Document</em> is a file (JPEG image, PDF file, etc.) suitable for printing. An <em>Option</em> controls some aspect of printing, such as the media used. <em>Media</em> is the sheets or roll that is printed on. An <em>Attribute</em> is an option encoded for an Internet Printing Protocol (IPP) request.</p>
+    <h3><a id="compiling-programs-that-use-the-cups-api">Compiling Programs That Use the CUPS API</a></h3>
     <p>The CUPS libraries can be used from any C, C++, or Objective C program. The method of compiling against the libraries varies depending on the operating system and installation of CUPS. The following sections show how to compile a simple program (shown below) in two common environments.</p>
     <p>The following simple program lists the available destinations:</p>
     <pre><code>#include &lt;stdio.h&gt;
@@ -552,20 +558,20 @@ int main(void)
   return (0);
 }
 </code></pre>
-    <h4 id="compiling-with-xcode">Compiling with Xcode</h4>
-    <p>In Xcode, choose <em>New Project...</em> from the <em>File</em> menu (or press SHIFT+CMD+N), then select the <em>Command Line Tool</em> under the macOS Application project type. Click <em>Next</em> and enter a name for the project, for example &quot;firstcups&quot;. Click <em>Next</em> and choose a project directory. The click <em>Next</em> to create the project.</p>
-    <p>In the project window, click on the <em>Build Phases</em> group and expand the <em>Link Binary with Libraries</em> section. Click <em>+</em>, type &quot;libcups&quot; to show the library, and then double-click on <code>libcups.tbd</code>.</p>
+    <h4><a id="compiling-with-xcode">Compiling with Xcode</a></h4>
+    <p>In Xcode, choose <em>New</em> <em>Project...</em> from the <em>File</em> menu (or press SHIFT+CMD+N), then select the <em>Command</em> <em>Line</em> <em>Tool</em> under the macOS Application project type. Click <em>Next</em> and enter a name for the project, for example &quot;firstcups&quot;. Click <em>Next</em> and choose a project directory. The click <em>Next</em> to create the project.</p>
+    <p>In the project window, click on the <em>Build</em> <em>Phases</em> group and expand the <em>Link</em> <em>Binary</em> <em>with</em> <em>Libraries</em> section. Click <em>+</em>, type &quot;libcups&quot; to show the library, and then double-click on <code>libcups.tbd</code>.</p>
     <p>Finally, click on the <code>main.c</code> file in the sidebar and copy the example program to the file. Build and run (CMD+R) to see the list of destinations.</p>
-    <h4 id="compiling-with-gcc">Compiling with GCC</h4>
-    <p>From the command-line, create a file called <code>sample.c</code> using your favorite editor, copy the example to this file, and save. Then run the following command to compile it with GCC and run it:</p>
+    <h4><a id="compiling-with-gcc">Compiling with GCC</a></h4>
+    <p>From the command-line, create a file called <code>simple.c</code> using your favorite editor, copy the example to this file, and save. Then run the following command to compile it with GCC and run it:</p>
     <pre><code>gcc -o simple `cups-config --cflags` simple.c `cups-config --libs`
 ./simple
 </code></pre>
     <p>The <code>cups-config</code> command provides the compiler flags (<code>cups-config --cflags</code>) and libraries (<code>cups-config --libs</code>) needed for the local system.</p>
-    <h2 class="title" id="working-with-destinations">Working with Destinations</h2>
+    <h2><a id="working-with-destinations">Working with Destinations</a></h2>
     <p>Destinations, which in CUPS represent individual printers or classes (collections or pools) of printers, are represented by the <code>cups_dest_t</code> structure which includes the name (<code>name</code>), instance (<code>instance</code>, saved options/settings), whether the destination is the default for the user (<code>is_default</code>), and the options and basic information associated with that destination (<code>num_options</code> and <code>options</code>).</p>
     <p>Historically destinations have been manually maintained by the administrator of a system or network, but CUPS also supports dynamic discovery of destinations on the current network.</p>
-    <h3 class="title" id="finding-available-destinations">Finding Available Destinations</h3>
+    <h3><a id="finding-available-destinations">Finding Available Destinations</a></h3>
     <p>The <code>cupsEnumDests</code> function finds all of the available destinations:</p>
     <pre><code> int
  cupsEnumDests(unsigned flags, int msec, int *cancel,
@@ -577,42 +583,24 @@ int main(void)
     <p>The <code>cancel</code> argument points to an integer variable that, when set to a non-zero value, will cause enumeration to stop as soon as possible. It can be <code>NULL</code> if not needed.</p>
     <p>The <code>type</code> and <code>mask</code> arguments are bitfields that allow the caller to filter the destinations based on categories and/or capabilities. The destination's &quot;printer-type&quot; value is masked by the <code>mask</code> value and compared to the <code>type</code> value when filtering. For example, to only enumerate destinations that are hosted on the local system, pass <code>CUPS_PRINTER_LOCAL</code> for the <code>type</code> argument and <code>CUPS_PRINTER_DISCOVERED</code> for the <code>mask</code> argument. The following constants can be used for filtering:</p>
     <ul>
-    <li>    <p><code>CUPS_PRINTER_CLASS</code>: A collection of destinations.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_FAX</code>: A facsimile device.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_LOCAL</code>: A local printer or class. This constant has the value 0 (no bits set) and is only used for the <code>type</code> argument and is paired with the <code>CUPS_PRINTER_REMOTE</code> or <code>CUPS_PRINTER_DISCOVERED</code> constant passed in the <code>mask</code> argument.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_REMOTE</code>: A remote (shared) printer or class.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_DISCOVERED</code>: An available network printer or class.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_BW</code>: Can do B&amp;W printing.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_COLOR</code>: Can do color printing.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_DUPLEX</code>: Can do two-sided printing.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_STAPLE</code>: Can staple output.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_COLLATE</code>: Can quickly collate copies.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_PUNCH</code>: Can punch output.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_COVER</code>: Can cover output.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_BIND</code>: Can bind output.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_SORT</code>: Can sort output (mailboxes, etc.)</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_SMALL</code>: Can print on Letter/Legal/A4-size media.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_MEDIUM</code>: Can print on Tabloid/B/C/A3/A2-size media.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_LARGE</code>: Can print on D/E/A1/A0-size media.</p>
-</li>
-    <li>    <p><code>CUPS_PRINTER_VARIABLE</code>: Can print on rolls and custom-size media.</p>
-</li>
+    <li><code>CUPS_PRINTER_CLASS</code>: A collection of destinations.</li>
+    <li><code>CUPS_PRINTER_FAX</code>: A facsimile device.</li>
+    <li><code>CUPS_PRINTER_LOCAL</code>: A local printer or class. This constant has the value 0 (no bits set) and is only used for the <code>type</code> argument and is paired with the <code>CUPS_PRINTER_REMOTE</code> or <code>CUPS_PRINTER_DISCOVERED</code> constant passed in the <code>mask</code> argument.</li>
+    <li><code>CUPS_PRINTER_REMOTE</code>: A remote (shared) printer or class.</li>
+    <li><code>CUPS_PRINTER_DISCOVERED</code>: An available network printer or class.</li>
+    <li><code>CUPS_PRINTER_BW</code>: Can do B&amp;W printing.</li>
+    <li><code>CUPS_PRINTER_COLOR</code>: Can do color printing.</li>
+    <li><code>CUPS_PRINTER_DUPLEX</code>: Can do two-sided printing.</li>
+    <li><code>CUPS_PRINTER_STAPLE</code>: Can staple output.</li>
+    <li><code>CUPS_PRINTER_COLLATE</code>: Can quickly collate copies.</li>
+    <li><code>CUPS_PRINTER_PUNCH</code>: Can punch output.</li>
+    <li><code>CUPS_PRINTER_COVER</code>: Can cover output.</li>
+    <li><code>CUPS_PRINTER_BIND</code>: Can bind output.</li>
+    <li><code>CUPS_PRINTER_SORT</code>: Can sort output (mailboxes, etc.)</li>
+    <li><code>CUPS_PRINTER_SMALL</code>: Can print on Letter/Legal/A4-size media.</li>
+    <li><code>CUPS_PRINTER_MEDIUM</code>: Can print on Tabloid/B/C/A3/A2-size media.</li>
+    <li><code>CUPS_PRINTER_LARGE</code>: Can print on D/E/A1/A0-size media.</li>
+    <li><code>CUPS_PRINTER_VARIABLE</code>: Can print on rolls and custom-size media.</li>
 </ul>
     <p>The <code>cb</code> argument specifies a function to call for every destination that is found:</p>
     <pre><code>typedef int (*cups_dest_cb_t)(void *user_data,
@@ -621,12 +609,9 @@ int main(void)
 </code></pre>
     <p>The callback function receives a copy of the <code>user_data</code> argument along with a bitfield (<code>flags</code>) and the destination that was found. The <code>flags</code> argument can have any of the following constant (bit) values set:</p>
     <ul>
-    <li>    <p><code>CUPS_DEST_FLAGS_MORE</code>: There are more destinations coming.</p>
-</li>
-    <li>    <p><code>CUPS_DEST_FLAGS_REMOVED</code>: The destination has gone away and should be removed from the list of destinations a user can select.</p>
-</li>
-    <li>    <p><code>CUPS_DEST_FLAGS_ERROR</code>: An error occurred. The reason for the error can be found by calling the <code>cupsLastError</code> and/or <code>cupsLastErrorString</code> functions.</p>
-</li>
+    <li><code>CUPS_DEST_FLAGS_MORE</code>: There are more destinations coming.</li>
+    <li><code>CUPS_DEST_FLAGS_REMOVED</code>: The destination has gone away and should be removed from the list of destinations a user can select.</li>
+    <li><code>CUPS_DEST_FLAGS_ERROR</code>: An error occurred. The reason for the error can be found by calling the <code>cupsLastError</code> and/or <code>cupsLastErrorString</code> functions.</li>
 </ul>
     <p>The callback function returns 0 to stop enumeration or 1 to continue.</p>
     <blockquote>
@@ -700,45 +685,34 @@ my_get_dests(cups_ptype_t type, cups_ptype_t mask,
   return (user_data.num_dests);
 }
 </code></pre>
-    <h3 class="title" id="basic-destination-information">Basic Destination Information</h3>
+    <h3><a id="basic-destination-information">Basic Destination Information</a></h3>
     <p>The <code>num_options</code> and <code>options</code> members of the <code>cups_dest_t</code> structure provide basic attributes about the destination in addition to the user default options and values for that destination. The following names are predefined for various destination attributes:</p>
     <ul>
-    <li>    <p>&quot;auth-info-required&quot;: The type of authentication required for printing to this destination: &quot;none&quot;, &quot;username,password&quot;, &quot;domain,username,password&quot;, or &quot;negotiate&quot; (Kerberos).</p>
-</li>
-    <li>    <p>&quot;printer-info&quot;: The human-readable description of the destination such as &quot;My Laser Printer&quot;.</p>
-</li>
-    <li>    <p>&quot;printer-is-accepting-jobs&quot;: &quot;true&quot; if the destination is accepting new jobs, &quot;false&quot; otherwise.</p>
-</li>
-    <li>    <p>&quot;printer-is-shared&quot;: &quot;true&quot; if the destination is being shared with other computers, &quot;false&quot; otherwise.</p>
-</li>
-    <li>    <p>&quot;printer-location&quot;: The human-readable location of the destination such as &quot;Lab 4&quot;.</p>
-</li>
-    <li>    <p>&quot;printer-make-and-model&quot;: The human-readable make and model of the destination such as &quot;ExampleCorp LaserPrinter 4000 Series&quot;.</p>
-</li>
-    <li>    <p>&quot;printer-state&quot;: &quot;3&quot; if the destination is idle, &quot;4&quot; if the destination is printing a job, and &quot;5&quot; if the destination is stopped.</p>
-</li>
-    <li>    <p>&quot;printer-state-change-time&quot;: The UNIX time when the destination entered the current state.</p>
-</li>
-    <li>    <p>&quot;printer-state-reasons&quot;: Additional comma-delimited state keywords for the destination such as &quot;media-tray-empty-error&quot; and &quot;toner-low-warning&quot;.</p>
-</li>
-    <li>    <p>&quot;printer-type&quot;: The <code>cups_ptype_t</code> value associated with the destination.</p>
-</li>
-    <li>    <p>&quot;printer-uri-supported&quot;: The URI associated with the destination; if not set, this destination was discovered but is not yet setup as a local printer.</p>
-</li>
+    <li>&quot;auth-info-required&quot;: The type of authentication required for printing to this destination: &quot;none&quot;, &quot;username,password&quot;, &quot;domain,username,password&quot;, or &quot;negotiate&quot; (Kerberos).</li>
+    <li>&quot;printer-info&quot;: The human-readable description of the destination such as &quot;My Laser Printer&quot;.</li>
+    <li>&quot;printer-is-accepting-jobs&quot;: &quot;true&quot; if the destination is accepting new jobs, &quot;false&quot; otherwise.</li>
+    <li>&quot;printer-is-shared&quot;: &quot;true&quot; if the destination is being shared with other computers, &quot;false&quot; otherwise.</li>
+    <li>&quot;printer-location&quot;: The human-readable location of the destination such as &quot;Lab 4&quot;.</li>
+    <li>&quot;printer-make-and-model&quot;: The human-readable make and model of the destination such as &quot;ExampleCorp LaserPrinter 4000 Series&quot;.</li>
+    <li>&quot;printer-state&quot;: &quot;3&quot; if the destination is idle, &quot;4&quot; if the destination is printing a job, and &quot;5&quot; if the destination is stopped.</li>
+    <li>&quot;printer-state-change-time&quot;: The UNIX time when the destination entered the current state.</li>
+    <li>&quot;printer-state-reasons&quot;: Additional comma-delimited state keywords for the destination such as &quot;media-tray-empty-error&quot; and &quot;toner-low-warning&quot;.</li>
+    <li>&quot;printer-type&quot;: The <code>cups_ptype_t</code> value associated with the destination.</li>
+    <li>&quot;printer-uri-supported&quot;: The URI associated with the destination; if not set, this destination was discovered but is not yet setup as a local printer.</li>
 </ul>
     <p>Use the <code>cupsGetOption</code> function to retrieve the value. For example, the following code gets the make and model of a destination:</p>
     <pre><code>const char *model = cupsGetOption(&quot;printer-make-and-model&quot;,
                                   dest-&gt;num_options,
                                   dest-&gt;options);
 </code></pre>
-    <h3 class="title" id="detailed-destination-information">Detailed Destination Information</h3>
+    <h3><a id="detailed-destination-information">Detailed Destination Information</a></h3>
     <p>Once a destination has been chosen, the <code>cupsCopyDestInfo</code> function can be used to gather detailed information about the destination:</p>
     <pre><code>cups_dinfo_t *
 cupsCopyDestInfo(http_t *http, cups_dest_t *dest);
 </code></pre>
     <p>The <code>http</code> argument specifies a connection to the CUPS scheduler and is typically the constant <code>CUPS_HTTP_DEFAULT</code>. The <code>dest</code> argument specifies the destination to query.</p>
     <p>The <code>cups_dinfo_t</code> structure that is returned contains a snapshot of the supported options and their supported, ready, and default values. It also can report constraints between different options and values, and recommend changes to resolve those constraints.</p>
-    <h4 id="getting-supported-options-and-values">Getting Supported Options and Values</h4>
+    <h4><a id="getting-supported-options-and-values">Getting Supported Options and Values</a></h4>
     <p>The <code>cupsCheckDestSupported</code> function can be used to test whether a particular option or option and value is supported:</p>
     <pre><code>int
 cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
@@ -748,26 +722,16 @@ cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
 </code></pre>
     <p>The <code>option</code> argument specifies the name of the option to check. The following constants can be used to check the various standard options:</p>
     <ul>
-    <li>    <p><code>CUPS_COPIES</code>: Controls the number of copies that are produced.</p>
-</li>
-    <li>    <p><code>CUPS_FINISHINGS</code>: A comma-delimited list of integer constants that control the finishing processes that are applied to the job, including stapling, punching, and folding.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA</code>: Controls the media size that is used, typically one of the following: <code>CUPS_MEDIA_3X5</code>, <code>CUPS_MEDIA_4X6</code>, <code>CUPS_MEDIA_5X7</code>, <code>CUPS_MEDIA_8X10</code>, <code>CUPS_MEDIA_A3</code>, <code>CUPS_MEDIA_A4</code>, <code>CUPS_MEDIA_A5</code>, <code>CUPS_MEDIA_A6</code>, <code>CUPS_MEDIA_ENV10</code>, <code>CUPS_MEDIA_ENVDL</code>, <code>CUPS_MEDIA_LEGAL</code>, <code>CUPS_MEDIA_LETTER</code>, <code>CUPS_MEDIA_PHOTO_L</code>, <code>CUPS_MEDIA_SUPERBA3</code>, or <code>CUPS_MEDIA_TABLOID</code>.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_SOURCE</code>: Controls where the media is pulled from, typically either <code>CUPS_MEDIA_SOURCE_AUTO</code> or <code>CUPS_MEDIA_SOURCE_MANUAL</code>.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_TYPE</code>: Controls the type of media that is used, typically one of the following: <code>CUPS_MEDIA_TYPE_AUTO</code>, <code>CUPS_MEDIA_TYPE_ENVELOPE</code>, <code>CUPS_MEDIA_TYPE_LABELS</code>, <code>CUPS_MEDIA_TYPE_LETTERHEAD</code>, <code>CUPS_MEDIA_TYPE_PHOTO</code>, <code>CUPS_MEDIA_TYPE_PHOTO_GLOSSY</code>, <code>CUPS_MEDIA_TYPE_PHOTO_MATTE</code>, <code>CUPS_MEDIA_TYPE_PLAIN</code>, or <code>CUPS_MEDIA_TYPE_TRANSPARENCY</code>.</p>
-</li>
-    <li>    <p><code>CUPS_NUMBER_UP</code>: Controls the number of document pages that are placed on each media side.</p>
-</li>
-    <li>    <p><code>CUPS_ORIENTATION</code>: Controls the orientation of document pages placed on the media: <code>CUPS_ORIENTATION_PORTRAIT</code> or <code>CUPS_ORIENTATION_LANDSCAPE</code>.</p>
-</li>
-    <li>    <p><code>CUPS_PRINT_COLOR_MODE</code>: Controls whether the output is in color (<code>CUPS_PRINT_COLOR_MODE_COLOR</code>), grayscale (<code>CUPS_PRINT_COLOR_MODE_MONOCHROME</code>), or either (<code>CUPS_PRINT_COLOR_MODE_AUTO</code>).</p>
-</li>
-    <li>    <p><code>CUPS_PRINT_QUALITY</code>: Controls the generate quality of the output: <code>CUPS_PRINT_QUALITY_DRAFT</code>, <code>CUPS_PRINT_QUALITY_NORMAL</code>, or <code>CUPS_PRINT_QUALITY_HIGH</code>.</p>
-</li>
-    <li>    <p><code>CUPS_SIDES</code>: Controls whether prints are placed on one or both sides of the media: <code>CUPS_SIDES_ONE_SIDED</code>, <code>CUPS_SIDES_TWO_SIDED_PORTRAIT</code>, or <code>CUPS_SIDES_TWO_SIDED_LANDSCAPE</code>.</p>
-</li>
+    <li><code>CUPS_COPIES</code>: Controls the number of copies that are produced.</li>
+    <li><code>CUPS_FINISHINGS</code>: A comma-delimited list of integer constants that control the finishing processes that are applied to the job, including stapling, punching, and folding.</li>
+    <li><code>CUPS_MEDIA</code>: Controls the media size that is used, typically one of the following: <code>CUPS_MEDIA_3X5</code>, <code>CUPS_MEDIA_4X6</code>, <code>CUPS_MEDIA_5X7</code>, <code>CUPS_MEDIA_8X10</code>, <code>CUPS_MEDIA_A3</code>, <code>CUPS_MEDIA_A4</code>, <code>CUPS_MEDIA_A5</code>, <code>CUPS_MEDIA_A6</code>, <code>CUPS_MEDIA_ENV10</code>, <code>CUPS_MEDIA_ENVDL</code>, <code>CUPS_MEDIA_LEGAL</code>, <code>CUPS_MEDIA_LETTER</code>, <code>CUPS_MEDIA_PHOTO_L</code>, <code>CUPS_MEDIA_SUPERBA3</code>, or <code>CUPS_MEDIA_TABLOID</code>.</li>
+    <li><code>CUPS_MEDIA_SOURCE</code>: Controls where the media is pulled from, typically either <code>CUPS_MEDIA_SOURCE_AUTO</code> or <code>CUPS_MEDIA_SOURCE_MANUAL</code>.</li>
+    <li><code>CUPS_MEDIA_TYPE</code>: Controls the type of media that is used, typically one of the following: <code>CUPS_MEDIA_TYPE_AUTO</code>, <code>CUPS_MEDIA_TYPE_ENVELOPE</code>, <code>CUPS_MEDIA_TYPE_LABELS</code>, <code>CUPS_MEDIA_TYPE_LETTERHEAD</code>, <code>CUPS_MEDIA_TYPE_PHOTO</code>, <code>CUPS_MEDIA_TYPE_PHOTO_GLOSSY</code>, <code>CUPS_MEDIA_TYPE_PHOTO_MATTE</code>, <code>CUPS_MEDIA_TYPE_PLAIN</code>, or <code>CUPS_MEDIA_TYPE_TRANSPARENCY</code>.</li>
+    <li><code>CUPS_NUMBER_UP</code>: Controls the number of document pages that are placed on each media side.</li>
+    <li><code>CUPS_ORIENTATION</code>: Controls the orientation of document pages placed on the media: <code>CUPS_ORIENTATION_PORTRAIT</code> or <code>CUPS_ORIENTATION_LANDSCAPE</code>.</li>
+    <li><code>CUPS_PRINT_COLOR_MODE</code>: Controls whether the output is in color (<code>CUPS_PRINT_COLOR_MODE_COLOR</code>), grayscale (<code>CUPS_PRINT_COLOR_MODE_MONOCHROME</code>), or either (<code>CUPS_PRINT_COLOR_MODE_AUTO</code>).</li>
+    <li><code>CUPS_PRINT_QUALITY</code>: Controls the generate quality of the output: <code>CUPS_PRINT_QUALITY_DRAFT</code>, <code>CUPS_PRINT_QUALITY_NORMAL</code>, or <code>CUPS_PRINT_QUALITY_HIGH</code>.</li>
+    <li><code>CUPS_SIDES</code>: Controls whether prints are placed on one or both sides of the media: <code>CUPS_SIDES_ONE_SIDED</code>, <code>CUPS_SIDES_TWO_SIDED_PORTRAIT</code>, or <code>CUPS_SIDES_TWO_SIDED_LANDSCAPE</code>.</li>
 </ul>
     <p>If the <code>value</code> argument is <code>NULL</code>, the <code>cupsCheckDestSupported</code> function returns whether the option is supported by the destination. Otherwise, the function returns whether the specified value of the option is supported.</p>
     <p>The <code>cupsFindDestSupported</code> function returns the IPP attribute containing the supported values for a given option:</p>
@@ -804,7 +768,7 @@ int i, count = ippGetCount(attrs);
 for (i = 0; i &lt; count; i ++)
   puts(ippGetString(attrs, i, NULL));
 </code></pre>
-    <h4 id="getting-default-values">Getting Default Values</h4>
+    <h4><a id="getting-default-values">Getting Default Values</a></h4>
     <p>There are two sets of default values - user defaults that are available via the <code>num_options</code> and <code>options</code> members of the <code>cups_dest_t</code> structure, and destination defaults that available via the <code>cups_dinfo_t</code> structure and the <code>cupsFindDestDefault</code> function which returns the IPP attribute containing the default value(s) for a given option:</p>
     <pre><code>ipp_attribute_t *
 cupsFindDestDefault(http_t *http, cups_dest_t *dest,
@@ -834,7 +798,7 @@ else
   putchar('\n');
 }
 </code></pre>
-    <h4 id="getting-ready-loaded-values">Getting Ready (Loaded) Values</h4>
+    <h4><a id="getting-ready-loaded-values">Getting Ready (Loaded) Values</a></h4>
     <p>The finishings and media options also support queries for the ready, or loaded, values. For example, a printer may have punch and staple finishers installed but be out of staples - the supported values will list both punch and staple finishing processes but the ready values will only list the punch processes. Similarly, a printer may support hundreds of different sizes of media but only have a single size loaded at any given time - the ready values are limited to the media that is actually in the printer.</p>
     <p>The <code>cupsFindDestReady</code> function finds the IPP attribute containing the ready values for a given option:</p>
     <pre><code>ipp_attribute_t *
@@ -857,7 +821,7 @@ if (ready_finishings != NULL)
 else
   puts(&quot;no finishings are ready.&quot;);
 </code></pre>
-    <h4 id="media-size-options">Media Size Options</h4>
+    <h4><a id="media-size-options">Media Size Options</a></h4>
     <p>CUPS provides functions for querying the dimensions and margins for each of the supported media size options. The <code>cups_size_t</code> structure is used to describe a media size:</p>
     <pre><code>typedef struct cups_size_s
 {
@@ -882,16 +846,11 @@ cupsGetDestMediaBySize(http_t *http, cups_dest_t *dest,
 </code></pre>
     <p>The <code>media</code>, <code>width</code>, and <code>length</code> arguments specify the size to lookup. The <code>flags</code> argument specifies a bitfield controlling various lookup options:</p>
     <ul>
-    <li>    <p><code>CUPS_MEDIA_FLAGS_DEFAULT</code>: Find the closest size supported by the printer.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_FLAGS_BORDERLESS</code>: Find a borderless size.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_FLAGS_DUPLEX</code>: Find a size compatible with two-sided printing.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_FLAGS_EXACT</code>: Find an exact match for the size.</p>
-</li>
-    <li>    <p><code>CUPS_MEDIA_FLAGS_READY</code>: If the printer supports media sensing or configuration of the media in each tray/source, find the size amongst the &quot;ready&quot; media.</p>
-</li>
+    <li><code>CUPS_MEDIA_FLAGS_DEFAULT</code>: Find the closest size supported by the printer.</li>
+    <li><code>CUPS_MEDIA_FLAGS_BORDERLESS</code>: Find a borderless size.</li>
+    <li><code>CUPS_MEDIA_FLAGS_DUPLEX</code>: Find a size compatible with two-sided printing.</li>
+    <li><code>CUPS_MEDIA_FLAGS_EXACT</code>: Find an exact match for the size.</li>
+    <li><code>CUPS_MEDIA_FLAGS_READY</code>: If the printer supports media sensing or configuration of the media in each tray/source, find the size amongst the &quot;ready&quot; media.</li>
 </ul>
     <p>If a matching size is found for the destination, the size information is stored in the structure pointed to by the <code>size</code> argument and 1 is returned. Otherwise 0 is returned.</p>
     <p>For example, the following code prints the margins for two-sided printing on US Letter media:</p>
@@ -949,7 +908,7 @@ cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
                         cups_dinfo_t *dinfo, unsigned flags,
                         cups_size_t *size);
 </code></pre>
-    <h4 id="localizing-options-and-values">Localizing Options and Values</h4>
+    <h4><a id="localizing-options-and-values">Localizing Options and Values</a></h4>
     <p>CUPS provides three functions to get localized, human-readable strings in the user's current locale for options and values: <code>cupsLocalizeDestMedia</code>, <code>cupsLocalizeDestOption</code>, and <code>cupsLocalizeDestValue</code>:</p>
     <pre><code>const char *
 cupsLocalizeDestMedia(http_t *http, cups_dest_t *dest,
@@ -966,7 +925,7 @@ cupsLocalizeDestValue(http_t *http, cups_dest_t *dest,
                       cups_dinfo_t *info,
                       const char *option, const char *value);
 </code></pre>
-    <h3 class="title" id="submitting-a-print-job">Submitting a Print Job</h3>
+    <h3><a id="submitting-a-print-job">Submitting a Print Job</a></h3>
     <p>Once you are ready to submit a print job, you create a job using the <code>cupsCreateDestJob</code> function:</p>
     <pre><code>ipp_status_t
 cupsCreateDestJob(http_t *http, cups_dest_t *dest,
@@ -1017,14 +976,10 @@ cupsFinishDestDocument(http_t *http, cups_dest_t *dest,
 </code></pre>
     <p>The <code>docname</code> argument specifies the name of the document, typically the original filename. The <code>format</code> argument specifies the MIME media type of the document, including the following constants:</p>
     <ul>
-    <li>    <p><code>CUPS_FORMAT_JPEG</code>: &quot;image/jpeg&quot;</p>
-</li>
-    <li>    <p><code>CUPS_FORMAT_PDF</code>: &quot;application/pdf&quot;</p>
-</li>
-    <li>    <p><code>CUPS_FORMAT_POSTSCRIPT</code>: &quot;application/postscript&quot;</p>
-</li>
-    <li>    <p><code>CUPS_FORMAT_TEXT</code>: &quot;text/plain&quot;</p>
-</li>
+    <li><code>CUPS_FORMAT_JPEG</code>: &quot;image/jpeg&quot;</li>
+    <li><code>CUPS_FORMAT_PDF</code>: &quot;application/pdf&quot;</li>
+    <li><code>CUPS_FORMAT_POSTSCRIPT</code>: &quot;application/postscript&quot;</li>
+    <li><code>CUPS_FORMAT_TEXT</code>: &quot;text/plain&quot;</li>
 </ul>
     <p>The <code>num_options</code> and <code>options</code> arguments specify per-document print options, which at present must be 0 and <code>NULL</code>. The <code>last_document</code> argument specifies whether this is the last document in the job.</p>
     <p>For example, the following code submits a PDF file to the job that was just created:</p>
@@ -1051,9 +1006,9 @@ if (cupsStartDestDocument(CUPS_HTTP_DEFAULT, dest, info,
 
 fclose(fp);
 </code></pre>
-    <h2 class="title" id="sending-ipp-requests">Sending IPP Requests</h2>
+    <h2><a id="sending-ipp-requests">Sending IPP Requests</a></h2>
     <p>CUPS provides a rich API for sending IPP requests to the scheduler or printers, typically from management or utility applications whose primary purpose is not to send print jobs.</p>
-    <h3 class="title" id="connecting-to-the-scheduler-or-printer">Connecting to the Scheduler or Printer</h3>
+    <h3><a id="connecting-to-the-scheduler-or-printer">Connecting to the Scheduler or Printer</a></h3>
     <p>The connection to the scheduler or printer is represented by the HTTP connection type <code>http_t</code>. The <code>cupsConnectDest</code> function connects to the scheduler or printer associated with the destination:</p>
     <pre><code>http_t *
 cupsConnectDest(cups_dest_t *dest, unsigned flags, int msec,
@@ -1074,7 +1029,7 @@ http_t *http = cupsConnectDest(dest, CUPS_DEST_FLAGS_DEVICE,
                                30000, NULL, resource,
                                sizeof(resource), NULL, NULL);
 </code></pre>
-    <h3 class="title" id="creating-an-ipp-request">Creating an IPP Request</h3>
+    <h3><a id="creating-an-ipp-request">Creating an IPP Request</a></h3>
     <p>IPP requests are represented by the IPP message type <code>ipp_t</code> and each IPP attribute in the request is representing using the type <code>ipp_attribute_t</code>. Each IPP request includes an operation code (<code>IPP_OP_CREATE_JOB</code>, <code>IPP_OP_GET_PRINTER_ATTRIBUTES</code>, etc.) and a 32-bit integer identifier.</p>
     <p>The <code>ippNewRequest</code> function creates a new IPP request:</p>
     <pre><code>ipp_t *
@@ -1112,30 +1067,19 @@ ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
     <p>The <code>ippAddStrings</code> function adds an attribute with one or more strings, in this case three. The <code>IPP_TAG_KEYWORD</code> argument specifies that the strings are keyword values, which are used for attribute names. All strings use the same language (<code>NULL</code>), and the attribute will contain the three strings in the array <code>requested_attributes</code>.</p>
     <p>CUPS provides many functions to adding attributes of different types:</p>
     <ul>
-    <li>    <p><code>ippAddBoolean</code> adds a boolean (<code>IPP_TAG_BOOLEAN</code>) attribute with one value.</p>
-</li>
-    <li>    <p><code>ippAddInteger</code> adds an enum (<code>IPP_TAG_ENUM</code>) or integer (<code>IPP_TAG_INTEGER</code>) attribute with one value.</p>
-</li>
-    <li>    <p><code>ippAddIntegers</code> adds an enum or integer attribute with one or more values.</p>
-</li>
-    <li>    <p><code>ippAddOctetString</code> adds an octetString attribute with one value.</p>
-</li>
-    <li>    <p><code>ippAddOutOfBand</code> adds a admin-defined (<code>IPP_TAG_ADMINDEFINE</code>), default (<code>IPP_TAG_DEFAULT</code>), delete-attribute (<code>IPP_TAG_DELETEATTR</code>), no-value (<code>IPP_TAG_NOVALUE</code>), not-settable (<code>IPP_TAG_NOTSETTABLE</code>), unknown (<code>IPP_TAG_UNKNOWN</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_VALUE</code>) out-of-band attribute.</p>
-</li>
-    <li>    <p><code>ippAddRange</code> adds a rangeOfInteger attribute with one range.</p>
-</li>
-    <li>    <p><code>ippAddRanges</code> adds a rangeOfInteger attribute with one or more ranges.</p>
-</li>
-    <li>    <p><code>ippAddResolution</code> adds a resolution attribute with one resolution.</p>
-</li>
-    <li>    <p><code>ippAddResolutions</code> adds a resolution attribute with one or more resolutions.</p>
-</li>
-    <li>    <p><code>ippAddString</code> adds a charset (<code>IPP_TAG_CHARSET</code>), keyword (<code>IPP_TAG_KEYWORD</code>), mimeMediaType (<code>IPP_TAG_MIMETYPE</code>), name (<code>IPP_TAG_NAME</code> and <code>IPP_TAG_NAMELANG</code>), naturalLanguage (<code>IPP_TAG_NATURAL_LANGUAGE</code>), text (<code>IPP_TAG_TEXT</code> and <code>IPP_TAG_TEXTLANG</code>), uri (<code>IPP_TAG_URI</code>), or uriScheme (<code>IPP_TAG_URISCHEME</code>) attribute with one value.</p>
-</li>
-    <li>    <p><code>ippAddStrings</code> adds a charset, keyword, mimeMediaType, name, naturalLanguage, text, uri, or uriScheme attribute with one or more values.</p>
-</li>
+    <li><code>ippAddBoolean</code> adds a boolean (<code>IPP_TAG_BOOLEAN</code>) attribute with one value.</li>
+    <li><code>ippAddInteger</code> adds an enum (<code>IPP_TAG_ENUM</code>) or integer (<code>IPP_TAG_INTEGER</code>) attribute with one value.</li>
+    <li><code>ippAddIntegers</code> adds an enum or integer attribute with one or more values.</li>
+    <li><code>ippAddOctetString</code> adds an octetString attribute with one value.</li>
+    <li><code>ippAddOutOfBand</code> adds a admin-defined (<code>IPP_TAG_ADMINDEFINE</code>), default (<code>IPP_TAG_DEFAULT</code>), delete-attribute (<code>IPP_TAG_DELETEATTR</code>), no-value (<code>IPP_TAG_NOVALUE</code>), not-settable (<code>IPP_TAG_NOTSETTABLE</code>), unknown (<code>IPP_TAG_UNKNOWN</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_VALUE</code>) out-of-band attribute.</li>
+    <li><code>ippAddRange</code> adds a rangeOfInteger attribute with one range.</li>
+    <li><code>ippAddRanges</code> adds a rangeOfInteger attribute with one or more ranges.</li>
+    <li><code>ippAddResolution</code> adds a resolution attribute with one resolution.</li>
+    <li><code>ippAddResolutions</code> adds a resolution attribute with one or more resolutions.</li>
+    <li><code>ippAddString</code> adds a charset (<code>IPP_TAG_CHARSET</code>), keyword (<code>IPP_TAG_KEYWORD</code>), mimeMediaType (<code>IPP_TAG_MIMETYPE</code>), name (<code>IPP_TAG_NAME</code> and <code>IPP_TAG_NAMELANG</code>), naturalLanguage (<code>IPP_TAG_NATURAL_LANGUAGE</code>), text (<code>IPP_TAG_TEXT</code> and <code>IPP_TAG_TEXTLANG</code>), uri (<code>IPP_TAG_URI</code>), or uriScheme (<code>IPP_TAG_URISCHEME</code>) attribute with one value.</li>
+    <li><code>ippAddStrings</code> adds a charset, keyword, mimeMediaType, name, naturalLanguage, text, uri, or uriScheme attribute with one or more values.</li>
 </ul>
-    <h3 class="title" id="sending-the-ipp-request">Sending the IPP Request</h3>
+    <h3><a id="sending-the-ipp-request">Sending the IPP Request</a></h3>
     <p>Once you have created the IPP request, you can send it using the <code>cupsDoRequest</code> function. For example, the following code sends the IPP Get-Printer-Attributes request to the destination and saves the response:</p>
     <pre><code>ipp_t *response = cupsDoRequest(http, request, resource);
 </code></pre>
@@ -1157,7 +1101,7 @@ ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
   printf(&quot;Request failed: %s\n&quot;, cupsLastErrorString());
 }
 </code></pre>
-    <h3 class="title" id="processing-the-ipp-response">Processing the IPP Response</h3>
+    <h3><a id="processing-the-ipp-response">Processing the IPP Response</a></h3>
     <p>Each response to an IPP request is also an IPP message (<code>ipp_t</code>) with its own IPP attributes (<code>ipp_attribute_t</code>) that includes a status code (<code>IPP_STATUS_OK</code>, <code>IPP_STATUS_ERROR_BAD_REQUEST</code>, etc.) and the corresponding 32-bit integer identifier from the request.</p>
     <p>For example, the following code finds the printer state attributes and prints their values:</p>
     <pre><code>ipp_attribute_t *attr;
@@ -1194,7 +1138,7 @@ if ((attr = ippFindAttribute(response, &quot;printer-state-reasons&quot;,
     <p>Once you are done using the IPP response message, free it using the <code>ippDelete</code> function:</p>
     <pre><code>ippDelete(response);
 </code></pre>
-    <h3 class="title" id="authentication">Authentication</h3>
+    <h3><a id="authentication">Authentication</a></h3>
     <p>CUPS normally handles authentication through the console. GUI applications should set a password callback using the <code>cupsSetPasswordCB2</code> function:</p>
     <pre><code>void
 cupsSetPasswordCB2(cups_password_cb2_t cb, void *user_data);
@@ -6339,7 +6283,7 @@ are server-oriented...</p>
         <tr><th>IPP_FINISHINGS_EDGE_STITCH_RIGHT </th>        <td class="description">Stitch along right side</td></tr>
         <tr><th>IPP_FINISHINGS_EDGE_STITCH_TOP </th>        <td class="description">Stitch along top edge</td></tr>
         <tr><th>IPP_FINISHINGS_FOLD </th>        <td class="description">Fold (any type)</td></tr>
-        <tr><th>IPP_FINISHINGS_FOLD_ACCORDIAN </th>        <td class="description">Accordian-fold the paper vertically into four sections</td></tr>
+        <tr><th>IPP_FINISHINGS_FOLD_ACCORDION </th>        <td class="description">Accordion-fold the paper vertically into four sections</td></tr>
         <tr><th>IPP_FINISHINGS_FOLD_DOUBLE_GATE </th>        <td class="description">Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically</td></tr>
         <tr><th>IPP_FINISHINGS_FOLD_ENGINEERING_Z </th>        <td class="description">Fold the paper vertically into two small sections and one larger, forming an elongated Z</td></tr>
         <tr><th>IPP_FINISHINGS_FOLD_GATE </th>        <td class="description">Fold the top and bottom quarters of the paper towards the midline</td></tr>
@@ -6361,10 +6305,10 @@ are server-oriented...</p>
         <tr><th>IPP_FINISHINGS_PUNCH_DUAL_LEFT </th>        <td class="description">Punch 2 holes left side</td></tr>
         <tr><th>IPP_FINISHINGS_PUNCH_DUAL_RIGHT </th>        <td class="description">Punch 2 holes right side</td></tr>
         <tr><th>IPP_FINISHINGS_PUNCH_DUAL_TOP </th>        <td class="description">Punch 2 holes top edge</td></tr>
-        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM </th>        <td class="description">Pucnh multiple holes bottom edge</td></tr>
-        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_LEFT </th>        <td class="description">Pucnh multiple holes left side</td></tr>
-        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT </th>        <td class="description">Pucnh multiple holes right side</td></tr>
-        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_TOP </th>        <td class="description">Pucnh multiple holes top edge</td></tr>
+        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_BOTTOM </th>        <td class="description">Punch multiple holes bottom edge</td></tr>
+        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_LEFT </th>        <td class="description">Punch multiple holes left side</td></tr>
+        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_RIGHT </th>        <td class="description">Punch multiple holes right side</td></tr>
+        <tr><th>IPP_FINISHINGS_PUNCH_MULTIPLE_TOP </th>        <td class="description">Punch multiple holes top edge</td></tr>
         <tr><th>IPP_FINISHINGS_PUNCH_QUAD_BOTTOM </th>        <td class="description">Punch 4 holes bottom edge</td></tr>
         <tr><th>IPP_FINISHINGS_PUNCH_QUAD_LEFT </th>        <td class="description">Punch 4 holes left side</td></tr>
         <tr><th>IPP_FINISHINGS_PUNCH_QUAD_RIGHT </th>        <td class="description">Punch 4 holes right side</td></tr>
