@@ -3486,6 +3486,16 @@ cups_enum_dests(
     data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
   }
 
+  if (!data.def_name[0] && (user_dest = cupsGetDest(NULL, NULL, data.num_dests, data.dests)) != NULL)
+  {
+   /*
+    * Use an lpoptions default printer...
+    */
+
+    strlcpy(data.def_name, user_dest->name, sizeof(data.def_name));
+    data.def_instance = user_dest->instance;
+  }
+
  /*
   * Get ready to enumerate...
   */

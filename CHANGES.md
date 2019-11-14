@@ -1,4 +1,4 @@
-CHANGES - 2.2.13 - 2019-10-07
+CHANGES - 2.2.13 - 2019-11-14
 =============================
 
 
@@ -10,6 +10,7 @@ Changes in CUPS v2.2.13
 - Fixed the default common name for TLS certificates used by `ippserver`.
 - The libusb-based USB backend now reports an error when the distribution
   permissions are wrong (Issue #5658)
+- Default printers set with `lpoptions` did not work in all cases (Issue #5681)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 
