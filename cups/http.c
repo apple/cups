@@ -1778,7 +1778,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
     if (http->used > 0 && ((z_stream *)http->stream)->avail_in < HTTP_MAX_BUFFER)
     {
-      size_t buflen = buflen = HTTP_MAX_BUFFER - ((z_stream *)http->stream)->avail_in;
+      size_t buflen = HTTP_MAX_BUFFER - ((z_stream *)http->stream)->avail_in;
 					/* Number of bytes to copy */
 
       if (((z_stream *)http->stream)->avail_in > 0 &&

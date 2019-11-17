@@ -881,7 +881,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
           protocol   = 0;
 
 	  for (altset = 0, altptr = ifaceptr->altsetting;
-	       altset < ifaceptr->num_altsetting;
+	       altset < (uint8_t)ifaceptr->num_altsetting;
 	       altset ++, altptr ++)
           {
 	   /*

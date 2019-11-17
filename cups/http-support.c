@@ -803,14 +803,12 @@ httpGetDateString2(time_t t,		/* I - Time in seconds */
                    char   *s,		/* I - String buffer */
 		   int    slen)		/* I - Size of string buffer */
 {
-  struct tm	*tdate;			/* UNIX date/time data */
+  struct tm	tdate;			/* UNIX date/time data */
 
 
-  tdate = gmtime(&t);
-  if (tdate)
-    snprintf(s, (size_t)slen, "%s, %02d %s %d %02d:%02d:%02d GMT", http_days[tdate->tm_wday], tdate->tm_mday, http_months[tdate->tm_mon], tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
-  else
-    s[0] = '\0';
+  gmtime_r(&t, &tdate);
+
+  snprintf(s, (size_t)slen, "%s, %02d %s %d %02d:%02d:%02d GMT", http_days[tdate.tm_wday], tdate.tm_mday, http_months[tdate.tm_mon], tdate.tm_year + 1900, tdate.tm_hour, tdate.tm_min, tdate.tm_sec);
 
   return (s);
 }

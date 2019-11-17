@@ -768,7 +768,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     */
 
     len                = (int)strlen(authorization);
-    input_token.value  = malloc((size_t)len);
+    input_token.value  = malloc((size_t)len); /* lgtm [cpp/no-space-for-terminator] */
     input_token.value  = httpDecode64_2(input_token.value, &len,
 					authorization);
     input_token.length = (size_t)len;

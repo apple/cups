@@ -52,6 +52,14 @@
 
 
 /*
+ * Microsoft "safe" functions use a different argument order than POSIX...
+ */
+
+#define gmtime_r(t,tm)	gmtime_s(tm,t)
+#define localtime_r(t,tm) localtime_s(tm,t)
+
+
+/*
  * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32
  * _stricmp() and _strnicmp() functions...
  */
