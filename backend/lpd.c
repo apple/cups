@@ -71,7 +71,11 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
  */
 
 static int	cups_rresvport(int *port, int family);
-static int	lpd_command(int lpd_fd, char *format, ...);
+static int	lpd_command(int lpd_fd, char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#    endif /* __GNUC__ */
+;
 static int	lpd_queue(const char *hostname, http_addrlist_t *addrlist, const char *printer, int print_fd, int snmp_fd, int mode, const char *user, const char *title, int copies, int banner, int format, int order, int reserve, int manual_copies, int timeout, int contimeout, const char *orighost) _CUPS_NONNULL((1,2,3,7,8,17));
 static ssize_t	lpd_write(int lpd_fd, char *buffer, size_t length);
 static void	sigterm_handler(int sig);
@@ -1042,7 +1046,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       * Send the control file...
       */
 
-      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", strlen(control),
+      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", (int)strlen(control),
                       (int)getpid() % 1000, localhost))
       {
 	close(fd);
@@ -1175,7 +1179,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       * Send control file...
       */
 
-      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", strlen(control),
+      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", (int)strlen(control),
                       (int)getpid() % 1000, localhost))
       {
 	close(fd);

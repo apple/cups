@@ -146,7 +146,7 @@ _cupsStrDate(char   *buf,		/* I - Buffer */
              size_t bufsize,		/* I - Size of buffer */
 	     time_t timeval)		/* I - Time value */
 {
-  struct tm	*dateval;		/* Local date/time */
+  struct tm	date;			/* Local date/time */
   char		temp[1024];		/* Temporary buffer */
   _cups_globals_t *cg = _cupsGlobals();	/* Per-thread globals */
 
@@ -154,15 +154,15 @@ _cupsStrDate(char   *buf,		/* I - Buffer */
   if (!cg->lang_default)
     cg->lang_default = cupsLangDefault();
 
-  dateval = localtime(&timeval);
+  localtime_r(&timeval, &date);
 
   if (cg->lang_default->encoding != CUPS_UTF8)
   {
-    strftime(temp, sizeof(temp), "%c", dateval);
+    strftime(temp, sizeof(temp), "%c", &date);
     cupsCharsetToUTF8((cups_utf8_t *)buf, temp, (int)bufsize, cg->lang_default->encoding);
   }
   else
-    strftime(buf, bufsize, "%c", dateval);
+    strftime(buf, bufsize, "%c", &date);
 
   return (buf);
 }

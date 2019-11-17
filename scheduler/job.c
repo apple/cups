@@ -2183,7 +2183,7 @@ cupsdSaveAllJobs(void)
 		temp[1024];		/* Temporary string */
   cupsd_job_t	*job;			/* Current job */
   time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  struct tm	curdate;		/* Current date */
 
 
   snprintf(filename, sizeof(filename), "%s/job.cache", CacheDir);
@@ -2196,9 +2196,9 @@ cupsdSaveAllJobs(void)
   * Write a small header to the file...
   */
 
-  curtime = time(NULL);
-  curdate = localtime(&curtime);
-  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", curdate);
+  time(&curtime);
+  localtime_r(&curtime, &curdate);
+  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", &curdate);
 
   cupsFilePuts(fp, "# Job cache file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
@@ -2311,7 +2311,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
 		     int         update)/* I - Update job-hold-until attr? */
 {
   time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  struct tm	curdate;		/* Current date */
   int		hour;			/* Hold hour */
   int		minute;			/* Hold minute */
   int		second = 0;		/* Hold second */
@@ -2380,15 +2380,15 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to 6am the next morning unless local time is < 6pm.
     */
 
-    curtime = time(NULL);
-    curdate = localtime(&curtime);
+    time(&curtime);
+    localtime_r(&curtime, &curdate);
 
-    if (curdate->tm_hour < 18)
+    if (curdate.tm_hour < 18)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +
-                        ((29 - curdate->tm_hour) * 60 + 59 -
-			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+                        ((29 - curdate.tm_hour) * 60 + 59 -
+			 curdate.tm_min) * 60 + 60 - curdate.tm_sec;
   }
   else if (!strcmp(when, "evening") || !strcmp(when, "night"))
   {
@@ -2396,15 +2396,15 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to 6pm unless local time is > 6pm or < 6am.
     */
 
-    curtime = time(NULL);
-    curdate = localtime(&curtime);
+    time(&curtime);
+    localtime_r(&curtime, &curdate);
 
-    if (curdate->tm_hour < 6 || curdate->tm_hour >= 18)
+    if (curdate.tm_hour < 6 || curdate.tm_hour >= 18)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +
-                        ((17 - curdate->tm_hour) * 60 + 59 -
-			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+                        ((17 - curdate.tm_hour) * 60 + 59 -
+			 curdate.tm_min) * 60 + 60 - curdate.tm_sec;
   }
   else if (!strcmp(when, "second-shift"))
   {
@@ -2412,15 +2412,15 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to 4pm unless local time is > 4pm.
     */
 
-    curtime = time(NULL);
-    curdate = localtime(&curtime);
+    time(&curtime);
+    localtime_r(&curtime, &curdate);
 
-    if (curdate->tm_hour >= 16)
+    if (curdate.tm_hour >= 16)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +
-                        ((15 - curdate->tm_hour) * 60 + 59 -
-			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+                        ((15 - curdate.tm_hour) * 60 + 59 -
+			 curdate.tm_min) * 60 + 60 - curdate.tm_sec;
   }
   else if (!strcmp(when, "third-shift"))
   {
@@ -2428,15 +2428,15 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to 12am unless local time is < 8am.
     */
 
-    curtime = time(NULL);
-    curdate = localtime(&curtime);
+    time(&curtime);
+    localtime_r(&curtime, &curdate);
 
-    if (curdate->tm_hour < 8)
+    if (curdate.tm_hour < 8)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +
-                        ((23 - curdate->tm_hour) * 60 + 59 -
-			 curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+                        ((23 - curdate.tm_hour) * 60 + 59 -
+			 curdate.tm_min) * 60 + 60 - curdate.tm_sec;
   }
   else if (!strcmp(when, "weekend"))
   {
@@ -2444,16 +2444,16 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to weekend unless we are in the weekend.
     */
 
-    curtime = time(NULL);
-    curdate = localtime(&curtime);
+    time(&curtime);
+    localtime_r(&curtime, &curdate);
 
-    if (curdate->tm_wday == 0 || curdate->tm_wday == 6)
+    if (curdate.tm_wday == 0 || curdate.tm_wday == 6)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +
-                        (((5 - curdate->tm_wday) * 24 +
-                          (17 - curdate->tm_hour)) * 60 + 59 -
-			   curdate->tm_min) * 60 + 60 - curdate->tm_sec;
+                        (((5 - curdate.tm_wday) * 24 +
+                          (17 - curdate.tm_hour)) * 60 + 59 -
+			   curdate.tm_min) * 60 + 60 - curdate.tm_sec;
   }
   else if (sscanf(when, "%d:%d:%d", &hour, &minute, &second) >= 2)
   {
@@ -2461,12 +2461,12 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     * Hold to specified GMT time (HH:MM or HH:MM:SS)...
     */
 
-    curtime = time(NULL);
-    curdate = gmtime(&curtime);
+    time(&curtime);
+    gmtime_r(&curtime, &curdate);
 
     job->hold_until = curtime +
-                      ((hour - curdate->tm_hour) * 60 + minute -
-		       curdate->tm_min) * 60 + second - curdate->tm_sec;
+                      ((hour - curdate.tm_hour) * 60 + minute -
+		       curdate.tm_min) * 60 + second - curdate.tm_sec;
 
    /*
     * Hold until next day as needed...
@@ -2957,7 +2957,7 @@ dump_job_history(cupsd_job_t *job)	/* I - Job */
 {
   int			i,		/* Looping var */
 			oldsize;	/* Current MaxLogSize */
-  struct tm		*date;		/* Date/time value */
+  struct tm		date;		/* Date/time value */
   cupsd_joblog_t	*message;	/* Current message */
   char			temp[2048],	/* Log message */
 			*ptr,		/* Pointer into log message */
@@ -2985,12 +2985,12 @@ dump_job_history(cupsd_job_t *job)	/* I - Job */
   */
 
   message = (cupsd_joblog_t *)cupsArrayFirst(job->history);
-  date = localtime(&(message->time));
-  strftime(start, sizeof(start), "%X", date);
+  localtime_r(&(message->time), &date);
+  strftime(start, sizeof(start), "%X", &date);
 
   message = (cupsd_joblog_t *)cupsArrayLast(job->history);
-  date = localtime(&(message->time));
-  strftime(end, sizeof(end), "%X", date);
+  localtime_r(&(message->time), &date);
+  strftime(end, sizeof(end), "%X", &date);
 
   snprintf(temp, sizeof(temp),
            "[Job %d] The following messages were recorded from %s to %s",

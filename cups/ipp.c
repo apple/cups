@@ -4659,7 +4659,7 @@ ippSetVersion(ipp_t *ipp,		/* I - IPP message */
 const ipp_uchar_t *			/* O - RFC-2579 date/time data */
 ippTimeToDate(time_t t)			/* I - Time in seconds */
 {
-  struct tm	*unixdate;		/* UNIX unixdate/time info */
+  struct tm	unixdate;		/* UNIX unixdate/time info */
   ipp_uchar_t	*date = _cupsGlobals()->ipp_date;
 					/* RFC-2579 date/time data */
 
@@ -4681,16 +4681,16 @@ ippTimeToDate(time_t t)			/* I - Time in seconds */
   *    10       UTC minutes (0 to 59)
   */
 
-  unixdate = gmtime(&t);
-  unixdate->tm_year += 1900;
+  gmtime_r(&t, &unixdate);
+  unixdate.tm_year += 1900;
 
-  date[0]  = (ipp_uchar_t)(unixdate->tm_year >> 8);
-  date[1]  = (ipp_uchar_t)(unixdate->tm_year);
-  date[2]  = (ipp_uchar_t)(unixdate->tm_mon + 1);
-  date[3]  = (ipp_uchar_t)unixdate->tm_mday;
-  date[4]  = (ipp_uchar_t)unixdate->tm_hour;
-  date[5]  = (ipp_uchar_t)unixdate->tm_min;
-  date[6]  = (ipp_uchar_t)unixdate->tm_sec;
+  date[0]  = (ipp_uchar_t)(unixdate.tm_year >> 8);
+  date[1]  = (ipp_uchar_t)(unixdate.tm_year);
+  date[2]  = (ipp_uchar_t)(unixdate.tm_mon + 1);
+  date[3]  = (ipp_uchar_t)unixdate.tm_mday;
+  date[4]  = (ipp_uchar_t)unixdate.tm_hour;
+  date[5]  = (ipp_uchar_t)unixdate.tm_min;
+  date[6]  = (ipp_uchar_t)unixdate.tm_sec;
   date[7]  = 0;
   date[8]  = '+';
   date[9]  = 0;

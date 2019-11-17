@@ -2162,16 +2162,16 @@ static char *				/* O - ISO 8601 date/time string */
 iso_date(const ipp_uchar_t *date)	/* I - IPP (RFC 1903) date/time value */
 {
   time_t	utctime;		/* UTC time since 1970 */
-  struct tm	*utcdate;		/* UTC date/time */
+  struct tm	utcdate;		/* UTC date/time */
   static char	buffer[255];		/* String buffer */
 
 
   utctime = ippDateToTime(date);
-  utcdate = gmtime(&utctime);
+  gmtime_r(&utctime, &utcdate);
 
   snprintf(buffer, sizeof(buffer), "%04d-%02d-%02dT%02d:%02d:%02dZ",
-	   utcdate->tm_year + 1900, utcdate->tm_mon + 1, utcdate->tm_mday,
-	   utcdate->tm_hour, utcdate->tm_min, utcdate->tm_sec);
+	   utcdate.tm_year + 1900, utcdate.tm_mon + 1, utcdate.tm_mday,
+	   utcdate.tm_hour, utcdate.tm_min, utcdate.tm_sec);
 
   return (buffer);
 }

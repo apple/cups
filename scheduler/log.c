@@ -301,7 +301,7 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
                  cupsd_time_t   format)	/* I - Format to use */
 {
   struct timeval	curtime;	/* Current time value */
-  struct tm		*date;		/* Date/time value */
+  struct tm		date;		/* Date/time value */
   static struct timeval	last_time = { 0, 0 };
 	    				/* Last time we formatted */
   static char		s[1024];	/* Date/time string */
@@ -351,23 +351,23 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
     * (*BSD and Darwin store the timezone offset in the tm structure)
     */
 
-    date = localtime(&(t->tv_sec));
+    localtime_r(&(t->tv_sec), &date);
 
     if (format == CUPSD_TIME_STANDARD)
       snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	       date->tm_hour, date->tm_min, date->tm_sec,
+	       date.tm_mday, months[date.tm_mon], 1900 + date.tm_year,
+	       date.tm_hour, date.tm_min, date.tm_sec,
 #ifdef HAVE_TM_GMTOFF
-	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+	       date.tm_gmtoff / 3600, (date.tm_gmtoff / 60) % 60);
 #else
 	       timezone / 3600, (timezone / 60) % 60);
 #endif /* HAVE_TM_GMTOFF */
     else
       snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d.%06d %+03ld%02ld]",
-	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	       date->tm_hour, date->tm_min, date->tm_sec, (int)t->tv_usec,
+	       date.tm_mday, months[date.tm_mon], 1900 + date.tm_year,
+	       date.tm_hour, date.tm_min, date.tm_sec, (int)t->tv_usec,
 #ifdef HAVE_TM_GMTOFF
-	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+	       date.tm_gmtoff / 3600, (date.tm_gmtoff / 60) % 60);
 #else
 	       timezone / 3600, (timezone / 60) % 60);
 #endif /* HAVE_TM_GMTOFF */

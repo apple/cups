@@ -523,7 +523,7 @@ _cupsEncodeOption(
 
 	  quote = *sep;
 	}
-	else if (*sep == ',' && count > 1)
+	else if (*sep == ',')
 	  break;
 	else if (*sep == '\\' && sep[1])
 	{
