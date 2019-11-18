@@ -2256,7 +2256,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
   * system preferences...
   */
 
-  if ((locprinter = _cupsAppleCopyDefaultPrinter()) != NULL)
+  if (!getenv("CUPS_NO_APPLE_DEFAULT") && (locprinter = _cupsAppleCopyDefaultPrinter()) != NULL)
   {
     CFStringGetCString(locprinter, name, (CFIndex)namesize, kCFStringEncodingUTF8);
     CFRelease(locprinter);
@@ -3379,10 +3379,9 @@ cups_enum_dests(
   int           i, j,			/* Looping vars */
                 num_dests;              /* Number of destinations */
   cups_dest_t   *dests = NULL,          /* Destinations */
-                *dest,                  /* Current destination */
-                *user_dest;		/* User destination */
+                *dest;			/* Current destination */
   cups_option_t	*option;		/* Current option */
-  char          *user_default;          /* User default printer */
+  const char	*user_default;		/* Default printer from environment */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   int           count,                  /* Number of queries started */
                 completed,              /* Number of completed queries */
@@ -3437,13 +3436,35 @@ cups_enum_dests(
 
   memset(&data, 0, sizeof(data));
 
-  if ((user_default = _cupsUserDefault(data.def_name, sizeof(data.def_name))) == NULL)
-  {
-    const char *defprinter = cupsGetDefault2(http);
-					/* Server default, if any */
+  user_default = _cupsUserDefault(data.def_name, sizeof(data.def_name));
 
-    if (defprinter)
-      strlcpy(data.def_name, defprinter, sizeof(data.def_name));
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+  data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
+
+  if (cg->home)
+  {
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
+
+    data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
+  }
+
+  if (!user_default && (dest = cupsGetDest(NULL, NULL, data.num_dests, data.dests)) != NULL)
+  {
+   /*
+    * Use an lpoptions default printer...
+    */
+
+    if (dest->instance)
+      snprintf(data.def_name, sizeof(data.def_name), "%s/%s", dest->name, dest->instance);
+    else
+      strlcpy(data.def_name, dest->name, sizeof(data.def_name));
+  }
+  else
+  {
+    const char	*default_printer;	/* Server default printer */
+
+    if ((default_printer = cupsGetDefault2(http)) != NULL)
+      strlcpy(data.def_name, default_printer, sizeof(data.def_name));
   }
 
   if (data.def_name[0])
@@ -3457,26 +3478,6 @@ cups_enum_dests(
   }
 
   DEBUG_printf(("1cups_enum_dests: def_name=\"%s\", def_instance=\"%s\"", data.def_name, data.def_instance));
-
-  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
-
-  if (cg->home)
-  {
-    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", cg->home);
-
-    data.num_dests = cups_get_dests(filename, NULL, NULL, 1, user_default != NULL, data.num_dests, &data.dests);
-  }
-
-  if (!data.def_name[0] && (user_dest = cupsGetDest(NULL, NULL, data.num_dests, data.dests)) != NULL)
-  {
-   /*
-    * Use an lpoptions default printer...
-    */
-
-    strlcpy(data.def_name, user_dest->name, sizeof(data.def_name));
-    data.def_instance = user_dest->instance;
-  }
 
  /*
   * Get ready to enumerate...
@@ -3515,8 +3516,9 @@ cups_enum_dests(
          i > 0 && (!cancel || !*cancel);
          i --, dest ++)
     {
+      cups_dest_t	*user_dest;	/* Destination from lpoptions */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-      const char *device_uri;    /* Device URI */
+      const char	*device_uri;	/* Device URI */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
       if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
@@ -3785,6 +3787,8 @@ cups_enum_dests(
 
         if ((device->type & mask) == type)
         {
+          cups_dest_t	*user_dest;	/* Destination from lpoptions */
+
           dest = &device->dest;
 
 	  if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
