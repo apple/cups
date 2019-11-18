@@ -328,8 +328,6 @@ cups_globals_alloc(void)
   }
 #endif /* _WIN32 */
 
-  fprintf(stderr, "Using \"%s\" as home directory.\n", cg->home);
-
   return (cg);
 }
 
