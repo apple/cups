@@ -21,7 +21,7 @@ Changes in CUPS v2.3.1
 - Sandboxed applications were not able to get the default printer (Issue #5676)
 - Log file access controls were not preserved by `cupsctl` (Issue #5677)
 - Default printers set with `lpoptions` did not work in all cases (Issue #5681,
-  Issue #5683)
+  Issue #5683, Issue #5684)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
