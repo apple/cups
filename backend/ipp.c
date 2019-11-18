@@ -2124,11 +2124,10 @@ main(int  argc,				/* I - Number of command-line args */
 		    job_sheets->values[0].integer);
 
 	 /*
-          * Stop polling if the job is finished or pending-held for 30 seconds...
+          * Stop polling if the job is finished or pending-held...
 	  */
 
-          if (job_state->values[0].integer > IPP_JSTATE_STOPPED ||
-	      (job_state->values[0].integer == IPP_JSTATE_HELD && time(NULL) > waittime))
+          if (job_state->values[0].integer > IPP_JSTATE_STOPPED || job_state->values[0].integer == IPP_JSTATE_HELD)
 	  {
 	    ippDelete(response);
 	    break;
