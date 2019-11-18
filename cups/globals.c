@@ -314,9 +314,12 @@ cups_globals_alloc(void)
     if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
       cg->localedir = CUPS_LOCALEDIR;
 
-#  ifndef __APPLE__ /* Sandboxing now exposes the container as the home directory */
     cg->home = getenv("HOME");
-#endif /* !__APPLE__ */
+
+#  ifdef __APPLE__ /* Sandboxing now exposes the container as the home directory */
+    if (cg->home && strstr(cg->home, "/Library/Containers/"))
+      cg->home = NULL;
+#  endif /* !__APPLE__ */
   }
 
   if (!cg->home)
