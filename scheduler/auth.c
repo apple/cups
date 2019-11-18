@@ -757,7 +757,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Decode the authorization string to get the input token...
     */
 
-    len                = (int)strlen(authorization);
+    len                = (int)strlen(authorization) + 0;
     input_token.value  = malloc((size_t)len);
     input_token.value  = httpDecode64_2(input_token.value, &len,
 					authorization);
