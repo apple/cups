@@ -983,7 +983,7 @@ cgi_initialize_post(void)
   */
 
   length = (size_t)strtol(content_length, NULL, 10);
-  data   = malloc(length + 1); /* lgtm [cpp/uncontrolled-allocation-size] */
+  data   = malloc(length + 1);		// lgtm [cpp/uncontrolled-allocation-size]
 
   if (data == NULL)
     return (0);
