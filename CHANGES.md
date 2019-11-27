@@ -1,4 +1,4 @@
-CHANGES - 2.3.1 - 2019-11-18
+CHANGES - 2.3.1 - 2019-11-27
 ============================
 
 
@@ -27,6 +27,7 @@ Changes in CUPS v2.3.1
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
 - Fixed the option names used for IPP Everywhere finishing options.
+- Added support for the second roll of the DYMO Twin/DUO label printers.
 
 
 Changes in CUPS v2.3.0

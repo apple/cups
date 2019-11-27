@@ -115,7 +115,7 @@ Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright (c) 2007-2018 by Apple Inc."
+Copyright "Copyright (c) 2007-2019 by Apple Inc."
 Copyright "Copyright (c) 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "Licensed under Apache License v2.0.  See the file \"LICENSE\" for more"
@@ -125,11 +125,11 @@ Font *
 
 Version "2.3"
 
-// Dymo Label Printer
+// DYMO Label Printer
 {
-  Manufacturer "Dymo"
+  Manufacturer "DYMO"
   ModelName "Label Printer"
-  Attribute NickName "" "Dymo Label Printer"
+  Attribute NickName "" "DYMO Label Printer"
   PCFileName "dymo.ppd"
   DriverType label
   ModelNumber $DYMO_3x0
@@ -154,6 +154,9 @@ Version "2.3"
   Resolution k 1 0 0 0 136dpi
   Resolution k 1 0 0 0 203dpi
   *Resolution k 1 0 0 0 300dpi
+
+  *InputSlot 0 "Roll/Main Roll"
+  InputSlot 1 "Roll2/Second Roll (DUO/Twin Only)"
 
   Darkness 0 Light
   Darkness 1 Medium

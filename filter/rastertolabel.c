@@ -23,12 +23,12 @@
 
 
 /*
- * This driver filter currently supports Dymo, Intellitech, and Zebra
+ * This driver filter currently supports DYMO, Intellitech, and Zebra
  * label printers.
  *
- * The Dymo portion of the driver has been tested with the 300, 330,
- * and 330 Turbo label printers; it may also work with other models.
- * The Dymo printers support printing at 136, 203, and 300 DPI.
+ * The DYMO portion of the driver has been tested with the 300, 330,
+ * 330 Turbo, and 450 Twin Turbo label printers; it may also work with other
+ * models.  The DYMO printers support printing at 136, 203, and 300 DPI.
  *
  * The Intellitech portion of the driver has been tested with the
  * Intellibar 408, 412, and 808 and supports their PCL variant.
@@ -43,7 +43,7 @@
  * Model number constants...
  */
 
-#define DYMO_3x0	0		/* Dymo Labelwriter 300/330/330 Turbo */
+#define DYMO_3x0	0		/* DYMO Labelwriter 300/330/330 Turbo */
 
 #define ZEBRA_EPL_LINE	0x10		/* Zebra EPL line mode printers */
 #define ZEBRA_EPL_PAGE	0x11		/* Zebra EPL page mode printers */
@@ -191,6 +191,9 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	printf("\033D%c", header->cupsBytesPerLine);
 
 	printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
+
+	if (header->MediaPosition)
+	  printf("\033q%d", header->MediaPosition + 1);	/* Roll Select */
 	break;
 
     case ZEBRA_EPL_LINE :
