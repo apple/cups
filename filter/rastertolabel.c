@@ -191,9 +191,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 	printf("\033D%c", header->cupsBytesPerLine);
 
 	printf("\033%c", header->cupsCompression + 'c'); /* Darkness */
-
-	if (header->MediaPosition)
-	  printf("\033q%d", header->MediaPosition + 1);	/* Roll Select */
+	printf("\033q%d", header->MediaPosition + 1);	 /* Roll Select */
 	break;
 
     case ZEBRA_EPL_LINE :
