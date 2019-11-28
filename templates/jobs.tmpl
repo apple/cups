@@ -20,7 +20,7 @@
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}"><INPUT TYPE="SUBMIT" VALUE="Reprint Job"></FORM>:}:}
 {job_state=4?{job_hold_until=auth-info-required?Held for authentication.:
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="release-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
-<INPUT TYPE="SUBMIT" VALUE="Release Job"></FORM>:}}
+<INPUT TYPE="SUBMIT" VALUE="Release Job"></FORM>:}:}
 {job_state=3?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="hold-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
 <INPUT TYPE="SUBMIT" VALUE="Hold Job"></FORM>:}
