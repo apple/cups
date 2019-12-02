@@ -1075,7 +1075,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       * Convert the PPD size name to the corresponding PWG keyword name.
       */
 
-      if ((pwg_media = pwgMediaForPPD(ppd_size->name)) != NULL)
+      if ((pwg_media = pwgMediaForSize(PWG_FROM_POINTS(ppd_size->width), PWG_FROM_POINTS(ppd_size->length))) != NULL)
       {
        /*
 	* Standard name, do we have conflicts?
