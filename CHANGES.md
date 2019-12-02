@@ -23,8 +23,8 @@ Changes in CUPS v2.3.1
 - Default printers set with `lpoptions` did not work in all cases (Issue #5681,
   Issue #5683, Issue #5684)
 - The IPP backend did not detect all cases where a job should be retried using
-  a raster format (rdar://56021091)
 - Fixed a few issues with the Apple Raster support (rdar://55301114)
+  a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
 - Fixed the option names used for IPP Everywhere finishing options.
