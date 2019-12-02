@@ -1,7 +1,7 @@
 /*
  * Raster file routines for CUPS.
  *
- * Copyright 2007-2018 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * This file is part of the CUPS Imaging library.
@@ -23,6 +23,29 @@
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #endif /* HAVE_STDINT_H */
+
+
+/*
+ * Local globals...
+ */
+
+static const char * const apple_media_types[] =
+{					/* media-type values for Apple Raster */
+  "auto",
+  "stationery",
+  "transparency",
+  "envelope",
+  "cardstock",
+  "labels",
+  "stationery-letterhead",
+  "disc",
+  "photographic-matte",
+  "photographic-satin",
+  "photographic-semi-gloss",
+  "photographic-glossy",
+  "photographic-high-gloss",
+  "other"
+};
 
 
 /*
@@ -1098,7 +1121,10 @@ cupsRasterWriteHeader(
     * zeroed.
     */
 
-    unsigned char appleheader[32];	/* Raw page header */
+    int			i;		/* Looping var */
+    unsigned char	appleheader[32];/* Raw page header */
+    unsigned		height = r->header.cupsHeight * r->rowheight;
+					/* Computed page height */
 
     if (r->apple_page_count == 0xffffffffU)
     {
@@ -1125,23 +1151,34 @@ cupsRasterWriteHeader(
 
     appleheader[0]  = (unsigned char)r->header.cupsBitsPerPixel;
     appleheader[1]  = r->header.cupsColorSpace == CUPS_CSPACE_SRGB ? 1 :
-                        r->header.cupsColorSpace == CUPS_CSPACE_RGBW ? 2 :
+                        r->header.cupsColorSpace == CUPS_CSPACE_CIELab ? 2 :
                         r->header.cupsColorSpace == CUPS_CSPACE_ADOBERGB ? 3 :
                         r->header.cupsColorSpace == CUPS_CSPACE_W ? 4 :
                         r->header.cupsColorSpace == CUPS_CSPACE_RGB ? 5 :
                         r->header.cupsColorSpace == CUPS_CSPACE_CMYK ? 6 : 0;
+    appleheader[2]  = r->header.Duplex ? (r->header.Tumble ? 2 : 3) : 1;
+    appleheader[5]  = (unsigned char)(r->header.MediaPosition);
     appleheader[12] = (unsigned char)(r->header.cupsWidth >> 24);
     appleheader[13] = (unsigned char)(r->header.cupsWidth >> 16);
     appleheader[14] = (unsigned char)(r->header.cupsWidth >> 8);
     appleheader[15] = (unsigned char)(r->header.cupsWidth);
-    appleheader[16] = (unsigned char)(r->header.cupsHeight >> 24);
-    appleheader[17] = (unsigned char)(r->header.cupsHeight >> 16);
-    appleheader[18] = (unsigned char)(r->header.cupsHeight >> 8);
-    appleheader[19] = (unsigned char)(r->header.cupsHeight);
+    appleheader[16] = (unsigned char)(height >> 24);
+    appleheader[17] = (unsigned char)(height >> 16);
+    appleheader[18] = (unsigned char)(height >> 8);
+    appleheader[19] = (unsigned char)(height);
     appleheader[20] = (unsigned char)(r->header.HWResolution[0] >> 24);
     appleheader[21] = (unsigned char)(r->header.HWResolution[0] >> 16);
     appleheader[22] = (unsigned char)(r->header.HWResolution[0] >> 8);
     appleheader[23] = (unsigned char)(r->header.HWResolution[0]);
+
+    for (i = 0; i < (int)(sizeof(apple_media_types) / sizeof(apple_media_types[0])); i ++)
+    {
+      if (!strcmp(r->header.MediaType, apple_media_types[i]))
+      {
+        appleheader[4] = i;
+        break;
+      }
+    }
 
     return (cups_raster_io(r, appleheader, sizeof(appleheader)) == sizeof(appleheader));
   }
@@ -1271,8 +1308,9 @@ cupsRasterWriteHeader2(
     * zeroed.
     */
 
-    unsigned char appleheader[32];	/* Raw page header */
-    unsigned height = r->header.cupsHeight * r->rowheight;
+    int			i;		/* Looping var */
+    unsigned char	appleheader[32];/* Raw page header */
+    unsigned		height = r->header.cupsHeight * r->rowheight;
 					/* Computed page height */
 
     if (r->apple_page_count == 0xffffffffU)
@@ -1300,11 +1338,14 @@ cupsRasterWriteHeader2(
 
     appleheader[0]  = (unsigned char)r->header.cupsBitsPerPixel;
     appleheader[1]  = r->header.cupsColorSpace == CUPS_CSPACE_SRGB ? 1 :
-                        r->header.cupsColorSpace == CUPS_CSPACE_RGBW ? 2 :
+                        r->header.cupsColorSpace == CUPS_CSPACE_CIELab ? 2 :
                         r->header.cupsColorSpace == CUPS_CSPACE_ADOBERGB ? 3 :
                         r->header.cupsColorSpace == CUPS_CSPACE_W ? 4 :
                         r->header.cupsColorSpace == CUPS_CSPACE_RGB ? 5 :
                         r->header.cupsColorSpace == CUPS_CSPACE_CMYK ? 6 : 0;
+    appleheader[2]  = r->header.Duplex ? (r->header.Tumble ? 2 : 3) : 1;
+    appleheader[3]  = r->header.cupsInteger[CUPS_RASTER_PWG_PrintQuality];
+    appleheader[5]  = (unsigned char)(r->header.MediaPosition);
     appleheader[12] = (unsigned char)(r->header.cupsWidth >> 24);
     appleheader[13] = (unsigned char)(r->header.cupsWidth >> 16);
     appleheader[14] = (unsigned char)(r->header.cupsWidth >> 8);
@@ -1317,6 +1358,15 @@ cupsRasterWriteHeader2(
     appleheader[21] = (unsigned char)(r->header.HWResolution[0] >> 16);
     appleheader[22] = (unsigned char)(r->header.HWResolution[0] >> 8);
     appleheader[23] = (unsigned char)(r->header.HWResolution[0]);
+
+    for (i = 0; i < (int)(sizeof(apple_media_types) / sizeof(apple_media_types[0])); i ++)
+    {
+      if (!strcmp(r->header.MediaType, apple_media_types[i]))
+      {
+        appleheader[4] = i;
+        break;
+      }
+    }
 
     return (cups_raster_io(r, appleheader, sizeof(appleheader)) == sizeof(appleheader));
   }
@@ -1589,7 +1639,7 @@ cups_raster_read_header(
           {
             CUPS_CSPACE_SW,
             CUPS_CSPACE_SRGB,
-            CUPS_CSPACE_RGBW,
+            CUPS_CSPACE_CIELab,
             CUPS_CSPACE_ADOBERGB,
             CUPS_CSPACE_W,
             CUPS_CSPACE_RGB,
@@ -1599,7 +1649,7 @@ cups_raster_read_header(
           {
             1,
             3,
-            4,
+            3,
             3,
             1,
             3,
@@ -1632,8 +1682,21 @@ cups_raster_read_header(
 	    r->header.cupsPageSize[1] = (float)(r->header.cupsHeight * 72.0 / r->header.HWResolution[1]);
           }
 
-          r->header.cupsInteger[0] = r->apple_page_count;
-          r->header.cupsInteger[7] = 0xffffff;
+          r->header.cupsInteger[CUPS_RASTER_PWG_TotalPageCount]   = r->apple_page_count;
+          r->header.cupsInteger[CUPS_RASTER_PWG_AlternatePrimary] = 0xffffff;
+          r->header.cupsInteger[CUPS_RASTER_PWG_PrintQuality]     = appleheader[3];
+
+          if (appleheader[2] >= 2)
+            r->header.Duplex = 1;
+          if (appleheader[2] == 2)
+            r->header.Tumble = 1;
+
+          r->header.MediaPosition = appleheader[5];
+
+          if (appleheader[4] < (int)(sizeof(apple_media_types) / sizeof(apple_media_types[0])))
+            strlcpy(r->header.MediaType, apple_media_types[appleheader[4]], sizeof(r->header.MediaType));
+          else
+            strlcpy(r->header.MediaType, "other", sizeof(r->header.MediaType));
         }
         break;
   }

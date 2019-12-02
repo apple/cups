@@ -1,4 +1,4 @@
-CHANGES - 2.2.13 - 2019-11-18
+CHANGES - 2.2.13 - 2019-12-02
 =============================
 
 
@@ -12,6 +12,7 @@ Changes in CUPS v2.2.13
   permissions are wrong (Issue #5658)
 - Default printers set with `lpoptions` did not work in all cases (Issue #5681,
   Issue #5683, Issue #5684)
+- Fixed a few issues with the Apple Raster support (rdar://55301114)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 

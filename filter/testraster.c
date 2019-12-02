@@ -1,7 +1,7 @@
 /*
  * Raster test program routines for CUPS.
  *
- * Copyright 2007-2016 by Apple Inc.
+ * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -560,6 +560,8 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     header.cupsPageSize[0]  = 288.0f;
     header.cupsPageSize[1]  = 288.0f;
 
+    strlcpy(header.MediaType, "auto", sizeof(header.MediaType));
+
     if (page & 1)
     {
       header.cupsBytesPerLine *= 4;
@@ -689,6 +691,8 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     expected.HWResolution[1]  = 64;
     expected.PageSize[0]      = 288;
     expected.PageSize[1]      = 288;
+
+    strlcpy(expected.MediaType, "auto", sizeof(expected.MediaType));
 
     if (mode != CUPS_RASTER_WRITE_PWG)
     {
