@@ -6,7 +6,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ippeveprinter 1 "CUPS" "17 May 2019" "Apple Inc."
+.TH ippeveprinter 1 "CUPS" "2 December 2019" "Apple Inc."
 .SH NAME
 ippeveprinter \- an ipp everywhere printer application for cups
 .SH SYNOPSIS
@@ -16,9 +16,14 @@ ippeveprinter \- an ipp everywhere printer application for cups
 ] [
 .B \-\-no\-web\-forms
 ] [
+.B \-\-pam\-service
+.I service
+] [
 .B \-\-version
 ] [
 .B \-2
+] [
+.B \-A
 ] [
 .B \-D
 .I device-uri
@@ -89,11 +94,20 @@ Show program usage.
 .B \-\-no\-web\-forms
 Disable the web interface forms used to update the media and supply levels.
 .TP 5
+\fB\-\-pam\-service \fIservice\fR
+Set the PAM service name.
+The default service is "other".
+.TP 5
 .B \-\-version
 Show the CUPS version.
 .TP 5
 .B \-2
 Report support for two-sided (duplex) printing.
+.TP 5
+.B \-A
+Enable authentication for the created printer.
+.B ippeveprinter
+uses PAM to authenticate HTTP Basic credentials.
 .TP 5
 \fB\-D \fIdevice-uri\fR
 Set the device URI for print output.

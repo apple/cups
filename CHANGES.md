@@ -19,6 +19,7 @@ Changes in CUPS v2.3.1
 - The libusb-based USB backend now reports an error when the distribution
   permissions are wrong (Issue #5658)
 - Added paint can labels to Dymo driver (Issue #5662)
+- The `ippeveprinter` program now supports authentication (Issue #5665)
 - The `--with-dbusdir` option was ignored by the configure script (Issue #5671)
 - Sandboxed applications were not able to get the default printer (Issue #5676)
 - Log file access controls were not preserved by `cupsctl` (Issue #5677)

@@ -147,7 +147,7 @@ local:	ippeveprinter-static ipptool-static
 
 ippeveprinter:	ippeveprinter.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o $(DNSSDLIBS) $(LINKCUPS)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o $(DNSSDLIBS) $(PAMLIBS) $(LINKCUPS)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 
@@ -157,7 +157,7 @@ ippeveprinter:	ippeveprinter.o ../cups/$(LIBCUPS)
 
 ippeveprinter-static:	ippeveprinter.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o $(LINKCUPSSTATIC)
+	$(LD_CC) $(ALL_LDFLAGS) -o $@ ippeveprinter.o $(PAMLIBS) $(LINKCUPSSTATIC)
 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
 
 

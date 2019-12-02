@@ -51,6 +51,7 @@ extern char **environ;
 #  include <avahi-common/error.h>
 #  include <avahi-common/thread-watch.h>
 #endif /* HAVE_DNSSD */
+
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
@@ -63,6 +64,14 @@ extern char **environ;
 #ifdef HAVE_SYS_VFS_H
 #  include <sys/vfs.h>
 #endif /* HAVE_SYS_VFS_H */
+
+#if HAVE_LIBPAM
+#  ifdef HAVE_PAM_PAM_APPL_H
+#    include <pam/pam_appl.h>
+#  else
+#    include <security/pam_appl.h>
+#  endif /* HAVE_PAM_PAM_APPL_H */
+#endif /* HAVE_LIBPAM */
 
 #include "printer-png.h"
 
@@ -148,6 +157,14 @@ typedef void *ippeve_srv_t;		/* Service reference */
 typedef void *ippeve_txt_t;		/* TXT record */
 #endif /* HAVE_DNSSD */
 
+#if HAVE_LIBPAM
+typedef struct ippeve_authdata_s	/* Authentication data */
+{
+  char	username[HTTP_MAX_VALUE],	/* Username string */
+	*password;			/* Password string */
+} ippeve_authdata_t;
+#endif /* HAVE_LIBPAM */
+
 typedef struct ippeve_filter_s		/**** Attribute filter ****/
 {
   cups_array_t		*ra;		/* Requested attributes */
@@ -224,7 +241,9 @@ typedef struct ippeve_client_s		/**** Client data ****/
   char			uri[1024],	/* Request URI */
 			*options;	/* URI options */
   http_addr_t		addr;		/* Client address */
-  char			hostname[256];	/* Client hostname */
+  char			hostname[256],	/* Client hostname */
+			username[HTTP_MAX_VALUE];
+					/* Authenticated username, if any */
   ippeve_printer_t	*printer;	/* Printer */
   ippeve_job_t		*job;		/* Current job, if any */
 } ippeve_client_t;
@@ -234,6 +253,7 @@ typedef struct ippeve_client_s		/**** Client data ****/
  * Local functions...
  */
 
+static http_status_t	authenticate_request(ippeve_client_t *client);
 static void		clean_jobs(ippeve_printer_t *printer);
 static int		compare_jobs(ippeve_job_t *a, ippeve_job_t *b);
 static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra, ipp_tag_t group_tag, int quickcopy);
@@ -281,6 +301,9 @@ static ipp_t		*load_legacy_attributes(const char *make, const char *model, int p
 #if !CUPS_LITE
 static ipp_t		*load_ppd_attributes(const char *ppdfile, cups_array_t *docformats);
 #endif /* !CUPS_LITE */
+#if HAVE_LIBPAM
+static int		pam_func(int, const struct pam_message **, struct pam_response **, void *);
+#endif /* HAVE_LIBPAM */
 static int		parse_options(ippeve_client_t *client, cups_option_t **options);
 static void		process_attr_message(ippeve_job_t *job, char *message);
 static void		*process_client(ippeve_client_t *client);
@@ -316,6 +339,8 @@ static AvahiClient	*DNSSDClient = NULL;
 static int		KeepFiles = 0,	/* Keep spooled job files? */
 			MaxVersion = 20,/* Maximum IPP version (20 = 2.0, 11 = 1.1, etc.) */
 			Verbosity = 0;	/* Verbosity level */
+static const char	*PAMService = NULL;
+					/* PAM service */
 
 
 /*
@@ -371,6 +396,14 @@ main(int  argc,				/* I - Number of command-line args */
     {
       web_forms = 0;
     }
+    else if (!strcmp(argv[i], "--pam-service"))
+    {
+      i ++;
+      if (i >= argc)
+        usage(1);
+
+      PAMService = argv[i];
+    }
     else if (!strcmp(argv[i], "--version"))
     {
       puts(CUPS_SVERSION);
@@ -390,6 +423,11 @@ main(int  argc,				/* I - Number of command-line args */
 	  case '2' : /* -2 (enable 2-sided printing) */
 	      duplex = 1;
 	      legacy = 1;
+	      break;
+
+          case 'A' : /* -A (enable authentication) */
+              if (!PAMService)
+                PAMService = "other";
 	      break;
 
           case 'D' : /* -D device-uri */
@@ -688,6 +726,102 @@ main(int  argc,				/* I - Number of command-line args */
   delete_printer(printer);
 
   return (0);
+}
+
+
+/*
+ * 'authenticate_request()' - Try to authenticate the request.
+ */
+
+static http_status_t			/* O - HTTP_STATUS_CONTINUE to keep going, otherwise status to return */
+authenticate_request(
+    ippeve_client_t *client)		/* I - Client */
+{
+#if HAVE_LIBPAM
+ /*
+  * If PAM isn't enabled, return 'continue' now...
+  */
+
+  const char		*authorization;	/* Pointer into Authorization string */
+  int			userlen;	/* Username:password length */
+  pam_handle_t		*pamh;		/* PAM authentication handle */
+  int			pamerr;		/* PAM error code */
+  struct pam_conv	pamdata;	/* PAM conversation data */
+  ippeve_authdata_t	data;		/* Authentication data */
+
+
+  if (!PAMService)
+    return (HTTP_STATUS_CONTINUE);
+
+ /*
+  * Try authenticating using PAM...
+  */
+
+  authorization = httpGetField(client->http, HTTP_FIELD_AUTHORIZATION);
+
+  if (strncmp(authorization, "Basic ", 6))
+  {
+    fputs("Unsupported scheme in Authorization header.\n", stderr);
+    return (HTTP_STATUS_BAD_REQUEST);
+  }
+
+  authorization += 5;
+  while (isspace(*authorization & 255))
+    authorization ++;
+
+  userlen = sizeof(data.username);
+  httpDecode64_2(data.username, &userlen, authorization);
+
+  if ((data.password = strchr(data.username, ':')) == NULL)
+  {
+    fputs("No password in Authorization header.\n", stderr);
+    return (HTTP_STATUS_BAD_REQUEST);
+  }
+
+  *(data.password)++ = '\0';
+
+  if (!data.username[0])
+  {
+    fputs("No username in Authorization header.\n", stderr);
+    return (HTTP_STATUS_BAD_REQUEST);
+  }
+
+  pamdata.conv        = pam_func;
+  pamdata.appdata_ptr = &data;
+
+  if ((pamerr = pam_start(PAMService, data.username, &pamdata, &pamh)) != PAM_SUCCESS)
+  {
+    fprintf(stderr, "pam_start() returned %d (%s)\n", pamerr, pam_strerror(pamh, pamerr));
+    return (HTTP_STATUS_SERVER_ERROR);
+  }
+
+  if ((pamerr = pam_authenticate(pamh, PAM_SILENT)) != PAM_SUCCESS)
+  {
+    fprintf(stderr, "pam_authenticate() returned %d (%s)\n", pamerr, pam_strerror(pamh, pamerr));
+    pam_end(pamh, 0);
+    return (HTTP_STATUS_UNAUTHORIZED);
+  }
+
+  if ((pamerr = pam_acct_mgmt(pamh, PAM_SILENT)) != PAM_SUCCESS)
+  {
+    fprintf(stderr, "pam_acct_mgmt() returned %d (%s)\n", pamerr, pam_strerror(pamh, pamerr));
+    pam_end(pamh, 0);
+    return (HTTP_STATUS_SERVER_ERROR);
+  }
+
+  strlcpy(client->username, data.username, sizeof(client->username));
+
+  pam_end(pamh, PAM_SUCCESS);
+
+  return (HTTP_STATUS_CONTINUE);
+
+#else
+ /*
+  * No authentication support built-in, return 'continue'...
+  */
+
+  return (HTTP_STATUS_CONTINUE);
+#endif /* HAVE_LIBPAM */
 }
 
 
@@ -5226,6 +5360,78 @@ load_ppd_attributes(
 #endif /* !CUPS_LITE */
 
 
+#if HAVE_LIBPAM
+/*
+ * 'pam_func()' - PAM conversation function.
+ */
+
+static int				/* O - Success or failure */
+pam_func(
+    int                      num_msg,	/* I - Number of messages */
+    const struct pam_message **msg,	/* I - Messages */
+    struct pam_response      **resp,	/* O - Responses */
+    void                     *appdata_ptr)
+					/* I - Pointer to connection */
+{
+  int			i;		/* Looping var */
+  struct pam_response	*replies;	/* Replies */
+  ippeve_authdata_t	*data;		/* Pointer to auth data */
+
+
+ /*
+  * Allocate memory for the responses...
+  */
+
+  if ((replies = malloc(sizeof(struct pam_response) * (size_t)num_msg)) == NULL)
+    return (PAM_CONV_ERR);
+
+ /*
+  * Answer all of the messages...
+  */
+
+  data = (ippeve_authdata_t *)appdata_ptr;
+
+  for (i = 0; i < num_msg; i ++)
+  {
+    switch (msg[i]->msg_style)
+    {
+      case PAM_PROMPT_ECHO_ON:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = strdup(data->username);
+          break;
+
+      case PAM_PROMPT_ECHO_OFF:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = strdup(data->password);
+          break;
+
+      case PAM_TEXT_INFO:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = NULL;
+          break;
+
+      case PAM_ERROR_MSG:
+          replies[i].resp_retcode = PAM_SUCCESS;
+          replies[i].resp         = NULL;
+          break;
+
+      default:
+          free(replies);
+          return (PAM_CONV_ERR);
+    }
+  }
+
+ /*
+  * Return the responses back to PAM...
+  */
+
+  *resp = replies;
+
+  return (PAM_SUCCESS);
+}
+#endif /* HAVE_LIBPAM */
+
+
 /*
  * 'parse_options()' - Parse URL options into CUPS options.
  *
@@ -5430,6 +5636,8 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
  /*
   * Clear state variables...
   */
+
+  client->username[0] = '\0';
 
   ippDelete(client->request);
   ippDelete(client->response);
@@ -5730,6 +5938,7 @@ process_ipp(ippeve_client_t *client)	/* I - Client */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
   int			major, minor;	/* Version number */
   const char		*name;		/* Name of attribute */
+  http_status_t		status;		/* Authentication status */
 
 
   debug_attributes("Request", client->request, 1);
@@ -5880,13 +6089,18 @@ process_ipp(ippeve_client_t *client)	/* I - Client */
                   strcmp(resource, "/ipp/print")))
 	  respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "%s %s not found.",
 		      name, ippGetString(uri, 0, NULL));
-	else
+	else if (client->operation_id != IPP_OP_GET_PRINTER_ATTRIBUTES && (status = authenticate_request(client)) != HTTP_STATUS_CONTINUE)
+        {
+          return (respond_http(client, status, NULL, NULL, 0));
+        }
+        else
 	{
 	 /*
 	  * Try processing the operation...
 	  */
 
-	  switch (ippGetOperation(client->request))
+
+	  switch (client->operation_id)
 	  {
 	    case IPP_OP_PRINT_JOB :
 		ipp_print_job(client);
@@ -6824,6 +7038,14 @@ respond_http(
       client->operation == HTTP_STATE_OPTIONS)
     httpSetField(client->http, HTTP_FIELD_ALLOW, "GET, HEAD, OPTIONS, POST");
 
+  if (code == HTTP_STATUS_UNAUTHORIZED)
+  {
+    char value[256];			/* WWW-Authenticate value */
+
+    snprintf(value, sizeof(value), "Basic realm=\"%s\"", PAMService);
+    httpSetField(client->http, HTTP_FIELD_WWW_AUTHENTICATE, value);
+  }
+
   if (type)
   {
     if (!strcmp(type, "text/html"))
@@ -7664,10 +7886,12 @@ usage(int status)			/* O - Exit status */
 {
   _cupsLangPuts(stdout, _("Usage: ippeveprinter [options] \"name\""));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stderr, _("--help                  Show program help"));
-  _cupsLangPuts(stderr, _("--no-web-forms          Disable web forms for media and supplies"));
-  _cupsLangPuts(stderr, _("--version               Show program version"));
+  _cupsLangPuts(stdout, _("--help                  Show program help"));
+  _cupsLangPuts(stdout, _("--no-web-forms          Disable web forms for media and supplies"));
+  _cupsLangPuts(stdout, _("--pam-service service   Use the named PAM service"));
+  _cupsLangPuts(stdout, _("--version               Show program version"));
   _cupsLangPuts(stdout, _("-2                      Set 2-sided printing support (default=1-sided)"));
+  _cupsLangPuts(stdout, _("-A                      Enable authentication"));
   _cupsLangPuts(stdout, _("-D device-uri           Set the device URI for the printer"));
   _cupsLangPuts(stdout, _("-F output-type/subtype  Set the output format for the printer"));
 #ifdef HAVE_SSL
@@ -7688,7 +7912,7 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(stdout, _("-p port                 Set port number for printer"));
   _cupsLangPuts(stdout, _("-r subtype,[subtype]    Set DNS-SD service subtype"));
   _cupsLangPuts(stdout, _("-s speed[,color-speed]  Set speed in pages per minute"));
-  _cupsLangPuts(stderr, _("-v                      Be verbose"));
+  _cupsLangPuts(stdout, _("-v                      Be verbose"));
 
   exit(status);
 }
