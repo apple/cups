@@ -1139,7 +1139,7 @@ _cupsRasterWriteHeader(
                         r->header.cupsColorSpace == CUPS_CSPACE_RGB ? 5 :
                         r->header.cupsColorSpace == CUPS_CSPACE_CMYK ? 6 : 0;
     appleheader[2]  = r->header.Duplex ? (r->header.Tumble ? 2 : 3) : 1;
-    appleheader[3]  = r->header.cupsInteger[CUPS_RASTER_PWG_PrintQuality];
+    appleheader[3]  = (unsigned char)(r->header.cupsInteger[CUPS_RASTER_PWG_PrintQuality]);
     appleheader[5]  = (unsigned char)(r->header.MediaPosition);
     appleheader[12] = (unsigned char)(r->header.cupsWidth >> 24);
     appleheader[13] = (unsigned char)(r->header.cupsWidth >> 16);
@@ -1158,7 +1158,7 @@ _cupsRasterWriteHeader(
     {
       if (!strcmp(r->header.MediaType, apple_media_types[i]))
       {
-        appleheader[4] = i;
+        appleheader[4] = (unsigned char)i;
         break;
       }
     }
