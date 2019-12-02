@@ -5734,8 +5734,7 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
   * Handle HTTP Upgrade...
   */
 
-  if (!strcasecmp(httpGetField(client->http, HTTP_FIELD_CONNECTION),
-                        "Upgrade"))
+  if (!strcasecmp(httpGetField(client->http, HTTP_FIELD_CONNECTION), "Upgrade"))
   {
 #ifdef HAVE_SSL
     if (strstr(httpGetField(client->http, HTTP_FIELD_UPGRADE), "TLS/") != NULL && !httpIsEncrypted(client->http))
@@ -5854,32 +5853,44 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
 	    httpFlushWrite(client->http);
 	  }
 	}
-	else if (!strcmp(client->uri, "/"))
-	{
-	 /*
-	  * Show web status page...
-	  */
-
-          return (show_status(client));
-	}
-	else if (!strcmp(client->uri, "/media"))
-	{
-	 /*
-	  * Show web media page...
-	  */
-
-          return (show_media(client));
-	}
-	else if (!strcmp(client->uri, "/supplies"))
-	{
-	 /*
-	  * Show web supplies page...
-	  */
-
-          return (show_supplies(client));
-	}
 	else
-	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
+	{
+	 /*
+	  * Authenticate if needed...
+	  */
+
+	  if ((http_status = authenticate_request(client)) != HTTP_STATUS_CONTINUE)
+	  {
+	    return (respond_http(client, http_status, NULL, NULL, 0));
+	  }
+
+	  if (!strcmp(client->uri, "/"))
+	  {
+	   /*
+	    * Show web status page...
+	    */
+
+	    return (show_status(client));
+	  }
+	  else if (!strcmp(client->uri, "/media"))
+	  {
+	   /*
+	    * Show web media page...
+	    */
+
+	    return (show_media(client));
+	  }
+	  else if (!strcmp(client->uri, "/supplies"))
+	  {
+	   /*
+	    * Show web supplies page...
+	    */
+
+	    return (show_supplies(client));
+	  }
+	  else
+	    return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
+	}
 	break;
 
     case HTTP_STATE_POST :
