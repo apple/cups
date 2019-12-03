@@ -427,7 +427,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           case 'A' : /* -A (enable authentication) */
               if (!PAMService)
-                PAMService = "other";
+                PAMService = "cups";
 	      break;
 
           case 'D' : /* -D device-uri */
