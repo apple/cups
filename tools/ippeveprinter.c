@@ -759,6 +759,9 @@ authenticate_request(
 
   authorization = httpGetField(client->http, HTTP_FIELD_AUTHORIZATION);
 
+  if (!*authorization)
+    return (HTTP_STATUS_UNAUTHORIZED);
+
   if (strncmp(authorization, "Basic ", 6))
   {
     fputs("Unsupported scheme in Authorization header.\n", stderr);
@@ -1561,6 +1564,11 @@ create_printer(
     "none",
     "none"
   };
+  static const char * const uri_authentication_basic[] =
+  {					/* uri-authentication-supported values with authentication */
+    "basic",
+    "basic"
+  };
   static const char * const uri_security_supported[] =
   {					/* uri-security-supported values */
     "none",
@@ -1897,9 +1905,15 @@ create_printer(
 
   /* uri-authentication-supported */
 #ifdef HAVE_SSL
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", 2, NULL, uri_authentication_supported);
+  if (PAMService)
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", 2, NULL, uri_authentication_basic);
+  else
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", 2, NULL, uri_authentication_supported);
 #else
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", NULL, "none");
+  if (PAMService)
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", NULL, "basic");
+  else
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "uri-authentication-supported", NULL, "none");
 #endif /* HAVE_SSL */
 
   /* uri-security-supported */
@@ -5760,34 +5774,6 @@ process_http(ippeve_client_t *client)	/* I - Client connection */
   }
 
  /*
-  * Handle HTTP Expect...
-  */
-
-  if (httpGetExpect(client->http) &&
-      (client->operation == HTTP_STATE_POST ||
-       client->operation == HTTP_STATE_PUT))
-  {
-    if (httpGetExpect(client->http) == HTTP_STATUS_CONTINUE)
-    {
-     /*
-      * Send 100-continue header...
-      */
-
-      if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
-	return (0);
-    }
-    else
-    {
-     /*
-      * Send 417-expectation-failed header...
-      */
-
-      if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, NULL, 0))
-	return (0);
-    }
-  }
-
- /*
   * Handle new transfers...
   */
 
@@ -6102,14 +6088,44 @@ process_ipp(ippeve_client_t *client)	/* I - Client */
 		      name, ippGetString(uri, 0, NULL));
 	else if (client->operation_id != IPP_OP_GET_PRINTER_ATTRIBUTES && (status = authenticate_request(client)) != HTTP_STATUS_CONTINUE)
         {
+          httpFlush(client->http);
+
           return (respond_http(client, status, NULL, NULL, 0));
         }
         else
 	{
 	 /*
-	  * Try processing the operation...
+	  * Handle HTTP Expect...
 	  */
 
+	  if (httpGetExpect(client->http))
+	  {
+	    if (httpGetExpect(client->http) == HTTP_STATUS_CONTINUE)
+	    {
+	     /*
+	      * Send 100-continue header...
+	      */
+
+	      if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
+		return (0);
+	    }
+	    else
+	    {
+	     /*
+	      * Send 417-expectation-failed header...
+	      */
+
+	      if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, NULL, 0))
+		return (0);
+
+	      httpFlush(client->http);
+	      return (1);
+	    }
+	  }
+
+	 /*
+	  * Try processing the operation...
+	  */
 
 	  switch (client->operation_id)
 	  {
