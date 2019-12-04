@@ -27,6 +27,7 @@ Changes in CUPS v2.3.1
 - Log file access controls were not preserved by `cupsctl` (Issue #5677)
 - Default printers set with `lpoptions` did not work in all cases (Issue #5681,
   Issue #5683, Issue #5684)
+- Fixed an error in the jobs web interface template (Issue #5694)
 - The IPP backend did not detect all cases where a job should be retried using
 - Fixed a few issues with the Apple Raster support (rdar://55301114)
   a raster format (rdar://56021091)
