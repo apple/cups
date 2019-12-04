@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol support functions for CUPS.
  *
- * Copyright © 2007-2018 by Apple Inc.
+ * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1899,7 +1899,7 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 			       sizeof(ipp_finishings[0]))))
       return (ipp_finishings[enumvalue - 3]);
     else if (enumvalue >= 0x40000000 &&
-             enumvalue <= (0x40000000 + (int)(sizeof(ipp_finishings_vendor) /
+             enumvalue < (0x40000000 + (int)(sizeof(ipp_finishings_vendor) /
                                               sizeof(ipp_finishings_vendor[0]))))
       return (ipp_finishings_vendor[enumvalue - 0x40000000]);
   }
