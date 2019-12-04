@@ -2093,7 +2093,7 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
   {
     if (enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]))))
       return (ipp_finishings[enumvalue - 3]);
-    else if (enumvalue >= 0x40000000 && enumvalue <= (0x40000000 + (int)(sizeof(ipp_finishings_vendor) / sizeof(ipp_finishings_vendor[0]))))
+    else if (enumvalue >= 0x40000000 && enumvalue < (0x40000000 + (int)(sizeof(ipp_finishings_vendor) / sizeof(ipp_finishings_vendor[0]))))
       return (ipp_finishings_vendor[enumvalue - 0x40000000]);
   }
   else if ((!strcmp(attrname, "job-collation-type") || !strcmp(attrname, "job-collation-type-actual")) && enumvalue >= 3 && enumvalue < (3 + (int)(sizeof(ipp_job_collation_types) / sizeof(ipp_job_collation_types[0]))))
