@@ -15,6 +15,7 @@ Changes in CUPS v2.2.13
 - Default printers set with `lpoptions` did not work in all cases (Issue #5681,
   Issue #5683, Issue #5684)
 - Fixed an off-by-one error in `ippEnumString` (Issue #5695)
+- Fixed some new compiler warnings (Issue #5700)
 - Fixed a few issues with the Apple Raster support (rdar://55301114)
 - The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)

@@ -1056,7 +1056,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       * Send the control file...
       */
 
-      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", (int)strlen(control),
+      if (lpd_command(fd, "\002%d cfA%03d%.15s\n", (int)strlen(control),
                       (int)getpid() % 1000, localhost))
       {
 	close(fd);
@@ -1106,7 +1106,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       * Send the print file...
       */
 
-      if (lpd_command(fd, "\003" CUPS_LLFMT " dfA%03.3d%.15s\n",
+      if (lpd_command(fd, "\003" CUPS_LLFMT " dfA%03d%.15s\n",
                       CUPS_LLCAST filestats.st_size, (int)getpid() % 1000,
 		      localhost))
       {
@@ -1189,7 +1189,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       * Send control file...
       */
 
-      if (lpd_command(fd, "\002%d cfA%03.3d%.15s\n", (int)strlen(control),
+      if (lpd_command(fd, "\002%d cfA%03d%.15s\n", (int)strlen(control),
                       (int)getpid() % 1000, localhost))
       {
 	close(fd);
