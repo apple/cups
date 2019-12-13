@@ -16,9 +16,14 @@ ippeveprinter - an ipp everywhere printer application for cups
 ] [
 <b>--no-web-forms</b>
 ] [
+<b>--pam-service</b>
+<i>service</i>
+] [
 <b>--version</b>
 ] [
 <b>-2</b>
+] [
+<b>-A</b>
 ] [
 <b>-D</b>
 <i>device-uri</i>
@@ -87,10 +92,17 @@ The following options are recognized by
 <dd style="margin-left: 5.0em">Show program usage.
 <dt><b>--no-web-forms</b>
 <dd style="margin-left: 5.0em">Disable the web interface forms used to update the media and supply levels.
+<dt><b>--pam-service </b><i>service</i>
+<dd style="margin-left: 5.0em">Set the PAM service name.
+The default service is "cups".
 <dt><b>--version</b>
 <dd style="margin-left: 5.0em">Show the CUPS version.
 <dt><b>-2</b>
 <dd style="margin-left: 5.0em">Report support for two-sided (duplex) printing.
+<dt><b>-A</b>
+<dd style="margin-left: 5.0em">Enable authentication for the created printer.
+<b>ippeveprinter</b>
+uses PAM to authenticate HTTP Basic credentials.
 <dt><b>-D </b><i>device-uri</i>
 <dd style="margin-left: 5.0em">Set the device URI for print output.
 The URI can be a filename, directory, or a network socket URI of the form "socket://ADDRESS[:PORT]" (where the default port number is 9100).
@@ -149,6 +161,8 @@ command.
 <dt><b>-p </b><i>port</i>
 <dd style="margin-left: 5.0em">Specifies the port number to listen on.
 The default is a user-specific number from 8000 to 8999.
+<dt><b>-r</b><b>off</b>
+<dd style="margin-left: 5.0em">Turns off DNS-SD service advertisements entirely.
 <dt><b>-r </b><i>subtype[,subtype]</i>
 <dd style="margin-left: 5.0em">Specifies the DNS-SD subtype(s) to advertise.
 Separate multiple subtypes with a comma.
