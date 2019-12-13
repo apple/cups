@@ -233,7 +233,6 @@ main(int  argc,				/* I - Number of command-line args */
   int		waitjob,			/* Wait for job complete? */
 		waitjob_tries = 0,	/* Number of times we've waited */
 		waitprinter;		/* Wait for printer ready? */
-  time_t	waittime;		/* Wait time for held jobs */
   _cups_monitor_t monitor;		/* Monitoring data */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
   int		job_id;			/* job-id value */
@@ -2009,7 +2008,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for job to complete."));
 
-    for (delay = _cupsNextDelay(0, &prev_delay), waittime = time(NULL) + 30; !job_canceled;)
+    for (delay = _cupsNextDelay(0, &prev_delay); !job_canceled;)
     {
      /*
       * Check for side-channel requests...

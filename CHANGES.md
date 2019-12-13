@@ -31,8 +31,9 @@ Changes in CUPS v2.3.1
   Issue #5683, Issue #5684)
 - Fixed an error in the jobs web interface template (Issue #5694)
 - Fixed an off-by-one error in `ippEnumString` (Issue #5695)
-- The IPP backend did not detect all cases where a job should be retried using
+- Fixed some new compiler warnings (Issue #5700)
 - Fixed a few issues with the Apple Raster support (rdar://55301114)
+- The IPP backend did not detect all cases where a job should be retried using
   a raster format (rdar://56021091)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippeveprinter`.
