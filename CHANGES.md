@@ -1,4 +1,4 @@
-CHANGES - 2.3.1 - 2019-12-04
+CHANGES - 2.3.1 - 2019-12-13
 ============================
 
 
@@ -6,6 +6,8 @@ Changes in CUPS v2.3.1
 ----------------------
 
 - Documentation updates (Issue #5661, #5674, #5682)
+- CVE-2019-2228: The `ippSetValuetag` function did not validate the default
+  language value.
 - Fixed a crash bug in the web interface (Issue #5621)
 - The PPD cache code now looks up page sizes using their dimensions
   (Issue #5633)

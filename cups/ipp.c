@@ -4565,7 +4565,7 @@ ippSetValueTag(
           return (0);
 
         if (ipp->attrs && ipp->attrs->next && ipp->attrs->next->name &&
-            !strcmp(ipp->attrs->next->name, "attributes-natural-language"))
+            !strcmp(ipp->attrs->next->name, "attributes-natural-language") && (ipp->attrs->next->value_tag & IPP_TAG_CUPS_MASK) == IPP_TAG_LANGUAGE)
         {
          /*
           * Use the language code from the IPP message...
