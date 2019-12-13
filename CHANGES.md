@@ -1,10 +1,12 @@
-CHANGES - 2.2.13 - 2019-12-04
+CHANGES - 2.2.13 - 2019-12-13
 =============================
 
 
 Changes in CUPS v2.2.13
 -----------------------
 
+- CVE-2019-2228: The `ippSetValuetag` function did not validate the default
+  language value.
 - Added a workaround for the scheduler's systemd support (Issue #5640)
 - Fixed spelling of "fold-accordion".
 - Fixed the default common name for TLS certificates used by `ippserver`.
