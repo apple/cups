@@ -1,4 +1,4 @@
-README - CUPS v2.2.12 - 2019-08-15
+README - CUPS v2.2.13 - 2019-12-13
 ==================================
 
 Looking for compile instructions?  Read the file `INSTALL.md` instead...
