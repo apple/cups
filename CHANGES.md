@@ -1,5 +1,11 @@
-CHANGES - 2.3.1 - 2019-12-13
+CHANGES - 2.3.2 - 2019-12-18
 ============================
+
+
+Changes in CUPS v2.3.2
+----------------------
+
+- Localization updates.
 
 
 Changes in CUPS v2.3.1

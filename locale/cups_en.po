@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-08-23 09:13-0400\n"
+"POT-Creation-Date: 2019-12-18 18:02-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -1599,6 +1599,9 @@ msgstr "--no-web-forms          Disable web forms for media and supplies"
 msgid "--not expression        Unary NOT of expression"
 msgstr "--not expression        Unary NOT of expression"
 
+msgid "--pam-service service   Use the named PAM service"
+msgstr ""
+
 msgid "--path regex            Match resource path to regular expression"
 msgstr "--path regex            Match resource path to regular expression"
 
@@ -1773,6 +1776,9 @@ msgstr "-90"
 
 msgid "-95"
 msgstr "-95"
+
+msgid "-A                      Enable authentication"
+msgstr ""
 
 msgid "-C                      Send requests using chunking (default)"
 msgstr "-C                      Send requests using chunking (default)"
@@ -1954,6 +1960,9 @@ msgstr "-d destination          Set default destination"
 msgid "-d destination          Set the named destination as the server default"
 msgstr ""
 "-d destination          Set the named destination as the server default"
+
+msgid "-d destination          Specify the destination"
+msgstr ""
 
 msgid "-d name=value           Set named variable to value"
 msgstr "-d name=value           Set named variable to value"
@@ -2595,6 +2604,9 @@ msgstr "300 mm/sec."
 
 msgid "300dpi"
 msgstr "300dpi"
+
+msgid "30859 Paint Can Label"
+msgstr ""
 
 msgid "35"
 msgstr "35"
@@ -3245,6 +3257,9 @@ msgstr "Cut"
 msgid "Cutter"
 msgstr "Cutter"
 
+msgid "DYMO"
+msgstr ""
+
 msgid "Dark"
 msgstr "Dark"
 
@@ -3333,9 +3348,6 @@ msgstr "Draft"
 
 msgid "Duplexer"
 msgstr "Duplexer"
-
-msgid "Dymo"
-msgstr "Dymo"
 
 msgid "EPL1 Label Printer"
 msgstr "EPL1 Label Printer"
@@ -3994,6 +4006,9 @@ msgstr "Long-Edge (Portrait)"
 msgid "Looking for printer."
 msgstr "Looking for printer."
 
+msgid "Main Roll"
+msgstr ""
+
 msgid "Manual Feed"
 msgstr "Manual Feed"
 
@@ -4529,6 +4544,9 @@ msgstr "SEQUENCE uses indefinite length"
 
 msgid "SSL/TLS Negotiation Error"
 msgstr "SSL/TLS Negotiation Error"
+
+msgid "Second Roll (DUO/Twin Only)"
+msgstr ""
 
 msgid "See Other"
 msgstr "See Other"
@@ -9022,6 +9040,34 @@ msgstr "Cardstock"
 msgid "media-type.cd"
 msgstr "CD"
 
+#. TRANSLATORS: Photo Advanced Paper
+msgid "media-type.com.hp.advanced-photo"
+msgstr "Photo Advanced Paper"
+
+#. TRANSLATORS: Brochure Glossy Paper
+msgid "media-type.com.hp.brochure-glossy"
+msgstr "Brochure Glossy Paper"
+
+#. TRANSLATORS: Brochure Matte Paper
+msgid "media-type.com.hp.brochure-matte"
+msgstr "Brochure Matte Paper"
+
+#. TRANSLATORS: Everyday Glossy Paper
+msgid "media-type.com.hp.everyday-glossy"
+msgstr "Everyday Glossy Paper"
+
+#. TRANSLATORS: Everyday Matte Paper
+msgid "media-type.com.hp.everyday-matte"
+msgstr "Everyday Matte Paper"
+
+#. TRANSLATORS: Inkjet Premium Paper
+msgid "media-type.com.hp.premium-inkjet"
+msgstr "Inkjet Premium Paper"
+
+#. TRANSLATORS: Photo Premium Paper
+msgid "media-type.com.hp.premium-photo"
+msgstr "Photo Premium Paper"
+
 #. TRANSLATORS: Continuous
 msgid "media-type.continuous"
 msgstr "Continuous"
@@ -9213,6 +9259,14 @@ msgstr "Image Setter Paper"
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+#. TRANSLATORS: Photo Paper Plus Glossy II
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+#. TRANSLATORS: Photo Paper Pro Platinum
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 #. TRANSLATORS: Labels
 msgid "media-type.labels"
@@ -12870,15 +12924,15 @@ msgstr "Ink missing"
 msgid "printer-state-reasons.marker-opc-missing"
 msgstr "OPC missing"
 
-#. TRANSLATORS: Print ribbon Almost Empty
+#. TRANSLATORS: Marker Print Ribbon Almost Empty
 msgid "printer-state-reasons.marker-print-ribbon-almost-empty"
 msgstr "Print ribbon Almost Empty"
 
-#. TRANSLATORS: Print ribbon Empty
+#. TRANSLATORS: Marker Print Ribbon Empty
 msgid "printer-state-reasons.marker-print-ribbon-empty"
 msgstr "Print ribbon Empty"
 
-#. TRANSLATORS: Print ribbon Missing
+#. TRANSLATORS: Marker Print Ribbon Missing
 msgid "printer-state-reasons.marker-print-ribbon-missing"
 msgstr "Print ribbon missing"
 
@@ -15210,3 +15264,6 @@ msgstr "{}                      URI"
 
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr "~/.cups/lpoptions file names default destination that does not exist."
+
+#~ msgid "Dymo"
+#~ msgstr "Dymo"

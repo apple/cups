@@ -347,6 +347,7 @@
 "--name regex            Match service name to regular expression" = "--name regex            Match service name to regular expression";
 "--no-web-forms          Disable web forms for media and supplies" = "--no-web-forms          Disable web forms for media and supplies";
 "--not expression        Unary NOT of expression" = "--not expression        Unary NOT of expression";
+"--pam-service service   Use the named PAM service" = "--pam-service service   Use the named PAM service";
 "--path regex            Match resource path to regular expression" = "--path regex            Match resource path to regular expression";
 "--port number[-number]  Match port to number or range" = "--port number[-number]  Match port to number or range";
 "--print                 Print URI if true" = "--print                 Print URI if true";
@@ -402,6 +403,7 @@
 "-9" = "-9";
 "-90" = "-90";
 "-95" = "-95";
+"-A                      Enable authentication" = "-A                      Enable authentication";
 "-C                      Send requests using chunking (default)" = "-C                      Send requests using chunking (default)";
 "-D description          Specify the textual description of the printer" = "-D description          Specify the textual description of the printer";
 "-D device-uri           Set the device URI for the printer" = "-D device-uri           Set the device URI for the printer";
@@ -456,6 +458,7 @@
 "-d                      Show the default destination" = "-d                      Show the default destination";
 "-d destination          Set default destination" = "-d destination          Set default destination";
 "-d destination          Set the named destination as the server default" = "-d destination          Set the named destination as the server default";
+"-d destination          Specify the destination" = "-d destination          Specify the destination";
 "-d name=value           Set named variable to value" = "-d name=value           Set named variable to value";
 "-d regex                Match domain to regular expression" = "-d regex                Match domain to regular expression";
 "-d spool-directory      Set spool directory" = "-d spool-directory      Set spool directory";
@@ -649,6 +652,7 @@
 "30 mm/sec." = "30 mm/sec.";
 "300 mm/sec." = "300 mm/sec.";
 "300dpi" = "300dpi";
+"30859 Paint Can Label" = "30859 Paint Can Label";
 "35" = "35";
 "360dpi" = "360dpi";
 "360x180dpi" = "360x180dpi";
@@ -854,6 +858,7 @@
 "CustominTearInterval" = "CustominTearInterval";
 "Cut" = "Cut";
 "Cutter" = "Cutter";
+"DYMO" = "DYMO";
 "Dark" = "Dark";
 "Darkness" = "Darkness";
 "Data file sent successfully." = "Data file sent successfully.";
@@ -877,7 +882,6 @@
 "Document #%d does not exist in job #%d." = "Document #%d does not exist in job #%d.";
 "Draft" = "Draft";
 "Duplexer" = "Duplexer";
-"Dymo" = "Dymo";
 "EPL1 Label Printer" = "EPL1 Label Printer";
 "EPL2 Label Printer" = "EPL2 Label Printer";
 "Edit Configuration File" = "Edit Configuration File";
@@ -1086,6 +1090,7 @@
 "Local printer created." = "Local printer created.";
 "Long-Edge (Portrait)" = "Long-Edge (Portrait)";
 "Looking for printer." = "Looking for printer.";
+"Main Roll" = "Main Roll";
 "Manual Feed" = "Manual Feed";
 "Media Size" = "Media Size";
 "Media Source" = "Media Source";
@@ -1258,6 +1263,7 @@
 "Rewind" = "Rewind";
 "SEQUENCE uses indefinite length" = "SEQUENCE uses indefinite length";
 "SSL/TLS Negotiation Error" = "SSL/TLS Negotiation Error";
+"Second Roll (DUO/Twin Only)" = "Second Roll (DUO/Twin Only)";
 "See Other" = "See Other";
 "See remote printer." = "See remote printer.";
 "Self-signed credentials are blocked." = "Self-signed credentials are blocked.";
@@ -2358,7 +2364,7 @@
 // TRANSLATORS: Job Accounting User ID
 "job-accounting-user-id" = "Job Accounting User ID";
 // TRANSLATORS: Job Cancel After
-"job-cancel-after" = "job-cancel-after";
+"job-cancel-after" = "Cancel job after";
 // TRANSLATORS: Copies
 "job-copies" = "Copies";
 // TRANSLATORS: Back Cover
@@ -2469,21 +2475,21 @@
 // TRANSLATORS: Job Recipient Name
 "job-recipient-name" = "Job Recipient Name";
 // TRANSLATORS: Job Retain Until
-"job-retain-until" = "job-retain-until";
+"job-retain-until" = "Retain job until";
 // TRANSLATORS: Job Retain Until Interval
-"job-retain-until-interval" = "job-retain-until-interval";
+"job-retain-until-interval" = "Retain job until interval";
 // TRANSLATORS: Job Retain Until Time
-"job-retain-until-time" = "job-retain-until-time";
+"job-retain-until-time" = "Retain job until time";
 // TRANSLATORS: End Of Day
-"job-retain-until.end-of-day" = "job-retain-until.end-of-day";
+"job-retain-until.end-of-day" = "End of day";
 // TRANSLATORS: End Of Month
-"job-retain-until.end-of-month" = "job-retain-until.end-of-month";
+"job-retain-until.end-of-month" = "End of month";
 // TRANSLATORS: End Of Week
-"job-retain-until.end-of-week" = "job-retain-until.end-of-week";
+"job-retain-until.end-of-week" = "End of week";
 // TRANSLATORS: Indefinite
-"job-retain-until.indefinite" = "job-retain-until.indefinite";
+"job-retain-until.indefinite" = "Indefinitely";
 // TRANSLATORS: None
-"job-retain-until.none" = "job-retain-until.none";
+"job-retain-until.none" = "Never";
 // TRANSLATORS: Job Save Disposition
 "job-save-disposition" = "Job Save Disposition";
 // TRANSLATORS: Job Sheet Message
@@ -3207,6 +3213,20 @@
 "media-type.cardstock" = "Cardstock";
 // TRANSLATORS: CD
 "media-type.cd" = "CD";
+// TRANSLATORS: Photo Advanced Paper
+"media-type.com.hp.advanced-photo" = "Photo Advanced Paper";
+// TRANSLATORS: Brochure Glossy Paper
+"media-type.com.hp.brochure-glossy" = "Brochure Glossy Paper";
+// TRANSLATORS: Brochure Matte Paper
+"media-type.com.hp.brochure-matte" = "Brochure Matte Paper";
+// TRANSLATORS: Everyday Glossy Paper
+"media-type.com.hp.everyday-glossy" = "Everyday Glossy Paper";
+// TRANSLATORS: Everyday Matte Paper
+"media-type.com.hp.everyday-matte" = "Everyday Matte Paper";
+// TRANSLATORS: Inkjet Premium Paper
+"media-type.com.hp.premium-inkjet" = "Inkjet Premium Paper";
+// TRANSLATORS: Photo Premium Paper
+"media-type.com.hp.premium-photo" = "Photo Premium Paper";
 // TRANSLATORS: Continuous
 "media-type.continuous" = "Continuous";
 // TRANSLATORS: Continuous Long
@@ -3303,6 +3323,10 @@
 "media-type.image-setter-paper" = "Image Setter Paper";
 // TRANSLATORS: Imaging Cylinder
 "media-type.imaging-cylinder" = "Imaging Cylinder";
+// TRANSLATORS: Photo Paper Plus Glossy II
+"media-type.jp.co.canon_photo-paper-plus-glossy-ii" = "Photo Paper Plus Glossy II";
+// TRANSLATORS: Photo Paper Pro Platinum
+"media-type.jp.co.canon_photo-paper-pro-platinum" = "Photo Paper Pro Platinum";
 // TRANSLATORS: Labels
 "media-type.labels" = "Labels";
 // TRANSLATORS: Colored Labels
@@ -3622,7 +3646,7 @@
 // TRANSLATORS: Envelope Chou 3
 "media.jpn_chou3_120x235mm" = "Envelope Chou 3";
 // TRANSLATORS: Envelope Chou 40
-"media.jpn_chou40_90x225mm" = "media.jpn_chou40_90x225mm";
+"media.jpn_chou40_90x225mm" = "Envelope Chou 40";
 // TRANSLATORS: Envelope Chou 4
 "media.jpn_chou4_90x205mm" = "Envelope Chou 4";
 // TRANSLATORS: Hagaki
@@ -4265,13 +4289,13 @@
 // TRANSLATORS: Print Optimization
 "print-content-optimize" = "Print Optimization";
 // TRANSLATORS: Print Content Optimize Actual
-"print-content-optimize-actual" = "print-content-optimize-actual";
+"print-content-optimize-actual" = "Print Optimization";
 // TRANSLATORS: Automatic
 "print-content-optimize.auto" = "Automatic";
 // TRANSLATORS: Graphics
 "print-content-optimize.graphic" = "Graphics";
 // TRANSLATORS: Graphics
-"print-content-optimize.graphics" = "print-content-optimize.graphics";
+"print-content-optimize.graphics" = "Graphics";
 // TRANSLATORS: Photo
 "print-content-optimize.photo" = "Photo";
 // TRANSLATORS: Text
@@ -4279,7 +4303,7 @@
 // TRANSLATORS: Text and Graphics
 "print-content-optimize.text-and-graphic" = "Text and Graphics";
 // TRANSLATORS: Text And Graphics
-"print-content-optimize.text-and-graphics" = "print-content-optimize.text-and-graphics";
+"print-content-optimize.text-and-graphics" = "Text and Graphics";
 // TRANSLATORS: Print Objects
 "print-objects" = "Print Objects";
 // TRANSLATORS: Print Quality
@@ -4334,25 +4358,25 @@
 "printer %s/%s is idle.  enabled since %s" = "printer %s/%s is idle.  enabled since %s";
 "printer %s/%s now printing %s-%d.  enabled since %s" = "printer %s/%s now printing %s-%d.  enabled since %s";
 // TRANSLATORS: Printer Kind
-"printer-kind" = "printer-kind";
+"printer-kind" = "Printer Kind";
 // TRANSLATORS: Disc
-"printer-kind.disc" = "printer-kind.disc";
+"printer-kind.disc" = "Disc";
 // TRANSLATORS: Document
-"printer-kind.document" = "printer-kind.document";
+"printer-kind.document" = "Document";
 // TRANSLATORS: Envelope
-"printer-kind.envelope" = "printer-kind.envelope";
+"printer-kind.envelope" = "Envelope";
 // TRANSLATORS: Label
-"printer-kind.label" = "printer-kind.label";
+"printer-kind.label" = "Label";
 // TRANSLATORS: Large Format
-"printer-kind.large-format" = "printer-kind.large-format";
+"printer-kind.large-format" = "Large format";
 // TRANSLATORS: Photo
-"printer-kind.photo" = "printer-kind.photo";
+"printer-kind.photo" = "Photo";
 // TRANSLATORS: Postcard
-"printer-kind.postcard" = "printer-kind.postcard";
+"printer-kind.postcard" = "Postcard";
 // TRANSLATORS: Receipt
-"printer-kind.receipt" = "printer-kind.receipt";
+"printer-kind.receipt" = "Receipt";
 // TRANSLATORS: Roll
-"printer-kind.roll" = "printer-kind.roll";
+"printer-kind.roll" = "Roll";
 // TRANSLATORS: Message From Operator
 "printer-message-from-operator" = "Message From Operator";
 // TRANSLATORS: Print Resolution
@@ -4624,15 +4648,15 @@
 // TRANSLATORS: Fan Failure
 "printer-state-reasons.fan-failure" = "Fan Failure";
 // TRANSLATORS: Fax Modem Life Almost Over
-"printer-state-reasons.fax-modem-life-almost-over" = "printer-state-reasons.fax-modem-life-almost-over";
+"printer-state-reasons.fax-modem-life-almost-over" = "Fax Modem Life Almost Over";
 // TRANSLATORS: Fax Modem Life Over
-"printer-state-reasons.fax-modem-life-over" = "printer-state-reasons.fax-modem-life-over";
+"printer-state-reasons.fax-modem-life-over" = "Fax Modem Life Over";
 // TRANSLATORS: Fax Modem Missing
-"printer-state-reasons.fax-modem-missing" = "printer-state-reasons.fax-modem-missing";
+"printer-state-reasons.fax-modem-missing" = "Fax Modem Missing";
 // TRANSLATORS: Fax Modem Turned Off
-"printer-state-reasons.fax-modem-turned-off" = "printer-state-reasons.fax-modem-turned-off";
+"printer-state-reasons.fax-modem-turned-off" = "Fax Modem Turned Off";
 // TRANSLATORS: Fax Modem Turned On
-"printer-state-reasons.fax-modem-turned-on" = "printer-state-reasons.fax-modem-turned-on";
+"printer-state-reasons.fax-modem-turned-on" = "Fax Modem Turned On";
 // TRANSLATORS: Folder Added
 "printer-state-reasons.folder-added" = "Folder Added";
 // TRANSLATORS: Folder Almost Empty
@@ -4796,23 +4820,23 @@
 // TRANSLATORS: Input Media Size Change
 "printer-state-reasons.input-media-size-change" = "Input Media Size Change";
 // TRANSLATORS: Input Media Tray Failure
-"printer-state-reasons.input-media-tray-failure" = "printer-state-reasons.input-media-tray-failure";
+"printer-state-reasons.input-media-tray-failure" = "Input Media Tray Failure";
 // TRANSLATORS: Input Media Tray Feed Error
-"printer-state-reasons.input-media-tray-feed-error" = "printer-state-reasons.input-media-tray-feed-error";
+"printer-state-reasons.input-media-tray-feed-error" = "Input Media Tray Feed Error";
 // TRANSLATORS: Input Media Tray Jam
-"printer-state-reasons.input-media-tray-jam" = "printer-state-reasons.input-media-tray-jam";
+"printer-state-reasons.input-media-tray-jam" = "Input Media Tray Jam";
 // TRANSLATORS: Input Media Type Change
 "printer-state-reasons.input-media-type-change" = "Input Media Type Change";
 // TRANSLATORS: Input Media Weight Change
 "printer-state-reasons.input-media-weight-change" = "Input Media Weight Change";
 // TRANSLATORS: Input Pick Roller Failure
-"printer-state-reasons.input-pick-roller-failure" = "printer-state-reasons.input-pick-roller-failure";
+"printer-state-reasons.input-pick-roller-failure" = "Input Pick Roller Failure";
 // TRANSLATORS: Input Pick Roller Life Over
-"printer-state-reasons.input-pick-roller-life-over" = "printer-state-reasons.input-pick-roller-life-over";
+"printer-state-reasons.input-pick-roller-life-over" = "Input Pick Roller Life Over";
 // TRANSLATORS: Input Pick Roller Life Warn
-"printer-state-reasons.input-pick-roller-life-warn" = "printer-state-reasons.input-pick-roller-life-warn";
+"printer-state-reasons.input-pick-roller-life-warn" = "Input Pick Roller Life Warn";
 // TRANSLATORS: Input Pick Roller Missing
-"printer-state-reasons.input-pick-roller-missing" = "printer-state-reasons.input-pick-roller-missing";
+"printer-state-reasons.input-pick-roller-missing" = "Input Pick Roller Missing";
 // TRANSLATORS: Input Tray Elevation Failure
 "printer-state-reasons.input-tray-elevation-failure" = "Input Tray Elevation Failure";
 // TRANSLATORS: Paper tray is missing
@@ -4998,63 +5022,63 @@
 // TRANSLATORS: Marker Adjusting Print Quality
 "printer-state-reasons.marker-adjusting-print-quality" = "Marker Adjusting Print Quality";
 // TRANSLATORS: Marker Cleaner Missing
-"printer-state-reasons.marker-cleaner-missing" = "printer-state-reasons.marker-cleaner-missing";
+"printer-state-reasons.marker-cleaner-missing" = "Marker Cleaner Missing";
 // TRANSLATORS: Marker Developer Almost Empty
 "printer-state-reasons.marker-developer-almost-empty" = "Marker Developer Almost Empty";
 // TRANSLATORS: Marker Developer Empty
 "printer-state-reasons.marker-developer-empty" = "Marker Developer Empty";
 // TRANSLATORS: Marker Developer Missing
-"printer-state-reasons.marker-developer-missing" = "printer-state-reasons.marker-developer-missing";
+"printer-state-reasons.marker-developer-missing" = "Marker Developer Missing";
 // TRANSLATORS: Marker Fuser Missing
-"printer-state-reasons.marker-fuser-missing" = "printer-state-reasons.marker-fuser-missing";
+"printer-state-reasons.marker-fuser-missing" = "Marker Fuser Missing";
 // TRANSLATORS: Marker Fuser Thermistor Failure
 "printer-state-reasons.marker-fuser-thermistor-failure" = "Marker Fuser Thermistor Failure";
 // TRANSLATORS: Marker Fuser Timing Failure
 "printer-state-reasons.marker-fuser-timing-failure" = "Marker Fuser Timing Failure";
 // TRANSLATORS: Marker Ink Almost Empty
-"printer-state-reasons.marker-ink-almost-empty" = "Marker Ink Almost Empty";
+"printer-state-reasons.marker-ink-almost-empty" = "Low ink";
 // TRANSLATORS: Marker Ink Empty
-"printer-state-reasons.marker-ink-empty" = "Marker Ink Empty";
+"printer-state-reasons.marker-ink-empty" = "Ink empty";
 // TRANSLATORS: Marker Ink Missing
-"printer-state-reasons.marker-ink-missing" = "printer-state-reasons.marker-ink-missing";
+"printer-state-reasons.marker-ink-missing" = "Ink missing";
 // TRANSLATORS: Marker Opc Missing
-"printer-state-reasons.marker-opc-missing" = "printer-state-reasons.marker-opc-missing";
+"printer-state-reasons.marker-opc-missing" = "OPC missing";
 // TRANSLATORS: Marker Print Ribbon Almost Empty
-"printer-state-reasons.marker-print-ribbon-almost-empty" = "Marker Print Ribbon Almost Empty";
+"printer-state-reasons.marker-print-ribbon-almost-empty" = "Print ribbon Almost Empty";
 // TRANSLATORS: Marker Print Ribbon Empty
-"printer-state-reasons.marker-print-ribbon-empty" = "Marker Print Ribbon Empty";
+"printer-state-reasons.marker-print-ribbon-empty" = "Print ribbon Empty";
 // TRANSLATORS: Marker Print Ribbon Missing
-"printer-state-reasons.marker-print-ribbon-missing" = "printer-state-reasons.marker-print-ribbon-missing";
+"printer-state-reasons.marker-print-ribbon-missing" = "Print ribbon missing";
 // TRANSLATORS: Marker Supply Almost Empty
-"printer-state-reasons.marker-supply-almost-empty" = "printer-state-reasons.marker-supply-almost-empty";
+"printer-state-reasons.marker-supply-almost-empty" = "Ink/toner almost empty";
 // TRANSLATORS: Ink/toner empty
-"printer-state-reasons.marker-supply-empty" = "Marker Supply Empty";
+"printer-state-reasons.marker-supply-empty" = "Ink/toner empty";
 // TRANSLATORS: Ink/toner low
-"printer-state-reasons.marker-supply-low" = "Marker Supply Low";
+"printer-state-reasons.marker-supply-low" = "Ink/toner low";
 // TRANSLATORS: Marker Supply Missing
-"printer-state-reasons.marker-supply-missing" = "printer-state-reasons.marker-supply-missing";
+"printer-state-reasons.marker-supply-missing" = "Ink/toner missing";
 // TRANSLATORS: Marker Toner Cartridge Missing
-"printer-state-reasons.marker-toner-cartridge-missing" = "Marker Toner Cartridge Missing";
+"printer-state-reasons.marker-toner-cartridge-missing" = "Toner cartridge missing";
 // TRANSLATORS: Marker Toner Missing
-"printer-state-reasons.marker-toner-missing" = "printer-state-reasons.marker-toner-missing";
+"printer-state-reasons.marker-toner-missing" = "Toner missing";
 // TRANSLATORS: Ink/toner waste bin almost full
-"printer-state-reasons.marker-waste-almost-full" = "Marker Waste Almost Full";
+"printer-state-reasons.marker-waste-almost-full" = "Ink/toner waste bin almost full";
 // TRANSLATORS: Ink/toner waste bin full
-"printer-state-reasons.marker-waste-full" = "Marker Waste Full";
+"printer-state-reasons.marker-waste-full" = "Ink/toner waste bin full";
 // TRANSLATORS: Marker Waste Ink Receptacle Almost Full
 "printer-state-reasons.marker-waste-ink-receptacle-almost-full" = "Marker Waste Ink Receptacle Almost Full";
 // TRANSLATORS: Marker Waste Ink Receptacle Full
 "printer-state-reasons.marker-waste-ink-receptacle-full" = "Marker Waste Ink Receptacle Full";
 // TRANSLATORS: Marker Waste Ink Receptacle Missing
-"printer-state-reasons.marker-waste-ink-receptacle-missing" = "printer-state-reasons.marker-waste-ink-receptacle-missing";
+"printer-state-reasons.marker-waste-ink-receptacle-missing" = "Marker Waste Ink Receptacle Missing";
 // TRANSLATORS: Marker Waste Missing
-"printer-state-reasons.marker-waste-missing" = "printer-state-reasons.marker-waste-missing";
+"printer-state-reasons.marker-waste-missing" = "Ink/toner waste bin missing";
 // TRANSLATORS: Marker Waste Toner Receptacle Almost Full
 "printer-state-reasons.marker-waste-toner-receptacle-almost-full" = "Marker Waste Toner Receptacle Almost Full";
 // TRANSLATORS: Marker Waste Toner Receptacle Full
 "printer-state-reasons.marker-waste-toner-receptacle-full" = "Marker Waste Toner Receptacle Full";
 // TRANSLATORS: Marker Waste Toner Receptacle Missing
-"printer-state-reasons.marker-waste-toner-receptacle-missing" = "printer-state-reasons.marker-waste-toner-receptacle-missing";
+"printer-state-reasons.marker-waste-toner-receptacle-missing" = "Marker Waste Toner Receptacle Missing";
 // TRANSLATORS: Material Empty
 "printer-state-reasons.material-empty" = "Material Empty";
 // TRANSLATORS: Material Low

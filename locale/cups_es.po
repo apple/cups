@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-08-23 09:13-0400\n"
+"POT-Creation-Date: 2019-12-18 18:02-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1582,6 +1582,9 @@ msgstr ""
 msgid "--not expression        Unary NOT of expression"
 msgstr ""
 
+msgid "--pam-service service   Use the named PAM service"
+msgstr ""
+
 msgid "--path regex            Match resource path to regular expression"
 msgstr ""
 
@@ -1752,6 +1755,9 @@ msgstr "-90"
 msgid "-95"
 msgstr "-95"
 
+msgid "-A                      Enable authentication"
+msgstr ""
+
 msgid "-C                      Send requests using chunking (default)"
 msgstr ""
 
@@ -1921,6 +1927,9 @@ msgid "-d destination          Set default destination"
 msgstr ""
 
 msgid "-d destination          Set the named destination as the server default"
+msgstr ""
+
+msgid "-d destination          Specify the destination"
 msgstr ""
 
 msgid "-d name=value           Set named variable to value"
@@ -2531,6 +2540,9 @@ msgstr "300 mm/seg"
 
 msgid "300dpi"
 msgstr "300ppp"
+
+msgid "30859 Paint Can Label"
+msgstr ""
 
 msgid "35"
 msgstr "35"
@@ -3182,6 +3194,9 @@ msgstr "Cortar"
 msgid "Cutter"
 msgstr "Cortadora"
 
+msgid "DYMO"
+msgstr ""
+
 msgid "Dark"
 msgstr "Oscuro"
 
@@ -3270,9 +3285,6 @@ msgstr "Borrador"
 
 msgid "Duplexer"
 msgstr "Unidad de impresión dúplex"
-
-msgid "Dymo"
-msgstr "Dymo"
 
 msgid "EPL1 Label Printer"
 msgstr "Impresora de etiquetas EPL1"
@@ -3928,6 +3940,9 @@ msgstr "Lado largo (retrato)"
 msgid "Looking for printer."
 msgstr ""
 
+msgid "Main Roll"
+msgstr ""
+
 msgid "Manual Feed"
 msgstr "Alimentación manual"
 
@@ -4464,6 +4479,9 @@ msgstr "SEQUENCE usa una longitud indefinida"
 
 msgid "SSL/TLS Negotiation Error"
 msgstr "Error en negociación SSL/TLS"
+
+msgid "Second Roll (DUO/Twin Only)"
+msgstr ""
 
 msgid "See Other"
 msgstr "Ver otros"
@@ -8953,6 +8971,34 @@ msgstr ""
 msgid "media-type.cd"
 msgstr ""
 
+#. TRANSLATORS: Photo Advanced Paper
+msgid "media-type.com.hp.advanced-photo"
+msgstr ""
+
+#. TRANSLATORS: Brochure Glossy Paper
+msgid "media-type.com.hp.brochure-glossy"
+msgstr ""
+
+#. TRANSLATORS: Brochure Matte Paper
+msgid "media-type.com.hp.brochure-matte"
+msgstr ""
+
+#. TRANSLATORS: Everyday Glossy Paper
+msgid "media-type.com.hp.everyday-glossy"
+msgstr ""
+
+#. TRANSLATORS: Everyday Matte Paper
+msgid "media-type.com.hp.everyday-matte"
+msgstr ""
+
+#. TRANSLATORS: Inkjet Premium Paper
+msgid "media-type.com.hp.premium-inkjet"
+msgstr ""
+
+#. TRANSLATORS: Photo Premium Paper
+msgid "media-type.com.hp.premium-photo"
+msgstr ""
+
 #. TRANSLATORS: Continuous
 msgid "media-type.continuous"
 msgstr ""
@@ -9143,6 +9189,14 @@ msgstr ""
 
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
+msgstr ""
+
+#. TRANSLATORS: Photo Paper Plus Glossy II
+msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
+msgstr ""
+
+#. TRANSLATORS: Photo Paper Pro Platinum
+msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
 msgstr ""
 
 #. TRANSLATORS: Labels
@@ -15171,6 +15225,9 @@ msgstr ""
 #~ msgstr ""
 #~ "Se requiere un nombre de usuario Samba para exportar los controladores de "
 #~ "impresora"
+
+#~ msgid "Dymo"
+#~ msgstr "Dymo"
 
 #~ msgid "Export Printers to Samba"
 #~ msgstr "Exportar impresoras a Samba"

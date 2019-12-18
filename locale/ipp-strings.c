@@ -1578,6 +1578,20 @@ _("media-type.cardboard");
 _("media-type.cardstock");
 /* TRANSLATORS: CD */
 _("media-type.cd");
+/* TRANSLATORS: Photo Advanced Paper */
+_("media-type.com.hp.advanced-photo");
+/* TRANSLATORS: Brochure Glossy Paper */
+_("media-type.com.hp.brochure-glossy");
+/* TRANSLATORS: Brochure Matte Paper */
+_("media-type.com.hp.brochure-matte");
+/* TRANSLATORS: Everyday Glossy Paper */
+_("media-type.com.hp.everyday-glossy");
+/* TRANSLATORS: Everyday Matte Paper */
+_("media-type.com.hp.everyday-matte");
+/* TRANSLATORS: Inkjet Premium Paper */
+_("media-type.com.hp.premium-inkjet");
+/* TRANSLATORS: Photo Premium Paper */
+_("media-type.com.hp.premium-photo");
 /* TRANSLATORS: Continuous */
 _("media-type.continuous");
 /* TRANSLATORS: Continuous Long */
@@ -1674,6 +1688,10 @@ _("media-type.gravure-cylinder");
 _("media-type.image-setter-paper");
 /* TRANSLATORS: Imaging Cylinder */
 _("media-type.imaging-cylinder");
+/* TRANSLATORS: Photo Paper Plus Glossy II*/
+_("media-type.jp.co.canon_photo-paper-plus-glossy-ii");
+/* TRANSLATORS: Photo Paper Pro Platinum*/
+_("media-type.jp.co.canon_photo-paper-pro-platinum");
 /* TRANSLATORS: Labels */
 _("media-type.labels");
 /* TRANSLATORS: Colored Labels */
