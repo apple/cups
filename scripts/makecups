@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# Script to configure and make CUPS with the standard build options.  When no
+# targets are specified, the "clean" and "check" targets are used.
+#
+# Usage:
+#
+#   scripts/makecups [configure option(s)] [make target(s)]
+#
+
+# Scan the command-line arguments...
+confopts="--enable-debug --enable-debug-guards --enable-debug-printfs --enable-sanitizer --enable-unit-tests"
+makeopts=""
+
+while test $# -gt 0; do
+	opt="$1"
+	shift
+
+	case "$opt" in
+		-*)
+			confopts="$confopts $opt"
+			;;
+		*)
+			makeopts="$makeopts $opt"
+			;;
+	esac
+done
+
+if test "x$makeopts" = x; then
+	makeopts="clean check"
+fi
+
+case "`uname`" in
+	Darwin)
+		makeopts="-j`sysctl -n hw.activecpu` $makeopts"
+		;;
+	Linux*)
+		ASAN_OPTIONS="leak_check_at_exit=false"; export ASAN_OPTIONS
+		;;
+esac
+
+# Run the configure script...
+echo ./configure $confopts
+./configure $confopts || exit 1
+
+# Build the software...
+echo make $makeopts
+make $makeopts
