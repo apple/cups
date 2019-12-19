@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-12-18 19:46-0500\n"
+"POT-Creation-Date: 2019-12-18 20:19-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -9095,6 +9095,10 @@ msgstr "Inkjet Premium Paper"
 #. TRANSLATORS: Photo Premium Paper
 msgid "media-type.com.hp.premium-photo"
 msgstr "Photo Premium Paper"
+
+#. TRANSLATORS: Premium Matte Presentation Paper
+msgid "media-type.com.hp.premium-presentation-matte"
+msgstr "Premium Matte Presentation Paper"
 
 #. TRANSLATORS: Continuous
 msgid "media-type.continuous"

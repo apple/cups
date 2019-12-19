@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-12-18 19:46-0500\n"
+"POT-Creation-Date: 2019-12-18 20:19-0500\n"
 "PO-Revision-Date: 2017-10-25 14:57+0200\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: German <LL@li.org>\n"
@@ -8915,6 +8915,10 @@ msgstr ""
 
 #. TRANSLATORS: Photo Premium Paper
 msgid "media-type.com.hp.premium-photo"
+msgstr ""
+
+#. TRANSLATORS: Premium Matte Presentation Paper
+msgid "media-type.com.hp.premium-presentation-matte"
 msgstr ""
 
 #. TRANSLATORS: Continuous

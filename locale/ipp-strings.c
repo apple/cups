@@ -1606,6 +1606,8 @@ _("media-type.com.hp.mid-weight");
 _("media-type.com.hp.premium-inkjet");
 /* TRANSLATORS: Photo Premium Paper */
 _("media-type.com.hp.premium-photo");
+/* TRANSLATORS: Premium Matte Presentation Paper */
+_("media-type.com.hp.premium-presentation-matte");
 /* TRANSLATORS: Continuous */
 _("media-type.continuous");
 /* TRANSLATORS: Continuous Long */
