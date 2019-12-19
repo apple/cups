@@ -2120,6 +2120,10 @@
 "finishing-template.trim-after-job" = "Trim After Job";
 // TRANSLATORS: Trim After Every Page
 "finishing-template.trim-after-pages" = "Trim After Every Page";
+// TRANSLATORS: Trim After Every Set
+"finishing-template.trim-after-sets" = "finishing-template.trim-after-sets";
+// TRANSLATORS: Trim After Every Page
+"finishing-template.trim-after-sheets" = "finishing-template.trim-after-sheets";
 // TRANSLATORS: Finishings
 "finishings" = "Finishings";
 // TRANSLATORS: Finishings
@@ -3219,10 +3223,20 @@
 "media-type.com.hp.brochure-glossy" = "Brochure Glossy Paper";
 // TRANSLATORS: Brochure Matte Paper
 "media-type.com.hp.brochure-matte" = "Brochure Matte Paper";
+// TRANSLATORS: Matte Coverstock
+"media-type.com.hp.cover-matte" = "Matte Coverstock";
+// TRANSLATORS: EcoSMART Lite Paper
+"media-type.com.hp.ecosmart-lite" = "EcoSMART Lite Paper";
 // TRANSLATORS: Everyday Glossy Paper
 "media-type.com.hp.everyday-glossy" = "Everyday Glossy Paper";
 // TRANSLATORS: Everyday Matte Paper
 "media-type.com.hp.everyday-matte" = "Everyday Matte Paper";
+// TRANSLATORS: Extra Heavyweight Paper
+"media-type.com.hp.extra-heavy" = "Extra Heavyweight Paper";
+// TRANSLATORS: Intermediate Paper
+"media-type.com.hp.intermediate" = "Intermediate Paper";
+// TRANSLATORS: Mid-Weight Paper
+"media-type.com.hp.mid-weight" = "Mid-Weight Paper";
 // TRANSLATORS: Inkjet Premium Paper
 "media-type.com.hp.premium-inkjet" = "Inkjet Premium Paper";
 // TRANSLATORS: Photo Premium Paper
@@ -3323,6 +3337,10 @@
 "media-type.image-setter-paper" = "Image Setter Paper";
 // TRANSLATORS: Imaging Cylinder
 "media-type.imaging-cylinder" = "Imaging Cylinder";
+// TRANSLATORS: Photo Paper Plus Glossy II
+"media-type.jp.co.canon-photo-paper-plus-glossy-ii" = "Photo Paper Plus Glossy II";
+// TRANSLATORS: Photo Paper Pro Platinum
+"media-type.jp.co.canon-photo-paper-pro-platinum" = "Photo Paper Pro Platinum";
 // TRANSLATORS: Photo Paper Plus Glossy II
 "media-type.jp.co.canon_photo-paper-plus-glossy-ii" = "Photo Paper Plus Glossy II";
 // TRANSLATORS: Photo Paper Pro Platinum

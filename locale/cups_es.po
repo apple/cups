@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-12-18 18:02-0500\n"
+"POT-Creation-Date: 2019-12-18 19:46-0500\n"
 "PO-Revision-Date: 2016-06-26 21:17+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <jpgriopedre@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -6630,6 +6630,14 @@ msgstr ""
 msgid "finishing-template.trim-after-pages"
 msgstr ""
 
+#. TRANSLATORS: Trim After Every Set
+msgid "finishing-template.trim-after-sets"
+msgstr ""
+
+#. TRANSLATORS: Trim After Every Page
+msgid "finishing-template.trim-after-sheets"
+msgstr ""
+
 #. TRANSLATORS: Finishings
 msgid "finishings"
 msgstr ""
@@ -8983,12 +8991,32 @@ msgstr ""
 msgid "media-type.com.hp.brochure-matte"
 msgstr ""
 
+#. TRANSLATORS: Matte Coverstock
+msgid "media-type.com.hp.cover-matte"
+msgstr ""
+
+#. TRANSLATORS: EcoSMART Lite Paper
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr ""
+
 #. TRANSLATORS: Everyday Glossy Paper
 msgid "media-type.com.hp.everyday-glossy"
 msgstr ""
 
 #. TRANSLATORS: Everyday Matte Paper
 msgid "media-type.com.hp.everyday-matte"
+msgstr ""
+
+#. TRANSLATORS: Extra Heavyweight Paper
+msgid "media-type.com.hp.extra-heavy"
+msgstr ""
+
+#. TRANSLATORS: Intermediate Paper
+msgid "media-type.com.hp.intermediate"
+msgstr ""
+
+#. TRANSLATORS: Mid-Weight Paper
+msgid "media-type.com.hp.mid-weight"
 msgstr ""
 
 #. TRANSLATORS: Inkjet Premium Paper
@@ -9189,6 +9217,14 @@ msgstr ""
 
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
+msgstr ""
+
+#. TRANSLATORS: Photo Paper Plus Glossy II
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr ""
+
+#. TRANSLATORS: Photo Paper Pro Platinum
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
 msgstr ""
 
 #. TRANSLATORS: Photo Paper Plus Glossy II

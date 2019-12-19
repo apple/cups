@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
-"POT-Creation-Date: 2019-12-18 18:02-0500\n"
+"POT-Creation-Date: 2019-12-18 19:46-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -6696,6 +6696,14 @@ msgstr "Trim After Job"
 msgid "finishing-template.trim-after-pages"
 msgstr "Trim After Every Page"
 
+#. TRANSLATORS: Trim After Every Set
+msgid "finishing-template.trim-after-sets"
+msgstr ""
+
+#. TRANSLATORS: Trim After Every Page
+msgid "finishing-template.trim-after-sheets"
+msgstr ""
+
 #. TRANSLATORS: Finishings
 msgid "finishings"
 msgstr "Finishings"
@@ -9052,6 +9060,14 @@ msgstr "Brochure Glossy Paper"
 msgid "media-type.com.hp.brochure-matte"
 msgstr "Brochure Matte Paper"
 
+#. TRANSLATORS: Matte Coverstock
+msgid "media-type.com.hp.cover-matte"
+msgstr "Matte Coverstock"
+
+#. TRANSLATORS: EcoSMART Lite Paper
+msgid "media-type.com.hp.ecosmart-lite"
+msgstr "EcoSMART Lite Paper"
+
 #. TRANSLATORS: Everyday Glossy Paper
 msgid "media-type.com.hp.everyday-glossy"
 msgstr "Everyday Glossy Paper"
@@ -9059,6 +9075,18 @@ msgstr "Everyday Glossy Paper"
 #. TRANSLATORS: Everyday Matte Paper
 msgid "media-type.com.hp.everyday-matte"
 msgstr "Everyday Matte Paper"
+
+#. TRANSLATORS: Extra Heavyweight Paper
+msgid "media-type.com.hp.extra-heavy"
+msgstr "Extra Heavyweight Paper"
+
+#. TRANSLATORS: Intermediate Paper
+msgid "media-type.com.hp.intermediate"
+msgstr "Intermediate Paper"
+
+#. TRANSLATORS: Mid-Weight Paper
+msgid "media-type.com.hp.mid-weight"
+msgstr "Mid-Weight Paper"
 
 #. TRANSLATORS: Inkjet Premium Paper
 msgid "media-type.com.hp.premium-inkjet"
@@ -9259,6 +9287,14 @@ msgstr "Image Setter Paper"
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
 msgstr "Imaging Cylinder"
+
+#. TRANSLATORS: Photo Paper Plus Glossy II
+msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
+msgstr "Photo Paper Plus Glossy II"
+
+#. TRANSLATORS: Photo Paper Pro Platinum
+msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
+msgstr "Photo Paper Pro Platinum"
 
 #. TRANSLATORS: Photo Paper Plus Glossy II
 msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
