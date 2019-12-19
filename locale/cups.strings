@@ -2121,9 +2121,9 @@
 // TRANSLATORS: Trim After Every Page
 "finishing-template.trim-after-pages" = "Trim After Every Page";
 // TRANSLATORS: Trim After Every Set
-"finishing-template.trim-after-sets" = "finishing-template.trim-after-sets";
+"finishing-template.trim-after-sets" = "Trim After Every Page";
 // TRANSLATORS: Trim After Every Page
-"finishing-template.trim-after-sheets" = "finishing-template.trim-after-sheets";
+"finishing-template.trim-after-sheets" = "Trim After Every Page";
 // TRANSLATORS: Finishings
 "finishings" = "Finishings";
 // TRANSLATORS: Finishings

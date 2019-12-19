@@ -6698,11 +6698,11 @@ msgstr "Trim After Every Page"
 
 #. TRANSLATORS: Trim After Every Set
 msgid "finishing-template.trim-after-sets"
-msgstr ""
+msgstr "Trim After Every Page"
 
 #. TRANSLATORS: Trim After Every Page
 msgid "finishing-template.trim-after-sheets"
-msgstr ""
+msgstr "Trim After Every Page"
 
 #. TRANSLATORS: Finishings
 msgid "finishings"
