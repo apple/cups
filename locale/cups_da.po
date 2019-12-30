@@ -27,7 +27,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-08-23 09:13-0400\n"
-"PO-Revision-Date: 2019-12-18 15:34+0200\n"
+"PO-Revision-Date: 2019-12-30 19:44+0200\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish\n"
 "Language: da\n"
@@ -924,7 +924,7 @@ msgstr ""
 
 #: ppdc/ppdc.cxx:435
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
-msgstr "  -l sprog[,sprog,...]    Angiv outputsproget/-sprogene (lokalitet)."
+msgstr "  -l sprog[,sprog,...]    Angiv outputsprogene (lokalitet)."
 
 #: ppdc/ppdc.cxx:437
 msgid "  -m                      Use the ModelName value as the filename."
@@ -1732,7 +1732,7 @@ msgstr ""
 
 #: tools/ippfind.c:2802
 msgid "( expressions )         Group expressions"
-msgstr "( udtryk )              Gruppe udtryk"
+msgstr "( udtryk )              Gruppér udtryk"
 
 #: berkeley/lprm.c:233
 msgid "-                       Cancel all jobs"
@@ -1770,7 +1770,7 @@ msgstr ""
 
 #: tools/ippfind.c:2785
 msgid "--domain regex          Match domain to regular expression"
-msgstr "--domain reg-udtryk     Mach domæne til regulært udtryk"
+msgstr "--domain reg-udtryk     Match domæne til regulært udtryk"
 
 #: systemv/lpinfo.c:505
 msgid ""
@@ -1876,11 +1876,11 @@ msgstr ""
 
 #: systemv/cupsaccept.c:251
 msgid "--release               Release previously held jobs"
-msgstr "--release               Frigiv forrige tilbageholdte jobs"
+msgstr "--release               Frigiv tidligere tilbageholdte jobs"
 
 #: tools/ippfind.c:2797
 msgid "--remote                True if service is remote"
-msgstr "--remote                Fjerntjeneste, hvis sand"
+msgstr "--remote                Sand hvis fjerntjeneste"
 
 #: tools/ipptool.c:4309
 msgid ""
@@ -1902,7 +1902,7 @@ msgstr "--true                  Altid sand"
 
 #: tools/ippfind.c:2798
 msgid "--txt key               True if the TXT record contains the key"
-msgstr "--txt nøgle             Sand, hvis TXT-registreringen indeholder nøglen"
+msgstr "--txt nøgle             Sand hvis TXT-registreringen indeholder nøglen"
 
 #: tools/ippfind.c:2799
 msgid "--txt-* regex           Match TXT record key to regular expression"
@@ -2109,7 +2109,7 @@ msgstr "-E                      Test med kryptering med HTTP Upgrade til TLS"
 
 #: scheduler/main.c:2136
 msgid "-F                      Run in the foreground but detach from console."
-msgstr "-F                      Kør i baggrunden men frakobl fra konsol."
+msgstr "-F                      Kør i forgrunden, men frakobl fra konsol."
 
 #: tools/ippeveprinter.c:7670
 msgid "-F output-type/subtype  Set the output format for the printer"
@@ -2219,7 +2219,7 @@ msgstr "-S                      Test med kryptering med HTTPS"
 
 #: tools/ippfind.c:2768
 msgid "-T seconds              Set the browse timeout in seconds"
-msgstr "-T sekunder             Indstil browserens timeout i sekunder"
+msgstr "-T sekunder             Indstil timeout for gennemse i sekunder"
 
 #: tools/ipptool.c:4320
 msgid "-T seconds              Set the receive/send timeout in seconds"
@@ -2286,9 +2286,7 @@ msgstr "-a filnavn.conf         Indlæs printerattributter fra conf-fil"
 
 #: systemv/lp.c:751
 msgid "-c                      Make a copy of the print file(s)"
-msgstr ""
-"-c                      Opret en kopi af "
-"udskrivningsfilen/udskrivningsfilerne"
+msgstr "-c                      Opret en kopi af udskrivningsfilerne"
 
 #: tools/ipptool.c:4323
 msgid "-c                      Produce CSV output"
@@ -2300,7 +2298,7 @@ msgstr "-c [klasse(r)]          Vis klasser og deres medlemmers printere"
 
 #: systemv/lpadmin.c:1621
 msgid "-c class                Add the named destination to a class"
-msgstr "-c klasse               Tilføj den navngivet destination til en klasse"
+msgstr "-c klasse               Tilføj den navngivne destination til en klasse"
 
 #: tools/ippeveprinter.c:7678
 msgid "-c command              Set print command"
@@ -2321,7 +2319,7 @@ msgstr "-d destination          Indstil standarddestination"
 #: systemv/lpadmin.c:1622
 msgid "-d destination          Set the named destination as the server default"
 msgstr ""
-"-d destination          Indstil den navngivet destination som "
+"-d destination          Indstil den navngivne destination som "
 "serverstandarden"
 
 #: tools/ipptool.c:4324
@@ -2330,7 +2328,7 @@ msgstr "-d navn=værdi           Indstil navngivet variabel til værdi"
 
 #: tools/ippfind.c:2773
 msgid "-d regex                Match domain to regular expression"
-msgstr "-d regex                Match domæne til regulært udtryk"
+msgstr "-d reg-udtryk           Match domæne til regulært udtryk"
 
 #: tools/ippeveprinter.c:7679
 msgid "-d spool-directory      Set spool directory"
@@ -2342,7 +2340,7 @@ msgstr "-e                      Vis tilgængelige destinationer på netværket"
 
 #: scheduler/main.c:2135
 msgid "-f                      Run in the foreground."
-msgstr "-f                      Kør i baggrunden."
+msgstr "-f                      Kør i forgrunden."
 
 #: tools/ipptool.c:4325
 msgid "-f filename             Set default request filename"
@@ -2362,7 +2360,7 @@ msgstr "-h                      Valider headere i HTTP-svar"
 
 #: tools/ippfind.c:2774
 msgid "-h regex                Match hostname to regular expression"
-msgstr "-h regex                Match værtsnavn til regulært udtryk"
+msgstr "-h reg-udtryk           Match værtsnavn til regulært udtryk"
 
 #: berkeley/lpq.c:645 berkeley/lprm.c:235 systemv/cancel.c:404
 #: systemv/cupsaccept.c:245 systemv/cupsctl.c:234 systemv/lp.c:753
@@ -2411,7 +2409,7 @@ msgstr "-l                      Vis understøttede tilvalg og værdier"
 
 #: berkeley/lpq.c:646 systemv/lpinfo.c:500 systemv/lpstat.c:2047
 msgid "-l                      Show verbose (long) output"
-msgstr "-l                      Vis uddybende (lang) output"
+msgstr "-l                      Vis uddybende (langt) output"
 
 #: tools/ippeveprinter.c:7683
 msgid "-l location             Set location of printer"
@@ -2420,7 +2418,7 @@ msgstr "-l placering            Indstil placeringen af printeren"
 #: berkeley/lpr.c:435 systemv/lp.c:760
 msgid "-m                      Send an email notification when the job completes"
 msgstr ""
-"-m                      Send en e-mail-underretning når jobbet er fuldført"
+"-m                      Send en e-mailunderretning når jobbet er fuldført"
 
 #: systemv/lpinfo.c:501
 msgid "-m                      Show models"
@@ -2453,12 +2451,12 @@ msgstr "-n antal-kopier         Angiv antallet af kopier som skal udskrives"
 
 #: tools/ippfind.c:2776
 msgid "-n regex                Match service name to regular expression"
-msgstr "-n regex                Match tjenestenavn til regulært udtryk"
+msgstr "-n reg-udtryk           Match tjenestenavn til regulært udtryk"
 
 #: systemv/lpadmin.c:1632
 msgid "-o Name=Value           Specify the default value for the named PPD option "
 msgstr ""
-"-o Navn=Værdi           Angiv standardværdien til det navngivet PPD-tilvalg "
+"-o Navn=Værdi           Angiv standardværdien til det navngivne PPD-tilvalg "
 
 #: systemv/lpstat.c:2057
 msgid "-o [destination(s)]     Show jobs"
@@ -2502,7 +2500,7 @@ msgstr "-o media=størrelse      Angiv mediestørrelsen som skal bruges"
 
 #: systemv/lpadmin.c:1631
 msgid "-o name-default=value   Specify the default value for the named option"
-msgstr "-o name-default=værdi   Angiv standardværdien til det navngivet tilvalg"
+msgstr "-o name-default=værdi   Angiv standardværdien til det navngivne tilvalg"
 
 #: systemv/lpoptions.c:543
 msgid "-o name[=value]         Set default option and value"
@@ -2524,13 +2522,13 @@ msgid ""
 "                        Specify portrait (3) or landscape (4) orientation"
 msgstr ""
 "-o orientation-requested=N\n"
-"                        Angiv portræt (3) eller landskap (4) orientering"
+"                        Angiv portræt- (3) eller landskabsorientering (4)"
 
 #: berkeley/lpr.c:442 systemv/lp.c:768
 msgid "-o print-quality=N      Specify the print quality - draft (3), normal (4), or best (5)"
 msgstr ""
-"-o print-quality=N      Angiv udskrivningskvaliteten - kladde (3), normal "
-"(4) eller bedste (5)"
+"-o print-quality=N      Angiv udskriftskvaliteten - kladde (3), normal (4) "
+"eller bedste (5)"
 
 #: systemv/lpadmin.c:1640
 msgid ""
@@ -2574,15 +2572,15 @@ msgid ""
 "                        Specify 2-sided landscape printing"
 msgstr ""
 "-o sides=two-sided-short-edge\n"
-"                        Angiv udskrivning som dobbeltsidet landskap"
+"                        Angiv udskrivning som dobbeltsidet landskab"
 
 #: tools/ippfind.c:2777
 msgid "-p                      Print URI if true"
-msgstr "-p                      Vis URI, hvis sand"
+msgstr "-p                      Udskriv URI, hvis sand"
 
 #: systemv/lpstat.c:2058
 msgid "-p [printer(s)]         Show the processing state of destinations"
-msgstr "-p [printer(e)]         Vis bearbejdningstilstanden af destinationer"
+msgstr "-p [printer(e)]         Vis destinationernes bearbejdningstilstand"
 
 #: systemv/lpoptions.c:544
 msgid "-p destination          Specify a destination"
@@ -2590,7 +2588,7 @@ msgstr "-p destination          Angiv en destination"
 
 #: systemv/lpadmin.c:1646
 msgid "-p destination          Specify/add the named destination"
-msgstr "-p destination          Angiv/tilføj den navngivet destination"
+msgstr "-p destination          Angiv/tilføj den navngivne destination"
 
 #: tools/ippeveprinter.c:7686
 msgid "-p port                 Set port number for printer"
@@ -2608,7 +2606,7 @@ msgstr "-q                      Kør stille"
 #: berkeley/lpr.c:448
 msgid "-q                      Specify the job should be held for printing"
 msgstr ""
-"-q                      Angiv jobbet som skal tilbageholdes til udskrivning"
+"-q                      Angiv at jobbet skal tilbageholdes til udskrivning"
 
 #: systemv/lp.c:775
 msgid "-q priority             Specify the priority from low (1) to high (100)"
@@ -2616,7 +2614,7 @@ msgstr "-q prioritet            Angiv prioriteten fra lav (1) til høj (100)"
 
 #: berkeley/lpr.c:449
 msgid "-r                      Remove the file(s) after submission"
-msgstr "-r                      Fjern filen/filerne fra indsendelse"
+msgstr "-r                      Fjern filerne efter indsendelse"
 
 #: systemv/lpstat.c:2059
 msgid "-r                      Show whether the CUPS server is running"
@@ -2624,7 +2622,7 @@ msgstr "-r                      Vis om CUPS-serveren kører"
 
 #: tools/ippfind.c:2779
 msgid "-r                      True if service is remote"
-msgstr "-r                      Sand, hvis fjerntjeneste"
+msgstr "-r                      Sand hvis fjerntjeneste"
 
 #: systemv/cupstestppd.c:3864
 msgid "-r                      Use 'relaxed' open mode"
@@ -2648,7 +2646,7 @@ msgstr "-s                      Vær stille"
 
 #: tools/ippfind.c:2780
 msgid "-s                      Print service name if true"
-msgstr "-s                      Vis tjenestenavn, hvis sand"
+msgstr "-s                      Udskriv tjenestenavn, hvis sand"
 
 #: systemv/lpstat.c:2061
 msgid "-s                      Show a status summary"
@@ -2656,7 +2654,7 @@ msgstr "-s                      Vis en statusopsummering"
 
 #: scheduler/main.c:2141
 msgid "-s cups-files.conf      Set cups-files.conf file to use."
-msgstr "-s cups-filer.conf      Indstil cups-files.conf-fil som skal bruges."
+msgstr "-s cups-files.conf      Indstil cups-files.conf-fil som skal bruges."
 
 #: tools/ippeveprinter.c:7688
 msgid "-s speed[,color-speed]  Set speed in pages per minute"
@@ -2676,7 +2674,7 @@ msgstr "-t                      Test konfigurationsfilen."
 
 #: tools/ippfind.c:2781
 msgid "-t key                  True if the TXT record contains the key"
-msgstr "-t nøgle                Sand, hvis TXT-registreringen indeholder nøglen"
+msgstr "-t nøgle                Sand hvis TXT-registreringen indeholder nøglen"
 
 #: systemv/lp.c:777
 msgid "-t title                Specify the job title"
@@ -2695,14 +2693,14 @@ msgstr "-u allow:all            Tillad alle brugere at udskrive"
 #: systemv/lpadmin.c:1650
 msgid "-u allow:list           Allow the list of users or groups (@name) to print"
 msgstr ""
-"-u allow:list           Tillad listen over brugere eller grupper (\"@name\") "
-"at udskrive"
+"-u allow:list           Tillad brugere eller grupper i listen (\"@name\") at "
+"udskrive"
 
 #: systemv/lpadmin.c:1651
 msgid "-u deny:list            Prevent the list of users or groups (@name) to print"
 msgstr ""
-"-u deny:list            Forhindr listen over brugere eller grupper (\"@name\") "
-"at udskrive"
+"-u deny:list            Forhindr brugere eller grupper i listen (\"@name\") at "
+"udskrive"
 
 #: systemv/cancel.c:405
 msgid "-u owner                Specify the owner to use for jobs"
@@ -2710,7 +2708,7 @@ msgstr "-u ejer                 Angiv ejeren som skal bruges til jobs"
 
 #: tools/ippfind.c:2782
 msgid "-u regex                Match URI to regular expression"
-msgstr "-u regex                Match URI til regulært udtryk"
+msgstr "-u reg-udtryk           Match URI til regulært udtryk"
 
 #: systemv/cupstestppd.c:3865 tools/ippeveprinter.c:7689 tools/ipptool.c:4332
 msgid "-v                      Be verbose"
@@ -2742,7 +2740,7 @@ msgstr "-x destination          Fjern standardtilvalg for destination"
 
 #: systemv/lpadmin.c:1654
 msgid "-x destination          Remove the named destination"
-msgstr "-x destination          Fjern den navngivet destination"
+msgstr "-x destination          Fjern den navngivne destination"
 
 #: tools/ippfind.c:2783
 msgid ""
@@ -4860,7 +4858,7 @@ msgstr "Job #%d er allerede afbrudt - kan ikke annullere."
 #: scheduler/ipp.c:3522
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
-msgstr "Job #%d er allerede afbrudt - kan ikke annullere."
+msgstr "Job #%d er allerede annulleret - kan ikke annullere."
 
 #: scheduler/ipp.c:3534
 #, c-format
@@ -5573,7 +5571,7 @@ msgstr ""
 
 #: backend/ipp.c:2261
 msgid "Print job canceled at printer."
-msgstr "Udskrivningsjob annulleret af printer."
+msgstr "Udskrivningsjob annulleret på printer."
 
 #: backend/ipp.c:2253
 msgid "Print job too large."
@@ -9927,7 +9925,7 @@ msgstr ""
 
 #: systemv/lpadmin.c:123 systemv/lpadmin.c:378
 msgid "lpadmin: Class name can only contain printable characters."
-msgstr "lpadmin: Klassenavn må kun indeholde \"printable\"-tegn."
+msgstr "lpadmin: Klassenavn må kun indeholde tegn som kan vises."
 
 #: systemv/lpadmin.c:213
 #, c-format
@@ -10007,18 +10005,18 @@ msgstr "lpadmin: Printeren %s er ikke et medlem af klassen %s."
 #: systemv/lpadmin.c:637
 msgid "lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS."
 msgstr ""
-"lpadmin: Printerdrivere er udgået og stopper med at virke i en fremtidig "
+"lpadmin: Printerdrivere er udgåede og stopper med at virke i en fremtidig "
 "version af CUPS."
 
 #: systemv/lpadmin.c:164 systemv/lpadmin.c:331 systemv/lpadmin.c:531
 msgid "lpadmin: Printer name can only contain printable characters."
-msgstr "lpadmin: Printernavn må kun indeholde \"printable\"-tegn."
+msgstr "lpadmin: Printernavn må kun indeholde tegn som kan vises."
 
 #: systemv/lpadmin.c:618
 msgid "lpadmin: Raw queues are deprecated and will stop working in a future version of CUPS."
 msgstr ""
-"lpadmin: Rå køer er udgået og stopper med at virke i en fremtidig version af "
-"CUPS."
+"lpadmin: Rå køer er udgåede og stopper med at virke i en fremtidig version "
+"af CUPS."
 
 #: systemv/lpadmin.c:616
 msgid "lpadmin: Raw queues are no longer supported on macOS."
@@ -10043,7 +10041,7 @@ msgstr ""
 #: systemv/lpadmin.c:656
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s"
-msgstr "lpadmin: Kan ikke oprette forbindelse server: %s"
+msgstr "lpadmin: Kan ikke oprette forbindelse til server: %s"
 
 #: systemv/lpadmin.c:1442
 msgid "lpadmin: Unable to create temporary file"
@@ -10174,7 +10172,9 @@ msgstr "lpoptions: Ukendt printer eller klasse."
 #: systemv/lpstat.c:1099
 #, c-format
 msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"."
-msgstr "lpstat: fejl - %s miljøvariabelnavne ikkeeksisterende destination \"%s\"."
+msgstr ""
+"lpstat: fejl - miljøvariablen %s nævner den ikkeeksisterende destination \"%"
+"s\"."
 
 #. TRANSLATORS: Amount of Material
 #: locale/ipp-strings.c:1120
@@ -16103,12 +16103,12 @@ msgstr "Markør til \"fuser\" mangler"
 #. TRANSLATORS: Marker Fuser Thermistor Failure
 #: locale/ipp-strings.c:3274
 msgid "printer-state-reasons.marker-fuser-thermistor-failure"
-msgstr "Markør til fejl i \"fuser\" temperatursensor"
+msgstr "Markør til fejl i temperatursensor for \"fuser\""
 
 #. TRANSLATORS: Marker Fuser Timing Failure
 #: locale/ipp-strings.c:3276
 msgid "printer-state-reasons.marker-fuser-timing-failure"
-msgstr "Markør til fejl i \"fuser\" timing"
+msgstr "Markør til fejl i timing af \"fuser\""
 
 #. TRANSLATORS: Marker Ink Almost Empty
 #: locale/ipp-strings.c:3278
@@ -16178,47 +16178,47 @@ msgstr "Markør til toner mangler"
 #. TRANSLATORS: Ink/toner waste bin almost full
 #: locale/ipp-strings.c:3304
 msgid "printer-state-reasons.marker-waste-almost-full"
-msgstr "Blæk/toner papirkurv næsten fuld"
+msgstr "Beholder til blæk-/tonerspild næsten fuld"
 
 #. TRANSLATORS: Ink/toner waste bin full
 #: locale/ipp-strings.c:3306
 msgid "printer-state-reasons.marker-waste-full"
-msgstr "Blæk/toner papirkurv fuld"
+msgstr "Beholder til blæk-/tonerspild fuld"
 
 #. TRANSLATORS: Marker Waste Ink Receptacle Almost Full
 #: locale/ipp-strings.c:3308
 msgid "printer-state-reasons.marker-waste-ink-receptacle-almost-full"
-msgstr "Markør til papirkurv blækbeholder næsten fuld"
+msgstr "Markør til beholder til blækspild næsten fuld"
 
 #. TRANSLATORS: Marker Waste Ink Receptacle Full
 #: locale/ipp-strings.c:3310
 msgid "printer-state-reasons.marker-waste-ink-receptacle-full"
-msgstr "Markør til papirkurv blækbeholder fuld"
+msgstr "Markør til beholder til blækspild fuld"
 
 #. TRANSLATORS: Marker Waste Ink Receptacle Missing
 #: locale/ipp-strings.c:3312
 msgid "printer-state-reasons.marker-waste-ink-receptacle-missing"
-msgstr "Markør til papirkurv blækbeholder mangler"
+msgstr "Markør til beholder til blækspild mangler"
 
 #. TRANSLATORS: Marker Waste Missing
 #: locale/ipp-strings.c:3314
 msgid "printer-state-reasons.marker-waste-missing"
-msgstr "Markør til papirkurv mangler"
+msgstr "Markør til beholder mangler"
 
 #. TRANSLATORS: Marker Waste Toner Receptacle Almost Full
 #: locale/ipp-strings.c:3316
 msgid "printer-state-reasons.marker-waste-toner-receptacle-almost-full"
-msgstr "Markør til papirkurv tonerbeholder næsten fuld"
+msgstr "Markør til beholder til tonerspild næsten fuld"
 
 #. TRANSLATORS: Marker Waste Toner Receptacle Full
 #: locale/ipp-strings.c:3318
 msgid "printer-state-reasons.marker-waste-toner-receptacle-full"
-msgstr "Markør til papirkurv tonerbeholder fuld"
+msgstr "Markør til beholder til tonerspild fuld"
 
 #. TRANSLATORS: Marker Waste Toner Receptacle Missing
 #: locale/ipp-strings.c:3320
 msgid "printer-state-reasons.marker-waste-toner-receptacle-missing"
-msgstr "Markør til papirkurv tonerbeholder mangler"
+msgstr "Markør til beholder til tonerspild mangler"
 
 #. TRANSLATORS: Material Empty
 #: locale/ipp-strings.c:3322
@@ -16278,12 +16278,12 @@ msgstr "Mediestiens input tom"
 #. TRANSLATORS: Media Path Input Feed Error
 #: locale/ipp-strings.c:3344
 msgid "printer-state-reasons.media-path-input-feed-error"
-msgstr "Fejl i indføring for mediestiens input"
+msgstr "Fejl i mediestiens inputfødning"
 
 #. TRANSLATORS: Media Path Input Jam
 #: locale/ipp-strings.c:3346
 msgid "printer-state-reasons.media-path-input-jam"
-msgstr "Mediestiens input sidder fast"
+msgstr "Sidder fast i mediestiens input"
 
 #. TRANSLATORS: Media Path Input Request
 #: locale/ipp-strings.c:3348
@@ -16293,7 +16293,7 @@ msgstr "Mediestiens input anmodet"
 #. TRANSLATORS: Media Path Jam
 #: locale/ipp-strings.c:3350
 msgid "printer-state-reasons.media-path-jam"
-msgstr "Mediesti sidder fast"
+msgstr "Sidder fast i mediesti"
 
 #. TRANSLATORS: Media Path Media Tray Almost Full
 #: locale/ipp-strings.c:3352
@@ -16313,7 +16313,7 @@ msgstr "Mediestiens mediebakke mangler"
 #. TRANSLATORS: Media Path Output Feed Error
 #: locale/ipp-strings.c:3358
 msgid "printer-state-reasons.media-path-output-feed-error"
-msgstr "Fejl i indføring for mediestiens output"
+msgstr "Fejl i mediestiens outputfødning"
 
 #. TRANSLATORS: Media Path Output Full
 #: locale/ipp-strings.c:3360
@@ -16323,7 +16323,7 @@ msgstr "Mediestiens output fuld"
 #. TRANSLATORS: Media Path Output Jam
 #: locale/ipp-strings.c:3362
 msgid "printer-state-reasons.media-path-output-jam"
-msgstr "Mediestiens output sidder fast"
+msgstr "Sidder fast i mediestiens output"
 
 #. TRANSLATORS: Media Path Pick Roller Failure
 #: locale/ipp-strings.c:3364
