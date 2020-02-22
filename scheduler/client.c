@@ -2789,6 +2789,25 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
     perm_check = 0;
   }
+  else if (!strcmp(con->uri, "/admin/conf/cupsd.conf"))
+  {
+    strlcpy(filename, ConfigurationFile, len);
+
+    perm_check = 0;
+  }
+  else if (!strncmp(con->uri, "/admin/log/", 11))
+  {
+    if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
+      strlcpy(filename, AccessLog, len);
+    else if (!strncmp(con->uri + 11, "error_log", 9) && ErrorLog[0] == '/')
+      strlcpy(filename, ErrorLog, len);
+    else if (!strncmp(con->uri + 11, "page_log", 8) && PageLog[0] == '/')
+      strlcpy(filename, PageLog, len);
+    else
+      return (NULL);
+
+    perm_check = 0;
+  }
   else if (!strncmp(con->uri, "/admin", 6) || !strncmp(con->uri, "/classes", 8) || !strncmp(con->uri, "/jobs", 5) || !strncmp(con->uri, "/printers", 9))
   {
    /*
@@ -2819,25 +2838,6 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     }
 
     strlcpy(filename, p->strings, len);
-
-    perm_check = 0;
-  }
-  else if (!strcmp(con->uri, "/admin/conf/cupsd.conf"))
-  {
-    strlcpy(filename, ConfigurationFile, len);
-
-    perm_check = 0;
-  }
-  else if (!strncmp(con->uri, "/admin/log/", 11))
-  {
-    if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
-      strlcpy(filename, AccessLog, len);
-    else if (!strncmp(con->uri + 11, "error_log", 9) && ErrorLog[0] == '/')
-      strlcpy(filename, ErrorLog, len);
-    else if (!strncmp(con->uri + 11, "page_log", 8) && PageLog[0] == '/')
-      strlcpy(filename, PageLog, len);
-    else
-      return (NULL);
 
     perm_check = 0;
   }
