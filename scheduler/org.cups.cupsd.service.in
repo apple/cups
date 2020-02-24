@@ -2,6 +2,7 @@
 Description=CUPS Scheduler
 Documentation=man:cupsd(8)
 After=sssd.service
+Requires=cups.socket
 
 [Service]
 ExecStart=@sbindir@/cupsd -l
