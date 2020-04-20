@@ -1251,7 +1251,7 @@ make_device_uri(
     char          *uri,			/* I - Device URI buffer */
     size_t        uri_size)		/* I - Size of device URI buffer */
 {
-  struct libusb_device_descriptor devdesc;
+  struct libusb_device_descriptor devdesc; /* Holds USB device information after loaded */
                                         /* Current device descriptor */
   char		options[1024];		/* Device URI options */
   int		num_values;		/* Number of 1284 parameters */
@@ -1259,40 +1259,47 @@ make_device_uri(
   const char	*mfg,			/* Manufacturer */
 		*mdl,			/* Model */
 		*des = NULL,		/* Description */
-		*sern;			/* Serial number */
+		*sern = NULL;			/* Serial number */
   size_t	mfglen;			/* Length of manufacturer string */
+  int sernlen; /* serial number length */
   char		tempmfg[256],		/* Temporary manufacturer string */
 		tempsern[256],		/* Temporary serial number string */
 		*tempptr;		/* Pointer into temp string */
 
 
- /*
-  * Get the make, model, and serial numbers...
-  */
 
+	/*
+	* Get the make, model, and serial numbers...
+	*
+	* Attempt to get the serial number from the USB device first
+	* as sometimes the ieee1284 does not have a unique code (DYMO!)
+	*/
+	libusb_get_device_descriptor( printer->device, &devdesc ); // load the data in to the descriptor
+	sernlen = libusb_get_string_descriptor_ascii( printer->handle
+			, devdesc.iSerialNumber
+			, (unsigned char *)tempsern
+			, sizeof(tempsern) -1 );
+	
+	if (sernlen > 0) {
+		tempsern[sernlen] = '\0';
+		sern = tempsern;
+	}
+
+	/*
+	 * Get the IEEE1284 data
+	 */
   num_values = _cupsGet1284Values(device_id, &values);
 
-  if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
-    if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
-      if ((sern = cupsGetOption("SN", num_values, values)) == NULL &&
-	  ((libusb_get_device_descriptor(printer->device, &devdesc) >= 0) &&
-	   devdesc.iSerialNumber))
-      {
-       /*
-        * Try getting the serial number from the device itself...
-	*/
-
-        int length =
-	  libusb_get_string_descriptor_ascii(printer->handle,
-					     devdesc.iSerialNumber,
-					     (unsigned char *)tempsern,
-					     sizeof(tempsern) - 1);
-        if (length > 0)
-	{
-	  tempsern[length] = '\0';
-	  sern             = tempsern;
-	}
-      }
+  if (sern == NULL) {
+	  if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL) {
+		 if ((sern = cupsGetOption("SERN", num_values, values)) == NULL) {
+			if ((sern = cupsGetOption("SN", num_values, values)) == NULL) {
+				tempsern[0] = '\0';
+				sern = tempsern;
+			}
+		 }
+	  }
+	} // sern == NULL
 
   if ((mfg = cupsGetOption("MANUFACTURER", num_values, values)) == NULL)
     mfg = cupsGetOption("MFG", num_values, values);
