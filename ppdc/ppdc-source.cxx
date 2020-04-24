@@ -1743,15 +1743,17 @@ ppdcSource::get_resolution(ppdcFile *fp)// I - File to read
 
   switch (sscanf(name, "%dx%d", &xdpi, &ydpi))
   {
-    case 0 :
-        _cupsLangPrintf(stderr,
-	                _("ppdc: Bad resolution name \"%s\" on line %d of "
-			  "%s."), name, fp->line, fp->filename);
-        break;
     case 1 :
         ydpi = xdpi;
-	break;
-  }
+        break;
+    case 2 :
+        break;
+    default :
+        _cupsLangPrintf(stderr,
+                  _("ppdc: Bad resolution name \"%s\" on line %d of "
+        "%s."), name, fp->line, fp->filename);
+        break;
+}
 
   // Create the necessary PS commands...
   snprintf(command, sizeof(command),

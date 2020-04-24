@@ -446,7 +446,7 @@ cupsdCreateCommonData(void)
 
   /* cups-version */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_TEXT | IPP_TAG_COPY,
-               "cups-version", NULL, CUPS_SVERSION + 6);
+               "cups-version", NULL, &CUPS_SVERSION[6]);
 
   /* generated-natural-language-supported (no IPP_TAG_COPY) */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,

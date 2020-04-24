@@ -1719,8 +1719,7 @@ _ppdOpen(
                      constraint->choice1, constraint->option2,
 		     constraint->choice2))
       {
-        case 0 : /* Error */
-	case 1 : /* Error */
+        default : /* Error */
 	    pg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
 	    goto error;
 

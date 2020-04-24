@@ -2956,7 +2956,7 @@ ippReadIO(void       *src,		/* I - Data source */
             * Read 32-bit "extension" tag...
             */
 
-	    if ((*cb)(src, buffer, 4) < 1)
+	    if ((*cb)(src, buffer, 4) < 4)
 	    {
 	      DEBUG_puts("1ippReadIO: Callback returned EOF/error");
 	      _cupsBufferRelease((char *)buffer);

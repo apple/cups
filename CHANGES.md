@@ -1,6 +1,15 @@
-CHANGES - 2.3.2 - 2019-12-18
+CHANGES - 2.3.3 - 2020-04-24
 ============================
 
+Changes in CUPS v2.3.3
+----------------------
+
+- CVE-2020-3898: The `ppdOpen` function did not handle invalid UI
+  constraint.  `ppdcSource::get_resolution` function did not handle
+  invalid resolution strings.
+- CVE-2019-8842: The `ippReadIO` function may under-read an extension
+  field.
+- Fixed WARNING_OPTIONS support for GCC 9.x
 
 Changes in CUPS v2.3.2
 ----------------------
