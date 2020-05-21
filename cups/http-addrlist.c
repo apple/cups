@@ -238,7 +238,10 @@ httpAddrConnect2(
     }
 
     if (!addrlist && nfds == 0)
+    {
+      errno = EHOSTDOWN;
       break;
+    }
 
    /*
     * See if we can connect to any of the addresses so far...
@@ -368,6 +371,9 @@ httpAddrConnect2(
     else
       remaining -= 250;
   }
+
+  if (remaining <= 0)
+    errno = ETIMEDOUT;
 
   while (nfds > 0)
   {
