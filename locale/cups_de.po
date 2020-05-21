@@ -1614,7 +1614,7 @@ msgid "-4"
 msgstr "-4"
 
 msgid "-4                      Connect using IPv4"
-msgstr ""
+msgstr "-4                      Verbinde mit IPv4"
 
 msgid "-40"
 msgstr "-40"
