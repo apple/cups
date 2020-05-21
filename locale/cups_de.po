@@ -1674,26 +1674,27 @@ msgid "-A                      Enable authentication"
 msgstr "-A                      Authentication einschalten"
 
 msgid "-C                      Send requests using chunking (default)"
-msgstr ""
+msgstr "-C                      Sende Anfragen mittels chunking (Voreinstellung)"
 
 msgid "-D description          Specify the textual description of the printer"
-msgstr ""
+msgstr "-D description          Angabe der Textbeschreibung des Druckers"
 
 msgid "-D device-uri           Set the device URI for the printer"
-msgstr ""
+msgstr "-D device-uri           Angabe der Geräte-URI für den Drucker"
 
 msgid ""
 "-E                      Enable and accept jobs on the printer (after -p)"
 msgstr ""
+"-E                      Freigabe für Aufträge an den Drucker einschalten (nach -p)"
 
 msgid "-E                      Encrypt the connection to the server"
 msgstr "-E                      Verbindung zum Server verschlüsseln"
 
 msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
-msgstr ""
+msgstr "-E                      Teste mit Hochstufung der HTTP Verschlüsselung auf TLS"
 
 msgid "-F                      Run in the foreground but detach from console."
-msgstr ""
+msgstr "-F                      Läuft im Vordergrund, aber gelöst von der Konsole."
 
 msgid "-F output-type/subtype  Set the output format for the printer"
 msgstr ""
@@ -1702,25 +1703,25 @@ msgid "-H                      Show the default server and port"
 msgstr "-H                      Zeige den voreingestellten Server und Port"
 
 msgid "-H HH:MM                Hold the job until the specified UTC time"
-msgstr ""
+msgstr "-H HH:MM                Auftrag anhalten biz zur angegeben UTC Uhrzeit"
 
 msgid "-H hold                 Hold the job until released/resumed"
-msgstr ""
+msgstr "-H hold                 Auftrag anhalten bis zur Freigabe/Wiederaufnahme"
 
 msgid "-H immediate            Print the job as soon as possible"
-msgstr ""
+msgstr "-H immediate            Drucke den Auftrag so bald als möglich"
 
 msgid "-H restart              Reprint the job"
-msgstr ""
+msgstr "-H restart              Auftrag erneut drucken"
 
 msgid "-H resume               Resume a held job"
-msgstr ""
+msgstr "-H resume               Wiederaufnahme eines angehaltenen Auftrags"
 
 msgid "-H server[:port]        Connect to the named server and port"
-msgstr ""
+msgstr "-H server[:port]        Verbinde zum genannten Server und Port"
 
 msgid "-I                      Ignore errors"
-msgstr ""
+msgstr "-I                      Ignoriere Fehler"
 
 msgid ""
 "-I {filename,filters,none,profiles}\n"
@@ -1732,19 +1733,19 @@ msgid ""
 msgstr ""
 
 msgid "-L                      Send requests using content-length"
-msgstr ""
+msgstr "-L                      Sende Anfragen mit content-length"
 
 msgid "-L location             Specify the textual location of the printer"
-msgstr ""
+msgstr "-L location             Textbeschreibung für den Ort des Druckers"
 
 msgid "-M manufacturer         Set manufacturer name (default=Test)"
-msgstr ""
+msgstr "-M manufacturer         Herstellername angeben (Voreinstellung=Test)"
 
 msgid "-P destination          Show status for the specified destination"
-msgstr ""
+msgstr "-P destination          Zeige den Status für das angegebene Ziel"
 
 msgid "-P destination          Specify the destination"
-msgstr ""
+msgstr "-P destination          Angabe des Ziels"
 
 msgid ""
 "-P filename.plist       Produce XML plist to a file and test report to "
@@ -1752,25 +1753,25 @@ msgid ""
 msgstr ""
 
 msgid "-P filename.ppd         Load printer attributes from PPD file"
-msgstr ""
+msgstr "-P filename.ppd         Lade die Druckerattribute von der PPD Datei"
 
 msgid "-P number[-number]      Match port to number or range"
 msgstr ""
 
 msgid "-P page-list            Specify a list of pages to print"
-msgstr ""
+msgstr "-P page-list            Angabe einer Liste zu druckender Seiten"
 
 msgid "-R                      Show the ranking of jobs"
-msgstr ""
+msgstr "-R                      Zeige die Rangfolge der Aufträge"
 
 msgid "-R name-default         Remove the default value for the named option"
-msgstr ""
+msgstr "-R name-default         Entferne voreingestellten Wert für die angegebene Option"
 
 msgid "-R root-directory       Set alternate root"
-msgstr ""
+msgstr "-R root-directory       Gebe alternatives Wurzelverzeichnis an"
 
 msgid "-S                      Test with encryption using HTTPS"
-msgstr ""
+msgstr "-S                      Test mit HTTPS Verschlüsselung"
 
 msgid "-T seconds              Set the browse timeout in seconds"
 msgstr ""
@@ -1779,22 +1780,22 @@ msgid "-T seconds              Set the receive/send timeout in seconds"
 msgstr ""
 
 msgid "-T title                Specify the job title"
-msgstr ""
+msgstr "-T title                Angabe eines Auftragstitels"
 
 msgid "-U username             Specify the username to use for authentication"
-msgstr ""
+msgstr "-U username             Angabe des Benutzernamens zur Authentifizierung"
 
 msgid "-U username             Specify username to use for authentication"
-msgstr ""
+msgstr "-U username             Angabe eines Benutzernamens zur Authentifizierung"
 
 msgid "-V version              Set default IPP version"
-msgstr ""
+msgstr "-V version              Setze die Voreinstellung der IPP Version"
 
 msgid "-W completed            Show completed jobs"
-msgstr ""
+msgstr "-W completed            Zeige abgeschlossene Aufträge"
 
 msgid "-W not-completed        Show pending jobs"
-msgstr ""
+msgstr "-W not-completed        Zeige anstehende Aufträge"
 
 msgid ""
 "-W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
@@ -1809,10 +1810,10 @@ msgid "-a                      Cancel all jobs"
 msgstr "-a                      Alle Aufträge abbrechen"
 
 msgid "-a                      Show jobs on all destinations"
-msgstr ""
+msgstr "-a                      Zeige Aufträge für alle Ziele"
 
 msgid "-a [destination(s)]     Show the accepting state of destinations"
-msgstr ""
+msgstr "-a [destination(s)]     Zeige den Akzeptanzstatus der angegebenen Ziele"
 
 msgid "-a filename.conf        Load printer attributes from conf file"
 msgstr ""
@@ -1821,7 +1822,7 @@ msgid "-c                      Make a copy of the print file(s)"
 msgstr ""
 
 msgid "-c                      Produce CSV output"
-msgstr ""
+msgstr "-c                      Erzeuge CSV Ausgabe"
 
 msgid "-c [class(es)]          Show classes and their member printers"
 msgstr ""
@@ -1830,22 +1831,23 @@ msgid "-c class                Add the named destination to a class"
 msgstr ""
 
 msgid "-c command              Set print command"
-msgstr ""
+msgstr "-c command              Bestimme Druckerbefehl"
 
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
-msgstr ""
+msgstr "-c cupsd.conf           Bestimme zu benutzende cupsd.conf Datei."
 
 msgid "-d                      Show the default destination"
-msgstr ""
+msgstr "-d                      Zeige das voreingestellte Ziel"
 
 msgid "-d destination          Set default destination"
-msgstr ""
+msgstr "-d                      Zeige voreingestelltes Ziel"
 
 msgid "-d destination          Set the named destination as the server default"
 msgstr ""
+"-d destination          Bestimme das benannte Ziel als Voreinstellung für den Server"
 
 msgid "-d destination          Specify the destination"
-msgstr ""
+msgstr "-d destination          Bestimme das Ziel"
 
 msgid "-d name=value           Set named variable to value"
 msgstr ""
@@ -1912,14 +1914,14 @@ msgid "-l                      Show verbose (long) output"
 msgstr ""
 
 msgid "-l location             Set location of printer"
-msgstr ""
+msgstr "-l location             Bestimme den Ort des Druckers"
 
 msgid ""
 "-m                      Send an email notification when the job completes"
 msgstr ""
 
 msgid "-m                      Show models"
-msgstr ""
+msgstr "-m                      Zeige Modelle"
 
 msgid ""
 "-m everywhere           Specify the printer is compatible with IPP Everywhere"
@@ -1971,10 +1973,10 @@ msgid "-o job-quota-period=N   Specify the per-user quota period in seconds"
 msgstr ""
 
 msgid "-o job-sheets=standard  Print a banner page with the job"
-msgstr ""
+msgstr "-o job-sheets=standard  Drucke eine Bannerseite mit dem Auftrag"
 
 msgid "-o media=size           Specify the media size to use"
-msgstr ""
+msgstr "-o media=size           Gebe die zu verwendende Mediengrösse an"
 
 msgid "-o name-default=value   Specify the default value for the named option"
 msgstr ""
@@ -1994,6 +1996,8 @@ msgid ""
 "-o orientation-requested=N\n"
 "                        Specify portrait (3) or landscape (4) orientation"
 msgstr ""
+"-o orientation-requested=N\n"
+"                        Gebe die Ausrichtung hochkant (3) oder quer (4) an"
 
 msgid ""
 "-o print-quality=N      Specify the print quality - draft (3), normal (4), "
@@ -2035,19 +2039,19 @@ msgid "-p [printer(s)]         Show the processing state of destinations"
 msgstr ""
 
 msgid "-p destination          Specify a destination"
-msgstr ""
+msgstr "-p destination          Bestimme ein Ziel"
 
 msgid "-p destination          Specify/add the named destination"
 msgstr ""
 
 msgid "-p port                 Set port number for printer"
-msgstr ""
+msgstr "-p port                 Bestimme die Portnummer für den Drucker"
 
 msgid "-q                      Quietly report match via exit code"
 msgstr ""
 
 msgid "-q                      Run silently"
-msgstr ""
+msgstr "-q                      Laufe leise"
 
 msgid "-q                      Specify the job should be held for printing"
 msgstr ""
@@ -2462,7 +2466,7 @@ msgid "300dpi"
 msgstr "300 dpi"
 
 msgid "30859 Paint Can Label"
-msgstr ""
+msgstr "30859 Aufkleber für Farbfässer"
 
 msgid "35"
 msgstr "35"
@@ -3617,24 +3621,26 @@ msgid ""
 "IPPFIND_SERVICE_HOSTNAME\n"
 "                        Fully-qualified domain name"
 msgstr ""
+"IPPFIND_SERVICE_HOSTNAME\n"
+"                        Vollqualifizierter Domänenname"
 
 msgid "IPPFIND_SERVICE_NAME    Service instance name"
-msgstr ""
+msgstr "IPPFIND_SERVICE_NAME    Name der Dienstinstanz"
 
 msgid "IPPFIND_SERVICE_PORT    Port number"
-msgstr ""
+msgstr "IPPFIND_SERVICE_PORT    Portnummer"
 
 msgid "IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
 msgstr ""
 
 msgid "IPPFIND_SERVICE_SCHEME  URI scheme"
-msgstr ""
+msgstr "IPPFIND_SERVICE_SCHEME  URI Schema"
 
 msgid "IPPFIND_SERVICE_URI     URI"
-msgstr ""
+msgstr "IPPFIND_SERVICE_URI     URI"
 
 msgid "IPPFIND_TXT_*           Value of TXT record key"
-msgstr ""
+msgstr "IPPFIND_TXT_*           Wert des TXT Schlüssel-Eintrags"
 
 msgid "ISOLatin1"
 msgstr "ISOLatin1"
@@ -3906,10 +3912,10 @@ msgid "Missing last-document attribute in request."
 msgstr "Fehlendes Letzte-Sete Attribut in der Anfrage."
 
 msgid "Missing media or media-col."
-msgstr ""
+msgstr "Fehlende Medien oder Medien-col."
 
 msgid "Missing media-size in media-col."
-msgstr ""
+msgstr "Fehlende Mediengrösse oder Medien-col."
 
 msgid "Missing notify-subscription-ids attribute."
 msgstr ""
@@ -4402,7 +4408,7 @@ msgid "SSL/TLS Negotiation Error"
 msgstr "SSL/TLS Verhandlungsfehler"
 
 msgid "Second Roll (DUO/Twin Only)"
-msgstr ""
+msgstr "Zweite Rolle (nur Doppelrolle)"
 
 msgid "See Other"
 msgstr "Siehe auch"
@@ -5121,7 +5127,7 @@ msgstr "Aktualisierung erforderlich"
 
 #, c-format
 msgid "Usage: %s [options] destination(s)"
-msgstr ""
+msgstr "Verwendung: %s [Optionen] Ziel(e)"
 
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]"
@@ -5172,16 +5178,25 @@ msgid ""
 "       lpadmin [options] -p destination -r class\n"
 "       lpadmin [options] -x destination"
 msgstr ""
+"Verwendung: lpadmin [Ooptionen] -d Ziel\n"
+"            lpadmin [Optionen] -p Ziel\n"
+"            lpadmin [Optionen] -p Ziel -c Klasse\n"
+"            lpadmin [Optionen] -p Ziel -r Klasse\n"
+"            lpadmin [Optionen] -x Ziel"
 
 msgid ""
 "Usage: lpinfo [options] -m\n"
 "       lpinfo [options] -v"
 msgstr ""
+"Verwendung: lpinfo [Optionen] -m\n"
+"            lpinfo [Optionen] -v"
 
 msgid ""
 "Usage: lpmove [options] job destination\n"
 "       lpmove [options] source-destination destination"
 msgstr ""
+"Verwendugn: lpmove [Optionen] Auftrag Ziel\n"
+"            lpmove [Optionen] Quelle Ziel"
 
 msgid ""
 "Usage: lpoptions [options] -d destination\n"
@@ -5189,6 +5204,10 @@ msgid ""
 "       lpoptions [options] [-p destination] -o option[=value]\n"
 "       lpoptions [options] -x destination"
 msgstr ""
+"Verwendugn: lpoptions [Optione] -d Ziel\n"
+"            lpoptions [Optionen] [-p Ziel] [-l]\n"
+"            lpoptions [Optionen] [-p Ziel] -o option[=Wert]\n"
+"            lpoptions [Optionen] -x Ziel"
 
 msgid "Usage: lpq [options] [+interval]"
 msgstr ""
@@ -5202,7 +5221,7 @@ msgid ""
 msgstr ""
 
 msgid "Usage: lpstat [options]"
-msgstr ""
+msgstr "Verwendung: lpstat [Optionen]"
 
 msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
 msgstr "Verwendung: ppdc [Optionen] Dateiname.drv [ ... DateinameN.drv ]"
@@ -5566,7 +5585,7 @@ msgstr "„cups-driverd“ konnte nicht ausgeführt werden."
 
 #, c-format
 msgid "cupsctl: Cannot set %s directly."
-msgstr ""
+msgstr "cupsctl: kann %s nicht direkt bestimmen"
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
@@ -6891,7 +6910,7 @@ msgid "held"
 msgstr "gehalten"
 
 msgid "help\t\tGet help on commands."
-msgstr ""
+msgstr "help\t\tHilfe zu Befehlen."
 
 msgid "idle"
 msgstr "inaktiv"
@@ -6961,14 +6980,14 @@ msgstr "ippfind: Fehlender Ausdruck vor  \"--or\"."
 
 #, c-format
 msgid "ippfind: Missing key name after %s."
-msgstr ""
+msgstr "ippfind: Fehlender Schlüsselname nach %s."
 
 #, c-format
 msgid "ippfind: Missing name after %s."
-msgstr ""
+msgstr "ippfind: Fehlender Name nach %s."
 
 msgid "ippfind: Missing open parenthesis."
-msgstr ""
+msgstr "ippfind: Fehlende offene Klammer"
 
 #, c-format
 msgid "ippfind: Missing program after %s."
@@ -7098,15 +7117,15 @@ msgstr ""
 
 #. TRANSLATORS: Front Cover
 msgid "job-cover-front"
-msgstr ""
+msgstr "Vorderumschlag"
 
 #. TRANSLATORS: Delay Output Until
 msgid "job-delay-output-until"
-msgstr ""
+msgstr "Ausgabeverzögerung bis"
 
 #. TRANSLATORS: Delay Output Until
 msgid "job-delay-output-until-time"
-msgstr "Verzögere Ausgabe bis"
+msgstr "Ausgabeverzögerung bis"
 
 #. TRANSLATORS: Daytime
 msgid "job-delay-output-until.day-time"
@@ -7150,7 +7169,7 @@ msgstr "Auftrag abbrechen"
 
 #. TRANSLATORS: Cancel Job
 msgid "job-error-action.cancel-job"
-msgstr ""
+msgstr "Auftrag abbrechen"
 
 #. TRANSLATORS: Continue Job
 msgid "job-error-action.continue-job"
@@ -7373,11 +7392,11 @@ msgstr ""
 
 #. TRANSLATORS: None
 msgid "job-sheets.none"
-msgstr ""
+msgstr "Keine"
 
 #. TRANSLATORS: Standard
 msgid "job-sheets.standard"
-msgstr ""
+msgstr "Standard"
 
 #. TRANSLATORS: Job State
 msgid "job-state"
@@ -7393,15 +7412,15 @@ msgstr ""
 
 #. TRANSLATORS: Stopping
 msgid "job-state-reasons.aborted-by-system"
-msgstr ""
+msgstr "Angehalten"
 
 #. TRANSLATORS: Account Authorization Failed
 msgid "job-state-reasons.account-authorization-failed"
-msgstr ""
+msgstr "Autorisierung fehlt"
 
 #. TRANSLATORS: Account Closed
 msgid "job-state-reasons.account-closed"
-msgstr ""
+msgstr "Konto geschlossen"
 
 #. TRANSLATORS: Account Info Needed
 msgid "job-state-reasons.account-info-needed"
@@ -7409,23 +7428,23 @@ msgstr ""
 
 #. TRANSLATORS: Account Limit Reached
 msgid "job-state-reasons.account-limit-reached"
-msgstr ""
+msgstr "Kontenbeschränkung erreicht"
 
 #. TRANSLATORS: Decompression error
 msgid "job-state-reasons.compression-error"
-msgstr ""
+msgstr "Dekompressionsfehler"
 
 #. TRANSLATORS: Conflicting Attributes
 msgid "job-state-reasons.conflicting-attributes"
-msgstr ""
+msgstr "Widersprüchliche Attribute"
 
 #. TRANSLATORS: Connected To Destination
 msgid "job-state-reasons.connected-to-destination"
-msgstr ""
+msgstr "Verbunden zum Ziel"
 
 #. TRANSLATORS: Connecting To Destination
 msgid "job-state-reasons.connecting-to-destination"
-msgstr ""
+msgstr "Verbinde zum Ziel"
 
 #. TRANSLATORS: Destination Uri Failed
 msgid "job-state-reasons.destination-uri-failed"
@@ -7437,23 +7456,23 @@ msgstr ""
 
 #. TRANSLATORS: Digital Signature Type Not Supported
 msgid "job-state-reasons.digital-signature-type-not-supported"
-msgstr ""
+msgstr "Typ der digitalen Signatur nicht unterstützt"
 
 #. TRANSLATORS: Document Access Error
 msgid "job-state-reasons.document-access-error"
-msgstr ""
+msgstr "Dokumenten-Zugriffsfehler"
 
 #. TRANSLATORS: Document Format Error
 msgid "job-state-reasons.document-format-error"
-msgstr ""
+msgstr "Dokument-Formatfehler"
 
 #. TRANSLATORS: Document Password Error
 msgid "job-state-reasons.document-password-error"
-msgstr ""
+msgstr "Dokument-Passwortfehler"
 
 #. TRANSLATORS: Document Permission Error
 msgid "job-state-reasons.document-permission-error"
-msgstr ""
+msgstr "Dokument-Erlaubnisfehler"
 
 #. TRANSLATORS: Document Security Error
 msgid "job-state-reasons.document-security-error"
@@ -7469,31 +7488,31 @@ msgstr ""
 
 #. TRANSLATORS: Canceled at printer
 msgid "job-state-reasons.job-canceled-at-device"
-msgstr ""
+msgstr "Am Drucker angehalten"
 
 #. TRANSLATORS: Canceled by operator
 msgid "job-state-reasons.job-canceled-by-operator"
-msgstr ""
+msgstr "Vom Bediener angehalten"
 
 #. TRANSLATORS: Canceled by user
 msgid "job-state-reasons.job-canceled-by-user"
-msgstr ""
+msgstr "vom Benutzer angehalten"
 
 #. TRANSLATORS:
 msgid "job-state-reasons.job-completed-successfully"
-msgstr ""
+msgstr "Erfolgreich abgeschlossen"
 
 #. TRANSLATORS: Completed with errors
 msgid "job-state-reasons.job-completed-with-errors"
-msgstr ""
+msgstr "Abschluss mit Fehlern"
 
 #. TRANSLATORS: Completed with warnings
 msgid "job-state-reasons.job-completed-with-warnings"
-msgstr ""
+msgstr "Abschluss mit Warnungen"
 
 #. TRANSLATORS: Insufficient data
 msgid "job-state-reasons.job-data-insufficient"
-msgstr ""
+msgstr "Ungenügende Auftragsdaten"
 
 #. TRANSLATORS: Job Delay Output Until Specified
 msgid "job-state-reasons.job-delay-output-until-specified"
@@ -7509,15 +7528,15 @@ msgstr ""
 
 #. TRANSLATORS: Job Held For Review
 msgid "job-state-reasons.job-held-for-review"
-msgstr ""
+msgstr "Auftrag zur Prüfung angehalten"
 
 #. TRANSLATORS: Job held
 msgid "job-state-reasons.job-hold-until-specified"
-msgstr ""
+msgstr "Auftrag angehalten"
 
 #. TRANSLATORS: Incoming
 msgid "job-state-reasons.job-incoming"
-msgstr ""
+msgstr "Eingehend"
 
 #. TRANSLATORS: Interpreting
 msgid "job-state-reasons.job-interpreting"
@@ -7525,131 +7544,131 @@ msgstr ""
 
 #. TRANSLATORS: Outgoing
 msgid "job-state-reasons.job-outgoing"
-msgstr ""
+msgstr "Ausgehend"
 
 #. TRANSLATORS: Job Password Wait
 msgid "job-state-reasons.job-password-wait"
-msgstr ""
+msgstr "Warte auf Auftragspasswort"
 
 #. TRANSLATORS: Job Printed Successfully
 msgid "job-state-reasons.job-printed-successfully"
-msgstr ""
+msgstr "Auftrag erfolgreich gedruckt"
 
 #. TRANSLATORS: Job Printed With Errors
 msgid "job-state-reasons.job-printed-with-errors"
-msgstr ""
+msgstr "Auftrag mit Fehlern gedruckt"
 
 #. TRANSLATORS: Job Printed With Warnings
 msgid "job-state-reasons.job-printed-with-warnings"
-msgstr ""
+msgstr "Auftrag mit Fehlern gedruckt"
 
 #. TRANSLATORS: Printing
 msgid "job-state-reasons.job-printing"
-msgstr ""
+msgstr "Drucke"
 
 #. TRANSLATORS: Preparing to print
 msgid "job-state-reasons.job-queued"
-msgstr ""
+msgstr "Druckvorbereitung"
 
 #. TRANSLATORS: Processing document
 msgid "job-state-reasons.job-queued-for-marker"
-msgstr ""
+msgstr "Verarbeite Dokument"
 
 #. TRANSLATORS: Job Release Wait
 msgid "job-state-reasons.job-release-wait"
-msgstr ""
+msgstr "Warte auf Auftragsfreigabe"
 
 #. TRANSLATORS: Restartable
 msgid "job-state-reasons.job-restartable"
-msgstr ""
+msgstr "Kann erneut gestartet werden"
 
 #. TRANSLATORS: Job Resuming
 msgid "job-state-reasons.job-resuming"
-msgstr ""
+msgstr "Auftrags-Wiederaufnahme"
 
 #. TRANSLATORS: Job Saved Successfully
 msgid "job-state-reasons.job-saved-successfully"
-msgstr ""
+msgstr "Auftrag erfolgreich gespeichert"
 
 #. TRANSLATORS: Job Saved With Errors
 msgid "job-state-reasons.job-saved-with-errors"
-msgstr ""
+msgstr "Auftrag mit Fehlern gespeichert"
 
 #. TRANSLATORS: Job Saved With Warnings
 msgid "job-state-reasons.job-saved-with-warnings"
-msgstr ""
+msgstr "Auftrag mit Warnungen gespeichert"
 
 #. TRANSLATORS: Job Saving
 msgid "job-state-reasons.job-saving"
-msgstr ""
+msgstr "Auftragsspeicherung"
 
 #. TRANSLATORS: Job Spooling
 msgid "job-state-reasons.job-spooling"
-msgstr ""
+msgstr "Auftragsspooling"
 
 #. TRANSLATORS: Job Streaming
 msgid "job-state-reasons.job-streaming"
-msgstr ""
+msgstr "Auftrags-Streaming"
 
 #. TRANSLATORS: Suspended
 msgid "job-state-reasons.job-suspended"
-msgstr ""
+msgstr "Unterbrochen"
 
 #. TRANSLATORS: Job Suspended By Operator
 msgid "job-state-reasons.job-suspended-by-operator"
-msgstr ""
+msgstr "Auftrag vom Bediener unterbrochen"
 
 #. TRANSLATORS: Job Suspended By System
 msgid "job-state-reasons.job-suspended-by-system"
-msgstr ""
+msgstr "Auftrag vom System unterbrochen"
 
 #. TRANSLATORS: Job Suspended By User
 msgid "job-state-reasons.job-suspended-by-user"
-msgstr ""
+msgstr "Auftrag vom Benutzer unterbrochen"
 
 #. TRANSLATORS: Job Suspending
 msgid "job-state-reasons.job-suspending"
-msgstr ""
+msgstr "Auftragsunterbrechung"
 
 #. TRANSLATORS: Job Transferring
 msgid "job-state-reasons.job-transferring"
-msgstr ""
+msgstr "Auftragsverschiebung"
 
 #. TRANSLATORS: Transforming
 msgid "job-state-reasons.job-transforming"
-msgstr ""
+msgstr "Auftragstransformation"
 
 #. TRANSLATORS: None
 msgid "job-state-reasons.none"
-msgstr ""
+msgstr "Nichts"
 
 #. TRANSLATORS: Printer offline
 msgid "job-state-reasons.printer-stopped"
-msgstr ""
+msgstr "Drucker offline"
 
 #. TRANSLATORS: Printer partially stopped
 msgid "job-state-reasons.printer-stopped-partly"
-msgstr ""
+msgstr "Drucker teilweise angehalten"
 
 #. TRANSLATORS: Stopping
 msgid "job-state-reasons.processing-to-stop-point"
-msgstr ""
+msgstr "Angehalten"
 
 #. TRANSLATORS: Ready
 msgid "job-state-reasons.queued-in-device"
-msgstr ""
+msgstr "Bereit"
 
 #. TRANSLATORS: Resources Are Not Ready
 msgid "job-state-reasons.resources-are-not-ready"
-msgstr ""
+msgstr "Resourcen nicht bereit"
 
 #. TRANSLATORS: Resources Are Not Supported
 msgid "job-state-reasons.resources-are-not-supported"
-msgstr ""
+msgstr "Resourcen nicht unterstützt"
 
 #. TRANSLATORS: Service offline
 msgid "job-state-reasons.service-off-line"
-msgstr ""
+msgstr "Dienst offline"
 
 #. TRANSLATORS: Submission Interrupted
 msgid "job-state-reasons.submission-interrupted"
@@ -7657,103 +7676,103 @@ msgstr ""
 
 #. TRANSLATORS: Unsupported Attributes Or Values
 msgid "job-state-reasons.unsupported-attributes-or-values"
-msgstr ""
+msgstr "Nicht unterstützte Attribute oder Werte"
 
 #. TRANSLATORS: Unsupported Compression
 msgid "job-state-reasons.unsupported-compression"
-msgstr ""
+msgstr "Nicht unterstützte Kompression"
 
 #. TRANSLATORS: Unsupported Document Format
 msgid "job-state-reasons.unsupported-document-format"
-msgstr ""
+msgstr "Nicht unterstütztes Dokumentenformat"
 
 #. TRANSLATORS: Waiting For User Action
 msgid "job-state-reasons.waiting-for-user-action"
-msgstr ""
+msgstr "Warte auf Benutzeraktion"
 
 #. TRANSLATORS: Warnings Detected
 msgid "job-state-reasons.warnings-detected"
-msgstr ""
+msgstr "Warnung aufgetreten"
 
 #. TRANSLATORS: Pending
 msgid "job-state.3"
-msgstr ""
+msgstr "Anstehend"
 
 #. TRANSLATORS: Held
 msgid "job-state.4"
-msgstr ""
+msgstr "Angehalten"
 
 #. TRANSLATORS: Processing
 msgid "job-state.5"
-msgstr ""
+msgstr "Verarbeitend"
 
 #. TRANSLATORS: Stopped
 msgid "job-state.6"
-msgstr ""
+msgstr "Angehalten"
 
 #. TRANSLATORS: Canceled
 msgid "job-state.7"
-msgstr ""
+msgstr "Abgebrochen"
 
 #. TRANSLATORS: Aborted
 msgid "job-state.8"
-msgstr ""
+msgstr "Abgebrochen"
 
 #. TRANSLATORS: Completed
 msgid "job-state.9"
-msgstr ""
+msgstr "Fertig"
 
 #. TRANSLATORS: Laminate Pages
 msgid "laminating"
-msgstr ""
+msgstr "Seitenlaminierung"
 
 #. TRANSLATORS: Laminate
 msgid "laminating-sides"
-msgstr ""
+msgstr "Laminierung"
 
 #. TRANSLATORS: Back Only
 msgid "laminating-sides.back"
-msgstr ""
+msgstr "Nur Rückseite"
 
 #. TRANSLATORS: Front and Back
 msgid "laminating-sides.both"
-msgstr ""
+msgstr "Vor- und Rückseite"
 
 #. TRANSLATORS: Front Only
 msgid "laminating-sides.front"
-msgstr ""
+msgstr "nur Vorderseite"
 
 #. TRANSLATORS: Type of Lamination
 msgid "laminating-type"
-msgstr ""
+msgstr "Typ der Laminierung"
 
 #. TRANSLATORS: Archival
 msgid "laminating-type.archival"
-msgstr ""
+msgstr "Archiv"
 
 #. TRANSLATORS: Glossy
 msgid "laminating-type.glossy"
-msgstr ""
+msgstr "Glänzend"
 
 #. TRANSLATORS: High Gloss
 msgid "laminating-type.high-gloss"
-msgstr ""
+msgstr "Hochglänzend"
 
 #. TRANSLATORS: Matte
 msgid "laminating-type.matte"
-msgstr ""
+msgstr "Matt"
 
 #. TRANSLATORS: Semi-gloss
 msgid "laminating-type.semi-gloss"
-msgstr ""
+msgstr "Halbglänzend"
 
 #. TRANSLATORS: Translucent
 msgid "laminating-type.translucent"
-msgstr ""
+msgstr "Durchscheinend"
 
 #. TRANSLATORS: Logo
 msgid "logo"
-msgstr ""
+msgstr "Logo"
 
 msgid "lpadmin: Class name can only contain printable characters."
 msgstr "lpadmin: Klassenname darf nur druckbare Zeichen enthalten."
@@ -7820,6 +7839,8 @@ msgid ""
 "lpadmin: Printer drivers are deprecated and will stop working in a future "
 "version of CUPS."
 msgstr ""
+"lpadmin: Druckertreiber sind veraltet und werden in einer zukünftigen"
+"Version von CUPS nicht mehr funktionieren."
 
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: Druckername darf nur druckbare Zeichen enthalten."
@@ -7828,14 +7849,18 @@ msgid ""
 "lpadmin: Raw queues are deprecated and will stop working in a future version "
 "of CUPS."
 msgstr ""
+"lpadmin: Roh-Warteschlangen sind veraltet und werden in einer zukünftigen"
+"Version von CUPS nicht mehr funktionieren."
 
 msgid "lpadmin: Raw queues are no longer supported on macOS."
-msgstr ""
+msgstr "lpadmin: Roh-Warteschlangen sind unter macOS nicht mehr unterstützt."
 
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
 "reasons."
 msgstr ""
+"lpadmin: System V Schnittstellenskripte sind aus Sicherheitsgründen "
+"nicht mehr unterstützt."
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -7954,71 +7979,71 @@ msgstr ""
 
 #. TRANSLATORS: Amount of Material
 msgid "material-amount"
-msgstr ""
+msgstr "Materialmenge"
 
 #. TRANSLATORS: Amount Units
 msgid "material-amount-units"
-msgstr ""
+msgstr "Einheiten"
 
 #. TRANSLATORS: Grams
 msgid "material-amount-units.g"
-msgstr ""
+msgstr "Gramm"
 
 #. TRANSLATORS: Kilograms
 msgid "material-amount-units.kg"
-msgstr ""
+msgstr "Kilogramm"
 
 #. TRANSLATORS: Liters
 msgid "material-amount-units.l"
-msgstr ""
+msgstr "Liter"
 
 #. TRANSLATORS: Meters
 msgid "material-amount-units.m"
-msgstr ""
+msgstr "Meter"
 
 #. TRANSLATORS: Milliliters
 msgid "material-amount-units.ml"
-msgstr ""
+msgstr "Milliliter"
 
 #. TRANSLATORS: Millimeters
 msgid "material-amount-units.mm"
-msgstr ""
+msgstr "Millimeter"
 
 #. TRANSLATORS: Material Color
 msgid "material-color"
-msgstr ""
+msgstr "Materialfarbe"
 
 #. TRANSLATORS: Material Diameter
 msgid "material-diameter"
-msgstr ""
+msgstr "Materialdurchmesser"
 
 #. TRANSLATORS: Material Diameter Tolerance
 msgid "material-diameter-tolerance"
-msgstr ""
+msgstr "Material-Durchmessertoleranz"
 
 #. TRANSLATORS: Material Fill Density
 msgid "material-fill-density"
-msgstr ""
+msgstr "Material-Fülldichte"
 
 #. TRANSLATORS: Material Name
 msgid "material-name"
-msgstr ""
+msgstr "Materialname"
 
 #. TRANSLATORS: Material Nozzle Diameter
 msgid "material-nozzle-diameter"
-msgstr ""
+msgstr "Material-Düsendurchmesser"
 
 #. TRANSLATORS: Use Material For
 msgid "material-purpose"
-msgstr ""
+msgstr "Materialverwendung für"
 
 #. TRANSLATORS: Everything
 msgid "material-purpose.all"
-msgstr ""
+msgstr "Alles"
 
 #. TRANSLATORS: Base
 msgid "material-purpose.base"
-msgstr ""
+msgstr "Untergrund"
 
 #. TRANSLATORS: In-fill
 msgid "material-purpose.in-fill"
@@ -8042,15 +8067,15 @@ msgstr ""
 
 #. TRANSLATORS: Milligrams per second
 msgid "material-rate-units.mg_second"
-msgstr ""
+msgstr "Milligramm pro Sekunde"
 
 #. TRANSLATORS: Milliliters per second
 msgid "material-rate-units.ml_second"
-msgstr ""
+msgstr "Milliliter pro Sekunde"
 
 #. TRANSLATORS: Millimeters per second
 msgid "material-rate-units.mm_second"
-msgstr ""
+msgstr "Millimeter pro Sekunde"
 
 #. TRANSLATORS: Material Retraction
 msgid "material-retraction"
@@ -8062,27 +8087,27 @@ msgstr ""
 
 #. TRANSLATORS: Material Temperature
 msgid "material-temperature"
-msgstr ""
+msgstr "Materialtemperatur"
 
 #. TRANSLATORS: Material Type
 msgid "material-type"
-msgstr ""
+msgstr "Materialtyp"
 
 #. TRANSLATORS: ABS
 msgid "material-type.abs"
-msgstr ""
+msgstr "ABS"
 
 #. TRANSLATORS: Carbon Fiber ABS
 msgid "material-type.abs-carbon-fiber"
-msgstr ""
+msgstr "Kohlefaser-ABS"
 
 #. TRANSLATORS: Carbon Nanotube ABS
 msgid "material-type.abs-carbon-nanotube"
-msgstr ""
+msgstr "Kohlenstoff-Nanoröhren-ABS"
 
 #. TRANSLATORS: Chocolate
 msgid "material-type.chocolate"
-msgstr ""
+msgstr "Schokolade"
 
 #. TRANSLATORS: Gold
 msgid "material-type.gold"
@@ -8090,11 +8115,11 @@ msgstr ""
 
 #. TRANSLATORS: Nylon
 msgid "material-type.nylon"
-msgstr ""
+msgstr "Nylon"
 
 #. TRANSLATORS: Pet
 msgid "material-type.pet"
-msgstr ""
+msgstr "PET"
 
 #. TRANSLATORS: Photopolymer
 msgid "material-type.photopolymer"
@@ -8102,43 +8127,43 @@ msgstr ""
 
 #. TRANSLATORS: PLA
 msgid "material-type.pla"
-msgstr ""
+msgstr "PLA"
 
 #. TRANSLATORS: Conductive PLA
 msgid "material-type.pla-conductive"
-msgstr ""
+msgstr "Leitfähiges PLA"
 
 #. TRANSLATORS: Pla Dissolvable
 msgid "material-type.pla-dissolvable"
-msgstr ""
+msgstr "Lösliches PLA"
 
 #. TRANSLATORS: Flexible PLA
 msgid "material-type.pla-flexible"
-msgstr ""
+msgstr "Flexibles PLA"
 
 #. TRANSLATORS: Magnetic PLA
 msgid "material-type.pla-magnetic"
-msgstr ""
+msgstr "Magnetisches PLA"
 
 #. TRANSLATORS: Steel PLA
 msgid "material-type.pla-steel"
-msgstr ""
+msgstr "Stahl PLA"
 
 #. TRANSLATORS: Stone PLA
 msgid "material-type.pla-stone"
-msgstr ""
+msgstr "Stein-PLA"
 
 #. TRANSLATORS: Wood PLA
 msgid "material-type.pla-wood"
-msgstr ""
+msgstr "Holz-PLA"
 
 #. TRANSLATORS: Polycarbonate
 msgid "material-type.polycarbonate"
-msgstr ""
+msgstr "PC"
 
 #. TRANSLATORS: Dissolvable PVA
 msgid "material-type.pva-dissolvable"
-msgstr ""
+msgstr "lösliches PLA"
 
 #. TRANSLATORS: Silver
 msgid "material-type.silver"
@@ -8162,7 +8187,7 @@ msgstr "Medien"
 
 #. TRANSLATORS: Back Coating of Media
 msgid "media-back-coating"
-msgstr ""
+msgstr "Beschichtung der Rückseite"
 
 #. TRANSLATORS: Glossy
 msgid "media-back-coating.glossy"
@@ -8178,7 +8203,7 @@ msgstr "Matt"
 
 #. TRANSLATORS: None
 msgid "media-back-coating.none"
-msgstr ""
+msgstr "Keine"
 
 #. TRANSLATORS: Satin
 msgid "media-back-coating.satin"
@@ -8194,7 +8219,7 @@ msgstr ""
 
 #. TRANSLATORS: Media
 msgid "media-col"
-msgstr ""
+msgstr "Medien"
 
 #. TRANSLATORS: Media Color
 msgid "media-color"
@@ -8214,7 +8239,7 @@ msgstr "Braun"
 
 #. TRANSLATORS: Buff
 msgid "media-color.buff"
-msgstr ""gelbbraun
+msgstr "gelbbraun"
 
 #. TRANSLATORS: Clear Black
 msgid "media-color.clear-black"
@@ -8242,7 +8267,7 @@ msgstr "klargold"
 
 #. TRANSLATORS: Clear Goldenrod
 msgid "media-color.clear-goldenrod"
-msgstr ""
+msgstr "Klar-Goldenrod"
 
 #. TRANSLATORS: Clear Gray
 msgid "media-color.clear-gray"
@@ -8326,7 +8351,7 @@ msgstr "dunkelgold"
 
 #. TRANSLATORS: Dark Goldenrod
 msgid "media-color.dark-goldenrod"
-msgstr ""
+msgstr "dunkel-Goldenrod"
 
 #. TRANSLATORS: Dark Gray
 msgid "media-color.dark-gray"
@@ -8414,79 +8439,79 @@ msgstr ""
 
 #. TRANSLATORS: Light Cyan
 msgid "media-color.light-cyan"
-msgstr ""
+msgstr "hellcyan"
 
 #. TRANSLATORS: Light Gold
 msgid "media-color.light-gold"
-msgstr ""
+msgstr "hellgold"
 
 #. TRANSLATORS: Light Goldenrod
 msgid "media-color.light-goldenrod"
-msgstr ""
+msgstr "hell-Goldenrod"
 
 #. TRANSLATORS: Light Gray
 msgid "media-color.light-gray"
-msgstr ""
+msgstr "hellgrau"
 
 #. TRANSLATORS: Light Green
 msgid "media-color.light-green"
-msgstr ""
+msgstr "hellgrün"
 
 #. TRANSLATORS: Light Ivory
 msgid "media-color.light-ivory"
-msgstr ""
+msgstr "hellelfenbein"
 
 #. TRANSLATORS: Light Magenta
 msgid "media-color.light-magenta"
-msgstr ""
+msgstr "hellmagenta"
 
 #. TRANSLATORS: Light Mustard
 msgid "media-color.light-mustard"
-msgstr ""
+msgstr "hellsenf"
 
 #. TRANSLATORS: Light Orange
 msgid "media-color.light-orange"
-msgstr ""
+msgstr "hellorange"
 
 #. TRANSLATORS: Light Pink
 msgid "media-color.light-pink"
-msgstr ""
+msgstr "hellpink"
 
 #. TRANSLATORS: Light Red
 msgid "media-color.light-red"
-msgstr ""
+msgstr "hellrot"
 
 #. TRANSLATORS: Light Silver
 msgid "media-color.light-silver"
-msgstr ""
+msgstr "hellsilber"
 
 #. TRANSLATORS: Light Turquoise
 msgid "media-color.light-turquoise"
-msgstr ""
+msgstr "helltürkis"
 
 #. TRANSLATORS: Light Violet
 msgid "media-color.light-violet"
-msgstr ""
+msgstr "hellviolet"
 
 #. TRANSLATORS: Light Yellow
 msgid "media-color.light-yellow"
-msgstr ""
+msgstr "hellgelb"
 
 #. TRANSLATORS: Magenta
 msgid "media-color.magenta"
-msgstr ""
+msgstr "magenta"
 
 #. TRANSLATORS: Multi-color
 msgid "media-color.multi-color"
-msgstr ""
+msgstr "mehrfarbig"
 
 #. TRANSLATORS: Mustard
 msgid "media-color.mustard"
-msgstr ""
+msgstr "senf"
 
 #. TRANSLATORS: No Color
 msgid "media-color.no-color"
-msgstr ""
+msgstr "farblos"
 
 #. TRANSLATORS: Orange
 msgid "media-color.orange"
@@ -8498,31 +8523,31 @@ msgstr "pink"
 
 #. TRANSLATORS: Red
 msgid "media-color.red"
-msgstr ""
+msgstr "rot"
 
 #. TRANSLATORS: Silver
 msgid "media-color.silver"
-msgstr ""
+msgstr "silber"
 
 #. TRANSLATORS: Turquoise
 msgid "media-color.turquoise"
-msgstr ""
+msgstr "türkis"
 
 #. TRANSLATORS: Violet
 msgid "media-color.violet"
-msgstr ""
+msgstr "violett"
 
 #. TRANSLATORS: White
 msgid "media-color.white"
-msgstr ""
+msgstr "weiß"
 
 #. TRANSLATORS: Yellow
 msgid "media-color.yellow"
-msgstr ""
+msgstr "gelb"
 
 #. TRANSLATORS: Front Coating of Media
 msgid "media-front-coating"
-msgstr ""
+msgstr "Beschichtung der Medien-Vorderseite"
 
 #. TRANSLATORS: Media Grain
 msgid "media-grain"
@@ -8550,7 +8575,7 @@ msgstr ""
 
 #. TRANSLATORS: Media Left Margin
 msgid "media-left-margin"
-msgstr ""
+msgstr "linker Rand des Mediums"
 
 #. TRANSLATORS: Pre-printed Media
 msgid "media-pre-printed"
@@ -8602,7 +8627,7 @@ msgstr ""
 
 #. TRANSLATORS: Alternate Roll
 msgid "media-source.alternate-roll"
-msgstr ""
+msgstr "Alternative Rolle"
 
 #. TRANSLATORS: Automatic
 msgid "media-source.auto"
@@ -8622,7 +8647,7 @@ msgstr "mitte"
 
 #. TRANSLATORS: Disc
 msgid "media-source.disc"
-msgstr ""
+msgstr "Scheibe"
 
 #. TRANSLATORS: Envelope
 msgid "media-source.envelope"
@@ -8630,11 +8655,11 @@ msgstr "Umschlag"
 
 #. TRANSLATORS: Hagaki
 msgid "media-source.hagaki"
-msgstr ""
+msgstr "Hagaki"
 
 #. TRANSLATORS: Large Capacity
 msgid "media-source.large-capacity"
-msgstr ""
+msgstr "Großvolumen"
 
 #. TRANSLATORS: Left
 msgid "media-source.left"
@@ -8646,7 +8671,7 @@ msgstr "Haupt"
 
 #. TRANSLATORS: Main Roll
 msgid "media-source.main-roll"
-msgstr "Haoptrolle"
+msgstr "Hauptrolle"
 
 #. TRANSLATORS: Manual
 msgid "media-source.manual"
@@ -8822,15 +8847,15 @@ msgstr "Fein"
 
 #. TRANSLATORS: Linen
 msgid "media-tooth.linen"
-msgstr ""
+msgstr "Linien"
 
 #. TRANSLATORS: Medium
 msgid "media-tooth.medium"
-msgstr ""
+msgstr "Mittel"
 
 #. TRANSLATORS: Smooth
 msgid "media-tooth.smooth"
-msgstr ""
+msgstr "Fein"
 
 #. TRANSLATORS: Stipple
 msgid "media-tooth.stipple"
@@ -8838,15 +8863,15 @@ msgstr ""
 
 #. TRANSLATORS: Rough
 msgid "media-tooth.uncalendared"
-msgstr ""
+msgstr "Rauh"
 
 #. TRANSLATORS: Vellum
 msgid "media-tooth.vellum"
-msgstr ""
+msgstr "Pergament"
 
 #. TRANSLATORS: Media Top Margin
 msgid "media-top-margin"
-msgstr ""
+msgstr "Oberer Rand des Mediums"
 
 #. TRANSLATORS: Media Type
 msgid "media-type"
@@ -8858,7 +8883,7 @@ msgstr "Aliminium"
 
 #. TRANSLATORS: Automatic
 msgid "media-type.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Back Print Film
 msgid "media-type.back-print-film"
@@ -8870,7 +8895,7 @@ msgstr "Karton"
 
 #. TRANSLATORS: Cardstock
 msgid "media-type.cardstock"
-msgstr ""
+msgstr "Postkarte"
 
 #. TRANSLATORS: CD
 msgid "media-type.cd"
@@ -9002,15 +9027,15 @@ msgstr ""
 
 #. TRANSLATORS: Coated Envelope
 msgid "media-type.envelope-coated"
-msgstr ""
+msgstr "Beschichteter Umschlag"
 
 #. TRANSLATORS: Cotton Envelope
 msgid "media-type.envelope-cotton"
-msgstr ""
+msgstr "Baumwollumschlag"
 
 #. TRANSLATORS: Fine Envelope
 msgid "media-type.envelope-fine"
-msgstr ""
+msgstr "Feiner Umschlag"
 
 #. TRANSLATORS: Heavyweight Envelope
 msgid "media-type.envelope-heavyweight"
@@ -9022,7 +9047,7 @@ msgstr "Inkjet Umschlag"
 
 #. TRANSLATORS: Lightweight Envelope
 msgid "media-type.envelope-lightweight"
-msgstr ""
+msgstr "Leichter Umschlag"
 
 #. TRANSLATORS: Plain Envelope
 msgid "media-type.envelope-plain"
@@ -9038,35 +9063,35 @@ msgstr "Fensterumschlag"
 
 #. TRANSLATORS: Fabric
 msgid "media-type.fabric"
-msgstr ""
+msgstr "Gewebe"
 
 #. TRANSLATORS: Archival Fabric
 msgid "media-type.fabric-archival"
-msgstr ""
+msgstr "Archiv-Gewebe"
 
 #. TRANSLATORS: Glossy Fabric
 msgid "media-type.fabric-glossy"
-msgstr ""
+msgstr "Glänzendes Gewebe"
 
 #. TRANSLATORS: High Gloss Fabric
 msgid "media-type.fabric-high-gloss"
-msgstr ""
+msgstr "Hochglanzgewebe"
 
 #. TRANSLATORS: Matte Fabric
 msgid "media-type.fabric-matte"
-msgstr ""
+msgstr "Mattes Gewebe"
 
 #. TRANSLATORS: Semi-Gloss Fabric
 msgid "media-type.fabric-semi-gloss"
-msgstr ""
+msgstr "Halbglänzendes Gewebe"
 
 #. TRANSLATORS: Waterproof Fabric
 msgid "media-type.fabric-waterproof"
-msgstr ""
+msgstr "Wasserfestes Gewebe"
 
 #. TRANSLATORS: Film
 msgid "media-type.film"
-msgstr ""
+msgstr "Film"
 
 #. TRANSLATORS: Flexo Base
 msgid "media-type.flexo-base"
@@ -9082,7 +9107,7 @@ msgstr ""
 
 #. TRANSLATORS: Foil
 msgid "media-type.foil"
-msgstr ""
+msgstr "Folie"
 
 #. TRANSLATORS: Full Cut Tabs
 msgid "media-type.full-cut-tabs"
@@ -9090,15 +9115,15 @@ msgstr ""
 
 #. TRANSLATORS: Glass
 msgid "media-type.glass"
-msgstr ""
+msgstr "Glas"
 
 #. TRANSLATORS: Glass Colored
 msgid "media-type.glass-colored"
-msgstr ""
+msgstr "farbiges Glas"
 
 #. TRANSLATORS: Glass Opaque
 msgid "media-type.glass-opaque"
-msgstr ""
+msgstr "opakes Glas"
 
 #. TRANSLATORS: Glass Surfaced
 msgid "media-type.glass-surfaced"
@@ -9106,11 +9131,11 @@ msgstr ""
 
 #. TRANSLATORS: Glass Textured
 msgid "media-type.glass-textured"
-msgstr ""
+msgstr "Texturiertes Glas"
 
 #. TRANSLATORS: Gravure Cylinder
 msgid "media-type.gravure-cylinder"
-msgstr ""
+msgstr "Gravurtrommel"
 
 #. TRANSLATORS: Image Setter Paper
 msgid "media-type.image-setter-paper"
@@ -9118,7 +9143,7 @@ msgstr ""
 
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
-msgstr ""
+msgstr "Bildtrommel"
 
 #. TRANSLATORS: Photo Paper Plus Glossy II
 msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
@@ -9166,7 +9191,7 @@ msgstr "permanente Aufkleber"
 
 #. TRANSLATORS: Satin Labels
 msgid "media-type.labels-satin"
-msgstr ""
+msgstr "Satin Aufkleber"
 
 #. TRANSLATORS: Security Labels
 msgid "media-type.labels-security"
@@ -9198,7 +9223,7 @@ msgstr ""
 
 #. TRANSLATORS: Metal Matte
 msgid "media-type.metal-matte"
-msgstr ""
+msgstr "Mattes Metall"
 
 #. TRANSLATORS: Metal Satin
 msgid "media-type.metal-satin"
@@ -9214,7 +9239,7 @@ msgstr ""
 
 #. TRANSLATORS: Multi Layer
 msgid "media-type.multi-layer"
-msgstr ""
+msgstr "Mehrlagig"
 
 #. TRANSLATORS: Multi Part Form
 msgid "media-type.multi-part-form"
@@ -9222,11 +9247,11 @@ msgstr ""
 
 #. TRANSLATORS: Other
 msgid "media-type.other"
-msgstr ""
+msgstr "Andere"
 
 #. TRANSLATORS: Paper
 msgid "media-type.paper"
-msgstr ""
+msgstr "Papier"
 
 #. TRANSLATORS: Photo Paper
 msgid "media-type.photographic"
@@ -9350,7 +9375,7 @@ msgstr ""
 
 #. TRANSLATORS: Coated Paper
 msgid "media-type.stationery-coated"
-msgstr ""
+msgstr "beschichtetes Papier"
 
 #. TRANSLATORS: Stationery Cotton
 msgid "media-type.stationery-cotton"
@@ -9358,11 +9383,11 @@ msgstr ""
 
 #. TRANSLATORS: Vellum Paper
 msgid "media-type.stationery-fine"
-msgstr ""
+msgstr "Pergamentpapier"
 
 #. TRANSLATORS: Heavyweight Paper
 msgid "media-type.stationery-heavyweight"
-msgstr ""
+msgstr "schweres Papier"
 
 #. TRANSLATORS: Stationery Heavyweight Coated
 msgid "media-type.stationery-heavyweight-coated"
@@ -9374,7 +9399,7 @@ msgstr ""
 
 #. TRANSLATORS: Letterhead
 msgid "media-type.stationery-letterhead"
-msgstr ""
+msgstr "Briefkopf"
 
 #. TRANSLATORS: Lightweight Paper
 msgid "media-type.stationery-lightweight"
@@ -9382,11 +9407,11 @@ msgstr ""
 
 #. TRANSLATORS: Preprinted Paper
 msgid "media-type.stationery-preprinted"
-msgstr ""
+msgstr "vorbedrucktes Papier"
 
 #. TRANSLATORS: Punched Paper
 msgid "media-type.stationery-prepunched"
-msgstr ""
+msgstr "gelochtes Papier"
 
 #. TRANSLATORS: Tab Stock
 msgid "media-type.tab-stock"
@@ -9402,7 +9427,7 @@ msgstr ""
 
 #. TRANSLATORS: Transparency
 msgid "media-type.transparency"
-msgstr ""
+msgstr "Transparentfolie"
 
 #. TRANSLATORS: Triple Wall
 msgid "media-type.triple-wall"
@@ -9410,15 +9435,15 @@ msgstr ""
 
 #. TRANSLATORS: Wet Film
 msgid "media-type.wet-film"
-msgstr ""
+msgstr "Nassfilm"
 
 #. TRANSLATORS: Media Weight (grams per m²)
 msgid "media-weight-metric"
-msgstr ""
+msgstr "spezifisches Mediengewicht (g/m²)"
 
 #. TRANSLATORS: 28 x 40″
 msgid "media.asme_f_28x40in"
-msgstr ""
+msgstr "20×40"
 
 #. TRANSLATORS: A4 or US Letter
 msgid "media.choice_iso_a4_210x297mm_na_letter_8.5x11in"
@@ -9426,7 +9451,7 @@ msgstr "A4 oder US Letter"
 
 #. TRANSLATORS: 2a0
 msgid "media.iso_2a0_1189x1682mm"
-msgstr ""
+msgstr "2A0"
 
 #. TRANSLATORS: A0
 msgid "media.iso_a0_841x1189mm"
@@ -9614,115 +9639,115 @@ msgstr "B9"
 
 #. TRANSLATORS: CEnvelope 0
 msgid "media.iso_c0_917x1297mm"
-msgstr "Cumschalg 0"
+msgstr "Umschalg C0"
 
 #. TRANSLATORS: CEnvelope 10
 msgid "media.iso_c10_28x40mm"
-msgstr ""
+msgstr "Umschalg C10"
 
 #. TRANSLATORS: CEnvelope 1
 msgid "media.iso_c1_648x917mm"
-msgstr ""
+msgstr "Umschalg C1"
 
 #. TRANSLATORS: CEnvelope 2
 msgid "media.iso_c2_458x648mm"
-msgstr ""
+msgstr "Umschalg C2"
 
 #. TRANSLATORS: CEnvelope 3
 msgid "media.iso_c3_324x458mm"
-msgstr ""
+msgstr "Umschalg C3"
 
 #. TRANSLATORS: CEnvelope 4
 msgid "media.iso_c4_229x324mm"
-msgstr ""
+msgstr "Umschlag C4"
 
 #. TRANSLATORS: CEnvelope 5
 msgid "media.iso_c5_162x229mm"
-msgstr ""
+msgstr "Umschlag C5"
 
 #. TRANSLATORS: CEnvelope 6
 msgid "media.iso_c6_114x162mm"
-msgstr ""
+msgstr "Umschlag C6"
 
 #. TRANSLATORS: CEnvelope 6c5
 msgid "media.iso_c6c5_114x229mm"
-msgstr ""
+msgstr "Umschlag 6C5"
 
 #. TRANSLATORS: CEnvelope 7
 msgid "media.iso_c7_81x114mm"
-msgstr ""
+msgstr "Umschalg C7"
 
 #. TRANSLATORS: CEnvelope 7c6
 msgid "media.iso_c7c6_81x162mm"
-msgstr ""
+msgstr "Umschalg 7C6"
 
 #. TRANSLATORS: CEnvelope 8
 msgid "media.iso_c8_57x81mm"
-msgstr ""
+msgstr "Umschalg C8"
 
 #. TRANSLATORS: CEnvelope 9
 msgid "media.iso_c9_40x57mm"
-msgstr ""
+msgstr "Umschalg C9"
 
 #. TRANSLATORS: Envelope DL
 msgid "media.iso_dl_110x220mm"
-msgstr ""
+msgstr "Umschalg DL"
 
 #. TRANSLATORS: Id-1
 msgid "media.iso_id-1_53.98x85.6mm"
-msgstr ""
+msgstr "ID-1"
 
 #. TRANSLATORS: Id-3
 msgid "media.iso_id-3_88x125mm"
-msgstr ""
+msgstr "ID-3"
 
 #. TRANSLATORS: ISO RA0
 msgid "media.iso_ra0_860x1220mm"
-msgstr ""
+msgstr "ISO RA0"
 
 #. TRANSLATORS: ISO RA1
 msgid "media.iso_ra1_610x860mm"
-msgstr ""
+msgstr "ISO RA1"
 
 #. TRANSLATORS: ISO RA2
 msgid "media.iso_ra2_430x610mm"
-msgstr ""
+msgstr "ISO RA2"
 
 #. TRANSLATORS: ISO RA3
 msgid "media.iso_ra3_305x430mm"
-msgstr ""
+msgstr "ISO RA3"
 
 #. TRANSLATORS: ISO RA4
 msgid "media.iso_ra4_215x305mm"
-msgstr ""
+msgstr "ISO RA4"
 
 #. TRANSLATORS: ISO SRA0
 msgid "media.iso_sra0_900x1280mm"
-msgstr ""
+msgstr "ISO SRA0"
 
 #. TRANSLATORS: ISO SRA1
 msgid "media.iso_sra1_640x900mm"
-msgstr ""
+msgstr "ISO SRA1"
 
 #. TRANSLATORS: ISO SRA2
 msgid "media.iso_sra2_450x640mm"
-msgstr ""
+msgstr "ISO SRA2"
 
 #. TRANSLATORS: ISO SRA3
 msgid "media.iso_sra3_320x450mm"
-msgstr ""
+msgstr "ISO SRA3"
 
 #. TRANSLATORS: ISO SRA4
 msgid "media.iso_sra4_225x320mm"
-msgstr ""
+msgstr "ISO SRA4"
 
 #. TRANSLATORS: JIS B0
 msgid "media.jis_b0_1030x1456mm"
-msgstr ""
+msgstr "JIS B0"
 
 #. TRANSLATORS: JIS B10
 msgid "media.jis_b10_32x45mm"
-msgstr ""
+msgstr "JIS B10"
 
 #. TRANSLATORS: JIS B1
 msgid "media.jis_b1_728x1030mm"
@@ -10226,11 +10251,11 @@ msgstr "Mitglieder der Klasse %s:"
 
 #. TRANSLATORS: Multiple Document Handling
 msgid "multiple-document-handling"
-msgstr ""
+msgstr "Behandlung mehrere Dokumente"
 
 #. TRANSLATORS: Separate Documents Collated Copies
 msgid "multiple-document-handling.separate-documents-collated-copies"
-msgstr ""
+msgstr "gruppierte Kopien"
 
 #. TRANSLATORS: Separate Documents Uncollated Copies
 msgid "multiple-document-handling.separate-documents-uncollated-copies"
@@ -10238,7 +10263,7 @@ msgstr ""
 
 #. TRANSLATORS: Single Document
 msgid "multiple-document-handling.single-document"
-msgstr ""
+msgstr "Dokument einzeln"
 
 #. TRANSLATORS: Single Document New Sheet
 msgid "multiple-document-handling.single-document-new-sheet"
@@ -10246,7 +10271,7 @@ msgstr ""
 
 #. TRANSLATORS: Multiple Object Handling
 msgid "multiple-object-handling"
-msgstr ""
+msgstr "Handhabung mehrerer Objekte"
 
 #. TRANSLATORS: Multiple Object Handling Actual
 msgid "multiple-object-handling-actual"
@@ -10254,7 +10279,7 @@ msgstr ""
 
 #. TRANSLATORS: Automatic
 msgid "multiple-object-handling.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Best Fit
 msgid "multiple-object-handling.best-fit"
@@ -10262,31 +10287,31 @@ msgstr ""
 
 #. TRANSLATORS: Best Quality
 msgid "multiple-object-handling.best-quality"
-msgstr ""
+msgstr "höchste Qualität"
 
 #. TRANSLATORS: Best Speed
 msgid "multiple-object-handling.best-speed"
-msgstr ""
+msgstr "schnellste Verarbeitung"
 
 #. TRANSLATORS: One At A Time
 msgid "multiple-object-handling.one-at-a-time"
-msgstr ""
+msgstr "Einzeln"
 
 #. TRANSLATORS: On Timeout
 msgid "multiple-operation-time-out-action"
-msgstr ""
+msgstr "Bei Zeitüberschreitung"
 
 #. TRANSLATORS: Abort Job
 msgid "multiple-operation-time-out-action.abort-job"
-msgstr ""
+msgstr "Auftrag abbrechen"
 
 #. TRANSLATORS: Hold Job
 msgid "multiple-operation-time-out-action.hold-job"
-msgstr ""
+msgstr "Auftrag anhalten"
 
 #. TRANSLATORS: Process Job
 msgid "multiple-operation-time-out-action.process-job"
-msgstr ""
+msgstr "Auftrag verarbeiten"
 
 msgid "no entries"
 msgstr "Keine Einträge"
@@ -10339,39 +10364,39 @@ msgstr ""
 
 #. TRANSLATORS: Job Completed
 msgid "notify-events.job-completed"
-msgstr ""
+msgstr "Auftrag abgeschlossen"
 
 #. TRANSLATORS: Job Config Changed
 msgid "notify-events.job-config-changed"
-msgstr ""
+msgstr "Auftragskonfiguration geändert"
 
 #. TRANSLATORS: Job Created
 msgid "notify-events.job-created"
-msgstr ""
+msgstr "Auftrag erstellt"
 
 #. TRANSLATORS: Job Fetchable
 msgid "notify-events.job-fetchable"
-msgstr ""
+msgstr "Auftrag abholbar"
 
 #. TRANSLATORS: Job Progress
 msgid "notify-events.job-progress"
-msgstr ""
+msgstr "Auftragsfortschritt"
 
 #. TRANSLATORS: Job State Changed
 msgid "notify-events.job-state-changed"
-msgstr ""
+msgstr "Auftragsstatus geändert"
 
 #. TRANSLATORS: Job Stopped
 msgid "notify-events.job-stopped"
-msgstr ""
+msgstr "Auftrag angehalten"
 
 #. TRANSLATORS: None
 msgid "notify-events.none"
-msgstr ""
+msgstr "Keine"
 
 #. TRANSLATORS: Printer Config Changed
 msgid "notify-events.printer-config-changed"
-msgstr ""
+msgstr "Druckerkonfiguration geändert"
 
 #. TRANSLATORS: Printer Finishings Changed
 msgid "notify-events.printer-finishings-changed"
