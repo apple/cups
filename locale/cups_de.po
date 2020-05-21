@@ -5444,19 +5444,19 @@ msgstr "Deckblattyp"
 
 #. TRANSLATORS: Archival
 msgid "coating-type.archival"
-msgstr "Archiv"
+msgstr "Archivfähig"
 
 #. TRANSLATORS: Archival Glossy
 msgid "coating-type.archival-glossy"
-msgstr "Archiv-Glanzpapier"
+msgstr "Glänzend archivfähig"
 
 #. TRANSLATORS: Archival Matte
 msgid "coating-type.archival-matte"
-msgstr "Archiv-Matt"
+msgstr "Matt archivfähig"
 
 #. TRANSLATORS: Archival Semi Gloss
 msgid "coating-type.archival-semi-gloss"
-msgstr "Archiv-Seidenglanz"
+msgstr "Seidenglanz archivfähig"
 
 #. TRANSLATORS: Glossy
 msgid "coating-type.glossy"
@@ -7748,7 +7748,7 @@ msgstr "Typ der Laminierung"
 
 #. TRANSLATORS: Archival
 msgid "laminating-type.archival"
-msgstr "Archiv"
+msgstr "Archivfähig"
 
 #. TRANSLATORS: Glossy
 msgid "laminating-type.glossy"
@@ -9019,7 +9019,7 @@ msgstr "Umschlag"
 
 #. TRANSLATORS: Archival Envelope
 msgid "media-type.envelope-archival"
-msgstr "Archivumschlag"
+msgstr "Umschlag archivfähig"
 
 #. TRANSLATORS: Bond Envelope
 msgid "media-type.envelope-bond"
@@ -9067,7 +9067,7 @@ msgstr "Gewebe"
 
 #. TRANSLATORS: Archival Fabric
 msgid "media-type.fabric-archival"
-msgstr "Archiv-Gewebe"
+msgstr "Gewebe archivfähig"
 
 #. TRANSLATORS: Glossy Fabric
 msgid "media-type.fabric-glossy"
@@ -9139,7 +9139,7 @@ msgstr "Gravurtrommel"
 
 #. TRANSLATORS: Image Setter Paper
 msgid "media-type.image-setter-paper"
-msgstr ""
+msgstr "Belichterpapier"
 
 #. TRANSLATORS: Imaging Cylinder
 msgid "media-type.imaging-cylinder"
@@ -9147,19 +9147,19 @@ msgstr "Bildtrommel"
 
 #. TRANSLATORS: Photo Paper Plus Glossy II
 msgid "media-type.jp.co.canon-photo-paper-plus-glossy-ii"
-msgstr ""
+msgstr "Fotopapier Plus Glossy II"
 
 #. TRANSLATORS: Photo Paper Pro Platinum
 msgid "media-type.jp.co.canon-photo-paper-pro-platinum"
-msgstr ""
+msgstr "Fotopapier Pro Platinum"
 
 #. TRANSLATORS: Photo Paper Plus Glossy II
 msgid "media-type.jp.co.canon_photo-paper-plus-glossy-ii"
-msgstr ""
+msgstr "Fotopapier Plus Glossy I"
 
 #. TRANSLATORS: Photo Paper Pro Platinum
 msgid "media-type.jp.co.canon_photo-paper-pro-platinum"
-msgstr ""
+msgstr "Fotopapier Pro Platinum"
 
 #. TRANSLATORS: Labels
 msgid "media-type.labels"
@@ -9183,7 +9183,7 @@ msgstr "Inkjet Aufkleber"
 
 #. TRANSLATORS: Matte Labels
 msgid "media-type.labels-matte"
-msgstr ""
+msgstr "Aufkleber matt"
 
 #. TRANSLATORS: Permanent Labels
 msgid "media-type.labels-permanent"
@@ -9259,7 +9259,7 @@ msgstr "Fotopapier"
 
 #. TRANSLATORS: Photographic Archival
 msgid "media-type.photographic-archival"
-msgstr ""
+msgstr "Fotopapier archivfähig"
 
 #. TRANSLATORS: Photo Film
 msgid "media-type.photographic-film"
@@ -9267,55 +9267,55 @@ msgstr "Fotofilm"
 
 #. TRANSLATORS: Glossy Photo Paper
 msgid "media-type.photographic-glossy"
-msgstr ""
+msgstr "Fotopapier glänzend"
 
 #. TRANSLATORS: High Gloss Photo Paper
 msgid "media-type.photographic-high-gloss"
-msgstr ""
+msgstr "Fotopapier hochglänzend"
 
 #. TRANSLATORS: Matte Photo Paper
 msgid "media-type.photographic-matte"
-msgstr ""
+msgstr "Fotopapier matt"
 
 #. TRANSLATORS: Satin Photo Paper
 msgid "media-type.photographic-satin"
-msgstr ""
+msgstr "Fotopapier satin"
 
 #. TRANSLATORS: Semi-Gloss Photo Paper
 msgid "media-type.photographic-semi-gloss"
-msgstr ""
+msgstr "Foropapier halbglänzend"
 
 #. TRANSLATORS: Plastic
 msgid "media-type.plastic"
-msgstr "Plastik"
+msgstr "Kunststoff"
 
 #. TRANSLATORS: Plastic Archival
 msgid "media-type.plastic-archival"
-msgstr ""
+msgstr "Kunststoff archivfähig"
 
 #. TRANSLATORS: Plastic Colored
 msgid "media-type.plastic-colored"
-msgstr ""
+msgstr "Kunststoff gefärbt"
 
 #. TRANSLATORS: Plastic Glossy
 msgid "media-type.plastic-glossy"
-msgstr ""
+msgstr "Kunststoff glänzend"
 
 #. TRANSLATORS: Plastic High Gloss
 msgid "media-type.plastic-high-gloss"
-msgstr ""
+msgstr "Kunststoff hochglanz"
 
 #. TRANSLATORS: Plastic Matte
 msgid "media-type.plastic-matte"
-msgstr ""
+msgstr "Kunststoff matt"
 
 #. TRANSLATORS: Plastic Satin
 msgid "media-type.plastic-satin"
-msgstr ""
+msgstr "Kunststoff satin"
 
 #. TRANSLATORS: Plastic Semi Gloss
 msgid "media-type.plastic-semi-gloss"
-msgstr ""
+msgstr "Kunststoff halbglänzend"
 
 #. TRANSLATORS: Plate
 msgid "media-type.plate"
@@ -9323,7 +9323,7 @@ msgstr ""
 
 #. TRANSLATORS: Polyester
 msgid "media-type.polyester"
-msgstr ""
+msgstr "PE"
 
 #. TRANSLATORS: Pre Cut Tabs
 msgid "media-type.pre-cut-tabs"
@@ -9343,15 +9343,15 @@ msgstr ""
 
 #. TRANSLATORS: Self Adhesive
 msgid "media-type.self-adhesive"
-msgstr ""
+msgstr "Selbstklebend"
 
 #. TRANSLATORS: Self Adhesive Film
 msgid "media-type.self-adhesive-film"
-msgstr ""
+msgstr "Selbstklebende Folie"
 
 #. TRANSLATORS: Shrink Foil
 msgid "media-type.shrink-foil"
-msgstr ""
+msgstr "Schrumpffolie"
 
 #. TRANSLATORS: Single Face
 msgid "media-type.single-face"
@@ -9367,11 +9367,11 @@ msgstr ""
 
 #. TRANSLATORS: Stationery
 msgid "media-type.stationery"
-msgstr ""
+msgstr "Normalpapier"
 
 #. TRANSLATORS: Stationery Archival
 msgid "media-type.stationery-archival"
-msgstr ""
+msgstr "Normalpapier archivfähig"
 
 #. TRANSLATORS: Coated Paper
 msgid "media-type.stationery-coated"
@@ -9379,7 +9379,7 @@ msgstr "beschichtetes Papier"
 
 #. TRANSLATORS: Stationery Cotton
 msgid "media-type.stationery-cotton"
-msgstr ""
+msgstr "Normalpapier Baumwolle"
 
 #. TRANSLATORS: Vellum Paper
 msgid "media-type.stationery-fine"
@@ -9391,11 +9391,11 @@ msgstr "schweres Papier"
 
 #. TRANSLATORS: Stationery Heavyweight Coated
 msgid "media-type.stationery-heavyweight-coated"
-msgstr ""
+msgstr "schweres, beschichtetes Normalpapier"
 
 #. TRANSLATORS: Stationery Inkjet Paper
 msgid "media-type.stationery-inkjet"
-msgstr ""
+msgstr "Tintenstrahl-Normalpapier"
 
 #. TRANSLATORS: Letterhead
 msgid "media-type.stationery-letterhead"
@@ -9403,7 +9403,7 @@ msgstr "Briefkopf"
 
 #. TRANSLATORS: Lightweight Paper
 msgid "media-type.stationery-lightweight"
-msgstr ""
+msgstr "leichtes Papier"
 
 #. TRANSLATORS: Preprinted Paper
 msgid "media-type.stationery-preprinted"
@@ -9431,7 +9431,7 @@ msgstr "Transparentfolie"
 
 #. TRANSLATORS: Triple Wall
 msgid "media-type.triple-wall"
-msgstr ""
+msgstr "Dreilagenpapier"
 
 #. TRANSLATORS: Wet Film
 msgid "media-type.wet-film"
@@ -9807,11 +9807,11 @@ msgstr "Umschalg Chou 4"
 
 #. TRANSLATORS: Hagaki
 msgid "media.jpn_hagaki_100x148mm"
-msgstr ""
+msgstr "Hagaki"
 
 #. TRANSLATORS: Envelope Kahu
 msgid "media.jpn_kahu_240x322.1mm"
-msgstr ""
+msgstr "Umschlag Kahu"
 
 #. TRANSLATORS: 270 x 382mm
 msgid "media.jpn_kaku1_270x382mm"
@@ -9843,23 +9843,23 @@ msgstr ""
 
 #. TRANSLATORS: Oufuku Reply Postcard
 msgid "media.jpn_oufuku_148x200mm"
-msgstr ""
+msgstr "Oufuku Postkarte"
 
 #. TRANSLATORS: Envelope You 4
 msgid "media.jpn_you4_105x235mm"
-msgstr ""
+msgstr "Umschlag You 4"
 
 #. TRANSLATORS: 10 x 11″
 msgid "media.na_10x11_10x11in"
-msgstr ""
+msgstr "10×11 inch"
 
 #. TRANSLATORS: 10 x 13″
 msgid "media.na_10x13_10x13in"
-msgstr ""
+msgstr "10×13 inch"
 
 #. TRANSLATORS: 10 x 14″
 msgid "media.na_10x14_10x14in"
-msgstr ""
+msgstr "10×14 inch"
 
 #. TRANSLATORS: 10 x 15″
 msgid "media.na_10x15_10x15in"
@@ -9867,35 +9867,35 @@ msgstr ""
 
 #. TRANSLATORS: 11 x 12″
 msgid "media.na_11x12_11x12in"
-msgstr ""
+msgstr "10×12 inch"
 
 #. TRANSLATORS: 11 x 15″
 msgid "media.na_11x15_11x15in"
-msgstr ""
+msgstr "11×15 inch"
 
 #. TRANSLATORS: 12 x 19″
 msgid "media.na_12x19_12x19in"
-msgstr ""
+msgstr "12×19 inch"
 
 #. TRANSLATORS: 5 x 7″
 msgid "media.na_5x7_5x7in"
-msgstr ""
+msgstr "5×7 inch"
 
 #. TRANSLATORS: 6 x 9″
 msgid "media.na_6x9_6x9in"
-msgstr ""
+msgstr "6×9 inch"
 
 #. TRANSLATORS: 7 x 9″
 msgid "media.na_7x9_7x9in"
-msgstr ""
+msgstr "7×9 inch"
 
 #. TRANSLATORS: 9 x 11″
 msgid "media.na_9x11_9x11in"
-msgstr ""
+msgstr "9×11 inch"
 
 #. TRANSLATORS: Envelope A2
 msgid "media.na_a2_4.375x5.75in"
-msgstr ""
+msgstr "Umschlag A2"
 
 #. TRANSLATORS: 9 x 12″
 msgid "media.na_arch-a_9x12in"
@@ -10023,35 +10023,35 @@ msgstr ""
 
 #. TRANSLATORS: US Letter
 msgid "media.na_letter_8.5x11in"
-msgstr ""
+msgstr "US Letter"
 
 #. TRANSLATORS: Envelope Monarch
 msgid "media.na_monarch_3.875x7.5in"
-msgstr ""
+msgstr "Umschlag Monarch"
 
 #. TRANSLATORS: Envelope #10
 msgid "media.na_number-10_4.125x9.5in"
-msgstr ""
+msgstr "Umschlag #10"
 
 #. TRANSLATORS: Envelope #11
 msgid "media.na_number-11_4.5x10.375in"
-msgstr ""
+msgstr "Umschlag #11"
 
 #. TRANSLATORS: Envelope #12
 msgid "media.na_number-12_4.75x11in"
-msgstr ""
+msgstr "Umschalg #12"
 
 #. TRANSLATORS: Envelope #14
 msgid "media.na_number-14_5x11.5in"
-msgstr ""
+msgstr "Umschalg #14"
 
 #. TRANSLATORS: Envelope #9
 msgid "media.na_number-9_3.875x8.875in"
-msgstr ""
+msgstr "Umschalg #9"
 
 #. TRANSLATORS: 8.5 x 13.4″
 msgid "media.na_oficio_8.5x13.4in"
-msgstr ""
+msgstr "8,5×13,4 inch"
 
 #. TRANSLATORS: Envelope Personal
 msgid "media.na_personal_3.625x6.5in"
@@ -10059,107 +10059,107 @@ msgstr ""
 
 #. TRANSLATORS: Quarto
 msgid "media.na_quarto_8.5x10.83in"
-msgstr ""
+msgstr "Quadro"
 
 #. TRANSLATORS: 8.94 x 14″
 msgid "media.na_super-a_8.94x14in"
-msgstr ""
+msgstr "8,94×14 inch"
 
 #. TRANSLATORS: 13 x 19″
 msgid "media.na_super-b_13x19in"
-msgstr ""
+msgstr "13×19 inch"
 
 #. TRANSLATORS: 30 x 42″
 msgid "media.na_wide-format_30x42in"
-msgstr ""
+msgstr "30×42 inch"
 
 #. TRANSLATORS: 12 x 16″
 msgid "media.oe_12x16_12x16in"
-msgstr ""
+msgstr "12×16 inch"
 
 #. TRANSLATORS: 14 x 17″
 msgid "media.oe_14x17_14x17in"
-msgstr ""
+msgstr "14×17 inch"
 
 #. TRANSLATORS: 18 x 22″
 msgid "media.oe_18x22_18x22in"
-msgstr ""
+msgstr "18×22 inch"
 
 #. TRANSLATORS: 17 x 24″
 msgid "media.oe_a2plus_17x24in"
-msgstr ""
+msgstr "17×24 inch"
 
 #. TRANSLATORS: 2 x 3.5″
 msgid "media.oe_business-card_2x3.5in"
-msgstr ""
+msgstr "Visitenkarte 2×3,5 inch"
 
 #. TRANSLATORS: 10 x 12″
 msgid "media.oe_photo-10r_10x12in"
-msgstr ""
+msgstr "10×12 inch"
 
 #. TRANSLATORS: 20 x 24″
 msgid "media.oe_photo-20r_20x24in"
-msgstr ""
+msgstr "20×24 inch"
 
 #. TRANSLATORS: 3.5 x 5″
 msgid "media.oe_photo-l_3.5x5in"
-msgstr ""
+msgstr "3,5×5 inch"
 
 #. TRANSLATORS: 10 x 15″
 msgid "media.oe_photo-s10r_10x15in"
-msgstr ""
+msgstr "10×15 inch"
 
 #. TRANSLATORS: 4 x 4″
 msgid "media.oe_square-photo_4x4in"
-msgstr ""
+msgstr "4×4 inch"
 
 #. TRANSLATORS: 5 x 5″
 msgid "media.oe_square-photo_5x5in"
-msgstr ""
+msgstr "5×5 inch"
 
 #. TRANSLATORS: 184 x 260mm
-msgid "media.om_16k_184x260mm"
-msgstr ""
+msgid "media.om_16k_184x260 mm"
+msgstr "184×260 mm"
 
 #. TRANSLATORS: 195 x 270mm
-msgid "media.om_16k_195x270mm"
-msgstr ""
+msgid "media.om_16k_195x270 mm"
+msgstr "195×270 mm"
 
 #. TRANSLATORS: 55 x 85mm
 msgid "media.om_business-card_55x85mm"
-msgstr ""
+msgstr "Visitenkarte 55×85 mm"
 
 #. TRANSLATORS: 55 x 91mm
 msgid "media.om_business-card_55x91mm"
-msgstr ""
+msgstr "Visitenkarte 55×91 mm"
 
 #. TRANSLATORS: 54 x 86mm
 msgid "media.om_card_54x86mm"
-msgstr ""
+msgstr "54×86 mm"
 
 #. TRANSLATORS: 275 x 395mm
 msgid "media.om_dai-pa-kai_275x395mm"
-msgstr ""
+msgstr "275×395 mm"
 
 #. TRANSLATORS: 89 x 119mm
 msgid "media.om_dsc-photo_89x119mm"
-msgstr ""
+msgstr "89×119 mm"
 
 #. TRANSLATORS: Folio
 msgid "media.om_folio-sp_215x315mm"
-msgstr ""
+msgstr "Folio (215×315 mm)"
 
 #. TRANSLATORS: Folio (Special)
 msgid "media.om_folio_210x330mm"
-msgstr ""
+msgstr "Folio spezial (210×330 mm)"
 
 #. TRANSLATORS: Envelope Invitation
 msgid "media.om_invite_220x220mm"
-msgstr ""
+msgstr "Umschlag Einladung (220×220 mm)"
 
 #. TRANSLATORS: Envelope Italian
 msgid "media.om_italian_110x230mm"
-msgstr ""
+msgstr "Umschlag italienisch (110×230 mm)"
 
 #. TRANSLATORS: 198 x 275mm
 msgid "media.om_juuro-ku-kai_198x275mm"
@@ -10325,42 +10325,42 @@ msgstr ""
 
 #. TRANSLATORS: Notify Attributes
 msgid "notify-attributes"
-msgstr ""
+msgstr "Benachrichtigungsattribute"
 
 #. TRANSLATORS: Notify Charset
 msgid "notify-charset"
-msgstr ""
+msgstr "Benachrichtigungszeichensatz"
 
 #. TRANSLATORS: Notify Events
 msgid "notify-events"
-msgstr ""
+msgstr "Benachrichtigungsereignisse"
 
 msgid "notify-events not specified."
 msgstr ""
 
 #. TRANSLATORS: Document Completed
 msgid "notify-events.document-completed"
-msgstr ""
+msgstr "Dokument fertig"
 
 #. TRANSLATORS: Document Config Changed
 msgid "notify-events.document-config-changed"
-msgstr ""
+msgstr "Dokumentkonfiguration geändert"
 
 #. TRANSLATORS: Document Created
 msgid "notify-events.document-created"
-msgstr ""
+msgstr "Dokument erstellt"
 
 #. TRANSLATORS: Document Fetchable
 msgid "notify-events.document-fetchable"
-msgstr ""
+msgstr "Dokument abholbereit"
 
 #. TRANSLATORS: Document State Changed
 msgid "notify-events.document-state-changed"
-msgstr ""
+msgstr "Dokumentenstatus geändert"
 
 #. TRANSLATORS: Document Stopped
 msgid "notify-events.document-stopped"
-msgstr ""
+msgstr "Dokument angehalten"
 
 #. TRANSLATORS: Job Completed
 msgid "notify-events.job-completed"
@@ -10412,19 +10412,19 @@ msgstr ""
 
 #. TRANSLATORS: Printer Restarted
 msgid "notify-events.printer-restarted"
-msgstr ""
+msgstr "Drucker neu gestartet"
 
 #. TRANSLATORS: Printer Shutdown
 msgid "notify-events.printer-shutdown"
-msgstr ""
+msgstr "Drucker heruntergefahren"
 
 #. TRANSLATORS: Printer State Changed
 msgid "notify-events.printer-state-changed"
-msgstr ""
+msgstr "Druckerstatus geändert"
 
 #. TRANSLATORS: Printer Stopped
 msgid "notify-events.printer-stopped"
-msgstr ""
+msgstr "Drucker angehalten"
 
 #. TRANSLATORS: Notify Get Interval
 msgid "notify-get-interval"
@@ -10444,15 +10444,15 @@ msgstr ""
 
 #. TRANSLATORS: Notify Recipient
 msgid "notify-recipient-uri"
-msgstr ""
+msgstr "Benachrichtigungs-Empfänger"
 
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" is already used."
-msgstr ""
+msgstr "notify-recipient-uri URI \"%s\" wird bereits benutzt."
 
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
-msgstr ""
+msgstr "notify-recipient-uri URI \"%s\" benutzt unbekanntes Schema."
 
 #. TRANSLATORS: Notify Sequence Numbers
 msgid "notify-sequence-numbers"
@@ -10484,135 +10484,135 @@ msgstr ""
 
 #. TRANSLATORS: Object Offset
 msgid "object-offset"
-msgstr ""
+msgstr "Objektversatz"
 
 #. TRANSLATORS: Object Size
 msgid "object-size"
-msgstr ""
+msgstr "Objektgröße"
 
 #. TRANSLATORS: Organization Name
 msgid "organization-name"
-msgstr ""
+msgstr "Name der Organisation"
 
 #. TRANSLATORS: Orientation
 msgid "orientation-requested"
-msgstr ""
+msgstr "Ausrichtung"
 
 #. TRANSLATORS: Portrait
 msgid "orientation-requested.3"
-msgstr ""
+msgstr "Hochformat"
 
 #. TRANSLATORS: Landscape
 msgid "orientation-requested.4"
-msgstr ""
+msgstr "Querformat"
 
 #. TRANSLATORS: Reverse Landscape
 msgid "orientation-requested.5"
-msgstr ""
+msgstr "umgekehrtes Querformat"
 
 #. TRANSLATORS: Reverse Portrait
 msgid "orientation-requested.6"
-msgstr ""
+msgstr "umgekehrtes Hochformat"
 
 #. TRANSLATORS: None
 msgid "orientation-requested.7"
-msgstr ""
+msgstr "Keines"
 
 #. TRANSLATORS: Scanned Image Options
 msgid "output-attributes"
-msgstr ""
+msgstr "Ausgabeattribute"
 
 #. TRANSLATORS: Output Tray
 msgid "output-bin"
-msgstr ""
+msgstr "Ausgabefach"
 
 #. TRANSLATORS: Automatic
 msgid "output-bin.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Bottom
 msgid "output-bin.bottom"
-msgstr ""
+msgstr "unten"
 
 #. TRANSLATORS: Center
 msgid "output-bin.center"
-msgstr ""
+msgstr "mitte"
 
 #. TRANSLATORS: Face Down
 msgid "output-bin.face-down"
-msgstr ""
+msgstr "Schriftseite nach unten"
 
 #. TRANSLATORS: Face Up
 msgid "output-bin.face-up"
-msgstr ""
+msgstr "Schriftseite nach oben"
 
 #. TRANSLATORS: Large Capacity
 msgid "output-bin.large-capacity"
-msgstr ""
+msgstr "Gross"
 
 #. TRANSLATORS: Left
 msgid "output-bin.left"
-msgstr ""
+msgstr "links"
 
 #. TRANSLATORS: Mailbox 1
 msgid "output-bin.mailbox-1"
-msgstr ""
+msgstr "Postfach 1"
 
 #. TRANSLATORS: Mailbox 10
 msgid "output-bin.mailbox-10"
-msgstr ""
+msgstr "Postfach 10"
 
 #. TRANSLATORS: Mailbox 2
 msgid "output-bin.mailbox-2"
-msgstr ""
+msgstr "Postfach 2"
 
 #. TRANSLATORS: Mailbox 3
 msgid "output-bin.mailbox-3"
-msgstr ""
+msgstr "Postfach 3"
 
 #. TRANSLATORS: Mailbox 4
 msgid "output-bin.mailbox-4"
-msgstr ""
+msgstr "Postfach 4"
 
 #. TRANSLATORS: Mailbox 5
 msgid "output-bin.mailbox-5"
-msgstr ""
+msgstr "Postfach 5"
 
 #. TRANSLATORS: Mailbox 6
 msgid "output-bin.mailbox-6"
-msgstr ""
+msgstr "Postfach 6"
 
 #. TRANSLATORS: Mailbox 7
 msgid "output-bin.mailbox-7"
-msgstr ""
+msgstr "Postfach 7"
 
 #. TRANSLATORS: Mailbox 8
 msgid "output-bin.mailbox-8"
-msgstr ""
+msgstr "Postfach 8"
 
 #. TRANSLATORS: Mailbox 9
 msgid "output-bin.mailbox-9"
-msgstr ""
+msgstr "Postfach 9"
 
 #. TRANSLATORS: Middle
 msgid "output-bin.middle"
-msgstr ""
+msgstr "mitte"
 
 #. TRANSLATORS: My Mailbox
 msgid "output-bin.my-mailbox"
-msgstr ""
+msgstr "Mein Postfach"
 
 #. TRANSLATORS: Rear
 msgid "output-bin.rear"
-msgstr ""
+msgstr "hinten"
 
 #. TRANSLATORS: Right
 msgid "output-bin.right"
-msgstr ""
+msgstr "rechts"
 
 #. TRANSLATORS: Side
 msgid "output-bin.side"
-msgstr ""
+msgstr "seitlich"
 
 #. TRANSLATORS: Stacker 1
 msgid "output-bin.stacker-1"
@@ -10660,47 +10660,47 @@ msgstr ""
 
 #. TRANSLATORS: Tray 1
 msgid "output-bin.tray-1"
-msgstr ""
+msgstr "Fach 1"
 
 #. TRANSLATORS: Tray 10
 msgid "output-bin.tray-10"
-msgstr ""
+msgstr "Fach 10"
 
 #. TRANSLATORS: Tray 2
 msgid "output-bin.tray-2"
-msgstr ""
+msgstr "Fach 2"
 
 #. TRANSLATORS: Tray 3
 msgid "output-bin.tray-3"
-msgstr ""
+msgstr "Fach 3"
 
 #. TRANSLATORS: Tray 4
 msgid "output-bin.tray-4"
-msgstr ""
+msgstr "Fach 4"
 
 #. TRANSLATORS: Tray 5
 msgid "output-bin.tray-5"
-msgstr ""
+msgstr "Fach 5"
 
 #. TRANSLATORS: Tray 6
 msgid "output-bin.tray-6"
-msgstr ""
+msgstr "Fach 6"
 
 #. TRANSLATORS: Tray 7
 msgid "output-bin.tray-7"
-msgstr ""
+msgstr "Fach 7"
 
 #. TRANSLATORS: Tray 8
 msgid "output-bin.tray-8"
-msgstr ""
+msgstr "Fach 8"
 
 #. TRANSLATORS: Tray 9
 msgid "output-bin.tray-9"
-msgstr ""
+msgstr "Fach 9"
 
 #. TRANSLATORS: Scanned Image Quality
 msgid "output-compression-quality-factor"
-msgstr ""
+msgstr "Bildqualität des Scans"
 
 #. TRANSLATORS: Page Delivery
 msgid "page-delivery"
@@ -10732,19 +10732,19 @@ msgstr ""
 
 #. TRANSLATORS: 1 To N
 msgid "page-order-received.1-to-n-order"
-msgstr ""
+msgstr "1 zu N"
 
 #. TRANSLATORS: N To 1
 msgid "page-order-received.n-to-1-order"
-msgstr ""
+msgstr "N zu 1"
 
 #. TRANSLATORS: Page Ranges
 msgid "page-ranges"
-msgstr ""
+msgstr "Seitenbereiche"
 
 #. TRANSLATORS: Pages
 msgid "pages"
-msgstr ""
+msgstr "Seiten"
 
 #. TRANSLATORS: Pages Per Subset
 msgid "pages-per-subset"
@@ -11325,19 +11325,19 @@ msgstr ""
 
 #. TRANSLATORS: Print Quality
 msgid "print-quality"
-msgstr ""
+msgstr "Druckqualität"
 
 #. TRANSLATORS: Draft
 msgid "print-quality.3"
-msgstr ""
+msgstr "Entwurf"
 
 #. TRANSLATORS: Normal
 msgid "print-quality.4"
-msgstr ""
+msgstr "Normal"
 
 #. TRANSLATORS: High
 msgid "print-quality.5"
-msgstr ""
+msgstr "Hoch"
 
 #. TRANSLATORS: Print Rendering Intent
 msgid "print-rendering-intent"
@@ -11345,51 +11345,51 @@ msgstr ""
 
 #. TRANSLATORS: Absolute
 msgid "print-rendering-intent.absolute"
-msgstr ""
+msgstr "Absolut"
 
 #. TRANSLATORS: Automatic
 msgid "print-rendering-intent.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Perceptual
 msgid "print-rendering-intent.perceptual"
-msgstr ""
+msgstr "Wahrnehmungsgemäss"
 
 #. TRANSLATORS: Relative
 msgid "print-rendering-intent.relative"
-msgstr ""
+msgstr "Relativ"
 
 #. TRANSLATORS: Relative w/Black Point Compensation
 msgid "print-rendering-intent.relative-bpc"
-msgstr ""
+msgstr "Relative Schwarzwert Kompensation"
 
 #. TRANSLATORS: Saturation
 msgid "print-rendering-intent.saturation"
-msgstr ""
+msgstr "Sättingung"
 
 #. TRANSLATORS: Print Scaling
 msgid "print-scaling"
-msgstr ""
+msgstr "Druckskalierung"
 
 #. TRANSLATORS: Automatic
 msgid "print-scaling.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Auto-fit
 msgid "print-scaling.auto-fit"
-msgstr ""
+msgstr "automatisch passend"
 
 #. TRANSLATORS: Fill
 msgid "print-scaling.fill"
-msgstr ""
+msgstr "Füllend"
 
 #. TRANSLATORS: Fit
 msgid "print-scaling.fit"
-msgstr ""
+msgstr "Passend"
 
 #. TRANSLATORS: None
 msgid "print-scaling.none"
-msgstr ""
+msgstr "Keine"
 
 #. TRANSLATORS: Print Supports
 msgid "print-supports"
@@ -11441,43 +11441,43 @@ msgstr "Drucker %s/%s druckt jetzt %s-%d.  Aktiviert seit %s"
 
 #. TRANSLATORS: Printer Kind
 msgid "printer-kind"
-msgstr ""
+msgstr "Art des Druckers"
 
 #. TRANSLATORS: Disc
 msgid "printer-kind.disc"
-msgstr ""
+msgstr "Scheibe"
 
 #. TRANSLATORS: Document
 msgid "printer-kind.document"
-msgstr ""
+msgstr "Document"
 
 #. TRANSLATORS: Envelope
 msgid "printer-kind.envelope"
-msgstr ""
+msgstr "Umschlag"
 
 #. TRANSLATORS: Label
 msgid "printer-kind.label"
-msgstr ""
+msgstr "Aufkleber"
 
 #. TRANSLATORS: Large Format
 msgid "printer-kind.large-format"
-msgstr ""
+msgstr "Großformat"
 
 #. TRANSLATORS: Photo
 msgid "printer-kind.photo"
-msgstr ""
+msgstr "Foto"
 
 #. TRANSLATORS: Postcard
 msgid "printer-kind.postcard"
-msgstr ""
+msgstr "Postkarte"
 
 #. TRANSLATORS: Receipt
 msgid "printer-kind.receipt"
-msgstr ""
+msgstr "Quittung"
 
 #. TRANSLATORS: Roll
 msgid "printer-kind.roll"
-msgstr ""
+msgstr "Rolle"
 
 #. TRANSLATORS: Message From Operator
 msgid "printer-message-from-operator"
@@ -11485,19 +11485,19 @@ msgstr ""
 
 #. TRANSLATORS: Print Resolution
 msgid "printer-resolution"
-msgstr ""
+msgstr "Druckauflösung"
 
 #. TRANSLATORS: Printer State
 msgid "printer-state"
-msgstr ""
+msgstr "Druckerstatus"
 
 #. TRANSLATORS: Detailed Printer State
 msgid "printer-state-reasons"
-msgstr ""
+msgstr "Detaillierter Druckerstatus"
 
 #. TRANSLATORS: Old Alerts Have Been Removed
 msgid "printer-state-reasons.alert-removal-of-binary-change-entry"
-msgstr ""
+msgstr "Alte Alarme wurden gelöscht"
 
 #. TRANSLATORS: Bander Added
 msgid "printer-state-reasons.bander-added"
@@ -11821,19 +11821,19 @@ msgstr ""
 
 #. TRANSLATORS: Configuration Change
 msgid "printer-state-reasons.configuration-change"
-msgstr ""
+msgstr "Konfigurationsänderung"
 
 #. TRANSLATORS: Connecting To Device
 msgid "printer-state-reasons.connecting-to-device"
-msgstr ""
+msgstr "Verbinde zum Gerät"
 
 #. TRANSLATORS: Cover Open
 msgid "printer-state-reasons.cover-open"
-msgstr ""
+msgstr "Abdeckung offen"
 
 #. TRANSLATORS: Deactivated
 msgid "printer-state-reasons.deactivated"
-msgstr ""
+msgstr "Deaktiviert"
 
 #. TRANSLATORS: Developer Empty
 msgid "printer-state-reasons.developer-empty"
@@ -11845,39 +11845,39 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Added
 msgid "printer-state-reasons.die-cutter-added"
-msgstr ""
+msgstr "Stanze hinzugefügt"
 
 #. TRANSLATORS: Die Cutter Almost Empty
 msgid "printer-state-reasons.die-cutter-almost-empty"
-msgstr ""
+msgstr "Stanzer fast leer"
 
 #. TRANSLATORS: Die Cutter Almost Full
 msgid "printer-state-reasons.die-cutter-almost-full"
-msgstr ""
+msgstr "Stanzer fast voll"
 
 #. TRANSLATORS: Die Cutter At Limit
 msgid "printer-state-reasons.die-cutter-at-limit"
-msgstr ""
+msgstr "Stanzer an der Grenze"
 
 #. TRANSLATORS: Die Cutter Closed
 msgid "printer-state-reasons.die-cutter-closed"
-msgstr ""
+msgstr "Stanzer aus"
 
 #. TRANSLATORS: Die Cutter Configuration Change
 msgid "printer-state-reasons.die-cutter-configuration-change"
-msgstr ""
+msgstr "Stanzerkonfigurationsänderung"
 
 #. TRANSLATORS: Die Cutter Cover Closed
 msgid "printer-state-reasons.die-cutter-cover-closed"
-msgstr ""
+msgstr "Stanzer-Abdeckung geschlossen"
 
 #. TRANSLATORS: Die Cutter Cover Open
 msgid "printer-state-reasons.die-cutter-cover-open"
-msgstr ""
+msgstr "Stanzer-Abdeckung offen"
 
 #. TRANSLATORS: Die Cutter Empty
 msgid "printer-state-reasons.die-cutter-empty"
-msgstr ""
+msgstr "Stanzer leer"
 
 #. TRANSLATORS: Die Cutter Full
 msgid "printer-state-reasons.die-cutter-full"
@@ -11893,15 +11893,15 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Jam
 msgid "printer-state-reasons.die-cutter-jam"
-msgstr ""
+msgstr "Stanzer gestört"
 
 #. TRANSLATORS: Die Cutter Life Almost Over
 msgid "printer-state-reasons.die-cutter-life-almost-over"
-msgstr ""
+msgstr "Lebensdauer des Stanzers fast vorüber"
 
 #. TRANSLATORS: Die Cutter Life Over
 msgid "printer-state-reasons.die-cutter-life-over"
-msgstr ""
+msgstr "Lebensdauer des Stanzers vorüber"
 
 #. TRANSLATORS: Die Cutter Memory Exhausted
 msgid "printer-state-reasons.die-cutter-memory-exhausted"
@@ -11993,31 +11993,31 @@ msgstr ""
 
 #. TRANSLATORS: Extruder Cooling
 msgid "printer-state-reasons.extruder-cooling"
-msgstr ""
+msgstr "Extruderkühlung"
 
 #. TRANSLATORS: Extruder Failure
 msgid "printer-state-reasons.extruder-failure"
-msgstr ""
+msgstr "Extruderfehler"
 
 #. TRANSLATORS: Extruder Heating
 msgid "printer-state-reasons.extruder-heating"
-msgstr ""
+msgstr "Extruder heizt"
 
 #. TRANSLATORS: Extruder Jam
 msgid "printer-state-reasons.extruder-jam"
-msgstr ""
+msgstr "Extruder gestört"
 
 #. TRANSLATORS: Extruder Temperature High
 msgid "printer-state-reasons.extruder-temperature-high"
-msgstr ""
+msgstr "Extrudertemperatur hoch"
 
 #. TRANSLATORS: Extruder Temperature Low
 msgid "printer-state-reasons.extruder-temperature-low"
-msgstr ""
+msgstr "Extrudertemperatur niedrig"
 
 #. TRANSLATORS: Fan Failure
 msgid "printer-state-reasons.fan-failure"
-msgstr ""
+msgstr "Lüfterfehler"
 
 #. TRANSLATORS: Fax Modem Life Almost Over
 msgid "printer-state-reasons.fax-modem-life-almost-over"
@@ -12897,27 +12897,27 @@ msgstr ""
 
 #. TRANSLATORS: Media Drying
 msgid "printer-state-reasons.media-drying"
-msgstr ""
+msgstr "Medientrocknung"
 
 #. TRANSLATORS: Paper tray is empty
 msgid "printer-state-reasons.media-empty"
-msgstr ""
+msgstr "Papierfach ist leer"
 
 #. TRANSLATORS: Paper jam
 msgid "printer-state-reasons.media-jam"
-msgstr ""
+msgstr "Papierstau"
 
 #. TRANSLATORS: Paper tray is almost empty
 msgid "printer-state-reasons.media-low"
-msgstr ""
+msgstr "Papierfach ist fast leer"
 
 #. TRANSLATORS: Load paper
 msgid "printer-state-reasons.media-needed"
-msgstr ""
+msgstr "Papier nachladen"
 
 #. TRANSLATORS: Media Path Cannot Do 2-Sided Printing
 msgid "printer-state-reasons.media-path-cannot-duplex-media-selected"
-msgstr ""
+msgstr "Medienpfad kann keinen Duplexdruck"
 
 #. TRANSLATORS: Media Path Failure
 msgid "printer-state-reasons.media-path-failure"
@@ -12985,7 +12985,7 @@ msgstr ""
 
 #. TRANSLATORS: Motor Failure
 msgid "printer-state-reasons.motor-failure"
-msgstr ""
+msgstr "Motorstörung"
 
 #. TRANSLATORS: Printer going offline
 msgid "printer-state-reasons.moving-to-paused"
@@ -13005,7 +13005,7 @@ msgstr ""
 
 #. TRANSLATORS: Check the printer for errors
 msgid "printer-state-reasons.other"
-msgstr ""
+msgstr "Andere, bitte am Drucker prüfen"
 
 #. TRANSLATORS: Output bin is almost full
 msgid "printer-state-reasons.output-area-almost-full"
@@ -13013,7 +13013,7 @@ msgstr ""
 
 #. TRANSLATORS: Output bin is full
 msgid "printer-state-reasons.output-area-full"
-msgstr ""
+msgstr "Ausgabefach ist voll"
 
 #. TRANSLATORS: Output Mailbox Select Failure
 msgid "printer-state-reasons.output-mailbox-select-failure"
@@ -13037,7 +13037,7 @@ msgstr ""
 
 #. TRANSLATORS: Paused
 msgid "printer-state-reasons.paused"
-msgstr ""
+msgstr "Pausiert"
 
 #. TRANSLATORS: Perforater Added
 msgid "printer-state-reasons.perforater-added"
@@ -14704,35 +14704,35 @@ msgstr ""
 
 #. TRANSLATORS: Punching
 msgid "punching"
-msgstr ""
+msgstr "Lochung"
 
 #. TRANSLATORS: Punching Locations
 msgid "punching-locations"
-msgstr ""
+msgstr "Lochpositionen"
 
 #. TRANSLATORS: Punching Offset
 msgid "punching-offset"
-msgstr ""
+msgstr "Lochversatz"
 
 #. TRANSLATORS: Punch Edge
 msgid "punching-reference-edge"
-msgstr ""
+msgstr "Lochrand"
 
 #. TRANSLATORS: Bottom
 msgid "punching-reference-edge.bottom"
-msgstr ""
+msgstr "unten"
 
 #. TRANSLATORS: Left
 msgid "punching-reference-edge.left"
-msgstr ""
+msgstr "links"
 
 #. TRANSLATORS: Right
 msgid "punching-reference-edge.right"
-msgstr ""
+msgstr "rechts"
 
 #. TRANSLATORS: Top
 msgid "punching-reference-edge.top"
-msgstr ""
+msgstr "oben"
 
 #, c-format
 msgid "request id is %s-%d (%d file(s))"
@@ -14743,15 +14743,15 @@ msgstr "Anfrage-ID hat unbestimmte Länge"
 
 #. TRANSLATORS: Requested Attributes
 msgid "requested-attributes"
-msgstr ""
+msgstr "Angefragte Attribute"
 
 #. TRANSLATORS: Retry Interval
 msgid "retry-interval"
-msgstr ""
+msgstr "Intervall für Wiederholung"
 
 #. TRANSLATORS: Retry Timeout
 msgid "retry-time-out"
-msgstr ""
+msgstr "Zeitlimit für Wiederholungen"
 
 #. TRANSLATORS: Save Disposition
 msgid "save-disposition"
@@ -14793,23 +14793,23 @@ msgstr "Zeitplandienst läuft"
 
 #. TRANSLATORS: Separator Sheets
 msgid "separator-sheets"
-msgstr ""
+msgstr "Trennblätter"
 
 #. TRANSLATORS: Type of Separator Sheets
 msgid "separator-sheets-type"
-msgstr ""
+msgstr "Typ der Trennblätter"
 
 #. TRANSLATORS: Start and End Sheets
 msgid "separator-sheets-type.both-sheets"
-msgstr ""
+msgstr "Anfangs- und Endblatt"
 
 #. TRANSLATORS: End Sheet
 msgid "separator-sheets-type.end-sheet"
-msgstr ""
+msgstr "Endblatt"
 
 #. TRANSLATORS: None
 msgid "separator-sheets-type.none"
-msgstr ""
+msgstr "Keines"
 
 #. TRANSLATORS: Slip Sheets
 msgid "separator-sheets-type.slip-sheets"
@@ -14817,11 +14817,11 @@ msgstr ""
 
 #. TRANSLATORS: Start Sheet
 msgid "separator-sheets-type.start-sheet"
-msgstr ""
+msgstr "Anfangsblatt"
 
 #. TRANSLATORS: 2-Sided Printing
 msgid "sides"
-msgstr ""
+msgstr "Duplexdruck"
 
 #. TRANSLATORS: Off
 msgid "sides.one-sided"
@@ -14829,11 +14829,11 @@ msgstr ""
 
 #. TRANSLATORS: On (Portrait)
 msgid "sides.two-sided-long-edge"
-msgstr ""
+msgstr "Duplex hochformat"
 
 #. TRANSLATORS: On (Landscape)
 msgid "sides.two-sided-short-edge"
-msgstr ""
+msgstr "Duplex querformat"
 
 #, c-format
 msgid "stat of %s failed: %s"
@@ -14844,7 +14844,7 @@ msgstr "status\t\tStatus von Dienst und Warteschlange anzeigen."
 
 #. TRANSLATORS: Status Message
 msgid "status-message"
-msgstr ""
+msgstr "Statusnachricht"
 
 #. TRANSLATORS: Staple
 msgid "stitching"
