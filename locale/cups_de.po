@@ -3131,7 +3131,7 @@ msgid "Data file sent successfully."
 msgstr "Datendatei erfolgreich gesendet."
 
 msgid "Deep Color"
-msgstr "Tiefe Farbe"
+msgstr "kräftige Farben"
 
 msgid "Deep Gray"
 msgstr "Dunkelgrau"
@@ -8667,7 +8667,7 @@ msgstr "links"
 
 #. TRANSLATORS: Main
 msgid "media-source.main"
-msgstr "Haupt"
+msgstr "Haupteinzug"
 
 #. TRANSLATORS: Main Roll
 msgid "media-source.main-roll"
