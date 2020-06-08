@@ -763,6 +763,13 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
         cgiSetVariable("TEMPLATE_NAME", template);
       }
+
+     /*
+      * Set DEVICE_URI to the actual device uri, without make and model from
+      * html form.
+      */
+
+      cgiSetVariable("DEVICE_URI", var);
     }
   }
 
