@@ -13,6 +13,7 @@
  */
 
 #include <cups/cups.h>
+#include <cups/cups-private.h>
 #include "ipp-private.h"
 #include "string-private.h"
 #include "debug-internal.h"
@@ -221,8 +222,29 @@ _ippVarsSet(_ipp_vars_t *v,		/* I - IPP variables */
   if (!strcmp(name, "uri"))
   {
     char		uri[1024];	/* New printer URI */
+    char		resolved[1024];	/* Resolved mDNS URI */
+    char		value_uri[1024];	/* URI from value */
+    http_uri_status_t	uri_status;	/* URI status */
 
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, v->scheme, sizeof(v->scheme), v->username, sizeof(v->username), v->host, sizeof(v->host), &(v->port), v->resource, sizeof(v->resource)) < HTTP_URI_STATUS_OK)
+    snprintf(value_uri, sizeof(value_uri), "%s", value);
+    value_uri[1023] = '\0';
+
+    if (strstr(value_uri, "._tcp"))
+    {
+     /*
+      * Resolve URI...
+      */
+
+      if (!_httpResolveURI(value_uri, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
+      {
+        return (0);
+      }
+
+      snprintf(value_uri, sizeof(value_uri), "%s", resolved);
+      value_uri[1023] = '\0';
+    }
+
+    if ((uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, value_uri, v->scheme, sizeof(v->scheme), v->username, sizeof(v->username), v->host, sizeof(v->host), &(v->port), v->resource, sizeof(v->resource))) < HTTP_URI_STATUS_OK)
       return (0);
 
     if (v->username[0])
