@@ -1,4 +1,4 @@
-<H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Add Printer}</H2>
+<H2 CLASS="title">{op=modify-printer?{printer_name} ändern:Drucker hinzufügen (Schritt 4/5)}</H2>
 
 <FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -15,24 +15,24 @@
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
 </TR>}
 <TR>
-<TH CLASS="label">Description:</TH>
+<TH CLASS="label">Beschreibung:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
 </TR>
 <TR>
-<TH CLASS="label">Location:</TH>
+<TH CLASS="label">Standort:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
 </TR>
 <TR>
-<TH CLASS="label">Connection:</TH>
+<TH CLASS="label">Verbindung:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
 </TR>
 <TR>
-<TH CLASS="label">Sharing:</TH>
+<TH CLASS="label">Freigabe:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
-{?printer_is_shared=?Do Not:{?printer_is_shared=0?Do Not:}} Share This Printer</TD>
+Drucker {?printer_is_shared=?nicht:{?printer_is_shared=0?nicht:}} im Netzwerk freigeben</TD>
 </TR>
 <TR>
-<TH CLASS="label">Make:</TH>
+<TH CLASS="label">Hersteller:</TH>
 <TD>
 <SELECT NAME="PPD_MAKE" SIZE="10">
 {[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
@@ -41,20 +41,20 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="SUBMIT" VALUE="Continue"></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Weiter"></TD>
 </TR>
 <TR>
 <TD></TD>
 <TD>&nbsp;</TD>
 </TR>
 <TR>
-<TH CLASS="label">Or Provide a PPD File:</TH>
+<TH CLASS="label">Oder PPD-Datei bereitstellen:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
 TYPE="FILE" NAME="PPD_FILE"></TD>
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?Add Printer:Modify Printer}"></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?Drucker hinzufügen:Drucker ändern}"></TD>
 </TR>
 </TABLE>
 

@@ -23,7 +23,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2017-10-25 14:57+0200\n"
+"PO-Revision-Date: 2020-06-25 07:27+0200\n"
 "Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
 "Language-Team: German <LL@li.org>\n"
 "Language: de\n"
@@ -2180,22 +2180,22 @@ msgid "1.25x0.25\""
 msgstr "1,25×0,25 inch"
 
 msgid "1.25x2.25\""
-msgstr "1,25 × 2,25 inch"
+msgstr "1,25×2,25 inch"
 
 msgid "1.5 inch/sec."
 msgstr "1,5 inch/s"
 
 msgid "1.50x0.25\""
-msgstr "1,50 × 0,25 inch"
+msgstr "1,50×0,25 inch"
 
 msgid "1.50x0.50\""
-msgstr "1,50 × 0,50 inch"
+msgstr "1,50×0,50 inch"
 
 msgid "1.50x1.00\""
-msgstr "1,50 × 1,00 inch"
+msgstr "1,50×1,00 inch"
 
 msgid "1.50x2.00\""
-msgstr "1,50 × 2,00 inch"
+msgstr "1,50×2,00 inch"
 
 msgid "10"
 msgstr "10"
@@ -2205,13 +2205,13 @@ msgid "10 inches/sec."
 msgstr "10 inch/s"
 
 msgid "10 x 11"
-msgstr "10 × 11 inch"
+msgstr "10×11 inch"
 
 msgid "10 x 13"
-msgstr "10 × 13 inch"
+msgstr "10×13 inch"
 
 msgid "10 x 14"
-msgstr "10 × 14 inch"
+msgstr "10×14 inch"
 
 msgid "100"
 msgstr "100"
@@ -2241,7 +2241,7 @@ msgid "12 inches/sec."
 msgstr "12 inch/s"
 
 msgid "12 x 11"
-msgstr "12 × 11 inch"
+msgstr "12×11 inch"
 
 msgid "120"
 msgstr "120"
@@ -2250,10 +2250,10 @@ msgid "120 mm/sec."
 msgstr "120 mm/s"
 
 msgid "120x60dpi"
-msgstr "120 × 60 dpi"
+msgstr "120×60 dpi"
 
 msgid "120x72dpi"
-msgstr "120 × 72 dpi"
+msgstr "120×72 dpi"
 
 msgid "13"
 msgstr "13"
@@ -2271,7 +2271,7 @@ msgid "15 mm/sec."
 msgstr "15 mm/s"
 
 msgid "15 x 11"
-msgstr "15 x 11"
+msgstr "15x11 inch"
 
 msgid "150 mm/sec."
 msgstr "150 mm/s"
@@ -2301,61 +2301,61 @@ msgid "2 inches/sec."
 msgstr "2 inch/s"
 
 msgid "2-Sided Printing"
-msgstr "Doppelseitig drucken"
+msgstr "Doppelseitiger Druck"
 
 msgid "2.00x0.37\""
-msgstr "2,00 × 0,37 inch"
+msgstr "2,00×0,37 inch"
 
 msgid "2.00x0.50\""
-msgstr "2,00 × 0,50 inch"
+msgstr "2,00×0,50 inch"
 
 msgid "2.00x1.00\""
-msgstr "2,00 × 1,00 inch"
+msgstr "2,00×1,00 inch"
 
 msgid "2.00x1.25\""
-msgstr "2,00 × 1,25 inch"
+msgstr "2,00×1,25 inch"
 
 msgid "2.00x2.00\""
-msgstr "2,00 × 2,00 inch"
+msgstr "2,00×2,00 inch"
 
 msgid "2.00x3.00\""
-msgstr "2,00 × 3,00 inch"
+msgstr "2,00×3,00 inch"
 
 msgid "2.00x4.00\""
-msgstr "2,00 × 4,00 inch"
+msgstr "2,00×4,00 inch"
 
 msgid "2.00x5.50\""
-msgstr "2,00 × 5,50 inch"
+msgstr "2,00×5,50 inch"
 
 msgid "2.25x0.50\""
-msgstr "2,25 × 0,50 inch"
+msgstr "2,25×0,50 inch"
 
 msgid "2.25x1.25\""
-msgstr "2,25 × 1,25 inch"
+msgstr "2,25×1,25 inch"
 
 msgid "2.25x4.00\""
-msgstr "2,25 × 4,00 inch"
+msgstr "2,25×4,00 inch"
 
 msgid "2.25x5.50\""
-msgstr "2,25 × 5,50 inch"
+msgstr "2,25×5,50 inch"
 
 msgid "2.38x5.50\""
-msgstr "2,38 × 5,50 inch"
+msgstr "2,38×5,50 inch"
 
 msgid "2.5 inches/sec."
 msgstr "2,5 inch/s"
 
 msgid "2.50x1.00\""
-msgstr "2,50 × 1,00 inch"
+msgstr "2,50×1,00 inch"
 
 msgid "2.50x2.00\""
-msgstr "2,50 × 2,00 inch"
+msgstr "2,50×2,00 inch"
 
 msgid "2.75x1.25\""
-msgstr "2,75 × 1,25 inch"
+msgstr "2,75×1,25 inch"
 
 msgid "2.9 x 1\""
-msgstr "2.9 × 1 inch"
+msgstr "2.9×1 inch"
 
 msgid "20"
 msgstr "20"
@@ -2385,7 +2385,7 @@ msgid "24-Pin Series"
 msgstr "24-Pin Serie"
 
 msgid "240x72dpi"
-msgstr "240 × 72 dpi"
+msgstr "240×72 dpi"
 
 msgid "25"
 msgstr "25"
@@ -2412,46 +2412,46 @@ msgid "3 inches/sec."
 msgstr "3 inch/s"
 
 msgid "3 x 5"
-msgstr "3 × 5"
+msgstr "3×5"
 
 msgid "3.00x1.00\""
-msgstr "3,00 × 1,00 inch"
+msgstr "3,00×1,00 inch"
 
 msgid "3.00x1.25\""
-msgstr "3,00 × 1,25 inch"
+msgstr "3,00×1,25 inch"
 
 msgid "3.00x2.00\""
-msgstr "3,00 × 2,00 inch"
+msgstr "3,00×2,00 inch"
 
 msgid "3.00x3.00\""
-msgstr "3,00 × 3,00 inch"
+msgstr "3,00×3,00 inch"
 
 msgid "3.00x5.00\""
-msgstr "3,00 × 5,00 inch"
+msgstr "3,00×5,00 inch"
 
 msgid "3.25x2.00\""
-msgstr "3,25 × 2,00 inch"
+msgstr "3,25×2,00 inch"
 
 msgid "3.25x5.00\""
-msgstr "3,25 × 5,00 inch"
+msgstr "3,25×5,00 inch"
 
 msgid "3.25x5.50\""
-msgstr "3,25 × 5,50 inch"
+msgstr "3,25×5,50 inch"
 
 msgid "3.25x5.83\""
-msgstr "3,25 × 5,83 inch"
+msgstr "3,25×5,83 inch"
 
 msgid "3.25x7.83\""
-msgstr "3,25 × 7,83 inch"
+msgstr "3,25×7,83 inch"
 
 msgid "3.5 x 5"
-msgstr "3,5 × 5 inch"
+msgstr "3,5×5 inch"
 
 msgid "3.5\" Disk"
 msgstr "3,5 inch Disk"
 
 msgid "3.50x1.00\""
-msgstr "3,50 × 1,00 inch"
+msgstr "3,50×1,00 inch"
 
 msgid "30"
 msgstr "30"
@@ -2475,7 +2475,7 @@ msgid "360dpi"
 msgstr "360 dpi"
 
 msgid "360x180dpi"
-msgstr "360 × 180 dpi"
+msgstr "360×180 dpi"
 
 msgid "4"
 msgstr "4"
@@ -2484,31 +2484,31 @@ msgid "4 inches/sec."
 msgstr "4 inch/s"
 
 msgid "4.00x1.00\""
-msgstr "4,00 × 1,00 inch"
+msgstr "4,00×1,00 inch"
 
 msgid "4.00x13.00\""
-msgstr "4,00 × 13,00 inch"
+msgstr "4,00×13,00 inch"
 
 msgid "4.00x2.00\""
-msgstr "4,00 × 2,00 inch"
+msgstr "4,00×2,00 inch"
 
 msgid "4.00x2.50\""
-msgstr "4,00 × 2,50 inch"
+msgstr "4,00×2,50 inch"
 
 msgid "4.00x3.00\""
-msgstr "4,00 × 3,00 inch"
+msgstr "4,00×3,00 inch"
 
 msgid "4.00x4.00\""
-msgstr "4,00 × 4,00 inch"
+msgstr "4,00×4,00 inch"
 
 msgid "4.00x5.00\""
-msgstr "4,00 × 5,00 inch"
+msgstr "4,00×5,00 inch"
 
 msgid "4.00x6.00\""
-msgstr "4,00 × 6,00 inch"
+msgstr "4,00×6,00 inch"
 
 msgid "4.00x6.50\""
-msgstr "4,00 × 6,50 inch"
+msgstr "4,00×6,50 inch"
 
 msgid "40"
 msgstr "40"
@@ -2526,7 +2526,7 @@ msgid "5 inches/sec."
 msgstr "5 inch/s"
 
 msgid "5 x 7"
-msgstr "5 × 7"
+msgstr "5×7"
 
 msgid "50"
 msgstr "50"
@@ -2541,25 +2541,25 @@ msgid "6 inches/sec."
 msgstr "6 inch/s"
 
 msgid "6.00x1.00\""
-msgstr "6,00 × 1,00 inch"
+msgstr "6,00×1,00 inch"
 
 msgid "6.00x2.00\""
-msgstr "6,00 × 2,00 inch"
+msgstr "6,00×2,00 inch"
 
 msgid "6.00x3.00\""
-msgstr "6,00 × 3,00 inch"
+msgstr "6,00×3,00 inch"
 
 msgid "6.00x4.00\""
-msgstr "6,00 × 4,00 inch"
+msgstr "6,00×4,00 inch"
 
 msgid "6.00x5.00\""
-msgstr "6,00 × 5,00 inch"
+msgstr "6,00×5,00 inch"
 
 msgid "6.00x6.00\""
-msgstr "6,00 × 6,00 inch"
+msgstr "6,00×6,00 inch"
 
 msgid "6.00x6.50\""
-msgstr "6,00 × 6,50 inch"
+msgstr "6,00×6,50 inch"
 
 msgid "60"
 msgstr "60"
@@ -2574,7 +2574,7 @@ msgid "60dpi"
 msgstr "60 dpi"
 
 msgid "60x72dpi"
-msgstr "60 × 72 dpi"
+msgstr "60×72 dpi"
 
 msgid "65"
 msgstr "65"
@@ -2586,7 +2586,7 @@ msgid "7 inches/sec."
 msgstr "7 inch/s"
 
 msgid "7 x 9"
-msgstr "7 × 9"
+msgstr "7×9"
 
 msgid "70"
 msgstr "70"
@@ -2601,28 +2601,28 @@ msgid "8 inches/sec."
 msgstr "8 inch/s"
 
 msgid "8 x 10"
-msgstr "8 × 10 inch"
+msgstr "8×10 inch"
 
 msgid "8.00x1.00\""
-msgstr "8,00 × 1,00 inch"
+msgstr "8,00×1,00 inch"
 
 msgid "8.00x2.00\""
-msgstr "8,00 × 2,00 inch"
+msgstr "8,00×2,00 inch"
 
 msgid "8.00x3.00\""
-msgstr "8,00 × 3,00 inch"
+msgstr "8,00×3,00 inch"
 
 msgid "8.00x4.00\""
-msgstr "8,00 × 4,00 inch"
+msgstr "8,00×4,00 inch"
 
 msgid "8.00x5.00\""
-msgstr "8,00 × 5,00 inch"
+msgstr "8,00×5,00 inch"
 
 msgid "8.00x6.00\""
-msgstr "8,00 × 6,00 inch"
+msgstr "8,00×6,00 inch"
 
 msgid "8.00x6.50\""
-msgstr "8,00 × 6,50 inch"
+msgstr "8,00×6,50 inch"
 
 msgid "80"
 msgstr "80"
@@ -3224,7 +3224,7 @@ msgstr "Verschlüsselung ist nicht unterstüzt."
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
-msgstr "Banner beenden"
+msgstr "Endbanner"
 
 msgid "English"
 msgstr "Deutsch"
@@ -9203,7 +9203,7 @@ msgstr ""
 
 #. TRANSLATORS: Laminating Foil
 msgid "media-type.laminating-foil"
-msgstr ""
+msgstr "Laminatfolie"
 
 #. TRANSLATORS: Letterhead
 msgid "media-type.letterhead"
@@ -9219,7 +9219,7 @@ msgstr "glänzendes Metall"
 
 #. TRANSLATORS: Metal High Gloss
 msgid "media-type.metal-high-gloss"
-msgstr ""
+msgstr "Hochglanz Metall"
 
 #. TRANSLATORS: Metal Matte
 msgid "media-type.metal-matte"
@@ -9227,7 +9227,7 @@ msgstr "Mattes Metall"
 
 #. TRANSLATORS: Metal Satin
 msgid "media-type.metal-satin"
-msgstr ""
+msgstr "Seidenglanz Metall"
 
 #. TRANSLATORS: Metal Semi Gloss
 msgid "media-type.metal-semi-gloss"
@@ -10175,27 +10175,27 @@ msgstr ""
 
 #. TRANSLATORS: 267 x 389mm
 msgid "media.om_pa-kai_267x389mm"
-msgstr ""
+msgstr "267×389 mm"
 
 #. TRANSLATORS: Envelope Postfix
 msgid "media.om_postfix_114x229mm"
-msgstr ""
+msgstr "114×229 mm"
 
 #. TRANSLATORS: 100 x 150mm
 msgid "media.om_small-photo_100x150mm"
-msgstr ""
+msgstr "100×150 mm"
 
 #. TRANSLATORS: 89 x 89mm
 msgid "media.om_square-photo_89x89mm"
-msgstr ""
+msgstr "89 mm quadratisch"
 
 #. TRANSLATORS: 100 x 200mm
 msgid "media.om_wide-photo_100x200mm"
-msgstr ""
+msgstr "100×200 mm"
 
 #. TRANSLATORS: Envelope Chinese #10
 msgid "media.prc_10_324x458mm"
-msgstr ""
+msgstr "Umschlag CN, 324×458 mm"
 
 #. TRANSLATORS: Chinese 16k
 msgid "media.prc_16k_146x215mm"
@@ -10259,7 +10259,7 @@ msgstr "gruppierte Kopien"
 
 #. TRANSLATORS: Separate Documents Uncollated Copies
 msgid "multiple-document-handling.separate-documents-uncollated-copies"
-msgstr ""
+msgstr "ungruppierte Kopien"
 
 #. TRANSLATORS: Single Document
 msgid "multiple-document-handling.single-document"
@@ -10267,7 +10267,7 @@ msgstr "Dokument einzeln"
 
 #. TRANSLATORS: Single Document New Sheet
 msgid "multiple-document-handling.single-document-new-sheet"
-msgstr ""
+msgstr "Einzeldokument, neues Blatt"
 
 #. TRANSLATORS: Multiple Object Handling
 msgid "multiple-object-handling"
@@ -10321,7 +10321,7 @@ msgstr "Keine systemvoreingestellten Ziele"
 
 #. TRANSLATORS: Noise Removal
 msgid "noise-removal"
-msgstr ""
+msgstr "Lärmreduziert"
 
 #. TRANSLATORS: Notify Attributes
 msgid "notify-attributes"
@@ -10400,15 +10400,15 @@ msgstr "Druckerkonfiguration geändert"
 
 #. TRANSLATORS: Printer Finishings Changed
 msgid "notify-events.printer-finishings-changed"
-msgstr ""
+msgstr "Endverarbeitung geändert"
 
 #. TRANSLATORS: Printer Media Changed
 msgid "notify-events.printer-media-changed"
-msgstr ""
+msgstr "Druckmedien geändert"
 
 #. TRANSLATORS: Printer Queue Order Changed
 msgid "notify-events.printer-queue-order-changed"
-msgstr ""
+msgstr "Reihenfolge der Warteschlange geändert"
 
 #. TRANSLATORS: Printer Restarted
 msgid "notify-events.printer-restarted"
@@ -10476,7 +10476,7 @@ msgstr ""
 
 #. TRANSLATORS: Number Of Retries
 msgid "number-of-retries"
-msgstr ""
+msgstr "Anzahl der Wiederholungen"
 
 #. TRANSLATORS: Number-Up
 msgid "number-up"
@@ -10616,47 +10616,47 @@ msgstr "seitlich"
 
 #. TRANSLATORS: Stacker 1
 msgid "output-bin.stacker-1"
-msgstr ""
+msgstr "Ausgabefach 1"
 
 #. TRANSLATORS: Stacker 10
 msgid "output-bin.stacker-10"
-msgstr ""
+msgstr "Ausgabefach 10"
 
 #. TRANSLATORS: Stacker 2
 msgid "output-bin.stacker-2"
-msgstr ""
+msgstr "Ausgabefach 2"
 
 #. TRANSLATORS: Stacker 3
 msgid "output-bin.stacker-3"
-msgstr ""
+msgstr "Ausgabefach 3"
 
 #. TRANSLATORS: Stacker 4
 msgid "output-bin.stacker-4"
-msgstr ""
+msgstr "Ausgabefach 4"
 
 #. TRANSLATORS: Stacker 5
 msgid "output-bin.stacker-5"
-msgstr ""
+msgstr "Ausgabefach 5"
 
 #. TRANSLATORS: Stacker 6
 msgid "output-bin.stacker-6"
-msgstr ""
+msgstr "Ausgabefach 6"
 
 #. TRANSLATORS: Stacker 7
 msgid "output-bin.stacker-7"
-msgstr ""
+msgstr "Ausgabefach 7"
 
 #. TRANSLATORS: Stacker 8
 msgid "output-bin.stacker-8"
-msgstr ""
+msgstr "Ausgabefach 8"
 
 #. TRANSLATORS: Stacker 9
 msgid "output-bin.stacker-9"
-msgstr ""
+msgstr "Ausgabefach 9"
 
 #. TRANSLATORS: Top
 msgid "output-bin.top"
-msgstr ""
+msgstr "Oben"
 
 #. TRANSLATORS: Tray 1
 msgid "output-bin.tray-1"
@@ -10748,7 +10748,7 @@ msgstr "Seiten"
 
 #. TRANSLATORS: Pages Per Subset
 msgid "pages-per-subset"
-msgstr ""
+msgstr "Seiten pro Teilsatz"
 
 #. TRANSLATORS: Pclm Raster Back Side
 msgid "pclm-raster-back-side"
@@ -10764,7 +10764,7 @@ msgstr ""
 
 #. TRANSLATORS: Rotated
 msgid "pclm-raster-back-side.rotated"
-msgstr ""
+msgstr "gedreht"
 
 #. TRANSLATORS: Pclm Source Resolution
 msgid "pclm-source-resolution"
@@ -11217,7 +11217,7 @@ msgstr ""
 
 #. TRANSLATORS: Print Accuracy
 msgid "print-accuracy"
-msgstr ""
+msgstr "Druckgenauigkeit"
 
 #. TRANSLATORS: Print Base
 msgid "print-base"
@@ -11245,27 +11245,27 @@ msgstr ""
 
 #. TRANSLATORS: Standard
 msgid "print-base.standard"
-msgstr ""
+msgstr "Standard"
 
 #. TRANSLATORS: Print Color Mode
 msgid "print-color-mode"
-msgstr ""
+msgstr "Farbdruckmodus"
 
 #. TRANSLATORS: Automatic
 msgid "print-color-mode.auto"
-msgstr ""
+msgstr "Automatisch"
 
 #. TRANSLATORS: Auto Monochrome
 msgid "print-color-mode.auto-monochrome"
-msgstr ""
+msgstr "automatisch monochrom"
 
 #. TRANSLATORS: Text
 msgid "print-color-mode.bi-level"
-msgstr ""
+msgstr "Text, 2-farbig"
 
 #. TRANSLATORS: Color
 msgid "print-color-mode.color"
-msgstr ""
+msgstr "Farbe"
 
 #. TRANSLATORS: Highlight
 msgid "print-color-mode.highlight"
@@ -11273,47 +11273,47 @@ msgstr ""
 
 #. TRANSLATORS: Monochrome
 msgid "print-color-mode.monochrome"
-msgstr ""
+msgstr "Monochrom"
 
 #. TRANSLATORS: Process Text
 msgid "print-color-mode.process-bi-level"
-msgstr ""
+msgstr "Text, 2-farbig"
 
 #. TRANSLATORS: Process Monochrome
 msgid "print-color-mode.process-monochrome"
-msgstr ""
+msgstr "Monochrom"
 
 #. TRANSLATORS: Print Optimization
 msgid "print-content-optimize"
-msgstr ""
+msgstr "Druckoptimierung"
 
 #. TRANSLATORS: Print Content Optimize Actual
 msgid "print-content-optimize-actual"
-msgstr ""
+msgstr "derzeitige Druckoptimierung"
 
 #. TRANSLATORS: Automatic
 msgid "print-content-optimize.auto"
-msgstr ""
+msgstr "automatisch"
 
 #. TRANSLATORS: Graphics
 msgid "print-content-optimize.graphic"
-msgstr ""
+msgstr "Grafik"
 
 #. TRANSLATORS: Graphics
 msgid "print-content-optimize.graphics"
-msgstr ""
+msgstr "Grafiken"
 
 #. TRANSLATORS: Photo
 msgid "print-content-optimize.photo"
-msgstr ""
+msgstr "Foto"
 
 #. TRANSLATORS: Text
 msgid "print-content-optimize.text"
-msgstr ""
+msgstr "Text"
 
 #. TRANSLATORS: Text and Graphics
 msgid "print-content-optimize.text-and-graphic"
-msgstr ""
+msgstr "Text und Grafik"
 
 #. TRANSLATORS: Text And Graphics
 msgid "print-content-optimize.text-and-graphics"
@@ -11341,7 +11341,7 @@ msgstr "Hoch"
 
 #. TRANSLATORS: Print Rendering Intent
 msgid "print-rendering-intent"
-msgstr ""
+msgstr "Renderingziel"
 
 #. TRANSLATORS: Absolute
 msgid "print-rendering-intent.absolute"
@@ -11417,7 +11417,7 @@ msgstr "Drucker %s ist deaktiviert seit %s"
 
 #, c-format
 msgid "printer %s is holding new jobs.  enabled since %s"
-msgstr ""
+msgstr "Drucker %s hält Druckaufträge zurück.  Aktiviert seit %s"
 
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
@@ -11481,7 +11481,7 @@ msgstr "Rolle"
 
 #. TRANSLATORS: Message From Operator
 msgid "printer-message-from-operator"
-msgstr ""
+msgstr "Nachricht vom Bediener"
 
 #. TRANSLATORS: Print Resolution
 msgid "printer-resolution"
@@ -11909,31 +11909,31 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Missing
 msgid "printer-state-reasons.die-cutter-missing"
-msgstr ""
+msgstr "Stanzer nicht vorhanden"
 
 #. TRANSLATORS: Die Cutter Motor Failure
 msgid "printer-state-reasons.die-cutter-motor-failure"
-msgstr ""
+msgstr "Motorfehler des Stanzers"
 
 #. TRANSLATORS: Die Cutter Near Limit
 msgid "printer-state-reasons.die-cutter-near-limit"
-msgstr ""
+msgstr "Stanzer im Grenzbereich"
 
 #. TRANSLATORS: Die Cutter Offline
 msgid "printer-state-reasons.die-cutter-offline"
-msgstr ""
+msgstr "Stanzer offline"
 
 #. TRANSLATORS: Die Cutter Opened
 msgid "printer-state-reasons.die-cutter-opened"
-msgstr ""
+msgstr "Stanzer geöffnet"
 
 #. TRANSLATORS: Die Cutter Over Temperature
 msgid "printer-state-reasons.die-cutter-over-temperature"
-msgstr ""
+msgstr "Temperaturüberschreitung am Stanzer"
 
 #. TRANSLATORS: Die Cutter Power Saver
 msgid "printer-state-reasons.die-cutter-power-saver"
-msgstr ""
+msgstr "Stanzer im Stromsparmodus"
 
 #. TRANSLATORS: Die Cutter Recoverable Failure
 msgid "printer-state-reasons.die-cutter-recoverable-failure"
@@ -11945,7 +11945,7 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Removed
 msgid "printer-state-reasons.die-cutter-removed"
-msgstr ""
+msgstr "Stanzer entfernt"
 
 #. TRANSLATORS: Die Cutter Resource Added
 msgid "printer-state-reasons.die-cutter-resource-added"
@@ -11957,7 +11957,7 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Thermistor Failure
 msgid "printer-state-reasons.die-cutter-thermistor-failure"
-msgstr ""
+msgstr "thermistorfehler am Stanzer"
 
 #. TRANSLATORS: Die Cutter Timing Failure
 msgid "printer-state-reasons.die-cutter-timing-failure"
@@ -11965,11 +11965,11 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Turned Off
 msgid "printer-state-reasons.die-cutter-turned-off"
-msgstr ""
+msgstr "Stanzer ausgeschaltet"
 
 #. TRANSLATORS: Die Cutter Turned On
 msgid "printer-state-reasons.die-cutter-turned-on"
-msgstr ""
+msgstr "Stanzer eingeschaltet"
 
 #. TRANSLATORS: Die Cutter Under Temperature
 msgid "printer-state-reasons.die-cutter-under-temperature"
@@ -11985,11 +11985,11 @@ msgstr ""
 
 #. TRANSLATORS: Die Cutter Warming Up
 msgid "printer-state-reasons.die-cutter-warming-up"
-msgstr ""
+msgstr "Stanzer in Aufwärmphase"
 
 #. TRANSLATORS: Door Open
 msgid "printer-state-reasons.door-open"
-msgstr ""
+msgstr "Tür offen"
 
 #. TRANSLATORS: Extruder Cooling
 msgid "printer-state-reasons.extruder-cooling"
@@ -12885,15 +12885,15 @@ msgstr ""
 
 #. TRANSLATORS: Material Empty
 msgid "printer-state-reasons.material-empty"
-msgstr ""
+msgstr "Material leer"
 
 #. TRANSLATORS: Material Low
 msgid "printer-state-reasons.material-low"
-msgstr ""
+msgstr "Niedriger Materialstand"
 
 #. TRANSLATORS: Material Needed
 msgid "printer-state-reasons.material-needed"
-msgstr ""
+msgstr "Material benötigt"
 
 #. TRANSLATORS: Media Drying
 msgid "printer-state-reasons.media-drying"
@@ -12921,7 +12921,7 @@ msgstr "Medienpfad kann keinen Duplexdruck"
 
 #. TRANSLATORS: Media Path Failure
 msgid "printer-state-reasons.media-path-failure"
-msgstr ""
+msgstr "Fehler im Medienpfad"
 
 #. TRANSLATORS: Media Path Input Empty
 msgid "printer-state-reasons.media-path-input-empty"
@@ -12933,7 +12933,7 @@ msgstr ""
 
 #. TRANSLATORS: Media Path Input Jam
 msgid "printer-state-reasons.media-path-input-jam"
-msgstr ""
+msgstr "Einzugsstau im Medienpfad"
 
 #. TRANSLATORS: Media Path Input Request
 msgid "printer-state-reasons.media-path-input-request"
@@ -12941,7 +12941,7 @@ msgstr ""
 
 #. TRANSLATORS: Media Path Jam
 msgid "printer-state-reasons.media-path-jam"
-msgstr ""
+msgstr "Stau im Medienpfad"
 
 #. TRANSLATORS: Media Path Media Tray Almost Full
 msgid "printer-state-reasons.media-path-media-tray-almost-full"
@@ -12997,11 +12997,11 @@ msgstr ""
 
 #. TRANSLATORS: Optical Photoconductor Life Over
 msgid "printer-state-reasons.opc-life-over"
-msgstr ""
+msgstr "Lebensdauer des OPC überschritten"
 
 #. TRANSLATORS: OPC almost at end-of-life
 msgid "printer-state-reasons.opc-near-eol"
-msgstr ""
+msgstr "Lebensdauer des OPC fast zu Ende"
 
 #. TRANSLATORS: Check the printer for errors
 msgid "printer-state-reasons.other"
@@ -13009,7 +13009,7 @@ msgstr "Andere, bitte am Drucker prüfen"
 
 #. TRANSLATORS: Output bin is almost full
 msgid "printer-state-reasons.output-area-almost-full"
-msgstr ""
+msgstr "Ausgabefach ist fast voll"
 
 #. TRANSLATORS: Output bin is full
 msgid "printer-state-reasons.output-area-full"
@@ -13021,7 +13021,7 @@ msgstr ""
 
 #. TRANSLATORS: Output Media Tray Failure
 msgid "printer-state-reasons.output-media-tray-failure"
-msgstr ""
+msgstr "Fehler im Ausgabefach"
 
 #. TRANSLATORS: Output Media Tray Feed Error
 msgid "printer-state-reasons.output-media-tray-feed-error"
@@ -13033,7 +13033,7 @@ msgstr ""
 
 #. TRANSLATORS: Output tray is missing
 msgid "printer-state-reasons.output-tray-missing"
-msgstr ""
+msgstr "Ausgabefach fehlt"
 
 #. TRANSLATORS: Paused
 msgid "printer-state-reasons.paused"
@@ -13197,47 +13197,47 @@ msgstr ""
 
 #. TRANSLATORS: Platform Temperature High
 msgid "printer-state-reasons.platform-temperature-high"
-msgstr ""
+msgstr "Plattformtemperatur hoch"
 
 #. TRANSLATORS: Platform Temperature Low
 msgid "printer-state-reasons.platform-temperature-low"
-msgstr ""
+msgstr "Plattformtemperatur niedrig"
 
 #. TRANSLATORS: Power Down
 msgid "printer-state-reasons.power-down"
-msgstr ""
+msgstr "Ausgeschaltet"
 
 #. TRANSLATORS: Power Up
 msgid "printer-state-reasons.power-up"
-msgstr ""
+msgstr "Hochfahren"
 
 #. TRANSLATORS: Printer Reset Manually
 msgid "printer-state-reasons.printer-manual-reset"
-msgstr ""
+msgstr "Manueller Reset"
 
 #. TRANSLATORS: Printer Reset Remotely
 msgid "printer-state-reasons.printer-nms-reset"
-msgstr ""
+msgstr "Remote-Reset"
 
 #. TRANSLATORS: Printer Ready To Print
 msgid "printer-state-reasons.printer-ready-to-print"
-msgstr ""
+msgstr "Drucker bereit zum Drucken"
 
 #. TRANSLATORS: Puncher Added
 msgid "printer-state-reasons.puncher-added"
-msgstr ""
+msgstr "Locher hinzugefügt"
 
 #. TRANSLATORS: Puncher Almost Empty
 msgid "printer-state-reasons.puncher-almost-empty"
-msgstr ""
+msgstr "Locher fast leer"
 
 #. TRANSLATORS: Puncher Almost Full
 msgid "printer-state-reasons.puncher-almost-full"
-msgstr ""
+msgstr "Locher fast voll"
 
 #. TRANSLATORS: Puncher At Limit
 msgid "printer-state-reasons.puncher-at-limit"
-msgstr ""
+msgstr "Locher im Grenzbereich"
 
 #. TRANSLATORS: Puncher Closed
 msgid "printer-state-reasons.puncher-closed"
@@ -13245,7 +13245,7 @@ msgstr ""
 
 #. TRANSLATORS: Puncher Configuration Change
 msgid "printer-state-reasons.puncher-configuration-change"
-msgstr ""
+msgstr "Konfiguration des Lochers geändert"
 
 #. TRANSLATORS: Puncher Cover Closed
 msgid "printer-state-reasons.puncher-cover-closed"
@@ -13257,11 +13257,11 @@ msgstr ""
 
 #. TRANSLATORS: Puncher Empty
 msgid "printer-state-reasons.puncher-empty"
-msgstr ""
+msgstr "Locher leer"
 
 #. TRANSLATORS: Puncher Full
 msgid "printer-state-reasons.puncher-full"
-msgstr ""
+msgstr "Locher voll"
 
 #. TRANSLATORS: Puncher Interlock Closed
 msgid "printer-state-reasons.puncher-interlock-closed"
@@ -13273,15 +13273,15 @@ msgstr ""
 
 #. TRANSLATORS: Puncher Jam
 msgid "printer-state-reasons.puncher-jam"
-msgstr ""
+msgstr "Stau im Locher"
 
 #. TRANSLATORS: Puncher Life Almost Over
 msgid "printer-state-reasons.puncher-life-almost-over"
-msgstr ""
+msgstr "Lebensdauer des Lochers fast überschritten"
 
 #. TRANSLATORS: Puncher Life Over
 msgid "printer-state-reasons.puncher-life-over"
-msgstr ""
+msgstr "Lebensdauer des Lochers überschritten"
 
 #. TRANSLATORS: Puncher Memory Exhausted
 msgid "printer-state-reasons.puncher-memory-exhausted"
@@ -13301,15 +13301,15 @@ msgstr ""
 
 #. TRANSLATORS: Puncher Offline
 msgid "printer-state-reasons.puncher-offline"
-msgstr ""
+msgstr "Locher Offline"
 
 #. TRANSLATORS: Puncher Opened
 msgid "printer-state-reasons.puncher-opened"
-msgstr ""
+msgstr "Locher geöffnet"
 
 #. TRANSLATORS: Puncher Over Temperature
 msgid "printer-state-reasons.puncher-over-temperature"
-msgstr ""
+msgstr "Übertemperatur am Locher"
 
 #. TRANSLATORS: Puncher Power Saver
 msgid "printer-state-reasons.puncher-power-saver"
@@ -14771,19 +14771,19 @@ msgstr ""
 
 #. TRANSLATORS: Save Document Format
 msgid "save-document-format"
-msgstr ""
+msgstr "Speicherformat"
 
 #. TRANSLATORS: Save Info
 msgid "save-info"
-msgstr ""
+msgstr "Speicherinformation"
 
 #. TRANSLATORS: Save Location
 msgid "save-location"
-msgstr ""
+msgstr "Speicherort"
 
 #. TRANSLATORS: Save Name
 msgid "save-name"
-msgstr ""
+msgstr "Speichername"
 
 msgid "scheduler is not running"
 msgstr "Zeitplandienst läuft nicht"
@@ -14813,7 +14813,7 @@ msgstr "Keines"
 
 #. TRANSLATORS: Slip Sheets
 msgid "separator-sheets-type.slip-sheets"
-msgstr ""
+msgstr "Trennblatt"
 
 #. TRANSLATORS: Start Sheet
 msgid "separator-sheets-type.start-sheet"
@@ -14825,7 +14825,7 @@ msgstr "Duplexdruck"
 
 #. TRANSLATORS: Off
 msgid "sides.one-sided"
-msgstr ""
+msgstr "Einseitig"
 
 #. TRANSLATORS: On (Portrait)
 msgid "sides.two-sided-long-edge"
@@ -14903,7 +14903,7 @@ msgstr "angehalten"
 
 #. TRANSLATORS: Subject
 msgid "subject"
-msgstr ""
+msgstr "Thema"
 
 #. TRANSLATORS: Subscription Privacy Attributes
 msgid "subscription-privacy-attributes"
@@ -15023,11 +15023,11 @@ msgstr "oberer Rand"
 
 #. TRANSLATORS: Type of Cut
 msgid "trimming-type"
-msgstr ""
+msgstr "Schnittype"
 
 #. TRANSLATORS: Draw Line
 msgid "trimming-type.draw-line"
-msgstr ""
+msgstr "Linie zeichnen"
 
 #. TRANSLATORS: Full
 msgid "trimming-type.full"
@@ -15039,7 +15039,7 @@ msgstr ""
 
 #. TRANSLATORS: Perforate
 msgid "trimming-type.perforate"
-msgstr ""
+msgstr "perforieren"
 
 #. TRANSLATORS: Score
 msgid "trimming-type.score"

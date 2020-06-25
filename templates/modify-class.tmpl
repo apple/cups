@@ -1,4 +1,4 @@
-<H2 CLASS="title">Modify Class {printer_name}</H2>
+<H2 CLASS="title">Klasse {printer_name} ändern</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -7,15 +7,15 @@
 
 <TABLE>
 <TR>
-<TH CLASS="label">Description:</TH>
+<TH CLASS="label">Beschreibung:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
-<TH CLASS="label">Location:</TH>
+<TH CLASS="label">Standort:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
-<TH CLASS="label">Members:</TH>
+<TH CLASS="label">Mitglieder:</TH>
 <TD>
 <SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
 {[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
@@ -24,7 +24,7 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="SUBMIT" VALUE="Modify Class"></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Klasse ändern"></TD>
 </TR>
 </TABLE>
 
