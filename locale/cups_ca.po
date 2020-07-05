@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2020-07-04 21:07+0200\n"
+"PO-Revision-Date: 2020-07-06 00:59+0200\n"
 "Last-Translator: Antoni Bella Pérez <antonibella5@yahoo.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -1186,40 +1186,49 @@ msgstr "! expressió               Unari «NOT» d'expressió"
 #: cups/ipp.c:5045
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
-msgstr ""
+msgstr "«%s»: valor incorrecte de l'URI «%s» - %s (RFC 8011 secció 5.1.6)."
 
 #: cups/ipp.c:5051
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 8011 section 5.1.6)."
 msgstr ""
+"«%s»: valor incorrecte de l'URI «%s» - longitud incorrecta %d (RFC 8011"
+" secció 5.1.6)."
 
 #: cups/ipp.c:4753
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
+"«%s»: nom incorrecte de l'atribut - longitud incorrecta %d (RFC 8011 secció"
+" 5.1.4)."
 
 #: cups/ipp.c:4747
 #, c-format
 msgid ""
 "\"%s\": Bad attribute name - invalid character (RFC 8011 section 5.1.4)."
 msgstr ""
+"«%s»: nom incorrecte de l'atribut - caràcter no vàlid (RFC 8011 secció 5.1.4)."
 
 #: cups/ipp.c:4768
 #, c-format
 msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
-msgstr ""
+msgstr "«%s»: valor booleà incorrecte %d (RFC 8011 secció 5.1.21)."
 
 #: cups/ipp.c:5096
 #, c-format
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad characters (RFC 8011 section 5.1.8)."
 msgstr ""
+"«%s»: valor incorrecte del joc de caràcters «%s» - caràcters incorrectes (RFC"
+" 8011 secció 5.1.8)."
 
 #: cups/ipp.c:5102
 #, c-format
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
 msgstr ""
+"«%s»: valor incorrecte del joc de caràcters «%s» - longitud incorrecta %d"
+" (RFC 8011 secció 5.1.8)."
 
 #: cups/ipp.c:4845
 #, c-format
@@ -1270,12 +1279,15 @@ msgstr ""
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
 msgstr ""
+"«%s»: valor «enum» incorrecte %d - fora de l'interval (RFC 8011 secció 5.1.5)."
 
 #: cups/ipp.c:5032
 #, c-format
 msgid ""
 "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 8011 section 5.1.4)."
 msgstr ""
+"«%s»: valor incorrecte de la paraula clau «%s» - longitud incorrecta %d (RFC"
+" 8011 secció 5.1.4)."
 
 #: cups/ipp.c:5026
 #, c-format
@@ -1283,6 +1295,9 @@ msgid ""
 "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 8011 section "
 "5.1.4)."
 msgstr ""
+"«%s»: nom incorrecte de la paraula clau «%s» - caràcter no vàlid (RFC 8011"
+" secció "
+"5.1.4)."
 
 #: cups/ipp.c:5187
 #, c-format
@@ -1290,6 +1305,9 @@ msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section "
 "5.1.10)."
 msgstr ""
+"«%s»: valor incorrecte del «mimeMediaType» «%s» - caràcters incorrectes (RFC"
+" 8011 secció "
+"5.1.10)."
 
 #: cups/ipp.c:5194
 #, c-format
@@ -1297,12 +1315,17 @@ msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.10)."
 msgstr ""
+"«%s»: valor incorrecte del «mimeMediaType» «%s» - longitud incorrecta %d (RFC"
+" 8011 secció "
+"5.1.10)."
 
 #: cups/ipp.c:5001
 #, c-format
 msgid ""
 "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.3)."
 msgstr ""
+"«%s»: valor incorrecte del nom «%s» - seqüència UTF-8 incorrecta (RFC 8011"
+" secció 5.1.3)."
 
 #: cups/ipp.c:4996
 #, c-format
@@ -1310,11 +1333,15 @@ msgid ""
 "\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
 "8.1)."
 msgstr ""
+"«%s»: valor incorrecte del nom «%s» - caràcter de control incorrecte (PWG"
+" secció 5100.14)."
 
 #: cups/ipp.c:5008
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
+"«%s»: valor incorrecte del nom «%s» - longitud incorrecta %d (RFC 8011 secció"
+" 5.1.3)."
 
 #: cups/ipp.c:5142
 #, c-format
@@ -1322,6 +1349,9 @@ msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section "
 "5.1.9)."
 msgstr ""
+"«%s»: valor incorrecte de la «naturalLanguage» «%s» - caràcters incorrectes"
+" (RFC 8011 secció "
+"5.1.9)."
 
 #: cups/ipp.c:5149
 #, c-format
@@ -1329,12 +1359,16 @@ msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.9)."
 msgstr ""
+"«%s»: valor incorrecte de la «naturalLanguage» «%s» - longitud incorrecta %d"
+" (RFC 8011 secció 5.1.9)."
 
 #: cups/ipp.c:4790
 #, c-format
 msgid ""
 "\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
 msgstr ""
+"«%s»: valor incorrecte de la «octetString» - longitud incorrecta %d (RFC 8011"
+" secció 5.1.20)."
 
 #: cups/ipp.c:4885
 #, c-format
@@ -1349,6 +1383,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
 "5.1.16)."
 msgstr ""
+"«%s»: valor incorrecte de la resolució %dx%d%s - valor incorrecte de les"
+" unitats (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4862
 #, c-format
@@ -1356,6 +1392,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
 "positive (RFC 8011 section 5.1.16)."
 msgstr ""
+"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de"
+" l'alimentació creuada haurà de ser positiva (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4868
 #, c-format
@@ -1363,12 +1401,16 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
 "8011 section 5.1.16)."
 msgstr ""
+"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de"
+" l'alimentació haurà de ser positiva (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4946
 #, c-format
 msgid ""
 "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 8011 section 5.1.2)."
 msgstr ""
+"«%s»: valor incorrecte del text «%s» - seqüència UTF-8 incorrecta (RFC 8011"
+" secció 5.1.2)."
 
 #: cups/ipp.c:4941
 #, c-format
@@ -1376,31 +1418,39 @@ msgid ""
 "\"%s\": Bad text value \"%s\" - bad control character (PWG 5100.14 section "
 "8.3)."
 msgstr ""
+"«%s»: valor incorrecte del text «%s» - caràcter de control incorrecte (PWG"
+" secció 5100.14)."
 
 #: cups/ipp.c:4953
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 8011 section 5.1.2)."
 msgstr ""
+"«%s»: valor incorrecte del text «%s» - longitud incorrecta %d (RFC 8011"
+" secció 5.1.2)."
 
 #: cups/ipp.c:5072
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
 msgstr ""
+"«%s»: valor incorrecte de la «uriScheme» «%s» - caràcters incorrectes (RFC"
+" 8011 secció 5.1.7)."
 
 #: cups/ipp.c:5078
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
+"«%s»: valor incorrecte de la «uriScheme» «%s» - longitud incorrecta %d (RFC"
+" 8011 secció 5.1.7)."
 
 #: scheduler/ipp.c:365
 msgid "\"requesting-user-name\" attribute in wrong group."
-msgstr ""
+msgstr "L'atribut «requesting-user-name» es troba en un grup incorrecte."
 
 #: scheduler/ipp.c:371 scheduler/ipp.c:386
 msgid "\"requesting-user-name\" attribute with wrong syntax."
-msgstr ""
+msgstr "L'atribut «requesting-user-name» es troba amb una sintaxi incorrecta."
 
 #: berkeley/lpq.c:538
 #, c-format
@@ -1430,17 +1480,17 @@ msgstr "%s (%s, %s)"
 #: cups/dest-localization.c:180
 #, c-format
 msgid "%s (Borderless)"
-msgstr ""
+msgstr "%s (sense vores)"
 
 #: cups/dest-localization.c:187 cups/dest-localization.c:194
 #, c-format
 msgid "%s (Borderless, %s)"
-msgstr ""
+msgstr "%s (sense vores, %s)"
 
 #: cups/dest-localization.c:201
 #, c-format
 msgid "%s (Borderless, %s, %s)"
-msgstr ""
+msgstr "%s (sense vores, %s, %s)"
 
 #: systemv/lpstat.c:806
 #, c-format
@@ -1520,17 +1570,17 @@ msgstr "%s: %s ha fallat: %s"
 #: systemv/lpadmin.c:1209
 #, c-format
 msgid "%s: Bad printer URI \"%s\"."
-msgstr ""
+msgstr "%s: URI «%s» incorrecte de la impressora."
 
 #: tools/ippfind.c:768 tools/ipptool.c:412
 #, c-format
 msgid "%s: Bad version %s for \"-V\"."
-msgstr ""
+msgstr "%s: versió incorrecta %s per a «-V»."
 
 #: systemv/cupsaccept.c:67
 #, c-format
 msgid "%s: Don't know what to do."
-msgstr "%s: no sé que fer."
+msgstr "%s: no sé què fer."
 
 #: berkeley/lpr.c:354 systemv/lp.c:589
 #, c-format
@@ -1554,12 +1604,12 @@ msgstr ""
 #: systemv/lpstat.c:1593
 #, c-format
 msgid "%s: Error - add '/version=1.1' to server name."
-msgstr ""
+msgstr "%s: Error - afegeix «/version=1.1» al nom del servidor."
 
 #: systemv/lp.c:237
 #, c-format
 msgid "%s: Error - bad job ID."
-msgstr "%s: Error - ID del treball incorrecte."
+msgstr "%s: Error - ID incorrecte del treball."
 
 #: systemv/lp.c:226
 #, c-format
@@ -1572,13 +1622,13 @@ msgstr ""
 #, c-format
 msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
 msgstr ""
-"%s: Error - no es pot imprimir des de l'entrada estàndard si s'indiquen els "
-"fitxers o l'ID del treball."
+"%s: Error - no es pot imprimir des de l'entrada estàndard si s'indiquen"
+" fitxers o un ID del treball."
 
 #: berkeley/lpr.c:259 systemv/lp.c:279
 #, c-format
 msgid "%s: Error - copies must be 1 or more."
-msgstr ""
+msgstr "%s: Error - les còpies haurien de ser una o més."
 
 #: systemv/lp.c:469
 #, c-format
@@ -1593,7 +1643,7 @@ msgstr "%s: Error - s'esperava un tipus de contingut després de l'opció «-T»
 #: berkeley/lpr.c:250
 #, c-format
 msgid "%s: Error - expected copies after \"-#\" option."
-msgstr "%s: Error - s'esperaven còpies després de l'opció «-#»."
+msgstr "%s: Error - s'esperaven còpies després de l'opció «-núm.»."
 
 #: systemv/lp.c:270
 #, c-format
@@ -1618,7 +1668,8 @@ msgstr "%s: Error - s'esperava un formulari després de l'opció «-f»."
 #: systemv/lp.c:405
 #, c-format
 msgid "%s: Error - expected hold name after \"-H\" option."
-msgstr "%s: Error - s'esperava un nom per pausa després de l'opció «-H»."
+msgstr ""
+"%s: Error - s'esperava un nom per posar en espera després de l'opció «-H»."
 
 #: berkeley/lpr.c:109
 #, c-format
@@ -1659,7 +1710,7 @@ msgstr "%s: Error - s'esperava una prioritat després de l'opció «-%c»."
 #: systemv/cupsaccept.c:152
 #, c-format
 msgid "%s: Error - expected reason text after \"-r\" option."
-msgstr "%s: Error - s'esperava una explicació després de l'opció «-r»."
+msgstr "%s: Error - s'esperava una raó després de l'opció «-r»."
 
 #: systemv/lp.c:366
 #, c-format
@@ -1689,7 +1740,7 @@ msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" "
 "option."
 msgstr ""
-"%s: Error - es requereix «completed», «not-completed», o «all» després de "
+"%s: Error - es requereix «completed», «not-completed» o «all» després de "
 "l'opció «-W»."
 
 #: berkeley/lpq.c:238
@@ -1710,7 +1761,7 @@ msgstr "%s: Error - el planificador no està responent."
 #: berkeley/lpr.c:321 systemv/lp.c:549
 #, c-format
 msgid "%s: Error - too many files - \"%s\"."
-msgstr "%s: Error - massa fitxers - «%s»."
+msgstr "%s: Error - hi ha massa fitxers - «%s»."
 
 #: berkeley/lpr.c:303 systemv/lp.c:532
 #, c-format
@@ -1720,7 +1771,7 @@ msgstr "%s: Error - no es pot accedir a «%s» - %s"
 #: berkeley/lpr.c:398 systemv/lp.c:621
 #, c-format
 msgid "%s: Error - unable to queue from stdin - %s."
-msgstr "%s: Error - no es pot posar en cua des d'stdin - %s."
+msgstr "%s: Error - no es pot posar en cua des de l'entrada estàndard - %s."
 
 #: berkeley/lprm.c:92 berkeley/lprm.c:179 systemv/cancel.c:227
 #, c-format
@@ -1756,32 +1807,33 @@ msgstr "%s: el nom de la destinació no és vàlid a la llista «%s»."
 #: scheduler/cupsfilter.c:573
 #, c-format
 msgid "%s: Invalid filter string \"%s\"."
-msgstr "%s: la cadena del filtre «%s» no és vàlida."
+msgstr "%s: la cadena de filtratge «%s» no és vàlida."
 
 #: tools/ipptool.c:334
 #, c-format
 msgid "%s: Missing filename for \"-P\"."
-msgstr ""
+msgstr "%s: falta un nom de fitxer per a «-P»."
 
 #: tools/ippfind.c:740 tools/ipptool.c:371
 #, c-format
 msgid "%s: Missing timeout for \"-T\"."
-msgstr ""
+msgstr "%s: falta un temps d'espera per a «-T»."
 
 #: tools/ippfind.c:753 tools/ipptool.c:385
 #, c-format
 msgid "%s: Missing version for \"-V\"."
-msgstr ""
+msgstr "%s: falta una versió per a «-V»."
 
 #: systemv/lp.c:425
 #, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
-msgstr "%s: es necessita l'ID del treball («-i jobid») abans de «-H restart»."
+msgstr ""
+"%s: es necessita l'ID del treball («-i ID_treball») abans de «-H restart»."
 
 #: scheduler/cupsfilter.c:445
 #, c-format
 msgid "%s: No filter to convert from %s/%s to %s/%s."
-msgstr "%s: no hi ha cap filtre per convertir de %s/%s a %s/%s."
+msgstr "%s: no hi ha cap filtre per convertir des de %s/%s a %s/%s."
 
 #: systemv/cupsaccept.c:195
 #, c-format
@@ -1799,62 +1851,62 @@ msgstr "%s: ho sento, no s'ha compilat la compatibilitat per a l'encriptatge."
 #: systemv/lpadmin.c:1216
 #, c-format
 msgid "%s: Unable to connect to \"%s:%d\": %s"
-msgstr ""
+msgstr "%s: no s'ha pogut connectar amb el servidor «%s:%d»: %s"
 
 #: berkeley/lpq.c:292 scheduler/cupsfilter.c:1269 systemv/cancel.c:250
 #, c-format
 msgid "%s: Unable to connect to server."
-msgstr "%s: no es pot connectar al servidor."
+msgstr "%s: no s'ha pogut connectar amb el servidor."
 
 #: systemv/cancel.c:334
 #, c-format
 msgid "%s: Unable to contact server."
-msgstr "%s: no es pot contactar amb el servidor."
+msgstr "%s: no s'ha pogut contactar amb el servidor."
 
 #: systemv/lpadmin.c:1246
 #, c-format
 msgid "%s: Unable to create PPD file: %s"
-msgstr ""
+msgstr "%s: no s'ha pogut crear el fitxer PPD: %s"
 
 #: scheduler/cupsfilter.c:410
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
-msgstr "%s: no es pot determinar el tips de MIME de «%s»."
+msgstr "%s: no s'ha pogut determinar el tips de MIME de «%s»."
 
 #: tools/ipptool.c:277 tools/ipptool.c:343
 #, c-format
 msgid "%s: Unable to open \"%s\": %s"
-msgstr ""
+msgstr "%s: no s'ha pogut obrir «%s»: %s"
 
 #: ppdc/ppdmerge.cxx:86
 #, c-format
 msgid "%s: Unable to open %s: %s"
-msgstr "%s: no es pot obrir %s: %s"
+msgstr "%s: no s'ha pogut obrir %s: %s"
 
 #: scheduler/cupsfilter.c:668 ppdc/ppdmerge.cxx:102
 #, c-format
 msgid "%s: Unable to open PPD file: %s on line %d."
-msgstr "%s: no es pot obrir el fitxer PPD: %s a la línia %d."
+msgstr "%s: no s'ha pogut obrir el fitxer PPD: %s a la línia %d."
 
 #: systemv/lpadmin.c:1231
 #, c-format
 msgid "%s: Unable to query printer: %s"
-msgstr ""
+msgstr "%s: no s'ha pogut fer la consulta a la impressora: %s"
 
 #: scheduler/cupsfilter.c:377
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
-msgstr "%s: no es pot llegir la base de dades MIME de «%s» o «%s»."
+msgstr "%s: no s'ha pogut llegir la base de dades MIME des de «%s» o «%s»."
 
 #: systemv/lpadmin.c:1200
 #, c-format
 msgid "%s: Unable to resolve \"%s\"."
-msgstr ""
+msgstr "%s: no s'ha pogut resoldre «%s»."
 
 #: systemv/lpinfo.c:238
 #, c-format
 msgid "%s: Unknown argument \"%s\"."
-msgstr ""
+msgstr "%s: l'argument «%s» és desconegut."
 
 #: berkeley/lpq.c:142 systemv/lpstat.c:608
 #, c-format
@@ -1898,12 +1950,12 @@ msgstr ""
 #: systemv/lp.c:474
 #, c-format
 msgid "%s: Warning - character set option ignored."
-msgstr "%s: Avís - s'ignora l'opció establerta del joc de caràcters."
+msgstr "%s: Avís - s'ignora l'opció que estableix el joc de caràcters."
 
 #: systemv/lp.c:493
 #, c-format
 msgid "%s: Warning - content type option ignored."
-msgstr "%s: Avís - s'ignora l'opció de tipus de contingut."
+msgstr "%s: Avís - s'ignora l'opció del tipus de contingut."
 
 #: systemv/lp.c:182
 #, c-format
@@ -1913,11 +1965,11 @@ msgstr "%s: Avís - s'ignora l'opció de formulari."
 #: systemv/lp.c:390
 #, c-format
 msgid "%s: Warning - mode option ignored."
-msgstr "%s: Avís - s'ignora l'opció de mode."
+msgstr "%s: Avís - s'ignora l'opció del mode."
 
 #: tools/ippfind.c:2802
 msgid "( expressions )         Group expressions"
-msgstr ""
+msgstr "( expressions )         Grup d'expressions"
 
 #: berkeley/lprm.c:233
 msgid "-                       Cancel all jobs"
@@ -2183,6 +2235,8 @@ msgstr "-2"
 #: tools/ippeveprinter.c:7927
 msgid "-2                      Set 2-sided printing support (default=1-sided)"
 msgstr ""
+"-2                      Estableix el suport d'impressió a dues cares"
+" (predeterminat=1_cara)"
 
 #: ppdc/sample.c:407
 msgid "-20"
@@ -2291,66 +2345,80 @@ msgstr "-A                      Habilita l'autenticació"
 #: tools/ipptool.c:4314
 msgid "-C                      Send requests using chunking (default)"
 msgstr ""
+"-C                      Envia sol·licituds usant fragments (predeterminat)"
 
 #: systemv/lpadmin.c:1623
 msgid "-D description          Specify the textual description of the printer"
 msgstr ""
+"-D descripció           Especifica la descripció en text de la impressora"
 
 #: tools/ippeveprinter.c:7929
 msgid "-D device-uri           Set the device URI for the printer"
 msgstr ""
+"-D URI_dispositiu       Estableix l'URI del dispositiu per a la impressora"
 
 #: systemv/lpadmin.c:1625
 msgid ""
 "-E                      Enable and accept jobs on the printer (after -p)"
 msgstr ""
+"-E                      Habilita i accepta treballs a la impressora (després"
+" de -p)"
 
 #: berkeley/lpq.c:644 berkeley/lpr.c:433 berkeley/lprm.c:234
 #: systemv/cancel.c:403 systemv/cupsaccept.c:244 systemv/cupsctl.c:233
 #: systemv/lp.c:753 systemv/lpadmin.c:1624 systemv/lpinfo.c:498
 #: systemv/lpmove.c:217 systemv/lpoptions.c:540 systemv/lpstat.c:2045
 msgid "-E                      Encrypt the connection to the server"
-msgstr ""
+msgstr "-E                      Encripta la connexió amb el servidor"
 
 #: tools/ipptool.c:4315
 msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
 msgstr ""
+"-E                      Prova amb l'encriptatge usant l'actualització HTTP a"
+" TLS"
 
 #: scheduler/main.c:2138
 msgid "-F                      Run in the foreground but detach from console."
 msgstr ""
+"-F                      Executa en primer pla però separa de la consola."
 
 #: tools/ippeveprinter.c:7930
 msgid "-F output-type/subtype  Set the output format for the printer"
 msgstr ""
+"-F tipus_sortida/subtipus\n"
+"                        Estableix el format de sortida per a la impressora"
 
 #: systemv/lpstat.c:2050
 msgid "-H                      Show the default server and port"
-msgstr ""
+msgstr "-H                      Mostra el servidor i port predeterminats"
 
 #: systemv/lp.c:755
 msgid "-H HH:MM                Hold the job until the specified UTC time"
 msgstr ""
+"-H HH:MM                Posa en espera el treball fins al temps en UTC indicat"
 
 #: systemv/lp.c:756
 msgid "-H hold                 Hold the job until released/resumed"
 msgstr ""
+"-H hold                 Posa en espera el treball fins que"
+" s'alliberi/reprengui"
 
 #: systemv/lp.c:757
 msgid "-H immediate            Print the job as soon as possible"
 msgstr ""
+"-H immediate            Imprimeix el treball tan aviat com sigui possible"
 
 #: systemv/lp.c:758
 msgid "-H restart              Reprint the job"
-msgstr ""
+msgstr "-H restart              Torna a imprimir el treball"
 
 #: systemv/lp.c:759
 msgid "-H resume               Resume a held job"
-msgstr ""
+msgstr "-H resume               Reprèn un treball en espera"
 
 #: berkeley/lpr.c:434
 msgid "-H server[:port]        Connect to the named server and port"
-msgstr ""
+msgstr "-H servidor[:port]      Connecta amb el servidor i el port indicat"
 
 #: tools/ipptool.c:4316
 msgid "-I                      Ignore errors"
@@ -2362,42 +2430,50 @@ msgid ""
 "                          Ignore specific warnings"
 msgstr ""
 "-I {filename,filters,none,profiles}\n"
-"                          Ignora els avisos específics"
+"                        Ignora els avisos específics"
 
 #: tools/ippeveprinter.c:7932
 msgid ""
 "-K keypath              Set location of server X.509 certificates and keys."
 msgstr ""
+"-K camí_clau            Estableix la ubicació dels certificats i claus del"
+" servidor X.509."
 
 #: tools/ipptool.c:4317
 msgid "-L                      Send requests using content-length"
-msgstr ""
+msgstr "-L                      Envia sol·licituds usant «content-length»"
 
 #: systemv/lpadmin.c:1628
 msgid "-L location             Specify the textual location of the printer"
 msgstr ""
+"-L ubicació             Especifica la ubicació en text de la impressora"
 
 #: tools/ippeveprinter.c:7934
 msgid "-M manufacturer         Set manufacturer name (default=Test)"
 msgstr ""
+"-M fabricant            Estableix el nom del fabricant (predeterminat=Test)"
 
 #: berkeley/lpq.c:647
 msgid "-P destination          Show status for the specified destination"
-msgstr ""
+msgstr "-P destinació           Mostra l'estat per a la destinació indicada"
 
 #: berkeley/lpr.c:448 berkeley/lprm.c:236
 msgid "-P destination          Specify the destination"
-msgstr ""
+msgstr "-P destinació           Especifica la destinació"
 
 #: tools/ipptool.c:4318
 msgid ""
 "-P filename.plist       Produce XML plist to a file and test report to "
 "standard output"
 msgstr ""
+"-P nom_fitxer.plist     Produeix la plist en XML a un fitxer, i informa de la"
+" prova a la sortida estàndard"
 
 #: tools/ippeveprinter.c:7935
 msgid "-P filename.ppd         Load printer attributes from PPD file"
 msgstr ""
+"-P nom_fitxer.ppd       Carrega els atributs de la impressora des del fitxer"
+" PPD"
 
 #: tools/ippfind.c:2772
 msgid "-P number[-number]      Match port to number or range"
@@ -2406,34 +2482,38 @@ msgstr "-P número[-número]      Coincidència del port amb el número o interv
 #: systemv/lp.c:775
 msgid "-P page-list            Specify a list of pages to print"
 msgstr ""
+"-P llista_pàgines       Especifica una llista de pàgines a la impressora"
 
 #: systemv/lpstat.c:2060
 msgid "-R                      Show the ranking of jobs"
-msgstr ""
+msgstr "-R                      Mostra la classificació dels treballs"
 
 #: systemv/lpadmin.c:1648
 msgid "-R name-default         Remove the default value for the named option"
 msgstr ""
+"-R nom_predeterminat    Elimina el valor predeterminat per a l'opció indicada"
 
 #: systemv/cupstestppd.c:3860
 msgid "-R root-directory       Set alternate root"
-msgstr ""
+msgstr "-R directori_arrel      Estableix una arrel alternativa"
 
 #: tools/ipptool.c:4319
 msgid "-S                      Test with encryption using HTTPS"
-msgstr ""
+msgstr "-S                      Prova amb l'encriptatge usant HTTPS"
 
 #: tools/ippfind.c:2768
 msgid "-T seconds              Set the browse timeout in seconds"
 msgstr ""
+"-T segons               Estableix el temps d'espera de l'explorador en segons"
 
 #: tools/ipptool.c:4320
 msgid "-T seconds              Set the receive/send timeout in seconds"
 msgstr ""
+"-T segons               Estableix el temps d'espera de rep/envia en segons"
 
 #: berkeley/lpr.c:451
 msgid "-T title                Specify the job title"
-msgstr ""
+msgstr "-T títol                Especifica el títol del treball"
 
 #: berkeley/lpq.c:648 berkeley/lpr.c:452 berkeley/lprm.c:237
 #: systemv/cancel.c:406 systemv/cupsaccept.c:247 systemv/lp.c:779
@@ -2441,22 +2521,24 @@ msgstr ""
 #: systemv/lpoptions.c:545 systemv/lpstat.c:2048
 msgid "-U username             Specify the username to use for authentication"
 msgstr ""
+"-U nom_usuari           Especifica el nom d'usuari a usar per a l'autenticació"
 
 #: systemv/cupsctl.c:235
 msgid "-U username             Specify username to use for authentication"
 msgstr ""
+"-U nom_usuari           Especifica el nom d'usuari a usar per a l'autenticació"
 
 #: tools/ippeveprinter.c:7936 tools/ippfind.c:2769 tools/ipptool.c:4321
 msgid "-V version              Set default IPP version"
-msgstr ""
+msgstr "-V versió               Estableix la versió predeterminada de l'IPP"
 
 #: systemv/lpstat.c:2051
 msgid "-W completed            Show completed jobs"
-msgstr ""
+msgstr "-W completed            Mostra els treballs finalitzats"
 
 #: systemv/lpstat.c:2052
 msgid "-W not-completed        Show pending jobs"
-msgstr ""
+msgstr "-W not-completed        Mostra els treballs en espera"
 
 #: systemv/cupstestppd.c:3861
 msgid ""
@@ -2464,102 +2546,115 @@ msgid ""
 "translations}\n"
 "                          Issue warnings instead of errors"
 msgstr ""
+"-W {all,none,constraints,defaults,duplex,filters,profiles,sizes,translations}"
+"\n"
+"                        Emet avisos en lloc d'errors"
 
 #: tools/ipptool.c:4322
 msgid "-X                      Produce XML plist instead of plain text"
-msgstr ""
+msgstr "-X                      Produeix una plist en XML en lloc de text net"
 
 #: systemv/cancel.c:402
 msgid "-a                      Cancel all jobs"
-msgstr ""
+msgstr "-a                      Cancel·la tots els treballs"
 
 #: berkeley/lpq.c:643
 msgid "-a                      Show jobs on all destinations"
-msgstr ""
+msgstr "-a                      Mostra els treballs a totes les destinacions"
 
 #: systemv/lpstat.c:2053
 msgid "-a [destination(s)]     Show the accepting state of destinations"
 msgstr ""
+"-a [destinació/ons]     Mostra l'estat d'acceptació de les destinacions"
 
 #: tools/ippeveprinter.c:7937
 msgid "-a filename.conf        Load printer attributes from conf file"
 msgstr ""
+"-a nom_fitxer.conf      Carrega els atributs de la impressora des del fitxer"
+" conf"
 
 #: systemv/lp.c:751
 msgid "-c                      Make a copy of the print file(s)"
-msgstr ""
+msgstr "-c                      Fa una còpia del/s fitxer/s de la impressora"
 
 #: tools/ipptool.c:4323
 msgid "-c                      Produce CSV output"
-msgstr ""
+msgstr "-c                      Produeix una sortida en CSV"
 
 #: systemv/lpstat.c:2054
 msgid "-c [class(es)]          Show classes and their member printers"
 msgstr ""
+"-c [classe/s]           Mostra les classes i les seves impressores membre"
 
 #: systemv/lpadmin.c:1621
 msgid "-c class                Add the named destination to a class"
-msgstr ""
+msgstr "-c classe               Afegeix la destinació amb nom a una classe"
 
 #: tools/ippeveprinter.c:7938
 msgid "-c command              Set print command"
-msgstr ""
+msgstr "-c ordre                Estableix l'ordre d'impressió"
 
 #: scheduler/main.c:2136
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
-msgstr ""
+msgstr "-c cupsd.conf           Estableix el fitxer cupsd.conf a usar."
 
 #: systemv/lpstat.c:2055
 msgid "-d                      Show the default destination"
-msgstr ""
+msgstr "-d                      Mostra la destinació predeterminada"
 
 #: systemv/lpoptions.c:539
 msgid "-d destination          Set default destination"
-msgstr ""
+msgstr "-d destinació           Estableix la destinació predeterminada"
 
 #: systemv/lpadmin.c:1622
 msgid "-d destination          Set the named destination as the server default"
 msgstr ""
+"-d destinació           Estableix la destinació amb nom com al servidor"
+" predeterminat"
 
 #: systemv/lp.c:752
 msgid "-d destination          Specify the destination"
-msgstr ""
+msgstr "-d destinació           Especifica la destinació"
 
 #: tools/ipptool.c:4324
 msgid "-d name=value           Set named variable to value"
-msgstr ""
+msgstr "-d nom=valor            Estableix la variable amb nom al valor"
 
 #: tools/ippfind.c:2773
 msgid "-d regex                Match domain to regular expression"
 msgstr ""
+"-d exp_reg              Coincidència del domini amb l'expressió regular"
 
 #: tools/ippeveprinter.c:7939
 msgid "-d spool-directory      Set spool directory"
-msgstr ""
+msgstr "-d directori_cua        Estableix el directori per a la gestió de cues"
 
 #: systemv/lpstat.c:2056
 msgid "-e                      Show available destinations on the network"
 msgstr ""
+"-e                      Mostra les destinacions disponibles sobre la xarxa"
 
 #: scheduler/main.c:2137
 msgid "-f                      Run in the foreground."
-msgstr ""
+msgstr "-f                      Executa en primer pla."
 
 #: tools/ipptool.c:4325
 msgid "-f filename             Set default request filename"
 msgstr ""
+"-f nom_fitxer           Estableix el nom de fitxer predeterminat de la"
+" sol·licitud"
 
 #: tools/ippeveprinter.c:7940
 msgid "-f type/subtype[,...]   Set supported file types"
-msgstr ""
+msgstr "-f tipus/subtipus[,...] Estableix els tipus de fitxer admesos"
 
 #: scheduler/main.c:2139
 msgid "-h                      Show this usage message."
-msgstr ""
+msgstr "-h                      Mostra aquest missatge que esteu usant."
 
 #: tools/ipptool.c:4326
 msgid "-h                      Validate HTTP response headers"
-msgstr ""
+msgstr "-h                      Valida les capçaleres de resposta HTTP"
 
 #: tools/ippfind.c:2774
 msgid "-h regex                Match hostname to regular expression"
@@ -2580,19 +2675,22 @@ msgstr "-i fitxer_icona.png     Estableix el fitxer de la icona"
 #: systemv/lp.c:760
 msgid "-i id                   Specify an existing job ID to modify"
 msgstr ""
+"-i ID                   Especifica un ID de treball existent per modificar"
 
 #: systemv/lpadmin.c:1627
 msgid "-i ppd-file             Specify a PPD file for the printer"
-msgstr ""
+msgstr "-i fitxer_PPD           Especifica un fitxer PPD per a la impressora"
 
 #: tools/ipptool.c:4327
 msgid ""
 "-i seconds              Repeat the last file with the given time interval"
 msgstr ""
+"-i segons               Repeteix l'últim fitxer amb l'interval de temps"
+" indicat"
 
 #: tools/ippeveprinter.c:7942
 msgid "-k                      Keep job spool files"
-msgstr ""
+msgstr "-k                      Mantén els fitxers a la cua de treballs"
 
 #: tools/ippfind.c:2775
 msgid "-l                      List attributes"
@@ -2600,50 +2698,58 @@ msgstr "-l                      Llista els atributs"
 
 #: tools/ipptool.c:4328
 msgid "-l                      Produce plain text output"
-msgstr ""
+msgstr "-l                      Produeix una sortida en text net"
 
 #: scheduler/main.c:2141
 msgid "-l                      Run cupsd on demand."
-msgstr ""
+msgstr "-l                      Executa el «cupsd» sota demanda."
 
 #: systemv/lpoptions.c:542
 msgid "-l                      Show supported options and values"
-msgstr ""
+msgstr "-l                      Mostra les opcions i valors admesos"
 
 #: berkeley/lpq.c:646 systemv/lpinfo.c:500 systemv/lpstat.c:2047
 msgid "-l                      Show verbose (long) output"
-msgstr ""
+msgstr "-l                      Mostra la sortida detallada (llarga)"
 
 #: tools/ippeveprinter.c:7943
 msgid "-l location             Set location of printer"
-msgstr ""
+msgstr "-l ubicació             Estableix la ubicació de la impressora"
 
 #: berkeley/lpr.c:435 systemv/lp.c:761
 msgid ""
 "-m                      Send an email notification when the job completes"
 msgstr ""
+"-m                      Envia una notificació per correu electrònic quan es"
+" finalitzi el treball"
 
 #: systemv/lpinfo.c:501
 msgid "-m                      Show models"
-msgstr ""
+msgstr "-m                      Mostra els models"
 
 #: systemv/lpadmin.c:1630
 msgid ""
 "-m everywhere           Specify the printer is compatible with IPP Everywhere"
 msgstr ""
+"-m everywhere           Especifica que la impressora és compatible amb IPP"
+" Everywhere"
 
 #: tools/ippeveprinter.c:7944
 msgid "-m model                Set model name (default=Printer)"
 msgstr ""
+"-m model                Estableix el nom del model (predeterminat=Printer)"
 
 #: systemv/lpadmin.c:1629
 msgid ""
 "-m model                Specify a standard model/PPD file for the printer"
 msgstr ""
+"-m model                Especifica un model estàndard/fitxer PPD per a la"
+" impressora"
 
 #: tools/ipptool.c:4329
 msgid "-n count                Repeat the last file the given number of times"
 msgstr ""
+"-n recompte             Repeteix l'últim fitxer el nombre de vegades indicat"
 
 #: tools/ippeveprinter.c:7945
 msgid "-n hostname             Set hostname for printer"
@@ -2663,106 +2769,140 @@ msgstr ""
 msgid ""
 "-o Name=Value           Specify the default value for the named PPD option "
 msgstr ""
+"-o Nom=Valor            Especifica el valor predeterminat per a l'opció PPD"
+" amb nom"
 
 #: systemv/lpstat.c:2057
 msgid "-o [destination(s)]     Show jobs"
-msgstr ""
+msgstr "-o [destinació/ons]     Mostra els treballs"
 
 #: systemv/lpadmin.c:1633
 msgid ""
 "-o cupsIPPSupplies=false\n"
 "                        Disable supply level reporting via IPP"
 msgstr ""
+"-o cupsIPPSupplies=false\n"
+"                        Inhabilita la informació de nivell aportada"
+" mitjançant IPP"
 
 #: systemv/lpadmin.c:1635
 msgid ""
 "-o cupsSNMPSupplies=false\n"
 "                        Disable supply level reporting via SNMP"
 msgstr ""
+"-o cupsSNMPSupplies=false\n"
+"                        Inhabilita la informació de nivell aportada"
+" mitjançant SNMP"
 
 #: systemv/lpadmin.c:1637
 msgid "-o job-k-limit=N        Specify the kilobyte limit for per-user quotas"
 msgstr ""
+"-o job-k-limit=N        Especifica el límit de kilobytes per a les quotes per"
+" usuari"
 
 #: systemv/lpadmin.c:1638
 msgid "-o job-page-limit=N     Specify the page limit for per-user quotas"
 msgstr ""
+"-o job-page-limit=N     Especifica el límit de pàgines per a les quotes per"
+" usuari"
 
 #: systemv/lpadmin.c:1639
 msgid "-o job-quota-period=N   Specify the per-user quota period in seconds"
 msgstr ""
+"-o job-quota-period=N   Especifica el període en segons per a les quotes per"
+" usuari"
 
 #: berkeley/lpr.c:437 systemv/lp.c:764
 msgid "-o job-sheets=standard  Print a banner page with the job"
-msgstr ""
+msgstr "-o job-sheets=standard  Imprimeix una pàgina de bàner amb el treball"
 
 #: berkeley/lpr.c:438 systemv/lp.c:765
 msgid "-o media=size           Specify the media size to use"
-msgstr ""
+msgstr "-o media=mida           Especifica la mida del paper per usar"
 
 #: systemv/lpadmin.c:1631
 msgid "-o name-default=value   Specify the default value for the named option"
 msgstr ""
+"-o nom_predeterminat=valor\n"
+"                        Especifica el valor predeterminat per a l'opció amb"
+" nom"
 
 #: systemv/lpoptions.c:543
 msgid "-o name[=value]         Set default option and value"
-msgstr ""
+msgstr "-o nom[=valor]          Estableix l'opció i el valor predeterminats"
 
 #: berkeley/lpr.c:439 systemv/lp.c:766
 msgid ""
 "-o number-up=N          Specify that input pages should be printed N-up (1, "
 "2, 4, 6, 9, and 16 are supported)"
 msgstr ""
+"-o number-up=N          Especifica quines pàgines d'entrada s'hauran"
+" d'imprimir (s'admeten 1, 2, 4, 6, 9 i 16)"
 
 #: berkeley/lpr.c:436 systemv/lp.c:763
 msgid "-o option[=value]       Specify a printer-specific option"
 msgstr ""
+"-o opció[=valor]        Especifica una opció específica per a la impressora"
 
 #: berkeley/lpr.c:440 systemv/lp.c:767
 msgid ""
 "-o orientation-requested=N\n"
 "                        Specify portrait (3) or landscape (4) orientation"
 msgstr ""
+"-o orientation-requested=N\n"
+"                        Especifica l'orientació vertical (3) o horitzontal (4)"
 
 #: berkeley/lpr.c:442 systemv/lp.c:769
 msgid ""
 "-o print-quality=N      Specify the print quality - draft (3), normal (4), "
 "or best (5)"
 msgstr ""
+"-o print-quality=N      Especifica la qualitat de la impressió: esborrany"
+" (3), normal (4) o millor (5)"
 
 #: systemv/lpadmin.c:1640
 msgid ""
 "-o printer-error-policy=name\n"
 "                        Specify the printer error policy"
 msgstr ""
+"-o printer-error-policy=nom\n"
+"                        Especifica la política d'error per a la impressora"
 
 #: systemv/lpadmin.c:1642
 msgid ""
 "-o printer-is-shared=true\n"
 "                        Share the printer"
 msgstr ""
+"-o printer-is-shared=true\n"
+"                        Comparteix la impressora"
 
 #: systemv/lpadmin.c:1644
 msgid ""
 "-o printer-op-policy=name\n"
 "                        Specify the printer operation policy"
 msgstr ""
+"-o printer-op-policy=nom\n"
+"                        Especifica la política d'operació per a la impressora"
 
 #: berkeley/lpr.c:443 systemv/lp.c:770
 msgid "-o sides=one-sided      Specify 1-sided printing"
-msgstr ""
+msgstr "-o sides=one-sided      Especifica la impressió a una cara"
 
 #: berkeley/lpr.c:444 systemv/lp.c:771
 msgid ""
 "-o sides=two-sided-long-edge\n"
 "                        Specify 2-sided portrait printing"
 msgstr ""
+"-o sides=two-sided-long-edge\n"
+"                        Especifica la impressió vertical a dues cares"
 
 #: berkeley/lpr.c:446 systemv/lp.c:773
 msgid ""
 "-o sides=two-sided-short-edge\n"
 "                        Specify 2-sided landscape printing"
 msgstr ""
+"-o sides=two-sided-short-edge\n"
+"                        Especifica la impressió horitzontal a dues cares"
 
 #: tools/ippfind.c:2777
 msgid "-p                      Print URI if true"
@@ -2771,18 +2911,20 @@ msgstr "-p                      Imprimeix l'URI si és cert"
 #: systemv/lpstat.c:2058
 msgid "-p [printer(s)]         Show the processing state of destinations"
 msgstr ""
+"-p [impressora/es]      Mostra l'estat de processament de les destinacions"
 
 #: systemv/lpoptions.c:544
 msgid "-p destination          Specify a destination"
-msgstr ""
+msgstr "-p destinació           Especifica una destinació"
 
 #: systemv/lpadmin.c:1646
 msgid "-p destination          Specify/add the named destination"
-msgstr ""
+msgstr "-p destinació           Especifica/afegeix la destinació amb nom"
 
 #: tools/ippeveprinter.c:7946
 msgid "-p port                 Set port number for printer"
 msgstr ""
+"-p port                 Estableix el número de port per a la impressora"
 
 #: tools/ippfind.c:2778
 msgid "-q                      Quietly report match via exit code"
@@ -2797,18 +2939,21 @@ msgstr "-q                      Executa silenciosament"
 #: berkeley/lpr.c:449
 msgid "-q                      Specify the job should be held for printing"
 msgstr ""
+"-q                      Especifica el treball que hauria de restar en espera"
+" per a la impressió"
 
 #: systemv/lp.c:776
 msgid "-q priority             Specify the priority from low (1) to high (100)"
 msgstr ""
+"-q prioritat            Especifica la prioritat des de baixa (1) a alta (100)"
 
 #: berkeley/lpr.c:450
 msgid "-r                      Remove the file(s) after submission"
-msgstr ""
+msgstr "-r                      Elimina el/s fitxer/s després d'enviar-lo/s"
 
 #: systemv/lpstat.c:2059
 msgid "-r                      Show whether the CUPS server is running"
-msgstr ""
+msgstr "-r                      Mostra si s'està executant el servidor CUPS"
 
 #: tools/ippfind.c:2779
 msgid "-r                      True if service is remote"
@@ -2816,19 +2961,21 @@ msgstr "-r                      Cert si el servei és remot"
 
 #: systemv/cupstestppd.c:3864
 msgid "-r                      Use 'relaxed' open mode"
-msgstr ""
+msgstr "-r                      Usa el mode d'obrir «relaxat»"
 
 #: systemv/lpadmin.c:1647
 msgid "-r class                Remove the named destination from a class"
-msgstr ""
+msgstr "-r classe               Elimina la destinació amb nom de la classe"
 
 #: systemv/cupsaccept.c:246
 msgid "-r reason               Specify a reason message that others can see"
 msgstr ""
+"-r raó                  Especifica un missatge de raó que podran veure els"
+" altres"
 
 #: tools/ippeveprinter.c:7947
 msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
-msgstr ""
+msgstr "-r subtipus,[subtipus]  Estableix el subtipus del servei DNS-SD"
 
 #: systemv/lp.c:777
 msgid "-s                      Be silent"
@@ -2849,6 +2996,8 @@ msgstr "-s cups-files.conf      Estableix el fitxer cups-files.conf a usar."
 #: tools/ippeveprinter.c:7948
 msgid "-s speed[,color-speed]  Set speed in pages per minute"
 msgstr ""
+"-s velocitat[,color-velocitat]\n"
+"                        Estableix la velocitat en pàgines per minut"
 
 #: tools/ipptool.c:4331
 msgid "-t                      Produce a test report"
@@ -2856,7 +3005,7 @@ msgstr "-t                      Produeix un informe de prova"
 
 #: systemv/lpstat.c:2062
 msgid "-t                      Show all status information"
-msgstr "-t                      Mostra tota la informació de l'estat"
+msgstr "-t                      Mostra tota la informació sobre l'estat"
 
 #: scheduler/main.c:2144
 msgid "-t                      Test the configuration file."
@@ -2874,6 +3023,8 @@ msgstr "-t títol                Especifica el títol del treball"
 msgid ""
 "-u [user(s)]            Show jobs queued by the current or specified users"
 msgstr ""
+"-u [usuari/s]           Mostra els treballs a la cua per als usuaris actuals"
+" o especificats"
 
 #: systemv/lpadmin.c:1649
 msgid "-u allow:all            Allow all users to print"
@@ -2883,15 +3034,19 @@ msgstr "-u allow:all            Permet imprimir a tots els usuaris"
 msgid ""
 "-u allow:list           Allow the list of users or groups (@name) to print"
 msgstr ""
+"-u allow:list           Permet imprimir la llista d'usuaris o grups (@name)"
 
 #: systemv/lpadmin.c:1651
 msgid ""
 "-u deny:list            Prevent the list of users or groups (@name) to print"
 msgstr ""
+"-u deny:list            Evita que s'imprimeixi la llista d'usuaris o grups"
+" (@name)"
 
 #: systemv/cancel.c:405
 msgid "-u owner                Specify the owner to use for jobs"
 msgstr ""
+"-u propietari           Especifica el propietari a usar per als treballs"
 
 #: tools/ippfind.c:2782
 msgid "-u regex                Match URI to regular expression"
@@ -2907,11 +3062,12 @@ msgstr "-v                      Mostra els dispositius"
 
 #: systemv/lpstat.c:2064
 msgid "-v [printer(s)]         Show the devices for each destination"
-msgstr ""
+msgstr "-v [impressora/es]      Mostra els dispositius per a cada destinació"
 
 #: systemv/lpadmin.c:1653
 msgid "-v device-uri           Specify the device URI for the printer"
 msgstr ""
+"-v URI_dispositiu       Especifica l'URI del dispositiu per a la impressora"
 
 #: systemv/cupstestppd.c:3866
 msgid "-vv                     Be very verbose"
@@ -2919,15 +3075,17 @@ msgstr "-vv                     És molt detallat"
 
 #: systemv/cancel.c:407
 msgid "-x                      Purge jobs rather than just canceling"
-msgstr ""
+msgstr "-x                      Purga els treballs en lloc de cancel·lar-los"
 
 #: systemv/lpoptions.c:546
 msgid "-x destination          Remove default options for destination"
 msgstr ""
+"-x destinació           Elimina les opcions predeterminades per a la"
+" destinació"
 
 #: systemv/lpadmin.c:1654
 msgid "-x destination          Remove the named destination"
-msgstr ""
+msgstr "-x destinació           Elimina la destinació amb nom"
 
 #: tools/ippfind.c:2783
 msgid ""
@@ -3609,7 +3767,7 @@ msgstr "A0"
 
 #: ppdc/sample.c:16
 msgid "A0 Long Edge"
-msgstr "A0 costat llarg"
+msgstr "A0 pel costat llarg"
 
 #: ppdc/sample.c:17
 msgid "A1"
@@ -3617,7 +3775,7 @@ msgstr "A1"
 
 #: ppdc/sample.c:18
 msgid "A1 Long Edge"
-msgstr "A1 costat llarg"
+msgstr "A1 pel costat llarg"
 
 #: ppdc/sample.c:37
 msgid "A10"
@@ -3629,7 +3787,7 @@ msgstr "A2"
 
 #: ppdc/sample.c:20
 msgid "A2 Long Edge"
-msgstr "A2 costat llarg"
+msgstr "A2 pel costat llarg"
 
 #: ppdc/sample.c:21
 msgid "A3"
@@ -3637,7 +3795,7 @@ msgstr "A3"
 
 #: ppdc/sample.c:22
 msgid "A3 Long Edge"
-msgstr "A3 costat llarg"
+msgstr "A3 pel costat llarg"
 
 #: ppdc/sample.c:23
 msgid "A3 Oversize"
@@ -3653,7 +3811,7 @@ msgstr "A4"
 
 #: ppdc/sample.c:27
 msgid "A4 Long Edge"
-msgstr "A4 costat llarg"
+msgstr "A4 pel costat llarg"
 
 #: ppdc/sample.c:26
 msgid "A4 Oversize"
@@ -3669,7 +3827,7 @@ msgstr "A5"
 
 #: ppdc/sample.c:31
 msgid "A5 Long Edge"
-msgstr "A5 costat llarg"
+msgstr "A5 pel costat llarg"
 
 #: ppdc/sample.c:30
 msgid "A5 Oversize"
@@ -3681,7 +3839,7 @@ msgstr "A6"
 
 #: ppdc/sample.c:33
 msgid "A6 Long Edge"
-msgstr "A6 costat llarg"
+msgstr "A6 pel costat llarg"
 
 #: ppdc/sample.c:34
 msgid "A7"
@@ -3721,7 +3879,7 @@ msgstr "ARCH C"
 
 #: ppdc/sample.c:48
 msgid "ARCH C Long Edge"
-msgstr "ARCH C costat llarg"
+msgstr "ARCH C pel costat llarg"
 
 #: ppdc/sample.c:49
 msgid "ARCH D"
@@ -3729,7 +3887,7 @@ msgstr "ARCH D"
 
 #: ppdc/sample.c:50
 msgid "ARCH D Long Edge"
-msgstr "ARCH D costat llarg"
+msgstr "ARCH D pel costat llarg"
 
 #: ppdc/sample.c:51
 msgid "ARCH E"
@@ -3737,7 +3895,7 @@ msgstr "ARCH E"
 
 #: ppdc/sample.c:52
 msgid "ARCH E Long Edge"
-msgstr "ARCH E costat llarg"
+msgstr "ARCH E pel costat llarg"
 
 #: cgi-bin/classes.c:155 cgi-bin/printers.c:158
 msgid "Accept Jobs"
@@ -3784,12 +3942,12 @@ msgstr ""
 #: scheduler/ipp.c:5422 scheduler/ipp.c:5448
 #, c-format
 msgid "Attribute \"%s\" is in the wrong group."
-msgstr ""
+msgstr "L'atribut «%s» es troba al grup incorrecte."
 
 #: scheduler/ipp.c:5424 scheduler/ipp.c:5450
 #, c-format
 msgid "Attribute \"%s\" is the wrong value type."
-msgstr ""
+msgstr "L'atribut «%s» és el tipus de valor incorrecte."
 
 #: scheduler/ipp.c:227
 #, c-format
@@ -3847,37 +4005,37 @@ msgstr "B9"
 #: scheduler/ipp.c:7504
 #, c-format
 msgid "Bad \"printer-id\" value %d."
-msgstr ""
+msgstr "El valor %d de la «printer-id» és incorrecte."
 
 #: scheduler/ipp.c:10336
 #, c-format
 msgid "Bad '%s' value."
-msgstr ""
+msgstr "El valor «%s» és incorrecte."
 
 #: scheduler/ipp.c:11284
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
-msgstr ""
+msgstr "El valor «%s» de la «document-format» és incorrecte."
 
 #: cups/ppd.c:307
 msgid "Bad CloseUI/JCLCloseUI"
-msgstr ""
+msgstr "La «CloseUI/JCLCloseUI» és incorrecta"
 
 #: cups/dest.c:1661
 msgid "Bad NULL dests pointer"
-msgstr "El punter de dests NULL és incorrecte"
+msgstr "El punter de «dests» NULL és incorrecte"
 
 #: cups/ppd.c:290
 msgid "Bad OpenGroup"
-msgstr "La OpenGroup és incorrecta"
+msgstr "La «OpenGroup» és incorrecta"
 
 #: cups/ppd.c:292
 msgid "Bad OpenUI/JCLOpenUI"
-msgstr "La OpenUI/JCLOpenUI és incorrecta"
+msgstr "La «OpenUI/JCLOpenUI» és incorrecta"
 
 #: cups/ppd.c:294
 msgid "Bad OrderDependency"
-msgstr "La OrderDependency és incorrecta"
+msgstr "La «OrderDependency» és incorrecta"
 
 #: cups/ppd-cache.c:483 cups/ppd-cache.c:530 cups/ppd-cache.c:564
 #: cups/ppd-cache.c:570 cups/ppd-cache.c:586 cups/ppd-cache.c:602
@@ -3894,11 +4052,11 @@ msgstr "El fitxer PPD de memòria cau és incorrecte."
 
 #: scheduler/ipp.c:2659
 msgid "Bad PPD file."
-msgstr ""
+msgstr "El fitxer PPD és incorrecte."
 
 #: cups/http-support.c:1517
 msgid "Bad Request"
-msgstr "La petició és incorrecta"
+msgstr "La sol·licitud és incorrecta"
 
 #: cups/snmp.c:956
 msgid "Bad SNMP version number"
@@ -3906,20 +4064,20 @@ msgstr "El número de versió del SNMP és incorrecte"
 
 #: cups/ppd.c:295
 msgid "Bad UIConstraints"
-msgstr "La UIConstraints és incorrecta"
+msgstr "La «UIConstraints» és incorrecta"
 
 #: cups/dest.c:1195
 msgid "Bad URI."
-msgstr ""
+msgstr "L'URI és incorrecte."
 
 #: cups/hash.c:49 cups/http-support.c:1611
 msgid "Bad arguments to function"
-msgstr ""
+msgstr "Arguments incorrectes per a la funció"
 
 #: scheduler/ipp.c:1372
 #, c-format
 msgid "Bad copies value %d."
-msgstr "El valor de còpies %d és incorrecte."
+msgstr "El valor %d per a les còpies és incorrecte."
 
 #: cups/ppd.c:303
 msgid "Bad custom parameter"
@@ -3938,29 +4096,29 @@ msgstr "L'esquema «%s» de l'URI del dispositiu és incorrecte."
 #: scheduler/ipp.c:8486 scheduler/ipp.c:8504 scheduler/ipp.c:9732
 #, c-format
 msgid "Bad document-format \"%s\"."
-msgstr "La document-format «%s» és incorrecta."
+msgstr "La «document-format» «%s» és incorrecta."
 
 #: scheduler/ipp.c:9750
 #, c-format
 msgid "Bad document-format-default \"%s\"."
-msgstr "La document-format-default «%s» és incorrecta."
+msgstr "La «document-format-default» «%s» és incorrecta."
 
 #: cups/ppd-util.c:169
 msgid "Bad filename buffer"
-msgstr "El nom del fitxer de la memòria cau és incorrecte"
+msgstr "El nom de fitxer de la memòria cau és incorrecte"
 
 #: cups/http-support.c:1620
 msgid "Bad hostname/address in URI"
-msgstr ""
+msgstr "L'amfitrió/adreça a l'URI són incorrectes"
 
 #: scheduler/ipp.c:1554
 #, c-format
 msgid "Bad job-name value: %s"
-msgstr ""
+msgstr "El valor de la «job-name» és incorrecte: %s"
 
 #: scheduler/ipp.c:1540
 msgid "Bad job-name value: Wrong type or count."
-msgstr ""
+msgstr "El valor de la «job-name» és incorrecte: Tipus o recompte incorrecte."
 
 #: scheduler/ipp.c:10374
 msgid "Bad job-priority value."
@@ -4000,7 +4158,7 @@ msgstr "El notify-recipient-uri «%s» és incorrecte."
 #: scheduler/ipp.c:5848
 #, c-format
 msgid "Bad notify-user-data \"%s\"."
-msgstr ""
+msgstr "La «notify-user-data» «%s» és incorrecte."
 
 #: scheduler/ipp.c:1418
 #, c-format
@@ -4010,30 +4168,30 @@ msgstr "El valor de la «number-up» %d és incorrecte."
 #: scheduler/ipp.c:1435
 #, c-format
 msgid "Bad page-ranges values %d-%d."
-msgstr "Els valors de page-ranges %d-%d són incorrectes."
+msgstr "Els valors de la «page-ranges» %d-%d són incorrectes."
 
 #: cups/http-support.c:1617
 msgid "Bad port number in URI"
-msgstr ""
+msgstr "El número de port a l'URI és incorrecte"
 
 #: scheduler/ipp.c:2456
 #, c-format
 msgid "Bad port-monitor \"%s\"."
-msgstr "La port-monitor «%s» és incorrecta."
+msgstr "La «port-monitor» «%s» és incorrecta."
 
 #: scheduler/ipp.c:2537
 #, c-format
 msgid "Bad printer-state value %d."
-msgstr "El valor %d de printer-state és incorrecte."
+msgstr "El valor %d de la «printer-state» és incorrecte."
 
 #: cups/dest.c:678 cups/dest.c:1245
 msgid "Bad printer-uri."
-msgstr ""
+msgstr "URI incorrecte de la impressora."
 
 #: scheduler/ipp.c:201
 #, c-format
 msgid "Bad request ID %d."
-msgstr "L'identificador %d de la sol·licitud és incorrecte."
+msgstr "L'ID %d de la sol·licitud és incorrecte."
 
 #: scheduler/ipp.c:191
 #, c-format
@@ -4042,15 +4200,15 @@ msgstr "El número de versió %d.%d de la sol·licitud és incorrecte."
 
 #: cups/http-support.c:1614
 msgid "Bad resource in URI"
-msgstr ""
+msgstr "El recurs a l'URI és incorrecte"
 
 #: cups/http-support.c:1626
 msgid "Bad scheme in URI"
-msgstr ""
+msgstr "L'esquema a l'URI és incorrecte"
 
 #: cups/http-support.c:1623
 msgid "Bad username in URI"
-msgstr ""
+msgstr "El nom d'usuari a l'URI és incorrecte"
 
 #: cups/ppd.c:305
 msgid "Bad value string"
@@ -4058,7 +4216,7 @@ msgstr "El valor de la cadena és incorrecte"
 
 #: cups/http-support.c:1629
 msgid "Bad/empty URI"
-msgstr ""
+msgstr "URI incorrecte/buit"
 
 #: cgi-bin/admin.c:2794 cgi-bin/admin.c:3043
 msgid "Banners"
@@ -4075,7 +4233,7 @@ msgstr "Fullet"
 #: backend/usb-darwin.c:2008
 #, c-format
 msgid "Boolean expected for waiteof option \"%s\"."
-msgstr "S'esperava un booleà per l'opció waiteof «%s»."
+msgstr "S'esperava un booleà per a l'opció «waiteof» «%s»."
 
 #: filter/pstops.c:2026
 msgid "Buffer overflow detected, aborting."
@@ -4091,7 +4249,7 @@ msgstr "Impressora d'etiquetes CPCL"
 
 #: cgi-bin/classes.c:159 cgi-bin/printers.c:162
 msgid "Cancel Jobs"
-msgstr ""
+msgstr "Cancel·la tots els treballs"
 
 #: backend/ipp.c:2295
 msgid "Canceling print job."
@@ -4099,7 +4257,7 @@ msgstr "Es cancel·la el treball."
 
 #: scheduler/ipp.c:963 scheduler/ipp.c:2512
 msgid "Cannot change printer-is-shared for remote queues."
-msgstr ""
+msgstr "No es pot canviar «printer-is-shared» per a les cues remotes."
 
 #: scheduler/ipp.c:2499
 msgid "Cannot share a remote Kerberized printer."
@@ -4107,12 +4265,12 @@ msgstr "No es pot compartir una impressora remota sobre Kerberos."
 
 #: ppdc/sample.c:274
 msgid "Cassette"
-msgstr "Classet"
+msgstr "Casset"
 
 #: cgi-bin/admin.c:1347 cgi-bin/admin.c:1489 cgi-bin/admin.c:1502
 #: cgi-bin/admin.c:1513
 msgid "Change Settings"
-msgstr "Canvia la configuració"
+msgstr "Canvia els ajustaments"
 
 #: scheduler/ipp.c:2061 scheduler/ipp.c:5785
 #, c-format
@@ -4129,7 +4287,7 @@ msgstr "Neteja els capçals de la impressora"
 
 #: scheduler/ipp.c:3920
 msgid "Close-Job doesn't support the job-uri attribute."
-msgstr "Close-Job no permet l'ús de l'atribut URI_treball."
+msgstr "«Close-Job» no permet l'ús de l'atribut URI_treball."
 
 #: cups/ppd-cache.c:3790 ppdc/sample.c:279
 msgid "Color"
@@ -4151,15 +4309,15 @@ msgstr ""
 
 #: cups/snmp.c:960
 msgid "Community name uses indefinite length"
-msgstr "Els noms de comunitat tenen longitud sense definir"
+msgstr "Els noms de comunitat tenen una longitud sense definir"
 
 #: backend/ipp.c:864 backend/lpd.c:933 backend/socket.c:375
 msgid "Connected to printer."
-msgstr "S'ha connectat a la impressora."
+msgstr "S'ha connectat amb la impressora."
 
 #: backend/ipp.c:700 backend/lpd.c:757 backend/socket.c:295
 msgid "Connecting to printer."
-msgstr "Es connecta a la impressora."
+msgstr "S'està connectant amb la impressora."
 
 #: cups/http-support.c:1487
 msgid "Continue"
@@ -4175,7 +4333,7 @@ msgstr "El fitxer de control s'ha enviat correctament."
 
 #: backend/ipp.c:1395 backend/lpd.c:449
 msgid "Copying print data."
-msgstr "Es copien les dades d'impressió."
+msgstr "S'estan copiant les dades d'impressió."
 
 #: cups/http-support.c:1496
 msgid "Created"
@@ -4183,11 +4341,11 @@ msgstr "Creat"
 
 #: cups/tls-darwin.c:723 cups/tls-gnutls.c:582
 msgid "Credentials do not validate against site CA certificate."
-msgstr ""
+msgstr "Les credencials no es validen contra el certificat CA del lloc."
 
 #: cups/tls-darwin.c:734 cups/tls-gnutls.c:599
 msgid "Credentials have expired."
-msgstr ""
+msgstr "Les credencials han caducat."
 
 #: cups/ppd.c:1133 cups/ppd.c:1173 cups/ppd.c:1382 cups/ppd.c:1485
 msgid "Custom"
@@ -4211,7 +4369,7 @@ msgstr "Cúter"
 
 #: ppdc/sample.c:230
 msgid "DYMO"
-msgstr ""
+msgstr "DYMO"
 
 #: ppdc/sample.c:243
 msgid "Dark"
@@ -4231,15 +4389,15 @@ msgstr "Profunditat de color"
 
 #: cups/ppd-cache.c:3784
 msgid "Deep Gray"
-msgstr ""
+msgstr "Gris fosc"
 
 #: cgi-bin/admin.c:1786 cgi-bin/admin.c:1797 cgi-bin/admin.c:1842
 msgid "Delete Class"
-msgstr "Elimina la classe"
+msgstr "Suprimeix la classe"
 
 #: cgi-bin/admin.c:1871 cgi-bin/admin.c:1882 cgi-bin/admin.c:1927
 msgid "Delete Printer"
-msgstr "Elimina la impressora"
+msgstr "Suprimeix la impressora"
 
 #: ppdc/sample.c:276
 msgid "DeskJet Series"
@@ -4252,15 +4410,15 @@ msgstr "La destinació «%s» no accepta treballs."
 
 #: cups/ppd-cache.c:3828 cups/ppd-cache.c:3834
 msgid "Device CMYK"
-msgstr ""
+msgstr "Dispositiu CMYK"
 
 #: cups/ppd-cache.c:3816 cups/ppd-cache.c:3822
 msgid "Device Gray"
-msgstr ""
+msgstr "Dispositiu gris"
 
 #: cups/ppd-cache.c:3840 cups/ppd-cache.c:3846
 msgid "Device RGB"
-msgstr ""
+msgstr "Dispositiu RGB"
 
 #: systemv/lpinfo.c:273
 #, c-format
@@ -4276,12 +4434,12 @@ msgstr ""
 "            classe = %s\n"
 "            informació = %s\n"
 "            fabricant i model = %s\n"
-"            identificador = %s\n"
+"            ID dispositiu = %s\n"
 "            ubicació = %s"
 
 #: ppdc/sample.c:434
 msgid "Direct Thermal Media"
-msgstr "Paper per impressió tèrmica directa"
+msgstr "Paper per a la impressió tèrmica directa"
 
 #: cups/file.c:285
 #, c-format
@@ -4310,7 +4468,7 @@ msgstr "El directori «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
 
 #: ppdc/sample.c:343
 msgid "Disabled"
-msgstr "Desabilitat"
+msgstr "Inhabilitat"
 
 #: scheduler/ipp.c:6302
 #, c-format
@@ -4342,7 +4500,7 @@ msgstr "Edita el fitxer de configuració"
 
 #: cups/http.c:4649
 msgid "Encryption is not supported."
-msgstr ""
+msgstr "L'encriptatge no està implementat."
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 #: cgi-bin/admin.c:3068
@@ -4438,7 +4596,7 @@ msgstr "Sobre Choukei 3"
 
 #: ppdc/sample.c:85
 msgid "Envelope Choukei 3 Long Edge"
-msgstr "Sobre Choukei 3 costat llarg"
+msgstr "Sobre Choukei 3 pel costat llarg"
 
 #: ppdc/sample.c:86
 msgid "Envelope Choukei 4"
@@ -4446,7 +4604,7 @@ msgstr "Sobre Choukei 4"
 
 #: ppdc/sample.c:87
 msgid "Envelope Choukei 4 Long Edge"
-msgstr "Sobre Choukei 4 costat llarg"
+msgstr "Sobre Choukei 4 pel costat llarg"
 
 #: ppdc/sample.c:70
 msgid "Envelope DL"
@@ -4470,7 +4628,7 @@ msgstr "Sobre Kaku2"
 
 #: ppdc/sample.c:94
 msgid "Envelope Kaku2 Long Edge"
-msgstr "Sobre Kaku2 costat llarg"
+msgstr "Sobre Kaku2 pel costat llarg"
 
 #: ppdc/sample.c:95
 msgid "Envelope Kaku3"
@@ -4478,7 +4636,7 @@ msgstr "Sobre Kaku3"
 
 #: ppdc/sample.c:96
 msgid "Envelope Kaku3 Long Edge"
-msgstr "Sobre Kaku3 costat llarg"
+msgstr "Sobre Kaku3 pel costat llarg"
 
 #: ppdc/sample.c:97
 msgid "Envelope Monarch"
@@ -4486,11 +4644,11 @@ msgstr "Sobre monarch"
 
 #: ppdc/sample.c:99
 msgid "Envelope PRC1"
-msgstr ""
+msgstr "Sobre PRC1"
 
 #: ppdc/sample.c:100
 msgid "Envelope PRC1 Long Edge"
-msgstr "Sobre PRC1 costat llarg"
+msgstr "Sobre PRC1 pel costat llarg"
 
 #: ppdc/sample.c:117
 msgid "Envelope PRC10"
@@ -4498,7 +4656,7 @@ msgstr "Sobre PRC10"
 
 #: ppdc/sample.c:118
 msgid "Envelope PRC10 Long Edge"
-msgstr "Sobre PRC10 costat llarg"
+msgstr "Sobre PRC10 pel costat llarg"
 
 #: ppdc/sample.c:101
 msgid "Envelope PRC2"
@@ -4506,7 +4664,7 @@ msgstr "Sobre PRC2"
 
 #: ppdc/sample.c:102
 msgid "Envelope PRC2 Long Edge"
-msgstr "Sobre PRC2 costat llarg"
+msgstr "Sobre PRC2 pel costat llarg"
 
 #: ppdc/sample.c:103
 msgid "Envelope PRC3"
@@ -4514,7 +4672,7 @@ msgstr "Sobre PRC3"
 
 #: ppdc/sample.c:104
 msgid "Envelope PRC3 Long Edge"
-msgstr "Sobre PRC3 costat llarg"
+msgstr "Sobre PRC3 pel costat llarg"
 
 #: ppdc/sample.c:105
 msgid "Envelope PRC4"
@@ -4522,11 +4680,11 @@ msgstr "Sobre PRC4"
 
 #: ppdc/sample.c:106
 msgid "Envelope PRC4 Long Edge"
-msgstr "Sobre PRC4 costat llarg"
+msgstr "Sobre PRC4 pel costat llarg"
 
 #: ppdc/sample.c:108
 msgid "Envelope PRC5 Long Edge"
-msgstr "Sobre PRC5 costat llarg"
+msgstr "Sobre PRC5 pel costat llarg"
 
 #: ppdc/sample.c:107
 msgid "Envelope PRC5PRC5"
@@ -4538,7 +4696,7 @@ msgstr "Sobre PRC6"
 
 #: ppdc/sample.c:110
 msgid "Envelope PRC6 Long Edge"
-msgstr "Sobre PRC6 costat llarg"
+msgstr "Sobre PRC6 pel costat llarg"
 
 #: ppdc/sample.c:111
 msgid "Envelope PRC7"
@@ -4546,7 +4704,7 @@ msgstr "Sobre PRC7"
 
 #: ppdc/sample.c:112
 msgid "Envelope PRC7 Long Edge"
-msgstr "Sobre PRC7 costat llarg"
+msgstr "Sobre PRC7 pel costat llarg"
 
 #: ppdc/sample.c:113
 msgid "Envelope PRC8"
@@ -4554,7 +4712,7 @@ msgstr "Sobre PRC8"
 
 #: ppdc/sample.c:114
 msgid "Envelope PRC8 Long Edge"
-msgstr "Sobre PRC8 costat llarg"
+msgstr "Sobre PRC8 pel costat llarg"
 
 #: ppdc/sample.c:115
 msgid "Envelope PRC9"
@@ -4562,7 +4720,7 @@ msgstr "Sobre PRC9"
 
 #: ppdc/sample.c:116
 msgid "Envelope PRC9 Long Edge"
-msgstr "Sobre PRC9 costat llarg"
+msgstr "Sobre PRC9 pel costat llarg"
 
 #: ppdc/sample.c:98
 msgid "Envelope Personal"
@@ -4574,7 +4732,7 @@ msgstr "Sobre You4"
 
 #: ppdc/sample.c:120
 msgid "Envelope You4 Long Edge"
-msgstr "Sobre You4 costat llarg"
+msgstr "Sobre You4 pel costat llarg"
 
 #: tools/ippfind.c:2822
 msgid "Environment Variables:"
@@ -4586,20 +4744,20 @@ msgstr "Epson"
 
 #: cgi-bin/admin.c:3111
 msgid "Error Policy"
-msgstr "Normes d'error"
+msgstr "Política d'error"
 
 #: filter/rastertopwg.c:452
 msgid "Error reading raster data."
-msgstr ""
+msgstr "Error en llegir les dades de la trama."
 
 #: filter/rastertopwg.c:421 filter/rastertopwg.c:442 filter/rastertopwg.c:460
 #: filter/rastertopwg.c:471
 msgid "Error sending raster data."
-msgstr "S'ha produït un error quan s'enviaven les dades de la trama."
+msgstr "Error en enviar les dades de la trama."
 
 #: systemv/lpinfo.c:208 systemv/lpmove.c:85
 msgid "Error: need hostname after \"-h\" option."
-msgstr "ERROR: es necessita un nom d'amfitrió després de l'opció «-h»."
+msgstr "Error: es necessita un nom d'amfitrió després de l'opció «-h»."
 
 #: ppdc/sample.c:122
 msgid "European Fanfold"
@@ -4663,7 +4821,7 @@ msgstr "Expressions:"
 
 #: cups/ppd-cache.c:3758
 msgid "Fast Grayscale"
-msgstr ""
+msgstr "Escala de grisos ràpida"
 
 #: cups/file.c:289
 #, c-format
@@ -4692,7 +4850,7 @@ msgstr "El fitxer «%s» té els permisos correctes (0%o/uid=%d/gid=%d)."
 
 #: ppdc/sample.c:169
 msgid "File Folder"
-msgstr ""
+msgstr "Carpeta de fitxer"
 
 #: scheduler/ipp.c:2386
 #, c-format
@@ -4700,6 +4858,8 @@ msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
 "in \"%s/cups-files.conf\"."
 msgstr ""
+"Els URI dels dispositius de fitxer s'han inhabilitat. Per habilitar-los,"
+" vegeu la directiva «FileDevice» al «%s/cups-files.conf»."
 
 #: filter/rastertoepson.c:1131 filter/rastertohp.c:802
 #: filter/rastertolabel.c:1260
@@ -4709,7 +4869,7 @@ msgstr "S'ha acabat la pàgina %d."
 
 #: cups/ppd-cache.c:4359
 msgid "Finishing Preset"
-msgstr ""
+msgstr "S'està finalitzant el predefinit"
 
 #: cups/ppd-cache.c:4134
 msgid "Fold"
@@ -4737,7 +4897,7 @@ msgstr "Genèric"
 
 #: cups/snmp.c:970
 msgid "Get-Response-PDU uses indefinite length"
-msgstr "La Get-Response-PDU fa servir una longitud sense definir"
+msgstr "La «Get-Response-PDU» fa servir una longitud sense definir"
 
 #: ppdc/sample.c:288
 msgid "Glossy Paper"
@@ -4764,11 +4924,11 @@ msgstr "Carpeta per penjar"
 
 #: cups/hash.c:289
 msgid "Hash buffer too small."
-msgstr ""
+msgstr "La memòria cau de la suma és massa petita."
 
 #: cgi-bin/help.c:133
 msgid "Help file not in index."
-msgstr "El fitxer d'ajuda no és a l'índex."
+msgstr "El fitxer d'ajuda no es troba a l'índex."
 
 #: cups/ppd-cache.c:4478 cups/ppd-cache.c:4547 cups/ppd-cache.c:4578
 msgid "High"
@@ -4777,7 +4937,7 @@ msgstr "Alta"
 #: cups/ipp.c:3094 cups/ipp.c:3121 cups/ipp.c:3144
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr ""
-"L'atribut 1setOf de l'IPP té etiquetes amb valors que no són compatibles."
+"L'atribut «1setOf» de l'IPP té etiquetes amb valors que no són admesos."
 
 #: cups/ipp.c:3057
 msgid "IPP attribute has no name."
@@ -4785,7 +4945,7 @@ msgstr "L'atribut de l'IPP no té nom."
 
 #: cups/ipp.c:6802
 msgid "IPP attribute is not a member of the message."
-msgstr "L'atribut de l'IPP no és membre del missatge."
+msgstr "L'atribut de l'IPP no és un membre del missatge."
 
 #: cups/ipp.c:3507
 msgid "IPP begCollection value not 0 bytes."
@@ -4809,19 +4969,19 @@ msgstr "El valor de l'«enum» de l'IPP no té 4 bytes."
 
 #: cups/ipp.c:2975
 msgid "IPP extension tag larger than 0x7FFFFFFF."
-msgstr "L'etiqueta d'«extension» de l'IPP és més llarga que 0x7FFFFFFF."
+msgstr "L'etiqueta «extension» de l'IPP és més llarga que 0x7FFFFFFF."
 
 #: cups/ipp.c:3257
 msgid "IPP integer value not 4 bytes."
-msgstr "El valor «enter» de l'IPP no té 4 bytes."
+msgstr "El valor enter de l'IPP no té 4 bytes."
 
 #: cups/ipp.c:3460
 msgid "IPP language length overflows value."
-msgstr "El valor de la «longitud del llenguatge» de l'IPP desborda."
+msgstr "El valor de la longitud del llenguatge de l'IPP desborda."
 
 #: cups/ipp.c:3469
 msgid "IPP language length too large."
-msgstr ""
+msgstr "La longitud del llenguatge de l'IPP és massa gran."
 
 #: cups/ipp.c:3171
 msgid "IPP member name is not empty."
@@ -4833,11 +4993,11 @@ msgstr "El valor de la «memberName» de l'IPP està buit."
 
 #: cups/ipp.c:3546
 msgid "IPP memberName with no attribute."
-msgstr ""
+msgstr "La «memberName» de l'IPP està sense atribut."
 
 #: cups/ipp.c:3035
 msgid "IPP name larger than 32767 bytes."
-msgstr "EL nom de l'IPP és més llarg que 32767 bytes."
+msgstr "El nom de l'IPP és més llarg que 32767 bytes."
 
 #: cups/ipp.c:3427
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
@@ -4847,7 +5007,7 @@ msgstr ""
 
 #: cups/ipp.c:3585
 msgid "IPP octetString length too large."
-msgstr ""
+msgstr "La longitud de la «octetString» de l'IPP és massa gran."
 
 #: cups/ipp.c:3395
 msgid "IPP rangeOfInteger value not 8 bytes."
@@ -4859,7 +5019,7 @@ msgstr "El valor de la «resolution» de l'IPP no té 9 bytes."
 
 #: cups/ipp.c:3487
 msgid "IPP string length overflows value."
-msgstr "El valor de la «longitud de la cadena» de l'IPP desborda."
+msgstr "El valor de la longitud de la cadena de l'IPP desborda."
 
 #: cups/ipp.c:3423
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
@@ -4869,41 +5029,43 @@ msgstr ""
 
 #: cups/ipp.c:3243
 msgid "IPP value larger than 32767 bytes."
-msgstr "El valor de l'«IPP» és més llarg que 32767 bytes."
+msgstr "El valor de l'IPP és més llarg que 32767 bytes."
 
 #: tools/ippfind.c:2823
 msgid "IPPFIND_SERVICE_DOMAIN  Domain name"
-msgstr ""
+msgstr "IPPFIND_SERVICE_DOMAIN  Nom de domini"
 
 #: tools/ippfind.c:2824
 msgid ""
 "IPPFIND_SERVICE_HOSTNAME\n"
 "                        Fully-qualified domain name"
 msgstr ""
+"IPPFIND_SERVICE_HOSTNAME\n"
+"                        Nom de domini completament qualificat"
 
 #: tools/ippfind.c:2826
 msgid "IPPFIND_SERVICE_NAME    Service instance name"
-msgstr ""
+msgstr "IPPFIND_SERVICE_NAME    Nom de la instància del servei"
 
 #: tools/ippfind.c:2827
 msgid "IPPFIND_SERVICE_PORT    Port number"
-msgstr ""
+msgstr "IPPFIND_SERVICE_PORT    Número de port"
 
 #: tools/ippfind.c:2828
 msgid "IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
-msgstr ""
+msgstr "IPPFIND_SERVICE_REGTYPE Tipus de registre de DNS-SD"
 
 #: tools/ippfind.c:2829
 msgid "IPPFIND_SERVICE_SCHEME  URI scheme"
-msgstr ""
+msgstr "IPPFIND_SERVICE_SCHEME  Esquema de l'URI"
 
 #: tools/ippfind.c:2830
 msgid "IPPFIND_SERVICE_URI     URI"
-msgstr ""
+msgstr "IPPFIND_SERVICE_URI     URI"
 
 #: tools/ippfind.c:2831
 msgid "IPPFIND_TXT_*           Value of TXT record key"
-msgstr ""
+msgstr "IPPFIND_TXT_*           Valor de la clau de registre en TXT"
 
 #: ppdc/sample.c:1
 msgid "ISOLatin1"
@@ -4911,23 +5073,23 @@ msgstr "ISOLatin1"
 
 #: cups/ppd.c:298
 msgid "Illegal control character"
-msgstr "Caràcter de control no permès"
+msgstr "Caràcter de control il·legal"
 
 #: cups/ppd.c:299
 msgid "Illegal main keyword string"
-msgstr "Cadena de paraula clau principal no permesa"
+msgstr "Cadena de paraula clau principal il·legal"
 
 #: cups/ppd.c:300
 msgid "Illegal option keyword string"
-msgstr "Cadena de paraula clau d'opció no permesa"
+msgstr "Cadena de paraula clau d'opció il·legal"
 
 #: cups/ppd.c:301
 msgid "Illegal translation string"
-msgstr "Cadena de traducció no permesa"
+msgstr "Cadena de traducció il·legal"
 
 #: cups/ppd.c:302
 msgid "Illegal whitespace character"
-msgstr "Caràcter d'espai en blanc no permés"
+msgstr "Caràcter d'espai en blanc il·legal"
 
 #: ppdc/sample.c:269
 msgid "Installable Options"
@@ -4967,11 +5129,11 @@ msgstr "Protocol d'impressió per Internet"
 
 #: cups/ipp.c:2995
 msgid "Invalid group tag."
-msgstr ""
+msgstr "Etiqueta de grup no vàlida."
 
 #: cups/pwg-media.c:288 cups/pwg-media.c:307
 msgid "Invalid media name arguments."
-msgstr ""
+msgstr "Els arguments del nom del paper no són vàlids."
 
 #: cups/dest-options.c:1232
 msgid "Invalid media size."
@@ -4979,16 +5141,16 @@ msgstr "La mida del paper no és vàlida."
 
 #: cups/ipp.c:3045
 msgid "Invalid named IPP attribute in collection."
-msgstr ""
+msgstr "L'atribut de l'IPP amb nom no és vàlid a la col·lecció."
 
 #: scheduler/ipp.c:2705 scheduler/ipp.c:7045
 msgid "Invalid ppd-name value."
-msgstr ""
+msgstr "El valor de la «ppd-name» no és vàlid."
 
 #: filter/commandtops.c:108
 #, c-format
 msgid "Invalid printer command \"%s\"."
-msgstr "L'ordre de la impressora «%s» no és vàlida."
+msgstr "L'ordre «%s» de la impressora no és vàlida."
 
 #: cups/ppd.c:1404
 msgid "JCL"
@@ -5020,7 +5182,7 @@ msgstr "JIS B4"
 
 #: ppdc/sample.c:59
 msgid "JIS B4 Long Edge"
-msgstr "JIS B4 costat llarg"
+msgstr "JIS B4 pel costat llarg"
 
 #: ppdc/sample.c:60
 msgid "JIS B5"
@@ -5028,7 +5190,7 @@ msgstr "JIS B5"
 
 #: ppdc/sample.c:61
 msgid "JIS B5 Long Edge"
-msgstr "JIS B5 costat llarg"
+msgstr "JIS B5 pel costat llarg"
 
 #: ppdc/sample.c:62
 msgid "JIS B6"
@@ -5036,7 +5198,7 @@ msgstr "JIS B6"
 
 #: ppdc/sample.c:63
 msgid "JIS B6 Long Edge"
-msgstr "JIS B6 costat llarg"
+msgstr "JIS B6 pel costat llarg"
 
 #: ppdc/sample.c:64
 msgid "JIS B7"
@@ -5098,7 +5260,7 @@ msgstr "El treball núm. %d no està retingut per a autenticació."
 #: scheduler/ipp.c:9082
 #, c-format
 msgid "Job #%d is not held."
-msgstr "El treball núm. %d no està retingut."
+msgstr "El treball núm. %d no està en espera."
 
 #: cgi-bin/ipp-var.c:1032
 msgid "Job Completed"
@@ -5134,7 +5296,7 @@ msgstr "Les subscripcions als treballs no es poden renovar."
 
 #: cgi-bin/jobs.c:91 cgi-bin/jobs.c:102 cgi-bin/jobs.c:183
 msgid "Jobs"
-msgstr "Feines"
+msgstr "Treballs"
 
 #: backend/lpd.c:166
 msgid "LPD/LPR Host or Printer"
@@ -5144,6 +5306,8 @@ msgstr "Amfitrió o impressora LPD/LPR"
 msgid ""
 "LPDEST environment variable names default destination that does not exist."
 msgstr ""
+"La variable d'entorn LPDEST anomena una destinació predeterminada que no"
+" existeix."
 
 #: ppdc/sample.c:231
 msgid "Label Printer"
@@ -5164,7 +5328,7 @@ msgstr "Adreça gran"
 
 #: ppdc/sample.c:289
 msgid "LaserJet Series PCL 4/5"
-msgstr "Sèrie Laser Jet PCL 4/5"
+msgstr "Sèrie LaserJet PCL 4/5"
 
 #: ppdc/sample.c:43
 msgid "Letter Oversize"
@@ -5172,7 +5336,7 @@ msgstr "Carta gran"
 
 #: ppdc/sample.c:44
 msgid "Letter Oversize Long Edge"
-msgstr "Carta americà gran costat llarg"
+msgstr "Carta americana gran pel costat llarg"
 
 #: ppdc/sample.c:240
 msgid "Light"
@@ -5180,7 +5344,7 @@ msgstr "Lluminós"
 
 #: cups/ppd.c:297
 msgid "Line longer than the maximum allowed (255 characters)"
-msgstr "La línia la longitud màxima permesa (255 caràcters)"
+msgstr "Línia més llarga que el màxim permès (255 caràcters)"
 
 #: cgi-bin/admin.c:1950
 msgid "List Available Printers"
@@ -5189,23 +5353,23 @@ msgstr "Llista les impressores disponibles"
 #: tools/ippeveprinter.c:642
 #, c-format
 msgid "Listening on port %d."
-msgstr ""
+msgstr "S'està escoltant el port %d."
 
 #: scheduler/ipp.c:5503
 msgid "Local printer created."
-msgstr ""
+msgstr "S'ha creat una impressora local."
 
 #: cups/ppd-cache.c:3872 ppdc/sample.c:267
 msgid "Long-Edge (Portrait)"
-msgstr "Costat-llarg (vertical)"
+msgstr "Costat llarg (vertical)"
 
 #: cups/http-support.c:1875
 msgid "Looking for printer."
-msgstr "S'està buscant la impressora."
+msgstr "S'està cercant la impressora."
 
 #: ppdc/sample.c:237
 msgid "Main Roll"
-msgstr ""
+msgstr "Rotlle principal"
 
 #: ppdc/sample.c:263
 msgid "Manual Feed"
@@ -5237,11 +5401,11 @@ msgstr "S'ha produït un error en l'assignació de memòria"
 
 #: cups/ppd.c:306
 msgid "Missing CloseGroup"
-msgstr "Falta el CloseGroup"
+msgstr "Falta la «CloseGroup»"
 
 #: cups/ppd.c:308
 msgid "Missing CloseUI/JCLCloseUI"
-msgstr ""
+msgstr "Falta la «CloseUI/JCLCloseUI»"
 
 #: cups/ppd.c:287
 msgid "Missing PPD-Adobe-4.x header"
@@ -5253,46 +5417,46 @@ msgstr "Falta un asterisc a la columna 1"
 
 #: scheduler/ipp.c:6294
 msgid "Missing document-number attribute."
-msgstr "Falta l'atribut document-number."
+msgstr "Falta l'atribut «document-number»."
 
 #: cgi-bin/admin.c:502 cgi-bin/admin.c:1798 cgi-bin/admin.c:1883
 #: cgi-bin/admin.c:2289 cgi-bin/admin.c:2543 cgi-bin/admin.c:2654
 #: cgi-bin/admin.c:3367
 msgid "Missing form variable"
-msgstr "Falta una variable del formulari"
+msgstr "Falta una variable en el formulari"
 
 #: scheduler/ipp.c:9698
 msgid "Missing last-document attribute in request."
-msgstr "Falta l'atribut last-document-number a la petició."
+msgstr "Falta l'atribut «last-document-number» a la sol·licitud."
 
 #: cups/pwg-media.c:547
 msgid "Missing media or media-col."
-msgstr "Falta el media o el media-col."
+msgstr "Falta el «media» o el «media-col»."
 
 #: cups/pwg-media.c:466
 msgid "Missing media-size in media-col."
-msgstr "Falta el media-size al media-col."
+msgstr "Falta el «media-size» al «media-col»."
 
 #: scheduler/ipp.c:6895
 msgid "Missing notify-subscription-ids attribute."
-msgstr "Falta l'atribut notify-subscription-ids."
+msgstr "Falta l'atribut «notify-subscription-ids»."
 
 #: cups/ppd.c:304
 msgid "Missing option keyword"
-msgstr "Falta l'opció keyword"
+msgstr "Falta l'opció «keyword»"
 
 #: scheduler/ipp.c:3165 scheduler/ipp.c:3190
 msgid "Missing requesting-user-name attribute."
-msgstr "Falta l'atribut requesting-user-name."
+msgstr "Falta l'atribut «requesting-user-name»."
 
 #: scheduler/ipp.c:5420 scheduler/ipp.c:5446
 #, c-format
 msgid "Missing required attribute \"%s\"."
-msgstr ""
+msgstr "Falta l'atribut «%s» obligatori."
 
 #: scheduler/ipp.c:347
 msgid "Missing required attributes."
-msgstr "Falten alguns atributs necessaris."
+msgstr "Falten alguns atributs obligatoris."
 
 #: cups/http-support.c:1641
 msgid "Missing resource in URI"
@@ -5308,11 +5472,11 @@ msgstr "Falta la cadena de valor"
 
 #: cups/pwg-media.c:454
 msgid "Missing x-dimension in media-size."
-msgstr "Falta la mida x a la mida del suport."
+msgstr "Falta la «x-dimension» a la «media-size»."
 
 #: cups/pwg-media.c:460
 msgid "Missing y-dimension in media-size."
-msgstr "Falta la mida y a la mida del suport."
+msgstr "Falta la «y-dimension» a la «media-size»."
 
 #: systemv/lpinfo.c:443 systemv/lpinfo.c:467
 #, c-format
@@ -5325,7 +5489,7 @@ msgstr ""
 "Model:  nom = %s\n"
 "        idioma_natural = %s\n"
 "        fabricant i model = %s\n"
-"        id del dispositiu = %s"
+"        ID del dispositiu = %s"
 
 #: tools/ippfind.c:2801
 msgid "Modifiers:"
@@ -5341,7 +5505,7 @@ msgstr "Modifica la impressora"
 
 #: cgi-bin/ipp-var.c:407 cgi-bin/ipp-var.c:498
 msgid "Move All Jobs"
-msgstr "Mou totes les treballs"
+msgstr "Mou tots els treballs"
 
 #: cgi-bin/ipp-var.c:346 cgi-bin/ipp-var.c:405 cgi-bin/ipp-var.c:496
 msgid "Move Job"
@@ -5369,11 +5533,12 @@ msgstr "Mai"
 
 #: cups/tls-darwin.c:665 cups/tls-gnutls.c:524
 msgid "New credentials are not valid for name."
-msgstr ""
+msgstr "Les credencials noves no són vàlides per al nom."
 
 #: cups/tls-darwin.c:655 cups/tls-gnutls.c:514
 msgid "New credentials are older than stored credentials."
 msgstr ""
+"Les credencials noves són més antigues que les credencials emmagatzemades."
 
 #: cups/ppd.c:1974
 msgid "No"
@@ -5385,7 +5550,7 @@ msgstr "No hi ha contingut"
 
 #: cups/ppd-cache.c:3076
 msgid "No IPP attributes."
-msgstr ""
+msgstr "Sense atributs per a l'IPP."
 
 #: cups/ppd-util.c:489
 msgid "No PPD name"
@@ -5393,7 +5558,7 @@ msgstr "El PPD no té nom"
 
 #: cups/snmp.c:1001
 msgid "No VarBind SEQUENCE"
-msgstr "No hi ha cap SEQUENCE VarBind"
+msgstr "No hi ha cap «VarBind SEQUENCE»"
 
 #: cups/request.c:548 cups/request.c:920
 msgid "No active connection"
@@ -5401,7 +5566,7 @@ msgstr "No hi ha cap connexió activa"
 
 #: cups/request.c:329
 msgid "No active connection."
-msgstr ""
+msgstr "No hi ha cap connexió activa."
 
 #: scheduler/ipp.c:3445
 #, c-format
@@ -5410,15 +5575,15 @@ msgstr "No hi ha cap treball actiu a %s."
 
 #: scheduler/ipp.c:207
 msgid "No attributes in request."
-msgstr "No hi ha atributs en demanda."
+msgstr "No hi ha atributs a la sol·licitud."
 
 #: scheduler/ipp.c:3066
 msgid "No authentication information provided."
-msgstr "No s'ha donat cap informació d'autenticació."
+msgstr "No s'ha indicat cap informació sobre l'autenticació."
 
 #: cups/tls-darwin.c:605 cups/tls-gnutls.c:461
 msgid "No common name specified."
-msgstr ""
+msgstr "No s'ha especificat cap nom habitual."
 
 #: cups/snmp.c:958
 msgid "No community name"
@@ -5426,11 +5591,11 @@ msgstr "Ho hi na cap nom de comunitat"
 
 #: cups/dest.c:1859 cups/dest.c:1871
 msgid "No default destination."
-msgstr ""
+msgstr "No hi ha cap destinació predeterminada."
 
 #: scheduler/ipp.c:6094
 msgid "No default printer."
-msgstr "No hi ha cap impressora per defecte."
+msgstr "No hi ha cap impressora predeterminada."
 
 #: cgi-bin/ipp-var.c:418 scheduler/ipp.c:7476
 msgid "No destinations added."
@@ -5456,7 +5621,7 @@ msgstr "No hi ha cap fitxer a la sol·licitud d'impressió."
 
 #: cups/ppd-util.c:162
 msgid "No modification time"
-msgstr "No hi ha cap hora de modificació"
+msgstr "No hi ha cap temps de modificació"
 
 #: cups/snmp.c:1005
 msgid "No name OID"
@@ -5485,23 +5650,23 @@ msgstr "No hi ha cap URI d'impressora a la sol·licitud."
 
 #: cups/http.c:2217
 msgid "No request URI."
-msgstr ""
+msgstr "Sense URI a la sol·licitud."
 
 #: cups/http.c:2234
 msgid "No request protocol version."
-msgstr ""
+msgstr "Sense versió de protocol a la sol·licitud."
 
 #: cups/request.c:337
 msgid "No request sent."
-msgstr ""
+msgstr "No s'ha enviat cap sol·licitud."
 
 #: cups/snmp.c:972
 msgid "No request-id"
-msgstr "No hi ha cap request-id"
+msgstr "No hi ha cap «request-id»"
 
 #: cups/tls-darwin.c:685 cups/tls-gnutls.c:544
 msgid "No stored credentials, not valid for name."
-msgstr ""
+msgstr "No hi ha credencials emmagatzemades, no vàlides per al nom."
 
 #: scheduler/ipp.c:5679
 msgid "No subscription attributes in request."
@@ -5513,7 +5678,7 @@ msgstr "No s'ha trobat cap sol·licitud."
 
 #: cups/snmp.c:996
 msgid "No variable-bindings SEQUENCE"
-msgstr "No hi ha cap SEQUENCE variable-bindings"
+msgstr "No hi ha cap «variable-bindings SEQUENCE»"
 
 #: cups/snmp.c:951
 msgid "No version number"
@@ -5525,7 +5690,7 @@ msgstr "Discontinu (sensible a les marques)"
 
 #: ppdc/sample.c:364
 msgid "Non-continuous (Web sensing)"
-msgstr "Discontinu (Sensible al web)"
+msgstr "Discontinu (sensible al web)"
 
 #: cups/ppd-cache.c:4059 cups/ppd-cache.c:4137 cups/ppd-cache.c:4225
 #: cups/ppd-cache.c:4315 cups/ppd-cache.c:4362
@@ -5543,7 +5708,7 @@ msgstr "No s'ha trobat"
 
 #: cups/http-support.c:1539
 msgid "Not Implemented"
-msgstr "No implementat"
+msgstr "No s'ha implementat"
 
 #: ppdc/sample.c:271
 msgid "Not Installed"
@@ -5551,11 +5716,11 @@ msgstr "No està instal·lat"
 
 #: cups/http-support.c:1514
 msgid "Not Modified"
-msgstr "No està modificat"
+msgstr "No s'ha modificat"
 
 #: cups/http-support.c:1542
 msgid "Not Supported"
-msgstr "No és compatible"
+msgstr "No està permès"
 
 #: scheduler/ipp.c:1510 scheduler/ipp.c:10979
 msgid "Not allowed to print."
@@ -5571,7 +5736,7 @@ msgstr "D'acord"
 
 #: cups/ppd-cache.c:3872 ppdc/sample.c:266
 msgid "Off (1-Sided)"
-msgstr "Inactiu (Una cara)"
+msgstr "Inactiu (una cara)"
 
 #: ppdc/sample.c:359
 msgid "Oki"
@@ -5583,24 +5748,24 @@ msgstr "Ajuda en línia"
 
 #: scheduler/ipp.c:5399
 msgid "Only local users can create a local printer."
-msgstr ""
+msgstr "Només els usuaris locals poden crear una impressora local."
 
 #: cups/adminutil.c:202
 #, c-format
 msgid "Open of %s failed: %s"
-msgstr "No s'ha pogut obrir %s: %s"
+msgstr "Ha fallat en obrir %s: %s"
 
 #: cups/ppd.c:291
 msgid "OpenGroup without a CloseGroup first"
-msgstr "OpenGroup sense un CloseGroup abans"
+msgstr "«OpenGroup» sense un «CloseGroup» abans"
 
 #: cups/ppd.c:293
 msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
-msgstr "OpenUI/JCLOpenUI sense un CloseUI/JCLCloseUI abans"
+msgstr "«OpenUI/JCLOpenUI» sense un «CloseUI/JCLCloseUI» abans"
 
 #: cgi-bin/admin.c:3138
 msgid "Operation Policy"
-msgstr "Política d'operacions"
+msgstr "Política d'operació"
 
 #: filter/pstops.c:2174
 #, c-format
@@ -5624,11 +5789,11 @@ msgstr "Opcions:"
 
 #: cups/dest-localization.c:169
 msgid "Other Media"
-msgstr ""
+msgstr "Altres papers"
 
 #: cups/dest-localization.c:167
 msgid "Other Tray"
-msgstr ""
+msgstr "Altres safates"
 
 #: cups/ppd-cache.c:491
 msgid "Out of date PPD cache file."
@@ -5636,7 +5801,7 @@ msgstr "El fitxer de memòria cau del PPD no està actualitzat."
 
 #: cups/ppd-cache.c:1934
 msgid "Out of memory."
-msgstr "Sense memòria."
+msgstr "Memòria exhaurida."
 
 #: cups/ppd.c:810 cups/ppd.c:1347
 msgid "Output Mode"
@@ -5652,7 +5817,7 @@ msgstr "PRC16K"
 
 #: ppdc/sample.c:150
 msgid "PRC16K Long Edge"
-msgstr "PRC16K costat llarg"
+msgstr "PRC16K pel costat llarg"
 
 #: ppdc/sample.c:151
 msgid "PRC32K"
@@ -5660,36 +5825,38 @@ msgstr "PRC32K"
 
 #: ppdc/sample.c:154
 msgid "PRC32K Long Edge"
-msgstr "PRC32K costat llarg"
+msgstr "PRC32K pel costat llarg"
 
 #: ppdc/sample.c:152
 msgid "PRC32K Oversize"
-msgstr "PRC32K gran"
+msgstr "PRC32K molt gran"
 
 #: ppdc/sample.c:153
 msgid "PRC32K Oversize Long Edge"
-msgstr "PRC32K gran costat llarg"
+msgstr "PRC32K molt gran pel costat llarg"
 
 #: cups/dest.c:1857
 msgid ""
 "PRINTER environment variable names default destination that does not exist."
 msgstr ""
+"La variable d'entorn PRINTER anomena una destinació predeterminada que no"
+" existeix."
 
 #: cups/snmp.c:968
 msgid "Packet does not contain a Get-Response-PDU"
-msgstr "El paquet no conté cap Get-Response-PDU"
+msgstr "El paquet no conté cap «Get-Response-PDU»"
 
 #: cups/snmp.c:947
 msgid "Packet does not start with SEQUENCE"
-msgstr "El paquet no comença amb SEQUENCE"
+msgstr "El paquet no comença amb «SEQUENCE»"
 
 #: ppdc/sample.c:358
 msgid "ParamCustominCutInterval"
-msgstr "ParamCustominCutInterval"
+msgstr ""
 
 #: ppdc/sample.c:356
 msgid "ParamCustominTearInterval"
-msgstr "ParamCustominTearInterval"
+msgstr ""
 
 #: cups/auth.c:235 cups/auth.c:394
 #, c-format
@@ -5742,11 +5909,11 @@ msgstr "Postal doble"
 
 #: ppdc/sample.c:72
 msgid "Postcard Double Long Edge"
-msgstr "Postal doble costat llarg"
+msgstr "Postal doble pel costat llarg"
 
 #: ppdc/sample.c:148
 msgid "Postcard Long Edge"
-msgstr "Postal costat llarg"
+msgstr "Postal pel costat llarg"
 
 #: backend/ipp.c:972 backend/ipp.c:980
 msgid "Preparing to print."
@@ -5770,11 +5937,11 @@ msgstr "Qualitat de la impressió"
 
 #: ppdc/sample.c:381
 msgid "Print Rate"
-msgstr "Ritme d'impressió"
+msgstr "Ritme de la impressió"
 
 #: cgi-bin/printers.c:165
 msgid "Print Self-Test Page"
-msgstr "Imprimeix la pàgina de prova pròpia"
+msgstr "Imprimeix la pàgina d'autocomprovació"
 
 #: ppdc/sample.c:325
 msgid "Print Speed"
@@ -5819,7 +5986,7 @@ msgstr "S'ha afegit una impressora"
 
 #: ppdc/sample.c:258
 msgid "Printer Default"
-msgstr "Impressora per defecte"
+msgstr "Impressora predeterminada"
 
 #: cgi-bin/ipp-var.c:1028
 msgid "Printer Deleted"
@@ -5848,6 +6015,8 @@ msgstr "La impressora no pot imprimir amb les opcions indicades."
 #: cups/ppd-cache.c:4744
 msgid "Printer does not support required IPP attributes or document formats."
 msgstr ""
+"La impressora no admet els atributs de l'IPP ni els formats de document"
+" obligatoris."
 
 #: cups/notify.c:113
 msgid "Printer:"
@@ -5861,7 +6030,7 @@ msgstr "Impressores"
 #: filter/rastertolabel.c:1236
 #, c-format
 msgid "Printing page %d, %u%% complete."
-msgstr ""
+msgstr "S'està imprimint la pàgina %d, %u%% finalitzada."
 
 #: cups/ppd-cache.c:4222
 msgid "Punch"
@@ -5900,7 +6069,7 @@ msgstr "Torna a imprimir després d'un error"
 
 #: cups/http-support.c:1530
 msgid "Request Entity Too Large"
-msgstr "Entitat de petició massa gran"
+msgstr "L'entitat de la sol·licitud és massa gran"
 
 #: cups/ppd.c:812 cups/ppd.c:1349 ppdc/sample.c:232
 msgid "Resolution"
@@ -5928,7 +6097,7 @@ msgstr "SEQUENCE té una longitud sense definir"
 
 #: cups/http-support.c:1554
 msgid "SSL/TLS Negotiation Error"
-msgstr "S'ha produït un error mentre es negociava el SSL/TLS"
+msgstr "Error en la negociació del SSL/TLS"
 
 #: ppdc/sample.c:238
 msgid "Second Roll (DUO/Twin Only)"
@@ -5936,11 +6105,11 @@ msgstr ""
 
 #: cups/http-support.c:1511
 msgid "See Other"
-msgstr "Vegeu altres"
+msgstr "Mira les altres"
 
 #: scheduler/ipp.c:7099 scheduler/ipp.c:7118
 msgid "See remote printer."
-msgstr ""
+msgstr "Veu la impressora remota."
 
 #: cups/tls-darwin.c:740 cups/tls-gnutls.c:606
 msgid "Self-signed credentials are blocked."
@@ -5948,7 +6117,7 @@ msgstr ""
 
 #: backend/usb-darwin.c:566 backend/usb-libusb.c:343
 msgid "Sending data to printer."
-msgstr "S'envien les dades a la impressora."
+msgstr "S'estan enviant les dades a la impressora."
 
 #: cgi-bin/ipp-var.c:1038
 msgid "Server Restarted"
@@ -5968,7 +6137,7 @@ msgstr "S'ha aturat el servidor"
 
 #: cups/tls-darwin.c:1250 cups/tls-gnutls.c:1299
 msgid "Server credentials not set."
-msgstr ""
+msgstr "No s'han establert les credencials del servidor."
 
 #: cups/http-support.c:1548
 msgid "Service Unavailable"
@@ -5977,23 +6146,23 @@ msgstr "El servei no està disponible"
 #: cgi-bin/admin.c:2290 cgi-bin/admin.c:2336 cgi-bin/admin.c:2493
 #: cgi-bin/admin.c:2512
 msgid "Set Allowed Users"
-msgstr "Definir els permisos dels usuaris"
+msgstr "Estableix els usuaris permesos"
 
 #: cgi-bin/admin.c:2539
 msgid "Set As Server Default"
-msgstr "Establir com a servidor per defecte"
+msgstr "Estableix com a servidor predeterminat"
 
 #: cgi-bin/admin.c:2639
 msgid "Set Class Options"
-msgstr "Definir les opcions de la classe"
+msgstr "Estableix les opcions de la classe"
 
 #: cgi-bin/admin.c:2639 cgi-bin/admin.c:2813 cgi-bin/admin.c:3198
 msgid "Set Printer Options"
-msgstr "Definir les opcions de la impressora"
+msgstr "Estableix les opcions de la impressora"
 
 #: cgi-bin/admin.c:3368 cgi-bin/admin.c:3412 cgi-bin/admin.c:3430
 msgid "Set Publishing"
-msgstr "Establir com a pública"
+msgstr "Estableix com a pública"
 
 #: ppdc/sample.c:166
 msgid "Shipping Address"
@@ -6018,12 +6187,12 @@ msgstr "Estàndard"
 
 #: cups/ppd-cache.c:4056
 msgid "Staple"
-msgstr ""
+msgstr "Grapa"
 
 #. TRANSLATORS: Banner/cover sheet before the print job.
 #: cgi-bin/admin.c:3059
 msgid "Starting Banner"
-msgstr "Bàner inicial"
+msgstr "Bàner d'inici"
 
 #: filter/rastertoepson.c:1083 filter/rastertohp.c:750
 #: filter/rastertolabel.c:1212
@@ -6059,7 +6228,7 @@ msgstr "Súper B/A3"
 
 #: cups/http-support.c:1490
 msgid "Switching Protocols"
-msgstr "Intercanviar els protocols"
+msgstr "Intercanvia els protocols"
 
 #: ppdc/sample.c:159
 msgid "Tabloid"
@@ -6071,44 +6240,46 @@ msgstr "Tabloide gran"
 
 #: ppdc/sample.c:46
 msgid "Tabloid Oversize Long Edge"
-msgstr "Tabloide gran costat llarg"
+msgstr "Tabloide gran pel costat llarg"
 
 #: ppdc/sample.c:340
 msgid "Tear"
-msgstr "Estripar"
+msgstr "Estripa"
 
 #: ppdc/sample.c:445
 msgid "Tear-Off"
-msgstr "Estripar"
+msgstr "Estripa"
 
 #: ppdc/sample.c:386
 msgid "Tear-Off Adjust Position"
-msgstr "Posició d'ajust d'estripat"
+msgstr "Posició d'ajust pe a l'estripat"
 
 #: scheduler/ipp.c:1341
 #, c-format
 msgid "The \"%s\" attribute is required for print jobs."
-msgstr ""
+msgstr "L'atribut «%s» és obligatori per als treballs d'impressió."
 
 #: scheduler/ipp.c:6572 scheduler/ipp.c:6652 scheduler/ipp.c:6665
 #: scheduler/ipp.c:6677 scheduler/ipp.c:6692
 #, c-format
 msgid "The %s attribute cannot be provided with job-ids."
-msgstr "No es pot fer servir l'atribut %s amb els ID de les treballs."
+msgstr "No es pot fer servir l'atribut %s amb els ID dels treballs."
 
 #: scheduler/ipp.c:1320
 #, c-format
 msgid ""
 "The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
+"L'atribut estat del treball «%s» no es pot subministrar en una sol·licitud de"
+" creació del treball."
 
 #: scheduler/ipp.c:5194
 #, c-format
 msgid ""
 "The '%s' operation attribute cannot be supplied in a Create-Job request."
 msgstr ""
-"L'atribut d'operació «%s» no es pot subministrar en una petició de Create-"
-"Job."
+"L'atribut d'operació «%s» no es pot subministrar en una sol·licitud de"
+" creació del treball."
 
 #: scheduler/ipp.c:7141
 #, c-format
@@ -6137,8 +6308,8 @@ msgstr ""
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
-"No es pot fer servir l'atribut notify-lease-duration amb les subscripcions a "
-"treballs."
+"No es pot fer servir l'atribut «notify-lease-duration» amb les subscripcions"
+" a treballs."
 
 #: scheduler/ipp.c:2080 scheduler/ipp.c:5804
 #, c-format
@@ -6148,6 +6319,7 @@ msgstr "El valor de la «notify-user-data» és massa gran (%d > 63 octets)."
 #: backend/ipp.c:992
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
+"La configuració de la impressora és incorrecta o la impressora ja no existeix."
 
 #: backend/lpd.c:682 backend/lpd.c:1071 backend/lpd.c:1153 backend/lpd.c:1203
 msgid "The printer did not respond."
@@ -6196,6 +6368,9 @@ msgid ""
 "contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
 "pound sign (#)."
 msgstr ""
+"El nom de la impressora només pot contenir fins a 127 caràcters imprimibles i"
+" no pot contenir espais, barres inclinades (/ \\), cometes (' \"), signe"
+" d'interrogació (?) o el signe coixinet (#)."
 
 #: scheduler/ipp.c:762 scheduler/ipp.c:1047 scheduler/ipp.c:3230
 #: scheduler/ipp.c:3411 scheduler/ipp.c:5177 scheduler/ipp.c:5638
@@ -6225,15 +6400,15 @@ msgstr "L'atribut URI d'impressora és obligatori."
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
 msgstr ""
-"L'URI d'impressora ha de tenir la forma «ipp://NOMAMFITRIÓ/classes/"
-"NOMCLASSE»."
+"L'URI d'impressora haurà de tenir la forma"
+" «ipp://NOMAMFITRIÓ/classes/NOMCLASSE»."
 
 #: scheduler/ipp.c:2245
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
 msgstr ""
-"L'URI d'impressora ha de tenir la forma «ipp://NOMAMFITRIÓ/printers/"
-"NOMIMPRESSORA»."
+"L'URI d'impressora haurà de tenir la forma"
+" «ipp://NOMAMFITRIÓ/printers/NOMIMPRESSORA»."
 
 #: scheduler/client.c:2003
 msgid ""
@@ -6246,7 +6421,7 @@ msgstr ""
 #: scheduler/ipp.c:6636
 #, c-format
 msgid "The which-jobs value \"%s\" is not supported."
-msgstr "El valor «%s» de which-jobs no està implementat."
+msgstr "El valor «%s» de «which-jobs» no està implementat."
 
 #: scheduler/ipp.c:5901
 msgid "There are too many subscriptions."
@@ -6255,7 +6430,7 @@ msgstr "Hi ha massa subscripcions."
 #: backend/usb-darwin.c:398 backend/usb-darwin.c:464 backend/usb-darwin.c:528
 #: backend/usb-darwin.c:549 backend/usb-libusb.c:268 backend/usb-libusb.c:322
 msgid "There was an unrecoverable USB error."
-msgstr "Hi ha un error de l'USB irrecuperable."
+msgstr "Hi ha un error irrecuperable de l'USB."
 
 #: ppdc/sample.c:433
 msgid "Thermal Transfer Media"
@@ -6263,17 +6438,17 @@ msgstr "Mitjà de transferència tèrmica"
 
 #: scheduler/ipp.c:1499
 msgid "Too many active jobs."
-msgstr "Hi ha massa treballs actives."
+msgstr "Hi ha massa treballs actius."
 
 #: scheduler/ipp.c:1393
 #, c-format
 msgid "Too many job-sheets values (%d > 2)."
-msgstr "Hi ha massa valors de job-sheets (%d > 2)."
+msgstr "Hi ha massa valors de «job-sheets» (%d > 2)."
 
 #: scheduler/ipp.c:2574
 #, c-format
 msgid "Too many printer-state-reasons values (%d > %d)."
-msgstr "Hi ha massa valors de printer-state-reasons (%d > %d)."
+msgstr "Hi ha massa valors de «printer-state-reasons» (%d > %d)."
 
 #: ppdc/sample.c:287
 msgid "Transparency"
@@ -6302,7 +6477,7 @@ msgstr "Safata 4"
 #: cups/tls-darwin.c:645 cups/tls-darwin.c:727 cups/tls-gnutls.c:504
 #: cups/tls-gnutls.c:586
 msgid "Trust on first use is disabled."
-msgstr ""
+msgstr "La confiança en el primer ús està inhabilitada."
 
 #: cups/http-support.c:1533
 msgid "URI Too Long"
@@ -6326,143 +6501,144 @@ msgstr "Legal americà"
 
 #: ppdc/sample.c:140
 msgid "US Legal Oversize"
-msgstr "Legal americà gran"
+msgstr "Legal americà molt gran"
 
 #: ppdc/sample.c:141
 msgid "US Letter"
-msgstr "Carta americà"
+msgstr "Carta americana"
 
 #: ppdc/sample.c:142
 msgid "US Letter Long Edge"
-msgstr "Carta americà costat llarg"
+msgstr "Carta americana pel costat llarg"
 
 #: ppdc/sample.c:143
 msgid "US Letter Oversize"
-msgstr "Carta americà gran"
+msgstr "Carta americana molt gran"
 
 #: ppdc/sample.c:144
 msgid "US Letter Oversize Long Edge"
-msgstr "Carta americà gran costat llarg"
+msgstr "Carta americana molt gran pel costat llarg"
 
 #: ppdc/sample.c:145
 msgid "US Letter Small"
-msgstr "Carta americà petit"
+msgstr "Carta americana petita"
 
 #: cgi-bin/admin.c:1651 cgi-bin/admin.c:1664 cgi-bin/admin.c:1688
 msgid "Unable to access cupsd.conf file"
-msgstr "No es pot accedir al fitxer cups.conf"
+msgstr "No s'ha pogut accedir al fitxer cups.conf"
 
 #: cgi-bin/help.c:123
 msgid "Unable to access help file."
-msgstr "No es pot accedir al fitxer d'ajuda."
+msgstr "No s'ha pogut accedir al fitxer d'ajuda."
 
 #: cgi-bin/admin.c:580
 msgid "Unable to add class"
-msgstr "No es pot afegir la classe"
+msgstr "No s'ha pogut afegir la classe"
 
 #: backend/ipp.c:1887
 msgid "Unable to add document to print job."
-msgstr "No es pot obrir el documenta el treball."
+msgstr "No s'ha pogut afegir el document al treball d'impressió."
 
 #: scheduler/ipp.c:1574
 #, c-format
 msgid "Unable to add job for destination \"%s\"."
-msgstr "No es pot afegir el treball a la destinació «%s»."
+msgstr "No s'ha pogut afegir el treball a la destinació «%s»."
 
 #: cgi-bin/admin.c:823 cgi-bin/admin.c:1193
 msgid "Unable to add printer"
-msgstr "No es pot afegir la impressora"
+msgstr "No s'ha pogut afegir la impressora"
 
 #: scheduler/ipp.c:1177
 msgid "Unable to allocate memory for file types."
-msgstr "No es pot assignar la memòria pels tipus de fitxers."
+msgstr "No s'ha pogut reservar memòria per als tipus de fitxer."
 
 #: filter/pstops.c:415
 msgid "Unable to allocate memory for page info"
-msgstr "No s'ha pogut assignar memòria per la pàgina d'informació"
+msgstr "No s'ha pogut reservar memòria per a la pàgina d'informació"
 
 #: filter/pstops.c:409
 msgid "Unable to allocate memory for pages array"
-msgstr "No s'ha pogut assignar memòria per la matriu de pàgines"
+msgstr "No s'ha pogut reservar memòria per a la matriu de pàgines"
 
 #: tools/ippeveprinter.c:1628
 msgid "Unable to allocate memory for printer"
-msgstr ""
+msgstr "No s'ha pogut reservar memòria per a la impressora"
 
 #: backend/ipp.c:2173 backend/ipp.c:2704
 msgid "Unable to cancel print job."
-msgstr "No es pot cancel·lar el treball d'impressió."
+msgstr "No s'ha pogut cancel·lar el treball d'impressió."
 
 #: cgi-bin/admin.c:2494
 msgid "Unable to change printer"
-msgstr "No es pot canviar la impressora"
+msgstr "No s'ha pogut canviar la impressora"
 
 #: cgi-bin/admin.c:3413
 msgid "Unable to change printer-is-shared attribute"
-msgstr "No es pot canviar l'atribut printer-is-shared"
+msgstr "No s'ha pogut canviar l'atribut «printer-is-shared»"
 
 #: cgi-bin/admin.c:1349 cgi-bin/admin.c:1491
 msgid "Unable to change server settings"
-msgstr "No es pot canviar la configuració del servidor"
+msgstr "No s'han pogut canviar els ajustaments del servidor"
 
 #: cups/ipp.c:5179
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
-msgstr ""
+msgstr "No s'ha pogut compilar l'expressió regular «mimeMediaType»: %s."
 
 #: cups/ipp.c:5134
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
-msgstr ""
+msgstr "No s'ha pogut compilar l'expressió regular «naturalLanguage»: %s."
 
 #: filter/commandtops.c:401
 msgid "Unable to configure printer options."
-msgstr "No es poden configurar les opcions de la impressora."
+msgstr "No s'han pogut configurar les opcions de la impressora."
 
 #: cups/adminutil.c:158 cups/request.c:1057
 msgid "Unable to connect to host."
-msgstr "No es pot connectar a l'amfitrió."
+msgstr "No s'ha pogut connectar amb l'amfitrió."
 
 #: backend/ipp.c:722 backend/ipp.c:1274 backend/lpd.c:850 backend/socket.c:314
 #: backend/usb-unix.c:103
 msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
-"No es pot contactar amb la impressora. Es posa a la cua de la següent "
-"impressora de la classe."
+"No s'ha pogut contactar amb la impressora. Es posa a la cua de la següent"
+" impressora a la classe."
 
 #: scheduler/ipp.c:2676
 #, c-format
 msgid "Unable to copy PPD file - %s"
-msgstr "No es pot copiar el fitxer PPD - %s"
+msgstr "No s'ha pogut copiar el fitxer PPD - %s"
 
 #: scheduler/ipp.c:2721
 msgid "Unable to copy PPD file."
-msgstr "No es pot copiar el fitxer PPD."
+msgstr "No s'ha pogut copiar el fitxer PPD."
 
 #: cups/tls-darwin.c:611 cups/tls-gnutls.c:467
 msgid "Unable to create credentials from array."
-msgstr ""
+msgstr "No s'han pogut crear les credencials des de la matriu."
 
 #: cups/ppd-util.c:573 cups/util.c:478
 msgid "Unable to create printer-uri"
-msgstr "No es pot crear l'URI d'impressora"
+msgstr "No s'ha pogut crear l'URI d'impressora"
 
 #: scheduler/ipp.c:5475
 msgid "Unable to create printer."
-msgstr ""
+msgstr "No s'ha pogut crear la impressora."
 
 #: cups/tls-darwin.c:1541 cups/tls-gnutls.c:1511
 msgid "Unable to create server credentials."
-msgstr ""
+msgstr "No s'han pogut crear les credencials del servidor."
 
 #: tools/ippeveprinter.c:664
 #, c-format
 msgid "Unable to create spool directory \"%s\": %s"
 msgstr ""
+"No ha estat possible crear el directori «%s» per a la gestió de cues: %s"
 
 #: cgi-bin/admin.c:1542 cgi-bin/admin.c:1554 scheduler/cupsfilter.c:1284
 msgid "Unable to create temporary file"
-msgstr "No es pot crear el fitxer temporal"
+msgstr "No s'ha pogut crear el fitxer temporal"
 
 #: cgi-bin/admin.c:1845
 msgid "Unable to delete class"
@@ -6478,12 +6654,12 @@ msgstr "No s'ha pogut executar l'ordre de manteniment"
 
 #: cgi-bin/admin.c:1666
 msgid "Unable to edit cupsd.conf files larger than 1MB"
-msgstr "No es poden editar fitxers cupsd.conf més grans d'1MB"
+msgstr "No es poden editar fitxers cupsd.conf més grans que 1MB"
 
 #: cups/tls-darwin.c:1768
 #, c-format
 msgid "Unable to establish a secure connection to host (%d)."
-msgstr ""
+msgstr "No s'ha pogut establir una connexió segura amb l'amfitrió (%d)."
 
 #: cups/tls-darwin.c:1729
 msgid ""
@@ -6535,7 +6711,7 @@ msgstr ""
 
 #: cups/tls-sspi.c:1277 cups/tls-sspi.c:1294
 msgid "Unable to establish a secure connection to host."
-msgstr "No es pot establir una connexió segura amb l'amfitrió."
+msgstr "No s'ha pogut establir una connexió segura amb l'amfitrió."
 
 #: tools/ippeveprinter.c:1603 tools/ippeveprinter.c:1613
 #, c-format
@@ -6544,135 +6720,135 @@ msgstr "No s'ha pogut executar l'ordre «%s»: %s"
 
 #: cgi-bin/ipp-var.c:347
 msgid "Unable to find destination for job"
-msgstr "No es pot trobar la destinació per al treball"
+msgstr "No s'ha pogut trobar la destinació per al treball"
 
 #: cups/http-support.c:2099
 msgid "Unable to find printer."
-msgstr "No es pot trobar la impressora."
+msgstr "No s'ha pogut trobar la impressora."
 
 #: cups/tls-darwin.c:1554
 msgid "Unable to find server credentials."
-msgstr ""
+msgstr "No s'han pogut trobar les credencials del servidor."
 
 #: backend/ipp.c:3367
 msgid "Unable to get backend exit status."
-msgstr "No es pot obtenir l'estat de la sortida del dorsal."
+msgstr "No s'ha pogut obtenir l'estat de la sortida del dorsal."
 
 #: cgi-bin/classes.c:426
 msgid "Unable to get class list"
-msgstr "No es pot obtenir la llista de classes"
+msgstr "No s'ha pogut obtenir la llista de classes"
 
 #: cgi-bin/classes.c:525
 msgid "Unable to get class status"
-msgstr "No es pot obtenir l'estat de la classe"
+msgstr "No s'ha pogut obtenir l'estat de la classe"
 
 #: cgi-bin/admin.c:1087
 msgid "Unable to get list of printer drivers"
-msgstr "No es pot obtenir la llista dels controladors d'impressora"
+msgstr "No s'ha pogut obtenir la llista dels controladors d'impressora"
 
 #: cgi-bin/admin.c:2344
 msgid "Unable to get printer attributes"
-msgstr "No es poden obtenir els atributs de la impressora"
+msgstr "No s'han pogut obtenir els atributs de la impressora"
 
 #: cgi-bin/printers.c:443
 msgid "Unable to get printer list"
-msgstr "No es pot obtenir la llista d'impressores"
+msgstr "No s'ha pogut obtenir la llista d'impressores"
 
 #: cgi-bin/printers.c:545
 msgid "Unable to get printer status"
-msgstr "No es pot obtenir l'estat de la impressora"
+msgstr "No s'ha pogut obtenir l'estat de la impressora"
 
 #: backend/ipp.c:1016
 msgid "Unable to get printer status."
-msgstr "No es pot obtenir l'estat de la impressora."
+msgstr "No s'ha pogut obtenir l'estat de la impressora."
 
 #: cgi-bin/help.c:82
 msgid "Unable to load help index."
-msgstr "No es pot carregar l'índex de l'ajuda."
+msgstr "No s'ha pogut carregar l'índex de l'ajuda."
 
 #: backend/network.c:69
 #, c-format
 msgid "Unable to locate printer \"%s\"."
-msgstr "No es pot ubicar la impressora «%s»."
+msgstr "No s'ha pogut ubicar la impressora «%s»."
 
 #: backend/dnssd.c:752 backend/ipp.c:335 backend/lpd.c:185 backend/socket.c:155
 msgid "Unable to locate printer."
-msgstr "No es pot ubicar la impressora."
+msgstr "No s'ha pogut ubicar la impressora."
 
 #: cgi-bin/admin.c:579
 msgid "Unable to modify class"
-msgstr "No es pot modificar la classe"
+msgstr "No s'ha pogut modificar la classe"
 
 #: cgi-bin/admin.c:822 cgi-bin/admin.c:1192
 msgid "Unable to modify printer"
-msgstr "No es pot modificar la impressora"
+msgstr "No s'ha pogut modificar la impressora"
 
 #: cgi-bin/ipp-var.c:414 cgi-bin/ipp-var.c:503
 msgid "Unable to move job"
-msgstr "No es pot moure el treball"
+msgstr "No s'ha pogut moure el treball"
 
 #: cgi-bin/ipp-var.c:416 cgi-bin/ipp-var.c:505
 msgid "Unable to move jobs"
-msgstr "No es poden moure les treballs"
+msgstr "No s'han pogut moure els treballs"
 
 #: cgi-bin/admin.c:2690 cups/ppd.c:284
 msgid "Unable to open PPD file"
-msgstr "No es pot obrir el fitxer PPD"
+msgstr "No s'ha pogut obrir el fitxer PPD"
 
 #: cgi-bin/admin.c:2161
 msgid "Unable to open cupsd.conf file:"
-msgstr "No es pot obrir el fitxer cups.conf:"
+msgstr "No s'ha pogut obrir el fitxer cups.conf:"
 
 #: backend/usb-unix.c:127
 msgid "Unable to open device file"
-msgstr "No es pot obrir el fitxer de dispositiu"
+msgstr "No s'ha pogut obrir el fitxer de dispositiu"
 
 #: scheduler/ipp.c:6315
 #, c-format
 msgid "Unable to open document #%d in job #%d."
-msgstr "No es pot obrir el document núm. %d al treball núm. %d."
+msgstr "No s'ha pogut obrir el document núm. %d al treball núm. %d."
 
 #: cgi-bin/help.c:356
 msgid "Unable to open help file."
-msgstr "No es pot obrir el fitxer d'impressió."
+msgstr "No s'ha pogut obrir el fitxer d'ajuda."
 
 #: backend/ipp.c:376 backend/ipp.c:1621 backend/ipp.c:1834 backend/lpd.c:473
 #: backend/socket.c:142 backend/usb.c:224 filter/gziptoany.c:65
 #: filter/pstops.c:262
 msgid "Unable to open print file"
-msgstr "No es pot obrir el fitxer d'impressió"
+msgstr "No s'ha pogut obrir el fitxer d'impressió"
 
 #: filter/rastertoepson.c:1012 filter/rastertohp.c:681
 #: filter/rastertolabel.c:1134
 msgid "Unable to open raster file"
-msgstr "No es pot obrir el fitxer de trama"
+msgstr "No s'ha pogut obrir el fitxer de trama"
 
 #: cgi-bin/ipp-var.c:777
 msgid "Unable to print test page"
-msgstr "No es pot imprimir la pàgina de prova"
+msgstr "No s'ha pogut imprimir la pàgina de prova"
 
 #: backend/runloop.c:78 backend/runloop.c:307 backend/usb-darwin.c:636
 #: backend/usb-darwin.c:680 backend/usb-libusb.c:413 backend/usb-libusb.c:448
 msgid "Unable to read print data."
-msgstr "No es poden llegir les dades d'impressió."
+msgstr "No s'han pogut llegir les dades d'impressió."
 
 #: tools/ippeveprinter.c:6861 tools/ippeveprinter.c:6879
 #: tools/ippeveprinter.c:6898 tools/ippeveprinter.c:6912
 #, c-format
 msgid "Unable to register \"%s.%s\": %d"
-msgstr ""
+msgstr "No s'ha pogut registrar «%s.%s»: %d"
 
 #: scheduler/ipp.c:8622 scheduler/ipp.c:9865
 msgid "Unable to rename job document file."
-msgstr ""
+msgstr "No s'ha pogut reanomenar el fitxer de document del treball."
 
 #: cups/dest.c:3252
 msgid "Unable to resolve printer-uri."
-msgstr ""
+msgstr "No s'ha pogut resoldre l'URI d'impressora."
 
 #: filter/pstops.c:527
 msgid "Unable to see in file"
-msgstr "No es pot veure al fitxer"
+msgstr "No s'ha pogut veure el fitxer"
 
 #: cgi-bin/ipp-var.c:580 cgi-bin/ipp-var.c:600
 msgid "Unable to send command to printer driver"
@@ -6680,36 +6856,36 @@ msgstr "No s'ha pogut enviar l'ordre al controlador de la impressora"
 
 #: backend/usb-darwin.c:758 backend/usb-libusb.c:524
 msgid "Unable to send data to printer."
-msgstr "No es poden enviar dades a la impressora."
+msgstr "No s'han pogut enviar dades a la impressora."
 
 #: cgi-bin/admin.c:3314
 msgid "Unable to set options"
-msgstr "No es poden configurar les opcions"
+msgstr "No s'han pogut establir les opcions"
 
 #: cgi-bin/admin.c:2581
 msgid "Unable to set server default"
-msgstr "No es pot posar la configuració per defecte al servidor"
+msgstr "No s'ha pogut establir el servidor predeterminat"
 
 #: backend/ipp.c:3226 backend/ipp.c:3303 backend/ipp.c:3311
 msgid "Unable to start backend process."
-msgstr "No es pot iniciar el procés del dorsal."
+msgstr "No s'ha pogut iniciar el procés del dorsal."
 
 #: cgi-bin/admin.c:1604
 msgid "Unable to upload cupsd.conf file"
-msgstr "No es pot penjar el fitxer cups.conf"
+msgstr "No s'ha pot pujar el fitxer cupsd.conf"
 
 #: backend/usb-darwin.c:2148 backend/usb-darwin.c:2172
 msgid "Unable to use legacy USB class driver."
-msgstr "No es pot fer servir el controlador de la classe USB antic."
+msgstr "No s'ha pogut fer servir el controlador antic de la classe USB."
 
 #: backend/runloop.c:107 backend/runloop.c:362
 msgid "Unable to write print data"
-msgstr "No es poden escriure les dades d'impressió"
+msgstr "No s'han pogut escriure les dades d'impressió"
 
 #: filter/gziptoany.c:84
 #, c-format
 msgid "Unable to write uncompressed print data: %s"
-msgstr "No es poden escriure les dades sense comprimir: %s"
+msgstr "No s'han pogut escriure les dades sense comprimir: %s"
 
 #: cups/http-support.c:1521
 msgid "Unauthorized"
@@ -6731,26 +6907,26 @@ msgstr "La tria de «%s» per l'opció «%s» és desconeguda."
 #: tools/ippeveprinter.c:3996
 #, c-format
 msgid "Unknown directive \"%s\" on line %d of \"%s\" ignored."
-msgstr ""
+msgstr "La directiva «%s» desconeguda a la línia %d de «%s» és ignorada."
 
 #: backend/ipp.c:518
 #, c-format
 msgid "Unknown encryption option value: \"%s\"."
-msgstr "El valor de l'opció d'encriptatge «%s» és desconegut."
+msgstr "El valor de l'opció d'encriptatge és desconegut: «%s»."
 
 #: backend/lpd.c:331
 #, c-format
 msgid "Unknown file order: \"%s\"."
-msgstr "Ordre desconegut del fitxer: «%s»."
+msgstr "Ordre desconegut en el fitxer: «%s»."
 
 #: backend/lpd.c:302
 #, c-format
 msgid "Unknown format character: \"%c\"."
-msgstr "Format del caràcter desconegut: «%c»."
+msgstr "Format desconegut en el caràcter: «%c»."
 
 #: cups/hash.c:279
 msgid "Unknown hash algorithm."
-msgstr ""
+msgstr "Algorisme de resum desconegut."
 
 #: cups/dest-options.c:1157
 msgid "Unknown media size name."
@@ -6774,24 +6950,24 @@ msgstr "El mode d'impressió «%s» és desconegut."
 #: scheduler/ipp.c:10806
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
-msgstr "El paràmetre printer-error-policy «%s» és desconegut."
+msgstr "El paràmetre «printer-error-policy» «%s» és desconegut."
 
 #: scheduler/ipp.c:10789
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
-msgstr "El paràmetre printer-op-policy «%s» és desconegut."
+msgstr "El paràmetre «printer-op-policy» «%s» és desconegut."
 
 #: cups/http.c:2266
 msgid "Unknown request method."
-msgstr ""
+msgstr "Mètode desconegut de la sol·licitud."
 
 #: cups/http.c:2286
 msgid "Unknown request version."
-msgstr ""
+msgstr "Versió desconeguda de la sol·licitud."
 
 #: cups/http-support.c:1638
 msgid "Unknown scheme in URI"
-msgstr ""
+msgstr "Esquema desconegut a l'URI"
 
 #: cups/http-addrlist.c:824
 msgid "Unknown service name."
@@ -6805,25 +6981,25 @@ msgstr "El valor de l'opció de la versió és desconegut: «%s»."
 #: scheduler/ipp.c:11265
 #, c-format
 msgid "Unsupported 'compression' value \"%s\"."
-msgstr ""
+msgstr "No s'admet el valor «%s» de «compression»."
 
 #: scheduler/ipp.c:11295
 #, c-format
 msgid "Unsupported 'document-format' value \"%s\"."
-msgstr ""
+msgstr "No s'admet el valor «%s» de «document-format»."
 
 #: scheduler/ipp.c:7969 scheduler/ipp.c:10348 scheduler/ipp.c:11309
 msgid "Unsupported 'job-hold-until' value."
-msgstr ""
+msgstr "No s'admet el valor de «job-hold-until»."
 
 #: scheduler/ipp.c:11325
 msgid "Unsupported 'job-name' value."
-msgstr ""
+msgstr "No s'admet el valor de «job-name»."
 
 #: scheduler/ipp.c:298
 #, c-format
 msgid "Unsupported character set \"%s\"."
-msgstr "No s'admet establir el joc de caràcters «%s»."
+msgstr "No s'admet el joc de caràcters «%s»."
 
 #: scheduler/ipp.c:8429 scheduler/ipp.c:9677
 #, c-format
@@ -6833,12 +7009,12 @@ msgstr "No s'admet la compressió «%s»."
 #: scheduler/ipp.c:8565 scheduler/ipp.c:9830
 #, c-format
 msgid "Unsupported document-format \"%s\"."
-msgstr "No s'admet el document-format «%s»."
+msgstr "No s'admet el «document-format» «%s»."
 
 #: scheduler/ipp.c:9813
 #, c-format
 msgid "Unsupported document-format \"%s/%s\"."
-msgstr "No s'admet el document-format «%s/%s»."
+msgstr "No s'admet el «document-format» «%s/%s»."
 
 #: scheduler/ipp.c:1359
 #, c-format
@@ -6856,28 +7032,29 @@ msgstr "No s'admet el valor del paper."
 #: filter/pstops.c:2447
 #, c-format
 msgid "Unsupported number-up value %d, using number-up=1."
-msgstr "No s'admet el valor %d a number-up. Es fa servir number-up=1."
+msgstr "No s'admet el valor %d a «number-up». Es fa servir «number-up=1»."
 
 #: filter/pstops.c:2481
 #, c-format
 msgid "Unsupported number-up-layout value %s, using number-up-layout=lrtb."
 msgstr ""
-"No s'admet el valor %s a number-up-layout. Es fa servir number-up-"
-"layout=lrtb."
+"No s'admet el valor %s a «number-up-layout». Es fa servir"
+" «number-up-layout=lrtb»."
 
 #: filter/pstops.c:2532
 #, c-format
 msgid "Unsupported page-border value %s, using page-border=none."
-msgstr "No s'admet el valor %s a page-border. Es fa servir page-border=none."
+msgstr ""
+"No s'admet el valor %s a «page-border». Es fa servir «page-border=none»."
 
 #: filter/rastertopwg.c:132 filter/rastertopwg.c:168 filter/rastertopwg.c:176
 #: filter/rastertopwg.c:185
 msgid "Unsupported raster data."
-msgstr "No s'admet les dades en trama."
+msgstr "No s'admeten les dades en trama."
 
 #: cups/snmp.c:1066
 msgid "Unsupported value type"
-msgstr "El tipus de valor no és compatible"
+msgstr "El tipus de valor no està admès"
 
 #: cups/http-support.c:1536
 msgid "Upgrade Required"
@@ -6893,7 +7070,7 @@ msgstr "Ús: %s [opcions] destinació/ons"
 #: filter/pstops.c:223 monitor/bcp.c:48 monitor/tbcp.c:47
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]"
-msgstr "Sintaxi: %s ID_treball usuari títol còpies opcions [fitxer]"
+msgstr "Ús: %s ID_treball usuari títol còpies opcions [fitxer]"
 
 #: systemv/cancel.c:398
 msgid ""
@@ -6907,25 +7084,27 @@ msgstr ""
 
 #: systemv/cupsctl.c:231
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
-msgstr "Sintaxi: cupsctl [opcions] [param=valor ... paramN=valorN]"
+msgstr "Ús: cupsctl [opcions] [param=valor ... param_N=valor_N]"
 
 #: scheduler/main.c:2134
 msgid "Usage: cupsd [options]"
-msgstr "Sintaxi: cupsd [opcions]"
+msgstr "Ús: cupsd [opcions]"
 
 #: scheduler/cupsfilter.c:1475
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
-msgstr ""
+msgstr "Ús: cupsfilter [ opcions ] [ -- ] nom_fitxer"
 
 #: systemv/cupstestppd.c:3855
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
 "       program | cupstestppd [options] -"
 msgstr ""
+"Ús: cupstestppd [opcions] nom_fitxer1.ppd[.gz] [... nom_fitxerN.ppd[.gz]]\n"
+"       programa | cupstestppd [opcions] -"
 
 #: tools/ippeveprinter.c:7921
 msgid "Usage: ippeveprinter [options] \"name\""
-msgstr ""
+msgstr "Ús: ippeveprinter [opcions] «nom»"
 
 #: tools/ippfind.c:2759
 msgid ""
@@ -6934,16 +7113,22 @@ msgid ""
 "       ippfind --help\n"
 "       ippfind --version"
 msgstr ""
+"Ús: ippfind [opcions] tipus_registre[,subtipus][.domini.] ... [expressió]\n"
+"       ippfind [opcions] nom[.tipus_registre[.domini.]] ... [expressió]\n"
+"       ippfind --help\n"
+"       ippfind --version"
 
 #: tools/ipptool.c:4306
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
-msgstr "Sintaxi: ipptool [opcions] URI nom_fitxer[ ... nom_fitxerN]"
+msgstr "Ús: ipptool [opcions] URI nom_fitxer [ ... nom_fitxerN]"
 
 #: systemv/lp.c:748
 msgid ""
 "Usage: lp [options] [--] [file(s)]\n"
 "       lp [options] -i id"
 msgstr ""
+"Ús: lp [opcions] [--] [fitxer/s]\n"
+"       lp [opcions] -i id"
 
 #: systemv/lpadmin.c:1615
 msgid ""
@@ -6964,7 +7149,7 @@ msgid ""
 "Usage: lpinfo [options] -m\n"
 "       lpinfo [options] -v"
 msgstr ""
-"Usage: lpinfo [opcions] -m\n"
+"Ús: lpinfo [opcions] -m\n"
 "       lpinfo [opcions] -v"
 
 #: systemv/lpmove.c:214
@@ -7009,47 +7194,46 @@ msgstr "Ús: lpstat [opcions]"
 
 #: ppdc/ppdc.cxx:424
 msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
-msgstr "Sintaxi: ppdc [opcions] nom_fitxer.rv [ ... nom_fitxerN.drv ]"
+msgstr "Ús: ppdc [opcions] nom_fitxer.rv [ ... nom_fitxerN.drv ]"
 
 #: ppdc/ppdhtml.cxx:171
 msgid "Usage: ppdhtml [options] filename.drv >filename.html"
-msgstr "Sintaxi: ppdhtml [opcions] nom_fitxer.drv >nom_fitxer.html"
+msgstr "Ús: ppdhtml [opcions] nom_fitxer.drv >nom_fitxer.html"
 
 #: ppdc/ppdi.cxx:117
 msgid "Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]"
-msgstr "Sintaxi: ppdi [opcions] nom_fitxer.ppd [ ... nom_fitxerN.ppd ]"
+msgstr "Ús: ppdi [opcions] nom_fitxer.ppd [ ... nom_fitxerN.ppd ]"
 
 #: ppdc/ppdmerge.cxx:354
 msgid "Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]"
-msgstr "Sintaxi: ppdmerge [opcions] nom_fitxer.ppd [ ... nom_fitxerN.ppd ]"
+msgstr "Ús: ppdmerge [opcions] nom_fitxer.ppd [ ... nom_fitxerN.ppd ]"
 
 #: ppdc/ppdpo.cxx:241
 msgid ""
 "Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
 msgstr ""
-"Sintaxi: ppdpo [opcions] -o nom_fitxer.po nom_fitxer.drv [ ... nom_fitxerN."
-"drv]"
+"Ús: ppdpo [opcions] -o nom_fitxer.po nom_fitxer.drv [ ... nom_fitxerN.drv]"
 
 #: backend/snmp.c:185
 msgid "Usage: snmp [host-or-ip-address]"
-msgstr "Sintaxi: snmp [adreça_o_IP_amfitrió]"
+msgstr "Ús: snmp [adreça_o_IP_amfitrió]"
 
 #: tools/ippeveprinter.c:669
 #, c-format
 msgid "Using spool directory \"%s\"."
-msgstr ""
+msgstr "S'està usant el directori «%s» per a la gestió de cues."
 
 #: cups/snmp.c:1018
 msgid "Value uses indefinite length"
-msgstr "El valor té una longitud sense definir"
+msgstr "«Value» usa una longitud sense definir"
 
 #: cups/snmp.c:1003
 msgid "VarBind uses indefinite length"
-msgstr "VarBind té una longitud sense definir"
+msgstr "«VarBind» usa una longitud sense definir"
 
 #: cups/snmp.c:953
 msgid "Version uses indefinite length"
-msgstr "Version té una longitud sense definir"
+msgstr "«Version» usa una longitud sense definir"
 
 #: backend/ipp.c:2009
 msgid "Waiting for job to complete."
@@ -7065,7 +7249,7 @@ msgstr "S'està esperant que la impressora acabi."
 
 #: systemv/cupstestppd.c:3854
 msgid "Warning: This program will be removed in a future version of CUPS."
-msgstr ""
+msgstr "Avís: aquest programa serà eliminat en una futura versió de CUPS."
 
 #: cups/http-support.c:1557
 msgid "Web Interface is Disabled"
@@ -7077,7 +7261,7 @@ msgstr "Sí"
 
 #: scheduler/client.c:1991
 msgid "You cannot access this page."
-msgstr ""
+msgstr "No heu pogut accedir a aquesta pàgina."
 
 #: scheduler/client.c:1997
 #, c-format
@@ -7086,7 +7270,7 @@ msgstr "Heu d'accedir a aquesta pagina a través de l'URL https://%s:%d%s."
 
 #: scheduler/client.c:1989
 msgid "Your account does not have the necessary privileges."
-msgstr ""
+msgstr "El vostre compte no té els privilegis necessaris."
 
 #: ppdc/sample.c:437
 msgid "ZPL Label Printer"
@@ -7455,21 +7639,21 @@ msgstr ""
 
 #: scheduler/ipp.c:6187
 msgid "cups-deviced failed to execute."
-msgstr "no s'ha pogut executar correctament la cups-deviced."
+msgstr "Ha fallat en executar correctament el cups-deviced."
 
 #: scheduler/ipp.c:7073 scheduler/ipp.c:7312
 msgid "cups-driverd failed to execute."
-msgstr "No s'ha pogut executar correctament la «cups-driverd»."
+msgstr "Ha fallat en executar correctament el cups-driverd."
 
 #: systemv/cupsctl.c:170
 #, c-format
 msgid "cupsctl: Cannot set %s directly."
-msgstr ""
+msgstr "cupsctl: no es pot establir %s directament."
 
 #: systemv/cupsctl.c:183
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
-msgstr "cupsctl: no es pot connectar al servidor: %s"
+msgstr "cupsctl: no es pot connectar amb el servidor: %s"
 
 #: systemv/cupsctl.c:226
 #, c-format
@@ -7489,32 +7673,35 @@ msgstr ""
 #: scheduler/main.c:270
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
+"cupsd: s'esperava el nom de fitxer cups-files.conf després de l'opció «-s»."
 
 #: scheduler/main.c:244
 msgid "cupsd: On-demand support not compiled in, running in normal mode."
 msgstr ""
+"cupsd: La implementació sota demanda no està compilada, s'executa en el mode"
+" normal."
 
 #: scheduler/main.c:281
 msgid "cupsd: Relative cups-files.conf filename not allowed."
-msgstr ""
+msgstr "cupsd: no es permet el nom de fitxer relatiu cups-files.conf."
 
 #: scheduler/main.c:205 scheduler/main.c:212
 msgid "cupsd: Unable to get current directory."
-msgstr "cupsd: No es pot obtenir el directori actual."
+msgstr "cupsd: no es pot obtenir el directori actual."
 
 #: scheduler/main.c:340 scheduler/main.c:350
 msgid "cupsd: Unable to get path to cups-files.conf file."
-msgstr ""
+msgstr "cupsd: no s'ha pogut obtenir el camí al fitxer cups-files.conf."
 
 #: scheduler/main.c:321
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting."
-msgstr "cupsd: l'argument «%s» és desconegut - s'interromp."
+msgstr "cupsd: l'argument «%s» és desconegut, s'interromp."
 
 #: scheduler/main.c:312
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
-msgstr "cupsd: l'opció «%c» és desconeguda - s'interromp."
+msgstr "cupsd: l'opció «%c» és desconeguda, s'interromp."
 
 #: scheduler/cupsfilter.c:1257
 #, c-format
@@ -7524,7 +7711,7 @@ msgstr "cupsfilter: el document número %d no és vàlid."
 #: scheduler/cupsfilter.c:1251
 #, c-format
 msgid "cupsfilter: Invalid job ID %d."
-msgstr "cupsfilter: el treball %d no és vàlid."
+msgstr "cupsfilter: l'ID del treball %d no és vàlid."
 
 #: scheduler/cupsfilter.c:342
 msgid "cupsfilter: Only one filename can be specified."
@@ -9166,71 +9353,71 @@ msgstr "insereix_un_full"
 #: tools/ippeveprinter.c:4850
 #, c-format
 msgid "ippeveprinter: Unable to open \"%s\": %s on line %d."
-msgstr ""
+msgstr "ippeveprinter: no s'ha pogut obrir «%s»: %s a la línia %d."
 
 #: tools/ippfind.c:2478
 #, c-format
 msgid "ippfind: Bad regular expression: %s"
-msgstr ""
+msgstr "ippfind: expressió regular incorrecta: %s"
 
 #: tools/ippfind.c:295
 msgid "ippfind: Cannot use --and after --or."
-msgstr ""
+msgstr "ippfind: no es pot usar --and després de --or."
 
 #: tools/ippfind.c:580
 #, c-format
 msgid "ippfind: Expected key name after %s."
-msgstr ""
+msgstr "ippfind: s'esperava un nom de clau després de %s."
 
 #: tools/ippfind.c:530 tools/ippfind.c:725
 #, c-format
 msgid "ippfind: Expected port range after %s."
-msgstr ""
+msgstr "ippfind: s'esperava un interval de ports després de %s."
 
 #: tools/ippfind.c:328
 #, c-format
 msgid "ippfind: Expected program after %s."
-msgstr ""
+msgstr "ippfind: s'esperava un programa després de %s."
 
 #: tools/ippfind.c:345
 #, c-format
 msgid "ippfind: Expected semi-colon after %s."
-msgstr ""
+msgstr "ippfind: s'esperava un punt i coma després de %s."
 
 #: tools/ippfind.c:1981
 msgid "ippfind: Missing close brace in substitution."
-msgstr ""
+msgstr "ippfind: falta el claudàtor de tancament a la substitució."
 
 #: tools/ippfind.c:1044
 msgid "ippfind: Missing close parenthesis."
-msgstr ""
+msgstr "ippfind: falta el parèntesis de tancament."
 
 #: tools/ippfind.c:302
 msgid "ippfind: Missing expression before \"--and\"."
-msgstr ""
+msgstr "ippfind: falta una expressió abans de «--and»."
 
 #: tools/ippfind.c:427
 msgid "ippfind: Missing expression before \"--or\"."
-msgstr ""
+msgstr "ippfind: falta una expressió abans de «--or»."
 
 #: tools/ippfind.c:862
 #, c-format
 msgid "ippfind: Missing key name after %s."
-msgstr ""
+msgstr "ippfind: falta un nom de clau després de %s."
 
 #: tools/ippfind.c:396 tools/ippfind.c:712
 #, c-format
 msgid "ippfind: Missing name after %s."
-msgstr ""
+msgstr "ippfind: falta un nom després de %s."
 
 #: tools/ippfind.c:1015
 msgid "ippfind: Missing open parenthesis."
-msgstr ""
+msgstr "ippfind: falta el parèntesis d'obertura."
 
 #: tools/ippfind.c:892
 #, c-format
 msgid "ippfind: Missing program after %s."
-msgstr ""
+msgstr "ippfind: falta un programa després de %s."
 
 #: tools/ippfind.c:314 tools/ippfind.c:368 tools/ippfind.c:409
 #: tools/ippfind.c:515 tools/ippfind.c:597 tools/ippfind.c:612
@@ -9238,83 +9425,83 @@ msgstr ""
 #: tools/ippfind.c:877
 #, c-format
 msgid "ippfind: Missing regular expression after %s."
-msgstr ""
+msgstr "ippfind: falta una expressió regular després de %s."
 
 #: tools/ippfind.c:910
 #, c-format
 msgid "ippfind: Missing semi-colon after %s."
-msgstr ""
+msgstr "ippfind: falta un punt i coma després de %s."
 
 #: tools/ippfind.c:1928 tools/ippfind.c:1953
 msgid "ippfind: Out of memory."
-msgstr ""
+msgstr "ippfind: memòria exhaurida."
 
 #: tools/ippfind.c:988
 msgid "ippfind: Too many parenthesis."
-msgstr ""
+msgstr "ippfind: hi ha masses parèntesis."
 
 #: tools/ippfind.c:1287 tools/ippfind.c:1415 tools/ippfind.c:2570
 #, c-format
 msgid "ippfind: Unable to browse or resolve: %s"
-msgstr ""
+msgstr "ippfind: no s'ha pogut explorar o resoldre: %s"
 
 #: tools/ippfind.c:2051 tools/ippfind.c:2078
 #, c-format
 msgid "ippfind: Unable to execute \"%s\": %s"
-msgstr ""
+msgstr "ippfind: no s'ha pogut executar «%s»: %s"
 
 #: tools/ippfind.c:1134 tools/ippfind.c:1142 tools/ippfind.c:1153
 #, c-format
 msgid "ippfind: Unable to use Bonjour: %s"
-msgstr ""
+msgstr "ippfind: no s'ha pogut usar Bonjour: %s"
 
 #: tools/ippfind.c:2010
 #, c-format
 msgid "ippfind: Unknown variable \"{%s}\"."
-msgstr ""
+msgstr "ippfind: variable desconeguda «{%s}»."
 
 #: tools/ipptool.c:566 tools/ipptool.c:588
 msgid ""
 "ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
 "and \"-X\"."
-msgstr ""
+msgstr "ipptool: «-i» i «-n» són incompatibles amb «--ippserver», «-P» i «-X»."
 
 #: tools/ipptool.c:351 tools/ipptool.c:422
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
-msgstr ""
+msgstr "ipptool: «-i» i «-n» són incompatibles amb «-P» i «-X»."
 
 #: tools/ipptool.c:634
 #, c-format
 msgid "ipptool: Bad URI \"%s\"."
-msgstr ""
+msgstr "ipptool: L'URI «%s» és incorrecte."
 
 #: tools/ipptool.c:559
 msgid "ipptool: Invalid seconds for \"-i\"."
-msgstr "ipptool: els segons de «-i» no són correctes."
+msgstr "ipptool: els segons per a «-i» no són vàlids."
 
 #: tools/ipptool.c:623
 msgid "ipptool: May only specify a single URI."
-msgstr "ipptool: heu d'especificar només un URI."
+msgstr "ipptool: només heu d'especificar un URI."
 
 #: tools/ipptool.c:580
 msgid "ipptool: Missing count for \"-n\"."
-msgstr "ipptool: falta el comptador de «-n»."
+msgstr "ipptool: falta el comptador per a «-n»."
 
 #: tools/ipptool.c:268
 msgid "ipptool: Missing filename for \"--ippserver\"."
-msgstr ""
+msgstr "ipptool: falta un nom de fitxer per a «--ippserver»."
 
 #: tools/ipptool.c:456
 msgid "ipptool: Missing filename for \"-f\"."
-msgstr "ipptool: falta el nom del fitxer a «-f»."
+msgstr "ipptool: falta un nom de fitxer per a «-f»."
 
 #: tools/ipptool.c:437
 msgid "ipptool: Missing name=value for \"-d\"."
-msgstr "ipptool: falta nom=valor a «-d»."
+msgstr "ipptool: falta nom=valor per a «-d»."
 
 #: tools/ipptool.c:551
 msgid "ipptool: Missing seconds for \"-i\"."
-msgstr "ipptool: falten els segons a «-i»."
+msgstr "ipptool: falten els segons per a «-i»."
 
 #: tools/ipptool.c:649
 msgid "ipptool: URI required before test file."
@@ -10221,11 +10408,12 @@ msgstr "lpadmin: el nom de la classe només pot tenir caràcters imprimibles."
 #: systemv/lpadmin.c:213
 #, c-format
 msgid "lpadmin: Expected PPD after \"-%c\" option."
-msgstr ""
+msgstr "lpadmin: s'esperava un PPD després de l'opció «-%c»."
 
 #: systemv/lpadmin.c:459
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
-msgstr "lpadmin: s'esperava allow/deny:llistausuaris després de l'opció «-u»."
+msgstr ""
+"lpadmin: s'esperava «allow/deny:llista_usuaris» després de l'opció «-u»."
 
 #: systemv/lpadmin.c:369
 msgid "lpadmin: Expected class after \"-r\" option."
@@ -10245,7 +10433,7 @@ msgstr "lpadmin: s'esperava un URI de dispositiu després de l'opció «-v»."
 
 #: systemv/lpadmin.c:566
 msgid "lpadmin: Expected file type(s) after \"-I\" option."
-msgstr "lpadmin: s'esperava un(s) tipus de fitxer(s) després de l'opció «-I»."
+msgstr "lpadmin: s'esperava un/s tipus de fitxer després de l'opció «-I»."
 
 #: systemv/lpadmin.c:192
 msgid "lpadmin: Expected hostname after \"-h\" option."
@@ -10265,7 +10453,7 @@ msgstr "lpadmin: s'esperava un nom després de l'opció «-R»."
 
 #: systemv/lpadmin.c:302
 msgid "lpadmin: Expected name=value after \"-o\" option."
-msgstr "lpadmin: s'esperava nom=valor després de l'opció «-o»."
+msgstr "lpadmin: s'esperava un nom=valor després de l'opció «-o»."
 
 #: systemv/lpadmin.c:322
 msgid "lpadmin: Expected printer after \"-p\" option."
@@ -10277,7 +10465,7 @@ msgstr "lpadmin: s'esperava un nom d'impressora després de l'opció «-d»."
 
 #: systemv/lpadmin.c:522
 msgid "lpadmin: Expected printer or class after \"-x\" option."
-msgstr "lpadmin: s'esperava un impressora o classe després de l'opció «-x»."
+msgstr "lpadmin: s'esperava una impressora o classe després de l'opció «-x»."
 
 #: systemv/lpadmin.c:958
 msgid "lpadmin: No member names were seen."
@@ -10298,6 +10486,8 @@ msgid ""
 "lpadmin: Printer drivers are deprecated and will stop working in a future "
 "version of CUPS."
 msgstr ""
+"lpadmin: els controladors de la impressora estan obsolets i deixaran de"
+" funcionar en una futura versió de CUPS."
 
 #: systemv/lpadmin.c:164 systemv/lpadmin.c:331 systemv/lpadmin.c:531
 msgid "lpadmin: Printer name can only contain printable characters."
@@ -10309,16 +10499,20 @@ msgid ""
 "lpadmin: Raw queues are deprecated and will stop working in a future version "
 "of CUPS."
 msgstr ""
+"lpadmin: posar a la cua en RAW està obsolet i deixarà de funcionar en una"
+" futura versió de CUPS."
 
 #: systemv/lpadmin.c:616
 msgid "lpadmin: Raw queues are no longer supported on macOS."
-msgstr ""
+msgstr "lpadmin: posar a la cua en RAW ja no està admès a macOS."
 
 #: systemv/lpadmin.c:231
 msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
 "reasons."
 msgstr ""
+"lpadmin: els scripts amb interfície System V ja no estan admesos per motius"
+" de seguretat."
 
 #: systemv/lpadmin.c:97
 msgid ""
@@ -10326,14 +10520,14 @@ msgid ""
 "         You must specify a printer name first."
 msgstr ""
 "lpadmin: no s'ha pogut afegir una impressora a la classe:\n"
-"         Primer heu d'especificar un nom d'impressora."
+"         Primer haureu d'especificar un nom d'impressora."
 
 #: systemv/lpadmin.c:89 systemv/lpadmin.c:139 systemv/lpadmin.c:261
 #: systemv/lpadmin.c:344 systemv/lpadmin.c:393 systemv/lpadmin.c:505
 #: systemv/lpadmin.c:656
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s"
-msgstr "lpadmin: no s'ha pogut connectar al servidor: %s"
+msgstr "lpadmin: no s'ha pogut connectar amb el servidor: %s"
 
 #: systemv/lpadmin.c:1442
 msgid "lpadmin: Unable to create temporary file"
@@ -10345,25 +10539,25 @@ msgid ""
 "         You must specify a printer name first."
 msgstr ""
 "lpadmin: no s'ha pogut suprimir l'opció:\n"
-"         Primer heu d'especificar un nom d'impressora."
+"         Primer haureu d'especificar un nom d'impressora."
 
 #: systemv/lpadmin.c:1453
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s"
-msgstr ""
+msgstr "lpadmin: no s'ha pogut obrir el PPD «%s»: %s"
 
 #: systemv/lpadmin.c:1433
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
-msgstr ""
+msgstr "lpadmin: no s'ha pogut obrir el PPD «%s»: %s a la línia %d."
 
 #: systemv/lpadmin.c:353
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
 "         You must specify a printer name first."
 msgstr ""
-"lpadmin: no es pot eliminar una impressora des de la classe:\n"
-"         Primer heu d'especificar un nom d'impressora."
+"lpadmin: no s'ha pogut eliminar una impressora des de la classe:\n"
+"         Primer haureu d'especificar un nom d'impressora."
 
 #: systemv/lpadmin.c:645
 msgid ""
@@ -10371,12 +10565,12 @@ msgid ""
 "         You must specify a printer name first."
 msgstr ""
 "lpadmin: no s'han pogut establir les opcions de la impressora:\n"
-"         Primer heu d'especificar un nom d'impressora."
+"         Primer haureu d'especificar un nom d'impressora."
 
 #: systemv/lpadmin.c:472
 #, c-format
 msgid "lpadmin: Unknown allow/deny option \"%s\"."
-msgstr "lpadmin: l'opció allow/deny «%s» és desconeguda."
+msgstr "lpadmin: l'opció «allow/deny» de «%s» és desconeguda."
 
 #: systemv/lpadmin.c:601
 #, c-format
@@ -10390,7 +10584,7 @@ msgstr "lpadmin: l'opció «%c» és desconeguda."
 
 #: systemv/lpadmin.c:622
 msgid "lpadmin: Use the 'everywhere' model for shared printers."
-msgstr ""
+msgstr "lpadmin: usa el model «everywhere» per a les impressores compartides."
 
 #: systemv/lpadmin.c:570
 msgid "lpadmin: Warning - content type list ignored."
@@ -10416,7 +10610,7 @@ msgstr "lpinfo: s'esperava una marca i model després de «--make-and-model»."
 
 #: systemv/lpinfo.c:159
 msgid "lpinfo: Expected product string after \"--product\"."
-msgstr "lpinfo: s'esperava una cadena de producte després de «--product!»."
+msgstr "lpinfo: s'esperava una cadena de producte després de «--product»."
 
 #: systemv/lpinfo.c:96
 msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
@@ -10437,7 +10631,7 @@ msgstr "lpinfo: s'esperava un temps d'espera després de «--timeout»."
 #: systemv/lpmove.c:129
 #, c-format
 msgid "lpmove: Unable to connect to server: %s"
-msgstr "lpmove: no s'ha pogut connectar al servidor: %s"
+msgstr "lpmove: no s'ha pogut connectar amb el servidor: %s"
 
 #: systemv/lpmove.c:117
 #, c-format
@@ -10456,12 +10650,12 @@ msgstr "lpoptions: no s'ha pogut afegir la impressora o la instància: %s"
 #: systemv/lpoptions.c:492 systemv/lpoptions.c:501
 #, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s"
-msgstr "lpoptions: no s'ha pogut obtenir el fitxer PPD de %s: %s"
+msgstr "lpoptions: no s'ha pogut obtenir el fitxer PPD per a %s: %s"
 
 #: systemv/lpoptions.c:511
 #, c-format
 msgid "lpoptions: Unable to open PPD file for %s."
-msgstr "lpoptions: no s'ha pogut obrir el fitxer PPD per %s."
+msgstr "lpoptions: no s'ha pogut obrir el fitxer PPD per a %s."
 
 #: systemv/lpoptions.c:95
 msgid "lpoptions: Unknown printer or class."
@@ -13426,7 +13620,7 @@ msgstr ""
 
 #: scheduler/ipp.c:5872
 msgid "notify-events not specified."
-msgstr "no s'ha especificat cap notify-events."
+msgstr "no s'ha especificat cap «notify-events»."
 
 #. TRANSLATORS: Document Completed
 #: locale/ipp-strings.c:2298
@@ -13566,12 +13760,12 @@ msgstr ""
 #: scheduler/ipp.c:2034 scheduler/ipp.c:5758
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" is already used."
-msgstr "L'URI de notify-recipient-uri «%s» ja s'ha fet servir."
+msgstr "L'URI de «notify-recipient-uri» «%s» ja s'ha fet servir."
 
 #: scheduler/ipp.c:2024 scheduler/ipp.c:5748
 #, c-format
 msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
-msgstr "L'URI de notify-recipient-uri «%s» fa servir un esquema desconegut."
+msgstr "L'URI de «notify-recipient-uri» «%s» fa servir un esquema desconegut."
 
 #. TRANSLATORS: Notify Sequence Numbers
 #: locale/ipp-strings.c:2352
@@ -14005,7 +14199,7 @@ msgstr "ppdc: s'afegeix el directori inclòs «%s»."
 #: ppdc/ppdpo.cxx:124
 #, c-format
 msgid "ppdc: Adding/updating UI text from %s."
-msgstr "ppdc: s'afegeix/actualitza el text de l'UI des de %s."
+msgstr "ppdc: s'afegeix/actualitza el text de la IU des de %s."
 
 #: ppdc/ppdc-source.cxx:362
 #, c-format
@@ -14020,18 +14214,18 @@ msgstr "ppdc: l'atribut del tipus de lletra és incorrecte: %s"
 #: ppdc/ppdc-source.cxx:1748
 #, c-format
 msgid "ppdc: Bad resolution name \"%s\" on line %d of %s."
-msgstr "ppdc: el nom de resolució «%s» de la línia %d de %s és incorrecte."
+msgstr "ppdc: el nom de resolució «%s» a la línia %d de %s és incorrecte."
 
 #: ppdc/ppdc-source.cxx:1065
 #, c-format
 msgid "ppdc: Bad status keyword %s on line %d of %s."
-msgstr "ppdc: la paraula clau d'estat %s de la línia %d de %s és incorrecta."
+msgstr "ppdc: la paraula clau d'estat %s a la línia %d de %s és incorrecta."
 
 #: ppdc/ppdc-source.cxx:1985
 #, c-format
 msgid "ppdc: Bad variable substitution ($%c) on line %d of %s."
 msgstr ""
-"ppdc: la variable de substitució ($%c) de la línia %d de %s és incorrecta."
+"ppdc: la variable de substitució ($%c) a la línia %d de %s és incorrecta."
 
 #: ppdc/ppdc-source.cxx:2671
 #, c-format
@@ -14080,46 +14274,47 @@ msgstr "ppdc: s'esperava un nom/text d'elecció a la línia %d de %s."
 #, c-format
 msgid "ppdc: Expected color order for ColorModel on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un ordre de colors per ColorModel a la línia %d de %s."
+"ppdc: s'esperava un ordre de colors per a «ColorModel» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:444
 #, c-format
 msgid "ppdc: Expected colorspace for ColorModel on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un espai de colors per ColorModel a la línia %d de %s."
+"ppdc: s'esperava un espai de color per a «ColorModel» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:466
 #, c-format
 msgid "ppdc: Expected compression for ColorModel on line %d of %s."
-msgstr "ppdc: s'esperava una compressió per ColorModel a la línia %d de %s."
+msgstr ""
+"ppdc: s'esperava una compressió per a «ColorModel» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:647
 #, c-format
 msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s."
 msgstr ""
-"ppdc: s'esperava una cadena de restriccions per UIConstraints a la línia %d "
-"de %s."
+"ppdc: s'esperava una cadena de restriccions per a «UIConstraints» a la línia "
+"%d de %s."
 
 #: ppdc/ppdc-source.cxx:2857
 #, c-format
 msgid ""
 "ppdc: Expected driver type keyword following DriverType on line %d of %s."
 msgstr ""
-"ppdc: s'esperava una paraula clau de tipus de controlador després de "
-"DriverType a la línia %d de %s."
+"ppdc: s'esperava una paraula clau per al tipus de controlador després de"
+" «DriverType» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:778
 #, c-format
 msgid "ppdc: Expected duplex type after Duplex on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un tipus de dúplex després de Duplex a la línia %d de %s."
+"ppdc: s'esperava un tipus dúplex després de «Duplex» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1029
 #, c-format
 msgid "ppdc: Expected encoding after Font on line %d of %s."
 msgstr ""
-"ppdc: s'esperava una codificació després de Tipus de lletra a la línia %d de "
-"%s."
+"ppdc: s'esperava una codificació després del Tipus de lletra a la línia %d de"
+" %s."
 
 #: ppdc/ppdc-source.cxx:1641
 #, c-format
@@ -14135,7 +14330,7 @@ msgstr "ppdc: s'esperava un nom/text de grup a la línia %d de %s."
 #: ppdc/ppdc-source.cxx:2570
 #, c-format
 msgid "ppdc: Expected include filename on line %d of %s."
-msgstr "ppdc: s'esperava un nom de fitxer d'inclusió a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom de fitxer a incloure a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1454
 #, c-format
@@ -14157,33 +14352,33 @@ msgstr "ppdc: s'esperava un nom després de %s a la línia %d de %s."
 #: ppdc/ppdc-source.cxx:3229
 #, c-format
 msgid "ppdc: Expected name after FileName on line %d of %s."
-msgstr "ppdc: s'esperava un nom després de FileName a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom després de «FileName» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1010
 #, c-format
 msgid "ppdc: Expected name after Font on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un nom després de Tipus de lletra a la línia %d de %s."
+"ppdc: s'esperava un nom després del Tipus de lletra a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:3060
 #, c-format
 msgid "ppdc: Expected name after Manufacturer on line %d of %s."
-msgstr "ppdc: s'esperava un nom després de Manufacturer a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom després de «Manufacturer» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:3093
 #, c-format
 msgid "ppdc: Expected name after MediaSize on line %d of %s."
-msgstr "ppdc: s'esperava un nom després de MediaSize a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom després de «MediaSize» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:3183
 #, c-format
 msgid "ppdc: Expected name after ModelName on line %d of %s."
-msgstr "ppdc: s'esperava un nom després de ModelName a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom després de «ModelName» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:3246
 #, c-format
 msgid "ppdc: Expected name after PCFileName on line %d of %s."
-msgstr "ppdc: s'esperava un nom després de PCFileName a la línia %d de %s."
+msgstr "ppdc: s'esperava un nom després de «PCFileName» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1108
 #, c-format
@@ -14194,20 +14389,20 @@ msgstr "ppdc: s'esperava un nom/text després de %s a la línia %d de %s."
 #, c-format
 msgid "ppdc: Expected name/text after Installable on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un nom/text després d'Installable a la línia %d de %s."
+"ppdc: s'esperava un nom/text després d'«Installable» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1734
 #, c-format
 msgid "ppdc: Expected name/text after Resolution on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un nom/text després de Resolution a la línia %d de %s."
+"ppdc: s'esperava un nom/text després de «Resolution» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:431
 #, c-format
 msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s."
 msgstr ""
-"ppdc: s'esperava una combinació de nom/text per ColorModel a la línia %d de "
-"%s."
+"ppdc: s'esperava una combinació de nom/text per a «ColorModel» a la línia %d"
+" de %s."
 
 #: ppdc/ppdc-source.cxx:1526
 #, c-format
@@ -14228,7 +14423,7 @@ msgstr "ppdc: s'esperava un tipus d'opció a la línia %d de %s."
 #, c-format
 msgid "ppdc: Expected override field after Resolution on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un camp de substitució després de Resolution a la línia %d "
+"ppdc: s'esperava un camp de substitució després de «Resolution» a la línia %d "
 "de %s."
 
 #: ppdc/ppdc-catalog.cxx:385 ppdc/ppdc-catalog.cxx:397
@@ -14239,14 +14434,14 @@ msgstr "ppdc: s'esperava una cadena entre cometes dobles a la línia %d de %s."
 #: ppdc/ppdc-source.cxx:956
 #, c-format
 msgid "ppdc: Expected real number on line %d of %s."
-msgstr "ppdc: s'esperava un número real a la línia %d de %s."
+msgstr "ppdc: s'esperava un nombre real a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:524
 #, c-format
 msgid ""
 "ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s."
 msgstr ""
-"ppdc: s'esperava una resolució/tipus de mitjà després de ColorProfile a la "
+"ppdc: s'esperava una resolució/tipus de mitjà després de «ColorProfile» a la "
 "línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1815
@@ -14255,7 +14450,7 @@ msgid ""
 "ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
 "of %s."
 msgstr ""
-"ppdc: s'esperava una resolució/tipus de mitjà després de SimpleColorProfile "
+"ppdc: s'esperava una resolució/tipus de paper després de «SimpleColorProfile» "
 "a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:313
@@ -14272,17 +14467,18 @@ msgstr ""
 #: ppdc/ppdc-source.cxx:2746
 #, c-format
 msgid "ppdc: Expected string after Copyright on line %d of %s."
-msgstr "ppdc: s'esperava una cadena després de Copyright a la línia %d de %s."
+msgstr ""
+"ppdc: s'esperava una cadena després de «Copyright» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:3349
 #, c-format
 msgid "ppdc: Expected string after Version on line %d of %s."
-msgstr "ppdc: s'esperava una cadena després de Version a la línia %d de %s."
+msgstr "ppdc: s'esperava una cadena després de «Version» a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:680
 #, c-format
 msgid "ppdc: Expected two option names on line %d of %s."
-msgstr "ppdc: s'esperava dos noms d'opció a la línia %d de %s."
+msgstr "ppdc: s'esperaven dos noms d'opció a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:324
 #, c-format
@@ -14308,13 +14504,14 @@ msgstr "ppdc: el cost del filtre no és vàlid a la línia %d de %s."
 #: ppdc/ppdc-source.cxx:916
 #, c-format
 msgid "ppdc: Invalid empty MIME type for filter on line %d of %s."
-msgstr "ppdc: el tipus MIME buit no és vàlid pel filtre a la línia %d de %s."
+msgstr ""
+"ppdc: el tipus MIME buit no és vàlid per al filtre a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:932
 #, c-format
 msgid "ppdc: Invalid empty program name for filter on line %d of %s."
 msgstr ""
-"ppdc: el nom de programa buit no és vàlid pel filtre a la línia %d de %s."
+"ppdc: un nom de programa buit no és vàlid per al filtre a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1580
 #, c-format
@@ -14329,7 +14526,8 @@ msgstr "ppdc: el tipus d'opció «%s» no és vàlid a la línia %d de %s."
 #: ppdc/ppdc.cxx:240 ppdc/ppdpo.cxx:111
 #, c-format
 msgid "ppdc: Loading driver information file \"%s\"."
-msgstr "ppdc: s'està carregant el fitxer d'informació del controlador «%s»."
+msgstr ""
+"ppdc: s'està carregant el fitxer «%s» per a la informació del controlador."
 
 #: ppdc/ppdc.cxx:176
 #, c-format
@@ -14339,7 +14537,7 @@ msgstr "ppdc: s'està carregant la configuració regional «%s»."
 #: ppdc/ppdc.cxx:115
 #, c-format
 msgid "ppdc: Loading messages from \"%s\"."
-msgstr "ppdc: s'està carregant els missatges des de «%s»."
+msgstr "ppdc: s'estan carregant els missatges des de «%s»."
 
 #: ppdc/ppdc-source.cxx:2363 ppdc/ppdc-source.cxx:2595
 #, c-format
@@ -14357,14 +14555,14 @@ msgstr "ppdc: falta un #if a la línia %d de %s."
 msgid ""
 "ppdc: Need a msgid line before any translation strings on line %d of %s."
 msgstr ""
-"oodc: es necessita un msgid abans de la cadena per traduir a la línia %d de "
-"%s."
+"ppdc: es necessita un msgid abans de qualsevol cadena de traducció a la línia"
+" %d de %s."
 
 #: ppdc/ppdc-driver.cxx:707
 #, c-format
 msgid "ppdc: No message catalog provided for locale %s."
 msgstr ""
-"ppdc: no s'ha donat el catàleg de missatges per a la configuració regional "
+"ppdc: no s'ha indicat un catàleg de missatges per a la configuració regional "
 "%s."
 
 #: ppdc/ppdc-source.cxx:1603 ppdc/ppdc-source.cxx:2834
@@ -14384,7 +14582,7 @@ msgstr ""
 #: ppdc/ppdc-source.cxx:657
 #, c-format
 msgid "ppdc: Option constraint must *name on line %d of %s."
-msgstr "ppdc: l'opció de restricció ha d'incloure *nom a la línia %d de %s."
+msgstr "ppdc: l'opció de restricció haurà d'incloure *nom a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:2446
 #, c-format
@@ -14404,7 +14602,7 @@ msgstr "ppdc: no s'ha pogut crear el directori de sortida %s: %s"
 #: ppdc/ppdc.cxx:276
 #, c-format
 msgid "ppdc: Unable to create output pipes: %s"
-msgstr "ppdc: no s'ha pogut crear els conductes de sortida: %s"
+msgstr "ppdc: no s'han pogut crear els conductes de sortida: %s"
 
 #: ppdc/ppdc.cxx:292 ppdc/ppdc.cxx:298
 #, c-format
@@ -14425,7 +14623,7 @@ msgstr ""
 #: ppdc/ppdc.cxx:187
 #, c-format
 msgid "ppdc: Unable to find localization for \"%s\" - %s"
-msgstr "ppdc: no s'ha pogut trobar la localització de «%s» - %s"
+msgstr "ppdc: no s'ha pogut trobar la localització per a «%s» - %s"
 
 #: ppdc/ppdc.cxx:124
 #, c-format
@@ -14440,7 +14638,7 @@ msgstr "ppdc: no s'ha pogut obrir %s: %s"
 #: ppdc/ppdc-source.cxx:2006
 #, c-format
 msgid "ppdc: Undefined variable (%s) on line %d of %s."
-msgstr "ppdc: la variable (%s) de la línia %d de %s no està definida."
+msgstr "ppdc: la variable (%s) a la línia %d de %s no està definida."
 
 #: ppdc/ppdc-catalog.cxx:479
 #, c-format
@@ -14450,41 +14648,41 @@ msgstr "ppdc: hi ha un text inesperat a la línia %d de %s."
 #: ppdc/ppdc-source.cxx:2876
 #, c-format
 msgid "ppdc: Unknown driver type %s on line %d of %s."
-msgstr "ppdc: el tipus de controlador %s de la línia %d de %s no és conegut."
+msgstr "ppdc: el tipus de controlador %s a la línia %d de %s no és conegut."
 
 #: ppdc/ppdc-source.cxx:858
 #, c-format
 msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s."
-msgstr "ppdc: el tipus de dúplex «%s» de la línia %d de %s no és conegut."
+msgstr "ppdc: el tipus dúplex «%s» a la línia %d de %s no és conegut."
 
 #: ppdc/ppdc-source.cxx:3106
 #, c-format
 msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
-msgstr "ppdc: la mida del paper «%s» de la línia %d de %s no és coneguda."
+msgstr "ppdc: la mida del paper «%s» a la línia %d de %s no és coneguda."
 
 #: ppdc/ppdc-catalog.cxx:507
 #, c-format
 msgid "ppdc: Unknown message catalog format for \"%s\"."
-msgstr "ppdc: el format del catàleg de missatges de «%s» no és conegut."
+msgstr "ppdc: el format del catàleg de missatges per a «%s» no és conegut."
 
 #: ppdc/ppdc-source.cxx:3360
 #, c-format
 msgid "ppdc: Unknown token \"%s\" seen on line %d of %s."
-msgstr "ppdc: el testimoni «%s» de la línia %d de %s no és conegut."
+msgstr "ppdc: el testimoni «%s» a la línia %d de %s no és conegut."
 
 #: ppdc/ppdc-source.cxx:966
 #, c-format
 msgid ""
 "ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s."
 msgstr ""
-"ppdc: els caràcters finals del número real «%s» de la línia %d de %s no són "
+"ppdc: els caràcters finals del número real «%s» a la línia %d de %s no són "
 "coneguts."
 
 #: ppdc/ppdc-source.cxx:2116
 #, c-format
 msgid "ppdc: Unterminated string starting with %c on line %d of %s."
 msgstr ""
-"ppdc: la cadena que comença per %c de la línia %d de %s no està acabada."
+"ppdc: la cadena que comença per %c a la línia %d de %s no està acabada."
 
 #: ppdc/ppdc.cxx:354
 #, c-format
@@ -14494,7 +14692,7 @@ msgstr "ppdc: Avís - se superposa el nom del fitxer «%s»."
 #: ppdc/ppdc.cxx:369
 #, c-format
 msgid "ppdc: Writing %s."
-msgstr "ppdc: s'escriu %s."
+msgstr "ppdc: s'està escrivint %s."
 
 #: ppdc/ppdc.cxx:137
 #, c-format
@@ -14504,7 +14702,7 @@ msgstr "ppdc: s'escriuen els fitxers PPD a la carpeta «%s»."
 #: ppdc/ppdmerge.cxx:126
 #, c-format
 msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s."
-msgstr "ppdmerge: LanguageVersion «%s» incorrecte a %s."
+msgstr "ppdmerge: el «LanguageVersion» «%s» és incorrecte a %s."
 
 #: ppdc/ppdmerge.cxx:163
 #, c-format
@@ -14514,7 +14712,7 @@ msgstr "ppdmerge: s'ignora el fitxer PPD %s."
 #: ppdc/ppdmerge.cxx:147
 #, c-format
 msgid "ppdmerge: Unable to backup %s to %s - %s"
-msgstr "ppdmerge: no s'ha pogut fer la còpia de seguretat %s a %s- %s"
+msgstr "ppdmerge: no s'ha pogut fer la còpia de seguretat %s a %s - %s"
 
 #. TRANSLATORS: Pre-dial String
 #: locale/ipp-strings.c:2520
