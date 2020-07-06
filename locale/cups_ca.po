@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2020-07-06 00:59+0200\n"
+"PO-Revision-Date: 2020-07-06 09:39+0200\n"
 "Last-Translator: Antoni Bella Pérez <antonibella5@yahoo.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -75,7 +75,7 @@ msgstr "\tTipus de contingut: qualsevol"
 
 #: systemv/lpstat.c:1879 systemv/lpstat.c:1998
 msgid "\tDefault page size:"
-msgstr "\tMida de la pàgina per defecte:"
+msgstr "\tMida predeterminada de la pàgina:"
 
 #: systemv/lpstat.c:1878 systemv/lpstat.c:1997
 msgid "\tDefault pitch:"
@@ -968,7 +968,8 @@ msgstr ""
 #: systemv/cupstestppd.c:342
 #, c-format
 msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
-msgstr "      **FALLADA** No es pot obrir el fitxer PPD -%s a la línia %d-."
+msgstr ""
+"      **FALLADA** No s'ha pogut obrir el fitxer PPD - %s a la línia %d."
 
 #: systemv/cupstestppd.c:1475
 #, c-format
@@ -1349,9 +1350,8 @@ msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 8011 section "
 "5.1.9)."
 msgstr ""
-"«%s»: valor incorrecte de la «naturalLanguage» «%s» - caràcters incorrectes"
-" (RFC 8011 secció "
-"5.1.9)."
+"«%s»: valor incorrecte de «naturalLanguage» «%s» - caràcters incorrectes (RFC "
+"8011 secció 5.1.9)."
 
 #: cups/ipp.c:5149
 #, c-format
@@ -1359,16 +1359,16 @@ msgid ""
 "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.9)."
 msgstr ""
-"«%s»: valor incorrecte de la «naturalLanguage» «%s» - longitud incorrecta %d"
-" (RFC 8011 secció 5.1.9)."
+"«%s»: valor incorrecte de «naturalLanguage» «%s» - longitud incorrecta %d "
+"(RFC 8011 secció 5.1.9)."
 
 #: cups/ipp.c:4790
 #, c-format
 msgid ""
 "\"%s\": Bad octetString value - bad length %d (RFC 8011 section 5.1.20)."
 msgstr ""
-"«%s»: valor incorrecte de la «octetString» - longitud incorrecta %d (RFC 8011"
-" secció 5.1.20)."
+"«%s»: valor incorrecte de «octetString» - longitud incorrecta %d (RFC 8011 "
+"secció 5.1.20)."
 
 #: cups/ipp.c:4885
 #, c-format
@@ -1383,8 +1383,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 8011 section "
 "5.1.16)."
 msgstr ""
-"«%s»: valor incorrecte de la resolució %dx%d%s - valor incorrecte de les"
-" unitats (RFC 8011 secció 5.1.16)."
+"«%s»: valor incorrecte de la resolució %dx%d%s - valor incorrecte de les "
+"unitats (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4862
 #, c-format
@@ -1392,8 +1392,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
 "positive (RFC 8011 section 5.1.16)."
 msgstr ""
-"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de"
-" l'alimentació creuada haurà de ser positiva (RFC 8011 secció 5.1.16)."
+"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de "
+"l'alimentació creuada haurà de ser positiva (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4868
 #, c-format
@@ -1401,8 +1401,8 @@ msgid ""
 "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
 "8011 section 5.1.16)."
 msgstr ""
-"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de"
-" l'alimentació haurà de ser positiva (RFC 8011 secció 5.1.16)."
+"«%s»: valor incorrecte de la resolució %dx%d%s - la resolució de "
+"l'alimentació haurà de ser positiva (RFC 8011 secció 5.1.16)."
 
 #: cups/ipp.c:4946
 #, c-format
@@ -1433,16 +1433,16 @@ msgstr ""
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 8011 section 5.1.7)."
 msgstr ""
-"«%s»: valor incorrecte de la «uriScheme» «%s» - caràcters incorrectes (RFC"
-" 8011 secció 5.1.7)."
+"«%s»: valor incorrecte de «uriScheme» «%s» - caràcters incorrectes (RFC 8011 "
+"secció 5.1.7)."
 
 #: cups/ipp.c:5078
 #, c-format
 msgid ""
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 8011 section 5.1.7)."
 msgstr ""
-"«%s»: valor incorrecte de la «uriScheme» «%s» - longitud incorrecta %d (RFC"
-" 8011 secció 5.1.7)."
+"«%s»: valor incorrecte de «uriScheme» «%s» - longitud incorrecta %d (RFC 8011 "
+"secció 5.1.7)."
 
 #: scheduler/ipp.c:365
 msgid "\"requesting-user-name\" attribute in wrong group."
@@ -1766,12 +1766,13 @@ msgstr "%s: Error - hi ha massa fitxers - «%s»."
 #: berkeley/lpr.c:303 systemv/lp.c:532
 #, c-format
 msgid "%s: Error - unable to access \"%s\" - %s"
-msgstr "%s: Error - no es pot accedir a «%s» - %s"
+msgstr "%s: Error - no s'ha pogut accedir a «%s» - %s"
 
 #: berkeley/lpr.c:398 systemv/lp.c:621
 #, c-format
 msgid "%s: Error - unable to queue from stdin - %s."
-msgstr "%s: Error - no es pot posar en cua des de l'entrada estàndard - %s."
+msgstr ""
+"%s: Error - no s'ha pogut posar en cua des de l'entrada estàndard - %s."
 
 #: berkeley/lprm.c:92 berkeley/lprm.c:179 systemv/cancel.c:227
 #, c-format
@@ -4005,7 +4006,7 @@ msgstr "B9"
 #: scheduler/ipp.c:7504
 #, c-format
 msgid "Bad \"printer-id\" value %d."
-msgstr "El valor %d de la «printer-id» és incorrecte."
+msgstr "El valor %d de «printer-id» és incorrecte."
 
 #: scheduler/ipp.c:10336
 #, c-format
@@ -4015,7 +4016,7 @@ msgstr "El valor «%s» és incorrecte."
 #: scheduler/ipp.c:11284
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
-msgstr "El valor «%s» de la «document-format» és incorrecte."
+msgstr "El valor «%s» de «document-format» és incorrecte."
 
 #: cups/ppd.c:307
 msgid "Bad CloseUI/JCLCloseUI"
@@ -4114,28 +4115,28 @@ msgstr "L'amfitrió/adreça a l'URI són incorrectes"
 #: scheduler/ipp.c:1554
 #, c-format
 msgid "Bad job-name value: %s"
-msgstr "El valor de la «job-name» és incorrecte: %s"
+msgstr "El valor de «job-name» és incorrecte: %s"
 
 #: scheduler/ipp.c:1540
 msgid "Bad job-name value: Wrong type or count."
-msgstr "El valor de la «job-name» és incorrecte: Tipus o recompte incorrecte."
+msgstr "El valor de «job-name» és incorrecte: Tipus o recompte incorrecte."
 
 #: scheduler/ipp.c:10374
 msgid "Bad job-priority value."
-msgstr "El valor de la «job-priority» és incorrecte."
+msgstr "El valor de «job-priority» és incorrecte."
 
 #: scheduler/ipp.c:1402
 #, c-format
 msgid "Bad job-sheets value \"%s\"."
-msgstr "El valor «%s» de la job-sheets és incorrecte."
+msgstr "El valor «%s» de «job-sheets» és incorrecte."
 
 #: scheduler/ipp.c:1386
 msgid "Bad job-sheets value type."
-msgstr "El tipus de valor de la «job-sheets» és incorrecte."
+msgstr "El tipus de valor de «job-sheets» és incorrecte."
 
 #: scheduler/ipp.c:10404
 msgid "Bad job-state value."
-msgstr "El valor de la «job-state» és incorrecte."
+msgstr "El valor de «job-state» és incorrecte."
 
 #: scheduler/ipp.c:3006 scheduler/ipp.c:3468 scheduler/ipp.c:6253
 #: scheduler/ipp.c:6400 scheduler/ipp.c:7912 scheduler/ipp.c:8184
@@ -4163,12 +4164,12 @@ msgstr "La «notify-user-data» «%s» és incorrecte."
 #: scheduler/ipp.c:1418
 #, c-format
 msgid "Bad number-up value %d."
-msgstr "El valor de la «number-up» %d és incorrecte."
+msgstr "El valor de «number-up» %d és incorrecte."
 
 #: scheduler/ipp.c:1435
 #, c-format
 msgid "Bad page-ranges values %d-%d."
-msgstr "Els valors de la «page-ranges» %d-%d són incorrectes."
+msgstr "Els valors de «page-ranges» %d-%d són incorrectes."
 
 #: cups/http-support.c:1617
 msgid "Bad port number in URI"
@@ -4182,7 +4183,7 @@ msgstr "La «port-monitor» «%s» és incorrecta."
 #: scheduler/ipp.c:2537
 #, c-format
 msgid "Bad printer-state value %d."
-msgstr "El valor %d de la «printer-state» és incorrecte."
+msgstr "El valor %d de «printer-state» és incorrecte."
 
 #: cups/dest.c:678 cups/dest.c:1245
 msgid "Bad printer-uri."
@@ -4949,7 +4950,7 @@ msgstr "L'atribut de l'IPP no és un membre del missatge."
 
 #: cups/ipp.c:3507
 msgid "IPP begCollection value not 0 bytes."
-msgstr "El valor de la «begColletion» de l'IPP no té 0 bytes."
+msgstr "El valor de «begColletion» de l'IPP no té 0 bytes."
 
 #: cups/ipp.c:3285
 msgid "IPP boolean value not 1 byte."
@@ -4957,11 +4958,11 @@ msgstr "El valor booleà de l'IPP no té 1 byte."
 
 #: cups/ipp.c:3350
 msgid "IPP date value not 11 bytes."
-msgstr "El valor de la «date» de l'IPP no té 11 bytes."
+msgstr "El valor de «date» de l'IPP no té 11 bytes."
 
 #: cups/ipp.c:3528
 msgid "IPP endCollection value not 0 bytes."
-msgstr "El valor de la «endColletion» de l'IPP no té 0 bytes."
+msgstr "El valor de «endColletion» de l'IPP no té 0 bytes."
 
 #: cups/ipp.c:3260
 msgid "IPP enum value not 4 bytes."
@@ -4989,7 +4990,7 @@ msgstr "El nom del membre de l'IPP no està buit."
 
 #: cups/ipp.c:3554
 msgid "IPP memberName value is empty."
-msgstr "El valor de la «memberName» de l'IPP està buit."
+msgstr "El valor de «memberName» de l'IPP està buit."
 
 #: cups/ipp.c:3546
 msgid "IPP memberName with no attribute."
@@ -5002,20 +5003,20 @@ msgstr "El nom de l'IPP és més llarg que 32767 bytes."
 #: cups/ipp.c:3427
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr ""
-"El valor de la «nameWithLanguage» de l'IPP és més petit que el mínim, 4 "
+"El valor de «nameWithLanguage» de l'IPP és més petit que el mínim, 4 "
 "bytes."
 
 #: cups/ipp.c:3585
 msgid "IPP octetString length too large."
-msgstr "La longitud de la «octetString» de l'IPP és massa gran."
+msgstr "La longitud de «octetString» de l'IPP és massa gran."
 
 #: cups/ipp.c:3395
 msgid "IPP rangeOfInteger value not 8 bytes."
-msgstr "El valor de la «rangeOfInteger» de l'IPP no té 8 bytes."
+msgstr "El valor de «rangeOfInteger» de l'IPP no té 8 bytes."
 
 #: cups/ipp.c:3368
 msgid "IPP resolution value not 9 bytes."
-msgstr "El valor de la «resolution» de l'IPP no té 9 bytes."
+msgstr "El valor de «resolution» de l'IPP no té 9 bytes."
 
 #: cups/ipp.c:3487
 msgid "IPP string length overflows value."
@@ -5024,8 +5025,7 @@ msgstr "El valor de la longitud de la cadena de l'IPP desborda."
 #: cups/ipp.c:3423
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr ""
-"EL valor de la «textWithLanguage» de l'IPP és més petit que el mínim, 4 "
-"bytes."
+"EL valor de «textWithLanguage» de l'IPP és més petit que el mínim, 4 bytes."
 
 #: cups/ipp.c:3243
 msgid "IPP value larger than 32767 bytes."
@@ -5145,7 +5145,7 @@ msgstr "L'atribut de l'IPP amb nom no és vàlid a la col·lecció."
 
 #: scheduler/ipp.c:2705 scheduler/ipp.c:7045
 msgid "Invalid ppd-name value."
-msgstr "El valor de la «ppd-name» no és vàlid."
+msgstr "El valor de «ppd-name» no és vàlid."
 
 #: filter/commandtops.c:108
 #, c-format
@@ -6314,7 +6314,7 @@ msgstr ""
 #: scheduler/ipp.c:2080 scheduler/ipp.c:5804
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)."
-msgstr "El valor de la «notify-user-data» és massa gran (%d > 63 octets)."
+msgstr "El valor de «notify-user-data» és massa gran (%d > 63 octets)."
 
 #: backend/ipp.c:992
 msgid "The printer configuration is incorrect or the printer no longer exists."
@@ -6602,8 +6602,8 @@ msgstr "No s'ha pogut connectar amb l'amfitrió."
 #: backend/usb-unix.c:103
 msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
-"No s'ha pogut contactar amb la impressora. Es posa a la cua de la següent"
-" impressora a la classe."
+"No s'ha pogut contactar amb la impressora. Es posa a la cua de la següent "
+"impressora a la classe."
 
 #: scheduler/ipp.c:2676
 #, c-format
@@ -6633,8 +6633,7 @@ msgstr "No s'han pogut crear les credencials del servidor."
 #: tools/ippeveprinter.c:664
 #, c-format
 msgid "Unable to create spool directory \"%s\": %s"
-msgstr ""
-"No ha estat possible crear el directori «%s» per a la gestió de cues: %s"
+msgstr "No s'ha pogut crear el directori «%s» per a la gestió de cues: %s"
 
 #: cgi-bin/admin.c:1542 cgi-bin/admin.c:1554 scheduler/cupsfilter.c:1284
 msgid "Unable to create temporary file"
@@ -7653,7 +7652,7 @@ msgstr "cupsctl: no es pot establir %s directament."
 #: systemv/cupsctl.c:183
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
-msgstr "cupsctl: no es pot connectar amb el servidor: %s"
+msgstr "cupsctl: no s'ha pogut connectar amb el servidor: %s"
 
 #: systemv/cupsctl.c:226
 #, c-format
@@ -7687,7 +7686,7 @@ msgstr "cupsd: no es permet el nom de fitxer relatiu cups-files.conf."
 
 #: scheduler/main.c:205 scheduler/main.c:212
 msgid "cupsd: Unable to get current directory."
-msgstr "cupsd: no es pot obtenir el directori actual."
+msgstr "cupsd: no s'ha pogut obtenir el directori actual."
 
 #: scheduler/main.c:340 scheduler/main.c:350
 msgid "cupsd: Unable to get path to cups-files.conf file."
@@ -7720,7 +7719,7 @@ msgstr "cupsfilter: només es pot especificar un nom de fitxer."
 #: scheduler/cupsfilter.c:1299
 #, c-format
 msgid "cupsfilter: Unable to get job file - %s"
-msgstr "cupsfilter: no es pot obtenir el fitxer del treball - %s"
+msgstr "cupsfilter: no s'ha pogut obtenir el fitxer del treball - %s"
 
 #: systemv/cupstestppd.c:238
 msgid "cupstestppd: The -q option is incompatible with the -v option."
@@ -15022,7 +15021,7 @@ msgstr ""
 #: systemv/lpstat.c:1780
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
-msgstr "la impressora %s està inactiva. Està activada des de %s"
+msgstr "la impressora %s està inactiva. Està habilitada des de %s"
 
 #: systemv/lpstat.c:1783
 #, c-format
@@ -15037,12 +15036,12 @@ msgstr "la impressora %s/%s està inhabilitada des de %s -"
 #: systemv/lpstat.c:1890
 #, c-format
 msgid "printer %s/%s is idle.  enabled since %s"
-msgstr "la impressora %s/%s està inactiva. Està activada des de %s"
+msgstr "la impressora %s/%s està inactiva. Està habilitada des de %s"
 
 #: systemv/lpstat.c:1897
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s"
-msgstr "la impressora %s/%s està imprimint %s-%d. Està activada des de %s"
+msgstr "la impressora %s/%s està imprimint %s-%d. Està habilitada des de %s"
 
 #. TRANSLATORS: Printer Kind
 #: locale/ipp-strings.c:2638
@@ -19170,7 +19169,7 @@ msgstr "l'identificador de la petició és %s-%d (%d fitxer(s))"
 
 #: cups/snmp.c:974
 msgid "request-id uses indefinite length"
-msgstr "la request-id fa servir una longitud sense definir"
+msgstr "la «request-id» fa servir una longitud sense definir"
 
 #. TRANSLATORS: Requested Attributes
 #: locale/ipp-strings.c:4284
@@ -19297,7 +19296,7 @@ msgstr "stat de %s ha fallat: %s"
 
 #: berkeley/lpc.c:197
 msgid "status\t\tShow status of daemon and queue."
-msgstr "status\t\tmostra l'estat del dimoni i la cua."
+msgstr "status\t\tMostra l'estat del dimoni i la gestió de la cua."
 
 #. TRANSLATORS: Status Message
 #: locale/ipp-strings.c:4328
@@ -19436,17 +19435,17 @@ msgstr ""
 #: systemv/lpstat.c:1077
 #, c-format
 msgid "system default destination: %s"
-msgstr "destinació per defecte del sistema: %s"
+msgstr "destinació predeterminada del sistema: %s"
 
 #: systemv/lpstat.c:1074
 #, c-format
 msgid "system default destination: %s/%s"
-msgstr "destinació per defecte del sistema: %s/%s"
+msgstr "destinació predeterminada del sistema: %s/%s"
 
 #. TRANSLATORS: T33 Subaddress
 #: locale/ipp-strings.c:4380
 msgid "t33-subaddress"
-msgstr "T33 Subaddress"
+msgstr ""
 
 #. TRANSLATORS: To Name
 #: locale/ipp-strings.c:4382
@@ -19652,11 +19651,11 @@ msgstr "desplaçament_Z"
 
 #: tools/ippfind.c:2814
 msgid "{service_domain}        Domain name"
-msgstr "{service_domain}        Nom del domini"
+msgstr "{service_domain}        Nom de domini"
 
 #: tools/ippfind.c:2815
 msgid "{service_hostname}      Fully-qualified domain name"
-msgstr ""
+msgstr "{service_hostname}      Nom de domini completament qualificat"
 
 #: tools/ippfind.c:2816
 msgid "{service_name}          Service instance name"
@@ -19668,11 +19667,11 @@ msgstr "{service_port}          Número de port"
 
 #: tools/ippfind.c:2818
 msgid "{service_regtype}       DNS-SD registration type"
-msgstr ""
+msgstr "{service_regtype}       Tipus de registre de DNS-SD"
 
 #: tools/ippfind.c:2819
 msgid "{service_scheme}        URI scheme"
-msgstr ""
+msgstr "{service_scheme}        Esquema de l'URI"
 
 #: tools/ippfind.c:2820
 msgid "{service_uri}           URI"
@@ -19680,7 +19679,7 @@ msgstr "{service_uri}           URI"
 
 #: tools/ippfind.c:2821
 msgid "{txt_*}                 Value of TXT record key"
-msgstr ""
+msgstr "{txt_*}                 Valor de la clau de registre en TXT"
 
 #: tools/ippfind.c:2813
 msgid "{}                      URI"
@@ -19689,6 +19688,8 @@ msgstr "{}                      URI"
 #: cups/dest.c:1863
 msgid "~/.cups/lpoptions file names default destination that does not exist."
 msgstr ""
+"El fitxer ~/.cups/lpoptions anomena una destinació predeterminada que no"
+" existeix."
 
 #~ msgid "A Samba password is required to export printer drivers"
 #~ msgstr ""
