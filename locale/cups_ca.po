@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2020-07-06 09:39+0200\n"
+"PO-Revision-Date: 2020-07-08 21:00+0200\n"
 "Last-Translator: Antoni Bella Pérez <antonibella5@yahoo.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -316,8 +316,8 @@ msgid ""
 "be named Duplex.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
-"        AVÍS    La paraula clau %s de l'opció dúplex pot no funcionar com "
-"s'espera i s'hauria de dir Duplex.\n"
+"        AVÍS    La paraula clau %s de l'opció a dues cares pot no funcionar "
+"com s'espera i s'hauria de dir «Duplex».\n"
 "                REF: pàgina 122, secció 5.17"
 
 #: systemv/cupstestppd.c:1721
@@ -14306,7 +14306,8 @@ msgstr ""
 #, c-format
 msgid "ppdc: Expected duplex type after Duplex on line %d of %s."
 msgstr ""
-"ppdc: s'esperava un tipus dúplex després de «Duplex» a la línia %d de %s."
+"ppdc: s'esperava un tipus a dues cares després de «Duplex» a la línia %d de "
+"%s."
 
 #: ppdc/ppdc-source.cxx:1029
 #, c-format
@@ -14652,7 +14653,7 @@ msgstr "ppdc: el tipus de controlador %s a la línia %d de %s no és conegut."
 #: ppdc/ppdc-source.cxx:858
 #, c-format
 msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s."
-msgstr "ppdc: el tipus dúplex «%s» a la línia %d de %s no és conegut."
+msgstr "ppdc: el tipus a dues cares «%s» a la línia %d de %s no és conegut."
 
 #: ppdc/ppdc-source.cxx:3106
 #, c-format
