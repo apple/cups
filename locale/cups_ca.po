@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2020-07-11 20:20+0200\n"
+"PO-Revision-Date: 2020-07-11 20:33+0200\n"
 "Last-Translator: Antoni Bella Pérez <antonibella5@yahoo.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -514,12 +514,12 @@ msgstr "      %s  cupsUIConstraints buit %s"
 #: systemv/cupstestppd.c:3580 systemv/cupstestppd.c:3620
 #, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s, choice %s."
-msgstr "      %s  Falta la traducció de «%s» per l'opció %s, elecció %s."
+msgstr "      %s  Falta la traducció de «%s» per a l'opció %s, elecció %s."
 
 #: systemv/cupstestppd.c:3488
 #, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s."
-msgstr "      %s  Falta la traducció de «%s» per l'opció %s."
+msgstr "      %s  Falta la traducció de «%s» per a l'opció %s."
 
 #: systemv/cupstestppd.c:2427 systemv/cupstestppd.c:2555
 #: systemv/cupstestppd.c:2641 systemv/cupstestppd.c:2699
@@ -792,9 +792,8 @@ msgstr ""
 #, c-format
 msgid "      **FAIL**  Option %s choice names %s and %s differ only by case."
 msgstr ""
-"      **FALLADA**  L'opció %s noms de les opcions %s i %s només es"
-" diferencien "
-"per les majúscules."
+"      **FALLADA**  L'opció %s noms de les opcions %s i %s només es "
+"diferencien per les majúscules."
 
 #: systemv/cupstestppd.c:2100
 #, c-format
@@ -851,7 +850,7 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 102, section 5.15."
 msgstr ""
-"      **FALLADA**  ES NECESSITA ImageableArea per PageSize %s\n"
+"      **FALLADA**  ES NECESSITA «ImageableArea» per a «PageSize» %s\n"
 "                REF: pàgina 41, secció 5.\n"
 "                REF: pàgina 102, secció 5.15."
 
@@ -944,7 +943,7 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 103, section 5.15."
 msgstr ""
-"      **FALLADA**  ES NECESSITA PaperDimension per PageSize %s\n"
+"      **FALLADA**  ES NECESSITA «PaperDimension» per a «PageSize» %s\n"
 "                REF: pàgina 41, secció 5.\n"
 "                REF: pàgina 103, secció 5.15."
 
@@ -1669,7 +1668,7 @@ msgstr "%s: Error - s'esperava un formulari després de l'opció «-f»."
 #, c-format
 msgid "%s: Error - expected hold name after \"-H\" option."
 msgstr ""
-"%s: Error - s'esperava un nom per posar en espera després de l'opció «-H»."
+"%s: Error - s'esperava un nom per a posar en espera després de l'opció «-H»."
 
 #: berkeley/lpr.c:109
 #, c-format
@@ -1834,7 +1833,7 @@ msgstr ""
 #: scheduler/cupsfilter.c:445
 #, c-format
 msgid "%s: No filter to convert from %s/%s to %s/%s."
-msgstr "%s: no hi ha cap filtre per convertir des de %s/%s a %s/%s."
+msgstr "%s: no hi ha cap filtre per a convertir des de %s/%s a %s/%s."
 
 #: systemv/cupsaccept.c:195
 #, c-format
@@ -2676,7 +2675,7 @@ msgstr "-i fitxer_icona.png     Estableix el fitxer de la icona"
 #: systemv/lp.c:760
 msgid "-i id                   Specify an existing job ID to modify"
 msgstr ""
-"-i ID                   Especifica un ID de treball existent per modificar"
+"-i ID                   Especifica un ID de treball existent per a modificar"
 
 #: systemv/lpadmin.c:1627
 msgid "-i ppd-file             Specify a PPD file for the printer"
@@ -2819,7 +2818,7 @@ msgstr "-o job-sheets=standard  Imprimeix una pàgina de bàner amb el treball"
 
 #: berkeley/lpr.c:438 systemv/lp.c:765
 msgid "-o media=size           Specify the media size to use"
-msgstr "-o media=mida           Especifica la mida del paper per usar"
+msgstr "-o media=mida           Especifica la mida del paper a usar"
 
 #: systemv/lpadmin.c:1631
 msgid "-o name-default=value   Specify the default value for the named option"
@@ -4519,7 +4518,7 @@ msgid ""
 "valid Kerberos ticket."
 msgstr ""
 "Introduïu el vostre nom d'usuari i contrasenya o el nom d'usuari i la "
-"contrasenya de root per accedir a aquesta pàgina. Si feu servir "
+"contrasenya de root per a accedir a aquesta pàgina. Si feu servir "
 "l'autenticació Kerberos, assegureu-vos de tenir un tiquet Kerberos que sigui "
 "vàlid."
 
@@ -4921,7 +4920,7 @@ msgstr "HP"
 
 #: ppdc/sample.c:170
 msgid "Hanging Folder"
-msgstr "Carpeta per penjar"
+msgstr "Carpeta per a penjar"
 
 #: cups/hash.c:289
 msgid "Hash buffer too small."
@@ -5724,7 +5723,7 @@ msgstr "No està permès"
 
 #: scheduler/ipp.c:1510 scheduler/ipp.c:10979
 msgid "Not allowed to print."
-msgstr "No teniu permís per imprimir."
+msgstr "No teniu permís per a imprimir."
 
 #: ppdc/sample.c:146
 msgid "Note"
@@ -6416,7 +6415,7 @@ msgid ""
 "enable it."
 msgstr ""
 "La interfície web està inhabilitada. Executeu «cupsctl WebInterface=yes» per "
-"habilitar-la."
+"a habilitar-la."
 
 #: scheduler/ipp.c:6636
 #, c-format
@@ -7737,12 +7736,12 @@ msgstr "Missatge detallat sobre l'estat"
 #: systemv/lpstat.c:1253 systemv/lpstat.c:1256 systemv/lpstat.c:1259
 #, c-format
 msgid "device for %s/%s: %s"
-msgstr "dispositiu per %s/%s: %s"
+msgstr "dispositiu per a %s/%s: %s"
 
 #: systemv/lpstat.c:1239 systemv/lpstat.c:1242 systemv/lpstat.c:1245
 #, c-format
 msgid "device for %s: %s"
-msgstr "dispositiu per %s: %s"
+msgstr "dispositiu per a %s: %s"
 
 #. TRANSLATORS: Copies
 #: locale/ipp-strings.c:142
@@ -19697,22 +19696,22 @@ msgstr ""
 
 #~ msgid "A Samba password is required to export printer drivers"
 #~ msgstr ""
-#~ "Necessiteu una contrasenya de Samba per exportar els controladors "
+#~ "Necessiteu una contrasenya de Samba per a exportar els controladors "
 #~ "d'impressora"
 
 #~ msgid "A Samba username is required to export printer drivers"
 #~ msgstr ""
-#~ "Necessiteu una nom d'usuari de Samba per exportar els controladors "
+#~ "Necessiteu un nom d'usuari de Samba per a exportar els controladors "
 #~ "d'impressora"
 
 #~ msgid "Dymo"
 #~ msgstr "Dymo"
 
 #~ msgid "Export Printers to Samba"
-#~ msgstr "Exportar les impressores al Samba"
+#~ msgstr "Exporta les impressores al Samba"
 
 #~ msgid "cupsctl: Cannot set Listen or Port directly."
-#~ msgstr "cupsctl: no es pot establir Listen o Port directament."
+#~ msgstr "cupsctl: no s'ha pogut establir «Listen» o «Port» directament."
 
 #~ msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
 #~ msgstr "lpadmin: no s'ha pogut obrir el fitxer PPD «%s» - %s"
