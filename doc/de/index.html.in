@@ -7,13 +7,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=9">
     <meta name="viewport" content="width=device-width">
-    <title>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
+    <title>Startseite - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
   </head>
   <body>
     <div class="header">
       <ul>
 	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
-	<li><a class="active" href="/">Home</a></li>
+	<li><a class="active" href="/">Startseite</a></li>
 	<li><a href="/admin">Verwaltung</a></li>
 	<li><a href="/classes/">Klassen</a></li>
 	<li><a href="/help/">Hilfe</a></li>
