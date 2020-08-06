@@ -32,7 +32,7 @@
 #define WAIT_EOF_DELAY			7
 #define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			5000L
-
+#define FIND_TRIES      6
 
 /*
  * Local types...
@@ -214,11 +214,15 @@ print_device(const char *uri,		/* I - Device URI */
   */
 
   fprintf(stderr, "DEBUG: Printing on printer with URI: %s\n", uri);
-  while ((g.printer = find_device(print_cb, uri)) == NULL)
+  for (int find_attempt = 0; ((g.printer = find_device(print_cb, uri)) == NULL) && (find_attempt < FIND_TRIES); ++find_attempt)
   {
-    _cupsLangPrintFilter(stderr, "INFO",
-			 _("Waiting for printer to become available."));
+    _cupsLangPrintFilter(stderr, "INFO", _("Waiting for printer to become available."));
     sleep(5);
+  }
+
+  if (g.printer == NULL) {
+    _cupsLangPrintFilter(stderr, "ERROR", _("Printer is not available."));
+    return (CUPS_BACKEND_FAILED);
   }
 
   g.print_fd = print_fd;
