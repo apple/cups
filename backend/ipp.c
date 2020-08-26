@@ -2825,7 +2825,21 @@ new_request(
         */
 
         _httpDecodeURI(phone, keyword, sizeof(phone));
-        for (ptr = phone; *ptr;)
+        ptr = phone;
+
+        /*
+         * Weed out "Custom." in the beginning, this allows to put the
+         * "phone" option as custom string option into the PPD so that
+         * print dialogs not supporting fax display the option and
+         * allow entering the phone number. Print dialogs also send "None"
+         * if no phone number got entered, filter this, too.
+         */
+        if (!_cups_strcasecmp(phone, "None"))
+          *ptr = '\0';
+        if (!_cups_strncasecmp(phone, "Custom.", 7))
+          _cups_strcpy(ptr, ptr + 7);
+
+        for (; *ptr;)
 	{
 	  if (*ptr == ',')
 	    *ptr = 'p';
@@ -2835,20 +2849,36 @@ new_request(
 	    ptr ++;
         }
 
-        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
-        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
-
-	if ((keyword = cupsGetOption("faxPrefix", num_options,
-	                             options)) != NULL && *keyword)
+        if (strlen(phone) > 0)
         {
-	  char	predial[1024];		/* Pre-dial string */
+          httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
+          ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
+          fprintf(stderr, "DEBUG: Faxing to phone %s; destination-uri: %s\n", phone, tel_uri);
 
-	  _httpDecodeURI(predial, keyword, sizeof(predial));
-	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT, "pre-dial-string", NULL, predial);
-	}
+          if ((keyword = cupsGetOption("faxPrefix", num_options, options)) != NULL && *keyword)
+          {
+            char	predial[1024];		/* Pre-dial string */
 
-        ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
-        ippDelete(destination);
+            _httpDecodeURI(predial, keyword, sizeof(predial));
+            ptr = predial;
+            if (!_cups_strcasecmp(ptr, "None"))
+              *ptr = '\0';
+            if (!_cups_strncasecmp(ptr, "Custom.", 7))
+              ptr += 7;
+            if (strlen(ptr) > 0)
+            {
+              ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT, "pre-dial-string", NULL, ptr);
+              fprintf(stderr, "DEBUG: Pre-dialing %s; pre-dial-string: %s\n", ptr, ptr);
+            }
+            else
+              fprintf(stderr, "WARNING: Pre-dial number for fax not valid! Sending fax without pre-dial number.\n");
+          }
+
+          ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
+          ippDelete(destination);
+        }
+        else
+          fprintf(stderr, "ERROR: Phone number for fax not valid! Fax cannot be sent.\n");
       }
     }
     else
