@@ -41,8 +41,10 @@ main(int  argc,				/* I - Number of command-line args */
 			page_top,	/* Top margin */
 			page_bottom,	/* Bottom margin */
 			page_left,	/* Left margin */
+			page_right,	/* Right margin */
 			linesize,	/* Bytes per line */
 			lineoffset;	/* Offset into line */
+  int			tmp;
   unsigned char		white;		/* White pixel */
   ppd_file_t		*ppd;		/* PPD file */
   ppd_attr_t		*back;		/* cupsBackSide attribute */
@@ -120,14 +122,30 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "PAGE: %d %d\n", page, inheader.NumCopies);
 
     page_width  = (unsigned)(inheader.cupsPageSize[0] * inheader.HWResolution[0] / 72.0);
+    if (page_width < inheader.cupsWidth &&
+	page_width >= inheader.cupsWidth - 1)
+      page_width = (unsigned)inheader.cupsWidth;
     page_height = (unsigned)(inheader.cupsPageSize[1] * inheader.HWResolution[1] / 72.0);
+    if (page_height < inheader.cupsHeight &&
+	page_height >= inheader.cupsHeight - 1)
+      page_height = (unsigned)inheader.cupsHeight;
     page_left   = (unsigned)(inheader.cupsImagingBBox[0] * inheader.HWResolution[0] / 72.0);
     page_bottom = (unsigned)(inheader.cupsImagingBBox[1] * inheader.HWResolution[1] / 72.0);
-    page_top    = page_height - page_bottom - inheader.cupsHeight;
+    tmp        = (int)(page_height - page_bottom - inheader.cupsHeight);
+    if (tmp < 0 && tmp >= -1) /* Rounding error */
+      page_top = 0;
+    else
+      page_top = (unsigned)tmp;
+    tmp        = (int)(page_width - page_left - inheader.cupsWidth);
+    if (tmp < 0 && tmp >= -1) /* Rounding error */
+      page_right = 0;
+    else
+      page_right = (unsigned)tmp;
     linesize    = (page_width * inheader.cupsBitsPerPixel + 7) / 8;
     lineoffset  = page_left * inheader.cupsBitsPerPixel / 8; /* Round down */
 
-    if (page_left > page_width || page_top > page_height || page_bottom > page_height)
+    fprintf(stderr, "DEBUG: In pixels: Width: %u  Height: %u  Left: %u  Right:  %u  Top: %u  Bottom: %u\n", page_width, page_height, page_left, page_right, page_top, page_bottom);
+    if (page_left > page_width || page_top > page_height || page_bottom > page_height || page_right > page_width)
     {
       _cupsLangPrintFilter(stderr, "ERROR", _("Unsupported raster data."));
       fprintf(stderr, "DEBUG: Bad bottom/left/top margin on page %d.\n", page);
@@ -290,8 +308,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  outheader.cupsInteger[1] = ~0U;/* CrossFeedTransform */
 	  outheader.cupsInteger[2] = 1;	/* FeedTransform */
 
-	  outheader.cupsInteger[3] = page_width - page_left -
-	                             inheader.cupsWidth;
+	  outheader.cupsInteger[3] = page_right;
 					/* ImageBoxLeft */
 	  outheader.cupsInteger[4] = page_top;
 					/* ImageBoxTop */
@@ -354,8 +371,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  outheader.cupsInteger[1] = ~0U;/* CrossFeedTransform */
 	  outheader.cupsInteger[2] = ~0U;/* FeedTransform */
 
-	  outheader.cupsInteger[3] = page_width - page_left -
-	                             inheader.cupsWidth;
+	  outheader.cupsInteger[3] = page_right;
 					/* ImageBoxLeft */
 	  outheader.cupsInteger[4] = page_bottom;
 					/* ImageBoxTop */
