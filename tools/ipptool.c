@@ -1,6 +1,7 @@
 /*
  * ipptool command for CUPS.
  *
+ * Copyright @ 2020 by The Printer Working Group.
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
@@ -140,6 +141,7 @@ typedef struct _cups_testdata_s		/**** Test Data ****/
 		file_id[1024];		/* File identifier */
   int		ignore_errors;		/* Ignore test failures? */
   char		name[1024];		/* Test name */
+  char		pause[1024];		/* PAUSE value */
   useconds_t	repeat_interval;	/* Repeat interval (delay) */
   int		request_id;		/* Current request ID */
   char		resource[512];		/* Resource for request */
@@ -914,6 +916,18 @@ do_test(_ipp_file_t      *f,		/* I - IPP data file */
 
   if (Cancel)
     return (0);
+
+ /*
+  * Show any PAUSE message, as needed...
+  */
+
+  if (data->pause[0])
+  {
+    if (!data->skip_test)
+      pause_message(data->pause);
+
+    data->pause[0] = '\0';
+  }
 
  /*
   * Take over control of the attributes in the request...
@@ -2047,6 +2061,21 @@ get_filename(const char *testfile,	/* I - Current test file */
       dstptr = dst; /* Should never happen */
 
     strlcpy(dstptr, src, dstsize - (size_t)(dstptr - dst));
+
+#if _WIN32
+    if (_access(dst, 0))
+    {
+     /*
+      * Not available relative to the testfile, see if it can be found on the
+      * desktop...
+      */
+      const char *userprofile = getenv("USERPROFILE");
+					/* User home directory */
+
+      if (userprofile)
+        snprintf(dst, dstsize, "%s/Desktop/%s", userprofile, src);
+    }
+#endif /* _WIN32 */
   }
 
   return (dst);
@@ -3132,7 +3161,7 @@ token_cb(_ipp_file_t      *f,		/* I - IPP file data */
 
       if (_ippFileReadToken(f, temp, sizeof(temp)))
       {
-        pause_message(temp);
+        strlcpy(data->pause, temp, sizeof(data->pause));
       }
       else
       {
