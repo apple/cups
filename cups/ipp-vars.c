@@ -221,9 +221,8 @@ _ippVarsSet(_ipp_vars_t *v,		/* I - IPP variables */
   if (!strcmp(name, "uri"))
   {
     char		uri[1024];	/* New printer URI */
-    http_uri_status_t	uri_status;	/* URI status */
 
-    if ((uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, value, v->scheme, sizeof(v->scheme), v->username, sizeof(v->username), v->host, sizeof(v->host), &(v->port), v->resource, sizeof(v->resource))) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, v->scheme, sizeof(v->scheme), v->username, sizeof(v->username), v->host, sizeof(v->host), &(v->port), v->resource, sizeof(v->resource)) < HTTP_URI_STATUS_OK)
       return (0);
 
     if (v->username[0])

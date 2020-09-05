@@ -603,6 +603,8 @@ make_raster_file(ipp_t      *response,  /* I - Printer attributes */
   for (y = 0; y < header.cupsHeight; y ++)
     cupsRasterWritePixels(ras, line, header.cupsBytesPerLine);
 
+  free(line);
+
   cupsRasterClose(ras);
 
   close(fd);
