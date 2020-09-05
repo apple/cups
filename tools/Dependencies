@@ -8,8 +8,9 @@ ippeveprinter.o: ippeveprinter.c ../cups/cups-private.h \
   ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/http.h \
   ../cups/language.h ../cups/pwg.h ../cups/http-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/thread-private.h ../cups/ppd-private.h ../cups/ppd.h \
-  ../cups/raster.h printer-png.h
+  ../cups/thread-private.h ../cups/debug-private.h ../cups/ppd-private.h \
+  ../cups/ppd.h ../cups/raster.h printer-png.h printer-lg-png.h \
+  printer-sm-png.h
 ippeveps.o: ippeveps.c ippevecommon.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
   ../cups/language.h ../cups/pwg.h ../cups/raster.h \
