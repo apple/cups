@@ -92,6 +92,9 @@
 # Canon, Inc. MP560 Printer (Issue #4155)
 0x04a9 0x173e unidir
 
+# Canon, Inc. PIXMA G1501 Printer
+0x04a9 0x1796 unidir
+
 # Canon, Inc. MF4150 Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x26a3 no-reattach
 
