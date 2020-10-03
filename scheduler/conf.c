@@ -1245,7 +1245,10 @@ cupsdReadConfiguration(void)
     char	*paper_result;		/* Paper size name from libpaper */
 
     if ((paper_result = systempapername()) != NULL)
+    {
       cupsdSetString(&DefaultPaperSize, paper_result);
+      free(paper_result);
+    }
     else
 #endif /* HAVE_LIBPAPER */
     if (!DefaultLanguage ||
