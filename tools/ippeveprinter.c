@@ -1712,17 +1712,21 @@ create_printer(
   }
   else
   {
-    char	temp[1024];		/* Temporary string */
+    char	temp[1024],		/* Temporary string */
+		*tempptr;		/* Pointer into temporary string */
 
 #ifdef HAVE_AVAHI
     const char *avahi_name = avahi_client_get_host_name_fqdn(DNSSDClient);
 
     if (avahi_name)
-      printer->hostname = strdup(avahi_name);
+      strlcpy(temp, avahi_name, sizeof(temp));
     else
 #endif /* HAVE_AVAHI */
 
-    printer->hostname = strdup(httpGetHostname(NULL, temp, sizeof(temp)));
+    if ((tempptr = strstr(httpGetHostname(NULL, temp, sizeof(temp)), ".lan")) != NULL && !tempptr[5])
+      strlcpy(tempptr, ".local", sizeof(temp) - (size_t)(tempptr - temp));
+
+    printer->hostname = strdup(temp);
   }
 
   _cupsRWInit(&(printer->rwlock));
