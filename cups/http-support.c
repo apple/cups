@@ -2504,7 +2504,8 @@ http_resolve_cb(
 			*resdefault;	/* Default path */
   char			resource[257],	/* Remote path */
 			fqdn[256];	/* FQDN of the .local name */
-  char			ifname[IF_NAMESIZE]; /* Interface name */
+  char			ifname[IF_NAMESIZE];
+					/* Interface name */
   AvahiStringList	*pair;		/* Current TXT record key/value pair */
   char			*value;		/* Value for "rp" key */
   size_t		valueLen = 0;	/* Length of "rp" key */
@@ -2632,33 +2633,29 @@ http_resolve_cb(
   }
 
  /*
-  * Check whether the interface is the loopback interface ("lo"), in this
-  * case set "localhost" as the host name
+  * Get the name of the interface this is coming from...
   */
 
   if (!if_indextoname((unsigned int)interface, ifname))
   {
     if (uribuf->options & _HTTP_RESOLVE_STDERR)
-      fprintf(stderr,
-	      "DEBUG: Unable to find interface name for interface %d: %s\n",
-	      interface, strerror(errno));
-    DEBUG_printf(("Unable to find interface name for interface %d: %s\n",
-		  interface, strerror(errno)));
+      fprintf(stderr, "DEBUG: Unable to find interface name for interface %d: %s\n", interface, strerror(errno));
+    DEBUG_printf(("Unable to find interface name for interface %d: %s\n", interface, strerror(errno)));
     ifname[0] = '\0';
   }
 
-  if (!strcmp(ifname, "lo")) {
+  if (!strcmp(ifname, "lo"))
+  {
+   /*
+    * If this service is registered on loopback interface ("lo"), force the host
+    * name to "localhost"...
+    */
+
     if (uribuf->options & _HTTP_RESOLVE_STDERR)
-      fputs("DEBUG: Service comes from loopback interface \"lo\", setting \"localhost\" as host name.\n",
-	    stderr);
+      fputs("DEBUG: Service comes from loopback interface \"lo\", setting \"localhost\" as host name.\n", stderr);
     DEBUG_puts("Service comes from loopback interface \"lo\", setting \"localhost\" as host name.");
     hostTarget = "localhost";
   }
-
- /*
-  * Lookup the FQDN if needed...
-  */
-
   else if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
 	   (hostptr = hostTarget + strlen(hostTarget) - 6) > hostTarget &&
 	   !_cups_strcasecmp(hostptr, ".local"))
@@ -2707,8 +2704,7 @@ http_resolve_cb(
   * Assemble the final device URI using the resolved hostname...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme,
-                  NULL, hostTarget, port, resource);
+  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, port, resource);
   DEBUG_printf(("5http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
