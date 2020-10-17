@@ -332,7 +332,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
 
   if (ColorBits > 1)
-    BitBuffer = malloc(ColorBits * ((header->cupsWidth + 7) / 8));
+    BitBuffer = malloc((size_t)ColorBits * (((size_t)header->cupsWidth + 7) / 8));
   else
     BitBuffer = NULL;
 

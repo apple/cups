@@ -13,7 +13,7 @@ Changes in CUPS v2.3.3op1
 - Updated ippfind to honor `SKIP-XXX` directives with `PAUSE`.
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
 - Fixed DNS-SD name collision support in ippeveprinter.
-- Fixed compiler warnings.
+- Fixed compiler and code analyzer warnings.
 - Fixed TLS support on Windows.
 - Fixed ippfind sub-type searches with Avahi.
 - Fixed the default hostname used by ippeveprinter on macOS.

@@ -955,7 +955,7 @@ OutputRows(
   * Clear the buffer...
   */
 
-  memset(LineBuffers[row], 0, header->cupsWidth * DotBytes);
+  memset(LineBuffers[row], 0, (size_t)header->cupsWidth * (size_t)DotBytes);
 }
 
 
