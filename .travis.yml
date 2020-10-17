@@ -4,6 +4,8 @@
 
 language: c
 
+script: ./configure && make && make check
+
 matrix:
   include:
     # Linux-specific build stuff
