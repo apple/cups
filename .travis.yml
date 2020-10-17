@@ -1,0 +1,25 @@
+#
+# Travis CI configuration file for CUPS.
+#
+
+language: c
+
+matrix:
+  include:
+    # Linux-specific build stuff
+    - os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages: [libavahi-client-dev, libgnutls28-dev, zlib1g-dev]
+
+    # macOS-specific build stuff
+    - os: osx
+      osx_image: xcode12
+
+
+notifications:
+  email:
+    # TODO: Need mailing list for OpenPrinting CI builds
+    recipients:
+      - msweet@msweet.org
