@@ -181,9 +181,9 @@ if test -n "$GCC"; then
 	esac
 
 	# Additional warning options for development testing...
-	if test -d .git; then
-		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
-	fi
+#	if test -d .git; then
+#		WARNING_OPTIONS="-Werror -Wno-error=deprecated-declarations $WARNING_OPTIONS"
+#	fi
 else
 	# Add vendor-specific compiler options...
 	case $host_os_name in
