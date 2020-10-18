@@ -1,0 +1,4 @@
+engines:
+  cppcheck:
+    exclude_paths:
+      - **/*
