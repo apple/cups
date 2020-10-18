@@ -641,7 +641,8 @@ table.list {
   width: 100%;
 }
 table.list tr:nth-child(even) {
-  background: rgba(127,127,127,0.1);]n}
+  background: rgba(127,127,127,0.1);
+}
 table.list th {
   border-right: 2px solid gray;
   font-family: monospace;
@@ -674,7 +675,7 @@ table.list td {
   }
 
   .body {
-    paddng: 0px;
+    padding: 0px;
   }
 
   .footer {
