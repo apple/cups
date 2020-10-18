@@ -11,9 +11,7 @@ matrix:
     # Linux-specific build stuff
     - os: linux
       dist: focal
-      virt: vm
-      sudo: required
-      group: deprecated-2017Q4
+      virt: lxd
       addons:
         apt:
           packages: [libavahi-client-dev, libgnutls28-dev, zlib1g-dev]
