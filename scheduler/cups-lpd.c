@@ -1268,7 +1268,7 @@ remove_jobs(const char *dest,		/* I - Destination */
 
     request = ippNewRequest(IPP_OP_CANCEL_JOB);
 
-    sprintf(uri, "ipp://localhost/jobs/%d", id);
+    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", id);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,

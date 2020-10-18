@@ -3116,11 +3116,10 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
       if (*ptr < ' ' && *ptr > 0 && *ptr != '\t')
       {
        /*
-        * Substitute "<XX>" for the control character; sprintf is safe because
-	* we always leave 6 chars free at the end...
+        * Substitute "<XX>" for the control character...
 	*/
 
-        sprintf(valptr, "<%02X>", *ptr);
+        snprintf(valptr, sizeof(value) - (size_t)(valptr - value), "<%02X>", *ptr);
 	valptr += 4;
       }
       else

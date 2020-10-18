@@ -224,7 +224,7 @@ cgiGetIPPObjects(ipp_t *response,	/* I - IPP response */
 	        char	buf[255];	/* Number buffer */
 
 
-                sprintf(buf, "%d", attr->values[i].integer);
+                snprintf(buf, sizeof(buf), "%d", attr->values[i].integer);
 
 		if (cgiDoSearch(search, buf))
 		  add = 1;
@@ -291,7 +291,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
       char	temp[255];		/* Temporary string */
 
 
-      sprintf(temp, "%d", job_id);
+      snprintf(temp, sizeof(temp), "%d", job_id);
       cgiSetVariable("JOB_ID", temp);
     }
 
@@ -1441,7 +1441,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     cgiSetVariable("SECTION", section);
 
-    sprintf(val, "%d", count);
+    snprintf(val, sizeof(val), "%d", count);
     cgiSetVariable("TOTAL", val);
 
     if (which_jobs)
@@ -1469,13 +1469,13 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     if (first > 0)
     {
-      sprintf(val, "%d", first - CUPS_PAGE_MAX);
+      snprintf(val, sizeof(val), "%d", first - CUPS_PAGE_MAX);
       cgiSetVariable("PREV", val);
     }
 
     if ((first + CUPS_PAGE_MAX) < count)
     {
-      sprintf(val, "%d", first + CUPS_PAGE_MAX);
+      snprintf(val, sizeof(val), "%d", first + CUPS_PAGE_MAX);
       cgiSetVariable("NEXT", val);
     }
 

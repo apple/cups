@@ -321,7 +321,7 @@ abbreviate(const char *s,		/* I - String to abbreviate */
       if (bufsize < 4)
         break;
 
-      sprintf(bufptr, "\\%03o", *s);
+      snprintf(bufptr, bufsize, "\\%03o", *s);
       bufptr += 4;
       bufsize -= 4;
     }

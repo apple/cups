@@ -1742,7 +1742,7 @@ get_address(const char  *value,		/* I - Value string */
       * Use the default port...
       */
 
-      sprintf(defpname, "%d", defport);
+      snprintf(defpname, sizeof(defpname), "%d", defport);
       portname = defpname;
       hostname = buffer;
     }

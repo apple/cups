@@ -266,8 +266,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		return (1);
 	      }
 
-	      sprintf(buffer, "%d", num_copies);
-	      num_options = cupsAddOption("copies", buffer, num_options, &options);
+	      num_options = cupsAddIntegerOption("copies", num_copies, num_options, &options);
 	      break;
 
 	  case 'C' : /* Class */

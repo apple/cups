@@ -10866,17 +10866,13 @@ set_printer_defaults(
 
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
-          sprintf(value, "%d", attr->values[0].integer);
-          printer->num_options = cupsAddOption(name, value,
-					       printer->num_options,
-					       &(printer->options));
+          printer->num_options = cupsAddIntegerOption(name, attr->values[0].integer, printer->num_options, &(printer->options));
           cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Setting %s to %s...", attr->name, value);
           break;
 
       case IPP_TAG_RANGE :
-          sprintf(value, "%d-%d", attr->values[0].range.lower,
-	          attr->values[0].range.upper);
+          snprintf(value, sizeof(value), "%d-%d", attr->values[0].range.lower, attr->values[0].range.upper);
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));
@@ -10885,10 +10881,7 @@ set_printer_defaults(
           break;
 
       case IPP_TAG_RESOLUTION :
-          sprintf(value, "%dx%d%s", attr->values[0].resolution.xres,
-	          attr->values[0].resolution.yres,
-		  attr->values[0].resolution.units == IPP_RES_PER_INCH ?
-		      "dpi" : "dpcm");
+          snprintf(value, sizeof(value), "%dx%d%s", attr->values[0].resolution.xres, attr->values[0].resolution.yres, attr->values[0].resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));

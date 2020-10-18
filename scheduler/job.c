@@ -893,7 +893,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     goto abort_job;
   }
 
-  sprintf(jobid, "%d", job->id);
+  snprintf(jobid, sizeof(jobid), "%d", job->id);
 
   argv[0] = job->printer->name;
   argv[1] = jobid;
