@@ -1,11 +1,11 @@
 /* Layout CSS */
 .header {
   background: rgba(46,46,46,.9);
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
   color: white;
   left: 0;
   margin-bottom: 20px;
-  padding: 0px;
+  padding: 0;
   position: fixed;
   right: 0;
   top: 0;
@@ -13,7 +13,7 @@
 }
 .header ul {
   list-style: none;
-  margin: 0px;
+  margin: 0;
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
   -webkit-margin-start: 0;
@@ -38,7 +38,7 @@
 }
 .header a.active {
   background: white !important;
-  box-shadow: rgba(0,0,0,0.1) 0px 0px 10px 0px inset;
+  box-shadow: rgba(0,0,0,0.1) 0 0 10px 0 inset;
   color: black !important;
   text-decoration: none !important;
 }
@@ -47,13 +47,13 @@
   padding: 40px 20px;
 }
 .row .body {
-  padding: 0px;
+  padding: 0;
 }
 
 .footer {
   background: rgba(46,46,46,.9);
   bottom: 0;
-  box-shadow: 0px -2px 5px rgba(0,0,0,0.25);
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.25);
   color: #cccccc;
   font-size: 10px;
   height: 20px;
@@ -104,54 +104,54 @@
 }
 
 /* Appearance CSS */
-BODY {
+body {
   background: white;
   color: black;
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
   margin: 0;
 }
 
-H1, H2, H3, H4, H5, H6, P, TD, TH {
+h1, h2, h3, h4, h5, h6, p, td, th {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
-H1 { font-size: 2em; }
-H2 { font-size: 1.75em; }
-H3 { font-size: 1.5em; }
-H4 { font-size: 1.25em; }
+h1 { font-size: 2em; }
+h2 { font-size: 1.75em; }
+h3 { font-size: 1.5em; }
+h4 { font-size: 1.25em; }
 
-KBD {
+kbd {
   color: #006600;
   font-family: monaco, courier, monospace;
   font-weight: bold;
 }
 
-PRE {
+pre {
   font-family: monaco, courier, monospace;
 }
 
-BLOCKQUOTE {
+blockquote {
   border-left: solid 2px #777;
   margin: 1em 0;
   padding: 10px;
 }
 
-BLOCKQUOTE OL LI {
+blockquote ol li {
   margin-left: -1em;
 }
 
-PRE.command, PRE.example {
+pre.command, pre.example {
   background: #eee;
   margin: 0 36pt;
   padding: 10px;
 }
 
-P.example {
+p.example {
   font-style: italic;
   margin-left: 36pt;
 }
 
-DL.man DD {
+dl.man dd {
   margin-left: 5em;
 }
 
@@ -159,48 +159,48 @@ DL.man DT {
   margin-left: 0;
 }
 
-PRE.man {
+pre.man {
   margin: 0;
 }
 
-PRE.command EM, PRE.example EM {
+pre.command EM, pre.example EM {
   color: #3f0000;
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
-P.command {
+p.command {
   color: #7f0000;
   font-family: monaco, courier, monospace;
   margin-left: 36pt;
 }
 
-P.formula {
+p.formula {
   font-style: italic;
   margin-left: 36pt;
 }
 
-A IMG {
+a img {
   border: none;
 }
 
-A:link:hover IMG {
+a:link:hover img {
   background: #f0f0f0;
   border-radius: 10px;
   -moz-border-radius: 10px;
 }
 
-A:link, A:visited {
+a:link, a:visited {
   font-weight: inherit;
   text-decoration: none;
   color: #000099;
 }
 
-A:link:hover, A:visited:hover, A:active {
+a:link:hover, a:visited:hover, a:active {
   text-decoration: underline;
   color: #990099;
 }
 
-TABLE.page {
+table.page {
   border: none;
   border-collapse: collapse;
   height: 100%;
@@ -209,29 +209,29 @@ TABLE.page {
   width: 100%;
 }
 
-TD.body {
+td.body {
   height: 100%;
   vertical-align: top;
 }
 
-TD.sel, TD.unsel {
+td.sel, td.unsel {
   border-left: thin solid #cccccc;
-  padding: 0px 5px;
+  padding: 0 5px;
   text-align: center;
   vertical-align: middle;
   width: 14%;
 }
 
-TD.sel {
+td.sel {
   background: url(images/sel.gif);
 }
 
-TD.unsel {
+td.unsel {
   background: url(images/unsel.gif);
 }
 
-TD.sel A, TD.sel A:hover, TD.unsel A:link:hover, TD.unsel A:visited:hover,
-TD.unsel A:active, TD.unsel A, TD.unsel A:visited {
+td.sel a, td.sel a:hover, td.unsel a:link:hover, td.unsel a:visited:hover,
+td.unsel a:active, td.unsel a, td.unsel a:visited {
   color: #666666;
   display: block;
   font-weight: normal;
@@ -239,7 +239,7 @@ TD.unsel A:active, TD.unsel A, TD.unsel A:visited {
   text-decoration: none;
 }
 
-TD.trailer {
+td.trailer {
   background: #f0f0f0;
   border: solid thin #e0e0e0;
   color: #666666;
@@ -247,42 +247,42 @@ TD.trailer {
   padding: 5px;
 }
 
-TD.trailer A {
+td.trailer a {
   color: #666699;
 }
 
-FORM {
+form {
   display: inline;
 }
 
-INPUT[TYPE="TEXT"], TEXTAREA {
+input[type="text"], textarea {
   font-family: monaco, courier, monospace;
 }
 
-INPUT[TYPE="IMAGE"] {
+input[type="image"] {
   border: none;
   padding: 2pt;
   vertical-align: bottom;
 }
 
-SUB, SUP {
+sub, sup {
   font-size: 50%;
 }
 
-TR.data, TD.data, TR.data TD {
+tr.data, td.data, tr.data td {
   margin-top: 10pt;
   padding: 5pt;
   border-bottom: solid 1pt #999999;
 }
 
-TR.data TH {
+tr.data th {
   border-bottom: solid 1pt #999999;
   padding-top: 10pt;
   padding-left: 5pt;
   text-align: left;
 }
 
-DIV.table TABLE {
+div.table table {
   border: solid thin #999999;
   border-collapse: collapse;
   border-spacing: 0;
@@ -290,7 +290,7 @@ DIV.table TABLE {
   margin-right: auto;
 }
 
-DIV.table CAPTION {
+div.table caption {
   caption-side: top;
   font-size: 120%;
   font-style: italic;
@@ -299,24 +299,24 @@ DIV.table CAPTION {
   margin-right: auto;
 }
 
-DIV.table TABLE TD {
+div.table table td {
   background: white;
   border: solid thin #bbbbbb;
   padding: 5pt 10pt 0;
 }
 
-DIV.table TABLE TH {
+div.table table th {
   background: #f0f0f0;
   border: none;
   border-bottom: solid thin #999999;
 }
 
-DIV.figure TABLE {
+div.figure table {
   margin-left: auto;
   margin-right: auto;
 }
 
-DIV.figure CAPTION {
+div.figure caption {
   caption-side: bottom;
   font-size: 120%;
   font-style: italic;
@@ -325,21 +325,21 @@ DIV.figure CAPTION {
   margin-right: auto;
 }
 
-TH.label {
+th.label {
   text-align: right;
   vertical-align: top;
 }
 
-TH.sublabel {
+th.sublabel {
   text-align: right;
   font-weight: normal;
 }
 
-HR {
+hr {
   border: solid thin;
 }
 
-SPAN.info {
+span.info {
   background: black;
   border: thin solid black;
   color: white;
@@ -349,7 +349,7 @@ SPAN.info {
   white-space: nowrap;
 }
 
-H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+h2 span.info, h3 span.info, h4 span.info {
   float: right;
   font-size: 100%;
 }
@@ -359,41 +359,41 @@ H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
   color: white;
 }
 
-TH.conflict {
+th.conflict {
   text-align: right;
 }
 
-H1.title {
+h1.title {
   display: none;
 }
 
-H2.title, H3.title, .row .body H2, .row .body H3 {
+h2.title, h3.title, .row .body h2, .row .body h3 {
   border-bottom: solid 2pt black;
 }
 
-TABLE.indent {
+table.indent {
   margin-top: 2em;
   margin-left: auto;
   margin-right: auto;
   width: 90%;
 }
 
-TABLE.indent {
+table.indent {
   border-collapse: collapse;
 }
 
-TABLE.indent TD, TABLE.indent TH {
+table.indent td, table.indent th {
   padding: 0;
 }
 
-TABLE.list {
+table.list {
   border-collapse: collapse;
   margin-left: auto;
   margin-right: auto;
   width: 90%;
 }
 
-TABLE.list TH {
+table.list th {
   background: white;
   border-bottom: solid thin #cccccc;
   color: #444444;
@@ -404,39 +404,39 @@ TABLE.list TH {
   white-space: nowrap;
 }
 
-TABLE.list TH A {
+table.list th a {
   color: #4444cc;
 }
 
-TABLE.list TD {
+table.list td {
   border-bottom: solid thin #eeeeee;
   padding-top: 5pt;
   padding-left: 5pt;
 }
 
-TABLE.list TR:nth-child(even) {
+table.list tr:nth-child(even) {
   background: #f8f8f8;
 }
 
-TABLE.list TR:nth-child(odd) {
+table.list tr:nth-child(odd) {
   background: #f4f4f4;
 }
 
-DIV.sidebar {
+div.sidebar {
   float: right;
   min-width: 25%;
   margin-left: 10px;
   max-width: 33%;
 }
 
-DIV.sidebar P.l0 {
+div.sidebar p.l0 {
   margin-bottom: 0;
   margin-left: 0;
   margin-right: 0;
   margin-top: 12pt;
 }
 
-DIV.sidebar P.l1 {
+div.sidebar p.l1 {
   margin-bottom: 0;
   margin-left: 36pt;
   margin-right: 0;
@@ -444,7 +444,7 @@ DIV.sidebar P.l1 {
   text-indent: -18pt;
 }
 
-DIV.sidebar P.l2 {
+div.sidebar p.l2 {
   font-style: italic;
   margin-bottom: 0;
   margin-left: 54pt;
@@ -453,18 +453,18 @@ DIV.sidebar P.l2 {
   text-indent: -18pt;
 }
 
-TABLE.inset {
+table.inset {
   background: #f0f0f0;
   border: thin solid #e0e0e0;
   margin-top: 1em;
   padding: 0;
   width: 100%;
-  /* These are not implemented by all browsers, but that's OK */
+  /* these are not implemented by all browsers, but that's ok */
   border-radius: 5px;
   -moz-border-radius: 5px;
 }
 
-TABLE.inset CAPTION {
+table.inset caption {
   caption-side: top;
   color: #666666;
   font-size: 80%;
@@ -473,36 +473,36 @@ TABLE.inset CAPTION {
   text-align: left;
 }
 
-TABLE.inset TD {
+table.inset td {
   padding: 2px;
 }
 
-DT {
+dt {
   margin-left: 36pt;
   margin-top: 12pt;
 }
 
-DD {
+dd {
   margin-left: 54pt;
 }
 
-DL.category DT {
+dl.category dt {
   font-weight: bold;
 }
 
-P.summary {
+p.summary {
   margin-left: 36pt;
   font-family: monaco, courier, monospace;
 }
 
-DIV.summary TABLE {
+div.summary table {
   border: solid thin #999999;
   border-collapse: collapse;
   border-spacing: 0;
   margin: 10px;
 }
 
-DIV.summary TABLE TD, DIV.summary TABLE TH {
+div.summary table td, div.summary table th {
   background: white;
   border: solid thin #999999;
   border-spacing: 0;
@@ -511,16 +511,16 @@ DIV.summary TABLE TD, DIV.summary TABLE TH {
   vertical-align: top;
 }
 
-DIV.summary TABLE THEAD TH {
+div.summary table thead th {
   background: #f0f0f0;
 }
 
-DIV.tabs {
+div.tabs {
   height: 480px;
   overflow: hidden;
 }
 
-DIV.tab {
+div.tab {
   float: left;
   height: 100%;
   overflow-y: auto;
@@ -675,7 +675,7 @@ table.list td {
   }
 
   .body {
-    padding: 0px;
+    padding: 0;
   }
 
   .footer {
@@ -690,7 +690,7 @@ table.list td {
     width: 100%;
   }
 
-  DIV.sidebar {
+  div.sidebar {
     float: none;
     margin-left: 0;
     max-width: 100%;
@@ -698,15 +698,15 @@ table.list td {
     width: 100%;
   }
 
-  BLOCKQUOTE {
+  blockquote {
     margin: 0;
   }
 
-  P.example {
+  p.example {
     margin-left: 0;
   }
 
-  PRE.command, PRE.example, PRE.man {
+  pre.command, pre.example, pre.man {
     margin-left: 0;
     white-space: pre-wrap;
   }
@@ -714,7 +714,6 @@ table.list td {
 
 /* iPad overrides */
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
-
   .mobile {
     display: inherit;
   }
