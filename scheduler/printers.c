@@ -822,12 +822,15 @@ cupsdDeletePrinter(
   ippDelete(p->attrs);
   ippDelete(p->ppd_attrs);
 
+  _ppdCacheDestroy(p->pc);
+
   mimeDeleteType(MimeDatabase, p->filetype);
   mimeDeleteType(MimeDatabase, p->prefiltertype);
 
   cupsdFreeStrings(&(p->users));
   cupsdFreeQuotas(p);
 
+  cupsdClearString(&p->uuid);
   cupsdClearString(&p->uri);
   cupsdClearString(&p->hostname);
   cupsdClearString(&p->name);
