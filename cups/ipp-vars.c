@@ -12,8 +12,7 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/cups-private.h>
+#include "cups-private.h"
 #include "ipp-private.h"
 #include "string-private.h"
 #include "debug-internal.h"
@@ -221,8 +220,8 @@ _ippVarsSet(_ipp_vars_t *v,		/* I - IPP variables */
 {
   if (!strcmp(name, "uri"))
   {
-    char		uri[1024];	/* New printer URI */
-    char		resolved[1024];	/* Resolved mDNS URI */
+    char	uri[1024];		/* New printer URI */
+    char	resolved[1024];		/* Resolved mDNS URI */
 
     if (strstr(value, "._tcp"))
     {
@@ -231,9 +230,7 @@ _ippVarsSet(_ipp_vars_t *v,		/* I - IPP variables */
       */
 
       if (!_httpResolveURI(value, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
-      {
         return (0);
-      }
 
       value = resolved;
     }

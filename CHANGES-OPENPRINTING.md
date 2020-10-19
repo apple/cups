@@ -11,6 +11,8 @@ Changes in CUPS v2.3.3op1
 - ippeveprinter now uses system sounds on macOS for Identify-Printer.
 - Updated ippfind to look for files in "~/Desktop" on Windows.
 - Updated ippfind to honor `SKIP-XXX` directives with `PAUSE`.
+- ipptool now supports DNS-SD URIs like `ipps://My%20Printer._ipps._tcp.local`
+  (Issue #5)
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
 - Fixed DNS-SD name collision support in ippeveprinter.
 - Fixed compiler and code analyzer warnings.
@@ -23,3 +25,6 @@ Changes in CUPS v2.3.3op1
 - Fixed web interface device URI issue (Issue #4)
 - Fixed lp/lpr "printer/class not found" error reporting (Issue #6)
 - Fixed xinetd support for LPD clients (Issue #7)
+- Fixed libtool build issue (Issue #11)
+- Fixed a memory leak in the scheduler (Issue #12)
+- Fixed a potential integer overflow in the PPD hashing code (Issue #13)
