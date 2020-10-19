@@ -60,9 +60,9 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 					AC_MSG_RESULT(yes)
 					AC_DEFINE(HAVE_DNSSD)
 					DNSSDLIBS="-ldns_sd"
-					DNSSD_BACKEND="dnssd",
+					DNSSD_BACKEND="dnssd"
 					IPPFIND_BIN="ippfind"
-					IPPFIND_MAN="ippfind.1"
+					IPPFIND_MAN="ippfind.1",
 					AC_MSG_RESULT(no))
 				LIBS="$SAVELIBS"
 				;;
