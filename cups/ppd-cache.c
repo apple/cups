@@ -3790,6 +3790,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 	PRINTF_COLOROPTION("RGB", _("Color"), CUPS_CSPACE_SRGB, 8)
 
 	default_color = "RGB";
+
+	if (ippGetCount(attr) == 1 || !ippContainsString(attr, "sgray_8") && !ippContainsString(attr, "black_1") && !ippContainsString(attr, "black_8"))
+	  PRINTF_COLOROPTION("Gray", _("GrayScale"), CUPS_CSPACE_SW, 8)
       }
       else if (!strcasecmp(keyword, "adobe-rgb_16") || !strcmp(keyword, "ADOBERGB48") || !strcmp(keyword, "ADOBERGB24-48"))
       {
