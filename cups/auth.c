@@ -295,7 +295,7 @@ cupsDoAuthentication(
     }
   }
 
-  if (http->authstring)
+  if (http->authstring && http->authstring[0])
   {
     DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\".", http->authstring));
 
