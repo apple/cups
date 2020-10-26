@@ -11,6 +11,8 @@ Changes in CUPS v2.3.3op1
 - ippeveprinter now uses system sounds on macOS for Identify-Printer.
 - Updated ippfind to look for files in "~/Desktop" on Windows.
 - Updated ippfind to honor `SKIP-XXX` directives with `PAUSE`.
+- Updated IPP Everywhere support to work around printers that only advertise
+  color raster support but really also support grayscale (Issue #1)
 - ipptool now supports DNS-SD URIs like `ipps://My%20Printer._ipps._tcp.local`
   (Issue #5)
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
