@@ -1043,11 +1043,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 #  endif /* HAVE_AUTHORIZATION_H */
 
-#  ifdef HAVE_GSSAPI
-  if (cups_auth_find(www_auth, "Negotiate"))
-    return (1);
-#  endif /* HAVE_GSSAPI */
-
 #  if defined(SO_PEERCRED) && defined(AF_LOCAL)
  /*
   * See if we can authenticate using the peer credentials provided over a

@@ -2109,18 +2109,13 @@ cupsdSendHeader(
     }
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
     {
-#if defined(SO_PEERCRED) && defined(AF_LOCAL)
-      if (httpAddrFamily(httpGetAddress(con->http)) == AF_LOCAL)
-	strlcpy(auth_str, "PeerCred", sizeof(auth_str));
-      else
-#endif /* SO_PEERCRED && AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
     }
 
-    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE && !con->is_browser && !_cups_strcasecmp(httpGetHostname(con->http, NULL, 0), "localhost"))
+    if (con->best && !con->is_browser && !_cups_strcasecmp(httpGetHostname(con->http, NULL, 0), "localhost"))
     {
      /*
-      * Add a "trc" (try root certification) parameter for local non-Kerberos
+      * Add a "trc" (try root certification) parameter for local
       * requests when the request requires system group membership - then the
       * client knows the root certificate can/should be used.
       *
