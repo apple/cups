@@ -175,10 +175,10 @@ cupsDoAuthentication(
     DEBUG_printf(("2cupsDoAuthentication: Trying scheme \"%s\"...", scheme));
 
 #ifdef HAVE_GSSAPI
-    if (!_cups_strcasecmp(scheme, "Negotiate"))
+    if (!_cups_strcasecmp(scheme, "Negotiate") && !cups_is_local_connection(http))
     {
      /*
-      * Kerberos authentication...
+      * Kerberos authentication to remote server...
       */
 
       int gss_status;			/* Auth status */
@@ -202,7 +202,9 @@ cupsDoAuthentication(
     }
     else
 #endif /* HAVE_GSSAPI */
-    if (_cups_strcasecmp(scheme, "Basic") && _cups_strcasecmp(scheme, "Digest"))
+    if (_cups_strcasecmp(scheme, "Basic") &&
+	_cups_strcasecmp(scheme, "Digest") &&
+	_cups_strcasecmp(scheme, "Negotiate"))
     {
      /*
       * Other schemes not yet supported...
@@ -216,7 +218,7 @@ cupsDoAuthentication(
     * See if we should retry the current username:password...
     */
 
-    if ((http->digest_tries > 1 || !http->userpass[0]) && (!_cups_strcasecmp(scheme, "Basic") || (!_cups_strcasecmp(scheme, "Digest"))))
+    if (http->digest_tries > 1 || !http->userpass[0])
     {
      /*
       * Nope - get a new password from the user...
