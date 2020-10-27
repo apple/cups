@@ -90,6 +90,7 @@ static void	cups_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
 #    define	cups_gss_printf(major, minor, message)
 #  endif /* DEBUG */
 #endif /* HAVE_GSSAPI */
+static int	cups_is_local_connection(http_t *http);
 static int	cups_local_auth(http_t *http);
 
 
@@ -916,6 +917,14 @@ cups_gss_printf(OM_uint32  major_status,/* I - Major status code */
 #  endif /* DEBUG */
 #endif /* HAVE_GSSAPI */
 
+static int				/* O - 0 if not a local connection */
+					/*     1  if local connection */
+cups_is_local_connection(http_t *http)	/* I - HTTP connection to server */
+{
+  if (!httpAddrLocalhost(http->hostaddr) && _cups_strcasecmp(http->hostname, "localhost") != 0)
+    return 0;
+  return 1;
+}
 
 /*
  * 'cups_local_auth()' - Get the local authorization certificate if
@@ -958,7 +967,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * See if we are accessing localhost...
   */
 
-  if (!httpAddrLocalhost(http->hostaddr) && _cups_strcasecmp(http->hostname, "localhost") != 0)
+  if (!cups_is_local_connection(http))
   {
     DEBUG_puts("8cups_local_auth: Not a local connection!");
     return (1);
