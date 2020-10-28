@@ -3228,7 +3228,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
         cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
     }
     else
-      cupsFilePuts(fp, "*cupsManualCopies: true\n");
+      cupsFilePuts(fp, "*cupsManualCopies: True\n");
     if (is_apple)
       cupsFilePuts(fp, "*cupsFilter2: \"image/urf image/urf 100 -\"\n");
     if (is_pwg)
