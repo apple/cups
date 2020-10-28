@@ -30,3 +30,4 @@ Changes in CUPS v2.3.3op1
 - Fixed libtool build issue (Issue #11)
 - Fixed a memory leak in the scheduler (Issue #12)
 - Fixed a potential integer overflow in the PPD hashing code (Issue #13)
+- Fixed output-bin and print-quality handling issues (Issue #18)
