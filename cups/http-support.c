@@ -841,6 +841,13 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
                 "min=%d, sec=%d", day, mon, year, hour, min, sec));
 
  /*
+  * Check for invalid year (RFC 7231 says it's 4DIGIT)
+  */
+
+  if (year > 9999)
+    return (0);
+
+ /*
   * Convert the month name to a number from 0 to 11.
   */
 
