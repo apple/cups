@@ -15,6 +15,7 @@ Changes in CUPS v2.3.3op1
   color raster support but really also support grayscale (Issue #1)
 - ipptool now supports DNS-SD URIs like `ipps://My%20Printer._ipps._tcp.local`
   (Issue #5)
+- Added USB quirks (Apple issue #5789, #5823, #5831)
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
 - Fixed DNS-SD name collision support in ippeveprinter.
 - Fixed compiler and code analyzer warnings.
