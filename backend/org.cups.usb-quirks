@@ -92,6 +92,9 @@
 # Canon, Inc. MP560 Printer (Issue #4155)
 0x04a9 0x173e unidir
 
+# Canon, Inc. PIXMA G1501 Printer (Issue #5831)
+0x04a9 0x1796 unidir
+
 # Canon, Inc. MF4150 Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x26a3 no-reattach
 
@@ -242,6 +245,9 @@
 # All Intermec devices (Issue #4553)
 0x067e no-reattach
 
+# HP LaserJet 1010 (Issue #5789)
+0x03f0 0x0c17 delay-close
+
 # HP LaserJet 1015 (Issue #5617)
 0x03f0 0x0e17 delay-close
 
@@ -302,3 +308,6 @@
 
 # Dymo 450 Turbo (Issue #5521)
 0x0922 0x0021 unidir
+
+# Citizen CT-S4000 (Issue #5823)
+0x2730 0x2008 unidir delay-close
