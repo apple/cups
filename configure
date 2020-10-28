@@ -8970,10 +8970,10 @@ $as_echo "yes" >&6; }
 
 					DNSSDLIBS="-ldns_sd"
 					DNSSD_BACKEND="dnssd"
-else
-  IPPFIND_BIN="ippfind"
+					IPPFIND_BIN="ippfind"
 					IPPFIND_MAN="ippfind.1"
-					{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
