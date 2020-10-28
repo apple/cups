@@ -259,8 +259,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
     }
 
-    if (inheader.cupsPageSizeName[0] &&
-        (pwg_size = _ppdCacheGetSize(cache, inheader.cupsPageSizeName)) != NULL)
+    if (inheader.cupsPageSizeName[0] && (pwg_size = _ppdCacheGetSize(cache, inheader.cupsPageSizeName)) != NULL && pwg_size->map.pwg)
     {
       strlcpy(outheader.cupsPageSizeName, pwg_size->map.pwg,
 	      sizeof(outheader.cupsPageSizeName));
