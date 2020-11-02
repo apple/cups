@@ -34,11 +34,11 @@ else
 	rev="1"
 	version=$1
 	fileversion=$1
-	fileurl="https://github.com/apple/cups/releases/download/v$fileversion/cups-${fileversion}-source.tar.gz"
+	fileurl="https://github.com/openprinting/cups/releases/download/v$fileversion/cups-${fileversion}-source.tar.gz"
 	SIGNFILES=yes
 
 	echo Validating sources...
-	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
+	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print int $3 } else { print "0" } }'`
 	cupsversion=`printf "2.03%02d" $cupsversionpatch`
 
         temp=`grep AC_INIT configure.ac | awk '{print $2}' | sed -e '1,$s/^\[//' -e '1,$s/\],$//'`
@@ -71,9 +71,9 @@ else
 		exit 1
 	fi
 
-	temp=`head -6 CHANGES.md | grep "Changes in" | awk '{print $4}'`
+	temp=`head -6 CHANGES-OPENPRINTING.md | grep "Changes in" | awk '{print $4}'`
 	if test "$temp" != "v$version"; then
-		echo "Still need to add Changes in v$version in CHANGES.md (saw $temp)"
+		echo "Still need to add Changes in v$version in CHANGES-OPENPRINTING.md (saw $temp)"
 		exit 1
 	fi
 
