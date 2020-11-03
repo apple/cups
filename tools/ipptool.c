@@ -711,7 +711,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsFileClose(data.outfile);
 
-/*
+ /*
   * Exit...
   */
 
