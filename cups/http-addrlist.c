@@ -239,7 +239,11 @@ httpAddrConnect2(
 
     if (!addrlist && nfds == 0)
     {
+#ifdef _WIN32
+      errno = WSAEHOSTDOWN;
+#else
       errno = EHOSTDOWN;
+#endif // _WIN32
       break;
     }
 
