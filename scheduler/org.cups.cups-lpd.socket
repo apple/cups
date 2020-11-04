@@ -1,6 +1,6 @@
 [Unit]
 Description=CUPS LPD Server Socket
-PartOf=org.cups.cups-lpd.service
+PartOf=cups-lpd.service
 
 [Socket]
 ListenStream=515
