@@ -1247,7 +1247,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       else if (stat(command, &backinfo))
 	backroot = 0;
       else
-        backroot = !(backinfo.st_mode & (S_IWGRP | S_IRWXO));
+        backroot = !(backinfo.st_mode & (S_IWGRP | S_IWOTH | S_IXOTH));
 
       argv[0] = job->printer->sanitized_device_uri;
 
