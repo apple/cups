@@ -15,6 +15,14 @@ Changes in CUPS v2.3.3op1
   color raster support but really also support grayscale (Issue #1)
 - ipptool now supports DNS-SD URIs like `ipps://My%20Printer._ipps._tcp.local`
   (Issue #5)
+- The scheduler now allows root backends to have world read permissions but not
+  world execute permissions (Issue #21)
+- The SNMP backend now supports the HP and Ricoh vendor MIBs (Issue #28)
+- The scheduler no longer includes a timestamp in files it writes (Issue #29)
+- The systemd service names are now "cups.service" and "cups-lpd.service"
+  (Issue #30, Issue #31)
+- The scheduler no longer adds the local hostname to the ServerAlias list
+  (Issue #32)
 - The `httpAddrListen` function now uses a listen backlog of 128.
 - Added USB quirks (Apple issue #5789, #5823, #5831)
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
@@ -33,5 +41,8 @@ Changes in CUPS v2.3.3op1
 - Fixed a memory leak in the scheduler (Issue #12)
 - Fixed a potential integer overflow in the PPD hashing code (Issue #13)
 - Fixed output-bin and print-quality handling issues (Issue #18)
+- Fixed PPD options getting mapped to odd IPP values like "tray---4" (Issue #23)
+- Fixed remote access to the cupsd.conf and log files (Issue #24)
+- Fixed potential rounding error in rastertopwg filter (Issue #41)
 - Fixed crash in rastertopwg (Apple issue #5773)
 - Fixed cupsManualCopies values in IPP Everywhere PPDs (Apple issue #5807)
