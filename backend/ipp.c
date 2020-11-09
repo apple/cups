@@ -3075,7 +3075,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
   * Report alerts and messages...
   */
 
-  if ((pa = ippFindAttribute(ipp, "printer-alert", IPP_TAG_TEXT)) != NULL)
+  if ((pa = ippFindAttribute(ipp, "printer-alert", IPP_TAG_STRING)) != NULL)
     report_attr(pa);
 
   if ((pam = ippFindAttribute(ipp, "printer-alert-message",
