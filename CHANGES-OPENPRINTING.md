@@ -43,6 +43,8 @@ Changes in CUPS v2.3.3op1
 - Fixed output-bin and print-quality handling issues (Issue #18)
 - Fixed PPD options getting mapped to odd IPP values like "tray---4" (Issue #23)
 - Fixed remote access to the cupsd.conf and log files (Issue #24)
+- Fixed fax phone number handling with GNOME (Issue #40)
 - Fixed potential rounding error in rastertopwg filter (Issue #41)
+- Fixed IPP backend crash bug with "printer-alert" values (Issue #43)
 - Fixed crash in rastertopwg (Apple issue #5773)
 - Fixed cupsManualCopies values in IPP Everywhere PPDs (Apple issue #5807)
