@@ -1,6 +1,7 @@
 /*
  * IPP routines for the CUPS scheduler.
  *
+ * Copyright © 2020 by Michael R Sweet
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
@@ -5015,6 +5016,9 @@ copy_printer_attrs(
 
   if (!ra || cupsArrayFind(ra, "queued-job-count"))
     add_queued_job_count(con, printer);
+
+  if (!ra || cupsArrayFind(ra, "uri-security-supported"))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "uri-security-supported", NULL, is_encrypted ? "tls" : "none");
 
   copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0, NULL);
   if (printer->ppd_attrs)
