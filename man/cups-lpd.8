@@ -1,13 +1,14 @@
 .\"
 .\" cups-lpd man page for CUPS.
 .\"
+.\" Copyright © 2020 by Michael R Sweet
 .\" Copyright © 2007-2019 by Apple Inc.
 .\" Copyright © 1997-2006 by Easy Software Products.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH cups-lpd 8 "CUPS" "26 April 2019" "Apple Inc."
+.TH cups-lpd 8 "CUPS" "14 November 2020" "Apple Inc."
 .SH NAME
 cups-lpd \- receive print jobs and report printer status to lpd clients (deprecated)
 .SH SYNOPSIS
@@ -96,10 +97,6 @@ mini-server:
 
 .fi
 .LP
-\fINote:\fR If you are using Solaris 10 or higher, you must run the
-.BR inetdconv (1m)
-program to register the changes to the \fIinetd.conf\fR file.
-.LP
 CUPS includes configuration files for
 .BR launchd (8),
 .BR systemd (8),
@@ -111,11 +108,11 @@ service using the corresponding control program.
 .SH SEE ALSO
 .BR cups (1),
 .BR cupsd (8),
-.BR inetconv (1m),
 .BR inetd (8),
 .BR launchd (8),
 .BR xinetd (8),
 CUPS Online Help (http://localhost:631/help),
 RFC 2569
 .SH COPYRIGHT
+Copyright \[co] 2020 by Michael R Sweet
 Copyright \[co] 2007-2019 by Apple Inc.

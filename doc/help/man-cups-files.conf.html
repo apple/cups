@@ -98,6 +98,10 @@ The <i>kind</i> strings are:
 <dt><a name="Group"></a><b>Group </b><i>group-name-or-number</i>
 <dd style="margin-left: 5.0em">Specifies the group name or ID that will be used when executing external programs.
 The default group is operating system specific but is usually "lp" or "nobody".
+</div>
+<dt><a name="LogFileGroup"></a><b>LogFileGroup </b><i>group-name-or-number</i>
+<dd style="margin-left: 5.0em">Specifies the group name or ID that will be used for log files.
+The default group is operating system specific but is usually "lp" or "nobody".
 <dt><a name="LogFilePerm"></a><b>LogFilePerm </b><i>mode</i>
 <dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes.
 The default is "0644".
@@ -150,7 +154,6 @@ The default is "/var/run/cups" or "/etc/cups" depending on the platform.
 <dd style="margin-left: 5.0em">Specifies whether the scheduler calls
 <b>fsync</b>(2)
 after writing configuration or state files.
-The default is "No".
 <dt><a name="SystemGroup"></a><b>SystemGroup </b><i>group-name </i>[ ... <i>group-name</i> ]
 <dd style="margin-left: 5.0em">Specifies the group(s) to use for <i>@SYSTEM</i> group authentication.
 The default contains "admin", "lpadmin", "root", "sys", and/or "system".
@@ -209,6 +212,7 @@ command is used instead.
 <b>subscriptions.conf</b>(5),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2020 by Michael R Sweet
 Copyright &copy; 2007-2019 by Apple Inc.
 
 </body>
