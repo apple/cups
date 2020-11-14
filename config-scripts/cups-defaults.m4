@@ -93,6 +93,13 @@ AC_ARG_WITH(log_file_perm, [  --with-log-file-perm    set default LogFilePerm va
 AC_SUBST(CUPS_LOG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_FILE_PERM, 0$CUPS_LOG_FILE_PERM)
 
+dnl Default MaxLogSize
+AC_ARG_WITH(max_log_size, [  --with-max-log-size     set default MaxLogSize value, default=1m],
+	CUPS_MAX_LOG_SIZE="$withval",
+	CUPS_MAX_LOG_SIZE="1m")
+AC_SUBST(CUPS_MAX_LOG_SIZE)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_LOG_SIZE, "$CUPS_MAX_LOG_SIZE")
+
 dnl Default FatalErrors
 AC_ARG_WITH(fatal_errors, [  --with-fatal-errors     set default FatalErrors value, default=config],
 	CUPS_FATAL_ERRORS="$withval",
