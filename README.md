@@ -1,5 +1,9 @@
-README - CUPS v2.3.3op1 - 2020-10-16
+README - CUPS v2.3.3op1 - 2020-11-14
 ====================================
+
+![Version](https://img.shields.io/github/v/release/openprinting/cups?include_prereleases)
+![Apache 2.0](https://img.shields.io/github/license/openprinting/cups)
+[![Build Status](https://travis-ci.org/openprinting/cups.svg?branch=master)](https://travis-ci.org/github/openprinting/cups)
 
 > *Note:* This version of CUPS is being maintained by the OpenPrinting
 > organization.  It tracks the current Apple CUPS sources and includes common
