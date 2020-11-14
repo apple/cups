@@ -25,6 +25,7 @@ Changes in CUPS v2.3.3op1
   (Issue #30, Issue #31)
 - The scheduler no longer adds the local hostname to the ServerAlias list
   (Issue #32)
+- IPP Everywhere PPDs could have an "unknown" default InputSlot (Issue #44)
 - The `httpAddrListen` function now uses a listen backlog of 128.
 - Added USB quirks (Apple issue #5789, #5823, #5831)
 - Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
