@@ -97,8 +97,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.3.3"
-#define CUPS_MINIMAL "CUPS/2.3.3"
+#define CUPS_SVERSION "CUPS v2.3.3op1"
+#define CUPS_MINIMAL "CUPS/2.3.3op1"
 
 
 /*
@@ -126,6 +126,7 @@ typedef unsigned long useconds_t;
 
 #define CUPS_DEFAULT_LOG_LEVEL "warn"
 #define CUPS_DEFAULT_ACCESS_LOG_LEVEL "none"
+#define CUPS_DEFAULT_MAX_LOG_SIZE "1m"
 
 
 /*
@@ -164,6 +165,13 @@ typedef unsigned long useconds_t;
 
 #define CUPS_DEFAULT_SMB_CONFIG_FILE ""
 #define CUPS_DEFAULT_LPD_CONFIG_FILE ""
+
+
+/*
+ * Default ErrorPolicy value...
+ */
+
+#define CUPS_DEFAULT_ERROR_POLICY "stop-printer"
 
 
 /*

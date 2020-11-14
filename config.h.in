@@ -1,6 +1,7 @@
 /*
  * Configuration file for CUPS.
  *
+ * Copyright 2020 by Michael R Sweet
  * Copyright 2007-2019 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
@@ -45,6 +46,7 @@
 
 #define CUPS_DEFAULT_LOG_LEVEL	"warn"
 #define CUPS_DEFAULT_ACCESS_LOG_LEVEL "actions"
+#define CUPS_DEFAULT_MAX_LOG_SIZE "1m"
 
 
 /*
@@ -83,6 +85,13 @@
 
 #define CUPS_DEFAULT_SMB_CONFIG_FILE	""
 #define CUPS_DEFAULT_LPD_CONFIG_FILE	""
+
+
+/*
+ * Default ErrorPolicy value...
+ */
+
+#define CUPS_DEFAULT_ERROR_POLICY "stop-printer"
 
 
 /*

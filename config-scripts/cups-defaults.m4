@@ -100,6 +100,13 @@ AC_ARG_WITH(max_log_size, [  --with-max-log-size     set default MaxLogSize valu
 AC_SUBST(CUPS_MAX_LOG_SIZE)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_LOG_SIZE, "$CUPS_MAX_LOG_SIZE")
 
+dnl Default ErrorPolicy
+AC_ARG_WITH(error_policy, [  --with-error-policy     set default ErrorPolicy value, default=stop-printer],
+	CUPS_MAX_LOG_SIZE="$withval",
+	CUPS_MAX_LOG_SIZE="stop-printer")
+AC_SUBST(CUPS_ERROR_POLICY)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ERROR_POLICY, "$CUPS_ERROR_POLICY")
+
 dnl Default FatalErrors
 AC_ARG_WITH(fatal_errors, [  --with-fatal-errors     set default FatalErrors value, default=config],
 	CUPS_FATAL_ERRORS="$withval",

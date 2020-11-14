@@ -752,7 +752,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);
   cupsdSetString(&SMBConfigFile, CUPS_DEFAULT_SMB_CONFIG_FILE);
 
-  cupsdSetString(&ErrorPolicy, "stop-printer");
+  cupsdSetString(&ErrorPolicy, CUPS_DEFAULT_ERROR_POLICY);
 
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;

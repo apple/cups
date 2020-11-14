@@ -11,6 +11,9 @@ LogLevel @CUPS_LOG_LEVEL@
 # Specifies the maximum size of the log files before they are rotated.  The value "0" disables log rotation.
 MaxLogSize @CUPS_MAX_LOG_SIZE@
 
+# Default error policy for printers
+ErrorPolicy @CUPS_ERROR_POLICY@
+
 # Only listen for connections from the local machine.
 Listen localhost:@DEFAULT_IPP_PORT@
 @CUPS_LISTEN_DOMAINSOCKET@
