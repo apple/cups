@@ -642,6 +642,7 @@ CUPS_USER
 CUPS_DEFAULT_SHARED
 CUPS_BROWSE_LOCAL_PROTOCOLS
 CUPS_BROWSING
+CUPS_SYNC_ON_CLOSE
 CUPS_PAGE_LOG_FORMAT
 CUPS_ACCESS_LOG_LEVEL
 CUPS_LOG_LEVEL
@@ -903,6 +904,7 @@ with_fatal_errors
 with_log_level
 with_access_log_level
 enable_page_logging
+enable_sync_on_close
 enable_browsing
 with_local_protocols
 enable_default_shared
@@ -1573,6 +1575,7 @@ Optional Features:
   --disable-systemd       disable systemd support
   --enable-upstart        enable upstart support
   --enable-page-logging   enable page_log by default
+  --enable-sync-on-close  enable SyncOnClose (off by default)
   --disable-browsing      disable Browsing by default
   --disable-default-shared
 			  disable DefaultShared by default
@@ -9456,6 +9459,20 @@ if test "x$enable_page_logging" = xyes; then
 	CUPS_PAGE_LOG_FORMAT=""
 else
 	CUPS_PAGE_LOG_FORMAT="PageLogFormat"
+fi
+
+
+# Check whether --enable-sync_on_close was given.
+if test "${enable_sync_on_close+set}" = set; then :
+  enableval=$enable_sync_on_close;
+fi
+
+if test "x$enable_sync_on_close" = xyes; then
+	CUPS_SYNC_ON_CLOSE="Yes"
+	$as_echo "#define CUPS_DEFAULT_SYNC_ON_CLOSE 1" >>confdefs.h
+
+else
+	CUPS_SYNC_ON_CLOSE="No"
 fi
 
 

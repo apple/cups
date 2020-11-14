@@ -137,6 +137,16 @@ else
 fi
 AC_SUBST(CUPS_PAGE_LOG_FORMAT)
 
+dnl Default SyncOnClose
+AC_ARG_ENABLE(sync_on_close, [  --enable-sync-on-close  enable SyncOnClose (off by default)])
+if test "x$enable_sync_on_close" = xyes; then
+	CUPS_SYNC_ON_CLOSE="Yes"
+	AC_DEFINE(CUPS_DEFAULT_SYNC_ON_CLOSE)
+else
+	CUPS_SYNC_ON_CLOSE="No"
+fi
+AC_SUBST(CUPS_SYNC_ON_CLOSE)
+
 dnl Default Browsing
 AC_ARG_ENABLE(browsing, [  --disable-browsing      disable Browsing by default])
 if test "x$enable_browsing" = xno; then

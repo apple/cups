@@ -26,6 +26,7 @@ Changes in CUPS v2.3.3op1
 - The scheduler no longer adds the local hostname to the ServerAlias list
   (Issue #32)
 - Added `--with-max-log-size` configure option (Issue #35)
+- Added `--enable-sync-on-close` configure option (Issue #37)
 - Added `--with-error-policy` configure option (Issue #38)
 - IPP Everywhere PPDs could have an "unknown" default InputSlot (Issue #44)
 - The `httpAddrListen` function now uses a listen backlog of 128.

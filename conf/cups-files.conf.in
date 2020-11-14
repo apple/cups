@@ -7,7 +7,7 @@
 #FatalErrors @CUPS_FATAL_ERRORS@
 
 # Do we call fsync() after writing configuration or status files?
-#SyncOnClose No
+#SyncOnClose @CUPS_SYNC_ON_CLOSE@
 
 # Default user and group for filters/backends/helper programs; this cannot be
 # any user or group that resolves to ID 0 for security reasons...

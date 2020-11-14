@@ -103,6 +103,13 @@
 
 
 /*
+ * Default SyncOnClose value...
+ */
+
+/* #undef CUPS_DEFAULT_SYNC_ON_CLOSE */
+
+
+/*
  * Do we have domain socket support, and if so what is the default one?
  */
 
