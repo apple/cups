@@ -9397,9 +9397,9 @@ _ACEOF
 
 # Check whether --with-error_policy was given.
 if test "${with_error_policy+set}" = set; then :
-  withval=$with_error_policy; CUPS_MAX_LOG_SIZE="$withval"
+  withval=$with_error_policy; CUPS_ERROR_POLICY="$withval"
 else
-  CUPS_MAX_LOG_SIZE="stop-printer"
+  CUPS_ERROR_POLICY="stop-printer"
 fi
 
 
