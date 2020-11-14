@@ -25,6 +25,8 @@ Changes in CUPS v2.3.3op1
   (Issue #30, Issue #31)
 - The scheduler no longer adds the local hostname to the ServerAlias list
   (Issue #32)
+- Added `LogFileGroup` directive in "cups-files.conf" to control the group
+  owner of log files (Issue #34)
 - Added `--with-max-log-size` configure option (Issue #35)
 - Added `--enable-sync-on-close` configure option (Issue #37)
 - Added `--with-error-policy` configure option (Issue #38)

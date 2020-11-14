@@ -173,6 +173,8 @@ VAR mode_t		ConfigFilePerm		VALUE(0640U),
 					/* Permissions for config files */
 			LogFilePerm		VALUE(0644U);
 					/* Permissions for log files */
+VAR gid_t		LogFileGroup		VALUE(0);
+					/* Group ID for log files */
 VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
 VAR cupsd_time_t	LogTimeFormat		VALUE(CUPSD_TIME_STANDARD);

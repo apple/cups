@@ -241,7 +241,7 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
       * Change ownership and permissions of non-device logs...
       */
 
-      fchown(cupsFileNumber(*lf), RunUser, Group);
+      fchown(cupsFileNumber(*lf), RunUser, LogFileGroup);
       fchmod(cupsFileNumber(*lf), LogFilePerm);
     }
   }
@@ -284,7 +284,7 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
     * Change ownership and permissions of non-device logs...
     */
 
-    fchown(cupsFileNumber(*lf), RunUser, Group);
+    fchown(cupsFileNumber(*lf), RunUser, LogFileGroup);
     fchmod(cupsFileNumber(*lf), LogFilePerm);
   }
 

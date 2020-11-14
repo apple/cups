@@ -723,6 +723,7 @@ cupsdReadConfiguration(void)
   ListenBackLog            = SOMAXCONN;
   LogDebugHistory          = 200;
   LogFilePerm              = CUPS_DEFAULT_LOG_FILE_PERM;
+  LogFileGroup             = Group;
   LogLevel                 = CUPSD_LOG_WARN;
   LogTimeFormat            = CUPSD_TIME_STANDARD;
   MaxClients               = 100;
@@ -3505,6 +3506,31 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unknown Group \"%s\" on line %d of %s.", value,
+	                  linenum, CupsFilesFile);
+	  if (FatalErrors & CUPSD_FATAL_CONFIG)
+	    return (0);
+	}
+      }
+    }
+    else if (!_cups_strcasecmp(line, "LogFileGroup") && value)
+    {
+     /*
+      * Group ID to log as...
+      */
+
+      if (isdigit(value[0]))
+        LogFileGroup = (gid_t)atoi(value);
+      else
+      {
+        endgrent();
+	group = getgrnam(value);
+
+	if (group != NULL)
+	  LogFileGroup = group->gr_gid;
+	else
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "Unknown LogFileGroup \"%s\" on line %d of %s.", value,
 	                  linenum, CupsFilesFile);
 	  if (FatalErrors & CUPSD_FATAL_CONFIG)
 	    return (0);
