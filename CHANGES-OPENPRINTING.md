@@ -17,6 +17,8 @@ Changes in CUPS v2.3.3op1
   (Issue #5)
 - The scheduler now allows root backends to have world read permissions but not
   world execute permissions (Issue #21)
+- Failures to bind IPv6 listener sockets no longer cause errors if IPv6 is
+  disabled on the host (Issue #25)
 - The SNMP backend now supports the HP and Ricoh vendor MIBs (Issue #28)
 - The scheduler no longer includes a timestamp in files it writes (Issue #29)
 - The systemd service names are now "cups.service" and "cups-lpd.service"
