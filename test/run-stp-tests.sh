@@ -268,7 +268,7 @@ case "$usedebugprintfs" in
 		echo "Enabling debug printfs (level $usedebugprintfs); log files can be found in $BASE/log..."
 		CUPS_DEBUG_LOG="$BASE/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
 		CUPS_DEBUG_LEVEL="$usedebugprintfs"; export CUPS_DEBUG_LEVEL
-		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend|mime).*$'; export CUPS_DEBUG_FILTER
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
 		;;
 
 	*)
@@ -443,14 +443,12 @@ EOF
 }
 
 ln -s $root/test/test.convs $BASE/share/mime
-ln -s $root/test/test.types $BASE/share/mime
 
 if test `uname` = Darwin; then
 	instfilter cgimagetopdf imagetopdf pdf
 	instfilter cgpdftopdf pdftopdf passthru
 	instfilter cgpdftops pdftops ps
 	instfilter cgpdftoraster pdftoraster raster
-	instfilter cgpdftoraster pdftourf raster
 	instfilter cgtexttopdf texttopdf pdf
 	instfilter pstocupsraster pstoraster raster
 else
@@ -458,7 +456,6 @@ else
 	instfilter pdftopdf pdftopdf passthru
 	instfilter pdftops pdftops ps
 	instfilter pdftoraster pdftoraster raster
-	instfilter pdftoraster pdftourf raster
 	instfilter pstoraster pstoraster raster
 	instfilter texttopdf texttopdf pdf
 
@@ -776,6 +773,13 @@ echo "    $date by $user on `hostname`." >>$strfile
 echo "    <pre>" >>$strfile
 
 for file in 5*.sh; do
+	# Wait for jobs from the previous test to complete before running the
+	# next test...
+	if test $file != 5.1-lpadmin.sh; then
+		./waitjobs.sh 1800
+	fi
+
+	# Run the test...
 	echo $ac_n "Performing $file: $ac_c"
 	echo "" >>$strfile
         echo "`date '+[%d/%b/%Y:%H:%M:%S %z]'` \"$file\":" >>$strfile
@@ -1040,7 +1044,7 @@ else
 fi
 
 # Warning log messages
-count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
+count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | $GREP -v 'libusb error' | $GREP -v ColorManager | $GREP -v 'Avahi client failed' | wc -l | awk '{print $1}'`
 if test $count != 8; then
 	echo "FAIL: $count warning messages, expected 8."
 	$GREP '^W ' $BASE/log/error_log
