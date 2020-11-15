@@ -1,6 +1,7 @@
 #
 # ESP Package Manager (EPM) file list for CUPS.
 #
+# Copyright © 2020 by Michael R Sweet
 # Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -10,8 +11,8 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2019 by Apple Inc.
-%vendor Apple Inc.
+%copyright 2020 by Michael R Sweet, 2007-2019 by Apple Inc.
+%vendor OpenPrinting
 #%license LICENSE
 %readme LICENSE
 %format rpm
@@ -20,8 +21,9 @@
 %format !rpm
 %version @CUPS_VERSION@
 %format all
-%description CUPS is the standards-based, open source printing system developed by
-%description Apple Inc. for macOS® and other UNIX®-like operating systems.
+%description CUPS is the standards-based, open source printing system developed
+%description by Apple Inc. and maintained by OpenPrinting for macOS® and other
+%description UNIX®-like operating systems.
 
 %format rpm
 %provides lpd

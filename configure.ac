@@ -70,10 +70,10 @@ AC_OUTPUT(Makedefs
 	  scheduler/cups.sh
 	  scheduler/cups.xml
 	  scheduler/org.cups.cups-lpd.plist
-	  scheduler/org.cups.cups-lpdAT.service
-	  scheduler/org.cups.cupsd.path
-	  scheduler/org.cups.cupsd.service
-	  scheduler/org.cups.cupsd.socket
+	  scheduler/cups-lpdAT.service
+	  scheduler/cups.path
+	  scheduler/cups.service
+	  scheduler/cups.socket
  	  templates/header.tmpl
           packaging/cups.list
 	  $LANGFILES)

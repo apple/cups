@@ -9928,7 +9928,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config desktop/cups.desktop doc/index.html scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpdAT.service scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket templates/header.tmpl packaging/cups.list $LANGFILES"
+ac_config_files="$ac_config_files Makedefs conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf cups-config desktop/cups.desktop doc/index.html scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/cups-lpdAT.service scheduler/cups.path scheduler/cups.service scheduler/cups.socket templates/header.tmpl packaging/cups.list $LANGFILES"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -10635,10 +10635,10 @@ do
     "scheduler/cups.sh") CONFIG_FILES="$CONFIG_FILES scheduler/cups.sh" ;;
     "scheduler/cups.xml") CONFIG_FILES="$CONFIG_FILES scheduler/cups.xml" ;;
     "scheduler/org.cups.cups-lpd.plist") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cups-lpd.plist" ;;
-    "scheduler/org.cups.cups-lpdAT.service") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cups-lpdAT.service" ;;
-    "scheduler/org.cups.cupsd.path") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.path" ;;
-    "scheduler/org.cups.cupsd.service") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.service" ;;
-    "scheduler/org.cups.cupsd.socket") CONFIG_FILES="$CONFIG_FILES scheduler/org.cups.cupsd.socket" ;;
+    "scheduler/cups-lpdAT.service") CONFIG_FILES="$CONFIG_FILES scheduler/cups-lpdAT.service" ;;
+    "scheduler/cups.path") CONFIG_FILES="$CONFIG_FILES scheduler/cups.path" ;;
+    "scheduler/cups.service") CONFIG_FILES="$CONFIG_FILES scheduler/cups.service" ;;
+    "scheduler/cups.socket") CONFIG_FILES="$CONFIG_FILES scheduler/cups.socket" ;;
     "templates/header.tmpl") CONFIG_FILES="$CONFIG_FILES templates/header.tmpl" ;;
     "packaging/cups.list") CONFIG_FILES="$CONFIG_FILES packaging/cups.list" ;;
     "$LANGFILES") CONFIG_FILES="$CONFIG_FILES $LANGFILES" ;;

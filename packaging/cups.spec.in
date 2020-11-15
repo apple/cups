@@ -3,6 +3,7 @@
 #
 # Original version by Jason McMullan <jmcc@ontv.com>.
 #
+# Copyright © 2020 by Michael R Sweet
 # Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1999-2007 by Easy Software Products, all rights reserved.
 #
@@ -48,7 +49,7 @@ Group: System Environment/Daemons
 Source: https://github.com/apple/cups/releases/download/v%{version}/cups-%{version}-source.tar.gz
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@example.com>
-Vendor: Example Corp
+Vendor: OpenPrinting
 
 # Package names are as defined for Red Hat (and clone) distributions
 BuildRequires: gnutls-devel, pam-devel
@@ -97,7 +98,8 @@ Requires: %{name} = %{epoch}:%{version} xinetd
 
 %description
 CUPS is the standards-based, open source printing system developed by
-Apple Inc. for macOS® and other UNIX®-like operating systems.
+Apple Inc. and maintained by OpenPrinting for macOS® and other UNIX®-like
+operating systems.
 
 %description devel
 This package provides the CUPS headers and development environment.
@@ -126,11 +128,11 @@ rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners $RPM_BUILD_ROOT/usr/share/cups/dat
 
 %post
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
-/bin/systemctl enable org.cups.cupsd.service
+/bin/systemctl enable cups.service
 
 if test $1 -ge 1; then
-	/bin/systemctl stop org.cups.cupsd.service
-	/bin/systemctl start org.cups.cupsd.service
+	/bin/systemctl stop cups.service
+	/bin/systemctl start cups.service
 fi
 
 %else
@@ -150,8 +152,8 @@ fi
 %preun
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 if test $1 -ge 1; then
-	/bin/systemctl stop org.cups.cupsd.service
-	/bin/systemctl disable org.cups.cupsd.service
+	/bin/systemctl stop cups.service
+	/bin/systemctl disable cups.service
 fi
 
 %else
@@ -164,8 +166,8 @@ fi
 %postun
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 if test $1 -ge 1; then
-	/bin/systemctl stop org.cups.cupsd.service
-	/bin/systemctl start org.cups.cupsd.service
+	/bin/systemctl stop cups.service
+	/bin/systemctl start cups.service
 fi
 
 %else
@@ -203,7 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 # SystemD
-/usr/lib/systemd/system/org.cups.cupsd.*
+/usr/lib/systemd/system/cups.*
 
 %else
 # Legacy init support on Linux
@@ -425,7 +427,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 # SystemD
-/usr/lib/systemd/system/org.cups.cups-lpd*
+/usr/lib/systemd/system/cups-lpd*
 %else
 # Legacy xinetd
 /etc/xinetd.d/cups-lpd
