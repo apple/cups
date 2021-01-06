@@ -1916,8 +1916,10 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
        ppd_attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
     cupsArrayAdd(pc->support_files, ppd_attr->value);
 
+#ifdef HAVE_APPLICATIONSERVICES_H
   if ((ppd_attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL)
     cupsArrayAdd(pc->support_files, ppd_attr->value);
+#endif
 
  /*
   * Return the cache data...
