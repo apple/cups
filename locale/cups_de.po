@@ -56,7 +56,7 @@ msgid "\tBanner required"
 msgstr "\tBanner erforderlich"
 
 msgid "\tCharset sets:"
-msgstr "\tZeichensatz Set:"
+msgstr "\tZeichensatz-Set:"
 
 msgid "\tConnection: direct"
 msgstr "\tVerbindung: direkt"
@@ -68,7 +68,7 @@ msgid "\tContent types: any"
 msgstr "\tInhaltstypen: beliebig"
 
 msgid "\tDefault page size:"
-msgstr "\tVoreingestellte Seitengrösse:"
+msgstr "\tVoreingestellte Seitengröße:"
 
 msgid "\tDefault pitch:"
 msgstr "\tVoreingestellte Neigung:"
@@ -254,7 +254,7 @@ msgid ""
 msgstr ""
 
 msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
-msgstr "        WARN    Datei einthält gemischt CR, LF, und CR LF Zeilenenden."
+msgstr "        WARN    Datei enthält gemischt CR-, LF-, und CR-LF-Zeilenenden."
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -277,7 +277,7 @@ msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF."
 msgstr ""
-"        WARN    Nicht-Windows PPD Dateien sollten ausschließlich LF "
+"        WARN    Nicht-Windows-PPD-Dateien sollten ausschließlich LF-"
 "Zeilenenden verwenden, nicht CR LF."
 
 #, c-format
@@ -285,7 +285,7 @@ msgid ""
 "        WARN    Obsolete PPD version %.1f.\n"
 "                REF: Page 42, section 5.2."
 msgstr ""
-"        WARN    Veraltete PPD Version %.1f.\n"
+"        WARN    Veraltete PPD-Version %.1f.\n"
 "                REF: Seite 42, Kap. 5.2."
 
 msgid ""
@@ -722,7 +722,7 @@ msgstr ""
 "  -I Inklus.Verz.         Inklusionsverzeichnis dem Suchpfad hinzufügen."
 
 msgid "  -P filename.ppd         Set PPD file."
-msgstr "  -P filename.ppd         Lege PPD Datei fest."
+msgstr "  -P filename.ppd         Lege PPD-Datei fest."
 
 msgid "  -U username             Specify username."
 msgstr "  -U username             Gebe den Benutzernamen an."
@@ -741,7 +741,7 @@ msgid "  -d printer              Use the named printer."
 msgstr "  -d printer              Benutze den genannten Drucker."
 
 msgid "  -e                      Use every filter from the PPD file."
-msgstr "  -e                      Benutzt jeden Filter der PPD Datei."
+msgstr "  -e                      Benutzt jeden Filter der PPD-Datei."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -786,7 +786,7 @@ msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p filename.ppd         PPD-Datei festlegen."
 
 msgid "  -t                      Test PPDs instead of generating them."
-msgstr "  -t                      Teste PPDs anstelle sie zu erzeugen."
+msgstr "  -t                      Teste PPDs anstatt sie zu erzeugen."
 
 msgid "  -t title                Set title."
 msgstr "  -t Titel                Legt den Titel fest."
@@ -799,7 +799,7 @@ msgstr "  -v                      Ausführliche Ausgabe."
 
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr ""
-"  -z                      Komprimiere PPD Datei unter Verwendung von GNU zip."
+"  -z                      Komprimiere PPD-Datei unter Verwendung von GNU zip."
 
 msgid " FAIL"
 msgstr ""
@@ -931,7 +931,7 @@ msgstr ""
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": Falsches Namenswert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt "
+"\"%s\": Falscher Namenswert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt "
 "5.1.3)."
 
 #, c-format
@@ -1148,7 +1148,7 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - copies must be 1 or more."
-msgstr "%s: Fehler - Kopien müssen 1 oder mehr sein."
+msgstr "%s: Fehler - Kopien muss 1 oder mehr sein."
 
 #, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
@@ -1320,7 +1320,7 @@ msgstr "%s: Entschuldigung, Verschlüsselung wird nicht unterstützt."
 
 #, c-format
 msgid "%s: Unable to connect to \"%s:%d\": %s"
-msgstr "%s: Verbindung zu \"%s:%d\": %s nicht möglich"
+msgstr "%s: Verbindung zu \"%s:%d\" nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to connect to server."
@@ -1332,7 +1332,7 @@ msgstr "%s: Server kontaktieren nicht möglich."
 
 #, c-format
 msgid "%s: Unable to create PPD file: %s"
-msgstr "%s: Erzeugung der PPD Datei nicht möglich: %s"
+msgstr "%s: Erzeugung der PPD-Datei nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1340,11 +1340,11 @@ msgstr "%s: Ermittlung des MIME-Typs von \"%s\" nicht möglich."
 
 #, c-format
 msgid "%s: Unable to open \"%s\": %s"
-msgstr "%s: Öffnen von \"%s\": %s nicht möglich"
+msgstr "%s: Öffnen von \"%s\" nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to open %s: %s"
-msgstr "%s: Öffnen von %s: %s nicht möglich"
+msgstr "%s: Öffnen von %s nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to open PPD file: %s on line %d."
@@ -2790,7 +2790,7 @@ msgstr "Applikator"
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
-msgstr "Versuch den %s Druckerstatus auf einen ungültigen %d Wert zu setzen."
+msgstr "Versuch den %s Druckerstatus auf einen ungültigen Wert %d zu setzen."
 
 #, c-format
 msgid "Attribute \"%s\" is in the wrong group."
@@ -2842,7 +2842,7 @@ msgstr "DIN B9"
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
-msgstr "Falscher \"printer-id\" Wert %d."
+msgstr "Falscher \"printer-id\"-Wert %d."
 
 #, c-format
 msgid "Bad '%s' value."
@@ -2850,7 +2850,7 @@ msgstr ""
 
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
-msgstr "Fehlerhafter 'document-format' Wert \"%s\"."
+msgstr "Fehlerhafter 'document-format'-Wert \"%s\"."
 
 msgid "Bad CloseUI/JCLCloseUI"
 msgstr ""
@@ -3091,7 +3091,7 @@ msgid "Created"
 msgstr "Erstellt"
 
 msgid "Credentials do not validate against site CA certificate."
-msgstr "Anmeldedaten validieren nicht gegen das CA Zertifikat der Seite"
+msgstr "Anmeldedaten validieren nicht gegen das CA-Zertifikat der Seite"
 
 msgid "Credentials have expired."
 msgstr "Berechtigung ist abgelaufen"
@@ -3213,7 +3213,7 @@ msgid "Edit Configuration File"
 msgstr "Konfigurationsdatei bearbeiten"
 
 msgid "Encryption is not supported."
-msgstr "Verschlüsselung ist nicht unterstüzt."
+msgstr "Verschlüsselung ist nicht unterstützt."
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
@@ -3228,7 +3228,7 @@ msgid ""
 "valid Kerberos ticket."
 msgstr ""
 "Geben Sie Ihren Benutzernamen und das Passwort oder den root-Benutzernamen "
-"und -passwort ein, um auf diese Seite zuzugreifen. Falls Sie die Kerberos-"
+"und -Passwort ein, um auf diese Seite zuzugreifen. Falls Sie die Kerberos-"
 "Authentifizierung verwenden, stellen Sie sicher, dass Sie ein gültiges "
 "Kerberos-Ticket haben."
 
@@ -3551,7 +3551,7 @@ msgid "IPP begCollection value not 0 bytes."
 msgstr "IPP begCollection Wert nicht 0 Byte."
 
 msgid "IPP boolean value not 1 byte."
-msgstr "IPP boolescher Wert nicht 1 Byte."
+msgstr "IPP boolscher Wert nicht 1 Byte."
 
 msgid "IPP date value not 11 bytes."
 msgstr "IPP-Datenwert nicht 11 Byte."
@@ -3563,7 +3563,7 @@ msgid "IPP enum value not 4 bytes."
 msgstr "IPP enum Wert nicht 4 Byte."
 
 msgid "IPP extension tag larger than 0x7FFFFFFF."
-msgstr "IPP Erweiterung grösser als 0x7FFFFFFF."
+msgstr "IPP-Erweiterung größer als 0x7FFFFFFF."
 
 msgid "IPP integer value not 4 bytes."
 msgstr "IPP Integer-Wert nicht 4 Bytes."
@@ -3794,7 +3794,7 @@ msgid "Job is completed and cannot be changed."
 msgstr "Auftrag ist abgeschlossen und kann nicht geändert werden."
 
 msgid "Job operation failed"
-msgstr "Auftrag fehlgeschlagen:"
+msgstr "Auftrag fehlgeschlagen"
 
 msgid "Job state cannot be changed."
 msgstr "Auftragsstatus kann nicht geändert werden."
@@ -3897,10 +3897,10 @@ msgid "Missing document-number attribute."
 msgstr "Fehlendes Attribut zur Dokumentennummer."
 
 msgid "Missing form variable"
-msgstr "Fehlende form Variable"
+msgstr "Fehlende form-Variable"
 
 msgid "Missing last-document attribute in request."
-msgstr "Fehlendes Letzte-Sete Attribut in der Anfrage."
+msgstr "Fehlendes Letzte-Seite-Attribut in der Anfrage."
 
 msgid "Missing media or media-col."
 msgstr ""
@@ -3985,7 +3985,7 @@ msgid "New credentials are not valid for name."
 msgstr "Neue Anmeldedaten sind für den Namen ungültig."
 
 msgid "New credentials are older than stored credentials."
-msgstr "Neue Anmeldedaten sind läter als die gespeicherten Anmeldedaten"
+msgstr "Neue Anmeldedaten sind älter als die gespeicherten Anmeldedaten"
 
 msgid "No"
 msgstr "Nein"
@@ -4542,7 +4542,7 @@ msgid "The PPD file \"%s\" could not be opened: %s"
 msgstr "Die PPD-Datei »%s« konnte nicht geöffnet werden: %s"
 
 msgid "The PPD file could not be opened."
-msgstr "Die PPD Datei konnte nicht geöffnet werden."
+msgstr "Die PPD-Datei konnte nicht geöffnet werden."
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -4610,7 +4610,7 @@ msgid "The printer-uri \"%s\" contains invalid characters."
 msgstr "Die Drucker-URI »%s« enthält ungültige Zeichen."
 
 msgid "The printer-uri attribute is required."
-msgstr "Das printer-uri Attribut ist erforderlich."
+msgstr "Das printer-uri-Attribut ist erforderlich."
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
@@ -4639,7 +4639,7 @@ msgid "There are too many subscriptions."
 msgstr "Es gibt zu viele Subskriptionen."
 
 msgid "There was an unrecoverable USB error."
-msgstr "Ein nicht zu behebender USB Fehler ist aufgetreten."
+msgstr "Ein nicht zu behebender USB-Fehler ist aufgetreten."
 
 msgid "Thermal Transfer Media"
 msgstr "Thermotransferpapier"
@@ -4649,11 +4649,11 @@ msgstr "Zu viele aktive Druckaufträge."
 
 #, c-format
 msgid "Too many job-sheets values (%d > 2)."
-msgstr "Zu viele job-sheets Werte (%d > 2)."
+msgstr "Zu viele job-sheets-Werte (%d > 2)."
 
 #, c-format
 msgid "Too many printer-state-reasons values (%d > %d)."
-msgstr "Zu viele printer-state-reasons Werte (%d > %d)."
+msgstr "Zu viele printer-state-reasons-Werte (%d > %d)."
 
 msgid "Transparency"
 msgstr "Transparenz"
@@ -4750,12 +4750,12 @@ msgid "Unable to change printer-is-shared attribute"
 msgstr "Attribut „printer-is-shared“ konnte nicht geändert werden"
 
 msgid "Unable to change server settings"
-msgstr "Servereinstellungen konnten nicht geändert werden :"
+msgstr "Servereinstellungen konnten nicht geändert werden"
 
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
 msgstr ""
-"Der regulären Ausdruck %s für mimeMediaType kann nicht kompiliert werden."
+"Der regulären Ausdruck für mimeMediaType kann nicht kompiliert werden: %s."
 
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
@@ -4775,10 +4775,10 @@ msgstr ""
 
 #, c-format
 msgid "Unable to copy PPD file - %s"
-msgstr "PPD Datei %s kann nicht kopiert werden"
+msgstr "PPD-Datei kann nicht kopiert werden - %s"
 
 msgid "Unable to copy PPD file."
-msgstr "PPD Datei kann nicht kopiert werden"
+msgstr "PPD-Datei kann nicht kopiert werden"
 
 msgid "Unable to create credentials from array."
 msgstr "Anmeldedaten aus dem Array können nicht erzeugt werden."
@@ -4809,7 +4809,7 @@ msgid "Unable to do maintenance command"
 msgstr "Wartungsbefehl konnte nicht ausgeführt werden"
 
 msgid "Unable to edit cupsd.conf files larger than 1MB"
-msgstr "cupsd.conf Dateien grösser als 1MB können nicht bearbeitet werden"
+msgstr "cupsd.conf-Dateien größer als 1MB können nicht bearbeitet werden"
 
 #, c-format
 msgid "Unable to establish a secure connection to host (%d)."
@@ -4978,7 +4978,7 @@ msgstr "Kann Druckdaten nicht schreiben"
 
 #, c-format
 msgid "Unable to write uncompressed print data: %s"
-msgstr "Unkomprimierte Druckdaten %s können nicht geschrieben werden."
+msgstr "Unkomprimierte Druckdaten können nicht geschrieben werden: %s"
 
 msgid "Unauthorized"
 msgstr "Nicht berechtigt"
@@ -5563,7 +5563,7 @@ msgstr ""
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
-msgstr "cupsctl: Kann nicht mit dem Server %s verbinden"
+msgstr "cupsctl: Kann nicht mit dem Server verbinden: %s"
 
 #, c-format
 msgid "cupsctl: Unknown option \"%s\""
@@ -7766,13 +7766,13 @@ msgid "lpadmin: Expected class name after \"-c\" option."
 msgstr "lpadmin: Klasse nach der \"-c\" Option erwartet."
 
 msgid "lpadmin: Expected description after \"-D\" option."
-msgstr "lpadmin: BEschreibung nach der \"-D\" Option erwartet."
+msgstr "lpadmin: Beschreibung nach der \"-D\" Option erwartet."
 
 msgid "lpadmin: Expected device URI after \"-v\" option."
 msgstr "lpadmin: Geräte-URI nach der \"-v\" Option erwartet."
 
 msgid "lpadmin: Expected file type(s) after \"-I\" option."
-msgstr "lpadmin: Dateitype nach der \"-I\" Option erwartet."
+msgstr "lpadmin: Dateityp nach der \"-I\" Option erwartet."
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
 msgstr "lpadmin: Hostname nach der \"-h\" Option erwartet."
@@ -7839,7 +7839,7 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s"
-msgstr "lpadmin: Kann nicht mit dem Server %s verbinden."
+msgstr "lpadmin: Kann nicht mit dem Server verbinden: %s"
 
 msgid "lpadmin: Unable to create temporary file"
 msgstr "lpadmin: Temporäre Datei kann nicht angelegt werden"
@@ -7915,7 +7915,7 @@ msgstr ""
 
 #, c-format
 msgid "lpmove: Unable to connect to server: %s"
-msgstr "lpmove: Verbindung zum Server »%s« nicht möglich"
+msgstr "lpmove: Verbindung zum Server nicht möglich: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
@@ -7930,7 +7930,7 @@ msgstr "lpoptions: Hinzufügen von Drucker oder Instanz nicht möglich: %s"
 
 #, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s"
-msgstr "lpoptions: Keine PPD-Datei für %s: %s verfügbar"
+msgstr "lpoptions: Keine PPD-Datei für %s verfügbar: %s"
 
 #, c-format
 msgid "lpoptions: Unable to open PPD file for %s."
@@ -11125,7 +11125,7 @@ msgstr ""
 
 #, c-format
 msgid "ppdc: Writing %s."
-msgstr "ppdc: Schreibe: %s."
+msgstr "ppdc: Schreibe %s."
 
 #, c-format
 msgid "ppdc: Writing PPD files to directory \"%s\"."
