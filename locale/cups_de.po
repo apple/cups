@@ -24,7 +24,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2021-02-02 13:50+0100\n"
+"PO-Revision-Date: 2021-02-02 17:11+0100\n"
 "Last-Translator: Joachim Schwender <Joachim@schwender-beyer.de>\n"
 "Language-Team: German <joachim.schwender@web.de>\n"
 "Language: de\n"
@@ -473,6 +473,8 @@ msgid ""
 "      %s  REQUIRED %s does not define choice None.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
+"      %s  ERFORDERLICHE %s definiert keine Auswahl.\n"
+"                REF: Seite 122, Abschnitt 5.17."
 
 #, c-format
 msgid "      %s  Size \"%s\" defined for %s but not for %s."
@@ -639,13 +641,15 @@ msgid ""
 "      **FAIL**  REQUIRED FileVersion\n"
 "                REF: Page 56, section 5.3."
 msgstr ""
-"      **FEHLER**  REQUIRED FileVersion\n"
-"                REF: Page 56, section 5.3."
+"    **FEHLER**  FileVersion ERFORDERLICH\n"
+"                REF: Seite 56, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED FormatVersion\n"
 "                REF: Page 56, section 5.3."
 msgstr ""
+"    **FEHLER**  FormatVersion ERFORDERLICH\n"
+"                REF: Seite 56, Abschnitt 5.3."
 
 #, c-format
 msgid ""
@@ -658,52 +662,73 @@ msgid ""
 "      **FAIL**  REQUIRED LanguageEncoding\n"
 "                REF: Pages 56-57, section 5.3."
 msgstr ""
+"    **FEHLER**  LanguageEncoding ERFORDERLICH\n"
+"                REF: Seiten 56-57, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED LanguageVersion\n"
 "                REF: Pages 57-58, section 5.3."
 msgstr ""
+"    **FEHLER**  LanguageVersion ERFORDERLICH\n"
+"                REF: Seiten 57-58, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED Manufacturer\n"
 "                REF: Pages 58-59, section 5.3."
 msgstr ""
+"    **FEHLER**  Manufacturer ERFORDERLICH\n"
+"                REF: Seiten 58-59, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED ModelName\n"
 "                REF: Pages 59-60, section 5.3."
 msgstr ""
+"    **FEHLER**  ModelName ERFORDERLICH\n"
+"                REF: Seiten 59-60, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED NickName\n"
 "                REF: Page 60, section 5.3."
 msgstr ""
+"    **FEHLER**  NickName ERFORDERLICH\n"
+"                REF: Seite 60, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PCFileName\n"
 "                REF: Pages 61-62, section 5.3."
 msgstr ""
+"    **FEHLER**  PCFileName ERFORDERLICH\n"
+"                REF: Seiten 61-62, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PSVersion\n"
 "                REF: Pages 62-64, section 5.3."
 msgstr ""
+"    **FEHLER**  PSVersion ERFORDERLICH\n"
+"                REF: Seiten 62-64, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED PageRegion\n"
 "                REF: Page 100, section 5.14."
 msgstr ""
+"    **FEHLER**  PageRegion ERFORDERLICH\n"
+"                REF: Seite 100, Abschnitt 5.14."
 
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Page 41, section 5.\n"
 "                REF: Page 99, section 5.14."
 msgstr ""
+"    **FEHLER**  PageSize ERFORDERLICH\n"
+"                REF: Seite 41, Abschnitt 5.\n"
+"                     Seite 99, Abschnitt 4.14."
 
 msgid ""
 "      **FAIL**  REQUIRED PageSize\n"
 "                REF: Pages 99-100, section 5.14."
 msgstr ""
+"    **FEHLER**  PageSize ERFORDERLICH\n"
+"                REF: Seiten 99-100, Abschnitt 5.14."
 
 #, c-format
 msgid ""
@@ -711,16 +736,23 @@ msgid ""
 "                REF: Page 41, section 5.\n"
 "                REF: Page 103, section 5.15."
 msgstr ""
+"    **FEHLER**  PaperDimension für PageSize %s ERFORDERLICH\n"
+"                REF: Seite 41, Abschnitt 5.\n"
+"                     Seite 103, Abschnitt 5.15."
 
 msgid ""
 "      **FAIL**  REQUIRED Product\n"
 "                REF: Page 62, section 5.3."
 msgstr ""
+"    **FEHLER**  Product ERFORDERLICH\n"
+"                REF: Seite 62, Abschnitt 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED ShortNickName\n"
 "                REF: Page 64-65, section 5.3."
 msgstr ""
+"    **FEHLER**  ShortNickName ERFORDERLICH\n"
+"                REF: Seiten 64-65, Abschnitt 5.3."
 
 #, c-format
 msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
@@ -1521,7 +1553,7 @@ msgid ""
 msgstr ""
 
 msgid "--ippserver filename    Produce ippserver attribute file"
-msgstr ""
+msgstr "--ippserver Dateiname   Erstelle eine ippserver Attribut-Datei"
 
 msgid "--language locale       Show models matching the given locale"
 msgstr ""
@@ -1556,7 +1588,7 @@ msgid "--port number[-number]  Match port to number or range"
 msgstr ""
 
 msgid "--print                 Print URI if true"
-msgstr ""
+msgstr "--print                 Drucke URI wenn wahr"
 
 msgid "--print-name            Print service name if true"
 msgstr ""
@@ -1569,7 +1601,7 @@ msgid "--quiet                 Quietly report match via exit code"
 msgstr ""
 
 msgid "--release               Release previously held jobs"
-msgstr ""
+msgstr "--release               Angehaltene Aufträge freigeben"
 
 msgid "--remote                True if service is remote"
 msgstr ""
@@ -1944,7 +1976,7 @@ msgstr ""
 "-f Dateiname            Lege den voreingestellten Dateinamen der Anfrage fest"
 
 msgid "-f type/subtype[,...]   Set supported file types"
-msgstr ""
+msgstr "-f Typ/Untertyp[,...]   Legt unterstützte Dateitypen fest"
 
 msgid "-h                      Show this usage message."
 msgstr "-h                      Zeige diesen Hinweis."
@@ -1953,7 +1985,7 @@ msgid "-h                      Validate HTTP response headers"
 msgstr "-h                      Validiere HTTP Antwort-Header"
 
 msgid "-h regex                Match hostname to regular expression"
-msgstr ""
+msgstr "-h Regex                Prüft den Hostnamen gegen regulären Ausdruck"
 
 msgid "-h server[:port]        Connect to the named server and port"
 msgstr "-h Server[:Port]        Verbinde mit genanntem Server und Port"
@@ -5407,7 +5439,7 @@ msgstr "abgebrochen"
 
 #. TRANSLATORS: Accuracy Units
 msgid "accuracy-units"
-msgstr ""
+msgstr "Genauigkeit"
 
 #. TRANSLATORS: Millimeters
 msgid "accuracy-units.mm"
@@ -5447,11 +5479,11 @@ msgstr ""
 
 #. TRANSLATORS: Job
 msgid "baling-when.after-job"
-msgstr "Auftrag"
+msgstr "nach dem Auftrag"
 
 #. TRANSLATORS: Sets
 msgid "baling-when.after-sets"
-msgstr "Set"
+msgstr "nach den Sets"
 
 #. TRANSLATORS: Bind Output
 msgid "binding"
@@ -7131,11 +7163,11 @@ msgstr "ippfind: Asuführung nicht möglich \"%s\": %s"
 
 #, c-format
 msgid "ippfind: Unable to use Bonjour: %s"
-msgstr ""
+msgstr "ippfind: Bonjour kann nicht verwendet werden: %s"
 
 #, c-format
 msgid "ippfind: Unknown variable \"{%s}\"."
-msgstr ""
+msgstr "ippfind: Unbejannte Variable \"{%s}\"."
 
 msgid ""
 "ipptool: \"-i\" and \"-n\" are incompatible with \"--ippserver\", \"-P\", "
@@ -7147,10 +7179,10 @@ msgstr ""
 
 #, c-format
 msgid "ipptool: Bad URI \"%s\"."
-msgstr ""
+msgstr "ipptool: Falsche URI \"%s\"."
 
 msgid "ipptool: Invalid seconds for \"-i\"."
-msgstr ""
+msgstr "ipptool: Ungültige Sekundenzahl für \"-i\"."
 
 msgid "ipptool: May only specify a single URI."
 msgstr ""
@@ -7168,14 +7200,14 @@ msgid "ipptool: Missing name=value for \"-d\"."
 msgstr ""
 
 msgid "ipptool: Missing seconds for \"-i\"."
-msgstr ""
+msgstr "ipptool: Fehlende Sekundenzahl für \"-i\"."
 
 msgid "ipptool: URI required before test file."
-msgstr ""
+msgstr "ipptool: URI muss vor der Testdatei angegeben werden."
 
 #. TRANSLATORS: Job Account ID
 msgid "job-account-id"
-msgstr ""
+msgstr "Auftragskonto-ID"
 
 #. TRANSLATORS: Job Account Type
 msgid "job-account-type"
@@ -8740,7 +8772,7 @@ msgstr "Medienquelle"
 
 #. TRANSLATORS: Alternate
 msgid "media-source.alternate"
-msgstr ""
+msgstr "Alternativer Einzug"
 
 #. TRANSLATORS: Alternate Roll
 msgid "media-source.alternate-roll"
@@ -9052,7 +9084,7 @@ msgstr "Extraschwer"
 
 #. TRANSLATORS: Intermediate Paper
 msgid "media-type.com.hp.intermediate"
-msgstr ""
+msgstr "Mittel"
 
 #. TRANSLATORS: Mid-Weight Paper
 msgid "media-type.com.hp.mid-weight"
@@ -9084,7 +9116,7 @@ msgstr "Endlos kurz"
 
 #. TRANSLATORS: Corrugated Board
 msgid "media-type.corrugated-board"
-msgstr ""
+msgstr "Geriffelter Karton"
 
 #. TRANSLATORS: Optical Disc
 msgid "media-type.disc"
@@ -9092,23 +9124,23 @@ msgstr "Optische Scheibe"
 
 #. TRANSLATORS: Glossy Optical Disc
 msgid "media-type.disc-glossy"
-msgstr "glänzende optische Scheibe"
+msgstr "Glänzend"
 
 #. TRANSLATORS: High Gloss Optical Disc
 msgid "media-type.disc-high-gloss"
-msgstr ""
+msgstr "Hochgänzend"
 
 #. TRANSLATORS: Matte Optical Disc
 msgid "media-type.disc-matte"
-msgstr "matte optische Scheibe"
+msgstr "Matt"
 
 #. TRANSLATORS: Satin Optical Disc
 msgid "media-type.disc-satin"
-msgstr ""
+msgstr "Satin"
 
 #. TRANSLATORS: Semi-Gloss Optical Disc
 msgid "media-type.disc-semi-gloss"
-msgstr ""
+msgstr "Halbglänzend"
 
 #. TRANSLATORS: Double Wall
 msgid "media-type.double-wall"
@@ -9928,35 +9960,35 @@ msgstr "Hagaki"
 
 #. TRANSLATORS: Envelope Kahu
 msgid "media.jpn_kahu_240x322.1mm"
-msgstr "Umschlag Kahu"
+msgstr "Umschlag Kahu 240×322 mm"
 
 #. TRANSLATORS: 270 x 382mm
 msgid "media.jpn_kaku1_270x382mm"
-msgstr ""
+msgstr "Umschlag Kahu 270×382 mm"
 
 #. TRANSLATORS: Envelope Kahu 2
 msgid "media.jpn_kaku2_240x332mm"
-msgstr ""
+msgstr "Umschlag Kahu 240×332 mm"
 
 #. TRANSLATORS: 216 x 277mm
 msgid "media.jpn_kaku3_216x277mm"
-msgstr ""
+msgstr "Umschlag Kahu 216×277 mm"
 
 #. TRANSLATORS: 197 x 267mm
 msgid "media.jpn_kaku4_197x267mm"
-msgstr ""
+msgstr "Umschlag Kahu 197×297 mm"
 
 #. TRANSLATORS: 190 x 240mm
 msgid "media.jpn_kaku5_190x240mm"
-msgstr ""
+msgstr "Umschlag Kahu 190×240 mm"
 
 #. TRANSLATORS: 142 x 205mm
 msgid "media.jpn_kaku7_142x205mm"
-msgstr ""
+msgstr "Umschlag Kahu 142×205 mm"
 
 #. TRANSLATORS: 119 x 197mm
 msgid "media.jpn_kaku8_119x197mm"
-msgstr ""
+msgstr "Umschlag Kahu 119×197 mm"
 
 #. TRANSLATORS: Oufuku Reply Postcard
 msgid "media.jpn_oufuku_148x200mm"
@@ -10016,127 +10048,127 @@ msgstr "Umschlag A2"
 
 #. TRANSLATORS: 9 x 12″
 msgid "media.na_arch-a_9x12in"
-msgstr ""
+msgstr "9×12 inch"
 
 #. TRANSLATORS: 12 x 18″
 msgid "media.na_arch-b_12x18in"
-msgstr ""
+msgstr "12×18 inch"
 
 #. TRANSLATORS: 18 x 24″
 msgid "media.na_arch-c_18x24in"
-msgstr ""
+msgstr "18×24 inch"
 
 #. TRANSLATORS: 24 x 36″
 msgid "media.na_arch-d_24x36in"
-msgstr ""
+msgstr "24×36 inch"
 
 #. TRANSLATORS: 26 x 38″
 msgid "media.na_arch-e2_26x38in"
-msgstr ""
+msgstr "26×38 inch"
 
 #. TRANSLATORS: 27 x 39″
 msgid "media.na_arch-e3_27x39in"
-msgstr ""
+msgstr "27×39 inch"
 
 #. TRANSLATORS: 36 x 48″
 msgid "media.na_arch-e_36x48in"
-msgstr ""
+msgstr "36×48 inch"
 
 #. TRANSLATORS: 12 x 19.17″
 msgid "media.na_b-plus_12x19.17in"
-msgstr ""
+msgstr "Bplus 12×19 inch"
 
 #. TRANSLATORS: Envelope C5
 msgid "media.na_c5_6.5x9.5in"
-msgstr ""
+msgstr "C5 6,5×9,5 inch"
 
 #. TRANSLATORS: 17 x 22″
 msgid "media.na_c_17x22in"
-msgstr ""
+msgstr "17×22 inch"
 
 #. TRANSLATORS: 22 x 34″
 msgid "media.na_d_22x34in"
-msgstr ""
+msgstr "22×34 inch"
 
 #. TRANSLATORS: 34 x 44″
 msgid "media.na_e_34x44in"
-msgstr ""
+msgstr "34×44 inch"
 
 #. TRANSLATORS: 11 x 14″
 msgid "media.na_edp_11x14in"
-msgstr ""
+msgstr "11×14 inch"
 
 #. TRANSLATORS: 12 x 14″
 msgid "media.na_eur-edp_12x14in"
-msgstr ""
+msgstr "12×14 inch"
 
 #. TRANSLATORS: Executive
 msgid "media.na_executive_7.25x10.5in"
-msgstr ""
+msgstr "Executive 7,25×10,5 inch"
 
 #. TRANSLATORS: 44 x 68″
 msgid "media.na_f_44x68in"
-msgstr ""
+msgstr "44×68 inch"
 
 #. TRANSLATORS: European Fanfold
 msgid "media.na_fanfold-eur_8.5x12in"
-msgstr ""
+msgstr "8,5×12 inch"
 
 #. TRANSLATORS: US Fanfold
 msgid "media.na_fanfold-us_11x14.875in"
-msgstr ""
+msgstr "11×14,875 inch"
 
 #. TRANSLATORS: Foolscap
 msgid "media.na_foolscap_8.5x13in"
-msgstr ""
+msgstr "8,5×13 inch"
 
 #. TRANSLATORS: 8 x 13″
 msgid "media.na_govt-legal_8x13in"
-msgstr ""
+msgstr "8×13 inch"
 
 #. TRANSLATORS: 8 x 10″
 msgid "media.na_govt-letter_8x10in"
-msgstr ""
+msgstr "Letter 8×10 inch"
 
 #. TRANSLATORS: 3 x 5″
 msgid "media.na_index-3x5_3x5in"
-msgstr ""
+msgstr "Index 3×5 inch"
 
 #. TRANSLATORS: 6 x 8″
 msgid "media.na_index-4x6-ext_6x8in"
-msgstr ""
+msgstr "Index 4×6,6×8 inch"
 
 #. TRANSLATORS: 4 x 6″
 msgid "media.na_index-4x6_4x6in"
-msgstr ""
+msgstr "Index 4×6 inch"
 
 #. TRANSLATORS: 5 x 8″
 msgid "media.na_index-5x8_5x8in"
-msgstr ""
+msgstr "Index 5×8 inch"
 
 #. TRANSLATORS: Statement
 msgid "media.na_invoice_5.5x8.5in"
-msgstr ""
+msgstr "Invoice 5,5×8,5 inch"
 
 #. TRANSLATORS: 11 x 17″
 msgid "media.na_ledger_11x17in"
-msgstr ""
+msgstr "Ledger 11×17 inch"
 
 #. TRANSLATORS: US Legal (Extra)
 msgid "media.na_legal-extra_9.5x15in"
-msgstr ""
+msgstr "Legal Extra 9,5×15 inch"
 
 #. TRANSLATORS: US Legal
 msgid "media.na_legal_8.5x14in"
-msgstr ""
+msgstr "Legal 8,5×14 inch"
 
 #. TRANSLATORS: US Letter (Extra)
 msgid "media.na_letter-extra_9.5x12in"
-msgstr ""
+msgstr "Letter Extra 9,5×12 inch"
 
 #. TRANSLATORS: US Letter (Plus)
 msgid "media.na_letter-plus_8.5x12.69in"
-msgstr ""
+msgstr "Letter Plus 8,5×12,69 inch"
 
 #. TRANSLATORS: US Letter
 msgid "media.na_letter_8.5x11in"
@@ -10280,15 +10312,15 @@ msgstr "Umschlag italienisch (110×230 mm)"
 
 #. TRANSLATORS: 198 x 275mm
 msgid "media.om_juuro-ku-kai_198x275mm"
-msgstr ""
+msgstr "KuKai 198×275 mm"
 
 #. TRANSLATORS: 200 x 300
 msgid "media.om_large-photo_200x300"
-msgstr ""
+msgstr "Foto 200×300 mm"
 
 #. TRANSLATORS: 130 x 180mm
 msgid "media.om_medium-photo_130x180mm"
-msgstr ""
+msgstr "Foto 130×180 mm"
 
 #. TRANSLATORS: 267 x 389mm
 msgid "media.om_pa-kai_267x389mm"
@@ -10316,51 +10348,51 @@ msgstr "Umschlag CN, 324×458 mm"
 
 #. TRANSLATORS: Chinese 16k
 msgid "media.prc_16k_146x215mm"
-msgstr ""
+msgstr "16k 146×215 mm"
 
 #. TRANSLATORS: Envelope Chinese #1
 msgid "media.prc_1_102x165mm"
-msgstr ""
+msgstr "PRC 102×165 mm"
 
 #. TRANSLATORS: Envelope Chinese #2
 msgid "media.prc_2_102x176mm"
-msgstr ""
+msgstr "PRC 102×176 mm"
 
 #. TRANSLATORS: Chinese 32k
 msgid "media.prc_32k_97x151mm"
-msgstr ""
+msgstr "PRC 97×151 mm"
 
 #. TRANSLATORS: Envelope Chinese #3
 msgid "media.prc_3_125x176mm"
-msgstr ""
+msgstr "PRC 125×176 mm"
 
 #. TRANSLATORS: Envelope Chinese #4
 msgid "media.prc_4_110x208mm"
-msgstr ""
+msgstr "PRC 110×208 mm"
 
 #. TRANSLATORS: Envelope Chinese #5
 msgid "media.prc_5_110x220mm"
-msgstr ""
+msgstr "PRC 110×220 mm"
 
 #. TRANSLATORS: Envelope Chinese #6
 msgid "media.prc_6_120x320mm"
-msgstr ""
+msgstr "PRC 120×320 mm"
 
 #. TRANSLATORS: Envelope Chinese #7
 msgid "media.prc_7_160x230mm"
-msgstr ""
+msgstr "PRC 160×230 mm"
 
 #. TRANSLATORS: Envelope Chinese #8
 msgid "media.prc_8_120x309mm"
-msgstr ""
+msgstr "PRC 120×309 mm"
 
 #. TRANSLATORS: ROC 16k
 msgid "media.roc_16k_7.75x10.75in"
-msgstr ""
+msgstr "ROC 7,75×10,75 inch"
 
 #. TRANSLATORS: ROC 8k
 msgid "media.roc_8k_10.75x15.5in"
-msgstr ""
+msgstr "ROC 10,75×15,5 inch"
 
 #, c-format
 msgid "members of class %s:"
@@ -10597,7 +10629,7 @@ msgstr "Anzahl der Wiederholungen"
 
 #. TRANSLATORS: Number-Up
 msgid "number-up"
-msgstr ""
+msgstr "Drucke pro Seite"
 
 #. TRANSLATORS: Object Offset
 msgid "object-offset"
@@ -10821,7 +10853,7 @@ msgstr "Bildqualität des Scans"
 
 #. TRANSLATORS: Page Delivery
 msgid "page-delivery"
-msgstr ""
+msgstr "Ausgabeorientierung"
 
 #. TRANSLATORS: Reverse Order Face-down
 msgid "page-delivery.reverse-order-face-down"
@@ -11386,7 +11418,7 @@ msgstr "Farbe"
 
 #. TRANSLATORS: Highlight
 msgid "print-color-mode.highlight"
-msgstr ""
+msgstr "Betont"
 
 #. TRANSLATORS: Monochrome
 msgid "print-color-mode.monochrome"
