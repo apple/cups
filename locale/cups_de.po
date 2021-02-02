@@ -24,7 +24,7 @@ msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2021-02-02 11:37+0100\n"
+"PO-Revision-Date: 2021-02-02 13:50+0100\n"
 "Last-Translator: Joachim Schwender <Joachim@schwender-beyer.de>\n"
 "Language-Team: German <joachim.schwender@web.de>\n"
 "Language: de\n"
@@ -192,52 +192,52 @@ msgstr "        %-39.39s %.0f Bytes"
 
 #, c-format
 msgid "        PASS    Default%s"
-msgstr ""
+msgstr "        BESTANDEN    Default%s"
 
 msgid "        PASS    DefaultImageableArea"
-msgstr ""
+msgstr "        BESTANDEN    DefaultImageableArea"
 
 msgid "        PASS    DefaultPaperDimension"
-msgstr ""
+msgstr "        BESTANDEN    DefaultPaperDimension"
 
 msgid "        PASS    FileVersion"
-msgstr ""
+msgstr "        BESTANDEN    FileVersion"
 
 msgid "        PASS    FormatVersion"
-msgstr ""
+msgstr "        BESTANDEN    FormatVersion"
 
 msgid "        PASS    LanguageEncoding"
-msgstr ""
+msgstr "        BESTANDEN    LanguageEncoding"
 
 msgid "        PASS    LanguageVersion"
-msgstr ""
+msgstr "        BESTANDEN    LanguageVersion"
 
 msgid "        PASS    Manufacturer"
-msgstr ""
+msgstr "        BESTANDEN    Manufacturer"
 
 msgid "        PASS    ModelName"
-msgstr ""
+msgstr "        BESTANDEN    ModelName"
 
 msgid "        PASS    NickName"
-msgstr ""
+msgstr "        BESTANDEN    NickName"
 
 msgid "        PASS    PCFileName"
-msgstr ""
+msgstr "        BESTANDEN    PCFileName"
 
 msgid "        PASS    PSVersion"
-msgstr ""
+msgstr "        BESTANDEN    PSVersion"
 
 msgid "        PASS    PageRegion"
-msgstr ""
+msgstr "        BESTANDEN    PageRegion"
 
 msgid "        PASS    PageSize"
-msgstr ""
+msgstr "        BESTANDEN    PageSize"
 
 msgid "        PASS    Product"
-msgstr ""
+msgstr "        BESTANDEN    Product"
 
 msgid "        PASS    ShortNickName"
-msgstr ""
+msgstr "        BESTANDEN    ShortNickName"
 
 #, c-format
 msgid "        WARN    %s has no corresponding options."
@@ -257,6 +257,9 @@ msgid ""
 "be named Duplex.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
+"        WARN    Schlüsselwort für Duplex-Option %s funktioniert "
+"möglicherweise nicht wie erwartet und sollte Duplex genannt werden.\n"
+"                REF: Seite 122, Abschnitt 5.17"
 
 msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
 msgstr ""
@@ -307,21 +310,30 @@ msgid ""
 "        WARN    PCFileName should contain a unique filename.\n"
 "                REF: Pages 61-62, section 5.3."
 msgstr ""
+"        WARN    PCFileName sollte einen eindeutigen Dateinamen enthalten.\n"
+"                REF: Seiten 61-62, Abschnitt 5.3."
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
 "                REF: Pages 78-79, section 5.7."
 msgstr ""
+"        WARN    Protocols enthält PJL aber JCL Attribute sind nicht "
+"festgelegt.\n"
+"                REF: Seiten 78-79, Abschnitt 5.7."
 
 msgid ""
 "        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
 "                REF: Pages 78-79, section 5.7."
 msgstr ""
+"        WARN    Protocols enthalten PJL und BCP; erwartet wird TBCP.\n"
+"                REF: Seiten 78-79, Abschnitt 5.7."
 
 msgid ""
 "        WARN    ShortNickName required by PPD 4.3 spec.\n"
 "                REF: Pages 64-65, section 5.3."
 msgstr ""
+"        WARN    ShortNickName erforderlich gem.PPD 4.3 Spezifikation.\n"
+"                REF: Seiten 64-65, Abschnitt 5.3."
 
 #, c-format
 msgid ""
@@ -393,6 +405,8 @@ msgstr "      %s  Ungültige Schreibweise von %s - sollte %s sein."
 #, c-format
 msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID."
 msgstr ""
+"      %s  Kann nicht sowohl APScanAppPath als auch APScanAppBundleID bereit "
+"stellen."
 
 #, c-format
 msgid "      %s  Default choices conflicting."
@@ -419,28 +433,32 @@ msgid ""
 "      %s  Missing REQUIRED PageRegion option.\n"
 "                REF: Page 100, section 5.14."
 msgstr ""
+"      %s  Fehlende ERFORDERLICHE PageRegion Option.\n"
+"                REF: Seite 100, Abschnitt 5.14."
 
 #, c-format
 msgid ""
 "      %s  Missing REQUIRED PageSize option.\n"
 "                REF: Page 99, section 5.14."
 msgstr ""
+"      %s  Fehlende ERFORDERLICHE PageSize Option.\n"
+"                REF: Seite 99, Abschnitt 5.14."
 
 #, c-format
 msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"."
-msgstr ""
+msgstr "      %s  Fehlende Auswahl *%s %s in UIConstraints \"*%s %s *%s %s\"."
 
 #, c-format
 msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\""
-msgstr ""
+msgstr "      %s  Fehlende Auswahl *%s %s in cupsUIConstraints %s: \"%s\""
 
 #, c-format
 msgid "      %s  Missing cupsUIResolver %s"
-msgstr ""
+msgstr "      %s  cupsUIResolver %s fehlt"
 
 #, c-format
 msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"."
-msgstr ""
+msgstr "      %s  Fehlende Option %s in UIConstraints \"*%s %s *%s %s\"."
 
 #, c-format
 msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\""
@@ -470,7 +488,7 @@ msgstr "      %s  Größe \"%s\" sollte \"%s\" sein."
 
 #, c-format
 msgid "      %s  Size \"%s\" should be the Adobe standard name \"%s\"."
-msgstr ""
+msgstr "      %s  Size \"%s\" sollte der Adobe-Standard-Name \"%s\" sein."
 
 #, c-format
 msgid "      %s  cupsICCProfile %s hash value collides with %s."
@@ -582,6 +600,8 @@ msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
 "characters."
 msgstr ""
+"      **FEHLER**  Voreingestellte Übersetzung für die Option %s enthält 8-"
+"bit Zeichen."
 
 #, c-format
 msgid "      **FAIL**  Group names %s and %s differ only by case."
@@ -619,6 +639,8 @@ msgid ""
 "      **FAIL**  REQUIRED FileVersion\n"
 "                REF: Page 56, section 5.3."
 msgstr ""
+"      **FEHLER**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3."
 
 msgid ""
 "      **FAIL**  REQUIRED FormatVersion\n"
@@ -702,7 +724,7 @@ msgstr ""
 
 #, c-format
 msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
-msgstr "      **FAIL**  Öffnen der PPD Datei - %s in Zeile %d nicht möglich."
+msgstr "      **FEHLER**  Öffnen der PPD Datei - %s in Zeile %d nicht möglich."
 
 #, c-format
 msgid "    %d ERRORS FOUND"
@@ -822,7 +844,7 @@ msgid " PASS"
 msgstr " BESTANDEN"
 
 msgid "! expression            Unary NOT of expression"
-msgstr ""
+msgstr "! expression            Unäres NICHT des Ausdrucks"
 
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 8011 section 5.1.6)."
@@ -861,46 +883,51 @@ msgstr ""
 msgid ""
 "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 8011 section 5.1.8)."
 msgstr ""
+"\"%s\": Falscher Zeichensatzwert \"%s\" - Falsche Länge %d (RFC 8011 "
+"Abschnitt 5.1.8)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC hours %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime UTC Stunden %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime UTC Minuten %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 8011 section 5.1.15)."
 msgstr ""
+"\"%s\": Falsche dateTime UTC Vorzeichen'%c'.(RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime day %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime UTC Tag %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime deciseconds %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime Dezisekunden %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime hours %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime Stunden %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime minutes %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime Minuten %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime month %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falscher dateTime Monat %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad dateTime seconds %u (RFC 8011 section 5.1.15)."
-msgstr ""
+msgstr "\"%s\": Falsche dateTime Sekunden %u (RFC 8011 Abschnitt 5.1.15)."
 
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 8011 section 5.1.5)."
 msgstr ""
+"\"%s\": Falscher enum Wert %d - Ausserhalb des Bereichs (RFC 8011 Abschnitt "
+"5.1.5)."
 
 #, c-format
 msgid ""
@@ -922,12 +949,16 @@ msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 8011 section "
 "5.1.10)."
 msgstr ""
+"\"%s\": Falscher mimeMediaType Wert \"%s\" - Falsche Zeichen (RFC 8011 "
+"section 5.1.10)."
 
 #, c-format
 msgid ""
 "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 8011 section "
 "5.1.10)."
 msgstr ""
+"\"%s\": Falscher mimeMediaType Wert \"%s\" - Falsche Länge %d (RFC 8011 "
+"section 5.1.10)."
 
 #, c-format
 msgid ""
@@ -941,6 +972,8 @@ msgid ""
 "\"%s\": Bad name value \"%s\" - bad control character (PWG 5100.14 section "
 "8.1)."
 msgstr ""
+"\"%s\": Falscher Namenswert \"%s\" - Falsches Steuerzeichen (PWG 5100.14 "
+"Abschnitt 8.1)."
 
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
@@ -1505,7 +1538,7 @@ msgid ""
 msgstr ""
 
 msgid "--name regex            Match service name to regular expression"
-msgstr ""
+msgstr "--name Regex            Prüfe Dienstname mit regulärem Ausdruck"
 
 msgid "--no-web-forms          Disable web forms for media and supplies"
 msgstr ""
@@ -1517,7 +1550,7 @@ msgid "--pam-service service   Use the named PAM service"
 msgstr ""
 
 msgid "--path regex            Match resource path to regular expression"
-msgstr ""
+msgstr "--path Regex            Prüfe Ressourcenpfad mit regulärem Ausdruck"
 
 msgid "--port number[-number]  Match port to number or range"
 msgstr ""
@@ -1550,18 +1583,21 @@ msgid ""
 "--timeout seconds       Specify the maximum number of seconds to discover "
 "devices"
 msgstr ""
+"--timeout Sekunden      Angabe der maximalen Anzahl der Sekunden zum "
+"detektieren von Geräten"
 
 msgid "--true                  Always true"
-msgstr ""
+msgstr "--true                  Immer wahr"
 
 msgid "--txt key               True if the TXT record contains the key"
 msgstr ""
 
 msgid "--txt-* regex           Match TXT record key to regular expression"
 msgstr ""
+"--txt-* Regex           Prüfe TXT-Schlüssel-Eintrag mit regulärem Ausdruck"
 
 msgid "--uri regex             Match URI to regular expression"
-msgstr ""
+msgstr "--uri Regex             Prüfe URI mit regulärem Ausdruck"
 
 msgid "--version               Show program version"
 msgstr "--version               zeige Programmversion"
@@ -1840,7 +1876,7 @@ msgid ""
 msgstr ""
 
 msgid "-X                      Produce XML plist instead of plain text"
-msgstr ""
+msgstr "-X                      Generiere XML-plist anstelle von Text"
 
 msgid "-a                      Cancel all jobs"
 msgstr "-a                      Alle Aufträge abbrechen"
@@ -1853,7 +1889,7 @@ msgstr ""
 "-a [Ziel(e)]            Zeige den Akzeptanzstatus der angegebenen Ziele"
 
 msgid "-a filename.conf        Load printer attributes from conf file"
-msgstr ""
+msgstr "-a Dateiname.conf        Lade Druckerattribute von der conf Datei"
 
 msgid "-c                      Make a copy of the print file(s)"
 msgstr ""
@@ -1862,7 +1898,7 @@ msgid "-c                      Produce CSV output"
 msgstr "-c                      Erzeuge CSV Ausgabe"
 
 msgid "-c [class(es)]          Show classes and their member printers"
-msgstr ""
+msgstr "-c [class(es)]          Zeige Klassen und deren Drucker-Mitglieder"
 
 msgid "-c class                Add the named destination to a class"
 msgstr "-c Klasse               Füge das genannte Ziel zu einer Klasse hinzu"
@@ -1905,6 +1941,7 @@ msgstr "-f                      Starte im Vordergrund."
 
 msgid "-f filename             Set default request filename"
 msgstr ""
+"-f Dateiname            Lege den voreingestellten Dateinamen der Anfrage fest"
 
 msgid "-f type/subtype[,...]   Set supported file types"
 msgstr ""
@@ -1913,7 +1950,7 @@ msgid "-h                      Show this usage message."
 msgstr "-h                      Zeige diesen Hinweis."
 
 msgid "-h                      Validate HTTP response headers"
-msgstr ""
+msgstr "-h                      Validiere HTTP Antwort-Header"
 
 msgid "-h regex                Match hostname to regular expression"
 msgstr ""
@@ -1988,7 +2025,7 @@ msgid "-n num-copies           Specify the number of copies to print"
 msgstr "-n Kopien               Gib die Anzahl der zu druckenden Kopien an"
 
 msgid "-n regex                Match service name to regular expression"
-msgstr ""
+msgstr "-n Regex                Prüfe Dienstname gegen regulären Ausdruck"
 
 msgid ""
 "-o Name=Value           Specify the default value for the named PPD option "
@@ -2127,31 +2164,33 @@ msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
 msgstr ""
 
 msgid "-s                      Be silent"
-msgstr ""
+msgstr "-s                      Sei ruhig"
 
 msgid "-s                      Print service name if true"
 msgstr ""
 
 msgid "-s                      Show a status summary"
-msgstr ""
+msgstr "-s                      Zeige eine Statuszusammenfassung"
 
 msgid "-s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
+"-s cups-files.conf      Gebe die zu verwendende cups-files.conf Datei an."
 
 msgid "-s speed[,color-speed]  Set speed in pages per minute"
 msgstr ""
 
 msgid "-t                      Produce a test report"
-msgstr ""
+msgstr "-t                      Generiere einen Testreport"
 
 msgid "-t                      Show all status information"
-msgstr ""
+msgstr "-t                      Zeige alle Statusinformationen"
 
 msgid "-t                      Test the configuration file."
-msgstr ""
+msgstr "-t                      Teste die Konfigurationsdatei."
 
 msgid "-t key                  True if the TXT record contains the key"
 msgstr ""
+"-t Schlüssel            Wahr wenn der TXT-Eintrag den Schlüssel enthält"
 
 msgid "-t title                Specify the job title"
 msgstr "-t Titel                Lege den Auftragstitel fest"
@@ -2174,10 +2213,10 @@ msgid ""
 msgstr ""
 
 msgid "-u owner                Specify the owner to use for jobs"
-msgstr ""
+msgstr "-u Besitzer             Gebe den Besitzer für Aufträge an"
 
 msgid "-u regex                Match URI to regular expression"
-msgstr ""
+msgstr "-u Regex                Prüfe URI gegen regulären Ausdruck"
 
 msgid "-v                      Be verbose"
 msgstr "-v                      ausführliche Ausgabe"
@@ -2186,22 +2225,24 @@ msgid "-v                      Show devices"
 msgstr "-v                      Zeige Geräte"
 
 msgid "-v [printer(s)]         Show the devices for each destination"
-msgstr ""
+msgstr "-v [Drucker]            Zeige die Geräte für jedes Druckerziel"
 
 msgid "-v device-uri           Specify the device URI for the printer"
-msgstr ""
+msgstr "-v Geräte-uri           Gib die Geräte-URI für den Drucker an"
 
 msgid "-vv                     Be very verbose"
 msgstr "-vv                     sehr ausführliche Ausgabe"
 
 msgid "-x                      Purge jobs rather than just canceling"
-msgstr ""
+msgstr "-x                      Entferne Aufträge anstatt sie nur abzubrechen"
 
 msgid "-x destination          Remove default options for destination"
 msgstr ""
+"-x Ziel                 Entferne die voreingestellten Optionen für das "
+"genannte Ziel"
 
 msgid "-x destination          Remove the named destination"
-msgstr ""
+msgstr "-x Ziel                 Entferne das genannte Ziel"
 
 msgid ""
 "-x utility [argument ...] ;\n"
@@ -2210,6 +2251,8 @@ msgstr ""
 
 msgid "/etc/cups/lpoptions file names default destination that does not exist."
 msgstr ""
+"/etc/cups/lpoptions Datei enthält eine nicht existierendes voreingestelltes "
+"Ziel."
 
 msgid "0"
 msgstr "0"
@@ -5191,6 +5234,9 @@ msgid ""
 "       cancel [options] [destination]\n"
 "       cancel [options] [destination-id]"
 msgstr ""
+"Verwendung: cancel [Optionen] [id]\n"
+"            cancel [Optionen] [Ziel]\n"
+"            cancel [Optionen] [Ziel-id]"
 
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
 msgstr "Verwendung: cupsctl [Optionen] [Parameter=Wert ... ParameterN=WertN]"
@@ -5205,9 +5251,11 @@ msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
 "       program | cupstestppd [options] -"
 msgstr ""
+"Verwendung: cupstestppd [Optionen] Datei1.ppd[.gz] [... DateiN.ppd[.gz]]\n"
+"            Programm | cupstestppd [Optionen] -"
 
 msgid "Usage: ippeveprinter [options] \"name\""
-msgstr ""
+msgstr "Verwendung: ippeveprinter [Optionen] \"Name\""
 
 msgid ""
 "Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
@@ -5215,6 +5263,10 @@ msgid ""
 "       ippfind --help\n"
 "       ippfind --version"
 msgstr ""
+"Verwendung: ippfind [Optionen] regtype[,subtype][.domain.] ... [Ausdruck]\n"
+"            ippfind [Optionen] name[.regtype[.domain.]] ... [Ausdruck]\n"
+"            ippfind --help\n"
+"            ippfind --version"
 
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr "Verwendung: ipptool [Optionen] URI Dateiname [ ... DateinameN ]"
@@ -5443,11 +5495,11 @@ msgstr "Flach"
 
 #. TRANSLATORS: Padding
 msgid "binding-type.padding"
-msgstr ""
+msgstr "Auspolstern"
 
 #. TRANSLATORS: Perfect
 msgid "binding-type.perfect"
-msgstr ""
+msgstr "Perfekt"
 
 #. TRANSLATORS: Spiral
 msgid "binding-type.spiral"
@@ -5459,7 +5511,7 @@ msgstr "Band"
 
 #. TRANSLATORS: Velo
 msgid "binding-type.velo"
-msgstr ""
+msgstr "Fahrrad"
 
 msgid "canceled"
 msgstr "abgebrochen"
@@ -5621,11 +5673,11 @@ msgstr ""
 
 #. TRANSLATORS: Add Cover
 msgid "covering-name"
-msgstr ""
+msgstr "Abdeckung"
 
 #. TRANSLATORS: Plain
 msgid "covering-name.plain"
-msgstr ""
+msgstr "Blanko"
 
 #. TRANSLATORS: Pre-cut
 msgid "covering-name.pre-cut"
@@ -5633,7 +5685,7 @@ msgstr ""
 
 #. TRANSLATORS: Pre-printed
 msgid "covering-name.pre-printed"
-msgstr ""
+msgstr "Vordruck"
 
 msgid "cups-deviced failed to execute."
 msgstr "„cups-deviced“ konnte nicht ausgeführt werden."
@@ -5859,11 +5911,11 @@ msgstr "Eingehend"
 
 #. TRANSLATORS: Interpreting
 msgid "document-state-reasons.interpreting"
-msgstr ""
+msgstr "interpretiere Seitenbeschreibung"
 
 #. TRANSLATORS: None
 msgid "document-state-reasons.none"
-msgstr ""
+msgstr "Nichts"
 
 #. TRANSLATORS: Outgoing
 msgid "document-state-reasons.outgoing"
@@ -5871,11 +5923,11 @@ msgstr "Ausgehend"
 
 #. TRANSLATORS: Printing
 msgid "document-state-reasons.printing"
-msgstr ""
+msgstr "im Druck"
 
 #. TRANSLATORS: Processing To Stop Point
 msgid "document-state-reasons.processing-to-stop-point"
-msgstr ""
+msgstr "Verarbeitung bis zum Haltepunkt"
 
 #. TRANSLATORS: Queued
 msgid "document-state-reasons.queued"
@@ -5903,7 +5955,7 @@ msgstr "Übermittlung unterbrochen"
 
 #. TRANSLATORS: Transforming
 msgid "document-state-reasons.transforming"
-msgstr ""
+msgstr "in Transformation"
 
 #. TRANSLATORS: Unsupported Compression
 msgid "document-state-reasons.unsupported-compression"
@@ -5951,14 +6003,18 @@ msgid ""
 "expression --and expression\n"
 "                        Logical AND"
 msgstr ""
+"Ausdruck --and Ausdruck\n"
+"                        Logisches UND"
 
 msgid ""
 "expression --or expression\n"
 "                        Logical OR"
 msgstr ""
+"Ausdruck --or Ausdruck\n"
+"                        Logisches ODER"
 
 msgid "expression expression   Logical AND"
-msgstr ""
+msgstr "Asudruck Ausdruck       Logisches UND"
 
 #. TRANSLATORS: Feed Orientation
 msgid "feed-orientation"
@@ -6538,7 +6594,7 @@ msgstr "3-Fach Lochung oben"
 
 #. TRANSLATORS: Saddle Stitch
 msgid "finishing-template.saddle-stitch"
-msgstr ""
+msgstr "Spezialheftung"
 
 #. TRANSLATORS: Staple
 msgid "finishing-template.staple"
@@ -6554,71 +6610,71 @@ msgstr "Heftung unten rechts"
 
 #. TRANSLATORS: 2 Staples on Bottom
 msgid "finishing-template.staple-dual-bottom"
-msgstr ""
+msgstr "Doppelheftung unten"
 
 #. TRANSLATORS: 2 Staples on Left
 msgid "finishing-template.staple-dual-left"
-msgstr ""
+msgstr "Doppelheftung links"
 
 #. TRANSLATORS: 2 Staples on Right
 msgid "finishing-template.staple-dual-right"
-msgstr ""
+msgstr "Doppelheftung rechts"
 
 #. TRANSLATORS: 2 Staples on Top
 msgid "finishing-template.staple-dual-top"
-msgstr ""
+msgstr "Doppelheftung oben"
 
 #. TRANSLATORS: Staple Top Left
 msgid "finishing-template.staple-top-left"
-msgstr ""
+msgstr "Heftung oben links"
 
 #. TRANSLATORS: Staple Top Right
 msgid "finishing-template.staple-top-right"
-msgstr ""
+msgstr "Heftung oben rechts"
 
 #. TRANSLATORS: 3 Staples on Bottom
 msgid "finishing-template.staple-triple-bottom"
-msgstr ""
+msgstr "Dreifachheftung unten"
 
 #. TRANSLATORS: 3 Staples on Left
 msgid "finishing-template.staple-triple-left"
-msgstr ""
+msgstr "Dreifachheftung links"
 
 #. TRANSLATORS: 3 Staples on Right
 msgid "finishing-template.staple-triple-right"
-msgstr ""
+msgstr "Dreifachheftung rechts"
 
 #. TRANSLATORS: 3 Staples on Top
 msgid "finishing-template.staple-triple-top"
-msgstr ""
+msgstr "Dreifachheftung unten"
 
 #. TRANSLATORS: Trim
 msgid "finishing-template.trim"
-msgstr ""
+msgstr "Beschnitt"
 
 #. TRANSLATORS: Trim After Every Set
 msgid "finishing-template.trim-after-copies"
-msgstr ""
+msgstr "nach Kopien"
 
 #. TRANSLATORS: Trim After Every Document
 msgid "finishing-template.trim-after-documents"
-msgstr ""
+msgstr "nach Dokument"
 
 #. TRANSLATORS: Trim After Job
 msgid "finishing-template.trim-after-job"
-msgstr ""
+msgstr "nach Auftrag"
 
 #. TRANSLATORS: Trim After Every Page
 msgid "finishing-template.trim-after-pages"
-msgstr ""
+msgstr "nach Seiten"
 
 #. TRANSLATORS: Trim After Every Set
 msgid "finishing-template.trim-after-sets"
-msgstr ""
+msgstr "nach Sets"
 
 #. TRANSLATORS: Trim After Every Page
 msgid "finishing-template.trim-after-sheets"
-msgstr ""
+msgstr "nach Blättern"
 
 #. TRANSLATORS: Finishings
 msgid "finishings"
@@ -6918,11 +6974,11 @@ msgstr "Falzrichtung"
 
 #. TRANSLATORS: Inward
 msgid "folding-direction.inward"
-msgstr ""
+msgstr "einwärts"
 
 #. TRANSLATORS: Outward
 msgid "folding-direction.outward"
-msgstr ""
+msgstr "auswärts"
 
 #. TRANSLATORS: Fold Position
 msgid "folding-offset"
@@ -6930,23 +6986,23 @@ msgstr "Falzposition"
 
 #. TRANSLATORS: Fold Edge
 msgid "folding-reference-edge"
-msgstr ""
+msgstr "Falzreferenzkante"
 
 #. TRANSLATORS: Bottom
 msgid "folding-reference-edge.bottom"
-msgstr ""
+msgstr "unten"
 
 #. TRANSLATORS: Left
 msgid "folding-reference-edge.left"
-msgstr ""
+msgstr "links"
 
 #. TRANSLATORS: Right
 msgid "folding-reference-edge.right"
-msgstr ""
+msgstr "rechts"
 
 #. TRANSLATORS: Top
 msgid "folding-reference-edge.top"
-msgstr ""
+msgstr "oben"
 
 #. TRANSLATORS: Font Name
 msgid "font-name-requested"
@@ -7025,7 +7081,7 @@ msgid "ippfind: Expected semi-colon after %s."
 msgstr "ippfind: Erwarte Semikolon nach %s."
 
 msgid "ippfind: Missing close brace in substitution."
-msgstr ""
+msgstr "ippfind: Fehlende schliessende Klammer in Ersetzung."
 
 msgid "ippfind: Missing close parenthesis."
 msgstr "ippfind: Fehlende Schlussklammer."
@@ -7053,11 +7109,11 @@ msgstr "ippfind: Fehlendes Programm nach %s."
 
 #, c-format
 msgid "ippfind: Missing regular expression after %s."
-msgstr ""
+msgstr "ippfind: Fehlender regulärer Ausdruck nach %s."
 
 #, c-format
 msgid "ippfind: Missing semi-colon after %s."
-msgstr ""
+msgstr "ippfind: Fehlendes Semikolon nach %s."
 
 msgid "ippfind: Out of memory."
 msgstr "ippfind: zu wenig Speicher."
@@ -7071,7 +7127,7 @@ msgstr "ippfind: Auflösen oder Browsen nicht möglich: %s"
 
 #, c-format
 msgid "ippfind: Unable to execute \"%s\": %s"
-msgstr ""
+msgstr "ippfind: Asuführung nicht möglich \"%s\": %s"
 
 #, c-format
 msgid "ippfind: Unable to use Bonjour: %s"
@@ -7123,7 +7179,7 @@ msgstr ""
 
 #. TRANSLATORS: Job Account Type
 msgid "job-account-type"
-msgstr ""
+msgstr "Auftragskontotyp"
 
 #. TRANSLATORS: General
 msgid "job-account-type.general"
@@ -7171,7 +7227,7 @@ msgstr "Kopien"
 
 #. TRANSLATORS: Back Cover
 msgid "job-cover-back"
-msgstr ""
+msgstr "Rückseitenumschlag"
 
 #. TRANSLATORS: Front Cover
 msgid "job-cover-front"
@@ -7422,7 +7478,7 @@ msgstr ""
 
 #. TRANSLATORS: Job Sheet Message
 msgid "job-sheet-message"
-msgstr "Auftragsnachricht"
+msgstr "Nachricht Auftragsbanner"
 
 #. TRANSLATORS: Banner Page
 msgid "job-sheets"
@@ -7462,11 +7518,11 @@ msgstr "Auftragsstatus"
 
 #. TRANSLATORS: Job State Message
 msgid "job-state-message"
-msgstr ""
+msgstr "Auftrags-Statusnachricht"
 
 #. TRANSLATORS: Detailed Job State
 msgid "job-state-reasons"
-msgstr ""
+msgstr "Auftragsstatus-Grund"
 
 #. TRANSLATORS: Stopping
 msgid "job-state-reasons.aborted-by-system"
@@ -7482,7 +7538,7 @@ msgstr "Konto geschlossen"
 
 #. TRANSLATORS: Account Info Needed
 msgid "job-state-reasons.account-info-needed"
-msgstr ""
+msgstr "Kontoinformation benötigt"
 
 #. TRANSLATORS: Account Limit Reached
 msgid "job-state-reasons.account-limit-reached"
@@ -7534,15 +7590,15 @@ msgstr "Dokument-Erlaubnisfehler"
 
 #. TRANSLATORS: Document Security Error
 msgid "job-state-reasons.document-security-error"
-msgstr ""
+msgstr "Fehler der Dokumentensicherheit"
 
 #. TRANSLATORS: Document Unprintable Error
 msgid "job-state-reasons.document-unprintable-error"
-msgstr ""
+msgstr "Dokument nicht druckbar"
 
 #. TRANSLATORS: Errors Detected
 msgid "job-state-reasons.errors-detected"
-msgstr ""
+msgstr "Fehler aufgetreten"
 
 #. TRANSLATORS: Canceled at printer
 msgid "job-state-reasons.job-canceled-at-device"
@@ -11562,27 +11618,27 @@ msgstr "Alte Alarme wurden gelöscht"
 
 #. TRANSLATORS: Bander Added
 msgid "printer-state-reasons.bander-added"
-msgstr ""
+msgstr "Banderolierer hinzugefügt"
 
 #. TRANSLATORS: Bander Almost Empty
 msgid "printer-state-reasons.bander-almost-empty"
-msgstr ""
+msgstr "Banderolierer fast leer"
 
 #. TRANSLATORS: Bander Almost Full
 msgid "printer-state-reasons.bander-almost-full"
-msgstr ""
+msgstr "Banderolierer fast voll"
 
 #. TRANSLATORS: Bander At Limit
 msgid "printer-state-reasons.bander-at-limit"
-msgstr ""
+msgstr "Banderolierer am Limit"
 
 #. TRANSLATORS: Bander Closed
 msgid "printer-state-reasons.bander-closed"
-msgstr ""
+msgstr "Banderolierer geschlossen"
 
 #. TRANSLATORS: Bander Configuration Change
 msgid "printer-state-reasons.bander-configuration-change"
-msgstr ""
+msgstr "Banderoliererkonfiguration geändert"
 
 #. TRANSLATORS: Bander Cover Closed
 msgid "printer-state-reasons.bander-cover-closed"
@@ -11598,7 +11654,7 @@ msgstr ""
 
 #. TRANSLATORS: Bander Full
 msgid "printer-state-reasons.bander-full"
-msgstr ""
+msgstr "Banderolierer voll"
 
 #. TRANSLATORS: Bander Interlock Closed
 msgid "printer-state-reasons.bander-interlock-closed"
@@ -11610,27 +11666,27 @@ msgstr ""
 
 #. TRANSLATORS: Bander Jam
 msgid "printer-state-reasons.bander-jam"
-msgstr ""
+msgstr "Banderolierer-Blockade"
 
 #. TRANSLATORS: Bander Life Almost Over
 msgid "printer-state-reasons.bander-life-almost-over"
-msgstr ""
+msgstr "Banderolierer fast am Lebensdauerende"
 
 #. TRANSLATORS: Bander Life Over
 msgid "printer-state-reasons.bander-life-over"
-msgstr ""
+msgstr "Banderolierer am Lebensdauerende"
 
 #. TRANSLATORS: Bander Memory Exhausted
 msgid "printer-state-reasons.bander-memory-exhausted"
-msgstr ""
+msgstr "Banderolierer Speicher aufgebraucht"
 
 #. TRANSLATORS: Bander Missing
 msgid "printer-state-reasons.bander-missing"
-msgstr ""
+msgstr "Banderolierer fehlt"
 
 #. TRANSLATORS: Bander Motor Failure
 msgid "printer-state-reasons.bander-motor-failure"
-msgstr ""
+msgstr "Banderolierer Motorfehler"
 
 #. TRANSLATORS: Bander Near Limit
 msgid "printer-state-reasons.bander-near-limit"
@@ -11638,15 +11694,15 @@ msgstr ""
 
 #. TRANSLATORS: Bander Offline
 msgid "printer-state-reasons.bander-offline"
-msgstr ""
+msgstr "Banderolierer offline"
 
 #. TRANSLATORS: Bander Opened
 msgid "printer-state-reasons.bander-opened"
-msgstr ""
+msgstr "Banderolierer geöffnet"
 
 #. TRANSLATORS: Bander Over Temperature
 msgid "printer-state-reasons.bander-over-temperature"
-msgstr ""
+msgstr "Banderolierer überhitzt"
 
 #. TRANSLATORS: Bander Power Saver
 msgid "printer-state-reasons.bander-power-saver"
@@ -11662,7 +11718,7 @@ msgstr ""
 
 #. TRANSLATORS: Bander Removed
 msgid "printer-state-reasons.bander-removed"
-msgstr ""
+msgstr "Banderolierer entfernt"
 
 #. TRANSLATORS: Bander Resource Added
 msgid "printer-state-reasons.bander-resource-added"
@@ -11682,19 +11738,19 @@ msgstr ""
 
 #. TRANSLATORS: Bander Turned Off
 msgid "printer-state-reasons.bander-turned-off"
-msgstr ""
+msgstr "Banderolierer ausgeschaltet"
 
 #. TRANSLATORS: Bander Turned On
 msgid "printer-state-reasons.bander-turned-on"
-msgstr ""
+msgstr "Banderolierer eingeschaltet"
 
 #. TRANSLATORS: Bander Under Temperature
 msgid "printer-state-reasons.bander-under-temperature"
-msgstr ""
+msgstr "Banderolierer zu kalt"
 
 #. TRANSLATORS: Bander Unrecoverable Failure
 msgid "printer-state-reasons.bander-unrecoverable-failure"
-msgstr ""
+msgstr "Banderolierer nicht behebbarer Fehler"
 
 #. TRANSLATORS: Bander Unrecoverable Storage Error
 msgid "printer-state-reasons.bander-unrecoverable-storage-error"
@@ -11702,7 +11758,7 @@ msgstr ""
 
 #. TRANSLATORS: Bander Warming Up
 msgid "printer-state-reasons.bander-warming-up"
-msgstr ""
+msgstr "Banderolierer in Aufwärmphase"
 
 #. TRANSLATORS: Binder Added
 msgid "printer-state-reasons.binder-added"
@@ -12422,7 +12478,7 @@ msgstr ""
 
 #. TRANSLATORS: Input Media Size Change
 msgid "printer-state-reasons.input-media-size-change"
-msgstr ""
+msgstr "Größe des Einzugsmediums geändert"
 
 #. TRANSLATORS: Input Media Tray Failure
 msgid "printer-state-reasons.input-media-tray-failure"
@@ -12466,7 +12522,7 @@ msgstr ""
 
 #. TRANSLATORS: Paper tray is missing
 msgid "printer-state-reasons.input-tray-missing"
-msgstr ""
+msgstr "Einzugsschacht fehlt"
 
 #. TRANSLATORS: Input Tray Position Failure
 msgid "printer-state-reasons.input-tray-position-failure"
@@ -12618,11 +12674,11 @@ msgstr ""
 
 #. TRANSLATORS: Interlock Closed
 msgid "printer-state-reasons.interlock-closed"
-msgstr ""
+msgstr "Sicherheitssperre geschlossen"
 
 #. TRANSLATORS: Interlock Open
 msgid "printer-state-reasons.interlock-open"
-msgstr ""
+msgstr "Sicherheitssperre offen"
 
 #. TRANSLATORS: Interpreter Cartridge Added
 msgid "printer-state-reasons.interpreter-cartridge-added"
