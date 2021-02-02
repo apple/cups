@@ -17,19 +17,22 @@
 #    ./checkpo cups_LL.po
 #
 # where "LL" is your locale.
+# Joachim Schwender <Joachim@schwender-beyer.de>, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.3\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
-"PO-Revision-Date: 2020-06-25 07:27+0200\n"
-"Last-Translator: Joachim Schwender <joachim.schwender@web.de>\n"
-"Language-Team: German <LL@li.org>\n"
+"PO-Revision-Date: 2021-02-02 11:37+0100\n"
+"Last-Translator: Joachim Schwender <Joachim@schwender-beyer.de>\n"
+"Language-Team: German <joachim.schwender@web.de>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Gtranslator 3.38.0\n"
 
 msgid "\t\t(all)"
 msgstr "\t\t(alle)"
@@ -56,7 +59,7 @@ msgid "\tBanner required"
 msgstr "\tBanner erforderlich"
 
 msgid "\tCharset sets:"
-msgstr "\tZeichensatz Set:"
+msgstr "\tZeichensatz-Set:"
 
 msgid "\tConnection: direct"
 msgstr "\tVerbindung: direkt"
@@ -68,7 +71,7 @@ msgid "\tContent types: any"
 msgstr "\tInhaltstypen: beliebig"
 
 msgid "\tDefault page size:"
-msgstr "\tVoreingestellte Seitengrösse:"
+msgstr "\tVoreingestellte Seitengröße:"
 
 msgid "\tDefault pitch:"
 msgstr "\tVoreingestellte Neigung:"
@@ -147,6 +150,8 @@ msgid ""
 "\n"
 "    DETAILED CONFORMANCE TEST RESULTS"
 msgstr ""
+"\n"
+"    DETAILLIERTE ERGEBNISSE DES KONFORMITÄTSTESTS"
 
 msgid "                REF: Page 15, section 3.1."
 msgstr "                REF: Seite 15, Kap. 3.1."
@@ -183,7 +188,7 @@ msgstr "                REF: Seiten 52-52, Kap. 5.2."
 
 #, c-format
 msgid "        %-39.39s %.0f bytes"
-msgstr ""
+msgstr "        %-39.39s %.0f Bytes"
 
 #, c-format
 msgid "        PASS    Default%s"
@@ -254,7 +259,8 @@ msgid ""
 msgstr ""
 
 msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
-msgstr "        WARN    Datei einthält gemischt CR, LF, und CR LF Zeilenenden."
+msgstr ""
+"        WARN    Datei enthält gemischt CR-, LF-, und CR-LF-Zeilenenden."
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -272,12 +278,14 @@ msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
 "                REF: Pages 58-59, section 5.3."
 msgstr ""
+"        WARN    Hersteller erforderlich gem. PPD 4.3.\n"
+"                REF: Seiten 58-59, Abschnitt 5.3."
 
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF."
 msgstr ""
-"        WARN    Nicht-Windows PPD Dateien sollten ausschließlich LF "
+"        WARN    Nicht-Windows-PPD-Dateien sollten ausschließlich LF-"
 "Zeilenenden verwenden, nicht CR LF."
 
 #, c-format
@@ -285,13 +293,15 @@ msgid ""
 "        WARN    Obsolete PPD version %.1f.\n"
 "                REF: Page 42, section 5.2."
 msgstr ""
-"        WARN    Veraltete PPD Version %.1f.\n"
+"        WARN    Veraltete PPD-Version %.1f.\n"
 "                REF: Seite 42, Kap. 5.2."
 
 msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
 "                REF: Pages 61-62, section 5.3."
 msgstr ""
+"        WARN    PCFileName länger als 8.3 verletzt die PPD Spezifikation.\n"
+"                REF: Seiten 61-62, Abschnitt 5.3."
 
 msgid ""
 "        WARN    PCFileName should contain a unique filename.\n"
@@ -334,6 +344,8 @@ msgid ""
 "      %s  Bad %s choice %s.\n"
 "                REF: Page 122, section 5.17"
 msgstr ""
+"      %s  Ungültige %s Auswahl %s.\n"
+"                Siehe: Seite 122, Kap. 5.17"
 
 #, c-format
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s."
@@ -436,7 +448,7 @@ msgstr "      %s  fehlende Option %s in cupsUIConstraints %s: \"%s\""
 
 #, c-format
 msgid "      %s  No base translation \"%s\" is included in file."
-msgstr ""
+msgstr "      %s  Es ist keine Übersetzung \"%s\" in der Datei."
 
 #, c-format
 msgid ""
@@ -722,10 +734,10 @@ msgstr ""
 "  -I Inklus.Verz.         Inklusionsverzeichnis dem Suchpfad hinzufügen."
 
 msgid "  -P filename.ppd         Set PPD file."
-msgstr "  -P filename.ppd         Lege PPD Datei fest."
+msgstr "  -P filename.ppd         Lege PPD-Datei fest."
 
 msgid "  -U username             Specify username."
-msgstr "  -U username             Gebe den Benutzernamen an."
+msgstr "  -U Benutzername         Gebe den Benutzernamen an."
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c Katalog.po           Lade den angegebenen Nachrichtenkatalog."
@@ -738,10 +750,10 @@ msgid "  -d output-dir           Specify the output directory."
 msgstr "  -d AusgabeVerz.         Angabe des Ausgabeverzeichnisses."
 
 msgid "  -d printer              Use the named printer."
-msgstr "  -d printer              Benutze den genannten Drucker."
+msgstr "  -d Drucker              Benutze den genannten Drucker."
 
 msgid "  -e                      Use every filter from the PPD file."
-msgstr "  -e                      Benutzt jeden Filter der PPD Datei."
+msgstr "  -e                      Benutzt jeden Filter der PPD-Datei."
 
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
@@ -752,6 +764,8 @@ msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
 msgstr ""
+"  -j Auftrags-id[,N]      Filterdatei N des angegebenen Auftrags "
+"(Voreingestellt ist Datei 1)."
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr "  -l lang[,lang,...]      Spezifiziere die Ausgabesprache(n) (locale)."
@@ -766,7 +780,7 @@ msgstr ""
 "application/pdf)."
 
 msgid "  -n copies               Set number of copies."
-msgstr "  -n copies               Lege die Anzahl der Kopien fest."
+msgstr "  -n Kopien               Lege die Anzahl der Kopien fest."
 
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
@@ -783,10 +797,10 @@ msgid "  -o name=value           Set option(s)."
 msgstr "  -o Name=Wert            Option(en) festlegen."
 
 msgid "  -p filename.ppd         Set PPD file."
-msgstr "  -p filename.ppd         PPD-Datei festlegen."
+msgstr "  -p Dateiname.ppd        PPD-Datei festlegen."
 
 msgid "  -t                      Test PPDs instead of generating them."
-msgstr "  -t                      Teste PPDs anstelle sie zu erzeugen."
+msgstr "  -t                      Teste PPDs anstatt sie zu erzeugen."
 
 msgid "  -t title                Set title."
 msgstr "  -t Titel                Legt den Titel fest."
@@ -799,7 +813,7 @@ msgstr "  -v                      Ausführliche Ausgabe."
 
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr ""
-"  -z                      Komprimiere PPD Datei unter Verwendung von GNU zip."
+"  -z                      Komprimiere PPD-Datei unter Verwendung von GNU zip."
 
 msgid " FAIL"
 msgstr " NICHT BESTANDEN"
@@ -834,7 +848,7 @@ msgstr ""
 
 #, c-format
 msgid "\"%s\": Bad boolean value %d (RFC 8011 section 5.1.21)."
-msgstr ""
+msgstr "\"%s\": Falscher logischer Wert %d (RFC 8011 Abschnitt 5.1.21)."
 
 #, c-format
 msgid ""
@@ -931,7 +945,7 @@ msgstr ""
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 8011 section 5.1.3)."
 msgstr ""
-"\"%s\": Falsches Namenswert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt "
+"\"%s\": Falscher Namenswert \"%s\" - falsche Länge %d (RFC 8011 Abschnitt "
 "5.1.3)."
 
 #, c-format
@@ -1011,10 +1025,10 @@ msgstr ""
 "Abschnitt 5.1.7)."
 
 msgid "\"requesting-user-name\" attribute in wrong group."
-msgstr ""
+msgstr "\"requesting-user-name\" Attribute in der falschen Gruppe."
 
 msgid "\"requesting-user-name\" attribute with wrong syntax."
-msgstr ""
+msgstr "\"requesting-user-name\" Attribute mit falscher Syntax."
 
 #, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
@@ -1148,7 +1162,7 @@ msgstr ""
 
 #, c-format
 msgid "%s: Error - copies must be 1 or more."
-msgstr "%s: Fehler - Kopien müssen 1 oder mehr sein."
+msgstr "%s: Fehler - Kopien muss 1 oder mehr sein."
 
 #, c-format
 msgid "%s: Error - expected character set after \"-S\" option."
@@ -1320,7 +1334,7 @@ msgstr "%s: Entschuldigung, Verschlüsselung wird nicht unterstützt."
 
 #, c-format
 msgid "%s: Unable to connect to \"%s:%d\": %s"
-msgstr "%s: Verbindung zu \"%s:%d\": %s nicht möglich"
+msgstr "%s: Verbindung zu \"%s:%d\" nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to connect to server."
@@ -1332,7 +1346,7 @@ msgstr "%s: Server kontaktieren nicht möglich."
 
 #, c-format
 msgid "%s: Unable to create PPD file: %s"
-msgstr "%s: Erzeugung der PPD Datei nicht möglich: %s"
+msgstr "%s: Erzeugung der PPD-Datei nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1340,11 +1354,11 @@ msgstr "%s: Ermittlung des MIME-Typs von \"%s\" nicht möglich."
 
 #, c-format
 msgid "%s: Unable to open \"%s\": %s"
-msgstr "%s: Öffnen von \"%s\": %s nicht möglich"
+msgstr "%s: Öffnen von \"%s\" nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to open %s: %s"
-msgstr "%s: Öffnen von %s: %s nicht möglich"
+msgstr "%s: Öffnen von %s nicht möglich: %s"
 
 #, c-format
 msgid "%s: Unable to open PPD file: %s on line %d."
@@ -1395,6 +1409,8 @@ msgid ""
 "%s: Warning - \"%c\" format modifier not supported - output may not be "
 "correct."
 msgstr ""
+"%s: Warnung - \"%c\" Formatänderung nicht unterstützt - Ausgabe könnte "
+"unkorrekt sein."
 
 #, c-format
 msgid "%s: Warning - character set option ignored."
@@ -1419,10 +1435,11 @@ msgid "-                       Cancel all jobs"
 msgstr "-                       Abbruch aller Aufträge"
 
 msgid "-# num-copies           Specify the number of copies to print"
-msgstr "-# Kopienzahl           Angabe der Anzahl der auszugebenden Druckexemplare"
+msgstr ""
+"-# Kopienzahl           Angabe der Anzahl der auszugebenden Druckexemplare"
 
 msgid "--[no-]debug-logging    Turn debug logging on/off"
-msgstr ""
+msgstr "--[no-]debug-logging    Debug-Logging aus/ein-schalten"
 
 msgid "--[no-]remote-admin     Turn remote administration on/off"
 msgstr "--[no-]remote-admin     Fernadministration ein/ausschalten"
@@ -1463,7 +1480,7 @@ msgid "--hold                  Hold new jobs"
 msgstr "--hold                  Neue Aufträge anhalten"
 
 msgid "--host regex            Match hostname to regular expression"
-msgstr ""
+msgstr "--host regex            Vergleiche Hostname mit Regulärem Ausdruck"
 
 msgid ""
 "--include-schemes scheme-list\n"
@@ -1475,8 +1492,7 @@ msgstr ""
 
 msgid "--language locale       Show models matching the given locale"
 msgstr ""
-"--language locale       Zeige Modelle auf die die angegebene "
-"locale passt"
+"--language locale       Zeige Modelle auf die die angegebene locale passt"
 
 msgid "--local                 True if service is local"
 msgstr "--local                 Wahr wenn der Dienst lokal ist"
@@ -1635,7 +1651,7 @@ msgid "-6"
 msgstr "-6"
 
 msgid "-6                      Connect using IPv6"
-msgstr ""
+msgstr "-6                      Verbinde mit IPv6"
 
 msgid "-60"
 msgstr "-60"
@@ -1674,30 +1690,35 @@ msgid "-A                      Enable authentication"
 msgstr "-A                      Authentication einschalten"
 
 msgid "-C                      Send requests using chunking (default)"
-msgstr "-C                      Sende Anfragen mittels chunking (Voreinstellung)"
+msgstr ""
+"-C                      Sende Anfragen mittels chunking (Voreinstellung)"
 
 msgid "-D description          Specify the textual description of the printer"
-msgstr "-D description          Angabe der Textbeschreibung des Druckers"
+msgstr "-D Beschreibung         Angabe der Textbeschreibung des Druckers"
 
 msgid "-D device-uri           Set the device URI for the printer"
-msgstr "-D device-uri           Angabe der Geräte-URI für den Drucker"
+msgstr "-D Geräte-uri           Angabe der Geräte-URI für den Drucker"
 
 msgid ""
 "-E                      Enable and accept jobs on the printer (after -p)"
 msgstr ""
-"-E                      Freigabe für Aufträge an den Drucker einschalten (nach -p)"
+"-E                      Freigabe für Aufträge an den Drucker einschalten "
+"(nach -p)"
 
 msgid "-E                      Encrypt the connection to the server"
 msgstr "-E                      Verbindung zum Server verschlüsseln"
 
 msgid "-E                      Test with encryption using HTTP Upgrade to TLS"
-msgstr "-E                      Teste mit Hochstufung der HTTP Verschlüsselung auf TLS"
+msgstr ""
+"-E                      Teste mit Hochstufung der HTTP Verschlüsselung auf "
+"TLS"
 
 msgid "-F                      Run in the foreground but detach from console."
-msgstr "-F                      Läuft im Vordergrund, aber gelöst von der Konsole."
+msgstr ""
+"-F                      Läuft im Vordergrund, aber gelöst von der Konsole."
 
 msgid "-F output-type/subtype  Set the output format for the printer"
-msgstr ""
+msgstr "-F output-type/subtype  Setze das Ausgabeformat für den Drucker"
 
 msgid "-H                      Show the default server and port"
 msgstr "-H                      Zeige den voreingestellten Server und Port"
@@ -1706,7 +1727,8 @@ msgid "-H HH:MM                Hold the job until the specified UTC time"
 msgstr "-H HH:MM                Auftrag anhalten biz zur angegeben UTC Uhrzeit"
 
 msgid "-H hold                 Hold the job until released/resumed"
-msgstr "-H hold                 Auftrag anhalten bis zur Freigabe/Wiederaufnahme"
+msgstr ""
+"-H hold                 Auftrag anhalten bis zur Freigabe/Wiederaufnahme"
 
 msgid "-H immediate            Print the job as soon as possible"
 msgstr "-H immediate            Drucke den Auftrag so bald als möglich"
@@ -1727,66 +1749,80 @@ msgid ""
 "-I {filename,filters,none,profiles}\n"
 "                          Ignore specific warnings"
 msgstr ""
+"-I {filename,filters,none,profiles}\n"
+"                          Ignoriere spezifische Warnungen"
 
 msgid ""
 "-K keypath              Set location of server X.509 certificates and keys."
 msgstr ""
+"-K Pfad              Lege den Pfad für Server X.509 Zertifikate und "
+"Schlüssel fest."
 
 msgid "-L                      Send requests using content-length"
 msgstr "-L                      Sende Anfragen mit content-length"
 
 msgid "-L location             Specify the textual location of the printer"
-msgstr "-L location             Textbeschreibung für den Ort des Druckers"
+msgstr "-L Ort                  Textbeschreibung für den Ort des Druckers"
 
 msgid "-M manufacturer         Set manufacturer name (default=Test)"
-msgstr "-M manufacturer         Herstellername angeben (Voreinstellung=Test)"
+msgstr "-M Hersteller           Herstellername angeben (Voreinstellung=Test)"
 
 msgid "-P destination          Show status for the specified destination"
-msgstr "-P destination          Zeige den Status für das angegebene Ziel"
+msgstr "-P Ziel                 Zeige den Status für das angegebene Ziel"
 
 msgid "-P destination          Specify the destination"
-msgstr "-P destination          Angabe des Ziels"
+msgstr "-P Ziel                 Angabe des Ziels"
 
 msgid ""
 "-P filename.plist       Produce XML plist to a file and test report to "
 "standard output"
 msgstr ""
+"-P Dateiname.plist       Erzeuge XML-plist in eine Datei und ein Testreport "
+"an die Standardausgabe"
 
 msgid "-P filename.ppd         Load printer attributes from PPD file"
-msgstr "-P filename.ppd         Lade die Druckerattribute von der PPD Datei"
+msgstr "-P Dateiname.ppd         Lade die Druckerattribute von der PPD Datei"
 
 msgid "-P number[-number]      Match port to number or range"
-msgstr ""
+msgstr "-P Nummer[-Nummer]      Vergleiche mit Portnummer oder Portbereich"
 
 msgid "-P page-list            Specify a list of pages to print"
-msgstr "-P page-list            Angabe einer Liste zu druckender Seiten"
+msgstr "-P Seitenliste          Angabe einer Liste zu druckender Seiten"
 
 msgid "-R                      Show the ranking of jobs"
 msgstr "-R                      Zeige die Rangfolge der Aufträge"
 
 msgid "-R name-default         Remove the default value for the named option"
-msgstr "-R name-default         Entferne voreingestellten Wert für die angegebene Option"
+msgstr ""
+"-R name-default         Entferne voreingestellten Wert für die angegebene "
+"Option"
 
 msgid "-R root-directory       Set alternate root"
-msgstr "-R root-directory       Gebe alternatives Wurzelverzeichnis an"
+msgstr "-R Wurzelverzeichnis    Gebe alternatives Wurzelverzeichnis an"
 
 msgid "-S                      Test with encryption using HTTPS"
 msgstr "-S                      Test mit HTTPS Verschlüsselung"
 
 msgid "-T seconds              Set the browse timeout in seconds"
 msgstr ""
+"-T Sekunden             Lege die Zeitüberschreitung für Browsing in Sekunden "
+"fest"
 
 msgid "-T seconds              Set the receive/send timeout in seconds"
 msgstr ""
+"-T Sekunden             Lege die Zeitüberschreitung für Senden/Empfangen in "
+"Sekunden fest"
 
 msgid "-T title                Specify the job title"
-msgstr "-T title                Angabe eines Auftragstitels"
+msgstr "-T Titel                Angabe eines Auftragstitels"
 
 msgid "-U username             Specify the username to use for authentication"
-msgstr "-U username             Angabe des Benutzernamens zur Authentifizierung"
+msgstr ""
+"-U Benutzername         Angabe des Benutzernamens zur Authentifizierung"
 
 msgid "-U username             Specify username to use for authentication"
-msgstr "-U username             Angabe eines Benutzernamens zur Authentifizierung"
+msgstr ""
+"-U Benutzername         Angabe eines Benutzernamens zur Authentifizierung"
 
 msgid "-V version              Set default IPP version"
 msgstr "-V version              Setze die Voreinstellung der IPP Version"
@@ -1813,7 +1849,8 @@ msgid "-a                      Show jobs on all destinations"
 msgstr "-a                      Zeige Aufträge für alle Ziele"
 
 msgid "-a [destination(s)]     Show the accepting state of destinations"
-msgstr "-a [destination(s)]     Zeige den Akzeptanzstatus der angegebenen Ziele"
+msgstr ""
+"-a [Ziel(e)]            Zeige den Akzeptanzstatus der angegebenen Ziele"
 
 msgid "-a filename.conf        Load printer attributes from conf file"
 msgstr ""
@@ -1828,10 +1865,10 @@ msgid "-c [class(es)]          Show classes and their member printers"
 msgstr ""
 
 msgid "-c class                Add the named destination to a class"
-msgstr ""
+msgstr "-c Klasse               Füge das genannte Ziel zu einer Klasse hinzu"
 
 msgid "-c command              Set print command"
-msgstr "-c command              Bestimme Druckerbefehl"
+msgstr "-c Befehl               Bestimme Druckerbefehl"
 
 msgid "-c cupsd.conf           Set cupsd.conf file to use."
 msgstr "-c cupsd.conf           Bestimme zu benutzende cupsd.conf Datei."
@@ -1844,25 +1881,27 @@ msgstr "-d                      Zeige voreingestelltes Ziel"
 
 msgid "-d destination          Set the named destination as the server default"
 msgstr ""
-"-d destination          Bestimme das benannte Ziel als Voreinstellung für den Server"
+"-d Ziel                 Bestimme das benannte Ziel als Voreinstellung für "
+"den Server"
 
 msgid "-d destination          Specify the destination"
-msgstr "-d destination          Bestimme das Ziel"
+msgstr "-d Ziel                 Bestimme das Ziel"
 
 msgid "-d name=value           Set named variable to value"
-msgstr ""
+msgstr "-d Name=Wert            Gebe der benannten Variablen einen Wert"
 
 msgid "-d regex                Match domain to regular expression"
 msgstr ""
+"-d Regex                Vergleiche die Domäne mit dem Regulären Ausdruck"
 
 msgid "-d spool-directory      Set spool directory"
-msgstr ""
+msgstr "-d Spoolverzeichnis     Lege das Spoolverzeichnis fest"
 
 msgid "-e                      Show available destinations on the network"
-msgstr ""
+msgstr "-e                      Zeige im Netz verfügbare Ziele"
 
 msgid "-f                      Run in the foreground."
-msgstr ""
+msgstr "-f                      Starte im Vordergrund."
 
 msgid "-f filename             Set default request filename"
 msgstr ""
@@ -1871,7 +1910,7 @@ msgid "-f type/subtype[,...]   Set supported file types"
 msgstr ""
 
 msgid "-h                      Show this usage message."
-msgstr ""
+msgstr "-h                      Zeige diesen Hinweis."
 
 msgid "-h                      Validate HTTP response headers"
 msgstr ""
@@ -1880,45 +1919,47 @@ msgid "-h regex                Match hostname to regular expression"
 msgstr ""
 
 msgid "-h server[:port]        Connect to the named server and port"
-msgstr ""
+msgstr "-h Server[:Port]        Verbinde mit genanntem Server und Port"
 
 msgid "-i iconfile.png         Set icon file"
-msgstr ""
+msgstr "-i iconfile.png         Lege Icon-Datei fest"
 
 msgid "-i id                   Specify an existing job ID to modify"
-msgstr ""
+msgstr "-i id                   Gib eine zu modifizierende Auftrags-ID an"
 
 msgid "-i ppd-file             Specify a PPD file for the printer"
-msgstr ""
+msgstr "-i ppd-Datei            Gib eine PPD-Datei für den Drucker an"
 
 msgid ""
 "-i seconds              Repeat the last file with the given time interval"
 msgstr ""
+"-i Sekunden             Wiederhole die letzte Datei mit dem angegebenen "
+"Intervall"
 
 msgid "-k                      Keep job spool files"
-msgstr ""
+msgstr "-k                      Spooldateien beibehalten"
 
 msgid "-l                      List attributes"
-msgstr ""
+msgstr "-l                      Liste attribute"
 
 msgid "-l                      Produce plain text output"
-msgstr ""
+msgstr "-l                      Generiere Reintext-Ausgabe"
 
 msgid "-l                      Run cupsd on demand."
-msgstr ""
+msgstr "-l                      Starte cupsd bei Bedarf."
 
 msgid "-l                      Show supported options and values"
-msgstr ""
+msgstr "-l                      Zeige unterstützte Optionen und Werte"
 
 msgid "-l                      Show verbose (long) output"
-msgstr ""
+msgstr "-l                      Zeige ausführliche (lange) Ausgabe"
 
 msgid "-l location             Set location of printer"
-msgstr "-l location             Bestimme den Ort des Druckers"
+msgstr "-l Ort                  Bestimme den Ort des Druckers"
 
 msgid ""
 "-m                      Send an email notification when the job completes"
-msgstr ""
+msgstr "-m                      Sende nach Auftragsabschluss eine eMail"
 
 msgid "-m                      Show models"
 msgstr "-m                      Zeige Modelle"
@@ -1926,22 +1967,25 @@ msgstr "-m                      Zeige Modelle"
 msgid ""
 "-m everywhere           Specify the printer is compatible with IPP Everywhere"
 msgstr ""
+"-m everywhere           Gib an dass der Drucker mit IPP Everywhere "
+"kompatibel ist"
 
 msgid "-m model                Set model name (default=Printer)"
-msgstr ""
+msgstr "-m Modell               Lege Modellname fest (Voreinstellung=Printer)"
 
 msgid ""
 "-m model                Specify a standard model/PPD file for the printer"
-msgstr ""
+msgstr "-m Modell               Lege eine"
 
 msgid "-n count                Repeat the last file the given number of times"
 msgstr ""
+"-n Anzahl               Wiederhole die letzte Datei so oft wie angegeben"
 
 msgid "-n hostname             Set hostname for printer"
-msgstr ""
+msgstr "-n Hostname             Lege den Hostnamen des Druckers fest"
 
 msgid "-n num-copies           Specify the number of copies to print"
-msgstr ""
+msgstr "-n Kopien               Gib die Anzahl der zu druckenden Kopien an"
 
 msgid "-n regex                Match service name to regular expression"
 msgstr ""
@@ -1951,7 +1995,7 @@ msgid ""
 msgstr ""
 
 msgid "-o [destination(s)]     Show jobs"
-msgstr ""
+msgstr "-o [Ziel(e)]            Zeige Aufträge"
 
 msgid ""
 "-o cupsIPPSupplies=false\n"
@@ -1990,7 +2034,7 @@ msgid ""
 msgstr ""
 
 msgid "-o option[=value]       Specify a printer-specific option"
-msgstr ""
+msgstr "-o Option[=Wert]       Gib eine Druckerspezifische Option an"
 
 msgid ""
 "-o orientation-requested=N\n"
@@ -2036,16 +2080,16 @@ msgid "-p                      Print URI if true"
 msgstr ""
 
 msgid "-p [printer(s)]         Show the processing state of destinations"
-msgstr ""
+msgstr "-p [Drucker]            Zeige den Bearbeitungsstatus der Drucker-Ziele"
 
 msgid "-p destination          Specify a destination"
-msgstr "-p destination          Bestimme ein Ziel"
+msgstr "-p Ziel                 Bestimme ein Ziel"
 
 msgid "-p destination          Specify/add the named destination"
-msgstr ""
+msgstr "-p Ziel                 Gebe das benannte Ziel an/füge hinzu"
 
 msgid "-p port                 Set port number for printer"
-msgstr "-p port                 Bestimme die Portnummer für den Drucker"
+msgstr "-p Port                 Bestimme die Portnummer für den Drucker"
 
 msgid "-q                      Quietly report match via exit code"
 msgstr ""
@@ -2076,6 +2120,8 @@ msgstr ""
 
 msgid "-r reason               Specify a reason message that others can see"
 msgstr ""
+"-r Grund                Gib einen Nachricht mit Grund an den andere sehen "
+"können"
 
 msgid "-r subtype,[subtype]    Set DNS-SD service subtype"
 msgstr ""
@@ -2108,11 +2154,13 @@ msgid "-t key                  True if the TXT record contains the key"
 msgstr ""
 
 msgid "-t title                Specify the job title"
-msgstr ""
+msgstr "-t Titel                Lege den Auftragstitel fest"
 
 msgid ""
 "-u [user(s)]            Show jobs queued by the current or specified users"
 msgstr ""
+"-u [Benutzer]           Zeige anstehede Aufträge des aktuellen oder "
+"angegebenen Benutzers an"
 
 msgid "-u allow:all            Allow all users to print"
 msgstr ""
@@ -2796,7 +2844,7 @@ msgstr "Applikator"
 
 #, c-format
 msgid "Attempt to set %s printer-state to bad value %d."
-msgstr "Versuch den %s Druckerstatus auf einen ungültigen %d Wert zu setzen."
+msgstr "Versuch den %s Druckerstatus auf einen ungültigen Wert %d zu setzen."
 
 #, c-format
 msgid "Attribute \"%s\" is in the wrong group."
@@ -2848,7 +2896,7 @@ msgstr "DIN B9"
 
 #, c-format
 msgid "Bad \"printer-id\" value %d."
-msgstr "Falscher \"printer-id\" Wert %d."
+msgstr "Falscher \"printer-id\"-Wert %d."
 
 #, c-format
 msgid "Bad '%s' value."
@@ -2856,7 +2904,7 @@ msgstr "Ungültiger Wert '%s'."
 
 #, c-format
 msgid "Bad 'document-format' value \"%s\"."
-msgstr "Fehlerhafter 'document-format' Wert \"%s\"."
+msgstr "Fehlerhafter 'document-format'-Wert \"%s\"."
 
 msgid "Bad CloseUI/JCLCloseUI"
 msgstr "Ungültiger Wert CloseUI/JCLCloseUI"
@@ -2957,7 +3005,7 @@ msgstr "Ungültige notify-recipient-uri \"%s\"."
 
 #, c-format
 msgid "Bad notify-user-data \"%s\"."
-msgstr ""
+msgstr "Ungültige notify-user-data \"%s\"."
 
 #, c-format
 msgid "Bad number-up value %d."
@@ -3033,8 +3081,7 @@ msgid "Canceling print job."
 msgstr "Auftrag wird abgebrochen."
 
 msgid "Cannot change printer-is-shared for remote queues."
-msgstr ""
-"Kann für entfernte Warteschlangen die Mitbenutzung nicht ändern."
+msgstr "Kann für entfernte Warteschlangen die Mitbenutzung nicht ändern."
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr "Freigabe eines entfernten kerberisierten Druckers nicht möglich"
@@ -3098,7 +3145,7 @@ msgid "Created"
 msgstr "Erstellt"
 
 msgid "Credentials do not validate against site CA certificate."
-msgstr "Anmeldedaten validieren nicht gegen das CA Zertifikat der Seite"
+msgstr "Anmeldedaten validieren nicht gegen das CA-Zertifikat der Seite"
 
 msgid "Credentials have expired."
 msgstr "Berechtigung ist abgelaufen"
@@ -3220,7 +3267,7 @@ msgid "Edit Configuration File"
 msgstr "Konfigurationsdatei bearbeiten"
 
 msgid "Encryption is not supported."
-msgstr "Verschlüsselung ist nicht unterstüzt."
+msgstr "Verschlüsselung ist nicht unterstützt."
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
@@ -3235,7 +3282,7 @@ msgid ""
 "valid Kerberos ticket."
 msgstr ""
 "Geben Sie Ihren Benutzernamen und das Passwort oder den root-Benutzernamen "
-"und -passwort ein, um auf diese Seite zuzugreifen. Falls Sie die Kerberos-"
+"und -Passwort ein, um auf diese Seite zuzugreifen. Falls Sie die Kerberos-"
 "Authentifizierung verwenden, stellen Sie sicher, dass Sie ein gültiges "
 "Kerberos-Ticket haben."
 
@@ -3492,6 +3539,8 @@ msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
 "in \"%s/cups-files.conf\"."
 msgstr ""
+"Datei-Geräte-URI sind gesperrt. Um sie zu entsperren siehe FileDevice "
+"Directive in \"%s/cups-files.conf\"."
 
 #, c-format
 msgid "Finished page %d."
@@ -3558,7 +3607,7 @@ msgid "IPP begCollection value not 0 bytes."
 msgstr "IPP begCollection Wert nicht 0 Byte."
 
 msgid "IPP boolean value not 1 byte."
-msgstr "IPP boolescher Wert nicht 1 Byte."
+msgstr "IPP boolscher Wert nicht 1 Byte."
 
 msgid "IPP date value not 11 bytes."
 msgstr "IPP-Datenwert nicht 11 Byte."
@@ -3570,7 +3619,7 @@ msgid "IPP enum value not 4 bytes."
 msgstr "IPP enum Wert nicht 4 Byte."
 
 msgid "IPP extension tag larger than 0x7FFFFFFF."
-msgstr "IPP Erweiterung grösser als 0x7FFFFFFF."
+msgstr "IPP-Erweiterung größer als 0x7FFFFFFF."
 
 msgid "IPP integer value not 4 bytes."
 msgstr "IPP Integer-Wert nicht 4 Bytes."
@@ -3803,7 +3852,7 @@ msgid "Job is completed and cannot be changed."
 msgstr "Auftrag ist abgeschlossen und kann nicht geändert werden."
 
 msgid "Job operation failed"
-msgstr "Auftrag fehlgeschlagen:"
+msgstr "Auftrag fehlgeschlagen"
 
 msgid "Job state cannot be changed."
 msgstr "Auftragsstatus kann nicht geändert werden."
@@ -3906,10 +3955,10 @@ msgid "Missing document-number attribute."
 msgstr "Fehlendes Attribut zur Dokumentennummer."
 
 msgid "Missing form variable"
-msgstr "Fehlende form Variable"
+msgstr "Fehlende form-Variable"
 
 msgid "Missing last-document attribute in request."
-msgstr "Fehlendes Letzte-Sete Attribut in der Anfrage."
+msgstr "Fehlendes Letzte-Seite-Attribut in der Anfrage."
 
 msgid "Missing media or media-col."
 msgstr "Fehlende Medien oder Medien-col."
@@ -3918,7 +3967,7 @@ msgid "Missing media-size in media-col."
 msgstr "Fehlende Mediengrösse oder Medien-col."
 
 msgid "Missing notify-subscription-ids attribute."
-msgstr ""
+msgstr "Fehlendes notify-subscription-ids Attribut."
 
 msgid "Missing option keyword"
 msgstr "Fehlende Option Schlüsselwort"
@@ -3994,7 +4043,7 @@ msgid "New credentials are not valid for name."
 msgstr "Neue Anmeldedaten sind für den Namen ungültig."
 
 msgid "New credentials are older than stored credentials."
-msgstr "Neue Anmeldedaten sind läter als die gespeicherten Anmeldedaten"
+msgstr "Neue Anmeldedaten sind älter als die gespeicherten Anmeldedaten"
 
 msgid "No"
 msgstr "Nein"
@@ -4213,6 +4262,7 @@ msgstr "PRCK32K Übergröße lange Kante"
 msgid ""
 "PRINTER environment variable names default destination that does not exist."
 msgstr ""
+"PRINTER Umgebungsvariable für ein voreingestelltes Ziel existiert nicht."
 
 msgid "Packet does not contain a Get-Response-PDU"
 msgstr "Paket enthält kein Get-Response-PDU"
@@ -4344,8 +4394,8 @@ msgstr "Drucker kann mit den angegebenen Optionen nicht drucken."
 
 msgid "Printer does not support required IPP attributes or document formats."
 msgstr ""
-"Drucker unterstützt die erforderlichen"
-"IPP-Attribute oder Dokumentformate nicht"
+"Drucker unterstützt die erforderlichenIPP-Attribute oder Dokumentformate "
+"nicht"
 
 msgid "Printer:"
 msgstr "Drucker:"
@@ -4553,7 +4603,7 @@ msgid "The PPD file \"%s\" could not be opened: %s"
 msgstr "Die PPD-Datei »%s« konnte nicht geöffnet werden: %s"
 
 msgid "The PPD file could not be opened."
-msgstr "Die PPD Datei konnte nicht geöffnet werden."
+msgstr "Die PPD-Datei konnte nicht geöffnet werden."
 
 msgid ""
 "The class name may only contain up to 127 printable characters and may not "
@@ -4609,6 +4659,9 @@ msgid ""
 "contain spaces, slashes (/ \\), quotes (' \"), question mark (?), or the "
 "pound sign (#)."
 msgstr ""
+"Der Druckername kann maximal 127 druckbare Zeichen umfassen aber keinesfalls "
+"Leerzeichen, Slashes (/ \\), Anführungszeichen (' \"), Fragezeichen (?), "
+"oder Rautezeichen (#)."
 
 msgid "The printer or class does not exist."
 msgstr "Der Drucker oder die Klasse existiert nicht."
@@ -4621,7 +4674,7 @@ msgid "The printer-uri \"%s\" contains invalid characters."
 msgstr "Die Drucker-URI »%s« enthält ungültige Zeichen."
 
 msgid "The printer-uri attribute is required."
-msgstr "Das printer-uri Attribut ist erforderlich."
+msgstr "Das printer-uri-Attribut ist erforderlich."
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
@@ -4650,7 +4703,7 @@ msgid "There are too many subscriptions."
 msgstr "Es gibt zu viele Subskriptionen."
 
 msgid "There was an unrecoverable USB error."
-msgstr "Ein nicht zu behebender USB Fehler ist aufgetreten."
+msgstr "Ein nicht zu behebender USB-Fehler ist aufgetreten."
 
 msgid "Thermal Transfer Media"
 msgstr "Thermotransferpapier"
@@ -4660,11 +4713,11 @@ msgstr "Zu viele aktive Druckaufträge."
 
 #, c-format
 msgid "Too many job-sheets values (%d > 2)."
-msgstr "Zu viele job-sheets Werte (%d > 2)."
+msgstr "Zu viele job-sheets-Werte (%d > 2)."
 
 #, c-format
 msgid "Too many printer-state-reasons values (%d > %d)."
-msgstr "Zu viele printer-state-reasons Werte (%d > %d)."
+msgstr "Zu viele printer-state-reasons-Werte (%d > %d)."
 
 msgid "Transparency"
 msgstr "Transparenz"
@@ -4761,12 +4814,12 @@ msgid "Unable to change printer-is-shared attribute"
 msgstr "Attribut „printer-is-shared“ konnte nicht geändert werden"
 
 msgid "Unable to change server settings"
-msgstr "Servereinstellungen konnten nicht geändert werden :"
+msgstr "Servereinstellungen konnten nicht geändert werden"
 
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
 msgstr ""
-"Der regulären Ausdruck %s für mimeMediaType kann nicht kompiliert werden."
+"Der regulären Ausdruck für mimeMediaType kann nicht kompiliert werden: %s."
 
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
@@ -4786,10 +4839,10 @@ msgstr ""
 
 #, c-format
 msgid "Unable to copy PPD file - %s"
-msgstr "PPD Datei %s kann nicht kopiert werden"
+msgstr "PPD-Datei kann nicht kopiert werden - %s"
 
 msgid "Unable to copy PPD file."
-msgstr "PPD Datei kann nicht kopiert werden"
+msgstr "PPD-Datei kann nicht kopiert werden"
 
 msgid "Unable to create credentials from array."
 msgstr "Anmeldedaten aus dem Array können nicht erzeugt werden."
@@ -4805,7 +4858,7 @@ msgstr "Die Server-Anmeldedaten können nicht erzeugt werden."
 
 #, c-format
 msgid "Unable to create spool directory \"%s\": %s"
-msgstr ""
+msgstr "Anlegen des spoolverzeichnisses \"%s\": %s nicht möglich"
 
 msgid "Unable to create temporary file"
 msgstr "Temporäre Datei konnte nicht erstellt werden"
@@ -4820,11 +4873,11 @@ msgid "Unable to do maintenance command"
 msgstr "Wartungsbefehl konnte nicht ausgeführt werden"
 
 msgid "Unable to edit cupsd.conf files larger than 1MB"
-msgstr "cupsd.conf Dateien grösser als 1MB können nicht bearbeitet werden"
+msgstr "cupsd.conf-Dateien größer als 1MB können nicht bearbeitet werden"
 
 #, c-format
 msgid "Unable to establish a secure connection to host (%d)."
-msgstr ""
+msgstr "Herstellen einer sicheren Verbindung zum Host (%d) nicht möglich."
 
 msgid ""
 "Unable to establish a secure connection to host (certificate chain invalid)."
@@ -4989,7 +5042,7 @@ msgstr "Kann Druckdaten nicht schreiben"
 
 #, c-format
 msgid "Unable to write uncompressed print data: %s"
-msgstr "Unkomprimierte Druckdaten %s können nicht geschrieben werden."
+msgstr "Unkomprimierte Druckdaten können nicht geschrieben werden: %s"
 
 msgid "Unauthorized"
 msgstr "Nicht berechtigt"
@@ -5006,7 +5059,7 @@ msgstr "Unbekannte Auswahl \"%s\" für Option \"%s\"."
 
 #, c-format
 msgid "Unknown directive \"%s\" on line %d of \"%s\" ignored."
-msgstr ""
+msgstr "Unbekannte Anweisung \"%s\" in Zeile %d in \"%s\" wird ignoriert."
 
 #, c-format
 msgid "Unknown encryption option value: \"%s\"."
@@ -5131,7 +5184,7 @@ msgstr "Verwendung: %s [Optionen] Ziel(e)"
 
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]"
-msgstr "Aufruf: %s Auftrags-ID Benutzer Titel Kopien Optionen [Datei]"
+msgstr "Verwendung: %s Auftrags-ID Benutzer Titel Kopien Optionen [Datei]"
 
 msgid ""
 "Usage: cancel [options] [id]\n"
@@ -5140,13 +5193,13 @@ msgid ""
 msgstr ""
 
 msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
-msgstr "Aufruf: cupsctl [Optionen] [Parameter=Wert ... ParameterN=WertN]"
+msgstr "Verwendung: cupsctl [Optionen] [Parameter=Wert ... ParameterN=WertN]"
 
 msgid "Usage: cupsd [options]"
-msgstr "Aufruf: cupsd [Optionen]"
+msgstr "Verwendung: cupsd [Optionen]"
 
 msgid "Usage: cupsfilter [ options ] [ -- ] filename"
-msgstr "Aufruf: cupsfilter [ Optionen ] [ -- ] Dateiname"
+msgstr "Verwendung: cupsfilter [ Optionen ] [ -- ] Dateiname"
 
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
@@ -5164,12 +5217,14 @@ msgid ""
 msgstr ""
 
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
-msgstr "Aufruf: ipptool [Optionen] URI Dateiname [ ... DateinameN ]"
+msgstr "Verwendung: ipptool [Optionen] URI Dateiname [ ... DateinameN ]"
 
 msgid ""
 "Usage: lp [options] [--] [file(s)]\n"
 "       lp [options] -i id"
 msgstr ""
+"Verwendung: lp [Optionen] [--] [Datei(en)]\n"
+"            lp [Optionen] -i id"
 
 msgid ""
 "Usage: lpadmin [options] -d destination\n"
@@ -5210,15 +5265,17 @@ msgstr ""
 "            lpoptions [Optionen] -x Ziel"
 
 msgid "Usage: lpq [options] [+interval]"
-msgstr ""
+msgstr "Verwendung: lpq [Optionen] [+Intervall]"
 
 msgid "Usage: lpr [options] [file(s)]"
-msgstr ""
+msgstr "Verwendung: lpr [Optionen] [Datei(en)]"
 
 msgid ""
 "Usage: lprm [options] [id]\n"
 "       lprm [options] -"
 msgstr ""
+"Verwendung: lprm [Optionen] [id]\n"
+"            lprm [Optionen] -"
 
 msgid "Usage: lpstat [options]"
 msgstr "Verwendung: lpstat [Optionen]"
@@ -5238,7 +5295,8 @@ msgstr "Verwendung: ppdmerge [Optionen] Dateiname.ppd [ ... DateinameN.ppd ]"
 msgid ""
 "Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
 msgstr ""
-"Aufruf: ppdpo [Optionen] -o Dateiname.po Dateiname.drv [ ... DateinameN.drv ]"
+"Verwendung: ppdpo [Optionen] -o Dateiname.po Dateiname.drv [ ... DateinameN."
+"drv ]"
 
 msgid "Usage: snmp [host-or-ip-address]"
 msgstr "Verwendung: snmp [Host-oder-IP-Adresse]"
@@ -5267,8 +5325,8 @@ msgstr "Warte auf Abschluss."
 
 msgid "Warning: This program will be removed in a future version of CUPS."
 msgstr ""
-"Warnung: Dieses Programm wird in einerzukünftigen Version"
-"von CUPS entfernt werden."
+"Warnung: Dieses Programm wird in einerzukünftigen Versionvon CUPS entfernt "
+"werden."
 
 msgid "Web Interface is Disabled"
 msgstr "Web-Schnittstelle ist deaktiviert"
@@ -5589,7 +5647,7 @@ msgstr "cupsctl: kann %s nicht direkt bestimmen"
 
 #, c-format
 msgid "cupsctl: Unable to connect to server: %s"
-msgstr "cupsctl: Kann nicht mit dem Server %s verbinden"
+msgstr "cupsctl: Kann nicht mit dem Server verbinden: %s"
 
 #, c-format
 msgid "cupsctl: Unknown option \"%s\""
@@ -6991,7 +7049,7 @@ msgstr "ippfind: Fehlende offene Klammer"
 
 #, c-format
 msgid "ippfind: Missing program after %s."
-msgstr ""
+msgstr "ippfind: Fehlendes Programm nach %s."
 
 #, c-format
 msgid "ippfind: Missing regular expression after %s."
@@ -7792,13 +7850,13 @@ msgid "lpadmin: Expected class name after \"-c\" option."
 msgstr "lpadmin: Klasse nach der \"-c\" Option erwartet."
 
 msgid "lpadmin: Expected description after \"-D\" option."
-msgstr "lpadmin: BEschreibung nach der \"-D\" Option erwartet."
+msgstr "lpadmin: Beschreibung nach der \"-D\" Option erwartet."
 
 msgid "lpadmin: Expected device URI after \"-v\" option."
 msgstr "lpadmin: Geräte-URI nach der \"-v\" Option erwartet."
 
 msgid "lpadmin: Expected file type(s) after \"-I\" option."
-msgstr "lpadmin: Dateitype nach der \"-I\" Option erwartet."
+msgstr "lpadmin: Dateityp nach der \"-I\" Option erwartet."
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
 msgstr "lpadmin: Hostname nach der \"-h\" Option erwartet."
@@ -7839,8 +7897,8 @@ msgid ""
 "lpadmin: Printer drivers are deprecated and will stop working in a future "
 "version of CUPS."
 msgstr ""
-"lpadmin: Druckertreiber sind veraltet und werden in einer zukünftigen"
-"Version von CUPS nicht mehr funktionieren."
+"lpadmin: Druckertreiber sind veraltet und werden in einer zukünftigenVersion "
+"von CUPS nicht mehr funktionieren."
 
 msgid "lpadmin: Printer name can only contain printable characters."
 msgstr "lpadmin: Druckername darf nur druckbare Zeichen enthalten."
@@ -7849,8 +7907,8 @@ msgid ""
 "lpadmin: Raw queues are deprecated and will stop working in a future version "
 "of CUPS."
 msgstr ""
-"lpadmin: Roh-Warteschlangen sind veraltet und werden in einer zukünftigen"
-"Version von CUPS nicht mehr funktionieren."
+"lpadmin: Roh-Warteschlangen sind veraltet und werden in einer "
+"zukünftigenVersion von CUPS nicht mehr funktionieren."
 
 msgid "lpadmin: Raw queues are no longer supported on macOS."
 msgstr "lpadmin: Roh-Warteschlangen sind unter macOS nicht mehr unterstützt."
@@ -7859,8 +7917,8 @@ msgid ""
 "lpadmin: System V interface scripts are no longer supported for security "
 "reasons."
 msgstr ""
-"lpadmin: System V Schnittstellenskripte sind aus Sicherheitsgründen "
-"nicht mehr unterstützt."
+"lpadmin: System V Schnittstellenskripte sind aus Sicherheitsgründen nicht "
+"mehr unterstützt."
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
@@ -7871,7 +7929,7 @@ msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s"
-msgstr "lpadmin: Kann nicht mit dem Server %s verbinden."
+msgstr "lpadmin: Kann nicht mit dem Server verbinden: %s"
 
 msgid "lpadmin: Unable to create temporary file"
 msgstr "lpadmin: Temporäre Datei kann nicht angelegt werden"
@@ -7880,10 +7938,12 @@ msgid ""
 "lpadmin: Unable to delete option:\n"
 "         You must specify a printer name first."
 msgstr ""
+"lpadmin: Löschen der Option nicht möglich:\n"
+"         Sie müssen zuerst einen Druckernamen angeben."
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s"
-msgstr ""
+msgstr "lpadmin: Öffnen der PPD \"%s\": %s nicht möglich."
 
 #, c-format
 msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
@@ -7917,6 +7977,7 @@ msgstr "lpadmin: Unbekannte Option »%c«."
 
 msgid "lpadmin: Use the 'everywhere' model for shared printers."
 msgstr ""
+"lpadmin: Benutzen sie das 'everywhere' Modell für freigegebene Drucker."
 
 msgid "lpadmin: Warning - content type list ignored."
 msgstr "lpadmin: Warnung - Inhaltstypliste ignoriert."
@@ -7934,7 +7995,7 @@ msgid "lpinfo: Expected make and model after \"--make-and-model\"."
 msgstr ""
 
 msgid "lpinfo: Expected product string after \"--product\"."
-msgstr ""
+msgstr "lpinfo: Produkt-Zeichenkette nach \"--product\" erwartet."
 
 msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
 msgstr ""
@@ -7947,7 +8008,7 @@ msgstr ""
 
 #, c-format
 msgid "lpmove: Unable to connect to server: %s"
-msgstr "lpmove: Verbindung zum Server »%s« nicht möglich"
+msgstr "lpmove: Verbindung zum Server nicht möglich: %s"
 
 #, c-format
 msgid "lpmove: Unknown argument \"%s\"."
@@ -7962,7 +8023,7 @@ msgstr "lpoptions: Hinzufügen von Drucker oder Instanz nicht möglich: %s"
 
 #, c-format
 msgid "lpoptions: Unable to get PPD file for %s: %s"
-msgstr "lpoptions: Keine PPD-Datei für %s: %s verfügbar"
+msgstr "lpoptions: Keine PPD-Datei für %s verfügbar: %s"
 
 #, c-format
 msgid "lpoptions: Unable to open PPD file for %s."
@@ -8111,7 +8172,7 @@ msgstr "Schokolade"
 
 #. TRANSLATORS: Gold
 msgid "material-type.gold"
-msgstr ""
+msgstr "material-type.Gold"
 
 #. TRANSLATORS: Nylon
 msgid "material-type.nylon"
@@ -8407,7 +8468,7 @@ msgstr "gold"
 
 #. TRANSLATORS: Goldenrod
 msgid "media-color.goldenrod"
-msgstr ""
+msgstr "media-color.goldrute"
 
 #. TRANSLATORS: Gray
 msgid "media-color.gray"
@@ -8435,7 +8496,7 @@ msgstr "hellbraun"
 
 #. TRANSLATORS: Light Buff
 msgid "media-color.light-buff"
-msgstr ""
+msgstr "media-color.hell-gelbbraun"
 
 #. TRANSLATORS: Light Cyan
 msgid "media-color.light-cyan"
@@ -8555,11 +8616,11 @@ msgstr ""
 
 #. TRANSLATORS: Cross-Feed Direction
 msgid "media-grain.x-direction"
-msgstr ""
+msgstr "media-grain.x-Richtung"
 
 #. TRANSLATORS: Feed Direction
 msgid "media-grain.y-direction"
-msgstr ""
+msgstr "media-grain.y-Richtung"
 
 #. TRANSLATORS: Media Hole Count
 msgid "media-hole-count"
@@ -8839,7 +8900,7 @@ msgstr "Extra fein"
 
 #. TRANSLATORS: Coarse
 msgid "media-tooth.coarse"
-msgstr ""
+msgstr "media-tooth.grob"
 
 #. TRANSLATORS: Fine
 msgid "media-tooth.fine"
@@ -9863,7 +9924,7 @@ msgstr "10×14 inch"
 
 #. TRANSLATORS: 10 x 15″
 msgid "media.na_10x15_10x15in"
-msgstr ""
+msgstr "10×15 inch"
 
 #. TRANSLATORS: 11 x 12″
 msgid "media.na_11x12_11x12in"
@@ -10055,7 +10116,7 @@ msgstr "8,5×13,4 inch"
 
 #. TRANSLATORS: Envelope Personal
 msgid "media.na_personal_3.625x6.5in"
-msgstr ""
+msgstr "3,625×6,5 inch"
 
 #. TRANSLATORS: Quarto
 msgid "media.na_quarto_8.5x10.83in"
@@ -11157,7 +11218,7 @@ msgstr ""
 
 #, c-format
 msgid "ppdc: Writing %s."
-msgstr "ppdc: Schreibe: %s."
+msgstr "ppdc: Schreibe %s."
 
 #, c-format
 msgid "ppdc: Writing PPD files to directory \"%s\"."
@@ -12021,23 +12082,23 @@ msgstr "Lüfterfehler"
 
 #. TRANSLATORS: Fax Modem Life Almost Over
 msgid "printer-state-reasons.fax-modem-life-almost-over"
-msgstr ""
+msgstr "Modemlebensdauer fast erreicht"
 
 #. TRANSLATORS: Fax Modem Life Over
 msgid "printer-state-reasons.fax-modem-life-over"
-msgstr ""
+msgstr "Modemlebensdauer erreicht"
 
 #. TRANSLATORS: Fax Modem Missing
 msgid "printer-state-reasons.fax-modem-missing"
-msgstr ""
+msgstr "Modem nicht vorhanden"
 
 #. TRANSLATORS: Fax Modem Turned Off
 msgid "printer-state-reasons.fax-modem-turned-off"
-msgstr ""
+msgstr "Modem ausgeschaltet"
 
 #. TRANSLATORS: Fax Modem Turned On
 msgid "printer-state-reasons.fax-modem-turned-on"
-msgstr ""
+msgstr "Modem eingeschaltet"
 
 #. TRANSLATORS: Folder Added
 msgid "printer-state-reasons.folder-added"
@@ -12597,27 +12658,27 @@ msgstr ""
 
 #. TRANSLATORS: Lamp At End of Life
 msgid "printer-state-reasons.lamp-at-eol"
-msgstr ""
+msgstr "Lampe am Lebensdauerende"
 
 #. TRANSLATORS: Lamp Failure
 msgid "printer-state-reasons.lamp-failure"
-msgstr ""
+msgstr "Lampenfehler"
 
 #. TRANSLATORS: Lamp Near End of Life
 msgid "printer-state-reasons.lamp-near-eol"
-msgstr ""
+msgstr "Lampe fast am Lebensdauerende"
 
 #. TRANSLATORS: Laser At End of Life
 msgid "printer-state-reasons.laser-at-eol"
-msgstr ""
+msgstr "Laser am Lebensdauerende"
 
 #. TRANSLATORS: Laser Failure
 msgid "printer-state-reasons.laser-failure"
-msgstr ""
+msgstr "Laserfehler"
 
 #. TRANSLATORS: Laser Near End of Life
 msgid "printer-state-reasons.laser-near-eol"
-msgstr ""
+msgstr "Laser fast am Lebensdauerende"
 
 #. TRANSLATORS: Envelope Maker Added
 msgid "printer-state-reasons.make-envelope-added"
@@ -12925,11 +12986,11 @@ msgstr "Fehler im Medienpfad"
 
 #. TRANSLATORS: Media Path Input Empty
 msgid "printer-state-reasons.media-path-input-empty"
-msgstr ""
+msgstr "Medieneinzugspfad leer"
 
 #. TRANSLATORS: Media Path Input Feed Error
 msgid "printer-state-reasons.media-path-input-feed-error"
-msgstr ""
+msgstr "Einzugsfehler"
 
 #. TRANSLATORS: Media Path Input Jam
 msgid "printer-state-reasons.media-path-input-jam"
@@ -12961,11 +13022,11 @@ msgstr ""
 
 #. TRANSLATORS: Media Path Output Full
 msgid "printer-state-reasons.media-path-output-full"
-msgstr ""
+msgstr "Ausgabepfad voll"
 
 #. TRANSLATORS: Media Path Output Jam
 msgid "printer-state-reasons.media-path-output-jam"
-msgstr ""
+msgstr "Stau im Ausgabepfad"
 
 #. TRANSLATORS: Media Path Pick Roller Failure
 msgid "printer-state-reasons.media-path-pick-roller-failure"
@@ -13657,27 +13718,27 @@ msgstr ""
 
 #. TRANSLATORS: Printer offline
 msgid "printer-state-reasons.shutdown"
-msgstr ""
+msgstr "Herunterfahren"
 
 #. TRANSLATORS: Slitter Added
 msgid "printer-state-reasons.slitter-added"
-msgstr ""
+msgstr "Schneidvorrichtung hinzugefügt"
 
 #. TRANSLATORS: Slitter Almost Empty
 msgid "printer-state-reasons.slitter-almost-empty"
-msgstr ""
+msgstr "Schneidvorrichtung fast leer"
 
 #. TRANSLATORS: Slitter Almost Full
 msgid "printer-state-reasons.slitter-almost-full"
-msgstr ""
+msgstr "Schneidvorrichtung fast voll"
 
 #. TRANSLATORS: Slitter At Limit
 msgid "printer-state-reasons.slitter-at-limit"
-msgstr ""
+msgstr "Schneidvorrichtung am Limit"
 
 #. TRANSLATORS: Slitter Closed
 msgid "printer-state-reasons.slitter-closed"
-msgstr ""
+msgstr "Schneidvorrichtung geschlossen"
 
 #. TRANSLATORS: Slitter Configuration Change
 msgid "printer-state-reasons.slitter-configuration-change"
@@ -13693,11 +13754,11 @@ msgstr ""
 
 #. TRANSLATORS: Slitter Empty
 msgid "printer-state-reasons.slitter-empty"
-msgstr ""
+msgstr "Schneidvorrichtung leer"
 
 #. TRANSLATORS: Slitter Full
 msgid "printer-state-reasons.slitter-full"
-msgstr ""
+msgstr "Schneidvorrichtung voll"
 
 #. TRANSLATORS: Slitter Interlock Closed
 msgid "printer-state-reasons.slitter-interlock-closed"
@@ -13709,15 +13770,15 @@ msgstr ""
 
 #. TRANSLATORS: Slitter Jam
 msgid "printer-state-reasons.slitter-jam"
-msgstr ""
+msgstr "Schneidvorrichtung blockiert"
 
 #. TRANSLATORS: Slitter Life Almost Over
 msgid "printer-state-reasons.slitter-life-almost-over"
-msgstr ""
+msgstr "Schneidvorrichtung nahe am Lebensdauerende"
 
 #. TRANSLATORS: Slitter Life Over
 msgid "printer-state-reasons.slitter-life-over"
-msgstr ""
+msgstr "Schneidvorrichtung am Lebensdauerende"
 
 #. TRANSLATORS: Slitter Memory Exhausted
 msgid "printer-state-reasons.slitter-memory-exhausted"
@@ -13741,15 +13802,15 @@ msgstr ""
 
 #. TRANSLATORS: Slitter Opened
 msgid "printer-state-reasons.slitter-opened"
-msgstr ""
+msgstr "Schneidvorrichtung geöffnet"
 
 #. TRANSLATORS: Slitter Over Temperature
 msgid "printer-state-reasons.slitter-over-temperature"
-msgstr ""
+msgstr "Schneidvorrichtung überhitzt"
 
 #. TRANSLATORS: Slitter Power Saver
 msgid "printer-state-reasons.slitter-power-saver"
-msgstr ""
+msgstr "Schneidvorrichtung im Energiesparmodus"
 
 #. TRANSLATORS: Slitter Recoverable Failure
 msgid "printer-state-reasons.slitter-recoverable-failure"
@@ -13761,7 +13822,7 @@ msgstr ""
 
 #. TRANSLATORS: Slitter Removed
 msgid "printer-state-reasons.slitter-removed"
-msgstr ""
+msgstr "Schneidvorrichtung entfernt"
 
 #. TRANSLATORS: Slitter Resource Added
 msgid "printer-state-reasons.slitter-resource-added"
@@ -13805,7 +13866,7 @@ msgstr ""
 
 #. TRANSLATORS: Spool Area Full
 msgid "printer-state-reasons.spool-area-full"
-msgstr ""
+msgstr "Spoolbereich voll"
 
 #. TRANSLATORS: Stacker Added
 msgid "printer-state-reasons.stacker-added"
@@ -14245,7 +14306,7 @@ msgstr ""
 
 #. TRANSLATORS: Stopping
 msgid "printer-state-reasons.stopping"
-msgstr ""
+msgstr "Angehalten"
 
 #. TRANSLATORS: Subunit Added
 msgid "printer-state-reasons.subunit-added"
@@ -14373,15 +14434,15 @@ msgstr ""
 
 #. TRANSLATORS: Printer stopped responding
 msgid "printer-state-reasons.timed-out"
-msgstr ""
+msgstr "Zeitüberschreitung"
 
 #. TRANSLATORS: Out of toner
 msgid "printer-state-reasons.toner-empty"
-msgstr ""
+msgstr "Toner leer"
 
 #. TRANSLATORS: Toner low
 msgid "printer-state-reasons.toner-low"
-msgstr ""
+msgstr "Tonerstand niedrig"
 
 #. TRANSLATORS: Trimmer Added
 msgid "printer-state-reasons.trimmer-added"
@@ -14529,7 +14590,7 @@ msgstr ""
 
 #. TRANSLATORS: Unknown
 msgid "printer-state-reasons.unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #. TRANSLATORS: Wrapper Added
 msgid "printer-state-reasons.wrapper-added"
@@ -14689,18 +14750,18 @@ msgstr ""
 
 #. TRANSLATORS: Printer Uptime
 msgid "printer-up-time"
-msgstr ""
+msgstr "Drucker-Betriebszeit"
 
 msgid "processing"
 msgstr "in Verarbeitung"
 
 #. TRANSLATORS: Proof Print
 msgid "proof-print"
-msgstr ""
+msgstr "Korrekturdruck"
 
 #. TRANSLATORS: Proof Print Copies
 msgid "proof-print-copies"
-msgstr ""
+msgstr "Anzahl Korrekturdrucke"
 
 #. TRANSLATORS: Punching
 msgid "punching"
@@ -15035,7 +15096,7 @@ msgstr "Voll"
 
 #. TRANSLATORS: Partial
 msgid "trimming-type.partial"
-msgstr ""
+msgstr "teilweise"
 
 #. TRANSLATORS: Perforate
 msgid "trimming-type.perforate"
@@ -15123,16 +15184,16 @@ msgid "z-offset"
 msgstr "z-Versatz"
 
 msgid "{service_domain}        Domain name"
-msgstr ""
+msgstr "{service_domain}        Domänenname"
 
 msgid "{service_hostname}      Fully-qualified domain name"
-msgstr ""
+msgstr "{service_hostname}      Voll qualifizierter Domänenname"
 
 msgid "{service_name}          Service instance name"
 msgstr ""
 
 msgid "{service_port}          Port number"
-msgstr ""
+msgstr "{service_port}          Portnummer"
 
 msgid "{service_regtype}       DNS-SD registration type"
 msgstr ""
