@@ -1596,7 +1596,7 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 		/* This request takes the 0 based configuration index. IOKit returns a 1 based configuration index */
 		configurationIndex -= 1;
 
-		bzero(&request, sizeof(request));
+		memset(&request, 0, sizeof(request));
 
 		request.bmRequestType		= USBmakebmRequestType(kUSBIn, kUSBClass, kUSBInterface);
 		request.bRequest			= kUSBPrintClassGetDeviceID;
@@ -1638,7 +1638,7 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 		IOUSBDevRequestTO		request;
 		IOUSBDeviceDescriptor	desc;
 
-		bzero(&request, sizeof(request));
+		memset(&request, 0, sizeof(request));
 
 		request.bmRequestType = USBmakebmRequestType( kUSBIn,  kUSBStandard, kUSBDevice );
 		request.bRequest = kUSBRqGetDescriptor;
@@ -1728,7 +1728,7 @@ static CFStringRef copy_printer_interface_indexed_description(printer_interface_
 	UInt8 description[256]; // Max possible descriptor length
 	IOUSBDevRequestTO	request;
 
-	bzero(description, 2);
+	memset(description, 0, 2);
 
 	request.bmRequestType = USBmakebmRequestType(kUSBIn, kUSBStandard, kUSBDevice);
 	request.bRequest = kUSBRqGetDescriptor;
@@ -1742,7 +1742,7 @@ static CFStringRef copy_printer_interface_indexed_description(printer_interface_
 	err = (*printer)->ControlRequestTO(printer, 0, &request);
 	if (err != kIOReturnSuccess && err != kIOReturnOverrun)
 	{
-		bzero(description, request.wLength);
+		memset(description, 0, request.wLength);
 
 		// Let's try again full length. Here's why:
 		//      On USB 2.0 controllers, we will not get an overrun error.  We just get a "babble" error
@@ -1775,7 +1775,7 @@ static CFStringRef copy_printer_interface_indexed_description(printer_interface_
 	request.wValue = (kUSBStringDesc << 8) | index;
 	request.wIndex = language;
 
-	bzero(description, length);
+	memset(description, 0, length);
 	request.wLength = (UInt16)length;
 	request.pData = &description;
 	request.completionTimeout = 0;
