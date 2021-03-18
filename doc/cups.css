@@ -711,6 +711,132 @@ table.list td {
   }
 }
 
+/* Style refresh */
+html,
+.body {
+    background-color: #2F2F2F;
+    color: white;
+}
+a:link,
+a:link:hover {
+    color: #887EE2;
+}
+a:visited,
+a:visited:hover {
+    color: #b37ee2;
+}
+
+/*headers*/
+.header {
+    background-color: #191919;
+    box-shadow: none;
+    border-bottom: 1px solid #5D5D5D;
+}
+.header a {
+    border-top: none;
+}
+.header a:hover {
+    background-color: #191919 !important;
+    color: #eeeeee !important;
+}
+.header a:link,
+.header a:visited {
+    color: #ddd !important;
+}
+.header a:link:hover,
+.header a:visited:hover {
+    color: #fff !important;
+}
+.header a.active {
+    background-color: #343434 !important;
+    color: #ffffff !important;
+    border: 1px solid #5D5D5D;
+    border-bottom: none;
+    border-top: none;
+    box-shadow: none;
+}
+
+input[type="SUBMIT"],
+select,
+input {
+    color: #ddd;
+    background-color: #191919;
+    border: 1px solid #4E4E4E;
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-family: San Fransisco, Noto Sans, Arial, sans serif;
+    font-size: 15px;
+}
+input[type="SUBMIT"]:hover {
+    color: #ddd;
+    background-color: #343434;
+    border: 1px solid #4E4E4E;
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-family: San Fransisco, Noto Sans, Arial, sans serif;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+
+.list {
+    background-color: #191919;
+    border: 1px solid #4e4e4e !important;
+}
+.list thead,
+.list thead tr th {
+    background-color: #191919 !important;
+    border: none !important;
+    border-left: 1px solid #4e4e4e !important;
+    color: #ddd;
+}
+.list thead tr th {
+    text-align: left !important;
+    padding-left: 10px !important;
+}
+.list thead {
+    border-bottom: 1px solid #4e4e4e !important;
+}
+
+.list tbody tr,
+.list tbody tr td {
+    background-color: #191919 !important;
+    border: none !important;
+    border-left: 1px solid #4e4e4e !important;
+}
+
+
+.inset {
+    background-color: #191919 !important;
+    border: 1px solid #4e4e4e !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    text-align: center !important;
+    padding-bottom: 10px !important;
+}
+.inset h3 {
+    color: #ddd;
+    text-align: center;
+    border-bottom: 2px solid #343434;
+}
+.inset hr {
+    color: #343434;
+    margin-left: 5px !important;
+    margin-right: 5px !important;
+}
+
+.footer {
+    background-color: #363636;
+    box-shadow: none;
+    border-top: 1px solid #4E4E4E;
+}
+
 /* iPad overrides */
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
 
