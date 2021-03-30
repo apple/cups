@@ -669,7 +669,7 @@ my_get_dests(cups_ptype_t type, cups_ptype_t mask,
     * return...
     */
 
-    cupsFreeDests(user_data.num_dests, user_dasta.dests);
+    cupsFreeDests(user_data.num_dests, user_data.dests);
 
     *dests = NULL;
 
