@@ -880,7 +880,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     * Class doesn't exist; see if we have a printer of the same name...
     */
 
-    if ((pclass = cupsdFindPrinter(resource + 9)) != NULL)
+    if (cupsdFindPrinter(resource + 9))
     {
      /*
       * Yes, return an error...
@@ -2273,7 +2273,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Printer doesn't exist; see if we have a class of the same name...
     */
 
-    if ((printer = cupsdFindClass(resource + 10)) != NULL)
+    if (cupsdFindClass(resource + 10))
     {
      /*
       * Yes, return an error...
@@ -4891,7 +4891,7 @@ copy_printer_attrs(
   }
 
   if (printer->alert && (!ra || cupsArrayFind(ra, "printer-alert")))
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_STRING, "printer-alert", NULL, printer->alert);
+    ippAddOctetString(con->response, IPP_TAG_PRINTER, "printer-alert", printer->alert, (int)strlen(printer->alert));
 
   if (printer->alert_description && (!ra || cupsArrayFind(ra, "printer-alert-description")))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-alert-description", NULL, printer->alert_description);
@@ -5015,6 +5015,9 @@ copy_printer_attrs(
 
   if (!ra || cupsArrayFind(ra, "queued-job-count"))
     add_queued_job_count(con, printer);
+
+  if (!ra || cupsArrayFind(ra, "uri-security-supported"))
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "uri-security-supported", NULL, is_encrypted ? "tls" : "none");
 
   copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0, NULL);
   if (printer->ppd_attrs)
@@ -10866,17 +10869,13 @@ set_printer_defaults(
 
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
-          sprintf(value, "%d", attr->values[0].integer);
-          printer->num_options = cupsAddOption(name, value,
-					       printer->num_options,
-					       &(printer->options));
+          printer->num_options = cupsAddIntegerOption(name, attr->values[0].integer, printer->num_options, &(printer->options));
           cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Setting %s to %s...", attr->name, value);
           break;
 
       case IPP_TAG_RANGE :
-          sprintf(value, "%d-%d", attr->values[0].range.lower,
-	          attr->values[0].range.upper);
+          snprintf(value, sizeof(value), "%d-%d", attr->values[0].range.lower, attr->values[0].range.upper);
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));
@@ -10885,10 +10884,7 @@ set_printer_defaults(
           break;
 
       case IPP_TAG_RESOLUTION :
-          sprintf(value, "%dx%d%s", attr->values[0].resolution.xres,
-	          attr->values[0].resolution.yres,
-		  attr->values[0].resolution.units == IPP_RES_PER_INCH ?
-		      "dpi" : "dpcm");
+          snprintf(value, sizeof(value), "%dx%d%s", attr->values[0].resolution.xres, attr->values[0].resolution.yres, attr->values[0].resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));

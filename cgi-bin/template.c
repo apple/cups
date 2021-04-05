@@ -307,9 +307,9 @@ cgi_copy(FILE *out,			/* I - Output file */
 	*/
 
         if (name[1])
-          sprintf(outval, "%d", cgiGetSize(name + 1));
+          snprintf(outval, sizeof(outval), "%d", cgiGetSize(name + 1));
 	else
-	  sprintf(outval, "%d", element + 1);
+	  snprintf(outval, sizeof(outval), "%d", element + 1);
 
         outptr = outval;
       }
@@ -457,7 +457,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	    continue;
 	  else if (ch == '#')
 	  {
-	    sprintf(s, "%d", element + 1);
+	    snprintf(s, sizeof(compare) - (size_t)(s - compare), "%d", element + 1);
 	    s += strlen(s);
 	  }
 	  else if (ch == '{')
@@ -473,7 +473,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	    *innerptr = '\0';
 
             if (innername[0] == '#')
-	      sprintf(s, "%d", cgiGetSize(innername + 1));
+	      snprintf(s, sizeof(compare) - (size_t)(s - compare), "%d", cgiGetSize(innername + 1));
 	    else if ((innerptr = strrchr(innername, '-')) != NULL &&
 	             isdigit(innerptr[1] & 255))
             {

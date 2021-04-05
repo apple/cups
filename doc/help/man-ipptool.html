@@ -36,6 +36,8 @@ ipptool - perform internet printing protocol requests
 <b>-P</b>
 <i>filename.plist</i>
 ] [
+<b>-R</b>
+] [
 <b>-S</b>
 ] [
 <b>-T</b>
@@ -128,6 +130,8 @@ The default is to use "Transfer-Encoding: chunked" for requests with attached fi
 <dt><b>-P</b><i> filename.plist</i>
 <dd style="margin-left: 5.0em">Specifies that the test results should be written to the named XML (Apple plist) file in addition to the regular test report (<b>-t</b>).
 This option is incompatible with the <b>-i</b> (interval) and <b>-n</b> (repeat-count) options.
+<dt><b>-R</b>
+<dd style="margin-left: 5.0em">Retries tests when the "server-error-busy" status code is returned.
 <dt><b>-S</b>
 <dd style="margin-left: 5.0em">Forces (dedicated) TLS encryption when connecting to the server.
 <dt><b>-T</b><i> seconds</i>
@@ -225,7 +229,7 @@ IANA IPP Registry (<a href="http://www.iana.org/assignments/ipp\-registrations)"
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp">http://www.pwg.org/ipp</a>)
 RFC 8011 (<a href="http://tools.ietf.org/html/rfc8011)">http://tools.ietf.org/html/rfc8011)</a>,
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2019 by Apple Inc.
+Copyright &copy; 2007-2021 by Apple Inc.
 
 </body>
 </html>

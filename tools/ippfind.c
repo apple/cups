@@ -3,6 +3,8 @@
  * commands such as IPP and Bonjour conformance tests.  This tool is
  * inspired by the UNIX "find" command, thus its name.
  *
+ * Copyright © 2021 by OpenPrinting.
+ * Copyright © 2020 by the IEEE-ISTO Printer Working Group
  * Copyright © 2008-2018 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -159,7 +161,7 @@ static void		browse_callback(AvahiServiceBrowser *browser,
 static void		client_callback(AvahiClient *client,
 					AvahiClientState state,
 					void *context);
-#endif /* HAVE_AVAHI */
+#endif /* HAVE_DNSSD */
 
 static int		compare_services(ippfind_srv_t *a, ippfind_srv_t *b);
 static const char	*dnssd_error_string(int error);
@@ -1273,6 +1275,16 @@ main(int  argc,				/* I - Number of command-line args */
       }
 
 #elif defined(HAVE_AVAHI)
+      char	*subtype,		/* Sub-type, if any */
+		subtype_buf[256];	/* Sub-type buffer */
+
+      if ((subtype = strstr(regtype, ",_")) != NULL)
+      {
+        *subtype++ = '\0';
+        snprintf(subtype_buf, sizeof(subtype_buf), "%s._sub.%s", subtype, regtype);
+        regtype = subtype_buf;
+      }
+
       if (avahi_service_browser_new(avahi_client, AVAHI_IF_UNSPEC,
                                     AVAHI_PROTO_UNSPEC, regtype, domain, 0,
                                     browse_callback, services))
@@ -2774,6 +2786,7 @@ show_usage(void)
   _cupsLangPuts(stderr, _("-h regex                Match hostname to regular expression"));
   _cupsLangPuts(stderr, _("-l                      List attributes"));
   _cupsLangPuts(stderr, _("-n regex                Match service name to regular expression"));
+  _cupsLangPuts(stderr, _("-N name                 Match service name to literal name value"));
   _cupsLangPuts(stderr, _("-p                      Print URI if true"));
   _cupsLangPuts(stderr, _("-q                      Quietly report match via exit code"));
   _cupsLangPuts(stderr, _("-r                      True if service is remote"));
@@ -2786,8 +2799,9 @@ show_usage(void)
   _cupsLangPuts(stderr, _("--exec utility [argument ...] ;\n"
                           "                        Execute program if true"));
   _cupsLangPuts(stderr, _("--host regex            Match hostname to regular expression"));
-  _cupsLangPuts(stderr, _("--ls                    List attributes"));
+  _cupsLangPuts(stderr, _("--literal-name name     Match service name to literal name value"));
   _cupsLangPuts(stderr, _("--local                 True if service is local"));
+  _cupsLangPuts(stderr, _("--ls                    List attributes"));
   _cupsLangPuts(stderr, _("--name regex            Match service name to regular expression"));
   _cupsLangPuts(stderr, _("--path regex            Match resource path to regular expression"));
   _cupsLangPuts(stderr, _("--port number[-number]  Match port to number or range"));

@@ -161,6 +161,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 				  "name."), argv[0]);
 		return (1);
 	      }
+	      else if (cupsLastError() == IPP_STATUS_ERROR_NOT_FOUND)
+	      {
+		_cupsLangPrintf(stderr,
+				_("%s: Error - The printer or class does not exist."), argv[0]);
+		return (1);
+	      }
 	      break;
 
 	  case 'f' : /* Form */
@@ -280,9 +286,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		return (1);
 	      }
 
-	      sprintf(buffer, "%d", num_copies);
-	      num_options = cupsAddOption("copies", buffer, num_options,
-					  &options);
+	      num_options = cupsAddIntegerOption("copies", num_copies, num_options, &options);
 	      break;
 
 	  case 'o' : /* Option */
@@ -342,9 +346,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		return (1);
 	      }
 
-	      sprintf(buffer, "%d", priority);
-	      num_options = cupsAddOption("job-priority", buffer, num_options,
-					  &options);
+	      num_options = cupsAddIntegerOption("job-priority", priority, num_options, &options);
 	      break;
 
 	  case 's' : /* Silent */
@@ -660,7 +662,7 @@ restart_job(const char *command,	/* I - Command name */
 
   request = ippNewRequest(IPP_RESTART_JOB);
 
-  sprintf(uri, "ipp://localhost/jobs/%d", job_id);
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "job-uri", NULL, uri);
@@ -708,7 +710,7 @@ set_job_attrs(
 
   request = ippNewRequest(IPP_SET_JOB_ATTRIBUTES);
 
-  sprintf(uri, "ipp://localhost/jobs/%d", job_id);
+  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "job-uri", NULL, uri);

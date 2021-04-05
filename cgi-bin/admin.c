@@ -208,7 +208,7 @@ main(void)
 	  * bytes left in the array...
 	  */
 
-	  sprintf(ptr, "%%%02X", *url & 255);
+	  snprintf(ptr, sizeof(encoded) - (size_t)(ptr - encoded), "%%%02X", *url & 255);
 	  ptr += 3;
 	}
 	else
@@ -763,6 +763,13 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
         cgiSetVariable("TEMPLATE_NAME", template);
       }
+
+     /*
+      * Set DEVICE_URI to the actual device uri, without make and model from
+      * html form.
+      */
+
+      cgiSetVariable("DEVICE_URI", var);
     }
   }
 
@@ -864,7 +871,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         break;
       else
       {
-        sprintf(baudrate, "%d", baudrates[i]);
+        snprintf(baudrate, sizeof(baudrate), "%d", baudrates[i]);
 	cgiSetArray("BAUDRATES", i, baudrate);
       }
 

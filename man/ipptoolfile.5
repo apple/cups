@@ -1,12 +1,12 @@
 .\"
 .\" ipptoolfile man page.
 .\"
-.\" Copyright © 2010-2019 by Apple Inc.
+.\" Copyright © 2010-2021 by Apple Inc.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ipptoolfile 5 "CUPS" "15 August 2019" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "5 April 2021" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -214,6 +214,10 @@ Specifies whether
 .BR ipptool (8)
 will ignore errors and continue with subsequent tests.
 .TP 5
+\fBMONITOR-PRINTER-STATE \fR[ \fIprinter-uri \fR] \fB{ EXPECT \fIattribute-name \fR[ \fIpredicate(s) \fR] \fB}\fR
+Specifies printer state monitoring tests to run in parallel with the test operation.
+The monitoring tests will run until all of the \fBEXPECT\fR conditions are satisfied or the primary test operation has completed, whichever occurs first.
+.TP 5
 \fBNAME "\fIliteral string\fB"\fR
 Specifies the human-readable name of the test.
 .TP 5
@@ -294,8 +298,9 @@ Makes the \fBEXPECT\fR conditions apply only if the specified variable is not de
 \fBIN\-GROUP \fItag\fR
 Requires the \fBEXPECT\fR attribute to be in the specified group tag.
 .TP 5
-\fBOF\-TYPE \fItag[|tag,...]\fR
+\fBOF\-TYPE \fItag[(limits)|tag|...]\fR
 Requires the \fBEXPECT\fR attribute to use one of the specified value tag(s).
+Most value tags also support the specification of limits in parenthesis, for example "name(42)" would allow nameWith/WithoutLanguage strings up to 42 octets in length, "name(4:MAX)" would allow nameWith/WithoutLanguage strings between 4 and 255 octets in length, and "integer(-273:MAX)" would allow integers between -273 and 2147483647.
 .TP 5
 \fBREPEAT\-LIMIT \fInumber\fR
 .br
@@ -342,7 +347,13 @@ Requires that all values of the \fBEXPECT\fR attribute match the number(s) or nu
 Requires that all values of the \fBEXPECT\fR attribute match the boolean value given.
 .TP 5
 \fBWITH\-ALL\-VALUES "/\fIregular expression\fB/"\fR
-Requires that all values of the \fBEXPECT\fR attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+Requires that all values of the \fBEXPECT\fR attribute match the regular expression, which must conform to the POSIX regular expression syntax.
+Comparisons are case-sensitive.
+.TP 5
+\fBWITH\-DISTINCT\-VALUES\fR
+Requires that all values of the \fBEXPECT\fR attribute are unique.
+Comparisons are case-sensitive.
+Only charset, enum, integer, keyword, mimeMediaType, naturalLanguage, rangeOfInteger, resolution, uriScheme attributes support this predicate.
 .TP 5
 \fBWITH\-HOSTNAME "\fIliteral string\fB"\fR
 .TP 5
@@ -652,4 +663,4 @@ IANA IPP Registry (http://www.iana.org/assignments/ipp-registrations),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp),
 RFC 8011 (http://tools.ietf.org/html/rfc8011)
 .SH COPYRIGHT
-Copyright \[co] 2007-2019 by Apple Inc.
+Copyright \[co] 2007-2021 by Apple Inc.

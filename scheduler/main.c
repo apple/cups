@@ -581,7 +581,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Clean out old temp files and printer cache data.
   */
 
-  if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
+  if (!RequestRoot || !strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
     cupsdCleanFiles(TempDir, NULL);
 
   cupsdCleanFiles(CacheDir, "*.ipp");

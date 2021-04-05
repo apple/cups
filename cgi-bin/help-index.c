@@ -579,7 +579,7 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   */
 
   for (; node; node = (help_node_t *)cupsArrayNext(hi->nodes))
-    if (section && strcmp(node->section, section))
+    if (node->section && section && strcmp(node->section, section))
       continue;
     else if (filename && strcmp(node->filename, filename))
       continue;

@@ -939,7 +939,7 @@ http_gnutls_default_path(char   *buffer,/* I - Path buffer */
 					/* Pointer to library globals */
 
 
-  if (cg->home)
+  if (cg->home && getuid())
   {
     snprintf(buffer, bufsize, "%s/.cups", cg->home);
     if (access(buffer, 0))

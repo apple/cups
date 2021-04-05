@@ -68,7 +68,7 @@
 # Canon, Inc. PIXMA iP6000D Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x1095 unidir
 
-# Canon, Inc. PIXMA iP4200 Printer (Issue #4155)
+# Canon, Inc. PIXMA iP4200 Printer (Apple #4155)
 0x04a9 0x10a2 unidir
 
 # Canon, Inc. PIXMA iP4300 Printer (https://bugs.launchpad.net/bugs/1032385)
@@ -86,11 +86,14 @@
 # Canon, Inc. MP540 Printer, https://bugzilla.redhat.com/967873
 0x04a9 0x1730 unidir
 
-# Canon, Inc. MP550 Printer (Issue #4155)
+# Canon, Inc. MP550 Printer (Apple #4155)
 0x04a9 0x173d unidir
 
-# Canon, Inc. MP560 Printer (Issue #4155)
+# Canon, Inc. MP560 Printer (Apple #4155)
 0x04a9 0x173e unidir
+
+# Canon, Inc. PIXMA G1501 Printer (Apple #5831)
+0x04a9 0x1796 unidir
 
 # Canon, Inc. MF4150 Printer (https://bugs.launchpad.net/bugs/1160638)
 0x04a9 0x26a3 no-reattach
@@ -140,7 +143,7 @@
 # Samsung ML-2160 Series (https://bugzilla.redhat.com/show_bug.cgi?id=873123)
 0x04e8 0x330f unidir
 
-# All Zebra devices (https://bugs.launchpad.net/bugs/1001028) (Issue #5395)
+# All Zebra devices (https://bugs.launchpad.net/bugs/1001028) (Apple #5395)
 0x0a5f unidir no-reattach
 
 # Canon CP-10
@@ -230,75 +233,87 @@
 # Lexmark E238 (<rdar://problem/14493054>)
 0x043d 0x00d7 no-reattach
 
-# Lexmark E238 (Issue #4448)
+# Lexmark E238 (Apple #4448)
 0x043d 0x009a no-reattach
 
-# Canon MX310 (Issue #4482)
+# Canon MX310 (Apple #4482)
 0x04a9 0x1728 unidir
 
-# Canon MX320 (Issue #4482)
+# Canon MX320 (Apple #4482)
 0x04A9 0x1736 unidir
 
-# All Intermec devices (Issue #4553)
+# All Intermec devices (Apple #4553)
 0x067e no-reattach
 
-# HP LaserJet 1015 (Issue #5617)
+# HP LaserJet 1010 (Apple #5789)
+0x03f0 0x0c17 delay-close
+
+# HP LaserJet 1015 (Apple #5617)
 0x03f0 0x0e17 delay-close
 
-# HP LaserJet 1150 (Issue #4549)
+# HP LaserJet 1150 (Apple #4549)
 0x03f0 0x0f17 delay-close
 
-# HP LaserJet 1300 (Issue #4549)
+# HP LaserJet 1300 (Apple #4549)
 0x03f0 0x1017 delay-close
 0x03f0 0x1117 delay-close
 
-# HP LaserJet 1320 (Issue #4549)
+# HP LaserJet 1320 (Apple #4549)
 0x03f0 0x1d17 delay-close
 
 # Canon, Inc. MP530 Printer
 0x04a9 0x1712 unidir
 
-# Xerox WorkCentre 3220 (https://bugs.launchpad.net/bugs/1406203, Issue #4789)
+# Xerox WorkCentre 3220 (https://bugs.launchpad.net/bugs/1406203, Apple #4789)
 0x0924 0x4294 no-reattach
 
-# Lexmark C540n (Issue #4778)
+# Lexmark C540n (Apple #4778)
 0x043d 0x0139 no-reattach
 
-# Kyocera Ecosys P6026cdn (Issue #4900)
+# Kyocera Ecosys P6026cdn (Apple #4900)
 0x0482 0x063f no-reattach
 
-# Kyocera Ecosys P6130cdn (Issue #5102)
+# Kyocera Ecosys P6130cdn (Apple #5102)
 0x0482 0x0677 no-reattach
 
-# Lexmark E260dn (Issue #4994)
+# Lexmark E260dn (Apple #4994)
 0x043d 0x0123 no-reattach
 
-# HP LaserJet 1160 (Issue #5121)
+# HP LaserJet 1160 (Apple #5121)
 0x03f0 0x1e17 delay-close
 
-# Canon, Inc. MP280 series (Issue #5221)
+# Canon, Inc. MP280 series (Apple #5221)
 0x04a9 0x1746 unidir
 
-# Star Micronics printers (Issue #5251)
+# Star Micronics printers (Apple #5251)
 0x0519 unidir
 
-# Lexmark Optra E310 (Issue #5259)
+# Lexmark Optra E310 (Apple #5259)
 0x043d 0x000c no-reattach
 
-# HP LaserJet P1102 (Issue #5310)
+# HP LaserJet P1102 (Apple #5310)
 0x03F0 0x002A no-reattach
 
 # Lexmark MS317dn
 0x043d 0x0226 no-reattach
 
-# Star TSP743 (Issue #5443)
+# Star TSP743 (Apple #5443)
 0x0519 0x0001 delay-close
 
-# Lexmark E120n (Issue #5478)
+# Lexmark E120n (Apple #5478)
 0x043d 0x00cc no-reattach
 
-# All Xerox printers (Issue #5523)
+# Lexmark E120n MT4506-100 (Apple #5766)
+0x043d 0x00cd no-reattach
+
+# All Xerox printers (Apple #5523)
 0x0924 no-reattach
 
-# Dymo 450 Turbo (Issue #5521)
-0x0922 0x0021 unidir
+# Citizen CT-S4000 (Apple #5823)
+0x2730 0x2008 unidir delay-close
+
+# All Arkscan label printers (Apple #5867)
+0x2d84 unidir no-reattach
+
+# HP DesignJet 130 (Apple #5838)
+0x03f0 0x0314 no-reattach

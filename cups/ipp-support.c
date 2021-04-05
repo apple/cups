@@ -2262,7 +2262,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * No, build an "0xxxxx" error string...
   */
 
-  sprintf(cg->ipp_unknown, "0x%04x", error);
+  snprintf(cg->ipp_unknown, sizeof(cg->ipp_unknown), "0x%04x", error);
 
   return (cg->ipp_unknown);
 }
@@ -2339,7 +2339,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * No, build an "0xxxxx" operation string...
   */
 
-  sprintf(cg->ipp_unknown, "0x%04x", op);
+  snprintf(cg->ipp_unknown, sizeof(cg->ipp_unknown), "0x%04x", op);
 
   return (cg->ipp_unknown);
 }

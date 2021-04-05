@@ -175,6 +175,9 @@ test report.
 <dd style="margin-left: 5.0em">Specifies whether
 <b>ipptool</b>(8)
 will ignore errors and continue with subsequent tests.
+<dt><b>MONITOR-PRINTER-STATE </b>[ <i>printer-uri </i>] <b>{ EXPECT </b><i>attribute-name </i>[ <i>predicate(s) </i>] <b>}</b>
+<dd style="margin-left: 5.0em">Specifies printer state monitoring tests to run in parallel with the test operation.
+The monitoring tests will run until all of the <b>EXPECT</b> conditions are satisfied or the primary test operation has completed, whichever occurs first.
 <dt><b>NAME "</b><i>literal string</i><b>"</b>
 <dd style="margin-left: 5.0em">Specifies the human-readable name of the test.
 <dt><b>OPERATION </b><i>operation-code</i>
@@ -230,8 +233,9 @@ The following predicates are understood following the <b>EXPECT</b> test directi
 <dd style="margin-left: 5.0em">Makes the <b>EXPECT</b> conditions apply only if the specified variable is not defined.
 <dt><b>IN-GROUP </b><i>tag</i>
 <dd style="margin-left: 5.0em">Requires the <b>EXPECT</b> attribute to be in the specified group tag.
-<dt><b>OF-TYPE </b><i>tag[|tag,...]</i>
+<dt><b>OF-TYPE </b><i>tag[(limits)|tag|...]</i>
 <dd style="margin-left: 5.0em">Requires the <b>EXPECT</b> attribute to use one of the specified value tag(s).
+Most value tags also support the specification of limits in parenthesis, for example "name(42)" would allow nameWith/WithoutLanguage strings up to 42 octets in length, "name(4:MAX)" would allow nameWith/WithoutLanguage strings between 4 and 255 octets in length, and "integer(-273:MAX)" would allow integers between -273 and 2147483647.
 <dt><b>REPEAT-LIMIT </b><i>number</i>
 <dd style="margin-left: 5.0em"><br>
 Specifies the maximum number of times to repeat if the <b>REPEAT-MATCH</b> or <b>REPEAT-NO-MATCH</b> predicate is specified. The default value is 1000.
@@ -260,7 +264,12 @@ Specifies the maximum number of times to repeat if the <b>REPEAT-MATCH</b> or <b
 <dd style="margin-left: 5.0em"><dt><b>WITH-ALL-VALUES "true"</b>
 <dd style="margin-left: 5.0em">Requires that all values of the <b>EXPECT</b> attribute match the boolean value given.
 <dt><b>WITH-ALL-VALUES "/</b><i>regular expression</i><b>/"</b>
-<dd style="margin-left: 5.0em">Requires that all values of the <b>EXPECT</b> attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dd style="margin-left: 5.0em">Requires that all values of the <b>EXPECT</b> attribute match the regular expression, which must conform to the POSIX regular expression syntax.
+Comparisons are case-sensitive.
+<dt><b>WITH-DISTINCT-VALUES</b>
+<dd style="margin-left: 5.0em">Requires that all values of the <b>EXPECT</b> attribute are unique.
+Comparisons are case-sensitive.
+Only charset, enum, integer, keyword, mimeMediaType, naturalLanguage, rangeOfInteger, resolution, uriScheme attributes support this predicate.
 <dt><b>WITH-HOSTNAME "</b><i>literal string</i><b>"</b>
 <dd style="margin-left: 5.0em"><dt><b>WITH-HOSTNAME "/</b><i>regular expression</i><b>/"</b>
 <dd style="margin-left: 5.0em">Requires that at least one URI value contains a matching hostname.
@@ -536,7 +545,7 @@ IANA IPP Registry (<a href="http://www.iana.org/assignments/ipp-registrations)">
 PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp)">http://www.pwg.org/ipp)</a>,
 RFC 8011 (<a href="http://tools.ietf.org/html/rfc8011">http://tools.ietf.org/html/rfc8011</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2019 by Apple Inc.
+Copyright &copy; 2007-2021 by Apple Inc.
 
 </body>
 </html>

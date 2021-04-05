@@ -258,7 +258,7 @@ backendNetworkSideCB(
 		         i < packet.object_value.string.num_bytes &&
 			     dataptr < (data + sizeof(data) - 3);
 			 i ++, dataptr += 2)
-		      sprintf(dataptr, "%02X", packet.object_value.string.bytes[i]);
+		      snprintf(dataptr, sizeof(data) - (size_t)(dataptr - data), "%02X", packet.object_value.string.bytes[i]);
 	            datalen += (int)strlen(dataptr);
 		    break;
 

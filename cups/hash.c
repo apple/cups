@@ -199,7 +199,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
       goto too_small;
 
     _cupsMD5Init(&state);
-    _cupsMD5Append(&state, data, datalen);
+    _cupsMD5Append(&state, data, (int)datalen);
     _cupsMD5Finish(&state, hash);
 
     return (16);

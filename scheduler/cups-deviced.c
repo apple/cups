@@ -265,7 +265,7 @@ main(int  argc,				/* I - Number of command-line args */
     * all others run as the unprivileged user...
     */
 
-    start_backend(dent->filename, !(dent->fileinfo.st_mode & (S_IWGRP | S_IRWXO)));
+    start_backend(dent->filename, !(dent->fileinfo.st_mode & (S_IWGRP | S_IWOTH | S_IXOTH)));
   }
 
   cupsDirClose(dir);
