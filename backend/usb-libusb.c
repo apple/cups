@@ -1,7 +1,7 @@
 /*
  * LIBUSB interface code for CUPS.
  *
- * Copyright 2007-2019 by Apple Inc.
+ * Copyright 2007-2020 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.

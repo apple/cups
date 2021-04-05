@@ -1,5 +1,10 @@
-CHANGES - 2.3.3 - 2020-04-24
+CHANGES - 2.3.4 - 2020-04-24 (IN PROGRESS)
 ============================
+
+Changes in CUPS v2.3.4
+----------------------
+
+- CVE-20XX-YYYY: TODO rdar://61415567 embargo
 
 Changes in CUPS v2.3.3
 ----------------------

@@ -1,7 +1,7 @@
 #
 # Message catalog template for CUPS.
 #
-# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 2007-2020 by Apple Inc.
 # Copyright © 2005-2007 by Easy Software Products.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -23,7 +23,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: CUPS 2.3.3\n"
+"Project-Id-Version: CUPS 2.3.4\n"
 "Report-Msgid-Bugs-To: https://github.com/apple/cups/issues\n"
 "POT-Creation-Date: 2019-12-18 20:19-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

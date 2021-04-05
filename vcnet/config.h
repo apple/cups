@@ -1,7 +1,7 @@
 /*
  * Configuration file for CUPS on Windows.
  *
- * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2007-2020 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -97,8 +97,8 @@ typedef unsigned long useconds_t;
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v2.3.3"
-#define CUPS_MINIMAL "CUPS/2.3.3"
+#define CUPS_SVERSION "CUPS v2.3.4"
+#define CUPS_MINIMAL "CUPS/2.3.4"
 
 
 /*

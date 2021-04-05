@@ -1,7 +1,7 @@
 dnl
 dnl Compiler stuff for CUPS.
 dnl
-dnl Copyright 2007-2018 by Apple Inc.
+dnl Copyright 2007-2020 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
@@ -175,7 +175,7 @@ if test -n "$GCC"; then
 	# doesn't trigger...
 	gccversion=`$CC --version | head -1 | awk '{print $NF}'`
 	case "$gccversion" in
-		7.* | 8.*)
+        7.* | 8.* | 9.*)
 			WARNING_OPTIONS="$WARNING_OPTIONS -Wno-format-truncation -Wno-tautological-compare"
 			;;
 	esac

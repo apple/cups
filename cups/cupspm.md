@@ -1,8 +1,8 @@
 ---
 title: CUPS Programming Manual
 author: Michael R Sweet
-copyright: Copyright © 2007-2019 by Apple Inc. All Rights Reserved.
-version: 2.3.3
+copyright: Copyright © 2007-2020 by Apple Inc. All Rights Reserved.
+version: 2.3.4
 ...
 
 > Please [file issues on Github](https://github.com/apple/cups/issues) to
