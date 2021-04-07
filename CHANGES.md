@@ -70,6 +70,8 @@ Changes in CUPS v2.3.5
   test (OpenPrinting #153)
 - Root certificates were incorrectly stored in "~/.cups/ssl".
 - Fixed a PPD memory leak caused by emulator definitions (OpenPrinting #124)
+- `httpReconnect2` did not reset the socket file descriptor when the TLS
+  negotiation failed (Issue #5907)
 
 
 Changes in CUPS v2.3.4
