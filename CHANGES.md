@@ -72,6 +72,8 @@ Changes in CUPS v2.3.5
 - Fixed a PPD memory leak caused by emulator definitions (OpenPrinting #124)
 - `httpReconnect2` did not reset the socket file descriptor when the TLS
   negotiation failed (Issue #5907)
+- Removed support for the (long deprecated and unused) `KeepAliveTimeout`
+  directive in `cupsd.conf` (Issue #5733)
 
 
 Changes in CUPS v2.3.4

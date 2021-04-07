@@ -199,8 +199,6 @@ VAR int			MaxClients		VALUE(100),
 					/* Timeout during requests */
 			KeepAlive		VALUE(TRUE),
 					/* Support the Keep-Alive option? */
-			KeepAliveTimeout	VALUE(DEFAULT_KEEPALIVE),
-					/* Timeout between requests */
 			FileDevice		VALUE(FALSE),
 					/* Allow file: devices? */
 			FilterLimit		VALUE(0),
