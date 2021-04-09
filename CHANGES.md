@@ -75,6 +75,7 @@ Changes in CUPS v2.3.5
 - `httpUpdate` did not reset the socket file descriptor when the TLS
   negotiation failed (Apple #5915)
 - The `ippeveprinter` tool now automatically uses an available port.
+- The IPP backend now retries Validate-Job requests (OpenPrinting #132)
 - Removed support for the (long deprecated and unused) `KeepAliveTimeout`
   directive in `cupsd.conf` (Issue #5733)
 
