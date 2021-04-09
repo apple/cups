@@ -3418,7 +3418,7 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
-  write(2, "DEBUG: Got SIGTERM.\n", 20);
+  backendMessage("DEBUG: Got SIGTERM.\n");
 
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
   if (child_pid)
@@ -3434,7 +3434,7 @@ sigterm_handler(int sig)		/* I - Signal */
     * Flag that the job should be canceled...
     */
 
-    write(2, "DEBUG: sigterm_handler: job_canceled = 1.\n", 25);
+    backendMessage("DEBUG: sigterm_handler: job_canceled = 1.\n");
 
     job_canceled = 1;
     return;
