@@ -74,6 +74,7 @@ Changes in CUPS v2.3.5
   negotiation failed (Issue #5907)
 - `httpUpdate` did not reset the socket file descriptor when the TLS
   negotiation failed (Apple #5915)
+- The `ippeveprinter` tool now automatically uses an available port.
 - Removed support for the (long deprecated and unused) `KeepAliveTimeout`
   directive in `cupsd.conf` (Issue #5733)
 

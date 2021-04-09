@@ -3,7 +3,7 @@
  *
  * Copyright © 2021 by OpenPrinting.
  * Copyright © 2020 by the IEEE-ISTO Printer Working Group.
- * Copyright © 2010-2019 by Apple Inc.
+ * Copyright © 2010-2021 by Apple Inc.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
  * information.
@@ -648,27 +648,6 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Apply defaults as needed...
   */
-
-  if (!serverport)
-  {
-#ifdef _WIN32
-   /*
-    * Windows is almost always used as a single user system, so use a default
-    * port number of 8631.
-    */
-
-    serverport = 8631;
-
-#else
-   /*
-    * Use 8000 + UID mod 1000 for the default port number...
-    */
-
-    serverport = 8000 + ((int)getuid() % 1000);
-#endif /* _WIN32 */
-
-    _cupsLangPrintf(stderr, _("Listening on port %d."), serverport);
-  }
 
   if (!directory[0])
   {
@@ -1736,10 +1715,50 @@ create_printer(
   * Create the listener sockets...
   */
 
-  if ((printer->ipv4 = create_listener(servername, printer->port, AF_INET)) < 0)
+  if (printer->port)
   {
-    perror("Unable to create IPv4 listener");
-    goto bad_printer;
+    if ((printer->ipv4 = create_listener(servername, printer->port, AF_INET)) < 0)
+    {
+      perror("Unable to create IPv4 listener");
+      goto bad_printer;
+    }
+  }
+  else
+  {
+#ifdef _WIN32
+   /*
+    * Windows is almost always used as a single user system, so use a default
+    * port number of 8631.
+    */
+
+    serverport = 8631;
+
+#else
+   /*
+    * Use 8000 + UID mod 1000 for the default port number...
+    */
+
+    serverport = 8000 + ((int)getuid() % 1000);
+#endif /* _WIN32 */
+
+    while (serverport < 10000)
+    {
+      if ((printer->ipv4 = create_listener(servername, serverport, AF_INET)) >= 0)
+        break;
+
+      serverport ++;
+    }
+
+    if (serverport < 10000)
+    {
+      _cupsLangPrintf(stderr, _("Listening on port %d."), serverport);
+      printer->port = serverport;
+    }
+    else
+    {
+      perror("Unable to create IPv4 listener");
+      goto bad_printer;
+    }
   }
 
   if ((printer->ipv6 = create_listener(servername, printer->port, AF_INET6)) < 0)
