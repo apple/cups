@@ -658,13 +658,10 @@ cupsdSaveAllClasses(void)
 {
   cups_file_t		*fp;		/* classes.conf file */
   char			filename[1024],	/* classes.conf filename */
-			temp[1024],	/* Temporary string */
 			value[2048],	/* Value string */
 			*name;		/* Current user name */
   cupsd_printer_t	*pclass;	/* Current printer class */
   int			i;		/* Looping var */
-  time_t		curtime;	/* Current time */
-  struct tm		curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
 
 
@@ -682,10 +679,6 @@ cupsdSaveAllClasses(void)
  /*
   * Write a small header to the file...
   */
-
-  time(&curtime);
-  localtime_r(&curtime, &curdate);
-  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", &curdate);
 
   cupsFilePuts(fp, "# Class configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd\n");

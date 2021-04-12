@@ -1021,11 +1021,8 @@ cupsdSaveAllSubscriptions(void)
 {
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* subscriptions.conf file */
-  char			filename[1024], /* subscriptions.conf filename */
-			temp[1024];	/* Temporary string */
+  char			filename[1024]; /* subscriptions.conf filename */
   cupsd_subscription_t	*sub;		/* Current subscription */
-  time_t		curtime;	/* Current time */
-  struct tm		curdate;	/* Current date */
   unsigned		mask;		/* Current event mask */
   const char		*name;		/* Current event name */
   int			hex;		/* Non-zero if we are writing hex data */
@@ -1045,10 +1042,6 @@ cupsdSaveAllSubscriptions(void)
  /*
   * Write a small header to the file...
   */
-
-  time(&curtime);
-  localtime_r(&curtime, &curdate);
-  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", &curdate);
 
   cupsFilePuts(fp, "# Subscription configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd\n");

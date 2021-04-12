@@ -1475,13 +1475,10 @@ cupsdSaveAllPrinters(void)
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
   char			filename[1024],	/* printers.conf filename */
-			temp[1024],	/* Temporary string */
 			value[2048],	/* Value string */
 			*ptr,		/* Pointer into value */
 			*name;		/* Current user/group name */
   cupsd_printer_t	*printer;	/* Current printer class */
-  time_t		curtime;	/* Current time */
-  struct tm		curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
   ipp_attribute_t	*marker;	/* Current marker attribute */
 
@@ -1500,10 +1497,6 @@ cupsdSaveAllPrinters(void)
  /*
   * Write a small header to the file...
   */
-
-  time(&curtime);
-  localtime_r(&curtime, &curdate);
-  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", &curdate);
 
   cupsFilePuts(fp, "# Printer configuration file for " CUPS_SVERSION "\n");
   cupsFilePrintf(fp, "# Written by cupsd\n");
