@@ -5279,6 +5279,7 @@ with_distinct_values(
     case IPP_TAG_CHARSET :
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
+    case IPP_TAG_BEGIN_COLLECTION :
         break;
 
     default :
@@ -5326,6 +5327,29 @@ with_distinct_values(
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_MIMETYPE :
           value = ippGetString(attr, i, NULL);
+          break;
+      case IPP_TAG_BEGIN_COLLECTION :
+          {
+            ipp_t	*col = ippGetCollection(attr, i);
+					// Collection value
+            ipp_attribute_t *member;	// Member attribute
+            char	*bufptr,	// Pointer into buffer
+			*bufend,	// End of buffer
+			prefix;		// Prefix character
+
+            for (prefix = '{', bufptr = buffer, bufend = buffer + sizeof(buffer) - 2, member = ippFirstAttribute(col); member && bufptr < bufend; member = ippNextAttribute(col))
+            {
+              *bufptr++ = prefix;
+              prefix    = ' ';
+
+              ippAttributeString(member, bufptr, (size_t)(bufend - bufptr));
+              bufptr += strlen(bufptr);
+            }
+
+            *bufptr++ = '}';
+            *bufptr   = '\0';
+            value     = buffer;
+          }
           break;
       default : // Should never happen
           value = "unsupported";
