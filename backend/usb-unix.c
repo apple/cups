@@ -214,21 +214,21 @@ list_devices(void)
     * for USB printer devices.  We get the honor of trying them all...
     */
 
-    sprintf(device, "/dev/usblp%d", i);
+    snprintf(device, sizeof(device), "/dev/usblp%d", i);
 
     if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
     {
       if (errno != ENOENT)
 	continue;
 
-      sprintf(device, "/dev/usb/lp%d", i);
+      snprintf(device, sizeof(device), "/dev/usb/lp%d", i);
 
       if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
       {
 	if (errno != ENOENT)
 	  continue;
 
-	sprintf(device, "/dev/usb/usblp%d", i);
+	snprintf(device, sizeof(device), "/dev/usb/usblp%d", i);
 
     	if ((fd = open(device, O_RDWR | O_EXCL)) < 0)
 	  continue;
@@ -258,7 +258,7 @@ list_devices(void)
 
   for (i = 0; i < 8; i ++)
   {
-    sprintf(device, "/dev/usb/printer%d", i);
+    snprintf(device, sizeof(device), "/dev/usb/printer%d", i);
 
     if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
     {
@@ -278,11 +278,11 @@ list_devices(void)
 
   for (i = 0; i < 8; i ++)
   {
-    sprintf(device, "/dev/ulpt%d", i);
+    snprintf(device, sizeof(device), "/dev/ulpt%d", i);
     if (!access(device, 0))
       printf("direct usb:%s \"Unknown\" \"USB Printer #%d\"\n", device, i + 1);
 
-    sprintf(device, "/dev/unlpt%d", i);
+    snprintf(device, sizeof(device), "/dev/unlpt%d", i);
     if (!access(device, 0))
       printf("direct usb:%s \"Unknown\" \"USB Printer #%d (no reset)\"\n", device, i + 1);
   }
@@ -344,15 +344,15 @@ open_device(const char *uri,		/* I - Device URI */
 	* for USB printer devices.  We get the honor of trying them all...
 	*/
 
-	sprintf(device, "/dev/usblp%d", i);
+	snprintf(device, sizeof(device), "/dev/usblp%d", i);
 
 	if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
 	{
-	  sprintf(device, "/dev/usb/lp%d", i);
+	  snprintf(device, sizeof(device), "/dev/usb/lp%d", i);
 
 	  if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
 	  {
-	    sprintf(device, "/dev/usb/usblp%d", i);
+	    snprintf(device, sizeof(device), "/dev/usb/usblp%d", i);
 
     	    if ((fd = open(device, O_RDWR | O_EXCL)) < 0 && errno == ENOENT)
 	      continue;
@@ -440,7 +440,7 @@ open_device(const char *uri,		/* I - Device URI */
     {
       for (i = 0, busy = 0; i < 8; i ++)
       {
-	sprintf(device, "/dev/usb/printer%d", i);
+	snprintf(device, sizeof(device), "/dev/usb/printer%d", i);
 
 	if ((fd = open(device, O_WRONLY | O_EXCL)) >= 0)
 	  backendGetDeviceID(fd, device_id, sizeof(device_id),

@@ -125,6 +125,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   free(ppd->lang_encoding);
   free(ppd->nickname);
   free(ppd->patches);
+  free(ppd->emulations);
   free(ppd->jcl_begin);
   free(ppd->jcl_end);
   free(ppd->jcl_ps);
@@ -871,15 +872,15 @@ _ppdOpen(
       ppd_decode(ppd->jcl_ps);		/* Decode quoted string */
     }
     else if (!strcmp(keyword, "AccurateScreensSupport"))
-      ppd->accurate_screens = !strcmp(string, "True");
+      ppd->accurate_screens = !strcasecmp(string, "True");
     else if (!strcmp(keyword, "ColorDevice"))
-      ppd->color_device = !strcmp(string, "True");
+      ppd->color_device = !strcasecmp(string, "True");
     else if (!strcmp(keyword, "ContoneOnly"))
-      ppd->contone_only = !strcmp(string, "True");
+      ppd->contone_only = !strcasecmp(string, "True");
     else if (!strcmp(keyword, "cupsFlipDuplex"))
-      ppd->flip_duplex = !strcmp(string, "True");
+      ppd->flip_duplex = !strcasecmp(string, "True");
     else if (!strcmp(keyword, "cupsManualCopies"))
-      ppd->manual_copies = !strcmp(string, "True");
+      ppd->manual_copies = !strcasecmp(string, "True");
     else if (!strcmp(keyword, "cupsModelNumber"))
       ppd->model_number = atoi(string);
     else if (!strcmp(keyword, "cupsColorProfile"))
@@ -1496,6 +1497,27 @@ _ppdOpen(
 	goto error;
       }
 
+      if (option && (!_cups_strcasecmp(option->defchoice, "custom") || !_cups_strncasecmp(option->defchoice, "custom.", 7)))
+      {
+       /*
+	* "*DefaultOption: Custom..." may set the default to a custom value
+	* or (for a very small number of incompatible PPD files) select a
+	* standard choice for the option, which CUPS renames to "_Custom..."
+	* to avoid compatibility issues.  See which this is...
+	*/
+
+        char tchoice[PPD_MAX_NAME];	/* Temporary choice name */
+
+	snprintf(tchoice, sizeof(tchoice), "_%s", option->defchoice);
+
+	if (ppdFindChoice(option, tchoice))
+	{
+	  strlcpy(option->defchoice, tchoice, sizeof(option->defchoice));
+
+	  DEBUG_printf(("2_ppdOpen: Reset Default%s to %s...", option->keyword, tchoice));
+	}
+      }
+
       option = NULL;
 
       free(string);
@@ -1508,6 +1530,27 @@ _ppdOpen(
         pg->ppd_status = PPD_BAD_CLOSE_UI;
 
 	goto error;
+      }
+
+      if (option && (!_cups_strcasecmp(option->defchoice, "custom") || !_cups_strncasecmp(option->defchoice, "custom.", 7)))
+      {
+       /*
+	* "*DefaultOption: Custom..." may set the default to a custom value
+	* or (for a very small number of incompatible PPD files) select a
+	* standard choice for the option, which CUPS renames to "_Custom..."
+	* to avoid compatibility issues.  See which this is...
+	*/
+
+        char tchoice[PPD_MAX_NAME];	/* Temporary choice name */
+
+	snprintf(tchoice, sizeof(tchoice), "_%s", option->defchoice);
+
+	if (ppdFindChoice(option, tchoice))
+	{
+	  strlcpy(option->defchoice, tchoice, sizeof(option->defchoice));
+
+	  DEBUG_printf(("2_ppdOpen: Reset Default%s to %s...", option->keyword, tchoice));
+	}
       }
 
       option = NULL;
@@ -1668,11 +1711,9 @@ _ppdOpen(
         * Set the default as part of the current option...
 	*/
 
-        DEBUG_printf(("2_ppdOpen: Setting %s to %s...", keyword, string));
+	strlcpy(option->defchoice, string, sizeof(option->defchoice));
 
-        strlcpy(option->defchoice, string, sizeof(option->defchoice));
-
-        DEBUG_printf(("2_ppdOpen: %s is now %s...", keyword, option->defchoice));
+        DEBUG_printf(("2_ppdOpen: Set %s to %s...", keyword, option->defchoice));
       }
       else
       {
@@ -1682,11 +1723,27 @@ _ppdOpen(
 
         ppd_option_t	*toption;	/* Temporary option */
 
-
         if ((toption = ppdFindOption(ppd, keyword + 7)) != NULL)
 	{
-	  DEBUG_printf(("2_ppdOpen: Setting %s to %s...", keyword, string));
-	  strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
+	  if (!_cups_strcasecmp(string, "custom") || !_cups_strncasecmp(string, "custom.", 7))
+	  {
+	   /*
+	    * "*DefaultOption: Custom..." may set the default to a custom value
+	    * or (for a very small number of incompatible PPD files) select a
+	    * standard choice for the option, which CUPS renames to "_Custom..."
+	    * to avoid compatibility issues.  See which this is...
+	    */
+
+	    snprintf(toption->defchoice, sizeof(toption->defchoice), "_%s", string);
+	    if (!ppdFindChoice(toption, toption->defchoice))
+	      strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
+	  }
+	  else
+	  {
+	    strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
+	  }
+
+	  DEBUG_printf(("2_ppdOpen: Set %s to %s...", keyword, toption->defchoice));
 	}
       }
     }
@@ -2847,7 +2904,7 @@ ppd_hash_option(ppd_option_t *option)	/* I - Option */
 
 
   for (hash = option->keyword[0], k = option->keyword + 1; *k;)
-    hash = 33 * hash + *k++;
+    hash = (int)(33U * (unsigned)hash) + *k++;
 
   return (hash & 511);
 }

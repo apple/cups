@@ -35,7 +35,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	9	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	10	/* Version number in cache file */
 
 
 /*

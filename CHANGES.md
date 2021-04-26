@@ -1,10 +1,90 @@
-CHANGES - 2.3.4 - 2020-04-24 (IN PROGRESS)
-============================
+Change History
+==============
+
+
+Changes in CUPS v2.3.5
+----------------------
+
+- The automated test suite can now be activated using `make test` for
+  consistency with other projects and CI environments - the old `make check`
+  continues to work as well, and the previous test server behavior can be
+  accessed by running `make testserver`.
+- ippeveprinter now supports multiple icons and strings files.
+- ippeveprinter now uses the system's FQDN with Avahi.
+- ippeveprinter now supports Get-Printer-Attributes on "/".
+- ippeveprinter now uses a deterministic "printer-uuid" value.
+- ippeveprinter now uses system sounds on macOS for Identify-Printer.
+- Updated ippfind to look for files in "~/Desktop" on Windows.
+- Updated ippfind to honor `SKIP-XXX` directives with `PAUSE`.
+- Updated IPP Everywhere support to work around printers that only advertise
+  color raster support but really also support grayscale (OpenPrinting #1)
+- ipptool now supports DNS-SD URIs like `ipps://My%20Printer._ipps._tcp.local`
+  (OpenPrinting #5)
+- ipptool now supports monitoring the printer state while submitting a job
+  with the `MONITOR-PRINTER-STATE` directive (OpenPrinting #153)
+- ipptool now supports testing for unique values with the `WITH-DISTINCT-VALUES`
+  predicate (OpenPrinting #153)
+- ipptool now supports retrying requests on a `server-error-busy` status code
+  (OpenPrinting #153)
+- ipptool now supports `value-tag(MAX)` and `value-tag(MIN:MAX)` for the
+  `OF-TYPE` predicate (OpenPrinting #153)
+- The scheduler now allows root backends to have world read permissions but not
+  world execute permissions (OpenPrinting #21)
+- Failures to bind IPv6 listener sockets no longer cause errors if IPv6 is
+  disabled on the host (OpenPrinting #25)
+- The SNMP backend now supports the HP and Ricoh vendor MIBs (OpenPrinting #28)
+- The scheduler no longer includes a timestamp in files it writes (OpenPrinting #29)
+- IPP Everywhere PPDs could have an "unknown" default InputSlot (OpenPrinting #44)
+- The `httpAddrListen` function now uses a listen backlog of 128.
+- The PPD functions now treat boolean values as case-insensitive (OpenPrinting #106)
+- Temporary queue names no longer end with an underscore (OpenPrinting #110)
+- Added USB quirks (Issue #5789, #5766, #5823, #5831, #5838, #5843, #5867)
+- Fixed IPP Everywhere v1.1 conformance issues in ippeveprinter.
+- Fixed DNS-SD name collision support in ippeveprinter.
+- Fixed compiler and code analyzer warnings.
+- Fixed TLS support on Windows.
+- Fixed ippfind sub-type searches with Avahi.
+- Fixed the default hostname used by ippeveprinter on macOS.
+- Fixed resolution of local IPP-USB printers with Avahi.
+- Fixed coverity issues (OpenPrinting #2)
+- Fixed `httpAddrConnect` issues (OpenPrinting #3)
+- Fixed web interface device URI issue (OpenPrinting #4)
+- Fixed lp/lpr "printer/class not found" error reporting (OpenPrinting #6)
+- Fixed a memory leak in the scheduler (OpenPrinting #12)
+- Fixed a potential integer overflow in the PPD hashing code (OpenPrinting #13)
+- Fixed output-bin and print-quality handling issues (OpenPrinting #18)
+- Fixed PPD options getting mapped to odd IPP values like "tray---4" (OpenPrinting #23)
+- Fixed remote access to the cupsd.conf and log files (OpenPrinting #24)
+- Fixed a logging regression caused by a previous change for Issue #5604
+  (OpenPrinting #25)
+- Fixed the "uri-security-supported" value from the scheduler (OpenPrinting #42)
+- Fixed IPP backend crash bug with "printer-alert" values (OpenPrinting #43)
+- Fixed default options that incorrectly use the "custom" prefix (OpenPrinting #48)
+- Fixed a memory leak when resolving DNS-SD URIs (OpenPrinting #49)
+- Fixed cupsManualCopies values in IPP Everywhere PPDs (Issue #5807)
+- Fixed duplicate ColorModel entries for AirPrint printers (Issue 59)
+- Fixed crash bug in `ppdOpen` (OpenPrinting #64, OpenPrinting #78)
+- Fixed regression in `snprintf` emulation function (OpenPrinting #67)
+- Fixed segfault in help.cgi when searching in man pages (OpenPrinting #81)
+- Fixed a bug in ipptool that caused the reuse of request IDs when repeating a
+  test (OpenPrinting #153)
+- Root certificates were incorrectly stored in "~/.cups/ssl".
+- Fixed a PPD memory leak caused by emulator definitions (OpenPrinting #124)
+- `httpReconnect2` did not reset the socket file descriptor when the TLS
+  negotiation failed (Issue #5907)
+- `httpUpdate` did not reset the socket file descriptor when the TLS
+  negotiation failed (Apple #5915)
+- The `ippeveprinter` tool now automatically uses an available port.
+- The IPP backend now retries Validate-Job requests (OpenPrinting #132)
+- Removed support for the (long deprecated and unused) `KeepAliveTimeout`
+  directive in `cupsd.conf` (Issue #5733)
+
 
 Changes in CUPS v2.3.4
 ----------------------
 
-- CVE-20XX-YYYY: TODO rdar://61415567 embargo
+- CVE-2020-10001: Fixed a buffer (read) overflow in the `ippReadIO` function.
+
 
 Changes in CUPS v2.3.3
 ----------------------
@@ -15,6 +95,7 @@ Changes in CUPS v2.3.3
 - CVE-2019-8842: The `ippReadIO` function may under-read an extension
   field.
 - Fixed WARNING_OPTIONS support for GCC 9.x
+
 
 Changes in CUPS v2.3.2
 ----------------------

@@ -56,6 +56,7 @@
 #media "w108h36/1.50x0.50\"" 108 36
 #media "w108h72/1.50x1.00\"" 108 72
 #media "w108h144/1.50x2.00\"" 108 144
+#media "w142h227/80x50mm" 142 227
 #media "w144h26/2.00x0.37\"" 144 26
 #media "w144h36/2.00x0.50\"" 144 36
 #media "w144h72/2.00x1.00\"" 144 72
@@ -78,7 +79,10 @@
 #media "w216h90/3.00x1.25\"" 216 90
 #media "w216h144/3.00x2.00\"" 216 144
 #media "w216h216/3.00x3.00\"" 216 216
+#media "w216h288/3.00x4.00\"" 216 288
 #media "w216h360/3.00x5.00\"" 216 360
+#media "w216h432/3.00x6.00\"" 216 432
+#media "w216h576/3.00x8.00\"" 216 576
 #media "w234h144/3.25x2.00\"" 234 144
 #media "w234h360/3.25x5.00\"" 234 360
 #media "w234h396/3.25x5.50\"" 234 396
@@ -93,6 +97,7 @@
 #media "w288h360/4.00x5.00\"" 288 360
 #media "w288h432/4.00x6.00\"" 288 432
 #media "w288h468/4.00x6.50\"" 288 468
+#media "w288h576/4.00x8.00\"" 288 576
 #media "w288h936/4.00x13.00\"" 288 936
 #media "w432h72/6.00x1.00\"" 432 72
 #media "w432h144/6.00x2.00\"" 432 144
@@ -101,6 +106,7 @@
 #media "w432h360/6.00x5.00\"" 432 360
 #media "w432h432/6.00x6.00\"" 432 432
 #media "w432h468/6.00x6.50\"" 432 468
+#media "w432h576/6.00x8.00\"" 432 576
 #media "w576h72/8.00x1.00\"" 576 72
 #media "w576h144/8.00x2.00\"" 576 144
 #media "w576h216/8.00x3.00\"" 576 216
@@ -108,6 +114,7 @@
 #media "w576h360/8.00x5.00\"" 576 360
 #media "w576h432/8.00x6.00\"" 576 432
 #media "w576h468/8.00x6.50\"" 576 468
+#media "w595h72/8.26x1.00\"" 595 72
 
 // Common stuff for all drivers...
 Attribute "cupsVersion" "" "2.3"
@@ -115,7 +122,7 @@ Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright (c) 2007-2019 by Apple Inc."
+Copyright "Copyright (c) 2007-2021 by Apple Inc."
 Copyright "Copyright (c) 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "Licensed under Apache License v2.0.  See the file \"LICENSE\" for more"
@@ -936,12 +943,16 @@ Version "2.3"
     MinSize 36 36
     MaxSize 576 3600
 
+    MediaSize A4
+    MediaSize A5
+    MediaSize A5Rotated
     MediaSize w90h18
     MediaSize w90h162
     MediaSize w108h18
     MediaSize w108h36
     MediaSize w108h72
     MediaSize w108h144
+    MediaSize w142h227
     MediaSize w144h26
     MediaSize w144h36
     MediaSize w144h72
@@ -959,8 +970,11 @@ Version "2.3"
     MediaSize w216h72
     MediaSize w216h90
     MediaSize w216h144
+    MediaSize w216h288
     MediaSize w216h216
     MediaSize w216h360
+    MediaSize w216h432
+    MediaSize w216h576
     MediaSize w234h144
     MediaSize w234h360
     MediaSize w234h396
@@ -975,6 +989,7 @@ Version "2.3"
     *MediaSize w288h360
     MediaSize w288h432
     MediaSize w288h468
+    MediaSize w288h576
     MediaSize w288h936
     MediaSize w432h72
     MediaSize w432h144
@@ -983,6 +998,7 @@ Version "2.3"
     MediaSize w432h360
     MediaSize w432h432
     MediaSize w432h468
+    MediaSize w432h576
     MediaSize w576h72
     MediaSize w576h144
     MediaSize w576h216
@@ -990,6 +1006,7 @@ Version "2.3"
     MediaSize w576h360
     MediaSize w576h432
     MediaSize w576h468
+    MediaSize w595h72
 
     *Resolution k 1 0 0 0 203dpi
     Resolution k 1 0 0 0 300dpi

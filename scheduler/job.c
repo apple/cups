@@ -893,7 +893,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     goto abort_job;
   }
 
-  sprintf(jobid, "%d", job->id);
+  snprintf(jobid, sizeof(jobid), "%d", job->id);
 
   argv[0] = job->printer->name;
   argv[1] = jobid;
@@ -1247,7 +1247,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       else if (stat(command, &backinfo))
 	backroot = 0;
       else
-        backroot = !(backinfo.st_mode & (S_IWGRP | S_IRWXO));
+        backroot = !(backinfo.st_mode & (S_IWGRP | S_IWOTH | S_IXOTH));
 
       argv[0] = job->printer->sanitized_device_uri;
 
@@ -2179,11 +2179,8 @@ cupsdSaveAllJobs(void)
 {
   int		i;			/* Looping var */
   cups_file_t	*fp;			/* job.cache file */
-  char		filename[1024],		/* job.cache filename */
-		temp[1024];		/* Temporary string */
+  char		filename[1024];		/* job.cache filename */
   cupsd_job_t	*job;			/* Current job */
-  time_t	curtime;		/* Current time */
-  struct tm	curdate;		/* Current date */
 
 
   snprintf(filename, sizeof(filename), "%s/job.cache", CacheDir);
@@ -2196,12 +2193,8 @@ cupsdSaveAllJobs(void)
   * Write a small header to the file...
   */
 
-  time(&curtime);
-  localtime_r(&curtime, &curdate);
-  strftime(temp, sizeof(temp) - 1, "%Y-%m-%d %H:%M", &curdate);
-
   cupsFilePuts(fp, "# Job cache file for " CUPS_SVERSION "\n");
-  cupsFilePrintf(fp, "# Written by cupsd on %s\n", temp);
+  cupsFilePrintf(fp, "# Written by cupsd\n");
   cupsFilePrintf(fp, "NextJobId %d\n", NextJobId);
 
  /*
@@ -2625,7 +2618,7 @@ cupsdSetJobState(
     else
       cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "%s", buffer);
 
-    if (newstate == IPP_JOB_STOPPED || newstate == IPP_JOB_ABORTED || newstate == IPP_JOB_HELD)
+    if (newstate == IPP_JOB_STOPPED || newstate == IPP_JOB_ABORTED)
       cupsdLogJob(job, CUPSD_LOG_ERROR, "%s", buffer);
     else
       cupsdLogJob(job, CUPSD_LOG_INFO, "%s", buffer);
@@ -3229,7 +3222,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
       exit_code = job->status;
     }
 
-    cupsdLogJob(job, CUPSD_LOG_INFO, "Backend returned status %d (%s)",
+    cupsdLogJob(job, CUPSD_LOG_WARN, "Backend returned status %d (%s)",
 		exit_code,
 		exit_code == CUPS_BACKEND_FAILED ? "failed" :
 		    exit_code == CUPS_BACKEND_AUTH_REQUIRED ?

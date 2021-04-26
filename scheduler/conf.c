@@ -95,7 +95,6 @@ static const cupsd_var_t	cupsd_vars[] =
   { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_TIME },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_TIME },
-  { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_TIME },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
   { "LaunchdTimeout",		&IdleExitTimeout,	CUPSD_VARTYPE_TIME },
@@ -719,7 +718,6 @@ cupsdReadConfiguration(void)
   FilterNice               = 0;
   HostNameLookups          = FALSE;
   KeepAlive                = TRUE;
-  KeepAliveTimeout         = DEFAULT_KEEPALIVE;
   ListenBackLog            = SOMAXCONN;
   LogDebugHistory          = 200;
   LogFilePerm              = CUPS_DEFAULT_LOG_FILE_PERM;

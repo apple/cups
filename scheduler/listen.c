@@ -160,7 +160,7 @@ cupsdStartListening(void)
 
       if (lis->fd == -1)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
+	cupsdLogMessage(errno == EAFNOSUPPORT ? CUPSD_LOG_INFO : CUPSD_LOG_ERROR,
 			"Unable to open listen socket for address %s:%d - %s.",
 			s, p, strerror(errno));
 

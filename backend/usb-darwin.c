@@ -1,5 +1,7 @@
 /*
- * Copyright 2005-2016 Apple Inc. All rights reserved.
+ * USB backend for macOS.
+ *
+ * Copyright © 2005-2021 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
  * Inc. ("Apple") in consideration of your agreement to the following
@@ -1667,11 +1669,34 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 					CFStringAppendFormat(extras, NULL, CFSTR("MDL:%@;"), model);
 			}
 
-			if (serial == NULL && desc.iSerialNumber != 0)
+			if (desc.iSerialNumber != 0)
 			{
-				serial = copy_printer_interface_indexed_description(printer, desc.iSerialNumber, kUSBLanguageEnglish);
-				if (serial && CFStringGetLength(serial) > 0)
-					CFStringAppendFormat(extras, NULL, CFSTR("SERN:%@;"), serial);
+				// Always look at the USB serial number since some printers
+				// incorrectly include a bogus static serial number in their
+				// IEEE-1284 device ID string...
+				CFStringRef userial = copy_printer_interface_indexed_description(printer, desc.iSerialNumber, kUSBLanguageEnglish);
+				if (userial && CFStringGetLength(userial) > 0 && (serial == NULL || CFStringCompare(serial, userial, kCFCompareCaseInsensitive) != kCFCompareEqualTo))
+				{
+					if (serial != NULL)
+					{
+						// 1284 serial number doesn't match USB serial number, so  replace the existing SERN: in device ID
+						CFRange range = CFStringFind(ret, serial, 0);
+						CFMutableStringRef deviceIDString = CFStringCreateMutableCopy(NULL, 0, ret);
+						CFStringReplace(deviceIDString, range, userial);
+						CFRelease(ret);
+						ret = deviceIDString;
+
+						CFRelease(serial);
+					}
+					else
+					{
+						// No 1284 serial number so add SERN: with USB serial number to device ID
+						CFStringAppendFormat(extras, NULL, CFSTR("SERN:%@;"), userial);
+					}
+					serial = userial;
+				}
+				else if (userial != NULL)
+					CFRelease(userial);
 			}
 
 			if (ret != NULL)
@@ -1690,18 +1715,18 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 
 	if (ret != NULL)
 	{
-	/* Remove special characters from the serial number */
-	CFRange range = (serial != NULL ? CFStringFind(serial, CFSTR("+"), 0) : CFRangeMake(0, 0));
-	if (range.length == 1)
-	{
-		range = CFStringFind(ret, serial, 0);
+		/* Remove special characters from the serial number */
+		CFRange range = (serial != NULL ? CFStringFind(serial, CFSTR("+"), 0) : CFRangeMake(0, 0));
+		if (range.length == 1)
+		{
+			range = CFStringFind(ret, serial, 0);
 
-		CFMutableStringRef deviceIDString = CFStringCreateMutableCopy(NULL, 0, ret);
-		CFRelease(ret);
+			CFMutableStringRef deviceIDString = CFStringCreateMutableCopy(NULL, 0, ret);
+			CFRelease(ret);
 
-		ret = deviceIDString;
-		CFStringFindAndReplace(deviceIDString, CFSTR("+"), CFSTR(""), range, 0);
-	}
+			ret = deviceIDString;
+			CFStringFindAndReplace(deviceIDString, CFSTR("+"), CFSTR(""), range, 0);
+		}
 	}
 
 	if (manufacturer != NULL)
@@ -2230,7 +2255,7 @@ sigterm_handler(int sig)		/* I - Signal */
       _exit(0);
     else
     {
-      write(2, "DEBUG: Child crashed.\n", 22);
+      backendMessage("DEBUG: Child crashed.\n");
       _exit(CUPS_BACKEND_STOP);
     }
   }

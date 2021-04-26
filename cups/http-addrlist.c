@@ -238,7 +238,14 @@ httpAddrConnect2(
     }
 
     if (!addrlist && nfds == 0)
+    {
+#ifdef _WIN32
+      errno = WSAEHOSTDOWN;
+#else
+      errno = EHOSTDOWN;
+#endif // _WIN32
       break;
+    }
 
    /*
     * See if we can connect to any of the addresses so far...
@@ -368,6 +375,9 @@ httpAddrConnect2(
     else
       remaining -= 250;
   }
+
+  if (remaining <= 0)
+    errno = ETIMEDOUT;
 
   while (nfds > 0)
   {

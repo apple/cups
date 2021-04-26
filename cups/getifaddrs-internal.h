@@ -25,6 +25,7 @@
 #    include <unistd.h>
 #    include <fcntl.h>
 #    include <sys/socket.h>
+#    include <netinet/in.h>
 #    define CUPS_SOCAST
 #  endif /* _WIN32 */
 

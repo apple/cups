@@ -1,7 +1,8 @@
 /*
  * Backend support definitions for CUPS.
  *
- * Copyright © 2007-2014 by Apple Inc.
+ * Copyright © 2021 by OpenPrinting
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -50,6 +51,14 @@
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
+
+
+/*
+ * Log messages in backend signal handlers or other places where stdio cannot
+ * be used...
+ */
+
+#  define backendMessage(msg) {const char *s = msg; write(2, s, strlen(s));}
 
 
 /*
@@ -319,7 +328,6 @@ extern int		backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
 					    int *printer_state);
 extern int		backendWaitLoop(int snmp_fd, http_addr_t *addr,
 			                int use_bc, _cups_sccb_t side_cb);
-
 
 #  ifdef __cplusplus
 }

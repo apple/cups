@@ -1,7 +1,7 @@
 /*
  * Internet Printing Protocol functions for CUPS.
  *
- * Copyright © 2007-2020 by Apple Inc.
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -2867,7 +2867,7 @@ ippReadIO(void       *src,		/* I - Data source */
 			string[IPP_MAX_TEXT],
 					/* Small string buffer */
 			*bufptr,	/* Pointer into buffer */
-			*bufptrEnd;	/* Pointer after valid buffer range */
+			*bufend;	/* End of buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
   ipp_tag_t		value_tag;	/* Current value tag */
@@ -3442,7 +3442,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		}
 
                 bufptr = buffer;
-                bufptrEnd = &buffer[n];
+                bufend = buffer + n;
 
 
 	       /*
@@ -3457,7 +3457,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 		n = (bufptr[0] << 8) | bufptr[1];
 
-		if ((bufptr + 2 + n) > bufptrEnd || n >= (int)sizeof(string))
+		if ((bufptr + 2 + n) >= bufend || n >= (int)sizeof(string))
 		{
 		  _cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		                _("IPP language length overflows value."), 1);
@@ -3481,10 +3481,10 @@ ippReadIO(void       *src,		/* I - Data source */
 
 		value->string.language = _cupsStrAlloc((char *)string);
 
-                bufptr += 2 + n;
+		bufptr += 2 + n;
 		n = (bufptr[0] << 8) | bufptr[1];
 
-		if ((bufptr + 2 + n) > bufptrEnd)
+		if ((bufptr + 2 + n) > bufend)
 		{
 		  _cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		                _("IPP string length overflows value."), 1);

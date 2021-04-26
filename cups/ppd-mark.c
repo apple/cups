@@ -307,7 +307,7 @@ cupsMarkOptions(
         * Look it up in the PPD file...
 	*/
 
-	sprintf(s, "%d", j);
+	snprintf(s, sizeof(s), "%d", j);
 
         if ((attr = ppdFindAttr(ppd, "cupsIPPFinishings", s)) == NULL)
 	  continue;

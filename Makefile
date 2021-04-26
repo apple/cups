@@ -1,7 +1,7 @@
 #
 # Top-level Makefile for CUPS.
 #
-# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 2007-2021 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -230,16 +230,16 @@ uninstall:
 # Run the test suite...
 #
 
-test:	all unittests
-	echo Running CUPS test suite...
+testserver:	all unittests
+	echo Running CUPS test server...
 	cd test; ./run-stp-tests.sh $(TESTOPTIONS)
 
 
-check:	all unittests
+check test:	all unittests
 	echo Running CUPS test suite with defaults...
 	cd test; ./run-stp-tests.sh 1 0 n n
 
-debugcheck:	all unittests
+debugcheck debugtest:	all unittests
 	echo Running CUPS test suite with debug printfs...
 	cd test; ./run-stp-tests.sh 1 0 n y
 

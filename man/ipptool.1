@@ -1,12 +1,12 @@
 .\"
 .\" ipptool man page.
 .\"
-.\" Copyright © 2010-2019 by Apple Inc.
+.\" Copyright © 2010-2021 by Apple Inc.
 .\"
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ipptool 1 "CUPS" "26 April 2019" "Apple Inc."
+.TH ipptool 1 "CUPS" "5 April 2021" "Apple Inc."
 .SH NAME
 ipptool \- perform internet printing protocol requests
 .SH SYNOPSIS
@@ -35,6 +35,8 @@ ipptool \- perform internet printing protocol requests
 ] [
 .B \-P
 .I filename.plist
+] [
+.B \-R
 ] [
 .B \-S
 ] [
@@ -138,6 +140,9 @@ The default is to use "Transfer\-Encoding: chunked" for requests with attached f
 .BI \-P \ filename.plist
 Specifies that the test results should be written to the named XML (Apple plist) file in addition to the regular test report (\fB\-t\fR).
 This option is incompatible with the \fB\-i\fR (interval) and \fB\-n\fR (repeat\-count) options.
+.TP 5
+.B \-R
+Retries tests when the "server-error-busy" status code is returned.
 .TP 5
 .B \-S
 Forces (dedicated) TLS encryption when connecting to the server.
@@ -249,4 +254,4 @@ IANA IPP Registry (http://www.iana.org/assignments/ipp\-registrations),
 PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 RFC 8011 (http://tools.ietf.org/html/rfc8011),
 .SH COPYRIGHT
-Copyright \[co] 2007-2019 by Apple Inc.
+Copyright \[co] 2007-2021 by Apple Inc.

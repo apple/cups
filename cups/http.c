@@ -2787,6 +2787,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
       if (_httpTLSStart(http) != 0)
       {
         httpAddrClose(NULL, http->fd);
+        http->fd = -1;
 
 	*status = http->status = HTTP_STATUS_ERROR;
 	return (0);

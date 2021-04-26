@@ -362,7 +362,7 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
     if (first < 0)
       first = 0;
 
-    sprintf(val, "%d", count);
+    snprintf(val, sizeof(val), "%d", count);
     cgiSetVariable("TOTAL", val);
 
     for (i = 0, pclass = (ipp_attribute_t *)cupsArrayIndex(classes, first);
@@ -378,13 +378,13 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 
     if (first > 0)
     {
-      sprintf(val, "%d", first - CUPS_PAGE_MAX);
+      snprintf(val, sizeof(val), "%d", first - CUPS_PAGE_MAX);
       cgiSetVariable("PREV", val);
     }
 
     if ((first + CUPS_PAGE_MAX) < count)
     {
-      sprintf(val, "%d", first + CUPS_PAGE_MAX);
+      snprintf(val, sizeof(val), "%d", first + CUPS_PAGE_MAX);
       cgiSetVariable("NEXT", val);
     }
 
