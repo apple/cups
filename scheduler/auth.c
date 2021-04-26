@@ -202,7 +202,6 @@ cupsdAddNameMask(cups_array_t **masks,	/* IO - Masks array (created as needed) *
 
     if (ifptr >= ifname && *ifptr == ')')
     {
-      ifptr --;
       *ifptr = '\0';
     }
 

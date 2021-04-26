@@ -78,6 +78,7 @@ Changes in CUPS v2.3.5
 - The IPP backend now retries Validate-Job requests (OpenPrinting #132)
 - Removed support for the (long deprecated and unused) `KeepAliveTimeout`
   directive in `cupsd.conf` (Issue #5733)
+- Fixed `@IF(name)` handling in `cupsd.conf` (Issue #5918)
 
 
 Changes in CUPS v2.3.4
