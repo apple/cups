@@ -1,4 +1,4 @@
-README - CUPS v2.3.4 - 2020-04-24 (IN PROGRESS)
+README - CUPS v2.3.5 - 2021-04-26
 =================================
 
 INTRODUCTION
@@ -157,7 +157,7 @@ This will prevent the filters from misinterpreting your print file.
 LEGAL STUFF
 -----------
 
-Copyright © 2007-2020 by Apple Inc.
+Copyright © 2007-2021 by Apple Inc.
 Copyright © 1997-2007 by Easy Software Products.
 
 CUPS is provided under the terms of the Apache License, Version 2.0 with
