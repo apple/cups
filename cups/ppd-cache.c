@@ -78,8 +78,11 @@ _cupsConvertOptions(
   int		num_finishings = 0,	/* Number of finishing values */
 		finishings[10];		/* Finishing enum values */
   ppd_choice_t	*choice;		/* Marked choice */
-  int           finishings_copies = copies;
+  int           finishings_copies = copies,
                                         /* Number of copies for finishings */
+                job_pages = 0,		/* job-pages value */
+		number_up = 1;		/* number-up value */
+  const char	*value;			/* Option value */
 
 
  /*
@@ -365,6 +368,28 @@ _cupsConvertOptions(
   * Map finishing options...
   */
 
+  if (copies != finishings_copies)
+  {
+    // Figure out the proper job-pages-per-set value...
+    if ((value = cupsGetOption("job-pages", num_options, options)) == NULL)
+      value = cupsGetOption("com.apple.print.PrintSettings.PMTotalBeginPages..n.", num_options, options);
+
+    if (value)
+      job_pages = atoi(value);
+
+    // Adjust for number-up
+    if ((value = cupsGetOption("number-up", num_options, options)) != NULL)
+      number_up = atoi(value);
+
+    job_pages = (job_pages + number_up - 1) / number_up;
+
+    // When duplex printing, raster data will include an extra (blank) page to
+    // make the total number of pages even.  Make sure this is reflected in the
+    // page count...
+    if ((job_pages & 1) && (keyword = cupsGetOption("sides", num_options, options)) != NULL && strcmp(keyword, "one-sided"))
+      job_pages ++;
+  }
+
   if ((finishing_template = cupsGetOption("cupsFinishingTemplate", num_options, options)) == NULL)
     finishing_template = cupsGetOption("finishing-template", num_options, options);
 
@@ -376,13 +401,13 @@ _cupsConvertOptions(
     ippAddCollection(request, IPP_TAG_JOB, "finishings-col", fin_col);
     ippDelete(fin_col);
 
-    if (copies != finishings_copies && (keyword = cupsGetOption("job-impressions", num_options, options)) != NULL)
+    if (copies != finishings_copies && job_pages > 0)
     {
      /*
       * Send job-pages-per-set attribute to apply finishings correctly...
       */
 
-      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", atoi(keyword) / finishings_copies);
+      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", job_pages);
     }
   }
   else
@@ -392,13 +417,13 @@ _cupsConvertOptions(
     {
       ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings", num_finishings, finishings);
 
-      if (copies != finishings_copies && (keyword = cupsGetOption("job-impressions", num_options, options)) != NULL)
+      if (copies != finishings_copies && job_pages > 0)
       {
        /*
 	* Send job-pages-per-set attribute to apply finishings correctly...
 	*/
 
-	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", atoi(keyword) / finishings_copies);
+	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", job_pages);
       }
     }
   }

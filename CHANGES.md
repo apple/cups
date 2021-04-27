@@ -79,6 +79,7 @@ Changes in CUPS v2.3.5
 - Removed support for the (long deprecated and unused) `KeepAliveTimeout`
   directive in `cupsd.conf` (Issue #5733)
 - Fixed `@IF(name)` handling in `cupsd.conf` (Issue #5918)
+- Fixed `job-pages-per-set` value for duplex print jobs.
 
 
 Changes in CUPS v2.3.4
