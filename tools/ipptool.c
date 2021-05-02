@@ -1197,7 +1197,10 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   */
 
   if (data->monitor_uri)
+  {
+    data->monitor_done   = 0;
     data->monitor_thread = _cupsThreadCreate((_cups_thread_func_t)do_monitor_printer_state, data);
+  }
 
  /*
   * Take over control of the attributes in the request...
