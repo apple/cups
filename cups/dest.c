@@ -271,7 +271,11 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
   if (!cupsGetDest(name, instance, num_dests, *dests))
   {
     if (instance && !cupsGetDest(name, NULL, num_dests, *dests))
-      return (num_dests);
+    {
+      // Add destination first...
+      if ((dest = cups_add_dest(name, NULL, &num_dests, dests)) == NULL)
+        return (num_dests);
+    }
 
     if ((dest = cups_add_dest(name, instance, &num_dests, dests)) == NULL)
       return (num_dests);
@@ -3379,7 +3383,7 @@ cups_enum_dests(
   cups_dest_cb_t cb,                    /* I - Callback function */
   void           *user_data)            /* I - User data */
 {
-  int           i, j,			/* Looping vars */
+  int           i, j, k,		/* Looping vars */
                 num_dests;              /* Number of destinations */
   cups_dest_t   *dests = NULL,          /* Destinations */
                 *dest;			/* Current destination */
@@ -3524,17 +3528,31 @@ cups_enum_dests(
       const char	*device_uri;	/* Device URI */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
-      if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
+      if ((user_dest = cupsGetDest(dest->name, NULL, data.num_dests, data.dests)) != NULL)
       {
        /*
-        * Apply user defaults to this destination...
+        * Apply user defaults to this destination for all instances...
         */
 
-        for (j = user_dest->num_options, option = user_dest->options; j > 0; j --, option ++)
-          dest->num_options = cupsAddOption(option->name, option->value, dest->num_options, &dest->options);
-      }
+        for (j = user_dest - data.dests; j < data.num_dests; j ++, user_dest ++)
+        {
+          if (_cups_strcasecmp(user_dest->name, dest->name))
+          {
+            j = data.num_dests;
+            break;
+          }
 
-      if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE, dest))
+	  for (k = dest->num_options, option = dest->options; k > 0; k --, option ++)
+	    user_dest->num_options = cupsAddOption(option->name, option->value, user_dest->num_options, &user_dest->options);
+
+          if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE, user_dest))
+            break;
+        }
+
+        if (j < data.num_dests)
+          break;
+      }
+      else if (!(*cb)(user_data, i > 1 ? CUPS_DEST_FLAGS_MORE : CUPS_DEST_FLAGS_NONE, dest))
         break;
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
@@ -3797,25 +3815,45 @@ cups_enum_dests(
 	  if ((user_dest = cupsGetDest(dest->name, dest->instance, data.num_dests, data.dests)) != NULL)
 	  {
 	   /*
-	    * Apply user defaults to this destination...
+	    * Apply user defaults to this destination for all instances...
 	    */
 
-	    for (j = user_dest->num_options, option = user_dest->options; j > 0; j --, option ++)
-	      dest->num_options = cupsAddOption(option->name, option->value, dest->num_options, &dest->options);
-	  }
+	    for (j = user_dest - data.dests; j < data.num_dests; j ++, user_dest ++)
+	    {
+	      if (_cups_strcasecmp(user_dest->name, dest->name))
+	      {
+		j = data.num_dests;
+		break;
+	      }
 
-          if (!strcasecmp(dest->name, data.def_name) && !data.def_instance)
+	      for (k = dest->num_options, option = dest->options; k > 0; k --, option ++)
+		user_dest->num_options = cupsAddOption(option->name, option->value, user_dest->num_options, &user_dest->options);
+
+	      if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, user_dest))
+		break;
+	    }
+
+	    if (j < data.num_dests)
+	    {
+	      remaining = -1;
+	      break;
+	    }
+	  }
+	  else
 	  {
-	    DEBUG_printf(("1cups_enum_dests: Setting is_default on discovered \"%s\".", dest->name));
-            dest->is_default = 1;
-	  }
+	    if (!strcasecmp(dest->name, data.def_name) && !data.def_instance)
+	    {
+	      DEBUG_printf(("1cups_enum_dests: Setting is_default on discovered \"%s\".", dest->name));
+	      dest->is_default = 1;
+	    }
 
-          DEBUG_printf(("1cups_enum_dests: Add callback for \"%s\".", device->dest.name));
-          if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, dest))
-          {
-            remaining = -1;
-            break;
-          }
+	    DEBUG_printf(("1cups_enum_dests: Add callback for \"%s\".", device->dest.name));
+	    if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, dest))
+	    {
+	      remaining = -1;
+	      break;
+	    }
+	  }
         }
 
         device->state = _CUPS_DNSSD_ACTIVE;
@@ -4186,7 +4224,7 @@ cups_get_dests(
 	* Out of memory!
 	*/
 
-        DEBUG_puts("9cups_get_dests: Out of memory!");
+        DEBUG_puts("9cups_get_dests: Could not find destination after adding, must be out of memory.");
         break;
       }
     }

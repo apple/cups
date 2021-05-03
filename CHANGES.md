@@ -65,6 +65,8 @@ Changes in CUPS v2.3.5
 - Fixed duplicate ColorModel entries for AirPrint printers (Issue 59)
 - Fixed crash bug in `ppdOpen` (OpenPrinting #64, OpenPrinting #78)
 - Fixed regression in `snprintf` emulation function (OpenPrinting #67)
+- Fixed reporting of printer instances when enumerating and when no options are
+  set for the main instance (OpenPrinting #71)
 - Fixed segfault in help.cgi when searching in man pages (OpenPrinting #81)
 - Fixed a bug in ipptool that caused the reuse of request IDs when repeating a
   test (OpenPrinting #153)
