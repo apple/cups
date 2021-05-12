@@ -6,7 +6,7 @@
 .\" Licensed under Apache License v2.0.  See the file "LICENSE" for more
 .\" information.
 .\"
-.TH ipptoolfile 5 "CUPS" "5 April 2021" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "12 May 2021" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -281,13 +281,19 @@ The following predicates are understood following the \fBEXPECT\fR test directiv
 Requires the \fBEXPECT\fR attribute to have the specified number of values.
 .TP 5
 \fBDEFINE\-MATCH \fIvariable-name\fR
-Defines the variable to "1" when the \fBEXPECT\fR condition matches. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
+Defines the variable to "1" when the \fBEXPECT\fR condition matches.
+A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
 .TP 5
 \fBDEFINE\-NO\-MATCH \fIvariable-name\fR
-Defines the variable to "1" when the \fBEXPECT\fR condition does not match. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
+Defines the variable to "1" when the \fBEXPECT\fR condition does not match.
+A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
 .TP 5
 \fBDEFINE\-VALUE \fIvariable-name\fR
-Defines the variable to the value of the attribute when the \fBEXPECT\fR condition matches. A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
+Defines the variable to the value of the attribute when the \fBEXPECT\fR condition matches.
+A side-effect of this predicate is that this \fBEXPECT\fR will never fail a test.
+.TP 5
+\fBDISPLAY\-MATCH \fI"message"\fR
+Displays the specified message when the \fBEXPECT\fR condition matches.
 .TP 5
 \fBIF\-DEFINED \fIvariable-name\fR
 Makes the \fBEXPECT\fR conditions apply only if the specified variable is defined.

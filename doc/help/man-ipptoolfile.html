@@ -222,11 +222,16 @@ The following predicates are understood following the <b>EXPECT</b> test directi
 <dt><b>COUNT </b><i>number</i>
 <dd style="margin-left: 5.0em">Requires the <b>EXPECT</b> attribute to have the specified number of values.
 <dt><b>DEFINE-MATCH </b><i>variable-name</i>
-<dd style="margin-left: 5.0em">Defines the variable to "1" when the <b>EXPECT</b> condition matches. A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the <b>EXPECT</b> condition matches.
+A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
 <dt><b>DEFINE-NO-MATCH </b><i>variable-name</i>
-<dd style="margin-left: 5.0em">Defines the variable to "1" when the <b>EXPECT</b> condition does not match. A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the <b>EXPECT</b> condition does not match.
+A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
 <dt><b>DEFINE-VALUE </b><i>variable-name</i>
-<dd style="margin-left: 5.0em">Defines the variable to the value of the attribute when the <b>EXPECT</b> condition matches. A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
+<dd style="margin-left: 5.0em">Defines the variable to the value of the attribute when the <b>EXPECT</b> condition matches.
+A side-effect of this predicate is that this <b>EXPECT</b> will never fail a test.
+<dt><b>DISPLAY-MATCH </b><i>"message"</i>
+<dd style="margin-left: 5.0em">Displays the specified message when the <b>EXPECT</b> condition matches.
 <dt><b>IF-DEFINED </b><i>variable-name</i>
 <dd style="margin-left: 5.0em">Makes the <b>EXPECT</b> conditions apply only if the specified variable is defined.
 <dt><b>IF-NOT-DEFINED </b><i>variable-name</i>

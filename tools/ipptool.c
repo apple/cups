@@ -85,7 +85,8 @@ typedef struct ipptool_expect_s		/**** Expected attribute info ****/
 		*with_value_from,	/* Attribute must have one of the values in this attribute */
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
-		*define_value;		/* Variable to define with value */
+		*define_value,		/* Variable to define with value */
+		*display_match;		/* Message to display on a match */
   int		repeat_limit,		/* Maximum number of times to repeat */
 		repeat_match,		/* Repeat test on match */
 		repeat_no_match,	/* Repeat test on no match */
@@ -1074,6 +1075,9 @@ do_monitor_printer_state(
 	break;
       }
 
+      if (found && expect->display_match && (data->output == IPPTOOL_OUTPUT_TEST || (data->output == IPPTOOL_OUTPUT_PLIST && data->outfile != cupsFileStdout())))
+	cupsFilePrintf(cupsFileStdout(), "CONT]\n\n%s\n\n    %-68.68s [", expect->display_match, data->name);
+
       if (found && expect->define_match)
       {
 	_ippVarsSet(data->vars, expect->define_match, "1");
@@ -1847,6 +1851,9 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 	    }
 	  }
 
+	  if (found && expect->display_match && (data->output == IPPTOOL_OUTPUT_TEST || (data->output == IPPTOOL_OUTPUT_PLIST && data->outfile != cupsFileStdout())))
+	    cupsFilePrintf(cupsFileStdout(), "\n%s\n\n", expect->display_match);
+
 	  if (found && expect->define_match)
 	    _ippVarsSet(data->vars, expect->define_match, "1");
 
@@ -2115,36 +2122,25 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
 
   for (i = 0; i < data->num_statuses; i ++)
   {
-    if (data->statuses[i].if_defined)
-      free(data->statuses[i].if_defined);
-    if (data->statuses[i].if_not_defined)
-      free(data->statuses[i].if_not_defined);
-    if (data->statuses[i].define_match)
-      free(data->statuses[i].define_match);
-    if (data->statuses[i].define_no_match)
-      free(data->statuses[i].define_no_match);
+    free(data->statuses[i].if_defined);
+    free(data->statuses[i].if_not_defined);
+    free(data->statuses[i].define_match);
+    free(data->statuses[i].define_no_match);
   }
   data->num_statuses = 0;
 
   for (i = data->num_expects, expect = data->expects; i > 0; i --, expect ++)
   {
     free(expect->name);
-    if (expect->of_type)
-      free(expect->of_type);
-    if (expect->same_count_as)
-      free(expect->same_count_as);
-    if (expect->if_defined)
-      free(expect->if_defined);
-    if (expect->if_not_defined)
-      free(expect->if_not_defined);
-    if (expect->with_value)
-      free(expect->with_value);
-    if (expect->define_match)
-      free(expect->define_match);
-    if (expect->define_no_match)
-      free(expect->define_no_match);
-    if (expect->define_value)
-      free(expect->define_value);
+    free(expect->of_type);
+    free(expect->same_count_as);
+    free(expect->if_defined);
+    free(expect->if_not_defined);
+    free(expect->with_value);
+    free(expect->define_match);
+    free(expect->define_no_match);
+    free(expect->define_value);
+    free(expect->display_match);
   }
   data->num_expects = 0;
 
@@ -2158,22 +2154,15 @@ do_test(_ipp_file_t    *f,		/* I - IPP data file */
   for (i = data->num_monitor_expects, expect = data->monitor_expects; i > 0; i --, expect ++)
   {
     free(expect->name);
-    if (expect->of_type)
-      free(expect->of_type);
-    if (expect->same_count_as)
-      free(expect->same_count_as);
-    if (expect->if_defined)
-      free(expect->if_defined);
-    if (expect->if_not_defined)
-      free(expect->if_not_defined);
-    if (expect->with_value)
-      free(expect->with_value);
-    if (expect->define_match)
-      free(expect->define_match);
-    if (expect->define_no_match)
-      free(expect->define_no_match);
-    if (expect->define_value)
-      free(expect->define_value);
+    free(expect->of_type);
+    free(expect->same_count_as);
+    free(expect->if_defined);
+    free(expect->if_not_defined);
+    free(expect->with_value);
+    free(expect->define_match);
+    free(expect->define_no_match);
+    free(expect->define_value);
+    free(expect->display_match);
   }
   data->num_monitor_expects = 0;
 
@@ -2705,6 +2694,7 @@ parse_monitor_printer_state(
 	_cups_strcasecmp(token, "DEFINE-MATCH") &&
 	_cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
 	_cups_strcasecmp(token, "DEFINE-VALUE") &&
+	_cups_strcasecmp(token, "DISPLAY-MATCH") &&
 	_cups_strcasecmp(token, "IF-DEFINED") &&
 	_cups_strcasecmp(token, "IF-NOT-DEFINED") &&
 	_cups_strcasecmp(token, "IN-GROUP") &&
@@ -2829,6 +2819,24 @@ parse_monitor_printer_state(
       else
       {
 	print_fatal_error(data, "DEFINE-VALUE without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DISPLAY-MATCH"))
+    {
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing DISPLAY-MATCH message on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+
+      if (data->last_expect)
+      {
+	data->last_expect->display_match = strdup(temp);
+      }
+      else
+      {
+	print_fatal_error(data, "DISPLAY-MATCH without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
 	return (0);
       }
     }
@@ -3130,7 +3138,7 @@ pause_message(const char *message)	/* I - Message */
   * Display the prompt...
   */
 
-  cupsFilePrintf(cupsFileStdout(), "%s\n---- PRESS ANY KEY ----", message);
+  cupsFilePrintf(cupsFileStdout(), "\n%s\n\n---- PRESS ANY KEY ----", message);
 
 #ifdef _WIN32
  /*
@@ -3935,6 +3943,7 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
 	_cups_strcasecmp(token, "DEFINE-MATCH") &&
 	_cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
 	_cups_strcasecmp(token, "DEFINE-VALUE") &&
+	_cups_strcasecmp(token, "DISPLAY-MATCH") &&
 	_cups_strcasecmp(token, "IF-DEFINED") &&
 	_cups_strcasecmp(token, "IF-NOT-DEFINED") &&
 	_cups_strcasecmp(token, "IN-GROUP") &&
@@ -4573,6 +4582,24 @@ token_cb(_ipp_file_t    *f,		/* I - IPP file data */
       else
       {
 	print_fatal_error(data, "DEFINE-VALUE without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(token, "DISPLAY-MATCH"))
+    {
+      if (!_ippFileReadToken(f, temp, sizeof(temp)))
+      {
+	print_fatal_error(data, "Missing DISPLAY-MATCH mesaage on line %d of \"%s\".", f->linenum, f->filename);
+	return (0);
+      }
+
+      if (data->last_expect)
+      {
+	data->last_expect->display_match = strdup(temp);
+      }
+      else
+      {
+	print_fatal_error(data, "DISPLAY-MATCH without a preceding EXPECT on line %d of \"%s\".", f->linenum, f->filename);
 	return (0);
       }
     }

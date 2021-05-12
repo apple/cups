@@ -13,7 +13,7 @@ cupsd.conf - server configuration file for cups
 The
 <i>cupsd.conf</i>
 file configures the CUPS scheduler,
-<b>cupsd</b>(8).
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
 It is normally located in the
 <i>/etc/cups</i>
 directory.
@@ -23,7 +23,7 @@ The configuration directive name and values are case-insensitive.
 Comment lines start with the # character.
 <h3><a name="TOP_LEVEL_DIRECTIVES">Top-level Directives</a></h3>
 The following top-level directives are understood by
-<b>cupsd</b>(8):
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
 <dt><a name="AccessLogLevel"></a><b>AccessLogLevel config</b>
 <dd style="margin-left: 5.0em"><dt><b>AccessLogLevel actions</b>
@@ -119,7 +119,7 @@ The default service name is "http."
 <dd style="margin-left: 5.0em"><dt><b>HostNameLookups Double</b>
 <dd style="margin-left: 5.0em">Specifies whether to do reverse lookups on connecting clients.
 The "Double" setting causes
-<b>cupsd</b>(8)
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
 to verify that the hostname resolved from the address matches one of the addresses returned for that hostname.
 Double lookups also prevent clients with unregistered addresses from connecting to your server.
 The default is "Off" to avoid the potential server performance problems with hostname lookups.
@@ -128,7 +128,7 @@ Only set this option to "On" or "Double" if absolutely required.
 <dd style="margin-left: 5.0em">Specifies the length of time to wait before shutting down due to inactivity.
 The default is "60" seconds.
 Note: Only applicable when
-<b>cupsd</b>(8)
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
 is run on-demand (e.g., with <b>-l</b>).
 <dt><a name="JobKillDelay"></a><b>JobKillDelay </b><i>seconds</i>
 <dd style="margin-left: 5.0em">Specifies the number of seconds to wait before killing the filters and backend associated with a canceled or held job.
@@ -304,7 +304,7 @@ The default is "No".
 </dl>
 <h3><a name="HTTP_METHOD_NAMES">Http Method Names</a></h3>
 The following HTTP methods are supported by
-<b>cupsd</b>(8):
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
 <dt>GET
 <dd style="margin-left: 5.0em">Used by a client to download icons and other printer resources and to access the CUPS web interface.
@@ -319,7 +319,7 @@ The following HTTP methods are supported by
 </dl>
 <h3><a name="IPP_OPERATION_NAMES">Ipp Operation Names</a></h3>
 The following IPP operations are supported by
-<b>cupsd</b>(8):
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
 <dt>CUPS-Accept-Jobs
 <dd style="margin-left: 5.0em">Allows a printer to accept new jobs.
@@ -412,7 +412,7 @@ The following IPP operations are supported by
 </dl>
 <h3><a name="LOCATION_PATHS">Location Paths</a></h3>
 The following paths are commonly used when configuring
-<b>cupsd</b>(8):
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
 <dt>/
 <dd style="margin-left: 5.0em">The path for all get operations (get-printers, get-jobs, etc.)
@@ -492,7 +492,7 @@ The default value is "IfRequested".
 <dt><b>Require user {</b><i>user-name</i>|<b>@</b><i>group-name</i>} ...
 <dd style="margin-left: 5.0em">Specifies that an authenticated user must match one of the named users or be a member of one of the named groups.
 The group name "@SYSTEM" corresponds to the list of groups defined by the SystemGroup directive in the
-<b>cups-files.conf</b>(5)
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 file.
 The group name "@OWNER" corresponds to the owner of the resource, for example the person that submitted a print job.
 Note: The 'root' user is not special and must be granted privileges like any other user account.
@@ -515,7 +515,7 @@ The "default" access list is "@OWNER @SYSTEM".
 "@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
 "@OWNER" maps to the job's owner.
 "@SYSTEM" maps to the groups listed for the SystemGroup directive in the
-<b>cups-files.conf</b>(5)
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 file.
 <dt><b>JobPrivateValues all</b>
 <dd style="margin-left: 5.0em"><dt><b>JobPrivateValues default</b>
@@ -531,7 +531,7 @@ The "default" access list is "@OWNER @SYSTEM".
 "@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
 "@OWNER" maps to the job's owner.
 "@SYSTEM" maps to the groups listed for the SystemGroup directive in the
-<b>cups-files.conf</b>(5)
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 file.
 <dt><b>SubscriptionPrivateValues all</b>
 <dd style="margin-left: 5.0em"><dt><b>SubscriptionPrivateValues default</b>
@@ -578,7 +578,7 @@ The default is "128m".
 </dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 File, directory, and user configuration directives that used to be allowed in the <b>cupsd.conf</b> file are now stored in the
-<b>cups-files.conf</b>(5)
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5)</a>
 file instead in order to prevent certain types of privilege escalation attacks.
 <p>The scheduler MUST be restarted manually after making changes to the <b>cupsd.conf</b> file.
 On Linux this is typically done using the
@@ -613,8 +613,8 @@ Require authentication for accesses from outside the 10. network:
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <b>classes.conf</b>(5),
-<b>cups-files.conf</b>(5),
-<b>cupsd</b>(8),
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
 <b>mime.convs</b>(5),
 <b>mime.types</b>(5),
 <b>printers.conf</b>(5),
