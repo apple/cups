@@ -2,3 +2,4 @@ queries:
   - exclude: cpp/integer-multiplication-cast-to-long
   - exclude: cpp/missing-header-guard
   - exclude: cpp/short-global-name
+  - exclude: cpp/tainted-format-string
