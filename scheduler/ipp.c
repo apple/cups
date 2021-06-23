@@ -1,7 +1,7 @@
 /*
  * IPP routines for the CUPS scheduler.
  *
- * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -72,6 +72,7 @@ static void	copy_subscription_attrs(cupsd_client_t *con,
 					cups_array_t *ra,
 					cups_array_t *exclude);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	*create_local_bg_thread(cupsd_printer_t *printer);
 static void	create_local_printer(cupsd_client_t *con);
 static cups_array_t *create_requested_array(ipp_t *request);
 static void	create_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -2691,7 +2692,22 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     need_restart_job = 1;
     changed_driver   = 1;
 
-    if (!strcmp(ppd_name, "raw"))
+    if (!strcmp(ppd_name, "everywhere"))
+    {
+      // Create IPP Everywhere PPD...
+      if (!printer->device_uri || (strncmp(printer->device_uri, "dnssd://", 8) && strncmp(printer->device_uri, "ipp://", 6) && strncmp(printer->device_uri, "ipps://", 7) && strncmp(printer->device_uri, "ippusb://", 9)))
+      {
+	send_ipp_status(con, IPP_INTERNAL_ERROR, _("IPP Everywhere driver requires an IPP connection."));
+	if (!modify)
+	  cupsdDeletePrinter(printer, 0);
+
+	return;
+      }
+
+      // Run a background thread to create the PPD...
+      _cupsThreadCreate((_cups_thread_func_t)create_local_bg_thread, printer);
+    }
+    else if (!strcmp(ppd_name, "raw"))
     {
      /*
       * Raw driver, remove any existing PPD file.

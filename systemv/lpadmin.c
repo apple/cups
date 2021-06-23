@@ -1,7 +1,7 @@
 /*
  * "lpadmin" command for CUPS.
  *
- * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2006 by Easy Software Products.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -28,7 +28,6 @@ static int		delete_printer_from_class(http_t *http, char *printer,
 static int		delete_printer_option(http_t *http, char *printer,
 			                      char *option);
 static int		enable_printer(http_t *http, char *printer);
-static char		*get_printer_ppd(const char *uri, char *buffer, size_t bufsize, int *num_options, cups_option_t **options);
 static cups_ptype_t	get_printer_type(http_t *http, char *printer, char *uri,
 			                 size_t urisize);
 static int		set_printer_options(http_t *http, char *printer,
@@ -625,14 +624,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
 #endif /* __APPLE__ */
   }
-  else if (ppd_name && !strcmp(ppd_name, "everywhere") && device_uri)
-  {
-    if ((file = get_printer_ppd(device_uri, evefile, sizeof(evefile), &num_options, &options)) == NULL)
-      return (1);
-
-    num_options = cupsRemoveOption("ppd-name", num_options, &options);
-  }
-  else if (ppd_name || file)
+  else if ((ppd_name && strcmp(ppd_name, "everywhere")) || file)
   {
     _cupsLangPuts(stderr, _("lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS."));
   }
@@ -1153,105 +1145,6 @@ enable_printer(http_t *http,		/* I - Server connection */
   }
 
   return (0);
-}
-
-
-/*
- * 'get_printer_ppd()' - Get an IPP Everywhere PPD file for the given URI.
- */
-
-static char *				/* O  - Filename or NULL */
-get_printer_ppd(
-    const char    *uri,			/* I  - Printer URI */
-    char          *buffer,		/* I  - Filename buffer */
-    size_t        bufsize,		/* I  - Size of filename buffer */
-    int           *num_options,		/* IO - Number of options */
-    cups_option_t **options)		/* IO - Options */
-{
-  http_t	*http;			/* Connection to printer */
-  ipp_t		*request,		/* Get-Printer-Attributes request */
-		*response;		/* Get-Printer-Attributes response */
-  ipp_attribute_t *attr;		/* Attribute from response */
-  char		resolved[1024],		/* Resolved URI */
-		scheme[32],		/* URI scheme */
-		userpass[256],		/* Username:password */
-		host[256],		/* Hostname */
-		resource[256];		/* Resource path */
-  int		port;			/* Port number */
-  static const char * const pattrs[] =	/* Attributes to use */
-  {
-    "all",
-    "media-col-database"
-  };
-
-
- /*
-  * Connect to the printer...
-  */
-
-  if (strstr(uri, "._tcp"))
-  {
-   /*
-    * Resolve URI...
-    */
-
-    if (!_httpResolveURI(uri, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
-    {
-      _cupsLangPrintf(stderr, _("%s: Unable to resolve \"%s\"."), "lpadmin", uri);
-      return (NULL);
-    }
-
-    uri = resolved;
-  }
-
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
-  {
-    _cupsLangPrintf(stderr, _("%s: Bad printer URI \"%s\"."), "lpadmin", uri);
-    return (NULL);
-  }
-
-  http = httpConnect2(host, port, NULL, AF_UNSPEC, !strcmp(scheme, "ipps") ? HTTP_ENCRYPTION_ALWAYS : HTTP_ENCRYPTION_IF_REQUESTED, 1, 30000, NULL);
-  if (!http)
-  {
-    _cupsLangPrintf(stderr, _("%s: Unable to connect to \"%s:%d\": %s"), "lpadmin", host, port, cupsLastErrorString());
-    return (NULL);
-  }
-
- /*
-  * Send a Get-Printer-Attributes request...
-  */
-
-  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]), NULL, pattrs);
-  response = cupsDoRequest(http, request, resource);
-
-  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
-  {
-    _cupsLangPrintf(stderr, _("%s: Unable to query printer: %s"), "lpadmin", cupsLastErrorString());
-    buffer[0] = '\0';
-  }
-  else if (_ppdCreateFromIPP(buffer, bufsize, response))
-  {
-    if (!cupsGetOption("printer-geo-location", *num_options, *options) && (attr = ippFindAttribute(response, "printer-geo-location", IPP_TAG_URI)) != NULL)
-      *num_options = cupsAddOption("printer-geo-location", ippGetString(attr, 0, NULL), *num_options, options);
-
-    if (!cupsGetOption("printer-info", *num_options, *options) && (attr = ippFindAttribute(response, "printer-info", IPP_TAG_TEXT)) != NULL)
-      *num_options = cupsAddOption("printer-info", ippGetString(attr, 0, NULL), *num_options, options);
-
-    if (!cupsGetOption("printer-location", *num_options, *options) && (attr = ippFindAttribute(response, "printer-location", IPP_TAG_TEXT)) != NULL)
-      *num_options = cupsAddOption("printer-location", ippGetString(attr, 0, NULL), *num_options, options);
-  }
-  else
-    _cupsLangPrintf(stderr, _("%s: Unable to create PPD file: %s"), "lpadmin", strerror(errno));
-
-  ippDelete(response);
-  httpClose(http);
-
-  if (buffer[0])
-    return (buffer);
-  else
-    return (NULL);
 }
 
 
