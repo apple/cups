@@ -77,6 +77,9 @@
 # Canon, Inc. MP210 (https://bugzilla.redhat.com/show_bug.cgi?id=847923#c53)
 0x04a9 0x1721 unidir
 
+# Canon, Inc. MP240 Printer (https://github.com/agalakhov/captdriver/issues/7#issuecomment-890380405)
+0x04a9 0x1732 unidir
+
 # Canon, Inc. MP500 Printer (https://bugs.launchpad.net/bugs/1032456)
 0x04a9 0x170c unidir
 
