@@ -3,3 +3,5 @@ queries:
   - exclude: cpp/missing-header-guard
   - exclude: cpp/short-global-name
   - exclude: cpp/tainted-format-string
+  - exclude: cpp/toctou-race-condition
+  - exclude: cpp/constant-comparison
