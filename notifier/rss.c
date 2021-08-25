@@ -85,6 +85,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*notify_printer_uri;	/* Printer URI */
   char		*subject,		/* Subject for notification message */
 		*text,			/* Text for notification message */
+    *subject_escaped,        /* Backup pointer for subject */
+    *text_escaped,           /* Backup pointer for text */
+    *link_url_escaped,       /* Backup pointer for link_url */
 		link_url[1024],		/* Link to printer */
 		link_scheme[32],	/* Scheme for link */
 		link_username[256],	/* Username for link */
@@ -332,17 +335,25 @@ main(int  argc,				/* I - Number of command-line arguments */
 			link_resource);
       }
 
+      subject_escaped = xml_escape(subject);
+      text_escaped = xml_escape(text);
+      link_url_escaped = notify_printer_uri ? xml_escape(link_url) : NULL;
+
       msg = new_message(notify_sequence_number->values[0].integer,
-                        xml_escape(subject), xml_escape(text),
-			notify_printer_uri ? xml_escape(link_url) : NULL,
-			printer_up_time->values[0].integer);
+                        subject_escaped, text_escaped, link_url_escaped,
+                        printer_up_time->values[0].integer);
 
       if (!msg)
       {
         fprintf(stderr, "ERROR: Unable to create message: %s\n",
-	        strerror(errno));
+                strerror(errno));
+
+        free(subject_escaped);
+        free(text_escaped);
+        free(link_url_escaped);
+
         exit_status = 1;
-	break;
+        break;
       }
 
      /*
