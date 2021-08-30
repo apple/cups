@@ -1,6 +1,7 @@
 /*
  * snprintf functions for CUPS.
  *
+ * Copyright © 2021 by OpenPrinting
  * Copyright © 2007-2019 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products.
  *
@@ -322,7 +323,8 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
   * Nul-terminate the string and return the number of characters needed.
   */
 
-  *bufptr = '\0';
+  if (bufptr)
+  	*bufptr = '\0';
 
   return (bytes);
 }
