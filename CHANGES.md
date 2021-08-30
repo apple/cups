@@ -83,6 +83,7 @@ Changes in CUPS v2.3.5
   directive in `cupsd.conf` (Issue #5733)
 - Fixed `@IF(name)` handling in `cupsd.conf` (Issue #5918)
 - The scheduler now supports the "everywhere" model directly (Issue #5919)
+- Fixed the `lpc` command prompt (Issue #5946)
 - Fixed `job-pages-per-set` value for duplex print jobs.
 
 

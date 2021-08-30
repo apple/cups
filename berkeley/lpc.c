@@ -21,6 +21,7 @@
 static int	compare_strings(const char *, const char *, size_t);
 static void	do_command(http_t *, const char *, const char *);
 static void	show_help(const char *);
+static void	show_prompt(const char *message);
 static void	show_status(http_t *, const char *);
 
 
@@ -59,7 +60,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the command prompt thing...
     */
 
-    _cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no-newline version */
+    show_prompt(_("lpc> "));
     while (fgets(line, sizeof(line), stdin) != NULL)
     {
      /*
@@ -87,7 +88,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         * Nothing left, just show a prompt...
 	*/
 
-	_cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no newline version */
+        show_prompt(_("lpc> "));
 	continue;
       }
 
@@ -123,7 +124,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Put another prompt out to the user...
       */
 
-      _cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no newline version */
+      show_prompt(_("lpc> "));
     }
   }
 
@@ -197,6 +198,30 @@ show_help(const char *command)		/* I - Command to describe or NULL */
     _cupsLangPrintf(stdout, _("status\t\tShow status of daemon and queue."));
   else
     _cupsLangPrintf(stdout, _("?Invalid help command unknown."));
+}
+
+
+/*
+ * 'show_prompt()' - Show a localized prompt message.
+ */
+
+static void
+show_prompt(const char *message)	/* I - Message string to use */
+{
+  ssize_t	bytes;			/* Number of bytes formatted */
+  char		output[8192];		/* Message buffer */
+  cups_lang_t	*lang = cupsLangDefault();
+					/* Default language */
+
+ /*
+  * Transcode to the destination charset and write the prompt...
+  */
+
+  if ((bytes = cupsUTF8ToCharset(output, (cups_utf8_t *)_cupsLangString(lang, message), sizeof(output), lang->encoding)) > 0)
+  {
+    fwrite(output, 1, (size_t)bytes, stdout);
+    fflush(stdout);
+  }
 }
 
 
