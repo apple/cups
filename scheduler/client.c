@@ -1,8 +1,9 @@
 /*
  * Client routines for the CUPS scheduler.
  *
- * Copyright © 2007-2019 by Apple Inc.
- * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright © 2021 by OpenPrinting.
+ * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
  * Jelmer Vernooij.
@@ -2933,7 +2934,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 	*/
 
 	if (language[3])
-	  language[0] = '\0';		/* Strip country code */
+	  language[3] = '\0';		/* Strip country code */
 	else
 	  language[0] = '\0';		/* Strip language */
       }
