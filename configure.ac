@@ -9,10 +9,10 @@ dnl information.
 dnl
 
 dnl We need at least autoconf 2.60...
-AC_PREREQ(2.60)
+AC_PREREQ([2.60])
 
 dnl Package name and version...
-AC_INIT([CUPS], [2.3.5], [https://github.com/apple/cups/issues], [cups], [https://www.cups.org/])
+AC_INIT([CUPS],[2.3.5],[https://github.com/apple/cups/issues],[cups],[https://www.cups.org/])
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
@@ -57,7 +57,7 @@ fi
 AC_SUBST(INSTALL_LANGUAGES)
 AC_SUBST(UNINSTALL_LANGUAGES)
 
-AC_OUTPUT(Makedefs
+AC_CONFIG_FILES([Makedefs
 	  conf/cups-files.conf
 	  conf/cupsd.conf
 	  conf/mime.convs
@@ -76,6 +76,7 @@ AC_OUTPUT(Makedefs
 	  scheduler/org.cups.cupsd.socket
  	  templates/header.tmpl
           packaging/cups.list
-	  $LANGFILES)
+	  $LANGFILES])
+AC_OUTPUT
 
 chmod +x cups-config
