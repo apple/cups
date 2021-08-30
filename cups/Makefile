@@ -1,7 +1,8 @@
 #
 # Library Makefile for CUPS.
 #
-# Copyright © 2007-2019 by Apple Inc.
+# Copyright © 2021 by OpenPrinting.
+# Copyright © 2007-2021 by Apple Inc.
 # Copyright © 1997-2006 by Easy Software Products, all rights reserved.
 #
 # Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -641,6 +642,8 @@ testlang:	testlang.o $(LIBCUPSSTATIC)
 		$(LN) ../../$$po locale/$$lang; \
 	done
 	echo Running language API tests...
+	echo ls -al locale
+	ls -al locale
 	LOCALEDIR=locale ./testlang
 
 
@@ -727,7 +730,7 @@ tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
 #
 
 apihelp:
-	echo Generating CUPS API help files...
+	echo "Generating CUPS API help files..."
 	$(RM) cupspm.xml
 	codedoc --section "Programming" --body cupspm.md \
 		cupspm.xml \
@@ -738,19 +741,23 @@ apihelp:
 	codedoc --section "Programming" --body cupspm.md \
 		cupspm.xml > ../doc/help/cupspm.html
 	$(RM) cupspm.xml
+	echo "Generating Administration APIs help..."
 	codedoc --section "Programming" --title "Administration APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-admin.header --body api-admin.shtml \
 		adminutil.c adminutil.h getdevices.c >../doc/help/api-admin.html
+	echo "Generating PPD API (deprecated) help..."
 	codedoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --body api-ppd.shtml \
 		ppd.h ppd-*.c raster-interstub.c >../doc/help/api-ppd.html
+	echo "Generating Raster help..."
 	codedoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --body api-raster.shtml \
 		../cups/raster.h raster-stubs.c \
 		>../doc/help/api-raster.html
+	echo "Generating Filter and Backend Programming help..."
 	codedoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \

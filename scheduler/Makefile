@@ -1,6 +1,7 @@
 #
 # Scheduler Makefile for CUPS.
 #
+# Copyright © 2020 by OpenPrinting
 # Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -199,7 +200,8 @@ install-data:
 		$(INSTALL_DATA) org.cups.cupsd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
 		$(INSTALL_DATA) org.cups.cups-lpdAT.service $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cups-lpd@.service; \
 		$(INSTALL_DATA) org.cups.cups-lpd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
-	elif test "x$(XINETD)" != x; then \
+	fi
+	if test "x$(XINETD)" != x; then \
 		echo Installing xinetd configuration file for cups-lpd...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
 		$(INSTALL_DATA) cups-lpd.xinetd $(BUILDROOT)$(XINETD)/cups-lpd; \

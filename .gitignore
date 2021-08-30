@@ -6,6 +6,8 @@ autom4te.cache
 config.h
 config.log
 config.status
+configure~
+cups.pc
 cups-config
 Makedefs
 backend/dnssd
@@ -153,4 +155,3 @@ vcnet/Win32
 vcnet/x64
 xcode/CUPS.xcodeproj/project.xcworkspace/
 xcode/CUPS.xcodeproj/xcuserdata/
-

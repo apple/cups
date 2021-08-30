@@ -38,7 +38,7 @@ else
 	SIGNFILES=yes
 
 	echo Validating sources...
-	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
+	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }' | sed -e '1,$s/op[0-9]*$//'`
 	cupsversion=`printf "2.03%02d" $cupsversionpatch`
 
         temp=`grep AC_INIT configure.ac | awk '{print $2}' | sed -e '1,$s/^\[//' -e '1,$s/\],$//'`

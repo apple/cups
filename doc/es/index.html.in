@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=9">
     <meta name="viewport" content="width=device-width">
-    <title>Inicio - CUPS @CUPS_VERSION@@CUPS_REVISION@</title>
+    <title>Inicio - CUPS @CUPS_VERSION@</title>
   </head>
   <body>
     <div class="header">

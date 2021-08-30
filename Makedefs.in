@@ -1,6 +1,7 @@
 #
 # Common makefile definitions for CUPS.
 #
+# Copyright © 2021 by OpenPrinting.
 # Copyright © 2007-2019 by Apple Inc.
 # Copyright © 1997-2007 by Easy Software Products, all rights reserved.
 #
@@ -34,7 +35,7 @@ LD_CXX		=	@LD_CXX@
 LIBTOOL		=	@LIBTOOL@
 LN		=	@LN@ -sf
 MKDIR           =       @MKDIR@ -p
-MV		=	@MV@
+MV		=	@MV@ -f
 RANLIB		=	@RANLIB@
 RM		=	@RM@ -f
 RMDIR		=	@RMDIR@
@@ -227,6 +228,7 @@ BUNDLEDIR	=	@CUPS_BUNDLEDIR@
 CACHEDIR	=	$(BUILDROOT)@CUPS_CACHEDIR@
 DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
 DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
+CUPS_PKGCONFPATH =	$(BUILDROOT)@CUPS_PKGCONFPATH@
 ICONDIR		=	@ICONDIR@
 INCLUDEDIR	=	$(BUILDROOT)$(includedir)
 LIBDIR		=	$(BUILDROOT)$(libdir)
