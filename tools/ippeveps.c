@@ -185,7 +185,7 @@ ascii85(const unsigned char *data,	/* I - Data to write */
   if (length > 0)
   {
     // Copy any remainder into the leftdata array...
-    if ((length - leftcount) > 0)
+    if (length > leftcount)
       memcpy(leftdata + leftcount, data, (size_t)(length - leftcount));
 
     memset(leftdata + length, 0, (size_t)(4 - length));

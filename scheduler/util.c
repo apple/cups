@@ -108,7 +108,7 @@ cupsdCompareNames(const char *s,	/* I - First string */
         return (-1);
       else if (digits > 0)
         return (1);
-      else if (diff)
+      else
         return (diff);
     }
     else if (tolower(*s) < tolower(*t))
@@ -142,10 +142,10 @@ cupsdCompareNames(const char *s,	/* I - First string */
 cups_array_t *				/* O - CUPS array */
 cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
 {
-  if (!s || !*s)
-    return (NULL);
-  else
+  if (s && *s)
     return (_cupsArrayNewStrings(s, ','));
+  else
+    return (NULL);
 }
 
 

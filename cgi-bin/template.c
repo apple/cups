@@ -33,7 +33,6 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
 {
   FILE	*in;				/* Input file */
 
-
   fprintf(stderr, "DEBUG2: cgiCopyTemplateFile(out=%p, tmpl=\"%s\")\n", out,
           tmpl ? tmpl : "(null)");
 
@@ -51,7 +50,7 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
   if ((in = fopen(tmpl, "r")) == NULL)
   {
     fprintf(stderr, "ERROR: Unable to open template file \"%s\" - %s\n",
-            tmpl ? tmpl : "(null)", strerror(errno));
+            tmpl, strerror(errno));
     return;
   }
 
@@ -91,8 +90,6 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
   * Convert the language to a locale name...
   */
 
-  locale[0] = '\0';
-
   if ((lang = getenv("LANG")) != NULL)
   {
     locale[0] = '/';
@@ -100,6 +97,10 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
 
     if ((locptr = strchr(locale, '.')) != NULL)
       *locptr = '\0';			/* Strip charset */
+  }
+  else
+  {
+    locale[0] = '\0';
   }
 
   fprintf(stderr, "DEBUG2: lang=\"%s\", locale=\"%s\"...\n",

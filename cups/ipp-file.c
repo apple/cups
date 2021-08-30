@@ -303,10 +303,7 @@ _ippFileReadToken(_ipp_file_t *f,	/* I - File to read from */
       * Start of quoted text or regular expression...
       */
 
-      if (ch == '<')
-        quote = '>';
-      else
-        quote = ch;
+      quote = ch;
 
       DEBUG_printf(("1_ippFileReadToken: Start of quoted string, quote=%c, pos=%ld", quote, (long)cupsFileTell(f->fp)));
     }
@@ -571,12 +568,10 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
   {
     case IPP_TAG_BOOLEAN :
         return (ippSetBoolean(ipp, attr, element, !_cups_strcasecmp(value, "true")));
-        break;
 
     case IPP_TAG_ENUM :
     case IPP_TAG_INTEGER :
         return (ippSetInteger(ipp, attr, element, (int)strtol(value, NULL, 0)));
-        break;
 
     case IPP_TAG_DATE :
         {
@@ -690,7 +685,6 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
           return (ippSetDate(ipp, attr, element, date));
         }
-        break;
 
     case IPP_TAG_RESOLUTION :
 	{
@@ -718,7 +712,6 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 	  else
 	    return (ippSetResolution(ipp, attr, element, (ipp_res_t)0, xres, yres));
 	}
-	break;
 
     case IPP_TAG_RANGE :
 	{
@@ -733,7 +726,6 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
 	  return (ippSetRange(ipp, attr, element, lower, upper));
 	}
-	break;
 
     case IPP_TAG_STRING :
         valuelen = strlen(value);
@@ -774,7 +766,6 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
         }
         else
           return (ippSetOctetString(ipp, attr, element, value, (int)valuelen));
-        break;
 
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
@@ -787,7 +778,6 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
         return (ippSetString(ipp, attr, element, value));
-        break;
 
     case IPP_TAG_BEGIN_COLLECTION :
         {
@@ -808,14 +798,11 @@ parse_value(_ipp_file_t      *f,	/* I  - IPP data file */
 
 	  return (status);
 	}
-	break;
 
     default :
         report_error(f, v, user_data, "Unsupported value on line %d of \"%s\".", f->linenum, f->filename);
         return (0);
   }
-
-  return (1);
 }
 
 

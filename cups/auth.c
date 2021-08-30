@@ -330,10 +330,6 @@ _cupsSetNegotiateAuthString(
   gss_buffer_desc output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token */
 
-
-  (void)method;
-  (void)resource;
-
 #  ifdef __APPLE__
  /*
   * If the weak-linked GSSAPI/Kerberos library is not present, don't try
@@ -450,6 +446,9 @@ _cupsSetNegotiateAuthString(
       }
     }
   }
+#  else
+  (void)method;
+  (void)resource;
 #  endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
   if (major_status == GSS_S_NO_CRED)
@@ -562,9 +561,9 @@ cups_auth_find(const char *www_authenticate,	/* I - Pointer into WWW-Authenticat
         * Skip quoted value...
         */
 
-        www_authenticate ++;
-        while (*www_authenticate && *www_authenticate != '\"')
+        do
           www_authenticate ++;
+        while (*www_authenticate && *www_authenticate != '\"');
 
         DEBUG_printf(("9cups_auth_find: After quoted: \"%s\"", www_authenticate));
       }

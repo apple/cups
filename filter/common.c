@@ -301,7 +301,7 @@ WriteLabelProlog(const char *label,	/* I - Page label */
 
   if ((classification = getenv("CLASSIFICATION")) == NULL)
     classification = "";
-  if (strcmp(classification, "none") == 0)
+  else if (strcmp(classification, "none") == 0)
     classification = "";
 
  /*
