@@ -21,7 +21,7 @@
 //
 
 static void	add_ui_strings(ppdcDriver *d, ppdcCatalog *catalog);
-static void	usage(void);
+static void	usage(void) _CUPS_NORETURN;
 
 
 //

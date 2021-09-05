@@ -22,7 +22,7 @@ int main(void) { puts("Sorry, no TLS support compiled in."); return (1); }
  * Local functions...
  */
 
-static void	usage(void);
+static void	usage(void) _CUPS_NORETURN;
 
 
 /*
