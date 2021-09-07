@@ -1,7 +1,8 @@
 /*
  * TLS support code for CUPS on macOS.
  *
- * Copyright © 2007-2019 by Apple Inc.
+ * Copyright © 2021 by OpenPrinting
+ * Copyright © 2007-2021 by Apple Inc.
  * Copyright © 1997-2007 by Easy Software Products, all rights reserved.
  *
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more
@@ -291,7 +292,7 @@ cupsMakeServerCredentials(
     else
       tls_selfsigned = ident;
 
-    _cupsMutexLock(&tls_mutex);
+    _cupsMutexUnlock(&tls_mutex);
 
 #  if 0 /* Someday perhaps SecItemCopyMatching will work for identities, at which point  */
     CFTypeRef itemKeys[] = { kSecClass, kSecAttrLabel, kSecValueRef };
