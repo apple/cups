@@ -39,7 +39,7 @@
 <TD>
 <SELECT NAME="PPD_NAME" SIZE="10">
 {op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Current Driver - {current_make_and_model}</OPTION>:}
-{show_ipp_everywhere?<OPTION VALUE="everywhere" SELECTED>{current_make_and_model} - IPP Everywhere &trade;</OPTION>:}
+{show_ipp_everywhere?<OPTION VALUE="everywhere" SELECTED>{current_make_and_model?{current_make_and_model} -:} IPP Everywhere &trade;</OPTION>:}
 {[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
 }</SELECT>
 </TD>
