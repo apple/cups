@@ -323,8 +323,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
     }
   }
 
-  if (ppd)
-    ppdClose(ppd);
+  ppdClose(ppd);
 
   return (1);
 }

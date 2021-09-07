@@ -1174,7 +1174,7 @@ html_fputs(const char *s,		/* I  - String */
         end --;
 
       strlcpy(temp, s, sizeof(temp));
-      if ((size_t)(end -s) < sizeof(temp))
+      if ((size_t)(end - s) < sizeof(temp))
         temp[end - s] = '\0';
 
       fprintf(fp, "<a href=\"%s\">%s</a>", temp, temp);

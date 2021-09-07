@@ -60,9 +60,7 @@ extern int	cupsUTF8ToUTF32(cups_utf32_t *dest,
 extern int	cupsUTF32ToUTF8(cups_utf8_t *dest,
 				const cups_utf32_t *src,
 				const int maxout) _CUPS_API_1_2;
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-
 #endif /* !_CUPS_TRANSCODE_H_ */

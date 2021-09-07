@@ -250,7 +250,7 @@
 #    define _CUPS_NONNULL(...) __attribute__ ((nonnull(__VA_ARGS__)))
 #  else
 #    define _CUPS_NONNULL(...)
-#  endif /* _CUPS_HAS_FORMAT */
+#  endif /* _CUPS_HAS_NONNULL */
 
 
 /*
@@ -262,6 +262,4 @@
 #  else
 #    define _CUPS_NORETURN
 #  endif /* _CUPS_HAS_NORETURN */
-
-
 #endif /* !_CUPS_VERSIONING_H_ */

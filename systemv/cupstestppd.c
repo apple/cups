@@ -3343,9 +3343,9 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       }
       else
       {
-        width_tmp  = (fabs(size->width - ceil(size->width)) < 0.1) ?
+        width_tmp  = (fabs(size->width - ceil(size->width)) < 0.1f) ?
 	                 ceil(size->width) : size->width;
-        length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
+        length_tmp = (fabs(size->length - ceil(size->length)) < 0.1f) ?
 	                 ceil(size->length) : size->length;
 
         if (fmod(width_tmp, 9.0) == 0.0 && fmod(length_tmp, 9.0) == 0.0)

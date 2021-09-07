@@ -421,6 +421,12 @@ get_options(cups_option_t **options)	/* O - Options */
   {
     ppd_cache = _ppdCacheCreateWithPPD(ppd);
 
+    if (!ppd_cache)
+    {
+      puts("ERROR: [cups] Unable to allocate memory for PPD cache.");
+      exit(1);
+    }
+
     /* TODO: Fix me - values are names, not numbers... Also need to support finishings-col */
     if ((value = getenv("IPP_FINISHINGS")) == NULL)
       value = getenv("IPP_FINISHINGS_DEFAULT");
@@ -463,7 +469,7 @@ get_options(cups_option_t **options)	/* O - Options */
     if ((value = getenv("IPP_SIDES")) == NULL)
       value = getenv("IPP_SIDES_DEFAULT");
 
-    if (value && ppd_cache->sides_option)
+    if (value && ppd_cache && ppd_cache->sides_option)
     {
       if (!strcmp(value, "one-sided") && ppd_cache->sides_1sided)
 	num_options = cupsAddOption(ppd_cache->sides_option, ppd_cache->sides_1sided, num_options, options);

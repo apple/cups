@@ -30,8 +30,7 @@
 
 static int	cups_get_printer_uri(http_t *http, const char *name,
 		                     char *host, int hostsize, int *port,
-				     char *resource, int resourcesize,
-				     int depth);
+				     char *resource, int resourcesize);
 
 
 /*
@@ -327,7 +326,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     }
   }
 
-  if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port, resource, sizeof(resource), 0))
+  if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port, resource, sizeof(resource)))
   {
     DEBUG_puts("2cupsGetPPD3: Unable to get printer URI.");
     return (HTTP_STATUS_NOT_FOUND);
@@ -545,8 +544,7 @@ cups_get_printer_uri(
     int        hostsize,		/* I - Size of hostname buffer */
     int        *port,			/* O - Port number */
     char       *resource,		/* I - Resource buffer */
-    int        resourcesize,		/* I - Size of resource buffer */
-    int        depth)			/* I - Depth of query */
+    int        resourcesize)		/* I - Size of resource buffer */
 {
   int		i;			/* Looping var */
   ipp_t		*request,		/* IPP request */
@@ -562,7 +560,7 @@ cups_get_printer_uri(
 		};
 
 
-  DEBUG_printf(("4cups_get_printer_uri(http=%p, name=\"%s\", host=%p, hostsize=%d, resource=%p, resourcesize=%d, depth=%d)", http, name, host, hostsize, resource, resourcesize, depth));
+  DEBUG_printf(("4cups_get_printer_uri(http=%p, name=\"%s\", host=%p, hostsize=%d, resource=%p, resourcesize=%d)", http, name, host, hostsize, resource, resourcesize));
 
  /*
   * Setup the printer URI...

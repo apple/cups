@@ -8,6 +8,13 @@
  * information.
  */
 
+#ifndef _SCHEDULER_NETWORK_H_
+#define _SCHEDULER_NETWORK_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 /*
  * Structures...
  */
@@ -40,3 +47,7 @@ VAR cups_array_t	*NetIFList	VALUE(NULL);
 
 extern cupsd_netif_t	*cupsdNetIFFind(const char *name);
 extern void		cupsdNetIFUpdate(void);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_NETWORK_H_*/

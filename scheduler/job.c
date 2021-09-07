@@ -1308,8 +1308,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     free(argv[i]);
   free(argv);
 
-  if (printer_state_reasons)
-    free(printer_state_reasons);
+  free(printer_state_reasons);
 
   cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)update_job, NULL,
                  job);
@@ -1343,8 +1342,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     free(argv);
   }
 
-  if (printer_state_reasons)
-    free(printer_state_reasons);
+  free(printer_state_reasons);
 
   cupsdClosePipe(job->print_pipes);
   cupsdClosePipe(job->back_pipes);

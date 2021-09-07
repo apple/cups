@@ -336,11 +336,15 @@ main(int  argc,				/* I - Number of command-line args */
                                argv + i)) == NULL)
             return (IPPFIND_EXIT_MEMORY);
 
-          while (i < argc)
+          do
+          {
             if (!strcmp(argv[i], ";"))
+            {
               break;
-            else
-              i ++;
+            }
+            i ++;
+          }
+          while (i < argc);
 
           if (i >= argc)
           {

@@ -11,6 +11,17 @@
  * Constants...
  */
 
+#ifndef _SCHEDULER_JOB_H_
+#define _SCHEDULER_JOB_H_
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 typedef enum cupsd_jobaction_e		/**** Actions for state changes ****/
 {
   CUPSD_JOB_DEFAULT,			/* Use default action */
@@ -171,3 +182,7 @@ extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
 extern void		cupsdUpdateJobs(void);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_JOB_H_*/

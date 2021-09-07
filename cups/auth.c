@@ -449,7 +449,7 @@ _cupsSetNegotiateAuthString(
 #  else
   (void)method;
   (void)resource;
-#  endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
+#  endif /* HAVE_GSS_ACQUIRE_CRED_EX_F */
 
   if (major_status == GSS_S_NO_CRED)
   {

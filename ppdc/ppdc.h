@@ -110,7 +110,7 @@ class ppdcArray				//// Shared Array
 		current;		// Current element
   ppdcShared	**data;			// Elements
 
-  ppdcArray(ppdcArray *a = 0);
+  ppdcArray(ppdcArray *a = NULL);
   ~ppdcArray();
 
   PPDC_NAME("ppdcArray")
@@ -488,9 +488,9 @@ class ppdcSource			//// Source File
   int		get_boolean(ppdcFile *fp);
   ppdcChoice	*get_choice(ppdcFile *fp);
   ppdcChoice	*get_color_model(ppdcFile *fp);
-  int		get_color_order(const char *co);
+  static int		get_color_order(const char *co);
   ppdcProfile	*get_color_profile(ppdcFile *fp);
-  int		get_color_space(const char *cs);
+  static int		get_color_space(const char *cs);
   ppdcConstraint *get_constraint(ppdcFile *fp);
   ppdcMediaSize	*get_custom_size(ppdcFile *fp);
   void		get_duplex(ppdcFile *fp, ppdcDriver *d);
@@ -512,7 +512,7 @@ class ppdcSource			//// Source File
   char		*get_token(ppdcFile *fp, char *buffer, int buflen);
   ppdcVariable	*get_variable(ppdcFile *fp);
   int		import_ppd(const char *f);
-  int		quotef(cups_file_t *fp, const char *format, ...);
+  static int		quotef(cups_file_t *fp, const char *format, ...);
   void		read_file(const char *f, cups_file_t *ffp = (cups_file_t *)0);
   void		scan_file(ppdcFile *fp, ppdcDriver *td = 0, bool inc = false);
   ppdcVariable	*set_variable(const char *name, const char *value);
@@ -520,4 +520,4 @@ class ppdcSource			//// Source File
 };
 
 
-#endif // !_PPDC_H_
+#endif /* !_PPDC_H_ */

@@ -54,7 +54,7 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
            ppd_section_t section,	/* I - Section to collect */
            ppd_choice_t  ***choices)	/* O - Pointers to choices */
 {
-  return (ppdCollect2(ppd, section, 0.0, choices));
+  return (ppdCollect2(ppd, section, 0.0f, choices));
 }
 
 
@@ -226,7 +226,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
         FILE          *fp,		/* I - File to write to */
         ppd_section_t section)		/* I - Section to write */
 {
-  return (ppdEmitAfterOrder(ppd, fp, section, 0, 0.0));
+  return (ppdEmitAfterOrder(ppd, fp, section, 0, 0.0f));
 }
 
 
@@ -310,7 +310,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
   * Get the string...
   */
 
-  buffer = ppdEmitString(ppd, section, 0.0);
+  buffer = ppdEmitString(ppd, section, 0.0f);
 
  /*
   * Write it as needed and return...

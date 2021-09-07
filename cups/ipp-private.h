@@ -207,13 +207,7 @@ extern const char	*_ippVarsGet(_ipp_vars_t *v, const char *name) _CUPS_PRIVATE;
 extern void		_ippVarsInit(_ipp_vars_t *v, _ipp_fattr_cb_t attrcb, _ipp_ferror_cb_t errorcb, _ipp_ftoken_cb_t tokencb) _CUPS_PRIVATE;
 extern const char	*_ippVarsPasswordCB(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data) _CUPS_PRIVATE;
 extern int		_ippVarsSet(_ipp_vars_t *v, const char *name, const char *value) _CUPS_PRIVATE;
-
-
-/*
- * C++ magic...
- */
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_CUPS_IPP_H_ */
+#endif /* !_CUPS_IPP_PRIVATE_H_ */

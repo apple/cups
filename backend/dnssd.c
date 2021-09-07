@@ -441,7 +441,7 @@ main(int  argc,				/* I - Number of command-line args */
 	              			/* Users never see this */
 	    else
 	      count ++;
-#endif /* HAVE_AVAHI */
+#endif /* HAVE_DNSSD */
           }
 	}
 	else if (!device->sent)
@@ -1146,8 +1146,7 @@ query_callback(
       device->uuid = strdup(value);
   }
 
-  if (device->device_id)
-    free(device->device_id);
+  free(device->device_id);
 
   if (!device_id[0] && strcmp(model, "Unknown"))
   {
@@ -1216,8 +1215,7 @@ query_callback(
   else
     device->device_id = NULL;
 
-  if (device->make_and_model)
-    free(device->make_and_model);
+  free(device->make_and_model);
 
   if (make_and_model[0])
   {

@@ -7,6 +7,12 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_STATBUF_H_
+#define _SCHEDULER_STATBUF_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Constants...
@@ -36,3 +42,7 @@ extern void		cupsdStatBufDelete(cupsd_statbuf_t *sb);
 extern cupsd_statbuf_t	*cupsdStatBufNew(int fd, const char *prefix, ...);
 extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 			                    char *line, int linelen);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_STATBUF_H_*/

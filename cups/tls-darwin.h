@@ -10,6 +10,13 @@
 
 /**** This file is included from tls-darwin.c ****/
 
+#ifndef _CUPS_TLS_DARWIN_H_
+#  define _CUPS_TLS_DARWIN_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 extern char **environ;
 
 #ifndef _SECURITY_VERSION_GREATER_THAN_57610_
@@ -33,3 +40,9 @@ extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime 
 extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
 extern SecCertificateRef SecGenerateSelfSignedCertificate(CFArrayRef subject, CFDictionaryRef parameters, SecKeyRef publicKey, SecKeyRef privateKey);
 extern SecIdentityRef SecIdentityCreate(CFAllocatorRef allocator, SecCertificateRef certificate, SecKeyRef privateKey);
+
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_CUPS_TLS_DARWIN_H_ */

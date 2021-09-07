@@ -7,6 +7,12 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_POLICY_H_
+#define _SCHEDULER_POLICY_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Policy structure...
@@ -50,3 +56,9 @@ extern cups_array_t	*cupsdGetPrivateAttrs(cupsd_policy_t *p,
 			                      cupsd_client_t *con,
 					      cupsd_printer_t *printer,
 			                      const char *owner);
+
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_POLICY_H_*/

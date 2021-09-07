@@ -60,10 +60,7 @@ extern void	*ppdxReadData(ppd_file_t *ppd, const char *name,
 
 extern void	ppdxWriteData(const char *name, const void *data,
 			      size_t datasize);
-
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-
-#endif /* !_PPDX_H */
+#endif /* !_PPDX_H_*/

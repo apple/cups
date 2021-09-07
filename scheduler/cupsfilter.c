@@ -1433,8 +1433,7 @@ static void
 set_string(char       **s,		/* O - Copy of string */
            const char *val)		/* I - String to copy */
 {
-  if (*s)
-    free(*s);
+  free(*s);
 
   *s = strdup(val);
 }

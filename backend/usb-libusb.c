@@ -1045,7 +1045,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
               char          *buffer,	/* I - String buffer */
               size_t        bufsize)	/* I - Number of bytes in buffer */
 {
-  int	length;				/* Length of device ID */
+  size_t	length;				/* Length of device ID */
 
 
   if (libusb_control_transfer(printer->handle,
@@ -1064,7 +1064,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * bytes.  The 1284 spec says the length is stored MSB first...
   */
 
-  length = (int)((((unsigned)buffer[0] & 255) << 8) | ((unsigned)buffer[1] & 255));
+  length = (((unsigned)buffer[0] & 255) << 8) | ((unsigned)buffer[1] & 255);
 
  /*
   * Check to see if the length is larger than our buffer or less than 14 bytes
@@ -1075,7 +1075,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   */
 
   if (length > bufsize || length < 14)
-    length = (int)((((unsigned)buffer[1] & 255) << 8) | ((unsigned)buffer[0] & 255));
+    length = (((unsigned)buffer[1] & 255) << 8) | ((unsigned)buffer[0] & 255);
 
   if (length > bufsize)
     length = bufsize;
@@ -1097,7 +1097,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * nul-terminate.
   */
 
-  memmove(buffer, buffer + 2, (size_t)length);
+  memmove(buffer, buffer + 2, length);
   buffer[length] = '\0';
 
   return (0);

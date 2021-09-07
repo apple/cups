@@ -248,10 +248,10 @@ static int				/* O - Index or -1 if not found */
 find_env(const char *name)		/* I - Variable name */
 {
   int		i;			/* Looping var */
-  size_t	namelen;		/* Length of name */
+  const size_t	namelen = strlen(name);		/* Length of name */
 
 
-  for (i = 0, namelen = strlen(name); i < num_common_env; i ++)
+  for (i = 0; i < num_common_env; i ++)
     if (!strncmp(common_env[i], name, namelen) && common_env[i][namelen] == '=')
       return (i);
 

@@ -182,7 +182,7 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
                     end));
 
       if (!cupsArrayFind(a, start))
-        status &= cupsArrayAdd(a, start);
+        status = cupsArrayAdd(a, start);
     }
 
     free(buffer);

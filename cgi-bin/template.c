@@ -549,10 +549,10 @@ cgi_copy(FILE *out,			/* I - Output file */
 
 	        if (!regexec(&re, outptr, 10, matches, 0))
 		{
-		  int i;
+		  unsigned i;
 		  for (i = 0; i < 10; i ++)
 		  {
-		    fprintf(stderr, "DEBUG: matches[%d].rm_so=%d\n", i,
+		    fprintf(stderr, "DEBUG: matches[%u].rm_so=%d\n", i,
 		            (int)matches[i].rm_so);
 		    if (matches[i].rm_so < 0)
 		      break;

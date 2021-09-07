@@ -2206,7 +2206,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
             ipp_attribute_t *uri)	/* I - URI of printer */
 {
   http_status_t	status;			/* Policy status */
-  int		i;			/* Looping var */
+  int		i = 0;			/* Looping var */
   char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
@@ -2446,7 +2446,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                                  IPP_TAG_NAME);
     if (supported)
     {
-      for (i = 0; i < supported->num_values; i ++)
+      for (; i < supported->num_values; i ++)
         if (!strcmp(supported->values[i].string.text,
                     attr->values[0].string.text))
           break;
@@ -8372,14 +8372,15 @@ ppd_parse_line(const char *line,	/* I - Line */
   if (!*line)
     return (-1);
 
-  line ++;
-
  /*
   * Now grab the option choice, skipping leading whitespace...
   */
 
-  while (isspace(*line & 255))
+  do
+  {
     line ++;
+  }
+  while (isspace(*line & 255));
 
   for (clen --;
        *line > ' ' && *line < 0x7f && *line != ':' && *line != '/';
@@ -8442,7 +8443,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 #ifdef HAVE_LIBZ
         && strcmp(attr->values[0].string.text, "gzip")
 #endif /* HAVE_LIBZ */
-      )
+    )
     {
       send_ipp_status(con, IPP_ATTRIBUTES,
                       _("Unsupported compression \"%s\"."),

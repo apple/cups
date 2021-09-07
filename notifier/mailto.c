@@ -177,11 +177,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Free the memory used for this event...
     */
 
-    if (subject)
-      free(subject);
+    free(subject);
 
-    if (text)
-      free(text);
+    free(text);
 
     ippDelete(msg);
   }

@@ -7,6 +7,13 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_SUBSCRIPTIONS_H_
+#define _SCHEDULER_SUBSCRIPTIONS_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 /*
  * Event mask enumeration...
  */
@@ -153,3 +160,7 @@ extern void	cupsdExpireSubscriptions(cupsd_printer_t *dest,
 extern void	cupsdLoadAllSubscriptions(void);
 extern void	cupsdSaveAllSubscriptions(void);
 extern void	cupsdStopAllNotifiers(void);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_SUBSCRIPTIONS_H_*/

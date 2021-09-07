@@ -8,6 +8,12 @@
  * information.
  */
 
+#ifndef _SCHEDULER_CONF_H_
+#define _SCHEDULER_CONF_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Log levels...
@@ -286,3 +292,7 @@ extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);
 extern int	cupsdWriteErrorLog(int level, const char *message);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_CONF_H_*/

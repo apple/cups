@@ -82,5 +82,5 @@ ppdcGroup::find_option(const char *n)	// I - Name of option
     if (!_cups_strcasecmp(n, o->name->value))
       return (o);
 
-  return (0);
+  return (NULL);
 }

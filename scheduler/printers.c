@@ -811,8 +811,7 @@ cupsdDeletePrinter(
   * Free all memory used by the printer...
   */
 
-  if (p->printers != NULL)
-    free(p->printers);
+  free(p->printers);
 
   delete_printer_filters(p);
 

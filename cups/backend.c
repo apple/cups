@@ -11,8 +11,8 @@
  * Include necessary headers...
  */
 
-#include "cups-private.h"
 #include "backend.h"
+#include "cups-private.h"
 #include "ppd.h"
 
 
@@ -40,7 +40,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
   const char	*device_uri,		/* Device URI */
 		*auth_info_required;	/* AUTH_INFO_REQUIRED env var */
   _cups_globals_t *cg = _cupsGlobals();	/* Global info */
-  int		options;		/* Resolve options */
+  unsigned		options;		/* Resolve options */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
 

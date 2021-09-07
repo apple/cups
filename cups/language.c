@@ -140,7 +140,7 @@ static const char	*appleLangDefault(void);
 #      else
 #        define CF_RETURNS_RETAINED
 #      endif /* __has_feature(attribute_cf_returns_retained) */
-#    endif /* !CF_RETURNED_RETAINED */
+#    endif /* CF_RETURNS_RETAINED */
 static cups_array_t	*appleMessageLoad(const char *locale) CF_RETURNS_RETAINED;
 #  endif /* CUPS_BUNDLEDIR */
 #endif /* __APPLE__ */
@@ -1028,10 +1028,9 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 	    */
 
 	    free(m->msg);
-	    if (m->str)
-	      free(m->str);
+	    free(m->str);
 	    free(m);
-	  }
+    }
 	}
 
        /*
@@ -1059,8 +1058,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 
 	if ((temp = realloc(m->str ? m->str : m->msg, length + ptrlen + 1)) == NULL)
 	{
-	  if (m->str)
-	    free(m->str);
+	  free(m->str);
 	  free(m->msg);
 	  free(m);
 	  m = NULL;
@@ -1125,8 +1123,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 	*/
 
 	free(m->msg);
-	if (m->str)
-	  free(m->str);
+	free(m->str);
 	free(m);
       }
     }
@@ -1662,11 +1659,9 @@ cups_message_compare(
 static void
 cups_message_free(_cups_message_t *m)	/* I - Message */
 {
-  if (m->msg)
-    free(m->msg);
+  free(m->msg);
 
-  if (m->str)
-    free(m->str);
+  free(m->str);
 
   free(m);
 }
@@ -1816,9 +1811,11 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     if (*bufptr != '=')
       continue;
 
-    bufptr ++;
-    while (*bufptr && isspace(*bufptr & 255))
-      bufptr ++;
+    do
+    {
+      bufptr++;
+    }
+    while (*bufptr && isspace(*bufptr & 255));
 
     if (*bufptr != '\"')
       continue;
@@ -1856,11 +1853,9 @@ cups_read_strings(cups_file_t  *fp,	/* I - .strings file */
     }
     else
     {
-      if (m->msg)
-	free(m->msg);
+      free(m->msg);
 
-      if (m->str)
-	free(m->str);
+      free(m->str);
 
       free(m);
       break;

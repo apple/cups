@@ -8,6 +8,13 @@
  * information.
  */
 
+#ifndef _SCHEDULER_CLIENT_H_
+#define _SCHEDULER_CLIENT_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 #ifdef HAVE_AUTHORIZATION_H
 #  include <Security/Authorization.h>
 #endif /* HAVE_AUTHORIZATION_H */
@@ -141,3 +148,7 @@ extern void	cupsdWriteClient(cupsd_client_t *con);
 extern int	cupsdEndTLS(cupsd_client_t *con);
 extern int	cupsdStartTLS(cupsd_client_t *con);
 #endif /* HAVE_SSL */
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_CLIENT_H_*/

@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _FILTER_COMMON_H_
+#define _FILTER_COMMON_H_
+
 /*
  * Include necessary headers...
  */
@@ -14,7 +17,6 @@
 #include <cups/string-private.h>
 #include <cups/cups.h>
 #include <cups/ppd.h>
-#include <time.h>
 
 
 /*
@@ -24,6 +26,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+
+#include <time.h>
 
 
 /*
@@ -54,12 +59,7 @@ extern void	WriteLabelProlog(const char *label, float bottom,
 		                 float top, float width);
 extern void	WriteLabels(int orient);
 extern void	WriteTextComment(const char *name, const char *value);
-
-
-/*
- * C++ magic...
- */
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+#endif /* !_FILTER_COMMON_H_*/

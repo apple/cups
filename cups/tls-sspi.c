@@ -510,8 +510,7 @@ cleanup:
   if (storedContext)
     CertFreeCertificateContext(storedContext);
 
-  if (p)
-    free(p);
+  free(p);
 
   if (store)
     CertCloseStore(store, 0);
@@ -648,8 +647,7 @@ cleanup:
   if (storedContext)
     CertFreeCertificateContext(storedContext);
 
-  if (p)
-    free(p);
+  free(p);
 
   if (store)
     CertCloseStore(store, 0);
@@ -1822,8 +1820,7 @@ cleanup:
   if (storedContext)
     CertFreeCertificateContext(storedContext);
 
-  if (p)
-    free(p);
+  free(p);
 
   if (store)
     CertCloseStore(store, 0);
@@ -1848,14 +1845,11 @@ http_sspi_free(_http_sspi_t *sspi)	/* I - SSPI data */
   if (sspi->contextInitialized)
     DeleteSecurityContext(&sspi->context);
 
-  if (sspi->decryptBuffer)
-    free(sspi->decryptBuffer);
+  free(sspi->decryptBuffer);
 
-  if (sspi->readBuffer)
-    free(sspi->readBuffer);
+  free(sspi->readBuffer);
 
-  if (sspi->writeBuffer)
-    free(sspi->writeBuffer);
+  free(sspi->writeBuffer);
 
   if (sspi->localCert)
     CertFreeCertificateContext(sspi->localCert);
@@ -2044,8 +2038,7 @@ cleanup:
   if (storedContext)
     CertFreeCertificateContext(storedContext);
 
-  if (p)
-    free(p);
+  free(p);
 
   if (store)
     CertCloseStore(store, 0);

@@ -410,11 +410,11 @@ backendGetMakeModel(
     if (strlen(des) >= 8)
     {
       const char	*ptr;		/* Pointer into description */
-      int		letters,	/* Number of letters seen */
-			spaces;		/* Number of spaces seen */
+      unsigned		letters = 0,	/* Number of letters seen */
+			spaces = 0;		/* Number of spaces seen */
 
 
-      for (ptr = des, letters = 0, spaces = 0; *ptr; ptr ++)
+      for (ptr = des; *ptr; ptr ++)
       {
 	if (isspace(*ptr & 255))
 	  spaces ++;

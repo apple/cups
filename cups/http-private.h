@@ -12,6 +12,15 @@
 #  define _CUPS_HTTP_PRIVATE_H_
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
  * Include necessary headers...
  */
 
@@ -101,15 +110,6 @@ typedef int socklen_t;
 #      endif /* HAVE_SYS_SOCKIO_H */
 #    endif /* HAVE_GETIFADDRS */
 #  endif /* !_WIN32 */
-
-
-/*
- * C++ magic...
- */
-
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* __cplusplus */
 
 
 /*
@@ -330,7 +330,7 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize) _CUPS_PRIVATE;
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials) _CUPS_PRIVATE;
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size, int options,
+			                 size_t resolved_size, unsigned options,
 					 int (*cb)(void *context),
 					 void *context) _CUPS_PRIVATE;
 extern int		_httpSetDigestAuthString(http_t *http, const char *nonce, const char *method, const char *resource) _CUPS_PRIVATE;
@@ -344,14 +344,7 @@ extern void		_httpTLSStop(http_t *http) _CUPS_PRIVATE;
 extern int		_httpTLSWrite(http_t *http, const char *buf, int len) _CUPS_PRIVATE;
 extern int		_httpUpdate(http_t *http, http_status_t *status) _CUPS_PRIVATE;
 extern int		_httpWait(http_t *http, int msec, int usessl) _CUPS_PRIVATE;
-
-
-/*
- * C++ magic...
- */
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */

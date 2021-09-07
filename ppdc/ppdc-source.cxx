@@ -29,7 +29,7 @@
 // Class globals...
 //
 
-ppdcArray	*ppdcSource::includes = 0;
+ppdcArray	*ppdcSource::includes = NULL;
 const char	*ppdcSource::driver_types[] =
 		{
 		  "custom",
@@ -164,7 +164,7 @@ ppdcSource::find_include(
 
   // Range check input...
   if (!f || !*f || !n || nlen < 2)
-    return (0);
+    return (NULL);
 
   // Check the first character to see if we have <name> or "name"...
   if (*f == '<')
@@ -177,7 +177,7 @@ ppdcSource::find_include(
     {
       _cupsLangPrintf(stderr,
                       _("ppdc: Invalid #include/#po filename \"%s\"."), n);
-      return (0);
+      return (NULL);
     }
 
     *ptr = '\0';
@@ -196,7 +196,7 @@ ppdcSource::find_include(
     else if (*f == '/')
     {
       // Absolute path that doesn't exist...
-      return (0);
+      return (NULL);
     }
   }
 
@@ -222,7 +222,7 @@ ppdcSource::find_include(
   if (!access(n, 0))
     return (n);
   else
-    return (0);
+    return (NULL);
 }
 
 
@@ -304,7 +304,7 @@ ppdcSource::get_attr(ppdcFile *fp, 	// I - File to read
     _cupsLangPrintf(stderr,
                     _("ppdc: Expected name after %s on line %d of %s."),
 		    loc ? "LocAttribute" : "Attribute", fp->line, fp->filename);
-    return (0);
+    return (NULL);
   }
 
   if (!get_token(fp, selector, sizeof(selector)))
@@ -312,7 +312,7 @@ ppdcSource::get_attr(ppdcFile *fp, 	// I - File to read
     _cupsLangPrintf(stderr,
                     _("ppdc: Expected selector after %s on line %d of %s."),
 		    loc ? "LocAttribute" : "Attribute", fp->line, fp->filename);
-    return (0);
+    return (NULL);
   }
 
   if ((text = strchr(selector, '/')) != NULL)
@@ -323,7 +323,7 @@ ppdcSource::get_attr(ppdcFile *fp, 	// I - File to read
     _cupsLangPrintf(stderr,
                     _("ppdc: Expected value after %s on line %d of %s."),
 		    loc ? "LocAttribute" : "Attribute", fp->line, fp->filename);
-    return (0);
+    return (NULL);
   }
 
   return (new ppdcAttr(name, selector, text, value, loc));
@@ -1009,7 +1009,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
     _cupsLangPrintf(stderr,
                     _("ppdc: Expected name after Font on line %d of %s."),
 		    fp->line, fp->filename);
-    return (0);
+    return (NULL);
   }
 
   if (!strcmp(name, "*"))
@@ -1028,7 +1028,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
       _cupsLangPrintf(stderr,
                       _("ppdc: Expected encoding after Font on line %d of "
 		        "%s."), fp->line, fp->filename);
-      return (0);
+      return (NULL);
     }
 
     if (!get_token(fp, version, sizeof(version)))
@@ -1036,7 +1036,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
       _cupsLangPrintf(stderr,
                       _("ppdc: Expected version after Font on line %d of "
 		        "%s."), fp->line, fp->filename);
-      return (0);
+      return (NULL);
     }
 
     if (!get_token(fp, charset, sizeof(charset)))
@@ -1044,7 +1044,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
       _cupsLangPrintf(stderr,
                       _("ppdc: Expected charset after Font on line %d of "
 		        "%s."), fp->line, fp->filename);
-      return (0);
+      return (NULL);
     }
 
     if (!get_token(fp, temp, sizeof(temp)))
@@ -1052,7 +1052,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
       _cupsLangPrintf(stderr,
                       _("ppdc: Expected status after Font on line %d of %s."),
 		      fp->line, fp->filename);
-      return (0);
+      return (NULL);
     }
 
     if (!_cups_strcasecmp(temp, "ROM"))
@@ -1064,7 +1064,7 @@ ppdcSource::get_font(ppdcFile *fp)	// I - File to read
       _cupsLangPrintf(stderr,
                       _("ppdc: Bad status keyword %s on line %d of %s."),
 		      temp, fp->line, fp->filename);
-      return (0);
+      return (NULL);
     }
   }
 

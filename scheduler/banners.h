@@ -7,6 +7,13 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_BANNERS_H_
+#define _SCHEDULER_BANNERS_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 /*
  * Banner information structure...
  */
@@ -32,3 +39,7 @@ VAR cups_array_t	*Banners	VALUE(NULL);
 
 extern cupsd_banner_t	*cupsdFindBanner(const char *name);
 extern void		cupsdLoadBanners(const char *d);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_BANNERS_H_*/

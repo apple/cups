@@ -622,7 +622,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 	  free(temp);
 	}
       }
-      else if (temp)
+      else
 	free(temp);
 
       return (1);

@@ -7,6 +7,9 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_PRINTERS_H_
+#define _SCHEDULER_PRINTERS_H_
+
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #elif defined(HAVE_AVAHI)
@@ -17,6 +20,9 @@
 #endif /* HAVE_DNSSD */
 #include <cups/pwg-private.h>
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Quota data...
@@ -192,3 +198,9 @@ extern const char	*cupsdValidateDest(const char *uri,
 			        	   cups_ptype_t *dtype,
 					   cupsd_printer_t **printer);
 extern void		cupsdWritePrintcap(void);
+
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_PRINTERS_H_*/

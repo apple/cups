@@ -124,17 +124,15 @@ _cupsFileCheck(
 
   result = _CUPS_FILE_CHECK_OK;
 
-  switch (filetype)
+  if (filetype == _CUPS_FILE_CHECK_DIRECTORY)
   {
-    case _CUPS_FILE_CHECK_DIRECTORY :
-        if (!S_ISDIR(fileinfo.st_mode))
-	  result = _CUPS_FILE_CHECK_WRONG_TYPE;
-        break;
-
-    default :
-        if (!S_ISREG(fileinfo.st_mode))
-	  result = _CUPS_FILE_CHECK_WRONG_TYPE;
-        break;
+    if (!S_ISDIR(fileinfo.st_mode))
+      result = _CUPS_FILE_CHECK_WRONG_TYPE;
+  }
+  else
+  {
+    if (!S_ISREG(fileinfo.st_mode))
+      result = _CUPS_FILE_CHECK_WRONG_TYPE;
   }
 
   if (result)
@@ -452,8 +450,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   fd   = fp->fd;
   mode = fp->mode;
 
-  if (fp->printf_buffer)
-    free(fp->printf_buffer);
+  free(fp->printf_buffer);
 
   free(fp);
 
@@ -862,10 +859,9 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
                 char        *buf,	/* I - Buffer */
                 size_t      buflen)	/* I - Size of buffer */
 {
-  int		ch;			/* Character from file */
-  char		*ptr,			/* Current position in line buffer */
-		*end;			/* End of line buffer */
-
+  char ch,                              /* Character from file */
+      *ptr,                             /* Current position in line buffer */
+      *end;                             /* End of line buffer */
 
  /*
   * Range check input...
@@ -936,10 +932,9 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - String buffer */
 	     size_t      buflen)	/* I - Size of string buffer */
 {
-  int		ch;			/* Character from file */
-  char		*ptr,			/* Current position in line buffer */
-		*end;			/* End of line buffer */
-
+  char ch,                              /* Character from file */
+      *ptr,                             /* Current position in line buffer */
+      *end;                             /* End of line buffer */
 
  /*
   * Range check input...
@@ -995,7 +990,7 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
       break;
     }
     else
-      *ptr++ = (char)ch;
+      *ptr++ = ch;
   }
 
   *ptr = '\0';
@@ -2298,7 +2293,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  return (-1);
 	}
 
-	bytes = ((unsigned char)ptr[1] << 8) | (unsigned char)ptr[0];
+	bytes = (ptr[1] << 8) | ptr[0];
 	ptr   += 2 + bytes;
 
 	if (ptr > end)

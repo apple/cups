@@ -41,7 +41,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
 #endif /* HAVE_AVAHI */
   char			*buffer;	/* Pointer to buffer */
   size_t		bufsize;	/* Size of buffer */
-  int			options;	/* Options passed to _httpResolveURI */
+  unsigned			options;	/* Options passed to _httpResolveURI */
   const char		*resource;	/* Resource from URI */
   const char		*uuid;		/* UUID from URI */
 } _http_uribuf_t;
@@ -1110,15 +1110,15 @@ httpSeparateURI(
         * Skip IPvFuture ("vXXXX.") prefix...
         */
 
-        uri ++;
+       do
+       {
+         uri++;
+       } while (isxdigit(*uri & 255));
 
-        while (isxdigit(*uri & 255))
-          uri ++;
-
-        if (*uri != '.')
-        {
-	  *host = '\0';
-	  return (HTTP_URI_STATUS_BAD_HOSTNAME);
+       if (*uri != '.')
+       {
+         *host = '\0';
+         return (HTTP_URI_STATUS_BAD_HOSTNAME);
         }
 
         uri ++;
@@ -1355,7 +1355,7 @@ _httpSetDigestAuthString(
     * Follow RFC 2617/7616...
     */
 
-    int		i;			/* Looping var */
+    unsigned		i;			/* Looping var */
     char	cnonce[65];		/* cnonce value */
     const char	*hashalg;		/* Hashing algorithm */
 
@@ -1717,14 +1717,14 @@ _httpEncodeURI(char       *dst,		/* I - Destination buffer */
  * '_httpResolveURI()' - Resolve a DNS-SD URI.
  */
 
-const char *				/* O - Resolved URI */
+const char *				                    /* O - Resolved URI */
 _httpResolveURI(
-    const char *uri,			/* I - DNS-SD URI */
-    char       *resolved_uri,		/* I - Buffer for resolved URI */
-    size_t     resolved_size,		/* I - Size of URI buffer */
-    int        options,			/* I - Resolve options */
-    int        (*cb)(void *context),	/* I - Continue callback function */
-    void       *context)		/* I - Context pointer for callback */
+    const char *uri,			              /* I - DNS-SD URI */
+    char       *resolved_uri,		        /* I - Buffer for resolved URI */
+    size_t     resolved_size,		        /* I - Size of URI buffer */
+    unsigned   options,			            /* I - Resolve options */
+    int        (*cb)(void *context),	  /* I - Continue callback function */
+    void       *context)		            /* I - Context pointer for callback */
 {
   char			scheme[32],	/* URI components... */
 			userpass[256],

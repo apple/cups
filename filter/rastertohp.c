@@ -377,11 +377,9 @@ EndPage(void)
 
   free(Planes[0]);
 
-  if (BitBuffer)
-    free(BitBuffer);
+  free(BitBuffer);
 
-  if (CompBuffer)
-    free(CompBuffer);
+  free(CompBuffer);
 }
 
 

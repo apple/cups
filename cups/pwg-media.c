@@ -835,8 +835,8 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
 
   key.pwg = pwg;
   if ((size = (pwg_media_t *)cupsArrayFind(cg->pwg_size_lut, &key)) == NULL &&
-      (ptr = (char *)strchr(pwg, '_')) != NULL &&
-      (ptr = (char *)strchr(ptr + 1, '_')) != NULL)
+      (ptr = strchr(pwg, '_')) != NULL &&
+      (ptr = strchr(ptr + 1, '_')) != NULL)
   {
    /*
     * Try decoding the self-describing name of the form:

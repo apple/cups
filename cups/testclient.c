@@ -1000,7 +1000,7 @@ show_attributes(const char *title,      /* I - Title */
 static void
 show_capabilities(ipp_t *response)      /* I - Printer attributes */
 {
-  int                   i;              /* Looping var */
+  size_t                i;              /* Looping var */
   ipp_attribute_t       *attr;          /* Attribute */
   char                  buffer[1024];   /* Attribute value buffer */
   static const char * const pattrs[] =  /* Attributes we want to show */
@@ -1028,7 +1028,7 @@ show_capabilities(ipp_t *response)      /* I - Printer attributes */
 
 
   puts("CAPABILITIES:");
-  for (i = 0; i < (int)(sizeof(pattrs) / sizeof(pattrs[0])); i ++)
+  for (i = 0; i < (sizeof(pattrs) / sizeof(pattrs[0])); i ++)
   {
      if ((attr = ippFindAttribute(response, pattrs[i], IPP_TAG_ZERO)) != NULL)
      {

@@ -151,7 +151,6 @@ main(int  argc,				/* I - Number of command-line args */
 
 	    default :
 	        usage(opt);
-		break;
 	  }
       }
     }

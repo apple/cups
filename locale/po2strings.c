@@ -191,11 +191,8 @@ main(int  argc,				/* I - Number of command-line args */
             cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid, normalize_string((use_msgid || !*msgstr) ? msgid : msgstr, normalized, sizeof(normalized)));
 	}
 
-	if (msgid)
-	  free(msgid);
-
-	if (msgstr)
-	  free(msgstr);
+  free(msgid);
+  free(msgstr);
 
         msgid  = strdup(ptr);
 	msgstr = NULL;
@@ -214,8 +211,7 @@ main(int  argc,				/* I - Number of command-line args */
 			    length + ptrlen + 1)) == NULL)
 	{
 	  free(msgid);
-	  if (msgstr)
-	    free(msgstr);
+	  free(msgstr);
 	  perror("Unable to allocate string");
 	  return (1);
 	}
@@ -248,18 +244,17 @@ main(int  argc,				/* I - Number of command-line args */
       else if (!strncmp(s, "msgstr", 6) && msgid)
       {
        /*
-	* Set the string...
-	*/
+        * Set the string...
+        */
 
-        if (msgstr)
-          free(msgstr);
+        free(msgstr);
 
-	if ((msgstr = strdup(ptr)) == NULL)
-	{
-	  free(msgid);
-	  perror("Unable to allocate msgstr");
-	  return (1);
-	}
+        if ((msgstr = strdup(ptr)) == NULL)
+        {
+          free(msgid);
+          perror("Unable to allocate msgstr");
+          return (1);
+        }
       }
     }
   }
@@ -270,11 +265,8 @@ main(int  argc,				/* I - Number of command-line args */
       cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid, normalize_string((use_msgid || !*msgstr) ? msgid : msgstr, normalized, sizeof(normalized)));
   }
 
-  if (msgid)
-    free(msgid);
-
-  if (msgstr)
-    free(msgstr);
+  free(msgid);
+  free(msgstr);
 
   cupsFileClose(po);
   cupsFileClose(strings);

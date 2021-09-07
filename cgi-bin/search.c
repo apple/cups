@@ -110,10 +110,9 @@ cgiCompileSearch(const char *query)	/* I - Query string */
 	free(s);
 	free(re);
 
-	if (lword)
-          free(lword);
+	free(lword);
 
-	return (NULL);
+  return (NULL);
       }
     }
     else
@@ -178,13 +177,12 @@ cgiCompileSearch(const char *query)	/* I - Query string */
         temp = (char *)realloc(s, slen);
 	if (!temp)
 	{
-	  free(s);
-	  free(re);
+    free(s);
+    free(re);
 
-	  if (lword)
-            free(lword);
+    free(lword);
 
-	  return (NULL);
+    return (NULL);
 	}
 
         sptr = temp + (sptr - s);
@@ -253,10 +251,9 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       }
       else
       {
-	if (lword)
-          free(lword);
+        free(lword);
 
-	lword = strdup(sword);
+        lword = strdup(sword);
       }
 
       prefix = ".*|.*";
@@ -270,8 +267,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       qptr ++;
   }
 
-  if (lword)
-    free(lword);
+  free(lword);
 
   if (sptr > s)
     memcpy(sptr, ".*", 3);

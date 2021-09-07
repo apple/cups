@@ -367,11 +367,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
     }
 
-    if (subject)
-      free(subject);
+    free(subject);
 
-    if (text)
-      free(text);
+    free(text);
 
     ippDelete(event);
     event = NULL;
@@ -412,18 +410,14 @@ compare_rss(_cups_rss_t *a,		/* I - First message */
 static void
 delete_message(_cups_rss_t *msg)	/* I - RSS message */
 {
-  if (msg->subject)
-    free(msg->subject);
+  free(msg->subject);
 
-  if (msg->text)
-    free(msg->text);
+  free(msg->text);
 
-  if (msg->link_url)
-    free(msg->link_url);
+  free(msg->link_url);
 
   free(msg);
 }
-
 
 /*
  * 'load_rss()' - Load an existing RSS feed file.
@@ -479,14 +473,9 @@ load_rss(cups_array_t *rss,		/* I - RSS messages */
       }
       else
       {
-        if (subject)
-	  free(subject);
-
-	if (text)
-	  free(text);
-
-	if (link_url)
-	  free(link_url);
+        free(subject);
+        free(text);
+        free(link_url);
       }
 
       subject         = NULL;
@@ -538,14 +527,11 @@ load_rss(cups_array_t *rss,		/* I - RSS messages */
       sequence_number = atoi(start + 6);
   }
 
-  if (subject)
-    free(subject);
+  free(subject);
 
-  if (text)
-    free(text);
+  free(text);
 
-  if (link_url)
-    free(link_url);
+  free(link_url);
 
   fclose(fp);
 }

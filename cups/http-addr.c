@@ -157,7 +157,7 @@ int					/* O - Socket or -1 on error */
 httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
                int         port)	/* I - Port number to bind to */
 {
-  int		fd = -1,		/* Socket */
+  int		fd,		/* Socket */
 		val,			/* Socket value */
                 status;			/* Bind status */
 

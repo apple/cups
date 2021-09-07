@@ -11,6 +11,11 @@
 #ifndef _CUPS_LANGUAGE_PRIVATE_H_
 #  define _CUPS_LANGUAGE_PRIVATE_H_
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
 /*
  * Include necessary headers...
  */
@@ -21,10 +26,6 @@
 #  ifdef __APPLE__
 #    include <CoreFoundation/CoreFoundation.h>
 #  endif /* __APPLE__ */
-
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* __cplusplus */
 
 
 /*
@@ -76,10 +77,7 @@ extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m) _CUPS_PRIV
 extern cups_array_t	*_cupsMessageNew(void *context) _CUPS_PRIVATE;
 extern int		_cupsMessageSave(const char *filename, int flags, cups_array_t *a) _CUPS_PRIVATE;
 extern void		_cupsSetLocale(char *argv[]) _CUPS_PRIVATE;
-
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-
 #endif /* !_CUPS_LANGUAGE_PRIVATE_H_ */

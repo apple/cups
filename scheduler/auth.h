@@ -7,11 +7,24 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_AUTH_H_
+#  define _SCHEDULER_AUTH_H_
+
+
 /*
  * Include necessary headers...
  */
 
 #include <pwd.h>
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 
 /*
@@ -134,3 +147,7 @@ extern cupsd_location_t	*cupsdFindLocation(const char *location);
 extern void		cupsdFreeLocation(cupsd_location_t *loc);
 extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
 extern cupsd_location_t	*cupsdNewLocation(const char *location);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_AUTH_H_*/

@@ -112,10 +112,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     cupsFreeOptions(num_options, options);
   }
 
-  if (option)
-    free(option);
-  if (choice)
-    free(choice);
+  free(option);
+  free(choice);
 
   return (0);
 }

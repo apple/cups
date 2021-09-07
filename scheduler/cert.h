@@ -7,6 +7,13 @@
  * Licensed under Apache License v2.0.  See the file "LICENSE" for more information.
  */
 
+#ifndef _SCHEDULER_CERT_H_
+#define _SCHEDULER_CERT_H_
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
 /*
  * Certificate structure...
  */
@@ -40,3 +47,7 @@ extern void		cupsdDeleteCert(int pid);
 extern void		cupsdDeleteAllCerts(void);
 extern cupsd_cert_t	*cupsdFindCert(const char *certificate);
 extern void		cupsdInitCerts(void);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_CERT_H_*/

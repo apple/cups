@@ -2111,8 +2111,7 @@ delete_job(ippeve_job_t *job)		/* I - Job */
 
   ippDelete(job->attrs);
 
-  if (job->message)
-    free(job->message);
+  free(job->message);
 
   if (job->filename)
   {
@@ -2158,26 +2157,17 @@ delete_printer(ippeve_printer_t *printer)	/* I - Printer */
   avahi_threaded_poll_unlock(DNSSDMaster);
 #endif /* HAVE_DNSSD */
 
-  if (printer->dnssd_name)
-    free(printer->dnssd_name);
-  if (printer->name)
-    free(printer->name);
-  if (printer->icons[0])
-    free(printer->icons[0]);
-  if (printer->strings)
-    free(printer->strings);
-  if (printer->command)
-    free(printer->command);
-  if (printer->device_uri)
-    free(printer->device_uri);
+  free(printer->dnssd_name);
+  free(printer->name);
+  free(printer->icons[0]);
+  free(printer->strings);
+  free(printer->command);
+  free(printer->device_uri);
 #if !CUPS_LITE
-  if (printer->ppdfile)
-    free(printer->ppdfile);
+  free(printer->ppdfile);
 #endif /* !CUPS_LITE */
-  if (printer->directory)
-    free(printer->directory);
-  if (printer->hostname)
-    free(printer->hostname);
+  free(printer->directory);
+  free(printer->hostname);
 
   ippDelete(printer->attrs);
   cupsArrayDelete(printer->jobs);

@@ -7,20 +7,20 @@
  * information.
  */
 
+#ifndef _TOOLS_IPPEVECOMMON_H_
+#define _TOOLS_IPPEVECOMMON_H_
+
 /*
  * Include necessary headers...
  */
 
 #include <cups/cups.h>
 #include <cups/raster.h>
+#include <cups/string-private.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <cups/string-private.h>
-
-
-/*
- * Prototypes...
- */
+#endif /* !_TOOLS_IPPEVECOMMON_H_ */

@@ -16,8 +16,6 @@
  */
 
 #  include "http.h"
-#  include <stdarg.h>
-
 
 /*
  * C++ magic...
@@ -27,6 +25,7 @@
 extern "C" {
 #  endif /* __cplusplus */
 
+#  include <stdarg.h>
 
 /*
  * IPP version string...

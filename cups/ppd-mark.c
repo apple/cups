@@ -888,12 +888,11 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 	  case PPD_CUSTOM_PASSCODE :
 	  case PPD_CUSTOM_PASSWORD :
 	  case PPD_CUSTOM_STRING :
-	      if (cparam->current.custom_string)
-	        free(cparam->current.custom_string);
+        free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = strdup(choice + 7);
-	      break;
-	}
+        cparam->current.custom_string = strdup(choice + 7);
+        break;
+    }
       }
     }
 
@@ -968,11 +967,10 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 	  case PPD_CUSTOM_PASSCODE :
 	  case PPD_CUSTOM_PASSWORD :
 	  case PPD_CUSTOM_STRING :
-	      if (cparam->current.custom_string)
-		free(cparam->current.custom_string);
+        free(cparam->current.custom_string);
 
-	      cparam->current.custom_string = strdup(val->value);
-	      break;
+        cparam->current.custom_string = strdup(val->value);
+        break;
 	}
       }
 

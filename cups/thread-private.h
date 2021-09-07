@@ -10,14 +10,6 @@
 #  define _CUPS_THREAD_PRIVATE_H_
 
 /*
- * Include necessary headers...
- */
-
-#  include "config.h"
-#  include <cups/versioning.h>
-
-
-/*
  * C++ magic...
  */
 
@@ -25,6 +17,13 @@
 extern "C" {
 #  endif /* __cplusplus */
 
+
+/*
+ * Include necessary headers...
+ */
+
+#  include "config.h"
+#  include <cups/versioning.h>
 
 #  ifdef HAVE_PTHREAD_H			/* POSIX threading */
 #    include <pthread.h>
@@ -96,7 +95,6 @@ extern void	_cupsThreadCancel(_cups_thread_t thread) _CUPS_PRIVATE;
 extern _cups_thread_t _cupsThreadCreate(_cups_thread_func_t func, void *arg) _CUPS_PRIVATE;
 extern void     _cupsThreadDetach(_cups_thread_t thread) _CUPS_PRIVATE;
 extern void	*_cupsThreadWait(_cups_thread_t thread) _CUPS_PRIVATE;
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */

@@ -33,7 +33,7 @@ ppdcOption::ppdcOption(ppdcOptType    ot,	// I - Option type
   section   = s;
   order     = o;
   choices   = new ppdcArray();
-  defchoice = 0;
+  defchoice = NULL;
 }
 
 

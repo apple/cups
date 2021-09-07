@@ -246,8 +246,7 @@ _ippVarsSet(_ipp_vars_t *v,		/* I - IPP variables */
 
     snprintf(v->portstr, sizeof(v->portstr), "%d", v->port);
 
-    if (v->uri)
-      free(v->uri);
+    free(v->uri);
 
     httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), v->scheme, NULL, v->host, v->port, v->resource);
     v->uri = strdup(uri);

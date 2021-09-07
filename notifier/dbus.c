@@ -555,11 +555,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     dbus_message_unref(message);
 
-    if (printer_reasons)
-      free(printer_reasons);
+    free(printer_reasons);
 
-    if (job_reasons)
-      free(job_reasons);
+    free(job_reasons);
 
     ippDelete(msg);
   }

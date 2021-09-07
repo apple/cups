@@ -2254,7 +2254,7 @@ parse_text(const char *start,		/* I - Start of text value */
       * Copy escaped character...
       */
 
-      int	i;			/* Looping var */
+      unsigned	i;			/* Looping var */
 
 
       for (i = 1;

@@ -603,8 +603,7 @@ mime_delete_fcache(
   {
     free(current->name);
 
-    if (current->path)
-      free(current->path);
+    free(current->path);
 
     free(current);
   }

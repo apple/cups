@@ -100,7 +100,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 		int        outfile)	/* I - File to write to or -1 for none */
 {
   ipp_t		*response = NULL;	/* IPP response data */
-  size_t	length = 0;		/* Content-Length value */
+  size_t	length;		/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
   struct stat	fileinfo;		/* File information */
   ssize_t	bytes;			/* Number of bytes read/written */

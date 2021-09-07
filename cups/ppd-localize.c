@@ -579,7 +579,7 @@ _ppdHashName(const char *name)		/* I - Name to hash */
 
 
   for (mult = 1; *name && mult <= 128; mult ++, name ++)
-    hash += (*name & 255) * mult;
+    hash += *(unsigned char *)name * mult;
 
   return (hash);
 }

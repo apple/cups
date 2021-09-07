@@ -8,6 +8,8 @@
  * information.
  */
 
+#ifndef _SCHEDULER_CUPSD_H_
+#define _SCHEDULER_CUPSD_H_
 
 /*
  * Include necessary headers.
@@ -119,6 +121,9 @@ extern const char *cups_hstrerror(int);
 #include "network.h"
 #include "subscriptions.h"
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
 
 /*
  * Reload types...
@@ -220,3 +225,7 @@ extern void		cupsdStopSelect(void);
 /* server.c */
 extern void		cupsdStartServer(void);
 extern void		cupsdStopServer(void);
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
+#endif /* !_SCHEDULER_CUPSD_H_*/

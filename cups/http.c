@@ -351,8 +351,7 @@ httpClose(http_t *http)			/* I - HTTP connection */
 
   httpAddrFreeList(http->addrlist);
 
-  if (http->cookie)
-    free(http->cookie);
+  free(http->cookie);
 
 #ifdef HAVE_GSSAPI
   if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -716,7 +715,7 @@ httpFreeCredentials(
        credential = (http_credential_t *)cupsArrayNext(credentials))
   {
     cupsArrayRemove(credentials, credential);
-    free((void *)credential->data);
+    free(credential->data);
     free(credential);
   }
 
@@ -805,12 +804,12 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
 #ifdef HAVE_LIBZ
   if (http && http->fields[HTTP_FIELD_ACCEPT_ENCODING])
   {
-    int		i;			/* Looping var */
-    char	temp[HTTP_MAX_VALUE],	/* Copy of Accepts-Encoding value */
-		*start,			/* Start of coding value */
-		*end;			/* End of coding value */
-    double	qvalue;			/* "qvalue" for coding */
-    struct lconv *loc = localeconv();	/* Locale data */
+    size_t i;                           /* Looping var */
+    char temp[HTTP_MAX_VALUE],          /* Copy of Accepts-Encoding value */
+        *start,                         /* Start of coding value */
+        *end;                           /* End of coding value */
+    double qvalue;                      /* "qvalue" for coding */
+    struct lconv *loc = localeconv();   /* Locale data */
     static const char * const codings[] =
     {					/* Supported content codings */
       "deflate",
@@ -862,7 +861,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
       if (qvalue <= 0.0)
         continue;
 
-      for (i = 0; i < (int)(sizeof(codings) / sizeof(codings[0])); i ++)
+      for (i = 0; i < sizeof(codings) / sizeof(codings[0]); i ++)
         if (!strcmp(start, codings[i]))
           return (codings[i]);
     }
@@ -2537,8 +2536,7 @@ httpSetCookie(http_t     *http,		/* I - Connection */
   if (!http)
     return;
 
-  if (http->cookie)
-    free(http->cookie);
+  free(http->cookie);
 
   if (cookie)
     http->cookie = strdup(cookie);
@@ -2566,8 +2564,7 @@ httpSetDefaultField(http_t       *http,	/* I - HTTP connection */
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return;
 
-  if (http->default_fields[field])
-    free(http->default_fields[field]);
+  free(http->default_fields[field]);
 
   http->default_fields[field] = value ? strdup(value) : NULL;
 }

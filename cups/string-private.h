@@ -12,6 +12,15 @@
 #  define _CUPS_STRING_PRIVATE_H_
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
  * Include necessary headers...
  */
 
@@ -44,15 +53,6 @@
 /* Windows does not support the ssize_t type, so map it to long... */
 typedef long ssize_t;			/* @private@ */
 #  endif /* _WIN32 && !__CUPS_SSIZE_T_DEFINED */
-
-
-/*
- * C++ magic...
- */
-
-#  ifdef __cplusplus
-extern "C" {
-#  endif /* __cplusplus */
 
 
 /*
@@ -206,14 +206,7 @@ extern double	_cupsStrScand(const char *buf, char **bufptr,
  */
 
 extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval) _CUPS_PRIVATE;
-
-
-/*
- * C++ magic...
- */
-
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-
 #endif /* !_CUPS_STRING_H_ */

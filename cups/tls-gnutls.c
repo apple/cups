@@ -822,10 +822,13 @@ httpLoadCredentials(
 
     httpFreeCredentials(*credentials);
     *credentials = NULL;
+
+    free(data);
+
+    return (-1);
   }
 
-  if (data)
-    free(data);
+  free(data);
 
   return (*credentials ? 0 : -1);
 }
@@ -1058,8 +1061,7 @@ http_gnutls_load_crl(void)
 
       cupsFileClose(fp);
 
-      if (data)
-	free(data);
+      free(data);
     }
   }
 
